@@ -1,0 +1,37 @@
+<xpath>
+  <query>
+    <combineStep>
+      <root/>
+      <locationStep>
+        <axis name="child"/>
+        <nodeTest>
+          <nameTest name="test"/>
+        </nodeTest>
+        <predicates/>
+      </locationStep>
+    </combineStep>
+  </query>
+  <result>
+    <nodeSet length="1">
+      <element>
+        <test>
+          <?pi pidata?>
+          <alpha a="1" b="2">
+            <beta>
+              <gamma>text1</gamma>
+            </beta>
+            <beta name="foo">
+              <gamma>text2</gamma>
+              <delta><!--  comment  --></delta>
+            </beta>
+          </alpha>
+          <alpha c="3"><![CDATA[cdata]]></alpha>
+        </test>
+      </element>
+    </nodeSet>
+  </result>
+</xpath>
+parsing XML took 9 ms
+parsing XPath query took 0 ms
+evaluating XPath query took 0 ms
+total duration: 16 ms

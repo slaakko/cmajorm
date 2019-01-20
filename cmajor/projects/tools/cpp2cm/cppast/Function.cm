@@ -1,0 +1,123 @@
+using System;
+using System.Collections;
+using Span = System.Text.Parsing.Span;
+
+namespace cppast
+{
+    public bool IsFunctionDeclaratorNode(Node* node)
+    {
+        return node is FunctionDeclaratorNode*;
+    }
+    
+    public class FunctionNode : Node
+    {
+        public nothrow FunctionNode(const Span& span_, Specifiers specifiers_, Node* returnTypeExpr_, Node* declarator_, CompoundStatementNode* body_) :
+            base(span_), specifiers(specifiers_), returnTypeExpr(returnTypeExpr_), declarator(declarator_), body(body_)
+        {
+            if (!returnTypeExpr.IsNull())
+            {
+                returnTypeExpr->parent = this;
+            }
+            declarator->parent = this;
+            if (!body.IsNull())
+            {
+                body->parent = this;
+            }
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public Specifiers specifiers;
+        public UniquePtr<Node> returnTypeExpr;
+        public UniquePtr<Node> declarator;
+        public UniquePtr<CompoundStatementNode> body;
+    }
+    
+    public class FunctionDeclaratorNode : Node
+    {
+        public nothrow FunctionDeclaratorNode(const Span& span_, Node* idExpr_, ParameterListNode* parameters_, CVSpecifiers cvSpecifiers_) : 
+            base(span_), idExpr(idExpr_), parameters(parameters_), cvSpecifiers(cvSpecifiers_)
+        {
+            idExpr->parent = this;
+            parameters->parent = this;
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public UniquePtr<Node> idExpr;
+        public UniquePtr<ParameterListNode> parameters;
+        public CVSpecifiers cvSpecifiers;
+    }
+    
+    public class ParameterNode : Node
+    {
+        public nothrow ParameterNode(const Span& span_, Node* typeExpr_, Node* name_) : base(span_), typeExpr(typeExpr_), name(name_)
+        {
+            typeExpr->parent = this;
+            if (!name.IsNull())
+            {
+                name->parent = this;
+            }
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public UniquePtr<Node> typeExpr;
+        public UniquePtr<Node> name;
+    }
+    
+    public class ParameterListNode : CompositeNode<ParameterNode>
+    {
+        public nothrow ParameterListNode(const Span& span_) : base(span_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+    }
+    
+    internal class FunctionGroupNameComputer : Visitor
+    {
+        public nothrow FunctionGroupNameComputer(const ustring& parentClassName_) : functionGroupName(u"@function_group_name"), parentClassName(parentClassName_)
+        {
+        }
+        public override void Visit(IdentifierNode& identifierNode)
+        {
+            functionGroupName = identifierNode.str;
+            if (functionGroupName == parentClassName)
+            {
+                functionGroupName = u"@constructor";
+            }
+        }
+        public override void Visit(TemplateIdNode& templateId)
+        {
+            templateId.id->Accept(*this);
+        }
+        public override void Visit(OperatorFunctionIdNode& operatorFunctionIdNode)
+        {
+            functionGroupName = u"@operator_" + OpName(operatorFunctionIdNode.op);
+        }
+        public override void Visit(ConversionFunctionIdNode& conversionFunctionIdNode)
+        {
+            functionGroupName = u"@operator_conv";
+        }
+        public override void Visit(DestructorIdNode& destructorIdNode)
+        {
+            functionGroupName = u"@destructor";
+        }
+        private ustring parentClassName;
+        public ustring functionGroupName;
+    }
+    
+    public ustring MakeFunctionGroupName(Node* node, const ustring& parentClassName)
+    {
+        FunctionGroupNameComputer computer(parentClassName);
+        node->Accept(computer);
+        return Rvalue(computer.functionGroupName);
+    }
+    
+}

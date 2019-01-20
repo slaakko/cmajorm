@@ -1,0 +1,20 @@
+// =================================
+// Copyright (c) 2019 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+
+namespace System.Text.Parsing.CodeDom
+{
+    public class Literal : DomObject
+    {
+        public nothrow Literal(const ustring& text) : base(text)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+    }
+}

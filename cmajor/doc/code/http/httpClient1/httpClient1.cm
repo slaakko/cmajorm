@@ -1,0 +1,32 @@
+using System;
+using System.Net.Http;
+using System.IO;
+using System.Xml;
+
+int main()
+{
+    try
+    {
+        HttpClient httpClient(UriReference(u"http://www.w3.org/"), &Console.Out());
+        HttpHeaderCollection responseHeaders;
+        SharedPtr<ByteStream> body;
+        UriReference uri = u"/2001/xml.xsd";
+        HttpStatus status = httpClient.Get(uri, responseHeaders, body);
+        if (status.StatusCode() == statusSuccessOK)
+        {
+            StreamReader reader(body);
+            string xmlContent = reader.ReadToEnd();
+            Console.Out() << xmlContent << endl();
+        }
+        else
+        {
+            throw HttpException(status);
+        }
+    }
+    catch (const Exception& ex)
+    {
+        Console.Error() << ex.ToString() << endl();
+        return 1;
+    }
+    return 0;
+}

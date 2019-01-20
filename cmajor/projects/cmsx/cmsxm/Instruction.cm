@@ -1,0 +1,4688 @@
+using System;
+
+namespace cmsx.machine
+{
+    public class Formatter
+    {
+        public nothrow Formatter() : targetAddrReg(-1), targetAddress(cast<ulong>(-1))
+        {
+        }
+        public default virtual ~Formatter();
+        public virtual string FormatRegisterNumber(byte x)
+        {
+            return "$" + ToString(x);
+        }
+        public virtual string GetLabel(ulong address) 
+        {
+            return string();
+        }
+        public virtual string FormatTrap(byte y)
+        {
+            return ToString(y);
+        }
+        public virtual string FormatShortOffset(ulong address, byte y, byte z, bool forward)
+        {
+            ulong to = address;
+            ulong offset = (cast<ulong>(y) << 8u) | cast<ulong>(z);
+            if (forward)
+            {
+                to = to + (offset << 2u);
+            }
+            else
+            {
+                to = to - (offset << 2u);
+            }
+            string label = GetLabel(to);
+            if (label.IsEmpty())
+            {
+                return "#" + ToHexString(y) + ToHexString(z);
+            }
+            else
+            {
+                return label;
+            }
+        }
+        public virtual string FormatLongOffset(ulong address, byte x, byte y, byte z, bool forward)
+        {
+            ulong to = address;
+            ulong offset = (cast<ulong>(x) << 16u) | (cast<ulong>(y) << 8u) | cast<ulong>(z);
+            if (forward)
+            {
+                to = to + (offset << 2u);
+            }
+            else
+            {
+                to = to - (offset << 2u);
+            }
+            string label = GetLabel(to);
+            if (label.IsEmpty())
+            {
+                return "#" + ToHexString(x) + ToHexString(y) + ToHexString(z);
+            }
+            else
+            {
+                return label;
+            }
+        }
+        public virtual string FormatYZWyde(byte y, byte z)
+        {
+            return "#" + ToHexString(y) + ToHexString(z);
+        }
+        public void SaveTargetAddress(byte opCode, byte x, byte y, byte z)
+        {
+            switch (opCode)
+            {
+                case SETH:
+                {
+                    targetAddrReg = x;
+                    targetAddress = (cast<ulong>(y) << 8u) | cast<ulong>(z);
+                    break;
+                }
+                case ORMH: case ORML: case ORL:
+                {
+                    if (targetAddress != cast<ulong>(-1) && x == targetAddrReg)
+                    {
+                        targetAddress = (targetAddress << 16u) | (cast<ulong>(y) << 8u) | cast<ulong>(z);
+                    }
+                    else
+                    {
+                        targetAddrReg = -1;
+                        targetAddress = cast<ulong>(-1);
+                    }
+                    break;
+                }
+                default:
+                {
+                    targetAddrReg = -1;
+                    targetAddress = cast<ulong>(-1);
+                    break;
+                }
+            }
+        }
+        public ulong GetTargetAddress(byte y) const
+        {
+            if (targetAddrReg == y)
+            {
+                return targetAddress;
+            }
+            else
+            {
+                return cast<ulong>(-1);
+            }
+        }
+        private int targetAddrReg;
+        private ulong targetAddress;
+    }
+
+    public class Instruction
+    {
+        public nothrow Instruction(byte opCode_) : opCode(opCode_)
+        {
+        }
+        public default virtual ~Instruction();
+        public virtual void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            Panic("instruction " + GetOpCodeName(opCode) + " not implemented");
+        }
+        public virtual string FormatParams(ulong address, byte x, byte y, byte z, Formatter& formatter)
+        {
+            string result;
+            result.Append(formatter.FormatRegisterNumber(x));
+            result.Append(',');
+            if (IsJumpInst() && !IsGoInst())
+            {
+                result.Append(formatter.FormatShortOffset(address, y, z, IsForwardInst()));
+            }
+            else if (IsWydeImmediateInst())
+            {
+                result.Append(formatter.FormatYZWyde(y, z));
+            }
+            else
+            {
+                result.Append(formatter.FormatRegisterNumber(y));
+                result.Append(',');
+                if (IsZReg())
+                {
+                    result.Append(formatter.FormatRegisterNumber(z));
+                }
+                else
+                {
+                    result.Append(ToString(z));
+                }
+            }
+            return result;
+        }
+        public virtual string Format(ulong address, byte x, byte y, byte z, Formatter& formatter)
+        {
+            string result = "#" + ToHexString(address);
+            result.Append(' ');
+            result.Append(ToHexString(opCode));
+            result.Append(' ');
+            result.Append(ToHexString(x));
+            result.Append(' ');
+            result.Append(ToHexString(y));
+            result.Append(' ');
+            result.Append(ToHexString(z));
+            result.Append(' ');
+            string label = formatter.GetLabel(address);
+            result.Append(Format(label, 32));
+            result.Append(' ');
+            int n = OpCodeMap.Instance().MaxOpCodeNameLength();
+            result.Append(Format(OpCodeMap.Instance().GetName(opCode), n));
+            result.Append(' ');
+            result.Append(FormatParams(address, x, y, z, formatter));
+            if (IsAbsoluteAddressInst())
+            {
+                ulong targetAddress = formatter.GetTargetAddress(y);
+                if (targetAddress != cast<ulong>(-1))
+                {
+                    string targetLabel = formatter.GetLabel(targetAddress);
+                    if (!targetLabel.IsEmpty())
+                    {
+                        result.Append(':').Append(targetLabel);
+                    }
+                }
+            }
+            formatter.SaveTargetAddress(opCode, x, y, z);
+            return result;
+        }
+        public nothrow virtual bool IsJumpInst() const
+        {
+            return false;
+        }
+        public nothrow virtual bool IsGoInst() const
+        {
+            return false;
+        }
+        public nothrow virtual bool IsForwardInst() const
+        {
+            return true;
+        }
+        public nothrow virtual bool IsZReg() const
+        {
+            return true;
+        }
+        public nothrow virtual bool IsWydeImmediateInst() const
+        {
+            return false;
+        }
+        public nothrow virtual bool IsAbsoluteAddressInst() const
+        {
+            return false;
+        }
+        public byte opCode;
+    }
+
+    public class Trap : Instruction
+    {
+        public nothrow Trap() : base(TRAP)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong trap = (cast<ulong>(x) << 16u) | (cast<ulong>(y) << 8u) | cast<ulong>(z);
+            regs.SetSpecial(Registers.rX, trap);
+            regs.SetSpecial(Registers.rQ, regs.GetSpecial(Registers.rQ) | SOFTWARE_INTERRUPT_BIT);
+        }
+        public override string FormatParams(ulong address, byte x, byte y, byte z, Formatter& formatter)
+        {
+            string result = ToString(x);
+            result.Append(',');
+            result.Append(formatter.FormatTrap(y));
+            result.Append(',');
+            result.Append(ToString(z));
+            return result;
+        }
+    }
+
+    public class Swym : Instruction
+    {
+        public nothrow Swym() : base(SWYM)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+        }
+        public override string FormatParams(ulong address, byte x, byte y, byte z, Formatter& formatter)
+        {
+            return string();
+        }
+    }
+
+    public class Ldb : Instruction
+    {
+        public nothrow Ldb() : base(LDB)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong yy = regs.Get(y);
+            ulong zz = regs.Get(z);
+            ulong a = yy + zz;
+            byte b = mem.ReadByte(a, Protection.read);
+            ulong xx = SignExtend(b);
+            regs.Set(x, xx);
+        }
+        public nothrow override bool IsAbsoluteAddressInst() const
+        {
+            return true;
+        }
+    }
+
+    public class Ldbi : Instruction
+    {
+        public nothrow Ldbi() : base(LDBI)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong yy = regs.Get(y);
+            ulong zz = z;
+            ulong a = yy + zz;
+            byte b = mem.ReadByte(a, Protection.read);
+            ulong xx = SignExtend(b);
+            regs.Set(x, xx);
+        }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
+        }
+        public nothrow override bool IsAbsoluteAddressInst() const
+        {
+            return true;
+        }
+    }
+
+    public class Ldw : Instruction
+    {
+        public nothrow Ldw() : base(LDW)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong yy = regs.Get(y);
+            ulong zz = regs.Get(z);
+            ulong a = yy + zz;
+            ushort w = mem.ReadUShort(a, Protection.read);
+            ulong xx = SignExtend(w);
+            regs.Set(x, xx);
+        }
+        public nothrow override bool IsAbsoluteAddressInst() const
+        {
+            return true;
+        }
+    }
+
+    public class Ldwi : Instruction
+    {
+        public nothrow Ldwi() : base(LDWI)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong yy = regs.Get(y);
+            ulong zz = z;
+            ulong a = yy + zz;
+            ushort w = mem.ReadUShort(a, Protection.read);
+            ulong xx = SignExtend(w);
+            regs.Set(x, xx);
+        }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
+        }
+        public nothrow override bool IsAbsoluteAddressInst() const
+        {
+            return true;
+        }
+    }
+
+    public class Ldt : Instruction
+    {
+        public nothrow Ldt() : base(LDT)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong yy = regs.Get(y);
+            ulong zz = regs.Get(z);
+            ulong a = yy + zz;
+            uint u = mem.ReadUInt(a, Protection.read);
+            ulong xx = SignExtend(u);
+            regs.Set(x, xx);
+        }
+        public nothrow override bool IsAbsoluteAddressInst() const
+        {
+            return true;
+        }
+    }
+
+    public class Ldti : Instruction
+    {
+        public nothrow Ldti() : base(LDTI)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong yy = regs.Get(y);
+            ulong zz = z;
+            ulong a = yy + zz;
+            uint u = mem.ReadUInt(a, Protection.read);
+            ulong xx = SignExtend(u);
+            regs.Set(x, xx);
+        }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
+        }
+        public nothrow override bool IsAbsoluteAddressInst() const
+        {
+            return true;
+        }
+    }
+
+    public class Ldo : Instruction
+    {
+        public nothrow Ldo() : base(LDO)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong yy = regs.Get(y);
+            ulong zz = regs.Get(z);
+            ulong a = yy + zz;
+            ulong xx = mem.ReadULong(a, Protection.read);
+            regs.Set(x, xx);
+        }
+        public nothrow override bool IsAbsoluteAddressInst() const
+        {
+            return true;
+        }
+    }
+
+    public class Ldoi : Instruction
+    {
+        public nothrow Ldoi() : base(LDOI)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong yy = regs.Get(y);
+            ulong zz = z;
+            ulong a = yy + zz;
+            ulong xx = mem.ReadULong(a, Protection.read);
+            regs.Set(x, xx);
+        }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
+        }
+        public nothrow override bool IsAbsoluteAddressInst() const
+        {
+            return true;
+        }
+    }
+
+    public class Ldbu : Instruction
+    {
+        public nothrow Ldbu() : base(LDBU)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong yy = regs.Get(y);
+            ulong zz = regs.Get(z);
+            ulong a = yy + zz;
+            byte b = mem.ReadByte(a, Protection.read);
+            ulong xx = b;
+            regs.Set(x, xx);
+        }
+        public nothrow override bool IsAbsoluteAddressInst() const
+        {
+            return true;
+        }
+    }
+
+    public class Ldbui : Instruction
+    {
+        public nothrow Ldbui() : base(LDBUI)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong yy = regs.Get(y);
+            ulong zz = z;
+            ulong a = yy + zz;
+            byte b = mem.ReadByte(a, Protection.read);
+            ulong xx = b;
+            regs.Set(x, xx);
+        }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
+        }
+        public nothrow override bool IsAbsoluteAddressInst() const
+        {
+            return true;
+        }
+    }
+
+    public class Ldwu : Instruction
+    {
+        public nothrow Ldwu() : base(LDWU)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong yy = regs.Get(y);
+            ulong zz = regs.Get(z);
+            ulong a = yy + zz;
+            ushort w = mem.ReadUShort(a, Protection.read);
+            ulong xx = w;
+            regs.Set(x, xx);
+        }
+        public nothrow override bool IsAbsoluteAddressInst() const
+        {
+            return true;
+        }
+    }
+
+    public class Ldwui : Instruction
+    {
+        public nothrow Ldwui() : base(LDWUI)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong yy = regs.Get(y);
+            ulong zz = z;
+            ulong a = yy + zz;
+            ushort w = mem.ReadUShort(a, Protection.read);
+            ulong xx = w;
+            regs.Set(x, xx);
+        }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
+        }
+        public nothrow override bool IsAbsoluteAddressInst() const
+        {
+            return true;
+        }
+    }
+
+    public class Ldtu : Instruction
+    {
+        public nothrow Ldtu() : base(LDTU)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong yy = regs.Get(y);
+            ulong zz = regs.Get(z);
+            ulong a = yy + zz;
+            uint u = mem.ReadUInt(a, Protection.read);
+            ulong xx = u;
+            regs.Set(x, xx);
+        }
+        public nothrow override bool IsAbsoluteAddressInst() const
+        {
+            return true;
+        }
+    }
+
+    public class Ldtui : Instruction
+    {
+        public nothrow Ldtui() : base(LDTUI)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong yy = regs.Get(y);
+            ulong zz = z;
+            ulong a = yy + zz;
+            uint u = mem.ReadUInt(a, Protection.read);
+            ulong xx = u;
+            regs.Set(x, xx);
+        }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
+        }
+        public nothrow override bool IsAbsoluteAddressInst() const
+        {
+            return true;
+        }
+    }
+
+    public class Ldou : Instruction
+    {
+        public nothrow Ldou() : base(LDOU)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong yy = regs.Get(y);
+            ulong zz = regs.Get(z);
+            ulong a = yy + zz;
+            ulong xx = mem.ReadULong(a, Protection.read);
+            regs.Set(x, xx);
+        }
+        public nothrow override bool IsAbsoluteAddressInst() const
+        {
+            return true;
+        }
+    }
+
+    public class Ldoui : Instruction
+    {
+        public nothrow Ldoui() : base(LDOUI)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong yy = regs.Get(y);
+            ulong zz = z;
+            ulong a = yy + zz;
+            ulong xx = mem.ReadULong(a, Protection.read);
+            regs.Set(x, xx);
+        }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
+        }
+        public nothrow override bool IsAbsoluteAddressInst() const
+        {
+            return true;
+        }
+    }
+
+    public class Ldht : Instruction
+    {
+        public nothrow Ldht() : base(LDHT)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong yy = regs.Get(y);
+            ulong zz = regs.Get(z);
+            ulong a = yy + zz;
+            uint u = mem.ReadUInt(a, Protection.read);
+            ulong xx = cast<ulong>(u) << 32u;
+            regs.Set(x, xx);
+        }
+        public nothrow override bool IsAbsoluteAddressInst() const
+        {
+            return true;
+        }
+    }
+
+    public class Ldhti : Instruction
+    {
+        public nothrow Ldhti() : base(LDHTI)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong yy = regs.Get(y);
+            ulong zz = z;
+            ulong a = yy + zz;
+            uint u = mem.ReadUInt(a, Protection.read);
+            ulong xx = cast<ulong>(u) << 32u;
+            regs.Set(x, xx);
+        }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
+        }
+        public nothrow override bool IsAbsoluteAddressInst() const
+        {
+            return true;
+        }
+    }
+
+    public class Stb : Instruction
+    {
+        public nothrow Stb() : base(STB)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong yy = regs.Get(y);
+            ulong zz = regs.Get(z);
+            ulong a = yy + zz;
+            byte b = cast<byte>(regs.Get(x) & 0xFFu);
+            mem.WriteByte(a, b, Protection.write);
+        }
+        public nothrow override bool IsAbsoluteAddressInst() const
+        {
+            return true;
+        }
+    }
+
+    public class Stbi : Instruction
+    {
+        public nothrow Stbi() : base(STBI)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong yy = regs.Get(y);
+            ulong zz = z;
+            ulong a = yy + zz;
+            byte b = cast<byte>(regs.Get(x) & 0xFFu);
+            mem.WriteByte(a, b, Protection.write);
+        }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
+        }
+        public nothrow override bool IsAbsoluteAddressInst() const
+        {
+            return true;
+        }
+    }
+
+    public class Stw : Instruction
+    {
+        public nothrow Stw() : base(STW)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong yy = regs.Get(y);
+            ulong zz = regs.Get(z);
+            ulong a = yy + zz;
+            ushort u = cast<ushort>(regs.Get(x) & 0xFFFFu);
+            mem.WriteUShort(a, u, Protection.write);
+        }
+        public nothrow override bool IsAbsoluteAddressInst() const
+        {
+            return true;
+        }
+    }
+
+    public class Stwi : Instruction
+    {
+        public nothrow Stwi() : base(STWI)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong yy = regs.Get(y);
+            ulong zz = z;
+            ulong a = yy + zz;
+            ushort u = cast<ushort>(regs.Get(x) & 0xFFFFu);
+            mem.WriteUShort(a, u, Protection.write);
+        }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
+        }
+        public nothrow override bool IsAbsoluteAddressInst() const
+        {
+            return true;
+        }
+    }
+
+    public class Stt : Instruction
+    {
+        public nothrow Stt() : base(STT)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong yy = regs.Get(y);
+            ulong zz = regs.Get(z);
+            ulong a = yy + zz;
+            uint u = cast<uint>(regs.Get(x) & 0xFFFFFFFFu);
+            mem.WriteUInt(a, u, Protection.write);
+        }
+        public nothrow override bool IsAbsoluteAddressInst() const
+        {
+            return true;
+        }
+    }
+
+    public class Stti : Instruction
+    {
+        public nothrow Stti() : base(STTI)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong yy = regs.Get(y);
+            ulong zz = z;
+            ulong a = yy + zz;
+            uint u = cast<uint>(regs.Get(x) & 0xFFFFFFFFu);
+            mem.WriteUInt(a, u, Protection.write);
+        }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
+        }
+        public nothrow override bool IsAbsoluteAddressInst() const
+        {
+            return true;
+        }
+    }
+
+    public class Sto : Instruction
+    {
+        public nothrow Sto() : base(STO)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong yy = regs.Get(y);
+            ulong zz = regs.Get(z);
+            ulong a = yy + zz;
+            ulong u = regs.Get(x);
+            mem.WriteULong(a, u, Protection.write);
+        }
+        public nothrow override bool IsAbsoluteAddressInst() const
+        {
+            return true;
+        }
+    }
+
+    public class Stoi : Instruction
+    {
+        public nothrow Stoi() : base(STOI)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong yy = regs.Get(y);
+            ulong zz = z;
+            ulong a = yy + zz;
+            ulong u = regs.Get(x);
+            mem.WriteULong(a, u, Protection.write);
+        }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
+        }
+        public nothrow override bool IsAbsoluteAddressInst() const
+        {
+            return true;
+        }
+    }
+
+    public class Stbu : Instruction
+    {
+        public nothrow Stbu() : base(STBU)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong yy = regs.Get(y);
+            ulong zz = regs.Get(z);
+            ulong a = yy + zz;
+            byte b = cast<byte>(regs.Get(x) & 0xFFu);
+            mem.WriteByte(a, b, Protection.write);
+        }
+        public nothrow override bool IsAbsoluteAddressInst() const
+        {
+            return true;
+        }
+    }
+
+    public class Stbui : Instruction
+    {
+        public nothrow Stbui() : base(STBUI)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong yy = regs.Get(y);
+            ulong zz = z;
+            ulong a = yy + zz;
+            byte b = cast<byte>(regs.Get(x) & 0xFFu);
+            mem.WriteByte(a, b, Protection.write);
+        }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
+        }
+        public nothrow override bool IsAbsoluteAddressInst() const
+        {
+            return true;
+        }
+    }
+
+    public class Stwu : Instruction
+    {
+        public nothrow Stwu() : base(STWU)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong yy = regs.Get(y);
+            ulong zz = regs.Get(z);
+            ulong a = yy + zz;
+            ushort u = cast<ushort>(regs.Get(x) & 0xFFFFu);
+            mem.WriteUShort(a, u, Protection.write);
+        }
+        public nothrow override bool IsAbsoluteAddressInst() const
+        {
+            return true;
+        }
+    }
+
+    public class Stwui : Instruction
+    {
+        public nothrow Stwui() : base(STWUI)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong yy = regs.Get(y);
+            ulong zz = z;
+            ulong a = yy + zz;
+            ushort u = cast<ushort>(regs.Get(x) & 0xFFFFu);
+            mem.WriteUShort(a, u, Protection.write);
+        }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
+        }
+        public nothrow override bool IsAbsoluteAddressInst() const
+        {
+            return true;
+        }
+    }
+
+    public class Sttu : Instruction
+    {
+        public nothrow Sttu() : base(STTU)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong yy = regs.Get(y);
+            ulong zz = regs.Get(z);
+            ulong a = yy + zz;
+            uint u = cast<uint>(regs.Get(x) & 0xFFFFFFFFu);
+            mem.WriteUInt(a, u, Protection.write);
+        }
+        public nothrow override bool IsAbsoluteAddressInst() const
+        {
+            return true;
+        }
+    }
+
+    public class Sttui : Instruction
+    {
+        public nothrow Sttui() : base(STTUI)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong yy = regs.Get(y);
+            ulong zz = z;
+            ulong a = yy + zz;
+            uint u = cast<uint>(regs.Get(x) & 0xFFFFFFFFu);
+            mem.WriteUInt(a, u, Protection.write);
+        }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
+        }
+        public nothrow override bool IsAbsoluteAddressInst() const
+        {
+            return true;
+        }
+    }
+
+    public class Stou : Instruction
+    {
+        public nothrow Stou() : base(STOU)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong yy = regs.Get(y);
+            ulong zz = regs.Get(z);
+            ulong a = yy + zz;
+            ulong u = regs.Get(x);
+            mem.WriteULong(a, u, Protection.write);
+        }
+        public nothrow override bool IsAbsoluteAddressInst() const
+        {
+            return true;
+        }
+    }
+
+    public class Stoui : Instruction
+    {
+        public nothrow Stoui() : base(STOUI)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong yy = regs.Get(y);
+            ulong zz = z;
+            ulong a = yy + zz;
+            ulong u = regs.Get(x);
+            mem.WriteULong(a, u, Protection.write);
+        }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
+        }
+        public nothrow override bool IsAbsoluteAddressInst() const
+        {
+            return true;
+        }
+    }
+
+    public class Stht : Instruction
+    {
+        public nothrow Stht() : base(STHT)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong yy = regs.Get(y);
+            ulong zz = regs.Get(z);
+            ulong a = yy + zz;
+            uint u = cast<uint>(regs.Get(x) >> 32u);
+            mem.WriteUInt(a, u, Protection.write);
+        }
+        public nothrow override bool IsAbsoluteAddressInst() const
+        {
+            return true;
+        }
+    }
+
+    public class Sthti : Instruction
+    {
+        public nothrow Sthti() : base(STHTI)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong yy = regs.Get(y);
+            ulong zz = z;
+            ulong a = yy + zz;
+            uint u = cast<uint>(regs.Get(x) >> 32u);
+            mem.WriteUInt(a, u, Protection.write);
+        }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
+        }
+        public nothrow override bool IsAbsoluteAddressInst() const
+        {
+            return true;
+        }
+    }
+
+    public class Stco : Instruction
+    {
+        public nothrow Stco() : base(STCO)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong yy = regs.Get(y);
+            ulong zz = regs.Get(z);
+            ulong a = yy + zz;
+            ulong u = x;
+            mem.WriteULong(a, u, Protection.write);
+        }
+        public nothrow override bool IsAbsoluteAddressInst() const
+        {
+            return true;
+        }
+    }
+
+    public class Stcoi : Instruction
+    {
+        public nothrow Stcoi() : base(STCOI)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong yy = regs.Get(y);
+            ulong zz = z;
+            ulong a = yy + zz;
+            ulong u = x;
+            mem.WriteULong(a, u, Protection.write);
+        }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
+        }
+        public nothrow override bool IsAbsoluteAddressInst() const
+        {
+            return true;
+        }
+    }
+
+    public class Add : Instruction
+    {
+        public nothrow Add() : base(ADD)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            long yy = cast<long>(regs.Get(y));
+            long zz = cast<long>(regs.Get(z));
+            long xx = yy + zz;
+            regs.Set(x, cast<ulong>(xx));
+        }
+    }
+
+    public class Addi : Instruction
+    {
+        public nothrow Addi() : base(ADDI)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            long yy = cast<long>(regs.Get(y));
+            long zz = z;
+            long xx = yy + zz;
+            regs.Set(x, cast<ulong>(xx));
+        }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
+        }
+    }
+
+    public class Sub : Instruction
+    {
+        public nothrow Sub() : base(SUB)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            long yy = cast<long>(regs.Get(y));
+            long zz = cast<long>(regs.Get(z));
+            long xx = yy - zz;
+            regs.Set(x, cast<ulong>(xx));
+        }
+    }
+
+    public class Subi : Instruction
+    {
+        public nothrow Subi() : base(SUBI)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            long yy = cast<long>(regs.Get(y));
+            long zz = z;
+            long xx = yy - zz;
+            regs.Set(x, cast<ulong>(xx));
+        }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
+        }
+    }
+
+    public class Mul : Instruction
+    {
+        public nothrow Mul() : base(MUL)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            long yy = cast<long>(regs.Get(y));
+            long zz = cast<long>(regs.Get(z));
+            long xx = yy * zz;
+            regs.Set(x, cast<ulong>(xx));
+        }
+    }
+
+    public class Muli : Instruction
+    {
+        public nothrow Muli() : base(MULI)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            long yy = cast<long>(regs.Get(y));
+            long zz = z;
+            long xx = yy * zz;
+            regs.Set(x, cast<ulong>(xx));
+        }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
+        }
+    }
+
+    public class Div : Instruction
+    {
+        public nothrow Div() : base(DIV)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            long yy = cast<long>(regs.Get(y));
+            long zz = cast<long>(regs.Get(z));
+            long xx = 0;
+            long rr = yy;
+            if (zz != 0)
+            {
+                xx = yy / zz;
+                rr = yy % zz;
+            }
+            regs.Set(x, cast<ulong>(xx));
+            regs.SetSpecial(Registers.rR, cast<ulong>(rr));
+        }
+    }
+
+    public class Divi : Instruction
+    {
+        public nothrow Divi() : base(DIVI)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            long yy = cast<long>(regs.Get(y));
+            long zz = z;
+            long xx = 0;
+            long rr = yy;
+            if (zz != 0)
+            {
+                xx = yy / zz;
+                rr = yy % zz;
+            }
+            regs.Set(x, cast<ulong>(xx));
+            regs.SetSpecial(Registers.rR, cast<ulong>(rr));
+        }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
+        }
+    }
+
+    public class Addu : Instruction
+    {
+        public nothrow Addu() : base(ADDU)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong yy = regs.Get(y);
+            ulong zz = regs.Get(z);
+            ulong xx = yy + zz;
+            regs.Set(x, xx);
+        }
+    }
+
+    public class Addui : Instruction
+    {
+        public nothrow Addui() : base(ADDUI)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong yy = regs.Get(y);
+            ulong zz = z;
+            ulong xx = yy + zz;
+            regs.Set(x, xx);
+        }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
+        }
+    }
+
+    public class Subu : Instruction
+    {
+        public nothrow Subu() : base(SUBU)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong yy = regs.Get(y);
+            ulong zz = regs.Get(z);
+            ulong xx = yy - zz;
+            regs.Set(x, xx);
+        }
+    }
+
+    public class Subui : Instruction
+    {
+        public nothrow Subui() : base(SUBUI)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong yy = regs.Get(y);
+            ulong zz = z;
+            ulong xx = yy - zz;
+            regs.Set(x, xx);
+        }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
+        }
+    }
+
+    public class Mulu : Instruction
+    {
+        public nothrow Mulu() : base(MULU)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            // todo!
+            ulong yy = regs.Get(y);
+            ulong zz = regs.Get(z);
+            ulong xx = yy * zz;
+            regs.Set(x, xx);
+        }
+    }
+
+    public class Mului : Instruction
+    {
+        public nothrow Mului() : base(MULUI)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            // todo!
+            ulong yy = regs.Get(y);
+            ulong zz = z;
+            ulong xx = yy * zz;
+            regs.Set(x, xx);
+        }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
+        }
+    }
+
+    public class Divu : Instruction
+    {
+        public nothrow Divu() : base(DIVU)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            // todo!
+            ulong yy = regs.Get(y);
+            ulong zz = regs.Get(z);
+            ulong xx = 0u;
+            ulong rr = yy;
+            if (zz != 0u)
+            {
+                xx = yy / zz;
+                rr = yy % zz;
+            }
+            regs.Set(x, xx);
+            regs.SetSpecial(Registers.rR, rr);
+        }
+    }
+
+    public class Divui : Instruction
+    {
+        public nothrow Divui() : base(DIVUI)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            // todo!
+            ulong yy = regs.Get(y);
+            ulong zz = z;
+            ulong xx = 0u;
+            ulong rr = yy;
+            if (zz != 0u)
+            {
+                xx = yy / zz;
+                rr = yy % zz;
+            }
+            regs.Set(x, xx);
+            regs.SetSpecial(Registers.rR, rr);
+        }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
+        }
+    }
+
+    public class I2Addu : Instruction
+    {
+        public nothrow I2Addu() : base(I2ADDU)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong yy = regs.Get(y);
+            ulong zz = regs.Get(z);
+            ulong xx = (yy << 1u) + zz;
+            regs.Set(x, xx);
+        }
+    }
+
+    public class I2Addui : Instruction
+    {
+        public nothrow I2Addui() : base(I2ADDUI)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong yy = regs.Get(y);
+            ulong zz = z;
+            ulong xx = (yy << 1u) + zz;
+            regs.Set(x, xx);
+        }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
+        }
+    }
+
+    public class I4Addu : Instruction
+    {
+        public nothrow I4Addu() : base(I4ADDU)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong yy = regs.Get(y);
+            ulong zz = regs.Get(z);
+            ulong xx = (yy << 2u) + zz;
+            regs.Set(x, xx);
+        }
+    }
+
+    public class I4Addui : Instruction
+    {
+        public nothrow I4Addui() : base(I4ADDUI)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong yy = regs.Get(y);
+            ulong zz = z;
+            ulong xx = (yy << 2u) + zz;
+            regs.Set(x, xx);
+        }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
+        }
+    }
+
+    public class I8Addu : Instruction
+    {
+        public nothrow I8Addu() : base(I8ADDU)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong yy = regs.Get(y);
+            ulong zz = regs.Get(z);
+            ulong xx = (yy << 3u) + zz;
+            regs.Set(x, xx);
+        }
+    }
+
+    public class I8Addui : Instruction
+    {
+        public nothrow I8Addui() : base(I8ADDUI)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong yy = regs.Get(y);
+            ulong zz = z;
+            ulong xx = (yy << 3u) + zz;
+            regs.Set(x, xx);
+        }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
+        }
+    }
+
+    public class I16Addu : Instruction
+    {
+        public nothrow I16Addu() : base(I16ADDU)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong yy = regs.Get(y);
+            ulong zz = regs.Get(z);
+            ulong xx = (yy << 4u) + zz;
+            regs.Set(x, xx);
+        }
+    }
+
+    public class I16Addui : Instruction
+    {
+        public nothrow I16Addui() : base(I16ADDUI)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong yy = regs.Get(y);
+            ulong zz = z;
+            ulong xx = (yy << 4u) + zz;
+            regs.Set(x, xx);
+        }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
+        }
+    }
+
+    public class Neg : Instruction
+    {
+        public nothrow Neg() : base(NEG)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            // todo!
+            long yy = y;
+            long zz = cast<long>(regs.Get(z));
+            long xx = yy - zz;
+            regs.Set(x, cast<ulong>(xx));
+        }
+    }
+
+    public class Negi : Instruction
+    {
+        public nothrow Negi() : base(NEGI)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            // todo!
+            long yy = y;
+            long zz = z;
+            long xx = yy - zz;
+            regs.Set(x, cast<ulong>(xx));
+        }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
+        }
+    }
+
+    public class Negu : Instruction
+    {
+        public nothrow Negu() : base(NEGU)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong yy = y;
+            ulong zz = regs.Get(z);
+            ulong xx = yy - zz;
+            regs.Set(x, xx);
+        }
+    }
+
+    public class Negui : Instruction
+    {
+        public nothrow Negui() : base(NEGUI)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong yy = y;
+            ulong zz = z;
+            ulong xx = yy - zz;
+            regs.Set(x, xx);
+        }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
+        }
+    }
+
+    public class Sl : Instruction
+    {
+        public nothrow Sl() : base(SL)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            // todo!
+            long yy = cast<long>(regs.Get(y));
+            long zz = Abs(cast<long>(regs.Get(z)));
+            long xx = yy << zz;
+            regs.Set(x, cast<ulong>(xx));
+        }
+    }
+
+    public class Sli : Instruction
+    {
+        public nothrow Sli() : base(SLI)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            // todo!
+            long yy = cast<long>(regs.Get(y));
+            long zz = z;
+            long xx = yy << zz;
+            regs.Set(x, cast<ulong>(xx));
+        }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
+        }
+    }
+
+    public class Slu : Instruction
+    {
+        public nothrow Slu() : base(SLU)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong yy = regs.Get(y);
+            ulong zz = regs.Get(z);
+            ulong xx = yy << zz;
+            regs.Set(x, xx);
+        }
+    }
+
+    public class Slui : Instruction
+    {
+        public nothrow Slui() : base(SLUI)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong yy = regs.Get(y);
+            ulong zz = z;
+            ulong xx = yy << zz;
+            regs.Set(x, xx);
+        }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
+        }
+    }
+
+    public class Sr : Instruction
+    {
+        public nothrow Sr() : base(SR)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            long yy = cast<long>(regs.Get(y));
+            long zz = Abs(cast<long>(regs.Get(z)));
+            long xx = yy >> zz;
+            regs.Set(x, cast<ulong>(xx));
+        }
+    }
+
+    public class Sri : Instruction
+    {
+        public nothrow Sri() : base(SRI)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            long yy = cast<long>(regs.Get(y));
+            long zz = z;
+            long xx = yy >> zz;
+            regs.Set(x, cast<ulong>(xx));
+        }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
+        }
+    }
+
+    public class Sru : Instruction
+    {
+        public nothrow Sru() : base(SRU)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong yy = regs.Get(y);
+            ulong zz = regs.Get(z);
+            ulong xx = yy >> zz;
+            regs.Set(x, xx);
+        }
+    }
+
+    public class Srui : Instruction
+    {
+        public nothrow Srui() : base(SRUI)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong yy = regs.Get(y);
+            ulong zz = z;
+            ulong xx = yy >> zz;
+            regs.Set(x, xx);
+        }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
+        }
+    }
+
+    public class Cmp : Instruction
+    {
+        public nothrow Cmp() : base(CMP)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            long yy = cast<long>(regs.Get(y));
+            long zz = cast<long>(regs.Get(z));
+            long gr = cast<long>(yy > zz);
+            long ls = cast<long>(yy < zz);
+            long xx = gr - ls;
+            regs.Set(x, cast<ulong>(xx));
+        }
+    }
+
+    public class Cmpi : Instruction
+    {
+        public nothrow Cmpi() : base(CMPI)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            long yy = cast<long>(regs.Get(y));
+            long zz = z;
+            long gr = cast<long>(yy > zz);
+            long ls = cast<long>(yy < zz);
+            long xx = gr - ls;
+            regs.Set(x, cast<ulong>(xx));
+        }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
+        }
+    }
+
+    public class Cmpu : Instruction
+    {
+        public nothrow Cmpu() : base(CMPU)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong yy = regs.Get(y);
+            ulong zz = regs.Get(z);
+            long gr = cast<long>(yy > zz);
+            long ls = cast<long>(yy < zz);
+            long xx = gr - ls;
+            regs.Set(x, cast<ulong>(xx));
+        }
+    }
+
+    public class Cmpui : Instruction
+    {
+        public nothrow Cmpui() : base(CMPUI)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong yy = regs.Get(y);
+            ulong zz = z;
+            long gr = cast<long>(yy > zz);
+            long ls = cast<long>(yy < zz);
+            long xx = gr - ls;
+            regs.Set(x, cast<ulong>(xx));
+        }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
+        }
+    }
+
+    public class Csn : Instruction
+    {
+        public nothrow Csn() : base(CSN)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            long yy = cast<long>(regs.Get(y));
+            if (yy < 0)
+            {
+                ulong zz = regs.Get(z);
+                ulong xx = zz;
+                regs.Set(x, xx);
+            }
+        }
+    }
+
+    public class Csni : Instruction
+    {
+        public nothrow Csni() : base(CSNI)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            long yy = cast<long>(regs.Get(y));
+            if (yy < 0)
+            {
+                ulong zz = z;
+                ulong xx = zz;
+                regs.Set(x, xx);
+            }
+        }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
+        }
+    }
+
+    public class Csz : Instruction
+    {
+        public nothrow Csz() : base(CSZ)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong yy = regs.Get(y);
+            if (yy == 0u)
+            {
+                ulong zz = regs.Get(z);
+                ulong xx = zz;
+                regs.Set(x, xx);
+            }
+        }
+    }
+
+    public class Cszi : Instruction
+    {
+        public nothrow Cszi() : base(CSZI)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong yy = regs.Get(y);
+            if (yy == 0u)
+            {
+                ulong zz = z;
+                ulong xx = zz;
+                regs.Set(x, xx);
+            }
+        }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
+        }
+    }
+
+    public class Csp : Instruction
+    {
+        public nothrow Csp() : base(CSP)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            long yy = cast<long>(regs.Get(y));
+            if (yy > 0)
+            {
+                ulong zz = regs.Get(z);
+                ulong xx = zz;
+                regs.Set(x, xx);
+            }
+        }
+    }
+
+    public class Cspi : Instruction
+    {
+        public nothrow Cspi() : base(CSPI)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            long yy = cast<long>(regs.Get(y));
+            if (yy > 0)
+            {
+                ulong zz = z;
+                ulong xx = zz;
+                regs.Set(x, xx);
+            }
+        }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
+        }
+    }
+
+    public class Csod : Instruction
+    {
+        public nothrow Csod() : base(CSOD)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong yy = regs.Get(y);
+            if ((yy & 0x1u) != 0u)
+            {
+                ulong zz = regs.Get(z);
+                ulong xx = zz;
+                regs.Set(x, xx);
+            }
+        }
+    }
+
+    public class Csodi : Instruction
+    {
+        public nothrow Csodi() : base(CSODI)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong yy = regs.Get(y);
+            if ((yy & 0x1u) != 0u)
+            {
+                ulong zz = z;
+                ulong xx = zz;
+                regs.Set(x, xx);
+            }
+        }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
+        }
+    }
+
+    public class Csnn : Instruction
+    {
+        public nothrow Csnn() : base(CSNN)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            long yy = cast<long>(regs.Get(y));
+            if (yy >= 0)
+            {
+                ulong zz = regs.Get(z);
+                ulong xx = zz;
+                regs.Set(x, xx);
+            }
+        }
+    }
+
+    public class Csnni : Instruction
+    {
+        public nothrow Csnni() : base(CSNNI)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            long yy = cast<long>(regs.Get(y));
+            if (yy >= 0)
+            {
+                ulong zz = z;
+                ulong xx = zz;
+                regs.Set(x, xx);
+            }
+        }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
+        }
+    }
+
+    public class Csnz : Instruction
+    {
+        public nothrow Csnz() : base(CSNZ)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong yy = regs.Get(y);
+            if (yy != 0u)
+            {
+                ulong zz = regs.Get(z);
+                ulong xx = zz;
+                regs.Set(x, xx);
+            }
+        }
+    }
+
+    public class Csnzi : Instruction
+    {
+        public nothrow Csnzi() : base(CSNZI)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong yy = regs.Get(y);
+            if (yy != 0u)
+            {
+                ulong zz = z;
+                ulong xx = zz;
+                regs.Set(x, xx);
+            }
+        }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
+        }
+    }
+
+    public class Csnp : Instruction
+    {
+        public nothrow Csnp() : base(CSNP)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            long yy = cast<long>(regs.Get(y));
+            if (yy <= 0)
+            {
+                ulong zz = regs.Get(z);
+                ulong xx = zz;
+                regs.Set(x, xx);
+            }
+        }
+    }
+
+    public class Csnpi : Instruction
+    {
+        public nothrow Csnpi() : base(CSNPI)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            long yy = cast<long>(regs.Get(y));
+            if (yy <= 0)
+            {
+                ulong zz = z;
+                ulong xx = zz;
+                regs.Set(x, xx);
+            }
+        }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
+        }
+    }
+
+    public class Csev : Instruction
+    {
+        public nothrow Csev() : base(CSEV)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong yy = regs.Get(y);
+            if ((yy & 0x1u) == 0u)
+            {
+                ulong zz = regs.Get(z);
+                ulong xx = zz;
+                regs.Set(x, xx);
+            }
+        }
+    }
+
+    public class Csevi : Instruction
+    {
+        public nothrow Csevi() : base(CSEVI)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong yy = regs.Get(y);
+            if ((yy & 0x1u) == 0u)
+            {
+                ulong zz = z;
+                ulong xx = zz;
+                regs.Set(x, xx);
+            }
+        }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
+        }
+    }
+
+    public class Zsn : Instruction
+    {
+        public nothrow Zsn() : base(ZSN)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            long yy = cast<long>(regs.Get(y));
+            if (yy < 0)
+            {
+                ulong zz = regs.Get(z);
+                ulong xx = zz;
+                regs.Set(x, xx);
+            }
+            else
+            {
+                ulong xx = 0u;
+                regs.Set(x, xx);
+            }
+        }
+    }
+
+    public class Zsni : Instruction
+    {
+        public nothrow Zsni() : base(ZSNI)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            long yy = cast<long>(regs.Get(y));
+            if (yy < 0)
+            {
+                ulong zz = z;
+                ulong xx = zz;
+                regs.Set(x, xx);
+            }
+            else
+            {
+                ulong xx = 0u;
+                regs.Set(x, xx);
+            }
+        }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
+        }
+    }
+
+    public class Zsz : Instruction
+    {
+        public nothrow Zsz() : base(ZSZ)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong yy = regs.Get(y);
+            if (yy == 0u)
+            {
+                ulong zz = regs.Get(z);
+                ulong xx = zz;
+                regs.Set(x, xx);
+            }
+            else
+            {
+                ulong xx = 0u;
+                regs.Set(x, xx);
+            }
+        }
+    }
+
+    public class Zszi : Instruction
+    {
+        public nothrow Zszi() : base(ZSZI)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong yy = regs.Get(y);
+            if (yy == 0u)
+            {
+                ulong zz = z;
+                ulong xx = zz;
+                regs.Set(x, xx);
+            }
+            else
+            {
+                ulong xx = 0u;
+                regs.Set(x, xx);
+            }
+        }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
+        }
+    }
+
+    public class Zsp : Instruction
+    {
+        public nothrow Zsp() : base(ZSP)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            long yy = cast<long>(regs.Get(y));
+            if (yy > 0)
+            {
+                ulong zz = regs.Get(z);
+                ulong xx = zz;
+                regs.Set(x, xx);
+            }
+            else
+            {
+                ulong xx = 0u;
+                regs.Set(x, xx);
+            }
+        }
+    }
+
+    public class Zspi : Instruction
+    {
+        public nothrow Zspi() : base(ZSPI)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            long yy = cast<long>(regs.Get(y));
+            if (yy > 0)
+            {
+                ulong zz = z;
+                ulong xx = zz;
+                regs.Set(x, xx);
+            }
+            else
+            {
+                ulong xx = 0u;
+                regs.Set(x, xx);
+            }
+        }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
+        }
+    }
+
+    public class Zsod : Instruction
+    {
+        public nothrow Zsod() : base(ZSOD)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong yy = regs.Get(y);
+            if ((yy & 0x1u) != 0u)
+            {
+                ulong zz = regs.Get(z);
+                ulong xx = zz;
+                regs.Set(x, xx);
+            }
+            else
+            {
+                ulong xx = 0u;
+                regs.Set(x, xx);
+            }
+        }
+    }
+
+    public class Zsodi : Instruction
+    {
+        public nothrow Zsodi() : base(ZSODI)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong yy = regs.Get(y);
+            if ((yy & 0x1u) != 0u)
+            {
+                ulong zz = z;
+                ulong xx = zz;
+                regs.Set(x, xx);
+            }
+            else
+            {
+                ulong xx = 0u;
+                regs.Set(x, xx);
+            }
+        }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
+        }
+    }
+
+    public class Zsnn : Instruction
+    {
+        public nothrow Zsnn() : base(ZSNN)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            long yy = cast<long>(regs.Get(y));
+            if (yy >= 0)
+            {
+                ulong zz = regs.Get(z);
+                ulong xx = zz;
+                regs.Set(x, xx);
+            }
+            else
+            {
+                ulong xx = 0u;
+                regs.Set(x, xx);
+            }
+        }
+    }
+
+    public class Zsnni : Instruction
+    {
+        public nothrow Zsnni() : base(ZSNNI)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            long yy = cast<long>(regs.Get(y));
+            if (yy >= 0)
+            {
+                ulong zz = z;
+                ulong xx = zz;
+                regs.Set(x, xx);
+            }
+            else
+            {
+                ulong xx = 0u;
+                regs.Set(x, xx);
+            }
+        }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
+        }
+    }
+
+    public class Zsnz : Instruction
+    {
+        public nothrow Zsnz() : base(ZSNZ)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong yy = regs.Get(y);
+            if (yy != 0u)
+            {
+                ulong zz = regs.Get(z);
+                ulong xx = zz;
+                regs.Set(x, xx);
+            }
+            else
+            {
+                ulong xx = 0u;
+                regs.Set(x, xx);
+            }
+        }
+    }
+
+    public class Zsnzi : Instruction
+    {
+        public nothrow Zsnzi() : base(ZSNZI)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong yy = regs.Get(y);
+            if (yy != 0u)
+            {
+                ulong zz = z;
+                ulong xx = zz;
+                regs.Set(x, xx);
+            }
+            else
+            {
+                ulong xx = 0u;
+                regs.Set(x, xx);
+            }
+        }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
+        }
+    }
+
+    public class Zsnp : Instruction
+    {
+        public nothrow Zsnp() : base(ZSNP)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            long yy = cast<long>(regs.Get(y));
+            if (yy <= 0)
+            {
+                ulong zz = regs.Get(z);
+                ulong xx = zz;
+                regs.Set(x, xx);
+            }
+            else
+            {
+                ulong xx = 0u;
+                regs.Set(x, xx);
+            }
+        }
+    }
+
+    public class Zsnpi : Instruction
+    {
+        public nothrow Zsnpi() : base(ZSNPI)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            long yy = cast<long>(regs.Get(y));
+            if (yy <= 0)
+            {
+                ulong zz = z;
+                ulong xx = zz;
+                regs.Set(x, xx);
+            }
+            else
+            {
+                ulong xx = 0u;
+                regs.Set(x, xx);
+            }
+        }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
+        }
+    }
+
+    public class Zsev : Instruction
+    {
+        public nothrow Zsev() : base(ZSEV)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong yy = regs.Get(y);
+            if ((yy & 0x1u) == 0u)
+            {
+                ulong zz = regs.Get(z);
+                ulong xx = zz;
+                regs.Set(x, xx);
+            }
+            else
+            {
+                ulong xx = 0u;
+                regs.Set(x, xx);
+            }
+        }
+    }
+
+    public class Zsevi : Instruction
+    {
+        public nothrow Zsevi() : base(ZSEVI)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong yy = regs.Get(y);
+            if ((yy & 0x1u) == 0u)
+            {
+                ulong zz = z;
+                ulong xx = zz;
+                regs.Set(x, xx);
+            }
+            else
+            {
+                ulong xx = 0u;
+                regs.Set(x, xx);
+            }
+        }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
+        }
+    }
+
+    public class And : Instruction
+    {
+        public nothrow And() : base(AND)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong yy = regs.Get(y);
+            ulong zz = regs.Get(z);
+            ulong xx = yy & zz;
+            regs.Set(x, xx);
+        }
+    }
+
+    public class Andi : Instruction
+    {
+        public nothrow Andi() : base(ANDI)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong yy = regs.Get(y);
+            ulong zz = z;
+            ulong xx = yy & zz;
+            regs.Set(x, xx);
+        }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
+        }
+    }
+
+    public class Or : Instruction
+    {
+        public nothrow Or() : base(OR)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong yy = regs.Get(y);
+            ulong zz = regs.Get(z);
+            ulong xx = yy | zz;
+            regs.Set(x, xx);
+        }
+    }
+
+    public class Ori : Instruction
+    {
+        public nothrow Ori() : base(ORI)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong yy = regs.Get(y);
+            ulong zz = z;
+            ulong xx = yy | zz;
+            regs.Set(x, xx);
+        }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
+        }
+    }
+
+    public class Xor : Instruction
+    {
+        public nothrow Xor() : base(XOR)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong yy = regs.Get(y);
+            ulong zz = regs.Get(z);
+            ulong xx = yy ^ zz;
+            regs.Set(x, xx);
+        }
+    }
+
+    public class Xori : Instruction
+    {
+        public nothrow Xori() : base(XORI)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong yy = regs.Get(y);
+            ulong zz = z;
+            ulong xx = yy ^ zz;
+            regs.Set(x, xx);
+        }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
+        }
+    }
+
+    public class Andn : Instruction
+    {
+        public nothrow Andn() : base(ANDN)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong yy = regs.Get(y);
+            ulong zz = regs.Get(z);
+            ulong xx = yy & ~zz;
+            regs.Set(x, xx);
+        }
+    }
+
+    public class Andni : Instruction
+    {
+        public nothrow Andni() : base(ANDNI)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong yy = regs.Get(y);
+            ulong zz = z;
+            ulong xx = yy & ~zz;
+            regs.Set(x, xx);
+        }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
+        }
+    }
+
+    public class Orn : Instruction
+    {
+        public nothrow Orn() : base(ORN)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong yy = regs.Get(y);
+            ulong zz = regs.Get(z);
+            ulong xx = yy | ~zz;
+            regs.Set(x, xx);
+        }
+    }
+
+    public class Orni : Instruction
+    {
+        public nothrow Orni() : base(ORNI)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong yy = regs.Get(y);
+            ulong zz = z;
+            ulong xx = yy | ~zz;
+            regs.Set(x, xx);
+        }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
+        }
+    }
+
+    public class Nand : Instruction
+    {
+        public nothrow Nand() : base(NAND)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong yy = regs.Get(y);
+            ulong zz = regs.Get(z);
+            ulong xx = ~(yy & zz);
+            regs.Set(x, xx);
+        }
+    }
+
+    public class Nandi : Instruction
+    {
+        public nothrow Nandi() : base(NANDI)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong yy = regs.Get(y);
+            ulong zz = z;
+            ulong xx = ~(yy & zz);
+            regs.Set(x, xx);
+        }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
+        }
+    }
+
+    public class Nor : Instruction
+    {
+        public nothrow Nor() : base(NOR)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong yy = regs.Get(y);
+            ulong zz = regs.Get(z);
+            ulong xx = ~(yy | zz);
+            regs.Set(x, xx);
+        }
+    }
+
+    public class Nori : Instruction
+    {
+        public nothrow Nori() : base(NORI)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong yy = regs.Get(y);
+            ulong zz = z;
+            ulong xx = ~(yy | zz);
+            regs.Set(x, xx);
+        }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
+        }
+    }
+
+    public class Nxor : Instruction
+    {
+        public nothrow Nxor() : base(NXOR)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong yy = regs.Get(y);
+            ulong zz = regs.Get(z);
+            ulong xx = ~(yy ^ zz);
+            regs.Set(x, xx);
+        }
+    }
+
+    public class Nxori : Instruction
+    {
+        public nothrow Nxori() : base(NXORI)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong yy = regs.Get(y);
+            ulong zz = z;
+            ulong xx = ~(yy ^ zz);
+            regs.Set(x, xx);
+        }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
+        }
+    }
+
+    public class Mux : Instruction
+    {
+        public nothrow Mux() : base(MUX)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong mm = regs.GetSpecial(Registers.rM);
+            ulong yy = regs.Get(y);
+            ulong zz = regs.Get(z);
+            ulong xx = (yy & mm) | (zz & ~mm);
+            regs.Set(x, xx);
+        }
+    }
+
+    public class Muxi : Instruction
+    {
+        public nothrow Muxi() : base(MUXI)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong mm = regs.GetSpecial(Registers.rM);
+            ulong yy = regs.Get(y);
+            ulong zz = z;
+            ulong xx = (yy & mm) | (zz & ~mm);
+            regs.Set(x, xx);
+        }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
+        }
+    }
+
+    public class Sadd : Instruction
+    {
+        public nothrow Sadd() : base(SADD)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong yy = regs.Get(y);
+            ulong zz = regs.Get(z);
+            ulong xx = BitCount(yy & ~zz);
+            regs.Set(x, xx);
+        }
+    }
+
+    public class Saddi : Instruction
+    {
+        public nothrow Saddi() : base(SADDI)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong yy = regs.Get(y);
+            ulong zz = z;
+            ulong xx = BitCount(yy & ~zz);
+            regs.Set(x, xx);
+        }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
+        }
+    }
+
+    public class Bdif : Instruction
+    {
+        public nothrow Bdif() : base(BDIF)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong yy = regs.Get(y);
+            ulong zz = regs.Get(z);
+            ulong xx = 00u;
+            for (int i = 0; i < 8; ++i)
+            {
+                byte yb = cast<byte>(yy);
+                byte zb = cast<byte>(zz);
+                byte xb = SaturatingSubtraction(yb, zb);
+                xx = xx | (cast<ulong>(xb) << cast<ulong>(i << 3));
+                yy = yy >> 8u;
+                zz = zz >> 8u;
+            }
+            regs.Set(x, xx);
+        }
+    }
+
+    public class Bdifi : Instruction
+    {
+        public nothrow Bdifi() : base(BDIFI)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong yy = regs.Get(y);
+            ulong zz = z;
+            ulong xx = 00u;
+            for (int i = 0; i < 8; ++i)
+            {
+                byte yb = cast<byte>(yy);
+                byte zb = cast<byte>(zz);
+                byte xb = SaturatingSubtraction(yb, zb);
+                xx = xx | (cast<ulong>(xb) << cast<ulong>(i << 3));
+                yy = yy >> 8u;
+                zz = zz >> 8u;
+            }
+            regs.Set(x, xx);
+        }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
+        }
+    }
+
+    public class Wdif : Instruction
+    {
+        public nothrow Wdif() : base(WDIF)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong yy = regs.Get(y);
+            ulong zz = regs.Get(z);
+            ulong xx = 00u;
+            for (int i = 0; i < 4; ++i)
+            {
+                ushort yw = cast<ushort>(yy);
+                ushort zw = cast<ushort>(zz);
+                ushort xw = SaturatingSubtraction(yw, zw);
+                xx = xx | (cast<ulong>(xw) << cast<ulong>(i << 4));
+                yy = yy >> 16u;
+                zz = zz >> 16u;
+            }
+            regs.Set(x, xx);
+        }
+    }
+
+    public class Wdifi : Instruction
+    {
+        public nothrow Wdifi() : base(WDIFI)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong yy = regs.Get(y);
+            ulong zz = z;
+            ulong xx = 00u;
+            for (int i = 0; i < 4; ++i)
+            {
+                ushort yw = cast<ushort>(yy);
+                ushort zw = cast<ushort>(zz);
+                ushort xw = SaturatingSubtraction(yw, zw);
+                xx = xx | (cast<ulong>(xw) << cast<ulong>(i << 4));
+                yy = yy >> 16u;
+                zz = zz >> 16u;
+            }
+            regs.Set(x, xx);
+        }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
+        }
+    }
+
+    public class Tdif : Instruction
+    {
+        public nothrow Tdif() : base(TDIF)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong yy = regs.Get(y);
+            ulong zz = regs.Get(z);
+            ulong xx = 00u;
+            for (int i = 0; i < 2; ++i)
+            {
+                uint yi = cast<uint>(yy);
+                uint zi = cast<uint>(zz);
+                uint xi = SaturatingSubtraction(yi, zi);
+                xx = xx | (cast<ulong>(xi) << cast<ulong>(i << 5));
+                yy = yy >> 32u;
+                zz = zz >> 32u;
+            }
+            regs.Set(x, xx);
+        }
+    }
+
+    public class Tdifi : Instruction
+    {
+        public nothrow Tdifi() : base(TDIFI)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong yy = regs.Get(y);
+            ulong zz = z;
+            ulong xx = 00u;
+            for (int i = 0; i < 2; ++i)
+            {
+                uint yi = cast<uint>(yy);
+                uint zi = cast<uint>(zz);
+                uint xi = SaturatingSubtraction(yi, zi);
+                xx = xx | (cast<ulong>(xi) << cast<ulong>(i << 5));
+                yy = yy >> 32u;
+                zz = zz >> 32u;
+            }
+            regs.Set(x, xx);
+        }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
+        }
+    }
+
+    public class Odif : Instruction
+    {
+        public nothrow Odif() : base(ODIF)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong yy = regs.Get(y);
+            ulong zz = regs.Get(z);
+            ulong xx = SaturatingSubtraction(yy, zz);
+            regs.Set(x, xx);
+        }
+    }
+
+    public class Odifi : Instruction
+    {
+        public nothrow Odifi() : base(ODIFI)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong yy = regs.Get(y);
+            ulong zz = regs.Get(z);
+            ulong xx = SaturatingSubtraction(yy, zz);
+            regs.Set(x, xx);
+        }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
+        }
+    }
+
+    public class Fadd : Instruction
+    {
+        public nothrow Fadd() : base(FADD)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong yy = regs.Get(y);
+            double yd = *cast<double*>(cast<void*>(&yy));
+            ulong zz = regs.Get(z);
+            double zd = *cast<double*>(cast<void*>(&zz));
+            double xd = yd + zd;
+            ulong xx = *cast<ulong*>(cast<void*>(&xd));
+            regs.Set(x, xx);
+        }
+    }
+
+    public class Fsub : Instruction
+    {
+        public nothrow Fsub() : base(FSUB)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong yy = regs.Get(y);
+            double yd = *cast<double*>(cast<void*>(&yy));
+            ulong zz = regs.Get(z);
+            double zd = *cast<double*>(cast<void*>(&zz));
+            double xd = yd - zd;
+            ulong xx = *cast<ulong*>(cast<void*>(&xd));
+            regs.Set(x, xx);
+        }
+    }
+
+    public class Fmul : Instruction
+    {
+        public nothrow Fmul() : base(FMUL)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong yy = regs.Get(y);
+            double yd = *cast<double*>(cast<void*>(&yy));
+            ulong zz = regs.Get(z);
+            double zd = *cast<double*>(cast<void*>(&zz));
+            double xd = yd * zd;
+            ulong xx = *cast<ulong*>(cast<void*>(&xd));
+            regs.Set(x, xx);
+        }
+    }
+
+    public class Fdiv : Instruction
+    {
+        public nothrow Fdiv() : base(FDIV)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong yy = regs.Get(y);
+            double yd = *cast<double*>(cast<void*>(&yy));
+            ulong zz = regs.Get(z);
+            double zd = *cast<double*>(cast<void*>(&zz));
+            double xd = yd / zd;
+            ulong xx = *cast<ulong*>(cast<void*>(&xd));
+            regs.Set(x, xx);
+        }
+    }
+
+    public class Fint : Instruction
+    {
+        public nothrow Fint() : base(FINT)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            // todo
+            ulong zz = regs.Get(z);
+            double zd = *cast<double*>(cast<void*>(&zz));
+            ulong zi = cast<ulong>(zd);
+            double xd = zi;
+            ulong xx = *cast<ulong*>(cast<void*>(&xd));
+            regs.Set(x, xx);
+        }
+    }
+
+    public class Fcmp : Instruction
+    {
+        public nothrow Fcmp() : base(FCMP)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong yy = regs.Get(y);
+            double yd = *cast<double*>(cast<void*>(&yy));
+            ulong zz = regs.Get(z);
+            double zd = *cast<double*>(cast<void*>(&zz));
+            long gr = cast<long>(yd > zd);
+            long ls = cast<long>(yd < zd);
+            long xx = gr - ls;
+            regs.Set(x, cast<ulong>(xx));
+        }
+    }
+
+    public class Fix : Instruction
+    {
+        public nothrow Fix() : base(FIX)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            // todo!
+            ulong zz = regs.Get(z);
+            double zd = *cast<double*>(cast<void*>(&zz));
+            long xx = cast<long>(zd);
+            regs.Set(x, cast<ulong>(xx));
+        }
+    }
+
+    public class Fixu : Instruction
+    {
+        public nothrow Fixu() : base(FIXU)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            // todo!
+            ulong zz = regs.Get(z);
+            double zd = *cast<double*>(cast<void*>(&zz));
+            ulong xx = cast<ulong>(zd);
+            regs.Set(x, xx);
+        }
+    }
+
+    public class Flot : Instruction
+    {
+        public nothrow Flot() : base(FLOT)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            long zz = cast<long>(regs.Get(z));
+            double xd = zz;
+            ulong xx = *cast<ulong*>(cast<void*>(&xd));
+            regs.Set(x, xx);
+        }
+    }
+
+    public class Floti : Instruction
+    {
+        public nothrow Floti() : base(FLOTI)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            long zz = z;
+            double xd = zz;
+            ulong xx = *cast<ulong*>(cast<void*>(&xd));
+            regs.Set(x, xx);
+        }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
+        }
+    }
+
+    public class Flotu : Instruction
+    {
+        public nothrow Flotu() : base(FLOTU)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong zz = regs.Get(z);
+            double xd = zz;
+            ulong xx = *cast<ulong*>(cast<void*>(&xd));
+            regs.Set(x, xx);
+        }
+    }
+
+    public class Flotui : Instruction
+    {
+        public nothrow Flotui() : base(FLOTUI)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong zz = z;
+            double xd = zz;
+            ulong xx = *cast<ulong*>(cast<void*>(&xd));
+            regs.Set(x, xx);
+        }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
+        }
+    }
+
+    public class Seth : Instruction
+    {
+        public nothrow Seth() : base(SETH)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ushort yz = (cast<ushort>(y) << 8u) | cast<ushort>(z);
+            ulong xx = cast<ulong>(yz) << 48u;
+            regs.Set(x, xx);
+        }
+        public nothrow override bool IsWydeImmediateInst() const
+        {
+            return true;
+        }
+    }
+
+    public class Setmh : Instruction
+    {
+        public nothrow Setmh() : base(SETMH)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ushort yz = (cast<ushort>(y) << 8u) | cast<ushort>(z);
+            ulong xx = cast<ulong>(yz) << 32u;
+            regs.Set(x, xx);
+        }
+        public nothrow override bool IsWydeImmediateInst() const
+        {
+            return true;
+        }
+    }
+
+    public class Setml : Instruction
+    {
+        public nothrow Setml() : base(SETML)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ushort yz = (cast<ushort>(y) << 8u) | cast<ushort>(z);
+            ulong xx = cast<ulong>(yz) << 16u;
+            regs.Set(x, xx);
+        }
+        public nothrow override bool IsWydeImmediateInst() const
+        {
+            return true;
+        }
+    }
+
+    public class Setl : Instruction
+    {
+        public nothrow Setl() : base(SETL)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ushort yz = (cast<ushort>(y) << 8u) | cast<ushort>(z);
+            ulong xx = yz;
+            regs.Set(x, xx);
+        }
+        public nothrow override bool IsWydeImmediateInst() const
+        {
+            return true;
+        }
+    }
+
+    public class Inch : Instruction
+    {
+        public nothrow Inch() : base(INCH)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ushort yz = (cast<ushort>(y) << 8u) | cast<ushort>(z);
+            ulong xx = regs.Get(x) + (cast<ulong>(yz) << 48u);
+            regs.Set(x, xx);
+        }
+        public nothrow override bool IsWydeImmediateInst() const
+        {
+            return true;
+        }
+    }
+
+    public class Incmh : Instruction
+    {
+        public nothrow Incmh() : base(INCMH)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ushort yz = (cast<ushort>(y) << 8u) | cast<ushort>(z);
+            ulong xx = regs.Get(x) + (cast<ulong>(yz) << 32u);
+            regs.Set(x, xx);
+        }
+        public nothrow override bool IsWydeImmediateInst() const
+        {
+            return true;
+        }
+    }
+
+    public class Incml : Instruction
+    {
+        public nothrow Incml() : base(INCML)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ushort yz = (cast<ushort>(y) << 8u) | cast<ushort>(z);
+            ulong xx = regs.Get(x) + (cast<ulong>(yz) << 16u);
+            regs.Set(x, xx);
+        }
+        public nothrow override bool IsWydeImmediateInst() const
+        {
+            return true;
+        }
+    }
+
+    public class Incl : Instruction
+    {
+        public nothrow Incl() : base(INCL)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ushort yz = (cast<ushort>(y) << 8u) | cast<ushort>(z);
+            ulong xx = regs.Get(x) + cast<ulong>(yz);
+            regs.Set(x, xx);
+        }
+        public nothrow override bool IsWydeImmediateInst() const
+        {
+            return true;
+        }
+    }
+
+    public class Orh : Instruction
+    {
+        public nothrow Orh() : base(ORH)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ushort yz = (cast<ushort>(y) << 8u) | cast<ushort>(z);
+            ulong xx = regs.Get(x) | (cast<ulong>(yz) << 48u);
+            regs.Set(x, xx);
+        }
+        public nothrow override bool IsWydeImmediateInst() const
+        {
+            return true;
+        }
+    }
+
+    public class Ormh : Instruction
+    {
+        public nothrow Ormh() : base(ORMH)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ushort yz = (cast<ushort>(y) << 8u) | cast<ushort>(z);
+            ulong xx = regs.Get(x) | (cast<ulong>(yz) << 32u);
+            regs.Set(x, xx);
+        }
+        public nothrow override bool IsWydeImmediateInst() const
+        {
+            return true;
+        }
+    }
+
+    public class Orml : Instruction
+    {
+        public nothrow Orml() : base(ORML)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ushort yz = (cast<ushort>(y) << 8u) | cast<ushort>(z);
+            ulong xx = regs.Get(x) | (cast<ulong>(yz) << 16u);
+            regs.Set(x, xx);
+        }
+        public nothrow override bool IsWydeImmediateInst() const
+        {
+            return true;
+        }
+    }
+
+    public class Orl : Instruction
+    {
+        public nothrow Orl() : base(ORL)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ushort yz = (cast<ushort>(y) << 8u) | cast<ushort>(z);
+            ulong xx = regs.Get(x) | cast<ulong>(yz);
+            regs.Set(x, xx);
+        }
+        public nothrow override bool IsWydeImmediateInst() const
+        {
+            return true;
+        }
+    }
+
+    public class Andnh : Instruction
+    {
+        public nothrow Andnh() : base(ANDNH)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ushort yz = (cast<ushort>(y) << 8u) | cast<ushort>(z);
+            ulong xx = regs.Get(x) & ~(cast<ulong>(yz) << 48u);
+            regs.Set(x, xx);
+        }
+        public nothrow override bool IsWydeImmediateInst() const
+        {
+            return true;
+        }
+    }
+
+    public class Andnmh : Instruction
+    {
+        public nothrow Andnmh() : base(ANDNMH)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ushort yz = (cast<ushort>(y) << 8u) | cast<ushort>(z);
+            ulong xx = regs.Get(x) & ~(cast<ulong>(yz) << 32u);
+            regs.Set(x, xx);
+        }
+        public nothrow override bool IsWydeImmediateInst() const
+        {
+            return true;
+        }
+    }
+
+    public class Andnml : Instruction
+    {
+        public nothrow Andnml() : base(ANDNML)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ushort yz = (cast<ushort>(y) << 8u) | cast<ushort>(z);
+            ulong xx = regs.Get(x) & ~(cast<ulong>(yz) << 16u);
+            regs.Set(x, xx);
+        }
+        public nothrow override bool IsWydeImmediateInst() const
+        {
+            return true;
+        }
+    }
+
+    public class Andnl : Instruction
+    {
+        public nothrow Andnl() : base(ANDNL)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ushort yz = (cast<ushort>(y) << 8u) | cast<ushort>(z);
+            ulong xx = regs.Get(x) & ~cast<ulong>(yz);
+            regs.Set(x, xx);
+        }
+        public nothrow override bool IsWydeImmediateInst() const
+        {
+            return true;
+        }
+    }
+
+    public class Jmp : Instruction
+    {
+        public nothrow Jmp() : base(JMP)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong pc = regs.GetPC();
+            ulong to = pc + (((cast<ulong>(x) << 16u) | (cast<ulong>(y) << 8u) | cast<ulong>(z)) << 2u);
+            regs.SetPC(to);
+        }
+        public override string FormatParams(ulong address, byte x, byte y, byte z, Formatter& formatter)
+        {
+            string result = formatter.FormatLongOffset(address, x, y, z, true);
+            return result;
+        }
+        public nothrow override bool IsJumpInst() const
+        {
+            return true;
+        }
+    }
+
+    public class Jmpb : Instruction
+    {
+        public nothrow Jmpb() : base(JMPB)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong pc = regs.GetPC();
+            ulong offset = ((cast<ulong>(x) << 16u) | (cast<ulong>(y) << 8u) | cast<ulong>(z)) << 2u;
+            ulong to = pc - offset;
+            regs.SetPC(to);
+        }
+        public override string FormatParams(ulong address, byte x, byte y, byte z, Formatter& formatter)
+        {
+            string result = formatter.FormatLongOffset(address, x, y, z, false);
+            return result;
+        }
+        public nothrow override bool IsJumpInst() const
+        {
+            return true;
+        }
+    }
+
+    public class Go : Instruction
+    {
+        public nothrow Go() : base(GO)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong yy = regs.Get(y);
+            ulong zz = regs.Get(z);
+            ulong to = yy + zz;
+            ulong pc = regs.GetPC();
+            ulong xx = pc + 4u;
+            regs.SetPC(to);
+            regs.Set(x, xx);
+        }
+        public nothrow override bool IsJumpInst() const
+        {
+            return true;
+        }
+        public nothrow override bool IsGoInst() const
+        {
+            return true;
+        }
+        public nothrow override bool IsAbsoluteAddressInst()
+        {
+            return true;
+        }
+    }
+
+    public class Goi : Instruction
+    {
+        public nothrow Goi() : base(GOI)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong yy = regs.Get(y);
+            ulong zz = z;
+            ulong to = yy + zz;
+            ulong pc = regs.GetPC();
+            ulong xx = pc + 4u;
+            regs.SetPC(to);
+            regs.Set(x, xx);
+        }
+        public nothrow override bool IsJumpInst() const
+        {
+            return true;
+        }
+        public nothrow override bool IsGoInst() const
+        {
+            return true;
+        }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
+        }
+        public nothrow override bool IsAbsoluteAddressInst()
+        {
+            return true;
+        }
+    }
+
+    public class Call : Instruction
+    {
+        public nothrow Call() : base(CALL)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong yy = regs.Get(y);
+            ulong zz = regs.Get(z);
+            ulong to = yy + zz;
+            ulong pc = regs.GetPC();
+            ulong ret = pc + 4u;
+            ulong sp = regs.GetSpecial(regSP);
+            for (byte i = 0u; i <= x; ++i)
+            {
+                mem.WriteULong(sp, regs.Get(i), Protection.write);
+                sp = sp + 8u;
+            }
+            mem.WriteULong(sp, x, Protection.write);
+            sp = sp + 8u;
+            mem.WriteULong(sp, regs.GetSpecial(Registers.rL), Protection.write);
+            sp = sp + 8u;
+            mem.WriteULong(sp, ret, Protection.write);
+            sp = sp + 8u;
+            regs.Set(regSP, sp);
+            regs.SetPC(to);
+            regs.SetSpecial(Registers.rL, 0u);
+        }
+        public nothrow override bool IsJumpInst() const
+        {
+            return true;
+        }
+        public nothrow override bool IsGoInst() const
+        {
+            return true;
+        }
+        public nothrow override bool IsAbsoluteAddressInst()
+        {
+            return true;
+        }
+    }
+
+    public class Calli : Instruction
+    {
+        public nothrow Calli() : base(CALLI)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong yy = regs.Get(y);
+            ulong zz = z;
+            ulong to = yy + zz;
+            ulong pc = regs.GetPC();
+            ulong ret = pc + 4u;
+            ulong sp = regs.Get(regSP);
+            for (byte i = 0u; i <= x; ++i)
+            {
+                mem.WriteULong(sp, regs.Get(i), Protection.write);
+                sp = sp + 8u;
+            }
+            mem.WriteULong(sp, x, Protection.write);
+            sp = sp + 8u;
+            mem.WriteULong(sp, regs.GetSpecial(Registers.rL), Protection.write);
+            sp = sp + 8u;
+            mem.WriteULong(sp, ret, Protection.write);
+            sp = sp + 8u;
+            regs.Set(regSP, sp);
+            regs.SetPC(to);
+            regs.SetSpecial(Registers.rL, 0u);
+        }
+        public nothrow override bool IsJumpInst() const
+        {
+            return true;
+        }
+        public nothrow override bool IsGoInst() const
+        {
+            return true;
+        }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
+        }
+        public nothrow override bool IsAbsoluteAddressInst()
+        {
+            return true;
+        }
+    }
+
+    public class Ret : Instruction
+    {
+        public nothrow Ret() : base(RET)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong sp = regs.Get(regSP);
+            sp = sp - 8u;
+            ulong ret = mem.ReadULong(sp, Protection.read);
+            sp = sp - 8u;
+            ulong rl = mem.ReadULong(sp, Protection.read);
+            regs.SetSpecial(Registers.rL, rl);
+            sp = sp - 8u;
+            byte n = cast<byte>(mem.ReadULong(sp, Protection.read));
+            for (int i = n; i >= 0; --i)
+            {
+                sp = sp - 8u;
+                ulong rr = mem.ReadULong(sp, Protection.read);
+                regs.Set(cast<byte>(i), rr);
+            }
+            regs.Set(regSP, sp);
+            regs.SetPC(ret);
+        }
+        public override string FormatParams(ulong address, byte x, byte y, byte z, Formatter& formatter)
+        {
+            return string();
+        }
+        public nothrow override bool IsJumpInst() const
+        {
+            return true;
+        }
+    }
+
+    public class Bn : Instruction
+    {
+        public nothrow Bn() : base(BN)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            long xx = cast<long>(regs.Get(x));
+            if (xx < 0)
+            {
+                ulong pc = regs.GetPC();
+                ulong to = pc + (((cast<ulong>(y) << 8u) | cast<ulong>(z)) << 2u);
+                regs.SetPC(to);
+            }
+            else
+            {
+                ulong pc = regs.GetPC();
+                ulong to = pc + 4u;
+                regs.SetPC(to);
+            }
+        }
+        public nothrow override bool IsJumpInst() const
+        {
+            return true;
+        }
+    }
+
+    public class Bnb : Instruction
+    {
+        public nothrow Bnb() : base(BNB)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            long xx = cast<long>(regs.Get(x));
+            if (xx < 0)
+            {
+                ulong pc = regs.GetPC();
+                ulong offset = ((cast<ulong>(y) << 8u) | cast<ulong>(z)) << 2u;
+                ulong to = pc - offset;
+                regs.SetPC(to);
+            }
+            else
+            {
+                ulong pc = regs.GetPC();
+                ulong to = pc + 4u;
+                regs.SetPC(to);
+            }
+        }
+        public nothrow override bool IsJumpInst() const
+        {
+            return true;
+        }
+        public nothrow override bool IsForwardInst() const
+        {
+            return false;
+        }
+    }
+
+    public class Bz : Instruction
+    {
+        public nothrow Bz() : base(BZ)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong xx = regs.Get(x);
+            if (xx == 0u)
+            {
+                ulong pc = regs.GetPC();
+                ulong to = pc + (((cast<ulong>(y) << 8u) | cast<ulong>(z)) << 2u);
+                regs.SetPC(to);
+            }
+            else
+            {
+                ulong pc = regs.GetPC();
+                ulong to = pc + 4u;
+                regs.SetPC(to);
+            }
+        }
+        public nothrow override bool IsJumpInst() const
+        {
+            return true;
+        }
+    }
+
+    public class Bzb : Instruction
+    {
+        public nothrow Bzb() : base(BZB)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong xx = regs.Get(x);
+            if (xx == 0u)
+            {
+                ulong pc = regs.GetPC();
+                ulong offset = ((cast<ulong>(y) << 8u) | cast<ulong>(z)) << 2u;
+                ulong to = pc - offset;
+                regs.SetPC(to);
+            }
+            else
+            {
+                ulong pc = regs.GetPC();
+                ulong to = pc + 4u;
+                regs.SetPC(to);
+            }
+        }
+        public nothrow override bool IsJumpInst() const
+        {
+            return true;
+        }
+        public nothrow override bool IsForwardInst() const
+        {
+            return false;
+        }
+    }
+
+    public class Bp : Instruction
+    {
+        public nothrow Bp() : base(BP)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            long xx = cast<long>(regs.Get(x));
+            if (xx > 0)
+            {
+                ulong pc = regs.GetPC();
+                ulong to = pc + (((cast<ulong>(y) << 8u) | cast<ulong>(z)) << 2u);
+                regs.SetPC(to);
+            }
+            else
+            {
+                ulong pc = regs.GetPC();
+                ulong to = pc + 4u;
+                regs.SetPC(to);
+            }
+        }
+        public nothrow override bool IsJumpInst() const
+        {
+            return true;
+        }
+    }
+
+    public class Bpb : Instruction
+    {
+        public nothrow Bpb() : base(BPB)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            long xx = cast<long>(regs.Get(x));
+            if (xx > 0)
+            {
+                ulong pc = regs.GetPC();
+                ulong offset = ((cast<ulong>(y) << 8u) | cast<ulong>(z)) << 2u;
+                ulong to = pc - offset;
+                regs.SetPC(to);
+            }
+            else
+            {
+                ulong pc = regs.GetPC();
+                ulong to = pc + 4u;
+                regs.SetPC(to);
+            }
+        }
+        public nothrow override bool IsJumpInst() const
+        {
+            return true;
+        }
+        public nothrow override bool IsForwardInst() const
+        {
+            return false;
+        }
+    }
+
+    public class Bod : Instruction
+    {
+        public nothrow Bod() : base(BOD)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong xx = regs.Get(x);
+            if ((xx & 1u) != 0u)
+            {
+                ulong pc = regs.GetPC();
+                ulong to = pc + (((cast<ulong>(y) << 8u) | cast<ulong>(z)) << 2u);
+                regs.SetPC(to);
+            }
+            else
+            {
+                ulong pc = regs.GetPC();
+                ulong to = pc + 4u;
+                regs.SetPC(to);
+            }
+        }
+        public nothrow override bool IsJumpInst() const
+        {
+            return true;
+        }
+    }
+
+    public class Bodb : Instruction
+    {
+        public nothrow Bodb() : base(BODB)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong xx = regs.Get(x);
+            if ((xx & 1u) != 0u)
+            {
+                ulong pc = regs.GetPC();
+                ulong offset = ((cast<ulong>(y) << 8u) | cast<ulong>(z)) << 2u;
+                ulong to = pc - offset;
+                regs.SetPC(to);
+            }
+            else
+            {
+                ulong pc = regs.GetPC();
+                ulong to = pc + 4u;
+                regs.SetPC(to);
+            }
+        }
+        public nothrow override bool IsJumpInst() const
+        {
+            return true;
+        }
+        public nothrow override bool IsForwardInst() const
+        {
+            return false;
+        }
+    }
+
+    public class Bnn : Instruction
+    {
+        public nothrow Bnn() : base(BNN)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            long xx = cast<long>(regs.Get(x));
+            if (xx >= 0)
+            {
+                ulong pc = regs.GetPC();
+                ulong to = pc + (((cast<ulong>(y) << 8u) | cast<ulong>(z)) << 2u);
+                regs.SetPC(to);
+            }
+            else
+            {
+                ulong pc = regs.GetPC();
+                ulong to = pc + 4u;
+                regs.SetPC(to);
+            }
+        }
+        public nothrow override bool IsJumpInst() const
+        {
+            return true;
+        }
+}
+
+    public class Bnnb : Instruction
+    {
+        public nothrow Bnnb() : base(BNNB)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            long xx = cast<long>(regs.Get(x));
+            if (xx >= 0)
+            {
+                ulong pc = regs.GetPC();
+                ulong offset = ((cast<ulong>(y) << 8u) | cast<ulong>(z)) << 2u;
+                ulong to = pc - offset;
+                regs.SetPC(to);
+            }
+            else
+            {
+                ulong pc = regs.GetPC();
+                ulong to = pc + 4u;
+                regs.SetPC(to);
+            }
+        }
+        public nothrow override bool IsJumpInst() const
+        {
+            return true;
+        }
+        public nothrow override bool IsForwardInst() const
+        {
+            return false;
+        }
+    }
+
+    public class Bnz : Instruction
+    {
+        public nothrow Bnz() : base(BNZ)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong xx = regs.Get(x);
+            if (xx != 0u)
+            {
+                ulong pc = regs.GetPC();
+                ulong to = pc + (((cast<ulong>(y) << 8u) | cast<ulong>(z)) << 2u);
+                regs.SetPC(to);
+            }
+            else
+            {
+                ulong pc = regs.GetPC();
+                ulong to = pc + 4u;
+                regs.SetPC(to);
+            }
+        }
+        public nothrow override bool IsJumpInst() const
+        {
+            return true;
+        }
+    }
+
+    public class Bnzb : Instruction
+    {
+        public nothrow Bnzb() : base(BNZB)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong xx = regs.Get(x);
+            if (xx != 0u)
+            {
+                ulong pc = regs.GetPC();
+                ulong offset = ((cast<ulong>(y) << 8u) | cast<ulong>(z)) << 2u;
+                ulong to = pc - offset;
+                regs.SetPC(to);
+            }
+            else
+            {
+                ulong pc = regs.GetPC();
+                ulong to = pc + 4u;
+                regs.SetPC(to);
+            }
+        }
+        public nothrow override bool IsJumpInst() const
+        {
+            return true;
+        }
+        public nothrow override bool IsForwardInst() const
+        {
+            return false;
+        }
+    }
+
+    public class Bnp : Instruction
+    {
+        public nothrow Bnp() : base(BNP)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            long xx = cast<long>(regs.Get(x));
+            if (xx <= 0)
+            {
+                ulong pc = regs.GetPC();
+                ulong to = pc + (((cast<ulong>(y) << 8u) | cast<ulong>(z)) << 2u);
+                regs.SetPC(to);
+            }
+            else
+            {
+                ulong pc = regs.GetPC();
+                ulong to = pc + 4u;
+                regs.SetPC(to);
+            }
+        }
+        public nothrow override bool IsJumpInst() const
+        {
+            return true;
+        }
+    }
+
+    public class Bnpb : Instruction
+    {
+        public nothrow Bnpb() : base(BNPB)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            long xx = cast<long>(regs.Get(x));
+            if (xx <= 0)
+            {
+                ulong pc = regs.GetPC();
+                ulong offset = ((cast<ulong>(y) << 8u) | cast<ulong>(z)) << 2u;
+                ulong to = pc - offset;
+                regs.SetPC(to);
+            }
+            else
+            {
+                ulong pc = regs.GetPC();
+                ulong to = pc + 4u;
+                regs.SetPC(to);
+            }
+        }
+        public nothrow override bool IsJumpInst() const
+        {
+            return true;
+        }
+        public nothrow override bool IsForwardInst() const
+        {
+            return false;
+        }
+    }
+
+    public class Bev : Instruction
+    {
+        public nothrow Bev() : base(BEV)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong xx = regs.Get(x);
+            if ((xx & 1u) == 0u)
+            {
+                ulong pc = regs.GetPC();
+                ulong to = pc + (((cast<ulong>(y) << 8u) | cast<ulong>(z)) << 2u);
+                regs.SetPC(to);
+            }
+            else
+            {
+                ulong pc = regs.GetPC();
+                ulong to = pc + 4u;
+                regs.SetPC(to);
+            }
+        }
+        public nothrow override bool IsJumpInst() const
+        {
+            return true;
+        }
+    }
+
+    public class Bevb : Instruction
+    {
+        public nothrow Bevb() : base(BEVB)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong xx = regs.Get(x);
+            if ((xx & 1u) == 0u)
+            {
+                ulong pc = regs.GetPC();
+                ulong offset = ((cast<ulong>(y) << 8u) | cast<ulong>(z)) << 2u;
+                ulong to = pc - offset;
+                regs.SetPC(to);
+            }
+            else
+            {
+                ulong pc = regs.GetPC();
+                ulong to = pc + 4u;
+                regs.SetPC(to);
+            }
+        }
+        public nothrow override bool IsJumpInst() const
+        {
+            return true;
+        }
+        public nothrow override bool IsForwardInst() const
+        {
+            return false;
+        }
+    }
+
+    public class Pbn : Instruction
+    {
+        public nothrow Pbn() : base(PBN)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            long xx = cast<long>(regs.Get(x));
+            if (xx < 0)
+            {
+                ulong pc = regs.GetPC();
+                ulong to = pc + (((cast<ulong>(y) << 8u) | cast<ulong>(z)) << 2u);
+                regs.SetPC(to);
+            }
+            else
+            {
+                ulong pc = regs.GetPC();
+                ulong to = pc + 4u;
+                regs.SetPC(to);
+            }
+        }
+        public nothrow override bool IsJumpInst() const
+        {
+            return true;
+        }
+    }
+
+    public class Pbnb : Instruction
+    {
+        public nothrow Pbnb() : base(PBNB)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            long xx = cast<long>(regs.Get(x));
+            if (xx < 0)
+            {
+                ulong pc = regs.GetPC();
+                ulong offset = ((cast<ulong>(y) << 8u) | cast<ulong>(z)) << 2u;
+                ulong to = pc - offset;
+                regs.SetPC(to);
+            }
+            else
+            {
+                ulong pc = regs.GetPC();
+                ulong to = pc + 4u;
+                regs.SetPC(to);
+            }
+        }
+        public nothrow override bool IsJumpInst() const
+        {
+            return true;
+        }
+        public nothrow override bool IsForwardInst() const
+        {
+            return false;
+        }
+    }
+
+    public class Pbz : Instruction
+    {
+        public nothrow Pbz() : base(PBZ)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong xx = regs.Get(x);
+            if (xx == 0u)
+            {
+                ulong pc = regs.GetPC();
+                ulong to = pc + (((cast<ulong>(y) << 8u) | cast<ulong>(z)) << 2u);
+                regs.SetPC(to);
+            }
+            else
+            {
+                ulong pc = regs.GetPC();
+                ulong to = pc + 4u;
+                regs.SetPC(to);
+            }
+        }
+        public nothrow override bool IsJumpInst() const
+        {
+            return true;
+        }
+}
+
+    public class Pbzb : Instruction
+    {
+        public nothrow Pbzb() : base(PBZB)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong xx = regs.Get(x);
+            if (xx == 0u)
+            {
+                ulong pc = regs.GetPC();
+                ulong offset = ((cast<ulong>(y) << 8u) | cast<ulong>(z)) << 2u;
+                ulong to = pc - offset;
+                regs.SetPC(to);
+            }
+            else
+            {
+                ulong pc = regs.GetPC();
+                ulong to = pc + 4u;
+                regs.SetPC(to);
+            }
+        }
+        public nothrow override bool IsJumpInst() const
+        {
+            return true;
+        }
+        public nothrow override bool IsForwardInst() const
+        {
+            return false;
+        }
+    }
+
+    public class Pbp : Instruction
+    {
+        public nothrow Pbp() : base(PBP)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            long xx = cast<long>(regs.Get(x));
+            if (xx > 0)
+            {
+                ulong pc = regs.GetPC();
+                ulong to = pc + (((cast<ulong>(y) << 8u) | cast<ulong>(z)) << 2u);
+                regs.SetPC(to);
+            }
+            else
+            {
+                ulong pc = regs.GetPC();
+                ulong to = pc + 4u;
+                regs.SetPC(to);
+            }
+        }
+        public nothrow override bool IsJumpInst() const
+        {
+            return true;
+        }
+    }
+
+    public class Pbpb : Instruction
+    {
+        public nothrow Pbpb() : base(PBPB)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            long xx = cast<long>(regs.Get(x));
+            if (xx > 0)
+            {
+                ulong pc = regs.GetPC();
+                ulong offset = ((cast<ulong>(y) << 8u) | cast<ulong>(z)) << 2u;
+                ulong to = pc - offset;
+                regs.SetPC(to);
+            }
+            else
+            {
+                ulong pc = regs.GetPC();
+                ulong to = pc + 4u;
+                regs.SetPC(to);
+            }
+        }
+        public nothrow override bool IsJumpInst() const
+        {
+            return true;
+        }
+        public nothrow override bool IsForwardInst() const
+        {
+            return false;
+        }
+    }
+
+    public class Pbod : Instruction
+    {
+        public nothrow Pbod() : base(PBOD)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong xx = regs.Get(x);
+            if ((xx & 1u) != 0u)
+            {
+                ulong pc = regs.GetPC();
+                ulong to = pc + (((cast<ulong>(y) << 8u) | cast<ulong>(z)) << 2u);
+                regs.SetPC(to);
+            }
+            else
+            {
+                ulong pc = regs.GetPC();
+                ulong to = pc + 4u;
+                regs.SetPC(to);
+            }
+        }
+        public nothrow override bool IsJumpInst() const
+        {
+            return true;
+        }
+    }
+
+    public class Pbodb : Instruction
+    {
+        public nothrow Pbodb() : base(PBODB)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong xx = regs.Get(x);
+            if ((xx & 1u) != 0u)
+            {
+                ulong pc = regs.GetPC();
+                ulong offset = ((cast<ulong>(y) << 8u) | cast<ulong>(z)) << 2u;
+                ulong to = pc - offset;
+                regs.SetPC(to);
+            }
+            else
+            {
+                ulong pc = regs.GetPC();
+                ulong to = pc + 4u;
+                regs.SetPC(to);
+            }
+        }
+        public nothrow override bool IsJumpInst() const
+        {
+            return true;
+        }
+        public nothrow override bool IsForwardInst() const
+        {
+            return false;
+        }
+    }
+
+    public class Pbnn : Instruction
+    {
+        public nothrow Pbnn() : base(PBNN)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            long xx = cast<long>(regs.Get(x));
+            if (xx >= 0)
+            {
+                ulong pc = regs.GetPC();
+                ulong to = pc + (((cast<ulong>(y) << 8u) | cast<ulong>(z)) << 2u);
+                regs.SetPC(to);
+            }
+            else
+            {
+                ulong pc = regs.GetPC();
+                ulong to = pc + 4u;
+                regs.SetPC(to);
+            }
+        }
+        public nothrow override bool IsJumpInst() const
+        {
+            return true;
+        }
+    }
+
+    public class Pbnnb : Instruction
+    {
+        public nothrow Pbnnb() : base(PBNNB)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            long xx = cast<long>(regs.Get(x));
+            if (xx >= 0)
+            {
+                ulong pc = regs.GetPC();
+                ulong offset = ((cast<ulong>(y) << 8u) | cast<ulong>(z)) << 2u;
+                ulong to = pc - offset;
+                regs.SetPC(to);
+            }
+            else
+            {
+                ulong pc = regs.GetPC();
+                ulong to = pc + 4u;
+                regs.SetPC(to);
+            }
+        }
+        public nothrow override bool IsJumpInst() const
+        {
+            return true;
+        }
+        public nothrow override bool IsForwardInst() const
+        {
+            return false;
+        }
+    }
+
+    public class Pbnz : Instruction
+    {
+        public nothrow Pbnz() : base(PBNZ)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong xx = regs.Get(x);
+            if (xx != 0u)
+            {
+                ulong pc = regs.GetPC();
+                ulong to = pc + (((cast<ulong>(y) << 8u) | cast<ulong>(z)) << 2u);
+                regs.SetPC(to);
+            }
+            else
+            {
+                ulong pc = regs.GetPC();
+                ulong to = pc + 4u;
+                regs.SetPC(to);
+            }
+        }
+        public nothrow override bool IsJumpInst() const
+        {
+            return true;
+        }
+}
+
+    public class Pbnzb : Instruction
+    {
+        public nothrow Pbnzb() : base(PBNZB)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong xx = regs.Get(x);
+            if (xx != 0u)
+            {
+                ulong pc = regs.GetPC();
+                ulong offset = ((cast<ulong>(y) << 8u) | cast<ulong>(z)) << 2u;
+                ulong to = pc - offset;
+                regs.SetPC(to);
+            }
+            else
+            {
+                ulong pc = regs.GetPC();
+                ulong to = pc + 4u;
+                regs.SetPC(to);
+            }
+        }
+        public nothrow override bool IsJumpInst() const
+        {
+            return true;
+        }
+        public nothrow override bool IsForwardInst() const
+        {
+            return false;
+        }
+    }
+
+    public class Pbnp : Instruction
+    {
+        public nothrow Pbnp() : base(PBNP)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            long xx = cast<long>(regs.Get(x));
+            if (xx <= 0)
+            {
+                ulong pc = regs.GetPC();
+                ulong to = pc + (((cast<ulong>(y) << 8u) | cast<ulong>(z)) << 2u);
+                regs.SetPC(to);
+            }
+            else
+            {
+                ulong pc = regs.GetPC();
+                ulong to = pc + 4u;
+                regs.SetPC(to);
+            }
+        }
+        public nothrow override bool IsJumpInst() const
+        {
+            return true;
+        }
+    }
+
+    public class Pbnpb : Instruction
+    {
+        public nothrow Pbnpb() : base(PBNPB)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            long xx = cast<long>(regs.Get(x));
+            if (xx <= 0)
+            {
+                ulong pc = regs.GetPC();
+                ulong offset = ((cast<ulong>(y) << 8u) | cast<ulong>(z)) << 2u;
+                ulong to = pc - offset;
+                regs.SetPC(to);
+            }
+            else
+            {
+                ulong pc = regs.GetPC();
+                ulong to = pc + 4u;
+                regs.SetPC(to);
+            }
+        }
+        public nothrow override bool IsJumpInst() const
+        {
+            return true;
+        }
+        public nothrow override bool IsForwardInst() const
+        {
+            return false;
+        }
+    }
+
+    public class Pbev : Instruction
+    {
+        public nothrow Pbev() : base(PBEV)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong xx = regs.Get(x);
+            if ((xx & 1u) == 0u)
+            {
+                ulong pc = regs.GetPC();
+                ulong to = pc + (((cast<ulong>(y) << 8u) | cast<ulong>(z)) << 2u);
+                regs.SetPC(to);
+            }
+            else
+            {
+                ulong pc = regs.GetPC();
+                ulong to = pc + 4u;
+                regs.SetPC(to);
+            }
+        }
+        public nothrow override bool IsJumpInst() const
+        {
+            return true;
+        }
+    }
+
+    public class Pbevb : Instruction
+    {
+        public nothrow Pbevb() : base(PBEVB)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong xx = regs.Get(x);
+            if ((xx & 1u) == 0u)
+            {
+                ulong pc = regs.GetPC();
+                ulong offset = ((cast<ulong>(y) << 8u) | cast<ulong>(z)) << 2u;
+                ulong to = pc - offset;
+                regs.SetPC(to);
+            }
+            else
+            {
+                ulong pc = regs.GetPC();
+                ulong to = pc + 4u;
+                regs.SetPC(to);
+            }
+        }
+        public nothrow override bool IsJumpInst() const
+        {
+            return true;
+        }
+        public nothrow override bool IsForwardInst() const
+        {
+            return false;
+        }
+    }
+
+    public class Get : Instruction
+    {
+        public nothrow Get() : base(GET)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong xx = regs.GetSpecial(y);
+            regs.Set(x, xx);
+        }
+        public override string FormatParams(ulong address, byte x, byte y, byte z, Formatter& formatter)
+        {
+            string result;
+            result.Append(formatter.FormatRegisterNumber(x));
+            result.Append(',');
+            cmsx.machine.Machine& machine = Machine.Instance();
+            cmsx.machine.Registers& regs = machine.GetRegisters();
+            string regName = regs.GetSpecialRegName(y);
+            if (!regName.IsEmpty())
+            {
+                result.Append(regName);
+            }
+            else
+            {
+                result.Append(ToString(y));
+            }
+            return result;
+        }
+    }
+
+    public class Put : Instruction
+    {
+        public nothrow Put() : base(PUT)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong yy = regs.Get(y);
+            regs.SetSpecial(x, yy);
+        }
+        public override string FormatParams(ulong address, byte x, byte y, byte z, Formatter& formatter)
+        {
+            string result;
+            cmsx.machine.Machine& machine = Machine.Instance();
+            cmsx.machine.Registers& regs = machine.GetRegisters();
+            string regName = regs.GetSpecialRegName(x);
+            if (!regName.IsEmpty())
+            {
+                result.Append(regName);
+            }
+            else
+            {
+                result.Append(ToString(x));
+            }
+            result.Append(',');
+            result.Append(formatter.FormatRegisterNumber(y));
+            return result;
+        }
+    }
+
+    public class GetA : Instruction
+    {
+        public nothrow GetA() : base(GETA)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong pc = regs.GetPC();
+            ulong to = pc + (((cast<ulong>(y) << 8u) | cast<ulong>(z)) << 2u);
+            ulong xx = to;
+            regs.Set(x, xx);
+        }
+    }
+
+    public class GetAb : Instruction
+    {
+        public nothrow GetAb() : base(GETAB)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong pc = regs.GetPC();
+            ulong offset = ((cast<ulong>(y) << 8u) | cast<ulong>(z)) << 2u;
+            ulong to = pc - offset;
+            ulong xx = to;
+            regs.Set(x, xx);
+        }
+        public nothrow override bool IsForwardInst() const
+        {
+            return false;
+        }
+    }
+
+    public string FormatInstruction(ulong address, byte opCode, byte x, byte y, byte z, Formatter& formatter)
+    {
+        Instruction* inst = Machine.Instance().GetInst(opCode);
+        if (inst != null)
+        {
+            return inst->Format(address, x, y, z, formatter);
+        }
+        else
+        {
+            string result = GetOpCodeName(opCode) + " instruction not implemented";
+            return result;
+        }
+    }
+}

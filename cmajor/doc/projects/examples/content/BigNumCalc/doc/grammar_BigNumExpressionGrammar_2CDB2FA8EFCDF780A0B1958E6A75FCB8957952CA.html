@@ -1,0 +1,75 @@
+<html>
+ <head>
+  <meta charset="utf-8"/>
+  <title>BigNumExpressionGrammar Grammar</title>
+  <link href="../../../style/style.css" rel="stylesheet" type="text/css"/>
+ </head>
+ <body>
+  <h1>BigNumExpressionGrammar Grammar</h1>
+  <table class="grammar">
+   <tr id="rule_Expr_D3FD46A6D973D8AF9A3E5C984228859085E74148">
+    <td class="grammarFirstCol">
+     <span class="rule">Expr</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#rule_Term_E5881B3953E51E75E8E8727CD64A6F95047FB03F">Term</a></span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleOp">(</span><span class="ruleChar">'+'</span><span class="ruleOp"> | </span><span class="ruleChar">'-'</span><span class="ruleOp">)</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_Term_E5881B3953E51E75E8E8727CD64A6F95047FB03F">Term</a></span><span class="ruleOp">)</span><span class="ruleOp">*</span></td>
+   </tr>
+   <tr id="rule_Term_E5881B3953E51E75E8E8727CD64A6F95047FB03F">
+    <td class="grammarFirstCol">
+     <span class="rule">Term</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#rule_Factor_81624A792CA0FED72F5C10D797D6676300CE7281">Factor</a></span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleOp">(</span><span class="ruleChar">'*'</span><span class="ruleOp"> | </span><span class="ruleChar">'/'</span><span class="ruleOp">)</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_Factor_81624A792CA0FED72F5C10D797D6676300CE7281">Factor</a></span><span class="ruleOp">)</span><span class="ruleOp">*</span></td>
+   </tr>
+   <tr id="rule_Factor_81624A792CA0FED72F5C10D797D6676300CE7281">
+    <td class="grammarFirstCol">
+     <span class="rule">Factor</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleOp">(</span><span class="ruleChar">'-'</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_Factor_81624A792CA0FED72F5C10D797D6676300CE7281">Factor</a></span><span class="ruleOp">)</span><span class="ruleOp"> | </span><span class="ruleOp">(</span><span class="ruleChar">'+'</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_Factor_81624A792CA0FED72F5C10D797D6676300CE7281">Factor</a></span><span class="ruleOp">)</span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#rule_Number_1FBD3F93D89E051F33C68ED01B4595A0C7DDE471">Number</a></span><span class="ruleOp"> | </span><span class="ruleChar">'('</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_Expr_D3FD46A6D973D8AF9A3E5C984228859085E74148">Expr</a></span><span class="ruleOp"> </span><span class="ruleChar">')'</span></td>
+   </tr>
+   <tr id="rule_Number_1FBD3F93D89E051F33C68ED01B4595A0C7DDE471">
+    <td class="grammarFirstCol">
+     <span class="rule">Number</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#rule_BigFloatLiteral_3E91B9DD3522E15364E6BEA4A82AEEBA26AE2E56">BigFloatLiteral</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#rule_BigRationalLiteral_96CD3517D97B450404F7285802F60277C64E293D">BigRationalLiteral</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#rule_BigIntLiteral_3178A107E102909141AC5E6E3F5EF590267C059C">BigIntLiteral</a></span></td>
+   </tr>
+   <tr id="rule_ExponentPart_50DE7F9DAF78DA3807E9E5F62386EEA4A1DDFB84">
+    <td class="grammarFirstCol">
+     <span class="rule">ExponentPart</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleKeyword">token</span><span class="ruleOp">(</span><span class="ruleCharSet">[eE]</span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleChar">'+'</span><span class="ruleOp"> | </span><span class="ruleChar">'-'</span><span class="ruleOp">)</span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleKeyword">digit</span><span class="ruleOp">+</span><span class="ruleOp">)</span></td>
+   </tr>
+   <tr id="rule_BigFloatLiteral_3E91B9DD3522E15364E6BEA4A82AEEBA26AE2E56">
+    <td class="grammarFirstCol">
+     <span class="rule">BigFloatLiteral</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleKeyword">token</span><span class="ruleOp">(</span><span class="ruleKeyword">digit</span><span class="ruleOp">+</span><span class="ruleOp"> </span><span class="ruleChar">'.'</span><span class="ruleOp"> </span><span class="ruleKeyword">digit</span><span class="ruleOp">+</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_ExponentPart_50DE7F9DAF78DA3807E9E5F62386EEA4A1DDFB84">ExponentPart</a></span><span class="ruleOp">?</span><span class="ruleOp"> | </span><span class="ruleKeyword">digit</span><span class="ruleOp">+</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_ExponentPart_50DE7F9DAF78DA3807E9E5F62386EEA4A1DDFB84">ExponentPart</a></span><span class="ruleOp">)</span></td>
+   </tr>
+   <tr id="rule_BigRationalLiteral_96CD3517D97B450404F7285802F60277C64E293D">
+    <td class="grammarFirstCol">
+     <span class="rule">BigRationalLiteral</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleKeyword">token</span><span class="ruleOp">(</span><span class="ruleChar">'['</span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleKeyword">digit</span><span class="ruleOp">+</span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleChar">'/'</span><span class="ruleOp"> </span><span class="ruleKeyword">digit</span><span class="ruleOp">+</span><span class="ruleOp">)</span><span class="ruleOp">?</span><span class="ruleOp">)</span><span class="ruleOp"> </span><span class="ruleChar">']'</span><span class="ruleOp">)</span></td>
+   </tr>
+   <tr id="rule_BigIntLiteral_3178A107E102909141AC5E6E3F5EF590267C059C">
+    <td class="grammarFirstCol">
+     <span class="rule">BigIntLiteral</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleKeyword">token</span><span class="ruleOp">(</span><span class="ruleKeyword">digit</span><span class="ruleOp">+</span><span class="ruleOp">)</span></td>
+   </tr>
+   <tr id="rule_Spaces_B86CEE0F63823E76C8DC5EDD2F72FB1863BD9CE2">
+    <td class="grammarFirstCol">
+     <span class="rule">Spaces</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleKeyword">space</span><span class="ruleOp">+</span></td>
+   </tr>
+  </table>
+ </body>
+</html>

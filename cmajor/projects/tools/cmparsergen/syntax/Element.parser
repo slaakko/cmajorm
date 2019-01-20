@@ -1,0 +1,78 @@
+using System.Text.Parsing.CodeDom;
+using System.Collections;
+using ParsingContext = Code.ParsingContext;
+
+namespace Syntax
+{
+    grammar ElementGrammar
+    {
+        using stdlib.identifier;
+        using stdlib.qualified_id;
+        using stdlib.string;
+        using Type = Code.TypeExprGrammar.TypeExpr;
+        using Id = Code.IdentifierGrammar.Identifier;
+
+        RuleLink(System.Text.Parsing.Grammar* grammar)
+            ::= (keyword("using") identifier:alias '=' qualified_id:rule ';')
+                {
+                    System.Text.Parsing.RuleLink* ruleLink = new System.Text.Parsing.RuleLink(alias, grammar, rule);
+                    ruleLink->SetSpan(span);
+                    grammar->AddRuleLink(ruleLink);
+                }
+            |   (keyword("using") qualified_id:qrule ';')
+                {
+                    System.Text.Parsing.RuleLink* ruleLink = new System.Text.Parsing.RuleLink(grammar, qrule);
+                    ruleLink->SetSpan(span);
+                    grammar->AddRuleLink(ruleLink);
+                }
+            ;
+
+        Signature(ParsingContext* ctx, System.Text.Parsing.RuleParser* rule)
+            ::= ParameterList(ctx, rule)? ReturnType(ctx, rule)?
+            ;
+
+        ParameterList(ParsingContext* ctx, System.Text.Parsing.RuleParser* rule)
+            ::= '(' ((Variable(ctx, rule) | Parameter(ctx, rule)) % ',') ')'!
+            ;
+
+        Variable(ParsingContext* ctx, System.Text.Parsing.RuleParser* rule, var UniquePtr<DomObject> type, var UniquePtr<DomObject> id)
+            ::= (keyword("var") Type(ctx){ type.Reset(Type); } Id{ id.Reset(Id); }){ rule->AddLocalVariable(AttrOrVar(type->Name(), id->Name())); }
+            ;
+
+        Parameter(ParsingContext* ctx, System.Text.Parsing.RuleParser* rule, var UniquePtr<DomObject> type, var UniquePtr<DomObject> id)
+            ::= (Type(ctx){ type.Reset(Type); } Id{ id.Reset(Id); }){ rule->AddInheritedAttribute(AttrOrVar(type->Name(), id->Name())); }
+            ;
+
+        ReturnType(ParsingContext* ctx, System.Text.Parsing.RuleParser* rule, var UniquePtr<DomObject> type)
+            ::= ':' Type(ctx){ type.Reset(Type); rule->SetValueTypeName(type->Name()); }
+            ;
+
+        Keyword
+            ::= keyword_list(identifier,
+                [   "using", "grammar", "start", "end", "skip", "token", "keyword", "keyword_list",
+                    "empty", "space", "anychar", "letter", "digit", "hexdigit", "var", "range",
+                    "upper_letter", "lower_letter", "title_letter", "modifier_letter", "other_letter",
+                    "cased_letter", "mark", "nonspacing_mark", "spacing_mark", "enclosing_mark",
+                    "number", "decimal_number", "letter_number", "other_number", "punctuation",
+                    "connector_punctuation", "dash_punctuation", "open_punctuation", "close_punctuation",
+                    "initial_punctuation", "final_punctuation", "other_punctuation",
+                    "symbol", "math_symbol", "currency_symbol", "modifier_symbol", "other_symbol",
+                    "separator", "space_separator", "line_separator", "paragraph_separator",
+                    "other", "control", "format", "surrogate", "private_use", "unassigned",
+                    "graphic", "basechar", "alphabetic", "idstart", "idcont"
+                ])
+            ;
+
+        Identifier : ustring
+            ::= token(identifier - Keyword){ value = ustring(matchBegin, matchEnd); }
+            ;
+
+        QualifiedId : ustring
+            ::= token(identifier:first ('.' identifier:reset)*){ value = ustring(matchBegin, matchEnd); }
+            ;
+
+        StringArray(List<ustring>* array)
+            ::= '[' (string:str{ array->Add(str); } % ',') ']'!
+            ;
+    }
+}

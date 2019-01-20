@@ -1,0 +1,49 @@
+<html>
+ <head>
+  <meta charset="utf-8"/>
+  <title>XPath/xpath.cm</title>
+  <link href="../../../style/style.css" rel="stylesheet" type="text/css"/>
+ </head>
+ <body>
+  <span class="code" id="1" xml:space="preserve"><span class="lineNumber">&nbsp;1</span>&nbsp;<span class="kw">using</span>&nbsp;<span class="identifier">System</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="2" xml:space="preserve"><span class="lineNumber">&nbsp;2</span>&nbsp;<span class="kw">using</span>&nbsp;<span class="identifier">System.Dom</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="3" xml:space="preserve"><span class="lineNumber">&nbsp;3</span>&nbsp;<span class="kw">using</span>&nbsp;<span class="identifier">System.Text</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="4" xml:space="preserve"><span class="lineNumber">&nbsp;4</span>&nbsp;<span class="kw">using</span>&nbsp;<span class="identifier">System.XPath</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="5" xml:space="preserve"><span class="lineNumber">&nbsp;5</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="6" xml:space="preserve"><span class="lineNumber">&nbsp;6</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../index.html#function_main_99F3726C50455B4187460FBE611E3885299323E1">main</a><span class="other">(</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="7" xml:space="preserve"><span class="lineNumber">&nbsp;7</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="8" xml:space="preserve"><span class="lineNumber">&nbsp;8</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">try</span></span>
+  <br/>
+  <span class="code" id="9" xml:space="preserve"><span class="lineNumber">&nbsp;9</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="10" xml:space="preserve"><span class="lineNumber">10</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../../../../../system/content/System.Base/doc/class_UniquePtr_T_793F841C13E9DD3A6869243C74F1D948C0E04009.html">UniquePtr</a><span class="other">&lt;</span><a href="../../../../../../system/content/System.Dom/doc/class_DomDocument_975632F3AA8CF3FEC1D51FB0E91F580D6EBA16C8.html">DomDocument</a><span class="other">></span>&nbsp;<span class="identifier">doc</span><span class="other">&nbsp;=&nbsp;</span><a href="../../../../../../system/content/System.Dom/doc/ns_System.Dom.html#function_ParseXmlFileToDomDocument_CDBEF03097E654DC3609B662FEAF72116D01B7CA">ParseXmlFileToDomDocument</a><span class="other">(</span><span class="string">"test.xml"</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="11" xml:space="preserve"><span class="lineNumber">11</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../../../../../system/content/System.Base/doc/class_UniquePtr_T_793F841C13E9DD3A6869243C74F1D948C0E04009.html">UniquePtr</a><span class="other">&lt;</span><a href="../../../../../../system/content/System.XPath/doc/class_XPathObject_91D53F03F45FCACE5D10959D030939A3CBB38F3E.html">XPathObject</a><span class="other">></span>&nbsp;<span class="identifier">result</span><span class="other">&nbsp;=&nbsp;</span><a href="../../../../../../system/content/System.XPath/doc/ns_System.XPath.html#function_Evaluate_BAADC9F9757ECDA2C151920B9C3805CAD33229D9">Evaluate</a><span class="other">(</span>&nbsp;<span class="string">u"/test/alpha[@a=\"1\"]/beta/gamma/text()"</span><span class="other">,&nbsp;</span><span class="identifier">doc</span><span class="other">.</span><a href="../../../../../../system/content/System.Base/doc/class_UniquePtr_T_793F841C13E9DD3A6869243C74F1D948C0E04009.html#member_function_Get_UniquePtr_T_84A185E63E772D34101667B639B5989D36F16FAA">Get</a><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="12" xml:space="preserve"><span class="lineNumber">12</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../../../../../system/content/System.Base/doc/class_UniquePtr_T_793F841C13E9DD3A6869243C74F1D948C0E04009.html">UniquePtr</a><span class="other">&lt;</span><a href="../../../../../../system/content/System.Dom/doc/class_DomNode_AAD27BD01107131DCBD7D66B91A6A861C7C23509.html">DomNode</a><span class="other">></span>&nbsp;<span class="identifier">resultAsDom</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">result</span><span class="other">-></span><a href="../../../../../../system/content/System.XPath/doc/class_XPathObject_91D53F03F45FCACE5D10959D030939A3CBB38F3E.html#member_function_ToDom_XPathObject_DC0C1BB26C5018C80710BAF5C3375004C1C7D2CF">ToDom</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="13" xml:space="preserve"><span class="lineNumber">13</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../../../../../system/content/System.Base/doc/class_CodeFormatter_38898A0914E7D27753F0D42E65A18EC272984F99.html">CodeFormatter</a>&nbsp;<span class="identifier">formatter</span><span class="other">(</span><a href="../../../../../../system/content/System.Base/doc/class_Console_41891B146EC51CAB04451732257B28BD18CAE52B.html">Console</a><span class="other">.</span><a href="../../../../../../system/content/System.Base/doc/class_Console_41891B146EC51CAB04451732257B28BD18CAE52B.html#member_function_Out_Console_A4BB5FFE2A3FD21817607224D4BC162094365AE1">Out</a><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="14" xml:space="preserve"><span class="lineNumber">14</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">resultAsDom</span><span class="other">-></span><a href="../../../../../../system/content/System.Dom/doc/class_DomNode_AAD27BD01107131DCBD7D66B91A6A861C7C23509.html#member_function_Write_DomNode_05F285958389E34CA6C2512D954F2AA7FDB24AD0">Write</a><span class="other">(</span><span class="identifier">formatter</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="15" xml:space="preserve"><span class="lineNumber">15</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="16" xml:space="preserve"><span class="lineNumber">16</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">catch</span>&nbsp;<span class="other">(</span><span class="kw">const</span>&nbsp;<a href="../../../../../../system/content/System.Base/doc/class_Exception_02AEA5204AD1035A91C2D843597EACBE078C8989.html">Exception</a><span class="other">&amp;</span>&nbsp;<span class="identifier">ex</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="17" xml:space="preserve"><span class="lineNumber">17</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="18" xml:space="preserve"><span class="lineNumber">18</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">Console</span><span class="other">.</span><span class="identifier">Error</span><span class="other">(</span><span class="other">)</span><span class="other">&nbsp;&lt;&lt;&nbsp;</span><span class="identifier">ex</span><span class="other">.</span><span class="identifier">ToString</span><span class="other">(</span><span class="other">)</span><span class="other">&nbsp;&lt;&lt;&nbsp;</span><span class="identifier">endl</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="19" xml:space="preserve"><span class="lineNumber">19</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="20" xml:space="preserve"><span class="lineNumber">20</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+ </body>
+</html>

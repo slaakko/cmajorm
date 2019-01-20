@@ -1,0 +1,827 @@
+using System;
+using System.Collections;
+using System.IO;
+
+public enum State
+{
+    edit, info, promptFileName, promptSave
+}
+
+public enum Tabs
+{
+    insertSpaces = 0, useTabs = 1
+}
+
+class Screen
+{
+    public nothrow Screen()
+    {
+        RtInitScreen();
+        RtNoEcho();
+        RtRaw();
+        RtKeyPad();
+        GetDimensions();
+    }
+    public ~Screen()
+    {
+        RtDoneScreen();
+    }
+    public nothrow void MoveCursorTo(int row, int col)
+    {
+        RtMove(row, col);
+    }
+    public nothrow void Refresh()
+    {
+        RtRefresh();
+    }
+    public nothrow void GetDimensions()
+    {
+        RtGetMaxYX(&rows, &cols);
+        textRows = rows - 1;
+    }
+    public int rows;
+    public int cols;
+    public int textRows;
+}
+
+class Editor
+{
+    public Editor(Screen& screen_) :
+        screen(screen_), rowOffset(0), colOffset(0), cursorRow(0), cursorCol(0), charIndex(0), dirty(false), fileName(), state(State.edit), tabSize(4), tabs(Tabs.insertSpaces)
+    {
+        string tabSizeVar = RtGetEnvironmentVariable("TABSIZE");
+        if (!tabSizeVar.IsEmpty())
+        {
+            try
+            {
+                tabSize = ParseInt(tabSizeVar);
+                if (tabSize < 1)
+                {
+                    tabSize = 1;
+                }
+            }
+            catch (const Exception& ex)
+            {
+                System.Console.Error() << "error parsing value of TABSIZE environment variable" << ex.Message() << endl();
+            }
+        }
+    }
+    public void OpenFile(const string& fileName_)
+    {
+        fileName = fileName_;
+        if (File.Exists(fileName))
+        {
+            lines.Clear();
+            List<string> utf8Lines = File.ReadAllLines(fileName);
+            for (const string& utf8Line : utf8Lines)
+            {
+                lines.Add(ToUtf32(utf8Line));
+            }
+        }
+        dirty = false;
+        Print();
+    }
+    public void Save()
+    {
+        if (fileName.IsEmpty())
+        {
+            Prompt("Enter filename: ", State.promptFileName);
+        }
+        else
+        {
+            StreamWriter writer = File.CreateText(fileName);
+            for (const ustring& line : lines)
+            {
+                writer.WriteLine(ToUtf8(line));
+            }
+            dirty = false;
+            Prompt("File '" + fileName + "' saved.", State.info);
+            Sleep(Duration.FromSeconds(3));
+            state = State.edit;
+            RtNoEcho();
+            RtRaw();
+            Print();
+        }
+    }
+    public void Run()
+    {
+        PrintStatus();
+        RtRefresh();
+        while (true)
+        {
+            int ch = RtGetCh();
+            if (state == State.edit)
+            {
+                if (ch >= 0 && ch < 32 || ch >= specialKeyStart && ch <= specialKeyEnd) 
+                {
+                    if (ch == keyEnter)
+                    {
+                        Enter();
+                    }
+                    else if (ch == keyTab)
+                    {
+                        Tab();
+                    }
+                    else if (ch == keyBackspace)
+                    {
+                        Backspace();
+                    }
+                    else if (ch == keyDel)
+                    {
+                        Delete();
+                    }
+                    else if (ch == keyControlY)
+                    {
+                        DeleteCurrentLine();
+                    }
+                    else if (ch == keyControlS)
+                    {
+                        Save();
+                    }
+                    else if (ch == keyControlT)
+                    {
+                        ToggleTabs();
+                    }
+                    else if (ch == keyLeft)
+                    {
+                        CursorLeft();
+                    }
+                    else if (ch == keyRight)
+                    {
+                        CursorRight();
+                    }
+                    else if (ch == keyUp)
+                    {
+                        CursorUp();
+                    }
+                    else if (ch == keyDown)
+                    {
+                        CursorDown();
+                    }
+                    else if (ch == keyPgUp)
+                    {
+                        CursorPageUp();
+                    }
+                    else if (ch == keyPgDown)
+                    {
+                        CursorPageDown();
+                    }
+                    else if (ch == keyHome)
+                    {
+                        CursorToBeginningOfLine();
+                    }
+                    else if (ch == keyEnd)
+                    {
+                        CursorToEndOfLine();
+                    }
+                    else if (ch == keyControlHome || ch == keyF3)
+                    {
+                        CursorToBeginningOfFile();
+                    }
+                    else if (ch == keyControlEnd || ch == keyF4)
+                    {
+                        CursorToEndOfFile();
+                    }
+                    else if (ch == keyResize)
+                    {
+                        screen.GetDimensions();
+                        Print();
+                    }
+                    else if (ch == keyEscape)
+                    {
+                        if (dirty)
+                        {
+                            Prompt("Save changes? (y/n)", State.promptSave);
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+                }
+                else if (ch >= 32 && ch < specialKeyStart) 
+                {
+                    InsertChar(cast<uchar>(ch));
+                }
+            }
+            else
+            {
+                if (state == State.promptFileName)
+                {
+                    if (ch == keyEnter)
+                    {
+                        if (fileName.IsEmpty())
+                        {
+                            Prompt("no file name given", State.info);
+                            Sleep(Duration.FromSeconds(3));
+                            state = State.edit;
+                            RtNoEcho();
+                            RtRaw();
+                            Print();
+                        }
+                        else
+                        {
+                            Save();
+                        }
+                    }
+                    else if (ch == keyEscape)
+                    {
+                        state = State.edit;
+                        RtNoEcho();
+                        RtRaw();
+                        Print();
+                    }
+                    else if (ch >= 32 && ch < specialKeyStart)
+                    {
+                        fileName.Append(cast<char>(ch));
+                    }
+                }
+                else if (state == State.promptSave)
+                {
+                    if (ch == keyEscape)
+                    {
+                        state = State.edit;
+                        RtNoEcho();
+                        RtRaw();
+                        Print();
+                    }
+                    else if (ch >= 32 && ch < specialKeyStart)
+                    {
+                        if (cast<char>(ch) == 'y')
+                        {
+                            Save();
+                            if (state == State.edit)
+                            {
+                                break;
+                            }
+                        }
+                        else if (cast<char>(ch) == 'n')
+                        {
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    private void Prompt(const string& promptText, State state_)
+    {
+        state = state_;
+        screen.MoveCursorTo(screen.rows - 1, 0);
+        for (char c : promptText)
+        {
+            RtAddCh(cast<int>(c));
+        }
+        RtClearToEol();
+        RtEcho();
+        RtNoRaw();
+        RtRefresh();
+    }
+    private void Tab()
+    {
+        if (tabs == Tabs.insertSpaces)
+        {
+            int column = cursorCol + colOffset;
+            int tabSpaces = TabSpaces(column);
+            for (int i = 0; i < tabSpaces; ++i)
+            {
+                InsertChar(' ');
+            }
+        }
+        else if (tabs == Tabs.useTabs)
+        {
+            InsertChar('\t');
+        }
+    }
+    private void ToggleTabs()
+    {
+        tabs = cast<Tabs>(1 - tabs);
+        PrintStatus();
+        screen.Refresh();
+    }
+    private void InsertChar(uchar c)
+    {
+        int lineNumber = cursorRow + rowOffset;
+        while (lineNumber >= lines.Count())
+        {
+            lines.Add(ustring());
+        }
+        //int charIndex = cursorCol + colOffset;
+        ustring line = lines[lineNumber];
+        if (charIndex < line.Length())
+        {
+            line = line.Substring(0, charIndex) + c + line.Substring(charIndex);
+        }
+        else
+        {
+            line.Append(c);
+        }
+        lines[lineNumber] = line;
+        dirty = true;
+        PrintLine(cursorRow, lineNumber);
+        CursorRight();
+        PrintStatus();
+        screen.Refresh();
+    }
+    private void Delete()
+    {
+        bool print = false;
+        int lineNumber = cursorRow + rowOffset;
+        if (lineNumber < lines.Count())
+        {
+            //int charIndex = cursorCol + colOffset;
+            ustring line = lines[lineNumber];
+            if (lineNumber < lines.Count() - 1 && charIndex >= line.Length())
+            {
+                line.Append(lines[lineNumber + 1]);
+                lines.Remove(lines.Begin() + lineNumber + 1);
+                print = true;
+            }
+            else if (lineNumber == lines.Count() - 1 && charIndex >= line.Length())
+            {
+                if (line.IsEmpty())
+                {
+                    lines.RemoveLast();
+                    Print();
+                }
+                return;
+            }
+            else
+            {
+                line = line.Substring(0, charIndex) + line.Substring(charIndex + 1);
+            }
+            lines[lineNumber] = line;
+            dirty = true;
+            if (print)
+            {
+                Print();
+            }
+            else
+            {
+                PrintLine(cursorRow, lineNumber);
+                PrintStatus();
+                screen.Refresh();
+            }
+        }
+    }
+    private void DeleteCurrentLine()
+    {
+        int lineNumber = cursorRow + rowOffset;
+        if (lineNumber < lines.Count())
+        {
+            lines.Remove(lines.Begin() + lineNumber);
+            dirty = true;
+            Print();
+        }
+    }
+    private void Backspace()
+    {
+        int lineNumber = cursorRow + rowOffset;
+        //int charIndex = cursorCol + colOffset;
+        if (lineNumber > 0 || charIndex > 0)
+        {
+            CursorLeft();
+            Delete();
+            dirty = true;
+            Print();
+        }
+    }
+    private void Enter()
+    {
+        int lineNumber = cursorRow + rowOffset;
+        if (lineNumber < lines.Count())
+        {
+            //int charIndex = cursorCol + colOffset;
+            ustring tail = lines[lineNumber].Substring(charIndex);
+            lines[lineNumber] = lines[lineNumber].Substring(0, charIndex);
+            lines.Insert(lines.Begin() + lineNumber + 1, tail);
+            dirty = true;
+            Print();
+        }
+        else
+        {
+            lines.Add(ustring());
+            dirty = true;
+            PrintStatus();
+            screen.Refresh();
+        }
+        CursorToEndOfLine();
+        CursorRight();
+    }
+    private int TabSpaces(int column)
+    {
+        int tabSpaces = cast<int>(Align(column, tabSize) - column);
+        if (tabSpaces == 0)
+        {
+            tabSpaces = tabSize;
+        }
+        return tabSpaces;
+    }
+    private void PrintLine(int row, int lineNumber)
+    {
+        screen.MoveCursorTo(row, 0);
+        for (int col = 0; col < screen.cols; ++col)
+        {
+            int ch = cast<int>(' ');
+            if (lineNumber < lines.Count())
+            {
+                const ustring& line = lines[lineNumber];
+                int charIndex = col + colOffset;
+                if (charIndex < line.Length())
+                {
+                    ch = cast<int>(line[charIndex]);
+                }
+            }
+            if (ch == cast<int>('\t'))
+            {
+                int column = cursorCol + colOffset;
+                int tabSpaces = TabSpaces(column);
+                for (int i = 0; i < tabSpaces; ++i)
+                {
+                    RtAddCh(cast<int>(' '));
+                }
+            }
+            else
+            {
+                RtAddCh(ch);
+            }
+        }
+    }
+    private void Print()
+    {
+        if (RtRunningOnWsl()) 
+        {
+            RtClear(); // on Windows Subsystem for Linux screen update does not work without this...
+        }        
+        for (int r = 0; r < screen.textRows; ++r)
+        {
+            int lineNumber = r + rowOffset;
+            PrintLine(r, lineNumber);
+        }
+        PrintStatus();
+        screen.Refresh();
+    }
+    private void PrintStatus()
+    {
+        screen.MoveCursorTo(screen.rows - 1, 0);
+        for (char c : fileName)
+        {
+            RtAddCh(cast<int>(c));
+        }
+        RtAddCh(cast<int>(' '));
+        if (dirty)
+        {
+            RtAddCh(cast<int>('*'));
+        }
+        else
+        {
+            RtAddCh(cast<int>(' '));
+        }
+        if (tabs == Tabs.insertSpaces)
+        {
+            RtAddCh(cast<int>('S'));
+        }
+        else if (tabs == Tabs.useTabs)
+        {
+            RtAddCh(cast<int>('T'));
+        }
+        RtClearToEol();
+        string positionStr = "(" + ToString(cursorRow + rowOffset + 1) + ", " + ToString(cursorCol + colOffset + 1) + ")";
+        screen.MoveCursorTo(screen.rows - 1, screen.cols - cast<int>(positionStr.Length()));
+        RtAddStr(positionStr.Chars());
+        screen.MoveCursorTo(cursorRow, cursorCol);
+    }
+    private void CursorRight()
+    {
+        int lineNumber = cursorRow + rowOffset;
+        if (lineNumber < lines.Count())
+        {
+            //int charIndex = cursorCol + colOffset;
+            if (charIndex < lines[lineNumber].Length())
+            {
+                if (lines[lineNumber][charIndex] == '\t')
+                {
+                    ++charIndex;
+                    int tabSpaces = TabSpaces(cursorCol + colOffset);
+                    if (cursorCol < screen.cols - tabSpaces)
+                    {
+                        cursorCol = cursorCol + tabSpaces;
+                        screen.MoveCursorTo(cursorRow, cursorCol);
+                        PrintStatus();
+                        screen.Refresh();
+                    }
+                    else
+                    {
+                        colOffset = colOffset + tabSpaces;
+                        Print();
+                    }
+                }
+                else
+                {
+                    if (cursorCol < screen.cols - 1)
+                    {
+                        ++cursorCol;
+                        ++charIndex;
+                        screen.MoveCursorTo(cursorRow, cursorCol);
+                        PrintStatus();
+                        screen.Refresh();
+                    }
+                    else
+                    {
+                        ++colOffset;
+                        ++charIndex;
+                        Print();
+                    }
+                }
+            }
+            else 
+            {
+                cursorCol = 0;
+                charIndex = 0;
+                colOffset = 0;
+                CursorDown();
+            }
+        }    
+    }
+    private void CursorLeft()
+    {
+        int lineNumber = cursorRow + rowOffset;
+        if (lineNumber < lines.Count())
+        {
+            //int charIndex = cursorCol + colOffset;
+            if (charINdex > 0 && charIndex < lines[lineNumber].Length())
+            {
+                --charIndex;
+                if (lines[lineNumber][charIndex] == '\t')
+                {
+                    int tabSpaces = TabSpaces(cursorCol + colOffset);
+                    if (cursorCol >= tabSpaces)
+                    {
+                        cursorCol = cursorCol - tabSpaces;
+                        screen.MoveCursorTo(cursorRow, cursorCol);
+                        PrintStatus();
+                        screen.Refresh();
+                    }
+                    else
+                    {
+                        cursorCol = 0;
+                        Print();
+                    }
+                }
+            }
+        }
+        else
+        {
+            if (cursorCol > 0)
+            {
+                --cursorCol;
+                --charIndex;
+                screen.MoveCursorTo(cursorRow, cursorCol);
+                PrintStatus();
+                screen.Refresh();
+            }
+            else if (colOffset > 0)
+            {
+                --colOffset;
+                --charIndex;
+                Print();
+            }
+            else if (cursorRow > 0 || rowOffset > 0)
+            {
+                CursorUp();
+                CursorToEndOfLine();
+            }
+        }
+    }
+    private void CursorDown()
+    {
+        if (cursorRow < screen.textRows - 1)
+        {
+            ++cursorRow;
+            int lineNumber = cursorRow + rowOffset;
+            if (lineNumber < lines.Count())
+            {
+                //int charIndex = cursorCol + colOffset;
+                int lineLength = cast<int>(lines[lineNumber].Length());
+                if (charIndex >= lineLength)
+                {
+                    colOffset = 0;
+                    cursorCol = lineLength;
+                    Print();
+                }
+                else
+                {
+                    screen.MoveCursorTo(cursorRow, cursorCol);
+                    PrintStatus();
+                    screen.Refresh();
+                }                
+            }            
+            else
+            {
+                CursorToEndOfFile();
+            }
+        }
+        else
+        {
+            int lineNumber = cursorRow + rowOffset;
+            if (lineNumber < lines.Count())
+            {
+                ++rowOffset;
+                int charIndex = cursorCol + colOffset;
+                int lineLength = 0;
+                lineNumber = cursorRow + rowOffset;
+                if (lineNumber < lines.Count())
+                {
+                    lineLength = cast<int>(lines[lineNumber].Length());
+                }
+                if (charIndex >= lineLength)
+                {
+                    colOffset = 0;
+                    cursorCol = lineLength;
+                }
+                Print();
+            }
+            else
+            {
+                CursorToEndOfFile();
+            }
+        }
+    }
+    private void CursorUp()
+    {
+        if (cursorRow > 0)
+        {
+            --cursorRow;
+            int lineNumber = cursorRow + rowOffset;
+            int lineLength = cast<int>(lines[lineNumber].Length());
+            int charIndex = cursorCol + colOffset;
+            if (charIndex > lineLength)
+            {
+                CursorToEndOfLine();
+            }
+            else
+            {
+                screen.MoveCursorTo(cursorRow, cursorCol);
+                PrintStatus();
+                screen.Refresh();
+            }
+        }
+        else if (rowOffset > 0)
+        {
+            --rowOffset;
+            int lineNumber = cursorRow + rowOffset;
+            int lineLength = cast<int>(lines[lineNumber].Length());
+            int charIndex = cursorCol + colOffset;
+            if (charIndex > lineLength)
+            {
+                CursorToEndOfLine();
+            }
+            else
+            {
+                Print();
+            }
+        }
+    }
+    private void CursorPageUp()
+    {
+        if (rowOffset >= screen.textRows)
+        {
+            rowOffset = rowOffset - screen.textRows;
+        }
+        else if (cursorRow + rowOffset >= screen.textRows)
+        {
+            rowOffset = 0;
+        }
+        else
+        {
+            rowOffset = 0;
+            cursorRow = 0;
+        }
+        int lineNumber = cursorRow + rowOffset;
+        if (lineNumber == 0)
+        {
+            CursorToBeginningOfFile();
+        }
+        else
+        {
+            int lineLength = cast<int>(lines[lineNumber].Length());
+            int charIndex = cursorCol + colOffset;
+            if (charIndex > lineLength)
+            {
+                CursorToEndOfLine();
+            }
+            Print();
+        }
+    }
+    private void CursorPageDown()
+    {
+        int lineCount = cast<int>(lines.Count());
+        if (rowOffset + screen.textRows > lineCount)
+        {
+            CursorToEndOfFile();
+        }
+        else
+        {
+            rowOffset = rowOffset + screen.textRows;
+            Print();
+        }
+    }
+    private void CursorToBeginningOfLine()
+    {
+        cursorCol = 0;
+        if (colOffset > 0)
+        {
+            colOffset = 0;
+            Print();
+        }
+        else
+        {
+            PrintStatus();
+            screen.Refresh();
+        }
+    }
+    private void CursorToEndOfLine()
+    {
+        int lineNumber = cursorRow + rowOffset;
+        if (lineNumber < lines.Count())
+        {
+            int lineLength = cast<int>(lines[lineNumber].Length());
+            if (lineLength < screen.cols)
+            {
+                cursorCol = lineLength;
+                colOffset = 0;
+                Print();
+            }
+            else
+            {
+                cursorCol = screen.cols - 1;
+                colOffset = lineLength - cursorCol;
+                Print();
+            }
+        }
+    }
+    private void CursorToBeginningOfFile()
+    {
+        cursorRow = 0;
+        rowOffset = 0;
+        cursorCol = 0;
+        colOffset = 0;
+        Print();
+    }
+    private void CursorToEndOfFile()
+    {
+        int lineCount = cast<int>(lines.Count());
+        if (lineCount < screen.textRows)
+        {
+            rowOffset = 0;
+            cursorRow = lineCount;
+            cursorCol = 0;
+            colOffset = 0;
+        }
+        else
+        {
+            cursorCol = 0;
+            colOffset = 0;
+            cursorRow = screen.textRows - 1;
+            rowOffset = lineCount - cursorRow;
+        }
+        Print();
+    }
+    private Screen& screen;
+    private List<ustring> lines;
+    private int rowOffset;
+    private int colOffset;
+    private int cursorRow;
+    private int cursorCol;
+    private int charIndex; 
+    private bool dirty;
+    private string fileName;
+    private State state;
+    private int tabSize;
+    private Tabs tabs;
+}
+
+int main(int argc, const char** argv)
+{
+    Screen screen;
+    try
+    {
+        Editor editor(screen);
+        string fileName;
+        if (argc >= 2)
+        {
+            fileName = argv[1];
+        }
+        if (!fileName.IsEmpty())
+        {
+            editor.OpenFile(fileName);
+        }
+        editor.Run();
+    }
+    catch (const Exception& ex)
+    {
+        Console.Error() << ex.Message() << endl();
+        return 1;
+    }
+    return 0;
+}

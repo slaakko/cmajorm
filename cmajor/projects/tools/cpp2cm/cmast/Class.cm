@@ -1,0 +1,159 @@
+using System;
+using System.Collections;
+
+namespace cmast
+{
+    public class ClassNode : Node
+    {
+        public nothrow ClassNode(Specifiers specifiers_, IdentifierNode* id_) : specifiers(specifiers_), id(id_)
+        {
+            id->parent = this;
+        }
+        public void AddTemplateParameter(TemplateParameterNode* templateParameter)
+        {
+            templateParameter->parent = this;
+            templateParameters.Add(UniquePtr<TemplateParameterNode>(templateParameter));
+        }
+        public void AddBaseClassOrInterface(Node* baseClassOrInterface)
+        {
+            baseClassOrInterface->parent = this;
+            baseClassOrInterfaces.Add(UniquePtr<Node>(baseClassOrInterface));
+        }
+        public void AddMember(Node* member)
+        {
+            member->parent = this;
+            members.Add(UniquePtr<Node>(member));
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public Specifiers specifiers;
+        public UniquePtr<IdentifierNode> id;
+        public List<UniquePtr<TemplateParameterNode>> templateParameters;
+        public List<UniquePtr<Node>> baseClassOrInterfaces;
+        public List<UniquePtr<Node>> members;
+    }
+    
+    public abstract class InitializerNode : Node
+    {
+        public void AddArgument(Node* argument)
+        {
+            argument->parent = this;
+            arguments.Add(UniquePtr<Node>(argument));
+        }
+        public List<UniquePtr<Node>> arguments;
+    }
+    
+    public class ThisInitializerNode : InitializerNode
+    {
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+    }
+    
+    public class BaseInitializerNode : InitializerNode
+    {
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+    }
+    
+    public class MemberInitializerNode : InitializerNode
+    {
+        public nothrow MemberInitializerNode(IdentifierNode* id_) : id(id_)
+        {
+            id->parent = this;
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public UniquePtr<IdentifierNode> id;
+    }
+    
+    public class StaticConstructorNode : FunctionNode
+    {
+        public nothrow StaticConstructorNode(Specifiers specifiers_) : base(specifiers_, null, new IdentifierNode(u"@static_constructor"))
+        {
+        }
+        public void AddInitializer(InitializerNode* initializer)
+        {
+            initializer->parent = this;
+            initializers.Add(UniquePtr<InitializerNode>(initializer));
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public List<UniquePtr<InitializerNode>> initializers;
+    }
+    
+    public class ConstructorNode : FunctionNode
+    {
+        public nothrow ConstructorNode(Specifiers specifiers_) : base(specifiers_, null, new IdentifierNode(u"@constructor"))
+        {
+        }
+        public void AddInitializer(InitializerNode* initializer)
+        {
+            initializer->parent = this;
+            initializers.Add(UniquePtr<InitializerNode>(initializer));
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public List<UniquePtr<InitializerNode>> initializers;
+    }
+    
+    public class DestructorNode : FunctionNode
+    {
+        public nothrow DestructorNode(Specifiers specifiers_) : base(specifiers_, null, new IdentifierNode(u"@destructor"))
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+    }
+    
+    public class MemberFunctionNode : FunctionNode
+    {
+        public nothrow MemberFunctionNode(Specifiers specifiers_, Node* returnTypeExpr_, IdentifierNode* groupId_) : base(specifiers_, returnTypeExpr_, groupId_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+    }
+    
+    public class ConversionFunctionNode : FunctionNode
+    {
+        public nothrow ConversionFunctionNode(Specifiers specifiers_, Node* returnTypeExpr_) : base(specifiers_, returnTypeExpr_, new IdentifierNode(u"operator_conv"))
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+    }
+    
+    public class MemberVariableNode : Node
+    {
+        public nothrow MemberVariableNode(Specifiers specifiers_, Node* typeExpr_, IdentifierNode* id_) : specifiers(specifiers_), typeExpr(typeExpr_), id(id_)
+        {
+            typeExpr->parent = this;
+            id->parent = this;
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public Specifiers specifiers;
+        public UniquePtr<Node> typeExpr;
+        public UniquePtr<IdentifierNode> id;
+    }
+}

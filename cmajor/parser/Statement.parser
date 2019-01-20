@@ -1,0 +1,288 @@
+// =================================
+// Copyright (c) 2019 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+[hpp]#include <cmajor/ast/Statement.hpp>
+[hpp]#include <cmajor/parser/ParsingContext.hpp>
+[cpp]#include <cmajor/parser/Keyword.hpp>
+[cpp]#include <cmajor/parser/Expression.hpp>
+[cpp]#include <cmajor/parser/TypeExpr.hpp>
+[cpp]#include <cmajor/parser/Identifier.hpp>
+
+namespace cmajor.parser
+{
+    [hpp]using namespace cmajor::ast;
+
+    grammar Statement
+    {
+        using stdlib.identifier;
+        using Keyword.Keyword;
+        using Expression.Expression;
+        using TypeExpr.TypeExpr;
+        using Identifier.Identifier;
+        using Expression.ArgumentList;
+
+        Statement(ParsingContext* ctx) : StatementNode*
+            ::= LabeledStatement(ctx){ value = LabeledStatement; }
+            |   ControlStatement(ctx){ value = ControlStatement; }
+            |   ExpressionStatement(ctx){ value = ExpressionStatement; }
+            |   AssignmentStatement(ctx){ value = AssignmentStatement; }
+            |   ConstructionStatement(ctx){ value = ConstructionStatement; }
+            |   DeleteStatement(ctx){ value = DeleteStatement; }
+            |   DestroyStatement(ctx){ value = DestroyStatement; }
+            |   EmptyStatement(ctx){ value = EmptyStatement; }
+            |   ThrowStatement(ctx){ value = ThrowStatement; }
+            |   TryStatement(ctx){ value = TryStatement; }
+            |   AssertStatement(ctx){ value = AssertStatement; }
+            |   ConditionalCompilationStatement(ctx){ value = ConditionalCompilationStatement; }
+            ;
+
+        LabelId : std::u32string
+            ::= (identifier - Keyword){ value = identifier; }
+            ;
+
+        Label(var std::u32string label) : LabelNode*
+            ::= (LabelId{ label = LabelId; } ':'){ value = new LabelNode(span, label); }
+            ;
+
+        LabeledStatement(ParsingContext* ctx) : StatementNode*
+            ::= Label:lbl Statement(ctx):stmt{ stmt->SetLabelNode(lbl); value = stmt; }
+            ;
+
+        ControlStatement(ParsingContext* ctx) : StatementNode*
+            ::= CompoundStatement(ctx){ value = CompoundStatement; }
+            |   ReturnStatement(ctx){ value = ReturnStatement; }
+            |   IfStatement(ctx){ value = IfStatement; }
+            |   WhileStatement(ctx){ value = WhileStatement; }
+            |   DoStatement(ctx){ value = DoStatement; }
+            |   RangeForStatement(ctx){ value = RangeForStatement; }
+            |   ForStatement(ctx){ value = ForStatement; }
+            |   BreakStatement(ctx){ value = BreakStatement; }
+            |   ContinueStatement(ctx){ value = ContinueStatement; }
+            |   GotoStatement(ctx){ value = GotoStatement; }
+            |   SwitchStatement(ctx){ value = SwitchStatement; }
+            |   GotoCaseStatement(ctx){ value = GotoCaseStatement; }
+            |   GotoDefaultStatement(ctx){ value = GotoDefaultStatement; }
+            ;
+
+        CompoundStatement(ParsingContext* ctx) : CompoundStatementNode*
+            ::= (   '{'{ value = new CompoundStatementNode(span); value->SetBeginBraceSpan(span); }
+                    (Statement(ctx):stmt{ value->AddStatement(stmt); })*
+                    '}'!{ value->SetEndBraceSpan(span); }
+                ){ value->GetSpan().SetEnd(span.End()); }
+            ;
+
+        ReturnStatement(ParsingContext* ctx) : StatementNode*
+            ::= (keyword("return") Expression(ctx)? ';'!){ value = new ReturnStatementNode(span, Expression); }
+            ;
+
+        IfStatement(ParsingContext* ctx, var Span leftParenSpan, var Span rightParenSpan, var Span elseSpan) : IfStatementNode*
+            ::= (keyword("if") '('{ leftParenSpan = span; } Expression(ctx) ')'{ rightParenSpan = span; } 
+                Statement(ctx):thens (keyword("else"){ elseSpan = span; } Statement(ctx):elses)?)
+                { 
+                    value = new IfStatementNode(span, Expression, thens, elses); 
+                    value->SetLeftParenSpan(leftParenSpan);
+                    value->SetRightParenSpan(rightParenSpan);
+                    value->SetElseSpan(elseSpan);
+                }
+            ;
+
+        WhileStatement(ParsingContext* ctx, var Span leftParenSpan, var Span rightParenSpan) : WhileStatementNode*
+            ::= (keyword("while") '('!{ leftParenSpan = span; } Expression(ctx)! ')'!{ rightParenSpan = span; } Statement(ctx)!)
+                { 
+                    value = new WhileStatementNode(span, Expression, Statement); 
+                    value->SetLeftParenSpan(leftParenSpan);
+                    value->SetRightParenSpan(rightParenSpan);
+                }
+            ;
+
+        DoStatement(ParsingContext* ctx, var Span whileSpan, var Span leftParenSpan, var Span rightParenSpan) : DoStatementNode*
+            ::= (keyword("do") Statement(ctx)! keyword("while")!{ whileSpan = span; } '('!{ leftParenSpan = span; } Expression(ctx)! ')'!{ rightParenSpan = span; } ';'!)
+                { 
+                    value = new DoStatementNode(span, Statement, Expression); 
+                    value->SetWhileSpan(whileSpan);
+                    value->SetLeftParenSpan(leftParenSpan);
+                    value->SetRightParenSpan(rightParenSpan);
+                }
+            ;
+
+        ForStatement(ParsingContext* ctx, var Span leftParenSpan, var Span rightParenSpan) : ForStatementNode*
+            ::= (keyword("for") '('{ leftParenSpan = span; } ForInitStatement(ctx)! Expression(ctx)? ';'! ForLoopStatementExpr(ctx)! ')'!{ rightParenSpan = span; } Statement(ctx)!)
+            { 
+                value = new ForStatementNode(span, ForInitStatement, Expression, ForLoopStatementExpr, Statement);
+                value->SetLeftParenSpan(leftParenSpan);
+                value->SetRightParenSpan(rightParenSpan);
+            }
+            ;
+
+        ForInitStatement(ParsingContext* ctx) : StatementNode*
+            ::= AssignmentStatement(ctx){ value = AssignmentStatement; }
+            |   ConstructionStatement(ctx){ value = ConstructionStatement; }
+            |   EmptyStatement(ctx){ value = EmptyStatement; }
+            ;
+
+        ForLoopStatementExpr(ParsingContext* ctx) : StatementNode*
+            ::= AssignmentStatementExpr(ctx){ value = AssignmentStatementExpr; }
+            |   Expression(ctx){ value = new ExpressionStatementNode(span, Expression); }
+            |   empty{ value = new EmptyStatementNode(span); }
+            ;
+
+        RangeForStatement(ParsingContext* ctx, var Span leftParenSpan, var Span rightParenSpan, var Span colonSpan) : RangeForStatementNode*
+            ::= (keyword("for") '('{ leftParenSpan = span; } TypeExpr(ctx) Identifier ':'{ colonSpan = span; } Expression(ctx)! ')'!{ rightParenSpan = span; } Statement(ctx)!)
+            { 
+                value = new RangeForStatementNode(span, TypeExpr, Identifier, Expression, Statement); 
+                value->SetLeftParenSpan(leftParenSpan);
+                value->SetRightParenSpan(rightParenSpan);
+                value->SetColonSpan(colonSpan);
+            }
+            ;
+
+        BreakStatement(ParsingContext* ctx) : StatementNode*
+            ::= (keyword("break") ';'!){ value = new BreakStatementNode(span); }
+            ;
+
+        ContinueStatement(ParsingContext* ctx) : StatementNode*
+            ::= (keyword("continue") ';'!){ value = new ContinueStatementNode(span); }
+            ;
+
+        GotoStatement(ParsingContext* ctx) : StatementNode*
+            ::= (keyword("goto") Identifier ';'!){ value = new GotoStatementNode(span, Identifier->Str()); }
+            ;
+
+        SwitchStatement(ParsingContext* ctx, var Span leftParenSpan, var Span rightParenSpan, var Span beginBraceSpan, var Span endBraceSpan) : SwitchStatementNode*
+            ::= (keyword("switch") '('!{ leftParenSpan = span; } Expression(ctx)! ')'!{ rightParenSpan = span; })
+                { value = new SwitchStatementNode(span, Expression); value->SetLeftParenSpan(leftParenSpan); value->SetRightParenSpan(rightParenSpan); }
+                '{'!{ beginBraceSpan = span; } (CaseStatement(ctx){ value->AddCase(CaseStatement); } | DefaultStatement(ctx){ value->SetDefault(DefaultStatement); })* 
+                '}'!{ endBraceSpan = span; value->SetBeginBraceSpan(beginBraceSpan); value->SetEndBraceSpan(endBraceSpan); }
+            ;
+
+        CaseStatement(ParsingContext* ctx, var std::unique_ptr<CaseStatementNode> caseS, var Span caseSpan) : CaseStatementNode*
+            ::= ((empty{ caseS.reset(new CaseStatementNode(span)); } (keyword("case"){ caseSpan = span; } Expression(ctx){ caseS->AddCaseSpan(caseSpan); caseS->AddCaseExpr(Expression); } ':'!)+)
+                { caseS->GetSpan().SetEnd(span.End()); }
+                (Statement(ctx){ caseS->AddStatement(Statement); })*){ value = caseS.release(); }
+            ;
+
+        DefaultStatement(ParsingContext* ctx) : DefaultStatementNode*
+            ::= (keyword("default") ':'!){ value = new DefaultStatementNode(span); }
+                (Statement(ctx){ value->AddStatement(Statement); })*
+            ;
+
+        GotoCaseStatement(ParsingContext* ctx) : StatementNode*
+            ::= (keyword("goto") keyword("case") Expression(ctx)! ';'!){ value = new GotoCaseStatementNode(span, Expression); }
+            ;
+
+        GotoDefaultStatement(ParsingContext* ctx) : StatementNode*
+            ::= (keyword("goto") keyword("default") ';'!){ value = new GotoDefaultStatementNode(span); }
+            ;
+
+        AssignmentStatementExpr(ParsingContext* ctx, var std::unique_ptr<Node> targetExpr) : StatementNode*
+            ::= empty{ ctx->PushParsingLvalue(true); } (Expression(ctx):target{ ctx->PopParsingLvalue(); targetExpr.reset(target); } / { ctx->PopParsingLvalue(); } '=' Expression(ctx):source)
+            {
+                value = new AssignmentStatementNode(span, targetExpr.release(), source);
+            }
+            ;
+
+        AssignmentStatement(ParsingContext* ctx) : StatementNode*
+            ::= (AssignmentStatementExpr(ctx) ';'){ value = AssignmentStatementExpr; value->GetSpan().SetEnd(span.End()); }
+            ;
+
+        ConstructionStatement(ParsingContext* ctx) : ConstructionStatementNode*
+            ::= (TypeExpr(ctx) Identifier!){ value = new ConstructionStatementNode(span, TypeExpr, Identifier); }
+                ('=' Expression(ctx)!{ value->AddArgument(Expression); value->SetAssignment(); }
+                |    '(' ArgumentList(ctx, value)! ')'!
+                |   empty{ value->SetEmpty(); }
+                )
+                ';'!{ value->GetSpan().SetEnd(span.End()); }
+            ;
+
+        DeleteStatement(ParsingContext* ctx) : StatementNode*
+            ::= (keyword("delete") Expression(ctx)! ';'!){ value = new DeleteStatementNode(span, Expression); }
+            ;
+
+        DestroyStatement(ParsingContext* ctx) : StatementNode*
+            ::= (keyword("destroy") Expression(ctx)! ';'!){ value = new DestroyStatementNode(span, Expression); }
+            ;
+
+        ExpressionStatement(ParsingContext* ctx, var std::unique_ptr<Node> expr) : StatementNode*
+            ::= empty{ ctx->PushParsingExpressionStatement(true); } (Expression(ctx){ expr.reset(Expression); } ';')
+                { 
+                    ctx->PopParsingExpressionStatement(); 
+                    value = new ExpressionStatementNode(span, expr.release()); 
+                }
+                /
+                {
+                    ctx->PopParsingExpressionStatement(); 
+                }
+            ;
+
+        EmptyStatement(ParsingContext* ctx) : StatementNode*
+            ::= ';'{ value = new EmptyStatementNode(span); } 
+            ;
+
+        ThrowStatement(ParsingContext* ctx) : StatementNode*
+            ::= (keyword("throw") Expression(ctx)? ';'!){ value = new ThrowStatementNode(span, Expression); }
+            ;
+
+        TryStatement(ParsingContext* ctx) : TryStatementNode*
+            ::= (keyword("try") CompoundStatement(ctx):tryBlock){ value = new TryStatementNode(span, tryBlock); } 
+                (Catch(ctx){ value->AddCatch(Catch); })+
+            ;
+
+        Catch(ParsingContext* ctx, var Span leftParenSpan, var Span rightParenSpan) : CatchNode*
+            ::= (keyword("catch") '('!{ leftParenSpan = span; } TypeExpr(ctx)! Identifier? ')'!{ rightParenSpan = span; } 
+                CompoundStatement(ctx):catchBlock){ value = new CatchNode(span, TypeExpr, Identifier, catchBlock); value->SetLeftParenSpan(leftParenSpan); value->SetRightParenSpan(rightParenSpan); }
+            ;
+
+        AssertStatement(ParsingContext* ctx) : StatementNode*
+            ::= ('#' keyword("assert") Expression(ctx)! ';'!){ value = new AssertStatementNode(span, Expression); }
+            ;
+
+        ConditionalCompilationStatement(ParsingContext* ctx, var Span leftParenSpan, var Span rightParenSpan, var Span keywordSpan) : 
+            ConditionalCompilationStatementNode*
+            ::= ('#'{ keywordSpan = span; } keyword("if") '('!{ leftParenSpan = span; } 
+                ConditionalCompilationExpression:ifExpr{ value = new ConditionalCompilationStatementNode(span, ifExpr); value->IfPart()->SetKeywordSpan(keywordSpan); } ')'!
+                { rightParenSpan = span; value->IfPart()->SetLeftParenSpan(leftParenSpan); value->IfPart()->SetRightParenSpan(rightParenSpan); } 
+                (Statement(ctx):ifS{ value->AddIfStatement(ifS); })*
+                (
+                    '#'{ keywordSpan = span; } keyword("elif") '('!{ leftParenSpan = span; } ConditionalCompilationExpression:elifExpr{ value->AddElifExpr(span, elifExpr); } ')'!
+                    {   rightParenSpan = span; 
+                        value->SetElifLeftParenSpan(leftParenSpan); 
+                        value->SetElifRightParenSpan(rightParenSpan); 
+                        value->SetElifKeywordSpan(keywordSpan); 
+                    }
+                    (Statement(ctx):elifS{ value->AddElifStatement(elifS); })*
+                )*
+                (
+                    '#'{ keywordSpan = span; } keyword("else") (Statement(ctx):elseS{ value->AddElseStatement(span, elseS); })* empty{ value->ElsePart()->SetKeywordSpan(keywordSpan); }
+                )?
+                '#'{ value->SetEndIfSpan(span); } keyword("endif")!)
+            ;
+
+        ConditionalCompilationExpression : ConditionalCompilationExpressionNode*
+            ::= ConditionalCompilationDisjunction{ value = ConditionalCompilationDisjunction; }
+            ;
+
+        ConditionalCompilationDisjunction(var Span s) : ConditionalCompilationExpressionNode*
+            ::= ConditionalCompilationConjunction:left{ s = span; value = left; } ("||" ConditionalCompilationConjunction:right{ s.SetEnd(span.End()); value = new ConditionalCompilationDisjunctionNode(s, value, right); })*
+            ;
+
+        ConditionalCompilationConjunction(var Span s): ConditionalCompilationExpressionNode*
+            ::= ConditionalCompilationPrefix:left{ s = span; value = left; } ("&&" ConditionalCompilationPrefix:right{ s.SetEnd(span.End()); value = new ConditionalCompilationConjunctionNode(s, value, right); })*
+            ;
+
+        ConditionalCompilationPrefix : ConditionalCompilationExpressionNode*
+            ::= ('!' ConditionalCompilationPrefix:left!){ value = new ConditionalCompilationNotNode(span, left); }
+            |   ConditionalCompilationPrimary:right!{ value = right; }
+            ;
+
+        ConditionalCompilationPrimary : ConditionalCompilationExpressionNode* 
+            ::= Symbol:symb{ value = new ConditionalCompilationPrimaryNode(span, symb); }
+            |   '(' ConditionalCompilationExpression:expr{ value = expr; } ')'
+            ;
+
+        Symbol : std::u32string
+            ::= (identifier - Keyword){ value = std::u32string(matchBegin, matchEnd); }
+            ;
+    }
+}

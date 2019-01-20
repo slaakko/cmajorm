@@ -1,0 +1,38 @@
+using System;
+
+namespace cmast
+{
+    public class IdentifierNode : Node
+    {
+        public nothrow IdentifierNode(const ustring& str_) : str(str_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public ustring str;
+    }
+    
+    public class DotNode : BinaryNode
+    {
+        public nothrow DotNode(Node* left_, Node* right_) : base(left_, right_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+    }
+    
+    public class ArrowNode : BinaryNode
+    {
+        public nothrow ArrowNode(Node* left_, Node* right_) : base(left_, right_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+    }
+}

@@ -1,0 +1,143 @@
+using System;
+
+namespace cmast
+{
+    public class BinaryExpressionNode : BinaryNode
+    {
+        public nothrow BinaryExpressionNode(Node* left_, Node* right_, Operator op_) : base(left_, right_), op(op_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public Operator op;
+    }
+    
+    public class UnaryExpressionNode : UnaryNode
+    {
+        public nothrow UnaryExpressionNode(Node* child_, Operator op_) : base(child_), op(op_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public Operator op;
+    }
+    
+    public class IsNode : BinaryNode
+    {
+        public nothrow IsNode(Node* left_, Node* right_) : base(left_, right_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+    }
+
+    public class AsNode : BinaryNode
+    {
+        public nothrow AsNode(Node* left_, Node* right_) : base(left_, right_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+    }
+    
+    public class SubscriptExpressionNode : BinaryNode
+    {
+        public nothrow SubscriptExpressionNode(Node* subject_, Node* subscript_) : base(subject_, subscript_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+    }
+    
+    public class InvokeNode : UnaryNode
+    {
+        public nothrow InvokeNode(Node* subject_) : base(subject_)
+        {
+        }
+        public void AddArgument(Node* argument)
+        {
+            argument->parent = this;
+            arguments.Add(UniquePtr<Node>(argument));
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public List<UniquePtr<Node>> arguments;
+    }
+    
+    public class PostfixIncrementNode : UnaryNode
+    {
+        public nothrow PostfixIncrementNode(Node* child_) : base(child_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+    }
+    public class PostfixDecrementNode : UnaryNode
+    {
+        public nothrow PostfixDecrementNode(Node* child_) : base(child_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+    }
+    
+    public class SizeOfNode : UnaryNode
+    {
+        public nothrow SizeOfNode(Node* child_) : base(child_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+    }
+    
+    public class TypeNameNode : UnaryNode
+    {
+        public nothrow TypeNameNode(Node* child_) : base(child_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+    }
+    
+    public class CastNode : BinaryNode
+    {
+        public nothrow CastNode(Node* typeExpr_, Node* expr_) : base(typeExpr_, expr_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+    }
+    
+    public class ParenthesizedExpressionNode : UnaryNode
+    {
+        public nothrow ParenthesizedExpressionNode(Node* expr_) : base(expr_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+    }
+}

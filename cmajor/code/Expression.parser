@@ -1,0 +1,306 @@
+// =================================
+// Copyright (c) 2019 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+[cpp]#include <cmajor/code/Declaration.hpp>
+[cpp]#include <cmajor/code/Declarator.hpp>
+[cpp]#include <cmajor/code/Literal.hpp>
+[cpp]#include <cmajor/code/Identifier.hpp>
+[cpp]#include <cmajor/util/TextUtils.hpp>
+[hpp]#include <cmajor/codedom/Expression.hpp>
+[cpp]#include <cmajor/codedom/Type.hpp>
+
+namespace cmajor.code
+{
+    [cpp]using namespace cmajor::codedom;
+    [cpp]using cmajor::util::Trim;
+
+    grammar Expression
+    {
+        using Literal.Literal;
+        using Declarator.TypeId;
+        using Declarator.TypeSpecifierSeq;
+        using Declarator.PtrOperator;
+        using Identifier.QualifiedId;
+        using Declaration.SimpleTypeSpecifier;
+        using Declaration.TypeName;
+
+        Expression: cmajor::codedom::CppObject*
+                            ::= AssignmentExpression:left{ value = left; } (',' AssignmentExpression:right{ value = new BinaryOpExpr(value, Operator::comma, 0, right); })*
+                            ;
+
+        ConstantExpression: cmajor::codedom::CppObject*
+                            ::= Expression{ value = Expression; }
+                            ;
+
+        AssignmentExpression(var std::unique_ptr<CppObject> lor): cmajor::codedom::CppObject*
+                            ::= (LogicalOrExpression{ lor.reset(LogicalOrExpression); } AssingmentOp AssignmentExpression!){ value = new BinaryOpExpr(lor.release(), AssingmentOp, 1, AssignmentExpression); }
+                            |   ConditionalExpression{ value = ConditionalExpression; }
+                            |   ThrowExpression{ value = ThrowExpression; }
+                            ;
+
+        AssingmentOp: Operator
+                            ::= ('=' | "*=" | "/=" | "%=" | "+=" | "-=" | ">>=" | "<<=" | "&=" | "^=" | "|="){ value = GetOperator(std::u32string(matchBegin, matchEnd)); }
+                            ;
+
+        ThrowExpression: cmajor::codedom::CppObject*
+                            ::= (keyword("throw") AssignmentExpression?){ value = new ThrowExpr(AssignmentExpression); }
+                            ;
+
+        ConditionalExpression: cmajor::codedom::CppObject*
+                            ::= LogicalOrExpression:left{ value = left; } (('?' Expression! ':' AssignmentExpression!){ value = new ConditionalExpr(value, Expression, AssignmentExpression); })?
+                            ;
+
+        LogicalOrExpression: cmajor::codedom::CppObject*
+                            ::= LogicalAndExpression:left{ value = left; } ("||" LogicalAndExpression:right!{ value = new BinaryOpExpr(value, Operator::or_, 2, right); })*
+                            ;
+
+        LogicalAndExpression: cmajor::codedom::CppObject*
+                            ::= InclusiveOrExpression:left{ value = left; } ("&&" InclusiveOrExpression:right!{ value = new BinaryOpExpr(value, Operator::and_, 3, right); })*
+                            ;
+
+        InclusiveOrExpression: cmajor::codedom::CppObject*
+                            ::= ExclusiveOrExpression:left{ value = left; } (('|' - "||") ExclusiveOrExpression:right!{ value = new BinaryOpExpr(value, Operator::bitor_, 4, right); })*
+                            ;
+
+        ExclusiveOrExpression: cmajor::codedom::CppObject*
+                            ::= AndExpression:left{ value = left; } ('^' AndExpression:right!{ value = new BinaryOpExpr(value, Operator::bitxor, 5, right); })*
+                            ;
+
+        AndExpression: cmajor::codedom::CppObject*
+                            ::= EqualityExpression:left{ value = left; } (('&' - "&&") EqualityExpression:right!{ value = new BinaryOpExpr(value, Operator::bitand_, 6, right); })*
+                            ;
+
+        EqualityExpression: cmajor::codedom::CppObject*
+                            ::= RelationalExpression:left{ value = left; } (EqOp RelationalExpression:right!{ value = new BinaryOpExpr(value, EqOp, 7, right); })*
+                            ;
+
+        EqOp: Operator      ::= "=="{ value = Operator::eq; }
+                            |   "!="{ value = Operator::notEq; }
+                            ;
+
+        RelationalExpression: cmajor::codedom::CppObject*
+                            ::= ShiftExpression:left{ value = left; } (RelOp ShiftExpression:right!{ value = new BinaryOpExpr(value, RelOp, 8, right); })*
+                            ;
+
+        RelOp: Operator     ::= "<="{ value = Operator::lessOrEq; }
+                            |   ">="{ value = Operator::greaterOrEq; }
+                            |   ('<' - "<<"){ value = Operator::less; }
+                            |   ('>' - ">>"){ value = Operator::greater; }
+                            ;
+
+        ShiftExpression: cmajor::codedom::CppObject*
+                            ::= AdditiveExpression:left{ value = left; } (ShiftOp AdditiveExpression:right!{ value = new BinaryOpExpr(value, ShiftOp, 9, right); })*
+                            ;
+
+        ShiftOp: Operator   ::= ("<<" - "<<="){ value = Operator::shiftLeft; }
+                            |   (">>" - ">>="){ value = Operator::shiftRight; }
+                            ;
+
+        AdditiveExpression: cmajor::codedom::CppObject*
+                            ::= MultiplicativeExpression:left{ value = left; } (AddOp MultiplicativeExpression:right!{ value = new BinaryOpExpr(value, AddOp, 10, right); })*
+                            ;
+
+        AddOp: Operator     ::= ('+' - "+="){ value = Operator::plus; }
+                            |   ('-' - ("-=" | "->")){ value = Operator::minus; }
+                            ;
+
+        MultiplicativeExpression: cmajor::codedom::CppObject*
+                            ::= PmExpression:left{ value = left; } (MulOp PmExpression:right!{ value = new BinaryOpExpr(value, MulOp, 11, right); })*
+                            ;
+
+        MulOp: Operator     ::= ('*' - "*="){ value = Operator::mul; }
+                            |   ('/' - "/="){ value = Operator::div; }
+                            |   ('%' - "%="){ value = Operator::rem; }
+                            ;
+
+        PmExpression: cmajor::codedom::CppObject*
+                            ::= CastExpression:left{ value = left; } (PmOp CastExpression:right!{ value = new BinaryOpExpr(value, PmOp, 12, right); })*
+                            ;
+
+        PmOp: Operator      ::= ".*"{ value = Operator::dotStar; }
+                            | "->*"{ value = Operator::arrowStar; }
+                            ;
+
+        CastExpression(var std::unique_ptr<CppObject> ce, var std::unique_ptr<CppObject> ti): cmajor::codedom::CppObject*
+                            ::= 
+                            (    ('(' TypeId{ ti.reset(TypeId); } ')' CastExpression){ ce.reset(new CastExpr(ti.release(), CastExpression)); }
+                            |   UnaryExpression{ ce.reset(UnaryExpression); }
+                            )
+                            {
+                                value = ce.release();
+                            }
+                            ;
+
+        UnaryExpression(var std::unique_ptr<CppObject> ue): cmajor::codedom::CppObject*
+                            ::= 
+                            (    (PostfixExpression{ ue.reset(PostfixExpression); } | PostCastExpression{ ue.reset(PostCastExpression); })
+                            |   ("++" UnaryExpression:e1!){ ue.reset(new PreIncrementExpr(e1)); }
+                            |   ("--" UnaryExpression:e2!){ ue.reset(new PreDecrementExpr(e2)); }
+                            |   (UnaryOperator CastExpression!){ ue.reset(new UnaryOpExpr(UnaryOperator, CastExpression)); }
+                            |   (keyword("sizeof") '(' TypeId! ')'!){ ue.reset(new SizeOfExpr(TypeId, true)); }
+                            |   (keyword("sizeof") UnaryExpression:e3!){ ue.reset(new SizeOfExpr(e3, false)); }
+                            |   NewExpression{ ue.reset(NewExpression); }
+                            |   DeleteExpression{ ue.reset(DeleteExpression); }
+                            )
+                            {
+                                value = ue.release();
+                            }
+                            ;
+
+        UnaryOperator: Operator
+                            ::= ('*' - "*="){ value = Operator::deref; }
+                            |   ('&' - "&="){ value = Operator::addrOf; }
+                            |   ('+' - "+="){ value = Operator::plus; }
+                            |   ('-' - "-="){ value = Operator::minus; }
+                            |   ('!' - "!="){ value = Operator::not_; }
+                            |   '~'{ value = Operator::neg; }
+                            ;
+
+        NewExpression(var bool global, var TypeId* typeId, var bool parens): cmajor::codedom::CppObject*
+                            ::= (("::"{ global = true; })? keyword("new") NewPlacement?
+                                (   NewTypeId{ typeId = NewTypeId; parens = false; }
+                                |   '(' TypeId{ typeId = TypeId; parens = true; } ')'
+                                )   NewInitializer?
+                            )
+                            {
+                                value = new NewExpr(global, NewPlacement, typeId, parens, NewInitializer);
+                            }
+                            ;
+
+        NewTypeId(var std::unique_ptr<TypeId> ti): cmajor::codedom::TypeId*
+                            ::= empty{ ti.reset(new TypeId()); }
+                                ((TypeSpecifierSeq(ti.get()) | TypeName{ ti->Add(TypeName); }) (NewDeclarator{ ti->Declarator() = NewDeclarator; })?){ value = ti.release(); }
+                            ;
+
+        NewDeclarator: std::u32string
+                            ::=
+                            (   PtrOperator NewDeclarator?
+                            |   DirectNewDeclarator
+                            )
+                            {
+                                value = Trim(std::u32string(matchBegin, matchEnd));
+                            }
+                            ;
+
+        DirectNewDeclarator(var std::unique_ptr<CppObject> e) 
+                            ::= '[' Expression{ e.reset(Expression); } ']' ('[' ConstantExpression{ e.reset(ConstantExpression); } ']')*
+                            ;
+
+        NewPlacement: std::vector<cmajor::codedom::CppObject*>
+                            ::= ('(' ExpressionList ')'){ value = ExpressionList; }
+                            ;
+
+        NewInitializer: std::vector<cmajor::codedom::CppObject*>
+                            ::= ('(' ExpressionList? ')'){ value = ExpressionList; }
+                            ;
+
+        DeleteExpression(var bool global, var bool array): cmajor::codedom::CppObject*
+                            ::= (("::"{ global = true; })? keyword("delete") ('[' ']'{ array = true; })? CastExpression)
+                            {
+                                value = new DeleteExpr(global, array, CastExpression);
+                            }
+                            ;
+
+        PostfixExpression(var std::unique_ptr<CppObject> pe): cmajor::codedom::CppObject*
+                            ::= 
+                            (    PrimaryExpression{ pe.reset(PrimaryExpression); }
+                                (   ('[' Expression:index! ']'!){ pe.reset(new IndexExpr(pe.release(), index)); }
+                                |   ('(' (ExpressionList:invoke)? ')'!){ pe.reset(new InvokeExpr(pe.release(), invoke)); }
+                                |   (('.' - ".*") IdExpression:member!){ pe.reset(new MemberAccessExpr(pe.release(), member)); }
+                                |   (("->" - "->*") IdExpression:ptrmember!){ pe.reset(new PtrMemberAccessExpr(pe.release(), ptrmember)); }
+                                |   "++"{ pe.reset(new PostIncrementExpr(pe.release())); }
+                                |   "--"{ pe.reset(new PostDecrementExpr(pe.release())); }
+                                )
+                                *
+                                |   (TypeSpecifierOrTypeName '(' ExpressionList:typeConstruction? ')') { pe.reset(new InvokeExpr(TypeSpecifierOrTypeName, typeConstruction)); }
+                            )
+                            {
+                                value = pe.release();
+                            }
+                            ;
+
+        TypeSpecifierOrTypeName: cmajor::codedom::CppObject*
+                            ::= SimpleTypeSpecifier{ value = SimpleTypeSpecifier; }
+                            |   TypeName{ value = TypeName; }
+                            ;
+
+        PostCastExpression: cmajor::codedom::CppObject*
+                            ::= (keyword("dynamic_cast") '<'! TypeId:dct! '>'! '('! Expression:dce! ')'!){ value = new PostCastExpr(U"dynamic_cast", dct, dce); }
+                            |   (keyword("static_cast") '<'! TypeId:sct! '>'! '('! Expression:sce! ')'!){ value = new PostCastExpr(U"static_cast", sct, sce); }
+                            |   (keyword("reinterpret_cast") '<'! TypeId:rct! '>'! '('! Expression:rce! ')'!){ value = new PostCastExpr(U"reinterpret_cast", rct, rce); }
+                            |   (keyword("const_cast") '<'! TypeId:cct! '>'! '('! Expression:cce! ')'!){ value = new PostCastExpr(U"const_cast", cct, cce); }
+                            |   (keyword("typeid") '('! Expression:typeidExpr! ')'!){ value = new TypeIdExpr(typeidExpr); }
+                            ;
+
+        ExpressionList: std::vector<cmajor::codedom::CppObject*>
+                            ::= AssignmentExpression{ value.push_back(AssignmentExpression); } % ','
+                            ;
+
+        PrimaryExpression(var std::unique_ptr<CppObject> pe): cmajor::codedom::CppObject*
+                            ::= 
+                            (    Literal{ pe.reset(Literal); }
+                            |   keyword("this"){ pe.reset(new ThisAccess()); }
+                            |   '(' Expression ')'!{ pe.reset(Expression); }
+                            |   IdExpression{ pe.reset(IdExpression); }
+                            )
+                            {
+                                value = pe.release();
+                            }
+                            ;
+
+        IdExpression: cmajor::codedom::IdExpr*
+                            ::= token(QualifiedId:id1 "::" OperatorFunctionId){ value = new IdExpr(std::u32string(matchBegin, matchEnd)); }
+                            |   token("::"? OperatorFunctionId){ value = new IdExpr(std::u32string(matchBegin, matchEnd)); }
+                            |   QualifiedId:id2{ value = new IdExpr(std::u32string(matchBegin, matchEnd)); }
+                            ;
+
+        OperatorFunctionId  ::= keyword("operator") Operator
+                            ;
+
+        Operator            ::= '[' ']'
+                            |   '(' ')'
+                            |   "->*"
+                            |   "->"
+                            |   ','
+                            |   "--"
+                            |   "++"
+                            |   "||"
+                            |   "&&"
+                            |   "<="
+                            |   ">="
+                            |   "!="
+                            |   "=="
+                            |   "<<="
+                            |   ">>="
+                            |   "<<"
+                            |   ">>"
+                            |   "|="
+                            |   "&="
+                            |   "^="
+                            |   "%="
+                            |   "/="
+                            |   "*="
+                            |   "-="
+                            |   "+="
+                            |   '<'
+                            |   '>'
+                            |   '='
+                            |   '!'
+                            |   '~'
+                            |   '|'
+                            |   '&'
+                            |   '^'
+                            |   '%'
+                            |   '/'
+                            |   '*'
+                            |   '-'
+                            |   '+'
+                            |   keyword("new") '[' ']'
+                            |   keyword("delete") '[' ']'
+                            |   keyword("new")
+                            |   keyword("delete")
+                            ;
+    }
+}

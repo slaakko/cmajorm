@@ -1,0 +1,323 @@
+using System.Text.Parsing.CodeDom;
+
+namespace Syntax
+{
+    grammar PrimitiveGrammar
+    {
+        using stdlib.char;
+        using stdlib.string;
+        using stdlib.escape;
+        using stdlib.hexdword;
+        using stdlib.uint;
+        using Code.IdentifierGrammar.QualifiedId;
+        using ElementGrammar.StringArray;
+
+        Primitive : System.Text.Parsing.Parser*
+            ::= Char{ value = Char; }
+            |   String{ value = String; }
+            |   CharSet{ value = CharSet; }
+            |   Keyword{ value = Keyword; }
+            |   KeywordList{ value = KeywordList; }
+            |   Range{ value = Range; }
+            |   Empty{ value = Empty; }
+            |   Space{ value = Space; }
+            |   AnyChar{ value = AnyChar; }
+            |   Letter{ value = Letter; }
+            |   Digit{ value = Digit; }
+            |   HexDigit{ value = HexDigit; }
+            |   UpperLetter{ value = UpperLetter; }
+            |   LowerLetter{ value = LowerLetter; }
+            |   TitleLetter{ value = TitleLetter; }
+            |   ModifierLetter{ value = ModifierLetter; }
+            |   OtherLetter{ value = OtherLetter; }
+            |   CasedLetter{ value = CasedLetter; }
+            |   Mark{ value = Mark; }
+            |   NonspacingMark{ value = NonspacingMark; }
+            |   EnclosingMark{ value = EnclosingMark; }
+            |   SpacingMark{ value = SpacingMark; }
+            |   Number{ value = Number; }
+            |   DecimalNumber{ value = DecimalNumber; }
+            |   LetterNumber{ value = LetterNumber; }
+            |   OtherNumber{ value = OtherNumber; }
+            |   Punctuation{ value = Punctuation; }
+            |   ConnectorPunctuation{ value = ConnectorPunctuation; }
+            |   DashPunctuation{ value = DashPunctuation; }
+            |   OpenPunctuation{ value = OpenPunctuation; }
+            |   ClosePunctuation{ value = ClosePunctuation; }
+            |   InitialPunctuation{ value = InitialPunctuation; }
+            |   FinalPunctuation{ value = FinalPunctuation; }
+            |   OtherPunctuation{ value = OtherPunctuation; }
+            |   Symbol{ value = Symbol; }
+            |   MathSymbol{ value = MathSymbol; }
+            |   CurrencySymbol{ value = CurrencySymbol; }
+            |   ModifierSymbol{ value = ModifierSymbol; }
+            |   OtherSymbol{ value = OtherSymbol; }
+            |   Separator{ value = Separator;}
+            |   SpaceSeparator{ value = SpaceSeparator; }
+            |   LineSeparator{ value = LineSeparator; }
+            |   ParagraphSeparator{ value = ParagraphSeparator; }
+            |   Other{ value = Other; }
+            |   Control{ value = Control; }
+            |   Format{ value = Format; }
+            |   Surrogate{ value = Surrogate; }
+            |   PrivateUse{ value = PrivateUse; }
+            |   Unassigned{ value = Unassigned; }
+            |   Graphic{ value = Graphic; }
+            |   BaseChar{ value = BaseChar; }
+            |   Alphabetic{ value = Alphabetic; }
+            |   IdStart{ value = IdStart; }
+            |   IdCont{ value = IdCont; }
+            ;
+
+        Char : System.Text.Parsing.Parser*
+            ::= char:chr{ value = new System.Text.Parsing.CharParser(chr); }
+            ;
+
+        String : System.Text.Parsing.Parser*
+            ::= string:str{ value = new System.Text.Parsing.StringParser(str); }
+            ;
+
+        CharSet(var bool inverse, var ustring s) : System.Text.Parsing.Parser*
+            ::= token
+                (   '['
+                    ('^'{ inverse = true; })?
+                    (CharSetRange{ s.Append(CharSetRange); })*
+                    ']'!
+                )
+                {
+                    value = new System.Text.Parsing.CharSetParser(s, inverse);
+                }
+            ;
+
+        CharSetRange : ustring
+            ::= CharSetChar:first
+            (   '-' CharSetChar:last{ value.Append(first); value.Append(u'-'); value.Append(last); }
+            |   empty{ value.Append(first); }
+            )
+            ;
+
+        CharSetChar : uchar
+            ::= [^\\\]]{ value = *matchBegin; }
+            |   escape{ value = escape; }
+            ;
+
+        Keyword : System.Text.Parsing.Parser*
+            ::= (keyword("keyword") '('! KeywordBody! ')'!){ value = KeywordBody; }
+            ;
+
+        KeywordBody(var UniquePtr<Identifier> qid) : System.Text.Parsing.Parser*
+            ::= string:str
+            (   ',' QualifiedId:continuation!{ qid.Reset(continuation); value = new KeywordParser(str, continuation->Name()); }
+            |   empty{ value = new KeywordParser(str); }
+            )
+            ;
+
+        KeywordList : System.Text.Parsing.Parser*
+            ::= (keyword("keyword_list") '('! KeywordListBody! ')'!){ value = KeywordListBody; }
+            ;
+
+        KeywordListBody(var UniquePtr<Identifier> qid, var List<ustring> keywords) : System.Text.Parsing.Parser*
+            ::= (QualifiedId:selector!{ qid.Reset(selector); } ','! StringArray(&keywords)!){ value = new KeywordListParser(selector->Name(), keywords); }
+            ;
+
+        Range : System.Text.Parsing.Parser*
+            ::= (keyword("range") '('! CodePoint:s! ',' CodePoint:e! ')'!){ value = new System.Text.Parsing.RangeParser(s, e); }
+            ;
+
+        CodePoint : uint
+            ::= token('x' hexdword:x){ value = x; } | uint:d{ value = d; }
+            ;
+
+        Empty : System.Text.Parsing.Parser*
+            ::= keyword("empty"){ value = new System.Text.Parsing.EmptyParser(); }
+            ;
+
+        Space : System.Text.Parsing.Parser*
+            ::= keyword("space"){ value = new System.Text.Parsing.SpaceParser(); }
+            ;
+
+        AnyChar : System.Text.Parsing.Parser*
+            ::= keyword("anychar"){ value = new System.Text.Parsing.AnyCharParser(); }
+            ;
+
+        Letter : System.Text.Parsing.Parser*
+            ::= keyword("letter"){ value = new System.Text.Parsing.LetterParser(); }
+            ;
+
+        Digit : System.Text.Parsing.Parser*
+            ::= keyword("digit"){ value = new System.Text.Parsing.DigitParser(); }
+            ;
+
+        HexDigit : System.Text.Parsing.Parser*
+            ::= keyword("hexdigit"){ value = new System.Text.Parsing.HexDigitParser(); }
+            ;
+
+        UpperLetter : System.Text.Parsing.Parser*
+            ::= keyword("upper_letter"){ value = new System.Text.Parsing.UpperLetterParser(); }
+            ;
+
+        LowerLetter : System.Text.Parsing.Parser*
+            ::= keyword("lower_letter"){ value = new System.Text.Parsing.LowerLetterParser(); }
+            ;
+
+        TitleLetter : System.Text.Parsing.Parser*
+            ::= keyword("title_letter"){ value = new System.Text.Parsing.TitleLetterParser(); }
+            ;
+
+        ModifierLetter : System.Text.Parsing.Parser*
+            ::= keyword("modifier_letter"){ value = new System.Text.Parsing.ModifierLetterParser(); }
+            ;
+
+        OtherLetter : System.Text.Parsing.Parser*
+            ::= keyword("other_letter"){ value = new System.Text.Parsing.OtherLetterParser(); }
+            ;
+
+        CasedLetter : System.Text.Parsing.Parser*
+            ::= keyword("cased_letter"){ value = new System.Text.Parsing.CasedLetterParser(); }
+            ;
+
+        Mark : System.Text.Parsing.Parser*
+            ::= keyword("mark"){ value = new System.Text.Parsing.MarkParser(); }
+            ;
+
+        NonspacingMark : System.Text.Parsing.Parser*
+            ::= keyword("nonspacing_mark"){ value = new System.Text.Parsing.NonspacingMarkParser(); }
+            ;
+
+        SpacingMark : System.Text.Parsing.Parser*
+            ::= keyword("spacing_mark"){ value = new System.Text.Parsing.SpacingMarkParser(); }
+            ;
+
+        EnclosingMark : System.Text.Parsing.Parser*
+            ::= keyword("enclosing_mark"){ value = new System.Text.Parsing.EnclosingMarkParser(); }
+            ;
+
+        Number : System.Text.Parsing.Parser*
+            ::= keyword("number"){ value = new System.Text.Parsing.NumberParser(); }
+            ;
+
+        DecimalNumber : System.Text.Parsing.Parser*
+            ::= keyword("decimal_number"){ value = new System.Text.Parsing.DecimalNumberParser(); }
+            ;
+
+        LetterNumber : System.Text.Parsing.Parser*
+            ::= keyword("letter_number"){ value = new System.Text.Parsing.LetterNumberParser(); }
+            ;
+
+        OtherNumber : System.Text.Parsing.Parser*
+            ::= keyword("other_number"){ value = new System.Text.Parsing.OtherNumberParser(); }
+            ;
+
+        Punctuation : System.Text.Parsing.Parser*
+            ::= keyword("punctuation"){ value = new System.Text.Parsing.PunctuationParser(); }
+            ;
+
+        ConnectorPunctuation : System.Text.Parsing.Parser*
+            ::= keyword("connector_punctuation"){ value = new System.Text.Parsing.ConnectorPunctuationParser(); }
+            ;
+
+        DashPunctuation : System.Text.Parsing.Parser*
+            ::= keyword("dash_punctuation"){ value = new System.Text.Parsing.DashPunctuationParser(); }
+            ;
+
+        OpenPunctuation : System.Text.Parsing.Parser*
+            ::= keyword("open_punctuation"){ value = new System.Text.Parsing.OpenPunctuationParser(); }
+            ;
+
+        ClosePunctuation : System.Text.Parsing.Parser*
+            ::= keyword("close_punctuation"){ value = new System.Text.Parsing.ClosePunctuationParser(); }
+            ;
+
+        InitialPunctuation : System.Text.Parsing.Parser*
+            ::= keyword("initial_punctuation"){ value = new System.Text.Parsing.InitialPunctuationParser(); }
+            ;
+
+        FinalPunctuation : System.Text.Parsing.Parser*
+            ::= keyword("final_punctuation"){ value = new System.Text.Parsing.FinalPunctuationParser(); }
+            ;
+
+        OtherPunctuation : System.Text.Parsing.Parser*
+            ::= keyword("other_punctuation"){ value = new System.Text.Parsing.OtherPunctuationParser(); }
+            ;
+
+        Symbol : System.Text.Parsing.Parser*
+            ::= keyword("symbol"){ value = new System.Text.Parsing.SymbolParser(); }
+            ;
+
+        MathSymbol : System.Text.Parsing.Parser*
+            ::= keyword("math_symbol"){ value = new System.Text.Parsing.MathSymbolParser(); }
+            ;
+
+        CurrencySymbol : System.Text.Parsing.Parser*
+            ::= keyword("currency_symbol"){ value = new System.Text.Parsing.CurrencySymbolParser(); }
+            ;
+
+        ModifierSymbol : System.Text.Parsing.Parser*
+            ::= keyword("modifier_symbol"){ value = new System.Text.Parsing.ModifierSymbolParser(); }
+            ;
+
+        OtherSymbol : System.Text.Parsing.Parser*
+            ::= keyword("other_symbol"){ value = new System.Text.Parsing.OtherSymbolParser(); }
+            ;
+
+        Separator : System.Text.Parsing.Parser*
+            ::= keyword("separator"){ value = new System.Text.Parsing.SeparatorParser(); }
+            ;
+
+        SpaceSeparator : System.Text.Parsing.Parser*
+            ::= keyword("space_separator"){ value = new System.Text.Parsing.SpaceSeparatorParser(); }
+            ;
+
+        LineSeparator : System.Text.Parsing.Parser*
+            ::= keyword("line_separator"){ value = new System.Text.Parsing.LineSeparatorParser(); }
+            ;
+
+        ParagraphSeparator : System.Text.Parsing.Parser*
+            ::= keyword("paragraph_separator"){ value = new System.Text.Parsing.ParagraphSeparatorParser(); }
+            ;
+
+        Other : System.Text.Parsing.Parser*
+            ::= keyword("other"){ value = new System.Text.Parsing.OtherParser(); }
+            ;
+
+        Control : System.Text.Parsing.Parser*
+            ::= keyword("control"){ value = new System.Text.Parsing.ControlParser(); }
+            ;
+
+        Format : System.Text.Parsing.Parser*
+            ::= keyword("format"){ value = new System.Text.Parsing.FormatParser(); }
+            ;
+
+        Surrogate : System.Text.Parsing.Parser*
+            ::= keyword("surrogate"){ value = new System.Text.Parsing.SurrogateParser(); }
+            ;
+
+        PrivateUse : System.Text.Parsing.Parser*
+            ::= keyword("private_use"){ value = new System.Text.Parsing.PrivateUseParser(); }
+            ;
+
+        Unassigned : System.Text.Parsing.Parser*
+            ::= keyword("unassigned"){ value = new System.Text.Parsing.UnassignedParser(); }
+            ;
+
+        Graphic : System.Text.Parsing.Parser*
+            ::= keyword("graphic"){ value = new System.Text.Parsing.GraphicParser(); }
+            ;
+
+        BaseChar : System.Text.Parsing.Parser*
+            ::= keyword("basechar"){ value = new System.Text.Parsing.BaseCharParser(); }
+            ;
+
+        Alphabetic : System.Text.Parsing.Parser*
+            ::= keyword("alphabetic"){ value = new System.Text.Parsing.AlphabeticParser(); }
+            ;
+
+        IdStart : System.Text.Parsing.Parser*
+            ::= keyword("idstart"){ value = new System.Text.Parsing.IdStartParser(); }
+            ;
+
+        IdCont : System.Text.Parsing.Parser*
+            ::= keyword("idcont"){ value = new System.Text.Parsing.IdContParser(); }
+            ;
+    }
+}

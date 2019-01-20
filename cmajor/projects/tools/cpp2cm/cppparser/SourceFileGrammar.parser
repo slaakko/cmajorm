@@ -1,0 +1,18 @@
+using System;
+using cppast;
+
+namespace cppparser
+{
+    grammar SourceFileGrammar
+    {
+        using stdlib.comment;
+        using stdlib.newline;
+        using stdlib.spaces;
+        using DeclarationGrammar.Declarations;
+        skip spaces;
+
+        SourceFile(var ParsingContext ctx) : SourceFileNode*
+            ::= empty{ value = new SourceFileNode(span, fileName); } Declarations(&ctx, value)
+            ;
+    }
+}

@@ -1,0 +1,278 @@
+<html>
+ <head>
+  <meta charset="utf-8"/>
+  <link href="../../../style/style.css" rel="stylesheet" type="text/css"/>
+ </head>
+ <body>
+  <span class="code" id="1" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;1</span>&nbsp;<span class="comment">//&nbsp;=================================</span></span>
+  <br/>
+  <span class="code" id="2" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;2</span>&nbsp;<span class="comment">//&nbsp;Copyright&nbsp;(c)&nbsp;2018&nbsp;Seppo&nbsp;Laakko</span></span>
+  <br/>
+  <span class="code" id="3" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;3</span>&nbsp;<span class="comment">//&nbsp;Distributed&nbsp;under&nbsp;the&nbsp;MIT&nbsp;license</span></span>
+  <br/>
+  <span class="code" id="4" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;4</span>&nbsp;<span class="comment">//&nbsp;=================================</span></span>
+  <br/>
+  <span class="code" id="5" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;5</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="6" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;6</span>&nbsp;<span class="pp">#ifndef&nbsp;CMAJOR_PARSING_COMPOSITE_INCLUDED</span></span>
+  <br/>
+  <span class="code" id="7" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;7</span>&nbsp;<span class="pp">#define&nbsp;CMAJOR_PARSING_COMPOSITE_INCLUDED</span></span>
+  <br/>
+  <span class="code" id="8" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;8</span>&nbsp;<span class="pp">#include&nbsp;&lt;cmajor/parsing/Parser.hpp></span></span>
+  <br/>
+  <span class="code" id="9" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;9</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="10" xml:space="preserve"><span class="lineNumber">&nbsp;10</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">cmajor</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">parsing</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="11" xml:space="preserve"><span class="lineNumber">&nbsp;11</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="12" xml:space="preserve"><span class="lineNumber">&nbsp;12</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../../class_Visitor_9FF4E73241464BB90D8C7FBE81C08324A94EDF37.html">Visitor</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="13" xml:space="preserve"><span class="lineNumber">&nbsp;13</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="14" xml:space="preserve"><span class="lineNumber">&nbsp;14</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../../class_UnaryParser_FF89216268C9CC5DF03A4E25BB32CA6CC0452C0B.html">UnaryParser</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<a href="../../class_Parser_06FFBBD9B804958FBBF30CE64369F383780572DC.html">Parser</a></span>
+  <br/>
+  <span class="code" id="15" xml:space="preserve"><span class="lineNumber">&nbsp;15</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="16" xml:space="preserve"><span class="lineNumber">&nbsp;16</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="17" xml:space="preserve"><span class="lineNumber">&nbsp;17</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../class_UnaryParser_FF89216268C9CC5DF03A4E25BB32CA6CC0452C0B.html#constructor_UnaryParser_3A6E3B62E3B176DB818F8FFCACF3EC8C48E9A384">UnaryParser</a><span class="other">(</span><span class="kw">const&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="type">u32string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">name_</span><span class="other">,&nbsp;</span><a href="../../class_Parser_06FFBBD9B804958FBBF30CE64369F383780572DC.html">Parser</a><span class="other">*</span>&nbsp;<span class="identifier">child_</span><span class="other">,&nbsp;</span><span class="kw">const&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="type">u32string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">info_</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="18" xml:space="preserve"><span class="lineNumber">&nbsp;18</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../class_Parser_06FFBBD9B804958FBBF30CE64369F383780572DC.html">Parser</a><span class="other">*</span>&nbsp;<a href="../../class_UnaryParser_FF89216268C9CC5DF03A4E25BB32CA6CC0452C0B.html#function_Child_BFFC654B28B0849C099F3525A5D66145047E7F6E">Child</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">child</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="19" xml:space="preserve"><span class="lineNumber">&nbsp;19</span>&nbsp;<span class="kw">private</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="20" xml:space="preserve"><span class="lineNumber">&nbsp;20</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../class_Parser_06FFBBD9B804958FBBF30CE64369F383780572DC.html">Parser</a><span class="other">*</span>&nbsp;<span class="identifier">child</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="21" xml:space="preserve"><span class="lineNumber">&nbsp;21</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="22" xml:space="preserve"><span class="lineNumber">&nbsp;22</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="23" xml:space="preserve"><span class="lineNumber">&nbsp;23</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../../class_OptionalParser_6FD9978AB98EEA0493DCE3F83862941434CEA9B6.html">OptionalParser</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<a href="../../class_UnaryParser_FF89216268C9CC5DF03A4E25BB32CA6CC0452C0B.html">UnaryParser</a></span>
+  <br/>
+  <span class="code" id="24" xml:space="preserve"><span class="lineNumber">&nbsp;24</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="25" xml:space="preserve"><span class="lineNumber">&nbsp;25</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="26" xml:space="preserve"><span class="lineNumber">&nbsp;26</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../class_OptionalParser_6FD9978AB98EEA0493DCE3F83862941434CEA9B6.html#constructor_OptionalParser_696541CCDCC892B6D2875977F30F778A7FB3B79D">OptionalParser</a><span class="other">(</span><a href="../../class_Parser_06FFBBD9B804958FBBF30CE64369F383780572DC.html">Parser</a><span class="other">*</span>&nbsp;<span class="identifier">child_</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="27" xml:space="preserve"><span class="lineNumber">&nbsp;27</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../class_Match_AE9F2DF666E0DCE819F7C290A90F765AA326231D.html">Match</a>&nbsp;<a href="../../class_OptionalParser_6FD9978AB98EEA0493DCE3F83862941434CEA9B6.html#function_Parse_77220F509C05E2DDE9F74D188740A287DD879B10">Parse</a><span class="other">(</span><a href="../../class_Scanner_4556143008C97A4C8F070C9C0679FAD7FD6E9B59.html">Scanner</a><span class="other">&amp;</span>&nbsp;<span class="identifier">scanner</span><span class="other">,&nbsp;</span><a href="../../namespace_parsing_D308EED43E54B87FB52D88ADF3DA7F4E649CD021.html#typedef_ObjectStack_4F33FF13CD2400B32D4C131BF840FA0517BCE3D1">ObjectStack</a><span class="other">&amp;</span>&nbsp;<span class="identifier">stack</span><span class="other">,&nbsp;</span><a href="../../class_ParsingData_04BCB31619144CF8592DA360C9D8C0A3597BFD79.html">ParsingData</a><span class="other">*</span>&nbsp;<span class="identifier">parsingData</span><span class="other">)</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="28" xml:space="preserve"><span class="lineNumber">&nbsp;28</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../../class_OptionalParser_6FD9978AB98EEA0493DCE3F83862941434CEA9B6.html#function_Accept_896B0376D263131AC73A3D784249E97C9F10B737">Accept</a><span class="other">(</span><a href="../../class_Visitor_9FF4E73241464BB90D8C7FBE81C08324A94EDF37.html">Visitor</a><span class="other">&amp;</span>&nbsp;<span class="identifier">visitor</span><span class="other">)</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="29" xml:space="preserve"><span class="lineNumber">&nbsp;29</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="30" xml:space="preserve"><span class="lineNumber">&nbsp;30</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="31" xml:space="preserve"><span class="lineNumber">&nbsp;31</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../../class_PositiveParser_63879E81F68ACDACC236983337A632B166B5E76B.html">PositiveParser</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<a href="../../class_UnaryParser_FF89216268C9CC5DF03A4E25BB32CA6CC0452C0B.html">UnaryParser</a></span>
+  <br/>
+  <span class="code" id="32" xml:space="preserve"><span class="lineNumber">&nbsp;32</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="33" xml:space="preserve"><span class="lineNumber">&nbsp;33</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="34" xml:space="preserve"><span class="lineNumber">&nbsp;34</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../class_PositiveParser_63879E81F68ACDACC236983337A632B166B5E76B.html#constructor_PositiveParser_47C6280A70DAE0395068C1DF60A6361535170693">PositiveParser</a><span class="other">(</span><a href="../../class_Parser_06FFBBD9B804958FBBF30CE64369F383780572DC.html">Parser</a><span class="other">*</span>&nbsp;<span class="identifier">child_</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="35" xml:space="preserve"><span class="lineNumber">&nbsp;35</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../class_Match_AE9F2DF666E0DCE819F7C290A90F765AA326231D.html">Match</a>&nbsp;<a href="../../class_PositiveParser_63879E81F68ACDACC236983337A632B166B5E76B.html#function_Parse_66746C4E467497EB956909E28EDA5B3866E60982">Parse</a><span class="other">(</span><a href="../../class_Scanner_4556143008C97A4C8F070C9C0679FAD7FD6E9B59.html">Scanner</a><span class="other">&amp;</span>&nbsp;<span class="identifier">scanner</span><span class="other">,&nbsp;</span><a href="../../namespace_parsing_D308EED43E54B87FB52D88ADF3DA7F4E649CD021.html#typedef_ObjectStack_4F33FF13CD2400B32D4C131BF840FA0517BCE3D1">ObjectStack</a><span class="other">&amp;</span>&nbsp;<span class="identifier">stack</span><span class="other">,&nbsp;</span><a href="../../class_ParsingData_04BCB31619144CF8592DA360C9D8C0A3597BFD79.html">ParsingData</a><span class="other">*</span>&nbsp;<span class="identifier">parsingData</span><span class="other">)</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="36" xml:space="preserve"><span class="lineNumber">&nbsp;36</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../../class_PositiveParser_63879E81F68ACDACC236983337A632B166B5E76B.html#function_Accept_62CA65905834656D08CBEF94353858FE58C70129">Accept</a><span class="other">(</span><a href="../../class_Visitor_9FF4E73241464BB90D8C7FBE81C08324A94EDF37.html">Visitor</a><span class="other">&amp;</span>&nbsp;<span class="identifier">visitor</span><span class="other">)</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="37" xml:space="preserve"><span class="lineNumber">&nbsp;37</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="38" xml:space="preserve"><span class="lineNumber">&nbsp;38</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="39" xml:space="preserve"><span class="lineNumber">&nbsp;39</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../../class_KleeneStarParser_E261C278FCDAD7DCF139EC5EF7E1934F3BAE7E9D.html">KleeneStarParser</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<a href="../../class_UnaryParser_FF89216268C9CC5DF03A4E25BB32CA6CC0452C0B.html">UnaryParser</a></span>
+  <br/>
+  <span class="code" id="40" xml:space="preserve"><span class="lineNumber">&nbsp;40</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="41" xml:space="preserve"><span class="lineNumber">&nbsp;41</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="42" xml:space="preserve"><span class="lineNumber">&nbsp;42</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../class_KleeneStarParser_E261C278FCDAD7DCF139EC5EF7E1934F3BAE7E9D.html#constructor_KleeneStarParser_89370E90A1533D826A81223CF500E6A53BC58CEA">KleeneStarParser</a><span class="other">(</span><a href="../../class_Parser_06FFBBD9B804958FBBF30CE64369F383780572DC.html">Parser</a><span class="other">*</span>&nbsp;<span class="identifier">child_</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="43" xml:space="preserve"><span class="lineNumber">&nbsp;43</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../class_Match_AE9F2DF666E0DCE819F7C290A90F765AA326231D.html">Match</a>&nbsp;<a href="../../class_KleeneStarParser_E261C278FCDAD7DCF139EC5EF7E1934F3BAE7E9D.html#function_Parse_A571AD8AB24FD914323D795EC451A291A12346C0">Parse</a><span class="other">(</span><a href="../../class_Scanner_4556143008C97A4C8F070C9C0679FAD7FD6E9B59.html">Scanner</a><span class="other">&amp;</span>&nbsp;<span class="identifier">scanner</span><span class="other">,&nbsp;</span><a href="../../namespace_parsing_D308EED43E54B87FB52D88ADF3DA7F4E649CD021.html#typedef_ObjectStack_4F33FF13CD2400B32D4C131BF840FA0517BCE3D1">ObjectStack</a><span class="other">&amp;</span>&nbsp;<span class="identifier">stack</span><span class="other">,&nbsp;</span><a href="../../class_ParsingData_04BCB31619144CF8592DA360C9D8C0A3597BFD79.html">ParsingData</a><span class="other">*</span>&nbsp;<span class="identifier">parsingData</span><span class="other">)</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="44" xml:space="preserve"><span class="lineNumber">&nbsp;44</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../../class_KleeneStarParser_E261C278FCDAD7DCF139EC5EF7E1934F3BAE7E9D.html#function_Accept_7430116A1AEB623E43415D62FEB1F33C93F6FCFB">Accept</a><span class="other">(</span><a href="../../class_Visitor_9FF4E73241464BB90D8C7FBE81C08324A94EDF37.html">Visitor</a><span class="other">&amp;</span>&nbsp;<span class="identifier">visitor</span><span class="other">)</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="45" xml:space="preserve"><span class="lineNumber">&nbsp;45</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="46" xml:space="preserve"><span class="lineNumber">&nbsp;46</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="47" xml:space="preserve"><span class="lineNumber">&nbsp;47</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../../class_ExpectationParser_A1807FD9E51C0E023034FC9532AF9EC10E43530F.html">ExpectationParser</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<a href="../../class_UnaryParser_FF89216268C9CC5DF03A4E25BB32CA6CC0452C0B.html">UnaryParser</a></span>
+  <br/>
+  <span class="code" id="48" xml:space="preserve"><span class="lineNumber">&nbsp;48</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="49" xml:space="preserve"><span class="lineNumber">&nbsp;49</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="50" xml:space="preserve"><span class="lineNumber">&nbsp;50</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../class_ExpectationParser_A1807FD9E51C0E023034FC9532AF9EC10E43530F.html#constructor_ExpectationParser_2AE3620B75AB2BDC4721178CF70957179B663D94">ExpectationParser</a><span class="other">(</span><a href="../../class_Parser_06FFBBD9B804958FBBF30CE64369F383780572DC.html">Parser</a><span class="other">*</span>&nbsp;<span class="identifier">child_</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="51" xml:space="preserve"><span class="lineNumber">&nbsp;51</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../class_Match_AE9F2DF666E0DCE819F7C290A90F765AA326231D.html">Match</a>&nbsp;<a href="../../class_ExpectationParser_A1807FD9E51C0E023034FC9532AF9EC10E43530F.html#function_Parse_B3F760E0623E8F545586C424BAD825B11A24089C">Parse</a><span class="other">(</span><a href="../../class_Scanner_4556143008C97A4C8F070C9C0679FAD7FD6E9B59.html">Scanner</a><span class="other">&amp;</span>&nbsp;<span class="identifier">scanner</span><span class="other">,&nbsp;</span><a href="../../namespace_parsing_D308EED43E54B87FB52D88ADF3DA7F4E649CD021.html#typedef_ObjectStack_4F33FF13CD2400B32D4C131BF840FA0517BCE3D1">ObjectStack</a><span class="other">&amp;</span>&nbsp;<span class="identifier">stack</span><span class="other">,&nbsp;</span><a href="../../class_ParsingData_04BCB31619144CF8592DA360C9D8C0A3597BFD79.html">ParsingData</a><span class="other">*</span>&nbsp;<span class="identifier">parsingData</span><span class="other">)</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="52" xml:space="preserve"><span class="lineNumber">&nbsp;52</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../../class_ExpectationParser_A1807FD9E51C0E023034FC9532AF9EC10E43530F.html#function_Accept_10BDC53CA806EF51C418A21D6A0B480439D35777">Accept</a><span class="other">(</span><a href="../../class_Visitor_9FF4E73241464BB90D8C7FBE81C08324A94EDF37.html">Visitor</a><span class="other">&amp;</span>&nbsp;<span class="identifier">visitor</span><span class="other">)</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="53" xml:space="preserve"><span class="lineNumber">&nbsp;53</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="54" xml:space="preserve"><span class="lineNumber">&nbsp;54</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="55" xml:space="preserve"><span class="lineNumber">&nbsp;55</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../../class_TokenParser_5AFF15A9767FCC122D6289E574586662CD693F8F.html">TokenParser</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<a href="../../class_UnaryParser_FF89216268C9CC5DF03A4E25BB32CA6CC0452C0B.html">UnaryParser</a></span>
+  <br/>
+  <span class="code" id="56" xml:space="preserve"><span class="lineNumber">&nbsp;56</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="57" xml:space="preserve"><span class="lineNumber">&nbsp;57</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="58" xml:space="preserve"><span class="lineNumber">&nbsp;58</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../class_TokenParser_5AFF15A9767FCC122D6289E574586662CD693F8F.html#constructor_TokenParser_C333E692FF192DE055E49C54191D69F7C1431712">TokenParser</a><span class="other">(</span><a href="../../class_Parser_06FFBBD9B804958FBBF30CE64369F383780572DC.html">Parser</a><span class="other">*</span>&nbsp;<span class="identifier">child_</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="59" xml:space="preserve"><span class="lineNumber">&nbsp;59</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../class_Match_AE9F2DF666E0DCE819F7C290A90F765AA326231D.html">Match</a>&nbsp;<a href="../../class_TokenParser_5AFF15A9767FCC122D6289E574586662CD693F8F.html#function_Parse_857E75AD9725228C22F8E49538F6EA863BE8F242">Parse</a><span class="other">(</span><a href="../../class_Scanner_4556143008C97A4C8F070C9C0679FAD7FD6E9B59.html">Scanner</a><span class="other">&amp;</span>&nbsp;<span class="identifier">scanner</span><span class="other">,&nbsp;</span><a href="../../namespace_parsing_D308EED43E54B87FB52D88ADF3DA7F4E649CD021.html#typedef_ObjectStack_4F33FF13CD2400B32D4C131BF840FA0517BCE3D1">ObjectStack</a><span class="other">&amp;</span>&nbsp;<span class="identifier">stack</span><span class="other">,&nbsp;</span><a href="../../class_ParsingData_04BCB31619144CF8592DA360C9D8C0A3597BFD79.html">ParsingData</a><span class="other">*</span>&nbsp;<span class="identifier">parsingData</span><span class="other">)</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="60" xml:space="preserve"><span class="lineNumber">&nbsp;60</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../../class_TokenParser_5AFF15A9767FCC122D6289E574586662CD693F8F.html#function_Accept_6FD16C73ACBC1AA856E9E410D3FCDF2969B69924">Accept</a><span class="other">(</span><a href="../../class_Visitor_9FF4E73241464BB90D8C7FBE81C08324A94EDF37.html">Visitor</a><span class="other">&amp;</span>&nbsp;<span class="identifier">visitor</span><span class="other">)</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="61" xml:space="preserve"><span class="lineNumber">&nbsp;61</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="62" xml:space="preserve"><span class="lineNumber">&nbsp;62</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="63" xml:space="preserve"><span class="lineNumber">&nbsp;63</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../../class_GroupingParser_A8003CAAA9F02E532229862E28DA2F07EED88B30.html">GroupingParser</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<a href="../../class_UnaryParser_FF89216268C9CC5DF03A4E25BB32CA6CC0452C0B.html">UnaryParser</a></span>
+  <br/>
+  <span class="code" id="64" xml:space="preserve"><span class="lineNumber">&nbsp;64</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="65" xml:space="preserve"><span class="lineNumber">&nbsp;65</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="66" xml:space="preserve"><span class="lineNumber">&nbsp;66</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../class_GroupingParser_A8003CAAA9F02E532229862E28DA2F07EED88B30.html#constructor_GroupingParser_A48C6B14EEFF2F69CABB3EC32000BF35379B6346">GroupingParser</a><span class="other">(</span><a href="../../class_Parser_06FFBBD9B804958FBBF30CE64369F383780572DC.html">Parser</a><span class="other">*</span>&nbsp;<span class="identifier">child_</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="67" xml:space="preserve"><span class="lineNumber">&nbsp;67</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../class_Match_AE9F2DF666E0DCE819F7C290A90F765AA326231D.html">Match</a>&nbsp;<a href="../../class_GroupingParser_A8003CAAA9F02E532229862E28DA2F07EED88B30.html#function_Parse_F7DFDB0393F47DCE3D2DA5683C752E7D6802245B">Parse</a><span class="other">(</span><a href="../../class_Scanner_4556143008C97A4C8F070C9C0679FAD7FD6E9B59.html">Scanner</a><span class="other">&amp;</span>&nbsp;<span class="identifier">scanner</span><span class="other">,&nbsp;</span><a href="../../namespace_parsing_D308EED43E54B87FB52D88ADF3DA7F4E649CD021.html#typedef_ObjectStack_4F33FF13CD2400B32D4C131BF840FA0517BCE3D1">ObjectStack</a><span class="other">&amp;</span>&nbsp;<span class="identifier">stack</span><span class="other">,&nbsp;</span><a href="../../class_ParsingData_04BCB31619144CF8592DA360C9D8C0A3597BFD79.html">ParsingData</a><span class="other">*</span>&nbsp;<span class="identifier">parsingData</span><span class="other">)</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="68" xml:space="preserve"><span class="lineNumber">&nbsp;68</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../../class_GroupingParser_A8003CAAA9F02E532229862E28DA2F07EED88B30.html#function_Accept_EF3F01B65F4836D29C905917B4AFD9FAEC1F210F">Accept</a><span class="other">(</span><a href="../../class_Visitor_9FF4E73241464BB90D8C7FBE81C08324A94EDF37.html">Visitor</a><span class="other">&amp;</span>&nbsp;<span class="identifier">visitor</span><span class="other">)</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="69" xml:space="preserve"><span class="lineNumber">&nbsp;69</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="70" xml:space="preserve"><span class="lineNumber">&nbsp;70</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="71" xml:space="preserve"><span class="lineNumber">&nbsp;71</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../../class_BinaryParser_01B3F4AD87A11BF51E8461473B91C32C547664B6.html">BinaryParser</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<a href="../../class_Parser_06FFBBD9B804958FBBF30CE64369F383780572DC.html">Parser</a></span>
+  <br/>
+  <span class="code" id="72" xml:space="preserve"><span class="lineNumber">&nbsp;72</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="73" xml:space="preserve"><span class="lineNumber">&nbsp;73</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="74" xml:space="preserve"><span class="lineNumber">&nbsp;74</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../class_BinaryParser_01B3F4AD87A11BF51E8461473B91C32C547664B6.html#constructor_BinaryParser_E565DB8856298845045B8C8A7D79163002BE305B">BinaryParser</a><span class="other">(</span><span class="kw">const&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="type">u32string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">name_</span><span class="other">,&nbsp;</span><a href="../../class_Parser_06FFBBD9B804958FBBF30CE64369F383780572DC.html">Parser</a><span class="other">*</span>&nbsp;<span class="identifier">left_</span><span class="other">,&nbsp;</span><a href="../../class_Parser_06FFBBD9B804958FBBF30CE64369F383780572DC.html">Parser</a><span class="other">*</span>&nbsp;<span class="identifier">right_</span><span class="other">,&nbsp;</span><span class="kw">const&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="type">u32string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">info_</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="75" xml:space="preserve"><span class="lineNumber">&nbsp;75</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../class_Parser_06FFBBD9B804958FBBF30CE64369F383780572DC.html">Parser</a><span class="other">*</span>&nbsp;<a href="../../class_BinaryParser_01B3F4AD87A11BF51E8461473B91C32C547664B6.html#function_Left_BCFF1B78D5C4876A48095733AB691BE8FF399993">Left</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">left</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="76" xml:space="preserve"><span class="lineNumber">&nbsp;76</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../class_Parser_06FFBBD9B804958FBBF30CE64369F383780572DC.html">Parser</a><span class="other">*</span>&nbsp;<a href="../../class_BinaryParser_01B3F4AD87A11BF51E8461473B91C32C547664B6.html#function_Right_27703D324F008FAED333B20854C139DB9B9F9DF3">Right</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">right</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="77" xml:space="preserve"><span class="lineNumber">&nbsp;77</span>&nbsp;<span class="kw">private</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="78" xml:space="preserve"><span class="lineNumber">&nbsp;78</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../class_Parser_06FFBBD9B804958FBBF30CE64369F383780572DC.html">Parser</a><span class="other">*</span>&nbsp;<span class="identifier">left</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="79" xml:space="preserve"><span class="lineNumber">&nbsp;79</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../class_Parser_06FFBBD9B804958FBBF30CE64369F383780572DC.html">Parser</a><span class="other">*</span>&nbsp;<span class="identifier">right</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="80" xml:space="preserve"><span class="lineNumber">&nbsp;80</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="81" xml:space="preserve"><span class="lineNumber">&nbsp;81</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="82" xml:space="preserve"><span class="lineNumber">&nbsp;82</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../../class_SequenceParser_EA74D30811182F9ABAD5FC03551D7EC1CDD358B1.html">SequenceParser</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<a href="../../class_BinaryParser_01B3F4AD87A11BF51E8461473B91C32C547664B6.html">BinaryParser</a></span>
+  <br/>
+  <span class="code" id="83" xml:space="preserve"><span class="lineNumber">&nbsp;83</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="84" xml:space="preserve"><span class="lineNumber">&nbsp;84</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="85" xml:space="preserve"><span class="lineNumber">&nbsp;85</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../class_SequenceParser_EA74D30811182F9ABAD5FC03551D7EC1CDD358B1.html#constructor_SequenceParser_BA9B64144B7E2A316F4F8BAE8F0D103B69885C98">SequenceParser</a><span class="other">(</span><a href="../../class_Parser_06FFBBD9B804958FBBF30CE64369F383780572DC.html">Parser</a><span class="other">*</span>&nbsp;<span class="identifier">left_</span><span class="other">,&nbsp;</span><a href="../../class_Parser_06FFBBD9B804958FBBF30CE64369F383780572DC.html">Parser</a><span class="other">*</span>&nbsp;<span class="identifier">right_</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="86" xml:space="preserve"><span class="lineNumber">&nbsp;86</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../class_Match_AE9F2DF666E0DCE819F7C290A90F765AA326231D.html">Match</a>&nbsp;<a href="../../class_SequenceParser_EA74D30811182F9ABAD5FC03551D7EC1CDD358B1.html#function_Parse_5E1FC2D1453EEA79A15D4B8F191F22F7AC14F849">Parse</a><span class="other">(</span><a href="../../class_Scanner_4556143008C97A4C8F070C9C0679FAD7FD6E9B59.html">Scanner</a><span class="other">&amp;</span>&nbsp;<span class="identifier">scanner</span><span class="other">,&nbsp;</span><a href="../../namespace_parsing_D308EED43E54B87FB52D88ADF3DA7F4E649CD021.html#typedef_ObjectStack_4F33FF13CD2400B32D4C131BF840FA0517BCE3D1">ObjectStack</a><span class="other">&amp;</span>&nbsp;<span class="identifier">stack</span><span class="other">,&nbsp;</span><a href="../../class_ParsingData_04BCB31619144CF8592DA360C9D8C0A3597BFD79.html">ParsingData</a><span class="other">*</span>&nbsp;<span class="identifier">parsingData</span><span class="other">)</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="87" xml:space="preserve"><span class="lineNumber">&nbsp;87</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../../class_SequenceParser_EA74D30811182F9ABAD5FC03551D7EC1CDD358B1.html#function_Accept_13F0D8D0E455C6F1AF2122EAA5C7BF00F1CBCF92">Accept</a><span class="other">(</span><a href="../../class_Visitor_9FF4E73241464BB90D8C7FBE81C08324A94EDF37.html">Visitor</a><span class="other">&amp;</span>&nbsp;<span class="identifier">visitor</span><span class="other">)</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="88" xml:space="preserve"><span class="lineNumber">&nbsp;88</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="89" xml:space="preserve"><span class="lineNumber">&nbsp;89</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="90" xml:space="preserve"><span class="lineNumber">&nbsp;90</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../../class_AlternativeParser_1090BF2BD33AD2523B1E0E73B7458AB6FC84D7BC.html">AlternativeParser</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<a href="../../class_BinaryParser_01B3F4AD87A11BF51E8461473B91C32C547664B6.html">BinaryParser</a></span>
+  <br/>
+  <span class="code" id="91" xml:space="preserve"><span class="lineNumber">&nbsp;91</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="92" xml:space="preserve"><span class="lineNumber">&nbsp;92</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="93" xml:space="preserve"><span class="lineNumber">&nbsp;93</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../class_AlternativeParser_1090BF2BD33AD2523B1E0E73B7458AB6FC84D7BC.html#constructor_AlternativeParser_2B49F18F95EF56ABB53C992B56CFB8EE725B385F">AlternativeParser</a><span class="other">(</span><a href="../../class_Parser_06FFBBD9B804958FBBF30CE64369F383780572DC.html">Parser</a><span class="other">*</span>&nbsp;<span class="identifier">left_</span><span class="other">,&nbsp;</span><a href="../../class_Parser_06FFBBD9B804958FBBF30CE64369F383780572DC.html">Parser</a><span class="other">*</span>&nbsp;<span class="identifier">right_</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="94" xml:space="preserve"><span class="lineNumber">&nbsp;94</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../class_Match_AE9F2DF666E0DCE819F7C290A90F765AA326231D.html">Match</a>&nbsp;<a href="../../class_AlternativeParser_1090BF2BD33AD2523B1E0E73B7458AB6FC84D7BC.html#function_Parse_6D981A443F751689D6B01E8217D978F860F5E15D">Parse</a><span class="other">(</span><a href="../../class_Scanner_4556143008C97A4C8F070C9C0679FAD7FD6E9B59.html">Scanner</a><span class="other">&amp;</span>&nbsp;<span class="identifier">scanner</span><span class="other">,&nbsp;</span><a href="../../namespace_parsing_D308EED43E54B87FB52D88ADF3DA7F4E649CD021.html#typedef_ObjectStack_4F33FF13CD2400B32D4C131BF840FA0517BCE3D1">ObjectStack</a><span class="other">&amp;</span>&nbsp;<span class="identifier">stack</span><span class="other">,&nbsp;</span><a href="../../class_ParsingData_04BCB31619144CF8592DA360C9D8C0A3597BFD79.html">ParsingData</a><span class="other">*</span>&nbsp;<span class="identifier">parsingData</span><span class="other">)</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="95" xml:space="preserve"><span class="lineNumber">&nbsp;95</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../../class_AlternativeParser_1090BF2BD33AD2523B1E0E73B7458AB6FC84D7BC.html#function_Accept_C8A68FBB23E9E530F804A6A817E80552E484BA99">Accept</a><span class="other">(</span><a href="../../class_Visitor_9FF4E73241464BB90D8C7FBE81C08324A94EDF37.html">Visitor</a><span class="other">&amp;</span>&nbsp;<span class="identifier">visitor</span><span class="other">)</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="96" xml:space="preserve"><span class="lineNumber">&nbsp;96</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="97" xml:space="preserve"><span class="lineNumber">&nbsp;97</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="98" xml:space="preserve"><span class="lineNumber">&nbsp;98</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../../class_DifferenceParser_105910B4FB1C28FBAF58426CD456E1A7825795BE.html">DifferenceParser</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<a href="../../class_BinaryParser_01B3F4AD87A11BF51E8461473B91C32C547664B6.html">BinaryParser</a></span>
+  <br/>
+  <span class="code" id="99" xml:space="preserve"><span class="lineNumber">&nbsp;99</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="100" xml:space="preserve"><span class="lineNumber">100</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="101" xml:space="preserve"><span class="lineNumber">101</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../class_DifferenceParser_105910B4FB1C28FBAF58426CD456E1A7825795BE.html#constructor_DifferenceParser_1635EBBD1FAFFE355C95E3065032B625BC88F144">DifferenceParser</a><span class="other">(</span><a href="../../class_Parser_06FFBBD9B804958FBBF30CE64369F383780572DC.html">Parser</a><span class="other">*</span>&nbsp;<span class="identifier">left_</span><span class="other">,&nbsp;</span><a href="../../class_Parser_06FFBBD9B804958FBBF30CE64369F383780572DC.html">Parser</a><span class="other">*</span>&nbsp;<span class="identifier">right_</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="102" xml:space="preserve"><span class="lineNumber">102</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../class_Match_AE9F2DF666E0DCE819F7C290A90F765AA326231D.html">Match</a>&nbsp;<a href="../../class_DifferenceParser_105910B4FB1C28FBAF58426CD456E1A7825795BE.html#function_Parse_A24FAC7DA4A67BB039E706A2068106560D3ADBDE">Parse</a><span class="other">(</span><a href="../../class_Scanner_4556143008C97A4C8F070C9C0679FAD7FD6E9B59.html">Scanner</a><span class="other">&amp;</span>&nbsp;<span class="identifier">scanner</span><span class="other">,&nbsp;</span><a href="../../namespace_parsing_D308EED43E54B87FB52D88ADF3DA7F4E649CD021.html#typedef_ObjectStack_4F33FF13CD2400B32D4C131BF840FA0517BCE3D1">ObjectStack</a><span class="other">&amp;</span>&nbsp;<span class="identifier">stack</span><span class="other">,&nbsp;</span><a href="../../class_ParsingData_04BCB31619144CF8592DA360C9D8C0A3597BFD79.html">ParsingData</a><span class="other">*</span>&nbsp;<span class="identifier">parsingData</span><span class="other">)</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="103" xml:space="preserve"><span class="lineNumber">103</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../../class_DifferenceParser_105910B4FB1C28FBAF58426CD456E1A7825795BE.html#function_Accept_A781BAEF26FD1B93D3F054911DA6D5B851717AF5">Accept</a><span class="other">(</span><a href="../../class_Visitor_9FF4E73241464BB90D8C7FBE81C08324A94EDF37.html">Visitor</a><span class="other">&amp;</span>&nbsp;<span class="identifier">visitor</span><span class="other">)</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="104" xml:space="preserve"><span class="lineNumber">104</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="105" xml:space="preserve"><span class="lineNumber">105</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="106" xml:space="preserve"><span class="lineNumber">106</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../../class_ExclusiveOrParser_799255ABFFE1FA900A013E8241D5EE6F9AB671DD.html">ExclusiveOrParser</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<a href="../../class_BinaryParser_01B3F4AD87A11BF51E8461473B91C32C547664B6.html">BinaryParser</a></span>
+  <br/>
+  <span class="code" id="107" xml:space="preserve"><span class="lineNumber">107</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="108" xml:space="preserve"><span class="lineNumber">108</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="109" xml:space="preserve"><span class="lineNumber">109</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../class_ExclusiveOrParser_799255ABFFE1FA900A013E8241D5EE6F9AB671DD.html#constructor_ExclusiveOrParser_AB5A43ACC9CE24E7742E21B1E236210E16FB242F">ExclusiveOrParser</a><span class="other">(</span><a href="../../class_Parser_06FFBBD9B804958FBBF30CE64369F383780572DC.html">Parser</a><span class="other">*</span>&nbsp;<span class="identifier">left_</span><span class="other">,&nbsp;</span><a href="../../class_Parser_06FFBBD9B804958FBBF30CE64369F383780572DC.html">Parser</a><span class="other">*</span>&nbsp;<span class="identifier">right_</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="110" xml:space="preserve"><span class="lineNumber">110</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../class_Match_AE9F2DF666E0DCE819F7C290A90F765AA326231D.html">Match</a>&nbsp;<a href="../../class_ExclusiveOrParser_799255ABFFE1FA900A013E8241D5EE6F9AB671DD.html#function_Parse_EFF5F80FE6C2246489F66102EAC6C909898EB6BA">Parse</a><span class="other">(</span><a href="../../class_Scanner_4556143008C97A4C8F070C9C0679FAD7FD6E9B59.html">Scanner</a><span class="other">&amp;</span>&nbsp;<span class="identifier">scanner</span><span class="other">,&nbsp;</span><a href="../../namespace_parsing_D308EED43E54B87FB52D88ADF3DA7F4E649CD021.html#typedef_ObjectStack_4F33FF13CD2400B32D4C131BF840FA0517BCE3D1">ObjectStack</a><span class="other">&amp;</span>&nbsp;<span class="identifier">stack</span><span class="other">,&nbsp;</span><a href="../../class_ParsingData_04BCB31619144CF8592DA360C9D8C0A3597BFD79.html">ParsingData</a><span class="other">*</span>&nbsp;<span class="identifier">parsingData</span><span class="other">)</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="111" xml:space="preserve"><span class="lineNumber">111</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../../class_ExclusiveOrParser_799255ABFFE1FA900A013E8241D5EE6F9AB671DD.html#function_Accept_76C6B39DC03AADF0481B4E4933A48343BC775352">Accept</a><span class="other">(</span><a href="../../class_Visitor_9FF4E73241464BB90D8C7FBE81C08324A94EDF37.html">Visitor</a><span class="other">&amp;</span>&nbsp;<span class="identifier">visitor</span><span class="other">)</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="112" xml:space="preserve"><span class="lineNumber">112</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="113" xml:space="preserve"><span class="lineNumber">113</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="114" xml:space="preserve"><span class="lineNumber">114</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../../class_IntersectionParser_B51FF660F70963DA1318EDAC167D050CF14C8753.html">IntersectionParser</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<a href="../../class_BinaryParser_01B3F4AD87A11BF51E8461473B91C32C547664B6.html">BinaryParser</a></span>
+  <br/>
+  <span class="code" id="115" xml:space="preserve"><span class="lineNumber">115</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="116" xml:space="preserve"><span class="lineNumber">116</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="117" xml:space="preserve"><span class="lineNumber">117</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../class_IntersectionParser_B51FF660F70963DA1318EDAC167D050CF14C8753.html#constructor_IntersectionParser_5500FA0F7892C9D7E4957A1827DB5308348AB1DA">IntersectionParser</a><span class="other">(</span><a href="../../class_Parser_06FFBBD9B804958FBBF30CE64369F383780572DC.html">Parser</a><span class="other">*</span>&nbsp;<span class="identifier">left_</span><span class="other">,&nbsp;</span><a href="../../class_Parser_06FFBBD9B804958FBBF30CE64369F383780572DC.html">Parser</a><span class="other">*</span>&nbsp;<span class="identifier">right_</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="118" xml:space="preserve"><span class="lineNumber">118</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../class_Match_AE9F2DF666E0DCE819F7C290A90F765AA326231D.html">Match</a>&nbsp;<a href="../../class_IntersectionParser_B51FF660F70963DA1318EDAC167D050CF14C8753.html#function_Parse_1D94A07D6B39530FAB877684FACE6802D082AA5B">Parse</a><span class="other">(</span><a href="../../class_Scanner_4556143008C97A4C8F070C9C0679FAD7FD6E9B59.html">Scanner</a><span class="other">&amp;</span>&nbsp;<span class="identifier">scanner</span><span class="other">,&nbsp;</span><a href="../../namespace_parsing_D308EED43E54B87FB52D88ADF3DA7F4E649CD021.html#typedef_ObjectStack_4F33FF13CD2400B32D4C131BF840FA0517BCE3D1">ObjectStack</a><span class="other">&amp;</span>&nbsp;<span class="identifier">stack</span><span class="other">,&nbsp;</span><a href="../../class_ParsingData_04BCB31619144CF8592DA360C9D8C0A3597BFD79.html">ParsingData</a><span class="other">*</span>&nbsp;<span class="identifier">parsingData</span><span class="other">)</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="119" xml:space="preserve"><span class="lineNumber">119</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../../class_IntersectionParser_B51FF660F70963DA1318EDAC167D050CF14C8753.html#function_Accept_136A3E1BD8281CC5898CB88A88B8CA3689F83202">Accept</a><span class="other">(</span><a href="../../class_Visitor_9FF4E73241464BB90D8C7FBE81C08324A94EDF37.html">Visitor</a><span class="other">&amp;</span>&nbsp;<span class="identifier">visitor</span><span class="other">)</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="120" xml:space="preserve"><span class="lineNumber">120</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="121" xml:space="preserve"><span class="lineNumber">121</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="122" xml:space="preserve"><span class="lineNumber">122</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../../class_ListParser_D5F77527DE3B67C04A6DFC19D6B173C79A380FEB.html">ListParser</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<a href="../../class_UnaryParser_FF89216268C9CC5DF03A4E25BB32CA6CC0452C0B.html">UnaryParser</a></span>
+  <br/>
+  <span class="code" id="123" xml:space="preserve"><span class="lineNumber">123</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="124" xml:space="preserve"><span class="lineNumber">124</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="125" xml:space="preserve"><span class="lineNumber">125</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../class_ListParser_D5F77527DE3B67C04A6DFC19D6B173C79A380FEB.html#constructor_ListParser_6CE057E3C89ED540EB2F914C110184377F1FEEF1">ListParser</a><span class="other">(</span><a href="../../class_Parser_06FFBBD9B804958FBBF30CE64369F383780572DC.html">Parser</a><span class="other">*</span>&nbsp;<span class="identifier">left_</span><span class="other">,&nbsp;</span><a href="../../class_Parser_06FFBBD9B804958FBBF30CE64369F383780572DC.html">Parser</a><span class="other">*</span>&nbsp;<span class="identifier">right_</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="126" xml:space="preserve"><span class="lineNumber">126</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../class_Match_AE9F2DF666E0DCE819F7C290A90F765AA326231D.html">Match</a>&nbsp;<a href="../../class_ListParser_D5F77527DE3B67C04A6DFC19D6B173C79A380FEB.html#function_Parse_641D29F53E2EEF1CF839AD48A6648BFC6BF67934">Parse</a><span class="other">(</span><a href="../../class_Scanner_4556143008C97A4C8F070C9C0679FAD7FD6E9B59.html">Scanner</a><span class="other">&amp;</span>&nbsp;<span class="identifier">scanner</span><span class="other">,&nbsp;</span><a href="../../namespace_parsing_D308EED43E54B87FB52D88ADF3DA7F4E649CD021.html#typedef_ObjectStack_4F33FF13CD2400B32D4C131BF840FA0517BCE3D1">ObjectStack</a><span class="other">&amp;</span>&nbsp;<span class="identifier">stack</span><span class="other">,&nbsp;</span><a href="../../class_ParsingData_04BCB31619144CF8592DA360C9D8C0A3597BFD79.html">ParsingData</a><span class="other">*</span>&nbsp;<span class="identifier">parsingData</span><span class="other">)</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="127" xml:space="preserve"><span class="lineNumber">127</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../../class_ListParser_D5F77527DE3B67C04A6DFC19D6B173C79A380FEB.html#function_Accept_FA200B6433DE139EE6210FE5296F947F08007B86">Accept</a><span class="other">(</span><a href="../../class_Visitor_9FF4E73241464BB90D8C7FBE81C08324A94EDF37.html">Visitor</a><span class="other">&amp;</span>&nbsp;<span class="identifier">visitor</span><span class="other">)</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="128" xml:space="preserve"><span class="lineNumber">128</span>&nbsp;<span class="kw">private</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="129" xml:space="preserve"><span class="lineNumber">129</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../class_Parser_06FFBBD9B804958FBBF30CE64369F383780572DC.html">Parser</a><span class="other">*</span>&nbsp;<span class="identifier">left</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="130" xml:space="preserve"><span class="lineNumber">130</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../class_Parser_06FFBBD9B804958FBBF30CE64369F383780572DC.html">Parser</a><span class="other">*</span>&nbsp;<span class="identifier">right</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="131" xml:space="preserve"><span class="lineNumber">131</span>&nbsp;<span class="other">}</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="132" xml:space="preserve"><span class="lineNumber">132</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="133" xml:space="preserve"><span class="lineNumber">133</span>&nbsp;<span class="other">}</span>&nbsp;<span class="other">}</span>&nbsp;<span class="comment">//&nbsp;namespace&nbsp;cmajor::parsing</span></span>
+  <br/>
+  <span class="code" id="134" xml:space="preserve"><span class="lineNumber">134</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="135" xml:space="preserve"><span class="lineNumber">135</span>&nbsp;<span class="pp">#endif&nbsp;//&nbsp;CMAJOR_PARSING_COMPOSITE_INCLUDED</span></span>
+  <br/>
+ </body>
+</html>

@@ -1,0 +1,16 @@
+project CppParser;
+reference <StdLib.pl>;
+source <ClassGrammar.parser>;
+source <DeclarationGrammar.parser>;
+source <DeclaratorGrammar.parser>;
+source <EnumerationGrammar.parser>;
+source <ExpressionGrammar.parser>;
+source <FunctionGrammar.parser>;
+source <IdentifierGrammar.parser>;
+source <KeywordGrammar.parser>;
+source <LiteralGrammar.parser>;
+source <SimpleTypeGrammar.parser>;
+source <SourceFileGrammar.parser>;
+source <StatementGrammar.parser>;
+source <TemplateGrammar.parser>;
+source <TypeExprGrammar.parser>;

@@ -1,0 +1,43 @@
+using System;
+using cppast;
+
+namespace cppparser
+{
+    grammar FunctionGrammar
+    {
+        using DeclarationGrammar.DeclSpecifiers;
+        using DeclaratorGrammar.Declarator;
+        using TypeExprGrammar.TypeExpr;
+        using ClassGrammar.VirtPureSpecifiers;
+        using StatementGrammar.CompoundStatement;
+        
+        FunctionDefinition(ParsingContext* ctx, var Specifiers specifiers, var UniquePtr<Node> returnTypeExpr, var UniquePtr<Node> declarator, var UniquePtr<CompoundStatementNode> body) : FunctionNode*
+            ::= (DeclSpecifiers{ specifiers = DeclSpecifiers; } 
+                TypeExpr(ctx):returnType{ returnTypeExpr.Reset(returnType); } Declarator(ctx){ declarator.Reset(Declarator); pass = IsFunctionDeclaratorNode(Declarator); } 
+                VirtPureSpecifiers(true){ specifiers = cast<Specifiers>(specifiers | VirtPureSpecifiers); }
+                (   FunctionBody(ctx){ body.Reset(FunctionBody); }
+                |   '=' (keyword("default"){ specifiers = cast<Specifiers>(specifiers | Specifiers.default_); } | keyword("delete"){ specifiers = cast<Specifiers>(specifiers | Specifiers.delete_); }) ';'
+                |   ';'{ pass = (VirtPureSpecifiers & Specifiers.pure) != Specifiers.none; }
+                )
+            )
+            {
+                value = new FunctionNode(span, specifiers, returnTypeExpr.Release(), declarator.Release(), body.Release());
+            }
+            ;
+             
+        ParameterList(ParsingContext* ctx, var UniquePtr<ParameterListNode> node) : ParameterListNode*
+            ::= ('('{ node.Reset(new ParameterListNode(span)); } (ParameterDeclaration(ctx):left{ node->AddNode(left); } (',' ParameterDeclaration(ctx):right{ node->AddNode(right); })*)? ')')
+            {
+                value = node.Release();
+            }
+            ;
+            
+        ParameterDeclaration(ParsingContext* ctx) : ParameterNode*
+            ::= (TypeExpr(ctx):parameterType Declarator(ctx):parameterName?){ value = new ParameterNode(span, parameterType, parameterName); }
+            ;
+            
+        FunctionBody(ParsingContext* ctx) : CompoundStatementNode*
+            ::= empty{ ctx->BeginFunctionBody(); } CompoundStatement(ctx){ value = CompoundStatement; ctx->EndFunctionBody(); } / { ctx->EndFunctionBody(); }
+            ;
+    }
+}

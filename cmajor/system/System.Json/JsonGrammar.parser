@@ -1,0 +1,53 @@
+namespace System.Json
+{
+    grammar JsonGrammar
+    {
+        using stdlib.spaces;
+        skip spaces;
+
+        Value : JsonValue*
+            ::= String:s{ value = s; }
+            |   Number:n{ value = n; }
+            |   Object:o{ value = o; }
+            |   Array:a{ value = a; }
+            |   keyword("true"){ value = new JsonBool(true); }
+            |   keyword("false"){ value = new JsonBool(false); }
+            |   keyword("null"){ value = new JsonNull(); }
+            ;
+
+        Object : JsonObject*
+            ::= '{'{ value = new JsonObject(); } (Field(value) % ',')? '}'
+            ;
+
+        Field(JsonObject* o)
+            ::= (String:n ':' Value:v){ o->AddField(n->Value(), UniquePtr<JsonValue>(v)); }
+            ;
+
+        Array : JsonArray*
+            ::= '['{ value = new JsonArray(); } (Value:v{ value->AddItem(UniquePtr<JsonValue>(v)); } % ',')? ']'
+            ;
+
+        String : JsonString*
+            ::= token('"'{ value = new JsonString(); } ([^"\\]{ value->Append(*matchBegin); } | Escape{ value->Append(Escape); })* '"')
+            ;
+
+        Escape : uchar
+            ::= token('\\'
+                (   '"'{ value = u'"'; }
+                |   '\\'{ value = u'\\'; }
+                |   '/'{ value = u'/'; }
+                |   'b'{ value = u'\b'; }
+                |   'f'{ value = u'\f'; }
+                |   'n'{ value = u'\n'; }
+                |   'r'{ value = u'\r'; }
+                |   't'{ value = u'\t'; }
+                |   'u' (hexdigit hexdigit hexdigit hexdigit){ value = cast<uchar>(ParseHexUShort(ToUtf8(ustring(matchBegin, matchEnd)))); }
+                )
+            )
+            ;
+
+        Number : JsonNumber*
+            ::= token('-'? digit+ ('.' digit+)? ([eE] [+-]? digit+)?){ value = new JsonNumber(ParseDouble(ToUtf8(ustring(matchBegin, matchEnd)))); }
+            ;
+    }
+}

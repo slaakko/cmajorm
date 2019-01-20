@@ -1,0 +1,34 @@
+using System;
+
+public class Point
+{
+    public constexpr nothrow inline Point() : x(0), y(0)
+    {
+    }
+    public constexpr nothrow inline Point(int x_, int y_) : x(x_), y(y_)
+    {
+    }
+    public constexpr nothrow inline int X() const
+    {
+        return x;
+    }
+    public constexpr nothrow inline int Y() const
+    {
+        return y;
+    }
+    private int x;
+    private int y;
+}
+
+public const Point[] points = [ { 0, 0 }, { 10, 20 }, { 100, 100 } ];
+
+void main()
+{
+    long n = points.Length();
+    for (long i = 0; i < n; ++i)
+    {
+        int x = points[i].X();
+        int y = points[i].Y();
+        Console.Out() << "(" << x << ", " << y << ")" << endl();
+    }
+}

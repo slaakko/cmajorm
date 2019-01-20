@@ -1,0 +1,70 @@
+<html>
+ <head>
+  <meta charset="utf-8"/>
+  <link href="../../../style/style.css" rel="stylesheet" type="text/css"/>
+ </head>
+ <body>
+  <span class="code" id="1" xml:space="preserve"><span class="lineNumber">&nbsp;1</span>&nbsp;<span class="comment">//&nbsp;=================================</span></span>
+  <br/>
+  <span class="code" id="2" xml:space="preserve"><span class="lineNumber">&nbsp;2</span>&nbsp;<span class="comment">//&nbsp;Copyright&nbsp;(c)&nbsp;2018&nbsp;Seppo&nbsp;Laakko</span></span>
+  <br/>
+  <span class="code" id="3" xml:space="preserve"><span class="lineNumber">&nbsp;3</span>&nbsp;<span class="comment">//&nbsp;Distributed&nbsp;under&nbsp;the&nbsp;MIT&nbsp;license</span></span>
+  <br/>
+  <span class="code" id="4" xml:space="preserve"><span class="lineNumber">&nbsp;4</span>&nbsp;<span class="comment">//&nbsp;=================================</span></span>
+  <br/>
+  <span class="code" id="5" xml:space="preserve"><span class="lineNumber">&nbsp;5</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="6" xml:space="preserve"><span class="lineNumber">&nbsp;6</span>&nbsp;<span class="pp">#ifndef&nbsp;CMAJOR_EMITTER_LINUX_EMITTER_INCLUDED</span></span>
+  <br/>
+  <span class="code" id="7" xml:space="preserve"><span class="lineNumber">&nbsp;7</span>&nbsp;<span class="pp">#define&nbsp;CMAJOR_EMITTER_LINUX_EMITTER_INCLUDED</span></span>
+  <br/>
+  <span class="code" id="8" xml:space="preserve"><span class="lineNumber">&nbsp;8</span>&nbsp;<span class="pp">#include&nbsp;&lt;cmajor/emitter/BasicEmitter.hpp></span></span>
+  <br/>
+  <span class="code" id="9" xml:space="preserve"><span class="lineNumber">&nbsp;9</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="10" xml:space="preserve"><span class="lineNumber">10</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">cmajor</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">emitter</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="11" xml:space="preserve"><span class="lineNumber">11</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="12" xml:space="preserve"><span class="lineNumber">12</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../../class_LinuxEmitter_0D6C8F1D40184D7E33A54EFC6DCC19251B9A9F32.html">LinuxEmitter</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span>&nbsp;<a href="../../class_BasicEmitter_ADBC5CA76E0CFA156325CCEFB69E7DB1412045E9.html">BasicEmitter</a></span>
+  <br/>
+  <span class="code" id="13" xml:space="preserve"><span class="lineNumber">13</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="14" xml:space="preserve"><span class="lineNumber">14</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="15" xml:space="preserve"><span class="lineNumber">15</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../class_LinuxEmitter_0D6C8F1D40184D7E33A54EFC6DCC19251B9A9F32.html#constructor_LinuxEmitter_0FAE51FF3E8570753747CE7DC5A59A0A2473FA8F">LinuxEmitter</a><span class="other">(</span><a href="../../class_EmittingContext_739028F53ABFE8B1AED5C69B221334EF29AB4122.html">EmittingContext</a><span class="other">&amp;</span>&nbsp;<span class="identifier">emittingContext_</span><span class="other">,&nbsp;</span><span class="kw">const&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="type">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">compileUnitModuleName_</span><span class="other">,&nbsp;</span><span class="identifier">cmajor</span><span class="other">::</span><span class="identifier">symbols</span><span class="other">::</span><a href="../../class_Module_A2BC96D600A4B3135D7F5444EC360BBF9EA9DDF4.html">Module</a><span class="other">&amp;</span>&nbsp;<span class="identifier">symbolsModule_</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="16" xml:space="preserve"><span class="lineNumber">16</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">llvm</span><span class="other">::</span><span class="type">Function</span><span class="other">*</span>&nbsp;<a href="../../class_LinuxEmitter_0D6C8F1D40184D7E33A54EFC6DCC19251B9A9F32.html#function_GetPersonalityFunction_38D98B2DC5E9E9DAE2E4C947CE6AEC2667A1895D">GetPersonalityFunction</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="17" xml:space="preserve"><span class="lineNumber">17</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../../class_LinuxEmitter_0D6C8F1D40184D7E33A54EFC6DCC19251B9A9F32.html#function_Visit_8237B5F612FDB6B937A2EE519D1BC15C3D7C4263">Visit</a><span class="other">(</span><a href="../../class_BoundReturnStatement_D998176947E97E412567764578B6117F430440D4.html">BoundReturnStatement</a><span class="other">&amp;</span>&nbsp;<span class="identifier">boundReturnStatement</span><span class="other">)</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="18" xml:space="preserve"><span class="lineNumber">18</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../../class_LinuxEmitter_0D6C8F1D40184D7E33A54EFC6DCC19251B9A9F32.html#function_Visit_225E369F891CE926118CC0A95BE022576CD8CBDF">Visit</a><span class="other">(</span><a href="../../class_BoundGotoCaseStatement_866A1AC6960DACD576576E5D25C9BE7AF42DC804.html">BoundGotoCaseStatement</a><span class="other">&amp;</span>&nbsp;<span class="identifier">boundGotoCaseStatement</span><span class="other">)</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="19" xml:space="preserve"><span class="lineNumber">19</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../../class_LinuxEmitter_0D6C8F1D40184D7E33A54EFC6DCC19251B9A9F32.html#function_Visit_FF6966339982B4C64C785256682993E199F26257">Visit</a><span class="other">(</span><a href="../../class_BoundGotoDefaultStatement_8AF1EB875ADD6C393850B230CFC5FD003F737241.html">BoundGotoDefaultStatement</a><span class="other">&amp;</span>&nbsp;<span class="identifier">boundGotoDefaultStatement</span><span class="other">)</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="20" xml:space="preserve"><span class="lineNumber">20</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../../class_LinuxEmitter_0D6C8F1D40184D7E33A54EFC6DCC19251B9A9F32.html#function_Visit_2D911120EBB92F5B542B45D29A5C5B0B8344726E">Visit</a><span class="other">(</span><a href="../../class_BoundBreakStatement_670BE810426808D6F8C26AA7B57F21BCC700B015.html">BoundBreakStatement</a><span class="other">&amp;</span>&nbsp;<span class="identifier">boundBreakStatement</span><span class="other">)</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="21" xml:space="preserve"><span class="lineNumber">21</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../../class_LinuxEmitter_0D6C8F1D40184D7E33A54EFC6DCC19251B9A9F32.html#function_Visit_66191EA4C8F3E12F6AA44F0CF374D498CDFB7EE0">Visit</a><span class="other">(</span><a href="../../class_BoundContinueStatement_979CE58FF83A9ED652425067EBFA731BBBE5384B.html">BoundContinueStatement</a><span class="other">&amp;</span>&nbsp;<span class="identifier">boundContinueStatement</span><span class="other">)</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="22" xml:space="preserve"><span class="lineNumber">22</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../../class_LinuxEmitter_0D6C8F1D40184D7E33A54EFC6DCC19251B9A9F32.html#function_Visit_3BF01948ECC233E4178576BCD54600163B688FF0">Visit</a><span class="other">(</span><a href="../../class_BoundGotoStatement_FCFCCD2D9BADF935C7D7DE2684A43343B1AAD43C.html">BoundGotoStatement</a><span class="other">&amp;</span>&nbsp;<span class="identifier">boundGotoStatement</span><span class="other">)</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="23" xml:space="preserve"><span class="lineNumber">23</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../../class_LinuxEmitter_0D6C8F1D40184D7E33A54EFC6DCC19251B9A9F32.html#function_Visit_CA9B779BA6E042512AA32C6F7D891635705914D5">Visit</a><span class="other">(</span><a href="../../class_BoundTryStatement_A14ED2DFB95B82CB86B48EC0AEA2D7C3D0757D10.html">BoundTryStatement</a><span class="other">&amp;</span>&nbsp;<span class="identifier">boundTryStatement</span><span class="other">)</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="24" xml:space="preserve"><span class="lineNumber">24</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../../class_LinuxEmitter_0D6C8F1D40184D7E33A54EFC6DCC19251B9A9F32.html#function_Visit_12CE35ED17878D3020C314C8508BF37AFFBF7C5A">Visit</a><span class="other">(</span><a href="../../class_BoundRethrowStatement_A720CEC1C74090443C19A23C0876F5A5D62007AA.html">BoundRethrowStatement</a><span class="other">&amp;</span>&nbsp;<span class="identifier">boundRethrowStatement</span><span class="other">)</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="25" xml:space="preserve"><span class="lineNumber">25</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../../class_LinuxEmitter_0D6C8F1D40184D7E33A54EFC6DCC19251B9A9F32.html#function_CreateCleanup_47BAEF60EDE4E0E9C28CBF4B8D25032957AAE826">CreateCleanup</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="26" xml:space="preserve"><span class="lineNumber">26</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../../class_LinuxEmitter_0D6C8F1D40184D7E33A54EFC6DCC19251B9A9F32.html#function_GenerateCodeForCleanups_EF76778D76EA864B1C18D282DB6A3BCA1A982600">GenerateCodeForCleanups</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">override</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="27" xml:space="preserve"><span class="lineNumber">27</span>&nbsp;<span class="other">}</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="28" xml:space="preserve"><span class="lineNumber">28</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="29" xml:space="preserve"><span class="lineNumber">29</span>&nbsp;<span class="other">}</span>&nbsp;<span class="other">}</span>&nbsp;<span class="comment">//&nbsp;namespace&nbsp;cmajor::emitter</span></span>
+  <br/>
+  <span class="code" id="30" xml:space="preserve"><span class="lineNumber">30</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="31" xml:space="preserve"><span class="lineNumber">31</span>&nbsp;<span class="pp">#endif&nbsp;//&nbsp;CMAJOR_EMITTER_LINUX_EMITTER_INCLUDED</span></span>
+  <br/>
+ </body>
+</html>

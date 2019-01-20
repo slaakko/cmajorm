@@ -1,0 +1,110 @@
+<html>
+ <head>
+  <meta charset="utf-8"/>
+  <link href="../../../style/style.css" rel="stylesheet" type="text/css"/>
+ </head>
+ <body>
+  <span class="code" id="1" xml:space="preserve"><span class="lineNumber">&nbsp;1</span>&nbsp;<span class="comment">//&nbsp;=================================</span></span>
+  <br/>
+  <span class="code" id="2" xml:space="preserve"><span class="lineNumber">&nbsp;2</span>&nbsp;<span class="comment">//&nbsp;Copyright&nbsp;(c)&nbsp;2018&nbsp;Seppo&nbsp;Laakko</span></span>
+  <br/>
+  <span class="code" id="3" xml:space="preserve"><span class="lineNumber">&nbsp;3</span>&nbsp;<span class="comment">//&nbsp;Distributed&nbsp;under&nbsp;the&nbsp;MIT&nbsp;license</span></span>
+  <br/>
+  <span class="code" id="4" xml:space="preserve"><span class="lineNumber">&nbsp;4</span>&nbsp;<span class="comment">//&nbsp;=================================</span></span>
+  <br/>
+  <span class="code" id="5" xml:space="preserve"><span class="lineNumber">&nbsp;5</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="6" xml:space="preserve"><span class="lineNumber">&nbsp;6</span>&nbsp;<span class="pp">#ifndef&nbsp;CMAJOR_PARSING_PARSER_INCLUDED</span></span>
+  <br/>
+  <span class="code" id="7" xml:space="preserve"><span class="lineNumber">&nbsp;7</span>&nbsp;<span class="pp">#define&nbsp;CMAJOR_PARSING_PARSER_INCLUDED</span></span>
+  <br/>
+  <span class="code" id="8" xml:space="preserve"><span class="lineNumber">&nbsp;8</span>&nbsp;<span class="pp">#include&nbsp;&lt;cmajor/parsing/Match.hpp></span></span>
+  <br/>
+  <span class="code" id="9" xml:space="preserve"><span class="lineNumber">&nbsp;9</span>&nbsp;<span class="pp">#include&nbsp;&lt;cmajor/parsing/ParsingData.hpp></span></span>
+  <br/>
+  <span class="code" id="10" xml:space="preserve"><span class="lineNumber">10</span>&nbsp;<span class="pp">#include&nbsp;&lt;cmajor/parsing/ParsingObject.hpp></span></span>
+  <br/>
+  <span class="code" id="11" xml:space="preserve"><span class="lineNumber">11</span>&nbsp;<span class="pp">#include&nbsp;&lt;stack></span></span>
+  <br/>
+  <span class="code" id="12" xml:space="preserve"><span class="lineNumber">12</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="13" xml:space="preserve"><span class="lineNumber">13</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">cmajor</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">parsing</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="14" xml:space="preserve"><span class="lineNumber">14</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="15" xml:space="preserve"><span class="lineNumber">15</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../../class_Object_B9A39810A94983A8E2FD34373427C10B646EF79E.html">Object</a>&nbsp;</span>
+  <br/>
+  <span class="code" id="16" xml:space="preserve"><span class="lineNumber">16</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="17" xml:space="preserve"><span class="lineNumber">17</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="18" xml:space="preserve"><span class="lineNumber">18</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">virtual</span>&nbsp;<span class="other">~</span><span class="identifier">Object</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="19" xml:space="preserve"><span class="lineNumber">19</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="20" xml:space="preserve"><span class="lineNumber">20</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="21" xml:space="preserve"><span class="lineNumber">21</span>&nbsp;<span class="kw">typedef</span>&nbsp;<span class="identifier">std</span><span class="other">:</span><span class="other">:</span><span class="identifier">stack</span><span class="other">&lt;</span><span class="identifier">std</span><span class="other">:</span><span class="other">:</span><span class="identifier">unique_ptr</span><span class="other">&lt;</span><span class="identifier">Object</span><span class="other">></span><span class="other">></span>&nbsp;<span class="identifier">ObjectStack</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="22" xml:space="preserve"><span class="lineNumber">22</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="23" xml:space="preserve"><span class="lineNumber">23</span>&nbsp;<span class="kw">template</span><span class="other">&lt;</span><span class="kw">typename</span>&nbsp;<span class="identifier">ValueType</span><span class="other">></span></span>
+  <br/>
+  <span class="code" id="24" xml:space="preserve"><span class="lineNumber">24</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../../class_ValueObject_982BF662A3F14F5DDFE7DCDE53F6DD08B4BB786A.html">ValueObject</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span><a href="../../class_Object_B9A39810A94983A8E2FD34373427C10B646EF79E.html">Object</a></span>
+  <br/>
+  <span class="code" id="25" xml:space="preserve"><span class="lineNumber">25</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="26" xml:space="preserve"><span class="lineNumber">26</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="27" xml:space="preserve"><span class="lineNumber">27</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../class_ValueObject_982BF662A3F14F5DDFE7DCDE53F6DD08B4BB786A.html#constructor_ValueObject_02496267175DE1D3B9ACB5D6F969BF99F346F1FF">ValueObject</a><span class="other">(</span><span class="other">)</span><span class="other">:</span>&nbsp;<span class="identifier">value</span><span class="other">(</span><span class="other">)</span>&nbsp;<span class="other">{</span><span class="other">}</span></span>
+  <br/>
+  <span class="code" id="28" xml:space="preserve"><span class="lineNumber">28</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../class_ValueObject_982BF662A3F14F5DDFE7DCDE53F6DD08B4BB786A.html#constructor_ValueObject_E62505BE9E94A53738BF9C2BC74FD77391B76B47">ValueObject</a><span class="other">(</span><span class="kw">const&nbsp;</span><span class="type">ValueType</span><span class="other">&amp;</span>&nbsp;<span class="identifier">value_</span><span class="other">)</span><span class="other">:</span>&nbsp;<span class="identifier">value</span><span class="other">(</span><span class="identifier">value_</span><span class="other">)</span>&nbsp;<span class="other">{</span><span class="other">}</span></span>
+  <br/>
+  <span class="code" id="29" xml:space="preserve"><span class="lineNumber">29</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../class_ValueObject_982BF662A3F14F5DDFE7DCDE53F6DD08B4BB786A.html">ValueObject</a><span class="other">&lt;</span><span class="type">ValueType</span><span class="other">></span><span class="other">&amp;</span>&nbsp;<span class="kw">operator</span><span class="other">=</span><span class="other">(</span><span class="kw">const&nbsp;</span><span class="type">ValueType</span><span class="other">&amp;</span>&nbsp;<span class="identifier">v</span><span class="other">)</span>&nbsp;<span class="other">{</span>&nbsp;<span class="identifier">value</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">v</span><span class="other">;</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="other">*</span><span class="kw">this</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="30" xml:space="preserve"><span class="lineNumber">30</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">operator</span>&nbsp;<span class="type">ValueType</span><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">value</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="31" xml:space="preserve"><span class="lineNumber">31</span>&nbsp;<span class="kw">private</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="32" xml:space="preserve"><span class="lineNumber">32</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="type">ValueType</span>&nbsp;<span class="identifier">value</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="33" xml:space="preserve"><span class="lineNumber">33</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="34" xml:space="preserve"><span class="lineNumber">34</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="35" xml:space="preserve"><span class="lineNumber">35</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../../class_Scanner_4556143008C97A4C8F070C9C0679FAD7FD6E9B59.html">Scanner</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="36" xml:space="preserve"><span class="lineNumber">36</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="37" xml:space="preserve"><span class="lineNumber">37</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../../class_Parser_06FFBBD9B804958FBBF30CE64369F383780572DC.html">Parser</a>&nbsp;<span class="other">:&nbsp;</span><span class="kw">public</span><a href="../../class_ParsingObject_D6A163B08653CF53190C94952F145DFC2EB09994.html">ParsingObject</a></span>
+  <br/>
+  <span class="code" id="38" xml:space="preserve"><span class="lineNumber">38</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="39" xml:space="preserve"><span class="lineNumber">39</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="40" xml:space="preserve"><span class="lineNumber">40</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../class_Parser_06FFBBD9B804958FBBF30CE64369F383780572DC.html#constructor_Parser_F5DB18A2F1550C83871E3BFBB041F49E3E60127D">Parser</a><span class="other">(</span><span class="kw">const&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="type">u32string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">name_</span><span class="other">,&nbsp;</span><span class="kw">const&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="type">u32string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">info_</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="41" xml:space="preserve"><span class="lineNumber">41</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../class_Parser_06FFBBD9B804958FBBF30CE64369F383780572DC.html#constructor_Parser_F28EFFCC6C5A8A182DDBF035810C626C942929F9">Parser</a><span class="other">(</span><span class="kw">const&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="type">u32string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">name_</span><span class="other">,&nbsp;</span><span class="kw">const&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="type">u32string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">info_</span><span class="other">,&nbsp;</span><a href="../../enum_ObjectKind_4E3C274E727BBC38DFFBE3508C3328AFBB7EA698.html">ObjectKind</a>&nbsp;<span class="identifier">kind_</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="42" xml:space="preserve"><span class="lineNumber">42</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">const&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="type">u32string</span><span class="other">&amp;</span>&nbsp;<a href="../../class_Parser_06FFBBD9B804958FBBF30CE64369F383780572DC.html#function_Info_2AB0EDCA9A6A7FF5D1739E9E04C718AFD82B8689">Info</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">info</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="43" xml:space="preserve"><span class="lineNumber">43</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">virtual</span>&nbsp;<a href="../../class_Match_AE9F2DF666E0DCE819F7C290A90F765AA326231D.html">Match</a>&nbsp;<a href="../../class_Parser_06FFBBD9B804958FBBF30CE64369F383780572DC.html#function_Parse_D39DC60E5997D4E437E2F5D4F61E29959C76E82C">Parse</a><span class="other">(</span><a href="../../class_Scanner_4556143008C97A4C8F070C9C0679FAD7FD6E9B59.html">Scanner</a><span class="other">&amp;</span>&nbsp;<span class="identifier">scanner</span><span class="other">,&nbsp;</span><a href="../../namespace_parsing_D308EED43E54B87FB52D88ADF3DA7F4E649CD021.html#typedef_ObjectStack_4F33FF13CD2400B32D4C131BF840FA0517BCE3D1">ObjectStack</a><span class="other">&amp;</span>&nbsp;<span class="identifier">stack</span><span class="other">,&nbsp;</span><a href="../../class_ParsingData_04BCB31619144CF8592DA360C9D8C0A3597BFD79.html">ParsingData</a><span class="other">*</span>&nbsp;<span class="identifier">parsingData</span><span class="other">)</span>&nbsp;<span class="other">=&nbsp;0</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="44" xml:space="preserve"><span class="lineNumber">44</span>&nbsp;<span class="kw">private</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="45" xml:space="preserve"><span class="lineNumber">45</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">u32string</span>&nbsp;<span class="identifier">info</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="46" xml:space="preserve"><span class="lineNumber">46</span>&nbsp;<span class="other">}</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="47" xml:space="preserve"><span class="lineNumber">47</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="48" xml:space="preserve"><span class="lineNumber">48</span>&nbsp;<span class="other">}</span>&nbsp;<span class="other">}</span>&nbsp;<span class="comment">//&nbsp;namespace&nbsp;cmajor::parsing</span></span>
+  <br/>
+  <span class="code" id="49" xml:space="preserve"><span class="lineNumber">49</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="50" xml:space="preserve"><span class="lineNumber">50</span>&nbsp;<span class="pp">#endif&nbsp;//&nbsp;CMAJOR_PARSING_PARSER_INCLUDED</span></span>
+  <br/>
+  <span class="code" id="51" xml:space="preserve"><span class="lineNumber">51</span>&nbsp;</span>
+  <br/>
+ </body>
+</html>

@@ -1,0 +1,212 @@
+<html>
+ <head>
+  <meta charset="utf-8"/>
+  <link href="../../../style/style.css" rel="stylesheet" type="text/css"/>
+ </head>
+ <body>
+  <span class="code" id="1" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;1</span>&nbsp;<span class="comment">//&nbsp;=================================</span></span>
+  <br/>
+  <span class="code" id="2" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;2</span>&nbsp;<span class="comment">//&nbsp;Copyright&nbsp;(c)&nbsp;2018&nbsp;Seppo&nbsp;Laakko</span></span>
+  <br/>
+  <span class="code" id="3" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;3</span>&nbsp;<span class="comment">//&nbsp;Distributed&nbsp;under&nbsp;the&nbsp;MIT&nbsp;license</span></span>
+  <br/>
+  <span class="code" id="4" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;4</span>&nbsp;<span class="comment">//&nbsp;=================================</span></span>
+  <br/>
+  <span class="code" id="5" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;5</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="6" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;6</span>&nbsp;<span class="pp">#include&nbsp;&lt;cmajor/ast/SystemFileIndex.hpp></span></span>
+  <br/>
+  <span class="code" id="7" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;7</span>&nbsp;<span class="pp">#include&nbsp;&lt;cmajor/ast/Project.hpp></span></span>
+  <br/>
+  <span class="code" id="8" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;8</span>&nbsp;<span class="pp">#include&nbsp;&lt;cmajor/util/Path.hpp></span></span>
+  <br/>
+  <span class="code" id="9" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;9</span>&nbsp;<span class="pp">#include&nbsp;&lt;cmajor/util/BinaryWriter.hpp></span></span>
+  <br/>
+  <span class="code" id="10" xml:space="preserve"><span class="lineNumber">&nbsp;10</span>&nbsp;<span class="pp">#include&nbsp;&lt;cmajor/util/BinaryReader.hpp></span></span>
+  <br/>
+  <span class="code" id="11" xml:space="preserve"><span class="lineNumber">&nbsp;11</span>&nbsp;<span class="pp">#include&nbsp;&lt;mutex></span></span>
+  <br/>
+  <span class="code" id="12" xml:space="preserve"><span class="lineNumber">&nbsp;12</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="13" xml:space="preserve"><span class="lineNumber">&nbsp;13</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">cmajor</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">ast</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="14" xml:space="preserve"><span class="lineNumber">&nbsp;14</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="15" xml:space="preserve"><span class="lineNumber">&nbsp;15</span>&nbsp;<span class="kw">using</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">cmajor</span><span class="other">:</span><span class="other">:</span><span class="identifier">util</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="16" xml:space="preserve"><span class="lineNumber">&nbsp;16</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="17" xml:space="preserve"><span class="lineNumber">&nbsp;17</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><a href="../../class_SystemFileIndex_9FE20829BDFD3CE4D8403984C03DC93FD7AD9FD1.html">SystemFileIndex</a><span class="other">></span>&nbsp;<span class="identifier">SystemFileIndex</span><span class="other">::</span><span class="identifier">instance</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="18" xml:space="preserve"><span class="lineNumber">&nbsp;18</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="19" xml:space="preserve"><span class="lineNumber">&nbsp;19</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../../class_SystemFileIndex_9FE20829BDFD3CE4D8403984C03DC93FD7AD9FD1.html">SystemFileIndex</a><span class="other">::</span><a href="../../class_SystemFileIndex_9FE20829BDFD3CE4D8403984C03DC93FD7AD9FD1.html#function_Init_9A44C7F49E002A243726AE6BBDFBC32B1C0A215A">Init</a><span class="other">(</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="20" xml:space="preserve"><span class="lineNumber">&nbsp;20</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="21" xml:space="preserve"><span class="lineNumber">&nbsp;21</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../class_SystemFileIndex_9FE20829BDFD3CE4D8403984C03DC93FD7AD9FD1.html#variable_instance_4FB75B2FC1FA67D0CA1025E14600398DFE3DF1B1">instance</a><span class="other">.</span><span class="identifier">reset</span><span class="other">(</span><span class="kw">new&nbsp;</span><a href="../../class_SystemFileIndex_9FE20829BDFD3CE4D8403984C03DC93FD7AD9FD1.html">SystemFileIndex</a><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="22" xml:space="preserve"><span class="lineNumber">&nbsp;22</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="23" xml:space="preserve"><span class="lineNumber">&nbsp;23</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="24" xml:space="preserve"><span class="lineNumber">&nbsp;24</span>&nbsp;<a href="../../class_SystemFileIndex_9FE20829BDFD3CE4D8403984C03DC93FD7AD9FD1.html">SystemFileIndex</a><span class="other">::</span><a href="../../class_SystemFileIndex_9FE20829BDFD3CE4D8403984C03DC93FD7AD9FD1.html#constructor_SystemFileIndex_00DCC9C4549147889432538C93A9598C0D9288F0">SystemFileIndex</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="other">:</span>&nbsp;<a href="../../class_SystemFileIndex_9FE20829BDFD3CE4D8403984C03DC93FD7AD9FD1.html#variable_nextSystemFileIndex_60BC59101F9C18D800A80045145E4D1EC251497E">nextSystemFileIndex</a><span class="other">(</span><a href="../../namespace_ast_C9161F619BA82A5AF902D95B166AD35F0072F67D.html#variable_firstSystemFileIndex_B0F9952076B1E9B9F6015F953F1075F43A904A01">firstSystemFileIndex</a><span class="other">)</span><span class="other">,&nbsp;</span><a href="../../class_SystemFileIndex_9FE20829BDFD3CE4D8403984C03DC93FD7AD9FD1.html#variable_cmajorRootDir_1291911925D1D456C63610F5224344E1F3943C8C">cmajorRootDir</a><span class="other">(</span><a href="../../namespace_util_10CA45893690AF432B785048B4AA3F0E7D4765DF.html#function_GetFullPath_A166C4B073AC21BF33EE8C4D54DDA19526C98C2A">GetFullPath</a><span class="other">(</span><a href="../../namespace_ast_C9161F619BA82A5AF902D95B166AD35F0072F67D.html#function_CmajorRootDir_EA0AEB7A757950FCE0AA84994AD176CA7B0A5309">CmajorRootDir</a><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="25" xml:space="preserve"><span class="lineNumber">&nbsp;25</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="26" xml:space="preserve"><span class="lineNumber">&nbsp;26</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="27" xml:space="preserve"><span class="lineNumber">&nbsp;27</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="28" xml:space="preserve"><span class="lineNumber">&nbsp;28</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">mutex</span>&nbsp;<span class="identifier">mtx</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="29" xml:space="preserve"><span class="lineNumber">&nbsp;29</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="30" xml:space="preserve"><span class="lineNumber">&nbsp;30</span>&nbsp;<span class="type">uint32_t</span>&nbsp;<a href="../../class_SystemFileIndex_9FE20829BDFD3CE4D8403984C03DC93FD7AD9FD1.html">SystemFileIndex</a><span class="other">::</span><a href="../../class_SystemFileIndex_9FE20829BDFD3CE4D8403984C03DC93FD7AD9FD1.html#function_RegisterSystemSourceFile_6EC9310B9AD35DCDE1DCFAE83326A17BB2B0CC9F">RegisterSystemSourceFile</a><span class="other">(</span><span class="kw">const&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="type">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">systemSourceFilePath</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="31" xml:space="preserve"><span class="lineNumber">&nbsp;31</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="32" xml:space="preserve"><span class="lineNumber">&nbsp;32</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">lock_guard</span><span class="other">&lt;</span><span class="identifier">std</span><span class="other">::</span><span class="type">mutex</span><span class="other">></span>&nbsp;<span class="identifier">lock</span><span class="other">(</span><a href="../../namespace_ast_C9161F619BA82A5AF902D95B166AD35F0072F67D.html#variable_mtx_52C763DFFE6ED156CB249A2BAEC1658193190B2C">mtx</a><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="33" xml:space="preserve"><span class="lineNumber">&nbsp;33</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="type">uint32_t</span>&nbsp;<span class="identifier">fileIndex</span>&nbsp;<span class="other">=</span>&nbsp;<a href="../../class_SystemFileIndex_9FE20829BDFD3CE4D8403984C03DC93FD7AD9FD1.html#variable_nextSystemFileIndex_60BC59101F9C18D800A80045145E4D1EC251497E">nextSystemFileIndex</a><span class="other">++</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="34" xml:space="preserve"><span class="lineNumber">&nbsp;34</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">string</span>&nbsp;<span class="identifier">sfp</span>&nbsp;<span class="other">=</span>&nbsp;<a href="../../namespace_util_10CA45893690AF432B785048B4AA3F0E7D4765DF.html#function_GetFullPath_A166C4B073AC21BF33EE8C4D54DDA19526C98C2A">GetFullPath</a><span class="other">(</span><span class="identifier">systemSourceFilePath</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="35" xml:space="preserve"><span class="lineNumber">&nbsp;35</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">sfp</span><span class="other">.</span><span class="identifier">find</span><span class="other">(</span><a href="../../class_SystemFileIndex_9FE20829BDFD3CE4D8403984C03DC93FD7AD9FD1.html#variable_cmajorRootDir_1291911925D1D456C63610F5224344E1F3943C8C">cmajorRootDir</a><span class="other">,&nbsp;</span><span class="other">0</span><span class="other">)</span><span class="other">&nbsp;==&nbsp;</span><span class="other">0</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="36" xml:space="preserve"><span class="lineNumber">&nbsp;36</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="37" xml:space="preserve"><span class="lineNumber">&nbsp;37</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">sfp</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">sfp</span><span class="other">.</span><span class="identifier">substr</span><span class="other">(</span><a href="../../class_SystemFileIndex_9FE20829BDFD3CE4D8403984C03DC93FD7AD9FD1.html#variable_cmajorRootDir_1291911925D1D456C63610F5224344E1F3943C8C">cmajorRootDir</a><span class="other">.</span><span class="identifier">size</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="38" xml:space="preserve"><span class="lineNumber">&nbsp;38</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="39" xml:space="preserve"><span class="lineNumber">&nbsp;39</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">else</span></span>
+  <br/>
+  <span class="code" id="40" xml:space="preserve"><span class="lineNumber">&nbsp;40</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="41" xml:space="preserve"><span class="lineNumber">&nbsp;41</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">throw&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">runtime_error</span><span class="other">(</span><span class="string">"CMAJOR_ROOT&nbsp;path&nbsp;prefix&nbsp;'"</span><span class="other">&nbsp;+&nbsp;</span><a href="../../class_SystemFileIndex_9FE20829BDFD3CE4D8403984C03DC93FD7AD9FD1.html#variable_cmajorRootDir_1291911925D1D456C63610F5224344E1F3943C8C">cmajorRootDir</a><span class="other">&nbsp;+&nbsp;</span><span class="string">"'&nbsp;differs&nbsp;from&nbsp;prefix&nbsp;of&nbsp;system&nbsp;source&nbsp;file&nbsp;path&nbsp;'"</span><span class="other">&nbsp;+&nbsp;</span><span class="identifier">sfp</span><span class="other">&nbsp;+&nbsp;</span><span class="string">"'"</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="42" xml:space="preserve"><span class="lineNumber">&nbsp;42</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="43" xml:space="preserve"><span class="lineNumber">&nbsp;43</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../class_SystemFileIndex_9FE20829BDFD3CE4D8403984C03DC93FD7AD9FD1.html#variable_systemFileMap_D606063774EE86EF9D487BD457046CA89B9968E0">systemFileMap</a><span class="other">[</span><span class="identifier">fileIndex</span><span class="other">]</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">sfp</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="44" xml:space="preserve"><span class="lineNumber">&nbsp;44</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">fileIndex</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="45" xml:space="preserve"><span class="lineNumber">&nbsp;45</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="46" xml:space="preserve"><span class="lineNumber">&nbsp;46</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="47" xml:space="preserve"><span class="lineNumber">&nbsp;47</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">string</span>&nbsp;<a href="../../class_SystemFileIndex_9FE20829BDFD3CE4D8403984C03DC93FD7AD9FD1.html">SystemFileIndex</a><span class="other">::</span><a href="../../class_SystemFileIndex_9FE20829BDFD3CE4D8403984C03DC93FD7AD9FD1.html#function_GetSystemSourceFilePath_E9849EFF981FB44ABF4E836CB24E56874FBB9908">GetSystemSourceFilePath</a><span class="other">(</span><span class="type">uint32_t</span>&nbsp;<span class="identifier">systemFileIndex</span><span class="other">)</span>&nbsp;<span class="kw">const</span></span>
+  <br/>
+  <span class="code" id="48" xml:space="preserve"><span class="lineNumber">&nbsp;48</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="49" xml:space="preserve"><span class="lineNumber">&nbsp;49</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">lock_guard</span><span class="other">&lt;</span><span class="identifier">std</span><span class="other">::</span><span class="type">mutex</span><span class="other">></span>&nbsp;<span class="identifier">lock</span><span class="other">(</span><a href="../../namespace_ast_C9161F619BA82A5AF902D95B166AD35F0072F67D.html#variable_mtx_52C763DFFE6ED156CB249A2BAEC1658193190B2C">mtx</a><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="50" xml:space="preserve"><span class="lineNumber">&nbsp;50</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">auto</span>&nbsp;<span class="identifier">it</span>&nbsp;<span class="other">=</span>&nbsp;<a href="../../class_SystemFileIndex_9FE20829BDFD3CE4D8403984C03DC93FD7AD9FD1.html#variable_systemFileMap_D606063774EE86EF9D487BD457046CA89B9968E0">systemFileMap</a><span class="other">.</span><span class="identifier">find</span><span class="other">(</span><span class="identifier">systemFileIndex</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="51" xml:space="preserve"><span class="lineNumber">&nbsp;51</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">it</span><span class="other">&nbsp;!=&nbsp;</span><a href="../../class_SystemFileIndex_9FE20829BDFD3CE4D8403984C03DC93FD7AD9FD1.html#variable_systemFileMap_D606063774EE86EF9D487BD457046CA89B9968E0">systemFileMap</a><span class="other">.</span><span class="identifier">cend</span><span class="other">(</span><span class="other">)</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="52" xml:space="preserve"><span class="lineNumber">&nbsp;52</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="53" xml:space="preserve"><span class="lineNumber">&nbsp;53</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">string</span>&nbsp;<span class="identifier">sourceFilePath</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">it</span><span class="other">-></span><span class="identifier">second</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="54" xml:space="preserve"><span class="lineNumber">&nbsp;54</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">boost</span><span class="other">::</span><span class="identifier">filesystem</span><span class="other">::</span><span class="type">path</span>&nbsp;<span class="identifier">p</span><span class="other">(</span><a href="../../class_SystemFileIndex_9FE20829BDFD3CE4D8403984C03DC93FD7AD9FD1.html#variable_cmajorRootDir_1291911925D1D456C63610F5224344E1F3943C8C">cmajorRootDir</a><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="55" xml:space="preserve"><span class="lineNumber">&nbsp;55</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">p</span><span class="other">&nbsp;/=&nbsp;</span><span class="identifier">sourceFilePath</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="56" xml:space="preserve"><span class="lineNumber">&nbsp;56</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">string</span>&nbsp;<span class="identifier">sfp</span>&nbsp;<span class="other">=</span>&nbsp;<a href="../../namespace_util_10CA45893690AF432B785048B4AA3F0E7D4765DF.html#function_GetFullPath_A166C4B073AC21BF33EE8C4D54DDA19526C98C2A">GetFullPath</a><span class="other">(</span><span class="identifier">p</span><span class="other">.</span><span class="identifier">generic_string</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="57" xml:space="preserve"><span class="lineNumber">&nbsp;57</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">sfp</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="58" xml:space="preserve"><span class="lineNumber">&nbsp;58</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="59" xml:space="preserve"><span class="lineNumber">&nbsp;59</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">else</span></span>
+  <br/>
+  <span class="code" id="60" xml:space="preserve"><span class="lineNumber">&nbsp;60</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="61" xml:space="preserve"><span class="lineNumber">&nbsp;61</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">throw&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">runtime_error</span><span class="other">(</span><span class="string">"system&nbsp;file&nbsp;index&nbsp;contains&nbsp;no&nbsp;system&nbsp;source&nbsp;file&nbsp;path&nbsp;for&nbsp;index&nbsp;"</span><span class="other">&nbsp;+&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">to_string</span><span class="other">(</span><span class="identifier">systemFileIndex</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="62" xml:space="preserve"><span class="lineNumber">&nbsp;62</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="63" xml:space="preserve"><span class="lineNumber">&nbsp;63</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="64" xml:space="preserve"><span class="lineNumber">&nbsp;64</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="65" xml:space="preserve"><span class="lineNumber">&nbsp;65</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../../class_SystemFileIndex_9FE20829BDFD3CE4D8403984C03DC93FD7AD9FD1.html">SystemFileIndex</a><span class="other">::</span><a href="../../class_SystemFileIndex_9FE20829BDFD3CE4D8403984C03DC93FD7AD9FD1.html#function_Write_F70B6F4315559DB4D0DEC66C90DF0671B00432F1">Write</a><span class="other">(</span><span class="kw">const&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="type">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">systemFileIndexFilePath</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="66" xml:space="preserve"><span class="lineNumber">&nbsp;66</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="67" xml:space="preserve"><span class="lineNumber">&nbsp;67</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">lock_guard</span><span class="other">&lt;</span><span class="identifier">std</span><span class="other">::</span><span class="type">mutex</span><span class="other">></span>&nbsp;<span class="identifier">lock</span><span class="other">(</span><a href="../../namespace_ast_C9161F619BA82A5AF902D95B166AD35F0072F67D.html#variable_mtx_52C763DFFE6ED156CB249A2BAEC1658193190B2C">mtx</a><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="68" xml:space="preserve"><span class="lineNumber">&nbsp;68</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../class_BinaryWriter_C63D48852BF8E92E7FD58CF0C72DEA2D09A302B4.html">BinaryWriter</a>&nbsp;<span class="identifier">writer</span><span class="other">(</span><span class="identifier">systemFileIndexFilePath</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="69" xml:space="preserve"><span class="lineNumber">&nbsp;69</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">writer</span><span class="other">.</span><a href="../../class_BinaryWriter_C63D48852BF8E92E7FD58CF0C72DEA2D09A302B4.html#function_Write_421E0219DF391189ACA0E9EDE03D813A9BA96517">Write</a><span class="other">(</span><a href="../../class_SystemFileIndex_9FE20829BDFD3CE4D8403984C03DC93FD7AD9FD1.html#variable_nextSystemFileIndex_60BC59101F9C18D800A80045145E4D1EC251497E">nextSystemFileIndex</a><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="70" xml:space="preserve"><span class="lineNumber">&nbsp;70</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="type">uint32_t</span>&nbsp;<span class="identifier">n</span>&nbsp;<span class="other">=</span>&nbsp;<a href="../../class_SystemFileIndex_9FE20829BDFD3CE4D8403984C03DC93FD7AD9FD1.html#variable_systemFileMap_D606063774EE86EF9D487BD457046CA89B9968E0">systemFileMap</a><span class="other">.</span><span class="identifier">size</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="71" xml:space="preserve"><span class="lineNumber">&nbsp;71</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">writer</span><span class="other">.</span><a href="../../class_BinaryWriter_C63D48852BF8E92E7FD58CF0C72DEA2D09A302B4.html#function_Write_421E0219DF391189ACA0E9EDE03D813A9BA96517">Write</a><span class="other">(</span><span class="identifier">n</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="72" xml:space="preserve"><span class="lineNumber">&nbsp;72</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">for&nbsp;</span><span class="other">(</span><span class="kw">const&nbsp;</span><span class="kw">auto</span><span class="other">&amp;</span>&nbsp;<span class="identifier">p</span><span class="other">&nbsp;:&nbsp;</span><a href="../../class_SystemFileIndex_9FE20829BDFD3CE4D8403984C03DC93FD7AD9FD1.html#variable_systemFileMap_D606063774EE86EF9D487BD457046CA89B9968E0">systemFileMap</a><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="73" xml:space="preserve"><span class="lineNumber">&nbsp;73</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="74" xml:space="preserve"><span class="lineNumber">&nbsp;74</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="type">uint32_t</span>&nbsp;<span class="identifier">index</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">p</span><span class="other">.</span><span class="identifier">first</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="75" xml:space="preserve"><span class="lineNumber">&nbsp;75</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">const&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="type">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">sourceFilePath</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">p</span><span class="other">.</span><span class="identifier">second</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="76" xml:space="preserve"><span class="lineNumber">&nbsp;76</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">writer</span><span class="other">.</span><a href="../../class_BinaryWriter_C63D48852BF8E92E7FD58CF0C72DEA2D09A302B4.html#function_Write_421E0219DF391189ACA0E9EDE03D813A9BA96517">Write</a><span class="other">(</span><span class="identifier">index</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="77" xml:space="preserve"><span class="lineNumber">&nbsp;77</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">writer</span><span class="other">.</span><a href="../../class_BinaryWriter_C63D48852BF8E92E7FD58CF0C72DEA2D09A302B4.html#function_Write_2F2F77F867664B2861B21C7832DF74F6845A51D8">Write</a><span class="other">(</span><span class="identifier">sourceFilePath</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="78" xml:space="preserve"><span class="lineNumber">&nbsp;78</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="79" xml:space="preserve"><span class="lineNumber">&nbsp;79</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="80" xml:space="preserve"><span class="lineNumber">&nbsp;80</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="81" xml:space="preserve"><span class="lineNumber">&nbsp;81</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../../class_SystemFileIndex_9FE20829BDFD3CE4D8403984C03DC93FD7AD9FD1.html">SystemFileIndex</a><span class="other">::</span><a href="../../class_SystemFileIndex_9FE20829BDFD3CE4D8403984C03DC93FD7AD9FD1.html#function_Read_CEB201C91F184EEA0A2E5645E3ABE7CA434D63E3">Read</a><span class="other">(</span><span class="kw">const&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="type">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">systemFileIndexFilePath</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="82" xml:space="preserve"><span class="lineNumber">&nbsp;82</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="83" xml:space="preserve"><span class="lineNumber">&nbsp;83</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">lock_guard</span><span class="other">&lt;</span><span class="identifier">std</span><span class="other">::</span><span class="type">mutex</span><span class="other">></span>&nbsp;<span class="identifier">lock</span><span class="other">(</span><a href="../../namespace_ast_C9161F619BA82A5AF902D95B166AD35F0072F67D.html#variable_mtx_52C763DFFE6ED156CB249A2BAEC1658193190B2C">mtx</a><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="84" xml:space="preserve"><span class="lineNumber">&nbsp;84</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../class_SystemFileIndex_9FE20829BDFD3CE4D8403984C03DC93FD7AD9FD1.html#variable_nextSystemFileIndex_60BC59101F9C18D800A80045145E4D1EC251497E">nextSystemFileIndex</a><span class="other">&nbsp;=&nbsp;</span><a href="../../namespace_ast_C9161F619BA82A5AF902D95B166AD35F0072F67D.html#variable_firstSystemFileIndex_B0F9952076B1E9B9F6015F953F1075F43A904A01">firstSystemFileIndex</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="85" xml:space="preserve"><span class="lineNumber">&nbsp;85</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../class_SystemFileIndex_9FE20829BDFD3CE4D8403984C03DC93FD7AD9FD1.html#variable_systemFileMap_D606063774EE86EF9D487BD457046CA89B9968E0">systemFileMap</a><span class="other">.</span><span class="identifier">clear</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="86" xml:space="preserve"><span class="lineNumber">&nbsp;86</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../class_BinaryReader_03B69C4712E895798960F755025292754AFB8DDD.html">BinaryReader</a>&nbsp;<span class="identifier">reader</span><span class="other">(</span><span class="identifier">systemFileIndexFilePath</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="87" xml:space="preserve"><span class="lineNumber">&nbsp;87</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../class_SystemFileIndex_9FE20829BDFD3CE4D8403984C03DC93FD7AD9FD1.html#variable_nextSystemFileIndex_60BC59101F9C18D800A80045145E4D1EC251497E">nextSystemFileIndex</a><span class="other">&nbsp;=&nbsp;</span><span class="identifier">reader</span><span class="other">.</span><a href="../../class_BinaryReader_03B69C4712E895798960F755025292754AFB8DDD.html#function_ReadUInt_79544C767D92DC9ACEFE9FE7AA5FB088B7F7295E">ReadUInt</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="88" xml:space="preserve"><span class="lineNumber">&nbsp;88</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="type">uint32_t</span>&nbsp;<span class="identifier">n</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">reader</span><span class="other">.</span><a href="../../class_BinaryReader_03B69C4712E895798960F755025292754AFB8DDD.html#function_ReadUInt_79544C767D92DC9ACEFE9FE7AA5FB088B7F7295E">ReadUInt</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="89" xml:space="preserve"><span class="lineNumber">&nbsp;89</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">for&nbsp;</span><span class="other">(</span><span class="type">uint32_t</span>&nbsp;<span class="identifier">i</span>&nbsp;<span class="other">=</span>&nbsp;<span class="other">0</span><span class="other">;</span>&nbsp;<span class="identifier">i</span><span class="other">&nbsp;&lt;&nbsp;</span><span class="identifier">n</span><span class="other">;</span>&nbsp;<span class="other">++</span><span class="identifier">i</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="90" xml:space="preserve"><span class="lineNumber">&nbsp;90</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="91" xml:space="preserve"><span class="lineNumber">&nbsp;91</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="type">uint32_t</span>&nbsp;<span class="identifier">index</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">reader</span><span class="other">.</span><a href="../../class_BinaryReader_03B69C4712E895798960F755025292754AFB8DDD.html#function_ReadUInt_79544C767D92DC9ACEFE9FE7AA5FB088B7F7295E">ReadUInt</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="92" xml:space="preserve"><span class="lineNumber">&nbsp;92</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">string</span>&nbsp;<span class="identifier">sourceFilepath</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">reader</span><span class="other">.</span><a href="../../class_BinaryReader_03B69C4712E895798960F755025292754AFB8DDD.html#function_ReadUtf8String_CF66D1DB2EC285A3352E4AC37993629AF8A7EC78">ReadUtf8String</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="93" xml:space="preserve"><span class="lineNumber">&nbsp;93</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../class_SystemFileIndex_9FE20829BDFD3CE4D8403984C03DC93FD7AD9FD1.html#variable_systemFileMap_D606063774EE86EF9D487BD457046CA89B9968E0">systemFileMap</a><span class="other">[</span><span class="identifier">index</span><span class="other">]</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">sourceFilepath</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="94" xml:space="preserve"><span class="lineNumber">&nbsp;94</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="95" xml:space="preserve"><span class="lineNumber">&nbsp;95</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="96" xml:space="preserve"><span class="lineNumber">&nbsp;96</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="97" xml:space="preserve"><span class="lineNumber">&nbsp;97</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../../namespace_ast_C9161F619BA82A5AF902D95B166AD35F0072F67D.html#function_SystemFileIndexInit_632955330C749C7D520982732FDEBEF56F87F0F4">SystemFileIndexInit</a><span class="other">(</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="98" xml:space="preserve"><span class="lineNumber">&nbsp;98</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="99" xml:space="preserve"><span class="lineNumber">&nbsp;99</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../class_SystemFileIndex_9FE20829BDFD3CE4D8403984C03DC93FD7AD9FD1.html">SystemFileIndex</a><span class="other">::</span><a href="../../class_SystemFileIndex_9FE20829BDFD3CE4D8403984C03DC93FD7AD9FD1.html#function_Init_9A44C7F49E002A243726AE6BBDFBC32B1C0A215A">Init</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="100" xml:space="preserve"><span class="lineNumber">100</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="101" xml:space="preserve"><span class="lineNumber">101</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="102" xml:space="preserve"><span class="lineNumber">102</span>&nbsp;<span class="other">}</span>&nbsp;<span class="other">}</span>&nbsp;<span class="comment">//&nbsp;namespace&nbsp;cmajor::ast</span></span>
+  <br/>
+ </body>
+</html>

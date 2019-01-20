@@ -1,0 +1,224 @@
+// =================================
+// Copyright (c) 2019 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Collections;
+
+namespace System.Text.RegularExpressions
+{
+    public Nfa ToNfa(const PtrNfa& ptrNfa)
+    {
+        Nfa nfa;
+        for (PtrNfaState* ptrNfaState : ptrNfa.States())
+        {
+            NfaState nfaState(ptrNfaState->Id());
+            if (ptrNfaState->Accepting())
+            {
+                nfaState.SetAccepting();
+            }
+            for (int i = 0; i < 256; ++i)
+            {
+                char c = cast<char>(i);
+                NfaStateNumberSet s;
+                List<PtrNfaState*> next = ptrNfaState->Next(c);
+                for (PtrNfaState* n : next)
+                {
+                    s.Add(n->Id());
+                }
+                s.MakeCanonical();
+                nfaState.SetNext(c, s);
+            }
+            nfa.AddState(nfaState);
+        }
+        return nfa;
+    }
+    
+    public Nfa ToNfa(const string& pattern, RegExFlags flags)
+    {
+        PtrNfaStateFactory factory;
+        PtrNfa ptrNfa = ParseRegEx(&factory, pattern, flags);
+        Nfa nfa = ToNfa(ptrNfa);
+        return nfa;
+    }
+    
+    public NfaStateNumberSet Move(const NfaStateNumberSet& states, char c, const Nfa& nfa)
+    {
+        NfaStateNumberSet next;
+        for (int s : states.Rep())
+        {
+            const NfaState& state = nfa.GetState(s);
+            next.Merge(state.Next(c));
+        }
+        return next;
+    }
+    
+    public NfaStateNumberSet EpsilonClosure(const NfaStateNumberSet& states, const Nfa& nfa)
+    {
+        Stack<int> stack;
+        for (int s : states.Rep())
+        {
+            stack.Push(s);
+        }
+        NfaStateNumberSet epsilonClosure = states;
+        while (!stack.IsEmpty())
+        {
+            int t = stack.Pop();
+            const NfaState& s = nfa.GetState(t);
+            NfaStateNumberSet u = s.Epsilon();
+            for (int v : u.Rep())
+            {
+                if (!epsilonClosure.Contains(v))
+                {
+                    epsilonClosure.Add(v);
+                    stack.Push(v);
+                }
+            }
+        }
+        epsilonClosure.MakeCanonical();
+        return epsilonClosure;
+    }
+    
+    public NfaStateNumberSet EpsilonClosure(int s, const Nfa& nfa)
+    {
+        NfaStateNumberSet states(s);
+        return EpsilonClosure(states, nfa);
+    }
+    
+    public bool MatchesSlow(const string& s, const Nfa& nfa)
+    {
+        NfaStateNumberSet states = EpsilonClosure(0, nfa);
+        for (char c : s)
+        {
+            states = EpsilonClosure(Move(states, c, nfa), nfa);
+        }
+        for (int s : states.Rep())
+        {
+            const NfaState& state = nfa.GetState(s);
+            if (state.Accepting())
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    public void AddState(int s, List<int>& newStates, Bitset& alreadyOn, const Nfa& nfa)
+    {
+        newStates.Add(s);
+        alreadyOn.Set(s);
+        const NfaState& state = nfa.GetState(s);
+        for (int t : state.Epsilon().Rep())
+        {
+            if (!alreadyOn.Test(t))
+            {
+                AddState(t, newStates, alreadyOn, nfa);
+            }
+        }
+    }
+    
+    public void Transform(char c, List<int>& oldStates, List<int>& newStates, Bitset& alreadyOn, const Nfa& nfa)
+    {
+        while (!oldStates.IsEmpty())
+        {
+            int s = oldStates.Back();
+            const NfaState& state = nfa.GetState(s);
+            for (int t : state.Next(c).Rep())
+            {
+                if (!alreadyOn.Test(t))
+                {
+                    AddState(t, newStates, alreadyOn, nfa);
+                }
+            }
+            oldStates.RemoveLast();
+        }
+        while (!newStates.IsEmpty())
+        {
+            int s = newStates.Back();
+            newStates.RemoveLast();
+            oldStates.Add(s);
+            alreadyOn.Reset(s);
+        }
+    }
+    
+    public bool Matches(const string& s, const Nfa& nfa)
+    {
+        Bitset alreadyOn(nfa.NumStates());
+        NfaStateNumberSet states = EpsilonClosure(0, nfa);
+        List<int> oldStates = states.Rep();
+        List<int> newStates;
+        for (char c : s)
+        {
+            Transform(c, oldStates, newStates, alreadyOn, nfa);
+        }
+        for (int s : oldStates)
+        {
+            const NfaState& state = nfa.GetState(s);
+            if (state.Accepting())
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    public Dfa ToDfa(const Nfa& nfa)
+    {
+        Dfa dfa;
+        DfaState start(0);
+        dfa.AddState(start);
+        List<NfaStateNumberSet> dstates;
+        dstates.Add(EpsilonClosure(0, nfa));
+        Stack<int> unmarked;
+        unmarked.Push(0);
+        while (!unmarked.IsEmpty())
+        {
+            int t = unmarked.Pop();
+            for (int i = 1; i < 256; ++i)
+            {
+                char c = cast<char>(i);
+                NfaStateNumberSet u = EpsilonClosure(Move(dstates[t], c, nfa), nfa);
+                if (!u.IsEmpty())
+                {
+                    int n = FindState(dstates.CBegin(), dstates.CEnd(), u);
+                    if (n == -1)
+                    {
+                        n = cast<int>(dstates.Count());
+                        DfaState s(n);
+                        dfa.AddState(s);
+                        unmarked.Push(n);
+                        dstates.Add(u);
+                    }
+                    dfa.SetNext(c, t, n);
+                }                
+            }
+        }
+        for (int i = 0; i < dstates.Count(); ++i)
+        {
+            for (int s : dstates[i].Rep())
+            {
+                if (nfa.GetState(s).Accepting())
+                {
+                    dfa.SetAccepting(i);
+                    break;
+                }
+            }
+        }
+        return dfa;
+    }
+    
+    public nothrow bool Matches(const string& s, const Dfa& dfa)
+    {
+        int state = 0;
+        for (char c : s)
+        {
+            state = dfa.Next(c, state);
+            if (state == -1)
+            {
+                return false;
+            }
+        }
+        return dfa.GetState(state).Accepting();
+    }
+}

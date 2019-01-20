@@ -1,0 +1,400 @@
+// =================================
+// Copyright (c) 2019 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Collections;
+
+namespace System.Text.Parsing
+{
+    public abstract class UnaryParser : Parser
+    {
+        public UnaryParser(const ustring& name_, Parser* child_, const ustring& info_) : base(name_, info_), child(child_)
+        {
+            Own(child);
+        }
+        public inline nothrow Parser* Child() const
+        {
+            return child;
+        }
+        private Parser* child;
+    }
+    
+    public class OptionalParser : UnaryParser
+    {
+        public OptionalParser(Parser* child_) : base(u"optional", child_, child_->Info() + u"?")
+        {
+        }
+        public override Match Parse(Scanner& scanner, Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
+        {
+            Span save = scanner.GetSpan();
+            Match match = Child()->Parse(scanner, stack, parsingData);
+            if (match.Hit())
+            {
+                return match;
+            }
+            scanner.SetSpan(save);
+            return Match.Empty();
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.BeginVisit(*this);
+            Child()->Accept(visitor);
+            visitor.EndVisit(*this);
+        }
+    }
+    
+    public class PositiveParser : UnaryParser
+    {
+        public PositiveParser(Parser* child_) : base(u"positive", child_, child_->Info() + u"+")
+        {
+        }
+        public override Match Parse(Scanner& scanner, Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
+        {
+            Match match = Child()->Parse(scanner, stack, parsingData);
+            if (match.Hit())
+            {
+                for (;;)
+                {
+                    Span save = scanner.GetSpan();
+                    scanner.Skip();
+                    Match next = Child()->Parse(scanner, stack, parsingData);
+                    if (next.Hit())
+                    {
+                        match.Concatenate(next);
+                    }
+                    else
+                    {
+                        scanner.SetSpan(save);
+                        break;
+                    }
+                }
+            }
+            return match;
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.BeginVisit(*this);
+            Child()->Accept(visitor);
+            visitor.EndVisit(*this);
+        }
+    }
+    
+    public class KleeneStarParser : UnaryParser
+    {
+        public KleeneStarParser(Parser* child_) : base(u"kleene", child_, child_->Info() + u"*")
+        {
+        }
+        public override Match Parse(Scanner& scanner, Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
+        {
+            Match match = Match.Empty();
+            bool first = true;
+            for (;;)
+            {
+                Span save = scanner.GetSpan();
+                if (first)
+                {
+                    first = false;
+                }
+                else
+                {
+                    scanner.Skip();
+                }
+                Match next = Child()->Parse(scanner, stack, parsingData);
+                if (next.Hit())
+                {
+                    match.Concatenate(next);
+                }
+                else
+                {
+                    scanner.SetSpan(save);
+                    break;
+                }
+            }
+            return match;
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.BeginVisit(*this);
+            Child()->Accept(visitor);
+            visitor.EndVisit(*this);
+        }
+    }
+    
+    public class ExpectationParser : UnaryParser
+    {
+        public ExpectationParser(Parser* child_) : base(u"expectation", child_, child_->Info() + u"!")
+        {
+        }
+        public override Match Parse(Scanner& scanner, Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
+        {
+            Span expectationSpan = scanner.GetSpan();
+            Match match = Match.Nothing();
+            try
+            {
+                match = Child()->Parse(scanner, stack, parsingData);
+            }
+            catch (const ExpectationFailure& ex)
+            {
+                throw ExpectationFailure(Child()->Info() + ex.Info(), ex.FileName(), ex.GetSpan(), ex.Start(), ex.End());
+            }
+            if (match.Hit())
+            {
+                return match;
+            }
+            else
+            {
+                throw ExpectationFailure(Child()->Info(), scanner.FileName(), expectationSpan, scanner.Start(), scanner.End());
+            }
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.BeginVisit(*this);
+            Child()->Accept(visitor);
+            visitor.EndVisit(*this);
+        }
+    }
+    
+    public class TokenParser : UnaryParser
+    {
+        public TokenParser(Parser* child_) : base(u"token", child_, child_->Info())
+        {
+        }
+        public override Match Parse(Scanner& scanner, Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
+        {
+            scanner.BeginToken();
+            Match match = Child()->Parse(scanner, stack, parsingData);
+            scanner.EndToken();
+            return match;
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.BeginVisit(*this);
+            Child()->Accept(visitor);
+            visitor.EndVisit(*this);
+        }
+    }
+    
+    public class GroupingParser : UnaryParser
+    {
+        public GroupingParser(Parser* child_) : base(u"grouping", child_, child_->Info())
+        {
+        }
+        public override Match Parse(Scanner& scanner, Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
+        {
+            return Child()->Parse(scanner, stack, parsingData);
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.BeginVisit(*this);
+            Child()->Accept(visitor);
+            visitor.EndVisit(*this);
+        }
+    }
+
+    public abstract class BinaryParser : Parser
+    {
+        public BinaryParser(const ustring& name_, Parser* left_, Parser* right_, const ustring& info_) : base(name_, info_), left(left_), right(right_)
+        {
+            Own(left);
+            Own(right);
+        }
+        public inline nothrow Parser* Left() const
+        {
+            return left;
+        }
+        public inline nothrow Parser* Right() const
+        {
+            return right;
+        }
+        private Parser* left;
+        private Parser* right;
+    }
+    
+    public class SequenceParser : BinaryParser
+    {
+        public SequenceParser(Parser* left_, Parser* right_) : base(u"sequence", left_, right_, left_->Info())
+        {
+        }
+        public override Match Parse(Scanner& scanner, Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
+        {
+            Match leftMatch = Left()->Parse(scanner, stack, parsingData);
+            if (leftMatch.Hit())
+            {
+                scanner.Skip();
+                Match rightMatch = Right()->Parse(scanner, stack, parsingData);
+                if (rightMatch.Hit())
+                {
+                    leftMatch.Concatenate(rightMatch);
+                    return leftMatch;
+                }
+            }
+            return Match.Nothing();
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.BeginVisit(*this);
+            Left()->Accept(visitor);
+            visitor.Visit(*this);
+            Right()->Accept(visitor);
+            visitor.EndVisit(*this);
+        }
+    }
+    
+    public class AlternativeParser : BinaryParser
+    {
+        public AlternativeParser(Parser* left_, Parser* right_) : base(u"alternative", left_, right_, left_->Info() + u" | " + right_->Info())
+        {
+        }
+        public override Match Parse(Scanner& scanner, Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
+        {
+            Span save = scanner.GetSpan();
+            Match leftMatch = Left()->Parse(scanner, stack, parsingData);
+            if (leftMatch.Hit())
+            {
+                return leftMatch;
+            }
+            scanner.SetSpan(save);
+            return Right()->Parse(scanner, stack, parsingData);
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.BeginVisit(*this);
+            Left()->Accept(visitor);
+            visitor.Visit(*this);
+            Right()->Accept(visitor);
+            visitor.EndVisit(*this);
+        }
+    }
+    
+    public class DifferenceParser : BinaryParser
+    {
+        public DifferenceParser(Parser* left_, Parser* right_) : base(u"difference", left_, right_, left_->Info() + u" - " + right_->Info())
+        {
+        }
+        public override Match Parse(Scanner& scanner, Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
+        {
+            Span save = scanner.GetSpan();
+            Match leftMatch = Left()->Parse(scanner, stack, parsingData);
+            if (leftMatch.Hit())
+            {
+                Span tmp = scanner.GetSpan();
+                scanner.SetSpan(save);
+                save = tmp;
+                Match rightMatch = Right()->Parse(scanner, stack, parsingData);
+                if (!rightMatch.Hit() || rightMatch.Length() < leftMatch.Length())
+                {
+                    scanner.SetSpan(save);
+                    return leftMatch;
+                }
+            }
+            return Match.Nothing();
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.BeginVisit(*this);
+            Left()->Accept(visitor);
+            visitor.Visit(*this);
+            Right()->Accept(visitor);
+            visitor.EndVisit(*this);
+        }
+    }
+    
+    public class ExclusiveOrParser : BinaryParser
+    {
+        public ExclusiveOrParser(Parser* left_, Parser* right_) : base(u"exclusive_or", left_, right_, left_->Info() + u" ^ " + right_->Info())
+        {
+        }
+        public override Match Parse(Scanner& scanner, Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
+        {
+            Span save = scanner.GetSpan();
+            Match leftMatch = Left()->Parse(scanner, stack, parsingData);
+            Span temp = scanner.GetSpan();
+            scanner.SetSpan(save);
+            save = temp;
+            Match rightMatch = Right()->Parse(scanner, stack, parsingData);
+            bool match = rightMatch.Hit();
+            if (leftMatch.Hit())
+            {
+                match = !rightMatch.Hit();
+            }
+            if (match)
+            {
+                if (leftMatch.Hit())
+                {
+                    scanner.SetSpan(save);
+                }
+                if (leftMatch.Hit())
+                {
+                    return leftMatch;
+                }
+                else
+                {
+                    return rightMatch;
+                }                
+            }
+            return Match.Nothing();
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.BeginVisit(*this);
+            Left()->Accept(visitor);
+            visitor.Visit(*this);
+            Right()->Accept(visitor);
+            visitor.EndVisit(*this);
+        }
+    }
+    
+    public class IntersectionParser : BinaryParser
+    {
+        public IntersectionParser(Parser* left_, Parser* right_) : base(u"intersection", left_, right_, left_->Info() + u" & " + right_->Info())
+        {
+        }
+        public override Match Parse(Scanner& scanner, Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
+        {
+            Span save = scanner.GetSpan();
+            Match leftMatch = Left()->Parse(scanner, stack, parsingData);
+            if (leftMatch.Hit())
+            {
+                scanner.SetSpan(save);
+                Match rightMatch = Right()->Parse(scanner, stack, parsingData);
+                if (leftMatch.Length() == rightMatch.Length())
+                {
+                    return leftMatch;
+                }           
+            }
+            return Match.Nothing();
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.BeginVisit(*this);
+            Left()->Accept(visitor);
+            visitor.Visit(*this);
+            Right()->Accept(visitor);
+            visitor.EndVisit(*this);
+        }
+    }
+    
+    public class ListParser : UnaryParser
+    {
+        public ListParser(Parser* left_, Parser* right_) : base(u"list", new SequenceParser(left_, new KleeneStarParser(new SequenceParser(right_, left_))), 
+            left_->Info() + u" % " + right_->Info()), left(left_), right(right_)
+        {
+        }
+        public override Match Parse(Scanner& scanner, Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
+        {
+            return Child()->Parse(scanner, stack, parsingData);
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.BeginVisit(*this);
+            left->Accept(visitor);
+            visitor.Visit(*this);
+            right->Accept(visitor);
+            visitor.EndVisit(*this);
+        }
+        private Parser* left;
+        private Parser* right;
+    }
+}

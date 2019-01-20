@@ -1,0 +1,31 @@
+using System;
+using System.Threading;
+
+void ThreadFunction()
+{
+    try
+    {
+        Console.WriteLine("thread sleeping 3 seconds");
+        Sleep(Duration.FromSeconds(3));
+        Console.WriteLine("thread exiting");
+    }    
+    catch (const Exception& ex)
+    {
+        Console.Error() << ex.ToString() << endl();
+    }
+}
+
+void main()
+{
+    try
+    {
+        Console.WriteLine("starting thread");
+        Thread thread = Thread.StartFunction(ThreadFunction);
+        thread.Join();
+        Console.WriteLine("main exiting");
+    }
+    catch (const Exception& ex)
+    {
+        Console.Error() << ex.ToString() << endl();
+    }
+}

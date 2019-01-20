@@ -1,0 +1,291 @@
+// =================================
+// Copyright (c) 2019 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Collections;
+using System.IO;
+
+namespace System.Text.Parsing
+{
+    public class Grammar : ParsingObject
+    {
+        public Grammar(const ustring& name_, Scope* enclosingScope_) : this(name_, enclosingScope_, new ParsingDomain())
+        {
+        }
+        public Grammar(const ustring& name_, Scope* enclosingScope_, ParsingDomain* parsingDomain_) : 
+            base(name_, enclosingScope_), parsingDomain(parsingDomain_), rules(), ruleLinks(), ns(null), startRuleName(), skipRuleName(), 
+            contentParser(null), startRule(null), skipRule(null), referencedGrammars(), linking(false), linked(false), maxLogLineLength(0)
+        {
+            RegisterParsingDomain(parsingDomain);
+            Scope* containerScope = new Scope(name_, enclosingScope_);
+            Own(containerScope);
+            SetContainerScope(containerScope);
+        }
+        public inline nothrow ParsingDomain* Domain() const
+        {
+            return parsingDomain;
+        }
+        public virtual void GetReferencedGrammars()
+        {
+        }
+        public virtual void CreateRules()
+        {
+        }
+        public void Link()
+        {
+            if (!linking && !linked)
+            {
+                linking = true;
+                GetReferencedGrammars();
+                for (Grammar* referencedGrammar : referencedGrammars)
+                {
+                    referencedGrammar->Link();
+                }
+                LinkerVisitor visitor;
+                Accept(visitor);
+                linking = false;
+                linked = true;
+            }
+        }
+        public void Parse(const uchar* start, const uchar* end, int fileIndex, const string& fileName)
+        {
+            UniquePtr<ParsingData> parsingData(new ParsingData(parsingDomain->NumRules()));
+            Parse(start, end, fileIndex, fileName, parsingData.Get());
+        }
+        public Match Parse(Scanner& scanner, Stack<UniquePtr<Object>>& stack)
+        {
+            UniquePtr<ParsingData> parsingData(new ParsingData(parsingDomain->NumRules()));
+            return Parse(scanner, stack, parsingData.Get());
+        }
+        public void Parse(const uchar* start, const uchar* end, int fileIndex, const string& fileName, ParsingData* parsingData)
+        {
+            Scanner scanner(start, end, fileName, fileIndex, skipRule);
+            scanner.SetParsingData(parsingData);
+            UniquePtr<XmlLog> xmlLog;
+            if (log != null)
+            {
+                xmlLog.Reset(new XmlLog(*log, maxLogLineLength));
+                scanner.SetLog(xmlLog.Get());
+                xmlLog->WriteBeginRule(u"parse");
+                xmlLog->IncIndent();
+            }
+            Stack<UniquePtr<Object>> stack;
+            Match match = Parse(scanner, stack, parsingData);
+            Span stop = scanner.GetSpan();
+            if (log != null)
+            {
+                xmlLog->DecIndent();
+                xmlLog->WriteEndRule(u"parse");
+            }
+            if (!match.Hit() || stop.start != cast<int>(end - start))
+            {
+                if (startRule != null)
+                {
+                    throw ExpectationFailure(startRule->Info(), fileName, stop, start, end);
+                }
+                else
+                {
+                    throw ParsingException("grammar '" + ToUtf8(FullName()) + "' has no start rule", fileName, stop, start, end);
+                }
+            }
+        }
+        public Match Parse(Scanner& scanner, Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
+        {
+            if (startRule != null)
+            {
+                if (contentParser == null)
+                {
+                    if (skipRule != null)
+                    {
+                        contentParser = new SequenceParser(new SequenceParser(new OptionalParser(skipRule), startRule), new OptionalParser(skipRule));
+                        Own(contentParser);
+                    }
+                    else
+                    {
+                        contentParser = startRule;
+                    }
+                }
+                return contentParser->Parse(scanner, stack, parsingData);
+            }
+            return Match.Nothing();
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.BeginVisit(*this);
+            for (RuleLink* ruleLink : ruleLinks)
+            {
+                ruleLink->Accept(visitor);
+            }
+            for (RuleParser* rule : rules)
+            {
+                rule->Accept(visitor);
+            }
+            visitor.EndVisit(*this);
+        }
+        public void AddRule(RuleParser* rule)
+        {
+            Own(rule);
+            rule->SetGrammar(this);
+            rule->GetScope()->SetEnclosingScope(GetScope());
+            rule->SetEnclosingScope(GetScope());
+            rules.Add(rule);
+            try
+            {
+                GetScope()->Add(rule);
+            }
+            catch (const Exception& ex)
+            {
+                ThrowException(ex.Message(), GetSpan());
+            }
+        }
+        public RuleParser* GetRule(const ustring& ruleName) const
+        {
+            ParsingObject* o = GetScope()->Get(ruleName);
+            if (o == null)
+            {
+                ThrowException("rule '" + ToUtf8(ruleName) + "' not found in grammar '" + ToUtf8(FullName()) + "'", GetSpan());
+            }
+            else if (o is RuleParser*)
+            {
+                return cast<RuleParser*>(o);
+            }
+            else
+            {
+                if (o is RuleLink*)
+                {
+                    RuleLink* ruleLink = cast<RuleLink*>(o);
+                    RuleParser* rule = ruleLink->Rule();
+                    if (rule == null)
+                    {
+                        ThrowException("rule link '" + ToUtf8(ruleName) + "' not bound in grammar '" + ToUtf8(FullName()) + "'", GetSpan());
+                    }
+                    return rule;
+                }            
+                else
+                {
+                    ThrowException("object '" + ToUtf8(ruleName) + "' (" + ToUtf8(o->FullName()) + ") is not a rule or rule link", GetSpan());
+                }
+            }
+            return null;
+        }
+        public void AddRuleLink(RuleLink* ruleLink)
+        {
+            if (ruleLink->IsAddedToGrammar()) return;
+            ruleLink->SetAddedToGrammar();
+            Own(ruleLink);
+            ruleLinks.Add(ruleLink);
+        }
+        public void ResolveStartRule()
+        {
+            if (startRuleName.IsEmpty())
+            {
+                if (rules.Count() > 0)
+                {
+                    startRule = rules[0];
+                }
+                else
+                {
+                    ThrowException("cannot resolve start rule because grammar '" + ToUtf8(FullName()) + "' is empty", GetSpan());
+                }
+            }
+            else
+            {
+                startRule = GetRule(startRuleName);
+            }
+        }
+        public void ResolveSkipRule()
+        {
+            if (skipRuleName.IsEmpty()) return;
+            skipRule = GetRule(skipRuleName);
+        }    
+        public inline nothrow Namespace* Ns() const
+        {
+            return ns;
+        }
+        public nothrow void SetNs(Namespace* ns_)
+        {
+            ns = ns_;
+        }
+        public inline nothrow const ustring& StartRuleName() const
+        {
+            return startRuleName;
+        }
+        public nothrow void SetStartRuleName(const ustring& startRuleName_)
+        {
+            startRuleName = startRuleName_;
+        }
+        public inline nothrow const ustring& SkipRuleName() const
+        {
+            return skipRuleName;
+        }
+        public nothrow void SetSkipRuleName(const ustring& skipRuleName_)
+        {
+            skipRuleName = skipRuleName_;
+        }
+        public inline nothrow RuleParser* StartRule() const
+        {
+            return startRule;
+        }
+        public nothrow void SetStartRule(RuleParser* startRule_)
+        {
+            startRule = startRule_;
+        }
+        public inline nothrow RuleParser* SkipRule() const
+        {
+            return skipRule;
+        }
+        public nothrow void SetSkipRule(RuleParser* skipRule_)
+        {
+            skipRule = skipRule_;
+        }
+        public inline nothrow const List<RuleParser*>& Rules() const
+        {
+            return rules;
+        }
+        public inline nothrow const List<RuleLink*>& RuleLinks() const
+        {
+            return ruleLinks;
+        }
+        public inline nothrow const HashSet<Grammar*>& ReferencedGrammars() const
+        {
+            return referencedGrammars;
+        }
+        public void AddGrammarReference(Grammar* grammarReference)
+        {
+            Own(grammarReference);
+            referencedGrammars.Insert(grammarReference);
+        }
+        public inline nothrow StreamWriter* Log() const
+        {
+            return log;
+        }
+        public nothrow void SetLog(StreamWriter* log_)
+        {
+            log = log_;
+        }
+        public inline nothrow int MaxLogLineLength() const
+        {
+            return maxLogLineLength;
+        }
+        public nothrow void SetMaxLogLineLength(int maxLogLineLength_)
+        {
+            maxLogLineLength = maxLogLineLength_;
+        }
+        private ParsingDomain* parsingDomain;
+        private List<RuleParser*> rules;
+        private List<RuleLink*> ruleLinks;
+        private Namespace* ns;
+        private ustring startRuleName;
+        private ustring skipRuleName;
+        private Parser* contentParser;
+        private RuleParser* startRule;
+        private RuleParser* skipRule;
+        private HashSet<Grammar*> referencedGrammars;
+        private bool linking;
+        private bool linked;
+        private StreamWriter* log;
+        private int maxLogLineLength;
+    }
+}

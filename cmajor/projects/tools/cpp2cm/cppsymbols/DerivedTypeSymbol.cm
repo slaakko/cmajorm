@@ -1,0 +1,88 @@
+using System;
+using Span = System.Text.Parsing.Span;
+
+namespace cppsymbols
+{
+    public abstract class DerivedTypeSymbol : TypeSymbol
+    {
+        public nothrow DerivedTypeSymbol(const Span& span_, const ustring& name_, TypeSymbol* childType_) : base(span_, name_), childType(childType_)
+        {
+        }
+        public TypeSymbol* childType;
+    }
+    
+    public class ConstTypeSymbol : DerivedTypeSymbol
+    {
+        public nothrow ConstTypeSymbol(const Span& span_, const ustring& name_, TypeSymbol* childType_) : base(span_, name_, childType_)
+        {
+        }
+        public override nothrow ustring FullName() const
+        {
+            return u"const " + childType->FullName();
+        }
+        public override void Accept(SymbolVisitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+    }
+    
+    public class VolatileTypeSymbol : DerivedTypeSymbol
+    {
+        public nothrow VolatileTypeSymbol(const Span& span_, const ustring& name_, TypeSymbol* childType_) : base(span_, name_, childType_)
+        {
+        }
+        public override nothrow ustring FullName() const
+        {
+            return u"volatile " + childType->FullName();
+        }
+        public override void Accept(SymbolVisitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+    }
+    
+    public class LvalueRefTypeSymbol : DerivedTypeSymbol
+    {
+        public nothrow LvalueRefTypeSymbol(const Span& span_, const ustring& name_, TypeSymbol* childType_) : base(span_, name_, childType_)
+        {
+        }
+        public override nothrow ustring FullName() const 
+        {
+            return childType->FullName() + u"&";
+        }
+        public override void Accept(SymbolVisitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+    }
+
+    public class RvalueRefTypeSymbol : DerivedTypeSymbol
+    {
+        public nothrow RvalueRefTypeSymbol(const Span& span_, const ustring& name_, TypeSymbol* childType_) : base(span_, name_, childType_)
+        {
+        }
+        public override nothrow ustring FullName() const 
+        {
+            return childType->FullName() + u"&&";
+        }
+        public override void Accept(SymbolVisitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+    }
+
+    public class PointerTypeSymbol : DerivedTypeSymbol
+    {
+        public nothrow PointerTypeSymbol(const Span& span_, const ustring& name_, TypeSymbol* childType_) : base(span_, name_, childType_)
+        {
+        }
+        public override nothrow ustring FullName() const 
+        {
+            return childType->FullName() + u"*";
+        }
+        public override void Accept(SymbolVisitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+    }
+}

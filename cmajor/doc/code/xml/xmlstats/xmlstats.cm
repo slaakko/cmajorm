@@ -1,0 +1,65 @@
+using System;
+using System.Xml;
+
+class XmlStats : XmlContentHandler
+{
+    public XmlStats(const string& xmlFileName_) : xmlFileName(xmlFileName_)
+    {
+    }
+    public override void StartElement(const ustring& namespaceUri, const ustring& localName, const ustring& qualifiedName, const Attributes& attributes)
+    {
+        ++numElements;
+        numAttributes = numAttributes + attributes.Count();
+    }
+    public override void PI(const ustring& target, const ustring& data)
+    {
+        ++numProcessingInstructions;
+    }
+    public override void Comment(const ustring& comment)
+    {
+        ++numComments;
+    }
+    public override void CDataSection(const ustring& cdata)
+    {
+        numCharacters = numCharacters + cdata.Length();
+    }
+    public override void Text(const ustring& text)
+    {
+        numCharacters = numCharacters + text.Length();
+    }
+    public void Print()
+    {
+        Console.Out() << xmlFileName << " contains:" << endl();
+        Console.Out() << numElements << " elements" << endl();
+        Console.Out() << numAttributes << " attributes" << endl();
+        Console.Out() << numProcessingInstructions << " processing instructions" << endl();
+        Console.Out() << numComments << " comments" << endl();
+        Console.Out() << numCharacters << " characters" << endl();
+    }
+    private string xmlFileName;
+    private long numElements;
+    private long numAttributes;
+    private long numProcessingInstructions;
+    private long numComments;
+    private long numCharacters;
+}
+
+int main(int argc, const char** argv)
+{
+    try
+    {
+        for (int i = 1; i < argc; ++i)
+        {
+            string xmlFileName = argv[i];
+            XmlStats stats(xmlFileName);
+            ParseXmlFile(xmlFileName, &stats);
+            stats.Print();
+        }
+    }
+    catch (const Exception& ex)
+    {
+        Console.Error() << ex.Message() << endl();
+        return 1;
+    }
+    return 0;
+}

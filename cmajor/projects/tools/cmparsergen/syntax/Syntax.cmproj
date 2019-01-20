@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+ <PropertyGroup Label="Globals">
+  <CustomProjectExtensionsPath>$(LocalAppData)\CustomProjectSystems\Cmajor\</CustomProjectExtensionsPath>
+  <ProjectGuid>2a35de6d-383b-43c0-af3a-cf888afa3212</ProjectGuid>
+ </PropertyGroup>
+ <PropertyGroup>
+  <TargetType>library</TargetType>
+ </PropertyGroup>
+ <ItemGroup>
+  <CmCompile Include="CodeGenerator.cm"/>
+  <CmCompile Include="CodeGeneratorVisitor.cm"/>
+  <CmCompile Include="Composite.cm"/>
+  <CmCompile Include="Element.cm"/>
+  <CmCompile Include="Flags.cm"/>
+  <CmCompile Include="Generator.cm"/>
+  <CmCompile Include="Grammar.cm"/>
+  <CmCompile Include="Library.cm"/>
+  <CmCompile Include="LibraryFile.cm"/>
+  <CmCompile Include="ParserFile.cm"/>
+  <CmCompile Include="ParserFileContent.cm"/>
+  <CmCompile Include="Primary.cm"/>
+  <CmCompile Include="Primitive.cm"/>
+  <CmCompile Include="Project.cm"/>
+  <CmCompile Include="ProjectFile.cm"/>
+  <CmCompile Include="Rule.cm"/>
+ </ItemGroup>
+ <ItemGroup>
+  <None Include="Composite.parser"/>
+  <None Include="Element.parser"/>
+  <None Include="Grammar.parser"/>
+  <None Include="LibraryFile.parser"/>
+  <None Include="ParserFile.parser"/>
+  <None Include="Primary.parser"/>
+  <None Include="Primitive.parser"/>
+  <None Include="ProjectFile.parser"/>
+  <None Include="Rule.parser"/>
+  <None Include="Syntax.pl"/>
+  <None Include="Syntax.pp"/>
+ </ItemGroup>
+ <ItemGroup>
+  <ProjectReference Include="../code/Code.cmproj"/>
+ </ItemGroup>
+ <Import Project="$(CustomProjectExtensionsPath)Cmajor.props"/>
+ <Import Project="$(CustomProjectExtensionsPath)Cmajor.targets"/>
+</Project>

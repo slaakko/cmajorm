@@ -1,0 +1,97 @@
+using System;
+using System.Collections;
+using System.IO;
+using cmsx.machine;
+using cmsx.object;
+
+namespace cmsx.kernel
+{
+    public Section MakePoolSection(const List<string>& argv)
+    {
+        Section poolSection;
+        long n = argv.Count() + 1;
+        for (long i = 0; i < n; ++i)
+        {
+            poolSection.EmitULong(0u);
+        }
+        List<ulong> argAddresses;
+        for (const string& arg : argv)
+        {
+            argAddresses.Add(poolSegmentBaseAddress + poolSection.Address());
+            poolSection.EmitString(arg);
+        }
+        poolSection.pos = 0u;
+        for (ulong argAddr : argAddresses)
+        {
+            poolSection.EmitULong(argAddr);
+        }
+        return poolSection;
+    }
+
+    public int Load(const string& programFileName, const List<string>& programArguments)
+    {
+        UniquePtr<BinaryFile> binaryFile = ReadBinaryFile(programFileName);
+        if (binaryFile.Get() is ExecutableFile*)
+        {
+            Machine& machine = GetMachine();
+            ProcessTable& processTable = GetProcessTable();
+            ExecutableFile* executable = cast<ExecutableFile*>(binaryFile.Get());
+            Section* codeSection = executable->GetCodeSection();
+            Section* dataSection = executable->GetDataSection();
+            string name = Path.GetFileName(programFileName);
+            List<string> argv;
+            argv.Add(name);
+            for (const string& arg : programArguments)
+            {
+                argv.Add(arg);
+            }
+            Process* process = CreateSingleProcess(machine, processTable, name, codeSection->BaseAddress(), codeSection->Length(), dataSection->Length(), executable->PoolSize(), executable->StackSize());
+            if (codeSection->Length() > 0u)
+            {
+                int result = WriteProcessMemory(machine, process, codeSection->BaseAddress(), codeSection->data.Begin().Ptr(), cast<ulong>(codeSection->data.Count()),
+                    Protection.execute);
+                if (result != 0)
+                {
+                    Panic("loader error: error writing to code segment of program '" + programFileName + "'");
+                }
+            }
+            if (dataSection->Length() > 0u)
+            {
+                int result = WriteProcessMemory(machine, process, dataSection->BaseAddress(), dataSection->data.Begin().Ptr(), cast<ulong>(dataSection->data.Count()),
+                    Protection.write);
+                if (result != 0)
+                {
+                    Panic("loader error: error writing to data segment of program '" + programFileName + "'");
+                }
+            }
+            Section poolSection = MakePoolSection(argv);
+            if (!poolSection.data.IsEmpty())
+            {
+                int result = WriteProcessMemory(machine, process, poolSegmentBaseAddress, poolSection.data.Begin().Ptr(), cast<ulong>(poolSection.data.Count()),
+                    Protection.write);
+                if (result != 0)
+                {
+                    Panic("loader error: error writing to pool segment of program '" + programFileName + "'");
+                }
+                int ax = cast<int>(argv.Count());
+                ulong bx = poolSegmentBaseAddress;
+                result = WriteProcessMemory(machine, process, process->regAXAddress, cast<ulong>(ax), 8u);
+                if (result != 0)
+                {
+                    Panic("loader error: error writing to stack segment of program '" + programFileName + "'");
+                }
+                result = WriteProcessMemory(machine, process, process->regBXAddress, bx, 8u);
+                if (result != 0)
+                {
+                    Panic("loader error: error writing to stack segment of program '" + programFileName + "'");
+                }
+            }
+            return process->pid;
+        }
+        else
+        {
+            Panic("file '" + programFileName + "' is not a cmsx executable");
+        }
+        return -1;
+    }
+}

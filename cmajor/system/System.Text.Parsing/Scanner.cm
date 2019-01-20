@@ -1,0 +1,139 @@
+// =================================
+// Copyright (c) 2019 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Collections;
+
+namespace System.Text.Parsing
+{
+    public class Scanner
+    {
+        public nothrow Scanner(const uchar* start_, const uchar* end_, const string& fileName_, int fileIndex_, Parser* skipper_) : 
+            start(start_), end(end_), fileName(fileName_), span(fileIndex_), skipper(skipper_), skipping(false), tokenCounter(0), atBeginningOfLine(true), parsingData(null), log(null)
+        {
+        }
+        public inline nothrow const uchar* Start() const
+        {
+            return start;
+        }
+        public inline nothrow const uchar* End() const
+        {
+            return end;
+        }
+        public inline nothrow uchar Char() const 
+        {
+            return start[span.start];
+        }
+        public nothrow void operator++()
+        {
+            uchar c = Char();
+            ++span;
+            if (c == u'\n')
+            {
+                atBeginningOfLine = true;
+                ++span.lineNumber;
+            }
+        }
+        public nothrow inline bool AtEnd() const
+        {
+            return start + span.start >= end;
+        }
+        public inline nothrow void BeginToken()
+        {
+            ++tokenCounter;
+        }
+        public inline nothrow void EndToken()
+        {
+            --tokenCounter;
+        }
+        public void Skip()
+        {
+            if (tokenCounter == 0 && skipper != null)
+            {
+                Span save = span;
+                BeginToken();
+                skipping = true;
+                Stack<UniquePtr<Object>> stack;
+                Match match = skipper->Parse(*this, stack, parsingData);
+                skipping = false;
+                EndToken();
+                if (!match.Hit())
+                {
+                    span = save;
+                }
+            }
+        }
+        public inline nothrow const string& FileName() const
+        {
+            return fileName;
+        }
+        public inline nothrow const Span& GetSpan() const
+        {
+            return span;
+        }
+        public inline nothrow void SetSpan(const Span& span_)
+        {
+            span = span_;
+        }
+        public inline nothrow Parser* Skipper() const
+        {
+            return skipper;
+        }
+        public inline nothrow bool Skipping() const
+        {
+            return skipping;
+        }
+        public inline nothrow int TokenCounter() const
+        {
+            return tokenCounter;
+        }
+        public inline nothrow bool AtBeginningOfLine() const
+        {
+            return atBeginningOfLine;
+        }
+        public inline nothrow void SetParsingData(ParsingData* parsingData_)
+        {
+            parsingData = parsingData_;
+        }
+        public nothrow int LineEndIndex(int maxLineLength) const
+        {
+            int lineEndIndex = span.start;
+            int contentLength = cast<int>(end - start);
+            int end_ = contentLength;
+            if (maxLineLength != 0)
+            {
+                end_ = Min(contentLength, span.start + maxLineLength);
+            }
+            while (lineEndIndex < end_ && (start[lineEndIndex] != '\r' && start[lineEndIndex] != '\n'))
+            {
+                ++lineEndIndex;
+            }
+            return lineEndIndex;
+        }
+        public nothrow ustring RestOfLine(int maxLineLength)
+        {
+            ustring restOfLine(start + span.start, start + LineEndIndex(maxLineLength));
+            return restOfLine;
+        }
+        public inline nothrow XmlLog* Log() const
+        {
+            return log;
+        }
+        public nothrow void SetLog(XmlLog* log_)
+        {
+            log = log_;
+        }
+        private const uchar* start;
+        private const uchar* end;
+        private string fileName;
+        private Span span;
+        private Parser* skipper;
+        private bool skipping;
+        private int tokenCounter;
+        private bool atBeginningOfLine;
+        private ParsingData* parsingData;
+        private XmlLog* log;
+    }
+}

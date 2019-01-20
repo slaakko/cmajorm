@@ -1,0 +1,53 @@
+using System;
+using cppast;
+
+namespace cppparser
+{
+    grammar TypeExprGrammar
+    {
+        using SimpleTypeGrammar.SimpleType;
+        using TemplateGrammar.TemplateId;
+        using ClassGrammar.ClassKey;
+        using IdentifierGrammar.QualifiedId;
+        using stdlib.spaces;
+        skip spaces;
+
+        TypeExpr(ParsingContext* ctx) : Node*
+            ::= PrefixTypeExpr(ctx){ value = PrefixTypeExpr; }
+            ;
+            
+        CVSpecifierSequence : CVSpecifiers
+            ::= (CVSpecifier:cv{ value = cast<CVSpecifiers>(value | cv); })*
+            ;
+            
+        CVSpecifier : CVSpecifiers
+            ::= keyword("const"){ value = CVSpecifiers.const_; }
+            |   keyword("volatile"){ value = CVSpecifiers.volatile; }
+            ;
+
+        PrefixTypeExpr(ParsingContext* ctx) : Node*
+            ::= keyword("const") keyword("volatile") PostfixTypeExpr(ctx):pf1{ value = new ConstNode(span, new VolatileNode(span, pf1)); }
+            |   keyword("volatile") keyword("const") PostfixTypeExpr(ctx):pf2{ value = new VolatileNode(span, new ConstNode(span, pf2)); }
+            |   keyword("const") PostfixTypeExpr(ctx):pf3{ value = new ConstNode(span, pf3); }
+            |   keyword("volatile") PostfixTypeExpr(ctx):pf4{ value = new VolatileNode(span, pf4); }
+            |   PostfixTypeExpr(ctx):pf5{ value = pf5; }
+            ;
+
+        PostfixTypeExpr(ParsingContext* ctx, var UniquePtr<Node> node) : Node*
+            ::= (PrimaryTypeExpr(ctx){ node.Reset(PrimaryTypeExpr); }
+                (   '*'{ node.Reset(new PointerNode(span, node.Release())); }
+                |   "&&"{ node.Reset(new RvalueRefNode(span, node.Release())); }
+                |   '&'{ node.Reset(new LvalueRefNode(span, node.Release())); }
+                )*
+            )
+            {
+                value = node.Release();
+            }
+            ;
+
+        PrimaryTypeExpr(ParsingContext* ctx) : Node*
+            ::= SimpleType{ value = SimpleType; }
+            |   (keyword("typename") | ClassKey)? QualifiedId(ctx){ value = QualifiedId; }
+            ;
+    }
+}

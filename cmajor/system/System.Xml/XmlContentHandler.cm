@@ -1,0 +1,154 @@
+// =================================
+// Copyright (c) 2019 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Collections;
+
+namespace System.Xml
+{
+    public class Attribute
+    {
+        public nothrow Attribute(const ustring& namespaceUri_, const ustring& localName_, const ustring& qualifiedName_, const ustring& value_) :
+            namespaceUri(namespaceUri_), localName(localName_), qualifiedName(qualifiedName_), value(value_)
+        {
+        }
+        public nothrow inline const ustring& NamespaceUri() const
+        {
+            return namespaceUri;
+        }
+        public nothrow inline const ustring& LocalName() const
+        {
+            return localName;
+        }
+        public nothrow inline const ustring& QualifiedName() const
+        {
+            return qualifiedName;
+        }
+        public nothrow inline const ustring& Value() const
+        {
+            return value;
+        }
+        private ustring namespaceUri;
+        private ustring localName;
+        private ustring qualifiedName;
+        private ustring value;
+    }
+    
+    public class Attributes
+    {
+        public typedef List<Attribute>.ConstIterator ConstIterator;
+        public typedef List<Attribute>.Iterator Iterator;
+        public nothrow inline ConstIterator CBegin() const
+        {
+            return attributes.CBegin();
+        }
+        public nothrow inline ConstIterator Begin() const
+        {
+            return attributes.CBegin();
+        }
+        public nothrow inline Iterator Begin() 
+        {
+            return attributes.Begin();
+        }
+        public nothrow inline ConstIterator CEnd() const
+        {
+            return attributes.CEnd();
+        }
+        public nothrow inline ConstIterator End() const
+        {
+            return attributes.CEnd();
+        }
+        public nothrow inline Iterator End()
+        {
+            return attributes.End();
+        }
+        public void Add(const Attribute& attribute)
+        {
+            attributes.Add(attribute);
+        }
+        public void Clear()
+        {
+            attributes.Clear();
+        }
+        public nothrow inline bool IsEmpty() const
+        {
+            return attributes.IsEmpty();
+        }
+        public nothrow inline long Count() const
+        {
+            return attributes.Count();
+        }
+        public nothrow const Attribute& operator[](long index) const
+        {
+            return attributes[index];
+        }
+        public const ustring* GetAttributeValue(const ustring& namespaceUri, const ustring& localName) const
+        {
+            for (const Attribute& attribute : attributes)
+            {
+                if (attribute.NamespaceUri() == namespaceUri && attribute.LocalName() == localName)
+                {
+                    const ustring& attValue = attribute.Value();
+                    return &attValue;
+                }
+            }
+            return null;
+        }
+        public const ustring* GetAttributeValue(const ustring& qualifiedName) const
+        {
+            for (const Attribute& attribute : attributes)
+            {
+                if (attribute.QualifiedName() == qualifiedName)
+                {
+                    const ustring& attValue = attribute.Value();
+                    return &attValue;
+                }
+            }
+            return null;
+        }
+        private List<Attribute> attributes;
+    }
+    
+    public class XmlContentHandler
+    {
+        public default virtual ~XmlContentHandler();
+        public virtual void StartDocument()
+        {
+        }
+        public virtual void EndDocument()
+        {
+        }
+        public virtual void Version(const ustring& version)
+        {
+        }
+        public virtual void Standalone(bool standalone)
+        {
+        }
+        public virtual void Encoding(const ustring& encoding)
+        {
+        }
+        public virtual void Text(const ustring& text)
+        {
+        }
+        public virtual void CDataSection(const ustring& cdata)
+        {
+        }
+        public virtual void Comment(const ustring& comment)
+        {
+        }
+        public virtual void PI(const ustring& target, const ustring& data)
+        {
+        }
+        public virtual void StartElement(const ustring& namespaceUri, const ustring& localName, const ustring& qualifiedName, const Attributes& attributes)
+        {
+        }
+        public virtual void EndElement(const ustring& namespaceUri, const ustring& localName, const ustring& qualifiedName)
+        {
+        }
+        public virtual void SkippedEntity(const ustring& entityName)
+        {
+        }
+    }
+}

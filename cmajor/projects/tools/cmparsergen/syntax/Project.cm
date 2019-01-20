@@ -1,0 +1,49 @@
+using System;
+using System.IO;
+using System.Collections;
+
+namespace Syntax
+{
+    public class Project
+    {
+        public Project(const ustring& name_, const string& filePath_) : name(name_), filePath(filePath_), basePath(Path.GetDirectoryName(filePath))
+        {
+        }
+        public ~Project()
+        {
+        }
+        public inline nothrow const ustring& Name() const
+        {
+            return name;
+        }
+        public inline nothrow const string& FilePath() const
+        {
+            return filePath;
+        }
+        public inline nothrow const string& BasePath() const
+        {
+            return basePath;
+        }
+        public void AddSourceFile(const string& sourceFilePath)
+        {
+            sourceFiles.Add(GetFullPath(Path.Combine(basePath, sourceFilePath)));
+        }
+        public void AddReferenceFile(const string& referenceFilePath)
+        {
+            referenceFiles.Add(referenceFilePath);
+        }
+        public inline nothrow const List<string>& SourceFiles() const
+        {
+            return sourceFiles;
+        }
+        public inline nothrow const List<string>& ReferenceFiles() const
+        {
+            return referenceFiles;
+        }
+        private ustring name;
+        private string filePath;
+        private string basePath;
+        private List<string> sourceFiles;
+        private List<string> referenceFiles;
+    }
+}

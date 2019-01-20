@@ -1,0 +1,193 @@
+// =================================
+// Copyright (c) 2019 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+
+namespace System.Net.Sockets
+{
+    public enum ShutdownMode : int
+    {
+        receive = 0, send = 1, both = 2
+    }
+    
+    public enum ConnectOptions : int
+    {
+        none = 0, useTls = 1 << 0
+    }
+    
+    public class SocketException : Exception
+    {
+        public nothrow SocketException(const string& message_) : base(message_)
+        {
+        }
+    }
+    
+    public class TcpSocket
+    {
+        public TcpSocket() : handle(RtCreateSocket()), connected(false), shutdown(false)
+        {
+            if (handle < 0)
+            {
+                string errorMessage = RtGetError(handle);
+                RtDisposeError(handle);
+                throw SocketException(errorMessage);
+            }
+        }
+        public TcpSocket(const string& node_, const string& service_) : this(node_, service_, ConnectOptions.none)
+        {
+        }
+        public TcpSocket(const string& node_, const string& service_, ConnectOptions options_) : 
+            handle(RtConnectSocket(node_.Chars(), service_.Chars(), cast<int>(options_))), connected(false), shutdown(false)
+        {
+            if (handle < 0)
+            {
+                string errorMessage = RtGetError(handle);
+                RtDisposeError(handle);
+                throw SocketException(errorMessage);
+            }
+            else
+            {
+                connected = true;
+            }            
+        }
+        public nothrow TcpSocket(int handle_) : handle(handle_)
+        {
+        }
+        suppress TcpSocket(const TcpSocket&);
+        suppress void operator=(const TcpSocket&);
+        public nothrow TcpSocket(TcpSocket&& that) : handle(that.handle)
+        {
+            that.handle = -1;
+            that.connected = false;
+            that.shutdown = false;
+        }
+        public nothrow void operator=(TcpSocket&& that) 
+        {
+            Swap(handle, that.handle);
+        }
+        public ~TcpSocket()
+        {
+            if (handle > 0)
+            {
+                if (connected && !shutdown)
+                {
+                    try
+                    {
+                        Shutdown(ShutdownMode.both);
+                    }                
+                    catch (const Exception& ex)
+                    {
+                    }                
+                }
+                RtCloseSocket(handle);
+            }
+        }
+        public void Close()
+        {
+            if (handle > 0)
+            {
+                if (connected && !shutdown)
+                {
+                    Shutdown(ShutdownMode.both);
+                }
+                int result = RtCloseSocket(handle);
+                if (result < 0)
+                {
+                    string errorMessage = RtGetError(result);
+                    RtDisposeError(result);
+                    throw SocketException(errorMessage);
+                }
+                handle = -1;
+                connected = false;
+            }
+        }
+        public void Connect(const string& node, const string& service) 
+        {
+            Connect(node, service, ConnectOptions.none);
+        }
+        public void Connect(const string& node, const string& service, ConnectOptions options)
+        {
+            Close();
+            handle = RtConnectSocket(node.Chars(), service.Chars(), cast<int>(options));
+            if (handle < 0)
+            {
+                string errorMessage = RtGetError(handle);
+                RtDisposeError(handle);
+                throw SocketException(errorMessage);
+            }
+            else
+            {
+                connected = true;                
+            }
+        }
+        public void Bind(int port)
+        {
+            int result = RtBindSocket(handle, port);
+            if (result < 0)
+            {
+                string errorMessage = RtGetError(result);
+                RtDisposeError(result);
+                throw SocketException(errorMessage);
+            }
+        }
+        public void Listen(int backLog)
+        {
+            int result = RtListenSocket(handle, backLog);
+            if (result < 0)
+            {
+                string errorMessage = RtGetError(result);
+                RtDisposeError(result);
+                throw SocketException(errorMessage);
+            }
+        }
+        public TcpSocket Accept()
+        {
+            int acceptedHandle = RtAcceptSocket(handle);
+            if (acceptedHandle < 0)
+            {
+                string errorMessage = RtGetError(acceptedHandle);
+                RtDisposeError(acceptedHandle);
+                throw SocketException(errorMessage);
+            }
+            return TcpSocket(acceptedHandle);
+        }
+        public void Shutdown(ShutdownMode mode)
+        {
+            shutdown = true;
+            int result = RtShutdownSocket(handle, cast<int>(mode));
+            if (result < 0)
+            {
+                string errorMessage = RtGetError(result);
+                RtDisposeError(result);
+                throw SocketException(errorMessage);
+            }
+        }
+        public int Send(byte* buffer, int count)
+        {
+            int result = RtSendSocket(handle, buffer, count, 0);
+            if (result < 0)
+            {
+                string errorMessage = RtGetError(result);
+                RtDisposeError(result);
+                throw SocketException(errorMessage);
+            }
+            return result;
+        }
+        public int Receive(byte* buffer, int count)
+        {
+            int result = RtReceiveSocket(handle, buffer, count, 0);
+            if (result < 0)
+            {
+                string errorMessage = RtGetError(result);
+                RtDisposeError(result);
+                throw SocketException(errorMessage);
+            }
+            return result;
+        }
+        private int handle;
+        private bool connected;
+        private bool shutdown;
+    }
+}

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+ <PropertyGroup Label="Globals">
+  <CustomProjectExtensionsPath>$(LocalAppData)\CustomProjectSystems\Cmajor\</CustomProjectExtensionsPath>
+  <ProjectGuid>4d847179-56a3-4277-a320-ac546d38cf08</ProjectGuid>
+ </PropertyGroup>
+ <PropertyGroup>
+  <TargetType>library</TargetType>
+ </PropertyGroup>
+ <ItemGroup>
+  <CmCompile Include="ClassGrammar.cm"/>
+  <CmCompile Include="DeclarationGrammar.cm"/>
+  <CmCompile Include="DeclaratorGrammar.cm"/>
+  <CmCompile Include="EnumerationGrammar.cm"/>
+  <CmCompile Include="ExpressionGrammar.cm"/>
+  <CmCompile Include="FileRegistry.cm"/>
+  <CmCompile Include="FunctionGrammar.cm"/>
+  <CmCompile Include="IdentifierGrammar.cm"/>
+  <CmCompile Include="KeywordGrammar.cm"/>
+  <CmCompile Include="LiteralGrammar.cm"/>
+  <CmCompile Include="Parser.cm"/>
+  <CmCompile Include="ParsingContext.cm"/>
+  <CmCompile Include="SimpleTypeGrammar.cm"/>
+  <CmCompile Include="SourceFileGrammar.cm"/>
+  <CmCompile Include="StatementGrammar.cm"/>
+  <CmCompile Include="TemplateGrammar.cm"/>
+  <CmCompile Include="TypeExprGrammar.cm"/>
+ </ItemGroup>
+ <ItemGroup>
+  <None Include="ClassGrammar.parser"/>
+  <None Include="CppParser.pl"/>
+  <None Include="CppParser.pp"/>
+  <None Include="DeclarationGrammar.parser"/>
+  <None Include="DeclaratorGrammar.parser"/>
+  <None Include="EnumerationGrammar.parser"/>
+  <None Include="ExpressionGrammar.parser"/>
+  <None Include="FunctionGrammar.parser"/>
+  <None Include="IdentifierGrammar.parser"/>
+  <None Include="KeywordGrammar.parser"/>
+  <None Include="LiteralGrammar.parser"/>
+  <None Include="SimpleTypeGrammar.parser"/>
+  <None Include="SourceFileGrammar.parser"/>
+  <None Include="StatementGrammar.parser"/>
+  <None Include="TemplateGrammar.parser"/>
+  <None Include="TypeExprGrammar.parser"/>
+ </ItemGroup>
+ <ItemGroup>
+  <ProjectReference Include="../cppast/cppast.cmproj"/>
+ </ItemGroup>
+ <Import Project="$(CustomProjectExtensionsPath)Cmajor.props"/>
+ <Import Project="$(CustomProjectExtensionsPath)Cmajor.targets"/>
+</Project>

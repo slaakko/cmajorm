@@ -1,0 +1,119 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title>Compiler</title>
+    <link rel="stylesheet" type="text/css" href="../../style/tool.css" />
+</head>
+<body>
+    <h1>Compiler</h1>
+    <p>
+        <b>cmc</b> compiles program and library projects and solutions containing them.
+    </p>
+
+    <p>
+        Usage: <b>cmc [options] { project.cmp | solution.cms }</b>
+    </p>
+
+    <table class="opt">
+        <tr>
+            <th class="opt">Long option</th>
+            <th class="opt">Short option</th>
+            <th class="opt">IDE command</th>
+            <th class="opt">Description</th>
+        </tr>
+        <tr>
+            <td class="opt">--help</td>
+            <td class="opt">-h</td>
+            <td class="opt"></td>
+            <td class="opt">Print help.</td>
+        </tr>
+        <tr>
+            <td class="opt">--verbose</td>
+            <td class="opt">-v</td>
+            <td class="opt"></td>
+            <td class="opt">Be verbose.</td>
+        </tr>
+        <tr>
+            <td class="opt">--quiet</td>
+            <td class="opt">-q</td>
+            <td class="opt"></td>
+            <td class="opt">Be quite, only return exit code.</td>
+        </tr>
+        <tr>
+            <td class="opt">--config=CONFIG</td>
+            <td class="opt">-c=CONFIG</td>
+            <td class="opt">Configuration combo box</td>
+            <td class="opt">Build usig CONFIG configuration. CONFIG can be "debug" or "release".
+            Default optimization level for debug build is 0 and for release build is 3.</td>
+        </tr>
+        <tr>
+            <td class="opt">--optimization-level=LEVEL</td>
+            <td class="opt">-O=LEVEL</td>
+            <td class="opt"></td>
+            <td class="opt">Set optimization level to LEVEL (0-3).</td>
+        </tr>
+        <tr>
+            <td class="opt">--clean</td>
+            <td class="opt">-e</td>
+            <td class="opt">Build | Clean project/solution</td>
+            <td class="opt">Clean given projects and solutions.</td>
+        </tr>
+        <tr>
+            <td class="opt">--strict-nothrow</td>
+            <td class="opt">-s</td>
+            <td class="opt">Build | Options | Strict nothrow</td>
+            <td class="opt">Treat a nothrow violation as an error.</td>
+        </tr>
+        <tr>
+            <td class="opt">--emit-llvm</td>
+            <td class="opt">-l</td>
+            <td class="opt">Build | Options | Emit LLVM intermediate code</td>
+            <td class="opt">Emit LLVM intermediate code to .ll files while compiling.</td>
+        </tr>
+        <tr>
+            <td class="opt">--emit-opt-llvm</td>
+            <td class="opt">-o</td>
+            <td class="opt">Build | Options | Emit optimized LLVM intermediate code</td>
+            <td class="opt">Emit optimized LLVM intermediate code to .opt.ll files while compiling.</td>
+        </tr>
+        <tr>
+            <td class="opt">--link-with-debug-runtime</td>
+            <td class="opt">-d</td>
+            <td class="opt">Build | Options | Link with debug runtime</td>
+            <td class="opt">Link with debug version of the runtime library cmrt2xx(d).dll.</td>
+        </tr>
+        <tr>
+            <td class="opt">--link-using-ms-link</td>
+            <td class="opt">-m</td>
+            <td class="opt">Build | Options | Use Microsoft's link.exe as the linker</td>
+            <td class="opt">Use Microsoft's link.exe as the linker. Link.exe must be found from the PATH. If this option not given, uses LLVM's lld-link as the linker.</td>
+        </tr>
+        <tr>
+            <td class="opt">--define SYMBOL</td>
+            <td class="opt">-D SYMBOL</td>
+            <td class="opt">Project | Properties | Conditional compilation symbols</td>
+            <td class="opt">Define a conditional compilation symbol SYMBOL.</td>
+        </tr>
+        <tr>
+            <td class="opt">--gen-debug-info</td>
+            <td class="opt">-g</td>
+            <td class="opt"></td>
+            <td class="opt">Generate debug info (on by default on debug configuration)</td>
+        </tr>
+        <tr>
+            <td class="opt">--no-debug-info</td>
+            <td class="opt">-n</td>
+            <td class="opt"></td>
+            <td class="opt">don't generate debug info even for debug build</td>
+        </tr>
+        <tr>
+            <td class="opt">--build-threads=N</td>
+            <td class="opt">-bt=N</td>
+            <td class="opt">Build | Options | Number of build threads combo box.</td>
+            <td class="opt">Use N threads for building a solution. Default is 2 x C, where C is the number of cores.</td>
+        </tr>
+    </table>
+</body>
+</html>

@@ -1,0 +1,79 @@
+using System;
+
+namespace Calculator
+{
+    public inline bool IsNumberChar(uchar c)
+    {
+        return IsAsciiDigit(c) || c == '.';
+    }
+    
+    public class Scanner
+    {
+        public nothrow Scanner(const ustring& input_) : input(input_)
+        {
+        }
+        public nothrow inline Token* CurrentToken() const
+        {
+            return token.Get();
+        }
+        public void NextToken()
+        {
+            SkipWhiteSpace();
+            if (pos < input.Length())
+            {
+                if (IsNumberChar(input[pos]))
+                {
+                    int start = pos;
+                    ++pos;
+                    while (pos < input.Length() && IsNumberChar(input[pos]))
+                    {
+                        ++pos;
+                    }
+                    double number = ParseDouble(ToUtf8(input.Substring(start, pos - start)));
+                    token.Reset(new NumberToken(number));
+                }
+                else if (IsIdStart(input[pos]))
+                {
+                    int start = pos;
+                    ++pos;
+                    while (pos < input.Length() && IsIdCont(input[pos]))
+                    {
+                        ++pos;
+                    }
+                    ustring variableName = input.Substring(start, pos - start);
+                    if (ToLower(variableName) == u"print")
+                    {
+                        token.Reset(new PrintToken());
+                    }
+                    else
+                    {
+                        token.Reset(new VariableNameToken(variableName));
+                    }
+                }
+                else
+                {
+                    token.Reset(new OperatorToken(input[pos]));
+                    ++pos;
+                }
+            }
+            else
+            {
+                token.Reset(new EndToken());
+            }
+        }
+        public void Rewind()
+        {
+            pos = 0;
+        }
+        private void SkipWhiteSpace()
+        {
+            while (pos < input.Length() && (input[pos] == ' ' || input[pos] == '\t'))
+            {
+                ++pos;
+            }
+        }    
+        private UniquePtr<Token> token;
+        private ustring input;
+        private int pos;
+    }
+}

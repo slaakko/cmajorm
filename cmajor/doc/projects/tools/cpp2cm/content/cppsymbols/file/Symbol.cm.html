@@ -1,0 +1,105 @@
+<html>
+ <head>
+  <meta charset="utf-8"/>
+  <title>cppsymbols/Symbol.cm</title>
+  <link href="../../../style/style.css" rel="stylesheet" type="text/css"/>
+ </head>
+ <body>
+  <span class="code" id="1" xml:space="preserve"><span class="lineNumber">&nbsp;1</span>&nbsp;&nbsp;<span class="kw">using</span>&nbsp;<span class="identifier">System</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="2" xml:space="preserve"><span class="lineNumber">&nbsp;2</span>&nbsp;<span class="kw">using</span>&nbsp;<span class="identifier">Span</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">System.Text.Parsing.Span</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="3" xml:space="preserve"><span class="lineNumber">&nbsp;3</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="4" xml:space="preserve"><span class="lineNumber">&nbsp;4</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">cppsymbols</span></span>
+  <br/>
+  <span class="code" id="5" xml:space="preserve"><span class="lineNumber">&nbsp;5</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="6" xml:space="preserve"><span class="lineNumber">&nbsp;6</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">enum</span>&nbsp;<a href="../doc/enumerated_type_SymbolFlags_C87FF80122B20BDE7CFBAA6E2C6C94B4EE556DC8.html">SymbolFlags</a></span>
+  <br/>
+  <span class="code" id="7" xml:space="preserve"><span class="lineNumber">&nbsp;7</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="8" xml:space="preserve"><span class="lineNumber">&nbsp;8</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">none</span><span class="other">&nbsp;=&nbsp;</span><span class="number">0</span><span class="other">,&nbsp;</span><span class="identifier">export</span><span class="other">&nbsp;=&nbsp;</span><span class="number">1</span><span class="other">&nbsp;&lt;&lt;&nbsp;</span><span class="number">0</span></span>
+  <br/>
+  <span class="code" id="9" xml:space="preserve"><span class="lineNumber">&nbsp;9</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="10" xml:space="preserve"><span class="lineNumber">10</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+  <br/>
+  <span class="code" id="11" xml:space="preserve"><span class="lineNumber">11</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">abstract</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../doc/class_Symbol_8A528ACAFCB10A97E11D5657F8828BEBB03E90DE.html">Symbol</a></span>
+  <br/>
+  <span class="code" id="12" xml:space="preserve"><span class="lineNumber">12</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="13" xml:space="preserve"><span class="lineNumber">13</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<a href="../doc/class_Symbol_8A528ACAFCB10A97E11D5657F8828BEBB03E90DE.html#constructor_Symbol_9B20B20F4C82A4E33FF80BBEC2C0507E9F0204D6">Symbol</a><span class="other">(</span><span class="kw">const</span>&nbsp;<a href="../../../../../../system/content/System.Text.Parsing/doc/class_Span_342F797681C8A26247E86213AFC9204FEF17D2A5.html">Span</a><span class="other">&amp;</span>&nbsp;<span class="identifier">span_</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<a href="../../../../../../system/content/System.Base/doc/ns_System.html#typedef_ustring_1750E1C62AAF5897C1F1DA3C5BC4999982AE9B36">ustring</a><span class="other">&amp;</span>&nbsp;<span class="identifier">name_</span><span class="other">)</span><span class="other">&nbsp;:&nbsp;</span><span class="identifier">flags</span><span class="other">(</span><a href="../doc/enumerated_type_SymbolFlags_C87FF80122B20BDE7CFBAA6E2C6C94B4EE556DC8.html">SymbolFlags</a><span class="other">.</span><a href="../doc/enumerated_type_SymbolFlags_C87FF80122B20BDE7CFBAA6E2C6C94B4EE556DC8.html#enumeration_constant_none_412D8F27E104AA6DB3759B618DE67CB52192F3B7">none</a><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">span</span><span class="other">(</span><span class="identifier">span_</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">name</span><span class="other">(</span><span class="identifier">name_</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">parent</span><span class="other">(</span><span class="kw">null</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="14" xml:space="preserve"><span class="lineNumber">14</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="15" xml:space="preserve"><span class="lineNumber">15</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="16" xml:space="preserve"><span class="lineNumber">16</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">virtual</span>&nbsp;<span class="kw">default</span>&nbsp;<span class="other">~</span><a href="../doc/class_Symbol_8A528ACAFCB10A97E11D5657F8828BEBB03E90DE.html#destructor_Symbol_1EDCE86D1337053AB4728B991F1E1F3D57ED668B">Symbol</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="17" xml:space="preserve"><span class="lineNumber">17</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">abstract</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/class_Symbol_8A528ACAFCB10A97E11D5657F8828BEBB03E90DE.html#member_function_Accept_Symbol_2D6F4CA17480D55455B6B127C05E8C87BAEE025A">Accept</a><span class="other">(</span><a href="../doc/class_SymbolVisitor_DB63309E7A9F1D0A4F0FFA18D9A5F39E8A42ABDE.html">SymbolVisitor</a><span class="other">&amp;</span>&nbsp;<span class="identifier">visitor</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="18" xml:space="preserve"><span class="lineNumber">18</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">virtual</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<a href="../doc/class_NamespaceSymbol_1C8DDC7DFE423B6635EB3EAC6A004A2384B2A070.html">NamespaceSymbol</a><span class="other">*</span>&nbsp;<a href="../doc/class_Symbol_8A528ACAFCB10A97E11D5657F8828BEBB03E90DE.html#member_function_GlobalNs_Symbol_999D08E64E919F51A6F09908C2DCCFDC2C86EA5E">GlobalNs</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span></span>
+  <br/>
+  <span class="code" id="19" xml:space="preserve"><span class="lineNumber">19</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="20" xml:space="preserve"><span class="lineNumber">20</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if</span>&nbsp;<span class="other">(</span><a href="../doc/class_Symbol_8A528ACAFCB10A97E11D5657F8828BEBB03E90DE.html#variable_parent_4ED9E147CC78A045F3685EF0F77F10FE6E2B40C4">parent</a><span class="other">&nbsp;!=&nbsp;</span><span class="kw">null</span><span class="other">)</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="../doc/class_Symbol_8A528ACAFCB10A97E11D5657F8828BEBB03E90DE.html#variable_parent_4ED9E147CC78A045F3685EF0F77F10FE6E2B40C4">parent</a><span class="other">-></span><a href="../doc/class_Symbol_8A528ACAFCB10A97E11D5657F8828BEBB03E90DE.html#member_function_GlobalNs_Symbol_999D08E64E919F51A6F09908C2DCCFDC2C86EA5E">GlobalNs</a><span class="other">(</span><span class="other">)</span><span class="other">;</span>&nbsp;<span class="kw">else</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">null</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="21" xml:space="preserve"><span class="lineNumber">21</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="22" xml:space="preserve"><span class="lineNumber">22</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">inline</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/class_Symbol_8A528ACAFCB10A97E11D5657F8828BEBB03E90DE.html#member_function_SetParent_Symbol_72A779E60AAB6AFFA3C057EFC3AD378458EDECCA">SetParent</a><span class="other">(</span><a href="../doc/class_ContainerSymbol_D2DD52C0F23F1518DA3A29F9A2B3F2356C7E7961.html">ContainerSymbol</a><span class="other">*</span>&nbsp;<span class="identifier">parent_</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="23" xml:space="preserve"><span class="lineNumber">23</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="24" xml:space="preserve"><span class="lineNumber">24</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../doc/class_Symbol_8A528ACAFCB10A97E11D5657F8828BEBB03E90DE.html#variable_parent_4ED9E147CC78A045F3685EF0F77F10FE6E2B40C4">parent</a><span class="other">&nbsp;=&nbsp;</span><span class="identifier">parent_</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="25" xml:space="preserve"><span class="lineNumber">25</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="26" xml:space="preserve"><span class="lineNumber">26</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">virtual</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<a href="../../../../../../system/content/System.Base/doc/ns_System.html#typedef_ustring_1750E1C62AAF5897C1F1DA3C5BC4999982AE9B36">ustring</a>&nbsp;<a href="../doc/class_Symbol_8A528ACAFCB10A97E11D5657F8828BEBB03E90DE.html#member_function_FullName_Symbol_C3A0973F8E4E85D1D6B7E6B47E2CCB69CF56057C">FullName</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span></span>
+  <br/>
+  <span class="code" id="27" xml:space="preserve"><span class="lineNumber">27</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="28" xml:space="preserve"><span class="lineNumber">28</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../../../../../system/content/System.Base/doc/ns_System.html#typedef_ustring_1750E1C62AAF5897C1F1DA3C5BC4999982AE9B36">ustring</a>&nbsp;<span class="identifier">fullName</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="29" xml:space="preserve"><span class="lineNumber">29</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if</span>&nbsp;<span class="other">(</span><a href="../doc/class_Symbol_8A528ACAFCB10A97E11D5657F8828BEBB03E90DE.html#variable_parent_4ED9E147CC78A045F3685EF0F77F10FE6E2B40C4">parent</a><span class="other">&nbsp;!=&nbsp;</span><span class="kw">null</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="30" xml:space="preserve"><span class="lineNumber">30</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="31" xml:space="preserve"><span class="lineNumber">31</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">fullName</span><span class="other">&nbsp;=&nbsp;</span><a href="../doc/class_Symbol_8A528ACAFCB10A97E11D5657F8828BEBB03E90DE.html#variable_parent_4ED9E147CC78A045F3685EF0F77F10FE6E2B40C4">parent</a><span class="other">-></span><a href="../doc/class_Symbol_8A528ACAFCB10A97E11D5657F8828BEBB03E90DE.html#member_function_FullName_Symbol_C3A0973F8E4E85D1D6B7E6B47E2CCB69CF56057C">FullName</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="32" xml:space="preserve"><span class="lineNumber">32</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="33" xml:space="preserve"><span class="lineNumber">33</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if</span>&nbsp;<span class="other">(</span><span class="other">!</span><span class="identifier">fullName</span><span class="other">.</span><a href="../../../../../../system/content/System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html#member_function_IsEmpty_String_CharT_EDEFC2684A6AD2925D2AACEE4DC82F21300E5F80">IsEmpty</a><span class="other">(</span><span class="other">)</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="34" xml:space="preserve"><span class="lineNumber">34</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="35" xml:space="preserve"><span class="lineNumber">35</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">fullName</span><span class="other">.</span><a href="../../../../../../system/content/System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html#member_function_Append_String_CharT_945B02DC7DD183AADA4D8824D22E409DB6D621C9">Append</a><span class="other">(</span>&nbsp;<span class="string">u"::"</span><span class="other">)</span><span class="other">.</span><a href="../../../../../../system/content/System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html#member_function_Append_String_CharT_AF953C10EFCD2B4E0A06C4E60B009E06D526C70F">Append</a><span class="other">(</span><a href="../doc/class_Symbol_8A528ACAFCB10A97E11D5657F8828BEBB03E90DE.html#variable_name_1D17C67A030592CB8FF9AC5BEC11DA68097E108D">name</a><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="36" xml:space="preserve"><span class="lineNumber">36</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">fullName</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="37" xml:space="preserve"><span class="lineNumber">37</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="38" xml:space="preserve"><span class="lineNumber">38</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">else</span></span>
+  <br/>
+  <span class="code" id="39" xml:space="preserve"><span class="lineNumber">39</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="40" xml:space="preserve"><span class="lineNumber">40</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<a href="../doc/class_Symbol_8A528ACAFCB10A97E11D5657F8828BEBB03E90DE.html#variable_name_1D17C67A030592CB8FF9AC5BEC11DA68097E108D">name</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="41" xml:space="preserve"><span class="lineNumber">41</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="42" xml:space="preserve"><span class="lineNumber">42</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="43" xml:space="preserve"><span class="lineNumber">43</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<a href="../doc/enumerated_type_SymbolFlags_C87FF80122B20BDE7CFBAA6E2C6C94B4EE556DC8.html">SymbolFlags</a>&nbsp;<span class="identifier">flags</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="44" xml:space="preserve"><span class="lineNumber">44</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<a href="../../../../../../system/content/System.Text.Parsing/doc/class_Span_342F797681C8A26247E86213AFC9204FEF17D2A5.html">Span</a>&nbsp;<span class="identifier">span</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="45" xml:space="preserve"><span class="lineNumber">45</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<a href="../../../../../../system/content/System.Base/doc/ns_System.html#typedef_ustring_1750E1C62AAF5897C1F1DA3C5BC4999982AE9B36">ustring</a>&nbsp;<span class="identifier">name</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="46" xml:space="preserve"><span class="lineNumber">46</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<a href="../doc/class_ContainerSymbol_D2DD52C0F23F1518DA3A29F9A2B3F2356C7E7961.html">ContainerSymbol</a><span class="other">*</span>&nbsp;<span class="identifier">parent</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="47" xml:space="preserve"><span class="lineNumber">47</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="48" xml:space="preserve"><span class="lineNumber">48</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+ </body>
+</html>

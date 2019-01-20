@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+ <PropertyGroup Label="Globals">
+  <CustomProjectExtensionsPath>$(LocalAppData)\CustomProjectSystems\Cmajor\</CustomProjectExtensionsPath>
+  <ProjectGuid>aa190e1a-635e-43db-a7a0-4260c2730f56</ProjectGuid>
+ </PropertyGroup>
+ <PropertyGroup>
+  <TargetType>library</TargetType>
+ </PropertyGroup>
+ <ItemGroup>
+  <CmCompile Include="FunctionProfiler.cm"/>
+  <CmCompile Include="Keys.cm"/>
+  <CmCompile Include="Os.cm"/>
+  <CmCompile Include="Runtime.cm"/>
+  <CmCompile Include="StaticInitCriticalSection.cm"/>
+ </ItemGroup>
+ <ItemGroup/>
+ <ItemGroup>
+  <ProjectReference Include="../System.Core/System.Core.cmproj"/>
+ </ItemGroup>
+ <Import Project="$(CustomProjectExtensionsPath)Cmajor.props"/>
+ <Import Project="$(CustomProjectExtensionsPath)Cmajor.targets"/>
+</Project>

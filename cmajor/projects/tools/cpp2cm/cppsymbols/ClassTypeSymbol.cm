@@ -1,0 +1,97 @@
+using System;
+using System.Collections;
+using cppast;
+
+namespace cppsymbols
+{
+    public class ClassGroupTypeSymbol : TypeSymbol
+    {
+        public nothrow ClassGroupTypeSymbol(const Span& span_, const ustring& name_) : base(span_, name_)
+        {
+        }
+        public override void Accept(SymbolVisitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+    }
+    
+    public class ClassTypeSymbol : TypeSymbol
+    {
+        public nothrow ClassTypeSymbol(const Span& span_, const ustring& name_, ClassKey classKey_) : base(span_, name_), classKey(classKey_)
+        {
+        }
+        public virtual nothrow int Arity() const
+        {
+            return 0;            
+        }
+        public override void Accept(SymbolVisitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public override nothrow long NumBases() const
+        {
+            return baseClasses.Count();
+        }
+        public override nothrow ContainerSymbol* GetBase(long index) const
+        {
+            #assert(index >= 0 && index < baseClasses.Count());
+            return baseClasses[index];
+        }
+        public void AddBaseClass(ClassTypeSymbol* baseClass)
+        {
+            baseClasses.Add(baseClass);
+        }
+        public ClassKey classKey;
+        public List<ClassTypeSymbol*> baseClasses;
+    }
+    
+    public class ClassTemplateSymbol : ClassTypeSymbol
+    {
+        public nothrow ClassTemplateSymbol(const Span& span_, const ustring& name_, ClassKey classKey_) : base(span_, name_, classKey_)
+        {
+        }
+        public override nothrow int Arity() const
+        {
+            return cast<int>(templateParameters.Count());
+        }
+        public nothrow int MinArity() const
+        {
+            int minArity = 0;
+            for (TemplateParameterSymbol* templateParameterSymbol : templateParameters)
+            {
+                if (!templateParameterSymbol->hasDefault) ++minArity; else break;
+            }
+            return minArity;
+        }
+        public nothrow int MaxArity() const
+        {
+            return cast<int>(templateParameters.Count());
+        }
+        public override void AddSymbol(Symbol* symbol, List<UniquePtr<Exception>>& errors)
+        {
+            base->AddSymbol(symbol, errors);
+            if (symbol is TemplateParameterSymbol*)
+            {
+                templateParameters.Add(cast<TemplateParameterSymbol*>(symbol));
+            }
+        }
+        public override void Accept(SymbolVisitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public List<TemplateParameterSymbol*> templateParameters;
+    }
+    
+    public class ClassTemplateSpecializationSymbol : ClassTypeSymbol
+    {
+        public nothrow ClassTemplateSpecializationSymbol(const Span& span_, const ustring& name_, ClassKey classKey_) : base(span_, name_, classKey_)
+        {
+        }
+        public override nothrow int Arity() const
+        {
+            return classTemplate->Arity();
+        }
+        public ClassTemplateSymbol* classTemplate;
+        public List<TypeSymbol*> templateArgumentTypes;
+    }
+}

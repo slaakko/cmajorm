@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title>Profiler</title>
+    <link rel="stylesheet" type="text/css" href="../../style/tool.css" />
+</head>
+<body>
+    <h1>Profiler</h1>
+    <p>
+        <b>cmprof</b> is a poor man's profiler.
+    </p>
+
+    <p>
+        Usage: <b>cmprof [options] { project.cmp }</b>
+    </p>
+
+    <p>
+        The profiler compiles libraries and program using the profile configuration.
+        That means each function is instrumented with a calls to take the timestamp in the start and end of the function.
+        The timestamps are saved to a binary file when profiling the program. The profiler calculates profiling metrics
+        from the timestamps and reports results. Compiler-generated functions are not profiled, only user code.
+    </p>
+
+    <table class="opt">
+        <tr>
+            <th class="opt">Long option</th>
+            <th class="opt">Short option</th>
+            <th class="opt">IDE command</th>
+            <th class="opt">Description</th>
+        </tr>
+        <tr>
+            <td class="opt">--help</td>
+            <td class="opt">-h</td>
+            <td class="opt"></td>
+            <td class="opt">Print help.</td>
+        </tr>
+        <tr>
+            <td class="opt">--verbose</td>
+            <td class="opt">-v</td>
+            <td class="opt"></td>
+            <td class="opt">Be verbose.</td>
+        </tr>
+        <tr>
+            <td class="opt">--rebuild-sys</td>
+            <td class="opt">-rs</td>
+            <td class="opt">Profile | Rebuild | System</td>
+            <td class="opt">Rebuild system libraries using the profile configuration. If this option is not given, compiles only the first time and if system library sources changed.</td>
+        </tr>
+        <tr>
+            <td class="opt">--rebuild-app</td>
+            <td class="opt">-ra</td>
+            <td class="opt">Profile | Rebuild | Application</td>
+            <td class="opt">Rebuild application libraries and the program using the profile configuration. If this option is not given, compiles application only the first time and if application sources changed.</td>
+        </tr>
+        <tr>
+            <td class="opt">--inclusive</td>
+            <td class="opt">-s</td>
+            <td class="opt">Profile | Report | Elapsed Time Inclusive</td>
+            <td class="opt">Report elapsed inclusive time. Inclusive time includes the time spent in called child functions of a function.</td>
+        </tr>
+        <tr>
+            <td class="opt">--exclusive</td>
+            <td class="opt">-x</td>
+            <td class="opt">Profile | Report | Elapsed Time Exclusive</td>
+            <td class="opt">Report elapsed exclusive time. Exclusive time does not include time spent in called child function of a function.</td>
+        </tr>
+        <tr>
+            <td class="opt">--count</td>
+            <td class="opt">-c</td>
+            <td class="opt">Profile | Report | Execution Count</td>
+            <td class="opt">Report number of times a function is called during the profile session.</td>
+        </tr>
+        <tr>
+            <td class="opt">--all</td>
+            <td class="opt">-a</td>
+            <td class="opt"></td>
+            <td class="opt">Report inclusive and exclusive time and execution count of functions.</td>
+        </tr>
+        <tr>
+            <td class="opt">--emit-llvm</td>
+            <td class="opt">-l</td>
+            <td class="opt">Build | Options | Emit LLVM intermediate code</td>
+            <td class="opt">Emit LLVM intermediate code to .ll files while compiling.</td>
+        </tr>
+        <tr>
+            <td class="opt">--emit-opt-llvm</td>
+            <td class="opt">-o</td>
+            <td class="opt">Build | Options | Emit optimized LLVM intermediate code</td>
+            <td class="opt">Emit optimized LLVM intermediate code to .opt.ll files while compiling.</td>
+        </tr>
+        <tr>
+            <td class="opt">--link-with-debug-runtime</td>
+            <td class="opt">-d</td>
+            <td class="opt">Build | Options | Link with debug runtime</td>
+            <td class="opt">Link with debug version of the runtime library cmrt2xx(d).dll.</td>
+        </tr>
+        <tr>
+            <td class="opt">--link-using-ms-link</td>
+            <td class="opt">-m</td>
+            <td class="opt">Build | Options | Use Microsoft's link.exe as the linker</td>
+            <td class="opt">Use Microsoft's link.exe as the linker. Link.exe must be found from the PATH. If not given uses LLVM's lld-link as the linker.</td>
+        </tr>
+        <tr>
+            <td class="opt">--top=N</td>
+            <td class="opt">-t=N</td>
+            <td class="opt">Show combo box.</td>
+            <td class="opt">Report top N functions. If N=* report all functions called during the profile sesssion.</td>
+        </tr>
+    </table>
+
+    <p>
+        This is an <a href="cmprof-20180307T171005.html">example</a> of a profile report.
+    </p>
+</body>
+</html>

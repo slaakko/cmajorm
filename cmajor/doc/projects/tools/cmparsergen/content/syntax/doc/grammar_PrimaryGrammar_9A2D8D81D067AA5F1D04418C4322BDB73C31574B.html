@@ -1,0 +1,68 @@
+<html>
+ <head>
+  <meta charset="utf-8"/>
+  <title>PrimaryGrammar Grammar</title>
+  <link href="../../../style/style.css" rel="stylesheet" type="text/css"/>
+ </head>
+ <body>
+  <h1>PrimaryGrammar Grammar</h1>
+  <table class="grammar">
+   <tr id="rule_Primary_10B33DC1A8BE524B180FD5E00740AF49AC5E25B6">
+    <td class="grammarFirstCol">
+     <span class="rule">Primary</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#rule_RuleCall_3F9A1AC077B4E7E77F9172D62D5DA9EAC4E0EA3E">RuleCall</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="grammar_PrimitiveGrammar_C4C775A93697FAA177B49670EFDCB67F8B6BEAE1.html#rule_Primitive_9A45D82D123B54AF436A5C81E81A2B32C5248944">Primitive</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#rule_Grouping_B977E80ACA7FFD60572D0DB0501686FA9EBBD98F">Grouping</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#rule_Token_583C8F6335B62143A658F35FB95DBD934B27C597">Token</a></span><span class="ruleOp">)</span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#rule_Expectation_06989EC456D877A7282B2258DDFD706297F488B7">Expectation</a></span><span class="ruleOp">)</span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#rule_Action_D80FCF2E4041C84EA9AEC636CA951BEE0B7B045D">Action</a></span><span class="ruleOp">)</span><span class="ruleOp">?</span></td>
+   </tr>
+   <tr id="rule_RuleCall_3F9A1AC077B4E7E77F9172D62D5DA9EAC4E0EA3E">
+    <td class="grammarFirstCol">
+     <span class="rule">RuleCall</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleOp">(</span><span class="ruleOp">(</span><span class="ruleKeyword">token</span><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#rule_Nonterminal_5FC54082F2780D7B306C6DCB205F47CAD032A00E">Nonterminal</a></span><span class="ruleOp"> </span><span class="ruleChar">'('</span><span class="ruleOp">)</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="../../code/doc/grammar_ExpressionGrammar_50CB3CF98C6F271F0621339198FEA874558BA2D1.html#rule_ArgumentList_0495B68680FCB4BF1E2889A5FDB86159FC8090A7">ArgumentList</a></span><span class="ruleOp"> </span><span class="ruleChar">')'</span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#rule_Nonterminal_5FC54082F2780D7B306C6DCB205F47CAD032A00E">Nonterminal</a></span><span class="ruleOp">)</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_Alias_5B8F1E329835A646127F98076DAFBBA31CE6DFDA">Alias</a></span><span class="ruleOp">?</span><span class="ruleOp">)</span></td>
+   </tr>
+   <tr id="rule_Nonterminal_5FC54082F2780D7B306C6DCB205F47CAD032A00E">
+    <td class="grammarFirstCol">
+     <span class="rule">Nonterminal</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="grammar_ElementGrammar_B5DDF4C63A54C0ECE47ECCA329A830AE4B734689.html#rule_Identifier_B4EFD76B9A366B23121E7A1EDBD876B0C96B6758">Identifier</a></span></td>
+   </tr>
+   <tr id="rule_Alias_5B8F1E329835A646127F98076DAFBBA31CE6DFDA">
+    <td class="grammarFirstCol">
+     <span class="rule">Alias</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleChar">':'</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="grammar_ElementGrammar_B5DDF4C63A54C0ECE47ECCA329A830AE4B734689.html#rule_Identifier_B4EFD76B9A366B23121E7A1EDBD876B0C96B6758">Identifier</a></span></td>
+   </tr>
+   <tr id="rule_Grouping_B977E80ACA7FFD60572D0DB0501686FA9EBBD98F">
+    <td class="grammarFirstCol">
+     <span class="rule">Grouping</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleOp">(</span><span class="ruleChar">'('</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="grammar_CompositeGrammar_9803F79EA3C163ACE5305AFF5B65A1AB26B96B39.html#rule_Alternative_F0F6750C64DCD5DC2FB5F527C7726D3F4BE016DA">Alternative</a></span><span class="ruleOp">!</span><span class="ruleOp"> </span><span class="ruleChar">')'</span><span class="ruleOp">!</span><span class="ruleOp">)</span></td>
+   </tr>
+   <tr id="rule_Token_583C8F6335B62143A658F35FB95DBD934B27C597">
+    <td class="grammarFirstCol">
+     <span class="rule">Token</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleOp">(</span><span class="ruleKeyword">keyword</span><span class="ruleString">("token")</span><span class="ruleOp"> </span><span class="ruleChar">'('</span><span class="ruleOp">!</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="grammar_CompositeGrammar_9803F79EA3C163ACE5305AFF5B65A1AB26B96B39.html#rule_Alternative_F0F6750C64DCD5DC2FB5F527C7726D3F4BE016DA">Alternative</a></span><span class="ruleOp">!</span><span class="ruleOp"> </span><span class="ruleChar">')'</span><span class="ruleOp">!</span><span class="ruleOp">)</span></td>
+   </tr>
+   <tr id="rule_Expectation_06989EC456D877A7282B2258DDFD706297F488B7">
+    <td class="grammarFirstCol">
+     <span class="rule">Expectation</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleChar">'!'</span></td>
+   </tr>
+   <tr id="rule_Action_D80FCF2E4041C84EA9AEC636CA951BEE0B7B045D">
+    <td class="grammarFirstCol">
+     <span class="rule">Action</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="../../code/doc/grammar_StatementGrammar_F7304BE229DA5898592EA114ED7B53E3E144D8B4.html#rule_CompoundStatement_B521F087AFFE0942BB0899E53D776CD33E26D633">CompoundStatement</a></span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleChar">'/'</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="../../code/doc/grammar_StatementGrammar_F7304BE229DA5898592EA114ED7B53E3E144D8B4.html#rule_CompoundStatement_B521F087AFFE0942BB0899E53D776CD33E26D633">CompoundStatement</a></span><span class="ruleOp">)</span><span class="ruleOp">?</span><span class="ruleOp">)</span></td>
+   </tr>
+  </table>
+ </body>
+</html>

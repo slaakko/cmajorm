@@ -1,0 +1,1057 @@
+using System;
+using System.Collections;
+using Span = System.Text.Parsing.Span;
+using cmsx.object;
+
+namespace cmsx.assembly
+{
+    public enum Stage : byte 
+    {
+        resolve = 0u, assemble = 1u, is_ = 2u, setExternal = 3u, setLinkOnce = 4u, bytes = 5u, wydes = 6u, tetras = 7u, octas = 8u
+    }
+
+    public void Error(const string& message, const Span& span)
+    {
+        System.Text.Parsing.ThrowException(message, span);
+    }
+
+    public class Assembler : Visitor
+    {
+        public Assembler(const string& objectFileName) :
+            objectFile(objectFileName, true), stage(Stage.resolve), currentSegment(Segment.text), currentSection(objectFile.codeSection), currentInstruction(null), currentSymbol(null), currentValue(),
+            currentFunctionSymbol(null), currentStructureSymbol(null)
+        {
+        }
+        public void Assemble(List<UniquePtr<Instruction>>& instructions)
+        {
+            currentSegment = Segment.text;
+            currentSection = objectFile.codeSection;
+            stage = Stage.resolve;
+            long n = instructions.Count();
+            for (long i = 0; i < n; ++i)
+            {
+                Instruction* inst = instructions[i].Get();
+                inst->Accept(*this);
+            }
+            currentSegment = Segment.text;
+            currentSection = objectFile.codeSection;
+            stage = Stage.assemble;
+            for (long i = 0; i < n; ++i)
+            {
+                Instruction* inst = instructions[i].Get();
+                inst->Accept(*this);
+            }
+            objectFile.Finalize();
+        }
+        public void WriteObjectFile()
+        {
+            objectFile.Write();
+        }
+        public Value Evaluate(Node* node)
+        {
+            currentValue = Value();
+            currentSymbol = null;
+            node->Accept(*this);
+            Value value = currentValue;
+            currentValue = Value();
+            return value;
+        }
+        public void EmitOpCode(byte opCode)
+        {
+            if (currentSegment != Segment.text)
+            {
+                Error(currentInstruction->opCode->name + " instruction can appear only in .CODE section", currentInstruction->opCode->span);
+            }
+            currentSection->EmitByte(opCode);
+        }
+        public void EmitRegisterValue(const string& paramName, const Value& v)
+        {
+            if (v.flags == Value.Flag.register)
+            {
+                if (v.value < 256u)
+                {
+                    currentSection->EmitByte(cast<byte>(v.value));
+                }
+                else
+                {
+                    Error("invalid " + currentInstruction->opCode->name + " " + paramName + " register operand", currentInstruction->span);
+                }
+            }
+            else
+            {
+                Error(currentInstruction->opCode->name + " instruction " + paramName + " operand must be a register", currentInstruction->span);
+            }
+        }
+        public void EmitPureByteValue(const string& paramName, const Value& v)
+        {
+            if (v.GetFlag(Value.Flag.pure))
+            {
+                if (v.value < 256u)
+                {
+                    currentSection->EmitByte(cast<byte>(v.value));
+                }
+                else
+                {
+                    Error("invalid " + currentInstruction->opCode->name + " " + paramName + " byte operand", currentInstruction->span);
+                }
+            }
+            else
+            {
+                Error(currentInstruction->opCode->name + " instruction " + paramName + " operand must be pure byte value", currentInstruction->span);
+            }
+        }
+        public void EmitSetReg255Value(ulong value)
+        {
+            if (value <= MaxValue<ushort>())
+            {
+                byte b0 = cast<byte>(value);
+                value = value >> 8u;
+                byte b1 = cast<byte>(value);
+                value = value >> 8u;
+                EmitOpCode(cmsx.machine.SETL);
+                currentSection->EmitByte(255u);
+                currentSection->EmitByte(b1);
+                currentSection->EmitByte(b0);
+            }
+            else if (value <= MaxValue<uint>())
+            {
+                byte b0 = cast<byte>(value);
+                value = value >> 8u;
+                byte b1 = cast<byte>(value);
+                value = value >> 8u;
+                byte b2 = cast<byte>(value);
+                value = value >> 8u;
+                byte b3 = cast<byte>(value);
+                value = value >> 8u;
+                EmitOpCode(cmsx.machine.SETML);
+                currentSection->EmitByte(255u);
+                currentSection->EmitByte(b3);
+                currentSection->EmitByte(b2);
+                EmitOpCode(cmsx.machine.ORL);
+                currentSection->EmitByte(255u);
+                currentSection->EmitByte(b1);
+                currentSection->EmitByte(b0);
+            }
+            else
+            {
+                byte b0 = cast<byte>(value);
+                value = value >> 8u;
+                byte b1 = cast<byte>(value);
+                value = value >> 8u;
+                byte b2 = cast<byte>(value);
+                value = value >> 8u;
+                byte b3 = cast<byte>(value);
+                value = value >> 8u;
+                byte b4 = cast<byte>(value);
+                value = value >> 8u;
+                byte b5 = cast<byte>(value);
+                value = value >> 8u;
+                byte b6 = cast<byte>(value);
+                value = value >> 8u;
+                byte b7 = cast<byte>(value);
+                value = value >> 8u;
+                EmitOpCode(cmsx.machine.SETH);
+                currentSection->EmitByte(255u);
+                currentSection->EmitByte(b7);
+                currentSection->EmitByte(b6);
+                EmitOpCode(cmsx.machine.ORMH);
+                currentSection->EmitByte(255u);
+                currentSection->EmitByte(b5);
+                currentSection->EmitByte(b4);
+                EmitOpCode(cmsx.machine.ORML);
+                currentSection->EmitByte(255u);
+                currentSection->EmitByte(b3);
+                currentSection->EmitByte(b2);
+                EmitOpCode(cmsx.machine.ORL);
+                currentSection->EmitByte(255u);
+                currentSection->EmitByte(b1);
+                currentSection->EmitByte(b0);
+            }
+        }
+        public void EmitAbsoluteRegisterValue(const Value& registerNumber, const string& paramName, Symbol* symbol)
+        {
+            #assert(symbol->index != -1);
+            byte reg = 0u;
+            if (registerNumber.flags == Value.Flag.register)
+            {
+                if (registerNumber.value < 256u)
+                {
+                    reg = cast<byte>(registerNumber.value);
+                }
+                else
+                {
+                    Error("invalid " + currentInstruction->opCode->name + " " + paramName + " register operand", currentInstruction->span);
+                }
+            }
+            else
+            {
+                Error(currentInstruction->opCode->name + " instruction " + paramName + " operand must be a register", currentInstruction->span);
+            }
+            if (currentSegment != Segment.text)
+            {
+                Error(currentInstruction->opCode->name + " instruction can appear only in .CODE section", currentInstruction->opCode->span);
+            }
+            objectFile.linkSection->EmitByte(LinkCode.absoluteAddrValue);
+            objectFile.linkSection->EmitUInt(cast<uint>(symbol->index));
+            objectFile.linkSection->EmitULong(objectFile.codeSection->Address());
+            objectFile.codeSection->EmitByte(cmsx.machine.SETH);
+            objectFile.codeSection->EmitByte(reg);
+            objectFile.codeSection->EmitShortOffset(cast<ushort>(-1));
+            objectFile.codeSection->EmitByte(cmsx.machine.ORMH);
+            objectFile.codeSection->EmitByte(reg);
+            objectFile.codeSection->EmitShortOffset(cast<ushort>(-1));
+            objectFile.codeSection->EmitByte(cmsx.machine.ORML);
+            objectFile.codeSection->EmitByte(reg);
+            objectFile.codeSection->EmitShortOffset(cast<ushort>(-1));
+            objectFile.codeSection->EmitByte(cmsx.machine.ORL);
+            objectFile.codeSection->EmitByte(reg);
+            objectFile.codeSection->EmitShortOffset(cast<ushort>(-1));
+        }
+        public void EmitForwardLongJump(Symbol* symbol)
+        {
+            #assert(symbol->index != -1);
+            if (currentSegment != Segment.text)
+            {
+                Error(currentInstruction->opCode->name + " instruction can appear only in .CODE section", currentInstruction->opCode->span);
+            }
+            objectFile.linkSection->EmitByte(LinkCode.forwardLongJump);
+            objectFile.linkSection->EmitUInt(cast<uint>(symbol->index));
+            objectFile.linkSection->EmitULong(objectFile.codeSection->Address());
+            objectFile.codeSection->EmitByte(cmsx.machine.JMP);
+            objectFile.codeSection->EmitLongOffset(cast<uint>(-1));
+        }
+        public void EmitForwardShortJump(const string& paramName, byte opCode, const Value& registerNumber, Symbol* symbol)
+        {
+            byte reg = 0u;
+            if (registerNumber.flags == Value.Flag.register)
+            {
+                if (registerNumber.value < 256u)
+                {
+                    reg = cast<byte>(registerNumber.value);
+                }
+                else
+                {
+                    Error("invalid " + currentInstruction->opCode->name + " " + paramName + " register operand", currentInstruction->span);
+                }
+            }
+            else
+            {
+                Error(currentInstruction->opCode->name + " instruction " + paramName + " operand must be a register", currentInstruction->span);
+            }
+            #assert(symbol->index != -1);
+            if (currentSegment != Segment.text)
+            {
+                Error(currentInstruction->opCode->name + " instruction can appear only in .CODE section", currentInstruction->opCode->span);
+            }
+            objectFile.linkSection->EmitByte(LinkCode.forwardShortJump);
+            objectFile.linkSection->EmitUInt(cast<uint>(symbol->index));
+            objectFile.linkSection->EmitULong(objectFile.codeSection->Address());
+            objectFile.codeSection->EmitByte(opCode);
+            objectFile.codeSection->EmitByte(reg);
+            objectFile.codeSection->EmitShortOffset(cast<ushort>(-1));
+        }
+        public void EmitLongOffset(uint offset)
+        {
+            currentSection->EmitLongOffset(offset);
+        }
+        public void EmitShortOffset(ushort offset)
+        {
+            currentSection->EmitShortOffset(offset);
+        }
+        public override void Visit(Instruction& inst)
+        {
+            currentInstruction = &inst;
+            if (stage == Stage.resolve)
+            {
+                inst.opCode->Accept(*this);
+                if (currentInstruction->opCode->value == CODE)
+                {
+                    currentSegment = Segment.text;
+                    currentSection = objectFile.codeSection;
+                    return;
+                }
+                else if (currentInstruction->opCode->value == DATA)
+                {
+                    currentSegment = Segment.data;
+                    currentSection = objectFile.dataSection;
+                    return;
+                }
+                if (!inst.label.IsNull())
+                {
+                    int opc = currentInstruction->opCode->value;
+                    if (opc == EXTERN || opc == LINKONCE)
+                    {
+                        Error("no label field allowed for EXTERN or LINKONCE instruction", inst.label->span);
+                    }
+                    else if (opc != IS)
+                    {
+                        inst.label->Accept(*this);
+                    }
+                }
+            }
+            else if (stage == Stage.assemble)
+            {
+                int opc = currentInstruction->opCode->value;
+                if (opc == CODE)
+                {
+                    currentSegment = Segment.text;
+                    currentSection = objectFile.codeSection;
+                    return;
+                }
+                else if (opc == DATA)
+                {
+                    currentSegment = Segment.data;
+                    currentSection = objectFile.dataSection;
+                    return;
+                }
+                currentSymbol = null;
+                AlignAt();
+                if (!inst.label.IsNull())
+                {
+                    if (opc == EXTERN || opc == LINKONCE)
+                    {
+                        Error("no label field allowed for EXTERN or LINKONCE instruction", inst.label->span);
+                    }
+                    else if (opc != IS)
+                    {
+                        currentInstruction->label->Accept(*this);
+                        if (currentSymbol != null)
+                        {
+                            if (opc == FUNC)
+                            {
+                                currentSymbol->value = Value(cast<Value.Flag>(Value.Flag.pure | Value.Flag.address | Value.Flag.function), currentSection->Address(), currentSymbol);
+                                currentFunctionSymbol = currentSymbol;
+                                currentSymbol->start = currentSection->BaseAddress() + currentSection->Address();
+                            }
+                            else if (opc == STRUCT)
+                            {
+                                currentSymbol->value = Value(cast<Value.Flag>(Value.Flag.pure | Value.Flag.address | Value.Flag.structure), currentSection->Address(), currentSymbol);
+                                currentStructureSymbol = currentSymbol;
+                                currentSymbol->start = currentSection->BaseAddress() + currentSection->Address();
+                            }
+                            else if (opc == ENDF)
+                            {
+                                currentSymbol->length = currentSection->BaseAddress() + currentSection->Address() - currentSymbol->start;
+                            }
+                            else if (opc == ENDS)
+                            {
+                                currentSymbol->length = currentSection->BaseAddress() + currentSection->Address() - currentSymbol->start;
+                            }
+                            else
+                            {
+                                currentSymbol->value = Value(cast<Value.Flag>(Value.Flag.pure | Value.Flag.address), currentSection->Address(), currentSymbol);
+                                currentSymbol->start = currentSection->BaseAddress() + currentSection->Address();
+                            }
+                            objectFile.GetSymbolTable().AddSymbolToAddressMap(currentSymbol);
+                        }
+                        else
+                        {
+                            Error("label not found", currentInstruction->label->span);
+                        }
+                    }
+                }
+                if (opc != FUNC && opc != ENDF && opc != STRUCT && opc != ENDS)
+                {
+                    AssemblyInstruction* assemblyInstruction = AssemblyInstructionMap.Instance().GetAssemblyInstruction(opc, currentInstruction->span);
+                    assemblyInstruction->Assemble(*this, currentInstruction);
+                }
+            }
+        }
+        public override void Visit(OpCode& opCode)
+        {
+            const string& opCodeName = opCode.name;
+            opCode.value = cmsx.machine.GetOpCode(opCodeName);
+            if (opCode.value == -1)
+            {
+                opCode.value = PseudoOpMap.Instance().GetCode(opCodeName);
+            }
+            if (opCode.value == -1)
+            {
+                Error("unknown opcode '" + opCodeName + "'", opCode.span);
+            }
+        }
+        public override void Visit(SymbolNode& node)
+        {
+            int opc = currentInstruction->opCode->value;
+            if (stage == Stage.resolve)
+            {
+                Symbol* symbol = objectFile.GetSymbolTable().GetSymbol(node.name);
+                if (symbol != null)
+                {
+                    if (opc == ENDF)
+                    {
+                        currentFunctionSymbol = null;
+                    }
+                    else if (opc == ENDS)
+                    {
+                        currentStructureSymbol = null;
+                    }
+                    else
+                    {
+                        Error("symbol '" + node.name + "' already defined", node.span);
+                    }
+                }
+                else
+                {
+                    if (opc == ENDF)
+                    {
+                        Error("no corresponding FUNC '" + node.name + "' seen", node.span);
+                    }
+                    else if (opc == ENDS)
+                    {
+                        Error("no corresponding STRUCT '" + node.name + "' seen", node.span);
+                    }
+                    symbol = new Symbol();
+                    symbol->index = -1;
+                    if (node.local)
+                    {
+                        if (currentFunctionSymbol != null)
+                        {
+                            symbol->name = currentFunctionSymbol->name + node.name;
+                            symbol->localName = node.name;
+                        }
+                        else
+                        {
+                            Error("local symbols can be used only inside FUNC", node.span);
+                        }
+                    }
+                    else
+                    {
+                        symbol->name = node.name;
+                    }
+                    symbol->segment = currentSegment;
+                    symbol->linkage = Linkage.internal_;
+                    symbol->value = Value(Value.Flag.undefined, undefinedValue, symbol);
+                    if (opc == FUNC)
+                    {
+                        currentFunctionSymbol = symbol;
+                    }
+                    else if (opc == STRUCT)
+                    {
+                        currentStructureSymbol = symbol;
+                    }
+                    symbol->start = 0u;
+                    symbol->length = 0u;
+                    symbol->section = currentSection;
+                    objectFile.GetSymbolTable().AddSymbol(symbol);
+                    if (currentSegment == Segment.data)
+                    {
+                        currentSection->AddSymbol(symbol);
+                    }
+                }
+            }
+            else if (stage == Stage.assemble)
+            {
+                if (opc == ENDF)
+                {
+                    currentFunctionSymbol = null;
+                }
+                if (opc == ENDS)
+                {
+                    currentStructureSymbol = null;
+                }
+                if (node.local)
+                {
+                    if (currentFunctionSymbol != null)
+                    {
+                        currentSymbol = objectFile.GetSymbolTable().GetSymbol(currentFunctionSymbol->name + node.name);
+                    }
+                    else
+                    {
+                        Error("local symbols can be used only inside FUNC", node.span);
+                    }
+                }
+                else
+                {
+                    currentSymbol = objectFile.GetSymbolTable().GetSymbol(node.name);
+                }
+                if (currentSymbol == null)
+                {
+                    currentSymbol = new Symbol();
+                    currentSymbol->index = -1;
+                    currentSymbol->name = node.name;
+                    currentSymbol->segment = Segment.unknown;
+                    currentSymbol->linkage = Linkage.undefined;
+                    currentSymbol->value = Value(Value.Flag.undefined, undefinedValue, currentSymbol);
+                    currentSymbol->start = 0u;
+                    currentSymbol->length = 0u;
+                    currentSymbol->section = currentSection;
+                    objectFile.GetSymbolTable().AddSymbol(currentSymbol);
+                }
+                currentValue = currentSymbol->value;
+            }
+            else if (stage == Stage.is_)
+            {
+                currentSymbol = objectFile.GetSymbolTable().GetSymbol(node.name);
+                if (currentSymbol != null)
+                {
+                    Error("symbol '" + node.name + "' already defined", node.span);
+                }
+                else
+                {
+                    currentSymbol = new Symbol();
+                    currentSymbol->index = -1;
+                    currentSymbol->name = node.name;
+                    currentSymbol->segment = Segment.unknown;
+                    currentSymbol->linkage = Linkage.internal_;
+                    currentSymbol->value = Value(Value.Flag.undefined, undefinedValue, currentSymbol);
+                    currentSymbol->start = 0u;
+                    currentSymbol->length = 0u;
+                    currentSymbol->section = currentSection;
+                    objectFile.GetSymbolTable().AddSymbol(currentSymbol);
+                }
+            }
+            else if (stage == Stage.setExternal)
+            {
+                currentSymbol = objectFile.GetSymbolTable().GetSymbol(node.name);
+                if (currentSymbol != null)
+                {
+                    currentSymbol->linkage = Linkage.external;
+                }
+                else
+                {
+                    Error("symbol '" + node.name + " not found", node.span);
+                }
+            }
+            else if (stage == Stage.setLinkOnce)
+            {
+                currentSymbol = objectFile.GetSymbolTable().GetSymbol(node.name);
+                if (currentSymbol != null)
+                {
+                    currentSymbol->linkage = Linkage.once;
+                    objectFile.linkSection->EmitByte(LinkCode.once);
+                    objectFile.linkSection->EmitUInt(cast<uint>(currentSymbol->index));
+                }
+                else
+                {
+                    Error("symbol '" + node.name + " not found", node.span);
+                }
+            }
+            else if (stage == Stage.octas)
+            {
+                if (currentSegment != Segment.data)
+                {
+                    Error("OCTA allowed only in .DATA section", node.span);
+                }
+                currentSymbol = objectFile.GetSymbolTable().GetSymbol(node.name);
+                if (currentSymbol == null)
+                {
+                    currentSymbol = new Symbol();
+                    currentSymbol->index = -1;
+                    currentSymbol->name = node.name;
+                    currentSymbol->segment = Segment.unknown;
+                    currentSymbol->linkage = Linkage.undefined;
+                    currentSymbol->value = Value(Value.Flag.undefined, undefinedValue, currentSymbol);
+                    currentSymbol->section = currentSection;
+                    objectFile.GetSymbolTable().AddSymbol(currentSymbol);
+                }
+                objectFile.linkSection->EmitByte(LinkCode.farOcta);
+                objectFile.linkSection->EmitUInt(cast<uint>(currentSymbol->index));
+                objectFile.linkSection->EmitULong(objectFile.dataSection->Address());
+                objectFile.dataSection->EmitULong(cast<ulong>(-1));
+            }
+            else
+            {
+                Error("undefined symbol '" + node.name + "' and not in OCTA mode", node.span);
+            }
+        }
+        private void ProcessValue(ulong value, const Span& span)
+        {
+            currentValue = Value(Value.Flag.pure, value, null);
+            if (stage == Stage.bytes)
+            {
+                if (value > 255u)
+                {
+                    Error("invalid BYTE operand", span);
+                }
+                else
+                {
+                    currentSection->EmitByte(cast<byte>(currentValue.value));
+                }
+            }
+            else if (stage == Stage.wydes)
+            {
+                if (value > 65535u)
+                {
+                    Error("invalid WYDE operand", span);
+                }
+                else
+                {
+                    byte b0 = cast<byte>(value);
+                    value = value >> 8u;
+                    byte b1 = cast<byte>(value);
+                    value = value >> 8u;
+                    currentSection->EmitByte(b1);
+                    currentSection->EmitByte(b0);
+                }
+            }
+            else if (stage == Stage.tetras)
+            {
+                if (value > 0xFFFFFFFFu)
+                {
+                    Error("invalid TETRA operand", span);
+                }
+                else
+                {
+                    byte b0 = cast<byte>(value);
+                    value = value >> 8u;
+                    byte b1 = cast<byte>(value);
+                    value = value >> 8u;
+                    byte b2 = cast<byte>(value);
+                    value = value >> 8u;
+                    byte b3 = cast<byte>(value);
+                    value = value >> 8u;
+                    currentSection->EmitByte(b3);
+                    currentSection->EmitByte(b2);
+                    currentSection->EmitByte(b1);
+                    currentSection->EmitByte(b0);
+                }
+            }
+            else if (stage == Stage.octas)
+            {
+                byte b0 = cast<byte>(value);
+                value = value >> 8u;
+                byte b1 = cast<byte>(value);
+                value = value >> 8u;
+                byte b2 = cast<byte>(value);
+                value = value >> 8u;
+                byte b3 = cast<byte>(value);
+                value = value >> 8u;
+                byte b4 = cast<byte>(value);
+                value = value >> 8u;
+                byte b5 = cast<byte>(value);
+                value = value >> 8u;
+                byte b6 = cast<byte>(value);
+                value = value >> 8u;
+                byte b7 = cast<byte>(value);
+                value = value >> 8u;
+                currentSection->EmitByte(b7);
+                currentSection->EmitByte(b6);
+                currentSection->EmitByte(b5);
+                currentSection->EmitByte(b4);
+                currentSection->EmitByte(b3);
+                currentSection->EmitByte(b2);
+                currentSection->EmitByte(b1);
+                currentSection->EmitByte(b0);
+            }
+        }
+        public override void Visit(DecimalConstant& dc) 
+        {
+            ProcessValue(dc.value, dc.span);
+        }
+        public override void Visit(HexConstant& hc)
+        {
+            ProcessValue(hc.value, hc.span);
+        }
+        public override void Visit(CharacterConstant& cc)
+        {
+            currentValue = Value(Value.Flag.pure, cast<ulong>(cc.value), null);
+            if (stage == Stage.bytes)
+            {
+                string s = ToString(cc.value);
+                for (char c : s)
+                {
+                    currentSection->EmitByte(cast<byte>(c));
+                }
+            }
+            else if (stage == Stage.wydes)
+            {
+                uint value = cast<uint>(cc.value);
+                if (value > 65535u)
+                {
+                    Error("invalid WYDE operand", cc.span);
+                }
+                byte b1 = cast<byte>(value);
+                value = value >> 8u;
+                byte b0 = cast<byte>(value);
+                value = value >> 8u;
+                currentSection->EmitByte(b1);
+                currentSection->EmitByte(b0);
+            }
+            else if (stage == Stage.tetras)
+            {
+                uint value = cast<uint>(cc.value);
+                byte b3 = cast<byte>(value);
+                value = value >> 8u;
+                byte b2 = cast<byte>(value);
+                value = value >> 8u;
+                byte b1 = cast<byte>(value);
+                value = value >> 8u;
+                byte b0 = cast<byte>(value);
+                value = value >> 8u;
+                currentSection->EmitByte(b3);
+                currentSection->EmitByte(b2);
+                currentSection->EmitByte(b1);
+                currentSection->EmitByte(b0);
+            }
+            else if (stage == Stage.octas)
+            {
+                uint value = cast<uint>(cc.value);
+                byte b3 = cast<byte>(value);
+                value = value >> 8u;
+                byte b2 = cast<byte>(value);
+                value = value >> 8u;
+                byte b1 = cast<byte>(value);
+                value = value >> 8u;
+                byte b0 = cast<byte>(value);
+                value = value >> 8u;
+                currentSection->EmitByte(0u);
+                currentSection->EmitByte(0u);
+                currentSection->EmitByte(0u);
+                currentSection->EmitByte(0u);
+                currentSection->EmitByte(b3);
+                currentSection->EmitByte(b2);
+                currentSection->EmitByte(b1);
+                currentSection->EmitByte(b0);
+            }
+        }
+        public override void Visit(At&)
+        {
+            currentValue = Value(cast<Value.Flag>(Value.Flag.pure | Value.Flag.address), currentSection->Address(), null);
+        }
+        public override void Visit(StringConstant& sc)
+        {
+            if (stage == Stage.bytes)
+            {
+                string s = ToUtf8(sc.value);
+                for (char c : s)
+                {
+                    currentSection->EmitByte(cast<byte>(c));
+                }
+            }
+            else
+            {
+                Error("string constant can appear only inside a BYTE instruction", sc.span);
+            }
+        }
+        public override void Visit(OperandList& operandList)
+        {
+            for (const UniquePtr<Node>& node : operandList.operands)
+            {
+                currentValue = Value();
+                node->Accept(*this);
+            }
+        }
+        public override void Visit(UnaryExpression& expr)
+        {
+            currentValue = Value();
+            expr.subject->Accept(*this);
+            if (currentValue.flags == Value.Flag.undefined)
+            {
+                Error("operand is undefined", expr.subject->span);
+            }
+            switch (expr.op)
+            {
+                case Operator.unaryPlus:
+                {
+                    break;
+                }
+                case Operator.unaryMinus:
+                {
+                    if (currentValue.GetFlag(Value.Flag.pure))
+                    {
+                        currentValue.value = cast<ulong>(-currentValue.value);
+                    }
+                    else
+                    {
+                        Error("unary minus needs pure operand", expr.span);
+                    }
+                    break;
+                }
+                case Operator.complement:
+                {
+                    if (currentValue.GetFlag(Value.Flag.pure))
+                    {
+                        currentValue.value = ~currentValue.value;
+                    }
+                    else
+                    {
+                        Error("complement needs pure operand", expr.span);
+                    }
+                    break;
+                }
+                case Operator.register:
+                {
+                    if (currentValue.value >= 0u && currentValue.value <= 255u && currentValue.GetFlag(Value.Flag.pure))
+                    {
+                        currentValue.SetRegister();
+                    }
+                    else
+                    {
+                        Error("invalid registerize operand", expr.span);
+                    }
+                    break;
+                }
+                case Operator.serial:
+                {
+                    Error("serial not implemented", expr.span);
+                    break;
+                }
+            }
+        }
+        public override void Visit(BinaryExpression& expr)
+        {
+            currentValue = Value();
+            expr.left->Accept(*this);
+            if (currentValue.flags == Value.Flag.undefined)
+            {
+                Error("left operand is undefined", expr.left->span);
+            }
+            Value leftValue = currentValue;
+            currentValue = Value();
+            expr.right->Accept(*this);
+            if (currentValue.flags == Value.Flag.undefined)
+            {
+                Error("right operand is undefined", expr.right->span);
+            }
+            Value rightValue = currentValue;
+            currentValue = Value();
+            switch (expr.op)
+            {
+                case Operator.multiply:
+                {
+                    if (leftValue.GetFlag(Value.Flag.pure) && rightValue.GetFlag(Value.Flag.pure))
+                    {
+                        currentValue = Value(Value.Flag.pure, leftValue.value * rightValue.value, null);
+                        if (leftValue.GetFlag(Value.Flag.address) || rightValue.GetFlag(Value.Flag.address))
+                        {
+                            currentValue.SetAddress();
+                        }
+                    }
+                    else
+                    {
+                        Error("multiplication needs pure operands", expr.span);
+                    }
+                    break;
+                }
+                case Operator.divide:
+                {
+                    if (leftValue.GetFlag(Value.Flag.pure) && rightValue.GetFlag(Value.Flag.pure))
+                    {
+                        currentValue = Value(Value.Flag.pure, leftValue.value / rightValue.value, null);
+                        if (leftValue.GetFlag(Value.Flag.address) || rightValue.GetFlag(Value.Flag.address))
+                        {
+                            currentValue.SetAddress();
+                        }
+                    }
+                    else
+                    {
+                        Error("division needs pure operands", expr.span);
+                    }
+                    break;
+                }
+                case Operator.modulus:
+                {
+                    if (leftValue.GetFlag(Value.Flag.pure) && rightValue.GetFlag(Value.Flag.pure))
+                    {
+                        currentValue = Value(Value.Flag.pure, leftValue.value % rightValue.value, null);
+                        if (leftValue.GetFlag(Value.Flag.address) || rightValue.GetFlag(Value.Flag.address))
+                        {
+                            currentValue.SetAddress();
+                        }
+                    }
+                    else
+                    {
+                        Error("modulus needs pure operands", expr.span);
+                    }
+                    break;
+                }
+                case Operator.shiftLeft:
+                {
+                    if (leftValue.GetFlag(Value.Flag.pure) && rightValue.GetFlag(Value.Flag.pure))
+                    {
+                        currentValue = Value(Value.Flag.pure, leftValue.value << rightValue.value, null);
+                        if (leftValue.GetFlag(Value.Flag.address) || rightValue.GetFlag(Value.Flag.address))
+                        {
+                            currentValue.SetAddress();
+                        }
+                    }
+                    else
+                    {
+                        Error("shift left needs pure operands", expr.span);
+                    }
+                    break;
+                }
+                case Operator.shiftRight:
+                {
+                    if (leftValue.GetFlag(Value.Flag.pure) && rightValue.GetFlag(Value.Flag.pure))
+                    {
+                        currentValue = Value(Value.Flag.pure, leftValue.value >> rightValue.value, null);
+                        if (leftValue.GetFlag(Value.Flag.address) || rightValue.GetFlag(Value.Flag.address))
+                        {
+                            currentValue.SetAddress();
+                        }
+                    }
+                    else
+                    {
+                        Error("shift right needs pure operands", expr.span);
+                    }
+                    break;
+                }
+                case Operator.bitwiseAnd:
+                {
+                    if (leftValue.GetFlag(Value.Flag.pure) && rightValue.GetFlag(Value.Flag.pure))
+                    {
+                        currentValue = Value(Value.Flag.pure, leftValue.value & rightValue.value, null);
+                        if (leftValue.GetFlag(Value.Flag.address) || rightValue.GetFlag(Value.Flag.address))
+                        {
+                            currentValue.SetAddress();
+                        }
+                    }
+                    else
+                    {
+                        Error("bitwise AND needs pure operands", expr.span);
+                    }
+                    break;
+                }
+                case Operator.bitwiseOr:
+                {
+                    if (leftValue.GetFlag(Value.Flag.pure) && rightValue.GetFlag(Value.Flag.pure))
+                    {
+                        currentValue = Value(Value.Flag.pure, leftValue.value | rightValue.value, null);
+                        if (leftValue.GetFlag(Value.Flag.address) || rightValue.GetFlag(Value.Flag.address))
+                        {
+                            currentValue.SetAddress();
+                        }
+                    }
+                    else
+                    {
+                        Error("bitwise OR needs pure operands", expr.span);
+                    }
+                    break;
+                }
+                case Operator.bitwiseXor:
+                {
+                    if (leftValue.GetFlag(Value.Flag.pure) && rightValue.GetFlag(Value.Flag.pure))
+                    {
+                        currentValue = Value(Value.Flag.pure, leftValue.value ^ rightValue.value, null);
+                        if (leftValue.GetFlag(Value.Flag.address) || rightValue.GetFlag(Value.Flag.address))
+                        {
+                            currentValue.SetAddress();
+                        }
+                    }
+                    else
+                    {
+                        Error("bitwise XOR needs pure operands", expr.span);
+                    }
+                    break;
+                }
+                case Operator.add:
+                {
+                    if (leftValue.GetFlag(Value.Flag.pure) && rightValue.GetFlag(Value.Flag.pure))
+                    {
+                        currentValue = Value(Value.Flag.pure, leftValue.value + rightValue.value, null);
+                        if (leftValue.GetFlag(Value.Flag.address) || rightValue.GetFlag(Value.Flag.address))
+                        {
+                            currentValue.SetAddress();
+                        }
+                    }
+                    else if (leftValue.flags == Value.Flag.register && rightValue.GetFlag(Value.Flag.pure))
+                    {
+                        currentValue = Value(Value.Flag.register, leftValue.value + rightValue.value, null);
+                    }
+                    else if (rightValue.flags == Value.Flag.register && leftValue.GetFlag(Value.Flag.pure))
+                    {
+                        currentValue = Value(Value.Flag.register, leftValue.value + rightValue.value, null);
+                    }
+                    else
+                    {
+                        Error("add operands must both be pure or either can be a register number", expr.span);
+                    }
+                    break;
+                }
+                case Operator.subtract:
+                {
+                    if (leftValue.GetFlag(Value.Flag.pure) && rightValue.GetFlag(Value.Flag.pure))
+                    {
+                        currentValue = Value(Value.Flag.pure, leftValue.value - rightValue.value, null);
+                        if (leftValue.GetFlag(Value.Flag.address) || rightValue.GetFlag(Value.Flag.address))
+                        {
+                            currentValue.SetAddress();
+                        }
+                    }
+                    else if (leftValue.flags == Value.Flag.register)
+                    {
+                        if (rightValue.GetFlag(Value.Flag.pure))
+                        {
+                            currentValue = Value(Value.Flag.register, leftValue.value - rightValue.value, null);
+                        }
+                        else if (rightValue.flags == Value.Flag.register)
+                        {
+                            currentValue = Value(Value.Flag.pure, leftValue.value - rightValue.value, null);
+                        }
+                        else
+                        {
+                            Error("subtract operands must both be pure or register numbers, or left can be a register number and right can be pure", expr.span);
+                        }
+                    }
+                    else
+                    {
+                        Error("add operands must both be pure or either can be a register number", expr.span);
+                    }
+                    break;
+                }
+                default:
+                {
+                    currentValue = Value();
+                    break;
+                }
+            }
+            if (currentValue.flags == Value.Flag.undefined)
+            {
+                Error("invalid binary expression", expr.span);
+            }
+            else if (currentValue.flags == Value.Flag.register)
+            {
+                if (!(currentValue.value >= 0u && currentValue.value <= 255u))
+                {
+                    Error("invalid binary expression register result", expr.span);
+                }
+            }
+        }
+        public override void Visit(ParenthesizedExpression& expr)
+        {
+            currentValue = Value();
+            expr.subject->Accept(*this);
+            if (currentValue.flags == Value.Flag.undefined)
+            {
+                Error("invalid parenthesized expression", expr.span);
+            }
+        }
+        private void AlignAt()
+        {
+            ulong alignment = 1u;
+            if (currentInstruction->opCode->value == WYDE)
+            {
+                alignment = 2u;
+            }
+            else if (currentInstruction->opCode->value == TETRA || currentInstruction->opCode->value < 256)
+            {
+                alignment = 4u;
+            }
+            else if (currentInstruction->opCode->value == OCTA || currentInstruction->opCode->value == STRUCT)
+            {
+                alignment = 8u;
+            }
+            ulong at = currentSection->Address();
+            ulong a = at & (alignment - 1u);
+            if (a != 0u)
+            {
+                ulong offset = alignment - a;
+                for (ulong i = 0u; i < offset; ++i)
+                {
+                    currentSection->EmitByte(0u);
+                }
+            }
+        }
+        public Stage stage;
+        public Value currentValue;
+        public ObjectFile objectFile;
+        public Section* currentSection;
+        public Symbol* currentSymbol;
+        public Segment currentSegment;
+        private Symbol* currentFunctionSymbol;
+        private Symbol* currentStructureSymbol;
+        private Instruction* currentInstruction;
+    }
+}

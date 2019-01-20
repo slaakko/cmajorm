@@ -1,0 +1,76 @@
+// =================================
+// Copyright (c) 2019 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+[hpp]#include <cmajor/ast/Function.hpp>
+[hpp]#include <cmajor/parser/ParsingContext.hpp>
+[hpp]#include <cmajor/parser/Attribute.hpp>
+[cpp]#include <cmajor/parser/Specifier.hpp>
+[cpp]#include <cmajor/parser/TypeExpr.hpp>
+[cpp]#include <cmajor/parser/Concept.hpp>
+[cpp]#include <cmajor/parser/Identifier.hpp>
+[cpp]#include <cmajor/parser/Template.hpp>
+[cpp]#include <cmajor/parser/Parameter.hpp>
+[cpp]#include <cmajor/parser/Statement.hpp>
+
+namespace cmajor.parser
+{
+    [hpp]using namespace cmajor::ast;
+
+    grammar Function
+    {
+        using Attribute.Attributes;
+        using Specifier.Specifiers;
+        using TypeExpr.TypeExpr;
+        using Template.TemplateParameterList;
+        using Concept.WhereConstraint;
+        using Parameter.ParameterList;
+        using Identifier.Identifier;
+        using Statement.CompoundStatement;
+        
+        Function(ParsingContext* ctx, var std::unique_ptr<FunctionNode> fun, var Span s, var Span specifierSpan, var Span groupIdSpan, var std::unique_ptr<Attributes> attributes) : FunctionNode*
+            ::= (((Attributes{ attributes.reset(Attributes); })? Specifiers{ specifierSpan = span; } TypeExpr(ctx) FunctionGroupId(ctx)
+                { 
+                    groupIdSpan = span;
+                    fun.reset(new FunctionNode(span, Specifiers, TypeExpr, FunctionGroupId, attributes.release())); 
+                    fun->SetSpecifierSpan(specifierSpan);
+                    fun->SetGroupIdSpan(groupIdSpan);
+                }
+                TemplateParameterList(ctx, fun.get())?
+                ParameterList(ctx, fun.get())){ fun->GetSpan() = span; }
+                (WhereConstraint(ctx){ fun->SetConstraint(WhereConstraint); })?
+                (CompoundStatement(ctx){ fun->SetBody(CompoundStatement); } | ';')){ value = fun.release(); }
+            ;
+
+        FunctionGroupId(ParsingContext* ctx, var std::unique_ptr<IdentifierNode> id) : std::u32string
+            ::= Identifier{ id.reset(Identifier); value = std::u32string(matchBegin, matchEnd); }
+            |   OperatorFunctionGroupId(ctx){ value = OperatorFunctionGroupId; }
+            ;
+
+        OperatorFunctionGroupId(ParsingContext* ctx, var std::unique_ptr<Node> typeExpr) : std::u32string
+            ::= keyword("operator")
+            (   ("<<" - ('<' '<' (TypeExpr(ctx){ typeExpr.reset(TypeExpr); } % ',') '>')){ value = ToUtf32("operator<<"); }
+            |   ">>"{ value = ToUtf32("operator>>"); }
+            |   "=="{ value = ToUtf32("operator=="); }
+            |   '='{ value = ToUtf32("operator="); }
+            |   '<'{ value = ToUtf32("operator<"); }
+            |   "->"{ value = ToUtf32("operator->"); }
+            |   "++"{ value = ToUtf32("operator++"); }
+            |   "--"{ value = ToUtf32("operator--"); }
+            |   '+'{ value = ToUtf32("operator+"); }
+            |   '-'{ value = ToUtf32("operator-"); }
+            |   '*'{ value = ToUtf32("operator*"); }
+            |   '/'{ value = ToUtf32("operator/"); }
+            |   '%'{ value = ToUtf32("operator%"); }
+            |   '&'{ value = ToUtf32("operator&"); }
+            |   '|'{ value = ToUtf32("operator|"); }
+            |   '^'{ value = ToUtf32("operator^"); }
+            |   '!'{ value = ToUtf32("operator!"); }
+            |   '~'{ value = ToUtf32("operator~"); }
+            |   ('[' ']'){ value = ToUtf32("operator[]"); }
+            |   ('(' ')'){ value = ToUtf32("operator()"); }
+            )
+            ;
+    }
+}

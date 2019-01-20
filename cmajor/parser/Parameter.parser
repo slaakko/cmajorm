@@ -1,0 +1,28 @@
+// =================================
+// Copyright (c) 2019 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+[hpp]#include <cmajor/ast/Parameter.hpp>
+[hpp]#include <cmajor/parser/ParsingContext.hpp>
+[cpp]#include <cmajor/parser/TypeExpr.hpp>
+[cpp]#include <cmajor/parser/Identifier.hpp>
+
+namespace cmajor.parser
+{
+    [hpp]using namespace cmajor::ast;
+
+    grammar Parameter
+    {
+        using TypeExpr.TypeExpr;
+        using Identifier.Identifier;
+        
+        ParameterList(ParsingContext* ctx, Node* owner)
+            ::= '(' (Parameter(ctx){ owner->AddParameter(Parameter); } % ',')? ')'!
+            ;
+
+        Parameter(ParsingContext* ctx) : ParameterNode*
+            ::= (TypeExpr(ctx) Identifier?){ value = new ParameterNode(span, TypeExpr, Identifier); }
+            ;
+    }
+}

@@ -1,0 +1,972 @@
+<html>
+    <head>
+        <meta charset="utf-8"/>
+        <title>ParsingObject Abstract Class</title>
+        <link href="../style/style.css" rel="stylesheet" type="text/css"/>
+        <script src="class_ParsingObject_D6A163B08653CF53190C94952F145DFC2EB09994_inheritance.js" type="text/javascript"> </script>
+    </head>
+    <body onload="drawClassInheritanceDiagram()">
+        <a href="../index.html">index</a>
+         | <a href="namespace_parsing_D308EED43E54B87FB52D88ADF3DA7F4E649CD021.html">up</a>
+         | <a href="class_ParsingException_57CF6A8A19B3FBD26E856AD514411D55B6CC678E.html">prev</a>
+         | <a href="class_PositiveParser_63879E81F68ACDACC236983337A632B166B5E76B.html">next</a>
+        <hr/>
+        <h1>ParsingObject Abstract Class</h1>
+        <div class="diagram">
+            <svg height="0" id="classInheritanceDiagram" version="2.0" width="0" xmlns="http://www.w3.org/2000/svg"/>
+        </div>
+        <span>
+            Definition at line <a href="file/parsing/ParsingObject.hpp_E29603879D4D8E45C699EE6405594EAAE47411A6.html#40">40</a>
+             of <a href="file/parsing/ParsingObject.hpp_E29603879D4D8E45C699EE6405594EAAE47411A6.html">ParsingObject.hpp</a>
+        </span>
+        <br/>
+        <h2>Constructors</h2>
+        <table class="constructorTable">
+            <tr>
+                <td class="constructorTableFirstCol" xml:space="preserve"><a href="class_ParsingObject_D6A163B08653CF53190C94952F145DFC2EB09994.html#constructor_ParsingObject_FCEB8DEA023EE589E407216151950A39E785691F">ParsingObject</a>(<span class="kw">const </span>std::u32string&amp; name_, <a href="enum_ObjectKind_4E3C274E727BBC38DFFBE3508C3328AFBB7EA698.html">ObjectKind</a> kind_)</td>
+            </tr>
+            <tr>
+                <td class="constructorTableFirstCol" xml:space="preserve"><a href="class_ParsingObject_D6A163B08653CF53190C94952F145DFC2EB09994.html#constructor_ParsingObject_A1C3FBF53E1E4BD2B4427F67E9472B2E1FD56EE2">ParsingObject</a>(<span class="kw">const </span>std::u32string&amp; name_, <a href="class_Scope_68666B1670BB0A45FDFC7BC194F5263DA68C727E.html">Scope</a>* enclosingScope_, <a href="enum_ObjectKind_4E3C274E727BBC38DFFBE3508C3328AFBB7EA698.html">ObjectKind</a> kind_)</td>
+            </tr>
+        </table>
+        <h2>Member Functions</h2>
+        <table class="functionTable">
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_ParsingObject_D6A163B08653CF53190C94952F145DFC2EB09994.html#function_Accept_88D5312B9AC0D8ABEF9C1BC6FC339655D21D3F15">Accept</a>(<a href="class_Visitor_9FF4E73241464BB90D8C7FBE81C08324A94EDF37.html">Visitor</a>&amp; visitor) <span class="kw">pure virtual</span></td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_ParsingObject_D6A163B08653CF53190C94952F145DFC2EB09994.html#function_AddToScope_0A935B888A9C4705EA43BFDD4B6CF8DC910DB123">AddToScope</a>() <span class="kw">virtual</span></td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><a href="class_Scope_68666B1670BB0A45FDFC7BC194F5263DA68C727E.html">Scope</a>*</td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_ParsingObject_D6A163B08653CF53190C94952F145DFC2EB09994.html#function_EnclosingScope_3FAC0A8976088D71E44D510E32B4149DC9175788">EnclosingScope</a>() <span class="kw">const</span></td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve">std::u32string</td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_ParsingObject_D6A163B08653CF53190C94952F145DFC2EB09994.html#function_FullName_1AF5AF1F96E29EB313D0A0B5CEAA9C4E8B99A2D9">FullName</a>() <span class="kw">const virtual</span></td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><a href="class_Scope_68666B1670BB0A45FDFC7BC194F5263DA68C727E.html">Scope</a>*</td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_ParsingObject_D6A163B08653CF53190C94952F145DFC2EB09994.html#function_GetScope_E2C3A8746ACE512A20BAB42302FAE70116421BE9">GetScope</a>() <span class="kw">const</span></td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">const </span><a href="class_Span_9CED8370AAA8B01E09FBC8A63AD262084B91FD78.html">Span</a>&amp;</td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_ParsingObject_D6A163B08653CF53190C94952F145DFC2EB09994.html#function_GetSpan_29E61A918F82D49AE9E91831B93D056289D92999">GetSpan</a>() <span class="kw">const</span></td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">bool</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_ParsingObject_D6A163B08653CF53190C94952F145DFC2EB09994.html#function_IsActionParser_5212594E653ADA28DD947922829C100B420C9B93">IsActionParser</a>() <span class="kw">const virtual</span></td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">bool</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_ParsingObject_D6A163B08653CF53190C94952F145DFC2EB09994.html#function_IsExternal_1DDF3FA2661E10860A0E04AAA21D4BE94A03284B">IsExternal</a>() <span class="kw">const</span></td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">bool</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_ParsingObject_D6A163B08653CF53190C94952F145DFC2EB09994.html#function_IsNamespace_B8794498C322CC97CAA2AE215463E0DE31205086">IsNamespace</a>() <span class="kw">const virtual</span></td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">bool</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_ParsingObject_D6A163B08653CF53190C94952F145DFC2EB09994.html#function_IsNonterminalParser_130164F79F82F4A85176B27BD990F3EB9AF04354">IsNonterminalParser</a>() <span class="kw">const virtual</span></td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">bool</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_ParsingObject_D6A163B08653CF53190C94952F145DFC2EB09994.html#function_IsOwned_2424594EAF10B7D7775BFA1275A5732EEE42866C">IsOwned</a>() <span class="kw">const</span></td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">bool</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_ParsingObject_D6A163B08653CF53190C94952F145DFC2EB09994.html#function_IsRule_22603152F4DFC5E73FAE90DCD5A66AC4E159431C">IsRule</a>() <span class="kw">const virtual</span></td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">bool</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_ParsingObject_D6A163B08653CF53190C94952F145DFC2EB09994.html#function_IsRuleLink_C0FBB7E29493DA4AC89F279215602A2C106F53E8">IsRuleLink</a>() <span class="kw">const virtual</span></td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><a href="enum_ObjectKind_4E3C274E727BBC38DFFBE3508C3328AFBB7EA698.html">ObjectKind</a></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_ParsingObject_D6A163B08653CF53190C94952F145DFC2EB09994.html#function_Kind_326C27D30F1AE1EBBA5659B164400B0F690E49DD">Kind</a>() <span class="kw">const</span></td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">const </span>std::u32string&amp;</td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_ParsingObject_D6A163B08653CF53190C94952F145DFC2EB09994.html#function_Name_54BD2CEF1D280CD3A6A763515B891CC7C7909DE8">Name</a>() <span class="kw">const</span></td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_ParsingObject_D6A163B08653CF53190C94952F145DFC2EB09994.html#function_Own_F4C61B6E093734D4BFE8339EB42030BDCB47782A">Own</a>(<a href="class_ParsingObject_D6A163B08653CF53190C94952F145DFC2EB09994.html">ParsingObject</a>* object)</td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">int</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_ParsingObject_D6A163B08653CF53190C94952F145DFC2EB09994.html#function_Owner_23B834CA26D32802B530C251A425B10C70A0F46D">Owner</a>() <span class="kw">const</span></td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_ParsingObject_D6A163B08653CF53190C94952F145DFC2EB09994.html#function_ResetOwned_6ED02A3DD7DBE0D802AEB402D26DBF6C25049C58">ResetOwned</a>()</td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_ParsingObject_D6A163B08653CF53190C94952F145DFC2EB09994.html#function_SetEnclosingScope_A3C4A90020FD6CE0FFDA7C8A5B81DF77D61D6B61">SetEnclosingScope</a>(<a href="class_Scope_68666B1670BB0A45FDFC7BC194F5263DA68C727E.html">Scope</a>* enclosingScope_)</td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_ParsingObject_D6A163B08653CF53190C94952F145DFC2EB09994.html#function_SetExternal_A6EACAE0EAD9E6468FFF67039E0D3733B04DDB20">SetExternal</a>()</td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_ParsingObject_D6A163B08653CF53190C94952F145DFC2EB09994.html#function_SetName_CC34233166420E36937852D5823CAFE64477FC81">SetName</a>(<span class="kw">const </span>std::u32string&amp; name_)</td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_ParsingObject_D6A163B08653CF53190C94952F145DFC2EB09994.html#function_SetOwned_6CA689E33638EBA67141B47B38040183177518A2">SetOwned</a>()</td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_ParsingObject_D6A163B08653CF53190C94952F145DFC2EB09994.html#function_SetOwner_438B0F471AFCD644619D44F10D67A1265FDF5D48">SetOwner</a>(<span class="kw">int</span> owner_)</td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_ParsingObject_D6A163B08653CF53190C94952F145DFC2EB09994.html#function_SetScope_370D8AF79A55A085C4F3E05250E88802E275C9B5">SetScope</a>(<a href="class_Scope_68666B1670BB0A45FDFC7BC194F5263DA68C727E.html">Scope</a>* scope_)</td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_ParsingObject_D6A163B08653CF53190C94952F145DFC2EB09994.html#function_SetSpan_2549F152EC67F9C2DB52DAAFCF96A0204D869518">SetSpan</a>(<span class="kw">const </span><a href="class_Span_9CED8370AAA8B01E09FBC8A63AD262084B91FD78.html">Span</a>&amp; span_)</td>
+            </tr>
+        </table>
+        <h2>Member Variables</h2>
+        <table>
+            <tr id="variable_enclosingScope_4E2D703B6DC3C6497668C70DC29BF0DF8DBFC5B9">
+                <td class="functionTableFirstCol" xml:space="preserve"><a href="class_Scope_68666B1670BB0A45FDFC7BC194F5263DA68C727E.html">Scope</a>*</td>
+                <td class="functionTableSecondCol" xml:space="preserve">enclosingScope</td>
+            </tr>
+            <tr id="variable_external_E2FEDA50E835E3159312186E8B1AF2C1BE44592C">
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">const </span><span class="kw">int</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve">external <span class="kw">static</span></td>
+            </tr>
+            <tr id="variable_isOwned_6C3E99A7CF5D63A9F6758209E8F8B9AC2B1B0DA5">
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">bool</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve">isOwned</td>
+            </tr>
+            <tr id="variable_kind_86289623712BAA2E1AEBC23C5EC637832D42B62D">
+                <td class="functionTableFirstCol" xml:space="preserve"><a href="enum_ObjectKind_4E3C274E727BBC38DFFBE3508C3328AFBB7EA698.html">ObjectKind</a></td>
+                <td class="functionTableSecondCol" xml:space="preserve">kind</td>
+            </tr>
+            <tr id="variable_name_DF4F72CD9C2BE0915DB5BC1925290004F9C76262">
+                <td class="functionTableFirstCol" xml:space="preserve">std::u32string</td>
+                <td class="functionTableSecondCol" xml:space="preserve">name</td>
+            </tr>
+            <tr id="variable_ownedObjects_C1ADBF2161DA35035FE6C3871F0C375CC461E144">
+                <td class="functionTableFirstCol" xml:space="preserve">std::vector&lt;std::unique_ptr&lt;<a href="class_ParsingObject_D6A163B08653CF53190C94952F145DFC2EB09994.html">ParsingObject</a>>></td>
+                <td class="functionTableSecondCol" xml:space="preserve">ownedObjects</td>
+            </tr>
+            <tr id="variable_owner_1B8C873C4408ECF119EFF36EE04A5CE3E3F52AD7">
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">int</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve">owner</td>
+            </tr>
+            <tr id="variable_scope_6B3B1A24BB5E1296FA4522697EF64A6ED1F37B79">
+                <td class="functionTableFirstCol" xml:space="preserve"><a href="class_Scope_68666B1670BB0A45FDFC7BC194F5263DA68C727E.html">Scope</a>*</td>
+                <td class="functionTableSecondCol" xml:space="preserve">scope</td>
+            </tr>
+            <tr id="variable_span_5571AEE5D622FCB2A6299B8488FB77EBF8B4CF2A">
+                <td class="functionTableFirstCol" xml:space="preserve"><a href="class_Span_9CED8370AAA8B01E09FBC8A63AD262084B91FD78.html">Span</a></td>
+                <td class="functionTableSecondCol" xml:space="preserve">span</td>
+            </tr>
+        </table>
+        <hr/>
+        <h2>Constructor Details</h2>
+        <h3 id="constructor_ParsingObject_FCEB8DEA023EE589E407216151950A39E785691F">ParsingObject Constructor</h3>
+        <h4>
+            cmajor::parsing::ParsingObject::ParsingObject(<span class="kw">const </span>
+            std::u32string&amp; name_, <a href="enum_ObjectKind_4E3C274E727BBC38DFFBE3508C3328AFBB7EA698.html">ObjectKind</a>
+             kind_)</h4>
+        <span>
+            Definition at line <a href="file/parsing/ParsingObject.cpp_70092E68057C0624E84C80B51D49C293642FFB31.html#12">12</a>
+             of <a href="file/parsing/ParsingObject.cpp_70092E68057C0624E84C80B51D49C293642FFB31.html">ParsingObject.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">12</span>&nbsp;<span class="other">:</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">13</span>&nbsp;<a href="class_ParsingObject_D6A163B08653CF53190C94952F145DFC2EB09994.html#variable_kind_86289623712BAA2E1AEBC23C5EC637832D42B62D">kind</a><span class="other">(</span><span class="identifier">kind_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="class_ParsingObject_D6A163B08653CF53190C94952F145DFC2EB09994.html#variable_name_DF4F72CD9C2BE0915DB5BC1925290004F9C76262">name</a><span class="other">(</span><span class="identifier">name_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="class_ParsingObject_D6A163B08653CF53190C94952F145DFC2EB09994.html#variable_owner_1B8C873C4408ECF119EFF36EE04A5CE3E3F52AD7">owner</a><span class="other">(</span><a href="class_ParsingObject_D6A163B08653CF53190C94952F145DFC2EB09994.html#variable_external_E2FEDA50E835E3159312186E8B1AF2C1BE44592C">external</a><span class="other">)</span><span class="other">,&nbsp;</span><a href="class_ParsingObject_D6A163B08653CF53190C94952F145DFC2EB09994.html#variable_isOwned_6C3E99A7CF5D63A9F6758209E8F8B9AC2B1B0DA5">isOwned</a><span class="other">(</span><span class="kw">false</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="class_ParsingObject_D6A163B08653CF53190C94952F145DFC2EB09994.html#variable_enclosingScope_4E2D703B6DC3C6497668C70DC29BF0DF8DBFC5B9">enclosingScope</a><span class="other">(</span><span class="kw">nullptr</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="class_ParsingObject_D6A163B08653CF53190C94952F145DFC2EB09994.html#variable_scope_6B3B1A24BB5E1296FA4522697EF64A6ED1F37B79">scope</a><span class="other">(</span><span class="kw">nullptr</span><span class="other">)</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">14</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">15</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/parsing/ParsingObject.hpp_E29603879D4D8E45C699EE6405594EAAE47411A6.html#44">44</a>
+             of <a href="file/parsing/ParsingObject.hpp_E29603879D4D8E45C699EE6405594EAAE47411A6.html">ParsingObject.hpp</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="constructor_ParsingObject_A1C3FBF53E1E4BD2B4427F67E9472B2E1FD56EE2">ParsingObject Constructor</h3>
+        <h4>
+            cmajor::parsing::ParsingObject::ParsingObject(<span class="kw">const </span>
+            std::u32string&amp; name_, <a href="class_Scope_68666B1670BB0A45FDFC7BC194F5263DA68C727E.html">Scope</a>
+            * enclosingScope_, <a href="enum_ObjectKind_4E3C274E727BBC38DFFBE3508C3328AFBB7EA698.html">ObjectKind</a>
+             kind_)</h4>
+        <span>
+            Definition at line <a href="file/parsing/ParsingObject.cpp_70092E68057C0624E84C80B51D49C293642FFB31.html#17">17</a>
+             of <a href="file/parsing/ParsingObject.cpp_70092E68057C0624E84C80B51D49C293642FFB31.html">ParsingObject.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">17</span>&nbsp;<span class="other">:</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">18</span>&nbsp;<a href="class_ParsingObject_D6A163B08653CF53190C94952F145DFC2EB09994.html#variable_kind_86289623712BAA2E1AEBC23C5EC637832D42B62D">kind</a><span class="other">(</span><span class="identifier">kind_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="class_ParsingObject_D6A163B08653CF53190C94952F145DFC2EB09994.html#variable_name_DF4F72CD9C2BE0915DB5BC1925290004F9C76262">name</a><span class="other">(</span><span class="identifier">name_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="class_ParsingObject_D6A163B08653CF53190C94952F145DFC2EB09994.html#variable_owner_1B8C873C4408ECF119EFF36EE04A5CE3E3F52AD7">owner</a><span class="other">(</span><a href="class_ParsingObject_D6A163B08653CF53190C94952F145DFC2EB09994.html#variable_external_E2FEDA50E835E3159312186E8B1AF2C1BE44592C">external</a><span class="other">)</span><span class="other">,&nbsp;</span><a href="class_ParsingObject_D6A163B08653CF53190C94952F145DFC2EB09994.html#variable_isOwned_6C3E99A7CF5D63A9F6758209E8F8B9AC2B1B0DA5">isOwned</a><span class="other">(</span><span class="kw">false</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="class_ParsingObject_D6A163B08653CF53190C94952F145DFC2EB09994.html#variable_enclosingScope_4E2D703B6DC3C6497668C70DC29BF0DF8DBFC5B9">enclosingScope</a><span class="other">(</span><span class="identifier">enclosingScope_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="class_ParsingObject_D6A163B08653CF53190C94952F145DFC2EB09994.html#variable_scope_6B3B1A24BB5E1296FA4522697EF64A6ED1F37B79">scope</a><span class="other">(</span><span class="kw">nullptr</span><span class="other">)</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">19</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">20</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/parsing/ParsingObject.hpp_E29603879D4D8E45C699EE6405594EAAE47411A6.html#45">45</a>
+             of <a href="file/parsing/ParsingObject.hpp_E29603879D4D8E45C699EE6405594EAAE47411A6.html">ParsingObject.hpp</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h2>Member Function Details</h2>
+        <h3 id="function_Accept_88D5312B9AC0D8ABEF9C1BC6FC339655D21D3F15">Accept Member Function</h3>
+        <h4>
+            <span class="kw">void</span>
+             cmajor::parsing::ParsingObject::Accept(<a href="class_Visitor_9FF4E73241464BB90D8C7FBE81C08324A94EDF37.html">Visitor</a>
+            &amp; visitor) <span class="kw">pure virtual</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/parsing/ParsingObject.hpp_E29603879D4D8E45C699EE6405594EAAE47411A6.html#47">47</a>
+             of <a href="file/parsing/ParsingObject.hpp_E29603879D4D8E45C699EE6405594EAAE47411A6.html">ParsingObject.hpp</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Derived class overrides: <a href="class_ActionParser_B6A250ED3D57DDC5182D3242ABEA122A032DDE3F.html#function_Accept_90CC77DF732BF3D531B718FB005C5F9817277636">cmajor::parsing::ActionParser::Accept</a>
+            , <a href="class_AlphabeticParser_DBD67FC75A9229827DF986E40A19F9FF82453303.html#function_Accept_8FA0FD938C6A7987C48ABAA4778D9E2760B1F853">cmajor::parsing::AlphabeticParser::Accept</a>
+            , <a href="class_AlternativeParser_1090BF2BD33AD2523B1E0E73B7458AB6FC84D7BC.html#function_Accept_C8A68FBB23E9E530F804A6A817E80552E484BA99">cmajor::parsing::AlternativeParser::Accept</a>
+            , <a href="class_AnyCharParser_966AC367D15DA51629FDC642B1E329BA3FD53C8D.html#function_Accept_D4E118FC9409A6193D9FACF22FDA5DAA224B031A">cmajor::parsing::AnyCharParser::Accept</a>
+            , <a href="class_BaseCharParser_43995E8BEB3EEB0EBF60EF639DB2E655C29AED48.html#function_Accept_50F3A7361F83A5C618B27F3C10A752C0F5ABCB86">cmajor::parsing::BaseCharParser::Accept</a>
+            , <a href="class_CasedLetterParser_1F97DDF3E2F9A98E33BC9D31A55EB1C622258BD4.html#function_Accept_FEFF3EB632287AF9D4099EEA1990604A77865155">cmajor::parsing::CasedLetterParser::Accept</a>
+            , <a href="class_CharParser_4BE81992B401971DBE477A1CF33C6D78756AD750.html#function_Accept_F165DE27BDBC62106D1789B0C8A673CC3A22E631">cmajor::parsing::CharParser::Accept</a>
+            , <a href="class_CharSetParser_9F0D26BD8BF9D8E76C98F61C5F36070E23455341.html#function_Accept_E46F6C221D8512237F00E3EFCD1B0103ADF758AB">cmajor::parsing::CharSetParser::Accept</a>
+            , <a href="class_ClosePunctuationParser_89D89F8972BB7BF6FE769105870C29E72B067547.html#function_Accept_119EDF995A7ECFCAD5A3B4A6E813584B9D6FC4AD">cmajor::parsing::ClosePunctuationParser::Accept</a>
+            , <a href="class_ConnectorPunctuationParser_68C5E85307992489A22E477071248D91A6EA3928.html#function_Accept_D29DC88C78296C1AB396E08112B4131A3CED71CF">cmajor::parsing::ConnectorPunctuationParser::Accept</a>
+            , <a href="class_ControlParser_62E6C9DA41378B57BFBE7826371B59C26677CDA8.html#function_Accept_2AA432D8D433567F6FEF1FD03C39123C2BE04863">cmajor::parsing::ControlParser::Accept</a>
+            , <a href="class_CurrencySymbolParser_2008E4F4392C2A0DEF0DEA115616C8CF26307E96.html#function_Accept_E15B03B7B8804392ACAE861D1E0840B9D3672357">cmajor::parsing::CurrencySymbolParser::Accept</a>
+            , <a href="class_DashPunctuationParser_79EA4E37B878681F7F553BB300997E32BD9842F1.html#function_Accept_EF9B35C42148C967691C148975BC3BC87E214DAB">cmajor::parsing::DashPunctuationParser::Accept</a>
+            , <a href="class_DecimalNumberParser_0CA9397D4B9333665A46B5E869655DE6CDFAFEE5.html#function_Accept_2DC83D2729FFA32574466E80DA0084EFCEEBDF2F">cmajor::parsing::DecimalNumberParser::Accept</a>
+            , <a href="class_DifferenceParser_105910B4FB1C28FBAF58426CD456E1A7825795BE.html#function_Accept_A781BAEF26FD1B93D3F054911DA6D5B851717AF5">cmajor::parsing::DifferenceParser::Accept</a>
+            , <a href="class_DigitParser_622518B4627B415AC6C64215870B1AE6A58D3F84.html#function_Accept_43F619337BE90EF8CC897E373B96677C6E689A47">cmajor::parsing::DigitParser::Accept</a>
+            , <a href="class_EmptyParser_53D2FDFB6022D514A1ED2FE488B01C152604B4AF.html#function_Accept_8BCFF4D1086C2569D817DFC3D6B403036FC347BA">cmajor::parsing::EmptyParser::Accept</a>
+            , <a href="class_EnclosingMarkParser_65E76E2ED6D53284CF44FC497269483E191F4971.html#function_Accept_8F4A5EA0FAAC62015634E736E7512D324FB3D0A1">cmajor::parsing::EnclosingMarkParser::Accept</a>
+            , <a href="class_ExclusiveOrParser_799255ABFFE1FA900A013E8241D5EE6F9AB671DD.html#function_Accept_76C6B39DC03AADF0481B4E4933A48343BC775352">cmajor::parsing::ExclusiveOrParser::Accept</a>
+            , <a href="class_ExpectationParser_A1807FD9E51C0E023034FC9532AF9EC10E43530F.html#function_Accept_10BDC53CA806EF51C418A21D6A0B480439D35777">cmajor::parsing::ExpectationParser::Accept</a>
+            , <a href="class_FinalPunctuationParser_8C5A00039206229A7C766BA6DCFE9AC95FAC68A8.html#function_Accept_5173D1C39EDB5308841E586CE754E2678423C3C0">cmajor::parsing::FinalPunctuationParser::Accept</a>
+            , <a href="class_FormatParser_4AFAEDD502DD9D8DC21158B551E989F54BE2C7E8.html#function_Accept_066989DE8F0A58FF8FA391001CC8DA7330A3E264">cmajor::parsing::FormatParser::Accept</a>
+            , <a href="class_GraphicParser_4E65ABD96CFBE2ECAFBDD0CCE3DD30A9EB8A0B6E.html#function_Accept_6D762100336B3BC82FC0C95A3B31EB4B53A2A06B">cmajor::parsing::GraphicParser::Accept</a>
+            , <a href="class_GroupingParser_A8003CAAA9F02E532229862E28DA2F07EED88B30.html#function_Accept_EF3F01B65F4836D29C905917B4AFD9FAEC1F210F">cmajor::parsing::GroupingParser::Accept</a>
+            , <a href="class_HexDigitParser_565141D9BDA2CC46E7B1F56F7C90F97D3FD2FDDB.html#function_Accept_A659FC296013E83EA0DF04FD73C4A181F3AFF160">cmajor::parsing::HexDigitParser::Accept</a>
+            , <a href="class_IdContParser_6470AC60E9210A8858739E7895BF7C5167434F05.html#function_Accept_AF243216891E57C218EA2BE2385CF9BAF6EC09CF">cmajor::parsing::IdContParser::Accept</a>
+            , <a href="class_IdStartParser_C1757FCB4DCFB0C20ECD233ABFFA39DBBA7D2CFE.html#function_Accept_9C6014A83E785F3ADD267B15FF841304D6141717">cmajor::parsing::IdStartParser::Accept</a>
+            , <a href="class_InitialPunctuationParser_40284E202DB252469254FA2C6D5C405E74C33CD7.html#function_Accept_5F36A06CFD31E78885215BD522E1A3961E45EBD4">cmajor::parsing::InitialPunctuationParser::Accept</a>
+            , <a href="class_IntersectionParser_B51FF660F70963DA1318EDAC167D050CF14C8753.html#function_Accept_136A3E1BD8281CC5898CB88A88B8CA3689F83202">cmajor::parsing::IntersectionParser::Accept</a>
+            , <a href="class_KeywordListParser_C3233C82E9F0E98A58E28C3F3A5B2C690A66B19B.html#function_Accept_224391CF16B31A09CC6740E3A706205BA6CA19AB">cmajor::parsing::KeywordListParser::Accept</a>
+            , <a href="class_KeywordParser_D0D445DF85E20066B09A63FC7A001AC6CABD2503.html#function_Accept_FCDA09E9136A3D8F01F73EE4D568F5153F023050">cmajor::parsing::KeywordParser::Accept</a>
+            , <a href="class_KleeneStarParser_E261C278FCDAD7DCF139EC5EF7E1934F3BAE7E9D.html#function_Accept_7430116A1AEB623E43415D62FEB1F33C93F6FCFB">cmajor::parsing::KleeneStarParser::Accept</a>
+            , <a href="class_LetterNumberParser_AF635C50BFF1C75AD06476B161687930A9E0AFF3.html#function_Accept_3550E9BBE458EE75FF90728BAB4992D3475FA6E3">cmajor::parsing::LetterNumberParser::Accept</a>
+            , <a href="class_LetterParser_DAEBA9D0F9AC1374ACC0917544CCDDB988990337.html#function_Accept_0BFA236CD8CA12BF43FC8530DCCF59037A1C1B75">cmajor::parsing::LetterParser::Accept</a>
+            , <a href="class_LineSeparatorParser_2F3B3A35DDE3435E31CC1BA0FA6C9C6D17190F17.html#function_Accept_17FDC33263FAAFE61526AB5B43D7FA1767002407">cmajor::parsing::LineSeparatorParser::Accept</a>
+            , <a href="class_ListParser_D5F77527DE3B67C04A6DFC19D6B173C79A380FEB.html#function_Accept_FA200B6433DE139EE6210FE5296F947F08007B86">cmajor::parsing::ListParser::Accept</a>
+            , <a href="class_LowerLetterParser_E1E0AD007C9D113F630D5790DB1135BD580FA9BC.html#function_Accept_928A125703715CA11BEEF579573E2FC3BF22DCEE">cmajor::parsing::LowerLetterParser::Accept</a>
+            , <a href="class_MarkParser_2966397F120DD85857EAB715BBE2FF1E5E429A54.html#function_Accept_7BCA13AAF151B45254C682E8C6DF4A71C2BCC865">cmajor::parsing::MarkParser::Accept</a>
+            , <a href="class_MathSymbolParser_36F7039FF60581B9720E41D86764ABD2A5445FBF.html#function_Accept_AE215137FD941270EB7D7A19EEBC8CCD47B7A667">cmajor::parsing::MathSymbolParser::Accept</a>
+            , <a href="class_ModifierLetterParser_AE31FA2B10CB9C6ECD7E774CE1138E03E4B49633.html#function_Accept_99AEB628A11593BB4C7F99A07A70167FAE1D74A4">cmajor::parsing::ModifierLetterParser::Accept</a>
+            , <a href="class_ModifierSymbolParser_7771193D5A70752EF3F70569F5972A26CF45B30E.html#function_Accept_E7150FB2D5B5B073845C5C04C5B8E7162438DA4F">cmajor::parsing::ModifierSymbolParser::Accept</a>
+            , <a href="class_Namespace_8B05254A0CF9BE40D0D41360A7BDEF2684E03F5B.html#function_Accept_338F9B6E19F2A17FC3B3298EA4020A7889553C2C">cmajor::parsing::Namespace::Accept</a>
+            , <a href="class_NonspacingMarkParser_6724F88A511D3C2E03428DE17281731B51821ECF.html#function_Accept_FB88ECF3BB9C1BA0EC8AB351A0AA2F62F77651E3">cmajor::parsing::NonspacingMarkParser::Accept</a>
+            , <a href="class_NonterminalParser_56DD7EE360F8E2637FBB60CB429476F12426A97D.html#function_Accept_D8252C666F0197D6757DA5334D281BF39671B276">cmajor::parsing::NonterminalParser::Accept</a>
+            , <a href="class_NumberParser_8FB3147501E18E6F061250A0AD28DB965A56AA6C.html#function_Accept_EFAF5174824F4B2B3365FBF70043690833BB92DE">cmajor::parsing::NumberParser::Accept</a>
+            , <a href="class_OpenPunctuationParser_E3EB43090C2618FB0E7A6A07D47A92934D76FE71.html#function_Accept_20A3C001DD6D2D50FAF8330DE6AD665EC9129B7F">cmajor::parsing::OpenPunctuationParser::Accept</a>
+            , <a href="class_OptionalParser_6FD9978AB98EEA0493DCE3F83862941434CEA9B6.html#function_Accept_896B0376D263131AC73A3D784249E97C9F10B737">cmajor::parsing::OptionalParser::Accept</a>
+            , <a href="class_OtherLetterParser_7950919A66D5E00C876F858B4F3DFA0F3394E5D4.html#function_Accept_772CDE4EF6620FE68EBD1D77418AEEB2F39BB644">cmajor::parsing::OtherLetterParser::Accept</a>
+            , <a href="class_OtherNumberParser_7B8F1B90C801B86B7418BDBC84901F557716C053.html#function_Accept_6E6C651924EC2ACE5C4D6D51F144D1D3B0FA3CA3">cmajor::parsing::OtherNumberParser::Accept</a>
+            , <a href="class_OtherParser_2D40ABCA39753B14DFA5F71C7EA1F4AEB49761E4.html#function_Accept_7DFBE231AEE2580922EF5BD3BE9183BC94DCF8EC">cmajor::parsing::OtherParser::Accept</a>
+            , <a href="class_OtherPunctuationParser_B0F5E8D70B3232A07B50CF7015D9741E9A24CD23.html#function_Accept_64381ADCCB64B809ECE591F3484B5E119FD54260">cmajor::parsing::OtherPunctuationParser::Accept</a>
+            , <a href="class_OtherSymbolParser_CBBECC04A09D5FFC768FFD3DDCE00F352A2079C5.html#function_Accept_60D56F8C763EFBBDD0A15E9AF717AE45244EEA95">cmajor::parsing::OtherSymbolParser::Accept</a>
+            , <a href="class_ParagraphSeparatorParser_E8EE8D34FE541B8CD1238B67C7381C7B9E911911.html#function_Accept_44AE02FA10FD58F0D53B0F423D10E57FEC230D5C">cmajor::parsing::ParagraphSeparatorParser::Accept</a>
+            , <a href="class_ParsingDomain_61DCEDE37EC9E175977FD613BC12969D327A4FC4.html#function_Accept_4ED4CAF33D37E3729FB993CB8610FBF1B9D05BAF">cmajor::parsing::ParsingDomain::Accept</a>
+            , <a href="class_PositiveParser_63879E81F68ACDACC236983337A632B166B5E76B.html#function_Accept_62CA65905834656D08CBEF94353858FE58C70129">cmajor::parsing::PositiveParser::Accept</a>
+            , <a href="class_PrivateUseParser_82D4EABFC92C3C93E645EF8A1FAA806958018B48.html#function_Accept_B6C3282F8C433B3F5AC7CD6CAAC94212FDFB0EB5">cmajor::parsing::PrivateUseParser::Accept</a>
+            , <a href="class_PunctuationParser_F355812060F743CF3520EE91A32399C39059D124.html#function_Accept_FE88B4761C723F8C231E611E710FF0517D4FB054">cmajor::parsing::PunctuationParser::Accept</a>
+            , <a href="class_RangeParser_3E797A64F0DA1EDD340267FE2FB788216DE86929.html#function_Accept_73CD7FEB74C9DCF641E7C4B578493657FA9B4693">cmajor::parsing::RangeParser::Accept</a>
+            , <a href="class_Rule_16F872E2C86FFAE73C79F2ECDE26C7EB2A095DF3.html#function_Accept_A1065CCCCD8C6D0F324AB10578057CCD9F480162">cmajor::parsing::Rule::Accept</a>
+            , <a href="class_RuleLink_4C1C4E8A50B4AD7D8A4FB592BDFE76619BF0023D.html#function_Accept_0606DA9206A91ACE77761495DE458B2C072A4A61">cmajor::parsing::RuleLink::Accept</a>
+            , <a href="class_Scope_68666B1670BB0A45FDFC7BC194F5263DA68C727E.html#function_Accept_008DC731E752FEC2ACEE1E5FB14C8DD55A07AED9">cmajor::parsing::Scope::Accept</a>
+            , <a href="class_SeparatorParser_BBD5C188DDA429B54C1533BBE0055B3EB6B64F24.html#function_Accept_2802B3304C44E5A91FC1DC1020D7D990B290929B">cmajor::parsing::SeparatorParser::Accept</a>
+            , <a href="class_SequenceParser_EA74D30811182F9ABAD5FC03551D7EC1CDD358B1.html#function_Accept_13F0D8D0E455C6F1AF2122EAA5C7BF00F1CBCF92">cmajor::parsing::SequenceParser::Accept</a>
+            , <a href="class_SpaceParser_2D56FF50EDBA175EE4D1B62066D931E3AF3607E5.html#function_Accept_CAEA4318D4DC3AE27F61E042DFF4E25384D8C13B">cmajor::parsing::SpaceParser::Accept</a>
+            , <a href="class_SpaceSeparatorParser_3616F1C67A32BA805BCA3899974540AB456C0B69.html#function_Accept_9AA936C45067275B01D31507E00EC1BB9FBF1BFF">cmajor::parsing::SpaceSeparatorParser::Accept</a>
+            , <a href="class_SpacingMarkParser_B70EBAC8270B45938DCBD320634E7D82036278CA.html#function_Accept_50C865FD3DA71465589100C9B268ED1A368E0242">cmajor::parsing::SpacingMarkParser::Accept</a>
+            , <a href="class_StringParser_251C72604F4B6C0F336B2A336FFEBA97832B39C8.html#function_Accept_9C8D6F23D5B52FCAFF2259509CB01476C9AC5577">cmajor::parsing::StringParser::Accept</a>
+            , <a href="class_SurrogateParser_EEEE6FD3AAF15811E8689FDFD562906742A25B3A.html#function_Accept_9531E44C64A22EE589651617603B4547FB598808">cmajor::parsing::SurrogateParser::Accept</a>
+            , <a href="class_SymbolParser_D435345C40ABD46174EEC5CB661013DBD190FF34.html#function_Accept_E28AEBAB3CEDE598C73111115A51D04305009769">cmajor::parsing::SymbolParser::Accept</a>
+            , <a href="class_TitleLetterParser_7915A7AAA37ABC81FF96B2E591A9564D0017FC9F.html#function_Accept_9C81C3DEA3C8E792D277514337FCB3E43654309C">cmajor::parsing::TitleLetterParser::Accept</a>
+            , <a href="class_TokenParser_5AFF15A9767FCC122D6289E574586662CD693F8F.html#function_Accept_6FD16C73ACBC1AA856E9E410D3FCDF2969B69924">cmajor::parsing::TokenParser::Accept</a>
+            , <a href="class_UnassignedParser_12DE92AE1F080449970FA7D79588DEEE7CAFC4C4.html#function_Accept_57F5D4BF79691A4EA06E03DFB344C186411560C1">cmajor::parsing::UnassignedParser::Accept</a>
+            , <a href="class_UpperLetterParser_F40702C63245957A4A94A26B151A66E2C9438969.html#function_Accept_8FFC75588FDFCB8F11C7F5E5412D53401FB536F5">cmajor::parsing::UpperLetterParser::Accept</a>
+            , <a href="class_UsingObject_6D4A48BD51139CA67B48715BEDFB1CFF647DAF15.html#function_Accept_64E403E9F5BC5D15FA465709090A6849442CFFE9">cmajor::parsing::UsingObject::Accept</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Called by: <a href="class_ActionParser_B6A250ED3D57DDC5182D3242ABEA122A032DDE3F.html#function_Accept_90CC77DF732BF3D531B718FB005C5F9817277636">cmajor::parsing::ActionParser::Accept</a>
+            , <a href="class_AlternativeParser_1090BF2BD33AD2523B1E0E73B7458AB6FC84D7BC.html#function_Accept_C8A68FBB23E9E530F804A6A817E80552E484BA99">cmajor::parsing::AlternativeParser::Accept</a>
+            , <a href="class_DifferenceParser_105910B4FB1C28FBAF58426CD456E1A7825795BE.html#function_Accept_A781BAEF26FD1B93D3F054911DA6D5B851717AF5">cmajor::parsing::DifferenceParser::Accept</a>
+            , <a href="class_ExclusiveOrParser_799255ABFFE1FA900A013E8241D5EE6F9AB671DD.html#function_Accept_76C6B39DC03AADF0481B4E4933A48343BC775352">cmajor::parsing::ExclusiveOrParser::Accept</a>
+            , <a href="class_ExpectationParser_A1807FD9E51C0E023034FC9532AF9EC10E43530F.html#function_Accept_10BDC53CA806EF51C418A21D6A0B480439D35777">cmajor::parsing::ExpectationParser::Accept</a>
+            , <a href="class_GroupingParser_A8003CAAA9F02E532229862E28DA2F07EED88B30.html#function_Accept_EF3F01B65F4836D29C905917B4AFD9FAEC1F210F">cmajor::parsing::GroupingParser::Accept</a>
+            , <a href="class_IntersectionParser_B51FF660F70963DA1318EDAC167D050CF14C8753.html#function_Accept_136A3E1BD8281CC5898CB88A88B8CA3689F83202">cmajor::parsing::IntersectionParser::Accept</a>
+            , <a href="class_KleeneStarParser_E261C278FCDAD7DCF139EC5EF7E1934F3BAE7E9D.html#function_Accept_7430116A1AEB623E43415D62FEB1F33C93F6FCFB">cmajor::parsing::KleeneStarParser::Accept</a>
+            , <a href="class_ListParser_D5F77527DE3B67C04A6DFC19D6B173C79A380FEB.html#function_Accept_FA200B6433DE139EE6210FE5296F947F08007B86">cmajor::parsing::ListParser::Accept</a>
+            , <a href="class_OptionalParser_6FD9978AB98EEA0493DCE3F83862941434CEA9B6.html#function_Accept_896B0376D263131AC73A3D784249E97C9F10B737">cmajor::parsing::OptionalParser::Accept</a>
+            , <a href="class_PositiveParser_63879E81F68ACDACC236983337A632B166B5E76B.html#function_Accept_62CA65905834656D08CBEF94353858FE58C70129">cmajor::parsing::PositiveParser::Accept</a>
+            , <a href="class_Rule_16F872E2C86FFAE73C79F2ECDE26C7EB2A095DF3.html#function_Accept_A1065CCCCD8C6D0F324AB10578057CCD9F480162">cmajor::parsing::Rule::Accept</a>
+            , <a href="class_Scope_68666B1670BB0A45FDFC7BC194F5263DA68C727E.html#function_Accept_008DC731E752FEC2ACEE1E5FB14C8DD55A07AED9">cmajor::parsing::Scope::Accept</a>
+            , <a href="class_SequenceParser_EA74D30811182F9ABAD5FC03551D7EC1CDD358B1.html#function_Accept_13F0D8D0E455C6F1AF2122EAA5C7BF00F1CBCF92">cmajor::parsing::SequenceParser::Accept</a>
+            , <a href="class_TokenParser_5AFF15A9767FCC122D6289E574586662CD693F8F.html#function_Accept_6FD16C73ACBC1AA856E9E410D3FCDF2969B69924">cmajor::parsing::TokenParser::Accept</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_AddToScope_0A935B888A9C4705EA43BFDD4B6CF8DC910DB123">AddToScope Member Function</h3>
+        <h4>
+            <span class="kw">void</span>
+             cmajor::parsing::ParsingObject::AddToScope() <span class="kw">virtual</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/parsing/ParsingObject.cpp_70092E68057C0624E84C80B51D49C293642FFB31.html#58">58</a>
+             of <a href="file/parsing/ParsingObject.cpp_70092E68057C0624E84C80B51D49C293642FFB31.html">ParsingObject.cpp</a>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/parsing/ParsingObject.hpp_E29603879D4D8E45C699EE6405594EAAE47411A6.html#68">68</a>
+             of <a href="file/parsing/ParsingObject.hpp_E29603879D4D8E45C699EE6405594EAAE47411A6.html">ParsingObject.hpp</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Derived class overrides: <a href="class_RuleLink_4C1C4E8A50B4AD7D8A4FB592BDFE76619BF0023D.html#function_AddToScope_0DDBA0C6E9B64B81791FB43E63BB1B53AE2C6640">cmajor::parsing::RuleLink::AddToScope</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Calls: <a href="class_ParsingObject_D6A163B08653CF53190C94952F145DFC2EB09994.html#function_SetEnclosingScope_A3C4A90020FD6CE0FFDA7C8A5B81DF77D61D6B61">cmajor::parsing::ParsingObject::SetEnclosingScope</a>
+            , <a href="class_Scope_68666B1670BB0A45FDFC7BC194F5263DA68C727E.html#function_Add_BADFACB8591AA559097D6A75E1051D9E92D4226C">cmajor::parsing::Scope::Add</a>
+            , <a href="namespace_parsing_D308EED43E54B87FB52D88ADF3DA7F4E649CD021.html#function_ThrowException_EFCC16DADB9645D50571DF44BC3A6DD20E68A23D">cmajor::parsing::ThrowException</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Called by: <a href="class_ParsingDomain_61DCEDE37EC9E175977FD613BC12969D327A4FC4.html#function_AddGrammar_D5A3750C232A3FA4148996C0CB02FAAD86D659BC">cmajor::parsing::ParsingDomain::AddGrammar</a>
+            , <a href="class_Rule_16F872E2C86FFAE73C79F2ECDE26C7EB2A095DF3.html#function_AddAction_997B807018E9CF189DB01FD84D95386F5834DF70">cmajor::parsing::Rule::AddAction</a>
+            , <a href="class_Rule_16F872E2C86FFAE73C79F2ECDE26C7EB2A095DF3.html#function_AddNonterminal_395C4C7BF5314BC0C05A7F38231E21C18D56968E">cmajor::parsing::Rule::AddNonterminal</a>
+            , <a href="class_RuleLink_4C1C4E8A50B4AD7D8A4FB592BDFE76619BF0023D.html#function_AddToScope_0DDBA0C6E9B64B81791FB43E63BB1B53AE2C6640">cmajor::parsing::RuleLink::AddToScope</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_EnclosingScope_3FAC0A8976088D71E44D510E32B4149DC9175788">EnclosingScope Member Function</h3>
+        <h4>
+            <a href="class_Scope_68666B1670BB0A45FDFC7BC194F5263DA68C727E.html">Scope</a>
+            * cmajor::parsing::ParsingObject::EnclosingScope() <span class="kw">const</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/parsing/ParsingObject.hpp_E29603879D4D8E45C699EE6405594EAAE47411A6.html#59">59</a>
+             of <a href="file/parsing/ParsingObject.hpp_E29603879D4D8E45C699EE6405594EAAE47411A6.html">ParsingObject.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">59</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">enclosingScope</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Called by: <a href="class_Scope_68666B1670BB0A45FDFC7BC194F5263DA68C727E.html#function_FullName_F1F84C18F06679EE3629DC9771F34149F9675CAE">cmajor::parsing::Scope::FullName</a>
+            , <a href="class_Scope_68666B1670BB0A45FDFC7BC194F5263DA68C727E.html#function_GetGlobalScope_C026F29439CB04E338BE49EE545D89859C1AA22A">cmajor::parsing::Scope::GetGlobalScope</a>
+            , <a href="class_Scope_68666B1670BB0A45FDFC7BC194F5263DA68C727E.html#function_GetQualifiedObject_659B7DA7419FA836EC99F289FA86F6BD7CC7477F">cmajor::parsing::Scope::GetQualifiedObject</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_FullName_1AF5AF1F96E29EB313D0A0B5CEAA9C4E8B99A2D9">FullName Member Function</h3>
+        <h4>
+            std::u32string cmajor::parsing::ParsingObject::FullName() <span class="kw">const virtual</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/parsing/ParsingObject.cpp_70092E68057C0624E84C80B51D49C293642FFB31.html#26">26</a>
+             of <a href="file/parsing/ParsingObject.cpp_70092E68057C0624E84C80B51D49C293642FFB31.html">ParsingObject.cpp</a>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/parsing/ParsingObject.hpp_E29603879D4D8E45C699EE6405594EAAE47411A6.html#58">58</a>
+             of <a href="file/parsing/ParsingObject.hpp_E29603879D4D8E45C699EE6405594EAAE47411A6.html">ParsingObject.hpp</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Derived class overrides: <a href="class_Scope_68666B1670BB0A45FDFC7BC194F5263DA68C727E.html#function_FullName_F1F84C18F06679EE3629DC9771F34149F9675CAE">cmajor::parsing::Scope::FullName</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Calls: <a href="class_Scope_68666B1670BB0A45FDFC7BC194F5263DA68C727E.html#function_FullName_F1F84C18F06679EE3629DC9771F34149F9675CAE">cmajor::parsing::Scope::FullName</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Called by: <a href="class_Grammar_F1BF78A27CDC5521CDD04CC43EBFC626424E80EA.html#function_GetRule_1AF5E2914611D2483539B2E7E474EE42B5F9A3BF">cmajor::parsing::Grammar::GetRule</a>
+            , <a href="class_Grammar_F1BF78A27CDC5521CDD04CC43EBFC626424E80EA.html#function_Parse_30826C80A1930BB9C855AB5CEA6BA92975B06DB2">cmajor::parsing::Grammar::Parse</a>
+            , <a href="class_Grammar_F1BF78A27CDC5521CDD04CC43EBFC626424E80EA.html#function_ResolveStartRule_F327C8FE2C63D445B0CD62832F7BBDBAC81E2669">cmajor::parsing::Grammar::ResolveStartRule</a>
+            , <a href="class_ParsingDomain_61DCEDE37EC9E175977FD613BC12969D327A4FC4.html#function_AddGrammar_D5A3750C232A3FA4148996C0CB02FAAD86D659BC">cmajor::parsing::ParsingDomain::AddGrammar</a>
+            , <a href="class_ParsingDomain_61DCEDE37EC9E175977FD613BC12969D327A4FC4.html#function_BeginNamespace_05713A200B444B1DB585F596835F278237AF1717">cmajor::parsing::ParsingDomain::BeginNamespace</a>
+            , <a href="class_Rule_16F872E2C86FFAE73C79F2ECDE26C7EB2A095DF3.html#function_GetAction_5D5A95367DC1497C52F57400A03B8757B61363B5">cmajor::parsing::Rule::GetAction</a>
+            , <a href="class_Scope_68666B1670BB0A45FDFC7BC194F5263DA68C727E.html#function_Add_BADFACB8591AA559097D6A75E1051D9E92D4226C">cmajor::parsing::Scope::Add</a>
+            , <a href="class_Scope_68666B1670BB0A45FDFC7BC194F5263DA68C727E.html#function_AddNamespace_90C38036FD3CE04E5F79C1315CC3870CCDE9E4D6">cmajor::parsing::Scope::AddNamespace</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_GetScope_E2C3A8746ACE512A20BAB42302FAE70116421BE9">GetScope Member Function</h3>
+        <h4>
+            <a href="class_Scope_68666B1670BB0A45FDFC7BC194F5263DA68C727E.html">Scope</a>
+            * cmajor::parsing::ParsingObject::GetScope() <span class="kw">const</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/parsing/ParsingObject.hpp_E29603879D4D8E45C699EE6405594EAAE47411A6.html#62">62</a>
+             of <a href="file/parsing/ParsingObject.hpp_E29603879D4D8E45C699EE6405594EAAE47411A6.html">ParsingObject.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">62</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">scope</span><span class="other">&nbsp;==&nbsp;</span><span class="kw">nullptr</span><span class="other">)</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">enclosingScope</span><span class="other">;</span>&nbsp;<span class="kw">else</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">scope</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Called by: <a href="class_Grammar_F1BF78A27CDC5521CDD04CC43EBFC626424E80EA.html#function_AddRule_21404B6164461515DFE24CADE851A614E14C28DF">cmajor::parsing::Grammar::AddRule</a>
+            , <a href="class_Grammar_F1BF78A27CDC5521CDD04CC43EBFC626424E80EA.html#function_GetRule_1AF5E2914611D2483539B2E7E474EE42B5F9A3BF">cmajor::parsing::Grammar::GetRule</a>
+            , <a href="class_LinkerVisitor_A26466D4B7F2ACDBAE09257FEB1A103DB9AF6A5B.html#function_Visit_755727EBB5A4093AA0041A713F69B2FAD88FE7D0">cmajor::parsing::LinkerVisitor::Visit</a>
+            , <a href="class_Namespace_8B05254A0CF9BE40D0D41360A7BDEF2684E03F5B.html#function_Accept_338F9B6E19F2A17FC3B3298EA4020A7889553C2C">cmajor::parsing::Namespace::Accept</a>
+            , <a href="class_ParsingDomain_61DCEDE37EC9E175977FD613BC12969D327A4FC4.html#function_BeginNamespace_05713A200B444B1DB585F596835F278237AF1717">cmajor::parsing::ParsingDomain::BeginNamespace</a>
+            , <a href="class_ParsingDomain_61DCEDE37EC9E175977FD613BC12969D327A4FC4.html#function_CurrentScope_B036BCE85F9E498A6722A85CE49738F9183E79BA">cmajor::parsing::ParsingDomain::CurrentScope</a>
+            , <a href="class_ParsingDomain_61DCEDE37EC9E175977FD613BC12969D327A4FC4.html#function_GetNamespaceScope_DC74652325C7EA6FCF8137437818787D6AA36C02">cmajor::parsing::ParsingDomain::GetNamespaceScope</a>
+            , <a href="class_Rule_16F872E2C86FFAE73C79F2ECDE26C7EB2A095DF3.html#function_AddAction_997B807018E9CF189DB01FD84D95386F5834DF70">cmajor::parsing::Rule::AddAction</a>
+            , <a href="class_Rule_16F872E2C86FFAE73C79F2ECDE26C7EB2A095DF3.html#function_AddNonterminal_395C4C7BF5314BC0C05A7F38231E21C18D56968E">cmajor::parsing::Rule::AddNonterminal</a>
+            , <a href="class_Rule_16F872E2C86FFAE73C79F2ECDE26C7EB2A095DF3.html#function_GetAction_5D5A95367DC1497C52F57400A03B8757B61363B5">cmajor::parsing::Rule::GetAction</a>
+            , <a href="class_Rule_16F872E2C86FFAE73C79F2ECDE26C7EB2A095DF3.html#function_GetNonterminal_79715B91BCCE9B8C1284BA890A81A47689F961D6">cmajor::parsing::Rule::GetNonterminal</a>
+            , <a href="class_Scope_68666B1670BB0A45FDFC7BC194F5263DA68C727E.html#function_AddNamespace_90C38036FD3CE04E5F79C1315CC3870CCDE9E4D6">cmajor::parsing::Scope::AddNamespace</a>
+            , <a href="class_Scope_68666B1670BB0A45FDFC7BC194F5263DA68C727E.html#function_GetQualifiedObject_659B7DA7419FA836EC99F289FA86F6BD7CC7477F">cmajor::parsing::Scope::GetQualifiedObject</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_GetSpan_29E61A918F82D49AE9E91831B93D056289D92999">GetSpan Member Function</h3>
+        <h4>
+            <span class="kw">const </span>
+            <a href="class_Span_9CED8370AAA8B01E09FBC8A63AD262084B91FD78.html">Span</a>
+            &amp; cmajor::parsing::ParsingObject::GetSpan() <span class="kw">const</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/parsing/ParsingObject.hpp_E29603879D4D8E45C699EE6405594EAAE47411A6.html#70">70</a>
+             of <a href="file/parsing/ParsingObject.hpp_E29603879D4D8E45C699EE6405594EAAE47411A6.html">ParsingObject.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">70</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">span</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Called by: <a href="class_Grammar_F1BF78A27CDC5521CDD04CC43EBFC626424E80EA.html#function_AddRule_21404B6164461515DFE24CADE851A614E14C28DF">cmajor::parsing::Grammar::AddRule</a>
+            , <a href="class_Grammar_F1BF78A27CDC5521CDD04CC43EBFC626424E80EA.html#function_GetRule_1AF5E2914611D2483539B2E7E474EE42B5F9A3BF">cmajor::parsing::Grammar::GetRule</a>
+            , <a href="class_Grammar_F1BF78A27CDC5521CDD04CC43EBFC626424E80EA.html#function_ResolveStartRule_F327C8FE2C63D445B0CD62832F7BBDBAC81E2669">cmajor::parsing::Grammar::ResolveStartRule</a>
+            , <a href="class_LinkerVisitor_A26466D4B7F2ACDBAE09257FEB1A103DB9AF6A5B.html#function_Visit_755727EBB5A4093AA0041A713F69B2FAD88FE7D0">cmajor::parsing::LinkerVisitor::Visit</a>
+            , <a href="class_Rule_16F872E2C86FFAE73C79F2ECDE26C7EB2A095DF3.html#function_GetAction_5D5A95367DC1497C52F57400A03B8757B61363B5">cmajor::parsing::Rule::GetAction</a>
+            , <a href="class_Rule_16F872E2C86FFAE73C79F2ECDE26C7EB2A095DF3.html#function_GetNonterminal_79715B91BCCE9B8C1284BA890A81A47689F961D6">cmajor::parsing::Rule::GetNonterminal</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_IsActionParser_5212594E653ADA28DD947922829C100B420C9B93">IsActionParser Member Function</h3>
+        <h4>
+            <span class="kw">bool</span>
+             cmajor::parsing::ParsingObject::IsActionParser() <span class="kw">const virtual</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/parsing/ParsingObject.hpp_E29603879D4D8E45C699EE6405594EAAE47411A6.html#63">63</a>
+             of <a href="file/parsing/ParsingObject.hpp_E29603879D4D8E45C699EE6405594EAAE47411A6.html">ParsingObject.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">63</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">false</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Derived class overrides: <a href="class_ActionParser_B6A250ED3D57DDC5182D3242ABEA122A032DDE3F.html#function_IsActionParser_9D8E5AB4A1F57B2A1B4D54D5E31F54D453A1ABFA">cmajor::parsing::ActionParser::IsActionParser</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Called by: <a href="class_Rule_16F872E2C86FFAE73C79F2ECDE26C7EB2A095DF3.html#function_GetAction_5D5A95367DC1497C52F57400A03B8757B61363B5">cmajor::parsing::Rule::GetAction</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_IsExternal_1DDF3FA2661E10860A0E04AAA21D4BE94A03284B">IsExternal Member Function</h3>
+        <h4>
+            <span class="kw">bool</span>
+             cmajor::parsing::ParsingObject::IsExternal() <span class="kw">const</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/parsing/ParsingObject.hpp_E29603879D4D8E45C699EE6405594EAAE47411A6.html#55">55</a>
+             of <a href="file/parsing/ParsingObject.hpp_E29603879D4D8E45C699EE6405594EAAE47411A6.html">ParsingObject.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">55</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">owner</span><span class="other">&nbsp;==&nbsp;</span><span class="identifier">external</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Called by: <a href="class_LinkerVisitor_A26466D4B7F2ACDBAE09257FEB1A103DB9AF6A5B.html#function_BeginVisit_BEA8456C8A92F5097D66EE81D5F96664DB70C748">cmajor::parsing::LinkerVisitor::BeginVisit</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_IsNamespace_B8794498C322CC97CAA2AE215463E0DE31205086">IsNamespace Member Function</h3>
+        <h4>
+            <span class="kw">bool</span>
+             cmajor::parsing::ParsingObject::IsNamespace() <span class="kw">const virtual</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/parsing/ParsingObject.hpp_E29603879D4D8E45C699EE6405594EAAE47411A6.html#67">67</a>
+             of <a href="file/parsing/ParsingObject.hpp_E29603879D4D8E45C699EE6405594EAAE47411A6.html">ParsingObject.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">67</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">false</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Derived class overrides: <a href="class_Namespace_8B05254A0CF9BE40D0D41360A7BDEF2684E03F5B.html#function_IsNamespace_AF0E38B3C713A7F87BDC0EAE76D8F38880F0032F">cmajor::parsing::Namespace::IsNamespace</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Called by: <a href="class_Scope_68666B1670BB0A45FDFC7BC194F5263DA68C727E.html#function_AddNamespace_90C38036FD3CE04E5F79C1315CC3870CCDE9E4D6">cmajor::parsing::Scope::AddNamespace</a>
+            , <a href="class_Scope_68666B1670BB0A45FDFC7BC194F5263DA68C727E.html#function_GetNamespace_7167438F043423122D9346424F1E389A529D6E12">cmajor::parsing::Scope::GetNamespace</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_IsNonterminalParser_130164F79F82F4A85176B27BD990F3EB9AF04354">IsNonterminalParser Member Function</h3>
+        <h4>
+            <span class="kw">bool</span>
+             cmajor::parsing::ParsingObject::IsNonterminalParser() <span class="kw">const virtual</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/parsing/ParsingObject.hpp_E29603879D4D8E45C699EE6405594EAAE47411A6.html#64">64</a>
+             of <a href="file/parsing/ParsingObject.hpp_E29603879D4D8E45C699EE6405594EAAE47411A6.html">ParsingObject.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">64</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">false</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Derived class overrides: <a href="class_NonterminalParser_56DD7EE360F8E2637FBB60CB429476F12426A97D.html#function_IsNonterminalParser_FB6CC3DE016B49FEF753CD29D8B8FACF6E6E54AA">cmajor::parsing::NonterminalParser::IsNonterminalParser</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Called by: <a href="class_Rule_16F872E2C86FFAE73C79F2ECDE26C7EB2A095DF3.html#function_GetNonterminal_79715B91BCCE9B8C1284BA890A81A47689F961D6">cmajor::parsing::Rule::GetNonterminal</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_IsOwned_2424594EAF10B7D7775BFA1275A5732EEE42866C">IsOwned Member Function</h3>
+        <h4>
+            <span class="kw">bool</span>
+             cmajor::parsing::ParsingObject::IsOwned() <span class="kw">const</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/parsing/ParsingObject.hpp_E29603879D4D8E45C699EE6405594EAAE47411A6.html#49">49</a>
+             of <a href="file/parsing/ParsingObject.hpp_E29603879D4D8E45C699EE6405594EAAE47411A6.html">ParsingObject.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">49</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">isOwned</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Called by: <a href="class_ParsingDomainRepository_4D39FB23BBF59E253C020EF42CDEA7F713C21B1E.html#function_Register_653164220722B832BB67ED24DC486F68CA341943">cmajor::parsing::ParsingDomainRepository::Register</a>
+            , <a href="class_ParsingObject_D6A163B08653CF53190C94952F145DFC2EB09994.html#function_Own_F4C61B6E093734D4BFE8339EB42030BDCB47782A">cmajor::parsing::ParsingObject::Own</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_IsRule_22603152F4DFC5E73FAE90DCD5A66AC4E159431C">IsRule Member Function</h3>
+        <h4>
+            <span class="kw">bool</span>
+             cmajor::parsing::ParsingObject::IsRule() <span class="kw">const virtual</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/parsing/ParsingObject.hpp_E29603879D4D8E45C699EE6405594EAAE47411A6.html#65">65</a>
+             of <a href="file/parsing/ParsingObject.hpp_E29603879D4D8E45C699EE6405594EAAE47411A6.html">ParsingObject.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">65</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">false</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Derived class overrides: <a href="class_Rule_16F872E2C86FFAE73C79F2ECDE26C7EB2A095DF3.html#function_IsRule_38698FD28783010FC2840199862403A50B0B3394">cmajor::parsing::Rule::IsRule</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Called by: <a href="class_Grammar_F1BF78A27CDC5521CDD04CC43EBFC626424E80EA.html#function_GetRule_1AF5E2914611D2483539B2E7E474EE42B5F9A3BF">cmajor::parsing::Grammar::GetRule</a>
+            , <a href="class_LinkerVisitor_A26466D4B7F2ACDBAE09257FEB1A103DB9AF6A5B.html#function_Visit_755727EBB5A4093AA0041A713F69B2FAD88FE7D0">cmajor::parsing::LinkerVisitor::Visit</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_IsRuleLink_C0FBB7E29493DA4AC89F279215602A2C106F53E8">IsRuleLink Member Function</h3>
+        <h4>
+            <span class="kw">bool</span>
+             cmajor::parsing::ParsingObject::IsRuleLink() <span class="kw">const virtual</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/parsing/ParsingObject.hpp_E29603879D4D8E45C699EE6405594EAAE47411A6.html#66">66</a>
+             of <a href="file/parsing/ParsingObject.hpp_E29603879D4D8E45C699EE6405594EAAE47411A6.html">ParsingObject.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">66</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">false</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Derived class overrides: <a href="class_RuleLink_4C1C4E8A50B4AD7D8A4FB592BDFE76619BF0023D.html#function_IsRuleLink_A7918662FE7CDF52156C5BE574780F8F67B29308">cmajor::parsing::RuleLink::IsRuleLink</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Called by: <a href="class_Grammar_F1BF78A27CDC5521CDD04CC43EBFC626424E80EA.html#function_GetRule_1AF5E2914611D2483539B2E7E474EE42B5F9A3BF">cmajor::parsing::Grammar::GetRule</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_Kind_326C27D30F1AE1EBBA5659B164400B0F690E49DD">Kind Member Function</h3>
+        <h4>
+            <a href="enum_ObjectKind_4E3C274E727BBC38DFFBE3508C3328AFBB7EA698.html">ObjectKind</a>
+             cmajor::parsing::ParsingObject::Kind() <span class="kw">const</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/parsing/ParsingObject.hpp_E29603879D4D8E45C699EE6405594EAAE47411A6.html#71">71</a>
+             of <a href="file/parsing/ParsingObject.hpp_E29603879D4D8E45C699EE6405594EAAE47411A6.html">ParsingObject.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">71</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">kind</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <hr/>
+        <h3 id="function_Name_54BD2CEF1D280CD3A6A763515B891CC7C7909DE8">Name Member Function</h3>
+        <h4>
+            <span class="kw">const </span>
+            std::u32string&amp; cmajor::parsing::ParsingObject::Name() <span class="kw">const</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/parsing/ParsingObject.hpp_E29603879D4D8E45C699EE6405594EAAE47411A6.html#56">56</a>
+             of <a href="file/parsing/ParsingObject.hpp_E29603879D4D8E45C699EE6405594EAAE47411A6.html">ParsingObject.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">56</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">name</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Called by: <a href="class_ActionParser_B6A250ED3D57DDC5182D3242ABEA122A032DDE3F.html#function_MethodName_EC05433168F90A8B105421AA59AFC3C79F2D46C0">cmajor::parsing::ActionParser::MethodName</a>
+            , <a href="class_LinkerVisitor_A26466D4B7F2ACDBAE09257FEB1A103DB9AF6A5B.html#function_BeginVisit_2DCD01795E4AE1E04320AAD40C08D4F9D7FAEFCD">cmajor::parsing::LinkerVisitor::BeginVisit</a>
+            , <a href="class_Rule_16F872E2C86FFAE73C79F2ECDE26C7EB2A095DF3.html#function_ExpandCode_8A31F9369EDF74A12F9E0B66C77FA6B442DCB802">cmajor::parsing::Rule::ExpandCode</a>
+            , <a href="class_Rule_16F872E2C86FFAE73C79F2ECDE26C7EB2A095DF3.html#function_Parse_F65D8C0815E3E8F79B6E217090BF486F8F7CC239">cmajor::parsing::Rule::Parse</a>
+            , <a href="class_Scope_68666B1670BB0A45FDFC7BC194F5263DA68C727E.html#function_Add_BADFACB8591AA559097D6A75E1051D9E92D4226C">cmajor::parsing::Scope::Add</a>
+            , <a href="class_Scope_68666B1670BB0A45FDFC7BC194F5263DA68C727E.html#function_FullName_F1F84C18F06679EE3629DC9771F34149F9675CAE">cmajor::parsing::Scope::FullName</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_Own_F4C61B6E093734D4BFE8339EB42030BDCB47782A">Own Member Function</h3>
+        <h4>
+            <span class="kw">void</span>
+             cmajor::parsing::ParsingObject::Own(<a href="class_ParsingObject_D6A163B08653CF53190C94952F145DFC2EB09994.html">ParsingObject</a>
+            * object)</h4>
+        <span>
+            Definition at line <a href="file/parsing/ParsingObject.cpp_70092E68057C0624E84C80B51D49C293642FFB31.html#40">40</a>
+             of <a href="file/parsing/ParsingObject.cpp_70092E68057C0624E84C80B51D49C293642FFB31.html">ParsingObject.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">41</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">42</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">object</span><span class="other">)</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">43</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">44</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="other">!</span><span class="identifier">object</span><span class="other">-></span><a href="class_ParsingObject_D6A163B08653CF53190C94952F145DFC2EB09994.html#function_IsOwned_2424594EAF10B7D7775BFA1275A5732EEE42866C">IsOwned</a><span class="other">(</span><span class="other">)</span><span class="other">)</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">45</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">46</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">object</span><span class="other">-></span><a href="class_ParsingObject_D6A163B08653CF53190C94952F145DFC2EB09994.html#function_SetOwned_6CA689E33638EBA67141B47B38040183177518A2">SetOwned</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">47</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="class_ParsingObject_D6A163B08653CF53190C94952F145DFC2EB09994.html#variable_ownedObjects_C1ADBF2161DA35035FE6C3871F0C375CC461E144">ownedObjects</a><span class="other">.</span><span class="identifier">push_back</span><span class="other">(</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><a href="class_ParsingObject_D6A163B08653CF53190C94952F145DFC2EB09994.html">ParsingObject</a><span class="other">></span><span class="other">(</span><span class="identifier">object</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">48</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">49</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">50</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/parsing/ParsingObject.hpp_E29603879D4D8E45C699EE6405594EAAE47411A6.html#48">48</a>
+             of <a href="file/parsing/ParsingObject.hpp_E29603879D4D8E45C699EE6405594EAAE47411A6.html">ParsingObject.hpp</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Calls: <a href="class_ParsingObject_D6A163B08653CF53190C94952F145DFC2EB09994.html#function_IsOwned_2424594EAF10B7D7775BFA1275A5732EEE42866C">cmajor::parsing::ParsingObject::IsOwned</a>
+            , <a href="class_ParsingObject_D6A163B08653CF53190C94952F145DFC2EB09994.html#function_SetOwned_6CA689E33638EBA67141B47B38040183177518A2">cmajor::parsing::ParsingObject::SetOwned</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Called by: <a href="class_Grammar_F1BF78A27CDC5521CDD04CC43EBFC626424E80EA.html#function_AddGrammarReference_0EBC9AD962E18C49286B512DAEF19143E6A18F9C">cmajor::parsing::Grammar::AddGrammarReference</a>
+            , <a href="class_Grammar_F1BF78A27CDC5521CDD04CC43EBFC626424E80EA.html#function_AddRule_21404B6164461515DFE24CADE851A614E14C28DF">cmajor::parsing::Grammar::AddRule</a>
+            , <a href="class_Grammar_F1BF78A27CDC5521CDD04CC43EBFC626424E80EA.html#function_AddRuleLink_0731E9EB9EE3C53A730D7787DA32F447278C5B1F">cmajor::parsing::Grammar::AddRuleLink</a>
+            , <a href="class_Grammar_F1BF78A27CDC5521CDD04CC43EBFC626424E80EA.html#function_Parse_B6ACFC3F5D8F5D9DC918E0A6679840001F13D862">cmajor::parsing::Grammar::Parse</a>
+            , <a href="class_KeywordParser_D0D445DF85E20066B09A63FC7A001AC6CABD2503.html#function_CreateKeywordRule_404C2BF61E9420F7AA10F5AF346174DC8B9B00F3">cmajor::parsing::KeywordParser::CreateKeywordRule</a>
+            , <a href="class_KeywordParser_D0D445DF85E20066B09A63FC7A001AC6CABD2503.html#function_SetContinuationRule_BBAD93FB5E6C807B925D8F2839E74D64C780372D">cmajor::parsing::KeywordParser::SetContinuationRule</a>
+            , <a href="class_ParsingDomain_61DCEDE37EC9E175977FD613BC12969D327A4FC4.html#function_AddGrammar_D5A3750C232A3FA4148996C0CB02FAAD86D659BC">cmajor::parsing::ParsingDomain::AddGrammar</a>
+            , <a href="class_ParsingDomain_61DCEDE37EC9E175977FD613BC12969D327A4FC4.html#function_BeginNamespace_05713A200B444B1DB585F596835F278237AF1717">cmajor::parsing::ParsingDomain::BeginNamespace</a>
+            , <a href="class_ParsingDomain_61DCEDE37EC9E175977FD613BC12969D327A4FC4.html#function_GetNamespaceScope_DC74652325C7EA6FCF8137437818787D6AA36C02">cmajor::parsing::ParsingDomain::GetNamespaceScope</a>
+            , <a href="class_ParsingObject_D6A163B08653CF53190C94952F145DFC2EB09994.html#function_SetScope_370D8AF79A55A085C4F3E05250E88802E275C9B5">cmajor::parsing::ParsingObject::SetScope</a>
+            , <a href="class_Rule_16F872E2C86FFAE73C79F2ECDE26C7EB2A095DF3.html#function_AddAction_997B807018E9CF189DB01FD84D95386F5834DF70">cmajor::parsing::Rule::AddAction</a>
+            , <a href="class_Rule_16F872E2C86FFAE73C79F2ECDE26C7EB2A095DF3.html#function_AddNonterminal_395C4C7BF5314BC0C05A7F38231E21C18D56968E">cmajor::parsing::Rule::AddNonterminal</a>
+            , <a href="class_Rule_16F872E2C86FFAE73C79F2ECDE26C7EB2A095DF3.html#function_SetDefinition_A62B313541DCD5329E10C930DBFBF2F75CDB9BDD">cmajor::parsing::Rule::SetDefinition</a>
+            , <a href="class_Scope_68666B1670BB0A45FDFC7BC194F5263DA68C727E.html#function_Add_BADFACB8591AA559097D6A75E1051D9E92D4226C">cmajor::parsing::Scope::Add</a>
+            , <a href="class_Scope_68666B1670BB0A45FDFC7BC194F5263DA68C727E.html#function_AddNamespace_90C38036FD3CE04E5F79C1315CC3870CCDE9E4D6">cmajor::parsing::Scope::AddNamespace</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_Owner_23B834CA26D32802B530C251A425B10C70A0F46D">Owner Member Function</h3>
+        <h4>
+            <span class="kw">int</span>
+             cmajor::parsing::ParsingObject::Owner() <span class="kw">const</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/parsing/ParsingObject.hpp_E29603879D4D8E45C699EE6405594EAAE47411A6.html#53">53</a>
+             of <a href="file/parsing/ParsingObject.hpp_E29603879D4D8E45C699EE6405594EAAE47411A6.html">ParsingObject.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">53</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">owner</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <hr/>
+        <h3 id="function_ResetOwned_6ED02A3DD7DBE0D802AEB402D26DBF6C25049C58">ResetOwned Member Function</h3>
+        <h4>
+            <span class="kw">void</span>
+             cmajor::parsing::ParsingObject::ResetOwned()</h4>
+        <span>
+            Definition at line <a href="file/parsing/ParsingObject.hpp_E29603879D4D8E45C699EE6405594EAAE47411A6.html#51">51</a>
+             of <a href="file/parsing/ParsingObject.hpp_E29603879D4D8E45C699EE6405594EAAE47411A6.html">ParsingObject.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">51</span>&nbsp;<span class="other">{</span>&nbsp;<span class="identifier">isOwned</span><span class="other">&nbsp;=&nbsp;</span><span class="kw">false</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <hr/>
+        <h3 id="function_SetEnclosingScope_A3C4A90020FD6CE0FFDA7C8A5B81DF77D61D6B61">SetEnclosingScope Member Function</h3>
+        <h4>
+            <span class="kw">void</span>
+             cmajor::parsing::ParsingObject::SetEnclosingScope(<a href="class_Scope_68666B1670BB0A45FDFC7BC194F5263DA68C727E.html">Scope</a>
+            * enclosingScope_)</h4>
+        <span>
+            Definition at line <a href="file/parsing/ParsingObject.hpp_E29603879D4D8E45C699EE6405594EAAE47411A6.html#60">60</a>
+             of <a href="file/parsing/ParsingObject.hpp_E29603879D4D8E45C699EE6405594EAAE47411A6.html">ParsingObject.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">60</span>&nbsp;<span class="other">{</span>&nbsp;<span class="identifier">enclosingScope</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">enclosingScope_</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Called by: <a href="class_Grammar_F1BF78A27CDC5521CDD04CC43EBFC626424E80EA.html#function_AddRule_21404B6164461515DFE24CADE851A614E14C28DF">cmajor::parsing::Grammar::AddRule</a>
+            , <a href="class_ParsingObject_D6A163B08653CF53190C94952F145DFC2EB09994.html#function_AddToScope_0A935B888A9C4705EA43BFDD4B6CF8DC910DB123">cmajor::parsing::ParsingObject::AddToScope</a>
+            , <a href="class_Rule_16F872E2C86FFAE73C79F2ECDE26C7EB2A095DF3.html#function_AddAction_997B807018E9CF189DB01FD84D95386F5834DF70">cmajor::parsing::Rule::AddAction</a>
+            , <a href="class_Rule_16F872E2C86FFAE73C79F2ECDE26C7EB2A095DF3.html#function_AddNonterminal_395C4C7BF5314BC0C05A7F38231E21C18D56968E">cmajor::parsing::Rule::AddNonterminal</a>
+            , <a href="class_Scope_68666B1670BB0A45FDFC7BC194F5263DA68C727E.html#function_AddNamespace_90C38036FD3CE04E5F79C1315CC3870CCDE9E4D6">cmajor::parsing::Scope::AddNamespace</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_SetExternal_A6EACAE0EAD9E6468FFF67039E0D3733B04DDB20">SetExternal Member Function</h3>
+        <h4>
+            <span class="kw">void</span>
+             cmajor::parsing::ParsingObject::SetExternal()</h4>
+        <span>
+            Definition at line <a href="file/parsing/ParsingObject.hpp_E29603879D4D8E45C699EE6405594EAAE47411A6.html#54">54</a>
+             of <a href="file/parsing/ParsingObject.hpp_E29603879D4D8E45C699EE6405594EAAE47411A6.html">ParsingObject.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">54</span>&nbsp;<span class="other">{</span>&nbsp;<span class="identifier">owner</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">external</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <hr/>
+        <h3 id="function_SetName_CC34233166420E36937852D5823CAFE64477FC81">SetName Member Function</h3>
+        <h4>
+            <span class="kw">void</span>
+             cmajor::parsing::ParsingObject::SetName(<span class="kw">const </span>
+            std::u32string&amp; name_)</h4>
+        <span>
+            Definition at line <a href="file/parsing/ParsingObject.hpp_E29603879D4D8E45C699EE6405594EAAE47411A6.html#57">57</a>
+             of <a href="file/parsing/ParsingObject.hpp_E29603879D4D8E45C699EE6405594EAAE47411A6.html">ParsingObject.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">57</span>&nbsp;<span class="other">{</span>&nbsp;<span class="identifier">name</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">name_</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Called by: <a href="class_LinkerVisitor_A26466D4B7F2ACDBAE09257FEB1A103DB9AF6A5B.html#function_BeginVisit_2DCD01795E4AE1E04320AAD40C08D4F9D7FAEFCD">cmajor::parsing::LinkerVisitor::BeginVisit</a>
+            , <a href="class_Scope_68666B1670BB0A45FDFC7BC194F5263DA68C727E.html#function_AddNamespace_90C38036FD3CE04E5F79C1315CC3870CCDE9E4D6">cmajor::parsing::Scope::AddNamespace</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_SetOwned_6CA689E33638EBA67141B47B38040183177518A2">SetOwned Member Function</h3>
+        <h4>
+            <span class="kw">void</span>
+             cmajor::parsing::ParsingObject::SetOwned()</h4>
+        <span>
+            Definition at line <a href="file/parsing/ParsingObject.hpp_E29603879D4D8E45C699EE6405594EAAE47411A6.html#50">50</a>
+             of <a href="file/parsing/ParsingObject.hpp_E29603879D4D8E45C699EE6405594EAAE47411A6.html">ParsingObject.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">50</span>&nbsp;<span class="other">{</span>&nbsp;<span class="identifier">isOwned</span><span class="other">&nbsp;=&nbsp;</span><span class="kw">true</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Called by: <a href="class_ParsingDomainRepository_4D39FB23BBF59E253C020EF42CDEA7F713C21B1E.html#function_Register_653164220722B832BB67ED24DC486F68CA341943">cmajor::parsing::ParsingDomainRepository::Register</a>
+            , <a href="class_ParsingObject_D6A163B08653CF53190C94952F145DFC2EB09994.html#function_Own_F4C61B6E093734D4BFE8339EB42030BDCB47782A">cmajor::parsing::ParsingObject::Own</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_SetOwner_438B0F471AFCD644619D44F10D67A1265FDF5D48">SetOwner Member Function</h3>
+        <h4>
+            <span class="kw">void</span>
+             cmajor::parsing::ParsingObject::SetOwner(<span class="kw">int</span>
+             owner_)</h4>
+        <span>
+            Definition at line <a href="file/parsing/ParsingObject.hpp_E29603879D4D8E45C699EE6405594EAAE47411A6.html#52">52</a>
+             of <a href="file/parsing/ParsingObject.hpp_E29603879D4D8E45C699EE6405594EAAE47411A6.html">ParsingObject.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">52</span>&nbsp;<span class="other">{</span>&nbsp;<span class="identifier">owner</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">owner_</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <hr/>
+        <h3 id="function_SetScope_370D8AF79A55A085C4F3E05250E88802E275C9B5">SetScope Member Function</h3>
+        <h4>
+            <span class="kw">void</span>
+             cmajor::parsing::ParsingObject::SetScope(<a href="class_Scope_68666B1670BB0A45FDFC7BC194F5263DA68C727E.html">Scope</a>
+            * scope_)</h4>
+        <span>
+            Definition at line <a href="file/parsing/ParsingObject.cpp_70092E68057C0624E84C80B51D49C293642FFB31.html#52">52</a>
+             of <a href="file/parsing/ParsingObject.cpp_70092E68057C0624E84C80B51D49C293642FFB31.html">ParsingObject.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">53</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">54</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="class_ParsingObject_D6A163B08653CF53190C94952F145DFC2EB09994.html#variable_scope_6B3B1A24BB5E1296FA4522697EF64A6ED1F37B79">scope</a><span class="other">&nbsp;=&nbsp;</span><span class="identifier">scope_</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">55</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="class_ParsingObject_D6A163B08653CF53190C94952F145DFC2EB09994.html#function_Own_F4C61B6E093734D4BFE8339EB42030BDCB47782A">Own</a><span class="other">(</span><a href="class_ParsingObject_D6A163B08653CF53190C94952F145DFC2EB09994.html#variable_scope_6B3B1A24BB5E1296FA4522697EF64A6ED1F37B79">scope</a><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">56</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/parsing/ParsingObject.hpp_E29603879D4D8E45C699EE6405594EAAE47411A6.html#61">61</a>
+             of <a href="file/parsing/ParsingObject.hpp_E29603879D4D8E45C699EE6405594EAAE47411A6.html">ParsingObject.hpp</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Calls: <a href="class_ParsingObject_D6A163B08653CF53190C94952F145DFC2EB09994.html#function_Own_F4C61B6E093734D4BFE8339EB42030BDCB47782A">cmajor::parsing::ParsingObject::Own</a>
+        </span>
+        <br/>
+        <br/>
+        <span>Called by: </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_SetSpan_2549F152EC67F9C2DB52DAAFCF96A0204D869518">SetSpan Member Function</h3>
+        <h4>
+            <span class="kw">void</span>
+             cmajor::parsing::ParsingObject::SetSpan(<span class="kw">const </span>
+            <a href="class_Span_9CED8370AAA8B01E09FBC8A63AD262084B91FD78.html">Span</a>
+            &amp; span_)</h4>
+        <span>
+            Definition at line <a href="file/parsing/ParsingObject.hpp_E29603879D4D8E45C699EE6405594EAAE47411A6.html#69">69</a>
+             of <a href="file/parsing/ParsingObject.hpp_E29603879D4D8E45C699EE6405594EAAE47411A6.html">ParsingObject.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">69</span>&nbsp;<span class="other">{</span>&nbsp;<span class="identifier">span</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">span_</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <hr/>
+        <a href="../index.html">index</a>
+         | <a href="namespace_parsing_D308EED43E54B87FB52D88ADF3DA7F4E649CD021.html">up</a>
+         | <a href="class_ParsingException_57CF6A8A19B3FBD26E856AD514411D55B6CC678E.html">prev</a>
+         | <a href="class_PositiveParser_63879E81F68ACDACC236983337A632B166B5E76B.html">next</a>
+    </body>
+</html>

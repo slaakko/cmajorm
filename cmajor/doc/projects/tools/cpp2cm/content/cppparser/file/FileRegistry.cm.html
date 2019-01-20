@@ -1,0 +1,107 @@
+<html>
+ <head>
+  <meta charset="utf-8"/>
+  <title>cppparser/FileRegistry.cm</title>
+  <link href="../../../style/style.css" rel="stylesheet" type="text/css"/>
+ </head>
+ <body>
+  <span class="code" id="1" xml:space="preserve"><span class="lineNumber">&nbsp;1</span>&nbsp;<span class="kw">using</span>&nbsp;<span class="identifier">System</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="2" xml:space="preserve"><span class="lineNumber">&nbsp;2</span>&nbsp;<span class="kw">using</span>&nbsp;<span class="identifier">System.Collections</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="3" xml:space="preserve"><span class="lineNumber">&nbsp;3</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="4" xml:space="preserve"><span class="lineNumber">&nbsp;4</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">cppparser</span></span>
+  <br/>
+  <span class="code" id="5" xml:space="preserve"><span class="lineNumber">&nbsp;5</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="6" xml:space="preserve"><span class="lineNumber">&nbsp;6</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../doc/class_FileRegistry_4433397F066EC377C7C009DA08D56CDF38AA8CCF.html">FileRegistry</a></span>
+  <br/>
+  <span class="code" id="7" xml:space="preserve"><span class="lineNumber">&nbsp;7</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="8" xml:space="preserve"><span class="lineNumber">&nbsp;8</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">static</span>&nbsp;<a href="../doc/class_FileRegistry_4433397F066EC377C7C009DA08D56CDF38AA8CCF.html#static_constructor_FileRegistry_7590460A8E7003A3A3D2E838AD06DE695020DE59">FileRegistry</a><span class="other">()</span><span class="other">&nbsp;:&nbsp;</span><span class="identifier">instance</span><span class="other">(</span><span class="kw">new</span>&nbsp;<span class="identifier">FileRegistry</span><span class="other">(</span><span class="other">)</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="9" xml:space="preserve"><span class="lineNumber">&nbsp;9</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="10" xml:space="preserve"><span class="lineNumber">10</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="11" xml:space="preserve"><span class="lineNumber">11</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">static</span>&nbsp;<a href="../doc/class_FileRegistry_4433397F066EC377C7C009DA08D56CDF38AA8CCF.html">FileRegistry</a><span class="other">&amp;</span>&nbsp;<a href="../doc/class_FileRegistry_4433397F066EC377C7C009DA08D56CDF38AA8CCF.html#member_function_Instance_FileRegistry_9F187A1FA118273EAC0254BDACADD8602DFC7AC6">Instance</a><span class="other">(</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="12" xml:space="preserve"><span class="lineNumber">12</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="13" xml:space="preserve"><span class="lineNumber">13</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="other">*</span><a href="../doc/class_FileRegistry_4433397F066EC377C7C009DA08D56CDF38AA8CCF.html#variable_instance_D4C9A6DD91DC504656A4FBC1FB1EC19490234F84">instance</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="14" xml:space="preserve"><span class="lineNumber">14</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="15" xml:space="preserve"><span class="lineNumber">15</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">int</span>&nbsp;<a href="../doc/class_FileRegistry_4433397F066EC377C7C009DA08D56CDF38AA8CCF.html#member_function_RegisterFilePath_FileRegistry_F242A54418FA3CE0BC39467C46D968EAA589DFBC">RegisterFilePath</a><span class="other">(</span><span class="kw">const</span>&nbsp;<a href="../../../../../../system/content/System.Base/doc/ns_System.html#typedef_string_B6DB6B2DEFC437FBF697A2E84F7B7771FC1DDEE3">string</a><span class="other">&amp;</span>&nbsp;<span class="identifier">filePath</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="16" xml:space="preserve"><span class="lineNumber">16</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="17" xml:space="preserve"><span class="lineNumber">17</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">int</span>&nbsp;<span class="identifier">index</span><span class="other">&nbsp;=&nbsp;</span><span class="kw">cast</span><span class="other">&lt;</span><span class="kw">int</span><span class="other">></span><span class="other">(</span><a href="../doc/class_FileRegistry_4433397F066EC377C7C009DA08D56CDF38AA8CCF.html#variable_filePaths_3995358399D0532D81521C436B558C2703154BD0">filePaths</a><span class="other">.</span><a href="../../../../../../system/content/System.Base/doc/class_List_T_4E42CF5913BEB21F5260DEFEC239180C94460B11.html#member_function_Count_List_T_CC08825E95DA25361D24D0B94402BCC8F4B0197F">Count</a><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="18" xml:space="preserve"><span class="lineNumber">18</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../doc/class_FileRegistry_4433397F066EC377C7C009DA08D56CDF38AA8CCF.html#variable_filePaths_3995358399D0532D81521C436B558C2703154BD0">filePaths</a><span class="other">.</span><a href="../../../../../../system/content/System.Base/doc/class_List_T_4E42CF5913BEB21F5260DEFEC239180C94460B11.html#member_function_Add_List_T_0CEB0F989B58359D06357C988DF595C83DA28430">Add</a><span class="other">(</span><span class="identifier">filePath</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="19" xml:space="preserve"><span class="lineNumber">19</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">index</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="20" xml:space="preserve"><span class="lineNumber">20</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="21" xml:space="preserve"><span class="lineNumber">21</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<a href="../../../../../../system/content/System.Base/doc/ns_System.html#typedef_string_B6DB6B2DEFC437FBF697A2E84F7B7771FC1DDEE3">string</a>&nbsp;<a href="../doc/class_FileRegistry_4433397F066EC377C7C009DA08D56CDF38AA8CCF.html#member_function_GetFilePath_FileRegistry_562A530636CFAE5D727A88C843C9D51AA7F5D955">GetFilePath</a><span class="other">(</span><span class="kw">int</span>&nbsp;<span class="identifier">index</span><span class="other">)</span>&nbsp;<span class="kw">const</span></span>
+  <br/>
+  <span class="code" id="22" xml:space="preserve"><span class="lineNumber">22</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="23" xml:space="preserve"><span class="lineNumber">23</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if</span>&nbsp;<span class="other">(</span><span class="identifier">index</span><span class="other">&nbsp;>=&nbsp;</span><span class="number">0</span><span class="other">&nbsp;&amp;&amp;&nbsp;</span><span class="identifier">index</span><span class="other">&nbsp;&lt;&nbsp;</span><a href="../doc/class_FileRegistry_4433397F066EC377C7C009DA08D56CDF38AA8CCF.html#variable_filePaths_3995358399D0532D81521C436B558C2703154BD0">filePaths</a><span class="other">.</span><a href="../../../../../../system/content/System.Base/doc/class_List_T_4E42CF5913BEB21F5260DEFEC239180C94460B11.html#member_function_Count_List_T_CC08825E95DA25361D24D0B94402BCC8F4B0197F">Count</a><span class="other">(</span><span class="other">)</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="24" xml:space="preserve"><span class="lineNumber">24</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="25" xml:space="preserve"><span class="lineNumber">25</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<a href="../doc/class_FileRegistry_4433397F066EC377C7C009DA08D56CDF38AA8CCF.html#variable_filePaths_3995358399D0532D81521C436B558C2703154BD0">filePaths</a><span class="other">[</span><span class="identifier">index</span><span class="other">]</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="26" xml:space="preserve"><span class="lineNumber">26</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="27" xml:space="preserve"><span class="lineNumber">27</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">else</span></span>
+  <br/>
+  <span class="code" id="28" xml:space="preserve"><span class="lineNumber">28</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="29" xml:space="preserve"><span class="lineNumber">29</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<a href="../../../../../../system/content/System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html#default_constructor_String_CharT_29D461A5530B53DD4D61100F8616E6F0141822A3">string</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="30" xml:space="preserve"><span class="lineNumber">30</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="31" xml:space="preserve"><span class="lineNumber">31</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="32" xml:space="preserve"><span class="lineNumber">32</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/class_FileRegistry_4433397F066EC377C7C009DA08D56CDF38AA8CCF.html#member_function_SetFileContent_FileRegistry_1E3BBBDA9BCE31F5CEE797CCD57ECA347100C60B">SetFileContent</a><span class="other">(</span><span class="kw">int</span>&nbsp;<span class="identifier">fileIndex</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<a href="../../../../../../system/content/System.Base/doc/ns_System.html#typedef_ustring_1750E1C62AAF5897C1F1DA3C5BC4999982AE9B36">ustring</a><span class="other">&amp;</span>&nbsp;<span class="identifier">fileContent</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="33" xml:space="preserve"><span class="lineNumber">33</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="34" xml:space="preserve"><span class="lineNumber">34</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../doc/class_FileRegistry_4433397F066EC377C7C009DA08D56CDF38AA8CCF.html#variable_fileContentMap_DDA1293C1763D5315AC6EA6945A67E071102FC44">fileContentMap</a><span class="other">[</span><span class="identifier">fileIndex</span><span class="other">]</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">fileContent</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="35" xml:space="preserve"><span class="lineNumber">35</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="36" xml:space="preserve"><span class="lineNumber">36</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<a href="../../../../../../system/content/System.Core/index.html#7ae8d55b-6302-41be-97a6-c17d98d250ad">ustring</a>&nbsp;<a href="../doc/class_FileRegistry_4433397F066EC377C7C009DA08D56CDF38AA8CCF.html#member_function_GetFileContent_FileRegistry_CED0C7B61B4E253C5C2CB8300FD13E0F44431E8E">GetFileContent</a><span class="other">(</span><span class="kw">int</span>&nbsp;<span class="identifier">fileIndex</span><span class="other">)</span>&nbsp;<span class="kw">const</span></span>
+  <br/>
+  <span class="code" id="37" xml:space="preserve"><span class="lineNumber">37</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="38" xml:space="preserve"><span class="lineNumber">38</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../../../../../system/content/System.Base/doc/class_HashMap_K_T_H_C_D555F9108F5700505E1FCCC02041016E58EE9314.html">HashMap</a><span class="other">&lt;</span><span class="kw">int</span><span class="other">,&nbsp;</span><a href="../../../../../../system/content/System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html">ustring</a><span class="other">></span><span class="other">.</span><a href="../../../../../../system/content/System.Base/doc/class_HashMap_K_T_H_C_D555F9108F5700505E1FCCC02041016E58EE9314.html#typedef_ConstIterator_B9E133409626E78F66C00B19E61F0A0079B2D5CC">ConstIterator</a>&nbsp;<span class="identifier">it</span><span class="other">&nbsp;=&nbsp;</span><a href="../doc/class_FileRegistry_4433397F066EC377C7C009DA08D56CDF38AA8CCF.html#variable_fileContentMap_DDA1293C1763D5315AC6EA6945A67E071102FC44">fileContentMap</a><span class="other">.</span><a href="../../../../../../system/content/System.Base/doc/class_HashMap_K_T_H_C_D555F9108F5700505E1FCCC02041016E58EE9314.html#member_function_CFind_HashMap_K_T_H_C_99BC0AA782AB57E9B9CFF753BCE6A9592268425F">CFind</a><span class="other">(</span><span class="identifier">fileIndex</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="39" xml:space="preserve"><span class="lineNumber">39</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if</span>&nbsp;<span class="other">(</span><span class="identifier">it</span><span class="other">&nbsp;!=&nbsp;</span><a href="../doc/class_FileRegistry_4433397F066EC377C7C009DA08D56CDF38AA8CCF.html#variable_fileContentMap_DDA1293C1763D5315AC6EA6945A67E071102FC44">fileContentMap</a><span class="other">.</span><a href="../../../../../../system/content/System.Base/doc/class_HashMap_K_T_H_C_D555F9108F5700505E1FCCC02041016E58EE9314.html#member_function_CEnd_HashMap_K_T_H_C_AD3B1510A4339A6B48156CF6C92AC2519DF5EB2C">CEnd</a><span class="other">(</span><span class="other">)</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="40" xml:space="preserve"><span class="lineNumber">40</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="41" xml:space="preserve"><span class="lineNumber">41</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">it</span><span class="other">-></span><span class="identifier">second</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="42" xml:space="preserve"><span class="lineNumber">42</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="43" xml:space="preserve"><span class="lineNumber">43</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<a href="../../../../../../system/content/System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html#default_constructor_String_CharT_29D461A5530B53DD4D61100F8616E6F0141822A3">ustring</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="44" xml:space="preserve"><span class="lineNumber">44</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="45" xml:space="preserve"><span class="lineNumber">45</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">private</span>&nbsp;<span class="kw">static</span>&nbsp;<a href="../../../../../../system/content/System.Base/doc/class_UniquePtr_T_793F841C13E9DD3A6869243C74F1D948C0E04009.html">UniquePtr</a><span class="other">&lt;</span><a href="../doc/class_FileRegistry_4433397F066EC377C7C009DA08D56CDF38AA8CCF.html">FileRegistry</a><span class="other">></span>&nbsp;<span class="identifier">instance</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="46" xml:space="preserve"><span class="lineNumber">46</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">private</span>&nbsp;<a href="../../../../../../system/content/System.Base/doc/class_List_T_4E42CF5913BEB21F5260DEFEC239180C94460B11.html">List</a><span class="other">&lt;</span><a href="../../../../../../system/content/System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html">string</a><span class="other">></span>&nbsp;<span class="identifier">filePaths</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="47" xml:space="preserve"><span class="lineNumber">47</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">private</span>&nbsp;<a href="../../../../../../system/content/System.Base/doc/class_HashMap_K_T_H_C_D555F9108F5700505E1FCCC02041016E58EE9314.html">HashMap</a><span class="other">&lt;</span><span class="kw">int</span><span class="other">,&nbsp;</span><a href="../../../../../../system/content/System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html">ustring</a><span class="other">></span>&nbsp;<span class="identifier">fileContentMap</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="48" xml:space="preserve"><span class="lineNumber">48</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="49" xml:space="preserve"><span class="lineNumber">49</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+ </body>
+</html>

@@ -1,0 +1,210 @@
+// =================================
+// Copyright (c) 2019 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+[hpp]#include <cmajor/ast/Literal.hpp>
+[hpp]#include <cmajor/parser/ParsingContext.hpp>
+[cpp]#include <cmajor/parser/Expression.hpp>
+[cpp]#include <sstream>
+
+namespace cmajor.parser
+{
+    [hpp]using namespace cmajor::ast;
+    [cpp]using namespace cmajor::util;
+
+    grammar Literal
+    {
+        using Expression.Expression;
+
+        Literal(ParsingContext* ctx) : LiteralNode*
+            ::= BooleanLiteral{ value = BooleanLiteral; value->SetText(std::u32string(matchBegin, matchEnd)); }
+            |   FloatingLiteral{ value = FloatingLiteral; value->SetText(std::u32string(matchBegin, matchEnd)); }
+            |   IntegerLiteral{ value = IntegerLiteral; value->SetText(std::u32string(matchBegin, matchEnd)); }
+            |   CharLiteral{ value = CharLiteral; value->SetText(std::u32string(matchBegin, matchEnd)); }
+            |   StringLiteral{ value = StringLiteral; value->SetText(std::u32string(matchBegin, matchEnd)); }
+            |   NullLiteral{ value = NullLiteral; value->SetText(std::u32string(matchBegin, matchEnd)); }
+            |   ArrayLiteral(ctx){ value = ArrayLiteral; value->SetText(std::u32string(matchBegin, matchEnd)); }
+            |   StructuredLiteral(ctx){ value = StructuredLiteral; value->SetText(std::u32string(matchBegin, matchEnd)); }
+            ;
+
+        BooleanLiteral : LiteralNode*
+            ::= keyword("true"){ value = new BooleanLiteralNode(span, true); }
+            |   keyword("false"){ value = new BooleanLiteralNode(span, false); }
+            ;
+
+        FloatingLiteral(var Span s) : LiteralNode*
+            ::= token(
+                    FloatingLiteralValue{ s = span; }
+                    (   [fF]{ s.SetEnd(span.End()); value = CreateFloatingLiteralNode(s, FloatingLiteralValue, true); }
+                    |   empty{ value = CreateFloatingLiteralNode(s, FloatingLiteralValue, false); }
+                    )
+                )
+            ;
+
+        FloatingLiteralValue : double
+            ::= token(FractionalFloatingLiteral | ExponentFloatingLiteral)
+                { 
+                    std::stringstream s;
+                    s.str(std::string(matchBegin, matchEnd));
+                    s >> value;
+                }
+            ;
+
+        FractionalFloatingLiteral
+            ::= token(DecDigitSequence:s0? '.' DecDigitSequence:m ExponentPart?)
+            |   token(DecDigitSequence:s1 '.')
+            ;
+
+        ExponentFloatingLiteral
+            ::= token(DecDigitSequence ExponentPart)
+            ;
+
+        ExponentPart
+            ::= token([eE] Sign? DecDigitSequence)
+            ;
+
+        IntegerLiteral(var Span s) : LiteralNode*
+            ::= token(
+                    IntegerLiteralValue{ s = span; }
+                    (   [uU]{ s.SetEnd(span.End()); value = CreateIntegerLiteralNode(s, IntegerLiteralValue, true); }
+                    |   empty{ value = CreateIntegerLiteralNode(s, IntegerLiteralValue, false); }
+                    )
+                )
+            ;
+
+        IntegerLiteralValue : uint64_t
+            ::= token(HexIntegerLiteral{ value = HexIntegerLiteral; } | DecIntegerLiteral{ value = DecIntegerLiteral; })
+            ;
+
+        HexIntegerLiteral : uint64_t
+            ::= token(
+                    ("0x" | "0X")
+                    HexDigitSequence{ value = HexDigitSequence; }
+                )
+            ;
+
+        DecIntegerLiteral : uint64_t
+            ::= DecDigitSequence{ value = DecDigitSequence; }
+            ;
+
+        CharLiteral(var char32_t litValue) : LiteralNode*
+            ::= token(  '\'' 
+                        (   ([^'\\\r\n]+){ std::u32string s = std::u32string(matchBegin, matchEnd); if (s.empty()) pass = false; else litValue = s[0]; } 
+                        |   CharEscape:ec{ litValue = ec; }
+                        ) 
+                        '\''!
+                    ){ value = new CharLiteralNode(span, char(litValue)); }
+            |   'w' token(  '\'' 
+                        (   ([^'\\\r\n]+){ std::u32string s = std::u32string(matchBegin, matchEnd); if (s.empty()) pass = false; else litValue = s[0]; } 
+                        |   CharEscape:ew{ litValue = ew; }
+                        ) 
+                        '\''!
+                    ){ value = new WCharLiteralNode(span, char16_t(litValue)); }
+            |   'u' token(  '\'' 
+                        (   ([^'\\\r\n]+){ std::u32string s = std::u32string(matchBegin, matchEnd); if (s.empty()) pass = false; else litValue = s[0]; } 
+                        |   CharEscape:eu{ litValue = eu; }
+                        ) 
+                        '\''!
+                    ){ value = new UCharLiteralNode(span, litValue); }
+            ;
+
+        StringLiteral(var std::u32string s) : LiteralNode*
+            ::= '@' token('"' ([^"]*){ s = std::u32string(matchBegin, matchEnd); } '"'){ value = new StringLiteralNode(span, ToUtf8(s)); }
+            |   'w' '@' token('"' ([^"]*){ s = std::u32string(matchBegin, matchEnd); } '"'){ value = new WStringLiteralNode(span, ToUtf16(s)); }
+            |   'u' '@' token('"' ([^"]*){ s = std::u32string(matchBegin, matchEnd); } '"'){ value = new UStringLiteralNode(span, s); }
+            |   token('"' 
+                    (   ([^"\\\r\n]+){ s.append(std::u32string(matchBegin, matchEnd)); }
+                    |   CharEscape:ec{ s.append(1, ec); }
+                    )*
+                    '"'!
+                ){ value = new StringLiteralNode(span, ToUtf8(s)); }
+            |   'w' token('"'
+                    (   ([^"\\\r\n]+){ s.append(std::u32string(matchBegin, matchEnd)); }
+                    |   CharEscape:ew{ s.append(1, ew); }
+                    )*
+                    '"'!
+                ){ value = new WStringLiteralNode(span, ToUtf16(s)); }
+            |   'u' token('"'
+                    (   ([^"\\\r\n]+){ s.append(std::u32string(matchBegin, matchEnd)); }
+                    |   CharEscape:eu{ s.append(1, eu); }
+                    )*
+                    '"'!
+                ){ value = new UStringLiteralNode(span, s); }
+            ;
+
+        NullLiteral : LiteralNode*
+            ::= keyword("null"){ value = new NullLiteralNode(span); }
+            ;
+
+        ArrayLiteral(ParsingContext* ctx) : ArrayLiteralNode*
+            ::= '['{ value = new ArrayLiteralNode(span); } (Expression(ctx){ value->AddValue(Expression); } % ',')? ']'!
+            ;
+
+        StructuredLiteral(ParsingContext* ctx) : StructuredLiteralNode*
+            ::= '{'{ value = new StructuredLiteralNode(span); } (Expression(ctx){ value->AddMember(Expression); } % ',')? '}'!
+            ;
+
+        CharEscape : char32_t
+            ::= token('\\' 
+                (   [xX] HexDigitSequence{ value = char32_t(HexDigitSequence); } 
+                |   [dD] DecDigitSequence{ value = char32_t(DecDigitSequence); } 
+                |   OctalDigitSequence{ value = char32_t(OctalDigitSequence); }
+                |   'u' HexDigit4{ value = char32_t(HexDigit4); }
+                |   'U' HexDigit8{ value = char32_t(HexDigit8); }
+                |   'a'{ value = char32_t('\a'); }
+                |   'b'{ value = char32_t('\b'); }
+                |   'f'{ value = char32_t('\f'); }
+                |   'n'{ value = char32_t('\n'); }
+                |   'r'{ value = char32_t('\r'); }
+                |   't'{ value = char32_t('\t'); }
+                |   'v'{ value = char32_t('\v'); }
+                |   anychar{ value = *matchBegin; }
+                ))
+                ;
+
+        DecDigitSequence : uint64_t
+            ::= token(digit+)
+                {
+                    std::stringstream s;
+                    s.str(ToUtf8(std::u32string(matchBegin, matchEnd)));
+                    s >> value;
+                }
+            ;
+
+        HexDigitSequence : uint64_t
+            ::= token(hexdigit+)
+                {
+                    std::stringstream s;
+                    s.str(ToUtf8(std::u32string(matchBegin, matchEnd)));
+                    s >> std::hex >> value;
+                }
+            ;
+
+        HexDigit4 : uint16_t
+            ::= token(hexdigit hexdigit hexdigit hexdigit)
+                {
+                    std::stringstream s;
+                    s.str(ToUtf8(std::u32string(matchBegin, matchEnd)));
+                    s >> std::hex >> value;
+                }
+            ;
+
+        HexDigit8 : uint32_t
+            ::= token(hexdigit hexdigit hexdigit hexdigit hexdigit hexdigit hexdigit hexdigit)
+                {
+                    std::stringstream s;
+                    s.str(ToUtf8(std::u32string(matchBegin, matchEnd)));
+                    s >> std::hex >> value;
+                }
+            ;
+
+        OctalDigitSequence : uint64_t
+            ::= token([0-7]{ value = 8 * value + (*matchBegin - '0'); })+
+            ;
+
+        Sign
+            ::= '+' | '-'
+            ;
+    }
+}

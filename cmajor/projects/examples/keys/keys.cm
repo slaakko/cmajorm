@@ -1,0 +1,27 @@
+using System;
+
+int main()
+{
+    int retval = 0;
+    RtInitScreen();
+    RtNoEcho();
+    RtRaw();
+    RtKeyPad();
+    try
+    {
+        int ch = RtGetRawCh();
+        while (ch != keyEscape)
+        {
+            string s = "raw: " + ToString(ch) + ", translated: " + ToString(RtTranslateCh(ch)) + "\n";
+            RtAddStr(s.Chars());
+            ch = RtGetRawCh();
+        }
+    }
+    catch (const Exception& ex)
+    {
+        Console.Error() << ex.Message() << endl();
+        retval = 1;
+    }
+    RtDoneScreen();
+    return retval;
+}

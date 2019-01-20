@@ -1,0 +1,111 @@
+using System;
+using cmsx.machine;
+
+namespace cmsx.kernel
+{
+    public const byte exitSystemCall = 0u;
+    public const byte waitSystemCall = 1u;
+    public const byte forkSystemCall = 2u;
+    public const byte writeSystemCall = 3u;
+    public const byte numSystemCalls = 4u;
+
+    public delegate long TrapHandler(Machine& machine, byte trapX, byte trapY, byte trapZ, ulong trapAX, ulong trapBX, ulong trapCX, ulong trapDX, ulong trapEX);
+
+    public inline nothrow ulong MakeSystemCallPtrAddress(int systemCall)
+    {
+        return trapTableBaseAddress + cast<ulong>(systemCall) * 8u;
+    }
+
+    public long Exit(Machine& machine, byte x, byte y, byte z, ulong ax, ulong bx, ulong cx, ulong dx, ulong ex)
+    {
+        if (x != 0u || y != exitSystemCall || z != 0u)
+        {
+            Panic("invalid exit parameters: " + ToString(x) + ", " + ToString(y) + ", " + ToString(z));
+        }
+        Kernel& kernel = Kernel.Instance();
+        ProcessTable& processTable = kernel.GetProcessTable();
+        Process* process = processTable.GetRunning();
+        if (process != null)
+        {
+            ushort exitCode = MakeProcessExitCode(0u, cast<byte>(ax));
+            int retval = ExitProcess(machine, processTable, process, exitCode);
+            if (retval != 0)
+            {
+                Panic("exit failed!");
+            }
+            if (Machine.GetFlag(Machine.Flags.runProgram) && process->pid == kernel.GetProgramPID())
+            {
+                machine.GetProcessor().Exit();
+            }
+            return 0;
+        }
+        else
+        {
+            Panic("exit called for a process that is not running!");
+        }
+        return 0;
+    }
+
+    public long Wait(Machine& machine, byte x, byte y, byte z, ulong ax, ulong bx, ulong cx, ulong dx, ulong ex)
+    {
+        if (x != 0u || y != waitSystemCall || z != 0u)
+        {
+            Panic("invalid wait parameters: " + ToString(x) + ", " + ToString(y) + ", " + ToString(z));
+        }
+        Kernel& kernel = Kernel.Instance();
+        ProcessTable& processTable = kernel.GetProcessTable();
+        Process* process = processTable.GetRunning();
+        if (process != null)
+        {
+            int retval = WaitProcess(machine, processTable, process, ax);
+            return retval;
+        }
+        else
+        {
+            Panic("wait called for a process that is not running!");
+        }
+        return 0;
+    }
+
+    public long Fork(Machine& machine, byte x, byte y, byte z, ulong ax, ulong bx, ulong cx, ulong dx, ulong ex)
+    {
+        if (x != 0u || y != forkSystemCall || z != 0u)
+        {
+            Panic("invalid fork parameters: " + ToString(x) + ", " + ToString(y) + ", " + ToString(z));
+        }
+        Kernel& kernel = Kernel.Instance();
+        ProcessTable& processTable = kernel.GetProcessTable();
+        Process* process = processTable.GetRunning();
+        if (process != null)
+        {
+            int retval = ForkProcess(machine, processTable, process);
+            return retval;
+        }
+        else
+        {
+            Panic("fork called for a process that is not running!");
+        }
+        return 0;
+    }
+
+    public long Write(Machine& machine, byte x, byte y, byte z, ulong ax, ulong bx, ulong cx, ulong dx, ulong ex)
+    {
+        if (x != 0u || y != writeSystemCall || z != 0u)
+        {
+            Panic("invalid write parameters: " + ToString(x) + ", " + ToString(y) + ", " + ToString(z));
+        }
+        Kernel& kernel = Kernel.Instance();
+        ProcessTable& processTable = kernel.GetProcessTable();
+        Process* process = processTable.GetRunning();
+        if (process != null)
+        {
+            long retval = Write(machine, process, cast<int>(ax), bx, cx);
+            return retval;
+        }
+        else
+        {
+            Panic("write called for a process that is not running!");
+        }
+        return 0;
+    }
+}

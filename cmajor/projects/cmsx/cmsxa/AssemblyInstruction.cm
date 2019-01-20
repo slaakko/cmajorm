@@ -1,0 +1,1542 @@
+using System;
+using System.Collections;
+using Span = System.Text.Parsing.Span;
+using cmsx.object;
+
+namespace cmsx.assembly
+{
+    public class AssemblyInstruction
+    {
+        public default virtual ~AssemblyInstruction();
+        public virtual void Assemble(Assembler& assembler, Instruction* inst)
+        {
+            Error("assembly instruction for '" + inst->opCode->name + "' not implemented", inst->span);
+        }
+    }
+
+    public class IsInstruction : AssemblyInstruction
+    {
+        public override void Assemble(Assembler& assembler, Instruction* inst)
+        {
+            Stage prevStage = assembler.stage;
+            assembler.stage = Stage.assemble;
+            OperandList& operandList = *inst->operandList;
+            if (operandList.operands.Count() == 1)
+            {
+                if (!inst->label.IsNull())
+                {
+                    Stage prevStage = assembler.stage;
+                    assembler.stage = Stage.is_;
+                    inst->label->Accept(assembler);
+                    assembler.stage = prevStage;
+                    Symbol* symbol = assembler.currentSymbol;
+                    if (symbol != null)
+                    {
+                        Value x = assembler.Evaluate(operandList.operands[0].Get());
+                        if (x.GetFlag(Value.Flag.pure) || x.flags == Value.Flag.register)
+                        {
+                            symbol->value = x;
+                        }
+                        else
+                        {
+                            Error("operand of " + inst->opCode->name + " instruction not defined", inst->span);
+                        }
+                    }
+                    else
+                    {
+                        Error("label of " + inst->opCode->name + " instruction not defined", inst->span);
+                    }
+                }
+                else
+                {
+                    Error("label of " + inst->opCode->name + " instruction not defined", inst->span);
+                }
+            }
+            else
+            {
+                Error("IS needs one operand", inst->span);
+            }
+            assembler.stage = prevStage;
+        }
+    }
+
+    public class ExternInstruction : AssemblyInstruction
+    {
+        public override void Assemble(Assembler& assembler, Instruction* inst)
+        {
+            Stage prevStage = assembler.stage;
+            assembler.stage = Stage.setExternal;
+            OperandList& operandList = *inst->operandList;
+            if (inst->operandList->operands.Count() > 0)
+            {
+                inst->operandList->Accept(assembler);
+            }
+            else
+            {
+                Error("EXTERN needs at least one operand", inst->span);
+            }
+            assembler.stage = prevStage;
+        }
+    }
+
+    public class LinkOnceInstruction : AssemblyInstruction
+    {
+        public override void Assemble(Assembler& assembler, Instruction* inst)
+        {
+            Stage prevStage = assembler.stage;
+            assembler.stage = Stage.setLinkOnce;
+            OperandList& operandList = *inst->operandList;
+            if (inst->operandList->operands.Count() > 0)
+            {
+                inst->operandList->Accept(assembler);
+            }
+            else
+            {
+                Error("LINKONCE needs at least one operand", inst->span);
+            }
+            assembler.stage = prevStage;
+        }
+    }
+
+    public class ByteInstruction : AssemblyInstruction
+    {
+        public override void Assemble(Assembler& assembler, Instruction* inst)
+        {
+            if (inst->operandList->operands.Count() > 0)
+            {
+                Stage prevStage = assembler.stage;
+                assembler.stage = Stage.bytes;
+                inst->operandList->Accept(assembler);
+                assembler.stage = prevStage;
+            }
+            else
+            {
+                Error("BYTE needs at least one operand", inst->span);
+            }
+        }
+    }
+
+    public class WydeInstruction : AssemblyInstruction
+    {
+        public override void Assemble(Assembler& assembler, Instruction* inst)
+        {
+            if (inst->operandList->operands.Count() > 0)
+            {
+                Stage prevStage = assembler.stage;
+                assembler.stage = Stage.wydes;
+                inst->operandList->Accept(assembler);
+                assembler.stage = prevStage;
+            }
+            else
+            {
+                Error("WYDE needs at least one operand", inst->span);
+            }
+        }
+    }
+
+    public class TetraInstruction : AssemblyInstruction
+    {
+        public override void Assemble(Assembler& assembler, Instruction* inst)
+        {
+            if (inst->operandList->operands.Count() > 0)
+            {
+                Stage prevStage = assembler.stage;
+                assembler.stage = Stage.tetras;
+                inst->operandList->Accept(assembler);
+                assembler.stage = prevStage;
+            }
+            else
+            {
+                Error("TETRA needs at least one operand", inst->span);
+            }
+        }
+    }
+
+    public class OctaInstruction : AssemblyInstruction
+    {
+        public override void Assemble(Assembler& assembler, Instruction* inst)
+        {
+            if (inst->operandList->operands.Count() > 0)
+            {
+                Stage prevStage = assembler.stage;
+                assembler.stage = Stage.octas;
+                inst->operandList->Accept(assembler);
+                assembler.stage = prevStage;
+            }
+            else
+            {
+                Error("OCTA needs at least one operand", inst->span);
+            }
+        }
+    }
+
+    public class LoadInstruction : AssemblyInstruction
+    {
+        public override void Assemble(Assembler& assembler, Instruction* inst)
+        {
+            #assert(inst->opCode->value >= 0 && inst->opCode->value < 256);
+            byte opCode = cast<byte>(inst->opCode->value);
+            Stage prevStage = assembler.stage;
+            assembler.stage = Stage.assemble;
+            OperandList& operandList = *inst->operandList;
+            if (operandList.operands.Count() >= 2 && operandList.operands.Count() <= 3)
+            {
+                Value x = assembler.Evaluate(operandList.operands[0].Get());
+                Value y = assembler.Evaluate(operandList.operands[1].Get());
+                Value z = Value();
+                if (operandList.operands.Count() == 3)
+                {
+                    z = assembler.Evaluate(operandList.operands[2].Get());
+                }
+                if (x.flags == Value.Flag.register)
+                {
+                    if (y.flags == Value.Flag.register)
+                    {
+                        if (z.flags == Value.Flag.register)
+                        {
+                            assembler.EmitOpCode(opCode);
+                            assembler.EmitRegisterValue("X", x);
+                            assembler.EmitRegisterValue("Y", y);
+                            assembler.EmitRegisterValue("Z", z);
+                        }
+                        else if (z.GetFlag(Value.Flag.pure))
+                        {
+                            if (z.value <= MaxValue<byte>())
+                            {
+                                assembler.EmitOpCode(opCode + 1u);
+                                assembler.EmitRegisterValue("X", x);
+                                assembler.EmitRegisterValue("Y", y);
+                                assembler.EmitPureByteValue("Z", z);
+                            }
+                            else 
+                            {
+                                assembler.EmitSetReg255Value(z.value);
+                                assembler.EmitOpCode(opCode);
+                                assembler.EmitRegisterValue("X", x);
+                                assembler.EmitRegisterValue("Y", y);
+                                assembler.EmitRegisterValue("Z", Value(Value.Flag.register, 255u, null));
+                            }
+                        }
+                        else
+                        {
+                            Error("if X and Y operands of " + inst->opCode->name + " instruction are registers, Z must be register or pure", inst->span);
+                        }
+                    }
+                    else 
+                    {
+                        if (z.flags == Value.Flag.undefined)
+                        {
+                            if (y.symbol != null)
+                            {
+                                assembler.EmitAbsoluteRegisterValue(x, "X", y.symbol);
+                                assembler.EmitOpCode(opCode + 1u);
+                                assembler.EmitRegisterValue("X", x);
+                                assembler.EmitRegisterValue("X", x);
+                                assembler.EmitPureByteValue("Z", Value(Value.Flag.pure, 0u, null));
+                            }
+                            else
+                            {
+                                Error("if Z operand of " + inst->opCode->name + " instruction is not defined, YZ must be a symbol", inst->span);
+                            }
+                        }
+                        else
+                        {
+                            Error("if Z operands of " + inst->opCode->name + " instruction is defined, X and Y must be register numbers", inst->span);
+                        }
+                    }
+                }
+                else
+                {
+                    Error("X operand of " + inst->opCode->name + " instruction must be a register number", inst->span);
+                }
+            }
+            else
+            {
+                Error(inst->opCode->name + " needs two or three operands", inst->span);
+            }
+            assembler.stage = prevStage;
+        }
+    }
+
+    public class StoreInstruction : AssemblyInstruction
+    {
+        public override void Assemble(Assembler& assembler, Instruction* inst)
+        {
+            #assert(inst->opCode->value >= 0 && inst->opCode->value < 256);
+            byte opCode = cast<byte>(inst->opCode->value);
+            Stage prevStage = assembler.stage;
+            assembler.stage = Stage.assemble;
+            OperandList& operandList = *inst->operandList;
+            if (operandList.operands.Count() >= 2 && operandList.operands.Count() <= 3)
+            {
+                Value x = assembler.Evaluate(operandList.operands[0].Get());
+                Value y = assembler.Evaluate(operandList.operands[1].Get());
+                Value z = Value();
+                if (operandList.operands.Count() == 3)
+                {
+                    z = assembler.Evaluate(operandList.operands[2].Get());
+                }
+                if (x.flags == Value.Flag.register)
+                {
+                    if (y.flags == Value.Flag.register)
+                    {
+                        if (z.flags == Value.Flag.register)
+                        {
+                            assembler.EmitOpCode(opCode);
+                            assembler.EmitRegisterValue("X", x);
+                            assembler.EmitRegisterValue("Y", y);
+                            assembler.EmitRegisterValue("Z", z);
+                        }
+                        else if (z.GetFlag(Value.Flag.pure))
+                        {
+                            if (z.value <= MaxValue<byte>())
+                            {
+                                assembler.EmitOpCode(opCode + 1u);
+                                assembler.EmitRegisterValue("X", x);
+                                assembler.EmitRegisterValue("Y", y);
+                                assembler.EmitPureByteValue("Z", z);
+                            }
+                            else 
+                            {
+                                assembler.EmitSetReg255Value(z.value);
+                                assembler.EmitOpCode(opCode);
+                                assembler.EmitRegisterValue("X", x);
+                                assembler.EmitRegisterValue("Y", y);
+                                assembler.EmitRegisterValue("Z", Value(Value.Flag.register, 255u, null));
+                            }
+                        }
+                        else
+                        {
+                            Error("if X and Y operands of " + inst->opCode->name + " instruction are registers, Z must be register or pure", inst->span);
+                        }
+                    }
+                    else 
+                    {
+                        if (z.flags == Value.Flag.undefined)
+                        {
+                            if (y.symbol != null)
+                            {
+                                assembler.EmitAbsoluteRegisterValue(Value(Value.Flag.register, 255u, null), "X", y.symbol);
+                                assembler.EmitOpCode(opCode + 1u);
+                                assembler.EmitRegisterValue("X", x);
+                                assembler.EmitRegisterValue("Y", Value(Value.Flag.register, 255u, null));
+                                assembler.EmitPureByteValue("Z", Value(Value.Flag.pure, 0u, null));
+                            }
+                            else
+                            {
+                                Error("if Z operand of " + inst->opCode->name + " instruction is not defined, YZ must be a symbol", inst->span);
+                            }
+                        }
+                        else
+                        {
+                            Error("if Z operands of " + inst->opCode->name + " instruction is defined, X and Y must be register numbers", inst->span);
+                        }
+                    }
+                }
+                else
+                {
+                    Error("X operand of " + inst->opCode->name + " instruction must be a register number", inst->span);
+                }
+            }
+            else
+            {
+                Error(inst->opCode->name + " needs two or three operands", inst->span);
+            }
+            assembler.stage = prevStage;
+        }
+    }
+
+    public class StoreConstantInstruction : AssemblyInstruction
+    {
+        public override void Assemble(Assembler& assembler, Instruction* inst)
+        {
+            #assert(inst->opCode->value >= 0 && inst->opCode->value < 256);
+            byte opCode = cast<byte>(inst->opCode->value);
+            Stage prevStage = assembler.stage;
+            assembler.stage = Stage.assemble;
+            OperandList& operandList = *inst->operandList;
+            if (operandList.operands.Count() >= 2 && operandList.operands.Count() <= 3)
+            {
+                Value x = assembler.Evaluate(operandList.operands[0].Get());
+                Value y = assembler.Evaluate(operandList.operands[1].Get());
+                Value z = Value();
+                if (operandList.operands.Count() == 3)
+                {
+                    z = assembler.Evaluate(operandList.operands[2].Get());
+                }
+                if (x.GetFlag(Value.Flag.pure))
+                {
+                    if (y.flags == Value.Flag.register)
+                    {
+                        if (z.flags == Value.Flag.register)
+                        {
+                            assembler.EmitOpCode(opCode);
+                            assembler.EmitPureByteValue("X", x);
+                            assembler.EmitRegisterValue("Y", y);
+                            assembler.EmitRegisterValue("Z", z);
+                        }
+                        else if (z.GetFlag(Value.Flag.pure))
+                        {
+                            if (z.value <= MaxValue<byte>())
+                            {
+                                assembler.EmitOpCode(opCode + 1u);
+                                assembler.EmitPureByteValue("X", x);
+                                assembler.EmitRegisterValue("Y", y);
+                                assembler.EmitPureByteValue("Z", z);
+                            }
+                            else 
+                            {
+                                assembler.EmitSetReg255Value(z.value);
+                                assembler.EmitOpCode(opCode);
+                                assembler.EmitPureByteValue("X", x);
+                                assembler.EmitRegisterValue("Y", y);
+                                assembler.EmitRegisterValue("Z", Value(Value.Flag.register, 255u, null));
+                            }
+                        }
+                        else
+                        {
+                            Error("if X and Y operands of " + inst->opCode->name + " instruction are registers, Z must be register or pure", inst->span);
+                        }
+                    }
+                    else 
+                    {
+                        if (z.flags == Value.Flag.undefined)
+                        {
+                            if (y.symbol != null)
+                            {
+                                assembler.EmitAbsoluteRegisterValue(Value(Value.Flag.register, 255u, null), "X", y.symbol);
+                                assembler.EmitOpCode(opCode + 1u);
+                                assembler.EmitRegisterValue("X", x);
+                                assembler.EmitRegisterValue("Y", Value(Value.Flag.register, 255u, null));
+                                assembler.EmitPureByteValue("Z", Value(Value.Flag.pure, 0u, null));
+                            }
+                            else
+                            {
+                                Error("if Z operand of " + inst->opCode->name + " instruction is not defined, YZ must be a symbol", inst->span);
+                            }
+                        }
+                        else
+                        {
+                            Error("if Z operands of " + inst->opCode->name + " instruction is defined, X and Y must be register numbers", inst->span);
+                        }
+                    }
+                }
+                else
+                {
+                    Error("X operand of " + inst->opCode->name + " instruction must be a register number", inst->span);
+                }
+            }
+            else
+            {
+                Error(inst->opCode->name + " needs two or three operands", inst->span);
+            }
+            assembler.stage = prevStage;
+        }
+    }
+
+    public class RegisterInstruction : AssemblyInstruction
+    {
+        public override void Assemble(Assembler& assembler, Instruction* inst)
+        {
+            #assert(inst->opCode->value >= 0 && inst->opCode->value < 256 || inst->opCode->value == LDA);
+            byte opCode = cast<byte>(inst->opCode->value);
+            if (inst->opCode->value == LDA)
+            {
+                opCode = cmsx.machine.ADDU;
+            }
+            Stage prevStage = assembler.stage;
+            assembler.stage = Stage.assemble;
+            OperandList& operandList = *inst->operandList;
+            if (operandList.operands.Count() >= 2 && operandList.operands.Count() <= 3)
+            {
+                Value x = assembler.Evaluate(operandList.operands[0].Get());
+                Value y = assembler.Evaluate(operandList.operands[1].Get());
+                Value z = Value();
+                if (operandList.operands.Count() == 3)
+                {
+                    z = assembler.Evaluate(operandList.operands[2].Get());
+                }
+                if (x.flags == Value.Flag.register && y.flags == Value.Flag.register)
+                {
+                    if (z.flags == Value.Flag.register)
+                    {
+                        assembler.EmitOpCode(opCode);
+                        assembler.EmitRegisterValue("X", x);
+                        assembler.EmitRegisterValue("Y", y);
+                        assembler.EmitRegisterValue("Z", z);
+                    }
+                    else if (z.GetFlag(Value.Flag.pure))
+                    {
+                        if (z.value <= MaxValue<byte>())
+                        {
+                            assembler.EmitOpCode(opCode + 1u);
+                            assembler.EmitRegisterValue("X", x);
+                            assembler.EmitRegisterValue("Y", y);
+                            assembler.EmitPureByteValue("Z", z);
+                        }
+                        else 
+                        {
+                            assembler.EmitSetReg255Value(z.value);
+                            assembler.EmitOpCode(opCode);
+                            assembler.EmitRegisterValue("X", x);
+                            assembler.EmitRegisterValue("Y", y);
+                            assembler.EmitRegisterValue("Z", Value(Value.Flag.register, 255u, null));
+                        }
+                    }
+                    else if (z.flags == Value.Flag.undefined)
+                    {
+                        assembler.EmitOpCode(opCode + 1u);
+                        assembler.EmitRegisterValue("X", x);
+                        assembler.EmitRegisterValue("Y", y);
+                        assembler.EmitPureByteValue("Z", Value(Value.Flag.pure, 0u, null));
+                    }
+                }
+                else
+                {
+                    Error("X and Y operands of " + inst->opCode->name + " instruction must be register numbers", inst->span);
+                }
+            }
+            else
+            {
+                Error(inst->opCode->name + " needs two or three operands", inst->span);
+            }
+            assembler.stage = prevStage;
+        }
+    }
+
+    public class FloatingPointInstruction : AssemblyInstruction
+    {
+        public override void Assemble(Assembler& assembler, Instruction* inst)
+        {
+            #assert(inst->opCode->value >= 0 && inst->opCode->value < 256 || inst->opCode->value == LDA);
+            byte opCode = cast<byte>(inst->opCode->value);
+            if (inst->opCode->value == LDA)
+            {
+                opCode = cmsx.machine.ADDU;
+            }
+            Stage prevStage = assembler.stage;
+            assembler.stage = Stage.assemble;
+            OperandList& operandList = *inst->operandList;
+            if (operandList.operands.Count() == 3 )
+            {
+                Value x = assembler.Evaluate(operandList.operands[0].Get());
+                Value y = assembler.Evaluate(operandList.operands[1].Get());
+                Value z = assembler.Evaluate(operandList.operands[2].Get());
+                if (x.flags == Value.Flag.register && y.flags == Value.Flag.register && z.flags == Value.Flag.register)
+                {
+                    assembler.EmitOpCode(opCode);
+                    assembler.EmitRegisterValue("X", x);
+                    assembler.EmitRegisterValue("Y", y);
+                    assembler.EmitRegisterValue("Z", z);
+                }
+                else
+                {
+                    Error("all operands of " + inst->opCode->name + " instruction must be register numbers", inst->span);
+                }
+            }
+            else
+            {
+                Error(inst->opCode->name + " needs three operands", inst->span);
+            }
+            assembler.stage = prevStage;
+        }
+    }
+
+    public class SetInstruction : AssemblyInstruction
+    {
+        public override void Assemble(Assembler& assembler, Instruction* inst)
+        {
+            Stage prevStage = assembler.stage;
+            assembler.stage = Stage.assemble;
+            OperandList& operandList = *inst->operandList;
+            if (operandList.operands.Count() == 2)
+            {
+                Value x = assembler.Evaluate(operandList.operands[0].Get());
+                Value y = assembler.Evaluate(operandList.operands[1].Get());
+                if (x.flags == Value.Flag.register)
+                {
+                    if (y.flags == Value.Flag.register)
+                    {
+                        assembler.EmitOpCode(cmsx.machine.ORI);
+                        assembler.EmitRegisterValue("X", x);
+                        assembler.EmitRegisterValue("Y", y);
+                        assembler.EmitPureByteValue("Z", Value(Value.Flag.pure, 0u, null));
+                    }
+                    else if (y.GetFlag(Value.Flag.pure))
+                    {
+                        ulong value = y.value;
+                        if (value <= MaxValue<ushort>())
+                        {
+                            byte b0 = cast<byte>(value);
+                            value = value >> 8u;
+                            byte b1 = cast<byte>(value);
+                            value = value >> 8u;
+                            assembler.EmitOpCode(cmsx.machine.SETL);
+                            assembler.EmitRegisterValue("X", x);
+                            assembler.EmitPureByteValue("Y", Value(Value.Flag.pure, b1, null));
+                            assembler.EmitPureByteValue("Z", Value(Value.Flag.pure, b0, null));
+                        }
+                        else if (value <= MaxValue<uint>())
+                        {
+                            byte b0 = cast<byte>(value);
+                            value = value >> 8u;
+                            byte b1 = cast<byte>(value);
+                            value = value >> 8u;
+                            byte b2 = cast<byte>(value);
+                            value = value >> 8u;
+                            byte b3 = cast<byte>(value);
+                            value = value >> 8u;
+                            assembler.EmitOpCode(cmsx.machine.SETML);
+                            assembler.EmitRegisterValue("X", x);
+                            assembler.EmitPureByteValue("Y", Value(Value.Flag.pure, b3, null));
+                            assembler.EmitPureByteValue("Z", Value(Value.Flag.pure, b2, null));
+                            assembler.EmitOpCode(cmsx.machine.ORL);
+                            assembler.EmitRegisterValue("X", x);
+                            assembler.EmitPureByteValue("Y", Value(Value.Flag.pure, b1, null));
+                            assembler.EmitPureByteValue("Z", Value(Value.Flag.pure, b0, null));
+                        }
+                        else
+                        {
+                            byte b0 = cast<byte>(value);
+                            value = value >> 8u;
+                            byte b1 = cast<byte>(value);
+                            value = value >> 8u;
+                            byte b2 = cast<byte>(value);
+                            value = value >> 8u;
+                            byte b3 = cast<byte>(value);
+                            value = value >> 8u;
+                            byte b4 = cast<byte>(value);
+                            value = value >> 8u;
+                            byte b5 = cast<byte>(value);
+                            value = value >> 8u;
+                            byte b6 = cast<byte>(value);
+                            value = value >> 8u;
+                            byte b7 = cast<byte>(value);
+                            value = value >> 8u;
+                            assembler.EmitOpCode(cmsx.machine.SETH);
+                            assembler.EmitRegisterValue("X", x);
+                            assembler.EmitPureByteValue("Y", Value(Value.Flag.pure, b7, null));
+                            assembler.EmitPureByteValue("Z", Value(Value.Flag.pure, b6, null));
+                            assembler.EmitOpCode(cmsx.machine.ORMH);
+                            assembler.EmitRegisterValue("X", x);
+                            assembler.EmitPureByteValue("Y", Value(Value.Flag.pure, b5, null));
+                            assembler.EmitPureByteValue("Z", Value(Value.Flag.pure, b4, null));
+                            assembler.EmitOpCode(cmsx.machine.ORML);
+                            assembler.EmitRegisterValue("X", x);
+                            assembler.EmitPureByteValue("Y", Value(Value.Flag.pure, b3, null));
+                            assembler.EmitPureByteValue("Z", Value(Value.Flag.pure, b2, null));
+                            assembler.EmitOpCode(cmsx.machine.ORL);
+                            assembler.EmitRegisterValue("X", x);
+                            assembler.EmitPureByteValue("Y", Value(Value.Flag.pure, b1, null));
+                            assembler.EmitPureByteValue("Z", Value(Value.Flag.pure, b0, null));
+                        }
+                    }
+                    else
+                    {
+                        Error("Y operand of " + inst->opCode->name + " instruction must be a register number or a pure value", inst->span);
+                    }
+                }
+                else
+                {
+                    Error("X operand of " + inst->opCode->name + " instruction must be a register number", inst->span);
+                }
+            }
+            else
+            {
+                Error(inst->opCode->name + " needs two operands", inst->span);
+            }
+            assembler.stage = prevStage;
+        }
+    }
+
+    public class NegateInstruction : AssemblyInstruction
+    {
+        public override void Assemble(Assembler& assembler, Instruction* inst)
+        {
+            #assert(inst->opCode->value >= 0 && inst->opCode->value < 256);
+            byte opCode = cast<byte>(inst->opCode->value);
+            Stage prevStage = assembler.stage;
+            assembler.stage = Stage.assemble;
+            OperandList& operandList = *inst->operandList;
+            if (operandList.operands.Count() == 2 || operandList.operands.Count() == 3)
+            {
+                Value x = assembler.Evaluate(operandList.operands[0].Get());
+                Value y = assembler.Evaluate(operandList.operands[1].Get());
+                Value z = Value();
+                if (operandList.operands.Count() == 3)
+                {
+                    z = assembler.Evaluate(operandList.operands[2].Get());
+                }
+                if (x.flags == Value.Flag.register)
+                {
+                    if (y.GetFlag(Value.Flag.pure))
+                    {
+                        if (z.flags == Value.Flag.register)
+                        {
+                            assembler.EmitOpCode(opCode);
+                            assembler.EmitRegisterValue("X", x);
+                            assembler.EmitPureByteValue("Y", y);
+                            assembler.EmitRegisterValue("Z", z);
+                        }
+                        else if (z.GetFlag(Value.Flag.pure))
+                        {
+                            if (z.value <= MaxValue<byte>())
+                            {
+                                assembler.EmitOpCode(opCode + 1u);
+                                assembler.EmitRegisterValue("X", x);
+                                assembler.EmitPureByteValue("Y", y);
+                                assembler.EmitPureByteValue("Z", z);
+                            }
+                            else 
+                            {
+                                assembler.EmitSetReg255Value(z.value);
+                                assembler.EmitOpCode(opCode);
+                                assembler.EmitPureByteValue("X", x);
+                                assembler.EmitPureByteValue("Y", y);
+                                assembler.EmitRegisterValue("Z", Value(Value.Flag.register, 255u, null));
+                            }
+                        }
+                        else if (z.flags == Value.Flag.undefined)
+                        {
+                            assembler.EmitOpCode(opCode + 1u);
+                            assembler.EmitPureByteValue("X", x);
+                            assembler.EmitRegisterValue("Y", y);
+                            assembler.EmitPureByteValue("Z", Value(Value.Flag.pure, 0u, null));
+                        }
+                    }
+                    else if (y.flags == Value.Flag.register)
+                    {
+                        if (z.flags == Value.Flag.undefined)
+                        {
+                            assembler.EmitOpCode(opCode + 1u);
+                            assembler.EmitRegisterValue("X", x);
+                            assembler.EmitPureByteValue("Y", Value(Value.Flag.pure, 0u, null));
+                            assembler.EmitPureByteValue("Z", y);
+                        }
+                        else
+                        {
+                            Error("If X and Y operands of " + inst->opCode->name + " instruction are register numbers, Z must be undefined", inst->span);
+                        }
+                    }
+                }
+                else
+                {
+                    Error("X operand of " + inst->opCode->name + " instruction must be a register number", inst->span);
+                }
+            }
+            else
+            {
+                Error(inst->opCode->name + " needs two or three operands", inst->span);
+            }
+            assembler.stage = prevStage;
+        }
+    }
+
+    public class FloatingRoundingInstruction : AssemblyInstruction
+    {
+        public override void Assemble(Assembler& assembler, Instruction* inst)
+        {
+            #assert(inst->opCode->value >= 0 && inst->opCode->value < 256);
+            byte opCode = cast<byte>(inst->opCode->value);
+            Stage prevStage = assembler.stage;
+            assembler.stage = Stage.assemble;
+            OperandList& operandList = *inst->operandList;
+            if (operandList.operands.Count() == 2 || operandList.operands.Count() == 3)
+            {
+                Value x = assembler.Evaluate(operandList.operands[0].Get());
+                Value y = assembler.Evaluate(operandList.operands[1].Get());
+                Value z = Value();
+                if (operandList.operands.Count() == 3)
+                {
+                    z = assembler.Evaluate(operandList.operands[2].Get());
+                }
+                if (x.flags == Value.Flag.register && y.flags == Value.Flag.register && z.flags == Value.Flag.undefined)
+                {
+                    assembler.EmitOpCode(opCode);
+                    assembler.EmitRegisterValue("X", x);
+                    assembler.EmitPureByteValue("Y", Value(Value.Flag.pure, 1u, null));
+                    assembler.EmitRegisterValue("Z", y);
+                }
+                else if (x.flags == Value.Flag.register && y.GetFlag(Value.Flag.pure) && z.flags == Value.Flag.register)
+                {
+                    assembler.EmitOpCode(opCode);
+                    assembler.EmitRegisterValue("X", x);
+                    assembler.EmitPureByteValue("Y", y);
+                    assembler.EmitRegisterValue("Z", z);
+                }
+                else
+                {
+                    Error(inst->opCode->name + " instruction needs X (register), Y (pure), Z (register), or X (register), Z (register) operands", inst->span);
+                }
+            }
+            else
+            {
+                Error(inst->opCode->name + " needs two or three operands", inst->span);
+            }
+            assembler.stage = prevStage;
+        }
+    }
+
+    public class WydeImmediateInstruction : AssemblyInstruction
+    {
+        public override void Assemble(Assembler& assembler, Instruction* inst)
+        {
+            #assert(inst->opCode->value >= 0 && inst->opCode->value < 256);
+            byte opCode = cast<byte>(inst->opCode->value);
+            Stage prevStage = assembler.stage;
+            assembler.stage = Stage.assemble;
+            OperandList& operandList = *inst->operandList;
+            if (operandList.operands.Count() == 2)
+            {
+                Value x = assembler.Evaluate(operandList.operands[0].Get());
+                Value y = assembler.Evaluate(operandList.operands[1].Get());
+                if (x.flags == Value.Flag.register)
+                {
+                    if (y.GetFlag(Value.Flag.pure) && y.value <= MaxValue<ushort>())
+                    {
+                        ulong value = y.value;
+                        byte b0 = cast<byte>(value);
+                        value = value >> 8u;
+                        byte b1 = cast<byte>(value);
+                        value = value >> 8u;
+                        assembler.EmitOpCode(opCode);
+                        assembler.EmitRegisterValue("X", x);
+                        assembler.EmitPureByteValue("Y", Value(Value.Flag.pure, b1, null));
+                        assembler.EmitPureByteValue("Z", Value(Value.Flag.pure, b0, null));
+                    }
+                    else 
+                    {
+                        Error("Y operand of " + inst->opCode->name + " instruction too big", inst->span);
+                    }
+                }
+                else
+                {
+                    Error("X operand of " + inst->opCode->name + " instruction must be a register number", inst->span);
+                }
+            }
+            else
+            {
+                Error(inst->opCode->name + " needs two operands", inst->span);
+            }
+            assembler.stage = prevStage;
+        }
+    }
+
+    public class JumpInstruction : AssemblyInstruction
+    {
+        public override void Assemble(Assembler& assembler, Instruction* inst)
+        {
+            #assert(inst->opCode->value >= 0 && inst->opCode->value < 256);
+            byte opCode = cast<byte>(inst->opCode->value);
+            Stage prevStage = assembler.stage;
+            assembler.stage = Stage.assemble;
+            OperandList& operandList = *inst->operandList;
+            if (operandList.operands.Count() == 1)
+            {
+                Value x = assembler.Evaluate(operandList.operands[0].Get());
+                Symbol* symbol = x.symbol;
+                if (symbol != null)
+                {
+                    if (symbol->linkage == Linkage.internal_ || symbol->linkage == Linkage.external)
+                    {
+                        if (symbol->value.GetFlag(Value.Flag.address))
+                        {
+                            ulong to = symbol->value.value;
+                            ulong at = assembler.currentSection->Address();
+                            if (at >= to)
+                            {
+                                ulong offset = (at - to) >> 2u;
+                                if (offset <= (cast<ulong>(MaxValue<ushort>()) << 8u))
+                                {
+                                    assembler.EmitOpCode(cmsx.machine.JMPB);
+                                    assembler.EmitLongOffset(cast<uint>(offset));
+                                }
+                                else
+                                {
+                                    Error(inst->opCode->name + " too far", inst->span);
+                                }
+                            }
+                            else
+                            {
+                                ulong offset = (to - at) >> 2u;
+                                if (offset <= (cast<ulong>(MaxValue<ushort>()) << 8u))
+                                {
+                                    assembler.EmitOpCode(cmsx.machine.JMP);
+                                    assembler.EmitLongOffset(cast<uint>(offset));
+                                }
+                                else
+                                {
+                                    Error(inst->opCode->name + " too far", inst->span);
+                                }
+                            }
+                        }
+                        else if (symbol->value.flags == Value.Flag.undefined)
+                        {
+                            assembler.EmitForwardLongJump(symbol);
+                        }
+                        else
+                        {
+                            Error("symbol operand of " + inst->opCode->name + " instruction cannot be a register number", inst->span);
+                        }
+                    }
+                    else if (symbol->linkage == Linkage.undefined)
+                    {
+                        Error(inst->opCode->name + " to undefined symbol", inst->span);
+                    }
+                }
+                else
+                {
+                    Error("X operand of " + inst->opCode->name + " instruction must be a symbol", inst->span);
+                }
+            }
+            else
+            {
+                Error(inst->opCode->name + " needs one operand", inst->span);
+            }
+            assembler.stage = prevStage;
+        }
+    }
+
+    public class GoInstruction : AssemblyInstruction
+    {
+        public override void Assemble(Assembler& assembler, Instruction* inst)
+        {
+            #assert(inst->opCode->value >= 0 && inst->opCode->value < 256);
+            byte opCode = cast<byte>(inst->opCode->value);
+            Stage prevStage = assembler.stage;
+            assembler.stage = Stage.assemble;
+            OperandList& operandList = *inst->operandList;
+            if (operandList.operands.Count() >= 2 && operandList.operands.Count() <= 3)
+            {
+                Value x = assembler.Evaluate(operandList.operands[0].Get());
+                Value y = assembler.Evaluate(operandList.operands[1].Get());
+                Value z = Value();
+                if (operandList.operands.Count() == 3)
+                {
+                    z = assembler.Evaluate(operandList.operands[2].Get());
+                }
+                if (x.flags == Value.Flag.register)
+                {
+                    if (y.flags == Value.Flag.register)
+                    {
+                        if (z.flags == Value.Flag.register)
+                        {
+                            assembler.EmitOpCode(opCode);
+                            assembler.EmitRegisterValue("X", x);
+                            assembler.EmitRegisterValue("Y", y);
+                            assembler.EmitRegisterValue("Z", z);
+                        }
+                        else if (z.GetFlag(Value.Flag.pure))
+                        {
+                            if (z.value <= MaxValue<byte>())
+                            {
+                                assembler.EmitOpCode(opCode + 1u);
+                                assembler.EmitRegisterValue("X", x);
+                                assembler.EmitRegisterValue("Y", y);
+                                assembler.EmitPureByteValue("Z", z);
+                            }
+                            else 
+                            {
+                                assembler.EmitSetReg255Value(z.value);
+                                assembler.EmitOpCode(opCode);
+                                assembler.EmitRegisterValue("X", x);
+                                assembler.EmitRegisterValue("Y", y);
+                                assembler.EmitRegisterValue("Z", Value(Value.Flag.register, 255u, null));
+                            }
+                        }
+                        else if (z.flags == Value.Flag.undefined)
+                        {
+                            assembler.EmitOpCode(opCode + 1u);
+                            assembler.EmitRegisterValue("X", x);
+                            assembler.EmitRegisterValue("Y", y);
+                            assembler.EmitPureByteValue("Z", Value(Value.Flag.pure, 0u, null));
+                        }
+                    }
+                    else if (y.symbol != null)
+                    {
+                        assembler.EmitAbsoluteRegisterValue(x, "X", y.symbol);
+                        if (z.flags == Value.Flag.register)
+                        {
+                            assembler.EmitOpCode(opCode);
+                            assembler.EmitRegisterValue("X", x);
+                            assembler.EmitRegisterValue("X", x);
+                            assembler.EmitRegisterValue("Z", z);
+                        }
+                        else if (z.GetFlag(Value.Flag.pure))
+                        {
+                            if (z.value <= MaxValue<byte>())
+                            {
+                                assembler.EmitOpCode(opCode + 1u);
+                                assembler.EmitRegisterValue("X", x);
+                                assembler.EmitRegisterValue("X", x);
+                                assembler.EmitPureByteValue("Z", z);
+                            }
+                            else 
+                            {
+                                Error("Z operand of " + inst->opCode->name + " instruction must be either a register number or a pure byte value", inst->span);
+                            }
+                        }
+                        else if (z.flags == Value.Flag.undefined)
+                        {
+                            assembler.EmitOpCode(opCode + 1u);
+                            assembler.EmitRegisterValue("X", x);
+                            assembler.EmitRegisterValue("X", x);
+                            assembler.EmitPureByteValue("Z", Value(Value.Flag.pure, 0u, null));
+                        }
+                    }
+                    else
+                    {
+                        Error("Y operand of " + inst->opCode->name + " instruction must be either a register number or a symbol", inst->span);
+                    }
+                }
+                else
+                {
+                    Error("X operand of " + inst->opCode->name + " instruction must be a register number", inst->span);
+                }
+            }
+            else
+            {
+                Error(inst->opCode->name + " needs two or three operands", inst->span);
+            }
+            assembler.stage = prevStage;
+        }
+    }
+
+    public class CallInstruction : AssemblyInstruction
+    {
+        public override void Assemble(Assembler& assembler, Instruction* inst)
+        {
+            #assert(inst->opCode->value >= 0 && inst->opCode->value < 256);
+            byte opCode = cast<byte>(inst->opCode->value);
+            Stage prevStage = assembler.stage;
+            assembler.stage = Stage.assemble;
+            OperandList& operandList = *inst->operandList;
+            if (operandList.operands.Count() >= 2 && operandList.operands.Count() <= 3)
+            {
+                Value x = assembler.Evaluate(operandList.operands[0].Get());
+                Value y = assembler.Evaluate(operandList.operands[1].Get());
+                Value z = Value();
+                if (operandList.operands.Count() == 3)
+                {
+                    z = assembler.Evaluate(operandList.operands[2].Get());
+                }
+                if (x.flags == Value.Flag.register)
+                {
+                    if (y.symbol != null)
+                    {
+                        assembler.EmitAbsoluteRegisterValue(x, "X", y.symbol);
+                        if (z.flags == Value.Flag.register)
+                        {
+                            assembler.EmitOpCode(opCode);
+                            assembler.EmitRegisterValue("X", x);
+                            assembler.EmitRegisterValue("X", x);
+                            assembler.EmitRegisterValue("Z", z);
+                        }
+                        else if (z.GetFlag(Value.Flag.pure))
+                        {
+                            if (z.value <= MaxValue<byte>())
+                            {
+                                assembler.EmitOpCode(opCode + 1u);
+                                assembler.EmitRegisterValue("X", x);
+                                assembler.EmitRegisterValue("X", x);
+                                assembler.EmitPureByteValue("Z", z);
+                            }
+                            else 
+                            {
+                                Error("Z operand of " + inst->opCode->name + " instruction must be either a register number or a pure byte value", inst->span);
+                            }
+                        }
+                        else if (z.flags == Value.Flag.undefined)
+                        {
+                            assembler.EmitOpCode(opCode + 1u);
+                            assembler.EmitRegisterValue("X", x);
+                            assembler.EmitRegisterValue("X", x);
+                            assembler.EmitPureByteValue("Z", Value(Value.Flag.pure, 0u, null));
+                        }
+                    }
+                    else
+                    {
+                        Error("Y operand of " + inst->opCode->name + " instruction must be a symbol", inst->span);
+                    }
+                }
+                else
+                {
+                    Error("X operand of " + inst->opCode->name + " instruction must be a register number", inst->span);
+                }
+            }
+            else
+            {
+                Error(inst->opCode->name + " needs two or three operands", inst->span);
+            }
+            assembler.stage = prevStage;
+        }
+    }
+
+    public class RetInstruction : AssemblyInstruction
+    {
+        public override void Assemble(Assembler& assembler, Instruction* inst)
+        {
+            #assert(inst->opCode->value >= 0 && inst->opCode->value < 256);
+            byte opCode = cast<byte>(inst->opCode->value);
+            Stage prevStage = assembler.stage;
+            assembler.stage = Stage.assemble;
+            OperandList& operandList = *inst->operandList;
+            if (operandList.operands.Count() == 1)
+            {
+                assembler.EmitOpCode(opCode);
+                assembler.EmitPureByteValue("X", Value(Value.Flag.pure, 0u, null));
+                assembler.EmitPureByteValue("Y", Value(Value.Flag.pure, 0u, null));
+                assembler.EmitPureByteValue("Z", Value(Value.Flag.pure, 0u, null));
+            }
+            else
+            {
+                Error(inst->opCode->name + " takes no operands", inst->span);
+            }
+            assembler.stage = prevStage;
+        }
+    }
+
+    public class SwymInstruction : AssemblyInstruction
+    {
+        public override void Assemble(Assembler& assembler, Instruction* inst)
+        {
+            #assert(inst->opCode->value >= 0 && inst->opCode->value < 256);
+            byte opCode = cast<byte>(inst->opCode->value);
+            Stage prevStage = assembler.stage;
+            assembler.stage = Stage.assemble;
+            OperandList& operandList = *inst->operandList;
+            if (operandList.operands.Count() == 1)
+            {
+                assembler.EmitOpCode(opCode);
+                assembler.EmitPureByteValue("X", Value(Value.Flag.pure, 0u, null));
+                assembler.EmitPureByteValue("Y", Value(Value.Flag.pure, 0u, null));
+                assembler.EmitPureByteValue("Z", Value(Value.Flag.pure, 0u, null));
+            }
+            else
+            {
+                Error(inst->opCode->name + " takes no operands", inst->span);
+            }
+            assembler.stage = prevStage;
+        }
+    }
+
+    public class BranchInstruction : AssemblyInstruction
+    {
+        public override void Assemble(Assembler& assembler, Instruction* inst)
+        {
+            #assert(inst->opCode->value >= 0 && inst->opCode->value < 256);
+            byte opCode = cast<byte>(inst->opCode->value);
+            Stage prevStage = assembler.stage;
+            assembler.stage = Stage.assemble;
+            OperandList& operandList = *inst->operandList;
+            if (operandList.operands.Count() == 2)
+            {
+                Value x = assembler.Evaluate(operandList.operands[0].Get());
+                Value y = assembler.Evaluate(operandList.operands[1].Get());
+                if (x.flags == Value.Flag.register)
+                {
+                    Symbol* symbol = y.symbol;
+                    if (symbol != null)
+                    {
+                        if (symbol->value.GetFlag(Value.Flag.address))
+                        {
+                            ulong to = symbol->value.value;
+                            ulong at = assembler.currentSection->Address();
+                            if (at >= to)
+                            {
+                                ulong offset = (at - to) >> 2u;
+                                if (offset <= cast<ulong>(MaxValue<ushort>()))
+                                {
+                                    assembler.EmitOpCode(opCode + 1u);
+                                    assembler.EmitRegisterValue("X", x);
+                                    assembler.EmitShortOffset(cast<ushort>(offset));
+                                }
+                                else
+                                {
+                                    Error(inst->opCode->name + " too far", inst->span);
+                                }
+                            }
+                            else
+                            {
+                                ulong offset = (to - at) >> 2u;
+                                if (offset <= cast<ulong>(MaxValue<ushort>()))
+                                {
+                                    assembler.EmitOpCode(opCode);
+                                    assembler.EmitRegisterValue("X", x);
+                                    assembler.EmitShortOffset(cast<ushort>(offset));
+                                }
+                                else
+                                {
+                                    Error(inst->opCode->name + " too far", inst->span);
+                                }
+                            }
+                        }
+                        else if (symbol->value.flags == Value.Flag.undefined)
+                        {
+                            assembler.EmitForwardShortJump("X", opCode, x, symbol);
+                        }
+                        else
+                        {
+                            Error("symbol operand of " + inst->opCode->name + " instruction cannot be a register number", inst->span);
+                        }
+                    }
+                    else
+                    {
+                        Error("Y operand of " + inst->opCode->name + " instruction must be a symbol", inst->span);
+                    }
+                }
+                else
+                {
+                    Error("X operand of " + inst->opCode->name + " instruction must be a register number", inst->span);
+                }
+            }
+            else
+            {
+                Error(inst->opCode->name + " needs two operands", inst->span);
+            }
+            assembler.stage = prevStage;
+        }
+    }
+
+    public class TrapInstruction : AssemblyInstruction
+    {
+        public override void Assemble(Assembler& assembler, Instruction* inst)
+        {
+            #assert(inst->opCode->value >= 0 && inst->opCode->value < 256);
+            byte opCode = cast<byte>(inst->opCode->value);
+            Stage prevStage = assembler.stage;
+            assembler.stage = Stage.assemble;
+            OperandList& operandList = *inst->operandList;
+            if (operandList.operands.Count() == 3)
+            {
+                Value x = assembler.Evaluate(operandList.operands[0].Get());
+                Value y = assembler.Evaluate(operandList.operands[1].Get());
+                Value z = assembler.Evaluate(operandList.operands[2].Get());
+                if (x.GetFlag(Value.Flag.pure) && y.GetFlag(Value.Flag.pure) && z.GetFlag(Value.Flag.pure))
+                {
+                    assembler.EmitOpCode(opCode);
+                    assembler.EmitPureByteValue("X", x);
+                    assembler.EmitPureByteValue("Y", y);
+                    assembler.EmitPureByteValue("Z", z);
+                }
+                else
+                {
+                    Error(inst->opCode->name + " operands must be pure bytes", inst->span);
+                }
+            }
+            else
+            {
+                Error(inst->opCode->name + " needs three operands", inst->span);
+            }
+            assembler.stage = prevStage;
+        }
+    }
+
+    public class GetInstruction : AssemblyInstruction
+    {
+        public override void Assemble(Assembler& assembler, Instruction* inst)
+        {
+            #assert(inst->opCode->value >= 0 && inst->opCode->value < 256);
+            byte opCode = cast<byte>(inst->opCode->value);
+            Stage prevStage = assembler.stage;
+            assembler.stage = Stage.assemble;
+            OperandList& operandList = *inst->operandList;
+            if (operandList.operands.Count() == 2)
+            {
+                Value x = assembler.Evaluate(operandList.operands[0].Get());
+                Value y = assembler.Evaluate(operandList.operands[1].Get());
+                if (x.flags == Value.Flag.register)
+                {
+                    if (y.GetFlag(Value.Flag.pure))
+                    {
+                        assembler.EmitOpCode(opCode);
+                        assembler.EmitRegisterValue("X", x);
+                        assembler.EmitPureByteValue("Y", y);
+                        assembler.EmitPureByteValue("Z", Value(Value.Flag.pure, 0u, null));
+                    }
+                    else
+                    {
+                        Error("Y operand of " + inst->opCode->name + " instruction must be a pure byte", inst->span);
+                    }
+                }
+                else
+                {
+                    Error("X operand of " + inst->opCode->name + " instruction must be a register number", inst->span);
+                }
+            }
+            else
+            {
+                Error(inst->opCode->name + " needs two operands", inst->span);
+            }
+            assembler.stage = prevStage;
+        }
+    }
+
+    public class PutInstruction : AssemblyInstruction
+    {
+        public override void Assemble(Assembler& assembler, Instruction* inst)
+        {
+            #assert(inst->opCode->value >= 0 && inst->opCode->value < 256);
+            byte opCode = cast<byte>(inst->opCode->value);
+            Stage prevStage = assembler.stage;
+            assembler.stage = Stage.assemble;
+            OperandList& operandList = *inst->operandList;
+            if (operandList.operands.Count() == 2)
+            {
+                Value x = assembler.Evaluate(operandList.operands[0].Get());
+                Value y = assembler.Evaluate(operandList.operands[1].Get());
+                if (x.GetFlag(Value.Flag.pure))
+                {
+                    if (y.flags == Value.Flag.register)
+                    {
+                        assembler.EmitOpCode(opCode);
+                        assembler.EmitPureByteValue("X", x);
+                        assembler.EmitRegisterValue("Y", y);
+                        assembler.EmitPureByteValue("Z", Value(Value.Flag.pure, 0u, null));
+                    }
+                    else
+                    {
+                        Error("Y operand of " + inst->opCode->name + " instruction must be a register number", inst->span);
+                    }
+                }
+                else
+                {
+                    Error("X operand of " + inst->opCode->name + " instruction must be a pure byte", inst->span);
+                }
+            }
+            else
+            {
+                Error(inst->opCode->name + " needs two operands", inst->span);
+            }
+            assembler.stage = prevStage;
+        }
+    }
+
+    public class AssemblyInstructionMap
+    {
+        static AssemblyInstructionMap() : instance(new AssemblyInstructionMap())
+        {
+        }
+        public static AssemblyInstructionMap& Instance()
+        {
+            return *instance;
+        }
+        private AssemblyInstructionMap()
+        {
+            AssemblyInstruction* assemblyInst = new AssemblyInstruction();
+            instructionList.Add(UniquePtr<AssemblyInstruction>(assemblyInst));
+            for (int i = 0; i < numInsts; ++i)
+            {
+                instructions.Add(assemblyInst);
+            }
+
+            IsInstruction* isInst = new IsInstruction();
+            instructionList.Add(UniquePtr<AssemblyInstruction>(isInst));
+            instructions[IS] = isInst;
+            ExternInstruction* externInst = new ExternInstruction();
+            instructionList.Add(UniquePtr<AssemblyInstruction>(externInst));
+            instructions[EXTERN] = externInst;
+            LinkOnceInstruction* linkOnceInst = new LinkOnceInstruction();
+            instructionList.Add(UniquePtr<AssemblyInstruction>(linkOnceInst));
+            instructions[LINKONCE] = linkOnceInst;
+            ByteInstruction* byteInst = new ByteInstruction();
+            instructionList.Add(UniquePtr<AssemblyInstruction>(byteInst));
+            instructions[BYTE] = byteInst;
+            WydeInstruction* wydeInst = new WydeInstruction();
+            instructionList.Add(UniquePtr<AssemblyInstruction>(wydeInst));
+            instructions[WYDE] = wydeInst;
+            TetraInstruction* tetraInst = new TetraInstruction();
+            instructionList.Add(UniquePtr<AssemblyInstruction>(tetraInst));
+            instructions[TETRA] = tetraInst;
+            OctaInstruction* octaInst = new OctaInstruction();
+            instructionList.Add(UniquePtr<AssemblyInstruction>(octaInst));
+            instructions[OCTA] = octaInst;
+
+            LoadInstruction* loadInst = new LoadInstruction();
+            instructionList.Add(UniquePtr<AssemblyInstruction>(loadInst));
+            instructions[cmsx.machine.LDB] = loadInst;
+            instructions[cmsx.machine.LDW] = loadInst;
+            instructions[cmsx.machine.LDT] = loadInst;
+            instructions[cmsx.machine.LDO] = loadInst;
+            instructions[cmsx.machine.LDBU] = loadInst;
+            instructions[cmsx.machine.LDWU] = loadInst;
+            instructions[cmsx.machine.LDTU] = loadInst;
+            instructions[cmsx.machine.LDOU] = loadInst;
+            instructions[cmsx.machine.LDHT] = loadInst;
+
+            StoreInstruction* storeInst = new StoreInstruction();
+            instructionList.Add(UniquePtr<AssemblyInstruction>(storeInst));
+            instructions[cmsx.machine.STB] = storeInst;
+            instructions[cmsx.machine.STW] = storeInst;
+            instructions[cmsx.machine.STT] = storeInst;
+            instructions[cmsx.machine.STO] = storeInst;
+            instructions[cmsx.machine.STBU] = storeInst;
+            instructions[cmsx.machine.STWU] = storeInst;
+            instructions[cmsx.machine.STTU] = storeInst;
+            instructions[cmsx.machine.STOU] = storeInst;
+            instructions[cmsx.machine.STHT] = storeInst;
+
+            StoreConstantInstruction* storeConstantInst = new StoreConstantInstruction();
+            instructionList.Add(UniquePtr<AssemblyInstruction>(storeConstantInst));
+            instructions[cmsx.machine.STCO] = storeConstantInst;
+
+            RegisterInstruction* registerInst = new RegisterInstruction();
+            instructionList.Add(UniquePtr<AssemblyInstruction>(registerInst));
+            instructions[cmsx.machine.ADD] = registerInst;
+            instructions[cmsx.machine.SUB] = registerInst;
+            instructions[cmsx.machine.MUL] = registerInst;
+            instructions[cmsx.machine.DIV] = registerInst;
+            instructions[cmsx.machine.ADDU] = registerInst;
+            instructions[LDA] = registerInst; // LDA is another name for ADDU
+            instructions[cmsx.machine.SUBU] = registerInst;
+            instructions[cmsx.machine.MULU] = registerInst;
+            instructions[cmsx.machine.DIVU] = registerInst;
+            instructions[cmsx.machine.I2ADDU] = registerInst;
+            instructions[cmsx.machine.I4ADDU] = registerInst;
+            instructions[cmsx.machine.I8ADDU] = registerInst;
+            instructions[cmsx.machine.I16ADDU] = registerInst;
+            instructions[cmsx.machine.SL] = registerInst;
+            instructions[cmsx.machine.SLU] = registerInst;
+            instructions[cmsx.machine.SR] = registerInst;
+            instructions[cmsx.machine.SRU] = registerInst;
+            instructions[cmsx.machine.CMP] = registerInst;
+            instructions[cmsx.machine.CMPU] = registerInst;
+            instructions[cmsx.machine.CSN] = registerInst;
+            instructions[cmsx.machine.CSZ] = registerInst;
+            instructions[cmsx.machine.CSP] = registerInst;
+            instructions[cmsx.machine.CSOD] = registerInst;
+            instructions[cmsx.machine.CSNN] = registerInst;
+            instructions[cmsx.machine.CSNZ] = registerInst;
+            instructions[cmsx.machine.CSNP] = registerInst;
+            instructions[cmsx.machine.CSEV] = registerInst;
+            instructions[cmsx.machine.ZSN] = registerInst;
+            instructions[cmsx.machine.ZSZ] = registerInst;
+            instructions[cmsx.machine.ZSP] = registerInst;
+            instructions[cmsx.machine.ZSOD] = registerInst;
+            instructions[cmsx.machine.ZSNN] = registerInst;
+            instructions[cmsx.machine.ZSNZ] = registerInst;
+            instructions[cmsx.machine.ZSNP] = registerInst;
+            instructions[cmsx.machine.ZSEV] = registerInst;
+            instructions[cmsx.machine.AND] = registerInst;
+            instructions[cmsx.machine.OR] = registerInst;
+            instructions[cmsx.machine.XOR] = registerInst;
+            instructions[cmsx.machine.ANDN] = registerInst;
+            instructions[cmsx.machine.ORN] = registerInst;
+            instructions[cmsx.machine.NAND] = registerInst;
+            instructions[cmsx.machine.NOR] = registerInst;
+            instructions[cmsx.machine.NXOR] = registerInst;
+            instructions[cmsx.machine.MUX] = registerInst;
+            instructions[cmsx.machine.SADD] = registerInst;
+            instructions[cmsx.machine.BDIF] = registerInst;
+            instructions[cmsx.machine.WDIF] = registerInst;
+            instructions[cmsx.machine.TDIF] = registerInst;
+            instructions[cmsx.machine.ODIF] = registerInst;
+
+            SetInstruction* setInst = new SetInstruction();
+            instructionList.Add(UniquePtr<AssemblyInstruction>(setInst));
+            instructions[SET] = setInst;
+
+            NegateInstruction* negInst = new NegateInstruction();
+            instructionList.Add(UniquePtr<AssemblyInstruction>(negInst));
+            instructions[cmsx.machine.NEG] = negInst;
+            instructions[cmsx.machine.NEGU] = negInst;
+
+            FloatingPointInstruction* fpInst = new FloatingPointInstruction();
+            instructionList.Add(UniquePtr<AssemblyInstruction>(fpInst));
+            instructions[cmsx.machine.FADD] = fpInst;
+            instructions[cmsx.machine.FSUB] = fpInst;
+            instructions[cmsx.machine.FMUL] = fpInst;
+            instructions[cmsx.machine.FDIV] = fpInst;
+            instructions[cmsx.machine.FCMP] = fpInst;
+
+            FloatingRoundingInstruction* fprInst = new FloatingRoundingInstruction();
+            instructionList.Add(UniquePtr<AssemblyInstruction>(fprInst));
+            instructions[cmsx.machine.FINT] = fprInst;
+            instructions[cmsx.machine.FIX] = fprInst;
+            instructions[cmsx.machine.FIXU] = fprInst;
+            instructions[cmsx.machine.FLOT] = fprInst;
+            instructions[cmsx.machine.FLOTU] = fprInst;
+
+            WydeImmediateInstruction* wydeImmediateInst = new WydeImmediateInstruction();
+            instructionList.Add(UniquePtr<AssemblyInstruction>(wydeImmediateInst));
+            instructions[cmsx.machine.SETH] = wydeImmediateInst;
+            instructions[cmsx.machine.SETMH] = wydeImmediateInst;
+            instructions[cmsx.machine.SETML] = wydeImmediateInst;
+            instructions[cmsx.machine.SETL] = wydeImmediateInst;
+            instructions[cmsx.machine.INCH] = wydeImmediateInst;
+            instructions[cmsx.machine.INCMH] = wydeImmediateInst;
+            instructions[cmsx.machine.INCML] = wydeImmediateInst;
+            instructions[cmsx.machine.INCL] = wydeImmediateInst;
+            instructions[cmsx.machine.ORH] = wydeImmediateInst;
+            instructions[cmsx.machine.ORMH] = wydeImmediateInst;
+            instructions[cmsx.machine.ORML] = wydeImmediateInst;
+            instructions[cmsx.machine.ORL] = wydeImmediateInst;
+            instructions[cmsx.machine.ANDNH] = wydeImmediateInst;
+            instructions[cmsx.machine.ANDNMH] = wydeImmediateInst;
+            instructions[cmsx.machine.ANDNML] = wydeImmediateInst;
+            instructions[cmsx.machine.ANDNL] = wydeImmediateInst;
+
+            JumpInstruction* jumpInst = new JumpInstruction();
+            instructionList.Add(UniquePtr<AssemblyInstruction>(jumpInst));
+            instructions[cmsx.machine.JMP] = jumpInst;
+
+            GoInstruction* goInst = new GoInstruction();
+            instructionList.Add(UniquePtr<AssemblyInstruction>(goInst));
+            instructions[cmsx.machine.GO] = goInst;
+            CallInstruction* callInst = new CallInstruction();
+            instructionList.Add(UniquePtr<AssemblyInstruction>(callInst));
+            instructions[cmsx.machine.CALL] = callInst;
+            RetInstruction* retInst = new RetInstruction();
+            instructionList.Add(UniquePtr<AssemblyInstruction>(retInst));
+            instructions[cmsx.machine.RET] = retInst;
+            SwymInstruction* swymInst = new SwymInstruction();
+            instructionList.Add(UniquePtr<AssemblyInstruction>(swymInst));
+            instructions[cmsx.machine.SWYM] = swymInst;
+
+            BranchInstruction* branchInst = new BranchInstruction();
+            instructionList.Add(UniquePtr<AssemblyInstruction>(branchInst));
+            instructions[cmsx.machine.BN] = branchInst;
+            instructions[cmsx.machine.BZ] = branchInst;
+            instructions[cmsx.machine.BP] = branchInst;
+            instructions[cmsx.machine.BOD] = branchInst;
+            instructions[cmsx.machine.BNN] = branchInst;
+            instructions[cmsx.machine.BNZ] = branchInst;
+            instructions[cmsx.machine.BNP] = branchInst;
+            instructions[cmsx.machine.BEV] = branchInst;
+            instructions[cmsx.machine.PBN] = branchInst;
+            instructions[cmsx.machine.PBZ] = branchInst;
+            instructions[cmsx.machine.PBP] = branchInst;
+            instructions[cmsx.machine.PBOD] = branchInst;
+            instructions[cmsx.machine.PBNN] = branchInst;
+            instructions[cmsx.machine.PBNZ] = branchInst;
+            instructions[cmsx.machine.PBNP] = branchInst;
+            instructions[cmsx.machine.PBEV] = branchInst;
+
+            TrapInstruction* trapInst = new TrapInstruction();
+            instructionList.Add(UniquePtr<AssemblyInstruction>(trapInst));
+            instructions[cmsx.machine.TRAP] = trapInst;
+
+            GetInstruction* getInst = new GetInstruction();
+            instructionList.Add(UniquePtr<AssemblyInstruction>(getInst));
+            instructions[cmsx.machine.GET] = getInst;
+            PutInstruction* putInst = new PutInstruction();
+            instructionList.Add(UniquePtr<AssemblyInstruction>(putInst));
+            instructions[cmsx.machine.PUT] = putInst;
+        }
+        public AssemblyInstruction* GetAssemblyInstruction(int opcode, const Span& span) const
+        {
+            if (opcode >= 0 && opcode < instructions.Count())
+            {
+                return instructions[opcode];
+            }
+            else
+            {
+                Error("no assembly instruction for opcode "  + ToString(opcode), span);
+                return null;
+            }
+        }
+        private static UniquePtr<AssemblyInstructionMap> instance;
+        private List<UniquePtr<AssemblyInstruction>> instructionList;
+        private List<AssemblyInstruction*> instructions;
+    }
+}

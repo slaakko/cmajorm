@@ -1,0 +1,124 @@
+<html>
+ <head>
+  <meta charset="utf-8"/>
+  <title>StatementGrammar Grammar</title>
+  <link href="../../../style/style.css" rel="stylesheet" type="text/css"/>
+ </head>
+ <body>
+  <h1>StatementGrammar Grammar</h1>
+  <table class="grammar">
+   <tr id="rule_Statement_1D9955307F1C817626C78D57E27FD0180F491D57">
+    <td class="grammarFirstCol">
+     <span class="rule">Statement</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#rule_LabeledStatement_5C609E83796FFC7CB003426C60A253B1574612F5">LabeledStatement</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#rule_ExpressionStatement_70E2D0F74CC2C99DFB9104D40541F18D0D581D13">ExpressionStatement</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#rule_CompoundStatement_F1543DDE8956A46858E3E25FF80414F005E8A988">CompoundStatement</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#rule_SelectionStatement_D92A45D1514A23402744F56A37FA91FCCF1CEB75">SelectionStatement</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#rule_IterationStatement_270F3C0F59826F7BB1EB51BD4F85634551C41B47">IterationStatement</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#rule_JumpStatement_D1DBA893A5ABB9B92048AF34791DB639512D83C4">JumpStatement</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#rule_DeclarationStatement_6A6F70DEC0A1234143E0764D8EAEB304C7DACB86">DeclarationStatement</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#rule_TryBlock_B0453036CE744DEABA86FCD2BBD87893E3530053">TryBlock</a></span></td>
+   </tr>
+   <tr id="rule_LabeledStatement_5C609E83796FFC7CB003426C60A253B1574612F5">
+    <td class="grammarFirstCol">
+     <span class="rule">LabeledStatement</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="grammar_IdentifierGrammar_8D8D6307DE3120A9332D1686FBA3E981750C42B8.html#rule_Identifier_3D5E4C3A33C06ED4DEE1FEA416EF82ABF99C916C">Identifier</a></span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleChar">':'</span><span class="ruleOp"> &minus; </span><span class="ruleString">"::"</span><span class="ruleOp">)</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_Statement_1D9955307F1C817626C78D57E27FD0180F491D57">Statement</a></span><span class="ruleOp">)</span><span class="ruleOp"> | </span><span class="ruleOp">(</span><span class="ruleKeyword">keyword</span><span class="ruleString">("case")</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="grammar_ExpressionGrammar_B28ED3443A69CA730C50D8B6A13B7A1B5708ABCB.html#rule_ConstantExpression_6D56A8328D81EB1F26DD89A9544E6ECAA2A34D1C">ConstantExpression</a></span><span class="ruleOp">!</span><span class="ruleOp"> </span><span class="ruleChar">':'</span><span class="ruleOp">!</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_Statement_1D9955307F1C817626C78D57E27FD0180F491D57">Statement</a></span><span class="ruleOp">!</span><span class="ruleOp">)</span><span class="ruleOp"> | </span><span class="ruleOp">(</span><span class="ruleKeyword">keyword</span><span class="ruleString">("default")</span><span class="ruleOp"> </span><span class="ruleChar">':'</span><span class="ruleOp">!</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_Statement_1D9955307F1C817626C78D57E27FD0180F491D57">Statement</a></span><span class="ruleOp">!</span><span class="ruleOp">)</span></td>
+   </tr>
+   <tr id="rule_ExpressionStatement_70E2D0F74CC2C99DFB9104D40541F18D0D581D13">
+    <td class="grammarFirstCol">
+     <span class="rule">ExpressionStatement</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="grammar_ExpressionGrammar_B28ED3443A69CA730C50D8B6A13B7A1B5708ABCB.html#rule_Expression_5A03F6B7E917169FA7482B74D7BEB8ECDF752F81">Expression</a></span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleChar">';'</span><span class="ruleOp">)</span></td>
+   </tr>
+   <tr id="rule_CompoundStatement_F1543DDE8956A46858E3E25FF80414F005E8A988">
+    <td class="grammarFirstCol">
+     <span class="rule">CompoundStatement</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleChar">'{'</span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#rule_Statement_1D9955307F1C817626C78D57E27FD0180F491D57">Statement</a></span><span class="ruleOp">)</span><span class="ruleOp">*</span><span class="ruleOp"> </span><span class="ruleChar">'}'</span><span class="ruleOp">!</span></td>
+   </tr>
+   <tr id="rule_SelectionStatement_D92A45D1514A23402744F56A37FA91FCCF1CEB75">
+    <td class="grammarFirstCol">
+     <span class="rule">SelectionStatement</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleOp">(</span><span class="ruleKeyword">keyword</span><span class="ruleString">("if")</span><span class="ruleOp"> </span><span class="ruleChar">'('</span><span class="ruleOp">!</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_Condition_395B9EBAF5620FDBEE25D4997639B924856D7012">Condition</a></span><span class="ruleOp">!</span><span class="ruleOp"> </span><span class="ruleChar">')'</span><span class="ruleOp">!</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_Statement_1D9955307F1C817626C78D57E27FD0180F491D57">Statement</a></span><span class="ruleOp">!</span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleKeyword">keyword</span><span class="ruleString">("else")</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_Statement_1D9955307F1C817626C78D57E27FD0180F491D57">Statement</a></span><span class="ruleOp">!</span><span class="ruleOp">)</span><span class="ruleOp">?</span><span class="ruleOp">)</span><span class="ruleOp"> | </span><span class="ruleOp">(</span><span class="ruleKeyword">keyword</span><span class="ruleString">("switch")</span><span class="ruleOp"> </span><span class="ruleChar">'('</span><span class="ruleOp">!</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_Condition_395B9EBAF5620FDBEE25D4997639B924856D7012">Condition</a></span><span class="ruleOp">!</span><span class="ruleOp"> </span><span class="ruleChar">')'</span><span class="ruleOp">!</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_Statement_1D9955307F1C817626C78D57E27FD0180F491D57">Statement</a></span><span class="ruleOp">!</span><span class="ruleOp">)</span></td>
+   </tr>
+   <tr id="rule_Condition_395B9EBAF5620FDBEE25D4997639B924856D7012">
+    <td class="grammarFirstCol">
+     <span class="rule">Condition</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="grammar_TypeExprGrammar_0B9AC7CEC733C22DDDF51A043400652AE29A775B.html#rule_TypeExpr_6DD497FEC1F5615F6D907AF80B670B7A68D5FC1E">TypeExpr</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="grammar_DeclaratorGrammar_FEC452FC8242F94400100B3182868607C058FE4B.html#rule_Declarator_92586CA5FBEBDFDCE42EB4D4F894D90234E36E08">Declarator</a></span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleChar">'='</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="grammar_DeclaratorGrammar_FEC452FC8242F94400100B3182868607C058FE4B.html#rule_InitializerClause_60B12038EAF7C0A6BA790210152AE8F5B91F42CB">InitializerClause</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="grammar_DeclaratorGrammar_FEC452FC8242F94400100B3182868607C058FE4B.html#rule_BracedInitializerList_37F651C56C5351FBA8DDE56FF4D17B25718E8C4E">BracedInitializerList</a></span><span class="ruleOp">)</span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="grammar_ExpressionGrammar_B28ED3443A69CA730C50D8B6A13B7A1B5708ABCB.html#rule_Expression_5A03F6B7E917169FA7482B74D7BEB8ECDF752F81">Expression</a></span></td>
+   </tr>
+   <tr id="rule_IterationStatement_270F3C0F59826F7BB1EB51BD4F85634551C41B47">
+    <td class="grammarFirstCol">
+     <span class="rule">IterationStatement</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleOp">(</span><span class="ruleKeyword">keyword</span><span class="ruleString">("while")</span><span class="ruleOp"> </span><span class="ruleChar">'('</span><span class="ruleOp">!</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_Condition_395B9EBAF5620FDBEE25D4997639B924856D7012">Condition</a></span><span class="ruleOp">!</span><span class="ruleOp"> </span><span class="ruleChar">')'</span><span class="ruleOp">!</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_Statement_1D9955307F1C817626C78D57E27FD0180F491D57">Statement</a></span><span class="ruleOp">!</span><span class="ruleOp">)</span><span class="ruleOp"> | </span><span class="ruleOp">(</span><span class="ruleKeyword">keyword</span><span class="ruleString">("do")</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_Statement_1D9955307F1C817626C78D57E27FD0180F491D57">Statement</a></span><span class="ruleOp">!</span><span class="ruleOp"> </span><span class="ruleKeyword">keyword</span><span class="ruleString">("while")</span><span class="ruleOp">!</span><span class="ruleOp"> </span><span class="ruleChar">'('</span><span class="ruleOp">!</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="grammar_ExpressionGrammar_B28ED3443A69CA730C50D8B6A13B7A1B5708ABCB.html#rule_Expression_5A03F6B7E917169FA7482B74D7BEB8ECDF752F81">Expression</a></span><span class="ruleOp">!</span><span class="ruleOp"> </span><span class="ruleChar">')'</span><span class="ruleOp">!</span><span class="ruleOp"> </span><span class="ruleChar">';'</span><span class="ruleOp">!</span><span class="ruleOp">)</span><span class="ruleOp"> | </span><span class="ruleOp">(</span><span class="ruleKeyword">keyword</span><span class="ruleString">("for")</span><span class="ruleOp"> </span><span class="ruleChar">'('</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_ForRangeDeclaration_8EF07936C8B083B79096524F70B358B80A8BFC1B">ForRangeDeclaration</a></span><span class="ruleOp"> </span><span class="ruleChar">':'</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_ForRangeInitializer_C1CF6C59FA805CE21F1CCE60A7B345B17D0DBC70">ForRangeInitializer</a></span><span class="ruleOp">!</span><span class="ruleOp"> </span><span class="ruleChar">')'</span><span class="ruleOp">!</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_Statement_1D9955307F1C817626C78D57E27FD0180F491D57">Statement</a></span><span class="ruleOp">!</span><span class="ruleOp">)</span><span class="ruleOp"> | </span><span class="ruleOp">(</span><span class="ruleKeyword">keyword</span><span class="ruleString">("for")</span><span class="ruleOp"> </span><span class="ruleChar">'('</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_ForInitialization_7FA5C6EE32FD663B1DA9B6776D6AB8D89770DD94">ForInitialization</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_Condition_395B9EBAF5620FDBEE25D4997639B924856D7012">Condition</a></span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleChar">';'</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="grammar_ExpressionGrammar_B28ED3443A69CA730C50D8B6A13B7A1B5708ABCB.html#rule_Expression_5A03F6B7E917169FA7482B74D7BEB8ECDF752F81">Expression</a></span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleChar">')'</span><span class="ruleOp">!</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_Statement_1D9955307F1C817626C78D57E27FD0180F491D57">Statement</a></span><span class="ruleOp">!</span><span class="ruleOp">)</span></td>
+   </tr>
+   <tr id="rule_ForInitialization_7FA5C6EE32FD663B1DA9B6776D6AB8D89770DD94">
+    <td class="grammarFirstCol">
+     <span class="rule">ForInitialization</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#rule_ExpressionStatement_70E2D0F74CC2C99DFB9104D40541F18D0D581D13">ExpressionStatement</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="grammar_DeclarationGrammar_A6CF3B7147E12FFA82DBF584E634094D51DDBB7D.html#rule_SimpleDeclaration_32CF0964E8CE4931CC123F8E897A0A700B9D3543">SimpleDeclaration</a></span></td>
+   </tr>
+   <tr id="rule_ForRangeDeclaration_8EF07936C8B083B79096524F70B358B80A8BFC1B">
+    <td class="grammarFirstCol">
+     <span class="rule">ForRangeDeclaration</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="grammar_TypeExprGrammar_0B9AC7CEC733C22DDDF51A043400652AE29A775B.html#rule_TypeExpr_6DD497FEC1F5615F6D907AF80B670B7A68D5FC1E">TypeExpr</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="grammar_DeclaratorGrammar_FEC452FC8242F94400100B3182868607C058FE4B.html#rule_Declarator_92586CA5FBEBDFDCE42EB4D4F894D90234E36E08">Declarator</a></span><span class="ruleOp">)</span></td>
+   </tr>
+   <tr id="rule_ForRangeInitializer_C1CF6C59FA805CE21F1CCE60A7B345B17D0DBC70">
+    <td class="grammarFirstCol">
+     <span class="rule">ForRangeInitializer</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="grammar_ExpressionGrammar_B28ED3443A69CA730C50D8B6A13B7A1B5708ABCB.html#rule_Expression_5A03F6B7E917169FA7482B74D7BEB8ECDF752F81">Expression</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="grammar_DeclaratorGrammar_FEC452FC8242F94400100B3182868607C058FE4B.html#rule_BracedInitializerList_37F651C56C5351FBA8DDE56FF4D17B25718E8C4E">BracedInitializerList</a></span></td>
+   </tr>
+   <tr id="rule_JumpStatement_D1DBA893A5ABB9B92048AF34791DB639512D83C4">
+    <td class="grammarFirstCol">
+     <span class="rule">JumpStatement</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleOp">(</span><span class="ruleKeyword">keyword</span><span class="ruleString">("break")</span><span class="ruleOp"> </span><span class="ruleChar">';'</span><span class="ruleOp">!</span><span class="ruleOp">)</span><span class="ruleOp"> | </span><span class="ruleOp">(</span><span class="ruleKeyword">keyword</span><span class="ruleString">("continue")</span><span class="ruleOp"> </span><span class="ruleChar">';'</span><span class="ruleOp">!</span><span class="ruleOp">)</span><span class="ruleOp"> | </span><span class="ruleOp">(</span><span class="ruleKeyword">keyword</span><span class="ruleString">("return")</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="grammar_ExpressionGrammar_B28ED3443A69CA730C50D8B6A13B7A1B5708ABCB.html#rule_Expression_5A03F6B7E917169FA7482B74D7BEB8ECDF752F81">Expression</a></span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleChar">';'</span><span class="ruleOp">!</span><span class="ruleOp">)</span><span class="ruleOp"> | </span><span class="ruleOp">(</span><span class="ruleKeyword">keyword</span><span class="ruleString">("return")</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="grammar_DeclaratorGrammar_FEC452FC8242F94400100B3182868607C058FE4B.html#rule_BracedInitializerList_37F651C56C5351FBA8DDE56FF4D17B25718E8C4E">BracedInitializerList</a></span><span class="ruleOp"> </span><span class="ruleChar">';'</span><span class="ruleOp">!</span><span class="ruleOp">)</span><span class="ruleOp"> | </span><span class="ruleOp">(</span><span class="ruleKeyword">keyword</span><span class="ruleString">("goto")</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="grammar_IdentifierGrammar_8D8D6307DE3120A9332D1686FBA3E981750C42B8.html#rule_Identifier_3D5E4C3A33C06ED4DEE1FEA416EF82ABF99C916C">Identifier</a></span><span class="ruleOp">!</span><span class="ruleOp"> </span><span class="ruleChar">';'</span><span class="ruleOp">!</span><span class="ruleOp">)</span></td>
+   </tr>
+   <tr id="rule_DeclarationStatement_6A6F70DEC0A1234143E0764D8EAEB304C7DACB86">
+    <td class="grammarFirstCol">
+     <span class="rule">DeclarationStatement</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="grammar_DeclarationGrammar_A6CF3B7147E12FFA82DBF584E634094D51DDBB7D.html#rule_BlockDeclaration_C552FFA5C7A9C83CCF0FF3518D387356F0CE996C">BlockDeclaration</a></span></td>
+   </tr>
+   <tr id="rule_TryBlock_B0453036CE744DEABA86FCD2BBD87893E3530053">
+    <td class="grammarFirstCol">
+     <span class="rule">TryBlock</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleKeyword">keyword</span><span class="ruleString">("try")</span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#rule_CompoundStatement_F1543DDE8956A46858E3E25FF80414F005E8A988">CompoundStatement</a></span><span class="ruleOp">)</span><span class="ruleOp">!</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_HandlerSequence_704E7761C12FD6CF8DC6C3A8E679970EC4B24C20">HandlerSequence</a></span><span class="ruleOp">!</span></td>
+   </tr>
+   <tr id="rule_HandlerSequence_704E7761C12FD6CF8DC6C3A8E679970EC4B24C20">
+    <td class="grammarFirstCol">
+     <span class="rule">HandlerSequence</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#rule_Handler_CCDAAF47B2D6AB29B96E2EACD88089448C0A1FD3">Handler</a></span><span class="ruleOp">)</span><span class="ruleOp">+</span></td>
+   </tr>
+   <tr id="rule_Handler_CCDAAF47B2D6AB29B96E2EACD88089448C0A1FD3">
+    <td class="grammarFirstCol">
+     <span class="rule">Handler</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleOp">(</span><span class="ruleKeyword">keyword</span><span class="ruleString">("catch")</span><span class="ruleOp"> </span><span class="ruleChar">'('</span><span class="ruleOp">!</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_ExceptionDeclaration_09884F8578743E0DB5F0BBF6BA44B8EF78703CFA">ExceptionDeclaration</a></span><span class="ruleOp">!</span><span class="ruleOp"> </span><span class="ruleChar">')'</span><span class="ruleOp">!</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_CompoundStatement_F1543DDE8956A46858E3E25FF80414F005E8A988">CompoundStatement</a></span><span class="ruleOp">!</span><span class="ruleOp">)</span></td>
+   </tr>
+   <tr id="rule_ExceptionDeclaration_09884F8578743E0DB5F0BBF6BA44B8EF78703CFA">
+    <td class="grammarFirstCol">
+     <span class="rule">ExceptionDeclaration</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="grammar_TypeExprGrammar_0B9AC7CEC733C22DDDF51A043400652AE29A775B.html#rule_TypeExpr_6DD497FEC1F5615F6D907AF80B670B7A68D5FC1E">TypeExpr</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="grammar_DeclaratorGrammar_FEC452FC8242F94400100B3182868607C058FE4B.html#rule_Declarator_92586CA5FBEBDFDCE42EB4D4F894D90234E36E08">Declarator</a></span><span class="ruleOp">?</span><span class="ruleOp">)</span><span class="ruleOp"> | </span><span class="ruleString">"..."</span></td>
+   </tr>
+  </table>
+ </body>
+</html>

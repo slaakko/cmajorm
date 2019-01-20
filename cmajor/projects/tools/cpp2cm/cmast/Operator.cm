@@ -1,0 +1,46 @@
+using System;
+
+namespace cmast
+{
+    public enum Operator
+    {
+        equivalence, implication, disjunction, conjunction, bitOr, bitXor, bitAnd, equal, notEqual, less, greater, lessOrEqual, greaterOrEqual, shiftLeft, shiftRight, add, sub, mul, div, rem,
+        not_, unaryPlus, unaryMinus, increment, decrement, complement, deref, addrOf
+    }
+    
+    public nothrow string OperatorStr(Operator op)
+    {
+        switch (op)
+        {
+            case Operator.equivalence: return "<=>";
+            case Operator.implication: return "=>";
+            case Operator.disjunction: return "||";
+            case Operator.conjunction: return "&&";
+            case Operator.bitOr: return "|";
+            case Operator.bitXor: return "^";
+            case Operator.bitAnd: return "&";
+            case Operator.equal: return "==";
+            case Operator.notEqual: return "!=";
+            case Operator.less: return "<";
+            case Operator.greater: return ">";
+            case Operator.lessOrEqual: return "<=";
+            case Operator.greaterOrEqual: return ">=";
+            case Operator.shiftLeft: return "<<";
+            case Operator.shiftRight: return ">>";
+            case Operator.add: return "+";
+            case Operator.sub: return "-";
+            case Operator.mul: return "*";
+            case Operator.div: return "/";
+            case Operator.rem: return "%";
+            case Operator.not_: return "!";
+            case Operator.unaryPlus: return "+";
+            case Operator.unaryMinus: return "-";
+            case Operator.increment: return "++";
+            case Operator.decrement: return "--";
+            case Operator.complement: return "~";
+            case Operator.deref: return "*";
+            case Operator.addrOf: return "&";
+        }
+        return string();
+    }
+}

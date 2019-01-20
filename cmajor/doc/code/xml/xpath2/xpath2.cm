@@ -1,0 +1,29 @@
+using System;
+using System.XPath;
+using System.Dom;
+
+void main()
+{
+    ustring query = u"/philosophers/philosopher[@name='Socrates']";
+    string xml;
+    xml.Append("<philosophers>")
+       .Append(    "<philosopher name='Plato'/>")
+       .Append(    "<philosopher name='Aristotle'/>")
+       .Append(    "<philosopher name='Socrates'/>")
+       .Append("</philosophers>");
+    UniquePtr<DomDocument> doc = ParseXmlContentToDomDocument(xml, "xml");
+    UniquePtr<XPathObject> o = Evaluate(query, doc.Get());
+    XPathNodeSet* ns = o.Get() as XPathNodeSet*;
+    if (ns != null)
+    {
+        long n = ns->Length();
+        for (long i = 0; i < n; ++i)
+        {
+            DomElement* p = (*ns)[i] as DomElement*;
+            if (p != null)
+            {
+                Console.Out() << p->GetAttribute(u"name") << endl();
+            }
+        }
+    }
+}

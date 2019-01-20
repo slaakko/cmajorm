@@ -1,0 +1,109 @@
+using System;
+using System.Collections;
+using System.IO;
+using System.Text.RegularExpressions;
+
+public string Version()
+{
+    return "2.0.0";
+}
+
+void PrintHelp()
+{
+    Console.WriteLine("Regular Expression Matcher version " + Version());
+    Console.WriteLine("Usage: rex \"<pattern>\" <files>");
+    Console.WriteLine("Searches <pattern> from <files> and prints each occurrence to stdout");
+    Console.WriteLine("Options:");
+    Console.WriteLine("--help | -h");
+    Console.WriteLine("     print this help");
+    Console.WriteLine("--dont-compile | -d");
+    Console.WriteLine("     dont compile regular expression to a DFA");
+    Console.WriteLine("Return value:");
+    Console.WriteLine("     returns 0 if a match is found, and 1 otherwise");
+}
+
+int main(int argc, const char** argv)
+{
+    try
+    {
+        bool first = true;
+        bool dontCompile = false;
+        bool matched = false;
+        string pattern;
+        List<string> fileNames;
+        for (int i = 1; i < argc; ++i)
+        {
+            string arg = argv[i];
+            if (arg.StartsWith("-"))
+            {
+                if (arg == "--help" || arg == "-h")
+                {
+                    PrintHelp();
+                    return 0;
+                }
+                else if (arg == "--dont-compile" || arg == "-d")
+                {
+                    dontCompile = true;
+                }
+                else
+                {
+                    throw Exception("unknown option '" + arg + "'");
+                }
+            }
+            else
+            {
+                if (first)
+                {
+                    first = false;
+                    pattern = arg;
+                }
+                else
+                {
+                    fileNames.Add(GetFullPath(arg));
+                }
+            }            
+        }
+        if (pattern.IsEmpty())
+        {
+            throw Exception("pattern is empty");
+        }
+        if (fileNames.IsEmpty())
+        {
+            throw Exception("no matching file names");
+        }
+        RegExFlags flags = RegExFlags.matchLine;
+        if (!dontCompile)
+        {
+            flags = cast<RegExFlags>(flags | RegExFlags.compiled);
+        }
+        RegEx re(pattern, flags);
+        for (const string& fileName : fileNames)
+        {
+            List<string> lines = File.ReadAllLines(fileName);
+            long n = lines.Count();
+            for (long i = 0; i < n; ++i)
+            {
+                const string& line = lines[i];
+                if (re.Matches(line))
+                {
+                    Console.WriteLine(fileName + "(" + ToString(i + 1) + "):");
+                    Console.WriteLine(line);
+                    matched = true;
+                }
+            }
+        }
+        if (matched)
+        {
+            return 0;
+        }
+        else
+        {
+            return 1;
+        }
+    }
+    catch (const Exception& ex)
+    {
+        Console.Error() << ex.ToString() << endl();
+    }
+    return 1;
+}

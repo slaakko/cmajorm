@@ -1,0 +1,107 @@
+using System;
+using cppast;
+
+namespace cppparser
+{
+    grammar StatementGrammar
+    {
+        using IdentifierGrammar.Identifier;
+        using ExpressionGrammar.Expression;
+        using ExpressionGrammar.ConstantExpression;
+        using TypeExprGrammar.TypeExpr;
+        using DeclaratorGrammar.Declarator;
+        using DeclaratorGrammar.InitializerClause;
+        using DeclaratorGrammar.BracedInitializerList;
+        using DeclarationGrammar.SimpleDeclaration;
+        using DeclarationGrammar.BlockDeclaration;
+        
+        Statement(ParsingContext* ctx) : StatementNode*
+            ::= LabeledStatement(ctx){ value = LabeledStatement; }
+            |   ExpressionStatement(ctx){ value = ExpressionStatement; }
+            |   CompoundStatement(ctx){ value = CompoundStatement; }
+            |   SelectionStatement(ctx){ value = SelectionStatement; }
+            |   IterationStatement(ctx){ value = IterationStatement; }
+            |   JumpStatement(ctx){ value = JumpStatement; }
+            |   DeclarationStatement(ctx){ value = DeclarationStatement; }
+            |   TryBlock(ctx){ value = TryBlock; }
+            ;
+            
+        LabeledStatement(ParsingContext* ctx) : StatementNode*
+            ::= (Identifier:label (':' - "::") Statement(ctx):s1){ value = new LabeledStatementNode(span, label, s1); }
+            |   (keyword("case") ConstantExpression(ctx)! ':'! Statement(ctx):s2!){ value = new CaseStatementNode(span, ConstantExpression, s2); }
+            |   (keyword("default") ':'! Statement(ctx):s3!){ value = new DefaultStatementNode(span, s3); }
+            ;
+            
+        ExpressionStatement(ParsingContext* ctx) : StatementNode*
+            ::= (Expression(ctx)? ';'){ value = new ExpressionStatementNode(span, Expression); }
+            ;
+            
+        CompoundStatement(ParsingContext* ctx) : CompoundStatementNode*
+            ::= '{'{ value = new CompoundStatementNode(span); } (Statement(ctx){ value->AddStatement(Statement); })* '}'!
+            ;
+            
+        SelectionStatement(ParsingContext* ctx) : StatementNode*
+            ::= (keyword("if") '('! Condition(ctx):c1! ')'! Statement(ctx):thenS! (keyword("else") Statement(ctx):elseS!)?){ value = new IfStatementNode(span, c1, thenS, elseS); }
+            |   (keyword("switch") '('! Condition(ctx):c2! ')'! Statement(ctx):sws!){ value = new SwitchStatementNode(span, c2, sws); }
+            ;
+            
+        Condition(ParsingContext* ctx, var UniquePtr<Node> typeExpr, var UniquePtr<Node> declarator) : Node*
+            ::= TypeExpr(ctx){ typeExpr.Reset(TypeExpr); } Declarator(ctx){ declarator.Reset(Declarator); }
+                (   '=' InitializerClause(ctx)
+                    { value = new SimpleDeclarationNode(span, Specifiers.none, typeExpr.Release(), new InitDeclaratorNode(span, declarator.Release(), new AssignmentInitializerNode(span, InitializerClause))); }
+                |   BracedInitializerList(ctx){ value = new SimpleDeclarationNode(span, Specifiers.none, typeExpr.Release(), new InitDeclaratorNode(span, declarator.Release(), BracedInitializerList)); }
+                )
+            |   Expression(ctx){ value = Expression; }
+            ;
+            
+        IterationStatement(ParsingContext* ctx) : StatementNode*
+            ::= (keyword("while") '('! Condition(ctx):c1! ')'! Statement(ctx):s1!){ value = new WhileStatementNode(span, c1, s1); }
+            |   (keyword("do") Statement(ctx):s2! keyword("while")! '('! Expression(ctx):e1! ')'! ';'!){ value = new DoStatementNode(span, s2, e1); }
+            |   (keyword("for") '(' ForRangeDeclaration(ctx) ':' ForRangeInitializer(ctx)! ')'! Statement(ctx):s3!){ value = new RangeForStatementNode(span, ForRangeDeclaration, ForRangeInitializer, s3); }
+            |   (keyword("for") '(' ForInitialization(ctx) Condition(ctx):c2? ';' Expression(ctx):e2? ')'! Statement(ctx):s4!){ value = new ForStatementNode(span, ForInitialization, c2, e2, s4); }
+            ;
+            
+        ForInitialization(ParsingContext* ctx) : Node*
+            ::= ExpressionStatement(ctx){ value = ExpressionStatement; }
+            |   SimpleDeclaration(ctx){ value = SimpleDeclaration; }
+            ;
+            
+        ForRangeDeclaration(ParsingContext* ctx) : SimpleDeclarationNode*
+            ::= (TypeExpr(ctx) Declarator(ctx)){ value = new SimpleDeclarationNode(span, Specifiers.none, TypeExpr, Declarator); }
+            ;
+            
+        ForRangeInitializer(ParsingContext* ctx) : Node*
+            ::= Expression(ctx){ value = Expression; }
+            |   BracedInitializerList(ctx){ value = BracedInitializerList; }
+            ;
+            
+        JumpStatement(ParsingContext* ctx) : StatementNode*
+            ::= (keyword("break") ';'!){ value = new BreakStatementNode(span); }
+            |   (keyword("continue") ';'!){ value = new ContinueStatementNode(span); }
+            |   (keyword("return") Expression(ctx)? ';'!){ value = new ReturnStatementNode(span, Expression); }
+            |   (keyword("return") BracedInitializerList(ctx) ';'!){ value = new ReturnStatementNode(span, BracedInitializerList); }
+            |   (keyword("goto") Identifier! ';'!){ value = new GotoStatementNode(span, Identifier); }
+            ;
+            
+        DeclarationStatement(ParsingContext* ctx) : StatementNode*
+            ::= BlockDeclaration(ctx){ value = new DeclarationStatementNode(span, BlockDeclaration); }
+            ;
+            
+        TryBlock(ParsingContext* ctx) : TryStatementNode*
+            ::= keyword("try") (CompoundStatement(ctx){ value = new TryStatementNode(span, CompoundStatement); })! HandlerSequence(ctx, value)!
+            ;
+            
+        HandlerSequence(ParsingContext* ctx, TryStatementNode* tryStatement)
+            ::= (Handler(ctx){ tryStatement->AddHandler(Handler); })+
+            ;
+            
+        Handler(ParsingContext* ctx) : ExceptionHandlerNode*
+            ::= (keyword("catch") '('! ExceptionDeclaration(ctx)! ')'! CompoundStatement(ctx)!){ value = new ExceptionHandlerNode(span, ExceptionDeclaration, CompoundStatement); }
+            ;
+            
+        ExceptionDeclaration(ParsingContext* ctx) : Node*
+            ::= (TypeExpr(ctx) Declarator(ctx)?){ value = new SimpleDeclarationNode(span, Specifiers.none, TypeExpr, Declarator); }
+            |   "..."{ value = new CatchAllNode(span); }
+            ;
+    }
+}

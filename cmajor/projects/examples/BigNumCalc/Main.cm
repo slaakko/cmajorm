@@ -1,0 +1,43 @@
+using System;
+using BigNumCalc;
+
+int main()
+{
+    try
+    {
+        BigNumExpressionGrammar* grammar = new BigNumExpressionGrammar();
+        Console.WriteLine("Bignum calculator.");
+#if (WINDOWS)        
+        Console.WriteLine("Enter expression, or CTRL-Z to end.");
+#else        
+        Console.WriteLine("Enter expression, or CTRL-D to end.");
+#endif
+        Console.Out() << "The expression can contain multiprecision integers, rationals using syntax [numerator/denominator], floating point numbers, " <<
+            "arithmetic operators +, -, * and /, and parenthesized subexpressions." << endl();
+        Console.Write("> ");
+        string line = Console.ReadLine();
+        while (!Console.In().EndOfStream())
+        {
+            EvaluationStack stack;
+            try
+            {
+                ustring s = ToUtf32(line);
+                grammar->Parse(s.Chars(), s.Chars() + s.Length(), 0, "expression", &stack);
+                UniquePtr<BigValue> result = stack.Pop();
+                Console.Out() << "= " << result->ToString() << endl();
+            }
+            catch (const Exception& ex)
+            {
+                Console.Out() << ex.Message() << endl();
+            }
+            Console.Write("> ");
+            line = Console.ReadLine();
+        }
+    }
+    catch (const Exception& ex)
+    {
+        Console.Error() << ex.ToString() << endl();
+        return 1;
+    }
+    return 0;
+}

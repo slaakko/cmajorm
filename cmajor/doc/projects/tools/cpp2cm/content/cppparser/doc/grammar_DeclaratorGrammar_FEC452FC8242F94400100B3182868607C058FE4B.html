@@ -1,0 +1,61 @@
+<html>
+ <head>
+  <meta charset="utf-8"/>
+  <title>DeclaratorGrammar Grammar</title>
+  <link href="../../../style/style.css" rel="stylesheet" type="text/css"/>
+ </head>
+ <body>
+  <h1>DeclaratorGrammar Grammar</h1>
+  <table class="grammar">
+   <tr id="rule_InitDeclarator_0036705536D30B05580ADB5B906E9747BBF025F6">
+    <td class="grammarFirstCol">
+     <span class="rule">InitDeclarator</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#rule_Declarator_92586CA5FBEBDFDCE42EB4D4F894D90234E36E08">Declarator</a></span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#rule_Initializer_84BA3809911296771EC3C37DBECF83BA6BA539E2">Initializer</a></span><span class="ruleOp"> | </span><span class="ruleKeyword">empty</span><span class="ruleOp">)</span></td>
+   </tr>
+   <tr id="rule_Declarator_92586CA5FBEBDFDCE42EB4D4F894D90234E36E08">
+    <td class="grammarFirstCol">
+     <span class="rule">Declarator</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleOp">(</span><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="grammar_ExpressionGrammar_B28ED3443A69CA730C50D8B6A13B7A1B5708ABCB.html#rule_IdExpression_6EF54B6F5F55FFB430C83B52E510E0009B1D7DC5">IdExpression</a></span><span class="ruleOp"> | </span><span class="ruleOp">(</span><span class="ruleChar">'('</span><span class="ruleOp"> </span><span class="ruleChar">'*'</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="grammar_IdentifierGrammar_8D8D6307DE3120A9332D1686FBA3E981750C42B8.html#rule_Identifier_3D5E4C3A33C06ED4DEE1FEA416EF82ABF99C916C">Identifier</a></span><span class="ruleOp"> </span><span class="ruleChar">')'</span><span class="ruleOp">)</span><span class="ruleOp"> | </span><span class="ruleOp">(</span><span class="ruleChar">'('</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="grammar_IdentifierGrammar_8D8D6307DE3120A9332D1686FBA3E981750C42B8.html#rule_NestedNameSpecifier_54A6C581CB3800C623985611A1CE783651A6C89B">NestedNameSpecifier</a></span><span class="ruleOp"> </span><span class="ruleChar">'*'</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="grammar_IdentifierGrammar_8D8D6307DE3120A9332D1686FBA3E981750C42B8.html#rule_Identifier_3D5E4C3A33C06ED4DEE1FEA416EF82ABF99C916C">Identifier</a></span><span class="ruleOp"> </span><span class="ruleChar">')'</span><span class="ruleOp">)</span><span class="ruleOp">)</span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleKeyword">empty</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="grammar_FunctionGrammar_48AFCEA6C7E5829230B589427750B951570E225B.html#rule_ParameterList_B0AE2C22EA7BD875BC42D477A419D63CEC518DC3">ParameterList</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="grammar_TypeExprGrammar_0B9AC7CEC733C22DDDF51A043400652AE29A775B.html#rule_CVSpecifierSequence_27303CF2E06399A405A71F12A6E3986702A214AA">CVSpecifierSequence</a></span><span class="ruleOp"> | </span><span class="ruleOp">(</span><span class="ruleChar">'['</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="grammar_ExpressionGrammar_B28ED3443A69CA730C50D8B6A13B7A1B5708ABCB.html#rule_ConstantExpression_6D56A8328D81EB1F26DD89A9544E6ECAA2A34D1C">ConstantExpression</a></span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleChar">']'</span><span class="ruleOp">!</span><span class="ruleOp">)</span><span class="ruleOp">)</span><span class="ruleOp">*</span><span class="ruleOp">)</span></td>
+   </tr>
+   <tr id="rule_Initializer_84BA3809911296771EC3C37DBECF83BA6BA539E2">
+    <td class="grammarFirstCol">
+     <span class="rule">Initializer</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleOp">(</span><span class="ruleChar">'='</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_InitializerClause_60B12038EAF7C0A6BA790210152AE8F5B91F42CB">InitializerClause</a></span><span class="ruleOp">)</span><span class="ruleOp"> | </span><span class="ruleChar">'('</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="grammar_ExpressionGrammar_B28ED3443A69CA730C50D8B6A13B7A1B5708ABCB.html#rule_ExpressionList_CBF401D7415F30E8BC2C0700773449F78B377002">ExpressionList</a></span><span class="ruleOp"> </span><span class="ruleChar">')'</span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#rule_BracedInitializerList_37F651C56C5351FBA8DDE56FF4D17B25718E8C4E">BracedInitializerList</a></span></td>
+   </tr>
+   <tr id="rule_BraceOrEqualInitializer_A209E8F1C066AE19F0B4BEA0DD6FCDB2C4582B25">
+    <td class="grammarFirstCol">
+     <span class="rule">BraceOrEqualInitializer</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleOp">(</span><span class="ruleChar">'='</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_InitializerClause_60B12038EAF7C0A6BA790210152AE8F5B91F42CB">InitializerClause</a></span><span class="ruleOp">)</span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#rule_BracedInitializerList_37F651C56C5351FBA8DDE56FF4D17B25718E8C4E">BracedInitializerList</a></span></td>
+   </tr>
+   <tr id="rule_BracedInitializerList_37F651C56C5351FBA8DDE56FF4D17B25718E8C4E">
+    <td class="grammarFirstCol">
+     <span class="rule">BracedInitializerList</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleOp">(</span><span class="ruleChar">'{'</span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#rule_InitializerClause_60B12038EAF7C0A6BA790210152AE8F5B91F42CB">InitializerClause</a></span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleChar">','</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_InitializerClause_60B12038EAF7C0A6BA790210152AE8F5B91F42CB">InitializerClause</a></span><span class="ruleOp">)</span><span class="ruleOp">*</span><span class="ruleOp">)</span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleChar">'}'</span><span class="ruleOp">)</span></td>
+   </tr>
+   <tr id="rule_InitializerClause_60B12038EAF7C0A6BA790210152AE8F5B91F42CB">
+    <td class="grammarFirstCol">
+     <span class="rule">InitializerClause</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="grammar_ExpressionGrammar_B28ED3443A69CA730C50D8B6A13B7A1B5708ABCB.html#rule_AssignmentExpression_53EF215B89DDF3B79815A5EA6426682BECDA5B23">AssignmentExpression</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#rule_BracedInitializerList_37F651C56C5351FBA8DDE56FF4D17B25718E8C4E">BracedInitializerList</a></span></td>
+   </tr>
+   <tr id="rule_InitializerList_B7769B55872B6169D10030B627E649F846593482">
+    <td class="grammarFirstCol">
+     <span class="rule">InitializerList</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleKeyword">empty</span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#rule_InitializerClause_60B12038EAF7C0A6BA790210152AE8F5B91F42CB">InitializerClause</a></span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleChar">','</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_InitializerClause_60B12038EAF7C0A6BA790210152AE8F5B91F42CB">InitializerClause</a></span><span class="ruleOp">)</span><span class="ruleOp">*</span><span class="ruleOp">)</span></td>
+   </tr>
+  </table>
+ </body>
+</html>

@@ -1,0 +1,17 @@
+using System;
+
+namespace cmast
+{
+    public class ParameterNode : Node
+    {
+        public nothrow ParameterNode(Node* typeExpr_, IdentifierNode* id_) : typeExpr(typeExpr_), id(id_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public UniquePtr<Node> typeExpr;
+        public UniquePtr<IdentifierNode> id;
+    }
+}

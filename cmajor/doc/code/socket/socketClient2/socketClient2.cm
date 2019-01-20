@@ -1,0 +1,23 @@
+using System;
+using System.Net.Sockets;
+using System.IO;
+
+int main()
+{
+    try
+    {
+        TcpClient client("www.w3.org", "http");
+        SharedPtr<ByteStream> networkStream = client.GetStream();
+        StreamWriter writer(networkStream);
+        writer.Write("GET /2001/xml.xsd HTTP/1.1\r\nHost: www.w3.org\r\n\r\n");
+        StreamReader reader(networkStream);
+        string content = reader.ReadToEnd();
+        Console.WriteLine(content);
+    }
+    catch (const Exception& ex)
+    {
+        Console.Error() << ex.Message() << endl();
+        return 1;
+    }
+    return 0;
+}

@@ -1,0 +1,317 @@
+using System;
+using Span = System.Text.Parsing.Span;
+
+namespace cppsymbols
+{
+    public abstract class SimpleTypeSymbol : TypeSymbol
+    {
+        public nothrow SimpleTypeSymbol(const Span& span_, const ustring& name_) : base(span_, name_)
+        {
+        }
+    }
+    
+    public class CharTypeSymbol : SimpleTypeSymbol
+    {
+        public nothrow CharTypeSymbol(const Span& span_) : base(span_, u"@char")
+        {
+        }
+        public override void Accept(SymbolVisitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public override nothrow ustring FullName() const
+        {
+            return u"char";
+        }
+    }
+
+    public class SignedCharTypeSymbol : SimpleTypeSymbol
+    {
+        public nothrow SignedCharTypeSymbol(const Span& span_) : base(span_, u"@signed_char")
+        {
+        }
+        public override void Accept(SymbolVisitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public override nothrow ustring FullName() const
+        {
+            return u"signed char";
+        }
+    }
+
+    public class UnsignedCharTypeSymbol : SimpleTypeSymbol
+    {
+        public nothrow UnsignedCharTypeSymbol(const Span& span_) : base(span_, u"@unsigned_char")
+        {
+        }
+        public nothrow override bool IsUnsignedType() const
+        {
+            return true;
+        }
+        public override void Accept(SymbolVisitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public override nothrow ustring FullName() const
+        {
+            return u"unsigned char";
+        }
+    }
+
+    public class Char16TypeSymbol : SimpleTypeSymbol
+    {
+        public nothrow Char16TypeSymbol(const Span& span_) : base(span_, u"@char16_t")
+        {
+        }
+        public override void Accept(SymbolVisitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public override nothrow ustring FullName() const
+        {
+            return u"char16_t";
+        }
+    }
+
+    public class Char32TypeSymbol : SimpleTypeSymbol
+    {
+        public nothrow Char32TypeSymbol(const Span& span_) : base(span_, u"@char32_t")
+        {
+        }
+        public override void Accept(SymbolVisitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public override nothrow ustring FullName() const
+        {
+            return u"char32_t";
+        }
+    }
+
+    public class WCharTypeSymbol : SimpleTypeSymbol
+    {
+        public nothrow WCharTypeSymbol(const Span& span_) : base(span_, u"@wchar_t")
+        {
+        }
+        public override void Accept(SymbolVisitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public override nothrow ustring FullName() const
+        {
+            return u"wchar_t";
+        }
+    }
+    
+    public class BoolTypeSymbol : SimpleTypeSymbol
+    {
+        public nothrow BoolTypeSymbol(const Span& span_) : base(span_, u"@bool")
+        {
+        }
+        public override void Accept(SymbolVisitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public override nothrow ustring FullName() const
+        {
+            return u"bool";
+        }
+    }
+    
+    public class ShortIntTypeSymbol : SimpleTypeSymbol
+    {
+        public nothrow ShortIntTypeSymbol(const Span& span_) : base(span_, u"@short_int")
+        {
+        }
+        public override void Accept(SymbolVisitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public override nothrow ustring FullName() const
+        {
+            return u"short int";
+        }
+    }
+
+    public class UnsignedShortIntTypeSymbol : SimpleTypeSymbol
+    {
+        public nothrow UnsignedShortIntTypeSymbol(const Span& span_) : base(span_, u"@unsigned_short_int")
+        {
+        }
+        public nothrow override bool IsUnsignedType() const
+        {
+            return true;
+        }
+        public override void Accept(SymbolVisitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public override nothrow ustring FullName() const
+        {
+            return u"unsigned short int";
+        }
+    }
+
+    public class IntTypeSymbol : SimpleTypeSymbol
+    {
+        public nothrow IntTypeSymbol(const Span& span_) : base(span_, u"@int")
+        {
+        }
+        public override void Accept(SymbolVisitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public override nothrow ustring FullName() const
+        {
+            return u"int";
+        }
+    }
+
+    public class UnsignedIntTypeSymbol : SimpleTypeSymbol
+    {
+        public nothrow UnsignedIntTypeSymbol(const Span& span_) : base(span_, u"@unsigned_int")
+        {
+        }
+        public nothrow override bool IsUnsignedType() const
+        {
+            return true;
+        }
+        public override void Accept(SymbolVisitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public override nothrow ustring FullName() const
+        {
+            return u"unsigned int";
+        }
+    }
+
+    public class LongIntTypeSymbol : SimpleTypeSymbol
+    {
+        public nothrow LongIntTypeSymbol(const Span& span_) : base(span_, u"@long_int")
+        {
+        }
+        public override void Accept(SymbolVisitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public override nothrow ustring FullName() const
+        {
+            return u"long int";
+        }
+    }
+
+    public class UnsignedLongIntTypeSymbol : SimpleTypeSymbol
+    {
+        public nothrow UnsignedLongIntTypeSymbol(const Span& span_) : base(span_, u"@unsigned_long_int")
+        {
+        }
+        public nothrow override bool IsUnsignedType() const
+        {
+            return true;
+        }
+        public override void Accept(SymbolVisitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public override nothrow ustring FullName() const
+        {
+            return u"unsigned long int";
+        }
+    }
+
+    public class LongLongIntTypeSymbol : SimpleTypeSymbol
+    {
+        public nothrow LongLongIntTypeSymbol(const Span& span_) : base(span_, u"@long_long_int")
+        {
+        }
+        public override void Accept(SymbolVisitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public override nothrow ustring FullName() const
+        {
+            return u"long long int";
+        }
+    }
+
+    public class UnsignedLongLongIntTypeSymbol : SimpleTypeSymbol
+    {
+        public nothrow UnsignedLongLongIntTypeSymbol(const Span& span_) : base(span_, u"@unsigned_long_long_int")
+        {
+        }
+        public nothrow override bool IsUnsignedType() const
+        {
+            return true;
+        }
+        public override void Accept(SymbolVisitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public override nothrow ustring FullName() const
+        {
+            return u"unsigned long long int";
+        }
+    }
+
+    public class FloatTypeSymbol : SimpleTypeSymbol
+    {
+        public nothrow FloatTypeSymbol(const Span& span_) : base(span_, u"@float")
+        {
+        }
+        public override void Accept(SymbolVisitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public override nothrow ustring FullName() const
+        {
+            return u"float";
+        }
+    }
+
+    public class DoubleTypeSymbol : SimpleTypeSymbol
+    {
+        public nothrow DoubleTypeSymbol(const Span& span_) : base(span_, u"@double")
+        {
+        }
+        public override void Accept(SymbolVisitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public override nothrow ustring FullName() const
+        {
+            return u"double";
+        }
+    }
+
+    public class VoidTypeSymbol : SimpleTypeSymbol
+    {
+        public nothrow VoidTypeSymbol(const Span& span_) : base(span_, u"@void")
+        {
+        }
+        public override void Accept(SymbolVisitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public override nothrow ustring FullName() const
+        {
+            return u"void";
+        }
+    }
+
+    public class AutoTypeSymbol : SimpleTypeSymbol
+    {
+        public nothrow AutoTypeSymbol(const Span& span_) : base(span_, u"@auto")
+        {
+        }
+        public override void Accept(SymbolVisitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public override nothrow ustring FullName() const
+        {
+            return u"auto";
+        }
+    }
+}

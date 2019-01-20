@@ -1,0 +1,96 @@
+using System;
+using System.Collections;
+using System.Dom;
+using System.XPath;
+using System.IO;
+using Span = System.Text.Parsing.Span;
+
+namespace conversion
+{
+    internal class TypeExprGrammarHolder
+    {
+        static TypeExprGrammarHolder() : instance(new TypeExprGrammarHolder())
+        {
+        }
+        public static TypeExprGrammarHolder& Instance()
+        {
+            return *instance;
+        }
+        private TypeExprGrammarHolder() : cppTypeExprGrammar(new cppparser.TypeExprGrammar())
+        {
+        }
+        public cppparser.TypeExprGrammar* GetCppTypeExprGrammar() 
+        {
+            return cppTypeExprGrammar;
+        }
+        private static UniquePtr<TypeExprGrammarHolder> instance;
+        private cppparser.TypeExprGrammar* cppTypeExprGrammar;
+    }
+    
+    public void AddTypeRule(const ustring& sourceTypeName, const ustring& targetTypeName, cppsymbols.SymbolTable& symbolTable, ConversionTable& conversionTable)
+    {
+        cppparser.ParsingContext ctx;
+        ctx.SetTypeRule();
+        UniquePtr<cppast.Node> cppTypeNode = TypeExprGrammarHolder.Instance().GetCppTypeExprGrammar()->Parse(sourceTypeName.Chars(), sourceTypeName.Chars() + sourceTypeName.Length(), 0, "", &ctx);
+        cppsymbols.TypeCreator typeCreator(symbolTable);
+        cppTypeNode->Accept(typeCreator);
+        cppsymbols.TypeSymbol* sourceType = typeCreator.GetType();
+        conversionTable.typeConversionTable.AddTypeConversionRule(new TypeConversionRule(cppTypeNode.Release(), sourceType));
+    }
+    
+    public void ReadRules(cppsymbols.SymbolTable& symbolTable, ConversionTable& conversionTable, bool verbose)
+    {
+        string cmajorRootDir = GetFullPath(RtGetEnvironmentVariable("CMAJOR_ROOT"));
+        if (cmajorRootDir.IsEmpty())
+        {
+            throw Exception("please set 'CMAJOR_ROOT' environment variable to contain /path/to/cmajor directory");
+        }
+        string ruleDir = GetFullPath(Path.Combine(cmajorRootDir, "projects/tools/cpp2cm/rules"));
+        string ruleFilePath = GetFullPath(Path.Combine(ruleDir, "rules.xml"));
+        UniquePtr<DomDocument> ruleDoc = ParseXmlFileToDomDocument(ruleFilePath);
+        UniquePtr<XPathObject> ruleObject = Evaluate(u"/rules/rule", ruleDoc.Get());
+        XPathNodeSet* ruleNodeSet = ruleObject.Get() as XPathNodeSet*;
+        if (ruleNodeSet != null)
+        {
+            long n = ruleNodeSet->Length();
+            for (long i = 0; i < n; ++i)
+            {
+                DomNode* ruleNode = (*ruleNodeSet)[i];
+                DomElement* ruleElement = ruleNode as DomElement*;
+                if (ruleElement != null)
+                {
+                    string ruleFileName = ToUtf8(ruleElement->GetAttribute(u"file"));
+                    string ruleFilePath = GetFullPath(Path.Combine(ruleDir, ruleFileName));
+                    ReadRuleFile(ruleFilePath, symbolTable, conversionTable, verbose);
+                }
+            }            
+        }
+    }
+    
+    public void ReadRuleFile(const string& ruleFilePath, cppsymbols.SymbolTable& symbolTable, ConversionTable& conversionTable, bool verbose)
+    {
+        if (verbose)
+        {
+            Console.Out() << "Reading rules from " << ruleFilePath << "..." << endl();
+        }
+        UniquePtr<DomDocument> ruleDoc = ParseXmlFileToDomDocument(ruleFilePath);
+        UniquePtr<XPathObject> ruleObject = Evaluate(u"/rules/*", ruleDoc.Get());
+        XPathNodeSet* ruleNodeSet = ruleObject.Get() as XPathNodeSet*;
+        if (ruleNodeSet != null)
+        {
+            long n = ruleNodeSet->Length();
+            for (long i = 0; i < n; ++i)
+            {
+                DomNode* ruleNode = (*ruleNodeSet)[i];
+                DomElement* ruleElement = ruleNode as DomElement*;
+                if (ruleElement != null)
+                {
+                    if (ruleElement->Name() == u"type")
+                    {
+                        AddTypeRule(ruleElement->GetAttribute(u"source"), ruleElement->GetAttribute(u"target"), symbolTable, conversionTable);
+                    }
+                }
+            }
+        }
+    }    
+}

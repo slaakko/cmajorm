@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+ <PropertyGroup Label="Globals">
+  <CustomProjectExtensionsPath>$(LocalAppData)\CustomProjectSystems\Cmajor\</CustomProjectExtensionsPath>
+  <ProjectGuid>8db59877-8c03-4491-9ab7-274c4ed8914e</ProjectGuid>
+ </PropertyGroup>
+ <PropertyGroup>
+  <TargetType>library</TargetType>
+ </PropertyGroup>
+ <ItemGroup>
+  <CmCompile Include="Action.cm"/>
+  <CmCompile Include="Composite.cm"/>
+  <CmCompile Include="Error.cm"/>
+  <CmCompile Include="Grammar.cm"/>
+  <CmCompile Include="Keyword.cm"/>
+  <CmCompile Include="Linking.cm"/>
+  <CmCompile Include="Match.cm"/>
+  <CmCompile Include="Namespace.cm"/>
+  <CmCompile Include="Nonterminal.cm"/>
+  <CmCompile Include="Parser.cm"/>
+  <CmCompile Include="ParsingData.cm"/>
+  <CmCompile Include="ParsingDomain.cm"/>
+  <CmCompile Include="ParsingObject.cm"/>
+  <CmCompile Include="Primitive.cm"/>
+  <CmCompile Include="Rule.cm"/>
+  <CmCompile Include="Scanner.cm"/>
+  <CmCompile Include="Scope.cm"/>
+  <CmCompile Include="Span.cm"/>
+  <CmCompile Include="StdLib.cm"/>
+  <CmCompile Include="Visitor.cm"/>
+  <CmCompile Include="XmlLog.cm"/>
+ </ItemGroup>
+ <ItemGroup>
+  <None Include="StdLib.parser"/>
+  <None Include="StdLib.pl"/>
+  <None Include="StdLib.pp"/>
+ </ItemGroup>
+ <ItemGroup>
+  <ProjectReference Include="../System.Text.Parsing.CodeDom/System.Text.Parsing.CodeDom.cmproj"/>
+ </ItemGroup>
+ <Import Project="$(CustomProjectExtensionsPath)Cmajor.props"/>
+ <Import Project="$(CustomProjectExtensionsPath)Cmajor.targets"/>
+</Project>

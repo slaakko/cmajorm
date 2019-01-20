@@ -1,0 +1,60 @@
+using System;
+using System.Threading;
+
+public class FooException : Exception
+{
+    public FooException(const string& message_) : base(message_)
+    {
+    }
+}
+
+void foo()
+{
+    throw FooException("foo");
+}
+
+class ThreadData
+{
+    public void SetCapturedException(const ExceptionPtr& exception_)
+    {
+        exception = exception_;
+    }
+    public const ExceptionPtr& GetCapturedException() const
+    {
+        return exception;
+    }
+    private ExceptionPtr exception;
+}
+
+void ThreadFunction(void* arg)
+{
+    ThreadData* threadData = cast<ThreadData*>(arg);
+    try
+    {
+        foo();
+    }
+    catch (const Exception& ex)
+    {
+        ExceptionPtr exceptionPtr = CaptureCurrentException();
+        threadData->SetCapturedException(exceptionPtr);
+    }
+}
+
+void main()
+{
+    try
+    {
+        ThreadData threadData;
+        Thread thread = Thread.StartFunction(ThreadFunction, &threadData);
+        thread.Join();
+        ExceptionPtr capturedExceptionPtr = threadData.GetCapturedException();
+        if (capturedExceptionPtr.Exception() != null)
+        {
+            ThrowCapturedException(capturedExceptionPtr);
+        }
+    }
+    catch (const Exception& ex)
+    {
+        Console.Error() << ex.ToString() << endl();
+    }
+}

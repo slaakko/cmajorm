@@ -1,0 +1,316 @@
+using System;
+using System.Collections;
+
+namespace cmsx.machine
+{
+    public void Panic(const string& message)
+    {
+        Clock.Instance().Stop();
+        throw Exception(message);
+    }
+
+    public class Machine
+    {
+        public enum Flags : byte
+        {
+            none = 0u,
+            verbose = 1u << 0u,
+            quiet = 1u << 1u,
+            debug = 1u << 2u,
+            runProgram = 1u << 3u
+        }
+        public static inline nothrow void SetFlag(Flags flag)
+        {
+            flags = cast<Flags>(flags | flag);
+        }
+        public static inline nothrow bool GetFlag(Flags flag)
+        {
+            return (flags & flag) != Flags.none;
+        }
+        static Machine() : instance(new Machine())
+        {
+        }
+        suppress Machine(const Machine&);
+        suppress Machine(Machine&&);
+        suppress void operator=(const Machine&);
+        suppress void operator=(Machine&&);
+        public static nothrow Machine& Instance()
+        {
+            return *instance;
+        }
+        public void Run()
+        {
+            processor.Run();
+        }
+        public void Exit()
+        {
+            processor.Exit();
+        }
+        public inline nothrow Memory& GetMemory()
+        {
+            return memory;
+        }
+        public inline nothrow Processor& GetProcessor()
+        {
+            return processor;
+        }
+        public inline nothrow Registers& GetRegisters()
+        {
+            return processor.GetRegisters();
+        }
+        private Machine() : processor(*this), memory(*this)
+        {
+            InitInsts();
+            AddInst(new Trap());
+            AddInst(new Swym());
+            AddInst(new Ldb());
+            AddInst(new Ldbi());
+            AddInst(new Ldw());
+            AddInst(new Ldwi());
+            AddInst(new Ldt());
+            AddInst(new Ldti());
+            AddInst(new Ldo());
+            AddInst(new Ldoi());
+            AddInst(new Ldbu());
+            AddInst(new Ldbui());
+            AddInst(new Ldwu());
+            AddInst(new Ldwui());
+            AddInst(new Ldtu());
+            AddInst(new Ldtui());
+            AddInst(new Ldou());
+            AddInst(new Ldoui());
+            AddInst(new Ldht());
+            AddInst(new Ldhti());
+            AddInst(new Stb());
+            AddInst(new Stbi());
+            AddInst(new Stw());
+            AddInst(new Stwi());
+            AddInst(new Stt());
+            AddInst(new Stti());
+            AddInst(new Sto());
+            AddInst(new Stoi());
+            AddInst(new Stbu());
+            AddInst(new Stbui());
+            AddInst(new Stwu());
+            AddInst(new Stwui());
+            AddInst(new Sttu());
+            AddInst(new Sttui());
+            AddInst(new Stou());
+            AddInst(new Stoui());
+            AddInst(new Stht());
+            AddInst(new Sthti());
+            AddInst(new Stco());
+            AddInst(new Stcoi());
+            AddInst(new Add());
+            AddInst(new Addi());
+            AddInst(new Sub());
+            AddInst(new Subi());
+            AddInst(new Mul());
+            AddInst(new Muli());
+            AddInst(new Div());
+            AddInst(new Divi());
+            AddInst(new Addu());
+            AddInst(new Addui());
+            AddInst(new Subu());
+            AddInst(new Subui());
+            AddInst(new Mulu());
+            AddInst(new Mului());
+            AddInst(new Divu());
+            AddInst(new Divui());
+            AddInst(new I2Addu());
+            AddInst(new I2Addui());
+            AddInst(new I4Addu());
+            AddInst(new I4Addui());
+            AddInst(new I8Addu());
+            AddInst(new I8Addui());
+            AddInst(new I16Addu());
+            AddInst(new I16Addui());
+            AddInst(new Neg());
+            AddInst(new Negi());
+            AddInst(new Negu());
+            AddInst(new Negui());
+            AddInst(new Sl());
+            AddInst(new Sli());
+            AddInst(new Slu());
+            AddInst(new Slui());
+            AddInst(new Sr());
+            AddInst(new Sri());
+            AddInst(new Sru());
+            AddInst(new Srui());
+            AddInst(new Cmp());
+            AddInst(new Cmpi());
+            AddInst(new Cmpu());
+            AddInst(new Cmpui());
+            AddInst(new Csn());
+            AddInst(new Csni());
+            AddInst(new Csz());
+            AddInst(new Cszi());
+            AddInst(new Csp());
+            AddInst(new Cspi());
+            AddInst(new Csod());
+            AddInst(new Csodi());
+            AddInst(new Csnn());
+            AddInst(new Csnni());
+            AddInst(new Csnz());
+            AddInst(new Csnzi());
+            AddInst(new Csnp());
+            AddInst(new Csnpi());
+            AddInst(new Csev());
+            AddInst(new Csevi());
+            AddInst(new Zsn());
+            AddInst(new Zsni());
+            AddInst(new Zsz());
+            AddInst(new Zszi());
+            AddInst(new Zsp());
+            AddInst(new Zspi());
+            AddInst(new Zsod());
+            AddInst(new Zsodi());
+            AddInst(new Zsnn());
+            AddInst(new Zsnni());
+            AddInst(new Zsnz());
+            AddInst(new Zsnzi());
+            AddInst(new Zsnp());
+            AddInst(new Zsnpi());
+            AddInst(new Zsev());
+            AddInst(new Zsevi());
+            AddInst(new And());
+            AddInst(new Andi());
+            AddInst(new Or());
+            AddInst(new Ori());
+            AddInst(new Xor());
+            AddInst(new Xori());
+            AddInst(new Andn());
+            AddInst(new Andni());
+            AddInst(new Orn());
+            AddInst(new Orni());
+            AddInst(new Nand());
+            AddInst(new Nandi());
+            AddInst(new Nor());
+            AddInst(new Nori());
+            AddInst(new Nxor());
+            AddInst(new Nxori());
+            AddInst(new Mux());
+            AddInst(new Muxi());
+            AddInst(new Sadd());
+            AddInst(new Saddi());
+            AddInst(new Bdif());
+            AddInst(new Bdifi());
+            AddInst(new Wdif());
+            AddInst(new Wdifi());
+            AddInst(new Tdif());
+            AddInst(new Tdifi());
+            AddInst(new Odif());
+            AddInst(new Odifi());
+            AddInst(new Fadd());
+            AddInst(new Fsub());
+            AddInst(new Fmul());
+            AddInst(new Fdiv());
+            AddInst(new Fint());
+            AddInst(new Fcmp());
+            AddInst(new Fix());
+            AddInst(new Fixu());
+            AddInst(new Flot());
+            AddInst(new Floti());
+            AddInst(new Flotu());
+            AddInst(new Flotui());
+            AddInst(new Seth());
+            AddInst(new Setmh());
+            AddInst(new Setml());
+            AddInst(new Setl());
+            AddInst(new Inch());
+            AddInst(new Incmh());
+            AddInst(new Incml());
+            AddInst(new Incl());
+            AddInst(new Orh());
+            AddInst(new Ormh());
+            AddInst(new Orml());
+            AddInst(new Orl());
+            AddInst(new Andnh());
+            AddInst(new Andnmh());
+            AddInst(new Andnml());
+            AddInst(new Andnl());
+            AddInst(new Jmp());
+            AddInst(new Jmpb());
+            AddInst(new Go());
+            AddInst(new Goi());
+            AddInst(new Call());
+            AddInst(new Calli());
+            AddInst(new Ret());
+            AddInst(new Swym());
+            AddInst(new Bn());
+            AddInst(new Bnb());
+            AddInst(new Bz());
+            AddInst(new Bzb());
+            AddInst(new Bp());
+            AddInst(new Bpb());
+            AddInst(new Bod());
+            AddInst(new Bodb());
+            AddInst(new Bnn());
+            AddInst(new Bnnb());
+            AddInst(new Bnz());
+            AddInst(new Bnzb());
+            AddInst(new Bnp());
+            AddInst(new Bnpb());
+            AddInst(new Bev());
+            AddInst(new Bevb());
+            AddInst(new Pbn());
+            AddInst(new Pbnb());
+            AddInst(new Pbz());
+            AddInst(new Pbzb());
+            AddInst(new Pbp());
+            AddInst(new Pbpb());
+            AddInst(new Pbod());
+            AddInst(new Pbodb());
+            AddInst(new Pbnn());
+            AddInst(new Pbnnb());
+            AddInst(new Pbnz());
+            AddInst(new Pbnzb());
+            AddInst(new Pbnp());
+            AddInst(new Pbnpb());
+            AddInst(new Pbev());
+            AddInst(new Pbevb());
+            AddInst(new Get());
+            AddInst(new Put());
+            AddInst(new GetA());
+            AddInst(new GetAb());
+        }
+        public inline nothrow Instruction* GetInst(byte opCode) const
+        {
+            return instructions[opCode];
+        }
+        public nothrow ulong GetKernelRootPageAddress() const
+        {
+            return kernelRootPageAddress;
+        }
+        public nothrow void SetKernelRootPageAddress(ulong kernelRootPageAddress_)
+        {
+            kernelRootPageAddress = kernelRootPageAddress_;
+        }
+        private void InitInsts()
+        {
+            instructionList.Resize(256);
+            for (int i = 0; i < 256; ++i)
+            {
+                byte opCode = cast<byte>(i);
+                AddInst(new Instruction(opCode));
+            }
+        }
+        private void AddInst(Instruction* inst)
+        {
+            instructionList[inst->opCode].Reset(inst);
+            instructions[inst->opCode] = inst;
+        }
+        private static UniquePtr<Machine> instance;
+        private static Flags flags;
+        private List<UniquePtr<Instruction>> instructionList;
+        private Instruction*[256] instructions;
+        private Processor processor;
+        private Memory memory;
+        private ulong kernelRootPageAddress;
+    }
+
+    public Machine& GetMachine()
+    {
+        return Machine.Instance();
+    }
+}

@@ -1,0 +1,8 @@
+ifeq ($(config),debug)
+    CXXFLAGS += -pthread -fPIC -std=c++11 -I$(shell llvm-config --includedir) -I../.. -L$(shell llvm-config --libdir) -L../lib -g -O0
+    CFLAGS += -pthread -fPIC -I../.. -g -O0
+else
+    CXXFLAGS += -pthread -fPIC -std=c++11 -I$(shell llvm-config --includedir) -I../.. -L$(shell llvm-config --libdir) -L../lib -DNDEBUG -O3
+    CFLAGS += -pthread -fPIC -I../.. -DNDEBUG -O3
+endif
+

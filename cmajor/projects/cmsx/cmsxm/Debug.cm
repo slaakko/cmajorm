@@ -1,0 +1,22 @@
+using System;
+
+namespace cmsx.machine
+{
+    public class Debug
+    {
+        public static void Start()
+        {
+            startTime = Now();
+        }
+        public nothrow Debug(const string& msg_) : msg(msg_)
+        {
+            Console.Out() << ToString((Now() - startTime).Milliseconds()) << "> " << msg << endl();
+        }
+        public ~Debug()
+        {
+            Console.Out() << ToString((Now() - startTime).Milliseconds()) << "< " << msg << endl();
+        }
+        private static TimePoint startTime;
+        private string msg;
+    }
+}

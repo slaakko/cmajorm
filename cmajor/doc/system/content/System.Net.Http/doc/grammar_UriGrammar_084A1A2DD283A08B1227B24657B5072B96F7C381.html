@@ -1,0 +1,299 @@
+<html>
+ <head>
+  <meta charset="utf-8"/>
+  <title>UriGrammar Grammar</title>
+  <link href="../../../style/style.css" rel="stylesheet" type="text/css"/>
+ </head>
+ <body>
+  <h1>UriGrammar Grammar</h1>
+  <table class="grammar">
+   <tr id="rule_UriReference_D9AB6582C3F06DA090F8234D635EEB77351C9BE2">
+    <td class="grammarFirstCol">
+     <span class="rule">UriReference</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#rule_AbsoluteUri_192A849903EDB2D7CC60827C7EF5051BA0603159">AbsoluteUri</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#rule_RelativeUri_E08C72106076DB185744D0CC808174254FDFB226">RelativeUri</a></span><span class="ruleOp">)</span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleChar">'#'</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_Fragment_085A7DE7316A561EFF45C814F31C935DEC056935">Fragment</a></span><span class="ruleOp">)</span><span class="ruleOp">?</span></td>
+   </tr>
+   <tr id="rule_AbsoluteUri_192A849903EDB2D7CC60827C7EF5051BA0603159">
+    <td class="grammarFirstCol">
+     <span class="rule">AbsoluteUri</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#rule_Scheme_3BCC2462C1626C9D0D6D546C49A6F98FE76BA88E">Scheme</a></span><span class="ruleOp"> </span><span class="ruleChar">':'</span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#rule_HierPart_48C05F2F8F63F5239BB7262281ECCFAF03D76DCD">HierPart</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#rule_OpaquePart_88D2991636C965284BC418B3673607EA9A7E08AC">OpaquePart</a></span><span class="ruleOp">)</span></td>
+   </tr>
+   <tr id="rule_RelativeUri_E08C72106076DB185744D0CC808174254FDFB226">
+    <td class="grammarFirstCol">
+     <span class="rule">RelativeUri</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleKeyword">empty</span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#rule_NetPath_791DA7731B4B46A6EF9300B595543C22A57CE146">NetPath</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#rule_AbsPath_5B0ECC7A6585E6A87574C09DDF71164E3A12F839">AbsPath</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#rule_RelPath_1113A2F2B5E15B8F0956917C14A9B65DDD000EC9">RelPath</a></span><span class="ruleOp">)</span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleChar">'?'</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_Query_0774C691E7C5CF19BCE6D314C77FFD8E31579683">Query</a></span><span class="ruleOp">)</span><span class="ruleOp">?</span></td>
+   </tr>
+   <tr id="rule_HierPart_48C05F2F8F63F5239BB7262281ECCFAF03D76DCD">
+    <td class="grammarFirstCol">
+     <span class="rule">HierPart</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#rule_NetPath_791DA7731B4B46A6EF9300B595543C22A57CE146">NetPath</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#rule_AbsPath_5B0ECC7A6585E6A87574C09DDF71164E3A12F839">AbsPath</a></span><span class="ruleOp">)</span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleChar">'?'</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_Query_0774C691E7C5CF19BCE6D314C77FFD8E31579683">Query</a></span><span class="ruleOp">)</span><span class="ruleOp">?</span></td>
+   </tr>
+   <tr id="rule_OpaquePart_88D2991636C965284BC418B3673607EA9A7E08AC">
+    <td class="grammarFirstCol">
+     <span class="rule">OpaquePart</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#rule_UriCNoSlash_43EE98DDCB03BE2F949B5C2D5FDCA8EE3BD31A9C">UriCNoSlash</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_UriC_A30C10E8A5BF4E819C9CF34653E838688DC4800F">UriC</a></span><span class="ruleOp">*</span></td>
+   </tr>
+   <tr id="rule_UriCNoSlash_43EE98DDCB03BE2F949B5C2D5FDCA8EE3BD31A9C">
+    <td class="grammarFirstCol">
+     <span class="rule">UriCNoSlash</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#rule_Unreserved_EFB50C0840DA9E8093A0E0118BA37AEA3AAEBEAA">Unreserved</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#rule_Escaped_66A5D61667381034302176787FD7470513CD1521">Escaped</a></span><span class="ruleOp"> | </span><span class="ruleCharSet">[;?:@&amp;=+$,]</span></td>
+   </tr>
+   <tr id="rule_NetPath_791DA7731B4B46A6EF9300B595543C22A57CE146">
+    <td class="grammarFirstCol">
+     <span class="rule">NetPath</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleString">"//"</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_Authority_502372DDD6A72F5E465A5FF655E78806CE55FA9E">Authority</a></span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#rule_AbsPath_5B0ECC7A6585E6A87574C09DDF71164E3A12F839">AbsPath</a></span><span class="ruleOp">)</span><span class="ruleOp">?</span></td>
+   </tr>
+   <tr id="rule_AbsPath_5B0ECC7A6585E6A87574C09DDF71164E3A12F839">
+    <td class="grammarFirstCol">
+     <span class="rule">AbsPath</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleChar">'/'</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_PathSegments_A962067DEA1B6B592668028B6C7B82FF3DFE67C8">PathSegments</a></span></td>
+   </tr>
+   <tr id="rule_RelPath_1113A2F2B5E15B8F0956917C14A9B65DDD000EC9">
+    <td class="grammarFirstCol">
+     <span class="rule">RelPath</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#rule_RelSegment_B15B062113872ED42B717BEDCFF3C4B86DABA255">RelSegment</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_AbsPath_5B0ECC7A6585E6A87574C09DDF71164E3A12F839">AbsPath</a></span><span class="ruleOp">?</span></td>
+   </tr>
+   <tr id="rule_RelSegment_B15B062113872ED42B717BEDCFF3C4B86DABA255">
+    <td class="grammarFirstCol">
+     <span class="rule">RelSegment</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#rule_Unreserved_EFB50C0840DA9E8093A0E0118BA37AEA3AAEBEAA">Unreserved</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#rule_Escaped_66A5D61667381034302176787FD7470513CD1521">Escaped</a></span><span class="ruleOp"> | </span><span class="ruleCharSet">[;@&amp;=+$,]</span><span class="ruleOp">)</span><span class="ruleOp">+</span></td>
+   </tr>
+   <tr id="rule_Scheme_3BCC2462C1626C9D0D6D546C49A6F98FE76BA88E">
+    <td class="grammarFirstCol">
+     <span class="rule">Scheme</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#rule_Alpha_671F76634B9A6748FE1293EA5307B3E373FED570">Alpha</a></span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#rule_Alpha_671F76634B9A6748FE1293EA5307B3E373FED570">Alpha</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#rule_Digit_52AF6BF75BD61BF8C89BA1DA3F375DA1BB94DB0E">Digit</a></span><span class="ruleOp"> | </span><span class="ruleCharSet">[+.-]</span><span class="ruleOp">)</span><span class="ruleOp">*</span></td>
+   </tr>
+   <tr id="rule_Authority_502372DDD6A72F5E465A5FF655E78806CE55FA9E">
+    <td class="grammarFirstCol">
+     <span class="rule">Authority</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#rule_Server_611BE3F66615C45B4C4358BCCFA731CE72A23BCF">Server</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#rule_RegName_0FE8F2EB9FD40FF5057B0041319E22E624E990F0">RegName</a></span></td>
+   </tr>
+   <tr id="rule_RegName_0FE8F2EB9FD40FF5057B0041319E22E624E990F0">
+    <td class="grammarFirstCol">
+     <span class="rule">RegName</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#rule_Unreserved_EFB50C0840DA9E8093A0E0118BA37AEA3AAEBEAA">Unreserved</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#rule_Escaped_66A5D61667381034302176787FD7470513CD1521">Escaped</a></span><span class="ruleOp"> | </span><span class="ruleCharSet">[$,;:@&amp;=+]</span><span class="ruleOp">)</span><span class="ruleOp">+</span></td>
+   </tr>
+   <tr id="rule_Server_611BE3F66615C45B4C4358BCCFA731CE72A23BCF">
+    <td class="grammarFirstCol">
+     <span class="rule">Server</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#rule_UserInfo_1D17F1777B1D2618D66ACFB5E6C5EF5B91326706">UserInfo</a></span><span class="ruleOp"> </span><span class="ruleChar">'@'</span><span class="ruleOp">)</span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_HostPort_77CF4FF34CCD511C665398E3E0FAC3FE14657E76">HostPort</a></span><span class="ruleOp">?</span></td>
+   </tr>
+   <tr id="rule_UserInfo_1D17F1777B1D2618D66ACFB5E6C5EF5B91326706">
+    <td class="grammarFirstCol">
+     <span class="rule">UserInfo</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#rule_Unreserved_EFB50C0840DA9E8093A0E0118BA37AEA3AAEBEAA">Unreserved</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#rule_Escaped_66A5D61667381034302176787FD7470513CD1521">Escaped</a></span><span class="ruleOp"> | </span><span class="ruleCharSet">[;:&amp;=+$,]</span><span class="ruleOp">)</span><span class="ruleOp">*</span></td>
+   </tr>
+   <tr id="rule_HostPort_77CF4FF34CCD511C665398E3E0FAC3FE14657E76">
+    <td class="grammarFirstCol">
+     <span class="rule">HostPort</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#rule_Host_B85C9DBD82388FF9A7465ABEB06B6DCCC6630F44">Host</a></span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleChar">':'</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_Port_58F93AFDD1120CB4ECB3C1DB235CCACF9CFAD054">Port</a></span><span class="ruleOp">)</span><span class="ruleOp">?</span></td>
+   </tr>
+   <tr id="rule_Host_B85C9DBD82388FF9A7465ABEB06B6DCCC6630F44">
+    <td class="grammarFirstCol">
+     <span class="rule">Host</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#rule_HostName_AF650ADDCA6656EEC7777A91F1C7ABECA1F0C06D">HostName</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#rule_IPv4Address_D45E1253BB04C31A9BAE02606AB840CECB037BD9">IPv4Address</a></span></td>
+   </tr>
+   <tr id="rule_HostName_AF650ADDCA6656EEC7777A91F1C7ABECA1F0C06D">
+    <td class="grammarFirstCol">
+     <span class="rule">HostName</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#rule_DomainLabel_44F328DBDBF3FB32F9E429E606F1F579FEAC7589">DomainLabel</a></span><span class="ruleOp"> </span><span class="ruleChar">'.'</span><span class="ruleOp">)</span><span class="ruleOp">*</span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#rule_TopLabel_786A3D24467443B11B1BED666757E4CBFD68B24B">TopLabel</a></span><span class="ruleOp"> </span><span class="ruleChar">'.'</span><span class="ruleOp">?</span><span class="ruleOp"> | </span><span class="ruleKeyword">empty</span><span class="ruleOp">)</span></td>
+   </tr>
+   <tr id="rule_DomainLabel_44F328DBDBF3FB32F9E429E606F1F579FEAC7589">
+    <td class="grammarFirstCol">
+     <span class="rule">DomainLabel</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#rule_AlphaNumOrDash_963E40C79A40BD29A2BC94A4A7BF62F54B856C8A">AlphaNumOrDash</a></span><span class="ruleOp">+</span><span class="ruleOp">)</span></td>
+   </tr>
+   <tr id="rule_TopLabel_786A3D24467443B11B1BED666757E4CBFD68B24B">
+    <td class="grammarFirstCol">
+     <span class="rule">TopLabel</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#rule_Alpha_671F76634B9A6748FE1293EA5307B3E373FED570">Alpha</a></span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#rule_AlphaNumOrDash_963E40C79A40BD29A2BC94A4A7BF62F54B856C8A">AlphaNumOrDash</a></span><span class="ruleOp">+</span><span class="ruleOp">)</span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#rule_Alpha_671F76634B9A6748FE1293EA5307B3E373FED570">Alpha</a></span></td>
+   </tr>
+   <tr id="rule_IPv4Address_D45E1253BB04C31A9BAE02606AB840CECB037BD9">
+    <td class="grammarFirstCol">
+     <span class="rule">IPv4Address</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#rule_Digit_52AF6BF75BD61BF8C89BA1DA3F375DA1BB94DB0E">Digit</a></span><span class="ruleOp">+</span><span class="ruleOp"> </span><span class="ruleChar">'.'</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_Digit_52AF6BF75BD61BF8C89BA1DA3F375DA1BB94DB0E">Digit</a></span><span class="ruleOp">+</span><span class="ruleOp"> </span><span class="ruleChar">'.'</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_Digit_52AF6BF75BD61BF8C89BA1DA3F375DA1BB94DB0E">Digit</a></span><span class="ruleOp">+</span><span class="ruleOp"> </span><span class="ruleChar">'.'</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_Digit_52AF6BF75BD61BF8C89BA1DA3F375DA1BB94DB0E">Digit</a></span><span class="ruleOp">+</span></td>
+   </tr>
+   <tr id="rule_Port_58F93AFDD1120CB4ECB3C1DB235CCACF9CFAD054">
+    <td class="grammarFirstCol">
+     <span class="rule">Port</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="../../System.Text.Parsing/doc/grammar_stdlib_1A00CD0A4B4616214D7B505BA9E73923739E1E77.html#rule_uint_B576C7C3A3FEC095F54489E9D57621A6F9A486C9">uint</a></span><span class="ruleOp">)</span><span class="ruleOp">?</span></td>
+   </tr>
+   <tr id="rule_Path_BE7881803F86EA6D8CC7DFC29BC4A1DE68F6AF5A">
+    <td class="grammarFirstCol">
+     <span class="rule">Path</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#rule_AbsPath_5B0ECC7A6585E6A87574C09DDF71164E3A12F839">AbsPath</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#rule_OpaquePart_88D2991636C965284BC418B3673607EA9A7E08AC">OpaquePart</a></span><span class="ruleOp">)</span><span class="ruleOp">?</span></td>
+   </tr>
+   <tr id="rule_PathSegments_A962067DEA1B6B592668028B6C7B82FF3DFE67C8">
+    <td class="grammarFirstCol">
+     <span class="rule">PathSegments</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#rule_Segment_399D024CFDAF0EE0C06ACDA1620E154D80BDDB27">Segment</a></span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleChar">'/'</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_Segment_399D024CFDAF0EE0C06ACDA1620E154D80BDDB27">Segment</a></span><span class="ruleOp">)</span><span class="ruleOp">*</span></td>
+   </tr>
+   <tr id="rule_Segment_399D024CFDAF0EE0C06ACDA1620E154D80BDDB27">
+    <td class="grammarFirstCol">
+     <span class="rule">Segment</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#rule_PChar_1311A3AE87AE2A450332CF23697A0E27E5D1F356">PChar</a></span><span class="ruleOp">*</span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleChar">';'</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_Param_3C2BF07763FF58DC6F6DA82C2EB2B4ED227D0B43">Param</a></span><span class="ruleOp">)</span><span class="ruleOp">*</span></td>
+   </tr>
+   <tr id="rule_Param_3C2BF07763FF58DC6F6DA82C2EB2B4ED227D0B43">
+    <td class="grammarFirstCol">
+     <span class="rule">Param</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#rule_PChar_1311A3AE87AE2A450332CF23697A0E27E5D1F356">PChar</a></span><span class="ruleOp">*</span></td>
+   </tr>
+   <tr id="rule_PChar_1311A3AE87AE2A450332CF23697A0E27E5D1F356">
+    <td class="grammarFirstCol">
+     <span class="rule">PChar</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#rule_Unreserved_EFB50C0840DA9E8093A0E0118BA37AEA3AAEBEAA">Unreserved</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#rule_Escaped_66A5D61667381034302176787FD7470513CD1521">Escaped</a></span><span class="ruleOp"> | </span><span class="ruleCharSet">[:@&amp;=+$,]</span></td>
+   </tr>
+   <tr id="rule_Query_0774C691E7C5CF19BCE6D314C77FFD8E31579683">
+    <td class="grammarFirstCol">
+     <span class="rule">Query</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#rule_UriC_A30C10E8A5BF4E819C9CF34653E838688DC4800F">UriC</a></span><span class="ruleOp">*</span></td>
+   </tr>
+   <tr id="rule_Fragment_085A7DE7316A561EFF45C814F31C935DEC056935">
+    <td class="grammarFirstCol">
+     <span class="rule">Fragment</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#rule_UriC_A30C10E8A5BF4E819C9CF34653E838688DC4800F">UriC</a></span><span class="ruleOp">*</span></td>
+   </tr>
+   <tr id="rule_UriC_A30C10E8A5BF4E819C9CF34653E838688DC4800F">
+    <td class="grammarFirstCol">
+     <span class="rule">UriC</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#rule_Reserved_4EE153AC1727740BBAC1F9EAABCFFA8B5AF0C8A6">Reserved</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#rule_Unreserved_EFB50C0840DA9E8093A0E0118BA37AEA3AAEBEAA">Unreserved</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#rule_Escaped_66A5D61667381034302176787FD7470513CD1521">Escaped</a></span></td>
+   </tr>
+   <tr id="rule_Reserved_4EE153AC1727740BBAC1F9EAABCFFA8B5AF0C8A6">
+    <td class="grammarFirstCol">
+     <span class="rule">Reserved</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleCharSet">[;/?:@&amp;=+$,]</span></td>
+   </tr>
+   <tr id="rule_Unreserved_EFB50C0840DA9E8093A0E0118BA37AEA3AAEBEAA">
+    <td class="grammarFirstCol">
+     <span class="rule">Unreserved</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#rule_AlphaNum_FA218F3D3F576A02CD00720BEE95C4512297A584">AlphaNum</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#rule_Mark_C553EDF41C40F61EA1677250713F45F24BEC7954">Mark</a></span></td>
+   </tr>
+   <tr id="rule_Mark_C553EDF41C40F61EA1677250713F45F24BEC7954">
+    <td class="grammarFirstCol">
+     <span class="rule">Mark</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleCharSet">[-_.!~*'()]</span></td>
+   </tr>
+   <tr id="rule_Escaped_66A5D61667381034302176787FD7470513CD1521">
+    <td class="grammarFirstCol">
+     <span class="rule">Escaped</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleChar">'%'</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_Hex_344DF9D499B81FD205D46DDD88E347A29DAD7A3E">Hex</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_Hex_344DF9D499B81FD205D46DDD88E347A29DAD7A3E">Hex</a></span></td>
+   </tr>
+   <tr id="rule_Hex_344DF9D499B81FD205D46DDD88E347A29DAD7A3E">
+    <td class="grammarFirstCol">
+     <span class="rule">Hex</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#rule_Digit_52AF6BF75BD61BF8C89BA1DA3F375DA1BB94DB0E">Digit</a></span><span class="ruleOp"> | </span><span class="ruleCharSet">[a-fA-F]</span></td>
+   </tr>
+   <tr id="rule_AlphaNum_FA218F3D3F576A02CD00720BEE95C4512297A584">
+    <td class="grammarFirstCol">
+     <span class="rule">AlphaNum</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#rule_Alpha_671F76634B9A6748FE1293EA5307B3E373FED570">Alpha</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#rule_Digit_52AF6BF75BD61BF8C89BA1DA3F375DA1BB94DB0E">Digit</a></span></td>
+   </tr>
+   <tr id="rule_AlphaNumOrDash_963E40C79A40BD29A2BC94A4A7BF62F54B856C8A">
+    <td class="grammarFirstCol">
+     <span class="rule">AlphaNumOrDash</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#rule_AlphaNum_FA218F3D3F576A02CD00720BEE95C4512297A584">AlphaNum</a></span><span class="ruleOp"> | </span><span class="ruleChar">'-'</span></td>
+   </tr>
+   <tr id="rule_Alpha_671F76634B9A6748FE1293EA5307B3E373FED570">
+    <td class="grammarFirstCol">
+     <span class="rule">Alpha</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#rule_LowerAlpha_0A6DA83719A94B3E2478273F10E1D463D938D9E7">LowerAlpha</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#rule_UpperAlpha_9F3BA0BCAB11DC365004C1AF802486468BD53F90">UpperAlpha</a></span></td>
+   </tr>
+   <tr id="rule_UpperAlpha_9F3BA0BCAB11DC365004C1AF802486468BD53F90">
+    <td class="grammarFirstCol">
+     <span class="rule">UpperAlpha</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleCharSet">[A-Z]</span></td>
+   </tr>
+   <tr id="rule_LowerAlpha_0A6DA83719A94B3E2478273F10E1D463D938D9E7">
+    <td class="grammarFirstCol">
+     <span class="rule">LowerAlpha</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleCharSet">[a-z]</span></td>
+   </tr>
+   <tr id="rule_Digit_52AF6BF75BD61BF8C89BA1DA3F375DA1BB94DB0E">
+    <td class="grammarFirstCol">
+     <span class="rule">Digit</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleCharSet">[0-9]</span></td>
+   </tr>
+  </table>
+ </body>
+</html>

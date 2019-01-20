@@ -1,0 +1,84 @@
+// =================================
+// Copyright (c) 2019 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Collections;
+
+namespace System.IO
+{
+    public class MemoryByteStream : ByteStream
+    {
+        public MemoryByteStream() : content(), readPos(0)
+        {
+        }
+        public MemoryByteStream(byte* data, long count) : content(), readPos(0)
+        {
+            this->Write(data, count);
+        }
+        suppress MemoryByteStream(const MemoryByteStream&);
+        suppress void operator=(const MemoryByteStream&);
+        public default nothrow MemoryByteStream(MemoryByteStream&&);
+        public default nothrow void operator=(MemoryByteStream&&);
+        public nothrow inline const byte* Data() const
+        {
+            return content.CBegin().Ptr();
+        }
+        public nothrow inline long Count() const
+        {
+            return content.Count();
+        }
+        public nothrow inline long ReadPos() const
+        {
+            return readPos;
+        }
+        public override int ReadByte()
+        {
+            if (readPos < content.Count())
+            {
+                return content[readPos++];
+            }
+            return -1;
+        }
+        public override long Read(byte* buf, long count)
+        {
+            long bytesRead = 0;
+            long n = content.Count();
+            while (count > 0 && readPos < n)
+            {
+                *buf++ = content[readPos++];
+                ++bytesRead;
+                --count;
+            }
+            return bytesRead;
+        }
+        public override void Write(byte x)
+        {
+            content.Add(x);
+        }
+        public override void Write(byte* buf, long count)
+        {
+            while (count > 0)
+            {
+                content.Add(*buf++);
+                --count;
+            }
+        }
+        public override void Seek(long pos, Origin origin)
+        {
+            switch (origin)
+            {
+                case Origin.seekSet: readPos = pos; break;
+                case Origin.seekCur: readPos = readPos + pos; break;
+                case Origin.seekEnd: readPos = content.Count() + pos; break;
+            }
+        }
+        public override long Tell()
+        {
+            return readPos;
+        }
+        private List<byte> content;
+        private long readPos;
+    }
+}

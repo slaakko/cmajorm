@@ -1,0 +1,25 @@
+using System;
+using cmast;
+
+namespace cmparser
+{
+    grammar BasicTypeGrammar
+    {
+        BasicType : Node*
+            ::= keyword("bool"){ value = new BoolNode(); }
+            |   keyword("char"){ value = new CharNode(); }
+            |   keyword("wchar"){ value = new WCharNode(); }
+            |   keyword("uchar"){ value = new UCharNode(); }
+            |   keyword("sbyte"){ value = new SByteNode(); }
+            |   keyword("byte"){ value = new ByteNode(); }
+            |   keyword("short"){ value = new ShortNode(); }
+            |   keyword("ushort"){ value = new UShortNode(); }
+            |   keyword("int"){ value = new IntNode(); }
+            |   keyword("uint"){ value = new UIntNode(); }
+            |   keyword("long"){ value = new LongNode(); }
+            |   keyword("ulong"){ value = new ULongNode(); }
+            |   keyword("float"){ value = new FloatNode(); }
+            |   keyword("double"){ value = new DoubleNode(); }
+            ;
+    }
+}

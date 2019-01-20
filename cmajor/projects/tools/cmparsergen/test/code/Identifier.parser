@@ -1,0 +1,41 @@
+using System.Text.Parsing.CodeDom;
+
+namespace Code
+{
+    grammar IdentifierGrammar
+    {
+        using stdlib.identifier;
+        using KeywordGrammar.Keyword;
+        using TypeExprGrammar.TypeExpr;
+
+        Identifier : Identifier*
+            ::= token(identifier - Keyword){ value = new Identifier(identifier); }
+            ;
+
+        QualifiedId : Identifier*
+            ::= token((identifier - Keyword) % '.'){ value = new Identifier(ustring(matchBegin, matchEnd)); }
+            ;
+
+        TemplateId(ParsingContext* ctx, var UniquePtr<Identifier> qid, var UniquePtr<TemplateId> templateId) : TemplateId*
+            ::= empty{ ctx->BeginParsingTemplateId(); }
+                (QualifiedId:primary{ qid.Reset(primary); templateId.Reset(new TemplateId(primary->Name())); }
+                '<' (TypeExpr(ctx):templateArg{ templateId->AddTemplateArg(templateArg); } % ',') '>')
+            {
+                ctx->EndParsingTemplateId();
+                value = templateId.Release();
+            }
+            /
+            {
+                ctx->EndParsingTemplateId();
+            }
+            ;
+
+        UsingAlias(var UniquePtr<Identifier> id, var UniquePtr<Identifier> qid) : ustring
+            ::= keyword("using") (Identifier{ id.Reset(Identifier); } '=' QualifiedId{ qid.Reset(QualifiedId); }){ value = ustring(matchBegin, matchEnd); } ';'
+            ;
+
+        UsingImport(var UniquePtr<Identifier> qid) : ustring
+            ::= keyword("using") (QualifiedId{ qid.Reset(QualifiedId); }){ value = ustring(matchBegin, matchEnd); } ';'
+            ;
+    }
+}

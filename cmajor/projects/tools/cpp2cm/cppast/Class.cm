@@ -1,0 +1,198 @@
+using System;
+
+namespace cppast
+{
+    public enum ClassKey
+    {
+        class_, struct_, union_
+    }
+    
+    public nothrow ustring ClassKeyStr(ClassKey key)
+    {
+        switch (key)
+        {
+            case ClassKey.class_: return u"class";
+            case ClassKey.struct_: return u"struct";
+            case ClassKey.union_: return u"union";
+        }
+        return u"CLASS_KEY";
+    }
+    
+    public class ForwardClassDeclarationNode : Node
+    {
+        public ForwardClassDeclarationNode(const Span& span_, ClassKey classKey_, Node* className_) : base(span_), classKey(classKey_), className(className_)
+        {
+            className->parent = this;
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public ClassKey classKey;
+        public UniquePtr<Node> className;
+    }
+    
+    public class ClassNode : Node
+    {
+        public nothrow ClassNode(const Span& span_, ClassKey classKey_, Node* className_, Specifiers specifiers_, BaseClassListNode* baseClasses_) :
+            base(span_), classKey(classKey_), className(className_), specifiers(specifiers_), baseClasses(baseClasses_)
+        {
+            className->parent = this;
+            if (!baseClasses.IsNull())
+            {
+                baseClasses->parent = this;
+            }
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public Specifiers DefaultAccess() const
+        {
+            if (classKey == ClassKey.class_) 
+            { 
+                return Specifiers.private_; 
+            }
+            else
+            {
+                return Specifiers.public_; 
+            }
+        }
+        public void AddMemberDeclaration(Node* memberDeclaration)
+        {
+            memberDeclaration->parent = this;
+            memberDeclarations.Add(UniquePtr<Node>(memberDeclaration));
+        }
+        public ClassKey classKey;
+        public UniquePtr<Node> className;
+        public Specifiers specifiers;
+        public UniquePtr<BaseClassListNode> baseClasses;
+        public List<UniquePtr<Node>> memberDeclarations;
+    }
+    
+    public class BaseClassListNode : CompositeNode<BaseClassNode>
+    {
+        public nothrow BaseClassListNode(const Span& span_) : base(span_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+    }
+    
+    public class BaseClassNode : Node
+    {
+        public nothrow BaseClassNode(const Span& span_, Specifiers baseSpecifiers_, Node* baseClassName_) :
+            base(span_), baseSpecifiers(baseSpecifiers_), baseClassName(baseClassName_)
+        {
+            baseClassName->parent = this;
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public Specifiers baseSpecifiers;
+        public UniquePtr<Node> baseClassName;
+    }
+    
+    public class MemberDeclarationNode : Node
+    {
+        public nothrow MemberDeclarationNode(const Span& span_, Specifiers specifiers_, Node* type_, Node* declarator_, Node* initializer_) : 
+            specifiers(specifiers_), type(type_), declarator(declarator_), initializer(initializer_)
+        {
+            if (!type.IsNull())
+            {
+                type->parent = this;
+            }            
+            declarator->parent = this;
+            if (!initializer.IsNull())
+            {
+                initializer->parent = this;
+            }
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public Specifiers specifiers;
+        public UniquePtr<Node> type;
+        public UniquePtr<Node> declarator;
+        public UniquePtr<Node> initializer;
+    }
+    
+    public nothrow bool HasMemberDeclarationNodeParent(Node* node)
+    {
+        if (node->parent != null)
+        {
+            if (node->parent is MemberDeclarationNode*)
+            {
+                return true;
+            }
+            else if (HasMemberDeclarationNodeParent(node->parent))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    public class SpecialMemberFunctionNode : Node
+    {
+        public nothrow SpecialMemberFunctionNode(const Span& span_, Specifiers specifiers_, Node* declarator_, Node* ctorInitializer_, CompoundStatementNode* body_) :
+            base(span_), declarator(declarator_), ctorInitializer(ctorInitializer_), body(body_)
+        {
+            declarator->parent = this;
+            if (!ctorInitializer.IsNull())
+            {
+                ctorInitializer->parent = this;
+            }
+            if (!body.IsNull())
+            {
+                body->parent = this;
+            }
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public Specifiers specifiers;
+        public UniquePtr<Node> declarator;
+        public UniquePtr<Node> ctorInitializer;
+        public UniquePtr<CompoundStatementNode> body;
+    }
+    
+    public class CtorInitializerNode : Node
+    {
+        public nothrow CtorInitializerNode(const Span& span_) : base(span_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public void AddMemberInitializer(MemberInitializerNode* memberInitializer)
+        {
+            memberInitializer->parent = this;
+            memberInitializers.Add(UniquePtr<MemberInitializerNode>(memberInitializer));
+        }
+        public List<UniquePtr<MemberInitializerNode>> memberInitializers;
+    }
+    
+    public class MemberInitializerNode : Node
+    {
+        public nothrow MemberInitializerNode(const Span& span_, Node* memberId_, Node* initializer_) : base(span_), memberId(memberId_), initializer(initializer_)
+        {
+            if (!initializer.IsNull())
+            {
+                initializer->parent = this;
+            }
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public UniquePtr<Node> memberId;
+        public UniquePtr<Node> initializer;
+    }
+}

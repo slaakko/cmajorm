@@ -1,0 +1,30 @@
+using System;
+using System.Collections;
+
+namespace System.IO
+{
+    public static class Directory
+    {
+        public static nothrow bool Exists(const string& directoryPath)
+        {
+            return RtDirectoryExists(directoryPath.Chars());
+        }
+        public static nothrow void CreateDirectories(const string& directoryPath)
+        {
+            RtCreateDirectories(directoryPath.Chars());
+        }
+        public static List<string> GetFiles(const string& directoryPath)
+        {
+            List<string> files;
+            int directoryIterationHandle = RtBeginIterateDirectory(directoryPath.Chars());
+            const char* filePath = RtGetNextFilePath(directoryIterationHandle);
+            while (filePath != null)
+            {
+                files.Add(filePath);
+                filePath = RtGetNextFilePath(directoryIterationHandle);
+            }
+            RtEndIterateDirectory(directoryIterationHandle);
+            return files;
+        }
+    }
+}

@@ -1,0 +1,103 @@
+// =================================
+// Copyright (c) 2019 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+
+namespace System.Text.Parsing.CodeDom
+{
+    public class Visitor
+    {
+        public default virtual ~Visitor();
+        public virtual void Visit(BoolType& boolType) {}
+        public virtual void Visit(CharType& charType) {}
+        public virtual void Visit(WCharType& wcharType) {}
+        public virtual void Visit(UCharType& ucharType) {}
+        public virtual void Visit(SByteType& sbyteType) {}
+        public virtual void Visit(ByteType& byteType) {}
+        public virtual void Visit(ShortType& shortType) {}
+        public virtual void Visit(UShortType& ushortType) {}
+        public virtual void Visit(IntType& intType) {}
+        public virtual void Visit(UIntType& uintType) {}
+        public virtual void Visit(LongType& longType) {}
+        public virtual void Visit(ULongType& ulongType) {}
+        public virtual void Visit(FloatType& floatType) {}
+        public virtual void Visit(DoubleType& doubleType) {}
+        public virtual void Visit(VoidType& voidType) {}
+        public virtual void Visit(Identifier& identifier) {}
+        public virtual void Visit(TemplateId& templateId) {}
+        public virtual void Visit(Literal& literal) {}
+        public virtual void Visit(Const& const_) {}
+        public virtual void Visit(LvalueRef& lvalueRef) {}
+        public virtual void Visit(RvalueRef& rvalueRef) {}
+        public virtual void Visit(Pointer& pointer) {}
+        public virtual void Visit(Array& array) {}
+        public virtual void Visit(Dot& dot) {}
+        public virtual void Visit(Arrow& arrow) {}
+        public virtual void Visit(Not& not_) {}
+        public virtual void Visit(Deref& deref) {}
+        public virtual void Visit(AddressOf& addressOf) {}
+        public virtual void Visit(PrefixIncrement& prefixIncrement) {}
+        public virtual void Visit(PrefixDecrement& prefixDecrement) {}
+        public virtual void Visit(UnaryPlus& unaryPlus) {}
+        public virtual void Visit(UnaryMinus& unaryMinus) {}
+        public virtual void Visit(Complement& complement) {}
+        public virtual void Visit(Disjunction& disjunction) {}
+        public virtual void Visit(Conjunction& conjunction) {}
+        public virtual void Visit(BitOr& bitOr) {}
+        public virtual void Visit(BitXor& bitXor) {}
+        public virtual void Visit(BitAnd& bitAnd) {}
+        public virtual void Visit(Equal& equal) {}
+        public virtual void Visit(NotEqual& notEqual) {}
+        public virtual void Visit(Less& less) {}
+        public virtual void Visit(Greater& greater) {}
+        public virtual void Visit(LessOrEqual& lessOrEqual) {}
+        public virtual void Visit(GreaterOrEqual& greaterOrEqual) {}
+        public virtual void Visit(ShiftLeft& shiftLeft) {}
+        public virtual void Visit(ShiftRight& shiftRight) {}
+        public virtual void Visit(Add& add) {}
+        public virtual void Visit(Sub& sub) {}
+        public virtual void Visit(Mul& mul) {}
+        public virtual void Visit(Div& div) {}
+        public virtual void Visit(Rem& rem) {}
+        public virtual void Visit(Is& is_) {}
+        public virtual void Visit(As& as_) {}
+        public virtual void Visit(Indexing& indexing) {}
+        public virtual void Visit(Invoke& invoke) {}
+        public virtual void Visit(PostfixIncrement& postfixIncrement) {}
+        public virtual void Visit(PostfixDecrement& postfixDecrement) {}
+        public virtual void Visit(SizeOf& sizeOf) {}
+        public virtual void Visit(TypeName& typeName) {}
+        public virtual void Visit(Cast& cast_) {}
+        public virtual void Visit(Construct& construct_) {}
+        public virtual void Visit(New& new_) {}
+        public virtual void Visit(This& this_) {}
+        public virtual void Visit(Base& base_) {}
+        public virtual void Visit(CompoundStatement& compoundStatement) {}
+        public virtual void Visit(ReturnStatement& returnStatement) {}
+        public virtual void Visit(IfStatement& ifStatement) {}
+        public virtual void Visit(WhileStatement& whileStatement) {}
+        public virtual void Visit(DoStatement& doStatement) {}
+        public virtual void Visit(ForStatement& forStatement) {}
+        public virtual void Visit(BreakStatement& breakStatement) {}
+        public virtual void Visit(ContinueStatement& continueStatement) {}
+        public virtual void Visit(GotoStatement& gotoStatement) {}
+        public virtual void Visit(ConstructionStatement& constructionStatement) {}
+        public virtual void Visit(DeleteStatement& deleteStatement) {}
+        public virtual void Visit(DestroyStatement& destroyStatement) {}
+        public virtual void Visit(AssignmentStatement& assignmentStatement) {}
+        public virtual void Visit(ExpressionStatement& expressionStatement) {}
+        public virtual void Visit(EmptyStatement& emptyStatement) {}
+        public virtual void Visit(RangeForStatement& rangeForStatement) {}
+        public virtual void Visit(SwitchStatement& switchStatement) {}
+        public virtual void Visit(CaseStatement& caseStatement) {}
+        public virtual void Visit(DefaultStatement& defaultStatement) {}
+        public virtual void Visit(GotoCaseStatement& gotoCaseStatement) {}
+        public virtual void Visit(GotoDefaultStatement& gotoDefaultStatement) {}
+        public virtual void Visit(ThrowStatement& throwStatement) {}
+        public virtual void Visit(Catch& catch_) {}
+        public virtual void Visit(TryStatement& tryStatement) {}
+        public virtual void Visit(AssertStatement& assertStatement) {}
+    }
+}

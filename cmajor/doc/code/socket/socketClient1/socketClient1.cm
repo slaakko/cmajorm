@@ -1,0 +1,29 @@
+using System;
+using System.IO;
+using System.Net.Sockets;
+
+int main()
+{
+    try
+    {
+        TcpSocket socket("www.w3.org", "http");
+        string request = "GET /2001/xml.xsd HTTP/1.1\r\nHost: www.w3.org\r\n\r\n";
+        int numSent = socket.Send(cast<byte*>(cast<void*>(request.Chars())), cast<int>(request.Length()));
+        string reply;
+        IOBuffer buf(4096);
+        int numReceived = socket.Receive(cast<byte*>(buf.Mem()), cast<int>(buf.Size()));
+        while (numReceived > 0)
+        {
+            const char* s = cast<const char*>(buf.Mem());
+            reply.Append(s, numReceived);
+            numReceived = socket.Receive(cast<byte*>(buf.Mem()), cast<int>(buf.Size()));
+        }
+        Console.Out() << reply << endl();
+    }
+    catch (const Exception& ex)
+    {
+        Console.Error() << ex.Message() << endl();
+        return 1;
+    }
+    return 0;
+}

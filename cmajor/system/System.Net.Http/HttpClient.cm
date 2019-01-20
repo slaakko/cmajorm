@@ -1,0 +1,119 @@
+// =================================
+// Copyright (c) 2019 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Collections;
+using System.IO;
+using System.Net.Sockets;
+using System.IO.Compression;
+
+namespace System.Net.Http
+{
+    public class HttpClient
+    {
+        public HttpClient() : baseAddress(), tcpClient(), stream(), log(null)
+        {
+        }
+        public HttpClient(const UriReference& baseAddress_) : baseAddress(baseAddress_), tcpClient(), stream(), log(null)
+        {
+            Connect();
+        }
+        public HttpClient(const UriReference& baseAddress_, StreamWriter* log_) : baseAddress(baseAddress_), tcpClient(), stream(), log(log_)
+        {
+            Connect();
+        }
+        public void Connect()
+        {
+            Connect(ToUtf8(baseAddress.Host()), ToUtf8(baseAddress.Scheme()));
+        }
+        public void Connect(const string& node, const string& service)
+        {
+            if (log != null)
+            {
+                log->WriteLine("Connecting to host '" + node + "', service '" + service + "'...");
+            }
+            tcpClient.Connect(node, service);
+            stream = tcpClient.GetStream();
+            if (log != null)
+            {
+                log->WriteLine("Connected to host '" + node + "', service '" + service + "'");
+            }
+        }
+        public HttpStatus Get(const UriReference& uri, HttpHeaderCollection& responseHeaders, SharedPtr<ByteStream>& body)
+        {
+            HttpHeaderCollection requestHeaders;
+            return Get(uri, requestHeaders, responseHeaders, body);
+        }
+        public HttpStatus Get(const UriReference& uri, HttpHeaderCollection& requestHeaders, HttpHeaderCollection& responseHeaders, SharedPtr<ByteStream>& body)
+        {
+            responseHeaders.Clear();
+            UriReference absoluteUri = UriReference.Combine(baseAddress, uri);
+            if (absoluteUri.Host() != baseAddress.Host() || absoluteUri.Scheme() != baseAddress.Scheme())
+            {
+                Connect(ToUtf8(absoluteUri.Host()), ToUtf8(absoluteUri.Scheme()));
+            }
+            HttpRequest request(absoluteUri, requestHeaders);
+            StreamWriter writer(stream);
+            request.Write(writer, log);
+            HttpStatus status = ReadStartOfMessage(*stream, responseHeaders, log);
+            if (status.StatusCode() == statusRedirectionMovedPermanently)
+            {
+                HttpHeader* locationHeader = responseHeaders.GetHeader(u"location");
+                ustring location = locationHeader->SingleFieldValue().FieldValue();
+                UriReference locationUri(location);
+                return Get(locationUri, requestHeaders, responseHeaders, body);
+            }
+            else if (status.StatusCode() == statusSuccessOK)
+            {
+                bool chunked = false;
+                HttpHeader* transferEncodingHeader = responseHeaders.GetHeader(u"transfer-encoding");
+                if (transferEncodingHeader != null)
+                {
+                    ustring transferCodingsValue = transferEncodingHeader->CombinedFieldValue();
+                    List<HttpFieldValue> transferCodings;
+                    HttpParser.Instance().ParseFieldValue(transferCodingsValue, &transferCodings);
+                    for (const HttpFieldValue& transferCoding : transferCodings)
+                    {
+                        if (ToLower(transferCoding.FieldValue()) == u"chunked")
+                        {
+                            chunked = true;
+                        }
+                    }
+                }
+                if (chunked)
+                {
+                    List<HttpHeader> trailer;
+                    SharedPtr<ByteStream> bodyStream = ReadChunkedBody(*stream, trailer);
+                    for (const HttpHeader& header : trailer)
+                    {
+                        responseHeaders.Add(UniquePtr<HttpHeader>(new HttpHeader(header)));
+                    }
+                    body = bodyStream;
+                }
+                else
+                {
+                    body = stream;
+                }
+            }
+            return status;
+        }
+        public nothrow inline const UriReference& BaseAddress() const
+        {
+            return baseAddress;
+        }
+        public void SetBaseAddress(const UriReference& baseAddress_)
+        {
+            baseAddress = baseAddress_;
+        }
+        public inline nothrow void SetLog(StreamWriter* log_)
+        {
+            log = log_;
+        }
+        private UriReference baseAddress;
+        private TcpClient tcpClient;
+        private SharedPtr<ByteStream> stream;
+        private StreamWriter* log;
+    }
+}

@@ -1,0 +1,115 @@
+// =================================
+// Copyright (c) 2019 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+
+namespace System.IO
+{
+    public class StreamReader
+    {
+        public StreamReader(const SharedPtr<ByteStream>& stream_) : stream(stream_), buffered(false), eos(false)
+        {
+        }
+        public int Read()
+        {
+            int x = Get(false);
+            eos = x == -1;
+            return x;
+        }
+        public int Peek()
+        {
+            int x = Get(true);
+            eos = x == -1;
+            return x;
+        }
+        public string ReadLine()
+        {
+            string result;
+            int x = Read();
+            bool prevWasCR = false;
+            while (x != -1)
+            {
+                if (cast<char>(x) == '\r')
+                {
+                    if (prevWasCR)
+                    {
+                        result.Append('\r');
+                    }
+                    prevWasCR = true;
+                }
+                else if (cast<char>(x) == '\n')
+                {
+                    return result;
+                }
+                else
+                {
+                    if (prevWasCR)
+                    {
+                        result.Append('\r');
+                        prevWasCR = false;
+                    }
+                    result.Append(cast<char>(x));
+                }
+                x = Read();
+            }
+            eos = true;
+            if (prevWasCR)
+            {
+                result.Append('\r');
+            }
+            return result;
+        }
+        public string ReadToEnd()
+        {
+            string result;
+            int x = Read();
+            while (x != -1)
+            {
+                result.Append(cast<char>(x));
+                x = Read();
+            }
+            eos = true;
+            return result;
+        }
+        public void PutBack(byte b)
+        {
+            buffered = true;
+            buffer = b;
+        }
+        private int Get(bool peek)
+        {
+            if (buffered)
+            {
+                if (!peek)
+                {
+                    buffered = false;
+                }
+                return buffer;
+            }
+            else
+            {
+                int x = stream->ReadByte();
+                if (peek)
+                {
+                    buffer = x;
+                    buffered = true;
+                }
+                return x;
+            }
+        }
+        public nothrow const SharedPtr<ByteStream>& ContainedStream() 
+        {
+            return stream;
+        }
+        public nothrow inline bool EndOfStream() const
+        {
+            return eos;
+        }
+        private SharedPtr<ByteStream> stream;
+        private bool buffered;
+        private int buffer;
+        private bool eos;
+    }
+}

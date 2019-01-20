@@ -1,0 +1,49 @@
+using System;
+using System.Collections;
+
+namespace cppparser
+{
+    public class FileRegistry
+    {
+        static FileRegistry() : instance(new FileRegistry())
+        {
+        }
+        public static FileRegistry& Instance() 
+        {
+            return *instance;
+        }
+        public int RegisterFilePath(const string& filePath)
+        {
+            int index = cast<int>(filePaths.Count());
+            filePaths.Add(filePath);
+            return index;
+        }
+        public string GetFilePath(int index) const
+        {
+            if (index >= 0 && index < filePaths.Count())
+            {
+                return filePaths[index];
+            }
+            else
+            {
+                return string();
+            }
+        }
+        public void SetFileContent(int fileIndex, const ustring& fileContent)
+        {
+            fileContentMap[fileIndex] = fileContent;
+        }
+        public ustring GetFileContent(int fileIndex) const
+        {
+            HashMap<int, ustring>.ConstIterator it = fileContentMap.CFind(fileIndex);
+            if (it != fileContentMap.CEnd())
+            {
+                return it->second;
+            }
+            return ustring();
+        }
+        private static UniquePtr<FileRegistry> instance;
+        private List<string> filePaths;
+        private HashMap<int, ustring> fileContentMap;
+    }
+}

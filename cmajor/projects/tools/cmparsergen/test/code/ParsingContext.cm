@@ -1,0 +1,84 @@
+using System;
+using System.Collections;
+
+namespace Code
+{
+    public class ParsingContext
+    {
+        public void BeginParsingTemplateId()
+        {
+            parsingTemplateIdStack.Push(parsingTemplateId);
+            parsingTemplateId = true;
+        }
+        public void EndParsingTemplateId()
+        {
+            parsingTemplateId = parsingTemplateIdStack.Pop();
+        }
+        public nothrow inline bool ParsingTemplateId() const
+        {
+            return parsingTemplateId;
+        }
+        public void PushParsingLvalue(bool parsingLvalue_)
+        {
+            parsingLvalueStack.Push(parsingLvalue);
+            parsingLvalue = parsingLvalue_;
+        }
+        public void PopParsingLvalue()
+        {
+            parsingLvalue = parsingLvalueStack.Pop();
+        }
+        public nothrow inline bool ParsingLvalue() const
+        {
+            return parsingLvalue;
+        }
+        public void PushParsingExpressionStatement(bool parsingExpressionStatement_)
+        {
+            parsingExpressionStatementStack.Push(parsingExpressionStatement);
+            parsingExpressionStatement = parsingExpressionStatement_;
+        }
+        public void PopParsingExpressionStatement()
+        {
+            parsingExpressionStatement = parsingExpressionStatementStack.Pop();
+        }
+        public nothrow inline bool ParsingExpressionStatement() const
+        {
+            return parsingExpressionStatement;
+        }
+        public void PushParsingArguments(bool parsingArguments_)
+        {
+            parsingArgumentsStack.Push(parsingArguments);
+            parsingArguments = parsingArguments_;
+        }
+        public void PopParsingArguments()
+        {
+            parsingArguments = parsingArgumentsStack.Pop();
+        }
+        public nothrow inline bool ParsingArguments() const
+        {
+            return parsingArguments;
+        }
+        public void PushParsingIsOrAs(bool parsingIsOrAs_)
+        {
+            parsingIsOrAsStack.Push(parsingIsOrAs);
+            parsingIsOrAs = parsingIsOrAs_;
+        }
+        public void PopParsingIsOrAs()
+        {
+            parsingIsOrAs = parsingIsOrAsStack.Pop();
+        }
+        public nothrow inline bool ParsingIsOrAs() const
+        {
+            return parsingIsOrAs;
+        }
+        private bool parsingTemplateId;
+        private Stack<bool> parsingTemplateIdStack;
+        private bool parsingLvalue;
+        private Stack<bool> parsingLvalueStack;
+        private bool parsingExpressionStatement;
+        private Stack<bool> parsingExpressionStatementStack;
+        private bool parsingArguments;
+        private Stack<bool> parsingArgumentsStack;
+        private bool parsingIsOrAs;
+        private Stack<bool> parsingIsOrAsStack;
+    }
+}

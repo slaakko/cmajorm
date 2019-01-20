@@ -1,0 +1,66 @@
+// =================================
+// Copyright (c) 2019 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Collections;
+
+namespace System.Text.Parsing
+{
+    public abstract class Context 
+    {
+        public default virtual ~Context();
+    }
+    
+    public class ContextStack
+    {
+        public void Push(Context* context)
+        {
+            stack.Push(UniquePtr<Context>(context));
+        }
+        public Context* Pop()
+        {
+            if (stack.IsEmpty())
+            {
+                throw Exception("context stack is empty");
+            }
+            UniquePtr<Context> context = stack.Pop();
+            return context.Release();
+        }
+        private Stack<UniquePtr<Context>> stack;
+    }
+    
+    public class RuleData
+    {
+        public UniquePtr<Context> context;
+        public ContextStack contextStack;
+    }
+    
+    public class ParsingData
+    {
+        public ParsingData(int numRules)
+        {
+            ruleData.Resize(numRules);
+        }
+        public default ~ParsingData();
+        public void PushContext(int ruleId, Context* context)
+        {
+            #assert(ruleId >= 0 && ruleId < ruleData.Count());
+            #assert(context != null);
+            ruleData[ruleId].contextStack.Push(ruleData[ruleId].context.Release());
+            ruleData[ruleId].context.Reset(context);
+        }
+        public void PopContext(int ruleId)
+        {
+            #assert(ruleId >= 0 && ruleId < ruleData.Count());
+            ruleData[ruleId].context.Reset(ruleData[ruleId].contextStack.Pop());
+        }
+        public Context* GetContext(int ruleId) const
+        {
+            #assert(ruleId >= 0 && ruleId < ruleData.Count());
+            return ruleData[ruleId].context.Get();
+        }
+        private List<RuleData> ruleData;
+    }
+}

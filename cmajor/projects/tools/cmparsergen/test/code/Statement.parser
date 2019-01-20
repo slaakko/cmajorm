@@ -1,0 +1,188 @@
+using System.Text.Parsing.CodeDom;
+
+namespace Code
+{
+    grammar StatementGrammar
+    {
+        using stdlib.identifier;
+        using KeywordGrammar.Keyword;
+        using ExpressionGrammar.Expression;
+        using ExpressionGrammar.ArgumentList;
+        using TypeExprGrammar.TypeExpr;
+        using IdentifierGrammar.Identifier;
+
+        Statement(ParsingContext* ctx) : Statement*
+            ::= LabeledStatement(ctx){ value = LabeledStatement; }
+            |   ControlStatement(ctx){ value = ControlStatement; }
+            |   ExpressionStatement(ctx){ value = ExpressionStatement; }
+            |   AssignmentStatement(ctx){ value = AssignmentStatement; }
+            |   ConstructionStatement(ctx){ value = ConstructionStatement; }
+            |   DeleteStatement(ctx){ value = DeleteStatement; }
+            |   DestroyStatement(ctx){ value = DestroyStatement; }
+            |   EmptyStatement(ctx){ value = EmptyStatement; }
+            |   ThrowStatement(ctx){ value = ThrowStatement; }
+            |   TryStatement(ctx){ value = TryStatement; }
+            |   AssertStatement(ctx){ value = AssertStatement; }
+            ;
+
+        LabelId : ustring
+            ::= token(identifier - Keyword){ value = identifier; }
+            ;
+
+        LabeledStatement(ParsingContext* ctx) : Statement*
+            ::= LabelId:lbl ':' Statement(ctx):stmt{ stmt->SetLabel(lbl); value = stmt; }
+            ;
+
+        ControlStatement(ParsingContext* ctx) : Statement*
+            ::= CompoundStatement(ctx){ value = CompoundStatement; }
+            |   ReturnStatement(ctx){ value = ReturnStatement; }
+            |   IfStatement(ctx){ value = IfStatement; }
+            |   WhileStatement(ctx){ value = WhileStatement; }
+            |   DoStatement(ctx){ value = DoStatement; }
+            |   RangeForStatement(ctx){ value = RangeForStatement; }
+            |   ForStatement(ctx){ value = ForStatement; }
+            |   BreakStatement(ctx){ value = BreakStatement; }
+            |   ContinueStatement(ctx){ value = ContinueStatement; }
+            |   GotoStatement(ctx){ value = GotoStatement; }
+            |   SwitchStatement(ctx){ value = SwitchStatement; }
+            |   GotoCaseStatement(ctx){ value = GotoCaseStatement; }
+            |   GotoDefaultStatement(ctx){ value = GotoDefaultStatement; }
+            ;
+
+        CompoundStatement(ParsingContext* ctx) : CompoundStatement*
+            ::= '{'{ value = new CompoundStatement(); }
+                (Statement(ctx):stmt{ value->AddStatement(stmt); })*
+                '}'!
+            ;
+
+        ReturnStatement(ParsingContext* ctx) : Statement*
+            ::= (keyword("return") Expression(ctx)? ';'!){ value = new ReturnStatement(Expression); }
+            ;
+
+        IfStatement(ParsingContext* ctx) : Statement*
+            ::= (keyword("if") '(' Expression(ctx) ')' Statement(ctx):thenS (keyword("else") Statement(ctx):elseS)?){ value = new IfStatement(Expression, thenS, elseS); }
+            ;
+
+        WhileStatement(ParsingContext* ctx) : Statement*
+            ::= (keyword("while") '('! Expression(ctx)! ')'! Statement(ctx)!){ value = new WhileStatement(Expression, Statement); }
+            ;
+
+        DoStatement(ParsingContext* ctx) : Statement*
+            ::= (keyword("do") Statement(ctx)! keyword("while")! '('! Expression(ctx)! ')'! ';'!){ value = new DoStatement(Expression, Statement); }
+            ;
+
+        ForStatement(ParsingContext* ctx) : Statement*
+            ::= (keyword("for") '(' ForInitStatement(ctx)! Expression(ctx)? ';'! ForLoopStatementExpr(ctx)! ')'! Statement(ctx)!)
+            {
+                value = new ForStatement(ForInitStatement, Expression, ForLoopStatementExpr, Statement);
+            }
+            ;
+
+        ForInitStatement(ParsingContext* ctx) : Statement*
+            ::= AssignmentStatement(ctx){ value = AssignmentStatement; }
+            |   ConstructionStatement(ctx){ value = ConstructionStatement; }
+            |   EmptyStatement(ctx){ value = EmptyStatement; }
+            ;
+
+        ForLoopStatementExpr(ParsingContext* ctx) : Statement*
+            ::= AssignmentStatementExpr(ctx){ value = AssignmentStatementExpr; }
+            |   Expression(ctx){ value = new ExpressionStatement(Expression); }
+            |   empty{ value = new EmptyStatement(); }
+            ;
+
+        RangeForStatement(ParsingContext* ctx) : Statement*
+            ::= (keyword("for") '(' TypeExpr(ctx) Identifier ':' Expression(ctx)! ')'! Statement(ctx)!){ value = new RangeForStatement(TypeExpr, Identifier, Expression, Statement); }
+            ;
+
+        BreakStatement(ParsingContext* ctx) : Statement*
+            ::= (keyword("break") ';'!){ value = new BreakStatement(); }
+            ;
+
+        ContinueStatement(ParsingContext* ctx) : Statement*
+            ::= (keyword("continue") ';'!){ value = new ContinueStatement(); }
+            ;
+
+        GotoStatement(ParsingContext* ctx, var UniquePtr<Identifier> id) : Statement*
+            ::= (keyword("goto") Identifier ';'!){ id.Reset(Identifier); value = new GotoStatement(Identifier->Name()); }
+            ;
+
+        SwitchStatement(ParsingContext* ctx) : SwitchStatement*
+            ::= (keyword("switch") '('! Expression(ctx)! ')'!){ value = new SwitchStatement(Expression); }
+                '{'! (CaseStatement(ctx){ value->AddCase(CaseStatement); } | DefaultStatement(ctx){ value->SetDefault(DefaultStatement); })* '}'!
+            ;
+
+        CaseStatement(ParsingContext* ctx, var UniquePtr<CaseStatement> caseS) : CaseStatement*
+            ::= (empty{ caseS.Reset(new CaseStatement()); } (keyword("case") Expression(ctx){ caseS->AddCaseExpr(Expression); } ':'!)+
+                (Statement(ctx){ caseS->AddStatement(Statement); })*){ value = caseS.Release(); }
+            ;
+
+        DefaultStatement(ParsingContext* ctx) : DefaultStatement*
+            ::= (keyword("default") ':'!){ value = new DefaultStatement(); }
+                (Statement(ctx){ value->AddStatement(Statement); })*
+            ;
+
+        GotoCaseStatement(ParsingContext* ctx) : Statement*
+            ::= (keyword("goto") keyword("case") Expression(ctx)! ';'!){ value = new GotoCaseStatement(Expression); }
+            ;
+
+        GotoDefaultStatement(ParsingContext* ctx) : Statement*
+            ::= (keyword("goto") keyword("default") ';'!){ value = new GotoDefaultStatement(); }
+            ;
+
+        AssignmentStatementExpr(ParsingContext* ctx, var UniquePtr<DomObject> targetExpr) : Statement*
+            ::= (empty{ ctx->PushParsingLvalue(true); }
+                Expression(ctx):target{ ctx->PopParsingLvalue(); targetExpr.Reset(target); } / { ctx->PopParsingLvalue(); } '=' Expression(ctx):source)
+            {
+                value = new AssignmentStatement(targetExpr.Release(), source);
+            }
+            ;
+
+        AssignmentStatement(ParsingContext* ctx) : Statement*
+            ::= (AssignmentStatementExpr(ctx) ';'){ value = AssignmentStatementExpr; }
+            ;
+
+        ConstructionStatement(ParsingContext* ctx) : ConstructionStatement*
+            ::= TypeExpr(ctx) Identifier!{ value = new ConstructionStatement(TypeExpr, Identifier); }
+                (   '=' Expression(ctx)!{ value->AddArgument(Expression); }
+                |   ('(' ArgumentList(ctx, value)! ')'!){ value->SetParens(); }
+                |   empty
+                )
+                ';'
+            ;
+
+        DeleteStatement(ParsingContext* ctx) : Statement*
+            ::= (keyword("delete") Expression(ctx)! ';'!){ value = new DeleteStatement(Expression); }
+            ;
+
+        DestroyStatement(ParsingContext* ctx) : Statement*
+            ::= (keyword("destroy") Expression(ctx)! ';'!){ value = new DestroyStatement(Expression); }
+            ;
+
+        ExpressionStatement(ParsingContext* ctx, var UniquePtr<DomObject> expr) : Statement*
+            ::= (empty{ ctx->PushParsingExpressionStatement(true); }
+                Expression(ctx){ expr.Reset(Expression); }
+                ';'){ ctx->PopParsingExpressionStatement(); value = new ExpressionStatement(expr.Release()); } / { ctx->PopParsingExpressionStatement(); }
+            ;
+
+        EmptyStatement(ParsingContext* ctx) : Statement*
+            ::= ';'{ value = new EmptyStatement(); }
+            ;
+
+        ThrowStatement(ParsingContext* ctx) : Statement*
+            ::= (keyword("throw") Expression(ctx)? ';'!){ value = new ThrowStatement(Expression); }
+            ;
+
+        TryStatement(ParsingContext* ctx) : TryStatement*
+            ::= keyword("try") CompoundStatement(ctx):tryBlock{ value = new TryStatement(tryBlock); }
+                (Catch(ctx){ value->AddCatch(Catch); })+
+            ;
+
+        Catch(ParsingContext* ctx) : Catch*
+            ::= (keyword("catch") '('! TypeExpr(ctx)! Identifier? ')'! CompoundStatement(ctx):catchBlock){ value = new Catch(TypeExpr, Identifier, catchBlock); }
+            ;
+
+        AssertStatement(ParsingContext* ctx) : Statement*
+            ::= ('#' keyword("assert") Expression(ctx)! ';'!){ value = new AssertStatement(Expression); }
+            ;
+    }
+}

@@ -1,0 +1,57 @@
+// =================================
+// Copyright (c) 2019 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Collections;
+
+namespace System.Json
+{
+    public delegate void* JsonClassCreatorDelegate(JsonValue* value);
+    
+    public class JsonClassFactory
+    {
+        static JsonClassFactory() : instance(new JsonClassFactory())
+        {
+        }
+        public static JsonClassFactory& Instance()
+        {
+            return *instance;
+        }
+        public void RegisterJsonClass(const ustring& jsonClassName, JsonClassCreatorDelegate creator)
+        {
+            creatorMap[jsonClassName] = creator;
+        }
+        public void* CreateJsonClass(const ustring& jsonClassName, JsonValue* value)
+        {
+            HashMap<ustring, JsonClassCreatorDelegate>.ConstIterator it = creatorMap.CFind(jsonClassName);
+            if (it != creatorMap.CEnd())
+            {
+                JsonClassCreatorDelegate creator = it->second;
+                return creator(value);
+            }
+            else
+            {
+                throw JsonImportException("no JSON creator delegate registered for JSON class '" + ToUtf8(jsonClassName) + "'");
+            }
+        }
+        private static UniquePtr<JsonClassFactory> instance;
+        private HashMap<ustring, JsonClassCreatorDelegate> creatorMap;
+    }
+    
+    public void RegisterJsonClass(const string& jsonClassName, JsonClassCreatorDelegate creator)
+    {
+        RegisterJsonClass(ToUtf32(jsonClassName), creator);
+    }
+    
+    public void RegisterJsonClass(const wstring& jsonClassName, JsonClassCreatorDelegate creator)
+    {
+        RegisterJsonClass(ToUtf32(jsonClassName), creator);
+    }
+    
+    public void RegisterJsonClass(const ustring& jsonClassName, JsonClassCreatorDelegate creator)
+    {
+        JsonClassFactory.Instance().RegisterJsonClass(jsonClassName, creator);
+    }
+}

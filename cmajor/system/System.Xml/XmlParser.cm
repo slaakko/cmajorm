@@ -1,0 +1,54 @@
+// =================================
+// Copyright (c) 2019 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.IO;
+
+namespace System.Xml
+{
+    public class XmlParser
+    {
+        static XmlParser() : instance(new XmlParser())
+        {
+        }
+        public static XmlParser& Instance()
+        {
+            return *instance;
+        }
+        private XmlParser() : xmlGrammar(new XmlGrammar())
+        {
+        }
+        public void Parse(const uchar* contentStart, const uchar* contentEnd, const string& systemId, XmlProcessor* processor)
+        {
+            xmlGrammar->Parse(contentStart, contentEnd, 0, systemId, processor);
+        }
+        private static UniquePtr<XmlParser> instance;
+        private XmlGrammar* xmlGrammar;
+    }
+    
+    public void ParseXmlFile(const string& xmlFileName, XmlContentHandler* contentHandler)
+    {
+        string xmlContent = File.ReadAllText(xmlFileName);
+        ParseXmlContent(xmlContent, xmlFileName, contentHandler);
+    }
+    
+    public void ParseXmlContent(const string& xmlContent, const string& systemId, XmlContentHandler* contentHandler)
+    {
+        ParseXmlContent(ToUtf32(xmlContent), systemId, contentHandler);
+    }
+    
+    public void ParseXmlContent(const wstring& xmlContent, const string& systemId, XmlContentHandler* contentHandler)
+    {
+        ParseXmlContent(ToUtf32(xmlContent), systemId, contentHandler);
+    }
+    
+    public void ParseXmlContent(const ustring& xmlContent, const string& systemId, XmlContentHandler* contentHandler)
+    {
+        const uchar* contentStart = xmlContent.Chars();
+        const uchar* contentEnd = xmlContent.Chars() + xmlContent.Length();
+        XmlProcessor xmlProcessor(contentStart, contentEnd, contentHandler);
+        XmlParser.Instance().Parse(contentStart, contentEnd, systemId, &xmlProcessor);
+    }
+}

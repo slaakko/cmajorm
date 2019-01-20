@@ -1,0 +1,152 @@
+using System;
+using System.Collections;
+using System.IO;
+using System.Text;
+using System.Dom;
+using System.XPath;
+using System.Text.Parsing;
+using Syntax;
+
+internal void AddToLibraryDirectories(const string& libraryPath, List<string>& libraryDirectories)
+{
+    List<string> dirs = libraryPath.Split(';');
+    for (const string& dir : dirs)
+    {
+        libraryDirectories.Add(dir);
+    }
+}
+
+internal void ProcessParserProject(HashMap<ustring, string>& grammarMap, List<GrammarInfo>& outputGrammars, 
+    const string& ppFilePath, const string& docDir, const string& styleFilePath, const List<string>& libraryDirectories, bool verbose)
+{
+    ParserProjectContext context;
+    ReadProject(ppFilePath, libraryDirectories, context);
+    if (verbose)
+    {
+        Console.Out() << "Linking...\n";
+    }
+    Link(context.parsingDomain.Get());
+    GrammarMapBuilderVisitor grammarMapBuilderVisitor(grammarMap);
+    context.parsingDomain->Accept(grammarMapBuilderVisitor);
+    HtmlGeneratorVisitor htmlGeneratorVisitor(grammarMap, outputGrammars, docDir, styleFilePath);
+    context.parsingDomain->Accept(htmlGeneratorVisitor);
+}
+
+internal int main(int argc, const char** argv)
+{
+    try
+    {
+        bool verbose = false;
+        List<string> libraryDirectories;
+        string cmajorRoot = RtGetEnvironmentVariable("CMAJOR_ROOT");
+        if (cmajorRoot.IsEmpty())
+        {
+            throw Exception("CMAJOR_ROOT environment variable not defined. Please set it to contain /path/to/cmajor directory.");
+        }
+        string libraryPath = Path.Combine(Path.Combine(cmajorRoot, "system"), "System.Text.Parsing");
+        AddToLibraryDirectories(libraryPath, libraryDirectories);
+        List<string> moduleDirs;
+        for (int i = 1; i < argc; ++i)
+        {
+            string arg = argv[i];
+            if (arg.StartsWith("-"))
+            {
+                if (arg == "--verbose" || arg == "-v")
+                {
+                    verbose = true;
+                    Syntax.Flags.Instance().SetVerbose();
+                }
+                else
+                {
+                    throw Exception("unknown argument '" + arg + "'");
+                }
+            }
+            else
+            {
+                moduleDirs.Add(GetFullPath(Path.MakeCanonical(arg)));
+            }
+        }
+        if (moduleDirs.IsEmpty())
+        {
+            throw Exception("no module directories given");
+        }
+        for (const string& moduleDir : moduleDirs)
+        {
+            HashMap<ustring, string> grammarMap;
+            if (verbose)
+            {
+               Console.Out() << "> " << moduleDir << endl();
+            }
+            string docDir = Path.Combine(moduleDir, "doc");
+            string ppXmlFile = Path.Combine(moduleDir, "pp.xml");
+            string gmXmlFile = Path.Combine(moduleDir, "gm.xml");
+            UniquePtr<DomDocument> ppDoc = ParseXmlFileToDomDocument(ppXmlFile);
+            UniquePtr<DomDocument> gmDoc = ParseXmlFileToDomDocument(gmXmlFile);
+            UniquePtr<XPathObject> grammarsObject = Evaluate(u"/grammars/grammar", gmDoc.Get());
+            if (grammarsObject.Get() is XPathNodeSet*)
+            {
+                XPathNodeSet* grammarsNodeSet = cast<XPathNodeSet*>(grammarsObject.Get());
+                long n = grammarsNodeSet->Length();
+                for (long i = 0; i < n; ++i)
+                {
+                    DomNode* grammarNode = (*grammarsNodeSet)[i];
+                    if (grammarNode is DomElement*)
+                    {
+                        DomElement* grammarElement = cast<DomElement*>(grammarNode);
+                        ustring grammarId = grammarElement->GetAttribute(u"id");
+                        ustring docPath = grammarElement->GetAttribute(u"docPath");
+                        grammarMap[grammarId] = ToUtf8(docPath);
+                    }
+                }
+            }
+            UniquePtr<XPathObject> parserProjectsObject = Evaluate(u"/parserProjects/parserProject", ppDoc.Get());
+            if (parserProjectsObject.Get() is XPathNodeSet*)
+            {
+                XPathNodeSet* parserProjectsNodeSet = cast<XPathNodeSet*>(parserProjectsObject.Get());
+                long n = parserProjectsNodeSet->Length();
+                for (long i = 0; i < n; ++i)
+                {
+                    DomNode* parserProjectNode = (*parserProjectsNodeSet)[i];
+                    if (parserProjectNode is DomElement*)
+                    {
+                        DomElement* parserProjectElement = cast<DomElement*>(parserProjectNode);
+                        string relativePPFilePath = ToUtf8(parserProjectElement->GetAttribute(u"filePath"));
+                        string styleFilePath = ToUtf8(parserProjectElement->GetAttribute(u"styleFilePath"));
+                        if (!relativePPFilePath.IsEmpty())
+                        {
+                            string ppFilePath = GetFullPath(Path.Combine(moduleDir, relativePPFilePath));
+                            if (verbose)
+                            {
+                               Console.Out() << ">> " << ppFilePath << endl();
+                            }
+                            List<GrammarInfo> outputGrammars;
+                            ProcessParserProject(grammarMap, outputGrammars, ppFilePath, docDir, styleFilePath, libraryDirectories, verbose);
+                            DomDocument outputGrammarDoc;
+                            UniquePtr<DomElement> grammarsElement(new DomElement(u"grammars"));
+                            for (const GrammarInfo& info : outputGrammars)
+                            {
+                                UniquePtr<DomElement> grammarElement(new DomElement(u"grammar"));
+                                grammarElement->SetAttribute(u"name", info.GrammarName());
+                                grammarElement->SetAttribute(u"id", info.GrammarId());
+                                grammarElement->SetAttribute(u"docPath", ToUtf32(Path.Combine("doc", info.GrammarFileName())));
+                                grammarsElement->AppendChild(UniquePtr<DomNode>(grammarElement.Release()));
+                                grammarMap[info.GrammarId()] = info.GrammarFileName();
+                            }
+                            outputGrammarDoc.AppendChild(UniquePtr<DomNode>(grammarsElement.Release()));
+                            StreamWriter writer = File.CreateText(Path.Combine(moduleDir, "grammars.xml"));
+                            CodeFormatter formatter(writer);
+                            formatter.SetIndentSize(1);
+                            outputGrammarDoc.Write(formatter);
+                        }
+                    }
+                }
+            }
+        }
+    }
+    catch (const Exception& ex)
+    {
+        Console.Error() << ex.ToString() << endl();
+        return 1;
+    }
+    return 0;
+}

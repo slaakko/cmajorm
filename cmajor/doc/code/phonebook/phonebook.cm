@@ -1,0 +1,47 @@
+using System;
+using System.Collections;
+
+public class PhoneBook
+{
+    static PhoneBook() : instance(new PhoneBook())
+    {
+    }
+    public static PhoneBook& Instance()
+    {
+        return *instance;
+    }
+    public int GetNumber(const ustring& name) const
+    {
+        Map<ustring, int>.ConstIterator i = map.CFind(name);
+        if (i != map.CEnd())
+        {
+            return i->second;
+        }
+        return 0;
+    }
+    private PhoneBook()
+    {
+        map[u"Stroustrup, B."] = 12345;
+        map[u"Gödel, K."] = 97531;
+        map[u"Knuth, D."] = 34567;
+        map[u"Stepanov, A."] = 98765;
+        map[u"Sjøberg, D."] = 13579;
+    }
+    public default ~PhoneBook();
+    private static UniquePtr<PhoneBook> instance;
+    private Map<ustring, int> map;
+}
+
+void main()
+{
+    ustring name = u"Gödel, K.";
+    int number = PhoneBook.Instance().GetNumber(name);
+    if (number != 0)
+    {
+        Console.Out() << "Phone number of " << name << " is " << number << endl();
+    }
+    else
+    {
+        Console.Out() << "Phone number not found";
+    }
+}

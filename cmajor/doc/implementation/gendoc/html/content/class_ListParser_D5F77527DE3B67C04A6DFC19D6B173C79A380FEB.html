@@ -1,0 +1,177 @@
+<html>
+    <head>
+        <meta charset="utf-8"/>
+        <title>ListParser Class</title>
+        <link href="../style/style.css" rel="stylesheet" type="text/css"/>
+        <script src="class_ListParser_D5F77527DE3B67C04A6DFC19D6B173C79A380FEB_inheritance.js" type="text/javascript"> </script>
+    </head>
+    <body onload="drawClassInheritanceDiagram()">
+        <a href="../index.html">index</a>
+         | <a href="namespace_parsing_D308EED43E54B87FB52D88ADF3DA7F4E649CD021.html">up</a>
+         | <a href="class_LinkerVisitor_A26466D4B7F2ACDBAE09257FEB1A103DB9AF6A5B.html">prev</a>
+         | <a href="class_LowerLetterParser_E1E0AD007C9D113F630D5790DB1135BD580FA9BC.html">next</a>
+        <hr/>
+        <h1>ListParser Class</h1>
+        <div class="diagram">
+            <svg height="0" id="classInheritanceDiagram" version="2.0" width="0" xmlns="http://www.w3.org/2000/svg"/>
+        </div>
+        <span>
+            Definition at line <a href="file/parsing/Composite.hpp_BFC9CAC1FD7514D8265829E67E4A0691D18CFE96.html#122">122</a>
+             of <a href="file/parsing/Composite.hpp_BFC9CAC1FD7514D8265829E67E4A0691D18CFE96.html">Composite.hpp</a>
+        </span>
+        <br/>
+        <h2>Constructors</h2>
+        <table class="constructorTable">
+            <tr>
+                <td class="constructorTableFirstCol" xml:space="preserve"><a href="class_ListParser_D5F77527DE3B67C04A6DFC19D6B173C79A380FEB.html#constructor_ListParser_6CE057E3C89ED540EB2F914C110184377F1FEEF1">ListParser</a>(<a href="class_Parser_06FFBBD9B804958FBBF30CE64369F383780572DC.html">Parser</a>* left_, <a href="class_Parser_06FFBBD9B804958FBBF30CE64369F383780572DC.html">Parser</a>* right_)</td>
+            </tr>
+        </table>
+        <h2>Member Functions</h2>
+        <table class="functionTable">
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_ListParser_D5F77527DE3B67C04A6DFC19D6B173C79A380FEB.html#function_Accept_FA200B6433DE139EE6210FE5296F947F08007B86">Accept</a>(<a href="class_Visitor_9FF4E73241464BB90D8C7FBE81C08324A94EDF37.html">Visitor</a>&amp; visitor) <span class="kw">override</span></td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><a href="class_Match_AE9F2DF666E0DCE819F7C290A90F765AA326231D.html">Match</a></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_ListParser_D5F77527DE3B67C04A6DFC19D6B173C79A380FEB.html#function_Parse_641D29F53E2EEF1CF839AD48A6648BFC6BF67934">Parse</a>(<a href="class_Scanner_4556143008C97A4C8F070C9C0679FAD7FD6E9B59.html">Scanner</a>&amp; scanner, <a href="namespace_parsing_D308EED43E54B87FB52D88ADF3DA7F4E649CD021.html#typedef_ObjectStack_4F33FF13CD2400B32D4C131BF840FA0517BCE3D1">ObjectStack</a>&amp; stack, <a href="class_ParsingData_04BCB31619144CF8592DA360C9D8C0A3597BFD79.html">ParsingData</a>* parsingData) <span class="kw">override</span></td>
+            </tr>
+        </table>
+        <h2>Member Variables</h2>
+        <table>
+            <tr id="variable_left_91E58FCBDB517A9C9D84522C3968E806CE54C789">
+                <td class="functionTableFirstCol" xml:space="preserve"><a href="class_Parser_06FFBBD9B804958FBBF30CE64369F383780572DC.html">Parser</a>*</td>
+                <td class="functionTableSecondCol" xml:space="preserve">left</td>
+            </tr>
+            <tr id="variable_right_EFA0E490D594E597554C86ECD148A173F94A497B">
+                <td class="functionTableFirstCol" xml:space="preserve"><a href="class_Parser_06FFBBD9B804958FBBF30CE64369F383780572DC.html">Parser</a>*</td>
+                <td class="functionTableSecondCol" xml:space="preserve">right</td>
+            </tr>
+        </table>
+        <hr/>
+        <h2>Constructor Details</h2>
+        <h3 id="constructor_ListParser_6CE057E3C89ED540EB2F914C110184377F1FEEF1">ListParser Constructor</h3>
+        <h4>
+            cmajor::parsing::ListParser::ListParser(<a href="class_Parser_06FFBBD9B804958FBBF30CE64369F383780572DC.html">Parser</a>
+            * left_, <a href="class_Parser_06FFBBD9B804958FBBF30CE64369F383780572DC.html">Parser</a>
+            * right_)</h4>
+        <span>
+            Definition at line <a href="file/parsing/Composite.cpp_6045A56B649E06305FD448877CA419F042122C17.html#339">339</a>
+             of <a href="file/parsing/Composite.cpp_6045A56B649E06305FD448877CA419F042122C17.html">Composite.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">339</span>&nbsp;<span class="other">:</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">340</span>&nbsp;<a href="class_UnaryParser_FF89216268C9CC5DF03A4E25BB32CA6CC0452C0B.html">UnaryParser</a><span class="other">(</span><span class="string">U"list"</span><span class="other">,&nbsp;</span><span class="kw">new&nbsp;</span><a href="class_SequenceParser_EA74D30811182F9ABAD5FC03551D7EC1CDD358B1.html">SequenceParser</a><span class="other">(</span><span class="identifier">left_</span><span class="other">,&nbsp;</span><span class="kw">new&nbsp;</span><a href="class_KleeneStarParser_E261C278FCDAD7DCF139EC5EF7E1934F3BAE7E9D.html">KleeneStarParser</a><span class="other">(</span><span class="kw">new&nbsp;</span><a href="class_SequenceParser_EA74D30811182F9ABAD5FC03551D7EC1CDD358B1.html">SequenceParser</a><span class="other">(</span><span class="identifier">right_</span><span class="other">,&nbsp;</span><span class="identifier">left_</span><span class="other">)</span><span class="other">)</span><span class="other">)</span><span class="other">,&nbsp;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">341</span>&nbsp;<span class="identifier">left_</span><span class="other">-></span><a href="class_Parser_06FFBBD9B804958FBBF30CE64369F383780572DC.html#function_Info_2AB0EDCA9A6A7FF5D1739E9E04C718AFD82B8689">Info</a><span class="other">(</span><span class="other">)</span><span class="other">&nbsp;+&nbsp;</span><span class="string">U"&nbsp;%&nbsp;"</span><span class="other">&nbsp;+&nbsp;</span><span class="identifier">right_</span><span class="other">-></span><a href="class_Parser_06FFBBD9B804958FBBF30CE64369F383780572DC.html#function_Info_2AB0EDCA9A6A7FF5D1739E9E04C718AFD82B8689">Info</a><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="class_ListParser_D5F77527DE3B67C04A6DFC19D6B173C79A380FEB.html#variable_left_91E58FCBDB517A9C9D84522C3968E806CE54C789">left</a><span class="other">(</span><span class="identifier">left_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="class_ListParser_D5F77527DE3B67C04A6DFC19D6B173C79A380FEB.html#variable_right_EFA0E490D594E597554C86ECD148A173F94A497B">right</a><span class="other">(</span><span class="identifier">right_</span><span class="other">)</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">342</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">343</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/parsing/Composite.hpp_BFC9CAC1FD7514D8265829E67E4A0691D18CFE96.html#125">125</a>
+             of <a href="file/parsing/Composite.hpp_BFC9CAC1FD7514D8265829E67E4A0691D18CFE96.html">Composite.hpp</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h2>Member Function Details</h2>
+        <h3 id="function_Accept_FA200B6433DE139EE6210FE5296F947F08007B86">Accept Member Function</h3>
+        <h4>
+            <span class="kw">void</span>
+             cmajor::parsing::ListParser::Accept(<a href="class_Visitor_9FF4E73241464BB90D8C7FBE81C08324A94EDF37.html">Visitor</a>
+            &amp; visitor) <span class="kw">override</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/parsing/Composite.cpp_6045A56B649E06305FD448877CA419F042122C17.html#350">350</a>
+             of <a href="file/parsing/Composite.cpp_6045A56B649E06305FD448877CA419F042122C17.html">Composite.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">351</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">352</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">visitor</span><span class="other">.</span><a href="class_Visitor_9FF4E73241464BB90D8C7FBE81C08324A94EDF37.html#function_BeginVisit_AD7CB46106D1A7AEA62ECA54C4E5639B12950A86">BeginVisit</a><span class="other">(</span><span class="other">*</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">353</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="class_ListParser_D5F77527DE3B67C04A6DFC19D6B173C79A380FEB.html#variable_left_91E58FCBDB517A9C9D84522C3968E806CE54C789">left</a><span class="other">-></span><a href="class_ParsingObject_D6A163B08653CF53190C94952F145DFC2EB09994.html#function_Accept_88D5312B9AC0D8ABEF9C1BC6FC339655D21D3F15">Accept</a><span class="other">(</span><span class="identifier">visitor</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">354</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">visitor</span><span class="other">.</span><a href="class_Visitor_9FF4E73241464BB90D8C7FBE81C08324A94EDF37.html#function_Visit_BAA1CD6AED39F42250A46A7D0659D57848058BEC">Visit</a><span class="other">(</span><span class="other">*</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">355</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="class_ListParser_D5F77527DE3B67C04A6DFC19D6B173C79A380FEB.html#variable_right_EFA0E490D594E597554C86ECD148A173F94A497B">right</a><span class="other">-></span><a href="class_ParsingObject_D6A163B08653CF53190C94952F145DFC2EB09994.html#function_Accept_88D5312B9AC0D8ABEF9C1BC6FC339655D21D3F15">Accept</a><span class="other">(</span><span class="identifier">visitor</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">356</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">visitor</span><span class="other">.</span><a href="class_Visitor_9FF4E73241464BB90D8C7FBE81C08324A94EDF37.html#function_EndVisit_3A717C05B8F103E14684C6FC514D9E1CED253D06">EndVisit</a><span class="other">(</span><span class="other">*</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">357</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/parsing/Composite.hpp_BFC9CAC1FD7514D8265829E67E4A0691D18CFE96.html#127">127</a>
+             of <a href="file/parsing/Composite.hpp_BFC9CAC1FD7514D8265829E67E4A0691D18CFE96.html">Composite.hpp</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Base class overridden functions: <a href="class_ParsingObject_D6A163B08653CF53190C94952F145DFC2EB09994.html#function_Accept_88D5312B9AC0D8ABEF9C1BC6FC339655D21D3F15">cmajor::parsing::ParsingObject::Accept</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Calls: <a href="class_ParsingObject_D6A163B08653CF53190C94952F145DFC2EB09994.html#function_Accept_88D5312B9AC0D8ABEF9C1BC6FC339655D21D3F15">cmajor::parsing::ParsingObject::Accept</a>
+            , <a href="class_Visitor_9FF4E73241464BB90D8C7FBE81C08324A94EDF37.html#function_BeginVisit_AD7CB46106D1A7AEA62ECA54C4E5639B12950A86">cmajor::parsing::Visitor::BeginVisit</a>
+            , <a href="class_Visitor_9FF4E73241464BB90D8C7FBE81C08324A94EDF37.html#function_EndVisit_3A717C05B8F103E14684C6FC514D9E1CED253D06">cmajor::parsing::Visitor::EndVisit</a>
+            , <a href="class_Visitor_9FF4E73241464BB90D8C7FBE81C08324A94EDF37.html#function_Visit_BAA1CD6AED39F42250A46A7D0659D57848058BEC">cmajor::parsing::Visitor::Visit</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_Parse_641D29F53E2EEF1CF839AD48A6648BFC6BF67934">Parse Member Function</h3>
+        <h4>
+            <a href="class_Match_AE9F2DF666E0DCE819F7C290A90F765AA326231D.html">Match</a>
+             cmajor::parsing::ListParser::Parse(<a href="class_Scanner_4556143008C97A4C8F070C9C0679FAD7FD6E9B59.html">Scanner</a>
+            &amp; scanner, <a href="namespace_parsing_D308EED43E54B87FB52D88ADF3DA7F4E649CD021.html#typedef_ObjectStack_4F33FF13CD2400B32D4C131BF840FA0517BCE3D1">ObjectStack</a>
+            &amp; stack, <a href="class_ParsingData_04BCB31619144CF8592DA360C9D8C0A3597BFD79.html">ParsingData</a>
+            * parsingData) <span class="kw">override</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/parsing/Composite.cpp_6045A56B649E06305FD448877CA419F042122C17.html#345">345</a>
+             of <a href="file/parsing/Composite.cpp_6045A56B649E06305FD448877CA419F042122C17.html">Composite.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">346</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">347</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<a href="class_UnaryParser_FF89216268C9CC5DF03A4E25BB32CA6CC0452C0B.html#function_Child_BFFC654B28B0849C099F3525A5D66145047E7F6E">Child</a><span class="other">(</span><span class="other">)</span><span class="other">-></span><a href="class_Parser_06FFBBD9B804958FBBF30CE64369F383780572DC.html#function_Parse_D39DC60E5997D4E437E2F5D4F61E29959C76E82C">Parse</a><span class="other">(</span><span class="identifier">scanner</span><span class="other">,&nbsp;</span><span class="identifier">stack</span><span class="other">,&nbsp;</span><span class="identifier">parsingData</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">348</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/parsing/Composite.hpp_BFC9CAC1FD7514D8265829E67E4A0691D18CFE96.html#126">126</a>
+             of <a href="file/parsing/Composite.hpp_BFC9CAC1FD7514D8265829E67E4A0691D18CFE96.html">Composite.hpp</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Base class overridden functions: <a href="class_Parser_06FFBBD9B804958FBBF30CE64369F383780572DC.html#function_Parse_D39DC60E5997D4E437E2F5D4F61E29959C76E82C">cmajor::parsing::Parser::Parse</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Calls: <a href="class_Parser_06FFBBD9B804958FBBF30CE64369F383780572DC.html#function_Parse_D39DC60E5997D4E437E2F5D4F61E29959C76E82C">cmajor::parsing::Parser::Parse</a>
+            , <a href="class_UnaryParser_FF89216268C9CC5DF03A4E25BB32CA6CC0452C0B.html#function_Child_BFFC654B28B0849C099F3525A5D66145047E7F6E">cmajor::parsing::UnaryParser::Child</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <a href="../index.html">index</a>
+         | <a href="namespace_parsing_D308EED43E54B87FB52D88ADF3DA7F4E649CD021.html">up</a>
+         | <a href="class_LinkerVisitor_A26466D4B7F2ACDBAE09257FEB1A103DB9AF6A5B.html">prev</a>
+         | <a href="class_LowerLetterParser_E1E0AD007C9D113F630D5790DB1135BD580FA9BC.html">next</a>
+    </body>
+</html>

@@ -1,0 +1,338 @@
+// =================================
+// Copyright (c) 2019 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Collections;
+
+namespace System.Net.Http
+{
+    public class UriException : Exception
+    {
+        public nothrow UriException(const string& message_) : base(message_)
+        {
+        }
+    }
+    
+    public class UriParser
+    {
+        static UriParser() : instance(new UriParser())
+        {
+        }
+        private UriParser() : grammar(new UriGrammar())
+        {
+        }
+        public static UriParser& Instance() 
+        {
+            return *instance;
+        }
+        public void Parse(const ustring& uri, UriReference* uriReference)
+        {
+            grammar->Parse(uri.Chars(), uri.Chars() + uri.Length(), 0, "", uriReference);
+        }
+        private static UniquePtr<UriParser> instance;
+        private UriGrammar* grammar;
+    }
+    
+    public class UriReference
+    {
+        public nothrow UriReference()
+        {
+        }
+        public UriReference(const ustring& uri)
+        {
+            UriParser.Instance().Parse(uri, this);
+        }
+        public static UriReference Combine(const UriReference& baseUri, const UriReference& relativeUri)
+        {
+            if (!baseUri.IsAbsolute())
+            {
+                throw UriException("base URI not absolute");
+            }
+            if (relativeUri.IsAbsolute())
+            {
+                return relativeUri;
+            }
+            ustring basePath = u"/";
+            if (!baseUri.Path().IsEmpty())
+            {
+                if (baseUri.Path().StartsWith(u"/"))
+                {
+                    basePath = baseUri.Path();
+                }
+                else
+                {
+                    basePath = u"/" + baseUri.Path();
+                }
+            }
+            UriReference combined;
+            combined.SetScheme(baseUri.Scheme());
+            combined.SetUserInfo(baseUri.UserInfo());
+            combined.SetHost(baseUri.Host());
+            combined.SetPort(baseUri.Port());
+            combined.SetPath(GetFullNetPath(CombineNetPath(basePath, relativeUri.Path())));
+            combined.SetQuery(relativeUri.Query());
+            combined.SetFragment(relativeUri.Fragment());
+            return combined;
+        }
+        public ustring ToString() const
+        {
+            if (asterisk)
+            {
+                return u"*";
+            }
+            else
+            {
+                ustring result;
+                if (!scheme.IsEmpty())
+                {
+                    result.Append(scheme).Append(u"://");
+                    if (host.IsEmpty())
+                    {
+                        if (!regName.IsEmpty())
+                        {
+                            result.Append(regName);
+                        }
+                    }
+                    else
+                    {
+                        if (!userInfo.IsEmpty())
+                        {
+                            result.Append(userInfo).Append(u'@');
+                        }
+                        if (!host.IsEmpty())
+                        {
+                            result.Append(host);
+                            if (port != 0u)
+                            {
+                                result.Append(u':').Append(ToUtf32(ToString(port)));
+                            }
+                        }
+                    }
+                }
+                if (!path.IsEmpty())
+                {
+                    result.Append(path);
+                }
+                if (!query.IsEmpty())
+                {
+                    result.Append(u'?').Append(query);
+                }
+                if (!fragment.IsEmpty())
+                {
+                    result.Append(u'#').Append(fragment);
+                }
+                return result;
+            }
+        }
+        public bool IsAbsolute() const
+        {
+            return !scheme.IsEmpty() && !Authority().IsEmpty() && !path.IsEmpty();
+        }
+        public bool IsRelative() const
+        {
+            return !IsAbsolute();
+        }
+        public nothrow inline bool Asterisk() const
+        {
+            return asterisk;
+        }
+        public nothrow inline void SetAsterisk(bool asterisk_)
+        {
+            asterisk = asterisk_;
+        }
+        public nothrow inline const ustring& Scheme() const
+        {
+            return scheme;
+        }
+        public nothrow inline void SetScheme(const ustring& scheme_)
+        {
+            scheme = scheme_;
+        }
+        public nothrow inline const ustring& UserInfo() const
+        {
+            return userInfo;
+        }
+        public nothrow inline void SetUserInfo(const ustring& userInfo_)
+        {
+            userInfo = userInfo_;
+        }
+        public nothrow inline const ustring& Host() const
+        {
+            return host;
+        }
+        public nothrow inline void SetHost(const ustring& host_)
+        {
+            host = host_;
+        }
+        public nothrow inline uint Port() const
+        {
+            return port;
+        }
+        public nothrow inline void SetPort(uint port_)
+        {
+            port = port_;
+        }
+        public nothrow inline const ustring& RegName() const
+        {
+            return regName;
+        }
+        public nothrow inline void SetRegName(const ustring& regName_) const
+        {
+            regName = regName_;
+        }
+        public ustring Authority() const
+        {
+            if (host.IsEmpty())
+            {
+                return regName;
+            }
+            else
+            {
+                ustring s;
+                if (!userInfo.IsEmpty())
+                {
+                    s.Append(userInfo).Append('@');
+                }
+                if (!host.IsEmpty())
+                {
+                    s.Append(host);
+                    if (port != 0u)
+                    {
+                        s.Append(':').Append(ToUtf32(ToString(port)));
+                    }
+                }
+                return s;
+            }
+        }
+        public nothrow inline const ustring& Path() const
+        {
+            return path;
+        }
+        public nothrow inline void SetPath(const ustring& path_)
+        {
+            path = path_;
+        }
+        public nothrow inline const ustring& Query() const
+        {
+            return query;
+        }
+        public nothrow inline void SetQuery(const ustring& query_)
+        {
+            query = query_;
+        }
+        public nothrow inline const ustring& Fragment() const
+        {
+            return fragment;
+        }
+        public nothrow inline void SetFragment(const ustring& fragment_)
+        {
+            fragment = fragment_;
+        }
+        public nothrow void Clear()
+        {
+            asterisk = false;
+            scheme.Clear();
+            userInfo.Clear();
+            host.Clear();
+            port = 0u;
+            regName.Clear();
+            path.Clear();
+            query.Clear();
+            fragment.Clear();
+        }
+        private bool asterisk;
+        private ustring scheme;
+        private ustring userInfo;
+        private ustring host;
+        private uint port;
+        private ustring regName;
+        private ustring path;
+        private ustring query;
+        private ustring fragment;
+    }
+    
+    public ustring GetFullNetPath(const ustring& path)
+    {
+        List<ustring> components = path.Split(u'/');
+        long w = 0;
+        long n = components.Count();
+        for (long i = 0; i < n; ++i)
+        {
+            ustring c = components[i];
+            if (i == 0 || !c.IsEmpty() && c != u".")
+            {
+                if (c == u"..")
+                {
+                    --w;
+                    if (w < 0)
+                    {
+                        throw UriException("invalid path '" + ToUtf8(path) + "'");
+                    }
+                }
+                else
+                {
+                    if (w != i)
+                    {
+                        components[w] = components[i];
+                    }
+                    ++w;
+                }
+            }
+        }
+        if (w == 0)
+        {
+            return u"/";
+        }
+        else
+        {
+            ustring result;
+            for (long i = 0; i < w; ++i)
+            {
+                if (i != 0)
+                {
+                    result.Append(u'/');
+                }
+                result.Append(components[i]);
+            }
+            if (result.IsEmpty())
+            {
+                return u"/";
+            }
+            else
+            {
+                return result;
+            }            
+        }
+    }
+    
+    public ustring CombineNetPath(const ustring& path1, const ustring& path2)
+    {
+        if (path1.IsEmpty())
+        {
+            return path2;
+        }
+        else if (path2.IsEmpty())
+        {
+            return path1;
+        }
+        else
+        {
+            if (path2.StartsWith(u"/"))
+            {
+                return path2;
+            }
+            else
+            {
+                ustring result = path1;
+                if (!path1.EndsWith(u"/"))
+                {
+                    result.Append(u'/');
+                }
+                result.Append(path2);
+                return result;
+            }
+        }
+    }
+}

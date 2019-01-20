@@ -1,0 +1,423 @@
+<html>
+ <head>
+  <meta charset="utf-8"/>
+  <title>System.Text.RegularExpressions/Nfa.cm</title>
+  <link href="../../../style/style.css" rel="stylesheet" type="text/css"/>
+ </head>
+ <body>
+  <span class="code" id="1" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;1</span>&nbsp;<span class="comment">//&nbsp;=================================</span></span>
+  <br/>
+  <span class="code" id="2" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;2</span>&nbsp;<span class="comment">//&nbsp;Copyright&nbsp;(c)&nbsp;2019&nbsp;Seppo&nbsp;Laakko</span></span>
+  <br/>
+  <span class="code" id="3" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;3</span>&nbsp;<span class="comment">//&nbsp;Distributed&nbsp;under&nbsp;the&nbsp;MIT&nbsp;license</span></span>
+  <br/>
+  <span class="code" id="4" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;4</span>&nbsp;<span class="comment">//&nbsp;=================================</span></span>
+  <br/>
+  <span class="code" id="5" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;5</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="6" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;6</span>&nbsp;<span class="kw">using</span>&nbsp;<span class="identifier">System</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="7" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;7</span>&nbsp;<span class="kw">using</span>&nbsp;<span class="identifier">System.Collections</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="8" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;8</span>&nbsp;<span class="kw">using</span>&nbsp;<span class="identifier">System.IO</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="9" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;9</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="10" xml:space="preserve"><span class="lineNumber">&nbsp;10</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">System.Text.RegularExpressions</span></span>
+  <br/>
+  <span class="code" id="11" xml:space="preserve"><span class="lineNumber">&nbsp;11</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="12" xml:space="preserve"><span class="lineNumber">&nbsp;12</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../doc/class_NfaStateNumberSet_94283B9E90ECB564FEF4909226A69DC50DFBEAC3.html">NfaStateNumberSet</a></span>
+  <br/>
+  <span class="code" id="13" xml:space="preserve"><span class="lineNumber">&nbsp;13</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="14" xml:space="preserve"><span class="lineNumber">&nbsp;14</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<a href="../doc/class_NfaStateNumberSet_94283B9E90ECB564FEF4909226A69DC50DFBEAC3.html#default_constructor_NfaStateNumberSet_4432F26437CB58C87A8E2FF4A904CFB34A567BCF">NfaStateNumberSet</a><span class="other">(</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="15" xml:space="preserve"><span class="lineNumber">&nbsp;15</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="16" xml:space="preserve"><span class="lineNumber">&nbsp;16</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="17" xml:space="preserve"><span class="lineNumber">&nbsp;17</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<a href="../doc/class_NfaStateNumberSet_94283B9E90ECB564FEF4909226A69DC50DFBEAC3.html#constructor_NfaStateNumberSet_520535118410C8EC3A9D6CDC97A44F3A6D1A3C1E">NfaStateNumberSet</a><span class="other">(</span><span class="kw">int</span>&nbsp;<span class="identifier">s</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="18" xml:space="preserve"><span class="lineNumber">&nbsp;18</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="19" xml:space="preserve"><span class="lineNumber">&nbsp;19</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../doc/class_NfaStateNumberSet_94283B9E90ECB564FEF4909226A69DC50DFBEAC3.html#variable_stateNumbers_F1E3A58B02D79B0955FFEC044281DE0A59B6522A">stateNumbers</a><span class="other">.</span><a href="../../System.Base/doc/class_List_T_4E42CF5913BEB21F5260DEFEC239180C94460B11.html#member_function_Add_List_T_0CEB0F989B58359D06357C988DF595C83DA28430">Add</a><span class="other">(</span><span class="identifier">s</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="20" xml:space="preserve"><span class="lineNumber">&nbsp;20</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="21" xml:space="preserve"><span class="lineNumber">&nbsp;21</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">bool</span>&nbsp;<a href="../doc/class_NfaStateNumberSet_94283B9E90ECB564FEF4909226A69DC50DFBEAC3.html#member_function_Contains_NfaStateNumberSet_918B8C3DDADA5D4B238A2DD02349CE0FE0F1C45F">Contains</a><span class="other">(</span><span class="kw">int</span>&nbsp;<span class="identifier">stateNumber</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="22" xml:space="preserve"><span class="lineNumber">&nbsp;22</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="23" xml:space="preserve"><span class="lineNumber">&nbsp;23</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">for</span>&nbsp;<span class="other">(</span><span class="kw">int</span>&nbsp;<span class="identifier">s</span>&nbsp;<span class="other">:</span>&nbsp;<a href="../../System.Core/index.html#ba351ded-10b7-46e0-aaf8-478ac63ed46d">stateNumbers</a><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="24" xml:space="preserve"><span class="lineNumber">&nbsp;24</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="25" xml:space="preserve"><span class="lineNumber">&nbsp;25</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if</span>&nbsp;<span class="other">(</span><span class="identifier">s</span><span class="other">&nbsp;==&nbsp;</span><span class="identifier">stateNumber</span><span class="other">)</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">true</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="26" xml:space="preserve"><span class="lineNumber">&nbsp;26</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="27" xml:space="preserve"><span class="lineNumber">&nbsp;27</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">false</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="28" xml:space="preserve"><span class="lineNumber">&nbsp;28</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="29" xml:space="preserve"><span class="lineNumber">&nbsp;29</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">bool</span>&nbsp;<a href="../doc/class_NfaStateNumberSet_94283B9E90ECB564FEF4909226A69DC50DFBEAC3.html#member_function_CanonicalContains_NfaStateNumberSet_3E3C070606C453E2D88124FE922BB741DDB90AE0">CanonicalContains</a><span class="other">(</span><span class="kw">int</span>&nbsp;<span class="identifier">stateNumber</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="30" xml:space="preserve"><span class="lineNumber">&nbsp;30</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="31" xml:space="preserve"><span class="lineNumber">&nbsp;31</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../System.Base/doc/class_List_T_4E42CF5913BEB21F5260DEFEC239180C94460B11.html">List</a><span class="other">&lt;</span><span class="kw">int</span><span class="other">></span><span class="other">.</span><a href="../../System.Base/doc/class_List_T_4E42CF5913BEB21F5260DEFEC239180C94460B11.html#typedef_ConstIterator_B1EACE9573E72F28A01935AED34A9E3408F954C5">ConstIterator</a>&nbsp;<span class="identifier">i</span><span class="other">&nbsp;=&nbsp;</span><a href="../doc/ns_System.html#function_LowerBound_F00524471F29AAE9BD53050A0E5951A3CD946740">LowerBound</a><span class="other">(</span><a href="../doc/class_NfaStateNumberSet_94283B9E90ECB564FEF4909226A69DC50DFBEAC3.html#variable_stateNumbers_F1E3A58B02D79B0955FFEC044281DE0A59B6522A">stateNumbers</a><span class="other">.</span><a href="../../System.Base/doc/class_List_T_4E42CF5913BEB21F5260DEFEC239180C94460B11.html#member_function_CBegin_List_T_CBA03EEF64A2784C05F241B0FA175357FC842886">CBegin</a><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="../doc/class_NfaStateNumberSet_94283B9E90ECB564FEF4909226A69DC50DFBEAC3.html#variable_stateNumbers_F1E3A58B02D79B0955FFEC044281DE0A59B6522A">stateNumbers</a><span class="other">.</span><a href="../../System.Base/doc/class_List_T_4E42CF5913BEB21F5260DEFEC239180C94460B11.html#member_function_CEnd_List_T_63142CF7EDE83E01CA2C9FBCAC75081A2DFA681D">CEnd</a><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">stateNumber</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="32" xml:space="preserve"><span class="lineNumber">&nbsp;32</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">i</span><span class="other">&nbsp;!=&nbsp;</span><a href="../doc/class_NfaStateNumberSet_94283B9E90ECB564FEF4909226A69DC50DFBEAC3.html#variable_stateNumbers_F1E3A58B02D79B0955FFEC044281DE0A59B6522A">stateNumbers</a><span class="other">.</span><a href="../../System.Base/doc/class_List_T_4E42CF5913BEB21F5260DEFEC239180C94460B11.html#member_function_CEnd_List_T_63142CF7EDE83E01CA2C9FBCAC75081A2DFA681D">CEnd</a><span class="other">(</span><span class="other">)</span><span class="other">&nbsp;&amp;&amp;&nbsp;</span><span class="other">*</span><span class="identifier">i</span><span class="other">&nbsp;==&nbsp;</span><span class="identifier">stateNumber</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="33" xml:space="preserve"><span class="lineNumber">&nbsp;33</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="34" xml:space="preserve"><span class="lineNumber">&nbsp;34</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/class_NfaStateNumberSet_94283B9E90ECB564FEF4909226A69DC50DFBEAC3.html#member_function_Add_NfaStateNumberSet_649B6F8C53A15F573E66E01469E390EAEE74ACA5">Add</a><span class="other">(</span><span class="kw">int</span>&nbsp;<span class="identifier">stateNumber</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="35" xml:space="preserve"><span class="lineNumber">&nbsp;35</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="36" xml:space="preserve"><span class="lineNumber">&nbsp;36</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if</span>&nbsp;<span class="other">(</span><span class="other">!</span><a href="../doc/class_NfaStateNumberSet_94283B9E90ECB564FEF4909226A69DC50DFBEAC3.html#member_function_Contains_NfaStateNumberSet_918B8C3DDADA5D4B238A2DD02349CE0FE0F1C45F">Contains</a><span class="other">(</span><span class="identifier">stateNumber</span><span class="other">)</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="37" xml:space="preserve"><span class="lineNumber">&nbsp;37</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="38" xml:space="preserve"><span class="lineNumber">&nbsp;38</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../doc/class_NfaStateNumberSet_94283B9E90ECB564FEF4909226A69DC50DFBEAC3.html#variable_stateNumbers_F1E3A58B02D79B0955FFEC044281DE0A59B6522A">stateNumbers</a><span class="other">.</span><a href="../../System.Base/doc/class_List_T_4E42CF5913BEB21F5260DEFEC239180C94460B11.html#member_function_Add_List_T_0CEB0F989B58359D06357C988DF595C83DA28430">Add</a><span class="other">(</span><span class="identifier">stateNumber</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="39" xml:space="preserve"><span class="lineNumber">&nbsp;39</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="40" xml:space="preserve"><span class="lineNumber">&nbsp;40</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="41" xml:space="preserve"><span class="lineNumber">&nbsp;41</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/class_NfaStateNumberSet_94283B9E90ECB564FEF4909226A69DC50DFBEAC3.html#member_function_Merge_NfaStateNumberSet_767CE8DDFEF6A5C7F29141A28ECA2172FC518E9D">Merge</a><span class="other">(</span><span class="kw">const</span>&nbsp;<a href="../doc/class_NfaStateNumberSet_94283B9E90ECB564FEF4909226A69DC50DFBEAC3.html">NfaStateNumberSet</a><span class="other">&amp;</span>&nbsp;<span class="identifier">x</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="42" xml:space="preserve"><span class="lineNumber">&nbsp;42</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="43" xml:space="preserve"><span class="lineNumber">&nbsp;43</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">for</span>&nbsp;<span class="other">(</span><span class="kw">int</span>&nbsp;<span class="identifier">s</span>&nbsp;<span class="other">:</span>&nbsp;<span class="identifier">x</span><span class="other">.</span><a href="../../System.Core/index.html#ba351ded-10b7-46e0-aaf8-478ac63ed46d">stateNumbers</a><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="44" xml:space="preserve"><span class="lineNumber">&nbsp;44</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="45" xml:space="preserve"><span class="lineNumber">&nbsp;45</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">Add</span><span class="other">(</span><span class="identifier">s</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="46" xml:space="preserve"><span class="lineNumber">&nbsp;46</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="47" xml:space="preserve"><span class="lineNumber">&nbsp;47</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="48" xml:space="preserve"><span class="lineNumber">&nbsp;48</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/class_NfaStateNumberSet_94283B9E90ECB564FEF4909226A69DC50DFBEAC3.html#member_function_MakeCanonical_NfaStateNumberSet_C42068B1DC4BA252151DD3777C00E7BE26039A0A">MakeCanonical</a><span class="other">(</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="49" xml:space="preserve"><span class="lineNumber">&nbsp;49</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="50" xml:space="preserve"><span class="lineNumber">&nbsp;50</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../doc/ns_System.html#function_Sort_8340E39903690F7CC970F9DCA3EC6209708659F4">Sort</a><span class="other">(</span><a href="../doc/class_NfaStateNumberSet_94283B9E90ECB564FEF4909226A69DC50DFBEAC3.html#variable_stateNumbers_F1E3A58B02D79B0955FFEC044281DE0A59B6522A">stateNumbers</a><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="51" xml:space="preserve"><span class="lineNumber">&nbsp;51</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="52" xml:space="preserve"><span class="lineNumber">&nbsp;52</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">inline</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">bool</span>&nbsp;<a href="../doc/class_NfaStateNumberSet_94283B9E90ECB564FEF4909226A69DC50DFBEAC3.html#member_function_IsEmpty_NfaStateNumberSet_43645D0B37A3928867F888309EB8452A9B1BDBE3">IsEmpty</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span></span>
+  <br/>
+  <span class="code" id="53" xml:space="preserve"><span class="lineNumber">&nbsp;53</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="54" xml:space="preserve"><span class="lineNumber">&nbsp;54</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<a href="../doc/class_NfaStateNumberSet_94283B9E90ECB564FEF4909226A69DC50DFBEAC3.html#variable_stateNumbers_F1E3A58B02D79B0955FFEC044281DE0A59B6522A">stateNumbers</a><span class="other">.</span><a href="../../System.Base/doc/class_List_T_4E42CF5913BEB21F5260DEFEC239180C94460B11.html#member_function_IsEmpty_List_T_9D2D6FCD118AECF7D6172A1DA09ACD9A5837CED0">IsEmpty</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="55" xml:space="preserve"><span class="lineNumber">&nbsp;55</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="56" xml:space="preserve"><span class="lineNumber">&nbsp;56</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<a href="../../System.Base/doc/ns_System.html#typedef_string_B6DB6B2DEFC437FBF697A2E84F7B7771FC1DDEE3">string</a>&nbsp;<a href="../doc/class_NfaStateNumberSet_94283B9E90ECB564FEF4909226A69DC50DFBEAC3.html#member_function_ToString_NfaStateNumberSet_44BA3F2CB44C01913423DABA63C2B2A64E29D293">ToString</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span></span>
+  <br/>
+  <span class="code" id="57" xml:space="preserve"><span class="lineNumber">&nbsp;57</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="58" xml:space="preserve"><span class="lineNumber">&nbsp;58</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../System.Core/index.html#ba351ded-10b7-46e0-aaf8-478ac63ed46d">string</a>&nbsp;<span class="identifier">s</span><span class="other">&nbsp;=&nbsp;</span><span class="string">"{"</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="59" xml:space="preserve"><span class="lineNumber">&nbsp;59</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">bool</span>&nbsp;<span class="identifier">first</span><span class="other">&nbsp;=&nbsp;</span><span class="kw">true</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="60" xml:space="preserve"><span class="lineNumber">&nbsp;60</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">for</span>&nbsp;<span class="other">(</span><span class="kw">int</span>&nbsp;<span class="identifier">n</span>&nbsp;<span class="other">:</span>&nbsp;<a href="../../System.Core/index.html#ba351ded-10b7-46e0-aaf8-478ac63ed46d">stateNumbers</a><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="61" xml:space="preserve"><span class="lineNumber">&nbsp;61</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="62" xml:space="preserve"><span class="lineNumber">&nbsp;62</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if</span>&nbsp;<span class="other">(</span><span class="identifier">first</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="63" xml:space="preserve"><span class="lineNumber">&nbsp;63</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="64" xml:space="preserve"><span class="lineNumber">&nbsp;64</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">first</span><span class="other">&nbsp;=&nbsp;</span><span class="kw">false</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="65" xml:space="preserve"><span class="lineNumber">&nbsp;65</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="66" xml:space="preserve"><span class="lineNumber">&nbsp;66</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">else</span></span>
+  <br/>
+  <span class="code" id="67" xml:space="preserve"><span class="lineNumber">&nbsp;67</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="68" xml:space="preserve"><span class="lineNumber">&nbsp;68</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">s</span><span class="other">.</span><span class="identifier">Append</span><span class="other">(</span><span class="string">",&nbsp;"</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="69" xml:space="preserve"><span class="lineNumber">&nbsp;69</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="70" xml:space="preserve"><span class="lineNumber">&nbsp;70</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">s</span><span class="other">.</span><span class="identifier">Append</span><span class="other">(</span><span class="identifier">ToString</span><span class="other">(</span><span class="identifier">n</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="71" xml:space="preserve"><span class="lineNumber">&nbsp;71</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="72" xml:space="preserve"><span class="lineNumber">&nbsp;72</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">s</span><span class="other">.</span><a href="../../System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html#member_function_Append_String_CharT_945B02DC7DD183AADA4D8824D22E409DB6D621C9">Append</a><span class="other">(</span><span class="string">"}"</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="73" xml:space="preserve"><span class="lineNumber">&nbsp;73</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">s</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="74" xml:space="preserve"><span class="lineNumber">&nbsp;74</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="75" xml:space="preserve"><span class="lineNumber">&nbsp;75</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">const</span>&nbsp;<a href="../../System.Base/doc/class_List_T_4E42CF5913BEB21F5260DEFEC239180C94460B11.html">List</a><span class="other">&lt;</span><span class="kw">int</span><span class="other">></span><span class="other">&amp;</span>&nbsp;<a href="../doc/class_NfaStateNumberSet_94283B9E90ECB564FEF4909226A69DC50DFBEAC3.html#member_function_Rep_NfaStateNumberSet_291560AD89F4F0E7F7A1887C43F7F01374E29171">Rep</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span></span>
+  <br/>
+  <span class="code" id="76" xml:space="preserve"><span class="lineNumber">&nbsp;76</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="77" xml:space="preserve"><span class="lineNumber">&nbsp;77</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<a href="../doc/class_NfaStateNumberSet_94283B9E90ECB564FEF4909226A69DC50DFBEAC3.html#variable_stateNumbers_F1E3A58B02D79B0955FFEC044281DE0A59B6522A">stateNumbers</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="78" xml:space="preserve"><span class="lineNumber">&nbsp;78</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="79" xml:space="preserve"><span class="lineNumber">&nbsp;79</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">private</span>&nbsp;<a href="../../System.Base/doc/class_List_T_4E42CF5913BEB21F5260DEFEC239180C94460B11.html">List</a><span class="other">&lt;</span><span class="kw">int</span><span class="other">></span>&nbsp;<span class="identifier">stateNumbers</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="80" xml:space="preserve"><span class="lineNumber">&nbsp;80</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="81" xml:space="preserve"><span class="lineNumber">&nbsp;81</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+  <br/>
+  <span class="code" id="82" xml:space="preserve"><span class="lineNumber">&nbsp;82</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">bool</span>&nbsp;<a href="../doc/ns_System.Text.RegularExpressions.html#function_op_eq_E167B657AE9463D25B3B65B5090C498284BDC388">operator==</a><span class="other">(</span><span class="kw">const</span>&nbsp;<a href="../doc/class_NfaStateNumberSet_94283B9E90ECB564FEF4909226A69DC50DFBEAC3.html">NfaStateNumberSet</a><span class="other">&amp;</span>&nbsp;<span class="identifier">left</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<a href="../doc/class_NfaStateNumberSet_94283B9E90ECB564FEF4909226A69DC50DFBEAC3.html">NfaStateNumberSet</a><span class="other">&amp;</span>&nbsp;<span class="identifier">right</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="83" xml:space="preserve"><span class="lineNumber">&nbsp;83</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="84" xml:space="preserve"><span class="lineNumber">&nbsp;84</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">left</span><span class="other">.</span><a href="../doc/class_NfaStateNumberSet_94283B9E90ECB564FEF4909226A69DC50DFBEAC3.html#member_function_Rep_NfaStateNumberSet_291560AD89F4F0E7F7A1887C43F7F01374E29171">Rep</a><span class="other">(</span><span class="other">)</span><span class="other">&nbsp;==&nbsp;</span><span class="identifier">right</span><span class="other">.</span><a href="../doc/class_NfaStateNumberSet_94283B9E90ECB564FEF4909226A69DC50DFBEAC3.html#member_function_Rep_NfaStateNumberSet_291560AD89F4F0E7F7A1887C43F7F01374E29171">Rep</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="85" xml:space="preserve"><span class="lineNumber">&nbsp;85</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="86" xml:space="preserve"><span class="lineNumber">&nbsp;86</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+  <br/>
+  <span class="code" id="87" xml:space="preserve"><span class="lineNumber">&nbsp;87</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<a href="../../System.Base/doc/class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452.html">OutputStream</a><span class="other">&amp;</span>&nbsp;<a href="../doc/ns_System.Text.RegularExpressions.html#function_op_shl_4708DEEF88C9580BCAB388C3AE502A8B4382BEC5">operator&lt;&lt;</a><span class="other">(</span><a href="../../System.Base/doc/class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452.html">OutputStream</a><span class="other">&amp;</span>&nbsp;<span class="identifier">s</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<a href="../doc/class_NfaStateNumberSet_94283B9E90ECB564FEF4909226A69DC50DFBEAC3.html">NfaStateNumberSet</a><span class="other">&amp;</span>&nbsp;<span class="identifier">ns</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="88" xml:space="preserve"><span class="lineNumber">&nbsp;88</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="89" xml:space="preserve"><span class="lineNumber">&nbsp;89</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">s</span><span class="other">&nbsp;&lt;&lt;&nbsp;</span><span class="identifier">ns</span><span class="other">.</span><a href="../doc/class_NfaStateNumberSet_94283B9E90ECB564FEF4909226A69DC50DFBEAC3.html#member_function_ToString_NfaStateNumberSet_44BA3F2CB44C01913423DABA63C2B2A64E29D293">ToString</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="90" xml:space="preserve"><span class="lineNumber">&nbsp;90</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="91" xml:space="preserve"><span class="lineNumber">&nbsp;91</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="92" xml:space="preserve"><span class="lineNumber">&nbsp;92</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<a href="../../System.Base/doc/class_StreamWriter_40A39F418049D49DB679452BB514CDFE47500311.html">StreamWriter</a><span class="other">&amp;</span>&nbsp;<a href="../doc/ns_System.Text.RegularExpressions.html#function_op_shl_1FAFC8A002E684C1701F2045817D6A3F812784C0">operator&lt;&lt;</a><span class="other">(</span><a href="../../System.Base/doc/class_StreamWriter_40A39F418049D49DB679452BB514CDFE47500311.html">StreamWriter</a><span class="other">&amp;</span>&nbsp;<span class="identifier">writer</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<a href="../doc/class_NfaStateNumberSet_94283B9E90ECB564FEF4909226A69DC50DFBEAC3.html">NfaStateNumberSet</a><span class="other">&amp;</span>&nbsp;<span class="identifier">ns</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="93" xml:space="preserve"><span class="lineNumber">&nbsp;93</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="94" xml:space="preserve"><span class="lineNumber">&nbsp;94</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">writer</span><span class="other">&nbsp;&lt;&lt;&nbsp;</span><span class="identifier">ns</span><span class="other">.</span><a href="../doc/class_NfaStateNumberSet_94283B9E90ECB564FEF4909226A69DC50DFBEAC3.html#member_function_ToString_NfaStateNumberSet_44BA3F2CB44C01913423DABA63C2B2A64E29D293">ToString</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="95" xml:space="preserve"><span class="lineNumber">&nbsp;95</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="96" xml:space="preserve"><span class="lineNumber">&nbsp;96</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+  <br/>
+  <span class="code" id="97" xml:space="preserve"><span class="lineNumber">&nbsp;97</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../doc/class_NfaState_9D1ED32B9E916097B40ADF566ECF8BF84ACD9662.html">NfaState</a></span>
+  <br/>
+  <span class="code" id="98" xml:space="preserve"><span class="lineNumber">&nbsp;98</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="99" xml:space="preserve"><span class="lineNumber">&nbsp;99</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<a href="../doc/class_NfaState_9D1ED32B9E916097B40ADF566ECF8BF84ACD9662.html#default_constructor_NfaState_CC4550AEE21C0EE53951230670CD03A47DA75FD7">NfaState</a><span class="other">(</span><span class="other">)</span><span class="other">&nbsp;:&nbsp;</span><span class="identifier">id</span><span class="other">(</span><span class="other">-</span><span class="number">1</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">accepting</span><span class="other">(</span><span class="kw">false</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="100" xml:space="preserve"><span class="lineNumber">100</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="101" xml:space="preserve"><span class="lineNumber">101</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../doc/class_NfaState_9D1ED32B9E916097B40ADF566ECF8BF84ACD9662.html#variable_next_AC22913A7269BDB421D11DCBB55D16434E044360">next</a><span class="other">.</span><a href="../../System.Base/doc/class_List_T_4E42CF5913BEB21F5260DEFEC239180C94460B11.html#member_function_Resize_List_T_57B376A5801DA1B47D2DA55DDE38E7037B451239">Resize</a><span class="other">(</span><span class="number">256</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="102" xml:space="preserve"><span class="lineNumber">102</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="103" xml:space="preserve"><span class="lineNumber">103</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<a href="../doc/class_NfaState_9D1ED32B9E916097B40ADF566ECF8BF84ACD9662.html#constructor_NfaState_DC6741ACEDF986BED3E1D9E3E7AB3E6A929F3673">NfaState</a><span class="other">(</span><span class="kw">int</span>&nbsp;<span class="identifier">id_</span><span class="other">)</span><span class="other">&nbsp;:&nbsp;</span><span class="identifier">id</span><span class="other">(</span><span class="identifier">id_</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">accepting</span><span class="other">(</span><span class="kw">false</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="104" xml:space="preserve"><span class="lineNumber">104</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="105" xml:space="preserve"><span class="lineNumber">105</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../doc/class_NfaState_9D1ED32B9E916097B40ADF566ECF8BF84ACD9662.html#variable_next_AC22913A7269BDB421D11DCBB55D16434E044360">next</a><span class="other">.</span><a href="../../System.Base/doc/class_List_T_4E42CF5913BEB21F5260DEFEC239180C94460B11.html#member_function_Resize_List_T_57B376A5801DA1B47D2DA55DDE38E7037B451239">Resize</a><span class="other">(</span><span class="number">256</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="106" xml:space="preserve"><span class="lineNumber">106</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="107" xml:space="preserve"><span class="lineNumber">107</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">inline</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">int</span>&nbsp;<a href="../doc/class_NfaState_9D1ED32B9E916097B40ADF566ECF8BF84ACD9662.html#member_function_Id_NfaState_1901DF43AE73062A31B45016F07FF2890C6B2D1E">Id</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span></span>
+  <br/>
+  <span class="code" id="108" xml:space="preserve"><span class="lineNumber">108</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="109" xml:space="preserve"><span class="lineNumber">109</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<a href="../doc/class_NfaState_9D1ED32B9E916097B40ADF566ECF8BF84ACD9662.html#variable_id_FC2A605C2AB468E6ECA86889A6112FA1AA247FC7">id</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="110" xml:space="preserve"><span class="lineNumber">110</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="111" xml:space="preserve"><span class="lineNumber">111</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">inline</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">bool</span>&nbsp;<a href="../doc/class_NfaState_9D1ED32B9E916097B40ADF566ECF8BF84ACD9662.html#member_function_Accepting_NfaState_AF5C02F9685E4F2B2F518875814539C115F74F16">Accepting</a><span class="other">(</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="112" xml:space="preserve"><span class="lineNumber">112</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="113" xml:space="preserve"><span class="lineNumber">113</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<a href="../doc/class_NfaState_9D1ED32B9E916097B40ADF566ECF8BF84ACD9662.html#variable_accepting_E241586A10F07B920F25F24AF141CACBEE91CCD7">accepting</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="114" xml:space="preserve"><span class="lineNumber">114</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="115" xml:space="preserve"><span class="lineNumber">115</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">inline</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/class_NfaState_9D1ED32B9E916097B40ADF566ECF8BF84ACD9662.html#member_function_SetAccepting_NfaState_9F80C6A52F51B0940F68E65869F9F1A0B2D6DB93">SetAccepting</a><span class="other">(</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="116" xml:space="preserve"><span class="lineNumber">116</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="117" xml:space="preserve"><span class="lineNumber">117</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../doc/class_NfaState_9D1ED32B9E916097B40ADF566ECF8BF84ACD9662.html#variable_accepting_E241586A10F07B920F25F24AF141CACBEE91CCD7">accepting</a><span class="other">&nbsp;=&nbsp;</span><span class="kw">true</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="118" xml:space="preserve"><span class="lineNumber">118</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="119" xml:space="preserve"><span class="lineNumber">119</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/class_NfaState_9D1ED32B9E916097B40ADF566ECF8BF84ACD9662.html#member_function_SetNext_NfaState_F96A4564E9D4510790B3FC80476BB34DC2701E05">SetNext</a><span class="other">(</span><span class="kw">char</span>&nbsp;<span class="identifier">c</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<a href="../doc/class_NfaStateNumberSet_94283B9E90ECB564FEF4909226A69DC50DFBEAC3.html">NfaStateNumberSet</a><span class="other">&amp;</span>&nbsp;<span class="identifier">s</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="120" xml:space="preserve"><span class="lineNumber">120</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="121" xml:space="preserve"><span class="lineNumber">121</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../doc/class_NfaState_9D1ED32B9E916097B40ADF566ECF8BF84ACD9662.html#variable_next_AC22913A7269BDB421D11DCBB55D16434E044360">next</a><span class="other">[</span><span class="kw">cast</span><span class="other">&lt;</span><span class="kw">byte</span><span class="other">></span><span class="other">(</span><span class="identifier">c</span><span class="other">)</span><span class="other">]</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">s</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="122" xml:space="preserve"><span class="lineNumber">122</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="123" xml:space="preserve"><span class="lineNumber">123</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">const</span>&nbsp;<a href="../doc/class_NfaStateNumberSet_94283B9E90ECB564FEF4909226A69DC50DFBEAC3.html">NfaStateNumberSet</a><span class="other">&amp;</span>&nbsp;<a href="../doc/class_NfaState_9D1ED32B9E916097B40ADF566ECF8BF84ACD9662.html#member_function_Next_NfaState_F1C182E26DED97995E45DE94E7A7F66CBF61A74E">Next</a><span class="other">(</span><span class="kw">char</span>&nbsp;<span class="identifier">c</span><span class="other">)</span>&nbsp;<span class="kw">const</span></span>
+  <br/>
+  <span class="code" id="124" xml:space="preserve"><span class="lineNumber">124</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="125" xml:space="preserve"><span class="lineNumber">125</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<a href="../doc/class_NfaState_9D1ED32B9E916097B40ADF566ECF8BF84ACD9662.html#variable_next_AC22913A7269BDB421D11DCBB55D16434E044360">next</a><span class="other">[</span><span class="kw">cast</span><span class="other">&lt;</span><span class="kw">byte</span><span class="other">></span><span class="other">(</span><span class="identifier">c</span><span class="other">)</span><span class="other">]</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="126" xml:space="preserve"><span class="lineNumber">126</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="127" xml:space="preserve"><span class="lineNumber">127</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">const</span>&nbsp;<a href="../doc/class_NfaStateNumberSet_94283B9E90ECB564FEF4909226A69DC50DFBEAC3.html">NfaStateNumberSet</a><span class="other">&amp;</span>&nbsp;<a href="../doc/class_NfaState_9D1ED32B9E916097B40ADF566ECF8BF84ACD9662.html#member_function_Epsilon_NfaState_D60F94B16132539AFC860863C4FE7AEF7249B326">Epsilon</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span></span>
+  <br/>
+  <span class="code" id="128" xml:space="preserve"><span class="lineNumber">128</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="129" xml:space="preserve"><span class="lineNumber">129</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<a href="../doc/class_NfaState_9D1ED32B9E916097B40ADF566ECF8BF84ACD9662.html#variable_next_AC22913A7269BDB421D11DCBB55D16434E044360">next</a><span class="other">[</span><span class="number">0</span><span class="other">]</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="130" xml:space="preserve"><span class="lineNumber">130</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="131" xml:space="preserve"><span class="lineNumber">131</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">private</span>&nbsp;<span class="kw">int</span>&nbsp;<span class="identifier">id</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="132" xml:space="preserve"><span class="lineNumber">132</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">private</span>&nbsp;<span class="kw">bool</span>&nbsp;<span class="identifier">accepting</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="133" xml:space="preserve"><span class="lineNumber">133</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">private</span>&nbsp;<a href="../../System.Base/doc/class_List_T_4E42CF5913BEB21F5260DEFEC239180C94460B11.html">List</a><span class="other">&lt;</span><a href="../doc/class_NfaStateNumberSet_94283B9E90ECB564FEF4909226A69DC50DFBEAC3.html">NfaStateNumberSet</a><span class="other">></span>&nbsp;<span class="identifier">next</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="134" xml:space="preserve"><span class="lineNumber">134</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="135" xml:space="preserve"><span class="lineNumber">135</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+  <br/>
+  <span class="code" id="136" xml:space="preserve"><span class="lineNumber">136</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<a href="../../System.Base/doc/class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452.html">OutputStream</a><span class="other">&amp;</span>&nbsp;<a href="../doc/ns_System.Text.RegularExpressions.html#function_op_shl_F6A1C2C0E02B025CF998B4AF949CC63F52E49A24">operator&lt;&lt;</a><span class="other">(</span><a href="../../System.Base/doc/class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452.html">OutputStream</a><span class="other">&amp;</span>&nbsp;<span class="identifier">s</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<a href="../doc/class_NfaState_9D1ED32B9E916097B40ADF566ECF8BF84ACD9662.html">NfaState</a><span class="other">&amp;</span>&nbsp;<span class="identifier">state</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="137" xml:space="preserve"><span class="lineNumber">137</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="138" xml:space="preserve"><span class="lineNumber">138</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">s</span><span class="other">&nbsp;&lt;&lt;&nbsp;</span><span class="identifier">state</span><span class="other">.</span><a href="../doc/class_NfaState_9D1ED32B9E916097B40ADF566ECF8BF84ACD9662.html#member_function_Id_NfaState_1901DF43AE73062A31B45016F07FF2890C6B2D1E">Id</a><span class="other">(</span><span class="other">)</span><span class="other">&nbsp;&lt;&lt;&nbsp;</span><span class="string">":&nbsp;"</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="139" xml:space="preserve"><span class="lineNumber">139</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">for</span>&nbsp;<span class="other">(</span><span class="kw">int</span>&nbsp;<span class="identifier">i</span><span class="other">&nbsp;=&nbsp;</span><span class="number">0</span><span class="other">;</span>&nbsp;<span class="identifier">i</span><span class="other">&nbsp;&lt;&nbsp;</span><span class="number">256</span><span class="other">;</span>&nbsp;<span class="other">++</span><span class="identifier">i</span><span class="other">;</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="140" xml:space="preserve"><span class="lineNumber">140</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="141" xml:space="preserve"><span class="lineNumber">141</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">char</span>&nbsp;<span class="identifier">c</span><span class="other">&nbsp;=&nbsp;</span><span class="kw">cast</span><span class="other">&lt;</span><span class="kw">char</span><span class="other">></span><span class="other">(</span><span class="identifier">i</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="142" xml:space="preserve"><span class="lineNumber">142</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">const</span>&nbsp;<a href="../doc/class_NfaStateNumberSet_94283B9E90ECB564FEF4909226A69DC50DFBEAC3.html">NfaStateNumberSet</a><span class="other">&amp;</span>&nbsp;<span class="identifier">next</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">state</span><span class="other">.</span><a href="../doc/class_NfaState_9D1ED32B9E916097B40ADF566ECF8BF84ACD9662.html#member_function_Next_NfaState_F1C182E26DED97995E45DE94E7A7F66CBF61A74E">Next</a><span class="other">(</span><span class="identifier">c</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="143" xml:space="preserve"><span class="lineNumber">143</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if</span>&nbsp;<span class="other">(</span><span class="other">!</span><span class="identifier">next</span><span class="other">.</span><a href="../doc/class_NfaStateNumberSet_94283B9E90ECB564FEF4909226A69DC50DFBEAC3.html#member_function_IsEmpty_NfaStateNumberSet_43645D0B37A3928867F888309EB8452A9B1BDBE3">IsEmpty</a><span class="other">(</span><span class="other">)</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="144" xml:space="preserve"><span class="lineNumber">144</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="145" xml:space="preserve"><span class="lineNumber">145</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">s</span><span class="other">&nbsp;&lt;&lt;&nbsp;</span><span class="string">"("</span><span class="other">&nbsp;&lt;&lt;&nbsp;</span><a href="../../System.Base/doc/ns_System.html#function_CharStr_C3E17C940E667CCE431D6D81C6EBEDC4D9FF67E2">CharStr</a><span class="other">(</span><span class="identifier">c</span><span class="other">)</span><span class="other">&nbsp;&lt;&lt;&nbsp;</span><span class="string">"&nbsp;->&nbsp;"</span><span class="other">&nbsp;&lt;&lt;&nbsp;</span><span class="identifier">next</span><span class="other">&nbsp;&lt;&lt;&nbsp;</span><span class="string">")"</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="146" xml:space="preserve"><span class="lineNumber">146</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="147" xml:space="preserve"><span class="lineNumber">147</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="148" xml:space="preserve"><span class="lineNumber">148</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">s</span><span class="other">&nbsp;&lt;&lt;&nbsp;</span><a href="../../System.Base/doc/ns_System.html#function_endl_6CF73794B39EC3D6208AD75F99327E1DACEBC134">endl</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="149" xml:space="preserve"><span class="lineNumber">149</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="150" xml:space="preserve"><span class="lineNumber">150</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+  <br/>
+  <span class="code" id="151" xml:space="preserve"><span class="lineNumber">151</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<a href="../../System.Base/doc/class_StreamWriter_40A39F418049D49DB679452BB514CDFE47500311.html">StreamWriter</a><span class="other">&amp;</span>&nbsp;<a href="../doc/ns_System.Text.RegularExpressions.html#function_op_shl_6485B9489611903D001C978ACF890102A19BB472">operator&lt;&lt;</a><span class="other">(</span><a href="../../System.Base/doc/class_StreamWriter_40A39F418049D49DB679452BB514CDFE47500311.html">StreamWriter</a><span class="other">&amp;</span>&nbsp;<span class="identifier">s</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<a href="../doc/class_NfaState_9D1ED32B9E916097B40ADF566ECF8BF84ACD9662.html">NfaState</a><span class="other">&amp;</span>&nbsp;<span class="identifier">state</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="152" xml:space="preserve"><span class="lineNumber">152</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="153" xml:space="preserve"><span class="lineNumber">153</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">s</span><span class="other">&nbsp;&lt;&lt;&nbsp;</span><span class="identifier">state</span><span class="other">.</span><a href="../doc/class_NfaState_9D1ED32B9E916097B40ADF566ECF8BF84ACD9662.html#member_function_Id_NfaState_1901DF43AE73062A31B45016F07FF2890C6B2D1E">Id</a><span class="other">(</span><span class="other">)</span><span class="other">&nbsp;&lt;&lt;&nbsp;</span><span class="string">":&nbsp;"</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="154" xml:space="preserve"><span class="lineNumber">154</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">for</span>&nbsp;<span class="other">(</span><span class="kw">int</span>&nbsp;<span class="identifier">i</span><span class="other">&nbsp;=&nbsp;</span><span class="number">0</span><span class="other">;</span>&nbsp;<span class="identifier">i</span><span class="other">&nbsp;&lt;&nbsp;</span><span class="number">256</span><span class="other">;</span>&nbsp;<span class="other">++</span><span class="identifier">i</span><span class="other">;</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="155" xml:space="preserve"><span class="lineNumber">155</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="156" xml:space="preserve"><span class="lineNumber">156</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">char</span>&nbsp;<span class="identifier">c</span><span class="other">&nbsp;=&nbsp;</span><span class="kw">cast</span><span class="other">&lt;</span><span class="kw">char</span><span class="other">></span><span class="other">(</span><span class="identifier">i</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="157" xml:space="preserve"><span class="lineNumber">157</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">const</span>&nbsp;<a href="../doc/class_NfaStateNumberSet_94283B9E90ECB564FEF4909226A69DC50DFBEAC3.html">NfaStateNumberSet</a><span class="other">&amp;</span>&nbsp;<span class="identifier">next</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">state</span><span class="other">.</span><a href="../doc/class_NfaState_9D1ED32B9E916097B40ADF566ECF8BF84ACD9662.html#member_function_Next_NfaState_F1C182E26DED97995E45DE94E7A7F66CBF61A74E">Next</a><span class="other">(</span><span class="identifier">c</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="158" xml:space="preserve"><span class="lineNumber">158</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if</span>&nbsp;<span class="other">(</span><span class="other">!</span><span class="identifier">next</span><span class="other">.</span><a href="../doc/class_NfaStateNumberSet_94283B9E90ECB564FEF4909226A69DC50DFBEAC3.html#member_function_IsEmpty_NfaStateNumberSet_43645D0B37A3928867F888309EB8452A9B1BDBE3">IsEmpty</a><span class="other">(</span><span class="other">)</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="159" xml:space="preserve"><span class="lineNumber">159</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="160" xml:space="preserve"><span class="lineNumber">160</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">s</span><span class="other">&nbsp;&lt;&lt;&nbsp;</span><span class="string">"("</span><span class="other">&nbsp;&lt;&lt;&nbsp;</span><a href="../../System.Base/doc/ns_System.html#function_CharStr_C3E17C940E667CCE431D6D81C6EBEDC4D9FF67E2">CharStr</a><span class="other">(</span><span class="identifier">c</span><span class="other">)</span><span class="other">&nbsp;&lt;&lt;&nbsp;</span><span class="string">"&nbsp;->&nbsp;"</span><span class="other">&nbsp;&lt;&lt;&nbsp;</span><span class="identifier">next</span><span class="other">&nbsp;&lt;&lt;&nbsp;</span><span class="string">")"</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="161" xml:space="preserve"><span class="lineNumber">161</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="162" xml:space="preserve"><span class="lineNumber">162</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="163" xml:space="preserve"><span class="lineNumber">163</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">s</span><span class="other">&nbsp;&lt;&lt;&nbsp;</span><a href="../../System.Base/doc/ns_System.html#function_endl_6CF73794B39EC3D6208AD75F99327E1DACEBC134">endl</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="164" xml:space="preserve"><span class="lineNumber">164</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="165" xml:space="preserve"><span class="lineNumber">165</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="166" xml:space="preserve"><span class="lineNumber">166</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../doc/class_Nfa_5E23E7BB511DC9602941611B6CE87476EC3ECB57.html">Nfa</a></span>
+  <br/>
+  <span class="code" id="167" xml:space="preserve"><span class="lineNumber">167</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="168" xml:space="preserve"><span class="lineNumber">168</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<a href="../doc/class_Nfa_5E23E7BB511DC9602941611B6CE87476EC3ECB57.html#default_constructor_Nfa_C911A047871E46B502D94CE905FACFC250286635">Nfa</a><span class="other">(</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="169" xml:space="preserve"><span class="lineNumber">169</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="170" xml:space="preserve"><span class="lineNumber">170</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="171" xml:space="preserve"><span class="lineNumber">171</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/class_Nfa_5E23E7BB511DC9602941611B6CE87476EC3ECB57.html#member_function_AddState_Nfa_B04784C00A1F38D5975225A1819B2E7F80FC5524">AddState</a><span class="other">(</span><span class="kw">const</span>&nbsp;<a href="../doc/class_NfaState_9D1ED32B9E916097B40ADF566ECF8BF84ACD9662.html">NfaState</a><span class="other">&amp;</span>&nbsp;<span class="identifier">state</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="172" xml:space="preserve"><span class="lineNumber">172</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="173" xml:space="preserve"><span class="lineNumber">173</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../doc/class_Nfa_5E23E7BB511DC9602941611B6CE87476EC3ECB57.html#variable_states_AB8239D7FD9022079FF55BC3799210D5C6820D1D">states</a><span class="other">.</span><a href="../../System.Base/doc/class_List_T_4E42CF5913BEB21F5260DEFEC239180C94460B11.html#member_function_Add_List_T_0CEB0F989B58359D06357C988DF595C83DA28430">Add</a><span class="other">(</span><span class="identifier">state</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="174" xml:space="preserve"><span class="lineNumber">174</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="175" xml:space="preserve"><span class="lineNumber">175</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">inline</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">const</span>&nbsp;<a href="../../System.Base/doc/class_List_T_4E42CF5913BEB21F5260DEFEC239180C94460B11.html">List</a><span class="other">&lt;</span><a href="../doc/class_NfaState_9D1ED32B9E916097B40ADF566ECF8BF84ACD9662.html">NfaState</a><span class="other">></span><span class="other">&amp;</span>&nbsp;<a href="../doc/class_Nfa_5E23E7BB511DC9602941611B6CE87476EC3ECB57.html#member_function_States_Nfa_02ACF5CE923C7145CB8872B14A9C917888A0A735">States</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span></span>
+  <br/>
+  <span class="code" id="176" xml:space="preserve"><span class="lineNumber">176</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="177" xml:space="preserve"><span class="lineNumber">177</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<a href="../doc/class_Nfa_5E23E7BB511DC9602941611B6CE87476EC3ECB57.html#variable_states_AB8239D7FD9022079FF55BC3799210D5C6820D1D">states</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="178" xml:space="preserve"><span class="lineNumber">178</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="179" xml:space="preserve"><span class="lineNumber">179</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">inline</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">const</span>&nbsp;<a href="../doc/class_NfaState_9D1ED32B9E916097B40ADF566ECF8BF84ACD9662.html">NfaState</a><span class="other">&amp;</span>&nbsp;<a href="../doc/class_Nfa_5E23E7BB511DC9602941611B6CE87476EC3ECB57.html#member_function_GetState_Nfa_69254B598DF5877CA3EEAF6EA75A9E56EB3A641F">GetState</a><span class="other">(</span><span class="kw">long</span>&nbsp;<span class="identifier">i</span><span class="other">)</span>&nbsp;<span class="kw">const</span></span>
+  <br/>
+  <span class="code" id="180" xml:space="preserve"><span class="lineNumber">180</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="181" xml:space="preserve"><span class="lineNumber">181</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<a href="../doc/class_Nfa_5E23E7BB511DC9602941611B6CE87476EC3ECB57.html#variable_states_AB8239D7FD9022079FF55BC3799210D5C6820D1D">states</a><span class="other">[</span><span class="identifier">i</span><span class="other">]</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="182" xml:space="preserve"><span class="lineNumber">182</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="183" xml:space="preserve"><span class="lineNumber">183</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">inline</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">long</span>&nbsp;<a href="../doc/class_Nfa_5E23E7BB511DC9602941611B6CE87476EC3ECB57.html#member_function_NumStates_Nfa_36BDB4B847FB98481B3F29F51A81C5BA63A4CA53">NumStates</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span></span>
+  <br/>
+  <span class="code" id="184" xml:space="preserve"><span class="lineNumber">184</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="185" xml:space="preserve"><span class="lineNumber">185</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<a href="../doc/class_Nfa_5E23E7BB511DC9602941611B6CE87476EC3ECB57.html#variable_states_AB8239D7FD9022079FF55BC3799210D5C6820D1D">states</a><span class="other">.</span><a href="../../System.Base/doc/class_List_T_4E42CF5913BEB21F5260DEFEC239180C94460B11.html#member_function_Count_List_T_CC08825E95DA25361D24D0B94402BCC8F4B0197F">Count</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="186" xml:space="preserve"><span class="lineNumber">186</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="187" xml:space="preserve"><span class="lineNumber">187</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">private</span>&nbsp;<a href="../../System.Base/doc/class_List_T_4E42CF5913BEB21F5260DEFEC239180C94460B11.html">List</a><span class="other">&lt;</span><a href="../doc/class_NfaState_9D1ED32B9E916097B40ADF566ECF8BF84ACD9662.html">NfaState</a><span class="other">></span>&nbsp;<span class="identifier">states</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="188" xml:space="preserve"><span class="lineNumber">188</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="189" xml:space="preserve"><span class="lineNumber">189</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="190" xml:space="preserve"><span class="lineNumber">190</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<a href="../../System.Base/doc/class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452.html">OutputStream</a><span class="other">&amp;</span>&nbsp;<a href="../doc/ns_System.Text.RegularExpressions.html#function_op_shl_4E5CAC0C1959738EA9F3D41EA8C384D0F55BEB02">operator&lt;&lt;</a><span class="other">(</span><a href="../../System.Base/doc/class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452.html">OutputStream</a><span class="other">&amp;</span>&nbsp;<span class="identifier">s</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<a href="../doc/class_Nfa_5E23E7BB511DC9602941611B6CE87476EC3ECB57.html">Nfa</a><span class="other">&amp;</span>&nbsp;<span class="identifier">nfa</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="191" xml:space="preserve"><span class="lineNumber">191</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="192" xml:space="preserve"><span class="lineNumber">192</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">for</span>&nbsp;<span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">NfaState</span><span class="other">&amp;</span>&nbsp;<span class="identifier">state</span>&nbsp;<span class="other">:</span>&nbsp;<span class="identifier">nfa</span><span class="other">.</span><a href="../doc/class_Nfa_5E23E7BB511DC9602941611B6CE87476EC3ECB57.html#member_function_States_Nfa_02ACF5CE923C7145CB8872B14A9C917888A0A735">States</a><span class="other">(</span><span class="other">)</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="193" xml:space="preserve"><span class="lineNumber">193</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="194" xml:space="preserve"><span class="lineNumber">194</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">s</span><span class="other">&nbsp;&lt;&lt;&nbsp;</span><span class="identifier">state</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="195" xml:space="preserve"><span class="lineNumber">195</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="196" xml:space="preserve"><span class="lineNumber">196</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">s</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="197" xml:space="preserve"><span class="lineNumber">197</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="198" xml:space="preserve"><span class="lineNumber">198</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="199" xml:space="preserve"><span class="lineNumber">199</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<a href="../../System.Base/doc/class_StreamWriter_40A39F418049D49DB679452BB514CDFE47500311.html">StreamWriter</a><span class="other">&amp;</span>&nbsp;<a href="../doc/ns_System.Text.RegularExpressions.html#function_op_shl_32B788139992A46133E1128EA68FE9705068391B">operator&lt;&lt;</a><span class="other">(</span><a href="../../System.Base/doc/class_StreamWriter_40A39F418049D49DB679452BB514CDFE47500311.html">StreamWriter</a><span class="other">&amp;</span>&nbsp;<span class="identifier">s</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<a href="../doc/class_Nfa_5E23E7BB511DC9602941611B6CE87476EC3ECB57.html">Nfa</a><span class="other">&amp;</span>&nbsp;<span class="identifier">nfa</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="200" xml:space="preserve"><span class="lineNumber">200</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="201" xml:space="preserve"><span class="lineNumber">201</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">for</span>&nbsp;<span class="other">(</span><span class="kw">const</span>&nbsp;<span class="identifier">NfaState</span><span class="other">&amp;</span>&nbsp;<span class="identifier">state</span>&nbsp;<span class="other">:</span>&nbsp;<span class="identifier">nfa</span><span class="other">.</span><a href="../doc/class_Nfa_5E23E7BB511DC9602941611B6CE87476EC3ECB57.html#member_function_States_Nfa_02ACF5CE923C7145CB8872B14A9C917888A0A735">States</a><span class="other">(</span><span class="other">)</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="202" xml:space="preserve"><span class="lineNumber">202</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="203" xml:space="preserve"><span class="lineNumber">203</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">s</span><span class="other">&nbsp;&lt;&lt;&nbsp;</span><span class="identifier">state</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="204" xml:space="preserve"><span class="lineNumber">204</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="205" xml:space="preserve"><span class="lineNumber">205</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">s</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="206" xml:space="preserve"><span class="lineNumber">206</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="207" xml:space="preserve"><span class="lineNumber">207</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+ </body>
+</html>

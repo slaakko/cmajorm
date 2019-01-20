@@ -1,0 +1,357 @@
+﻿<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title>cmdoc</title>
+    <link rel="stylesheet" type="text/css" href="../../style/tool.css" />
+</head>
+<body>
+    <h1>CmDoc Documentation Generator</h1>
+    <p>
+        <strong>cmdoc</strong> is a tool for generating HTML documentation with hyperlinked source code for a Cmajor solution.
+        The source code can be linked with the system library documentation.
+    </p>
+
+    <h2>Table of contents</h2>
+
+    <div class="toc">
+        1 <a href="#tutorial">Tutorial</a><br />
+        2 <a href="#reference">Reference</a><br />
+        &nbsp;&nbsp; 2.1 <a href="#input-file-format">Input File Format</a><br />
+        &nbsp;&nbsp; 2.2 <a href="#documentation-file-format">Documentation File Format</a><br />
+        &nbsp;&nbsp; 2.3 <a href="#usage">Usage</a><br />
+    </div>
+
+    <h2 id="tutorial">1 Tutorial</h2>
+    <p>
+        In this tutorial we go through creating a simple example program and some documentation for it.
+        The documentation can be created with any text editor that can save the text with UTF-8 encoding.
+        In this tutorial we use Windows notepad.
+    </p>
+
+    <ul>
+        <li>
+            <p>
+                Create a new Cmajor console application project under the <strong>C:\cmajor\projects</strong> folder.
+                We create also a new solution for it, because <strong>cmdoc</strong> operates with solutions.
+            </p>
+            <img src="images/00_Project.png" />
+        </li>
+        <li>
+            <p>
+                Add a new source file to it:
+            </p>
+            <img src="images/01_SourceFile.png" />
+        </li>
+        <li>
+            <p>
+                Create some source code, compile and save the project:
+            </p>
+            <img src="images/02_CmDocExample.png" />
+        </li>
+        <li>
+            <p>
+                Create a new folder named <strong>CmDocExample</strong> for the project documentation under the <strong>C:\cmajor\doc\projects</strong> folder,
+                open a command prompt to that folder and create an XML file for the project with name <strong>CmDocExample.cmdoc.xml</strong>:
+            </p>
+            <img src="images/03_Notepad.png" />
+        </li>
+        <li>
+            <p>
+                Create a <strong>cmdoc</strong> element to the XML file, and under it a <strong>solution</strong> element with a <strong>filePath</strong> attribute that points to the <strong>CmDocExample.cms</strong> solution file.
+                Create also a <strong>target</strong> element with a <strong>dir</strong> attribute that points to the current directory.
+                The documentation will be generated to the target directory.
+                Finally create a <strong>libraries/library</strong> element with a <strong>dir</strong> attribute that points to the
+                <strong>C:\cmajor\doc\system</strong> directory. This links the generated documentation with the system library documentation.
+            </p>
+            <p>
+                So the contents of the XML file is as follows:
+            </p>
+            <img src="images/04_Xml.png" />
+        </li>
+        <li>
+            <p>
+                Run command <strong>cmdoc --verbose CmDocExample.cmdoc.xml</strong> from the <strong>C:\cmajor\doc\projects\CmDocExample</strong> directory:
+            </p>
+            <img src="images/05_Run.png" />
+        </li>
+        <li>
+            <p>
+                The <strong>cmdoc</strong> program creates two directories: <strong>content</strong> and <strong>style</strong>,
+                an <strong>index.html</strong> file that is the root HTML documentation file and some XML files to the target directory:
+            </p>
+            <img src="images/06_Explorer.png" />
+        </li>
+        <li>
+            <p>
+                The generated <strong>index.html</strong> looks now like this:
+            </p>
+            <img src="images/07_Index.png" />
+        </li>
+        <li>
+            <p>
+                Now create an XML file named <strong>docs.xml</strong> to the <strong>C:\cmajor\doc\projects\CmDocExample</strong> directory
+                that will contain documentation for the example program:
+            </p>
+            <img src="images/08_Docs.png" />
+        </li>
+        <li>
+            <p>
+                Open the <strong>index.html</strong> and click the link for the <strong>CmDocExample</strong> module, then the link for the <strong>main()</strong> function and
+                then copy the part of the address coming after the '#' from the address line to the clipboard:
+            </p>
+            <img src="images/09_Main.png" />
+        </li>
+        <li>
+            <p>
+                Create a <strong>docs</strong> element to the <strong>docs.xml</strong> file and under it a </strong><strong>doc</strong> element.
+                Then create an <strong>id</strong> attribute for the <strong>doc</strong> element,
+                and paste the id for the <strong>main</strong> function from the clipboard as the value of it.
+                We have created three elements under the <strong>doc</strong> element:
+                the <strong>desc</strong> element contains the description of the <strong>main</strong> function, and any possible <strong>details</strong>
+                elements will contain detail paragraphs for it:
+            </p>
+            <img src="images/10_Docs.png" />
+        </li>
+        <li>
+            <p>
+                Now edit the <strong>CmDocExample.cmdoc.xml</strong> file by adding a <strong>doc</strong> element with a <strong>filePath</strong> attribute
+                with the value <strong>docs.xml</strong>.
+            </p>
+            <img src="images/11_Changes.png" />
+        </li>
+        <li>
+            <p>
+                Run the <strong>cmdoc</strong> command again:
+            </p>
+            <img src="images/12_RunAgain.png" />
+        </li>
+        <li>
+            <p>
+                Now view the <strong>index.html</strong>. The written documentation appears:
+            </p>
+            <img src="images/13_Final.png" />
+        </li>
+        <li>
+            <p>
+                The source code of <strong>CmDocExample/main.cm</strong> looks like this:
+            </p>
+            <img src="images/14_SourceCode.png" />
+        </li>
+        <li>
+            <p>
+                If you click the <strong>Console</strong> link from the source code, the documentation for the Console class of the system library appears:
+            </p>
+            <img src="images/15_Console.png" />
+        </li>
+        <li>
+            <p>
+                That's the end of this tutorial.
+            </p>
+        </li>
+    </ul>
+
+    <h2 id="reference">2 Reference</h2>
+
+    <p>
+        The <strong>cmdoc</strong> program processes two XML files: an input XML file <strong>SOLUTION.cmdoc.xml</strong> and 
+        a documentation XML file (for example <strong>docs.xml</strong>).
+    </p>
+
+    <h3 id="input-file-format">2.1 Input File Format</h3>
+
+    <p>
+        The format of the <strong>SOLUTION.cmdoc.xml</strong> file, where SOLUTION is the solution to be documented is as follows:
+    </p>
+
+    <pre>
+        &lt;cmdoc>
+          &lt;solution filePath="SOLUTION_FILE_PATH.cms"/>
+          &lt;doc filePath="DOCUMENTATION_FILE_PATH.xml"/>
+          &lt;target dir="TARGET_DIRECTORY_PATH"/>
+          &lt;libraries>
+            &lt;library dir="EXTERNAL_DIRECTORY_PATH"/>
+            &lt;library dir="EXTERNAL_DIRECTORY_PATH"/>
+            ...
+          &lt;/libraries>
+        &lt;/cmdoc>
+    </pre>
+
+    <p>
+        where 
+        <ul>
+            <li>SOLUTION_FILE_PATH is a relative path to a solution file (<strong>SOLUTION.cms</strong>),</li>
+            <li>DOCUMENTATION_FILE_PATH is a relative path to a documentation XML file (for example <strong>docs.xml</strong>),</li>
+            <li>TARGET_DIRECTORY_PATH is a path to the directory where the documentation will be generated (for example <strong>.</strong>), and</li>
+            <li>
+                EXTERNAL_DIRECTORY_PATH is a relative path to a directory that contains a documentation of another solution,
+                for example a relative path to the <strong>C:\cmajor\doc\system</strong> directory.
+            </li>
+        </ul>
+    </p>
+
+    <p>
+        The <em>doc</em>, <em>libraries</em> and <em>library</em> elements may be missing.
+    </p>
+
+    <h3 id="documentation-file-format">2.2 Documentation File Format</h3>
+
+    <p>
+        The format of the documentation file (for example <strong>docs.xml</strong>) that contains the documentation for a solution is as follows:
+    </p>
+
+    <pre>
+        &lt;docs>
+            &lt;doc id="<em>ID</em>">
+                &lt;desc>
+                  <em>DESCRIPTION</em>
+                &lt;/desc>
+                &lt;details>
+                  <em>DETAILS paragraph 1</em>
+                &lt;/details>
+                &lt;details>
+                  <em>DETAILS paragraph 2</em>
+                &lt;/details>
+                ...
+            &lt;/doc>
+            &lt;doc id="ID">
+                &lt;desc>
+                  <em>DESCRIPTION</em>
+                &lt;/desc>
+            &lt;/doc>
+            ...
+        &lt;/docs>
+    </pre>
+
+    <p>
+        Each documented program entity has a single <strong>desc</strong> element that is obligatory.
+        The <strong>desc</strong> contains the description text of an entity.
+        The documented entity may have zero or more <strong>details</strong> elements that represent detail text paragraphs.
+        Only a namespace, class, concept and enumeration may have <strong>details</strong> elements.
+    </p>
+
+    <p>
+        The <em>ID</em> is the documentation identifier of the program entity to be documented.
+    </p>
+
+    <p>
+        Each documented program entity has an URL.
+        The URL of an entity can be found out by clicking a link of it in the documentation source code or in other generated documentation.
+        The URL will be shown in the address line of the browser.
+        When you got an URL of an entity, the ID of it can be derived from it as follows:
+    </p>
+
+    <table>
+        <tr>
+            <th>entity</th>
+            <th>example URL</th>
+            <th>ID</th>
+        </tr>
+        <tr>
+            <td>namespace</td>
+            <td>.../ns_System.html</td>
+            <td>ns_System</td>
+        </tr>
+        <tr>
+            <td>class</td>
+            <td>.../class_Console_41891B146EC51CAB04451732257B28BD18CAE52B.html</td>
+            <td>class_Console_41891B146EC51CAB04451732257B28BD18CAE52B</td>
+        </tr>
+        <tr>
+            <td>concept</td>
+            <td>.../concept_Container_0A128B13B9494DFD21086D34DFB070EAA26D473A.html</td>
+            <td>concept_Container_0A128B13B9494DFD21086D34DFB070EAA26D473A</td>
+        </tr>
+        <tr>
+            <td>enumeration</td>
+            <td>.../enumerated_type_Month_7829D8A209CD9954EC457E7406A5269E99C4AA48.html</td>
+            <td>enumerated_type_Month_7829D8A209CD9954EC457E7406A5269E99C4AA48</td>
+        </tr>
+        <tr>
+            <td>function</td>
+            <td>.../ns_System.html#function_Min_CBFBA4BF1C9AFF4708FC71F4031C929A1A8AE1FB</td>
+            <td>function_Min_CBFBA4BF1C9AFF4708FC71F4031C929A1A8AE1FB</td>
+        </tr>
+        <tr>
+            <td>typedef</td>
+            <td>.../ns_System.html#typedef_string_B6DB6B2DEFC437FBF697A2E84F7B7771FC1DDEE3</td>
+            <td>typedef_string_B6DB6B2DEFC437FBF697A2E84F7B7771FC1DDEE3</td>
+        </tr>
+        <tr>
+            <td>constant</td>
+            <td>.../ns_System.html#constant_insertionSortThreshold_56F85BEA8266D9529E96B6415FF32EC6B8AB62C5</td>
+            <td>constant_insertionSortThreshold_56F85BEA8266D9529E96B6415FF32EC6B8AB62C5</td>
+        </tr>
+        <tr>
+            <td>delegate</td>
+            <td>.../ns_System.Threading.html#delegate_ThreadStartFunction_56B97B5DFF5ED9F3C1C29C2C8655A9ED8753032F</td>
+            <td>delegate_ThreadStartFunction_56B97B5DFF5ED9F3C1C29C2C8655A9ED8753032F</td>
+        </tr>
+        <tr>
+            <td>class delegate</td>
+            <td>.../ns_System.Threading.html#class_delegate_ThreadStartMethod_3044EADA25CA797E0DE0095ECAC529EAFE935B55</td>
+            <td>class_delegate_ThreadStartMethod_3044EADA25CA797E0DE0095ECAC529EAFE935B55</td>
+        </tr>
+        <tr>
+            <td>enumeration constant</td>
+            <td>.../enumerated_type_CharClass_825BD0E92E069CC6BC59D5D117AD06076A653B4D.html#enumeration_constant_space_F27E532B5A11148A0B68171CCD38C1A2C0B6FBAD</td>
+            <td>enumeration_constant_space_F27E532B5A11148A0B68171CCD38C1A2C0B6FBAD</td>
+        </tr>
+    </table>
+
+    <p>
+        <em>DESCRIPTION</em> and <em>DETAILS</em> texts can contain a <strong>&lt;ref>ID&lt;/ref></strong> elements, where ID is the documentation identifier of a program entity.
+        Each <strong>ref</strong> element will be substituted by a HTML link to the documentation of referenced entity.
+    </p>
+    <p>
+        <em>DESCRIPTION</em> and <em>DETAILS</em> texts can also contain other HTML elements that are preserved in the generated documentation.
+    </p>
+
+    <p>
+     A <strong>details</strong> element may have a <strong>title</strong> attribute with a value that will become a section title in the generated documentation.
+    </p>
+
+    <h3 id="usage">2.3 Usage</h3>
+
+    <p>
+        Usage: <strong>cmdoc [options] { INPUT_FILE.cmdoc.xml }</strong>
+    </p>
+
+    <p>
+        Generate documentation for a solution in input file <strong>INPUT_FILE.cmdoc.xml</strong>.
+    </p>
+
+    <p>
+        Options:
+    </p>
+
+    <table class="opt">
+        <tr>
+            <th class="opt">Long option</th>
+            <th class="opt">Short option</th>
+            <th class="opt">Description</th>
+        </tr>
+        <tr>
+            <td class="opt">--verbose</td>
+            <td class="opt">-v</td>
+            <td class="opt">Be verbose.</td>
+        </tr>
+        <tr>
+            <td class="opt">--help</td>
+            <td class="opt">-h</td>
+            <td class="opt">Print help.</td>
+        </tr>
+        <tr>
+            <td class="opt">--optimize</td>
+            <td class="opt">-o</td>
+            <td class="opt">Do not compile the solution and generate documentation source code and symbol table XML files for those projects that are up-to-date.</td>
+        </tr>
+        <tr>
+            <td class="opt">--build-threads=N</td>
+            <td class="opt">-bt=N</td>
+            <td class="opt">Use N build threads.</td>
+        </tr>
+    </table>
+
+</body>
+</html>

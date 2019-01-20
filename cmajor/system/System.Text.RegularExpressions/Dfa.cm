@@ -1,0 +1,145 @@
+// =================================
+// Copyright (c) 2019 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Collections;
+using System.IO;
+
+namespace System.Text.RegularExpressions
+{
+    public class DfaState
+    {
+        public DfaState(): id(-1), accepting(false), next(256, -1)
+        {
+        }
+        public DfaState(int id_): id(id_), accepting(false), next(256, -1)
+        {
+        }
+        public nothrow inline int Id() const
+        {
+            return id;
+        }
+        public nothrow inline bool Accepting() const
+        {
+            return accepting;
+        }
+        public nothrow inline void SetAccepting()
+        {
+            accepting = true;
+        }
+        public nothrow inline int Next(char c) const
+        {
+            return next[cast<byte>(c)];
+        }
+        public nothrow inline void SetNext(char c, int n)
+        {
+            next[cast<byte>(c)] = n;
+        }
+        private int id;
+        private bool accepting;
+        private List<int> next;
+    }
+    
+    public OutputStream& operator<<(OutputStream& s, const DfaState& state)
+    {
+        if (state.Accepting())
+        {
+            s << '*';
+        }
+        s << state.Id() << ": ";
+        for (int i = 1; i < 256; ++i)
+        {
+            char c = cast<char>(i);
+            int n = state.Next(c);
+            if (n != -1)
+            {
+                s << "(" << CharStr(c) << "->" << n << ")";
+            }
+        }
+        return s << endl();
+    }
+
+    public StreamWriter& operator<<(StreamWriter& s, const DfaState& state)
+    {
+        if (state.Accepting())
+        {
+            s << '*';
+        }
+        s << state.Id() << ": ";
+        for (int i = 1; i < 256; ++i)
+        {
+            char c = cast<char>(i);
+            int n = state.Next(c);
+            if (n != -1)
+            {
+                s << "(" << CharStr(c) << "->" << n << ")";
+            }
+        }
+        return s << endl();
+    }
+
+    public class Dfa
+    {
+        public Dfa()
+        {
+        }
+        public void AddState(const DfaState& state)
+        {
+            states.Add(state);
+        }
+        public nothrow inline const DfaState& GetState(int i) const
+        {
+            return states[i];
+        }
+        public nothrow inline long NumStates() const
+        {
+            return states.Count();
+        }
+        public nothrow void SetNext(char c, int from, int to)
+        {
+            DfaState& s = states[from];
+            s.SetNext(c, to);
+        }
+        public nothrow inline int Next(char c, int s)
+        {
+            return states[s].Next(c);
+        }
+        public void SetAccepting(int s)
+        {
+            states[s].SetAccepting();
+        }
+        private List<DfaState> states;
+    }
+    
+    public OutputStream& operator<<(OutputStream& s, const Dfa& dfa)
+    {
+        for (int i = 0; i < dfa.NumStates(); ++i)
+        {
+            const DfaState& state = dfa.GetState(i);
+            s << state;
+        }
+        return s;
+    }
+    
+    public StreamWriter& operator<<(StreamWriter& s, const Dfa& dfa)
+    {
+        for (int i = 0; i < dfa.NumStates(); ++i)
+        {
+            const DfaState& state = dfa.GetState(i);
+            s << state;
+        }
+        return s;
+    }
+    
+    public int FindState(List<NfaStateNumberSet>.ConstIterator begin, List<NfaStateNumberSet>.ConstIterator end, const NfaStateNumberSet& s)
+    {
+        List<NfaStateNumberSet>.ConstIterator pos = Find(begin, end, s);
+        if (pos != end)
+        {
+            return cast<int>(pos - begin);
+        }
+        return -1;
+    }
+}

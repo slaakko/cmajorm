@@ -1,0 +1,471 @@
+<html>
+ <head>
+  <meta charset="utf-8"/>
+  <title>System.Base/Stream.cm</title>
+  <link href="../../../style/style.css" rel="stylesheet" type="text/css"/>
+ </head>
+ <body>
+  <span class="code" id="1" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;1</span>&nbsp;<span class="comment">//&nbsp;=================================</span></span>
+  <br/>
+  <span class="code" id="2" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;2</span>&nbsp;<span class="comment">//&nbsp;Copyright&nbsp;(c)&nbsp;2019&nbsp;Seppo&nbsp;Laakko</span></span>
+  <br/>
+  <span class="code" id="3" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;3</span>&nbsp;<span class="comment">//&nbsp;Distributed&nbsp;under&nbsp;the&nbsp;MIT&nbsp;license</span></span>
+  <br/>
+  <span class="code" id="4" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;4</span>&nbsp;<span class="comment">//&nbsp;=================================</span></span>
+  <br/>
+  <span class="code" id="5" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;5</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="6" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;6</span>&nbsp;<span class="kw">using</span>&nbsp;<span class="identifier">System</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="7" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;7</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="8" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;8</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">System.IO</span></span>
+  <br/>
+  <span class="code" id="9" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;9</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="10" xml:space="preserve"><span class="lineNumber">&nbsp;10</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">abstract</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../doc/class_InputStream_B895ABA4BFD9E6393A7395627FF850EE42AE55EB.html">InputStream</a></span>
+  <br/>
+  <span class="code" id="11" xml:space="preserve"><span class="lineNumber">&nbsp;11</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="12" xml:space="preserve"><span class="lineNumber">&nbsp;12</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">default</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<a href="../doc/class_InputStream_B895ABA4BFD9E6393A7395627FF850EE42AE55EB.html#default_constructor_InputStream_7D5649B84C4C91D763347586CD9848423E6B49C8">InputStream</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="13" xml:space="preserve"><span class="lineNumber">&nbsp;13</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">virtual</span>&nbsp;<span class="kw">default</span>&nbsp;<span class="other">~</span><a href="../doc/class_InputStream_B895ABA4BFD9E6393A7395627FF850EE42AE55EB.html#destructor_InputStream_5643B6E59D15021001F1DB7AB6C2C599154062E9">InputStream</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="14" xml:space="preserve"><span class="lineNumber">&nbsp;14</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">suppress</span>&nbsp;<a href="../doc/class_InputStream_B895ABA4BFD9E6393A7395627FF850EE42AE55EB.html#copy_constructor_InputStream_40F3BE66A53D917B7061913522D9647359537137">InputStream</a><span class="other">(</span><span class="kw">const</span>&nbsp;<a href="../doc/class_InputStream_B895ABA4BFD9E6393A7395627FF850EE42AE55EB.html">InputStream</a><span class="other">&amp;</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="15" xml:space="preserve"><span class="lineNumber">&nbsp;15</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">suppress</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/class_InputStream_B895ABA4BFD9E6393A7395627FF850EE42AE55EB.html#copy_assignment_op_assign_InputStream_BCDF0DFB3075FF6A43CC1D58A566E8A15441690E">operator=</a><span class="other">(</span><span class="kw">const</span>&nbsp;<a href="../doc/class_InputStream_B895ABA4BFD9E6393A7395627FF850EE42AE55EB.html">InputStream</a><span class="other">&amp;</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="16" xml:space="preserve"><span class="lineNumber">&nbsp;16</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">default</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<a href="../doc/class_InputStream_B895ABA4BFD9E6393A7395627FF850EE42AE55EB.html#move_constructor_InputStream_7027EA0240D5245013841AC728460D7C7DB13593">InputStream</a><span class="other">(</span><a href="../doc/class_InputStream_B895ABA4BFD9E6393A7395627FF850EE42AE55EB.html">InputStream</a><span class="other">&amp;&amp;</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="17" xml:space="preserve"><span class="lineNumber">&nbsp;17</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">default</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/class_InputStream_B895ABA4BFD9E6393A7395627FF850EE42AE55EB.html#move_assignment_op_assign_InputStream_AF663758DBDB898DA41A882A9DB7AAD2DF24B054">operator=</a><span class="other">(</span><a href="../doc/class_InputStream_B895ABA4BFD9E6393A7395627FF850EE42AE55EB.html">InputStream</a><span class="other">&amp;&amp;</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="18" xml:space="preserve"><span class="lineNumber">&nbsp;18</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">abstract</span>&nbsp;<span class="kw">int</span>&nbsp;<a href="../doc/class_InputStream_B895ABA4BFD9E6393A7395627FF850EE42AE55EB.html#member_function_Read_InputStream_3E924A8C5C07B4DB3929F035B7C89790369DD893">Read</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="19" xml:space="preserve"><span class="lineNumber">&nbsp;19</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">abstract</span>&nbsp;<a href="../doc/ns_System.html#typedef_string_B6DB6B2DEFC437FBF697A2E84F7B7771FC1DDEE3">string</a>&nbsp;<a href="../doc/class_InputStream_B895ABA4BFD9E6393A7395627FF850EE42AE55EB.html#member_function_ReadLine_InputStream_98BB0109EF356D058A3DBE4817DF1AF984A57BE2">ReadLine</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="20" xml:space="preserve"><span class="lineNumber">&nbsp;20</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">abstract</span>&nbsp;<a href="../doc/ns_System.html#typedef_string_B6DB6B2DEFC437FBF697A2E84F7B7771FC1DDEE3">string</a>&nbsp;<a href="../doc/class_InputStream_B895ABA4BFD9E6393A7395627FF850EE42AE55EB.html#member_function_ReadToEnd_InputStream_ADEBA2FF8EA641934E7FC7A34C6F28693F58D7EB">ReadToEnd</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="21" xml:space="preserve"><span class="lineNumber">&nbsp;21</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">abstract</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">bool</span>&nbsp;<a href="../doc/class_InputStream_B895ABA4BFD9E6393A7395627FF850EE42AE55EB.html#member_function_EndOfStream_InputStream_1ED62A5082C00BAE3F4982D9A09631A6D4AC0E38">EndOfStream</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="22" xml:space="preserve"><span class="lineNumber">&nbsp;22</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="23" xml:space="preserve"><span class="lineNumber">&nbsp;23</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="24" xml:space="preserve"><span class="lineNumber">&nbsp;24</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">abstract</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../doc/class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452.html">OutputStream</a></span>
+  <br/>
+  <span class="code" id="25" xml:space="preserve"><span class="lineNumber">&nbsp;25</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="26" xml:space="preserve"><span class="lineNumber">&nbsp;26</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">default</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<a href="../doc/class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452.html#default_constructor_OutputStream_9717706E7E516F622EBF564BB05E8D84C42E6449">OutputStream</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="27" xml:space="preserve"><span class="lineNumber">&nbsp;27</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">virtual</span>&nbsp;<span class="kw">default</span>&nbsp;<span class="other">~</span><a href="../doc/class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452.html#destructor_OutputStream_8657F91E0A6C3CCBA2A04C77E78FBDCD557D5976">OutputStream</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="28" xml:space="preserve"><span class="lineNumber">&nbsp;28</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">suppress</span>&nbsp;<a href="../doc/class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452.html#copy_constructor_OutputStream_A9B30B4E75EB94FCC1D747BD9209BFB4B6BEA2AA">OutputStream</a><span class="other">(</span><span class="kw">const</span>&nbsp;<a href="../doc/class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452.html">OutputStream</a><span class="other">&amp;</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="29" xml:space="preserve"><span class="lineNumber">&nbsp;29</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">suppress</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452.html#copy_assignment_op_assign_OutputStream_EB34DCA2EBEBB8548EB43C12922DDCD625C7C12F">operator=</a><span class="other">(</span><span class="kw">const</span>&nbsp;<a href="../doc/class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452.html">OutputStream</a><span class="other">&amp;</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="30" xml:space="preserve"><span class="lineNumber">&nbsp;30</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">default</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<a href="../doc/class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452.html#move_constructor_OutputStream_78D26119EA2468CCD190FA508BE342A5750B255D">OutputStream</a><span class="other">(</span><a href="../doc/class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452.html">OutputStream</a><span class="other">&amp;&amp;</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="31" xml:space="preserve"><span class="lineNumber">&nbsp;31</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">default</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452.html#move_assignment_op_assign_OutputStream_B4C7791665430951D4B05B8DD50776C069710A09">operator=</a><span class="other">(</span><a href="../doc/class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452.html">OutputStream</a><span class="other">&amp;&amp;</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="32" xml:space="preserve"><span class="lineNumber">&nbsp;32</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">abstract</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452.html#member_function_Write_OutputStream_14381E50002DA57FA60435068EC59336539E4336">Write</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="kw">char</span><span class="other">*</span>&nbsp;<span class="identifier">s</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="33" xml:space="preserve"><span class="lineNumber">&nbsp;33</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">abstract</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452.html#member_function_Write_OutputStream_645CD4BB53ADD4FFA6DDBC11122EDD501E45A2AE">Write</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="kw">wchar</span><span class="other">*</span>&nbsp;<span class="identifier">s</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="34" xml:space="preserve"><span class="lineNumber">&nbsp;34</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">abstract</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452.html#member_function_Write_OutputStream_E5E8FEAE93DE2BEB1C7B1A5565856BA351F8CF0E">Write</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="kw">uchar</span><span class="other">*</span>&nbsp;<span class="identifier">s</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="35" xml:space="preserve"><span class="lineNumber">&nbsp;35</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">abstract</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452.html#member_function_Write_OutputStream_FE237A2CD12AFACC0433DA63E59C8B2EED7EF816">Write</a><span class="other">(</span><span class="kw">const</span>&nbsp;<a href="../doc/ns_System.html#typedef_string_B6DB6B2DEFC437FBF697A2E84F7B7771FC1DDEE3">string</a><span class="other">&amp;</span>&nbsp;<span class="identifier">s</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="36" xml:space="preserve"><span class="lineNumber">&nbsp;36</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">abstract</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452.html#member_function_Write_OutputStream_2D93CDA2859CAC0D0B03CF18A57DA0686DF075AF">Write</a><span class="other">(</span><span class="kw">const</span>&nbsp;<a href="../doc/ns_System.html#typedef_wstring_EDB6336488DF46A7779AFB4209BAB1DAF59B5DAE">wstring</a><span class="other">&amp;</span>&nbsp;<span class="identifier">s</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="37" xml:space="preserve"><span class="lineNumber">&nbsp;37</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">abstract</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452.html#member_function_Write_OutputStream_BCA89A14B38B84F2518D3F334C7C53BDA8310E20">Write</a><span class="other">(</span><span class="kw">const</span>&nbsp;<a href="../doc/ns_System.html#typedef_ustring_1750E1C62AAF5897C1F1DA3C5BC4999982AE9B36">ustring</a><span class="other">&amp;</span>&nbsp;<span class="identifier">s</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="38" xml:space="preserve"><span class="lineNumber">&nbsp;38</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">abstract</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452.html#member_function_Write_OutputStream_F241FF4731110C8A2FA0401A54B6169129AEAD65">Write</a><span class="other">(</span><span class="kw">bool</span>&nbsp;<span class="identifier">b</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="39" xml:space="preserve"><span class="lineNumber">&nbsp;39</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">abstract</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452.html#member_function_Write_OutputStream_2AC43272071C47BBC77FD399BB96F6AE663AA0A8">Write</a><span class="other">(</span><span class="kw">char</span>&nbsp;<span class="identifier">c</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="40" xml:space="preserve"><span class="lineNumber">&nbsp;40</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">abstract</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452.html#member_function_Write_OutputStream_321FA1AB9A790DEBA67BC46C202106CF29B43CF2">Write</a><span class="other">(</span><span class="kw">wchar</span>&nbsp;<span class="identifier">c</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="41" xml:space="preserve"><span class="lineNumber">&nbsp;41</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">abstract</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452.html#member_function_Write_OutputStream_6DC04E8AFDE36F6614CF1F1BFD7CE1FE51255FF3">Write</a><span class="other">(</span><span class="kw">uchar</span>&nbsp;<span class="identifier">c</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="42" xml:space="preserve"><span class="lineNumber">&nbsp;42</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">abstract</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452.html#member_function_Write_OutputStream_CED0AE5CF45015272BB34134D2EB53080E00B9D8">Write</a><span class="other">(</span><span class="kw">sbyte</span>&nbsp;<span class="identifier">s</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="43" xml:space="preserve"><span class="lineNumber">&nbsp;43</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">abstract</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452.html#member_function_Write_OutputStream_4C79F03EA108188534CBA31771D339DF1E5DE3A9">Write</a><span class="other">(</span><span class="kw">byte</span>&nbsp;<span class="identifier">b</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="44" xml:space="preserve"><span class="lineNumber">&nbsp;44</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">abstract</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452.html#member_function_Write_OutputStream_263B5DF158BE603ADC3F7615B6E304BD58B26AAD">Write</a><span class="other">(</span><span class="kw">short</span>&nbsp;<span class="identifier">s</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="45" xml:space="preserve"><span class="lineNumber">&nbsp;45</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">abstract</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452.html#member_function_Write_OutputStream_2710022DCA96CC490A4057F08D2DA0E5AFFD5083">Write</a><span class="other">(</span><span class="kw">ushort</span>&nbsp;<span class="identifier">u</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="46" xml:space="preserve"><span class="lineNumber">&nbsp;46</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">abstract</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452.html#member_function_Write_OutputStream_CF5AE02C47D0DADA399E97625AD877CD20296E05">Write</a><span class="other">(</span><span class="kw">int</span>&nbsp;<span class="identifier">i</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="47" xml:space="preserve"><span class="lineNumber">&nbsp;47</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">abstract</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452.html#member_function_Write_OutputStream_FD5E635B53DC75C29A751204A7322C674250B9F1">Write</a><span class="other">(</span><span class="kw">uint</span>&nbsp;<span class="identifier">u</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="48" xml:space="preserve"><span class="lineNumber">&nbsp;48</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">abstract</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452.html#member_function_Write_OutputStream_084C20C518BB23F8DBB5888683753710F9B9A7F5">Write</a><span class="other">(</span><span class="kw">long</span>&nbsp;<span class="identifier">l</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="49" xml:space="preserve"><span class="lineNumber">&nbsp;49</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">abstract</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452.html#member_function_Write_OutputStream_8ABFE3BF010613E18223C1CF3374D3183EBDBC0F">Write</a><span class="other">(</span><span class="kw">ulong</span>&nbsp;<span class="identifier">u</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="50" xml:space="preserve"><span class="lineNumber">&nbsp;50</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">abstract</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452.html#member_function_Write_OutputStream_10BB29CC18D44EB86F582E957118C9925EF27ADA">Write</a><span class="other">(</span><span class="kw">float</span>&nbsp;<span class="identifier">f</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="51" xml:space="preserve"><span class="lineNumber">&nbsp;51</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">abstract</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452.html#member_function_Write_OutputStream_E84F5BF2CE2855E02AA424CFD622630ECFDE366B">Write</a><span class="other">(</span><span class="kw">double</span>&nbsp;<span class="identifier">d</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="52" xml:space="preserve"><span class="lineNumber">&nbsp;52</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">abstract</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452.html#member_function_Write_OutputStream_5250B0CFEAD21196322860725DBDB20363351591">Write</a><span class="other">(</span><span class="kw">const</span>&nbsp;<a href="../doc/class_Date_351EEEABF504E83A9336BC83CE10D3450072F1E8.html">Date</a><span class="other">&amp;</span>&nbsp;<span class="identifier">date</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="53" xml:space="preserve"><span class="lineNumber">&nbsp;53</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">abstract</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452.html#member_function_Write_OutputStream_70E11395AB807802CC40012718ACCFB213D11DDE">Write</a><span class="other">(</span><span class="kw">const</span>&nbsp;<a href="../doc/class_DateTime_1CCCF400289F734AAAB9BC0562E46C77468B398E.html">DateTime</a><span class="other">&amp;</span>&nbsp;<span class="identifier">dateTime</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="54" xml:space="preserve"><span class="lineNumber">&nbsp;54</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">abstract</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452.html#member_function_WriteLine_OutputStream_A1C626A588CF5C150737D66E04D529E4BDD75A74">WriteLine</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="55" xml:space="preserve"><span class="lineNumber">&nbsp;55</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">abstract</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452.html#member_function_WriteLine_OutputStream_4FB0F1757F6B8C2F59A073817EDD001E71AC90AC">WriteLine</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="kw">char</span><span class="other">*</span>&nbsp;<span class="identifier">s</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="56" xml:space="preserve"><span class="lineNumber">&nbsp;56</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">abstract</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452.html#member_function_WriteLine_OutputStream_9521351A816AA02134A4B26D09306276D1BF5B2B">WriteLine</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="kw">wchar</span><span class="other">*</span>&nbsp;<span class="identifier">s</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="57" xml:space="preserve"><span class="lineNumber">&nbsp;57</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">abstract</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452.html#member_function_WriteLine_OutputStream_605965794173F719977C43C40DCBB7EAE752E967">WriteLine</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="kw">uchar</span><span class="other">*</span>&nbsp;<span class="identifier">s</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="58" xml:space="preserve"><span class="lineNumber">&nbsp;58</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">abstract</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452.html#member_function_WriteLine_OutputStream_DD08702CFFDA4D40ED5AD6BCA11811782D9462C2">WriteLine</a><span class="other">(</span><span class="kw">const</span>&nbsp;<a href="../doc/ns_System.html#typedef_string_B6DB6B2DEFC437FBF697A2E84F7B7771FC1DDEE3">string</a><span class="other">&amp;</span>&nbsp;<span class="identifier">s</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="59" xml:space="preserve"><span class="lineNumber">&nbsp;59</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">abstract</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452.html#member_function_WriteLine_OutputStream_EABCFB9CE867A7B33198944E8CAAD397931C4E5F">WriteLine</a><span class="other">(</span><span class="kw">const</span>&nbsp;<a href="../doc/ns_System.html#typedef_wstring_EDB6336488DF46A7779AFB4209BAB1DAF59B5DAE">wstring</a><span class="other">&amp;</span>&nbsp;<span class="identifier">s</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="60" xml:space="preserve"><span class="lineNumber">&nbsp;60</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">abstract</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452.html#member_function_WriteLine_OutputStream_12D3BFF746EE0551E34567E7BD3486BF5339BDAB">WriteLine</a><span class="other">(</span><span class="kw">const</span>&nbsp;<a href="../doc/ns_System.html#typedef_ustring_1750E1C62AAF5897C1F1DA3C5BC4999982AE9B36">ustring</a><span class="other">&amp;</span>&nbsp;<span class="identifier">s</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="61" xml:space="preserve"><span class="lineNumber">&nbsp;61</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">abstract</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452.html#member_function_WriteLine_OutputStream_DBB82ECCC0F44DDC02F8BC30417C12F91ED1C58A">WriteLine</a><span class="other">(</span><span class="kw">bool</span>&nbsp;<span class="identifier">b</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="62" xml:space="preserve"><span class="lineNumber">&nbsp;62</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">abstract</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452.html#member_function_WriteLine_OutputStream_E487F80977733522AD5345B22FD5FDD2067353CA">WriteLine</a><span class="other">(</span><span class="kw">char</span>&nbsp;<span class="identifier">c</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="63" xml:space="preserve"><span class="lineNumber">&nbsp;63</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">abstract</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452.html#member_function_WriteLine_OutputStream_4C64D22BEDDF6DFC90B27A3BA170F3C2402FA13E">WriteLine</a><span class="other">(</span><span class="kw">wchar</span>&nbsp;<span class="identifier">c</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="64" xml:space="preserve"><span class="lineNumber">&nbsp;64</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">abstract</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452.html#member_function_WriteLine_OutputStream_122B46FFEA55338D27C9427ED332CD44958D5B66">WriteLine</a><span class="other">(</span><span class="kw">uchar</span>&nbsp;<span class="identifier">c</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="65" xml:space="preserve"><span class="lineNumber">&nbsp;65</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">abstract</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452.html#member_function_WriteLine_OutputStream_F38F53441D2C83BF85C60269EDB0CCF8E3E7E243">WriteLine</a><span class="other">(</span><span class="kw">sbyte</span>&nbsp;<span class="identifier">s</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="66" xml:space="preserve"><span class="lineNumber">&nbsp;66</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">abstract</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452.html#member_function_WriteLine_OutputStream_A20B9BD7A5F67A45F48CA30D26E44E62E595603E">WriteLine</a><span class="other">(</span><span class="kw">byte</span>&nbsp;<span class="identifier">b</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="67" xml:space="preserve"><span class="lineNumber">&nbsp;67</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">abstract</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452.html#member_function_WriteLine_OutputStream_A1CFDFDA4FB88475B8B65A5F6C41D927DD936761">WriteLine</a><span class="other">(</span><span class="kw">short</span>&nbsp;<span class="identifier">s</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="68" xml:space="preserve"><span class="lineNumber">&nbsp;68</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">abstract</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452.html#member_function_WriteLine_OutputStream_E658D2A94A8DD5DC25A755EE3011032DC892AC54">WriteLine</a><span class="other">(</span><span class="kw">ushort</span>&nbsp;<span class="identifier">u</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="69" xml:space="preserve"><span class="lineNumber">&nbsp;69</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">abstract</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452.html#member_function_WriteLine_OutputStream_A783F07F95AAEBC3C6120C3EA20D4DA451562633">WriteLine</a><span class="other">(</span><span class="kw">int</span>&nbsp;<span class="identifier">i</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="70" xml:space="preserve"><span class="lineNumber">&nbsp;70</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">abstract</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452.html#member_function_WriteLine_OutputStream_4C732656D3B17B032C90CFB603D63E235F050C68">WriteLine</a><span class="other">(</span><span class="kw">uint</span>&nbsp;<span class="identifier">u</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="71" xml:space="preserve"><span class="lineNumber">&nbsp;71</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">abstract</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452.html#member_function_WriteLine_OutputStream_520C161212D27DC2140677E10AE943E78059890E">WriteLine</a><span class="other">(</span><span class="kw">long</span>&nbsp;<span class="identifier">l</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="72" xml:space="preserve"><span class="lineNumber">&nbsp;72</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">abstract</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452.html#member_function_WriteLine_OutputStream_3FD8E7B119F957AA6E2257066FFA928E6469EF91">WriteLine</a><span class="other">(</span><span class="kw">ulong</span>&nbsp;<span class="identifier">u</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="73" xml:space="preserve"><span class="lineNumber">&nbsp;73</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">abstract</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452.html#member_function_WriteLine_OutputStream_BDECEB1EB819F38921A695A24E873DBA55B4E2E4">WriteLine</a><span class="other">(</span><span class="kw">float</span>&nbsp;<span class="identifier">f</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="74" xml:space="preserve"><span class="lineNumber">&nbsp;74</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">abstract</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452.html#member_function_WriteLine_OutputStream_F469F229CCAEE14D835D19087353D46A310E8582">WriteLine</a><span class="other">(</span><span class="kw">double</span>&nbsp;<span class="identifier">d</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="75" xml:space="preserve"><span class="lineNumber">&nbsp;75</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">abstract</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452.html#member_function_WriteLine_OutputStream_7060ED70B797BF9AAFA3E8EB459EA72743AF4E49">WriteLine</a><span class="other">(</span><span class="kw">const</span>&nbsp;<a href="../doc/class_Date_351EEEABF504E83A9336BC83CE10D3450072F1E8.html">Date</a><span class="other">&amp;</span>&nbsp;<span class="identifier">date</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="76" xml:space="preserve"><span class="lineNumber">&nbsp;76</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">abstract</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452.html#member_function_WriteLine_OutputStream_D7A0A48AC2DBDD31CA034840206A38B1E7AC1334">WriteLine</a><span class="other">(</span><span class="kw">const</span>&nbsp;<a href="../doc/class_DateTime_1CCCF400289F734AAAB9BC0562E46C77468B398E.html">DateTime</a><span class="other">&amp;</span>&nbsp;<span class="identifier">dateTime</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="77" xml:space="preserve"><span class="lineNumber">&nbsp;77</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="78" xml:space="preserve"><span class="lineNumber">&nbsp;78</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="79" xml:space="preserve"><span class="lineNumber">&nbsp;79</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<a href="../doc/class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452.html">OutputStream</a><span class="other">&amp;</span>&nbsp;<a href="../doc/ns_System.IO.html#function_op_shl_8B9C77002F9310427D2D2FD37D3335703C024074">operator&lt;&lt;</a><span class="other">(</span><a href="../doc/class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452.html">OutputStream</a><span class="other">&amp;</span>&nbsp;<span class="identifier">s</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<span class="kw">char</span><span class="other">*</span>&nbsp;<span class="identifier">x</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="80" xml:space="preserve"><span class="lineNumber">&nbsp;80</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="81" xml:space="preserve"><span class="lineNumber">&nbsp;81</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">s</span><span class="other">.</span><a href="../doc/class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452.html#member_function_Write_OutputStream_14381E50002DA57FA60435068EC59336539E4336">Write</a><span class="other">(</span><span class="identifier">x</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="82" xml:space="preserve"><span class="lineNumber">&nbsp;82</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">s</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="83" xml:space="preserve"><span class="lineNumber">&nbsp;83</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="84" xml:space="preserve"><span class="lineNumber">&nbsp;84</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="85" xml:space="preserve"><span class="lineNumber">&nbsp;85</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<a href="../doc/class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452.html">OutputStream</a><span class="other">&amp;</span>&nbsp;<a href="../doc/ns_System.IO.html#function_op_shl_4E5017C76B162064D2EAF11A92D51EAC40489B5F">operator&lt;&lt;</a><span class="other">(</span><a href="../doc/class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452.html">OutputStream</a><span class="other">&amp;</span>&nbsp;<span class="identifier">s</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<span class="kw">wchar</span><span class="other">*</span>&nbsp;<span class="identifier">x</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="86" xml:space="preserve"><span class="lineNumber">&nbsp;86</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="87" xml:space="preserve"><span class="lineNumber">&nbsp;87</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">s</span><span class="other">.</span><a href="../doc/class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452.html#member_function_Write_OutputStream_645CD4BB53ADD4FFA6DDBC11122EDD501E45A2AE">Write</a><span class="other">(</span><span class="identifier">x</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="88" xml:space="preserve"><span class="lineNumber">&nbsp;88</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">s</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="89" xml:space="preserve"><span class="lineNumber">&nbsp;89</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="90" xml:space="preserve"><span class="lineNumber">&nbsp;90</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="91" xml:space="preserve"><span class="lineNumber">&nbsp;91</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<a href="../doc/class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452.html">OutputStream</a><span class="other">&amp;</span>&nbsp;<a href="../doc/ns_System.IO.html#function_op_shl_1DCB89EAF22CF381018DA9F66F790498ADF5E452">operator&lt;&lt;</a><span class="other">(</span><a href="../doc/class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452.html">OutputStream</a><span class="other">&amp;</span>&nbsp;<span class="identifier">s</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<span class="kw">uchar</span><span class="other">*</span>&nbsp;<span class="identifier">x</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="92" xml:space="preserve"><span class="lineNumber">&nbsp;92</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="93" xml:space="preserve"><span class="lineNumber">&nbsp;93</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">s</span><span class="other">.</span><a href="../doc/class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452.html#member_function_Write_OutputStream_E5E8FEAE93DE2BEB1C7B1A5565856BA351F8CF0E">Write</a><span class="other">(</span><span class="identifier">x</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="94" xml:space="preserve"><span class="lineNumber">&nbsp;94</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">s</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="95" xml:space="preserve"><span class="lineNumber">&nbsp;95</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="96" xml:space="preserve"><span class="lineNumber">&nbsp;96</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="97" xml:space="preserve"><span class="lineNumber">&nbsp;97</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<a href="../doc/class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452.html">OutputStream</a><span class="other">&amp;</span>&nbsp;<a href="../doc/ns_System.IO.html#function_op_shl_49892595972A7B033E1CECAFA86D8AFB4CA05757">operator&lt;&lt;</a><span class="other">(</span><a href="../doc/class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452.html">OutputStream</a><span class="other">&amp;</span>&nbsp;<span class="identifier">s</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<a href="../doc/ns_System.html#typedef_string_B6DB6B2DEFC437FBF697A2E84F7B7771FC1DDEE3">string</a><span class="other">&amp;</span>&nbsp;<span class="identifier">x</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="98" xml:space="preserve"><span class="lineNumber">&nbsp;98</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="99" xml:space="preserve"><span class="lineNumber">&nbsp;99</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">s</span><span class="other">.</span><a href="../doc/class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452.html#member_function_Write_OutputStream_FE237A2CD12AFACC0433DA63E59C8B2EED7EF816">Write</a><span class="other">(</span><span class="identifier">x</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="100" xml:space="preserve"><span class="lineNumber">100</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">s</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="101" xml:space="preserve"><span class="lineNumber">101</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="102" xml:space="preserve"><span class="lineNumber">102</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="103" xml:space="preserve"><span class="lineNumber">103</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<a href="../doc/class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452.html">OutputStream</a><span class="other">&amp;</span>&nbsp;<a href="../doc/ns_System.IO.html#function_op_shl_C190C73F4712864327307E6C54FFC83EECEFDF57">operator&lt;&lt;</a><span class="other">(</span><a href="../doc/class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452.html">OutputStream</a><span class="other">&amp;</span>&nbsp;<span class="identifier">s</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<a href="../doc/ns_System.html#typedef_wstring_EDB6336488DF46A7779AFB4209BAB1DAF59B5DAE">wstring</a><span class="other">&amp;</span>&nbsp;<span class="identifier">x</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="104" xml:space="preserve"><span class="lineNumber">104</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="105" xml:space="preserve"><span class="lineNumber">105</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">s</span><span class="other">.</span><a href="../doc/class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452.html#member_function_Write_OutputStream_2D93CDA2859CAC0D0B03CF18A57DA0686DF075AF">Write</a><span class="other">(</span><span class="identifier">x</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="106" xml:space="preserve"><span class="lineNumber">106</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">s</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="107" xml:space="preserve"><span class="lineNumber">107</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="108" xml:space="preserve"><span class="lineNumber">108</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="109" xml:space="preserve"><span class="lineNumber">109</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<a href="../doc/class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452.html">OutputStream</a><span class="other">&amp;</span>&nbsp;<a href="../doc/ns_System.IO.html#function_op_shl_EEF147124B24E3190EA9B8A49BC78146B179FC2B">operator&lt;&lt;</a><span class="other">(</span><a href="../doc/class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452.html">OutputStream</a><span class="other">&amp;</span>&nbsp;<span class="identifier">s</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<a href="../doc/ns_System.html#typedef_ustring_1750E1C62AAF5897C1F1DA3C5BC4999982AE9B36">ustring</a><span class="other">&amp;</span>&nbsp;<span class="identifier">x</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="110" xml:space="preserve"><span class="lineNumber">110</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="111" xml:space="preserve"><span class="lineNumber">111</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">s</span><span class="other">.</span><a href="../doc/class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452.html#member_function_Write_OutputStream_BCA89A14B38B84F2518D3F334C7C53BDA8310E20">Write</a><span class="other">(</span><span class="identifier">x</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="112" xml:space="preserve"><span class="lineNumber">112</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">s</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="113" xml:space="preserve"><span class="lineNumber">113</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="114" xml:space="preserve"><span class="lineNumber">114</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="115" xml:space="preserve"><span class="lineNumber">115</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<a href="../doc/class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452.html">OutputStream</a><span class="other">&amp;</span>&nbsp;<a href="../doc/ns_System.IO.html#function_op_shl_F5A9436710D9E3BB22E14E8E995CCABF892C87A6">operator&lt;&lt;</a><span class="other">(</span><a href="../doc/class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452.html">OutputStream</a><span class="other">&amp;</span>&nbsp;<span class="identifier">s</span><span class="other">,&nbsp;</span><span class="kw">bool</span>&nbsp;<span class="identifier">x</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="116" xml:space="preserve"><span class="lineNumber">116</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="117" xml:space="preserve"><span class="lineNumber">117</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">s</span><span class="other">.</span><a href="../doc/class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452.html#member_function_Write_OutputStream_F241FF4731110C8A2FA0401A54B6169129AEAD65">Write</a><span class="other">(</span><span class="identifier">x</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="118" xml:space="preserve"><span class="lineNumber">118</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">s</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="119" xml:space="preserve"><span class="lineNumber">119</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="120" xml:space="preserve"><span class="lineNumber">120</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="121" xml:space="preserve"><span class="lineNumber">121</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<a href="../doc/class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452.html">OutputStream</a><span class="other">&amp;</span>&nbsp;<a href="../doc/ns_System.IO.html#function_op_shl_9327BF1AC396F8396C037B5416DF2256F0C5DA3E">operator&lt;&lt;</a><span class="other">(</span><a href="../doc/class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452.html">OutputStream</a><span class="other">&amp;</span>&nbsp;<span class="identifier">s</span><span class="other">,&nbsp;</span><span class="kw">sbyte</span>&nbsp;<span class="identifier">x</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="122" xml:space="preserve"><span class="lineNumber">122</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="123" xml:space="preserve"><span class="lineNumber">123</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">s</span><span class="other">.</span><a href="../doc/class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452.html#member_function_Write_OutputStream_CED0AE5CF45015272BB34134D2EB53080E00B9D8">Write</a><span class="other">(</span><span class="identifier">x</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="124" xml:space="preserve"><span class="lineNumber">124</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">s</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="125" xml:space="preserve"><span class="lineNumber">125</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="126" xml:space="preserve"><span class="lineNumber">126</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="127" xml:space="preserve"><span class="lineNumber">127</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<a href="../doc/class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452.html">OutputStream</a><span class="other">&amp;</span>&nbsp;<a href="../doc/ns_System.IO.html#function_op_shl_62754DB9C59BA5429BFE531B16CE1A7261206044">operator&lt;&lt;</a><span class="other">(</span><a href="../doc/class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452.html">OutputStream</a><span class="other">&amp;</span>&nbsp;<span class="identifier">s</span><span class="other">,&nbsp;</span><span class="kw">byte</span>&nbsp;<span class="identifier">x</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="128" xml:space="preserve"><span class="lineNumber">128</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="129" xml:space="preserve"><span class="lineNumber">129</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">s</span><span class="other">.</span><a href="../doc/class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452.html#member_function_Write_OutputStream_4C79F03EA108188534CBA31771D339DF1E5DE3A9">Write</a><span class="other">(</span><span class="identifier">x</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="130" xml:space="preserve"><span class="lineNumber">130</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">s</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="131" xml:space="preserve"><span class="lineNumber">131</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="132" xml:space="preserve"><span class="lineNumber">132</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="133" xml:space="preserve"><span class="lineNumber">133</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<a href="../doc/class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452.html">OutputStream</a><span class="other">&amp;</span>&nbsp;<a href="../doc/ns_System.IO.html#function_op_shl_096EFD72E9EF7C22D4B36DE53A21D33B6BD126E6">operator&lt;&lt;</a><span class="other">(</span><a href="../doc/class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452.html">OutputStream</a><span class="other">&amp;</span>&nbsp;<span class="identifier">s</span><span class="other">,&nbsp;</span><span class="kw">short</span>&nbsp;<span class="identifier">x</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="134" xml:space="preserve"><span class="lineNumber">134</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="135" xml:space="preserve"><span class="lineNumber">135</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">s</span><span class="other">.</span><a href="../doc/class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452.html#member_function_Write_OutputStream_263B5DF158BE603ADC3F7615B6E304BD58B26AAD">Write</a><span class="other">(</span><span class="identifier">x</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="136" xml:space="preserve"><span class="lineNumber">136</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">s</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="137" xml:space="preserve"><span class="lineNumber">137</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="138" xml:space="preserve"><span class="lineNumber">138</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="139" xml:space="preserve"><span class="lineNumber">139</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<a href="../doc/class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452.html">OutputStream</a><span class="other">&amp;</span>&nbsp;<a href="../doc/ns_System.IO.html#function_op_shl_26E7D2DE7417885151B17F2CB02D4C9180C76F5A">operator&lt;&lt;</a><span class="other">(</span><a href="../doc/class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452.html">OutputStream</a><span class="other">&amp;</span>&nbsp;<span class="identifier">s</span><span class="other">,&nbsp;</span><span class="kw">ushort</span>&nbsp;<span class="identifier">x</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="140" xml:space="preserve"><span class="lineNumber">140</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="141" xml:space="preserve"><span class="lineNumber">141</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">s</span><span class="other">.</span><a href="../doc/class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452.html#member_function_Write_OutputStream_2710022DCA96CC490A4057F08D2DA0E5AFFD5083">Write</a><span class="other">(</span><span class="identifier">x</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="142" xml:space="preserve"><span class="lineNumber">142</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">s</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="143" xml:space="preserve"><span class="lineNumber">143</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="144" xml:space="preserve"><span class="lineNumber">144</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="145" xml:space="preserve"><span class="lineNumber">145</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<a href="../doc/class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452.html">OutputStream</a><span class="other">&amp;</span>&nbsp;<a href="../doc/ns_System.IO.html#function_op_shl_DEABD1B6DC1CB605B5A503CA43A4E05CBB7DBE69">operator&lt;&lt;</a><span class="other">(</span><a href="../doc/class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452.html">OutputStream</a><span class="other">&amp;</span>&nbsp;<span class="identifier">s</span><span class="other">,&nbsp;</span><span class="kw">int</span>&nbsp;<span class="identifier">x</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="146" xml:space="preserve"><span class="lineNumber">146</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="147" xml:space="preserve"><span class="lineNumber">147</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">s</span><span class="other">.</span><a href="../doc/class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452.html#member_function_Write_OutputStream_CF5AE02C47D0DADA399E97625AD877CD20296E05">Write</a><span class="other">(</span><span class="identifier">x</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="148" xml:space="preserve"><span class="lineNumber">148</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">s</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="149" xml:space="preserve"><span class="lineNumber">149</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="150" xml:space="preserve"><span class="lineNumber">150</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="151" xml:space="preserve"><span class="lineNumber">151</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<a href="../doc/class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452.html">OutputStream</a><span class="other">&amp;</span>&nbsp;<a href="../doc/ns_System.IO.html#function_op_shl_7ABC9434B961059FD22ABBF578E8CA001D0EA66D">operator&lt;&lt;</a><span class="other">(</span><a href="../doc/class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452.html">OutputStream</a><span class="other">&amp;</span>&nbsp;<span class="identifier">s</span><span class="other">,&nbsp;</span><span class="kw">uint</span>&nbsp;<span class="identifier">x</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="152" xml:space="preserve"><span class="lineNumber">152</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="153" xml:space="preserve"><span class="lineNumber">153</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">s</span><span class="other">.</span><a href="../doc/class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452.html#member_function_Write_OutputStream_FD5E635B53DC75C29A751204A7322C674250B9F1">Write</a><span class="other">(</span><span class="identifier">x</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="154" xml:space="preserve"><span class="lineNumber">154</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">s</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="155" xml:space="preserve"><span class="lineNumber">155</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="156" xml:space="preserve"><span class="lineNumber">156</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="157" xml:space="preserve"><span class="lineNumber">157</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<a href="../doc/class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452.html">OutputStream</a><span class="other">&amp;</span>&nbsp;<a href="../doc/ns_System.IO.html#function_op_shl_6D9D91D6E907C2FEEE5D6D786B550ECE9EBD2351">operator&lt;&lt;</a><span class="other">(</span><a href="../doc/class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452.html">OutputStream</a><span class="other">&amp;</span>&nbsp;<span class="identifier">s</span><span class="other">,&nbsp;</span><span class="kw">long</span>&nbsp;<span class="identifier">x</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="158" xml:space="preserve"><span class="lineNumber">158</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="159" xml:space="preserve"><span class="lineNumber">159</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">s</span><span class="other">.</span><a href="../doc/class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452.html#member_function_Write_OutputStream_084C20C518BB23F8DBB5888683753710F9B9A7F5">Write</a><span class="other">(</span><span class="identifier">x</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="160" xml:space="preserve"><span class="lineNumber">160</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">s</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="161" xml:space="preserve"><span class="lineNumber">161</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="162" xml:space="preserve"><span class="lineNumber">162</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="163" xml:space="preserve"><span class="lineNumber">163</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<a href="../doc/class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452.html">OutputStream</a><span class="other">&amp;</span>&nbsp;<a href="../doc/ns_System.IO.html#function_op_shl_4969CA354E16A3D540C5A3D6C3481DCFDE45E380">operator&lt;&lt;</a><span class="other">(</span><a href="../doc/class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452.html">OutputStream</a><span class="other">&amp;</span>&nbsp;<span class="identifier">s</span><span class="other">,&nbsp;</span><span class="kw">ulong</span>&nbsp;<span class="identifier">x</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="164" xml:space="preserve"><span class="lineNumber">164</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="165" xml:space="preserve"><span class="lineNumber">165</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">s</span><span class="other">.</span><a href="../doc/class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452.html#member_function_Write_OutputStream_8ABFE3BF010613E18223C1CF3374D3183EBDBC0F">Write</a><span class="other">(</span><span class="identifier">x</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="166" xml:space="preserve"><span class="lineNumber">166</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">s</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="167" xml:space="preserve"><span class="lineNumber">167</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="168" xml:space="preserve"><span class="lineNumber">168</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="169" xml:space="preserve"><span class="lineNumber">169</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<a href="../doc/class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452.html">OutputStream</a><span class="other">&amp;</span>&nbsp;<a href="../doc/ns_System.IO.html#function_op_shl_4F9AB5F8DEA9E94762AE50D43A58944EFC08073B">operator&lt;&lt;</a><span class="other">(</span><a href="../doc/class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452.html">OutputStream</a><span class="other">&amp;</span>&nbsp;<span class="identifier">s</span><span class="other">,&nbsp;</span><span class="kw">float</span>&nbsp;<span class="identifier">x</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="170" xml:space="preserve"><span class="lineNumber">170</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="171" xml:space="preserve"><span class="lineNumber">171</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">s</span><span class="other">.</span><a href="../doc/class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452.html#member_function_Write_OutputStream_10BB29CC18D44EB86F582E957118C9925EF27ADA">Write</a><span class="other">(</span><span class="identifier">x</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="172" xml:space="preserve"><span class="lineNumber">172</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">s</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="173" xml:space="preserve"><span class="lineNumber">173</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="174" xml:space="preserve"><span class="lineNumber">174</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="175" xml:space="preserve"><span class="lineNumber">175</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<a href="../doc/class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452.html">OutputStream</a><span class="other">&amp;</span>&nbsp;<a href="../doc/ns_System.IO.html#function_op_shl_AE9443E4627A138D220FFA50E2EFDB80D89D4217">operator&lt;&lt;</a><span class="other">(</span><a href="../doc/class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452.html">OutputStream</a><span class="other">&amp;</span>&nbsp;<span class="identifier">s</span><span class="other">,&nbsp;</span><span class="kw">double</span>&nbsp;<span class="identifier">x</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="176" xml:space="preserve"><span class="lineNumber">176</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="177" xml:space="preserve"><span class="lineNumber">177</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">s</span><span class="other">.</span><a href="../doc/class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452.html#member_function_Write_OutputStream_E84F5BF2CE2855E02AA424CFD622630ECFDE366B">Write</a><span class="other">(</span><span class="identifier">x</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="178" xml:space="preserve"><span class="lineNumber">178</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">s</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="179" xml:space="preserve"><span class="lineNumber">179</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="180" xml:space="preserve"><span class="lineNumber">180</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+  <br/>
+  <span class="code" id="181" xml:space="preserve"><span class="lineNumber">181</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<a href="../doc/class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452.html">OutputStream</a><span class="other">&amp;</span>&nbsp;<a href="../doc/ns_System.IO.html#function_op_shl_7B28E193E8389F87168C44B68E78DD2E329560F3">operator&lt;&lt;</a><span class="other">(</span><a href="../doc/class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452.html">OutputStream</a><span class="other">&amp;</span>&nbsp;<span class="identifier">s</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<a href="../doc/class_Date_351EEEABF504E83A9336BC83CE10D3450072F1E8.html">Date</a><span class="other">&amp;</span>&nbsp;<span class="identifier">date</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="182" xml:space="preserve"><span class="lineNumber">182</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="183" xml:space="preserve"><span class="lineNumber">183</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">s</span><span class="other">.</span><a href="../doc/class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452.html#member_function_Write_OutputStream_5250B0CFEAD21196322860725DBDB20363351591">Write</a><span class="other">(</span><span class="identifier">date</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="184" xml:space="preserve"><span class="lineNumber">184</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">s</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="185" xml:space="preserve"><span class="lineNumber">185</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="186" xml:space="preserve"><span class="lineNumber">186</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+  <br/>
+  <span class="code" id="187" xml:space="preserve"><span class="lineNumber">187</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<a href="../doc/class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452.html">OutputStream</a><span class="other">&amp;</span>&nbsp;<a href="../doc/ns_System.IO.html#function_op_shl_18BBC67E67DC91AD02E3A722CC6E41E49468E13D">operator&lt;&lt;</a><span class="other">(</span><a href="../doc/class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452.html">OutputStream</a><span class="other">&amp;</span>&nbsp;<span class="identifier">s</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<a href="../doc/class_DateTime_1CCCF400289F734AAAB9BC0562E46C77468B398E.html">DateTime</a><span class="other">&amp;</span>&nbsp;<span class="identifier">dateTime</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="188" xml:space="preserve"><span class="lineNumber">188</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="189" xml:space="preserve"><span class="lineNumber">189</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">s</span><span class="other">.</span><a href="../doc/class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452.html#member_function_Write_OutputStream_70E11395AB807802CC40012718ACCFB213D11DDE">Write</a><span class="other">(</span><span class="identifier">dateTime</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="190" xml:space="preserve"><span class="lineNumber">190</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">s</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="191" xml:space="preserve"><span class="lineNumber">191</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="192" xml:space="preserve"><span class="lineNumber">192</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+  <br/>
+  <span class="code" id="193" xml:space="preserve"><span class="lineNumber">193</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<a href="../doc/class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452.html">OutputStream</a><span class="other">&amp;</span>&nbsp;<a href="../doc/ns_System.IO.html#function_op_shl_31FA515175D7E4EC3B71904ADBA56D0090FA7732">operator&lt;&lt;</a><span class="other">(</span><a href="../doc/class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452.html">OutputStream</a><span class="other">&amp;</span>&nbsp;<span class="identifier">s</span><span class="other">,&nbsp;</span><span class="kw">char</span>&nbsp;<span class="identifier">x</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="194" xml:space="preserve"><span class="lineNumber">194</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="195" xml:space="preserve"><span class="lineNumber">195</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">s</span><span class="other">.</span><a href="../doc/class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452.html#member_function_Write_OutputStream_2AC43272071C47BBC77FD399BB96F6AE663AA0A8">Write</a><span class="other">(</span><span class="identifier">x</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="196" xml:space="preserve"><span class="lineNumber">196</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">s</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="197" xml:space="preserve"><span class="lineNumber">197</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="198" xml:space="preserve"><span class="lineNumber">198</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+  <br/>
+  <span class="code" id="199" xml:space="preserve"><span class="lineNumber">199</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<a href="../doc/class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452.html">OutputStream</a><span class="other">&amp;</span>&nbsp;<a href="../doc/ns_System.IO.html#function_op_shl_B22A6F11B5FAE2FD77F34A5D3E68FE0AB096736B">operator&lt;&lt;</a><span class="other">(</span><a href="../doc/class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452.html">OutputStream</a><span class="other">&amp;</span>&nbsp;<span class="identifier">s</span><span class="other">,&nbsp;</span><span class="kw">wchar</span>&nbsp;<span class="identifier">x</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="200" xml:space="preserve"><span class="lineNumber">200</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="201" xml:space="preserve"><span class="lineNumber">201</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">s</span><span class="other">.</span><a href="../doc/class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452.html#member_function_Write_OutputStream_321FA1AB9A790DEBA67BC46C202106CF29B43CF2">Write</a><span class="other">(</span><span class="identifier">x</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="202" xml:space="preserve"><span class="lineNumber">202</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">s</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="203" xml:space="preserve"><span class="lineNumber">203</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="204" xml:space="preserve"><span class="lineNumber">204</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+  <br/>
+  <span class="code" id="205" xml:space="preserve"><span class="lineNumber">205</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<a href="../doc/class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452.html">OutputStream</a><span class="other">&amp;</span>&nbsp;<a href="../doc/ns_System.IO.html#function_op_shl_620F811676CBD8561C828EF292446BA6D028229A">operator&lt;&lt;</a><span class="other">(</span><a href="../doc/class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452.html">OutputStream</a><span class="other">&amp;</span>&nbsp;<span class="identifier">s</span><span class="other">,&nbsp;</span><span class="kw">uchar</span>&nbsp;<span class="identifier">x</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="206" xml:space="preserve"><span class="lineNumber">206</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="207" xml:space="preserve"><span class="lineNumber">207</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">s</span><span class="other">.</span><a href="../doc/class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452.html#member_function_Write_OutputStream_6DC04E8AFDE36F6614CF1F1BFD7CE1FE51255FF3">Write</a><span class="other">(</span><span class="identifier">x</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="208" xml:space="preserve"><span class="lineNumber">208</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">s</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="209" xml:space="preserve"><span class="lineNumber">209</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="210" xml:space="preserve"><span class="lineNumber">210</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="211" xml:space="preserve"><span class="lineNumber">211</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<a href="../doc/class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452.html">OutputStream</a><span class="other">&amp;</span>&nbsp;<a href="../doc/ns_System.IO.html#function_op_shl_BB8970546F6C94A65B533B4538B8653882BB5CC4">operator&lt;&lt;</a><span class="other">(</span><a href="../doc/class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452.html">OutputStream</a><span class="other">&amp;</span>&nbsp;<span class="identifier">s</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<a href="../doc/class_Endl_8E2537FC3949E4C290D6CAA3B15C71D5697AC895.html">Endl</a><span class="other">&amp;</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="212" xml:space="preserve"><span class="lineNumber">212</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="213" xml:space="preserve"><span class="lineNumber">213</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">s</span><span class="other">.</span><a href="../doc/class_OutputStream_D306768ED83C9FB00EA54CD61D604CE2BF727452.html#member_function_WriteLine_OutputStream_A1C626A588CF5C150737D66E04D529E4BDD75A74">WriteLine</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="214" xml:space="preserve"><span class="lineNumber">214</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">s</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="215" xml:space="preserve"><span class="lineNumber">215</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="216" xml:space="preserve"><span class="lineNumber">216</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="217" xml:space="preserve"><span class="lineNumber">217</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="218" xml:space="preserve"><span class="lineNumber">218</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">System</span></span>
+  <br/>
+  <span class="code" id="219" xml:space="preserve"><span class="lineNumber">219</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="220" xml:space="preserve"><span class="lineNumber">220</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../doc/class_Endl_8E2537FC3949E4C290D6CAA3B15C71D5697AC895.html">Endl</a></span>
+  <br/>
+  <span class="code" id="221" xml:space="preserve"><span class="lineNumber">221</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="222" xml:space="preserve"><span class="lineNumber">222</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<a href="../doc/class_Endl_8E2537FC3949E4C290D6CAA3B15C71D5697AC895.html#default_constructor_Endl_A3066028F976E1381F839506EDBB9D62527DB168">Endl</a><span class="other">(</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="223" xml:space="preserve"><span class="lineNumber">223</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="224" xml:space="preserve"><span class="lineNumber">224</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="225" xml:space="preserve"><span class="lineNumber">225</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="226" xml:space="preserve"><span class="lineNumber">226</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="227" xml:space="preserve"><span class="lineNumber">227</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<a href="../doc/class_Endl_8E2537FC3949E4C290D6CAA3B15C71D5697AC895.html">Endl</a>&nbsp;<a href="../doc/ns_System.html#function_endl_6CF73794B39EC3D6208AD75F99327E1DACEBC134">endl</a><span class="other">(</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="228" xml:space="preserve"><span class="lineNumber">228</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="229" xml:space="preserve"><span class="lineNumber">229</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<a href="../doc/class_Endl_8E2537FC3949E4C290D6CAA3B15C71D5697AC895.html#default_constructor_Endl_A3066028F976E1381F839506EDBB9D62527DB168">Endl</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="230" xml:space="preserve"><span class="lineNumber">230</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="231" xml:space="preserve"><span class="lineNumber">231</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+ </body>
+</html>

@@ -1,0 +1,198 @@
+using System;
+using System.Collections;
+using System.Concepts;
+using System.Numerics.Multiprecision;
+
+namespace BigNumCalc
+{
+    public concept BigValueType<T>
+    {
+        where Derived<T, BigValue>;
+    }
+    
+    public class EvaluationStack 
+    {
+        public void Push(BigValue* value)
+        {
+            stack.Push(UniquePtr<BigValue>(value));
+        }
+        public BigValue* Pop()
+        {
+            UniquePtr<BigValue> value = stack.Pop();
+            return value.Release();
+        }
+        private Stack<UniquePtr<BigValue>> stack;
+    }
+    
+    public BigValue* UnaryEvaluate<BigValueT, Op>(BigValue* operand, Op op) where BigValueT is BigValueType and Op is UnaryFunction
+    {
+        BigValueT* value = cast<BigValueT*>(operand);
+        BigValueT.OperandType result = op(value->Get());
+        return new BigValueT(result);
+    }
+    
+    public inline BigValue* UnaryPlus<BigValueT>(BigValue* operand) where BigValueT is BigValueType
+    {
+        return UnaryEvaluate<BigValueT>(operand, Identity<BigValueT.OperandType>());
+    }
+    
+    public inline BigValue* UnaryMinus<BigValueT>(BigValue* operand) where BigValueT is BigValueType
+    {
+        return UnaryEvaluate<BigValueT>(operand, Negate<BigValueT.OperandType>());
+    }
+    
+    public delegate BigValue* UnaryOperatorDelegate(BigValue* operand);
+    
+    public nothrow UnaryOperatorDelegate GetUnaryOperatorDelegate(uchar op, BigNumKind kind)
+    {
+        UnaryOperatorDelegate dlg;
+        switch (op)
+        {
+            case '+': 
+            {
+                switch (kind)
+                {
+                    case BigNumKind.bigInt: dlg = UnaryPlus<BigIntValue>; break;
+                    case BigNumKind.bigRational: dlg = UnaryPlus<BigRationalValue>; break;
+                    case BigNumKind.bigFloat: dlg = UnaryPlus<BigFloatValue>; break;
+                }
+                break;
+            }
+            case '-':
+            {
+                switch (kind)
+                {
+                    case BigNumKind.bigInt: dlg = UnaryMinus<BigIntValue>; break;
+                    case BigNumKind.bigRational: dlg = UnaryMinus<BigRationalValue>; break;
+                    case BigNumKind.bigFloat: dlg = UnaryMinus<BigFloatValue>; break;
+                }
+                break;
+            }
+        }
+        return dlg;
+    }
+    
+    public BigValue* Evaluate(BigValue* operand, uchar op)
+    {
+        UnaryOperatorDelegate dlg = GetUnaryOperatorDelegate(op, operand->Kind());
+        if (dlg != UnaryOperatorDelegate())
+        {
+            BigValue* result = dlg(operand);
+            if (result != null)
+            {
+                return result;
+            }
+            else
+            {
+                throw Exception("operator '" + ToUtf8(CharStr(op)) + "' not implemented for this operand type");
+            }
+        }
+        else
+        {
+            throw Exception("operator '" + ToUtf8(CharStr(op)) + "' not implemented");
+        }
+    }
+    
+    public BigValue* BinaryEvaluate<BigValueT, Op>(BigValue* left, BigValue* right, Op op) where BigValueT is BigValueType and Op is BinaryFunction
+    {
+        BigValueT* left_ = cast<BigValueT*>(left);
+        BigValueT* right_ = cast<BigValueT*>(right);
+        BigValueT.OperandType result = op(left_->Get(), right_->Get());
+        return new BigValueT(result);
+    }
+    
+    public inline BigValue* Add<BigValueT>(BigValue* left, BigValue* right) where BigValueT is BigValueType
+    {
+        return BinaryEvaluate<BigValueT>(left, right, Plus<BigValueT.OperandType>());
+    }
+
+    public inline BigValue* Sub<BigValueT>(BigValue* left, BigValue* right) where BigValueT is BigValueType
+    {
+        return BinaryEvaluate<BigValueT>(left, right, Minus<BigValueT.OperandType>());
+    }
+    
+    public inline BigValue* Mul<BigValueT>(BigValue* left, BigValue* right) where BigValueT is BigValueType
+    {
+        return BinaryEvaluate<BigValueT>(left, right, Multiplies<BigValueT.OperandType>());
+    }
+
+    public inline BigValue* Div<BigValueT>(BigValue* left, BigValue* right) where BigValueT is BigValueType
+    {
+        return BinaryEvaluate<BigValueT>(left, right, Divides<BigValueT.OperandType>());
+    }
+
+    public delegate BigValue* BinaryOperatorDelegate(BigValue* left, BigValue* right);
+    
+    public nothrow BinaryOperatorDelegate GetBinaryOperatorDelegate(uchar op, BigNumKind kind)
+    {
+        BinaryOperatorDelegate dlg;
+        switch (op)
+        {
+            case '+': 
+            {
+                switch (kind)
+                {
+                    case BigNumKind.bigInt: dlg = Add<BigIntValue>; break;
+                    case BigNumKind.bigRational: dlg = Add<BigRationalValue>; break;
+                    case BigNumKind.bigFloat: dlg = Add<BigFloatValue>; break;
+                }
+                break;
+            }
+            case '-':
+            {
+                switch (kind)
+                {
+                    case BigNumKind.bigInt: dlg = Sub<BigIntValue>; break;
+                    case BigNumKind.bigRational: dlg = Sub<BigRationalValue>; break;
+                    case BigNumKind.bigFloat: dlg = Sub<BigFloatValue>; break;
+                }
+                break;
+            }
+            case '*':
+            {
+                switch (kind)
+                {
+                    case BigNumKind.bigInt: dlg = Mul<BigIntValue>; break;
+                    case BigNumKind.bigRational: dlg = Mul<BigRationalValue>; break;
+                    case BigNumKind.bigFloat: dlg = Mul<BigFloatValue>; break;
+                }
+                break;
+            }
+            case '/':
+            {
+                switch (kind)
+                {
+                    case BigNumKind.bigInt: dlg = Div<BigIntValue>; break;
+                    case BigNumKind.bigRational: dlg = Div<BigRationalValue>; break;
+                    case BigNumKind.bigFloat: dlg = Div<BigFloatValue>; break;
+                }
+                break;
+            }
+        }
+        return dlg;
+    }
+    
+    public BigValue* Evaluate(BigValue* left, BigValue* right, uchar op)
+    {
+        BigNumKind commonType = CommonType(left->Kind(), right->Kind());
+        UniquePtr<BigValue> left_(left->As(commonType));
+        UniquePtr<BigValue> right_(right->As(commonType));
+        BinaryOperatorDelegate dlg = GetBinaryOperatorDelegate(op, commonType);
+        if (dlg != BinaryOperatorDelegate())
+        {
+            BigValue* result = dlg(left_.Get(), right_.Get());
+            if (result != null)
+            {
+                return result;
+            }
+            else
+            {
+                throw Exception("operator '" + ToUtf8(CharStr(op)) + "' not implemented for these operand types");
+            }
+        }
+        else
+        {
+            throw Exception("operator '" + ToUtf8(CharStr(op)) + "' not implemented");
+        }
+    }
+}

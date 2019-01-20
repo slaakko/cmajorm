@@ -1,0 +1,146 @@
+// =================================
+// Copyright (c) 2019 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Collections;
+
+namespace System.Json
+{
+    public concept JsonExportable<T>
+    {
+        UniquePtr<JsonValue> T.ToJson();
+    }
+
+    public UniquePtr<JsonValue> ToJson<T>(const T& object) 
+        where T is JsonExportable
+    {
+        return object.ToJson();
+    }
+    
+    public UniquePtr<JsonValue> ToJson<T>(const UniquePtr<T>& ptr)
+        where T is JsonExportable
+    {
+        if (ptr.IsNull())
+        {
+            return UniquePtr<JsonValue>(new JsonNull());
+        }
+        else
+        {
+            T* p = ptr.Get();
+            UniquePtr<JsonObject> object = new JsonObject();
+            object->AddField("class", UniquePtr<JsonValue>(new JsonString(ToUtf32(typename(*p)))));
+            object->AddField("object", p->ToJson());
+            return UniquePtr<JsonValue>(object.Release());
+        }
+    }
+
+    public UniquePtr<JsonValue> ToJson<T>(const SharedPtr<T>& ptr)
+        where T is JsonExportable
+    {
+        if (ptr.IsNull())
+        {
+            return UniquePtr<JsonValue>(new JsonNull());
+        }
+        else
+        {
+            T* p = ptr.Get();
+            UniquePtr<JsonObject> object = new JsonObject();
+            object->AddField("class", UniquePtr<JsonValue>(new JsonString(ToUtf32(typename(*p)))));
+            object->AddField("object", p->ToJson());
+            return UniquePtr<JsonValue>(object.Release());
+        }
+    }
+    
+    public nothrow UniquePtr<JsonValue> ToJson(double value)
+    {
+        return UniquePtr<JsonValue>(new JsonNumber(value));
+    }
+    
+    public nothrow UniquePtr<JsonValue> ToJson(bool value)
+    {
+        return UniquePtr<JsonValue>(new JsonBool(value));
+    }
+
+    public nothrow UniquePtr<JsonValue> ToJson<T>(T value)
+        where System.Meta.IsEnumeratedType<T>()
+    {
+        return UniquePtr<JsonValue>(new JsonNumber(cast<double>(cast<T.UnderlyingType>(value))));
+    }
+
+    public UniquePtr<JsonValue> ToJson(const string& value)
+    {
+        return UniquePtr<JsonValue>(new JsonString(ToUtf32(value)));
+    }
+    
+    public UniquePtr<JsonValue> ToJson(const wstring& value)
+    {
+        return UniquePtr<JsonValue>(new JsonString(ToUtf32(value)));
+    }
+    
+    public nothrow UniquePtr<JsonValue> ToJson(const ustring& value)
+    {
+        return UniquePtr<JsonValue>(new JsonString(value));
+    }
+    
+    public UniquePtr<JsonValue> ToJson<T>(const List<T>& value)
+    {
+        UniquePtr<JsonArray> array = new JsonArray();
+        for (const T& item : value)
+        {
+            array->AddItem(ToJson(item));
+        }
+        return UniquePtr<JsonValue>(array.Release());
+    }
+
+    public UniquePtr<JsonValue> ToJson<T>(const Queue<T>& value)
+    {
+        UniquePtr<JsonArray> array = new JsonArray();
+        for (const T& item : value.Rep())
+        {
+            array->AddItem(ToJson(item));
+        }
+        return UniquePtr<JsonValue>(array.Release());
+    }
+    
+    public UniquePtr<JsonValue> ToJson<Key, Value, KeyCompare>(const Map<Key, Value, KeyCompare>& value) where Key is ustring
+    {
+        UniquePtr<JsonObject> object = new JsonObject();
+        for (const Pair<Key, Value>& p : value)
+        {
+            object->AddField(p.first, ToJson(p.second));
+        }
+        return UniquePtr<JsonValue>(object.Release());
+    }
+
+    public UniquePtr<JsonValue> ToJson<Key, Value, KeyCompare>(const Map<Key, Value, KeyCompare>& value) where Key is wstring or Key is string
+    {
+        UniquePtr<JsonObject> object = new JsonObject();
+        for (const Pair<Key, Value>& p : value)
+        {
+            object->AddField(ToUtf32(p.first), ToJson(p.second));
+        }
+        return UniquePtr<JsonValue>(object.Release());
+    }
+
+    public UniquePtr<JsonValue> ToJson<K, T, H, C>(const HashMap<K, T, H, C>& value) where K is ustring
+    {
+        UniquePtr<JsonObject> object = new JsonObject();
+        for (const Pair<K, T>& p : value)
+        {
+            object->AddField(p.first, ToJson(p.second));
+        }
+        return UniquePtr<JsonValue>(object.Release());
+    }
+        
+    public UniquePtr<JsonValue> ToJson<K, T, H, C>(const HashMap<K, T, H, C>& value) where K is wstring or K is string
+    {
+        UniquePtr<JsonObject> object = new JsonObject();
+        for (const Pair<K, T>& p : value)
+        {
+            object->AddField(ToUtf32(p.first), ToJson(p.second));
+        }
+        return UniquePtr<JsonValue>(object.Release());
+    }
+}

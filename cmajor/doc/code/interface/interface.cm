@@ -1,0 +1,62 @@
+using System;
+using System.IO;
+
+public interface Reader
+{
+    long Read(byte* buf, long count);
+}
+
+public interface Writer
+{
+    void Write(byte* buf, long count);
+}
+
+public void Copy(Reader reader, Writer writer)
+{
+    byte[16] buf;
+    long bytesRead = reader.Read(&buf[0], buf.Length());
+    while (bytesRead > 0)
+    {
+        writer.Write(&buf[0], bytesRead);
+        bytesRead = reader.Read(&buf[0], buf.Length());
+    }
+}
+
+public class StringReader : Reader
+{
+    public StringReader(const string& s_) : s(s_), pos(0)
+    {
+    }
+    public long Read(byte* buf, long count)
+    {
+        long bytesLeft = s.Length() - pos;
+        long bytesRead = Min(bytesLeft, count);
+        for (long i = 0; i < bytesRead; ++i)
+        {
+            buf[i] = cast<byte>(s[pos + i]);
+        }
+        pos = pos + bytesRead;
+        return bytesRead;
+    }
+    private string s;
+    private long pos;
+}
+
+public class ConsoleWriter : Writer
+{
+    public ConsoleWriter() : standardOutputStream(stdout)
+    {
+    }
+    public void Write(byte* buf, long count)
+    {
+        standardOutputStream.Write(buf, count);
+    }
+    private FileByteStream standardOutputStream;
+}
+
+void main()
+{
+    StringReader stringReader("Nothing is impossible, the word itself says 'I'm possible'!\n");
+    ConsoleWriter consoleWriter;
+    Copy(stringReader, consoleWriter);
+}

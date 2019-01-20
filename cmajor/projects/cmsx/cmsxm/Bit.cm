@@ -1,0 +1,80 @@
+using System;
+
+namespace cmsx.machine
+{
+    public const ulong negByte = 0xFFFFFFFFFFFFFF00u;
+    public const ulong negUShort = 0xFFFFFFFFFFFF0000u;
+    public const ulong negUInt = 0xFFFFFFFF00000000u;
+    public const ulong signBit = 0x8000000000000000u;
+
+    public inline nothrow ulong SignExtend(byte b)
+    {
+        if ((b & 0x80u)!= 0u)
+        {
+            return negByte | b;
+        }
+        else
+        {
+            return b;
+        }
+    }
+
+    public inline nothrow ulong SignExtend(ushort s)
+    {
+        if ((s & 0x8000u) != 0u)
+        {
+            return negUShort | s;
+        }
+        else
+        {
+            return s;
+        }
+    }
+
+    public inline nothrow ulong SignExtend(uint u)
+    {
+        if ((u & 0x80000000u) != 0u)
+        {
+            return negUInt | u;
+        }
+        else
+        {
+            return u;
+        }
+    }
+
+    public inline nothrow ulong BitCount(ulong x)
+    {
+        ulong c = 0u;
+        ulong m = 1u;
+        for (int i = 0; i < 64; ++i)
+        {
+            if ((x & m) != 0u)
+            {
+                ++c;
+            }
+            m = m << 1u;
+        }
+        return c;
+    }
+
+    public inline nothrow nothrow byte SaturatingSubtraction(byte x, byte y)
+    {
+        if (x >= y) return x - y; else return 0u;
+    }
+
+    public inline nothrow nothrow ushort SaturatingSubtraction(ushort x, ushort y)
+    {
+        if (x >= y) return x - y; else return 0u;
+    }
+
+    public inline nothrow nothrow uint SaturatingSubtraction(uint x, uint y)
+    {
+        if (x >= y) return x - y; else return 0u;
+    }
+
+    public inline nothrow nothrow ulong SaturatingSubtraction(ulong x, ulong y)
+    {
+        if (x >= y) return x - y; else return 0u;
+    }
+}

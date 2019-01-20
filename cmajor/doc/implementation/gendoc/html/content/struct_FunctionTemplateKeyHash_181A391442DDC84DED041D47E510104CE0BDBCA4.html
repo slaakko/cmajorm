@@ -1,0 +1,66 @@
+<html>
+    <head>
+        <meta charset="utf-8"/>
+        <title>FunctionTemplateKeyHash Struct</title>
+        <link href="../style/style.css" rel="stylesheet" type="text/css"/>
+    </head>
+    <body>
+        <a href="../index.html">index</a>
+         | <a href="namespace_binder_C711B7605339DC3A9E128C1E622E7D9A4629C97D.html">up</a>
+         | <a href="struct_FunctionTemplateKey_A977172C35867B4966246A8D34A6FAB60AE8EE2A.html">prev</a>
+         | <a href="class_FunctionTemplateRepository_10783C76E1CD0A9F074EEAC00AE057491C72AE50.html">next</a>
+        <hr/>
+        <h1>FunctionTemplateKeyHash Struct</h1>
+        <span>
+            Definition at line <a href="file/binder/FunctionTemplateRepository.hpp_1F8B06B291C533523F22A57D8373C961D9101C97.html#28">28</a>
+             of <a href="file/binder/FunctionTemplateRepository.hpp_1F8B06B291C533523F22A57D8373C961D9101C97.html">FunctionTemplateRepository.hpp</a>
+        </span>
+        <br/>
+        <h2>Member Functions</h2>
+        <table class="functionTable">
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve">size_t</td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="struct_FunctionTemplateKeyHash_181A391442DDC84DED041D47E510104CE0BDBCA4.html#function_operator_apply_68AD4583F1DD355D297488EC76604D0AF1928183">operator()</a>(<span class="kw">const </span><a href="struct_FunctionTemplateKey_A977172C35867B4966246A8D34A6FAB60AE8EE2A.html">FunctionTemplateKey</a>&amp; key) <span class="kw">const</span></td>
+            </tr>
+        </table>
+        <hr/>
+        <h2>Member Function Details</h2>
+        <h3 id="function_operator_apply_68AD4583F1DD355D297488EC76604D0AF1928183">operator() Member Function</h3>
+        <h4>
+            size_t cmajor::binder::FunctionTemplateKeyHash::operator()(<span class="kw">const </span>
+            <a href="struct_FunctionTemplateKey_A977172C35867B4966246A8D34A6FAB60AE8EE2A.html">FunctionTemplateKey</a>
+            &amp; key) <span class="kw">const</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/binder/FunctionTemplateRepository.hpp_1F8B06B291C533523F22A57D8373C961D9101C97.html#30">30</a>
+             of <a href="file/binder/FunctionTemplateRepository.hpp_1F8B06B291C533523F22A57D8373C961D9101C97.html">FunctionTemplateRepository.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">31</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">32</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="type">size_t</span>&nbsp;<span class="identifier">x</span>&nbsp;<span class="other">=</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">hash</span><span class="other">&lt;</span><a href="class_FunctionSymbol_5AC1C26A9572181B3E31247997BF40453B22EDEF.html">FunctionSymbol</a><span class="other">*</span><span class="other">></span><span class="other">(</span><span class="other">)</span><span class="other">(</span><span class="identifier">key</span><span class="other">.</span><span class="identifier">functionTemplate</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">33</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">int</span>&nbsp;<span class="identifier">n</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">key</span><span class="other">.</span><span class="identifier">templateArgumentTypes</span><span class="other">.</span><span class="identifier">size</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">34</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">for&nbsp;</span><span class="other">(</span><span class="kw">int</span>&nbsp;<span class="identifier">i</span>&nbsp;<span class="other">=</span>&nbsp;<span class="other">0</span><span class="other">;</span>&nbsp;<span class="identifier">i</span><span class="other">&nbsp;&lt;&nbsp;</span><span class="identifier">n</span><span class="other">;</span>&nbsp;<span class="other">++</span><span class="identifier">i</span><span class="other">)</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">35</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">36</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">x</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">x</span><span class="other">&nbsp;^&nbsp;</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">hash</span><span class="other">&lt;</span><a href="class_TypeSymbol_E4B881CC0D40D6232A69F240FA90045A54D93258.html">TypeSymbol</a><span class="other">*</span><span class="other">></span><span class="other">(</span><span class="other">)</span><span class="other">(</span><span class="identifier">key</span><span class="other">.</span><span class="identifier">templateArgumentTypes</span><span class="other">[</span><span class="identifier">i</span><span class="other">]</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">37</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">38</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">x</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">39</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <hr/>
+        <a href="../index.html">index</a>
+         | <a href="namespace_binder_C711B7605339DC3A9E128C1E622E7D9A4629C97D.html">up</a>
+         | <a href="struct_FunctionTemplateKey_A977172C35867B4966246A8D34A6FAB60AE8EE2A.html">prev</a>
+         | <a href="class_FunctionTemplateRepository_10783C76E1CD0A9F074EEAC00AE057491C72AE50.html">next</a>
+    </body>
+</html>

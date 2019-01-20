@@ -1,0 +1,546 @@
+<html>
+ <head>
+  <meta charset="utf-8"/>
+  <link href="../../../style/style.css" rel="stylesheet" type="text/css"/>
+ </head>
+ <body>
+  <span class="code" id="1" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;1</span>&nbsp;<span class="comment">//&nbsp;=================================</span></span>
+  <br/>
+  <span class="code" id="2" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;2</span>&nbsp;<span class="comment">//&nbsp;Copyright&nbsp;(c)&nbsp;2018&nbsp;Seppo&nbsp;Laakko</span></span>
+  <br/>
+  <span class="code" id="3" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;3</span>&nbsp;<span class="comment">//&nbsp;Distributed&nbsp;under&nbsp;the&nbsp;MIT&nbsp;license</span></span>
+  <br/>
+  <span class="code" id="4" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;4</span>&nbsp;<span class="comment">//&nbsp;=================================</span></span>
+  <br/>
+  <span class="code" id="5" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;5</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="6" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;6</span>&nbsp;<span class="pp">#include&nbsp;&lt;cmajor/ast/Project.hpp></span></span>
+  <br/>
+  <span class="code" id="7" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;7</span>&nbsp;<span class="pp">#include&nbsp;&lt;cmajor/util/Path.hpp></span></span>
+  <br/>
+  <span class="code" id="8" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;8</span>&nbsp;<span class="pp">#include&nbsp;&lt;boost/filesystem.hpp></span></span>
+  <br/>
+  <span class="code" id="9" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;9</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="10" xml:space="preserve"><span class="lineNumber">&nbsp;10</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">cmajor</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">ast</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="11" xml:space="preserve"><span class="lineNumber">&nbsp;11</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="12" xml:space="preserve"><span class="lineNumber">&nbsp;12</span>&nbsp;<span class="kw">using</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">cmajor</span><span class="other">:</span><span class="other">:</span><span class="identifier">util</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="13" xml:space="preserve"><span class="lineNumber">&nbsp;13</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="14" xml:space="preserve"><span class="lineNumber">&nbsp;14</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">string</span>&nbsp;<a href="../../namespace_ast_C9161F619BA82A5AF902D95B166AD35F0072F67D.html#function_CmajorRootDir_EA0AEB7A757950FCE0AA84994AD176CA7B0A5309">CmajorRootDir</a><span class="other">(</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="15" xml:space="preserve"><span class="lineNumber">&nbsp;15</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="16" xml:space="preserve"><span class="lineNumber">&nbsp;16</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">char</span><span class="other">*</span>&nbsp;<span class="identifier">e</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">getenv</span><span class="other">(</span><span class="string">"CMAJOR_ROOT"</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="17" xml:space="preserve"><span class="lineNumber">&nbsp;17</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">e</span><span class="other">&nbsp;==&nbsp;</span><span class="kw">nullptr</span><span class="other">&nbsp;||&nbsp;</span><span class="other">!</span><span class="other">*</span><span class="identifier">e</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="18" xml:space="preserve"><span class="lineNumber">&nbsp;18</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="19" xml:space="preserve"><span class="lineNumber">&nbsp;19</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">throw&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">runtime_error</span><span class="other">(</span><span class="string">"please&nbsp;set&nbsp;'CMAJOR_ROOT'&nbsp;environment&nbsp;variable&nbsp;to&nbsp;contain&nbsp;/path/to/cmajor&nbsp;directory."</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="20" xml:space="preserve"><span class="lineNumber">&nbsp;20</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="21" xml:space="preserve"><span class="lineNumber">&nbsp;21</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span><span class="other">(</span><span class="identifier">e</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="22" xml:space="preserve"><span class="lineNumber">&nbsp;22</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="23" xml:space="preserve"><span class="lineNumber">&nbsp;23</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="24" xml:space="preserve"><span class="lineNumber">&nbsp;24</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">string</span>&nbsp;<a href="../../namespace_ast_C9161F619BA82A5AF902D95B166AD35F0072F67D.html#function_CmajorSystemLibDir_5A38E58F74647DE5D88A967716A16367426A96E3">CmajorSystemLibDir</a><span class="other">(</span><span class="kw">const&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="type">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">config</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="25" xml:space="preserve"><span class="lineNumber">&nbsp;25</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="26" xml:space="preserve"><span class="lineNumber">&nbsp;26</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">boost</span><span class="other">::</span><span class="identifier">filesystem</span><span class="other">::</span><span class="type">path</span>&nbsp;<span class="identifier">sld</span><span class="other">(</span><a href="../../namespace_ast_C9161F619BA82A5AF902D95B166AD35F0072F67D.html#function_CmajorRootDir_EA0AEB7A757950FCE0AA84994AD176CA7B0A5309">CmajorRootDir</a><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="27" xml:space="preserve"><span class="lineNumber">&nbsp;27</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">sld</span><span class="other">&nbsp;/=&nbsp;</span><span class="string">"system"</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="28" xml:space="preserve"><span class="lineNumber">&nbsp;28</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">sld</span><span class="other">&nbsp;/=&nbsp;</span><span class="string">"lib"</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="29" xml:space="preserve"><span class="lineNumber">&nbsp;29</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">sld</span><span class="other">&nbsp;/=&nbsp;</span><span class="identifier">config</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="30" xml:space="preserve"><span class="lineNumber">&nbsp;30</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<a href="../../namespace_util_10CA45893690AF432B785048B4AA3F0E7D4765DF.html#function_GetFullPath_A166C4B073AC21BF33EE8C4D54DDA19526C98C2A">GetFullPath</a><span class="other">(</span><span class="identifier">sld</span><span class="other">.</span><span class="identifier">generic_string</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="31" xml:space="preserve"><span class="lineNumber">&nbsp;31</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="32" xml:space="preserve"><span class="lineNumber">&nbsp;32</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="33" xml:space="preserve"><span class="lineNumber">&nbsp;33</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">string</span>&nbsp;<a href="../../namespace_ast_C9161F619BA82A5AF902D95B166AD35F0072F67D.html#function_CmajorSystemModuleFilePath_7BD764ACD0F48B4229352D5BED1A0935BFAC3E8A">CmajorSystemModuleFilePath</a><span class="other">(</span><span class="kw">const&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="type">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">config</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="34" xml:space="preserve"><span class="lineNumber">&nbsp;34</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="35" xml:space="preserve"><span class="lineNumber">&nbsp;35</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">boost</span><span class="other">::</span><span class="identifier">filesystem</span><span class="other">::</span><span class="type">path</span>&nbsp;<span class="identifier">smfp</span><span class="other">(</span><a href="../../namespace_ast_C9161F619BA82A5AF902D95B166AD35F0072F67D.html#function_CmajorSystemLibDir_5A38E58F74647DE5D88A967716A16367426A96E3">CmajorSystemLibDir</a><span class="other">(</span><span class="identifier">config</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="36" xml:space="preserve"><span class="lineNumber">&nbsp;36</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">smfp</span><span class="other">&nbsp;/=&nbsp;</span><span class="string">"System.cmm"</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="37" xml:space="preserve"><span class="lineNumber">&nbsp;37</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<a href="../../namespace_util_10CA45893690AF432B785048B4AA3F0E7D4765DF.html#function_GetFullPath_A166C4B073AC21BF33EE8C4D54DDA19526C98C2A">GetFullPath</a><span class="other">(</span><span class="identifier">smfp</span><span class="other">.</span><span class="identifier">generic_string</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="38" xml:space="preserve"><span class="lineNumber">&nbsp;38</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="39" xml:space="preserve"><span class="lineNumber">&nbsp;39</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="40" xml:space="preserve"><span class="lineNumber">&nbsp;40</span>&nbsp;<a href="../../class_ProjectDeclaration_6E361EA1B0241033008CDF36FBC22CF32803BDED.html">ProjectDeclaration</a><span class="other">::</span><a href="../../class_ProjectDeclaration_6E361EA1B0241033008CDF36FBC22CF32803BDED.html#constructor_ProjectDeclaration_9E63B06B856CBA162061E55DEB7AC4191F525D2E">ProjectDeclaration</a><span class="other">(</span><a href="../../enum_ProjectDeclarationType_DC752C0CBC1078EB0816F14D15AD369A813061F5.html">ProjectDeclarationType</a>&nbsp;<span class="identifier">declarationType_</span><span class="other">)</span>&nbsp;<span class="other">:</span>&nbsp;<a href="../../class_ProjectDeclaration_6E361EA1B0241033008CDF36FBC22CF32803BDED.html#variable_declarationType_4055F397E9AAA0274D37323DE6876A2740CCDF38">declarationType</a><span class="other">(</span><span class="identifier">declarationType_</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="41" xml:space="preserve"><span class="lineNumber">&nbsp;41</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="42" xml:space="preserve"><span class="lineNumber">&nbsp;42</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="43" xml:space="preserve"><span class="lineNumber">&nbsp;43</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="44" xml:space="preserve"><span class="lineNumber">&nbsp;44</span>&nbsp;<span class="identifier">ProjectDeclaration</span><span class="other">::</span><span class="other">~</span><span class="identifier">ProjectDeclaration</span><span class="other">(</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="45" xml:space="preserve"><span class="lineNumber">&nbsp;45</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="46" xml:space="preserve"><span class="lineNumber">&nbsp;46</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="47" xml:space="preserve"><span class="lineNumber">&nbsp;47</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="48" xml:space="preserve"><span class="lineNumber">&nbsp;48</span>&nbsp;<a href="../../class_ReferenceDeclaration_3D822FFC3988BB82083869DB547425A96ED3FB37.html">ReferenceDeclaration</a><span class="other">::</span><a href="../../class_ReferenceDeclaration_3D822FFC3988BB82083869DB547425A96ED3FB37.html#constructor_ReferenceDeclaration_BCF281955A3C57D59E556855881BC8C8E52FB018">ReferenceDeclaration</a><span class="other">(</span><span class="kw">const&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="type">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">filePath_</span><span class="other">)</span>&nbsp;<span class="other">:</span>&nbsp;<a href="../../class_ProjectDeclaration_6E361EA1B0241033008CDF36FBC22CF32803BDED.html">ProjectDeclaration</a><span class="other">(</span><a href="../../enum_ProjectDeclarationType_DC752C0CBC1078EB0816F14D15AD369A813061F5.html">ProjectDeclarationType</a><span class="other">::</span><a href="../../enum_ProjectDeclarationType_DC752C0CBC1078EB0816F14D15AD369A813061F5.html#enumerator_referenceDeclaration_BAD430DCB11E923BC829E88AD61847ABEFFA8D8D">referenceDeclaration</a><span class="other">)</span><span class="other">,&nbsp;</span><a href="../../class_ReferenceDeclaration_3D822FFC3988BB82083869DB547425A96ED3FB37.html#variable_filePath_7F495F6665208F1C15B2FDB751ABBCE9FA527181">filePath</a><span class="other">(</span><span class="identifier">filePath_</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="49" xml:space="preserve"><span class="lineNumber">&nbsp;49</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="50" xml:space="preserve"><span class="lineNumber">&nbsp;50</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="51" xml:space="preserve"><span class="lineNumber">&nbsp;51</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="52" xml:space="preserve"><span class="lineNumber">&nbsp;52</span>&nbsp;<a href="../../class_SourceFileDeclaration_B6A1C12C8F54B960FE9AC836EA86F45CDA74DDB5.html">SourceFileDeclaration</a><span class="other">::</span><a href="../../class_SourceFileDeclaration_B6A1C12C8F54B960FE9AC836EA86F45CDA74DDB5.html#constructor_SourceFileDeclaration_09109989C074869425E1AE48B0D0EB08C68B4C7C">SourceFileDeclaration</a><span class="other">(</span><span class="kw">const&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="type">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">filePath_</span><span class="other">)</span>&nbsp;<span class="other">:</span>&nbsp;<a href="../../class_ProjectDeclaration_6E361EA1B0241033008CDF36FBC22CF32803BDED.html">ProjectDeclaration</a><span class="other">(</span><a href="../../enum_ProjectDeclarationType_DC752C0CBC1078EB0816F14D15AD369A813061F5.html">ProjectDeclarationType</a><span class="other">::</span><a href="../../enum_ProjectDeclarationType_DC752C0CBC1078EB0816F14D15AD369A813061F5.html#enumerator_sourceFileDeclaration_55986634D4F2AB401C4F8166DFE3A87470D79257">sourceFileDeclaration</a><span class="other">)</span><span class="other">,&nbsp;</span><a href="../../class_SourceFileDeclaration_B6A1C12C8F54B960FE9AC836EA86F45CDA74DDB5.html#variable_filePath_8A788DB22836E7F03EE04034618B7DC409CFC1AD">filePath</a><span class="other">(</span><span class="identifier">filePath_</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="53" xml:space="preserve"><span class="lineNumber">&nbsp;53</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="54" xml:space="preserve"><span class="lineNumber">&nbsp;54</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="55" xml:space="preserve"><span class="lineNumber">&nbsp;55</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="56" xml:space="preserve"><span class="lineNumber">&nbsp;56</span>&nbsp;<a href="../../class_TextFileDeclaration_592D436B4D5157325BE84247368F81F3426832E9.html">TextFileDeclaration</a><span class="other">::</span><a href="../../class_TextFileDeclaration_592D436B4D5157325BE84247368F81F3426832E9.html#constructor_TextFileDeclaration_63EB7C91FC4B653E900BC07A4557E3863175A002">TextFileDeclaration</a><span class="other">(</span><span class="kw">const&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="type">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">filePath_</span><span class="other">)</span>&nbsp;<span class="other">:</span>&nbsp;<a href="../../class_ProjectDeclaration_6E361EA1B0241033008CDF36FBC22CF32803BDED.html">ProjectDeclaration</a><span class="other">(</span><a href="../../enum_ProjectDeclarationType_DC752C0CBC1078EB0816F14D15AD369A813061F5.html">ProjectDeclarationType</a><span class="other">::</span><a href="../../enum_ProjectDeclarationType_DC752C0CBC1078EB0816F14D15AD369A813061F5.html#enumerator_textFileDeclaration_BEF589A56C607A2D99E8595EBC80B9CF215BE239">textFileDeclaration</a><span class="other">)</span><span class="other">,&nbsp;</span><a href="../../class_TextFileDeclaration_592D436B4D5157325BE84247368F81F3426832E9.html#variable_filePath_42B16E615C976C793B3780C306CCF86A367B60F3">filePath</a><span class="other">(</span><span class="identifier">filePath_</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="57" xml:space="preserve"><span class="lineNumber">&nbsp;57</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="58" xml:space="preserve"><span class="lineNumber">&nbsp;58</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="59" xml:space="preserve"><span class="lineNumber">&nbsp;59</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="60" xml:space="preserve"><span class="lineNumber">&nbsp;60</span>&nbsp;<a href="../../class_TargetDeclaration_77EC41A404A2CDB98CCE13E3F21D4DD6211CFE14.html">TargetDeclaration</a><span class="other">::</span><a href="../../class_TargetDeclaration_77EC41A404A2CDB98CCE13E3F21D4DD6211CFE14.html#constructor_TargetDeclaration_4650867E072E1408CA4B80E42D7B0A97A3EA5CFA">TargetDeclaration</a><span class="other">(</span><a href="../../enum_Target_2D1119384DC39FDFFAAFC723B1F715827257B573.html">Target</a>&nbsp;<span class="identifier">target_</span><span class="other">)</span>&nbsp;<span class="other">:</span>&nbsp;<a href="../../class_ProjectDeclaration_6E361EA1B0241033008CDF36FBC22CF32803BDED.html">ProjectDeclaration</a><span class="other">(</span><a href="../../enum_ProjectDeclarationType_DC752C0CBC1078EB0816F14D15AD369A813061F5.html">ProjectDeclarationType</a><span class="other">::</span><a href="../../enum_ProjectDeclarationType_DC752C0CBC1078EB0816F14D15AD369A813061F5.html#enumerator_targetDeclaration_9CE01076858B70A722BA154C8B198897D70C0063">targetDeclaration</a><span class="other">)</span><span class="other">,&nbsp;</span><a href="../../class_TargetDeclaration_77EC41A404A2CDB98CCE13E3F21D4DD6211CFE14.html#variable_target_378BF4BBC9BE2D39EB1345D7F59F80397C275886">target</a><span class="other">(</span><span class="identifier">target_</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="61" xml:space="preserve"><span class="lineNumber">&nbsp;61</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="62" xml:space="preserve"><span class="lineNumber">&nbsp;62</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="63" xml:space="preserve"><span class="lineNumber">&nbsp;63</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="64" xml:space="preserve"><span class="lineNumber">&nbsp;64</span>&nbsp;<a href="../../class_Project_490FE99079251779F37F238EB82C55DB138D46F9.html">Project</a><span class="other">::</span><a href="../../class_Project_490FE99079251779F37F238EB82C55DB138D46F9.html#constructor_Project_2B4B680CEE76528F572F3D4BD0E6FD60D48AA898">Project</a><span class="other">(</span><span class="kw">const&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="type">u32string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">name_</span><span class="other">,&nbsp;</span><span class="kw">const&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="type">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">filePath_</span><span class="other">,&nbsp;</span><span class="kw">const&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="type">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">config_</span><span class="other">)</span>&nbsp;<span class="other">:</span></span>
+  <br/>
+  <span class="code" id="65" xml:space="preserve"><span class="lineNumber">&nbsp;65</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../class_Project_490FE99079251779F37F238EB82C55DB138D46F9.html#variable_name_59565A9C4713DD42A8CD40BC2328DB744707D43F">name</a><span class="other">(</span><span class="identifier">name_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="../../class_Project_490FE99079251779F37F238EB82C55DB138D46F9.html#variable_filePath_D1DB3AA2095C9A4E084058B457142F1733C2C9FD">filePath</a><span class="other">(</span><span class="identifier">filePath_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="../../class_Project_490FE99079251779F37F238EB82C55DB138D46F9.html#variable_config_690E06EE2FF422E68EFDBAD366100D3A44F20349">config</a><span class="other">(</span><span class="identifier">config_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="../../class_Project_490FE99079251779F37F238EB82C55DB138D46F9.html#variable_target_BAD3A260C9C4FBA9DC91F457E228DED1FF868660">target</a><span class="other">(</span><a href="../../enum_Target_2D1119384DC39FDFFAAFC723B1F715827257B573.html">Target</a><span class="other">::</span><a href="../../enum_Target_2D1119384DC39FDFFAAFC723B1F715827257B573.html#enumerator_program_33854766A4A34DD4E2D94E6BB5D5C10CFCF89031">program</a><span class="other">)</span><span class="other">,&nbsp;</span><a href="../../class_Project_490FE99079251779F37F238EB82C55DB138D46F9.html#variable_basePath_090975C12DCDE49F7BEF9F85F20965936505AC75">basePath</a><span class="other">(</span><a href="../../class_Project_490FE99079251779F37F238EB82C55DB138D46F9.html#variable_filePath_D1DB3AA2095C9A4E084058B457142F1733C2C9FD">filePath</a><span class="other">)</span><span class="other">,&nbsp;</span><a href="../../class_Project_490FE99079251779F37F238EB82C55DB138D46F9.html#variable_isSystemProject_6F3E90436D9F512063E0DD0534F2C0F65B2A2BCF">isSystemProject</a><span class="other">(</span><span class="kw">false</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="../../class_Project_490FE99079251779F37F238EB82C55DB138D46F9.html#variable_logStreamId_66797B99FF0DD49158691B32B3B3D727199F00A9">logStreamId</a><span class="other">(</span><span class="other">0</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="../../class_Project_490FE99079251779F37F238EB82C55DB138D46F9.html#variable_built_21B8DC1D364B1D946527D18D4B70CACA735198FE">built</a><span class="other">(</span><span class="kw">false</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="66" xml:space="preserve"><span class="lineNumber">&nbsp;66</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="67" xml:space="preserve"><span class="lineNumber">&nbsp;67</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../class_Project_490FE99079251779F37F238EB82C55DB138D46F9.html#variable_basePath_090975C12DCDE49F7BEF9F85F20965936505AC75">basePath</a><span class="other">.</span><span class="identifier">remove_filename</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="68" xml:space="preserve"><span class="lineNumber">&nbsp;68</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../class_Project_490FE99079251779F37F238EB82C55DB138D46F9.html#variable_systemLibDir_00408E1902F1B9BD9CF1A683443C066DC982F6C0">systemLibDir</a><span class="other">&nbsp;=&nbsp;</span><a href="../../namespace_ast_C9161F619BA82A5AF902D95B166AD35F0072F67D.html#function_CmajorSystemLibDir_5A38E58F74647DE5D88A967716A16367426A96E3">CmajorSystemLibDir</a><span class="other">(</span><a href="../../class_Project_490FE99079251779F37F238EB82C55DB138D46F9.html#variable_config_690E06EE2FF422E68EFDBAD366100D3A44F20349">config</a><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="69" xml:space="preserve"><span class="lineNumber">&nbsp;69</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">boost</span><span class="other">::</span><span class="identifier">filesystem</span><span class="other">::</span><span class="type">path</span>&nbsp;<span class="identifier">mfp</span><span class="other">(</span><a href="../../class_Project_490FE99079251779F37F238EB82C55DB138D46F9.html#variable_filePath_D1DB3AA2095C9A4E084058B457142F1733C2C9FD">filePath</a><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="70" xml:space="preserve"><span class="lineNumber">&nbsp;70</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">boost</span><span class="other">::</span><span class="identifier">filesystem</span><span class="other">::</span><span class="type">path</span>&nbsp;<span class="identifier">fn</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">mfp</span><span class="other">.</span><span class="identifier">filename</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="71" xml:space="preserve"><span class="lineNumber">&nbsp;71</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">mfp</span><span class="other">.</span><span class="identifier">remove_filename</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="72" xml:space="preserve"><span class="lineNumber">&nbsp;72</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">mfp</span><span class="other">&nbsp;/=&nbsp;</span><span class="string">"lib"</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="73" xml:space="preserve"><span class="lineNumber">&nbsp;73</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">mfp</span><span class="other">&nbsp;/=&nbsp;</span><a href="../../class_Project_490FE99079251779F37F238EB82C55DB138D46F9.html#variable_config_690E06EE2FF422E68EFDBAD366100D3A44F20349">config</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="74" xml:space="preserve"><span class="lineNumber">&nbsp;74</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">mfp</span><span class="other">&nbsp;/=&nbsp;</span><span class="identifier">fn</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="75" xml:space="preserve"><span class="lineNumber">&nbsp;75</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">mfp</span><span class="other">.</span><span class="identifier">replace_extension</span><span class="other">(</span><span class="string">".cmm"</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="76" xml:space="preserve"><span class="lineNumber">&nbsp;76</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../class_Project_490FE99079251779F37F238EB82C55DB138D46F9.html#variable_moduleFilePath_62BD0F75B076C08AC9A7CBD1E82DBD7BD24A3626">moduleFilePath</a><span class="other">&nbsp;=&nbsp;</span><a href="../../namespace_util_10CA45893690AF432B785048B4AA3F0E7D4765DF.html#function_GetFullPath_A166C4B073AC21BF33EE8C4D54DDA19526C98C2A">GetFullPath</a><span class="other">(</span><span class="identifier">mfp</span><span class="other">.</span><span class="identifier">generic_string</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="77" xml:space="preserve"><span class="lineNumber">&nbsp;77</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">boost</span><span class="other">::</span><span class="identifier">filesystem</span><span class="other">::</span><span class="type">path</span>&nbsp;<span class="identifier">lfp</span><span class="other">(</span><span class="identifier">mfp</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="78" xml:space="preserve"><span class="lineNumber">&nbsp;78</span>&nbsp;<span class="pp">#ifdef&nbsp;_WIN32</span></span>
+  <br/>
+  <span class="code" id="79" xml:space="preserve"><span class="lineNumber">&nbsp;79</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">lfp</span><span class="other">.</span><span class="identifier">replace_extension</span><span class="other">(</span><span class="string">".lib"</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="80" xml:space="preserve"><span class="lineNumber">&nbsp;80</span>&nbsp;<span class="pp">#else</span></span>
+  <br/>
+  <span class="code" id="81" xml:space="preserve"><span class="lineNumber">&nbsp;81</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">lfp</span><span class="other">.</span><span class="identifier">replace_extension</span><span class="other">(</span><span class="string">".a"</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="82" xml:space="preserve"><span class="lineNumber">&nbsp;82</span>&nbsp;<span class="pp">#endif</span></span>
+  <br/>
+  <span class="code" id="83" xml:space="preserve"><span class="lineNumber">&nbsp;83</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../class_Project_490FE99079251779F37F238EB82C55DB138D46F9.html#variable_libraryFilePath_4459C16B07126B21C2BDF79361874E3278336004">libraryFilePath</a><span class="other">&nbsp;=&nbsp;</span><a href="../../namespace_util_10CA45893690AF432B785048B4AA3F0E7D4765DF.html#function_GetFullPath_A166C4B073AC21BF33EE8C4D54DDA19526C98C2A">GetFullPath</a><span class="other">(</span><span class="identifier">lfp</span><span class="other">.</span><span class="identifier">generic_string</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="84" xml:space="preserve"><span class="lineNumber">&nbsp;84</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">boost</span><span class="other">::</span><span class="identifier">filesystem</span><span class="other">::</span><span class="type">path</span>&nbsp;<span class="identifier">efp</span><span class="other">(</span><a href="../../class_Project_490FE99079251779F37F238EB82C55DB138D46F9.html#variable_filePath_D1DB3AA2095C9A4E084058B457142F1733C2C9FD">filePath</a><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="85" xml:space="preserve"><span class="lineNumber">&nbsp;85</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">efp</span><span class="other">.</span><span class="identifier">remove_filename</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="86" xml:space="preserve"><span class="lineNumber">&nbsp;86</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">efp</span><span class="other">&nbsp;/=&nbsp;</span><span class="string">"bin"</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="87" xml:space="preserve"><span class="lineNumber">&nbsp;87</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">efp</span><span class="other">&nbsp;/=&nbsp;</span><a href="../../class_Project_490FE99079251779F37F238EB82C55DB138D46F9.html#variable_config_690E06EE2FF422E68EFDBAD366100D3A44F20349">config</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="88" xml:space="preserve"><span class="lineNumber">&nbsp;88</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">efp</span><span class="other">&nbsp;/=&nbsp;</span><span class="identifier">fn</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="89" xml:space="preserve"><span class="lineNumber">&nbsp;89</span>&nbsp;<span class="pp">#ifdef&nbsp;_WIN32</span></span>
+  <br/>
+  <span class="code" id="90" xml:space="preserve"><span class="lineNumber">&nbsp;90</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">efp</span><span class="other">.</span><span class="identifier">replace_extension</span><span class="other">(</span><span class="string">".exe"</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="91" xml:space="preserve"><span class="lineNumber">&nbsp;91</span>&nbsp;<span class="pp">#else</span></span>
+  <br/>
+  <span class="code" id="92" xml:space="preserve"><span class="lineNumber">&nbsp;92</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">efp</span><span class="other">.</span><span class="identifier">replace_extension</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="93" xml:space="preserve"><span class="lineNumber">&nbsp;93</span>&nbsp;<span class="pp">#endif</span></span>
+  <br/>
+  <span class="code" id="94" xml:space="preserve"><span class="lineNumber">&nbsp;94</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../class_Project_490FE99079251779F37F238EB82C55DB138D46F9.html#variable_executableFilePath_E6D86A2854695A5C756291E58C55F4BBA13D451B">executableFilePath</a><span class="other">&nbsp;=&nbsp;</span><a href="../../namespace_util_10CA45893690AF432B785048B4AA3F0E7D4765DF.html#function_GetFullPath_A166C4B073AC21BF33EE8C4D54DDA19526C98C2A">GetFullPath</a><span class="other">(</span><span class="identifier">efp</span><span class="other">.</span><span class="identifier">generic_string</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="95" xml:space="preserve"><span class="lineNumber">&nbsp;95</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="96" xml:space="preserve"><span class="lineNumber">&nbsp;96</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="97" xml:space="preserve"><span class="lineNumber">&nbsp;97</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../../class_Project_490FE99079251779F37F238EB82C55DB138D46F9.html">Project</a><span class="other">::</span><a href="../../class_Project_490FE99079251779F37F238EB82C55DB138D46F9.html#function_AddDeclaration_DA74E060363B8BC0518671AE64C3633F23DC9045">AddDeclaration</a><span class="other">(</span><a href="../../class_ProjectDeclaration_6E361EA1B0241033008CDF36FBC22CF32803BDED.html">ProjectDeclaration</a><span class="other">*</span>&nbsp;<span class="identifier">declaration</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="98" xml:space="preserve"><span class="lineNumber">&nbsp;98</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="99" xml:space="preserve"><span class="lineNumber">&nbsp;99</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../class_Project_490FE99079251779F37F238EB82C55DB138D46F9.html#variable_declarations_DC91800C053C6D821761471224D773D5C863544B">declarations</a><span class="other">.</span><span class="identifier">push_back</span><span class="other">(</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><a href="../../class_ProjectDeclaration_6E361EA1B0241033008CDF36FBC22CF32803BDED.html">ProjectDeclaration</a><span class="other">></span><span class="other">(</span><span class="identifier">declaration</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="100" xml:space="preserve"><span class="lineNumber">100</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="101" xml:space="preserve"><span class="lineNumber">101</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="102" xml:space="preserve"><span class="lineNumber">102</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../../class_Project_490FE99079251779F37F238EB82C55DB138D46F9.html">Project</a><span class="other">::</span><a href="../../class_Project_490FE99079251779F37F238EB82C55DB138D46F9.html#function_ResolveDeclarations_B84C9089528329C798ED211E9D66D9CE3F3AA9A5">ResolveDeclarations</a><span class="other">(</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="103" xml:space="preserve"><span class="lineNumber">103</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="104" xml:space="preserve"><span class="lineNumber">104</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">for&nbsp;</span><span class="other">(</span><span class="kw">const&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><a href="../../class_ProjectDeclaration_6E361EA1B0241033008CDF36FBC22CF32803BDED.html">ProjectDeclaration</a><span class="other">></span><span class="other">&amp;</span>&nbsp;<span class="identifier">declaration</span><span class="other">&nbsp;:&nbsp;</span><a href="../../class_Project_490FE99079251779F37F238EB82C55DB138D46F9.html#variable_declarations_DC91800C053C6D821761471224D773D5C863544B">declarations</a><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="105" xml:space="preserve"><span class="lineNumber">105</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="106" xml:space="preserve"><span class="lineNumber">106</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">switch&nbsp;</span><span class="other">(</span><span class="identifier">declaration</span><span class="other">-></span><span class="identifier">GetDeclarationType</span><span class="other">(</span><span class="other">)</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="107" xml:space="preserve"><span class="lineNumber">107</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="108" xml:space="preserve"><span class="lineNumber">108</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">case</span>&nbsp;<a href="../../enum_ProjectDeclarationType_DC752C0CBC1078EB0816F14D15AD369A813061F5.html">ProjectDeclarationType</a><span class="other">::</span><a href="../../enum_ProjectDeclarationType_DC752C0CBC1078EB0816F14D15AD369A813061F5.html#enumerator_referenceDeclaration_BAD430DCB11E923BC829E88AD61847ABEFFA8D8D">referenceDeclaration</a><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="109" xml:space="preserve"><span class="lineNumber">109</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="110" xml:space="preserve"><span class="lineNumber">110</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../class_ReferenceDeclaration_3D822FFC3988BB82083869DB547425A96ED3FB37.html">ReferenceDeclaration</a><span class="other">*</span>&nbsp;<span class="identifier">reference</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">static_cast</span><span class="other">&lt;</span><a href="../../class_ReferenceDeclaration_3D822FFC3988BB82083869DB547425A96ED3FB37.html">ReferenceDeclaration</a><span class="other">*</span><span class="other">></span><span class="other">(</span><span class="identifier">declaration</span><span class="other">.</span><span class="identifier">get</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="111" xml:space="preserve"><span class="lineNumber">111</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">boost</span><span class="other">::</span><span class="identifier">filesystem</span><span class="other">::</span><span class="type">path</span>&nbsp;<span class="identifier">rp</span><span class="other">(</span><span class="identifier">reference</span><span class="other">-></span><a href="../../class_ReferenceDeclaration_3D822FFC3988BB82083869DB547425A96ED3FB37.html#function_FilePath_8081EE12FD2801B1F83D95DCAEF1CC7E62B2DBE4">FilePath</a><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="112" xml:space="preserve"><span class="lineNumber">112</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../class_Project_490FE99079251779F37F238EB82C55DB138D46F9.html#variable_relativeReferencedProjectFilePaths_3F8663FFDE82EC3450FD0D503D34616A1F68D14B">relativeReferencedProjectFilePaths</a><span class="other">.</span><span class="identifier">push_back</span><span class="other">(</span><span class="identifier">rp</span><span class="other">.</span><span class="identifier">generic_string</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="113" xml:space="preserve"><span class="lineNumber">113</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">rp</span><span class="other">.</span><span class="identifier">is_absolute</span><span class="other">(</span><span class="other">)</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="114" xml:space="preserve"><span class="lineNumber">114</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="115" xml:space="preserve"><span class="lineNumber">115</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../class_Project_490FE99079251779F37F238EB82C55DB138D46F9.html#variable_referencedProjectFilePaths_629EDB5CD259D88510FA1B129E318F26AB42C8E9">referencedProjectFilePaths</a><span class="other">.</span><span class="identifier">push_back</span><span class="other">(</span><a href="../../namespace_util_10CA45893690AF432B785048B4AA3F0E7D4765DF.html#function_GetFullPath_A166C4B073AC21BF33EE8C4D54DDA19526C98C2A">GetFullPath</a><span class="other">(</span><span class="identifier">rp</span><span class="other">.</span><span class="identifier">generic_string</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="116" xml:space="preserve"><span class="lineNumber">116</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="117" xml:space="preserve"><span class="lineNumber">117</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">else</span></span>
+  <br/>
+  <span class="code" id="118" xml:space="preserve"><span class="lineNumber">118</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="119" xml:space="preserve"><span class="lineNumber">119</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">boost</span><span class="other">::</span><span class="identifier">filesystem</span><span class="other">::</span><span class="type">path</span>&nbsp;<span class="identifier">ar</span>&nbsp;<span class="other">=</span>&nbsp;<a href="../../class_Project_490FE99079251779F37F238EB82C55DB138D46F9.html#variable_basePath_090975C12DCDE49F7BEF9F85F20965936505AC75">basePath</a><span class="other">&nbsp;/&nbsp;</span><span class="identifier">rp</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="120" xml:space="preserve"><span class="lineNumber">120</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../class_Project_490FE99079251779F37F238EB82C55DB138D46F9.html#variable_referencedProjectFilePaths_629EDB5CD259D88510FA1B129E318F26AB42C8E9">referencedProjectFilePaths</a><span class="other">.</span><span class="identifier">push_back</span><span class="other">(</span><a href="../../namespace_util_10CA45893690AF432B785048B4AA3F0E7D4765DF.html#function_GetFullPath_A166C4B073AC21BF33EE8C4D54DDA19526C98C2A">GetFullPath</a><span class="other">(</span><span class="identifier">ar</span><span class="other">.</span><span class="identifier">generic_string</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="121" xml:space="preserve"><span class="lineNumber">121</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="122" xml:space="preserve"><span class="lineNumber">122</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">boost</span><span class="other">::</span><span class="identifier">filesystem</span><span class="other">::</span><span class="type">path</span>&nbsp;<span class="identifier">fn</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">rp</span><span class="other">.</span><span class="identifier">filename</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="123" xml:space="preserve"><span class="lineNumber">123</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">rp</span><span class="other">.</span><span class="identifier">remove_filename</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="124" xml:space="preserve"><span class="lineNumber">124</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">rp</span><span class="other">.</span><span class="identifier">is_relative</span><span class="other">(</span><span class="other">)</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="125" xml:space="preserve"><span class="lineNumber">125</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="126" xml:space="preserve"><span class="lineNumber">126</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">rp</span><span class="other">&nbsp;=&nbsp;</span><a href="../../class_Project_490FE99079251779F37F238EB82C55DB138D46F9.html#variable_systemLibDir_00408E1902F1B9BD9CF1A683443C066DC982F6C0">systemLibDir</a><span class="other">&nbsp;/&nbsp;</span><span class="identifier">rp</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="127" xml:space="preserve"><span class="lineNumber">127</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="128" xml:space="preserve"><span class="lineNumber">128</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">rp</span><span class="other">&nbsp;/=&nbsp;</span><span class="identifier">fn</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="129" xml:space="preserve"><span class="lineNumber">129</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">rp</span><span class="other">.</span><span class="identifier">extension</span><span class="other">(</span><span class="other">)</span><span class="other">&nbsp;==&nbsp;</span><span class="string">".cmp"</span><span class="other">&nbsp;||&nbsp;</span><span class="identifier">rp</span><span class="other">.</span><span class="identifier">extension</span><span class="other">(</span><span class="other">)</span><span class="other">&nbsp;==&nbsp;</span><span class="string">".cmproj"</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="130" xml:space="preserve"><span class="lineNumber">130</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="131" xml:space="preserve"><span class="lineNumber">131</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">rp</span><span class="other">.</span><span class="identifier">replace_extension</span><span class="other">(</span><span class="string">".cmm"</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="132" xml:space="preserve"><span class="lineNumber">132</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="133" xml:space="preserve"><span class="lineNumber">133</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">rp</span><span class="other">.</span><span class="identifier">extension</span><span class="other">(</span><span class="other">)</span><span class="other">&nbsp;!=&nbsp;</span><span class="string">".cmm"</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="134" xml:space="preserve"><span class="lineNumber">134</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="135" xml:space="preserve"><span class="lineNumber">135</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">throw&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">runtime_error</span><span class="other">(</span><span class="string">"invalid&nbsp;reference&nbsp;path&nbsp;extension&nbsp;'"</span><span class="other">&nbsp;+&nbsp;</span><span class="identifier">rp</span><span class="other">.</span><span class="identifier">generic_string</span><span class="other">(</span><span class="other">)</span><span class="other">&nbsp;+&nbsp;</span><span class="string">"'&nbsp;(not&nbsp;.cmp,&nbsp;.cmproj&nbsp;or&nbsp;.cmm)"</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="136" xml:space="preserve"><span class="lineNumber">136</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="137" xml:space="preserve"><span class="lineNumber">137</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="other">!</span><span class="identifier">boost</span><span class="other">::</span><span class="identifier">filesystem</span><span class="other">::</span><span class="identifier">exists</span><span class="other">(</span><span class="identifier">rp</span><span class="other">)</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="138" xml:space="preserve"><span class="lineNumber">138</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="139" xml:space="preserve"><span class="lineNumber">139</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">rp</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">reference</span><span class="other">-></span><a href="../../class_ReferenceDeclaration_3D822FFC3988BB82083869DB547425A96ED3FB37.html#function_FilePath_8081EE12FD2801B1F83D95DCAEF1CC7E62B2DBE4">FilePath</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="140" xml:space="preserve"><span class="lineNumber">140</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">rp</span><span class="other">.</span><span class="identifier">remove_filename</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="141" xml:space="preserve"><span class="lineNumber">141</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">rp</span><span class="other">.</span><span class="identifier">is_relative</span><span class="other">(</span><span class="other">)</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="142" xml:space="preserve"><span class="lineNumber">142</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="143" xml:space="preserve"><span class="lineNumber">143</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">rp</span><span class="other">&nbsp;=&nbsp;</span><a href="../../class_Project_490FE99079251779F37F238EB82C55DB138D46F9.html#variable_basePath_090975C12DCDE49F7BEF9F85F20965936505AC75">basePath</a><span class="other">&nbsp;/&nbsp;</span><span class="identifier">rp</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="144" xml:space="preserve"><span class="lineNumber">144</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="145" xml:space="preserve"><span class="lineNumber">145</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">rp</span><span class="other">&nbsp;/=&nbsp;</span><span class="string">"lib"</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="146" xml:space="preserve"><span class="lineNumber">146</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">rp</span><span class="other">&nbsp;/=&nbsp;</span><a href="../../class_Project_490FE99079251779F37F238EB82C55DB138D46F9.html#variable_config_690E06EE2FF422E68EFDBAD366100D3A44F20349">config</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="147" xml:space="preserve"><span class="lineNumber">147</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">rp</span><span class="other">&nbsp;/=&nbsp;</span><span class="identifier">fn</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="148" xml:space="preserve"><span class="lineNumber">148</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">rp</span><span class="other">.</span><span class="identifier">extension</span><span class="other">(</span><span class="other">)</span><span class="other">&nbsp;==&nbsp;</span><span class="string">".cmp"</span><span class="other">&nbsp;||&nbsp;</span><span class="identifier">rp</span><span class="other">.</span><span class="identifier">extension</span><span class="other">(</span><span class="other">)</span><span class="other">&nbsp;==&nbsp;</span><span class="string">".cmproj"</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="149" xml:space="preserve"><span class="lineNumber">149</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="150" xml:space="preserve"><span class="lineNumber">150</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">rp</span><span class="other">.</span><span class="identifier">replace_extension</span><span class="other">(</span><span class="string">".cmm"</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="151" xml:space="preserve"><span class="lineNumber">151</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="152" xml:space="preserve"><span class="lineNumber">152</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">rp</span><span class="other">.</span><span class="identifier">extension</span><span class="other">(</span><span class="other">)</span><span class="other">&nbsp;!=&nbsp;</span><span class="string">".cmm"</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="153" xml:space="preserve"><span class="lineNumber">153</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="154" xml:space="preserve"><span class="lineNumber">154</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">throw&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">runtime_error</span><span class="other">(</span><span class="string">"invalid&nbsp;reference&nbsp;path&nbsp;extension&nbsp;'"</span><span class="other">&nbsp;+&nbsp;</span><span class="identifier">rp</span><span class="other">.</span><span class="identifier">generic_string</span><span class="other">(</span><span class="other">)</span><span class="other">&nbsp;+&nbsp;</span><span class="string">"'&nbsp;(not&nbsp;.cmp,&nbsp;.cmproj&nbsp;or&nbsp;.cmm)"</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="155" xml:space="preserve"><span class="lineNumber">155</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="156" xml:space="preserve"><span class="lineNumber">156</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="157" xml:space="preserve"><span class="lineNumber">157</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">string</span>&nbsp;<span class="identifier">referencePath</span>&nbsp;<span class="other">=</span>&nbsp;<a href="../../namespace_util_10CA45893690AF432B785048B4AA3F0E7D4765DF.html#function_GetFullPath_A166C4B073AC21BF33EE8C4D54DDA19526C98C2A">GetFullPath</a><span class="other">(</span><span class="identifier">rp</span><span class="other">.</span><span class="identifier">generic_string</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="158" xml:space="preserve"><span class="lineNumber">158</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">find</span><span class="other">(</span><a href="../../class_Project_490FE99079251779F37F238EB82C55DB138D46F9.html#variable_references_225919D934CBA1ED5F1B7E01DDCC59688BBEFCCA">references</a><span class="other">.</span><span class="identifier">cbegin</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="../../class_Project_490FE99079251779F37F238EB82C55DB138D46F9.html#variable_references_225919D934CBA1ED5F1B7E01DDCC59688BBEFCCA">references</a><span class="other">.</span><span class="identifier">cend</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">referencePath</span><span class="other">)</span><span class="other">&nbsp;==&nbsp;</span><a href="../../class_Project_490FE99079251779F37F238EB82C55DB138D46F9.html#variable_references_225919D934CBA1ED5F1B7E01DDCC59688BBEFCCA">references</a><span class="other">.</span><span class="identifier">cend</span><span class="other">(</span><span class="other">)</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="159" xml:space="preserve"><span class="lineNumber">159</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="160" xml:space="preserve"><span class="lineNumber">160</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../class_Project_490FE99079251779F37F238EB82C55DB138D46F9.html#variable_references_225919D934CBA1ED5F1B7E01DDCC59688BBEFCCA">references</a><span class="other">.</span><span class="identifier">push_back</span><span class="other">(</span><span class="identifier">referencePath</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="161" xml:space="preserve"><span class="lineNumber">161</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="162" xml:space="preserve"><span class="lineNumber">162</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">break</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="163" xml:space="preserve"><span class="lineNumber">163</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="164" xml:space="preserve"><span class="lineNumber">164</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">case</span>&nbsp;<a href="../../enum_ProjectDeclarationType_DC752C0CBC1078EB0816F14D15AD369A813061F5.html">ProjectDeclarationType</a><span class="other">::</span><a href="../../enum_ProjectDeclarationType_DC752C0CBC1078EB0816F14D15AD369A813061F5.html#enumerator_sourceFileDeclaration_55986634D4F2AB401C4F8166DFE3A87470D79257">sourceFileDeclaration</a><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="165" xml:space="preserve"><span class="lineNumber">165</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="166" xml:space="preserve"><span class="lineNumber">166</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../class_SourceFileDeclaration_B6A1C12C8F54B960FE9AC836EA86F45CDA74DDB5.html">SourceFileDeclaration</a><span class="other">*</span>&nbsp;<span class="identifier">sourceFileDeclaration</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">static_cast</span><span class="other">&lt;</span><a href="../../class_SourceFileDeclaration_B6A1C12C8F54B960FE9AC836EA86F45CDA74DDB5.html">SourceFileDeclaration</a><span class="other">*</span><span class="other">></span><span class="other">(</span><span class="identifier">declaration</span><span class="other">.</span><span class="identifier">get</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="167" xml:space="preserve"><span class="lineNumber">167</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">boost</span><span class="other">::</span><span class="identifier">filesystem</span><span class="other">::</span><span class="type">path</span>&nbsp;<span class="identifier">sfp</span><span class="other">(</span><span class="identifier">sourceFileDeclaration</span><span class="other">-></span><a href="../../class_SourceFileDeclaration_B6A1C12C8F54B960FE9AC836EA86F45CDA74DDB5.html#function_FilePath_EF0DC451BAC151FB18118268D160019584A7CF12">FilePath</a><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="168" xml:space="preserve"><span class="lineNumber">168</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../class_Project_490FE99079251779F37F238EB82C55DB138D46F9.html#variable_relativeSourceFilePaths_1D4BF47C6CFDC72B11491A60A07FFC11660DA9EF">relativeSourceFilePaths</a><span class="other">.</span><span class="identifier">push_back</span><span class="other">(</span><span class="identifier">sfp</span><span class="other">.</span><span class="identifier">generic_string</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="169" xml:space="preserve"><span class="lineNumber">169</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">sfp</span><span class="other">.</span><span class="identifier">is_relative</span><span class="other">(</span><span class="other">)</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="170" xml:space="preserve"><span class="lineNumber">170</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="171" xml:space="preserve"><span class="lineNumber">171</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">sfp</span><span class="other">&nbsp;=&nbsp;</span><a href="../../class_Project_490FE99079251779F37F238EB82C55DB138D46F9.html#variable_basePath_090975C12DCDE49F7BEF9F85F20965936505AC75">basePath</a><span class="other">&nbsp;/&nbsp;</span><span class="identifier">sfp</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="172" xml:space="preserve"><span class="lineNumber">172</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="173" xml:space="preserve"><span class="lineNumber">173</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">sfp</span><span class="other">.</span><span class="identifier">extension</span><span class="other">(</span><span class="other">)</span><span class="other">&nbsp;!=&nbsp;</span><span class="string">".cm"</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="174" xml:space="preserve"><span class="lineNumber">174</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="175" xml:space="preserve"><span class="lineNumber">175</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">throw&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">runtime_error</span><span class="other">(</span><span class="string">"invalid&nbsp;source&nbsp;file&nbsp;extension&nbsp;'"</span><span class="other">&nbsp;+&nbsp;</span><span class="identifier">sfp</span><span class="other">.</span><span class="identifier">generic_string</span><span class="other">(</span><span class="other">)</span><span class="other">&nbsp;+&nbsp;</span><span class="string">"'&nbsp;(not&nbsp;.cm)"</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="176" xml:space="preserve"><span class="lineNumber">176</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="177" xml:space="preserve"><span class="lineNumber">177</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="other">!</span><span class="identifier">boost</span><span class="other">::</span><span class="identifier">filesystem</span><span class="other">::</span><span class="identifier">exists</span><span class="other">(</span><span class="identifier">sfp</span><span class="other">)</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="178" xml:space="preserve"><span class="lineNumber">178</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="179" xml:space="preserve"><span class="lineNumber">179</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">throw&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">runtime_error</span><span class="other">(</span><span class="string">"source&nbsp;file&nbsp;path&nbsp;'"</span><span class="other">&nbsp;+&nbsp;</span><a href="../../namespace_util_10CA45893690AF432B785048B4AA3F0E7D4765DF.html#function_GetFullPath_A166C4B073AC21BF33EE8C4D54DDA19526C98C2A">GetFullPath</a><span class="other">(</span><span class="identifier">sfp</span><span class="other">.</span><span class="identifier">generic_string</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">&nbsp;+&nbsp;</span><span class="string">"'&nbsp;not&nbsp;found"</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="180" xml:space="preserve"><span class="lineNumber">180</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="181" xml:space="preserve"><span class="lineNumber">181</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">string</span>&nbsp;<span class="identifier">sourceFilePath</span>&nbsp;<span class="other">=</span>&nbsp;<a href="../../namespace_util_10CA45893690AF432B785048B4AA3F0E7D4765DF.html#function_GetFullPath_A166C4B073AC21BF33EE8C4D54DDA19526C98C2A">GetFullPath</a><span class="other">(</span><span class="identifier">sfp</span><span class="other">.</span><span class="identifier">generic_string</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="182" xml:space="preserve"><span class="lineNumber">182</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">find</span><span class="other">(</span><a href="../../class_Project_490FE99079251779F37F238EB82C55DB138D46F9.html#variable_sourceFilePaths_35CEFBB957729769D4CC8EAFC2E10B9113ACD5C0">sourceFilePaths</a><span class="other">.</span><span class="identifier">cbegin</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="../../class_Project_490FE99079251779F37F238EB82C55DB138D46F9.html#variable_sourceFilePaths_35CEFBB957729769D4CC8EAFC2E10B9113ACD5C0">sourceFilePaths</a><span class="other">.</span><span class="identifier">cend</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">sourceFilePath</span><span class="other">)</span><span class="other">&nbsp;==&nbsp;</span><a href="../../class_Project_490FE99079251779F37F238EB82C55DB138D46F9.html#variable_sourceFilePaths_35CEFBB957729769D4CC8EAFC2E10B9113ACD5C0">sourceFilePaths</a><span class="other">.</span><span class="identifier">cend</span><span class="other">(</span><span class="other">)</span><span class="other">&nbsp;&amp;&amp;&nbsp;</span><span class="identifier">sourceFilePath</span><span class="other">&nbsp;!=&nbsp;</span><a href="../../class_Project_490FE99079251779F37F238EB82C55DB138D46F9.html#variable_excludeSourceFilePath_D9AD3721872A59A366B7B76E6994B430CB16156B">excludeSourceFilePath</a><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="183" xml:space="preserve"><span class="lineNumber">183</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="184" xml:space="preserve"><span class="lineNumber">184</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../class_Project_490FE99079251779F37F238EB82C55DB138D46F9.html#variable_sourceFilePaths_35CEFBB957729769D4CC8EAFC2E10B9113ACD5C0">sourceFilePaths</a><span class="other">.</span><span class="identifier">push_back</span><span class="other">(</span><span class="identifier">sourceFilePath</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="185" xml:space="preserve"><span class="lineNumber">185</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="186" xml:space="preserve"><span class="lineNumber">186</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">break</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="187" xml:space="preserve"><span class="lineNumber">187</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="188" xml:space="preserve"><span class="lineNumber">188</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">case</span>&nbsp;<a href="../../enum_ProjectDeclarationType_DC752C0CBC1078EB0816F14D15AD369A813061F5.html">ProjectDeclarationType</a><span class="other">::</span><a href="../../enum_ProjectDeclarationType_DC752C0CBC1078EB0816F14D15AD369A813061F5.html#enumerator_targetDeclaration_9CE01076858B70A722BA154C8B198897D70C0063">targetDeclaration</a><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="189" xml:space="preserve"><span class="lineNumber">189</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="190" xml:space="preserve"><span class="lineNumber">190</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../class_TargetDeclaration_77EC41A404A2CDB98CCE13E3F21D4DD6211CFE14.html">TargetDeclaration</a><span class="other">*</span>&nbsp;<span class="identifier">targetDeclaration</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">static_cast</span><span class="other">&lt;</span><a href="../../class_TargetDeclaration_77EC41A404A2CDB98CCE13E3F21D4DD6211CFE14.html">TargetDeclaration</a><span class="other">*</span><span class="other">></span><span class="other">(</span><span class="identifier">declaration</span><span class="other">.</span><span class="identifier">get</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="191" xml:space="preserve"><span class="lineNumber">191</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../class_Project_490FE99079251779F37F238EB82C55DB138D46F9.html#variable_target_BAD3A260C9C4FBA9DC91F457E228DED1FF868660">target</a><span class="other">&nbsp;=&nbsp;</span><span class="identifier">targetDeclaration</span><span class="other">-></span><a href="../../class_TargetDeclaration_77EC41A404A2CDB98CCE13E3F21D4DD6211CFE14.html#function_GetTarget_B45E902B994766DE5F9A41D691DCB9DF2327A342">GetTarget</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="192" xml:space="preserve"><span class="lineNumber">192</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">break</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="193" xml:space="preserve"><span class="lineNumber">193</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="194" xml:space="preserve"><span class="lineNumber">194</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">case</span>&nbsp;<a href="../../enum_ProjectDeclarationType_DC752C0CBC1078EB0816F14D15AD369A813061F5.html">ProjectDeclarationType</a><span class="other">::</span><a href="../../enum_ProjectDeclarationType_DC752C0CBC1078EB0816F14D15AD369A813061F5.html#enumerator_textFileDeclaration_BEF589A56C607A2D99E8595EBC80B9CF215BE239">textFileDeclaration</a><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="195" xml:space="preserve"><span class="lineNumber">195</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="196" xml:space="preserve"><span class="lineNumber">196</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../class_TextFileDeclaration_592D436B4D5157325BE84247368F81F3426832E9.html">TextFileDeclaration</a><span class="other">*</span>&nbsp;<span class="identifier">textFileDeclaration</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">static_cast</span><span class="other">&lt;</span><a href="../../class_TextFileDeclaration_592D436B4D5157325BE84247368F81F3426832E9.html">TextFileDeclaration</a><span class="other">*</span><span class="other">></span><span class="other">(</span><span class="identifier">declaration</span><span class="other">.</span><span class="identifier">get</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="197" xml:space="preserve"><span class="lineNumber">197</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">boost</span><span class="other">::</span><span class="identifier">filesystem</span><span class="other">::</span><span class="type">path</span>&nbsp;<span class="identifier">tfp</span><span class="other">(</span><span class="identifier">textFileDeclaration</span><span class="other">-></span><a href="../../class_TextFileDeclaration_592D436B4D5157325BE84247368F81F3426832E9.html#function_FilePath_792B2C3961D0EEE2E3C25E3F3E215476588545FB">FilePath</a><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="198" xml:space="preserve"><span class="lineNumber">198</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../class_Project_490FE99079251779F37F238EB82C55DB138D46F9.html#variable_relativeTextFilePaths_50424F9582E3DC059EFAEAF6C0CB3031FC752901">relativeTextFilePaths</a><span class="other">.</span><span class="identifier">push_back</span><span class="other">(</span><span class="identifier">tfp</span><span class="other">.</span><span class="identifier">generic_string</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="199" xml:space="preserve"><span class="lineNumber">199</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">break</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="200" xml:space="preserve"><span class="lineNumber">200</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="201" xml:space="preserve"><span class="lineNumber">201</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">default</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="202" xml:space="preserve"><span class="lineNumber">202</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="203" xml:space="preserve"><span class="lineNumber">203</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">throw&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">runtime_error</span><span class="other">(</span><span class="string">"unknown&nbsp;project&nbsp;declaration"</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="204" xml:space="preserve"><span class="lineNumber">204</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="205" xml:space="preserve"><span class="lineNumber">205</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="206" xml:space="preserve"><span class="lineNumber">206</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="207" xml:space="preserve"><span class="lineNumber">207</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="208" xml:space="preserve"><span class="lineNumber">208</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="209" xml:space="preserve"><span class="lineNumber">209</span>&nbsp;<span class="kw">bool</span>&nbsp;<a href="../../class_Project_490FE99079251779F37F238EB82C55DB138D46F9.html">Project</a><span class="other">::</span><a href="../../class_Project_490FE99079251779F37F238EB82C55DB138D46F9.html#function_DependsOn_D8AEDF8DEE73595DC3D9D0C311CEF3D641897C5A">DependsOn</a><span class="other">(</span><a href="../../class_Project_490FE99079251779F37F238EB82C55DB138D46F9.html">Project</a><span class="other">*</span>&nbsp;<span class="identifier">that</span><span class="other">)</span>&nbsp;<span class="kw">const</span></span>
+  <br/>
+  <span class="code" id="210" xml:space="preserve"><span class="lineNumber">210</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="211" xml:space="preserve"><span class="lineNumber">211</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">find</span><span class="other">(</span><a href="../../class_Project_490FE99079251779F37F238EB82C55DB138D46F9.html#variable_references_225919D934CBA1ED5F1B7E01DDCC59688BBEFCCA">references</a><span class="other">.</span><span class="identifier">cbegin</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="../../class_Project_490FE99079251779F37F238EB82C55DB138D46F9.html#variable_references_225919D934CBA1ED5F1B7E01DDCC59688BBEFCCA">references</a><span class="other">.</span><span class="identifier">cend</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">that</span><span class="other">-></span><a href="../../class_Project_490FE99079251779F37F238EB82C55DB138D46F9.html#variable_moduleFilePath_62BD0F75B076C08AC9A7CBD1E82DBD7BD24A3626">moduleFilePath</a><span class="other">)</span><span class="other">&nbsp;!=&nbsp;</span><a href="../../class_Project_490FE99079251779F37F238EB82C55DB138D46F9.html#variable_references_225919D934CBA1ED5F1B7E01DDCC59688BBEFCCA">references</a><span class="other">.</span><span class="identifier">cend</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="212" xml:space="preserve"><span class="lineNumber">212</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="213" xml:space="preserve"><span class="lineNumber">213</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="214" xml:space="preserve"><span class="lineNumber">214</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../../class_Project_490FE99079251779F37F238EB82C55DB138D46F9.html">Project</a><span class="other">::</span><a href="../../class_Project_490FE99079251779F37F238EB82C55DB138D46F9.html#function_AddDependsOnProjects_B10941A099E7AD9D4245C804D279890C7F1126B8">AddDependsOnProjects</a><span class="other">(</span><a href="../../class_Project_490FE99079251779F37F238EB82C55DB138D46F9.html">Project</a><span class="other">*</span>&nbsp;<span class="identifier">dependsOnProject</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="215" xml:space="preserve"><span class="lineNumber">215</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="216" xml:space="preserve"><span class="lineNumber">216</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../class_Project_490FE99079251779F37F238EB82C55DB138D46F9.html#variable_dependsOn_403BC348CC64E116E79FF30082C9FA6F1D19CE6C">dependsOn</a><span class="other">.</span><span class="identifier">push_back</span><span class="other">(</span><span class="identifier">dependsOnProject</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="217" xml:space="preserve"><span class="lineNumber">217</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="218" xml:space="preserve"><span class="lineNumber">218</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="219" xml:space="preserve"><span class="lineNumber">219</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../../class_Project_490FE99079251779F37F238EB82C55DB138D46F9.html">Project</a><span class="other">::</span><a href="../../class_Project_490FE99079251779F37F238EB82C55DB138D46F9.html#function_SetModuleFilePath_68965C07F31161D3336AFFDF7C7556F7836B64B9">SetModuleFilePath</a><span class="other">(</span><span class="kw">const&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="type">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">moduleFilePath_</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="220" xml:space="preserve"><span class="lineNumber">220</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="221" xml:space="preserve"><span class="lineNumber">221</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../class_Project_490FE99079251779F37F238EB82C55DB138D46F9.html#variable_moduleFilePath_62BD0F75B076C08AC9A7CBD1E82DBD7BD24A3626">moduleFilePath</a><span class="other">&nbsp;=&nbsp;</span><span class="identifier">moduleFilePath_</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="222" xml:space="preserve"><span class="lineNumber">222</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="223" xml:space="preserve"><span class="lineNumber">223</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="224" xml:space="preserve"><span class="lineNumber">224</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../../class_Project_490FE99079251779F37F238EB82C55DB138D46F9.html">Project</a><span class="other">::</span><a href="../../class_Project_490FE99079251779F37F238EB82C55DB138D46F9.html#function_SetLibraryFilePath_82B6D911280CE8956DDD7180045228B621936EAF">SetLibraryFilePath</a><span class="other">(</span><span class="kw">const&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="type">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">libraryFilePath_</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="225" xml:space="preserve"><span class="lineNumber">225</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="226" xml:space="preserve"><span class="lineNumber">226</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../class_Project_490FE99079251779F37F238EB82C55DB138D46F9.html#variable_libraryFilePath_4459C16B07126B21C2BDF79361874E3278336004">libraryFilePath</a><span class="other">&nbsp;=&nbsp;</span><span class="identifier">libraryFilePath_</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="227" xml:space="preserve"><span class="lineNumber">227</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="228" xml:space="preserve"><span class="lineNumber">228</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="229" xml:space="preserve"><span class="lineNumber">229</span>&nbsp;<span class="kw">bool</span>&nbsp;<a href="../../class_Project_490FE99079251779F37F238EB82C55DB138D46F9.html">Project</a><span class="other">::</span><a href="../../class_Project_490FE99079251779F37F238EB82C55DB138D46F9.html#function_IsUpToDate_CED60B1D782B718A76BC75FCDBD319AB0F87DA55">IsUpToDate</a><span class="other">(</span><span class="kw">const&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="type">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">systemModuleFilePath</span><span class="other">)</span>&nbsp;<span class="kw">const</span></span>
+  <br/>
+  <span class="code" id="230" xml:space="preserve"><span class="lineNumber">230</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="231" xml:space="preserve"><span class="lineNumber">231</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="other">!</span><span class="identifier">boost</span><span class="other">::</span><span class="identifier">filesystem</span><span class="other">::</span><span class="identifier">exists</span><span class="other">(</span><a href="../../class_Project_490FE99079251779F37F238EB82C55DB138D46F9.html#variable_moduleFilePath_62BD0F75B076C08AC9A7CBD1E82DBD7BD24A3626">moduleFilePath</a><span class="other">)</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="232" xml:space="preserve"><span class="lineNumber">232</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="233" xml:space="preserve"><span class="lineNumber">233</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">false</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="234" xml:space="preserve"><span class="lineNumber">234</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="235" xml:space="preserve"><span class="lineNumber">235</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">for&nbsp;</span><span class="other">(</span><span class="kw">const&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="type">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">sourceFilePath</span><span class="other">&nbsp;:&nbsp;</span><a href="../../class_Project_490FE99079251779F37F238EB82C55DB138D46F9.html#variable_sourceFilePaths_35CEFBB957729769D4CC8EAFC2E10B9113ACD5C0">sourceFilePaths</a><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="236" xml:space="preserve"><span class="lineNumber">236</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="237" xml:space="preserve"><span class="lineNumber">237</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">boost</span><span class="other">::</span><span class="identifier">filesystem</span><span class="other">::</span><span class="identifier">last_write_time</span><span class="other">(</span><span class="identifier">sourceFilePath</span><span class="other">)</span><span class="other">&nbsp;>&nbsp;</span><span class="identifier">boost</span><span class="other">::</span><span class="identifier">filesystem</span><span class="other">::</span><span class="identifier">last_write_time</span><span class="other">(</span><a href="../../class_Project_490FE99079251779F37F238EB82C55DB138D46F9.html#variable_moduleFilePath_62BD0F75B076C08AC9A7CBD1E82DBD7BD24A3626">moduleFilePath</a><span class="other">)</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="238" xml:space="preserve"><span class="lineNumber">238</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="239" xml:space="preserve"><span class="lineNumber">239</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">false</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="240" xml:space="preserve"><span class="lineNumber">240</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="241" xml:space="preserve"><span class="lineNumber">241</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="242" xml:space="preserve"><span class="lineNumber">242</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="other">!</span><span class="identifier">systemModuleFilePath</span><span class="other">.</span><span class="identifier">empty</span><span class="other">(</span><span class="other">)</span><span class="other">&nbsp;&amp;&amp;&nbsp;</span><span class="other">!</span><a href="../../class_Project_490FE99079251779F37F238EB82C55DB138D46F9.html#function_IsSystemProject_13E0EC8FD0E737D0B70C8057BAB82E01B8EF3A81">IsSystemProject</a><span class="other">(</span><span class="other">)</span><span class="other">&nbsp;&amp;&amp;&nbsp;</span><span class="identifier">boost</span><span class="other">::</span><span class="identifier">filesystem</span><span class="other">::</span><span class="identifier">exists</span><span class="other">(</span><span class="identifier">systemModuleFilePath</span><span class="other">)</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="243" xml:space="preserve"><span class="lineNumber">243</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="244" xml:space="preserve"><span class="lineNumber">244</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">boost</span><span class="other">::</span><span class="identifier">filesystem</span><span class="other">::</span><span class="identifier">last_write_time</span><span class="other">(</span><span class="identifier">systemModuleFilePath</span><span class="other">)</span><span class="other">&nbsp;>&nbsp;</span><span class="identifier">boost</span><span class="other">::</span><span class="identifier">filesystem</span><span class="other">::</span><span class="identifier">last_write_time</span><span class="other">(</span><a href="../../class_Project_490FE99079251779F37F238EB82C55DB138D46F9.html#variable_moduleFilePath_62BD0F75B076C08AC9A7CBD1E82DBD7BD24A3626">moduleFilePath</a><span class="other">)</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="245" xml:space="preserve"><span class="lineNumber">245</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="246" xml:space="preserve"><span class="lineNumber">246</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">false</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="247" xml:space="preserve"><span class="lineNumber">247</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="248" xml:space="preserve"><span class="lineNumber">248</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="249" xml:space="preserve"><span class="lineNumber">249</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">true</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="250" xml:space="preserve"><span class="lineNumber">250</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="251" xml:space="preserve"><span class="lineNumber">251</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="252" xml:space="preserve"><span class="lineNumber">252</span>&nbsp;<span class="kw">bool</span>&nbsp;<a href="../../class_Project_490FE99079251779F37F238EB82C55DB138D46F9.html">Project</a><span class="other">::</span><a href="../../class_Project_490FE99079251779F37F238EB82C55DB138D46F9.html#function_Ready_9ABEDBB4A1F7A8F4CF1845B824E5426A341403BA">Ready</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span></span>
+  <br/>
+  <span class="code" id="253" xml:space="preserve"><span class="lineNumber">253</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="254" xml:space="preserve"><span class="lineNumber">254</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">for&nbsp;</span><span class="other">(</span><a href="../../class_Project_490FE99079251779F37F238EB82C55DB138D46F9.html">Project</a><span class="other">*</span>&nbsp;<span class="identifier">dependOn</span><span class="other">&nbsp;:&nbsp;</span><a href="../../class_Project_490FE99079251779F37F238EB82C55DB138D46F9.html#variable_dependsOn_403BC348CC64E116E79FF30082C9FA6F1D19CE6C">dependsOn</a><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="255" xml:space="preserve"><span class="lineNumber">255</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="256" xml:space="preserve"><span class="lineNumber">256</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="other">!</span><span class="identifier">dependOn</span><span class="other">-></span><a href="../../class_Project_490FE99079251779F37F238EB82C55DB138D46F9.html#function_Built_F1102E5F2D9A4CA45CDE6257AC301FBA38DCD684">Built</a><span class="other">(</span><span class="other">)</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="257" xml:space="preserve"><span class="lineNumber">257</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="258" xml:space="preserve"><span class="lineNumber">258</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">false</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="259" xml:space="preserve"><span class="lineNumber">259</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="260" xml:space="preserve"><span class="lineNumber">260</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="261" xml:space="preserve"><span class="lineNumber">261</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">true</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="262" xml:space="preserve"><span class="lineNumber">262</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="263" xml:space="preserve"><span class="lineNumber">263</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="264" xml:space="preserve"><span class="lineNumber">264</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../../class_Project_490FE99079251779F37F238EB82C55DB138D46F9.html">Project</a><span class="other">::</span><a href="../../class_Project_490FE99079251779F37F238EB82C55DB138D46F9.html#function_SetExcludeSourceFilePath_6C222B2402BF0C270A474CADBC9D4AD590A662A9">SetExcludeSourceFilePath</a><span class="other">(</span><span class="kw">const&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="type">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">excludeSourceFilePath_</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="265" xml:space="preserve"><span class="lineNumber">265</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="266" xml:space="preserve"><span class="lineNumber">266</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../class_Project_490FE99079251779F37F238EB82C55DB138D46F9.html#variable_excludeSourceFilePath_D9AD3721872A59A366B7B76E6994B430CB16156B">excludeSourceFilePath</a><span class="other">&nbsp;=&nbsp;</span><span class="identifier">excludeSourceFilePath_</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="267" xml:space="preserve"><span class="lineNumber">267</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="268" xml:space="preserve"><span class="lineNumber">268</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="269" xml:space="preserve"><span class="lineNumber">269</span>&nbsp;<span class="other">}</span>&nbsp;<span class="other">}</span>&nbsp;<span class="comment">//&nbsp;namespace&nbsp;cmajor::ast</span></span>
+  <br/>
+ </body>
+</html>

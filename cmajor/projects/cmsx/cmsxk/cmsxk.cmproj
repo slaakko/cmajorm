@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Label="Globals">
+    <CustomProjectExtensionsPath>$(LocalAppData)\CustomProjectSystems\Cmajor\</CustomProjectExtensionsPath>
+    <ProjectGuid>41e9e486-fbff-4e28-bc97-c4db0fb9a67b</ProjectGuid>
+  </PropertyGroup>
+  <PropertyGroup>
+    <TargetType>library</TargetType>
+  </PropertyGroup>
+  <Import Project="$(CustomProjectExtensionsPath)Cmajor.props" />
+  <Import Project="$(CustomProjectExtensionsPath)Cmajor.targets" />
+  <ItemGroup>
+    <CmCompile Include="Boot.cm" />
+    <CmCompile Include="ConsoleInputDriver.cm" />
+    <CmCompile Include="File.cm" />
+    <CmCompile Include="InterruptHandler.cm" />
+    <CmCompile Include="Kernel.cm" />
+    <CmCompile Include="Loader.cm" />
+    <CmCompile Include="Memory.cm" />
+    <CmCompile Include="Process.cm" />
+    <CmCompile Include="Segment.cm" />
+    <CmCompile Include="SystemCall.cm" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\cmsxm\cmsxm.cmproj" />
+    <ProjectReference Include="..\cmsxo\cmsxo.cmproj" />
+    <ProjectReference Include="..\cmsxu\cmsxu.cmproj" />
+  </ItemGroup>
+</Project>

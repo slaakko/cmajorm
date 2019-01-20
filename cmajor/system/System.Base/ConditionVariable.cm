@@ -1,0 +1,134 @@
+// =================================
+// Copyright (c) 2019 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+
+namespace System.Threading
+{
+    public enum ConditionVariableStatus : int
+    {
+        timeout = 0, no_timeout = 1
+    }
+
+    public delegate bool Predicate(void* arg);
+    public class delegate bool PredicateMethod(void* arg);
+    
+    public class ConditionVariable
+    {
+        public nothrow ConditionVariable() : id(RtAllocateConditionVariable())
+        {
+        }
+        public ~ConditionVariable()
+        {
+            if (id > 0)
+            {
+                RtFreeConditionVariable(id);
+            }            
+        }
+        suppress ConditionVariable(const ConditionVariable&);
+        suppress void operator=(ConditionVariable&);
+        public nothrow ConditionVariable(ConditionVariable&& that) : id(that.id)
+        {
+            that.id = -1;
+        }
+        public nothrow void operator=(ConditionVariable&& that)
+        {
+            Swap(id, that.id);
+        }
+        public void NotifyOne()
+        {
+            int result = RtNotifyOne(id);
+            if (result < 0)
+            {
+                string message = RtGetError(result);
+                RtDisposeError(result);
+                throw ThreadingException(message);
+            }            
+        }
+        public void NotifyAll()
+        {
+            int result = RtNotifyAll(id);
+            if (result < 0)
+            {
+                string message = RtGetError(result);
+                RtDisposeError(result);
+                throw ThreadingException(message);
+            }            
+        }
+        public void Wait(RecursiveMutex& mtx)
+        {
+            int result = RtWaitConditionVariable(id, cast<void*>(&mtx));
+            if (result < 0)
+            {
+                string message = RtGetError(result);
+                RtDisposeError(result);
+                throw ThreadingException(message);
+            }            
+        }
+        public ConditionVariableStatus WaitFor(RecursiveMutex& mtx, const Duration& duration)
+        {
+            int result = RtWaitConditionVariableDuration(id, cast<void*>(&mtx), duration.Rep());
+            if (result < 0)
+            {
+                string message = RtGetError(result);
+                RtDisposeError(result);
+                throw ThreadingException(message);
+            }
+            return cast<ConditionVariableStatus>(result);
+        }
+        public ConditionVariableStatus WaitUntil(RecursiveMutex& mtx, const TimePoint& tp)
+        {
+            Duration duration = tp - Now();
+            return WaitFor(mtx, duration);
+        }
+        public void Wait(RecursiveMutex& mtx, Predicate predicate, void* arg)
+        {
+            while (!predicate(arg))
+            {
+                Wait(mtx);
+            }
+        }
+        public bool WaitFor(RecursiveMutex& mtx, Predicate predicate, void* arg, const Duration& duration)
+        {
+            while (!predicate(arg))
+            {
+                if (WaitFor(mtx, duration) == ConditionVariableStatus.timeout) 
+                {
+                    return predicate(arg);
+                }
+            }
+            return true;
+        }
+        public bool WaitUntil(RecursiveMutex& mtx, Predicate predicate, void* arg, const TimePoint& tp)
+        {
+            Duration duration = tp - Now();
+            return WaitFor(mtx, predicate, arg, duration);
+        }
+        public void Wait(RecursiveMutex& mtx, PredicateMethod predicateMethod, void* arg)
+        {
+            while (!predicateMethod(arg))
+            {
+                Wait(mtx);
+            }
+        }
+        public bool WaitFor(RecursiveMutex& mtx, PredicateMethod predicateMethod, void* arg, const Duration& duration)
+        {
+            while (!predicateMethod(arg))
+            {
+                if (WaitFor(mtx, duration) == ConditionVariableStatus.timeout) 
+                {
+                    return predicateMethod(arg);
+                }
+            }
+            return true;
+        }
+        public bool WaitUntil(RecursiveMutex& mtx, PredicateMethod predicateMethod, void* arg, const TimePoint& tp)
+        {
+            Duration duration = tp - Now();
+            return WaitFor(mtx, predicateMethod, arg, duration);
+        }
+        private int id;
+    }
+}

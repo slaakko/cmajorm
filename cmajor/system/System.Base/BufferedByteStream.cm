@@ -1,0 +1,117 @@
+// =================================
+// Copyright (c) 2019 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+
+namespace System.IO
+{
+    public class BufferedByteStream : ByteStream
+    {
+        public nothrow BufferedByteStream(const SharedPtr<ByteStream>& baseStream_) : this(baseStream_, 4096)
+        {
+        }
+        public nothrow BufferedByteStream(const SharedPtr<ByteStream>& baseStream_, long bufferSize_) : 
+            baseStream(baseStream_), buffer(bufferSize_), pos(buffer.Size()), bytesAvailable(0), end(0)
+        {
+        }
+        suppress BufferedByteStream(const BufferedByteStream&);
+        suppress void operator=(const BufferedByteStream&);
+        public override ~BufferedByteStream()
+        {
+            try
+            {
+                if (!baseStream.IsNull())
+                {
+                    Flush();
+                }
+            }            
+            catch (const Exception&)
+            {
+            }
+        }
+        public override int ReadByte()
+        {
+            Flush();
+            if (bytesAvailable == 0)
+            {
+                FillBuf();
+                if (bytesAvailable == 0)
+                {
+                    return -1;
+                }
+            }
+            byte value = buffer[pos++];
+            --bytesAvailable;
+            return value;
+        }
+        public override long Read(byte* buf, long count)
+        {
+            #assert(count >= 0);
+            Flush();
+            if (bytesAvailable == 0)
+            {
+                FillBuf();
+            }
+            long bytesRead = 0;
+            long n = Min(bytesAvailable, count);
+            for (long i = 0; i < n; ++i)
+            {
+                buf[i] = buffer[pos++];
+                ++bytesRead;
+                --bytesAvailable;
+            }
+            return bytesRead;
+        }
+        public override void Write(byte x)
+        {
+            if (end >= buffer.Size())
+            {
+                Flush();
+            }
+            buffer[end++] = x;
+        }
+        public override void Write(byte* buf, long count)
+        {
+            #assert(count >= 0);
+            for (long i = 0; i < count; ++i)
+            {
+                Write(buf[i]);
+            }
+        }
+        public override void Flush()
+        {
+            if (end != 0)
+            {
+                baseStream->Write(cast<byte*>(buffer.Mem()), end);
+                end = 0;
+            }
+        }
+        public override void Seek(long pos, Origin origin)
+        {
+            Flush();
+            bytesAvailable = 0;
+            baseStream->Seek(pos, origin);
+        }
+        public override long Tell()
+        {
+            Flush();
+            return baseStream->Tell() - bytesAvailable;
+        }
+        public nothrow const SharedPtr<ByteStream>& ContainedStream() 
+        {
+            return baseStream;
+        }
+        private void FillBuf()
+        {
+            bytesAvailable = baseStream->Read(cast<byte*>(buffer.Mem()), buffer.Size());
+            pos = 0;
+        }
+        private SharedPtr<ByteStream> baseStream;
+        private IOBuffer buffer;
+        private long pos;
+        private long bytesAvailable;
+        private long end;
+    }
+}

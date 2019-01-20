@@ -1,0 +1,316 @@
+using System;
+using System.Collections;
+using Span = System.Text.Parsing.Span;
+
+namespace cppast
+{
+    public abstract class StatementNode : Node
+    {
+        public nothrow StatementNode(const Span& span_) : base(span_)
+        {
+        }
+    }
+    
+    public class LabeledStatementNode : StatementNode
+    {
+        public nothrow LabeledStatementNode(const Span& span_, IdentifierNode* label_, StatementNode* statement_) : base(span_), label(label_), statement(statement_)
+        {
+            label->parent = this;
+            statement->parent = this;
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public UniquePtr<IdentifierNode> label;
+        public UniquePtr<StatementNode> statement;
+    }
+    
+    public class CaseStatementNode : StatementNode
+    {
+        public nothrow CaseStatementNode(const Span& span_, Node* caseExpr_, StatementNode* statement_) : base(span_), caseExpr(caseExpr_), statement(statement_)
+        {
+            caseExpr->parent = this;
+            statement->parent = this;
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public UniquePtr<Node> caseExpr;
+        public UniquePtr<StatementNode> statement;
+    }
+    
+    public class DefaultStatementNode : StatementNode
+    {
+        public nothrow DefaultStatementNode(const Span& span_, StatementNode* statement_) : base(span_), statement(statement_)
+        {
+            statement->parent = this;
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public UniquePtr<StatementNode> statement;
+    }
+    
+    public class ExpressionStatementNode : StatementNode
+    {
+        public nothrow ExpressionStatementNode(const Span& span_, Node* expression_) : base(span_), expression(expression_)
+        {
+            if (!expression.IsNull())
+            {
+                expression->parent = this;
+            }
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public UniquePtr<Node> expression;
+    }
+    
+    public class CompoundStatementNode : StatementNode
+    {
+        public nothrow CompoundStatementNode(const Span& span_) : base(span_), statements()
+        {
+        }
+        public void AddStatement(StatementNode* statement)
+        {
+            statement->parent = this;
+            statements.Add(UniquePtr<StatementNode>(statement));
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public List<UniquePtr<StatementNode>> statements;
+    }
+    
+    public class IfStatementNode : StatementNode
+    {
+        public nothrow IfStatementNode(const Span& span_, Node* condition_, StatementNode* thenS_, StatementNode* elseS_) : 
+            base(span_), condition(condition_), thenS(thenS_), elseS(elseS_)
+        {
+            condition->parent = this;
+            thenS->parent = this;
+            if (!elseS.IsNull())
+            {
+                elseS->parent = this;
+            }
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public UniquePtr<Node> condition;
+        public UniquePtr<StatementNode> thenS;
+        public UniquePtr<StatementNode> elseS;
+    }
+    
+    public class SwitchStatementNode : StatementNode
+    {
+        public nothrow SwitchStatementNode(const Span& span_, Node* condition_, StatementNode* statement_) :
+            base(span_), condition(condition_), statement(statement_)
+        {
+            condition->parent = this;
+            statement->parent = this;
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public UniquePtr<Node> condition;
+        public UniquePtr<StatementNode> statement;
+    }
+    
+    public class WhileStatementNode : StatementNode
+    {
+        public nothrow WhileStatementNode(const Span& span_, Node* condition_, StatementNode* statement_) :
+            base(span_), condition(condition_), statement(statement_)
+        {
+            condition->parent = this;
+            statement->parent = this;
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public UniquePtr<Node> condition;
+        public UniquePtr<StatementNode> statement;
+    }
+    
+    public class DoStatementNode : StatementNode
+    {
+        public nothrow DoStatementNode(const Span& span_, StatementNode* statement_, Node* expression_) : 
+            base(span_), statement(statement_), expression(expression_)
+        {
+            statement->parent = this;
+            expression->parent = this;
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public UniquePtr<StatementNode> statement;
+        public UniquePtr<Node> expression;
+    }
+    
+    public class RangeForStatementNode : StatementNode
+    {
+        public nothrow RangeForStatementNode(const Span& span_, SimpleDeclarationNode* forRangeDeclaration_, Node* forRangeInitializer_, StatementNode* statement_) : 
+            base(span_), forRangeDeclaration(forRangeDeclaration_), forRangeInitializer(forRangeInitializer_), statement(statement_)
+        {
+            forRangeDeclaration->parent = this;
+            forRangeInitializer->parent = this;
+            statement->parent = this;
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public UniquePtr<SimpleDeclarationNode> forRangeDeclaration;
+        public UniquePtr<Node> forRangeInitializer;
+        public UniquePtr<StatementNode> statement;
+    }
+    
+    public class ForStatementNode : StatementNode
+    {
+        public nothrow ForStatementNode(const Span& span_, Node* forInitialization_, Node* condition_, Node* loopExpr_, StatementNode* statement_) :
+            base(span_), forInitialization(forInitialization_), condition(condition_), loopExpr(loopExpr_), statement(statement_)
+        {
+            if (!forInitialization.IsNull())
+            {
+                forInitialization->parent = this;
+            }
+            if (!condition.IsNull())
+            {
+                condition->parent = this;
+            }
+            if (!loopExpr.IsNull())
+            {
+                loopExpr->parent = this;
+            }
+            statement->parent = this;
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public UniquePtr<Node> forInitialization;
+        public UniquePtr<Node> condition;
+        public UniquePtr<Node> loopExpr;
+        public UniquePtr<StatementNode> statement;
+    }
+    
+    public class BreakStatementNode : StatementNode
+    {
+        public nothrow BreakStatementNode(const Span& span_) : base(span_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+    }
+    
+    public class ContinueStatementNode : StatementNode
+    {
+        public nothrow ContinueStatementNode(const Span& span_) : base(span_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+    }
+    
+    public class ReturnStatementNode : StatementNode
+    {
+        public nothrow ReturnStatementNode(const Span& span_, Node* expression_) : base(span_), expression(expression_)
+        {
+            if (!expression.IsNull())
+            {
+                expression->parent = this;
+            }
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public UniquePtr<Node> expression;
+    }
+    
+    public class GotoStatementNode : StatementNode
+    {
+        public nothrow GotoStatementNode(const Span& span_, IdentifierNode* target_) : base(span_), target(target_) 
+        {
+            target->parent = this;
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public UniquePtr<IdentifierNode> target;
+    }
+    
+    public class DeclarationStatementNode : StatementNode
+    {
+        public nothrow DeclarationStatementNode(const Span& span_, Node* declaration_) : base(span_), declaration(declaration_)
+        {
+            declaration->parent = this;
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public UniquePtr<Node> declaration;
+    }
+    
+    public class ExceptionHandlerNode : Node
+    {
+        public nothrow ExceptionHandlerNode(const Span& span_, Node* exceptionDeclaration_, CompoundStatementNode* catchBlock_) : 
+            base(span_), exceptionDeclaration(exceptionDeclaration_), catchBlock(catchBlock_)
+        {
+            exceptionDeclaration->parent = this;
+            catchBlock->parent = this;
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public UniquePtr<Node> exceptionDeclaration;
+        public UniquePtr<CompoundStatementNode> catchBlock;
+    }
+    
+    public class CatchAllNode : Node
+    {
+        public nothrow CatchAllNode(const Span& span_) : base(span_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+    }
+
+    public class TryStatementNode : StatementNode
+    {
+        public nothrow TryStatementNode(const Span& span_, CompoundStatementNode* tryBlock_) : base(span_), tryBlock(tryBlock_), handlers()
+        {
+            tryBlock->parent = this;
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public void AddHandler(ExceptionHandlerNode* handler)
+        {
+            handler->parent = this;
+            handlers.Add(UniquePtr<ExceptionHandlerNode>(handler));
+        }
+        public UniquePtr<CompoundStatementNode> tryBlock;
+        public List<UniquePtr<ExceptionHandlerNode>> handlers;
+    }
+    
+}

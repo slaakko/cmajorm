@@ -1,0 +1,166 @@
+using System;
+using cmast;
+
+namespace cmsymbols
+{
+    public abstract class BasicTypeSymbol : TypeSymbol
+    {
+        public nothrow BasicTypeSymbol(const ustring& name_) : base(name_)
+        {
+        }
+    }
+    
+    public class BoolTypeSymbol : BasicTypeSymbol
+    {
+        public nothrow BoolTypeSymbol() : base(u"bool")
+        {
+        }
+        public override Node* Syntax() 
+        {
+            return new BoolNode();
+        }
+    }
+    
+    public class SByteTypeSymbol : BasicTypeSymbol
+    {
+        public nothrow SByteTypeSymbol() : base(u"sbyte")
+        {
+        }
+        public override Node* Syntax() 
+        {
+            return new SByteNode();
+        }
+    }
+
+    public class ByteTypeSymbol : BasicTypeSymbol
+    {
+        public nothrow ByteTypeSymbol() : base(u"byte")
+        {
+        }
+        public override Node* Syntax() 
+        {
+            return new ByteNode();
+        }
+    }
+
+    public class ShortTypeSymbol : BasicTypeSymbol
+    {
+        public nothrow ShortTypeSymbol() : base(u"short")
+        {
+        }
+        public override Node* Syntax() 
+        {
+            return new ShortNode();
+        }
+    }
+
+    public class UShortTypeSymbol : BasicTypeSymbol
+    {
+        public nothrow UShortTypeSymbol() : base(u"ushort")
+        {
+        }
+        public override Node* Syntax() 
+        {
+            return new UShortNode();
+        }
+    }
+
+    public class IntTypeSymbol : BasicTypeSymbol
+    {
+        public nothrow IntTypeSymbol() : base(u"int")
+        {
+        }
+        public override Node* Syntax() 
+        {
+            return new IntNode();
+        }
+    }
+
+    public class UIntTypeSymbol : BasicTypeSymbol
+    {
+        public nothrow UIntTypeSymbol() : base(u"uint")
+        {
+        }
+        public override Node* Syntax() 
+        {
+            return new UIntNode();
+        }
+    }
+
+    public class LongTypeSymbol : BasicTypeSymbol
+    {
+        public nothrow LongTypeSymbol() : base(u"long")
+        {
+        }
+        public override Node* Syntax() 
+        {
+            return new LongNode();
+        }
+    }
+
+    public class ULongTypeSymbol : BasicTypeSymbol
+    {
+        public nothrow ULongTypeSymbol() : base(u"ulong")
+        {
+        }
+        public override Node* Syntax() 
+        {
+            return new ULongNode();
+        }
+    }
+
+    public class FloatTypeSymbol : BasicTypeSymbol
+    {
+        public nothrow FloatTypeSymbol() : base(u"float")
+        {
+        }
+        public override Node* Syntax() 
+        {
+            return new FloatNode();
+        }
+    }
+
+    public class DoubleTypeSymbol : BasicTypeSymbol
+    {
+        public nothrow DoubleTypeSymbol() : base(u"double")
+        {
+        }
+        public override Node* Syntax() 
+        {
+            return new DoubleNode();
+        }
+    }
+
+    public class CharTypeSymbol : BasicTypeSymbol
+    {
+        public nothrow CharTypeSymbol() : base(u"char")
+        {
+        }
+        public override Node* Syntax() 
+        {
+            return new CharNode();
+        }
+    }
+
+    public class WCharTypeSymbol : BasicTypeSymbol
+    {
+        public nothrow WCharTypeSymbol() : base(u"wchar")
+        {
+        }
+        public override Node* Syntax() 
+        {
+            return new WCharNode();
+        }
+    }
+
+    public class UCharTypeSymbol : BasicTypeSymbol
+    {
+        public nothrow UCharTypeSymbol() : base(u"uchar")
+        {
+        }
+        public override Node* Syntax() 
+        {
+            return new UCharNode();
+        }
+    }
+}

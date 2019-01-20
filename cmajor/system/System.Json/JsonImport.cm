@@ -1,0 +1,950 @@
+// =================================
+// Copyright (c) 2019 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Collections;
+using System.Concepts;
+
+namespace System.Json
+{
+    public class JsonImportException : Exception
+    {
+        public nothrow JsonImportException(const string& message_) : base(message_)
+        {
+        }
+    }
+    
+    public concept JsonConstructible<T>
+    {
+        T(JsonValue* value);
+    }
+    
+    public concept JsonValueType<T>
+    {
+        where System.Meta.IsBasicType<T>() or System.Meta.IsEnumeratedType<T>() or T is string or T is wstring or T is ustring;
+    }
+    
+    public void FromJson(JsonValue* value, int& field)
+    {
+        if (value is JsonNumber*)
+        {
+            JsonNumber* number = cast<JsonNumber*>(value);
+            field = cast<int>(number->Value());
+        }
+        else
+        {
+            throw JsonImportException("JSON number expected");
+        }
+    }
+
+    public void FromJson(JsonValue* value, double& field)
+    {
+        if (value is JsonNumber*)
+        {
+            JsonNumber* number = cast<JsonNumber*>(value);
+            field = number->Value();
+        }
+        else
+        {
+            throw JsonImportException("JSON number expected");
+        }
+    }
+
+    public void FromJson(JsonValue* value, bool& field)
+    {
+        if (value is JsonBool*)
+        {
+            JsonBool* b = cast<JsonBool*>(value);
+            field = b->Value();
+        }
+        else
+        {
+            throw JsonImportException("JSON Boolean expected");
+        }
+    }
+    
+    public void FromJson<T>(JsonValue* value, T& field)
+        where System.Meta.IsEnumeratedType<T>()
+    {
+        if (value is JsonNumber*)
+        {
+            JsonNumber* number = cast<JsonNumber*>(value);
+            field = cast<T>(cast<T.UnderlyingType>(number->Value()));
+        }
+        else
+        {
+            throw JsonImportException("JSON number expected");
+        }
+    }
+
+    public void FromJson(JsonValue* value, string& field)
+    {
+        if (value is JsonString*)
+        {
+            JsonString* s = cast<JsonString*>(value);
+            field = ToUtf8(s->Value());
+        }
+        else
+        {
+            throw JsonImportException("JSON string expected");
+        }
+    }
+                                
+    public void FromJson(JsonValue* value, wstring& field)
+    {
+        if (value is JsonString*)
+        {
+            JsonString* s = cast<JsonString*>(value);
+            field = ToUtf16(s->Value());
+        }
+        else
+        {
+            throw JsonImportException("JSON string expected");
+        }
+    }
+                                
+    public void FromJson(JsonValue* value, ustring& field)
+    {
+        if (value is JsonString*)
+        {
+            JsonString* s = cast<JsonString*>(value);
+            field = s->Value();
+        }
+        else
+        {
+            throw JsonImportException("JSON string expected");
+        }
+    }
+    
+    public void FromJson<T>(JsonValue* value, List<T>& field) 
+        where T is JsonValueType
+    {
+        if (value is JsonArray*)
+        {
+            JsonArray* array = cast<JsonArray*>(value);
+            long n = array->Count();
+            for (long i = 0; i < n; ++i)
+            {
+                JsonValue* itemValue = (*array)[i];
+                T item;
+                FromJson(itemValue, item);
+                field.Add(item);
+            }
+        }
+        else
+        {
+            throw JsonImportException("JSON array expected");
+        }
+    }
+
+    public void FromJson<T>(JsonValue* value, List<T>& field) 
+        where T is JsonConstructible
+    {
+        if (value is JsonArray*)
+        {
+            JsonArray* array = cast<JsonArray*>(value);
+            long n = array->Count();
+            for (long i = 0; i < n; ++i)
+            {
+                JsonValue* itemValue = (*array)[i];
+                T item(itemValue);
+                field.Add(item);
+            }
+        }
+        else
+        {
+            throw JsonImportException("JSON array expected");
+        }
+    }
+
+    public void FromJson<T>(JsonValue* value, List<UniquePtr<T>>& field) 
+        where T is JsonConstructible
+    {
+        if (value is JsonArray*)
+        {
+            JsonArray* array = cast<JsonArray*>(value);
+            long n = array->Count();
+            for (long i = 0; i < n; ++i)
+            {
+                JsonValue* itemValue = (*array)[i];
+                UniquePtr<T> item;
+                FromJson(itemValue, item);
+                field.Add(Rvalue(item));
+            }
+        }
+        else
+        {
+            throw JsonImportException("JSON array expected");
+        }
+    }
+
+    public void FromJson<T>(JsonValue* value, List<SharedPtr<T>>& field) 
+        where T is JsonConstructible
+    {
+        if (value is JsonArray*)
+        {
+            JsonArray* array = cast<JsonArray*>(value);
+            long n = array->Count();
+            for (long i = 0; i < n; ++i)
+            {
+                JsonValue* itemValue = (*array)[i];
+                SharedPtr<T> item;
+                FromJson(itemValue, item);
+                field.Add(item);
+            }
+        }
+        else
+        {
+            throw JsonImportException("JSON array expected");
+        }
+    }
+
+    public void FromJson<Key, Value, KeyCompare>(JsonValue* value, Map<Key, Value, KeyCompare>& field) 
+        where Key is ustring and Value is JsonValueType
+    {
+        if (value is JsonObject*)
+        {
+            JsonObject* object = cast<JsonObject*>(value);
+            for (const Pair<ustring, JsonValue*>& p : object->Fields())
+            {
+                const ustring& fieldName = p.first;
+                JsonValue* fieldValue = p.second;
+                Value value;
+                FromJson(fieldValue, value);
+                field[fieldName] = value;
+            }
+        }
+        else
+        {
+            throw JsonImportException("JSON object expected");
+        }
+    }
+
+    public void FromJson<Key, Value, KeyCompare>(JsonValue* value, Map<Key, Value, KeyCompare>& field) 
+        where Key is wstring and Value is JsonValueType
+    {
+        if (value is JsonObject*)
+        {
+            JsonObject* object = cast<JsonObject*>(value);
+            for (const Pair<ustring, JsonValue*>& p : object->Fields())
+            {
+                const ustring& fieldName = p.first;
+                JsonValue* fieldValue = p.second;
+                Value value;
+                FromJson(fieldValue, value);
+                field[ToUtf16(fieldName)] = value;
+            }
+        }
+        else
+        {
+            throw JsonImportException("JSON object expected");
+        }
+    }
+
+    public void FromJson<Key, Value, KeyCompare>(JsonValue* value, Map<Key, Value, KeyCompare>& field) 
+        where Key is string and Value is JsonValueType
+    {
+        if (value is JsonObject*)
+        {
+            JsonObject* object = cast<JsonObject*>(value);
+            for (const Pair<ustring, JsonValue*>& p : object->Fields())
+            {
+                const ustring& fieldName = p.first;
+                JsonValue* fieldValue = p.second;
+                Value value;
+                FromJson(fieldValue, value);
+                field[ToUtf8(fieldName)] = value;
+            }
+        }
+        else
+        {
+            throw JsonImportException("JSON object expected");
+        }
+    }
+
+    public void FromJson<Key, Value, KeyCompare>(JsonValue* value, Map<Key, Value, KeyCompare>& field) 
+        where Key is ustring and Value is JsonConstructible
+    {
+        if (value is JsonObject*)
+        {
+            JsonObject* object = cast<JsonObject*>(value);
+            for (const Pair<ustring, JsonValue*>& p : object->Fields())
+            {
+                const ustring& fieldName = p.first;
+                JsonValue* fieldValue = p.second;
+                Value value(fieldValue);
+                field[fieldName] = value;
+            }
+        }
+        else
+        {
+            throw JsonImportException("JSON object expected");
+        }
+    }
+
+    public void FromJson<Key, Value, KeyCompare>(JsonValue* value, Map<Key, Value, KeyCompare>& field) 
+        where Key is wstring and Value is JsonConstructible
+    {
+        if (value is JsonObject*)
+        {
+            JsonObject* object = cast<JsonObject*>(value);
+            for (const Pair<ustring, JsonValue*>& p : object->Fields())
+            {
+                const ustring& fieldName = p.first;
+                JsonValue* fieldValue = p.second;
+                Value value(fieldValue);
+                field[ToUtf16(fieldName)] = value;
+            }
+        }
+        else
+        {
+            throw JsonImportException("JSON object expected");
+        }
+    }
+
+    public void FromJson<Key, Value, KeyCompare>(JsonValue* value, Map<Key, Value, KeyCompare>& field) 
+        where Key is string and Value is JsonConstructible
+    {
+        if (value is JsonObject*)
+        {
+            JsonObject* object = cast<JsonObject*>(value);
+            for (const Pair<ustring, JsonValue*>& p : object->Fields())
+            {
+                const ustring& fieldName = p.first;
+                JsonValue* fieldValue = p.second;
+                Value value(fieldValue);
+                field[ToUtf8(fieldName)] = value;
+            }
+        }
+        else
+        {
+            throw JsonImportException("JSON object expected");
+        }
+    }
+
+    public void FromJson<K, T, H, C>(JsonValue* value, HashMap<K, T, H, C>& field) 
+        where K is ustring and T is JsonValueType
+    {
+        if (value is JsonObject*)
+        {
+            JsonObject* object = cast<JsonObject*>(value);
+            for (const Pair<ustring, JsonValue*>& p : object->Fields())
+            {
+                const ustring& fieldName = p.first;
+                JsonValue* fieldValue = p.second;
+                T value;
+                FromJson(fieldValue, value);
+                field[fieldName] = value;
+            }
+        }
+        else
+        {
+            throw JsonImportException("JSON object expected");
+        }
+    }
+
+    public void FromJson<K, T, H, C>(JsonValue* value, HashMap<K, T, H, C>& field) 
+        where K is wstring and T is JsonValueType
+    {
+        if (value is JsonObject*)
+        {
+            JsonObject* object = cast<JsonObject*>(value);
+            for (const Pair<ustring, JsonValue*>& p : object->Fields())
+            {
+                const ustring& fieldName = p.first;
+                JsonValue* fieldValue = p.second;
+                T value;
+                FromJson(fieldValue, value);
+                field[ToUtf16(fieldName)] = value;
+            }
+        }
+        else
+        {
+            throw JsonImportException("JSON object expected");
+        }
+    }
+
+    public void FromJson<K, T, H, C>(JsonValue* value, HashMap<K, T, H, C>& field) 
+        where K is string and T is JsonValueType
+    {
+        if (value is JsonObject*)
+        {
+            JsonObject* object = cast<JsonObject*>(value);
+            for (const Pair<ustring, JsonValue*>& p : object->Fields())
+            {
+                const ustring& fieldName = p.first;
+                JsonValue* fieldValue = p.second;
+                T value;
+                FromJson(fieldValue, value);
+                field[ToUtf8(fieldName)] = value;
+            }
+        }
+        else
+        {
+            throw JsonImportException("JSON object expected");
+        }
+    }
+    
+    public void FromJson<T>(JsonValue* value, T& field)
+        where T is JsonConstructible
+    {
+        field = T(value);
+    }
+    
+    public void FromJson<T>(JsonValue* value, UniquePtr<T>& field)
+        where T is JsonConstructible
+    {
+        if (value is JsonNull*)
+        {
+            field.Reset();
+        }
+        else if (value is JsonObject*)
+        {
+            JsonObject* object = cast<JsonObject*>(value);
+            JsonValue* classValue = object->GetField("class");
+            if (classValue != null)
+            {
+                if (classValue is JsonString*)
+                {
+                    JsonString* jsonClassString = cast<JsonString*>(classValue);
+                    ustring jsonClassName = jsonClassString->Value();
+                    JsonValue* objectValue = object->GetField("object");
+                    if (objectValue != null)
+                    {
+                        void* jsonClassValue = JsonClassFactory.Instance().CreateJsonClass(jsonClassName, objectValue);
+                        field.Reset(cast<T*>(jsonClassValue));
+                    }                
+                    else
+                    {
+                        throw JsonImportException("JSON 'object' field not found");
+                    }
+                }
+                else
+                {
+                    throw JsonImportException("JSON string expected");
+                }
+            }            
+            else
+            {
+                throw JsonImportException("JSON 'class' field not found");
+            }
+        }
+        else
+        {
+            throw JsonImportException("null or JSON object expected");
+        }
+    }
+    
+    public void FromJson<T>(JsonValue* value, SharedPtr<T>& field)
+        where T is JsonConstructible
+    {
+        if (value is JsonNull*)
+        {
+            field.Reset();
+        }
+        else if (value is JsonObject*)
+        {
+            JsonObject* object = cast<JsonObject*>(value);
+            JsonValue* classValue = object->GetField("class");
+            if (classValue != null)
+            {
+                if (classValue is JsonString*)
+                {
+                    JsonString* jsonClassString = cast<JsonString*>(classValue);
+                    ustring jsonClassName = jsonClassString->Value();
+                    JsonValue* objectValue = object->GetField("object");
+                    if (objectValue != null)
+                    {
+                        void* jsonClassValue = JsonClassFactory.Instance().CreateJsonClass(jsonClassName, objectValue);
+                        field.Reset(cast<T*>(jsonClassValue));
+                    }                
+                    else
+                    {
+                        throw JsonImportException("JSON 'object' field not found");
+                    }
+                }
+                else
+                {
+                    throw JsonImportException("JSON string expected");
+                }
+            }            
+            else
+            {
+                throw JsonImportException("JSON 'class' field not found");
+            }
+        }
+        else
+        {
+            throw JsonImportException("null or JSON object expected");
+        }
+    }    
+    public void FromJson(JsonValue* container, const string& fieldName, int& field)
+    {   
+        FromJson(container, ToUtf32(fieldName), field);
+    }
+    
+    public void FromJson(JsonValue* container, const wstring& fieldName, int& field)
+    {
+        FromJson(container, ToUtf32(fieldName), field);
+    }
+    
+    public void FromJson(JsonValue* container, const ustring& fieldName, int& field)
+    {
+        if (container is JsonObject*)
+        {
+            JsonObject* object = cast<JsonObject*>(container);
+            JsonValue* value = object->GetField(fieldName);
+            if (value != null)
+            {
+                FromJson(value, field);
+            }
+            else
+            {
+                throw JsonImportException("field '" + ToUtf8(fieldName) + "' not found");
+            }
+        }
+        else
+        {
+            throw JsonImportException("JSON object expected");
+        }
+    }
+
+    public void FromJson(JsonValue* container, const string& fieldName, double& field)
+    {   
+        FromJson(container, ToUtf32(fieldName), field);
+    }
+    
+    public void FromJson(JsonValue* container, const wstring& fieldName, double& field)
+    {
+        FromJson(container, ToUtf32(fieldName), field);
+    }
+    
+    public void FromJson(JsonValue* container, const ustring& fieldName, double& field)
+    {
+        if (container is JsonObject*)
+        {
+            JsonObject* object = cast<JsonObject*>(container);
+            JsonValue* value = object->GetField(fieldName);
+            if (value != null)
+            {
+                FromJson(value, field);
+            }
+            else
+            {
+                throw JsonImportException("field '" + ToUtf8(fieldName) + "' not found");
+            }
+        }
+        else
+        {
+            throw JsonImportException("JSON object expected");
+        }
+    }
+                
+    public void FromJson(JsonValue* container, const string& fieldName, bool& field)
+    {   
+        FromJson(container, ToUtf32(fieldName), field);
+    }
+    
+    public void FromJson(JsonValue* container, const wstring& fieldName, bool& field)
+    {
+        FromJson(container, ToUtf32(fieldName), field);
+    }
+    
+    public void FromJson(JsonValue* container, const ustring& fieldName, bool& field)
+    {
+        if (container is JsonObject*)
+        {
+            JsonObject* object = cast<JsonObject*>(container);
+            JsonValue* value = object->GetField(fieldName);
+            if (value != null)
+            {
+                FromJson(value, field);
+            }
+            else
+            {
+                throw JsonImportException("field '" + ToUtf8(fieldName) + "' not found");
+            }
+        }
+        else
+        {
+            throw JsonImportException("JSON object expected");
+        }
+    }
+    
+    public void FromJson<T>(JsonValue* container, const string& fieldName, T& field)
+        where System.Meta.IsEnumeratedType<T>()
+    {
+        FromJson(container, ToUtf32(fieldName), field);
+    }
+
+    public void FromJson<T>(JsonValue* container, const wstring& fieldName, T& field)
+        where System.Meta.IsEnumeratedType<T>()
+    {
+        FromJson(container, ToUtf32(fieldName), field);
+    }         
+
+    public void FromJson<T>(JsonValue* container, const ustring& fieldName, T& field)
+        where System.Meta.IsEnumeratedType<T>()
+    {
+        if (container is JsonObject*)
+        {
+            JsonObject* object = cast<JsonObject*>(container);
+            JsonValue* value = object->GetField(fieldName);
+            if (value != null)
+            {
+                FromJson(value, field);
+            }
+            else
+            {
+                throw JsonImportException("field '" + ToUtf8(fieldName) + "' not found");
+            }
+        }
+        else
+        {
+            throw JsonImportException("JSON object expected");
+        }
+    }
+          
+    public void FromJson(JsonValue* container, const string& fieldName, string& field)
+    {   
+        FromJson(container, ToUtf32(fieldName), field);
+    }
+    
+    public void FromJson(JsonValue* container, const wstring& fieldName, string& field)
+    {
+        FromJson(container, ToUtf32(fieldName), field);
+    }
+    
+    public void FromJson(JsonValue* container, const ustring& fieldName, string& field)
+    {
+        if (container is JsonObject*)
+        {
+            JsonObject* object = cast<JsonObject*>(container);
+            JsonValue* value = object->GetField(fieldName);
+            if (value != null)
+            {
+                FromJson(value, field);
+            }
+            else
+            {
+                throw JsonImportException("field '" + ToUtf8(fieldName) + "' not found");
+            }
+        }
+        else
+        {
+            throw JsonImportException("JSON object expected");
+        }
+    }
+                
+    public void FromJson(JsonValue* container, const string& fieldName, wstring& field)
+    {   
+        FromJson(container, ToUtf32(fieldName), field);
+    }
+    
+    public void FromJson(JsonValue* container, const wstring& fieldName, wstring& field)
+    {
+        FromJson(container, ToUtf32(fieldName), field);
+    }
+    
+    public void FromJson(JsonValue* container, const ustring& fieldName, wstring& field)
+    {
+        if (container is JsonObject*)
+        {
+            JsonObject* object = cast<JsonObject*>(container);
+            JsonValue* value = object->GetField(fieldName);
+            if (value != null)
+            {
+                FromJson(value, field);
+            }
+            else
+            {
+                throw JsonImportException("field '" + ToUtf8(fieldName) + "' not found");
+            }
+        }
+        else
+        {
+            throw JsonImportException("JSON object expected");
+        }
+    }
+                
+    public void FromJson(JsonValue* container, const string& fieldName, ustring& field)
+    {   
+        FromJson(container, ToUtf32(fieldName), field);
+    }
+    
+    public void FromJson(JsonValue* container, const wstring& fieldName, ustring& field)
+    {
+        FromJson(container, ToUtf32(fieldName), field);
+    }
+    
+    public void FromJson(JsonValue* container, const ustring& fieldName, ustring& field)
+    {
+        if (container is JsonObject*)
+        {
+            JsonObject* object = cast<JsonObject*>(container);
+            JsonValue* value = object->GetField(fieldName);
+            if (value != null)
+            {
+                FromJson(value, field);
+            }
+            else
+            {
+                throw JsonImportException("field '" + ToUtf8(fieldName) + "' not found");
+            }
+        }
+        else
+        {
+            throw JsonImportException("JSON object expected");
+        }
+    }
+                
+    public void FromJson<T>(JsonValue* container, const string& fieldName, List<T>& field) 
+        where T is JsonValueType or T is JsonConstructible
+    {   
+        FromJson(container, ToUtf32(fieldName), field);
+    }
+    
+    public void FromJson<T>(JsonValue* container, const wstring& fieldName, List<T>& field) 
+        where T is JsonValueType or T is JsonConstructible
+    {
+        FromJson(container, ToUtf32(fieldName), field);
+    }
+    
+    public void FromJson<T>(JsonValue* container, const ustring& fieldName, List<T>& field) 
+        where T is JsonValueType or T is JsonConstructible
+    {
+        if (container is JsonObject*)
+        {
+            JsonObject* object = cast<JsonObject*>(container);
+            JsonValue* value = object->GetField(fieldName);
+            if (value != null)
+            {
+                FromJson(value, field);
+            }
+            else
+            {
+                throw JsonImportException("field '" + ToUtf8(fieldName) + "' not found");
+            }
+        }
+        else
+        {
+            throw JsonImportException("JSON object expected");
+        }
+    }
+
+    public void FromJson<T>(JsonValue* container, const string& fieldName, List<UniquePtr<T>>& field) 
+        where T is JsonConstructible
+    {   
+        FromJson(container, ToUtf32(fieldName), field);
+    }
+    
+    public void FromJson<T>(JsonValue* container, const wstring& fieldName, List<UniquePtr<T>>& field) 
+        where T is JsonConstructible
+    {
+        FromJson(container, ToUtf32(fieldName), field);
+    }
+    
+    public void FromJson<T>(JsonValue* container, const ustring& fieldName, List<UniquePtr<T>>& field) 
+        where T is JsonConstructible
+    {
+        if (container is JsonObject*)
+        {
+            JsonObject* object = cast<JsonObject*>(container);
+            JsonValue* value = object->GetField(fieldName);
+            if (value != null)
+            {
+                FromJson(value, field);
+            }
+            else
+            {
+                throw JsonImportException("field '" + ToUtf8(fieldName) + "' not found");
+            }
+        }
+        else
+        {
+            throw JsonImportException("JSON object expected");
+        }
+    }
+
+    public void FromJson<T>(JsonValue* container, const string& fieldName, List<SharedPtr<T>>& field) 
+        where T is JsonConstructible
+    {   
+        FromJson(container, ToUtf32(fieldName), field);
+    }
+    
+    public void FromJson<T>(JsonValue* container, const wstring& fieldName, List<SharedPtr<T>>& field) 
+        where T is JsonConstructible
+    {
+        FromJson(container, ToUtf32(fieldName), field);
+    }
+    
+    public void FromJson<T>(JsonValue* container, const ustring& fieldName, List<SharedPtr<T>>& field) 
+        where T is JsonConstructible
+    {
+        if (container is JsonObject*)
+        {
+            JsonObject* object = cast<JsonObject*>(container);
+            JsonValue* value = object->GetField(fieldName);
+            if (value != null)
+            {
+                FromJson(value, field);
+            }
+            else
+            {
+                throw JsonImportException("field '" + ToUtf8(fieldName) + "' not found");
+            }
+        }
+        else
+        {
+            throw JsonImportException("JSON object expected");
+        }
+    }
+
+    public void FromJson<Key, Value, KeyCompare>(JsonValue* container, const string& fieldName, Map<Key, Value, KeyCompare>& field) 
+        where Value is JsonValueType or Value is JsonConstructible
+    {   
+        FromJson(container, ToUtf32(fieldName), field);
+    }
+    
+    public void FromJson<Key, Value, KeyCompare>(JsonValue* container, const wstring& fieldName, Map<Key, Value, KeyCompare>& field) 
+        where Value is JsonValueType or Value is JsonConstructible
+    {
+        FromJson(container, ToUtf32(fieldName), field);
+    }
+    
+    public void FromJson<Key, Value, KeyCompare>(JsonValue* container, const ustring& fieldName, Map<Key, Value, KeyCompare>& field) 
+        where Value is JsonValueType or Value is JsonConstructible
+    {
+        if (container is JsonObject*)
+        {
+            JsonObject* object = cast<JsonObject*>(container);
+            JsonValue* value = object->GetField(fieldName);
+            if (value != null)
+            {
+                FromJson(value, field);
+            }
+            else
+            {
+                throw JsonImportException("field '" + ToUtf8(fieldName) + "' not found");
+            }
+        }
+        else
+        {
+            throw JsonImportException("JSON object expected");
+        }
+    }
+
+    public void FromJson<K, T, H, C>(JsonValue* container, const string& fieldName, HashMap<K, T, H, C>& field)
+        where T is JsonValueType or T is JsonConstructible
+    {   
+        FromJson(container, ToUtf32(fieldName), field);
+    }
+    
+    public void FromJson<K, T, H, C>(JsonValue* container, const wstring& fieldName, HashMap<K, T, H, C>& field) 
+        where T is JsonValueType or T is JsonConstructible
+    {
+        FromJson(container, ToUtf32(fieldName), field);
+    }
+    
+    public void FromJson<K, T, H, C>(JsonValue* container, const ustring& fieldName, HashMap<K, T, H, C>& field)
+        where T is JsonValueType or T is JsonConstructible
+    {
+        if (container is JsonObject*)
+        {
+            JsonObject* object = cast<JsonObject*>(container);
+            JsonValue* value = object->GetField(fieldName);
+            if (value != null)
+            {
+                FromJson(value, field);
+            }
+            else
+            {
+                throw JsonImportException("field '" + ToUtf8(fieldName) + "' not found");
+            }
+        }
+        else
+        {
+            throw JsonImportException("JSON object expected");
+        }
+    }
+
+    public void FromJson<T>(JsonValue* container, const string& fieldName, T& field)
+        where T is JsonConstructible
+    {
+        FromJson(container, ToUtf32(fieldName), field);
+    }
+    
+    public void FromJson<T>(JsonValue* container, const wstring& fieldName, T& field)
+        where T is JsonConstructible
+    {
+        FromJson(container, ToUtf32(fieldName), field);
+    }
+        
+    public void FromJson<T>(JsonValue* container, const ustring& fieldName, T& field)
+        where T is JsonConstructible
+    {
+        if (container is JsonObject*)
+        {
+            JsonObject* object = cast<JsonObject*>(container);
+            JsonValue* value = object->GetField(fieldName);
+            if (value != null)
+            {
+                FromJson(value, field);
+            }
+            else
+            {
+                throw JsonImportException("field '" + ToUtf8(fieldName) + "' not found");
+            }
+        }
+        else
+        {
+            throw JsonImportException("JSON object expected");
+        }
+    }
+    
+    public void FromJson<T>(JsonValue* container, const ustring& fieldName, UniquePtr<T>& field)
+        where T is JsonConstructible
+    {
+        if (container is JsonObject*)
+        {
+            JsonObject* object = cast<JsonObject*>(container);
+            JsonValue* value = object->GetField(fieldName);
+            if (value != null)
+            {
+                FromJson(value, field);
+            }
+            else
+            {
+                throw JsonImportException("field '" + ToUtf8(fieldName) + "' not found");
+            }
+        }
+        else
+        {
+            throw JsonImportException("JSON object expected");
+        }
+    }
+
+    public void FromJson<T>(JsonValue* container, const ustring& fieldName, SharedPtr<T>& field)
+        where T is JsonConstructible
+    {
+        if (container is JsonObject*)
+        {
+            JsonObject* object = cast<JsonObject*>(container);
+            JsonValue* value = object->GetField(fieldName);
+            if (value != null)
+            {
+                FromJson(value, field);
+            }
+            else
+            {
+                throw JsonImportException("field '" + ToUtf8(fieldName) + "' not found");
+            }
+        }
+        else
+        {
+            throw JsonImportException("JSON object expected");
+        }
+    }
+}

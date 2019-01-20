@@ -1,0 +1,42 @@
+using System;
+using System.Collections;
+
+namespace conversion
+{
+    public class TypeConversionRule
+    {
+        public nothrow TypeConversionRule(cppast.Node* sourceNode_, cppsymbols.TypeSymbol* sourceType_) : sourceNode(sourceNode_), sourceType(sourceType_)
+        {
+        }
+        public UniquePtr<cppast.Node> sourceNode;
+        public cppsymbols.TypeSymbol* sourceType;
+    }
+    
+    public class TypeConversionTable
+    {
+        public void AddTypeConversionRule(TypeConversionRule* typeConversionRule)
+        {
+            typeConversionMap[typeConversionRule->sourceType] = typeConversionRule;
+            typeConversionRules.Add(UniquePtr<TypeConversionRule>(typeConversionRule));
+        }
+        public TypeConversionRule* GetTypeConversionRule(cppsymbols.TypeSymbol* sourceType)
+        {
+            HashMap<cppsymbols.TypeSymbol*, TypeConversionRule*>.ConstIterator it = typeConversionMap.CFind(sourceType);
+            if (it != typeConversionMap.CEnd())
+            {
+                return it->second;
+            }
+            else
+            {
+                return null;
+            }
+        }
+        private HashMap<cppsymbols.TypeSymbol*, TypeConversionRule*> typeConversionMap;
+        private List<UniquePtr<TypeConversionRule>> typeConversionRules;
+    }
+    
+    public class ConversionTable
+    {
+        public TypeConversionTable typeConversionTable;
+    }
+}

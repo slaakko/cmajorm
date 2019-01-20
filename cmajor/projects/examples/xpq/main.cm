@@ -1,0 +1,140 @@
+using System;
+using System.IO;
+using System.Text;
+using System.Dom;
+using System.XPath;
+
+public string Version()
+{
+    return "2.0.0";
+}
+
+void PrintHelp()
+{
+    Console.WriteLine("XPath Query Debugger version " + Version());
+    Console.WriteLine("Usage: xpq [options] \"<XPath query>\" <xmlFileName>");
+    Console.WriteLine("Compiles given XPath query, executes it on given <xmlFileName> and prints the query and results as XML.");
+    Console.WriteLine("Options:");
+    Console.WriteLine("--help | -h");
+    Console.WriteLine("     Print this help.");
+    Console.WriteLine("--verbose | -v");
+    Console.WriteLine("     Be verbose.");
+    Console.WriteLine("--debug-parsing | -p");
+    Console.WriteLine("     Print parsing query expression to stdout.");
+}
+
+void Execute(const string& xpathQuery, const string& xmlFilePath, Duration& parsingDuration, bool verbose)
+{
+    if (verbose)
+    {
+        Console.WriteLine("> " + xmlFilePath);
+    }
+    TimePoint startParsing = Now();
+    UniquePtr<DomDocument> document = ParseXmlFileToDomDocument(xmlFilePath);
+    TimePoint endParsing = Now();
+    parsingDuration = endParsing - startParsing;
+    if (verbose)
+    {
+        Console.WriteLine("> " + xpathQuery);
+    }
+    UniquePtr<XPathObject> evaluationResult = Evaluate(ToUtf32(xpathQuery), document.Get());
+    UniquePtr<DomNode> evaluationDom;
+    if (!evaluationResult.IsNull())
+    {
+        evaluationDom = evaluationResult->ToDom();
+    }    
+    UniquePtr<DomDocument> result(new DomDocument());
+    result->AppendChild(UniquePtr<DomNode>(new DomElement(u"xpath")));
+    DomElement* queryElement = new DomElement(u"query");
+    result->DocumentElement()->AppendChild(UniquePtr<DomNode>(queryElement));
+    UniquePtr<DomNode> queryNode = XPathDebug.Instance().GetQueryDom();
+    if (!queryNode.IsNull())
+    {
+        queryElement->AppendChild(Rvalue(queryNode));
+    }
+    DomElement* resultElement = new DomElement(u"result");
+    result->DocumentElement()->AppendChild(UniquePtr<DomNode>(resultElement));
+    if (!evaluationDom.IsNull())
+    {
+        resultElement->AppendChild(Rvalue(evaluationDom));
+    }
+    CodeFormatter formatter(Console.Out());
+    formatter.SetIndentSize(2);
+    result->Write(formatter);
+}
+
+int main(int argc, const char** argv)
+{
+    try
+    {
+        TimePoint start = Now();
+        bool first = true;
+        bool verbose = false;
+        string query;
+        string xmlFilePath;
+        XPathDebug.Instance().SetDebugQuery();
+        for (int i = 1; i < argc; ++i)
+        {
+            string arg = argv[i];
+            if (arg.StartsWith("-"))
+            {
+                if (arg == "--help" || arg == "-h")
+                {
+                    PrintHelp();
+                    return 0;
+                }
+                else if (arg == "--verbose" || arg == "-v")
+                {
+                    verbose = true;
+                }
+                else if (arg == "--debug-parsing" || arg == "-p")
+                {
+                    XPathDebug.Instance().SetDebugParsing();
+                }
+                else 
+                {
+                    throw Exception("unknown option '" + arg + "'");
+                }
+            }
+            else
+            {
+                if (first)
+                {
+                    first = false;
+                    query = arg;
+                }
+                else if (xmlFilePath.IsEmpty())
+                {
+                    xmlFilePath = GetFullPath(arg);
+                }
+                else
+                {
+                    PrintHelp();
+                    return 1;
+                }
+            }
+        }
+        if (query.IsEmpty())
+        {
+            throw Exception("no query specified");
+        }
+        if (xmlFilePath.IsEmpty())
+        {
+            throw Exception("no xml file specified");
+        }
+        Duration parsingDuration;
+        Execute(query, xmlFilePath, parsingDuration, verbose);
+        TimePoint end = Now();
+        Duration duration = end - start;
+        Console.WriteLine("parsing XML took " + ToString(parsingDuration.Milliseconds()) + " ms");
+        Console.WriteLine("parsing XPath query took " + ToString(XPathDebug.Instance().GetQueryDuration().Milliseconds()) + " ms");
+        Console.WriteLine("evaluating XPath query took " + ToString(XPathDebug.Instance().GetExecutionDuration().Milliseconds()) + " ms");
+        Console.WriteLine("total duration: " + ToString(duration.Milliseconds()) + " ms");
+    }
+    catch (const Exception& ex)
+    {
+        Console.Error() << ex.ToString() << endl();
+        return 1;
+    }
+    return 0;
+}

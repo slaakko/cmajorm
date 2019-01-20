@@ -1,0 +1,61 @@
+// =================================
+// Copyright (c) 2019 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System.Concepts;
+
+namespace System
+{
+    public class FrontInsertProxy<C> where C is FrontInsertionSequence
+    {
+        private typedef FrontInsertProxy<C> Self;
+        private typedef C.ValueType ValueType;
+
+        public inline nothrow FrontInsertProxy() : c(null)
+        {
+        }
+        public inline nothrow explicit FrontInsertProxy(C* c_) : c(c_)
+        {
+        }
+        public inline void operator=(const ValueType& value)
+        {
+            c->InsertFront(value);
+        }
+        private C* c;
+    }
+
+    public class FrontInsertIterator<C> where C is FrontInsertionSequence
+    {
+        private typedef FrontInsertIterator<C> Self;
+        private typedef FrontInsertProxy<C> Proxy;
+        public typedef C.ValueType ValueType;
+        public typedef Proxy& ReferenceType;
+        public typedef Proxy* PointerType;
+
+        public inline nothrow FrontInsertIterator() : proxy()
+        {
+        }
+        public inline nothrow FrontInsertIterator(C& c) : proxy(&c)
+        {
+        }
+        public inline nothrow ReferenceType operator*() 
+        {
+            return proxy;
+        }
+        public inline nothrow PointerType operator->()
+        {
+            return &proxy;
+        }
+        public inline nothrow Self& operator++()
+        {
+            return *this;
+        }
+        private Proxy proxy;
+    }
+
+    public nothrow FrontInsertIterator<C> FrontInserter<C>(C& c) where C is FrontInsertionSequence
+    {
+        return FrontInsertIterator<C>(c);
+    }
+}

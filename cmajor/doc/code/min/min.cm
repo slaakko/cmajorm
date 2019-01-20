@@ -1,0 +1,18 @@
+public constexpr nothrow inline const T& Min<T>(const T& left, const T& right) where T is System.Concepts.LessThanComparable
+{
+    if (left <= right) return left;
+    return right;
+}
+
+public void main()
+{
+    sbyte min = Min(3, 2);
+    if (min == 2)
+    {
+        System.Console.WriteLine("Min(3, 2) == 2");
+    }
+    else
+    {
+        System.Console.WriteLine("bug");
+    }
+}

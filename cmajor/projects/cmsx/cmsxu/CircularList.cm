@@ -1,0 +1,40 @@
+using System;
+
+namespace cmsx.util
+{
+    public class Node
+    {
+        public nothrow Node() : prev(this), next(this)
+        {
+        }
+        public Node* prev;
+        public Node* next;
+    }
+
+    public nothrow void Link(Node* head, Node* node)
+    {
+        head->prev->next = node;
+        node->prev = head->prev;
+        head->prev = node;
+        node->next = head;
+    }
+
+    public nothrow Node* Unlink(Node*& head)
+    {
+        Node* node = head;
+        if (head->next == head)
+        {
+            head = null;
+        }
+        else
+        {
+            Node* next = head->next;
+            head->next->prev = head->prev;
+            head->prev->next = head->next;
+            head->next = head;
+            head->prev = head;
+            head = next;
+        }
+        return node;
+    }
+}

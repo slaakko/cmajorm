@@ -1,0 +1,21 @@
+namespace Code
+{
+    grammar KeywordGrammar
+    {
+        using stdlib.identifier;
+
+        Keyword
+            ::= keyword_list(identifier,
+                ["bool", "true", "false",
+                "sbyte", "byte", "short", "ushort", "int", "uint", "long", "ulong",
+                "float", "double", "char", "wchar", "uchar", "void", "enum", "cast", "interface",
+                "namespace", "using", "static", "extern", "as", "is", "explicit", "delegate", "inline", "cdecl", "nothrow",
+                "public", "protected", "private", "internal", "virtual", "abstract", "override", "suppress",
+                "operator", "class", "return", "if", "else",
+                "switch", "case", "default", "while", "do", "for",
+                "break", "continue", "goto", "typedef", "typename", "const", "constexpr", "null", "this", "base",
+                "construct", "destroy", "new", "delete", "sizeof", "try", "catch", "throw",
+                "concept", "where", "axiom", "and", "or", "not"])
+            ;
+    }
+}

@@ -1,0 +1,49 @@
+public static class Console
+{
+    static nothrow Console() :
+        in(new System.IO.InputFileStream(System.IO.stdin)),
+        out(new System.IO.OutputFileStream(System.IO.stdout)),
+        err(new System.IO.OutputFileStream(System.IO.stderr))
+    {
+    }
+    public static void Write(bool b)
+    {
+        out->Write(b);
+    }
+    public static void Write(int i)
+    {
+        out->Write(i);
+    }
+    public static void WriteLine(bool b)
+    {
+        out->WriteLine(b);
+    }
+    public static void WriteLine(int i)
+    {
+        out->WriteLine(i);
+    }
+    // ...
+    public static System.IO.InputStream& In()
+    {
+        return *in;
+    }
+    public static System.IO.OutputStream& Out()
+    {
+        return *out;
+    }
+    public static System.IO.OutputStream& Error()
+    {
+        return *err;
+    }
+    private static System.UniquePtr<System.IO.InputStream> in;
+    private static System.UniquePtr<System.IO.OutputStream> out;
+    private static System.UniquePtr<System.IO.OutputStream> err;
+}
+
+public void main()
+{
+    Console.WriteLine(true);
+    int x = 1;
+    Console.WriteLine(x);
+    Console.Out() << "ABC" << 123 << System.endl();
+}

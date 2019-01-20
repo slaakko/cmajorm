@@ -1,0 +1,18 @@
+public constexpr nothrow inline long Align(long n, long alignment)
+{
+    #assert(alignment > 0);
+    return (n + alignment - 1) & -alignment;
+}
+
+void main()
+{
+    long a = Align(10, 4);
+    if (a == 12)
+    {
+        System.Console.WriteLine("Align(10, 4) is 12");
+    }
+    else
+    {
+        System.Console.WriteLine("bug");
+    }
+}

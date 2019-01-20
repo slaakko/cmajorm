@@ -1,0 +1,29 @@
+using System;
+using System.Collections;
+
+namespace cppsymbols
+{
+    public abstract class ContainerSymbol : Symbol
+    {
+        public nothrow ContainerSymbol(const Span& span_, const ustring& name_) : base(span_, name_), scope(this)
+        {
+        }
+        public nothrow virtual long NumBases() const
+        {
+            return 0;
+        }
+        public nothrow virtual ContainerSymbol* GetBase(long index) const
+        {
+            #assert(false);
+            return null;
+        }
+        public virtual void AddSymbol(Symbol* symbol, List<UniquePtr<Exception>>& errors)
+        {
+            symbol->SetParent(this);
+            symbols.Add(UniquePtr<Symbol>(symbol));
+            scope.Install(symbol, errors);
+        }
+        public List<UniquePtr<Symbol>> symbols;
+        public Scope scope;
+    }
+}

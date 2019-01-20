@@ -1,0 +1,227 @@
+<html>
+    <head>
+        <meta charset="utf-8"/>
+        <title>NodeList&lt;T> Class</title>
+        <link href="../style/style.css" rel="stylesheet" type="text/css"/>
+    </head>
+    <body>
+        <a href="../index.html">index</a>
+         | <a href="namespace_ast_C9161F619BA82A5AF902D95B166AD35F0072F67D.html">up</a>
+         | <a href="class_NodeFactory_325E22DD08235313DEB4B63B419F43BDDB9AAD5E.html">prev</a>
+         | <a href="class_NonreferenceTypeConceptNode_17F5320EA9E8E884BBF504AC3A0D66867AA00959.html">next</a>
+        <hr/>
+        <h1>NodeList&lt;T> Class</h1>
+        <span>
+            Definition at line <a href="file/ast/NodeList.hpp_2FFAF8FF85EFFAB64B5BB46974EEEF9826763D92.html#14">14</a>
+             of <a href="file/ast/NodeList.hpp_2FFAF8FF85EFFAB64B5BB46974EEEF9826763D92.html">NodeList.hpp</a>
+        </span>
+        <br/>
+        <h2>Member Functions</h2>
+        <table class="functionTable">
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_NodeList_634CD2B65410966280F1AC27B3A570D065505ECD.html#function_Add_6A79F2E1F989B37B97D926949A967441A4F54E86">Add</a>(T* node)</td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">int</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_NodeList_634CD2B65410966280F1AC27B3A570D065505ECD.html#function_Count_D48415E8CD68BF3A719F8BDEF3B34BEE49C56E3E">Count</a>() <span class="kw">const</span></td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve">std::vector&lt;std::unique_ptr&lt;T>>&amp;</td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_NodeList_634CD2B65410966280F1AC27B3A570D065505ECD.html#function_Nodes_1C9CBA0A6DACC3633B59CA7E6B39875DBFBE854C">Nodes</a>()</td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_NodeList_634CD2B65410966280F1AC27B3A570D065505ECD.html#function_Read_7D1DDE53D6E1AB4495C2121F920D0990DA3A7C7B">Read</a>(<a href="class_AstReader_79D1108F70EAB0D555FDDD074FED033B2DCABCD5.html">AstReader</a>&amp; reader)</td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_NodeList_634CD2B65410966280F1AC27B3A570D065505ECD.html#function_SetParent_134695914ED23138D008A986392ADAED3B0532A8">SetParent</a>(<a href="class_Node_66FC1D6AD8F487E453CE6E17163479C7C2DAC063.html">Node</a>* parent)</td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_NodeList_634CD2B65410966280F1AC27B3A570D065505ECD.html#function_Write_4EC4CF1951B50077BC6D68B7F63FAD3AEFF8F78D">Write</a>(<a href="class_AstWriter_E913198FD26EB86BE054254E7AA4791401EA149B.html">AstWriter</a>&amp; writer)</td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve">T*</td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_NodeList_634CD2B65410966280F1AC27B3A570D065505ECD.html#function_operator_subscript_C4833C51252C0E70C271FD881CBCB6F64984E1B6">operator[]</a>(<span class="kw">int</span> index) <span class="kw">const</span></td>
+            </tr>
+        </table>
+        <h2>Member Variables</h2>
+        <table>
+            <tr id="variable_nodes_F102078B84140404A7BAA45DF23FC9715A3850E1">
+                <td class="functionTableFirstCol" xml:space="preserve">std::vector&lt;std::unique_ptr&lt;T>></td>
+                <td class="functionTableSecondCol" xml:space="preserve">nodes</td>
+            </tr>
+        </table>
+        <hr/>
+        <h2>Member Function Details</h2>
+        <h3 id="function_Add_6A79F2E1F989B37B97D926949A967441A4F54E86">Add Member Function</h3>
+        <h4>
+            <span class="kw">void</span>
+             cmajor::ast::NodeList::Add(T* node)</h4>
+        <span>
+            Definition at line <a href="file/ast/NodeList.hpp_2FFAF8FF85EFFAB64B5BB46974EEEF9826763D92.html#25">25</a>
+             of <a href="file/ast/NodeList.hpp_2FFAF8FF85EFFAB64B5BB46974EEEF9826763D92.html">NodeList.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">26</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">27</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">nodes</span><span class="other">.</span><span class="identifier">push_back</span><span class="other">(</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><span class="type">T</span><span class="other">></span><span class="other">(</span><span class="identifier">node</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">28</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <hr/>
+        <h3 id="function_Count_D48415E8CD68BF3A719F8BDEF3B34BEE49C56E3E">Count Member Function</h3>
+        <h4>
+            <span class="kw">int</span>
+             cmajor::ast::NodeList::Count() <span class="kw">const</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/ast/NodeList.hpp_2FFAF8FF85EFFAB64B5BB46974EEEF9826763D92.html#17">17</a>
+             of <a href="file/ast/NodeList.hpp_2FFAF8FF85EFFAB64B5BB46974EEEF9826763D92.html">NodeList.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">18</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">19</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">static_cast</span><span class="other">&lt;</span><span class="kw">int</span><span class="other">></span><span class="other">(</span><span class="identifier">nodes</span><span class="other">.</span><span class="identifier">size</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">20</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <hr/>
+        <h3 id="function_Nodes_1C9CBA0A6DACC3633B59CA7E6B39875DBFBE854C">Nodes Member Function</h3>
+        <h4>
+            std::vector&lt;std::unique_ptr&lt;T>>&amp; cmajor::ast::NodeList::Nodes()</h4>
+        <span>
+            Definition at line <a href="file/ast/NodeList.hpp_2FFAF8FF85EFFAB64B5BB46974EEEF9826763D92.html#56">56</a>
+             of <a href="file/ast/NodeList.hpp_2FFAF8FF85EFFAB64B5BB46974EEEF9826763D92.html">NodeList.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">56</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">nodes</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <hr/>
+        <h3 id="function_Read_7D1DDE53D6E1AB4495C2121F920D0990DA3A7C7B">Read Member Function</h3>
+        <h4>
+            <span class="kw">void</span>
+             cmajor::ast::NodeList::Read(<a href="class_AstReader_79D1108F70EAB0D555FDDD074FED033B2DCABCD5.html">AstReader</a>
+            &amp; reader)</h4>
+        <span>
+            Definition at line <a href="file/ast/NodeList.hpp_2FFAF8FF85EFFAB64B5BB46974EEEF9826763D92.html#45">45</a>
+             of <a href="file/ast/NodeList.hpp_2FFAF8FF85EFFAB64B5BB46974EEEF9826763D92.html">NodeList.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">46</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">47</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="type">uint32_t</span>&nbsp;<span class="identifier">n</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">reader</span><span class="other">.</span><span class="identifier">GetBinaryReader</span><span class="other">(</span><span class="other">)</span><span class="other">.</span><span class="identifier">ReadULEB128UInt</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">48</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">for&nbsp;</span><span class="other">(</span><span class="type">uint32_t</span>&nbsp;<span class="identifier">i</span>&nbsp;<span class="other">=</span>&nbsp;<span class="other">0</span><span class="other">;</span>&nbsp;<span class="identifier">i</span><span class="other">&nbsp;&lt;&nbsp;</span><span class="identifier">n</span><span class="other">;</span>&nbsp;<span class="other">++</span><span class="identifier">i</span><span class="other">)</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">49</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">50</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="class_Node_66FC1D6AD8F487E453CE6E17163479C7C2DAC063.html">Node</a><span class="other">*</span>&nbsp;<span class="identifier">node</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">reader</span><span class="other">.</span><span class="identifier">ReadNode</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">51</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="type">T</span><span class="other">*</span>&nbsp;<span class="identifier">asTNode</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">dynamic_cast</span><span class="other">&lt;</span><span class="type">T</span><span class="other">*</span><span class="other">></span><span class="other">(</span><span class="identifier">node</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">52</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">Assert</span><span class="other">(</span><span class="identifier">asTNode</span><span class="other">,&nbsp;</span><span class="string">"wrong&nbsp;node&nbsp;type"</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">53</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">nodes</span><span class="other">.</span><span class="identifier">push_back</span><span class="other">(</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><span class="type">T</span><span class="other">></span><span class="other">(</span><span class="identifier">asTNode</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">54</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">55</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <hr/>
+        <h3 id="function_SetParent_134695914ED23138D008A986392ADAED3B0532A8">SetParent Member Function</h3>
+        <h4>
+            <span class="kw">void</span>
+             cmajor::ast::NodeList::SetParent(<a href="class_Node_66FC1D6AD8F487E453CE6E17163479C7C2DAC063.html">Node</a>
+            * parent)</h4>
+        <span>
+            Definition at line <a href="file/ast/NodeList.hpp_2FFAF8FF85EFFAB64B5BB46974EEEF9826763D92.html#29">29</a>
+             of <a href="file/ast/NodeList.hpp_2FFAF8FF85EFFAB64B5BB46974EEEF9826763D92.html">NodeList.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">30</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">31</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">for&nbsp;</span><span class="other">(</span><span class="kw">const&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><span class="type">T</span><span class="other">></span><span class="other">&amp;</span>&nbsp;<span class="identifier">node</span><span class="other">&nbsp;:&nbsp;</span><span class="identifier">nodes</span><span class="other">)</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">32</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">33</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">node</span><span class="other">-></span><span class="identifier">SetParent</span><span class="other">(</span><span class="identifier">parent</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">34</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">35</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <hr/>
+        <h3 id="function_Write_4EC4CF1951B50077BC6D68B7F63FAD3AEFF8F78D">Write Member Function</h3>
+        <h4>
+            <span class="kw">void</span>
+             cmajor::ast::NodeList::Write(<a href="class_AstWriter_E913198FD26EB86BE054254E7AA4791401EA149B.html">AstWriter</a>
+            &amp; writer)</h4>
+        <span>
+            Definition at line <a href="file/ast/NodeList.hpp_2FFAF8FF85EFFAB64B5BB46974EEEF9826763D92.html#36">36</a>
+             of <a href="file/ast/NodeList.hpp_2FFAF8FF85EFFAB64B5BB46974EEEF9826763D92.html">NodeList.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">37</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">38</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="type">uint32_t</span>&nbsp;<span class="identifier">n</span>&nbsp;<span class="other">=</span>&nbsp;<span class="kw">static_cast</span><span class="other">&lt;</span><span class="type">uint32_t</span><span class="other">></span><span class="other">(</span><span class="identifier">nodes</span><span class="other">.</span><span class="identifier">size</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">39</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">writer</span><span class="other">.</span><span class="identifier">GetBinaryWriter</span><span class="other">(</span><span class="other">)</span><span class="other">.</span><span class="identifier">WriteULEB128UInt</span><span class="other">(</span><span class="identifier">n</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">40</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">for&nbsp;</span><span class="other">(</span><span class="type">uint32_t</span>&nbsp;<span class="identifier">i</span>&nbsp;<span class="other">=</span>&nbsp;<span class="other">0</span><span class="other">;</span>&nbsp;<span class="identifier">i</span><span class="other">&nbsp;&lt;&nbsp;</span><span class="identifier">n</span><span class="other">;</span>&nbsp;<span class="other">++</span><span class="identifier">i</span><span class="other">)</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">41</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">42</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">writer</span><span class="other">.</span><span class="identifier">Write</span><span class="other">(</span><span class="identifier">nodes</span><span class="other">[</span><span class="identifier">i</span><span class="other">]</span><span class="other">.</span><span class="identifier">get</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">43</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">44</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <hr/>
+        <h3 id="function_operator_subscript_C4833C51252C0E70C271FD881CBCB6F64984E1B6">operator[] Member Function</h3>
+        <h4>
+            T* cmajor::ast::NodeList::operator[](<span class="kw">int</span>
+             index) <span class="kw">const</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/ast/NodeList.hpp_2FFAF8FF85EFFAB64B5BB46974EEEF9826763D92.html#21">21</a>
+             of <a href="file/ast/NodeList.hpp_2FFAF8FF85EFFAB64B5BB46974EEEF9826763D92.html">NodeList.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">22</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">23</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">nodes</span><span class="other">[</span><span class="identifier">index</span><span class="other">]</span><span class="other">.</span><span class="identifier">get</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">24</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <hr/>
+        <a href="../index.html">index</a>
+         | <a href="namespace_ast_C9161F619BA82A5AF902D95B166AD35F0072F67D.html">up</a>
+         | <a href="class_NodeFactory_325E22DD08235313DEB4B63B419F43BDDB9AAD5E.html">prev</a>
+         | <a href="class_NonreferenceTypeConceptNode_17F5320EA9E8E884BBF504AC3A0D66867AA00959.html">next</a>
+    </body>
+</html>

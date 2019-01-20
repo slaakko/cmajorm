@@ -1,0 +1,115 @@
+<html>
+ <head>
+  <meta charset="utf-8"/>
+  <title>System.Base/ByteStream.cm</title>
+  <link href="../../../style/style.css" rel="stylesheet" type="text/css"/>
+ </head>
+ <body>
+  <span class="code" id="1" xml:space="preserve"><span class="lineNumber">&nbsp;1</span>&nbsp;<span class="comment">//&nbsp;=================================</span></span>
+  <br/>
+  <span class="code" id="2" xml:space="preserve"><span class="lineNumber">&nbsp;2</span>&nbsp;<span class="comment">//&nbsp;Copyright&nbsp;(c)&nbsp;2019&nbsp;Seppo&nbsp;Laakko</span></span>
+  <br/>
+  <span class="code" id="3" xml:space="preserve"><span class="lineNumber">&nbsp;3</span>&nbsp;<span class="comment">//&nbsp;Distributed&nbsp;under&nbsp;the&nbsp;MIT&nbsp;license</span></span>
+  <br/>
+  <span class="code" id="4" xml:space="preserve"><span class="lineNumber">&nbsp;4</span>&nbsp;<span class="comment">//&nbsp;=================================</span></span>
+  <br/>
+  <span class="code" id="5" xml:space="preserve"><span class="lineNumber">&nbsp;5</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="6" xml:space="preserve"><span class="lineNumber">&nbsp;6</span>&nbsp;<span class="kw">using</span>&nbsp;<span class="identifier">System</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="7" xml:space="preserve"><span class="lineNumber">&nbsp;7</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="8" xml:space="preserve"><span class="lineNumber">&nbsp;8</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">System.IO</span></span>
+  <br/>
+  <span class="code" id="9" xml:space="preserve"><span class="lineNumber">&nbsp;9</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="10" xml:space="preserve"><span class="lineNumber">10</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">enum</span>&nbsp;<a href="../doc/enumerated_type_Origin_A770811A120AA0D85B3AD4E90D4A9AF5ADC90D70.html">Origin</a><span class="other">&nbsp;:&nbsp;</span><span class="kw">byte</span></span>
+  <br/>
+  <span class="code" id="11" xml:space="preserve"><span class="lineNumber">11</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="12" xml:space="preserve"><span class="lineNumber">12</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">seekSet</span><span class="other">,&nbsp;</span><span class="identifier">seekCur</span><span class="other">,&nbsp;</span><span class="identifier">seekEnd</span></span>
+  <br/>
+  <span class="code" id="13" xml:space="preserve"><span class="lineNumber">13</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="14" xml:space="preserve"><span class="lineNumber">14</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+  <br/>
+  <span class="code" id="15" xml:space="preserve"><span class="lineNumber">15</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">abstract</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../doc/class_ByteStream_3B7A2F3379612ADBD7E416487752A1935AA8B96F.html">ByteStream</a></span>
+  <br/>
+  <span class="code" id="16" xml:space="preserve"><span class="lineNumber">16</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="17" xml:space="preserve"><span class="lineNumber">17</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">virtual</span>&nbsp;<span class="kw">default</span>&nbsp;<span class="other">~</span><a href="../doc/class_ByteStream_3B7A2F3379612ADBD7E416487752A1935AA8B96F.html#destructor_ByteStream_3E27CF641412EAE17C0DBD9D1611CC7FB8682A94">ByteStream</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="18" xml:space="preserve"><span class="lineNumber">18</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">suppress</span>&nbsp;<a href="../doc/class_ByteStream_3B7A2F3379612ADBD7E416487752A1935AA8B96F.html#copy_constructor_ByteStream_4402A742E288F424E7F02AAE0BDDE6373E425661">ByteStream</a><span class="other">(</span><span class="kw">const</span>&nbsp;<a href="../doc/class_ByteStream_3B7A2F3379612ADBD7E416487752A1935AA8B96F.html">ByteStream</a><span class="other">&amp;</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="19" xml:space="preserve"><span class="lineNumber">19</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">suppress</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/class_ByteStream_3B7A2F3379612ADBD7E416487752A1935AA8B96F.html#copy_assignment_op_assign_ByteStream_27E57493C80E6DC9ABE84D5461E6149032E3245D">operator=</a><span class="other">(</span><span class="kw">const</span>&nbsp;<a href="../doc/class_ByteStream_3B7A2F3379612ADBD7E416487752A1935AA8B96F.html">ByteStream</a><span class="other">&amp;</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="20" xml:space="preserve"><span class="lineNumber">20</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">default</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<a href="../doc/class_ByteStream_3B7A2F3379612ADBD7E416487752A1935AA8B96F.html#move_constructor_ByteStream_79C9D690CE6C3AE37E3ED5CCACF1950640749162">ByteStream</a><span class="other">(</span><a href="../doc/class_ByteStream_3B7A2F3379612ADBD7E416487752A1935AA8B96F.html">ByteStream</a><span class="other">&amp;&amp;</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="21" xml:space="preserve"><span class="lineNumber">21</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">default</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/class_ByteStream_3B7A2F3379612ADBD7E416487752A1935AA8B96F.html#move_assignment_op_assign_ByteStream_15F91751C8166EF74B764D28C21985D119070C22">operator=</a><span class="other">(</span><a href="../doc/class_ByteStream_3B7A2F3379612ADBD7E416487752A1935AA8B96F.html">ByteStream</a><span class="other">&amp;&amp;</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="22" xml:space="preserve"><span class="lineNumber">22</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">abstract</span>&nbsp;<span class="kw">int</span>&nbsp;<a href="../doc/class_ByteStream_3B7A2F3379612ADBD7E416487752A1935AA8B96F.html#member_function_ReadByte_ByteStream_00F33B1B22C620EA630EFF170682AF0914E4E568">ReadByte</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="23" xml:space="preserve"><span class="lineNumber">23</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">abstract</span>&nbsp;<span class="kw">long</span>&nbsp;<a href="../doc/class_ByteStream_3B7A2F3379612ADBD7E416487752A1935AA8B96F.html#member_function_Read_ByteStream_026763BB61037CC329F0EC41074406529C920B49">Read</a><span class="other">(</span><span class="kw">byte</span><span class="other">*</span>&nbsp;<span class="identifier">buf</span><span class="other">,&nbsp;</span><span class="kw">long</span>&nbsp;<span class="identifier">count</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="24" xml:space="preserve"><span class="lineNumber">24</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">abstract</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/class_ByteStream_3B7A2F3379612ADBD7E416487752A1935AA8B96F.html#member_function_Write_ByteStream_B16019C1887E69858F8B4AADB6B9CE65537722E2">Write</a><span class="other">(</span><span class="kw">byte</span>&nbsp;<span class="identifier">x</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="25" xml:space="preserve"><span class="lineNumber">25</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">abstract</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/class_ByteStream_3B7A2F3379612ADBD7E416487752A1935AA8B96F.html#member_function_Write_ByteStream_E19BFE5AE2C372D12C30E7858F26083DF778BC5D">Write</a><span class="other">(</span><span class="kw">byte</span><span class="other">*</span>&nbsp;<span class="identifier">buf</span><span class="other">,&nbsp;</span><span class="kw">long</span>&nbsp;<span class="identifier">count</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="26" xml:space="preserve"><span class="lineNumber">26</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">virtual</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/class_ByteStream_3B7A2F3379612ADBD7E416487752A1935AA8B96F.html#member_function_Flush_ByteStream_B359C6583A0F7B15600ACAFE7CAC23020693AEBB">Flush</a><span class="other">(</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="27" xml:space="preserve"><span class="lineNumber">27</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="28" xml:space="preserve"><span class="lineNumber">28</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="29" xml:space="preserve"><span class="lineNumber">29</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">virtual</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/class_ByteStream_3B7A2F3379612ADBD7E416487752A1935AA8B96F.html#member_function_Seek_ByteStream_6127E9DEF97F05A69D099D8E1CED2CCA9FD5F9B3">Seek</a><span class="other">(</span><span class="kw">long</span>&nbsp;<span class="identifier">pos</span><span class="other">,&nbsp;</span><a href="../doc/enumerated_type_Origin_A770811A120AA0D85B3AD4E90D4A9AF5ADC90D70.html">Origin</a>&nbsp;<span class="identifier">origin</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="30" xml:space="preserve"><span class="lineNumber">30</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="31" xml:space="preserve"><span class="lineNumber">31</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">throw</span>&nbsp;<a href="../doc/class_FileSystemException_BB9552A6F8CD7166104BC90F55939797AA006B1A.html#constructor_FileSystemException_0E10B74628849BBEDA9615E53923669F0A0DB677">FileSystemException</a><span class="other">(</span><span class="string">"this&nbsp;stream&nbsp;does&nbsp;not&nbsp;support&nbsp;seek"</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="32" xml:space="preserve"><span class="lineNumber">32</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="33" xml:space="preserve"><span class="lineNumber">33</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">virtual</span>&nbsp;<span class="kw">long</span>&nbsp;<a href="../doc/class_ByteStream_3B7A2F3379612ADBD7E416487752A1935AA8B96F.html#member_function_Tell_ByteStream_163EFD5A892885A5804810B26BDF0BA74083B8D7">Tell</a><span class="other">(</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="34" xml:space="preserve"><span class="lineNumber">34</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="35" xml:space="preserve"><span class="lineNumber">35</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">throw</span>&nbsp;<a href="../doc/class_FileSystemException_BB9552A6F8CD7166104BC90F55939797AA006B1A.html#constructor_FileSystemException_0E10B74628849BBEDA9615E53923669F0A0DB677">FileSystemException</a><span class="other">(</span><span class="string">"this&nbsp;stream&nbsp;does&nbsp;not&nbsp;support&nbsp;tell"</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="36" xml:space="preserve"><span class="lineNumber">36</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="37" xml:space="preserve"><span class="lineNumber">37</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/class_ByteStream_3B7A2F3379612ADBD7E416487752A1935AA8B96F.html#member_function_CopyTo_ByteStream_0492E0CBFB6B3F30EF00802A23577E7067B981A0">CopyTo</a><span class="other">(</span><a href="../doc/class_ByteStream_3B7A2F3379612ADBD7E416487752A1935AA8B96F.html">ByteStream</a><span class="other">&amp;</span>&nbsp;<span class="identifier">destination</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="38" xml:space="preserve"><span class="lineNumber">38</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="39" xml:space="preserve"><span class="lineNumber">39</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">this</span><span class="other">-></span><a href="../doc/class_ByteStream_3B7A2F3379612ADBD7E416487752A1935AA8B96F.html#member_function_CopyTo_ByteStream_09F8EA0997885DD83562B277CD430D46040BB611">CopyTo</a><span class="other">(</span><span class="identifier">destination</span><span class="other">,&nbsp;</span><span class="number">16384</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="40" xml:space="preserve"><span class="lineNumber">40</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="41" xml:space="preserve"><span class="lineNumber">41</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/class_ByteStream_3B7A2F3379612ADBD7E416487752A1935AA8B96F.html#member_function_CopyTo_ByteStream_09F8EA0997885DD83562B277CD430D46040BB611">CopyTo</a><span class="other">(</span><a href="../doc/class_ByteStream_3B7A2F3379612ADBD7E416487752A1935AA8B96F.html">ByteStream</a><span class="other">&amp;</span>&nbsp;<span class="identifier">destination</span><span class="other">,&nbsp;</span><span class="kw">long</span>&nbsp;<span class="identifier">bufferSize</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="42" xml:space="preserve"><span class="lineNumber">42</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="43" xml:space="preserve"><span class="lineNumber">43</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">#assert</span><span class="other">(</span><span class="identifier">bufferSize</span><span class="other">&nbsp;>&nbsp;</span><span class="number">0</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="44" xml:space="preserve"><span class="lineNumber">44</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../doc/class_IOBuffer_7AC61842AD3FCA40A4176E0D72E981B672D7E222.html">IOBuffer</a>&nbsp;<span class="identifier">buffer</span><span class="other">(</span><span class="identifier">bufferSize</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="45" xml:space="preserve"><span class="lineNumber">45</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">long</span>&nbsp;<span class="identifier">bytesRead</span><span class="other">&nbsp;=&nbsp;</span><a href="../doc/class_ByteStream_3B7A2F3379612ADBD7E416487752A1935AA8B96F.html#member_function_Read_ByteStream_026763BB61037CC329F0EC41074406529C920B49">Read</a><span class="other">(</span><span class="kw">cast</span><span class="other">&lt;</span><span class="kw">byte</span><span class="other">*</span><span class="other">></span><span class="other">(</span><span class="identifier">buffer</span><span class="other">.</span><a href="../doc/class_IOBuffer_7AC61842AD3FCA40A4176E0D72E981B672D7E222.html#member_function_Mem_IOBuffer_996BF7317F966ED0127C18F3E362F5BE3EABCC8A">Mem</a><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">bufferSize</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="46" xml:space="preserve"><span class="lineNumber">46</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">while</span>&nbsp;<span class="other">(</span><span class="identifier">bytesRead</span><span class="other">&nbsp;>&nbsp;</span><span class="number">0</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="47" xml:space="preserve"><span class="lineNumber">47</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="48" xml:space="preserve"><span class="lineNumber">48</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">destination</span><span class="other">.</span><a href="../doc/class_ByteStream_3B7A2F3379612ADBD7E416487752A1935AA8B96F.html#member_function_Write_ByteStream_E19BFE5AE2C372D12C30E7858F26083DF778BC5D">Write</a><span class="other">(</span><span class="kw">cast</span><span class="other">&lt;</span><span class="kw">byte</span><span class="other">*</span><span class="other">></span><span class="other">(</span><span class="identifier">buffer</span><span class="other">.</span><a href="../doc/class_IOBuffer_7AC61842AD3FCA40A4176E0D72E981B672D7E222.html#member_function_Mem_IOBuffer_996BF7317F966ED0127C18F3E362F5BE3EABCC8A">Mem</a><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">bytesRead</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="49" xml:space="preserve"><span class="lineNumber">49</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">bytesRead</span><span class="other">&nbsp;=&nbsp;</span><a href="../doc/class_ByteStream_3B7A2F3379612ADBD7E416487752A1935AA8B96F.html#member_function_Read_ByteStream_026763BB61037CC329F0EC41074406529C920B49">Read</a><span class="other">(</span><span class="kw">cast</span><span class="other">&lt;</span><span class="kw">byte</span><span class="other">*</span><span class="other">></span><span class="other">(</span><span class="identifier">buffer</span><span class="other">.</span><a href="../doc/class_IOBuffer_7AC61842AD3FCA40A4176E0D72E981B672D7E222.html#member_function_Mem_IOBuffer_996BF7317F966ED0127C18F3E362F5BE3EABCC8A">Mem</a><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">bufferSize</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="50" xml:space="preserve"><span class="lineNumber">50</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="51" xml:space="preserve"><span class="lineNumber">51</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="52" xml:space="preserve"><span class="lineNumber">52</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="53" xml:space="preserve"><span class="lineNumber">53</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+ </body>
+</html>

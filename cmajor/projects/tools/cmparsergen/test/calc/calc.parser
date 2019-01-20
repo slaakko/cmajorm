@@ -1,0 +1,23 @@
+namespace Calc
+{
+    grammar CalculatorGrammar
+    {
+        using stdlib.num;
+
+        Expr
+            ::= Term (('+' | '-') Term)*
+            ;
+
+        Term
+            ::= Factor (('*' | '/') Factor)*
+            ;
+
+        Factor
+            ::= '+' Primary | '-' Primary | Primary
+            ;
+
+        Primary
+            ::= '(' Expr ')' | num
+            ;
+    }
+}

@@ -1,0 +1,257 @@
+<html>
+ <head>
+  <meta charset="utf-8"/>
+  <title>stdlib Grammar</title>
+  <link href="../../../style/style.css" rel="stylesheet" type="text/css"/>
+ </head>
+ <body>
+  <h1>stdlib Grammar</h1>
+  <table class="grammar">
+   <tr id="rule_spaces_1AE0E447CE429F4398E65FFF0A8FED1760EF89D4">
+    <td class="grammarFirstCol">
+     <span class="rule">spaces</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleKeyword">space</span><span class="ruleOp">+</span></td>
+   </tr>
+   <tr id="rule_newline_8D83C6A88BF04B09CA508634F63FE992F97061C7">
+    <td class="grammarFirstCol">
+     <span class="rule">newline</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleString">"\r\n"</span><span class="ruleOp"> | </span><span class="ruleString">"\n"</span><span class="ruleOp"> | </span><span class="ruleString">"\r"</span></td>
+   </tr>
+   <tr id="rule_comment_DCC2E170D0EAD8D0D6E15C04F02CC23C288CFC80">
+    <td class="grammarFirstCol">
+     <span class="rule">comment</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#rule_line_comment_609DBAB751C7EEEBF3F314D9D127BE6B938330FA">line_comment</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#rule_block_comment_76ADF147042F93A9E3599B424A55A3B5C322FC63">block_comment</a></span></td>
+   </tr>
+   <tr id="rule_line_comment_609DBAB751C7EEEBF3F314D9D127BE6B938330FA">
+    <td class="grammarFirstCol">
+     <span class="rule">line_comment</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleString">"//"</span><span class="ruleOp"> </span><span class="ruleCharSet">[^\r\n]</span><span class="ruleOp">*</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_newline_8D83C6A88BF04B09CA508634F63FE992F97061C7">newline</a></span></td>
+   </tr>
+   <tr id="rule_block_comment_76ADF147042F93A9E3599B424A55A3B5C322FC63">
+    <td class="grammarFirstCol">
+     <span class="rule">block_comment</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleString">"/*"</span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#rule_string_85537169549F8AD731347E57D3A47B0F546A8949">string</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#rule_char_B356A507EF497187D65D4FC9DEE1FA39355AECD2">char</a></span><span class="ruleOp"> | </span><span class="ruleOp">(</span><span class="ruleKeyword">anychar</span><span class="ruleOp"> &minus; </span><span class="ruleString">"*/"</span><span class="ruleOp">)</span><span class="ruleOp">)</span><span class="ruleOp">*</span><span class="ruleOp"> </span><span class="ruleString">"*/"</span></td>
+   </tr>
+   <tr id="rule_spaces_and_comments_B81A6EBCB854FD3DADE8994F39BC430F5EB4C4D0">
+    <td class="grammarFirstCol">
+     <span class="rule">spaces_and_comments</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleOp">(</span><span class="ruleKeyword">space</span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#rule_comment_DCC2E170D0EAD8D0D6E15C04F02CC23C288CFC80">comment</a></span><span class="ruleOp">)</span><span class="ruleOp">+</span></td>
+   </tr>
+   <tr id="rule_digit_sequence_2FF0F8A142D91571248CEBC2034810FBED6AC54E">
+    <td class="grammarFirstCol">
+     <span class="rule">digit_sequence</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleKeyword">token</span><span class="ruleOp">(</span><span class="ruleKeyword">digit</span><span class="ruleOp">+</span><span class="ruleOp">)</span></td>
+   </tr>
+   <tr id="rule_sign_7100FCA859260527D92633F24AE023A50436D5C7">
+    <td class="grammarFirstCol">
+     <span class="rule">sign</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleChar">'+'</span><span class="ruleOp"> | </span><span class="ruleChar">'-'</span></td>
+   </tr>
+   <tr id="rule_sbyte_6BB0C36ACAFE421BA0276F535605BA38683A65AD">
+    <td class="grammarFirstCol">
+     <span class="rule">sbyte</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleKeyword">token</span><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#rule_sign_7100FCA859260527D92633F24AE023A50436D5C7">sign</a></span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_digit_sequence_2FF0F8A142D91571248CEBC2034810FBED6AC54E">digit_sequence</a></span><span class="ruleOp">)</span></td>
+   </tr>
+   <tr id="rule_byte_C2DDD39B6AD5B1F40B5539D993B89D2FF7975460">
+    <td class="grammarFirstCol">
+     <span class="rule">byte</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleKeyword">token</span><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#rule_digit_sequence_2FF0F8A142D91571248CEBC2034810FBED6AC54E">digit_sequence</a></span><span class="ruleOp">)</span></td>
+   </tr>
+   <tr id="rule_short_A0618570486ADB4C896379BDF69D560A1AACA2B6">
+    <td class="grammarFirstCol">
+     <span class="rule">short</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleKeyword">token</span><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#rule_sign_7100FCA859260527D92633F24AE023A50436D5C7">sign</a></span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_digit_sequence_2FF0F8A142D91571248CEBC2034810FBED6AC54E">digit_sequence</a></span><span class="ruleOp">)</span></td>
+   </tr>
+   <tr id="rule_ushort_F93CFDB7658C020AEAC8AE609A24031B7E2EAA88">
+    <td class="grammarFirstCol">
+     <span class="rule">ushort</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleKeyword">token</span><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#rule_digit_sequence_2FF0F8A142D91571248CEBC2034810FBED6AC54E">digit_sequence</a></span><span class="ruleOp">)</span></td>
+   </tr>
+   <tr id="rule_int_BC7E1F27AC581F0F50BA7DC9E873C752D77D4D0A">
+    <td class="grammarFirstCol">
+     <span class="rule">int</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleKeyword">token</span><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#rule_sign_7100FCA859260527D92633F24AE023A50436D5C7">sign</a></span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_digit_sequence_2FF0F8A142D91571248CEBC2034810FBED6AC54E">digit_sequence</a></span><span class="ruleOp">)</span></td>
+   </tr>
+   <tr id="rule_uint_B576C7C3A3FEC095F54489E9D57621A6F9A486C9">
+    <td class="grammarFirstCol">
+     <span class="rule">uint</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleKeyword">token</span><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#rule_digit_sequence_2FF0F8A142D91571248CEBC2034810FBED6AC54E">digit_sequence</a></span><span class="ruleOp">)</span></td>
+   </tr>
+   <tr id="rule_long_7C590701C6D1E667A3C80A8362A7B866EC2A80C9">
+    <td class="grammarFirstCol">
+     <span class="rule">long</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleKeyword">token</span><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#rule_sign_7100FCA859260527D92633F24AE023A50436D5C7">sign</a></span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_digit_sequence_2FF0F8A142D91571248CEBC2034810FBED6AC54E">digit_sequence</a></span><span class="ruleOp">)</span></td>
+   </tr>
+   <tr id="rule_ulong_1DA767A515D4C25CB5AD0097F1DA3CDE60E14F70">
+    <td class="grammarFirstCol">
+     <span class="rule">ulong</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleKeyword">token</span><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#rule_digit_sequence_2FF0F8A142D91571248CEBC2034810FBED6AC54E">digit_sequence</a></span><span class="ruleOp">)</span></td>
+   </tr>
+   <tr id="rule_hexbyte_09877EFDD0BF29EAE4D9738D7C60BF437CA9AC2D">
+    <td class="grammarFirstCol">
+     <span class="rule">hexbyte</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleKeyword">token</span><span class="ruleOp">(</span><span class="ruleKeyword">hexdigit</span><span class="ruleOp">+</span><span class="ruleOp">)</span></td>
+   </tr>
+   <tr id="rule_hexword_B7FB76662D1887DF360C678D2947214520841164">
+    <td class="grammarFirstCol">
+     <span class="rule">hexword</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleKeyword">token</span><span class="ruleOp">(</span><span class="ruleKeyword">hexdigit</span><span class="ruleOp">+</span><span class="ruleOp">)</span></td>
+   </tr>
+   <tr id="rule_hexdword_F453C401D35C3BD497CC9F203EB83ACF1CCC07DF">
+    <td class="grammarFirstCol">
+     <span class="rule">hexdword</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleKeyword">token</span><span class="ruleOp">(</span><span class="ruleKeyword">hexdigit</span><span class="ruleOp">+</span><span class="ruleOp">)</span></td>
+   </tr>
+   <tr id="rule_hexqword_2B36E6BD3C7AA8387FAB34B1DE3985028C92735C">
+    <td class="grammarFirstCol">
+     <span class="rule">hexqword</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleKeyword">token</span><span class="ruleOp">(</span><span class="ruleKeyword">hexdigit</span><span class="ruleOp">+</span><span class="ruleOp">)</span></td>
+   </tr>
+   <tr id="rule_hex_10EA9C5F025764FA507545832CFF81A98D128D11">
+    <td class="grammarFirstCol">
+     <span class="rule">hex</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#rule_hexqword_2B36E6BD3C7AA8387FAB34B1DE3985028C92735C">hexqword</a></span></td>
+   </tr>
+   <tr id="rule_hex_literal_AFF9D6A0AD656BEB4D9BF99B9C1C8E7C2E78F470">
+    <td class="grammarFirstCol">
+     <span class="rule">hex_literal</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleKeyword">token</span><span class="ruleOp">(</span><span class="ruleOp">(</span><span class="ruleString">"0x"</span><span class="ruleOp"> | </span><span class="ruleString">"0X"</span><span class="ruleOp">)</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_hex_10EA9C5F025764FA507545832CFF81A98D128D11">hex</a></span><span class="ruleOp">!</span><span class="ruleOp">)</span></td>
+   </tr>
+   <tr id="rule_octal_digit_4DD133F8EBE3B81F95F76F846EF87AF239D50D4B">
+    <td class="grammarFirstCol">
+     <span class="rule">octal_digit</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleCharSet">[0-7]</span></td>
+   </tr>
+   <tr id="rule_float_DDAC364E8C4D91763D954CB06A39D9AEA27D5C47">
+    <td class="grammarFirstCol">
+     <span class="rule">float</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleKeyword">token</span><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#rule_sign_7100FCA859260527D92633F24AE023A50436D5C7">sign</a></span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_fractional_real_2BEA65DC0B289D2D766C03377C74A48E4CAB9D00">fractional_real</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_exponent_part_9B335AEFFF19D126592CBA3629124637193AB924">exponent_part</a></span><span class="ruleOp">?</span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#rule_sign_7100FCA859260527D92633F24AE023A50436D5C7">sign</a></span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_digit_sequence_2FF0F8A142D91571248CEBC2034810FBED6AC54E">digit_sequence</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_exponent_part_9B335AEFFF19D126592CBA3629124637193AB924">exponent_part</a></span><span class="ruleOp">)</span></td>
+   </tr>
+   <tr id="rule_double_A75DC2E0E151E062338FC5D0B7DA76EC22F43B21">
+    <td class="grammarFirstCol">
+     <span class="rule">double</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleKeyword">token</span><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#rule_sign_7100FCA859260527D92633F24AE023A50436D5C7">sign</a></span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_fractional_real_2BEA65DC0B289D2D766C03377C74A48E4CAB9D00">fractional_real</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_exponent_part_9B335AEFFF19D126592CBA3629124637193AB924">exponent_part</a></span><span class="ruleOp">?</span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#rule_sign_7100FCA859260527D92633F24AE023A50436D5C7">sign</a></span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_digit_sequence_2FF0F8A142D91571248CEBC2034810FBED6AC54E">digit_sequence</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_exponent_part_9B335AEFFF19D126592CBA3629124637193AB924">exponent_part</a></span><span class="ruleOp">)</span></td>
+   </tr>
+   <tr id="rule_ureal_BA1029409322522E628CDB60092F1E7077FC9324">
+    <td class="grammarFirstCol">
+     <span class="rule">ureal</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleKeyword">token</span><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#rule_fractional_real_2BEA65DC0B289D2D766C03377C74A48E4CAB9D00">fractional_real</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_exponent_part_9B335AEFFF19D126592CBA3629124637193AB924">exponent_part</a></span><span class="ruleOp">?</span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#rule_digit_sequence_2FF0F8A142D91571248CEBC2034810FBED6AC54E">digit_sequence</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_exponent_part_9B335AEFFF19D126592CBA3629124637193AB924">exponent_part</a></span><span class="ruleOp">)</span></td>
+   </tr>
+   <tr id="rule_fractional_real_2BEA65DC0B289D2D766C03377C74A48E4CAB9D00">
+    <td class="grammarFirstCol">
+     <span class="rule">fractional_real</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleKeyword">token</span><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#rule_digit_sequence_2FF0F8A142D91571248CEBC2034810FBED6AC54E">digit_sequence</a></span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleChar">'.'</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_digit_sequence_2FF0F8A142D91571248CEBC2034810FBED6AC54E">digit_sequence</a></span><span class="ruleOp">)</span><span class="ruleOp"> | </span><span class="ruleKeyword">token</span><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#rule_digit_sequence_2FF0F8A142D91571248CEBC2034810FBED6AC54E">digit_sequence</a></span><span class="ruleOp"> </span><span class="ruleChar">'.'</span><span class="ruleOp">)</span></td>
+   </tr>
+   <tr id="rule_exponent_part_9B335AEFFF19D126592CBA3629124637193AB924">
+    <td class="grammarFirstCol">
+     <span class="rule">exponent_part</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleKeyword">token</span><span class="ruleOp">(</span><span class="ruleCharSet">[eE]</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_sign_7100FCA859260527D92633F24AE023A50436D5C7">sign</a></span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_digit_sequence_2FF0F8A142D91571248CEBC2034810FBED6AC54E">digit_sequence</a></span><span class="ruleOp">)</span></td>
+   </tr>
+   <tr id="rule_num_0B48AD87A52791FF8B6D9E12ED8AFE95D26662D8">
+    <td class="grammarFirstCol">
+     <span class="rule">num</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#rule_double_A75DC2E0E151E062338FC5D0B7DA76EC22F43B21">double</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#rule_int_BC7E1F27AC581F0F50BA7DC9E873C752D77D4D0A">int</a></span></td>
+   </tr>
+   <tr id="rule_bool_D30BF7FDAA6C176C3997897BBA2FB8038106B7C7">
+    <td class="grammarFirstCol">
+     <span class="rule">bool</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleKeyword">keyword</span><span class="ruleString">("true")</span><span class="ruleOp"> | </span><span class="ruleKeyword">keyword</span><span class="ruleString">("false")</span></td>
+   </tr>
+   <tr id="rule_identifier_EC79E9557ADCB4230187E4EB2CFA518A0D75FDF1">
+    <td class="grammarFirstCol">
+     <span class="rule">identifier</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleKeyword">token</span><span class="ruleOp">(</span><span class="ruleOp">(</span><span class="ruleKeyword">idstart</span><span class="ruleOp"> | </span><span class="ruleChar">'_'</span><span class="ruleOp">)</span><span class="ruleOp"> </span><span class="ruleKeyword">idcont</span><span class="ruleOp">*</span><span class="ruleOp">)</span></td>
+   </tr>
+   <tr id="rule_qualified_id_56A0F52F3D50ED3FB6A7DAFF6D694F5FF1BAF129">
+    <td class="grammarFirstCol">
+     <span class="rule">qualified_id</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleKeyword">token</span><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#rule_identifier_EC79E9557ADCB4230187E4EB2CFA518A0D75FDF1">identifier</a></span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleChar">'.'</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_identifier_EC79E9557ADCB4230187E4EB2CFA518A0D75FDF1">identifier</a></span><span class="ruleOp">)</span><span class="ruleOp">*</span><span class="ruleOp">)</span></td>
+   </tr>
+   <tr id="rule_escape_35B1304EE89CA8A4CFB632BA91CA3BC542B43B13">
+    <td class="grammarFirstCol">
+     <span class="rule">escape</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleKeyword">token</span><span class="ruleOp">(</span><span class="ruleChar">'\\'</span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleCharSet">[xX]</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_hexdword_F453C401D35C3BD497CC9F203EB83ACF1CCC07DF">hexdword</a></span><span class="ruleOp"> | </span><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#rule_octal_digit_4DD133F8EBE3B81F95F76F846EF87AF239D50D4B">octal_digit</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_octal_digit_4DD133F8EBE3B81F95F76F846EF87AF239D50D4B">octal_digit</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_octal_digit_4DD133F8EBE3B81F95F76F846EF87AF239D50D4B">octal_digit</a></span><span class="ruleOp">)</span><span class="ruleOp"> | </span><span class="ruleCharSet">[dD]</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_uint_B576C7C3A3FEC095F54489E9D57621A6F9A486C9">uint</a></span><span class="ruleOp"> | </span><span class="ruleCharSet">[^dDxX]</span><span class="ruleOp">)</span><span class="ruleOp">)</span></td>
+   </tr>
+   <tr id="rule_char_B356A507EF497187D65D4FC9DEE1FA39355AECD2">
+    <td class="grammarFirstCol">
+     <span class="rule">char</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleKeyword">token</span><span class="ruleOp">(</span><span class="ruleChar">'\''</span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleCharSet">[^\\\r\n]</span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#rule_escape_35B1304EE89CA8A4CFB632BA91CA3BC542B43B13">escape</a></span><span class="ruleOp">)</span><span class="ruleOp"> </span><span class="ruleChar">'\''</span><span class="ruleOp">!</span><span class="ruleOp">)</span></td>
+   </tr>
+   <tr id="rule_string_85537169549F8AD731347E57D3A47B0F546A8949">
+    <td class="grammarFirstCol">
+     <span class="rule">string</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleKeyword">token</span><span class="ruleOp">(</span><span class="ruleChar">'\"'</span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleOp">(</span><span class="ruleCharSet">[^\"\\\r\n]</span><span class="ruleOp">+</span><span class="ruleOp">)</span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#rule_escape_35B1304EE89CA8A4CFB632BA91CA3BC542B43B13">escape</a></span><span class="ruleOp">)</span><span class="ruleOp">*</span><span class="ruleOp"> </span><span class="ruleChar">'\"'</span><span class="ruleOp">!</span><span class="ruleOp">)</span></td>
+   </tr>
+  </table>
+ </body>
+</html>

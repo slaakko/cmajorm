@@ -1,0 +1,914 @@
+// =================================
+// Copyright (c) 2019 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Collections;
+
+namespace System.Text.Parsing.CodeDom
+{
+    public enum Operator 
+    {
+        disjunction, conjunction, bitOr, bitXor, bitAnd, equal, notEqual, less, greater, lessOrEqual, greaterOrEqual, shiftLeft, shiftRight, add, sub, mul, div, rem,
+        not_, deref, addressOf, increment, decrement, unaryPlus, unaryMinus, complement, is_, as_
+    }
+    
+    public nothrow string MakeBinOpName(Operator op)
+    {
+        switch (op)
+        {
+            case Operator.disjunction: return "||";
+            case Operator.conjunction: return "&&";
+            case Operator.bitOr: return "|";
+            case Operator.bitXor: return "^";
+            case Operator.bitAnd: return "&";
+            case Operator.equal: return "==";
+            case Operator.notEqual: return "!=";
+            case Operator.less: return "<";
+            case Operator.greater: return ">";
+            case Operator.lessOrEqual: return "<=";
+            case Operator.greaterOrEqual: return ">=";
+            case Operator.shiftLeft: return "<<";
+            case Operator.shiftRight: return ">>";
+            case Operator.add: return "+";
+            case Operator.sub: return "-";
+            case Operator.mul: return "*";
+            case Operator.div: return "/";
+            case Operator.rem: return "%";
+        }
+        return "";
+    }
+    
+    public nothrow int GetBinOpRank(Operator op)
+    {
+        switch (op)
+        {
+            case Operator.disjunction: return 1;
+            case Operator.conjunction: return 2;
+            case Operator.bitOr: return 3;
+            case Operator.bitXor: return 4;
+            case Operator.bitAnd: return 5;
+            case Operator.equal: return 6;
+            case Operator.notEqual: return 6;
+            case Operator.less: return 7;
+            case Operator.greater: return 7;
+            case Operator.lessOrEqual: return 7;
+            case Operator.greaterOrEqual: return 7;
+            case Operator.shiftLeft: return 8;
+            case Operator.shiftRight: return 8;
+            case Operator.add: return 9;
+            case Operator.sub: return 9;
+            case Operator.mul: return 10;
+            case Operator.div: return 10;
+            case Operator.rem: return 10;
+        }
+        return 100;
+    }
+    
+
+    public nothrow string MakePrefixOpName(Operator op)
+    {
+        switch (op)
+        {
+            case Operator.not_: return "!";
+            case Operator.deref: return "*";
+            case Operator.addressOf: return "&";
+            case Operator.increment: return "++";
+            case Operator.decrement: return "--";
+            case Operator.unaryPlus: return "+";
+            case Operator.unaryMinus: return "-";
+            case Operator.complement: return "~";
+        }
+        return "";
+    }
+    
+    public nothrow string MakePostfixOpName(Operator op)
+    {
+        switch (op)
+        {
+            case Operator.increment: return "++";
+            case Operator.decrement: return "--";
+        }
+        return "";
+    }
+            
+    public abstract class Expression : DomObject
+    {
+        public nothrow Expression(const ustring& name_, int rank_) : base(name_), rank(rank_)
+        {
+        }
+        public nothrow override int Rank() const
+        {
+            return rank;
+        }
+        private int rank;
+    }
+    
+    public abstract class PrefixExpression : Expression
+    {
+        public PrefixExpression(Operator op_, DomObject* subject_) : base(ToUtf32(MakePrefixOpName(op_)), 11), subject(subject_)
+        {
+        }
+        public override void Print(CodeFormatter& formatter)
+        {
+            if (Parens())
+            {
+                formatter.Write('(');
+            }
+            if (subject->Rank() < Rank())
+            {
+                subject->SetParens();
+            }
+            formatter.Write(ToUtf8(Name()));
+            subject->Print(formatter);
+            if (Parens())
+            {
+                formatter.Write(')');
+            }
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            subject->Accept(visitor);
+        }    
+        private UniquePtr<DomObject> subject;
+    }
+    
+    public class Not : PrefixExpression
+    {
+        public Not(DomObject* subject_) : base(Operator.not_, subject_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+            base->Accept(visitor);
+        }
+    }
+    
+    public class Deref : PrefixExpression
+    {
+        public Deref(DomObject* subject_) : base(Operator.deref, subject_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+            base->Accept(visitor);
+        }
+    }
+
+    public class AddressOf : PrefixExpression
+    {
+        public AddressOf(DomObject* subject_) : base(Operator.addressOf, subject_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+            base->Accept(visitor);
+        }
+    }
+
+    public class PrefixIncrement : PrefixExpression
+    {
+        public PrefixIncrement(DomObject* subject_) : base(Operator.increment, subject_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+            base->Accept(visitor);
+        }
+    }
+
+    public class PrefixDecrement : PrefixExpression
+    {
+        public PrefixDecrement(DomObject* subject_) : base(Operator.decrement, subject_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+            base->Accept(visitor);
+        }
+    }
+                                
+    public class UnaryPlus : PrefixExpression
+    {
+        public UnaryPlus(DomObject* subject_) : base(Operator.unaryPlus, subject_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+            base->Accept(visitor);
+        }
+    }
+
+    public class UnaryMinus : PrefixExpression
+    {
+        public UnaryMinus(DomObject* subject_) : base(Operator.unaryMinus, subject_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+            base->Accept(visitor);
+        }
+    }
+
+    public class Complement : PrefixExpression
+    {
+        public Complement(DomObject* subject_) : base(Operator.complement, subject_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+            base->Accept(visitor);
+        }
+    }
+    
+    public class Dot : Expression
+    {
+        public nothrow Dot(DomObject* subject_, const ustring& memberId_) : base(u".", 11), subject(subject_), memberId(memberId_)
+        {
+        }
+        public nothrow override ustring Name() const 
+        {
+            return subject->Name() + u"." + memberId;
+        }
+        public override void Print(CodeFormatter& formatter)
+        {
+            if (Parens())
+            {
+                formatter.Write('(');
+            }
+            subject->Print(formatter);
+            formatter.Write('.');
+            formatter.Write(ToUtf8(memberId));
+            if (Parens())
+            {
+                formatter.Write(')');
+            }
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+            subject->Accept(visitor);
+        }
+        private UniquePtr<DomObject> subject;
+        private ustring memberId;
+    }
+
+    public class Arrow : Expression
+    {
+        public nothrow Arrow(DomObject* subject_, const ustring& memberId_) : base(u"->", 11), subject(subject_), memberId(memberId_)
+        {
+        }
+        public nothrow override ustring Name() const 
+        {
+            return subject->Name() + u"->" + memberId;
+        }
+        public override void Print(CodeFormatter& formatter)
+        {
+            if (Parens())
+            {
+                formatter.Write('(');
+            }
+            subject->Print(formatter);
+            formatter.Write("->");
+            formatter.Write(ToUtf8(memberId));
+            if (Parens())
+            {
+                formatter.Write(')');
+            }
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+            subject->Accept(visitor);
+        }
+        private UniquePtr<DomObject> subject;
+        private ustring memberId;
+    }
+        
+    public abstract class BinaryExpression : Expression
+    {
+        public BinaryExpression(Operator op_, DomObject* left_, DomObject* right_) : 
+            base(ToUtf32(MakeBinOpName(op_)), GetBinOpRank(op_)), left(left_), right(right_)
+        {
+        }
+        public override void Print(CodeFormatter& formatter)
+        {
+            if (Parens())
+            {
+                formatter.Write('(');
+            }
+            if (left->Rank() < Rank())
+            {
+                left->SetParens();
+            }
+            left->Print(formatter);
+            formatter.Write(' ');
+            formatter.Write(ToUtf8(Name()));
+            formatter.Write(' ');
+            if (right->Rank() < Rank())
+            {
+                right->SetParens();
+            }
+            right->Print(formatter);
+            if (Parens())
+            {
+                formatter.Write(')');
+            }
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            left->Accept(visitor);
+            right->Accept(visitor);
+        }
+        private UniquePtr<DomObject> left;
+        private UniquePtr<DomObject> right;
+    }
+    
+    public class Disjunction : BinaryExpression
+    {
+        public Disjunction(DomObject* left_, DomObject* right_) : base(Operator.disjunction, left_, right_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+            base->Accept(visitor);
+        }
+    }
+
+    public class Conjunction : BinaryExpression
+    {
+        public Conjunction(DomObject* left_, DomObject* right_) : base(Operator.conjunction, left_, right_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+            base->Accept(visitor);
+        }
+    }
+    
+    public class BitOr : BinaryExpression
+    {
+        public BitOr(DomObject* left_, DomObject* right_) : base(Operator.bitOr, left_, right_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+            base->Accept(visitor);
+        }
+    }
+
+    public class BitXor : BinaryExpression
+    {
+        public BitXor(DomObject* left_, DomObject* right_) : base(Operator.bitXor, left_, right_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+            base->Accept(visitor);
+        }
+    }
+
+    public class BitAnd : BinaryExpression
+    {
+        public BitAnd(DomObject* left_, DomObject* right_) : base(Operator.bitAnd, left_, right_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+            base->Accept(visitor);
+        }
+    }
+
+    public class Equal : BinaryExpression
+    {
+        public Equal(DomObject* left_, DomObject* right_) : base(Operator.equal, left_, right_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+            base->Accept(visitor);
+        }
+    }
+
+    public class NotEqual : BinaryExpression
+    {
+        public NotEqual(DomObject* left_, DomObject* right_) : base(Operator.notEqual, left_, right_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+            base->Accept(visitor);
+        }
+    }
+
+    public class Less : BinaryExpression
+    {
+        public Less(DomObject* left_, DomObject* right_) : base(Operator.less, left_, right_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+            base->Accept(visitor);
+        }
+    }
+
+    public class Greater : BinaryExpression
+    {
+        public Greater(DomObject* left_, DomObject* right_) : base(Operator.greater, left_, right_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+            base->Accept(visitor);
+        }
+    }
+
+    public class LessOrEqual : BinaryExpression
+    {
+        public LessOrEqual(DomObject* left_, DomObject* right_) : base(Operator.lessOrEqual, left_, right_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+            base->Accept(visitor);
+        }
+    }
+
+    public class GreaterOrEqual : BinaryExpression
+    {
+        public GreaterOrEqual(DomObject* left_, DomObject* right_) : base(Operator.greaterOrEqual, left_, right_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+            base->Accept(visitor);
+        }
+    }
+    
+    public class ShiftLeft : BinaryExpression
+    {
+        public ShiftLeft(DomObject* left_, DomObject* right_) : base(Operator.shiftLeft, left_, right_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+            base->Accept(visitor);
+        }
+    }
+    
+    public class ShiftRight : BinaryExpression
+    {
+        public ShiftRight(DomObject* left_, DomObject* right_) : base(Operator.shiftRight, left_, right_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+            base->Accept(visitor);
+        }
+    }
+
+    public class Add : BinaryExpression
+    {
+        public Add(DomObject* left_, DomObject* right_) : base(Operator.add, left_, right_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+            base->Accept(visitor);
+        }
+    }
+
+    public class Sub : BinaryExpression
+    {
+        public Sub(DomObject* left_, DomObject* right_) : base(Operator.sub, left_, right_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+            base->Accept(visitor);
+        }
+    }
+
+    public class Mul : BinaryExpression
+    {
+        public Mul(DomObject* left_, DomObject* right_) : base(Operator.mul, left_, right_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+            base->Accept(visitor);
+        }
+    }
+
+    public class Div : BinaryExpression
+    {
+        public Div(DomObject* left_, DomObject* right_) : base(Operator.div, left_, right_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+            base->Accept(visitor);
+        }
+    }
+
+    public class Rem : BinaryExpression
+    {
+        public Rem(DomObject* left_, DomObject* right_) : base(Operator.rem, left_, right_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+            base->Accept(visitor);
+        }
+    }
+    
+    public class Is : BinaryExpression
+    {
+        public Is(DomObject* expr_, DomObject* targetTypeExpr_) : base(Operator.is_, expr_, targetTypeExpr_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+            base->Accept(visitor);
+        }
+    }
+
+    public class As : BinaryExpression
+    {
+        public As(DomObject* expr_, DomObject* targetTypeExpr_) : base(Operator.as_, expr_, targetTypeExpr_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+            base->Accept(visitor);
+        }
+    }
+    
+    public class Indexing : Expression
+    {
+        public Indexing(DomObject* subject_, DomObject* index_) : base(u"[]", 11), subject(subject_), index(index_)
+        {
+        }
+        public nothrow override ustring Name() const 
+        {
+            return subject->Name() + u"[" + index->Name() + u"]";
+        }
+        public override void Print(CodeFormatter& formatter)
+        {
+            if (Parens())
+            {
+                formatter.Write('(');
+            }
+            subject->Print(formatter);
+            formatter.Write('[');
+            index->Print(formatter);
+            formatter.Write(']');
+            if (Parens())
+            {
+                formatter.Write(')');
+            }
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+            subject->Accept(visitor);
+            index->Accept(visitor);
+        }
+        private UniquePtr<DomObject> subject;
+        private UniquePtr<DomObject> index;
+    }
+    
+    public class Invoke : Expression
+    {
+        public Invoke(DomObject* subject_) : base(u"()", 11), subject(subject_)
+        {
+        }
+        public override void AddArgument(DomObject* argument)
+        {
+            arguments.Add(UniquePtr<DomObject>(argument));
+        }
+        public override void Print(CodeFormatter& formatter)
+        {
+            if (Parens())
+            {
+                formatter.Write('(');
+            }
+            subject->Print(formatter);
+            formatter.Write('(');
+            bool first = true;
+            for (const UniquePtr<DomObject>& argument : arguments)
+            {
+                if (first)
+                {
+                    first = false;
+                }
+                else
+                {
+                    formatter.Write(", ");
+                }
+                argument->Print(formatter);
+            }
+            formatter.Write(')');
+            if (Parens())
+            {
+                formatter.Write(')');
+            }
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+            subject->Accept(visitor);
+            for (const UniquePtr<DomObject>& argument : arguments)
+            {
+                argument->Accept(visitor);
+            }
+        }
+        private UniquePtr<DomObject> subject;
+        private List<UniquePtr<DomObject>> arguments;
+    }
+    
+    public abstract class PostfixExpression : Expression
+    {
+        public PostfixExpression(DomObject* subject_, Operator op_) : base(ToUtf32(MakePostfixOpName(op_)), 11), subject(subject_)
+        {
+        }
+        public override void Print(CodeFormatter& formatter)
+        {
+            if (Parens())
+            {
+                formatter.Write('(');
+            }
+            subject->Print(formatter);
+            formatter.Write(ToUtf8(Name()));
+            if (Parens())
+            {
+                formatter.Write(')');
+            }
+        }    
+        public override void Accept(Visitor& visitor)
+        {
+            subject->Accept(visitor);
+        }
+        private UniquePtr<DomObject> subject;
+    }
+    
+    public class PostfixIncrement : PostfixExpression
+    {
+        public PostfixIncrement(DomObject* subject_) : base(subject_, Operator.increment)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+            base->Accept(visitor);
+        }
+    }
+
+    public class PostfixDecrement : PostfixExpression
+    {
+        public PostfixDecrement(DomObject* subject_) : base(subject_, Operator.decrement)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+            base->Accept(visitor);
+        }
+    }
+    
+    public class SizeOf : Expression
+    {
+        public SizeOf(DomObject* subject_) : base(u"sizeof", 11), subject(subject_)
+        {
+        }
+        public override void Print(CodeFormatter& formatter)
+        {
+            if (Parens())
+            {
+                formatter.Write('(');
+            }
+            formatter.Write("sizeof(");
+            subject->Print(formatter);
+            formatter.Write(')');
+            if (Parens())
+            {
+                formatter.Write(')');
+            }
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+            subject->Accept(visitor);
+        }
+        private UniquePtr<DomObject> subject;
+    }
+
+    public class TypeName : Expression
+    {
+        public TypeName(DomObject* subject_) : base(u"typename", 11), subject(subject_)
+        {
+        }
+        public override void Print(CodeFormatter& formatter)
+        {
+            if (Parens())
+            {
+                formatter.Write('(');
+            }
+            formatter.Write("typename(");
+            subject->Print(formatter);
+            formatter.Write(')');
+            if (Parens())
+            {
+                formatter.Write(')');
+            }
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+            subject->Accept(visitor);
+        }
+        private UniquePtr<DomObject> subject;
+    }
+    
+    public class Cast : Expression
+    {
+        public Cast(DomObject* targetTypeExpr_, DomObject* sourceExpr_) : base(u"cast", 11), targetTypeExpr(targetTypeExpr_), sourceExpr(sourceExpr_)
+        {
+        }
+        public override void Print(CodeFormatter& formatter)
+        {
+            if (Parens())
+            {
+                formatter.Write('(');
+            }
+            formatter.Write("cast<");
+            targetTypeExpr->Print(formatter);
+            formatter.Write(">(");
+            sourceExpr->Print(formatter);
+            formatter.Write(')');
+            if (Parens())
+            {
+                formatter.Write(')');
+            }
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+            targetTypeExpr->Accept(visitor);
+            sourceExpr->Accept(visitor);
+        }
+        private UniquePtr<DomObject> targetTypeExpr;
+        private UniquePtr<DomObject> sourceExpr;
+    }
+    
+    public class Construct : Expression
+    {
+        public Construct(DomObject* typeExpr_) : base(u"construct", 11), typeExpr(typeExpr_)
+        {
+        }
+        public override void AddArgument(DomObject* argument)
+        {
+            arguments.Add(UniquePtr<DomObject>(argument));
+        }
+        public override void Print(CodeFormatter& formatter)
+        {
+            if (Parens())
+            {
+                formatter.Write('(');
+            }
+            formatter.Write("construct<");
+            typeExpr->Print(formatter);
+            formatter.Write(">(");
+            bool first = true;
+            for (const UniquePtr<DomObject>& argument : arguments)
+            {
+                if (first)
+                {
+                    first = false;
+                }
+                else
+                {
+                    formatter.Write(", ");
+                }
+                argument->Print(formatter);
+            }
+            formatter.Write(')');
+            if (Parens())
+            {
+                formatter.Write(')');
+            }
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+            typeExpr->Accept(visitor);
+            for (const UniquePtr<DomObject>& argument : arguments)
+            {
+                argument->Accept(visitor);
+            }
+        }
+        private UniquePtr<DomObject> typeExpr;
+        private List<UniquePtr<DomObject>> arguments;
+    }
+
+    public class New : Expression
+    {
+        public New(DomObject* typeExpr_) : base(u"new", 11), typeExpr(typeExpr_)
+        {
+        }
+        public override void AddArgument(DomObject* argument)
+        {
+            arguments.Add(UniquePtr<DomObject>(argument));
+        }
+        public override void Print(CodeFormatter& formatter)
+        {
+            if (Parens())
+            {
+                formatter.Write('(');
+            }
+            formatter.Write("new ");
+            typeExpr->Print(formatter);
+            formatter.Write("(");
+            bool first = true;
+            for (const UniquePtr<DomObject>& argument : arguments)
+            {
+                if (first)
+                {
+                    first = false;
+                }
+                else
+                {
+                    formatter.Write(", ");
+                }
+                argument->Print(formatter);
+            }
+            formatter.Write(')');
+            if (Parens())
+            {
+                formatter.Write(')');
+            }
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+            typeExpr->Accept(visitor);
+            for (const UniquePtr<DomObject>& argument : arguments)
+            {
+                argument->Accept(visitor);
+            }
+        }
+        private UniquePtr<DomObject> typeExpr;
+        private List<UniquePtr<DomObject>> arguments;
+    }
+    
+    public class This : Expression
+    {
+        public This() : base(u"this", 20) 
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+    }
+
+    public class Base : Expression
+    {
+        public Base() : base(u"base", 20) 
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+    }
+}

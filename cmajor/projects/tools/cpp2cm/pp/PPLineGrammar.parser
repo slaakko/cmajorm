@@ -1,0 +1,59 @@
+using System;
+using cppparser;
+using ast;
+
+namespace pp
+{
+    grammar PPLineGrammar
+    {
+        using cppparser.ExpressionGrammar.ConstantExpression;
+        using cppparser.LiteralGrammar.CharacterLiteral;
+        using cppparser.LiteralGrammar.StringLiteral;
+        using stdlib.spaces;
+        using stdlib.identifier;
+        using stdlib.sign;
+        skip spaces;
+        
+        PPLine(ustring* result, PP* pp)
+            ::= '#' PPDirective(result, pp)
+            |   empty{ pass = pp->process; } (PPToken(result, pp))*
+            |   empty{ result->Append('\n'); }
+            ;
+            
+        PPDirective(ustring* result, PP* pp, var ustring replacementList, var ParsingContext ctx)
+            ::= (keyword("include") (HeaderName:headerName)!)
+                { 
+                    string headerFilePath = pp->ResolveHeaderFilePath(ToUtf8(headerName)); 
+                    if (!headerFilePath.IsEmpty()) Preprocess(*pp, headerFilePath); 
+                }
+            |   (keyword("define") token(identifier:fmid '(') Identifiers ')'! PPToken(&replacementList, pp)*){ pp->Define(fmid, Identifiers, replacementList); }
+            |   (keyword("define") identifier:id0! PPToken(&replacementList, pp)*){ pp->Define(id0, replacementList); }
+            |   (keyword("undef") identifier:id1!){ pp->Undefine(id1); }
+            |   (keyword("ifdef") identifier:id2!){ pp->Push(pp->Defined(id2)); }
+            |   (keyword("ifndef") identifier:id3!){ pp->Push(!pp->Defined(id3)); }
+            |   (keyword("if") ConstantExpression(&ctx)!){ bool val = Evaluate(*pp, ConstantExpression); pp->Push(val); }
+            |   keyword("endif"){ pp->Pop(); }
+            ;
+            
+        Identifiers : List<ustring>
+            ::= identifier:left{ value.Add(left); } (',' identifier:right){ value.Add(right); })*
+            ;
+            
+        PPToken(ustring* result, PP* pp)
+            ::= identifier{ result->Append(pp->Substitute(identifier)); }
+            |   PPNumber{ result->Append(PPNumber); }
+            |   CharacterLiteral{ result->Append(ustring(matchBegin, matchEnd)); }
+            |   StringLiteral{ result->Append(ustring(matchBegin, matchEnd)); }
+            |   anychar{ result->Append(*matchBegin); }
+            ;
+            
+        PPNumber : ustring
+            ::= token((digit | ('.' digit)) (digit | '.' | [eE] sign | [a-zA-Z_])*){ value = ustring(matchBegin, matchEnd); }
+            ;
+            
+        HeaderName : ustring
+            ::= token('<' ([^>]+){ value = ustring(matchBegin, matchEnd); } '>')
+            |   token('"' ([^"]+){ value = ustring(matchBegin, matchEnd); } '"')
+            ;
+    }
+}

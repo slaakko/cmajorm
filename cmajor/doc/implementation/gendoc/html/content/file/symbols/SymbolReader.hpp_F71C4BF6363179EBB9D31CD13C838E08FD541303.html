@@ -1,0 +1,126 @@
+<html>
+ <head>
+  <meta charset="utf-8"/>
+  <link href="../../../style/style.css" rel="stylesheet" type="text/css"/>
+ </head>
+ <body>
+  <span class="code" id="1" xml:space="preserve"><span class="lineNumber">&nbsp;1</span>&nbsp;<span class="comment">//&nbsp;=================================</span></span>
+  <br/>
+  <span class="code" id="2" xml:space="preserve"><span class="lineNumber">&nbsp;2</span>&nbsp;<span class="comment">//&nbsp;Copyright&nbsp;(c)&nbsp;2018&nbsp;Seppo&nbsp;Laakko</span></span>
+  <br/>
+  <span class="code" id="3" xml:space="preserve"><span class="lineNumber">&nbsp;3</span>&nbsp;<span class="comment">//&nbsp;Distributed&nbsp;under&nbsp;the&nbsp;MIT&nbsp;license</span></span>
+  <br/>
+  <span class="code" id="4" xml:space="preserve"><span class="lineNumber">&nbsp;4</span>&nbsp;<span class="comment">//&nbsp;=================================</span></span>
+  <br/>
+  <span class="code" id="5" xml:space="preserve"><span class="lineNumber">&nbsp;5</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="6" xml:space="preserve"><span class="lineNumber">&nbsp;6</span>&nbsp;<span class="pp">#ifndef&nbsp;CMAJOR_SYMBOLS_SYMBOL_READER_INCLUDED</span></span>
+  <br/>
+  <span class="code" id="7" xml:space="preserve"><span class="lineNumber">&nbsp;7</span>&nbsp;<span class="pp">#define&nbsp;CMAJOR_SYMBOLS_SYMBOL_READER_INCLUDED</span></span>
+  <br/>
+  <span class="code" id="8" xml:space="preserve"><span class="lineNumber">&nbsp;8</span>&nbsp;<span class="pp">#include&nbsp;&lt;cmajor/ast/AstReader.hpp></span></span>
+  <br/>
+  <span class="code" id="9" xml:space="preserve"><span class="lineNumber">&nbsp;9</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="10" xml:space="preserve"><span class="lineNumber">10</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">cmajor</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">symbols</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="11" xml:space="preserve"><span class="lineNumber">11</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="12" xml:space="preserve"><span class="lineNumber">12</span>&nbsp;<span class="kw">using</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">cmajor</span><span class="other">:</span><span class="other">:</span><span class="identifier">ast</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="13" xml:space="preserve"><span class="lineNumber">13</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="14" xml:space="preserve"><span class="lineNumber">14</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../../class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html">Symbol</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="15" xml:space="preserve"><span class="lineNumber">15</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../../class_ArrayTypeSymbol_0A220BDED10648126A9C249A2B866EDE0E28CF71.html">ArrayTypeSymbol</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="16" xml:space="preserve"><span class="lineNumber">16</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../../class_DerivedTypeSymbol_F26B99CE4BE262395853B507ABF2858B06F9A216.html">DerivedTypeSymbol</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="17" xml:space="preserve"><span class="lineNumber">17</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../../class_ClassTemplateSpecializationSymbol_F0BC1A28739F39F0DA3BC5C1405A607BF1DFC8EA.html">ClassTemplateSpecializationSymbol</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="18" xml:space="preserve"><span class="lineNumber">18</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../../class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html">SymbolTable</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="19" xml:space="preserve"><span class="lineNumber">19</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../../class_Module_A2BC96D600A4B3135D7F5444EC360BBF9EA9DDF4.html">Module</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="20" xml:space="preserve"><span class="lineNumber">20</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../../class_FunctionSymbol_5AC1C26A9572181B3E31247997BF40453B22EDEF.html">FunctionSymbol</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="21" xml:space="preserve"><span class="lineNumber">21</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../../class_ClassTypeSymbol_706F15CDE917688D403DB002B3816EE91C6F66CB.html">ClassTypeSymbol</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="22" xml:space="preserve"><span class="lineNumber">22</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../../class_ParameterSymbol_EFEA20B84930B4A79D869DA6EFE9F58679F053A6.html">ParameterSymbol</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="23" xml:space="preserve"><span class="lineNumber">23</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="24" xml:space="preserve"><span class="lineNumber">24</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../../class_SymbolReader_EB36ADE3BE82C48FB57873005D5A7206C8D9F6E8.html">SymbolReader</a>&nbsp;</span>
+  <br/>
+  <span class="code" id="25" xml:space="preserve"><span class="lineNumber">25</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="26" xml:space="preserve"><span class="lineNumber">26</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="27" xml:space="preserve"><span class="lineNumber">27</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../class_SymbolReader_EB36ADE3BE82C48FB57873005D5A7206C8D9F6E8.html#constructor_SymbolReader_B025C000FF67160AC8631642298D77ADA433CD43">SymbolReader</a><span class="other">(</span><span class="kw">const&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="type">string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">fileName_</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="28" xml:space="preserve"><span class="lineNumber">28</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../class_AstReader_79D1108F70EAB0D555FDDD074FED033B2DCABCD5.html">AstReader</a><span class="other">&amp;</span>&nbsp;<a href="../../class_SymbolReader_EB36ADE3BE82C48FB57873005D5A7206C8D9F6E8.html#function_GetAstReader_9145E0096A6401E42D03D2BCB6C4EDE57A385715">GetAstReader</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">astReader</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="29" xml:space="preserve"><span class="lineNumber">29</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../class_BinaryReader_03B69C4712E895798960F755025292754AFB8DDD.html">BinaryReader</a><span class="other">&amp;</span>&nbsp;<a href="../../class_SymbolReader_EB36ADE3BE82C48FB57873005D5A7206C8D9F6E8.html#function_GetBinaryReader_09806EC47DD0DB222D693F04AF043F0FEBBC6EB0">GetBinaryReader</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">astReader</span><span class="other">.</span><span class="identifier">GetBinaryReader</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="30" xml:space="preserve"><span class="lineNumber">30</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html">Symbol</a><span class="other">*</span>&nbsp;<a href="../../class_SymbolReader_EB36ADE3BE82C48FB57873005D5A7206C8D9F6E8.html#function_ReadSymbol_4BC2CED1FC9B9E928D72FC2723FBC44B90E54875">ReadSymbol</a><span class="other">(</span><a href="../../class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html">Symbol</a><span class="other">*</span>&nbsp;<span class="identifier">parent</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="31" xml:space="preserve"><span class="lineNumber">31</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../class_ArrayTypeSymbol_0A220BDED10648126A9C249A2B866EDE0E28CF71.html">ArrayTypeSymbol</a><span class="other">*</span>&nbsp;<a href="../../class_SymbolReader_EB36ADE3BE82C48FB57873005D5A7206C8D9F6E8.html#function_ReadArrayTypeSymbol_1FB16B9BA6AB94486A3C439FAC83AFF0CC1A58B5">ReadArrayTypeSymbol</a><span class="other">(</span><a href="../../class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html">Symbol</a><span class="other">*</span>&nbsp;<span class="identifier">parent</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="32" xml:space="preserve"><span class="lineNumber">32</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../class_DerivedTypeSymbol_F26B99CE4BE262395853B507ABF2858B06F9A216.html">DerivedTypeSymbol</a><span class="other">*</span>&nbsp;<a href="../../class_SymbolReader_EB36ADE3BE82C48FB57873005D5A7206C8D9F6E8.html#function_ReadDerivedTypeSymbol_F774EF72AD2AB1902EDE51680E09C82CDE3DE99B">ReadDerivedTypeSymbol</a><span class="other">(</span><a href="../../class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html">Symbol</a><span class="other">*</span>&nbsp;<span class="identifier">parent</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="33" xml:space="preserve"><span class="lineNumber">33</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../class_ClassTemplateSpecializationSymbol_F0BC1A28739F39F0DA3BC5C1405A607BF1DFC8EA.html">ClassTemplateSpecializationSymbol</a><span class="other">*</span>&nbsp;<a href="../../class_SymbolReader_EB36ADE3BE82C48FB57873005D5A7206C8D9F6E8.html#function_ReadClassTemplateSpecializationSymbol_05AE7E9F179AC04E815262C3B1D4562D8C84B5F2">ReadClassTemplateSpecializationSymbol</a><span class="other">(</span><a href="../../class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html">Symbol</a><span class="other">*</span>&nbsp;<span class="identifier">parent</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="34" xml:space="preserve"><span class="lineNumber">34</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../class_ParameterSymbol_EFEA20B84930B4A79D869DA6EFE9F58679F053A6.html">ParameterSymbol</a><span class="other">*</span>&nbsp;<a href="../../class_SymbolReader_EB36ADE3BE82C48FB57873005D5A7206C8D9F6E8.html#function_ReadParameterSymbol_3329AB791EE436E94260714844AEBA784417366A">ReadParameterSymbol</a><span class="other">(</span><a href="../../class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html">Symbol</a><span class="other">*</span>&nbsp;<span class="identifier">parent</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="35" xml:space="preserve"><span class="lineNumber">35</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../../class_SymbolReader_EB36ADE3BE82C48FB57873005D5A7206C8D9F6E8.html#function_SetSymbolTable_199D9F2CB3DD62357A3756EEA23AB9DB03CCA54D">SetSymbolTable</a><span class="other">(</span><a href="../../class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html">SymbolTable</a><span class="other">*</span>&nbsp;<span class="identifier">symbolTable_</span><span class="other">)</span>&nbsp;<span class="other">{</span>&nbsp;<span class="identifier">symbolTable</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">symbolTable_</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="36" xml:space="preserve"><span class="lineNumber">36</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html">SymbolTable</a><span class="other">*</span>&nbsp;<a href="../../class_SymbolReader_EB36ADE3BE82C48FB57873005D5A7206C8D9F6E8.html#function_GetSymbolTable_9F15647C7315A170EE5EC9CB1CF0E291A136240F">GetSymbolTable</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">symbolTable</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="37" xml:space="preserve"><span class="lineNumber">37</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../../class_SymbolReader_EB36ADE3BE82C48FB57873005D5A7206C8D9F6E8.html#function_SetModule_F23CF6DC74A7389849749709A417940BA26FA22A">SetModule</a><span class="other">(</span><a href="../../class_Module_A2BC96D600A4B3135D7F5444EC360BBF9EA9DDF4.html">Module</a><span class="other">*</span>&nbsp;<span class="identifier">module_</span><span class="other">)</span>&nbsp;<span class="other">{</span>&nbsp;<span class="identifier">module</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">module_</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="38" xml:space="preserve"><span class="lineNumber">38</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../class_Module_A2BC96D600A4B3135D7F5444EC360BBF9EA9DDF4.html">Module</a><span class="other">*</span>&nbsp;<a href="../../class_SymbolReader_EB36ADE3BE82C48FB57873005D5A7206C8D9F6E8.html#function_GetModule_F2D3ABF83417EB3DA51C5B206EDAC8C3CC2EE153">GetModule</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">module</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="39" xml:space="preserve"><span class="lineNumber">39</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../../class_SymbolReader_EB36ADE3BE82C48FB57873005D5A7206C8D9F6E8.html#function_AddConversion_CD0DECFD7135C6CEA5C2B16B5EA21D26112D4E99">AddConversion</a><span class="other">(</span><a href="../../class_FunctionSymbol_5AC1C26A9572181B3E31247997BF40453B22EDEF.html">FunctionSymbol</a><span class="other">*</span>&nbsp;<span class="identifier">conversion</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="40" xml:space="preserve"><span class="lineNumber">40</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">const&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="type">vector</span><span class="other">&lt;</span><a href="../../class_FunctionSymbol_5AC1C26A9572181B3E31247997BF40453B22EDEF.html">FunctionSymbol</a><span class="other">*</span><span class="other">></span><span class="other">&amp;</span>&nbsp;<a href="../../class_SymbolReader_EB36ADE3BE82C48FB57873005D5A7206C8D9F6E8.html#function_Conversions_974B53F5BCFA376329CA5718C94EE0D7231D382B">Conversions</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">conversions</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="41" xml:space="preserve"><span class="lineNumber">41</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../../class_SymbolReader_EB36ADE3BE82C48FB57873005D5A7206C8D9F6E8.html#function_AddClassType_DB3814B8D615DECA0EB07B1E05C89094BB2BE263">AddClassType</a><span class="other">(</span><a href="../../class_ClassTypeSymbol_706F15CDE917688D403DB002B3816EE91C6F66CB.html">ClassTypeSymbol</a><span class="other">*</span>&nbsp;<span class="identifier">classType</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="42" xml:space="preserve"><span class="lineNumber">42</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">const&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="type">vector</span><span class="other">&lt;</span><a href="../../class_ClassTypeSymbol_706F15CDE917688D403DB002B3816EE91C6F66CB.html">ClassTypeSymbol</a><span class="other">*</span><span class="other">></span><span class="other">&amp;</span>&nbsp;<a href="../../class_SymbolReader_EB36ADE3BE82C48FB57873005D5A7206C8D9F6E8.html#function_ClassTypes_4C93E5C1F0FFD346FA13BBAFEF54642CCBB56804">ClassTypes</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">classTypes</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="43" xml:space="preserve"><span class="lineNumber">43</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../../class_SymbolReader_EB36ADE3BE82C48FB57873005D5A7206C8D9F6E8.html#function_AddClassTemplateSpecialization_A5DC9D750BB74A7C894B69B65BDC8E26FBDFF254">AddClassTemplateSpecialization</a><span class="other">(</span><a href="../../class_ClassTemplateSpecializationSymbol_F0BC1A28739F39F0DA3BC5C1405A607BF1DFC8EA.html">ClassTemplateSpecializationSymbol</a><span class="other">*</span>&nbsp;<span class="identifier">classTemplateSpecialization</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="44" xml:space="preserve"><span class="lineNumber">44</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">const&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="type">vector</span><span class="other">&lt;</span><a href="../../class_ClassTemplateSpecializationSymbol_F0BC1A28739F39F0DA3BC5C1405A607BF1DFC8EA.html">ClassTemplateSpecializationSymbol</a><span class="other">*</span><span class="other">></span><span class="other">&amp;</span>&nbsp;<a href="../../class_SymbolReader_EB36ADE3BE82C48FB57873005D5A7206C8D9F6E8.html#function_ClassTemplateSpecializations_F86BDA19919561456086F2D095EB04A728D5718D">ClassTemplateSpecializations</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">classTemplateSpecializations</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="45" xml:space="preserve"><span class="lineNumber">45</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">bool</span>&nbsp;<a href="../../class_SymbolReader_EB36ADE3BE82C48FB57873005D5A7206C8D9F6E8.html#function_SetProjectBit_4782B393B54CD70605D65918995F275FE4BC0DE6">SetProjectBit</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">setProjectBit</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="46" xml:space="preserve"><span class="lineNumber">46</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../../class_SymbolReader_EB36ADE3BE82C48FB57873005D5A7206C8D9F6E8.html#function_SetProjectBitForSymbols_C308ACEBA8A1046041967A4B162D7A2DEB753FF7">SetProjectBitForSymbols</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="other">{</span>&nbsp;<span class="identifier">setProjectBit</span><span class="other">&nbsp;=&nbsp;</span><span class="kw">true</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="47" xml:space="preserve"><span class="lineNumber">47</span>&nbsp;<span class="kw">private</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="48" xml:space="preserve"><span class="lineNumber">48</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../class_AstReader_79D1108F70EAB0D555FDDD074FED033B2DCABCD5.html">AstReader</a>&nbsp;<span class="identifier">astReader</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="49" xml:space="preserve"><span class="lineNumber">49</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html">SymbolTable</a><span class="other">*</span>&nbsp;<span class="identifier">symbolTable</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="50" xml:space="preserve"><span class="lineNumber">50</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../class_Module_A2BC96D600A4B3135D7F5444EC360BBF9EA9DDF4.html">Module</a><span class="other">*</span>&nbsp;<span class="identifier">module</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="51" xml:space="preserve"><span class="lineNumber">51</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">vector</span><span class="other">&lt;</span><a href="../../class_FunctionSymbol_5AC1C26A9572181B3E31247997BF40453B22EDEF.html">FunctionSymbol</a><span class="other">*</span><span class="other">></span>&nbsp;<span class="identifier">conversions</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="52" xml:space="preserve"><span class="lineNumber">52</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">vector</span><span class="other">&lt;</span><a href="../../class_ClassTypeSymbol_706F15CDE917688D403DB002B3816EE91C6F66CB.html">ClassTypeSymbol</a><span class="other">*</span><span class="other">></span>&nbsp;<span class="identifier">classTypes</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="53" xml:space="preserve"><span class="lineNumber">53</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">vector</span><span class="other">&lt;</span><a href="../../class_ClassTemplateSpecializationSymbol_F0BC1A28739F39F0DA3BC5C1405A607BF1DFC8EA.html">ClassTemplateSpecializationSymbol</a><span class="other">*</span><span class="other">></span>&nbsp;<span class="identifier">classTemplateSpecializations</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="54" xml:space="preserve"><span class="lineNumber">54</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">bool</span>&nbsp;<span class="identifier">setProjectBit</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="55" xml:space="preserve"><span class="lineNumber">55</span>&nbsp;<span class="other">}</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="56" xml:space="preserve"><span class="lineNumber">56</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="57" xml:space="preserve"><span class="lineNumber">57</span>&nbsp;<span class="other">}</span>&nbsp;<span class="other">}</span>&nbsp;<span class="comment">//&nbsp;namespace&nbsp;cmajor::symbols</span></span>
+  <br/>
+  <span class="code" id="58" xml:space="preserve"><span class="lineNumber">58</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="59" xml:space="preserve"><span class="lineNumber">59</span>&nbsp;<span class="pp">#endif&nbsp;//&nbsp;CMAJOR_SYMBOLS_SYMBOL_READER_INCLUDED</span></span>
+  <br/>
+ </body>
+</html>

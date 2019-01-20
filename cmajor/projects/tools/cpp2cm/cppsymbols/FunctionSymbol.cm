@@ -1,0 +1,76 @@
+using System;
+using System.Collections;
+using Span = System.Text.Parsing.Span;
+using cppast;
+
+namespace cppsymbols
+{
+    public class FunctionGroupSymbol : ContainerSymbol
+    {
+        public nothrow FunctionGroupSymbol(const Span& span_, const ustring& name_) : base(span_, name_)
+        {
+        }
+        public override void Accept(SymbolVisitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+    }
+    
+    public class FunctionSymbol : ContainerSymbol
+    {
+        public nothrow FunctionSymbol(const Span& span_, const ustring& name_, CVSpecifiers cvSpecifiers_) : base(span_, name_), cvSpecifiers(cvSpecifiers_)
+        {
+        }
+        public override void AddSymbol(Symbol* symbol, List<UniquePtr<Exception>>& errors)
+        {
+            base->AddSymbol(symbol, errors);
+            if (symbol is ParameterSymbol*)
+            {
+                parameters.Add(cast<ParameterSymbol*>(symbol));
+            }
+        }
+        public override void Accept(SymbolVisitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public nothrow inline long Arity() const 
+        {
+            return parameters.Count();
+        }
+        public CVSpecifiers cvSpecifiers;
+        public TypeSymbol* returnType;
+        public List<ParameterSymbol*> parameters;
+        public BlockSymbol* body;
+    }
+    
+    public class FunctionTemplateSymbol : FunctionSymbol
+    {
+        public nothrow FunctionTemplateSymbol(const Span& span_, const ustring& name_, CVSpecifiers cvSpecifiers_) : base(span_, name_, cvSpecifiers_)
+        {
+        }
+        public override void Accept(SymbolVisitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public override void AddSymbol(Symbol* symbol, List<UniquePtr<Exception>>& errors)
+        {
+            base->AddSymbol(symbol, errors);
+            if (symbol is TemplateParameterSymbol*)
+            {
+                templateParameters.Add(cast<TemplateParameterSymbol*>(symbol));
+            }
+        }
+        public List<TemplateParameterSymbol*> templateParameters;
+    }
+    
+    public class BlockSymbol : ContainerSymbol
+    {
+        public nothrow BlockSymbol(const Span& span_, const ustring& name_) : base(span_, name_)
+        {
+        }
+        public override void Accept(SymbolVisitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+    }
+}

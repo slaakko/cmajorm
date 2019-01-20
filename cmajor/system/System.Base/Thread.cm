@@ -1,0 +1,84 @@
+// =================================
+// Copyright (c) 2019 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+
+public extern cdecl nothrow int RtGetHardwareConcurrency();
+public extern cdecl int RtStartThreadFunction(System.Threading.ThreadStartFunction function);
+public extern cdecl int RtStartThreadFunctionWithParam(System.Threading.ParameterizedThreadStartFunction function, void* param);
+public extern cdecl int RtStartThreadMethod(System.Threading.ThreadStartMethod method);
+public extern cdecl int RtStartThreadMethodWithParam(System.Threading.ParameterizedThreadStartMethod method, void* param);
+public extern cdecl bool RtJoinThread(int threadId);
+
+namespace System.Threading
+{
+    public delegate void ThreadStartFunction();
+    public delegate void ParameterizedThreadStartFunction(void* param);
+    public class delegate void ThreadStartMethod();        
+    public class delegate void ParameterizedThreadStartMethod(void* param);
+    
+    public class ThreadingException : Exception
+    {
+        public ThreadingException(const string& message_) : base(message_)
+        {
+        }
+    }
+                
+    public nothrow int HardwareConcurrency()
+    {
+        return RtGetHardwareConcurrency();
+    }
+    
+    public class Thread
+    {
+        public static Thread StartFunction(ThreadStartFunction function)
+        {
+            Thread thread(RtStartThreadFunction(function));
+            return thread;
+        }
+        public static Thread StartFunction(ParameterizedThreadStartFunction function, void* param)
+        {
+            Thread thread(RtStartThreadFunctionWithParam(function, param));
+            return thread;
+        }
+        public static Thread StartMethod(ThreadStartMethod method)
+        {
+            Thread thread(RtStartThreadMethod(method));
+            return thread;
+        }
+        public static Thread StartMethod(ParameterizedThreadStartMethod method, void* param)
+        {
+            Thread thread(RtStartThreadMethodWithParam(method, param));
+            return thread;
+        }
+        public nothrow Thread() : id(0)
+        {
+        }
+        private nothrow Thread(int id_) : id(id_)
+        {
+        }
+        suppress Thread(const Thread&);
+        suppress void operator=(const Thread&);
+        public nothrow Thread(Thread&& that) : id(that.id)
+        {
+            that.id = 0;
+        }
+        public default nothrow void operator=(Thread&&);
+        public nothrow inline int Id() const
+        {
+            return id;
+        }
+        public void Join()
+        {
+            int jid = id;
+            id = 0;
+            if (!RtJoinThread(jid))
+            {
+                throw ThreadingException("thread " + ToString(id) + " not joinable");
+            }
+        }
+        private int id;
+    }
+}

@@ -1,0 +1,126 @@
+<html>
+    <head>
+        <meta charset="utf-8"/>
+        <title>StringRepository&lt;StringT, CharPtrT> Class</title>
+        <link href="../style/style.css" rel="stylesheet" type="text/css"/>
+    </head>
+    <body>
+        <a href="../index.html">index</a>
+         | <a href="namespace_binder_C711B7605339DC3A9E128C1E622E7D9A4629C97D.html">up</a>
+         | <a href="class_StatementBinder_9ABCC30A844E1A4C1BE61777BAAE98FBBA33A6BD.html">prev</a>
+         | <a href="class_StructuredReferenceValue_1B156C5E52F7BF2E393459D37558362AEB307353.html">next</a>
+        <hr/>
+        <h1>StringRepository&lt;StringT, CharPtrT> Class</h1>
+        <span>
+            Definition at line <a href="file/binder/StringRepository.hpp_EF34558815C954F0866C5A330F6B0A5912F5E3FF.html#15">15</a>
+             of <a href="file/binder/StringRepository.hpp_EF34558815C954F0866C5A330F6B0A5912F5E3FF.html">StringRepository.hpp</a>
+        </span>
+        <br/>
+        <h2>Member Functions</h2>
+        <table class="functionTable">
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve">CharPtrT</td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_StringRepository_D66B6786A43C17350A8D4665B16B58E1D48B4DCA.html#function_CharPtr_AF94E821B427D92B4E08E2F744FD5EE5BD03E1AB">CharPtr&lt;StringT, CharPtrT></a>(<span class="kw">int</span> id) <span class="kw">const</span></td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">const </span>StringT&amp;</td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_StringRepository_D66B6786A43C17350A8D4665B16B58E1D48B4DCA.html#function_GetString_3A168F86DCAE1F15E132265AD0458DD0EB8C4C1E">GetString&lt;StringT, CharPtrT></a>(<span class="kw">int</span> id) <span class="kw">const</span></td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">int</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_StringRepository_D66B6786A43C17350A8D4665B16B58E1D48B4DCA.html#function_Install_083CCA2CE07CC885E4C301A8825C4D95B9DBD2DA">Install&lt;StringT, CharPtrT></a>(<span class="kw">const </span>StringT&amp; str)</td>
+            </tr>
+        </table>
+        <h2>Member Variables</h2>
+        <table>
+            <tr id="variable_stringMap_2200CAD3E00BC348B3FD50AD338996CAC9A0C520">
+                <td class="functionTableFirstCol" xml:space="preserve">std::unordered_map&lt;StringT, <span class="kw">int</span>></td>
+                <td class="functionTableSecondCol" xml:space="preserve">stringMap</td>
+            </tr>
+            <tr id="variable_strings_B1C2F36383860CAF6F80AAA868A451A4C5C55250">
+                <td class="functionTableFirstCol" xml:space="preserve">std::vector&lt;StringT></td>
+                <td class="functionTableSecondCol" xml:space="preserve">strings</td>
+            </tr>
+        </table>
+        <hr/>
+        <h2>Member Function Details</h2>
+        <h3 id="function_CharPtr_AF94E821B427D92B4E08E2F744FD5EE5BD03E1AB">CharPtr Member Function</h3>
+        <h4>
+            CharPtrT cmajor::binder::StringRepository::CharPtr&lt;StringT, CharPtrT>(<span class="kw">int</span>
+             id) <span class="kw">const</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/binder/StringRepository.hpp_EF34558815C954F0866C5A330F6B0A5912F5E3FF.html#51">51</a>
+             of <a href="file/binder/StringRepository.hpp_EF34558815C954F0866C5A330F6B0A5912F5E3FF.html">StringRepository.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">52</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">53</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">Assert</span><span class="other">(</span><span class="identifier">id</span><span class="other">&nbsp;>=&nbsp;</span><span class="other">0</span><span class="other">&nbsp;&amp;&amp;&nbsp;</span><span class="identifier">id</span><span class="other">&nbsp;&lt;&nbsp;</span><span class="identifier">strings</span><span class="other">.</span><span class="identifier">size</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="string">"invalid&nbsp;string&nbsp;id"</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">54</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">reinterpret_cast</span><span class="other">&lt;</span><span class="type">CharPtrT</span><span class="other">></span><span class="other">(</span><span class="identifier">strings</span><span class="other">[</span><span class="identifier">id</span><span class="other">]</span><span class="other">.</span><span class="identifier">c_str</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">55</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/binder/StringRepository.hpp_EF34558815C954F0866C5A330F6B0A5912F5E3FF.html#20">20</a>
+             of <a href="file/binder/StringRepository.hpp_EF34558815C954F0866C5A330F6B0A5912F5E3FF.html">StringRepository.hpp</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_GetString_3A168F86DCAE1F15E132265AD0458DD0EB8C4C1E">GetString Member Function</h3>
+        <h4>
+            <span class="kw">const </span>
+            StringT&amp; cmajor::binder::StringRepository::GetString&lt;StringT, CharPtrT>(<span class="kw">int</span>
+             id) <span class="kw">const</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/binder/StringRepository.hpp_EF34558815C954F0866C5A330F6B0A5912F5E3FF.html#44">44</a>
+             of <a href="file/binder/StringRepository.hpp_EF34558815C954F0866C5A330F6B0A5912F5E3FF.html">StringRepository.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">45</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">46</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">Assert</span><span class="other">(</span><span class="identifier">id</span><span class="other">&nbsp;>=&nbsp;</span><span class="other">0</span><span class="other">&nbsp;&amp;&amp;&nbsp;</span><span class="identifier">id</span><span class="other">&nbsp;&lt;&nbsp;</span><span class="identifier">strings</span><span class="other">.</span><span class="identifier">size</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="string">"invalid&nbsp;string&nbsp;id"</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">47</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">strings</span><span class="other">[</span><span class="identifier">id</span><span class="other">]</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">48</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/binder/StringRepository.hpp_EF34558815C954F0866C5A330F6B0A5912F5E3FF.html#19">19</a>
+             of <a href="file/binder/StringRepository.hpp_EF34558815C954F0866C5A330F6B0A5912F5E3FF.html">StringRepository.hpp</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_Install_083CCA2CE07CC885E4C301A8825C4D95B9DBD2DA">Install Member Function</h3>
+        <h4>
+            <span class="kw">int</span>
+             cmajor::binder::StringRepository::Install&lt;StringT, CharPtrT>(<span class="kw">const </span>
+            StringT&amp; str)</h4>
+        <span>
+            Definition at line <a href="file/binder/StringRepository.hpp_EF34558815C954F0866C5A330F6B0A5912F5E3FF.html#27">27</a>
+             of <a href="file/binder/StringRepository.hpp_EF34558815C954F0866C5A330F6B0A5912F5E3FF.html">StringRepository.hpp</a>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/binder/StringRepository.hpp_EF34558815C954F0866C5A330F6B0A5912F5E3FF.html#18">18</a>
+             of <a href="file/binder/StringRepository.hpp_EF34558815C954F0866C5A330F6B0A5912F5E3FF.html">StringRepository.hpp</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <a href="../index.html">index</a>
+         | <a href="namespace_binder_C711B7605339DC3A9E128C1E622E7D9A4629C97D.html">up</a>
+         | <a href="class_StatementBinder_9ABCC30A844E1A4C1BE61777BAAE98FBBA33A6BD.html">prev</a>
+         | <a href="class_StructuredReferenceValue_1B156C5E52F7BF2E393459D37558362AEB307353.html">next</a>
+    </body>
+</html>

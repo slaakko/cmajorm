@@ -1,0 +1,30 @@
+using System;
+using System.Json;
+using MyNs;
+
+namespace MyNs
+{
+    [json]
+    public class MyJsonExportableClass
+    {
+        private int i;
+        private double d;
+        private bool b;
+        private string s;
+    }
+}
+
+void main()
+{
+    try
+    {
+        MyJsonExportableClass exportable;
+        UniquePtr<JsonValue> jsonValue = ToJson(exportable);
+        string jsonText = jsonValue->ToString();
+        Console.WriteLine(jsonText);
+    }
+    catch (const Exception& ex)
+    {
+        Console.WriteLine(ex.ToString());
+    }
+}

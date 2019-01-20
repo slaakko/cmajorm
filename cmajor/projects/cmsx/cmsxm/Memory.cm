@@ -1,0 +1,591 @@
+using System;
+using System.Collections;
+
+namespace cmsx.machine
+{
+    public enum Protection : byte
+    {
+        notPresent = 0u,
+        execute = 1u << 0u,
+        write = 1u << 1u,
+        read = 1u << 2u,
+        copyOnWrite = execute | write | read
+    }
+
+    public const byte textSegmentIndex = 0u;
+    public const byte dataSegmentIndex = 1u;
+    public const byte poolSegmentIndex = 2u;
+    public const byte stackSegmentIndex = 3u;
+    public const byte numSegments = 4u;
+    public const ulong pageSize = 0x1000u; // 4K bytes
+    public const ulong pageOffsetMask = 0x0FFFu;
+    public const byte pageOffsetBits = 12u;
+    public const ushort numPtesInPage = 512u;
+    public const ushort numSegmentPageEntriesInRootPage = numPtesInPage / numSegments; // 128
+    public const ushort numDirectEntries = numSegmentPageEntriesInRootPage - 3u; // 128 - 3 = 125
+    public const ushort pteOffsetMask = 0x1FFu; // 511
+    //public const ushort pteOffsetMask = 0x3u; 
+    public const byte numPteBits = 9u;
+    //public const byte numPteBits = 2u;
+    public const ushort maxDigit = 511u;
+    //public const ushort maxDigit = 3u;
+    public const ulong textSegmentBaseAddress = 0x0000000000000000u;
+    public const ulong dataSegmentBaseAddress = 0x2000000000000000u;
+    public const ulong poolSegmentBaseAddress = 0x4000000000000000u;
+    public const ulong stackSegmentBaseAddress = 0x6000000000000000u;
+    public const ulong kernelBaseAddress = 0x8000000000000000u;
+    public const ushort kernelAddressSpaceNumber = 0u;
+    public const ulong invalidAddress = cast<ulong>(-1);
+    public const byte segmentNumberShift = 61u;
+    public const byte segmentNumberMask = 0x03u; 
+    public const ulong m2Mask = ~cast<ulong>(1u);
+    public const ulong m4Mask = ~cast<ulong>(3u);
+    public const ulong m8Mask = ~cast<ulong>(7u);
+    public const byte numAddressSpaceBits = 10u;
+    public const ulong addressSpaceMask = (cast<ulong>(1u) << numAddressSpaceBits) - 1u;
+    public const ulong invalidAddrSpaceMask = ~addressSpaceMask;
+    public const byte numProtectionBits = 3u;
+    public const ulong protectionMask = (cast<ulong>(1u) << numProtectionBits) - 1u;
+    public const byte numVirtualAddressBits = 48u;
+    public const ulong virtualAddressBase = cast<ulong>(1u) << numVirtualAddressBits;
+    public const ulong virtualAddressBaseMask = virtualAddressBase - 1u;
+    public const ulong kernelDataBaseAddress = kernelBaseAddress;
+    public const ulong interruptVectorBaseAddress = kernelDataBaseAddress + dataSegmentBaseAddress + 512u;
+    public const ulong interruptVectorEndAddress = interruptVectorBaseAddress + cast<ulong>(irqMax) * 8u;
+    public const int maxTraps = 256;
+    public const ulong trapTableBaseAddress = interruptVectorEndAddress;
+    public const ulong trapTableEndAddress = trapTableBaseAddress + cast<ulong>(maxTraps) * 8u;
+
+    public class PageFrame
+    {
+        public nothrow PageFrame() : useCount(1u)
+        {
+        }
+        public byte useCount;
+    }
+
+    public string GetProtectionStr(Protection protection)
+    {
+        string s;
+        if (protection != Protection.notPresent)
+        {
+            if (protection == Protection.copyOnWrite)
+            {
+                s = s + "COW";
+            }
+            else
+            {
+                if ((protection & Protection.read) != Protection.notPresent)
+                {
+                    s = s + "R";
+                }
+                if ((protection & Protection.write) != Protection.notPresent)
+                {
+                    s = s + "W";
+                }
+                if ((protection & Protection.execute) != Protection.notPresent)
+                {
+                    s = s + "X";
+                }
+            }
+        }
+        else
+        {
+            s = s + "-";
+        }
+        return s;
+    }
+
+    public inline nothrow ulong GetPageNumber(ulong address)
+    {
+        ulong pageNumber = address / pageSize;
+        return pageNumber;
+    }
+
+    public inline nothrow ulong MakeVirtualTranslationRegisterValue(ulong rootPageAddress, ushort addressSpaceNumber)
+    {
+        return (rootPageAddress << numAddressSpaceBits) | cast<ulong>(addressSpaceNumber);
+    }
+
+    public inline nothrow void UnpackVirtualTranslationRegisterValue(ulong virtualTranslationRegisterValue, ulong& rootPageAddress, ushort& addressSpaceNumber)
+    {
+        rootPageAddress = virtualTranslationRegisterValue >> numAddressSpaceBits;
+        addressSpaceNumber = cast<ushort>(virtualTranslationRegisterValue & addressSpaceMask);
+    }
+
+    public inline nothrow ulong PackProtection(Protection pageProtection, Protection protection)
+    {
+        return (cast<ulong>(cast<byte>(pageProtection)) << 8u) | cast<ulong>(cast<byte>(protection));
+    }
+
+    public inline nothrow void UnpackProtection(ulong packedValue, Protection& pageProtection, Protection& protection)
+    {
+        protection = cast<Protection>(cast<byte>(packedValue));
+        packedValue = packedValue >> 8u;
+        pageProtection = cast<Protection>(cast<byte>(packedValue));
+    }
+
+    public inline nothrow ulong MakePageTableEntry(ulong pageAddress, ushort addressSpaceNumber, Protection protection)
+    {
+        ulong pte = (pageAddress << 13u) | (cast<ulong>(addressSpaceNumber) << 3u) | cast<ulong>(cast<byte>(protection));
+        return pte;
+    }
+
+    public inline nothrow void UnpackPageTableEntry(ulong pte, ulong& pageAddress, ushort& addressSpaceNumber, Protection& protection)
+    {
+        pageAddress = pte >> 13u;
+        addressSpaceNumber = cast<ushort>((pte >> 3u) & addressSpaceMask);
+        protection = cast<Protection>(cast<byte>(pte & protectionMask));
+    }
+
+    public nothrow Protection MakeDefaultPageProtection(byte segmentIndex)
+    {
+        switch (segmentIndex)
+        {
+            case textSegmentIndex: return cast<Protection>(Protection.read | Protection.execute);
+            case dataSegmentIndex: return cast<Protection>(Protection.read | Protection.write);
+            case poolSegmentIndex: return cast<Protection>(Protection.read | Protection.write);
+            case stackSegmentIndex: return cast<Protection>(Protection.read | Protection.write);
+        }
+        return Protection.notPresent;
+    }
+
+    public inline nothrow byte GetSegmentIndex(ulong virtualAddress)
+    {
+        return cast<byte>((virtualAddress >> segmentNumberShift) & segmentNumberMask);
+    }
+
+    public inline nothrow ushort MakeSegmentOffset(byte segmentIndex)
+    {
+        return segmentIndex * numSegmentPageEntriesInRootPage;
+    }
+
+    public inline nothrow void ExtractDigitsFromPageNumber(ulong pageNum, ushort& digit0, ushort& digit1, ushort& digit2)
+    {
+        digit0 = cast<ushort>(pageNum & pteOffsetMask);
+        pageNum = pageNum >> numPteBits;
+        digit1 = cast<ushort>(pageNum & pteOffsetMask);
+        pageNum = pageNum >> numPteBits;
+        digit2 = cast<ushort>(pageNum & pteOffsetMask);
+        pageNum = pageNum >> numPteBits;
+    }
+
+    public nothrow byte ReadMemoryByte(ulong address)
+    {
+        byte b = OsReadMemoryByte(address);
+        return b;
+    }
+
+    public nothrow void WriteMemoryByte(ulong address, byte b)
+    {
+        OsWriteMemoryByte(address, b);
+    }
+
+    public nothrow ushort ReadMemoryUShort(ulong address)
+    {
+        ulong a = address & m2Mask;
+        byte m0 = ReadMemoryByte(a);
+        byte m1 = ReadMemoryByte(a + 1u);
+        ushort u = (cast<ushort>(m0) << 8u) | cast<ushort>(m1);
+        return u;
+    }
+
+    public nothrow void WriteMemoryUShort(ulong address, ushort s)
+    {
+        ulong a = address & m2Mask;
+        byte m0 = cast<byte>(s >> 8u);
+        byte m1 = cast<byte>(s);
+        WriteMemoryByte(a, m0);
+        WriteMemoryByte(a + 1u, m1);
+    }
+
+    public nothrow uint ReadMemoryUInt(ulong address)
+    {
+        ulong a = address & m4Mask;
+        byte m0 = ReadMemoryByte(a);
+        byte m1 = ReadMemoryByte(a + 1u);
+        byte m2 = ReadMemoryByte(a + 2u);
+        byte m3 = ReadMemoryByte(a + 3u);
+        uint u = (cast<uint>(m0) << 24u) | (cast<uint>(m1) << 16u) | (cast<uint>(m2) << 8u) | cast<uint>(m3);
+        return u;
+    }
+
+    public nothrow void WriteMemoryUInt(ulong address, uint u)
+    {
+        ulong a = address & m4Mask;
+        byte m0 = cast<byte>(u >> 24u);
+        byte m1 = cast<byte>(u >> 16u);
+        byte m2 = cast<byte>(u >> 8u);
+        byte m3 = cast<byte>(u);
+        WriteMemoryByte(a, m0);
+        WriteMemoryByte(a + 1u, m1);
+        WriteMemoryByte(a + 2u, m2);
+        WriteMemoryByte(a + 3u, m3);
+    }
+
+    public nothrow ulong ReadMemoryULong(ulong address)
+    {
+        ulong a = address & m8Mask;
+        byte m0 = ReadMemoryByte(a);
+        byte m1 = ReadMemoryByte(a + 1u);
+        byte m2 = ReadMemoryByte(a + 2u);
+        byte m3 = ReadMemoryByte(a + 3u);
+        byte m4 = ReadMemoryByte(a + 4u);
+        byte m5 = ReadMemoryByte(a + 5u);
+        byte m6 = ReadMemoryByte(a + 6u);
+        byte m7 = ReadMemoryByte(a + 7u);
+        ulong u = (cast<ulong>(m0) << 56u) | (cast<ulong>(m1) << 48u) | (cast<ulong>(m2) << 40u) | (cast<ulong>(m3) << 32u) | (cast<ulong>(m4) << 24u) | (cast<ulong>(m5) << 16u) | (cast<ulong>(m6) << 8u) | cast<ulong>(m7);
+        return u;
+    }
+
+    public nothrow void WriteMemoryULong(ulong address, ulong u)
+    {
+        ulong a = address & m8Mask;
+        byte m0 = cast<byte>(u >> 56u);
+        byte m1 = cast<byte>(u >> 48u);
+        byte m2 = cast<byte>(u >> 40u);
+        byte m3 = cast<byte>(u >> 32u);
+        byte m4 = cast<byte>(u >> 24u);
+        byte m5 = cast<byte>(u >> 16u);
+        byte m6 = cast<byte>(u >> 8u);
+        byte m7 = cast<byte>(u);
+        WriteMemoryByte(a, m0);
+        WriteMemoryByte(a + 1u, m1);
+        WriteMemoryByte(a + 2u, m2);
+        WriteMemoryByte(a + 3u, m3);
+        WriteMemoryByte(a + 4u, m4);
+        WriteMemoryByte(a + 5u, m5);
+        WriteMemoryByte(a + 6u, m6);
+        WriteMemoryByte(a + 7u, m7);
+    }
+
+    public class Memory
+    {
+        public nothrow Memory(Machine& machine_) : machine(machine_)
+        {
+        }
+        public nothrow ulong AllocatePage()
+        {
+            ulong pageAddress = OsAllocateMemoryPage(pageSize);
+            pageFrameMap[pageAddress] = new PageFrame();
+            return pageAddress;
+        }
+        public nothrow ulong AllocateRootPage()
+        {
+            ulong rootPageAddress = AllocatePage();
+            return rootPageAddress;
+        }
+        public void FreePage(ulong pageAddress)
+        {
+            HashMap<ulong, PageFrame*>.ConstIterator it = pageFrameMap.CFind(pageAddress);
+            if (it != pageFrameMap.CEnd())
+            {
+                PageFrame* pageFrame = it->second;
+                #assert(pageFrame->useCount > 0u);
+                pageFrame->useCount = pageFrame->useCount - 1u;
+                if (pageFrame->useCount == 0u)
+                {
+                    OsFreeMemoryPage(pageAddress);
+                    pageFrameMap.Remove(pageAddress);
+                    delete pageFrame;
+                }
+            }
+            else
+            {
+                Panic("page frame for page address " + ToHexString(pageAddress) + " not found");
+            }
+        }
+        public nothrow void FreeRootPage(ulong rootPageAddress)
+        {
+            FreePage(rootPageAddress);
+        }
+        public void SharePage(ulong pageAddress)
+        {
+            HashMap<ulong, PageFrame*>.ConstIterator it = pageFrameMap.CFind(pageAddress);
+            if (it != pageFrameMap.CEnd())
+            {
+                PageFrame* pageFrame = it->second;
+                #assert(pageFrame->useCount > 0u);
+                pageFrame->useCount = pageFrame->useCount + 1u;
+            }
+            else
+            {
+                Panic("page frame for page address " + ToHexString(pageAddress) + " not found");
+            }
+        }
+        public nothrow void CopyPage(ulong fromAddress, ulong toAddress)
+        {
+            OsCopyMemoryPage(fromAddress, toAddress, pageSize);
+        }
+        public nothrow ulong GetPageTableEntry(ulong virtualAddress)
+        {
+            byte segmentIndex = 0u;
+            ulong pageAddress = 0u;
+            ushort offset = 0u;
+            ushort addressSpaceNumber = 0u;
+            Protection pageProtection = Protection.notPresent;
+            ulong pteAddress = 0u;
+            return GetPageTableEntry(virtualAddress, segmentIndex, pageAddress, offset, addressSpaceNumber, pageProtection, pteAddress);
+        }
+        public nothrow ulong GetPageTableEntry(ulong virtualAddress, byte& segmentIndex, ulong& pageAddress, ushort& offset, ushort& addressSpaceNumber, Protection& pageProtection, ulong& pteAddress)
+        {
+            ulong pte = 0u;
+            pageProtection = Protection.notPresent;
+            segmentIndex = GetSegmentIndex(virtualAddress);
+            ushort segmentOffset = MakeSegmentOffset(segmentIndex);
+            ushort pageTableAddressSpaceNumber = 0u;
+            ulong rv = machine.GetRegisters().GetSpecial(Registers.rV);
+            ulong rootPageAddress = 0u;
+            UnpackVirtualTranslationRegisterValue(rv, rootPageAddress, addressSpaceNumber);
+            ulong firstRootPageEntryNumber = segmentOffset;
+            ulong lastDirectRootPageEntryNumber = firstRootPageEntryNumber + numDirectEntries - 1u;
+            ulong firstIndirectEntryNumber = lastDirectRootPageEntryNumber + 1u;
+            ulong singleIndirectEntryNumber = lastDirectRootPageEntryNumber + 1u;
+            ulong doubleIndirectEntryNumber = lastDirectRootPageEntryNumber + 2u;
+            ulong tripleIndirectEntryNumber = lastDirectRootPageEntryNumber + 3u;
+            ulong address = virtualAddress & virtualAddressBaseMask;
+            ulong pageNum = firstRootPageEntryNumber + GetPageNumber(address);
+            offset = cast<ushort>(virtualAddress & pageOffsetMask);
+            if (pageNum >= firstRootPageEntryNumber && pageNum <= lastDirectRootPageEntryNumber)
+            {
+                pteAddress = rootPageAddress + 8u * pageNum;
+                pte = ReadMemoryULong(pteAddress);
+                ushort pteAddressSpaceNumber = 0u;
+                UnpackPageTableEntry(pte, pageAddress, pteAddressSpaceNumber, pageProtection);
+                if (pageProtection == Protection.notPresent || addressSpaceNumber != pteAddressSpaceNumber)
+                {
+                    return 0u;
+                }
+            }
+            else
+            {
+                pageNum = pageNum - firstIndirectEntryNumber;
+                ushort digit0 = 0u;
+                ushort digit1 = 0u;
+                ushort digit2 = 0u;
+                ExtractDigitsFromPageNumber(pageNum, digit0, digit1, digit2);
+                if (digit2 == 0u && digit1 == 0u)
+                {
+                    ulong singleIndirectEntryAddress = rootPageAddress + 8u * singleIndirectEntryNumber;
+                    ulong singleIndirectPageTableEntry = ReadMemoryULong(singleIndirectEntryAddress);
+                    ulong singleIndirectPageAddress = 0u;
+                    ushort singleIndirectAddressSpaceNumber = 0u;
+                    Protection singleIndirectProtection = Protection.notPresent;
+                    UnpackPageTableEntry(singleIndirectPageTableEntry, singleIndirectPageAddress, singleIndirectAddressSpaceNumber, singleIndirectProtection);
+                    if (singleIndirectProtection == Protection.notPresent || addressSpaceNumber != singleIndirectAddressSpaceNumber)
+                    {
+                        return 0u;
+                    }
+                    pteAddress = singleIndirectPageAddress + 8u * digit0;
+                    pte = ReadMemoryULong(pteAddress);
+                    ushort pteAddressSpaceNumber = 0u;
+                    UnpackPageTableEntry(pte, pageAddress, pteAddressSpaceNumber, pageProtection);
+                    if (pageProtection == Protection.notPresent || addressSpaceNumber != pteAddressSpaceNumber)
+                    {
+                        return 0u;
+                    }
+                }
+                else if (digit2 == 0u && digit1 > 0u)
+                {
+                    ulong doubleIndirectEntryAddress = rootPageAddress + 8u * doubleIndirectEntryNumber;
+                    ulong doubleIndirectPageTableEntry = ReadMemoryULong(doubleIndirectEntryAddress);
+                    ulong doubleIndirectPageAddress = 0u;
+                    ushort doubleIndirectAddressSpaceNumber = 0u;
+                    Protection doubleIndirectProtection = Protection.notPresent;
+                    UnpackPageTableEntry(doubleIndirectPageTableEntry, doubleIndirectPageAddress, doubleIndirectAddressSpaceNumber, doubleIndirectProtection);
+                    if (doubleIndirectProtection == Protection.notPresent || addressSpaceNumber != doubleIndirectAddressSpaceNumber)
+                    {
+                        return 0u;
+                    }
+                    ulong singleIndirectEntryAddress = doubleIndirectPageAddress + 8u * digit1;
+                    ulong singleIndirectPageTableEntry = ReadMemoryULong(singleIndirectEntryAddress);
+                    ulong singleIndirectPageAddress = 0u;
+                    ushort singleIndirectAddressSpaceNumber = 0u;
+                    Protection singleIndirectProtection = Protection.notPresent;
+                    UnpackPageTableEntry(singleIndirectPageTableEntry, singleIndirectPageAddress, singleIndirectAddressSpaceNumber, singleIndirectProtection);
+                    if (singleIndirectProtection == Protection.notPresent || addressSpaceNumber != singleIndirectAddressSpaceNumber)
+                    {
+                        return 0u;
+                    }
+                    pteAddress = singleIndirectPageAddress + 8u * digit0;
+                    pte = ReadMemoryULong(pteAddress);
+                    ushort pteAddressSpaceNumber = 0u;
+                    UnpackPageTableEntry(pte, pageAddress, pteAddressSpaceNumber, pageProtection);
+                    if (pageProtection == Protection.notPresent || addressSpaceNumber != pteAddressSpaceNumber)
+                    {
+                        return 0u;
+                    }
+                }
+                else if (digit2 >= 0u)
+                {
+                    ulong tripleIndirectEntryAddress = rootPageAddress + 8u * tripleIndirectEntryNumber;
+                    ulong tripleIndirectPageTableEntry = ReadMemoryULong(tripleIndirectEntryAddress);
+                    ulong tripleIndirectPageAddress = 0u;
+                    ushort tripleIndirectAddressSpaceNumber = 0u;
+                    Protection tripleIndirectProtection = Protection.notPresent;
+                    UnpackPageTableEntry(tripleIndirectPageTableEntry, tripleIndirectPageAddress, tripleIndirectAddressSpaceNumber, tripleIndirectProtection);
+                    if (tripleIndirectProtection == Protection.notPresent || addressSpaceNumber != tripleIndirectAddressSpaceNumber)
+                    {
+                        return 0u;
+                    }
+                    ulong doubleIndirectEntryAddress = tripleIndirectPageAddress + 8u * digit2;
+                    ulong doubleIndirectPageTableEntry = ReadMemoryULong(doubleIndirectEntryAddress);
+                    ulong doubleIndirectPageAddress = 0u;
+                    ushort doubleIndirectAddressSpaceNumber = 0u;
+                    Protection doubleIndirectProtection = Protection.notPresent;
+                    UnpackPageTableEntry(doubleIndirectPageTableEntry, doubleIndirectPageAddress, doubleIndirectAddressSpaceNumber, doubleIndirectProtection);
+                    if (doubleIndirectProtection == Protection.notPresent || addressSpaceNumber != doubleIndirectAddressSpaceNumber)
+                    {
+                        return 0u;
+                    }
+                    ulong singleIndirectEntryAddress = doubleIndirectPageAddress + 8u * digit1;
+                    ulong singleIndirectPageTableEntry = ReadMemoryULong(singleIndirectEntryAddress);
+                    ulong singleIndirectPageAddress = 0u;
+                    ushort singleIndirectAddressSpaceNumber = 0u;
+                    Protection singleIndirectProtection = Protection.notPresent;
+                    UnpackPageTableEntry(singleIndirectPageTableEntry, singleIndirectPageAddress, singleIndirectAddressSpaceNumber, singleIndirectProtection);
+                    if (singleIndirectProtection == Protection.notPresent || addressSpaceNumber != singleIndirectAddressSpaceNumber)
+                    {
+                        return 0u;
+                    }
+                    pteAddress = singleIndirectPageAddress + 8u * digit0;
+                    pte = ReadMemoryULong(pteAddress);
+                    ushort pteAddressSpaceNumber = 0u;
+                    UnpackPageTableEntry(pte, pageAddress, pteAddressSpaceNumber, pageProtection);
+                    if (pageProtection == Protection.notPresent || addressSpaceNumber != pteAddressSpaceNumber)
+                    {
+                        return 0u;
+                    }
+                }
+            }
+            return pte;
+        }
+        public nothrow ulong TranslateAddress(ulong virtualAddress, Protection access)
+        {
+            if (CheckSecurityViolation(virtualAddress))
+            {
+                return invalidAddress;
+            }
+            byte segmentIndex = 0u;
+            ulong pageAddress = 0u;
+            ushort offset = 0u;
+            ushort addressSpaceNumber = 0u;
+            Protection pageProtection = Protection.notPresent;
+            ulong pteAddress = 0u;
+            ulong pte = GetPageTableEntry(virtualAddress, segmentIndex, pageAddress, offset, addressSpaceNumber, pageProtection, pteAddress);
+            if (pte != 0u && pageProtection == Protection.copyOnWrite && (access & Protection.write) != 0u)
+            {
+                ulong newPageAddress = AllocatePage();
+                CopyPage(pageAddress, newPageAddress);
+                FreePage(pageAddress);
+                pageAddress = newPageAddress;
+                pte = MakePageTableEntry(pageAddress, addressSpaceNumber, cast<Protection>(Protection.read | Protection.write));
+                WriteMemoryULong(pteAddress, pte);
+            }
+            else if (pte == 0u || (pageProtection & access) != access)
+            {
+                PageFault(virtualAddress, pageProtection, access);
+                return invalidAddress;
+            }
+            ulong physicalAddress = pageAddress + offset;
+            return physicalAddress;
+        }
+        public nothrow byte ReadByte(ulong virtualAddress, Protection access)
+        {
+            ulong address = TranslateAddress(virtualAddress, access);
+            if (address != invalidAddress)
+            {
+                return ReadMemoryByte(address);
+            }
+            else
+            {
+                return 0u;
+            }
+        }
+        public nothrow void WriteByte(ulong virtualAddress, byte b, Protection access)
+        {
+            ulong address = TranslateAddress(virtualAddress, access);
+            if (address != invalidAddress)
+            {
+                WriteMemoryByte(address, b);
+            }
+        }
+        public nothrow ushort ReadUShort(ulong virtualAddress, Protection access)
+        {
+            ulong address = TranslateAddress(virtualAddress, access);
+            if (address != invalidAddress)
+            {
+                return ReadMemoryUShort(address);
+            }
+            else
+            {
+                return 0u;
+            }
+        }
+        public nothrow void WriteUShort(ulong virtualAddress, ushort u, Protection access)
+        {
+            ulong address = TranslateAddress(virtualAddress, access);
+            if (address != invalidAddress)
+            {
+                WriteMemoryUShort(address, u);
+            }
+        }
+        public nothrow uint ReadUInt(ulong virtualAddress, Protection access)
+        {
+            ulong address = TranslateAddress(virtualAddress, access);
+            if (address != invalidAddress)
+            {
+                return ReadMemoryUInt(address);
+            }
+            else
+            {
+                return 0u;
+            }
+        }
+        public nothrow void WriteUInt(ulong virtualAddress, uint u, Protection access)
+        {
+            ulong address = TranslateAddress(virtualAddress, access);
+            if (address != invalidAddress)
+            {
+                WriteMemoryUInt(address, u);
+            }
+        }
+        public nothrow ulong ReadULong(ulong virtualAddress, Protection access)
+        {
+            ulong address = TranslateAddress(virtualAddress, access);
+            if (address != invalidAddress)
+            {
+                return ReadMemoryULong(address);
+            }
+            else
+            {
+                return 0u;
+            }
+        }
+        public nothrow void WriteULong(ulong virtualAddress, ulong u, Protection access)
+        {
+            ulong address = TranslateAddress(virtualAddress, access);
+            if (address != invalidAddress)
+            {
+                WriteMemoryULong(address, u);
+            }
+        }
+        private nothrow void PageFault(ulong virtualAddress, Protection pageProtection, Protection access)
+        {
+            InvokePageFault(machine.GetRegisters(), virtualAddress, pageProtection, access);
+        }
+        private nothrow bool CheckSecurityViolation(ulong virtualAddress)
+        {
+            Registers& regs = machine.GetRegisters();
+            if ((virtualAddress & kernelBaseAddress) != 0u && !IsProcessorInKernelMode(regs))
+            {
+                SetSecurityViolation(regs, virtualAddress);
+                return true;
+            }
+            return false;
+        }
+        private HashMap<ulong, PageFrame*> pageFrameMap;
+        private PageFrame* freePageFrameList;
+        private Machine& machine;
+    }
+}

@@ -1,0 +1,119 @@
+using System;
+using cppast;
+
+namespace cppparser
+{
+    grammar LiteralGrammar
+    {
+        using stdlib.digit_sequence;
+        using stdlib.sign;
+        using stdlib.escape;
+
+        Literal : LiteralNode*
+            ::= FloatingLiteral{ value = FloatingLiteral; }
+            |   IntegerLiteral{ value = IntegerLiteral; }
+            |   CharacterLiteral{ value = CharacterLiteral; }
+            |   StringLiteral{ value = StringLiteral; }
+            |   BooleanLiteral{ value = BooleanLiteral; }
+            |   PointerLiteral{ value = PointerLiteral; }
+            ;
+
+        FloatingLiteral(var double val) : FloatingLiteralNode*
+            ::= (token((FractionalConstant ExponentPart?){ val = ParseDouble(ToUtf8(ustring(matchBegin, matchEnd))); } FloatingSuffix?)
+            |   token((digit_sequence ExponentPart){ val = ParseDouble(ToUtf8(ustring(matchBegin, matchEnd))); } FloatingSuffix?))
+            {
+                value = new FloatingLiteralNode(span);
+                value->strValue = ustring(matchBegin, matchEnd);
+                value->val = val;
+            }
+            ;
+
+        FractionalConstant
+            ::= token(digit_sequence? '.' digit_sequence)
+            |   token(digit_sequence '.')
+            ;
+
+        ExponentPart 
+            ::= token([eE] sign? digit_sequence)
+            ;
+
+        FloatingSuffix
+            ::= [fF]
+            ;
+
+        IntegerLiteral(var ulong val) : IntegerLiteralNode*
+            ::= (token(HexadecimalLiteral{ val = HexadecimalLiteral; } IntegerSuffix?)
+            |   token(OctalLiteral{ val = OctalLiteral; } IntegerSuffix?)
+            |   token(DecimalLiteral{ val = DecimalLiteral; } IntegerSuffix?)
+            )
+            {
+                value = new IntegerLiteralNode(span);
+                value->strValue = ustring(matchBegin, matchEnd);
+                value->val = val;
+            }
+            ;
+
+        DecimalLiteral : ulong
+            ::= token([1-9] digit*){ value = ParseULong(ToUtf8(ustring(matchBegin, matchEnd))); }
+            ;
+
+        OctalLiteral : ulong
+            ::= token('0' [0-7]*){ value = ParseOctal(ToUtf8(ustring(matchBegin, matchEnd))); }
+            ;
+
+        HexadecimalLiteral : ulong
+            ::= token(("0x" | "0X") (hexdigit+){ value = ParseHexULong(ToUtf8(ustring(matchBegin, matchEnd))); })
+            ;
+
+        IntegerSuffix
+            ::= token([uU] ("ll" | "LL")?)
+            |   token([uU] [lL]?)
+            |   token(("ll" | "LL") [uU]?)
+            |   token([lL] [uU]?)
+            ;
+
+        CharacterLiteral(var uchar val) : CharacterLiteralNode*
+            ::= token([uUL]? '\'' CChar{ val = CChar; } '\''){ value = new CharacterLiteralNode(span); value->strValue = ustring(matchBegin, matchEnd); value->val = val; }
+            ;
+
+        CChar : uchar
+            ::= [^\r\n\\']{ value = *matchBegin; } | escape{ value = escape; } | 'u' HexDigit4{ value = cast<uchar>(HexDigit4); } | 'U' HexDigit8{ value = cast<uchar>(HexDigit8); }
+            ;
+
+        HexDigit4 : uint
+            ::= token(hexdigit hexdigit hexdigit hexdigit){ value = ParseHexUInt(ToUtf8(ustring(matchBegin, matchEnd))); }
+            ;
+
+        HexDigit8 : uint
+            ::= token(hexdigit hexdigit hexdigit hexdigit hexdigit hexdigit hexdigit hexdigit){ value = ParseHexUInt(ToUtf8(ustring(matchBegin, matchEnd))); }
+            ;
+
+        StringLiteral(var ustring val) : StringLiteralNode*
+            ::= (token(EncodingPrefix? '"' (SChar{ val.Append(SChar); })* '"')
+            |   token(EncodingPrefix? 'R' '"' ([^\r\n"]{ val.Append(*matchBegin); })* '"')
+            )
+            {
+                value = new StringLiteralNode(span);
+                value->strValue = ustring(matchBegin, matchEnd);
+                value->val = val;
+            }
+            ;
+
+        EncodingPrefix
+            ::= "u8" | 'u' | 'U' | 'L'
+            ;
+
+        SChar : uchar
+            ::= [^\r\n\\"]{ value = *matchBegin; } | escape{ value = escape; } | 'u' HexDigit4{ value = cast<uchar>(HexDigit4); } | 'U' HexDigit8{ value = cast<uchar>(HexDigit8); }
+            ;
+
+        BooleanLiteral : BooleanLiteralNode*
+            ::= keyword("true"){ value = new BooleanLiteralNode(span); value->strValue = ustring(matchBegin, matchEnd); value->val = true; }
+            |   keyword("false"){ value = new BooleanLiteralNode(span); value->strValue = ustring(matchBegin, matchEnd); value->val = false; }
+            ;
+
+        PointerLiteral : PointerLiteralNode*
+            ::= keyword("nullptr"){ value = new PointerLiteralNode(span); value->strValue = ustring(matchBegin, matchEnd); }
+            ;
+    }
+}

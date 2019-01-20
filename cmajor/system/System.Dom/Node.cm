@@ -1,0 +1,555 @@
+// =================================
+// Copyright (c) 2019 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Collections;
+using System.Text;
+
+namespace System.Dom
+{
+    public enum Axis
+    {
+        child, descendant, parent, ancestor, followingSibling, precedingSibling, following, preceding, attribute, ns, self, descendantOrSelf, ancestorOrSelf
+    }
+    
+    public nothrow ustring AxisName(Axis axis)
+    {
+        switch (axis)
+        {
+            case Axis.child : return u"child"; 
+            case Axis.descendant: return u"descendant";
+            case Axis.parent: return u"parent";
+            case Axis.ancestor: return u"ancestor";
+            case Axis.followingSibling: return u"following-sibling";
+            case Axis.precedingSibling: return u"preceding-sibling";
+            case Axis.following: return u"following";
+            case Axis.preceding: return u"preceding";
+            case Axis.attribute: return u"attribute";
+            case Axis.ns: return u"namespace";
+            case Axis.self: return u"self";
+            case Axis.descendantOrSelf: return u"descendant-or-self";
+            case Axis.ancestorOrSelf: return u"ancestor-or-self";
+        }
+        return ustring();
+    }
+    
+    public class DomException : Exception
+    {
+        public nothrow DomException(const string& message_) : base(message_)
+        {
+        }
+    }
+    
+    public class NodeOp
+    {
+        public default virtual ~NodeOp();
+        public virtual void Apply(DomNode* node)
+        {
+        }
+    }
+    
+    public abstract class DomNode
+    {
+        public default virtual ~DomNode();
+        public nothrow explicit DomNode(const ustring& name_) : name(name_)
+        {
+        }
+        suppress DomNode(const DomNode&);
+        suppress void operator=(const DomNode&);
+        suppress DomNode(DomNode&&);
+        suppress void operator=(DomNode&&);
+        public abstract UniquePtr<DomNode> CloneNode(bool deep) const;
+        public nothrow inline const ustring& Name() const
+        {
+            return name;
+        }
+        public nothrow inline void SetName(const ustring& name_)
+        {
+            name = name_;
+        }
+        public nothrow inline const ustring& NamespaceUri() const
+        {
+            return namespaceUri;
+        }
+        public nothrow virtual ustring Prefix() const
+        {
+            return ustring();
+        }
+        public virtual void SetPrefix(const ustring& prefix)
+        {
+            throw DomException("cannot set prefix for this node type"); 
+        }
+        public nothrow virtual ustring LocalName() const
+        {
+            return ustring();
+        }
+        public nothrow virtual bool HasChildNodes() const
+        {
+            return false;
+        }
+        public nothrow virtual bool HasAttributes() const
+        {
+            return false;
+        }
+        public abstract void Write(CodeFormatter& formatter);
+        public nothrow virtual bool ValueContainsNewLine() const
+        {
+            return false;
+        }
+        public virtual void Accept(Visitor& visitor)
+        {
+        }
+        public void Walk(NodeOp& nodeOp, Axis axis)
+        {
+            switch (axis)
+            {
+                case Axis.child: WalkChildren(nodeOp); break;
+                case Axis.descendant: WalkDescendant(nodeOp); break;
+                case Axis.descendantOrSelf: WalkDescendantOrSelf(nodeOp); break;
+                case Axis.parent: WalkParent(nodeOp); break;
+                case Axis.ancestor: WalkAncestor(nodeOp); break;
+                case Axis.ancestorOrSelf: WalkAncestorOrSelf(nodeOp); break;
+                case Axis.followingSibling: WalkFollowingSibling(nodeOp); break;
+                case Axis.precedingSibling: WalkPrecedingSibling(nodeOp); break;
+                case Axis.following: WalkFollowing(nodeOp); break;
+                case Axis.preceding: WalkPreceding(nodeOp); break;
+                case Axis.attribute: WalkAttribute(nodeOp); break;
+                case Axis.self: nodeOp.Apply(this); break;
+            }
+        }
+        public virtual void WalkChildren(NodeOp& nodeOp)
+        {
+        }
+        public virtual void WalkDescendant(NodeOp& nodeOp)
+        {
+        }
+        public virtual void WalkDescendantOrSelf(NodeOp& nodeOp)
+        {
+            nodeOp.Apply(this); 
+        }
+        public virtual void WalkParent(NodeOp& nodeOp)
+        {
+            if (parent != null)
+            {
+                nodeOp.Apply(parent);
+            }
+        }
+        public void WalkAncestor(NodeOp& nodeOp)
+        {
+            if (parent != null)
+            {
+                parent->WalkAncestorOrSelf(nodeOp);
+            }
+        }
+        public void WalkAncestorOrSelf(NodeOp& nodeOp)
+        {
+            nodeOp.Apply(this);
+            if (parent != null)
+            {
+                parent->WalkAncestorOrSelf(nodeOp);
+            }
+        }
+        public void WalkFollowingSibling(NodeOp& nodeOp)
+        {
+            DomNode* ns = nextSibling;
+            if (ns != null)
+            {
+                nodeOp.Apply(ns);
+                ns = ns->nextSibling;
+            }
+        }
+        public void WalkPrecedingSibling(NodeOp& nodeOp)
+        {
+            DomNode* ps = previousSibling;
+            if (ps != null)
+            {
+                nodeOp.Apply(ps);
+                ps = ps->previousSibling;
+            }
+        }
+        public virtual void WalkFollowing(NodeOp& nodeOp)
+        {
+            DomNode* ns = nextSibling;
+            if (ns != null)
+            {
+                ns->WalkDescendantOrSelf(nodeOp);
+                ns = ns->nextSibling;
+            }
+        }
+        public virtual void WalkPreceding(NodeOp& nodeOp)
+        {
+        }
+        public virtual void WalkAttribute(NodeOp& nodeOp)
+        {
+        }
+        public virtual void WalkPrecedingOrSelf(NodeOp& nodeOp)
+        {
+            nodeOp.Apply(this); 
+        }
+        public inline nothrow DomNode* PreviousSibling() const
+        {
+            return previousSibling;
+        }
+        public inline nothrow DomNode* NextSibling() const
+        {
+            return nextSibling;
+        }
+        public inline nothrow DomParentNode* Parent() const
+        {
+            return parent;
+        }
+        public inline nothrow DomDocument* OwnerDocument() const
+        {
+            return ownerDocument;
+        }
+        public nothrow void InternalLinkBefore(DomNode* newNode)
+        {
+            newNode->previousSibling = previousSibling;
+            newNode->nextSibling = this;
+            previousSibling = newNode;
+        }
+        public nothrow void InternalLinkAfter(DomNode* newNode)
+        {
+            newNode->previousSibling = this;
+            newNode->nextSibling = nextSibling;
+            nextSibling = newNode;
+        }
+        public nothrow void InternalUnlink()
+        {
+            if (previousSibling != null)
+            {
+                previousSibling->nextSibling = nextSibling;
+            }
+            if (nextSibling != null)
+            {
+                nextSibling->previousSibling = previousSibling;
+            }
+        }
+        public nothrow inline void InternalSetParent(DomParentNode* parent_) 
+        { 
+            parent = parent_; 
+        }
+        public nothrow inline void InternalSetOwnerDocument(DomDocument* ownerDocument_)
+        {
+            ownerDocument = ownerDocument_;
+        }
+        public nothrow void InternalSetNamespaceUri(const ustring& namespaceUri_)
+        {
+            namespaceUri = namespaceUri_;
+        }
+        private ustring name;
+        private ustring namespaceUri;
+        private DomParentNode* parent;
+        private DomNode* previousSibling;
+        private DomNode* nextSibling;
+        private DomDocument* ownerDocument;
+    }
+    
+    public abstract class DomParentNode : DomNode
+    {
+        public nothrow explicit DomParentNode(const ustring& name_) : base(name_)
+        {
+        }
+        public override ~DomParentNode()
+        {
+            DomNode* child = firstChild;
+            while (child != null)
+            {
+                DomNode* toDel = child;
+                child = child->NextSibling();
+                delete toDel;
+            }
+        }
+        suppress DomParentNode(const DomParentNode&);
+        suppress void operator=(const DomParentNode&);
+        suppress DomParentNode(DomParentNode&&);
+        suppress void operator=(DomParentNode&&);
+        public nothrow override bool HasChildNodes() const
+        {
+            return firstChild != null;
+        }
+        public NodeList ChildNodes() const
+        {
+            NodeList result;
+            DomNode* child = firstChild;
+            while (child != null)
+            {
+                result.InternalAddNode(child);
+                child = child->NextSibling();
+            }
+            return result;
+        }
+        public override void Write(CodeFormatter& formatter)
+        {
+            DomNode* child = firstChild;
+            while (child != null)
+            {
+                child->Write(formatter);
+                child = child->NextSibling();
+            }
+        }
+        public void CloneChildrenTo(DomParentNode* clone)
+        {
+            DomNode* child = firstChild;
+            while (child != null)
+            {
+                clone->AppendChild(child->CloneNode(true));
+                child = child->NextSibling();
+            }
+        }
+        public nothrow inline DomNode* FirstChild() const
+        {
+            return firstChild;
+        }
+        public nothrow inline DomNode* LastChild() const
+        {
+            return lastChild;
+        }
+        public virtual DomNode* InsertBefore(UniquePtr<DomNode>&& newChild, DomNode* refChild)
+        {
+            if (refChild == null)
+            {
+                return AppendChild(newChild);
+            }
+            else
+            {
+                if (OwnerDocument() != null)
+                {
+                    OwnerDocument()->InternalInvalidateIndex();
+                }
+                if (newChild.Get() is DomDocumentFragment*)
+                {
+                    DomDocumentFragment* documentFragment = cast<DomDocumentFragment*>(newChild.Get());
+                    DomNode* docFragChild = documentFragment->FirstChild();
+                    DomNode* nodeInserted = null;
+                    while (docFragChild != null)
+                    {
+                        UniquePtr<DomNode> docFragChildRemoved = documentFragment->RemoveChild(docFragChild);
+                        nodeInserted = InsertBefore(Rvalue(docFragChildRemoved), refChild);                        
+                        docFragChild = documentFragment->FirstChild();
+                    }
+                    return nodeInserted;
+                }
+                else
+                {
+                    if (newChild->Parent() != null)
+                    {
+                        newChild.Reset(newChild->Parent()->RemoveChild(newChild.Get()).Release());
+                    }
+                    if (firstChild == refChild)
+                    {
+                        firstChild = newChild.Get();
+                    }
+                    newChild->InternalSetParent(this);
+                    newChild->InternalSetOwnerDocument(OwnerDocument());
+                    DomNode* nodeInserted = newChild.Get();
+                    refChild->InternalLinkBefore(newChild.Release());
+                    return nodeInserted;
+                }
+            }
+        }
+        public virtual UniquePtr<DomNode> RemoveChild(DomNode* oldChild)
+        {
+            if (oldChild == null)
+            {
+                throw DomException("could not remove node: given old child is null");
+            }
+            if (oldChild->Parent() != this)
+            {
+                throw DomException("could not remove node: given old child is not child of this node");
+            }
+            if (OwnerDocument() != null)
+            {
+                OwnerDocument()->InternalInvalidateIndex();
+            }
+            oldChild->InternalUnlink();
+            if (oldChild == firstChild)
+            {
+                firstChild = oldChild->NextSibling();
+            }
+            if (oldChild == lastChild)
+            {
+                lastChild = oldChild->PreviousSibling();
+            }
+            UniquePtr<DomNode> removedNode = UniquePtr<DomNode>(oldChild);
+            removedNode->InternalSetOwnerDocument(null);
+            removedNode->InternalSetParent(null);
+            return removedNode;
+        }
+        public virtual UniquePtr<DomNode> ReplaceChild(UniquePtr<DomNode>&& newChild, DomNode* oldChild)
+        {
+            if (oldChild == null)
+            {
+                throw DomException("could not replace node: given old child is null");
+            }
+            if (oldChild->Parent() != this)
+            {
+                throw DomException("could not replace node: given old child is not child of this node");
+            }
+            if (OwnerDocument() != null)
+            {
+                OwnerDocument()->InternalInvalidateIndex();
+            }
+            if (newChild->Parent() != null)
+            {
+                newChild.Reset(newChild->Parent()->RemoveChild(newChild.Get()).Release());
+            }
+            InsertBefore(newChild, oldChild);
+            return RemoveChild(oldChild);
+        }
+        public virtual DomNode* AppendChild(UniquePtr<DomNode>&& newChild)
+        {
+            if (OwnerDocument() != null)
+            {
+                OwnerDocument()->InternalInvalidateIndex();
+            }
+            if (newChild->Parent() != null)
+            {
+                newChild.Reset(newChild->Parent()->RemoveChild(newChild.Get()).Release());
+            }
+            if (newChild.Get() is DomDocumentFragment*)
+            {
+                DomDocumentFragment* documentFragment = cast<DomDocumentFragment*>(newChild.Get());
+                DomNode* docFragChild = documentFragment->FirstChild();
+                DomNode* nodeInserted = null;
+                while (docFragChild != null)
+                {
+                    UniquePtr<DomNode> docFragChildRemoved = documentFragment->RemoveChild(docFragChild);
+                    nodeInserted = AppendChild(Rvalue(docFragChildRemoved));
+                    docFragChild = documentFragment->FirstChild();
+                }
+                return nodeInserted;
+            }
+            else
+            {
+                if (lastChild != null)
+                {
+                    lastChild->InternalLinkAfter(newChild.Get());
+                }
+                if (firstChild == null)
+                {
+                    firstChild = newChild.Get();
+                }
+                newChild->InternalSetOwnerDocument(OwnerDocument());
+                newChild->InternalSetParent(this);
+                lastChild = newChild.Release();
+                return lastChild;
+            }
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            DomNode* child = firstChild;
+            while (child != null)
+            {
+                child->Accept(visitor);
+                child = child->NextSibling();
+            }
+        }
+        public override void WalkChildren(NodeOp& nodeOp)
+        {
+            DomNode* child = firstChild;
+            while (child != null)
+            {
+                nodeOp.Apply(child);
+                child = child->NextSibling();
+            }
+        }
+        public override void WalkDescendant(NodeOp& nodeOp)
+        {
+            DomNode* child = firstChild;
+            while (child != null)
+            {
+                child->WalkDescendantOrSelf(nodeOp);
+                child = child->NextSibling();
+            }
+        }
+        public override void WalkDescendantOrSelf(NodeOp& nodeOp)
+        {
+            base->WalkDescendantOrSelf(nodeOp);
+            DomNode* child = firstChild;
+            while (child != null)
+            {
+                child->WalkDescendantOrSelf(nodeOp);
+                child = child->NextSibling();
+            }
+        }
+        public override void WalkPreceding(NodeOp& nodeOp)
+        {
+            DomNode* preceding = PreviousSibling();
+            if (preceding != null)
+            {
+                preceding->WalkPrecedingOrSelf(nodeOp);
+            }
+        }
+        public override void WalkPrecedingOrSelf(NodeOp& nodeOp)
+        {
+            base->WalkPrecedingOrSelf(nodeOp);
+            DomNode* child = lastChild;
+            while (child != null)
+            {
+                child->WalkPrecedingOrSelf(nodeOp);
+                child = child->PreviousSibling();
+            }
+        }
+        private DomNode* firstChild;
+        private DomNode* lastChild;
+    }
+    
+    public class Visitor 
+    {
+        public default virtual ~Visitor();
+        public virtual void BeginVisit(DomDocument* document)
+        {
+        }
+        public virtual void EndVisit(DomDocument* document)
+        {
+        }
+        public virtual void BeginVisit(DomElement* element)
+        {
+        }
+        public virtual void EndVisit(DomElement* element)
+        {
+        }
+        public virtual void Visit(DomText* text)
+        {
+        }
+        public virtual void Visit(DomEntityReference* entityRef)
+        {
+        }
+        public virtual void Visit(DomCDataSection* cdataSection)
+        {
+        }
+        public virtual void Visit(DomComment* comment)
+        {
+        }
+        public virtual void Visit(DomProcessingInstruction* processingInstruction)
+        {
+        }
+    }
+    
+    public class NodeList
+    {
+        public nothrow inline DomNode* Item(long index) const
+        {
+            return nodes[index];
+        }
+        public nothrow inline DomNode* operator[](long index) const
+        {
+            return nodes[index];
+        }
+        public nothrow inline long Length() const
+        {
+            return nodes.Count();
+        }
+        public void InternalAddNode(DomNode* node)
+        {
+            if (Find(nodes.CBegin(), nodes.CEnd(), node) == nodes.CEnd())
+            {
+                nodes.Add(node);
+            }
+        }
+        private List<DomNode*> nodes;
+    }
+}

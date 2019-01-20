@@ -1,0 +1,207 @@
+// =================================
+// Copyright (c) 2019 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Collections;
+using System.IO;
+
+namespace System.Text.RegularExpressions
+{
+    public class NfaStateNumberSet
+    {
+        public nothrow NfaStateNumberSet()
+        {
+        }
+        public NfaStateNumberSet(int s)
+        {
+            stateNumbers.Add(s);
+        }
+        public nothrow bool Contains(int stateNumber)
+        {
+            for (int s : stateNumbers)
+            {
+                if (s == stateNumber) return true;
+            }
+            return false;
+        }
+        public nothrow bool CanonicalContains(int stateNumber)
+        {
+            List<int>.ConstIterator i = LowerBound(stateNumbers.CBegin(), stateNumbers.CEnd(), stateNumber);
+            return i != stateNumbers.CEnd() && *i == stateNumber;
+        }
+        public void Add(int stateNumber)
+        {
+            if (!Contains(stateNumber)) 
+            {
+                stateNumbers.Add(stateNumber);
+            }            
+        }
+        public void Merge(const NfaStateNumberSet& x)
+        {
+            for (int s : x.stateNumbers)
+            {
+                Add(s);
+            }
+        }
+        public void MakeCanonical()
+        {
+            Sort(stateNumbers);
+        }
+        public nothrow inline bool IsEmpty() const 
+        {
+            return stateNumbers.IsEmpty(); 
+        }
+        public string ToString() const
+        {
+            string s = "{";
+            bool first = true;
+            for (int n : stateNumbers)
+            {
+                if (first)
+                {
+                    first = false;
+                }
+                else
+                {
+                    s.Append(", ");
+                }
+                s.Append(ToString(n));
+            }
+            s.Append("}");
+            return s;
+        }
+        public nothrow const List<int>& Rep() const
+        {
+            return stateNumbers;
+        }
+        private List<int> stateNumbers;
+    }
+    
+    public nothrow bool operator==(const NfaStateNumberSet& left, const NfaStateNumberSet& right)
+    {
+        return left.Rep() == right.Rep();
+    }
+    
+    public OutputStream& operator<<(OutputStream& s, const NfaStateNumberSet& ns)
+    {
+        return s << ns.ToString();
+    }
+
+    public StreamWriter& operator<<(StreamWriter& writer, const NfaStateNumberSet& ns)
+    {
+        return writer << ns.ToString();
+    }
+    
+    public class NfaState
+    {
+        public NfaState(): id(-1), accepting(false)
+        {
+            next.Resize(256);
+        }
+        public NfaState(int id_): id(id_), accepting(false)
+        {
+            next.Resize(256);
+        }
+        public nothrow inline int Id() const
+        {
+            return id;
+        }
+        public nothrow inline bool Accepting()
+        {
+            return accepting;
+        }
+        public nothrow inline void SetAccepting()
+        {
+            accepting = true;
+        }
+        public void SetNext(char c, const NfaStateNumberSet& s)
+        {
+            next[cast<byte>(c)] = s;
+        }
+        public nothrow const NfaStateNumberSet& Next(char c) const
+        {
+            return next[cast<byte>(c)];
+        }
+        public nothrow const NfaStateNumberSet& Epsilon() const
+        {
+            return next[0];
+        }
+        private int id;
+        private bool accepting;
+        private List<NfaStateNumberSet> next;
+    }
+    
+    public OutputStream& operator<<(OutputStream& s, const NfaState& state)
+    {
+        s << state.Id() << ": ";
+        for (int i = 0; i < 256; ++i)
+        {
+            char c = cast<char>(i);
+            const NfaStateNumberSet& next = state.Next(c);
+            if (!next.IsEmpty())
+            {
+                s << "(" << CharStr(c) << " -> " << next << ")";
+            }
+        }
+        return s << endl();
+    }
+    
+    public StreamWriter& operator<<(StreamWriter& s, const NfaState& state)
+    {
+        s << state.Id() << ": ";
+        for (int i = 0; i < 256; ++i)
+        {
+            char c = cast<char>(i);
+            const NfaStateNumberSet& next = state.Next(c);
+            if (!next.IsEmpty())
+            {
+                s << "(" << CharStr(c) << " -> " << next << ")";
+            }
+        }
+        return s << endl();
+    }
+
+    public class Nfa
+    {
+        public Nfa()
+        {
+        }
+        public void AddState(const NfaState& state)
+        {
+            states.Add(state);
+        }
+        public nothrow inline const List<NfaState>& States() const
+        {
+            return states;
+        }
+        public nothrow inline const NfaState& GetState(long i) const
+        {
+            return states[i];
+        }
+        public nothrow inline long NumStates() const
+        {
+            return states.Count();
+        }
+        private List<NfaState> states;
+    }
+
+    public OutputStream& operator<<(OutputStream& s, const Nfa& nfa)
+    {
+        for (const NfaState& state : nfa.States())
+        {
+            s << state;
+        }
+        return s;
+    }
+
+    public StreamWriter& operator<<(StreamWriter& s, const Nfa& nfa)
+    {
+        for (const NfaState& state : nfa.States())
+        {
+            s << state;
+        }
+        return s;
+    }
+}

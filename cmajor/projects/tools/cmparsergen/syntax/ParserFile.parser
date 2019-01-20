@@ -1,0 +1,33 @@
+using ParsingContext = Code.ParsingContext;
+
+namespace Syntax
+{
+    grammar ParserFileGrammar
+    {
+        using Code.IdentifierGrammar.UsingAlias;
+        using Code.IdentifierGrammar.UsingImport;
+        using GrammarGrammar.Grammar;
+        using stdlib.spaces_and_comments;
+        using stdlib.qualified_id;
+
+        skip spaces_and_comments;
+
+        ParserFile(ParsingContext* ctx, int id, System.Text.Parsing.ParsingDomain* parsingDomain) : ParserFileContent*
+            ::= empty{ value = new ParserFileContent(id, fileName, parsingDomain); }
+                NamespaceContent(ctx, value)
+            ;
+
+        NamespaceContent(ParsingContext* ctx, ParserFileContent* parserFileContent)
+            ::= (   UsingAlias{ parserFileContent->AddUsingAlias(UsingAlias); }
+                |   UsingImport{ parserFileContent->AddUsingImport(UsingImport); }
+                )*
+                (   Grammar(ctx, parserFileContent->CurrentScope()){ parserFileContent->AddGrammar(Grammar); }
+                |   Namespace(ctx, parserFileContent)
+                )*
+            ;
+
+        Namespace(ParsingContext* ctx, ParserFileContent* parserFileContent)
+            ::= keyword("namespace") qualified_id:ns!{ parserFileContent->BeginNamespace(ns); } '{'! NamespaceContent(ctx, parserFileContent) '}'!{ parserFileContent->EndNamespace(); }
+            ;
+    }
+}

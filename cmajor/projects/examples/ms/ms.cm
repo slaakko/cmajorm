@@ -1,0 +1,30 @@
+using System;
+
+int main(int argc, const char** argv)
+{
+    try
+    {
+        TimePoint start = Now();
+        string command;
+        for (int i = 1; i < argc; ++i)
+        {
+            string arg = argv[i];
+            if (!command.IsEmpty())
+            {
+                command.Append(' ');
+            }
+            command.Append(arg);
+        }
+        int exitCode = Execute(command);
+        TimePoint end = Now();
+        Duration dur = end - start;
+        Console.Out() << "executing command '" + command << "' took " << dur.Milliseconds() << " ms" << endl();
+        Console.Out() << "command returned exit code: " << exitCode << endl();
+    }
+    catch (const Exception& ex)
+    {
+        Console.Error() << ex.Message() << endl();
+        return 1;
+    }
+    return 0;
+}

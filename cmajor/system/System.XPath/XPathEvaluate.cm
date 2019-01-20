@@ -1,0 +1,62 @@
+// =================================
+// Copyright (c) 2019 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Dom;
+using System.Text;
+
+namespace System.XPath
+{
+    public class XPathExpressionParser
+    {
+        static XPathExpressionParser() : instance(new XPathExpressionParser())
+        {
+        }
+        public static XPathExpressionParser& Instance()
+        {
+            return *instance;
+        }
+        public UniquePtr<XPathExpr> Parse(const ustring& xpathExpression)
+        {
+            if (DebugParsing())
+            {
+                xpathExpressionGrammar->SetLog(&Console.Out());
+            }
+            TimePoint start = Now();
+            UniquePtr<XPathExpr> expr = xpathExpressionGrammar->Parse(xpathExpression.Chars(), xpathExpression.Chars() + xpathExpression.Length(), 0, "");
+            TimePoint end = Now();
+            if (DebugQuery())
+            {
+                UniquePtr<DomNode> queryDom = expr->ToDom();
+                SetQueryDom(Rvalue(queryDom));
+                SetQueryDuration(end - start);
+            }
+            return expr;
+        }
+        private XPathExpressionParser() : xpathExpressionGrammar(new XPathExpressionGrammar())
+        {
+        }
+        private static UniquePtr<XPathExpressionParser> instance;
+        private XPathExpressionGrammar* xpathExpressionGrammar;
+    }
+    
+    public UniquePtr<XPathObject> Evaluate(const ustring& xpathExpression, DomNode* node)
+    {
+        UniquePtr<XPathExpr> xpathExpr = XPathExpressionParser.Instance().Parse(xpathExpression);
+        TimePoint start = Now();
+        XPathContext context(node, 1, 1);
+        UniquePtr<XPathObject> result = xpathExpr->Evaluate(context);
+        TimePoint end = Now();
+        if (DebugQuery())
+        {
+            SetExecutionDuration(end - start);
+        }
+        return result;
+    }
+    public UniquePtr<XPathObject> Evaluate(const ustring& xpathExpression, DomDocument* document)
+    {
+        return Evaluate(xpathExpression, cast<DomNode*>(document));
+    }
+}

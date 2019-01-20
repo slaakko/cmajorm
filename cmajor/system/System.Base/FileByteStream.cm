@@ -1,0 +1,135 @@
+// =================================
+// Copyright (c) 2019 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+
+namespace System.IO
+{
+    public class FileByteStream : ByteStream
+    {
+        public nothrow FileByteStream(int fileHandle_) : fileHandle(fileHandle_), opened(false)
+        {
+        }
+        public FileByteStream(const string& filePath, OpenMode openMode) : fileHandle(-1), opened(false)
+        {
+            Open(filePath, openMode);
+        }
+        suppress FileByteStream(const FileByteStream&);
+        suppress void operator=(const FileByteStream&);
+        public nothrow FileByteStream(FileByteStream&& that) : fileHandle(that.fileHandle), opened(that.opened)
+        {
+            that.fileHandle = -1;
+            that.opened = false;
+        }
+        public default nothrow void operator=(FileByteStream&&);
+        public override ~FileByteStream()
+        {
+            try
+            {
+                Close();            
+            }
+            catch (const Exception&)
+            {
+            }
+        }
+        public inline nothrow bool IsOpen() const
+        {
+            return fileHandle != -1;
+        }
+        public void Open(const string& filePath, OpenMode openMode)
+        {
+            Close();
+            int result = RtOpen(filePath.Chars(), openMode);
+            if (result < 0)
+            {
+                string errorMessage = RtGetError(result);
+                RtDisposeError(result);
+                throw FileSystemException(errorMessage);
+            }
+            else
+            {
+                fileHandle = result;
+                opened = true;
+            }
+        }
+        public void Close()
+        {
+            if (fileHandle != -1 && opened)
+            {
+                int result = RtClose(fileHandle);
+                if (result < 0)
+                {
+                    string errorMessage = RtGetError(result);
+                    RtDisposeError(result);
+                    throw FileSystemException(errorMessage);
+                }
+                fileHandle = -1;
+                opened = false;
+            }
+        }
+        public override int ReadByte()
+        {
+            return RtReadByte(fileHandle);
+        }
+        public override long Read(byte* buf, long count)
+        {
+            #assert(count >= 0);
+            long result = RtRead(fileHandle, buf, count);
+            if (result < 0)
+            {
+                int res = cast<int>(result);
+                string errorMessage = RtGetError(res);
+                RtDisposeError(res);
+                throw FileSystemException(errorMessage);
+            }
+            return result;
+        }
+        public override void Write(byte x)
+        {
+            int result = RtWriteByte(fileHandle, x);
+            if (result < 0)
+            {
+                string errorMessage = RtGetError(result);
+                RtDisposeError(result);
+                throw FileSystemException(errorMessage);
+            }
+        }
+        public override void Write(byte* buf, long count)
+        {
+            #assert(count >= 0);
+            int result = RtWrite(fileHandle, buf, count);
+            if (result < 0)
+            {
+                string errorMessage = RtGetError(result);
+                RtDisposeError(result);
+                throw FileSystemException(errorMessage);
+            }
+        }
+        public override void Seek(long pos, Origin origin)
+        {
+            int result = RtSeek(fileHandle, pos, origin);
+            if (result < 0)
+            {
+                string errorMessage = RtGetError(result);
+                RtDisposeError(result);
+                throw FileSystemException(errorMessage);
+            }
+        }
+        public override long Tell()
+        {
+            long result = RtTell(fileHandle);
+            if (result < 0)
+            {
+                int res = cast<int>(result);
+                string errorMessage = RtGetError(res);
+                RtDisposeError(res);
+                throw FileSystemException(errorMessage);
+            }
+            return result;
+        }
+        private int fileHandle;
+        private bool opened;
+    }    
+}

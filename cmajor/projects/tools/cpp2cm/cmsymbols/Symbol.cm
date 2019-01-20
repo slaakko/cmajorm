@@ -1,0 +1,20 @@
+using System;
+using cmast;
+
+namespace cmsymbols
+{
+    public abstract class Symbol
+    {
+        public nothrow Symbol(const ustring& name_) : name(name_)
+        {
+        }
+        public virtual default ~Symbol();
+        public abstract Node* Syntax();
+        public nothrow void SetParent(ContainerSymbol* parent_)
+        {
+            parent = parent_;
+        }
+        public ustring name;
+        public ContainerSymbol* parent;
+    }
+}

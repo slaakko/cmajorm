@@ -1,0 +1,69 @@
+// =================================
+// Copyright (c) 2019 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Collections;
+
+namespace System.Net.Http
+{
+    public class HttpParser
+    {
+        static HttpParser() : instance(new HttpParser())
+        {
+        }
+        public static HttpParser& Instance()
+        {
+            return *instance;
+        }
+        public HttpHeader ParseHeader(const ustring& header)
+        {
+            return headerGrammar->Parse(header.Chars(), header.Chars() + header.Length(), 0, "");
+        }
+        public HttpStatus ParseStatus(const ustring& statusLine)
+        {
+            HttpStatus httpStatus;
+            statusLineGrammar->Parse(statusLine.Chars(), statusLine.Chars() + statusLine.Length(), 0, "", &httpStatus);
+            return httpStatus;
+        }
+        public void ParseChunkHeader(const ustring& chunkHeader, ulong* chunkSize, ChunkExtensionAdder* adder)
+        {
+            chunkHeaderGrammar->Parse(chunkHeader.Chars(), chunkHeader.Chars() + chunkHeader.Length(), 0, "", chunkSize, adder);
+        }
+        public void ParseFieldValue(const ustring& fieldValue, List<HttpFieldValue>* values)
+        {
+            fieldValueGrammar->Parse(fieldValue.Chars(), fieldValue.Chars() + fieldValue.Length(), 0, "", values);
+        }
+        public MimeType ParseMediaType(const ustring& fieldValue)
+        {
+            MimeType mediaType;
+            mediaTypeGrammar->Parse(fieldValue.Chars(), fieldValue.Chars() + fieldValue.Length(), 0, "", &mediaType);
+            return mediaType;
+        }
+        public DateTime ParseDate(const ustring& fieldValue)
+        {
+            DateTime date;
+            dateGrammar->Parse(fieldValue.Chars(), fieldValue.Chars() + fieldValue.Length(), 0, "", &date);
+            return date;
+        }
+        private HttpParser() : 
+            httpGrammar(new HttpGrammar()), 
+            headerGrammar(new HttpHeaderGrammar(httpGrammar->Domain())), 
+            statusLineGrammar(new HttpStatusLineGrammar(httpGrammar->Domain())),
+            chunkHeaderGrammar(new HttpChunkHeaderGrammar(httpGrammar->Domain())),
+            fieldValueGrammar(new HttpFieldValueGrammar(httpGrammar->Domain())),
+            mediaTypeGrammar(new HttpMediaTypeGrammar(httpGrammar->Domain())),
+            dateGrammar(new HttpDateGrammar(httpGrammar->Domain()))
+        {
+        }
+        private static UniquePtr<HttpParser> instance;
+        private HttpGrammar* httpGrammar;
+        private HttpHeaderGrammar* headerGrammar;
+        private HttpStatusLineGrammar* statusLineGrammar;
+        private HttpChunkHeaderGrammar* chunkHeaderGrammar;
+        private HttpFieldValueGrammar* fieldValueGrammar;
+        private HttpMediaTypeGrammar* mediaTypeGrammar;
+        private HttpDateGrammar* dateGrammar;
+    }
+}

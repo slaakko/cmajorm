@@ -1,0 +1,47 @@
+<html>
+ <head>
+  <meta charset="utf-8"/>
+  <title>IdentifierGrammar Grammar</title>
+  <link href="../../../style/style.css" rel="stylesheet" type="text/css"/>
+ </head>
+ <body>
+  <h1>IdentifierGrammar Grammar</h1>
+  <table class="grammar">
+   <tr id="rule_Identifier_EBD3B155B01AF51011AA5088EE81AB5F96102F58">
+    <td class="grammarFirstCol">
+     <span class="rule">Identifier</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleKeyword">token</span><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="../../../../../../system/content/System.Text.Parsing/grammars.xml#rule_identifier_EC79E9557ADCB4230187E4EB2CFA518A0D75FDF1">identifier</a></span><span class="ruleOp"> &minus; </span><span class="ruleLink"><a class="ruleLink" href="grammar_KeywordGrammar_4736589658524987885D4BECF4D1F0C57799B9B3.html#rule_Keyword_146949D420FEF5EA00C8829FA7DAB6EE8258B66B">Keyword</a></span><span class="ruleOp">)</span></td>
+   </tr>
+   <tr id="rule_QualifiedId_F3DA8D1E2257EC14ECFEC0721B9A524DF030F248">
+    <td class="grammarFirstCol">
+     <span class="rule">QualifiedId</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleKeyword">token</span><span class="ruleOp">(</span><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="../../../../../../system/content/System.Text.Parsing/grammars.xml#rule_identifier_EC79E9557ADCB4230187E4EB2CFA518A0D75FDF1">identifier</a></span><span class="ruleOp"> &minus; </span><span class="ruleLink"><a class="ruleLink" href="grammar_KeywordGrammar_4736589658524987885D4BECF4D1F0C57799B9B3.html#rule_Keyword_146949D420FEF5EA00C8829FA7DAB6EE8258B66B">Keyword</a></span><span class="ruleOp">)</span><span class="ruleOp"> % </span><span class="ruleChar">'.'</span><span class="ruleOp">)</span></td>
+   </tr>
+   <tr id="rule_TemplateId_396BD3C05CBE25C1725B8133A78E8D851EDE8108">
+    <td class="grammarFirstCol">
+     <span class="rule">TemplateId</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleKeyword">empty</span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#rule_QualifiedId_F3DA8D1E2257EC14ECFEC0721B9A524DF030F248">QualifiedId</a></span><span class="ruleOp"> </span><span class="ruleChar">'&lt;'</span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="grammar_TypeExprGrammar_5D5238A9B046F548A2A5A21A0D787C7BE470E9B5.html#rule_TypeExpr_227CCC5876D9327D0470DE842BE42BFFAC159AB0">TypeExpr</a></span><span class="ruleOp"> % </span><span class="ruleChar">','</span><span class="ruleOp">)</span><span class="ruleOp"> </span><span class="ruleChar">'>'</span><span class="ruleOp">)</span></td>
+   </tr>
+   <tr id="rule_UsingAlias_A973D1D775376ABB430E63D1AB97566A95A36093">
+    <td class="grammarFirstCol">
+     <span class="rule">UsingAlias</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleKeyword">keyword</span><span class="ruleString">("using")</span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#rule_Identifier_EBD3B155B01AF51011AA5088EE81AB5F96102F58">Identifier</a></span><span class="ruleOp"> </span><span class="ruleChar">'='</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_QualifiedId_F3DA8D1E2257EC14ECFEC0721B9A524DF030F248">QualifiedId</a></span><span class="ruleOp">)</span><span class="ruleOp"> </span><span class="ruleChar">';'</span></td>
+   </tr>
+   <tr id="rule_UsingImport_83C3B65DAA5F7BB357F015178A775B79E2D27E67">
+    <td class="grammarFirstCol">
+     <span class="rule">UsingImport</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleKeyword">keyword</span><span class="ruleString">("using")</span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#rule_QualifiedId_F3DA8D1E2257EC14ECFEC0721B9A524DF030F248">QualifiedId</a></span><span class="ruleOp">)</span><span class="ruleOp"> </span><span class="ruleChar">';'</span></td>
+   </tr>
+  </table>
+ </body>
+</html>

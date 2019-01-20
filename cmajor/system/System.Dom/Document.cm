@@ -1,0 +1,175 @@
+// =================================
+// Copyright (c) 2019 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Collections;
+using System.Text;
+
+namespace System.Dom
+{
+    public class DomDocument : DomParentNode
+    {
+        public nothrow DomDocument() : base(u"document")
+        {
+        }
+        suppress DomDocument(const DomDocument&);
+        suppress void operator=(const DomDocument&);
+        suppress DomDocument(DomDocument&&);
+        suppress void operator=(DomDocument&&);
+        public nothrow inline DomElement* DocumentElement() const
+        {
+            return documentElement;
+        }
+        public override UniquePtr<DomNode> CloneNode(bool deep) const
+        {
+            UniquePtr<DomNode> clonedDocument(new DomDocument());
+            if (deep)
+            {
+                DomParentNode* parentNode = cast<DomParentNode*>(clonedDocument.Get());
+                CloneChildrenTo(parentNode);
+            }
+            return clonedDocument;
+        }
+        public override DomNode* InsertBefore(UniquePtr<DomNode>&& newChild, DomNode* refChild)
+        {
+            CheckValidInsert(newChild.Get(), refChild);
+            if (newChild.Get() is DomElement*)
+            {
+                documentElement = cast<DomElement*>(newChild.Get());
+            }
+            return base->InsertBefore(newChild, refChild);
+        }
+        public override UniquePtr<DomNode> RemoveChild(DomNode* oldChild)
+        {
+            if (oldChild == null)
+            {
+                throw DomException("could not remove node: given old child is null");
+            }
+            if (oldChild->Parent() != this)
+            {
+                throw DomException("could not remove node: given old child is not child of this node");
+            }
+            if (oldChild is DomElement*)
+            {
+                documentElement = null;
+            }
+            return base->RemoveChild(oldChild);
+        }
+        public override UniquePtr<DomNode> ReplaceChild(UniquePtr<DomNode>&& newChild, DomNode* oldChild)
+        {
+            if (oldChild == null)
+            {
+                throw DomException("could not replace node: given old child is null");
+            }
+            if (oldChild->Parent() != this)
+            {
+                throw DomException("could not replace node: given old child is not child of this node");
+            }
+            CheckValidInsert(newChild.Get(), null);
+            if (newChild.Get() is DomElement*)
+            {
+                UniquePtr<DomNode> removed = RemoveChild(oldChild);
+                AppendChild(newChild);
+                return removed;
+            }
+            else
+            {
+                return base->ReplaceChild(newChild, oldChild);
+            }
+        }
+        public override DomNode* AppendChild(UniquePtr<DomNode>&& newChild)
+        {
+            CheckValidInsert(newChild.Get(), null);
+            if (newChild.Get() is DomElement*)
+            {
+                documentElement = cast<DomElement*>(newChild.Get());
+            }
+            return base->AppendChild(newChild);
+        }
+        public DomElement* GetElementById(const ustring& elementId)
+        {
+            if (!indexValid)
+            {
+                elementsByIdMap.Clear();
+                BuildIndexVisitor visitor(elementsByIdMap);
+                Accept(visitor);
+                indexValid = true;
+            }
+            HashMap<ustring, DomElement*>.ConstIterator it = elementsByIdMap.CFind(elementId);
+            if (it != elementsByIdMap.CEnd())
+            {
+                DomElement* element = it->second;
+                return element;
+            }
+            return null;
+        }
+        public nothrow inline bool XmlStandalone() const
+        {
+            return xmlStandalone;
+        }
+        public nothrow inline void SetXmlStandalone(bool xmlStandalone_)
+        {
+            xmlStandalone = xmlStandalone_;
+        }
+        public nothrow inline const ustring& XmlVersion() const
+        {
+            return xmlVersion;
+        }
+        public nothrow inline void SetXmlVersion(const ustring& xmlVersion_)
+        {
+            xmlVersion = xmlVersion_;
+        }
+        public nothrow inline const ustring& XmlEncoding() const
+        {
+            return xmlEncoding;
+        }
+        public nothrow inline void SetXmlEncoding(const ustring& xmlEncoding_)
+        {
+            xmlEncoding = xmlEncoding_;
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.BeginVisit(this);
+            base->Accept(visitor);
+            visitor.EndVisit(this);
+        }
+        public nothrow inline void InternalInvalidateIndex()
+        {
+            indexValid = false;
+        }
+        private void CheckValidInsert(DomNode* node, DomNode* refNode)
+        {
+            if (node is DomElement*)
+            {
+                if (refNode != null || documentElement != null)
+                {
+                    throw DomException("attempt to insert a second element to a document");
+                }
+            }
+        }
+        private DomElement* documentElement;
+        private HashMap<ustring, DomElement*> elementsByIdMap;
+        private bool indexValid;
+        private bool xmlStandalone;
+        private ustring xmlVersion;
+        private ustring xmlEncoding;
+    }
+
+    public class BuildIndexVisitor : Visitor
+    {
+        public nothrow BuildIndexVisitor(HashMap<ustring, DomElement*>& elementsByIdMap_) : elementsByIdMap(elementsByIdMap_)
+        {
+        }
+        public override void BeginVisit(DomElement* element)
+        {
+            const ustring& id = element->GetAttribute(u"id");
+            if (!id.IsEmpty())
+            {
+                elementsByIdMap[id] = element;
+            }
+        }
+        private HashMap<ustring, DomElement*>& elementsByIdMap;
+    }
+}

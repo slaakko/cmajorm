@@ -1,0 +1,117 @@
+using System;
+using System.Collections;
+using System.IO;
+
+public void PrintIntList(const List<int>& intList)
+{
+    Console.WriteLine("intList:");
+    for (int i : intList)
+    {
+        Console.WriteLine(i);
+    }
+}
+
+public void AddOneToAll(List<int>& intList)
+{
+    for (int& x : intList)
+    {
+        x = x + 1;
+    }
+}
+
+public void PrintStringList(const List<string>& stringList)
+{
+    Console.WriteLine("stringList:");
+    for (const string& s : stringList)
+    {
+        Console.WriteLine(s);
+    }
+}
+
+public class Foo
+{
+    public Foo(int x_) : x(x_)
+    {
+    }
+    public int X() const
+    {
+        return x;
+    }
+    private int x;
+}
+
+public StreamWriter& operator<<(StreamWriter& writer, const Foo& foo)
+{
+    return writer << "Foo: " << foo.X();
+}
+
+public class MyCollection
+{
+    public typedef List<Foo>.ConstIterator ConstIterator;
+    public typedef List<Foo>.Iterator Iterator;
+    public ConstIterator CBegin() const
+    {
+        return fooList.CBegin();
+    }
+    public ConstIterator Begin() const
+    {
+        return fooList.CBegin();
+    }
+    public Iterator Begin()
+    {
+        return fooList.Begin();
+    }
+    public ConstIterator CEnd() const
+    {
+        return fooList.CEnd();
+    }
+    public ConstIterator End() const
+    {
+        return fooList.CEnd();
+    }
+    public Iterator End()
+    {
+        return fooList.End();
+    }
+    public void Add(const Foo& foo)
+    {
+        fooList.Add(foo);
+    }
+    private List<Foo> fooList;
+}
+
+public void PrintMyCollection(const MyCollection& myCollection)
+{
+    Console.WriteLine("myCollection:");
+    for (const Foo& foo : myCollection)
+    {
+        Console.Out() << foo << endl();
+    }
+}
+
+void main()
+{
+    try
+    {
+        List<int> intList;
+        intList.Add(1);
+        intList.Add(2);
+        intList.Add(3);
+        PrintIntList(intList);
+        AddOneToAll(intList);
+        PrintIntList(intList);
+        List<string> stringList;
+        stringList.Add("foo");
+        stringList.Add("bar");
+        PrintStringList(stringList);
+        MyCollection myCollection;
+        myCollection.Add(Foo(1));
+        myCollection.Add(Foo(2));
+        myCollection.Add(Foo(3));
+        PrintMyCollection(myCollection);
+    }
+    catch (const Exception& ex)
+    {
+        Console.Error() << ex.ToString() << endl();
+    }
+}

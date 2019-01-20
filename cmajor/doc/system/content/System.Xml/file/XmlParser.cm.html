@@ -1,0 +1,117 @@
+<html>
+ <head>
+  <meta charset="utf-8"/>
+  <title>System.Xml/XmlParser.cm</title>
+  <link href="../../../style/style.css" rel="stylesheet" type="text/css"/>
+ </head>
+ <body>
+  <span class="code" id="1" xml:space="preserve"><span class="lineNumber">&nbsp;1</span>&nbsp;<span class="comment">//&nbsp;=================================</span></span>
+  <br/>
+  <span class="code" id="2" xml:space="preserve"><span class="lineNumber">&nbsp;2</span>&nbsp;<span class="comment">//&nbsp;Copyright&nbsp;(c)&nbsp;2019&nbsp;Seppo&nbsp;Laakko</span></span>
+  <br/>
+  <span class="code" id="3" xml:space="preserve"><span class="lineNumber">&nbsp;3</span>&nbsp;<span class="comment">//&nbsp;Distributed&nbsp;under&nbsp;the&nbsp;MIT&nbsp;license</span></span>
+  <br/>
+  <span class="code" id="4" xml:space="preserve"><span class="lineNumber">&nbsp;4</span>&nbsp;<span class="comment">//&nbsp;=================================</span></span>
+  <br/>
+  <span class="code" id="5" xml:space="preserve"><span class="lineNumber">&nbsp;5</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="6" xml:space="preserve"><span class="lineNumber">&nbsp;6</span>&nbsp;<span class="kw">using</span>&nbsp;<span class="identifier">System</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="7" xml:space="preserve"><span class="lineNumber">&nbsp;7</span>&nbsp;<span class="kw">using</span>&nbsp;<span class="identifier">System.IO</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="8" xml:space="preserve"><span class="lineNumber">&nbsp;8</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="9" xml:space="preserve"><span class="lineNumber">&nbsp;9</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">System.Xml</span></span>
+  <br/>
+  <span class="code" id="10" xml:space="preserve"><span class="lineNumber">10</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="11" xml:space="preserve"><span class="lineNumber">11</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../doc/class_XmlParser_57E6C3062973C902D7D9AABADA17F1524293CA83.html">XmlParser</a></span>
+  <br/>
+  <span class="code" id="12" xml:space="preserve"><span class="lineNumber">12</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="13" xml:space="preserve"><span class="lineNumber">13</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">static</span>&nbsp;<a href="../doc/class_XmlParser_57E6C3062973C902D7D9AABADA17F1524293CA83.html#static_constructor_XmlParser_733393B172AF548DECCBB209171B0B6D7E1B8A7D">XmlParser</a><span class="other">()</span><span class="other">&nbsp;:&nbsp;</span><span class="identifier">instance</span><span class="other">(</span><span class="kw">new</span>&nbsp;<span class="identifier">XmlParser</span><span class="other">(</span><span class="other">)</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="14" xml:space="preserve"><span class="lineNumber">14</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="15" xml:space="preserve"><span class="lineNumber">15</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="16" xml:space="preserve"><span class="lineNumber">16</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">static</span>&nbsp;<a href="../doc/class_XmlParser_57E6C3062973C902D7D9AABADA17F1524293CA83.html">XmlParser</a><span class="other">&amp;</span>&nbsp;<a href="../doc/class_XmlParser_57E6C3062973C902D7D9AABADA17F1524293CA83.html#member_function_Instance_XmlParser_EBE8AA52E4F55503BE22716978C368C130634AD1">Instance</a><span class="other">(</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="17" xml:space="preserve"><span class="lineNumber">17</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="18" xml:space="preserve"><span class="lineNumber">18</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="other">*</span><a href="../doc/class_XmlParser_57E6C3062973C902D7D9AABADA17F1524293CA83.html#variable_instance_004CEC962529EAB11925556CF694CDECC0CCE8B9">instance</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="19" xml:space="preserve"><span class="lineNumber">19</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="20" xml:space="preserve"><span class="lineNumber">20</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">private</span>&nbsp;<a href="../doc/class_XmlParser_57E6C3062973C902D7D9AABADA17F1524293CA83.html#default_constructor_XmlParser_5095BA041D400A70596A9C55104851980D6F5472">XmlParser</a><span class="other">(</span><span class="other">)</span><span class="other">&nbsp;:&nbsp;</span><span class="identifier">xmlGrammar</span><span class="other">(</span><span class="kw">new</span>&nbsp;<span class="identifier">XmlGrammar</span><span class="other">(</span><span class="other">)</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="21" xml:space="preserve"><span class="lineNumber">21</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="22" xml:space="preserve"><span class="lineNumber">22</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="23" xml:space="preserve"><span class="lineNumber">23</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/class_XmlParser_57E6C3062973C902D7D9AABADA17F1524293CA83.html#member_function_Parse_XmlParser_210093CFB2FE60223FBC497BD623FAB6EF894B19">Parse</a><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="kw">uchar</span><span class="other">*</span>&nbsp;<span class="identifier">contentStart</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<span class="kw">uchar</span><span class="other">*</span>&nbsp;<span class="identifier">contentEnd</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<a href="../../System.Base/doc/ns_System.html#typedef_string_B6DB6B2DEFC437FBF697A2E84F7B7771FC1DDEE3">string</a><span class="other">&amp;</span>&nbsp;<span class="identifier">systemId</span><span class="other">,&nbsp;</span><a href="../doc/class_XmlProcessor_43F8A1739D5D942B02033D1C516D8C6DF1EF8319.html">XmlProcessor</a><span class="other">*</span>&nbsp;<span class="identifier">processor</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="24" xml:space="preserve"><span class="lineNumber">24</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="25" xml:space="preserve"><span class="lineNumber">25</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../doc/class_XmlParser_57E6C3062973C902D7D9AABADA17F1524293CA83.html#variable_xmlGrammar_20D96D874650FB62CC083216EE529D42E3AA5AAE">xmlGrammar</a><span class="other">-></span><a href="../doc/class_XmlGrammar_514387B50789C8E470155317F17349CFC3DF6E94.html#member_function_Parse_XmlGrammar_4C1C12CA48F9C75D5C640AB5CE7642DE9E1F2D17">Parse</a><span class="other">(</span><span class="identifier">contentStart</span><span class="other">,&nbsp;</span><span class="identifier">contentEnd</span><span class="other">,&nbsp;</span><span class="number">0</span><span class="other">,&nbsp;</span><span class="identifier">systemId</span><span class="other">,&nbsp;</span><span class="identifier">processor</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="26" xml:space="preserve"><span class="lineNumber">26</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="27" xml:space="preserve"><span class="lineNumber">27</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">private</span>&nbsp;<span class="kw">static</span>&nbsp;<a href="../../System.Base/doc/class_UniquePtr_T_793F841C13E9DD3A6869243C74F1D948C0E04009.html">UniquePtr</a><span class="other">&lt;</span><a href="../doc/class_XmlParser_57E6C3062973C902D7D9AABADA17F1524293CA83.html">XmlParser</a><span class="other">></span>&nbsp;<span class="identifier">instance</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="28" xml:space="preserve"><span class="lineNumber">28</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">private</span>&nbsp;<a href="../doc/class_XmlGrammar_514387B50789C8E470155317F17349CFC3DF6E94.html">XmlGrammar</a><span class="other">*</span>&nbsp;<span class="identifier">xmlGrammar</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="29" xml:space="preserve"><span class="lineNumber">29</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="30" xml:space="preserve"><span class="lineNumber">30</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+  <br/>
+  <span class="code" id="31" xml:space="preserve"><span class="lineNumber">31</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/ns_System.Xml.html#function_ParseXmlFile_7ED565F7B87DFEA8BE61A14E6C0BDB5D473022BC">ParseXmlFile</a><span class="other">(</span><span class="kw">const</span>&nbsp;<a href="../../System.Base/doc/ns_System.html#typedef_string_B6DB6B2DEFC437FBF697A2E84F7B7771FC1DDEE3">string</a><span class="other">&amp;</span>&nbsp;<span class="identifier">xmlFileName</span><span class="other">,&nbsp;</span><a href="../doc/class_XmlContentHandler_7429223FCBE3A541F14FD9475F2099B20E248715.html">XmlContentHandler</a><span class="other">*</span>&nbsp;<span class="identifier">contentHandler</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="32" xml:space="preserve"><span class="lineNumber">32</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="33" xml:space="preserve"><span class="lineNumber">33</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../System.Base/doc/ns_System.html#typedef_string_B6DB6B2DEFC437FBF697A2E84F7B7771FC1DDEE3">string</a>&nbsp;<span class="identifier">xmlContent</span><span class="other">&nbsp;=&nbsp;</span><a href="../../System.Base/doc/class_File_85477685F364D5CA8DD10F980720D3A3446A5D8A.html">File</a><span class="other">.</span><a href="../../System.Base/doc/class_File_85477685F364D5CA8DD10F980720D3A3446A5D8A.html#member_function_ReadAllText_File_BF69423F5ECED3BABCA2932C268CBA63196E46E4">ReadAllText</a><span class="other">(</span><span class="identifier">xmlFileName</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="34" xml:space="preserve"><span class="lineNumber">34</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../doc/ns_System.Xml.html#function_ParseXmlContent_FB317CA5307F6138BFBA2CA2A43B5744FE92B917">ParseXmlContent</a><span class="other">(</span><span class="identifier">xmlContent</span><span class="other">,&nbsp;</span><span class="identifier">xmlFileName</span><span class="other">,&nbsp;</span><span class="identifier">contentHandler</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="35" xml:space="preserve"><span class="lineNumber">35</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="36" xml:space="preserve"><span class="lineNumber">36</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+  <br/>
+  <span class="code" id="37" xml:space="preserve"><span class="lineNumber">37</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/ns_System.Xml.html#function_ParseXmlContent_FB317CA5307F6138BFBA2CA2A43B5744FE92B917">ParseXmlContent</a><span class="other">(</span><span class="kw">const</span>&nbsp;<a href="../../System.Base/doc/ns_System.html#typedef_string_B6DB6B2DEFC437FBF697A2E84F7B7771FC1DDEE3">string</a><span class="other">&amp;</span>&nbsp;<span class="identifier">xmlContent</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<a href="../../System.Base/doc/ns_System.html#typedef_string_B6DB6B2DEFC437FBF697A2E84F7B7771FC1DDEE3">string</a><span class="other">&amp;</span>&nbsp;<span class="identifier">systemId</span><span class="other">,&nbsp;</span><a href="../doc/class_XmlContentHandler_7429223FCBE3A541F14FD9475F2099B20E248715.html">XmlContentHandler</a><span class="other">*</span>&nbsp;<span class="identifier">contentHandler</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="38" xml:space="preserve"><span class="lineNumber">38</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="39" xml:space="preserve"><span class="lineNumber">39</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../doc/ns_System.Xml.html#function_ParseXmlContent_61335068D4F75C1370C9C52E1DDE3F3C6797D054">ParseXmlContent</a><span class="other">(</span><a href="../../System.Base/doc/ns_System.html#function_ToUtf32_0476C1B2C07579259DF76F80D2F2987EA2B8EFDD">ToUtf32</a><span class="other">(</span><span class="identifier">xmlContent</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">systemId</span><span class="other">,&nbsp;</span><span class="identifier">contentHandler</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="40" xml:space="preserve"><span class="lineNumber">40</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="41" xml:space="preserve"><span class="lineNumber">41</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+  <br/>
+  <span class="code" id="42" xml:space="preserve"><span class="lineNumber">42</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/ns_System.Xml.html#function_ParseXmlContent_02CBE0E791587725441F53556A92648D169B81B9">ParseXmlContent</a><span class="other">(</span><span class="kw">const</span>&nbsp;<a href="../../System.Base/doc/ns_System.html#typedef_wstring_EDB6336488DF46A7779AFB4209BAB1DAF59B5DAE">wstring</a><span class="other">&amp;</span>&nbsp;<span class="identifier">xmlContent</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<a href="../../System.Base/doc/ns_System.html#typedef_string_B6DB6B2DEFC437FBF697A2E84F7B7771FC1DDEE3">string</a><span class="other">&amp;</span>&nbsp;<span class="identifier">systemId</span><span class="other">,&nbsp;</span><a href="../doc/class_XmlContentHandler_7429223FCBE3A541F14FD9475F2099B20E248715.html">XmlContentHandler</a><span class="other">*</span>&nbsp;<span class="identifier">contentHandler</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="43" xml:space="preserve"><span class="lineNumber">43</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="44" xml:space="preserve"><span class="lineNumber">44</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../doc/ns_System.Xml.html#function_ParseXmlContent_61335068D4F75C1370C9C52E1DDE3F3C6797D054">ParseXmlContent</a><span class="other">(</span><a href="../../System.Base/doc/ns_System.html#function_ToUtf32_591A6A903DC5D15ED167D4844BC2864FC446614A">ToUtf32</a><span class="other">(</span><span class="identifier">xmlContent</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">systemId</span><span class="other">,&nbsp;</span><span class="identifier">contentHandler</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="45" xml:space="preserve"><span class="lineNumber">45</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="46" xml:space="preserve"><span class="lineNumber">46</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+  <br/>
+  <span class="code" id="47" xml:space="preserve"><span class="lineNumber">47</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/ns_System.Xml.html#function_ParseXmlContent_61335068D4F75C1370C9C52E1DDE3F3C6797D054">ParseXmlContent</a><span class="other">(</span><span class="kw">const</span>&nbsp;<a href="../../System.Base/doc/ns_System.html#typedef_ustring_1750E1C62AAF5897C1F1DA3C5BC4999982AE9B36">ustring</a><span class="other">&amp;</span>&nbsp;<span class="identifier">xmlContent</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<a href="../../System.Base/doc/ns_System.html#typedef_string_B6DB6B2DEFC437FBF697A2E84F7B7771FC1DDEE3">string</a><span class="other">&amp;</span>&nbsp;<span class="identifier">systemId</span><span class="other">,&nbsp;</span><a href="../doc/class_XmlContentHandler_7429223FCBE3A541F14FD9475F2099B20E248715.html">XmlContentHandler</a><span class="other">*</span>&nbsp;<span class="identifier">contentHandler</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="48" xml:space="preserve"><span class="lineNumber">48</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="49" xml:space="preserve"><span class="lineNumber">49</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">uchar</span><span class="other">*</span>&nbsp;<span class="identifier">contentStart</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">xmlContent</span><span class="other">.</span><a href="../../System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html#member_function_Chars_String_CharT_F23E248DC46A5AA9215CDB25B6779E94681FBAB6">Chars</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="50" xml:space="preserve"><span class="lineNumber">50</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">uchar</span><span class="other">*</span>&nbsp;<span class="identifier">contentEnd</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">xmlContent</span><span class="other">.</span><a href="../../System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html#member_function_Chars_String_CharT_F23E248DC46A5AA9215CDB25B6779E94681FBAB6">Chars</a><span class="other">(</span><span class="other">)</span><span class="other">&nbsp;+&nbsp;</span><span class="identifier">xmlContent</span><span class="other">.</span><a href="../../System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html#member_function_Length_String_CharT_5DAD659AF865F217935177758B9A1E040AFCB58F">Length</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="51" xml:space="preserve"><span class="lineNumber">51</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../doc/class_XmlProcessor_43F8A1739D5D942B02033D1C516D8C6DF1EF8319.html">XmlProcessor</a>&nbsp;<span class="identifier">xmlProcessor</span><span class="other">(</span><span class="identifier">contentStart</span><span class="other">,&nbsp;</span><span class="identifier">contentEnd</span><span class="other">,&nbsp;</span><span class="identifier">contentHandler</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="52" xml:space="preserve"><span class="lineNumber">52</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../doc/class_XmlParser_57E6C3062973C902D7D9AABADA17F1524293CA83.html">XmlParser</a><span class="other">.</span><a href="../doc/class_XmlParser_57E6C3062973C902D7D9AABADA17F1524293CA83.html#member_function_Instance_XmlParser_EBE8AA52E4F55503BE22716978C368C130634AD1">Instance</a><span class="other">(</span><span class="other">)</span><span class="other">.</span><a href="../doc/class_XmlParser_57E6C3062973C902D7D9AABADA17F1524293CA83.html#member_function_Parse_XmlParser_210093CFB2FE60223FBC497BD623FAB6EF894B19">Parse</a><span class="other">(</span><span class="identifier">contentStart</span><span class="other">,&nbsp;</span><span class="identifier">contentEnd</span><span class="other">,&nbsp;</span><span class="identifier">systemId</span><span class="other">,&nbsp;</span><span class="other">&amp;</span><span class="identifier">xmlProcessor</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="53" xml:space="preserve"><span class="lineNumber">53</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="54" xml:space="preserve"><span class="lineNumber">54</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+ </body>
+</html>

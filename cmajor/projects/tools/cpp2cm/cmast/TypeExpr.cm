@@ -1,0 +1,64 @@
+using System;
+
+namespace cmast
+{
+    public class ConstNode : UnaryNode
+    {
+        public nothrow ConstNode(Node* child_) : base(child_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+    }
+    
+    public class LvalueRefNode : UnaryNode
+    {
+        public nothrow LvalueRefNode(Node* child_) : base(child_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+    }
+    
+    public class RvalueRefNode : UnaryNode
+    {
+        public nothrow RvalueRefNode(Node* child_) : base(child_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+    }
+    
+    public class PointerNode : UnaryNode
+    {
+        public nothrow PointerNode(Node* child_) : base(child_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+    }
+    
+    public class ArrayNode : UnaryNode
+    {
+        public nothrow ArrayNode(Node* element_, Node* size_) : base(element_), size(size_)
+        {
+            if (!size.IsNull())
+            {
+                size->parent = this;
+            }
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public UniquePtr<Node> size;
+    }
+}

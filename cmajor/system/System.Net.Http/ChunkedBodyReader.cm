@@ -1,0 +1,185 @@
+// =================================
+// Copyright (c) 2019 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.IO;
+using System.Collections;
+using System.Concepts;
+
+namespace System.Net.Http
+{
+    public class ChunkExtensionAdder
+    {
+        public ChunkExtensionAdder(Map<ustring, ustring>& chunkExtensions_) : chunkExtensions(chunkExtensions_)
+        {
+        }
+        public void AddChunkExtension(const ustring& chunkExtName, const ustring& chunkExtVal)
+        {
+            chunkExtensions[chunkExtName] = chunkExtVal;
+        }
+        private Map<ustring, ustring>& chunkExtensions;
+    }
+    
+    public void ReadCRLF(ByteStream& stream)
+    {
+        int x = stream.ReadByte();
+        if (x != 13)
+        {
+            throw Exception("CR expected");
+        }
+        x = stream.ReadByte();
+        if (x != 10)
+        {
+            throw Exception("LF expected");
+        }        
+    }
+    
+    public ulong ReadChunkHeader(ByteStream& stream, Map<ustring, ustring>& chunkExtensions)
+    {
+        string s;
+        int x = stream.ReadByte();
+        int state = 0;
+        while (x != -1)
+        {
+            byte b = cast<byte>(x);
+            switch (state)
+            {
+                case 0:
+                {
+                    if (b == 13u)
+                    {
+                        state = 1;
+                    }
+                    else
+                    {
+                        s.Append(cast<char>(b));
+                    }
+                    break;
+                }
+                case 1:
+                {
+                    if (b == 10u)
+                    {
+                        ulong chunkSize = 0u;
+                        ChunkExtensionAdder adder(chunkExtensions);
+                        HttpParser.Instance().ParseChunkHeader(ToUtf32(s), &chunkSize, &adder);
+                        return chunkSize;
+                    }
+                    else if (b != 13u)
+                    {
+                        state = 0;
+                    }
+                    break;
+                }
+            }
+            x = stream.ReadByte();
+        }
+        throw HttpException(HttpStatus(u"HTTP/1.1", statusClientErrorBadRequest, u"invalid HTTP message"));
+    }
+    
+    public void ReadTrailer(ByteStream& stream, List<HttpHeader>& trailer)
+    {
+        string line;
+        int x = stream.ReadByte();
+        int state = 0;
+        while (x != -1)
+        {
+            byte b = cast<byte>(x);
+            switch (state)
+            {
+                case 0:
+                {
+                    if (b == 13u)
+                    {
+                        state = 1;
+                    }
+                    else
+                    {
+                        line.Append(cast<char>(b));
+                        state = 2;
+                    }
+                    break;
+                }
+                case 1:
+                {
+                    if (b == 10u)
+                    {
+                        return;
+                    }
+                    else if (b != 13u)
+                    {
+                        line.Append(cast<char>(13));
+                        line.Append(cast<char>(b));
+                        state = 2;
+                    }
+                    break;
+                }
+                case 2:
+                {
+                    if (b == 13u)
+                    {
+                        state = 3;
+                    }
+                    else 
+                    {
+                        line.Append(cast<char>(b));
+                    }
+                    break;
+                }
+                case 3:
+                {
+                    if (b == 10u)
+                    {
+                        if (!line.IsEmpty())
+                        {
+                            HttpHeader header = HttpParser.Instance().ParseHeader(ToUtf32(line));
+                            trailer.Add(header);
+                            line.Clear();
+                        }
+                        state = 0;
+                    }
+                    else if (b != 13u)
+                    {
+                        line.Append(cast<char>(13));
+                        line.Append(cast<char>(b));
+                        state = 2;
+                    }
+                    else
+                    {
+                        line.Append(cast<char>(13));
+                    }
+                    break;
+                }
+            }
+            x = stream.ReadByte();
+        }
+        throw HttpException(HttpStatus(u"HTTP/1.1", statusClientErrorBadRequest, u"invalid HTTP message"));
+    }
+    
+    public SharedPtr<ByteStream> ReadChunkedBody(ByteStream& stream, List<HttpHeader>& trailer)
+    {
+        SharedPtr<ByteStream> resultStream(new BufferedByteStream(SharedPtr<ByteStream>(new MemoryByteStream())));
+        Map<ustring, ustring> firstChunkExtensions;
+        ulong chunkSize = ReadChunkHeader(stream, firstChunkExtensions);
+        while (chunkSize != 0u)
+        {
+            for (ulong i = 0u; i < chunkSize; ++i)
+            {
+                int x = stream.ReadByte();
+                if (x == -1)
+                {
+                    throw Exception("unexpected end of stream");
+                }
+                byte b = cast<byte>(x);
+                resultStream->Write(b);
+            }
+            ReadCRLF(stream);
+            Map<ustring, ustring> nextChunkExtensions;
+            chunkSize = ReadChunkHeader(stream, nextChunkExtensions);
+        }
+        ReadTrailer(stream, trailer);
+        return resultStream;
+    }
+}

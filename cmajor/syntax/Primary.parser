@@ -1,0 +1,90 @@
+// =================================
+// Copyright (c) 2019 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+[hpp]#include <cmajor/parsing/Parser.hpp>
+[hpp]#include <cmajor/parsing/Scope.hpp>
+[cpp]#include <cmajor/code/Expression.hpp>
+[cpp]#include <cmajor/code/Statement.hpp>
+[cpp]#include <cmajor/syntax/Primitive.hpp>
+[cpp]#include <cmajor/syntax/Composite.hpp>
+[cpp]#include <cmajor/syntax/Element.hpp>
+[cpp]#include <cmajor/parsing/Nonterminal.hpp>
+[cpp]#include <cmajor/codedom/Statement.hpp>
+
+namespace cmajor.syntax
+{
+    [cpp]using namespace cmajor::code;
+
+    grammar Primary
+    {
+        using Primitive.Primitive;
+        using Element.Identifier;
+        using Composite.Alternative;
+        using cmajor.code.Expression.ExpressionList;
+        using cmajor.code.Statement.CompoundStatement;
+
+        Primary(cmajor::parsing::Scope* enclosingScope): cmajor::parsing::Parser*
+                    ::=
+                    (   RuleCall{ value = RuleCall; }
+                    |   Primitive{ value = Primitive; }
+                    |   Grouping(enclosingScope){ value = Grouping; }
+                    |   Token(enclosingScope){ value = Token; }
+                    )
+                    (Expectation(value){ value = Expectation; })?
+                    (Action(value){ value = Action; })?
+                    ;
+
+        RuleCall: cmajor::parsing::Parser*
+                    ::= ((token(Nonterminal:ntWithArgs '(') ExpressionList ')' | Nonterminal:nt) Alias?)
+                    {
+                        std::u32string ruleName;
+                        if (!ntWithArgs.empty())
+                        {
+                            ruleName = ntWithArgs;
+                        }
+                        else
+                        {
+                            ruleName = nt;
+                        }
+                        std::u32string alias = Alias;
+                        std::u32string name = !alias.empty() ? alias : ruleName;
+                        NonterminalParser* parser(new NonterminalParser(name, ruleName));
+                        parser->SetSpan(span);
+                        if (!ExpressionList.empty())
+                        {
+                            parser->SetArguments(ExpressionList); 
+                        }
+                        value = parser;
+                    }
+                    ;
+
+        Nonterminal: std::u32string 
+                    ::= Identifier{ value = Identifier; }
+                    ;
+
+        Alias: std::u32string
+                    ::= ':' Identifier!{ value = Identifier; }
+                    ;
+
+        Grouping(cmajor::parsing::Scope* enclosingScope): cmajor::parsing::Parser*
+                    ::= '(' Alternative(enclosingScope)! ')'!{ value = new GroupingParser(Alternative); }
+                    ;
+
+        Token(cmajor::parsing::Scope* enclosingScope): cmajor::parsing::Parser*
+                    ::= keyword("token") '('! Alternative(enclosingScope)! ')'!{ value = new TokenParser(Alternative); }
+                    ;
+
+        Expectation(cmajor::parsing::Parser* child): cmajor::parsing::Parser* 
+                    ::= '!'{ value = new ExpectationParser(child); }
+                    ;
+
+        Action(cmajor::parsing::Parser* child): cmajor::parsing::Parser*
+                    ::= (CompoundStatement:action ('/' CompoundStatement:failureAction)?)
+                    {
+                        value = new ActionParser(U"", action, failureAction, child);
+                    }
+                    ;
+    }
+}

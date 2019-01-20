@@ -1,0 +1,171 @@
+// =================================
+// Copyright (c) 2019 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.IO;
+using System.Collections;
+
+namespace System.Net.Http
+{
+    public HttpStatus ReadStartOfMessage(ByteStream& stream, HttpHeaderCollection& headers, StreamWriter* log)
+    {
+        ustring statusLine = ReadStartOfMessageWithStatus(stream, headers, log);
+        return HttpParser.Instance().ParseStatus(statusLine);
+    }
+    
+    public ustring ReadStartOfMessageWithStatus(ByteStream& stream, HttpHeaderCollection& headers, StreamWriter* log)
+    {
+        if (log != null)
+        {
+            log->WriteLine("RESPONSE:");
+        }
+        bool firstLine = true;
+        ustring startLine;
+        int state = 0;
+        int x = stream.ReadByte();
+        ustring line;
+        while (x != -1)
+        {
+            byte c = cast<byte>(x);
+            switch (state)
+            {
+                case 0:
+                {
+                    if (c == 13u)
+                    {
+                        state = 1;
+                    }
+                    else
+                    {
+                        line.Append(cast<uchar>(c));
+                        state = 2;
+                    }
+                    break;
+                }
+                case 1:
+                {
+                    if (c == 10u)
+                    {
+                        state = 0;
+                    }
+                    else if (c != 13u)
+                    {
+                        line.Append(cast<uchar>(c));
+                        state = 2;
+                    }
+                    break;
+                }
+                case 2:
+                {
+                    if (c == 13u)
+                    {
+                        state = 3;
+                    }
+                    else
+                    {
+                        line.Append(cast<uchar>(c));
+                    }
+                    break;
+                }
+                case 3:
+                {
+                    if (c == 10u)
+                    {
+                        if (log != null)
+                        {
+                            log->WriteLine(line);
+                        }
+                        if (firstLine)
+                        {
+                            firstLine = false;
+                            startLine = Rvalue(line);
+                        }
+                        else
+                        {
+                            HttpHeader hdr = HttpParser.Instance().ParseHeader(line);
+                            headers.Add(UniquePtr<HttpHeader>(new HttpHeader(hdr)));
+                        }
+                        line.Clear();
+                        state = 4;
+                    }
+                    else if (c == 13u)
+                    {
+                        line.Append(cast<uchar>(13));
+                        line.Append(cast<uchar>(13));
+                        state = 5;
+                    }
+                    else
+                    {
+                        state = 2;
+                        line.Append(cast<uchar>(13));
+                        line.Append(cast<uchar>(c));
+                    }
+                    break;
+                }
+                case 4:
+                {
+                    if (c == 13u)
+                    {
+                        state = 6;
+                    }
+                    else
+                    {
+                        line.Append(cast<uchar>(c));
+                        state = 2;
+                    }
+                    break;
+                }
+                case 5:
+                {
+                    if (c == 13u)
+                    {
+                        line.Append(cast<uchar>(13));
+                    }
+                    else if (c == 10u)
+                    {
+                        if (log != null)
+                        {
+                            log->WriteLine(line);
+                        }
+                        if (firstLine)
+                        {
+                            firstLine = false;
+                            startLine = Rvalue(line);
+                        }
+                        else
+                        {
+                            HttpHeader hdr = HttpParser.Instance().ParseHeader(line);
+                            headers.Add(UniquePtr<HttpHeader>(new HttpHeader(hdr)));
+                        }
+                        line.Clear();
+                        state = 4;
+                    }
+                    else
+                    {
+                        line.Append(cast<uchar>(c));
+                        state = 2;
+                    }
+                    break;
+                }
+                case 6:
+                {
+                    if (c == 10u)
+                    {
+                        return startLine;
+                    }
+                    else
+                    {
+                        line.Append(cast<uchar>(13));
+                        line.Append(cast<uchar>(c));
+                        state = 2;
+                    }
+                    break;
+                }
+            }
+            x = stream.ReadByte();
+        }
+        throw HttpException(HttpStatus(u"HTTP/1.1", statusClientErrorBadRequest, u"invalid HTTP message"));
+    }
+}

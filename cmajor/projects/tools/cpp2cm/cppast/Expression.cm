@@ -1,0 +1,360 @@
+using System;
+using System.Collections;
+using Span = System.Text.Parsing.Span;
+
+namespace cppast
+{
+    public class BinaryExpressionNode : BinaryNode
+    {
+        public nothrow BinaryExpressionNode(const Span& span_, Node* left_, Node* right_, Operator op_) : base(span_, left_, right_), op(op_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public Operator op;
+    }
+    
+    public class UnaryExpressionNode : UnaryNode
+    {
+        public nothrow UnaryExpressionNode(const Span& span_, Node* child_, Operator op_) : base(span_, child_), op(op_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public Operator op;
+    }
+
+    public class ExpressionListNode : CompositeNode<Node>
+    {
+        public nothrow ExpressionListNode(const Span& span_) : base(span_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+    }
+        
+    public class ConditionalExpressionNode : Node
+    {
+        public nothrow ConditionalExpressionNode(const Span& span_, Node* expr_, Node* thenExpr_, Node* elseExpr_) : base(span_), expr(expr_), thenExpr(thenExpr_), elseExpr(elseExpr_)
+        {
+            expr->parent = this;
+            thenExpr->parent = this;
+            elseExpr->parent = this;
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public UniquePtr<Node> expr;
+        public UniquePtr<Node> thenExpr;
+        public UniquePtr<Node> elseExpr;
+    }
+    
+    public class ThrowExpressionNode : UnaryNode
+    {
+        public nothrow ThrowExpressionNode(const Span& span_, Node* expr_) : base(span_, expr_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+    }
+    
+    public class CastExpressionNode : BinaryNode
+    {
+        public nothrow CastExpressionNode(const Span& span_, Node* typeExpr_, Node* expr_) : base(span_, typeExpr_, expr_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+    }
+    
+    public class PrefixIncrementNode : UnaryNode
+    {
+        public nothrow PrefixIncrementNode(const Span& span_, Node* expr_) : base(span_, expr_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+    }
+    
+    public class PrefixDecrementNode : UnaryNode
+    {
+        public nothrow PrefixDecrementNode(const Span& span_, Node* expr_) : base(span_, expr_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+    }
+    
+    public class SizeOfExpressionNode : UnaryNode
+    {
+        public nothrow SizeOfExpressionNode(const Span& span_, Node* expr_) : base(span_, expr_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+    }
+    
+    public class AlignOfExpressionNode : UnaryNode
+    {
+        public nothrow AlignOfExpressionNode(const Span& span_, Node* typeExpr_) : base(span_, typeExpr_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+    }
+    
+    public class NewExpressionNode : Node
+    {
+        public nothrow NewExpressionNode(const Span& span_, ExpressionListNode* placement_, Node* typeExpr_, Node* initializer_) :
+            base(span_), placement(placement_), typeExpr(typeExpr_), initializer(initializer_)
+        {
+            if (!placement.IsNull())
+            {
+                placement->parent = this;
+            }
+            typeExpr->parent = this;
+            if (!initializer.IsNull())
+            {
+                initializer->parent = this;
+            }
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public UniquePtr<ExpressionListNode> placement;
+        public UniquePtr<Node> typeExpr;
+        public UniquePtr<Node> initializer;
+    }
+    
+    public class DeleteExpressionNode : UnaryNode
+    {
+        public nothrow DeleteExpressionNode(const Span& span_, Node* ptr_, bool arrayDelete_) : base(span_, ptr_), arrayDelete(arrayDelete_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public bool arrayDelete;
+    }
+    
+    public class SubscriptExpressionNode : BinaryNode
+    {
+        public nothrow SubscriptExpressionNode(const Span& span_, Node* subject_, Node* subscript_) : base(span_, subject_, subscript_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+    }
+    
+    public class InvokeExpressionNode : UnaryNode
+    {
+        public nothrow InvokeExpressionNode(const Span& span_, Node* subject_, Node* args_) : base(span_, subject_), args(args_)
+        {
+            if (!args.IsNull())
+            {
+                args->parent = this;
+            }
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public UniquePtr<Node> args;
+    }
+    
+    public class PostfixIncrementNode : UnaryNode
+    {
+        public nothrow PostfixIncrementNode(const Span& span_, Node* expr_) : base(span_, expr_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+    }
+    
+    public class PostfixDecrementNode : UnaryNode
+    {
+        public nothrow PostfixDecrementNode(const Span& span_, Node* expr_) : base(span_, expr_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+    }
+    
+    public class AssignCapture : Node
+    {
+        public nothrow AssignCapture(const Span& span_) : base(span_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+    }
+    
+    public class RefCapture : Node
+    {
+        public nothrow RefCapture(const Span& span_) : base(span_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+    }
+    
+    public class IdentifierCapture : UnaryNode
+    {
+        public nothrow IdentifierCapture(const Span& span_, IdentifierNode* id_) : base(span_, id_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+    }
+    
+    public class ThisCapture : Node
+    {
+        public nothrow ThisCapture(const Span& span_) : base(span_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+    }
+    
+    public class LambdaExpressionNode : Node
+    {
+        public nothrow LambdaExpressionNode(const Span& span_) : base(span_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public void AddCapture(Node* capture)
+        {
+            capture->parent = this;
+            captures.Add(UniquePtr<Node>(capture));
+        }
+        public void SetParameters(ParameterListNode* parameters_)
+        {
+            parameters = UniquePtr<ParameterListNode>(parameters_);
+            parameters->parent = this;
+        }
+        public void SetBody(CompoundStatementNode* body_)
+        {
+            body = UniquePtr<CompoundStatementNode>(body_);
+            body->parent = this;
+        }
+        public List<UniquePtr<Node>> captures;
+        public UniquePtr<ParameterListNode> parameters;
+        public UniquePtr<CompoundStatementNode> body;
+    }
+    
+    public class ParenthesizedExpressionNode : UnaryNode
+    {
+        public nothrow ParenthesizedExpressionNode(const Span& span_, Node* child_) : base(span_, child_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+    }
+    
+    public class ThisNode : Node
+    {
+        public nothrow ThisNode(const Span& span_) : base(span_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+    }
+    
+    public enum CppCast
+    {
+        dynamicCast, staticCast, reinterpretCast, constCast
+    }
+    
+    public nothrow ustring CppCastStr(CppCast cast_)
+    {
+        switch (cast_)
+        {
+            case CppCast.dynamicCast: return u"dynamic_cast";
+            case CppCast.staticCast: return u"static_cast";
+            case CppCast.reinterpretCast: return u"reinterpret_cast";
+            case CppCast.constCast: return u"const_cast";
+        }
+        return u"CAST";
+    }
+    
+    public class CppCastNode : Node
+    {
+        public nothrow CppCastNode(const Span& span_, CppCast cast__, Node* typeExpr_, Node* expr_) : base(span_), cast_(cast__), typeExpr(typeExpr_), expr(expr_)
+        {
+            typeExpr->parent = this;
+            expr->parent = this;
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public CppCast cast_;
+        public UniquePtr<Node> typeExpr;
+        public UniquePtr<Node> expr;
+    }
+    
+    public class TypeIdNode : UnaryNode
+    {
+        public nothrow TypeIdNode(const Span& span_, Node* child_) : base(span_, child_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+    }
+    
+    public class DefinedNode : Node
+    {
+        public nothrow DefinedNode(const Span& span_, const ustring& identifier_) : base(span_), identifier(identifier_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public ustring identifier;
+    }
+}

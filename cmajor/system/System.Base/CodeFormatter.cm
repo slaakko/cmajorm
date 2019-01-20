@@ -1,0 +1,113 @@
+// =================================
+// Copyright (c) 2019 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.IO;
+
+namespace System.Text
+{
+    public class CodeFormatter
+    {
+        public nothrow CodeFormatter(StreamWriter& writer_) : 
+            writer(writer_), indent(0), indentSize(4), atBeginningOfLine(true), line(1), start(false), startText(), preserveSpace(false)
+        {
+        }
+        public void Write(const string& text)
+        {
+            if (atBeginningOfLine)
+            {
+                if (indent != 0)
+                {
+                    writer.Write(string(' ', indentSize * indent));
+                    atBeginningOfLine = false;
+                }
+            }
+            writer.Write(text);
+        }
+        public void WriteLine(const string& text)
+        {
+            Write(text);
+            WriteLine();
+        }
+        public void WriteLine()
+        {
+            writer.WriteLine();
+            atBeginningOfLine = true;
+            ++line;
+        }
+        public inline nothrow int Indent() const
+        {
+            return indent;
+        }
+        public inline nothrow void IncIndent()
+        {
+            ++indent;
+        }
+        public inline nothrow void DecIndent()
+        {
+            --indent;
+        }
+        public inline nothrow int IndentSize() const
+        {
+            return indentSize;
+        }
+        public inline nothrow void SetIndentSize(int indentSize_)
+        {
+            indentSize = indentSize_;
+        }
+        public inline nothrow int CurrentIndent() const
+        {
+            return indent * indentSize;
+        }
+        public inline nothrow bool AtBeginningOfLine() const
+        {
+            return atBeginningOfLine;
+        }
+        public inline nothrow int Line() const
+        {
+            return line;
+        }
+        public inline nothrow void SetLine(int line_)
+        {
+            line = line_;
+        }
+        public inline nothrow bool Start() const
+        {
+            return start;
+        }
+        public inline nothrow void SetStart(bool start_)
+        {
+            start = start_;
+        }
+        public inline nothrow const string& StartText() const
+        {
+            return startText;
+        }
+        public nothrow void SetStartText(const string& startText_)
+        {
+            startText = startText_;
+        }
+        public inline nothrow StreamWriter& Writer()
+        {
+            return writer;
+        }           
+        public nothrow inline bool PreserveSpace() const 
+        { 
+            return preserveSpace; 
+        }
+        public nothrow inline void SetPreserveSpace(bool preserveSpace_) 
+        { 
+            preserveSpace = preserveSpace_; 
+        }
+        private StreamWriter& writer;
+        private int indent;
+        private int indentSize;
+        private bool atBeginningOfLine;
+        private int line;
+        private bool start;
+        private string startText;
+        private bool preserveSpace;
+    }
+}

@@ -1,0 +1,300 @@
+using System.Text.Parsing.CodeDom;
+
+namespace Code
+{
+    grammar ExpressionGrammar
+    {
+        using LiteralGrammar.Literal;
+        using BasicTypeGrammar.BasicType;
+        using IdentifierGrammar.Identifier;
+        using IdentifierGrammar.TemplateId;
+        using TypeExprGrammar.TypeExpr;
+
+        Expression(ParsingContext* ctx) : DomObject*
+            ::= Disjunction(ctx){ value = Disjunction; }
+            ;
+
+        Disjunction(ParsingContext* ctx, var UniquePtr<DomObject> expr) : DomObject*
+            ::=
+            (   Conjunction(ctx):left{ expr.Reset(left); }
+                (   "||"{ if (ctx->ParsingLvalue() || ctx->ParsingExpressionStatement() && !ctx->ParsingArguments()) pass = false; }
+                    Conjunction(ctx):right{ expr.Reset(new Disjunction(expr.Release(), right)); }
+                )*
+            )
+            {
+                value = expr.Release();
+            }
+            ;
+
+        Conjunction(ParsingContext* ctx, var UniquePtr<DomObject> expr) : DomObject*
+            ::=
+            (   BitOr(ctx):left{ expr.Reset(left); }
+                (   "&&"{ if (ctx->ParsingLvalue() || ctx->ParsingExpressionStatement() && !ctx->ParsingArguments()) pass = false; }
+                    BitOr(ctx):right{ expr.Reset(new Conjunction(expr.Release(), right)); }
+                )*
+            )
+            {
+                value = expr.Release();
+            }
+            ;
+
+        BitOr(ParsingContext* ctx, var UniquePtr<DomObject> expr) : DomObject*
+            ::=
+            (   BitXor(ctx):left{ expr.Reset(left); }
+                (   ('|' - "||"){ if (ctx->ParsingLvalue() || ctx->ParsingExpressionStatement() && !ctx->ParsingArguments()) pass = false; }
+                    BitXor(ctx):right{ expr.Reset(new System.Text.Parsing.CodeDom.BitOr(expr.Release(), right)); }
+                )*
+            )
+            {
+                value = expr.Release();
+            }
+            ;
+
+        BitXor(ParsingContext* ctx, var UniquePtr<DomObject> expr) : DomObject*
+            ::=
+            (   BitAnd(ctx):left{ expr.Reset(left); }
+                (   '^'{ if (ctx->ParsingLvalue() || ctx->ParsingExpressionStatement() && !ctx->ParsingArguments()) pass = false; }
+                    BitAnd(ctx):right{ expr.Reset(new System.Text.Parsing.CodeDom.BitXor(expr.Release(), right)); }
+                )*
+            )
+            {
+                value = expr.Release();
+            }
+            ;
+
+        BitAnd(ParsingContext* ctx, var UniquePtr<DomObject> expr) : DomObject*
+            ::=
+            (   Equality(ctx):left{ expr.Reset(left); }
+                (   ('&' - "&&"){ if (ctx->ParsingLvalue() || ctx->ParsingExpressionStatement() && !ctx->ParsingArguments()) pass = false; }
+                    Equality(ctx):right{ expr.Reset(new System.Text.Parsing.CodeDom.BitAnd(expr.Release(), right)); }
+                )*
+            )
+            {
+                value = expr.Release();
+            }
+            ;
+
+        Equality(ParsingContext* ctx, var UniquePtr<DomObject> expr, var Operator op) : DomObject*
+            ::=
+            (
+                Relational(ctx):left{ expr.Reset(left); }
+                (
+                    (   "=="{ if (ctx->ParsingLvalue() || ctx->ParsingExpressionStatement() && !ctx->ParsingArguments()) pass = false; else op = Operator.equal; }
+                    |   "!="{ if (ctx->ParsingLvalue() || ctx->ParsingExpressionStatement() && !ctx->ParsingArguments()) pass = false; else op = Operator.notEqual; }
+                    )
+                    Relational(ctx):right!
+                    {
+                        switch (op)
+                        {
+                            case Operator.equal: expr.Reset(new System.Text.Parsing.CodeDom.Equal(expr.Release(), right)); break;
+                            case Operator.notEqual: expr.Reset(new System.Text.Parsing.CodeDom.NotEqual(expr.Release(), right)); break;
+                        }
+                    }
+                )*
+            )
+            {
+                value = expr.Release();
+            }
+            ;
+
+        Relational(ParsingContext* ctx, var UniquePtr<DomObject> expr, var Operator op) : DomObject*
+            ::=
+            (
+                Shift(ctx):left{ expr.Reset(left); }
+                (
+                    (   "<="{ if (ctx->ParsingLvalue() || ctx->ParsingExpressionStatement() && !ctx->ParsingArguments()) pass = false; else { op = Operator.lessOrEqual; ctx->PushParsingIsOrAs(false); } }
+                    |   ">="{ if (ctx->ParsingLvalue() || ctx->ParsingExpressionStatement() && !ctx->ParsingArguments()) pass = false; else { op = Operator.greaterOrEqual; ctx->PushParsingIsOrAs(false); } }
+                    |   ('<' - "<<"){ if (ctx->ParsingLvalue() || ctx->ParsingExpressionStatement() && !ctx->ParsingArguments()) pass = false; else { op = Operator.less; ctx->PushParsingIsOrAs(false); } }
+                    |   ('>' - ">>"){ if (ctx->ParsingLvalue() || ctx->ParsingExpressionStatement() && !ctx->ParsingArguments()) pass = false; else { op = Operator.greater; ctx->PushParsingIsOrAs(false); } }
+                    |   (keyword("is"){ if (ctx->ParsingLvalue() || ctx->ParsingExpressionStatement() && !ctx->ParsingArguments()) pass = false; else { op = Operator.is_; ctx->PushParsingIsOrAs(true); } }
+                        TypeExpr(ctx):isType)
+                    |   (keyword("as"){ if (ctx->ParsingLvalue() || ctx->ParsingExpressionStatement() && !ctx->ParsingArguments()) pass = false; else { op = Operator.as_; ctx->PushParsingIsOrAs(true); } }
+                        TypeExpr(ctx):asType)
+                    )
+                    (Shift(ctx):right | empty{ if (!ctx->ParsingIsOrAs()) pass = false; })
+                    {
+                        ctx->PopParsingIsOrAs();
+                        switch (op)
+                        {
+                            case Operator.lessOrEqual: expr.Reset(new System.Text.Parsing.CodeDom.LessOrEqual(expr.Release(), right)); break;
+                            case Operator.greaterOrEqual: expr.Reset(new System.Text.Parsing.CodeDom.GreaterOrEqual(expr.Release(), right)); break;
+                            case Operator.less: expr.Reset(new System.Text.Parsing.CodeDom.Less(expr.Release(), right)); break;
+                            case Operator.greater: expr.Reset(new System.Text.Parsing.CodeDom.Greater(expr.Release(), right)); break;
+                            case Operator.is_: expr.Reset(new Is(expr.Release(), isType)); break;
+                            case Operator.as_: expr.Reset(new As(expr.Release(), asType)); break;
+                        }
+                    }
+                )*
+            )
+            {
+                value = expr.Release();
+            }
+            ;
+
+        Shift(ParsingContext* ctx, var UniquePtr<DomObject> expr, var Operator op) : DomObject*
+            ::=
+            (   Additive(ctx):left{ expr.Reset(left); }
+                (
+                    (   "<<"{ if (ctx->ParsingLvalue()) pass = false; else op = Operator.shiftLeft; }
+                    |   ">>"{ if (ctx->ParsingLvalue()) pass = false; else op = Operator.shiftRight; }
+                    )
+                    empty{ ctx->PushParsingArguments(true); }
+                    Additive(ctx):right!
+                    {
+                        switch (op)
+                        {
+                            case Operator.shiftLeft: expr.Reset(new System.Text.Parsing.CodeDom.ShiftLeft(expr.Release(), right)); break;
+                            case Operator.shiftRight: expr.Reset(new System.Text.Parsing.CodeDom.ShiftRight(expr.Release(), right)); break;
+                        }
+                        ctx->PopParsingArguments();
+                    }
+                    /
+                    {
+                        ctx->PopParsingArguments();
+                    }
+                )*
+            )
+            {
+                value = expr.Release();
+            }
+            ;
+
+        Additive(ParsingContext* ctx, var UniquePtr<DomObject> expr, var Operator op) : DomObject*
+            ::=
+            (   Multiplicative(ctx):left{ expr.Reset(left); }
+                (
+                    (   ('+' - "++"){ if (ctx->ParsingLvalue() || ctx->ParsingExpressionStatement() && !ctx->ParsingArguments()) pass = false; else op = Operator.add; }
+                    |   ('-' - "--"){ if (ctx->ParsingLvalue() || ctx->ParsingExpressionStatement() && !ctx->ParsingArguments()) pass = false; else op = Operator.sub; }
+                    )
+                    Multiplicative(ctx):right!
+                    {
+                        switch (op)
+                        {
+                            case Operator.add: expr.Reset(new Add(expr.Release(), right)); break;
+                            case Operator.sub: expr.Reset(new Sub(expr.Release(), right)); break;
+                        }
+                    }
+                )*
+            )
+            {
+                value = expr.Release();
+            }
+            ;
+
+        Multiplicative(ParsingContext* ctx, var UniquePtr<DomObject> expr, var Operator op) : DomObject*
+            ::=
+            (   Prefix(ctx):left{ expr.Reset(left); }
+                (
+                    (   '*'{ if (ctx->ParsingLvalue() || ctx->ParsingExpressionStatement() && !ctx->ParsingArguments()) pass = false; else op = Operator.mul; }
+                    |   '/'{ if (ctx->ParsingLvalue() || ctx->ParsingExpressionStatement() && !ctx->ParsingArguments()) pass = false; else op = Operator.div; }
+                    |   '%'{ if (ctx->ParsingLvalue() || ctx->ParsingExpressionStatement() && !ctx->ParsingArguments()) pass = false; else op = Operator.rem; }
+                    )
+                    Prefix(ctx):right!
+                    {
+                        switch (op)
+                        {
+                            case Operator.mul: expr.Reset(new Mul(expr.Release(), right)); break;
+                            case Operator.div: expr.Reset(new Div(expr.Release(), right)); break;
+                            case Operator.rem: expr.Reset(new Rem(expr.Release(), right)); break;
+                        }
+                    }
+                )*
+            )
+            {
+                value = expr.Release();
+            }
+            ;
+
+        Prefix(ParsingContext* ctx, var Operator op) : DomObject*
+            ::= (
+                    (   "++"{ op = Operator.increment; }
+                    |   "--"{ op = Operator.decrement; }
+                    |   '-'{ if (ctx->ParsingExpressionStatement() && !ctx->ParsingArguments()) pass = false; else op = Operator.unaryMinus; }
+                    |   '+'{ if (ctx->ParsingExpressionStatement() && !ctx->ParsingArguments()) pass = false; else op = Operator.unaryPlus; }
+                    |   ('!' - "!="){ if (ctx->ParsingExpressionStatement() && !ctx->ParsingArguments()) pass = false; else op = Operator.not_; }
+                    |   '~'{ if (ctx->ParsingExpressionStatement() && !ctx->ParsingArguments()) pass = false; else op = Operator.complement; }
+                    |   '*'{ if (ctx->ParsingExpressionStatement() && !ctx->ParsingArguments()) pass = false; else op = Operator.deref; }
+                    |   ('&' - "&&"){ if (ctx->ParsingExpressionStatement() && !ctx->ParsingArguments()) pass = false; else op = Operator.addressOf; }
+                    )
+                    Prefix(ctx):prefix
+                    {
+                        switch (op)
+                        {
+                            case Operator.increment: value = new PrefixIncrement(prefix); break;
+                            case Operator.decrement: value = new PrefixDecrement(prefix); break;
+                            case Operator.unaryMinus: value = new UnaryMinus(prefix); break;
+                            case Operator.unaryPlus: value = new UnaryPlus(prefix); break;
+                            case Operator.not_: value = new Not(prefix); break;
+                            case Operator.complement: value = new Complement(prefix); break;
+                            case Operator.deref: value = new Deref(prefix); break;
+                            case Operator.addressOf: value = new AddressOf(prefix); break;
+                        }
+                    }
+                )
+                |   Postfix(ctx){ value = Postfix; }
+            ;
+
+        Postfix(ParsingContext* ctx, var UniquePtr<Identifier> id, var UniquePtr<DomObject> expr) : DomObject*
+            ::=
+            (
+                Primary(ctx){ expr.Reset(Primary); }
+                (   "++"{ expr.Reset(new PostfixIncrement(expr.Release())); }
+                |   "--"{ expr.Reset(new PostfixDecrement(expr.Release())); }
+                |   '.' Identifier:dotMemberId{ id.Reset(dotMemberId); expr.Reset(new Dot(expr.Release(), dotMemberId->Name())); }
+                |   "->" Identifier:arrowMemberId{ id.Reset(arrowMemberId); expr.Reset(new Arrow(expr.Release(), arrowMemberId->Name())); }
+                |   ('['{ ctx->PushParsingLvalue(false); ctx->PushParsingExpressionStatement(false); }
+                        Expression(ctx):index{ ctx->PopParsingLvalue(); ctx->PopParsingExpressionStatement(); } / { ctx->PopParsingLvalue(); ctx->PopParsingExpressionStatement(); }
+                     ']'!){ expr.Reset(new Indexing(expr.Release(), index)); }
+                |   ('('{ expr.Reset(new Invoke(expr.Release())); } ArgumentList(ctx, expr.Get()) ')'!)
+                )*
+            )
+            {
+                value = expr.Release();
+            }
+            ;
+
+        Primary(ParsingContext* ctx) : DomObject*
+            ::= ('(' Expression(ctx) ')'){ value = Expression; }
+            |   Literal{ value = Literal; }
+            |   BasicType{ value = BasicType; }
+            |   TemplateId(ctx){ value = TemplateId; }
+            |   Identifier{ value = Identifier; }
+            |   keyword("this"){ value = new This(); }
+            |   keyword("base"){ value = new Base(); }
+            |   SizeOfExpr(ctx){ value = SizeOfExpr; }
+            |   TypeNameExpr(ctx){ value = TypeNameExpr; }
+            |   CastExpr(ctx){ value = CastExpr; }
+            |   ConstructExpr(ctx){ value = ConstructExpr; }
+            |   NewExpr(ctx){ value = NewExpr; }
+            ;
+
+        SizeOfExpr(ParsingContext* ctx) : DomObject*
+            ::= (keyword("sizeof") '('! Expression(ctx)! ')'!){ value = new SizeOf(Expression); }
+            ;
+
+        TypeNameExpr(ParsingContext* ctx) : DomObject*
+            ::= (keyword("typename") '('! Expression(ctx)! ')'!){ value = new TypeName(Expression); }
+            ;
+
+        CastExpr(ParsingContext* ctx) : DomObject*
+            ::= (keyword("cast") '<'! TypeExpr(ctx)! '>'! '('! Expression(ctx)! ')'!){ value = new Cast(TypeExpr, Expression); }
+            ;
+
+        ConstructExpr(ParsingContext* ctx) : DomObject*
+            ::= keyword("construct") '<'! TypeExpr(ctx)!{ value = new Construct(TypeExpr); } '>'! '('! ExpressionList(ctx, value)! ')'!
+            ;
+
+        NewExpr(ParsingContext* ctx) : DomObject*
+            ::= keyword("new") TypeExpr(ctx)!{ value = new New(TypeExpr); } ('(' ArgumentList(ctx, value) ')')?
+            ;
+
+        ArgumentList(ParsingContext* ctx, DomObject* owner)
+            ::= ExpressionList(ctx, owner)?
+            ;
+
+        ExpressionList(ParsingContext* ctx, DomObject* owner)
+            ::= empty{ ctx->PushParsingArguments(true); }
+            (   (Expression(ctx):arg{ owner->AddArgument(arg); }) % ','){ ctx->PopParsingArguments(); } / { ctx->PopParsingArguments(); }
+            ;
+    }
+}

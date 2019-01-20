@@ -1,0 +1,108 @@
+public class UniquePtr<T>
+{
+    private typedef UniquePtr<T> Self;
+
+    public nothrow UniquePtr() : ptr(null)
+    {
+    }
+    public explicit nothrow UniquePtr(T* ptr_) : ptr(ptr_)
+    {
+    }
+    suppress UniquePtr(const Self&);
+    public nothrow UniquePtr(Self&& that) : ptr(that.Release())
+    {
+    }
+    public nothrow void operator=(T* ptr_)
+    {
+        if (ptr != null)
+        {
+            delete ptr;
+        }
+        ptr = ptr_;
+    }
+    suppress void operator=(const Self&);
+    public nothrow void operator=(Self&& that)
+    {
+        if (ptr != null)
+        {
+            delete ptr;
+        }
+        ptr = that.Release();
+    }
+    public ~UniquePtr()
+    {
+        if (ptr != null)
+        {
+            delete ptr;
+        }
+    }
+    public nothrow void Reset()
+    {
+        if (ptr != null)
+        {
+            delete ptr;
+            ptr = null;
+        }
+    }
+    public nothrow void Reset(T* ptr_)
+    {
+        if (ptr != null)
+        {
+            delete ptr;
+        }
+        ptr = ptr_;
+    }
+    public inline nothrow T* Release()
+    {
+        T* ptr_ = ptr;
+        ptr = null;
+        return ptr_;
+    }
+    public inline nothrow T* Get()
+    { 
+        return ptr; 
+    }
+    public inline nothrow bool IsNull() const 
+    { 
+        return ptr == null; 
+    }
+    public inline nothrow T* operator->()
+    {
+        #assert(ptr != null);
+        return ptr;
+    }
+    public inline nothrow const T* operator->() const
+    {
+        #assert(ptr != null);
+        return ptr;
+    }
+    public inline nothrow T& operator*()
+    {
+        #assert(ptr != null);
+        return *ptr;
+    }
+    public inline nothrow const T& operator*() const
+    {
+        #assert(ptr != null);
+        return *ptr;
+    }
+    public nothrow void Swap(Self& that)
+    {
+        Swap(ptr, that.ptr);
+    }
+    private T* ptr;
+}
+
+public class TestClass
+{
+    public void foo()
+    {
+        System.Console.WriteLine("foo");
+    }
+}
+
+public void main()
+{
+    UniquePtr<TestClass> p = new TestClass();
+    p->foo();
+}

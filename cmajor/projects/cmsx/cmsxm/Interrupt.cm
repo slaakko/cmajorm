@@ -1,0 +1,124 @@
+using System;
+
+namespace cmsx.machine
+{
+    public const byte irqMax = 64u;
+
+    public const byte irqSoftware = 0u;
+    public const ulong SOFTWARE_INTERRUPT_BIT = cast<ulong>(1u) << irqSoftware;
+    public const byte irqInterval = 1u;
+    public const ulong INTERVAL_INTERRUPT_BIT = cast<ulong>(1u) << irqInterval;
+    public const byte irqClock = 2u;
+    public const ulong CLOCK_BIT = cast<ulong>(1u) << irqClock;
+
+    public const byte irqR = 32u; // read page fault
+    public const ulong R_BIT = cast<ulong>(1u) << irqR;
+    public const byte irqW = 33u; // write page fault
+    public const ulong W_BIT = cast<ulong>(1u) << irqW;
+    public const byte irqX = 34u; // execute page fault
+    public const ulong X_BIT = cast<ulong>(1u) << irqX;
+    public const byte irqN = 35u; // kernel address page fault
+    public const ulong N_BIT = cast<ulong>(1u) << irqN;
+    public const byte irqK = 36u; // kernel instruction 
+    public const ulong K_BIT = cast<ulong>(1u) << irqK;
+    public const byte irqCOW = 37u; // originally invalid instruction, reused as copy-on-write page fault 
+    public const ulong COW_BIT = cast<ulong>(1u) << irqCOW;
+    public const byte irqS = 38u; // security violation
+    public const ulong S_BIT = cast<ulong>(1u) << irqS;
+    public const byte irqP = 39u; // negative virtual address
+    public const ulong P_BIT = cast<ulong>(1u) << irqP;
+
+    public const ulong MACHINE_INTERRUPT_BITS = R_BIT | W_BIT | X_BIT | N_BIT | K_BIT | COW_BIT | S_BIT | P_BIT;
+
+    public const ulong ALL_INTERRUPT_BITS = 0xFFFFFFFFFFFFFFFFu;
+
+    public delegate void InterruptHandler(Machine& machine, byte irq);
+
+    public inline nothrow ulong MakeInterruptHandlerPtrAddress(byte irq)
+    {
+        return interruptVectorBaseAddress + cast<ulong>(8u) * irq;
+    }
+
+    public nothrow void SetProcessorToKernelMode(Registers& regs)
+    {
+        regs.SetSpecial(Registers.rK, regs.GetSpecial(Registers.rK) & ~N_BIT);
+    }
+
+    public nothrow void SetProcessorToUserMode(Registers& regs)
+    {
+        regs.SetSpecial(Registers.rK, regs.GetSpecial(Registers.rK) | MACHINE_INTERRUPT_BITS);
+    }
+
+    public nothrow bool IsProcessorInKernelMode(Registers& regs)
+    {
+        return (regs.GetSpecial(Registers.rK) & N_BIT) == 0u;
+    }
+
+    public nothrow void DisableAllInterrupts(Registers& regs)
+    {
+        regs.SetSpecial(Registers.rK, 0u);
+    }
+
+    public nothrow void EnableAllInterrupts(Registers& regs)
+    {
+        regs.SetSpecial(Registers.rK, ALL_INTERRUPT_BITS);
+    }
+
+    public nothrow void SetSecurityViolation(Registers& regs, ulong virtualAddress)
+    {
+        regs.SetSpecial(Registers.rZZ, virtualAddress);
+        regs.SetSpecial(Registers.rK, regs.GetSpecial(Registers.rK) | S_BIT);
+        regs.SetSpecial(Registers.rQ, regs.GetSpecial(Registers.rQ) | S_BIT);
+    }
+
+    public nothrow void InvokePageFault(Registers& regs, ulong virtualAddress, Protection pageProtection, Protection access)
+    {
+        regs.SetSpecial(Registers.rYY, PackProtection(pageProtection, access));
+        regs.SetSpecial(Registers.rZZ, virtualAddress);
+        ulong rq = regs.GetSpecial(Registers.rQ);
+        if (pageProtection == Protection.copyOnWrite)
+        {
+            rq = rq | COW_BIT; 
+        }
+        else
+        {
+            if ((access & Protection.execute) != 0u)
+            {
+                rq = rq | X_BIT; 
+            }
+            else if ((access & Protection.write) != 0u)
+            {
+                rq = rq | W_BIT; 
+            }
+            else if ((access & Protection.read) != 0u)
+            {
+                rq = rq | R_BIT; 
+            }
+            else
+            {
+                SetSecurityViolation(regs, virtualAddress);
+                return;
+            }
+        }
+        regs.SetSpecial(Registers.rQ, rq);
+    }
+
+    public nothrow string GetInterruptName(int irq)
+    {
+        switch (irq)
+        {
+            case irqSoftware: return "software";
+            case irqInterval: return "interval";
+            case irqClock: return "clock";
+            case irqR: return "read page fault";
+            case irqW: return "write page fault";
+            case irqX: return "execute page fault";
+            case irqCOW: return "copy-on-write page fault";
+            case irqN: return "kernel address page fault";
+            case irqK: return "kernel instruction";
+            case irqS: return "security violation";
+            case irqP: return "negative address";
+        }
+        return "unknown";
+    }
+}

@@ -1,0 +1,65 @@
+﻿/*========================================================================
+    Copyright (c) 2012-2016 Seppo Laakko
+    http://sourceforge.net/projects/cmajor/
+ 
+    Distributed under the GNU General Public License, version 3 (GPLv3).
+    (See accompanying LICENSE.txt or http://www.gnu.org/licenses/gpl.html)
+
+ ========================================================================*/
+
+using devcore;
+
+namespace parser
+{
+    grammar ProjectFile
+    {
+        using stdlib;
+        extern spaces_and_comments;
+        extern identifier: string;
+        extern qualified_id: string;
+        extern ulong: ulong;
+        extern long: long;
+        extern int: int;
+        skip spaces_and_comments;
+
+        ProjectFile: Project
+                    ::= ProjectDeclaration!{ value = ProjectDeclaration; }
+                        ProjectFileDeclarations(value)?
+                    ;
+
+        ProjectDeclaration: Project
+                    ::= (keyword("project") qualified_id:name! ';'!){ value = new Project(name, fileName); }
+                    ;
+
+        ProjectFileDeclarations(Project project)
+                    ::= ProjectFileDeclaration(project)+
+                    ;
+
+        ProjectFileDeclaration(Project project)
+                    ::= TargetDeclaration{ project.Target = TargetDeclaration; }
+                    |   (ProjectReference:prf){ project.AddReference(prf); } ';'!
+                    |   (SourceFile:src){ project.AddSourceFile(src, SourceFile.Kind.cm); } ';'!
+                    |   (TextFile:txt){ project.AddSourceFile(txt, SourceFile.Kind.text); } ';'!
+                    ;
+
+        TargetDeclaration: Target
+                    ::= keyword("target") '='! (keyword("program"){ value = Target.program; } | keyword("library"){ value = Target.library; } | keyword("unitTest"){ value = Target.unitTest; }) ';'!
+                    ;
+                
+        ProjectReference: string
+                    ::= keyword("reference") FilePath!{ value = FilePath; }
+                    ;
+                    
+        SourceFile: string
+                    ::= keyword("source") FilePath!{ value = FilePath; }
+                    ;
+                
+        TextFile: string
+                    ::= keyword("text") FilePath!{ value = FilePath; }
+                    ;
+
+        FilePath: string    
+                    ::= (token('<' ([^>]+){ value = match; } '>'!))
+                    ;
+    }
+}

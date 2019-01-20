@@ -1,0 +1,66 @@
+using System;
+using cmsx.machine;
+
+namespace cmsx.kernel
+{
+    public nothrow void ClockHandler(Machine& machine, byte irq)
+    {
+        Kernel& kernel = Kernel.Instance();
+        Schedule(machine, kernel.GetProcessTable());
+    }
+
+    public void PageFaultHandler(Machine& machine, byte irq)
+    {
+        ulong yy = machine.GetRegisters().GetSpecial(Registers.rYY);
+        Protection pageProtection = Protection.notPresent;
+        Protection protection = Protection.notPresent;
+        UnpackProtection(yy, pageProtection, protection);
+        ulong virtualAddress = machine.GetRegisters().GetSpecial(Registers.rZZ);
+        Panic("page fault at virtual address " + ToHexString(virtualAddress) + " , page protection = " + GetProtectionStr(pageProtection) + ", " + GetProtectionStr(protection) + " needed");
+    }
+
+    public void SecurityViolationHandler(Machine& machine, byte irq)
+    {
+        ulong virtualAddress = machine.GetRegisters().GetSpecial(Registers.rZZ);
+        Panic("security violation, virtual address = " + ToHexString(virtualAddress) + ", processor not in kernel mode");
+    }
+
+    public void SoftwareInterruptHandler(Machine& machine, byte irq)
+    {
+        Registers& regs = machine.GetRegisters();
+        ulong prevRV = regs.GetSpecial(Registers.rV);
+        ulong kernelRV = MakeVirtualTranslationRegisterValue(machine.GetKernelRootPageAddress(), kernelAddressSpaceNumber);
+        regs.SetSpecial(Registers.rV, kernelRV);
+        ulong trapValue = regs.GetSpecial(Registers.rX);
+        byte trapX = cast<byte>((trapValue & trapXMask) >> trapXShift);
+        byte trapY = cast<byte>((trapValue & trapYMask) >> trapYShift);
+        byte trapZ = cast<byte>((trapValue & trapZMask) >> trapZShift);
+        ulong trapAX = regs.Get(regAX);
+        ulong trapBX = regs.Get(regBX);
+        ulong trapCX = regs.Get(regCX);
+        ulong trapDX = regs.Get(regDX);
+        ulong trapEX = regs.Get(regEX);
+        ulong trapOffset = cast<ulong>(trapY) << 3u;
+        ulong trapBaseAddress = regs.GetSpecial(Registers.rT);
+        ulong trapHandlerPtrAddress = trapTableBaseAddress + trapOffset;
+        ulong trapHandlerAddress = machine.GetMemory().ReadULong(trapHandlerPtrAddress, Protection.read);
+        regs.SetSpecial(Registers.rV, prevRV);
+        if (trapHandlerAddress == 0u)
+        {
+            Panic("handler for trap " + ToString(trapY) + " is null");
+        }
+        TrapHandler trap = cast<TrapHandler>(cast<void*>(trapHandlerAddress));
+        long result = trap(machine, trapX, trapY, trapZ, trapAX, trapBX, trapCX, trapDX, trapEX);
+        ulong currentRV = regs.GetSpecial(Registers.rV);
+        if (currentRV == prevRV) // if context not switched
+        {
+            ulong returnValue = cast<ulong>(result);
+            regs.Set(regAX, returnValue);
+        }
+    }
+
+    public nothrow void IntervalInterruptHandler(Machine& machine, byte irq)
+    {
+        // todo
+    }
+}

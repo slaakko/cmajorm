@@ -1,0 +1,149 @@
+using System;
+
+namespace cmsx.assembly
+{
+    grammar AssemblyGrammar
+    {
+        start AssemblyFile;
+
+        DecimalConstant : DecimalConstant*
+            ::= token(digit+){ value = new DecimalConstant(span, ParseULong(ToUtf8(ustring(matchBegin, matchEnd)))); }
+            ;
+
+        HexConstant : HexConstant*
+            ::= token('#' (hexdigit+){ value = new HexConstant(span, ParseHexULong(ToUtf8(ustring(matchBegin, matchEnd)))); })
+            ;
+
+        CharacterConstant : CharacterConstant*
+            ::= '\'' [^\n']{ value = new CharacterConstant(span, *matchBegin); } '\''
+            ;
+
+        StringConstant : StringConstant*
+            ::= '"' ([^"\n]*){ value = new StringConstant(span, ustring(matchBegin, matchEnd)); } '"'
+            ;
+
+        Constant : Constant*
+            ::= DecimalConstant{ value = DecimalConstant; }
+            |   HexConstant{ value = HexConstant; }
+            |   CharacterConstant{ value = CharacterConstant; }
+            |   StringConstant{ value = StringConstant; }
+            ;
+
+        LocalSymbol : SymbolNode*
+            ::= token('@' digit+){ value = new SymbolNode(span, ToUtf8(ustring(matchBegin, matchEnd)), true); }
+            ;
+
+        Symbol : SymbolNode*
+            ::= token((idstart | ':' | '_') (idcont | ':' | '_' )*){ value = new SymbolNode(span, ToUtf8(ustring(matchBegin, matchEnd)), false); }
+            ;
+
+        At : At*
+            ::= '@'{ value = new At(span); }
+            ;
+
+        PrimaryExpression : Node*
+            ::= token(
+                LocalSymbol{ value = LocalSymbol; }
+            |   Constant{ value = Constant; }
+            |   Symbol{ value = Symbol; }
+            |   At{ value = At; }
+            |   ('(' Expression ')'){ value = new ParenthesizedExpression(span, Expression); }
+            |   (UnaryOperator PrimaryExpression){ value = new UnaryExpression(span, UnaryOperator, PrimaryExpression); }
+            )
+            ;
+
+        UnaryOperator : Operator
+            ::= '+'{ value = Operator.unaryPlus; }
+            |   '-'{ value = Operator.unaryMinus; }
+            |   '~'{ value = Operator.complement; }
+            |   '$'{ value = Operator.register; }
+            |   '&'{ value = Operator.serial; }
+            ;
+
+        Term : Node*
+            ::= token(PrimaryExpression:left{ value = left; } (StrongOperator PrimaryExpression:right{ value = new BinaryExpression(span, value, StrongOperator, right); })*)
+            ;
+
+        StrongOperator : Operator
+            ::= '*'{ value = Operator.multiply; }
+            |   '/'{ value = Operator.divide; }
+            |   "//"{ value = Operator.fractionalDivide; }
+            |   '%'{ value = Operator.modulus; }
+            |   "<<"{ value = Operator.shiftLeft; }
+            |   ">>"{ value = Operator.shiftRight; }
+            |   '&'{ value = Operator.bitwiseAnd; }
+            ;
+
+        Expression : Node*
+            ::= token(Term:left{ value = left; } (WeakOperator Term:right{ value = new BinaryExpression(span, value, WeakOperator, right); })*)
+            ;
+
+        WeakOperator : Operator
+            ::= '+'{ value = Operator.add; }
+            |   '-'{ value = Operator.subtract; }
+            |   '|'{ value = Operator.bitwiseOr; }
+            |   '^'{ value = Operator.bitwiseXor; }
+            ;
+
+        Instruction : Instruction*
+            ::= (Label SNL(Label) OpCode Operands){ value = new Instruction(span, Label, OpCode, Operands); }
+            ;
+
+        InstructionLine(List<UniquePtr<Instruction>>* instructionList)
+            ::= Instruction:left{ instructionList->Add(UniquePtr<Instruction>(left)); } (S? ';' Instruction:right{ instructionList->Add(UniquePtr<Instruction>(right)); })* Comment? NL
+            ;
+
+        Label : Node*
+            ::= LocalSymbol{ value = LocalSymbol; }
+            |   Symbol{ value = Symbol; }
+            |   empty{ value = null; }
+            ;
+
+        OpCode : OpCode*
+            ::= token((letter | digit)+){ value = new OpCode(span, ToUtf8(ustring(matchBegin, matchEnd))); }
+            ;
+
+        Operands : OperandList*
+            ::= token(S Expression:left{ value = new OperandList(span, left); } (',' Expression:right{ value->AddOperand(right); })*
+            |   S? empty{ value = new OperandList(span, new DecimalConstant(span, 0u)); }
+            )
+            ;
+
+        S   ::= token([ \t]+)
+            ;
+
+        SNL(Node* label) ::= token(S (NL S)? | empty{ if (label != null) pass = true; else pass = false; } NL S)
+            ;
+
+        NL  ::= token("\r\n" | '\n' | '\r')
+            ;
+
+        Comment
+            ::= S? (anychar - (idstart | ':' | '_' | '@' | ';' | '.' | NL)) (anychar - NL)*
+            ;
+
+        CommentLine
+            ::= Comment NL
+            ;
+
+        EmptyLine
+            ::= S? NL
+            ;
+
+        ModeLine(List<UniquePtr<Instruction>>* instructionList)
+            ::= token(S? '.' [cC][oO][dD][eE]){ instructionList->Add(UniquePtr<Instruction>(new Instruction(span, null, new OpCode(span, ".CODE"), null))); } S? NL
+            |   token(S? '.' [dD][aA][tT][aA]){ instructionList->Add(UniquePtr<Instruction>(new Instruction(span, null, new OpCode(span, ".DATA"), null))); } S? NL
+            ;
+
+        AssemblyLine(List<UniquePtr<Instruction>>* instructionList)
+            ::= CommentLine
+            |   EmptyLine
+            |   ModeLine(instructionList)
+            |   InstructionLine(instructionList)
+            ;
+
+        AssemblyFile(List<UniquePtr<Instruction>>* instructionList)
+            ::= AssemblyLine(instructionList)*
+            ;
+    }
+}

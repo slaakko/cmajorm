@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+ <PropertyGroup Label="Globals">
+  <CustomProjectExtensionsPath>$(LocalAppData)\CustomProjectSystems\Cmajor\</CustomProjectExtensionsPath>
+  <ProjectGuid>3fc93b97-5d27-4c9a-b998-3ba99e4cd6cd</ProjectGuid>
+ </PropertyGroup>
+ <PropertyGroup>
+  <TargetType>library</TargetType>
+ </PropertyGroup>
+ <ItemGroup>
+  <CmCompile Include="XPathContext.cm"/>
+  <CmCompile Include="XPathDebug.cm"/>
+  <CmCompile Include="XPathEvaluate.cm"/>
+  <CmCompile Include="XPathExpr.cm"/>
+  <CmCompile Include="XPathExpressionGrammar.cm"/>
+  <CmCompile Include="XPathFunction.cm"/>
+  <CmCompile Include="XPathObject.cm"/>
+ </ItemGroup>
+ <ItemGroup>
+  <None Include="XPathExpressionGrammar.parser"/>
+  <None Include="XPathExpressionGrammar.pl"/>
+  <None Include="XPathExpressionGrammar.pp"/>
+ </ItemGroup>
+ <ItemGroup>
+  <ProjectReference Include="../System.Dom/System.Dom.cmproj"/>
+ </ItemGroup>
+ <Import Project="$(CustomProjectExtensionsPath)Cmajor.props"/>
+ <Import Project="$(CustomProjectExtensionsPath)Cmajor.targets"/>
+</Project>

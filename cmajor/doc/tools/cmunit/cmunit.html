@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title>Unit Test Engine</title>
+    <link rel="stylesheet" type="text/css" href="../../style/tool.css" />
+</head>
+<body>
+    <h1>Unit Test Engine</h1>
+    <p>
+        <b>cmunit</b> is a poor man's unit test engine.
+    </p>
+
+    <p>
+        Usage: <b>cmunit [options] { project.cmp | solution.cms }</b>
+    </p>
+
+    <p>
+        The engine compiles each function that has a <b>unit_test</b> specifier using given configuration (debug/release)
+        into its own program and runs the compiled program. The number of succeeded and failed <b>#assert</b> statements in unit tests are
+        counted and reported at the end of the unit testing session.
+    </p>
+
+    <p>
+        <b><a href="../../code/unitTest/string.cm.html">string.cm</a></b> is an example of a source file containing a unit test function.
+    </p>
+
+    <table class="opt">
+        <tr>
+            <th class="opt">Long option</th>
+            <th class="opt">Short option</th>
+            <th class="opt">IDE command</th>
+            <th class="opt">Description</th>
+        </tr>
+        <tr>
+            <td class="opt">--help</td>
+            <td class="opt">-h</td>
+            <td class="opt"></td>
+            <td class="opt">Print help.</td>
+        </tr>
+        <tr>
+            <td class="opt">--verbose</td>
+            <td class="opt">-v</td>
+            <td class="opt"></td>
+            <td class="opt">Be verbose.</td>
+        </tr>
+        <tr>
+            <td class="opt">--config=CONFIG</td>
+            <td class="opt">-c=CONFIG</td>
+            <td class="opt">Configuration combo box</td>
+            <td class="opt">
+                Build usig CONFIG configuration. CONFIG can be "debug" or "release".
+            </td>
+        </tr>
+        <tr>
+            <td class="opt">--file=FILE</td>
+            <td class="opt">-f=FILE</td>
+            <td class="opt">File | Run Unit Tests</td>
+            <td class="opt">Run only unit tests in the given source file.</td>
+        </tr>
+        <tr>
+            <td class="opt">--test=TEST</td>
+            <td class="opt">-t=TEST</td>
+            <td class="opt"></td>
+            <td class="opt">Run only given unit test function.</td>
+        </tr>
+        <tr>
+            <td class="opt">--link-with-debug-runtime</td>
+            <td class="opt">-d</td>
+            <td class="opt">Build | Options | Link with debug runtime</td>
+            <td class="opt">Link with debug version of the runtime library cmrt2xx(d).dll.</td>
+        </tr>
+        <tr>
+            <td class="opt">--link-using-ms-link</td>
+            <td class="opt">-m</td>
+            <td class="opt">Build | Options | Use Microsoft's link.exe as the linker</td>
+            <td class="opt">Use Microsoft's link.exe as the linker. Link.exe must be found from the PATH. If not given uses LLVM's lld-link as the linker.</td>
+        </tr>
+    </table>
+
+    <p>
+        This is an <a href="cmunit-20180307T131340.html">example</a> of a unit testing report.
+    </p>
+</body>
+</html>

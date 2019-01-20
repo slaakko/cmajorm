@@ -1,0 +1,42 @@
+using System;
+using System.Collections;
+
+namespace cmast
+{
+    public class EnumTypeNode : CompositeNode<EnumeratorNode>
+    {
+        public nothrow EnumTypeNode(Specifiers specifiers_, IdentifierNode* id_, Node* underlyingType_) : specifiers(specifiers_), id(id_), underlyingType(underlyingType_)
+        {
+            id->parent = this;
+            if (!underlyingType.IsNull())
+            {
+                underlyingType->parent = this;
+            }
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public Specifiers specifiers;
+        public UniquePtr<IdentifierNode> id;
+        public UniquePtr<Node> underlyingType;
+    }
+    
+    public class EnumeratorNode : Node
+    {
+        public nothrow EnumeratorNode(IdentifierNode* id_, Node* value_) : id(id_), value(value_)
+        {
+            id->parent = this;
+            if (!value.IsNull())
+            {
+                value->parent = this;
+            }
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public UniquePtr<IdentifierNode> id;
+        public UniquePtr<Node> value;
+    }
+}

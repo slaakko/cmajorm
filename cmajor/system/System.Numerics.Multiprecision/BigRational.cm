@@ -1,0 +1,155 @@
+// =================================
+// Copyright (c) 2019 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.IO;
+
+namespace System.Numerics.Multiprecision
+{
+    public class BigRational
+    {
+        public nothrow BigRational(): handle(RtCreateBigRational())
+        {
+        }
+        public nothrow BigRational(int that) : handle(RtCreateBigRational())
+        {
+            RtSetBigRationalInt(handle, that, 1);
+        }
+        public nothrow BigRational(uint that) : handle(RtCreateBigRational())
+        {
+            RtSetBigRationalUInt(handle, that, 1u);
+        }
+        public nothrow BigRational(const BigInt& that) : handle(RtCreateBigRational())
+        {
+            RtSetBigRationalBigInt(handle, that.Handle());
+        }
+        public BigRational(const string& str) : this(str, 10)
+        {
+        }
+        public BigRational(const string& str, int base_) : handle(RtCreateBigRational())
+        {
+            int result = RtAssignBigRationalStr(handle, str.Chars(), base_);
+            if (result != 0)
+            {
+                ThrowConversionException("invalid digit string for initializing BigRational");
+            }
+        }
+        public ~BigRational()
+        {
+            if (handle != null)
+            {
+                RtDestroyBigRational(handle);
+            }
+        }
+        public nothrow BigRational(const BigRational& that) : handle(RtCreateBigRational())
+        {
+            RtAssignBigRational(handle, that.handle);
+        }
+        public nothrow BigRational(BigRational&& that) : handle(that.handle)
+        {
+            that.handle = null;
+        }
+        public nothrow void operator=(const BigRational& that)
+        {
+            if (handle != null)
+            {
+                RtDestroyBigRational(handle);
+            }
+            handle = RtCreateBigRational();
+            RtAssignBigRational(handle, that.handle);
+        }
+        public default nothrow void operator=(BigRational&& that);
+        public nothrow BigInt Numerator() const 
+        {
+            BigInt numerator;
+            RtGetNumeratorBigRational(numerator.Handle(), handle);
+            return numerator;
+        }
+        public nothrow BigInt Denominator() const 
+        {
+            BigInt denominator;
+            RtGetDenominatorBigRational(denominator.Handle(), handle);
+            return denominator;
+        }
+        public nothrow string ToString() const
+        {
+            return this->ToString(10);
+        }
+        public nothrow string ToString(int base_) const
+        {
+            int strHandle = RtGetBigRationalStrHandle(handle, base_);
+            string s = RtGetBigRationalStr(strHandle);
+            RtFreeBigRationalStr(strHandle);
+            return s;
+        }
+        public nothrow inline void* Handle() const
+        {
+            return handle;
+        }    
+        private void* handle;
+    }
+    
+    public nothrow BigRational operator-(const BigRational& x)
+    {
+        BigRational result;
+        RtNegBigRational(result.Handle(), x.Handle());
+        return result;
+    }    
+    
+    public nothrow BigRational Abs(const BigRational& x)
+    {
+        BigRational result;
+        RtAbsBigRational(result.Handle(), x.Handle());
+        return result;
+    }
+
+    public nothrow BigRational operator+(const BigRational& left, const BigRational& right)
+    {
+        BigRational result;
+        RtAddBigRational(result.Handle(), left.Handle(), right.Handle());
+        return result;
+    }
+    
+    public nothrow BigRational operator-(const BigRational& left, const BigRational& right)
+    {
+        BigRational result;
+        RtSubBigRational(result.Handle(), left.Handle(), right.Handle());
+        return result;
+    }
+    
+    public nothrow BigRational operator*(const BigRational& left, const BigRational& right)
+    {
+        BigRational result;
+        RtMulBigRational(result.Handle(), left.Handle(), right.Handle());
+        return result;
+    }
+    
+    public nothrow BigRational operator/(const BigRational& left, const BigRational& right)
+    {
+        BigRational result;
+        RtDivBigRational(result.Handle(), left.Handle(), right.Handle());
+        return result;
+    }
+    
+    public nothrow bool operator==(const BigRational& left, const BigRational& right)
+    {
+        return RtEqualBigRational(left.Handle(), right.Handle()) != 0;
+    }
+
+    public nothrow bool operator<(const BigRational& left, const BigRational& right)
+    {
+        return RtCmpBigRational(left.Handle(), right.Handle()) < 0;
+    }
+    
+    public OutputStream& operator<<(OutputStream& s, const BigRational& x)
+    {
+        return s << x.ToString();
+    }
+    
+    public StreamWriter& operator<<(StreamWriter& writer, const BigRational& x)
+    {
+        return writer << x.ToString();
+    }
+}

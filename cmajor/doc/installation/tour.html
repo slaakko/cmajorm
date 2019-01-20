@@ -1,0 +1,224 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title>Tour</title>
+    <link rel="stylesheet" type="text/css" href="../style/library.css" />
+</head>
+<body>
+    <h1>
+        Tour of Cmajor Visual Studio Extension
+    </h1>
+
+    <p>
+        This tour undergoes common operations for Cmajor projects.
+    </p>
+
+    <h2>
+        1. Creating a new Cmajor project
+    </h2>
+
+    <ul>
+        <li>
+            <p>
+                Select <strong>File | New | Project...</strong> menu item in Visual Studio.
+            </p>
+        </li>
+        <li>
+            <p>
+                The New Project dialog opens...
+            </p>
+        </li>
+        <img src="image/new_project.png" />
+
+        <li>
+            <p>
+                You can create either a console application or library project.
+                Let's create a console application with name PrintDate into <strong>C:\cmajor\projects</strong> folder.
+            </p>
+        </li>
+
+        <li>
+            <p>
+                Now the <strong>PrintDate</strong> project looks like this:
+            </p>
+        </li>
+
+        <img src="image/print_date_project.png" />
+
+    </ul>
+
+    <h2>
+        2. Adding a new source file
+    </h2>
+
+    <ul>
+        <li>
+            <p>
+                Right-click the <strong>PrintDate</strong> project and select <strong>Add | New Item...</strong>.
+                The <strong>New Item</strong> dialog opens. Let's create a Cmajor source file with name <strong>PrintDate.cm</strong>...
+            </p>
+        </li>
+
+        <img src="image/add_new_item.png" />
+
+        <li>
+            <p>
+                Let's give the <strong>PrintDate.cm</strong> file the following content:
+            </p>
+        </li>
+
+        <img src="image/print_date.png" />
+
+        <li>
+            <p>
+                Before building the project we set the build verbosity to <strong>Normal</strong> by
+                selecting <strong>Tools | Options... | Projects and Solutions | Build and Run | MSBuild project build output verbosity</strong> to
+                <strong>Normal</strong> to see some build output messages...
+            </p>
+        </li>
+
+        <img src="image/build_output_verbosity.png" />
+
+    </ul>
+
+    <h2>
+        3. Building a project or solution
+    </h2>
+
+    <ul>
+        <li>
+            <p>
+                Build the project by selecting <strong>Build | Build Solution</strong> menu item:
+            </p>
+        </li>
+
+        <img src="image/build.png" />
+    </ul>
+
+    <h2>
+        4. Debugging a project
+    </h2>
+
+    <ul>
+        <li>
+            <p>
+                The build succeeded, so we can start debugging the project by first setting a break point:
+            </p>
+        </li>
+
+        <img src="image/break_point.png" />
+
+        <li>
+            <p>
+                Now run the project by selecting <strong>Debug | Start Debugging</strong> menu item or pressing F5:
+            </p>
+        </li>
+
+        <img src="image/run.png" />
+
+        <li>
+            <p>
+                Right-click the <strong>date</strong> variable and select QuickWatch.
+                A QuickWatch dialog appears showing valid data for the <strong>date</strong> variable...
+            </p>
+        </li>
+
+        <img src="image/quick_watch.png" />
+
+        <li>
+            <p>
+                By setting another break point to the return statement and clicking the <strong>Continue</strong> button,
+                we can see the output of the program...
+            </p>
+        </li>
+
+        <img src="image/output.png" />
+
+        <li>
+            <p>
+                Clicking the <strong>Continue</strong> button once again the program exits with exit code 0...
+            </p>
+        </li>
+
+        <img src="image/exit.png" />
+
+    </ul>
+
+    <h2>
+        5. Unicode output of non-Latin character set and editor configuration
+    </h2>
+
+    <ul>
+        <li>
+            Ensure you have an <strong>.editorconfig</strong> file in the same or some parent directory as your source file,
+            and in the editor configuration the charset is either <strong>utf-8</strong> or <strong>utf-8-bom</strong>.
+        </li>
+
+        <li>
+            <p>
+                The <strong>C:\cmajor\projects</strong> folder contains an <a href="https://editorconfig.org/">EditorConfig</a> file
+                that defines properties for created source files under its subfolders.
+                Here's the default <a href="../../projects/.editorconfig">.editorconfig</a> file used for Cmajor source files.
+            </p>
+        </li>
+
+        <li>
+            <p>
+                To see that output of non-Latin characters works, we enter another line to the program that says "good morning" in finnish:
+            </p>
+        </li>
+
+        <img src="image/huomenta.png" />
+
+        <li>
+            <p>
+                A hexdump of the <strong>PrintDate.cm</strong> shows that finnish ä-letters have proper utf-8 encoding C3 A4...
+                <pre>
+                    C:/cmajor/projects/PrintDate/PrintDate/PrintDate.cm:
+                    00000000: 75 73 69 6E 67 20 53 79 - 73 74 65 6D 3B 0D 0A 0D |using System;   |
+                    00000010: 0A 69 6E 74 20 6D 61 69 - 6E 28 29 0D 0A 7B 0D 0A | int main()  {  |
+                    00000020: 20 20 20 20 44 61 74 65 - 20 64 61 74 65 20 3D 20 |    Date date = |
+                    00000030: 47 65 74 43 75 72 72 65 - 6E 74 44 61 74 65 28 29 |GetCurrentDate()|
+                    00000040: 3B 0D 0A 20 20 20 20 43 - 6F 6E 73 6F 6C 65 2E 4F |;      Console.O|
+                    00000050: 75 74 28 29 20 3C 3C 20 - 22 47 6F 6F 64 20 6D 6F |ut() << "Good mo|
+                    00000060: 72 6E 69 6E 67 21 20 54 - 6F 64 61 79 20 69 73 20 |rning! Today is |
+                    00000070: 22 20 3C 3C 20 64 61 74 - 65 20 3C 3C 20 22 2E 22 |" << date << "."|
+                    00000080: 20 3C 3C 20 65 6E 64 6C - 28 29 3B 0D 0A 20 20 20 | << endl();     |
+                    00000090: 20 43 6F 6E 73 6F 6C 65 - 2E 4F 75 74 28 29 20 3C | Console.Out() <| 
+                    000000A0: 3C 20 22 48 79 76 C3 A4 - C3 A4 20 68 75 6F 6D 65 |< "Hyv     huome|
+                    000000B0: 6E 74 61 21 20 54 C3 A4 - 6E C3 A4 C3 A4 6E 20 6F |nta! T  n    n o|
+                    000000C0: 6E 20 22 20 3C 3C 20 64 - 61 74 65 20 3C 3C 20 22 |n " << date << "|
+                    000000D0: 2E 22 20 3C 3C 20 65 6E - 64 6C 28 29 3B 0D 0A 20 |." << endl();   |
+                    000000E0: 20 20 20 72 65 74 75 72 - 6E 20 30 3B 0D 0A 7D 0D |   return 0;  } |
+                    000000F0: 0A                      -                         |                |
+                    000000F1;
+                    </pre>
+            </p>
+        </li>
+
+        <li>
+            <p>
+                By setting a break point, running the program and looking at the console window
+                we see that the output encoding is also valid...
+            </p>
+        </li>
+
+        <img src="image/finnish_output.png" />
+    </ul>
+
+    <h2>
+        6. Troubleshooting
+    </h2>
+
+    <ul>
+        <li>
+            <p>
+                If you get the following error, build you project or solution before trying to run or debug:
+            </p>
+        </li>
+        <img src="image/run_error.png" />
+    </ul>
+</body>
+</html>

@@ -1,0 +1,22 @@
+public delegate void Delegate(int x);
+
+public void foo(int x)
+{
+    System.Console.WriteLine("foo called with argument " + System.ToString(x));
+}
+
+public static class Alpha
+{
+    public static void bar(int x)
+    {
+        System.Console.WriteLine("bar called with argument " + System.ToString(x));
+    }
+}
+
+void main()
+{
+    Delegate dlg = foo;
+    dlg(42);
+    dlg = Alpha.bar;
+    dlg(21);
+}

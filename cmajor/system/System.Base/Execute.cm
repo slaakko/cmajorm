@@ -1,0 +1,34 @@
+// =================================
+// Copyright (c) 2019 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System.Collections;
+
+namespace System
+{
+    public nothrow int Execute(const string& command)
+    {
+        return RtExecute(command.Chars());
+    }
+    
+    public nothrow int Execute(const string& command, const List<Pair<int, string>>& redirections)
+    {
+        int execHandle = RtBeginExec(command.Chars());
+        for (const Pair<int, string>& redirection : redirections)
+        {
+            int handle = redirection.first;
+            const string& file = redirection.second;
+            RtAddRedirection(execHandle, handle, file.Chars());
+        }
+        return RtEndExec(execHandle);
+    }
+    
+    public nothrow string GetPathToExecutable()
+    {
+        int pathHandle = RtBeginGetPathToExecutable();
+        string pathToExecutable = RtGetPathToExecutable(pathHandle);
+        RtEndGetPathToExecutable(pathHandle);
+        return pathToExecutable;
+    }
+}

@@ -1,0 +1,316 @@
+using System;
+
+namespace cmsx.machine
+{
+    public delegate void BootProc(Machine& machine);
+    public const ulong bootProcAddress = kernelBaseAddress + dataSegmentBaseAddress;
+
+    public class Processor
+    {
+        public nothrow Processor(Machine& machine_) : machine(machine_), regs(), exiting(false)
+        {
+        }
+        public nothrow Registers& GetRegisters()
+        {
+            return regs;
+        }
+        public void Run()
+        {
+            Boot();
+            DoRun();
+            DoExit();
+        }
+        public void Exit()
+        {
+            exiting = true;
+        }
+        public nothrow ulong SaveContext(ulong virtualTranslateionRegisterValue, ulong sp, ulong* regAXAddress, ulong* regBXAddress)
+        {
+            Memory& mem = machine.GetMemory();
+            ulong prevRV = regs.GetSpecial(Registers.rV);
+            regs.SetSpecial(Registers.rV, virtualTranslateionRegisterValue);
+            mem.WriteULong(sp, regs.GetPC(), Protection.write);
+            sp = sp + 8u;
+            mem.WriteULong(sp, regs.GetSpecial(Registers.rA), Protection.write);
+            sp = sp + 8u;
+            mem.WriteULong(sp, regs.GetSpecial(Registers.rB), Protection.write);
+            sp = sp + 8u;
+            mem.WriteULong(sp, regs.GetSpecial(Registers.rD), Protection.write);
+            sp = sp + 8u;
+            mem.WriteULong(sp, regs.GetSpecial(Registers.rE), Protection.write);
+            sp = sp + 8u;
+            mem.WriteULong(sp, regs.GetSpecial(Registers.rH), Protection.write);
+            sp = sp + 8u;
+            mem.WriteULong(sp, regs.GetSpecial(Registers.rI), Protection.write);
+            sp = sp + 8u;
+            mem.WriteULong(sp, regs.GetSpecial(Registers.rJ), Protection.write);
+            sp = sp + 8u;
+            mem.WriteULong(sp, regs.GetSpecial(Registers.rM), Protection.write);
+            sp = sp + 8u;
+            mem.WriteULong(sp, regs.GetSpecial(Registers.rP), Protection.write);
+            sp = sp + 8u;
+            mem.WriteULong(sp, regs.GetSpecial(Registers.rR), Protection.write);
+            sp = sp + 8u;
+            mem.WriteULong(sp, regs.GetSpecial(Registers.rW), Protection.write);
+            sp = sp + 8u;
+            mem.WriteULong(sp, regs.GetSpecial(Registers.rX), Protection.write);
+            sp = sp + 8u;
+            mem.WriteULong(sp, regs.GetSpecial(Registers.rY), Protection.write);
+            sp = sp + 8u;
+            mem.WriteULong(sp, regs.GetSpecial(Registers.rZ), Protection.write);
+            sp = sp + 8u;
+            ulong rl = regs.GetSpecial(Registers.rL);
+            #assert(rl < 256u);
+            int n = cast<int>(rl);
+            for (int i = 0u; i < n; ++i)
+            {
+                mem.WriteULong(sp, regs.Get(cast<byte>(i)), Protection.write);
+                sp = sp + 8u;
+            }
+            ulong rg = regs.GetSpecial(Registers.rG);
+            #assert(rg < 256u);
+            for (int i = cast<int>(rg); i < 256; ++i)
+            {
+                switch (i)
+                {
+                    case regAX:
+                    {
+                        if (regAXAddress != null) *regAXAddress = sp;
+                        break;
+                    }
+                    case regBX:
+                    {
+                        if (regBXAddress != null) *regBXAddress = sp;
+                        break;
+                    }
+                }
+                mem.WriteULong(sp, regs.Get(cast<byte>(i)), Protection.write);
+                sp = sp + 8u;
+            }
+            mem.WriteULong(sp, regs.GetSpecial(Registers.rL), Protection.write);
+            sp = sp + 8u;
+            mem.WriteULong(sp, regs.GetSpecial(Registers.rG), Protection.write);
+            sp = sp + 8u;
+            regs.SetSpecial(Registers.rV, prevRV);
+            return sp;
+        }
+        public nothrow void UnsaveContext(ulong virtualTranslateionRegisterValue, ulong sp)
+        {
+            Memory& mem = machine.GetMemory();
+            regs.SetSpecial(Registers.rV, virtualTranslateionRegisterValue);
+            sp = sp - 8u;
+            ulong rg = mem.ReadULong(sp, Protection.read);
+            regs.SetSpecial(Registers.rG, rg);
+            sp = sp - 8u;
+            ulong rl = mem.ReadULong(sp, Protection.read);
+            regs.SetSpecial(Registers.rL, rl);
+            for (int i = 255; i >= cast<int>(rg); --i)
+            {
+                sp = sp - 8u;
+                regs.Set(cast<byte>(i), mem.ReadULong(sp, Protection.read));
+            }
+            int n = cast<int>(rl);
+            for (int i = n - 1; i >= 0; --i)
+            {
+                sp = sp - 8u;
+                regs.Set(cast<byte>(i), mem.ReadULong(sp, Protection.read));
+            }
+            sp = sp - 8u;
+            regs.SetSpecial(Registers.rZ, mem.ReadULong(sp, Protection.read));
+            sp = sp - 8u;
+            regs.SetSpecial(Registers.rY, mem.ReadULong(sp, Protection.read));
+            sp = sp - 8u;
+            regs.SetSpecial(Registers.rX, mem.ReadULong(sp, Protection.read));
+            sp = sp - 8u;
+            regs.SetSpecial(Registers.rW, mem.ReadULong(sp, Protection.read));
+            sp = sp - 8u;
+            regs.SetSpecial(Registers.rR, mem.ReadULong(sp, Protection.read));
+            sp = sp - 8u;
+            regs.SetSpecial(Registers.rP, mem.ReadULong(sp, Protection.read));
+            sp = sp - 8u;
+            regs.SetSpecial(Registers.rM, mem.ReadULong(sp, Protection.read));
+            sp = sp - 8u;
+            regs.SetSpecial(Registers.rJ, mem.ReadULong(sp, Protection.read));
+            sp = sp - 8u;
+            regs.SetSpecial(Registers.rI, mem.ReadULong(sp, Protection.read));
+            sp = sp - 8u;
+            regs.SetSpecial(Registers.rH, mem.ReadULong(sp, Protection.read));
+            sp = sp - 8u;
+            regs.SetSpecial(Registers.rE, mem.ReadULong(sp, Protection.read));
+            sp = sp - 8u;
+            regs.SetSpecial(Registers.rD, mem.ReadULong(sp, Protection.read));
+            sp = sp - 8u;
+            regs.SetSpecial(Registers.rB, mem.ReadULong(sp, Protection.read));
+            sp = sp - 8u;
+            regs.SetSpecial(Registers.rA, mem.ReadULong(sp, Protection.read));
+            sp = sp - 8u;
+            regs.SetPC(mem.ReadULong(sp, Protection.read));
+            regs.Set(regSP, sp);
+        }
+        private void DoRun()
+        {
+            ClockDriver clockDriver(Clock.Instance());
+            Memory& mem = machine.GetMemory();
+            ulong pc = regs.GetPC();
+            while (pc != invalidAddress && !exiting)
+            {
+                ulong prevPC = pc;
+                byte x = 0u;
+                byte y = 0u;
+                byte z = 0u;
+                Instruction* inst = FetchInstruction(pc, mem, x, y, z);
+                inst->Execute(regs, mem, x, y, z);
+                SetPC(inst, pc, prevPC);
+                IncrementCycleCounter();
+                CheckInterrupts();
+                DecrementIntervalCounter();
+                pc = regs.GetPC();
+            }
+        }
+        private void Boot()
+        {
+            ulong kernelRootPageAddress = machine.GetKernelRootPageAddress();
+            Memory& mem = machine.GetMemory();
+            if (kernelRootPageAddress == 0u)
+            {
+                kernelRootPageAddress = mem.AllocateRootPage();
+                machine.SetKernelRootPageAddress(kernelRootPageAddress);
+            }
+            regs.SetPC(invalidAddress);
+            regs.SetSpecial(Registers.rV, MakeVirtualTranslationRegisterValue(kernelRootPageAddress, kernelAddressSpaceNumber));
+            ulong pte = mem.GetPageTableEntry(bootProcAddress);
+            if (pte != 0u)
+            {
+                ulong bootProcValue = mem.ReadULong(bootProcAddress, Protection.read);
+                if (bootProcValue != 0u)
+                {
+                    BootProc boot = cast<BootProc>(cast<void*>(bootProcValue));
+                    boot(machine);
+                }
+                else
+                {
+                    if (!Machine.GetFlag(Machine.Flags.quiet))
+                    {
+                        Console.Error() << "machine boot procedure not set" << endl();
+                    }
+                }
+            }
+            else
+            {
+                if (!Machine.GetFlag(Machine.Flags.quiet))
+                {
+                    Console.Error() << "machine boot procedure not set" << endl();
+                }
+            }
+        }
+        private void DoExit()
+        {
+            if (Machine.GetFlag(Machine.Flags.verbose))
+            {
+                Console.Out() << "machine exit." << endl();
+            }
+        }
+        private nothrow Instruction* FetchInstruction(ulong& pc, Memory& mem, byte& x, byte& y, byte& z)
+        {
+            byte opCode = mem.ReadByte(pc, Protection.execute);
+            pc = pc + 1u;
+            x = mem.ReadByte(pc, Protection.execute);
+            pc = pc + 1u;
+            y = mem.ReadByte(pc, Protection.execute);
+            pc = pc + 1u;
+            z = mem.ReadByte(pc, Protection.execute);
+            pc = pc + 1u;
+            Instruction* inst = machine.GetInst(opCode);
+            return inst;
+        }
+        private nothrow void IncrementCycleCounter()
+        {
+            ulong cycleCounter = regs.GetSpecial(Registers.rC);
+            ++cycleCounter;
+            regs.SetSpecial(Registers.rC, cycleCounter);
+        }
+        private nothrow void DecrementIntervalCounter()
+        {
+            ulong intervalCounter = regs.GetSpecial(Registers.rI);
+            if (intervalCounter != 0u)
+            {
+                --intervalCounter;
+                regs.SetSpecial(Registers.rI, intervalCounter);
+                if (intervalCounter == 0u)
+                {
+                    ulong prevRQ = regs.GetSpecial(Registers.rQ);
+                    regs.SetSpecial(Registers.rQ, INTERVAL_INTERRUPT_BIT);
+                    CheckInterrupts();
+                    regs.SetSpecial(Registers.rQ, prevRQ);
+                }
+            }
+        }
+        private nothrow void SetPC(Instruction* inst, ulong& newPC, ulong prevPC)
+        {
+            ulong pc = regs.GetPC();
+            if (!inst->IsJumpInst() && pc == prevPC)
+            {
+                regs.SetPC(newPC);
+            }
+            else
+            {
+                newPC = pc;
+            }
+            regs.SetSpecial(Registers.rW, prevPC);
+        }
+        private nothrow void CheckInterrupts()
+        {
+            ulong rq = regs.GetSpecial(Registers.rQ);
+            ulong rk = regs.GetSpecial(Registers.rK);
+            ulong bits = rq & rk;
+            if (bits != 0u)
+            {
+                Memory& mem = machine.GetMemory();
+                ulong handlerPtrAddress = regs.GetSpecial(Registers.rTT);
+                ulong irqBit = 1u;
+                for (byte irq = 0u; irq < irqMax; ++irq)
+                {
+                    byte bit = cast<byte>(bits & 1u);
+                    if (bit != 0u)
+                    {
+                        HandleInterrupt(irq, handlerPtrAddress);
+                        rq = rq & ~irqBit;
+                        regs.SetSpecial(Registers.rQ, rq);
+                    }
+                    bits = bits >> 1u;
+                    handlerPtrAddress = handlerPtrAddress + 8u;
+                    irqBit = irqBit << 1u;
+                }
+            }
+        }
+        private void HandleInterrupt(byte irq, ulong handlerPtrAddress)
+        {
+            ulong prevRV = regs.GetSpecial(Registers.rV);
+            bool inKernelMode = IsProcessorInKernelMode(regs);
+            if (!inKernelMode)
+            {
+                SetProcessorToKernelMode(regs);
+                ulong kernelRV = MakeVirtualTranslationRegisterValue(machine.GetKernelRootPageAddress(), kernelAddressSpaceNumber);
+                regs.SetSpecial(Registers.rV, kernelRV);
+            }
+            ulong handlerAddress = machine.GetMemory().ReadULong(handlerPtrAddress, Protection.read);
+            regs.SetSpecial(Registers.rV, prevRV);
+            if (handlerAddress != 0u)
+            {
+                InterruptHandler handler = cast<InterruptHandler>(cast<void*>(handlerAddress));
+                handler(machine, irq);
+            }
+            else
+            {
+                Panic("cannot handle " + GetInterruptName(irq) + " interrupt " + ToString(irq) + ", handler address is null");
+            }
+            if (!inKernelMode)
+            {
+                SetProcessorToUserMode(regs);
+            }
+        }
+        private Machine& machine;
+        private Registers regs;
+        private bool exiting;
+    }
+}

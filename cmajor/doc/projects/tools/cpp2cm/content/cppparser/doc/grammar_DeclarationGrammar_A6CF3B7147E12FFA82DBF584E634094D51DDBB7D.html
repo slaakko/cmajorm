@@ -1,0 +1,131 @@
+<html>
+ <head>
+  <meta charset="utf-8"/>
+  <title>DeclarationGrammar Grammar</title>
+  <link href="../../../style/style.css" rel="stylesheet" type="text/css"/>
+ </head>
+ <body>
+  <h1>DeclarationGrammar Grammar</h1>
+  <table class="grammar">
+   <tr id="rule_Declarations_D3DDB614E42AD02D9917335A6037B094942C23C9">
+    <td class="grammarFirstCol">
+     <span class="rule">Declarations</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#rule_Declaration_15AA32F02DE751D99C355B673F9F6529FFE5E5B8">Declaration</a></span><span class="ruleOp">)</span><span class="ruleOp">*</span></td>
+   </tr>
+   <tr id="rule_Declaration_15AA32F02DE751D99C355B673F9F6529FFE5E5B8">
+    <td class="grammarFirstCol">
+     <span class="rule">Declaration</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#rule_NamespaceDefinition_13CC482F2EBFA57B24BDEC66F8F988E7827AF6BF">NamespaceDefinition</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#rule_LinkageSpecification_569E6D3C6F3AEC18E392A4E3DE52D439713F696E">LinkageSpecification</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="grammar_FunctionGrammar_48AFCEA6C7E5829230B589427750B951570E225B.html#rule_FunctionDefinition_597C4551CE219592241012E22F57D20B59ED2D97">FunctionDefinition</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="grammar_ClassGrammar_B6DF937C6DB95E024115AE1BF1738CC54C08E0E9.html#rule_SpecialMemberFunctionDefinition_4A8CE944CAE3085034F4C32F617A3649629C3C00">SpecialMemberFunctionDefinition</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="grammar_TemplateGrammar_5E63030052F7CAEDD3655C0D298C403B6D3278E1.html#rule_TemplateDeclaration_D86856184F8AEBC4CB62E8A14C515FB01C9E6192">TemplateDeclaration</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="grammar_TemplateGrammar_5E63030052F7CAEDD3655C0D298C403B6D3278E1.html#rule_ExplicitInstantiation_BB0524F403AA465F71B6E7FBA337AA32ABB1F733">ExplicitInstantiation</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="grammar_TemplateGrammar_5E63030052F7CAEDD3655C0D298C403B6D3278E1.html#rule_ExplicitSpecialization_A90D5EE76CF78CF4A8AFBC5392ABEC5928BE667F">ExplicitSpecialization</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="grammar_ClassGrammar_B6DF937C6DB95E024115AE1BF1738CC54C08E0E9.html#rule_ClassDeclaration_C177756CE630B33B5DCBE98886CFFA628104C812">ClassDeclaration</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="grammar_EnumerationGrammar_60FA1B198F4496F3B6899FD8C8D4D9546069BCA1.html#rule_EnumDeclaration_06EA10CB45D4F13A3FE0155B4203BF069200D64C">EnumDeclaration</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#rule_BlockDeclaration_C552FFA5C7A9C83CCF0FF3518D387356F0CE996C">BlockDeclaration</a></span></td>
+   </tr>
+   <tr id="rule_NamespaceDefinition_13CC482F2EBFA57B24BDEC66F8F988E7827AF6BF">
+    <td class="grammarFirstCol">
+     <span class="rule">NamespaceDefinition</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#rule_NamedNamespaceDefinition_82C85C7CCC9D3FD4E336E522746946DBE59BCEFE">NamedNamespaceDefinition</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#rule_UnnamedNamespaceDefinition_AE6512864F8DF9763205E4135C5503AE4A44D080">UnnamedNamespaceDefinition</a></span></td>
+   </tr>
+   <tr id="rule_NamedNamespaceDefinition_82C85C7CCC9D3FD4E336E522746946DBE59BCEFE">
+    <td class="grammarFirstCol">
+     <span class="rule">NamedNamespaceDefinition</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleKeyword">keyword</span><span class="ruleString">("namespace")</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="grammar_IdentifierGrammar_8D8D6307DE3120A9332D1686FBA3E981750C42B8.html#rule_Identifier_3D5E4C3A33C06ED4DEE1FEA416EF82ABF99C916C">Identifier</a></span><span class="ruleOp"> </span><span class="ruleChar">'{'</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_Declarations_D3DDB614E42AD02D9917335A6037B094942C23C9">Declarations</a></span><span class="ruleOp"> </span><span class="ruleChar">'}'</span><span class="ruleOp">!</span></td>
+   </tr>
+   <tr id="rule_UnnamedNamespaceDefinition_AE6512864F8DF9763205E4135C5503AE4A44D080">
+    <td class="grammarFirstCol">
+     <span class="rule">UnnamedNamespaceDefinition</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleKeyword">keyword</span><span class="ruleString">("namespace")</span><span class="ruleOp"> </span><span class="ruleChar">'{'</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_Declarations_D3DDB614E42AD02D9917335A6037B094942C23C9">Declarations</a></span><span class="ruleOp"> </span><span class="ruleChar">'}'</span><span class="ruleOp">!</span></td>
+   </tr>
+   <tr id="rule_BlockDeclaration_C552FFA5C7A9C83CCF0FF3518D387356F0CE996C">
+    <td class="grammarFirstCol">
+     <span class="rule">BlockDeclaration</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#rule_SimpleDeclaration_32CF0964E8CE4931CC123F8E897A0A700B9D3543">SimpleDeclaration</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#rule_AliasDeclaration_2CBD094C8117749D4B0C467703FE0B5243FC0EFE">AliasDeclaration</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#rule_UsingDirective_15D0F50BB476D1FB8CDBCC7AA5FA7CB2CBECD519">UsingDirective</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#rule_UsingDeclaration_BC866E550AB645767EE02DC3D83BB0F857B4F9F0">UsingDeclaration</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#rule_StaticAssertDeclaration_2BEA17885E1CD87EBBCB979D1DE745D2FD63CDE5">StaticAssertDeclaration</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="grammar_EnumerationGrammar_60FA1B198F4496F3B6899FD8C8D4D9546069BCA1.html#rule_OpaqueEnumDeclaration_860780D5ECE4ED23E0F98295466ADD9D99AA7DD8">OpaqueEnumDeclaration</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#rule_TypedefDeclaration_AF38163CDFA37B816F78ED23FC3CA92DCD417361">TypedefDeclaration</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="grammar_ClassGrammar_B6DF937C6DB95E024115AE1BF1738CC54C08E0E9.html#rule_ForwardClassDeclaration_94C830BBFBFA7E57C1BAB83406BB0D239E787B31">ForwardClassDeclaration</a></span></td>
+   </tr>
+   <tr id="rule_SimpleDeclaration_32CF0964E8CE4931CC123F8E897A0A700B9D3543">
+    <td class="grammarFirstCol">
+     <span class="rule">SimpleDeclaration</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#rule_DeclSpecifiers_F01FAEF2D21DC1934C4C87F91C8978B51D5FA99F">DeclSpecifiers</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="grammar_TypeExprGrammar_0B9AC7CEC733C22DDDF51A043400652AE29A775B.html#rule_TypeExpr_6DD497FEC1F5615F6D907AF80B670B7A68D5FC1E">TypeExpr</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="grammar_DeclaratorGrammar_FEC452FC8242F94400100B3182868607C058FE4B.html#rule_InitDeclarator_0036705536D30B05580ADB5B906E9747BBF025F6">InitDeclarator</a></span><span class="ruleOp"> </span><span class="ruleChar">';'</span><span class="ruleOp">)</span></td>
+   </tr>
+   <tr id="rule_DeclSpecifiers_F01FAEF2D21DC1934C4C87F91C8978B51D5FA99F">
+    <td class="grammarFirstCol">
+     <span class="rule">DeclSpecifiers</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#rule_DeclSpecifier_873FEB0FCFAC959888AE321AE57F90CADE045639">DeclSpecifier</a></span><span class="ruleOp">)</span><span class="ruleOp">*</span></td>
+   </tr>
+   <tr id="rule_DeclSpecifier_873FEB0FCFAC959888AE321AE57F90CADE045639">
+    <td class="grammarFirstCol">
+     <span class="rule">DeclSpecifier</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#rule_StorageClassSpecifier_C837E45CDDFFA033320AC79FA9E1C7C8820CE70B">StorageClassSpecifier</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#rule_FunctionSpecifier_DE060905E83EF8996E94CFCCD619F42F2622BE33">FunctionSpecifier</a></span><span class="ruleOp"> | </span><span class="ruleKeyword">keyword</span><span class="ruleString">("friend")</span><span class="ruleOp"> | </span><span class="ruleKeyword">keyword</span><span class="ruleString">("constexpr")</span><span class="ruleOp"> | </span><span class="ruleKeyword">keyword</span><span class="ruleString">("__declspec")</span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleChar">'('</span><span class="ruleOp"> </span><span class="ruleKeyword">keyword</span><span class="ruleString">("thread")</span><span class="ruleOp"> </span><span class="ruleChar">')'</span><span class="ruleOp"> | </span><span class="ruleChar">'('</span><span class="ruleOp"> </span><span class="ruleKeyword">keyword</span><span class="ruleString">("dllimport")</span><span class="ruleOp"> </span><span class="ruleChar">')'</span><span class="ruleOp"> | </span><span class="ruleChar">'('</span><span class="ruleOp"> </span><span class="ruleKeyword">keyword</span><span class="ruleString">("dllexport")</span><span class="ruleOp"> </span><span class="ruleChar">')'</span><span class="ruleOp">)</span><span class="ruleOp"> | </span><span class="ruleKeyword">keyword</span><span class="ruleString">("__thread")</span></td>
+   </tr>
+   <tr id="rule_StorageClassSpecifier_C837E45CDDFFA033320AC79FA9E1C7C8820CE70B">
+    <td class="grammarFirstCol">
+     <span class="rule">StorageClassSpecifier</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleKeyword">keyword</span><span class="ruleString">("register")</span><span class="ruleOp"> | </span><span class="ruleKeyword">keyword</span><span class="ruleString">("static")</span><span class="ruleOp"> | </span><span class="ruleKeyword">keyword</span><span class="ruleString">("thread_local")</span><span class="ruleOp"> | </span><span class="ruleKeyword">keyword</span><span class="ruleString">("extern")</span><span class="ruleOp"> | </span><span class="ruleKeyword">keyword</span><span class="ruleString">("mutable")</span></td>
+   </tr>
+   <tr id="rule_FunctionSpecifier_DE060905E83EF8996E94CFCCD619F42F2622BE33">
+    <td class="grammarFirstCol">
+     <span class="rule">FunctionSpecifier</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleKeyword">keyword</span><span class="ruleString">("inline")</span><span class="ruleOp"> | </span><span class="ruleKeyword">keyword</span><span class="ruleString">("virtual")</span><span class="ruleOp"> | </span><span class="ruleKeyword">keyword</span><span class="ruleString">("explicit")</span></td>
+   </tr>
+   <tr id="rule_AliasDeclaration_2CBD094C8117749D4B0C467703FE0B5243FC0EFE">
+    <td class="grammarFirstCol">
+     <span class="rule">AliasDeclaration</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleOp">(</span><span class="ruleKeyword">keyword</span><span class="ruleString">("using")</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="grammar_IdentifierGrammar_8D8D6307DE3120A9332D1686FBA3E981750C42B8.html#rule_Identifier_3D5E4C3A33C06ED4DEE1FEA416EF82ABF99C916C">Identifier</a></span><span class="ruleOp"> </span><span class="ruleChar">'='</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="grammar_TypeExprGrammar_0B9AC7CEC733C22DDDF51A043400652AE29A775B.html#rule_TypeExpr_6DD497FEC1F5615F6D907AF80B670B7A68D5FC1E">TypeExpr</a></span><span class="ruleOp">!</span><span class="ruleOp"> </span><span class="ruleChar">';'</span><span class="ruleOp">!</span><span class="ruleOp">)</span></td>
+   </tr>
+   <tr id="rule_UsingDirective_15D0F50BB476D1FB8CDBCC7AA5FA7CB2CBECD519">
+    <td class="grammarFirstCol">
+     <span class="rule">UsingDirective</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleOp">(</span><span class="ruleKeyword">keyword</span><span class="ruleString">("using")</span><span class="ruleOp"> </span><span class="ruleKeyword">keyword</span><span class="ruleString">("namespace")</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="grammar_IdentifierGrammar_8D8D6307DE3120A9332D1686FBA3E981750C42B8.html#rule_QualifiedId_C5417B64956A2289AA19994B6A984DBEFEFBAC20">QualifiedId</a></span><span class="ruleOp">!</span><span class="ruleOp"> </span><span class="ruleChar">';'</span><span class="ruleOp">!</span><span class="ruleOp">)</span></td>
+   </tr>
+   <tr id="rule_UsingDeclaration_BC866E550AB645767EE02DC3D83BB0F857B4F9F0">
+    <td class="grammarFirstCol">
+     <span class="rule">UsingDeclaration</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleOp">(</span><span class="ruleKeyword">keyword</span><span class="ruleString">("using")</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="grammar_IdentifierGrammar_8D8D6307DE3120A9332D1686FBA3E981750C42B8.html#rule_QualifiedId_C5417B64956A2289AA19994B6A984DBEFEFBAC20">QualifiedId</a></span><span class="ruleOp"> </span><span class="ruleChar">';'</span><span class="ruleOp">)</span></td>
+   </tr>
+   <tr id="rule_StaticAssertDeclaration_2BEA17885E1CD87EBBCB979D1DE745D2FD63CDE5">
+    <td class="grammarFirstCol">
+     <span class="rule">StaticAssertDeclaration</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleOp">(</span><span class="ruleKeyword">keyword</span><span class="ruleString">("static_assert")</span><span class="ruleOp"> </span><span class="ruleChar">'('</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="grammar_ExpressionGrammar_B28ED3443A69CA730C50D8B6A13B7A1B5708ABCB.html#rule_ConstantExpression_6D56A8328D81EB1F26DD89A9544E6ECAA2A34D1C">ConstantExpression</a></span><span class="ruleOp"> </span><span class="ruleChar">','</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="grammar_LiteralGrammar_2F7B1DBBC02D2614C2296EF8CBE31716418D0FE1.html#rule_StringLiteral_3DB61013A138824285294F074D3A357546917A4D">StringLiteral</a></span><span class="ruleOp"> </span><span class="ruleChar">')'</span><span class="ruleOp"> </span><span class="ruleChar">';'</span><span class="ruleOp">)</span></td>
+   </tr>
+   <tr id="rule_TypedefDeclaration_AF38163CDFA37B816F78ED23FC3CA92DCD417361">
+    <td class="grammarFirstCol">
+     <span class="rule">TypedefDeclaration</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleOp">(</span><span class="ruleKeyword">keyword</span><span class="ruleString">("typedef")</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="grammar_TypeExprGrammar_0B9AC7CEC733C22DDDF51A043400652AE29A775B.html#rule_TypeExpr_6DD497FEC1F5615F6D907AF80B670B7A68D5FC1E">TypeExpr</a></span><span class="ruleOp">!</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="grammar_DeclaratorGrammar_FEC452FC8242F94400100B3182868607C058FE4B.html#rule_Declarator_92586CA5FBEBDFDCE42EB4D4F894D90234E36E08">Declarator</a></span><span class="ruleOp">!</span><span class="ruleOp"> </span><span class="ruleChar">';'</span><span class="ruleOp">!</span><span class="ruleOp">)</span></td>
+   </tr>
+   <tr id="rule_LinkageSpecification_569E6D3C6F3AEC18E392A4E3DE52D439713F696E">
+    <td class="grammarFirstCol">
+     <span class="rule">LinkageSpecification</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleKeyword">keyword</span><span class="ruleString">("extern")</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="grammar_LiteralGrammar_2F7B1DBBC02D2614C2296EF8CBE31716418D0FE1.html#rule_StringLiteral_3DB61013A138824285294F074D3A357546917A4D">StringLiteral</a></span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleChar">'{'</span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#rule_Declaration_15AA32F02DE751D99C355B673F9F6529FFE5E5B8">Declaration</a></span><span class="ruleOp">)</span><span class="ruleOp">*</span><span class="ruleOp"> </span><span class="ruleChar">'}'</span><span class="ruleOp">!</span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#rule_Declaration_15AA32F02DE751D99C355B673F9F6529FFE5E5B8">Declaration</a></span><span class="ruleOp">)</span></td>
+   </tr>
+  </table>
+ </body>
+</html>

@@ -1,0 +1,29 @@
+namespace Syntax
+{
+    grammar ProjectFileGrammar
+    {
+        using stdlib.qualified_id;
+        using stdlib.spaces_and_comments;
+        skip spaces_and_comments;
+
+        ProjectFile : Project*
+            ::= keyword("project") qualified_id:projectName{ value = new Project(projectName, fileName); } ';' ProjectFileContent(value)
+            ;
+
+        ProjectFileContent(Project* project)
+            ::= (Source{ project->AddSourceFile(Source); } | Reference{ project->AddReferenceFile(Reference); })*
+            ;
+
+        Source : string
+            ::= keyword("source") FilePath{ value = FilePath; } ';'
+            ;
+
+        Reference : string
+            ::= keyword("reference") FilePath{ value = FilePath; } ';'
+            ;
+
+        FilePath : string
+            ::= token('<' ([^>\r\n]+){ value = ToUtf8(ustring(matchBegin, matchEnd)); } '>')
+            ;
+    }
+}

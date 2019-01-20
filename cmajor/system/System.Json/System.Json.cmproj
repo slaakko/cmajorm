@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+ <PropertyGroup Label="Globals">
+  <CustomProjectExtensionsPath>$(LocalAppData)\CustomProjectSystems\Cmajor\</CustomProjectExtensionsPath>
+  <ProjectGuid>11664707-49ca-4f9c-b90c-d874d5f0cfb6</ProjectGuid>
+ </PropertyGroup>
+ <PropertyGroup>
+  <TargetType>library</TargetType>
+ </PropertyGroup>
+ <ItemGroup>
+  <CmCompile Include="Json.cm"/>
+  <CmCompile Include="JsonClassFactory.cm"/>
+  <CmCompile Include="JsonExport.cm"/>
+  <CmCompile Include="JsonGrammar.cm"/>
+  <CmCompile Include="JsonImport.cm"/>
+ </ItemGroup>
+ <ItemGroup>
+  <None Include="JsonGrammar.parser"/>
+  <None Include="JsonGrammar.pl"/>
+  <None Include="JsonGrammar.pp"/>
+ </ItemGroup>
+ <ItemGroup>
+  <ProjectReference Include="../System.Text.Parsing/System.Text.Parsing.cmproj"/>
+ </ItemGroup>
+ <Import Project="$(CustomProjectExtensionsPath)Cmajor.props"/>
+ <Import Project="$(CustomProjectExtensionsPath)Cmajor.targets"/>
+</Project>

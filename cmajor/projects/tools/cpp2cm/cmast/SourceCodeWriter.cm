@@ -1,0 +1,1033 @@
+using System;
+using System.Collections;
+using System.Text;
+
+namespace cmast
+{
+    public class SourceCodeWriter : Visitor
+    {
+        public nothrow SourceCodeWriter(CodeFormatter& formatter_) : formatter(formatter_)
+        {
+        }
+        public override void Visit(BoolNode& boolNode) 
+        {
+            formatter.Write("bool");
+        }
+        public override void Visit(SByteNode& sbyteNode) 
+        {
+            formatter.Write("sbyte");
+        }
+        public override void Visit(ByteNode& byteNode) 
+        {
+            formatter.Write("byte");
+        }
+        public override void Visit(ShortNode& shortNode) 
+        {
+            formatter.Write("short");
+        }
+        public override void Visit(UShortNode& ushortNode) 
+        {
+            formatter.Write("ushort");
+        }
+        public override void Visit(IntNode& intNode) 
+        {
+            formatter.Write("int");
+        }
+        public override void Visit(UIntNode& uintNode) 
+        {
+            formatter.Write("uint");
+        }
+        public override void Visit(LongNode& longNode) 
+        {
+            formatter.Write("long");
+        }
+        public override void Visit(ULongNode& ulongNode) 
+        {
+            formatter.Write("ulong");
+        }
+        public override void Visit(FloatNode& floatNode) 
+        {
+            formatter.Write("float");
+        }
+        public override void Visit(DoubleNode& doubleNode) 
+        {
+            formatter.Write("double");
+        }
+        public override void Visit(CharNode& charNode)
+        {
+            formatter.Write("char");
+        }
+        public override void Visit(WCharNode& wcharNode)
+        {
+            formatter.Write("wchar");
+        }
+        public override void Visit(UCharNode& ucharNode)
+        {
+            formatter.Write("uchar");
+        }
+        public override void Visit(VoidNode& voidNode) 
+        {
+            formatter.Write("void");
+        }
+        public override void Visit(CompileUnitNode& compileUnitNode) 
+        {
+            compileUnitNode.globalNs->Accept(*this);
+        }
+        public override void Visit(NamespaceNode& namespaceNode) 
+        {
+            if (!namespaceNode.id.IsNull())
+            {
+                formatter.WriteLine("namespace ");
+                namespaceNode.id->Accept(*this);
+                formatter.WriteLine();
+                formatter.WriteLine("{");
+                formatter.IncIndent();
+            }
+            for (const UniquePtr<Node>& node : namespaceNode.nodes)
+            {
+                node->Accept(*this);
+            }
+            if (!namespaceNode.id.IsNull())
+            {
+                formatter.DecIndent();
+                formatter.WriteLine("}");
+            }
+        }
+        public override void Visit(AliasNode& aliasNode)
+        {
+            formatter.Write("using ");
+            aliasNode.id->Accept(*this);
+            formatter.Write(" = ");
+            aliasNode.qid->Accept(*this);
+            formatter.WriteLine(";");
+        }
+        public override void Visit(NamespaceImportNode& namespaceImportNode)
+        {
+            formatter.Write("using ");
+            namespaceImportNode.id->Accept(*this);
+            formatter.WriteLine(";");
+        }
+        public override void Visit(EnumTypeNode& enumTypeNode) 
+        {
+            string specifierStr = SpecifierStr(enumTypeNode.specifiers);
+            if (!specifierStr.IsEmpty())
+            {
+                specifierStr.Append(' ');
+            }
+            formatter.Write(specifierStr);
+            formatter.Write("enum ");
+            enumTypeNode.id->Accept(*this);
+            if (!enumTypeNode.underlyingType.IsNull())
+            {
+                formatter.Write(" : ");
+                enumTypeNode.underlyingType->Accept(*this);
+            }
+            formatter.WriteLine();
+            formatter.WriteLine("{");
+            formatter.IncIndent();
+            bool first = true;
+            for (const UniquePtr<EnumeratorNode>& enumerator : enumTypeNode.nodes)
+            {
+                if (first)
+                {
+                    first = false;
+                }
+                else
+                {
+                    formatter.Write(", ");
+                }
+                enumerator->Accept(*this);
+            }
+            formatter.DecIndent();
+            formatter.WriteLine("}");
+            
+        }
+        public override void Visit(EnumeratorNode& enumeratorNode) 
+        {
+            enumeratorNode.id->Accept(*this);
+            if (!enumeratorNode.value.IsNull())
+            {
+                formatter.Write(" = ");
+                enumeratorNode.value->Accept(*this);
+            }
+        }
+        public override void Visit(IdentifierNode& identifierNode) 
+        {
+            formatter.Write(ToUtf8(identifierNode.str));
+        }
+        public override void Visit(DotNode& dotNode) 
+        {
+            dotNode.left->Accept(*this);
+            formatter.Write(".");
+            dotNode.right->Accept(*this);
+        }
+        public override void Visit(ArrowNode& arrowNode)
+        {
+            arrowNode.left->Accept(*this);
+            formatter.Write("->");
+            arrowNode.right->Accept(*this);
+        }
+        public override void Visit(ConstNode& constNode) 
+        {
+            formatter.Write("const ");
+            constNode.child->Accept(*this);
+        }
+        public override void Visit(LvalueRefNode& lvalueRefNode) 
+        {
+            lvalueRefNode.child->Accept(*this);
+            formatter.Write("&");
+        }
+        public override void Visit(RvalueRefNode& rvalueRefNode) 
+        {
+            rvalueRefNode.child->Accept(*this);
+            formatter.Write("&&");
+        }
+        public override void Visit(PointerNode& pointerNode) 
+        {
+            pointerNode.child->Accept(*this);
+            formatter.Write("*");
+        }
+        public override void Visit(ArrayNode& arrayNode)
+        {
+            arrayNode.child->Accept(*this);
+            formatter.Write("[");
+            if (!arrayNode.size.IsNull())
+            {
+                arrayNode.size->Accept(*this);
+            }
+            formatter.Write("]");
+        }
+        public override void Visit(TypedefNode& typedefNode) 
+        {
+            string specifierStr = SpecifierStr(typedefNode.specifiers);
+            if (!specifierStr.IsEmpty())
+            {
+                specifierStr.Append(' ');
+            }
+            formatter.Write(specifierStr);
+            formatter.Write("typedef ");
+            typedefNode.typeExpr->Accept(*this);
+            formatter.Write(" ");
+            typedefNode.id->Accept(*this);
+            formatter.WriteLine(";");
+        }
+        public override void Visit(ParameterNode& parameterNode)
+        {
+            parameterNode.typeExpr->Accept(*this);
+            if (!parameterNode.id.IsNull())
+            {
+                formatter.Write(" ");
+                parameterNode.id->Accept(*this);
+            }
+        }    
+        public override void Visit(BinaryExpressionNode& binaryExpressionNode)
+        {
+            binaryExpressionNode.left->Accept(*this);
+            formatter.Write(" ");
+            formatter.Write(OperatorStr(binaryExpressionNode.op));
+            formatter.Write(" ");
+            binaryExpressionNode.right->Accept(*this);
+        }
+        public override void Visit(UnaryExpressionNode& unaryExpressionNode)
+        {
+            formatter.Write(OperatorStr(unaryExpressionNode.op));
+            unaryExpressionNode.child->Accept(*this);
+        }
+        public override void Visit(IsNode& isNode)
+        {
+            isNode.left->Accept(*this);
+            formatter.Write(" is ");
+            isNode.right->Accept(*this);
+        }
+        public override void Visit(AsNode& asNode)
+        {
+            asNode.left->Accept(*this);
+            formatter.Write(" as ");
+            asNode.right->Accept(*this);
+        }
+        public override void Visit(SubscriptExpressionNode& subscriptExpressionNode) 
+        {
+            subscriptExpressionNode.left->Accept(*this);
+            formatter.Write("[");
+            subscriptExpressionNode.right->Accept(*this);
+            formatter.Write("]");
+        }
+        public override void Visit(InvokeNode& invokeNode) 
+        {
+            invokeNode.child->Accept(*this);
+            formatter.Write("(");
+            bool first = true;
+            for (const UniquePtr<Node>& argument : invokeNode.arguments)
+            {
+                if (first)
+                {
+                    first = false;
+                }
+                else
+                {
+                    formatter.Write(", ");
+                }
+                argument->Accept(*this);
+            }
+            formatter.Write(")");
+        }
+        public override void Visit(PostfixIncrementNode& postfixIncrementNode)
+        {
+            postfixIncrementNode.child->Accept(*this);
+            formatter.Write("++");
+        }
+        public override void Visit(PostfixDecrementNode& postfixDecrementNode)
+        {
+            postfixDecrementNode.child->Accept(*this);
+            formatter.Write("--");
+        }
+        public override void Visit(SizeOfNode& sizeOfNode)
+        {
+            formatter.Write("sizeof(");
+            sizeOfNode.child->Accept(*this);
+            formatter.Write(")");
+        }
+        public override void Visit(TypeNameNode& typeNameNode)
+        {
+            formatter.Write("typename(");
+            typeNameNode.child->Accept(*this);
+            formatter.Write(")");
+        }
+        public override void Visit(CastNode& castNode) 
+        {
+            formatter.Write("cast<");
+            castNode.left->Accept(*this);
+            formatter.Write(">(");
+            castNode.right->Accept(*this);
+            formatter.Write(")");
+        }
+        public override void Visit(ParenthesizedExpressionNode& parenthesizedExpressionNode)
+        {
+            formatter.Write("(");
+            parenthesizedExpressionNode.child->Accept(*this);
+            formatter.Write(")");
+        }
+        public override void Visit(LabeledStatementNode& labeledStatementNode)
+        {
+            formatter.DecIndent();
+            formatter.Write(ToUtf8(labeledStatementNode.label));
+            formatter.WriteLine(":");
+            formatter.IncIndent();
+            labeledStatementNode.statement->Accept(*this);
+        }
+        public override void Visit(CompoundStatementNode& compoundStatementNode)
+        {
+            formatter.WriteLine("{");
+            formatter.IncIndent();
+            for (const UniquePtr<StatementNode>& statement : compoundStatementNode.statements)
+            {
+                statement->Accept(*this);
+            }
+            formatter.DecIndent();
+            formatter.WriteLine("}");
+        }
+        public override void Visit(ReturnStatementNode& returnStatementNode)
+        {
+            formatter.Write("return");
+            if (!returnStatementNode.expr.IsNull())
+            {
+                formatter.Write(" ");
+                returnStatementNode.expr->Accept(*this);
+            }
+            formatter.WriteLine(";");
+        }
+        public override void Visit(IfStatementNode& ifStatementNode)
+        {
+            formatter.Write("if (");
+            ifStatementNode.condition->Accept(*this);
+            formatter.Write(")");
+            if (ifStatementNode.thenS.Get() is CompoundStatementNode*)
+            {
+                formatter.WriteLine();
+            }
+            else
+            {
+                formatter.Write(" ");
+            }
+            ifStatementNode.thenS->Accept(*this);
+            if (!ifStatementNode.elseS.IsNull())
+            {
+                if (ifStatementNode.elseS.Get() is CompoundStatementNode*)
+                {
+                    formatter.WriteLine("else");
+                }
+                else
+                {
+                    formatter.Write("else ");
+                }
+                ifStatementNode.elseS->Accept(*this);
+            }
+        }
+        public override void Visit(WhileStatementNode& whileStatementNode)
+        {
+            formatter.Write("while (");
+            whileStatementNode.condition->Accept(*this);
+            formatter.Write(")");
+            if (whileStatementNode.statement.Get() is CompoundStatementNode*)
+            {
+                formatter.WriteLine();
+            }
+            else
+            {
+                formatter.Write(" ");
+            }
+            whileStatementNode.statement->Accept(*this);
+        }
+        public override void Visit(DoStatementNode& doStatementNode)
+        {
+            formatter.Write("do");
+            if (doStatementNode.statement.Get() is CompoundStatementNode*)
+            {
+                formatter.WriteLine();
+            }
+            else
+            {
+                formatter.Write(" ");
+            }
+            doStatementNode.statement->Accept(*this);
+            formatter.Write("while (");
+            doStatementNode.expression->Accept(*this);
+            formatter.WriteLine(");");
+        }
+        public override void Visit(ForStatementNode& forStatementNode)
+        {
+            formatter.Write("for (");
+            if (!forStatementNode.initS.IsNull())
+            {
+                forStatementNode.initS->Accept(*this);
+            }
+            else
+            {
+                formatter.Write("; ");
+            }
+            if (!forStatementNode.condition.IsNull())
+            {
+                forStatementNode.condition->Accept(*this);
+            }
+            formatter.Write("; ");
+            if (!forStatementNode.loopS.IsNull())
+            {
+                forStatementNode.loopS->Accept(*this);
+            }
+            formatter.Write(")");
+            if (forStatementNode.actionS.Get() is CompoundStatementNode*)
+            {
+                formatter.WriteLine();
+            }
+            else
+            {
+                formatter.Write(" ");
+            }
+            forStatementNode.actionS->Accept(*this);
+        }
+        public override void Visit(BreakStatementNode& breakStatementNode)
+        {
+            formatter.WriteLine("break;");
+        }
+        public override void Visit(GotoStatementNode& gotoStatementNode)
+        {
+            formatter.WriteLine("goto " + ToUtf8(gotoStatementNode.target) + ";");
+        }
+        public override void Visit(ConstructionStatementNode& constructionStatementNode) 
+        {
+            constructionStatementNode.typeExpr->Accept(*this);
+            formatter.Write(" ");
+            constructionStatementNode.id->Accept(*this);
+            if (!constructionStatementNode.arguments.IsEmpty())
+            {
+                if (constructionStatementNode.arguments.Count() == 1)
+                {
+                    formatter.Write(" = ");
+                    constructionStatementNode.arguments[0]->Accept(*this);
+                }
+                else
+                {
+                    formatter.Write("(");
+                    bool first = true;
+                    for (const UniquePtr<Node>& argument : constructionStatementNode.arguments)
+                    {
+                        if (first)
+                        {
+                            first = false;
+                        }
+                        else
+                        {
+                            formatter.Write(", ");
+                        }
+                        argument->Accept(*this);
+                    }
+                    formatter.Write(")");
+                }
+            }
+            formatter.WriteLine(";");
+        }
+        public override void Visit(DeleteStatementNode& deleteStatementNode)
+        {
+            formatter.Write("delete ");
+            deleteStatementNode.expression->Accept(*this);
+            formatter.WriteLine(";");
+        }
+        public override void Visit(DestroyStatementNode& destroyStatementNode)
+        {
+            formatter.Write("destroy ");
+            destroyStatementNode.expression->Accept(*this);
+            formatter.WriteLine(";");
+        }
+        public override void Visit(AssignmentStatementNode& assignmentStatementNode)
+        {
+            assignmentStatementNode.targetExpr->Accept(*this);
+            formatter.Write(" = ");
+            assignmentStatementNode.sourceExpr->Accept(*this);
+            bool writeSemicolon = true;
+            if (assignmentStatementNode.parent is ForStatementNode*)
+            {
+                ForStatementNode* forStatementNode = cast<ForStatementNode*>(assignmentStatementNode.parent);
+                if (forStatementNode->loopS.Get() == &assignmentStatementNode)
+                {
+                    writeSemicolon = false;
+                }
+            }
+            if (writeSemicolon)
+            {
+                formatter.WriteLine(";");
+            }
+        }
+        public override void Visit(ExpressionStatementNode& expressionStatementNode)
+        {
+            expressionStatementNode.expression->Accept(*this);
+            bool writeSemicolon = true;
+            if (expressionStatementNode.parent is ForStatementNode*)
+            {
+                ForStatementNode* forStatementNode = cast<ForStatementNode*>(expressionStatementNode.parent);
+                if (forStatementNode->loopS.Get() == &expressionStatementNode)
+                {
+                    writeSemicolon = false;
+                }
+            }
+            if (writeSemicolon)
+            {
+                formatter.WriteLine(";");
+            }
+        }
+        public override void Visit(EmptyStatementNode& emptyStatementNode)
+        {
+            bool writeSemicolon = true;
+            if (emptyStatementNode.parent is ForStatementNode*)
+            {
+                ForStatementNode* forStatementNode = cast<ForStatementNode*>(emptyStatementNode.parent);
+                if (forStatementNode->loopS.Get() == &emptyStatementNode)
+                {
+                    writeSemicolon = false;
+                }
+            }
+            if (writeSemicolon)
+            {
+                formatter.WriteLine(";");
+            }
+        }
+        public override void Visit(RangeForStatementNode& rangeForStatementNode) 
+        {
+            formatter.Write("for (");
+            rangeForStatementNode.typeExpr->Accept(*this);
+            formatter.Write(" ");
+            rangeForStatementNode.id->Accept(*this);
+            formatter.Write(" : ");
+            rangeForStatementNode.container->Accept(*this);
+            if (rangeForStatementNode.action.Get() is CompoundStatementNode*)
+            {
+                formatter.WriteLine(")");
+            }            
+            else
+            {
+                formatter.Write(") ");
+            }
+            rangeForStatementNode.action->Accept(*this);
+        }
+        public override void Visit(SwitchStatementNode& switchStatementNode) 
+        {
+            formatter.Write("switch (");
+            switchStatementNode.condition->Accept(*this);
+            formatter.WriteLine(")");
+            for (UniquePtr<CaseStatementNode>& caseStatement : switchStatementNode.cases)
+            {
+                caseStatement->Accept(*this);
+            }
+            if (!switchStatementNode.defaultS.IsNull())
+            {
+                switchStatementNode.defaultS->Accept(*this);
+            }
+        }
+        public override void Visit(CaseStatementNode& caseStatementNode) 
+        {
+            for (UniquePtr<Node>& caseExpr : caseStatementNode.caseExprs)
+            {
+                formatter.Write("case ");
+                caseExpr->Accept(*this);
+                formatter.Write(": ");
+            }            
+            formatter.WriteLine("{");
+            for (UniquePtr<StatementNode>& statement : caseStatementNode.statements)
+            {
+                statement->Accept(*this);
+            }
+            formatter.WriteLine("}");
+        }
+        public override void Visit(DefaultStatementNode& defaultStatementNode) 
+        {
+            formatter.Write("default:");
+            formatter.WriteLine("{");
+            for (UniquePtr<StatementNode>& statement : defaultStatementNode.statements)
+            {
+                statement->Accept(*this);
+            }
+            formatter.WriteLine("}");
+        }
+        public override void Visit(GotoCaseStatementNode& gotoCaseStatementNode) 
+        {
+           formatter.Write("goto case ");
+           gotoCaseStatementNode.caseExpr->Accept(*this);
+           formatter.WriteLine(";");
+        }
+        public override void Visit(GotoDefaultStatementNode& gotoDefaultStatementNode)
+        {
+            formatter.WriteLine("goto default;");
+        }
+        public override void Visit(ThrowStatementNode& throwStatementNode)
+        {
+            formatter.Write("throw");
+            if (!throwStatementNode.expression.IsNull())
+            {
+                formatter.Write(" ");
+                throwStatementNode.expression->Accept(*this);
+                formatter.WriteLine(";");
+            }
+            else
+            {
+                formatter.WriteLine(";");
+            }
+        }
+        public override void Visit(TryStatementNode& tryStatementNode)
+        {
+            formatter.WriteLine("try");
+            tryStatementNode.tryBlock->Accept(*this);
+            for (const UniquePtr<CatchNode>& catch_ : tryStatementNode.catches)
+            {
+                catch_->Accept(*this);
+            }
+        }
+        public override void Visit(CatchNode& catchNode)
+        {
+            formatter.Write("catch (");
+            catchNode.typeExpr->Accept(*this);
+            if (!catchNode.id.IsNull())
+            {
+                formatter.Write(" ");
+                catchNode.id->Accept(*this);
+            }
+            formatter.WriteLine(")");
+            catchNode.catchBlock->Accept(*this);
+        }
+        public override void Visit(ConstantNode& constantNode)
+        {
+            string specifierStr = SpecifierStr(constantNode.specifiers);
+            if (!specifierStr.IsEmpty())
+            {
+                formatter.Write(specifierStr);
+                formatter.Write(" const ");
+            }
+            else 
+            {
+                formatter.Write("const ");
+            }        
+            constantNode.typeExpr->Accept(*this);
+            formatter.Write(" ");
+            constantNode.id->Accept(*this);
+            formatter.Write(" = ");
+            constantNode.value->Accept(*this);
+            formatter.WriteLine(";");
+        }
+        public override void Visit(FunctionNode& functionNode)
+        {
+            string specifierStr = SpecifierStr(functionNode.specifiers);
+            formatter.Write(specifierStr);
+            if (!specifierStr.IsEmpty())
+            {
+                formatter.Write(" ");
+            }
+            if (!functionNode.returnTypeExpr.IsNull())
+            {
+                functionNode.returnTypeExpr->Accept(*this);
+                formatter.Write(" ");
+            }
+            functionNode.groupId->Accept(*this);
+            if (!functionNode.templateParameters.IsEmpty())
+            {
+                formatter.Write("<");
+                bool first = true;
+                for (const UniquePtr<TemplateParameterNode>& templateParameter : functionNode.templateParameters)
+                {
+                    if (first)
+                    {
+                        first = false;
+                    }
+                    else
+                    {
+                        formatter.Write(", ");
+                    }
+                    templateParameter->Accept(*this);
+                }
+                formatter.Write(">");
+            }
+            formatter.Write("(");
+            bool first = true;
+            for (const UniquePtr<ParameterNode>& parameter : functionNode.parameters)
+            {
+                if (first)
+                {
+                    first = false;
+                }
+                else
+                {
+                    formatter.Write(", ");
+                }
+                parameter->Accept(*this);
+            }
+            formatter.Write(")");
+            if (!functionNode.body.IsNull())
+            {
+                formatter.WriteLine();
+                functionNode.body->Accept(*this);
+            }
+            else
+            {
+                formatter.WriteLine(";");
+            }
+        }
+        public override void Visit(TemplateParameterNode& templateParameterNode)
+        {
+            templateParameterNode.id->Accept(*this);
+            if (!templateParameterNode.defaultTemplateArgument.IsNull())
+            {
+                formatter.Write(" = ");
+                templateParameterNode.defaultTemplateArgument->Accept(*this);
+            }
+        }
+        public override void Visit(TemplateIdNode& templateIdNode)
+        {
+            templateIdNode.primary->Accept(*this);
+            formatter.Write("<");
+            bool first = true;
+            for (const UniquePtr<Node>& templateArgument : templateIdNode.templateArguments)
+            {
+                if (first)
+                {
+                    first = false;
+                }
+                else
+                {
+                    formatter.Write(", ");
+                }
+                templateArgument->Accept(*this);
+            }
+            formatter.Write(">"); 
+        }
+        public override void Visit(ClassNode& classNode) 
+        {
+            string specifierStr = SpecifierStr(classNode.specifiers);
+            formatter.Write(specifierStr);
+            if (!specifierStr.IsEmpty())
+            {
+                formatter.Write(" ");
+            }
+            formatter.Write("class ");
+            classNode.id->Accept(*this);
+            if (!classNode.templateParameters.IsEmpty())
+            {
+                formatter.Write("<");
+                bool first = true;
+                for (const UniquePtr<TemplateParameterNode>& templateParameter : classNode.templateParameters)
+                {
+                    if (first)
+                    {
+                        first = false;
+                    }
+                    else
+                    {
+                        formatter.Write(", ");
+                    }
+                    templateParameter->Accept(*this);
+                }
+                formatter.Write(">");
+            }
+            if (!classNode.baseClassOrInterfaces.IsEmpty())
+            {
+                formatter.Write(" : ");
+                bool first = true;
+                for (const UniquePtr<Node>& baseClassOrInterface : classNode.baseClassOrInterfaces)
+                {
+                    if (first)
+                    {
+                        first = false;
+                    }
+                    else
+                    {
+                        formatter.Write(", ");
+                    }
+                    baseClassOrInterface->Accept(*this);
+                }
+            }
+            formatter.WriteLine("{");
+            formatter.IncIndent();
+            for (const UniquePtr<Node>& member : classNode.members)
+            {
+                member->Accept(*this);
+            }
+            formatter.DecIndent();
+            formatter.WriteLine("}");
+        }
+        public override void Visit(ThisInitializerNode& thisInitializerNode) 
+        {
+            formatter.Write("this(");
+            bool first = true;
+            for (const UniquePtr<Node>& argument : thisInitializerNode.arguments)
+            {
+                if (first)
+                {
+                    first = false;
+                }
+                else
+                {
+                    formatter.Write(", ");
+                }
+                argument->Accept(*this);
+            }
+            formatter.WriteLine(")");
+        }
+        public override void Visit(BaseInitializerNode& baseInitializerNode) 
+        {
+            formatter.Write("base(");
+            bool first = true;
+            for (const UniquePtr<Node>& argument : baseInitializerNode.arguments)
+            {
+                if (first)
+                {
+                    first = false;
+                }
+                else
+                {
+                    formatter.Write(", ");
+                }
+                argument->Accept(*this);
+            }
+            formatter.WriteLine(")");
+        }
+        public override void Visit(MemberInitializerNode& memberInitializerNode) 
+        {
+            memberInitializerNode.id->Accept(*this);
+            formatter.Write("(");
+            bool first = true;
+            for (const UniquePtr<Node>& argument : memberInitializerNode.arguments)
+            {
+                if (first)
+                {
+                    first = false;
+                }
+                else
+                {
+                    formatter.Write(", ");
+                }
+                argument->Accept(*this);
+            }
+            formatter.WriteLine(")");
+        }
+        public override void Visit(StaticConstructorNode& staticConstructorNode) 
+        {
+            string specifierStr = SpecifierStr(staticConstructorNode.specifiers);
+            formatter.Write(specifierStr);
+            if (!specifierStr.IsEmpty())
+            {
+                formatter.Write(" ");
+            }
+            ClassNode* cls = cast<ClassNode*>(staticConstructorNode.parent);
+            cls->id->Accept(*this);
+            formatter.Write("()");
+            if (!staticConstructorNode.initializers.IsEmpty())
+            {
+                formatter.Write(" : ");
+                bool first = true;
+                for (const UniquePtr<InitializerNode>& initializer : staticConstructorNode.initializers)
+                {
+                    if (first)
+                    {
+                        first = false;
+                    }
+                    else
+                    {
+                        formatter.Write(", ");
+                    }
+                    initializer->Accept(*this);
+                }
+            }
+            formatter.WriteLine();
+            staticConstructorNode.body->Accept(*this);
+        }
+        public override void Visit(ConstructorNode& constructorNode) 
+        {
+            string specifierStr = SpecifierStr(constructorNode.specifiers);
+            formatter.Write(specifierStr);
+            if (!specifierStr.IsEmpty())
+            {
+                formatter.Write(" ");
+            }
+            ClassNode* cls = cast<ClassNode*>(constructorNode.parent);
+            cls->id->Accept(*this);
+            formatter.Write("(");
+            bool first = true;
+            for (const UniquePtr<ParameterNode>& parameter : constructorNode.parameters)
+            {
+                if (first)
+                {
+                    first = false;
+                }
+                else
+                {
+                    formatter.Write(", ");
+                }
+                parameter->Accept(*this);
+            }
+            formatter.Write(")");
+            if (!constructorNode.initializers.IsEmpty())
+            {
+                formatter.Write(" : ");
+                bool first = true;
+                for (const UniquePtr<InitializerNode>& initializer : constructorNode.initializers)
+                {
+                    if (first)
+                    {
+                        first = false;
+                    }
+                    else
+                    {
+                        formatter.Write(", ");
+                    }
+                    initializer->Accept(*this);
+                }
+            }
+            if (!constructorNode.body.IsNull())
+            {
+                formatter.WriteLine();
+                constructorNode.body->Accept(*this);
+            }
+            else
+            {
+                formatter.WriteLine(";");
+            }
+        }
+        public override void Visit(DestructorNode& destructorNode) 
+        {
+            string specifierStr = SpecifierStr(destructorNode.specifiers);
+            formatter.Write(specifierStr);
+            if (!specifierStr.IsEmpty())
+            {
+                formatter.Write(" ");
+            }
+            ClassNode* cls = cast<ClassNode*>(destructorNode.parent);
+            formatter.Write("~");
+            cls->id->Accept(*this);
+            formatter.Write("()");
+            if (!destructorNode.body.IsNull())
+            {
+                formatter.WriteLine();
+                destructorNode.body->Accept(*this);
+            }
+            else
+            {
+                formatter.WriteLine(";");
+            }
+        }
+        public override void Visit(MemberFunctionNode& memberFunctionNode) 
+        {
+            string specifierStr = SpecifierStr(cast<Specifiers>(memberFunctionNode.specifiers & ~Specifiers.const_));
+            formatter.Write(specifierStr);
+            if (!specifierStr.IsEmpty())
+            {
+                formatter.Write(" ");
+            }
+            memberFunctionNode.returnTypeExpr->Accept(*this);
+            formatter.Write(" ");
+            memberFunctionNode.groupId->Accept(*this);
+            formatter.Write("(");
+            bool first = true;
+            for (const UniquePtr<ParameterNode>& parameter : memberFunctionNode.parameters)
+            {
+                if (first)
+                {
+                    first = false;
+                }
+                else
+                {
+                    formatter.Write(", ");
+                }
+                parameter->Accept(*this);
+            }
+            formatter.Write(")");
+            if ((memberFunctionNode.specifiers & Specifiers.const_) != Specifiers.none)
+            {
+                formatter.Write(" const");
+            }
+            if (!memberFunctionNode.body.IsNull())
+            {
+                formatter.WriteLine();
+                memberFunctionNode.body->Accept(*this);
+            }
+            else
+            {
+                formatter.WriteLine(";");
+            }
+        }
+        public override void Visit(ConversionFunctionNode& conversionFunctionNode) 
+        {
+            string specifierStr = SpecifierStr(cast<Specifiers>(conversionFunctionNode.specifiers & ~Specifiers.const_));
+            formatter.Write(specifierStr);
+            if (!specifierStr.IsEmpty())
+            {
+                formatter.Write(" ");
+            }
+            formatter.Write("operator ");
+            conversionFunctionNode.returnTypeExpr->Accept(*this);
+            formatter.Write("()");
+            if ((conversionFunctionNode.specifiers & Specifiers.const_) != Specifiers.none)
+            {
+                formatter.Write(" const");
+            }
+            if (!conversionFunctionNode.body.IsNull())
+            {
+                formatter.WriteLine();
+                conversionFunctionNode.body->Accept(*this);
+            }
+            else
+            {
+                formatter.WriteLine(";");
+            }
+        }
+        public override void Visit(MemberVariableNode& memberVariableNode) 
+        {
+            string specifierStr = SpecifierStr(memberVariableNode.specifiers);
+            formatter.Write(specifierStr);
+            if (!specifierStr.IsEmpty())
+            {
+                formatter.Write(" ");
+            }
+            memberVariableNode.typeExpr->Accept(*this);
+            formatter.Write(" ");
+            memberVariableNode.id->Accept(*this);
+            formatter.WriteLine(";");
+        }
+        private CodeFormatter& formatter;
+    }
+}

@@ -1,0 +1,65 @@
+// =================================
+// Copyright (c) 2019 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+namespace System
+{
+    public class Exception
+    {
+        public nothrow Exception(const string& message_) : message(message_), stackTrace(RtGetStackTrace())
+        {
+            RtDisposeStackTrace();
+        }
+        public default virtual ~Exception();
+        public nothrow inline const string& Message() const
+        {
+            return message;
+        }
+        public nothrow inline const string& StackTrace() const
+        {
+            return stackTrace;
+        }
+        public nothrow virtual string ToString() const
+        {
+            string s = typename(*this);
+            s.Append(": ").Append(message).Append("\nCALL STACK:\n").Append(stackTrace);
+            return s;
+        }
+        private string message;
+        private string stackTrace;
+    }
+    
+    public class ExceptionPtr
+    {
+        public nothrow ExceptionPtr() : exception(null), exceptionClassId(0u)
+        {
+        }
+        public nothrow ExceptionPtr(void* exception_, ulong exceptionClassId_) : exception(exception_), exceptionClassId(exceptionClassId_)
+        {
+        }
+        public inline nothrow void* Exception() const
+        {
+            return exception;
+        }
+        public inline nothrow ulong ExceptionClassId() const
+        {
+            return exceptionClassId;
+        }
+        private void* exception;
+        private ulong exceptionClassId;
+    }
+    
+    public nothrow ExceptionPtr CaptureCurrentException()
+    {
+        void* exception;
+        ulong exceptionClassId;
+        RtCaptureException(exception, exceptionClassId);
+        return ExceptionPtr(exception, exceptionClassId);
+    }
+    
+    public void ThrowCapturedException(const ExceptionPtr& capturedException)
+    {
+        RtThrowCapturedException(capturedException.Exception(), capturedException.ExceptionClassId());
+    }
+}

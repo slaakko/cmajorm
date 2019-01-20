@@ -1,0 +1,56 @@
+// =================================
+// Copyright (c) 2019 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+[hpp]#include <cmajor/ast/Project.hpp>
+
+namespace cmajor.parser
+{
+    [hpp]using namespace cmajor::ast;
+
+    grammar Project
+    {
+        using stdlib.qualified_id;
+        using stdlib.spaces_and_comments;
+        skip spaces_and_comments;
+
+        Project(std::string config) : cmajor::ast::Project*
+            ::= keyword("project") qualified_id ';'{ value = new cmajor::ast::Project(qualified_id, fileName, config); }
+                (Declaration{ value->AddDeclaration(Declaration); })*
+            ;
+
+        Declaration : ProjectDeclaration*
+            ::= ReferenceDeclaration{ value = ReferenceDeclaration; }
+            |   SourceFileDeclaration{ value = SourceFileDeclaration; }
+            |   TextFileDeclaration{ value = TextFileDeclaration; }
+            |   TargetDeclaration{ value = TargetDeclaration; }
+            ;
+
+        ReferenceDeclaration : ProjectDeclaration*
+            ::= (keyword("reference") FilePath! ';'!){ value = new ReferenceDeclaration(FilePath); }
+            ;
+
+        SourceFileDeclaration : ProjectDeclaration*
+            ::= (keyword("source") FilePath! ';'!){ value = new SourceFileDeclaration(FilePath); }
+            ;
+
+        TextFileDeclaration : ProjectDeclaration*
+            ::= (keyword("text") FilePath! ';'!){ value = new TextFileDeclaration(FilePath); }
+            ;
+
+        TargetDeclaration : ProjectDeclaration*
+            ::= (keyword("target") '='! Target! ';'!){ value = new TargetDeclaration(Target); }
+            ;
+
+        Target : Target
+            ::= keyword("program"){ value = Target::program; }
+            |   keyword("library"){ value = Target::library; }
+            |   keyword("unitTest"){ value = Target::unitTest; }
+            ;
+
+        FilePath: std::string
+            ::= token('<' ([^>]+){ value = ToUtf8(std::u32string(matchBegin, matchEnd)); } '>'!)
+            ;
+    }
+}

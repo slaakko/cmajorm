@@ -1,0 +1,33 @@
+using ParsingContext = Code.ParsingContext;
+
+namespace Syntax
+{
+    grammar GrammarGrammar
+    {
+        using ElementGrammar.Identifier;
+        using ElementGrammar.RuleLink;
+        using RuleGrammar.Rule;
+
+        Grammar(ParsingContext* ctx, System.Text.Parsing.Scope* enclosingScope) : System.Text.Parsing.Grammar*
+            ::= keyword("grammar") Identifier:grammarName!{ value = new System.Text.Parsing.Grammar(grammarName, enclosingScope); value->SetNs(enclosingScope->Ns()); }
+                '{'! GrammarContent(ctx, value) '}'!
+            ;
+
+        GrammarContent(ParsingContext* ctx, System.Text.Parsing.Grammar* grammar)
+            ::=
+            (   StartClause(grammar)
+            |   SkipClause(grammar)
+            |   RuleLink(grammar)
+            |   Rule(ctx, grammar->GetScope()){ grammar->AddRule(Rule); }
+            )*
+        ;
+
+        StartClause(System.Text.Parsing.Grammar* grammar)
+            ::= (keyword("start") Identifier:startRuleName! ';'!){ grammar->SetStartRuleName(startRuleName); }
+            ;
+
+        SkipClause(System.Text.Parsing.Grammar* grammar)
+            ::= (keyword("skip") Identifier:skipRuleName! ';'!){ grammar->SetSkipRuleName(skipRuleName); }
+            ;
+    }
+}

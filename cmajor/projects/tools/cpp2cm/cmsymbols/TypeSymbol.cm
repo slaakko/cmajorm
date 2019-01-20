@@ -1,0 +1,20 @@
+using System;
+
+namespace cmsymbols
+{
+    public abstract class TypeSymbol : ContainerSymbol
+    {
+        public nothrow TypeSymbol(const ustring& name_) : base(name_)
+        {
+        }
+    }
+    
+    public class TemplateParameterSymbol : TypeSymbol
+    {
+        public nothrow TemplateParameterSymbol(const ustring& name_) : base(name_)
+        {
+        }
+        public bool hasDefault;
+        public Node* defaultArg;
+    }
+}

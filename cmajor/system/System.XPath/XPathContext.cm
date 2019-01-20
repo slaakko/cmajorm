@@ -1,0 +1,32 @@
+// =================================
+// Copyright (c) 2019 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Dom;
+
+namespace System.XPath
+{
+    public class XPathContext
+    {
+        public nothrow XPathContext(DomNode* node_, long position_, long size_) : node(node_), position(position_), size(size_)
+        {
+        }
+        public nothrow inline DomNode* Node() const
+        {
+            return node;
+        }
+        public nothrow inline long Position() const
+        {
+            return position;
+        }
+        public nothrow inline long Size() const
+        {
+            return size;
+        }
+        private DomNode* node;
+        private long position;
+        private long size;
+    }
+}

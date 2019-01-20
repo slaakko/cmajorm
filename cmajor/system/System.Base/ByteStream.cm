@@ -1,0 +1,53 @@
+// =================================
+// Copyright (c) 2019 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+
+namespace System.IO
+{
+    public enum Origin : byte
+    {
+        seekSet, seekCur, seekEnd
+    }
+    
+    public abstract class ByteStream
+    {
+        public default virtual ~ByteStream();
+        suppress ByteStream(const ByteStream&);
+        suppress void operator=(const ByteStream&);
+        public default nothrow ByteStream(ByteStream&&);
+        public default nothrow void operator=(ByteStream&&);
+        public abstract int ReadByte();
+        public abstract long Read(byte* buf, long count);
+        public abstract void Write(byte x);
+        public abstract void Write(byte* buf, long count);
+        public virtual void Flush()
+        {
+        }
+        public virtual void Seek(long pos, Origin origin)
+        {
+            throw FileSystemException("this stream does not support seek");
+        }
+        public virtual long Tell()
+        {
+            throw FileSystemException("this stream does not support tell");
+        }
+        public void CopyTo(ByteStream& destination)
+        {
+            this->CopyTo(destination, 16384);
+        }
+        public void CopyTo(ByteStream& destination, long bufferSize)
+        {
+            #assert(bufferSize > 0);
+            IOBuffer buffer(bufferSize);
+            long bytesRead = Read(cast<byte*>(buffer.Mem()), bufferSize);
+            while (bytesRead > 0)
+            {
+                destination.Write(cast<byte*>(buffer.Mem()), bytesRead);
+                bytesRead = Read(cast<byte*>(buffer.Mem()), bufferSize);
+            }
+        }
+    }
+}

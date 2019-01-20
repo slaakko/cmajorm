@@ -1,0 +1,116 @@
+using System;
+using System.Collections;
+using System.Threading;
+using ThreadSynchronizationExample;
+
+namespace ThreadSynchronizationExample
+{
+    public class OutputCollector
+    {
+        static OutputCollector() : instance(new OutputCollector())
+        {
+        }
+        public static OutputCollector& Instance()
+        {
+            return *instance;
+        }
+        private OutputCollector() : exiting(false)
+        {
+        }
+        public void EnqueueLine(const string& line)
+        {
+            LockGuard<RecursiveMutex> lock(outputMutex);
+            outputLines.Add(line);
+            outputAvailableOrExiting.NotifyOne();
+        }
+        public void Run()
+        {
+            try
+            {
+                int lineNumber = 1;
+                while (!exiting)
+                {
+                    LockGuard<RecursiveMutex> lock(outputMutex);
+                    outputAvailableOrExiting.Wait(outputMutex, OutputLinesAvailableOrExiting, null);
+                    while (!outputLines.IsEmpty())
+                    {
+                        string outputLine = outputLines.RemoveFirst();
+                        Console.WriteLine(ToString(lineNumber) + " : " + outputLine);
+                        ++lineNumber;
+                    }                
+                }
+            }
+            catch (const Exception& ex)
+            {
+                Console.Error() << ex.ToString() << endl();
+            }
+        }
+        public void Exit()
+        {
+            LockGuard<RecursiveMutex> lock(outputMutex);
+            exiting = true;
+            outputAvailableOrExiting.NotifyOne();
+        }
+        private bool OutputLinesAvailableOrExiting(void* arg)
+        {
+            return !outputLines.IsEmpty() || exiting;
+        }
+        private static UniquePtr<OutputCollector> instance;
+        private List<string> outputLines;
+        private RecursiveMutex outputMutex;
+        private bool exiting;
+        private ConditionVariable outputAvailableOrExiting;
+    }
+    
+    public void OutputThreadMain(void* arg)
+    {
+        try
+        {
+            int* threadNumberPtr = cast<int*>(arg);
+            int threadNumber = *threadNumberPtr;
+            for (int i = 0; i < 10; ++i)
+            {
+                uint randomMs = RandomNumber(20u);
+                OutputCollector.Instance().EnqueueLine("Hello " + ToString(i) + " from thread " + ToString(threadNumber) + ". Sleeping " + ToString(randomMs) + " ms.");
+                Duration duration = Duration.FromMilliseconds(randomMs);
+                Sleep(duration);
+            }
+        }
+        catch (const Exception& ex)
+        {
+            Console.Error() << ex.ToString() << endl();
+        }
+    }
+}
+
+public void main()
+{
+    try
+    {
+        List<Thread> outputThreads;
+        ThreadStartMethod threadMethod = OutputCollector.Instance().Run;
+        Thread outputCollectorThread = Thread.StartMethod(threadMethod);
+        int n = 2 * HardwareConcurrency();
+        List<int> threadNumbers;
+        for (int i = 0; i < n; ++i)
+        {
+            threadNumbers.Add(i);
+        }        
+        for (int i = 0; i < n; ++i)
+        {
+            int* threadNumber = &threadNumbers[i];
+            Thread outputThread = Thread.StartFunction(OutputThreadMain, threadNumber);
+            outputThreads.Add(Rvalue(outputThread));
+        }
+        for (Thread& outputThread : outputThreads)
+        {
+            outputThread.Join();
+        }
+        OutputCollector.Instance().Exit();
+        outputCollectorThread.Join();
+    }
+    catch (const Exception& ex)
+    {
+        Console.Error() << ex.ToString() << endl();
+    }
+}

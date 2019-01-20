@@ -1,0 +1,41 @@
+using ParsingContext = Code.ParsingContext;
+
+namespace Syntax
+{
+    grammar CompositeGrammar
+    {
+        using PrimaryGrammar.Primary;
+
+        Alternative(ParsingContext* ctx) : System.Text.Parsing.Parser*
+            ::= Sequence(ctx):left{ value = left; } ('|' Sequence(ctx):right!{ value = new System.Text.Parsing.AlternativeParser(value, right); })*
+            ;
+
+        Sequence(ParsingContext* ctx) : System.Text.Parsing.Parser*
+            ::= Difference(ctx):left{ value = left; } (Difference(ctx):right{ value = new System.Text.Parsing.SequenceParser(value, right); })*
+            ;
+
+        Difference(ParsingContext* ctx) : System.Text.Parsing.Parser*
+            ::= ExclusiveOr(ctx):left{ value = left; } ('-' ExclusiveOr(ctx):right!{ value = new System.Text.Parsing.DifferenceParser(value, right); })*
+            ;
+
+        ExclusiveOr(ParsingContext* ctx) : System.Text.Parsing.Parser*
+            ::= Intersection(ctx):left{ value = left; } ('^' Intersection(ctx):right!{ value = new System.Text.Parsing.ExclusiveOrParser(value, right); })*
+            ;
+
+        Intersection(ParsingContext* ctx) : System.Text.Parsing.Parser*
+            ::= List(ctx):left{ value = left; } ('&' List(ctx):right!{ value = new System.Text.Parsing.IntersectionParser(value, right); })*
+            ;
+
+        List(ParsingContext* ctx) : System.Text.Parsing.Parser*
+            ::= Postfix(ctx):left{ value = left; } ('%' Postfix(ctx):right!{ value = new System.Text.Parsing.ListParser(value, right); })?
+            ;
+
+        Postfix(ParsingContext* ctx) : System.Text.Parsing.Parser*
+            ::= Primary(ctx){ value = Primary; }
+            (   '*'{ value = new System.Text.Parsing.KleeneStarParser(value); }
+            |   '+'{ value = new System.Text.Parsing.PositiveParser(value); }
+            |   '?'{ value = new System.Text.Parsing.OptionalParser(value); }
+            )?
+            ;
+    }
+}

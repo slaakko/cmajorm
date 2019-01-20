@@ -1,0 +1,95 @@
+using System;
+using System.IO;
+using System.Collections;
+using cpp2cm;
+
+const char* Version() 
+{
+    return "2.5.0";
+}
+
+void PrintHelp()
+{
+    Console.Out() << "C++ to Cmajor converter version " << Version() << endl() <<
+        "Usage: cpp2cm [options] [ INPUT.XML ]" << endl() <<
+        "Options:" << endl() <<
+        "--help (-h)" << endl() <<
+        "   Print this help" << endl() <<
+        "--verbose (-v)" << endl() <<
+        "   Be verbose" << endl() <<
+        "--diagnostics (-d)" << endl() <<
+        "   Diagnostic output" << endl() <<
+        "--force (-f)" << endl() <<
+        "   Force all conversion phases" << endl();
+}
+
+int main(int argc, const char** argv)
+{
+    try
+    {
+        List<string> inputXmlFilePaths;
+        for (int i = 1; i < argc; ++i)
+        {
+            string arg = argv[i];
+            if (arg.StartsWith("-"))
+            {
+                if (arg == "--help" || arg == "-h")
+                {
+                    PrintHelp();
+                    return 0;
+                }
+                else if (arg == "--verbose" || arg == "-v")
+                {
+                    Flags.SetVerbose();
+                }
+                else if (arg == "--diagnostics" || arg == "-d")
+                {
+                    Flags.SetDiagnostics();
+                }
+                else if (arg == "--force" || arg == "-f")
+                {
+                    Flags.SetForce();
+                }
+                else
+                {
+                    throw Exception("unknown option '" + arg + "'");
+                }
+            }
+            else 
+            {
+                inputXmlFilePaths.Add(GetFullPath(arg));
+            }
+        }
+        if (inputXmlFilePaths.IsEmpty())
+        {
+            string defaultInputXml = GetFullPath("cpp2cm.xml");
+            if (File.Exists(defaultInputXml))
+            {
+                inputXmlFilePaths.Add(defaultInputXml);
+            }
+            else
+            {
+                PrintHelp();
+                throw Exception("no INPUT.XML given and no cpp2cm.xml in the current directory exists");
+            }
+        }
+        for (const string& inputXmlFilePath : inputXmlFilePaths)
+        {
+            if (inputXmlFilePath.EndsWith(".xml"))
+            {
+                string workXmlFilePath = MakeWorkXml(inputXmlFilePath);
+                Process(workXmlFilePath);
+            }
+            else
+            {
+                throw Exception("error: input file '" + inputXmlFilePath + "' does not have .xml extension");
+            }
+        }
+    }
+    catch (const Exception& ex)
+    {
+        Console.Error() << ex.ToString() << endl();
+        return 1;
+    }
+    return 0;
+}

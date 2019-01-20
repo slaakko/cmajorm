@@ -1,0 +1,177 @@
+using System;
+using System.Numerics.Multiprecision;
+
+namespace BigNumCalc
+{
+    public enum BigNumKind
+    {
+        bigInt, bigRational, bigFloat
+    }
+    
+    public nothrow BigNumKind CommonType(BigNumKind left, BigNumKind right) 
+    {
+        switch (left)
+        {
+            case BigNumKind.bigInt:
+            {
+                switch (right)
+                {
+                    case BigNumKind.bigInt: return BigNumKind.bigInt;
+                    case BigNumKind.bigRational: return BigNumKind.bigRational;
+                    case BigNumKind.bigFloat: return BigNumKind.bigFloat;
+                }
+                break;
+            }
+            case BigNumKind.bigRational:
+            {
+                switch (right)
+                {
+                    case BigNumKind.bigInt: return BigNumKind.bigRational;
+                    case BigNumKind.bigRational: return BigNumKind.bigRational;
+                    case BigNumKind.bigFloat: return BigNumKind.bigFloat;
+                }
+                break;
+            }
+            case BigNumKind.bigFloat:
+            {
+                switch (right)
+                {
+                    case BigNumKind.bigInt: return BigNumKind.bigFloat;
+                    case BigNumKind.bigRational: return BigNumKind.bigFloat;
+                    case BigNumKind.bigFloat: return BigNumKind.bigFloat;
+                }
+                break;
+            }
+        }
+        return BigNumKind.bigInt;
+    }
+    
+    public abstract class BigValue
+    {
+        public virtual default ~BigValue();
+        public nothrow abstract BigNumKind Kind() const;
+        public abstract BigValue* As(BigNumKind kind) const;
+        public abstract string ToString() const;
+    }
+    
+    public class BigIntValue : BigValue
+    {
+        public typedef BigInt OperandType;
+        public nothrow BigIntValue() : value()
+        {
+        }
+        public explicit nothrow BigIntValue(const BigInt& value_) : value(value_)
+        {
+        }
+        public nothrow override BigNumKind Kind() const 
+        { 
+            return BigNumKind.bigInt; 
+        }
+        public override BigValue* As(BigNumKind kind) const
+        {
+            switch (kind)
+            {
+                case BigNumKind.bigInt: 
+                {
+                    return new BigIntValue(value);
+                }
+                case BigNumKind.bigRational: 
+                {
+                    BigRational val(value);
+                    return new BigRationalValue(val);
+                }                
+                case BigNumKind.bigFloat: 
+                {
+                    BigFloat val(value);
+                    return new BigFloatValue(val);
+                }
+            }
+            return null;
+        }
+        public override string ToString() const
+        {
+            return value.ToString();
+        }
+        public nothrow inline const BigInt& Get() const
+        {
+            return value;
+        }
+        private BigInt value;
+    }
+    
+    public class BigRationalValue : BigValue
+    {
+        public typedef BigRational OperandType;
+        public nothrow BigRationalValue() : value()
+        {
+        }
+        public explicit nothrow BigRationalValue(const BigRational& value_) : value(value_)
+        {
+        }    
+        public nothrow override BigNumKind Kind() const
+        {
+            return BigNumKind.bigRational;
+        }
+        public override BigValue* As(BigNumKind kind) const
+        {
+            switch (kind)
+            {
+                case BigNumKind.bigRational:
+                {
+                    return new BigRationalValue(value);
+                }
+                case BigNumKind.bigFloat: 
+                {
+                    BigFloat val(value);
+                    return new BigFloatValue(val);
+                }
+            }
+            return null;
+        }
+        public override string ToString() const
+        {
+            return "[" + value.ToString() + "]";
+        }
+        public nothrow inline const BigRational& Get() const
+        {
+            return value;
+        }
+        private BigRational value;
+    }
+    
+    public class BigFloatValue : BigValue
+    {
+        public typedef BigFloat OperandType;
+        public nothrow BigFloatValue() : value()
+        {
+        }
+        public explicit nothrow BigFloatValue(const BigFloat& value_) : value(value_)
+        {
+        }
+        public nothrow override BigNumKind Kind() const
+        {
+            return BigNumKind.bigFloat;
+        }
+        public override BigValue* As(BigNumKind kind) const
+        {
+            switch (kind)
+            {
+                case BigNumKind.bigFloat: 
+                {
+                    return new BigFloatValue(value);
+                }
+            }
+            return null;
+        }
+        public override string ToString() const
+        {
+            return value.ToString();
+        }
+        public nothrow inline const BigFloat& Get() const
+        {
+            return value;
+        }
+        private BigFloat value;
+    }
+}
+

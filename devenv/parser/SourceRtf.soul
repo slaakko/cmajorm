@@ -1,0 +1,48 @@
+﻿/*========================================================================
+    Copyright (c) 2012-2016 Seppo Laakko
+    http://sourceforge.net/projects/cmajor/
+ 
+    Distributed under the GNU General Public License, version 3 (GPLv3).
+    (See accompanying LICENSE.txt or http://www.gnu.org/licenses/gpl.html)
+
+ ========================================================================*/
+
+using devcore;
+
+namespace parser
+{
+    grammar SourceRtf
+    {
+        using stdlib;
+        extern newline;
+        using SourceToken;
+        extern Keyword: string;
+        extern QualifiedId: string;
+        extern Char: string;
+        extern String: string;
+        extern Number: string;
+        extern Spaces: string;
+        extern LineComment: string;
+        extern BlockComment: string;
+        extern Other: string;
+
+        SourceRtf(SourceFormatter formatter)
+                    ::= empty{ formatter.BeginFormat(); }
+                        SourceToken(formatter)*
+                        empty{ formatter.EndFormat(); }
+                    ;
+
+        SourceToken(SourceFormatter formatter)
+                    ::= Keyword:kw{ formatter.Keyword(kw); }
+                    |   QualifiedId:id{ formatter.Id(id); }
+                    |   Char:chr{ formatter.Char(chr); }
+                    |   String:str{ formatter.String(str); }
+                    |   Number:num{ formatter.Number(num); }
+                    |   Spaces:spc{ formatter.Spaces(spc); }
+                    |   LineComment:cmt{ formatter.LineComment(cmt); }
+                    |   BlockComment:bct{ formatter.BlockComment(bct); }
+                    |   newline{ formatter.NewLine(); }
+                    |   Other:other{ formatter.Other(other); }
+                    ;
+        }
+}

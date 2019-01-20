@@ -1,0 +1,215 @@
+// =================================
+// Copyright (c) 2019 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Collections;
+using System.Dom;
+
+namespace System.XPath
+{
+    public abstract class XPathObject
+    {
+        public default virtual ~XPathObject();
+        public abstract nothrow bool ToBool() const;
+        public abstract double ToDouble(XPathContext& context) const;
+        public abstract ustring ToString() const;
+        public abstract UniquePtr<DomNode> ToDom() const;
+    }
+    
+    public class XPathNodeSet : XPathObject
+    {
+        public void Add(DomNode* node)
+        {
+            nodes.InternalAddNode(node);
+        }
+        public nothrow inline DomNode* operator[](long index) const
+        {
+            return nodes[index];
+        }
+        public nothrow inline long Length() const
+        {
+            return nodes.Length();
+        }
+        public override nothrow bool ToBool() const
+        {
+            return nodes.Length() > 0;
+        }
+        public override double ToDouble(XPathContext& context) const
+        {
+            XPathFunction* stringFunction = GetXPathLibraryFunction(u"string");
+            List<XPathObject*> stringArgs;
+            XPathObject* arg = this;
+            stringArgs.Add(arg);
+            UniquePtr<XPathObject> asStringObject = stringFunction->Evaluate(context, stringArgs);
+            if (!(asStringObject.Get() is XPathString*))
+            {
+                throw XPathException("string result expected");
+            }
+            XPathString* asString = cast<XPathString*>(asStringObject.Get());
+            return ParseDouble(ToUtf8(Trim(asString->Value())));
+        }
+        public override ustring ToString() const
+        {
+            if (nodes.Length() == 0)
+            {
+                return ustring();
+            }
+            else
+            {
+                DomNode* node = nodes[0];
+                return StringValue(node);
+            }
+        }
+        public override UniquePtr<DomNode> ToDom() const
+        {
+            UniquePtr<DomElement> result(new DomElement(u"nodeSet"));
+            result->SetAttribute(u"length", ToUtf32(ToString(nodes.Length())));
+            long n = nodes.Length();
+            for (long i = 0; i < n; ++i)
+            {
+                DomNode* node = nodes[i];
+                if (node is DomAttr*)
+                {
+                    UniquePtr<DomElement> element(new DomElement(u"attribute"));
+                    UniquePtr<DomNode> clonedAttrNode = node->CloneNode(false);
+                    UniquePtr<DomAttr> clonedAttr(cast<DomAttr*>(clonedAttrNode.Release()));
+                    element->AddAttribute(Rvalue(clonedAttr));
+                    result->AppendChild(UniquePtr<DomNode>(element.Release()));
+                }
+                else 
+                {
+                    ustring nodeName;
+                    if (node is DomDocument*)
+                    {
+                        nodeName = u"document";
+                    }
+                    else if (node is DomElement*)
+                    {
+                         nodeName = u"element";
+                    }
+                    else if (node is DomText*)
+                    {
+                        nodeName = u"text";
+                    }
+                    else if (node is DomCDataSection*)
+                    {
+                        nodeName = u"cdataSection";
+                    }
+                    else if (node is DomComment*)
+                    {
+                        nodeName = u"comment";
+                    }
+                    else if (node is DomProcessingInstruction*)
+                    {
+                        nodeName = u"processingInstruction";
+                    }
+                    UniquePtr<DomElement> element(new DomElement(nodeName));
+                    element->AppendChild(node->CloneNode(true));
+                    result->AppendChild(UniquePtr<DomNode>(element.Release()));
+                }
+            }
+            return UniquePtr<DomNode>(result.Release());
+        }    
+        private NodeList nodes;
+    }
+    
+    public class XPathBoolean : XPathObject
+    {
+        public nothrow XPathBoolean(bool value_) : value(value_)
+        {
+        }
+        public nothrow inline bool Value() const
+        {
+            return value;
+        }
+        public override nothrow bool ToBool() const
+        {
+            return value;
+        }
+        public override double ToDouble(XPathContext& context) const
+        {
+            if (value)
+            {
+                return 1;
+            }
+            return 0;
+        }
+        public override ustring ToString() const
+        {
+            if (value)
+            {
+                return u"true";
+            }
+            return u"false";
+        }
+        public override UniquePtr<DomNode> ToDom() const
+        {
+            UniquePtr<DomElement> result(new DomElement(u"boolean"));
+            result->SetAttribute(u"value", ToUtf32(ToString(value)));
+            return UniquePtr<DomNode>(result.Release());
+        }
+        private bool value;
+    }
+    
+    public class XPathNumber : XPathObject
+    {
+        public nothrow XPathNumber(double value_) : value(value_)
+        {
+        }
+        public nothrow inline double Value() const
+        {
+            return value;
+        }
+        public override nothrow bool ToBool() const
+        {
+            return value != 0;
+        }
+        public override double ToDouble(XPathContext& context) const
+        {
+            return value;
+        }
+        public override ustring ToString() const
+        {
+            return ToUtf32(ToString(value));
+        }
+        public override UniquePtr<DomNode> ToDom() const
+        {
+            UniquePtr<DomElement> result(new DomElement(u"number"));
+            result->SetAttribute(u"value", ToUtf32(ToString(value)));
+            return UniquePtr<DomNode>(result.Release());
+        }
+        private double value;
+    }
+    
+    public class XPathString : XPathObject
+    {
+        public nothrow XPathString(const ustring& value_) : value(value_)
+        {
+        }
+        public nothrow inline const ustring& Value() const
+        {
+            return value;
+        }
+        public override nothrow bool ToBool() const
+        {
+            return !value.IsEmpty();
+        }
+        public override double ToDouble(XPathContext& context) const
+        {
+            return ParseDouble(ToUtf8(Trim(value)));
+        }
+        public override ustring ToString() const
+        {
+            return value;
+        }
+        public override UniquePtr<DomNode> ToDom() const
+        {
+            UniquePtr<DomElement> result(new DomElement(u"string"));
+            result->SetAttribute(u"value", value);
+            return UniquePtr<DomNode>(result.Release());
+        }
+        private ustring value;
+    }
+}

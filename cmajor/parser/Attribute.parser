@@ -1,0 +1,26 @@
+// =================================
+// Copyright (c) 2019 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+[hpp]#include <cmajor/ast/Attribute.hpp>
+
+namespace cmajor.parser
+{
+    grammar Attribute
+    {
+        using stdlib.identifier;
+        using stdlib.string;
+
+        Attributes : cmajor::ast::Attributes*
+            ::= '['{ value = new cmajor::ast::Attributes(); } (Attribute(value) % ',')? ']'
+            ;
+
+        Attribute(cmajor::ast::Attributes* attributes)
+            ::= identifier:name 
+            (   '=' string:val{ attributes->AddAttribute(span, name, val); } 
+            |   empty{ attributes->AddAttribute(span, name); }
+            )
+            ;
+    }
+}

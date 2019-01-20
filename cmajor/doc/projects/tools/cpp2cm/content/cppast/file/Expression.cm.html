@@ -1,0 +1,729 @@
+<html>
+ <head>
+  <meta charset="utf-8"/>
+  <title>cppast/Expression.cm</title>
+  <link href="../../../style/style.css" rel="stylesheet" type="text/css"/>
+ </head>
+ <body>
+  <span class="code" id="1" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;1</span>&nbsp;<span class="kw">using</span>&nbsp;<span class="identifier">System</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="2" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;2</span>&nbsp;<span class="kw">using</span>&nbsp;<span class="identifier">System.Collections</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="3" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;3</span>&nbsp;<span class="kw">using</span>&nbsp;<span class="identifier">Span</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">System.Text.Parsing.Span</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="4" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;4</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="5" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;5</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">cppast</span></span>
+  <br/>
+  <span class="code" id="6" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;6</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="7" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;7</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../doc/class_BinaryExpressionNode_86A1B39A338A53CB1ABB61375FE3958711C55881.html">BinaryExpressionNode</a><span class="other">&nbsp;:&nbsp;</span><a href="../doc/class_BinaryNode_69D6C5D662616978E829A18F735D960D5A59FCB4.html">BinaryNode</a></span>
+  <br/>
+  <span class="code" id="8" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;8</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="9" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;9</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<a href="../doc/class_BinaryExpressionNode_86A1B39A338A53CB1ABB61375FE3958711C55881.html#constructor_BinaryExpressionNode_A9EA1B6E3FF56EE026BDD406A7797D05A3D72E61">BinaryExpressionNode</a><span class="other">(</span><span class="kw">const</span>&nbsp;<a href="../../../../../../system/content/System.Text.Parsing/doc/class_Span_342F797681C8A26247E86213AFC9204FEF17D2A5.html">Span</a><span class="other">&amp;</span>&nbsp;<span class="identifier">span_</span><span class="other">,&nbsp;</span><a href="../doc/class_Node_DEB477A450EF6E99A28A9855849F398D50BF1609.html">Node</a><span class="other">*</span>&nbsp;<span class="identifier">left_</span><span class="other">,&nbsp;</span><a href="../doc/class_Node_DEB477A450EF6E99A28A9855849F398D50BF1609.html">Node</a><span class="other">*</span>&nbsp;<span class="identifier">right_</span><span class="other">,&nbsp;</span><a href="../doc/enumerated_type_Operator_FA5C07633B74EEF8F5DCFBBD1F158D8A5641B509.html">Operator</a>&nbsp;<span class="identifier">op_</span><span class="other">)</span><span class="other">&nbsp;:&nbsp;</span><span class="kw">base</span><span class="other">(</span><span class="identifier">span_</span><span class="other">,&nbsp;</span><span class="identifier">left_</span><span class="other">,&nbsp;</span><span class="identifier">right_</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">op</span><span class="other">(</span><span class="identifier">op_</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="10" xml:space="preserve"><span class="lineNumber">&nbsp;10</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="11" xml:space="preserve"><span class="lineNumber">&nbsp;11</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="12" xml:space="preserve"><span class="lineNumber">&nbsp;12</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">override</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/class_BinaryExpressionNode_86A1B39A338A53CB1ABB61375FE3958711C55881.html#member_function_Accept_BinaryExpressionNode_A2A2742A8806A3BEC3B5C44F0AA16AA090CBC7F4">Accept</a><span class="other">(</span><a href="../doc/class_Visitor_28273FE318CD5DFB4ED5432CA7F6868A076C1E70.html">Visitor</a><span class="other">&amp;</span>&nbsp;<span class="identifier">visitor</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="13" xml:space="preserve"><span class="lineNumber">&nbsp;13</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="14" xml:space="preserve"><span class="lineNumber">&nbsp;14</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">visitor</span><span class="other">.</span><a href="../doc/class_Visitor_28273FE318CD5DFB4ED5432CA7F6868A076C1E70.html#member_function_Visit_Visitor_63E0F0C07FE919AB623D101E75A6385CCC410E70">Visit</a><span class="other">(</span><span class="other">*</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="15" xml:space="preserve"><span class="lineNumber">&nbsp;15</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="16" xml:space="preserve"><span class="lineNumber">&nbsp;16</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<a href="../doc/enumerated_type_Operator_FA5C07633B74EEF8F5DCFBBD1F158D8A5641B509.html">Operator</a>&nbsp;<span class="identifier">op</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="17" xml:space="preserve"><span class="lineNumber">&nbsp;17</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="18" xml:space="preserve"><span class="lineNumber">&nbsp;18</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+  <br/>
+  <span class="code" id="19" xml:space="preserve"><span class="lineNumber">&nbsp;19</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../doc/class_UnaryExpressionNode_F8FC23EE14CB6BB47D36E947DC8855822E0F65D4.html">UnaryExpressionNode</a><span class="other">&nbsp;:&nbsp;</span><a href="../doc/class_UnaryNode_EAFF99520EE6A633B0DE72A169C3BA5ABA76AB03.html">UnaryNode</a></span>
+  <br/>
+  <span class="code" id="20" xml:space="preserve"><span class="lineNumber">&nbsp;20</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="21" xml:space="preserve"><span class="lineNumber">&nbsp;21</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<a href="../doc/class_UnaryExpressionNode_F8FC23EE14CB6BB47D36E947DC8855822E0F65D4.html#constructor_UnaryExpressionNode_88098C19D4E0F3345966F36AAAC585DD3805D37D">UnaryExpressionNode</a><span class="other">(</span><span class="kw">const</span>&nbsp;<a href="../../../../../../system/content/System.Text.Parsing/doc/class_Span_342F797681C8A26247E86213AFC9204FEF17D2A5.html">Span</a><span class="other">&amp;</span>&nbsp;<span class="identifier">span_</span><span class="other">,&nbsp;</span><a href="../doc/class_Node_DEB477A450EF6E99A28A9855849F398D50BF1609.html">Node</a><span class="other">*</span>&nbsp;<span class="identifier">child_</span><span class="other">,&nbsp;</span><a href="../doc/enumerated_type_Operator_FA5C07633B74EEF8F5DCFBBD1F158D8A5641B509.html">Operator</a>&nbsp;<span class="identifier">op_</span><span class="other">)</span><span class="other">&nbsp;:&nbsp;</span><span class="kw">base</span><span class="other">(</span><span class="identifier">span_</span><span class="other">,&nbsp;</span><span class="identifier">child_</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">op</span><span class="other">(</span><span class="identifier">op_</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="22" xml:space="preserve"><span class="lineNumber">&nbsp;22</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="23" xml:space="preserve"><span class="lineNumber">&nbsp;23</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="24" xml:space="preserve"><span class="lineNumber">&nbsp;24</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">override</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/class_UnaryExpressionNode_F8FC23EE14CB6BB47D36E947DC8855822E0F65D4.html#member_function_Accept_UnaryExpressionNode_98881706EC708A0A9347F25DF58A9B7B770B6551">Accept</a><span class="other">(</span><a href="../doc/class_Visitor_28273FE318CD5DFB4ED5432CA7F6868A076C1E70.html">Visitor</a><span class="other">&amp;</span>&nbsp;<span class="identifier">visitor</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="25" xml:space="preserve"><span class="lineNumber">&nbsp;25</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="26" xml:space="preserve"><span class="lineNumber">&nbsp;26</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">visitor</span><span class="other">.</span><a href="../doc/class_Visitor_28273FE318CD5DFB4ED5432CA7F6868A076C1E70.html#member_function_Visit_Visitor_8085B09455BA623769161873B9551899F8F88012">Visit</a><span class="other">(</span><span class="other">*</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="27" xml:space="preserve"><span class="lineNumber">&nbsp;27</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="28" xml:space="preserve"><span class="lineNumber">&nbsp;28</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<a href="../doc/enumerated_type_Operator_FA5C07633B74EEF8F5DCFBBD1F158D8A5641B509.html">Operator</a>&nbsp;<span class="identifier">op</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="29" xml:space="preserve"><span class="lineNumber">&nbsp;29</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="30" xml:space="preserve"><span class="lineNumber">&nbsp;30</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="31" xml:space="preserve"><span class="lineNumber">&nbsp;31</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../doc/class_ExpressionListNode_8D55853DAF21249AB1298863FF41D033BA6FF634.html">ExpressionListNode</a><span class="other">&nbsp;:&nbsp;</span><a href="../doc/class_CompositeNode_NodeT_2446AABC55658CCCD2E902CC14643EAE2863C51E.html">CompositeNode</a><span class="other">&lt;</span><a href="../doc/class_Node_DEB477A450EF6E99A28A9855849F398D50BF1609.html">Node</a><span class="other">></span></span>
+  <br/>
+  <span class="code" id="32" xml:space="preserve"><span class="lineNumber">&nbsp;32</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="33" xml:space="preserve"><span class="lineNumber">&nbsp;33</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<a href="../doc/class_ExpressionListNode_8D55853DAF21249AB1298863FF41D033BA6FF634.html#constructor_ExpressionListNode_43673AD8EE51A80D427D219DF62F999D0315F285">ExpressionListNode</a><span class="other">(</span><span class="kw">const</span>&nbsp;<a href="../../../../../../system/content/System.Text.Parsing/doc/class_Span_342F797681C8A26247E86213AFC9204FEF17D2A5.html">Span</a><span class="other">&amp;</span>&nbsp;<span class="identifier">span_</span><span class="other">)</span><span class="other">&nbsp;:&nbsp;</span><span class="kw">base</span><span class="other">(</span><span class="identifier">span_</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="34" xml:space="preserve"><span class="lineNumber">&nbsp;34</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="35" xml:space="preserve"><span class="lineNumber">&nbsp;35</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="36" xml:space="preserve"><span class="lineNumber">&nbsp;36</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">override</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/class_ExpressionListNode_8D55853DAF21249AB1298863FF41D033BA6FF634.html#member_function_Accept_ExpressionListNode_36985734C83BE8F26B8515E9B0EC4E70281C3B06">Accept</a><span class="other">(</span><a href="../doc/class_Visitor_28273FE318CD5DFB4ED5432CA7F6868A076C1E70.html">Visitor</a><span class="other">&amp;</span>&nbsp;<span class="identifier">visitor</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="37" xml:space="preserve"><span class="lineNumber">&nbsp;37</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="38" xml:space="preserve"><span class="lineNumber">&nbsp;38</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">visitor</span><span class="other">.</span><a href="../doc/class_Visitor_28273FE318CD5DFB4ED5432CA7F6868A076C1E70.html#member_function_Visit_Visitor_3267B5B2EFFCC95FE3495B197D56861EB0C22EAE">Visit</a><span class="other">(</span><span class="other">*</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="39" xml:space="preserve"><span class="lineNumber">&nbsp;39</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="40" xml:space="preserve"><span class="lineNumber">&nbsp;40</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="41" xml:space="preserve"><span class="lineNumber">&nbsp;41</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+  <br/>
+  <span class="code" id="42" xml:space="preserve"><span class="lineNumber">&nbsp;42</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../doc/class_ConditionalExpressionNode_FA29E6FDAFAB77076A1A6DECE6250969A6CDAD4A.html">ConditionalExpressionNode</a><span class="other">&nbsp;:&nbsp;</span><a href="../doc/class_Node_DEB477A450EF6E99A28A9855849F398D50BF1609.html">Node</a></span>
+  <br/>
+  <span class="code" id="43" xml:space="preserve"><span class="lineNumber">&nbsp;43</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="44" xml:space="preserve"><span class="lineNumber">&nbsp;44</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<a href="../doc/class_ConditionalExpressionNode_FA29E6FDAFAB77076A1A6DECE6250969A6CDAD4A.html#constructor_ConditionalExpressionNode_24B8490608E9617B36436217C3E29B5051AE4F76">ConditionalExpressionNode</a><span class="other">(</span><span class="kw">const</span>&nbsp;<a href="../../../../../../system/content/System.Text.Parsing/doc/class_Span_342F797681C8A26247E86213AFC9204FEF17D2A5.html">Span</a><span class="other">&amp;</span>&nbsp;<span class="identifier">span_</span><span class="other">,&nbsp;</span><a href="../doc/class_Node_DEB477A450EF6E99A28A9855849F398D50BF1609.html">Node</a><span class="other">*</span>&nbsp;<span class="identifier">expr_</span><span class="other">,&nbsp;</span><a href="../doc/class_Node_DEB477A450EF6E99A28A9855849F398D50BF1609.html">Node</a><span class="other">*</span>&nbsp;<span class="identifier">thenExpr_</span><span class="other">,&nbsp;</span><a href="../doc/class_Node_DEB477A450EF6E99A28A9855849F398D50BF1609.html">Node</a><span class="other">*</span>&nbsp;<span class="identifier">elseExpr_</span><span class="other">)</span><span class="other">&nbsp;:&nbsp;</span><span class="kw">base</span><span class="other">(</span><span class="identifier">span_</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">expr</span><span class="other">(</span><span class="identifier">expr_</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">thenExpr</span><span class="other">(</span><span class="identifier">thenExpr_</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">elseExpr</span><span class="other">(</span><span class="identifier">elseExpr_</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="45" xml:space="preserve"><span class="lineNumber">&nbsp;45</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="46" xml:space="preserve"><span class="lineNumber">&nbsp;46</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../doc/class_ConditionalExpressionNode_FA29E6FDAFAB77076A1A6DECE6250969A6CDAD4A.html#variable_expr_F7E5BE1208EA201F860E552C594657B6D2747491">expr</a><span class="other">-></span><span class="identifier">parent</span><span class="other">&nbsp;=&nbsp;</span><span class="kw">this</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="47" xml:space="preserve"><span class="lineNumber">&nbsp;47</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../doc/class_ConditionalExpressionNode_FA29E6FDAFAB77076A1A6DECE6250969A6CDAD4A.html#variable_thenExpr_BCF5E18A1BE410061A22103D7469AC86C22B736A">thenExpr</a><span class="other">-></span><span class="identifier">parent</span><span class="other">&nbsp;=&nbsp;</span><span class="kw">this</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="48" xml:space="preserve"><span class="lineNumber">&nbsp;48</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../doc/class_ConditionalExpressionNode_FA29E6FDAFAB77076A1A6DECE6250969A6CDAD4A.html#variable_elseExpr_B6DBFFC8965B9766CAEA0D1C8A04DDD1A07F7E7C">elseExpr</a><span class="other">-></span><span class="identifier">parent</span><span class="other">&nbsp;=&nbsp;</span><span class="kw">this</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="49" xml:space="preserve"><span class="lineNumber">&nbsp;49</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="50" xml:space="preserve"><span class="lineNumber">&nbsp;50</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">override</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/class_ConditionalExpressionNode_FA29E6FDAFAB77076A1A6DECE6250969A6CDAD4A.html#member_function_Accept_ConditionalExpressionNode_6B293B05E69832FE6451777E1272A2F34D5FAEEF">Accept</a><span class="other">(</span><a href="../doc/class_Visitor_28273FE318CD5DFB4ED5432CA7F6868A076C1E70.html">Visitor</a><span class="other">&amp;</span>&nbsp;<span class="identifier">visitor</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="51" xml:space="preserve"><span class="lineNumber">&nbsp;51</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="52" xml:space="preserve"><span class="lineNumber">&nbsp;52</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">visitor</span><span class="other">.</span><a href="../doc/class_Visitor_28273FE318CD5DFB4ED5432CA7F6868A076C1E70.html#member_function_Visit_Visitor_7CEFB7BA404F51FB0BF496BAF4FFDCAD1834819F">Visit</a><span class="other">(</span><span class="other">*</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="53" xml:space="preserve"><span class="lineNumber">&nbsp;53</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="54" xml:space="preserve"><span class="lineNumber">&nbsp;54</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<a href="../../../../../../system/content/System.Base/doc/class_UniquePtr_T_793F841C13E9DD3A6869243C74F1D948C0E04009.html">UniquePtr</a><span class="other">&lt;</span><a href="../doc/class_Node_DEB477A450EF6E99A28A9855849F398D50BF1609.html">Node</a><span class="other">></span>&nbsp;<span class="identifier">expr</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="55" xml:space="preserve"><span class="lineNumber">&nbsp;55</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<a href="../../../../../../system/content/System.Base/doc/class_UniquePtr_T_793F841C13E9DD3A6869243C74F1D948C0E04009.html">UniquePtr</a><span class="other">&lt;</span><a href="../doc/class_Node_DEB477A450EF6E99A28A9855849F398D50BF1609.html">Node</a><span class="other">></span>&nbsp;<span class="identifier">thenExpr</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="56" xml:space="preserve"><span class="lineNumber">&nbsp;56</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<a href="../../../../../../system/content/System.Base/doc/class_UniquePtr_T_793F841C13E9DD3A6869243C74F1D948C0E04009.html">UniquePtr</a><span class="other">&lt;</span><a href="../doc/class_Node_DEB477A450EF6E99A28A9855849F398D50BF1609.html">Node</a><span class="other">></span>&nbsp;<span class="identifier">elseExpr</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="57" xml:space="preserve"><span class="lineNumber">&nbsp;57</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="58" xml:space="preserve"><span class="lineNumber">&nbsp;58</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+  <br/>
+  <span class="code" id="59" xml:space="preserve"><span class="lineNumber">&nbsp;59</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../doc/class_ThrowExpressionNode_15059D2ABCF6E3DD83CDD46D46062403F06E7458.html">ThrowExpressionNode</a><span class="other">&nbsp;:&nbsp;</span><a href="../doc/class_UnaryNode_EAFF99520EE6A633B0DE72A169C3BA5ABA76AB03.html">UnaryNode</a></span>
+  <br/>
+  <span class="code" id="60" xml:space="preserve"><span class="lineNumber">&nbsp;60</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="61" xml:space="preserve"><span class="lineNumber">&nbsp;61</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<a href="../doc/class_ThrowExpressionNode_15059D2ABCF6E3DD83CDD46D46062403F06E7458.html#constructor_ThrowExpressionNode_B12329C80E59BE97E8D1F14E4E55DD038B658F82">ThrowExpressionNode</a><span class="other">(</span><span class="kw">const</span>&nbsp;<a href="../../../../../../system/content/System.Text.Parsing/doc/class_Span_342F797681C8A26247E86213AFC9204FEF17D2A5.html">Span</a><span class="other">&amp;</span>&nbsp;<span class="identifier">span_</span><span class="other">,&nbsp;</span><a href="../doc/class_Node_DEB477A450EF6E99A28A9855849F398D50BF1609.html">Node</a><span class="other">*</span>&nbsp;<span class="identifier">expr_</span><span class="other">)</span><span class="other">&nbsp;:&nbsp;</span><span class="kw">base</span><span class="other">(</span><span class="identifier">span_</span><span class="other">,&nbsp;</span><span class="identifier">expr_</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="62" xml:space="preserve"><span class="lineNumber">&nbsp;62</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="63" xml:space="preserve"><span class="lineNumber">&nbsp;63</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="64" xml:space="preserve"><span class="lineNumber">&nbsp;64</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">override</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/class_ThrowExpressionNode_15059D2ABCF6E3DD83CDD46D46062403F06E7458.html#member_function_Accept_ThrowExpressionNode_8EA1772603B11AAC42EB03BC572BAA2F9FD6A206">Accept</a><span class="other">(</span><a href="../doc/class_Visitor_28273FE318CD5DFB4ED5432CA7F6868A076C1E70.html">Visitor</a><span class="other">&amp;</span>&nbsp;<span class="identifier">visitor</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="65" xml:space="preserve"><span class="lineNumber">&nbsp;65</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="66" xml:space="preserve"><span class="lineNumber">&nbsp;66</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">visitor</span><span class="other">.</span><a href="../doc/class_Visitor_28273FE318CD5DFB4ED5432CA7F6868A076C1E70.html#member_function_Visit_Visitor_C1CF91E69315BB4FE8255CB8646016098F0ECD74">Visit</a><span class="other">(</span><span class="other">*</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="67" xml:space="preserve"><span class="lineNumber">&nbsp;67</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="68" xml:space="preserve"><span class="lineNumber">&nbsp;68</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="69" xml:space="preserve"><span class="lineNumber">&nbsp;69</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+  <br/>
+  <span class="code" id="70" xml:space="preserve"><span class="lineNumber">&nbsp;70</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../doc/class_CastExpressionNode_EB5B2015F2B3F3FB69AC9086A7A5F3B39E88DAAF.html">CastExpressionNode</a><span class="other">&nbsp;:&nbsp;</span><a href="../doc/class_BinaryNode_69D6C5D662616978E829A18F735D960D5A59FCB4.html">BinaryNode</a></span>
+  <br/>
+  <span class="code" id="71" xml:space="preserve"><span class="lineNumber">&nbsp;71</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="72" xml:space="preserve"><span class="lineNumber">&nbsp;72</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<a href="../doc/class_CastExpressionNode_EB5B2015F2B3F3FB69AC9086A7A5F3B39E88DAAF.html#constructor_CastExpressionNode_6B1F0D214C435B1FB71022830CD4D0FA6054768B">CastExpressionNode</a><span class="other">(</span><span class="kw">const</span>&nbsp;<a href="../../../../../../system/content/System.Text.Parsing/doc/class_Span_342F797681C8A26247E86213AFC9204FEF17D2A5.html">Span</a><span class="other">&amp;</span>&nbsp;<span class="identifier">span_</span><span class="other">,&nbsp;</span><a href="../doc/class_Node_DEB477A450EF6E99A28A9855849F398D50BF1609.html">Node</a><span class="other">*</span>&nbsp;<span class="identifier">typeExpr_</span><span class="other">,&nbsp;</span><a href="../doc/class_Node_DEB477A450EF6E99A28A9855849F398D50BF1609.html">Node</a><span class="other">*</span>&nbsp;<span class="identifier">expr_</span><span class="other">)</span><span class="other">&nbsp;:&nbsp;</span><span class="kw">base</span><span class="other">(</span><span class="identifier">span_</span><span class="other">,&nbsp;</span><span class="identifier">typeExpr_</span><span class="other">,&nbsp;</span><span class="identifier">expr_</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="73" xml:space="preserve"><span class="lineNumber">&nbsp;73</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="74" xml:space="preserve"><span class="lineNumber">&nbsp;74</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="75" xml:space="preserve"><span class="lineNumber">&nbsp;75</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">override</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/class_CastExpressionNode_EB5B2015F2B3F3FB69AC9086A7A5F3B39E88DAAF.html#member_function_Accept_CastExpressionNode_0A3BDF404520BCC2074BA15C7E7E670E2FF586AA">Accept</a><span class="other">(</span><a href="../doc/class_Visitor_28273FE318CD5DFB4ED5432CA7F6868A076C1E70.html">Visitor</a><span class="other">&amp;</span>&nbsp;<span class="identifier">visitor</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="76" xml:space="preserve"><span class="lineNumber">&nbsp;76</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="77" xml:space="preserve"><span class="lineNumber">&nbsp;77</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">visitor</span><span class="other">.</span><a href="../doc/class_Visitor_28273FE318CD5DFB4ED5432CA7F6868A076C1E70.html#member_function_Visit_Visitor_14B5D39915C916817C2742C4BDE616793A72F6D3">Visit</a><span class="other">(</span><span class="other">*</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="78" xml:space="preserve"><span class="lineNumber">&nbsp;78</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="79" xml:space="preserve"><span class="lineNumber">&nbsp;79</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="80" xml:space="preserve"><span class="lineNumber">&nbsp;80</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+  <br/>
+  <span class="code" id="81" xml:space="preserve"><span class="lineNumber">&nbsp;81</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../doc/class_PrefixIncrementNode_B6F294A87BD4705728A6A088412E80F4238D109C.html">PrefixIncrementNode</a><span class="other">&nbsp;:&nbsp;</span><a href="../doc/class_UnaryNode_EAFF99520EE6A633B0DE72A169C3BA5ABA76AB03.html">UnaryNode</a></span>
+  <br/>
+  <span class="code" id="82" xml:space="preserve"><span class="lineNumber">&nbsp;82</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="83" xml:space="preserve"><span class="lineNumber">&nbsp;83</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<a href="../doc/class_PrefixIncrementNode_B6F294A87BD4705728A6A088412E80F4238D109C.html#constructor_PrefixIncrementNode_5132549AED19A3794D3D4B2D78185C5204C94AEE">PrefixIncrementNode</a><span class="other">(</span><span class="kw">const</span>&nbsp;<a href="../../../../../../system/content/System.Text.Parsing/doc/class_Span_342F797681C8A26247E86213AFC9204FEF17D2A5.html">Span</a><span class="other">&amp;</span>&nbsp;<span class="identifier">span_</span><span class="other">,&nbsp;</span><a href="../doc/class_Node_DEB477A450EF6E99A28A9855849F398D50BF1609.html">Node</a><span class="other">*</span>&nbsp;<span class="identifier">expr_</span><span class="other">)</span><span class="other">&nbsp;:&nbsp;</span><span class="kw">base</span><span class="other">(</span><span class="identifier">span_</span><span class="other">,&nbsp;</span><span class="identifier">expr_</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="84" xml:space="preserve"><span class="lineNumber">&nbsp;84</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="85" xml:space="preserve"><span class="lineNumber">&nbsp;85</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="86" xml:space="preserve"><span class="lineNumber">&nbsp;86</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">override</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/class_PrefixIncrementNode_B6F294A87BD4705728A6A088412E80F4238D109C.html#member_function_Accept_PrefixIncrementNode_D80B5A4F9CF771702B7D5BF360603443E73DB2D7">Accept</a><span class="other">(</span><a href="../doc/class_Visitor_28273FE318CD5DFB4ED5432CA7F6868A076C1E70.html">Visitor</a><span class="other">&amp;</span>&nbsp;<span class="identifier">visitor</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="87" xml:space="preserve"><span class="lineNumber">&nbsp;87</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="88" xml:space="preserve"><span class="lineNumber">&nbsp;88</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">visitor</span><span class="other">.</span><a href="../doc/class_Visitor_28273FE318CD5DFB4ED5432CA7F6868A076C1E70.html#member_function_Visit_Visitor_1A5680F07649241586A2F8C20A43BC8E0BF44DA2">Visit</a><span class="other">(</span><span class="other">*</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="89" xml:space="preserve"><span class="lineNumber">&nbsp;89</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="90" xml:space="preserve"><span class="lineNumber">&nbsp;90</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="91" xml:space="preserve"><span class="lineNumber">&nbsp;91</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+  <br/>
+  <span class="code" id="92" xml:space="preserve"><span class="lineNumber">&nbsp;92</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../doc/class_PrefixDecrementNode_016DD9D7F75648E2683AD949993DF7DA4F09C9A9.html">PrefixDecrementNode</a><span class="other">&nbsp;:&nbsp;</span><a href="../doc/class_UnaryNode_EAFF99520EE6A633B0DE72A169C3BA5ABA76AB03.html">UnaryNode</a></span>
+  <br/>
+  <span class="code" id="93" xml:space="preserve"><span class="lineNumber">&nbsp;93</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="94" xml:space="preserve"><span class="lineNumber">&nbsp;94</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<a href="../doc/class_PrefixDecrementNode_016DD9D7F75648E2683AD949993DF7DA4F09C9A9.html#constructor_PrefixDecrementNode_38E47B5085E18F96732E915CBD52D9ED9869A3A2">PrefixDecrementNode</a><span class="other">(</span><span class="kw">const</span>&nbsp;<a href="../../../../../../system/content/System.Text.Parsing/doc/class_Span_342F797681C8A26247E86213AFC9204FEF17D2A5.html">Span</a><span class="other">&amp;</span>&nbsp;<span class="identifier">span_</span><span class="other">,&nbsp;</span><a href="../doc/class_Node_DEB477A450EF6E99A28A9855849F398D50BF1609.html">Node</a><span class="other">*</span>&nbsp;<span class="identifier">expr_</span><span class="other">)</span><span class="other">&nbsp;:&nbsp;</span><span class="kw">base</span><span class="other">(</span><span class="identifier">span_</span><span class="other">,&nbsp;</span><span class="identifier">expr_</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="95" xml:space="preserve"><span class="lineNumber">&nbsp;95</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="96" xml:space="preserve"><span class="lineNumber">&nbsp;96</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="97" xml:space="preserve"><span class="lineNumber">&nbsp;97</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">override</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/class_PrefixDecrementNode_016DD9D7F75648E2683AD949993DF7DA4F09C9A9.html#member_function_Accept_PrefixDecrementNode_54A4CEFBC3D7894E3CC1BF01C0F83A76D504FA05">Accept</a><span class="other">(</span><a href="../doc/class_Visitor_28273FE318CD5DFB4ED5432CA7F6868A076C1E70.html">Visitor</a><span class="other">&amp;</span>&nbsp;<span class="identifier">visitor</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="98" xml:space="preserve"><span class="lineNumber">&nbsp;98</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="99" xml:space="preserve"><span class="lineNumber">&nbsp;99</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">visitor</span><span class="other">.</span><a href="../doc/class_Visitor_28273FE318CD5DFB4ED5432CA7F6868A076C1E70.html#member_function_Visit_Visitor_149CCA9E520008CD694FCE9DA29503FCD5AFF774">Visit</a><span class="other">(</span><span class="other">*</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="100" xml:space="preserve"><span class="lineNumber">100</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="101" xml:space="preserve"><span class="lineNumber">101</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="102" xml:space="preserve"><span class="lineNumber">102</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+  <br/>
+  <span class="code" id="103" xml:space="preserve"><span class="lineNumber">103</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../doc/class_SizeOfExpressionNode_B4CF2B6552CBBF91D88AAA311E05690760B067FA.html">SizeOfExpressionNode</a><span class="other">&nbsp;:&nbsp;</span><a href="../doc/class_UnaryNode_EAFF99520EE6A633B0DE72A169C3BA5ABA76AB03.html">UnaryNode</a></span>
+  <br/>
+  <span class="code" id="104" xml:space="preserve"><span class="lineNumber">104</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="105" xml:space="preserve"><span class="lineNumber">105</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<a href="../doc/class_SizeOfExpressionNode_B4CF2B6552CBBF91D88AAA311E05690760B067FA.html#constructor_SizeOfExpressionNode_4CD7B6966C9433C6D8C9700FC75ED22D0F98B9E2">SizeOfExpressionNode</a><span class="other">(</span><span class="kw">const</span>&nbsp;<a href="../../../../../../system/content/System.Text.Parsing/doc/class_Span_342F797681C8A26247E86213AFC9204FEF17D2A5.html">Span</a><span class="other">&amp;</span>&nbsp;<span class="identifier">span_</span><span class="other">,&nbsp;</span><a href="../doc/class_Node_DEB477A450EF6E99A28A9855849F398D50BF1609.html">Node</a><span class="other">*</span>&nbsp;<span class="identifier">expr_</span><span class="other">)</span><span class="other">&nbsp;:&nbsp;</span><span class="kw">base</span><span class="other">(</span><span class="identifier">span_</span><span class="other">,&nbsp;</span><span class="identifier">expr_</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="106" xml:space="preserve"><span class="lineNumber">106</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="107" xml:space="preserve"><span class="lineNumber">107</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="108" xml:space="preserve"><span class="lineNumber">108</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">override</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/class_SizeOfExpressionNode_B4CF2B6552CBBF91D88AAA311E05690760B067FA.html#member_function_Accept_SizeOfExpressionNode_9AE9F1C8B9BA87592C0A18DC509EE55BB8F6CC7D">Accept</a><span class="other">(</span><a href="../doc/class_Visitor_28273FE318CD5DFB4ED5432CA7F6868A076C1E70.html">Visitor</a><span class="other">&amp;</span>&nbsp;<span class="identifier">visitor</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="109" xml:space="preserve"><span class="lineNumber">109</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="110" xml:space="preserve"><span class="lineNumber">110</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">visitor</span><span class="other">.</span><a href="../doc/class_Visitor_28273FE318CD5DFB4ED5432CA7F6868A076C1E70.html#member_function_Visit_Visitor_53CAB5D780ACB7CDD94864C131CA609667BF3DDB">Visit</a><span class="other">(</span><span class="other">*</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="111" xml:space="preserve"><span class="lineNumber">111</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="112" xml:space="preserve"><span class="lineNumber">112</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="113" xml:space="preserve"><span class="lineNumber">113</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+  <br/>
+  <span class="code" id="114" xml:space="preserve"><span class="lineNumber">114</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../doc/class_AlignOfExpressionNode_6828194D7D4A5334C55A230DE71439093258B58B.html">AlignOfExpressionNode</a><span class="other">&nbsp;:&nbsp;</span><a href="../doc/class_UnaryNode_EAFF99520EE6A633B0DE72A169C3BA5ABA76AB03.html">UnaryNode</a></span>
+  <br/>
+  <span class="code" id="115" xml:space="preserve"><span class="lineNumber">115</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="116" xml:space="preserve"><span class="lineNumber">116</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<a href="../doc/class_AlignOfExpressionNode_6828194D7D4A5334C55A230DE71439093258B58B.html#constructor_AlignOfExpressionNode_C92AB970632CE0E3BE5BDB735F9ACB475A6DCE44">AlignOfExpressionNode</a><span class="other">(</span><span class="kw">const</span>&nbsp;<a href="../../../../../../system/content/System.Text.Parsing/doc/class_Span_342F797681C8A26247E86213AFC9204FEF17D2A5.html">Span</a><span class="other">&amp;</span>&nbsp;<span class="identifier">span_</span><span class="other">,&nbsp;</span><a href="../doc/class_Node_DEB477A450EF6E99A28A9855849F398D50BF1609.html">Node</a><span class="other">*</span>&nbsp;<span class="identifier">typeExpr_</span><span class="other">)</span><span class="other">&nbsp;:&nbsp;</span><span class="kw">base</span><span class="other">(</span><span class="identifier">span_</span><span class="other">,&nbsp;</span><span class="identifier">typeExpr_</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="117" xml:space="preserve"><span class="lineNumber">117</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="118" xml:space="preserve"><span class="lineNumber">118</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="119" xml:space="preserve"><span class="lineNumber">119</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">override</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/class_AlignOfExpressionNode_6828194D7D4A5334C55A230DE71439093258B58B.html#member_function_Accept_AlignOfExpressionNode_E418DFC08AE3559FC22EC0C9ADAB422246ECF103">Accept</a><span class="other">(</span><a href="../doc/class_Visitor_28273FE318CD5DFB4ED5432CA7F6868A076C1E70.html">Visitor</a><span class="other">&amp;</span>&nbsp;<span class="identifier">visitor</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="120" xml:space="preserve"><span class="lineNumber">120</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="121" xml:space="preserve"><span class="lineNumber">121</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">visitor</span><span class="other">.</span><a href="../doc/class_Visitor_28273FE318CD5DFB4ED5432CA7F6868A076C1E70.html#member_function_Visit_Visitor_B8D08D0FDCC552328DF116A185CD2DEDE9222367">Visit</a><span class="other">(</span><span class="other">*</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="122" xml:space="preserve"><span class="lineNumber">122</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="123" xml:space="preserve"><span class="lineNumber">123</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="124" xml:space="preserve"><span class="lineNumber">124</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+  <br/>
+  <span class="code" id="125" xml:space="preserve"><span class="lineNumber">125</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../doc/class_NewExpressionNode_F210F3CEB93B7B9E7096007599EEBF523845A8D9.html">NewExpressionNode</a><span class="other">&nbsp;:&nbsp;</span><a href="../doc/class_Node_DEB477A450EF6E99A28A9855849F398D50BF1609.html">Node</a></span>
+  <br/>
+  <span class="code" id="126" xml:space="preserve"><span class="lineNumber">126</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="127" xml:space="preserve"><span class="lineNumber">127</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<a href="../doc/class_NewExpressionNode_F210F3CEB93B7B9E7096007599EEBF523845A8D9.html#constructor_NewExpressionNode_14B20686ED510CD1158FA0706F3321B1EF1038EA">NewExpressionNode</a><span class="other">(</span><span class="kw">const</span>&nbsp;<a href="../../../../../../system/content/System.Text.Parsing/doc/class_Span_342F797681C8A26247E86213AFC9204FEF17D2A5.html">Span</a><span class="other">&amp;</span>&nbsp;<span class="identifier">span_</span><span class="other">,&nbsp;</span><a href="../doc/class_ExpressionListNode_8D55853DAF21249AB1298863FF41D033BA6FF634.html">ExpressionListNode</a><span class="other">*</span>&nbsp;<span class="identifier">placement_</span><span class="other">,&nbsp;</span><a href="../doc/class_Node_DEB477A450EF6E99A28A9855849F398D50BF1609.html">Node</a><span class="other">*</span>&nbsp;<span class="identifier">typeExpr_</span><span class="other">,&nbsp;</span><a href="../doc/class_Node_DEB477A450EF6E99A28A9855849F398D50BF1609.html">Node</a><span class="other">*</span>&nbsp;<span class="identifier">initializer_</span><span class="other">)</span><span class="other">&nbsp;:&nbsp;</span></span>
+  <br/>
+  <span class="code" id="128" xml:space="preserve"><span class="lineNumber">128</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">base</span><span class="other">(</span><span class="identifier">span_</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">placement</span><span class="other">(</span><span class="identifier">placement_</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">typeExpr</span><span class="other">(</span><span class="identifier">typeExpr_</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">initializer</span><span class="other">(</span><span class="identifier">initializer_</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="129" xml:space="preserve"><span class="lineNumber">129</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="130" xml:space="preserve"><span class="lineNumber">130</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if</span>&nbsp;<span class="other">(</span><span class="other">!</span><a href="../doc/class_NewExpressionNode_F210F3CEB93B7B9E7096007599EEBF523845A8D9.html#variable_placement_D3DAD9DA422DC6C483332F70F1F6CD048EFF43A3">placement</a><span class="other">.</span><a href="../../../../../../system/content/System.Base/doc/class_UniquePtr_T_793F841C13E9DD3A6869243C74F1D948C0E04009.html#member_function_IsNull_UniquePtr_T_9E7249CE0E7032B785739C6557F172D7F52E3C8F">IsNull</a><span class="other">(</span><span class="other">)</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="131" xml:space="preserve"><span class="lineNumber">131</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="132" xml:space="preserve"><span class="lineNumber">132</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../doc/class_NewExpressionNode_F210F3CEB93B7B9E7096007599EEBF523845A8D9.html#variable_placement_D3DAD9DA422DC6C483332F70F1F6CD048EFF43A3">placement</a><span class="other">-></span><span class="identifier">parent</span><span class="other">&nbsp;=&nbsp;</span><span class="kw">this</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="133" xml:space="preserve"><span class="lineNumber">133</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="134" xml:space="preserve"><span class="lineNumber">134</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../doc/class_NewExpressionNode_F210F3CEB93B7B9E7096007599EEBF523845A8D9.html#variable_typeExpr_6223493C28240F4BE69D0E39A0EA28A430557971">typeExpr</a><span class="other">-></span><span class="identifier">parent</span><span class="other">&nbsp;=&nbsp;</span><span class="kw">this</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="135" xml:space="preserve"><span class="lineNumber">135</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if</span>&nbsp;<span class="other">(</span><span class="other">!</span><a href="../doc/class_NewExpressionNode_F210F3CEB93B7B9E7096007599EEBF523845A8D9.html#variable_initializer_9A32D53F38306D1A6EF75A4E8B1DDFE6A48AE5EC">initializer</a><span class="other">.</span><a href="../../../../../../system/content/System.Base/doc/class_UniquePtr_T_793F841C13E9DD3A6869243C74F1D948C0E04009.html#member_function_IsNull_UniquePtr_T_9E7249CE0E7032B785739C6557F172D7F52E3C8F">IsNull</a><span class="other">(</span><span class="other">)</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="136" xml:space="preserve"><span class="lineNumber">136</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="137" xml:space="preserve"><span class="lineNumber">137</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../doc/class_NewExpressionNode_F210F3CEB93B7B9E7096007599EEBF523845A8D9.html#variable_initializer_9A32D53F38306D1A6EF75A4E8B1DDFE6A48AE5EC">initializer</a><span class="other">-></span><span class="identifier">parent</span><span class="other">&nbsp;=&nbsp;</span><span class="kw">this</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="138" xml:space="preserve"><span class="lineNumber">138</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="139" xml:space="preserve"><span class="lineNumber">139</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="140" xml:space="preserve"><span class="lineNumber">140</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">override</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/class_NewExpressionNode_F210F3CEB93B7B9E7096007599EEBF523845A8D9.html#member_function_Accept_NewExpressionNode_F788725D95945A81A9724B20632D6A675E19018B">Accept</a><span class="other">(</span><a href="../doc/class_Visitor_28273FE318CD5DFB4ED5432CA7F6868A076C1E70.html">Visitor</a><span class="other">&amp;</span>&nbsp;<span class="identifier">visitor</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="141" xml:space="preserve"><span class="lineNumber">141</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="142" xml:space="preserve"><span class="lineNumber">142</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">visitor</span><span class="other">.</span><a href="../doc/class_Visitor_28273FE318CD5DFB4ED5432CA7F6868A076C1E70.html#member_function_Visit_Visitor_DA0396C3CBD74C421591743FE9A95E897B10A582">Visit</a><span class="other">(</span><span class="other">*</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="143" xml:space="preserve"><span class="lineNumber">143</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="144" xml:space="preserve"><span class="lineNumber">144</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<a href="../../../../../../system/content/System.Base/doc/class_UniquePtr_T_793F841C13E9DD3A6869243C74F1D948C0E04009.html">UniquePtr</a><span class="other">&lt;</span><a href="../doc/class_ExpressionListNode_8D55853DAF21249AB1298863FF41D033BA6FF634.html">ExpressionListNode</a><span class="other">></span>&nbsp;<span class="identifier">placement</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="145" xml:space="preserve"><span class="lineNumber">145</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<a href="../../../../../../system/content/System.Base/doc/class_UniquePtr_T_793F841C13E9DD3A6869243C74F1D948C0E04009.html">UniquePtr</a><span class="other">&lt;</span><a href="../doc/class_Node_DEB477A450EF6E99A28A9855849F398D50BF1609.html">Node</a><span class="other">></span>&nbsp;<span class="identifier">typeExpr</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="146" xml:space="preserve"><span class="lineNumber">146</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<a href="../../../../../../system/content/System.Base/doc/class_UniquePtr_T_793F841C13E9DD3A6869243C74F1D948C0E04009.html">UniquePtr</a><span class="other">&lt;</span><a href="../doc/class_Node_DEB477A450EF6E99A28A9855849F398D50BF1609.html">Node</a><span class="other">></span>&nbsp;<span class="identifier">initializer</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="147" xml:space="preserve"><span class="lineNumber">147</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="148" xml:space="preserve"><span class="lineNumber">148</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+  <br/>
+  <span class="code" id="149" xml:space="preserve"><span class="lineNumber">149</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../doc/class_DeleteExpressionNode_AEE83657AA20B5D2CDF0F8E0447F94F68DCB153C.html">DeleteExpressionNode</a><span class="other">&nbsp;:&nbsp;</span><a href="../doc/class_UnaryNode_EAFF99520EE6A633B0DE72A169C3BA5ABA76AB03.html">UnaryNode</a></span>
+  <br/>
+  <span class="code" id="150" xml:space="preserve"><span class="lineNumber">150</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="151" xml:space="preserve"><span class="lineNumber">151</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<a href="../doc/class_DeleteExpressionNode_AEE83657AA20B5D2CDF0F8E0447F94F68DCB153C.html#constructor_DeleteExpressionNode_331AF622272DA376B2C981F60D120ECAA5CAE99C">DeleteExpressionNode</a><span class="other">(</span><span class="kw">const</span>&nbsp;<a href="../../../../../../system/content/System.Text.Parsing/doc/class_Span_342F797681C8A26247E86213AFC9204FEF17D2A5.html">Span</a><span class="other">&amp;</span>&nbsp;<span class="identifier">span_</span><span class="other">,&nbsp;</span><a href="../doc/class_Node_DEB477A450EF6E99A28A9855849F398D50BF1609.html">Node</a><span class="other">*</span>&nbsp;<span class="identifier">ptr_</span><span class="other">,&nbsp;</span><span class="kw">bool</span>&nbsp;<span class="identifier">arrayDelete_</span><span class="other">)</span><span class="other">&nbsp;:&nbsp;</span><span class="kw">base</span><span class="other">(</span><span class="identifier">span_</span><span class="other">,&nbsp;</span><span class="identifier">ptr_</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">arrayDelete</span><span class="other">(</span><span class="identifier">arrayDelete_</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="152" xml:space="preserve"><span class="lineNumber">152</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="153" xml:space="preserve"><span class="lineNumber">153</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="154" xml:space="preserve"><span class="lineNumber">154</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">override</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/class_DeleteExpressionNode_AEE83657AA20B5D2CDF0F8E0447F94F68DCB153C.html#member_function_Accept_DeleteExpressionNode_2E015C869F1A926B720CCE4269C30AC7E2C801B0">Accept</a><span class="other">(</span><a href="../doc/class_Visitor_28273FE318CD5DFB4ED5432CA7F6868A076C1E70.html">Visitor</a><span class="other">&amp;</span>&nbsp;<span class="identifier">visitor</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="155" xml:space="preserve"><span class="lineNumber">155</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="156" xml:space="preserve"><span class="lineNumber">156</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">visitor</span><span class="other">.</span><a href="../doc/class_Visitor_28273FE318CD5DFB4ED5432CA7F6868A076C1E70.html#member_function_Visit_Visitor_11A5D06FBC793E288B5C7BA0C4D1ACF8F78A2F73">Visit</a><span class="other">(</span><span class="other">*</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="157" xml:space="preserve"><span class="lineNumber">157</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="158" xml:space="preserve"><span class="lineNumber">158</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">bool</span>&nbsp;<span class="identifier">arrayDelete</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="159" xml:space="preserve"><span class="lineNumber">159</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="160" xml:space="preserve"><span class="lineNumber">160</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+  <br/>
+  <span class="code" id="161" xml:space="preserve"><span class="lineNumber">161</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../doc/class_SubscriptExpressionNode_E03A9E2955DC59A0AAF18DFDAA0359D5C1799835.html">SubscriptExpressionNode</a><span class="other">&nbsp;:&nbsp;</span><a href="../doc/class_BinaryNode_69D6C5D662616978E829A18F735D960D5A59FCB4.html">BinaryNode</a></span>
+  <br/>
+  <span class="code" id="162" xml:space="preserve"><span class="lineNumber">162</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="163" xml:space="preserve"><span class="lineNumber">163</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<a href="../doc/class_SubscriptExpressionNode_E03A9E2955DC59A0AAF18DFDAA0359D5C1799835.html#constructor_SubscriptExpressionNode_71A115230EB5C229263813F86A3633F96EFA0923">SubscriptExpressionNode</a><span class="other">(</span><span class="kw">const</span>&nbsp;<a href="../../../../../../system/content/System.Text.Parsing/doc/class_Span_342F797681C8A26247E86213AFC9204FEF17D2A5.html">Span</a><span class="other">&amp;</span>&nbsp;<span class="identifier">span_</span><span class="other">,&nbsp;</span><a href="../doc/class_Node_DEB477A450EF6E99A28A9855849F398D50BF1609.html">Node</a><span class="other">*</span>&nbsp;<span class="identifier">subject_</span><span class="other">,&nbsp;</span><a href="../doc/class_Node_DEB477A450EF6E99A28A9855849F398D50BF1609.html">Node</a><span class="other">*</span>&nbsp;<span class="identifier">subscript_</span><span class="other">)</span><span class="other">&nbsp;:&nbsp;</span><span class="kw">base</span><span class="other">(</span><span class="identifier">span_</span><span class="other">,&nbsp;</span><span class="identifier">subject_</span><span class="other">,&nbsp;</span><span class="identifier">subscript_</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="164" xml:space="preserve"><span class="lineNumber">164</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="165" xml:space="preserve"><span class="lineNumber">165</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="166" xml:space="preserve"><span class="lineNumber">166</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">override</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/class_SubscriptExpressionNode_E03A9E2955DC59A0AAF18DFDAA0359D5C1799835.html#member_function_Accept_SubscriptExpressionNode_F980F3A08A8B602DD34C8113EF94FC550A6DAC4F">Accept</a><span class="other">(</span><a href="../doc/class_Visitor_28273FE318CD5DFB4ED5432CA7F6868A076C1E70.html">Visitor</a><span class="other">&amp;</span>&nbsp;<span class="identifier">visitor</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="167" xml:space="preserve"><span class="lineNumber">167</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="168" xml:space="preserve"><span class="lineNumber">168</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">visitor</span><span class="other">.</span><a href="../doc/class_Visitor_28273FE318CD5DFB4ED5432CA7F6868A076C1E70.html#member_function_Visit_Visitor_D7A0B4C6888E7E3DDC2F950DCE4144D09ED417EB">Visit</a><span class="other">(</span><span class="other">*</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="169" xml:space="preserve"><span class="lineNumber">169</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="170" xml:space="preserve"><span class="lineNumber">170</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="171" xml:space="preserve"><span class="lineNumber">171</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+  <br/>
+  <span class="code" id="172" xml:space="preserve"><span class="lineNumber">172</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../doc/class_InvokeExpressionNode_8E2C5B3557C04DF37039AA90251FFA62730222B9.html">InvokeExpressionNode</a><span class="other">&nbsp;:&nbsp;</span><a href="../doc/class_UnaryNode_EAFF99520EE6A633B0DE72A169C3BA5ABA76AB03.html">UnaryNode</a></span>
+  <br/>
+  <span class="code" id="173" xml:space="preserve"><span class="lineNumber">173</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="174" xml:space="preserve"><span class="lineNumber">174</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<a href="../doc/class_InvokeExpressionNode_8E2C5B3557C04DF37039AA90251FFA62730222B9.html#constructor_InvokeExpressionNode_E5CC57F316EE30DF2CB042B841DF04EFFDCEA497">InvokeExpressionNode</a><span class="other">(</span><span class="kw">const</span>&nbsp;<a href="../../../../../../system/content/System.Text.Parsing/doc/class_Span_342F797681C8A26247E86213AFC9204FEF17D2A5.html">Span</a><span class="other">&amp;</span>&nbsp;<span class="identifier">span_</span><span class="other">,&nbsp;</span><a href="../doc/class_Node_DEB477A450EF6E99A28A9855849F398D50BF1609.html">Node</a><span class="other">*</span>&nbsp;<span class="identifier">subject_</span><span class="other">,&nbsp;</span><a href="../doc/class_Node_DEB477A450EF6E99A28A9855849F398D50BF1609.html">Node</a><span class="other">*</span>&nbsp;<span class="identifier">args_</span><span class="other">)</span><span class="other">&nbsp;:&nbsp;</span><span class="kw">base</span><span class="other">(</span><span class="identifier">span_</span><span class="other">,&nbsp;</span><span class="identifier">subject_</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">args</span><span class="other">(</span><span class="identifier">args_</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="175" xml:space="preserve"><span class="lineNumber">175</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="176" xml:space="preserve"><span class="lineNumber">176</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if</span>&nbsp;<span class="other">(</span><span class="other">!</span><a href="../doc/class_InvokeExpressionNode_8E2C5B3557C04DF37039AA90251FFA62730222B9.html#variable_args_9607E4EE958DD8067EC92529C5BC4850E753F2F5">args</a><span class="other">.</span><a href="../../../../../../system/content/System.Base/doc/class_UniquePtr_T_793F841C13E9DD3A6869243C74F1D948C0E04009.html#member_function_IsNull_UniquePtr_T_9E7249CE0E7032B785739C6557F172D7F52E3C8F">IsNull</a><span class="other">(</span><span class="other">)</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="177" xml:space="preserve"><span class="lineNumber">177</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="178" xml:space="preserve"><span class="lineNumber">178</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../doc/class_InvokeExpressionNode_8E2C5B3557C04DF37039AA90251FFA62730222B9.html#variable_args_9607E4EE958DD8067EC92529C5BC4850E753F2F5">args</a><span class="other">-></span><span class="identifier">parent</span><span class="other">&nbsp;=&nbsp;</span><span class="kw">this</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="179" xml:space="preserve"><span class="lineNumber">179</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="180" xml:space="preserve"><span class="lineNumber">180</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="181" xml:space="preserve"><span class="lineNumber">181</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">override</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/class_InvokeExpressionNode_8E2C5B3557C04DF37039AA90251FFA62730222B9.html#member_function_Accept_InvokeExpressionNode_45880CDFBA44A1AFBB5540685D54E2B81AA67FBF">Accept</a><span class="other">(</span><a href="../doc/class_Visitor_28273FE318CD5DFB4ED5432CA7F6868A076C1E70.html">Visitor</a><span class="other">&amp;</span>&nbsp;<span class="identifier">visitor</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="182" xml:space="preserve"><span class="lineNumber">182</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="183" xml:space="preserve"><span class="lineNumber">183</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">visitor</span><span class="other">.</span><a href="../doc/class_Visitor_28273FE318CD5DFB4ED5432CA7F6868A076C1E70.html#member_function_Visit_Visitor_E80FECA71363CA1CDEAA761D6550799F429A4D04">Visit</a><span class="other">(</span><span class="other">*</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="184" xml:space="preserve"><span class="lineNumber">184</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="185" xml:space="preserve"><span class="lineNumber">185</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<a href="../../../../../../system/content/System.Base/doc/class_UniquePtr_T_793F841C13E9DD3A6869243C74F1D948C0E04009.html">UniquePtr</a><span class="other">&lt;</span><a href="../doc/class_Node_DEB477A450EF6E99A28A9855849F398D50BF1609.html">Node</a><span class="other">></span>&nbsp;<span class="identifier">args</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="186" xml:space="preserve"><span class="lineNumber">186</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="187" xml:space="preserve"><span class="lineNumber">187</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+  <br/>
+  <span class="code" id="188" xml:space="preserve"><span class="lineNumber">188</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../doc/class_PostfixIncrementNode_06C84C37D44872BBBBF3308C782F703D719F7C2B.html">PostfixIncrementNode</a><span class="other">&nbsp;:&nbsp;</span><a href="../doc/class_UnaryNode_EAFF99520EE6A633B0DE72A169C3BA5ABA76AB03.html">UnaryNode</a></span>
+  <br/>
+  <span class="code" id="189" xml:space="preserve"><span class="lineNumber">189</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="190" xml:space="preserve"><span class="lineNumber">190</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<a href="../doc/class_PostfixIncrementNode_06C84C37D44872BBBBF3308C782F703D719F7C2B.html#constructor_PostfixIncrementNode_BDB39B16D9F68DED7568F9A65666433FC3B042A5">PostfixIncrementNode</a><span class="other">(</span><span class="kw">const</span>&nbsp;<a href="../../../../../../system/content/System.Text.Parsing/doc/class_Span_342F797681C8A26247E86213AFC9204FEF17D2A5.html">Span</a><span class="other">&amp;</span>&nbsp;<span class="identifier">span_</span><span class="other">,&nbsp;</span><a href="../doc/class_Node_DEB477A450EF6E99A28A9855849F398D50BF1609.html">Node</a><span class="other">*</span>&nbsp;<span class="identifier">expr_</span><span class="other">)</span><span class="other">&nbsp;:&nbsp;</span><span class="kw">base</span><span class="other">(</span><span class="identifier">span_</span><span class="other">,&nbsp;</span><span class="identifier">expr_</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="191" xml:space="preserve"><span class="lineNumber">191</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="192" xml:space="preserve"><span class="lineNumber">192</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="193" xml:space="preserve"><span class="lineNumber">193</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">override</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/class_PostfixIncrementNode_06C84C37D44872BBBBF3308C782F703D719F7C2B.html#member_function_Accept_PostfixIncrementNode_BB9AE631D9B96D885748B25EC7C3A30E7BE9DBFB">Accept</a><span class="other">(</span><a href="../doc/class_Visitor_28273FE318CD5DFB4ED5432CA7F6868A076C1E70.html">Visitor</a><span class="other">&amp;</span>&nbsp;<span class="identifier">visitor</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="194" xml:space="preserve"><span class="lineNumber">194</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="195" xml:space="preserve"><span class="lineNumber">195</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">visitor</span><span class="other">.</span><a href="../doc/class_Visitor_28273FE318CD5DFB4ED5432CA7F6868A076C1E70.html#member_function_Visit_Visitor_EE501FB91F32CF6CB42A6977CBCDBFF6366182E2">Visit</a><span class="other">(</span><span class="other">*</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="196" xml:space="preserve"><span class="lineNumber">196</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="197" xml:space="preserve"><span class="lineNumber">197</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="198" xml:space="preserve"><span class="lineNumber">198</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+  <br/>
+  <span class="code" id="199" xml:space="preserve"><span class="lineNumber">199</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../doc/class_PostfixDecrementNode_03356E4B45819451B7CDC424D624063714D0706D.html">PostfixDecrementNode</a><span class="other">&nbsp;:&nbsp;</span><a href="../doc/class_UnaryNode_EAFF99520EE6A633B0DE72A169C3BA5ABA76AB03.html">UnaryNode</a></span>
+  <br/>
+  <span class="code" id="200" xml:space="preserve"><span class="lineNumber">200</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="201" xml:space="preserve"><span class="lineNumber">201</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<a href="../doc/class_PostfixDecrementNode_03356E4B45819451B7CDC424D624063714D0706D.html#constructor_PostfixDecrementNode_63CA6468AFDC4E2F52B7652598E6539DC8C3617A">PostfixDecrementNode</a><span class="other">(</span><span class="kw">const</span>&nbsp;<a href="../../../../../../system/content/System.Text.Parsing/doc/class_Span_342F797681C8A26247E86213AFC9204FEF17D2A5.html">Span</a><span class="other">&amp;</span>&nbsp;<span class="identifier">span_</span><span class="other">,&nbsp;</span><a href="../doc/class_Node_DEB477A450EF6E99A28A9855849F398D50BF1609.html">Node</a><span class="other">*</span>&nbsp;<span class="identifier">expr_</span><span class="other">)</span><span class="other">&nbsp;:&nbsp;</span><span class="kw">base</span><span class="other">(</span><span class="identifier">span_</span><span class="other">,&nbsp;</span><span class="identifier">expr_</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="202" xml:space="preserve"><span class="lineNumber">202</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="203" xml:space="preserve"><span class="lineNumber">203</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="204" xml:space="preserve"><span class="lineNumber">204</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">override</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/class_PostfixDecrementNode_03356E4B45819451B7CDC424D624063714D0706D.html#member_function_Accept_PostfixDecrementNode_C2D76971FC2A5025BAC55B552199BA9267DE18D6">Accept</a><span class="other">(</span><a href="../doc/class_Visitor_28273FE318CD5DFB4ED5432CA7F6868A076C1E70.html">Visitor</a><span class="other">&amp;</span>&nbsp;<span class="identifier">visitor</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="205" xml:space="preserve"><span class="lineNumber">205</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="206" xml:space="preserve"><span class="lineNumber">206</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">visitor</span><span class="other">.</span><a href="../doc/class_Visitor_28273FE318CD5DFB4ED5432CA7F6868A076C1E70.html#member_function_Visit_Visitor_AAEDB7383083AC3DAB57E837AA2E11FD77167CF8">Visit</a><span class="other">(</span><span class="other">*</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="207" xml:space="preserve"><span class="lineNumber">207</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="208" xml:space="preserve"><span class="lineNumber">208</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="209" xml:space="preserve"><span class="lineNumber">209</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+  <br/>
+  <span class="code" id="210" xml:space="preserve"><span class="lineNumber">210</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../doc/class_AssignCapture_28133785D186673042BA45320D4C49E7427E4B50.html">AssignCapture</a><span class="other">&nbsp;:&nbsp;</span><a href="../doc/class_Node_DEB477A450EF6E99A28A9855849F398D50BF1609.html">Node</a></span>
+  <br/>
+  <span class="code" id="211" xml:space="preserve"><span class="lineNumber">211</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="212" xml:space="preserve"><span class="lineNumber">212</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<a href="../doc/class_AssignCapture_28133785D186673042BA45320D4C49E7427E4B50.html#constructor_AssignCapture_1902B73FB438124C2F5BF2D650F5192CD9D01EA8">AssignCapture</a><span class="other">(</span><span class="kw">const</span>&nbsp;<a href="../../../../../../system/content/System.Text.Parsing/doc/class_Span_342F797681C8A26247E86213AFC9204FEF17D2A5.html">Span</a><span class="other">&amp;</span>&nbsp;<span class="identifier">span_</span><span class="other">)</span><span class="other">&nbsp;:&nbsp;</span><span class="kw">base</span><span class="other">(</span><span class="identifier">span_</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="213" xml:space="preserve"><span class="lineNumber">213</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="214" xml:space="preserve"><span class="lineNumber">214</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="215" xml:space="preserve"><span class="lineNumber">215</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">override</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/class_AssignCapture_28133785D186673042BA45320D4C49E7427E4B50.html#member_function_Accept_AssignCapture_B70055E3CB69C86C073B67DBFAED64C5228A1773">Accept</a><span class="other">(</span><a href="../doc/class_Visitor_28273FE318CD5DFB4ED5432CA7F6868A076C1E70.html">Visitor</a><span class="other">&amp;</span>&nbsp;<span class="identifier">visitor</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="216" xml:space="preserve"><span class="lineNumber">216</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="217" xml:space="preserve"><span class="lineNumber">217</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">visitor</span><span class="other">.</span><a href="../doc/class_Visitor_28273FE318CD5DFB4ED5432CA7F6868A076C1E70.html#member_function_Visit_Visitor_A7668799B9D05EBBD71F7A5D170734B4A9A63F21">Visit</a><span class="other">(</span><span class="other">*</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="218" xml:space="preserve"><span class="lineNumber">218</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="219" xml:space="preserve"><span class="lineNumber">219</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="220" xml:space="preserve"><span class="lineNumber">220</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+  <br/>
+  <span class="code" id="221" xml:space="preserve"><span class="lineNumber">221</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../doc/class_RefCapture_494D41AFA537C79130EDFE2D8E584F5F6E2E4A0D.html">RefCapture</a><span class="other">&nbsp;:&nbsp;</span><a href="../doc/class_Node_DEB477A450EF6E99A28A9855849F398D50BF1609.html">Node</a></span>
+  <br/>
+  <span class="code" id="222" xml:space="preserve"><span class="lineNumber">222</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="223" xml:space="preserve"><span class="lineNumber">223</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<a href="../doc/class_RefCapture_494D41AFA537C79130EDFE2D8E584F5F6E2E4A0D.html#constructor_RefCapture_611515ED79F80CFE6E4AE2AA596D07D61AF65992">RefCapture</a><span class="other">(</span><span class="kw">const</span>&nbsp;<a href="../../../../../../system/content/System.Text.Parsing/doc/class_Span_342F797681C8A26247E86213AFC9204FEF17D2A5.html">Span</a><span class="other">&amp;</span>&nbsp;<span class="identifier">span_</span><span class="other">)</span><span class="other">&nbsp;:&nbsp;</span><span class="kw">base</span><span class="other">(</span><span class="identifier">span_</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="224" xml:space="preserve"><span class="lineNumber">224</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="225" xml:space="preserve"><span class="lineNumber">225</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="226" xml:space="preserve"><span class="lineNumber">226</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">override</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/class_RefCapture_494D41AFA537C79130EDFE2D8E584F5F6E2E4A0D.html#member_function_Accept_RefCapture_BCB014BB282A801AA10D74DDFC5E4F73F805235A">Accept</a><span class="other">(</span><a href="../doc/class_Visitor_28273FE318CD5DFB4ED5432CA7F6868A076C1E70.html">Visitor</a><span class="other">&amp;</span>&nbsp;<span class="identifier">visitor</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="227" xml:space="preserve"><span class="lineNumber">227</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="228" xml:space="preserve"><span class="lineNumber">228</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">visitor</span><span class="other">.</span><a href="../doc/class_Visitor_28273FE318CD5DFB4ED5432CA7F6868A076C1E70.html#member_function_Visit_Visitor_53307B57A4B798355095CCCBA1F9AF12737E3875">Visit</a><span class="other">(</span><span class="other">*</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="229" xml:space="preserve"><span class="lineNumber">229</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="230" xml:space="preserve"><span class="lineNumber">230</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="231" xml:space="preserve"><span class="lineNumber">231</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+  <br/>
+  <span class="code" id="232" xml:space="preserve"><span class="lineNumber">232</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../doc/class_IdentifierCapture_A0E525308111586BD7EC86465FBEFAF99D929982.html">IdentifierCapture</a><span class="other">&nbsp;:&nbsp;</span><a href="../doc/class_UnaryNode_EAFF99520EE6A633B0DE72A169C3BA5ABA76AB03.html">UnaryNode</a></span>
+  <br/>
+  <span class="code" id="233" xml:space="preserve"><span class="lineNumber">233</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="234" xml:space="preserve"><span class="lineNumber">234</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<a href="../doc/class_IdentifierCapture_A0E525308111586BD7EC86465FBEFAF99D929982.html#constructor_IdentifierCapture_58D4C4A012C3BC7CBCD160A007F5CB216A0D3767">IdentifierCapture</a><span class="other">(</span><span class="kw">const</span>&nbsp;<a href="../../../../../../system/content/System.Text.Parsing/doc/class_Span_342F797681C8A26247E86213AFC9204FEF17D2A5.html">Span</a><span class="other">&amp;</span>&nbsp;<span class="identifier">span_</span><span class="other">,&nbsp;</span><a href="../doc/class_IdentifierNode_F085A94295201408D19F6BCCAA6D30C97CF3ED1D.html">IdentifierNode</a><span class="other">*</span>&nbsp;<span class="identifier">id_</span><span class="other">)</span><span class="other">&nbsp;:&nbsp;</span><span class="kw">base</span><span class="other">(</span><span class="identifier">span_</span><span class="other">,&nbsp;</span><span class="identifier">id_</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="235" xml:space="preserve"><span class="lineNumber">235</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="236" xml:space="preserve"><span class="lineNumber">236</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="237" xml:space="preserve"><span class="lineNumber">237</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">override</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/class_IdentifierCapture_A0E525308111586BD7EC86465FBEFAF99D929982.html#member_function_Accept_IdentifierCapture_209AFC131F2C1E6D5A5D9FB3236A5609EE9DA0CE">Accept</a><span class="other">(</span><a href="../doc/class_Visitor_28273FE318CD5DFB4ED5432CA7F6868A076C1E70.html">Visitor</a><span class="other">&amp;</span>&nbsp;<span class="identifier">visitor</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="238" xml:space="preserve"><span class="lineNumber">238</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="239" xml:space="preserve"><span class="lineNumber">239</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">visitor</span><span class="other">.</span><a href="../doc/class_Visitor_28273FE318CD5DFB4ED5432CA7F6868A076C1E70.html#member_function_Visit_Visitor_31F73B19B042C795D2C94AE0EB61E368844E96A3">Visit</a><span class="other">(</span><span class="other">*</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="240" xml:space="preserve"><span class="lineNumber">240</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="241" xml:space="preserve"><span class="lineNumber">241</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="242" xml:space="preserve"><span class="lineNumber">242</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+  <br/>
+  <span class="code" id="243" xml:space="preserve"><span class="lineNumber">243</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../doc/class_ThisCapture_37DA6F93D91FECFB7B5AFCF2B1E8FB345CC5581B.html">ThisCapture</a><span class="other">&nbsp;:&nbsp;</span><a href="../doc/class_Node_DEB477A450EF6E99A28A9855849F398D50BF1609.html">Node</a></span>
+  <br/>
+  <span class="code" id="244" xml:space="preserve"><span class="lineNumber">244</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="245" xml:space="preserve"><span class="lineNumber">245</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<a href="../doc/class_ThisCapture_37DA6F93D91FECFB7B5AFCF2B1E8FB345CC5581B.html#constructor_ThisCapture_D6924474804AABF9044C324CC5462C951CDE07CA">ThisCapture</a><span class="other">(</span><span class="kw">const</span>&nbsp;<a href="../../../../../../system/content/System.Text.Parsing/doc/class_Span_342F797681C8A26247E86213AFC9204FEF17D2A5.html">Span</a><span class="other">&amp;</span>&nbsp;<span class="identifier">span_</span><span class="other">)</span><span class="other">&nbsp;:&nbsp;</span><span class="kw">base</span><span class="other">(</span><span class="identifier">span_</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="246" xml:space="preserve"><span class="lineNumber">246</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="247" xml:space="preserve"><span class="lineNumber">247</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="248" xml:space="preserve"><span class="lineNumber">248</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">override</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/class_ThisCapture_37DA6F93D91FECFB7B5AFCF2B1E8FB345CC5581B.html#member_function_Accept_ThisCapture_FA75673E0F2392BE1DBF94859934C3239FC7FD4B">Accept</a><span class="other">(</span><a href="../doc/class_Visitor_28273FE318CD5DFB4ED5432CA7F6868A076C1E70.html">Visitor</a><span class="other">&amp;</span>&nbsp;<span class="identifier">visitor</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="249" xml:space="preserve"><span class="lineNumber">249</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="250" xml:space="preserve"><span class="lineNumber">250</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">visitor</span><span class="other">.</span><a href="../doc/class_Visitor_28273FE318CD5DFB4ED5432CA7F6868A076C1E70.html#member_function_Visit_Visitor_406F3CE5CB17EF5FAF65136B443759F43355B897">Visit</a><span class="other">(</span><span class="other">*</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="251" xml:space="preserve"><span class="lineNumber">251</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="252" xml:space="preserve"><span class="lineNumber">252</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="253" xml:space="preserve"><span class="lineNumber">253</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+  <br/>
+  <span class="code" id="254" xml:space="preserve"><span class="lineNumber">254</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../doc/class_LambdaExpressionNode_B41592994B297007121DB6B416E19C5D1CC8157C.html">LambdaExpressionNode</a><span class="other">&nbsp;:&nbsp;</span><a href="../doc/class_Node_DEB477A450EF6E99A28A9855849F398D50BF1609.html">Node</a></span>
+  <br/>
+  <span class="code" id="255" xml:space="preserve"><span class="lineNumber">255</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="256" xml:space="preserve"><span class="lineNumber">256</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<a href="../doc/class_LambdaExpressionNode_B41592994B297007121DB6B416E19C5D1CC8157C.html#constructor_LambdaExpressionNode_58D2B1C8D685D7C293A0F70773200C0AF06C2613">LambdaExpressionNode</a><span class="other">(</span><span class="kw">const</span>&nbsp;<a href="../../../../../../system/content/System.Text.Parsing/doc/class_Span_342F797681C8A26247E86213AFC9204FEF17D2A5.html">Span</a><span class="other">&amp;</span>&nbsp;<span class="identifier">span_</span><span class="other">)</span><span class="other">&nbsp;:&nbsp;</span><span class="kw">base</span><span class="other">(</span><span class="identifier">span_</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="257" xml:space="preserve"><span class="lineNumber">257</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="258" xml:space="preserve"><span class="lineNumber">258</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="259" xml:space="preserve"><span class="lineNumber">259</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">override</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/class_LambdaExpressionNode_B41592994B297007121DB6B416E19C5D1CC8157C.html#member_function_Accept_LambdaExpressionNode_E73F42A39BE52A7CEDACB69C03CD3B192413140C">Accept</a><span class="other">(</span><a href="../doc/class_Visitor_28273FE318CD5DFB4ED5432CA7F6868A076C1E70.html">Visitor</a><span class="other">&amp;</span>&nbsp;<span class="identifier">visitor</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="260" xml:space="preserve"><span class="lineNumber">260</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="261" xml:space="preserve"><span class="lineNumber">261</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">visitor</span><span class="other">.</span><a href="../doc/class_Visitor_28273FE318CD5DFB4ED5432CA7F6868A076C1E70.html#member_function_Visit_Visitor_336933D590C1D276F849C4FC09D16D602D9606A7">Visit</a><span class="other">(</span><span class="other">*</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="262" xml:space="preserve"><span class="lineNumber">262</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="263" xml:space="preserve"><span class="lineNumber">263</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/class_LambdaExpressionNode_B41592994B297007121DB6B416E19C5D1CC8157C.html#member_function_AddCapture_LambdaExpressionNode_8EA7D09DEFBCFB43213B6028F13A7C486B04C94D">AddCapture</a><span class="other">(</span><a href="../doc/class_Node_DEB477A450EF6E99A28A9855849F398D50BF1609.html">Node</a><span class="other">*</span>&nbsp;<span class="identifier">capture</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="264" xml:space="preserve"><span class="lineNumber">264</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="265" xml:space="preserve"><span class="lineNumber">265</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">capture</span><span class="other">-></span><span class="identifier">parent</span><span class="other">&nbsp;=&nbsp;</span><span class="kw">this</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="266" xml:space="preserve"><span class="lineNumber">266</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../doc/class_LambdaExpressionNode_B41592994B297007121DB6B416E19C5D1CC8157C.html#variable_captures_A636060CE0706C72086A4D70CB1E8F3AF3A9B998">captures</a><span class="other">.</span><a href="../../../../../../system/content/System.Base/doc/class_List_T_4E42CF5913BEB21F5260DEFEC239180C94460B11.html#member_function_Add_List_T_1242E85AAD4D8369255E6BB57F2A841ED245BACD">Add</a><span class="other">(</span><span class="identifier">UniquePtr</span><span class="other">&lt;</span><a href="../../../../../../system/content/System.Base/doc/class_UniquePtr_T_793F841C13E9DD3A6869243C74F1D948C0E04009.html#constructor_UniquePtr_T_DD6D1101BC9A141DA69E2148ACA482C029FB9691">Node</a><span class="other">></span><span class="other">(</span><span class="identifier">capture</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="267" xml:space="preserve"><span class="lineNumber">267</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="268" xml:space="preserve"><span class="lineNumber">268</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/class_LambdaExpressionNode_B41592994B297007121DB6B416E19C5D1CC8157C.html#member_function_SetParameters_LambdaExpressionNode_4C8DEFCAA06D03FE8790B27F67FA3CC6BFC2AD13">SetParameters</a><span class="other">(</span><a href="../doc/class_ParameterListNode_33706CD0487B6B1DEC95753EC08E15BF8C827D95.html">ParameterListNode</a><span class="other">*</span>&nbsp;<span class="identifier">parameters_</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="269" xml:space="preserve"><span class="lineNumber">269</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="270" xml:space="preserve"><span class="lineNumber">270</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../doc/class_LambdaExpressionNode_B41592994B297007121DB6B416E19C5D1CC8157C.html#variable_parameters_27B34C2CFCF0927151C87E6214627D2744A74516">parameters</a><span class="other">&nbsp;=&nbsp;</span><span class="identifier">UniquePtr</span><span class="other">&lt;</span><a href="../../../../../../system/content/System.Base/doc/class_UniquePtr_T_793F841C13E9DD3A6869243C74F1D948C0E04009.html#constructor_UniquePtr_T_DD6D1101BC9A141DA69E2148ACA482C029FB9691">ParameterListNode</a><span class="other">></span><span class="other">(</span><span class="identifier">parameters_</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="271" xml:space="preserve"><span class="lineNumber">271</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../doc/class_LambdaExpressionNode_B41592994B297007121DB6B416E19C5D1CC8157C.html#variable_parameters_27B34C2CFCF0927151C87E6214627D2744A74516">parameters</a><span class="other">-></span><span class="identifier">parent</span><span class="other">&nbsp;=&nbsp;</span><span class="kw">this</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="272" xml:space="preserve"><span class="lineNumber">272</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="273" xml:space="preserve"><span class="lineNumber">273</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/class_LambdaExpressionNode_B41592994B297007121DB6B416E19C5D1CC8157C.html#member_function_SetBody_LambdaExpressionNode_15BB6B8BD89058471E69663A1C2ECACDDC5EA45B">SetBody</a><span class="other">(</span><a href="../../../../../../system/content/System.Base/doc/class_UniquePtr_T_793F841C13E9DD3A6869243C74F1D948C0E04009.html">CompoundStatementNode</a><span class="other">*</span>&nbsp;<span class="identifier">body_</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="274" xml:space="preserve"><span class="lineNumber">274</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="275" xml:space="preserve"><span class="lineNumber">275</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../doc/class_LambdaExpressionNode_B41592994B297007121DB6B416E19C5D1CC8157C.html#variable_body_5061EFA89566F978A992B6CC3D22676D53ACFED8">body</a><span class="other">&nbsp;=&nbsp;</span><span class="identifier">UniquePtr</span><span class="other">&lt;</span><a href="../../../../../../system/content/System.Base/doc/class_UniquePtr_T_793F841C13E9DD3A6869243C74F1D948C0E04009.html#constructor_UniquePtr_T_DD6D1101BC9A141DA69E2148ACA482C029FB9691">CompoundStatementNode</a><span class="other">></span><span class="other">(</span><span class="identifier">body_</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="276" xml:space="preserve"><span class="lineNumber">276</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../doc/class_LambdaExpressionNode_B41592994B297007121DB6B416E19C5D1CC8157C.html#variable_body_5061EFA89566F978A992B6CC3D22676D53ACFED8">body</a><span class="other">-></span><span class="identifier">parent</span><span class="other">&nbsp;=&nbsp;</span><span class="kw">this</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="277" xml:space="preserve"><span class="lineNumber">277</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="278" xml:space="preserve"><span class="lineNumber">278</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<a href="../../../../../../system/content/System.Base/doc/class_List_T_4E42CF5913BEB21F5260DEFEC239180C94460B11.html">List</a><span class="other">&lt;</span><a href="../../../../../../system/content/System.Base/doc/class_UniquePtr_T_793F841C13E9DD3A6869243C74F1D948C0E04009.html">UniquePtr</a><span class="other">&lt;</span><a href="../doc/class_Node_DEB477A450EF6E99A28A9855849F398D50BF1609.html">Node</a><span class="other">></span><span class="other">></span>&nbsp;<span class="identifier">captures</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="279" xml:space="preserve"><span class="lineNumber">279</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<a href="../../../../../../system/content/System.Base/doc/class_UniquePtr_T_793F841C13E9DD3A6869243C74F1D948C0E04009.html">UniquePtr</a><span class="other">&lt;</span><a href="../doc/class_ParameterListNode_33706CD0487B6B1DEC95753EC08E15BF8C827D95.html">ParameterListNode</a><span class="other">></span>&nbsp;<span class="identifier">parameters</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="280" xml:space="preserve"><span class="lineNumber">280</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<a href="../../../../../../system/content/System.Base/doc/class_UniquePtr_T_793F841C13E9DD3A6869243C74F1D948C0E04009.html">UniquePtr</a><span class="other">&lt;</span><a href="../doc/class_CompoundStatementNode_15C7F98877ABF9D629A373476CF70C051CE8A292.html">CompoundStatementNode</a><span class="other">></span>&nbsp;<span class="identifier">body</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="281" xml:space="preserve"><span class="lineNumber">281</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="282" xml:space="preserve"><span class="lineNumber">282</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+  <br/>
+  <span class="code" id="283" xml:space="preserve"><span class="lineNumber">283</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../doc/class_ParenthesizedExpressionNode_8CBB28376773B66387A4BCE112FC39E64B162AB2.html">ParenthesizedExpressionNode</a><span class="other">&nbsp;:&nbsp;</span><a href="../doc/class_UnaryNode_EAFF99520EE6A633B0DE72A169C3BA5ABA76AB03.html">UnaryNode</a></span>
+  <br/>
+  <span class="code" id="284" xml:space="preserve"><span class="lineNumber">284</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="285" xml:space="preserve"><span class="lineNumber">285</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<a href="../doc/class_ParenthesizedExpressionNode_8CBB28376773B66387A4BCE112FC39E64B162AB2.html#constructor_ParenthesizedExpressionNode_4104EFEEAF3DA63FCB4E9835144631F558CDC9EB">ParenthesizedExpressionNode</a><span class="other">(</span><span class="kw">const</span>&nbsp;<a href="../../../../../../system/content/System.Text.Parsing/doc/class_Span_342F797681C8A26247E86213AFC9204FEF17D2A5.html">Span</a><span class="other">&amp;</span>&nbsp;<span class="identifier">span_</span><span class="other">,&nbsp;</span><a href="../doc/class_Node_DEB477A450EF6E99A28A9855849F398D50BF1609.html">Node</a><span class="other">*</span>&nbsp;<span class="identifier">child_</span><span class="other">)</span><span class="other">&nbsp;:&nbsp;</span><span class="kw">base</span><span class="other">(</span><span class="identifier">span_</span><span class="other">,&nbsp;</span><span class="identifier">child_</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="286" xml:space="preserve"><span class="lineNumber">286</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="287" xml:space="preserve"><span class="lineNumber">287</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="288" xml:space="preserve"><span class="lineNumber">288</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">override</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/class_ParenthesizedExpressionNode_8CBB28376773B66387A4BCE112FC39E64B162AB2.html#member_function_Accept_ParenthesizedExpressionNode_5B5DD1F7F746E183529FCFFA51A7FBD6BC58D00D">Accept</a><span class="other">(</span><a href="../doc/class_Visitor_28273FE318CD5DFB4ED5432CA7F6868A076C1E70.html">Visitor</a><span class="other">&amp;</span>&nbsp;<span class="identifier">visitor</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="289" xml:space="preserve"><span class="lineNumber">289</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="290" xml:space="preserve"><span class="lineNumber">290</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">visitor</span><span class="other">.</span><a href="../doc/class_Visitor_28273FE318CD5DFB4ED5432CA7F6868A076C1E70.html#member_function_Visit_Visitor_02AD71CDF7FC906DC82FEB74D4D2F8845C3951E9">Visit</a><span class="other">(</span><span class="other">*</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="291" xml:space="preserve"><span class="lineNumber">291</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="292" xml:space="preserve"><span class="lineNumber">292</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="293" xml:space="preserve"><span class="lineNumber">293</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+  <br/>
+  <span class="code" id="294" xml:space="preserve"><span class="lineNumber">294</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../doc/class_ThisNode_DF4B17144B6D03DE64EF8DB448577700F998696E.html">ThisNode</a><span class="other">&nbsp;:&nbsp;</span><a href="../doc/class_Node_DEB477A450EF6E99A28A9855849F398D50BF1609.html">Node</a></span>
+  <br/>
+  <span class="code" id="295" xml:space="preserve"><span class="lineNumber">295</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="296" xml:space="preserve"><span class="lineNumber">296</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<a href="../doc/class_ThisNode_DF4B17144B6D03DE64EF8DB448577700F998696E.html#constructor_ThisNode_6E5EFFBB0124DA7A5AB0B253793A35009AC250B9">ThisNode</a><span class="other">(</span><span class="kw">const</span>&nbsp;<a href="../../../../../../system/content/System.Text.Parsing/doc/class_Span_342F797681C8A26247E86213AFC9204FEF17D2A5.html">Span</a><span class="other">&amp;</span>&nbsp;<span class="identifier">span_</span><span class="other">)</span><span class="other">&nbsp;:&nbsp;</span><span class="kw">base</span><span class="other">(</span><span class="identifier">span_</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="297" xml:space="preserve"><span class="lineNumber">297</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="298" xml:space="preserve"><span class="lineNumber">298</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="299" xml:space="preserve"><span class="lineNumber">299</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">override</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/class_ThisNode_DF4B17144B6D03DE64EF8DB448577700F998696E.html#member_function_Accept_ThisNode_99E853306392959C4ED70A1D76CBE640A583E6FD">Accept</a><span class="other">(</span><a href="../doc/class_Visitor_28273FE318CD5DFB4ED5432CA7F6868A076C1E70.html">Visitor</a><span class="other">&amp;</span>&nbsp;<span class="identifier">visitor</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="300" xml:space="preserve"><span class="lineNumber">300</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="301" xml:space="preserve"><span class="lineNumber">301</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">visitor</span><span class="other">.</span><a href="../doc/class_Visitor_28273FE318CD5DFB4ED5432CA7F6868A076C1E70.html#member_function_Visit_Visitor_D9D93855611CF456B0B89E10B737E893C013BBFB">Visit</a><span class="other">(</span><span class="other">*</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="302" xml:space="preserve"><span class="lineNumber">302</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="303" xml:space="preserve"><span class="lineNumber">303</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="304" xml:space="preserve"><span class="lineNumber">304</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+  <br/>
+  <span class="code" id="305" xml:space="preserve"><span class="lineNumber">305</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">enum</span>&nbsp;<a href="../doc/enumerated_type_CppCast_22EDF23FE52744BAED9948F388182D81EF9AB8A2.html">CppCast</a></span>
+  <br/>
+  <span class="code" id="306" xml:space="preserve"><span class="lineNumber">306</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="307" xml:space="preserve"><span class="lineNumber">307</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">dynamicCast</span><span class="other">,&nbsp;</span><span class="identifier">staticCast</span><span class="other">,&nbsp;</span><span class="identifier">reinterpretCast</span><span class="other">,&nbsp;</span><span class="identifier">constCast</span></span>
+  <br/>
+  <span class="code" id="308" xml:space="preserve"><span class="lineNumber">308</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="309" xml:space="preserve"><span class="lineNumber">309</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+  <br/>
+  <span class="code" id="310" xml:space="preserve"><span class="lineNumber">310</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<a href="../../../../../../system/content/System.Base/doc/ns_System.html#typedef_ustring_1750E1C62AAF5897C1F1DA3C5BC4999982AE9B36">ustring</a>&nbsp;<a href="../doc/ns_cppast.html#function_CppCastStr_B512681233367544A556918E7429C21882834EE8">CppCastStr</a><span class="other">(</span><a href="../doc/enumerated_type_CppCast_22EDF23FE52744BAED9948F388182D81EF9AB8A2.html">CppCast</a>&nbsp;<span class="identifier">cast_</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="311" xml:space="preserve"><span class="lineNumber">311</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="312" xml:space="preserve"><span class="lineNumber">312</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">switch</span>&nbsp;<span class="other">(</span><span class="identifier">cast_</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="313" xml:space="preserve"><span class="lineNumber">313</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="314" xml:space="preserve"><span class="lineNumber">314</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">case</span>&nbsp;<span class="identifier">CppCast</span><span class="other">.</span><span class="identifier">dynamicCast</span><span class="other">:</span>&nbsp;<span class="kw">return</span>&nbsp;&nbsp;<span class="string">u"dynamic_cast"</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="315" xml:space="preserve"><span class="lineNumber">315</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">case</span>&nbsp;<span class="identifier">CppCast</span><span class="other">.</span><span class="identifier">staticCast</span><span class="other">:</span>&nbsp;<span class="kw">return</span>&nbsp;&nbsp;<span class="string">u"static_cast"</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="316" xml:space="preserve"><span class="lineNumber">316</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">case</span>&nbsp;<span class="identifier">CppCast</span><span class="other">.</span><span class="identifier">reinterpretCast</span><span class="other">:</span>&nbsp;<span class="kw">return</span>&nbsp;&nbsp;<span class="string">u"reinterpret_cast"</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="317" xml:space="preserve"><span class="lineNumber">317</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">case</span>&nbsp;<span class="identifier">CppCast</span><span class="other">.</span><span class="identifier">constCast</span><span class="other">:</span>&nbsp;<span class="kw">return</span>&nbsp;&nbsp;<span class="string">u"const_cast"</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="318" xml:space="preserve"><span class="lineNumber">318</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="319" xml:space="preserve"><span class="lineNumber">319</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;&nbsp;<span class="string">u"CAST"</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="320" xml:space="preserve"><span class="lineNumber">320</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="321" xml:space="preserve"><span class="lineNumber">321</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+  <br/>
+  <span class="code" id="322" xml:space="preserve"><span class="lineNumber">322</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../doc/class_CppCastNode_0603C49342B96235ADA53D1F950A6DEC7FEB7C90.html">CppCastNode</a><span class="other">&nbsp;:&nbsp;</span><a href="../doc/class_Node_DEB477A450EF6E99A28A9855849F398D50BF1609.html">Node</a></span>
+  <br/>
+  <span class="code" id="323" xml:space="preserve"><span class="lineNumber">323</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="324" xml:space="preserve"><span class="lineNumber">324</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<a href="../doc/class_CppCastNode_0603C49342B96235ADA53D1F950A6DEC7FEB7C90.html#constructor_CppCastNode_624D318C74276ACEAA57E76F6D040A0150155F49">CppCastNode</a><span class="other">(</span><span class="kw">const</span>&nbsp;<a href="../../../../../../system/content/System.Text.Parsing/doc/class_Span_342F797681C8A26247E86213AFC9204FEF17D2A5.html">Span</a><span class="other">&amp;</span>&nbsp;<span class="identifier">span_</span><span class="other">,&nbsp;</span><a href="../doc/enumerated_type_CppCast_22EDF23FE52744BAED9948F388182D81EF9AB8A2.html">CppCast</a>&nbsp;<span class="identifier">cast__</span><span class="other">,&nbsp;</span><a href="../doc/class_Node_DEB477A450EF6E99A28A9855849F398D50BF1609.html">Node</a><span class="other">*</span>&nbsp;<span class="identifier">typeExpr_</span><span class="other">,&nbsp;</span><a href="../doc/class_Node_DEB477A450EF6E99A28A9855849F398D50BF1609.html">Node</a><span class="other">*</span>&nbsp;<span class="identifier">expr_</span><span class="other">)</span><span class="other">&nbsp;:&nbsp;</span><span class="kw">base</span><span class="other">(</span><span class="identifier">span_</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">cast_</span><span class="other">(</span><span class="identifier">cast__</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">typeExpr</span><span class="other">(</span><span class="identifier">typeExpr_</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">expr</span><span class="other">(</span><span class="identifier">expr_</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="325" xml:space="preserve"><span class="lineNumber">325</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="326" xml:space="preserve"><span class="lineNumber">326</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../doc/class_CppCastNode_0603C49342B96235ADA53D1F950A6DEC7FEB7C90.html#variable_typeExpr_368EFAA2F8FEE47E8C5FCFBDC963D02D4FC1293A">typeExpr</a><span class="other">-></span><span class="identifier">parent</span><span class="other">&nbsp;=&nbsp;</span><span class="kw">this</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="327" xml:space="preserve"><span class="lineNumber">327</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../doc/class_CppCastNode_0603C49342B96235ADA53D1F950A6DEC7FEB7C90.html#variable_expr_C3FBE62EA1957A80F8A5A7FA3455FB905AD6E13B">expr</a><span class="other">-></span><span class="identifier">parent</span><span class="other">&nbsp;=&nbsp;</span><span class="kw">this</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="328" xml:space="preserve"><span class="lineNumber">328</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="329" xml:space="preserve"><span class="lineNumber">329</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">override</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/class_CppCastNode_0603C49342B96235ADA53D1F950A6DEC7FEB7C90.html#member_function_Accept_CppCastNode_DD642D0851808E8A512F13A6FE31A87843750E74">Accept</a><span class="other">(</span><a href="../doc/class_Visitor_28273FE318CD5DFB4ED5432CA7F6868A076C1E70.html">Visitor</a><span class="other">&amp;</span>&nbsp;<span class="identifier">visitor</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="330" xml:space="preserve"><span class="lineNumber">330</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="331" xml:space="preserve"><span class="lineNumber">331</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">visitor</span><span class="other">.</span><a href="../doc/class_Visitor_28273FE318CD5DFB4ED5432CA7F6868A076C1E70.html#member_function_Visit_Visitor_9BA04110DCB709EFC8FED37E86A980FEA93A766D">Visit</a><span class="other">(</span><span class="other">*</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="332" xml:space="preserve"><span class="lineNumber">332</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="333" xml:space="preserve"><span class="lineNumber">333</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<a href="../doc/enumerated_type_CppCast_22EDF23FE52744BAED9948F388182D81EF9AB8A2.html">CppCast</a>&nbsp;<span class="identifier">cast_</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="334" xml:space="preserve"><span class="lineNumber">334</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<a href="../../../../../../system/content/System.Base/doc/class_UniquePtr_T_793F841C13E9DD3A6869243C74F1D948C0E04009.html">UniquePtr</a><span class="other">&lt;</span><a href="../doc/class_Node_DEB477A450EF6E99A28A9855849F398D50BF1609.html">Node</a><span class="other">></span>&nbsp;<span class="identifier">typeExpr</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="335" xml:space="preserve"><span class="lineNumber">335</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<a href="../../../../../../system/content/System.Base/doc/class_UniquePtr_T_793F841C13E9DD3A6869243C74F1D948C0E04009.html">UniquePtr</a><span class="other">&lt;</span><a href="../doc/class_Node_DEB477A450EF6E99A28A9855849F398D50BF1609.html">Node</a><span class="other">></span>&nbsp;<span class="identifier">expr</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="336" xml:space="preserve"><span class="lineNumber">336</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="337" xml:space="preserve"><span class="lineNumber">337</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+  <br/>
+  <span class="code" id="338" xml:space="preserve"><span class="lineNumber">338</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../doc/class_TypeIdNode_80688BF18DBCFACC81D07AE3747161005139D734.html">TypeIdNode</a><span class="other">&nbsp;:&nbsp;</span><a href="../doc/class_UnaryNode_EAFF99520EE6A633B0DE72A169C3BA5ABA76AB03.html">UnaryNode</a></span>
+  <br/>
+  <span class="code" id="339" xml:space="preserve"><span class="lineNumber">339</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="340" xml:space="preserve"><span class="lineNumber">340</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<a href="../doc/class_TypeIdNode_80688BF18DBCFACC81D07AE3747161005139D734.html#constructor_TypeIdNode_C5E7FA080E5047FC490BE6836E08078381C6475B">TypeIdNode</a><span class="other">(</span><span class="kw">const</span>&nbsp;<a href="../../../../../../system/content/System.Text.Parsing/doc/class_Span_342F797681C8A26247E86213AFC9204FEF17D2A5.html">Span</a><span class="other">&amp;</span>&nbsp;<span class="identifier">span_</span><span class="other">,&nbsp;</span><a href="../doc/class_Node_DEB477A450EF6E99A28A9855849F398D50BF1609.html">Node</a><span class="other">*</span>&nbsp;<span class="identifier">child_</span><span class="other">)</span><span class="other">&nbsp;:&nbsp;</span><span class="kw">base</span><span class="other">(</span><span class="identifier">span_</span><span class="other">,&nbsp;</span><span class="identifier">child_</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="341" xml:space="preserve"><span class="lineNumber">341</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="342" xml:space="preserve"><span class="lineNumber">342</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="343" xml:space="preserve"><span class="lineNumber">343</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">override</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/class_TypeIdNode_80688BF18DBCFACC81D07AE3747161005139D734.html#member_function_Accept_TypeIdNode_DD71DA4EF20303CAB294CD84839F99C23110A363">Accept</a><span class="other">(</span><a href="../doc/class_Visitor_28273FE318CD5DFB4ED5432CA7F6868A076C1E70.html">Visitor</a><span class="other">&amp;</span>&nbsp;<span class="identifier">visitor</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="344" xml:space="preserve"><span class="lineNumber">344</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="345" xml:space="preserve"><span class="lineNumber">345</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">visitor</span><span class="other">.</span><a href="../doc/class_Visitor_28273FE318CD5DFB4ED5432CA7F6868A076C1E70.html#member_function_Visit_Visitor_0AC32D209A1F13AA3B1FFBDA7AEA44C2256645A4">Visit</a><span class="other">(</span><span class="other">*</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="346" xml:space="preserve"><span class="lineNumber">346</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="347" xml:space="preserve"><span class="lineNumber">347</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="348" xml:space="preserve"><span class="lineNumber">348</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+  <br/>
+  <span class="code" id="349" xml:space="preserve"><span class="lineNumber">349</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../doc/class_DefinedNode_68DB0C20A6529E03AAD686F195D170D02D17CF65.html">DefinedNode</a><span class="other">&nbsp;:&nbsp;</span><a href="../doc/class_Node_DEB477A450EF6E99A28A9855849F398D50BF1609.html">Node</a></span>
+  <br/>
+  <span class="code" id="350" xml:space="preserve"><span class="lineNumber">350</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="351" xml:space="preserve"><span class="lineNumber">351</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<a href="../doc/class_DefinedNode_68DB0C20A6529E03AAD686F195D170D02D17CF65.html#constructor_DefinedNode_42C182ADEC3A3EA2ADD0789FC9D183A5B7734011">DefinedNode</a><span class="other">(</span><span class="kw">const</span>&nbsp;<a href="../../../../../../system/content/System.Text.Parsing/doc/class_Span_342F797681C8A26247E86213AFC9204FEF17D2A5.html">Span</a><span class="other">&amp;</span>&nbsp;<span class="identifier">span_</span><span class="other">,&nbsp;</span><span class="kw">const</span>&nbsp;<a href="../../../../../../system/content/System.Base/doc/ns_System.html#typedef_ustring_1750E1C62AAF5897C1F1DA3C5BC4999982AE9B36">ustring</a><span class="other">&amp;</span>&nbsp;<span class="identifier">identifier_</span><span class="other">)</span><span class="other">&nbsp;:&nbsp;</span><span class="kw">base</span><span class="other">(</span><span class="identifier">span_</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">identifier</span><span class="other">(</span><span class="identifier">identifier_</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="352" xml:space="preserve"><span class="lineNumber">352</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="353" xml:space="preserve"><span class="lineNumber">353</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="354" xml:space="preserve"><span class="lineNumber">354</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">override</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/class_DefinedNode_68DB0C20A6529E03AAD686F195D170D02D17CF65.html#member_function_Accept_DefinedNode_E5BF79225B52330B2DC57823EA7275E457AA11B8">Accept</a><span class="other">(</span><a href="../doc/class_Visitor_28273FE318CD5DFB4ED5432CA7F6868A076C1E70.html">Visitor</a><span class="other">&amp;</span>&nbsp;<span class="identifier">visitor</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="355" xml:space="preserve"><span class="lineNumber">355</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="356" xml:space="preserve"><span class="lineNumber">356</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">visitor</span><span class="other">.</span><a href="../doc/class_Visitor_28273FE318CD5DFB4ED5432CA7F6868A076C1E70.html#member_function_Visit_Visitor_F254FC9CB2FE5ED3F2133433193AC645B1A269F2">Visit</a><span class="other">(</span><span class="other">*</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="357" xml:space="preserve"><span class="lineNumber">357</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="358" xml:space="preserve"><span class="lineNumber">358</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<a href="../../../../../../system/content/System.Base/doc/ns_System.html#typedef_ustring_1750E1C62AAF5897C1F1DA3C5BC4999982AE9B36">ustring</a>&nbsp;<span class="identifier">identifier</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="359" xml:space="preserve"><span class="lineNumber">359</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="360" xml:space="preserve"><span class="lineNumber">360</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+ </body>
+</html>

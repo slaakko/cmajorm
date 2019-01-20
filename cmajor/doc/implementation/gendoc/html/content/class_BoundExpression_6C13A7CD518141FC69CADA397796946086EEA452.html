@@ -1,0 +1,644 @@
+<html>
+    <head>
+        <meta charset="utf-8"/>
+        <title>BoundExpression Abstract Class</title>
+        <link href="../style/style.css" rel="stylesheet" type="text/css"/>
+        <script src="class_BoundExpression_6C13A7CD518141FC69CADA397796946086EEA452_inheritance.js" type="text/javascript"> </script>
+    </head>
+    <body onload="drawClassInheritanceDiagram()">
+        <a href="../index.html">index</a>
+         | <a href="namespace_binder_C711B7605339DC3A9E128C1E622E7D9A4629C97D.html">up</a>
+         | <a href="class_BoundEnumTypeDefinition_2895F4A41B9598387B5B5734A980C22A8B8D89AE.html">prev</a>
+         | <a href="class_BoundExpressionStatement_FC39663CCD7EF04AA66CB2F57D05425C4BC6FA09.html">next</a>
+        <hr/>
+        <h1>BoundExpression Abstract Class</h1>
+        <div class="diagram">
+            <svg height="0" id="classInheritanceDiagram" version="2.0" width="0" xmlns="http://www.w3.org/2000/svg"/>
+        </div>
+        <span>
+            Definition at line <a href="file/binder/BoundExpression.hpp_A44A2248C36EC09E918BFC81F1F069BE4D8EE996.html#43">43</a>
+             of <a href="file/binder/BoundExpression.hpp_A44A2248C36EC09E918BFC81F1F069BE4D8EE996.html">BoundExpression.hpp</a>
+        </span>
+        <br/>
+        <h2>Constructors</h2>
+        <table class="constructorTable">
+            <tr>
+                <td class="constructorTableFirstCol" xml:space="preserve"><a href="class_BoundExpression_6C13A7CD518141FC69CADA397796946086EEA452.html#constructor_BoundExpression_81BB7634F0BEEC44DA6435DB88C8EA0929307EA1">BoundExpression</a>(<a href="class_Module_A2BC96D600A4B3135D7F5444EC360BBF9EA9DDF4.html">Module</a>* module_, <span class="kw">const </span><a href="class_Span_9CED8370AAA8B01E09FBC8A63AD262084B91FD78.html">Span</a>&amp; span_, <a href="enum_BoundNodeType_D23A5BEF797E833494EFFEAEC4D3EDFBB5754B8C.html">BoundNodeType</a> boundNodeType_, <a href="class_TypeSymbol_E4B881CC0D40D6232A69F240FA90045A54D93258.html">TypeSymbol</a>* type_)</td>
+            </tr>
+        </table>
+        <h2>Member Functions</h2>
+        <table class="functionTable">
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_BoundExpression_6C13A7CD518141FC69CADA397796946086EEA452.html#function_AddTemporaryDestructorCall_D51075A26C4FBC1F816E9A0676ADE198CF3A8A61">AddTemporaryDestructorCall</a>(std::unique_ptr&lt;<a href="class_BoundFunctionCall_3B6FF42595EC5C47E14802245CBCB5F47F5F3EAC.html">BoundFunctionCall</a>>&amp;&amp; destructorCall)</td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><a href="class_BoundExpression_6C13A7CD518141FC69CADA397796946086EEA452.html">BoundExpression</a>*</td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_BoundExpression_6C13A7CD518141FC69CADA397796946086EEA452.html#function_Clone_2263083E59C890CD5E41970A402C7ACDF254443D">Clone</a>() <span class="kw">pure virtual</span></td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">bool</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_BoundExpression_6C13A7CD518141FC69CADA397796946086EEA452.html#function_ContainsExceptionCapture_B6D57C69ACBAF294E1B406C078EA08855C67DC9D">ContainsExceptionCapture</a>() <span class="kw">const virtual</span></td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_BoundExpression_6C13A7CD518141FC69CADA397796946086EEA452.html#function_DestroyTemporaries_55EFDFD17654123EF2F39C7EE90DDD5C70527566">DestroyTemporaries</a>(<a href="class_Emitter_154396B281E1F2C3ECA7612F1A3AD2E408E7D595.html">Emitter</a>&amp; emitter)</td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">bool</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_BoundExpression_6C13A7CD518141FC69CADA397796946086EEA452.html#function_GetFlag_40B6B61DB2DE7E1C34A9B5B2E0D06ED85C1AE394">GetFlag</a>(<a href="enum_BoundExpressionFlags_854A679BF89B60E989E997BA7CD6388D2EC142B7.html">BoundExpressionFlags</a> flag) <span class="kw">const</span></td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">const </span><a href="class_TypeSymbol_E4B881CC0D40D6232A69F240FA90045A54D93258.html">TypeSymbol</a>*</td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_BoundExpression_6C13A7CD518141FC69CADA397796946086EEA452.html#function_GetType_A047432B77A32E73EFB7CEF817627B3EE6224DAB">GetType</a>() <span class="kw">const</span></td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><a href="class_TypeSymbol_E4B881CC0D40D6232A69F240FA90045A54D93258.html">TypeSymbol</a>*</td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_BoundExpression_6C13A7CD518141FC69CADA397796946086EEA452.html#function_GetType_33A982727FC4397D43723CB5DF3B51CE76B1D8D8">GetType</a>()</td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">bool</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_BoundExpression_6C13A7CD518141FC69CADA397796946086EEA452.html#function_HasValue_605969E15F16FEDE8165B83E569B9D9F7F964764">HasValue</a>() <span class="kw">const virtual</span></td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">bool</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_BoundExpression_6C13A7CD518141FC69CADA397796946086EEA452.html#function_IsComplete_80C73451008F00DDB49EB2480845517809E63414">IsComplete</a>() <span class="kw">const virtual</span></td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">bool</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_BoundExpression_6C13A7CD518141FC69CADA397796946086EEA452.html#function_IsLvalueExpression_6CC1B80BB4064B35DE4FA99CFE90A6929C9C7327">IsLvalueExpression</a>() <span class="kw">const virtual</span></td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_BoundExpression_6C13A7CD518141FC69CADA397796946086EEA452.html#function_MoveTemporaryDestructorCallsTo_5C58046675CE13458ED59A9386C93FFB44C41F6B">MoveTemporaryDestructorCallsTo</a>(<a href="class_BoundExpression_6C13A7CD518141FC69CADA397796946086EEA452.html">BoundExpression</a>&amp; expression)</td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_BoundExpression_6C13A7CD518141FC69CADA397796946086EEA452.html#function_SetFlag_41AFCDC80E89E0BEC6074D7635465C9468CE21EC">SetFlag</a>(<a href="enum_BoundExpressionFlags_854A679BF89B60E989E997BA7CD6388D2EC142B7.html">BoundExpressionFlags</a> flag)</td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve">std::unique_ptr&lt;<a href="class_Value_D656BD8E5EC910AF6747A38C3979A4A9B1E41ED4.html">Value</a>></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_BoundExpression_6C13A7CD518141FC69CADA397796946086EEA452.html#function_ToValue_49A00D5DA301F36B0CEA9CDDFD37880FC64241F2">ToValue</a>(<a href="class_BoundCompileUnit_E99BC7539B5239DF3A33DC3D613FE1D188A0A9E1.html">BoundCompileUnit</a>&amp; boundCompileUnit) <span class="kw">const virtual</span></td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve">std::string</td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_BoundExpression_6C13A7CD518141FC69CADA397796946086EEA452.html#function_TypeString_532F77978E15E752440933D6F704096F625F0D52">TypeString</a>() <span class="kw">const virtual</span></td>
+            </tr>
+        </table>
+        <h2>Member Variables</h2>
+        <table>
+            <tr id="variable_flags_F67AD71B2FE5AAD9F8A3FDFAA716714416316BC9">
+                <td class="functionTableFirstCol" xml:space="preserve"><a href="enum_BoundExpressionFlags_854A679BF89B60E989E997BA7CD6388D2EC142B7.html">BoundExpressionFlags</a></td>
+                <td class="functionTableSecondCol" xml:space="preserve">flags</td>
+            </tr>
+            <tr id="variable_temporaryDestructorCalls_779213E64859E45EACA86242802F024DFA481037">
+                <td class="functionTableFirstCol" xml:space="preserve">std::vector&lt;std::unique_ptr&lt;<a href="class_BoundFunctionCall_3B6FF42595EC5C47E14802245CBCB5F47F5F3EAC.html">BoundFunctionCall</a>>></td>
+                <td class="functionTableSecondCol" xml:space="preserve">temporaryDestructorCalls</td>
+            </tr>
+            <tr id="variable_type_03E74C0C8B428662B9FB1F141C9F683040351E53">
+                <td class="functionTableFirstCol" xml:space="preserve"><a href="class_TypeSymbol_E4B881CC0D40D6232A69F240FA90045A54D93258.html">TypeSymbol</a>*</td>
+                <td class="functionTableSecondCol" xml:space="preserve">type</td>
+            </tr>
+        </table>
+        <hr/>
+        <h2>Constructor Details</h2>
+        <h3 id="constructor_BoundExpression_81BB7634F0BEEC44DA6435DB88C8EA0929307EA1">BoundExpression Constructor</h3>
+        <h4>
+            cmajor::binder::BoundExpression::BoundExpression(<a href="class_Module_A2BC96D600A4B3135D7F5444EC360BBF9EA9DDF4.html">Module</a>
+            * module_, <span class="kw">const </span>
+            <a href="class_Span_9CED8370AAA8B01E09FBC8A63AD262084B91FD78.html">Span</a>
+            &amp; span_, <a href="enum_BoundNodeType_D23A5BEF797E833494EFFEAEC4D3EDFBB5754B8C.html">BoundNodeType</a>
+             boundNodeType_, <a href="class_TypeSymbol_E4B881CC0D40D6232A69F240FA90045A54D93258.html">TypeSymbol</a>
+            * type_)</h4>
+        <span>
+            Definition at line <a href="file/binder/BoundExpression.cpp_DF2AC308499D981CAB212ED826C2DB12708BF3E8.html#24">24</a>
+             of <a href="file/binder/BoundExpression.cpp_DF2AC308499D981CAB212ED826C2DB12708BF3E8.html">BoundExpression.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;24</span>&nbsp;<span class="other">:</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;25</span>&nbsp;<a href="class_BoundNode_0DE6B6FC2B245301A2A10752E494079DE5D7401C.html">BoundNode</a><span class="other">(</span><span class="identifier">module_</span><span class="other">,&nbsp;</span><span class="identifier">span_</span><span class="other">,&nbsp;</span><span class="identifier">boundNodeType_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="class_BoundExpression_6C13A7CD518141FC69CADA397796946086EEA452.html#variable_type_03E74C0C8B428662B9FB1F141C9F683040351E53">type</a><span class="other">(</span><span class="identifier">type_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="class_BoundExpression_6C13A7CD518141FC69CADA397796946086EEA452.html#variable_flags_F67AD71B2FE5AAD9F8A3FDFAA716714416316BC9">flags</a><span class="other">(</span><a href="enum_BoundExpressionFlags_854A679BF89B60E989E997BA7CD6388D2EC142B7.html">BoundExpressionFlags</a><span class="other">::</span><a href="enum_BoundExpressionFlags_854A679BF89B60E989E997BA7CD6388D2EC142B7.html#enumerator_none_022BBE79AB30B7EB3056C03CDE773666BC4A1A90">none</a><span class="other">)</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;26</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;27</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/binder/BoundExpression.hpp_A44A2248C36EC09E918BFC81F1F069BE4D8EE996.html#46">46</a>
+             of <a href="file/binder/BoundExpression.hpp_A44A2248C36EC09E918BFC81F1F069BE4D8EE996.html">BoundExpression.hpp</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h2>Member Function Details</h2>
+        <h3 id="function_AddTemporaryDestructorCall_D51075A26C4FBC1F816E9A0676ADE198CF3A8A61">AddTemporaryDestructorCall Member Function</h3>
+        <h4>
+            <span class="kw">void</span>
+             cmajor::binder::BoundExpression::AddTemporaryDestructorCall(std::unique_ptr&lt;<a href="class_BoundFunctionCall_3B6FF42595EC5C47E14802245CBCB5F47F5F3EAC.html">BoundFunctionCall</a>
+            >&amp;&amp; destructorCall)</h4>
+        <span>
+            Definition at line <a href="file/binder/BoundExpression.cpp_DF2AC308499D981CAB212ED826C2DB12708BF3E8.html#29">29</a>
+             of <a href="file/binder/BoundExpression.cpp_DF2AC308499D981CAB212ED826C2DB12708BF3E8.html">BoundExpression.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;30</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;31</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="class_BoundExpression_6C13A7CD518141FC69CADA397796946086EEA452.html#variable_temporaryDestructorCalls_779213E64859E45EACA86242802F024DFA481037">temporaryDestructorCalls</a><span class="other">.</span><span class="identifier">push_back</span><span class="other">(</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">move</span><span class="other">(</span><span class="identifier">destructorCall</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;32</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/binder/BoundExpression.hpp_A44A2248C36EC09E918BFC81F1F069BE4D8EE996.html#58">58</a>
+             of <a href="file/binder/BoundExpression.hpp_A44A2248C36EC09E918BFC81F1F069BE4D8EE996.html">BoundExpression.hpp</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Called by: <a href="class_BoundExpression_6C13A7CD518141FC69CADA397796946086EEA452.html#function_MoveTemporaryDestructorCallsTo_5C58046675CE13458ED59A9386C93FFB44C41F6B">cmajor::binder::BoundExpression::MoveTemporaryDestructorCallsTo</a>
+            , <a href="class_BoundFunction_4B30B35495A99AFFC545153C02C4EBBD88F0A38D.html#function_MoveTemporaryDestructorCallsTo_7E30B4DA44BE542C3407622F5209DB278CBE5786">cmajor::binder::BoundFunction::MoveTemporaryDestructorCallsTo</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_Clone_2263083E59C890CD5E41970A402C7ACDF254443D">Clone Member Function</h3>
+        <h4>
+            <a href="class_BoundExpression_6C13A7CD518141FC69CADA397796946086EEA452.html">BoundExpression</a>
+            * cmajor::binder::BoundExpression::Clone() <span class="kw">pure virtual</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/binder/BoundExpression.hpp_A44A2248C36EC09E918BFC81F1F069BE4D8EE996.html#47">47</a>
+             of <a href="file/binder/BoundExpression.hpp_A44A2248C36EC09E918BFC81F1F069BE4D8EE996.html">BoundExpression.hpp</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Derived class overrides: <a href="class_BoundAddressOfExpression_A5E64A329637AA93D0A30E7D1814C2EEE18E77AC.html#function_Clone_1DDC0FFBDF193565C67068A0F8A31E6F1B7FA500">cmajor::binder::BoundAddressOfExpression::Clone</a>
+            , <a href="class_BoundAsExpression_801F8209CE20D1833758832CB25511162B89B9E1.html#function_Clone_7209E34A3C58C24323DC84CBF3B38BE0E30FB0B7">cmajor::binder::BoundAsExpression::Clone</a>
+            , <a href="class_BoundBitCast_3555C7754DA41091352EB8855BE2C25DDD0324B9.html#function_Clone_FBE224C7406B0393D339E48F4CE569D8CA9A7516">cmajor::binder::BoundBitCast::Clone</a>
+            , <a href="class_BoundClassDelegateCall_26162C838B3AF67704003CCD2EB0BEAEB31960BE.html#function_Clone_1303DD860FF5519D3B4CD8017D94605F2CA8F316">cmajor::binder::BoundClassDelegateCall::Clone</a>
+            , <a href="class_BoundClassOrClassDelegateConversionResult_D567FAC30733A2FFC5F2046B64EE2668ECCB14D4.html#function_Clone_B6B281E9A8BF4FF1B26F0CC4F0242FBFCE27D015">cmajor::binder::BoundClassOrClassDelegateConversionResult::Clone</a>
+            , <a href="class_BoundConjunction_2AC2B0CD92C9B5896BEAD429EB0EE89309478CA8.html#function_Clone_0288242D7048FB451F161440467A8F818BC2C751">cmajor::binder::BoundConjunction::Clone</a>
+            , <a href="class_BoundConstant_4F99952EEB608967A62DFA4EB371782CD2C2C305.html#function_Clone_E4CE64C96D27E96C61A33500DD2A3BC2D430DDED">cmajor::binder::BoundConstant::Clone</a>
+            , <a href="class_BoundConstructAndReturnTemporaryExpression_B8171A28E33D7C8E1DB1ED4B12DAF35314C1C7F1.html#function_Clone_103E02DE4589B0A7012E5E58A74931854191AF7C">cmajor::binder::BoundConstructAndReturnTemporaryExpression::Clone</a>
+            , <a href="class_BoundConstructExpression_9519ADD2DD5B4CD90CB0E2D0B6F5839B8EC86FEE.html#function_Clone_F461CA9CBCB6C471D47D8DD4FE8BE51C3341BEB6">cmajor::binder::BoundConstructExpression::Clone</a>
+            , <a href="class_BoundConversion_EAE9ECDF9392F64A339764A1F3415D0B33E49E78.html#function_Clone_C690663D9D9293BFB9ABD7B194E825EADBDE4E00">cmajor::binder::BoundConversion::Clone</a>
+            , <a href="class_BoundDelegateCall_E0D935F2EC14B697C235FC3CD519F0432213A6DC.html#function_Clone_39A12AFD58D8850BB67A9DEF11F0AF86D703C439">cmajor::binder::BoundDelegateCall::Clone</a>
+            , <a href="class_BoundDereferenceExpression_148C0D624D0D019C3691247C87FF0A797FA273CF.html#function_Clone_71F1F473E2EEEE2A8C5DABE0244A61F65E967379">cmajor::binder::BoundDereferenceExpression::Clone</a>
+            , <a href="class_BoundDisjunction_D6F8EC06B62E996A115B5E04FFF3930937DF493A.html#function_Clone_A609AC2C42878A613A8F4B949051713D7E1ABB7E">cmajor::binder::BoundDisjunction::Clone</a>
+            , <a href="class_BoundEnumConstant_64D2349EFF17704F48853830738512BA35F3A51C.html#function_Clone_BAC12E4CB31277C12F08050AFD487B6144F23406">cmajor::binder::BoundEnumConstant::Clone</a>
+            , <a href="class_BoundFunctionCall_3B6FF42595EC5C47E14802245CBCB5F47F5F3EAC.html#function_Clone_E2B8D8151AA2003FCF0891E7CF64774F5BCB1581">cmajor::binder::BoundFunctionCall::Clone</a>
+            , <a href="class_BoundFunctionGroupExpression_DBE9589AB7AC869E137796EFE30ACDE4EE11A27F.html#function_Clone_04E6217C20E0124A023563BA60A0B5CC130949FC">cmajor::binder::BoundFunctionGroupExpression::Clone</a>
+            , <a href="class_BoundFunctionPtr_484736F4C9F94241A850DC79D71AB4813A1F314A.html#function_Clone_A5A109F97341922CC7E97A4F7AFBFB8C7E72C187">cmajor::binder::BoundFunctionPtr::Clone</a>
+            , <a href="class_BoundIsExpression_F285D49EF42A61F29AF03EE57616326ED7354E31.html#function_Clone_0926BCF3676A8BF294D9B5AFF18B14463C7D5832">cmajor::binder::BoundIsExpression::Clone</a>
+            , <a href="class_BoundLiteral_DF1E22194FB48EAFA2C4993DC33E08DF24AF2F68.html#function_Clone_FFDFCD33E4C324A0D3E1C83F902C60598BAFA7DF">cmajor::binder::BoundLiteral::Clone</a>
+            , <a href="class_BoundLocalVariable_A57A3CCE331BFEC9A961AA545EA665CA0BE43FD1.html#function_Clone_9CF8E62EB1BDE1F55C6C86540DAAD3A0DF2E01F7">cmajor::binder::BoundLocalVariable::Clone</a>
+            , <a href="class_BoundMemberExpression_A140A910BB1C0AD08ADA71E4479201E4281A387E.html#function_Clone_ACFF9767E74F71E7F78FE54CC330D77609841F5D">cmajor::binder::BoundMemberExpression::Clone</a>
+            , <a href="class_BoundMemberVariable_821DBEEE08AD07613BC7E1C4D846438683D4C96E.html#function_Clone_5E08C143BCF0E6A4DC1EEEF515E146EE2F5D015A">cmajor::binder::BoundMemberVariable::Clone</a>
+            , <a href="class_BoundNamespaceExpression_FD16E8F993428DCEC3740B7D751536BD24985319.html#function_Clone_BD64DC78CF3C2E091D36D9B7BF316A9E2C9566AC">cmajor::binder::BoundNamespaceExpression::Clone</a>
+            , <a href="class_BoundParameter_4BB9E4325E4AE1836E6E8B01866834DDC5B6CF15.html#function_Clone_0776CD6413207066C3AFA24E5073C8C5322AC631">cmajor::binder::BoundParameter::Clone</a>
+            , <a href="class_BoundReferenceToPointerExpression_6B616912996B9A65540A4ACAC567521B4ABC73D4.html#function_Clone_D27BE7C8984D7D4E06718A4728D74124832FB94C">cmajor::binder::BoundReferenceToPointerExpression::Clone</a>
+            , <a href="class_BoundSizeOfExpression_0A449849E9BDD7D11179D9ECC7A57EBFA10D2E16.html#function_Clone_0280DA24C1EE4AD3A57F92980159505B96F5A53F">cmajor::binder::BoundSizeOfExpression::Clone</a>
+            , <a href="class_BoundTemporary_315499F7B13852EFEFF919C8053CF901987BEE7E.html#function_Clone_7EE8E496C375DCD708768A378D19FF2F74955BE2">cmajor::binder::BoundTemporary::Clone</a>
+            , <a href="class_BoundTypeExpression_C2681C3ACE7F6FBEBF9AD6464D7478D7E60F3A3A.html#function_Clone_D7AA49EEC3E5718E20020D9F29DB464D28BEB014">cmajor::binder::BoundTypeExpression::Clone</a>
+            , <a href="class_BoundTypeNameExpression_4B31DB86C15C38624020EEBE7398FBA93B17540A.html#function_Clone_C3421F31F20E55BDD0EB822421B3CA836BEEDC01">cmajor::binder::BoundTypeNameExpression::Clone</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_ContainsExceptionCapture_B6D57C69ACBAF294E1B406C078EA08855C67DC9D">ContainsExceptionCapture Member Function</h3>
+        <h4>
+            <span class="kw">bool</span>
+             cmajor::binder::BoundExpression::ContainsExceptionCapture() <span class="kw">const virtual</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/binder/BoundExpression.hpp_A44A2248C36EC09E918BFC81F1F069BE4D8EE996.html#53">53</a>
+             of <a href="file/binder/BoundExpression.hpp_A44A2248C36EC09E918BFC81F1F069BE4D8EE996.html">BoundExpression.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;53</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">GetFlag</span><span class="other">(</span><span class="identifier">BoundExpressionFlags</span><span class="other">::</span><span class="identifier">exceptionCapture</span><span class="other">)</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Derived class overrides: <a href="class_BoundAddressOfExpression_A5E64A329637AA93D0A30E7D1814C2EEE18E77AC.html#function_ContainsExceptionCapture_B392105689064C6D099F3981D7FBCA3CF12AAC3D">cmajor::binder::BoundAddressOfExpression::ContainsExceptionCapture</a>
+            , <a href="class_BoundAsExpression_801F8209CE20D1833758832CB25511162B89B9E1.html#function_ContainsExceptionCapture_D5B239B4D6A3AB09D98F664AD1B2577396DDEFF1">cmajor::binder::BoundAsExpression::ContainsExceptionCapture</a>
+            , <a href="class_BoundBitCast_3555C7754DA41091352EB8855BE2C25DDD0324B9.html#function_ContainsExceptionCapture_E1D5475152892631CC6E9BC706725A09B2047D0E">cmajor::binder::BoundBitCast::ContainsExceptionCapture</a>
+            , <a href="class_BoundClassDelegateCall_26162C838B3AF67704003CCD2EB0BEAEB31960BE.html#function_ContainsExceptionCapture_09D45945BE36B8BAFF21CF827BD08E5CBD23D24C">cmajor::binder::BoundClassDelegateCall::ContainsExceptionCapture</a>
+            , <a href="class_BoundClassOrClassDelegateConversionResult_D567FAC30733A2FFC5F2046B64EE2668ECCB14D4.html#function_ContainsExceptionCapture_4E8EA714967AD8271A66D8A2C0FBB870BC3F7795">cmajor::binder::BoundClassOrClassDelegateConversionResult::ContainsExceptionCapture</a>
+            , <a href="class_BoundConjunction_2AC2B0CD92C9B5896BEAD429EB0EE89309478CA8.html#function_ContainsExceptionCapture_7B33218A315ADD81C0147554E1CB0F93DEB9B5C1">cmajor::binder::BoundConjunction::ContainsExceptionCapture</a>
+            , <a href="class_BoundConstructAndReturnTemporaryExpression_B8171A28E33D7C8E1DB1ED4B12DAF35314C1C7F1.html#function_ContainsExceptionCapture_9F3E311AE6B9E406265B59138E23C1503B257A5A">cmajor::binder::BoundConstructAndReturnTemporaryExpression::ContainsExceptionCapture</a>
+            , <a href="class_BoundConstructExpression_9519ADD2DD5B4CD90CB0E2D0B6F5839B8EC86FEE.html#function_ContainsExceptionCapture_6A109EEEA04A070941D65D923E14BA1BFB923EE0">cmajor::binder::BoundConstructExpression::ContainsExceptionCapture</a>
+            , <a href="class_BoundConversion_EAE9ECDF9392F64A339764A1F3415D0B33E49E78.html#function_ContainsExceptionCapture_C7FD6E4F41A1265151C1BC62FB24DE8D028798C2">cmajor::binder::BoundConversion::ContainsExceptionCapture</a>
+            , <a href="class_BoundDelegateCall_E0D935F2EC14B697C235FC3CD519F0432213A6DC.html#function_ContainsExceptionCapture_E0F8CFBBB1430EB121D03E4ED129409BD98AC19F">cmajor::binder::BoundDelegateCall::ContainsExceptionCapture</a>
+            , <a href="class_BoundDereferenceExpression_148C0D624D0D019C3691247C87FF0A797FA273CF.html#function_ContainsExceptionCapture_ED07BAC40FE974744FA97FB000FD98C20C1D4296">cmajor::binder::BoundDereferenceExpression::ContainsExceptionCapture</a>
+            , <a href="class_BoundDisjunction_D6F8EC06B62E996A115B5E04FFF3930937DF493A.html#function_ContainsExceptionCapture_C814360CA104C7A54DC18F8B50DAECD5FA361779">cmajor::binder::BoundDisjunction::ContainsExceptionCapture</a>
+            , <a href="class_BoundFunctionCall_3B6FF42595EC5C47E14802245CBCB5F47F5F3EAC.html#function_ContainsExceptionCapture_6C3BD7CA6204E6D597D3E0C85A842C0BA58F2A32">cmajor::binder::BoundFunctionCall::ContainsExceptionCapture</a>
+            , <a href="class_BoundIsExpression_F285D49EF42A61F29AF03EE57616326ED7354E31.html#function_ContainsExceptionCapture_3585AF66ABDEE2482FC09730F788040B7DE0A12E">cmajor::binder::BoundIsExpression::ContainsExceptionCapture</a>
+            , <a href="class_BoundReferenceToPointerExpression_6B616912996B9A65540A4ACAC567521B4ABC73D4.html#function_ContainsExceptionCapture_953B275A550D89317B26DA9E49FD4920595B8525">cmajor::binder::BoundReferenceToPointerExpression::ContainsExceptionCapture</a>
+            , <a href="class_BoundTemporary_315499F7B13852EFEFF919C8053CF901987BEE7E.html#function_ContainsExceptionCapture_F31FA39D2ECEA311D736A975FD9BD019ECACAB60">cmajor::binder::BoundTemporary::ContainsExceptionCapture</a>
+            , <a href="class_BoundTypeNameExpression_4B31DB86C15C38624020EEBE7398FBA93B17540A.html#function_ContainsExceptionCapture_2C9025F7CFC1A3F67C31D4EC6B66CA576E81AFBB">cmajor::binder::BoundTypeNameExpression::ContainsExceptionCapture</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Called by: <a href="class_BoundAddressOfExpression_A5E64A329637AA93D0A30E7D1814C2EEE18E77AC.html#function_ContainsExceptionCapture_B392105689064C6D099F3981D7FBCA3CF12AAC3D">cmajor::binder::BoundAddressOfExpression::ContainsExceptionCapture</a>
+            , <a href="class_BoundAsExpression_801F8209CE20D1833758832CB25511162B89B9E1.html#function_ContainsExceptionCapture_D5B239B4D6A3AB09D98F664AD1B2577396DDEFF1">cmajor::binder::BoundAsExpression::ContainsExceptionCapture</a>
+            , <a href="class_BoundBitCast_3555C7754DA41091352EB8855BE2C25DDD0324B9.html#function_ContainsExceptionCapture_E1D5475152892631CC6E9BC706725A09B2047D0E">cmajor::binder::BoundBitCast::ContainsExceptionCapture</a>
+            , <a href="class_BoundClassDelegateCall_26162C838B3AF67704003CCD2EB0BEAEB31960BE.html#function_ContainsExceptionCapture_09D45945BE36B8BAFF21CF827BD08E5CBD23D24C">cmajor::binder::BoundClassDelegateCall::ContainsExceptionCapture</a>
+            , <a href="class_BoundClassOrClassDelegateConversionResult_D567FAC30733A2FFC5F2046B64EE2668ECCB14D4.html#function_ContainsExceptionCapture_4E8EA714967AD8271A66D8A2C0FBB870BC3F7795">cmajor::binder::BoundClassOrClassDelegateConversionResult::ContainsExceptionCapture</a>
+            , <a href="class_BoundConjunction_2AC2B0CD92C9B5896BEAD429EB0EE89309478CA8.html#function_ContainsExceptionCapture_7B33218A315ADD81C0147554E1CB0F93DEB9B5C1">cmajor::binder::BoundConjunction::ContainsExceptionCapture</a>
+            , <a href="class_BoundConstructAndReturnTemporaryExpression_B8171A28E33D7C8E1DB1ED4B12DAF35314C1C7F1.html#function_ContainsExceptionCapture_9F3E311AE6B9E406265B59138E23C1503B257A5A">cmajor::binder::BoundConstructAndReturnTemporaryExpression::ContainsExceptionCapture</a>
+            , <a href="class_BoundConstructExpression_9519ADD2DD5B4CD90CB0E2D0B6F5839B8EC86FEE.html#function_ContainsExceptionCapture_6A109EEEA04A070941D65D923E14BA1BFB923EE0">cmajor::binder::BoundConstructExpression::ContainsExceptionCapture</a>
+            , <a href="class_BoundConversion_EAE9ECDF9392F64A339764A1F3415D0B33E49E78.html#function_ContainsExceptionCapture_C7FD6E4F41A1265151C1BC62FB24DE8D028798C2">cmajor::binder::BoundConversion::ContainsExceptionCapture</a>
+            , <a href="class_BoundDelegateCall_E0D935F2EC14B697C235FC3CD519F0432213A6DC.html#function_ContainsExceptionCapture_E0F8CFBBB1430EB121D03E4ED129409BD98AC19F">cmajor::binder::BoundDelegateCall::ContainsExceptionCapture</a>
+            , <a href="class_BoundDereferenceExpression_148C0D624D0D019C3691247C87FF0A797FA273CF.html#function_ContainsExceptionCapture_ED07BAC40FE974744FA97FB000FD98C20C1D4296">cmajor::binder::BoundDereferenceExpression::ContainsExceptionCapture</a>
+            , <a href="class_BoundDisjunction_D6F8EC06B62E996A115B5E04FFF3930937DF493A.html#function_ContainsExceptionCapture_C814360CA104C7A54DC18F8B50DAECD5FA361779">cmajor::binder::BoundDisjunction::ContainsExceptionCapture</a>
+            , <a href="class_BoundFunctionCall_3B6FF42595EC5C47E14802245CBCB5F47F5F3EAC.html#function_ContainsExceptionCapture_6C3BD7CA6204E6D597D3E0C85A842C0BA58F2A32">cmajor::binder::BoundFunctionCall::ContainsExceptionCapture</a>
+            , <a href="class_BoundIsExpression_F285D49EF42A61F29AF03EE57616326ED7354E31.html#function_ContainsExceptionCapture_3585AF66ABDEE2482FC09730F788040B7DE0A12E">cmajor::binder::BoundIsExpression::ContainsExceptionCapture</a>
+            , <a href="class_BoundReferenceToPointerExpression_6B616912996B9A65540A4ACAC567521B4ABC73D4.html#function_ContainsExceptionCapture_953B275A550D89317B26DA9E49FD4920595B8525">cmajor::binder::BoundReferenceToPointerExpression::ContainsExceptionCapture</a>
+            , <a href="class_BoundTemporary_315499F7B13852EFEFF919C8053CF901987BEE7E.html#function_ContainsExceptionCapture_F31FA39D2ECEA311D736A975FD9BD019ECACAB60">cmajor::binder::BoundTemporary::ContainsExceptionCapture</a>
+            , <a href="class_BoundTypeNameExpression_4B31DB86C15C38624020EEBE7398FBA93B17540A.html#function_ContainsExceptionCapture_2C9025F7CFC1A3F67C31D4EC6B66CA576E81AFBB">cmajor::binder::BoundTypeNameExpression::ContainsExceptionCapture</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_DestroyTemporaries_55EFDFD17654123EF2F39C7EE90DDD5C70527566">DestroyTemporaries Member Function</h3>
+        <h4>
+            <span class="kw">void</span>
+             cmajor::binder::BoundExpression::DestroyTemporaries(<a href="class_Emitter_154396B281E1F2C3ECA7612F1A3AD2E408E7D595.html">Emitter</a>
+            &amp; emitter)</h4>
+        <span>
+            Definition at line <a href="file/binder/BoundExpression.cpp_DF2AC308499D981CAB212ED826C2DB12708BF3E8.html#43">43</a>
+             of <a href="file/binder/BoundExpression.cpp_DF2AC308499D981CAB212ED826C2DB12708BF3E8.html">BoundExpression.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;44</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;45</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">for&nbsp;</span><span class="other">(</span><span class="kw">const&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><a href="class_BoundFunctionCall_3B6FF42595EC5C47E14802245CBCB5F47F5F3EAC.html">BoundFunctionCall</a><span class="other">></span><span class="other">&amp;</span>&nbsp;<span class="identifier">destructorCall</span><span class="other">&nbsp;:&nbsp;</span><a href="class_BoundExpression_6C13A7CD518141FC69CADA397796946086EEA452.html#variable_temporaryDestructorCalls_779213E64859E45EACA86242802F024DFA481037">temporaryDestructorCalls</a><span class="other">)</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;46</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;47</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">destructorCall</span><span class="other">-></span><span class="identifier">Load</span><span class="other">(</span><span class="identifier">emitter</span><span class="other">,&nbsp;</span><a href="enum_OperationFlags_759E65CBD07EA7837676833D7E212AEDFEBEC62C.html">OperationFlags</a><span class="other">::</span><a href="enum_OperationFlags_759E65CBD07EA7837676833D7E212AEDFEBEC62C.html#enumerator_none_B0E31C514C0E96B027D04BCECCEBC15366CBF135">none</a><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;48</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;49</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/binder/BoundExpression.hpp_A44A2248C36EC09E918BFC81F1F069BE4D8EE996.html#60">60</a>
+             of <a href="file/binder/BoundExpression.hpp_A44A2248C36EC09E918BFC81F1F069BE4D8EE996.html">BoundExpression.hpp</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Called by: <a href="class_BoundAddressOfExpression_A5E64A329637AA93D0A30E7D1814C2EEE18E77AC.html#function_Load_E0FC244347E26AB0BABF2F55D5BD84FF180E0E77">cmajor::binder::BoundAddressOfExpression::Load</a>
+            , <a href="class_BoundAddressOfExpression_A5E64A329637AA93D0A30E7D1814C2EEE18E77AC.html#function_Store_26AE7B7254184D3D80A71788249D5DC1CF191A60">cmajor::binder::BoundAddressOfExpression::Store</a>
+            , <a href="class_BoundAsExpression_801F8209CE20D1833758832CB25511162B89B9E1.html#function_Load_3FC2639A0408072BB0F9731D408A6D763D2B4D3E">cmajor::binder::BoundAsExpression::Load</a>
+            , <a href="class_BoundBitCast_3555C7754DA41091352EB8855BE2C25DDD0324B9.html#function_Load_B603083FFF851C936AF75EB69D1EE3B6A59572CF">cmajor::binder::BoundBitCast::Load</a>
+            , <a href="class_BoundClassDelegateCall_26162C838B3AF67704003CCD2EB0BEAEB31960BE.html#function_Load_322E83C792A5A63FB73F98E807E8407F6B32E51C">cmajor::binder::BoundClassDelegateCall::Load</a>
+            , <a href="class_BoundClassDelegateCall_26162C838B3AF67704003CCD2EB0BEAEB31960BE.html#function_Store_CB1924402E56CD3B88E3F5FCDE06377005C2EA91">cmajor::binder::BoundClassDelegateCall::Store</a>
+            , <a href="class_BoundConjunction_2AC2B0CD92C9B5896BEAD429EB0EE89309478CA8.html#function_Load_668E84359AC1BD6D839914B690FB0FAB55D3E6A8">cmajor::binder::BoundConjunction::Load</a>
+            , <a href="class_BoundConstant_4F99952EEB608967A62DFA4EB371782CD2C2C305.html#function_Load_4D815C2F185419911785194C0A2E9143989BB195">cmajor::binder::BoundConstant::Load</a>
+            , <a href="class_BoundConstructAndReturnTemporaryExpression_B8171A28E33D7C8E1DB1ED4B12DAF35314C1C7F1.html#function_Load_E19A0F3E8E90B68289BF3A0681533173C0CE6BBD">cmajor::binder::BoundConstructAndReturnTemporaryExpression::Load</a>
+            , <a href="class_BoundConstructExpression_9519ADD2DD5B4CD90CB0E2D0B6F5839B8EC86FEE.html#function_Load_CE758B4CDAC9EDE295604FE43B110E36116AE8BA">cmajor::binder::BoundConstructExpression::Load</a>
+            , <a href="class_BoundConversion_EAE9ECDF9392F64A339764A1F3415D0B33E49E78.html#function_Load_502EBF5B41FEB3D84D6965F44131355663F27A6F">cmajor::binder::BoundConversion::Load</a>
+            , <a href="class_BoundDelegateCall_E0D935F2EC14B697C235FC3CD519F0432213A6DC.html#function_Load_6A8FB222CFCFA7238D4B4DEFCCFB81C89872E132">cmajor::binder::BoundDelegateCall::Load</a>
+            , <a href="class_BoundDelegateCall_E0D935F2EC14B697C235FC3CD519F0432213A6DC.html#function_Store_6A44D1BE3E8777F69CE318220413D7A8E012A3AB">cmajor::binder::BoundDelegateCall::Store</a>
+            , <a href="class_BoundDereferenceExpression_148C0D624D0D019C3691247C87FF0A797FA273CF.html#function_Load_FAB48D78446289DFF2512678429672A2A93BEDD8">cmajor::binder::BoundDereferenceExpression::Load</a>
+            , <a href="class_BoundDereferenceExpression_148C0D624D0D019C3691247C87FF0A797FA273CF.html#function_Store_696AA46007B056FE7240DD59F3C434EF19E3DEA1">cmajor::binder::BoundDereferenceExpression::Store</a>
+            , <a href="class_BoundDisjunction_D6F8EC06B62E996A115B5E04FFF3930937DF493A.html#function_Load_08428C22881D6396126CBB51E17154CE1EE923EF">cmajor::binder::BoundDisjunction::Load</a>
+            , <a href="class_BoundEnumConstant_64D2349EFF17704F48853830738512BA35F3A51C.html#function_Load_19576783E1E8ECB27676DE8895B9766BA45AAD0E">cmajor::binder::BoundEnumConstant::Load</a>
+            , <a href="class_BoundFunctionCall_3B6FF42595EC5C47E14802245CBCB5F47F5F3EAC.html#function_Load_DAE00517845253A62A2030636821370ADE2D966C">cmajor::binder::BoundFunctionCall::Load</a>
+            , <a href="class_BoundFunctionCall_3B6FF42595EC5C47E14802245CBCB5F47F5F3EAC.html#function_Store_4C31C406F1B84E8D1A8CEA36B5A39A910505FF9F">cmajor::binder::BoundFunctionCall::Store</a>
+            , <a href="class_BoundFunctionPtr_484736F4C9F94241A850DC79D71AB4813A1F314A.html#function_Load_CABF0C4E23AE119009D4B1F43B137F61660E5242">cmajor::binder::BoundFunctionPtr::Load</a>
+            , <a href="class_BoundIsExpression_F285D49EF42A61F29AF03EE57616326ED7354E31.html#function_Load_A2933C77CABDEC0A75076BB6EBC43C16DBDEFD05">cmajor::binder::BoundIsExpression::Load</a>
+            , <a href="class_BoundLiteral_DF1E22194FB48EAFA2C4993DC33E08DF24AF2F68.html#function_Load_CCF2E956F4DD4A5BD159D193C354016A9309B81D">cmajor::binder::BoundLiteral::Load</a>
+            , <a href="class_BoundLocalVariable_A57A3CCE331BFEC9A961AA545EA665CA0BE43FD1.html#function_Load_0C2D8D3045245DC3196DB187FBD1B1183F619AF2">cmajor::binder::BoundLocalVariable::Load</a>
+            , <a href="class_BoundLocalVariable_A57A3CCE331BFEC9A961AA545EA665CA0BE43FD1.html#function_Store_867A322F3FB8D87F6EA84C54736C17AB3E6B1A3C">cmajor::binder::BoundLocalVariable::Store</a>
+            , <a href="class_BoundMemberVariable_821DBEEE08AD07613BC7E1C4D846438683D4C96E.html#function_Load_033FCDD2D84F7C608B7F6B9BA96713512793E33B">cmajor::binder::BoundMemberVariable::Load</a>
+            , <a href="class_BoundMemberVariable_821DBEEE08AD07613BC7E1C4D846438683D4C96E.html#function_Store_F331D6908F593787CC4DDCC5EE4CCDBA17ABA70E">cmajor::binder::BoundMemberVariable::Store</a>
+            , <a href="class_BoundParameter_4BB9E4325E4AE1836E6E8B01866834DDC5B6CF15.html#function_Load_F35FFF2B01FA294A7B8125F5399A7E44D4FB3A37">cmajor::binder::BoundParameter::Load</a>
+            , <a href="class_BoundParameter_4BB9E4325E4AE1836E6E8B01866834DDC5B6CF15.html#function_Store_64030030B0BEF29E697C99D68D074776DBA644D0">cmajor::binder::BoundParameter::Store</a>
+            , <a href="class_BoundReferenceToPointerExpression_6B616912996B9A65540A4ACAC567521B4ABC73D4.html#function_Load_B0F26855153C290A629A4658B7326BA2B51B243D">cmajor::binder::BoundReferenceToPointerExpression::Load</a>
+            , <a href="class_BoundReferenceToPointerExpression_6B616912996B9A65540A4ACAC567521B4ABC73D4.html#function_Store_48B557E0CE86D9A1D4E16F7AE8EAD4041B3F799D">cmajor::binder::BoundReferenceToPointerExpression::Store</a>
+            , <a href="class_BoundSizeOfExpression_0A449849E9BDD7D11179D9ECC7A57EBFA10D2E16.html#function_Load_62FF0FA2DE7F73E4C8796CB3B529064D9CFFE0DA">cmajor::binder::BoundSizeOfExpression::Load</a>
+            , <a href="class_BoundTemporary_315499F7B13852EFEFF919C8053CF901987BEE7E.html#function_Load_8F08DAE1D05C4C3457F61A1E67603236B39AB5D4">cmajor::binder::BoundTemporary::Load</a>
+            , <a href="class_BoundTypeNameExpression_4B31DB86C15C38624020EEBE7398FBA93B17540A.html#function_Load_AD90BA26AF610D6DF639D0B72A5EC57FB33720B3">cmajor::binder::BoundTypeNameExpression::Load</a>
+            , <a href="class_BasicEmitter_ADBC5CA76E0CFA156325CCEFB69E7DB1412045E9.html#function_Visit_B793C1DA7B36EE97FFE753C183C19EB5304F094C">cmajor::emitter::BasicEmitter::Visit</a>
+            , <a href="class_BasicEmitter_ADBC5CA76E0CFA156325CCEFB69E7DB1412045E9.html#function_Visit_27106C0281647ED43071B7ECA7D136001701E375">cmajor::emitter::BasicEmitter::Visit</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_GetFlag_40B6B61DB2DE7E1C34A9B5B2E0D06ED85C1AE394">GetFlag Member Function</h3>
+        <h4>
+            <span class="kw">bool</span>
+             cmajor::binder::BoundExpression::GetFlag(<a href="enum_BoundExpressionFlags_854A679BF89B60E989E997BA7CD6388D2EC142B7.html">BoundExpressionFlags</a>
+             flag) <span class="kw">const</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/binder/BoundExpression.hpp_A44A2248C36EC09E918BFC81F1F069BE4D8EE996.html#56">56</a>
+             of <a href="file/binder/BoundExpression.hpp_A44A2248C36EC09E918BFC81F1F069BE4D8EE996.html">BoundExpression.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;56</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="other">(</span><span class="identifier">flags</span><span class="other">&nbsp;&amp;&nbsp;</span><span class="identifier">flag</span><span class="other">)</span><span class="other">&nbsp;!=&nbsp;</span><span class="identifier">BoundExpressionFlags</span><span class="other">::</span><span class="identifier">none</span><span class="other">;</span>&nbsp;&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Called by: <a href="class_BoundClassDelegateCall_26162C838B3AF67704003CCD2EB0BEAEB31960BE.html#function_Store_CB1924402E56CD3B88E3F5FCDE06377005C2EA91">cmajor::binder::BoundClassDelegateCall::Store</a>
+            , <a href="class_BoundDelegateCall_E0D935F2EC14B697C235FC3CD519F0432213A6DC.html#function_Store_6A44D1BE3E8777F69CE318220413D7A8E012A3AB">cmajor::binder::BoundDelegateCall::Store</a>
+            , <a href="class_BoundFunctionCall_3B6FF42595EC5C47E14802245CBCB5F47F5F3EAC.html#function_Load_DAE00517845253A62A2030636821370ADE2D966C">cmajor::binder::BoundFunctionCall::Load</a>
+            , <a href="class_BoundFunctionCall_3B6FF42595EC5C47E14802245CBCB5F47F5F3EAC.html#function_Store_4C31C406F1B84E8D1A8CEA36B5A39A910505FF9F">cmajor::binder::BoundFunctionCall::Store</a>
+            , <a href="namespace_binder_C711B7605339DC3A9E128C1E622E7D9A4629C97D.html#function_FindConversions_5065CE9EF2B7D3D84674ACFFF3CCF83418952381">cmajor::binder::FindConversions</a>
+            , <a href="namespace_binder_C711B7605339DC3A9E128C1E622E7D9A4629C97D.html#function_FindQualificationConversion_5FA24CE962D55A24ABF411EECA35C7220F45C227">cmajor::binder::FindQualificationConversion</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_GetType_A047432B77A32E73EFB7CEF817627B3EE6224DAB">GetType Member Function</h3>
+        <h4>
+            <span class="kw">const </span>
+            <a href="class_TypeSymbol_E4B881CC0D40D6232A69F240FA90045A54D93258.html">TypeSymbol</a>
+            * cmajor::binder::BoundExpression::GetType() <span class="kw">const</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/binder/BoundExpression.hpp_A44A2248C36EC09E918BFC81F1F069BE4D8EE996.html#54">54</a>
+             of <a href="file/binder/BoundExpression.hpp_A44A2248C36EC09E918BFC81F1F069BE4D8EE996.html">BoundExpression.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;54</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">type</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <hr/>
+        <h3 id="function_GetType_33A982727FC4397D43723CB5DF3B51CE76B1D8D8">GetType Member Function</h3>
+        <h4>
+            <a href="class_TypeSymbol_E4B881CC0D40D6232A69F240FA90045A54D93258.html">TypeSymbol</a>
+            * cmajor::binder::BoundExpression::GetType()</h4>
+        <span>
+            Definition at line <a href="file/binder/BoundExpression.hpp_A44A2248C36EC09E918BFC81F1F069BE4D8EE996.html#55">55</a>
+             of <a href="file/binder/BoundExpression.hpp_A44A2248C36EC09E918BFC81F1F069BE4D8EE996.html">BoundExpression.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;55</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">type</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <hr/>
+        <h3 id="function_HasValue_605969E15F16FEDE8165B83E569B9D9F7F964764">HasValue Member Function</h3>
+        <h4>
+            <span class="kw">bool</span>
+             cmajor::binder::BoundExpression::HasValue() <span class="kw">const virtual</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/binder/BoundExpression.hpp_A44A2248C36EC09E918BFC81F1F069BE4D8EE996.html#50">50</a>
+             of <a href="file/binder/BoundExpression.hpp_A44A2248C36EC09E918BFC81F1F069BE4D8EE996.html">BoundExpression.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;50</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">false</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Derived class overrides: <a href="class_BoundAsExpression_801F8209CE20D1833758832CB25511162B89B9E1.html#function_HasValue_51E79496CD72D1A18530A09D807CC4B9832AF333">cmajor::binder::BoundAsExpression::HasValue</a>
+            , <a href="class_BoundBitCast_3555C7754DA41091352EB8855BE2C25DDD0324B9.html#function_HasValue_C6CC973C371772AD41880F9B028F630ADA290F87">cmajor::binder::BoundBitCast::HasValue</a>
+            , <a href="class_BoundClassDelegateCall_26162C838B3AF67704003CCD2EB0BEAEB31960BE.html#function_HasValue_6FCA5CD6B6B576FAFC0FC8A9AD7D0530E18023AF">cmajor::binder::BoundClassDelegateCall::HasValue</a>
+            , <a href="class_BoundClassOrClassDelegateConversionResult_D567FAC30733A2FFC5F2046B64EE2668ECCB14D4.html#function_HasValue_89295B2CFFCFAF9BD85EC044603A2E1B93E179AD">cmajor::binder::BoundClassOrClassDelegateConversionResult::HasValue</a>
+            , <a href="class_BoundConjunction_2AC2B0CD92C9B5896BEAD429EB0EE89309478CA8.html#function_HasValue_EABAA6D6C4D69560CA7CF8059167551F9A923B1A">cmajor::binder::BoundConjunction::HasValue</a>
+            , <a href="class_BoundConstant_4F99952EEB608967A62DFA4EB371782CD2C2C305.html#function_HasValue_6C81CD4250C5EDF7AF2ACE7706BC1CA42889562E">cmajor::binder::BoundConstant::HasValue</a>
+            , <a href="class_BoundConstructAndReturnTemporaryExpression_B8171A28E33D7C8E1DB1ED4B12DAF35314C1C7F1.html#function_HasValue_878B9522A588EF815452E8DF07992F33E20C4713">cmajor::binder::BoundConstructAndReturnTemporaryExpression::HasValue</a>
+            , <a href="class_BoundConstructExpression_9519ADD2DD5B4CD90CB0E2D0B6F5839B8EC86FEE.html#function_HasValue_5D16D7505B5520BB1ADE47D7956901A8FDA1E3AD">cmajor::binder::BoundConstructExpression::HasValue</a>
+            , <a href="class_BoundConversion_EAE9ECDF9392F64A339764A1F3415D0B33E49E78.html#function_HasValue_AE9865EA78FAB4A7C7BF8C06545935A126E1F096">cmajor::binder::BoundConversion::HasValue</a>
+            , <a href="class_BoundDelegateCall_E0D935F2EC14B697C235FC3CD519F0432213A6DC.html#function_HasValue_6F112DD1A600408954F81AA2481247EDE0A75C71">cmajor::binder::BoundDelegateCall::HasValue</a>
+            , <a href="class_BoundDisjunction_D6F8EC06B62E996A115B5E04FFF3930937DF493A.html#function_HasValue_8C66619D8A6D5AB670814AB057D5B585198CE6E9">cmajor::binder::BoundDisjunction::HasValue</a>
+            , <a href="class_BoundEnumConstant_64D2349EFF17704F48853830738512BA35F3A51C.html#function_HasValue_1B46163D0B955484D3839005F2B2FAB9DADC0353">cmajor::binder::BoundEnumConstant::HasValue</a>
+            , <a href="class_BoundFunctionCall_3B6FF42595EC5C47E14802245CBCB5F47F5F3EAC.html#function_HasValue_4E9A081DCC01C274F596C46A95FFC8C420045250">cmajor::binder::BoundFunctionCall::HasValue</a>
+            , <a href="class_BoundFunctionPtr_484736F4C9F94241A850DC79D71AB4813A1F314A.html#function_HasValue_DDEC6175398EA729579279B261B5A916B14F3069">cmajor::binder::BoundFunctionPtr::HasValue</a>
+            , <a href="class_BoundIsExpression_F285D49EF42A61F29AF03EE57616326ED7354E31.html#function_HasValue_31E27E8C61240226240AF6031D99BDA8E772E73C">cmajor::binder::BoundIsExpression::HasValue</a>
+            , <a href="class_BoundLiteral_DF1E22194FB48EAFA2C4993DC33E08DF24AF2F68.html#function_HasValue_3A313FB3DDB9660377C4A2EBE777D7DA2BE1107C">cmajor::binder::BoundLiteral::HasValue</a>
+            , <a href="class_BoundLocalVariable_A57A3CCE331BFEC9A961AA545EA665CA0BE43FD1.html#function_HasValue_0BD9A1318C0E1EC6C870EA7D3BCBA1B6541FBF6F">cmajor::binder::BoundLocalVariable::HasValue</a>
+            , <a href="class_BoundMemberVariable_821DBEEE08AD07613BC7E1C4D846438683D4C96E.html#function_HasValue_D542820BC3398338CC65F184F1BD2D418C68974C">cmajor::binder::BoundMemberVariable::HasValue</a>
+            , <a href="class_BoundParameter_4BB9E4325E4AE1836E6E8B01866834DDC5B6CF15.html#function_HasValue_38811FE59968C4C87990B19B321A61358DFB0145">cmajor::binder::BoundParameter::HasValue</a>
+            , <a href="class_BoundTemporary_315499F7B13852EFEFF919C8053CF901987BEE7E.html#function_HasValue_120599450180A716EC41ECFCDE5F9F05F3D5BFFE">cmajor::binder::BoundTemporary::HasValue</a>
+            , <a href="class_BoundTypeNameExpression_4B31DB86C15C38624020EEBE7398FBA93B17540A.html#function_HasValue_5AAE1F38D804FE1811E19D1CCA0818A4059FBC80">cmajor::binder::BoundTypeNameExpression::HasValue</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Called by: <a href="class_BasicEmitter_ADBC5CA76E0CFA156325CCEFB69E7DB1412045E9.html#function_Visit_8DD7E5928BE44C83561EF5C131D52E42B43C7FB7">cmajor::emitter::BasicEmitter::Visit</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_IsComplete_80C73451008F00DDB49EB2480845517809E63414">IsComplete Member Function</h3>
+        <h4>
+            <span class="kw">bool</span>
+             cmajor::binder::BoundExpression::IsComplete() <span class="kw">const virtual</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/binder/BoundExpression.hpp_A44A2248C36EC09E918BFC81F1F069BE4D8EE996.html#48">48</a>
+             of <a href="file/binder/BoundExpression.hpp_A44A2248C36EC09E918BFC81F1F069BE4D8EE996.html">BoundExpression.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;48</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">true</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Derived class overrides: <a href="class_BoundFunctionGroupExpression_DBE9589AB7AC869E137796EFE30ACDE4EE11A27F.html#function_IsComplete_1688037039428D0AC29A6B2FCB0B9D0407A2EFDC">cmajor::binder::BoundFunctionGroupExpression::IsComplete</a>
+            , <a href="class_BoundMemberExpression_A140A910BB1C0AD08ADA71E4479201E4281A387E.html#function_IsComplete_399B0960BEF4DB897BB756F26397E7F163C1E071">cmajor::binder::BoundMemberExpression::IsComplete</a>
+            , <a href="class_BoundNamespaceExpression_FD16E8F993428DCEC3740B7D751536BD24985319.html#function_IsComplete_D84A6E409FB558902E310E934C32E206CBFEC102">cmajor::binder::BoundNamespaceExpression::IsComplete</a>
+            , <a href="class_BoundTypeExpression_C2681C3ACE7F6FBEBF9AD6464D7478D7E60F3A3A.html#function_IsComplete_6A5CF32B8400D3EEDE1D8E9C4EC403B9F4CA182D">cmajor::binder::BoundTypeExpression::IsComplete</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_IsLvalueExpression_6CC1B80BB4064B35DE4FA99CFE90A6929C9C7327">IsLvalueExpression Member Function</h3>
+        <h4>
+            <span class="kw">bool</span>
+             cmajor::binder::BoundExpression::IsLvalueExpression() <span class="kw">const virtual</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/binder/BoundExpression.hpp_A44A2248C36EC09E918BFC81F1F069BE4D8EE996.html#49">49</a>
+             of <a href="file/binder/BoundExpression.hpp_A44A2248C36EC09E918BFC81F1F069BE4D8EE996.html">BoundExpression.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;49</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">false</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Derived class overrides: <a href="class_BoundClassDelegateCall_26162C838B3AF67704003CCD2EB0BEAEB31960BE.html#function_IsLvalueExpression_C61C1F475DD9DD9FD4DFE1DD3925012378B85F40">cmajor::binder::BoundClassDelegateCall::IsLvalueExpression</a>
+            , <a href="class_BoundClassOrClassDelegateConversionResult_D567FAC30733A2FFC5F2046B64EE2668ECCB14D4.html#function_IsLvalueExpression_26D50744C9D429C53020FE09E1F461BEB106BC97">cmajor::binder::BoundClassOrClassDelegateConversionResult::IsLvalueExpression</a>
+            , <a href="class_BoundConstructAndReturnTemporaryExpression_B8171A28E33D7C8E1DB1ED4B12DAF35314C1C7F1.html#function_IsLvalueExpression_AB58AA19CE3D1E1D563183CBDDA68CA1E87DDCB6">cmajor::binder::BoundConstructAndReturnTemporaryExpression::IsLvalueExpression</a>
+            , <a href="class_BoundConversion_EAE9ECDF9392F64A339764A1F3415D0B33E49E78.html#function_IsLvalueExpression_2FFF9690AD64CF3A62C11934A21D3D93E972C271">cmajor::binder::BoundConversion::IsLvalueExpression</a>
+            , <a href="class_BoundDelegateCall_E0D935F2EC14B697C235FC3CD519F0432213A6DC.html#function_IsLvalueExpression_20BADF827599BA796C00AA213022DF5B7D231F11">cmajor::binder::BoundDelegateCall::IsLvalueExpression</a>
+            , <a href="class_BoundDereferenceExpression_148C0D624D0D019C3691247C87FF0A797FA273CF.html#function_IsLvalueExpression_CE13984BA4CAC60C6EBB01869F020571DF5ADFE8">cmajor::binder::BoundDereferenceExpression::IsLvalueExpression</a>
+            , <a href="class_BoundFunctionCall_3B6FF42595EC5C47E14802245CBCB5F47F5F3EAC.html#function_IsLvalueExpression_D48C8F9812B0A4E390A5E8BE9C8C0F2F2B11A3A9">cmajor::binder::BoundFunctionCall::IsLvalueExpression</a>
+            , <a href="class_BoundLocalVariable_A57A3CCE331BFEC9A961AA545EA665CA0BE43FD1.html#function_IsLvalueExpression_9B526B18CE1DCD3BD4753932D5701FA3DCDCD5BD">cmajor::binder::BoundLocalVariable::IsLvalueExpression</a>
+            , <a href="class_BoundMemberVariable_821DBEEE08AD07613BC7E1C4D846438683D4C96E.html#function_IsLvalueExpression_0D9CD1B88D1B2BDCECF28C4D7CBF8BAADF066F7F">cmajor::binder::BoundMemberVariable::IsLvalueExpression</a>
+            , <a href="class_BoundParameter_4BB9E4325E4AE1836E6E8B01866834DDC5B6CF15.html#function_IsLvalueExpression_99D93A7D45D043DD9308C704A9F4AAC769997CCA">cmajor::binder::BoundParameter::IsLvalueExpression</a>
+            , <a href="class_BoundTemporary_315499F7B13852EFEFF919C8053CF901987BEE7E.html#function_IsLvalueExpression_2ECB1B5B45B0A93769C3C3B6E85F0B5720C224BA">cmajor::binder::BoundTemporary::IsLvalueExpression</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Called by: <a href="namespace_binder_C711B7605339DC3A9E128C1E622E7D9A4629C97D.html#function_FindConversions_5065CE9EF2B7D3D84674ACFFF3CCF83418952381">cmajor::binder::FindConversions</a>
+            , <a href="namespace_binder_C711B7605339DC3A9E128C1E622E7D9A4629C97D.html#function_FindQualificationConversion_5FA24CE962D55A24ABF411EECA35C7220F45C227">cmajor::binder::FindQualificationConversion</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_MoveTemporaryDestructorCallsTo_5C58046675CE13458ED59A9386C93FFB44C41F6B">MoveTemporaryDestructorCallsTo Member Function</h3>
+        <h4>
+            <span class="kw">void</span>
+             cmajor::binder::BoundExpression::MoveTemporaryDestructorCallsTo(<a href="class_BoundExpression_6C13A7CD518141FC69CADA397796946086EEA452.html">BoundExpression</a>
+            &amp; expression)</h4>
+        <span>
+            Definition at line <a href="file/binder/BoundExpression.cpp_DF2AC308499D981CAB212ED826C2DB12708BF3E8.html#34">34</a>
+             of <a href="file/binder/BoundExpression.cpp_DF2AC308499D981CAB212ED826C2DB12708BF3E8.html">BoundExpression.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;35</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;36</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">for&nbsp;</span><span class="other">(</span><span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><a href="class_BoundFunctionCall_3B6FF42595EC5C47E14802245CBCB5F47F5F3EAC.html">BoundFunctionCall</a><span class="other">></span><span class="other">&amp;</span>&nbsp;<span class="identifier">destructorCall</span><span class="other">&nbsp;:&nbsp;</span><a href="class_BoundExpression_6C13A7CD518141FC69CADA397796946086EEA452.html#variable_temporaryDestructorCalls_779213E64859E45EACA86242802F024DFA481037">temporaryDestructorCalls</a><span class="other">)</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;37</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;38</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">expression</span><span class="other">.</span><a href="class_BoundExpression_6C13A7CD518141FC69CADA397796946086EEA452.html#function_AddTemporaryDestructorCall_D51075A26C4FBC1F816E9A0676ADE198CF3A8A61">AddTemporaryDestructorCall</a><span class="other">(</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">move</span><span class="other">(</span><span class="identifier">destructorCall</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;39</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;40</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="class_BoundExpression_6C13A7CD518141FC69CADA397796946086EEA452.html#variable_temporaryDestructorCalls_779213E64859E45EACA86242802F024DFA481037">temporaryDestructorCalls</a><span class="other">.</span><span class="identifier">clear</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;41</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/binder/BoundExpression.hpp_A44A2248C36EC09E918BFC81F1F069BE4D8EE996.html#59">59</a>
+             of <a href="file/binder/BoundExpression.hpp_A44A2248C36EC09E918BFC81F1F069BE4D8EE996.html">BoundExpression.hpp</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Calls: <a href="class_BoundExpression_6C13A7CD518141FC69CADA397796946086EEA452.html#function_AddTemporaryDestructorCall_D51075A26C4FBC1F816E9A0676ADE198CF3A8A61">cmajor::binder::BoundExpression::AddTemporaryDestructorCall</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Called by: <a href="namespace_binder_C711B7605339DC3A9E128C1E622E7D9A4629C97D.html#function_CreateBoundFunctionCall_8A1CBD9AED666DBB5EDDFA32ECD6378DB7D3AD77">cmajor::binder::CreateBoundFunctionCall</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_SetFlag_41AFCDC80E89E0BEC6074D7635465C9468CE21EC">SetFlag Member Function</h3>
+        <h4>
+            <span class="kw">void</span>
+             cmajor::binder::BoundExpression::SetFlag(<a href="enum_BoundExpressionFlags_854A679BF89B60E989E997BA7CD6388D2EC142B7.html">BoundExpressionFlags</a>
+             flag)</h4>
+        <span>
+            Definition at line <a href="file/binder/BoundExpression.hpp_A44A2248C36EC09E918BFC81F1F069BE4D8EE996.html#57">57</a>
+             of <a href="file/binder/BoundExpression.hpp_A44A2248C36EC09E918BFC81F1F069BE4D8EE996.html">BoundExpression.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;57</span>&nbsp;<span class="other">{</span>&nbsp;<span class="identifier">flags</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">flags</span><span class="other">&nbsp;|&nbsp;</span><span class="identifier">flag</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <hr/>
+        <h3 id="function_ToValue_49A00D5DA301F36B0CEA9CDDFD37880FC64241F2">ToValue Member Function</h3>
+        <h4>
+            std::unique_ptr&lt;<a href="class_Value_D656BD8E5EC910AF6747A38C3979A4A9B1E41ED4.html">Value</a>
+            > cmajor::binder::BoundExpression::ToValue(<a href="class_BoundCompileUnit_E99BC7539B5239DF3A33DC3D613FE1D188A0A9E1.html">BoundCompileUnit</a>
+            &amp; boundCompileUnit) <span class="kw">const virtual</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/binder/BoundExpression.hpp_A44A2248C36EC09E918BFC81F1F069BE4D8EE996.html#52">52</a>
+             of <a href="file/binder/BoundExpression.hpp_A44A2248C36EC09E918BFC81F1F069BE4D8EE996.html">BoundExpression.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;52</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><a href="class_Value_D656BD8E5EC910AF6747A38C3979A4A9B1E41ED4.html">Value</a><span class="other">></span><span class="other">(</span><span class="other">)</span><span class="other">;</span><span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Derived class overrides: <a href="class_BoundAddressOfExpression_A5E64A329637AA93D0A30E7D1814C2EEE18E77AC.html#function_ToValue_98D78D84FF5F51C785029DA36840052461426717">cmajor::binder::BoundAddressOfExpression::ToValue</a>
+            , <a href="class_BoundConstant_4F99952EEB608967A62DFA4EB371782CD2C2C305.html#function_ToValue_7CC1529E18C02F25CA1BFA1CE8282A8481039D19">cmajor::binder::BoundConstant::ToValue</a>
+            , <a href="class_BoundConversion_EAE9ECDF9392F64A339764A1F3415D0B33E49E78.html#function_ToValue_21C474A7BEF4BB223BC995B05CBCB0A416FC5437">cmajor::binder::BoundConversion::ToValue</a>
+            , <a href="class_BoundEnumConstant_64D2349EFF17704F48853830738512BA35F3A51C.html#function_ToValue_E0028C2D70A4BB81CA921675D82EE441F8BD29D3">cmajor::binder::BoundEnumConstant::ToValue</a>
+            , <a href="class_BoundLiteral_DF1E22194FB48EAFA2C4993DC33E08DF24AF2F68.html#function_ToValue_CF7E514D0CAE68FF275E132CB5E0F5A6AF368024">cmajor::binder::BoundLiteral::ToValue</a>
+            , <a href="class_BoundTemporary_315499F7B13852EFEFF919C8053CF901987BEE7E.html#function_ToValue_D3256FA76FA635A6F62E12CA6AAFE33125664A55">cmajor::binder::BoundTemporary::ToValue</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_TypeString_532F77978E15E752440933D6F704096F625F0D52">TypeString Member Function</h3>
+        <h4>
+            std::string cmajor::binder::BoundExpression::TypeString() <span class="kw">const virtual</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/binder/BoundExpression.hpp_A44A2248C36EC09E918BFC81F1F069BE4D8EE996.html#51">51</a>
+             of <a href="file/binder/BoundExpression.hpp_A44A2248C36EC09E918BFC81F1F069BE4D8EE996.html">BoundExpression.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;51</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="string">"expression"</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Derived class overrides: <a href="class_BoundAddressOfExpression_A5E64A329637AA93D0A30E7D1814C2EEE18E77AC.html#function_TypeString_F29C4A376EEB8300D97F34E1CB87884EC10E8E43">cmajor::binder::BoundAddressOfExpression::TypeString</a>
+            , <a href="class_BoundAsExpression_801F8209CE20D1833758832CB25511162B89B9E1.html#function_TypeString_E6DF4EE4D4E3F7BE54E1D57C4A1AE468296FCD4B">cmajor::binder::BoundAsExpression::TypeString</a>
+            , <a href="class_BoundClassDelegateCall_26162C838B3AF67704003CCD2EB0BEAEB31960BE.html#function_TypeString_EC6783D0240D0D520035EF7DF94FE1E68F34608F">cmajor::binder::BoundClassDelegateCall::TypeString</a>
+            , <a href="class_BoundClassOrClassDelegateConversionResult_D567FAC30733A2FFC5F2046B64EE2668ECCB14D4.html#function_TypeString_82491CE3B859D740F62D6A4F5229BD3E95E48FC3">cmajor::binder::BoundClassOrClassDelegateConversionResult::TypeString</a>
+            , <a href="class_BoundConstant_4F99952EEB608967A62DFA4EB371782CD2C2C305.html#function_TypeString_EF740972FF54063D05DE2596387AC6F46BCC0AF5">cmajor::binder::BoundConstant::TypeString</a>
+            , <a href="class_BoundConstructAndReturnTemporaryExpression_B8171A28E33D7C8E1DB1ED4B12DAF35314C1C7F1.html#function_TypeString_20E062AD7EF0C07FD1B8D7F5B30E6F7A3429DE03">cmajor::binder::BoundConstructAndReturnTemporaryExpression::TypeString</a>
+            , <a href="class_BoundConstructExpression_9519ADD2DD5B4CD90CB0E2D0B6F5839B8EC86FEE.html#function_TypeString_228A3E7EE5F0C639E1D7C7E84F4D61D3B9C0F3D0">cmajor::binder::BoundConstructExpression::TypeString</a>
+            , <a href="class_BoundConversion_EAE9ECDF9392F64A339764A1F3415D0B33E49E78.html#function_TypeString_592754C6821259434246D38160B2F0FEE6D16DD6">cmajor::binder::BoundConversion::TypeString</a>
+            , <a href="class_BoundDelegateCall_E0D935F2EC14B697C235FC3CD519F0432213A6DC.html#function_TypeString_7E5A81EEB61C3B7AD91ED48C0DD79DD85F61C83D">cmajor::binder::BoundDelegateCall::TypeString</a>
+            , <a href="class_BoundDereferenceExpression_148C0D624D0D019C3691247C87FF0A797FA273CF.html#function_TypeString_D3C11429A18E301553E05EC45F5D35D9FE7B43FE">cmajor::binder::BoundDereferenceExpression::TypeString</a>
+            , <a href="class_BoundEnumConstant_64D2349EFF17704F48853830738512BA35F3A51C.html#function_TypeString_5EBE5B2D5CB3FB1113BE8915FCD53E849559A09B">cmajor::binder::BoundEnumConstant::TypeString</a>
+            , <a href="class_BoundFunctionCall_3B6FF42595EC5C47E14802245CBCB5F47F5F3EAC.html#function_TypeString_D20C04E042A7AAAEA5794322D2C33E7FCFDCC1D3">cmajor::binder::BoundFunctionCall::TypeString</a>
+            , <a href="class_BoundFunctionGroupExpression_DBE9589AB7AC869E137796EFE30ACDE4EE11A27F.html#function_TypeString_7A253AD39F81A2C61FBE5F0611CB813BBA37C273">cmajor::binder::BoundFunctionGroupExpression::TypeString</a>
+            , <a href="class_BoundIsExpression_F285D49EF42A61F29AF03EE57616326ED7354E31.html#function_TypeString_2ACE22E1DC719989D20D5989BFF82CEBA4477FD1">cmajor::binder::BoundIsExpression::TypeString</a>
+            , <a href="class_BoundLiteral_DF1E22194FB48EAFA2C4993DC33E08DF24AF2F68.html#function_TypeString_204DBBF1B920059A70291F91948CAE2E1200AEE4">cmajor::binder::BoundLiteral::TypeString</a>
+            , <a href="class_BoundLocalVariable_A57A3CCE331BFEC9A961AA545EA665CA0BE43FD1.html#function_TypeString_493DD9BA8A202590EAA6310C794907C8DCC2331F">cmajor::binder::BoundLocalVariable::TypeString</a>
+            , <a href="class_BoundMemberExpression_A140A910BB1C0AD08ADA71E4479201E4281A387E.html#function_TypeString_E9A6639696CCCDC66DBA3E26A13B6C23AF70D121">cmajor::binder::BoundMemberExpression::TypeString</a>
+            , <a href="class_BoundMemberVariable_821DBEEE08AD07613BC7E1C4D846438683D4C96E.html#function_TypeString_EAB388EF67D6C20133C9CFD4E9F2ABC07CF0E111">cmajor::binder::BoundMemberVariable::TypeString</a>
+            , <a href="class_BoundNamespaceExpression_FD16E8F993428DCEC3740B7D751536BD24985319.html#function_TypeString_63B92807EE6B4DF9A2293EF008851E297657BB40">cmajor::binder::BoundNamespaceExpression::TypeString</a>
+            , <a href="class_BoundParameter_4BB9E4325E4AE1836E6E8B01866834DDC5B6CF15.html#function_TypeString_55523AD19F2DDE6D0B3AFB01BC3D6B8B641541C3">cmajor::binder::BoundParameter::TypeString</a>
+            , <a href="class_BoundReferenceToPointerExpression_6B616912996B9A65540A4ACAC567521B4ABC73D4.html#function_TypeString_986354313E0E3E4414080102070323EB730842B1">cmajor::binder::BoundReferenceToPointerExpression::TypeString</a>
+            , <a href="class_BoundSizeOfExpression_0A449849E9BDD7D11179D9ECC7A57EBFA10D2E16.html#function_TypeString_178002BB08B8DA8E2D0AB2EFB67186884EE46352">cmajor::binder::BoundSizeOfExpression::TypeString</a>
+            , <a href="class_BoundTemporary_315499F7B13852EFEFF919C8053CF901987BEE7E.html#function_TypeString_64DF446914FB88CA5D501B94AF0D4F9118C52CF4">cmajor::binder::BoundTemporary::TypeString</a>
+            , <a href="class_BoundTypeExpression_C2681C3ACE7F6FBEBF9AD6464D7478D7E60F3A3A.html#function_TypeString_1F6AA6718371FD1CD38B1C012BCD575BD2D7C8AF">cmajor::binder::BoundTypeExpression::TypeString</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <a href="../index.html">index</a>
+         | <a href="namespace_binder_C711B7605339DC3A9E128C1E622E7D9A4629C97D.html">up</a>
+         | <a href="class_BoundEnumTypeDefinition_2895F4A41B9598387B5B5734A980C22A8B8D89AE.html">prev</a>
+         | <a href="class_BoundExpressionStatement_FC39663CCD7EF04AA66CB2F57D05425C4BC6FA09.html">next</a>
+    </body>
+</html>

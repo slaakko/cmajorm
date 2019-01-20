@@ -1,0 +1,389 @@
+<CompileUnitNode info="QuickSort.cm">
+ <NamespaceNode>
+  <IdentifierNode info=""/>
+  <NamespaceImportNode>
+   <IdentifierNode info="System"/>
+  </NamespaceImportNode>
+  <NamespaceImportNode>
+   <IdentifierNode info="System.Collections"/>
+  </NamespaceImportNode>
+  <FunctionNode info="Partition">
+   <ParameterNode>
+    <IdentifierNode info="intList"/>
+    <LValueRefNode>
+     <TemplateIdNode>
+      <IdentifierNode info="List"/>
+      <IntNode/>
+     </TemplateIdNode>
+    </LValueRefNode>
+   </ParameterNode>
+   <ParameterNode>
+    <IdentifierNode info="left"/>
+    <LongNode/>
+   </ParameterNode>
+   <ParameterNode>
+    <IdentifierNode info="right"/>
+    <LongNode/>
+   </ParameterNode>
+   <CompoundStatementNode>
+    <AssertStatementNode>
+     <LessOrEqualNode>
+      <IdentifierNode info="left"/>
+      <IdentifierNode info="right"/>
+     </LessOrEqualNode>
+    </AssertStatementNode>
+    <ConstructionStatementNode>
+     <IdentifierNode info="i"/>
+     <LongNode/>
+     <IdentifierNode info="left"/>
+    </ConstructionStatementNode>
+    <ConstructionStatementNode>
+     <IdentifierNode info="j"/>
+     <LongNode/>
+     <IdentifierNode info="right"/>
+    </ConstructionStatementNode>
+    <ConstructionStatementNode>
+     <IdentifierNode info="pivot"/>
+     <IntNode/>
+     <IndexingNode>
+      <IdentifierNode info="intList"/>
+      <DivNode>
+       <AddNode>
+        <IdentifierNode info="left"/>
+        <IdentifierNode info="right"/>
+       </AddNode>
+       <SByteLiteralNode info="2"/>
+      </DivNode>
+     </IndexingNode>
+    </ConstructionStatementNode>
+    <WhileStatementNode>
+     <LessOrEqualNode>
+      <IdentifierNode info="i"/>
+      <IdentifierNode info="j"/>
+     </LessOrEqualNode>
+     <CompoundStatementNode>
+      <WhileStatementNode>
+       <LessNode>
+        <IndexingNode>
+         <IdentifierNode info="intList"/>
+         <IdentifierNode info="i"/>
+        </IndexingNode>
+        <IdentifierNode info="pivot"/>
+       </LessNode>
+       <ExpressionStatementNode>
+        <PrefixIncrementNode>
+         <IdentifierNode info="i"/>
+        </PrefixIncrementNode>
+       </ExpressionStatementNode>
+      </WhileStatementNode>
+      <WhileStatementNode>
+       <GreaterNode>
+        <IndexingNode>
+         <IdentifierNode info="intList"/>
+         <IdentifierNode info="j"/>
+        </IndexingNode>
+        <IdentifierNode info="pivot"/>
+       </GreaterNode>
+       <ExpressionStatementNode>
+        <PrefixDecrementNode>
+         <IdentifierNode info="j"/>
+        </PrefixDecrementNode>
+       </ExpressionStatementNode>
+      </WhileStatementNode>
+      <IfStatementNode>
+       <LessOrEqualNode>
+        <IdentifierNode info="i"/>
+        <IdentifierNode info="j"/>
+       </LessOrEqualNode>
+       <CompoundStatementNode>
+        <ExpressionStatementNode>
+         <InvokeNode>
+          <IdentifierNode info="Swap"/>
+          <IndexingNode>
+           <IdentifierNode info="intList"/>
+           <IdentifierNode info="i"/>
+          </IndexingNode>
+          <IndexingNode>
+           <IdentifierNode info="intList"/>
+           <IdentifierNode info="j"/>
+          </IndexingNode>
+         </InvokeNode>
+        </ExpressionStatementNode>
+        <ExpressionStatementNode>
+         <PrefixIncrementNode>
+          <IdentifierNode info="i"/>
+         </PrefixIncrementNode>
+        </ExpressionStatementNode>
+        <ExpressionStatementNode>
+         <PrefixDecrementNode>
+          <IdentifierNode info="j"/>
+         </PrefixDecrementNode>
+        </ExpressionStatementNode>
+       </CompoundStatementNode>
+      </IfStatementNode>
+     </CompoundStatementNode>
+    </WhileStatementNode>
+    <ReturnStatementNode>
+     <IdentifierNode info="i"/>
+    </ReturnStatementNode>
+   </CompoundStatementNode>
+  </FunctionNode>
+  <FunctionNode info="QuickSort">
+   <ParameterNode>
+    <IdentifierNode info="intList"/>
+    <LValueRefNode>
+     <TemplateIdNode>
+      <IdentifierNode info="List"/>
+      <IntNode/>
+     </TemplateIdNode>
+    </LValueRefNode>
+   </ParameterNode>
+   <ParameterNode>
+    <IdentifierNode info="left"/>
+    <LongNode/>
+   </ParameterNode>
+   <ParameterNode>
+    <IdentifierNode info="right"/>
+    <LongNode/>
+   </ParameterNode>
+   <CompoundStatementNode>
+    <AssertStatementNode>
+     <LessOrEqualNode>
+      <IdentifierNode info="left"/>
+      <IdentifierNode info="right"/>
+     </LessOrEqualNode>
+    </AssertStatementNode>
+    <ConstructionStatementNode>
+     <IdentifierNode info="index"/>
+     <LongNode/>
+     <InvokeNode>
+      <IdentifierNode info="Partition"/>
+      <IdentifierNode info="intList"/>
+      <IdentifierNode info="left"/>
+      <IdentifierNode info="right"/>
+     </InvokeNode>
+    </ConstructionStatementNode>
+    <IfStatementNode>
+     <LessNode>
+      <IdentifierNode info="left"/>
+      <SubNode>
+       <IdentifierNode info="index"/>
+       <SByteLiteralNode info="1"/>
+      </SubNode>
+     </LessNode>
+     <CompoundStatementNode>
+      <ExpressionStatementNode>
+       <InvokeNode>
+        <IdentifierNode info="QuickSort"/>
+        <IdentifierNode info="intList"/>
+        <IdentifierNode info="left"/>
+        <SubNode>
+         <IdentifierNode info="index"/>
+         <SByteLiteralNode info="1"/>
+        </SubNode>
+       </InvokeNode>
+      </ExpressionStatementNode>
+     </CompoundStatementNode>
+    </IfStatementNode>
+    <IfStatementNode>
+     <LessNode>
+      <IdentifierNode info="index"/>
+      <IdentifierNode info="right"/>
+     </LessNode>
+     <CompoundStatementNode>
+      <ExpressionStatementNode>
+       <InvokeNode>
+        <IdentifierNode info="QuickSort"/>
+        <IdentifierNode info="intList"/>
+        <IdentifierNode info="index"/>
+        <IdentifierNode info="right"/>
+       </InvokeNode>
+      </ExpressionStatementNode>
+     </CompoundStatementNode>
+    </IfStatementNode>
+   </CompoundStatementNode>
+  </FunctionNode>
+  <FunctionNode info="QuickSort">
+   <ParameterNode>
+    <IdentifierNode info="intList"/>
+    <LValueRefNode>
+     <TemplateIdNode>
+      <IdentifierNode info="List"/>
+      <IntNode/>
+     </TemplateIdNode>
+    </LValueRefNode>
+   </ParameterNode>
+   <CompoundStatementNode>
+    <IfStatementNode>
+     <NotNode>
+      <InvokeNode>
+       <DotNode>
+        <IdentifierNode info="IsEmpty"/>
+        <IdentifierNode info="intList"/>
+       </DotNode>
+      </InvokeNode>
+     </NotNode>
+     <CompoundStatementNode>
+      <ExpressionStatementNode>
+       <InvokeNode>
+        <IdentifierNode info="QuickSort"/>
+        <IdentifierNode info="intList"/>
+        <SByteLiteralNode info="0"/>
+        <SubNode>
+         <InvokeNode>
+          <DotNode>
+           <IdentifierNode info="Count"/>
+           <IdentifierNode info="intList"/>
+          </DotNode>
+         </InvokeNode>
+         <SByteLiteralNode info="1"/>
+        </SubNode>
+       </InvokeNode>
+      </ExpressionStatementNode>
+     </CompoundStatementNode>
+    </IfStatementNode>
+   </CompoundStatementNode>
+  </FunctionNode>
+  <FunctionNode info="Print">
+   <ParameterNode>
+    <IdentifierNode info="intList"/>
+    <ConstNode>
+     <LValueRefNode>
+      <TemplateIdNode>
+       <IdentifierNode info="List"/>
+       <IntNode/>
+      </TemplateIdNode>
+     </LValueRefNode>
+    </ConstNode>
+   </ParameterNode>
+   <CompoundStatementNode>
+    <ConstructionStatementNode>
+     <IdentifierNode info="first"/>
+     <BoolNode/>
+     <BooleanLiteralNode info="true"/>
+    </ConstructionStatementNode>
+    <ExpressionStatementNode>
+     <InvokeNode>
+      <DotNode>
+       <IdentifierNode info="Write"/>
+       <IdentifierNode info="Console"/>
+      </DotNode>
+      <CharLiteralNode info="["/>
+     </InvokeNode>
+    </ExpressionStatementNode>
+    <RangeForStatementNode>
+     <IdentifierNode info="x"/>
+     <IntNode/>
+     <IdentifierNode info="intList"/>
+     <CompoundStatementNode>
+      <IfStatementNode>
+       <IdentifierNode info="first"/>
+       <CompoundStatementNode>
+        <AssignmentStatementNode>
+         <IdentifierNode info="first"/>
+         <BooleanLiteralNode info="false"/>
+        </AssignmentStatementNode>
+       </CompoundStatementNode>
+       <CompoundStatementNode>
+        <ExpressionStatementNode>
+         <InvokeNode>
+          <DotNode>
+           <IdentifierNode info="Write"/>
+           <IdentifierNode info="Console"/>
+          </DotNode>
+          <StringLiteralNode info=", "/>
+         </InvokeNode>
+        </ExpressionStatementNode>
+       </CompoundStatementNode>
+      </IfStatementNode>
+      <ExpressionStatementNode>
+       <InvokeNode>
+        <DotNode>
+         <IdentifierNode info="Write"/>
+         <IdentifierNode info="Console"/>
+        </DotNode>
+        <IdentifierNode info="x"/>
+       </InvokeNode>
+      </ExpressionStatementNode>
+     </CompoundStatementNode>
+    </RangeForStatementNode>
+    <ExpressionStatementNode>
+     <InvokeNode>
+      <DotNode>
+       <IdentifierNode info="WriteLine"/>
+       <IdentifierNode info="Console"/>
+      </DotNode>
+      <CharLiteralNode info="]"/>
+     </InvokeNode>
+    </ExpressionStatementNode>
+   </CompoundStatementNode>
+  </FunctionNode>
+  <FunctionNode info="main">
+   <CompoundStatementNode>
+    <ConstructionStatementNode>
+     <IdentifierNode info="intList"/>
+     <TemplateIdNode>
+      <IdentifierNode info="List"/>
+      <IntNode/>
+     </TemplateIdNode>
+    </ConstructionStatementNode>
+    <ConstructionStatementNode>
+     <IdentifierNode info="n"/>
+     <IntNode/>
+     <SByteLiteralNode info="10"/>
+    </ConstructionStatementNode>
+    <ForStatementNode>
+     <ConstructionStatementNode>
+      <IdentifierNode info="i"/>
+      <IntNode/>
+      <SByteLiteralNode info="0"/>
+     </ConstructionStatementNode>
+     <LessNode>
+      <IdentifierNode info="i"/>
+      <IdentifierNode info="n"/>
+     </LessNode>
+     <ExpressionStatementNode>
+      <PrefixIncrementNode>
+       <IdentifierNode info="i"/>
+      </PrefixIncrementNode>
+     </ExpressionStatementNode>
+     <CompoundStatementNode>
+      <ExpressionStatementNode>
+       <InvokeNode>
+        <DotNode>
+         <IdentifierNode info="Add"/>
+         <IdentifierNode info="intList"/>
+        </DotNode>
+        <CastNode>
+         <IntNode/>
+         <InvokeNode>
+          <IdentifierNode info="RandomNumber"/>
+          <ByteLiteralNode info="100"/>
+         </InvokeNode>
+        </CastNode>
+       </InvokeNode>
+      </ExpressionStatementNode>
+     </CompoundStatementNode>
+    </ForStatementNode>
+    <ExpressionStatementNode>
+     <InvokeNode>
+      <IdentifierNode info="Print"/>
+      <IdentifierNode info="intList"/>
+     </InvokeNode>
+    </ExpressionStatementNode>
+    <ExpressionStatementNode>
+     <InvokeNode>
+      <IdentifierNode info="QuickSort"/>
+      <IdentifierNode info="intList"/>
+     </InvokeNode>
+    </ExpressionStatementNode>
+    <ExpressionStatementNode>
+     <InvokeNode>
+      <IdentifierNode info="Print"/>
+      <IdentifierNode info="intList"/>
+     </InvokeNode>
+    </ExpressionStatementNode>
+   </CompoundStatementNode>
+  </FunctionNode>
+ </NamespaceNode>
+</CompileUnitNode>

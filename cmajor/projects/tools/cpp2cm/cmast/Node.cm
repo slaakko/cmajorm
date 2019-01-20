@@ -1,0 +1,50 @@
+using System;
+using System.Collections;
+
+namespace cmast
+{
+    public concept NodeType<T>
+    {
+        where Same<T, Node> or Derived<T, Node>;
+    }
+
+    public abstract class Node
+    {
+        public default virtual ~Node();
+        public abstract void Accept(Visitor& visitor);
+        public Node* parent;
+    }
+    
+    public abstract class UnaryNode : Node
+    {
+        public nothrow UnaryNode(Node* child_) : child(child_)
+        {
+            child->parent = this;
+        }
+        public UniquePtr<Node> child;
+    }
+    
+    public abstract class BinaryNode : Node
+    {
+        public nothrow BinaryNode(Node* left_, Node* right_) : left(left_), right(right_)
+        {
+            left->parent = this;
+            right->parent = this;
+        }
+        public UniquePtr<Node> left;
+        public UniquePtr<Node> right;
+    }
+
+    public abstract class CompositeNode<NodeT> : Node where NodeT is NodeType 
+    {
+        public void AddNode(NodeT* node)
+        {
+            if (node != null)
+            {
+                node->parent = this;
+            }
+            nodes.Add(UniquePtr<NodeT>(node));
+        }
+        public List<UniquePtr<NodeT>> nodes;
+    }
+}

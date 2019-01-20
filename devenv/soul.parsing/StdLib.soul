@@ -1,0 +1,133 @@
+/*========================================================================
+    Copyright (c) 2011-2012 Seppo Laakko
+    http://sourceforge.net/projects/soulparsing/
+
+    Distributed under the GNU General Public License, version 3 (GPLv3).
+    (See accompanying LICENSE.txt or http://www.gnu.org/licenses/gpl.html)
+
+========================================================================*/
+
+using System.Globalization;
+using System.Text;
+
+namespace soul.parsing
+{
+    grammar stdlib
+    {
+        spaces                              ::= space+
+                                            ;
+
+        newline                             ::= "\r\n" | "\n" | "\r"
+                                            ;
+
+        comment                             ::= line_comment | block_comment
+                                            ;
+
+        line_comment                        ::= "//" [^\r\n]* newline
+                                            ;
+
+        block_comment                       ::= "/*" (string | char | (anychar - "*/"))* "*/"
+                                            ;
+
+        spaces_and_comments                 ::= (space | comment)+
+                                            ;
+
+        digit_sequence                      ::= token(digit+)
+                                            ;
+
+        sign                                ::= '+' | '-'
+                                            ;
+
+        int: int                            ::= token(sign? digit_sequence)<int>{ value = int.Parse(match); }
+                                            ;
+
+        uint: uint                          ::= digit_sequence<uint>{ value = uint.Parse(match); }
+                                            ;
+
+        long: long                          ::= token(sign? digit_sequence)<long>{ value = long.Parse(match); }
+                                            ;
+
+        ulong: ulong                        ::= digit_sequence<ulong>{ value = ulong.Parse(match); }
+                                            ;
+
+        hex: uint                           ::= token(hexdigit+)<hex>{ value = Convert.ToUInt32(match, 16); }
+                                            ;
+
+        hex_literal: uint                   ::= token(("0x" | "0X") hex!)<hex_literal>{ value = hex; }
+                                            ;
+
+        real: double                        ::= token(sign? (fractional_real | exponent_real))<real>{ value = double.Parse(match, CultureInfo.InvariantCulture); }
+                                            ;
+
+        ureal: double                       ::= (fractional_real | exponent_real)<ureal>{ value = double.Parse(match, CultureInfo.InvariantCulture); }
+                                            ;
+
+        fractional_real                     ::= token(digit_sequence? '.' digit_sequence exponent_part?)
+                                            ;
+
+        exponent_real                       ::= token(digit_sequence exponent_part)
+                                            ;
+
+        exponent_part                       ::= token([eE] sign? digit_sequence)
+                                            ;
+
+        number: double                      ::= real{ value = real; } | ulong:u{ value = u; } | long:l{ value = l; } 
+                                            ;
+
+        bool: bool                          ::= keyword("true")<true>{ value = true; } | keyword("false")<false>{ value = false; }
+                                            ;
+
+        identifier: string                  ::= token((letter | '_') (letter | digit | '_')*)
+                                            {
+                                                value = match;
+                                            }
+                                            ;
+
+        qualified_id: string                ::= token(identifier:id1 ('.' identifier:id2)*)
+                                            {
+                                                value = match;
+                                            }
+                                            ;
+
+        escape: char                        ::= token('\\'
+                                            (
+                                                [xX] hex<hexEscape>{ value = (char)hex; }
+                                            |   [dD] uint:decEscape{ value = (char)decEscape; }
+                                            |   [^dDxX]<charEscape>
+                                            {
+                                                char c = match[0];
+                                                switch (c)
+                                                {
+                                                    case 'a': value = '\a'; break;
+                                                    case 'b': value = '\b'; break;
+                                                    case 'f': value = '\f'; break;
+                                                    case 'n': value = '\n'; break;
+                                                    case 'r': value = '\r'; break;
+                                                    case 't': value = '\t'; break;
+                                                    case 'v': value = '\v'; break;
+                                                    case '0': value = '\0'; break;
+                                                    default:  value = c; break;
+                                                }
+                                            }
+                                            )
+                                            )
+                                            ;
+
+        char: char                          ::= token('\''
+                                            (   [^\\\r\n]<char>{ value = match[0]; }
+                                            |   escape<esc>{ value = escape; }
+                                            )   '\''!)
+                                            ;
+
+        string(var StringBuilder s): string ::= token('"'<init>{ s = new StringBuilder(); }
+                                                (
+                                                    ([^"\\\r\n]+)<stringChars>{ s.Append(match); }
+                                                |   escape<esc>{ s.Append(escape); }
+                                                )*
+                                                '"'!)<string>{ value = s.ToString(); }
+                                            ;
+
+        next_semicolon_or_closing_brace     ::= token([^;}]* (';' | '}'))
+                                            ;
+    }
+}

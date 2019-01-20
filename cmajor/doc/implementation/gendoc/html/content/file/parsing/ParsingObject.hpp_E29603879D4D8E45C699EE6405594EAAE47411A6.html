@@ -1,0 +1,179 @@
+<html>
+ <head>
+  <meta charset="utf-8"/>
+  <link href="../../../style/style.css" rel="stylesheet" type="text/css"/>
+ </head>
+ <body>
+  <span class="code" id="1" xml:space="preserve"><span class="lineNumber">&nbsp;1</span>&nbsp;<span class="comment">//&nbsp;=================================</span></span>
+  <br/>
+  <span class="code" id="2" xml:space="preserve"><span class="lineNumber">&nbsp;2</span>&nbsp;<span class="comment">//&nbsp;Copyright&nbsp;(c)&nbsp;2018&nbsp;Seppo&nbsp;Laakko</span></span>
+  <br/>
+  <span class="code" id="3" xml:space="preserve"><span class="lineNumber">&nbsp;3</span>&nbsp;<span class="comment">//&nbsp;Distributed&nbsp;under&nbsp;the&nbsp;MIT&nbsp;license</span></span>
+  <br/>
+  <span class="code" id="4" xml:space="preserve"><span class="lineNumber">&nbsp;4</span>&nbsp;<span class="comment">//&nbsp;=================================</span></span>
+  <br/>
+  <span class="code" id="5" xml:space="preserve"><span class="lineNumber">&nbsp;5</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="6" xml:space="preserve"><span class="lineNumber">&nbsp;6</span>&nbsp;<span class="pp">#ifndef&nbsp;CMAJOR_PARSING_PARSING_OBJECT_INCLUDED</span></span>
+  <br/>
+  <span class="code" id="7" xml:space="preserve"><span class="lineNumber">&nbsp;7</span>&nbsp;<span class="pp">#define&nbsp;CMAJOR_PARSING_PARSING_OBJECT_INCLUDED</span></span>
+  <br/>
+  <span class="code" id="8" xml:space="preserve"><span class="lineNumber">&nbsp;8</span>&nbsp;<span class="pp">#include&nbsp;&lt;cmajor/parsing/Scanner.hpp></span></span>
+  <br/>
+  <span class="code" id="9" xml:space="preserve"><span class="lineNumber">&nbsp;9</span>&nbsp;<span class="pp">#include&nbsp;&lt;memory></span></span>
+  <br/>
+  <span class="code" id="10" xml:space="preserve"><span class="lineNumber">10</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="11" xml:space="preserve"><span class="lineNumber">11</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">cmajor</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">parsing</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="12" xml:space="preserve"><span class="lineNumber">12</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="13" xml:space="preserve"><span class="lineNumber">13</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../../class_Visitor_9FF4E73241464BB90D8C7FBE81C08324A94EDF37.html">Visitor</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="14" xml:space="preserve"><span class="lineNumber">14</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../../class_Scope_68666B1670BB0A45FDFC7BC194F5263DA68C727E.html">Scope</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="15" xml:space="preserve"><span class="lineNumber">15</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="16" xml:space="preserve"><span class="lineNumber">16</span>&nbsp;<span class="kw">enum&nbsp;class</span>&nbsp;<a href="../../enum_ObjectKind_4E3C274E727BBC38DFFBE3508C3328AFBB7EA698.html">ObjectKind</a><span class="other">&nbsp;:&nbsp;</span><span class="type">uint8_t</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="17" xml:space="preserve"><span class="lineNumber">17</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="18" xml:space="preserve"><span class="lineNumber">18</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">none</span>&nbsp;<span class="other">=</span>&nbsp;<span class="other">0</span><span class="other">,&nbsp;</span></span>
+  <br/>
+  <span class="code" id="19" xml:space="preserve"><span class="lineNumber">19</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">grammar</span>&nbsp;<span class="other">=</span>&nbsp;<span class="other">1&nbsp;&lt;&lt;&nbsp;0</span><span class="other">,&nbsp;</span></span>
+  <br/>
+  <span class="code" id="20" xml:space="preserve"><span class="lineNumber">20</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">ns</span>&nbsp;<span class="other">=</span>&nbsp;<span class="other">1&nbsp;&lt;&lt;&nbsp;1</span><span class="other">,&nbsp;</span></span>
+  <br/>
+  <span class="code" id="21" xml:space="preserve"><span class="lineNumber">21</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">usingObject</span>&nbsp;<span class="other">=</span>&nbsp;<span class="other">1&nbsp;&lt;&lt;&nbsp;2</span><span class="other">,&nbsp;</span></span>
+  <br/>
+  <span class="code" id="22" xml:space="preserve"><span class="lineNumber">22</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">parser</span>&nbsp;<span class="other">=</span>&nbsp;<span class="other">1&nbsp;&lt;&lt;&nbsp;3</span><span class="other">,&nbsp;</span></span>
+  <br/>
+  <span class="code" id="23" xml:space="preserve"><span class="lineNumber">23</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">parsingDomain</span>&nbsp;<span class="other">=</span>&nbsp;<span class="other">1&nbsp;&lt;&lt;&nbsp;4</span><span class="other">,&nbsp;</span></span>
+  <br/>
+  <span class="code" id="24" xml:space="preserve"><span class="lineNumber">24</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">rule</span>&nbsp;<span class="other">=</span>&nbsp;<span class="other">1&nbsp;&lt;&lt;&nbsp;5</span><span class="other">,&nbsp;</span></span>
+  <br/>
+  <span class="code" id="25" xml:space="preserve"><span class="lineNumber">25</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">ruleLink</span>&nbsp;<span class="other">=</span>&nbsp;<span class="other">1&nbsp;&lt;&lt;&nbsp;6</span><span class="other">,&nbsp;</span></span>
+  <br/>
+  <span class="code" id="26" xml:space="preserve"><span class="lineNumber">26</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">scope</span>&nbsp;<span class="other">=</span>&nbsp;<span class="other">1&nbsp;&lt;&lt;&nbsp;7</span><span class="other">,&nbsp;</span></span>
+  <br/>
+  <span class="code" id="27" xml:space="preserve"><span class="lineNumber">27</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">parent</span>&nbsp;<span class="other">=</span>&nbsp;<span class="other">grammar&nbsp;|&nbsp;ns&nbsp;|&nbsp;scope
+</span></span>
+  <br/>
+  <span class="code" id="28" xml:space="preserve"><span class="lineNumber">28</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="29" xml:space="preserve"><span class="lineNumber">29</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="30" xml:space="preserve"><span class="lineNumber">30</span>&nbsp;<span class="kw">constexpr</span><span class="other">,&nbsp;</span><span class="kw">inline</span><a href="../../enum_ObjectKind_4E3C274E727BBC38DFFBE3508C3328AFBB7EA698.html">ObjectKind</a>&nbsp;<span class="kw">operator</span><span class="other">|</span><span class="other">(</span><a href="../../enum_ObjectKind_4E3C274E727BBC38DFFBE3508C3328AFBB7EA698.html">ObjectKind</a>&nbsp;<span class="identifier">left</span><span class="other">,&nbsp;</span><a href="../../enum_ObjectKind_4E3C274E727BBC38DFFBE3508C3328AFBB7EA698.html">ObjectKind</a>&nbsp;<span class="identifier">right</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="31" xml:space="preserve"><span class="lineNumber">31</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="32" xml:space="preserve"><span class="lineNumber">32</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;&nbsp;<a href="../../enum_ObjectKind_4E3C274E727BBC38DFFBE3508C3328AFBB7EA698.html">ObjectKind</a><span class="other">(</span><span class="identifier">uint8_t</span><span class="other">(</span><span class="identifier">left</span><span class="other">)</span><span class="other">&nbsp;|&nbsp;</span><span class="identifier">uint8_t</span><span class="other">(</span><span class="identifier">right</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="33" xml:space="preserve"><span class="lineNumber">33</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="34" xml:space="preserve"><span class="lineNumber">34</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="35" xml:space="preserve"><span class="lineNumber">35</span>&nbsp;<span class="kw">constexpr</span><span class="other">,&nbsp;</span><span class="kw">inline</span><a href="../../enum_ObjectKind_4E3C274E727BBC38DFFBE3508C3328AFBB7EA698.html">ObjectKind</a>&nbsp;<span class="kw">operator</span><span class="other">&amp;</span><span class="other">(</span><a href="../../enum_ObjectKind_4E3C274E727BBC38DFFBE3508C3328AFBB7EA698.html">ObjectKind</a>&nbsp;<span class="identifier">left</span><span class="other">,&nbsp;</span><a href="../../enum_ObjectKind_4E3C274E727BBC38DFFBE3508C3328AFBB7EA698.html">ObjectKind</a>&nbsp;<span class="identifier">right</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="36" xml:space="preserve"><span class="lineNumber">36</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="37" xml:space="preserve"><span class="lineNumber">37</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;&nbsp;<a href="../../enum_ObjectKind_4E3C274E727BBC38DFFBE3508C3328AFBB7EA698.html">ObjectKind</a><span class="other">(</span><span class="identifier">uint8_t</span><span class="other">(</span><span class="identifier">left</span><span class="other">)</span><span class="other">&nbsp;&amp;&nbsp;</span><span class="identifier">uint8_t</span><span class="other">(</span><span class="identifier">right</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="38" xml:space="preserve"><span class="lineNumber">38</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="39" xml:space="preserve"><span class="lineNumber">39</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="40" xml:space="preserve"><span class="lineNumber">40</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../../class_ParsingObject_D6A163B08653CF53190C94952F145DFC2EB09994.html">ParsingObject</a>&nbsp;</span>
+  <br/>
+  <span class="code" id="41" xml:space="preserve"><span class="lineNumber">41</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="42" xml:space="preserve"><span class="lineNumber">42</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="43" xml:space="preserve"><span class="lineNumber">43</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">static</span>&nbsp;<span class="kw">const&nbsp;</span><span class="kw">int</span>&nbsp;<span class="identifier">external</span>&nbsp;<span class="other">=</span>&nbsp;<span class="other">-</span><span class="other">1</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="44" xml:space="preserve"><span class="lineNumber">44</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../class_ParsingObject_D6A163B08653CF53190C94952F145DFC2EB09994.html#constructor_ParsingObject_FCEB8DEA023EE589E407216151950A39E785691F">ParsingObject</a><span class="other">(</span><span class="kw">const&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="type">u32string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">name_</span><span class="other">,&nbsp;</span><a href="../../enum_ObjectKind_4E3C274E727BBC38DFFBE3508C3328AFBB7EA698.html">ObjectKind</a>&nbsp;<span class="identifier">kind_</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="45" xml:space="preserve"><span class="lineNumber">45</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../class_ParsingObject_D6A163B08653CF53190C94952F145DFC2EB09994.html#constructor_ParsingObject_A1C3FBF53E1E4BD2B4427F67E9472B2E1FD56EE2">ParsingObject</a><span class="other">(</span><span class="kw">const&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="type">u32string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">name_</span><span class="other">,&nbsp;</span><a href="../../class_Scope_68666B1670BB0A45FDFC7BC194F5263DA68C727E.html">Scope</a><span class="other">*</span>&nbsp;<span class="identifier">enclosingScope_</span><span class="other">,&nbsp;</span><a href="../../enum_ObjectKind_4E3C274E727BBC38DFFBE3508C3328AFBB7EA698.html">ObjectKind</a>&nbsp;<span class="identifier">kind_</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="46" xml:space="preserve"><span class="lineNumber">46</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">virtual</span>&nbsp;<span class="other">~</span><span class="identifier">ParsingObject</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="47" xml:space="preserve"><span class="lineNumber">47</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">virtual</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../../class_ParsingObject_D6A163B08653CF53190C94952F145DFC2EB09994.html#function_Accept_88D5312B9AC0D8ABEF9C1BC6FC339655D21D3F15">Accept</a><span class="other">(</span><a href="../../class_Visitor_9FF4E73241464BB90D8C7FBE81C08324A94EDF37.html">Visitor</a><span class="other">&amp;</span>&nbsp;<span class="identifier">visitor</span><span class="other">)</span>&nbsp;<span class="other">=&nbsp;0</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="48" xml:space="preserve"><span class="lineNumber">48</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../../class_ParsingObject_D6A163B08653CF53190C94952F145DFC2EB09994.html#function_Own_F4C61B6E093734D4BFE8339EB42030BDCB47782A">Own</a><span class="other">(</span><a href="../../class_ParsingObject_D6A163B08653CF53190C94952F145DFC2EB09994.html">ParsingObject</a><span class="other">*</span>&nbsp;<span class="identifier">object</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="49" xml:space="preserve"><span class="lineNumber">49</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">bool</span>&nbsp;<a href="../../class_ParsingObject_D6A163B08653CF53190C94952F145DFC2EB09994.html#function_IsOwned_2424594EAF10B7D7775BFA1275A5732EEE42866C">IsOwned</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">isOwned</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="50" xml:space="preserve"><span class="lineNumber">50</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../../class_ParsingObject_D6A163B08653CF53190C94952F145DFC2EB09994.html#function_SetOwned_6CA689E33638EBA67141B47B38040183177518A2">SetOwned</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="other">{</span>&nbsp;<span class="identifier">isOwned</span><span class="other">&nbsp;=&nbsp;</span><span class="kw">true</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="51" xml:space="preserve"><span class="lineNumber">51</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../../class_ParsingObject_D6A163B08653CF53190C94952F145DFC2EB09994.html#function_ResetOwned_6ED02A3DD7DBE0D802AEB402D26DBF6C25049C58">ResetOwned</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="other">{</span>&nbsp;<span class="identifier">isOwned</span><span class="other">&nbsp;=&nbsp;</span><span class="kw">false</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="52" xml:space="preserve"><span class="lineNumber">52</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../../class_ParsingObject_D6A163B08653CF53190C94952F145DFC2EB09994.html#function_SetOwner_438B0F471AFCD644619D44F10D67A1265FDF5D48">SetOwner</a><span class="other">(</span><span class="kw">int</span>&nbsp;<span class="identifier">owner_</span><span class="other">)</span>&nbsp;<span class="other">{</span>&nbsp;<span class="identifier">owner</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">owner_</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="53" xml:space="preserve"><span class="lineNumber">53</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">int</span>&nbsp;<a href="../../class_ParsingObject_D6A163B08653CF53190C94952F145DFC2EB09994.html#function_Owner_23B834CA26D32802B530C251A425B10C70A0F46D">Owner</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">owner</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="54" xml:space="preserve"><span class="lineNumber">54</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../../class_ParsingObject_D6A163B08653CF53190C94952F145DFC2EB09994.html#function_SetExternal_A6EACAE0EAD9E6468FFF67039E0D3733B04DDB20">SetExternal</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="other">{</span>&nbsp;<span class="identifier">owner</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">external</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="55" xml:space="preserve"><span class="lineNumber">55</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">bool</span>&nbsp;<a href="../../class_ParsingObject_D6A163B08653CF53190C94952F145DFC2EB09994.html#function_IsExternal_1DDF3FA2661E10860A0E04AAA21D4BE94A03284B">IsExternal</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">owner</span><span class="other">&nbsp;==&nbsp;</span><span class="identifier">external</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="56" xml:space="preserve"><span class="lineNumber">56</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">const&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="type">u32string</span><span class="other">&amp;</span>&nbsp;<a href="../../class_ParsingObject_D6A163B08653CF53190C94952F145DFC2EB09994.html#function_Name_54BD2CEF1D280CD3A6A763515B891CC7C7909DE8">Name</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">name</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="57" xml:space="preserve"><span class="lineNumber">57</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../../class_ParsingObject_D6A163B08653CF53190C94952F145DFC2EB09994.html#function_SetName_CC34233166420E36937852D5823CAFE64477FC81">SetName</a><span class="other">(</span><span class="kw">const&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="type">u32string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">name_</span><span class="other">)</span>&nbsp;<span class="other">{</span>&nbsp;<span class="identifier">name</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">name_</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="58" xml:space="preserve"><span class="lineNumber">58</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">virtual</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">u32string</span>&nbsp;<a href="../../class_ParsingObject_D6A163B08653CF53190C94952F145DFC2EB09994.html#function_FullName_1AF5AF1F96E29EB313D0A0B5CEAA9C4E8B99A2D9">FullName</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="59" xml:space="preserve"><span class="lineNumber">59</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../class_Scope_68666B1670BB0A45FDFC7BC194F5263DA68C727E.html">Scope</a><span class="other">*</span>&nbsp;<a href="../../class_ParsingObject_D6A163B08653CF53190C94952F145DFC2EB09994.html#function_EnclosingScope_3FAC0A8976088D71E44D510E32B4149DC9175788">EnclosingScope</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">enclosingScope</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="60" xml:space="preserve"><span class="lineNumber">60</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../../class_ParsingObject_D6A163B08653CF53190C94952F145DFC2EB09994.html#function_SetEnclosingScope_A3C4A90020FD6CE0FFDA7C8A5B81DF77D61D6B61">SetEnclosingScope</a><span class="other">(</span><a href="../../class_Scope_68666B1670BB0A45FDFC7BC194F5263DA68C727E.html">Scope</a><span class="other">*</span>&nbsp;<span class="identifier">enclosingScope_</span><span class="other">)</span>&nbsp;<span class="other">{</span>&nbsp;<span class="identifier">enclosingScope</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">enclosingScope_</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="61" xml:space="preserve"><span class="lineNumber">61</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../../class_ParsingObject_D6A163B08653CF53190C94952F145DFC2EB09994.html#function_SetScope_370D8AF79A55A085C4F3E05250E88802E275C9B5">SetScope</a><span class="other">(</span><a href="../../class_Scope_68666B1670BB0A45FDFC7BC194F5263DA68C727E.html">Scope</a><span class="other">*</span>&nbsp;<span class="identifier">scope_</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="62" xml:space="preserve"><span class="lineNumber">62</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../class_Scope_68666B1670BB0A45FDFC7BC194F5263DA68C727E.html">Scope</a><span class="other">*</span>&nbsp;<a href="../../class_ParsingObject_D6A163B08653CF53190C94952F145DFC2EB09994.html#function_GetScope_E2C3A8746ACE512A20BAB42302FAE70116421BE9">GetScope</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">scope</span><span class="other">&nbsp;==&nbsp;</span><span class="kw">nullptr</span><span class="other">)</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">enclosingScope</span><span class="other">;</span>&nbsp;<span class="kw">else</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">scope</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="63" xml:space="preserve"><span class="lineNumber">63</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">virtual</span>&nbsp;<span class="kw">bool</span>&nbsp;<a href="../../class_ParsingObject_D6A163B08653CF53190C94952F145DFC2EB09994.html#function_IsActionParser_5212594E653ADA28DD947922829C100B420C9B93">IsActionParser</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">false</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="64" xml:space="preserve"><span class="lineNumber">64</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">virtual</span>&nbsp;<span class="kw">bool</span>&nbsp;<a href="../../class_ParsingObject_D6A163B08653CF53190C94952F145DFC2EB09994.html#function_IsNonterminalParser_130164F79F82F4A85176B27BD990F3EB9AF04354">IsNonterminalParser</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">false</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="65" xml:space="preserve"><span class="lineNumber">65</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">virtual</span>&nbsp;<span class="kw">bool</span>&nbsp;<a href="../../class_ParsingObject_D6A163B08653CF53190C94952F145DFC2EB09994.html#function_IsRule_22603152F4DFC5E73FAE90DCD5A66AC4E159431C">IsRule</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">false</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="66" xml:space="preserve"><span class="lineNumber">66</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">virtual</span>&nbsp;<span class="kw">bool</span>&nbsp;<a href="../../class_ParsingObject_D6A163B08653CF53190C94952F145DFC2EB09994.html#function_IsRuleLink_C0FBB7E29493DA4AC89F279215602A2C106F53E8">IsRuleLink</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">false</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="67" xml:space="preserve"><span class="lineNumber">67</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">virtual</span>&nbsp;<span class="kw">bool</span>&nbsp;<a href="../../class_ParsingObject_D6A163B08653CF53190C94952F145DFC2EB09994.html#function_IsNamespace_B8794498C322CC97CAA2AE215463E0DE31205086">IsNamespace</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">false</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="68" xml:space="preserve"><span class="lineNumber">68</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">virtual</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../../class_ParsingObject_D6A163B08653CF53190C94952F145DFC2EB09994.html#function_AddToScope_0A935B888A9C4705EA43BFDD4B6CF8DC910DB123">AddToScope</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="69" xml:space="preserve"><span class="lineNumber">69</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../../class_ParsingObject_D6A163B08653CF53190C94952F145DFC2EB09994.html#function_SetSpan_2549F152EC67F9C2DB52DAAFCF96A0204D869518">SetSpan</a><span class="other">(</span><span class="kw">const&nbsp;</span><a href="../../class_Span_9CED8370AAA8B01E09FBC8A63AD262084B91FD78.html">Span</a><span class="other">&amp;</span>&nbsp;<span class="identifier">span_</span><span class="other">)</span>&nbsp;<span class="other">{</span>&nbsp;<span class="identifier">span</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">span_</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="70" xml:space="preserve"><span class="lineNumber">70</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">const&nbsp;</span><a href="../../class_Span_9CED8370AAA8B01E09FBC8A63AD262084B91FD78.html">Span</a><span class="other">&amp;</span>&nbsp;<a href="../../class_ParsingObject_D6A163B08653CF53190C94952F145DFC2EB09994.html#function_GetSpan_29E61A918F82D49AE9E91831B93D056289D92999">GetSpan</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">span</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="71" xml:space="preserve"><span class="lineNumber">71</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../enum_ObjectKind_4E3C274E727BBC38DFFBE3508C3328AFBB7EA698.html">ObjectKind</a>&nbsp;<a href="../../class_ParsingObject_D6A163B08653CF53190C94952F145DFC2EB09994.html#function_Kind_326C27D30F1AE1EBBA5659B164400B0F690E49DD">Kind</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">kind</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="72" xml:space="preserve"><span class="lineNumber">72</span>&nbsp;<span class="kw">private</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="73" xml:space="preserve"><span class="lineNumber">73</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../enum_ObjectKind_4E3C274E727BBC38DFFBE3508C3328AFBB7EA698.html">ObjectKind</a>&nbsp;<span class="identifier">kind</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="74" xml:space="preserve"><span class="lineNumber">74</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">u32string</span>&nbsp;<span class="identifier">name</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="75" xml:space="preserve"><span class="lineNumber">75</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">vector</span><span class="other">&lt;</span><span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><a href="../../class_ParsingObject_D6A163B08653CF53190C94952F145DFC2EB09994.html">ParsingObject</a><span class="other">></span><span class="other">></span>&nbsp;<span class="identifier">ownedObjects</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="76" xml:space="preserve"><span class="lineNumber">76</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">int</span>&nbsp;<span class="identifier">owner</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="77" xml:space="preserve"><span class="lineNumber">77</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">bool</span>&nbsp;<span class="identifier">isOwned</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="78" xml:space="preserve"><span class="lineNumber">78</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../class_Scope_68666B1670BB0A45FDFC7BC194F5263DA68C727E.html">Scope</a><span class="other">*</span>&nbsp;<span class="identifier">enclosingScope</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="79" xml:space="preserve"><span class="lineNumber">79</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../class_Scope_68666B1670BB0A45FDFC7BC194F5263DA68C727E.html">Scope</a><span class="other">*</span>&nbsp;<span class="identifier">scope</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="80" xml:space="preserve"><span class="lineNumber">80</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../class_Span_9CED8370AAA8B01E09FBC8A63AD262084B91FD78.html">Span</a>&nbsp;<span class="identifier">span</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="81" xml:space="preserve"><span class="lineNumber">81</span>&nbsp;<span class="other">}</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="82" xml:space="preserve"><span class="lineNumber">82</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="83" xml:space="preserve"><span class="lineNumber">83</span>&nbsp;<span class="other">}</span>&nbsp;<span class="other">}</span>&nbsp;<span class="comment">//&nbsp;namespace&nbsp;cmajor::parsing</span></span>
+  <br/>
+  <span class="code" id="84" xml:space="preserve"><span class="lineNumber">84</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="85" xml:space="preserve"><span class="lineNumber">85</span>&nbsp;<span class="pp">#endif&nbsp;//&nbsp;CMAJOR_PARSING_PARSING_OBJECT_INCLUDED</span></span>
+  <br/>
+ </body>
+</html>

@@ -1,0 +1,121 @@
+// =================================
+// Copyright (c) 2019 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+[cpp]#include <cmajor/code/Expression.hpp>
+[cpp]#include <cmajor/code/Declaration.hpp>
+[cpp]#include <cmajor/util/TextUtils.hpp>
+[hpp]#include <cmajor/codedom/Declaration.hpp>
+[cpp]#include <cmajor/codedom/Type.hpp>
+
+namespace cmajor.code
+{
+    [cpp]using cmajor::util::Trim;
+    [cpp]using namespace cmajor::codedom;
+
+    grammar Declarator
+    {
+        using Expression.ConstantExpression;
+        using Expression.IdExpression;
+        using Expression.ExpressionList;
+        using Expression.AssignmentExpression;
+        using Declaration.TypeName;
+        using Declaration.TypeSpecifier;
+        using Declaration.CVQualifier;
+
+        InitDeclaratorList(var std::unique_ptr<InitDeclaratorList> idl): cmajor::codedom::InitDeclaratorList*
+                        ::= empty{ idl.reset(new InitDeclaratorList()); }
+                            (InitDeclarator{ idl->Add(InitDeclarator); } % ','){ value = idl.release(); }
+                        ;
+
+        InitDeclarator: cmajor::codedom::InitDeclarator*
+                        ::= (Declarator Initializer?)
+                        {
+                            value = new InitDeclarator(Declarator, Initializer);
+                        }
+                        ;
+
+        Declarator: std::u32string
+                        ::=
+                        (   DirectDeclarator
+                        |   PtrOperator Declarator
+                        )
+                        {
+                            value = Trim(std::u32string(matchBegin, matchEnd));
+                        }
+                        ;
+
+        DirectDeclarator(var std::unique_ptr<CppObject> o)
+                        ::= DeclaratorId
+                        (
+                            '[' (ConstantExpression{ o.reset(ConstantExpression); })? ']'
+                            '(' Declarator ')'
+                        )*
+                        ;
+
+        DeclaratorId(var std::unique_ptr<CppObject> o)
+                        ::= IdExpression{ o.reset(IdExpression); }
+                        |   TypeName{ o.reset(TypeName); }
+                        ;
+
+        TypeId(var std::unique_ptr<TypeId> ti): cmajor::codedom::TypeId*
+                        ::= empty{ ti.reset(new TypeId()); }
+                        (
+                            (TypeSpecifierSeq(ti.get()) | TypeName{ ti->Add(TypeName); })
+                            (AbstractDeclarator{ ti->Declarator() = AbstractDeclarator; })?
+                        ){ value = ti.release(); }
+                        ;
+
+        Type(var std::unique_ptr<Type> t): cmajor::codedom::Type*
+                        ::= empty{ t.reset(new Type()); }
+                            (   (TypeSpecifier{ t->Add(TypeSpecifier); })+
+                            |   TypeName{ t->Add(TypeName); }
+                            ){ value = t.release(); }
+                        ;
+
+        TypeSpecifierSeq(cmajor::codedom::TypeId* typeId)
+                        ::= (TypeSpecifier{ typeId->Add(TypeSpecifier); })+
+                        ;
+
+        AbstractDeclarator: std::u32string
+                        ::=
+                        (   PtrOperator AbstractDeclarator?
+                        |   DirectAbstractDeclarator
+                        )
+                        {
+                            value = Trim(std::u32string(matchBegin, matchEnd));
+                        }
+                        ;
+
+        DirectAbstractDeclarator(var std::unique_ptr<CppObject> o)
+                        ::=
+                        (   '[' (ConstantExpression{ o.reset(ConstantExpression); })? ']'
+                        |   '(' AbstractDeclarator ')'
+                        )+
+                        ;
+
+        PtrOperator     ::= '*' CVQualifierSeq?
+                        |   '&'
+                        ;
+
+        CVQualifierSeq(var std::unique_ptr<CppObject> o)
+                        ::= (CVQualifier{ o.reset(CVQualifier); })+
+                        ;
+
+        Initializer: cmajor::codedom::Initializer*
+                        ::= '=' InitializerClause{ value = new Initializer(InitializerClause, GetEmptyVector()); }
+                        |   ('(' ExpressionList ')'){ value = new Initializer(nullptr, ExpressionList); }
+                        ;
+
+        InitializerClause: cmajor::codedom::AssignInit*
+                        ::= AssignmentExpression{  value = new AssignInit(AssignmentExpression); }
+                        |   '{'{ value = new AssignInit(nullptr); } InitializerList(value) '}'
+                        |   '{' '}'{ value = new AssignInit(nullptr); }
+                        ;
+
+        InitializerList(cmajor::codedom::AssignInit* init)
+                        ::= InitializerClause{ init->Add(InitializerClause); } % ','
+                        ;
+   }
+}

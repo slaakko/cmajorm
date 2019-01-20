@@ -1,0 +1,181 @@
+// =================================
+// Copyright (c) 2019 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+
+namespace System.Text.Parsing.CodeDom
+{
+    public abstract class Type : DomObject
+    {
+        public nothrow Type(const ustring& name_) : base(name_)
+        {
+        }
+    }
+    
+    public class BoolType : Type
+    {
+        public nothrow BoolType() : base(u"bool")
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+    }
+    
+    public class CharType : Type
+    {
+        public nothrow CharType() : base(u"char")
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+    }
+    
+    public class WCharType : Type
+    {
+        public nothrow WCharType() : base(u"wchar")
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+    }
+    
+    public class UCharType : Type
+    {
+        public nothrow UCharType() : base(u"uchar")
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+    }
+    
+    public class SByteType : Type
+    {
+        public nothrow SByteType() : base(u"sbyte")
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+    }
+    
+    public class ByteType : Type
+    {
+        public nothrow ByteType() : base(u"byte")
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+    }
+    
+    public class ShortType : Type
+    {
+        public nothrow ShortType() : base(u"short")
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+    }
+    
+    public class UShortType : Type
+    {
+        public nothrow UShortType() : base(u"ushort")
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+    }
+    
+    public class IntType : Type
+    {
+        public nothrow IntType() : base(u"int")
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+    }
+    
+    public class UIntType : Type
+    {
+        public nothrow UIntType() : base(u"uint")
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+    }
+    
+    public class LongType : Type
+    {
+        public nothrow LongType() : base(u"long")
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+    }
+    
+    public class ULongType : Type
+    {
+        public nothrow ULongType() : base(u"ulong")
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+    }
+    
+    public class FloatType : Type
+    {
+        public nothrow FloatType() : base(u"float")
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+    }
+    
+    public class DoubleType : Type
+    {
+        public nothrow DoubleType() : base(u"double")
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+    }
+    
+    public class VoidType : Type
+    {
+        public nothrow VoidType() : base(u"void")
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+    }
+}

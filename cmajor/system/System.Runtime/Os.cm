@@ -1,0 +1,13 @@
+// =================================
+// Copyright (c) 2019 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+public extern cdecl nothrow ulong OsAllocateMemoryPage(ulong pageSize);
+public extern cdecl nothrow bool OsFreeMemoryPage(ulong pageAddress);
+public extern cdecl nothrow void OsCopyMemoryPage(ulong fromAddress, ulong toAddress, ulong pageSize);
+public extern cdecl nothrow void OsWriteMemoryByte(ulong address, byte b);
+public extern cdecl nothrow byte OsReadMemoryByte(ulong address);
+public extern cdecl nothrow void* OsGetStdHandle(int stdInOutOrErr);
+public extern cdecl nothrow bool OsRegisterConsoleCallback(void* consoleInputHandle, ulong callBackValue);
+public extern cdecl nothrow bool OsReadConsoleInput(void* consoleInputHandle, uchar* c);

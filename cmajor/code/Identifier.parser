@@ -1,0 +1,22 @@
+﻿// =================================
+// Copyright (c) 2019 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+[cpp]#include <cmajor/code/Keyword.hpp>
+
+namespace cmajor.code
+{
+    grammar Identifier
+    {
+        using stdlib.identifier;
+        using Keyword.Keyword;
+        
+        Identifier: std::u32string ::= (identifier - Keyword){ value = std::u32string(matchBegin, matchEnd); }
+                                ;
+                        
+        QualifiedId: std::u32string 
+                                ::= (token("::"? (Identifier % "::"))){ value = std::u32string(matchBegin, matchEnd); }
+                                ;
+    }
+}

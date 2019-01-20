@@ -1,0 +1,76 @@
+using System;
+using System.Collections;
+using System.IO;
+using cmsx.object;
+
+public nothrow const char* Version()
+{
+    return "0.1.0";
+}
+
+void PrintHelp()
+{
+    Console.Out() << "Cmajor System X Dumper version " << Version() << endl();
+    Console.Out() << "Usage: cmsxdump [options] { FILE.o | FILE.a | FILE }" << endl();
+    Console.Out() << "Dump contents of an object file FILE.o, a library file FILE.a or an executable file FILE to standard output." << endl();
+    Console.Out() << "Options:" << endl();
+    Console.Out() << "--verbose (-v)" << endl();
+    Console.Out() << "  be verbose" << endl();
+    Console.Out() << "--help (-h)" << endl();
+    Console.Out() << "  print help" << endl();
+}
+
+int main(int argc, const char** argv)
+{
+    try
+    {
+        bool verbose = false;
+        List<string> fileNames;
+        for (int i = 1; i < argc; ++i)
+        {
+            string arg = argv[i];
+            if (arg.StartsWith("-"))
+            {
+                if (arg == "-h" || arg == "--help")
+                {
+                    PrintHelp();
+                    return 0;
+                }
+                else if (arg == "-v" || arg == "--verbose")
+                {
+                    verbose = true;
+                }
+                else
+                {
+                    throw Exception("unknown option '" + arg + "'");
+                }
+            }
+            else
+            {
+                fileNames.Add(GetFullPath(arg));
+            }
+        }
+        if (verbose)
+        {
+            Console.Out() << "Cmajor System X Dumper version " << Version() << endl();
+        }
+        if (fileNames.IsEmpty())
+        {
+            PrintHelp();
+            throw Exception("no files given");
+        }
+        for (const string& fileName : fileNames)
+        {
+            Console.Out() << fileName << ":" << endl();
+            UniquePtr<BinaryFile> binaryFile = ReadBinaryFile(fileName);
+            binaryFile->AddSymbolsToAddressMap();
+            binaryFile->Dump(Console.Out());
+        }
+    }
+    catch (const Exception& ex)
+    {
+        Console.Error() << ex.Message() << endl();
+        return 1;
+    }
+    return 0;
+}

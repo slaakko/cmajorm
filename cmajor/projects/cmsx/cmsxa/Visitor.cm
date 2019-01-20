@@ -1,0 +1,21 @@
+using System;
+
+namespace cmsx.assembly
+{
+    public class Visitor
+    {
+        public default ~Visitor();
+        public virtual void Visit(DecimalConstant& dc) {}
+        public virtual void Visit(HexConstant& hc) {}
+        public virtual void Visit(CharacterConstant& cc) {}
+        public virtual void Visit(StringConstant& sc) {}
+        public virtual void Visit(SymbolNode& node) {}
+        public virtual void Visit(At& at) {}
+        public virtual void Visit(UnaryExpression& expr) {}
+        public virtual void Visit(BinaryExpression& expr) {}
+        public virtual void Visit(ParenthesizedExpression& expr) {}
+        public virtual void Visit(OpCode& opCode) {}
+        public virtual void Visit(OperandList& operands) {}
+        public virtual void Visit(Instruction& inst) {}
+    }
+}

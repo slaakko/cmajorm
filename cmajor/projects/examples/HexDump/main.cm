@@ -1,0 +1,127 @@
+using System;
+using System.Collections;
+using System.IO;
+
+void PrintHelp()
+{
+    Console.WriteLine("Usage: hexdump [options] { <filename> }");
+    Console.WriteLine("options:");
+    Console.WriteLine("--help | -h");
+    Console.WriteLine("     print this help");
+}
+
+const uint bytesInLine = 16u;
+
+string HexDumpLine(uint addr, byte* bytes, uint numBytes)
+{
+    #assert(numBytes > 0 && numBytes <= bytesInLine);
+    string line(ToHexString(addr));
+    line.Append(": ");
+    for (uint i = 0u; i < bytesInLine; ++i)
+    {
+        if (i == bytesInLine / 2)
+        {
+            line.Append("- ");
+        }
+        if (i < numBytes)
+        {
+            line.Append(ToHexString(bytes[i]));
+        }
+        else
+        {
+            line.Append("  ");
+        }
+        line.Append(' ');
+    }
+    line.Append('|');
+    for (uint i = 0u; i < bytesInLine; ++i)
+    {
+        char c = ' ';
+        if (i < numBytes)
+        {
+            char b = cast<char>(bytes[i]);
+            if (IsPrintable(b))
+            {
+                c = b;
+            }
+        }
+        line.Append(c);
+    }
+    line.Append('|');
+    return line;
+}
+
+void HexDump(const string& fileName)
+{
+    Console.WriteLine(GetFullPath(fileName) + ":");
+    ulong fileSize = File.Size(fileName);
+    BinaryReader reader = File.OpenBinary(fileName);
+    byte[bytesInLine] bytes;
+    uint addr = 0u;
+    ulong numRows = fileSize / bytesInLine;
+    for (ulong i = 0u; i < numRows; ++i)
+    {
+        for (uint j = 0u; j < bytesInLine; ++j)
+        {
+            bytes[j] = reader.ReadByte();
+        }
+        Console.WriteLine(HexDumpLine(addr, &bytes[0], bytesInLine));
+        addr = addr + bytesInLine;
+    }
+    uint rest = cast<uint>(fileSize % bytesInLine);
+    for (uint j = 0u; j < rest; ++j)
+    {
+        bytes[j] = reader.ReadByte();
+    }
+    Console.WriteLine(HexDumpLine(addr, &bytes[0], rest));
+    addr = addr + rest;
+    uint size = addr;
+    string sizeLine = ToHexString(size);
+    sizeLine.Append(';');
+    Console.WriteLine(sizeLine);
+}
+
+int main(int argc, const char** argv)
+{
+    try
+    {
+        List<string> fileNames;
+        for (int i = 1; i < argc; ++i)
+        {
+            string arg = argv[i];
+            if (arg.StartsWith("-"))
+            {
+                if (arg == "--help" || arg == "-h")
+                {
+                    PrintHelp();
+                    return 0;
+                }
+                else
+                {
+                    throw Exception("unknown arguent '" + arg + "'");
+                }
+            }
+            else 
+            {
+                fileNames.Add(arg);
+            }
+        }
+        if (fileNames.IsEmpty())
+        {
+            throw Exception("no files given");
+        }
+        else
+        {
+            for (const string& fileName : fileNames)
+            {
+                HexDump(fileName);
+            }
+        }
+    }
+    catch (const Exception& ex)
+    {
+        Console.Error() << ex.ToString() << endl();
+        return 1;
+    }
+    return 0;
+}

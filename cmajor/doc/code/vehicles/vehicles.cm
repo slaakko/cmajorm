@@ -1,0 +1,38 @@
+public abstract class Vehicle
+{
+    public abstract void Drive();
+}
+
+public class Bicycle : Vehicle
+{
+    public override void Drive()
+    {
+        System.Console.WriteLine("Bicycle.Drive()");
+    }
+}
+
+public class Car : Vehicle
+{
+    public override void Drive()
+    {
+        System.Console.WriteLine("Car.Drive()");
+    }
+}
+
+public class Truck : Car
+{
+    public override void Drive()
+    {
+        System.Console.WriteLine("Truck.Drive()");
+    }
+}
+
+void main()
+{
+    System.UniquePtr<Vehicle> bicycle(new Bicycle());
+    bicycle->Drive();
+    System.UniquePtr<Vehicle> car(new Car());
+    car->Drive();
+    System.UniquePtr<Vehicle> truck(new Truck());
+    truck->Drive();
+}

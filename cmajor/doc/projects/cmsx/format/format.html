@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title>Binary File Formats</title>
+    <link href="../../../style/langref.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+    <h1>3 Binary File Formats</h1>
+
+    <p>
+        System X has three kinds of binary files.
+        There are object files having <strong>.o</strong> extension,
+        library or archive files having <strong>.a</strong> extension and
+        executable files having no extension.
+        All these files share a common overall structure having a header and at most four sections:
+        CODE section contains the machine code, DATA section contains assembled data,
+        SYMB section contains the symbol table and LINK section contains
+        commands for the linker. To be defined is a DBUG section for providing information
+        to a source-level debugger.
+    </p>
+
+    <p>
+        An object file has all these four sections,
+        a library file contains object files that each in turn contains these
+        sections, and an executable file contains CODE, DATA, and SYMB sections.
+    </p>
+
+    <h2>
+        Object File Format
+    </h2>
+
+    <p>
+        The object file header consists of the string "CMSXOBJ" and
+        a one character version number having currently value '1'.
+        Then comes the number of sections represented as an big-endian encoded octabyte,
+        and then the sections themselves.
+    </p>
+
+    <h3>CODE section</h3>
+
+    <p>
+        The CODE scection consists of a four-character header 'CODE' followed
+        by a big-endian encoded octabyte representing the length of the data
+        and a big-endian encoded octabyte representing the base address.
+        In the object file this base address is always 0, but in the final executable
+        the base address is a running offset from the start of the executable.
+    </p>
+
+    <p>
+        Let's take a look at the format of the CODE section of the assembled object code of
+        <strong>echo.o</strong> as printed by the <strong>cmsxdump</strong> program:
+    </p>
+
+    <pre>
+ 1 C:/cmajor/projects/cmsx/test/assembly/echo.o:
+ 2 CODE section
+ 3 base address:     #0000000000000000
+ 4 length:           #0000000000000074
+ 5 #0000000000000000 AD F9 FA 00 main                             STOI    fp,sp,0
+ 6 #0000000000000004 C1 F9 FA 00                                  ORI     fp,sp,0
+ 7 #0000000000000008 E7 FA 00 08                                  INCL    sp,#0008
+ 8 #000000000000000C C1 00 FF 00                                  ORI     $0,ax,0
+ 9 #0000000000000010 C1 01 FE 00                                  ORI     $1,bx,0
+10 #0000000000000014 F0 00 00 0F                                  JMP     @1
+11 #0000000000000018 4C 00 00 11 @0                               BNP     $0,@2
+12 #000000000000001C 8F FF 01 00                                  LDOUI   ax,$1,0
+13 #0000000000000020 E0 02 FF FF                                  SETH    $2,#FFFF
+14 #0000000000000024 E9 02 FF FF                                  ORMH    $2,#FFFF
+15 #0000000000000028 EA 02 FF FF                                  ORML    $2,#FFFF
+16 #000000000000002C EB 02 FF FF                                  ORL     $2,#FFFF
+17 #0000000000000030 BF 02 02 00                                  CALLI   $2,$2,0
+18 #0000000000000034 40 FF 00 0C                                  BN      ax,@3
+19 #0000000000000038 E0 02 FF FF                                  SETH    $2,#FFFF
+20 #000000000000003C E9 02 FF FF                                  ORMH    $2,#FFFF
+21 #0000000000000040 EA 02 FF FF                                  ORML    $2,#FFFF
+22 #0000000000000044 EB 02 FF FF                                  ORL     $2,#FFFF
+23 #0000000000000048 BF 02 02 00                                  CALLI   $2,$2,0
+24 #000000000000004C 40 FF 00 06                                  BN      ax,@3
+25 #0000000000000050 23 01 01 08 @1                               ADDUI   $1,$1,8
+26 #0000000000000054 25 00 00 01                                  SUBI    $0,$0,1
+27 #0000000000000058 F1 00 00 10                                  JMPB    @0
+28 #000000000000005C E3 FF 00 00 @2                               SETL    ax,#0000
+29 #0000000000000060 F0 00 00 02                                  JMP     @4
+30 #0000000000000064 E3 FF 00 01 @3                               SETL    ax,#0001
+31 #0000000000000068 C1 FA F9 00 @4                               ORI     sp,fp,0
+32 #000000000000006C 8D F9 FA 00                                  LDOI    fp,sp,0
+33 #0000000000000070 F8 00 00 00                                  RET
+    </pre>
+
+    <p>
+        The first field shows the address of each instruction,
+        then comes four bytes that represent the machine code of the assembled instruction,
+        then comes possible label of the instruction and then the instruction and its operands in symbolic form.
+        The absolute addresses for the CALL and GO instructions and loads and stores from and to the data segment
+        are still unresolved. The assembler prefixes these instructions by assembling a four-instruction sequence,
+        SETH $X,#FFFF, ORMH $X,#FFFF, ORML $X,#FFFF and ORL $X,#FFFF that will eventually contain the absolute address
+        put to the register $X. It is resolved by the linker. For example, see lines 13 and 19.
+    </p>
+
+    <h3>DATA section</h3>
+
+    <p>
+        The data section consists of a four-character header 'DATA" followed by a
+        big-endian encoded octabyte that represents the length of the data and a
+        big-endian encoded octabyte that represents the base address.
+        In the object file this base address has always the value #2000000000000000,
+        but in the final executable the base address is a running offset
+        from the data of the executable.
+    </p>
+
+    <p>
+        The data section of the <strong>echo.o</strong> is empty:
+    </p>
+
+    <pre>
+35 DATA section
+36 base address:     #2000000000000000
+37 length:           #0000000000000000
+    </pre>
+
+    <h3>
+        SYMB section
+    </h3>
+
+    <p>
+        The symbol section consists of a four-character header 'SYMB' followed by a
+        big-endian encoded octabyte that represents the length of the data and a
+        dummy octabyte. Then comes a big-endian encoded octabyte that is the number of the symbols.
+    </p>
+
+    <p>
+        The symbol section of the <strong>echo.o</strong>:
+    </p>
+
+<pre>
+39 SYMB section
+40 length:           #00000000000006A8
+41                   0           ax                               -       internal  R     #00000000000000FF $255
+42                   1           bx                               -       internal  R     #00000000000000FE $254
+43                   2           cx                               -       internal  R     #00000000000000FD $253
+44                   3           dx                               -       internal  R     #00000000000000FC $252
+45                   4           ex                               -       internal  R     #00000000000000FB $251
+46                   5           sp                               -       internal  R     #00000000000000FA $250
+47                   6           fp                               -       internal  R     #00000000000000F9 $249
+48 #0000000000000000 7           rA                               -       internal  P     #0000000000000000 0
+49 #0000000000000000 8           rB                               -       internal  P     #0000000000000001 1
+50 #0000000000000000 9           rC                               -       internal  P     #0000000000000002 2
+51 #0000000000000000 10          rD                               -       internal  P     #0000000000000003 3
+52 #0000000000000000 11          rE                               -       internal  P     #0000000000000004 4
+53 #0000000000000000 12          rF                               -       internal  P     #0000000000000005 5
+54 #0000000000000000 13          rG                               -       internal  P     #0000000000000006 6
+55 #0000000000000000 14          rH                               -       internal  P     #0000000000000007 7
+56 #0000000000000000 15          rI                               -       internal  P     #0000000000000008 8
+57 #0000000000000000 16          rJ                               -       internal  P     #0000000000000009 9
+58 #0000000000000000 17          rK                               -       internal  P     #000000000000000A 10
+59 #0000000000000000 18          rL                               -       internal  P     #000000000000000B 11
+60 #0000000000000000 19          rM                               -       internal  P     #000000000000000C 12
+61 #0000000000000000 20          rN                               -       internal  P     #000000000000000D 13
+62 #0000000000000000 21          rO                               -       internal  P     #000000000000000E 14
+63 #0000000000000000 22          rP                               -       internal  P     #000000000000000F 15
+64 #0000000000000000 23          rQ                               -       internal  P     #0000000000000010 16
+65 #0000000000000000 24          rR                               -       internal  P     #0000000000000011 17
+66 #0000000000000000 25          rS                               -       internal  P     #0000000000000012 18
+67 #0000000000000000 26          rT                               -       internal  P     #0000000000000013 19
+68 #0000000000000000 27          rU                               -       internal  P     #0000000000000014 20
+69 #0000000000000000 28          rV                               -       internal  P     #0000000000000015 21
+70 #0000000000000000 29          rW                               -       internal  P     #0000000000000016 22
+71 #0000000000000000 30          rX                               -       internal  P     #0000000000000017 23
+72 #0000000000000000 31          rY                               -       internal  P     #0000000000000018 24
+73 #0000000000000000 32          rZ                               -       internal  P     #0000000000000019 25
+74 #0000000000000000 33          rBB                              -       internal  P     #000000000000001A 26
+75 #0000000000000000 34          rTT                              -       internal  P     #000000000000001B 27
+76 #0000000000000000 35          rWW                              -       internal  P     #000000000000001C 28
+77 #0000000000000000 36          rXX                              -       internal  P     #000000000000001D 29
+78 #0000000000000000 37          rYY                              -       internal  P     #000000000000001E 30
+79 #0000000000000000 38          rZZ                              -       internal  P     #000000000000001F 31
+80 #0000000000000000 39          main                             text    external  PAF   #0000000000000000 0                    #0000000000000000 #0000000000000074
+81 #0000000000000018 40          main@0                           text    internal  PA    #0000000000000018 24
+82 #0000000000000050 41          main@1                           text    internal  PA    #0000000000000050 80
+83 #000000000000005C 42          main@2                           text    internal  PA    #000000000000005C 92
+84 #0000000000000064 43          main@3                           text    internal  PA    #0000000000000064 100
+85 #0000000000000068 44          main@4                           text    internal  PA    #0000000000000068 104
+86                   45          puts                             -       undefined U     #FFFFFFFFFFFFFFFF 18446744073709551615
+87                   46          putnl                            -       undefined U     #FFFFFFFFFFFFFFFF 18446744073709551615
+    </pre>
+
+    <p>
+        The data for each symbol consists of a big-endian encoded four-byte index followed by the UTF-8 encoded null-terminated string
+        that is the name of the symbol, and a similarly encoded local name of the symbol.
+        Then comes the one-byte segment of the symbol that can be 0: <strong>text</strong>, 1: <strong>data</strong>, 2: <strong>pool</strong>,
+        3: <strong>stack</strong>, 255: <strong>unknown</strong>.
+    </p>
+
+    <p>
+        After that comes the one-byte linkage of the symbol. It can have the following values: 0: <strong>internal</strong>, 1: <strong>external</strong>,
+        2: <strong>once</strong>, 3: <strong>remove</strong>, and 4: <strong>undefined</strong>.
+        The values are meaningful to the linker. If the symbol has an <strong>internal</strong> linkage, there can be many symbols with the same local name
+        in the final executable. If the symbol has an <strong>external</strong> linkage, its name must be unique among all object files and libraries linked
+        to the final executable. If the symbol has <strong>once</strong> linkage, the linker will treat the first occurrence of such a symbol as an external
+        symbol, and throw the rest of the symbols with the same name (and linkage) away. This can be used to implement COMDATs.
+        The <strong>remove</strong> linkage is used internally by the linker to remove functions and structures from the final executable.
+        If the symbol has <strong>undefined</strong> linkage it is undefined in the current object file, and must be resolved by the linker to a symbol that
+        has an <strong>external</strong> linkage. For example, the <strong>main</strong> symbol at line 80 has an <strong>external</strong> linkage,
+        but the local labels <strong>@1</strong>, <strong>@2</strong>, <strong>@3</strong>, and <strong>@4</strong> at lines 81-85,
+        have an <strong>internal</strong> linkage. The <strong>puts</strong> and <strong>putnl</strong> symbols at lines 86 and 87 have <strong>undefined</strong>
+        linkage.
+    </p>
+    <p>
+        After that comes the value of the symbol that consists of a one-byte flags field and an octabyte pure value.
+        If the flags field is 0: 'U': the value of the symbol is still undefined.
+        Otherwise the following flags can be combined: 1: 'R': the value of the symbol represents a register number 0-255;
+        2: 'P': the value of the symbol has pure octabyte value; 4: 'A': the value of the symbol represents an address;
+        8: 'F': the value of the symbol represents the start of a function; 16: 'S': the value of the symbol represents the start of a structure.
+        Finally comes the start address of the symbol and the length of the symbol, both defined if the symbol has flag 8: 'F' or 16: 'S', that is:
+        the symbol represents a function or a structure. For example, symbols <strong>ax</strong>, <strong>bx</strong>, etc. at lines 41, 42, etc.
+        represent <strong>R</strong>egister numbers with values $255, $254, etc. The special register number symbols <strong>rA</strong>, <strong>rB</strong>, etc.
+        at lines 48, 49, etc. represent <strong>P</strong>ure values.  The <strong>main</strong> symbol at line 80 represents a <strong>P</strong>ure,
+        <strong>A</strong>ddress, <strong>F</strong>unction symbol that starts at offset #0 and whose length is #74 bytes.
+        Finally the value of the <strong>puts</strong> and <strong>putnl</strong> symbols at lines 86 and 87 are <strong>U</strong>ndefined.
+    </p>
+
+    <h3>LINK section</h3>
+
+    <p>
+        The link section consists of a four-character header 'LINK' followed by a
+        big-endian encoded octabyte that represents the length of the data and a
+        dummy octabyte.
+    </p>
+
+    <pre>
+88 
+89 LINK section
+90 length:           #000000000000001A
+91 LINKABSOLUTEADDR  45          #0000000000000020
+92 LINKABSOLUTEADDR  46          #0000000000000038
+    </pre>
+
+    <p>
+        The linker commands consist of one-byte link command code, that can be 0: <strong>LINKFWDLONGJUMP</strong>, 1: <strong>LINKFWDSHORTJMP</strong>,
+        2: <strong>LINKABSOLUTEADDR</strong>, 3: <strong>LINKFAROCTA</strong> and 4: <strong>LINKONCE</strong>, followed by a big-endian encoded four-byte
+        symbol index followed possibly by a big-endian encoded offset octabyte.
+    </p>
+
+    <p>
+        If the link code is <strong>LINKFWDLONGJUMP</strong>, it represents link command for a JMP instruction.
+        It is followed by a symbol index followed by an offset from the start of the CODE section.
+        The assembler has already processed this link command after it assembles a symbolic file, so that it does not exist in the object, library or executable file.
+    </p>
+
+    <p>
+        If the link code is <strong>LINKFWDSHORTJMP</strong>, it represents link command for a branching instruction BZ, BNZ, etc.
+        It is followed by a symbol index followed by an offset from the start of the CODE section.
+        The assembler has already processed this link command after it assembles a symbolic file, so that it does not exist in the object, library or executable file.
+    </p>
+
+    <p>
+        If the link code is <strong>LINKABSOLUTEADDR</strong>, it represents link command for a CALL, GO, load or store instruction.
+        It is followed by a symbol index followed by an offset from the start of the CODE section. The linker processes this command by calculating the absolute
+        address of the target symbol of the CALL, GO, load or store instruction and emitting it to the locations indicated by the offset.
+    </p>
+
+    <p>
+        If the link code is <strong>LINKFAROCTA</strong>, it represents an undefined data symbol defined using the OCTA instruction.
+        It is followed by a symbol index followed by an offset from the start of the DATA section. The linker processes this command by calculating the absolute
+        address of the target symbol of the OCTA instruction and emitting it to the location indicated by the offset.
+    </p>
+
+    <p>
+        If the link code is <strong>LINKONCE</strong>, it represents a FUNC symbol or a STRUCT symbol.
+        It is followed by a symbol index. The linker processes this command by treating the first occurrence of it for a given symbol as an external symbol,
+        and removing other occurrences of given functions or structures from the final executable.
+    </p>
+
+    <p>
+        For example, the LINK section of the echo.o object file contains LINKABSOLUTEADDR commands for symbols 45 and 46 (puts and putnl)
+        for CODE section offsets #20 and #38.
+    </p>
+
+    <h2>
+        Library File Format
+    </h2>
+
+    <p>
+        The library file header consists of the string "CMSXLIB" and
+        a one character version number having currently value '1'.
+        Then comes the number of contained object files represented as an big-endian encoded octabyte,
+        and then the object files themselves.
+    </p>
+
+    <h2>
+        Executable File Format
+    </h2>
+
+    <p>
+        The executable file header consists of the string "CMSXEXE" and
+        a one character version number having currently value '1'.
+        Then comes the number of sections the size of the stack segment followed by the size of the pool segment all
+        represended as big-endian encoded octabytes.
+    </p>
+
+    <pre>
+C:/cmajor/projects/cmsx/test/assembly/echo:
+HEADER section
+stack size:       #0000000000010000
+pool size:        #0000000000010000
+
+CODE section
+base address:     #0000000000001000
+length:           #00000000000001E4
+#0000000000001000 E0 00 00 00 Main                             SETH    $0,#0000
+#0000000000001004 E9 00 00 00                                  ORMH    $0,#0000
+#0000000000001008 EA 00 00 00                                  ORML    $0,#0000
+#000000000000100C EB 00 11 70                                  ORL     $0,#1170
+#0000000000001010 BF 00 00 00                                  CALLI   $0,$0,0:main
+#0000000000001014 E0 00 00 00                                  SETH    $0,#0000
+#0000000000001018 E9 00 00 00                                  ORMH    $0,#0000
+#000000000000101C EA 00 00 00                                  ORML    $0,#0000
+#0000000000001020 EB 00 11 54                                  ORL     $0,#1154
+#0000000000001024 BF 00 00 00                                  CALLI   $0,$0,0:exit
+#0000000000001028 AD F9 FA 00 strlen                           STOI    fp,sp,0
+#000000000000102C C1 F9 FA 00                                  ORI     fp,sp,0
+#0000000000001030 E7 FA 00 08                                  INCL    sp,#0008
+#0000000000001034 C1 00 FF 00                                  ORI     $0,ax,0
+#0000000000001038 E3 FF 00 00                                  SETL    ax,#0000
+#000000000000103C 81 01 00 00 strlen@1                         LDBI    $1,$0,0
+#0000000000001040 42 01 00 04                                  BZ      $1,strlen@2
+#0000000000001044 21 FF FF 01                                  ADDI    ax,ax,1
+#0000000000001048 21 00 00 01                                  ADDI    $0,$0,1
+#000000000000104C F1 00 00 04                                  JMPB    strlen@1
+#0000000000001050 C1 FA F9 00 strlen@2                         ORI     sp,fp,0
+#0000000000001054 8D F9 FA 00                                  LDOI    fp,sp,0
+#0000000000001058 F8 00 00 00                                  RET
+#000000000000105C AD F9 FA 00 puts                             STOI    fp,sp,0
+#0000000000001060 C1 F9 FA 00                                  ORI     fp,sp,0
+#0000000000001064 E7 FA 00 08                                  INCL    sp,#0008
+#0000000000001068 E3 FE 00 01                                  SETL    bx,#0001
+#000000000000106C E0 00 00 00                                  SETH    $0,#0000
+#0000000000001070 E9 00 00 00                                  ORMH    $0,#0000
+#0000000000001074 EA 00 00 00                                  ORML    $0,#0000
+#0000000000001078 EB 00 10 8C                                  ORL     $0,#108C
+#000000000000107C BF 00 00 00                                  CALLI   $0,$0,0:putsf
+#0000000000001080 C1 FA F9 00                                  ORI     sp,fp,0
+#0000000000001084 8D F9 FA 00                                  LDOI    fp,sp,0
+#0000000000001088 F8 00 00 00                                  RET
+#000000000000108C AD F9 FA 00 putsf                            STOI    fp,sp,0
+#0000000000001090 C1 F9 FA 00                                  ORI     fp,sp,0
+#0000000000001094 E7 FA 00 08                                  INCL    sp,#0008
+#0000000000001098 C1 01 FE 00                                  ORI     $1,bx,0
+#000000000000109C C1 00 FF 00                                  ORI     $0,ax,0
+#00000000000010A0 E0 02 00 00                                  SETH    $2,#0000
+#00000000000010A4 E9 02 00 00                                  ORMH    $2,#0000
+#00000000000010A8 EA 02 00 00                                  ORML    $2,#0000
+#00000000000010AC EB 02 10 28                                  ORL     $2,#1028
+#00000000000010B0 BF 02 02 00                                  CALLI   $2,$2,0:strlen
+#00000000000010B4 C1 FD FF 00                                  ORI     cx,ax,0
+#00000000000010B8 C1 FE 00 00                                  ORI     bx,$0,0
+#00000000000010BC C1 FF 01 00                                  ORI     ax,$1,0
+#00000000000010C0 E0 02 00 00                                  SETH    $2,#0000
+#00000000000010C4 E9 02 00 00                                  ORMH    $2,#0000
+#00000000000010C8 EA 02 00 00                                  ORML    $2,#0000
+#00000000000010CC EB 02 11 68                                  ORL     $2,#1168
+#00000000000010D0 BF 02 02 00                                  CALLI   $2,$2,0:write
+#00000000000010D4 C1 FA F9 00                                  ORI     sp,fp,0
+#00000000000010D8 8D F9 FA 00                                  LDOI    fp,sp,0
+#00000000000010DC F8 00 00 00                                  RET
+#00000000000010E0 AD F9 FA 00 putnl                            STOI    fp,sp,0
+#00000000000010E4 C1 F9 FA 00                                  ORI     fp,sp,0
+#00000000000010E8 E7 FA 00 08                                  INCL    sp,#0008
+#00000000000010EC E3 FF 00 01                                  SETL    ax,#0001
+#00000000000010F0 E0 00 00 00                                  SETH    $0,#0000
+#00000000000010F4 E9 00 00 00                                  ORMH    $0,#0000
+#00000000000010F8 EA 00 00 00                                  ORML    $0,#0000
+#00000000000010FC EB 00 11 10                                  ORL     $0,#1110
+#0000000000001100 BF 00 00 00                                  CALLI   $0,$0,0:putnlf
+#0000000000001104 C1 FA F9 00                                  ORI     sp,fp,0
+#0000000000001108 8D F9 FA 00                                  LDOI    fp,sp,0
+#000000000000110C F8 00 00 00                                  RET
+#0000000000001110 AD F9 FA 00 putnlf                           STOI    fp,sp,0
+#0000000000001114 C1 F9 FA 00                                  ORI     fp,sp,0
+#0000000000001118 E7 FA 00 08                                  INCL    sp,#0008
+#000000000000111C C1 FE FF 00                                  ORI     bx,ax,0
+#0000000000001120 E0 FF 20 00                                  SETH    ax,#2000
+#0000000000001124 E9 FF 00 00                                  ORMH    ax,#0000
+#0000000000001128 EA FF 00 00                                  ORML    ax,#0000
+#000000000000112C EB FF 00 00                                  ORL     ax,#0000
+#0000000000001130 8F FF FF 00                                  LDOUI   ax,ax,0:newline
+#0000000000001134 E0 00 00 00                                  SETH    $0,#0000
+#0000000000001138 E9 00 00 00                                  ORMH    $0,#0000
+#000000000000113C EA 00 00 00                                  ORML    $0,#0000
+#0000000000001140 EB 00 10 8C                                  ORL     $0,#108C
+#0000000000001144 BF 00 00 00                                  CALLI   $0,$0,0:putsf
+#0000000000001148 C1 FA F9 00                                  ORI     sp,fp,0
+#000000000000114C 8D F9 FA 00                                  LDOI    fp,sp,0
+#0000000000001150 F8 00 00 00                                  RET
+#0000000000001154 00 00 00 00 exit                             TRAP    0,0,0
+#0000000000001158 00 00 01 00 wait                             TRAP    0,1,0
+#000000000000115C F8 00 00 00                                  RET
+#0000000000001160 00 00 02 00 fork                             TRAP    0,2,0
+#0000000000001164 F8 00 00 00                                  RET
+#0000000000001168 00 00 03 00 write                            TRAP    0,3,0
+#000000000000116C F8 00 00 00                                  RET
+#0000000000001170 AD F9 FA 00 main                             STOI    fp,sp,0
+#0000000000001174 C1 F9 FA 00                                  ORI     fp,sp,0
+#0000000000001178 E7 FA 00 08                                  INCL    sp,#0008
+#000000000000117C C1 00 FF 00                                  ORI     $0,ax,0
+#0000000000001180 C1 01 FE 00                                  ORI     $1,bx,0
+#0000000000001184 F0 00 00 0F                                  JMP     main@1
+#0000000000001188 4C 00 00 11 main@0                           BNP     $0,main@2
+#000000000000118C 8F FF 01 00                                  LDOUI   ax,$1,0
+#0000000000001190 E0 02 00 00                                  SETH    $2,#0000
+#0000000000001194 E9 02 00 00                                  ORMH    $2,#0000
+#0000000000001198 EA 02 00 00                                  ORML    $2,#0000
+#000000000000119C EB 02 10 5C                                  ORL     $2,#105C
+#00000000000011A0 BF 02 02 00                                  CALLI   $2,$2,0:puts
+#00000000000011A4 40 FF 00 0C                                  BN      ax,main@3
+#00000000000011A8 E0 02 00 00                                  SETH    $2,#0000
+#00000000000011AC E9 02 00 00                                  ORMH    $2,#0000
+#00000000000011B0 EA 02 00 00                                  ORML    $2,#0000
+#00000000000011B4 EB 02 10 E0                                  ORL     $2,#10E0
+#00000000000011B8 BF 02 02 00                                  CALLI   $2,$2,0:putnl
+#00000000000011BC 40 FF 00 06                                  BN      ax,main@3
+#00000000000011C0 23 01 01 08 main@1                           ADDUI   $1,$1,8
+#00000000000011C4 25 00 00 01                                  SUBI    $0,$0,1
+#00000000000011C8 F1 00 00 10                                  JMPB    main@0
+#00000000000011CC E3 FF 00 00 main@2                           SETL    ax,#0000
+#00000000000011D0 F0 00 00 02                                  JMP     main@4
+#00000000000011D4 E3 FF 00 01 main@3                           SETL    ax,#0001
+#00000000000011D8 C1 FA F9 00 main@4                           ORI     sp,fp,0
+#00000000000011DC 8D F9 FA 00                                  LDOI    fp,sp,0
+#00000000000011E0 F8 00 00 00                                  RET
+
+DATA section
+base address:     #2000000000000000
+length:           #0000000000000010
+#2000000000000000 newline                          20 00 00 00 00 00 00 08  .......
+#2000000000000008 nl                               0A 00 00 00 00 00 00 00 ........
+
+SYMB section
+length:           #0000000000000869
+                  0           ax                               -       internal  R     #00000000000000FF $255
+                  1           bx                               -       internal  R     #00000000000000FE $254
+                  2           cx                               -       internal  R     #00000000000000FD $253
+                  3           dx                               -       internal  R     #00000000000000FC $252
+                  4           ex                               -       internal  R     #00000000000000FB $251
+                  5           sp                               -       internal  R     #00000000000000FA $250
+                  6           fp                               -       internal  R     #00000000000000F9 $249
+#0000000000000000 7           rA                               -       internal  P     #0000000000000000 0
+#0000000000000000 8           rB                               -       internal  P     #0000000000000001 1
+#0000000000000000 9           rC                               -       internal  P     #0000000000000002 2
+#0000000000000000 10          rD                               -       internal  P     #0000000000000003 3
+#0000000000000000 11          rE                               -       internal  P     #0000000000000004 4
+#0000000000000000 12          rF                               -       internal  P     #0000000000000005 5
+#0000000000000000 13          rG                               -       internal  P     #0000000000000006 6
+#0000000000000000 14          rH                               -       internal  P     #0000000000000007 7
+#0000000000000000 15          rI                               -       internal  P     #0000000000000008 8
+#0000000000000000 16          rJ                               -       internal  P     #0000000000000009 9
+#0000000000000000 17          rK                               -       internal  P     #000000000000000A 10
+#0000000000000000 18          rL                               -       internal  P     #000000000000000B 11
+#0000000000000000 19          rM                               -       internal  P     #000000000000000C 12
+#0000000000000000 20          rN                               -       internal  P     #000000000000000D 13
+#0000000000000000 21          rO                               -       internal  P     #000000000000000E 14
+#0000000000000000 22          rP                               -       internal  P     #000000000000000F 15
+#0000000000000000 23          rQ                               -       internal  P     #0000000000000010 16
+#0000000000000000 24          rR                               -       internal  P     #0000000000000011 17
+#0000000000000000 25          rS                               -       internal  P     #0000000000000012 18
+#0000000000000000 26          rT                               -       internal  P     #0000000000000013 19
+#0000000000000000 27          rU                               -       internal  P     #0000000000000014 20
+#0000000000000000 28          rV                               -       internal  P     #0000000000000015 21
+#0000000000000000 29          rW                               -       internal  P     #0000000000000016 22
+#0000000000000000 30          rX                               -       internal  P     #0000000000000017 23
+#0000000000000000 31          rY                               -       internal  P     #0000000000000018 24
+#0000000000000000 32          rZ                               -       internal  P     #0000000000000019 25
+#0000000000000000 33          rBB                              -       internal  P     #000000000000001A 26
+#0000000000000000 34          rTT                              -       internal  P     #000000000000001B 27
+#0000000000000000 35          rWW                              -       internal  P     #000000000000001C 28
+#0000000000000000 36          rXX                              -       internal  P     #000000000000001D 29
+#0000000000000000 37          rYY                              -       internal  P     #000000000000001E 30
+#0000000000000000 38          rZZ                              -       internal  P     #000000000000001F 31
+#0000000000001000 39          Main                             text    external  PAF   #0000000000000000 0                    #0000000000001000 #0000000000000028
+#0000000000001028 40          strlen                           text    external  PAF   #0000000000000028 40                   #0000000000001028 #0000000000000034
+#000000000000105C 41          puts                             text    external  PAF   #000000000000005C 92                   #000000000000105C #0000000000000030
+#000000000000108C 42          putsf                            text    external  PAF   #000000000000008C 140                  #000000000000108C #0000000000000054
+#00000000000010E0 43          putnl                            text    external  PAF   #00000000000000E0 224                  #00000000000010E0 #0000000000000030
+#0000000000001110 44          putnlf                           text    external  PAF   #0000000000000110 272                  #0000000000001110 #0000000000000044
+#2000000000000000 45          newline                          data    external  PA    #0000000000000000 0
+#0000000000001154 46          exit                             text    external  PAF   #0000000000000154 340                  #0000000000001154 #0000000000000004
+#0000000000001158 47          wait                             text    external  PAF   #0000000000000158 344                  #0000000000001158 #0000000000000008
+#0000000000001160 48          fork                             text    external  PAF   #0000000000000160 352                  #0000000000001160 #0000000000000008
+#0000000000001168 49          write                            text    external  PAF   #0000000000000168 360                  #0000000000001168 #0000000000000008
+#0000000000001170 50          main                             text    external  PAF   #0000000000000170 368                  #0000000000001170 #0000000000000074
+#000000000000103C 0           strlen@1                         text    internal  PA    #0000000000000014 20
+#0000000000001050 1           strlen@2                         text    internal  PA    #0000000000000028 40
+#2000000000000008 2           nl                               data    internal  PA    #0000000000000008 8
+#0000000000001188 3           main@0                           text    internal  PA    #0000000000000018 24
+#00000000000011C0 4           main@1                           text    internal  PA    #0000000000000050 80
+#00000000000011CC 5           main@2                           text    internal  PA    #000000000000005C 92
+#00000000000011D4 6           main@3                           text    internal  PA    #0000000000000064 100
+#00000000000011D8 7           main@4                           text    internal  PA    #0000000000000068 104
+</pre>
+
+    <p>
+        The CODE section of the final executable starts from the virtual address #1000 (at 4K bytes).
+        The linker has processed symbols and resolved their absolute addresses.
+    </p>
+
+
+    <h2>
+        Binary File Inspection Utility
+    </h2>
+
+    <p>
+        To view the contents of a cmsx object file, library file or executable file, enter command
+    </p>
+
+    <pre>
+        cmsxdump <em>filename</em>
+    </pre>
+
+    <pre>
+    </pre>
+</body>
+
+</html>

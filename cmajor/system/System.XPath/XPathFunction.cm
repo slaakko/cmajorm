@@ -1,0 +1,244 @@
+// =================================
+// Copyright (c) 2019 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Collections;
+using System.Dom;
+
+namespace System.XPath
+{
+    public abstract class XPathFunction
+    {
+        public nothrow XPathFunction(const ustring& name_, int minArity_, int maxArity_) : name(name_), minArity(minArity_), maxArity(maxArity_)
+        {
+        }
+        public default virtual ~XPathFunction();
+        public abstract UniquePtr<XPathObject> Evaluate(XPathContext& context, List<XPathObject*>& arguments);
+        public nothrow inline const ustring& Name() const
+        {
+            return name;
+        }
+        public nothrow inline int MinArity() const
+        {
+            return minArity;
+        }
+        public nothrow inline int MaxArity() const
+        {
+            return maxArity;
+        }
+        private ustring name;
+        private int minArity;
+        private int maxArity;
+    }
+    
+    public XPathFunction* GetXPathLibraryFunction(const ustring& functionName)
+    {
+        return XPathFunctionLibrary.Instance().GetFunction(functionName);
+    }
+    
+    public class XPathFunctionLibrary
+    {
+        static XPathFunctionLibrary() : instance(new XPathFunctionLibrary())
+        {
+        }
+        public static XPathFunctionLibrary& Instance()
+        {
+            return *instance;
+        }
+        public XPathFunction* GetFunction(const ustring& functionName) const
+        {
+            Map<ustring, XPathFunction*>.ConstIterator it = functionMap.CFind(functionName);
+            if (it != functionMap.CEnd())
+            {
+                return it->second;
+            }
+            else
+            {
+                throw Exception("xpath function '" + ToUtf8(functionName) + "' not found");
+            }
+        }
+        private XPathFunctionLibrary()
+        {
+            functions.Add(UniquePtr<XPathFunction>(new XPathBooleanFunction()));
+            functions.Add(UniquePtr<XPathFunction>(new XPathNumberFunction()));
+            functions.Add(UniquePtr<XPathFunction>(new XPathStringFunction()));
+            functions.Add(UniquePtr<XPathFunction>(new XPathLastFunction()));
+            functions.Add(UniquePtr<XPathFunction>(new XPathPositionFunction()));
+            functions.Add(UniquePtr<XPathFunction>(new XPathCountFunction()));
+            for (const UniquePtr<XPathFunction>& function : functions)
+            {
+                functionMap[function->Name()] = function.Get();
+            }
+        }
+        private static UniquePtr<XPathFunctionLibrary> instance;
+        private Map<ustring, XPathFunction*> functionMap;
+        private List<UniquePtr<XPathFunction>> functions;
+    }
+    
+    public class XPathBooleanFunction : XPathFunction
+    {
+        public nothrow XPathBooleanFunction() : base(u"boolean", 1, 1)
+        {
+        }
+        public override UniquePtr<XPathObject> Evaluate(XPathContext& context, List<XPathObject*>& arguments)
+        {
+            if (arguments.Count() != 1)
+            {
+                throw XPathException("boolean function requires one argument");
+            }
+            XPathObject* argument = arguments[0];
+            return UniquePtr<XPathObject>(new XPathBoolean(argument->ToBool()));
+        }
+    }
+
+    public class XPathNumberFunction : XPathFunction
+    {
+        public nothrow XPathNumberFunction() : base(u"number", 0, 1)
+        {
+        }
+        public override UniquePtr<XPathObject> Evaluate(XPathContext& context, List<XPathObject*>& arguments)
+        {
+            XPathObject* argument = null;
+            XPathNodeSet nodeSet;
+            if (arguments.IsEmpty())
+            {
+                nodeSet.Add(context.Node());
+                argument = &nodeSet;
+            }
+            else
+            {
+                if (arguments.Count() != 1)
+                {
+                    throw XPathException("boolean function requires zero or one arguments");
+                }
+                argument = arguments[0];
+            }
+            return UniquePtr<XPathObject>(new XPathNumber(argument->ToDouble(context)));
+        }
+    }
+
+    public class XPathStringFunction : XPathFunction
+    {
+        public nothrow XPathStringFunction() : base(u"string", 0, 1)
+        {
+        }
+        public override UniquePtr<XPathObject> Evaluate(XPathContext& context, List<XPathObject*>& arguments)
+        {
+            XPathObject* argument = null;
+            XPathNodeSet nodeSet;
+            if (arguments.IsEmpty())
+            {
+                nodeSet.Add(context.Node());
+                argument = &nodeSet;
+            }
+            else
+            {
+                if (arguments.Count() != 1)
+                {
+                    throw XPathException("string function requires zero or one arguments");
+                }
+                argument = arguments[0];
+            }
+            return UniquePtr<XPathObject>(new XPathString(argument->ToString()));
+        }
+    }
+
+    public class XPathLastFunction : XPathFunction
+    {
+        public nothrow XPathLastFunction() : base(u"last", 0, 0)
+        {
+        }
+        public override UniquePtr<XPathObject> Evaluate(XPathContext& context, List<XPathObject*>& arguments)
+        {
+            if (!arguments.IsEmpty())
+            {
+                throw XPathException("last function requires no arguments");
+            }
+            return UniquePtr<XPathObject>(new XPathNumber(context.Size()));
+        }
+    }
+
+    public class XPathPositionFunction : XPathFunction
+    {
+        public nothrow XPathPositionFunction() : base(u"position", 0, 0)
+        {
+        }
+        public override UniquePtr<XPathObject> Evaluate(XPathContext& context, List<XPathObject*>& arguments)
+        {
+            if (!arguments.IsEmpty())
+            {
+                throw XPathException("position function requires no arguments");
+            }
+            return UniquePtr<XPathObject>(new XPathNumber(context.Position()));
+        }
+    }
+
+    public class XPathCountFunction : XPathFunction
+    {
+        public nothrow XPathCountFunction() : base(u"count", 1, 1)
+        {
+        }
+        public override UniquePtr<XPathObject> Evaluate(XPathContext& context, List<XPathObject*>& arguments)
+        {
+            if (arguments.Count() != 1)
+            {
+                throw XPathException("position function requires one argument");
+            }
+            XPathObject* argument = arguments[0];
+            if (!(argument is XPathNodeSet*))
+            {
+                throw XPathException("position function requires one node set argument");
+            }
+            XPathNodeSet* nodeSet = cast<XPathNodeSet*>(argument);
+            return UniquePtr<XPathObject>(new XPathNumber(nodeSet->Length()));
+        }
+    }
+    
+    public class ElementAndDocumentStringValueComputer : System.Dom.Visitor
+    {
+        public override void Visit(DomText* text)
+        {
+            stringValue.Append(text->Data());
+        }
+        public override void Visit(DomCDataSection* cdataSection)
+        {
+            stringValue.Append(cdataSection->Data());
+        }
+        public ustring GetStringValue()
+        {
+            return Rvalue(stringValue);
+        }
+        private ustring stringValue;
+    }
+    
+    public ustring StringValue(DomNode* node)
+    {
+        if ((node is DomDocument*) || (node is DomElement*))
+        {
+            ElementAndDocumentStringValueComputer stringValueComputer;
+            node->Accept(stringValueComputer);
+            return stringValueComputer.GetStringValue();
+        }
+        else if (node is DomAttr*)
+        {
+            DomAttr* attr = cast<DomAttr*>(node);
+            return attr->Value();
+        }
+        else if (node is DomCharacterData*)
+        {
+            DomCharacterData* characterData = cast<DomCharacterData*>(node);
+            return characterData->Data();
+        }
+        else if (node is DomProcessingInstruction*)
+        {
+            DomProcessingInstruction* pi = cast<DomProcessingInstruction*>(node);
+            return pi->Data();
+        }
+        else
+        {
+            return ustring();
+        }
+    }
+}

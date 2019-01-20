@@ -1,0 +1,32 @@
+// =================================
+// Copyright (c) 2019 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+[hpp]#include <cmajor/ast/BasicType.hpp>
+
+namespace cmajor.parser
+{
+    [hpp]using namespace cmajor::ast;
+
+    grammar BasicType
+    {
+        BasicType : Node*
+            ::= keyword("bool"){ value = new BoolNode(span); }
+            |   keyword("sbyte"){ value = new SByteNode(span); }
+            |   keyword("byte"){ value = new ByteNode(span); }
+            |   keyword("short"){ value = new ShortNode(span); }
+            |   keyword("ushort"){ value = new UShortNode(span); }
+            |   keyword("int"){ value = new IntNode(span); }
+            |   keyword("uint"){ value = new UIntNode(span); }
+            |   keyword("long"){ value = new LongNode(span); }
+            |   keyword("ulong"){ value = new ULongNode(span); }
+            |   keyword("float"){ value = new FloatNode(span); }
+            |   keyword("double"){ value = new DoubleNode(span); }
+            |   keyword("char"){ value = new CharNode(span); }
+            |   keyword("wchar"){ value = new WCharNode(span); }
+            |   keyword("uchar"){ value = new UCharNode(span); }
+            |   keyword("void"){ value = new VoidNode(span); }
+            ;
+    }
+}

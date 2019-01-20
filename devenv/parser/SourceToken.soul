@@ -1,0 +1,67 @@
+﻿/*========================================================================
+    Copyright (c) 2012-2016 Seppo Laakko
+    http://sourceforge.net/projects/cmajor/
+ 
+    Distributed under the GNU General Public License, version 3 (GPLv3).
+    (See accompanying LICENSE.txt or http://www.gnu.org/licenses/gpl.html)
+
+ ========================================================================*/
+
+namespace parser
+{
+    grammar SourceToken
+    {
+        using stdlib;
+        extern identifier: string;
+        extern number: double;
+        extern escape: char;
+
+        Keyword: string ::= ((("#" Spaces?) ("assert" | "if" | "elif" | "endif")) | keyword_list(identifier, 
+                        ["bool", "true", "false", "sbyte", "byte", "short", "ushort", "int", "uint", "long", "ulong", 
+                        "float", "double", "char", "wchar", "uchar", "void", "enum", "cast", "namespace", "using", "static", "extern", "interface",
+                        "is", "as", "explicit", "delegate", "inline", "constexpr", "cdecl", "nothrow", "public", "protected", "private", 
+                        "internal", "virtual", "abstract", "override", "suppress", "default", "operator", "class", 
+                        "return", "if", "else", "switch", "case", "default", "while", "do", "for", "break", "continue", 
+                        "goto", "typedef", "typename", "const", "null", "this", "base", "construct", "destroy", "new", 
+                        "delete", "sizeof", "try", "catch", "throw", "concept", "where", "axiom", "and", "or", "not", "unit_test"]))
+                    { 
+                        value = match; 
+                    }
+                    ;
+
+        QualifiedId: string
+                    ::= (Identifier ('.' Identifier)*){ value = match; }
+                    ;
+
+        Identifier  ::= identifier - Keyword
+                    ;
+
+        Char: string
+                    ::= token('\'' ([^'\\\r\n] | escape) '\''){ value = match; }
+                    ;
+
+        String: string
+                    ::= token('"' ([^"\r\n]+ | escape)* '"'){ value = match; }
+                    ;
+
+        Number: string
+                    ::= number{ value = match; }
+                    ;
+
+        Spaces: string
+                    ::= ([\t ]+){ value = match; }
+                    ;
+
+        LineComment: string
+                    ::= ("//" [^\r\n]*){ value = match; }
+                    ;
+
+        BlockComment: string
+                    ::= ("/*" (String | Char | (anychar - "*/"))* ("*/")?){ value = match; }
+                    ;
+
+        Other: string
+                    ::= [^\r\n]{ value = match; }
+                    ;
+    }
+}

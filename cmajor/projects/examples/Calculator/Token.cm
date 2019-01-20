@@ -1,0 +1,60 @@
+using System;
+
+namespace Calculator
+{
+    public abstract class Token
+    {
+    }
+
+    public class PrintToken : Token
+    {
+    }
+
+    public class NumberToken : Token
+    {
+        public nothrow NumberToken(double value_) : value(value_)
+        {
+        }
+        public nothrow inline double Value() const
+        {
+            return value; 
+        }
+        private double value;
+    }
+
+    public class VariableNameToken : Token
+    {
+        public nothrow VariableNameToken(const ustring& variableName_) : variableName(variableName_)
+        {
+        }
+        public nothrow inline const ustring& VariableName() const
+        {
+            return variableName;
+        }
+        private ustring variableName;
+    }
+
+    public class OperatorToken : Token
+    {
+        public nothrow OperatorToken(uchar operatorChar_) : operatorChar(operatorChar_)
+        {
+        }
+        public nothrow inline uchar Char() const
+        {
+            return operatorChar;
+        }
+        public nothrow inline bool IsAdditiveOperator() const
+        {
+            return operatorChar == '+' || operatorChar == '-'; 
+        }
+        public nothrow inline bool IsMultiplicativeOperator() const
+        {
+            return operatorChar == '*' || operatorChar == '/';
+        }
+        private uchar operatorChar;
+    }
+
+    public class EndToken : Token
+    {
+    }
+}

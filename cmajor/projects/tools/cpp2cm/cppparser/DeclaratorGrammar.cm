@@ -1,0 +1,991 @@
+using System;
+using System.Collections;
+using System.Text.Parsing;
+using cppast;
+
+// this source file has been automatically generated from 'DeclaratorGrammar.parser' using cmparsergen version 2.0.0.
+
+namespace cppparser
+{
+    public class DeclaratorGrammar : System.Text.Parsing.Grammar
+    {
+        public DeclaratorGrammar() : this(new ParsingDomain())
+        {
+        }
+        public DeclaratorGrammar(ParsingDomain* parsingDomain) : base(ToUtf32("DeclaratorGrammar"), parsingDomain->GetNamespaceScope(ToUtf32("cppparser")), parsingDomain)
+        {
+            SetOwner(0);
+            RegisterParsingDomain(parsingDomain);
+            parsingDomain->AddGrammar(this);
+            CreateRules();
+            Link();
+        }
+        public Node* Parse(const uchar* start, const uchar* end, int fileIndex, const string& fileName, ParsingContext* ctx)
+        {
+            Scanner scanner(start, end, fileName, fileIndex, SkipRule());
+            UniquePtr<XmlLog> xmlLog;
+            if (Log() != null)
+            {
+                xmlLog.Reset(new XmlLog(*Log(), MaxLogLineLength()));
+                scanner.SetLog(xmlLog.Get());
+                xmlLog->WriteBeginRule(u"parse");
+                xmlLog->IncIndent();
+            }
+            Stack<UniquePtr<Object>> stack;
+            UniquePtr<ParsingData> parsingData(new ParsingData(Domain()->NumRules()));
+            scanner.SetParsingData(parsingData.Get());
+            stack.Push(UniquePtr<Object>(new ValueObject<ParsingContext*>(ctx)));
+            Match match = base->Parse(scanner, stack, parsingData.Get());
+            Span stop = scanner.GetSpan();
+            if (Log() != null)
+            {
+                xmlLog->DecIndent();
+                xmlLog->WriteEndRule(u"parse");
+            }
+            if (!match.Hit() || stop.start != cast<int>(end - start))
+            {
+                if (StartRule() != null)
+                {
+                    throw ExpectationFailure(StartRule()->Info(), fileName, stop, start, end);
+                }
+                else
+                {
+                    throw ParsingException("grammar '" + ToUtf8(Name()) + "' has no start rule", fileName, scanner.GetSpan(), start, end);
+                }
+            }
+            UniquePtr<Object> value = stack.Pop();
+            Node* result = *cast<ValueObject<Node*>*>(value.Get());
+            return result;
+        }
+
+        public class InitDeclaratorRule : System.Text.Parsing.RuleParser
+        {
+            public InitDeclaratorRule(const ustring& name_, Scope* enclosingScope_, int id_, Parser* definition_) : base(name_, enclosingScope_, id_, definition_)
+            {
+                AddInheritedAttribute(AttrOrVar(ToUtf32("ParsingContext*"), ToUtf32("ctx")));
+                SetValueTypeName(ToUtf32("Node*"));
+            }
+            public override void Enter(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
+            {
+                parsingData->PushContext(Id(), new Context());
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                UniquePtr<Object> ctx_value = stack.Pop();
+                context->ctx = *cast<ValueObject<ParsingContext*>*>(ctx_value.Get());
+            }
+            public override void Leave(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                if (matched)
+                {
+                    stack.Push(UniquePtr<Object>(new ValueObject<Node*>(context->value)));
+                }
+                parsingData->PopContext(Id());
+            }
+            public override void Link()
+            {
+                ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
+                a0ActionParser->SetAction(A0Action);
+                ActionParser* a1ActionParser = GetAction(ToUtf32("A1"));
+                a1ActionParser->SetAction(A1Action);
+                NonterminalParser* declaratorNonterminalParser = GetNonterminal(ToUtf32("Declarator"));
+                declaratorNonterminalParser->SetPre(PreDeclarator);
+                declaratorNonterminalParser->SetPost(PostDeclarator);
+                NonterminalParser* initializerNonterminalParser = GetNonterminal(ToUtf32("Initializer"));
+                initializerNonterminalParser->SetPre(PreInitializer);
+                initializerNonterminalParser->SetPost(PostInitializer);
+            }
+            public void A0Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                context->value = context->fromDeclarator;
+            }
+            public void A1Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                context->value = new InitDeclaratorNode(span, context->value, context->fromInitializer);
+            }
+            public void PreDeclarator(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                stack.Push(UniquePtr<Object>(new ValueObject<ParsingContext*>(context->ctx)));
+            }
+            public void PostDeclarator(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                if (matched)
+                {
+                    UniquePtr<Object> fromDeclarator_value = stack.Pop();
+                    context->fromDeclarator = *cast<ValueObject<Node*>*>(fromDeclarator_value.Get());
+                }
+            }
+            public void PreInitializer(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                stack.Push(UniquePtr<Object>(new ValueObject<ParsingContext*>(context->ctx)));
+            }
+            public void PostInitializer(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                if (matched)
+                {
+                    UniquePtr<Object> fromInitializer_value = stack.Pop();
+                    context->fromInitializer = *cast<ValueObject<Node*>*>(fromInitializer_value.Get());
+                }
+            }
+            public class Context : System.Text.Parsing.Context
+            {
+                public Context() : ctx(), value(), fromDeclarator(), fromInitializer()
+                {
+                }
+                public ParsingContext* ctx;
+                public Node* value;
+                public Node* fromDeclarator;
+                public Node* fromInitializer;
+            }
+        }
+
+        public class DeclaratorRule : System.Text.Parsing.RuleParser
+        {
+            public DeclaratorRule(const ustring& name_, Scope* enclosingScope_, int id_, Parser* definition_) : base(name_, enclosingScope_, id_, definition_)
+            {
+                AddInheritedAttribute(AttrOrVar(ToUtf32("ParsingContext*"), ToUtf32("ctx")));
+                SetValueTypeName(ToUtf32("Node*"));
+                AddLocalVariable(AttrOrVar(ToUtf32("UniquePtr<Node>"), ToUtf32("node")));
+            }
+            public override void Enter(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
+            {
+                parsingData->PushContext(Id(), new Context());
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                UniquePtr<Object> ctx_value = stack.Pop();
+                context->ctx = *cast<ValueObject<ParsingContext*>*>(ctx_value.Get());
+            }
+            public override void Leave(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                if (matched)
+                {
+                    stack.Push(UniquePtr<Object>(new ValueObject<Node*>(context->value)));
+                }
+                parsingData->PopContext(Id());
+            }
+            public override void Link()
+            {
+                ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
+                a0ActionParser->SetAction(A0Action);
+                ActionParser* a1ActionParser = GetAction(ToUtf32("A1"));
+                a1ActionParser->SetAction(A1Action);
+                ActionParser* a2ActionParser = GetAction(ToUtf32("A2"));
+                a2ActionParser->SetAction(A2Action);
+                ActionParser* a3ActionParser = GetAction(ToUtf32("A3"));
+                a3ActionParser->SetAction(A3Action);
+                ActionParser* a4ActionParser = GetAction(ToUtf32("A4"));
+                a4ActionParser->SetAction(A4Action);
+                ActionParser* a5ActionParser = GetAction(ToUtf32("A5"));
+                a5ActionParser->SetAction(A5Action);
+                ActionParser* a6ActionParser = GetAction(ToUtf32("A6"));
+                a6ActionParser->SetAction(A6Action);
+                NonterminalParser* idExpressionNonterminalParser = GetNonterminal(ToUtf32("IdExpression"));
+                idExpressionNonterminalParser->SetPre(PreIdExpression);
+                idExpressionNonterminalParser->SetPost(PostIdExpression);
+                NonterminalParser* i1NonterminalParser = GetNonterminal(ToUtf32("i1"));
+                i1NonterminalParser->SetPost(Posti1);
+                NonterminalParser* nnsNonterminalParser = GetNonterminal(ToUtf32("nns"));
+                nnsNonterminalParser->SetPre(Prenns);
+                nnsNonterminalParser->SetPost(Postnns);
+                NonterminalParser* i2NonterminalParser = GetNonterminal(ToUtf32("i2"));
+                i2NonterminalParser->SetPost(Posti2);
+                NonterminalParser* parameterListNonterminalParser = GetNonterminal(ToUtf32("ParameterList"));
+                parameterListNonterminalParser->SetPre(PreParameterList);
+                parameterListNonterminalParser->SetPost(PostParameterList);
+                NonterminalParser* cVSpecifierSequenceNonterminalParser = GetNonterminal(ToUtf32("CVSpecifierSequence"));
+                cVSpecifierSequenceNonterminalParser->SetPost(PostCVSpecifierSequence);
+                NonterminalParser* sizeNonterminalParser = GetNonterminal(ToUtf32("size"));
+                sizeNonterminalParser->SetPre(Presize);
+                sizeNonterminalParser->SetPost(Postsize);
+            }
+            public void A0Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                context->value = context->node.Release();
+            }
+            public void A1Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                context->node.Reset(context->fromIdExpression);
+            }
+            public void A2Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                context->node.Reset(new FunctionPtrIdNode(span, context->fromi1));
+            }
+            public void A3Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                context->node.Reset(new MemberFunctionPtrIdNode(span, context->fromnns, context->fromi2));
+            }
+            public void A4Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                pass = !context->ctx->InFunctionBody();
+            }
+            public void A5Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                context->node.Reset(new FunctionDeclaratorNode(span, context->node.Release(), context->fromParameterList, context->fromCVSpecifierSequence));
+            }
+            public void A6Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                context->node.Reset(new ArrayDeclaratorNode(span, context->node.Release(), context->fromsize));
+            }
+            public void PreIdExpression(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                stack.Push(UniquePtr<Object>(new ValueObject<ParsingContext*>(context->ctx)));
+            }
+            public void PostIdExpression(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                if (matched)
+                {
+                    UniquePtr<Object> fromIdExpression_value = stack.Pop();
+                    context->fromIdExpression = *cast<ValueObject<Node*>*>(fromIdExpression_value.Get());
+                }
+            }
+            public void Posti1(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                if (matched)
+                {
+                    UniquePtr<Object> fromi1_value = stack.Pop();
+                    context->fromi1 = *cast<ValueObject<IdentifierNode*>*>(fromi1_value.Get());
+                }
+            }
+            public void Prenns(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                stack.Push(UniquePtr<Object>(new ValueObject<ParsingContext*>(context->ctx)));
+            }
+            public void Postnns(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                if (matched)
+                {
+                    UniquePtr<Object> fromnns_value = stack.Pop();
+                    context->fromnns = *cast<ValueObject<Node*>*>(fromnns_value.Get());
+                }
+            }
+            public void Posti2(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                if (matched)
+                {
+                    UniquePtr<Object> fromi2_value = stack.Pop();
+                    context->fromi2 = *cast<ValueObject<IdentifierNode*>*>(fromi2_value.Get());
+                }
+            }
+            public void PreParameterList(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                stack.Push(UniquePtr<Object>(new ValueObject<ParsingContext*>(context->ctx)));
+            }
+            public void PostParameterList(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                if (matched)
+                {
+                    UniquePtr<Object> fromParameterList_value = stack.Pop();
+                    context->fromParameterList = *cast<ValueObject<ParameterListNode*>*>(fromParameterList_value.Get());
+                }
+            }
+            public void PostCVSpecifierSequence(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                if (matched)
+                {
+                    UniquePtr<Object> fromCVSpecifierSequence_value = stack.Pop();
+                    context->fromCVSpecifierSequence = *cast<ValueObject<CVSpecifiers>*>(fromCVSpecifierSequence_value.Get());
+                }
+            }
+            public void Presize(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                stack.Push(UniquePtr<Object>(new ValueObject<ParsingContext*>(context->ctx)));
+            }
+            public void Postsize(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                if (matched)
+                {
+                    UniquePtr<Object> fromsize_value = stack.Pop();
+                    context->fromsize = *cast<ValueObject<Node*>*>(fromsize_value.Get());
+                }
+            }
+            public class Context : System.Text.Parsing.Context
+            {
+                public Context() : ctx(), value(), node(), fromIdExpression(), fromi1(), fromnns(), fromi2(), fromParameterList(), fromCVSpecifierSequence(), fromsize()
+                {
+                }
+                public ParsingContext* ctx;
+                public Node* value;
+                public UniquePtr<Node> node;
+                public Node* fromIdExpression;
+                public IdentifierNode* fromi1;
+                public Node* fromnns;
+                public IdentifierNode* fromi2;
+                public ParameterListNode* fromParameterList;
+                public CVSpecifiers fromCVSpecifierSequence;
+                public Node* fromsize;
+            }
+        }
+
+        public class InitializerRule : System.Text.Parsing.RuleParser
+        {
+            public InitializerRule(const ustring& name_, Scope* enclosingScope_, int id_, Parser* definition_) : base(name_, enclosingScope_, id_, definition_)
+            {
+                AddInheritedAttribute(AttrOrVar(ToUtf32("ParsingContext*"), ToUtf32("ctx")));
+                SetValueTypeName(ToUtf32("Node*"));
+            }
+            public override void Enter(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
+            {
+                parsingData->PushContext(Id(), new Context());
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                UniquePtr<Object> ctx_value = stack.Pop();
+                context->ctx = *cast<ValueObject<ParsingContext*>*>(ctx_value.Get());
+            }
+            public override void Leave(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                if (matched)
+                {
+                    stack.Push(UniquePtr<Object>(new ValueObject<Node*>(context->value)));
+                }
+                parsingData->PopContext(Id());
+            }
+            public override void Link()
+            {
+                ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
+                a0ActionParser->SetAction(A0Action);
+                ActionParser* a1ActionParser = GetAction(ToUtf32("A1"));
+                a1ActionParser->SetAction(A1Action);
+                ActionParser* a2ActionParser = GetAction(ToUtf32("A2"));
+                a2ActionParser->SetAction(A2Action);
+                NonterminalParser* initializerClauseNonterminalParser = GetNonterminal(ToUtf32("InitializerClause"));
+                initializerClauseNonterminalParser->SetPre(PreInitializerClause);
+                initializerClauseNonterminalParser->SetPost(PostInitializerClause);
+                NonterminalParser* expressionListNonterminalParser = GetNonterminal(ToUtf32("ExpressionList"));
+                expressionListNonterminalParser->SetPre(PreExpressionList);
+                expressionListNonterminalParser->SetPost(PostExpressionList);
+                NonterminalParser* bracedInitializerListNonterminalParser = GetNonterminal(ToUtf32("BracedInitializerList"));
+                bracedInitializerListNonterminalParser->SetPre(PreBracedInitializerList);
+                bracedInitializerListNonterminalParser->SetPost(PostBracedInitializerList);
+            }
+            public void A0Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                context->value = new AssignmentInitializerNode(span, context->fromInitializerClause);
+            }
+            public void A1Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                context->value = context->fromExpressionList;
+            }
+            public void A2Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                context->value = context->fromBracedInitializerList;
+            }
+            public void PreInitializerClause(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                stack.Push(UniquePtr<Object>(new ValueObject<ParsingContext*>(context->ctx)));
+            }
+            public void PostInitializerClause(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                if (matched)
+                {
+                    UniquePtr<Object> fromInitializerClause_value = stack.Pop();
+                    context->fromInitializerClause = *cast<ValueObject<Node*>*>(fromInitializerClause_value.Get());
+                }
+            }
+            public void PreExpressionList(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                stack.Push(UniquePtr<Object>(new ValueObject<ParsingContext*>(context->ctx)));
+            }
+            public void PostExpressionList(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                if (matched)
+                {
+                    UniquePtr<Object> fromExpressionList_value = stack.Pop();
+                    context->fromExpressionList = *cast<ValueObject<ExpressionListNode*>*>(fromExpressionList_value.Get());
+                }
+            }
+            public void PreBracedInitializerList(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                stack.Push(UniquePtr<Object>(new ValueObject<ParsingContext*>(context->ctx)));
+            }
+            public void PostBracedInitializerList(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                if (matched)
+                {
+                    UniquePtr<Object> fromBracedInitializerList_value = stack.Pop();
+                    context->fromBracedInitializerList = *cast<ValueObject<BracedInitializerListNode*>*>(fromBracedInitializerList_value.Get());
+                }
+            }
+            public class Context : System.Text.Parsing.Context
+            {
+                public Context() : ctx(), value(), fromInitializerClause(), fromExpressionList(), fromBracedInitializerList()
+                {
+                }
+                public ParsingContext* ctx;
+                public Node* value;
+                public Node* fromInitializerClause;
+                public ExpressionListNode* fromExpressionList;
+                public BracedInitializerListNode* fromBracedInitializerList;
+            }
+        }
+
+        public class BraceOrEqualInitializerRule : System.Text.Parsing.RuleParser
+        {
+            public BraceOrEqualInitializerRule(const ustring& name_, Scope* enclosingScope_, int id_, Parser* definition_) : base(name_, enclosingScope_, id_, definition_)
+            {
+                AddInheritedAttribute(AttrOrVar(ToUtf32("ParsingContext*"), ToUtf32("ctx")));
+                SetValueTypeName(ToUtf32("Node*"));
+            }
+            public override void Enter(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
+            {
+                parsingData->PushContext(Id(), new Context());
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                UniquePtr<Object> ctx_value = stack.Pop();
+                context->ctx = *cast<ValueObject<ParsingContext*>*>(ctx_value.Get());
+            }
+            public override void Leave(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                if (matched)
+                {
+                    stack.Push(UniquePtr<Object>(new ValueObject<Node*>(context->value)));
+                }
+                parsingData->PopContext(Id());
+            }
+            public override void Link()
+            {
+                ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
+                a0ActionParser->SetAction(A0Action);
+                ActionParser* a1ActionParser = GetAction(ToUtf32("A1"));
+                a1ActionParser->SetAction(A1Action);
+                NonterminalParser* initializerClauseNonterminalParser = GetNonterminal(ToUtf32("InitializerClause"));
+                initializerClauseNonterminalParser->SetPre(PreInitializerClause);
+                initializerClauseNonterminalParser->SetPost(PostInitializerClause);
+                NonterminalParser* bracedInitializerListNonterminalParser = GetNonterminal(ToUtf32("BracedInitializerList"));
+                bracedInitializerListNonterminalParser->SetPre(PreBracedInitializerList);
+                bracedInitializerListNonterminalParser->SetPost(PostBracedInitializerList);
+            }
+            public void A0Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                context->value = new AssignmentInitializerNode(span, context->fromInitializerClause);
+            }
+            public void A1Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                context->value = context->fromBracedInitializerList;
+            }
+            public void PreInitializerClause(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                stack.Push(UniquePtr<Object>(new ValueObject<ParsingContext*>(context->ctx)));
+            }
+            public void PostInitializerClause(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                if (matched)
+                {
+                    UniquePtr<Object> fromInitializerClause_value = stack.Pop();
+                    context->fromInitializerClause = *cast<ValueObject<Node*>*>(fromInitializerClause_value.Get());
+                }
+            }
+            public void PreBracedInitializerList(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                stack.Push(UniquePtr<Object>(new ValueObject<ParsingContext*>(context->ctx)));
+            }
+            public void PostBracedInitializerList(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                if (matched)
+                {
+                    UniquePtr<Object> fromBracedInitializerList_value = stack.Pop();
+                    context->fromBracedInitializerList = *cast<ValueObject<BracedInitializerListNode*>*>(fromBracedInitializerList_value.Get());
+                }
+            }
+            public class Context : System.Text.Parsing.Context
+            {
+                public Context() : ctx(), value(), fromInitializerClause(), fromBracedInitializerList()
+                {
+                }
+                public ParsingContext* ctx;
+                public Node* value;
+                public Node* fromInitializerClause;
+                public BracedInitializerListNode* fromBracedInitializerList;
+            }
+        }
+
+        public class BracedInitializerListRule : System.Text.Parsing.RuleParser
+        {
+            public BracedInitializerListRule(const ustring& name_, Scope* enclosingScope_, int id_, Parser* definition_) : base(name_, enclosingScope_, id_, definition_)
+            {
+                AddInheritedAttribute(AttrOrVar(ToUtf32("ParsingContext*"), ToUtf32("ctx")));
+                SetValueTypeName(ToUtf32("BracedInitializerListNode*"));
+                AddLocalVariable(AttrOrVar(ToUtf32("UniquePtr<BracedInitializerListNode>"), ToUtf32("node")));
+            }
+            public override void Enter(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
+            {
+                parsingData->PushContext(Id(), new Context());
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                UniquePtr<Object> ctx_value = stack.Pop();
+                context->ctx = *cast<ValueObject<ParsingContext*>*>(ctx_value.Get());
+            }
+            public override void Leave(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                if (matched)
+                {
+                    stack.Push(UniquePtr<Object>(new ValueObject<BracedInitializerListNode*>(context->value)));
+                }
+                parsingData->PopContext(Id());
+            }
+            public override void Link()
+            {
+                ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
+                a0ActionParser->SetAction(A0Action);
+                ActionParser* a1ActionParser = GetAction(ToUtf32("A1"));
+                a1ActionParser->SetAction(A1Action);
+                ActionParser* a2ActionParser = GetAction(ToUtf32("A2"));
+                a2ActionParser->SetAction(A2Action);
+                ActionParser* a3ActionParser = GetAction(ToUtf32("A3"));
+                a3ActionParser->SetAction(A3Action);
+                NonterminalParser* ic1NonterminalParser = GetNonterminal(ToUtf32("ic1"));
+                ic1NonterminalParser->SetPre(Preic1);
+                ic1NonterminalParser->SetPost(Postic1);
+                NonterminalParser* ic2NonterminalParser = GetNonterminal(ToUtf32("ic2"));
+                ic2NonterminalParser->SetPre(Preic2);
+                ic2NonterminalParser->SetPost(Postic2);
+            }
+            public void A0Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                context->value = context->node.Release();
+            }
+            public void A1Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                context->node.Reset(new BracedInitializerListNode(span));
+            }
+            public void A2Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                context->node->AddNode(context->fromic1);
+            }
+            public void A3Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                context->node->AddNode(context->fromic2);
+            }
+            public void Preic1(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                stack.Push(UniquePtr<Object>(new ValueObject<ParsingContext*>(context->ctx)));
+            }
+            public void Postic1(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                if (matched)
+                {
+                    UniquePtr<Object> fromic1_value = stack.Pop();
+                    context->fromic1 = *cast<ValueObject<Node*>*>(fromic1_value.Get());
+                }
+            }
+            public void Preic2(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                stack.Push(UniquePtr<Object>(new ValueObject<ParsingContext*>(context->ctx)));
+            }
+            public void Postic2(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                if (matched)
+                {
+                    UniquePtr<Object> fromic2_value = stack.Pop();
+                    context->fromic2 = *cast<ValueObject<Node*>*>(fromic2_value.Get());
+                }
+            }
+            public class Context : System.Text.Parsing.Context
+            {
+                public Context() : ctx(), value(), node(), fromic1(), fromic2()
+                {
+                }
+                public ParsingContext* ctx;
+                public BracedInitializerListNode* value;
+                public UniquePtr<BracedInitializerListNode> node;
+                public Node* fromic1;
+                public Node* fromic2;
+            }
+        }
+
+        public class InitializerClauseRule : System.Text.Parsing.RuleParser
+        {
+            public InitializerClauseRule(const ustring& name_, Scope* enclosingScope_, int id_, Parser* definition_) : base(name_, enclosingScope_, id_, definition_)
+            {
+                AddInheritedAttribute(AttrOrVar(ToUtf32("ParsingContext*"), ToUtf32("ctx")));
+                SetValueTypeName(ToUtf32("Node*"));
+            }
+            public override void Enter(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
+            {
+                parsingData->PushContext(Id(), new Context());
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                UniquePtr<Object> ctx_value = stack.Pop();
+                context->ctx = *cast<ValueObject<ParsingContext*>*>(ctx_value.Get());
+            }
+            public override void Leave(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                if (matched)
+                {
+                    stack.Push(UniquePtr<Object>(new ValueObject<Node*>(context->value)));
+                }
+                parsingData->PopContext(Id());
+            }
+            public override void Link()
+            {
+                ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
+                a0ActionParser->SetAction(A0Action);
+                ActionParser* a1ActionParser = GetAction(ToUtf32("A1"));
+                a1ActionParser->SetAction(A1Action);
+                NonterminalParser* assignmentExpressionNonterminalParser = GetNonterminal(ToUtf32("AssignmentExpression"));
+                assignmentExpressionNonterminalParser->SetPre(PreAssignmentExpression);
+                assignmentExpressionNonterminalParser->SetPost(PostAssignmentExpression);
+                NonterminalParser* bracedInitializerListNonterminalParser = GetNonterminal(ToUtf32("BracedInitializerList"));
+                bracedInitializerListNonterminalParser->SetPre(PreBracedInitializerList);
+                bracedInitializerListNonterminalParser->SetPost(PostBracedInitializerList);
+            }
+            public void A0Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                context->value = context->fromAssignmentExpression;
+            }
+            public void A1Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                context->value = context->fromBracedInitializerList;
+            }
+            public void PreAssignmentExpression(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                stack.Push(UniquePtr<Object>(new ValueObject<ParsingContext*>(context->ctx)));
+            }
+            public void PostAssignmentExpression(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                if (matched)
+                {
+                    UniquePtr<Object> fromAssignmentExpression_value = stack.Pop();
+                    context->fromAssignmentExpression = *cast<ValueObject<Node*>*>(fromAssignmentExpression_value.Get());
+                }
+            }
+            public void PreBracedInitializerList(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                stack.Push(UniquePtr<Object>(new ValueObject<ParsingContext*>(context->ctx)));
+            }
+            public void PostBracedInitializerList(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                if (matched)
+                {
+                    UniquePtr<Object> fromBracedInitializerList_value = stack.Pop();
+                    context->fromBracedInitializerList = *cast<ValueObject<BracedInitializerListNode*>*>(fromBracedInitializerList_value.Get());
+                }
+            }
+            public class Context : System.Text.Parsing.Context
+            {
+                public Context() : ctx(), value(), fromAssignmentExpression(), fromBracedInitializerList()
+                {
+                }
+                public ParsingContext* ctx;
+                public Node* value;
+                public Node* fromAssignmentExpression;
+                public BracedInitializerListNode* fromBracedInitializerList;
+            }
+        }
+
+        public class InitializerListRule : System.Text.Parsing.RuleParser
+        {
+            public InitializerListRule(const ustring& name_, Scope* enclosingScope_, int id_, Parser* definition_) : base(name_, enclosingScope_, id_, definition_)
+            {
+                AddInheritedAttribute(AttrOrVar(ToUtf32("ParsingContext*"), ToUtf32("ctx")));
+                SetValueTypeName(ToUtf32("InitializerListNode*"));
+                AddLocalVariable(AttrOrVar(ToUtf32("UniquePtr<InitializerListNode>"), ToUtf32("node")));
+            }
+            public override void Enter(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
+            {
+                parsingData->PushContext(Id(), new Context());
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                UniquePtr<Object> ctx_value = stack.Pop();
+                context->ctx = *cast<ValueObject<ParsingContext*>*>(ctx_value.Get());
+            }
+            public override void Leave(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                if (matched)
+                {
+                    stack.Push(UniquePtr<Object>(new ValueObject<InitializerListNode*>(context->value)));
+                }
+                parsingData->PopContext(Id());
+            }
+            public override void Link()
+            {
+                ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
+                a0ActionParser->SetAction(A0Action);
+                ActionParser* a1ActionParser = GetAction(ToUtf32("A1"));
+                a1ActionParser->SetAction(A1Action);
+                ActionParser* a2ActionParser = GetAction(ToUtf32("A2"));
+                a2ActionParser->SetAction(A2Action);
+                ActionParser* a3ActionParser = GetAction(ToUtf32("A3"));
+                a3ActionParser->SetAction(A3Action);
+                NonterminalParser* ic1NonterminalParser = GetNonterminal(ToUtf32("ic1"));
+                ic1NonterminalParser->SetPre(Preic1);
+                ic1NonterminalParser->SetPost(Postic1);
+                NonterminalParser* ic2NonterminalParser = GetNonterminal(ToUtf32("ic2"));
+                ic2NonterminalParser->SetPre(Preic2);
+                ic2NonterminalParser->SetPost(Postic2);
+            }
+            public void A0Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                context->node.Reset(new InitializerListNode(span));
+            }
+            public void A1Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                context->value = context->node.Release();
+            }
+            public void A2Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                context->node->AddNode(context->fromic1);
+            }
+            public void A3Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                context->node->AddNode(context->fromic2);
+            }
+            public void Preic1(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                stack.Push(UniquePtr<Object>(new ValueObject<ParsingContext*>(context->ctx)));
+            }
+            public void Postic1(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                if (matched)
+                {
+                    UniquePtr<Object> fromic1_value = stack.Pop();
+                    context->fromic1 = *cast<ValueObject<Node*>*>(fromic1_value.Get());
+                }
+            }
+            public void Preic2(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                stack.Push(UniquePtr<Object>(new ValueObject<ParsingContext*>(context->ctx)));
+            }
+            public void Postic2(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                if (matched)
+                {
+                    UniquePtr<Object> fromic2_value = stack.Pop();
+                    context->fromic2 = *cast<ValueObject<Node*>*>(fromic2_value.Get());
+                }
+            }
+            public class Context : System.Text.Parsing.Context
+            {
+                public Context() : ctx(), value(), node(), fromic1(), fromic2()
+                {
+                }
+                public ParsingContext* ctx;
+                public InitializerListNode* value;
+                public UniquePtr<InitializerListNode> node;
+                public Node* fromic1;
+                public Node* fromic2;
+            }
+        }
+
+        public override void GetReferencedGrammars()
+        {
+            ParsingDomain* pd = Domain();
+            Grammar* grammar0 = pd->GetGrammar(ToUtf32("cppparser.FunctionGrammar"));
+            if (grammar0 == null)
+            {
+                grammar0 = new cppparser.FunctionGrammar(pd);
+            }
+            AddGrammarReference(grammar0);
+            Grammar* grammar1 = pd->GetGrammar(ToUtf32("cppparser.IdentifierGrammar"));
+            if (grammar1 == null)
+            {
+                grammar1 = new cppparser.IdentifierGrammar(pd);
+            }
+            AddGrammarReference(grammar1);
+            Grammar* grammar2 = pd->GetGrammar(ToUtf32("cppparser.ExpressionGrammar"));
+            if (grammar2 == null)
+            {
+                grammar2 = new cppparser.ExpressionGrammar(pd);
+            }
+            AddGrammarReference(grammar2);
+            Grammar* grammar3 = pd->GetGrammar(ToUtf32("cppparser.TypeExprGrammar"));
+            if (grammar3 == null)
+            {
+                grammar3 = new cppparser.TypeExprGrammar(pd);
+            }
+            AddGrammarReference(grammar3);
+        }
+        public override void CreateRules()
+        {
+            AddRuleLink(new System.Text.Parsing.RuleLink(ToUtf32("Identifier"), this, ToUtf32("IdentifierGrammar.Identifier")));
+            AddRuleLink(new System.Text.Parsing.RuleLink(ToUtf32("NestedNameSpecifier"), this, ToUtf32("IdentifierGrammar.NestedNameSpecifier")));
+            AddRuleLink(new System.Text.Parsing.RuleLink(ToUtf32("IdExpression"), this, ToUtf32("ExpressionGrammar.IdExpression")));
+            AddRuleLink(new System.Text.Parsing.RuleLink(ToUtf32("ConstantExpression"), this, ToUtf32("ExpressionGrammar.ConstantExpression")));
+            AddRuleLink(new System.Text.Parsing.RuleLink(ToUtf32("ExpressionList"), this, ToUtf32("ExpressionGrammar.ExpressionList")));
+            AddRuleLink(new System.Text.Parsing.RuleLink(ToUtf32("AssignmentExpression"), this, ToUtf32("ExpressionGrammar.AssignmentExpression")));
+            AddRuleLink(new System.Text.Parsing.RuleLink(ToUtf32("ParameterList"), this, ToUtf32("FunctionGrammar.ParameterList")));
+            AddRuleLink(new System.Text.Parsing.RuleLink(ToUtf32("CVSpecifierSequence"), this, ToUtf32("TypeExprGrammar.CVSpecifierSequence")));
+            AddRule(new InitDeclaratorRule(ToUtf32("InitDeclarator"), GetScope(), Domain()->GetNextRuleId(),
+                new System.Text.Parsing.SequenceParser(
+                    new System.Text.Parsing.ActionParser(ToUtf32("A0"),
+                        new System.Text.Parsing.NonterminalParser(ToUtf32("Declarator"), ToUtf32("Declarator"), 1)),
+                    new System.Text.Parsing.GroupingParser(
+                        new System.Text.Parsing.AlternativeParser(
+                            new System.Text.Parsing.ActionParser(ToUtf32("A1"),
+                                new System.Text.Parsing.NonterminalParser(ToUtf32("Initializer"), ToUtf32("Initializer"), 1)),
+                            new System.Text.Parsing.EmptyParser())))));
+            AddRule(new DeclaratorRule(ToUtf32("Declarator"), GetScope(), Domain()->GetNextRuleId(),
+                new System.Text.Parsing.ActionParser(ToUtf32("A0"),
+                    new System.Text.Parsing.GroupingParser(
+                        new System.Text.Parsing.SequenceParser(
+                            new System.Text.Parsing.GroupingParser(
+                                new System.Text.Parsing.AlternativeParser(
+                                    new System.Text.Parsing.AlternativeParser(
+                                        new System.Text.Parsing.ActionParser(ToUtf32("A1"),
+                                            new System.Text.Parsing.NonterminalParser(ToUtf32("IdExpression"), ToUtf32("IdExpression"), 1)),
+                                        new System.Text.Parsing.ActionParser(ToUtf32("A2"),
+                                            new System.Text.Parsing.GroupingParser(
+                                                new System.Text.Parsing.SequenceParser(
+                                                    new System.Text.Parsing.SequenceParser(
+                                                        new System.Text.Parsing.SequenceParser(
+                                                            new System.Text.Parsing.CharParser('('),
+                                                            new System.Text.Parsing.CharParser('*')),
+                                                        new System.Text.Parsing.NonterminalParser(ToUtf32("i1"), ToUtf32("Identifier"), 0)),
+                                                    new System.Text.Parsing.CharParser(')'))))),
+                                    new System.Text.Parsing.ActionParser(ToUtf32("A3"),
+                                        new System.Text.Parsing.GroupingParser(
+                                            new System.Text.Parsing.SequenceParser(
+                                                new System.Text.Parsing.SequenceParser(
+                                                    new System.Text.Parsing.SequenceParser(
+                                                        new System.Text.Parsing.SequenceParser(
+                                                            new System.Text.Parsing.CharParser('('),
+                                                            new System.Text.Parsing.NonterminalParser(ToUtf32("nns"), ToUtf32("NestedNameSpecifier"), 1)),
+                                                        new System.Text.Parsing.CharParser('*')),
+                                                    new System.Text.Parsing.NonterminalParser(ToUtf32("i2"), ToUtf32("Identifier"), 0)),
+                                                new System.Text.Parsing.CharParser(')')))))),
+                            new System.Text.Parsing.KleeneStarParser(
+                                new System.Text.Parsing.GroupingParser(
+                                    new System.Text.Parsing.AlternativeParser(
+                                        new System.Text.Parsing.SequenceParser(
+                                            new System.Text.Parsing.SequenceParser(
+                                                new System.Text.Parsing.ActionParser(ToUtf32("A4"),
+                                                    new System.Text.Parsing.EmptyParser()),
+                                                new System.Text.Parsing.NonterminalParser(ToUtf32("ParameterList"), ToUtf32("ParameterList"), 1)),
+                                            new System.Text.Parsing.ActionParser(ToUtf32("A5"),
+                                                new System.Text.Parsing.NonterminalParser(ToUtf32("CVSpecifierSequence"), ToUtf32("CVSpecifierSequence"), 0))),
+                                        new System.Text.Parsing.ActionParser(ToUtf32("A6"),
+                                            new System.Text.Parsing.GroupingParser(
+                                                new System.Text.Parsing.SequenceParser(
+                                                    new System.Text.Parsing.SequenceParser(
+                                                        new System.Text.Parsing.CharParser('['),
+                                                        new System.Text.Parsing.OptionalParser(
+                                                            new System.Text.Parsing.NonterminalParser(ToUtf32("size"), ToUtf32("ConstantExpression"), 1))),
+                                                    new System.Text.Parsing.ExpectationParser(
+                                                        new System.Text.Parsing.CharParser(']')))))))))))));
+            AddRule(new InitializerRule(ToUtf32("Initializer"), GetScope(), Domain()->GetNextRuleId(),
+                new System.Text.Parsing.AlternativeParser(
+                    new System.Text.Parsing.AlternativeParser(
+                        new System.Text.Parsing.ActionParser(ToUtf32("A0"),
+                            new System.Text.Parsing.GroupingParser(
+                                new System.Text.Parsing.SequenceParser(
+                                    new System.Text.Parsing.CharParser('='),
+                                    new System.Text.Parsing.NonterminalParser(ToUtf32("InitializerClause"), ToUtf32("InitializerClause"), 1)))),
+                        new System.Text.Parsing.SequenceParser(
+                            new System.Text.Parsing.SequenceParser(
+                                new System.Text.Parsing.CharParser('('),
+                                new System.Text.Parsing.NonterminalParser(ToUtf32("ExpressionList"), ToUtf32("ExpressionList"), 1)),
+                            new System.Text.Parsing.ActionParser(ToUtf32("A1"),
+                                new System.Text.Parsing.CharParser(')')))),
+                    new System.Text.Parsing.ActionParser(ToUtf32("A2"),
+                        new System.Text.Parsing.NonterminalParser(ToUtf32("BracedInitializerList"), ToUtf32("BracedInitializerList"), 1)))));
+            AddRule(new BraceOrEqualInitializerRule(ToUtf32("BraceOrEqualInitializer"), GetScope(), Domain()->GetNextRuleId(),
+                new System.Text.Parsing.AlternativeParser(
+                    new System.Text.Parsing.ActionParser(ToUtf32("A0"),
+                        new System.Text.Parsing.GroupingParser(
+                            new System.Text.Parsing.SequenceParser(
+                                new System.Text.Parsing.CharParser('='),
+                                new System.Text.Parsing.NonterminalParser(ToUtf32("InitializerClause"), ToUtf32("InitializerClause"), 1)))),
+                    new System.Text.Parsing.ActionParser(ToUtf32("A1"),
+                        new System.Text.Parsing.NonterminalParser(ToUtf32("BracedInitializerList"), ToUtf32("BracedInitializerList"), 1)))));
+            AddRule(new BracedInitializerListRule(ToUtf32("BracedInitializerList"), GetScope(), Domain()->GetNextRuleId(),
+                new System.Text.Parsing.ActionParser(ToUtf32("A0"),
+                    new System.Text.Parsing.GroupingParser(
+                        new System.Text.Parsing.SequenceParser(
+                            new System.Text.Parsing.SequenceParser(
+                                new System.Text.Parsing.ActionParser(ToUtf32("A1"),
+                                    new System.Text.Parsing.CharParser('{')),
+                                new System.Text.Parsing.OptionalParser(
+                                    new System.Text.Parsing.GroupingParser(
+                                        new System.Text.Parsing.SequenceParser(
+                                            new System.Text.Parsing.ActionParser(ToUtf32("A2"),
+                                                new System.Text.Parsing.NonterminalParser(ToUtf32("ic1"), ToUtf32("InitializerClause"), 1)),
+                                            new System.Text.Parsing.KleeneStarParser(
+                                                new System.Text.Parsing.GroupingParser(
+                                                    new System.Text.Parsing.SequenceParser(
+                                                        new System.Text.Parsing.CharParser(','),
+                                                        new System.Text.Parsing.ActionParser(ToUtf32("A3"),
+                                                            new System.Text.Parsing.NonterminalParser(ToUtf32("ic2"), ToUtf32("InitializerClause"), 1))))))))),
+                            new System.Text.Parsing.CharParser('}'))))));
+            AddRule(new InitializerClauseRule(ToUtf32("InitializerClause"), GetScope(), Domain()->GetNextRuleId(),
+                new System.Text.Parsing.AlternativeParser(
+                    new System.Text.Parsing.ActionParser(ToUtf32("A0"),
+                        new System.Text.Parsing.NonterminalParser(ToUtf32("AssignmentExpression"), ToUtf32("AssignmentExpression"), 1)),
+                    new System.Text.Parsing.ActionParser(ToUtf32("A1"),
+                        new System.Text.Parsing.NonterminalParser(ToUtf32("BracedInitializerList"), ToUtf32("BracedInitializerList"), 1)))));
+            AddRule(new InitializerListRule(ToUtf32("InitializerList"), GetScope(), Domain()->GetNextRuleId(),
+                new System.Text.Parsing.SequenceParser(
+                    new System.Text.Parsing.ActionParser(ToUtf32("A0"),
+                        new System.Text.Parsing.EmptyParser()),
+                    new System.Text.Parsing.ActionParser(ToUtf32("A1"),
+                        new System.Text.Parsing.GroupingParser(
+                            new System.Text.Parsing.SequenceParser(
+                                new System.Text.Parsing.ActionParser(ToUtf32("A2"),
+                                    new System.Text.Parsing.NonterminalParser(ToUtf32("ic1"), ToUtf32("InitializerClause"), 1)),
+                                new System.Text.Parsing.KleeneStarParser(
+                                    new System.Text.Parsing.GroupingParser(
+                                        new System.Text.Parsing.SequenceParser(
+                                            new System.Text.Parsing.CharParser(','),
+                                            new System.Text.Parsing.ActionParser(ToUtf32("A3"),
+                                                new System.Text.Parsing.NonterminalParser(ToUtf32("ic2"), ToUtf32("InitializerClause"), 1)))))))))));
+        }
+    }
+} // cppparser

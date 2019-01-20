@@ -1,0 +1,138 @@
+using System;
+using System.IO;
+using System.IO.Compression;
+
+void PrintHelp()
+{
+    Console.Out() <<
+        "Usage: bz2 [options] <input-file> <output-file>" << endl() <<
+        "options:" << endl() <<
+        "--help (-h)" << endl() <<
+        "   Print this help." << endl() <<
+        "--verbose (-v)" << endl() <<
+        "   Be verbose." << endl() <<
+        "--compress (-c)" << endl() <<
+        "   Compress <input-file> to <output-file>." << endl() <<
+        "   (default)" << endl() <<
+        "--extract (-x)" << endl() <<
+        "   Extract <input-file> to <output-file>." << endl()
+    ;
+}
+
+public enum Mode
+{
+    compress, extract
+}
+
+int main(int argc, const char** argv)
+{
+    try
+    {
+        string inputFile;
+        string outputFile;
+        int argCount = 0;
+        Mode mode = Mode.compress;
+        bool verbose = false;
+        for (int i = 1; i < argc; ++i)
+        {
+            string arg = argv[i];
+            if (arg.StartsWith("-"))
+            {
+                if (arg == "--help" || arg == "-h")
+                {
+                    PrintHelp();
+                    return 0;
+                }
+                else if (arg == "--verbose" || arg == "-v")
+                {
+                    verbose = true;
+                }
+                else if (arg == "--compress" || arg == "-c")
+                {
+                    mode = Mode.compress;
+                }
+                else if (arg == "--extract" || arg == "-x")
+                {
+                    mode = Mode.extract;
+                }
+                else
+                {
+                    throw Exception("unknown argument '" + arg + "'");
+                }
+            }
+            else
+            {
+                switch (argCount)
+                {
+                    case 0:
+                    {
+                        inputFile = arg;
+                        ++argCount;
+                        break;
+                    }
+                    case 1:
+                    {
+                        outputFile = arg;
+                        ++argCount;
+                        break;
+                    }
+                    default:
+                    {
+                        ++argCount;
+                        break;
+                    }
+                }
+            }
+        }
+        if (argCount < 2)
+        {
+            throw Exception("missing arguments (try --help)");
+        }
+        else if (argCount > 2)
+        {
+            throw Exception("extra arguments (try --help)");
+        }
+        if (verbose)
+        {
+            if (mode == Mode.compress)
+            {
+                Console.Out() << "compressing '" << inputFile << "' to '" << outputFile << "'..." << endl();
+            }
+            else if (mode == Mode.extract)
+            {
+                Console.Out() << "extracting '" << inputFile << "' to '" << outputFile << "'..." << endl();
+            }
+        }
+        if (mode == Mode.compress)
+        {
+            FileByteStream in(inputFile, cast<OpenMode>(OpenMode.read | OpenMode.binary));
+            SharedPtr<ByteStream> out(new FileByteStream(outputFile, cast<OpenMode>(OpenMode.write | OpenMode.binary)));
+            BZip2Stream compressStream(out, CompressionMode.compress);
+            in.CopyTo(compressStream);
+        }
+        else if (mode == Mode.extract)
+        {
+            SharedPtr<ByteStream> in(new FileByteStream(inputFile, cast<OpenMode>(OpenMode.read | OpenMode.binary)));
+            BZip2Stream extractStream(in, CompressionMode.decompress);
+            FileByteStream out(outputFile, cast<OpenMode>(OpenMode.write | OpenMode.binary));
+            extractStream.CopyTo(out);
+        }
+        if (verbose)
+        {
+            if (mode == Mode.compress)
+            {
+                Console.Out() << "compressed." << endl();
+            }
+            else if (mode == Mode.extract)
+            {
+                Console.Out() << "extracted." << endl();
+            }
+        }
+    }
+    catch (const Exception& ex)
+    {
+        Console.Error() << ex.Message() << endl();
+        return 1;
+    }
+    return 0;
+}

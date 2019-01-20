@@ -1,0 +1,44 @@
+﻿using devcore;
+
+namespace parser
+{
+    grammar JsonGrammar
+    {
+        using stdlib;
+        extern spaces;
+        extern escape: char;
+        extern number: double;
+
+        skip spaces;
+     
+        Value : JsonValue
+            ::= String{ value = String; }
+            |   Number{ value = Number; }
+            |   Object{ value = Object; }
+            |   Array{ value = Array; }
+            |   keyword("true"){ value = new JsonBool(true); }
+            |   keyword("false"){ value = new JsonBool(false); }
+            |   keyword("null"){ value = new JsonNull(); }
+            ;
+            
+        Object : JsonObject
+            ::= '{'{ value = new JsonObject(); } ((String:name ':' Value:val){ value.AddField(name.Value, val); } % ',')? '}'
+            ;
+            
+        Array : JsonArray
+            ::= '['{ value = new JsonArray(); } (Value:item{ value.AddItem(item); } % ',')? ']'
+            ;
+            
+        String : JsonString
+            ::= token('"'{ value = new JsonString(); } 
+            (   [^"\\]{ value.Append(match[0]); }
+            |   "\\u" (hexdigit hexdigit hexdigit hexdigit){ value.Append(char.ConvertFromUtf32(Convert.ToInt32(match, 16))); }
+            |   escape{ value.Append(escape); } 
+            )* '"')
+            ;
+            
+        Number : JsonNumber
+            ::= number{ value = new JsonNumber(number); }
+            ;
+    }
+}

@@ -1,0 +1,61 @@
+<html>
+ <head>
+  <meta charset="utf-8"/>
+  <title>JsonGrammar Grammar</title>
+  <link href="../../../style/style.css" rel="stylesheet" type="text/css"/>
+ </head>
+ <body>
+  <h1>JsonGrammar Grammar</h1>
+  <table class="grammar">
+   <tr id="rule_Value_955958ED0BD8C37C6D487A72411480061DAEDE19">
+    <td class="grammarFirstCol">
+     <span class="rule">Value</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#rule_String_AFED27C9C3CCDBADC12BC430FB87C95904D9495E">String</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#rule_Number_107285998C66DF07030DC7ADC37A5BD921B28855">Number</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#rule_Object_89851950BAC219DE0F1D49F91A6CB9F1EBD0CAB7">Object</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#rule_Array_A72B8C2250CC4A5DAC4AE30948929F749115BE15">Array</a></span><span class="ruleOp"> | </span><span class="ruleKeyword">keyword</span><span class="ruleString">("true")</span><span class="ruleOp"> | </span><span class="ruleKeyword">keyword</span><span class="ruleString">("false")</span><span class="ruleOp"> | </span><span class="ruleKeyword">keyword</span><span class="ruleString">("null")</span></td>
+   </tr>
+   <tr id="rule_Object_89851950BAC219DE0F1D49F91A6CB9F1EBD0CAB7">
+    <td class="grammarFirstCol">
+     <span class="rule">Object</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleChar">'{'</span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#rule_Field_35315287B5CBBA00009A7958D6A0E16FE3364A66">Field</a></span><span class="ruleOp"> % </span><span class="ruleChar">','</span><span class="ruleOp">)</span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleChar">'}'</span></td>
+   </tr>
+   <tr id="rule_Field_35315287B5CBBA00009A7958D6A0E16FE3364A66">
+    <td class="grammarFirstCol">
+     <span class="rule">Field</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#rule_String_AFED27C9C3CCDBADC12BC430FB87C95904D9495E">String</a></span><span class="ruleOp"> </span><span class="ruleChar">':'</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_Value_955958ED0BD8C37C6D487A72411480061DAEDE19">Value</a></span><span class="ruleOp">)</span></td>
+   </tr>
+   <tr id="rule_Array_A72B8C2250CC4A5DAC4AE30948929F749115BE15">
+    <td class="grammarFirstCol">
+     <span class="rule">Array</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleChar">'['</span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#rule_Value_955958ED0BD8C37C6D487A72411480061DAEDE19">Value</a></span><span class="ruleOp"> % </span><span class="ruleChar">','</span><span class="ruleOp">)</span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleChar">']'</span></td>
+   </tr>
+   <tr id="rule_String_AFED27C9C3CCDBADC12BC430FB87C95904D9495E">
+    <td class="grammarFirstCol">
+     <span class="rule">String</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleKeyword">token</span><span class="ruleOp">(</span><span class="ruleChar">'\"'</span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleCharSet">[^\"\\]</span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#rule_Escape_AFB502C8869E9F09D174180EE70A74634C804B61">Escape</a></span><span class="ruleOp">)</span><span class="ruleOp">*</span><span class="ruleOp"> </span><span class="ruleChar">'\"'</span><span class="ruleOp">)</span></td>
+   </tr>
+   <tr id="rule_Escape_AFB502C8869E9F09D174180EE70A74634C804B61">
+    <td class="grammarFirstCol">
+     <span class="rule">Escape</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleKeyword">token</span><span class="ruleOp">(</span><span class="ruleChar">'\\'</span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleChar">'\"'</span><span class="ruleOp"> | </span><span class="ruleChar">'\\'</span><span class="ruleOp"> | </span><span class="ruleChar">'/'</span><span class="ruleOp"> | </span><span class="ruleChar">'b'</span><span class="ruleOp"> | </span><span class="ruleChar">'f'</span><span class="ruleOp"> | </span><span class="ruleChar">'n'</span><span class="ruleOp"> | </span><span class="ruleChar">'r'</span><span class="ruleOp"> | </span><span class="ruleChar">'t'</span><span class="ruleOp"> | </span><span class="ruleChar">'u'</span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleKeyword">hexdigit</span><span class="ruleOp"> </span><span class="ruleKeyword">hexdigit</span><span class="ruleOp"> </span><span class="ruleKeyword">hexdigit</span><span class="ruleOp"> </span><span class="ruleKeyword">hexdigit</span><span class="ruleOp">)</span><span class="ruleOp">)</span><span class="ruleOp">)</span></td>
+   </tr>
+   <tr id="rule_Number_107285998C66DF07030DC7ADC37A5BD921B28855">
+    <td class="grammarFirstCol">
+     <span class="rule">Number</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleKeyword">token</span><span class="ruleOp">(</span><span class="ruleChar">'-'</span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleKeyword">digit</span><span class="ruleOp">+</span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleChar">'.'</span><span class="ruleOp"> </span><span class="ruleKeyword">digit</span><span class="ruleOp">+</span><span class="ruleOp">)</span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleCharSet">[eE]</span><span class="ruleOp"> </span><span class="ruleCharSet">[+-]</span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleKeyword">digit</span><span class="ruleOp">+</span><span class="ruleOp">)</span><span class="ruleOp">?</span><span class="ruleOp">)</span></td>
+   </tr>
+  </table>
+ </body>
+</html>

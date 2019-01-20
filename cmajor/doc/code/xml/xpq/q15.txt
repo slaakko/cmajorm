@@ -1,0 +1,78 @@
+<xpath>
+  <query>
+    <combineStep>
+      <root/>
+      <combineStep>
+        <locationStep>
+          <axis name="descendant-or-self"/>
+          <nodeTest>
+            <anyNodeTest/>
+          </nodeTest>
+          <predicates/>
+        </locationStep>
+        <combineStep>
+          <combineStep>
+            <locationStep>
+              <axis name="child"/>
+              <nodeTest>
+                <nameTest name="parameter"/>
+              </nodeTest>
+              <predicates/>
+            </locationStep>
+            <locationStep>
+              <axis name="child"/>
+              <nodeTest>
+                <nameTest name="type"/>
+              </nodeTest>
+              <predicates>
+                <equal>
+                  <locationStep>
+                    <axis name="attribute"/>
+                    <nodeTest>
+                      <nameTest name="ref"/>
+                    </nodeTest>
+                    <predicates/>
+                  </locationStep>
+                  <literal value="type.5822889"/>
+                </equal>
+              </predicates>
+            </locationStep>
+          </combineStep>
+          <locationStep>
+            <axis name="parent"/>
+            <nodeTest>
+              <anyNodeTest/>
+            </nodeTest>
+            <predicates/>
+          </locationStep>
+        </combineStep>
+      </combineStep>
+    </combineStep>
+  </query>
+  <result>
+    <nodeSet length="3">
+      <element>
+        <parameter>
+          <name>value_</name>
+          <type ref="type.5822889"/>
+        </parameter>
+      </element>
+      <element>
+        <parameter>
+          <name>value_</name>
+          <type ref="type.5822889"/>
+        </parameter>
+      </element>
+      <element>
+        <parameter>
+          <name>value</name>
+          <type ref="type.5822889"/>
+        </parameter>
+      </element>
+    </nodeSet>
+  </result>
+</xpath>
+parsing XML took 1669 ms
+parsing XPath query took 1 ms
+evaluating XPath query took 2385 ms
+total duration: 4084 ms

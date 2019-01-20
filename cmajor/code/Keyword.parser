@@ -1,0 +1,31 @@
+﻿// =================================
+// Copyright (c) 2019 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+namespace cmajor.code
+{
+    grammar Keyword
+    {
+        using stdlib.identifier;
+        
+        Keyword  ::=    keyword_list(identifier,
+                        [   "alignas", "continue", "friend", "register", "true",
+                            "alignof", "decltype", "goto", "reinterpret_cast", "try",
+                            "asm", "default", "if", "return", "typedef",
+                            "auto", "delete", "inline", "short", "typeid",
+                            "bool", "double", "int", "signed", "typename",
+                            "break", "do", "long", "sizeof", "union",
+                            "case", "dynamic_cast", "mutable", "static", "unsigned",
+                            "catch", "else", "namespace", "static_assert", "using",
+                            "char", "enum", "new", "static_cast", "virtual",
+                            "explicit", "noexcept", "struct", "void",
+                            "export", "nullptr", "switch", "volatile",
+                            "class", "extern", "operator", "template", "wchar_t",
+                            "const", "false", "private", "this", "while",
+                            "constexpr", "float", "protected", "thread_local",
+                            "const_cast", "for", "public", "throw"
+                        ])
+                    ;
+    }
+}

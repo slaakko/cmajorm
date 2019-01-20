@@ -1,0 +1,73 @@
+using System;
+
+namespace Syntax
+{
+    public class Flags
+    {
+        static Flags() : instance(new Flags())
+        {
+        }
+        public static Flags& Instance() 
+        {
+            return *instance;
+        }
+        private Flags() : forceCodeGen(false), verbose(false), debugProject(false), debugLibrary(false), debugParse(false), numThreads(0)
+        {
+        }
+        public nothrow inline bool ForceCodeGen() const
+        {
+            return forceCodeGen;
+        }
+        public nothrow inline void SetForceCodeGen()
+        {
+            forceCodeGen = true;
+        }
+        public nothrow inline bool Verbose() const
+        {
+            return verbose;
+        }
+        public nothrow inline void SetVerbose()
+        {
+            verbose = true;
+        }
+        public nothrow inline bool DebugProject() const
+        {
+            return debugProject;
+        }
+        public nothrow inline void SetDebugProject()
+        {
+            debugProject = true;
+        }
+        public nothrow inline bool DebugLibrary() const
+        {
+            return debugLibrary;
+        }
+        public nothrow inline void SetDebugLibrary()
+        {
+            debugLibrary = true;
+        }
+        public nothrow inline bool DebugParse() const
+        {
+            return debugParse;
+        }
+        public nothrow inline void SetDebugParse()
+        {
+            debugParse = true;
+        }
+        public nothrow inline int NumThreads() const
+        {
+            return numThreads;
+        }
+        public nothrow inline void SetNumThreads(int numThreads_)
+        {
+            numThreads = numThreads_;
+        }
+        private static UniquePtr<Flags> instance;
+        private bool forceCodeGen;
+        private bool verbose;
+        private bool debugProject;
+        private bool debugLibrary;
+        private bool debugParse;
+        private int numThreads;
+    }
+}

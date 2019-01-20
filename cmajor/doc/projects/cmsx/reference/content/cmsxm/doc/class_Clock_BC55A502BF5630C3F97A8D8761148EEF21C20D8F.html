@@ -1,0 +1,120 @@
+<html>
+ <head>
+  <meta charset="utf-8"/>
+  <title>Clock Class</title>
+  <link href="../../../style/style.css" rel="stylesheet" type="text/css"/>
+ </head>
+ <body>
+  <h1>Clock Class</h1>
+  <h2>Definition</h2>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxm/file/Clock.cm.html#19">19</a>&nbsp;of&nbsp;<a href="../../cmsxm/file/Clock.cm.html">cmsxm/Clock.cm</a></span>
+  <h2>Constructors &amp; Destructor</h2>
+  <table>
+   <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">static</span></td>
+    <td xml:space="preserve"><a href="../../cmsxm/doc/class_Clock_BC55A502BF5630C3F97A8D8761148EEF21C20D8F.html#static_constructor_Clock_E51702C8DB2E8B2672EE5DF7F58D53DAA3C32A54">Clock</a>()</td>
+   </tr>
+   <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">private</span></td>
+    <td xml:space="preserve"><a href="../../cmsxm/doc/class_Clock_BC55A502BF5630C3F97A8D8761148EEF21C20D8F.html#default_constructor_Clock_624D0B641D2A924A54A92323917426A5F6E28C98">Clock</a>()</td>
+   </tr>
+  </table>
+  <h2>Member Functions</h2>
+  <table>
+   <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">static</span>&nbsp;<a href="../../cmsxm/doc/class_Clock_BC55A502BF5630C3F97A8D8761148EEF21C20D8F.html">Clock</a>&amp;</td>
+    <td xml:space="preserve"><a href="../../cmsxm/doc/class_Clock_BC55A502BF5630C3F97A8D8761148EEF21C20D8F.html#member_function_Instance_Clock_FB2D24DA9602C1E7131AB4614510605B1A4586E4">Instance</a>()</td>
+   </tr>
+   <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">void</span></td>
+    <td xml:space="preserve"><a href="../../cmsxm/doc/class_Clock_BC55A502BF5630C3F97A8D8761148EEF21C20D8F.html#member_function_Start_Clock_59656F18CC1163418C354633F069E4BB8E5C4110">Start</a>()</td>
+   </tr>
+   <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">void</span></td>
+    <td xml:space="preserve"><a href="../../cmsxm/doc/class_Clock_BC55A502BF5630C3F97A8D8761148EEF21C20D8F.html#member_function_Stop_Clock_380275200D6EB89BAE70C4929E7DA7FB8645BF81">Stop</a>()</td>
+   </tr>
+   <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">private</span>&nbsp;<span class="kw">void</span></td>
+    <td xml:space="preserve"><a href="../../cmsxm/doc/class_Clock_BC55A502BF5630C3F97A8D8761148EEF21C20D8F.html#member_function_Tick_Clock_FD687E6CF202BDB1FF6FC14F3C0A2E9CAED704F8">Tick</a>()</td>
+   </tr>
+  </table>
+  <h2>Constants</h2>
+  <table>
+   <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">long</span>&nbsp;tick</td>
+    <td xml:space="preserve">50</td>
+   </tr>
+  </table>
+  <h2>Member Variables</h2>
+  <table>
+   <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">private</span>&nbsp;<span class="kw">static</span>&nbsp;<a href="../../../../../../system/content/System.Base/doc/class_UniquePtr_T_793F841C13E9DD3A6869243C74F1D948C0E04009.html">UniquePtr</a>&lt;<a href="../../cmsxm/doc/class_Clock_BC55A502BF5630C3F97A8D8761148EEF21C20D8F.html">Clock</a>></td>
+    <td xml:space="preserve">instance</td>
+   </tr>
+   <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">private</span>&nbsp;<a href="../../cmsxm/doc/class_Machine_F7663CCABD183952965566D1944B82FAFEDE0822.html">Machine</a>&amp;</td>
+    <td xml:space="preserve">machine</td>
+   </tr>
+   <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">private</span>&nbsp;<a href="../../../../../../system/content/System.Base/doc/class_RecursiveMutex_B9ED5479754BBDDED6A4491348BBD2F20F701D82.html">RecursiveMutex</a></td>
+    <td xml:space="preserve">mtx</td>
+   </tr>
+   <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">private</span>&nbsp;<a href="../../../../../../system/content/System.Base/doc/class_ConditionVariable_019A80625043CF98EC88D8F55238C84CFD4A9C26.html">ConditionVariable</a></td>
+    <td xml:space="preserve">stop</td>
+   </tr>
+   <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">private</span>&nbsp;<span class="kw">bool</span></td>
+    <td xml:space="preserve">stopping</td>
+   </tr>
+   <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">private</span>&nbsp;<a href="../../../../../../system/content/System.Base/doc/class_Thread_805238682CDC09B4D1BB5C11ACA935F47C73BA4F.html">Thread</a></td>
+    <td xml:space="preserve">thread</td>
+   </tr>
+  </table>
+  <h2>Constructor&amp; Destructor Details</h2>
+  <h3 id="static_constructor_Clock_E51702C8DB2E8B2672EE5DF7F58D53DAA3C32A54" xml:space="preserve">Clock&nbsp;Static Constructor</h3>
+  <h4 xml:space="preserve"><span class="kw">static</span>&nbsp;Clock()</h4>
+  <h5>Definition</h5>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxm/file/Clock.cm.html#23">23</a>&nbsp;of&nbsp;<a href="../../cmsxm/file/Clock.cm.html">cmsxm/Clock.cm</a></span>
+  <br/>
+  <br/>
+  <hr/>
+  <h3 id="default_constructor_Clock_624D0B641D2A924A54A92323917426A5F6E28C98" xml:space="preserve">Clock&nbsp;Constructor</h3>
+  <h4 xml:space="preserve"><span class="kw">private</span>&nbsp;Clock()</h4>
+  <h5>Definition</h5>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxm/file/Clock.cm.html#30">30</a>&nbsp;of&nbsp;<a href="../../cmsxm/file/Clock.cm.html">cmsxm/Clock.cm</a></span>
+  <br/>
+  <br/>
+  <hr/>
+  <h2>Member Function Details</h2>
+  <h3 id="member_function_Instance_Clock_FB2D24DA9602C1E7131AB4614510605B1A4586E4" xml:space="preserve">Instance&nbsp;Static Member Function</h3>
+  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">static</span>&nbsp;<a href="../../cmsxm/doc/class_Clock_BC55A502BF5630C3F97A8D8761148EEF21C20D8F.html">Clock</a>&amp;&nbsp;Instance()</h4>
+  <h5>Definition</h5>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxm/file/Clock.cm.html#26">26</a>&nbsp;of&nbsp;<a href="../../cmsxm/file/Clock.cm.html">cmsxm/Clock.cm</a></span>
+  <br/>
+  <br/>
+  <hr/>
+  <h3 id="member_function_Start_Clock_59656F18CC1163418C354633F069E4BB8E5C4110" xml:space="preserve">Start&nbsp;Member Function</h3>
+  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">void</span>&nbsp;Start()</h4>
+  <h5>Definition</h5>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxm/file/Clock.cm.html#33">33</a>&nbsp;of&nbsp;<a href="../../cmsxm/file/Clock.cm.html">cmsxm/Clock.cm</a></span>
+  <br/>
+  <br/>
+  <hr/>
+  <h3 id="member_function_Stop_Clock_380275200D6EB89BAE70C4929E7DA7FB8645BF81" xml:space="preserve">Stop&nbsp;Member Function</h3>
+  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">void</span>&nbsp;Stop()</h4>
+  <h5>Definition</h5>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxm/file/Clock.cm.html#38">38</a>&nbsp;of&nbsp;<a href="../../cmsxm/file/Clock.cm.html">cmsxm/Clock.cm</a></span>
+  <br/>
+  <br/>
+  <hr/>
+  <h3 id="member_function_Tick_Clock_FD687E6CF202BDB1FF6FC14F3C0A2E9CAED704F8" xml:space="preserve">Tick&nbsp;Member Function</h3>
+  <h4 xml:space="preserve"><span class="kw">private</span>&nbsp;<span class="kw">void</span>&nbsp;Tick()</h4>
+  <h5>Definition</h5>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxm/file/Clock.cm.html#44">44</a>&nbsp;of&nbsp;<a href="../../cmsxm/file/Clock.cm.html">cmsxm/Clock.cm</a></span>
+  <br/>
+  <br/>
+  <hr/>
+ </body>
+</html>

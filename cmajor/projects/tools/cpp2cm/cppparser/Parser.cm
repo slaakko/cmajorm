@@ -1,0 +1,24 @@
+using System;
+
+namespace cppparser
+{
+    public class Parser
+    {
+        static Parser() : instance(new Parser())
+        {
+        }
+        public static Parser& Instance()
+        {
+            return *instance;
+        }
+        public SourceFileGrammar* GetSourceFileGrammar()
+        {
+            return sourceFileGrammar;
+        }
+        private Parser() : sourceFileGrammar(new SourceFileGrammar())
+        {
+        }
+        private static UniquePtr<Parser> instance;
+        private SourceFileGrammar* sourceFileGrammar;
+    }
+}

@@ -1,0 +1,129 @@
+<html>
+ <head>
+  <meta charset="utf-8"/>
+  <title>transferringExceptions/transferringExceptions.cm</title>
+  <link href="../../../style/style.css" rel="stylesheet" type="text/css"/>
+ </head>
+ <body>
+  <span class="code" id="1" xml:space="preserve"><span class="lineNumber">&nbsp;1</span>&nbsp;<span class="kw">using</span>&nbsp;<span class="identifier">System</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="2" xml:space="preserve"><span class="lineNumber">&nbsp;2</span>&nbsp;<span class="kw">using</span>&nbsp;<span class="identifier">System.Threading</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="3" xml:space="preserve"><span class="lineNumber">&nbsp;3</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="4" xml:space="preserve"><span class="lineNumber">&nbsp;4</span>&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../doc/class_FooException_96CA69DE98A85D3C7CBED406DA76CF1F79570F2D.html">FooException</a><span class="other">&nbsp;:&nbsp;</span><a href="../../../../../../system/content/System.Base/doc/class_Exception_02AEA5204AD1035A91C2D843597EACBE078C8989.html">Exception</a></span>
+  <br/>
+  <span class="code" id="5" xml:space="preserve"><span class="lineNumber">&nbsp;5</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="6" xml:space="preserve"><span class="lineNumber">&nbsp;6</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<a href="../doc/class_FooException_96CA69DE98A85D3C7CBED406DA76CF1F79570F2D.html#constructor_FooException_90C2C987F6D0902C6C1CE80D07551B9FAB6BFFD9">FooException</a><span class="other">(</span><span class="kw">const</span>&nbsp;<a href="../../../../../../system/content/System.Base/doc/ns_System.html#typedef_string_B6DB6B2DEFC437FBF697A2E84F7B7771FC1DDEE3">string</a><span class="other">&amp;</span>&nbsp;<span class="identifier">message_</span><span class="other">)</span><span class="other">&nbsp;:&nbsp;</span><span class="kw">base</span><span class="other">(</span><span class="identifier">message_</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="7" xml:space="preserve"><span class="lineNumber">&nbsp;7</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="8" xml:space="preserve"><span class="lineNumber">&nbsp;8</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="9" xml:space="preserve"><span class="lineNumber">&nbsp;9</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="10" xml:space="preserve"><span class="lineNumber">10</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="11" xml:space="preserve"><span class="lineNumber">11</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../index.html#function_foo_00F4173D145260F9C5E75C65C45F2BB7EDCB9B44">foo</a><span class="other">(</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="12" xml:space="preserve"><span class="lineNumber">12</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="13" xml:space="preserve"><span class="lineNumber">13</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">throw</span>&nbsp;<a href="../doc/class_FooException_96CA69DE98A85D3C7CBED406DA76CF1F79570F2D.html#constructor_FooException_90C2C987F6D0902C6C1CE80D07551B9FAB6BFFD9">FooException</a><span class="other">(</span><span class="string">"foo"</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="14" xml:space="preserve"><span class="lineNumber">14</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="15" xml:space="preserve"><span class="lineNumber">15</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="16" xml:space="preserve"><span class="lineNumber">16</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../doc/class_ThreadData_502AF7BFD7B1A97EC51F5CA695B5D9A6AE944149.html">ThreadData</a></span>
+  <br/>
+  <span class="code" id="17" xml:space="preserve"><span class="lineNumber">17</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="18" xml:space="preserve"><span class="lineNumber">18</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/class_ThreadData_502AF7BFD7B1A97EC51F5CA695B5D9A6AE944149.html#member_function_SetCapturedException_ThreadData_856ADD0D477BAEDF90E45CB12D9C87E2AF58C6B0">SetCapturedException</a><span class="other">(</span><span class="kw">const</span>&nbsp;<a href="../../../../../../system/content/System.Base/doc/class_ExceptionPtr_3E313CB08B225E0124692C11F3BF8F26E971600C.html">ExceptionPtr</a><span class="other">&amp;</span>&nbsp;<span class="identifier">exception_</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="19" xml:space="preserve"><span class="lineNumber">19</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="20" xml:space="preserve"><span class="lineNumber">20</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../doc/class_ThreadData_502AF7BFD7B1A97EC51F5CA695B5D9A6AE944149.html#variable_exception_55227FC4490AC02B7BAC7A45058A46D9185B51C2">exception</a><span class="other">&nbsp;=&nbsp;</span><span class="identifier">exception_</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="21" xml:space="preserve"><span class="lineNumber">21</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="22" xml:space="preserve"><span class="lineNumber">22</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<a href="../../../../../../system/content/System.Base/doc/class_ExceptionPtr_3E313CB08B225E0124692C11F3BF8F26E971600C.html">ExceptionPtr</a><span class="other">&amp;</span>&nbsp;<a href="../doc/class_ThreadData_502AF7BFD7B1A97EC51F5CA695B5D9A6AE944149.html#member_function_GetCapturedException_ThreadData_547E0759E0FA45C1433730139EDE48DBF6257C01">GetCapturedException</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span></span>
+  <br/>
+  <span class="code" id="23" xml:space="preserve"><span class="lineNumber">23</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="24" xml:space="preserve"><span class="lineNumber">24</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<a href="../doc/class_ThreadData_502AF7BFD7B1A97EC51F5CA695B5D9A6AE944149.html#variable_exception_55227FC4490AC02B7BAC7A45058A46D9185B51C2">exception</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="25" xml:space="preserve"><span class="lineNumber">25</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="26" xml:space="preserve"><span class="lineNumber">26</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">private</span>&nbsp;<a href="../../../../../../system/content/System.Base/doc/class_ExceptionPtr_3E313CB08B225E0124692C11F3BF8F26E971600C.html">ExceptionPtr</a>&nbsp;<span class="identifier">exception</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="27" xml:space="preserve"><span class="lineNumber">27</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="28" xml:space="preserve"><span class="lineNumber">28</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="29" xml:space="preserve"><span class="lineNumber">29</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../index.html#function_ThreadFunction_F64A6EDF8809568644CCA852DAD8994E2E61AA2B">ThreadFunction</a><span class="other">(</span><span class="kw">void</span><span class="other">*</span>&nbsp;<span class="identifier">arg</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="30" xml:space="preserve"><span class="lineNumber">30</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="31" xml:space="preserve"><span class="lineNumber">31</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../doc/class_ThreadData_502AF7BFD7B1A97EC51F5CA695B5D9A6AE944149.html">ThreadData</a><span class="other">*</span>&nbsp;<span class="identifier">threadData</span><span class="other">&nbsp;=&nbsp;</span><span class="kw">cast</span><span class="other">&lt;</span><a href="../doc/class_ThreadData_502AF7BFD7B1A97EC51F5CA695B5D9A6AE944149.html">ThreadData</a><span class="other">*</span><span class="other">></span><span class="other">(</span><span class="identifier">arg</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="32" xml:space="preserve"><span class="lineNumber">32</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">try</span></span>
+  <br/>
+  <span class="code" id="33" xml:space="preserve"><span class="lineNumber">33</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="34" xml:space="preserve"><span class="lineNumber">34</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../index.html#function_foo_00F4173D145260F9C5E75C65C45F2BB7EDCB9B44">foo</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="35" xml:space="preserve"><span class="lineNumber">35</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="36" xml:space="preserve"><span class="lineNumber">36</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">catch</span>&nbsp;<span class="other">(</span><span class="kw">const</span>&nbsp;<a href="../../../../../../system/content/System.Base/doc/class_Exception_02AEA5204AD1035A91C2D843597EACBE078C8989.html">Exception</a><span class="other">&amp;</span>&nbsp;<span class="identifier">ex</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="37" xml:space="preserve"><span class="lineNumber">37</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="38" xml:space="preserve"><span class="lineNumber">38</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../../../../../system/content/System.Base/doc/class_ExceptionPtr_3E313CB08B225E0124692C11F3BF8F26E971600C.html">ExceptionPtr</a>&nbsp;<span class="identifier">exceptionPtr</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">CaptureCurrentException</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="39" xml:space="preserve"><span class="lineNumber">39</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">threadData</span><span class="other">-></span><span class="identifier">SetCapturedException</span><span class="other">(</span><span class="identifier">exceptionPtr</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="40" xml:space="preserve"><span class="lineNumber">40</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="41" xml:space="preserve"><span class="lineNumber">41</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="42" xml:space="preserve"><span class="lineNumber">42</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="43" xml:space="preserve"><span class="lineNumber">43</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../index.html#function_main_99F3726C50455B4187460FBE611E3885299323E1">main</a><span class="other">(</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="44" xml:space="preserve"><span class="lineNumber">44</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="45" xml:space="preserve"><span class="lineNumber">45</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">try</span></span>
+  <br/>
+  <span class="code" id="46" xml:space="preserve"><span class="lineNumber">46</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="47" xml:space="preserve"><span class="lineNumber">47</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../doc/class_ThreadData_502AF7BFD7B1A97EC51F5CA695B5D9A6AE944149.html">ThreadData</a>&nbsp;<span class="identifier">threadData</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="48" xml:space="preserve"><span class="lineNumber">48</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../../../../../system/content/System.Base/doc/class_Thread_805238682CDC09B4D1BB5C11ACA935F47C73BA4F.html">Thread</a>&nbsp;<span class="identifier">thread</span><span class="other">&nbsp;=&nbsp;</span><a href="../../../../../../system/content/System.Base/doc/class_Thread_805238682CDC09B4D1BB5C11ACA935F47C73BA4F.html">Thread</a><span class="other">.</span><a href="../../../../../../system/content/System.Base/doc/class_Thread_805238682CDC09B4D1BB5C11ACA935F47C73BA4F.html#member_function_StartFunction_Thread_1A1C4769AEF7CF35DCD25E3F8193972EEA5BB99C">StartFunction</a><span class="other">(</span><span class="identifier">ThreadFunction</span><span class="other">,&nbsp;</span><span class="other">&amp;</span><span class="identifier">threadData</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="49" xml:space="preserve"><span class="lineNumber">49</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">thread</span><span class="other">.</span><a href="../../../../../../system/content/System.Base/doc/class_Thread_805238682CDC09B4D1BB5C11ACA935F47C73BA4F.html#member_function_Join_Thread_2321207B993A5A106E72F80F93CBAD2DA409A166">Join</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="50" xml:space="preserve"><span class="lineNumber">50</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../../../../../system/content/System.Base/doc/class_ExceptionPtr_3E313CB08B225E0124692C11F3BF8F26E971600C.html">ExceptionPtr</a>&nbsp;<span class="identifier">capturedExceptionPtr</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">threadData</span><span class="other">.</span><a href="../doc/class_ThreadData_502AF7BFD7B1A97EC51F5CA695B5D9A6AE944149.html#member_function_GetCapturedException_ThreadData_547E0759E0FA45C1433730139EDE48DBF6257C01">GetCapturedException</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="51" xml:space="preserve"><span class="lineNumber">51</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if</span>&nbsp;<span class="other">(</span><span class="identifier">capturedExceptionPtr</span><span class="other">.</span><a href="../../../../../../system/content/System.Base/doc/class_ExceptionPtr_3E313CB08B225E0124692C11F3BF8F26E971600C.html#member_function_Exception_ExceptionPtr_7038D6AA666D0F81707FFD4675665ED8AAE66255">Exception</a><span class="other">(</span><span class="other">)</span><span class="other">&nbsp;!=&nbsp;</span><span class="kw">null</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="52" xml:space="preserve"><span class="lineNumber">52</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="53" xml:space="preserve"><span class="lineNumber">53</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../../../../../system/content/System.Base/doc/ns_System.html#function_ThrowCapturedException_3C8DDE776866EED7DA7C5B7657B761F790C31B75">ThrowCapturedException</a><span class="other">(</span><span class="identifier">capturedExceptionPtr</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="54" xml:space="preserve"><span class="lineNumber">54</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="55" xml:space="preserve"><span class="lineNumber">55</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="56" xml:space="preserve"><span class="lineNumber">56</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">catch</span>&nbsp;<span class="other">(</span><span class="kw">const</span>&nbsp;<a href="../../../../../../system/content/System.Base/doc/class_Exception_02AEA5204AD1035A91C2D843597EACBE078C8989.html">Exception</a><span class="other">&amp;</span>&nbsp;<span class="identifier">ex</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="57" xml:space="preserve"><span class="lineNumber">57</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="58" xml:space="preserve"><span class="lineNumber">58</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">Console</span><span class="other">.</span><span class="identifier">Error</span><span class="other">(</span><span class="other">)</span><span class="other">&nbsp;&lt;&lt;&nbsp;</span><span class="identifier">ex</span><span class="other">.</span><span class="identifier">ToString</span><span class="other">(</span><span class="other">)</span><span class="other">&nbsp;&lt;&lt;&nbsp;</span><span class="identifier">endl</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="59" xml:space="preserve"><span class="lineNumber">59</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="60" xml:space="preserve"><span class="lineNumber">60</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+ </body>
+</html>

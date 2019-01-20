@@ -1,0 +1,41 @@
+// =================================
+// Copyright (c) 2019 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+
+namespace System.Net.Sockets
+{
+    public class TcpListener
+    {
+        public TcpListener(int port_) : socket(), port(port_)
+        {
+            socket.Bind(port);
+        }
+        public void Start()
+        {
+            Start(256);
+        }
+        public void Start(int backLog)
+        {
+            socket.Listen(backLog);
+        }
+        public void Stop()
+        {
+            socket.Close();
+            socket = TcpSocket();
+            socket.Bind(port);
+        }
+        public TcpSocket AcceptSocket()
+        {
+            return socket.Accept();
+        }
+        public TcpSocket& ContainedSocket()
+        {
+            return socket;
+        }
+        private TcpSocket socket;
+        private int port;
+    }
+}

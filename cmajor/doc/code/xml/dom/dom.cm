@@ -1,0 +1,17 @@
+using System;
+using System.Text;
+using System.Dom;
+
+void main()
+{
+    try
+    {
+        UniquePtr<DomDocument> doc = ParseXmlFileToDomDocument("test.xml");
+        CodeFormatter formatter(Console.Out());
+        doc->Write(formatter);
+    }
+    catch (const Exception& ex)
+    {
+        Console.Error() << ex.ToString() << endl();
+    }
+}

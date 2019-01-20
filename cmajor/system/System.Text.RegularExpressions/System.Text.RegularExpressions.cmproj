@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+ <PropertyGroup Label="Globals">
+  <CustomProjectExtensionsPath>$(LocalAppData)\CustomProjectSystems\Cmajor\</CustomProjectExtensionsPath>
+  <ProjectGuid>5112e408-5973-4cb0-a213-e09ab735191a</ProjectGuid>
+ </PropertyGroup>
+ <PropertyGroup>
+  <TargetType>library</TargetType>
+ </PropertyGroup>
+ <ItemGroup>
+  <CmCompile Include="Algorithm.cm"/>
+  <CmCompile Include="CharClass.cm"/>
+  <CmCompile Include="Dfa.cm"/>
+  <CmCompile Include="Nfa.cm"/>
+  <CmCompile Include="Parser.cm"/>
+  <CmCompile Include="PtrNfa.cm"/>
+  <CmCompile Include="RegEx.cm"/>
+  <CmCompile Include="RegExGrammar.cm"/>
+ </ItemGroup>
+ <ItemGroup>
+  <None Include="RegExGrammar.parser"/>
+  <None Include="RegExGrammar.pl"/>
+  <None Include="RegExGrammar.pp"/>
+ </ItemGroup>
+ <ItemGroup>
+  <ProjectReference Include="../System.Text.Parsing/System.Text.Parsing.cmproj"/>
+ </ItemGroup>
+ <Import Project="$(CustomProjectExtensionsPath)Cmajor.props"/>
+ <Import Project="$(CustomProjectExtensionsPath)Cmajor.targets"/>
+</Project>

@@ -1,0 +1,233 @@
+using System;
+using System.Collections;
+using Span = System.Text.Parsing.Span;
+using cppast;
+
+namespace cppsymbols
+{
+    public enum ScopeLookup
+    {
+        none = 0,
+        this_ = 1 << 0,
+        parent = 1 << 1,
+        bases = 1 << 2,
+        this_and_parent = this_ | parent,
+        this_and_bases = this_ | bases,
+        this_and_bases_and_parent = this_ | bases | parent
+    }
+    
+    public class Scope
+    {
+        public nothrow Scope(ContainerSymbol* containerSymbol_) : containerSymbol(containerSymbol_)
+        {
+        }
+        public void Install(Symbol* symbol, List<UniquePtr<Exception>>& errors)
+        {
+            if (symbol is NamespaceImportSymbol*)
+            {
+                namespaceImports.Add(cast<NamespaceImportSymbol*>(symbol));
+            }
+            else if (!(symbol is FunctionSymbol*) && !(symbol is ClassTypeSymbol*) && !(symbol is BlockSymbol*))
+            {
+                if (!(symbol is AliasSymbol*) && !(symbol is TypeAliasSymbol*) && !(symbol is TypedefSymbol*))
+                {
+                    if (symbolMap.CFind(symbol->name) != symbolMap.CEnd())
+                    {
+                        errors.Add(UniquePtr<Exception>(new Exception("symbol '" + ToUtf8(symbol->name) + "' already in scope '" + ToUtf8(containerSymbol->FullName()) + "'")));
+                        return;
+                    }
+                }                
+                symbolMap[symbol->name] = symbol;
+            }
+        }
+        public Symbol* Lookup(Node* node, ScopeLookup lookup, const Span& span, List<UniquePtr<Exception>>& errors)
+        {
+            bool errorOccurred = false;
+            HashSet<Scope*> scopesLookedUp;
+            return Lookup(node, lookup, span, errors, errorOccurred, scopesLookedUp);
+        }
+        public Symbol* Lookup(Node* node, ScopeLookup lookup, const Span& span, List<UniquePtr<Exception>>& errors, bool& errorOccurred, HashSet<Scope*>& scopesLookedUp)
+        {
+            if (node == null)
+            {
+                return containerSymbol->GlobalNs();
+            }
+            else if (node is IdentifierNode*)
+            {
+                IdentifierNode* identifierNode = cast<IdentifierNode*>(node);
+                return Lookup(identifierNode->str, lookup, span, errors, errorOccurred, scopesLookedUp);
+            }
+            else if (node is ColonColonNode*)
+            {
+                ColonColonNode* qualifiedId = cast<ColonColonNode*>(node);
+                if ((lookup & ScopeLookup.parent) != ScopeLookup.none)
+                {
+                    Symbol* s = Lookup(qualifiedId->left.Get(), lookup, span, errors, errorOccurred, scopesLookedUp);
+                    if (errorOccurred) return null;
+                    if (s != null)
+                    {
+                        if (s is ContainerSymbol*)
+                        {
+                            ContainerSymbol* c = cast<ContainerSymbol*>(s);
+                            Symbol* n = c->scope.Lookup(qualifiedId->right.Get(), cast<ScopeLookup>(lookup & ~ScopeLookup.parent), span, errors, errorOccurred, scopesLookedUp);
+                            if (errorOccurred) return null;
+                            if (n != null)
+                            {
+                                return n;
+                            }
+                            else if (node->parent != null)
+                            {
+                                return Lookup(node->parent, lookup, span, errors, errorOccurred, scopesLookedUp);
+                            }
+                            else
+                            {
+                                return null;
+                            }
+                        }
+                        else if (node->parent != null)
+                        {
+                            return Lookup(node->parent, lookup, span, errors, errorOccurred, scopesLookedUp);
+                        }
+                        else
+                        {
+                            return null;
+                        }
+                    }
+                    else if (node->parent != null)
+                    {
+                        return Lookup(node->parent, lookup, span, errors, errorOccurred, scopesLookedUp);
+                    }                
+                    else
+                    {
+                        return null;
+                    }
+                }
+                else if ((lookup & ScopeLookup.this_) != ScopeLookup.none)
+                {
+                    Symbol* s = Lookup(qualifiedId->left.Get(), lookup, span, errors, errorOccurred, scopesLookedUp);
+                    if (errorOccurred) return null;
+                    if (s != null)
+                    {
+                        if (s is ContainerSymbol*)
+                        {
+                            ContainerSymbol* c = cast<ContainerSymbol*>(s);
+                            return c->scope.Lookup(qualifiedId->right.Get(), lookup, span, errors, errorOccurred, scopesLookedUp);
+                        }
+                        else
+                        {
+                            return null;
+                        }
+                    }
+                    else
+                    {
+                        return null;
+                    }
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            else
+            {                
+                return null;
+            }
+        }
+        public Symbol* Lookup(const ustring& name, const Span& span, List<UniquePtr<Exception>>& errors)
+        {
+            bool errorOccurred = false;
+            HashSet<Scope*> scopesLookedUp;
+            return Lookup(name, span, errors, errorOccurred, scopesLookedUp);
+        }
+        public Symbol* Lookup(const ustring& name, const Span& span, List<UniquePtr<Exception>>& errors, bool& errorOccurred, HashSet<Scope*>& scopesLookedUp)
+        {
+            return Lookup(name, ScopeLookup.this_, span, errors, errorOccurred, scopesLookedUp);
+        }
+        public Symbol* Lookup(const ustring& name, ScopeLookup lookup, const Span& span, List<UniquePtr<Exception>>& errors)
+        {
+            bool errorOccurred = false;
+            HashSet<Scope*> scopesLookedUp;
+            return Lookup(name, lookup, span, errors, errorOccurred, scopesLookedUp);
+        }
+        public Symbol* Lookup(const ustring& name, ScopeLookup lookup, const Span& span, List<UniquePtr<Exception>>& errors, bool& errorOccurred, HashSet<Scope*>& scopesLookedUp)
+        {
+            if ((lookup & ScopeLookup.this_) != ScopeLookup.none)
+            {
+                HashMap<ustring, Symbol*>.ConstIterator it = symbolMap.CFind(name);
+                if (it != symbolMap.CEnd())
+                {
+                    return it->second;
+                }
+            }
+            if ((lookup & ScopeLookup.bases) != ScopeLookup.none)
+            {
+                long n = containerSymbol->NumBases();
+                for (long i = 0; i < n; ++i)
+                {
+                    ContainerSymbol* baseClass = containerSymbol->GetBase(i);
+                    Symbol* s = baseClass->scope.Lookup(name, lookup, span, errors, errorOccurred, scopesLookedUp);
+                    if (errorOccurred) return null;
+                    if (s != null)
+                    {
+                        return s;
+                    }
+                }
+            }
+            if ((lookup & ScopeLookup.parent) != ScopeLookup.none)
+            {
+                if (containerSymbol->parent != null)
+                {
+                    Symbol* s = containerSymbol->parent->scope.Lookup(name, lookup, span, errors, errorOccurred, scopesLookedUp);
+                    if (errorOccurred) return null;
+                    if (s != null)
+                    {
+                        return s;
+                    }
+                }
+            }
+            if (scopesLookedUp.CFind(this) != scopesLookedUp.CEnd()) return null;
+            scopesLookedUp.Insert(this);
+            HashSet<Symbol*> matched;
+            for (NamespaceImportSymbol* namespaceImport : namespaceImports)
+            {
+                Symbol* s = namespaceImport->ns->scope.Lookup(name, ScopeLookup.this_, span, errors, errorOccurred, scopesLookedUp);
+                if (errorOccurred) return null;
+                if (s != null)
+                {
+                    matched.Insert(s);
+                }
+            }
+            if (matched.IsEmpty())
+            {
+                return null;
+            }
+            else if (matched.Count() > 1)
+            {
+                string matchedString;
+                bool first = true;
+                for (Symbol* s : matched)
+                {
+                    if (first)
+                    {
+                        first = false;
+                    }
+                    else
+                    {
+                        matchedString.Append(" or ");
+                    }
+                    matchedString.Append(ToUtf8(s->FullName()));
+                }
+                errors.Add(UniquePtr<Exception>(new SymbolException("reference to symbol '" + ToUtf8(name) + "' is ambiguous: " + matchedString, span)));
+                errorOccurred = true;
+                return null;
+            }
+            else
+            {
+                return *matched.CBegin();
+            }
+        }
+        public ContainerSymbol* containerSymbol;
+        private HashMap<ustring, Symbol*> symbolMap;
+        private List<NamespaceImportSymbol*> namespaceImports;
+    }
+}

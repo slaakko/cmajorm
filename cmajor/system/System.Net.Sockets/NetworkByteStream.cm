@@ -1,0 +1,51 @@
+// =================================
+// Copyright (c) 2019 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.IO;
+
+namespace System.Net.Sockets
+{
+    public class NetworkByteStream : ByteStream
+    {
+        public nothrow NetworkByteStream(TcpSocket&& socket_) : socket(socket_)
+        {
+        }
+        public override int ReadByte()
+        {
+            byte buf;
+            long bytesRead = Read(&buf, 1);
+            if (bytesRead == 0)
+            {
+                return -1;
+            }
+            else
+            {
+                return buf;
+            }
+        }
+        public override long Read(byte* buf, long count)
+        {
+            #assert(buf != null);
+            #assert(count >= 0);
+            return socket.Receive(buf, cast<int>(count));
+        }
+        public override void Write(byte x)
+        {
+            Write(&x, 1);
+        }
+        public override void Write(byte* buf, long count)
+        {
+            #assert(buf != null);
+            #assert(count >= 0);
+            socket.Send(buf, cast<int>(count));
+        }
+        public TcpSocket& ContainedSocket()
+        {
+            return socket;
+        }
+        private TcpSocket socket;
+    }
+}

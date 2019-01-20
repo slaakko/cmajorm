@@ -1,0 +1,47 @@
+<html>
+ <head>
+  <meta charset="utf-8"/>
+  <title>ProjectFileGrammar Grammar</title>
+  <link href="../../../style/style.css" rel="stylesheet" type="text/css"/>
+ </head>
+ <body>
+  <h1>ProjectFileGrammar Grammar</h1>
+  <table class="grammar">
+   <tr id="rule_ProjectFile_CD266B9780F5BB399287C086628A4DEE96BAB5E7">
+    <td class="grammarFirstCol">
+     <span class="rule">ProjectFile</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleKeyword">keyword</span><span class="ruleString">("project")</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="../../../../../../system/content/System.Text.Parsing/grammars.xml#rule_qualified_id_56A0F52F3D50ED3FB6A7DAFF6D694F5FF1BAF129">qualified_id</a></span><span class="ruleOp"> </span><span class="ruleChar">';'</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_ProjectFileContent_A7A18B0FEBD309434C3BA7C723707710F2A3F4AE">ProjectFileContent</a></span></td>
+   </tr>
+   <tr id="rule_ProjectFileContent_A7A18B0FEBD309434C3BA7C723707710F2A3F4AE">
+    <td class="grammarFirstCol">
+     <span class="rule">ProjectFileContent</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#rule_Source_1C1586EBB0C872FFFBE736B1558A1CD8FFD87F9B">Source</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#rule_Reference_AF6006AFCF0EF4AC3F4639DF84A1F5167849AAF3">Reference</a></span><span class="ruleOp">)</span><span class="ruleOp">*</span></td>
+   </tr>
+   <tr id="rule_Source_1C1586EBB0C872FFFBE736B1558A1CD8FFD87F9B">
+    <td class="grammarFirstCol">
+     <span class="rule">Source</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleKeyword">keyword</span><span class="ruleString">("source")</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_FilePath_3A3EDDAF5EAE7872448CB62A66376F9194A8F8B3">FilePath</a></span><span class="ruleOp"> </span><span class="ruleChar">';'</span></td>
+   </tr>
+   <tr id="rule_Reference_AF6006AFCF0EF4AC3F4639DF84A1F5167849AAF3">
+    <td class="grammarFirstCol">
+     <span class="rule">Reference</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleKeyword">keyword</span><span class="ruleString">("reference")</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_FilePath_3A3EDDAF5EAE7872448CB62A66376F9194A8F8B3">FilePath</a></span><span class="ruleOp"> </span><span class="ruleChar">';'</span></td>
+   </tr>
+   <tr id="rule_FilePath_3A3EDDAF5EAE7872448CB62A66376F9194A8F8B3">
+    <td class="grammarFirstCol">
+     <span class="rule">FilePath</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleKeyword">token</span><span class="ruleOp">(</span><span class="ruleChar">'&lt;'</span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleCharSet">[^>\r\n]</span><span class="ruleOp">+</span><span class="ruleOp">)</span><span class="ruleOp"> </span><span class="ruleChar">'>'</span><span class="ruleOp">)</span></td>
+   </tr>
+  </table>
+ </body>
+</html>

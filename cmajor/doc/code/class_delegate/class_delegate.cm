@@ -1,0 +1,31 @@
+public class delegate void ClassDelegate(int x);
+
+public class Alpha
+{
+    public void foo(int x)
+    {
+        System.Console.WriteLine("foo called with " + System.ToString(x));
+    }
+    public void bar(int x)
+    {
+        System.Console.WriteLine("bar called with " + System.ToString(x));
+    }
+    public void baz()
+    {
+        barDlg = bar;
+    }
+    public void fuz()
+    {
+        barDlg(24);
+    }
+    private ClassDelegate barDlg;
+}
+
+public void main()
+{
+    Alpha alpha;
+    ClassDelegate fooDlg = alpha.foo;
+    fooDlg(42);
+    alpha.baz();
+    alpha.fuz();
+}

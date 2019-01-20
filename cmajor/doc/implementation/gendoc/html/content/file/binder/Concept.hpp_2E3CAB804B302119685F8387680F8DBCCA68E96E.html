@@ -1,0 +1,70 @@
+<html>
+ <head>
+  <meta charset="utf-8"/>
+  <link href="../../../style/style.css" rel="stylesheet" type="text/css"/>
+ </head>
+ <body>
+  <span class="code" id="1" xml:space="preserve"><span class="lineNumber">&nbsp;1</span>&nbsp;<span class="comment">//&nbsp;=================================</span></span>
+  <br/>
+  <span class="code" id="2" xml:space="preserve"><span class="lineNumber">&nbsp;2</span>&nbsp;<span class="comment">//&nbsp;Copyright&nbsp;(c)&nbsp;2018&nbsp;Seppo&nbsp;Laakko</span></span>
+  <br/>
+  <span class="code" id="3" xml:space="preserve"><span class="lineNumber">&nbsp;3</span>&nbsp;<span class="comment">//&nbsp;Distributed&nbsp;under&nbsp;the&nbsp;MIT&nbsp;license</span></span>
+  <br/>
+  <span class="code" id="4" xml:space="preserve"><span class="lineNumber">&nbsp;4</span>&nbsp;<span class="comment">//&nbsp;=================================</span></span>
+  <br/>
+  <span class="code" id="5" xml:space="preserve"><span class="lineNumber">&nbsp;5</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="6" xml:space="preserve"><span class="lineNumber">&nbsp;6</span>&nbsp;<span class="pp">#ifndef&nbsp;CMAJOR_BINDER_CONCEPT_INCLUDED</span></span>
+  <br/>
+  <span class="code" id="7" xml:space="preserve"><span class="lineNumber">&nbsp;7</span>&nbsp;<span class="pp">#define&nbsp;CMAJOR_BINDER_CONCEPT_INCLUDED</span></span>
+  <br/>
+  <span class="code" id="8" xml:space="preserve"><span class="lineNumber">&nbsp;8</span>&nbsp;<span class="pp">#include&nbsp;&lt;cmajor/symbols/Scope.hpp></span></span>
+  <br/>
+  <span class="code" id="9" xml:space="preserve"><span class="lineNumber">&nbsp;9</span>&nbsp;<span class="pp">#include&nbsp;&lt;cmajor/symbols/Exception.hpp></span></span>
+  <br/>
+  <span class="code" id="10" xml:space="preserve"><span class="lineNumber">10</span>&nbsp;<span class="pp">#include&nbsp;&lt;cmajor/symbols/TemplateSymbol.hpp></span></span>
+  <br/>
+  <span class="code" id="11" xml:space="preserve"><span class="lineNumber">11</span>&nbsp;<span class="pp">#include&nbsp;&lt;cmajor/symbols/ConceptSymbol.hpp></span></span>
+  <br/>
+  <span class="code" id="12" xml:space="preserve"><span class="lineNumber">12</span>&nbsp;<span class="pp">#include&nbsp;&lt;cmajor/ast/Concept.hpp></span></span>
+  <br/>
+  <span class="code" id="13" xml:space="preserve"><span class="lineNumber">13</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="14" xml:space="preserve"><span class="lineNumber">14</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">cmajor</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">binder</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="15" xml:space="preserve"><span class="lineNumber">15</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="16" xml:space="preserve"><span class="lineNumber">16</span>&nbsp;<span class="kw">using</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">cmajor</span><span class="other">:</span><span class="other">:</span><span class="identifier">ast</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="17" xml:space="preserve"><span class="lineNumber">17</span>&nbsp;<span class="kw">using</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">cmajor</span><span class="other">:</span><span class="other">:</span><span class="identifier">symbols</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="18" xml:space="preserve"><span class="lineNumber">18</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="19" xml:space="preserve"><span class="lineNumber">19</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../../class_BoundCompileUnit_E99BC7539B5239DF3A33DC3D613FE1D188A0A9E1.html">BoundCompileUnit</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="20" xml:space="preserve"><span class="lineNumber">20</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../../class_BoundFunction_4B30B35495A99AFFC545153C02C4EBBD88F0A38D.html">BoundFunction</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="21" xml:space="preserve"><span class="lineNumber">21</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../../class_BoundConstraint_BF9035845B44865EC362C316621E43736AF2751D.html">BoundConstraint</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="22" xml:space="preserve"><span class="lineNumber">22</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="23" xml:space="preserve"><span class="lineNumber">23</span>&nbsp;<a href="../../class_ConceptSymbol_480671C9D512EFD41CDF07DFD5D4A47F11E07A99.html">ConceptSymbol</a><span class="other">*</span>&nbsp;<a href="../../namespace_binder_C711B7605339DC3A9E128C1E622E7D9A4629C97D.html#function_ResolveConceptId_B4AED57B2939119A19C3FB8DE955B5AB9B52678E">ResolveConceptId</a><span class="other">(</span><a href="../../class_ConceptIdNode_726D79E62740AAB16C8AA517A7DEB4DEB6184137.html">ConceptIdNode</a><span class="other">*</span>&nbsp;<span class="identifier">conceptIdNode</span><span class="other">,&nbsp;</span><a href="../../class_BoundCompileUnit_E99BC7539B5239DF3A33DC3D613FE1D188A0A9E1.html">BoundCompileUnit</a><span class="other">&amp;</span>&nbsp;<span class="identifier">boundCompileUnit</span><span class="other">,&nbsp;</span><a href="../../class_ContainerScope_868483F636E19113CC59067DD8B70247AA7D81F2.html">ContainerScope</a><span class="other">*</span>&nbsp;<span class="identifier">containerScope</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="24" xml:space="preserve"><span class="lineNumber">24</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="25" xml:space="preserve"><span class="lineNumber">25</span>&nbsp;<span class="kw">bool</span>&nbsp;<a href="../../namespace_binder_C711B7605339DC3A9E128C1E622E7D9A4629C97D.html#function_CheckConstraint_655082791242B4143BE93249845C456A922C95F1">CheckConstraint</a><span class="other">(</span><a href="../../class_ConstraintNode_C8CAFBDD270BC60F16280322541DF170148F294F.html">ConstraintNode</a><span class="other">*</span>&nbsp;<span class="identifier">constraint</span><span class="other">,&nbsp;</span><span class="kw">const&nbsp;</span><a href="../../class_NodeList_634CD2B65410966280F1AC27B3A570D065505ECD.html">NodeList</a><span class="other">&lt;</span><a href="../../class_Node_66FC1D6AD8F487E453CE6E17163479C7C2DAC063.html">Node</a><span class="other">></span><span class="other">&amp;</span>&nbsp;<span class="identifier">usingNodes</span><span class="other">,&nbsp;</span><a href="../../class_BoundCompileUnit_E99BC7539B5239DF3A33DC3D613FE1D188A0A9E1.html">BoundCompileUnit</a><span class="other">&amp;</span>&nbsp;<span class="identifier">boundCompileUnit</span><span class="other">,&nbsp;</span><a href="../../class_ContainerScope_868483F636E19113CC59067DD8B70247AA7D81F2.html">ContainerScope</a><span class="other">*</span>&nbsp;<span class="identifier">containerScope</span><span class="other">,&nbsp;</span><a href="../../class_BoundFunction_4B30B35495A99AFFC545153C02C4EBBD88F0A38D.html">BoundFunction</a><span class="other">*</span>&nbsp;<span class="identifier">currentFunction</span><span class="other">,&nbsp;</span></span>
+  <br/>
+  <span class="code" id="26" xml:space="preserve"><span class="lineNumber">26</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">const&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="type">vector</span><span class="other">&lt;</span><a href="../../class_TemplateParameterSymbol_E40C8C6A1A16CD38F979FFEC21EFECE32E4417BC.html">TemplateParameterSymbol</a><span class="other">*</span><span class="other">></span><span class="other">&amp;</span>&nbsp;<span class="identifier">templateParameters</span><span class="other">,&nbsp;</span><span class="kw">const&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="type">unordered_map</span><span class="other">&lt;</span><a href="../../class_TemplateParameterSymbol_E40C8C6A1A16CD38F979FFEC21EFECE32E4417BC.html">TemplateParameterSymbol</a><span class="other">*</span><span class="other">,&nbsp;</span><a href="../../class_TypeSymbol_E4B881CC0D40D6232A69F240FA90045A54D93258.html">TypeSymbol</a><span class="other">*</span><span class="other">></span><span class="other">&amp;</span>&nbsp;<span class="identifier">templateParameterMap</span><span class="other">,&nbsp;</span></span>
+  <br/>
+  <span class="code" id="27" xml:space="preserve"><span class="lineNumber">27</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">:</span><span class="other">:</span><span class="identifier">unique_ptr</span><span class="other">&lt;</span><span class="identifier">BoundConstraint</span><span class="other">></span><span class="other">&amp;</span>&nbsp;<span class="identifier">boundConstraint</span><span class="other">,</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="identifier">Span</span><span class="other">&amp;</span>&nbsp;<span class="identifier">span</span><span class="other">,</span>&nbsp;<span class="identifier">FunctionSymbol</span><span class="other">*</span>&nbsp;<span class="identifier">viableFunction</span><span class="other">,</span>&nbsp;<span class="identifier">std</span><span class="other">:</span><span class="other">:</span><span class="identifier">unique_ptr</span><span class="other">&lt;</span><span class="identifier">Exception</span><span class="other">></span><span class="other">&amp;</span>&nbsp;<span class="identifier">conceptCheckException</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="28" xml:space="preserve"><span class="lineNumber">28</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="29" xml:space="preserve"><span class="lineNumber">29</span>&nbsp;<span class="other">}</span>&nbsp;<span class="other">}</span>&nbsp;<span class="comment">//&nbsp;namespace&nbsp;cmajor::binder</span></span>
+  <br/>
+  <span class="code" id="30" xml:space="preserve"><span class="lineNumber">30</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="31" xml:space="preserve"><span class="lineNumber">31</span>&nbsp;<span class="pp">#endif&nbsp;//&nbsp;CMAJOR_BINDER_CONCEPT_INCLUDED</span></span>
+  <br/>
+ </body>
+</html>

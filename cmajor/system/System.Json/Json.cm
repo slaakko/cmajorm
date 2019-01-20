@@ -1,0 +1,290 @@
+// =================================
+// Copyright (c) 2019 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Collections;
+
+namespace System.Json
+{
+    public abstract class JsonValue
+    {
+        public default virtual ~JsonValue();
+        public abstract string ToString() const;
+    }
+    
+    public class JsonNull : JsonValue
+    {
+        public override string ToString() const
+        {
+            return "null";
+        }
+    }
+    
+    public class JsonNumber : JsonValue
+    {
+        public nothrow JsonNumber() : value(0.0)
+        {
+        }
+        public explicit nothrow JsonNumber(double value_) : value(value_)
+        {
+        }
+        public override string ToString() const
+        {
+            return System.ToString(value);
+        }
+        public nothrow inline double Value() const
+        {
+            return value;
+        }
+        public nothrow inline void SetValue(double value_) 
+        {
+            value = value_;
+        }
+        private double value;
+    }
+    
+    public class JsonBool : JsonValue
+    {
+        public nothrow JsonBool() : value(false)
+        {
+        }
+        public explicit nothrow JsonBool(bool value_) : value(value_)
+        {
+        }
+        public override string ToString() const
+        {
+            return System.ToString(value);
+        }
+        public nothrow inline bool Value() const
+        {
+            return value;
+        }
+        public nothrow inline void SetValue(bool value_) 
+        {
+            value = value_;
+        }
+        private bool value;
+    }
+    
+    public class JsonString : JsonValue
+    {
+        public nothrow JsonString() : value()
+        {
+        }
+        public nothrow JsonString(const ustring& value_) : value(value_)
+        {
+        }
+        public nothrow inline const ustring& Value() const
+        {
+            return value;
+        }
+        public nothrow inline void SetValue(const ustring& value_)
+        {
+            value = value_;
+        }
+        public nothrow JsonString& Append(uchar c)
+        {
+            value.Append(c);
+            return *this;
+        }
+        public nothrow JsonString& Append(const uchar* s)
+        {
+            value.Append(s);
+            return *this;
+        }
+        public nothrow JsonString& Append(const ustring& s) 
+        {
+            value.Append(s);
+            return *this;
+        }
+        public override string ToString() const
+        {
+            wstring s = w'"';
+            for (uchar c : value)
+            {
+                s.Append(JsonCharStr(c));
+            }
+            s.Append(w'"');
+            return ToUtf8(s);
+        }
+        private wstring JsonCharStr(uchar c)
+        {
+            wstring result;
+            ustring s(c);
+            wstring t = ToUtf16(s);
+            for (wchar x : t)
+            {
+                switch (x)
+                {
+                    case '"': result.Append(w"\\\""); break;
+                    case '\\': result.Append(w"\\\\"); break;
+                    case '/': result.Append(w"\\/"); break;
+                    case '\b': result.Append(w"\\b"); break;
+                    case '\f': result.Append(w"\\f"); break;
+                    case '\n': result.Append(w"\\n"); break;
+                    case '\r': result.Append(w"\\r"); break;
+                    case '\t': result.Append(w"\\t"); break;
+                    default:
+                    {
+                        if (cast<ushort>(x) >= 32u && cast<ushort>(x) <= 126u)
+                        {
+                            result.Append(x);
+                        }
+                        else
+                        {
+                            result.Append(w"\\u").Append(ToUtf16(ToHexString(cast<ushort>(x))));
+                        }           
+                        break;
+                    }
+                }
+            }
+            return result;
+        }
+        private ustring value;
+    }
+    
+    public class JsonObject : JsonValue
+    {
+        public JsonObject() : fieldValues(), fieldMap()
+        {
+        }
+        public void AddField(const string& fieldName, UniquePtr<JsonValue>&& fieldValue)
+        {
+            AddField(ToUtf32(fieldName), fieldValue);
+        }
+        public void AddField(const wstring& fieldName, UniquePtr<JsonValue>&& fieldValue)
+        {
+            AddField(ToUtf32(fieldName), fieldValue);
+        }
+        public void AddField(const ustring& fieldName, UniquePtr<JsonValue>&& fieldValue)
+        {
+            fieldMap[fieldName] = fieldValue.Get();
+            fieldValues.Add(fieldValue);
+        }
+        public JsonValue* GetField(const string& fieldName) const
+        {
+            return GetField(ToUtf32(fieldName));
+        }
+        public JsonValue* GetField(const wstring& fieldName) const
+        {
+            return GetField(ToUtf32(fieldName));
+        }
+        public JsonValue* GetField(const ustring& fieldName) const
+        {
+            Map<ustring, JsonValue*>.ConstIterator i = fieldMap.CFind(fieldName);
+            if (i != fieldMap.CEnd())
+            {
+                return i->second;
+            }
+            return null;
+        }
+        public nothrow const Map<ustring, JsonValue*>& Fields() const 
+        {
+            return fieldMap;
+        }
+        public nothrow Map<ustring, JsonValue*>& Fields()
+        {
+            return fieldMap;
+        }
+        public override string ToString() const
+        {
+            string s = "{";
+            bool first = true;
+            for (const Pair<ustring, JsonValue*>& p : fieldMap)
+            {
+                JsonString fs = p.first;
+                JsonValue* fv = p.second;
+                if (first)
+                {
+                    first = false;
+                }
+                else
+                {
+                    s.Append(", ");
+                }
+                s.Append(fs.ToString()).Append(":").Append(fv->ToString());
+            }
+            s.Append("}");
+            return s;
+        }
+        private List<UniquePtr<JsonValue>> fieldValues;
+        private Map<ustring, JsonValue*> fieldMap;
+    }
+    
+    public class JsonArray : JsonValue
+    {
+        public nothrow JsonArray() : items()
+        {
+        }
+        public void AddItem(UniquePtr<JsonValue>&& item)
+        {
+            items.Add(item);
+        }
+        public JsonValue* operator[](long index) const 
+        {
+            return items[index].Get();
+        }
+        public inline nothrow long Count() const
+        {
+            return items.Count();
+        }
+        public override string ToString() const
+        {
+            string s = "[";
+            bool first =  true;
+            for (const UniquePtr<JsonValue>& item : items)
+            {
+                if (first)
+                {
+                    first = false;
+                }
+                else
+                {                    
+                    s.Append(", ");
+                }
+                s.Append(item->ToString());
+            }
+            s.Append("]");
+            return s;
+        }
+        private List<UniquePtr<JsonValue>> items;
+    }
+    
+    public class JsonParser
+    {
+        static JsonParser() : instance(new JsonParser())
+        {
+        }
+        public static nothrow JsonParser& Instance()
+        {
+            return *instance;
+        }
+        private JsonParser() : jsonGrammar(new JsonGrammar())
+        {
+        }
+        public nothrow JsonGrammar* GetJsonGrammar() const
+        {
+            return jsonGrammar;
+        }
+        private static UniquePtr<JsonParser> instance;
+        private JsonGrammar* jsonGrammar;
+    }
+    
+    public UniquePtr<JsonValue> ParseJson(const string& jsonText)
+    {
+        return ParseJson(ToUtf32(jsonText));
+    }
+    
+    public UniquePtr<JsonValue> ParseJson(const wstring& jsonText)
+    {
+        return ParseJson(ToUtf32(jsonText));
+    }
+    
+    public UniquePtr<JsonValue> ParseJson(const ustring& jsonText)
+    {
+        UniquePtr<JsonValue> jsonValue = JsonParser.Instance().GetJsonGrammar()->Parse(jsonText.Chars(), jsonText.Chars() + jsonText.Length(), 0, "");
+        return jsonValue;
+    }
+}

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+ <PropertyGroup Label="Globals">
+  <CustomProjectExtensionsPath>$(LocalAppData)\CustomProjectSystems\Cmajor\</CustomProjectExtensionsPath>
+  <ProjectGuid>d0a97df4-9a6f-44a2-8155-e8dd06b85c8d</ProjectGuid>
+ </PropertyGroup>
+ <PropertyGroup>
+  <TargetType>program</TargetType>
+ </PropertyGroup>
+ <ItemGroup>
+  <CmCompile Include="Flags.cm"/>
+  <CmCompile Include="Main.cm"/>
+  <CmCompile Include="Process.cm"/>
+  <CmCompile Include="Solution.cm"/>
+  <CmCompile Include="SolutionGrammar.cm"/>
+  <CmCompile Include="Work.cm"/>
+ </ItemGroup>
+ <ItemGroup>
+  <None Include="cpp2cm.pl"/>
+  <None Include="cpp2cm.pp"/>
+  <None Include="SolutionGrammar.parser"/>
+ </ItemGroup>
+ <ItemGroup>
+  <ProjectReference Include="../cppparser/cppparser.cmproj"/>
+ </ItemGroup>
+ <Import Project="$(CustomProjectExtensionsPath)Cmajor.props"/>
+ <Import Project="$(CustomProjectExtensionsPath)Cmajor.targets"/>
+</Project>

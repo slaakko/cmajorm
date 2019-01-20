@@ -1,0 +1,37 @@
+using System;
+using System.Json;
+using MyNs;
+
+namespace MyNs
+{
+    [json]
+    public class MyJsonConstructibleClass
+    {
+        public void Dump()
+        {
+            Console.WriteLine("i : " + ToString(i));
+            Console.WriteLine("d : " + ToString(d));
+            Console.WriteLine("b : " + ToString(b));
+            Console.WriteLine("s : " + s);
+        }
+        private int i;
+        private double d;
+        private bool b;
+        private string s;
+    }
+}
+
+void main()
+{
+    try
+    {
+        string jsonText = "{\"b\":true, \"d\":1.5, \"i\":2, \"s\":\"foo\"}";
+        UniquePtr<JsonValue> jsonValue = ParseJson(jsonText);
+        MyJsonConstructibleClass constructible(jsonValue.Get());
+        constructible.Dump();
+    }
+    catch (const Exception& ex)
+    {
+        Console.WriteLine(ex.ToString());
+    }
+}

@@ -1,0 +1,42 @@
+using ParsingContext = Code.ParsingContext;
+
+namespace Syntax
+{
+    grammar LibraryFileGrammar
+    {
+        using stdlib.qualified_id;
+        using stdlib.spaces_and_comments;
+        using ElementGrammar.Identifier;
+        using ElementGrammar.Signature;
+
+        skip spaces_and_comments;
+
+        LibraryFile(ParsingContext* ctx, System.Text.Parsing.ParsingDomain* parsingDomain)
+            ::= NamespaceContent(ctx, parsingDomain)
+            ;
+
+        NamespaceContent(ParsingContext* ctx, System.Text.Parsing.ParsingDomain* parsingDomain)
+            ::=
+            (   Grammar(ctx, parsingDomain->CurrentNamespace()->GetScope()){ parsingDomain->AddGrammar(Grammar); }
+            |   Namespace(ctx, parsingDomain)
+            )*
+            ;
+
+        Namespace(ParsingContext* ctx, System.Text.Parsing.ParsingDomain* parsingDomain)
+            ::= keyword("namespace") qualified_id:ns!{ parsingDomain->BeginNamespace(ns); } '{'! NamespaceContent(ctx, parsingDomain) '}'!{ parsingDomain->EndNamespace(); }
+            ;
+
+        Grammar(ParsingContext* ctx, System.Text.Parsing.Scope* enclosingScope) : System.Text.Parsing.Grammar*
+            ::= keyword("grammar") Identifier:grammarName!{ value = new System.Text.Parsing.Grammar(grammarName, enclosingScope); value->SetNs(enclosingScope->Ns()); }
+                '{'! GrammarContent(ctx, value) '}'!
+            ;
+
+        GrammarContent(ParsingContext* ctx, System.Text.Parsing.Grammar* grammar)
+            ::= (Rule(ctx, grammar->GetScope()){ grammar->AddRule(Rule); })*
+            ;
+
+        Rule(ParsingContext* ctx, System.Text.Parsing.Scope* enclosingScope) : System.Text.Parsing.RuleParser*
+            ::= Identifier:ruleName{ value = new System.Text.Parsing.RuleParser(ruleName, enclosingScope); } Signature(ctx, value) ';'
+            ;
+    }
+}

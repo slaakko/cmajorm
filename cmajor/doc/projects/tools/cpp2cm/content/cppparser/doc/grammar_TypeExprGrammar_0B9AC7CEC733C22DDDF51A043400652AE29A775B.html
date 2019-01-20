@@ -1,0 +1,54 @@
+<html>
+ <head>
+  <meta charset="utf-8"/>
+  <title>TypeExprGrammar Grammar</title>
+  <link href="../../../style/style.css" rel="stylesheet" type="text/css"/>
+ </head>
+ <body>
+  <h1>TypeExprGrammar Grammar</h1>
+  <table class="grammar">
+   <tr id="rule_TypeExpr_6DD497FEC1F5615F6D907AF80B670B7A68D5FC1E">
+    <td class="grammarFirstCol">
+     <span class="rule">TypeExpr</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#rule_PrefixTypeExpr_3319C629E56E91C2C260349552879ED599ECD17C">PrefixTypeExpr</a></span></td>
+   </tr>
+   <tr id="rule_CVSpecifierSequence_27303CF2E06399A405A71F12A6E3986702A214AA">
+    <td class="grammarFirstCol">
+     <span class="rule">CVSpecifierSequence</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#rule_CVSpecifier_F47BB1E066D47ED97DBC7C1B81EE8AC8EE37547B">CVSpecifier</a></span><span class="ruleOp">)</span><span class="ruleOp">*</span></td>
+   </tr>
+   <tr id="rule_CVSpecifier_F47BB1E066D47ED97DBC7C1B81EE8AC8EE37547B">
+    <td class="grammarFirstCol">
+     <span class="rule">CVSpecifier</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleKeyword">keyword</span><span class="ruleString">("const")</span><span class="ruleOp"> | </span><span class="ruleKeyword">keyword</span><span class="ruleString">("volatile")</span></td>
+   </tr>
+   <tr id="rule_PrefixTypeExpr_3319C629E56E91C2C260349552879ED599ECD17C">
+    <td class="grammarFirstCol">
+     <span class="rule">PrefixTypeExpr</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleKeyword">keyword</span><span class="ruleString">("const")</span><span class="ruleOp"> </span><span class="ruleKeyword">keyword</span><span class="ruleString">("volatile")</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_PostfixTypeExpr_1AC16CA97D5D427729B86F45EC3928C6955333A7">PostfixTypeExpr</a></span><span class="ruleOp"> | </span><span class="ruleKeyword">keyword</span><span class="ruleString">("volatile")</span><span class="ruleOp"> </span><span class="ruleKeyword">keyword</span><span class="ruleString">("const")</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_PostfixTypeExpr_1AC16CA97D5D427729B86F45EC3928C6955333A7">PostfixTypeExpr</a></span><span class="ruleOp"> | </span><span class="ruleKeyword">keyword</span><span class="ruleString">("const")</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_PostfixTypeExpr_1AC16CA97D5D427729B86F45EC3928C6955333A7">PostfixTypeExpr</a></span><span class="ruleOp"> | </span><span class="ruleKeyword">keyword</span><span class="ruleString">("volatile")</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_PostfixTypeExpr_1AC16CA97D5D427729B86F45EC3928C6955333A7">PostfixTypeExpr</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#rule_PostfixTypeExpr_1AC16CA97D5D427729B86F45EC3928C6955333A7">PostfixTypeExpr</a></span></td>
+   </tr>
+   <tr id="rule_PostfixTypeExpr_1AC16CA97D5D427729B86F45EC3928C6955333A7">
+    <td class="grammarFirstCol">
+     <span class="rule">PostfixTypeExpr</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#rule_PrimaryTypeExpr_9B397FC43B0BD092C1490EFBB44D65AE32E68D8C">PrimaryTypeExpr</a></span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleChar">'*'</span><span class="ruleOp"> | </span><span class="ruleString">"&amp;&amp;"</span><span class="ruleOp"> | </span><span class="ruleChar">'&amp;'</span><span class="ruleOp">)</span><span class="ruleOp">*</span><span class="ruleOp">)</span></td>
+   </tr>
+   <tr id="rule_PrimaryTypeExpr_9B397FC43B0BD092C1490EFBB44D65AE32E68D8C">
+    <td class="grammarFirstCol">
+     <span class="rule">PrimaryTypeExpr</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="grammar_SimpleTypeGrammar_644A7A04000DA6E095C444B0459B7FCB4570B102.html#rule_SimpleType_358DC28A1B7593A5DF5AEEE8CB46E48C1FDD8ED4">SimpleType</a></span><span class="ruleOp"> | </span><span class="ruleOp">(</span><span class="ruleKeyword">keyword</span><span class="ruleString">("typename")</span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="grammar_ClassGrammar_B6DF937C6DB95E024115AE1BF1738CC54C08E0E9.html#rule_ClassKey_851790A05C8F927AB7004ED2788BE4B563192859">ClassKey</a></span><span class="ruleOp">)</span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="grammar_IdentifierGrammar_8D8D6307DE3120A9332D1686FBA3E981750C42B8.html#rule_QualifiedId_C5417B64956A2289AA19994B6A984DBEFEFBAC20">QualifiedId</a></span></td>
+   </tr>
+  </table>
+ </body>
+</html>

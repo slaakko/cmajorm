@@ -1,0 +1,76 @@
+using System;
+using System.Collections;
+
+public long Partition(List<int>& intList, long left, long right)
+{
+    #assert(left <= right); // precondition : left <= right
+    long i = left;
+    long j = right;
+    int pivot = intList[(left + right) / 2];
+    while (i <= j)
+    {
+        while (intList[i] < pivot) ++i;
+        while (intList[j] > pivot) --j;
+        if (i <= j)
+        {
+            Swap(intList[i], intList[j]);
+            ++i;
+            --j;
+        }
+    }
+    return i;
+}
+
+public void QuickSort(List<int>& intList, long left, long right)
+{
+    #assert(left <= right); // precondition : left <= right
+    long index = Partition(intList, left, right);
+    if (left < index - 1)
+    {
+        QuickSort(intList, left, index - 1);
+    }
+    if (index < right)
+    {
+        QuickSort(intList, index, right);
+    }
+}
+
+public void QuickSort(List<int>& intList)
+{
+    if (!intList.IsEmpty())
+    {
+        QuickSort(intList, 0, intList.Count() - 1);
+    }    
+}
+
+public void Print(const List<int>& intList)
+{
+    bool first = true;
+    Console.Write('[');
+    for (int x : intList)
+    {
+        if (first)
+        {
+            first = false;
+        }
+        else
+        {
+            Console.Write(", ");
+        }
+        Console.Write(x);
+    }
+    Console.WriteLine(']');
+}
+
+internal void main()
+{
+    List<int> intList;
+    int n = 10;
+    for (int i = 0; i < n; ++i)
+    {
+        intList.Add(cast<int>(RandomNumber(100u)));
+    }
+    Print(intList);
+    QuickSort(intList);
+    Print(intList);
+}

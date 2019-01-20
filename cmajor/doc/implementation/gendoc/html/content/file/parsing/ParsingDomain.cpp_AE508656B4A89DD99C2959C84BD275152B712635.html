@@ -1,0 +1,350 @@
+<html>
+ <head>
+  <meta charset="utf-8"/>
+  <link href="../../../style/style.css" rel="stylesheet" type="text/css"/>
+ </head>
+ <body>
+  <span class="code" id="1" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;1</span>&nbsp;<span class="comment">//&nbsp;=================================</span></span>
+  <br/>
+  <span class="code" id="2" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;2</span>&nbsp;<span class="comment">//&nbsp;Copyright&nbsp;(c)&nbsp;2018&nbsp;Seppo&nbsp;Laakko</span></span>
+  <br/>
+  <span class="code" id="3" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;3</span>&nbsp;<span class="comment">//&nbsp;Distributed&nbsp;under&nbsp;the&nbsp;MIT&nbsp;license</span></span>
+  <br/>
+  <span class="code" id="4" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;4</span>&nbsp;<span class="comment">//&nbsp;=================================</span></span>
+  <br/>
+  <span class="code" id="5" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;5</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="6" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;6</span>&nbsp;<span class="pp">#include&nbsp;&lt;cmajor/parsing/ParsingDomain.hpp></span></span>
+  <br/>
+  <span class="code" id="7" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;7</span>&nbsp;<span class="pp">#include&nbsp;&lt;cmajor/parsing/Namespace.hpp></span></span>
+  <br/>
+  <span class="code" id="8" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;8</span>&nbsp;<span class="pp">#include&nbsp;&lt;cmajor/parsing/Scope.hpp></span></span>
+  <br/>
+  <span class="code" id="9" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;9</span>&nbsp;<span class="pp">#include&nbsp;&lt;cmajor/parsing/Grammar.hpp></span></span>
+  <br/>
+  <span class="code" id="10" xml:space="preserve"><span class="lineNumber">&nbsp;10</span>&nbsp;<span class="pp">#include&nbsp;&lt;memory></span></span>
+  <br/>
+  <span class="code" id="11" xml:space="preserve"><span class="lineNumber">&nbsp;11</span>&nbsp;<span class="pp">#include&nbsp;&lt;unordered_set></span></span>
+  <br/>
+  <span class="code" id="12" xml:space="preserve"><span class="lineNumber">&nbsp;12</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="13" xml:space="preserve"><span class="lineNumber">&nbsp;13</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">cmajor</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">parsing</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="14" xml:space="preserve"><span class="lineNumber">&nbsp;14</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="15" xml:space="preserve"><span class="lineNumber">&nbsp;15</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../../class_ParsingDomainRepository_4D39FB23BBF59E253C020EF42CDEA7F713C21B1E.html">ParsingDomainRepository</a>&nbsp;</span>
+  <br/>
+  <span class="code" id="16" xml:space="preserve"><span class="lineNumber">&nbsp;16</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="17" xml:space="preserve"><span class="lineNumber">&nbsp;17</span>&nbsp;<span class="kw">public</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="18" xml:space="preserve"><span class="lineNumber">&nbsp;18</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">static</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../../class_ParsingDomainRepository_4D39FB23BBF59E253C020EF42CDEA7F713C21B1E.html#function_Init_25D7449EBC6CDD432BF16D90588E27ECE1B99457">Init</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="19" xml:space="preserve"><span class="lineNumber">&nbsp;19</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">static</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../../class_ParsingDomainRepository_4D39FB23BBF59E253C020EF42CDEA7F713C21B1E.html#function_Done_07AF20BB9CD561F4D2518D7A3811A2C3BDDA8E8A">Done</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="20" xml:space="preserve"><span class="lineNumber">&nbsp;20</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">static</span>&nbsp;<a href="../../class_ParsingDomainRepository_4D39FB23BBF59E253C020EF42CDEA7F713C21B1E.html">ParsingDomainRepository</a><span class="other">&amp;</span>&nbsp;<a href="../../class_ParsingDomainRepository_4D39FB23BBF59E253C020EF42CDEA7F713C21B1E.html#function_Instance_5D61C0B89559CC3EA0F77E98984BFA1C34B6E34D">Instance</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="21" xml:space="preserve"><span class="lineNumber">&nbsp;21</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span>&nbsp;<a href="../../class_ParsingDomainRepository_4D39FB23BBF59E253C020EF42CDEA7F713C21B1E.html#function_Register_653164220722B832BB67ED24DC486F68CA341943">Register</a><span class="other">(</span><a href="../../class_ParsingDomain_61DCEDE37EC9E175977FD613BC12969D327A4FC4.html">ParsingDomain</a><span class="other">*</span>&nbsp;<span class="identifier">parsingDomain</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="22" xml:space="preserve"><span class="lineNumber">&nbsp;22</span>&nbsp;<span class="kw">private</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="23" xml:space="preserve"><span class="lineNumber">&nbsp;23</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../class_ParsingDomainRepository_4D39FB23BBF59E253C020EF42CDEA7F713C21B1E.html#constructor_ParsingDomainRepository_6939F5A326DFE981F1DC4482EA0666A62A57EEBC">ParsingDomainRepository</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="24" xml:space="preserve"><span class="lineNumber">&nbsp;24</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">static</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><a href="../../class_ParsingDomainRepository_4D39FB23BBF59E253C020EF42CDEA7F713C21B1E.html">ParsingDomainRepository</a><span class="other">></span>&nbsp;<span class="identifier">instance</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="25" xml:space="preserve"><span class="lineNumber">&nbsp;25</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">static</span>&nbsp;<span class="kw">int</span>&nbsp;<span class="identifier">initCount</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="26" xml:space="preserve"><span class="lineNumber">&nbsp;26</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">typedef</span>&nbsp;<span class="identifier">std</span><span class="other">:</span><span class="other">:</span><span class="identifier">unordered_set</span><span class="other">&lt;</span><span class="identifier">std</span><span class="other">:</span><span class="other">:</span><span class="identifier">unique_ptr</span><span class="other">&lt;</span><span class="identifier">ParsingDomain</span><span class="other">></span><span class="other">></span>&nbsp;<span class="identifier">ParsingDomainSet</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="27" xml:space="preserve"><span class="lineNumber">&nbsp;27</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">typedef</span>&nbsp;<span class="identifier">ParsingDomainSet</span><span class="other">:</span><span class="other">:</span><span class="identifier">const_iterator</span>&nbsp;<span class="identifier">ParsingDomainSetIt</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="28" xml:space="preserve"><span class="lineNumber">&nbsp;28</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../class_ParsingDomainRepository_4D39FB23BBF59E253C020EF42CDEA7F713C21B1E.html#typedef_ParsingDomainSet_E20A671B7CFC227E2F08E52CC39F89362A80CCAA">ParsingDomainSet</a>&nbsp;<span class="identifier">parsingDomains</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="29" xml:space="preserve"><span class="lineNumber">&nbsp;29</span>&nbsp;<span class="other">};</span></span>
+  <br/>
+  <span class="code" id="30" xml:space="preserve"><span class="lineNumber">&nbsp;30</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="31" xml:space="preserve"><span class="lineNumber">&nbsp;31</span>&nbsp;<a href="../../class_ParsingDomainRepository_4D39FB23BBF59E253C020EF42CDEA7F713C21B1E.html">ParsingDomainRepository</a><span class="other">::</span><a href="../../class_ParsingDomainRepository_4D39FB23BBF59E253C020EF42CDEA7F713C21B1E.html#constructor_ParsingDomainRepository_6939F5A326DFE981F1DC4482EA0666A62A57EEBC">ParsingDomainRepository</a><span class="other">(</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="32" xml:space="preserve"><span class="lineNumber">&nbsp;32</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="33" xml:space="preserve"><span class="lineNumber">&nbsp;33</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="34" xml:space="preserve"><span class="lineNumber">&nbsp;34</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="35" xml:space="preserve"><span class="lineNumber">&nbsp;35</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../../class_ParsingDomainRepository_4D39FB23BBF59E253C020EF42CDEA7F713C21B1E.html">ParsingDomainRepository</a><span class="other">::</span><a href="../../class_ParsingDomainRepository_4D39FB23BBF59E253C020EF42CDEA7F713C21B1E.html#function_Register_653164220722B832BB67ED24DC486F68CA341943">Register</a><span class="other">(</span><a href="../../class_ParsingDomain_61DCEDE37EC9E175977FD613BC12969D327A4FC4.html">ParsingDomain</a><span class="other">*</span>&nbsp;<span class="identifier">parsingDomain</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="36" xml:space="preserve"><span class="lineNumber">&nbsp;36</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="37" xml:space="preserve"><span class="lineNumber">&nbsp;37</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="other">!</span><span class="identifier">parsingDomain</span><span class="other">-></span><a href="../../class_ParsingObject_D6A163B08653CF53190C94952F145DFC2EB09994.html#function_IsOwned_2424594EAF10B7D7775BFA1275A5732EEE42866C">IsOwned</a><span class="other">(</span><span class="other">)</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="38" xml:space="preserve"><span class="lineNumber">&nbsp;38</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="39" xml:space="preserve"><span class="lineNumber">&nbsp;39</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">parsingDomain</span><span class="other">-></span><a href="../../class_ParsingObject_D6A163B08653CF53190C94952F145DFC2EB09994.html#function_SetOwned_6CA689E33638EBA67141B47B38040183177518A2">SetOwned</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="40" xml:space="preserve"><span class="lineNumber">&nbsp;40</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../class_ParsingDomainRepository_4D39FB23BBF59E253C020EF42CDEA7F713C21B1E.html#variable_parsingDomains_CB06DD2B9D31967492713941C8D1E88D16DA58FC">parsingDomains</a><span class="other">.</span><span class="identifier">insert</span><span class="other">(</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><a href="../../class_ParsingDomain_61DCEDE37EC9E175977FD613BC12969D327A4FC4.html">ParsingDomain</a><span class="other">></span><span class="other">(</span><span class="identifier">parsingDomain</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="41" xml:space="preserve"><span class="lineNumber">&nbsp;41</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="42" xml:space="preserve"><span class="lineNumber">&nbsp;42</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="43" xml:space="preserve"><span class="lineNumber">&nbsp;43</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="44" xml:space="preserve"><span class="lineNumber">&nbsp;44</span>&nbsp;<span class="kw">int</span>&nbsp;<span class="identifier">ParsingDomainRepository</span><span class="other">::</span><span class="identifier">initCount</span>&nbsp;<span class="other">=</span>&nbsp;<span class="other">0</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="45" xml:space="preserve"><span class="lineNumber">&nbsp;45</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="46" xml:space="preserve"><span class="lineNumber">&nbsp;46</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../../class_ParsingDomainRepository_4D39FB23BBF59E253C020EF42CDEA7F713C21B1E.html">ParsingDomainRepository</a><span class="other">::</span><a href="../../class_ParsingDomainRepository_4D39FB23BBF59E253C020EF42CDEA7F713C21B1E.html#function_Init_25D7449EBC6CDD432BF16D90588E27ECE1B99457">Init</a><span class="other">(</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="47" xml:space="preserve"><span class="lineNumber">&nbsp;47</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="48" xml:space="preserve"><span class="lineNumber">&nbsp;48</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><a href="../../class_ParsingDomainRepository_4D39FB23BBF59E253C020EF42CDEA7F713C21B1E.html#variable_initCount_EBAA8CE1FCBAAC2D3EA9C188D86A2AA39105DDC6">initCount</a><span class="other">++</span><span class="other">&nbsp;==&nbsp;</span><span class="other">0</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="49" xml:space="preserve"><span class="lineNumber">&nbsp;49</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="50" xml:space="preserve"><span class="lineNumber">&nbsp;50</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../class_ParsingDomainRepository_4D39FB23BBF59E253C020EF42CDEA7F713C21B1E.html#variable_instance_13CADE3215007E74E042B50A6B7A8495205EFD70">instance</a><span class="other">.</span><span class="identifier">reset</span><span class="other">(</span><span class="kw">new&nbsp;</span><a href="../../class_ParsingDomainRepository_4D39FB23BBF59E253C020EF42CDEA7F713C21B1E.html">ParsingDomainRepository</a><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="51" xml:space="preserve"><span class="lineNumber">&nbsp;51</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="52" xml:space="preserve"><span class="lineNumber">&nbsp;52</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="53" xml:space="preserve"><span class="lineNumber">&nbsp;53</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="54" xml:space="preserve"><span class="lineNumber">&nbsp;54</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../../class_ParsingDomainRepository_4D39FB23BBF59E253C020EF42CDEA7F713C21B1E.html">ParsingDomainRepository</a><span class="other">::</span><a href="../../class_ParsingDomainRepository_4D39FB23BBF59E253C020EF42CDEA7F713C21B1E.html#function_Done_07AF20BB9CD561F4D2518D7A3811A2C3BDDA8E8A">Done</a><span class="other">(</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="55" xml:space="preserve"><span class="lineNumber">&nbsp;55</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="56" xml:space="preserve"><span class="lineNumber">&nbsp;56</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="other">--</span><a href="../../class_ParsingDomainRepository_4D39FB23BBF59E253C020EF42CDEA7F713C21B1E.html#variable_initCount_EBAA8CE1FCBAAC2D3EA9C188D86A2AA39105DDC6">initCount</a><span class="other">&nbsp;==&nbsp;</span><span class="other">0</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="57" xml:space="preserve"><span class="lineNumber">&nbsp;57</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="58" xml:space="preserve"><span class="lineNumber">&nbsp;58</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../class_ParsingDomainRepository_4D39FB23BBF59E253C020EF42CDEA7F713C21B1E.html#variable_instance_13CADE3215007E74E042B50A6B7A8495205EFD70">instance</a><span class="other">.</span><span class="identifier">reset</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="59" xml:space="preserve"><span class="lineNumber">&nbsp;59</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="60" xml:space="preserve"><span class="lineNumber">&nbsp;60</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="61" xml:space="preserve"><span class="lineNumber">&nbsp;61</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="62" xml:space="preserve"><span class="lineNumber">&nbsp;62</span>&nbsp;<a href="../../class_ParsingDomainRepository_4D39FB23BBF59E253C020EF42CDEA7F713C21B1E.html">ParsingDomainRepository</a><span class="other">&amp;</span>&nbsp;<a href="../../class_ParsingDomainRepository_4D39FB23BBF59E253C020EF42CDEA7F713C21B1E.html">ParsingDomainRepository</a><span class="other">::</span><a href="../../class_ParsingDomainRepository_4D39FB23BBF59E253C020EF42CDEA7F713C21B1E.html#function_Instance_5D61C0B89559CC3EA0F77E98984BFA1C34B6E34D">Instance</a><span class="other">(</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="63" xml:space="preserve"><span class="lineNumber">&nbsp;63</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="64" xml:space="preserve"><span class="lineNumber">&nbsp;64</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="other">*</span><a href="../../class_ParsingDomainRepository_4D39FB23BBF59E253C020EF42CDEA7F713C21B1E.html#variable_instance_13CADE3215007E74E042B50A6B7A8495205EFD70">instance</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="65" xml:space="preserve"><span class="lineNumber">&nbsp;65</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="66" xml:space="preserve"><span class="lineNumber">&nbsp;66</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="67" xml:space="preserve"><span class="lineNumber">&nbsp;67</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><a href="../../class_ParsingDomainRepository_4D39FB23BBF59E253C020EF42CDEA7F713C21B1E.html">ParsingDomainRepository</a><span class="other">></span>&nbsp;<span class="identifier">ParsingDomainRepository</span><span class="other">::</span><span class="identifier">instance</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="68" xml:space="preserve"><span class="lineNumber">&nbsp;68</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="69" xml:space="preserve"><span class="lineNumber">&nbsp;69</span>&nbsp;<a href="../../class_ParsingDomain_61DCEDE37EC9E175977FD613BC12969D327A4FC4.html">ParsingDomain</a><span class="other">::</span><a href="../../class_ParsingDomain_61DCEDE37EC9E175977FD613BC12969D327A4FC4.html#constructor_ParsingDomain_3A62ECE458A221415A6EF68A78928C181DB63848">ParsingDomain</a><span class="other">(</span><span class="other">)</span><span class="other">:</span>&nbsp;<a href="../../class_ParsingObject_D6A163B08653CF53190C94952F145DFC2EB09994.html">ParsingObject</a><span class="other">(</span><span class="string">U"parsingDomain"</span><span class="other">,&nbsp;</span><a href="../../enum_ObjectKind_4E3C274E727BBC38DFFBE3508C3328AFBB7EA698.html">ObjectKind</a><span class="other">::</span><a href="../../enum_ObjectKind_4E3C274E727BBC38DFFBE3508C3328AFBB7EA698.html#enumerator_parsingDomain_3C710937EEA5DD3AD3F39C46BE7CE06A1156862E">parsingDomain</a><span class="other">)</span><span class="other">,&nbsp;</span></span>
+  <br/>
+  <span class="code" id="70" xml:space="preserve"><span class="lineNumber">&nbsp;70</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../class_ParsingDomain_61DCEDE37EC9E175977FD613BC12969D327A4FC4.html#variable_globalNamespace_6BC56CC95766AE890561DD451901652FF3737D96">globalNamespace</a><span class="other">(</span><span class="kw">new&nbsp;</span><a href="../../class_Namespace_8B05254A0CF9BE40D0D41360A7BDEF2684E03F5B.html">Namespace</a><span class="other">(</span><span class="string">U""</span><span class="other">,&nbsp;</span><span class="kw">nullptr</span><span class="other">)</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="../../class_ParsingDomain_61DCEDE37EC9E175977FD613BC12969D327A4FC4.html#variable_globalScope_E054D13163E2AB11BAF6294C16959C0D11C9B2B5">globalScope</a><span class="other">(</span><a href="../../class_ParsingDomain_61DCEDE37EC9E175977FD613BC12969D327A4FC4.html#variable_globalNamespace_6BC56CC95766AE890561DD451901652FF3737D96">globalNamespace</a><span class="other">-></span><a href="../../class_ParsingObject_D6A163B08653CF53190C94952F145DFC2EB09994.html#function_GetScope_E2C3A8746ACE512A20BAB42302FAE70116421BE9">GetScope</a><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="../../class_ParsingDomain_61DCEDE37EC9E175977FD613BC12969D327A4FC4.html#variable_currentNamespace_9C1EE7C69BED6178C4AD18F1EF66ACF97BFAF6B9">currentNamespace</a><span class="other">(</span><a href="../../class_ParsingDomain_61DCEDE37EC9E175977FD613BC12969D327A4FC4.html#variable_globalNamespace_6BC56CC95766AE890561DD451901652FF3737D96">globalNamespace</a><span class="other">)</span><span class="other">,&nbsp;</span><a href="../../class_ParsingDomain_61DCEDE37EC9E175977FD613BC12969D327A4FC4.html#variable_nextRuleId_74FD9B15C2CEB4DAFEBB9DDEEA156165340E878B">nextRuleId</a><span class="other">(</span><span class="other">0</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="71" xml:space="preserve"><span class="lineNumber">&nbsp;71</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="72" xml:space="preserve"><span class="lineNumber">&nbsp;72</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../class_ParsingObject_D6A163B08653CF53190C94952F145DFC2EB09994.html#function_Own_F4C61B6E093734D4BFE8339EB42030BDCB47782A">Own</a><span class="other">(</span><a href="../../class_ParsingDomain_61DCEDE37EC9E175977FD613BC12969D327A4FC4.html#variable_globalNamespace_6BC56CC95766AE890561DD451901652FF3737D96">globalNamespace</a><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="73" xml:space="preserve"><span class="lineNumber">&nbsp;73</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../class_ParsingDomain_61DCEDE37EC9E175977FD613BC12969D327A4FC4.html#variable_globalScope_E054D13163E2AB11BAF6294C16959C0D11C9B2B5">globalScope</a><span class="other">-></span><a href="../../class_Scope_68666B1670BB0A45FDFC7BC194F5263DA68C727E.html#function_SetNs_71F49B5B151408A6BB48E5B5424DCDCC9A9D0F69">SetNs</a><span class="other">(</span><a href="../../class_ParsingDomain_61DCEDE37EC9E175977FD613BC12969D327A4FC4.html#variable_globalNamespace_6BC56CC95766AE890561DD451901652FF3737D96">globalNamespace</a><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="74" xml:space="preserve"><span class="lineNumber">&nbsp;74</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../class_ParsingDomain_61DCEDE37EC9E175977FD613BC12969D327A4FC4.html#variable_namespaceMap_A286E04987EEFE9C16C674FE2C09D10BF07C1B77">namespaceMap</a><span class="other">[</span><a href="../../class_ParsingDomain_61DCEDE37EC9E175977FD613BC12969D327A4FC4.html#variable_currentNamespace_9C1EE7C69BED6178C4AD18F1EF66ACF97BFAF6B9">currentNamespace</a><span class="other">-></span><a href="../../class_ParsingObject_D6A163B08653CF53190C94952F145DFC2EB09994.html#function_FullName_1AF5AF1F96E29EB313D0A0B5CEAA9C4E8B99A2D9">FullName</a><span class="other">(</span><span class="other">)</span><span class="other">]</span><span class="other">&nbsp;=&nbsp;</span><a href="../../class_ParsingDomain_61DCEDE37EC9E175977FD613BC12969D327A4FC4.html#variable_currentNamespace_9C1EE7C69BED6178C4AD18F1EF66ACF97BFAF6B9">currentNamespace</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="75" xml:space="preserve"><span class="lineNumber">&nbsp;75</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="76" xml:space="preserve"><span class="lineNumber">&nbsp;76</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="77" xml:space="preserve"><span class="lineNumber">&nbsp;77</span>&nbsp;<a href="../../class_Scope_68666B1670BB0A45FDFC7BC194F5263DA68C727E.html">Scope</a><span class="other">*</span>&nbsp;<a href="../../class_ParsingDomain_61DCEDE37EC9E175977FD613BC12969D327A4FC4.html">ParsingDomain</a><span class="other">::</span><a href="../../class_ParsingDomain_61DCEDE37EC9E175977FD613BC12969D327A4FC4.html#function_CurrentScope_B036BCE85F9E498A6722A85CE49738F9183E79BA">CurrentScope</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span></span>
+  <br/>
+  <span class="code" id="78" xml:space="preserve"><span class="lineNumber">&nbsp;78</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="79" xml:space="preserve"><span class="lineNumber">&nbsp;79</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<a href="../../class_ParsingDomain_61DCEDE37EC9E175977FD613BC12969D327A4FC4.html#variable_currentNamespace_9C1EE7C69BED6178C4AD18F1EF66ACF97BFAF6B9">currentNamespace</a><span class="other">-></span><a href="../../class_ParsingObject_D6A163B08653CF53190C94952F145DFC2EB09994.html#function_GetScope_E2C3A8746ACE512A20BAB42302FAE70116421BE9">GetScope</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="80" xml:space="preserve"><span class="lineNumber">&nbsp;80</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="81" xml:space="preserve"><span class="lineNumber">&nbsp;81</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="82" xml:space="preserve"><span class="lineNumber">&nbsp;82</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../../class_ParsingDomain_61DCEDE37EC9E175977FD613BC12969D327A4FC4.html">ParsingDomain</a><span class="other">::</span><a href="../../class_ParsingDomain_61DCEDE37EC9E175977FD613BC12969D327A4FC4.html#function_BeginNamespace_05713A200B444B1DB585F596835F278237AF1717">BeginNamespace</a><span class="other">(</span><span class="kw">const&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="type">u32string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">ns</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="83" xml:space="preserve"><span class="lineNumber">&nbsp;83</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="84" xml:space="preserve"><span class="lineNumber">&nbsp;84</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">u32string</span>&nbsp;<span class="identifier">fullNamespaceName</span>&nbsp;<span class="other">=</span>&nbsp;<a href="../../class_ParsingDomain_61DCEDE37EC9E175977FD613BC12969D327A4FC4.html#variable_currentNamespace_9C1EE7C69BED6178C4AD18F1EF66ACF97BFAF6B9">currentNamespace</a><span class="other">-></span><a href="../../class_ParsingObject_D6A163B08653CF53190C94952F145DFC2EB09994.html#function_FullName_1AF5AF1F96E29EB313D0A0B5CEAA9C4E8B99A2D9">FullName</a><span class="other">(</span><span class="other">)</span><span class="other">.</span><span class="identifier">empty</span><span class="other">(</span><span class="other">)</span><span class="other">&nbsp;?&nbsp;</span><span class="identifier">ns</span><span class="other">&nbsp;:&nbsp;</span><a href="../../class_ParsingDomain_61DCEDE37EC9E175977FD613BC12969D327A4FC4.html#variable_currentNamespace_9C1EE7C69BED6178C4AD18F1EF66ACF97BFAF6B9">currentNamespace</a><span class="other">-></span><a href="../../class_ParsingObject_D6A163B08653CF53190C94952F145DFC2EB09994.html#function_FullName_1AF5AF1F96E29EB313D0A0B5CEAA9C4E8B99A2D9">FullName</a><span class="other">(</span><span class="other">)</span><span class="other">&nbsp;+&nbsp;</span><span class="string">U"."</span><span class="other">&nbsp;+&nbsp;</span><span class="identifier">ns</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="85" xml:space="preserve"><span class="lineNumber">&nbsp;85</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../class_ParsingDomain_61DCEDE37EC9E175977FD613BC12969D327A4FC4.html#variable_namespaceStack_FF4529A316540BA457919DD7F255F4AF440FE8A0">namespaceStack</a><span class="other">.</span><span class="identifier">push</span><span class="other">(</span><a href="../../class_ParsingDomain_61DCEDE37EC9E175977FD613BC12969D327A4FC4.html#variable_currentNamespace_9C1EE7C69BED6178C4AD18F1EF66ACF97BFAF6B9">currentNamespace</a><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="86" xml:space="preserve"><span class="lineNumber">&nbsp;86</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../class_ParsingDomain_61DCEDE37EC9E175977FD613BC12969D327A4FC4.html#typedef_NamespaceMapIt_5754E41A91D329B883BCF8F1F8C9473D4CB89E7D">NamespaceMapIt</a>&nbsp;<span class="identifier">i</span>&nbsp;<span class="other">=</span>&nbsp;<a href="../../class_ParsingDomain_61DCEDE37EC9E175977FD613BC12969D327A4FC4.html#variable_namespaceMap_A286E04987EEFE9C16C674FE2C09D10BF07C1B77">namespaceMap</a><span class="other">.</span><span class="identifier">find</span><span class="other">(</span><span class="identifier">fullNamespaceName</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="87" xml:space="preserve"><span class="lineNumber">&nbsp;87</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">i</span><span class="other">&nbsp;!=&nbsp;</span><a href="../../class_ParsingDomain_61DCEDE37EC9E175977FD613BC12969D327A4FC4.html#variable_namespaceMap_A286E04987EEFE9C16C674FE2C09D10BF07C1B77">namespaceMap</a><span class="other">.</span><span class="identifier">end</span><span class="other">(</span><span class="other">)</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="88" xml:space="preserve"><span class="lineNumber">&nbsp;88</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="89" xml:space="preserve"><span class="lineNumber">&nbsp;89</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../class_ParsingDomain_61DCEDE37EC9E175977FD613BC12969D327A4FC4.html#variable_currentNamespace_9C1EE7C69BED6178C4AD18F1EF66ACF97BFAF6B9">currentNamespace</a><span class="other">&nbsp;=&nbsp;</span><span class="identifier">i</span><span class="other">-></span><span class="identifier">second</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="90" xml:space="preserve"><span class="lineNumber">&nbsp;90</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="91" xml:space="preserve"><span class="lineNumber">&nbsp;91</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">else</span></span>
+  <br/>
+  <span class="code" id="92" xml:space="preserve"><span class="lineNumber">&nbsp;92</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="93" xml:space="preserve"><span class="lineNumber">&nbsp;93</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../class_Namespace_8B05254A0CF9BE40D0D41360A7BDEF2684E03F5B.html">Namespace</a><span class="other">&nbsp;*&nbsp;</span><span class="identifier">newNs</span><span class="other">(</span><span class="kw">new&nbsp;</span><a href="../../class_Namespace_8B05254A0CF9BE40D0D41360A7BDEF2684E03F5B.html">Namespace</a><span class="other">(</span><span class="identifier">fullNamespaceName</span><span class="other">,&nbsp;</span><a href="../../class_ParsingDomain_61DCEDE37EC9E175977FD613BC12969D327A4FC4.html#variable_globalScope_E054D13163E2AB11BAF6294C16959C0D11C9B2B5">globalScope</a><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="94" xml:space="preserve"><span class="lineNumber">&nbsp;94</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../class_ParsingObject_D6A163B08653CF53190C94952F145DFC2EB09994.html#function_Own_F4C61B6E093734D4BFE8339EB42030BDCB47782A">Own</a><span class="other">(</span><span class="identifier">newNs</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="95" xml:space="preserve"><span class="lineNumber">&nbsp;95</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">newNs</span><span class="other">-></span><a href="../../class_ParsingObject_D6A163B08653CF53190C94952F145DFC2EB09994.html#function_GetScope_E2C3A8746ACE512A20BAB42302FAE70116421BE9">GetScope</a><span class="other">(</span><span class="other">)</span><span class="other">-></span><a href="../../class_Scope_68666B1670BB0A45FDFC7BC194F5263DA68C727E.html#function_SetNs_71F49B5B151408A6BB48E5B5424DCDCC9A9D0F69">SetNs</a><span class="other">(</span><span class="identifier">newNs</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="96" xml:space="preserve"><span class="lineNumber">&nbsp;96</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../class_ParsingDomain_61DCEDE37EC9E175977FD613BC12969D327A4FC4.html#variable_namespaceMap_A286E04987EEFE9C16C674FE2C09D10BF07C1B77">namespaceMap</a><span class="other">[</span><span class="identifier">newNs</span><span class="other">-></span><a href="../../class_ParsingObject_D6A163B08653CF53190C94952F145DFC2EB09994.html#function_FullName_1AF5AF1F96E29EB313D0A0B5CEAA9C4E8B99A2D9">FullName</a><span class="other">(</span><span class="other">)</span><span class="other">]</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">newNs</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="97" xml:space="preserve"><span class="lineNumber">&nbsp;97</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../class_ParsingDomain_61DCEDE37EC9E175977FD613BC12969D327A4FC4.html#variable_currentNamespace_9C1EE7C69BED6178C4AD18F1EF66ACF97BFAF6B9">currentNamespace</a><span class="other">&nbsp;=&nbsp;</span><span class="identifier">newNs</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="98" xml:space="preserve"><span class="lineNumber">&nbsp;98</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../class_ParsingDomain_61DCEDE37EC9E175977FD613BC12969D327A4FC4.html#variable_globalScope_E054D13163E2AB11BAF6294C16959C0D11C9B2B5">globalScope</a><span class="other">-></span><a href="../../class_Scope_68666B1670BB0A45FDFC7BC194F5263DA68C727E.html#function_AddNamespace_90C38036FD3CE04E5F79C1315CC3870CCDE9E4D6">AddNamespace</a><span class="other">(</span><span class="identifier">newNs</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="99" xml:space="preserve"><span class="lineNumber">&nbsp;99</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="100" xml:space="preserve"><span class="lineNumber">100</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="101" xml:space="preserve"><span class="lineNumber">101</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="102" xml:space="preserve"><span class="lineNumber">102</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../../class_ParsingDomain_61DCEDE37EC9E175977FD613BC12969D327A4FC4.html">ParsingDomain</a><span class="other">::</span><a href="../../class_ParsingDomain_61DCEDE37EC9E175977FD613BC12969D327A4FC4.html#function_EndNamespace_6FD09E35D2E47E268DDD7CC11377809ADB06D836">EndNamespace</a><span class="other">(</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="103" xml:space="preserve"><span class="lineNumber">103</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="104" xml:space="preserve"><span class="lineNumber">104</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../class_ParsingDomain_61DCEDE37EC9E175977FD613BC12969D327A4FC4.html#variable_currentNamespace_9C1EE7C69BED6178C4AD18F1EF66ACF97BFAF6B9">currentNamespace</a><span class="other">&nbsp;=&nbsp;</span><a href="../../class_ParsingDomain_61DCEDE37EC9E175977FD613BC12969D327A4FC4.html#variable_namespaceStack_FF4529A316540BA457919DD7F255F4AF440FE8A0">namespaceStack</a><span class="other">.</span><span class="identifier">top</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="105" xml:space="preserve"><span class="lineNumber">105</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../class_ParsingDomain_61DCEDE37EC9E175977FD613BC12969D327A4FC4.html#variable_namespaceStack_FF4529A316540BA457919DD7F255F4AF440FE8A0">namespaceStack</a><span class="other">.</span><span class="identifier">pop</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="106" xml:space="preserve"><span class="lineNumber">106</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="107" xml:space="preserve"><span class="lineNumber">107</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="108" xml:space="preserve"><span class="lineNumber">108</span>&nbsp;<a href="../../class_Scope_68666B1670BB0A45FDFC7BC194F5263DA68C727E.html">Scope</a><span class="other">*</span>&nbsp;<a href="../../class_ParsingDomain_61DCEDE37EC9E175977FD613BC12969D327A4FC4.html">ParsingDomain</a><span class="other">::</span><a href="../../class_ParsingDomain_61DCEDE37EC9E175977FD613BC12969D327A4FC4.html#function_GetNamespaceScope_DC74652325C7EA6FCF8137437818787D6AA36C02">GetNamespaceScope</a><span class="other">(</span><span class="kw">const&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="type">u32string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">fullNamespaceName</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="109" xml:space="preserve"><span class="lineNumber">109</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="110" xml:space="preserve"><span class="lineNumber">110</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">fullNamespaceName</span><span class="other">.</span><span class="identifier">empty</span><span class="other">(</span><span class="other">)</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="111" xml:space="preserve"><span class="lineNumber">111</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="112" xml:space="preserve"><span class="lineNumber">112</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<a href="../../class_ParsingDomain_61DCEDE37EC9E175977FD613BC12969D327A4FC4.html#variable_globalScope_E054D13163E2AB11BAF6294C16959C0D11C9B2B5">globalScope</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="113" xml:space="preserve"><span class="lineNumber">113</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="114" xml:space="preserve"><span class="lineNumber">114</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../class_Namespace_8B05254A0CF9BE40D0D41360A7BDEF2684E03F5B.html">Namespace</a><span class="other">*</span>&nbsp;<span class="identifier">ns</span>&nbsp;<span class="other">=</span>&nbsp;<a href="../../class_ParsingDomain_61DCEDE37EC9E175977FD613BC12969D327A4FC4.html#variable_globalScope_E054D13163E2AB11BAF6294C16959C0D11C9B2B5">globalScope</a><span class="other">-></span><a href="../../class_Scope_68666B1670BB0A45FDFC7BC194F5263DA68C727E.html#function_GetNamespace_7167438F043423122D9346424F1E389A529D6E12">GetNamespace</a><span class="other">(</span><span class="identifier">fullNamespaceName</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="115" xml:space="preserve"><span class="lineNumber">115</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="other">!</span><span class="identifier">ns</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="116" xml:space="preserve"><span class="lineNumber">116</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="117" xml:space="preserve"><span class="lineNumber">117</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">ns</span><span class="other">&nbsp;=&nbsp;</span><span class="kw">new&nbsp;</span><a href="../../class_Namespace_8B05254A0CF9BE40D0D41360A7BDEF2684E03F5B.html">Namespace</a><span class="other">(</span><span class="identifier">fullNamespaceName</span><span class="other">,&nbsp;</span><a href="../../class_ParsingDomain_61DCEDE37EC9E175977FD613BC12969D327A4FC4.html#variable_globalScope_E054D13163E2AB11BAF6294C16959C0D11C9B2B5">globalScope</a><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="118" xml:space="preserve"><span class="lineNumber">118</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../class_ParsingObject_D6A163B08653CF53190C94952F145DFC2EB09994.html#function_Own_F4C61B6E093734D4BFE8339EB42030BDCB47782A">Own</a><span class="other">(</span><span class="identifier">ns</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="119" xml:space="preserve"><span class="lineNumber">119</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../class_ParsingDomain_61DCEDE37EC9E175977FD613BC12969D327A4FC4.html#variable_globalScope_E054D13163E2AB11BAF6294C16959C0D11C9B2B5">globalScope</a><span class="other">-></span><a href="../../class_Scope_68666B1670BB0A45FDFC7BC194F5263DA68C727E.html#function_AddNamespace_90C38036FD3CE04E5F79C1315CC3870CCDE9E4D6">AddNamespace</a><span class="other">(</span><span class="identifier">ns</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="120" xml:space="preserve"><span class="lineNumber">120</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="121" xml:space="preserve"><span class="lineNumber">121</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">ns</span><span class="other">-></span><a href="../../class_ParsingObject_D6A163B08653CF53190C94952F145DFC2EB09994.html#function_GetScope_E2C3A8746ACE512A20BAB42302FAE70116421BE9">GetScope</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="122" xml:space="preserve"><span class="lineNumber">122</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="123" xml:space="preserve"><span class="lineNumber">123</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="124" xml:space="preserve"><span class="lineNumber">124</span>&nbsp;<a href="../../class_Grammar_F1BF78A27CDC5521CDD04CC43EBFC626424E80EA.html">Grammar</a><span class="other">*</span>&nbsp;<a href="../../class_ParsingDomain_61DCEDE37EC9E175977FD613BC12969D327A4FC4.html">ParsingDomain</a><span class="other">::</span><a href="../../class_ParsingDomain_61DCEDE37EC9E175977FD613BC12969D327A4FC4.html#function_GetGrammar_EBB376B2E1A4625D01A458D29B440B098011118E">GetGrammar</a><span class="other">(</span><span class="kw">const&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="type">u32string</span><span class="other">&amp;</span>&nbsp;<span class="identifier">grammarName</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="125" xml:space="preserve"><span class="lineNumber">125</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="126" xml:space="preserve"><span class="lineNumber">126</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../class_ParsingDomain_61DCEDE37EC9E175977FD613BC12969D327A4FC4.html#typedef_GrammarMapIt_091B955C7952D164915B9002C59CA31FF8C29E68">GrammarMapIt</a>&nbsp;<span class="identifier">i</span>&nbsp;<span class="other">=</span>&nbsp;<a href="../../class_ParsingDomain_61DCEDE37EC9E175977FD613BC12969D327A4FC4.html#variable_grammarMap_F26BF8A0BEBAC675DA51D72BBDC97B1077CA9A19">grammarMap</a><span class="other">.</span><span class="identifier">find</span><span class="other">(</span><span class="identifier">grammarName</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="127" xml:space="preserve"><span class="lineNumber">127</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">i</span><span class="other">&nbsp;!=&nbsp;</span><a href="../../class_ParsingDomain_61DCEDE37EC9E175977FD613BC12969D327A4FC4.html#variable_grammarMap_F26BF8A0BEBAC675DA51D72BBDC97B1077CA9A19">grammarMap</a><span class="other">.</span><span class="identifier">end</span><span class="other">(</span><span class="other">)</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="128" xml:space="preserve"><span class="lineNumber">128</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="129" xml:space="preserve"><span class="lineNumber">129</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">i</span><span class="other">-></span><span class="identifier">second</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="130" xml:space="preserve"><span class="lineNumber">130</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="131" xml:space="preserve"><span class="lineNumber">131</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">nullptr</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="132" xml:space="preserve"><span class="lineNumber">132</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="133" xml:space="preserve"><span class="lineNumber">133</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="134" xml:space="preserve"><span class="lineNumber">134</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../../class_ParsingDomain_61DCEDE37EC9E175977FD613BC12969D327A4FC4.html">ParsingDomain</a><span class="other">::</span><a href="../../class_ParsingDomain_61DCEDE37EC9E175977FD613BC12969D327A4FC4.html#function_AddGrammar_D5A3750C232A3FA4148996C0CB02FAAD86D659BC">AddGrammar</a><span class="other">(</span><a href="../../class_Grammar_F1BF78A27CDC5521CDD04CC43EBFC626424E80EA.html">Grammar</a><span class="other">*</span>&nbsp;<span class="identifier">grammar</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="135" xml:space="preserve"><span class="lineNumber">135</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="136" xml:space="preserve"><span class="lineNumber">136</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../class_ParsingObject_D6A163B08653CF53190C94952F145DFC2EB09994.html#function_Own_F4C61B6E093734D4BFE8339EB42030BDCB47782A">Own</a><span class="other">(</span><span class="identifier">grammar</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="137" xml:space="preserve"><span class="lineNumber">137</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">u32string</span>&nbsp;<span class="identifier">grammarFullName</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">grammar</span><span class="other">-></span><a href="../../class_ParsingObject_D6A163B08653CF53190C94952F145DFC2EB09994.html#function_FullName_1AF5AF1F96E29EB313D0A0B5CEAA9C4E8B99A2D9">FullName</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="138" xml:space="preserve"><span class="lineNumber">138</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../class_ParsingDomain_61DCEDE37EC9E175977FD613BC12969D327A4FC4.html#typedef_GrammarMapIt_091B955C7952D164915B9002C59CA31FF8C29E68">GrammarMapIt</a>&nbsp;<span class="identifier">i</span>&nbsp;<span class="other">=</span>&nbsp;<a href="../../class_ParsingDomain_61DCEDE37EC9E175977FD613BC12969D327A4FC4.html#variable_grammarMap_F26BF8A0BEBAC675DA51D72BBDC97B1077CA9A19">grammarMap</a><span class="other">.</span><span class="identifier">find</span><span class="other">(</span><span class="identifier">grammarFullName</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="139" xml:space="preserve"><span class="lineNumber">139</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">i</span><span class="other">&nbsp;==&nbsp;</span><a href="../../class_ParsingDomain_61DCEDE37EC9E175977FD613BC12969D327A4FC4.html#variable_grammarMap_F26BF8A0BEBAC675DA51D72BBDC97B1077CA9A19">grammarMap</a><span class="other">.</span><span class="identifier">end</span><span class="other">(</span><span class="other">)</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="140" xml:space="preserve"><span class="lineNumber">140</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="141" xml:space="preserve"><span class="lineNumber">141</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../class_ParsingDomain_61DCEDE37EC9E175977FD613BC12969D327A4FC4.html#variable_grammarMap_F26BF8A0BEBAC675DA51D72BBDC97B1077CA9A19">grammarMap</a><span class="other">[</span><span class="identifier">grammarFullName</span><span class="other">]</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">grammar</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="142" xml:space="preserve"><span class="lineNumber">142</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">grammar</span><span class="other">-></span><a href="../../class_Grammar_F1BF78A27CDC5521CDD04CC43EBFC626424E80EA.html#function_SetNs_44A5BC5A0D53C3E5B323B6E0BC48157D90A5B580">SetNs</a><span class="other">(</span><a href="../../class_ParsingDomain_61DCEDE37EC9E175977FD613BC12969D327A4FC4.html#variable_currentNamespace_9C1EE7C69BED6178C4AD18F1EF66ACF97BFAF6B9">currentNamespace</a><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="143" xml:space="preserve"><span class="lineNumber">143</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">grammar</span><span class="other">-></span><a href="../../class_ParsingObject_D6A163B08653CF53190C94952F145DFC2EB09994.html#function_AddToScope_0A935B888A9C4705EA43BFDD4B6CF8DC910DB123">AddToScope</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="144" xml:space="preserve"><span class="lineNumber">144</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="145" xml:space="preserve"><span class="lineNumber">145</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="146" xml:space="preserve"><span class="lineNumber">146</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="147" xml:space="preserve"><span class="lineNumber">147</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../../class_ParsingDomain_61DCEDE37EC9E175977FD613BC12969D327A4FC4.html">ParsingDomain</a><span class="other">::</span><a href="../../class_ParsingDomain_61DCEDE37EC9E175977FD613BC12969D327A4FC4.html#function_Accept_4ED4CAF33D37E3729FB993CB8610FBF1B9D05BAF">Accept</a><span class="other">(</span><a href="../../class_Visitor_9FF4E73241464BB90D8C7FBE81C08324A94EDF37.html">Visitor</a><span class="other">&amp;</span>&nbsp;<span class="identifier">visitor</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="148" xml:space="preserve"><span class="lineNumber">148</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="149" xml:space="preserve"><span class="lineNumber">149</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">for&nbsp;</span><span class="other">(</span><span class="kw">const&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="type">pair</span><span class="other">&lt;</span><span class="identifier">std</span><span class="other">::</span><span class="type">u32string</span><span class="other">,&nbsp;</span><a href="../../class_Grammar_F1BF78A27CDC5521CDD04CC43EBFC626424E80EA.html">Grammar</a><span class="other">*</span><span class="other">></span><span class="other">&amp;</span>&nbsp;<span class="identifier">p</span><span class="other">&nbsp;:&nbsp;</span><a href="../../class_ParsingDomain_61DCEDE37EC9E175977FD613BC12969D327A4FC4.html#variable_grammarMap_F26BF8A0BEBAC675DA51D72BBDC97B1077CA9A19">grammarMap</a><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="150" xml:space="preserve"><span class="lineNumber">150</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="151" xml:space="preserve"><span class="lineNumber">151</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../class_Grammar_F1BF78A27CDC5521CDD04CC43EBFC626424E80EA.html">Grammar</a><span class="other">*</span>&nbsp;<span class="identifier">grammar</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">p</span><span class="other">.</span><span class="identifier">second</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="152" xml:space="preserve"><span class="lineNumber">152</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">grammar</span><span class="other">-></span><a href="../../class_Grammar_F1BF78A27CDC5521CDD04CC43EBFC626424E80EA.html#function_Accept_1801F18C5819BBC23F54052D8A3B6ECE2BC960F8">Accept</a><span class="other">(</span><span class="identifier">visitor</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="153" xml:space="preserve"><span class="lineNumber">153</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="154" xml:space="preserve"><span class="lineNumber">154</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="155" xml:space="preserve"><span class="lineNumber">155</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="156" xml:space="preserve"><span class="lineNumber">156</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../../namespace_parsing_D308EED43E54B87FB52D88ADF3DA7F4E649CD021.html#function_RegisterParsingDomain_7EC60D1F45C9148A9C0446A3CFC4F5F5C2776AF4">RegisterParsingDomain</a><span class="other">(</span><a href="../../class_ParsingDomain_61DCEDE37EC9E175977FD613BC12969D327A4FC4.html">ParsingDomain</a><span class="other">*</span>&nbsp;<span class="identifier">parsingDomain</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="157" xml:space="preserve"><span class="lineNumber">157</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="158" xml:space="preserve"><span class="lineNumber">158</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../class_ParsingDomainRepository_4D39FB23BBF59E253C020EF42CDEA7F713C21B1E.html">ParsingDomainRepository</a><span class="other">::</span><a href="../../class_ParsingDomainRepository_4D39FB23BBF59E253C020EF42CDEA7F713C21B1E.html#function_Instance_5D61C0B89559CC3EA0F77E98984BFA1C34B6E34D">Instance</a><span class="other">(</span><span class="other">)</span><span class="other">.</span><a href="../../class_ParsingDomainRepository_4D39FB23BBF59E253C020EF42CDEA7F713C21B1E.html#function_Register_653164220722B832BB67ED24DC486F68CA341943">Register</a><span class="other">(</span><span class="identifier">parsingDomain</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="159" xml:space="preserve"><span class="lineNumber">159</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="160" xml:space="preserve"><span class="lineNumber">160</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="161" xml:space="preserve"><span class="lineNumber">161</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../../namespace_parsing_D308EED43E54B87FB52D88ADF3DA7F4E649CD021.html#function_ParsingDomainInit_E2AC2F688676099B354C93235545489E054D4A16">ParsingDomainInit</a><span class="other">(</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="162" xml:space="preserve"><span class="lineNumber">162</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="163" xml:space="preserve"><span class="lineNumber">163</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../class_ParsingDomainRepository_4D39FB23BBF59E253C020EF42CDEA7F713C21B1E.html">ParsingDomainRepository</a><span class="other">::</span><a href="../../class_ParsingDomainRepository_4D39FB23BBF59E253C020EF42CDEA7F713C21B1E.html#function_Init_25D7449EBC6CDD432BF16D90588E27ECE1B99457">Init</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="164" xml:space="preserve"><span class="lineNumber">164</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="165" xml:space="preserve"><span class="lineNumber">165</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="166" xml:space="preserve"><span class="lineNumber">166</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../../namespace_parsing_D308EED43E54B87FB52D88ADF3DA7F4E649CD021.html#function_ParsingDomainDone_BEFCDE1581354B1F66D1DAC4DD5FEBA0C0E9BF69">ParsingDomainDone</a><span class="other">(</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="167" xml:space="preserve"><span class="lineNumber">167</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="168" xml:space="preserve"><span class="lineNumber">168</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../class_ParsingDomainRepository_4D39FB23BBF59E253C020EF42CDEA7F713C21B1E.html">ParsingDomainRepository</a><span class="other">::</span><a href="../../class_ParsingDomainRepository_4D39FB23BBF59E253C020EF42CDEA7F713C21B1E.html#function_Done_07AF20BB9CD561F4D2518D7A3811A2C3BDDA8E8A">Done</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="169" xml:space="preserve"><span class="lineNumber">169</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="170" xml:space="preserve"><span class="lineNumber">170</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="171" xml:space="preserve"><span class="lineNumber">171</span>&nbsp;<span class="other">}</span>&nbsp;<span class="other">}</span>&nbsp;<span class="comment">//&nbsp;namespace&nbsp;cmajor::parsing</span></span>
+  <br/>
+ </body>
+</html>

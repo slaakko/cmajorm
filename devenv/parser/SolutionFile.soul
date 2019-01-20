@@ -1,0 +1,62 @@
+﻿/*========================================================================
+    Copyright (c) 2012-2016 Seppo Laakko
+    http://sourceforge.net/projects/cmajor/
+ 
+    Distributed under the GNU General Public License, version 3 (GPLv3).
+    (See accompanying LICENSE.txt or http://www.gnu.org/licenses/gpl.html)
+
+ ========================================================================*/
+
+using devcore;
+using System.IO;
+
+namespace parser
+{
+    grammar SolutionFile
+    {
+        using stdlib;
+        extern spaces_and_comments;
+        extern identifier: string;
+        extern qualified_id: string;
+        skip spaces_and_comments;
+
+        SolutionFile: Solution
+                    ::= SolutionDeclaration!{ value = SolutionDeclaration; }
+                        ProjectFileDeclarations(value)?
+                        ActiveProject(value)?
+                    ;
+
+        SolutionDeclaration: Solution
+                    ::= (keyword("solution") qualified_id:name! ';'!){ value = new Solution(name, fileName); } 
+                    ;
+
+        ProjectFileDeclarations(Solution solution)
+                    ::= (ProjectFileDeclaration:projectFilePath
+                    { 
+                        ProjectFile projectFileParser = ParserRepository.Instance.ProjectFileParser;
+                        Project project = projectFileParser.Parse(File.ReadAllText(Path.Combine(solution.BasePath, projectFilePath)), 0, Path.GetFullPath(projectFilePath));
+                        solution.Projects.Add(project);
+                    }
+                    )+
+                    ;    
+                    
+        ProjectFileDeclaration: string
+                    ::= (keyword("project") FilePath! ';'){ value = FilePath; }
+                    ;
+
+        ActiveProject(Solution solution)
+                    ::= (keyword("activeProject") qualified_id:projectName! ';')
+                    { 
+                        Project activeProject = solution.GetProject(projectName); 
+                        if (activeProject != null)
+                        {
+                            solution.ActiveProject = activeProject;
+                        }
+                    }
+                    ;
+
+        FilePath: string    
+                    ::= (token('<' ([^>]+){ value = match; } '>'!))
+                    ;
+     }
+}

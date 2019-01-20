@@ -1,0 +1,20 @@
+// =================================
+// Copyright (c) 2019 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+namespace System.Runtime
+{
+    public class FunctionProfiler
+    {
+        public explicit nothrow FunctionProfiler(void* functionId_) : functionId(functionId_)
+        {
+            RtProfileStartFunction(functionId);
+        }
+        public ~FunctionProfiler()
+        {
+            RtProfileEndFunction(functionId);
+        }
+        private void* functionId;
+    }
+}

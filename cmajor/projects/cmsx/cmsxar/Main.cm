@@ -1,0 +1,123 @@
+using System;
+using System.IO;
+using System.Collections;
+using cmsx.object;
+
+public nothrow const char* Version()
+{
+    return "0.1.0";
+}
+
+void PrintHelp()
+{
+    Console.Out() << "Cmajor System X Archiver version " << Version() << endl();
+    Console.Out() << "Usage: cmsxar [options] { file.o }" << endl();
+    Console.Out() << "Options:" << endl();
+    Console.Out() << "--verbose (-v)" << endl();
+    Console.Out() << "  be verbose" << endl();
+    Console.Out() << "--help (-h)" << endl();
+    Console.Out() << "  print help" << endl();
+    Console.Out() << "--out=FILE.a (-o=FILE.a)" << endl();
+    Console.Out() << "  set output file name to 'FILE.a'." << endl();
+}
+
+int main(int argc, const char** argv)
+{
+    try
+    {
+        bool verbose = false;
+        string libraryFileName;
+        List<string> objectFileNames;
+        for (int i = 1; i < argc; ++i)
+        {
+            string arg = argv[i];
+            if (arg.StartsWith("-"))
+            {
+                if (arg.Find('=') != -1)
+                {
+                    List<string> components = arg.Split('=');
+                    if (components.Count() == 2)
+                    {
+                        if (components[0] == "-o" || components[0] == "--out")
+                        {
+                            libraryFileName = GetFullPath(components[1]);
+                        }
+                        else
+                        {
+                            throw Exception("unknown option '" + arg + "'");
+                        }
+                    }
+                    else
+                    {
+                        throw Exception("unknown option '" + arg + "'");
+                    }
+                }
+                else if (arg == "-v" || arg == "--verbose")
+                {
+                    verbose = true;
+                }
+                else if (arg == "-h" || arg == "--help")
+                {
+                    PrintHelp();
+                    return 0;
+                }
+                else
+                {
+                    throw Exception("unknown option '" + arg + "'");
+                }
+            }
+            else
+            {
+                objectFileNames.Add(GetFullPath(arg));
+            }
+        }
+        if (verbose)
+        {
+            Console.Out() << "Cmajor System X Archiver version " << Version() << endl();
+        }
+        if (objectFileNames.IsEmpty())
+        {
+            PrintHelp();
+            throw Exception("no object files given");
+        }
+        if (libraryFileName.IsEmpty())
+        {
+            PrintHelp();
+            throw Exception("no library file name given");
+        }
+        List<UniquePtr<BinaryFile>> binaryFiles;
+        for (const string& objectFileName : objectFileNames)
+        {
+            if (verbose)
+            {
+                Console.Out() << "> " << objectFileName << endl();
+            }
+            UniquePtr<BinaryFile> binaryFile = ReadBinaryFile(objectFileName);
+            binaryFile->AddSymbolsToAddressMap();
+            binaryFiles.Add(Rvalue(binaryFile));
+        }
+        LibraryFile libraryFile(libraryFileName, true);
+        for (UniquePtr<BinaryFile>& binaryFile : binaryFiles)
+        {
+            if (binaryFile.Get() is ObjectFile*)
+            {
+                libraryFile.objectFiles.Add(UniquePtr<ObjectFile>(cast<ObjectFile*>(binaryFile.Release())));
+            }
+            else
+            {
+                throw Exception("file '" + binaryFile->FileName() + "' is not a cmsx object file");
+            }
+        }
+        libraryFile.Write();
+        if (verbose)
+        {
+            Console.Out() << "==> " << libraryFileName << endl();
+        }
+    }
+    catch (const Exception& ex)
+    {
+        Console.Error() << ex.Message() << endl();
+        return 1;
+    }
+    return 0;
+}

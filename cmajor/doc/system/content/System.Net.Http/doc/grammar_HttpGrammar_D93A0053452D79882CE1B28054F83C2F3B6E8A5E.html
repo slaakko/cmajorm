@@ -1,0 +1,481 @@
+<html>
+ <head>
+  <meta charset="utf-8"/>
+  <title>HttpGrammar Grammar</title>
+  <link href="../../../style/style.css" rel="stylesheet" type="text/css"/>
+ </head>
+ <body>
+  <h1>HttpGrammar Grammar</h1>
+  <table class="grammar">
+   <tr id="rule_statusLine_06AE195E2671EFEC37A4C6CDD617A48F64E1AC7D">
+    <td class="grammarFirstCol">
+     <span class="rule">statusLine</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#rule_httpVersion_4C6509DFDBCA833EF8C9B16526464EECF1828DEC">httpVersion</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_SP_EEA073F4176895CB45D47EFF1E2C28EED79739FF">SP</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_statusCode_27CE550A43B941FDB3B0B118B9B95254A9D30022">statusCode</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_SP_EEA073F4176895CB45D47EFF1E2C28EED79739FF">SP</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_reasonPhrase_60A614603D90FCA716218363393CB0DF972D5266">reasonPhrase</a></span><span class="ruleOp">)</span></td>
+   </tr>
+   <tr id="rule_httpVersion_4C6509DFDBCA833EF8C9B16526464EECF1828DEC">
+    <td class="grammarFirstCol">
+     <span class="rule">httpVersion</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleOp">(</span><span class="ruleString">"HTTP"</span><span class="ruleOp"> </span><span class="ruleChar">'/'</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_DIGIT_B4F9C320794C85BC2B63AF974008285A01000388">DIGIT</a></span><span class="ruleOp">+</span><span class="ruleOp"> </span><span class="ruleChar">'.'</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_DIGIT_B4F9C320794C85BC2B63AF974008285A01000388">DIGIT</a></span><span class="ruleOp">+</span><span class="ruleOp">)</span></td>
+   </tr>
+   <tr id="rule_statusCode_27CE550A43B941FDB3B0B118B9B95254A9D30022">
+    <td class="grammarFirstCol">
+     <span class="rule">statusCode</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#rule_DIGIT_B4F9C320794C85BC2B63AF974008285A01000388">DIGIT</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_DIGIT_B4F9C320794C85BC2B63AF974008285A01000388">DIGIT</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_DIGIT_B4F9C320794C85BC2B63AF974008285A01000388">DIGIT</a></span><span class="ruleOp">)</span></td>
+   </tr>
+   <tr id="rule_reasonPhrase_60A614603D90FCA716218363393CB0DF972D5266">
+    <td class="grammarFirstCol">
+     <span class="rule">reasonPhrase</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleOp">(</span><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#rule_TEXT_0B7CC791454BBCF12FF9690D8D02AD7CCF262005">TEXT</a></span><span class="ruleOp"> &minus; </span><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#rule_CR_433FC288BB362ED61E34832F20EFE5A06C83DD39">CR</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#rule_LF_0AFC68C6EF88C522F74D478CC23B8EE6B9CEFCE2">LF</a></span><span class="ruleOp">)</span><span class="ruleOp">)</span><span class="ruleOp">*</span><span class="ruleOp">)</span></td>
+   </tr>
+   <tr id="rule_charset_94AFA40B30FC4CAC6EB93F85F3742A5C739BED09">
+    <td class="grammarFirstCol">
+     <span class="rule">charset</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#rule_httpToken_07447D0DF410E14E1B66AFF089BECAB849662DBF">httpToken</a></span></td>
+   </tr>
+   <tr id="rule_contentCoding_725745BF9E4EFD5FBD7E07BAD2FC7AA2E7C005BE">
+    <td class="grammarFirstCol">
+     <span class="rule">contentCoding</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#rule_httpToken_07447D0DF410E14E1B66AFF089BECAB849662DBF">httpToken</a></span></td>
+   </tr>
+   <tr id="rule_transferCoding_F7E1CD0BDECF72C6B52E553B2E5525DF1C4AF0E2">
+    <td class="grammarFirstCol">
+     <span class="rule">transferCoding</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleString">"chunked"</span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#rule_transferExtension_29F1C7720E6F64EF63E14C4C49630BFAE1C0F479">transferExtension</a></span></td>
+   </tr>
+   <tr id="rule_commaSeparatedFieldValue_6C2167B298C90A40F515CA726BE8175215BC3DC3">
+    <td class="grammarFirstCol">
+     <span class="rule">commaSeparatedFieldValue</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#rule_generalFieldValue_17214082A22561FFDDA4A1EF92EDA3C97AF9F519">generalFieldValue</a></span><span class="ruleOp"> % </span><span class="ruleChar">','</span></td>
+   </tr>
+   <tr id="rule_generalFieldValue_17214082A22561FFDDA4A1EF92EDA3C97AF9F519">
+    <td class="grammarFirstCol">
+     <span class="rule">generalFieldValue</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#rule_httpToken_07447D0DF410E14E1B66AFF089BECAB849662DBF">httpToken</a></span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleChar">';'</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_generalParameter_4B3DD58CB2DBEC73EB376B5C380E7D6B4DAE8FAB">generalParameter</a></span><span class="ruleOp">)</span><span class="ruleOp">*</span><span class="ruleOp">)</span></td>
+   </tr>
+   <tr id="rule_generalParameter_4B3DD58CB2DBEC73EB376B5C380E7D6B4DAE8FAB">
+    <td class="grammarFirstCol">
+     <span class="rule">generalParameter</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#rule_attribute_A59394E13421BA892D2156D63797EF0E742063A9">attribute</a></span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleChar">'='</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_attrval_45B3A54DFACE3B4E1D03B3D9F3B4DA80D41AEF8C">attrval</a></span><span class="ruleOp">)</span><span class="ruleOp">?</span><span class="ruleOp">)</span></td>
+   </tr>
+   <tr id="rule_chunkHeader_1B13FCBB2C3F158ECFB4105C253DCDA1EB6D55E7">
+    <td class="grammarFirstCol">
+     <span class="rule">chunkHeader</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleOp">(</span><span class="ruleKeyword">hexdigit</span><span class="ruleOp">+</span><span class="ruleOp">)</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_chunkExtensions_C1858DE98DD7595BCE6919270C2C0899C6245750">chunkExtensions</a></span><span class="ruleOp">?</span></td>
+   </tr>
+   <tr id="rule_chunkExtensions_C1858DE98DD7595BCE6919270C2C0899C6245750">
+    <td class="grammarFirstCol">
+     <span class="rule">chunkExtensions</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleOp">(</span><span class="ruleChar">';'</span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#rule_chunkExtName_7BEAE2000287EFA106CFA09187C7E99EF9664F30">chunkExtName</a></span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleChar">'='</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_chunkExtVal_3925FDC916469AB66C2E253171C21942ACFD35C5">chunkExtVal</a></span><span class="ruleOp">)</span><span class="ruleOp">?</span><span class="ruleOp">)</span><span class="ruleOp">)</span><span class="ruleOp">*</span></td>
+   </tr>
+   <tr id="rule_chunkExtName_7BEAE2000287EFA106CFA09187C7E99EF9664F30">
+    <td class="grammarFirstCol">
+     <span class="rule">chunkExtName</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#rule_httpToken_07447D0DF410E14E1B66AFF089BECAB849662DBF">httpToken</a></span></td>
+   </tr>
+   <tr id="rule_chunkExtVal_3925FDC916469AB66C2E253171C21942ACFD35C5">
+    <td class="grammarFirstCol">
+     <span class="rule">chunkExtVal</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#rule_httpToken_07447D0DF410E14E1B66AFF089BECAB849662DBF">httpToken</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#rule_quotedString_C5DB534D21FF11785BF522AC13936C365EB274CA">quotedString</a></span></td>
+   </tr>
+   <tr id="rule_transferExtension_29F1C7720E6F64EF63E14C4C49630BFAE1C0F479">
+    <td class="grammarFirstCol">
+     <span class="rule">transferExtension</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#rule_httpToken_07447D0DF410E14E1B66AFF089BECAB849662DBF">httpToken</a></span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleChar">';'</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_parameter_218EB4241C1BC57B91085F781AD97DF6A1195891">parameter</a></span><span class="ruleOp">)</span><span class="ruleOp">*</span></td>
+   </tr>
+   <tr id="rule_parameter_218EB4241C1BC57B91085F781AD97DF6A1195891">
+    <td class="grammarFirstCol">
+     <span class="rule">parameter</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#rule_attribute_A59394E13421BA892D2156D63797EF0E742063A9">attribute</a></span><span class="ruleOp"> </span><span class="ruleChar">'='</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_attrval_45B3A54DFACE3B4E1D03B3D9F3B4DA80D41AEF8C">attrval</a></span><span class="ruleOp">)</span></td>
+   </tr>
+   <tr id="rule_attribute_A59394E13421BA892D2156D63797EF0E742063A9">
+    <td class="grammarFirstCol">
+     <span class="rule">attribute</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#rule_httpToken_07447D0DF410E14E1B66AFF089BECAB849662DBF">httpToken</a></span></td>
+   </tr>
+   <tr id="rule_attrval_45B3A54DFACE3B4E1D03B3D9F3B4DA80D41AEF8C">
+    <td class="grammarFirstCol">
+     <span class="rule">attrval</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#rule_httpToken_07447D0DF410E14E1B66AFF089BECAB849662DBF">httpToken</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#rule_quotedString_C5DB534D21FF11785BF522AC13936C365EB274CA">quotedString</a></span></td>
+   </tr>
+   <tr id="rule_mediaType_2DC7978A0B749585F8A1EF44AFE9EB86948095F7">
+    <td class="grammarFirstCol">
+     <span class="rule">mediaType</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#rule_type_C7318B495540F9B2C87024804BEBAA1723B7B3A9">type</a></span><span class="ruleOp"> </span><span class="ruleChar">'/'</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_subtype_258261F40775C10E4F55D28C562E9D8D2A7F1610">subtype</a></span><span class="ruleOp">)</span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleChar">';'</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_parameter_218EB4241C1BC57B91085F781AD97DF6A1195891">parameter</a></span><span class="ruleOp">)</span><span class="ruleOp">*</span></td>
+   </tr>
+   <tr id="rule_type_C7318B495540F9B2C87024804BEBAA1723B7B3A9">
+    <td class="grammarFirstCol">
+     <span class="rule">type</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#rule_httpToken_07447D0DF410E14E1B66AFF089BECAB849662DBF">httpToken</a></span></td>
+   </tr>
+   <tr id="rule_subtype_258261F40775C10E4F55D28C562E9D8D2A7F1610">
+    <td class="grammarFirstCol">
+     <span class="rule">subtype</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#rule_httpToken_07447D0DF410E14E1B66AFF089BECAB849662DBF">httpToken</a></span></td>
+   </tr>
+   <tr id="rule_httpHeader_7CBBF27C6728B2BB3FDC9106AAC935AA874156C0">
+    <td class="grammarFirstCol">
+     <span class="rule">httpHeader</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#rule_fieldName_32EFA8D7A6202C71CCEDF463D02A354D19B1E5AC">fieldName</a></span><span class="ruleOp"> </span><span class="ruleChar">':'</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_fieldValue_21B6C47C18F9BBE3527152A71C89E04295058870">fieldValue</a></span><span class="ruleOp">)</span></td>
+   </tr>
+   <tr id="rule_fieldName_32EFA8D7A6202C71CCEDF463D02A354D19B1E5AC">
+    <td class="grammarFirstCol">
+     <span class="rule">fieldName</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#rule_httpToken_07447D0DF410E14E1B66AFF089BECAB849662DBF">httpToken</a></span></td>
+   </tr>
+   <tr id="rule_fieldValue_21B6C47C18F9BBE3527152A71C89E04295058870">
+    <td class="grammarFirstCol">
+     <span class="rule">fieldValue</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleOp">(</span><span class="ruleKeyword">anychar</span><span class="ruleOp">*</span><span class="ruleOp">)</span></td>
+   </tr>
+   <tr id="rule_dateValue_DE0CF6AABE05D76454DF2843F3FD97D2E46EFD42">
+    <td class="grammarFirstCol">
+     <span class="rule">dateValue</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#rule_httpDate_CCEF16AABDA53CFEDAE5939C139E905EF1CA2E12">httpDate</a></span></td>
+   </tr>
+   <tr id="rule_httpDate_CCEF16AABDA53CFEDAE5939C139E905EF1CA2E12">
+    <td class="grammarFirstCol">
+     <span class="rule">httpDate</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#rule_rfc1123Date_222A87264DE8D4912E3DD3885A06E5B64DA33797">rfc1123Date</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#rule_rfc850Date_4FD23F816007A9F0D5C6F48ACF2A7155E7F39AB7">rfc850Date</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#rule_asctimeDate_22A131761A639E8AD67781B9E3EAA8BB72D18308">asctimeDate</a></span></td>
+   </tr>
+   <tr id="rule_rfc1123Date_222A87264DE8D4912E3DD3885A06E5B64DA33797">
+    <td class="grammarFirstCol">
+     <span class="rule">rfc1123Date</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#rule_wkday_B78ADAA67A9FD5879B186C4F7BF1305C361668DF">wkday</a></span><span class="ruleOp"> </span><span class="ruleChar">','</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_SP_EEA073F4176895CB45D47EFF1E2C28EED79739FF">SP</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_date1_4E0B9FA98E41A821C289B226E8CBAB77729FEC8C">date1</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_SP_EEA073F4176895CB45D47EFF1E2C28EED79739FF">SP</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_time_C2C5153FF135DA7F45D68FDE86DCC4AFCDFCD3BE">time</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_SP_EEA073F4176895CB45D47EFF1E2C28EED79739FF">SP</a></span><span class="ruleOp"> </span><span class="ruleString">"GMT"</span><span class="ruleOp">)</span></td>
+   </tr>
+   <tr id="rule_rfc850Date_4FD23F816007A9F0D5C6F48ACF2A7155E7F39AB7">
+    <td class="grammarFirstCol">
+     <span class="rule">rfc850Date</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#rule_weekday_CC9C2C4EE2528F4F159D56CCBFFCAC4D78390A4F">weekday</a></span><span class="ruleOp"> </span><span class="ruleString">","</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_SP_EEA073F4176895CB45D47EFF1E2C28EED79739FF">SP</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_date2_370FA35C272206EECD1DC2523FDE0CA6457C01A4">date2</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_SP_EEA073F4176895CB45D47EFF1E2C28EED79739FF">SP</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_time_C2C5153FF135DA7F45D68FDE86DCC4AFCDFCD3BE">time</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_SP_EEA073F4176895CB45D47EFF1E2C28EED79739FF">SP</a></span><span class="ruleOp"> </span><span class="ruleString">"GMT"</span><span class="ruleOp">)</span></td>
+   </tr>
+   <tr id="rule_asctimeDate_22A131761A639E8AD67781B9E3EAA8BB72D18308">
+    <td class="grammarFirstCol">
+     <span class="rule">asctimeDate</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#rule_wkday_B78ADAA67A9FD5879B186C4F7BF1305C361668DF">wkday</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_SP_EEA073F4176895CB45D47EFF1E2C28EED79739FF">SP</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_date3_D38EBED4435088114DE95151823F6724AC136948">date3</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_SP_EEA073F4176895CB45D47EFF1E2C28EED79739FF">SP</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_time_C2C5153FF135DA7F45D68FDE86DCC4AFCDFCD3BE">time</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_SP_EEA073F4176895CB45D47EFF1E2C28EED79739FF">SP</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_Year_A34258B299B53D21377B4F9FA34853F29BA7050C">Year</a></span><span class="ruleOp">)</span></td>
+   </tr>
+   <tr id="rule_date1_4E0B9FA98E41A821C289B226E8CBAB77729FEC8C">
+    <td class="grammarFirstCol">
+     <span class="rule">date1</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#rule_Day_95C81ED8A364A424ED564CA47624636005039594">Day</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_SP_EEA073F4176895CB45D47EFF1E2C28EED79739FF">SP</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_month_AD7CAE6777AC66222720DF87D8DB3474CAEB40E8">month</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_SP_EEA073F4176895CB45D47EFF1E2C28EED79739FF">SP</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_Year_A34258B299B53D21377B4F9FA34853F29BA7050C">Year</a></span><span class="ruleOp">)</span></td>
+   </tr>
+   <tr id="rule_date2_370FA35C272206EECD1DC2523FDE0CA6457C01A4">
+    <td class="grammarFirstCol">
+     <span class="rule">date2</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#rule_Day_95C81ED8A364A424ED564CA47624636005039594">Day</a></span><span class="ruleOp"> </span><span class="ruleChar">'-'</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_month_AD7CAE6777AC66222720DF87D8DB3474CAEB40E8">month</a></span><span class="ruleOp"> </span><span class="ruleChar">'-'</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_Year2_577A7B361DCCF71FDC3C14CDAE35F398C6DD5D91">Year2</a></span><span class="ruleOp">)</span></td>
+   </tr>
+   <tr id="rule_date3_D38EBED4435088114DE95151823F6724AC136948">
+    <td class="grammarFirstCol">
+     <span class="rule">date3</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#rule_month_AD7CAE6777AC66222720DF87D8DB3474CAEB40E8">month</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_SP_EEA073F4176895CB45D47EFF1E2C28EED79739FF">SP</a></span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#rule_Day_95C81ED8A364A424ED564CA47624636005039594">Day</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#rule_Day1_25D7A4C8EB5549A0EC17B406879EC5805DEB61D9">Day1</a></span><span class="ruleOp">)</span><span class="ruleOp">)</span></td>
+   </tr>
+   <tr id="rule_Year_A34258B299B53D21377B4F9FA34853F29BA7050C">
+    <td class="grammarFirstCol">
+     <span class="rule">Year</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#rule_DIGIT_B4F9C320794C85BC2B63AF974008285A01000388">DIGIT</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_DIGIT_B4F9C320794C85BC2B63AF974008285A01000388">DIGIT</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_DIGIT_B4F9C320794C85BC2B63AF974008285A01000388">DIGIT</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_DIGIT_B4F9C320794C85BC2B63AF974008285A01000388">DIGIT</a></span><span class="ruleOp">)</span></td>
+   </tr>
+   <tr id="rule_Year2_577A7B361DCCF71FDC3C14CDAE35F398C6DD5D91">
+    <td class="grammarFirstCol">
+     <span class="rule">Year2</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#rule_DIGIT_B4F9C320794C85BC2B63AF974008285A01000388">DIGIT</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_DIGIT_B4F9C320794C85BC2B63AF974008285A01000388">DIGIT</a></span><span class="ruleOp">)</span></td>
+   </tr>
+   <tr id="rule_Day_95C81ED8A364A424ED564CA47624636005039594">
+    <td class="grammarFirstCol">
+     <span class="rule">Day</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#rule_DIGIT_B4F9C320794C85BC2B63AF974008285A01000388">DIGIT</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_DIGIT_B4F9C320794C85BC2B63AF974008285A01000388">DIGIT</a></span><span class="ruleOp">)</span></td>
+   </tr>
+   <tr id="rule_Day1_25D7A4C8EB5549A0EC17B406879EC5805DEB61D9">
+    <td class="grammarFirstCol">
+     <span class="rule">Day1</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#rule_SP_EEA073F4176895CB45D47EFF1E2C28EED79739FF">SP</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_DIGIT_B4F9C320794C85BC2B63AF974008285A01000388">DIGIT</a></span></td>
+   </tr>
+   <tr id="rule_wkday_B78ADAA67A9FD5879B186C4F7BF1305C361668DF">
+    <td class="grammarFirstCol">
+     <span class="rule">wkday</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleString">"Mon"</span><span class="ruleOp"> | </span><span class="ruleString">"Tue"</span><span class="ruleOp"> | </span><span class="ruleString">"Wed"</span><span class="ruleOp"> | </span><span class="ruleString">"Thu"</span><span class="ruleOp"> | </span><span class="ruleString">"Fri"</span><span class="ruleOp"> | </span><span class="ruleString">"Sat"</span><span class="ruleOp"> | </span><span class="ruleString">"Sun"</span></td>
+   </tr>
+   <tr id="rule_weekday_CC9C2C4EE2528F4F159D56CCBFFCAC4D78390A4F">
+    <td class="grammarFirstCol">
+     <span class="rule">weekday</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleString">"Monday"</span><span class="ruleOp"> | </span><span class="ruleString">"Tuesday"</span><span class="ruleOp"> | </span><span class="ruleString">"Wednesday"</span><span class="ruleOp"> | </span><span class="ruleString">"Thursday"</span><span class="ruleOp"> | </span><span class="ruleString">"Friday"</span><span class="ruleOp"> | </span><span class="ruleString">"Saturday"</span><span class="ruleOp"> | </span><span class="ruleString">"Sunday"</span></td>
+   </tr>
+   <tr id="rule_month_AD7CAE6777AC66222720DF87D8DB3474CAEB40E8">
+    <td class="grammarFirstCol">
+     <span class="rule">month</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleString">"Jan"</span><span class="ruleOp"> | </span><span class="ruleString">"Feb"</span><span class="ruleOp"> | </span><span class="ruleString">"Mar"</span><span class="ruleOp"> | </span><span class="ruleString">"Apr"</span><span class="ruleOp"> | </span><span class="ruleString">"May"</span><span class="ruleOp"> | </span><span class="ruleString">"Jun"</span><span class="ruleOp"> | </span><span class="ruleString">"Jul"</span><span class="ruleOp"> | </span><span class="ruleString">"Aug"</span><span class="ruleOp"> | </span><span class="ruleString">"Sep"</span><span class="ruleOp"> | </span><span class="ruleString">"Oct"</span><span class="ruleOp"> | </span><span class="ruleString">"Nov"</span><span class="ruleOp"> | </span><span class="ruleString">"Dec"</span></td>
+   </tr>
+   <tr id="rule_time_C2C5153FF135DA7F45D68FDE86DCC4AFCDFCD3BE">
+    <td class="grammarFirstCol">
+     <span class="rule">time</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#rule_Hour_6E5504EB795037DE1F0BD9581CD73286A3D00BDE">Hour</a></span><span class="ruleOp"> </span><span class="ruleChar">':'</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_Min_567C3A14D03C2AF56BC5684389E2B779EE321B6A">Min</a></span><span class="ruleOp"> </span><span class="ruleChar">':'</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_Sec_7CE91C1CF549B27573D375E5123B790F600806BC">Sec</a></span><span class="ruleOp">)</span></td>
+   </tr>
+   <tr id="rule_Hour_6E5504EB795037DE1F0BD9581CD73286A3D00BDE">
+    <td class="grammarFirstCol">
+     <span class="rule">Hour</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#rule_DIGIT_B4F9C320794C85BC2B63AF974008285A01000388">DIGIT</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_DIGIT_B4F9C320794C85BC2B63AF974008285A01000388">DIGIT</a></span><span class="ruleOp">)</span></td>
+   </tr>
+   <tr id="rule_Min_567C3A14D03C2AF56BC5684389E2B779EE321B6A">
+    <td class="grammarFirstCol">
+     <span class="rule">Min</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#rule_DIGIT_B4F9C320794C85BC2B63AF974008285A01000388">DIGIT</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_DIGIT_B4F9C320794C85BC2B63AF974008285A01000388">DIGIT</a></span><span class="ruleOp">)</span></td>
+   </tr>
+   <tr id="rule_Sec_7CE91C1CF549B27573D375E5123B790F600806BC">
+    <td class="grammarFirstCol">
+     <span class="rule">Sec</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#rule_DIGIT_B4F9C320794C85BC2B63AF974008285A01000388">DIGIT</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_DIGIT_B4F9C320794C85BC2B63AF974008285A01000388">DIGIT</a></span><span class="ruleOp">)</span></td>
+   </tr>
+   <tr id="rule_deltaSeconds_419DD36059E61C95DC55AEB4961C1844D8C1DF3C">
+    <td class="grammarFirstCol">
+     <span class="rule">deltaSeconds</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#rule_DIGIT_B4F9C320794C85BC2B63AF974008285A01000388">DIGIT</a></span><span class="ruleOp">+</span><span class="ruleOp">)</span></td>
+   </tr>
+   <tr id="rule_httpToken_07447D0DF410E14E1B66AFF089BECAB849662DBF">
+    <td class="grammarFirstCol">
+     <span class="rule">httpToken</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleOp">(</span><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#rule_CHAR_8DCA58CD1A450F2192953D1A2366CDCC0F39E32C">CHAR</a></span><span class="ruleOp"> &minus; </span><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#rule_CTL_A6A9F195C779F3A539EB4CBBB2B99A7ACAE4FA52">CTL</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#rule_sep_6AE437A1CB80C2743B7A6A502993A0C6ECAA3C07">sep</a></span><span class="ruleOp">)</span><span class="ruleOp">)</span><span class="ruleOp">+</span><span class="ruleOp">)</span></td>
+   </tr>
+   <tr id="rule_sep_6AE437A1CB80C2743B7A6A502993A0C6ECAA3C07">
+    <td class="grammarFirstCol">
+     <span class="rule">sep</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleCharSet">[()&lt;>@,;:\\\"/[]?={}]</span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#rule_SP_EEA073F4176895CB45D47EFF1E2C28EED79739FF">SP</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#rule_HT_8C9F2CA61E944B88FEC562D92DD6B078BACDE1F4">HT</a></span></td>
+   </tr>
+   <tr id="rule_comment_FC66A5EB2CB2735C71C2FA5AA6D381C40BFAF1C3">
+    <td class="grammarFirstCol">
+     <span class="rule">comment</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleChar">'('</span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#rule_ctext_A99616B0754C3A3D8B19DE9F746FBD66CA3F571C">ctext</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#rule_quotedPair_143795E57BC06797201899E012D57F50015B4CE6">quotedPair</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#rule_comment_FC66A5EB2CB2735C71C2FA5AA6D381C40BFAF1C3">comment</a></span><span class="ruleOp">)</span><span class="ruleOp">*</span><span class="ruleOp"> </span><span class="ruleChar">')'</span></td>
+   </tr>
+   <tr id="rule_ctext_A99616B0754C3A3D8B19DE9F746FBD66CA3F571C">
+    <td class="grammarFirstCol">
+     <span class="rule">ctext</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#rule_TEXT_0B7CC791454BBCF12FF9690D8D02AD7CCF262005">TEXT</a></span><span class="ruleOp"> &minus; </span><span class="ruleCharSet">[()]</span><span class="ruleOp">)</span></td>
+   </tr>
+   <tr id="rule_quotedString_C5DB534D21FF11785BF522AC13936C365EB274CA">
+    <td class="grammarFirstCol">
+     <span class="rule">quotedString</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleChar">'\"'</span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#rule_qdtext_1129E54F929A40238C707367FA29FC5ED8904CD3">qdtext</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#rule_quotedPair_143795E57BC06797201899E012D57F50015B4CE6">quotedPair</a></span><span class="ruleOp">)</span><span class="ruleOp">*</span><span class="ruleOp"> </span><span class="ruleChar">'\"'</span></td>
+   </tr>
+   <tr id="rule_qdtext_1129E54F929A40238C707367FA29FC5ED8904CD3">
+    <td class="grammarFirstCol">
+     <span class="rule">qdtext</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#rule_TEXT_0B7CC791454BBCF12FF9690D8D02AD7CCF262005">TEXT</a></span><span class="ruleOp"> &minus; </span><span class="ruleChar">'\"'</span><span class="ruleOp">)</span></td>
+   </tr>
+   <tr id="rule_quotedPair_143795E57BC06797201899E012D57F50015B4CE6">
+    <td class="grammarFirstCol">
+     <span class="rule">quotedPair</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleChar">'\\'</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_CHAR_8DCA58CD1A450F2192953D1A2366CDCC0F39E32C">CHAR</a></span></td>
+   </tr>
+   <tr id="rule_OCTET_8477E8F607820169C6A019A81373B0B4E2A2105C">
+    <td class="grammarFirstCol">
+     <span class="rule">OCTET</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleKeyword">range</span><span class="ruleParams">(0,255)</span></td>
+   </tr>
+   <tr id="rule_CHAR_8DCA58CD1A450F2192953D1A2366CDCC0F39E32C">
+    <td class="grammarFirstCol">
+     <span class="rule">CHAR</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleKeyword">range</span><span class="ruleParams">(0,127)</span></td>
+   </tr>
+   <tr id="rule_UPALPHA_CF38CB098C86367D363ACB10B625A0780872E10B">
+    <td class="grammarFirstCol">
+     <span class="rule">UPALPHA</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleCharSet">[A-Z]</span></td>
+   </tr>
+   <tr id="rule_LOALPHA_EAC527D0F46B6A249602BBCCF1940D0B727FECDB">
+    <td class="grammarFirstCol">
+     <span class="rule">LOALPHA</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleCharSet">[a-z]</span></td>
+   </tr>
+   <tr id="rule_ALPHA_1CE1B267D074DDD1FBA0B110F60D16E187B916B6">
+    <td class="grammarFirstCol">
+     <span class="rule">ALPHA</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#rule_UPALPHA_CF38CB098C86367D363ACB10B625A0780872E10B">UPALPHA</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#rule_LOALPHA_EAC527D0F46B6A249602BBCCF1940D0B727FECDB">LOALPHA</a></span></td>
+   </tr>
+   <tr id="rule_DIGIT_B4F9C320794C85BC2B63AF974008285A01000388">
+    <td class="grammarFirstCol">
+     <span class="rule">DIGIT</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleCharSet">[0-9]</span></td>
+   </tr>
+   <tr id="rule_CTL_A6A9F195C779F3A539EB4CBBB2B99A7ACAE4FA52">
+    <td class="grammarFirstCol">
+     <span class="rule">CTL</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleKeyword">range</span><span class="ruleParams">(0,31)</span><span class="ruleOp"> | </span><span class="ruleChar">'\x0000007F'</span></td>
+   </tr>
+   <tr id="rule_CR_433FC288BB362ED61E34832F20EFE5A06C83DD39">
+    <td class="grammarFirstCol">
+     <span class="rule">CR</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleChar">'\r'</span></td>
+   </tr>
+   <tr id="rule_LF_0AFC68C6EF88C522F74D478CC23B8EE6B9CEFCE2">
+    <td class="grammarFirstCol">
+     <span class="rule">LF</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleChar">'\n'</span></td>
+   </tr>
+   <tr id="rule_SP_EEA073F4176895CB45D47EFF1E2C28EED79739FF">
+    <td class="grammarFirstCol">
+     <span class="rule">SP</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleChar">' '</span></td>
+   </tr>
+   <tr id="rule_HT_8C9F2CA61E944B88FEC562D92DD6B078BACDE1F4">
+    <td class="grammarFirstCol">
+     <span class="rule">HT</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleChar">'\t'</span></td>
+   </tr>
+   <tr id="rule_QUOTE_25EF6FE96139DCB9B7E0FFEC8CA2464F0A2523CD">
+    <td class="grammarFirstCol">
+     <span class="rule">QUOTE</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleChar">'\"'</span></td>
+   </tr>
+   <tr id="rule_CRLF_25B7B9045871CB4096C3302B1991DB9FD6DF6917">
+    <td class="grammarFirstCol">
+     <span class="rule">CRLF</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#rule_CR_433FC288BB362ED61E34832F20EFE5A06C83DD39">CR</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_LF_0AFC68C6EF88C522F74D478CC23B8EE6B9CEFCE2">LF</a></span></td>
+   </tr>
+   <tr id="rule_LWS_D6464D81BE6518817BBABDBCCB14C16BA5121096">
+    <td class="grammarFirstCol">
+     <span class="rule">LWS</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#rule_CRLF_25B7B9045871CB4096C3302B1991DB9FD6DF6917">CRLF</a></span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#rule_SP_EEA073F4176895CB45D47EFF1E2C28EED79739FF">SP</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#rule_HT_8C9F2CA61E944B88FEC562D92DD6B078BACDE1F4">HT</a></span><span class="ruleOp">)</span><span class="ruleOp">+</span></td>
+   </tr>
+   <tr id="rule_TEXT_0B7CC791454BBCF12FF9690D8D02AD7CCF262005">
+    <td class="grammarFirstCol">
+     <span class="rule">TEXT</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#rule_OCTET_8477E8F607820169C6A019A81373B0B4E2A2105C">OCTET</a></span><span class="ruleOp"> &minus; </span><span class="ruleLink"><a class="ruleLink" href="#rule_CTL_A6A9F195C779F3A539EB4CBBB2B99A7ACAE4FA52">CTL</a></span><span class="ruleOp">)</span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#rule_CR_433FC288BB362ED61E34832F20EFE5A06C83DD39">CR</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#rule_LF_0AFC68C6EF88C522F74D478CC23B8EE6B9CEFCE2">LF</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#rule_SP_EEA073F4176895CB45D47EFF1E2C28EED79739FF">SP</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#rule_HT_8C9F2CA61E944B88FEC562D92DD6B078BACDE1F4">HT</a></span></td>
+   </tr>
+   <tr id="rule_HEX_35F6202C42749835358BBAC297BD237553C4F73A">
+    <td class="grammarFirstCol">
+     <span class="rule">HEX</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleCharSet">[A-Fa-f0-9]</span></td>
+   </tr>
+  </table>
+ </body>
+</html>

@@ -1,0 +1,59 @@
+using System;
+using System.Dom;
+using System.IO;
+using System.Text;
+
+public UniquePtr<DomDocument> CreateDoc()
+{
+    UniquePtr<DomDocument> doc(new DomDocument());
+    UniquePtr<DomElement> phs(new DomElement(u"philosophers"));
+    UniquePtr<DomElement> ph1(new DomElement(u"philosopher"));
+    ph1->SetAttribute(u"name", u"Plato");
+    phs->AppendChild(UniquePtr<DomNode>(ph1.Release()));
+    UniquePtr<DomElement> ph2(new DomElement(u"philosopher"));
+    ph2->SetAttribute(u"name", u"Aristotle");
+    phs->AppendChild(UniquePtr<DomNode>(ph2.Release()));
+    UniquePtr<DomElement> ph3(new DomElement(u"philosopher"));
+    ph3->SetAttribute(u"name", u"Socrates");
+    phs->AppendChild(UniquePtr<DomNode>(ph3.Release()));
+    doc->AppendChild(UniquePtr<DomNode>(phs.Release()));
+    return doc;
+}
+
+public void WriteDocToFile(DomDocument* doc)
+{
+    StreamWriter writer = File.CreateText("philosophers.xml");
+    CodeFormatter formatter(writer);
+    formatter.SetIndentSize(1);
+    doc->Write(formatter);
+}
+
+public UniquePtr<DomDocument> ReadDocFromFile()
+{
+    UniquePtr<DomDocument> doc = ParseXmlFileToDomDocument("philosophers.xml");
+    return doc;
+}
+
+public void WriteDocToConsole(DomDocument* doc)
+{
+    CodeFormatter formatter(Console.Out());
+    formatter.SetIndentSize(4);
+    doc->Write(formatter);
+}
+
+int main()
+{
+    try
+    {
+        UniquePtr<DomDocument> doc = CreateDoc();
+        WriteDocToFile(doc.Get());
+        UniquePtr<DomDocument> docRead = ReadDocFromFile();
+        WriteDocToConsole(docRead.Get());
+    }
+    catch (const Exception& ex)
+    {
+        Console.Error() << ex.Message() << endl();
+        return 1;
+    }
+    return 0;
+}

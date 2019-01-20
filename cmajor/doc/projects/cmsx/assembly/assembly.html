@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title>Assembly Language Tutorial</title>
+    <link href="../../../style/langref.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+    <h1>2 Assembly Language Tutorial</h1>
+
+    <p>
+        System X assembly language is based on the instruction set of
+        the mythical <a href="mmix/fasc1.pdf">MMIX</a> computer architecture invented by Donald E. Knuth.
+        The details are a bit different, though, because full compatibility with the original
+        was not possible and it was not aimed either.
+    </p>
+
+    <h2>
+        Hello
+    </h2>
+
+    <p>
+        Let's take a look at the classical hello world program written in
+        System X assembly language:
+    </p>
+
+    <pre>
+ 1 // ===================================================
+ 2 // hello
+ 3 //
+ 4 // Writes text "Hello, world!" to the standard output.
+ 5 // On entry ax=argc and bx=argv.
+ 6 // On exit ax contains the exit code of the program.
+ 7 // ===================================================
+ 8 
+ 9             EXTERN main
+10  
+11 .CODE
+12  
+13 main        FUNC
+14             STO fp,sp,0
+15             SET fp,sp
+16             INCL sp,1*8
+17             LDOU ax,hello
+18             CALL $0,puts
+19             BN ax,@0
+20             SET ax,0
+21             JMP @1
+22 @0          SET ax,1
+23 @1          SET sp,fp
+24             LDO fp,sp,0
+25             RET
+26 main        ENDF
+27 
+28 .DATA
+29
+30 hello       OCTA message
+31 message     BYTE "Hello, world!",10,0
+    </pre>
+
+    <p>
+        System X assembly files are UTF-8 encoded text files that
+        have zero or more lines consisting of three fields separated by spaces,
+        a label field, an instruction field and an operand field.
+        Some or all of these fields can be empty.
+        The first field is the label field that starts from the first column.
+        A label can start with a letter, or one of the characters @, : or _.
+        If the first character of a line that is not a space or period, is
+        not a label character either, the whole line is taken as a comment,
+        so according to this, lines 1-7 are comments.
+        Typical comments start with // as in C++ or % as in TeX and postscript.
+        Semicolon cannot be used, because it is used to separate many instructions entered in the same line.
+        Comments can occur also at the end of instruction lines.
+    </p>
+
+    <p>
+        The next field that starts with the first character after the label field that is not a space
+        is the instruction field. The instruction can be an MMIX instruction or a pseudo-instruction
+        that is meaningful to the assembler. The EXTERN instruction at line 9 declares that
+        operand symbols separated by commas can be called or referenced from outside of this assembly file.
+        It is not a standard MMIX instruction or pseudo-instruction, but an extension supported only
+        by the cmsx tools. Its purpose is to communicate to the linker that listed symbols are visible
+        outside of this assembly file.
+    </p>
+
+    <p>
+        If the line starts with symbol .CODE, as in line 11, it turns the assembler to "code" mode, and if it is
+        .DATA, it turns it to the "data" mode. These are also extensions to the stardard MMIX assembly
+        language. Assembly of a file starts with the .CODE mode so strictly speaking the first .CODE
+        instruction is not necessary. In .CODE mode the instruction are assembled to the
+        text segment of the program, and in the .DATA mode to the data segment of the program.
+        The text segment begins at virtual address #0000000000000000 though the first 4K is left undefined
+        so that trying to load or store from or to the address 0 will cause a page fault handled by the kernel.
+        The data segment begins at virtual address #2000000000000000.
+    </p>
+
+    <p>
+        The fuctions in cmsx assembly language are decorated with pseudo-instructions FUNC and ENDF,
+        as in lines 13 and 26. These are extensions to the standard MMIX whose purpose is to allow
+        the linker to remove unused functions from the resulting executable, although this feature
+        is not yet implemented. Next come ordinary instruction lines. An ordinary instruction line consists of an
+        optional label field, an instruction field that is never empty, and then an optional operand field listing
+        operands of the instruction separated by commas. Note that there can be no white space between the operands.
+    </p>
+
+    <p>
+        The next three instructions at lines 14, 15 and 16 establish a stack frame for a function.
+        First the contents of the frame pointer, MMIX global register $249, is stored to the top of the
+        stack. Then the value of the stack pointer, which is represented as an MMIX global register $250,
+        is set to the frame pointer, so that possible parameters and local variables can be refererred as
+        fp+8, fp+16, etc. Finally the stack pointer is incremented by the size of the stack frame,
+        in this case simply 1 octabyte. On the contrary to many computer architectures, the
+        stack for cmsx programs grows onward, not downward. The stack segment begins at virtual
+        address #6000000000000000.
+    </p>
+
+    <p>
+        The LDOU instruction, load octa unsigned, at line 17, retrieves the start address of the
+        message into the ax register, an MMIX global register $255. In the cmsx function call convention,
+        first five function arguments are passed in registers, ax, bx, cx, dx, and ex, and the
+        rest in the stack. The names of the global registers, ax, $255, bx, $254, cx, $253, dx, $252,
+        ex, $251, sp, $250 and fp, $249 are predefined by the cmsx assembler and can be used instead of the
+        global register numbers in all cmsx assembly files.
+    </p>
+
+    <p>
+        The CALL instruction at line 18 is a nonstandard extension renamed from the PUSHGO MMIX instruction
+        because its semantics differ from the PUSHGO. The CALL $X,A instruction first pushes local registers
+        $0, $1, ..., $X to the top of the stack, and then an octabyte with the value of the number of
+        registers pushed, X, is pushed. Then the value of MMIX rL special register that contains the number of
+        current local registers, and finally the return address, the address of the instruction coming
+        after the CALL instruction are pushed to the top of the stack.
+        The stack pointer is incremented accordingly, the rL receives value 0,
+        and then the control is transferred to the function starting at address A,
+        in this case the <em>puts</em> library function.
+    </p>
+
+    <p>
+        By convention the return value of a cmsx function is put to the global register ax, so the BN instruction,
+        branch if negative, at line 19, tests if the value of the ax register is less than zero and if so,
+        branches to the local label @0 to indicate a failure. Local labels are also extension to the standard MMIX.
+        The SET ax,0 instruction at line 20, the JMP @1 instruction at line 21 and the SET ax,1
+        set zero to return value register ax, jump to local label @1 and set one to return value register ax
+        respectively.
+    </p>
+
+    <p>
+        In the end of the function SET sp,fp instruction at line 23 removes parameters and local variables from
+        the stack and LDO fp,sp,0, load octa instruction at line 24 gets the old value of the frame pointer.
+        The RET instruction at line 25 is renamed from the standard MMIX POP instruction for the same reason
+        as the PUSHGO is renamed to CALL. The RET pops the return address, the old value of the rL register,
+        the number of registers, X, and the old values of registers $X,$X-1,..,$1,$0 from the stack.
+        The stack pointer is decremented accordingly and then the control is transferred to the calling function
+        to the position indicated by the return address. The function is ended by the ENDF instruction that
+        takes no operands.
+    </p>
+
+    <p>
+        In the .DATA mode, starting from the line 28, only pseudo-instructions STRUCT, ENDS, OCTA, TETRA, WYDE and BYTE can be used.
+        The OCTA defines octabytes, eight-byte entities, TETRA defines four-byte entities, WYDE two-byte entities and
+        BYTE bytes, UTF-8 encoded strings and characters that are all assembled as bytes.
+        An operand of an OCTA instruction can be defined outside of this assembly file, but the assembler must be able to
+        evaluate operands of TETRA, WYDE and BYTE in place. The STRUCT and ENDS instructions not used in this program
+        are extensions that tell the linker about the bounds of data records.
+    </p>
+
+    <h2>
+        Assembling Hello
+    </h2>
+
+    <p>
+        System X assembly files have by convention <strong>.s</strong> extension standing for <em>symbolic</em>.
+        To assemble <strong>hello.s</strong> file that contains the hello world program, change to the
+        <strong>cmajor/projects/cmsx/test/assembly</strong> directory and enter the following command:
+    </p>
+
+    <pre>
+        cmsxas hello.s
+    </pre>
+
+    <p>
+        If the command succeeds it assembles the <strong>hello.s</strong> to a binary file <strong>hello.o</strong> that
+        contains the object code for the hello program, otherwise the error message is printed to the screen.
+    </p>
+
+    <p>
+        If you prefer some message to be printed to the screen also in the successful case, enter command
+    </p>
+
+    <pre>
+        cmsxas -v hello.s
+    </pre>
+
+    <p>
+        <strong>-v</strong> option stands for <em>verbose</em>.
+    </p>
+
+    <p>
+        To see usage, enter command
+    </p>
+
+    <pre>
+        cmsxas -h
+    </pre>
+
+    <h2>
+        Linking Hello
+    </h2>
+
+    <p>
+        To link <strong>hello.o</strong> to an executable program type command
+    </p>
+
+    <pre>
+        cmsxlink hello.o -o=hello
+    </pre>
+
+    <p>
+        If the command succeeds it links the <strong>hello.o</strong> with the startup routine <strong>Main.o</strong> and the runtime library <strong>System.a</strong>
+        and produces an executable file whose name is given in the <strong>-o</strong> option. If no <strong>-o</strong> option is used the executable will be named <strong>a.out</strong>.
+    </p>
+
+    <p>
+        To see some printing on the screen enter command
+    </p>
+
+    <pre>
+        cmsxlink -v hello.o -o=hello    
+    </pre>
+
+    <p>
+        This lists the input files that are linked:
+    </p>
+
+    <pre>
+        Cmajor System X Linker version 0.1.0
+        > C:/cmajor/projects/cmsx/cmsxrt/Main.o
+        > C:/cmajor/projects/cmsx/cmsxrt/System.a
+        > C:/cmajor/projects/cmsx/test/assembly/hello.o
+        ==> C:/cmajor/projects/cmsx/test/assembly/hello
+    </pre>
+
+    <p>
+        Option <strong>-h</strong> or <strong>--help</strong> prints the usage and lists the possible options of the link command.
+    </p>
+
+    <h2>
+        Building libraries
+    </h2>
+
+    <p>
+        There's also an archiver to build libraries of object files.
+        To build an archive, enter command:
+    </p>
+
+    <pre>
+        <strong>cmsxar</strong> <em>object1.o</em> <em>object2.o</em> <em>-o=library.a</em>
+    </pre>
+
+    <h2>
+        Executing Hello
+    </h2>
+
+    <p>
+        The <strong>hello</strong> program can be executed by giving the command
+    </p>
+
+    <pre>
+        cmsx hello
+    </pre>
+
+    <p>
+        This finally prints the famous message
+    </p>
+
+    <pre>
+        Hello, world!
+    </pre>
+
+    <p>
+        To see the exit code of the program give a <strong>-v</strong> option before the program name:
+    </p>
+
+    <pre>
+        cmsx -v hello
+    </pre>
+
+    <p>
+        This produces the following output:
+    </p>
+
+    <pre>
+        Cmajor System X kernel version 0.1.0 booting, done.
+        running program 'hello' as process 0
+        Hello, world!
+        machine exit.
+        program exited with code 0.
+    </pre>
+
+    <p>
+        If the program to be executed takes parameters add them after the program name:
+    </p>
+
+    <pre>
+        <strong>cmsx</strong> <em>program</em> <em>--opt1</em> <em>--opt2</em> <em>arg1</em> <em>arg2</em>
+    </pre>
+
+    <h2>
+        Assembly File Grammar
+    </h2>
+
+    <p>
+        Here's the full <a href="../reference/content/cmsxa/doc/grammar_AssemblyGrammar_47862B8D7B56A0CEA2CD4F01A580C9F0E3F65979.html">grammar</a> of the System X assembly file format.
+    </p>
+
+    <pre>
+    </pre>
+</body>
+
+</html>

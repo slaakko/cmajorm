@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+ <PropertyGroup Label="Globals">
+  <CustomProjectExtensionsPath>$(LocalAppData)\CustomProjectSystems\Cmajor\</CustomProjectExtensionsPath>
+  <ProjectGuid>44f6cde2-3eb1-4c78-baa2-bb5c6956f90b</ProjectGuid>
+ </PropertyGroup>
+ <PropertyGroup>
+  <TargetType>library</TargetType>
+ </PropertyGroup>
+ <ItemGroup>
+  <CmCompile Include="ChunkedBodyReader.cm"/>
+  <CmCompile Include="HttpAgent.cm"/>
+  <CmCompile Include="HttpClient.cm"/>
+  <CmCompile Include="HttpGrammar.cm"/>
+  <CmCompile Include="HttpParser.cm"/>
+  <CmCompile Include="HttpRequest.cm"/>
+  <CmCompile Include="MediaType.cm"/>
+  <CmCompile Include="UriGrammar.cm"/>
+  <CmCompile Include="UriReference.cm"/>
+ </ItemGroup>
+ <ItemGroup>
+  <None Include="HttpGrammar.parser"/>
+  <None Include="Parsers.pl"/>
+  <None Include="Parsers.pp"/>
+  <None Include="UriGrammar.parser"/>
+ </ItemGroup>
+ <ItemGroup>
+  <ProjectReference Include="../System.Net.Sockets/System.Net.Sockets.cmproj"/>
+  <ProjectReference Include="../System.IO.Compression/System.IO.Compression.cmproj"/>
+  <ProjectReference Include="../System.Text.Parsing/System.Text.Parsing.cmproj"/>
+ </ItemGroup>
+ <Import Project="$(CustomProjectExtensionsPath)Cmajor.props"/>
+ <Import Project="$(CustomProjectExtensionsPath)Cmajor.targets"/>
+</Project>

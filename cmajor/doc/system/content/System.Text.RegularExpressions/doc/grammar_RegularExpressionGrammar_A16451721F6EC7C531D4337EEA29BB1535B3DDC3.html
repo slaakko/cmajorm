@@ -1,0 +1,82 @@
+<html>
+ <head>
+  <meta charset="utf-8"/>
+  <title>RegularExpressionGrammar Grammar</title>
+  <link href="../../../style/style.css" rel="stylesheet" type="text/css"/>
+ </head>
+ <body>
+  <h1>RegularExpressionGrammar Grammar</h1>
+  <table class="grammar">
+   <tr id="rule_RegularExpression_17E99163D2599F35368625EB07D8750D80E4EAFE">
+    <td class="grammarFirstCol">
+     <span class="rule">RegularExpression</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#rule_AlternativeExpression_7BB997C5992922E810F862BAD719A9DDA9DFE038">AlternativeExpression</a></span></td>
+   </tr>
+   <tr id="rule_AlternativeExpression_7BB997C5992922E810F862BAD719A9DDA9DFE038">
+    <td class="grammarFirstCol">
+     <span class="rule">AlternativeExpression</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#rule_SequenceExpression_64B7BECB5546D4C722EE394409B85388C97FE1A0">SequenceExpression</a></span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleChar">'|'</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_SequenceExpression_64B7BECB5546D4C722EE394409B85388C97FE1A0">SequenceExpression</a></span><span class="ruleOp">)</span><span class="ruleOp">*</span></td>
+   </tr>
+   <tr id="rule_SequenceExpression_64B7BECB5546D4C722EE394409B85388C97FE1A0">
+    <td class="grammarFirstCol">
+     <span class="rule">SequenceExpression</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#rule_PostfixExpression_C3900878B3E143D349F4E6F2850C9E016AD4F45B">PostfixExpression</a></span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#rule_PostfixExpression_C3900878B3E143D349F4E6F2850C9E016AD4F45B">PostfixExpression</a></span><span class="ruleOp">)</span><span class="ruleOp">*</span></td>
+   </tr>
+   <tr id="rule_PostfixExpression_C3900878B3E143D349F4E6F2850C9E016AD4F45B">
+    <td class="grammarFirstCol">
+     <span class="rule">PostfixExpression</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#rule_PrimaryExpression_6D96861755CA9A2D9F766E74DD323C4FDDBEFB77">PrimaryExpression</a></span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleChar">'*'</span><span class="ruleOp"> | </span><span class="ruleChar">'+'</span><span class="ruleOp"> | </span><span class="ruleChar">'?'</span><span class="ruleOp">)</span><span class="ruleOp">?</span></td>
+   </tr>
+   <tr id="rule_PrimaryExpression_6D96861755CA9A2D9F766E74DD323C4FDDBEFB77">
+    <td class="grammarFirstCol">
+     <span class="rule">PrimaryExpression</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#rule_Char_178CA2C13B8386B27693595666D7D02CECB94E33">Char</a></span><span class="ruleOp"> | </span><span class="ruleChar">'.'</span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#rule_CharClass_624997EBD3C1E89CC211FDC13A48E1BB546D15AD">CharClass</a></span><span class="ruleOp"> | </span><span class="ruleOp">(</span><span class="ruleChar">'('</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_AlternativeExpression_7BB997C5992922E810F862BAD719A9DDA9DFE038">AlternativeExpression</a></span><span class="ruleOp"> </span><span class="ruleChar">')'</span><span class="ruleOp">)</span><span class="ruleOp"> | </span><span class="ruleString">"\\d"</span><span class="ruleOp"> | </span><span class="ruleString">"\\D"</span><span class="ruleOp"> | </span><span class="ruleString">"\\s"</span><span class="ruleOp"> | </span><span class="ruleString">"\\S"</span><span class="ruleOp"> | </span><span class="ruleString">"\\w"</span><span class="ruleOp"> | </span><span class="ruleString">"\\W"</span><span class="ruleOp"> | </span><span class="ruleString">"\\l"</span><span class="ruleOp"> | </span><span class="ruleString">"\\L"</span><span class="ruleOp"> | </span><span class="ruleString">"\\u"</span><span class="ruleOp"> | </span><span class="ruleString">"\\U"</span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="../../System.Text.Parsing/doc/grammar_stdlib_1A00CD0A4B4616214D7B505BA9E73923739E1E77.html#rule_escape_35B1304EE89CA8A4CFB632BA91CA3BC542B43B13">escape</a></span></td>
+   </tr>
+   <tr id="rule_Char_178CA2C13B8386B27693595666D7D02CECB94E33">
+    <td class="grammarFirstCol">
+     <span class="rule">Char</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleOp">(</span><span class="ruleKeyword">anychar</span><span class="ruleOp"> &minus; </span><span class="ruleCharSet">[()\\[*+?|.]</span><span class="ruleOp">)</span></td>
+   </tr>
+   <tr id="rule_CharClass_624997EBD3C1E89CC211FDC13A48E1BB546D15AD">
+    <td class="grammarFirstCol">
+     <span class="rule">CharClass</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleOp">(</span><span class="ruleChar">'['</span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleChar">'^'</span><span class="ruleOp">)</span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#rule_Class_C4F08EE782866C7E90988C6D31AFC7C4A4319729">Class</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#rule_CharRange_72FAED918E9A0AC65FCE135EC75FBC797F222FC2">CharRange</a></span><span class="ruleOp">)</span><span class="ruleOp">*</span><span class="ruleOp"> </span><span class="ruleChar">']'</span><span class="ruleOp">!</span><span class="ruleOp">)</span></td>
+   </tr>
+   <tr id="rule_Class_C4F08EE782866C7E90988C6D31AFC7C4A4319729">
+    <td class="grammarFirstCol">
+     <span class="rule">Class</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleString">"[:alnum:]"</span><span class="ruleOp"> | </span><span class="ruleString">"[:alpha:]"</span><span class="ruleOp"> | </span><span class="ruleString">"[:blank:]"</span><span class="ruleOp"> | </span><span class="ruleString">"[:cntrl:]"</span><span class="ruleOp"> | </span><span class="ruleString">"[:digit:]"</span><span class="ruleOp"> | </span><span class="ruleString">"[:graph:]"</span><span class="ruleOp"> | </span><span class="ruleString">"[:lower:]"</span><span class="ruleOp"> | </span><span class="ruleString">"[:print:]"</span><span class="ruleOp"> | </span><span class="ruleString">"[:punct:]"</span><span class="ruleOp"> | </span><span class="ruleString">"[:space:]"</span><span class="ruleOp"> | </span><span class="ruleString">"[:upper:]"</span><span class="ruleOp"> | </span><span class="ruleString">"[:word:]"</span><span class="ruleOp"> | </span><span class="ruleString">"[:w:]"</span><span class="ruleOp"> | </span><span class="ruleString">"[:xdigit:]"</span></td>
+   </tr>
+   <tr id="rule_CharRange_72FAED918E9A0AC65FCE135EC75FBC797F222FC2">
+    <td class="grammarFirstCol">
+     <span class="rule">CharRange</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#rule_CharClassChar_9D2D227ABD7972F9B09EC7268DD3A76DD73DC90C">CharClassChar</a></span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleChar">'-'</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_CharClassChar_9D2D227ABD7972F9B09EC7268DD3A76DD73DC90C">CharClassChar</a></span><span class="ruleOp"> | </span><span class="ruleKeyword">empty</span><span class="ruleOp">)</span></td>
+   </tr>
+   <tr id="rule_CharClassChar_9D2D227ABD7972F9B09EC7268DD3A76DD73DC90C">
+    <td class="grammarFirstCol">
+     <span class="rule">CharClassChar</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleCharSet">[^\\]]</span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="../../System.Text.Parsing/doc/grammar_stdlib_1A00CD0A4B4616214D7B505BA9E73923739E1E77.html#rule_escape_35B1304EE89CA8A4CFB632BA91CA3BC542B43B13">escape</a></span></td>
+   </tr>
+  </table>
+ </body>
+</html>

@@ -1,0 +1,46 @@
+using System;
+using System.Collections;
+
+namespace Calculator
+{
+    public class SymbolTable
+    {
+        static SymbolTable() : instance(new SymbolTable())
+        {
+        }
+        public static SymbolTable& Instance()
+        {
+            return *instance;
+        }
+        private SymbolTable() : variableMap()
+        {
+        }
+        public void SetVariable(const ustring& variableName, double variableValue)
+        {
+            variableMap[variableName] = variableValue;
+        }
+        public double GetVariableValue(const ustring& variableName)
+        {
+            Map<ustring, double>.ConstIterator it = variableMap.CFind(variableName);
+            if (it != variableMap.CEnd())
+            {
+                double value = it->second;
+                return value;
+            }
+            else
+            {
+                throw VariableNotFoundException("variable '" + ToUtf8(variableName) + "' not found");
+            }
+        }
+        public void Print()
+        {
+            Console.WriteLine("variables:");
+            for (const Pair<ustring, double>& pair : variableMap)
+            {
+                Console.Out() << pair.first << " = " << pair.second << endl();
+            }
+        }
+        private static UniquePtr<SymbolTable> instance;
+        private Map<ustring, double> variableMap;
+    }
+}

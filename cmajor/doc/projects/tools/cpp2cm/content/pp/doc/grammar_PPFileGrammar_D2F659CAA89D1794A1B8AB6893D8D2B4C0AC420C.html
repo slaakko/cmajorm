@@ -1,0 +1,229 @@
+<html>
+ <head>
+  <meta charset="utf-8"/>
+  <title>PPFileGrammar Grammar</title>
+  <link href="../../../style/style.css" rel="stylesheet" type="text/css"/>
+ </head>
+ <body>
+  <h1>PPFileGrammar Grammar</h1>
+  <table class="grammar">
+   <tr id="rule_PPFile_E32700C6A8C2C4B36D3C1FEB3C60C801DC80F56A">
+    <td class="grammarFirstCol">
+     <span class="rule">PPFile</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#rule_Group_27410E554D7740BCCB9526460E4F0761F2E4B6FA">Group</a></span><span class="ruleOp">?</span></td>
+   </tr>
+   <tr id="rule_Group_27410E554D7740BCCB9526460E4F0761F2E4B6FA">
+    <td class="grammarFirstCol">
+     <span class="rule">Group</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#rule_IfSection_CA3F16E1F9B542B9F0AEE9422B261F2316FC9C9B">IfSection</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#rule_ControlLine_0DE543DD7297EC9D9FA6B4AF8F092446101E3E4A">ControlLine</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#rule_TextLine_F4AD44ED7F8BFA66921C5D001CA3AF66BC1534EC">TextLine</a></span><span class="ruleOp">)</span><span class="ruleOp">+</span></td>
+   </tr>
+   <tr id="rule_IfSection_CA3F16E1F9B542B9F0AEE9422B261F2316FC9C9B">
+    <td class="grammarFirstCol">
+     <span class="rule">IfSection</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#rule_IfGroup_E2196CD1F841D57649E171A7240BC2A5D24CC988">IfGroup</a></span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#rule_ElifGroup_B9F8B40E5A13E3B4DDE15CEA8382AFC98920EE93">ElifGroup</a></span><span class="ruleOp">)</span><span class="ruleOp">*</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_ElseGroup_8076A5A513DB20FCFAF374DF1B88179AFB3ED9D6">ElseGroup</a></span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_EndIfLine_329F46D77429A457F611903050BF7B15D6B8C6B4">EndIfLine</a></span></td>
+   </tr>
+   <tr id="rule_IfGroup_E2196CD1F841D57649E171A7240BC2A5D24CC988">
+    <td class="grammarFirstCol">
+     <span class="rule">IfGroup</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#rule_S_88BAB4EECB6DE7E07F3F6460C7F1BA1889393EE9">S</a></span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleChar">'#'</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_S_88BAB4EECB6DE7E07F3F6460C7F1BA1889393EE9">S</a></span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleKeyword">keyword</span><span class="ruleString">("if")</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_S_88BAB4EECB6DE7E07F3F6460C7F1BA1889393EE9">S</a></span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_ConstantExpression_3ECDF504FB7F5246331C35F5073CCF618EBCE77B">ConstantExpression</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_S_88BAB4EECB6DE7E07F3F6460C7F1BA1889393EE9">S</a></span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="../../../../../../system/content/System.Text.Parsing/grammars.xml#rule_newline_8D83C6A88BF04B09CA508634F63FE992F97061C7">newline</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_Group_27410E554D7740BCCB9526460E4F0761F2E4B6FA">Group</a></span><span class="ruleOp">?</span><span class="ruleOp">)</span><span class="ruleOp"> | </span><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#rule_S_88BAB4EECB6DE7E07F3F6460C7F1BA1889393EE9">S</a></span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleChar">'#'</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_S_88BAB4EECB6DE7E07F3F6460C7F1BA1889393EE9">S</a></span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleKeyword">keyword</span><span class="ruleString">("ifdef")</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_S_88BAB4EECB6DE7E07F3F6460C7F1BA1889393EE9">S</a></span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="../../../../../../system/content/System.Text.Parsing/grammars.xml#rule_identifier_EC79E9557ADCB4230187E4EB2CFA518A0D75FDF1">identifier</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_S_88BAB4EECB6DE7E07F3F6460C7F1BA1889393EE9">S</a></span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="../../../../../../system/content/System.Text.Parsing/grammars.xml#rule_newline_8D83C6A88BF04B09CA508634F63FE992F97061C7">newline</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_Group_27410E554D7740BCCB9526460E4F0761F2E4B6FA">Group</a></span><span class="ruleOp">?</span><span class="ruleOp">)</span><span class="ruleOp"> | </span><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#rule_S_88BAB4EECB6DE7E07F3F6460C7F1BA1889393EE9">S</a></span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleChar">'#'</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_S_88BAB4EECB6DE7E07F3F6460C7F1BA1889393EE9">S</a></span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleKeyword">keyword</span><span class="ruleString">("ifndef")</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_S_88BAB4EECB6DE7E07F3F6460C7F1BA1889393EE9">S</a></span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="../../../../../../system/content/System.Text.Parsing/grammars.xml#rule_identifier_EC79E9557ADCB4230187E4EB2CFA518A0D75FDF1">identifier</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_S_88BAB4EECB6DE7E07F3F6460C7F1BA1889393EE9">S</a></span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="../../../../../../system/content/System.Text.Parsing/grammars.xml#rule_newline_8D83C6A88BF04B09CA508634F63FE992F97061C7">newline</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_Group_27410E554D7740BCCB9526460E4F0761F2E4B6FA">Group</a></span><span class="ruleOp">?</span><span class="ruleOp">)</span></td>
+   </tr>
+   <tr id="rule_ElifGroup_B9F8B40E5A13E3B4DDE15CEA8382AFC98920EE93">
+    <td class="grammarFirstCol">
+     <span class="rule">ElifGroup</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#rule_S_88BAB4EECB6DE7E07F3F6460C7F1BA1889393EE9">S</a></span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleChar">'#'</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_S_88BAB4EECB6DE7E07F3F6460C7F1BA1889393EE9">S</a></span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleKeyword">keyword</span><span class="ruleString">("elif")</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_S_88BAB4EECB6DE7E07F3F6460C7F1BA1889393EE9">S</a></span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_ConstantExpression_3ECDF504FB7F5246331C35F5073CCF618EBCE77B">ConstantExpression</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_S_88BAB4EECB6DE7E07F3F6460C7F1BA1889393EE9">S</a></span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="../../../../../../system/content/System.Text.Parsing/grammars.xml#rule_newline_8D83C6A88BF04B09CA508634F63FE992F97061C7">newline</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_Group_27410E554D7740BCCB9526460E4F0761F2E4B6FA">Group</a></span><span class="ruleOp">?</span><span class="ruleOp">)</span></td>
+   </tr>
+   <tr id="rule_ElseGroup_8076A5A513DB20FCFAF374DF1B88179AFB3ED9D6">
+    <td class="grammarFirstCol">
+     <span class="rule">ElseGroup</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#rule_S_88BAB4EECB6DE7E07F3F6460C7F1BA1889393EE9">S</a></span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleChar">'#'</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_S_88BAB4EECB6DE7E07F3F6460C7F1BA1889393EE9">S</a></span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleKeyword">keyword</span><span class="ruleString">("else")</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_S_88BAB4EECB6DE7E07F3F6460C7F1BA1889393EE9">S</a></span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="../../../../../../system/content/System.Text.Parsing/grammars.xml#rule_newline_8D83C6A88BF04B09CA508634F63FE992F97061C7">newline</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_Group_27410E554D7740BCCB9526460E4F0761F2E4B6FA">Group</a></span><span class="ruleOp">?</span></td>
+   </tr>
+   <tr id="rule_EndIfLine_329F46D77429A457F611903050BF7B15D6B8C6B4">
+    <td class="grammarFirstCol">
+     <span class="rule">EndIfLine</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#rule_S_88BAB4EECB6DE7E07F3F6460C7F1BA1889393EE9">S</a></span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleChar">'#'</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_S_88BAB4EECB6DE7E07F3F6460C7F1BA1889393EE9">S</a></span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleKeyword">keyword</span><span class="ruleString">("endif")</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_S_88BAB4EECB6DE7E07F3F6460C7F1BA1889393EE9">S</a></span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="../../../../../../system/content/System.Text.Parsing/grammars.xml#rule_newline_8D83C6A88BF04B09CA508634F63FE992F97061C7">newline</a></span></td>
+   </tr>
+   <tr id="rule_ControlLine_0DE543DD7297EC9D9FA6B4AF8F092446101E3E4A">
+    <td class="grammarFirstCol">
+     <span class="rule">ControlLine</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#rule_IncludeDirective_159933DD343BAA2B9844D295FB3CA4D686B6541B">IncludeDirective</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#rule_DefineFunctionMacro_E252794BEF8F1FFD9C12D7C13D06AE25993A55A0">DefineFunctionMacro</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#rule_DefineObjectMacro_0DA3A54F658D565B483708AD144C2598967FC82B">DefineObjectMacro</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#rule_UndefineMacro_A4AA4F8BB9FAA824CDFC73FE0926590E31D50E68">UndefineMacro</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#rule_PragmaDirective_6BD9970DF052235B3D06B4EFF7A3AA82D38DAC83">PragmaDirective</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#rule_ErrorDirective_D6742BC5B31EB731D4259361115940416247149C">ErrorDirective</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#rule_LineDirective_8097D49A359988A746391B0252A9D109E50545AB">LineDirective</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#rule_NullDirective_D59902896BEE4C1B970B0A361DC538BA827E81AB">NullDirective</a></span></td>
+   </tr>
+   <tr id="rule_IncludeDirective_159933DD343BAA2B9844D295FB3CA4D686B6541B">
+    <td class="grammarFirstCol">
+     <span class="rule">IncludeDirective</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#rule_S_88BAB4EECB6DE7E07F3F6460C7F1BA1889393EE9">S</a></span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleChar">'#'</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_S_88BAB4EECB6DE7E07F3F6460C7F1BA1889393EE9">S</a></span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleKeyword">keyword</span><span class="ruleString">("include")</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_S_88BAB4EECB6DE7E07F3F6460C7F1BA1889393EE9">S</a></span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_NonemptyTokenLine_877DB0DEC83088EAC782A017E1E3BCE73120BD48">NonemptyTokenLine</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="../../../../../../system/content/System.Text.Parsing/grammars.xml#rule_newline_8D83C6A88BF04B09CA508634F63FE992F97061C7">newline</a></span><span class="ruleOp">)</span></td>
+   </tr>
+   <tr id="rule_DefineFunctionMacro_E252794BEF8F1FFD9C12D7C13D06AE25993A55A0">
+    <td class="grammarFirstCol">
+     <span class="rule">DefineFunctionMacro</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#rule_S_88BAB4EECB6DE7E07F3F6460C7F1BA1889393EE9">S</a></span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleChar">'#'</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_S_88BAB4EECB6DE7E07F3F6460C7F1BA1889393EE9">S</a></span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleKeyword">keyword</span><span class="ruleString">("define")</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_S_88BAB4EECB6DE7E07F3F6460C7F1BA1889393EE9">S</a></span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleKeyword">token</span><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="../../../../../../system/content/System.Text.Parsing/grammars.xml#rule_identifier_EC79E9557ADCB4230187E4EB2CFA518A0D75FDF1">identifier</a></span><span class="ruleOp"> </span><span class="ruleChar">'('</span><span class="ruleOp">)</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_MacroParams_2F50A73AC00BFDCCD841F5A182CD13DF5DC292AB">MacroParams</a></span><span class="ruleOp"> </span><span class="ruleChar">')'</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_S_88BAB4EECB6DE7E07F3F6460C7F1BA1889393EE9">S</a></span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_PossiblyEmptyTokenLine_B8D6781A0A8191DC322851140064AE46E7B3DBB4">PossiblyEmptyTokenLine</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="../../../../../../system/content/System.Text.Parsing/grammars.xml#rule_newline_8D83C6A88BF04B09CA508634F63FE992F97061C7">newline</a></span><span class="ruleOp">)</span></td>
+   </tr>
+   <tr id="rule_MacroParams_2F50A73AC00BFDCCD841F5A182CD13DF5DC292AB">
+    <td class="grammarFirstCol">
+     <span class="rule">MacroParams</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#rule_S_88BAB4EECB6DE7E07F3F6460C7F1BA1889393EE9">S</a></span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="../../../../../../system/content/System.Text.Parsing/grammars.xml#rule_identifier_EC79E9557ADCB4230187E4EB2CFA518A0D75FDF1">identifier</a></span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#rule_S_88BAB4EECB6DE7E07F3F6460C7F1BA1889393EE9">S</a></span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleChar">','</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_S_88BAB4EECB6DE7E07F3F6460C7F1BA1889393EE9">S</a></span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="../../../../../../system/content/System.Text.Parsing/grammars.xml#rule_identifier_EC79E9557ADCB4230187E4EB2CFA518A0D75FDF1">identifier</a></span><span class="ruleOp">)</span><span class="ruleOp">*</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_S_88BAB4EECB6DE7E07F3F6460C7F1BA1889393EE9">S</a></span><span class="ruleOp">?</span><span class="ruleOp">)</span><span class="ruleOp">?</span></td>
+   </tr>
+   <tr id="rule_DefineObjectMacro_0DA3A54F658D565B483708AD144C2598967FC82B">
+    <td class="grammarFirstCol">
+     <span class="rule">DefineObjectMacro</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#rule_S_88BAB4EECB6DE7E07F3F6460C7F1BA1889393EE9">S</a></span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleChar">'#'</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_S_88BAB4EECB6DE7E07F3F6460C7F1BA1889393EE9">S</a></span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleKeyword">keyword</span><span class="ruleString">("define")</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_S_88BAB4EECB6DE7E07F3F6460C7F1BA1889393EE9">S</a></span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="../../../../../../system/content/System.Text.Parsing/grammars.xml#rule_identifier_EC79E9557ADCB4230187E4EB2CFA518A0D75FDF1">identifier</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_S_88BAB4EECB6DE7E07F3F6460C7F1BA1889393EE9">S</a></span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_PossiblyEmptyTokenLine_B8D6781A0A8191DC322851140064AE46E7B3DBB4">PossiblyEmptyTokenLine</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="../../../../../../system/content/System.Text.Parsing/grammars.xml#rule_newline_8D83C6A88BF04B09CA508634F63FE992F97061C7">newline</a></span><span class="ruleOp">)</span></td>
+   </tr>
+   <tr id="rule_UndefineMacro_A4AA4F8BB9FAA824CDFC73FE0926590E31D50E68">
+    <td class="grammarFirstCol">
+     <span class="rule">UndefineMacro</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#rule_S_88BAB4EECB6DE7E07F3F6460C7F1BA1889393EE9">S</a></span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleChar">'#'</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_S_88BAB4EECB6DE7E07F3F6460C7F1BA1889393EE9">S</a></span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleKeyword">keyword</span><span class="ruleString">("undef")</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_S_88BAB4EECB6DE7E07F3F6460C7F1BA1889393EE9">S</a></span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="../../../../../../system/content/System.Text.Parsing/grammars.xml#rule_identifier_EC79E9557ADCB4230187E4EB2CFA518A0D75FDF1">identifier</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_S_88BAB4EECB6DE7E07F3F6460C7F1BA1889393EE9">S</a></span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="../../../../../../system/content/System.Text.Parsing/grammars.xml#rule_newline_8D83C6A88BF04B09CA508634F63FE992F97061C7">newline</a></span><span class="ruleOp">)</span></td>
+   </tr>
+   <tr id="rule_PragmaDirective_6BD9970DF052235B3D06B4EFF7A3AA82D38DAC83">
+    <td class="grammarFirstCol">
+     <span class="rule">PragmaDirective</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#rule_S_88BAB4EECB6DE7E07F3F6460C7F1BA1889393EE9">S</a></span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleChar">'#'</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_S_88BAB4EECB6DE7E07F3F6460C7F1BA1889393EE9">S</a></span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleKeyword">keyword</span><span class="ruleString">("pragma")</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_S_88BAB4EECB6DE7E07F3F6460C7F1BA1889393EE9">S</a></span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleKeyword">token</span><span class="ruleOp">(</span><span class="ruleOp">(</span><span class="ruleKeyword">anychar</span><span class="ruleOp"> &minus; </span><span class="ruleLink"><a class="ruleLink" href="../../../../../../system/content/System.Text.Parsing/grammars.xml#rule_newline_8D83C6A88BF04B09CA508634F63FE992F97061C7">newline</a></span><span class="ruleOp">)</span><span class="ruleOp">*</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="../../../../../../system/content/System.Text.Parsing/grammars.xml#rule_newline_8D83C6A88BF04B09CA508634F63FE992F97061C7">newline</a></span><span class="ruleOp">)</span></td>
+   </tr>
+   <tr id="rule_ErrorDirective_D6742BC5B31EB731D4259361115940416247149C">
+    <td class="grammarFirstCol">
+     <span class="rule">ErrorDirective</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#rule_S_88BAB4EECB6DE7E07F3F6460C7F1BA1889393EE9">S</a></span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleChar">'#'</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_S_88BAB4EECB6DE7E07F3F6460C7F1BA1889393EE9">S</a></span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleKeyword">keyword</span><span class="ruleString">("error")</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_S_88BAB4EECB6DE7E07F3F6460C7F1BA1889393EE9">S</a></span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleKeyword">token</span><span class="ruleOp">(</span><span class="ruleOp">(</span><span class="ruleKeyword">anychar</span><span class="ruleOp"> &minus; </span><span class="ruleLink"><a class="ruleLink" href="../../../../../../system/content/System.Text.Parsing/grammars.xml#rule_newline_8D83C6A88BF04B09CA508634F63FE992F97061C7">newline</a></span><span class="ruleOp">)</span><span class="ruleOp">*</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="../../../../../../system/content/System.Text.Parsing/grammars.xml#rule_newline_8D83C6A88BF04B09CA508634F63FE992F97061C7">newline</a></span><span class="ruleOp">)</span></td>
+   </tr>
+   <tr id="rule_LineDirective_8097D49A359988A746391B0252A9D109E50545AB">
+    <td class="grammarFirstCol">
+     <span class="rule">LineDirective</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#rule_S_88BAB4EECB6DE7E07F3F6460C7F1BA1889393EE9">S</a></span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleChar">'#'</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_S_88BAB4EECB6DE7E07F3F6460C7F1BA1889393EE9">S</a></span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleKeyword">keyword</span><span class="ruleString">("line")</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_S_88BAB4EECB6DE7E07F3F6460C7F1BA1889393EE9">S</a></span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleKeyword">token</span><span class="ruleOp">(</span><span class="ruleOp">(</span><span class="ruleKeyword">anychar</span><span class="ruleOp"> &minus; </span><span class="ruleLink"><a class="ruleLink" href="../../../../../../system/content/System.Text.Parsing/grammars.xml#rule_newline_8D83C6A88BF04B09CA508634F63FE992F97061C7">newline</a></span><span class="ruleOp">)</span><span class="ruleOp">*</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="../../../../../../system/content/System.Text.Parsing/grammars.xml#rule_newline_8D83C6A88BF04B09CA508634F63FE992F97061C7">newline</a></span><span class="ruleOp">)</span></td>
+   </tr>
+   <tr id="rule_NullDirective_D59902896BEE4C1B970B0A361DC538BA827E81AB">
+    <td class="grammarFirstCol">
+     <span class="rule">NullDirective</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#rule_S_88BAB4EECB6DE7E07F3F6460C7F1BA1889393EE9">S</a></span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleChar">'#'</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_S_88BAB4EECB6DE7E07F3F6460C7F1BA1889393EE9">S</a></span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="../../../../../../system/content/System.Text.Parsing/grammars.xml#rule_newline_8D83C6A88BF04B09CA508634F63FE992F97061C7">newline</a></span><span class="ruleOp">)</span></td>
+   </tr>
+   <tr id="rule_ConstantExpression_3ECDF504FB7F5246331C35F5073CCF618EBCE77B">
+    <td class="grammarFirstCol">
+     <span class="rule">ConstantExpression</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#rule_NonemptyTokenLine_877DB0DEC83088EAC782A017E1E3BCE73120BD48">NonemptyTokenLine</a></span></td>
+   </tr>
+   <tr id="rule_TextLine_F4AD44ED7F8BFA66921C5D001CA3AF66BC1534EC">
+    <td class="grammarFirstCol">
+     <span class="rule">TextLine</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#rule_PossiblyEmptyTokenLine_B8D6781A0A8191DC322851140064AE46E7B3DBB4">PossiblyEmptyTokenLine</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="../../../../../../system/content/System.Text.Parsing/grammars.xml#rule_newline_8D83C6A88BF04B09CA508634F63FE992F97061C7">newline</a></span><span class="ruleOp">)</span></td>
+   </tr>
+   <tr id="rule_PossiblyEmptyTokenLine_B8D6781A0A8191DC322851140064AE46E7B3DBB4">
+    <td class="grammarFirstCol">
+     <span class="rule">PossiblyEmptyTokenLine</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleKeyword">empty</span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleKeyword">token</span><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#rule_PPToken_4816CAC467353DF0F8B51C0239BFA4F8956FCEB9">PPToken</a></span><span class="ruleOp">*</span><span class="ruleOp">)</span><span class="ruleOp">)</span></td>
+   </tr>
+   <tr id="rule_NonemptyTokenLine_877DB0DEC83088EAC782A017E1E3BCE73120BD48">
+    <td class="grammarFirstCol">
+     <span class="rule">NonemptyTokenLine</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleKeyword">empty</span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleKeyword">token</span><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#rule_PPToken_4816CAC467353DF0F8B51C0239BFA4F8956FCEB9">PPToken</a></span><span class="ruleOp">+</span><span class="ruleOp">)</span><span class="ruleOp">)</span></td>
+   </tr>
+   <tr id="rule_PPToken_4816CAC467353DF0F8B51C0239BFA4F8956FCEB9">
+    <td class="grammarFirstCol">
+     <span class="rule">PPToken</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleKeyword">empty</span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleString">"##"</span><span class="ruleOp"> | </span><span class="ruleChar">'#'</span><span class="ruleOp">)</span><span class="ruleOp"> | </span><span class="ruleKeyword">empty</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_HeaderName_746F03F64FD80DE0FA6C0AE5B3DC804CD3F824B7">HeaderName</a></span><span class="ruleOp"> | </span><span class="ruleKeyword">empty</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_FunctionMacroInvocation_46988ED79383B5E2F6AAEDAF6E147043DAAF26F1">FunctionMacroInvocation</a></span><span class="ruleOp"> | </span><span class="ruleKeyword">empty</span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleChar">'@'</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_S_88BAB4EECB6DE7E07F3F6460C7F1BA1889393EE9">S</a></span><span class="ruleOp">?</span><span class="ruleOp">)</span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="../../../../../../system/content/System.Text.Parsing/grammars.xml#rule_identifier_EC79E9557ADCB4230187E4EB2CFA518A0D75FDF1">identifier</a></span><span class="ruleOp"> | </span><span class="ruleKeyword">empty</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="../../../../../../system/content/System.Text.Parsing/grammars.xml#rule_identifier_EC79E9557ADCB4230187E4EB2CFA518A0D75FDF1">identifier</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#rule_PPNumber_F2F16557EEA409631EBF72D611E0F27068A2278C">PPNumber</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="../../cppparser/doc/grammar_LiteralGrammar_2F7B1DBBC02D2614C2296EF8CBE31716418D0FE1.html#rule_CharacterLiteral_8F58B0F1A49723B75099ECFEC915B2279D9BBDFD">CharacterLiteral</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="../../cppparser/doc/grammar_LiteralGrammar_2F7B1DBBC02D2614C2296EF8CBE31716418D0FE1.html#rule_StringLiteral_3DB61013A138824285294F074D3A357546917A4D">StringLiteral</a></span><span class="ruleOp"> | </span><span class="ruleKeyword">empty</span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleChar">'('</span><span class="ruleOp"> | </span><span class="ruleChar">')'</span><span class="ruleOp"> | </span><span class="ruleChar">','</span><span class="ruleOp"> | </span><span class="ruleOp">(</span><span class="ruleKeyword">anychar</span><span class="ruleOp"> &minus; </span><span class="ruleOp">(</span><span class="ruleChar">'#'</span><span class="ruleOp"> | </span><span class="ruleChar">'('</span><span class="ruleOp"> | </span><span class="ruleChar">')'</span><span class="ruleOp"> | </span><span class="ruleChar">','</span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="../../../../../../system/content/System.Text.Parsing/grammars.xml#rule_newline_8D83C6A88BF04B09CA508634F63FE992F97061C7">newline</a></span><span class="ruleOp">)</span><span class="ruleOp">)</span><span class="ruleOp">)</span><span class="ruleOp"> | </span><span class="ruleKeyword">empty</span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleKeyword">anychar</span><span class="ruleOp"> &minus; </span><span class="ruleOp">(</span><span class="ruleChar">'#'</span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="../../../../../../system/content/System.Text.Parsing/grammars.xml#rule_newline_8D83C6A88BF04B09CA508634F63FE992F97061C7">newline</a></span><span class="ruleOp">)</span><span class="ruleOp">)</span></td>
+   </tr>
+   <tr id="rule_FunctionMacroInvocation_46988ED79383B5E2F6AAEDAF6E147043DAAF26F1">
+    <td class="grammarFirstCol">
+     <span class="rule">FunctionMacroInvocation</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleOp">(</span><span class="ruleKeyword">token</span><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="../../../../../../system/content/System.Text.Parsing/grammars.xml#rule_identifier_EC79E9557ADCB4230187E4EB2CFA518A0D75FDF1">identifier</a></span><span class="ruleOp"> </span><span class="ruleChar">'('</span><span class="ruleOp">)</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_MacroArgumentList_A1BF6C3B552A0C776E76A1F8DC881C44004A26EC">MacroArgumentList</a></span><span class="ruleOp"> </span><span class="ruleChar">')'</span><span class="ruleOp">)</span></td>
+   </tr>
+   <tr id="rule_MacroArgumentList_A1BF6C3B552A0C776E76A1F8DC881C44004A26EC">
+    <td class="grammarFirstCol">
+     <span class="rule">MacroArgumentList</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#rule_MacroArgument_521945C04622422670A0DC4D8318898FD5E45409">MacroArgument</a></span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleChar">','</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_MacroArgument_521945C04622422670A0DC4D8318898FD5E45409">MacroArgument</a></span><span class="ruleOp">)</span><span class="ruleOp">*</span><span class="ruleOp">)</span><span class="ruleOp">?</span></td>
+   </tr>
+   <tr id="rule_MacroArgument_521945C04622422670A0DC4D8318898FD5E45409">
+    <td class="grammarFirstCol">
+     <span class="rule">MacroArgument</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleKeyword">token</span><span class="ruleOp">(</span><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#rule_PPToken_4816CAC467353DF0F8B51C0239BFA4F8956FCEB9">PPToken</a></span><span class="ruleOp">)</span><span class="ruleOp">+</span><span class="ruleOp">)</span></td>
+   </tr>
+   <tr id="rule_PPTokenCatenation_AD121A736EC83A025722525BA64DD4A01EADCD4D">
+    <td class="grammarFirstCol">
+     <span class="rule">PPTokenCatenation</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#rule_PPToken_4816CAC467353DF0F8B51C0239BFA4F8956FCEB9">PPToken</a></span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#rule_S_88BAB4EECB6DE7E07F3F6460C7F1BA1889393EE9">S</a></span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleChar">'$'</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_S_88BAB4EECB6DE7E07F3F6460C7F1BA1889393EE9">S</a></span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_PPToken_4816CAC467353DF0F8B51C0239BFA4F8956FCEB9">PPToken</a></span><span class="ruleOp">)</span><span class="ruleOp">*</span><span class="ruleOp">)</span></td>
+   </tr>
+   <tr id="rule_PPTokenSequence_94AE0D5044349BBBAC281BE64666E20DF3F96FD3">
+    <td class="grammarFirstCol">
+     <span class="rule">PPTokenSequence</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#rule_PPTokenCatenation_AD121A736EC83A025722525BA64DD4A01EADCD4D">PPTokenCatenation</a></span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#rule_PPTokenCatenation_AD121A736EC83A025722525BA64DD4A01EADCD4D">PPTokenCatenation</a></span><span class="ruleOp">)</span><span class="ruleOp">*</span></td>
+   </tr>
+   <tr id="rule_MacroReplacement_E9F4AB82120722A9E567AAB1EEC5CD4630C358AA">
+    <td class="grammarFirstCol">
+     <span class="rule">MacroReplacement</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleKeyword">empty</span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#rule_PPTokenSequence_94AE0D5044349BBBAC281BE64666E20DF3F96FD3">PPTokenSequence</a></span><span class="ruleOp">)</span><span class="ruleOp">?</span><span class="ruleOp">)</span></td>
+   </tr>
+   <tr id="rule_PPNumber_F2F16557EEA409631EBF72D611E0F27068A2278C">
+    <td class="grammarFirstCol">
+     <span class="rule">PPNumber</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleKeyword">token</span><span class="ruleOp">(</span><span class="ruleOp">(</span><span class="ruleKeyword">digit</span><span class="ruleOp"> | </span><span class="ruleOp">(</span><span class="ruleChar">'.'</span><span class="ruleOp"> </span><span class="ruleKeyword">digit</span><span class="ruleOp">)</span><span class="ruleOp">)</span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleKeyword">digit</span><span class="ruleOp"> | </span><span class="ruleChar">'.'</span><span class="ruleOp"> | </span><span class="ruleCharSet">[eE]</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="../../../../../../system/content/System.Text.Parsing/grammars.xml#rule_sign_7100FCA859260527D92633F24AE023A50436D5C7">sign</a></span><span class="ruleOp"> | </span><span class="ruleCharSet">[a-zA-Z_]</span><span class="ruleOp">)</span><span class="ruleOp">*</span><span class="ruleOp">)</span></td>
+   </tr>
+   <tr id="rule_HeaderName_746F03F64FD80DE0FA6C0AE5B3DC804CD3F824B7">
+    <td class="grammarFirstCol">
+     <span class="rule">HeaderName</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleKeyword">token</span><span class="ruleOp">(</span><span class="ruleChar">'&lt;'</span><span class="ruleOp"> </span><span class="ruleCharSet">[^>]</span><span class="ruleOp">+</span><span class="ruleOp"> </span><span class="ruleChar">'>'</span><span class="ruleOp">)</span><span class="ruleOp"> | </span><span class="ruleKeyword">token</span><span class="ruleOp">(</span><span class="ruleChar">'\"'</span><span class="ruleOp"> </span><span class="ruleCharSet">[^\"]</span><span class="ruleOp">+</span><span class="ruleOp"> </span><span class="ruleChar">'\"'</span><span class="ruleOp">)</span></td>
+   </tr>
+   <tr id="rule_S_88BAB4EECB6DE7E07F3F6460C7F1BA1889393EE9">
+    <td class="grammarFirstCol">
+     <span class="rule">S</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleCharSet">[ \t]</span><span class="ruleOp">+</span></td>
+   </tr>
+  </table>
+ </body>
+</html>

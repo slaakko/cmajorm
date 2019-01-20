@@ -1,0 +1,176 @@
+// =================================
+// Copyright (c) 2019 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Collections;
+using System.IO;
+
+namespace System.Text.Parsing
+{
+    public class FileInfo
+    {
+        static nothrow FileInfo() : instance(new FileInfo())
+        {
+        }
+        private nothrow FileInfo() : files()
+        {
+        }
+        public ~FileInfo()
+        {
+        }
+        public static nothrow FileInfo& Instance()
+        {
+            return *instance;
+        }
+        public nothrow inline const List<string>& Files()
+        {
+            return files;
+        }
+        public void SetFiles(const List<string>& files_)
+        {
+            files = files_;
+        }
+        public nothrow string GetFilePath(int index)
+        {
+            if (index >= 0 && index < files.Count())
+            {
+                return files[index];
+            }
+            return string();
+        }
+        private static UniquePtr<FileInfo> instance;
+        private List<string> files;
+    }
+    
+    public nothrow const uchar* LineStart(const uchar* start, const uchar* pos)
+    {
+        while (pos > start && *pos != u'\n')
+        {
+            --pos;
+        }
+        if (*pos == u'\n')
+        {
+            ++pos;
+        }
+        return pos;
+    }
+
+    public nothrow const uchar* LineEnd(const uchar* end, const uchar* pos)
+    {
+        while (pos < end && *pos != u'\n')
+        {
+            ++pos;
+        }
+        return pos;
+    }
+
+    public nothrow ustring GetErrorLines(const uchar* start, const uchar* end, const Span& span)
+    {
+        const uchar* startPos = start + span.start;
+        if (startPos < start || startPos >= end)
+        {
+            return ustring();
+        }
+        const uchar* lineStart = LineStart(start, startPos);
+        int cols = cast<int>(startPos - lineStart);
+        if (cols < 0)
+        {
+            cols = 0;
+        }
+        const uchar* lineEnd = LineEnd(end, startPos);
+        if (lineEnd < lineStart)
+        {
+            lineEnd = lineStart;
+        }
+        int lineLength = cast<int>(lineEnd - lineStart);
+        ustring lines(lineStart, lineEnd);
+        int spanCols = Max(cast<int>(1), Min(span.end - span.start, lineLength - cols));
+        lines.Append(u'\n').Append(ustring(u' ', cols)).Append(ustring(u'^', spanCols));
+        return lines;
+    }
+
+    public class ExpectationFailure : Exception
+    {
+        public ExpectationFailure(const ustring& info_, const string& fileName_, const Span& span_, const uchar* start_, const uchar* end_) : 
+            base("Parsing file '" + fileName_ + "' failed at line " + ToString(span_.lineNumber) + ":\n" + ToUtf8(info_) + " expected:\n" + ToUtf8(GetErrorLines(start_, end_, span_))),
+            info(info_), fileName(fileName_), span(span_), start(start_), end(end_)
+        {
+        }
+        public inline nothrow const ustring& Info() const
+        {
+            return info;
+        }
+        public inline nothrow const string& FileName() const
+        {
+            return fileName;
+        }
+        public inline nothrow const Span& GetSpan() const
+        {
+            return span;
+        }
+        public inline nothrow const uchar* Start() const
+        {
+            return start;
+        }
+        public inline nothrow const uchar* End() const
+        {
+            return end;
+        }
+        private ustring info;
+        private string fileName;
+        private Span span;
+        private const uchar* start;
+        private const uchar* end;
+    }
+
+    public class ParsingException : Exception
+    {
+        public ParsingException(const string& message_, const string& fileName_, const Span& span_, const uchar* start_, const uchar* end_) : 
+            base(message_ + " in file '" + fileName_ + "' at line " + ToString(span_.lineNumber) + ":\n" + ToUtf8(GetErrorLines(start_, end_, span_))),
+            message(message_), fileName(fileName_), span(span_), start(start_), end(end_)
+        {
+        }
+        public nothrow inline const string& Message() const
+        {
+            return message;
+        }
+        public nothrow inline const string& FileName() const
+        {
+            return fileName;
+        }
+        public nothrow inline const Span& SpanValue() const
+        {
+            return span;
+        }
+        public nothrow inline const uchar* Start() const
+        {
+            return start;
+        }
+        public nothrow inline const uchar* End() const
+        {
+            return end;
+        }
+        private string message;
+        private string fileName;
+        private Span span;
+        private const uchar* start;
+        private const uchar* end;
+    }
+                
+    public void ThrowException(const string& message, const Span& span)
+    {
+        if (span.IsValid())
+        {
+            string filePath = FileInfo.Instance().GetFilePath(span.fileIndex);
+            if (!filePath.IsEmpty())
+            {
+                string content = File.ReadAllText(filePath);
+                ustring uc = ToUtf32(content);
+                throw ParsingException(message, filePath, span, &uc[0], &uc[0] + uc.Length());
+            }
+        }
+        throw Exception(message);
+    }
+}

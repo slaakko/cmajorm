@@ -1,0 +1,162 @@
+using System;
+
+namespace cmsx.machine
+{
+    public const ulong trapXMask = 0x0000000000FF0000u;
+    public const byte trapXShift = 16u;
+    public const ulong trapYMask = 0x000000000000FF00u;
+    public const byte trapYShift = 8u;
+    public const ulong trapZMask = 0x00000000000000FFu;
+    public const byte trapZShift = 0u;
+
+    public const byte regAX = 255u;
+    public const byte regBX = 254u;
+    public const byte regCX = 253u;
+    public const byte regDX = 252u;
+    public const byte regEX = 251u;
+    public const byte regSP = 250u;
+    public const byte regFP = 249u;
+    public const byte firstGlobalReg = 249u;
+
+    public class Registers
+    {
+//      register                           description                          S = saved, P = put
+// ===============================================================================================
+        public const byte rA = 0u;      // arithmetic status register           S P
+        public const byte rB = 1u;      // bootstrap register (trip)            S P
+        public const byte rC = 2u;      // cycle counter
+        public const byte rD = 3u;      // dividend register                    S P
+        public const byte rE = 4u;      // epsilon register                     S P
+        public const byte rF = 5u;      // failure location register              P
+        public const byte rG = 6u;      // global threshold register            S P
+        public const byte rH = 7u;      // himult register                      S P
+        public const byte rI = 8u;      // interval counter                     S P
+        public const byte rJ = 9u;      // return-jump register                 S P
+        public const byte rK = 10u;     // interrupt mask register
+        public const byte rL = 11u;     // local threshold register             S P
+        public const byte rM = 12u;     // multiplex mask register              S P
+        public const byte rN = 13u;     // serial number
+        public const byte rO = 14u;     // register stack offset
+        public const byte rP = 15u;     // prediction register                  S P
+        public const byte rQ = 16u;     // interrupt request register
+        public const byte rR = 17u;     // remainder register                   S P
+        public const byte rS = 18u;     // register stack pointer
+        public const byte rT = 19u;     // trap address register
+        public const byte rU = 20u;     // usage counter
+        public const byte rV = 21u;     // virtual translation register
+        public const byte rW = 22u;     // where-interrupted register (trip)    S P
+        public const byte rX = 23u;     // execution register (trip)            S P
+        public const byte rY = 24u;     // Y operand (trip)                     S P
+        public const byte rZ = 25u;     // Z operand (trip)                     S P
+        public const byte rBB = 26u;    // bootstrap register (trap)            P
+        public const byte rTT = 27u;    // dynamic trap address register
+        public const byte rWW = 28u;    // where-interrupted register (trap)    P
+        public const byte rXX = 29u;    // execution register (trap)            P
+        public const byte rYY = 30u;    // Y operand (trap)                     P
+        public const byte rZZ = 31u;    // Z operand (trap)                     P
+
+        public nothrow Registers()
+        {
+            specialRegMap[rA] = "rA";
+            specialRegMap[rB] = "rB";
+            specialRegMap[rC] = "rC";
+            specialRegMap[rD] = "rD";
+            specialRegMap[rE] = "rE";
+            specialRegMap[rF] = "rF";
+            specialRegMap[rG] = "rG";
+            specialRegMap[rH] = "rH";
+            specialRegMap[rI] = "rI";
+            specialRegMap[rJ] = "rJ";
+            specialRegMap[rK] = "rK";
+            specialRegMap[rL] = "rL";
+            specialRegMap[rM] = "rM";
+            specialRegMap[rN] = "rN";
+            specialRegMap[rO] = "rO";
+            specialRegMap[rP] = "rP";
+            specialRegMap[rQ] = "rQ";
+            specialRegMap[rR] = "rR";
+            specialRegMap[rS] = "rS";
+            specialRegMap[rT] = "rT";
+            specialRegMap[rU] = "rU";
+            specialRegMap[rV] = "rV";
+            specialRegMap[rW] = "rW";
+            specialRegMap[rX] = "rX";
+            specialRegMap[rY] = "rY";
+            specialRegMap[rZ] = "rZ";
+            specialRegMap[rBB] = "rBB";
+            specialRegMap[rTT] = "rTT";
+            specialRegMap[rWW] = "rWW";
+            specialRegMap[rXX] = "rXX";
+            specialRegMap[rYY] = "rYY";
+            specialRegMap[rZZ] = "rZZ";
+        }
+        public ulong Get(byte regNum)
+        {
+            ulong rg = GetSpecial(rG);
+            if (regNum >= rg)
+            {
+                return globalRegs[regNum];
+            }
+            else
+            {
+                ulong rl = GetSpecial(rL);
+                if (regNum >= rl)
+                {
+                    SetSpecial(rL, regNum + 1u);
+                }
+                return localRegs[regNum];
+            }
+        }
+        public void Set(byte regNum, ulong value)
+        {
+            ulong rg = GetSpecial(rG);
+            if (regNum >= rg)
+            {
+                globalRegs[regNum] = value;
+            }
+            else
+            {
+                ulong rl = GetSpecial(rL);
+                if (regNum >= rl)
+                {
+                    SetSpecial(rL, regNum + 1u);
+                }
+                localRegs[regNum] = value;
+            }
+        }
+        public ulong GetSpecial(byte regNum)
+        {
+            #assert(regNum >= 0u && regNum < 32u);
+            return globalRegs[regNum];
+        }
+        public void SetSpecial(byte regNum, ulong value)
+        {
+            #assert(regNum >= 0u && regNum < 32u);
+            globalRegs[regNum] = value;
+        }
+        public string GetSpecialRegName(byte specialReg) const
+        {
+            Map<byte, string>.ConstIterator it = specialRegMap.CFind(specialReg);
+            if (it != specialRegMap.CEnd())
+            {
+                return it->second;
+            }
+            else
+            {
+                return string();
+            }
+        }
+        public inline nothrow ulong GetPC() const
+        {
+            return pc;
+        }
+        public inline nothrow void SetPC(ulong pc_)
+        {
+            pc = pc_;
+        }
+        private ulong[256] localRegs;
+        private ulong[256] globalRegs;
+        private ulong pc;
+        private Map<byte, string> specialRegMap;
+    }
+}

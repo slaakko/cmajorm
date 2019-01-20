@@ -1,0 +1,922 @@
+using System;
+using System.Collections;
+
+namespace cmsx.machine
+{
+    public const byte TRAP = 0x00u;
+    public const byte FCMP = 0x01u;
+    public const byte FUN = 0x02u;
+    public const byte FEQL = 0x03u;
+    public const byte FADD = 0x04u;
+    public const byte FIX = 0x05u;
+    public const byte FSUB = 0x06u;
+    public const byte FIXU = 0x07u;
+
+    public const byte FLOT = 0x08u;
+    public const byte FLOTI = 0x09u;
+    public const byte FLOTU = 0x0Au;
+    public const byte FLOTUI = 0x0Bu;
+    public const byte SFLOT = 0x0Cu;
+    public const byte SFLOTI = 0x0Du;
+    public const byte SFLOTU = 0x0Eu;
+    public const byte SFLOTUI = 0x0Fu;
+
+    public const byte FMUL = 0x10u;
+    public const byte FCMPE = 0x11u;
+    public const byte FUNE = 0x12u;
+    public const byte FEQLE = 0x13u;
+    public const byte FDIV = 0x14u;
+    public const byte FSQRT = 0x15u;
+    public const byte FREM = 0x16u;
+    public const byte FINT = 0x17u;
+
+    public const byte MUL = 0x18u;
+    public const byte MULI = 0x19u;
+    public const byte MULU = 0x1Au;
+    public const byte MULUI = 0x1Bu;
+    public const byte DIV = 0x1Cu;
+    public const byte DIVI = 0x1Du;
+    public const byte DIVU = 0x1Eu;
+    public const byte DIVUI = 0x1Fu;
+
+    public const byte ADD = 0x20u;
+    public const byte ADDI = 0x21u;
+    public const byte ADDU = 0x22u;
+    public const byte ADDUI = 0x23u;
+    public const byte SUB = 0x24u;
+    public const byte SUBI = 0x25u;
+    public const byte SUBU = 0x26u;
+    public const byte SUBUI = 0x27u;
+
+    public const byte I2ADDU = 0x28u;
+    public const byte I2ADDUI = 0x29u;
+    public const byte I4ADDU = 0x2Au;
+    public const byte I4ADDUI = 0x2Bu;
+    public const byte I8ADDU = 0x2Cu;
+    public const byte I8ADDUI = 0x2Du;
+    public const byte I16ADDU = 0x2Eu;
+    public const byte I16ADDUI = 0x2Fu;
+
+    public const byte CMP = 0x30u;
+    public const byte CMPI = 0x31u;
+    public const byte CMPU = 0x32u;
+    public const byte CMPUI = 0x33u;
+    public const byte NEG = 0x34u;
+    public const byte NEGI = 0x35u;
+    public const byte NEGU = 0x36u;
+    public const byte NEGUI = 0x37u;
+
+    public const byte SL = 0x38u;
+    public const byte SLI = 0x39u;
+    public const byte SLU = 0x3Au;
+    public const byte SLUI = 0x3Bu;
+    public const byte SR = 0x03Cu;
+    public const byte SRI = 0x3Du;
+    public const byte SRU = 0x3Eu;
+    public const byte SRUI = 0x3Fu;
+
+    public const byte BN = 0x40u;
+    public const byte BNB = 0x41u;
+    public const byte BZ = 0x42u;
+    public const byte BZB = 0x43u;
+    public const byte BP = 0x44u;
+    public const byte BPB = 0x45u;
+    public const byte BOD = 0x46u;
+    public const byte BODB = 0x47u;
+
+    public const byte BNN = 0x48u;
+    public const byte BNNB = 0x49u;
+    public const byte BNZ = 0x4Au;
+    public const byte BNZB = 0x4Bu;
+    public const byte BNP = 0x4Cu;
+    public const byte BNPB = 0x4Du;
+    public const byte BEV = 0x4Eu;
+    public const byte BEVB = 0x4Fu;
+
+    public const byte PBN = 0x50u;
+    public const byte PBNB = 0x51u;
+    public const byte PBZ = 0x52u;
+    public const byte PBZB = 0x53u;
+    public const byte PBP = 0x54u;
+    public const byte PBPB = 0x55u;
+    public const byte PBOD = 0x56u;
+    public const byte PBODB = 0x57u;
+
+    public const byte PBNN = 0x58u;
+    public const byte PBNNB = 0x59u;
+    public const byte PBNZ = 0x5Au;
+    public const byte PBNZB = 0x5Bu;
+    public const byte PBNP = 0x5Cu;
+    public const byte PBNPB = 0x5Du;
+    public const byte PBEV = 0x5Eu;
+    public const byte PBEVB = 0x5Fu;
+
+    public const byte CSN = 0x60u;
+    public const byte CSNI = 0x61u;
+    public const byte CSZ = 0x62u;
+    public const byte CSZI = 0x63u;
+    public const byte CSP = 0x64u;
+    public const byte CSPI = 0x65u;
+    public const byte CSOD = 0x66u;
+    public const byte CSODI = 0x67u;
+
+    public const byte CSNN = 0x68u;
+    public const byte CSNNI = 0x69u;
+    public const byte CSNZ = 0x6Au;
+    public const byte CSNZI = 0x6Bu;
+    public const byte CSNP = 0x6Cu;
+    public const byte CSNPI = 0x6Du;
+    public const byte CSEV = 0x6Eu;
+    public const byte CSEVI = 0x6Fu;
+
+    public const byte ZSN = 0x70u;
+    public const byte ZSNI = 0x71u;
+    public const byte ZSZ = 0x72u;
+    public const byte ZSZI = 0x73u;
+    public const byte ZSP = 0x74u;
+    public const byte ZSPI = 0x75u;
+    public const byte ZSOD = 0x76u;
+    public const byte ZSODI = 0x77u;
+
+    public const byte ZSNN = 0x78u;
+    public const byte ZSNNI = 0x79u;
+    public const byte ZSNZ = 0x7Au;
+    public const byte ZSNZI = 0x7Bu;
+    public const byte ZSNP = 0x7Cu;
+    public const byte ZSNPI = 0x7Du;
+    public const byte ZSEV = 0x7Eu;
+    public const byte ZSEVI = 0x7Fu;
+
+    public const byte LDB = 0x80u;
+    public const byte LDBI = 0x81u;
+    public const byte LDBU = 0x82u;
+    public const byte LDBUI = 0x83u;
+    public const byte LDW = 0x84u;
+    public const byte LDWI = 0x85u;
+    public const byte LDWU = 0x86u;
+    public const byte LDWUI = 0x87u;
+
+    public const byte LDT = 0x88u;
+    public const byte LDTI = 0x89u;
+    public const byte LDTU = 0x8Au;
+    public const byte LDTUI = 0x8Bu;
+    public const byte LDO = 0x8Cu;
+    public const byte LDOI = 0x8Du;
+    public const byte LDOU = 0x8Eu;
+    public const byte LDOUI = 0x8Fu;
+
+    public const byte LDSF = 0x90u;
+    public const byte LDSFI = 0x91u;
+    public const byte LDHT = 0x92u;
+    public const byte LDHTI = 0x93u;
+    public const byte CSWAP = 0x94u;
+    public const byte CSWAPI = 0x95u;
+    public const byte LDUNC = 0x96u;
+    public const byte LDUNCI = 0x97u;
+
+    public const byte LDVTS = 0x98u;
+    public const byte LDVTSI = 0x99u;
+    public const byte PRELD = 0x9Au;
+    public const byte PRELDI = 0x9Bu;
+    public const byte PREGO = 0x9Cu;
+    public const byte PREGOI = 0x9Du;
+    public const byte GO = 0x9Eu;
+    public const byte GOI = 0x9Fu;
+
+    public const byte STB = 0xA0u;
+    public const byte STBI = 0xA1u;
+    public const byte STBU = 0xA2u;
+    public const byte STBUI = 0xA3u;
+    public const byte STW = 0xA4u;
+    public const byte STWI = 0xA5u;
+    public const byte STWU = 0xA6u;
+    public const byte STWUI = 0xA7u;
+
+    public const byte STT = 0xA8u;
+    public const byte STTI = 0xA9u;
+    public const byte STTU = 0xAAu;
+    public const byte STTUI = 0xABu;
+    public const byte STO = 0xACu;
+    public const byte STOI = 0xADu;
+    public const byte STOU = 0xAEu;
+    public const byte STOUI = 0xAFu;
+
+    public const byte STSF = 0xB0u;
+    public const byte STSFI = 0xB1u;
+    public const byte STHT = 0xB2u;
+    public const byte STHTI = 0xB3u;
+    public const byte STCO = 0xB4u;
+    public const byte STCOI = 0xB5u;
+    public const byte STUNC = 0xB6u;
+    public const byte STUNCI = 0xB7u;
+
+    public const byte SYNCD = 0xB8u;
+    public const byte SYNCDI = 0xB9u;
+    public const byte PREST = 0xBAu;
+    public const byte PRESTI = 0xBBu;
+    public const byte SYNCID = 0xBCu;
+    public const byte SYNCIDI = 0xBDu;
+    public const byte CALL = 0xBEu;
+    public const byte CALLI = 0xBFu;
+
+    public const byte OR = 0xC0u;
+    public const byte ORI = 0xC1u;
+    public const byte ORN = 0xC2u;
+    public const byte ORNI = 0xC3u;
+    public const byte NOR = 0xC4u;
+    public const byte NORI = 0xC5u;
+    public const byte XOR = 0xC6u;
+    public const byte XORI = 0xC7u;
+
+    public const byte AND = 0xC8u;
+    public const byte ANDI = 0xC9u;
+    public const byte ANDN = 0xCAu;
+    public const byte ANDNI = 0xCBu;
+    public const byte NAND = 0xCCu;
+    public const byte NANDI = 0xCDu;
+    public const byte NXOR = 0xCEu;
+    public const byte NXORI = 0xCFu;
+
+    public const byte BDIF = 0xD0;
+    public const byte BDIFI = 0xD1u;
+    public const byte WDIF = 0xD2u;
+    public const byte WDIFI = 0xD3u;
+    public const byte TDIF = 0xD4u;
+    public const byte TDIFI = 0xD5u;
+    public const byte ODIF = 0xD6u;
+    public const byte ODIFI = 0xD7u;
+
+    public const byte MUX = 0xD8u;
+    public const byte MUXI = 0xD9u;
+    public const byte SADD = 0xDAu;
+    public const byte SADDI = 0xDBu;
+    public const byte MOR = 0xDCu;
+    public const byte MORI = 0xDDu;
+    public const byte MXOR = 0xDEu;
+    public const byte MXORI = 0xDFu;
+
+    public const byte SETH = 0xE0u;
+    public const byte SETMH = 0xE1u;
+    public const byte SETML = 0xE2u;
+    public const byte SETL = 0xE3u;
+    public const byte INCH = 0xE4u;
+    public const byte INCMH = 0xE5u;
+    public const byte INCML = 0xE6u;
+    public const byte INCL = 0xE7u;
+
+    public const byte ORH = 0xE8u;
+    public const byte ORMH = 0xE9u;
+    public const byte ORML = 0xEAu;
+    public const byte ORL = 0xEBu;
+    public const byte ANDNH = 0xECu;
+    public const byte ANDNMH = 0xEDu;
+    public const byte ANDNML = 0xEEu;
+    public const byte ANDNL = 0xEFu;
+
+    public const byte JMP = 0xF0u;
+    public const byte JMPB = 0xF1u;
+    public const byte PUSHJ = 0xF2u;
+    public const byte PUSHJB = 0xF3u;
+    public const byte GETA = 0xF4u;
+    public const byte GETAB = 0xF5u;
+    public const byte PUT = 0xF6u;
+    public const byte PUTI = 0xF7u;
+
+    public const byte RET = 0xF8u;
+    public const byte RESUME = 0xF9u;
+    public const byte SAVE = 0xFAu;
+    public const byte UNSAVE = 0xFBu;
+    public const byte SYNC = 0xFCu;
+    public const byte SWYM = 0xFDu;
+    public const byte GET = 0xFEu;
+    public const byte TRIP = 0xFFu;
+
+    public class OpCodeMap
+    {
+        static OpCodeMap() : instance(new OpCodeMap())
+        {
+        }
+        public static nothrow OpCodeMap& Instance()
+        {
+            return *instance;
+        }
+        private OpCodeMap() : maxOpCodeNameLength(0)
+        {
+            codes["TRAP"] = TRAP;
+            codes["FCMP"] = FCMP;
+            codes["FUN"] = FUN;
+            codes["FEQL"] = FEQL;
+            codes["FADD"] = FADD;
+            codes["FIX"] = FIX;
+            codes["FSUB"] = FSUB;
+            codes["FIXU"] = FIXU;
+
+            codes["FLOT"] = FLOT;
+            codes["FLOTI"] = FLOTI;
+            codes["FLOTU"] = FLOTU;
+            codes["FLOTUI"] = FLOTUI;
+            codes["SFLOT"] = SFLOT;
+            codes["SFLOTI"] = SFLOTI;
+            codes["SFLOTU"] = SFLOTU;
+            codes["SFLOTUI"] = SFLOTUI;
+
+            codes["FMUL"] = FMUL;
+            codes["FCMPE"] = FCMPE;
+            codes["FUNE"] = FUNE;
+            codes["FEQLE"] = FEQLE;
+            codes["FDIV"] = FDIV;
+            codes["FSQRT"] = FSQRT;
+            codes["FREM"] = FREM;
+            codes["FINT"] = FINT;
+
+            codes["MUL"] = MUL;
+            codes["MULI"] = MULI;
+            codes["MULU"] = MULU;
+            codes["MULUI"] = MULUI;
+            codes["DIV"] = DIV;
+            codes["DIVI"] = DIVI;
+            codes["DIVU"] = DIVU;
+            codes["DIVUI"] = DIVUI;
+
+            codes["ADD"] = ADD;
+            codes["ADDI"] = ADDI;
+            codes["ADDU"] = ADDU;
+            codes["ADDUI"] = ADDUI;
+            codes["SUB"] = SUB;
+            codes["SUBI"] = SUBI;
+            codes["SUBU"] = SUBU;
+            codes["SUBUI"] = SUBUI;
+
+            codes["2ADDU"] = I2ADDU;
+            codes["2ADDUI"] = I2ADDUI;
+            codes["4ADDU"] = I4ADDU;
+            codes["4ADDUI"] = I4ADDUI;
+            codes["8ADDU"] = I8ADDU;
+            codes["8ADDUI"] = I8ADDUI;
+            codes["16ADDU"] = I16ADDU;
+            codes["16ADDUI"] = I16ADDUI;
+
+            codes["CMP"] = CMP;
+            codes["CMPI"] = CMPI;
+            codes["CMPU"] = CMPU;
+            codes["CMPUI"] = CMPUI;
+            codes["NEG"] = NEG;
+            codes["NEGI"] = NEGI;
+            codes["NEGU"] = NEGU;
+            codes["NEGUI"] = NEGUI;
+
+            codes["SL"] = SL;
+            codes["SLI"] = SLI;
+            codes["SLU"] = SLU;
+            codes["SLUI"] = SLUI;
+            codes["SR"] = SR;
+            codes["SRI"] = SRI;
+            codes["SRU"] = SRU;
+            codes["SRUI"] = SRUI;
+
+            codes["BN"] = BN;
+            codes["BNB"] = BNB;
+            codes["BZ"] = BZ;
+            codes["BZB"] = BZB;
+            codes["BP"] = BP;
+            codes["BPB"] = BPB;
+            codes["BOD"] = BOD;
+            codes["BODB"] = BODB;
+
+            codes["BNN"] = BNN;
+            codes["BNNB"] = BNNB;
+            codes["BNZ"] = BNZ;
+            codes["BNZB"] = BNZB;
+            codes["BNP"] = BNP;
+            codes["BNPB"] = BNPB;
+            codes["BEV"] = BEV;
+            codes["BEVB"] = BEVB;
+
+            codes["PBN"] = PBN;
+            codes["PBNB"] = PBNB;
+            codes["PBZ"] = PBZ;
+            codes["PBZB"] = PBZB;
+            codes["PBP"] = PBP;
+            codes["PBPB"] = PBPB;
+            codes["PBOD"] = PBOD;
+            codes["PBODB"] = PBODB;
+
+            codes["PBNN"] = PBNN;
+            codes["PBNNB"] = PBNNB;
+            codes["PBNZ"] = PBNZ;
+            codes["PBNZB"] = PBNZB;
+            codes["PBNP"] = PBNP;
+            codes["PBNPB"] = PBNPB;
+            codes["PBEV"] = PBEV;
+            codes["PBEVB"] = PBEVB;
+
+            codes["CSN"] = CSN;
+            codes["CSNI"] = CSNI;
+            codes["CSZ"] = CSZ;
+            codes["CSZI"] = CSZI;
+            codes["CSP"] = CSP;
+            codes["CSPI"] = CSPI;
+            codes["CSOD"] = CSOD;
+            codes["CSODI"] = CSODI;
+
+            codes["CSNN"] = CSNN;
+            codes["CSNNI"] = CSNNI;
+            codes["CSNZ"] = CSNZ;
+            codes["CSNZI"] = CSNZI;
+            codes["CSNP"] = CSNP;
+            codes["CSNPI"] = CSNPI;
+            codes["CSEV"] = CSEV;
+            codes["CSEVI"] = CSEVI;
+
+            codes["ZSN"] = ZSN;
+            codes["ZSNI"] = ZSNI;
+            codes["ZSZ"] = ZSZ;
+            codes["ZSZI"] = ZSZI;
+            codes["ZSP"] = ZSP;
+            codes["ZSPI"] = ZSPI;
+            codes["ZSOD"] = ZSOD;
+            codes["ZSODI"] = ZSODI;
+
+            codes["ZSNN"] = ZSNN;
+            codes["ZSNNI"] = ZSNNI;
+            codes["ZSNZ"] = ZSNZ;
+            codes["ZSNZI"] = ZSNZI;
+            codes["ZSNP"] = ZSNP;
+            codes["ZSNPI"] = ZSNPI;
+            codes["ZSEV"] = ZSEV;
+            codes["ZSEVI"] = ZSEVI;
+
+            codes["LDB"] = LDB;
+            codes["LDBI"] = LDBI;
+            codes["LDBU"] = LDBU;
+            codes["LDBUI"] = LDBUI;
+            codes["LDW"] = LDW;
+            codes["LDWI"] = LDWI;
+            codes["LDWU"] = LDWU;
+            codes["LDWUI"] = LDWUI;
+
+            codes["LDT"] = LDT;
+            codes["LDTI"] = LDTI;
+            codes["LDTU"] = LDTU;
+            codes["LDTUI"] = LDTUI;
+            codes["LDO"] = LDO;
+            codes["LDOI"] = LDOI;
+            codes["LDOU"] = LDOU;
+            codes["LDOUI"] = LDOUI;
+
+            codes["LDSF"] = LDSF;
+            codes["LDSFI"] = LDSFI;
+            codes["LDHT"] = LDHT;
+            codes["LDHTI"] = LDHTI;
+            codes["CSWAP"] = CSWAP;
+            codes["CSWAPI"] = CSWAPI;
+            codes["LDUNC"] = LDUNC;
+            codes["LDUNCI"] = LDUNCI;
+
+            codes["LDVTS"] = LDVTS;
+            codes["LDVTSI"] = LDVTSI;
+            codes["PRELD"] = PRELD;
+            codes["PRELDI"] = PRELDI;
+            codes["PREGO"] = PREGO;
+            codes["PREGOI"] = PREGOI;
+            codes["GO"] = GO;
+            codes["GOI"] = GOI;
+
+            codes["STB"] = STB;
+            codes["STBI"] = STBI;
+            codes["STBU"] = STBU;
+            codes["STBUI"] = STBUI;
+            codes["STW"] = STW;
+            codes["STWI"] = STWI;
+            codes["STWU"] = STWU;
+            codes["STWUI"] = STWUI;
+
+            codes["STT"] = STT;
+            codes["STTI"] = STTI;
+            codes["STTU"] = STTU;
+            codes["STTUI"] = STTUI;
+            codes["STO"] = STO;
+            codes["STOI"] = STOI;
+            codes["STOU"] = STOU;
+            codes["STOUI"] = STOUI;
+
+            codes["STSF"] = STSF;
+            codes["STSFI"] = STSFI;
+            codes["STHT"] = STHT;
+            codes["STHTI"] = STHTI;
+            codes["STCO"] = STCO;
+            codes["STCOI"] = STCOI;
+            codes["STUNC"] = STUNC;
+            codes["STUNCI"] = STUNCI;
+
+            codes["SYNCD"] = SYNCD;
+            codes["SYNCDI"] = SYNCDI;
+            codes["PREST"] = PREST;
+            codes["PRESTI"] = PRESTI;
+            codes["SYNCID"] = SYNCID;
+            codes["SYNCIDI"] = SYNCIDI;
+            codes["CALL"] = CALL;
+            codes["CALLI"] = CALLI;
+
+            codes["OR"] = OR;
+            codes["ORI"] = ORI;
+            codes["ORN"] = ORN;
+            codes["ORNI"] = ORNI;
+            codes["NOR"] = NOR;
+            codes["NORI"] = NORI;
+            codes["XOR"] = XOR;
+            codes["XORI"] = XORI;
+
+            codes["AND"] = AND;
+            codes["ANDI"] = ANDI;
+            codes["ANDN"] = ANDN;
+            codes["ANDNI"] = ANDNI;
+            codes["NAND"] = NAND;
+            codes["NANDI"] = NANDI;
+            codes["NXOR"] = NXOR;
+            codes["NXORI"] = NXORI;
+
+            codes["BDIF"] = BDIF;
+            codes["BDIFI"] = BDIFI;
+            codes["WDIF"] = WDIF;
+            codes["WDIFI"] = WDIFI;
+            codes["TDIF"] = TDIF;
+            codes["TDIFI"] = TDIFI;
+            codes["ODIF"] = ODIF;
+            codes["ODIFI"] = ODIFI;
+
+            codes["MUX"] = MUX;
+            codes["MUXI"] = MUXI;
+            codes["SADD"] = SADD;
+            codes["SADDI"] = SADDI;
+            codes["MOR"] = MOR;
+            codes["MORI"] = MORI;
+            codes["MXOR"] = MXOR;
+            codes["MXORI"] = MXORI;
+
+            codes["SETH"] = SETH;
+            codes["SETMH"] = SETMH;
+            codes["SETML"] = SETML;
+            codes["SETL"] = SETL;
+            codes["INCH"] = INCH;
+            codes["INCMH"] = INCMH;
+            codes["INCML"] = INCML;
+            codes["INCL"] = INCL;
+
+            codes["ORH"] = ORH;
+            codes["ORMH"] = ORMH;
+            codes["ORML"] = ORML;
+            codes["ORL"] = ORL;
+            codes["ANDNH"] = ANDNH;
+            codes["ANDNMH"] = ANDNMH;
+            codes["ANDNML"] = ANDNML;
+            codes["ANDNL"] = ANDNL;
+
+            codes["JMP"] = JMP;
+            codes["JMPB"] = JMPB;
+            codes["PUSHJ"] = PUSHJ;
+            codes["PUSHJB"] = PUSHJB;
+            codes["GETA"] = GETA;
+            codes["GETAB"] = GETAB;
+            codes["PUT"] = PUT;
+            codes["PUTI"] = PUTI;
+
+            codes["RET"] = RET;
+            codes["RESUME"] = RESUME;
+            codes["SAVE"] = SAVE;
+            codes["UNSAVE"] = UNSAVE;
+            codes["SYNC"] = SYNC;
+            codes["SWYM"] = SWYM;
+            codes["GET"] = GET;
+            codes["TRIP"] = TRIP;
+
+            names[TRAP] = "TRAP";
+            names[FCMP] = "FCMP";
+            names[FUN] = "FUN";
+            names[FEQL] = "FEQL";
+            names[FADD] = "FADD";
+            names[FIX] = "FIX";
+            names[FSUB] = "FSUB";
+            names[FIXU] = "FIXU";
+
+            names[FLOT] = "FLOT";
+            names[FLOTI] = "FLOTI";
+            names[FLOTU] = "FLOTU";
+            names[FLOTUI] = "FLOTUI";
+            names[SFLOT] = "SFLOT";
+            names[SFLOTI] = "SFLOTI";
+            names[SFLOTU] = "SFLOTU";
+            names[SFLOTUI] = "SFLOTUI";
+
+            names[FMUL] = "FMUL";
+            names[FCMPE] = "FCMPE";
+            names[FUNE] = "FUNE";
+            names[FEQLE] = "FEQLE";
+            names[FDIV] = "FDIV";
+            names[FSQRT] = "FSQRT";
+            names[FREM] = "FREM";
+            names[FINT] = "FINT";
+
+            names[MUL] = "MUL";
+            names[MULI] = "MULI";
+            names[MULU] = "MULU";
+            names[MULUI] = "MULUI";
+            names[DIV] = "DIV";
+            names[DIVI] = "DIVI";
+            names[DIVU] = "DIVU";
+            names[DIVUI] = "DIVUI";
+
+            names[ADD] = "ADD";
+            names[ADDI] = "ADDI";
+            names[ADDU] = "ADDU";
+            names[ADDUI] = "ADDUI";
+            names[SUB] = "SUB";
+            names[SUBI] = "SUBI";
+            names[SUBU] = "SUBU";
+            names[SUBUI] = "SUBUI";
+
+            names[I2ADDU] = "2ADDU";
+            names[I2ADDUI] = "2ADDUI";
+            names[I4ADDU] = "4ADDU";
+            names[I4ADDUI] = "4ADDUI";
+            names[I8ADDU] = "8ADDU";
+            names[I8ADDUI] = "8ADDUI";
+            names[I16ADDU] = "16ADDU";
+            names[I16ADDUI] = "16ADDUI";
+
+            names[CMP] = "CMP";
+            names[CMPI] = "CMPI";
+            names[CMPU] = "CMPU";
+            names[CMPUI] = "CMPUI";
+            names[NEG] = "NEG";
+            names[NEGI] = "NEGI";
+            names[NEGU] = "NEGU";
+            names[NEGUI] = "NEGUI";
+
+            names[SL] = "SL";
+            names[SLI] = "SLI";
+            names[SLU] = "SLU";
+            names[SLUI] = "SLUI";
+            names[SR] = "SR";
+            names[SRI] = "SRI";
+            names[SRU] = "SRU";
+            names[SRUI] = "SRUI";
+
+            names[BN] = "BN";
+            names[BNB] = "BNB";
+            names[BZ] = "BZ";
+            names[BZB] = "BZB";
+            names[BP] = "BP";
+            names[BPB] = "BPB";
+            names[BOD] = "BOD";
+            names[BODB] = "BODB";
+
+            names[BNN] = "BNN";
+            names[BNNB] = "BNNB";
+            names[BNZ] = "BNZ";
+            names[BNZB] = "BNZB";
+            names[BNP] = "BNP";
+            names[BNPB] = "BNPB";
+            names[BEV] = "BEV";
+            names[BEVB] = "BEVB";
+
+            names[PBN] = "PBN";
+            names[PBNB] = "PBNB";
+            names[PBZ] = "PBZ";
+            names[PBZB] = "PBZB";
+            names[PBP] = "PBP";
+            names[PBPB] = "PBPB";
+            names[PBOD] = "PBOD";
+            names[PBODB] = "PBODB";
+
+            names[PBNN] = "PBNN";
+            names[PBNNB] = "PBNNB";
+            names[PBNZ] = "PBNZ";
+            names[PBNZB] = "PBNZB";
+            names[PBNP] = "PBNP";
+            names[PBNPB] = "PBNPB";
+            names[PBEV] = "PBEV";
+            names[PBEVB] = "PBEVB";
+
+            names[CSN] = "CSN";
+            names[CSNI] = "CSNI";
+            names[CSZ] = "CSZ";
+            names[CSZI] = "CSZI";
+            names[CSP] = "CSP";
+            names[CSPI] = "CSPI";
+            names[CSOD] = "CSOD";
+            names[CSODI] = "CSODI";
+
+            names[CSNN] = "CSNN";
+            names[CSNNI] = "CSNNI";
+            names[CSNZ] = "CSNZ";
+            names[CSNZI] = "CSNZI";
+            names[CSNP] = "CSNP";
+            names[CSNPI] = "CSNPI";
+            names[CSEV] = "CSEV";
+            names[CSEVI] = "CSEVI";
+
+            names[ZSN] = "ZSN";
+            names[ZSNI] = "ZSNI";
+            names[ZSZ] = "ZSZ";
+            names[ZSZI] = "ZSZI";
+            names[ZSP] = "ZSP";
+            names[ZSPI] = "ZSPI";
+            names[ZSOD] = "ZSOD";
+            names[ZSODI] = "ZSODI";
+
+            names[ZSNN] = "ZSNN";
+            names[ZSNNI] = "ZSNNI";
+            names[ZSNZ] = "ZSNZ";
+            names[ZSNZI] = "ZSNZI";
+            names[ZSNP] = "ZSNP";
+            names[ZSNPI] = "ZSNPI";
+            names[ZSEV] = "ZSEV";
+            names[ZSEVI] = "ZSEVI";
+
+            names[LDB] = "LDB";
+            names[LDBI] = "LDBI";
+            names[LDBU] = "LDBU";
+            names[LDBUI] = "LDBUI";
+            names[LDW] = "LDW";
+            names[LDWI] = "LDWI";
+            names[LDWU] = "LDWU";
+            names[LDWUI] = "LDWUI";
+
+            names[LDT] = "LDT";
+            names[LDTI] = "LDTI";
+            names[LDTU] = "LDTU";
+            names[LDTUI] = "LDTUI";
+            names[LDO] = "LDO";
+            names[LDOI] = "LDOI";
+            names[LDOU] = "LDOU";
+            names[LDOUI] = "LDOUI";
+
+            names[LDSF] = "LDSF";
+            names[LDSFI] = "LDSFI";
+            names[LDHT] = "LDHT";
+            names[LDHTI] = "LDHTI";
+            names[CSWAP] = "CSWAP";
+            names[CSWAPI] = "CSWAPI";
+            names[LDUNC] = "LDUNC";
+            names[LDUNCI] = "LDUNCI";
+
+            names[LDVTS] = "LDVTS";
+            names[LDVTSI] = "LDVTSI";
+            names[PRELD] = "PRELD";
+            names[PRELDI] = "PRELDI";
+            names[PREGO] = "PREGO";
+            names[PREGOI] = "PREGOI";
+            names[GO] = "GO";
+            names[GOI] = "GOI";
+
+            names[STB] = "STB";
+            names[STBI] = "STBI";
+            names[STBU] = "STBU";
+            names[STBUI] = "STBUI";
+            names[STW] = "STW";
+            names[STWI] = "STWI";
+            names[STWU] = "STWU";
+            names[STWUI] = "STWUI";
+
+            names[STT] = "STT";
+            names[STTI] = "STTI";
+            names[STTU] = "STTU";
+            names[STTUI] = "STTUI";
+            names[STO] = "STO";
+            names[STOI] = "STOI";
+            names[STOU] = "STOU";
+            names[STOUI] = "STOUI";
+
+            names[STSF] = "STSF";
+            names[STSFI] = "STSFI";
+            names[STHT] = "STHT";
+            names[STHTI] = "STHTI";
+            names[STCO] = "STCO";
+            names[STCOI] = "STCOI";
+            names[STUNC] = "STUNC";
+            names[STUNCI] = "STUNCI";
+
+            names[SYNCD] = "SYNCD";
+            names[SYNCDI] = "SYNCDI";
+            names[PREST] = "PREST";
+            names[PRESTI] = "PRESTI";
+            names[SYNCID] = "SYNCID";
+            names[SYNCIDI] = "SYNCIDI";
+            names[CALL] = "CALL";
+            names[CALLI] = "CALLI";
+
+            names[OR] = "OR";
+            names[ORI] = "ORI";
+            names[ORN] = "ORN";
+            names[ORNI] = "ORNI";
+            names[NOR] = "NOR";
+            names[NORI] = "NORI";
+            names[XOR] = "XOR";
+            names[XORI] = "XORI";
+
+            names[AND] = "AND";
+            names[ANDI] = "ANDI";
+            names[ANDN] = "ANDN";
+            names[ANDNI] = "ANDNI";
+            names[NAND] = "NAND";
+            names[NANDI] = "NANDI";
+            names[NXOR] = "NXOR";
+            names[NXORI] = "NXORI";
+
+            names[BDIF] = "BDIF";
+            names[BDIFI] = "BDIFI";
+            names[WDIF] = "WDIF";
+            names[WDIFI] = "WDIFI";
+            names[TDIF] = "TDIF";
+            names[TDIFI] = "TDIFI";
+            names[ODIF] = "ODIF";
+            names[ODIFI] = "ODIFI";
+
+            names[MUX] = "MUX";
+            names[MUXI] = "MUXI";
+            names[SADD] = "SADD";
+            names[SADDI] = "SADDI";
+            names[MOR] = "MOR";
+            names[MORI] = "MORI";
+            names[MXOR] = "MXOR";
+            names[MXORI] = "MXORI";
+
+            names[SETH] = "SETH";
+            names[SETMH] = "SETMH";
+            names[SETML] = "SETML";
+            names[SETL] = "SETL";
+            names[INCH] = "INCH";
+            names[INCMH] = "INCMH";
+            names[INCML] = "INCML";
+            names[INCL] = "INCL";
+
+            names[ORH] = "ORH";
+            names[ORMH] = "ORMH";
+            names[ORML] = "ORML";
+            names[ORL] = "ORL";
+            names[ANDNH] = "ANDNH";
+            names[ANDNMH] = "ANDNMH";
+            names[ANDNML] = "ANDNML";
+            names[ANDNL] = "ANDNL";
+
+            names[JMP] = "JMP";
+            names[JMPB] = "JMPB";
+            names[PUSHJ] = "PUSHJ";
+            names[PUSHJB] = "PUSHJB";
+            names[GETA] = "GETA";
+            names[GETAB] = "GETAB";
+            names[PUT] = "PUT";
+            names[PUTI] = "PUTI";
+
+            names[RET] = "RET";
+            names[RESUME] = "RESUME";
+            names[SAVE] = "SAVE";
+            names[UNSAVE] = "UNSAVE";
+            names[SYNC] = "SYNC";
+            names[SWYM] = "SWYM";
+            names[GET] = "GET";
+            names[TRIP] = "TRIP";
+            int n = cast<int>(names.Length());
+            for (int i = 0; i < n; ++i)
+            {
+                int nameLength = cast<int>(names[i].Length());
+                if (nameLength > maxOpCodeNameLength)
+                {
+                    maxOpCodeNameLength = nameLength;
+                }
+            }
+        }
+        public nothrow const string& GetName(byte opCode) const
+        {
+            return names[opCode];
+        }
+        public nothrow int GetCode(const string& name) const
+        {
+            HashMap<string, byte>.ConstIterator i = codes.CFind(name);
+            if (i != codes.CEnd())
+            {
+                return i->second;
+            }
+            return -1;
+        }
+        public nothrow int MaxOpCodeNameLength() const
+        {
+            return maxOpCodeNameLength;
+        }
+        private static UniquePtr<OpCodeMap> instance;
+        private HashMap<string, byte> codes;
+        private string[256] names;
+        private int maxOpCodeNameLength;
+    }
+
+    public nothrow const string& GetOpCodeName(byte opCode)
+    {
+        return OpCodeMap.Instance().GetName(opCode);
+    }
+
+    public nothrow int GetOpCode(const string& opCodeName)
+    {
+        return OpCodeMap.Instance().GetCode(opCodeName);
+    }
+}

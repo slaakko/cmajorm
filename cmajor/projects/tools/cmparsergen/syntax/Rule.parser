@@ -1,0 +1,24 @@
+using ParsingContext = Code.ParsingContext;
+
+namespace Syntax
+{
+    grammar RuleGrammar
+    {
+        using ElementGrammar.Identifier;
+        using ElementGrammar.Signature;
+        using CompositeGrammar.Alternative;
+
+        Rule(ParsingContext* ctx, System.Text.Parsing.Scope* enclosingScope) : System.Text.Parsing.RuleParser*
+            ::= RuleHeader(ctx, enclosingScope){ value = RuleHeader; } "::=" RuleBody(ctx, value)
+            ;
+
+        RuleHeader(ParsingContext* ctx, System.Text.Parsing.Scope* enclosingScope) : System.Text.Parsing.RuleParser*
+            ::= Identifier:ruleName{ value = new System.Text.Parsing.RuleParser(ruleName, enclosingScope); value->SetSpan(span); }
+                Signature(ctx, value)
+            ;
+
+        RuleBody(ParsingContext* ctx, System.Text.Parsing.RuleParser* rule)
+            ::= (Alternative(ctx):definition! ';'!){ rule->SetDefinition(definition); }
+            ;
+    }
+}

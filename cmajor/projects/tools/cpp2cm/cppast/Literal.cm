@@ -1,0 +1,99 @@
+using System;
+using Span = System.Text.Parsing.Span;
+
+namespace cppast
+{
+    public abstract class LiteralNode : Node
+    {
+        public nothrow LiteralNode(const Span& span_) : base(span_)
+        {
+        }
+        public ustring strValue;
+    }
+    
+    public class FloatingLiteralNode : LiteralNode
+    {
+        public nothrow FloatingLiteralNode(const Span& span_) : base(span_)
+        {
+        }
+        public nothrow FloatingLiteralNode(const Span& span_, double value_) : base(span_), val(value_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public double val;
+    }
+    
+    public class IntegerLiteralNode : LiteralNode
+    {
+        public nothrow IntegerLiteralNode(const Span& span_) : base(span_)
+        {
+        }
+        public nothrow IntegerLiteralNode(const Span& span_, ulong value_) : base(span_), val(value_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public ulong val;
+    }
+    
+    public class CharacterLiteralNode : LiteralNode
+    {
+        public nothrow CharacterLiteralNode(const Span& span_) : base(span_)
+        {
+        }
+        public nothrow CharacterLiteralNode(const Span& span_, uchar value_) : base(span_), val(value_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public uchar val;
+    }
+    
+    public class StringLiteralNode : LiteralNode
+    {
+        public nothrow StringLiteralNode(const Span& span_) : base(span_)
+        {
+        }
+        public nothrow StringLiteralNode(const Span& span_, const ustring& value_) : base(span_), val(value_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public ustring val;
+    }
+    
+    public class BooleanLiteralNode : LiteralNode
+    {
+        public nothrow BooleanLiteralNode(const Span& span_) : base(span_)
+        {
+        }
+        public nothrow BooleanLiteralNode(const Span& span_, bool value_) : base(span_), val(value_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public bool val;
+    }
+    
+    public class PointerLiteralNode : LiteralNode
+    {
+        public nothrow PointerLiteralNode(const Span& span_) : base(span_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+    }
+}

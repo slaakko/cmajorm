@@ -1,0 +1,303 @@
+using System;
+using System.IO;
+using System.Collections;
+using Span = System.Text.Parsing.Span;
+
+namespace cmsx.assembly
+{
+    public const int IS = 256;
+    public const int EXTERN = 257;
+    public const int LINKONCE = 258;
+    public const int FUNC = 259;
+    public const int ENDF = 260;
+    public const int STRUCT = 261;
+    public const int ENDS = 262;
+    public const int BYTE = 263;
+    public const int WYDE = 264;
+    public const int TETRA = 265;
+    public const int OCTA = 266;
+    public const int CODE = 267;
+    public const int DATA = 268;
+    public const int LDA = 269;
+    public const int SET = 270;
+    public const int numInsts = SET + 1;
+
+    public class PseudoOpMap
+    {
+        static PseudoOpMap() : instance(new PseudoOpMap())
+        {
+        }
+        public static nothrow PseudoOpMap& Instance()
+        {
+            return *instance;
+        }
+        private PseudoOpMap()
+        {
+            codes["IS"] = IS;
+            codes["EXTERN"] = EXTERN;
+            codes["LINKONCE"] = LINKONCE;
+            codes["FUNC"] = FUNC;
+            codes["ENDF"] = ENDF;
+            codes["STRUCT"] = STRUCT;
+            codes["ENDS"] = ENDS;
+            codes["BYTE"] = BYTE;
+            codes["WYDE"] = WYDE;
+            codes["TETRA"] = TETRA;
+            codes["OCTA"] = OCTA;
+            codes[".CODE"] = CODE;
+            codes[".DATA"] = DATA;
+            codes["LDA"] = LDA;
+            codes["SET"] = SET;
+        }
+        public nothrow int GetCode(const string& name) const
+        {
+            HashMap<string, int>.ConstIterator it = codes.CFind(name);
+            if (it != codes.CEnd())
+            {
+                return it->second;
+            }
+            return -1;
+        }
+        private static UniquePtr<PseudoOpMap> instance;
+        private HashMap<string, int> codes;
+    }
+
+    public abstract class Node
+    {
+        public nothrow Node(const Span& span_) : span(span_)
+        {
+        }
+        public default virtual ~Node();
+        public abstract void Accept(Visitor& visitor);
+        public Span span;
+    }
+
+    public abstract class Constant : Node
+    {
+        public nothrow Constant(const Span& span_) : base(span_)
+        {
+        }
+    }
+
+    public abstract class IntegralConstant : Constant
+    {
+        public nothrow IntegralConstant(const Span& span_, ulong value_) : base(span_), value(value_)
+        {
+        }
+        public ulong value;
+    }
+
+    public class DecimalConstant : IntegralConstant
+    {
+        public nothrow DecimalConstant(const Span& span_, ulong value_) : base(span_, value_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+    }
+
+    public class HexConstant : IntegralConstant
+    {
+        public nothrow HexConstant(const Span& span_, ulong value_) : base(span_, value_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+    }
+
+    public class CharacterConstant : Constant
+    {
+        public nothrow CharacterConstant(const Span& span_, uchar value_) : base(span_), value(value_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public uchar value;
+    }
+
+    public class StringConstant : Constant
+    {
+        public nothrow StringConstant(const Span& span_, const ustring& value_) : base(span_), value(value_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public ustring value;
+    }
+
+    public class SymbolNode : Node
+    {
+        public nothrow SymbolNode(const Span& span_, const string& name_, bool local_) : base(span_), name(name_), local(local_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public string name;
+        public bool local;
+    }
+
+    public enum Direction
+    {
+        forward, backward
+    }
+
+    public class At : Node
+    {
+        public nothrow At(const Span& span_) : base(span_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+    }
+
+    public enum Operator : byte
+    {
+        unaryPlus, unaryMinus, complement, register, serial,
+        multiply, divide, fractionalDivide, modulus, shiftLeft, shiftRight, bitwiseAnd,
+        add, subtract, bitwiseOr, bitwiseXor
+    }
+
+    public class UnaryExpression : Node
+    {
+        public nothrow UnaryExpression(const Span& span_, Operator op_, Node* subject_) : base(span_), op(op_), subject(subject_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public Operator op;
+        public UniquePtr<Node> subject;
+    }
+
+    public class BinaryExpression : Node
+    {
+        public nothrow BinaryExpression(const Span& span_, Node* left_, Operator op_, Node* right_) : base(span_), left(left_), op(op_), right(right_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public Operator op;
+        public UniquePtr<Node> left;
+        public UniquePtr<Node> right;
+    }
+
+    public class ParenthesizedExpression : Node
+    {
+        public nothrow ParenthesizedExpression(const Span& span_, Node* subject_) : base(span_), subject(subject_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public UniquePtr<Node> subject;
+    }
+
+    public class OpCode : Node
+    {
+        public nothrow OpCode(const Span& span_, const string& name_) : base(span_), name(name_), value(-1)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public string name;
+        public int value;
+    }
+
+    public class OperandList : Node
+    {
+        public nothrow OperandList(const Span& span_, Node* firstOperand_) : base(span_)
+        {
+            operands.Add(UniquePtr<Node>(firstOperand_));
+        }
+        suppress OperandList(const OperandList&);
+        suppress void operator=(const OperandList&);
+        suppress OperandList(OperandList&&);
+        suppress void operator=(OperandList&&);
+        public void AddOperand(Node* operand)
+        {
+            operands.Add(UniquePtr<Node>(operand));
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public List<UniquePtr<Node>> operands;
+    }
+
+    public class Instruction : Node
+    {
+        public nothrow Instruction(const Span& span_, Node* label_, OpCode* opCode_, OperandList* operandList_) : base(span_), label(label_), opCode(opCode_), operandList(operandList_)
+        {
+        }
+        suppress Instruction(const Instruction&);
+        suppress void operator=(const Instruction&);
+        suppress Instruction(Instruction&&);
+        suppress void operator=(Instruction&&);
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public UniquePtr<Node> label;
+        public UniquePtr<OpCode> opCode;
+        public UniquePtr<OperandList> operandList;
+    }
+
+    public class AssemblyFileParser
+    {
+        static AssemblyFileParser() : instance(new AssemblyFileParser())
+        {
+        }
+        public static nothrow AssemblyFileParser& Instance()
+        {
+            return *instance;
+        }
+        private AssemblyFileParser() : grammar(new AssemblyGrammar())
+        {
+        }
+        public void Parse(long index, const ustring& assemblyFileContent, const string& assemblyFileName, List<UniquePtr<Instruction>>* instructions)
+        {
+            grammar->Parse(assemblyFileContent.Chars(), assemblyFileContent.Chars() + assemblyFileContent.Length(), cast<int>(index), assemblyFileName, instructions);
+        }
+        private static UniquePtr<AssemblyFileParser> instance;
+        private AssemblyGrammar* grammar;
+    }
+
+    public void ProcessAssemblyFile(long index, const string& assemblyFilePath, bool verbose)
+    {
+        if (verbose)
+        {
+            Console.Out() << "> " << assemblyFilePath << endl();
+        }
+        string utf8Content = File.ReadAllText(assemblyFilePath);
+        ustring assemblyFileContent = ToUtf32(utf8Content);
+        List<UniquePtr<Instruction>> instructions;
+        AssemblyFileParser.Instance().Parse(index, assemblyFileContent, assemblyFilePath, &instructions);
+        string objectFilePath = Path.ChangeExtension(assemblyFilePath, ".o");
+        Assembler assembler(objectFilePath);
+        assembler.Assemble(instructions);
+        cmsx.object.LinkInternal(assembler.objectFile);
+        if (verbose)
+        {
+            Console.Out() << "==> " << objectFilePath << endl();
+        }
+        assembler.WriteObjectFile();
+    }
+}

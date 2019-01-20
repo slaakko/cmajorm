@@ -1,0 +1,59 @@
+// =================================
+// Copyright (c) 2019 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+[hpp]#include <cmajor/ast/SourceToken.hpp>
+[cpp]#include <cmajor/parser/Keyword.hpp>
+[cpp]#include <cmajor/parser/Identifier.hpp>
+[cpp]#include <cmajor/parser/Literal.hpp>
+
+namespace cmajor.parser
+{
+    [hpp]using namespace cmajor::ast;
+
+    grammar SourceToken
+    {
+        using Keyword.Keyword;
+        using Keyword.PPKeyword;
+        using Identifier.QualifiedId;
+        using Literal.FloatingLiteral;
+        using Literal.IntegerLiteral;
+        using Literal.CharLiteral;
+        using Literal.StringLiteral;
+        using stdlib.block_comment;
+        using stdlib.newline;
+
+        SourceTokens(SourceTokenFormatter* formatter)
+            ::= empty{ formatter->BeginFormat(); }
+                SourceToken(formatter)*
+                empty{ formatter->EndFormat(); }
+            ;
+
+        SourceToken(SourceTokenFormatter* formatter)
+            ::= PPKeyword{ formatter->Keyword(std::u32string(matchBegin, matchEnd)); }
+            |   Keyword{ formatter->Keyword(std::u32string(matchBegin, matchEnd)); }
+            |   QualifiedId{ formatter->Identifier(std::u32string(matchBegin, matchEnd)); }
+            |   (FloatingLiteral | IntegerLiteral){ formatter->Number(std::u32string(matchBegin, matchEnd)); }
+            |   CharLiteral{ formatter->Char(std::u32string(matchBegin, matchEnd)); }
+            |   StringLiteral{ formatter->String(std::u32string(matchBegin, matchEnd)); }
+            |   Spaces{ formatter->Spaces(Spaces); }
+            |   LineComment{ formatter->Comment(std::u32string(matchBegin, matchEnd)); }
+            |   block_comment{ formatter->Comment(std::u32string(matchBegin, matchEnd)); }
+            |   newline{ formatter->NewLine(std::u32string(matchBegin, matchEnd)); }
+            |   Other{ formatter->Other(Other); }
+            ;
+
+        Spaces : std::u32string
+            ::= ([\t ]+){ value = std::u32string(matchBegin, matchEnd); }
+            ;
+
+        LineComment 
+            ::= "//" [^\r\n]* newline?
+            ;
+
+        Other : std::u32string
+            ::= [^\r\n]{ value = std::u32string(matchBegin, matchEnd); }
+            ;
+    }
+}

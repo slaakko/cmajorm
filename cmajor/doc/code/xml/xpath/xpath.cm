@@ -1,0 +1,20 @@
+using System;
+using System.Dom;
+using System.Text;
+using System.XPath;
+
+void main()
+{
+    try
+    {
+        UniquePtr<DomDocument> doc = ParseXmlFileToDomDocument("test.xml");
+        UniquePtr<XPathObject> result = Evaluate(u"/test/alpha[@a=\"1\"]/beta/gamma/text()", doc.Get());
+        UniquePtr<DomNode> resultAsDom = result->ToDom();
+        CodeFormatter formatter(Console.Out());
+        resultAsDom->Write(formatter);
+    }
+    catch (const Exception& ex)
+    {
+        Console.Error() << ex.ToString() << endl();
+    }
+}

@@ -1,0 +1,450 @@
+<html>
+ <head>
+  <meta charset="utf-8"/>
+  <link href="../../../style/style.css" rel="stylesheet" type="text/css"/>
+ </head>
+ <body>
+  <span class="code" id="1" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;1</span>&nbsp;<span class="comment">//&nbsp;=================================</span></span>
+  <br/>
+  <span class="code" id="2" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;2</span>&nbsp;<span class="comment">//&nbsp;Copyright&nbsp;(c)&nbsp;2018&nbsp;Seppo&nbsp;Laakko</span></span>
+  <br/>
+  <span class="code" id="3" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;3</span>&nbsp;<span class="comment">//&nbsp;Distributed&nbsp;under&nbsp;the&nbsp;MIT&nbsp;license</span></span>
+  <br/>
+  <span class="code" id="4" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;4</span>&nbsp;<span class="comment">//&nbsp;=================================</span></span>
+  <br/>
+  <span class="code" id="5" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;5</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="6" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;6</span>&nbsp;<span class="pp">#include&nbsp;&lt;cmajor/ast/BasicType.hpp></span></span>
+  <br/>
+  <span class="code" id="7" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;7</span>&nbsp;<span class="pp">#include&nbsp;&lt;cmajor/ast/Visitor.hpp></span></span>
+  <br/>
+  <span class="code" id="8" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;8</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="9" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;9</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">cmajor</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">ast</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="10" xml:space="preserve"><span class="lineNumber">&nbsp;10</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="11" xml:space="preserve"><span class="lineNumber">&nbsp;11</span>&nbsp;<a href="../../class_BoolNode_7F653F3E54BE7E76E7D3F6849A00BC9E61F4C441.html">BoolNode</a><span class="other">::</span><a href="../../class_BoolNode_7F653F3E54BE7E76E7D3F6849A00BC9E61F4C441.html#constructor_BoolNode_386A984CA6829FE587AE1B03BC7993245A78B622">BoolNode</a><span class="other">(</span><span class="kw">const&nbsp;</span><a href="../../class_Span_9CED8370AAA8B01E09FBC8A63AD262084B91FD78.html">Span</a><span class="other">&amp;</span>&nbsp;<span class="identifier">span_</span><span class="other">)</span>&nbsp;<span class="other">:</span>&nbsp;<a href="../../class_Node_66FC1D6AD8F487E453CE6E17163479C7C2DAC063.html">Node</a><span class="other">(</span><a href="../../enum_NodeType_0D66E0D14D03B3151A778BF9E86A029828B6D5F6.html">NodeType</a><span class="other">::</span><a href="../../enum_NodeType_0D66E0D14D03B3151A778BF9E86A029828B6D5F6.html#enumerator_boolNode_B5EED995E8E24CC723AA9D2D7A204CF62350B757">boolNode</a><span class="other">,&nbsp;</span><span class="identifier">span_</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="12" xml:space="preserve"><span class="lineNumber">&nbsp;12</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="13" xml:space="preserve"><span class="lineNumber">&nbsp;13</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="14" xml:space="preserve"><span class="lineNumber">&nbsp;14</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="15" xml:space="preserve"><span class="lineNumber">&nbsp;15</span>&nbsp;<a href="../../class_Node_66FC1D6AD8F487E453CE6E17163479C7C2DAC063.html">Node</a><span class="other">*</span>&nbsp;<a href="../../class_BoolNode_7F653F3E54BE7E76E7D3F6849A00BC9E61F4C441.html">BoolNode</a><span class="other">::</span><a href="../../class_BoolNode_7F653F3E54BE7E76E7D3F6849A00BC9E61F4C441.html#function_Clone_5ED15DCA40A880171D3116FD4E553934715963AE">Clone</a><span class="other">(</span><a href="../../class_CloneContext_5E55B7AF2C2173E2EA60A2B86069816A9F0FB764.html">CloneContext</a><span class="other">&amp;</span>&nbsp;<span class="identifier">cloneContext</span><span class="other">)</span>&nbsp;<span class="kw">const</span></span>
+  <br/>
+  <span class="code" id="16" xml:space="preserve"><span class="lineNumber">&nbsp;16</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="17" xml:space="preserve"><span class="lineNumber">&nbsp;17</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">new&nbsp;</span><a href="../../class_BoolNode_7F653F3E54BE7E76E7D3F6849A00BC9E61F4C441.html">BoolNode</a><span class="other">(</span><span class="identifier">GetSpan</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="18" xml:space="preserve"><span class="lineNumber">&nbsp;18</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="19" xml:space="preserve"><span class="lineNumber">&nbsp;19</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="20" xml:space="preserve"><span class="lineNumber">&nbsp;20</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../../class_BoolNode_7F653F3E54BE7E76E7D3F6849A00BC9E61F4C441.html">BoolNode</a><span class="other">::</span><a href="../../class_BoolNode_7F653F3E54BE7E76E7D3F6849A00BC9E61F4C441.html#function_Accept_9348E96F7B5655C12ACA4170A4974F81754BA097">Accept</a><span class="other">(</span><a href="../../class_Visitor_72892152D0864AA2907A1FD60E7A49EB4E071AD6.html">Visitor</a><span class="other">&amp;</span>&nbsp;<span class="identifier">visitor</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="21" xml:space="preserve"><span class="lineNumber">&nbsp;21</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="22" xml:space="preserve"><span class="lineNumber">&nbsp;22</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">visitor</span><span class="other">.</span><a href="../../class_Visitor_72892152D0864AA2907A1FD60E7A49EB4E071AD6.html#function_Visit_BB8DE14AC70C95A373862554B6862C8D4C3133C2">Visit</a><span class="other">(</span><span class="other">*</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="23" xml:space="preserve"><span class="lineNumber">&nbsp;23</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="24" xml:space="preserve"><span class="lineNumber">&nbsp;24</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="25" xml:space="preserve"><span class="lineNumber">&nbsp;25</span>&nbsp;<a href="../../class_SByteNode_510878231A1D99BDE97C6AB3215045C8A8A02DB8.html">SByteNode</a><span class="other">::</span><a href="../../class_SByteNode_510878231A1D99BDE97C6AB3215045C8A8A02DB8.html#constructor_SByteNode_8E6B64D7D2C4DB825BDE93600B5F0371BBAC76C8">SByteNode</a><span class="other">(</span><span class="kw">const&nbsp;</span><a href="../../class_Span_9CED8370AAA8B01E09FBC8A63AD262084B91FD78.html">Span</a><span class="other">&amp;</span>&nbsp;<span class="identifier">span_</span><span class="other">)</span>&nbsp;<span class="other">:</span>&nbsp;<a href="../../class_Node_66FC1D6AD8F487E453CE6E17163479C7C2DAC063.html">Node</a><span class="other">(</span><a href="../../enum_NodeType_0D66E0D14D03B3151A778BF9E86A029828B6D5F6.html">NodeType</a><span class="other">::</span><a href="../../enum_NodeType_0D66E0D14D03B3151A778BF9E86A029828B6D5F6.html#enumerator_sbyteNode_9F2B9A74B80B5637DFF1A55030D11164A9D02ADA">sbyteNode</a><span class="other">,&nbsp;</span><span class="identifier">span_</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="26" xml:space="preserve"><span class="lineNumber">&nbsp;26</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="27" xml:space="preserve"><span class="lineNumber">&nbsp;27</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="28" xml:space="preserve"><span class="lineNumber">&nbsp;28</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="29" xml:space="preserve"><span class="lineNumber">&nbsp;29</span>&nbsp;<a href="../../class_Node_66FC1D6AD8F487E453CE6E17163479C7C2DAC063.html">Node</a><span class="other">*</span>&nbsp;<a href="../../class_SByteNode_510878231A1D99BDE97C6AB3215045C8A8A02DB8.html">SByteNode</a><span class="other">::</span><a href="../../class_SByteNode_510878231A1D99BDE97C6AB3215045C8A8A02DB8.html#function_Clone_C453B78491231FB97D55D1EDE593F2D812C288B7">Clone</a><span class="other">(</span><a href="../../class_CloneContext_5E55B7AF2C2173E2EA60A2B86069816A9F0FB764.html">CloneContext</a><span class="other">&amp;</span>&nbsp;<span class="identifier">cloneContext</span><span class="other">)</span>&nbsp;<span class="kw">const</span></span>
+  <br/>
+  <span class="code" id="30" xml:space="preserve"><span class="lineNumber">&nbsp;30</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="31" xml:space="preserve"><span class="lineNumber">&nbsp;31</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">new&nbsp;</span><a href="../../class_SByteNode_510878231A1D99BDE97C6AB3215045C8A8A02DB8.html">SByteNode</a><span class="other">(</span><span class="identifier">GetSpan</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="32" xml:space="preserve"><span class="lineNumber">&nbsp;32</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="33" xml:space="preserve"><span class="lineNumber">&nbsp;33</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="34" xml:space="preserve"><span class="lineNumber">&nbsp;34</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../../class_SByteNode_510878231A1D99BDE97C6AB3215045C8A8A02DB8.html">SByteNode</a><span class="other">::</span><a href="../../class_SByteNode_510878231A1D99BDE97C6AB3215045C8A8A02DB8.html#function_Accept_7D274DD9D21BBC86DD07C45463738CC24DE79073">Accept</a><span class="other">(</span><a href="../../class_Visitor_72892152D0864AA2907A1FD60E7A49EB4E071AD6.html">Visitor</a><span class="other">&amp;</span>&nbsp;<span class="identifier">visitor</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="35" xml:space="preserve"><span class="lineNumber">&nbsp;35</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="36" xml:space="preserve"><span class="lineNumber">&nbsp;36</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">visitor</span><span class="other">.</span><a href="../../class_Visitor_72892152D0864AA2907A1FD60E7A49EB4E071AD6.html#function_Visit_6F6B11D6720F71A2FF2A69879473D73CF43A8C78">Visit</a><span class="other">(</span><span class="other">*</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="37" xml:space="preserve"><span class="lineNumber">&nbsp;37</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="38" xml:space="preserve"><span class="lineNumber">&nbsp;38</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="39" xml:space="preserve"><span class="lineNumber">&nbsp;39</span>&nbsp;<a href="../../class_ByteNode_CC008AEF81F6E2506B1BFDBF6264C85D847AD97C.html">ByteNode</a><span class="other">::</span><a href="../../class_ByteNode_CC008AEF81F6E2506B1BFDBF6264C85D847AD97C.html#constructor_ByteNode_D633626F3A9E1F9DAC2F4FD3A07E4E0EBB91DAE6">ByteNode</a><span class="other">(</span><span class="kw">const&nbsp;</span><a href="../../class_Span_9CED8370AAA8B01E09FBC8A63AD262084B91FD78.html">Span</a><span class="other">&amp;</span>&nbsp;<span class="identifier">span_</span><span class="other">)</span>&nbsp;<span class="other">:</span>&nbsp;<a href="../../class_Node_66FC1D6AD8F487E453CE6E17163479C7C2DAC063.html">Node</a><span class="other">(</span><a href="../../enum_NodeType_0D66E0D14D03B3151A778BF9E86A029828B6D5F6.html">NodeType</a><span class="other">::</span><a href="../../enum_NodeType_0D66E0D14D03B3151A778BF9E86A029828B6D5F6.html#enumerator_byteNode_F683DF0FF88882CD0AE602507D4DC351775C8CA2">byteNode</a><span class="other">,&nbsp;</span><span class="identifier">span_</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="40" xml:space="preserve"><span class="lineNumber">&nbsp;40</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="41" xml:space="preserve"><span class="lineNumber">&nbsp;41</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="42" xml:space="preserve"><span class="lineNumber">&nbsp;42</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="43" xml:space="preserve"><span class="lineNumber">&nbsp;43</span>&nbsp;<a href="../../class_Node_66FC1D6AD8F487E453CE6E17163479C7C2DAC063.html">Node</a><span class="other">*</span>&nbsp;<a href="../../class_ByteNode_CC008AEF81F6E2506B1BFDBF6264C85D847AD97C.html">ByteNode</a><span class="other">::</span><a href="../../class_ByteNode_CC008AEF81F6E2506B1BFDBF6264C85D847AD97C.html#function_Clone_458E77A86982CDA690ADBCBBB40BC8F2FC5589EE">Clone</a><span class="other">(</span><a href="../../class_CloneContext_5E55B7AF2C2173E2EA60A2B86069816A9F0FB764.html">CloneContext</a><span class="other">&amp;</span>&nbsp;<span class="identifier">cloneContext</span><span class="other">)</span>&nbsp;<span class="kw">const</span></span>
+  <br/>
+  <span class="code" id="44" xml:space="preserve"><span class="lineNumber">&nbsp;44</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="45" xml:space="preserve"><span class="lineNumber">&nbsp;45</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">new&nbsp;</span><a href="../../class_ByteNode_CC008AEF81F6E2506B1BFDBF6264C85D847AD97C.html">ByteNode</a><span class="other">(</span><span class="identifier">GetSpan</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="46" xml:space="preserve"><span class="lineNumber">&nbsp;46</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="47" xml:space="preserve"><span class="lineNumber">&nbsp;47</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="48" xml:space="preserve"><span class="lineNumber">&nbsp;48</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../../class_ByteNode_CC008AEF81F6E2506B1BFDBF6264C85D847AD97C.html">ByteNode</a><span class="other">::</span><a href="../../class_ByteNode_CC008AEF81F6E2506B1BFDBF6264C85D847AD97C.html#function_Accept_BC50813CC7285B8ECA48D189AA367C506C91BEE3">Accept</a><span class="other">(</span><a href="../../class_Visitor_72892152D0864AA2907A1FD60E7A49EB4E071AD6.html">Visitor</a><span class="other">&amp;</span>&nbsp;<span class="identifier">visitor</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="49" xml:space="preserve"><span class="lineNumber">&nbsp;49</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="50" xml:space="preserve"><span class="lineNumber">&nbsp;50</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">visitor</span><span class="other">.</span><a href="../../class_Visitor_72892152D0864AA2907A1FD60E7A49EB4E071AD6.html#function_Visit_DB12623520C2458ABD27190115CC17F1C4DA9710">Visit</a><span class="other">(</span><span class="other">*</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="51" xml:space="preserve"><span class="lineNumber">&nbsp;51</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="52" xml:space="preserve"><span class="lineNumber">&nbsp;52</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="53" xml:space="preserve"><span class="lineNumber">&nbsp;53</span>&nbsp;<a href="../../class_ShortNode_5E0BE2B31873FABEDF13800D08568332D6669883.html">ShortNode</a><span class="other">::</span><a href="../../class_ShortNode_5E0BE2B31873FABEDF13800D08568332D6669883.html#constructor_ShortNode_03548FC0B4EDFD733B9B9B68A424F3E7465657E3">ShortNode</a><span class="other">(</span><span class="kw">const&nbsp;</span><a href="../../class_Span_9CED8370AAA8B01E09FBC8A63AD262084B91FD78.html">Span</a><span class="other">&amp;</span>&nbsp;<span class="identifier">span_</span><span class="other">)</span>&nbsp;<span class="other">:</span>&nbsp;<a href="../../class_Node_66FC1D6AD8F487E453CE6E17163479C7C2DAC063.html">Node</a><span class="other">(</span><a href="../../enum_NodeType_0D66E0D14D03B3151A778BF9E86A029828B6D5F6.html">NodeType</a><span class="other">::</span><a href="../../enum_NodeType_0D66E0D14D03B3151A778BF9E86A029828B6D5F6.html#enumerator_shortNode_61137F634EAFFF9E0E1FCA006890CF9876F433C3">shortNode</a><span class="other">,&nbsp;</span><span class="identifier">span_</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="54" xml:space="preserve"><span class="lineNumber">&nbsp;54</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="55" xml:space="preserve"><span class="lineNumber">&nbsp;55</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="56" xml:space="preserve"><span class="lineNumber">&nbsp;56</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="57" xml:space="preserve"><span class="lineNumber">&nbsp;57</span>&nbsp;<a href="../../class_Node_66FC1D6AD8F487E453CE6E17163479C7C2DAC063.html">Node</a><span class="other">*</span>&nbsp;<a href="../../class_ShortNode_5E0BE2B31873FABEDF13800D08568332D6669883.html">ShortNode</a><span class="other">::</span><a href="../../class_ShortNode_5E0BE2B31873FABEDF13800D08568332D6669883.html#function_Clone_98585FCAA99EF7D54D8E6A1B33B7932F1118A80D">Clone</a><span class="other">(</span><a href="../../class_CloneContext_5E55B7AF2C2173E2EA60A2B86069816A9F0FB764.html">CloneContext</a><span class="other">&amp;</span>&nbsp;<span class="identifier">cloneContext</span><span class="other">)</span>&nbsp;<span class="kw">const</span></span>
+  <br/>
+  <span class="code" id="58" xml:space="preserve"><span class="lineNumber">&nbsp;58</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="59" xml:space="preserve"><span class="lineNumber">&nbsp;59</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">new&nbsp;</span><a href="../../class_ShortNode_5E0BE2B31873FABEDF13800D08568332D6669883.html">ShortNode</a><span class="other">(</span><span class="identifier">GetSpan</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="60" xml:space="preserve"><span class="lineNumber">&nbsp;60</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="61" xml:space="preserve"><span class="lineNumber">&nbsp;61</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="62" xml:space="preserve"><span class="lineNumber">&nbsp;62</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../../class_ShortNode_5E0BE2B31873FABEDF13800D08568332D6669883.html">ShortNode</a><span class="other">::</span><a href="../../class_ShortNode_5E0BE2B31873FABEDF13800D08568332D6669883.html#function_Accept_D4AB2361E6E50F5368845AFE87F76A4BC0AB3D57">Accept</a><span class="other">(</span><a href="../../class_Visitor_72892152D0864AA2907A1FD60E7A49EB4E071AD6.html">Visitor</a><span class="other">&amp;</span>&nbsp;<span class="identifier">visitor</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="63" xml:space="preserve"><span class="lineNumber">&nbsp;63</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="64" xml:space="preserve"><span class="lineNumber">&nbsp;64</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">visitor</span><span class="other">.</span><a href="../../class_Visitor_72892152D0864AA2907A1FD60E7A49EB4E071AD6.html#function_Visit_5B0D8844C1E6F8B693D2D3C182B4FF1071C7FED1">Visit</a><span class="other">(</span><span class="other">*</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="65" xml:space="preserve"><span class="lineNumber">&nbsp;65</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="66" xml:space="preserve"><span class="lineNumber">&nbsp;66</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="67" xml:space="preserve"><span class="lineNumber">&nbsp;67</span>&nbsp;<a href="../../class_UShortNode_FC23A6B0F63A8B6743984B39906CAF83F2A612AF.html">UShortNode</a><span class="other">::</span><a href="../../class_UShortNode_FC23A6B0F63A8B6743984B39906CAF83F2A612AF.html#constructor_UShortNode_C18B6C4AEE3801EE32B845D357321A223416B6C6">UShortNode</a><span class="other">(</span><span class="kw">const&nbsp;</span><a href="../../class_Span_9CED8370AAA8B01E09FBC8A63AD262084B91FD78.html">Span</a><span class="other">&amp;</span>&nbsp;<span class="identifier">span_</span><span class="other">)</span>&nbsp;<span class="other">:</span>&nbsp;<a href="../../class_Node_66FC1D6AD8F487E453CE6E17163479C7C2DAC063.html">Node</a><span class="other">(</span><a href="../../enum_NodeType_0D66E0D14D03B3151A778BF9E86A029828B6D5F6.html">NodeType</a><span class="other">::</span><a href="../../enum_NodeType_0D66E0D14D03B3151A778BF9E86A029828B6D5F6.html#enumerator_ushortNode_C6B931CBEA589198F83754B3E3075D346EADA80A">ushortNode</a><span class="other">,&nbsp;</span><span class="identifier">span_</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="68" xml:space="preserve"><span class="lineNumber">&nbsp;68</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="69" xml:space="preserve"><span class="lineNumber">&nbsp;69</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="70" xml:space="preserve"><span class="lineNumber">&nbsp;70</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="71" xml:space="preserve"><span class="lineNumber">&nbsp;71</span>&nbsp;<a href="../../class_Node_66FC1D6AD8F487E453CE6E17163479C7C2DAC063.html">Node</a><span class="other">*</span>&nbsp;<a href="../../class_UShortNode_FC23A6B0F63A8B6743984B39906CAF83F2A612AF.html">UShortNode</a><span class="other">::</span><a href="../../class_UShortNode_FC23A6B0F63A8B6743984B39906CAF83F2A612AF.html#function_Clone_9D68FE96411E71EB3EF70FE8E5EC53B63E943E8A">Clone</a><span class="other">(</span><a href="../../class_CloneContext_5E55B7AF2C2173E2EA60A2B86069816A9F0FB764.html">CloneContext</a><span class="other">&amp;</span>&nbsp;<span class="identifier">cloneContext</span><span class="other">)</span>&nbsp;<span class="kw">const</span></span>
+  <br/>
+  <span class="code" id="72" xml:space="preserve"><span class="lineNumber">&nbsp;72</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="73" xml:space="preserve"><span class="lineNumber">&nbsp;73</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">new&nbsp;</span><a href="../../class_UShortNode_FC23A6B0F63A8B6743984B39906CAF83F2A612AF.html">UShortNode</a><span class="other">(</span><span class="identifier">GetSpan</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="74" xml:space="preserve"><span class="lineNumber">&nbsp;74</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="75" xml:space="preserve"><span class="lineNumber">&nbsp;75</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="76" xml:space="preserve"><span class="lineNumber">&nbsp;76</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../../class_UShortNode_FC23A6B0F63A8B6743984B39906CAF83F2A612AF.html">UShortNode</a><span class="other">::</span><a href="../../class_UShortNode_FC23A6B0F63A8B6743984B39906CAF83F2A612AF.html#function_Accept_FADDC90982983AEFD0C9FD793FBDFF8C80630AD6">Accept</a><span class="other">(</span><a href="../../class_Visitor_72892152D0864AA2907A1FD60E7A49EB4E071AD6.html">Visitor</a><span class="other">&amp;</span>&nbsp;<span class="identifier">visitor</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="77" xml:space="preserve"><span class="lineNumber">&nbsp;77</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="78" xml:space="preserve"><span class="lineNumber">&nbsp;78</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">visitor</span><span class="other">.</span><a href="../../class_Visitor_72892152D0864AA2907A1FD60E7A49EB4E071AD6.html#function_Visit_7E91E748799F1FDC2FE8750C810F453CEC2A66A5">Visit</a><span class="other">(</span><span class="other">*</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="79" xml:space="preserve"><span class="lineNumber">&nbsp;79</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="80" xml:space="preserve"><span class="lineNumber">&nbsp;80</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="81" xml:space="preserve"><span class="lineNumber">&nbsp;81</span>&nbsp;<a href="../../class_IntNode_BF54BA8BBF2DCD19C6D55113194C0367415A5319.html">IntNode</a><span class="other">::</span><a href="../../class_IntNode_BF54BA8BBF2DCD19C6D55113194C0367415A5319.html#constructor_IntNode_AC8D619E06875BA1BBA764A50CA576533E4F34F8">IntNode</a><span class="other">(</span><span class="kw">const&nbsp;</span><a href="../../class_Span_9CED8370AAA8B01E09FBC8A63AD262084B91FD78.html">Span</a><span class="other">&amp;</span>&nbsp;<span class="identifier">span_</span><span class="other">)</span>&nbsp;<span class="other">:</span>&nbsp;<a href="../../class_Node_66FC1D6AD8F487E453CE6E17163479C7C2DAC063.html">Node</a><span class="other">(</span><a href="../../enum_NodeType_0D66E0D14D03B3151A778BF9E86A029828B6D5F6.html">NodeType</a><span class="other">::</span><a href="../../enum_NodeType_0D66E0D14D03B3151A778BF9E86A029828B6D5F6.html#enumerator_intNode_81376F413D39DF8723D91B1D56106CC1C009FCD6">intNode</a><span class="other">,&nbsp;</span><span class="identifier">span_</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="82" xml:space="preserve"><span class="lineNumber">&nbsp;82</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="83" xml:space="preserve"><span class="lineNumber">&nbsp;83</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="84" xml:space="preserve"><span class="lineNumber">&nbsp;84</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="85" xml:space="preserve"><span class="lineNumber">&nbsp;85</span>&nbsp;<a href="../../class_Node_66FC1D6AD8F487E453CE6E17163479C7C2DAC063.html">Node</a><span class="other">*</span>&nbsp;<a href="../../class_IntNode_BF54BA8BBF2DCD19C6D55113194C0367415A5319.html">IntNode</a><span class="other">::</span><a href="../../class_IntNode_BF54BA8BBF2DCD19C6D55113194C0367415A5319.html#function_Clone_0C3BABF56B2726799247949DF4ADB2FC14842381">Clone</a><span class="other">(</span><a href="../../class_CloneContext_5E55B7AF2C2173E2EA60A2B86069816A9F0FB764.html">CloneContext</a><span class="other">&amp;</span>&nbsp;<span class="identifier">cloneContext</span><span class="other">)</span>&nbsp;<span class="kw">const</span></span>
+  <br/>
+  <span class="code" id="86" xml:space="preserve"><span class="lineNumber">&nbsp;86</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="87" xml:space="preserve"><span class="lineNumber">&nbsp;87</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">new&nbsp;</span><a href="../../class_IntNode_BF54BA8BBF2DCD19C6D55113194C0367415A5319.html">IntNode</a><span class="other">(</span><span class="identifier">GetSpan</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="88" xml:space="preserve"><span class="lineNumber">&nbsp;88</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="89" xml:space="preserve"><span class="lineNumber">&nbsp;89</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="90" xml:space="preserve"><span class="lineNumber">&nbsp;90</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../../class_IntNode_BF54BA8BBF2DCD19C6D55113194C0367415A5319.html">IntNode</a><span class="other">::</span><a href="../../class_IntNode_BF54BA8BBF2DCD19C6D55113194C0367415A5319.html#function_Accept_24958343B1782101AB09ABE6A787D2326B8C502C">Accept</a><span class="other">(</span><a href="../../class_Visitor_72892152D0864AA2907A1FD60E7A49EB4E071AD6.html">Visitor</a><span class="other">&amp;</span>&nbsp;<span class="identifier">visitor</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="91" xml:space="preserve"><span class="lineNumber">&nbsp;91</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="92" xml:space="preserve"><span class="lineNumber">&nbsp;92</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">visitor</span><span class="other">.</span><a href="../../class_Visitor_72892152D0864AA2907A1FD60E7A49EB4E071AD6.html#function_Visit_94D2834F9AA8A0727F71248C2B7BC2F9053950D3">Visit</a><span class="other">(</span><span class="other">*</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="93" xml:space="preserve"><span class="lineNumber">&nbsp;93</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="94" xml:space="preserve"><span class="lineNumber">&nbsp;94</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="95" xml:space="preserve"><span class="lineNumber">&nbsp;95</span>&nbsp;<a href="../../class_UIntNode_DDCE482023EFED9380036B27A0BCDE811F8DDD65.html">UIntNode</a><span class="other">::</span><a href="../../class_UIntNode_DDCE482023EFED9380036B27A0BCDE811F8DDD65.html#constructor_UIntNode_5AD677102897B7F8CD89CC0576CF720E13182FB2">UIntNode</a><span class="other">(</span><span class="kw">const&nbsp;</span><a href="../../class_Span_9CED8370AAA8B01E09FBC8A63AD262084B91FD78.html">Span</a><span class="other">&amp;</span>&nbsp;<span class="identifier">span_</span><span class="other">)</span>&nbsp;<span class="other">:</span>&nbsp;<a href="../../class_Node_66FC1D6AD8F487E453CE6E17163479C7C2DAC063.html">Node</a><span class="other">(</span><a href="../../enum_NodeType_0D66E0D14D03B3151A778BF9E86A029828B6D5F6.html">NodeType</a><span class="other">::</span><a href="../../enum_NodeType_0D66E0D14D03B3151A778BF9E86A029828B6D5F6.html#enumerator_uintNode_47E4897EE27EFDE34E7451102497FF8830754FDE">uintNode</a><span class="other">,&nbsp;</span><span class="identifier">span_</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="96" xml:space="preserve"><span class="lineNumber">&nbsp;96</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="97" xml:space="preserve"><span class="lineNumber">&nbsp;97</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="98" xml:space="preserve"><span class="lineNumber">&nbsp;98</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="99" xml:space="preserve"><span class="lineNumber">&nbsp;99</span>&nbsp;<a href="../../class_Node_66FC1D6AD8F487E453CE6E17163479C7C2DAC063.html">Node</a><span class="other">*</span>&nbsp;<a href="../../class_UIntNode_DDCE482023EFED9380036B27A0BCDE811F8DDD65.html">UIntNode</a><span class="other">::</span><a href="../../class_UIntNode_DDCE482023EFED9380036B27A0BCDE811F8DDD65.html#function_Clone_7AF1F935EA8B0546611230929EE83B123C091ABF">Clone</a><span class="other">(</span><a href="../../class_CloneContext_5E55B7AF2C2173E2EA60A2B86069816A9F0FB764.html">CloneContext</a><span class="other">&amp;</span>&nbsp;<span class="identifier">cloneContext</span><span class="other">)</span>&nbsp;<span class="kw">const</span></span>
+  <br/>
+  <span class="code" id="100" xml:space="preserve"><span class="lineNumber">100</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="101" xml:space="preserve"><span class="lineNumber">101</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">new&nbsp;</span><a href="../../class_UIntNode_DDCE482023EFED9380036B27A0BCDE811F8DDD65.html">UIntNode</a><span class="other">(</span><span class="identifier">GetSpan</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="102" xml:space="preserve"><span class="lineNumber">102</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="103" xml:space="preserve"><span class="lineNumber">103</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="104" xml:space="preserve"><span class="lineNumber">104</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../../class_UIntNode_DDCE482023EFED9380036B27A0BCDE811F8DDD65.html">UIntNode</a><span class="other">::</span><a href="../../class_UIntNode_DDCE482023EFED9380036B27A0BCDE811F8DDD65.html#function_Accept_8F9F03D806AE88A5F65F5ECEF9EBFAAAEB309B65">Accept</a><span class="other">(</span><a href="../../class_Visitor_72892152D0864AA2907A1FD60E7A49EB4E071AD6.html">Visitor</a><span class="other">&amp;</span>&nbsp;<span class="identifier">visitor</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="105" xml:space="preserve"><span class="lineNumber">105</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="106" xml:space="preserve"><span class="lineNumber">106</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">visitor</span><span class="other">.</span><a href="../../class_Visitor_72892152D0864AA2907A1FD60E7A49EB4E071AD6.html#function_Visit_1CE456E2C75AF28836BF2870A3A0F6367613FDA1">Visit</a><span class="other">(</span><span class="other">*</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="107" xml:space="preserve"><span class="lineNumber">107</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="108" xml:space="preserve"><span class="lineNumber">108</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="109" xml:space="preserve"><span class="lineNumber">109</span>&nbsp;<a href="../../class_LongNode_86954C05064DC9EA36349217F83C1206CD5C24C9.html">LongNode</a><span class="other">::</span><a href="../../class_LongNode_86954C05064DC9EA36349217F83C1206CD5C24C9.html#constructor_LongNode_8E0357150246BBC858B4996008D52D2CD4C8F03E">LongNode</a><span class="other">(</span><span class="kw">const&nbsp;</span><a href="../../class_Span_9CED8370AAA8B01E09FBC8A63AD262084B91FD78.html">Span</a><span class="other">&amp;</span>&nbsp;<span class="identifier">span_</span><span class="other">)</span>&nbsp;<span class="other">:</span>&nbsp;<a href="../../class_Node_66FC1D6AD8F487E453CE6E17163479C7C2DAC063.html">Node</a><span class="other">(</span><a href="../../enum_NodeType_0D66E0D14D03B3151A778BF9E86A029828B6D5F6.html">NodeType</a><span class="other">::</span><a href="../../enum_NodeType_0D66E0D14D03B3151A778BF9E86A029828B6D5F6.html#enumerator_longNode_60BC0F2850F2D59063C7880B86FB5E036A2B9569">longNode</a><span class="other">,&nbsp;</span><span class="identifier">span_</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="110" xml:space="preserve"><span class="lineNumber">110</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="111" xml:space="preserve"><span class="lineNumber">111</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="112" xml:space="preserve"><span class="lineNumber">112</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="113" xml:space="preserve"><span class="lineNumber">113</span>&nbsp;<a href="../../class_Node_66FC1D6AD8F487E453CE6E17163479C7C2DAC063.html">Node</a><span class="other">*</span>&nbsp;<a href="../../class_LongNode_86954C05064DC9EA36349217F83C1206CD5C24C9.html">LongNode</a><span class="other">::</span><a href="../../class_LongNode_86954C05064DC9EA36349217F83C1206CD5C24C9.html#function_Clone_1EA9BD929642ED9FD1B6B5F00112901C9B6577A3">Clone</a><span class="other">(</span><a href="../../class_CloneContext_5E55B7AF2C2173E2EA60A2B86069816A9F0FB764.html">CloneContext</a><span class="other">&amp;</span>&nbsp;<span class="identifier">cloneContext</span><span class="other">)</span>&nbsp;<span class="kw">const</span></span>
+  <br/>
+  <span class="code" id="114" xml:space="preserve"><span class="lineNumber">114</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="115" xml:space="preserve"><span class="lineNumber">115</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">new&nbsp;</span><a href="../../class_LongNode_86954C05064DC9EA36349217F83C1206CD5C24C9.html">LongNode</a><span class="other">(</span><span class="identifier">GetSpan</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="116" xml:space="preserve"><span class="lineNumber">116</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="117" xml:space="preserve"><span class="lineNumber">117</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="118" xml:space="preserve"><span class="lineNumber">118</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../../class_LongNode_86954C05064DC9EA36349217F83C1206CD5C24C9.html">LongNode</a><span class="other">::</span><a href="../../class_LongNode_86954C05064DC9EA36349217F83C1206CD5C24C9.html#function_Accept_90C7B671435112309D69723B527414A7BB66C1F9">Accept</a><span class="other">(</span><a href="../../class_Visitor_72892152D0864AA2907A1FD60E7A49EB4E071AD6.html">Visitor</a><span class="other">&amp;</span>&nbsp;<span class="identifier">visitor</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="119" xml:space="preserve"><span class="lineNumber">119</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="120" xml:space="preserve"><span class="lineNumber">120</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">visitor</span><span class="other">.</span><a href="../../class_Visitor_72892152D0864AA2907A1FD60E7A49EB4E071AD6.html#function_Visit_44E283A0C5A35CBAADDF5EB417517BD67AFBF7CB">Visit</a><span class="other">(</span><span class="other">*</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="121" xml:space="preserve"><span class="lineNumber">121</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="122" xml:space="preserve"><span class="lineNumber">122</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="123" xml:space="preserve"><span class="lineNumber">123</span>&nbsp;<a href="../../class_ULongNode_DBB305474AFE431E871A01FFD347A6B976F94B2D.html">ULongNode</a><span class="other">::</span><a href="../../class_ULongNode_DBB305474AFE431E871A01FFD347A6B976F94B2D.html#constructor_ULongNode_E4EE77D6505CC4DD9D740580573F751903E67065">ULongNode</a><span class="other">(</span><span class="kw">const&nbsp;</span><a href="../../class_Span_9CED8370AAA8B01E09FBC8A63AD262084B91FD78.html">Span</a><span class="other">&amp;</span>&nbsp;<span class="identifier">span_</span><span class="other">)</span>&nbsp;<span class="other">:</span>&nbsp;<a href="../../class_Node_66FC1D6AD8F487E453CE6E17163479C7C2DAC063.html">Node</a><span class="other">(</span><a href="../../enum_NodeType_0D66E0D14D03B3151A778BF9E86A029828B6D5F6.html">NodeType</a><span class="other">::</span><a href="../../enum_NodeType_0D66E0D14D03B3151A778BF9E86A029828B6D5F6.html#enumerator_ulongNode_75A5F7E871161071428F4BC1470577B2EE28272B">ulongNode</a><span class="other">,&nbsp;</span><span class="identifier">span_</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="124" xml:space="preserve"><span class="lineNumber">124</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="125" xml:space="preserve"><span class="lineNumber">125</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="126" xml:space="preserve"><span class="lineNumber">126</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="127" xml:space="preserve"><span class="lineNumber">127</span>&nbsp;<a href="../../class_Node_66FC1D6AD8F487E453CE6E17163479C7C2DAC063.html">Node</a><span class="other">*</span>&nbsp;<a href="../../class_ULongNode_DBB305474AFE431E871A01FFD347A6B976F94B2D.html">ULongNode</a><span class="other">::</span><a href="../../class_ULongNode_DBB305474AFE431E871A01FFD347A6B976F94B2D.html#function_Clone_31AE75A6915D9AF73C91C930F48A388AB7D3EBA6">Clone</a><span class="other">(</span><a href="../../class_CloneContext_5E55B7AF2C2173E2EA60A2B86069816A9F0FB764.html">CloneContext</a><span class="other">&amp;</span>&nbsp;<span class="identifier">cloneContext</span><span class="other">)</span>&nbsp;<span class="kw">const</span></span>
+  <br/>
+  <span class="code" id="128" xml:space="preserve"><span class="lineNumber">128</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="129" xml:space="preserve"><span class="lineNumber">129</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">new&nbsp;</span><a href="../../class_ULongNode_DBB305474AFE431E871A01FFD347A6B976F94B2D.html">ULongNode</a><span class="other">(</span><span class="identifier">GetSpan</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="130" xml:space="preserve"><span class="lineNumber">130</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="131" xml:space="preserve"><span class="lineNumber">131</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="132" xml:space="preserve"><span class="lineNumber">132</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../../class_ULongNode_DBB305474AFE431E871A01FFD347A6B976F94B2D.html">ULongNode</a><span class="other">::</span><a href="../../class_ULongNode_DBB305474AFE431E871A01FFD347A6B976F94B2D.html#function_Accept_BF155F2FA442D4DEAC8253BD34ACF0E18619B56A">Accept</a><span class="other">(</span><a href="../../class_Visitor_72892152D0864AA2907A1FD60E7A49EB4E071AD6.html">Visitor</a><span class="other">&amp;</span>&nbsp;<span class="identifier">visitor</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="133" xml:space="preserve"><span class="lineNumber">133</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="134" xml:space="preserve"><span class="lineNumber">134</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">visitor</span><span class="other">.</span><a href="../../class_Visitor_72892152D0864AA2907A1FD60E7A49EB4E071AD6.html#function_Visit_0DE61787BA8484E5B5DF84A4CCCF52BC003A6360">Visit</a><span class="other">(</span><span class="other">*</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="135" xml:space="preserve"><span class="lineNumber">135</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="136" xml:space="preserve"><span class="lineNumber">136</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="137" xml:space="preserve"><span class="lineNumber">137</span>&nbsp;<a href="../../class_FloatNode_11EE6B7D6E995D56FFC5EA6DADBAB51A4C7D6C72.html">FloatNode</a><span class="other">::</span><a href="../../class_FloatNode_11EE6B7D6E995D56FFC5EA6DADBAB51A4C7D6C72.html#constructor_FloatNode_624A364689A125BCE4EAA983DB7F215A30F2B239">FloatNode</a><span class="other">(</span><span class="kw">const&nbsp;</span><a href="../../class_Span_9CED8370AAA8B01E09FBC8A63AD262084B91FD78.html">Span</a><span class="other">&amp;</span>&nbsp;<span class="identifier">span_</span><span class="other">)</span>&nbsp;<span class="other">:</span>&nbsp;<a href="../../class_Node_66FC1D6AD8F487E453CE6E17163479C7C2DAC063.html">Node</a><span class="other">(</span><a href="../../enum_NodeType_0D66E0D14D03B3151A778BF9E86A029828B6D5F6.html">NodeType</a><span class="other">::</span><a href="../../enum_NodeType_0D66E0D14D03B3151A778BF9E86A029828B6D5F6.html#enumerator_floatNode_80DE0FCA3D25215E61B88EFD10F7B8A51B7BCC0A">floatNode</a><span class="other">,&nbsp;</span><span class="identifier">span_</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="138" xml:space="preserve"><span class="lineNumber">138</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="139" xml:space="preserve"><span class="lineNumber">139</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="140" xml:space="preserve"><span class="lineNumber">140</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="141" xml:space="preserve"><span class="lineNumber">141</span>&nbsp;<a href="../../class_Node_66FC1D6AD8F487E453CE6E17163479C7C2DAC063.html">Node</a><span class="other">*</span>&nbsp;<a href="../../class_FloatNode_11EE6B7D6E995D56FFC5EA6DADBAB51A4C7D6C72.html">FloatNode</a><span class="other">::</span><a href="../../class_FloatNode_11EE6B7D6E995D56FFC5EA6DADBAB51A4C7D6C72.html#function_Clone_913DB278E8EF1D272B757EA1FBC79CA732850D78">Clone</a><span class="other">(</span><a href="../../class_CloneContext_5E55B7AF2C2173E2EA60A2B86069816A9F0FB764.html">CloneContext</a><span class="other">&amp;</span>&nbsp;<span class="identifier">cloneContext</span><span class="other">)</span>&nbsp;<span class="kw">const</span></span>
+  <br/>
+  <span class="code" id="142" xml:space="preserve"><span class="lineNumber">142</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="143" xml:space="preserve"><span class="lineNumber">143</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">new&nbsp;</span><a href="../../class_FloatNode_11EE6B7D6E995D56FFC5EA6DADBAB51A4C7D6C72.html">FloatNode</a><span class="other">(</span><span class="identifier">GetSpan</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="144" xml:space="preserve"><span class="lineNumber">144</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="145" xml:space="preserve"><span class="lineNumber">145</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="146" xml:space="preserve"><span class="lineNumber">146</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../../class_FloatNode_11EE6B7D6E995D56FFC5EA6DADBAB51A4C7D6C72.html">FloatNode</a><span class="other">::</span><a href="../../class_FloatNode_11EE6B7D6E995D56FFC5EA6DADBAB51A4C7D6C72.html#function_Accept_1247CDFDBA07B3CCAEFC0C409F8ECBE19817438B">Accept</a><span class="other">(</span><a href="../../class_Visitor_72892152D0864AA2907A1FD60E7A49EB4E071AD6.html">Visitor</a><span class="other">&amp;</span>&nbsp;<span class="identifier">visitor</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="147" xml:space="preserve"><span class="lineNumber">147</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="148" xml:space="preserve"><span class="lineNumber">148</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">visitor</span><span class="other">.</span><a href="../../class_Visitor_72892152D0864AA2907A1FD60E7A49EB4E071AD6.html#function_Visit_763F1750FBE002654E01D4E4DC76DD173AE9E7B1">Visit</a><span class="other">(</span><span class="other">*</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="149" xml:space="preserve"><span class="lineNumber">149</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="150" xml:space="preserve"><span class="lineNumber">150</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="151" xml:space="preserve"><span class="lineNumber">151</span>&nbsp;<a href="../../class_DoubleNode_F75FD29766F88AFC54AB08F31D57BD0CA20C305B.html">DoubleNode</a><span class="other">::</span><a href="../../class_DoubleNode_F75FD29766F88AFC54AB08F31D57BD0CA20C305B.html#constructor_DoubleNode_45D920E3A57D2728462CA35DA75E88B9E0434952">DoubleNode</a><span class="other">(</span><span class="kw">const&nbsp;</span><a href="../../class_Span_9CED8370AAA8B01E09FBC8A63AD262084B91FD78.html">Span</a><span class="other">&amp;</span>&nbsp;<span class="identifier">span_</span><span class="other">)</span>&nbsp;<span class="other">:</span>&nbsp;<a href="../../class_Node_66FC1D6AD8F487E453CE6E17163479C7C2DAC063.html">Node</a><span class="other">(</span><a href="../../enum_NodeType_0D66E0D14D03B3151A778BF9E86A029828B6D5F6.html">NodeType</a><span class="other">::</span><a href="../../enum_NodeType_0D66E0D14D03B3151A778BF9E86A029828B6D5F6.html#enumerator_doubleNode_9FE6345C1A492A0BAD482612C56E1E4DEF1FE24A">doubleNode</a><span class="other">,&nbsp;</span><span class="identifier">span_</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="152" xml:space="preserve"><span class="lineNumber">152</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="153" xml:space="preserve"><span class="lineNumber">153</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="154" xml:space="preserve"><span class="lineNumber">154</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="155" xml:space="preserve"><span class="lineNumber">155</span>&nbsp;<a href="../../class_Node_66FC1D6AD8F487E453CE6E17163479C7C2DAC063.html">Node</a><span class="other">*</span>&nbsp;<a href="../../class_DoubleNode_F75FD29766F88AFC54AB08F31D57BD0CA20C305B.html">DoubleNode</a><span class="other">::</span><a href="../../class_DoubleNode_F75FD29766F88AFC54AB08F31D57BD0CA20C305B.html#function_Clone_0619822BF0033D91B2B61A1431D8F6704A3538E0">Clone</a><span class="other">(</span><a href="../../class_CloneContext_5E55B7AF2C2173E2EA60A2B86069816A9F0FB764.html">CloneContext</a><span class="other">&amp;</span>&nbsp;<span class="identifier">cloneContext</span><span class="other">)</span>&nbsp;<span class="kw">const</span></span>
+  <br/>
+  <span class="code" id="156" xml:space="preserve"><span class="lineNumber">156</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="157" xml:space="preserve"><span class="lineNumber">157</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">new&nbsp;</span><a href="../../class_DoubleNode_F75FD29766F88AFC54AB08F31D57BD0CA20C305B.html">DoubleNode</a><span class="other">(</span><span class="identifier">GetSpan</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="158" xml:space="preserve"><span class="lineNumber">158</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="159" xml:space="preserve"><span class="lineNumber">159</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="160" xml:space="preserve"><span class="lineNumber">160</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../../class_DoubleNode_F75FD29766F88AFC54AB08F31D57BD0CA20C305B.html">DoubleNode</a><span class="other">::</span><a href="../../class_DoubleNode_F75FD29766F88AFC54AB08F31D57BD0CA20C305B.html#function_Accept_E7C15A72E2D9FEDAB74E41E3581B3E4E3D5CB827">Accept</a><span class="other">(</span><a href="../../class_Visitor_72892152D0864AA2907A1FD60E7A49EB4E071AD6.html">Visitor</a><span class="other">&amp;</span>&nbsp;<span class="identifier">visitor</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="161" xml:space="preserve"><span class="lineNumber">161</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="162" xml:space="preserve"><span class="lineNumber">162</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">visitor</span><span class="other">.</span><a href="../../class_Visitor_72892152D0864AA2907A1FD60E7A49EB4E071AD6.html#function_Visit_57D0EF1E8B7AE30C5E2EEAC353DD7652EF4B319D">Visit</a><span class="other">(</span><span class="other">*</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="163" xml:space="preserve"><span class="lineNumber">163</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="164" xml:space="preserve"><span class="lineNumber">164</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="165" xml:space="preserve"><span class="lineNumber">165</span>&nbsp;<a href="../../class_CharNode_54EE74E03AB82052879E0112E91C53E5436D0818.html">CharNode</a><span class="other">::</span><a href="../../class_CharNode_54EE74E03AB82052879E0112E91C53E5436D0818.html#constructor_CharNode_EA6CBDAB3D56A490113B8F9B47633CE21F2FF4BB">CharNode</a><span class="other">(</span><span class="kw">const&nbsp;</span><a href="../../class_Span_9CED8370AAA8B01E09FBC8A63AD262084B91FD78.html">Span</a><span class="other">&amp;</span>&nbsp;<span class="identifier">span_</span><span class="other">)</span>&nbsp;<span class="other">:</span>&nbsp;<a href="../../class_Node_66FC1D6AD8F487E453CE6E17163479C7C2DAC063.html">Node</a><span class="other">(</span><a href="../../enum_NodeType_0D66E0D14D03B3151A778BF9E86A029828B6D5F6.html">NodeType</a><span class="other">::</span><a href="../../enum_NodeType_0D66E0D14D03B3151A778BF9E86A029828B6D5F6.html#enumerator_charNode_5935A57870A6FE0A16A1B3672BD33EF64AEA6991">charNode</a><span class="other">,&nbsp;</span><span class="identifier">span_</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="166" xml:space="preserve"><span class="lineNumber">166</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="167" xml:space="preserve"><span class="lineNumber">167</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="168" xml:space="preserve"><span class="lineNumber">168</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="169" xml:space="preserve"><span class="lineNumber">169</span>&nbsp;<a href="../../class_Node_66FC1D6AD8F487E453CE6E17163479C7C2DAC063.html">Node</a><span class="other">*</span>&nbsp;<a href="../../class_CharNode_54EE74E03AB82052879E0112E91C53E5436D0818.html">CharNode</a><span class="other">::</span><a href="../../class_CharNode_54EE74E03AB82052879E0112E91C53E5436D0818.html#function_Clone_6E9C047B39A5B6D3D5119A8C302AD80CF0C9BD3F">Clone</a><span class="other">(</span><a href="../../class_CloneContext_5E55B7AF2C2173E2EA60A2B86069816A9F0FB764.html">CloneContext</a><span class="other">&amp;</span>&nbsp;<span class="identifier">cloneContext</span><span class="other">)</span>&nbsp;<span class="kw">const</span></span>
+  <br/>
+  <span class="code" id="170" xml:space="preserve"><span class="lineNumber">170</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="171" xml:space="preserve"><span class="lineNumber">171</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">new&nbsp;</span><a href="../../class_CharNode_54EE74E03AB82052879E0112E91C53E5436D0818.html">CharNode</a><span class="other">(</span><span class="identifier">GetSpan</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="172" xml:space="preserve"><span class="lineNumber">172</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="173" xml:space="preserve"><span class="lineNumber">173</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="174" xml:space="preserve"><span class="lineNumber">174</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../../class_CharNode_54EE74E03AB82052879E0112E91C53E5436D0818.html">CharNode</a><span class="other">::</span><a href="../../class_CharNode_54EE74E03AB82052879E0112E91C53E5436D0818.html#function_Accept_62F344A6E9A143E08172B323F2AD9B9A3272C762">Accept</a><span class="other">(</span><a href="../../class_Visitor_72892152D0864AA2907A1FD60E7A49EB4E071AD6.html">Visitor</a><span class="other">&amp;</span>&nbsp;<span class="identifier">visitor</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="175" xml:space="preserve"><span class="lineNumber">175</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="176" xml:space="preserve"><span class="lineNumber">176</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">visitor</span><span class="other">.</span><a href="../../class_Visitor_72892152D0864AA2907A1FD60E7A49EB4E071AD6.html#function_Visit_DA0A988410845590D0D8742A2DD35CCA0A77E499">Visit</a><span class="other">(</span><span class="other">*</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="177" xml:space="preserve"><span class="lineNumber">177</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="178" xml:space="preserve"><span class="lineNumber">178</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="179" xml:space="preserve"><span class="lineNumber">179</span>&nbsp;<a href="../../class_WCharNode_C6CA94A0FB00F3CE5C8C1C12BAEF39FB8AB8C899.html">WCharNode</a><span class="other">::</span><a href="../../class_WCharNode_C6CA94A0FB00F3CE5C8C1C12BAEF39FB8AB8C899.html#constructor_WCharNode_6FD22E6EB2F423FFB16655C24A103E7065424003">WCharNode</a><span class="other">(</span><span class="kw">const&nbsp;</span><a href="../../class_Span_9CED8370AAA8B01E09FBC8A63AD262084B91FD78.html">Span</a><span class="other">&amp;</span>&nbsp;<span class="identifier">span_</span><span class="other">)</span>&nbsp;<span class="other">:</span>&nbsp;<a href="../../class_Node_66FC1D6AD8F487E453CE6E17163479C7C2DAC063.html">Node</a><span class="other">(</span><a href="../../enum_NodeType_0D66E0D14D03B3151A778BF9E86A029828B6D5F6.html">NodeType</a><span class="other">::</span><a href="../../enum_NodeType_0D66E0D14D03B3151A778BF9E86A029828B6D5F6.html#enumerator_wcharNode_96AE53CAA9C88252CDF67B1F2BE9A00321364E06">wcharNode</a><span class="other">,&nbsp;</span><span class="identifier">span_</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="180" xml:space="preserve"><span class="lineNumber">180</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="181" xml:space="preserve"><span class="lineNumber">181</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="182" xml:space="preserve"><span class="lineNumber">182</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="183" xml:space="preserve"><span class="lineNumber">183</span>&nbsp;<a href="../../class_Node_66FC1D6AD8F487E453CE6E17163479C7C2DAC063.html">Node</a><span class="other">*</span>&nbsp;<a href="../../class_WCharNode_C6CA94A0FB00F3CE5C8C1C12BAEF39FB8AB8C899.html">WCharNode</a><span class="other">::</span><a href="../../class_WCharNode_C6CA94A0FB00F3CE5C8C1C12BAEF39FB8AB8C899.html#function_Clone_5F7FEB8BF87EA2EA58172AE6D331C1950A8713D9">Clone</a><span class="other">(</span><a href="../../class_CloneContext_5E55B7AF2C2173E2EA60A2B86069816A9F0FB764.html">CloneContext</a><span class="other">&amp;</span>&nbsp;<span class="identifier">cloneContext</span><span class="other">)</span>&nbsp;<span class="kw">const</span></span>
+  <br/>
+  <span class="code" id="184" xml:space="preserve"><span class="lineNumber">184</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="185" xml:space="preserve"><span class="lineNumber">185</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">new&nbsp;</span><a href="../../class_WCharNode_C6CA94A0FB00F3CE5C8C1C12BAEF39FB8AB8C899.html">WCharNode</a><span class="other">(</span><span class="identifier">GetSpan</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="186" xml:space="preserve"><span class="lineNumber">186</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="187" xml:space="preserve"><span class="lineNumber">187</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="188" xml:space="preserve"><span class="lineNumber">188</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../../class_WCharNode_C6CA94A0FB00F3CE5C8C1C12BAEF39FB8AB8C899.html">WCharNode</a><span class="other">::</span><a href="../../class_WCharNode_C6CA94A0FB00F3CE5C8C1C12BAEF39FB8AB8C899.html#function_Accept_663FDC112E5261AFD2FBC580F6FACF657A7B44B2">Accept</a><span class="other">(</span><a href="../../class_Visitor_72892152D0864AA2907A1FD60E7A49EB4E071AD6.html">Visitor</a><span class="other">&amp;</span>&nbsp;<span class="identifier">visitor</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="189" xml:space="preserve"><span class="lineNumber">189</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="190" xml:space="preserve"><span class="lineNumber">190</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">visitor</span><span class="other">.</span><a href="../../class_Visitor_72892152D0864AA2907A1FD60E7A49EB4E071AD6.html#function_Visit_8FEFB7684983B1EAA6A27E000A80C7423B2AB6F2">Visit</a><span class="other">(</span><span class="other">*</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="191" xml:space="preserve"><span class="lineNumber">191</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="192" xml:space="preserve"><span class="lineNumber">192</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="193" xml:space="preserve"><span class="lineNumber">193</span>&nbsp;<a href="../../class_UCharNode_82EA556E7DDE846873F01014337AF75E89C6EBBC.html">UCharNode</a><span class="other">::</span><a href="../../class_UCharNode_82EA556E7DDE846873F01014337AF75E89C6EBBC.html#constructor_UCharNode_C4D1B161DD9CF73328267CEE9A501738CFF0D6CC">UCharNode</a><span class="other">(</span><span class="kw">const&nbsp;</span><a href="../../class_Span_9CED8370AAA8B01E09FBC8A63AD262084B91FD78.html">Span</a><span class="other">&amp;</span>&nbsp;<span class="identifier">span_</span><span class="other">)</span>&nbsp;<span class="other">:</span>&nbsp;<a href="../../class_Node_66FC1D6AD8F487E453CE6E17163479C7C2DAC063.html">Node</a><span class="other">(</span><a href="../../enum_NodeType_0D66E0D14D03B3151A778BF9E86A029828B6D5F6.html">NodeType</a><span class="other">::</span><a href="../../enum_NodeType_0D66E0D14D03B3151A778BF9E86A029828B6D5F6.html#enumerator_ucharNode_D90CCACF798F58C5773992FF200E7A513A48833A">ucharNode</a><span class="other">,&nbsp;</span><span class="identifier">span_</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="194" xml:space="preserve"><span class="lineNumber">194</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="195" xml:space="preserve"><span class="lineNumber">195</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="196" xml:space="preserve"><span class="lineNumber">196</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="197" xml:space="preserve"><span class="lineNumber">197</span>&nbsp;<a href="../../class_Node_66FC1D6AD8F487E453CE6E17163479C7C2DAC063.html">Node</a><span class="other">*</span>&nbsp;<a href="../../class_UCharNode_82EA556E7DDE846873F01014337AF75E89C6EBBC.html">UCharNode</a><span class="other">::</span><a href="../../class_UCharNode_82EA556E7DDE846873F01014337AF75E89C6EBBC.html#function_Clone_AAD96939E5AD374D8725C543163345119FA57B4B">Clone</a><span class="other">(</span><a href="../../class_CloneContext_5E55B7AF2C2173E2EA60A2B86069816A9F0FB764.html">CloneContext</a><span class="other">&amp;</span>&nbsp;<span class="identifier">cloneContext</span><span class="other">)</span>&nbsp;<span class="kw">const</span></span>
+  <br/>
+  <span class="code" id="198" xml:space="preserve"><span class="lineNumber">198</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="199" xml:space="preserve"><span class="lineNumber">199</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">new&nbsp;</span><a href="../../class_UCharNode_82EA556E7DDE846873F01014337AF75E89C6EBBC.html">UCharNode</a><span class="other">(</span><span class="identifier">GetSpan</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="200" xml:space="preserve"><span class="lineNumber">200</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="201" xml:space="preserve"><span class="lineNumber">201</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="202" xml:space="preserve"><span class="lineNumber">202</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../../class_UCharNode_82EA556E7DDE846873F01014337AF75E89C6EBBC.html">UCharNode</a><span class="other">::</span><a href="../../class_UCharNode_82EA556E7DDE846873F01014337AF75E89C6EBBC.html#function_Accept_AC56694BB3F9B2BA56DB54F10B083F0A240FF8AC">Accept</a><span class="other">(</span><a href="../../class_Visitor_72892152D0864AA2907A1FD60E7A49EB4E071AD6.html">Visitor</a><span class="other">&amp;</span>&nbsp;<span class="identifier">visitor</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="203" xml:space="preserve"><span class="lineNumber">203</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="204" xml:space="preserve"><span class="lineNumber">204</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">visitor</span><span class="other">.</span><a href="../../class_Visitor_72892152D0864AA2907A1FD60E7A49EB4E071AD6.html#function_Visit_B74D43B03885461DAA2A96BCAFC6E567D2FD8CEC">Visit</a><span class="other">(</span><span class="other">*</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="205" xml:space="preserve"><span class="lineNumber">205</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="206" xml:space="preserve"><span class="lineNumber">206</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="207" xml:space="preserve"><span class="lineNumber">207</span>&nbsp;<a href="../../class_VoidNode_24E8AE51C29CB69249491B636C08BC507950598F.html">VoidNode</a><span class="other">::</span><a href="../../class_VoidNode_24E8AE51C29CB69249491B636C08BC507950598F.html#constructor_VoidNode_51025D57633C34D05C3C8D2FFC2BCE5DD9BFB2EE">VoidNode</a><span class="other">(</span><span class="kw">const&nbsp;</span><a href="../../class_Span_9CED8370AAA8B01E09FBC8A63AD262084B91FD78.html">Span</a><span class="other">&amp;</span>&nbsp;<span class="identifier">span_</span><span class="other">)</span>&nbsp;<span class="other">:</span>&nbsp;<a href="../../class_Node_66FC1D6AD8F487E453CE6E17163479C7C2DAC063.html">Node</a><span class="other">(</span><a href="../../enum_NodeType_0D66E0D14D03B3151A778BF9E86A029828B6D5F6.html">NodeType</a><span class="other">::</span><a href="../../enum_NodeType_0D66E0D14D03B3151A778BF9E86A029828B6D5F6.html#enumerator_voidNode_F3772426DC49BE0B929B04F7D3561B12272EF360">voidNode</a><span class="other">,&nbsp;</span><span class="identifier">span_</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="208" xml:space="preserve"><span class="lineNumber">208</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="209" xml:space="preserve"><span class="lineNumber">209</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="210" xml:space="preserve"><span class="lineNumber">210</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="211" xml:space="preserve"><span class="lineNumber">211</span>&nbsp;<a href="../../class_Node_66FC1D6AD8F487E453CE6E17163479C7C2DAC063.html">Node</a><span class="other">*</span>&nbsp;<a href="../../class_VoidNode_24E8AE51C29CB69249491B636C08BC507950598F.html">VoidNode</a><span class="other">::</span><a href="../../class_VoidNode_24E8AE51C29CB69249491B636C08BC507950598F.html#function_Clone_730EE0CA7742DE171C576B3149C2AF651114E22B">Clone</a><span class="other">(</span><a href="../../class_CloneContext_5E55B7AF2C2173E2EA60A2B86069816A9F0FB764.html">CloneContext</a><span class="other">&amp;</span>&nbsp;<span class="identifier">cloneContext</span><span class="other">)</span>&nbsp;<span class="kw">const</span></span>
+  <br/>
+  <span class="code" id="212" xml:space="preserve"><span class="lineNumber">212</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="213" xml:space="preserve"><span class="lineNumber">213</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">new&nbsp;</span><a href="../../class_VoidNode_24E8AE51C29CB69249491B636C08BC507950598F.html">VoidNode</a><span class="other">(</span><span class="identifier">GetSpan</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="214" xml:space="preserve"><span class="lineNumber">214</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="215" xml:space="preserve"><span class="lineNumber">215</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="216" xml:space="preserve"><span class="lineNumber">216</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../../class_VoidNode_24E8AE51C29CB69249491B636C08BC507950598F.html">VoidNode</a><span class="other">::</span><a href="../../class_VoidNode_24E8AE51C29CB69249491B636C08BC507950598F.html#function_Accept_D5354871824155CB8F3273C88ACC307F2C72344D">Accept</a><span class="other">(</span><a href="../../class_Visitor_72892152D0864AA2907A1FD60E7A49EB4E071AD6.html">Visitor</a><span class="other">&amp;</span>&nbsp;<span class="identifier">visitor</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="217" xml:space="preserve"><span class="lineNumber">217</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="218" xml:space="preserve"><span class="lineNumber">218</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">visitor</span><span class="other">.</span><a href="../../class_Visitor_72892152D0864AA2907A1FD60E7A49EB4E071AD6.html#function_Visit_E75C8FF7971F8157BFE9AF2F2248394A3C487BCF">Visit</a><span class="other">(</span><span class="other">*</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="219" xml:space="preserve"><span class="lineNumber">219</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="220" xml:space="preserve"><span class="lineNumber">220</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="221" xml:space="preserve"><span class="lineNumber">221</span>&nbsp;<span class="other">}</span>&nbsp;<span class="other">}</span>&nbsp;<span class="comment">//&nbsp;namespace&nbsp;cmajor::ast</span></span>
+  <br/>
+ </body>
+</html>

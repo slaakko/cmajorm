@@ -1,0 +1,177 @@
+using System;
+
+namespace Calculator
+{
+    public void Parse(const ustring& input)
+    {
+        Scanner scanner(input);
+        scanner.NextToken();
+        if (scanner.CurrentToken() is PrintToken*)
+        {
+            SymbolTable.Instance().Print();
+            return;
+        }
+        else if (scanner.CurrentToken() is VariableNameToken*)
+        {
+            VariableNameToken* token = cast<VariableNameToken*>(scanner.CurrentToken());
+            ustring variableName = token->VariableName();
+            scanner.NextToken();
+            if (scanner.CurrentToken() is OperatorToken*)
+            {
+                OperatorToken* token = cast<OperatorToken*>(scanner.CurrentToken());
+                if (token->Char() == '=')
+                {
+                    scanner.NextToken();
+                    double value = Expr(scanner);
+                    Token* token = scanner.CurrentToken();
+                    if (token is EndToken*)
+                    {
+                        SymbolTable.Instance().SetVariable(variableName, value);
+                        Console.Out() << variableName << " = " << value << endl();
+                        return;
+                    }
+                    else
+                    {
+                        throw ParsingException("invalid input");
+                    }
+                }
+            }
+        }
+        scanner.Rewind();
+        scanner.NextToken();
+        double value = Expr(scanner);
+        Token* token = scanner.CurrentToken();
+        if (token is EndToken*)
+        {
+            Console.Out() << "= " << value << endl();
+        }
+        else
+        {
+            throw ParsingException("invalid input");
+        }
+    }
+    
+    internal double Expr(Scanner& scanner)
+    {
+        double value = Term(scanner);
+        Token* token = scanner.CurrentToken();
+        OperatorToken* op = token as OperatorToken*;
+        while (op != null && op->IsAdditiveOperator())
+        {
+            uchar opChar = op->Char();
+            scanner.NextToken();
+            double right = Term(scanner);
+            if (opChar == '+')
+            {
+                value = value + right;
+            }
+            else if (opChar == '-')
+            {
+                value = value - right;
+            }
+            else
+            {
+                throw LogicErrorException("logic error");
+            }
+            token = scanner.CurrentToken();
+            op = token as OperatorToken*;
+        }
+        return value;
+    }
+    
+    internal double Term(Scanner& scanner)
+    {
+        double value = Factor(scanner);
+        Token* token = scanner.CurrentToken();
+        OperatorToken* op = token as OperatorToken*;
+        while (op != null && op->IsMultiplicativeOperator())
+        {
+            uchar opChar = op->Char();
+            scanner.NextToken();
+            double right = Factor(scanner);
+            if (opChar == '*')
+            {
+                value = value * right;
+            }
+            else if (opChar == '/')
+            {
+                if (right == 0)
+                {
+                    throw DivisionByZeroException("division by zero");
+                }
+                value = value / right;
+            }
+            else
+            {
+                throw LogicErrorException("logic error");
+            }
+            token = scanner.CurrentToken();
+            op = token as OperatorToken*;
+        }
+        return value;
+    }
+    
+    internal double Factor(Scanner& scanner)
+    {
+        Token* token = scanner.CurrentToken();
+        OperatorToken* op = token as OperatorToken*;
+        bool neg = false;
+        if (op != null && op->IsAdditiveOperator())
+        {
+            if (op->Char() == '-')
+            {
+                neg = true;
+            }
+            scanner.NextToken();
+        }
+        double value = Primary(scanner);
+        if (neg)
+        {
+            return -value;
+        }
+        return value;
+    }
+    
+    internal double Primary(Scanner& scanner)
+    {
+        Token* token = scanner.CurrentToken();
+        if (token is NumberToken*)
+        {
+            NumberToken* number = cast<NumberToken*>(token);
+            double value = number->Value();
+            scanner.NextToken();
+            return value;
+        }
+        else if (token is VariableNameToken*)
+        {
+            VariableNameToken* variableNameToken = cast<VariableNameToken*>(token);
+            double value = SymbolTable.Instance().GetVariableValue(variableNameToken->VariableName());
+            scanner.NextToken();
+            return value;
+        }
+        else if (token is OperatorToken*)
+        {
+            OperatorToken* op = cast<OperatorToken*>(token);
+            if (op->Char() == '(')
+            {
+                scanner.NextToken();
+                double value = Expr(scanner);
+                token = scanner.CurrentToken();
+                if (token is OperatorToken*)
+                {
+                    op = cast<OperatorToken*>(token);
+                    if (op->Char() == ')')
+                    {
+                        scanner.NextToken();
+                        return value;
+                    }
+                    else
+                    {
+                        throw ParsingException("')' expected");
+                    }
+                }
+            }
+        }
+        throw ParsingException("number, variable name or subexpression expected");
+    }
+}

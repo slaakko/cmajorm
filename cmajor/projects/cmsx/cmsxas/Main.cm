@@ -1,0 +1,73 @@
+using System;
+using System.IO;
+using System.Collections;
+using System.Text.Parsing;
+using cmsx.assembly;
+
+public nothrow const char* Version()
+{
+    return "0.1.0";
+}
+
+public nothrow void PrintHelp()
+{
+    Console.Out() << "Cmajor System X Assembler version " << Version() << endl();
+    Console.Out() << "Usage: cmsxas [options] { <file>.s }" << endl();
+    Console.Out() << "Options: " << endl();
+    Console.Out() << "   --help (-h)" << endl();
+    Console.Out() << "      print this help" << endl();
+    Console.Out() << "   --verbose (-v)" << endl();
+    Console.Out() << "      be verbose" << endl();
+}
+
+int main(int argc, const char** argv)
+{
+    try
+    {
+        List<string> assemblyFiles;
+        bool verbose = false;
+        for (int i = 1; i < argc; ++i)
+        {
+            string arg = argv[i];
+            if (arg.StartsWith("-"))
+            {
+                if (arg == "--verbose" || arg == "-v")
+                {
+                    verbose = true;
+                }
+                else if (arg == "--help" || arg == "-h")
+                {
+                    PrintHelp();
+                    return 0;
+                }
+            }
+            else
+            {
+                assemblyFiles.Add(GetFullPath(arg));
+            }
+        }
+        if (verbose)
+        {
+            Console.Out() << "Cmajor System X Assembler version " << Version() << endl();
+        }
+        if (assemblyFiles.IsEmpty())
+        {
+            PrintHelp();
+            throw Exception("no assembly files given");
+        }
+        FileInfo.Instance().SetFiles(assemblyFiles);
+        long n = assemblyFiles.Count();
+        for (long i = 0; i < n; ++i)
+        {
+            const string& assemblyFileName = assemblyFiles[i];
+            string assemblyFilePath = GetFullPath(assemblyFileName);
+            ProcessAssemblyFile(i, assemblyFilePath, verbose);
+        }
+    }
+    catch (const Exception& ex)
+    {
+        Console.Error() << ex.Message() << endl();
+        return 1;
+    }
+    return 0;
+}
