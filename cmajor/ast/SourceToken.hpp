@@ -5,11 +5,12 @@
 
 #ifndef CMAJOR_AST_SOURCE_TOKEN_INCLUDED
 #define CMAJOR_AST_SOURCE_TOKEN_INCLUDED
+#include <cmajor/ast/AstApi.hpp>
 #include <string>
 
 namespace cmajor { namespace ast {
 
-class SourceTokenFormatter
+class AST_API SourceTokenFormatter
 {
 public:
     virtual ~SourceTokenFormatter();

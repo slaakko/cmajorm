@@ -11,7 +11,7 @@ namespace cmajor { namespace symbols {
 
 class Module;
 
-class IntrinsicFunction
+class SYMBOLS_API IntrinsicFunction
 {
 public:
     IntrinsicFunction(Module* module_);
@@ -26,7 +26,7 @@ private:
     Module* module;
 };
 
-void MetaInit(SymbolTable& symbolTable);
+SYMBOLS_API void MetaInit(SymbolTable& symbolTable);
 
 } } // namespace cmajor::symbols
 

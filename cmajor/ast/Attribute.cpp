@@ -34,6 +34,10 @@ void Attribute::Read(AstReader& reader)
     value = reader.GetBinaryReader().ReadUtf32String();
 }
 
+Attributes::Attributes()
+{
+}
+
 Attribute* Attributes::GetAttribute(const std::u32string& name) const
 {
     auto it = attributeMap.find(name);

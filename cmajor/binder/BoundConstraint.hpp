@@ -12,7 +12,7 @@ namespace cmajor { namespace binder {
 
 using namespace cmajor::symbols;
 
-class BoundConstraint : public BoundNode
+class BINDER_API BoundConstraint : public BoundNode
 {
 public:
     BoundConstraint(Module* module_, const Span& span_, BoundNodeType boundNodeType_);
@@ -23,7 +23,7 @@ public:
     void Store(Emitter& emitter, OperationFlags flags) override;
 };
 
-class BoundAtomicConstraint : public BoundConstraint
+class BINDER_API BoundAtomicConstraint : public BoundConstraint
 {
 public:
     BoundAtomicConstraint(Module* module_, const Span& span_, bool satisfied_);
@@ -37,7 +37,7 @@ private:
     ConceptSymbol* concept;
 };
 
-class BoundBinaryConstraint : public BoundConstraint
+class BINDER_API BoundBinaryConstraint : public BoundConstraint
 {
 public:
     BoundBinaryConstraint(Module* module_, const Span& span_, BoundNodeType boundNodeType_, BoundConstraint* left_, BoundConstraint* right_);
@@ -50,7 +50,7 @@ private:
     std::unique_ptr<BoundConstraint> right;
 };
 
-class BoundDisjunctiveConstraint : public BoundBinaryConstraint
+class BINDER_API BoundDisjunctiveConstraint : public BoundBinaryConstraint
 {
 public:
     BoundDisjunctiveConstraint(Module* module_, const Span& span_, BoundConstraint* left_, BoundConstraint* right_);
@@ -60,7 +60,7 @@ public:
     BoundConstraint* Clone() const override;
 };
 
-class BoundConjunctiveConstraint : public BoundBinaryConstraint
+class BINDER_API BoundConjunctiveConstraint : public BoundBinaryConstraint
 {
 public:
     BoundConjunctiveConstraint(Module* module_, const Span& span_, BoundConstraint* left_, BoundConstraint* right_);
@@ -70,7 +70,7 @@ public:
     BoundConstraint* Clone() const override;
 };
 
-class BoundConcept : public BoundNode
+class BINDER_API BoundConcept : public BoundNode
 {
 public:
     BoundConcept(Module* module_, ConceptSymbol* conceptSymbol_, const std::vector<TypeSymbol*>& typeArguments_, const Span& span_);
@@ -94,7 +94,7 @@ private:
     std::vector<std::unique_ptr<BoundTemplateParameterSymbol>> boundTemplateParameters;
 };
 
-struct BoundConceptKey
+struct BINDER_API BoundConceptKey
 {
     BoundConceptKey(ConceptSymbol* conceptSymbol_, std::vector<TypeSymbol*> typeArguments_) : conceptSymbol(conceptSymbol_), typeArguments(typeArguments_) {}
     int Arity() const { return typeArguments.size(); }
@@ -108,7 +108,7 @@ inline bool operator!=(const BoundConceptKey& left, const BoundConceptKey& right
     return !(left == right);
 }
 
-struct BoundConceptKeyHash
+struct BINDER_API BoundConceptKeyHash
 {
     bool operator()(const BoundConceptKey& boundConceptKey) const
     {

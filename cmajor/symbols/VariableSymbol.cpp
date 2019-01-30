@@ -227,21 +227,19 @@ void MemberVariableSymbol::SetSpecifiers(Specifiers specifiers)
     }
 }
 
-llvm::DIDerivedType* MemberVariableSymbol::GetDIMemberType(Emitter& emitter, uint64_t offsetInBits)
+void* MemberVariableSymbol::GetDIMemberType(Emitter& emitter, uint64_t offsetInBits)
 {
     Assert(layoutIndex != -1, "invalid layout index");
     Assert(Parent() && Parent()->IsClassTypeSymbol(), "parent class type expected");
     ClassTypeSymbol* parentClassType = static_cast<ClassTypeSymbol*>(Parent());
     std::pair<boost::uuids::uuid, int32_t> memberVariableId = std::make_pair(parentClassType->TypeId(), layoutIndex);
-    llvm::DIDerivedType* localDIType = emitter.GetDIMemberType(memberVariableId);
+    void* localDIType = emitter.GetDIMemberType(memberVariableId);
     if (!localDIType)
     {
         uint64_t sizeInBits = GetType()->SizeInBits(emitter);
         uint32_t alignInBits = GetType()->AlignmentInBits(emitter);
-        llvm::DINode::DIFlags flags = llvm::DINode::DIFlags::FlagZero;
-        llvm::DIType* scope = parentClassType->GetDIType(emitter);
-        localDIType = emitter.DIBuilder()->createMemberType(scope, ToUtf8(Name()), emitter.GetFile(GetSpan().FileIndex()), GetSpan().LineNumber(), sizeInBits, alignInBits, 
-            offsetInBits, flags, GetType()->GetDIType(emitter));
+        void* scope = parentClassType->GetDIType(emitter);
+        localDIType = emitter.CreateDIMemberType(scope, ToUtf8(Name()), GetSpan(), sizeInBits, alignInBits, offsetInBits, GetType()->GetDIType(emitter));
         emitter.SetDIMemberType(memberVariableId, localDIType);
     }
     return localDIType;

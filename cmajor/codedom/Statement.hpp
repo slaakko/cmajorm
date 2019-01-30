@@ -9,14 +9,14 @@
 
 namespace cmajor { namespace codedom {
 
-class Statement: public CppObject
+class CODEDOM_API Statement: public CppObject
 {
 public:
     Statement(const std::u32string& name_);
     virtual bool IsCompoundStatement() const { return false; }
 };
 
-class LabeledStatement: public Statement
+class CODEDOM_API LabeledStatement: public Statement
 {
 public:
     LabeledStatement(const std::u32string& label_, Statement* statement_);
@@ -27,7 +27,7 @@ private:
     Statement* statement;
 };
 
-class CaseStatement: public Statement
+class CODEDOM_API CaseStatement: public Statement
 {
 public:
     CaseStatement(CppObject* expression_, Statement* statement_);
@@ -38,7 +38,7 @@ private:
     Statement* statement;
 };
 
-class DefaultStatement : public Statement
+class CODEDOM_API DefaultStatement : public Statement
 {
 public:
     DefaultStatement(Statement* statement_);
@@ -48,7 +48,7 @@ private:
     Statement* statement;
 };
 
-class EmptyStatement : public Statement
+class CODEDOM_API EmptyStatement : public Statement
 {
 public:
     EmptyStatement();
@@ -56,7 +56,7 @@ public:
     void Accept(Visitor& visitor) override;
 };
 
-class ExpressionStatement : public Statement
+class CODEDOM_API ExpressionStatement : public Statement
 {
 public:
     ExpressionStatement(CppObject* expression_);
@@ -66,7 +66,7 @@ private:
     CppObject* expression;
 };
 
-class CompoundStatement : public Statement
+class CODEDOM_API CompoundStatement : public Statement
 {
 public:
     CompoundStatement();
@@ -80,13 +80,13 @@ private:
 
 typedef std::shared_ptr<CompoundStatement> CompoundStatementPtr;
 
-class SelectionStatement : public Statement
+class CODEDOM_API SelectionStatement : public Statement
 {
 public:
     SelectionStatement(const std::u32string& name_);
 };
 
-class IfStatement : public SelectionStatement
+class CODEDOM_API IfStatement : public SelectionStatement
 {
 public:
     IfStatement(CppObject* condition_, Statement* thenStatement_, Statement* elseStatement_);
@@ -98,7 +98,7 @@ private:
     Statement* elseStatement;
 };
 
-class SwitchStatement : public SelectionStatement
+class CODEDOM_API SwitchStatement : public SelectionStatement
 {
 public:
     SwitchStatement(CppObject* condition_, Statement* statement_);
@@ -109,13 +109,13 @@ private:
     Statement* statement;
 };
 
-class IterationStatement : public Statement
+class CODEDOM_API IterationStatement : public Statement
 {
 public:
     IterationStatement(const std::u32string& name_);
 };
 
-class WhileStatement : public IterationStatement
+class CODEDOM_API WhileStatement : public IterationStatement
 {
 public:
     WhileStatement(CppObject* condition_, Statement* statement_);
@@ -126,7 +126,7 @@ private:
     Statement* statement;
 };
 
-class DoStatement : public IterationStatement
+class CODEDOM_API DoStatement : public IterationStatement
 {
 public:
     DoStatement(Statement* statement_, CppObject* condition_);
@@ -137,7 +137,7 @@ private:
     CppObject* condition;
 };
 
-class ForStatement : public IterationStatement
+class CODEDOM_API ForStatement : public IterationStatement
 {
 public:
     ForStatement(CppObject* initialization_, CppObject* condition_, CppObject* iteration_, Statement* statement_);
@@ -150,13 +150,13 @@ private:
     Statement* statement;
 };
 
-class JumpStatement : public Statement
+class CODEDOM_API JumpStatement : public Statement
 {
 public:
     JumpStatement(const std::u32string& name_);
 };
 
-class BreakStatement : public JumpStatement
+class CODEDOM_API BreakStatement : public JumpStatement
 {
 public:
     BreakStatement();
@@ -164,7 +164,7 @@ public:
     void Accept(Visitor& visitor) override;
 };
 
-class ContinueStatement : public JumpStatement
+class CODEDOM_API ContinueStatement : public JumpStatement
 {
 public:
     ContinueStatement();
@@ -172,7 +172,7 @@ public:
     void Accept(Visitor& visitor) override;
 };
 
-class GotoStatement : public JumpStatement
+class CODEDOM_API GotoStatement : public JumpStatement
 {
 public:
     GotoStatement(const std::u32string& target_);
@@ -182,7 +182,7 @@ private:
     std::u32string target;
 };
 
-class ReturnStatement : public JumpStatement
+class CODEDOM_API ReturnStatement : public JumpStatement
 {
 public:
     ReturnStatement(CppObject* expression_);
@@ -194,7 +194,7 @@ private:
 
 class TypeId;
 
-class ConditionWithDeclarator : public CppObject
+class CODEDOM_API ConditionWithDeclarator : public CppObject
 {
 public:
     ConditionWithDeclarator(TypeId* type_, const std::u32string& declarator_, CppObject* expression_);
@@ -209,7 +209,7 @@ private:
     CppObject* expression;
 };
 
-class DeclarationStatement : public Statement
+class CODEDOM_API DeclarationStatement : public Statement
 {
 public:
     DeclarationStatement(CppObject* declaration_);
@@ -219,7 +219,7 @@ private:
     CppObject* declaration;
 };
 
-class ExceptionDeclaration : public CppObject
+class CODEDOM_API ExceptionDeclaration : public CppObject
 {
 public:
     ExceptionDeclaration();
@@ -235,7 +235,7 @@ private:
 
 typedef std::shared_ptr<ExceptionDeclaration> ExceptionDeclarationPtr;
 
-class Handler : public CppObject
+class CODEDOM_API Handler : public CppObject
 {
 public:
     Handler(ExceptionDeclaration* exceptionDeclaration_, CompoundStatement* statement_);
@@ -246,7 +246,7 @@ private:
     CompoundStatement* statement;
 };
 
-class TryStatement : public Statement
+class CODEDOM_API TryStatement : public Statement
 {
 public:
     TryStatement(CompoundStatement* statement_);

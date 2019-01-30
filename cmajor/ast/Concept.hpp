@@ -10,7 +10,7 @@
 
 namespace cmajor { namespace ast {
 
-class ConstraintNode : public Node
+class AST_API ConstraintNode : public Node
 {
 public:
     ConstraintNode(NodeType nodeType_, const Span& span_);
@@ -18,7 +18,7 @@ public:
     virtual bool IsHeaderConstraint() const { return false; }
 };
 
-class ParenthesizedConstraintNode : public ConstraintNode
+class AST_API ParenthesizedConstraintNode : public ConstraintNode
 {
 public:
     ParenthesizedConstraintNode(const Span& span_);
@@ -34,7 +34,7 @@ private:
     std::unique_ptr<ConstraintNode> constraint;
 };
 
-class BinaryConstraintNode : public ConstraintNode
+class AST_API BinaryConstraintNode : public ConstraintNode
 {
 public:
     BinaryConstraintNode(NodeType nodeType_, const Span& span_);
@@ -50,7 +50,7 @@ private:
     std::unique_ptr<ConstraintNode> right;
 };
 
-class DisjunctiveConstraintNode : public BinaryConstraintNode
+class AST_API DisjunctiveConstraintNode : public BinaryConstraintNode
 {
 public:
     DisjunctiveConstraintNode(const Span& span_);
@@ -60,7 +60,7 @@ public:
     std::string ToString() const override;
 };
 
-class ConjunctiveConstraintNode : public BinaryConstraintNode
+class AST_API ConjunctiveConstraintNode : public BinaryConstraintNode
 {
 public:
     ConjunctiveConstraintNode(const Span& span_);
@@ -70,7 +70,7 @@ public:
     std::string ToString() const override;
 };
 
-class WhereConstraintNode : public ConstraintNode
+class AST_API WhereConstraintNode : public ConstraintNode
 {
 public:
     WhereConstraintNode(const Span& span_);
@@ -92,7 +92,7 @@ private:
     bool semicolon;
 };
 
-class PredicateConstraintNode : public ConstraintNode
+class AST_API PredicateConstraintNode : public ConstraintNode
 {
 public:
     PredicateConstraintNode(const Span& span_);
@@ -108,7 +108,7 @@ private:
     std::unique_ptr<Node> invokeExpr;
 };
 
-class IsConstraintNode : public ConstraintNode
+class AST_API IsConstraintNode : public ConstraintNode
 {
 public:
     IsConstraintNode(const Span& span_);
@@ -127,7 +127,7 @@ private:
     std::unique_ptr<Node> conceptOrTypeName;
 };
 
-class MultiParamConstraintNode : public ConstraintNode
+class AST_API MultiParamConstraintNode : public ConstraintNode
 {
 public:
     MultiParamConstraintNode(const Span& span_);
@@ -146,7 +146,7 @@ private:
     NodeList<Node> typeExprs;
 };
 
-class TypeNameConstraintNode : public ConstraintNode
+class AST_API TypeNameConstraintNode : public ConstraintNode
 {
 public:
     TypeNameConstraintNode(const Span& span_);
@@ -162,13 +162,13 @@ private:
     std::unique_ptr<Node> typeId;
 };
 
-class SignatureConstraintNode : public ConstraintNode
+class AST_API SignatureConstraintNode : public ConstraintNode
 {
 public:
     SignatureConstraintNode(NodeType nodeType_, const Span& span_);
 };
 
-class ConstructorConstraintNode : public SignatureConstraintNode
+class AST_API ConstructorConstraintNode : public SignatureConstraintNode
 {
 public:
     ConstructorConstraintNode(const Span& span_);
@@ -187,7 +187,7 @@ private:
     NodeList<ParameterNode> parameters;
 };
 
-class DestructorConstraintNode : public SignatureConstraintNode
+class AST_API DestructorConstraintNode : public SignatureConstraintNode
 {
 public:
     DestructorConstraintNode(const Span& span_);
@@ -202,7 +202,7 @@ private:
     std::unique_ptr<IdentifierNode> typeParamId;
 };
 
-class MemberFunctionConstraintNode : public SignatureConstraintNode
+class AST_API MemberFunctionConstraintNode : public SignatureConstraintNode
 {
 public:
     MemberFunctionConstraintNode(const Span& span_);
@@ -226,7 +226,7 @@ private:
     NodeList<ParameterNode> parameters;
 };
 
-class FunctionConstraintNode : public SignatureConstraintNode
+class AST_API FunctionConstraintNode : public SignatureConstraintNode
 {
 public:
     FunctionConstraintNode(const Span& span_);
@@ -247,7 +247,7 @@ private:
     NodeList<ParameterNode> parameters;
 };
 
-class AxiomStatementNode : public Node
+class AST_API AxiomStatementNode : public Node
 {
 public:
     AxiomStatementNode(const Span& span_);
@@ -265,7 +265,7 @@ private:
     std::u32string text;
 };
 
-class AxiomNode : public Node
+class AST_API AxiomNode : public Node
 {
 public:
     AxiomNode(const Span& span_);
@@ -292,7 +292,7 @@ private:
     NodeList<AxiomStatementNode> statements;
 };
 
-class ConceptIdNode : public Node
+class AST_API ConceptIdNode : public Node
 {
 public:
     ConceptIdNode(const Span& span_);
@@ -312,7 +312,7 @@ private:
     NodeList<Node> typeParameters;
 };
 
-class ConceptNode : public Node
+class AST_API ConceptNode : public Node
 {
 public:
     ConceptNode(const Span& span_);
@@ -352,13 +352,13 @@ private:
     NodeList<AxiomNode> axioms;
 };
 
-class IntrinsicConstraintNode : public ConstraintNode
+class AST_API IntrinsicConstraintNode : public ConstraintNode
 {
 public:
     IntrinsicConstraintNode(NodeType nodeType_);
 };
 
-class SameConstraintNode : public IntrinsicConstraintNode
+class AST_API SameConstraintNode : public IntrinsicConstraintNode
 {
 public:
     SameConstraintNode();
@@ -367,7 +367,7 @@ public:
     Node* Clone(CloneContext& cloneContext) const override;
 };
 
-class DerivedConstraintNode : public IntrinsicConstraintNode
+class AST_API DerivedConstraintNode : public IntrinsicConstraintNode
 {
 public:
     DerivedConstraintNode();
@@ -376,7 +376,7 @@ public:
     Node* Clone(CloneContext& cloneContext) const override;
 };
 
-class ConvertibleConstraintNode : public IntrinsicConstraintNode
+class AST_API ConvertibleConstraintNode : public IntrinsicConstraintNode
 {
 public:
     ConvertibleConstraintNode();
@@ -385,7 +385,7 @@ public:
     Node* Clone(CloneContext& cloneContext) const override;
 };
 
-class ExplicitlyConvertibleConstraintNode : public IntrinsicConstraintNode
+class AST_API ExplicitlyConvertibleConstraintNode : public IntrinsicConstraintNode
 {
 public:
     ExplicitlyConvertibleConstraintNode();
@@ -394,7 +394,7 @@ public:
     Node* Clone(CloneContext& cloneContext) const override;
 };
 
-class CommonConstraintNode : public IntrinsicConstraintNode
+class AST_API CommonConstraintNode : public IntrinsicConstraintNode
 {
 public:
     CommonConstraintNode();
@@ -403,7 +403,7 @@ public:
     Node* Clone(CloneContext& cloneContext) const override;
 };
 
-class NonreferenceTypeConstraintNode : public IntrinsicConstraintNode
+class AST_API NonreferenceTypeConstraintNode : public IntrinsicConstraintNode
 {
 public:
     NonreferenceTypeConstraintNode();
@@ -412,7 +412,7 @@ public:
     Node* Clone(CloneContext& cloneContext) const override;
 };
 
-class SameConceptNode : public ConceptNode
+class AST_API SameConceptNode : public ConceptNode
 {
 public:
     SameConceptNode();
@@ -420,7 +420,7 @@ public:
     bool IsIntrinsicConceptNode() const override { return true; }
 };
 
-class DerivedConceptNode : public ConceptNode
+class AST_API DerivedConceptNode : public ConceptNode
 {
 public:
     DerivedConceptNode();
@@ -428,7 +428,7 @@ public:
     bool IsIntrinsicConceptNode() const override { return true; }
 };
 
-class ConvertibleConceptNode : public ConceptNode
+class AST_API ConvertibleConceptNode : public ConceptNode
 {
 public:
     ConvertibleConceptNode();
@@ -436,7 +436,7 @@ public:
     bool IsIntrinsicConceptNode() const override { return true; }
 };
 
-class ExplicitlyConvertibleConceptNode : public ConceptNode
+class AST_API ExplicitlyConvertibleConceptNode : public ConceptNode
 {
 public:
     ExplicitlyConvertibleConceptNode();
@@ -444,7 +444,7 @@ public:
     bool IsIntrinsicConceptNode() const override { return true; }
 };
 
-class CommonConceptNode : public ConceptNode
+class AST_API CommonConceptNode : public ConceptNode
 {
 public:
     CommonConceptNode();
@@ -453,7 +453,7 @@ public:
     bool IsIntrinsicConceptNode() const override { return true; }
 };
 
-class NonreferenceTypeConceptNode : public ConceptNode
+class AST_API NonreferenceTypeConceptNode : public ConceptNode
 {
 public:
     NonreferenceTypeConceptNode();

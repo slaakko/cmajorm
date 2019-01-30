@@ -15,9 +15,8 @@ class EmittingContext
 public:
     EmittingContext();
     ~EmittingContext();
-    EmittingContextImpl* GetEmittingContextImpl() { return emittingContextImpl; }
 private:
-    EmittingContextImpl * emittingContextImpl;
+    void* handle;
 };
 
 } } // namespace cmajor::emitter

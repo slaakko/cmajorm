@@ -12,7 +12,7 @@
 
 namespace cmajor { namespace parsing {
 
-class Object
+class PARSING_API Object
 {
 public:
     virtual ~Object();
@@ -34,7 +34,7 @@ private:
 
 class Scanner;
 
-class Parser: public ParsingObject
+class PARSING_API Parser: public ParsingObject
 {
 public:
     Parser(const std::u32string& name_, const std::u32string& info_);

@@ -6,13 +6,13 @@
 #ifndef CMAJOR_BINDER_STATEMENT_BINDER_INCLUDED
 #define CMAJOR_BINDER_STATEMENT_BINDER_INCLUDED
 #include <cmajor/binder/BoundCompileUnit.hpp>
+#include <cmajor/binder/BoundStatement.hpp>
 #include <cmajor/ast/Visitor.hpp>
 
 namespace cmajor { namespace binder {
 
 using namespace cmajor::ast;
 
-class BoundStatement;
 class BoundGotoCaseStatement;
 class BoundGotoDefaultStatement;
 class BoundClass;
@@ -20,7 +20,7 @@ class BoundFunction;
 
 void CheckFunctionReturnPaths(FunctionSymbol* functionSymbol, FunctionNode& functionNode, ContainerScope* containerScope, BoundCompileUnit& boundCompileUnit);
 
-class StatementBinder : public Visitor
+class BINDER_API StatementBinder : public Visitor
 {
 public:
     StatementBinder(BoundCompileUnit& boundCompileUnit_);

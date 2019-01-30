@@ -5,6 +5,7 @@
 
 #ifndef CMAJOR_SYMBOLS_SYMBOL_READER_INCLUDED
 #define CMAJOR_SYMBOLS_SYMBOL_READER_INCLUDED
+#include <cmajor/symbols/SymbolsApi.hpp>
 #include <cmajor/ast/AstReader.hpp>
 
 namespace cmajor { namespace symbols {
@@ -23,7 +24,7 @@ class FunctionSymbol;
 class ClassTypeSymbol;
 class ParameterSymbol;
 
-class SymbolReader
+class SYMBOLS_API SymbolReader
 {
 public:
     SymbolReader(const std::string& fileName_);

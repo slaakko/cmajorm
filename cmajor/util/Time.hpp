@@ -5,6 +5,7 @@
 
 #ifndef CMAJOR_UTIL_TIME_INCLUDED
 #define CMAJOR_UTIL_TIME_INCLUDED
+#include <cmajor/util/UtilApi.hpp>
 #include <stdint.h>
 #include <string>
 
@@ -44,9 +45,9 @@ private:
     int8_t day;
 };
 
-Date GetCurrentDate();
+UTIL_API Date GetCurrentDate();
 
-class DateTime
+class UTIL_API DateTime
 {
 public:
     DateTime() : date(), secs(0)
@@ -81,11 +82,11 @@ private:
     int32_t secs;
 };
 
-DateTime GetCurrentDateTime();
+UTIL_API DateTime GetCurrentDateTime();
 
-std::string FormatTimeMs(int32_t milliseconds);
+UTIL_API std::string FormatTimeMs(int32_t milliseconds);
 
-std::int64_t CurrentMs();
+UTIL_API std::int64_t CurrentMs();
 
 } } // namespace cmajor::util
 

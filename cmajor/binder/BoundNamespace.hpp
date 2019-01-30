@@ -12,10 +12,12 @@ namespace cmajor { namespace binder {
 
 using namespace cmajor::ast;
 
-class BoundNamespace : public BoundNode
+class BINDER_API BoundNamespace : public BoundNode
 {
 public:
     BoundNamespace(Module* module_, NamespaceNode& namespaceNode_);
+    BoundNamespace(const BoundNamespace&) = delete;
+    BoundNamespace& operator=(const BoundNamespace&) = delete;
     void Accept(BoundNodeVisitor& visitor) override;
     void Load(Emitter& emitter, OperationFlags flags) override;
     void Store(Emitter& emitter, OperationFlags flags) override;

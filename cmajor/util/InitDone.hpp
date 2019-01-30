@@ -5,11 +5,12 @@
 
 #ifndef CMAJOR_UTIL_INIT_DONE_INCLUDED
 #define CMAJOR_UTIL_INIT_DONE_INCLUDED
+#include <cmajor/util/UtilApi.hpp>
 
 namespace cmajor { namespace util {
 
-void Init();
-void Done();
+UTIL_API void Init();
+UTIL_API void Done();
 
 } } // namespace cmajor::util
 

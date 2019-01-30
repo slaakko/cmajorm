@@ -5,6 +5,7 @@
 
 #ifndef CMAJOR_UTIL_PATH_INCLUDED
 #define CMAJOR_UTIL_PATH_INCLUDED
+#include <cmajor/util/UtilApi.hpp>
 #include <stdexcept>
 
 namespace cmajor { namespace util {
@@ -15,13 +16,13 @@ public:
     InvalidPathException(const std::string& message_);
 };
 
-std::string GetCurrentWorkingDirectory();
-bool FileExists(const std::string& filePath);
-bool DirectoryExists(const std::string& directoryPath);
-bool PathExists(const std::string& path);
-std::string GetFullPath(const std::string& path);
+UTIL_API std::string GetCurrentWorkingDirectory();
+UTIL_API bool FileExists(const std::string& filePath);
+UTIL_API bool DirectoryExists(const std::string& directoryPath);
+UTIL_API bool PathExists(const std::string& path);
+UTIL_API std::string GetFullPath(const std::string& path);
 
-class Path
+class UTIL_API Path
 {
 public:
     static std::string MakeCanonical(const std::string& path);

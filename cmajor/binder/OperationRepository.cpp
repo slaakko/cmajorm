@@ -18,7 +18,6 @@
 #include <cmajor/ast/Identifier.hpp>
 #include <cmajor/ast/Expression.hpp>
 #include <cmajor/util/Unicode.hpp>
-#include <llvm/IR/Constant.h>
 
 namespace cmajor { namespace binder {
 
@@ -34,7 +33,7 @@ public:
     const char* ClassName() const override { return "PointerDefaultCtor"; }
 private:
     TypeSymbol* type;
-    llvm::Value* nullValue;
+    void* nullValue;
 };
 
 PointerDefaultCtor::PointerDefaultCtor(TypeSymbol* type_, const Span& span) : FunctionSymbol(span, U"@constructor"), type(type_), nullValue(nullptr)
@@ -52,7 +51,7 @@ void PointerDefaultCtor::GenerateCall(Emitter& emitter, std::vector<GenObject*>&
     Assert(genObjects.size() == 1, "default constructor needs one object");
     if (!nullValue)
     {
-        nullValue = llvm::Constant::getNullValue(type->IrType(emitter));
+        nullValue = emitter.CreateDefaultIrValueForPtrType(type->IrType(emitter));
     }
     emitter.Stack().Push(nullValue);
     genObjects[0]->Store(emitter, OperationFlags::none);
@@ -129,7 +128,7 @@ void PointerCopyCtor::GenerateCall(Emitter& emitter, std::vector<GenObject*>& ge
     if ((flags & OperationFlags::leaveFirstArg) != OperationFlags::none)
     {
         emitter.Stack().Dup();
-        llvm::Value* ptr = emitter.Stack().Pop();
+        void* ptr = emitter.Stack().Pop();
         emitter.SaveObjectPointer(ptr);
     }
     genObjects[0]->Store(emitter, OperationFlags::none);
@@ -206,12 +205,12 @@ void PointerMoveCtor::GenerateCall(Emitter& emitter, std::vector<GenObject*>& ge
 {
     Assert(genObjects.size() == 2, "move constructor needs two objects");
     genObjects[1]->Load(emitter, OperationFlags::none);
-    llvm::Value* rvalueRefValue = emitter.Stack().Pop();
-    emitter.Stack().Push(emitter.Builder().CreateLoad(rvalueRefValue));
+    void* rvalueRefValue = emitter.Stack().Pop();
+    emitter.Stack().Push(emitter.CreateLoad(rvalueRefValue));
     if ((flags & OperationFlags::leaveFirstArg) != OperationFlags::none)
     {
         emitter.Stack().Dup();
-        llvm::Value* ptr = emitter.Stack().Pop();
+        void* ptr = emitter.Stack().Pop();
         emitter.SaveObjectPointer(ptr);
     }
     genObjects[0]->Store(emitter, OperationFlags::none);
@@ -364,8 +363,8 @@ void PointerMoveAssignment::GenerateCall(Emitter& emitter, std::vector<GenObject
 {
     Assert(genObjects.size() == 2, "copy assignment needs two objects");
     genObjects[1]->Load(emitter, OperationFlags::none);
-    llvm::Value* rvalueRefValue = emitter.Stack().Pop();
-    emitter.Stack().Push(emitter.Builder().CreateLoad(rvalueRefValue));
+    void* rvalueRefValue = emitter.Stack().Pop();
+    emitter.Stack().Push(emitter.CreateLoad(rvalueRefValue));
     genObjects[0]->Store(emitter, OperationFlags::none);
 }
 
@@ -441,7 +440,7 @@ void PointerReturn::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genO
     if ((flags & OperationFlags::leaveFirstArg) != OperationFlags::none)
     {
         emitter.Stack().Dup();
-        llvm::Value* ptr = emitter.Stack().Pop();
+        void* ptr = emitter.Stack().Pop();
         emitter.SaveObjectPointer(ptr);
     }
 }
@@ -512,10 +511,10 @@ void PointerPlusOffset::GenerateCall(Emitter& emitter, std::vector<GenObject*>& 
 {
     Assert(genObjects.size() == 2, "operator+ needs two objects");
     genObjects[0]->Load(emitter, OperationFlags::none);
-    llvm::Value* left = emitter.Stack().Pop();
+    void* left = emitter.Stack().Pop();
     genObjects[1]->Load(emitter, OperationFlags::none);
-    llvm::Value* right = emitter.Stack().Pop();
-    emitter.Stack().Push(emitter.Builder().CreateGEP(left, right));
+    void* right = emitter.Stack().Pop();
+    emitter.Stack().Push(emitter.ComputeAddress(left, right));
 }
 
 class PointerPlusOffsetOperation : public Operation
@@ -592,10 +591,10 @@ void OffsetPlusPointer::GenerateCall(Emitter& emitter, std::vector<GenObject*>& 
 {
     Assert(genObjects.size() == 2, "operator+ needs two objects");
     genObjects[0]->Load(emitter, OperationFlags::none);
-    llvm::Value* left = emitter.Stack().Pop();
+    void* left = emitter.Stack().Pop();
     genObjects[1]->Load(emitter, OperationFlags::none);
-    llvm::Value* right = emitter.Stack().Pop();
-    emitter.Stack().Push(emitter.Builder().CreateGEP(right, left));
+    void* right = emitter.Stack().Pop();
+    emitter.Stack().Push(emitter.ComputeAddress(right, left));
 }
 
 class OffsetPlusPointerOperation : public Operation
@@ -673,11 +672,11 @@ void PointerMinusOffset::GenerateCall(Emitter& emitter, std::vector<GenObject*>&
 {
     Assert(genObjects.size() == 2, "operator- needs two objects");
     genObjects[0]->Load(emitter, OperationFlags::none);
-    llvm::Value* left = emitter.Stack().Pop();
+    void* left = emitter.Stack().Pop();
     genObjects[1]->Load(emitter, OperationFlags::none);
-    llvm::Value* right = emitter.Stack().Pop();
-    llvm::Value* offset = emitter.Builder().CreateNeg(right);
-    emitter.Stack().Push(emitter.Builder().CreateGEP(left, offset));
+    void* right = emitter.Stack().Pop();
+    void* offset = emitter.CreateNeg(right);
+    emitter.Stack().Push(emitter.ComputeAddress(left, offset));
 }
 
 class PointerMinusOffsetOperation : public Operation
@@ -754,10 +753,10 @@ void PointerMinusPointer::GenerateCall(Emitter& emitter, std::vector<GenObject*>
 {
     Assert(genObjects.size() == 2, "operator- needs two objects");
     genObjects[0]->Load(emitter, OperationFlags::none);
-    llvm::Value* left = emitter.Stack().Pop();
+    void* left = emitter.Stack().Pop();
     genObjects[1]->Load(emitter, OperationFlags::none);
-    llvm::Value* right = emitter.Stack().Pop();
-    emitter.Stack().Push(emitter.Builder().CreatePtrDiff(left, right));
+    void* right = emitter.Stack().Pop();
+    emitter.Stack().Push(emitter.CreatePtrDiff(left, right));
 }
 
 class PointerMinusPointerOperation : public Operation
@@ -827,10 +826,10 @@ void PointerEqual::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genOb
 {
     Assert(genObjects.size() == 2, "operator== needs two objects");
     genObjects[0]->Load(emitter, OperationFlags::none);
-    llvm::Value* left = emitter.Stack().Pop();
+    void* left = emitter.Stack().Pop();
     genObjects[1]->Load(emitter, OperationFlags::none);
-    llvm::Value* right = emitter.Stack().Pop();
-    emitter.Stack().Push(emitter.Builder().CreateICmpEQ(left, right));
+    void* right = emitter.Stack().Pop();
+    emitter.Stack().Push(emitter.CreateICmpEQ(left, right));
 }
 
 class PointerEqualOperation : public Operation
@@ -904,10 +903,10 @@ void PointerLess::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObj
 {
     Assert(genObjects.size() == 2, "operator< needs two objects");
     genObjects[0]->Load(emitter, OperationFlags::none);
-    llvm::Value* left = emitter.Stack().Pop();
+    void* left = emitter.Stack().Pop();
     genObjects[1]->Load(emitter, OperationFlags::none);
-    llvm::Value* right = emitter.Stack().Pop();
-    emitter.Stack().Push(emitter.Builder().CreateICmpULT(left, right));
+    void* right = emitter.Stack().Pop();
+    emitter.Stack().Push(emitter.CreateICmpULT(left, right));
 }
 
 class PointerLessOperation : public Operation
@@ -1192,8 +1191,8 @@ void LvalueReferenceMoveAssignment::GenerateCall(Emitter& emitter, std::vector<G
 {
     Assert(genObjects.size() == 2, "copy assignment needs two objects");
     genObjects[1]->Load(emitter, OperationFlags::none);
-    llvm::Value* rvalueRefValue = emitter.Stack().Pop();
-    emitter.Stack().Push(emitter.Builder().CreateLoad(rvalueRefValue));
+    void* rvalueRefValue = emitter.Stack().Pop();
+    emitter.Stack().Push(emitter.CreateLoad(rvalueRefValue));
     genObjects[0]->Store(emitter, OperationFlags::none);
 }
 
@@ -1406,8 +1405,8 @@ void RvalueReferenceCopyAssignment::GenerateCall(Emitter& emitter, std::vector<G
 {
     Assert(genObjects.size() == 2, "copy assignment needs two objects");
     genObjects[1]->Load(emitter, OperationFlags::none);
-    llvm::Value* rvalueRefValue = emitter.Stack().Pop();
-    emitter.Stack().Push(emitter.Builder().CreateLoad(rvalueRefValue));
+    void* rvalueRefValue = emitter.Stack().Pop();
+    emitter.Stack().Push(emitter.CreateLoad(rvalueRefValue));
     genObjects[0]->Store(emitter, OperationFlags::none);
 }
 

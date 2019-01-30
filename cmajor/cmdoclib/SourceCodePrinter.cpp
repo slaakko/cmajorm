@@ -578,7 +578,7 @@ void SourceCodePrinter::WriteType(TypeSymbol* type)
     else if (type->GetSymbolType() == SymbolType::derivedTypeSymbol)
     {
         DerivedTypeSymbol* derivedTypeSymbol = static_cast<DerivedTypeSymbol*>(type);
-        const DerivationVec& derivations = derivedTypeSymbol->DerivationRec().derivations;
+        const std::vector<Derivation>& derivations = derivedTypeSymbol->DerivationRec().derivations;
         if (HasFrontConstDerivation(derivations))
         {
             Keyword(U"const");

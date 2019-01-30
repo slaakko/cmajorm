@@ -13,7 +13,7 @@ namespace cmajor { namespace symbols {
 class MemberFunctionSymbol;
 class InterfaceTypeCopyConstructor;
 
-class InterfaceTypeSymbol : public TypeSymbol
+class SYMBOLS_API InterfaceTypeSymbol : public TypeSymbol
 {
 public:
     InterfaceTypeSymbol(const Span& span_, const std::u32string& name_);
@@ -21,8 +21,8 @@ public:
     void AddMember(Symbol* member) override;
     void Accept(SymbolCollector* collector) override;
     void SetSpecifiers(Specifiers specifiers);
-    llvm::Type* IrType(Emitter& emitter) override;
-    llvm::Constant* CreateDefaultIrValue(Emitter& emitter) override;
+    void* IrType(Emitter& emitter) override;
+    void* CreateDefaultIrValue(Emitter& emitter) override;
     const std::vector<MemberFunctionSymbol*>& MemberFunctions() const { return memberFunctions; }
     void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, MemberFunctionSymbol* interfaceMemberFunction, const Span& span);
     void SetCopyConstructor(InterfaceTypeCopyConstructor* copyConstructor_) { copyConstructor = copyConstructor_; }
@@ -35,7 +35,7 @@ private:
     InterfaceTypeCopyConstructor* copyConstructor;
 };
 
-class InterfaceTypeDefaultConstructor : public FunctionSymbol
+class SYMBOLS_API InterfaceTypeDefaultConstructor : public FunctionSymbol
 {
 public:
     InterfaceTypeDefaultConstructor(InterfaceTypeSymbol* interfaceType_, const Span& span_);
@@ -44,7 +44,7 @@ public:
     const char* ClassName() const override { return "InterfaceTypeDefaultConstructor"; }
 };
 
-class InterfaceTypeCopyConstructor : public FunctionSymbol
+class SYMBOLS_API InterfaceTypeCopyConstructor : public FunctionSymbol
 {
 public:
     InterfaceTypeCopyConstructor(InterfaceTypeSymbol* interfaceType_, const Span& span_);
@@ -53,7 +53,7 @@ public:
     const char* ClassName() const override { return "InterfaceTypeCopyConstructor"; }
 };
 
-class InterfaceTypeMoveConstructor : public FunctionSymbol
+class SYMBOLS_API InterfaceTypeMoveConstructor : public FunctionSymbol
 {
 public:
     InterfaceTypeMoveConstructor(InterfaceTypeSymbol* interfaceType_, const Span& span_);
@@ -62,7 +62,7 @@ public:
     const char* ClassName() const override { return "InterfaceTypeMoveConstructor"; }
 };
 
-class InterfaceTypeCopyAssignment : public FunctionSymbol
+class SYMBOLS_API InterfaceTypeCopyAssignment : public FunctionSymbol
 {
 public:
     InterfaceTypeCopyAssignment(InterfaceTypeSymbol* interfaceType_, const Span& span_);
@@ -71,7 +71,7 @@ public:
     const char* ClassName() const override { return "InterfaceTypeCopyAssignment"; }
 };
 
-class InterfaceTypeMoveAssignment : public FunctionSymbol
+class SYMBOLS_API InterfaceTypeMoveAssignment : public FunctionSymbol
 {
 public:
     InterfaceTypeMoveAssignment(InterfaceTypeSymbol* interfaceType_, const Span& span_);
@@ -80,7 +80,7 @@ public:
     const char* ClassName() const override { return "InterfaceTypeMoveAssignment"; }
 };
 
-class ClassToInterfaceConversion : public FunctionSymbol
+class SYMBOLS_API ClassToInterfaceConversion : public FunctionSymbol
 {
 public:
     ClassToInterfaceConversion(ClassTypeSymbol* sourceClassType_, InterfaceTypeSymbol* targetInterfaceType_, int32_t interfaceIndex_, const Span& span_);

@@ -5,6 +5,7 @@
 
 #ifndef CMAJOR_AST_PROJECT_INCLUDED
 #define CMAJOR_AST_PROJECT_INCLUDED
+#include <cmajor/ast/AstApi.hpp>
 #include <boost/filesystem.hpp>
 #include <string>
 #include <vector>
@@ -12,26 +13,28 @@
 
 namespace cmajor { namespace ast {
 
-std::string CmajorRootDir();
-std::string CmajorSystemLibDir(const std::string& config);
-std::string CmajorSystemModuleFilePath(const std::string& config);
+AST_API std::string CmajorRootDir();
+AST_API std::string CmajorSystemLibDir(const std::string& config);
+AST_API std::string CmajorSystemModuleFilePath(const std::string& config);
 
 enum class ProjectDeclarationType : uint8_t
 {
     referenceDeclaration, sourceFileDeclaration, textFileDeclaration, targetDeclaration
 };
 
-class ProjectDeclaration
+class AST_API ProjectDeclaration
 {
 public:
     ProjectDeclaration(ProjectDeclarationType declarationType_);
+    ProjectDeclaration(const ProjectDeclaration&) = delete;
+    ProjectDeclaration& operator=(const ProjectDeclaration&) = delete;
     virtual ~ProjectDeclaration();
     ProjectDeclarationType GetDeclarationType() const { return declarationType; }
 private:
     ProjectDeclarationType declarationType;
 };
 
-class ReferenceDeclaration : public ProjectDeclaration
+class AST_API ReferenceDeclaration : public ProjectDeclaration
 {
 public:
     ReferenceDeclaration(const std::string& filePath_);
@@ -40,7 +43,7 @@ private:
     std::string filePath;
 };
 
-class SourceFileDeclaration : public ProjectDeclaration
+class AST_API SourceFileDeclaration : public ProjectDeclaration
 {
 public:
     SourceFileDeclaration(const std::string& filePath_);
@@ -49,7 +52,7 @@ private:
     std::string filePath;
 };
 
-class TextFileDeclaration : public ProjectDeclaration
+class AST_API TextFileDeclaration : public ProjectDeclaration
 {
 public:
     TextFileDeclaration(const std::string& filePath_);
@@ -63,7 +66,7 @@ enum class Target
     program, library, unitTest
 };
 
-class TargetDeclaration : public ProjectDeclaration
+class AST_API TargetDeclaration : public ProjectDeclaration
 {
 public:
     TargetDeclaration(Target target_);
@@ -72,10 +75,12 @@ private:
     Target target;
 };
 
-class Project
+class AST_API Project
 {
 public:
     Project(const std::u32string& name_, const std::string& filePath_, const std::string& config_);
+    Project(const Project&) = delete;
+    Project& operator=(const Project&) = delete;
     const std::u32string& Name() const { return name; }
     const std::string& FilePath() const { return filePath; }
     const boost::filesystem::path& BasePath() const { return basePath; }

@@ -21,7 +21,6 @@
 #include <cmajor/util/Sha1.hpp>
 #include <cmajor/util/Uuid.hpp>
 #include <cmajor/util/Prime.hpp>
-#include <llvm/IR/Module.h>
 #include <boost/uuid/uuid_generators.hpp>
 #include <boost/uuid/uuid_io.hpp>
 
@@ -33,13 +32,13 @@ ClassGroupTypeSymbol::ClassGroupTypeSymbol(const Span& span_, const std::u32stri
 {
 }
 
-llvm::Type* ClassGroupTypeSymbol::IrType(Emitter& emitter)
+void* ClassGroupTypeSymbol::IrType(Emitter& emitter)
 {
     Assert(false, "tried to get ir type of class group");
     return nullptr;
 }
 
-llvm::Constant* ClassGroupTypeSymbol::CreateDefaultIrValue(Emitter& emitter)
+void* ClassGroupTypeSymbol::CreateDefaultIrValue(Emitter& emitter)
 {
     Assert(false, "tried to create default ir value of class group");
     return nullptr;
@@ -1202,16 +1201,16 @@ bool ClassTypeSymbol::IsRecursive()
     }
 }
 
-llvm::Type* ClassTypeSymbol::IrType(Emitter& emitter)
+void* ClassTypeSymbol::IrType(Emitter& emitter)
 {
     if (!IsBound())
     {
         throw Exception(GetRootModuleForCurrentThread(), "class '" + ToUtf8(Name()) + "' not bound", GetSpan());
     }
-    llvm::Type* localIrType = emitter.GetIrTypeByTypeId(TypeId());
+    void* localIrType = emitter.GetIrTypeByTypeId(TypeId());
     if (!localIrType)
     {
-        std::vector<llvm::Type*> elementTypes;
+        std::vector<void*> elementTypes;
         int n = objectLayout.size();
         if (!IsRecursive())
         {
@@ -1220,12 +1219,13 @@ llvm::Type* ClassTypeSymbol::IrType(Emitter& emitter)
                 TypeSymbol* elementType = objectLayout[i];
                 elementTypes.push_back(elementType->IrType(emitter));
             }
-            localIrType = llvm::StructType::get(emitter.Context(), elementTypes);
+            localIrType = emitter.GetIrTypeForClassType(elementTypes);
             emitter.SetIrTypeByTypeId(TypeId(), localIrType);
         }
         else
         {
-            llvm::StructType* forwardDeclaredType = llvm::StructType::create(emitter.Context());
+
+            void* forwardDeclaredType = emitter.CreateFwdIrTypeForClassType();
             localIrType = forwardDeclaredType;
             emitter.SetIrTypeByTypeId(TypeId(), localIrType);
             for (int i = 0; i < n; ++i)
@@ -1233,60 +1233,52 @@ llvm::Type* ClassTypeSymbol::IrType(Emitter& emitter)
                 TypeSymbol* elementType = objectLayout[i];
                 elementTypes.push_back(elementType->IrType(emitter));
             }
-            forwardDeclaredType->setBody(elementTypes);
+            emitter.SetFwdIrTypeBody(forwardDeclaredType, elementTypes);
         }
     }
     return localIrType;
 }
 
-llvm::Constant* ClassTypeSymbol::CreateDefaultIrValue(Emitter& emitter)
+void* ClassTypeSymbol::CreateDefaultIrValue(Emitter& emitter)
 {
-    llvm::Type* irType = IrType(emitter);
-    std::vector<llvm::Constant*> arrayOfDefaults;
+    void* irType = IrType(emitter);
+    std::vector<void*> arrayOfDefaults;
     for (TypeSymbol* type : objectLayout)
     {
         arrayOfDefaults.push_back(type->CreateDefaultIrValue(emitter));
     }
-    return llvm::ConstantStruct::get(llvm::cast<llvm::StructType>(irType), arrayOfDefaults);
+    return emitter.CreateDefaultIrValueForStruct(irType, arrayOfDefaults);
 }
 
-llvm::DIType* ClassTypeSymbol::CreateDIType(Emitter& emitter)
+void* ClassTypeSymbol::CreateDIType(Emitter& emitter)
 {
-    llvm::DIType* baseClassDIType = nullptr;
+    void* baseClassDIType = nullptr;
     if (baseClass)
     {
         baseClassDIType = baseClass->GetDIType(emitter);
     }
-    llvm::DIType* vtableHolderClass = nullptr;
+    void* vtableHolderClass = nullptr;
     if (IsPolymorphic() && VmtPtrHolderClass())
     {
         vtableHolderClass = VmtPtrHolderClass()->CreateDIForwardDeclaration(emitter);
         emitter.MapFwdDeclaration(vtableHolderClass, VmtPtrHolderClass()->TypeId());
     }
-    std::vector<llvm::Metadata*> elements;
-    const llvm::StructLayout* structLayout = emitter.DataLayout()->getStructLayout(llvm::cast<llvm::StructType>(IrType(emitter)));
+    std::vector<void*> elements;
     for (MemberVariableSymbol* memberVariable : memberVariables)
     {
-        int memberVariableLayoutIndex = memberVariable->LayoutIndex();
-        uint64_t offsetInBits = structLayout->getElementOffsetInBits(memberVariableLayoutIndex);
+        uint64_t offsetInBits = emitter.GetOffsetInBits(IrType(emitter), memberVariable->LayoutIndex());
         elements.push_back(memberVariable->GetDIMemberType(emitter, offsetInBits));
     }
-    llvm::MDNode* templateParams = nullptr;
-    uint64_t sizeInBits = structLayout->getSizeInBits();
-    uint32_t alignInBits = 8 * structLayout->getAlignment();
-    uint64_t offsetInBits = 0; // todo?
-    llvm::DINode::DIFlags flags = llvm::DINode::DIFlags::FlagZero;
     Span classSpan = GetSpan();
     if (GetSymbolType() == SymbolType::classTemplateSpecializationSymbol)
     {
         ClassTemplateSpecializationSymbol* specialization = static_cast<ClassTemplateSpecializationSymbol*>(this);
         classSpan = specialization->GetClassTemplate()->GetSpan();
     }
-    return emitter.DIBuilder()->createClassType(nullptr, ToUtf8(Name()), emitter.GetFile(classSpan.FileIndex()), classSpan.LineNumber(), sizeInBits, alignInBits, offsetInBits,
-        flags, baseClassDIType, emitter.DIBuilder()->getOrCreateArray(elements), vtableHolderClass, templateParams, ToUtf8(MangledName()));
+    return emitter.CreateDITypeForClassType(IrType(emitter), elements, classSpan, ToUtf8(Name()), vtableHolderClass, ToUtf8(MangledName()), baseClassDIType);
 }
 
-llvm::DIType* ClassTypeSymbol::CreateDIForwardDeclaration(Emitter& emitter)
+void* ClassTypeSymbol::CreateDIForwardDeclaration(Emitter& emitter)
 {
     Span classSpan = GetSpan();
     if (GetSymbolType() == SymbolType::classTemplateSpecializationSymbol)
@@ -1294,11 +1286,7 @@ llvm::DIType* ClassTypeSymbol::CreateDIForwardDeclaration(Emitter& emitter)
         ClassTemplateSpecializationSymbol* specialization = static_cast<ClassTemplateSpecializationSymbol*>(this);
         classSpan = specialization->GetClassTemplate()->GetSpan();
     }
-    uint64_t sizeInBits = emitter.DataLayout()->getStructLayout(llvm::cast<llvm::StructType>(IrType(emitter)))->getSizeInBits();
-    uint32_t alignInBits = 8 * emitter.DataLayout()->getStructLayout(llvm::cast<llvm::StructType>(IrType(emitter)))->getAlignment();
-    uint64_t offsetInBits = 0; // todo?
-    return emitter.DIBuilder()->createReplaceableCompositeType(llvm::dwarf::DW_TAG_class_type, ToUtf8(Name()), nullptr, emitter.GetFile(classSpan.FileIndex()), classSpan.LineNumber(),
-        0, sizeInBits, alignInBits, llvm::DINode::DIFlags::FlagZero, ToUtf8(MangledName()));
+    return emitter.CreateIrDIForwardDeclaration(IrType(emitter), ToUtf8(Name()), ToUtf8(MangledName()), classSpan);
 }
 
 std::string ClassTypeSymbol::VmtObjectNameStr()
@@ -1356,88 +1344,82 @@ ClassTypeSymbol* ClassTypeSymbol::VmtPtrHolderClass()
     }
 }
 
-llvm::Type* ClassTypeSymbol::VmtPtrType(Emitter& emitter)
+void* ClassTypeSymbol::VmtPtrType(Emitter& emitter)
 {
-    return llvm::PointerType::get(llvm::ArrayType::get(emitter.Builder().getInt8PtrTy(), vmt.size() + functionVmtIndexOffset), 0);
+    void* vmtArrayType = emitter.GetIrTypeForArrayType(emitter.GetIrTypeForVoidPtrType(), vmt.size() + functionVmtIndexOffset);
+    void* vmtPtrType = emitter.GetIrTypeForPtrType(vmtArrayType);
+    return vmtPtrType;
 }
 
-llvm::Value* ClassTypeSymbol::CreateImt(Emitter& emitter, int index)
+void* ClassTypeSymbol::CreateImt(Emitter& emitter, int index)
 {
     std::vector<FunctionSymbol*>& imt = imts[index];
     std::string imtObjectName = ImtObjectName(index);
-    llvm::ArrayType* imtType = llvm::ArrayType::get(emitter.Builder().getInt8PtrTy(), imt.size());
-    llvm::Constant* imtObject = emitter.Module()->getOrInsertGlobal(imtObjectName, imtType);
-    llvm::Comdat* comdat = emitter.Module()->getOrInsertComdat(imtObjectName);
-    llvm::GlobalVariable* imtObjectGlobal = llvm::cast<llvm::GlobalVariable>(imtObject);
-    imtObjectGlobal->setComdat(comdat);
-    std::vector<llvm::Constant*> irImt;
+    void* imtType = emitter.GetIrTypeForArrayType(emitter.GetIrTypeForVoidPtrType(), imt.size());
+    void* imtObject = emitter.GetOrInsertGlobal(imtObjectName, imtType);
+    void* comdat = emitter.GetOrInsertAnyComdat(imtObjectName, imtObject);
+    std::vector<void*> irImt;
     int n = imt.size();
     for (int i = 0; i < n; ++i)
     {
         FunctionSymbol* memFun = imt[i];
-        llvm::Function* interfaceFun = llvm::cast<llvm::Function>(emitter.Module()->getOrInsertFunction(ToUtf8(memFun->MangledName()), memFun->IrType(emitter)));
-        irImt.push_back(llvm::cast<llvm::Constant>(emitter.Builder().CreateBitCast(interfaceFun, emitter.Builder().getInt8PtrTy())));
+        void* interfaceFun = emitter.GetOrInsertFunction(ToUtf8(memFun->MangledName()), memFun->IrType(emitter));
+        irImt.push_back(emitter.CreateBitCast(interfaceFun, emitter.GetIrTypeForVoidPtrType()));
     }
-    imtObjectGlobal->setInitializer(llvm::ConstantArray::get(imtType, irImt));
+    emitter.SetInitializer(imtObject, emitter.CreateIrValueForConstantArray(imtType, irImt));
     return imtObject;
 }
 
-llvm::Value* ClassTypeSymbol::CreateImts(Emitter& emitter)
+void* ClassTypeSymbol::CreateImts(Emitter& emitter)
 {
     std::string imtArrayObjectName = ImtArrayObjectName(emitter);
-    llvm::ArrayType* imtsArrayType = llvm::ArrayType::get(emitter.Builder().getInt8PtrTy(), implementedInterfaces.size());
-    llvm::Constant* imtsArrayObject = emitter.Module()->getOrInsertGlobal(imtArrayObjectName, imtsArrayType);
-    llvm::Comdat* comdat = emitter.Module()->getOrInsertComdat(imtArrayObjectName);
-    llvm::GlobalVariable* imtsArrayObjectGlobal = llvm::cast<llvm::GlobalVariable>(imtsArrayObject);
-    imtsArrayObjectGlobal->setComdat(comdat);
-    std::vector<llvm::Constant*> imtsArray;
+    void* imtsArrayType = emitter.GetIrTypeForArrayType(emitter.GetIrTypeForVoidPtrType(), implementedInterfaces.size());
+    void* imtsArrayObject = emitter.GetOrInsertGlobal(imtArrayObjectName, imtsArrayType);
+    void* comdat = emitter.GetOrInsertAnyComdat(imtArrayObjectName, imtsArrayObject);
+    std::vector<void*> imtsArray;
     int n = imts.size();
     for (int i = 0; i < n; ++i)
     {
-        llvm::Value* irImt = CreateImt(emitter, i);
-        imtsArray.push_back(llvm::cast<llvm::Constant>(emitter.Builder().CreateBitCast(irImt, emitter.Builder().getInt8PtrTy())));
+        void* irImt = CreateImt(emitter, i);
+        imtsArray.push_back(emitter.CreateBitCast(irImt, emitter.GetIrTypeForVoidPtrType()));
     }
-    imtsArrayObjectGlobal->setInitializer(llvm::ConstantArray::get(imtsArrayType, imtsArray));
+    emitter.SetInitializer(imtsArrayObject, emitter.CreateIrValueForConstantArray(imtsArrayType, imtsArray));
     return imtsArrayObject;
 }
 
-llvm::Value* ClassTypeSymbol::VmtObject(Emitter& emitter, bool create)
+void* ClassTypeSymbol::VmtObject(Emitter& emitter, bool create)
 {
     if (!IsPolymorphic()) return nullptr;
-    llvm::ArrayType* localVmtObjectType = emitter.GetVmtObjectType(this);
+    void* localVmtObjectType = emitter.GetVmtObjectType(this);
     if (!localVmtObjectType)
     {
-        localVmtObjectType = llvm::ArrayType::get(emitter.Builder().getInt8PtrTy(), vmt.size() + functionVmtIndexOffset);
+        localVmtObjectType = emitter.GetIrTypeForArrayType(emitter.GetIrTypeForVoidPtrType(), vmt.size() + functionVmtIndexOffset);
         emitter.SetVmtObjectType(this, localVmtObjectType);
     }
-    llvm::Constant* vmtObject = emitter.Module()->getOrInsertGlobal(VmtObjectName(emitter), localVmtObjectType);
+    void* vmtObject = emitter.GetOrInsertGlobal(VmtObjectName(emitter), localVmtObjectType);
     if (!emitter.IsVmtObjectCreated(this) && create)
     {
         emitter.SetVmtObjectCreated(this);
         std::string vmtObjectName = VmtObjectName(emitter);
-        llvm::Comdat* comdat = emitter.Module()->getOrInsertComdat(vmtObjectName);
-        GetRootModuleForCurrentThread()->AddExportedData(vmtObjectName);
-        comdat->setSelectionKind(llvm::Comdat::SelectionKind::Any);
-        llvm::GlobalVariable* vmtObjectGlobal = llvm::cast<llvm::GlobalVariable>(vmtObject);
-        vmtObjectGlobal->setComdat(comdat);
-        std::vector<llvm::Constant*> vmtArray;
-        vmtArray.push_back(llvm::Constant::getNullValue(emitter.Builder().getInt8PtrTy())); // 64-bit class id, initially 0, dynamically initialized
+        void* comdat = emitter.GetOrInsertAnyComdat(vmtObjectName, vmtObject);
+        std::vector<void*> vmtArray;
+        vmtArray.push_back(emitter.CreateDefaultIrValueForVoidPtrType()); // 64-bit class id, initially 0, dynamically initialized
         uint64_t typeId1 = 0;
         uint64_t typeId2 = 0;
         UuidToInts(TypeId(), typeId1, typeId2);
 //      16-byte type id:
-        vmtArray.push_back(llvm::cast<llvm::Constant>(emitter.Builder().CreateIntToPtr(emitter.Builder().getInt64(typeId1), emitter.Builder().getInt8PtrTy())));
-        vmtArray.push_back(llvm::cast<llvm::Constant>(emitter.Builder().CreateIntToPtr(emitter.Builder().getInt64(typeId2), emitter.Builder().getInt8PtrTy())));
-        llvm::Value* className = emitter.Builder().CreateGlobalStringPtr(ToUtf8(FullName())); 
-        vmtArray.push_back(llvm::cast<llvm::Constant>(emitter.Builder().CreateBitCast(className, emitter.Builder().getInt8PtrTy()))); // class name pointer
+        vmtArray.push_back(emitter.CreateIntToPtr(emitter.CreateIrValueForULong(typeId1), emitter.GetIrTypeForVoidPtrType()));
+        vmtArray.push_back(emitter.CreateIntToPtr(emitter.CreateIrValueForULong(typeId2), emitter.GetIrTypeForVoidPtrType()));
+        void* className = emitter.CreateGlobalStringPtr(ToUtf8(FullName()));
+        vmtArray.push_back(emitter.CreateBitCast(className, emitter.GetIrTypeForVoidPtrType())); // class name pointer
         if (!implementedInterfaces.empty())
         {
-            llvm::Value* itabsArrayObject = CreateImts(emitter);
-            vmtArray.push_back(llvm::cast<llvm::Constant>(emitter.Builder().CreateBitCast(itabsArrayObject, emitter.Builder().getInt8PtrTy()))); // interface method table pointer
+            void* itabsArrayObject = CreateImts(emitter);
+            vmtArray.push_back(emitter.CreateBitCast(itabsArrayObject, emitter.GetIrTypeForVoidPtrType())); // interface method table pointer
         }
         else
         {
-            vmtArray.push_back(llvm::Constant::getNullValue(emitter.Builder().getInt8PtrTy()));
+            vmtArray.push_back(emitter.CreateDefaultIrValueForVoidPtrType());
         }
 //      virtual method table:
         int n = vmt.size();
@@ -1446,51 +1428,51 @@ llvm::Value* ClassTypeSymbol::VmtObject(Emitter& emitter, bool create)
             FunctionSymbol* virtualFunction = vmt[i];
             if (!virtualFunction || virtualFunction->IsAbstract())
             {
-                vmtArray.push_back(llvm::Constant::getNullValue(emitter.Builder().getInt8PtrTy()));
+                vmtArray.push_back(emitter.CreateDefaultIrValueForVoidPtrType());
             }
             else
             {
-                llvm::Function* functionObject = llvm::cast<llvm::Function>(emitter.Module()->getOrInsertFunction(ToUtf8(virtualFunction->MangledName()), virtualFunction->IrType(emitter)));
-                vmtArray.push_back(llvm::cast<llvm::Constant>(emitter.Builder().CreateBitCast(functionObject, emitter.Builder().getInt8PtrTy())));
+                void* functionObject = emitter.GetOrInsertFunction(ToUtf8(virtualFunction->MangledName()), virtualFunction->IrType(emitter));
+                vmtArray.push_back(emitter.CreateBitCast(functionObject, emitter.GetIrTypeForVoidPtrType()));
             }
         }
-        vmtObjectGlobal->setInitializer(llvm::ConstantArray::get(localVmtObjectType, vmtArray));
+        void* initializer = emitter.CreateIrValueForConstantArray(localVmtObjectType, vmtArray);
+        emitter.SetInitializer(vmtObject, initializer);
     }
     return vmtObject;
 }
 
-llvm::Value* ClassTypeSymbol::StaticObject(Emitter& emitter, bool create)
+void* ClassTypeSymbol::StaticObject(Emitter& emitter, bool create)
 {
     if (staticLayout.empty()) return nullptr;
-    llvm::Constant* staticObject = emitter.Module()->getOrInsertGlobal(StaticObjectName(emitter), StaticObjectType(emitter));
+    void* staticObject = emitter.GetOrInsertGlobal(StaticObjectName(emitter), StaticObjectType(emitter));
     if (!emitter.IsStaticObjectCreated(this) && create)
     {
         emitter.SetStaticObjectCreated(this);
-        //this->SetStaticObjectCreated(); 
-        llvm::GlobalVariable* staticObjectGlobal = llvm::cast<llvm::GlobalVariable>(staticObject);
-        std::vector<llvm::Constant*> arrayOfStatics;
+        void* staticObjectGlobal = staticObject;
+        std::vector<void*> arrayOfStatics;
         for (TypeSymbol* type : staticLayout)
         {
             arrayOfStatics.push_back(type->CreateDefaultIrValue(emitter));
         }
-        staticObjectGlobal->setInitializer(llvm::ConstantStruct::get(StaticObjectType(emitter), arrayOfStatics));
+        emitter.SetInitializer(staticObjectGlobal, emitter.CreateIrValueForConstantStruct(StaticObjectType(emitter), arrayOfStatics));
     }
     return staticObject;
 }
 
-llvm::StructType* ClassTypeSymbol::StaticObjectType(Emitter& emitter)
+void* ClassTypeSymbol::StaticObjectType(Emitter& emitter)
 {
-    llvm::StructType* localStaticObjectType = emitter.GetStaticObjectType(this);
+    void* localStaticObjectType = emitter.GetStaticObjectType(this);
     if (!localStaticObjectType)
     {
-        std::vector<llvm::Type*> elementTypes;
+        std::vector<void*> elementTypes;
         int n = staticLayout.size();
         for (int i = 0; i < n; ++i)
         {
-            llvm::Type* elementType = staticLayout[i]->IrType(emitter);
+            void* elementType = staticLayout[i]->IrType(emitter);
             elementTypes.push_back(elementType);
         }
-        localStaticObjectType = llvm::StructType::get(emitter.Context(), elementTypes);
+        localStaticObjectType = emitter.GetIrTypeForStructType(elementTypes);
     }
     emitter.SetStaticObjectType(this, localStaticObjectType);
     return localStaticObjectType;

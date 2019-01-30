@@ -5,6 +5,7 @@
 
 #ifndef CMAJOR_CODEDOM_OPERATOR_INCLUDED
 #define CMAJOR_CODEDOM_OPERATOR_INCLUDED
+#include <cmajor/codedom/CodeDomApi.hpp>
 #include <string>
 
 namespace cmajor { namespace codedom {
@@ -16,10 +17,10 @@ enum class Operator
     assign, mulAssing, divAssign, remAssign, plusAssign, minusAssing, shiftLeftAssign, shiftRightAssign, andAssing, xorAssing, orAssign
 };
 
-Operator GetOperator(const std::u32string& operatorName);
-std::u32string GetOperatorStr(Operator op);
-void OperatorInit();
-void OperatorDone();
+CODEDOM_API Operator GetOperator(const std::u32string& operatorName);
+CODEDOM_API std::u32string GetOperatorStr(Operator op);
+CODEDOM_API void OperatorInit();
+CODEDOM_API void OperatorDone();
 
 } } // namespace cmajor::codedom
 

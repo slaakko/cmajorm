@@ -12,7 +12,7 @@ namespace cmajor { namespace ast {
 
 class IdentifierNode;
 
-class LabelNode : public Node
+class AST_API LabelNode : public Node
 {
 public:
     LabelNode(const Span& span_);
@@ -26,7 +26,7 @@ private:
     std::u32string label;
 };
 
-class StatementNode : public Node
+class AST_API StatementNode : public Node
 {
 public:
     StatementNode(NodeType nodeType_, const Span& span_);
@@ -46,7 +46,7 @@ private:
     std::unique_ptr<LabelNode> labelNode;
 };
 
-class CompoundStatementNode : public StatementNode
+class AST_API CompoundStatementNode : public StatementNode
 {
 public:
     CompoundStatementNode(const Span& span_);
@@ -66,7 +66,7 @@ private:
     Span endBraceSpan;
 };
 
-class ReturnStatementNode : public StatementNode
+class AST_API ReturnStatementNode : public StatementNode
 {
 public:
     ReturnStatementNode(const Span& span_);
@@ -84,7 +84,7 @@ private:
     std::unique_ptr<Node> expression;
 };
 
-class IfStatementNode : public StatementNode
+class AST_API IfStatementNode : public StatementNode
 {
 public:
     IfStatementNode(const Span& span_);
@@ -114,7 +114,7 @@ private:
     Span elseSpan;
 };
 
-class WhileStatementNode : public StatementNode
+class AST_API WhileStatementNode : public StatementNode
 {
 public:
     WhileStatementNode(const Span& span_);
@@ -140,7 +140,7 @@ private:
     Span rightParenSpan;
 };
 
-class DoStatementNode : public StatementNode
+class AST_API DoStatementNode : public StatementNode
 {
 public:
     DoStatementNode(const Span& span_);
@@ -169,7 +169,7 @@ private:
     Span rightParenSpan;
 };
 
-class ForStatementNode : public StatementNode
+class AST_API ForStatementNode : public StatementNode
 {
 public:
     ForStatementNode(const Span& span_);
@@ -201,7 +201,7 @@ private:
     Span rightParenSpan;
 };
 
-class BreakStatementNode : public StatementNode
+class AST_API BreakStatementNode : public StatementNode
 {
 public:
     BreakStatementNode(const Span& span_);
@@ -211,7 +211,7 @@ public:
     bool IsDefaultTerminatingNode() const override { return true; }
 };
 
-class ContinueStatementNode : public StatementNode
+class AST_API ContinueStatementNode : public StatementNode
 {
 public:
     ContinueStatementNode(const Span& span_);
@@ -221,7 +221,7 @@ public:
     bool IsDefaultTerminatingNode() const override { return true; }
 };
 
-class GotoStatementNode : public StatementNode
+class AST_API GotoStatementNode : public StatementNode
 {
 public:
     GotoStatementNode(const Span& span_);
@@ -235,7 +235,7 @@ private:
     std::u32string target;
 };
 
-class ConstructionStatementNode : public StatementNode
+class AST_API ConstructionStatementNode : public StatementNode
 {
 public:
     ConstructionStatementNode(const Span& span_);
@@ -262,7 +262,7 @@ private:
     bool empty;
 };
 
-class DeleteStatementNode : public StatementNode
+class AST_API DeleteStatementNode : public StatementNode
 {
 public:
     DeleteStatementNode(const Span& span_);
@@ -277,7 +277,7 @@ private:
     std::unique_ptr<Node> expression;
 };
 
-class DestroyStatementNode : public StatementNode
+class AST_API DestroyStatementNode : public StatementNode
 {
 public:
     DestroyStatementNode(const Span& span_);
@@ -292,7 +292,7 @@ private:
     std::unique_ptr<Node> expression;
 };
 
-class AssignmentStatementNode : public StatementNode
+class AST_API AssignmentStatementNode : public StatementNode
 {
 public:
     AssignmentStatementNode(const Span& span_);
@@ -310,7 +310,7 @@ private:
     std::unique_ptr<Node> sourceExpr;
 };
 
-class ExpressionStatementNode : public StatementNode
+class AST_API ExpressionStatementNode : public StatementNode
 {
 public:
     ExpressionStatementNode(const Span& span_);
@@ -325,7 +325,7 @@ private:
     std::unique_ptr<Node> expression;
 };
 
-class EmptyStatementNode : public StatementNode
+class AST_API EmptyStatementNode : public StatementNode
 {
 public:
     EmptyStatementNode(const Span& span_);
@@ -333,7 +333,7 @@ public:
     void Accept(Visitor& visitor) override;
 };
 
-class RangeForStatementNode : public StatementNode
+class AST_API RangeForStatementNode : public StatementNode
 {
 public:
     RangeForStatementNode(const Span& span_);
@@ -371,7 +371,7 @@ private:
 class CaseStatementNode;
 class DefaultStatementNode;
 
-class SwitchStatementNode : public StatementNode
+class AST_API SwitchStatementNode : public StatementNode
 {
 public:
     SwitchStatementNode(const Span& span_);
@@ -406,7 +406,7 @@ private:
     Span endBraceSpan;
 };
 
-class CaseStatementNode : public StatementNode
+class AST_API CaseStatementNode : public StatementNode
 {
 public:
     CaseStatementNode(const Span& span_);
@@ -426,7 +426,7 @@ private:
     std::vector<Span> caseSpans;
 };
 
-class DefaultStatementNode : public StatementNode
+class AST_API DefaultStatementNode : public StatementNode
 {
 public:
     DefaultStatementNode(const Span& span_);
@@ -440,7 +440,7 @@ private:
     NodeList<StatementNode> statements;
 };
 
-class GotoCaseStatementNode : public StatementNode
+class AST_API GotoCaseStatementNode : public StatementNode
 {
 public:
     GotoCaseStatementNode(const Span& span_);
@@ -457,7 +457,7 @@ private:
     std::unique_ptr<Node> caseExpr;
 };
 
-class GotoDefaultStatementNode : public StatementNode
+class AST_API GotoDefaultStatementNode : public StatementNode
 {
 public:
     GotoDefaultStatementNode(const Span& span_);
@@ -466,7 +466,7 @@ public:
     bool IsCaseTerminatingNode() const override { return true; }
 };
 
-class ThrowStatementNode : public StatementNode
+class AST_API ThrowStatementNode : public StatementNode
 {
 public:
     ThrowStatementNode(const Span& span_);
@@ -486,7 +486,7 @@ private:
 
 class CatchNode;
 
-class TryStatementNode : public StatementNode
+class AST_API TryStatementNode : public StatementNode
 {
 public:
     TryStatementNode(const Span& span_);
@@ -504,7 +504,7 @@ private:
     NodeList<CatchNode> catches;
 };
 
-class CatchNode : public Node
+class AST_API CatchNode : public Node
 {
 public:
     CatchNode(const Span& span_);
@@ -531,7 +531,7 @@ private:
     Span rightParenSpan;
 };
 
-class AssertStatementNode : public StatementNode
+class AST_API AssertStatementNode : public StatementNode
 {
 public:
     AssertStatementNode(const Span& span_);
@@ -546,14 +546,14 @@ private:
     std::unique_ptr<Node> assertExpr;
 };
 
-class ConditionalCompilationExpressionNode : public Node
+class AST_API ConditionalCompilationExpressionNode : public Node
 {
 public:
     ConditionalCompilationExpressionNode(NodeType nodeType_, const Span& span_);
     bool IsConditionalCompilationExpressionNode() const override { return true; }
 };
 
-class ConditionalCompilationBinaryExpressionNode : public ConditionalCompilationExpressionNode
+class AST_API ConditionalCompilationBinaryExpressionNode : public ConditionalCompilationExpressionNode
 {
 public:
     ConditionalCompilationBinaryExpressionNode(NodeType nodeType_, const Span& span_);
@@ -567,7 +567,7 @@ private:
     std::unique_ptr<ConditionalCompilationExpressionNode> right;
 };
 
-class ConditionalCompilationDisjunctionNode : public ConditionalCompilationBinaryExpressionNode
+class AST_API ConditionalCompilationDisjunctionNode : public ConditionalCompilationBinaryExpressionNode
 {
 public:
     ConditionalCompilationDisjunctionNode(const Span& span_);
@@ -576,7 +576,7 @@ public:
     void Accept(Visitor& visitor) override;
 };
 
-class ConditionalCompilationConjunctionNode : public ConditionalCompilationBinaryExpressionNode
+class AST_API ConditionalCompilationConjunctionNode : public ConditionalCompilationBinaryExpressionNode
 {
 public:
     ConditionalCompilationConjunctionNode(const Span& span_);
@@ -585,7 +585,7 @@ public:
     void Accept(Visitor& visitor) override;
 };
 
-class ConditionalCompilationNotNode : public ConditionalCompilationExpressionNode
+class AST_API ConditionalCompilationNotNode : public ConditionalCompilationExpressionNode
 {
 public:
     ConditionalCompilationNotNode(const Span& span_);
@@ -599,7 +599,7 @@ private:
     std::unique_ptr<ConditionalCompilationExpressionNode> expr;
 };
 
-class ConditionalCompilationPrimaryNode : public ConditionalCompilationExpressionNode
+class AST_API ConditionalCompilationPrimaryNode : public ConditionalCompilationExpressionNode
 {
 public:
     ConditionalCompilationPrimaryNode(const Span& span_);
@@ -613,7 +613,7 @@ private:
     std::u32string symbol;
 };
 
-class ConditionalCompilationPartNode : public Node
+class AST_API ConditionalCompilationPartNode : public Node
 {
 public:
     ConditionalCompilationPartNode(const Span& span_);
@@ -639,7 +639,7 @@ private:
     Span rightParenSpan;
 };
 
-class ConditionalCompilationStatementNode : public StatementNode
+class AST_API ConditionalCompilationStatementNode : public StatementNode
 {
 public:
     ConditionalCompilationStatementNode(const Span& span_);

@@ -5,6 +5,7 @@
 
 #ifndef CMAJOR_AST_ATTRIBUTE_INCLUDED
 #define CMAJOR_AST_ATTRIBUTE_INCLUDED
+#include <cmajor/ast/AstApi.hpp>
 #include <cmajor/parsing/Scanner.hpp>
 #include <stdexcept>
 #include <memory>
@@ -18,11 +19,13 @@ using cmajor::parsing::Span;
 class AstWriter;
 class AstReader;
 
-class Attribute
+class AST_API Attribute
 {
 public:
     Attribute();
     Attribute(const Span& span_, const std::u32string& name_, const std::u32string& value_);
+    Attribute(const Attribute&) = delete;
+    Attribute& operator=(const Attribute&) = delete;
     const Span& GetSpan() const { return span; }
     const std::u32string& Name() const { return name; }
     const std::u32string& Value() const { return value; }
@@ -34,9 +37,12 @@ private:
     std::u32string value;
 };
 
-class Attributes
+class AST_API Attributes
 {
 public:
+    Attributes();
+    Attributes(const Attributes&) = delete;
+    Attributes& operator=(const Attributes&) = delete;
     const std::vector<std::unique_ptr<Attribute>>& GetAttributes() const { return attributes; }
     void AddAttribute(const Span& span, const std::u32string& name);
     void AddAttribute(const Span& span, const std::u32string& name, const std::u32string& value);

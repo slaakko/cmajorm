@@ -5,6 +5,7 @@
 
 #ifndef CMAJOR_BINDER_BOUND_NODE_INCLUDED
 #define CMAJOR_BINDER_BOUND_NODE_INCLUDED
+#include <cmajor/binder/BinderApi.hpp>
 #include <cmajor/parsing/Scanner.hpp>
 #include <cmajor/ir/GenObject.hpp>
 #include <cmajor/symbols/Module.hpp>
@@ -33,7 +34,7 @@ enum class BoundNodeType : uint8_t
 
 class BoundNodeVisitor;
 
-class BoundNode : public GenObject
+class BINDER_API BoundNode : public GenObject
 {
 public:
     BoundNode(Module* module_, const Span& span_, BoundNodeType boundNodeType_);

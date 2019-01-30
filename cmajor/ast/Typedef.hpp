@@ -12,7 +12,7 @@ namespace cmajor { namespace ast {
 
 class IdentifierNode;
 
-class TypedefNode : public Node
+class AST_API TypedefNode : public Node
 {
 public:
     TypedefNode(const Span& span_);

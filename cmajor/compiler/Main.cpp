@@ -7,6 +7,7 @@
 #include <cmajor/parsing/InitDone.hpp>
 #include <cmajor/util/InitDone.hpp>
 #include <cmajor/build/Build.hpp>
+#include <cmajor/cmmid/InitDone.hpp>
 #include <cmajor/symbols/Exception.hpp>
 #include <cmajor/symbols/InitDone.hpp>
 #include <cmajor/symbols/GlobalFlags.hpp>
@@ -45,7 +46,31 @@ struct InitDone
     }
 };
 
-const char* version = "3.2.0";
+struct CompileTargetSelector
+{
+    CompileTargetSelector(cmajor::symbols::CompileTarget compileTarget)
+    {
+        switch (compileTarget)
+        {
+            case cmajor::symbols::CompileTarget::llvm:
+            {
+                CmmInit(cmajor::mid::BackEndKind::llvmBackEnd);
+                break;
+            }
+            case cmajor::symbols::CompileTarget::cmsx:
+            {
+                CmmInit(cmajor::mid::BackEndKind::cmsxBackEnd);
+                break;
+            }
+        }
+    }
+    ~CompileTargetSelector()
+    {
+        CmmDone();
+    }
+};
+
+const char* version = "3.3.0";
 
 void PrintHelp()
 {
@@ -62,6 +87,9 @@ void PrintHelp()
         "--config=CONFIG (-c=CONFIG)\n" <<
         "   set configuration to CONFIG (debug | release)\n" <<
         "   default is debug\n" <<
+        "--compile-target=COMPILE_TARGET (-ct=COMPILE_TARGET)\n" <<
+        "   set compile target to COMPILE_TARGET : (llvm | cmsx)\n" <<
+        "   default is llvm\n" <<
         "--optimization-level=LEVEL (-O=LEVEL)\n" <<
         "   set optimization level to LEVEL=0-3\n" <<
         "   defaults: debug=0, release=3\n" <<
@@ -88,7 +116,7 @@ void PrintHelp()
         "--bdt2xml (-bd)\n" <<
         "   output bound tree as xml\n" <<
         "--link-with-debug-runtime (-d)\n" <<
-        "   link with the debug version of the runtime library cmrt320(d).dll\n" <<
+        "   link with the debug version of the runtime library cmrt330(d).dll\n" <<
         "--link-using-ms-link (-m)\n" <<
         "   use Microsoft's link.exe as the linker\n" << 
         "--define SYMBOL (-D SYMBOL)\n" <<
@@ -302,6 +330,21 @@ int main(int argc, const char** argv)
                                     throw std::runtime_error("unknown configuration '" + components[1] + "'");
                                 }
                             }
+                            else if (components[0] == "--compile-target" || components[0] == "-ct")
+                            {
+                                if (components[1] == "llvm")
+                                {
+                                    SetCompileTarget(CompileTarget::llvm);
+                                }
+                                else if (components[1] == "cmsx")
+                                {
+                                    SetCompileTarget(CompileTarget::cmsx);
+                                }
+                                else
+                                {
+                                    throw std::runtime_error("unknown compile target '" + components[1] + "'");
+                                }
+                            }
                             else if (components[0] == "--optimization-level" || components[0] == "-O")
                             {
                                 int optimizationLevel = boost::lexical_cast<int>(components[1]);
@@ -387,6 +430,7 @@ int main(int argc, const char** argv)
             noDebugInfo = true;
 #endif
             SetUseModuleCache(useModuleCache);
+            CompileTargetSelector compileTarget(GetCompileTarget());
             if (!GetGlobalFlag(GlobalFlags::release) && !noDebugInfo)
             {
                 SetGlobalFlag(GlobalFlags::generateDebugInfo);

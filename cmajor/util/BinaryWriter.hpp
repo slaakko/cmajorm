@@ -5,13 +5,14 @@
 
 #ifndef CMAJOR_UTIL_BINARY_WRITER_INCLUDED
 #define CMAJOR_UTIL_BINARY_WRITER_INCLUDED
+#include <cmajor/util/UtilApi.hpp>
 #include <string>
 #include <stdio.h>
 #include <boost/uuid/uuid.hpp>
 
 namespace cmajor { namespace util {
 
-class FilePtr
+class UTIL_API FilePtr
 {
 public:
     FilePtr(FILE* fp_) : fp(fp_)
@@ -29,7 +30,7 @@ private:
     FILE* fp;
 };
 
-class BinaryWriter
+class UTIL_API BinaryWriter
 {
 public:
     BinaryWriter(const std::string& fileName_);

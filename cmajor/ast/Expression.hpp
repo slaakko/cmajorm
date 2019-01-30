@@ -10,7 +10,7 @@
 
 namespace cmajor { namespace ast {
 
-class DotNode : public UnaryNode
+class AST_API DotNode : public UnaryNode
 {
 public:
     DotNode(const Span& span_);
@@ -26,7 +26,7 @@ private:
     std::unique_ptr<IdentifierNode> memberId;
 };
 
-class ArrowNode : public UnaryNode
+class AST_API ArrowNode : public UnaryNode
 {
 public:
     ArrowNode(const Span& span_);
@@ -42,7 +42,7 @@ private:
     std::unique_ptr<IdentifierNode> memberId;
 };
 
-class EquivalenceNode : public BinaryNode
+class AST_API EquivalenceNode : public BinaryNode
 {
 public:
     EquivalenceNode(const Span& span_);
@@ -52,7 +52,7 @@ public:
     std::string ToString() const override;
 };
 
-class ImplicationNode : public BinaryNode
+class AST_API ImplicationNode : public BinaryNode
 {
 public:
     ImplicationNode(const Span& span_);
@@ -62,7 +62,7 @@ public:
     std::string ToString() const override;
 };
 
-class DisjunctionNode : public BinaryNode
+class AST_API DisjunctionNode : public BinaryNode
 {
 public:
     DisjunctionNode(const Span& span_);
@@ -72,7 +72,7 @@ public:
     std::string ToString() const override;
 };
 
-class ConjunctionNode : public BinaryNode
+class AST_API ConjunctionNode : public BinaryNode
 {
 public:
     ConjunctionNode(const Span& span_);
@@ -82,7 +82,7 @@ public:
     std::string ToString() const override;
 };
 
-class BitOrNode : public BinaryNode
+class AST_API BitOrNode : public BinaryNode
 {
 public:
     BitOrNode(const Span& span_);
@@ -92,7 +92,7 @@ public:
     std::string ToString() const override;
 };
 
-class BitXorNode : public BinaryNode
+class AST_API BitXorNode : public BinaryNode
 {
 public:
     BitXorNode(const Span& span_);
@@ -102,7 +102,7 @@ public:
     std::string ToString() const override;
 };
 
-class BitAndNode : public BinaryNode
+class AST_API BitAndNode : public BinaryNode
 {
 public:
     BitAndNode(const Span& span_);
@@ -112,7 +112,7 @@ public:
     std::string ToString() const override;
 };
 
-class EqualNode : public BinaryNode
+class AST_API EqualNode : public BinaryNode
 {
 public:
     EqualNode(const Span& span_);
@@ -122,7 +122,7 @@ public:
     std::string ToString() const override;
 };
 
-class NotEqualNode : public BinaryNode
+class AST_API NotEqualNode : public BinaryNode
 {
 public:
     NotEqualNode(const Span& span_);
@@ -132,7 +132,7 @@ public:
     std::string ToString() const override;
 };
 
-class LessNode : public BinaryNode
+class AST_API LessNode : public BinaryNode
 {
 public:
     LessNode(const Span& span_);
@@ -142,7 +142,7 @@ public:
     std::string ToString() const override;
 };
 
-class GreaterNode : public BinaryNode
+class AST_API GreaterNode : public BinaryNode
 {
 public:
     GreaterNode(const Span& span_);
@@ -152,7 +152,7 @@ public:
     std::string ToString() const override;
 };
 
-class LessOrEqualNode : public BinaryNode
+class AST_API LessOrEqualNode : public BinaryNode
 {
 public:
     LessOrEqualNode(const Span& span_);
@@ -162,7 +162,7 @@ public:
     std::string ToString() const override;
 };
 
-class GreaterOrEqualNode : public BinaryNode
+class AST_API GreaterOrEqualNode : public BinaryNode
 {
 public:
     GreaterOrEqualNode(const Span& span_);
@@ -172,7 +172,7 @@ public:
     std::string ToString() const override;
 };
 
-class ShiftLeftNode : public BinaryNode
+class AST_API ShiftLeftNode : public BinaryNode
 {
 public:
     ShiftLeftNode(const Span& span_);
@@ -182,7 +182,7 @@ public:
     std::string ToString() const override;
 };
 
-class ShiftRightNode : public BinaryNode
+class AST_API ShiftRightNode : public BinaryNode
 {
 public:
     ShiftRightNode(const Span& span_);
@@ -192,7 +192,7 @@ public:
     std::string ToString() const override;
 };
 
-class AddNode : public BinaryNode
+class AST_API AddNode : public BinaryNode
 {
 public:
     AddNode(const Span& span_);
@@ -202,7 +202,7 @@ public:
     std::string ToString() const override;
 };
 
-class SubNode : public BinaryNode
+class AST_API SubNode : public BinaryNode
 {
 public:
     SubNode(const Span& span_);
@@ -212,7 +212,7 @@ public:
     std::string ToString() const override;
 };
 
-class MulNode : public BinaryNode
+class AST_API MulNode : public BinaryNode
 {
 public:
     MulNode(const Span& span_);
@@ -222,7 +222,7 @@ public:
     std::string ToString() const override;
 };
 
-class DivNode : public BinaryNode
+class AST_API DivNode : public BinaryNode
 {
 public:
     DivNode(const Span& span_);
@@ -232,7 +232,7 @@ public:
     std::string ToString() const override;
 };
 
-class RemNode : public BinaryNode
+class AST_API RemNode : public BinaryNode
 {
 public:
     RemNode(const Span& span_);
@@ -242,7 +242,7 @@ public:
     std::string ToString() const override;
 };
 
-class NotNode : public UnaryNode
+class AST_API NotNode : public UnaryNode
 {
 public:
     NotNode(const Span& span_);
@@ -252,7 +252,7 @@ public:
     std::string ToString() const override;
 };
 
-class UnaryPlusNode : public UnaryNode
+class AST_API UnaryPlusNode : public UnaryNode
 {
 public:
     UnaryPlusNode(const Span& span_);
@@ -262,7 +262,7 @@ public:
     std::string ToString() const override;
 };
 
-class UnaryMinusNode : public UnaryNode
+class AST_API UnaryMinusNode : public UnaryNode
 {
 public:
     UnaryMinusNode(const Span& span_);
@@ -272,7 +272,7 @@ public:
     std::string ToString() const override;
 };
 
-class PrefixIncrementNode : public UnaryNode
+class AST_API PrefixIncrementNode : public UnaryNode
 {
 public:
     PrefixIncrementNode(const Span& span_);
@@ -282,7 +282,7 @@ public:
     std::string ToString() const override;
 };
 
-class PrefixDecrementNode : public UnaryNode
+class AST_API PrefixDecrementNode : public UnaryNode
 {
 public:
     PrefixDecrementNode(const Span& span_);
@@ -292,7 +292,7 @@ public:
     std::string ToString() const override;
 };
 
-class ComplementNode : public UnaryNode
+class AST_API ComplementNode : public UnaryNode
 {
 public:
     ComplementNode(const Span& span_);
@@ -302,7 +302,7 @@ public:
     std::string ToString() const override;
 };
 
-class DerefNode : public UnaryNode
+class AST_API DerefNode : public UnaryNode
 {
 public:
     DerefNode(const Span& span_);
@@ -312,7 +312,7 @@ public:
     std::string ToString() const override;
 };
 
-class AddrOfNode : public UnaryNode
+class AST_API AddrOfNode : public UnaryNode
 {
 public:
     AddrOfNode(const Span& span_);
@@ -322,7 +322,7 @@ public:
     std::string ToString() const override;
 };
 
-class IsNode : public Node
+class AST_API IsNode : public Node
 {
 public:
     IsNode(const Span& span_);
@@ -341,7 +341,7 @@ private:
     std::unique_ptr<Node> targetTypeExpr;
 };
 
-class AsNode : public Node
+class AST_API AsNode : public Node
 {
 public:
     AsNode(const Span& span_);
@@ -360,7 +360,7 @@ private:
     std::unique_ptr<Node> targetTypeExpr;
 };
 
-class IndexingNode : public Node
+class AST_API IndexingNode : public Node
 {
 public:
     IndexingNode(const Span& span_);
@@ -379,7 +379,7 @@ private:
     std::unique_ptr<Node> index;
 };
 
-class InvokeNode : public Node
+class AST_API InvokeNode : public Node
 {
 public:
     InvokeNode(const Span& span_);
@@ -398,7 +398,7 @@ private:
     NodeList<Node> arguments;
 };
 
-class PostfixIncrementNode : public UnaryNode
+class AST_API PostfixIncrementNode : public UnaryNode
 {
 public:
     PostfixIncrementNode(const Span& span_);
@@ -408,7 +408,7 @@ public:
     std::string ToString() const override;
 };
 
-class PostfixDecrementNode : public UnaryNode
+class AST_API PostfixDecrementNode : public UnaryNode
 {
 public:
     PostfixDecrementNode(const Span& span_);
@@ -418,7 +418,7 @@ public:
     std::string ToString() const override;
 };
 
-class SizeOfNode : public Node
+class AST_API SizeOfNode : public Node
 {
 public:
     SizeOfNode(const Span& span_);
@@ -434,7 +434,7 @@ private:
     std::unique_ptr<Node> expression;
 };
 
-class TypeNameNode : public Node
+class AST_API TypeNameNode : public Node
 {
 public:
     TypeNameNode(const Span& span_);
@@ -453,7 +453,7 @@ private:
     bool static_;
 };
 
-class CastNode : public Node
+class AST_API CastNode : public Node
 {
 public:
     CastNode(const Span& span_);
@@ -472,7 +472,7 @@ private:
     std::unique_ptr<Node> sourceExpr;
 };
 
-class ConstructNode : public Node
+class AST_API ConstructNode : public Node
 {
 public:
     ConstructNode(const Span& span_);
@@ -491,7 +491,7 @@ private:
     NodeList<Node> arguments;
 };
 
-class NewNode : public Node
+class AST_API NewNode : public Node
 {
 public:
     NewNode(const Span& span_);
@@ -510,7 +510,7 @@ private:
     NodeList<Node> arguments;
 };
 
-class ThisNode : public Node
+class AST_API ThisNode : public Node
 {
 public:
     ThisNode(const Span& span_);
@@ -519,7 +519,7 @@ public:
     std::string ToString() const override;
 };
 
-class BaseNode : public Node
+class AST_API BaseNode : public Node
 {
 public:
     BaseNode(const Span& span_);
@@ -528,7 +528,7 @@ public:
     std::string ToString() const override;
 };
 
-class ParenthesizedExpressionNode : public UnaryNode
+class AST_API ParenthesizedExpressionNode : public UnaryNode
 {
 public:
     ParenthesizedExpressionNode(const Span& span_);

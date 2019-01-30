@@ -5,11 +5,12 @@
 
 #ifndef CMAJOR_UTIL_MEMORY_READER_INCLUDED
 #define CMAJOR_UTIL_MEMORY_READER_INCLUDED
+#include <cmajor/util/UtilApi.hpp>
 #include <stdint.h>
 
 namespace cmajor { namespace util {
 
-class MemoryReader
+class UTIL_API MemoryReader
 {
 public:
     MemoryReader(const uint8_t* begin_, const uint8_t* end_);

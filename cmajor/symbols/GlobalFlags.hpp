@@ -5,6 +5,7 @@
 
 #ifndef CMAJOR_SYMBOLS_GLOBAL_FLAGS_INCLUDED
 #define CMAJOR_SYMBOLS_GLOBAL_FLAGS_INCLUDED
+#include <cmajor/symbols/SymbolsApi.hpp>
 #include <string>
 #include <vector>
 #include <stdint.h>
@@ -41,31 +42,39 @@ enum class GlobalFlags : uint32_t
     debugCompile = 1 << 23
 };
 
-void ResetGlobalFlags();
-void SetGlobalFlag(GlobalFlags flag);
-void ResetGlobalFlag(GlobalFlags flag);
-bool GetGlobalFlag(GlobalFlags flag);
+enum class CompileTarget : int
+{
+    llvm = 0, cmsx = 1
+};
 
-std::string GetConfig();
-int GetOptimizationLevel();
-void SetOptimizationLevel(int optimizationLevel_);
-int GetNumBuildThreads();
-void SetNumBuildThreads(int numBuildThreads_);
+SYMBOLS_API void SetCompileTarget(CompileTarget compileTarget_);
+SYMBOLS_API CompileTarget GetCompileTarget();
 
-void SetCompilerVersion(const std::string& compilerVersion_);
-std::string GetCompilerVersion();
+SYMBOLS_API void ResetGlobalFlags();
+SYMBOLS_API void SetGlobalFlag(GlobalFlags flag);
+SYMBOLS_API void ResetGlobalFlag(GlobalFlags flag);
+SYMBOLS_API bool GetGlobalFlag(GlobalFlags flag);
 
-void DefineCommandLineConditionalSymbol(const std::u32string& symbol);
-std::set<std::u32string> GetCommandLineDefines();
+SYMBOLS_API std::string GetConfig();
+SYMBOLS_API int GetOptimizationLevel();
+SYMBOLS_API void SetOptimizationLevel(int optimizationLevel_);
+SYMBOLS_API int GetNumBuildThreads();
+SYMBOLS_API void SetNumBuildThreads(int numBuildThreads_);
 
-bool BeginUnitTest();
-bool InUnitTest();
-void ResetUnitTestAssertionNumber();
-int32_t GetNextUnitTestAssertionNumber();
-int32_t GetNumUnitTestAssertions();
-void EndUnitTest(bool prevUnitTest);
-void SetAssertionLineNumberVector(std::vector<int32_t>* assertionLineNumberVector_);
-void AddAssertionLineNumber(int32_t lineNumber);
+SYMBOLS_API void SetCompilerVersion(const std::string& compilerVersion_);
+SYMBOLS_API std::string GetCompilerVersion();
+
+SYMBOLS_API void DefineCommandLineConditionalSymbol(const std::u32string& symbol);
+SYMBOLS_API std::set<std::u32string> GetCommandLineDefines();
+
+SYMBOLS_API bool BeginUnitTest();
+SYMBOLS_API bool InUnitTest();
+SYMBOLS_API void ResetUnitTestAssertionNumber();
+SYMBOLS_API int32_t GetNextUnitTestAssertionNumber();
+SYMBOLS_API int32_t GetNumUnitTestAssertions();
+SYMBOLS_API void EndUnitTest(bool prevUnitTest);
+SYMBOLS_API void SetAssertionLineNumberVector(std::vector<int32_t>* assertionLineNumberVector_);
+SYMBOLS_API void AddAssertionLineNumber(int32_t lineNumber);
 
 } } // namespace cmajor::symbols
 

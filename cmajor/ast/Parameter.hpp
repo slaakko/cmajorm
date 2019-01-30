@@ -11,7 +11,7 @@ namespace cmajor { namespace ast {
 
 class IdentifierNode;
 
-class ParameterNode : public Node
+class AST_API ParameterNode : public Node
 {
 public:
     ParameterNode(const Span& span_);

@@ -29,7 +29,7 @@ std::u32string DerivationStr(Derivation derivation)
     }
 }
 
-bool HasFrontConstDerivation(const DerivationVec& derivations)
+bool HasFrontConstDerivation(const std::vector<Derivation>& derivations)
 {
     if (!derivations.empty())
     {
@@ -41,7 +41,7 @@ bool HasFrontConstDerivation(const DerivationVec& derivations)
     return false;
 }
 
-bool HasReferenceDerivation(const DerivationVec& derivations)
+bool HasReferenceDerivation(const std::vector<Derivation>& derivations)
 {
     for (Derivation derivation : derivations)
     {
@@ -53,7 +53,7 @@ bool HasReferenceDerivation(const DerivationVec& derivations)
     return false;
 }
 
-bool HasLvalueReferenceDerivation(const DerivationVec& derivations) 
+bool HasLvalueReferenceDerivation(const std::vector<Derivation>& derivations) 
 {
     for (Derivation derivation : derivations)
     {
@@ -65,7 +65,7 @@ bool HasLvalueReferenceDerivation(const DerivationVec& derivations)
     return false;
 }
 
-bool HasRvalueReferenceDerivation(const DerivationVec& derivations)
+bool HasRvalueReferenceDerivation(const std::vector<Derivation>& derivations)
 {
     for (Derivation derivation : derivations)
     {
@@ -77,7 +77,7 @@ bool HasRvalueReferenceDerivation(const DerivationVec& derivations)
     return false;
 }
 
-bool HasReferenceOrConstDerivation(const DerivationVec& derivations)
+bool HasReferenceOrConstDerivation(const std::vector<Derivation>& derivations)
 {
     for (Derivation derivation : derivations)
     {
@@ -89,7 +89,7 @@ bool HasReferenceOrConstDerivation(const DerivationVec& derivations)
     return false;
 }
 
-bool HasPointerDerivation(const DerivationVec& derivations)
+bool HasPointerDerivation(const std::vector<Derivation>& derivations)
 {
     for (Derivation derivation : derivations)
     {
@@ -98,7 +98,7 @@ bool HasPointerDerivation(const DerivationVec& derivations)
     return false;
 }
 
-int CountPointerDerivations(const DerivationVec& derivations)
+int CountPointerDerivations(const std::vector<Derivation>& derivations)
 {
     int numPointers = 0;
     for (Derivation derivation : derivations)
@@ -511,7 +511,7 @@ TypeSymbol* DerivedTypeSymbol::AddPointer(const Span& span)
 TypeSymbol* DerivedTypeSymbol::RemoveDerivations(const TypeDerivationRec& sourceDerivationRec, const Span& span)
 {
     TypeDerivationRec result;
-    const DerivationVec& sourceDerivations = sourceDerivationRec.derivations;
+    const std::vector<Derivation>& sourceDerivations = sourceDerivationRec.derivations;
     if (!HasFrontConstDerivation(sourceDerivations) && HasFrontConstDerivation(derivationRec.derivations))
     {
         result.derivations.push_back(Derivation::constDerivation);
@@ -548,14 +548,14 @@ bool DerivedTypeSymbol::IsRecursive(TypeSymbol* type, std::unordered_set<boost::
     return TypeSymbol::IsRecursive(type, tested) || baseType->IsRecursive(type, tested);
 }
 
-llvm::Type* DerivedTypeSymbol::IrType(Emitter& emitter) 
+void* DerivedTypeSymbol::IrType(Emitter& emitter) 
 {
-    llvm::Type* localIrType = emitter.GetIrTypeByTypeId(TypeId());
+    void* localIrType = emitter.GetIrTypeByTypeId(TypeId());
     if (!localIrType)
     {
         if (baseType->IsVoidType())
         {
-            localIrType = emitter.Builder().getInt8Ty();
+            localIrType = emitter.GetIrTypeForByte();
         }
         else
         {
@@ -569,7 +569,7 @@ llvm::Type* DerivedTypeSymbol::IrType(Emitter& emitter)
                 case Derivation::rvalueRefDerivation:
                 case Derivation::pointerDerivation:
                 {
-                    localIrType = llvm::PointerType::get(localIrType, 0);
+                    localIrType = emitter.GetIrTypeForPtrType(localIrType);
                     break;
                 }
                 default:
@@ -584,7 +584,7 @@ llvm::Type* DerivedTypeSymbol::IrType(Emitter& emitter)
     return localIrType;
 }
 
-llvm::Constant* DerivedTypeSymbol::CreateDefaultIrValue(Emitter& emitter)
+void* DerivedTypeSymbol::CreateDefaultIrValue(Emitter& emitter)
 {
     if (HasFrontConstDerivation(derivationRec.derivations) && !HasPointerDerivation(derivationRec.derivations) && !HasReferenceDerivation(derivationRec.derivations))
     {
@@ -592,40 +592,36 @@ llvm::Constant* DerivedTypeSymbol::CreateDefaultIrValue(Emitter& emitter)
     }
     else
     {
-        return llvm::Constant::getNullValue(IrType(emitter));
+        return emitter.CreateDefaultIrValueForDerivedType(IrType(emitter));
     }
 }
 
-llvm::DIType* DerivedTypeSymbol::CreateDIType(Emitter& emitter)
+void* DerivedTypeSymbol::CreateDIType(Emitter& emitter)
 {
-    llvm::DIType* type = baseType->GetDIType(emitter);
+    void* diType = baseType->GetDIType(emitter);
     for (Derivation derivation : derivationRec.derivations)
     {
         switch (derivation)
         {
             case Derivation::constDerivation:
             {
-                type = emitter.DIBuilder()->createQualifiedType(llvm::dwarf::DW_TAG_const_type, type);
-                break;
+                return emitter.CreateConstDIType(diType);
             }
             case Derivation::lvalueRefDerivation:
             {
-                type = emitter.DIBuilder()->createReferenceType(llvm::dwarf::DW_TAG_reference_type, type);
-                break;
+                return emitter.CreateLValueRefDIType(diType);
             }
             case Derivation::rvalueRefDerivation:
             {
-                type = emitter.DIBuilder()->createReferenceType(llvm::dwarf::DW_TAG_rvalue_reference_type, type);
-                break;
+                return emitter.CreateRValueRefDIType(diType);
             }
             case Derivation::pointerDerivation:
             {
-                type = emitter.DIBuilder()->createPointerType(type, 64);
-                break;
+                return emitter.CreatePointerDIType(diType);
             }
         }
     }
-    return type;
+    return diType;
 }
 
 ValueType DerivedTypeSymbol::GetValueType() const 
@@ -650,14 +646,14 @@ NullPtrType::NullPtrType(const Span& span_, const std::u32string& name_) : TypeS
 {
 }
 
-llvm::Type* NullPtrType::IrType(Emitter& emitter)
+void* NullPtrType::IrType(Emitter& emitter)
 {
-    return emitter.Builder().getInt8PtrTy();
+    return emitter.GetIrTypeForVoidPtrType();
 }
 
-llvm::Constant* NullPtrType::CreateDefaultIrValue(Emitter& emitter)
+void* NullPtrType::CreateDefaultIrValue(Emitter& emitter)
 {
-    return llvm::Constant::getNullValue(IrType(emitter));
+    return emitter.CreateDefaultIrValueForPtrType(IrType(emitter));
 }
 
 ValueType NullPtrType::GetValueType() const

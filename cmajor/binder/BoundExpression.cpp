@@ -15,7 +15,6 @@
 #include <cmajor/symbols/InterfaceTypeSymbol.hpp>
 #include <cmajor/ir/Emitter.hpp>
 #include <cmajor/util/Unicode.hpp>
-#include <llvm/IR/Module.h>
 
 namespace cmajor { namespace binder {
 
@@ -67,17 +66,17 @@ void BoundParameter::Load(Emitter& emitter, OperationFlags flags)
     }
     else if ((flags & OperationFlags::deref) != OperationFlags::none)
     {
-        llvm::Value* value = emitter.Builder().CreateLoad(parameterSymbol->IrObject(emitter));
+        void* value = emitter.CreateLoad(parameterSymbol->IrObject(emitter));
         uint8_t n = GetDerefCount(flags);
         for (uint8_t i = 0; i < n; ++i)
         {
-            value = emitter.Builder().CreateLoad(value);
+            value = emitter.CreateLoad(value);
         }
         emitter.Stack().Push(value);
     }
     else
     {
-        emitter.Stack().Push(emitter.Builder().CreateLoad(parameterSymbol->IrObject(emitter)));
+        emitter.Stack().Push(emitter.CreateLoad(parameterSymbol->IrObject(emitter)));
     }
     DestroyTemporaries(emitter);
 }
@@ -85,24 +84,24 @@ void BoundParameter::Load(Emitter& emitter, OperationFlags flags)
 void BoundParameter::Store(Emitter& emitter, OperationFlags flags)
 {
     emitter.SetCurrentDebugLocation(GetSpan());
-    llvm::Value* value = emitter.Stack().Pop();
+    void* value = emitter.Stack().Pop();
     if ((flags & OperationFlags::addr) != OperationFlags::none)
     {
         throw Exception(GetModule(), "cannot take address of a parameter", GetSpan());
     }
     else if ((flags & OperationFlags::deref) != OperationFlags::none)
     {
-        llvm::Value* ptr = emitter.Builder().CreateLoad(parameterSymbol->IrObject(emitter));
+        void* ptr = emitter.CreateLoad(parameterSymbol->IrObject(emitter));
         uint8_t n = GetDerefCount(flags);
         for (uint8_t i = 1; i < n; ++i)
         {
-            ptr = emitter.Builder().CreateLoad(ptr);
+            ptr = emitter.CreateLoad(ptr);
         }
-        emitter.Builder().CreateStore(value, ptr);
+        emitter.CreateStore(value, ptr);
     }
     else
     {
-        emitter.Builder().CreateStore(value, parameterSymbol->IrObject(emitter));
+        emitter.CreateStore(value, parameterSymbol->IrObject(emitter));
     }
     DestroyTemporaries(emitter);
 }
@@ -131,17 +130,17 @@ void BoundLocalVariable::Load(Emitter& emitter, OperationFlags flags)
     }
     else if ((flags & OperationFlags::deref) != OperationFlags::none)
     {
-        llvm::Value* value = emitter.Builder().CreateLoad(localVariableSymbol->IrObject(emitter));
+        void* value = emitter.CreateLoad(localVariableSymbol->IrObject(emitter));
         uint8_t n = GetDerefCount(flags);
         for (uint8_t i = 0; i < n; ++i)
         {
-            value = emitter.Builder().CreateLoad(value);
+            value = emitter.CreateLoad(value);
         }
         emitter.Stack().Push(value);
     }
     else
     {
-        emitter.Stack().Push(emitter.Builder().CreateLoad(localVariableSymbol->IrObject(emitter)));
+        emitter.Stack().Push(emitter.CreateLoad(localVariableSymbol->IrObject(emitter)));
     }
     DestroyTemporaries(emitter);
 }
@@ -149,24 +148,24 @@ void BoundLocalVariable::Load(Emitter& emitter, OperationFlags flags)
 void BoundLocalVariable::Store(Emitter& emitter, OperationFlags flags)
 {
     emitter.SetCurrentDebugLocation(GetSpan());
-    llvm::Value* value = emitter.Stack().Pop();
+    void* value = emitter.Stack().Pop();
     if ((flags & OperationFlags::addr) != OperationFlags::none)
     {
         throw Exception(GetModule(), "cannot store to address of a local variable", GetSpan());
     }
     else if ((flags & OperationFlags::deref) != OperationFlags::none)
     {
-        llvm::Value* ptr = emitter.Builder().CreateLoad(localVariableSymbol->IrObject(emitter));
+        void* ptr = emitter.CreateLoad(localVariableSymbol->IrObject(emitter));
         uint8_t n = GetDerefCount(flags);
         for (uint8_t i = 1; i < n; ++i)
         {
-            ptr = emitter.Builder().CreateLoad(ptr);
+            ptr = emitter.CreateLoad(ptr);
         }
-        emitter.Builder().CreateStore(value, ptr);
+        emitter.CreateStore(value, ptr);
     }
     else
     {
-        emitter.Builder().CreateStore(value, localVariableSymbol->IrObject(emitter));
+        emitter.CreateStore(value, localVariableSymbol->IrObject(emitter));
     }
     DestroyTemporaries(emitter);
 }
@@ -220,28 +219,25 @@ void BoundMemberVariable::Load(Emitter& emitter, OperationFlags flags)
         }
         classPtr->Load(emitter, OperationFlags::none);
     }
-    llvm::Value* ptr = emitter.Stack().Pop();
-    ArgVector indeces;
-    indeces.push_back(emitter.Builder().getInt32(0));
-    indeces.push_back(emitter.Builder().getInt32(memberVariableSymbol->LayoutIndex()));
-    llvm::Value* memberVariablePtr = emitter.Builder().CreateGEP(ptr, indeces);
+    void* ptr = emitter.Stack().Pop();
+    void* memberVariablePtr = emitter.GetMemberVariablePtr(ptr, memberVariableSymbol->LayoutIndex());
     if ((flags & OperationFlags::addr) != OperationFlags::none)
     {
         emitter.Stack().Push(memberVariablePtr);
     }
     else if ((flags & OperationFlags::deref) != OperationFlags::none)
     {
-        llvm::Value* value = emitter.Builder().CreateLoad(memberVariablePtr);
+        void* value = emitter.CreateLoad(memberVariablePtr);
         uint8_t n = GetDerefCount(flags);
         for (uint8_t i = 0; i < n; ++i)
         {
-            value = emitter.Builder().CreateLoad(value);
+            value = emitter.CreateLoad(value);
         }
         emitter.Stack().Push(value);
     }
     else
     {
-        emitter.Stack().Push(emitter.Builder().CreateLoad(memberVariablePtr));
+        emitter.Stack().Push(emitter.CreateLoad(memberVariablePtr));
     }
     DestroyTemporaries(emitter);
 }
@@ -250,7 +246,7 @@ void BoundMemberVariable::Store(Emitter& emitter, OperationFlags flags)
 {
     emitter.SetCurrentDebugLocation(GetSpan());
     Assert(memberVariableSymbol->LayoutIndex() != -1, "layout index of the member variable not set");
-    llvm::Value* value = emitter.Stack().Pop();
+    void* value = emitter.Stack().Pop();
     if ((flags & OperationFlags::addr) != OperationFlags::none)
     {
         throw Exception(GetModule(), "cannot store to the address of a member variable", GetSpan());
@@ -274,24 +270,21 @@ void BoundMemberVariable::Store(Emitter& emitter, OperationFlags flags)
         {
             classPtr->Load(emitter, OperationFlags::none);
         }
-        llvm::Value* ptr = emitter.Stack().Pop();
-        ArgVector indeces;
-        indeces.push_back(emitter.Builder().getInt32(0));
-        indeces.push_back(emitter.Builder().getInt32(memberVariableSymbol->LayoutIndex()));
-        llvm::Value* memberVariablePtr = emitter.Builder().CreateGEP(ptr, indeces);
+        void* ptr = emitter.Stack().Pop();
+        void* memberVariablePtr = emitter.GetMemberVariablePtr(ptr, memberVariableSymbol->LayoutIndex());
         if ((flags & OperationFlags::deref) != OperationFlags::none)
         {
-            llvm::Value* ptr = emitter.Builder().CreateLoad(memberVariablePtr);
+            void* ptr = emitter.CreateLoad(memberVariablePtr);
             uint8_t n = GetDerefCount(flags);
             for (uint8_t i = 1; i < n; ++i)
             {
-                ptr = emitter.Builder().CreateLoad(ptr);
+                ptr = emitter.CreateLoad(ptr);
             }
-            emitter.Builder().CreateStore(value, ptr);
+            emitter.CreateStore(value, ptr);
         }
         else
         {
-            emitter.Builder().CreateStore(value, memberVariablePtr);
+            emitter.CreateStore(value, memberVariablePtr);
         }
     }
     DestroyTemporaries(emitter);
@@ -552,10 +545,7 @@ void BoundSizeOfExpression::Load(Emitter& emitter, OperationFlags flags)
     }
     else
     {
-        llvm::Value* nullPtr = llvm::Constant::getNullValue(pointerType->IrType(emitter));
-        llvm::Value* gep = emitter.Builder().CreateGEP(nullPtr, emitter.Builder().getInt64(1));
-        llvm::Value* size = emitter.Builder().CreatePtrToInt(gep, emitter.Builder().getInt64Ty());
-        emitter.Stack().Push(size);
+        emitter.Stack().Push(emitter.SizeOf(pointerType->IrType(emitter)));
     }
     DestroyTemporaries(emitter);
 }
@@ -849,11 +839,11 @@ void BoundFunctionCall::Load(Emitter& emitter, OperationFlags flags)
         }
         if ((flags & OperationFlags::deref) != OperationFlags::none)
         {
-            llvm::Value* value = emitter.Stack().Pop();
+            void* value = emitter.Stack().Pop();
             uint8_t n = GetDerefCount(flags);
             for (uint8_t i = 0; i < n; ++i)
             {
-                value = emitter.Builder().CreateLoad(value);
+                value = emitter.CreateLoad(value);
             }
             emitter.Stack().Push(value);
         }
@@ -869,7 +859,7 @@ void BoundFunctionCall::Store(Emitter& emitter, OperationFlags flags)
     }
     else
     {
-        llvm::Value* value = emitter.Stack().Pop();
+        void* value = emitter.Stack().Pop();
         std::vector<GenObject*> genObjects;
         for (const std::unique_ptr<BoundExpression>& argument : arguments)
         {
@@ -888,13 +878,13 @@ void BoundFunctionCall::Store(Emitter& emitter, OperationFlags flags)
         if (functionSymbol->IsArrayElementAccess())
         {
             functionSymbol->GenerateCall(emitter, genObjects, callFlags | OperationFlags::addr, GetSpan());
-            llvm::Value* ptr = emitter.Stack().Pop();
-            emitter.Builder().CreateStore(value, ptr);
+            void* ptr = emitter.Stack().Pop();
+            emitter.CreateStore(value, ptr);
         }
         else
         {
             functionSymbol->GenerateCall(emitter, genObjects, callFlags, GetSpan());
-            llvm::Value* ptr = emitter.Stack().Pop();
+            void* ptr = emitter.Stack().Pop();
             if ((flags & OperationFlags::leaveFirstArg) != OperationFlags::none)
             {
                 emitter.SaveObjectPointer(ptr);
@@ -904,13 +894,13 @@ void BoundFunctionCall::Store(Emitter& emitter, OperationFlags flags)
                 uint8_t n = GetDerefCount(flags);
                 for (uint8_t i = 1; i < n; ++i)
                 {
-                    ptr = emitter.Builder().CreateLoad(ptr);
+                    ptr = emitter.CreateLoad(ptr);
                 }
-                emitter.Builder().CreateStore(value, ptr);
+                emitter.CreateStore(value, ptr);
             }
             else
             {
-                emitter.Builder().CreateStore(emitter.Builder().CreateLoad(value), ptr);
+                emitter.CreateStore(emitter.CreateLoad(value), ptr);
             }
         }
     }
@@ -970,11 +960,11 @@ void BoundDelegateCall::Load(Emitter& emitter, OperationFlags flags)
         delegateTypeSymbol->GenerateCall(emitter, genObjects, callFlags, GetSpan());
         if ((flags & OperationFlags::deref) != OperationFlags::none)
         {
-            llvm::Value* value = emitter.Stack().Pop();
+            void* value = emitter.Stack().Pop();
             uint8_t n = GetDerefCount(flags);
             for (uint8_t i = 0; i < n; ++i)
             {
-                value = emitter.Builder().CreateLoad(value);
+                value = emitter.CreateLoad(value);
             }
             emitter.Stack().Push(value);
         }
@@ -990,7 +980,7 @@ void BoundDelegateCall::Store(Emitter& emitter, OperationFlags flags)
     }
     else
     {
-        llvm::Value* value = emitter.Stack().Pop();
+        void* value = emitter.Stack().Pop();
         std::vector<GenObject*> genObjects;
         for (const std::unique_ptr<BoundExpression>& argument : arguments)
         {
@@ -1007,7 +997,7 @@ void BoundDelegateCall::Store(Emitter& emitter, OperationFlags flags)
             emitter.SetLineNumber(GetSpan().LineNumber());
         }
         delegateTypeSymbol->GenerateCall(emitter, genObjects, callFlags, GetSpan());
-        llvm::Value* ptr = emitter.Stack().Pop();
+        void* ptr = emitter.Stack().Pop();
         if ((flags & OperationFlags::leaveFirstArg) != OperationFlags::none)
         {
             emitter.SaveObjectPointer(ptr);
@@ -1017,13 +1007,13 @@ void BoundDelegateCall::Store(Emitter& emitter, OperationFlags flags)
             uint8_t n = GetDerefCount(flags);
             for (uint8_t i = 1; i < n; ++i)
             {
-                ptr = emitter.Builder().CreateLoad(ptr);
+                ptr = emitter.CreateLoad(ptr);
             }
-            emitter.Builder().CreateStore(value, ptr);
+            emitter.CreateStore(value, ptr);
         }
         else
         {
-            emitter.Builder().CreateStore(emitter.Builder().CreateLoad(value), ptr);
+            emitter.CreateStore(emitter.CreateLoad(value), ptr);
         }
     }
     DestroyTemporaries(emitter);
@@ -1102,11 +1092,11 @@ void BoundClassDelegateCall::Load(Emitter& emitter, OperationFlags flags)
         classDelegateTypeSymbol->GenerateCall(emitter, genObjects, callFlags, GetSpan());
         if ((flags & OperationFlags::deref) != OperationFlags::none)
         {
-            llvm::Value* value = emitter.Stack().Pop();
+            void* value = emitter.Stack().Pop();
             uint8_t n = GetDerefCount(flags);
             for (uint8_t i = 0; i < n; ++i)
             {
-                value = emitter.Builder().CreateLoad(value);
+                value = emitter.CreateLoad(value);
             }
             emitter.Stack().Push(value);
         }
@@ -1122,7 +1112,7 @@ void BoundClassDelegateCall::Store(Emitter& emitter, OperationFlags flags)
     }
     else
     {
-        llvm::Value* value = emitter.Stack().Pop();
+        void* value = emitter.Stack().Pop();
         std::vector<GenObject*> genObjects;
         for (const std::unique_ptr<BoundExpression>& argument : arguments)
         {
@@ -1139,7 +1129,7 @@ void BoundClassDelegateCall::Store(Emitter& emitter, OperationFlags flags)
             emitter.SetLineNumber(GetSpan().LineNumber());
         }
         classDelegateTypeSymbol->GenerateCall(emitter, genObjects, callFlags, GetSpan());
-        llvm::Value* ptr = emitter.Stack().Pop();
+        void* ptr = emitter.Stack().Pop();
         if ((flags & OperationFlags::leaveFirstArg) != OperationFlags::none)
         {
             emitter.SaveObjectPointer(ptr);
@@ -1149,13 +1139,13 @@ void BoundClassDelegateCall::Store(Emitter& emitter, OperationFlags flags)
             uint8_t n = GetDerefCount(flags);
             for (uint8_t i = 1; i < n; ++i)
             {
-                ptr = emitter.Builder().CreateLoad(ptr);
+                ptr = emitter.CreateLoad(ptr);
             }
-            emitter.Builder().CreateStore(value, ptr);
+            emitter.CreateStore(value, ptr);
         }
         else
         {
-            emitter.Builder().CreateStore(emitter.Builder().CreateLoad(value), ptr);
+            emitter.CreateStore(emitter.CreateLoad(value), ptr);
         }
     }
     DestroyTemporaries(emitter);
@@ -1217,7 +1207,7 @@ BoundExpression* BoundConstructExpression::Clone()
 
 void BoundConstructExpression::Load(Emitter& emitter, OperationFlags flags)
 {
-    llvm::Value* prevObjectPointer = emitter.GetObjectPointer();
+    void* prevObjectPointer = emitter.GetObjectPointer();
     emitter.SetObjectPointer(nullptr);
     if ((flags & OperationFlags::addr) != OperationFlags::none)
     {
@@ -1226,7 +1216,7 @@ void BoundConstructExpression::Load(Emitter& emitter, OperationFlags flags)
     else
     {
         constructorCall->Load(emitter, OperationFlags::leaveFirstArg);
-        llvm::Value* objectPointer = emitter.GetObjectPointer();
+        void* objectPointer = emitter.GetObjectPointer();
         if (!objectPointer)
         {
             throw Exception(GetModule(), "do not have object pointer", GetSpan());
@@ -1447,7 +1437,7 @@ BoundExpression* BoundIsExpression::Clone()
 void BoundIsExpression::Load(Emitter& emitter, OperationFlags flags)
 {
     expr->Load(emitter, OperationFlags::none);
-    llvm::Value* thisPtr = emitter.Stack().Pop();
+    void* thisPtr = emitter.Stack().Pop();
     TypeSymbol* exprType = static_cast<TypeSymbol*>(expr->GetType());
     Assert(exprType->IsPointerType(), "pointer type expected");
     TypeSymbol* leftType = exprType->RemovePointer(GetSpan());
@@ -1456,66 +1446,59 @@ void BoundIsExpression::Load(Emitter& emitter, OperationFlags flags)
     ClassTypeSymbol* leftVmtPtrHolderClass = leftClassType->VmtPtrHolderClass();
     if (leftClassType != leftVmtPtrHolderClass)
     {
-        thisPtr = emitter.Builder().CreateBitCast(thisPtr, leftVmtPtrHolderClass->AddPointer(GetSpan())->IrType(emitter));
+        thisPtr = emitter.CreateBitCast(thisPtr, leftVmtPtrHolderClass->AddPointer(GetSpan())->IrType(emitter));
     }
-    ArgVector vmtPtrIndeces;
-    vmtPtrIndeces.push_back(emitter.Builder().getInt32(0));
-    vmtPtrIndeces.push_back(emitter.Builder().getInt32(leftVmtPtrHolderClass->VmtPtrIndex()));
-    llvm::Value* vmtPtrPtr = emitter.Builder().CreateGEP(thisPtr, vmtPtrIndeces);
-    llvm::Value* vmtPtr = emitter.Builder().CreateBitCast(emitter.Builder().CreateLoad(vmtPtrPtr), leftClassType->VmtPtrType(emitter));
-    ArgVector indeces;
-    indeces.push_back(emitter.Builder().getInt32(0));
-    indeces.push_back(emitter.Builder().getInt32(0));
-    llvm::Value* leftClassIdPtr = emitter.Builder().CreateGEP(vmtPtr, indeces);
-    llvm::Value* leftClassId = emitter.Builder().CreatePtrToInt(emitter.Builder().CreateLoad(leftClassIdPtr), emitter.Builder().getInt64Ty());
-    llvm::Value* leftClassIdNull = emitter.Builder().CreateICmpEQ(leftClassId, emitter.Builder().getInt64(0));
-    llvm::BasicBlock* leftTrueBlock = llvm::BasicBlock::Create(emitter.Context(), "leftTrue", emitter.Function());
-    llvm::BasicBlock* leftFalseBlock = llvm::BasicBlock::Create(emitter.Context(), "leftFalse", emitter.Function());
-    llvm::BasicBlock* leftContinueBlock = llvm::BasicBlock::Create(emitter.Context(), "leftContinue", emitter.Function());
-    emitter.Builder().CreateCondBr(leftClassIdNull, leftTrueBlock, leftFalseBlock);
+    void* vmtPtr = emitter.GetVmtPtr(thisPtr, leftVmtPtrHolderClass->VmtPtrIndex(), leftClassType->VmtPtrType(emitter));
+    void* leftClassIdPtr = emitter.GetClassIdPtr(vmtPtr);
+    void* leftClassId = emitter.CreatePtrToInt(emitter.CreateLoad(leftClassIdPtr), emitter.GetIrTypeForULong());
+    void* leftClassIdNull = emitter.CreateICmpEQ(leftClassId, emitter.CreateDefaultIrValueForULong());
+    void* leftTrueBlock = emitter.CreateBasicBlock("leftTrue");
+    void* leftFalseBlock = emitter.CreateBasicBlock("leftFalse");
+    void* leftContinueBlock = emitter.CreateBasicBlock("leftContinue");
+    emitter.CreateCondBr(leftClassIdNull, leftTrueBlock, leftFalseBlock);
     emitter.SetCurrentBasicBlock(leftTrueBlock);
-    llvm::Type* retType = llvm::Type::getInt64Ty(emitter.Context());
-    std::vector<llvm::Type*> paramTypes;
-    paramTypes.push_back(llvm::Type::getInt8PtrTy(emitter.Context()));
-    llvm::FunctionType* dynamicInitFnType = llvm::FunctionType::get(retType, paramTypes, false);
-    llvm::Function* dynamicInitFn = llvm::cast<llvm::Function>(emitter.Module()->getOrInsertFunction("RtDynamicInitVmt", dynamicInitFnType));
-    std::vector<llvm::Value*> leftArgs;
-    leftArgs.push_back(emitter.Builder().CreateBitCast(leftClassIdPtr, emitter.Builder().getInt8PtrTy()));
-    llvm::Value* computedLeftClassId = emitter.Builder().CreateCall(dynamicInitFn, leftArgs);
+    void* retType = emitter.GetIrTypeForULong();
+    std::vector<void*> paramTypes;
+    paramTypes.push_back(emitter.GetIrTypeForVoidPtrType());
+    void* dynamicInitFnType = emitter.GetIrTypeForFunction(retType, paramTypes);
+    void* dynamicInitFn = emitter.GetOrInsertFunction("RtDynamicInitVmt", dynamicInitFnType);
+    std::vector<void*> leftArgs;
+    leftArgs.push_back(emitter.CreateBitCast(leftClassIdPtr, emitter.GetIrTypeForVoidPtrType()));
+    void* computedLeftClassId = emitter.CreateCall(dynamicInitFn, leftArgs);
     emitter.Stack().Push(computedLeftClassId);
     leftClassIdVar->Store(emitter, OperationFlags::none);
-    emitter.Builder().CreateBr(leftContinueBlock);
+    emitter.CreateBr(leftContinueBlock);
     emitter.SetCurrentBasicBlock(leftFalseBlock);
     emitter.Stack().Push(leftClassId);
     leftClassIdVar->Store(emitter, OperationFlags::none);
-    emitter.Builder().CreateBr(leftContinueBlock);
+    emitter.CreateBr(leftContinueBlock);
     emitter.SetCurrentBasicBlock(leftContinueBlock);
-    llvm::Value* rightClassTypeVmtObject = rightClassType->VmtObject(emitter, false);
-    llvm::Value* rightClassIdPtr = emitter.Builder().CreateGEP(rightClassTypeVmtObject, indeces);
-    llvm::Value* rightClassId = emitter.Builder().CreatePtrToInt(emitter.Builder().CreateLoad(rightClassIdPtr), emitter.Builder().getInt64Ty());
-    llvm::Value* rightClassIdNull = emitter.Builder().CreateICmpEQ(rightClassId, emitter.Builder().getInt64(0));
-    llvm::BasicBlock* rightTrueBlock = llvm::BasicBlock::Create(emitter.Context(), "rightTrue", emitter.Function());
-    llvm::BasicBlock* rightFalseBlock = llvm::BasicBlock::Create(emitter.Context(), "rightFalse", emitter.Function());
-    llvm::BasicBlock* rightContinueBlock = llvm::BasicBlock::Create(emitter.Context(), "rightContinue", emitter.Function());
-    emitter.Builder().CreateCondBr(rightClassIdNull, rightTrueBlock, rightFalseBlock);
+    void* rightClassTypeVmtObject = rightClassType->VmtObject(emitter, false);
+    void* rightClassIdPtr = emitter.GetClassIdPtr(rightClassTypeVmtObject);
+    void* rightClassId = emitter.CreatePtrToInt(emitter.CreateLoad(rightClassIdPtr), emitter.GetIrTypeForULong());
+    void* rightClassIdNull = emitter.CreateICmpEQ(rightClassId, emitter.CreateDefaultIrValueForULong());
+    void* rightTrueBlock = emitter.CreateBasicBlock("rightTrue");
+    void* rightFalseBlock = emitter.CreateBasicBlock("rightFalse");
+    void* rightContinueBlock = emitter.CreateBasicBlock("rightContinue");
+    emitter.CreateCondBr(rightClassIdNull, rightTrueBlock, rightFalseBlock);
     emitter.SetCurrentBasicBlock(rightTrueBlock);
-    std::vector<llvm::Value*> rightArgs;
-    rightArgs.push_back(emitter.Builder().CreateBitCast(rightClassIdPtr, emitter.Builder().getInt8PtrTy()));
-    llvm::Value* computedRightClassId = emitter.Builder().CreateCall(dynamicInitFn, rightArgs);
+    std::vector<void*> rightArgs;
+    rightArgs.push_back(emitter.CreateBitCast(rightClassIdPtr, emitter.GetIrTypeForVoidPtrType()));
+    void* computedRightClassId = emitter.CreateCall(dynamicInitFn, rightArgs);
     emitter.Stack().Push(computedRightClassId);
     rightClassIdVar->Store(emitter, OperationFlags::none);
-    emitter.Builder().CreateBr(rightContinueBlock);
+    emitter.CreateBr(rightContinueBlock);
     emitter.SetCurrentBasicBlock(rightFalseBlock);
     emitter.Stack().Push(rightClassId);
     rightClassIdVar->Store(emitter, OperationFlags::none);
-    emitter.Builder().CreateBr(rightContinueBlock);
+    emitter.CreateBr(rightContinueBlock);
     emitter.SetCurrentBasicBlock(rightContinueBlock);
     leftClassIdVar->Load(emitter, OperationFlags::none);
-    llvm::Value* loadedLeftClassId = emitter.Stack().Pop();
+    void* loadedLeftClassId = emitter.Stack().Pop();
     rightClassIdVar->Load(emitter, OperationFlags::none);
-    llvm::Value* loadedRightClassId = emitter.Stack().Pop();
-    llvm::Value* remainder = emitter.Builder().CreateURem(loadedLeftClassId, loadedRightClassId);
-    llvm::Value* remainderIsZero = emitter.Builder().CreateICmpEQ(remainder, emitter.Builder().getInt64(0));
+    void* loadedRightClassId = emitter.Stack().Pop();
+    void* remainder = emitter.CreateURem(loadedLeftClassId, loadedRightClassId);
+    void* remainderIsZero = emitter.CreateICmpEQ(remainder, emitter.CreateDefaultIrValueForULong());
     emitter.Stack().Push(remainderIsZero);
     DestroyTemporaries(emitter);
 }
@@ -1561,7 +1544,7 @@ BoundExpression* BoundAsExpression::Clone()
 void BoundAsExpression::Load(Emitter& emitter, OperationFlags flags)
 {
     expr->Load(emitter, OperationFlags::none);
-    llvm::Value* thisPtr = emitter.Stack().Pop();
+    void* thisPtr = emitter.Stack().Pop();
     TypeSymbol* exprType = static_cast<TypeSymbol*>(expr->GetType());
     Assert(exprType->IsPointerType(), "pointer type expected");
     TypeSymbol* leftType = exprType->RemovePointer(GetSpan());
@@ -1570,78 +1553,71 @@ void BoundAsExpression::Load(Emitter& emitter, OperationFlags flags)
     ClassTypeSymbol* leftVmtPtrHolderClass = leftClassType->VmtPtrHolderClass();
     if (leftClassType != leftVmtPtrHolderClass)
     {
-        thisPtr = emitter.Builder().CreateBitCast(thisPtr, leftVmtPtrHolderClass->AddPointer(GetSpan())->IrType(emitter));
+        thisPtr = emitter.CreateBitCast(thisPtr, leftVmtPtrHolderClass->AddPointer(GetSpan())->IrType(emitter));
     }
-    ArgVector vmtPtrIndeces;
-    vmtPtrIndeces.push_back(emitter.Builder().getInt32(0));
-    vmtPtrIndeces.push_back(emitter.Builder().getInt32(leftVmtPtrHolderClass->VmtPtrIndex()));
-    llvm::Value* vmtPtrPtr = emitter.Builder().CreateGEP(thisPtr, vmtPtrIndeces);
-    llvm::Value* vmtPtr = emitter.Builder().CreateBitCast(emitter.Builder().CreateLoad(vmtPtrPtr), leftClassType->VmtPtrType(emitter));
-    ArgVector indeces;
-    indeces.push_back(emitter.Builder().getInt32(0));
-    indeces.push_back(emitter.Builder().getInt32(0));
-    llvm::Value* leftClassIdPtr = emitter.Builder().CreateGEP(vmtPtr, indeces);
-    llvm::Value* leftClassId = emitter.Builder().CreatePtrToInt(emitter.Builder().CreateLoad(leftClassIdPtr), emitter.Builder().getInt64Ty());
-    llvm::Value* leftClassIdNull = emitter.Builder().CreateICmpEQ(leftClassId, emitter.Builder().getInt64(0));
-    llvm::BasicBlock* leftTrueBlock = llvm::BasicBlock::Create(emitter.Context(), "leftTrue", emitter.Function());
-    llvm::BasicBlock* leftFalseBlock = llvm::BasicBlock::Create(emitter.Context(), "leftFalse", emitter.Function());
-    llvm::BasicBlock* leftContinueBlock = llvm::BasicBlock::Create(emitter.Context(), "leftContinue", emitter.Function());
-    emitter.Builder().CreateCondBr(leftClassIdNull, leftTrueBlock, leftFalseBlock);
+    void* vmtPtr = emitter.GetVmtPtr(thisPtr, leftVmtPtrHolderClass->VmtPtrIndex(), leftClassType->VmtPtrType(emitter));
+    void* leftClassIdPtr = emitter.GetClassIdPtr(vmtPtr);
+    void* leftClassId = emitter.CreatePtrToInt(emitter.CreateLoad(leftClassIdPtr), emitter.GetIrTypeForULong());
+    void* leftClassIdNull = emitter.CreateICmpEQ(leftClassId, emitter.CreateDefaultIrValueForULong());
+    void* leftTrueBlock = emitter.CreateBasicBlock("leftTrue");
+    void* leftFalseBlock = emitter.CreateBasicBlock("leftFalse");
+    void* leftContinueBlock = emitter.CreateBasicBlock("leftContinue");
+    emitter.CreateCondBr(leftClassIdNull, leftTrueBlock, leftFalseBlock);
     emitter.SetCurrentBasicBlock(leftTrueBlock);
-    llvm::Type* retType = llvm::Type::getInt64Ty(emitter.Context());
-    std::vector<llvm::Type*> paramTypes;
-    paramTypes.push_back(llvm::Type::getInt8PtrTy(emitter.Context()));
-    llvm::FunctionType* dynamicInitFnType = llvm::FunctionType::get(retType, paramTypes, false);
-    llvm::Function* dynamicInitFn = llvm::cast<llvm::Function>(emitter.Module()->getOrInsertFunction("RtDynamicInitVmt", dynamicInitFnType));
-    std::vector<llvm::Value*> leftArgs;
-    leftArgs.push_back(emitter.Builder().CreateBitCast(leftClassIdPtr, emitter.Builder().getInt8PtrTy()));
-    llvm::Value* computedLeftClassId = emitter.Builder().CreateCall(dynamicInitFn, leftArgs);
+    void* retType = emitter.GetIrTypeForULong();
+    std::vector<void*> paramTypes;
+    paramTypes.push_back(emitter.GetIrTypeForVoidPtrType());
+    void* dynamicInitFnType = emitter.GetIrTypeForFunction(retType, paramTypes);
+    void* dynamicInitFn = emitter.GetOrInsertFunction("RtDynamicInitVmt", dynamicInitFnType);
+    std::vector<void*> leftArgs;
+    leftArgs.push_back(emitter.CreateBitCast(leftClassIdPtr, emitter.GetIrTypeForVoidPtrType()));
+    void* computedLeftClassId = emitter.CreateCall(dynamicInitFn, leftArgs);
     emitter.Stack().Push(computedLeftClassId);
     leftClassIdVar->Store(emitter, OperationFlags::none);
-    emitter.Builder().CreateBr(leftContinueBlock);
+    emitter.CreateBr(leftContinueBlock);
     emitter.SetCurrentBasicBlock(leftFalseBlock);
     emitter.Stack().Push(leftClassId);
     leftClassIdVar->Store(emitter, OperationFlags::none);
-    emitter.Builder().CreateBr(leftContinueBlock);
+    emitter.CreateBr(leftContinueBlock);
     emitter.SetCurrentBasicBlock(leftContinueBlock);
-    llvm::Value* rightClassTypeVmtObject = rightClassType->VmtObject(emitter, false);
-    llvm::Value* rightClassIdPtr = emitter.Builder().CreateGEP(rightClassTypeVmtObject, indeces);
-    llvm::Value* rightClassId = emitter.Builder().CreatePtrToInt(emitter.Builder().CreateLoad(rightClassIdPtr), emitter.Builder().getInt64Ty());
-    llvm::Value* rightClassIdNull = emitter.Builder().CreateICmpEQ(rightClassId, emitter.Builder().getInt64(0));
-    llvm::BasicBlock* rightTrueBlock = llvm::BasicBlock::Create(emitter.Context(), "rightTrue", emitter.Function());
-    llvm::BasicBlock* rightFalseBlock = llvm::BasicBlock::Create(emitter.Context(), "rightFalse", emitter.Function());
-    llvm::BasicBlock* rightContinueBlock = llvm::BasicBlock::Create(emitter.Context(), "rightContinue", emitter.Function());
-    emitter.Builder().CreateCondBr(rightClassIdNull, rightTrueBlock, rightFalseBlock);
+    void* rightClassTypeVmtObject = rightClassType->VmtObject(emitter, false);
+    void* rightClassIdPtr = emitter.GetClassIdPtr(rightClassTypeVmtObject);
+    void* rightClassId = emitter.CreatePtrToInt(emitter.CreateLoad(rightClassIdPtr), emitter.GetIrTypeForULong());
+    void* rightClassIdNull = emitter.CreateICmpEQ(rightClassId, emitter.CreateDefaultIrValueForULong());
+    void* rightTrueBlock = emitter.CreateBasicBlock("rightTrue");
+    void* rightFalseBlock = emitter.CreateBasicBlock("rightFalse");
+    void* rightContinueBlock = emitter.CreateBasicBlock("rightContinue");
+    emitter.CreateCondBr(rightClassIdNull, rightTrueBlock, rightFalseBlock);
     emitter.SetCurrentBasicBlock(rightTrueBlock);
-    std::vector<llvm::Value*> rightArgs;
-    rightArgs.push_back(emitter.Builder().CreateBitCast(rightClassIdPtr, emitter.Builder().getInt8PtrTy()));
-    llvm::Value* computedRightClassId = emitter.Builder().CreateCall(dynamicInitFn, rightArgs);
+    std::vector<void*> rightArgs;
+    rightArgs.push_back(emitter.CreateBitCast(rightClassIdPtr, emitter.GetIrTypeForVoidPtrType()));
+    void* computedRightClassId = emitter.CreateCall(dynamicInitFn, rightArgs);
     emitter.Stack().Push(computedRightClassId);
     rightClassIdVar->Store(emitter, OperationFlags::none);
-    emitter.Builder().CreateBr(rightContinueBlock);
+    emitter.CreateBr(rightContinueBlock);
     emitter.SetCurrentBasicBlock(rightFalseBlock);
     emitter.Stack().Push(rightClassId);
     rightClassIdVar->Store(emitter, OperationFlags::none);
-    emitter.Builder().CreateBr(rightContinueBlock);
+    emitter.CreateBr(rightContinueBlock);
     emitter.SetCurrentBasicBlock(rightContinueBlock);
     leftClassIdVar->Load(emitter, OperationFlags::none);
-    llvm::Value* loadedLeftClassId = emitter.Stack().Pop();
+    void* loadedLeftClassId = emitter.Stack().Pop();
     rightClassIdVar->Load(emitter, OperationFlags::none);
-    llvm::Value* loadedRightClassId = emitter.Stack().Pop();
-    llvm::Value* remainder = emitter.Builder().CreateURem(loadedLeftClassId, loadedRightClassId);
-    llvm::Value* remainderIsZero = emitter.Builder().CreateICmpEQ(remainder, emitter.Builder().getInt64(0));
-    llvm::BasicBlock* trueBlock = llvm::BasicBlock::Create(emitter.Context(), "true", emitter.Function());
-    llvm::BasicBlock* falseBlock = llvm::BasicBlock::Create(emitter.Context(), "false", emitter.Function());
-    llvm::BasicBlock* continueBlock = llvm::BasicBlock::Create(emitter.Context(), "continue", emitter.Function());
-    emitter.Builder().CreateCondBr(remainderIsZero, trueBlock, falseBlock);
+    void* loadedRightClassId = emitter.Stack().Pop();
+    void* remainder = emitter.CreateURem(loadedLeftClassId, loadedRightClassId);
+    void* remainderIsZero = emitter.CreateICmpEQ(remainder, emitter.CreateDefaultIrValueForULong());
+    void* trueBlock = emitter.CreateBasicBlock("true");
+    void* falseBlock = emitter.CreateBasicBlock("false");
+    void* continueBlock = emitter.CreateBasicBlock("continue");
+    emitter.CreateCondBr(remainderIsZero, trueBlock, falseBlock);
     emitter.SetCurrentBasicBlock(trueBlock);
-    emitter.Stack().Push(emitter.Builder().CreateBitCast(thisPtr, rightClassType->AddPointer(GetSpan())->IrType(emitter)));
+    emitter.Stack().Push(emitter.CreateBitCast(thisPtr, rightClassType->AddPointer(GetSpan())->IrType(emitter)));
     variable->Store(emitter, OperationFlags::none);
-    emitter.Builder().CreateBr(continueBlock);
+    emitter.CreateBr(continueBlock);
     emitter.SetCurrentBasicBlock(falseBlock);
-    emitter.Stack().Push(llvm::Constant::getNullValue(rightClassType->AddPointer(GetSpan())->IrType(emitter)));
+    emitter.Stack().Push(emitter.CreateDefaultIrValueForPtrType(rightClassType->AddPointer(GetSpan())->IrType(emitter)));
     variable->Store(emitter, OperationFlags::none);
-    emitter.Builder().CreateBr(continueBlock);
+    emitter.CreateBr(continueBlock);
     emitter.SetCurrentBasicBlock(continueBlock);
     variable->Load(emitter, OperationFlags::none);
     DestroyTemporaries(emitter);
@@ -1682,7 +1658,7 @@ BoundExpression* BoundTypeNameExpression::Clone()
 void BoundTypeNameExpression::Load(Emitter& emitter, OperationFlags flags)
 {
     classPtr->Load(emitter, OperationFlags::none);
-    llvm::Value* thisPtr = emitter.Stack().Pop();
+    void* thisPtr = emitter.Stack().Pop();
     TypeSymbol* classPtrType = static_cast<TypeSymbol*>(classPtr->GetType());
     Assert(classPtrType->IsPointerType(), "pointer type expected");
     TypeSymbol* type = classPtrType->BaseType();
@@ -1691,18 +1667,10 @@ void BoundTypeNameExpression::Load(Emitter& emitter, OperationFlags flags)
     ClassTypeSymbol* vmtPtrHolderClass = classType->VmtPtrHolderClass();
     if (classType != vmtPtrHolderClass)
     {
-        thisPtr = emitter.Builder().CreateBitCast(thisPtr, vmtPtrHolderClass->AddPointer(GetSpan())->IrType(emitter));
+        thisPtr = emitter.CreateBitCast(thisPtr, vmtPtrHolderClass->AddPointer(GetSpan())->IrType(emitter));
     }
-    ArgVector vmtPtrIndeces;
-    vmtPtrIndeces.push_back(emitter.Builder().getInt32(0));
-    vmtPtrIndeces.push_back(emitter.Builder().getInt32(vmtPtrHolderClass->VmtPtrIndex()));
-    llvm::Value* vmtPtrPtr = emitter.Builder().CreateGEP(thisPtr, vmtPtrIndeces);
-    llvm::Value* vmtPtr = emitter.Builder().CreateBitCast(emitter.Builder().CreateLoad(vmtPtrPtr), classType->VmtPtrType(emitter));
-    ArgVector indeces;
-    indeces.push_back(emitter.Builder().getInt32(0));
-    indeces.push_back(emitter.Builder().getInt32(classNameVmtIndexOffset)); // new layout: 3
-    llvm::Value* classNamePtr = emitter.Builder().CreateGEP(vmtPtr, indeces);
-    llvm::Value* className = emitter.Builder().CreateLoad(classNamePtr);
+    void* vmtPtr = emitter.GetVmtPtr(thisPtr, vmtPtrHolderClass->VmtPtrIndex(), classType->VmtPtrType(emitter));
+    void* className = emitter.GetClassName(vmtPtr, classNameVmtIndexOffset);
     emitter.Stack().Push(className);
     DestroyTemporaries(emitter);
 }
@@ -1740,8 +1708,8 @@ BoundExpression* BoundBitCast::Clone()
 void BoundBitCast::Load(Emitter& emitter, OperationFlags flags)
 {
     expr->Load(emitter, OperationFlags::none);
-    llvm::Value* value = emitter.Stack().Pop();
-    llvm::Value* casted = emitter.Builder().CreateBitCast(value, GetType()->IrType(emitter));
+    void* value = emitter.Stack().Pop();
+    void* casted = emitter.CreateBitCast(value, GetType()->IrType(emitter));
     emitter.Stack().Push(casted);
     DestroyTemporaries(emitter);
 }
@@ -1777,7 +1745,7 @@ BoundExpression* BoundFunctionPtr::Clone()
 
 void BoundFunctionPtr::Load(Emitter& emitter, OperationFlags flags)
 {
-    llvm::Value* irObject = emitter.Module()->getOrInsertFunction(ToUtf8(function->MangledName()), function->IrType(emitter));
+    void* irObject = emitter.GetOrInsertFunction(ToUtf8(function->MangledName()), function->IrType(emitter));
     emitter.Stack().Push(irObject);
     DestroyTemporaries(emitter);
 }
@@ -1805,26 +1773,26 @@ BoundExpression* BoundDisjunction::Clone()
 void BoundDisjunction::Load(Emitter& emitter, OperationFlags flags)
 {
     temporary->Load(emitter, OperationFlags::addr);
-    llvm::Value* temp = emitter.Stack().Pop();
+    void* temp = emitter.Stack().Pop();
     left->Load(emitter, OperationFlags::none);
-    llvm::Value* leftValue = emitter.Stack().Pop();
-    llvm::BasicBlock* trueBlock = llvm::BasicBlock::Create(emitter.Context(), "true", emitter.Function());
-    llvm::BasicBlock* rightBlock = llvm::BasicBlock::Create(emitter.Context(), "right", emitter.Function());
-    llvm::BasicBlock* falseBlock = llvm::BasicBlock::Create(emitter.Context(), "false", emitter.Function());
-    llvm::BasicBlock* nextBlock = llvm::BasicBlock::Create(emitter.Context(), "next", emitter.Function());
-    emitter.Builder().CreateCondBr(leftValue, trueBlock, rightBlock);
+    void* leftValue = emitter.Stack().Pop();
+    void* trueBlock = emitter.CreateBasicBlock("true");
+    void* rightBlock = emitter.CreateBasicBlock("right");
+    void* falseBlock = emitter.CreateBasicBlock("false");
+    void* nextBlock = emitter.CreateBasicBlock("next");
+    emitter.CreateCondBr(leftValue, trueBlock, rightBlock);
     emitter.SetCurrentBasicBlock(rightBlock);
     right->Load(emitter, OperationFlags::none);
-    llvm::Value* rightValue = emitter.Stack().Pop();
-    emitter.Builder().CreateCondBr(rightValue, trueBlock, falseBlock);
+    void* rightValue = emitter.Stack().Pop();
+    emitter.CreateCondBr(rightValue, trueBlock, falseBlock);
     emitter.SetCurrentBasicBlock(trueBlock);
-    emitter.Builder().CreateStore(emitter.Builder().getInt1(true), temp);
-    emitter.Builder().CreateBr(nextBlock);
+    emitter.CreateStore(emitter.CreateIrValueForBool(true), temp);
+    emitter.CreateBr(nextBlock);
     emitter.SetCurrentBasicBlock(falseBlock);
-    emitter.Builder().CreateStore(emitter.Builder().getInt1(false), temp);
-    emitter.Builder().CreateBr(nextBlock);
+    emitter.CreateStore(emitter.CreateIrValueForBool(false), temp);
+    emitter.CreateBr(nextBlock);
     emitter.SetCurrentBasicBlock(nextBlock);
-    llvm::Value* value = emitter.Builder().CreateLoad(temp);
+    void* value = emitter.CreateLoad(temp);
     emitter.Stack().Push(value);
     DestroyTemporaries(emitter);
 }
@@ -1874,26 +1842,26 @@ BoundExpression* BoundConjunction::Clone()
 void BoundConjunction::Load(Emitter& emitter, OperationFlags flags)
 {
     temporary->Load(emitter, OperationFlags::addr);
-    llvm::Value* temp = emitter.Stack().Pop();
+    void* temp = emitter.Stack().Pop();
     left->Load(emitter, OperationFlags::none);
-    llvm::Value* leftValue = emitter.Stack().Pop();
-    llvm::BasicBlock* trueBlock = llvm::BasicBlock::Create(emitter.Context(), "true", emitter.Function());
-    llvm::BasicBlock* rightBlock = llvm::BasicBlock::Create(emitter.Context(), "right", emitter.Function());
-    llvm::BasicBlock* falseBlock = llvm::BasicBlock::Create(emitter.Context(), "false", emitter.Function());
-    llvm::BasicBlock* nextBlock = llvm::BasicBlock::Create(emitter.Context(), "next", emitter.Function());
-    emitter.Builder().CreateCondBr(leftValue, rightBlock, falseBlock);
+    void* leftValue = emitter.Stack().Pop();
+    void* trueBlock = emitter.CreateBasicBlock("true");
+    void* rightBlock = emitter.CreateBasicBlock("right");
+    void* falseBlock = emitter.CreateBasicBlock("false");
+    void* nextBlock = emitter.CreateBasicBlock("next");
+    emitter.CreateCondBr(leftValue, rightBlock, falseBlock);
     emitter.SetCurrentBasicBlock(rightBlock);
     right->Load(emitter, OperationFlags::none);
-    llvm::Value* rightValue = emitter.Stack().Pop();
-    emitter.Builder().CreateCondBr(rightValue, trueBlock, falseBlock);
+    void* rightValue = emitter.Stack().Pop();
+    emitter.CreateCondBr(rightValue, trueBlock, falseBlock);
     emitter.SetCurrentBasicBlock(trueBlock);
-    emitter.Builder().CreateStore(emitter.Builder().getInt1(true), temp);
-    emitter.Builder().CreateBr(nextBlock);
+    emitter.CreateStore(emitter.CreateIrValueForBool(true), temp);
+    emitter.CreateBr(nextBlock);
     emitter.SetCurrentBasicBlock(falseBlock);
-    emitter.Builder().CreateStore(emitter.Builder().getInt1(false), temp);
-    emitter.Builder().CreateBr(nextBlock);
+    emitter.CreateStore(emitter.CreateIrValueForBool(false), temp);
+    emitter.CreateBr(nextBlock);
     emitter.SetCurrentBasicBlock(nextBlock);
-    llvm::Value* value = emitter.Builder().CreateLoad(temp);
+    void* value = emitter.CreateLoad(temp);
     emitter.Stack().Push(value);
     DestroyTemporaries(emitter);
 }

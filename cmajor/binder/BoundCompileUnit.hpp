@@ -29,10 +29,12 @@ struct ArgumentMatch;
 class AttributeBinder;
 class BoundNamespace;
 
-class BoundCompileUnit : public BoundNode
+class BINDER_API BoundCompileUnit : public BoundNode
 {
 public:
     BoundCompileUnit(Module& module_, CompileUnitNode* compileUnitNode_, AttributeBinder* attributeBinder_);
+    BoundCompileUnit(const BoundCompileUnit&) = delete;
+    BoundCompileUnit& operator=(const BoundCompileUnit&) = delete;
     void Load(Emitter& emitter, OperationFlags flags) override;
     void Store(Emitter& emitter, OperationFlags flags) override;
     void Accept(BoundNodeVisitor& visitor) override;

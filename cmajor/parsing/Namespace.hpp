@@ -10,7 +10,7 @@
 
 namespace cmajor { namespace parsing {
 
-class Namespace: public ParsingObject
+class PARSING_API Namespace: public ParsingObject
 {
 public:
     Namespace(const std::u32string& name_, Scope* enclosingScope_);
@@ -20,7 +20,7 @@ public:
 
 class Scope;
 
-class UsingObject: public ParsingObject
+class PARSING_API UsingObject: public ParsingObject
 {
 public:
     UsingObject(cmajor::codedom::UsingObject* subject_, Scope* enclosingScope_);

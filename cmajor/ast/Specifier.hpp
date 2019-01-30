@@ -5,6 +5,7 @@
 
 #ifndef CMAJOR_AST_SPECIFIER_INCLUDED
 #define CMAJOR_AST_SPECIFIER_INCLUDED
+#include <cmajor/ast/AstApi.hpp>
 #include <string>
 #include <stdint.h>
 
@@ -51,9 +52,9 @@ inline Specifiers operator~(Specifiers operand)
     return Specifiers(~uint32_t(operand));
 }
 
-bool StaticConstructorSpecifiers(Specifiers specifiers);
+AST_API bool StaticConstructorSpecifiers(Specifiers specifiers);
 
-std::string SpecifierStr(Specifiers specifiers);
+AST_API std::string SpecifierStr(Specifiers specifiers);
 
 } } // namespace cmajor::ast
 

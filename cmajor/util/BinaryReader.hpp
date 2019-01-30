@@ -5,12 +5,13 @@
 
 #ifndef CMAJOR_UTIL_BINARY_READER_INCLUDED
 #define CMAJOR_UTIL_BINARY_READER_INCLUDED
+#include <cmajor/util/UtilApi.hpp>
 #include <cmajor/util/MappedInputFile.hpp>
 #include <boost/uuid/uuid.hpp>
 
 namespace cmajor { namespace util {
 
-class BinaryReader
+class UTIL_API BinaryReader
 {
 public:
     BinaryReader(const std::string& fileName_);

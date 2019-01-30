@@ -5,7 +5,7 @@
 
 #ifndef CMAJOR_BINDER_BOUND_STATEMENT_INCLUDED
 #define CMAJOR_BINDER_BOUND_STATEMENT_INCLUDED
-#include <cmajor/binder/BoundNode.hpp>
+#include <cmajor/binder/BoundExpression.hpp>
 #include <cmajor/symbols/VariableSymbol.hpp>
 #include <cmajor/symbols/Value.hpp>
 #include <cmajor/ast/Statement.hpp>
@@ -36,10 +36,12 @@ inline BoundStatementFlags operator&(BoundStatementFlags left, BoundStatementFla
     return BoundStatementFlags(uint8_t(left) & uint8_t(right));
 }
 
-class BoundStatement : public BoundNode
+class BINDER_API BoundStatement : public BoundNode
 {
 public:
     BoundStatement(Module* module_, const Span& span_, BoundNodeType boundNodeType_);
+    BoundStatement(const BoundStatement&) = delete;
+    BoundStatement& operator=(const BoundStatement&) = delete;
     void Load(Emitter& emitter, OperationFlags flags) override;
     void Store(Emitter& emitter, OperationFlags flags) override;
     BoundStatement* Parent() { return parent; }
@@ -59,7 +61,7 @@ private:
     void SetFlag(BoundStatementFlags flag) { flags = flags | flag; }
 };
 
-class BoundSequenceStatement : public BoundStatement
+class BINDER_API BoundSequenceStatement : public BoundStatement
 {
 public:
     BoundSequenceStatement(Module* module_, const Span& span_, std::unique_ptr<BoundStatement>&& first_, std::unique_ptr<BoundStatement>&& second_);
@@ -71,11 +73,13 @@ private:
     std::unique_ptr<BoundStatement> second;
 };
 
-class BoundCompoundStatement : public BoundStatement
+class BINDER_API BoundCompoundStatement : public BoundStatement
 {
 public:
     BoundCompoundStatement(Module* module_, const Span& span_);
     BoundCompoundStatement(Module* module_, const Span& span_, const Span& endSpan_);
+    BoundCompoundStatement(const BoundCompoundStatement&) = delete;
+    BoundCompoundStatement& operator=(const BoundCompoundStatement&) = delete;
     void Accept(BoundNodeVisitor& visitor) override;
     void InsertStatementToFront(std::unique_ptr<BoundStatement>&& statement);
     void AddStatement(std::unique_ptr<BoundStatement>&& statement);
@@ -86,17 +90,19 @@ private:
     Span endSpan;
 };
 
-class BoundReturnStatement : public BoundStatement
+class BINDER_API BoundReturnStatement : public BoundStatement
 {
 public:
     BoundReturnStatement(Module* module_, std::unique_ptr<BoundFunctionCall>&& returnFunctionCall_, const Span& span_);
+    BoundReturnStatement(const BoundReturnStatement&) = delete;
+    BoundReturnStatement& operator=(const BoundReturnStatement&) = delete;
     void Accept(BoundNodeVisitor& visitor) override;
     BoundFunctionCall* ReturnFunctionCall() { return returnFunctionCall.get(); }
 private:
     std::unique_ptr<BoundFunctionCall> returnFunctionCall;
 };
 
-class BoundIfStatement : public BoundStatement
+class BINDER_API BoundIfStatement : public BoundStatement
 {
 public:
     BoundIfStatement(Module* module_, const Span& span_, std::unique_ptr<BoundExpression>&& condition_, std::unique_ptr<BoundStatement>&& thenS_, std::unique_ptr<BoundStatement>&& elseS_);
@@ -110,7 +116,7 @@ private:
     std::unique_ptr<BoundStatement> elseS;
 };
 
-class BoundWhileStatement : public BoundStatement
+class BINDER_API BoundWhileStatement : public BoundStatement
 {
 public:
     BoundWhileStatement(Module* module_, const Span& span_, std::unique_ptr<BoundExpression>&& condition_, std::unique_ptr<BoundStatement>&& statement_);
@@ -122,7 +128,7 @@ private:
     std::unique_ptr<BoundStatement> statement;
 };
 
-class BoundDoStatement : public BoundStatement
+class BINDER_API BoundDoStatement : public BoundStatement
 {
 public:
     BoundDoStatement(Module* module_, const Span& span_, std::unique_ptr<BoundStatement>&& statement_, std::unique_ptr<BoundExpression>&& condition_);
@@ -134,7 +140,7 @@ private:
     std::unique_ptr<BoundExpression> condition;
 };
 
-class BoundForStatement : public BoundStatement
+class BINDER_API BoundForStatement : public BoundStatement
 {
 public:
     BoundForStatement(Module* module_, const Span& span_, std::unique_ptr<BoundStatement>&& initS_, std::unique_ptr<BoundExpression>&& condition_, std::unique_ptr<BoundStatement>&& loopS_, std::unique_ptr<BoundStatement>&& actionS_);
@@ -153,7 +159,7 @@ private:
 class BoundCaseStatement;
 class BoundDefaultStatement;
 
-class BoundSwitchStatement : public BoundStatement
+class BINDER_API BoundSwitchStatement : public BoundStatement
 {
 public:
     BoundSwitchStatement(Module* module_, const Span& span_, std::unique_ptr<BoundExpression>&& condition_);
@@ -169,7 +175,7 @@ private:
     std::unique_ptr<BoundDefaultStatement> defaultStatement;
 };
 
-class BoundCaseStatement : public BoundStatement
+class BINDER_API BoundCaseStatement : public BoundStatement
 {
 public:
     BoundCaseStatement(Module* module_, const Span& span_);
@@ -183,7 +189,7 @@ private:
     BoundCompoundStatement compoundStatement;
 };
 
-class BoundDefaultStatement : public BoundStatement
+class BINDER_API BoundDefaultStatement : public BoundStatement
 {
 public:
     BoundDefaultStatement(Module* module_, const Span& span_);
@@ -194,7 +200,7 @@ private:
     BoundCompoundStatement compoundStatement;
 };
 
-class BoundGotoCaseStatement : public BoundStatement
+class BINDER_API BoundGotoCaseStatement : public BoundStatement
 {
 public:
     BoundGotoCaseStatement(Module* module_, const Span& span_, std::unique_ptr<Value>&& caseValue_);
@@ -204,28 +210,28 @@ private:
     std::unique_ptr<Value> caseValue;
 };
 
-class BoundGotoDefaultStatement : public BoundStatement
+class BINDER_API BoundGotoDefaultStatement : public BoundStatement
 {
 public:
     BoundGotoDefaultStatement(Module* module_, const Span& span_);
     void Accept(BoundNodeVisitor& visitor) override;
 };
 
-class BoundBreakStatement : public BoundStatement
+class BINDER_API BoundBreakStatement : public BoundStatement
 {
 public:
     BoundBreakStatement(Module* module_, const Span& span_);
     void Accept(BoundNodeVisitor& visitor) override;
 };
 
-class BoundContinueStatement : public BoundStatement
+class BINDER_API BoundContinueStatement : public BoundStatement
 {
 public:
     BoundContinueStatement(Module* module_, const Span& span_);
     void Accept(BoundNodeVisitor& visitor) override;
 };
 
-class BoundGotoStatement : public BoundStatement
+class BINDER_API BoundGotoStatement : public BoundStatement
 {
 public:
     BoundGotoStatement(Module* module_, const Span& span_, const std::u32string& target_);
@@ -241,7 +247,7 @@ private:
     BoundCompoundStatement* targetBlock;
 };
 
-class BoundConstructionStatement : public BoundStatement
+class BINDER_API BoundConstructionStatement : public BoundStatement
 {
 public:
     BoundConstructionStatement(Module* module_, std::unique_ptr<BoundFunctionCall>&& constructorCall_);
@@ -251,7 +257,7 @@ private:
     std::unique_ptr<BoundFunctionCall> constructorCall;
 };
 
-class BoundAssignmentStatement : public BoundStatement
+class BINDER_API BoundAssignmentStatement : public BoundStatement
 {
 public:
     BoundAssignmentStatement(Module* module_, std::unique_ptr<BoundFunctionCall>&& assignmentCall_);
@@ -261,7 +267,7 @@ private:
     std::unique_ptr<BoundFunctionCall> assignmentCall;
 };
 
-class BoundExpressionStatement : public BoundStatement
+class BINDER_API BoundExpressionStatement : public BoundStatement
 {
 public:
     BoundExpressionStatement(Module* module_, std::unique_ptr<BoundExpression>&& expression_);
@@ -271,14 +277,14 @@ private:
     std::unique_ptr<BoundExpression> expression;
 };
 
-class BoundEmptyStatement : public BoundStatement
+class BINDER_API BoundEmptyStatement : public BoundStatement
 {
 public:
     BoundEmptyStatement(Module* module_, const Span& span_);
     void Accept(BoundNodeVisitor& visitor) override;
 };
 
-class BoundSetVmtPtrStatement : public BoundStatement
+class BINDER_API BoundSetVmtPtrStatement : public BoundStatement
 {
 public:
     BoundSetVmtPtrStatement(Module * module_, std::unique_ptr<BoundExpression>&& classPtr_, ClassTypeSymbol* classType_);
@@ -290,7 +296,7 @@ private:
     ClassTypeSymbol* classType;
 };
 
-class BoundThrowStatement : public BoundStatement
+class BINDER_API BoundThrowStatement : public BoundStatement
 {
 public:
     BoundThrowStatement(Module* module_, const Span& span_, std::unique_ptr<BoundExpression>&& throwCallExpr_);
@@ -300,7 +306,7 @@ private:
     std::unique_ptr<BoundExpression> throwCallExpr;
 };
 
-class BoundRethrowStatement : public BoundStatement
+class BINDER_API BoundRethrowStatement : public BoundStatement
 {
 public:
     BoundRethrowStatement(Module* module_, const Span& span_, std::unique_ptr<BoundExpression>&& releaseCall_);
@@ -312,7 +318,7 @@ private:
 
 class BoundCatchStatement;
 
-class BoundTryStatement : public BoundStatement
+class BINDER_API BoundTryStatement : public BoundStatement
 {
 public:
     BoundTryStatement(Module* module_, const Span& span_);
@@ -326,7 +332,7 @@ private:
     std::vector<std::unique_ptr<BoundCatchStatement>> catches;
 };
 
-class BoundCatchStatement : public BoundStatement
+class BINDER_API BoundCatchStatement : public BoundStatement
 {
 public:
     BoundCatchStatement(Module* module_, const Span& span__);

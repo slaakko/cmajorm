@@ -7,7 +7,6 @@
 #define CMAJOR_SYMBOLS_TYPE_SYMBOL_INCLUDED
 #include <cmajor/symbols/ContainerSymbol.hpp>
 #include <cmajor/ir/Emitter.hpp>
-#include <llvm/IR/Type.h>
 #include <boost/uuid/uuid.hpp>
 #include <boost/functional/hash.hpp>
 
@@ -20,7 +19,7 @@ enum class ValueType : uint8_t;
 class Value;
 class TemplateParameterSymbol;
 
-class TypeSymbol : public ContainerSymbol
+class SYMBOLS_API TypeSymbol : public ContainerSymbol
 {
 public:
     TypeSymbol(SymbolType symbolType_, const Span& span_, const std::u32string& name_);
@@ -48,9 +47,9 @@ public:
     virtual TypeSymbol* AddLvalueReference(const Span& span);
     virtual TypeSymbol* AddRvalueReference(const Span& span);
     virtual TypeSymbol* AddPointer(const Span& span);
-    virtual llvm::Type* IrType(Emitter& emitter) = 0;
-    virtual llvm::Constant* CreateDefaultIrValue(Emitter& emitter) = 0;
-    virtual llvm::DIType* CreateDIType(Emitter& emitter);
+    virtual void* IrType(Emitter& emitter) = 0;
+    virtual void* CreateDefaultIrValue(Emitter& emitter) = 0;
+    virtual void* CreateDIType(Emitter& emitter);
     virtual bool IsConstType() const { return false; }
     virtual bool IsReferenceType() const { return false; }
     virtual bool IsLvalueReferenceType() const { return false; }
@@ -76,7 +75,7 @@ public:
     virtual ValueType GetValueType() const;
     virtual Value* MakeValue() const { return nullptr; }
     std::u32string Id() const override;
-    llvm::DIType* GetDIType(Emitter& emitter);
+    void* GetDIType(Emitter& emitter);
     uint64_t SizeInBits(Emitter& emitter);
     uint32_t AlignmentInBits(Emitter& emitter);
     const char* ClassName() const override { return "TypeSymbol"; }
@@ -85,7 +84,7 @@ private:
     boost::uuids::uuid typeId;
 };
 
-bool CompareTypesForEquality(const TypeSymbol* left, const TypeSymbol* right);
+SYMBOLS_API bool CompareTypesForEquality(const TypeSymbol* left, const TypeSymbol* right);
 
 inline bool TypesEqual(const TypeSymbol* left, const TypeSymbol* right)
 {

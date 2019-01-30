@@ -5,6 +5,7 @@
 
 #ifndef CMAJOR_SYMBOLS_TYPE_MAP_INCLUDED
 #define CMAJOR_SYMBOLS_TYPE_MAP_INCLUDED
+#include <cmajor/symbols/SymbolsApi.hpp>
 #include <cmajor/dom/Element.hpp>
 #include <unordered_map>
 
@@ -12,10 +13,12 @@ namespace cmajor { namespace symbols {
 
 class TypeSymbol;
 
-class TypeMap
+class SYMBOLS_API TypeMap
 {
 public:
     TypeMap();
+    TypeMap(const TypeMap&) = delete;
+    TypeMap& operator=(const TypeMap&) = delete;
     int GetOrInsertType(TypeSymbol* type);
     std::vector<std::unique_ptr<dom::Element>> TypeElements();
 private:

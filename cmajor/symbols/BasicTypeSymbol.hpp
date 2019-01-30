@@ -9,7 +9,7 @@
 
 namespace cmajor { namespace symbols {
 
-class BasicTypeSymbol : public TypeSymbol
+class SYMBOLS_API BasicTypeSymbol : public TypeSymbol
 {
 public:
     BasicTypeSymbol(SymbolType symbolType_, const Span& span_, const std::u32string& name_);
@@ -46,28 +46,28 @@ private:
     FunctionSymbol* equalityOp;
 };
 
-class BoolTypeSymbol : public BasicTypeSymbol
+class SYMBOLS_API BoolTypeSymbol : public BasicTypeSymbol
 {
 public:
     BoolTypeSymbol(const Span& span_, const std::u32string& name_);
     std::string TypeString() const override { return "bool"; }
-    llvm::Type* IrType(Emitter& emitter) override { return llvm::Type::getInt1Ty(emitter.Context()); }
-    llvm::Constant* CreateDefaultIrValue(Emitter& emitter) override { return emitter.Builder().getInt1(false); }
-    llvm::DIType* CreateDIType(Emitter& emitter) override;
+    void* IrType(Emitter& emitter) override { return emitter.GetIrTypeForBool(); }
+    void* CreateDefaultIrValue(Emitter& emitter) override { return emitter.CreateDefaultIrValueForBool(); }
+    void* CreateDIType(Emitter& emitter) override;
     bool IsSwitchConditionType() const override { return true; }
     ValueType GetValueType() const override;
     Value* MakeValue() const override;
     const char* ClassName() const override { return "BoolTypeSymbol"; }
 };
 
-class SByteTypeSymbol : public BasicTypeSymbol
+class SYMBOLS_API SByteTypeSymbol : public BasicTypeSymbol
 {
 public:
     SByteTypeSymbol(const Span& span_, const std::u32string& name_);
     std::string TypeString() const override { return "sbyte"; }
-    llvm::Type* IrType(Emitter& emitter) override { return llvm::Type::getInt8Ty(emitter.Context()); }
-    llvm::Constant* CreateDefaultIrValue(Emitter& emitter) override { return emitter.Builder().getInt8(0); }
-    llvm::DIType* CreateDIType(Emitter& emitter) override;
+    void* IrType(Emitter& emitter) override { return emitter.GetIrTypeForSByte(); }
+    void* CreateDefaultIrValue(Emitter& emitter) override { return emitter.CreateDefaultIrValueForSByte(); }
+    void* CreateDIType(Emitter& emitter) override;
     bool IsIntegralType() const override { return true; }
     bool IsSwitchConditionType() const override { return true; }
     ValueType GetValueType() const override;
@@ -75,14 +75,14 @@ public:
     const char* ClassName() const override { return "SByteTypeSymbol"; }
 };
 
-class ByteTypeSymbol : public BasicTypeSymbol
+class SYMBOLS_API ByteTypeSymbol : public BasicTypeSymbol
 {
 public:
     ByteTypeSymbol(const Span& span_, const std::u32string& name_);
     std::string TypeString() const override { return "byte"; }
-    llvm::Type* IrType(Emitter& emitter) override { return llvm::Type::getInt8Ty(emitter.Context()); }
-    llvm::Constant* CreateDefaultIrValue(Emitter& emitter) override { return emitter.Builder().getInt8(0); }
-    llvm::DIType* CreateDIType(Emitter& emitter) override;
+    void* IrType(Emitter& emitter) override { return emitter.GetIrTypeForByte(); }
+    void* CreateDefaultIrValue(Emitter& emitter) override { return emitter.CreateDefaultIrValueForByte(); }
+    void* CreateDIType(Emitter& emitter) override;
     bool IsIntegralType() const override { return true; }
     bool IsUnsignedType() const override { return true; }
     bool IsSwitchConditionType() const override { return true; }
@@ -91,14 +91,14 @@ public:
     const char* ClassName() const override { return "ByteTypeSymbol"; }
 };
 
-class ShortTypeSymbol : public BasicTypeSymbol
+class SYMBOLS_API ShortTypeSymbol : public BasicTypeSymbol
 {
 public:
     ShortTypeSymbol(const Span& span_, const std::u32string& name_);
     std::string TypeString() const override { return "short"; }
-    llvm::Type* IrType(Emitter& emitter) override { return llvm::Type::getInt16Ty(emitter.Context()); }
-    llvm::Constant* CreateDefaultIrValue(Emitter& emitter) override { return emitter.Builder().getInt16(0); }
-    llvm::DIType* CreateDIType(Emitter& emitter) override;
+    void* IrType(Emitter& emitter) override { return emitter.GetIrTypeForShort(); }
+    void* CreateDefaultIrValue(Emitter& emitter) override { return emitter.CreateDefaultIrValueForShort(); }
+    void* CreateDIType(Emitter& emitter) override;
     bool IsIntegralType() const override { return true; }
     bool IsSwitchConditionType() const override { return true; }
     ValueType GetValueType() const override;
@@ -106,14 +106,14 @@ public:
     const char* ClassName() const override { return "ShortTypeSymbol"; }
 };
 
-class UShortTypeSymbol : public BasicTypeSymbol
+class SYMBOLS_API UShortTypeSymbol : public BasicTypeSymbol
 {
 public:
     UShortTypeSymbol(const Span& span_, const std::u32string& name_);
     std::string TypeString() const override { return "ushort"; }
-    llvm::Type* IrType(Emitter& emitter) override { return llvm::Type::getInt16Ty(emitter.Context()); }
-    llvm::Constant* CreateDefaultIrValue(Emitter& emitter) override { return emitter.Builder().getInt16(0); }
-    llvm::DIType* CreateDIType(Emitter& emitter) override;
+    void* IrType(Emitter& emitter) override { return emitter.GetIrTypeForUShort(); }
+    void* CreateDefaultIrValue(Emitter& emitter) override { return emitter.CreateDefaultIrValueForUShort(); }
+    void* CreateDIType(Emitter& emitter) override;
     bool IsIntegralType() const override { return true; }
     bool IsUnsignedType() const override { return true; }
     bool IsSwitchConditionType() const override { return true; }
@@ -122,14 +122,14 @@ public:
     const char* ClassName() const override { return "UShortTypeSymbol"; }
 };
 
-class IntTypeSymbol : public BasicTypeSymbol
+class SYMBOLS_API IntTypeSymbol : public BasicTypeSymbol
 {
 public:
     IntTypeSymbol(const Span& span_, const std::u32string& name_);
     std::string TypeString() const override { return "int"; }
-    llvm::Type* IrType(Emitter& emitter) override { return llvm::Type::getInt32Ty(emitter.Context()); }
-    llvm::Constant* CreateDefaultIrValue(Emitter& emitter) override { return emitter.Builder().getInt32(0); }
-    llvm::DIType* CreateDIType(Emitter& emitter) override;
+    void* IrType(Emitter& emitter) override { return emitter.GetIrTypeForInt(); }
+    void* CreateDefaultIrValue(Emitter& emitter) override { return emitter.CreateDefaultIrValueForInt(); }
+    void* CreateDIType(Emitter& emitter) override;
     bool IsIntegralType() const override { return true; }
     bool IsSwitchConditionType() const override { return true; }
     ValueType GetValueType() const override;
@@ -137,14 +137,14 @@ public:
     const char* ClassName() const override { return "IntTypeSymbol"; }
 };
 
-class UIntTypeSymbol : public BasicTypeSymbol
+class SYMBOLS_API UIntTypeSymbol : public BasicTypeSymbol
 {
 public:
     UIntTypeSymbol(const Span& span_, const std::u32string& name_);
     std::string TypeString() const override { return "uint"; }
-    llvm::Type* IrType(Emitter& emitter) override { return llvm::Type::getInt32Ty(emitter.Context()); }
-    llvm::Constant* CreateDefaultIrValue(Emitter& emitter) override { return emitter.Builder().getInt32(0); }
-    llvm::DIType* CreateDIType(Emitter& emitter) override;
+    void* IrType(Emitter& emitter) override { return emitter.GetIrTypeForUInt(); }
+    void* CreateDefaultIrValue(Emitter& emitter) override { return emitter.CreateDefaultIrValueForUInt(); }
+    void* CreateDIType(Emitter& emitter) override;
     bool IsIntegralType() const override { return true; }
     bool IsUnsignedType() const override { return true; }
     bool IsSwitchConditionType() const override { return true; }
@@ -153,14 +153,14 @@ public:
     const char* ClassName() const override { return "UIntTypeSymbol"; }
 };
 
-class LongTypeSymbol : public BasicTypeSymbol
+class SYMBOLS_API LongTypeSymbol : public BasicTypeSymbol
 {
 public:
     LongTypeSymbol(const Span& span_, const std::u32string& name_);
     std::string TypeString() const override { return "long"; }
-    llvm::Type* IrType(Emitter& emitter) override { return llvm::Type::getInt64Ty(emitter.Context()); }
-    llvm::Constant* CreateDefaultIrValue(Emitter& emitter) override { return emitter.Builder().getInt64(0); }
-    llvm::DIType* CreateDIType(Emitter& emitter) override;
+    void* IrType(Emitter& emitter) override { return emitter.GetIrTypeForLong(); }
+    void* CreateDefaultIrValue(Emitter& emitter) override { return emitter.CreateDefaultIrValueForLong(); }
+    void* CreateDIType(Emitter& emitter) override;
     bool IsIntegralType() const override { return true; }
     bool IsSwitchConditionType() const override { return true; }
     ValueType GetValueType() const override;
@@ -168,14 +168,14 @@ public:
     const char* ClassName() const override { return "LongTypeSymbol"; }
 };
 
-class ULongTypeSymbol : public BasicTypeSymbol
+class SYMBOLS_API ULongTypeSymbol : public BasicTypeSymbol
 {
 public:
     ULongTypeSymbol(const Span& span_, const std::u32string& name_);
     std::string TypeString() const override { return "ulong"; }
-    llvm::Type* IrType(Emitter& emitter) override { return llvm::Type::getInt64Ty(emitter.Context()); }
-    llvm::Constant* CreateDefaultIrValue(Emitter& emitter) override { return emitter.Builder().getInt64(0); }
-    llvm::DIType* CreateDIType(Emitter& emitter) override;
+    void* IrType(Emitter& emitter) override { return emitter.GetIrTypeForULong(); }
+    void* CreateDefaultIrValue(Emitter& emitter) override { return emitter.CreateDefaultIrValueForULong(); }
+    void* CreateDIType(Emitter& emitter) override;
     bool IsIntegralType() const override { return true; }
     bool IsUnsignedType() const override { return true; }
     bool IsSwitchConditionType() const override { return true; }
@@ -184,84 +184,84 @@ public:
     const char* ClassName() const override { return "ULongTypeSymbol"; }
 };
 
-class FloatTypeSymbol : public BasicTypeSymbol
+class SYMBOLS_API FloatTypeSymbol : public BasicTypeSymbol
 {
 public:
     FloatTypeSymbol(const Span& span_, const std::u32string& name_);
     std::string TypeString() const override { return "float"; }
-    llvm::Type* IrType(Emitter& emitter) override { return llvm::Type::getFloatTy(emitter.Context()); }
-    llvm::Constant* CreateDefaultIrValue(Emitter& emitter) override { return llvm::ConstantFP::get(llvm::Type::getFloatTy(emitter.Context()), 0.0); }
-    llvm::DIType* CreateDIType(Emitter& emitter) override;
+    void* IrType(Emitter& emitter) override { return emitter.GetIrTypeForFloat(); }
+    void* CreateDefaultIrValue(Emitter& emitter) override { return emitter.CreateDefaultIrValueForFloat(); }
+    void* CreateDIType(Emitter& emitter) override;
     bool IsFloatingPointType() const override { return true; }
     ValueType GetValueType() const override;
     Value* MakeValue() const override;
     const char* ClassName() const override { return "FloatTypeSymbol"; }
 };
 
-class DoubleTypeSymbol : public BasicTypeSymbol
+class SYMBOLS_API DoubleTypeSymbol : public BasicTypeSymbol
 {
 public:
     DoubleTypeSymbol(const Span& span_, const std::u32string& name_);
     std::string TypeString() const override { return "double"; }
-    llvm::Type* IrType(Emitter& emitter) override { return llvm::Type::getDoubleTy(emitter.Context()); }
-    llvm::Constant* CreateDefaultIrValue(Emitter& emitter) override { return llvm::ConstantFP::get(llvm::Type::getDoubleTy(emitter.Context()), 0.0); }
-    llvm::DIType* CreateDIType(Emitter& emitter) override;
+    void* IrType(Emitter& emitter) override { return emitter.GetIrTypeForDouble(); }
+    void* CreateDefaultIrValue(Emitter& emitter) override { return emitter.CreateDefaultIrValueForDouble(); }
+    void* CreateDIType(Emitter& emitter) override;
     bool IsFloatingPointType() const override { return true; }
     ValueType GetValueType() const override;
     Value* MakeValue() const override;
     const char* ClassName() const override { return "DoubleTypeSymbol"; }
 };
 
-class CharTypeSymbol : public BasicTypeSymbol
+class SYMBOLS_API CharTypeSymbol : public BasicTypeSymbol
 {
 public:
     CharTypeSymbol(const Span& span_, const std::u32string& name_);
     std::string TypeString() const override { return "char"; }
-    llvm::Type* IrType(Emitter& emitter) override { return llvm::Type::getInt8Ty(emitter.Context()); }
-    llvm::Constant* CreateDefaultIrValue(Emitter& emitter) override { return emitter.Builder().getInt8(0); }
-    llvm::DIType* CreateDIType(Emitter& emitter) override;
+    void* IrType(Emitter& emitter) override { return emitter.GetIrTypeForChar(); }
+    void* CreateDefaultIrValue(Emitter& emitter) override { return emitter.CreateDefaultIrValueForChar(); }
+    void* CreateDIType(Emitter& emitter) override;
     bool IsSwitchConditionType() const override { return true; }
     ValueType GetValueType() const override;
     Value* MakeValue() const override;
     const char* ClassName() const override { return "CharTypeSymbol"; }
 };
 
-class WCharTypeSymbol : public BasicTypeSymbol
+class SYMBOLS_API WCharTypeSymbol : public BasicTypeSymbol
 {
 public:
     WCharTypeSymbol(const Span& span_, const std::u32string& name_);
     std::string TypeString() const override { return "wchar"; }
-    llvm::Type* IrType(Emitter& emitter) override { return llvm::Type::getInt16Ty(emitter.Context()); }
-    llvm::Constant* CreateDefaultIrValue(Emitter& emitter) override { return emitter.Builder().getInt16(0); }
-    llvm::DIType* CreateDIType(Emitter& emitter) override;
+    void* IrType(Emitter& emitter) override { return emitter.GetIrTypeForWChar(); }
+    void* CreateDefaultIrValue(Emitter& emitter) override { return emitter.CreateDefaultIrValueForWChar(); }
+    void* CreateDIType(Emitter& emitter) override;
     bool IsSwitchConditionType() const override { return true; }
     ValueType GetValueType() const override;
     Value* MakeValue() const override;
     const char* ClassName() const override { return "WCharTypeSymbol"; }
 };
 
-class UCharTypeSymbol : public BasicTypeSymbol
+class SYMBOLS_API UCharTypeSymbol : public BasicTypeSymbol
 {
 public:
     UCharTypeSymbol(const Span& span_, const std::u32string& name_);
     std::string TypeString() const override { return "uchar"; }
-    llvm::Type* IrType(Emitter& emitter) override { return llvm::Type::getInt32Ty(emitter.Context()); }
-    llvm::Constant* CreateDefaultIrValue(Emitter& emitter) override { return emitter.Builder().getInt32(0); }
-    llvm::DIType* CreateDIType(Emitter& emitter) override;
+    void* IrType(Emitter& emitter) override { return emitter.GetIrTypeForUChar(); }
+    void* CreateDefaultIrValue(Emitter& emitter) override { return emitter.CreateDefaultIrValueForUChar(); }
+    void* CreateDIType(Emitter& emitter) override;
     bool IsSwitchConditionType() const override { return true; }
     ValueType GetValueType() const override;
     Value* MakeValue() const override;
     const char* ClassName() const override { return "UCharTypeSymbol"; }
 };
 
-class VoidTypeSymbol : public BasicTypeSymbol
+class SYMBOLS_API VoidTypeSymbol : public BasicTypeSymbol
 {
 public:
     VoidTypeSymbol(const Span& span_, const std::u32string& name_);
     std::string TypeString() const override { return "void"; }
-    llvm::Type* IrType(Emitter& emitter) override { return llvm::Type::getVoidTy(emitter.Context()); }
-    llvm::Constant* CreateDefaultIrValue(Emitter& emitter) override { Assert(false, "tried to create default value of void"); return llvm::Constant::getNullValue(emitter.Builder().getInt8PtrTy()); }
-    llvm::DIType* CreateDIType(Emitter& emitter) override;
+    void* IrType(Emitter& emitter) override { return emitter.GetIrTypeForVoid(); }
+    void* CreateDefaultIrValue(Emitter& emitter) override { Assert(false, "tried to create default value for void type"); return nullptr; }
+    void* CreateDIType(Emitter& emitter) override;
     bool IsVoidType() const override { return true; }
     const char* ClassName() const override { return "VoidTypeSymbol"; }
 };

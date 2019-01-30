@@ -109,24 +109,24 @@ std::string SymbolFlagStr(SymbolFlags symbolFlags, bool noAccess)
     return s;
 }
 
-llvm::DINode::DIFlags AccessFlag(SymbolAccess access)
+uint32_t AccessFlag(Emitter& emitter, SymbolAccess access)
 {
     switch (access)
     {
         case SymbolAccess::private_:
         {
-            return llvm::DINode::DIFlags::FlagPrivate;
+            return emitter.GetPrivateFlag();
         }
         case SymbolAccess::protected_:
         {
-            return llvm::DINode::DIFlags::FlagProtected;
+            return emitter.GetProtectedFlag();
         }
         case SymbolAccess::public_:
         {
-            return llvm::DINode::DIFlags::FlagPublic;
+            return emitter.GetPublicFlag();
         }
     }
-    return llvm::DINode::DIFlags::FlagZero;
+    return emitter.GetNoFlags();
 }
 
 Symbol::Symbol(SymbolType symbolType_, const Span& span_, const std::u32string& name_) : 
@@ -203,7 +203,7 @@ std::u32string Symbol::FullNameWithSpecifiers() const
     return fullNameWithSpecifiers;
 }
 
-llvm::Value* Symbol::IrObject(Emitter& emitter)
+void* Symbol::IrObject(Emitter& emitter)
 {
     return emitter.GetIrObject(this);
 }

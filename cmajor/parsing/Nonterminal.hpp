@@ -15,7 +15,7 @@ class Rule;
 class PreCall;
 class PostCall;
 
-class NonterminalParser: public Parser
+class PARSING_API NonterminalParser: public Parser
 {
 public:
     typedef std::vector<cmajor::codedom::CppObject*> ArgumentVector;

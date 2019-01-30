@@ -5,12 +5,13 @@
 
 #ifndef CMAJOR_BINDER_CONTROL_FLOW_ANALYZER_INCLUDED
 #define CMAJOR_BINDER_CONTROL_FLOW_ANALYZER_INCLUDED
+#include <cmajor/binder/BinderApi.hpp>
 
 namespace cmajor { namespace binder {
 
 class BoundCompileUnit;
 
-void AnalyzeControlFlow(BoundCompileUnit& boundCompileUUnit);
+BINDER_API void AnalyzeControlFlow(BoundCompileUnit& boundCompileUUnit);
 
 } } // namespace cmajor::binder
 

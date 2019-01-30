@@ -212,8 +212,8 @@ void BasicTypeMoveCtor::GenerateCall(Emitter& emitter, std::vector<GenObject*>& 
 {
     Assert(genObjects.size() == 2, "move constructor needs two objects");
     genObjects[1]->Load(emitter, OperationFlags::none);
-    llvm::Value* rvalueRefValue = emitter.Stack().Pop();
-    emitter.Stack().Push(emitter.Builder().CreateLoad(rvalueRefValue));
+    void* rvalueRefValue = emitter.Stack().Pop();
+    emitter.Stack().Push(emitter.CreateLoad(rvalueRefValue));
     genObjects[0]->Store(emitter, flags & OperationFlags::functionCallFlags);
 }
 
@@ -280,8 +280,8 @@ void BasicTypeMoveAssignment::GenerateCall(Emitter& emitter, std::vector<GenObje
 {
     Assert(genObjects.size() == 2, "move assignment needs two objects");
     genObjects[1]->Load(emitter, OperationFlags::none);
-    llvm::Value* rvalueRefValue = emitter.Stack().Pop();
-    emitter.Stack().Push(emitter.Builder().CreateLoad(rvalueRefValue));
+    void* rvalueRefValue = emitter.Stack().Pop();
+    emitter.Stack().Push(emitter.CreateLoad(rvalueRefValue));
     genObjects[0]->Store(emitter, OperationFlags::none);
 }
 

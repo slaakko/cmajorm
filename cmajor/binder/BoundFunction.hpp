@@ -6,19 +6,19 @@
 #ifndef CMAJOR_BINDER_BOUND_FUNCTION_INCLUDED
 #define CMAJOR_BINDER_BOUND_FUNCTION_INCLUDED
 #include <cmajor/binder/BoundExpression.hpp>
+#include <cmajor/binder/BoundStatement.hpp>
 #include <cmajor/symbols/FunctionSymbol.hpp>
 
 namespace cmajor { namespace binder {
 
 using namespace cmajor::symbols;
 
-class BoundStatement;
-class BoundCompoundStatement;
-
-class BoundFunction : public BoundNode
+class BINDER_API BoundFunction : public BoundNode
 {
 public:
     BoundFunction(Module* module_, FunctionSymbol* functionSymbol_);
+    BoundFunction(const BoundFunction&) = delete;
+    BoundFunction& operator=(const BoundFunction&) = delete;
     void Load(Emitter& emitter, OperationFlags flags) override;
     void Store(Emitter& emitter, OperationFlags flags) override;
     void Accept(BoundNodeVisitor& visitor) override;

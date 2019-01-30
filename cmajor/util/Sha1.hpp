@@ -5,12 +5,13 @@
 
 #ifndef CMAJOR_UTIL_SHA1_INCLUDED
 #define CMAJOR_UTIL_SHA1_INCLUDED
+#include <cmajor/util/UtilApi.hpp>
 #include <stdint.h>
 #include <string>
 
 namespace cmajor { namespace util {
 
-class Sha1
+class UTIL_API Sha1
 {
 public:
     Sha1();
@@ -44,7 +45,7 @@ private:
     uint64_t bitCount;
 };
 
-std::string GetSha1MessageDigest(const std::string& message);
+UTIL_API std::string GetSha1MessageDigest(const std::string& message);
 
 } } // namespace cmajor::util
 

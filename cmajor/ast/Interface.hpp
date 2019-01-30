@@ -9,7 +9,7 @@
 
 namespace cmajor { namespace ast {
 
-class InterfaceNode : public Node
+class AST_API InterfaceNode : public Node
 {
 public:
     InterfaceNode(const Span& span_);

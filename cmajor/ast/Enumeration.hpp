@@ -14,7 +14,7 @@ namespace cmajor { namespace ast {
 class IdentifierNode;
 class EnumConstantNode;
 
-class EnumTypeNode : public Node
+class AST_API EnumTypeNode : public Node
 {
 public:
     EnumTypeNode(const Span& span_);
@@ -43,7 +43,7 @@ private:
     Span endBraceSpan;
 };
 
-class EnumConstantNode : public Node
+class AST_API EnumConstantNode : public Node
 {
 public:
     EnumConstantNode(const Span& span_);
@@ -65,7 +65,7 @@ private:
     std::u32string strValue;
 };
 
-Node* MakeNextEnumConstantValue(const Span& span, EnumTypeNode* enumType);
+AST_API Node* MakeNextEnumConstantValue(const Span& span, EnumTypeNode* enumType);
 
 } } // namespace cmajor::ast
 

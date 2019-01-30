@@ -23,7 +23,7 @@ namespace System.Json
     
     public concept JsonValueType<T>
     {
-        where System.Meta.IsBasicType<T>() or System.Meta.IsEnumeratedType<T>() or T is string or T is wstring or T is ustring;
+        where System.Meta.IsBasicType<T>() or System.Meta.IsEnumeratedType<T>() or T is string or T is wstring or T is ustring or T is Date or T is DateTime;
     }
     
     public void FromJson(JsonValue* value, int& field)
@@ -118,6 +118,34 @@ namespace System.Json
         }
     }
     
+    public void FromJson(JsonValue* value, Date& field)
+    {
+        if (value is JsonString*)
+        {
+            JsonString* s = cast<JsonString*>(value);
+            string str = ToUtf8(s->Value());
+            field = ParseDate(str);
+        }
+        else
+        {
+            throw JsonImportException("JSON string expected");
+        }
+    }
+
+    public void FromJson(JsonValue* value, DateTime& field)
+    {
+        if (value is JsonString*)
+        {
+            JsonString* s = cast<JsonString*>(value);
+            string str = ToUtf8(s->Value());
+            field = ParseDateTime(str);
+        }
+        else
+        {
+            throw JsonImportException("JSON string expected");
+        }
+    }
+        
     public void FromJson<T>(JsonValue* value, List<T>& field) 
         where T is JsonValueType
     {
@@ -699,7 +727,69 @@ namespace System.Json
             throw JsonImportException("JSON object expected");
         }
     }
-                
+
+    public void FromJson(JsonValue* container, const string& fieldName, Date& field)
+    {   
+        FromJson(container, ToUtf32(fieldName), field);
+    }
+    
+    public void FromJson(JsonValue* container, const wstring& fieldName, Date& field)
+    {
+        FromJson(container, ToUtf32(fieldName), field);
+    }
+    
+    public void FromJson(JsonValue* container, const ustring& fieldName, Date& field)
+    {
+        if (container is JsonObject*)
+        {
+            JsonObject* object = cast<JsonObject*>(container);
+            JsonValue* value = object->GetField(fieldName);
+            if (value != null)
+            {
+                FromJson(value, field);
+            }
+            else
+            {
+                throw JsonImportException("field '" + ToUtf8(fieldName) + "' not found");
+            }
+        }
+        else
+        {
+            throw JsonImportException("JSON object expected");
+        }
+    }
+
+    public void FromJson(JsonValue* container, const string& fieldName, DateTime& field)
+    {   
+        FromJson(container, ToUtf32(fieldName), field);
+    }
+    
+    public void FromJson(JsonValue* container, const wstring& fieldName, DateTime& field)
+    {
+        FromJson(container, ToUtf32(fieldName), field);
+    }
+    
+    public void FromJson(JsonValue* container, const ustring& fieldName, DateTime& field)
+    {
+        if (container is JsonObject*)
+        {
+            JsonObject* object = cast<JsonObject*>(container);
+            JsonValue* value = object->GetField(fieldName);
+            if (value != null)
+            {
+                FromJson(value, field);
+            }
+            else
+            {
+                throw JsonImportException("field '" + ToUtf8(fieldName) + "' not found");
+            }
+        }
+        else
+        {
+            throw JsonImportException("JSON object expected");
+        }
+    }
+                                                                
     public void FromJson<T>(JsonValue* container, const string& fieldName, List<T>& field) 
         where T is JsonValueType or T is JsonConstructible
     {   

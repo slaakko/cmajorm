@@ -9,7 +9,7 @@
 
 namespace cmajor { namespace parsing {
 
-class AttrOrVariable
+class PARSING_API AttrOrVariable
 {
 public:
     AttrOrVariable(const std::u32string& typeName_, const std::u32string& name_);
@@ -24,7 +24,7 @@ class ActionParser;
 class NonterminalParser;
 class Grammar;
 
-class Rule: public Parser
+class PARSING_API Rule: public Parser
 {
 public:
     typedef std::vector<AttrOrVariable> AttrOrVariableVec;
@@ -74,7 +74,7 @@ private:
     NonterminalVec nonterminals;
 };
 
-class RuleLink: public ParsingObject
+class PARSING_API RuleLink: public ParsingObject
 {
 public:
     RuleLink(const std::u32string& name_, Grammar* grammar_, const std::u32string& linkedRuleName_);
@@ -94,4 +94,3 @@ private:
 } } // namespace cmajor::parsing
 
 #endif // CMAJOR_PARSING_RULE_INCLUDED
-

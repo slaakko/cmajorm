@@ -93,7 +93,7 @@ struct ArrayKeyHash
     }
 };
 
-class SymbolTable
+class SYMBOLS_API SymbolTable
 {
 public:
     SymbolTable(Module* module_);

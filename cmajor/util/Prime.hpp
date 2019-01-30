@@ -5,13 +5,14 @@
 
 #ifndef CMAJOR_UTIL_PRIME_INCLUDED
 #define CMAJOR_UTIL_PRIME_INCLUDED
+#include <cmajor/util/UtilApi.hpp>
 #include <stdint.h>
 
 namespace cmajor { namespace util {
 
 // Returns smallest prime greater than or equal to x
 
-uint64_t NextPrime(uint64_t x);
+UTIL_API uint64_t NextPrime(uint64_t x);
 
 } } // namespace cmajor::util
 

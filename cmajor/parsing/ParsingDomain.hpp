@@ -16,7 +16,7 @@ class Scope;
 class Grammar;
 class Namespace;
 
-class ParsingDomain: public ParsingObject
+class PARSING_API ParsingDomain: public ParsingObject
 {
 public:
     ParsingDomain();
@@ -45,9 +45,9 @@ private:
     int nextRuleId;
 };
 
-void RegisterParsingDomain(ParsingDomain* parsingDomain);
-void ParsingDomainInit();
-void ParsingDomainDone();
+PARSING_API void RegisterParsingDomain(ParsingDomain* parsingDomain);
+PARSING_API void ParsingDomainInit();
+PARSING_API void ParsingDomainDone();
 
 } } // namespace cmajor::parsing
 

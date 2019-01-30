@@ -8,9 +8,21 @@
 
 namespace cmajor { namespace symbols {
 
+CompileTarget compileTarget = CompileTarget::llvm;
+
 GlobalFlags globalFlags = GlobalFlags::none;
 int optimizationLevel = -1;
 int numBuildThreads = -1;
+
+void SetCompileTarget(CompileTarget compileTarget_)
+{
+    compileTarget = compileTarget_;
+}
+
+CompileTarget GetCompileTarget()
+{
+    return compileTarget;
+}
 
 inline GlobalFlags operator|(GlobalFlags flags, GlobalFlags flag)
 {

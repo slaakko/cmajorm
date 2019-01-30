@@ -259,9 +259,9 @@ BoolValue::BoolValue(const Span& span_, bool value_) : Value(span_, ValueType::b
 {
 }
 
-llvm::Value* BoolValue::IrValue(Emitter& emitter)
+void* BoolValue::IrValue(Emitter& emitter)
 {
-    return emitter.Builder().getInt1(value);
+    return emitter.CreateIrValueForBool(value);
 }
 
 void BoolValue::Write(BinaryWriter& writer)
@@ -539,9 +539,9 @@ SByteValue::SByteValue(const Span& span_, int8_t value_) : Value(span_, ValueTyp
 {
 }
 
-llvm::Value* SByteValue::IrValue(Emitter& emitter)
+void* SByteValue::IrValue(Emitter& emitter)
 {
-    return emitter.Builder().getInt8(static_cast<uint8_t>(value));
+    return emitter.CreateIrValueForSByte(value);
 }
 
 void SByteValue::Write(BinaryWriter& writer)
@@ -749,9 +749,9 @@ ByteValue::ByteValue(const Span& span_, uint8_t value_) : Value(span_, ValueType
 {
 }
 
-llvm::Value* ByteValue::IrValue(Emitter& emitter)
+void* ByteValue::IrValue(Emitter& emitter)
 {
-    return emitter.Builder().getInt8(value);
+    return emitter.CreateIrValueForByte(value);
 }
 
 void ByteValue::Write(BinaryWriter& writer)
@@ -917,9 +917,9 @@ ShortValue::ShortValue(const Span& span_, int16_t value_) : Value(span_, ValueTy
 {
 }
 
-llvm::Value* ShortValue::IrValue(Emitter& emitter)
+void* ShortValue::IrValue(Emitter& emitter)
 {
-    return emitter.Builder().getInt16(static_cast<uint16_t>(value));
+    return emitter.CreateIrValueForShort(value);
 }
 
 void ShortValue::Write(BinaryWriter& writer)
@@ -1141,9 +1141,9 @@ UShortValue::UShortValue(const Span& span_, uint16_t value_) : Value(span_, Valu
 {
 }
 
-llvm::Value* UShortValue::IrValue(Emitter& emitter)
+void* UShortValue::IrValue(Emitter& emitter)
 {
-    return emitter.Builder().getInt16(value);
+    return emitter.CreateIrValueForUShort(value);
 }
 
 void UShortValue::Write(BinaryWriter& writer)
@@ -1337,9 +1337,9 @@ IntValue::IntValue(const Span& span_, int32_t value_) : Value(span_, ValueType::
 {
 }
 
-llvm::Value* IntValue::IrValue(Emitter& emitter)
+void* IntValue::IrValue(Emitter& emitter)
 {
-    return emitter.Builder().getInt32(static_cast<uint32_t>(value));
+    return emitter.CreateIrValueForInt(value);
 }
 
 void IntValue::Write(BinaryWriter& writer)
@@ -1575,9 +1575,9 @@ UIntValue::UIntValue(const Span& span_, uint32_t value_) : Value(span_, ValueTyp
 {
 }
 
-llvm::Value* UIntValue::IrValue(Emitter& emitter)
+void* UIntValue::IrValue(Emitter& emitter)
 {
-    return emitter.Builder().getInt32(value);
+    return emitter.CreateIrValueForUInt(value);
 }
 
 void UIntValue::Write(BinaryWriter& writer)
@@ -1799,9 +1799,9 @@ LongValue::LongValue(const Span& span_, int64_t value_) : Value(span_, ValueType
 {
 }
 
-llvm::Value* LongValue::IrValue(Emitter& emitter)
+void* LongValue::IrValue(Emitter& emitter)
 {
-    return emitter.Builder().getInt64(static_cast<uint64_t>(value));
+    return emitter.CreateIrValueForLong(value);
 }
 
 void LongValue::Write(BinaryWriter& writer)
@@ -2051,9 +2051,9 @@ ULongValue::ULongValue(const Span& span_, uint64_t value_) : Value(span_, ValueT
 {
 }
 
-llvm::Value* ULongValue::IrValue(Emitter& emitter)
+void* ULongValue::IrValue(Emitter& emitter)
 {
-    return emitter.Builder().getInt64(value);
+    return emitter.CreateIrValueForULong(value);
 }
 
 void ULongValue::Write(BinaryWriter& writer)
@@ -2303,9 +2303,9 @@ FloatValue::FloatValue(const Span& span_, float value_) : Value(span_, ValueType
 {
 }
 
-llvm::Value* FloatValue::IrValue(Emitter& emitter)
+void* FloatValue::IrValue(Emitter& emitter)
 {
-    return llvm::ConstantFP::get(emitter.Builder().getFloatTy(), value);
+    return emitter.CreateIrValueForFloat(value);
 }
 
 void FloatValue::Write(BinaryWriter& writer)
@@ -2569,9 +2569,9 @@ DoubleValue::DoubleValue(const Span& span_, double value_) : Value(span_, ValueT
 {
 }
 
-llvm::Value* DoubleValue::IrValue(Emitter& emitter)
+void* DoubleValue::IrValue(Emitter& emitter)
 {
-    return llvm::ConstantFP::get(emitter.Builder().getDoubleTy(), value);
+    return emitter.CreateIrValueForDouble(value);
 }
 
 void DoubleValue::Write(BinaryWriter& writer)
@@ -2849,9 +2849,9 @@ CharValue::CharValue(const Span& span_, unsigned char value_) : Value(span_, Val
 {
 }
 
-llvm::Value* CharValue::IrValue(Emitter& emitter)
+void* CharValue::IrValue(Emitter& emitter)
 {
-    return emitter.Builder().getInt8(static_cast<uint8_t>(value));
+    return emitter.CreateIrValueForChar(static_cast<uint8_t>(value));
 }
 
 void CharValue::Write(BinaryWriter& writer)
@@ -3101,9 +3101,9 @@ WCharValue::WCharValue(const Span& span_, char16_t value_) : Value(span_, ValueT
 {
 }
 
-llvm::Value* WCharValue::IrValue(Emitter& emitter)
+void* WCharValue::IrValue(Emitter& emitter)
 {
-    return emitter.Builder().getInt16(static_cast<uint16_t>(value));
+    return emitter.CreateIrValueForWChar(static_cast<uint16_t>(value));
 }
 
 void WCharValue::Write(BinaryWriter& writer)
@@ -3367,9 +3367,9 @@ UCharValue::UCharValue(const Span& span_, char32_t value_) : Value(span_, ValueT
 {
 }
 
-llvm::Value* UCharValue::IrValue(Emitter& emitter)
+void* UCharValue::IrValue(Emitter& emitter)
 {
-    return emitter.Builder().getInt32(static_cast<uint32_t>(value));
+    return emitter.CreateIrValueForUChar(static_cast<uint32_t>(value));
 }
 
 void UCharValue::Write(BinaryWriter& writer)
@@ -3647,7 +3647,7 @@ StringValue::StringValue(const Span& span_, int stringId_) : Value(span_, ValueT
 {
 }
 
-llvm::Value* StringValue::IrValue(Emitter& emitter)
+void* StringValue::IrValue(Emitter& emitter)
 {
     return emitter.GetGlobalStringPtr(stringId);
 }
@@ -3693,13 +3693,10 @@ WStringValue::WStringValue(const Span& span_, int stringId_) : Value(span_, Valu
 {
 }
 
-llvm::Value* WStringValue::IrValue(Emitter& emitter)
+void* WStringValue::IrValue(Emitter& emitter)
 { 
-    llvm::Value* wstringConstant = emitter.GetGlobalWStringConstant(stringId);
-    ArgVector indeces;
-    indeces.push_back(emitter.Builder().getInt32(0));
-    indeces.push_back(emitter.Builder().getInt32(0));
-    return emitter.Builder().CreateGEP(wstringConstant, indeces);
+    void* wstringConstant = emitter.GetGlobalWStringConstant(stringId);
+    return emitter.CreateIrValueForWString(wstringConstant);
 }
 
 void WStringValue::Write(BinaryWriter& writer)
@@ -3743,13 +3740,10 @@ UStringValue::UStringValue(const Span& span_, int stringId_) : Value(span_, Valu
 {
 }
 
-llvm::Value* UStringValue::IrValue(Emitter& emitter)
+void* UStringValue::IrValue(Emitter& emitter)
 {
-    llvm::Value* ustringConstant = emitter.GetGlobalUStringConstant(stringId);
-    ArgVector indeces;
-    indeces.push_back(emitter.Builder().getInt32(0));
-    indeces.push_back(emitter.Builder().getInt32(0));
-    return emitter.Builder().CreateGEP(ustringConstant, indeces);
+    void* ustringConstant = emitter.GetGlobalUStringConstant(stringId);
+    return emitter.CreateIrValueForUString(ustringConstant);
 }
 
 void UStringValue::Write(BinaryWriter& writer)
@@ -3793,9 +3787,9 @@ NullValue::NullValue(const Span& span_, TypeSymbol* nullPtrType_) : Value(span_,
 {
 }
 
-llvm::Value* NullValue::IrValue(Emitter& emitter)
+void* NullValue::IrValue(Emitter& emitter)
 {
-    return llvm::Constant::getNullValue(nullPtrType->IrType(emitter));
+    return emitter.CreateDefaultIrValueForPtrType(nullPtrType->IrType(emitter));
 }
 
 void NullValue::Write(BinaryWriter& writer)
@@ -3855,7 +3849,7 @@ PointerValue::PointerValue(const Span& span_, TypeSymbol* type_, const void* ptr
 {
 }
 
-llvm::Value* PointerValue::IrValue(Emitter& emitter)
+void* PointerValue::IrValue(Emitter& emitter)
 {
     Assert(false, "ir value for pointer value not supported");
     return nullptr;
@@ -4027,15 +4021,15 @@ Value* ArrayValue::Clone() const
     return new ArrayValue(GetSpan(), type, std::move(clonedElementValues));
 }
 
-llvm::Value* ArrayValue::IrValue(Emitter& emitter)
+void* ArrayValue::IrValue(Emitter& emitter)
 {
-    std::vector<llvm::Constant*> elementConstants;
+    std::vector<void*> elementConstants;
     int64_t n = elementValues.size();
     for (int64_t i = 0; i < n; ++i)
     {
-        elementConstants.push_back(llvm::cast<llvm::Constant>(elementValues[i]->IrValue(emitter)));
+        elementConstants.push_back(elementValues[i]->IrValue(emitter));
     }
-    return llvm::ConstantArray::get(llvm::cast<llvm::ArrayType>(type->IrType(emitter)), elementConstants);
+    return emitter.CreateIrValueForConstantArray(type->IrType(emitter), elementConstants);
 }
 
 void ArrayValue::Write(BinaryWriter& writer)
@@ -4096,9 +4090,9 @@ Value* StructuredValue::Clone() const
     return new StructuredValue(GetSpan(), type, std::move(clonedMemberValues));
 }
 
-llvm::Value* StructuredValue::IrValue(Emitter& emitter) 
+void* StructuredValue::IrValue(Emitter& emitter) 
 {
-    std::vector<llvm::Constant*> memberConstants;
+    std::vector<void*> memberConstants;
     int64_t n = memberValues.size();
     if (n == 0)
     {
@@ -4115,10 +4109,10 @@ llvm::Value* StructuredValue::IrValue(Emitter& emitter)
     {
         for (int64_t i = 0; i < n; ++i)
         {
-            memberConstants.push_back(llvm::cast<llvm::Constant>(memberValues[i]->IrValue(emitter)));
+            memberConstants.push_back(memberValues[i]->IrValue(emitter));
         }
     }
-    return llvm::ConstantStruct::get(llvm::cast<llvm::StructType>(type->IrType(emitter)), memberConstants);
+    return emitter.CreateIrValueForConstantStruct(type->IrType(emitter), memberConstants);
 }
 
 void StructuredValue::Write(BinaryWriter& writer)
@@ -4162,13 +4156,10 @@ UuidValue::UuidValue(const Span& span_, int uuidId_) : Value(span_, ValueType::u
 {
 }
 
-llvm::Value* UuidValue::IrValue(Emitter& emitter)
+void* UuidValue::IrValue(Emitter& emitter)
 {
-    llvm::Value* uuidConstant = emitter.GetGlobalUuidConstant(uuidId);
-    ArgVector indeces;
-    indeces.push_back(emitter.Builder().getInt32(0));
-    indeces.push_back(emitter.Builder().getInt32(0));
-    return emitter.Builder().CreateBitCast(emitter.Builder().CreateGEP(uuidConstant, indeces), emitter.Builder().getInt8PtrTy());
+    void* uuidConstant = emitter.GetGlobalUuidConstant(uuidId);
+    return emitter.CreateIrValueForUuid(uuidConstant);
 }
 
 void UuidValue::Write(BinaryWriter& writer) 

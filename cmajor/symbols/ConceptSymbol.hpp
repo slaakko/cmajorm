@@ -13,7 +13,7 @@ namespace cmajor { namespace symbols {
 
 class ConceptSymbol;
 
-class ConceptGroupSymbol : public Symbol
+class SYMBOLS_API ConceptGroupSymbol : public Symbol
 {
 public:
     ConceptGroupSymbol(const Span& span_, const std::u32string& name_);
@@ -31,7 +31,7 @@ private:
     std::unordered_map<int, ConceptSymbol*> arityConceptMap;
 };
 
-class ConceptSymbol : public ContainerSymbol
+class SYMBOLS_API ConceptSymbol : public ContainerSymbol
 {
 public:
     ConceptSymbol(const Span& span_, const std::u32string& name_);

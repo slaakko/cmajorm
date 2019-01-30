@@ -12,10 +12,12 @@ namespace cmajor { namespace binder {
 
 using namespace cmajor::symbols;
 
-class BoundClass : public BoundNode
+class BINDER_API BoundClass : public BoundNode
 {
 public:
     BoundClass(Module* module_, ClassTypeSymbol* classTypeSymbol_);
+    BoundClass(const BoundClass&) = delete;
+    BoundClass& operator=(const BoundClass&) = delete;
     void Accept(BoundNodeVisitor& visitor) override;
     void Load(Emitter& emitter, OperationFlags flags) override;
     void Store(Emitter& emitter, OperationFlags flags) override;

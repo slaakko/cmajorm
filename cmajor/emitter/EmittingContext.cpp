@@ -4,17 +4,18 @@
 // =================================
 
 #include <cmajor/emitter/EmittingContext.hpp>
-#include <cmajor/emitter/EmittingContextImpl.hpp>
+#include <cmajor/cmmid/Interface.hpp>
 
 namespace cmajor { namespace emitter {
 
-EmittingContext::EmittingContext() : emittingContextImpl(new EmittingContextImpl())
+EmittingContext::EmittingContext() : handle(CmmCreateEmittingContext())
 {
+
 }
 
 EmittingContext::~EmittingContext()
 {
-    delete emittingContextImpl;
+    CmmDestroyEmittingContext(handle);
 }
 
 } } // namespace cmajor::emitter

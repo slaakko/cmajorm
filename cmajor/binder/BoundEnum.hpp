@@ -12,7 +12,7 @@ namespace cmajor { namespace binder {
 
 using namespace cmajor::symbols;
 
-class BoundEnumTypeDefinition : public BoundNode
+class BINDER_API BoundEnumTypeDefinition : public BoundNode
 {
 public:
     BoundEnumTypeDefinition(Module* module_, EnumTypeSymbol* enumTypeSymbol_);

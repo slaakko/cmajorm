@@ -13,7 +13,7 @@ namespace cmajor { namespace symbols {
 
 class EnumConstantSymbol;
 
-class EnumTypeSymbol : public TypeSymbol
+class SYMBOLS_API EnumTypeSymbol : public TypeSymbol
 {
 public:
     EnumTypeSymbol(const Span& span_, const std::u32string& name_);
@@ -32,9 +32,9 @@ public:
     TypeSymbol* UnderlyingType() { return underlyingType; }
     void SetUnderlyingType(TypeSymbol* underlyingType_) { underlyingType = underlyingType_; }
     std::vector<EnumConstantSymbol*> GetEnumConstants();
-    llvm::Type* IrType(Emitter& emitter) override { return underlyingType->IrType(emitter); }
-    llvm::Constant* CreateDefaultIrValue(Emitter& emitter) override { return underlyingType->CreateDefaultIrValue(emitter); }
-    llvm::DIType* CreateDIType(Emitter& emitter) override;
+    void* IrType(Emitter& emitter) override { return underlyingType->IrType(emitter); }
+    void* CreateDefaultIrValue(Emitter& emitter) override { return underlyingType->CreateDefaultIrValue(emitter); }
+    void* CreateDIType(Emitter& emitter) override;
     bool IsSwitchConditionType() const override { return true; }
     ValueType GetValueType() const override;
     Value* MakeValue() const override;
@@ -46,7 +46,7 @@ private:
     TypeSymbol* underlyingType;
 };
 
-class EnumConstantSymbol : public Symbol
+class SYMBOLS_API EnumConstantSymbol : public Symbol
 {
 public:
     EnumConstantSymbol(const Span& span_, const std::u32string& name_);
@@ -74,7 +74,7 @@ private:
     std::u32string strValue;
 };
 
-class EnumTypeDefaultConstructor : public FunctionSymbol
+class SYMBOLS_API EnumTypeDefaultConstructor : public FunctionSymbol
 {
 public:
     EnumTypeDefaultConstructor(const Span& span_, const std::u32string& name_);
@@ -90,7 +90,7 @@ private:
     FunctionSymbol* underlyingTypeDefaultConstructor;
 };
 
-class EnumTypeCopyConstructor : public FunctionSymbol
+class SYMBOLS_API EnumTypeCopyConstructor : public FunctionSymbol
 {
 public:
     EnumTypeCopyConstructor(const Span& span_, const std::u32string& name_);
@@ -106,7 +106,7 @@ private:
     FunctionSymbol* underlyingTypeCopyConstructor;
 };
 
-class EnumTypeMoveConstructor : public FunctionSymbol
+class SYMBOLS_API EnumTypeMoveConstructor : public FunctionSymbol
 {
 public:
     EnumTypeMoveConstructor(const Span& span_, const std::u32string& name_);
@@ -122,7 +122,7 @@ private:
     FunctionSymbol* underlyingTypeMoveConstructor;
 };
 
-class EnumTypeCopyAssignment : public FunctionSymbol
+class SYMBOLS_API EnumTypeCopyAssignment : public FunctionSymbol
 {
 public:
     EnumTypeCopyAssignment(const Span& span_, const std::u32string& name_);
@@ -138,7 +138,7 @@ private:
     FunctionSymbol* underlyingTypeCopyAssignment;
 };
 
-class EnumTypeMoveAssignment : public FunctionSymbol
+class SYMBOLS_API EnumTypeMoveAssignment : public FunctionSymbol
 {
 public:
     EnumTypeMoveAssignment(const Span& span_, const std::u32string& name_);
@@ -154,7 +154,7 @@ private:
     FunctionSymbol* underlyingTypeMoveAssignment;
 };
 
-class EnumTypeReturn : public FunctionSymbol
+class SYMBOLS_API EnumTypeReturn : public FunctionSymbol
 {
 public:
     EnumTypeReturn(const Span& span_, const std::u32string& name_);
@@ -170,7 +170,7 @@ private:
     FunctionSymbol* underlyingTypeReturn;
 };
 
-class EnumTypeEqualityOp : public FunctionSymbol
+class SYMBOLS_API EnumTypeEqualityOp : public FunctionSymbol
 {
 public:
     EnumTypeEqualityOp(const Span& span_, const std::u32string& name_);
@@ -186,7 +186,7 @@ private:
     FunctionSymbol* underlyingTypeEquality;
 };
 
-class EnumTypeToUnderlyingTypeConversion : public FunctionSymbol
+class SYMBOLS_API EnumTypeToUnderlyingTypeConversion : public FunctionSymbol
 {
 public:
     EnumTypeToUnderlyingTypeConversion(const Span& span_, const std::u32string& name_);
@@ -208,7 +208,7 @@ private:
     TypeSymbol* targetType;
 };
 
-class UnderlyingTypeToEnumTypeConversion : public FunctionSymbol
+class SYMBOLS_API UnderlyingTypeToEnumTypeConversion : public FunctionSymbol
 {
 public:
     UnderlyingTypeToEnumTypeConversion(const Span& span_, const std::u32string& name_);

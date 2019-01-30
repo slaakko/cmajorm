@@ -11,7 +11,7 @@
 
 namespace cmajor { namespace parsing {
 
-class ParsingAction
+class PARSING_API ParsingAction
 {
 public:
     virtual ~ParsingAction();
@@ -35,7 +35,7 @@ private:
     void (Type::*memfun)(const char32_t* matchBegin, const char32_t* matchEnd, const Span& span, const std::string& fileName, ParsingData* parsingData, bool& pass);
 };
 
-class FailureAction
+class PARSING_API FailureAction
 {
 public:
     virtual ~FailureAction();
@@ -59,7 +59,7 @@ private:
     void (Type::*memfun)(ParsingData* parsingData);
 };
 
-class PreCall
+class PARSING_API PreCall
 {
 public:
     virtual ~PreCall();
@@ -83,7 +83,7 @@ private:
     void (Type::*memfun)(ObjectStack& stack, ParsingData* parsingData);
 };
 
-class PostCall
+class PARSING_API PostCall
 {
 public:
     virtual ~PostCall();
@@ -107,7 +107,7 @@ private:
     void (Type::*memfun)(ObjectStack& stack, ParsingData* parsingData, bool matched);
 };
 
-class ActionParser : public UnaryParser
+class PARSING_API ActionParser : public UnaryParser
 {
 public:
     ActionParser(const std::u32string& name_, Parser* child_);

@@ -12,13 +12,13 @@ namespace cmajor { namespace codedom {
 
 void PrintExprs(const std::vector<CppObject*>& expressions, CodeFormatter& formatter);
 
-class Expression : public CppObject
+class CODEDOM_API Expression : public CppObject
 {
 public:
     Expression(const std::u32string& name_);
 };
 
-class ThisAccess : public Expression
+class CODEDOM_API ThisAccess : public Expression
 {
 public:
     ThisAccess();
@@ -26,7 +26,7 @@ public:
     int Rank() const override { return 25; }
 };
 
-class IdExpr : public Expression
+class CODEDOM_API IdExpr : public Expression
 {
 public:
     IdExpr(const std::u32string& value_);
@@ -34,7 +34,7 @@ public:
     int Rank() const override { return 26; }
 };
 
-class UnaryExpression : public Expression
+class CODEDOM_API UnaryExpression : public Expression
 {
 public:
     UnaryExpression(const std::u32string& name_, CppObject* child_);
@@ -43,13 +43,13 @@ private:
     CppObject* child;
 };
 
-class PostfixExpression : public UnaryExpression
+class CODEDOM_API PostfixExpression : public UnaryExpression
 {
 public:
     PostfixExpression(const std::u32string& name_, CppObject* child_);
 };
 
-class IndexExpr : public PostfixExpression
+class CODEDOM_API IndexExpr : public PostfixExpression
 {
 public:
     IndexExpr(CppObject* child_, CppObject* index_);
@@ -61,7 +61,7 @@ private:
     CppObject* index;
 };
 
-class InvokeExpr : public PostfixExpression
+class CODEDOM_API InvokeExpr : public PostfixExpression
 {
 public:
     InvokeExpr(CppObject* child_, const std::vector<CppObject*>& arguments_);
@@ -72,7 +72,7 @@ private:
     std::vector<CppObject*> arguments;
 };
 
-class MemberAccessExpr : public PostfixExpression
+class CODEDOM_API MemberAccessExpr : public PostfixExpression
 {
 public:
     MemberAccessExpr(CppObject* child_, CppObject* member_);
@@ -83,7 +83,7 @@ private:
     CppObject* member;
 };
 
-class PtrMemberAccessExpr : public PostfixExpression
+class CODEDOM_API PtrMemberAccessExpr : public PostfixExpression
 {
 public:
     PtrMemberAccessExpr(CppObject* child_, CppObject* member_);
@@ -94,7 +94,7 @@ private:
     CppObject* member;
 };
 
-class PostIncrementExpr : public PostfixExpression
+class CODEDOM_API PostIncrementExpr : public PostfixExpression
 {
 public:
     PostIncrementExpr(CppObject* child_);
@@ -103,7 +103,7 @@ public:
     int Rank() const override { return 22; }
 };
 
-class PostDecrementExpr : public PostfixExpression
+class CODEDOM_API PostDecrementExpr : public PostfixExpression
 {
 public:
     PostDecrementExpr(CppObject* child_);
@@ -112,7 +112,7 @@ public:
     int Rank() const override { return 22; }
 };
 
-class PostCastExpr: public PostfixExpression
+class CODEDOM_API PostCastExpr: public PostfixExpression
 {
 public:
     PostCastExpr(const std::u32string& name_, CppObject* type_, CppObject* child_);
@@ -123,7 +123,7 @@ private:
     CppObject* type;
 };
 
-class TypeIdExpr : public PostfixExpression
+class CODEDOM_API TypeIdExpr : public PostfixExpression
 {
 public:
     TypeIdExpr(CppObject* child_);
@@ -132,7 +132,7 @@ public:
     int Rank() const override { return 24; }
 };
 
-class PreIncrementExpr : public UnaryExpression
+class CODEDOM_API PreIncrementExpr : public UnaryExpression
 {
 public:
     PreIncrementExpr(CppObject* child_);
@@ -141,7 +141,7 @@ public:
     int Rank() const override { return 14; }
 };
 
-class PreDecrementExpr : public UnaryExpression
+class CODEDOM_API PreDecrementExpr : public UnaryExpression
 {
 public:
     PreDecrementExpr(CppObject* child_);
@@ -150,7 +150,7 @@ public:
     int Rank() const override { return 14; }
 };
 
-class UnaryOpExpr : public UnaryExpression
+class CODEDOM_API UnaryOpExpr : public UnaryExpression
 {
 public:
     UnaryOpExpr(Operator op_, CppObject* child_);
@@ -162,7 +162,7 @@ private:
     Operator op;
 };
 
-class SizeOfExpr : public UnaryExpression
+class CODEDOM_API SizeOfExpr : public UnaryExpression
 {
 public:
     SizeOfExpr(CppObject* child_, bool parens_);
@@ -173,7 +173,7 @@ private:
     bool parens;
 };
 
-class CastExpr : public Expression
+class CODEDOM_API CastExpr : public Expression
 {
 public:
     CastExpr(CppObject* typeId_, CppObject* expr_);
@@ -185,7 +185,7 @@ private:
     CppObject* expr;
 };
 
-class BinaryExpression : public Expression
+class CODEDOM_API BinaryExpression : public Expression
 {
 public:
     BinaryExpression(const std::u32string& name_, CppObject* left_, CppObject* right_);
@@ -196,7 +196,7 @@ private:
     CppObject* right;
 };
 
-class BinaryOpExpr : public BinaryExpression
+class CODEDOM_API BinaryOpExpr : public BinaryExpression
 {
 public:
     BinaryOpExpr(CppObject* left_, Operator op_, int rank_, CppObject* right_);
@@ -209,7 +209,7 @@ private:
     int rank;
 };
 
-class ConditionalExpr : public Expression
+class CODEDOM_API ConditionalExpr : public Expression
 {
 public:
     ConditionalExpr(CppObject* condition_, CppObject* thenExpr_, CppObject* elseExpr_);
@@ -221,7 +221,7 @@ private:
     CppObject* elseExpr;
 };
 
-class ThrowExpr : public Expression
+class CODEDOM_API ThrowExpr : public Expression
 {
 public:
     ThrowExpr(CppObject* exception_);
@@ -233,7 +233,7 @@ private:
 
 class TypeId;
 
-class NewExpr : public Expression
+class CODEDOM_API NewExpr : public Expression
 {
 public:
     NewExpr(bool global_, const std::vector<CppObject*>& placement_, TypeId* typeId_, bool parens_, const std::vector<CppObject*>& initializer_);
@@ -248,7 +248,7 @@ private:
     std::vector<CppObject*> initializer;
 };
 
-class DeleteExpr : public Expression
+class CODEDOM_API DeleteExpr : public Expression
 {
 public:
     DeleteExpr(bool global_, bool isArray_, CppObject* expr_);

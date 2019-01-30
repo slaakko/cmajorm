@@ -5,6 +5,7 @@
 
 #ifndef CMAJOR_AST_AST_READER_INCLUDED
 #define CMAJOR_AST_AST_READER_INCLUDED
+#include <cmajor/ast/AstApi.hpp>
 #include <cmajor/ast/Specifier.hpp>
 #include <cmajor/util/BinaryReader.hpp>
 #include <cmajor/parsing/Scanner.hpp>
@@ -41,7 +42,7 @@ inline int16_t GetFileId(int32_t fileIndex)
     return static_cast<int16_t>(fileIndex & 0xFFFF);
 }
 
-class AstReader
+class AST_API AstReader
 {
 public:
     AstReader(const std::string& fileName_);

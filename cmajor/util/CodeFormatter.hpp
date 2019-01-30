@@ -5,12 +5,13 @@
 
 #ifndef CMAJOR_UTIL_CODE_FORMATTER_INCLUDED
 #define CMAJOR_UTIL_CODE_FORMATTER_INCLUDED
+#include <cmajor/util/UtilApi.hpp>
 #include <ostream>
 #include <string>
 
 namespace cmajor { namespace util {
 
-class CodeFormatter
+class UTIL_API CodeFormatter
 {
 public:
     CodeFormatter(std::ostream& stream_) : stream(stream_), indent(0), indentSize(4), atBeginningOfLine(true), line(1), start(false), preserveSpace(false) {}

@@ -7,7 +7,7 @@
 
 namespace cmajor { namespace parsing {
 
-class stdlib : public cmajor::parsing::Grammar
+class PARSING_API stdlib : public cmajor::parsing::Grammar
 {
 public:
     static stdlib* Create();

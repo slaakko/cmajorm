@@ -16,10 +16,10 @@ namespace cmajor { namespace parsing {
 
 class Rule;
 
-void SetCountSourceLines(bool count);
-int GetParsedSourceLines();
+PARSING_API void SetCountSourceLines(bool count);
+PARSING_API int GetParsedSourceLines();
 
-class Span
+class PARSING_API Span
 {
 public:
     Span(): fileIndex(-1), lineNumber(-1), start(-1), end(-1) {}
@@ -58,13 +58,13 @@ inline bool operator==(const Span& left, const Span& right)
     return left.FileIndex() == right.FileIndex() && left.LineNumber() == right.LineNumber() && left.Start() == right.Start() && left.End() == right.End();
 }
 
-std::u32string NarrowString(const char32_t* start, const char32_t* end);
+PARSING_API std::u32string NarrowString(const char32_t* start, const char32_t* end);
 
 class Parser;
 class XmlLog;
 class ExpectationFailure;
 
-class Scanner
+class PARSING_API Scanner
 {
 public:
     Scanner(const char32_t* start_, const char32_t* end_, const std::string& fileName_, int fileIndex_, Parser* skipper_);

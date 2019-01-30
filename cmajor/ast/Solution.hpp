@@ -10,13 +10,16 @@
 
 namespace cmajor { namespace ast {
 
-class SolutionDeclaration
+class AST_API SolutionDeclaration
 {
 public:
+    SolutionDeclaration();
+    SolutionDeclaration(const SolutionDeclaration&) = delete;
+    SolutionDeclaration& operator=(const SolutionDeclaration&) = delete;
     virtual ~SolutionDeclaration();
 };
 
-class SolutionProjectDeclaration : public SolutionDeclaration
+class AST_API SolutionProjectDeclaration : public SolutionDeclaration
 {
 public:
     SolutionProjectDeclaration(const std::string& filePath_);
@@ -25,7 +28,7 @@ private:
     std::string filePath;
 };
 
-class SolutionActiveProjectDeclaration : public SolutionDeclaration
+class AST_API SolutionActiveProjectDeclaration : public SolutionDeclaration
 {
 public:
     SolutionActiveProjectDeclaration(const std::u32string& activeProjectName_);
@@ -34,10 +37,12 @@ private:
     std::u32string activeProjectName;
 };
 
-class ProjectDependencyDeclaration : public SolutionDeclaration
+class AST_API ProjectDependencyDeclaration : public SolutionDeclaration
 {
 public:
     ProjectDependencyDeclaration(const std::u32string& projectName_);
+    ProjectDependencyDeclaration(const ProjectDependencyDeclaration&) = delete;
+    ProjectDependencyDeclaration& operator=(const ProjectDependencyDeclaration&) = delete;
     void AddDependency(const std::u32string& dependsOn);
     const std::u32string& ProjectName() const { return projectName; }
     const std::vector<std::u32string>& DependsOnProjects() const { return dependsOnProjects; }
@@ -46,10 +51,12 @@ private:
     std::vector<std::u32string> dependsOnProjects;
 };
 
-class Solution
+class AST_API Solution
 {
 public:
     Solution(const std::u32string& name_, const std::string& filePath_);
+    Solution(const Solution&) = delete;
+    Solution& operator=(const Solution&) = delete;
     const std::u32string& Name() const { return name; }
     const std::string& FilePath() const { return filePath; }
     const boost::filesystem::path& BasePath() const { return basePath; }

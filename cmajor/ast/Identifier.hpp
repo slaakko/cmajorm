@@ -9,7 +9,7 @@
 
 namespace cmajor { namespace ast {
 
-class IdentifierNode : public Node
+class AST_API IdentifierNode : public Node
 {
 public:
     IdentifierNode(const Span& span_);
@@ -26,7 +26,7 @@ private:
     std::u32string identifier;
 };
 
-class CursorIdNode : public IdentifierNode
+class AST_API CursorIdNode : public IdentifierNode
 {
 public:
     CursorIdNode(const Span& span_);

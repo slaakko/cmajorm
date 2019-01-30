@@ -12,7 +12,7 @@ namespace cmajor { namespace ast {
 
 class IdentifierNode;
 
-class NamespaceNode : public Node
+class AST_API NamespaceNode : public Node
 {
 public:
     NamespaceNode(const Span& span_);
@@ -30,7 +30,7 @@ private:
     NodeList<Node> members;
 };
 
-class AliasNode : public Node
+class AST_API AliasNode : public Node
 {
 public:
     AliasNode(const Span& span_);
@@ -46,7 +46,7 @@ private:
     std::unique_ptr<IdentifierNode> qid;
 };
 
-class NamespaceImportNode : public Node
+class AST_API NamespaceImportNode : public Node
 {
 public:
     NamespaceImportNode(const Span& span_);

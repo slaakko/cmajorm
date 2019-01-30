@@ -12,12 +12,20 @@ CloneContext::CloneContext() : instantiateFunctionNode(false), instantiateClassN
 {
 }
 
-void CloneContext::AddUnitTestFunction(std::unique_ptr<FunctionNode>&& unitTestFunction)
+CloneContext::~CloneContext()
 {
-    unitTestFunctions.push_back(std::move(unitTestFunction));
+    for (FunctionNode* unitTestFunction : unitTestFunctions)
+    {
+        delete unitTestFunction;
+    }
 }
 
-std::vector<std::unique_ptr<FunctionNode>>& CloneContext::UnitTestFunctions()
+void CloneContext::AddUnitTestFunction(FunctionNode* unitTestFunction)
+{
+    unitTestFunctions.push_back(unitTestFunction);
+}
+
+std::vector<FunctionNode*>& CloneContext::UnitTestFunctions()
 {
     return unitTestFunctions;
 }

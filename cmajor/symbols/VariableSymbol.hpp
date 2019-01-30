@@ -8,13 +8,12 @@
 #include <cmajor/symbols/Symbol.hpp>
 #include <cmajor/symbols/TypeMap.hpp>
 #include <cmajor/ir/Emitter.hpp>
-#include <llvm/IR/Instructions.h>
 
 namespace cmajor { namespace symbols {
 
 using namespace cmajor::ir;
 
-class VariableSymbol : public Symbol
+class SYMBOLS_API VariableSymbol : public Symbol
 {
 public:
     VariableSymbol(SymbolType symbolType_, const Span& span_, const std::u32string& name_);
@@ -32,7 +31,7 @@ private:
     TypeSymbol* type;
 };
 
-class ParameterSymbol : public VariableSymbol
+class SYMBOLS_API ParameterSymbol : public VariableSymbol
 {
 public:    
     ParameterSymbol(const Span& span_, const std::u32string& name_);
@@ -49,7 +48,7 @@ private:
     bool artificialName;
 };
 
-class LocalVariableSymbol : public VariableSymbol
+class SYMBOLS_API LocalVariableSymbol : public VariableSymbol
 {
 public:     
     LocalVariableSymbol(const Span& span_, const std::u32string& name_);
@@ -59,7 +58,7 @@ public:
     const char* ClassName() const override { return "LocalVariableSymbol"; }
 };
 
-class MemberVariableSymbol : public VariableSymbol
+class SYMBOLS_API MemberVariableSymbol : public VariableSymbol
 {
 public:
     MemberVariableSymbol(const Span& span_, const std::u32string& name_);
@@ -73,7 +72,7 @@ public:
     void SetSpecifiers(Specifiers specifiers);
     int32_t LayoutIndex() const { return layoutIndex; }
     void SetLayoutIndex(int32_t layoutIndex_) { layoutIndex = layoutIndex_; }
-    llvm::DIDerivedType* GetDIMemberType(Emitter& emitter, uint64_t offsetInBits);
+    void* GetDIMemberType(Emitter& emitter, uint64_t offsetInBits);
     std::unique_ptr<dom::Element> CreateDomElement(TypeMap& typeMap) override;
     const char* ClassName() const override { return "MemberVariableSymbol"; }
     void Check() override;

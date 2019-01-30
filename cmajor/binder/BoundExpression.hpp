@@ -40,10 +40,12 @@ inline BoundExpressionFlags operator&(BoundExpressionFlags left, BoundExpression
 class BoundFunctionCall;
 class BoundFunction;
 
-class BoundExpression : public BoundNode
+class BINDER_API BoundExpression : public BoundNode
 {
 public:
     BoundExpression(Module* module_, const Span& span_, BoundNodeType boundNodeType_, TypeSymbol* type_);
+    BoundExpression(const BoundExpression&) = delete;
+    BoundExpression& operator=(const BoundExpression&) = delete;
     virtual BoundExpression* Clone() = 0;
     virtual bool IsComplete() const { return true; }
     virtual bool IsLvalueExpression() const { return false; }
@@ -64,7 +66,7 @@ private:
     std::vector<std::unique_ptr<BoundFunctionCall>> temporaryDestructorCalls;
 };
 
-class BoundParameter : public BoundExpression
+class BINDER_API BoundParameter : public BoundExpression
 {
 public:
     BoundParameter(Module* module_, const Span& span_, ParameterSymbol* parameterSymbol_);
@@ -80,7 +82,7 @@ private:
     ParameterSymbol* parameterSymbol;
 };
 
-class BoundLocalVariable : public BoundExpression
+class BINDER_API BoundLocalVariable : public BoundExpression
 {
 public:
     BoundLocalVariable(Module* module_, const Span& span_, LocalVariableSymbol* localVariableSymbol_);
@@ -96,7 +98,7 @@ private:
     LocalVariableSymbol* localVariableSymbol;
 };
 
-class BoundMemberVariable : public BoundExpression
+class BINDER_API BoundMemberVariable : public BoundExpression
 {
 public:
     BoundMemberVariable(Module* module_, const Span& span_, MemberVariableSymbol* memberVariableSymbol_);
@@ -116,7 +118,7 @@ private:
     bool staticInitNeeded;
 };
 
-class BoundConstant : public BoundExpression
+class BINDER_API BoundConstant : public BoundExpression
 {
 public:
     BoundConstant(Module* module_, const Span& span_, ConstantSymbol* constantSymbol_);
@@ -132,7 +134,7 @@ private:
     ConstantSymbol* constantSymbol;
 };
 
-class BoundEnumConstant : public BoundExpression
+class BINDER_API BoundEnumConstant : public BoundExpression
 {
 public:
     BoundEnumConstant(Module* module_, const Span& span_, EnumConstantSymbol* enumConstantSymbol_);
@@ -148,7 +150,7 @@ private:
     EnumConstantSymbol* enumConstantSymbol;
 };
 
-class BoundLiteral : public BoundExpression
+class BINDER_API BoundLiteral : public BoundExpression
 {
 public:
     BoundLiteral(Module* module_, std::unique_ptr<Value>&& value_, TypeSymbol* type_);
@@ -164,7 +166,7 @@ private:
     std::unique_ptr<Value> value;
 };
 
-class BoundTemporary : public BoundExpression
+class BINDER_API BoundTemporary : public BoundExpression
 {
 public:
     BoundTemporary(Module* module_, std::unique_ptr<BoundExpression>&& rvalueExpr_, std::unique_ptr<BoundLocalVariable>&& backingStore_);
@@ -184,7 +186,7 @@ private:
     std::unique_ptr<BoundLocalVariable> backingStore;
 };
 
-class BoundSizeOfExpression : public BoundExpression
+class BINDER_API BoundSizeOfExpression : public BoundExpression
 {
 public:
     BoundSizeOfExpression(Module* module_, const Span& span_, TypeSymbol* type_, TypeSymbol* pointerType_);
@@ -198,7 +200,7 @@ private:
     TypeSymbol* pointerType;
 };
 
-class BoundAddressOfExpression : public BoundExpression
+class BINDER_API BoundAddressOfExpression : public BoundExpression
 {
 public:
     BoundAddressOfExpression(Module* module_, std::unique_ptr<BoundExpression>&& subject_, TypeSymbol* type_);
@@ -214,7 +216,7 @@ private:
     std::unique_ptr<BoundExpression> subject;
 };
 
-class BoundDereferenceExpression : public BoundExpression
+class BINDER_API BoundDereferenceExpression : public BoundExpression
 {
 public:
     BoundDereferenceExpression(Module* module_, std::unique_ptr<BoundExpression>&& subject_, TypeSymbol* type_);
@@ -230,7 +232,7 @@ private:
     std::unique_ptr<BoundExpression> subject;
 };
 
-class BoundReferenceToPointerExpression : public BoundExpression
+class BINDER_API BoundReferenceToPointerExpression : public BoundExpression
 {
 public:
     BoundReferenceToPointerExpression(Module* module_, std::unique_ptr<BoundExpression>&& subject_, TypeSymbol* type_);
@@ -245,10 +247,12 @@ private:
     std::unique_ptr<BoundExpression> subject;
 };
 
-class BoundFunctionCall : public BoundExpression
+class BINDER_API BoundFunctionCall : public BoundExpression
 {
 public:
     BoundFunctionCall(Module* module_, const Span& span_, FunctionSymbol* functionSymbol_);
+    BoundFunctionCall(const BoundFunctionCall&) = delete;
+    BoundFunctionCall& operator=(const BoundFunctionCall&) = delete;
     BoundExpression* Clone() override;
     void Load(Emitter& emitter, OperationFlags flags) override;
     void Store(Emitter& emitter, OperationFlags flags) override;
@@ -269,7 +273,7 @@ private:
     std::vector<std::unique_ptr<BoundLocalVariable>> temporaries;
 };
 
-class BoundDelegateCall : public BoundExpression
+class BINDER_API BoundDelegateCall : public BoundExpression
 {
 public:
     BoundDelegateCall(Module* module_, const Span& span_, DelegateTypeSymbol* delegateType_);
@@ -289,7 +293,7 @@ private:
     std::vector<std::unique_ptr<BoundExpression>> arguments;
 };
 
-class BoundClassDelegateCall : public BoundExpression
+class BINDER_API BoundClassDelegateCall : public BoundExpression
 {
 public:
     BoundClassDelegateCall(Module* module_, const Span& span_, ClassDelegateTypeSymbol* classDelegateType_);
@@ -309,7 +313,7 @@ private:
     std::vector<std::unique_ptr<BoundExpression>> arguments;
 };
 
-class BoundConstructExpression : public BoundExpression
+class BINDER_API BoundConstructExpression : public BoundExpression
 {
 public:
     BoundConstructExpression(Module* module_, std::unique_ptr<BoundExpression>&& constructorCall_, TypeSymbol* resultType_);
@@ -325,7 +329,7 @@ private:
     std::unique_ptr<BoundExpression> constructorCall;
 };
 
-class BoundConstructAndReturnTemporaryExpression : public BoundExpression
+class BINDER_API BoundConstructAndReturnTemporaryExpression : public BoundExpression
 {
 public:
     BoundConstructAndReturnTemporaryExpression(Module* module_, std::unique_ptr<BoundExpression>&& constructorCall_, std::unique_ptr<BoundExpression>&& boundTemporary_);
@@ -344,7 +348,7 @@ private:
     std::unique_ptr<BoundExpression> boundTemporary;
 };
 
-class BoundClassOrClassDelegateConversionResult : public BoundExpression
+class BINDER_API BoundClassOrClassDelegateConversionResult : public BoundExpression
 {
 public:
     BoundClassOrClassDelegateConversionResult(Module* module_, std::unique_ptr<BoundExpression>&& conversionResult_, std::unique_ptr<BoundFunctionCall>&& conversionFunctionCall_);
@@ -363,7 +367,7 @@ private:
     std::unique_ptr<BoundFunctionCall> conversionFunctionCall;
 };
 
-class BoundConversion : public BoundExpression
+class BINDER_API BoundConversion : public BoundExpression
 {
 public:
     BoundConversion(Module* module_, std::unique_ptr<BoundExpression>&& sourceExpr_, FunctionSymbol* conversionFun_);
@@ -385,7 +389,7 @@ private:
     std::vector<std::unique_ptr<BoundLocalVariable>> temporaries;
 };
 
-class BoundIsExpression : public BoundExpression
+class BINDER_API BoundIsExpression : public BoundExpression
 {
 public:
     BoundIsExpression(Module* module_, std::unique_ptr<BoundExpression>&& expr_, ClassTypeSymbol* rightClassType_, TypeSymbol* boolType_,
@@ -406,7 +410,7 @@ private:
     std::unique_ptr<BoundLocalVariable> rightClassIdVar;
 };
 
-class BoundAsExpression : public BoundExpression
+class BINDER_API BoundAsExpression : public BoundExpression
 {
 public:
     BoundAsExpression(Module* module_, std::unique_ptr<BoundExpression>&& expr_, ClassTypeSymbol* rightClassType_, std::unique_ptr<BoundLocalVariable>&& variable_,
@@ -429,7 +433,7 @@ private:
     std::unique_ptr<BoundLocalVariable> rightClassIdVar;
 };
 
-class BoundTypeNameExpression : public BoundExpression
+class BINDER_API BoundTypeNameExpression : public BoundExpression
 {
 public:
     BoundTypeNameExpression(Module* module_, std::unique_ptr<BoundExpression>&& classPtr_, TypeSymbol* constCharPtrType_);
@@ -444,7 +448,7 @@ private:
     std::unique_ptr<BoundExpression> classPtr;
 };
 
-class BoundBitCast : public BoundExpression
+class BINDER_API BoundBitCast : public BoundExpression
 {
 public:
     BoundBitCast(Module* module_, std::unique_ptr<BoundExpression>&& expr_, TypeSymbol* type_);
@@ -459,7 +463,7 @@ private:
     std::unique_ptr<BoundExpression> expr;
 };
 
-class BoundFunctionPtr : public BoundExpression
+class BINDER_API BoundFunctionPtr : public BoundExpression
 {
 public:
     BoundFunctionPtr(Module* module_, const Span& span_, FunctionSymbol* function_, TypeSymbol* type_);
@@ -473,7 +477,7 @@ private:
     FunctionSymbol* function;
 };
 
-class BoundDisjunction : public BoundExpression
+class BINDER_API BoundDisjunction : public BoundExpression
 {
 public:
     BoundDisjunction(Module* module_, const Span& span_, std::unique_ptr<BoundExpression>&& left_, std::unique_ptr<BoundExpression>&& right_, TypeSymbol* boolType_);
@@ -492,7 +496,7 @@ private:
     std::unique_ptr<BoundLocalVariable> temporary;
 };
 
-class BoundConjunction : public BoundExpression
+class BINDER_API BoundConjunction : public BoundExpression
 {
 public:
     BoundConjunction(Module* module_, const Span& span_, std::unique_ptr<BoundExpression>&& left_, std::unique_ptr<BoundExpression>&& right_, TypeSymbol* boolType_);
@@ -511,7 +515,7 @@ private:
     std::unique_ptr<BoundLocalVariable> temporary;
 };
 
-class BoundTypeExpression : public BoundExpression
+class BINDER_API BoundTypeExpression : public BoundExpression
 {
 public:
     BoundTypeExpression(Module* module_, const Span& span_, TypeSymbol* type_);
@@ -523,7 +527,7 @@ public:
     std::string TypeString() const override { return "type expression"; }
 };
 
-class BoundNamespaceExpression : public BoundExpression
+class BINDER_API BoundNamespaceExpression : public BoundExpression
 {
 public:
     BoundNamespaceExpression(Module* module_, const Span& span_, NamespaceSymbol* ns_);
@@ -539,7 +543,7 @@ private:
     std::unique_ptr<TypeSymbol> nsType;
 };
 
-class BoundFunctionGroupExpression : public BoundExpression
+class BINDER_API BoundFunctionGroupExpression : public BoundExpression
 {
 public:
     BoundFunctionGroupExpression(Module* module_, const Span& span_, FunctionGroupSymbol* functionGroupSymbol_);
@@ -569,7 +573,7 @@ private:
     std::vector<TypeSymbol*> templateArgumentTypes;
 };
 
-class BoundMemberExpression : public BoundExpression
+class BINDER_API BoundMemberExpression : public BoundExpression
 {
 public:
     BoundMemberExpression(Module* module_, const Span& span_, std::unique_ptr<BoundExpression>&& classPtr_, std::unique_ptr<BoundExpression>&& member_);

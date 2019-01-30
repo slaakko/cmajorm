@@ -34,10 +34,12 @@ struct ConversionTableEntryHash
     }
 };
 
-class ConversionTable
+class SYMBOLS_API ConversionTable
 {
 public:
     ConversionTable(Module* module_);
+    ConversionTable(const ConversionTable&) = delete;
+    ConversionTable& operator=(const ConversionTable&) = delete;
     void AddConversion(FunctionSymbol* conversion);
     void AddConversion(FunctionSymbol* conversion, Module* module);
     FunctionSymbol* GetConversion(TypeSymbol* sourceType, TypeSymbol* targetType, const Span& span) const;

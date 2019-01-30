@@ -5,6 +5,7 @@
 
 #ifndef CMAJOR_AST_NODE_INCLUDED
 #define CMAJOR_AST_NODE_INCLUDED
+#include <cmajor/ast/AstApi.hpp>
 #include <cmajor/parsing/Scanner.hpp>
 #include <cmajor/ast/Clone.hpp>
 #include <memory>
@@ -51,11 +52,13 @@ enum class NodeType : uint8_t
 
 std::string NodeTypeStr(NodeType nodeType);
 
-class Node
+class AST_API Node
 {
 public:
     Node(NodeType nodeType_, const Span& span_);
     virtual ~Node();
+    Node(const Node&) = delete;
+    Node& operator=(const Node&) = delete;
     NodeType GetNodeType() const { return nodeType; }
     virtual Node* Clone(CloneContext& cloneContext) const = 0;
     virtual void Accept(Visitor& visitor) = 0;
@@ -83,7 +86,7 @@ private:
     Node* parent;
 };
 
-class UnaryNode : public Node
+class AST_API UnaryNode : public Node
 {
 public:
     UnaryNode(NodeType nodeType, const Span& span_);
@@ -96,7 +99,7 @@ private:
     std::unique_ptr<Node> subject;
 };
 
-class BinaryNode : public Node
+class AST_API BinaryNode : public Node
 {
 public:
     BinaryNode(NodeType nodeType, const Span& span_);

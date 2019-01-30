@@ -5,12 +5,13 @@
 
 #ifndef CMAJOR_PARSING_XMLLOG_INCLUDED
 #define CMAJOR_PARSING_XMLLOG_INCLUDED
+#include <cmajor/parsing/ParsingApi.hpp>
 #include <ostream>
 #include <string>
 
 namespace cmajor { namespace parsing {
 
-class XmlLog
+class PARSING_API XmlLog
 {
 public:
     XmlLog(std::ostream& stream_, int maxLineLength_): stream(stream_), maxLineLength(maxLineLength_), indent(0) {}

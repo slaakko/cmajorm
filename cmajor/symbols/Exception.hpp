@@ -5,6 +5,7 @@
 
 #ifndef CMAJOR_SYMBOLS_EXCEPTION_INCLUDED
 #define CMAJOR_SYMBOLS_EXCEPTION_INCLUDED
+#include <cmajor/symbols/SymbolsApi.hpp>
 #include <cmajor/parsing/Scanner.hpp>
 #include <cmajor/dom/Element.hpp>
 #include <cmajor/util/Json.hpp>
@@ -22,10 +23,10 @@ std::string Expand(Module* module, const std::string& errorMessage, const Span& 
 std::string Expand(Module* module, const std::string& errorMessage, const Span& span, const std::vector<Span>& references);
 std::string Expand(Module* module, const std::string& errorMessage, const Span& span, const std::vector<Span>& references, const std::string& title);
 
-std::unique_ptr<JsonObject> SpanToJson(Module* module, const Span& span);
-std::unique_ptr<cmajor::dom::Element> SpanToDomElement(Module* module, const Span& span);
+SYMBOLS_API std::unique_ptr<JsonObject> SpanToJson(Module* module, const Span& span);
+SYMBOLS_API std::unique_ptr<cmajor::dom::Element> SpanToDomElement(Module* module, const Span& span);
 
-class Exception
+class SYMBOLS_API Exception
 {
 public:
     Exception(Module* module_, const std::string& message_, const Span& defined_);
@@ -47,19 +48,19 @@ private:
     std::vector<Span> references;
 };
 
-class ModuleImmutableException : public Exception
+class SYMBOLS_API ModuleImmutableException : public Exception
 {
 public:
     ModuleImmutableException(Module* module_, Module* immutableModule, const Span& defined_, const Span& referenced_);
 };
 
-class SymbolCheckException : public Exception
+class SYMBOLS_API SymbolCheckException : public Exception
 {
 public:
     SymbolCheckException(Module* module_, const std::string& message_, const Span& defined_);
 };
 
-class CastOverloadException : public Exception
+class SYMBOLS_API CastOverloadException : public Exception
 {
 public:
     CastOverloadException(Module* module, const std::string& message_, const Span& defined_);
@@ -67,7 +68,7 @@ public:
     CastOverloadException(Module* module, const std::string& message_, const Span& defined_, const std::vector<Span>& references_);
 };
 
-class CannotBindConstToNonconstOverloadException : public Exception
+class SYMBOLS_API CannotBindConstToNonconstOverloadException : public Exception
 {
 public:
     CannotBindConstToNonconstOverloadException(Module* module, const std::string& message_, const Span& defined_);
@@ -75,7 +76,7 @@ public:
     CannotBindConstToNonconstOverloadException(Module* module, const std::string& message_, const Span& defined_, const std::vector<Span>& references_);
 };
 
-class CannotAssignToConstOverloadException : public Exception
+class SYMBOLS_API CannotAssignToConstOverloadException : public Exception
 {
 public:
     CannotAssignToConstOverloadException(Module* module, const std::string& message_, const Span& defined_);
@@ -83,7 +84,7 @@ public:
     CannotAssignToConstOverloadException(Module* module, const std::string& message_, const Span& defined_, const std::vector<Span>& references_);
 };
 
-class NoViableFunctionException : public Exception
+class SYMBOLS_API NoViableFunctionException : public Exception
 {
 public:
     NoViableFunctionException(Module* module, const std::string& message_, const Span& defined_);

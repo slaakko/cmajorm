@@ -9,7 +9,7 @@
 
 namespace cmajor { namespace codedom {
 
-class AssignInit : public CppObject
+class CODEDOM_API AssignInit : public CppObject
 {
 public:
     AssignInit(CppObject* assignmentExpr_);
@@ -21,7 +21,7 @@ private:
     std::vector<AssignInit*> subInits;
 };
 
-class Initializer : public CppObject
+class CODEDOM_API Initializer : public CppObject
 {
 public:
     Initializer(AssignInit* assignInit_, const std::vector<CppObject*>& expressionList_);
@@ -32,7 +32,7 @@ private:
     std::vector<CppObject*> expressionList;
 };
 
-class InitDeclarator : public CppObject
+class CODEDOM_API InitDeclarator : public CppObject
 {
 public:
     InitDeclarator(const std::u32string& declarator_, Initializer* initializer_);
@@ -43,7 +43,7 @@ private:
     Initializer* initializer;
 };
 
-class InitDeclaratorList : public CppObject
+class CODEDOM_API InitDeclaratorList : public CppObject
 {
 public:
     InitDeclaratorList();
@@ -56,7 +56,7 @@ private:
 
 class DeclSpecifier;
 
-class SimpleDeclaration : public CppObject
+class CODEDOM_API SimpleDeclaration : public CppObject
 {
 public:
     SimpleDeclaration();
@@ -69,7 +69,7 @@ private:
     InitDeclaratorList* initDeclaratorList;
 };
 
-class UsingObject : public CppObject
+class CODEDOM_API UsingObject : public CppObject
 {
 public:
     UsingObject(const std::u32string& name_);
@@ -79,7 +79,7 @@ private:
     std::u32string fileAttr;
 };
 
-class NamespaceAlias : public UsingObject
+class CODEDOM_API NamespaceAlias : public UsingObject
 {
 public:
     NamespaceAlias(const std::u32string& aliasName_, const std::u32string& namespaceName_);
@@ -90,7 +90,7 @@ private:
     std::u32string namespaceName;
 };
 
-class UsingDeclaration : public UsingObject
+class CODEDOM_API UsingDeclaration : public UsingObject
 {
 public:
     UsingDeclaration(const std::u32string& usingId_);
@@ -100,7 +100,7 @@ private:
     std::u32string usingId;
 };
 
-class UsingDirective : public UsingObject
+class CODEDOM_API UsingDirective : public UsingObject
 {
 public:
     UsingDirective(const std::u32string& usingNs_);

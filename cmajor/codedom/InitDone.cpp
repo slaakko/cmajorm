@@ -3,6 +3,7 @@
 // Distributed under the MIT license
 // =================================
 
+#include <cmajor/codedom/InitDone.hpp>
 #include <cmajor/codedom/Operator.hpp>
 
 namespace cmajor { namespace codedom {

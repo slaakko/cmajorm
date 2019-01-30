@@ -12,7 +12,6 @@
 #include <cmajor/symbols/SymbolCollector.hpp>
 #include <cmajor/symbols/Module.hpp>
 #include <cmajor/util/Unicode.hpp>
-#include <llvm/IR/Module.h>
 #include <boost/uuid/uuid_io.hpp>
 
 namespace cmajor { namespace symbols {
@@ -115,17 +114,17 @@ void DelegateTypeSymbol::Dump(CodeFormatter& formatter)
     formatter.WriteLine("typeid: " + boost::uuids::to_string(TypeId()));
 }
 
-llvm::Type* DelegateTypeSymbol::IrType(Emitter& emitter)
+void* DelegateTypeSymbol::IrType(Emitter& emitter)
 {
-    llvm::Type* localIrType = emitter.GetIrTypeByTypeId(TypeId());
+    void* localIrType = emitter.GetIrTypeByTypeId(TypeId());
     if (!localIrType)
     {
-        llvm::Type* retType = llvm::Type::getVoidTy(emitter.Context());
+        void* retType = emitter.GetIrTypeForVoid();
         if (!returnType->IsVoidType() && !ReturnsClassInterfaceOrClassDelegateByValue())
         {
             retType = returnType->IrType(emitter);
         }
-        std::vector<llvm::Type*> paramTypes;
+        std::vector<void*> paramTypes;
         int np = parameters.size();
         for (int i = 0; i < np; ++i)
         {
@@ -136,15 +135,15 @@ llvm::Type* DelegateTypeSymbol::IrType(Emitter& emitter)
         {
             paramTypes.push_back(returnParam->GetType()->IrType(emitter));
         }
-        localIrType = llvm::PointerType::get(llvm::FunctionType::get(retType, paramTypes, false), 0);
+        localIrType = emitter.GetIrTypeForDelegateType(retType, paramTypes);
         emitter.SetIrTypeByTypeId(TypeId(), localIrType);
     }
     return localIrType;
 }
 
-llvm::Constant* DelegateTypeSymbol::CreateDefaultIrValue(Emitter& emitter)
+void* DelegateTypeSymbol::CreateDefaultIrValue(Emitter& emitter)
 {
-    return llvm::Constant::getNullValue(IrType(emitter));
+    return emitter.CreateDefaultIrValueForDelegateType(IrType(emitter));
 }
 
 void DelegateTypeSymbol::SetSpecifiers(Specifiers specifiers)
@@ -232,7 +231,7 @@ void DelegateTypeSymbol::SetReturnParam(ParameterSymbol* returnParam_)
 
 void DelegateTypeSymbol::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span)
 {
-    llvm::Value* callee = nullptr;
+    void* callee = nullptr;
     int na = genObjects.size();
     for (int i = 0; i < na; ++i)
     {
@@ -243,7 +242,7 @@ void DelegateTypeSymbol::GenerateCall(Emitter& emitter, std::vector<GenObject*>&
             callee = emitter.Stack().Pop();
         }
     }
-    ArgVector args;
+    std::vector<void*> args;
     int n = parameters.size();
     if (ReturnsClassInterfaceOrClassDelegateByValue())
     {
@@ -252,20 +251,18 @@ void DelegateTypeSymbol::GenerateCall(Emitter& emitter, std::vector<GenObject*>&
     args.resize(n);
     for (int i = 0; i < n; ++i)
     {
-        llvm::Value* arg = emitter.Stack().Pop();
+        void* arg = emitter.Stack().Pop();
         args[n - i - 1] = arg;
     }
     emitter.SetCurrentDebugLocation(span);
-    llvm::BasicBlock* handlerBlock = emitter.HandlerBlock();
-    llvm::BasicBlock* cleanupBlock = emitter.CleanupBlock();
+    void* handlerBlock = emitter.HandlerBlock();
+    void* cleanupBlock = emitter.CleanupBlock();
     bool newCleanupNeeded = emitter.NewCleanupNeeded();
     Pad* currentPad = emitter.CurrentPad();
-    std::vector<llvm::OperandBundleDef> bundles;
+    std::vector<void*> bundles;
     if (currentPad != nullptr)
     {
-        std::vector<llvm::Value*> inputs;
-        inputs.push_back(currentPad->value);
-        bundles.push_back(llvm::OperandBundleDef("funclet", inputs));
+        bundles.push_back(currentPad->value);
     }
     if (returnType->GetSymbolType() != SymbolType::voidTypeSymbol && !ReturnsClassInterfaceOrClassDelegateByValue())
     {
@@ -273,27 +270,23 @@ void DelegateTypeSymbol::GenerateCall(Emitter& emitter, std::vector<GenObject*>&
         {
             if (currentPad == nullptr)
             {
-                emitter.Stack().Push(emitter.Builder().CreateCall(callee, args));
+                emitter.Stack().Push(emitter.CreateCall(callee, args));
             }
             else
             {
-                llvm::CallInst* callInst = llvm::CallInst::Create(callee, args, bundles, "", emitter.CurrentBasicBlock());
-                if (emitter.DIBuilder())
-                {
-                    callInst->setDebugLoc(emitter.GetDebugLocation(span));
-                }
+                void* callInst = emitter.CreateCallInst(callee, args, bundles, span);
                 emitter.Stack().Push(callInst);
             }
         }
         else
         {
-            llvm::BasicBlock* nextBlock = llvm::BasicBlock::Create(emitter.Context(), "next", emitter.Function());
+            void* nextBlock = emitter.CreateBasicBlock("next");
             if (newCleanupNeeded)
             {
                 emitter.CreateCleanup();
                 cleanupBlock = emitter.CleanupBlock();
             }
-            llvm::BasicBlock* unwindBlock = cleanupBlock;
+            void* unwindBlock = cleanupBlock;
             if (unwindBlock == nullptr)
             {
                 unwindBlock = handlerBlock;
@@ -301,15 +294,11 @@ void DelegateTypeSymbol::GenerateCall(Emitter& emitter, std::vector<GenObject*>&
             }
             if (currentPad == nullptr)
             {
-                emitter.Stack().Push(emitter.Builder().CreateInvoke(callee, nextBlock, unwindBlock, args));
+                emitter.Stack().Push(emitter.CreateInvoke(callee, nextBlock, unwindBlock, args));
             }
             else
             {
-                llvm::InvokeInst* invokeInst = llvm::InvokeInst::Create(callee, nextBlock, unwindBlock, args, bundles, "", emitter.CurrentBasicBlock());
-                if (emitter.DIBuilder())
-                {
-                    invokeInst->setDebugLoc(emitter.GetDebugLocation(span));
-                }
+                void* invokeInst = emitter.CreateInvokeInst(callee, nextBlock, unwindBlock, args, bundles, span);
                 emitter.Stack().Push(invokeInst);
             }
             emitter.SetCurrentBasicBlock(nextBlock);
@@ -321,26 +310,22 @@ void DelegateTypeSymbol::GenerateCall(Emitter& emitter, std::vector<GenObject*>&
         {
             if (currentPad == nullptr)
             {
-                emitter.Builder().CreateCall(callee, args);
+                emitter.CreateCall(callee, args);
             }
             else
             {
-                llvm::CallInst* callInst = llvm::CallInst::Create(callee, args, bundles, "", emitter.CurrentBasicBlock());
-                if (emitter.DIBuilder())
-                {
-                    callInst->setDebugLoc(emitter.GetDebugLocation(span));
-                }
+                emitter.CreateCallInst(callee, args, bundles, span);
             }
         }
         else
         {
-            llvm::BasicBlock* nextBlock = llvm::BasicBlock::Create(emitter.Context(), "next", emitter.Function());
+            void* nextBlock = emitter.CreateBasicBlock("next");
             if (newCleanupNeeded)
             {
                 emitter.CreateCleanup();
                 cleanupBlock = emitter.CleanupBlock();
             }
-            llvm::BasicBlock* unwindBlock = cleanupBlock;
+            void* unwindBlock = cleanupBlock;
             if (unwindBlock == nullptr)
             {
                 unwindBlock = handlerBlock;
@@ -348,15 +333,11 @@ void DelegateTypeSymbol::GenerateCall(Emitter& emitter, std::vector<GenObject*>&
             }
             if (currentPad == nullptr)
             {
-                emitter.Builder().CreateInvoke(callee, nextBlock, unwindBlock, args);
+                emitter.CreateInvoke(callee, nextBlock, unwindBlock, args);
             }
             else
             {
-                llvm::InvokeInst* invokeInst = llvm::InvokeInst::Create(callee, nextBlock, unwindBlock, args, bundles, "", emitter.CurrentBasicBlock());
-                if (emitter.DIBuilder())
-                {
-                    invokeInst->setDebugLoc(emitter.GetDebugLocation(span));
-                }
+                emitter.CreateInvokeInst(callee, nextBlock, unwindBlock, args, bundles, span);
             }
             emitter.SetCurrentBasicBlock(nextBlock);
         }
@@ -476,8 +457,8 @@ void DelegateTypeMoveConstructor::GenerateCall(Emitter& emitter, std::vector<Gen
 {
     Assert(genObjects.size() == 2, "move constructor needs two objects");
     genObjects[1]->Load(emitter, OperationFlags::none);
-    llvm::Value* rvalueRefValue = emitter.Stack().Pop();
-    emitter.Stack().Push(emitter.Builder().CreateLoad(rvalueRefValue));
+    void* rvalueRefValue = emitter.Stack().Pop();
+    emitter.Stack().Push(emitter.CreateLoad(rvalueRefValue));
     genObjects[0]->Store(emitter, OperationFlags::none);
 }
 
@@ -528,8 +509,8 @@ void DelegateTypeMoveAssignment::GenerateCall(Emitter& emitter, std::vector<GenO
 {
     Assert(genObjects.size() == 2, "move assignment needs two objects");
     genObjects[1]->Load(emitter, OperationFlags::none);
-    llvm::Value* rvalueRefValue = emitter.Stack().Pop();
-    emitter.Stack().Push(emitter.Builder().CreateLoad(rvalueRefValue));
+    void* rvalueRefValue = emitter.Stack().Pop();
+    emitter.Stack().Push(emitter.CreateLoad(rvalueRefValue));
     genObjects[0]->Store(emitter, OperationFlags::none);
 }
 
@@ -575,10 +556,10 @@ void DelegateTypeEquality::GenerateCall(Emitter& emitter, std::vector<GenObject*
 {
     Assert(genObjects.size() == 2, "operator== needs two objects");
     genObjects[0]->Load(emitter, OperationFlags::none);
-    llvm::Value* left = emitter.Stack().Pop();
+    void* left = emitter.Stack().Pop();
     genObjects[1]->Load(emitter, OperationFlags::none);
-    llvm::Value* right = emitter.Stack().Pop();
-    emitter.Stack().Push(emitter.Builder().CreateICmpEQ(left, right));
+    void* right = emitter.Stack().Pop();
+    emitter.Stack().Push(emitter.CreateICmpEQ(left, right));
 }
 
 FunctionToDelegateConversion::FunctionToDelegateConversion(const Span& span_, const std::u32string& name_) : FunctionSymbol(SymbolType::functionToDelegateSymbol, span_, name_)
@@ -594,7 +575,7 @@ FunctionToDelegateConversion::FunctionToDelegateConversion(TypeSymbol* sourceTyp
 void FunctionToDelegateConversion::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span)
 {
     emitter.Stack().Pop();
-    emitter.Stack().Push(emitter.Module()->getOrInsertFunction(ToUtf8(function->MangledName()), function->IrType(emitter)));
+    emitter.Stack().Push(emitter.GetOrInsertFunction(ToUtf8(function->MangledName()), function->IrType(emitter)));
 }
 
 void FunctionToDelegateConversion::Check()
@@ -625,8 +606,8 @@ DelegateToVoidPtrConversion::DelegateToVoidPtrConversion(TypeSymbol* delegateTyp
 void DelegateToVoidPtrConversion::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span)
 {
     emitter.SetCurrentDebugLocation(span);
-    llvm::Value* value = emitter.Stack().Pop();
-    emitter.Stack().Push(emitter.Builder().CreateBitCast(value, voidPtrType->IrType(emitter)));
+    void* value = emitter.Stack().Pop();
+    emitter.Stack().Push(emitter.CreateBitCast(value, voidPtrType->IrType(emitter)));
 }
 
 VoidPtrToDelegateConversion::VoidPtrToDelegateConversion(TypeSymbol* voidPtrType_, TypeSymbol* delegateType_, TypeSymbol* ulongType_) :
@@ -640,9 +621,9 @@ VoidPtrToDelegateConversion::VoidPtrToDelegateConversion(TypeSymbol* voidPtrType
 void VoidPtrToDelegateConversion::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span)
 {
     emitter.SetCurrentDebugLocation(span);
-    llvm::Value* value = emitter.Stack().Pop();
-    llvm::Value* ulongValue = emitter.Builder().CreatePtrToInt(value, ulongType->IrType(emitter));
-    emitter.Stack().Push(emitter.Builder().CreateIntToPtr(ulongValue, delegateType->IrType(emitter)));
+    void* value = emitter.Stack().Pop();
+    void* ulongValue = emitter.CreatePtrToInt(value, ulongType->IrType(emitter));
+    emitter.Stack().Push(emitter.CreateIntToPtr(ulongValue, delegateType->IrType(emitter)));
 }
 
 ClassDelegateTypeSymbol::ClassDelegateTypeSymbol(const Span& span_, const std::u32string& name_) : 
@@ -754,26 +735,26 @@ void ClassDelegateTypeSymbol::Dump(CodeFormatter& formatter)
     formatter.WriteLine("typeid: " + boost::uuids::to_string(TypeId()));
 }
 
-llvm::Type* ClassDelegateTypeSymbol::IrType(Emitter& emitter)
+void* ClassDelegateTypeSymbol::IrType(Emitter& emitter)
 {
-    llvm::Type* localIrType = emitter.GetIrTypeByTypeId(TypeId());
+    void* localIrType = emitter.GetIrTypeByTypeId(TypeId());
     if (!localIrType)
     {
-        std::vector<llvm::Type*> elementTypes;
-        elementTypes.push_back(emitter.Builder().getInt8PtrTy());
+        std::vector<void*> elementTypes;
+        elementTypes.push_back(emitter.GetIrTypeForVoidPtrType());
         elementTypes.push_back(delegateType->IrType(emitter));
-        localIrType = llvm::StructType::get(emitter.Context(), elementTypes);
+        localIrType = emitter.GetIrTypeForStructType(elementTypes);
         emitter.SetIrTypeByTypeId(TypeId(), localIrType);
     }
     return localIrType;
 }
 
-llvm::Constant* ClassDelegateTypeSymbol::CreateDefaultIrValue(Emitter& emitter)
+void* ClassDelegateTypeSymbol::CreateDefaultIrValue(Emitter& emitter)
 {
-    std::vector<llvm::Constant*> constants;
-    constants.push_back(llvm::Constant::getNullValue(emitter.Builder().getInt8PtrTy()));
+    std::vector<void*> constants;
+    constants.push_back(emitter.CreateDefaultIrValueForVoidPtrType());
     constants.push_back(delegateType->CreateDefaultIrValue(emitter));
-    return llvm::ConstantStruct::get(llvm::cast<llvm::StructType>(IrType(emitter)), constants);
+    return emitter.CreateDefaultIrValueForStruct(IrType(emitter), constants);
 }
 
 bool ClassDelegateTypeSymbol::ReturnsClassInterfaceOrClassDelegateByValue() const
@@ -863,19 +844,13 @@ void ClassDelegateTypeSymbol::GenerateCall(Emitter& emitter, std::vector<GenObje
 {
     Assert(!genObjects.empty(), "gen objects is empty");
     genObjects[0]->Load(emitter, flags);
-    llvm::Value* classDelegatePtr = emitter.Stack().Pop();
-    ArgVector delegateIndeces;
-    delegateIndeces.push_back(emitter.Builder().getInt32(0));
-    delegateIndeces.push_back(emitter.Builder().getInt32(1));
-    llvm::Value* delegatePtr = emitter.Builder().CreateGEP(classDelegatePtr, delegateIndeces);
-    llvm::Value* callee = emitter.Builder().CreateLoad(delegatePtr);
-    LlvmValue calleeValue(callee);
-    ArgVector objectIndeces;
-    objectIndeces.push_back(emitter.Builder().getInt32(0));
-    objectIndeces.push_back(emitter.Builder().getInt32(0));
-    llvm::Value* objectPtr = emitter.Builder().CreateGEP(classDelegatePtr, objectIndeces);
-    llvm::Value* object = emitter.Builder().CreateLoad(objectPtr);
-    LlvmValue objectValue(object);
+    void* classDelegatePtr = emitter.Stack().Pop();
+    void* delegatePtr = emitter.GetDelegateFromClassDelegate(classDelegatePtr);
+    void* callee = emitter.CreateLoad(delegatePtr);
+    NativeValue calleeValue(callee);
+    void* objectPtr = emitter.GetObjectFromClassDelegate(classDelegatePtr);
+    void* object = emitter.CreateLoad(objectPtr);
+    NativeValue objectValue(object);
     std::vector<GenObject*> classDelegateCallObjects;
     classDelegateCallObjects.push_back(&calleeValue);
     classDelegateCallObjects.push_back(&objectValue);
@@ -955,20 +930,14 @@ void ClassDelegateTypeDefaultConstructor::EmplaceType(TypeSymbol* typeSymbol, in
 void ClassDelegateTypeDefaultConstructor::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span)
 {
     Assert(genObjects.size() == 1, "default constructor needs one object");
-    llvm::Value* objectValue = llvm::Constant::getNullValue(emitter.Builder().getInt8PtrTy());
-    ArgVector objectIndeces;
-    objectIndeces.push_back(emitter.Builder().getInt32(0));
-    objectIndeces.push_back(emitter.Builder().getInt32(0));
+    void* objectValue = emitter.CreateDefaultIrValueForVoidPtrType();
     genObjects[0]->Load(emitter, OperationFlags::none);
-    llvm::Value* ptr = emitter.Stack().Pop();
-    llvm::Value* objectPtr = emitter.Builder().CreateGEP(ptr, objectIndeces);
-    emitter.Builder().CreateStore(objectValue, objectPtr);
-    llvm::Value* delegateValue = classDelegateType->DelegateType()->CreateDefaultIrValue(emitter);
-    ArgVector delegateIndeces;
-    delegateIndeces.push_back(emitter.Builder().getInt32(0));
-    delegateIndeces.push_back(emitter.Builder().getInt32(1));
-    llvm::Value* delegatePtr = emitter.Builder().CreateGEP(ptr, delegateIndeces);
-    emitter.Builder().CreateStore(delegateValue, delegatePtr);
+    void* ptr = emitter.Stack().Pop();
+    void* objectPtr = emitter.GetObjectFromClassDelegate(ptr);
+    emitter.CreateStore(objectValue, objectPtr);
+    void* delegateValue = classDelegateType->DelegateType()->CreateDefaultIrValue(emitter);
+    void* delegatePtr = emitter.GetDelegateFromClassDelegate(ptr);
+    emitter.CreateStore(delegateValue, delegatePtr);
 }
 
 void ClassDelegateTypeDefaultConstructor::Check()
@@ -1001,24 +970,18 @@ ClassDelegateTypeCopyConstructor::ClassDelegateTypeCopyConstructor(ClassDelegate
 
 void ClassDelegateTypeCopyConstructor::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span)
 {
-    ArgVector objectIndeces;
-    objectIndeces.push_back(emitter.Builder().getInt32(0));
-    objectIndeces.push_back(emitter.Builder().getInt32(0));
     genObjects[1]->Load(emitter, OperationFlags::none);
-    llvm::Value* thatPtr = emitter.Stack().Pop();
-    llvm::Value* thatObjectPtr = emitter.Builder().CreateGEP(thatPtr, objectIndeces);
-    llvm::Value* objectValue = emitter.Builder().CreateLoad(thatObjectPtr);
+    void* thatPtr = emitter.Stack().Pop();
+    void* thatObjectPtr = emitter.GetObjectFromClassDelegate(thatPtr);
+    void* objectValue = emitter.CreateLoad(thatObjectPtr);
     genObjects[0]->Load(emitter, OperationFlags::none);
-    llvm::Value* thisPtr = emitter.Stack().Pop();
-    llvm::Value* thisObjectPtr = emitter.Builder().CreateGEP(thisPtr, objectIndeces);
-    emitter.Builder().CreateStore(objectValue, thisObjectPtr);
-    ArgVector delegateIndeces;
-    delegateIndeces.push_back(emitter.Builder().getInt32(0));
-    delegateIndeces.push_back(emitter.Builder().getInt32(1));
-    llvm::Value* thatDelegatePtr = emitter.Builder().CreateGEP(thatPtr, delegateIndeces);
-    llvm::Value* delegateValue = emitter.Builder().CreateLoad(thatDelegatePtr);
-    llvm::Value* thisDelegatePtr = emitter.Builder().CreateGEP(thisPtr, delegateIndeces);
-    emitter.Builder().CreateStore(delegateValue, thisDelegatePtr);
+    void* thisPtr = emitter.Stack().Pop();
+    void* thisObjectPtr = emitter.GetObjectFromClassDelegate(thisPtr);
+    emitter.CreateStore(objectValue, thisObjectPtr);
+    void* thatDelegatePtr = emitter.GetDelegateFromClassDelegate(thatPtr);
+    void* delegateValue = emitter.CreateLoad(thatDelegatePtr);
+    void* thisDelegatePtr = emitter.GetDelegateFromClassDelegate(thisPtr);
+    emitter.CreateStore(delegateValue, thisDelegatePtr);
 }
 
 ClassDelegateTypeMoveConstructor::ClassDelegateTypeMoveConstructor(const Span& span_, const std::u32string& name_) :
@@ -1042,24 +1005,18 @@ ClassDelegateTypeMoveConstructor::ClassDelegateTypeMoveConstructor(ClassDelegate
 
 void ClassDelegateTypeMoveConstructor::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span)
 {
-    ArgVector objectIndeces;
-    objectIndeces.push_back(emitter.Builder().getInt32(0));
-    objectIndeces.push_back(emitter.Builder().getInt32(0));
     genObjects[1]->Load(emitter, OperationFlags::none);
-    llvm::Value* thatPtr = emitter.Stack().Pop();
-    llvm::Value* thatObjectPtr = emitter.Builder().CreateGEP(thatPtr, objectIndeces);
-    llvm::Value* objectValue = emitter.Builder().CreateLoad(thatObjectPtr);
+    void* thatPtr = emitter.Stack().Pop();
+    void* thatObjectPtr = emitter.GetObjectFromClassDelegate(thatPtr);
+    void* objectValue = emitter.CreateLoad(thatObjectPtr);
     genObjects[0]->Load(emitter, OperationFlags::none);
-    llvm::Value* thisPtr = emitter.Stack().Pop();
-    llvm::Value* thisObjectPtr = emitter.Builder().CreateGEP(thisPtr, objectIndeces);
-    emitter.Builder().CreateStore(objectValue, thisObjectPtr);
-    ArgVector delegateIndeces;
-    delegateIndeces.push_back(emitter.Builder().getInt32(0));
-    delegateIndeces.push_back(emitter.Builder().getInt32(1));
-    llvm::Value* thatDelegatePtr = emitter.Builder().CreateGEP(thatPtr, delegateIndeces);
-    llvm::Value* delegateValue = emitter.Builder().CreateLoad(thatDelegatePtr);
-    llvm::Value* thisDelegatePtr = emitter.Builder().CreateGEP(thisPtr, delegateIndeces);
-    emitter.Builder().CreateStore(delegateValue, thisDelegatePtr);
+    void* thisPtr = emitter.Stack().Pop();
+    void* thisObjectPtr = emitter.GetObjectFromClassDelegate(thisPtr);
+    emitter.CreateStore(objectValue, thisObjectPtr);
+    void* thatDelegatePtr = emitter.GetDelegateFromClassDelegate(thatPtr);
+    void* delegateValue = emitter.CreateLoad(thatDelegatePtr);
+    void* thisDelegatePtr = emitter.GetDelegateFromClassDelegate(thisPtr);
+    emitter.CreateStore(delegateValue, thisDelegatePtr);
 }
 
 ClassDelegateTypeCopyAssignment::ClassDelegateTypeCopyAssignment(const Span& span_, const std::u32string& name_) :
@@ -1084,24 +1041,18 @@ ClassDelegateTypeCopyAssignment::ClassDelegateTypeCopyAssignment(ClassDelegateTy
 
 void ClassDelegateTypeCopyAssignment::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span)
 {
-    ArgVector objectIndeces;
-    objectIndeces.push_back(emitter.Builder().getInt32(0));
-    objectIndeces.push_back(emitter.Builder().getInt32(0));
     genObjects[1]->Load(emitter, OperationFlags::none);
-    llvm::Value* thatPtr = emitter.Stack().Pop();
-    llvm::Value* thatObjectPtr = emitter.Builder().CreateGEP(thatPtr, objectIndeces);
-    llvm::Value* objectValue = emitter.Builder().CreateLoad(thatObjectPtr);
+    void* thatPtr = emitter.Stack().Pop();
+    void* thatObjectPtr = emitter.GetObjectFromClassDelegate(thatPtr);
+    void* objectValue = emitter.CreateLoad(thatObjectPtr);
     genObjects[0]->Load(emitter, OperationFlags::none);
-    llvm::Value* thisPtr = emitter.Stack().Pop();
-    llvm::Value* thisObjectPtr = emitter.Builder().CreateGEP(thisPtr, objectIndeces);
-    emitter.Builder().CreateStore(objectValue, thisObjectPtr);
-    ArgVector delegateIndeces;
-    delegateIndeces.push_back(emitter.Builder().getInt32(0));
-    delegateIndeces.push_back(emitter.Builder().getInt32(1));
-    llvm::Value* thatDelegatePtr = emitter.Builder().CreateGEP(thatPtr, delegateIndeces);
-    llvm::Value* delegateValue = emitter.Builder().CreateLoad(thatDelegatePtr);
-    llvm::Value* thisDelegatePtr = emitter.Builder().CreateGEP(thisPtr, delegateIndeces);
-    emitter.Builder().CreateStore(delegateValue, thisDelegatePtr);
+    void* thisPtr = emitter.Stack().Pop();
+    void* thisObjectPtr = emitter.GetObjectFromClassDelegate(thisPtr);
+    emitter.CreateStore(objectValue, thisObjectPtr);
+    void* thatDelegatePtr = emitter.GetDelegateFromClassDelegate(thatPtr);
+    void* delegateValue = emitter.CreateLoad(thatDelegatePtr);
+    void* thisDelegatePtr = emitter.GetDelegateFromClassDelegate(thisPtr);
+    emitter.CreateStore(delegateValue, thisDelegatePtr);
 }
 
 ClassDelegateTypeMoveAssignment::ClassDelegateTypeMoveAssignment(const Span& span_, const std::u32string& name_) :
@@ -1126,24 +1077,18 @@ ClassDelegateTypeMoveAssignment::ClassDelegateTypeMoveAssignment(ClassDelegateTy
 
 void ClassDelegateTypeMoveAssignment::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span)
 {
-    ArgVector objectIndeces;
-    objectIndeces.push_back(emitter.Builder().getInt32(0));
-    objectIndeces.push_back(emitter.Builder().getInt32(0));
     genObjects[1]->Load(emitter, OperationFlags::none);
-    llvm::Value* thatPtr = emitter.Stack().Pop();
-    llvm::Value* thatObjectPtr = emitter.Builder().CreateGEP(thatPtr, objectIndeces);
-    llvm::Value* objectValue = emitter.Builder().CreateLoad(thatObjectPtr);
+    void* thatPtr = emitter.Stack().Pop();
+    void* thatObjectPtr = emitter.GetObjectFromClassDelegate(thatPtr);
+    void* objectValue = emitter.CreateLoad(thatObjectPtr);
     genObjects[0]->Load(emitter, OperationFlags::none);
-    llvm::Value* thisPtr = emitter.Stack().Pop();
-    llvm::Value* thisObjectPtr = emitter.Builder().CreateGEP(thisPtr, objectIndeces);
-    emitter.Builder().CreateStore(objectValue, thisObjectPtr);
-    ArgVector delegateIndeces;
-    delegateIndeces.push_back(emitter.Builder().getInt32(0));
-    delegateIndeces.push_back(emitter.Builder().getInt32(1));
-    llvm::Value* thatDelegatePtr = emitter.Builder().CreateGEP(thatPtr, delegateIndeces);
-    llvm::Value* delegateValue = emitter.Builder().CreateLoad(thatDelegatePtr);
-    llvm::Value* thisDelegatePtr = emitter.Builder().CreateGEP(thisPtr, delegateIndeces);
-    emitter.Builder().CreateStore(delegateValue, thisDelegatePtr);
+    void* thisPtr = emitter.Stack().Pop();
+    void* thisObjectPtr = emitter.GetObjectFromClassDelegate(thisPtr);
+    emitter.CreateStore(objectValue, thisObjectPtr);
+    void* thatDelegatePtr = emitter.GetDelegateFromClassDelegate(thatPtr);
+    void* delegateValue = emitter.CreateLoad(thatDelegatePtr);
+    void* thisDelegatePtr = emitter.GetDelegateFromClassDelegate(thisPtr);
+    emitter.CreateStore(delegateValue, thisDelegatePtr);
 }
 
 ClassDelegateTypeEquality::ClassDelegateTypeEquality(const Span& span_, const std::u32string& name_) :
@@ -1168,27 +1113,21 @@ ClassDelegateTypeEquality::ClassDelegateTypeEquality(ClassDelegateTypeSymbol* cl
 
 void ClassDelegateTypeEquality::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span)
 {
-    ArgVector objectIndeces;
-    objectIndeces.push_back(emitter.Builder().getInt32(0));
-    objectIndeces.push_back(emitter.Builder().getInt32(0));
     genObjects[0]->Load(emitter, OperationFlags::none);
-    llvm::Value* leftPtr = emitter.Stack().Pop();
-    llvm::Value* leftObjectPtr = emitter.Builder().CreateGEP(leftPtr, objectIndeces);
-    llvm::Value* leftObjectValue = emitter.Builder().CreateLoad(leftObjectPtr);
+    void* leftPtr = emitter.Stack().Pop();
+    void* leftObjectPtr = emitter.GetObjectFromClassDelegate(leftPtr);
+    void* leftObjectValue = emitter.CreateLoad(leftObjectPtr);
     genObjects[1]->Load(emitter, OperationFlags::none);
-    llvm::Value* rightPtr = emitter.Stack().Pop();
-    llvm::Value* rightObjectPtr = emitter.Builder().CreateGEP(rightPtr, objectIndeces);
-    llvm::Value* rightObjectValue = emitter.Builder().CreateLoad(rightObjectPtr);
-    llvm::Value* objectsEqual = emitter.Builder().CreateICmpEQ(leftObjectValue, rightObjectValue);
-    ArgVector delegateIndeces;
-    delegateIndeces.push_back(emitter.Builder().getInt32(0));
-    delegateIndeces.push_back(emitter.Builder().getInt32(1));
-    llvm::Value* leftDelegatePtr = emitter.Builder().CreateGEP(leftPtr, delegateIndeces);
-    llvm::Value* leftDelegateValue = emitter.Builder().CreateLoad(leftDelegatePtr);
-    llvm::Value* rightDelegatePtr = emitter.Builder().CreateGEP(rightPtr, delegateIndeces);
-    llvm::Value* rightDelegateValue = emitter.Builder().CreateLoad(rightDelegatePtr);
-    llvm::Value* delegatesEqual = emitter.Builder().CreateICmpEQ(leftDelegateValue, rightDelegateValue);
-    llvm::Value* equal = emitter.Builder().CreateAnd(objectsEqual, delegatesEqual);
+    void* rightPtr = emitter.Stack().Pop();
+    void* rightObjectPtr = emitter.GetObjectFromClassDelegate(rightPtr);
+    void* rightObjectValue = emitter.CreateLoad(rightObjectPtr);
+    void* objectsEqual = emitter.CreateICmpEQ(leftObjectValue, rightObjectValue);
+    void* leftDelegatePtr = emitter.GetDelegateFromClassDelegate(leftPtr);
+    void* leftDelegateValue = emitter.CreateLoad(leftDelegatePtr);
+    void* rightDelegatePtr = emitter.GetDelegateFromClassDelegate(rightPtr);
+    void* rightDelegateValue = emitter.CreateLoad(rightDelegatePtr);
+    void* delegatesEqual = emitter.CreateICmpEQ(leftDelegateValue, rightDelegateValue);
+    void* equal = emitter.CreateAnd(objectsEqual, delegatesEqual);
     emitter.Stack().Push(equal);
 }
 
@@ -1214,27 +1153,20 @@ std::vector<LocalVariableSymbol*> MemberFunctionToClassDelegateConversion::Creat
 void MemberFunctionToClassDelegateConversion::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span)
 {
     Assert(genObjects.size() == 1, "MemberFunctionToClassDelegateConversion needs one temporary object");
-    llvm::Value* objectValue = emitter.Stack().Pop();
+    void* objectValue = emitter.Stack().Pop();
     if (!objectValue)
     {
         throw Exception(GetRootModuleForCurrentThread(), "cannot construct class delegate because expression has no this pointer", GetSpan());
     }
-    llvm::Value* objectValueAsVoidPtr = emitter.Builder().CreateBitCast(objectValue, emitter.Builder().getInt8PtrTy());
-    llvm::Value* memFunPtrValue = emitter.Module()->getOrInsertFunction(ToUtf8(function->MangledName()), function->IrType(emitter));
+    void* objectValueAsVoidPtr = emitter.CreateBitCast(objectValue, emitter.GetIrTypeForVoidPtrType());
+    void* memFunPtrValue = emitter.GetOrInsertFunction(ToUtf8(function->MangledName()), function->IrType(emitter));
     genObjects[0]->Load(emitter, OperationFlags::addr);
-    llvm::Value* ptr = emitter.Stack().Pop();
-    //llvm::Value* ptr = objectDelegatePairVariable->IrObject(emitter);
-    ArgVector objectIndeces;
-    objectIndeces.push_back(emitter.Builder().getInt32(0));
-    objectIndeces.push_back(emitter.Builder().getInt32(0));
-    llvm::Value* objectPtr = emitter.Builder().CreateGEP(ptr, objectIndeces);
-    emitter.Builder().CreateStore(objectValueAsVoidPtr, objectPtr);
-    ArgVector delegateIndeces;
-    delegateIndeces.push_back(emitter.Builder().getInt32(0));
-    delegateIndeces.push_back(emitter.Builder().getInt32(1));
-    llvm::Value* delegatePtr = emitter.Builder().CreateGEP(ptr, delegateIndeces);
-    llvm::Value* delegateValue = emitter.Builder().CreateBitCast(memFunPtrValue, targetType->DelegateType()->IrType(emitter));
-    emitter.Builder().CreateStore(delegateValue, delegatePtr);
+    void* ptr = emitter.Stack().Pop();
+    void* objectPtr = emitter.GetObjectFromClassDelegate(ptr);
+    emitter.CreateStore(objectValueAsVoidPtr, objectPtr);
+    void* delegatePtr = emitter.GetDelegateFromClassDelegate(ptr);
+    void* delegateValue = emitter.CreateBitCast(memFunPtrValue, targetType->DelegateType()->IrType(emitter));
+    emitter.CreateStore(delegateValue, delegatePtr);
     emitter.Stack().Push(ptr);
 }
 

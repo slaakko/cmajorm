@@ -5,6 +5,7 @@
 
 #ifndef CMAJOR_CODEDOM_OBJECT_INCLUDED
 #define CMAJOR_CODEDOM_OBJECT_INCLUDED
+#include <cmajor/codedom/CodeDomApi.hpp>
 #include <cmajor/util/CodeFormatter.hpp>
 #include <string>
 #include <vector>
@@ -15,10 +16,12 @@ namespace cmajor { namespace codedom {
 using cmajor::util::CodeFormatter;
 class Visitor;
 
-class CppObject
+class CODEDOM_API CppObject
 {
 public:
     CppObject(const std::u32string& name_);
+    CppObject(const CppObject&) = delete;
+    CppObject& operator=(const CppObject&) = delete;
     virtual ~CppObject();
     const std::u32string& Name() const { return name; }
     void SetName(const std::u32string& newName) { name = newName; }

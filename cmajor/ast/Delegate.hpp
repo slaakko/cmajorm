@@ -11,7 +11,7 @@
 
 namespace cmajor { namespace ast {
 
-class DelegateNode : public Node
+class AST_API DelegateNode : public Node
 {
 public:
     DelegateNode(const Span& span_);
@@ -32,7 +32,7 @@ private:
     NodeList<ParameterNode> parameters;
 };
 
-class ClassDelegateNode : public Node
+class AST_API ClassDelegateNode : public Node
 {
 public:
     ClassDelegateNode(const Span& span_);

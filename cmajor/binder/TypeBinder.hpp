@@ -5,6 +5,7 @@
 
 #ifndef CMAJOR_BINDER_TYPE_BINDER_INCLUDED
 #define CMAJOR_BINDER_TYPE_BINDER_INCLUDED
+#include <cmajor/binder/BinderApi.hpp>
 #include <cmajor/binder/TypeResolver.hpp>
 #include <cmajor/ast/Visitor.hpp>
 #include <cmajor/symbols/Scope.hpp>
@@ -22,7 +23,7 @@ using namespace cmajor::symbols;
 class BoundCompileUnit;
 class AttributeBinder;
 
-class TypeBinder : public Visitor
+class BINDER_API TypeBinder : public Visitor
 {
 public:
     TypeBinder(BoundCompileUnit& boundCompileUnit_);

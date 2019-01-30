@@ -6,7 +6,6 @@
 #ifndef CMAJOR_SYMBOLS_DERIVED_TYPE_SYMBOL_INCLUDED
 #define CMAJOR_SYMBOLS_DERIVED_TYPE_SYMBOL_INCLUDED
 #include <cmajor/symbols/TypeSymbol.hpp>
-#include <llvm/ADT/SmallVector.h>
 
 namespace cmajor { namespace symbols {
 
@@ -15,13 +14,11 @@ enum class Derivation : uint8_t
     none = 0, constDerivation = 1, lvalueRefDerivation = 2, rvalueRefDerivation = 3, pointerDerivation = 4, max
 };
 
-std::u32string DerivationStr(Derivation derivation);
+SYMBOLS_API std::u32string DerivationStr(Derivation derivation);
 
-typedef llvm::SmallVector<Derivation, 8> DerivationVec;
-
-struct TypeDerivationRec
+struct SYMBOLS_API TypeDerivationRec
 {
-    DerivationVec derivations;
+    std::vector<Derivation> derivations;
     bool IsEmpty() const { return derivations.empty(); }
 };
 
@@ -35,27 +32,27 @@ inline bool operator!=(const TypeDerivationRec& left, const TypeDerivationRec& r
     return !(left == right);
 }
 
-std::u32string MakeDerivedTypeName(TypeSymbol* baseType, const TypeDerivationRec& derivationRec);
+SYMBOLS_API std::u32string MakeDerivedTypeName(TypeSymbol* baseType, const TypeDerivationRec& derivationRec);
 
-bool HasFrontConstDerivation(const DerivationVec& derivations);
-bool HasReferenceDerivation(const DerivationVec& derivations);
-bool HasLvalueReferenceDerivation(const DerivationVec& derivations);
-bool HasRvalueReferenceDerivation(const DerivationVec& derivations);
-bool HasReferenceOrConstDerivation(const DerivationVec& derivations);
-bool HasPointerDerivation(const DerivationVec& derivations);
-int CountPointerDerivations(const DerivationVec& derivations);
+SYMBOLS_API bool HasFrontConstDerivation(const std::vector<Derivation>& derivations);
+SYMBOLS_API bool HasReferenceDerivation(const std::vector<Derivation>& derivations);
+SYMBOLS_API bool HasLvalueReferenceDerivation(const std::vector<Derivation>& derivations);
+SYMBOLS_API bool HasRvalueReferenceDerivation(const std::vector<Derivation>& derivations);
+SYMBOLS_API bool HasReferenceOrConstDerivation(const std::vector<Derivation>& derivations);
+SYMBOLS_API bool HasPointerDerivation(const std::vector<Derivation>& derivations);
+SYMBOLS_API int CountPointerDerivations(const std::vector<Derivation>& derivations);
 
-TypeDerivationRec MakePlainDerivationRec(const TypeDerivationRec& typeDerivationRec);
-TypeDerivationRec RemoveReferenceDerivation(const TypeDerivationRec& typeDerivationRec);
-TypeDerivationRec RemovePointerDerivation(const TypeDerivationRec& typeDerivationRec);
-TypeDerivationRec RemoveConstDerivation(const TypeDerivationRec& typeDerivationRec);
-TypeDerivationRec AddConstDerivation(const TypeDerivationRec& typeDerivationRec);
-TypeDerivationRec AddLvalueReferenceDerivation(const TypeDerivationRec& typeDerivationRec);
-TypeDerivationRec AddRvalueReferenceDerivation(const TypeDerivationRec& typeDerivationRec);
-TypeDerivationRec AddPointerDerivation(const TypeDerivationRec& typeDerivationRec);
-TypeDerivationRec UnifyDerivations(const TypeDerivationRec& left, const TypeDerivationRec& right);
+SYMBOLS_API TypeDerivationRec MakePlainDerivationRec(const TypeDerivationRec& typeDerivationRec);
+SYMBOLS_API TypeDerivationRec RemoveReferenceDerivation(const TypeDerivationRec& typeDerivationRec);
+SYMBOLS_API TypeDerivationRec RemovePointerDerivation(const TypeDerivationRec& typeDerivationRec);
+SYMBOLS_API TypeDerivationRec RemoveConstDerivation(const TypeDerivationRec& typeDerivationRec);
+SYMBOLS_API TypeDerivationRec AddConstDerivation(const TypeDerivationRec& typeDerivationRec);
+SYMBOLS_API TypeDerivationRec AddLvalueReferenceDerivation(const TypeDerivationRec& typeDerivationRec);
+SYMBOLS_API TypeDerivationRec AddRvalueReferenceDerivation(const TypeDerivationRec& typeDerivationRec);
+SYMBOLS_API TypeDerivationRec AddPointerDerivation(const TypeDerivationRec& typeDerivationRec);
+SYMBOLS_API TypeDerivationRec UnifyDerivations(const TypeDerivationRec& left, const TypeDerivationRec& right);
 
-class DerivedTypeSymbol : public TypeSymbol
+class SYMBOLS_API DerivedTypeSymbol : public TypeSymbol
 {
 public:
     DerivedTypeSymbol(const Span& span_, const std::u32string& name_);
@@ -77,9 +74,9 @@ public:
     TypeSymbol* AddLvalueReference(const Span& span) override;
     TypeSymbol* AddRvalueReference(const Span& span) override;
     TypeSymbol* AddPointer(const Span& span) override;
-    llvm::Type* IrType(Emitter& emitter) override;
-    llvm::Constant* CreateDefaultIrValue(Emitter& emitter) override;
-    llvm::DIType* CreateDIType(Emitter& emitter) override;
+    void* IrType(Emitter& emitter) override;
+    void* CreateDefaultIrValue(Emitter& emitter) override;
+    void* CreateDIType(Emitter& emitter) override;
     bool IsConstType() const override;
     bool IsReferenceType() const override;
     bool IsLvalueReferenceType() const override;
@@ -101,15 +98,15 @@ private:
     TypeDerivationRec derivationRec;
 };
 
-class NullPtrType : public TypeSymbol
+class SYMBOLS_API NullPtrType : public TypeSymbol
 {
 public:
     NullPtrType(const Span& span_, const std::u32string& name_);
     std::string TypeString() const override { return "nullptr_type"; }
     bool IsPointerType() const override { return true; }
     bool IsNullPtrType() const override { return true; }
-    llvm::Type* IrType(Emitter& emitter) override;
-    llvm::Constant* CreateDefaultIrValue(Emitter& emitter) override;
+    void* IrType(Emitter& emitter) override;
+    void* CreateDefaultIrValue(Emitter& emitter) override;
     ValueType GetValueType() const override;
     std::u32string Info() const override { return Name(); }
     const char* ClassName() const override { return "NullPtrTypeSymbol"; }

@@ -30,7 +30,7 @@ Node* NamespaceNode::Clone(CloneContext& cloneContext) const
         {
             FunctionNode* unitTestFunction = static_cast<FunctionNode*>(member->Clone(cloneContext));
             unitTestFunction->SetParent(const_cast<NamespaceNode*>(this));
-            cloneContext.AddUnitTestFunction(std::unique_ptr<FunctionNode>(unitTestFunction));
+            cloneContext.AddUnitTestFunction(unitTestFunction);
         }
         else
         {

@@ -5,11 +5,12 @@
 
 #ifndef CMAJOR_CODEDOM_INITDONE_INCLUDED
 #define CMAJOR_CODEDOM_INITDONE_INCLUDED
+#include <cmajor/codedom/CodeDomApi.hpp>
 
 namespace cmajor { namespace codedom {
 
-void Init();
-void Done();
+CODEDOM_API void Init();
+CODEDOM_API void Done();
 
 } } // namespace cmajor::codedom
 

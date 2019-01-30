@@ -14,7 +14,7 @@ namespace cmajor { namespace parsing {
 class Visitor;
 class Rule;
 
-class CharParser : public Parser
+class PARSING_API CharParser : public Parser
 {
 public:
     CharParser(char32_t c_);
@@ -25,7 +25,7 @@ private:
     char32_t c;
 };
 
-class StringParser : public Parser
+class PARSING_API StringParser : public Parser
 {
 public:
     StringParser(const std::u32string& s_);
@@ -36,7 +36,7 @@ private:
     std::u32string s;
 };
 
-struct CharRange
+struct PARSING_API CharRange
 {
     CharRange(char32_t start_, char32_t end_) : start(start_), end(end_) {}
     bool Includes(char32_t c) const { return c >= start && c <= end; }
@@ -44,7 +44,7 @@ struct CharRange
     char32_t end;
 };
 
-class CharSetParser : public Parser
+class PARSING_API CharSetParser : public Parser
 {
 public:
     CharSetParser(const std::u32string& s_);
@@ -60,7 +60,7 @@ private:
     void InitRanges();
 };
 
-class EmptyParser : public Parser
+class PARSING_API EmptyParser : public Parser
 {
 public:
     EmptyParser();
@@ -68,7 +68,7 @@ public:
     void Accept(Visitor& visitor) override;
 };
 
-class SpaceParser : public Parser
+class PARSING_API SpaceParser : public Parser
 {
 public:
     SpaceParser();
@@ -76,7 +76,7 @@ public:
     void Accept(Visitor& visitor) override;
 };
 
-class LetterParser : public Parser
+class PARSING_API LetterParser : public Parser
 {
 public:
     LetterParser();
@@ -84,7 +84,7 @@ public:
     void Accept(Visitor& visitor) override;
 };
 
-class UpperLetterParser : public Parser
+class PARSING_API UpperLetterParser : public Parser
 {
 public:
     UpperLetterParser();
@@ -92,7 +92,7 @@ public:
     void Accept(Visitor& visitor) override;
 };
 
-class LowerLetterParser : public Parser
+class PARSING_API LowerLetterParser : public Parser
 {
 public:
     LowerLetterParser();
@@ -100,7 +100,7 @@ public:
     void Accept(Visitor& visitor) override;
 };
 
-class TitleLetterParser : public Parser
+class PARSING_API TitleLetterParser : public Parser
 {
 public:
     TitleLetterParser();
@@ -108,7 +108,7 @@ public:
     void Accept(Visitor& visitor) override;
 };
 
-class ModifierLetterParser : public Parser
+class PARSING_API ModifierLetterParser : public Parser
 {
 public:
     ModifierLetterParser();
@@ -116,7 +116,7 @@ public:
     void Accept(Visitor& visitor) override;
 };
 
-class OtherLetterParser : public Parser
+class PARSING_API OtherLetterParser : public Parser
 {
 public:
     OtherLetterParser();
@@ -124,7 +124,7 @@ public:
     void Accept(Visitor& visitor) override;
 };
 
-class CasedLetterParser : public Parser
+class PARSING_API CasedLetterParser : public Parser
 {
 public:
     CasedLetterParser();
@@ -132,7 +132,7 @@ public:
     void Accept(Visitor& visitor) override;
 };
 
-class DigitParser : public Parser
+class PARSING_API DigitParser : public Parser
 {
 public:
     DigitParser();
@@ -140,7 +140,7 @@ public:
     void Accept(Visitor& visitor) override;
 };
 
-class HexDigitParser : public Parser
+class PARSING_API HexDigitParser : public Parser
 {
 public:
     HexDigitParser();
@@ -148,7 +148,7 @@ public:
     void Accept(Visitor& visitor) override;
 };
 
-class MarkParser : public Parser
+class PARSING_API MarkParser : public Parser
 {
 public:
     MarkParser();
@@ -156,7 +156,7 @@ public:
     void Accept(Visitor& visitor) override;
 };
 
-class NonspacingMarkParser : public Parser
+class PARSING_API NonspacingMarkParser : public Parser
 {
 public:
     NonspacingMarkParser();
@@ -164,7 +164,7 @@ public:
     void Accept(Visitor& visitor) override;
 };
 
-class SpacingMarkParser : public Parser
+class PARSING_API SpacingMarkParser : public Parser
 {
 public:
     SpacingMarkParser();
@@ -172,7 +172,7 @@ public:
     void Accept(Visitor& visitor) override;
 };
 
-class EnclosingMarkParser : public Parser
+class PARSING_API EnclosingMarkParser : public Parser
 {
 public:
     EnclosingMarkParser();
@@ -180,7 +180,7 @@ public:
     void Accept(Visitor& visitor) override;
 };
 
-class NumberParser : public Parser
+class PARSING_API NumberParser : public Parser
 {
 public:
     NumberParser();
@@ -188,7 +188,7 @@ public:
     void Accept(Visitor& visitor) override;
 };
 
-class DecimalNumberParser : public Parser
+class PARSING_API DecimalNumberParser : public Parser
 {
 public:
     DecimalNumberParser();
@@ -196,7 +196,7 @@ public:
     void Accept(Visitor& visitor) override;
 };
 
-class LetterNumberParser : public Parser
+class PARSING_API LetterNumberParser : public Parser
 {
 public:
     LetterNumberParser();
@@ -204,7 +204,7 @@ public:
     void Accept(Visitor& visitor) override;
 };
 
-class OtherNumberParser : public Parser
+class PARSING_API OtherNumberParser : public Parser
 {
 public:
     OtherNumberParser();
@@ -212,7 +212,7 @@ public:
     void Accept(Visitor& visitor) override;
 };
 
-class PunctuationParser : public Parser
+class PARSING_API PunctuationParser : public Parser
 {
 public:
     PunctuationParser();
@@ -220,7 +220,7 @@ public:
     void Accept(Visitor& visitor) override;
 };
 
-class ConnectorPunctuationParser : public Parser
+class PARSING_API ConnectorPunctuationParser : public Parser
 {
 public:
     ConnectorPunctuationParser();
@@ -228,7 +228,7 @@ public:
     void Accept(Visitor& visitor) override;
 };
 
-class DashPunctuationParser : public Parser
+class PARSING_API DashPunctuationParser : public Parser
 {
 public:
     DashPunctuationParser();
@@ -236,7 +236,7 @@ public:
     void Accept(Visitor& visitor) override;
 };
 
-class OpenPunctuationParser : public Parser
+class PARSING_API OpenPunctuationParser : public Parser
 {
 public:
     OpenPunctuationParser();
@@ -244,7 +244,7 @@ public:
     void Accept(Visitor& visitor) override;
 };
 
-class ClosePunctuationParser : public Parser
+class PARSING_API ClosePunctuationParser : public Parser
 {
 public:
     ClosePunctuationParser();
@@ -252,7 +252,7 @@ public:
     void Accept(Visitor& visitor) override;
 };
 
-class InitialPunctuationParser : public Parser
+class PARSING_API InitialPunctuationParser : public Parser
 {
 public:
     InitialPunctuationParser();
@@ -260,7 +260,7 @@ public:
     void Accept(Visitor& visitor) override;
 };
 
-class FinalPunctuationParser : public Parser
+class PARSING_API FinalPunctuationParser : public Parser
 {
 public:
     FinalPunctuationParser();
@@ -268,7 +268,7 @@ public:
     void Accept(Visitor& visitor) override;
 };
 
-class OtherPunctuationParser : public Parser
+class PARSING_API OtherPunctuationParser : public Parser
 {
 public:
     OtherPunctuationParser();
@@ -276,7 +276,7 @@ public:
     void Accept(Visitor& visitor) override;
 };
 
-class SymbolParser : public Parser
+class PARSING_API SymbolParser : public Parser
 {
 public:
     SymbolParser();
@@ -284,7 +284,7 @@ public:
     void Accept(Visitor& visitor) override;
 };
 
-class MathSymbolParser : public Parser
+class PARSING_API MathSymbolParser : public Parser
 {
 public:
     MathSymbolParser();
@@ -292,7 +292,7 @@ public:
     void Accept(Visitor& visitor) override;
 };
 
-class CurrencySymbolParser : public Parser
+class PARSING_API CurrencySymbolParser : public Parser
 {
 public:
     CurrencySymbolParser();
@@ -300,7 +300,7 @@ public:
     void Accept(Visitor& visitor) override;
 };
 
-class ModifierSymbolParser : public Parser
+class PARSING_API ModifierSymbolParser : public Parser
 {
 public:
     ModifierSymbolParser();
@@ -308,7 +308,7 @@ public:
     void Accept(Visitor& visitor) override;
 };
 
-class OtherSymbolParser : public Parser
+class PARSING_API OtherSymbolParser : public Parser
 {
 public:
     OtherSymbolParser();
@@ -316,7 +316,7 @@ public:
     void Accept(Visitor& visitor) override;
 };
 
-class SeparatorParser : public Parser
+class PARSING_API SeparatorParser : public Parser
 {
 public:
     SeparatorParser();
@@ -324,7 +324,7 @@ public:
     void Accept(Visitor& visitor) override;
 };
 
-class SpaceSeparatorParser : public Parser
+class PARSING_API SpaceSeparatorParser : public Parser
 {
 public:
     SpaceSeparatorParser();
@@ -332,7 +332,7 @@ public:
     void Accept(Visitor& visitor) override;
 };
 
-class LineSeparatorParser : public Parser
+class PARSING_API LineSeparatorParser : public Parser
 {
 public:
     LineSeparatorParser();
@@ -340,7 +340,7 @@ public:
     void Accept(Visitor& visitor) override;
 };
 
-class ParagraphSeparatorParser : public Parser
+class PARSING_API ParagraphSeparatorParser : public Parser
 {
 public:
     ParagraphSeparatorParser();
@@ -348,7 +348,7 @@ public:
     void Accept(Visitor& visitor) override;
 };
 
-class OtherParser : public Parser
+class PARSING_API OtherParser : public Parser
 {
 public:
     OtherParser();
@@ -356,7 +356,7 @@ public:
     void Accept(Visitor& visitor) override;
 };
 
-class ControlParser : public Parser
+class PARSING_API ControlParser : public Parser
 {
 public:
     ControlParser();
@@ -364,7 +364,7 @@ public:
     void Accept(Visitor& visitor) override;
 };
 
-class FormatParser : public Parser
+class PARSING_API FormatParser : public Parser
 {
 public:
     FormatParser();
@@ -372,7 +372,7 @@ public:
     void Accept(Visitor& visitor) override;
 };
 
-class SurrogateParser : public Parser
+class PARSING_API SurrogateParser : public Parser
 {
 public:
     SurrogateParser();
@@ -380,7 +380,7 @@ public:
     void Accept(Visitor& visitor) override;
 };
 
-class PrivateUseParser : public Parser
+class PARSING_API PrivateUseParser : public Parser
 {
 public:
     PrivateUseParser();
@@ -388,7 +388,7 @@ public:
     void Accept(Visitor& visitor) override;
 };
 
-class UnassignedParser : public Parser
+class PARSING_API UnassignedParser : public Parser
 {
 public:
     UnassignedParser();
@@ -396,7 +396,7 @@ public:
     void Accept(Visitor& visitor) override;
 };
 
-class GraphicParser : public Parser
+class PARSING_API GraphicParser : public Parser
 {
 public:
     GraphicParser();
@@ -404,7 +404,7 @@ public:
     void Accept(Visitor& visitor) override;
 };
 
-class BaseCharParser : public Parser
+class PARSING_API BaseCharParser : public Parser
 {
 public:
     BaseCharParser();
@@ -412,7 +412,7 @@ public:
     void Accept(Visitor& visitor) override;
 };
 
-class AlphabeticParser : public Parser
+class PARSING_API AlphabeticParser : public Parser
 {
 public:
     AlphabeticParser();
@@ -420,7 +420,7 @@ public:
     void Accept(Visitor& visitor) override;
 };
 
-class IdStartParser : public Parser
+class PARSING_API IdStartParser : public Parser
 {
 public:
     IdStartParser();
@@ -428,7 +428,7 @@ public:
     void Accept(Visitor& visitor) override;
 };
 
-class IdContParser : public Parser
+class PARSING_API IdContParser : public Parser
 {
 public:
     IdContParser();
@@ -436,7 +436,7 @@ public:
     void Accept(Visitor& visitor) override;
 };
 
-class AnyCharParser : public Parser
+class PARSING_API AnyCharParser : public Parser
 {
 public:
     AnyCharParser();
@@ -444,7 +444,7 @@ public:
     void Accept(Visitor& visitor) override;
 };
 
-class RangeParser : public Parser
+class PARSING_API RangeParser : public Parser
 {
 public:
     RangeParser(uint32_t start_, uint32_t end_);

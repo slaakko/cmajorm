@@ -18,17 +18,17 @@ using namespace cmajor::ir;
 class Value;
 class IntrinsicFunction;
 
-struct FunctionSymbolsEqual
+struct SYMBOLS_API FunctionSymbolsEqual
 {
     bool operator()(FunctionSymbol* left, FunctionSymbol* right) const;
 };
 
-struct FunctionSymbolHash
+struct SYMBOLS_API FunctionSymbolHash
 {
     size_t operator()(FunctionSymbol* fun) const;
 };
 
-class ViableFunctionSet
+class SYMBOLS_API ViableFunctionSet
 {
 public:
     const std::unordered_set<FunctionSymbol*, FunctionSymbolHash, FunctionSymbolsEqual>& Get() const { return set; }
@@ -37,7 +37,7 @@ private:
     std::unordered_set<FunctionSymbol*, FunctionSymbolHash, FunctionSymbolsEqual> set;
 };
 
-class FunctionGroupSymbol : public Symbol
+class SYMBOLS_API FunctionGroupSymbol : public Symbol
 {
 public:
     FunctionGroupSymbol(const Span& span_, const std::u32string& name_);
@@ -102,11 +102,13 @@ class TypeSymbol;
 class TemplateParameterSymbol;
 class BoundTemplateParameterSymbol;
 
-class FunctionSymbol : public ContainerSymbol
+class SYMBOLS_API FunctionSymbol : public ContainerSymbol
 {
 public:
     FunctionSymbol(const Span& span_, const std::u32string& name_);
     FunctionSymbol(SymbolType symbolType_, const Span& span_, const std::u32string& name_);
+    FunctionSymbol(const FunctionSymbol&) = delete;
+    FunctionSymbol& operator=(const FunctionSymbol&) = delete;
     void Write(SymbolWriter& writer) override;
     void Read(SymbolReader& reader) override;
     void EmplaceFunction(FunctionSymbol* functionSymbol, int index) override;
@@ -210,7 +212,7 @@ public:
     void CloneUsingNodes(const std::vector<Node*>& usingNodes_);
     LocalVariableSymbol* CreateTemporary(TypeSymbol* type, const Span& span);
     virtual std::vector<LocalVariableSymbol*> CreateTemporariesTo(FunctionSymbol* currentFunction);
-    llvm::FunctionType* IrType(Emitter& emitter);
+    void* IrType(Emitter& emitter);
     int32_t VmtIndex() const { return vmtIndex; }
     void SetVmtIndex(int32_t vmtIndex_) { vmtIndex = vmtIndex_; }
     int32_t ImtIndex() const { return imtIndex; }
@@ -259,7 +261,7 @@ private:
     bool isProgramMain;
 };
 
-class StaticConstructorSymbol : public FunctionSymbol
+class SYMBOLS_API StaticConstructorSymbol : public FunctionSymbol
 {
 public:
     StaticConstructorSymbol(const Span& span_, const std::u32string& name_);
@@ -272,7 +274,7 @@ public:
     const char* ClassName() const override { return "StaticConstructorSymbol"; }
 };
    
-class ConstructorSymbol : public FunctionSymbol
+class SYMBOLS_API ConstructorSymbol : public FunctionSymbol
 {
 public:
     ConstructorSymbol(const Span& span_, const std::u32string& name_);
@@ -289,7 +291,7 @@ public:
     const char* ClassName() const override { return "ConstructorSymbol"; }
 };
 
-class DestructorSymbol : public FunctionSymbol
+class SYMBOLS_API DestructorSymbol : public FunctionSymbol
 {
 public:
     DestructorSymbol(const Span& span_, const std::u32string& name_);
@@ -311,7 +313,7 @@ private:
     bool generated;
 };
 
-class MemberFunctionSymbol : public FunctionSymbol
+class SYMBOLS_API MemberFunctionSymbol : public FunctionSymbol
 {
 public:
     MemberFunctionSymbol(const Span& span_, const std::u32string& name_);
@@ -323,7 +325,7 @@ public:
     const char* ClassName() const override { return "MemberFunctionSymbol"; }
 };
 
-class ConversionFunctionSymbol : public FunctionSymbol
+class SYMBOLS_API ConversionFunctionSymbol : public FunctionSymbol
 {
 public:
     ConversionFunctionSymbol(const Span& span_, const std::u32string& name_);
@@ -341,13 +343,13 @@ public:
     const char* ClassName() const override { return "ConversionFunctionSymbol"; }
 };
 
-class FunctionGroupTypeSymbol : public TypeSymbol
+class SYMBOLS_API FunctionGroupTypeSymbol : public TypeSymbol
 {
 public:
     FunctionGroupTypeSymbol(FunctionGroupSymbol* functionGroup_, void* boundFunctionGroup_);
     bool IsExportSymbol() const override { return false; }
-    llvm::Type* IrType(Emitter& emitter) override { Assert(false, "tried to get ir type of function group type"); return nullptr; }
-    llvm::Constant* CreateDefaultIrValue(Emitter& emitter) override { Assert(false, "tried to get default ir value of function group type"); return nullptr; }
+    void* IrType(Emitter& emitter) override { Assert(false, "tried to get ir type of function group type"); return nullptr; }
+    void* CreateDefaultIrValue(Emitter& emitter) override { Assert(false, "tried to get default ir value of function group type"); return nullptr; }
     const FunctionGroupSymbol* FunctionGroup() const { return functionGroup; }
     FunctionGroupSymbol* FunctionGroup() { return functionGroup; }
     void* BoundFunctionGroup() const { return boundFunctionGroup; }
@@ -357,13 +359,13 @@ private:
     void* boundFunctionGroup;
 };
 
-class MemberExpressionTypeSymbol : public TypeSymbol
+class SYMBOLS_API MemberExpressionTypeSymbol : public TypeSymbol
 {
 public:
     MemberExpressionTypeSymbol(const Span& span_, const std::u32string& name_, void* boundMemberExpression_);
     bool IsExportSymbol() const override { return false; }
-    llvm::Type* IrType(Emitter& emitter) override { Assert(false, "tried to get ir type of member expression type");  return nullptr; }
-    llvm::Constant* CreateDefaultIrValue(Emitter& emitter) override { Assert(false, "tried to get default ir value of member expression type"); return nullptr; }
+    void* IrType(Emitter& emitter) override { Assert(false, "tried to get ir type of member expression type");  return nullptr; }
+    void* CreateDefaultIrValue(Emitter& emitter) override { Assert(false, "tried to get default ir value of member expression type"); return nullptr; }
     std::string TypeString() const override { return "member_expression_type"; }
     void* BoundMemberExpression() const { return boundMemberExpression; }
     const char* ClassName() const override { return "MemberExpressionTypeSymbol"; }
@@ -371,8 +373,8 @@ private:
     void* boundMemberExpression;
 };
 
-void InitFunctionSymbol();
-void DoneFunctionSymbol();
+SYMBOLS_API void InitFunctionSymbol();
+SYMBOLS_API void DoneFunctionSymbol();
 
 } } // namespace cmajor::symbols
 

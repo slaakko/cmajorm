@@ -64,9 +64,9 @@ TypeSymbol* TypeSymbol::AddPointer(const Span& span)
     return GetRootModuleForCurrentThread()->GetSymbolTable().MakeDerivedType(this, typeDerivationRec, span);
 }
 
-llvm::DIType* TypeSymbol::CreateDIType(Emitter& emitter)
+void* TypeSymbol::CreateDIType(Emitter& emitter)
 {
-    return emitter.DIBuilder()->createUnspecifiedType(ToUtf8(Name()));
+    return emitter.CreateUnspecifiedDIType(ToUtf8(Name()));
 }
 
 const TypeDerivationRec& TypeSymbol::DerivationRec() const
@@ -98,9 +98,9 @@ std::u32string TypeSymbol::Id() const
     return ToUtf32(boost::uuids::to_string(TypeId())); 
 }
 
-llvm::DIType* TypeSymbol::GetDIType(Emitter& emitter)
+void* TypeSymbol::GetDIType(Emitter& emitter)
 {
-    llvm::DIType* localDiType = emitter.GetDITypeByTypeId(TypeId());
+    void* localDiType = emitter.GetDITypeByTypeId(TypeId());
     if (!localDiType)
     {
         if (IsClassTypeSymbol())
@@ -119,12 +119,12 @@ llvm::DIType* TypeSymbol::GetDIType(Emitter& emitter)
 
 uint64_t TypeSymbol::SizeInBits(Emitter& emitter) 
 {
-    return emitter.DataLayout()->getTypeSizeInBits(IrType(emitter));
+    return emitter.GetSizeInBits(IrType(emitter));
 }
 
 uint32_t TypeSymbol::AlignmentInBits(Emitter& emitter)
 {
-    return 8 * emitter.DataLayout()->getABITypeAlignment(IrType(emitter));
+    return emitter.GetAlignmentInBits(IrType(emitter));
 }
 
 void TypeSymbol::Check()

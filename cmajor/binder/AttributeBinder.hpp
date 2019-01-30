@@ -5,6 +5,7 @@
 
 #ifndef CMAJOR_BINDER_ATTRIBUTE_BINDER_INCLUDED
 #define CMAJOR_BINDER_ATTRIBUTE_BINDER_INCLUDED
+#include <cmajor/binder/BinderApi.hpp>
 #include <cmajor/ast/Attribute.hpp>
 #include <cmajor/symbols/Symbol.hpp>
 #include <unordered_map>
@@ -17,7 +18,7 @@ class BoundCompileUnit;
 
 class StatementBinder;
 
-class AttributeProcessor
+class BINDER_API AttributeProcessor
 {
 public:
     AttributeProcessor(const std::u32string& attributeName_);
@@ -30,10 +31,12 @@ private:
     std::u32string attributeName;
 };
 
-class AttributeBinder
+class BINDER_API AttributeBinder
 {
 public:
     AttributeBinder(Module* module);
+    AttributeBinder(const AttributeBinder&) = delete;
+    AttributeBinder& operator=(const AttributeBinder&) = delete;
     void BindAttributes(Attributes* attrs, Symbol* symbol, BoundCompileUnit& boundCompileUnit, ContainerScope* containerScope);
     void GenerateImplementation(Attributes* attrs, Symbol* symbol, StatementBinder* statementBinder);
 private:

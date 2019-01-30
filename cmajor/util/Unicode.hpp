@@ -25,7 +25,7 @@ public:
     UnicodeException(const std::string& message_);
 };
 
-class Utf8ToUtf32Engine
+class UTIL_API Utf8ToUtf32Engine
 {
 public:
     Utf8ToUtf32Engine();
@@ -39,17 +39,17 @@ private:
     uint8_t bytes[4];
 };
 
-std::u32string ToUtf32(const std::string& utf8Str);
-std::u32string ToUtf32(const std::u16string& utf16Str);
-std::u16string ToUtf16(const std::u32string& utf32Str);
-std::u16string ToUtf16(const std::string& utf8Str);
-std::string ToUtf8(const std::u32string& utf32Str);
-std::string ToUtf8(const std::u16string& utf16Str);
+UTIL_API std::u32string ToUtf32(const std::string& utf8Str);
+UTIL_API std::u32string ToUtf32(const std::u16string& utf16Str);
+UTIL_API std::u16string ToUtf16(const std::u32string& utf32Str);
+UTIL_API std::u16string ToUtf16(const std::string& utf8Str);
+UTIL_API std::string ToUtf8(const std::u32string& utf32Str);
+UTIL_API std::string ToUtf8(const std::u16string& utf16Str);
 
-std::u32string ToUpper(const std::u32string& s);
-std::u32string ToLower(const std::u32string& s);
+UTIL_API std::u32string ToUpper(const std::u32string& s);
+UTIL_API std::u32string ToLower(const std::u32string& s);
 
-std::string MakeCanonicalPropertyName(const std::string& s);
+UTIL_API std::string MakeCanonicalPropertyName(const std::string& s);
 
 enum class BinaryPropertyId : uint8_t
 {
@@ -115,7 +115,7 @@ enum class BinaryPropertyId : uint8_t
     expandsOnNFKD
 };
 
-class BinaryProperty
+class UTIL_API BinaryProperty
 {
 public:
     BinaryProperty(BinaryPropertyId id_, const std::string& shortName_, const std::string& longName_);
@@ -128,7 +128,7 @@ private:
     std::string longName;
 };
 
-struct BinaryPropertyIdHash
+struct UTIL_API BinaryPropertyIdHash
 {
     size_t operator()(BinaryPropertyId id) const
     {
@@ -136,7 +136,7 @@ struct BinaryPropertyIdHash
     }
 };
 
-class BinaryPropertyTable
+class UTIL_API BinaryPropertyTable
 {
 public:
     static void Init();
@@ -205,7 +205,7 @@ enum class BlockId : uint16_t
     ucas, ucasExt, ugaritic, vai, vedicExt, verticalForms, vs, vsSup, warangCiti, yiRadicals, yiSyllables, yijing, zanabazarSquare
 };
 
-struct BlockIdHash
+struct UTIL_API BlockIdHash
 {
     size_t operator()(BlockId id) const
     {
@@ -213,7 +213,7 @@ struct BlockIdHash
     }
 };
 
-class Block
+class UTIL_API Block
 {
 public:
     Block(BlockId id_, const std::string& shortName_, const std::string& longName_, char32_t start, char32_t end_);
@@ -230,7 +230,7 @@ private:
     char32_t end;
 };
 
-class BlockTable
+class UTIL_API BlockTable
 {
 public:
     static void Init();
@@ -296,7 +296,7 @@ inline GeneralCategoryId operator|(GeneralCategoryId left, GeneralCategoryId rig
     return GeneralCategoryId(uint32_t(left) | uint32_t(right));
 }
 
-struct GeneralCategoryIdHash
+struct UTIL_API GeneralCategoryIdHash
 {
     size_t operator()(GeneralCategoryId id) const
     {
@@ -304,7 +304,7 @@ struct GeneralCategoryIdHash
     }
 };
 
-class GeneralCategory
+class UTIL_API GeneralCategory
 {
 public:
     GeneralCategory(GeneralCategoryId id_, const std::string& shortName_, const std::string& longName_);
@@ -317,7 +317,7 @@ private:
     std::string longName;
 };
 
-class GeneralCategoryTable
+class UTIL_API GeneralCategoryTable
 {
 public:
     static void Init();
@@ -367,7 +367,7 @@ enum class AgeId : uint8_t
     age_11_0
 };
 
-struct AgeIdHash
+struct UTIL_API AgeIdHash
 {
     size_t operator()(AgeId id) const
     {
@@ -375,7 +375,7 @@ struct AgeIdHash
     }
 };
 
-class Age
+class UTIL_API Age
 {
 public:
     Age(AgeId id_, const std::string& version_);
@@ -386,7 +386,7 @@ private:
     std::string version;
 };
 
-class AgeTable
+class UTIL_API AgeTable
 {
 public:
     static void Init();
@@ -443,7 +443,7 @@ enum class ScriptId : uint8_t
     zinh, zyyy, zzzz
 };
 
-struct ScriptIdHash
+struct UTIL_API ScriptIdHash
 {
     size_t operator()(ScriptId id) const
     {
@@ -451,7 +451,7 @@ struct ScriptIdHash
     }
 };
 
-class Script
+class UTIL_API Script
 {
 public:
     Script(ScriptId id_, const std::string& shortName_, const std::string& longName_);
@@ -464,7 +464,7 @@ private:
     std::string longName;
 };
 
-class ScriptTable
+class UTIL_API ScriptTable
 {
 public:
     static void Init();
@@ -498,7 +498,7 @@ inline const Script& GetScriptByLongName(const std::string& longName)
     return ScriptTable::Instance().GetScriptByLongName(longName);
 }
 
-class CharacterInfo
+class UTIL_API CharacterInfo
 {
 public:
     CharacterInfo();
@@ -612,7 +612,7 @@ enum class NumericTypeId : uint8_t
     de, di, nu
 };
 
-struct NumericTypeIdHash
+struct UTIL_API NumericTypeIdHash
 {
     size_t operator()(NumericTypeId id) const
     {
@@ -620,7 +620,7 @@ struct NumericTypeIdHash
     }
 };
 
-class NumericType
+class UTIL_API NumericType
 {
 public:
     NumericType(NumericTypeId id_, const std::string& shortName_, const std::string& longName_);
@@ -633,7 +633,7 @@ private:
     std::string longName;
 };
 
-class NumericTypeTable
+class UTIL_API NumericTypeTable
 {
 public:
     static void Init();
@@ -673,7 +673,7 @@ enum class BidiClassId : uint8_t
     al, an, b, bn, cs, en, es, et, fsi, l, lre, lri, lro, nsm, on, pdf, pdi, r, rle, rli, rlo, s, ws
 };
 
-struct BidiClassIdHash
+struct UTIL_API BidiClassIdHash
 {
     size_t operator()(BidiClassId id) const
     {
@@ -681,7 +681,7 @@ struct BidiClassIdHash
     }
 };
 
-class BidiClass
+class UTIL_API BidiClass
 {
 public:
     BidiClass(BidiClassId id_, const std::string& shortName_, const std::string& longName_);
@@ -694,7 +694,7 @@ private:
     std::string longName;
 };
 
-class BidiClassTable
+class UTIL_API BidiClassTable
 {
 public:
     static void Init();
@@ -734,7 +734,7 @@ enum class BidiPairedBracketTypeId : uint8_t
     o, c
 };
 
-struct BidiPairedBracketTypeIdHash
+struct UTIL_API BidiPairedBracketTypeIdHash
 {
     size_t operator()(BidiPairedBracketTypeId id) const
     {
@@ -742,7 +742,7 @@ struct BidiPairedBracketTypeIdHash
     }
 };
 
-class BidiPairedBracketType
+class UTIL_API BidiPairedBracketType
 {
 public:
     BidiPairedBracketType(BidiPairedBracketTypeId id_, const std::string& shortName_, const std::string& longName_);
@@ -755,7 +755,7 @@ private:
     std::string longName;
 };
 
-class BidiPairedBracketTypeTable
+class UTIL_API BidiPairedBracketTypeTable
 {
 public:
     static void Init();
@@ -795,7 +795,7 @@ enum class AliasTypeId : uint8_t
     correction, control, alternate, figment, abbreviation
 };
 
-struct AliasTypeIdHash
+struct UTIL_API AliasTypeIdHash
 {
     size_t operator()(AliasTypeId id) const
     {
@@ -803,7 +803,7 @@ struct AliasTypeIdHash
     }
 };
 
-class AliasType
+class UTIL_API AliasType
 {
 public:
     AliasType(AliasTypeId id_, const std::string& name_);
@@ -814,7 +814,7 @@ private:
     std::string name;
 };
 
-class AliasTypeTable
+class UTIL_API AliasTypeTable
 {
 public:
     static void Init();
@@ -841,7 +841,7 @@ inline const AliasType& GetAliasType(const std::string& typeName)
     return AliasTypeTable::Instance().GetAliasType(typeName);
 }
 
-class Alias
+class UTIL_API Alias
 {
 public:
     Alias();
@@ -855,7 +855,7 @@ private:
     std::string name;
 };
 
-class ExtendedCharacterInfo
+class UTIL_API ExtendedCharacterInfo
 {
 public:
     ExtendedCharacterInfo();
@@ -984,10 +984,12 @@ private:
     char32_t bidiPairedBracket;
 };
 
-class CharacterInfoPage
+class UTIL_API CharacterInfoPage
 {
 public:
     CharacterInfoPage();
+    CharacterInfoPage(const CharacterInfoPage&) = delete;
+    CharacterInfoPage& operator=(const CharacterInfoPage&) = delete;
     const CharacterInfo& GetCharacterInfo(int index) const;
     CharacterInfo& GetCharacterInfo(int index);
     void Write(BinaryWriter& writer);
@@ -996,10 +998,12 @@ private:
     std::vector<CharacterInfo> characterInfos;
 };
 
-class ExtendedCharacterInfoPage
+class UTIL_API ExtendedCharacterInfoPage
 {
 public:
     ExtendedCharacterInfoPage();
+    ExtendedCharacterInfoPage(const ExtendedCharacterInfoPage&) = delete;
+    ExtendedCharacterInfoPage& operator=(const ExtendedCharacterInfoPage&) = delete;
     const ExtendedCharacterInfo& GetExtendedCharacterInfo(int index) const;
     ExtendedCharacterInfo& GetExtendedCharacterInfo(int index);
     void Write(BinaryWriter& writer);
@@ -1008,7 +1012,7 @@ private:
     std::vector<ExtendedCharacterInfo> extendedCharacterInfos;
 };
 
-class ExtendedCharacterInfoHeader
+class UTIL_API ExtendedCharacterInfoHeader
 {
 public:
     void AllocatePages(int numExtendedPages);
@@ -1024,9 +1028,11 @@ const uint8_t cmajor_ucd_version_1 = '1';
 const uint8_t cmajor_ucd_version_2 = '2';
 const uint8_t current_cmajor_ucd_version = cmajor_ucd_version_2;
 
-class CharacterTable
+class UTIL_API CharacterTable
 {
 public:
+    CharacterTable(const CharacterTable&) = delete;
+    CharacterTable& operator=(const CharacterTable&) = delete;
     static void Init();
     static void Done();
     static CharacterTable& Instance() { return *instance; }
@@ -1319,7 +1325,7 @@ inline bool IsAsciiHexDigit(char32_t c)
     return GetCharacterInfo(c).GetBinaryProperty(BinaryPropertyId::asciiHexDigit);
 }
 
-bool IsAsciiDigit(char32_t c);
+UTIL_API bool IsAsciiDigit(char32_t c);
 
 inline bool IsUppercase(char32_t c)
 {
@@ -1411,8 +1417,8 @@ inline const std::vector<Alias>& Aliases(char32_t c)
     return GetExtendedCharacterInfo(c).Aliases();
 }
 
-void UnicodeInit();
-void UnicodeDone();
+UTIL_API void UnicodeInit();
+UTIL_API void UnicodeDone();
 
 } } // namespace cmajor::unicode
 

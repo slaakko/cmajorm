@@ -5,6 +5,7 @@
 
 #ifndef CMAJOR_AST_AST_WRITER_INCLUDED
 #define CMAJOR_AST_AST_WRITER_INCLUDED
+#include <cmajor/ast/AstApi.hpp>
 #include <cmajor/ast/Specifier.hpp>
 #include <cmajor/util/BinaryWriter.hpp>
 #include <cmajor/parsing/Scanner.hpp>
@@ -15,7 +16,7 @@ using namespace cmajor::util;
 using cmajor::parsing::Span;
 class Node;
 
-class AstWriter
+class AST_API AstWriter
 {
 public:
     AstWriter(const std::string& fileName_);

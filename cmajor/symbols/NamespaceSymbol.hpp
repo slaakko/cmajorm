@@ -9,7 +9,7 @@
 
 namespace cmajor { namespace symbols {
 
-class NamespaceSymbol : public ContainerSymbol
+class SYMBOLS_API NamespaceSymbol : public ContainerSymbol
 {
 public:   
     NamespaceSymbol(const Span& span_, const std::u32string& name_);

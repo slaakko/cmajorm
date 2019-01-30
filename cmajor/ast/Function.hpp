@@ -15,13 +15,15 @@
 
 namespace cmajor { namespace ast {
 
-class FunctionNode : public Node
+class AST_API FunctionNode : public Node
 {
 public:
     FunctionNode(const Span& span_);
     FunctionNode(NodeType nodeType_, const Span& span_);
     FunctionNode(const Span& span_, Specifiers specifiers_, Node* returnTypeExpr_, const std::u32string& groupId_, Attributes* attributes_);
     FunctionNode(NodeType nodeType_, const Span& span_, Specifiers specifiers_, Node* returnTypeExpr_, const std::u32string& groupId_, Attributes* attributes_);
+    FunctionNode(const FunctionNode&) = delete;
+    FunctionNode& operator=(const FunctionNode&) = delete;
     Node* Clone(CloneContext& cloneContext) const override;
     bool IsFunctionNode() const override { return true; }
     void CloneContent(FunctionNode* clone, CloneContext& cloneContext) const;

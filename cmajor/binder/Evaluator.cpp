@@ -46,7 +46,7 @@ public:
     void Write(BinaryWriter& writer) override {}
     void Read(BinaryReader& reader) override {}
     Value* As(TypeSymbol* targetType, bool cast, const Span& span, bool dontThrow) const override { Assert(false, "scoped value cannot be converted"); return nullptr; }
-    llvm::Value* IrValue(Emitter& emitter) override { Assert(false, "scoped value does not have ir value"); return nullptr; }
+    void* IrValue(Emitter& emitter) override { Assert(false, "scoped value does not have ir value"); return nullptr; }
     TypeSymbol* GetType(SymbolTable* symbolTable) override { return type; }
     void SetType(TypeSymbol* type_) { type = type_; }
     Value* Subject() { return subject.get(); }
@@ -71,7 +71,7 @@ public:
     void Write(BinaryWriter& writer) override {}
     void Read(BinaryReader& reader) override {}
     Value* As(TypeSymbol* targetType, bool cast, const Span& span, bool dontThrow) const override { Assert(false, "function group value cannot be converted"); return nullptr; }
-    llvm::Value* IrValue(Emitter& emitter) override { Assert(false, "function group value does not have ir value"); return nullptr; }
+    void* IrValue(Emitter& emitter) override { Assert(false, "function group value does not have ir value"); return nullptr; }
     FunctionGroupSymbol* FunctionGroup() { return functionGroup; }
     ContainerScope* QualifiedScope() { return qualifiedScope; }
     TypeSymbol* GetType(SymbolTable* symbolTable) override { return nullptr; }
@@ -99,7 +99,7 @@ public:
     void Write(BinaryWriter& writer) override {}
     void Read(BinaryReader& reader) override {}
     Value* As(TypeSymbol* targetType, bool cast, const Span& span, bool dontThrow) const override { Assert(false, "array reference value cannot be converted"); return nullptr; }
-    llvm::Value* IrValue(Emitter& emitter) override { Assert(false, "array reference does not have ir value"); return nullptr; }
+    void* IrValue(Emitter& emitter) override { Assert(false, "array reference does not have ir value"); return nullptr; }
     TypeSymbol* GetType(SymbolTable* symbolTable) override { return arrayValue->GetType(symbolTable); }
     ArrayValue* GetArrayValue() const { return arrayValue; }
 private:
@@ -119,7 +119,7 @@ public:
     void Write(BinaryWriter& writer) override {}
     void Read(BinaryReader& reader) override {}
     Value* As(TypeSymbol* targetType, bool cast, const Span& span, bool dontThrow) const override { Assert(false, "structured reference value cannot be converted"); return nullptr; }
-    llvm::Value* IrValue(Emitter& emitter) override { Assert(false, "structured reference does not have ir value"); return nullptr; }
+    void* IrValue(Emitter& emitter) override { Assert(false, "structured reference does not have ir value"); return nullptr; }
     TypeSymbol* GetType(SymbolTable* symbolTable) override { return structuredValue->GetType(symbolTable); }
     StructuredValue* GetStructuredValue() const { return structuredValue; }
 private:

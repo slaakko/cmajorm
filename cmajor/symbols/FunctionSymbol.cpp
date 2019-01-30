@@ -18,7 +18,6 @@
 #include <cmajor/symbols/SymbolCollector.hpp>
 #include <cmajor/util/Unicode.hpp>
 #include <cmajor/util/Sha1.hpp>
-#include <llvm/IR/Module.h>
 #include <boost/uuid/uuid_generators.hpp>
 
 namespace cmajor { namespace symbols {
@@ -737,9 +736,9 @@ void FunctionSymbol::GenerateCall(Emitter& emitter, std::vector<GenObject*>& gen
         genObject->Load(emitter, flags & OperationFlags::functionCallFlags);
     }
     emitter.SetCurrentDebugLocation(span);
-    llvm::FunctionType* functionType = IrType(emitter);
-    llvm::Function* callee = llvm::cast<llvm::Function>(emitter.Module()->getOrInsertFunction(ToUtf8(MangledName()), functionType));
-    ArgVector args;
+    void* functionType = IrType(emitter);
+    void* callee = emitter.GetOrInsertFunction(ToUtf8(MangledName()), functionType);
+    std::vector<void*> args;
     int n = parameters.size();
     if (ReturnsClassInterfaceOrClassDelegateByValue())
     {
@@ -748,19 +747,17 @@ void FunctionSymbol::GenerateCall(Emitter& emitter, std::vector<GenObject*>& gen
     args.resize(n);
     for (int i = 0; i < n; ++i)
     {
-        llvm::Value* arg = emitter.Stack().Pop();
+        void* arg = emitter.Stack().Pop();
         args[n - i - 1] = arg;
     }
-    llvm::BasicBlock* handlerBlock = emitter.HandlerBlock();
-    llvm::BasicBlock* cleanupBlock = emitter.CleanupBlock();
+    void* handlerBlock = emitter.HandlerBlock();
+    void* cleanupBlock = emitter.CleanupBlock();
     bool newCleanupNeeded = emitter.NewCleanupNeeded();
     Pad* currentPad = emitter.CurrentPad();
-    std::vector<llvm::OperandBundleDef> bundles;
+    std::vector<void*> bundles;
     if (currentPad != nullptr)
     {
-        std::vector<llvm::Value*> inputs;
-        inputs.push_back(currentPad->value);
-        bundles.push_back(llvm::OperandBundleDef("funclet", inputs));
+        bundles.push_back(currentPad->value);
     }
     if (ReturnType() && ReturnType()->GetSymbolType() != SymbolType::voidTypeSymbol && !ReturnsClassInterfaceOrClassDelegateByValue())
     {
@@ -768,27 +765,22 @@ void FunctionSymbol::GenerateCall(Emitter& emitter, std::vector<GenObject*>& gen
         {
             if (currentPad == nullptr)
             {
-                emitter.Stack().Push(emitter.Builder().CreateCall(callee, args));
+                emitter.Stack().Push(emitter.CreateCall(callee, args));
             }
             else
             {
-                llvm::CallInst* callInst = llvm::CallInst::Create(callee, args, bundles, "", emitter.CurrentBasicBlock());
-                if (emitter.DIBuilder())
-                {
-                    callInst->setDebugLoc(emitter.GetDebugLocation(span));
-                }
-                emitter.Stack().Push(callInst);;
+                emitter.Stack().Push(emitter.CreateCallInst(callee, args, bundles, span));
             }
         }
         else
         {
-            llvm::BasicBlock* nextBlock = llvm::BasicBlock::Create(emitter.Context(), "next", emitter.Function());
+            void* nextBlock = emitter.CreateBasicBlock("next");
             if (newCleanupNeeded)
             {
                 emitter.CreateCleanup();
                 cleanupBlock = emitter.CleanupBlock();
             }
-            llvm::BasicBlock* unwindBlock = cleanupBlock;
+            void* unwindBlock = cleanupBlock;
             if (unwindBlock == nullptr)
             {
                 unwindBlock = handlerBlock;
@@ -796,16 +788,11 @@ void FunctionSymbol::GenerateCall(Emitter& emitter, std::vector<GenObject*>& gen
             }
             if (currentPad == nullptr)
             {
-                emitter.Stack().Push(emitter.Builder().CreateInvoke(callee, nextBlock, unwindBlock, args));
+                emitter.Stack().Push(emitter.CreateInvoke(callee, nextBlock, unwindBlock, args));
             }
             else
             {
-                llvm::InvokeInst* invokeInst = llvm::InvokeInst::Create(callee, nextBlock, unwindBlock, args, bundles, "", emitter.CurrentBasicBlock());
-                if (emitter.DIBuilder())
-                {
-                    invokeInst->setDebugLoc(emitter.GetDebugLocation(span));
-                }
-                emitter.Stack().Push(invokeInst);
+                emitter.Stack().Push(emitter.CreateInvokeInst(callee, nextBlock, unwindBlock, args, bundles, span));
             }
             emitter.SetCurrentBasicBlock(nextBlock);
         }
@@ -816,26 +803,22 @@ void FunctionSymbol::GenerateCall(Emitter& emitter, std::vector<GenObject*>& gen
         {
             if (currentPad == nullptr)
             {
-                emitter.Builder().CreateCall(callee, args);
+                emitter.CreateCall(callee, args);
             }
             else
             {
-                llvm::CallInst* callInst = llvm::CallInst::Create(callee, args, bundles, "", emitter.CurrentBasicBlock());
-                if (emitter.DIBuilder())
-                {
-                    callInst->setDebugLoc(emitter.GetDebugLocation(span));
-                }
+                emitter.CreateCallInst(callee, args, bundles, span);
             }
         }
         else
         {
-            llvm::BasicBlock* nextBlock = llvm::BasicBlock::Create(emitter.Context(), "next", emitter.Function());
+            void* nextBlock = emitter.CreateBasicBlock("next");
             if (newCleanupNeeded)
             {
                 emitter.CreateCleanup();
                 cleanupBlock = emitter.CleanupBlock();
             }
-            llvm::BasicBlock* unwindBlock = cleanupBlock;
+            void* unwindBlock = cleanupBlock;
             if (unwindBlock == nullptr)
             {
                 unwindBlock = handlerBlock;
@@ -843,15 +826,11 @@ void FunctionSymbol::GenerateCall(Emitter& emitter, std::vector<GenObject*>& gen
             }
             if (currentPad == nullptr)
             {
-                emitter.Builder().CreateInvoke(callee, nextBlock, unwindBlock, args);
+                emitter.CreateInvoke(callee, nextBlock, unwindBlock, args);
             }
             else
             {
-                llvm::InvokeInst* invokeInst = llvm::InvokeInst::Create(callee, nextBlock, unwindBlock, args, bundles, "", emitter.CurrentBasicBlock());
-                if (emitter.DIBuilder())
-                {
-                    invokeInst->setDebugLoc(emitter.GetDebugLocation(span));
-                }
+                emitter.CreateInvokeInst(callee, nextBlock, unwindBlock, args, bundles, span);
             }
             emitter.SetCurrentBasicBlock(nextBlock);
         }
@@ -869,7 +848,7 @@ void FunctionSymbol::GenerateVirtualCall(Emitter& emitter, std::vector<GenObject
     Assert(type->BaseType()->IsClassTypeSymbol(), "class type pointer expected");
     ClassTypeSymbol* classType = static_cast<ClassTypeSymbol*>(type->BaseType());
     ClassTypeSymbol* vmtPtrHolderClass = classType->VmtPtrHolderClass();
-    llvm::Value* callee = nullptr;
+    void* callee = nullptr;
     for (int i = 0; i < na; ++i)
     {
         GenObject* genObject = genObjects[i];
@@ -877,25 +856,17 @@ void FunctionSymbol::GenerateVirtualCall(Emitter& emitter, std::vector<GenObject
         if (i == 0)
         {
             emitter.Stack().Dup();
-            llvm::Value* thisPtr = emitter.Stack().Pop();
+            void* thisPtr = emitter.Stack().Pop();
             if (classType != vmtPtrHolderClass)
             {
-                thisPtr = emitter.Builder().CreateBitCast(thisPtr, vmtPtrHolderClass->AddPointer(GetSpan())->IrType(emitter));
+                thisPtr = emitter.CreateBitCast(thisPtr, vmtPtrHolderClass->AddPointer(GetSpan())->IrType(emitter));
             }
-            ArgVector vmtPtrIndeces;
-            vmtPtrIndeces.push_back(emitter.Builder().getInt32(0));
-            vmtPtrIndeces.push_back(emitter.Builder().getInt32(vmtPtrHolderClass->VmtPtrIndex()));
-            llvm::Value* vmtPtrPtr = emitter.Builder().CreateGEP(thisPtr, vmtPtrIndeces);
-            llvm::Value* vmtPtr = emitter.Builder().CreateBitCast(emitter.Builder().CreateLoad(vmtPtrPtr), classType->VmtPtrType(emitter));
-            ArgVector funPtrIndeces;
-            funPtrIndeces.push_back(emitter.Builder().getInt32(0));
-            funPtrIndeces.push_back(emitter.Builder().getInt32(VmtIndex() + functionVmtIndexOffset));
-            llvm::Value* funPtrPtr = emitter.Builder().CreateGEP(vmtPtr, funPtrIndeces);
-            llvm::Value* funAsVoidPtr = emitter.Builder().CreateLoad(funPtrPtr);
-            callee = emitter.Builder().CreateBitCast(funAsVoidPtr, llvm::PointerType::get(IrType(emitter), 0));
+            void* vmtPtr = emitter.GetVmtPtr(thisPtr, vmtPtrHolderClass->VmtPtrIndex(), classType->VmtPtrType(emitter));
+            void* methodPtr = emitter.GetMethodPtr(vmtPtr, VmtIndex() + functionVmtIndexOffset);
+            callee = emitter.CreateBitCast(methodPtr, emitter.GetIrTypeForPtrType(IrType(emitter)));
         }
     }
-    ArgVector args;
+    std::vector<void*> args;
     int n = Parameters().size();
     if (ReturnsClassInterfaceOrClassDelegateByValue())
     {
@@ -904,20 +875,18 @@ void FunctionSymbol::GenerateVirtualCall(Emitter& emitter, std::vector<GenObject
     args.resize(n);
     for (int i = 0; i < n; ++i)
     {
-        llvm::Value* arg = emitter.Stack().Pop();
+        void* arg = emitter.Stack().Pop();
         args[n - i - 1] = arg;
     }
     emitter.SetCurrentDebugLocation(span);
-    llvm::BasicBlock* handlerBlock = emitter.HandlerBlock();
-    llvm::BasicBlock* cleanupBlock = emitter.CleanupBlock();
+    void* handlerBlock = emitter.HandlerBlock();
+    void* cleanupBlock = emitter.CleanupBlock();
     bool newCleanupNeeded = emitter.NewCleanupNeeded();
-    std::vector<llvm::OperandBundleDef> bundles;
+    std::vector<void*> bundles;
     Pad* currentPad = emitter.CurrentPad();
     if (currentPad != nullptr)
     {
-        std::vector<llvm::Value*> inputs;
-        inputs.push_back(currentPad->value);
-        bundles.push_back(llvm::OperandBundleDef("funclet", inputs));
+        bundles.push_back(currentPad->value);
     }
     if (ReturnType() && !ReturnType()->IsVoidType() && !ReturnsClassInterfaceOrClassDelegateByValue())
     {
@@ -925,27 +894,22 @@ void FunctionSymbol::GenerateVirtualCall(Emitter& emitter, std::vector<GenObject
         {
             if (currentPad == nullptr)
             {
-                emitter.Stack().Push(emitter.Builder().CreateCall(IrType(emitter), callee, args));
+                emitter.Stack().Push(emitter.CreateCall(callee, args));
             }
             else
             {
-                llvm::CallInst* callInst = llvm::CallInst::Create(callee, args, bundles, "", emitter.CurrentBasicBlock());
-                if (emitter.DIBuilder())
-                {
-                    callInst->setDebugLoc(emitter.GetDebugLocation(span));
-                }
-                emitter.Stack().Push(callInst);
+                emitter.Stack().Push(emitter.CreateCallInst(callee, args, bundles, span));
             }
         }
         else
         {
-            llvm::BasicBlock* nextBlock = llvm::BasicBlock::Create(emitter.Context(), "next", emitter.Function());
+            void* nextBlock = emitter.CreateBasicBlock("next");
             if (newCleanupNeeded)
             {
                 emitter.CreateCleanup();
                 cleanupBlock = emitter.CleanupBlock();
             }
-            llvm::BasicBlock* unwindBlock = cleanupBlock;
+            void* unwindBlock = cleanupBlock;
             if (unwindBlock == nullptr)
             {
                 unwindBlock = handlerBlock;
@@ -953,16 +917,11 @@ void FunctionSymbol::GenerateVirtualCall(Emitter& emitter, std::vector<GenObject
             }
             if (currentPad == nullptr)
             {
-                emitter.Stack().Push(emitter.Builder().CreateInvoke(callee, nextBlock, unwindBlock, args));
+                emitter.Stack().Push(emitter.CreateInvoke(callee, nextBlock, unwindBlock, args));
             }
             else
             {
-                llvm::InvokeInst* invokeInst = llvm::InvokeInst::Create(callee, nextBlock, unwindBlock, args, bundles, "", emitter.CurrentBasicBlock());
-                if (emitter.DIBuilder())
-                {
-                    invokeInst->setDebugLoc(emitter.GetDebugLocation(span));
-                }
-                emitter.Stack().Push(invokeInst);
+                emitter.Stack().Push(emitter.CreateInvokeInst(callee, nextBlock, unwindBlock, args, bundles, span));
             }
             emitter.SetCurrentBasicBlock(nextBlock);
         }
@@ -973,26 +932,22 @@ void FunctionSymbol::GenerateVirtualCall(Emitter& emitter, std::vector<GenObject
         {
             if (currentPad == nullptr)
             {
-                emitter.Builder().CreateCall(IrType(emitter), callee, args);
+                emitter.CreateCall(callee, args);
             }
             else
             {
-                llvm::CallInst* callInst = llvm::CallInst::Create(callee, args, bundles, "", emitter.CurrentBasicBlock());
-                if (emitter.DIBuilder())
-                {
-                    callInst->setDebugLoc(emitter.GetDebugLocation(span));
-                }
+                emitter.CreateCallInst(callee, args, bundles, span);
             }
         }
         else
         {
-            llvm::BasicBlock* nextBlock = llvm::BasicBlock::Create(emitter.Context(), "next", emitter.Function());
+            void* nextBlock = emitter.CreateBasicBlock("next");
             if (newCleanupNeeded)
             {
                 emitter.CreateCleanup();
                 cleanupBlock = emitter.CleanupBlock();
             }
-            llvm::BasicBlock* unwindBlock = cleanupBlock;
+            void* unwindBlock = cleanupBlock;
             if (unwindBlock == nullptr)
             {
                 unwindBlock = handlerBlock;
@@ -1000,15 +955,11 @@ void FunctionSymbol::GenerateVirtualCall(Emitter& emitter, std::vector<GenObject
             }
             if (currentPad == nullptr)
             {
-                emitter.Builder().CreateInvoke(callee, nextBlock, unwindBlock, args);
+                emitter.CreateInvoke(callee, nextBlock, unwindBlock, args);
             }
             else
             {
-                llvm::InvokeInst* invokeInst = llvm::InvokeInst::Create(callee, nextBlock, unwindBlock, args, bundles, "", emitter.CurrentBasicBlock());
-                if (emitter.DIBuilder())
-                {
-                    invokeInst->setDebugLoc(emitter.GetDebugLocation(span));
-                }
+                emitter.CreateInvokeInst(callee, nextBlock, unwindBlock, args, bundles, span);
             }
             emitter.SetCurrentBasicBlock(nextBlock);
         }
@@ -1215,24 +1166,24 @@ std::vector<LocalVariableSymbol*> FunctionSymbol::CreateTemporariesTo(FunctionSy
     return std::vector<LocalVariableSymbol*>();
 }
 
-llvm::FunctionType* FunctionSymbol::IrType(Emitter& emitter)
+void* FunctionSymbol::IrType(Emitter& emitter)
 {
-    llvm::FunctionType* localIrType = emitter.GetFunctionIrType(this);
+    void* localIrType = emitter.GetFunctionIrType(this);
     if (!localIrType)
     {
-        llvm::Type* retType = llvm::Type::getVoidTy(emitter.Context());
+        void* retType = emitter.GetIrTypeForVoid();
         if (returnType && returnType->GetSymbolType() != SymbolType::voidTypeSymbol && !ReturnsClassInterfaceOrClassDelegateByValue())
         {
             retType = returnType->IrType(emitter);
         }
         bool interfaceMemFun = Parent()->GetSymbolType() == SymbolType::interfaceTypeSymbol;
-        std::vector<llvm::Type*> paramTypes;
+        std::vector<void*> paramTypes;
         int np = parameters.size();
         for (int i = 0; i < np; ++i)
         {
             if (i == 0 && interfaceMemFun)
             {
-                paramTypes.push_back(emitter.Builder().getInt8PtrTy());
+                paramTypes.push_back(emitter.GetIrTypeForVoidPtrType());
             }
             else
             {
@@ -1249,7 +1200,7 @@ llvm::FunctionType* FunctionSymbol::IrType(Emitter& emitter)
         {
             paramTypes.push_back(returnParam->GetType()->IrType(emitter));
         }
-        localIrType = llvm::FunctionType::get(retType, paramTypes, false);
+        localIrType = emitter.GetIrTypeForFunction(retType, paramTypes);
         emitter.SetFunctionIrType(this, localIrType);
     }
     return localIrType;

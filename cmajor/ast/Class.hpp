@@ -10,7 +10,7 @@
 
 namespace cmajor { namespace ast {
 
-class ClassNode : public Node
+class AST_API ClassNode : public Node
 {
 public:
     ClassNode(const Span& span_);
@@ -53,7 +53,7 @@ private:
     std::unique_ptr<Attributes> attributes;
 };
 
-class InitializerNode : public Node
+class AST_API InitializerNode : public Node
 {
 public:
     InitializerNode(NodeType nodeType_, const Span& span_);
@@ -65,7 +65,7 @@ private:
     NodeList<Node> arguments;
 };
 
-class ThisInitializerNode : public InitializerNode
+class AST_API ThisInitializerNode : public InitializerNode
 {
 public:
     ThisInitializerNode(const Span& span_);
@@ -73,7 +73,7 @@ public:
     void Accept(Visitor& visitor) override;
 };
 
-class BaseInitializerNode : public InitializerNode
+class AST_API BaseInitializerNode : public InitializerNode
 {
 public:
     BaseInitializerNode(const Span& span_);
@@ -81,7 +81,7 @@ public:
     void Accept(Visitor& visitor) override;
 };
 
-class MemberInitializerNode : public InitializerNode
+class AST_API MemberInitializerNode : public InitializerNode
 {
 public:
     MemberInitializerNode(const Span& span_);
@@ -96,7 +96,7 @@ private:
     std::unique_ptr<IdentifierNode> memberId;
 };
 
-class StaticConstructorNode : public FunctionNode
+class AST_API StaticConstructorNode : public FunctionNode
 {
 public:
     StaticConstructorNode(const Span& span_);
@@ -114,7 +114,7 @@ private:
     std::unique_ptr<IdentifierNode> classId;
 };
 
-class ConstructorNode : public FunctionNode
+class AST_API ConstructorNode : public FunctionNode
 {
 public:
     ConstructorNode(const Span& span_);
@@ -132,7 +132,7 @@ private:
     std::unique_ptr<IdentifierNode> classId;
 };
 
-class DestructorNode : public FunctionNode
+class AST_API DestructorNode : public FunctionNode
 {
 public:
     DestructorNode(const Span& span_);
@@ -145,7 +145,7 @@ private:
     std::unique_ptr<IdentifierNode> classId;
 };
 
-class MemberFunctionNode : public FunctionNode
+class AST_API MemberFunctionNode : public FunctionNode
 {
 public:
     MemberFunctionNode(const Span& span_);
@@ -156,7 +156,7 @@ public:
     void SetConst() { SetSpecifiers(GetSpecifiers() | Specifiers::const_); }
 };
 
-class ConversionFunctionNode : public FunctionNode
+class AST_API ConversionFunctionNode : public FunctionNode
 {
 public:
     ConversionFunctionNode(const Span& span_);
@@ -167,7 +167,7 @@ public:
     void SetConst() { SetSpecifiers(GetSpecifiers() | Specifiers::const_); }
 };
 
-class MemberVariableNode : public Node
+class AST_API MemberVariableNode : public Node
 {
 public:
     MemberVariableNode(const Span& span_);

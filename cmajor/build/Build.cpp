@@ -4,7 +4,8 @@
 // =================================
 
 #include <cmajor/build/Build.hpp>
-#include <cmajor/emitter/Emitter.hpp>
+#include <cmajor/codegen/EmittingContext.hpp>
+#include <cmajor/codegen/Interface.hpp>
 #include <cmajor/parser/Project.hpp>
 #include <cmajor/parser/Solution.hpp>
 #include <cmajor/parser/CompileUnit.hpp>
@@ -57,7 +58,7 @@
 #include <list>
 #include <condition_variable>
 
-using namespace cmajor::emitter;
+//using namespace cmajor::emitter;
 using namespace cmajor::parser;
 using namespace cmajor::parsing;
 using namespace cmajor::ast;
@@ -475,10 +476,10 @@ void Link(const std::string& executableFilePath, const std::string& libraryFileP
     // std::string defFilePath = GetFullPath(boost::filesystem::path(libraryFilePath).replace_extension(".def").generic_string());
     // CreateDefFile(defFilePath, module);
     // args.push_back("/def:" + QuotedPath(defFilePath));
-    std::string cmrtLibName = "cmrt320.lib";
+    std::string cmrtLibName = "cmrt330.lib";
     if (GetGlobalFlag(GlobalFlags::linkWithDebugRuntime))
     {
-        cmrtLibName = "cmrt320d.lib";
+        cmrtLibName = "cmrt330d.lib";
     }
     args.push_back(QuotedPath(Path::Combine(Path::Combine(CmajorRootDir(), "lib"), cmrtLibName)));
     int n = libraryFilePaths.size();
@@ -668,7 +669,7 @@ void CheckMainFunctionSymbol(Module& module)
     }
 }
 
-void CreateJsonRegistrationUnit(std::vector<std::string>& objectFilePaths, Module& module, EmittingContext& emittingContext, AttributeBinder* attributeBinder)
+void CreateJsonRegistrationUnit(std::vector<std::string>& objectFilePaths, Module& module, cmajor::codegen::EmittingContext& emittingContext, AttributeBinder* attributeBinder)
 {
     CompileUnitNode jsonRegistrationCompileUnit(Span(), boost::filesystem::path(module.OriginalFilePath()).parent_path().append("__json__.cm").generic_string());
     jsonRegistrationCompileUnit.SetSynthesizedUnit();
@@ -701,11 +702,11 @@ void CreateJsonRegistrationUnit(std::vector<std::string>& objectFilePaths, Modul
     {
         AnalyzeControlFlow(boundJsonCompileUnit);
     }
-    GenerateCode(emittingContext, boundJsonCompileUnit);
+    cmajor::codegen::GenerateCode(emittingContext, boundJsonCompileUnit);
     objectFilePaths.push_back(boundJsonCompileUnit.ObjectFilePath());
 }
 
-void CreateMainUnit(std::vector<std::string>& objectFilePaths, Module& module, EmittingContext& emittingContext, AttributeBinder* attributeBinder)
+void CreateMainUnit(std::vector<std::string>& objectFilePaths, Module& module, cmajor::codegen::EmittingContext& emittingContext, AttributeBinder* attributeBinder)
 {
     CompileUnitNode mainCompileUnit(Span(), boost::filesystem::path(module.OriginalFilePath()).parent_path().append("__main__.cm").generic_string());
     mainCompileUnit.SetSynthesizedUnit();
@@ -825,7 +826,7 @@ void CreateMainUnit(std::vector<std::string>& objectFilePaths, Module& module, E
     {
         AnalyzeControlFlow(boundMainCompileUnit);
     }
-    GenerateCode(emittingContext, boundMainCompileUnit);
+    cmajor::codegen::GenerateCode(emittingContext, boundMainCompileUnit);
     objectFilePaths.push_back(boundMainCompileUnit.ObjectFilePath());
 }
 
@@ -903,7 +904,7 @@ void InstallSystemLibraries(Module* systemInstallModule)
     }
 }
 
-void CompileSingleThreaded(Project* project, Module* rootModule, std::vector<std::unique_ptr<BoundCompileUnit>>& boundCompileUnits, EmittingContext& emittingContext,
+void CompileSingleThreaded(Project* project, Module* rootModule, std::vector<std::unique_ptr<BoundCompileUnit>>& boundCompileUnits, cmajor::codegen::EmittingContext& emittingContext,
     std::vector<std::string>& objectFilePaths, std::unordered_map<int, cmdoclib::File>& docFileMap, bool& stop)
 {
     if (GetGlobalFlag(GlobalFlags::verbose))
@@ -941,7 +942,7 @@ void CompileSingleThreaded(Project* project, Module* rootModule, std::vector<std
         }
         else
         {
-            GenerateCode(emittingContext, *boundCompileUnit);
+            cmajor::codegen::GenerateCode(emittingContext, *boundCompileUnit);
             objectFilePaths.push_back(boundCompileUnit->ObjectFilePath());
         }
     }
@@ -1034,7 +1035,7 @@ void GenerateCode(CompileData* data, int threadId)
     try
     {
         SetRootModuleForCurrentThread(data->rootModule);
-        EmittingContext emittingContext;
+        cmajor::codegen::EmittingContext emittingContext(GetOptimizationLevel());
         while (!data->stop && !data->ready)
         {
             int compileUnitIndex = data->input.Get();
@@ -1046,7 +1047,7 @@ void GenerateCode(CompileData* data, int threadId)
                     LogMessage(data->rootModule->LogStreamId(), CurrentCompileDebugMsStr() + " begin generating code for compile unit " + std::to_string(compileUnitIndex) + 
                         " of " + std::to_string(data->boundCompileUnits.size()));
                 }
-                GenerateCode(emittingContext, *compileUnit);
+                cmajor::codegen::GenerateCode(emittingContext, *compileUnit);
                 if (GetGlobalFlag(GlobalFlags::debugCompile))
                 {
                     LogMessage(data->rootModule->LogStreamId(), CurrentCompileDebugMsStr() + " end generating code for compile unit " + std::to_string(compileUnitIndex) + 
@@ -1251,7 +1252,7 @@ void BuildProject(Project* project, std::unique_ptr<Module>& rootModule, bool& s
             symbolTableDoc->Write(formatter);
         }
         std::unordered_map<int, cmdoclib::File> docFileMap;
-        EmittingContext emittingContext;
+        cmajor::codegen::EmittingContext emittingContext(GetOptimizationLevel());
         std::vector<std::string> objectFilePaths;
         if (GetGlobalFlag(GlobalFlags::singleThreadedCompile))
         {

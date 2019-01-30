@@ -10,12 +10,12 @@
 
 namespace cmajor { namespace parsing {
 
-void SetFileInfo(const std::vector<std::string>& files_);
-std::u32string GetErrorLines(const char32_t* start, const char32_t* end, const Span& span);
-void GetColumns(const char32_t* start, const char32_t* end, const Span& span, int32_t& startCol, int32_t& endCol);
-void ThrowException(const std::string& message, const Span& span);
+PARSING_API void SetFileInfo(const std::vector<std::string>& files_);
+PARSING_API std::u32string GetErrorLines(const char32_t* start, const char32_t* end, const Span& span);
+PARSING_API void GetColumns(const char32_t* start, const char32_t* end, const Span& span, int32_t& startCol, int32_t& endCol);
+PARSING_API void ThrowException(const std::string& message, const Span& span);
 
-class ParsingException : public std::runtime_error
+class PARSING_API ParsingException : public std::runtime_error
 {
 public:
     ParsingException(const std::string& message_, const std::string& fileName_, const Span& span_, const char32_t* start_, const char32_t* end_);
@@ -38,7 +38,7 @@ private:
     void* module;
 };
 
-class ExpectationFailure : public ParsingException
+class PARSING_API ExpectationFailure : public ParsingException
 {
 public:
     ExpectationFailure(const std::u32string& info_, const std::string& fileName_, const Span& span_, const char32_t* start, const char32_t* end);

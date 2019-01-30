@@ -5,6 +5,7 @@
 
 #ifndef CMAJOR_SYMBOLS_WARNING_INCLUDED
 #define CMAJOR_SYMBOLS_WARNING_INCLUDED
+#include <cmajor/symbols/SymbolsApi.hpp>
 #include <cmajor/parsing/Scanner.hpp>
 #include <cmajor/util/Json.hpp>
 
@@ -14,7 +15,7 @@ using cmajor::parsing::Span;
 using cmajor::util::JsonValue;
 class Module;
 
-class Warning
+class SYMBOLS_API Warning
 {
 public:
     Warning(const std::u32string& project_, const std::string& message_);
@@ -35,7 +36,7 @@ private:
     Module* module;
 };
 
-class CompileWarningCollection
+class SYMBOLS_API CompileWarningCollection
 {
 public:
     CompileWarningCollection();

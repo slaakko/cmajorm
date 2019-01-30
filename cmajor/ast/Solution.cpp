@@ -13,6 +13,10 @@ namespace cmajor { namespace ast {
 using namespace cmajor::util;
 using namespace cmajor::unicode;
 
+SolutionDeclaration::SolutionDeclaration()
+{
+}
+
 SolutionDeclaration::~SolutionDeclaration()
 {
 }

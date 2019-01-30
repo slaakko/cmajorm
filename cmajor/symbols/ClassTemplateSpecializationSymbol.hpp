@@ -33,7 +33,7 @@ inline ClassTemplateSpecializationFlags operator~(ClassTemplateSpecializationFla
 
 std::u32string MakeClassTemplateSpecializationName(ClassTypeSymbol* classTemplate, const std::vector<TypeSymbol*>& templateArgumentTypes);
 
-class ClassTemplateSpecializationSymbol : public ClassTypeSymbol
+class SYMBOLS_API ClassTemplateSpecializationSymbol : public ClassTypeSymbol
 {
 public:
     ClassTemplateSpecializationSymbol(const Span& span_, const std::u32string& name_);
@@ -43,7 +43,7 @@ public:
     void Read(SymbolReader& reader) override;
     void EmplaceType(TypeSymbol* typeSymbol, int index) override;
     bool IsPrototypeTemplateSpecialization() const override;
-    llvm::Type* IrType(Emitter& emitter) override;
+    void* IrType(Emitter& emitter) override;
     ClassTypeSymbol* GetClassTemplate() { return classTemplate; }
     const std::vector<TypeSymbol*>& TemplateArgumentTypes() const { return templateArgumentTypes; }
     std::vector<TypeSymbol*>& TemplateArgumentTypes() { return templateArgumentTypes; }

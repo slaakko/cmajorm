@@ -5,6 +5,7 @@
 
 #ifndef CMAJOR_SYMBOLS_SYMBOL_INCLUDED
 #define CMAJOR_SYMBOLS_SYMBOL_INCLUDED
+#include <cmajor/symbols/SymbolsApi.hpp>
 #include <cmajor/symbols/TypeMap.hpp>
 #include <cmajor/ast/Attribute.hpp>
 #include <cmajor/ast/Specifier.hpp>
@@ -13,8 +14,6 @@
 #include <cmajor/parsing/Scanner.hpp>
 #include <cmajor/util/CodeFormatter.hpp>
 #include <cmajor/ir/Emitter.hpp>
-#include <llvm/IR/Value.h>
-#include <llvm/IR/DIBuilder.h>
 #include <unordered_set>
 #include <stdint.h>
 
@@ -75,7 +74,7 @@ enum class SymbolAccess : uint8_t
     private_ = 0, protected_ = 1, internal_ = 2, public_ = 3
 };
 
-llvm::DINode::DIFlags AccessFlag(SymbolAccess access);
+SYMBOLS_API uint32_t AccessFlag(Emitter& emitter, SymbolAccess access);
 
 enum class SymbolFlags : uint8_t
 {
@@ -107,7 +106,7 @@ inline SymbolFlags operator~(SymbolFlags flags)
 std::string SymbolFlagStr(SymbolFlags symbolFlags);
 std::string SymbolFlagStr(SymbolFlags symbolFlags, bool noAccess);
 
-class Symbol
+class SYMBOLS_API Symbol
 {
 public:
     Symbol(SymbolType symbolType_, const Span& span_, const std::u32string& name_);
@@ -135,7 +134,7 @@ public:
     virtual std::u32string Id() const { return mangledName; }
     virtual SymbolAccess DeclaredAccess() const { return Access(); }
     virtual std::string TypeString() const { return "symbol";  }
-    virtual llvm::Value* IrObject(Emitter& emitter);
+    virtual void* IrObject(Emitter& emitter);
     virtual void ComputeMangledName();
     virtual void Dump(CodeFormatter& formatter) {}
     virtual std::string GetSpecifierStr() const;

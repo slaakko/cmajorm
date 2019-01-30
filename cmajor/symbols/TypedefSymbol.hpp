@@ -9,7 +9,7 @@
 
 namespace cmajor { namespace symbols {
 
-class TypedefSymbol : public Symbol
+class SYMBOLS_API TypedefSymbol : public Symbol
 {
 public:
     TypedefSymbol(const Span& span_, const std::u32string& name_);

@@ -5,11 +5,12 @@
 
 #ifndef CMAJOR_AST_INIT_DONE_INCLUDED
 #define CMAJOR_AST_INIT_DONE_INCLUDED
+#include <cmajor/ast/AstApi.hpp>
 
 namespace cmajor { namespace ast {
 
-void Init();
-void Done();
+AST_API void Init();
+AST_API void Done();
 
 } } // namespace cmajor::ast
 

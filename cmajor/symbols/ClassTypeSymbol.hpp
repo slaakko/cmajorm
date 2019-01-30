@@ -21,15 +21,15 @@ class DestructorSymbol;
 class MemberFunctionSymbol;
 class ClassTemplateSpecializationSymbol;
 
-class ClassGroupTypeSymbol : public TypeSymbol
+class SYMBOLS_API ClassGroupTypeSymbol : public TypeSymbol
 {
 public:
     ClassGroupTypeSymbol(const Span& span_, const std::u32string& name_);
     bool IsExportSymbol() const override { return false; }
     std::string TypeString() const override { return "class_group"; }
     bool IsInComplete() const override { return true; }
-    llvm::Type* IrType(Emitter& emitter) override;
-    llvm::Constant* CreateDefaultIrValue(Emitter& emitter) override;
+    void* IrType(Emitter& emitter) override;
+    void* CreateDefaultIrValue(Emitter& emitter) override;
     void AddClass(ClassTypeSymbol* classTypeSymbol);
     ClassTypeSymbol* GetClass(int arity) const;
     bool HasProjectMembers() const override;
@@ -75,7 +75,7 @@ const int32_t classNameVmtIndexOffset = 3;  // class name pointer
 const int32_t imtsVmtIndexOffset = 4;       // interface method table pointer
 const int32_t functionVmtIndexOffset = 5;   // virtual method table
 
-class ClassTypeSymbol : public TypeSymbol
+class SYMBOLS_API ClassTypeSymbol : public TypeSymbol
 {
 public:
     ClassTypeSymbol(const Span& span_, const std::u32string& name_);
@@ -167,20 +167,20 @@ public:
     void CreateLayouts();
     const std::vector<TypeSymbol*>& ObjectLayout() const { return objectLayout; }
     const std::vector<FunctionSymbol*>& Vmt() const { return vmt; }
-    llvm::Type* IrType(Emitter& emitter) override;
-    llvm::Constant* CreateDefaultIrValue(Emitter& emitter) override;
-    llvm::DIType* CreateDIType(Emitter& emitter) override; 
-    llvm::DIType* CreateDIForwardDeclaration(Emitter& emitter);
-    llvm::Value* VmtObject(Emitter& emitter, bool create);
-    llvm::Type* VmtPtrType(Emitter& emitter);
+    void* IrType(Emitter& emitter) override;
+    void* CreateDefaultIrValue(Emitter& emitter) override;
+    void* CreateDIType(Emitter& emitter) override; 
+    void* CreateDIForwardDeclaration(Emitter& emitter);
+    void* VmtObject(Emitter& emitter, bool create);
+    void* VmtPtrType(Emitter& emitter);
     std::string VmtObjectName(Emitter& emitter);
     std::string VmtObjectNameStr();
     std::string ImtArrayObjectName(Emitter& emitter);
     std::string ImtObjectName(int index);
     int32_t VmtPtrIndex() const { return vmtPtrIndex; }
     ClassTypeSymbol* VmtPtrHolderClass();
-    llvm::Value* StaticObject(Emitter& emitter, bool create);
-    llvm::StructType* StaticObjectType(Emitter& emitter);
+    void* StaticObject(Emitter& emitter, bool create);
+    void* StaticObjectType(Emitter& emitter);
     std::string StaticObjectName(Emitter& emitter);
     void SetPrototype(ClassTemplateSpecializationSymbol* prototype_) { prototype = prototype_; }
     ClassTemplateSpecializationSymbol* Prototype() const { return prototype; }
@@ -219,12 +219,12 @@ private:
     std::unique_ptr<ConstraintNode> constraint;
     ClassTemplateSpecializationSymbol* prototype;
     void InitVmt(std::vector<FunctionSymbol*>& vmtToInit);
-    llvm::Value* CreateImt(Emitter& emitter, int index);
-    llvm::Value* CreateImts(Emitter& emitter);
+    void* CreateImt(Emitter& emitter, int index);
+    void* CreateImts(Emitter& emitter);
 };
 
-ConstantNode* MakePolymorphicClassArray(const std::unordered_set<ClassTypeSymbol*>& polymorphicClasses, const std::u32string& arrayName);
-ConstantNode* MakeStaticClassArray(const std::unordered_set<ClassTypeSymbol*>& classesHavingStaticConstructor, const std::u32string& arrayName);
+SYMBOLS_API ConstantNode* MakePolymorphicClassArray(const std::unordered_set<ClassTypeSymbol*>& polymorphicClasses, const std::u32string& arrayName);
+SYMBOLS_API ConstantNode* MakeStaticClassArray(const std::unordered_set<ClassTypeSymbol*>& classesHavingStaticConstructor, const std::u32string& arrayName);
 
 } } // namespace cmajor::symbols
 

@@ -9,7 +9,7 @@
 
 namespace cmajor { namespace codedom {
 
-class Literal: public CppObject
+class CODEDOM_API Literal: public CppObject
 {
 public:
     Literal(const std::u32string& name_);

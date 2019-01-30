@@ -9,39 +9,39 @@
 
 namespace cmajor { namespace codedom {
 
-class DeclSpecifier : public CppObject
+class CODEDOM_API DeclSpecifier : public CppObject
 {
 public:
     DeclSpecifier(const std::u32string& name_);
 };
 
-class Typedef : public DeclSpecifier
+class CODEDOM_API Typedef : public DeclSpecifier
 {
 public:
     Typedef();
     void Accept(Visitor& visitor) override;
 };
 
-class TypeSpecifier : public DeclSpecifier
+class CODEDOM_API TypeSpecifier : public DeclSpecifier
 {
 public:
     TypeSpecifier(const std::u32string& name_);
     void Accept(Visitor& visitor) override;
 };
 
-class Const : public TypeSpecifier
+class CODEDOM_API Const : public TypeSpecifier
 {
 public:
     Const();
 };
 
-class Volatile: public TypeSpecifier
+class CODEDOM_API Volatile: public TypeSpecifier
 {
 public:
     Volatile();
 };
 
-class TypeName : public TypeSpecifier
+class CODEDOM_API TypeName : public TypeSpecifier
 {
 public:
     TypeName(const std::u32string& name_);
@@ -56,7 +56,7 @@ private:
     std::vector<CppObject*> templateArguments;
 };
 
-class Type : public CppObject
+class CODEDOM_API Type : public CppObject
 {
 public:
     Type();
@@ -70,7 +70,7 @@ private:
 
 typedef std::shared_ptr<Type> TypePtr;
 
-class TypeId : public CppObject
+class CODEDOM_API TypeId : public CppObject
 {
 public:
     typedef std::vector<TypeSpecifier*> TypeSpecifierVec;
@@ -88,7 +88,7 @@ private:
     std::u32string declarator;
 };
 
-class StorageClassSpecifier : public DeclSpecifier
+class CODEDOM_API StorageClassSpecifier : public DeclSpecifier
 {
 public:
     StorageClassSpecifier(const std::u32string& name_): DeclSpecifier(name_) {}

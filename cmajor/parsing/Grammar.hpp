@@ -19,7 +19,7 @@ class ParsingDomain;
 class Namespace;
 class RuleLink;
 
-class Grammar: public ParsingObject
+class PARSING_API Grammar: public ParsingObject
 {
 public:
     typedef std::vector<Rule*> RuleVec;

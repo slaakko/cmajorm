@@ -5,6 +5,7 @@
 
 #ifndef CMAJOR_PARSING_PARSING_OBJECT_INCLUDED
 #define CMAJOR_PARSING_PARSING_OBJECT_INCLUDED
+#include <cmajor/parsing/ParsingApi.hpp>
 #include <cmajor/parsing/Scanner.hpp>
 #include <memory>
 
@@ -37,12 +38,14 @@ constexpr inline ObjectKind operator&(ObjectKind left, ObjectKind right)
     return  ObjectKind(uint8_t(left) & uint8_t(right));
 }
 
-class ParsingObject
+class PARSING_API ParsingObject
 {
 public:
     static const int external = -1;
     ParsingObject(const std::u32string& name_, ObjectKind kind_);
     ParsingObject(const std::u32string& name_, Scope* enclosingScope_, ObjectKind kind_);
+    ParsingObject(const ParsingObject&) = delete;
+    ParsingObject& operator=(const ParsingObject&) = delete;
     virtual ~ParsingObject();
     virtual void Accept(Visitor& visitor) = 0;
     void Own(ParsingObject* object);

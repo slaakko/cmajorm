@@ -12,7 +12,7 @@ namespace cmajor { namespace ast {
 
 class IdentifierNode;
 
-class ConstantNode : public Node
+class AST_API ConstantNode : public Node
 {
 public:
     ConstantNode(const Span& span_);

@@ -13,7 +13,7 @@ class Grammar;
 class Rule;
 class ParsingDomain;
 
-class LinkerVisitor : public Visitor
+class PARSING_API LinkerVisitor : public Visitor
 {
 public:
     LinkerVisitor();
@@ -32,8 +32,8 @@ private:
     int actionNumber;
 };
 
-void Link(ParsingDomain* parsingDomain);
-void ExpandCode(ParsingDomain* parsingDomain);
+PARSING_API void Link(ParsingDomain* parsingDomain);
+PARSING_API void ExpandCode(ParsingDomain* parsingDomain);
 
 } } // namespace cmajor::parsing
 

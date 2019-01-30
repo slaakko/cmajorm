@@ -5,6 +5,7 @@
 
 #ifndef CMAJOR_BINDER_BOUND_NODE_VISITOR_INCLUDED
 #define CMAJOR_BINDER_BOUND_NODE_VISITOR_INCLUDED
+#include <cmajor/binder/BinderApi.hpp>
 
 namespace cmajor { namespace binder {
 
@@ -67,7 +68,7 @@ class BoundAtomicConstraint;
 class BoundDisjunctiveConstraint;
 class BoundConjunctiveConstraint;
 
-class BoundNodeVisitor
+class BINDER_API BoundNodeVisitor
 {
 public:
     virtual ~BoundNodeVisitor();

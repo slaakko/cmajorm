@@ -9,7 +9,7 @@
 
 namespace cmajor { namespace ast {
 
-class ConstNode : public Node
+class AST_API ConstNode : public Node
 {
 public:
     ConstNode(const Span& span_);
@@ -25,7 +25,7 @@ private:
     std::unique_ptr<Node> subject;
 };
 
-class LValueRefNode : public Node
+class AST_API LValueRefNode : public Node
 {
 public:
     LValueRefNode(const Span& span_);
@@ -41,7 +41,7 @@ private:
     std::unique_ptr<Node> subject;
 };
 
-class RValueRefNode : public Node
+class AST_API RValueRefNode : public Node
 {
 public:
     RValueRefNode(const Span& span_);
@@ -57,7 +57,7 @@ private:
     std::unique_ptr<Node> subject;
 };
 
-class PointerNode : public Node
+class AST_API PointerNode : public Node
 {
 public:
     PointerNode(const Span& span_);
@@ -73,7 +73,7 @@ private:
     std::unique_ptr<Node> subject;
 };
 
-class ArrayNode : public Node
+class AST_API ArrayNode : public Node
 {
 public:
     ArrayNode(const Span& span_);

@@ -13,7 +13,6 @@
 #include <cmajor/symbols/Module.hpp>
 #include <cmajor/ir/Emitter.hpp>
 #include <cmajor/util/Unicode.hpp>
-#include <llvm/IR/Module.h>
 
 namespace cmajor { namespace symbols {
 
@@ -219,7 +218,7 @@ void ConstantSymbol::SetValue(Value* value_)
     value.reset(value_);
 }
 
-llvm::Value* ConstantSymbol::ArrayIrObject(Emitter& emitter, bool create)
+void* ConstantSymbol::ArrayIrObject(Emitter& emitter, bool create)
 {
     if (!type->IsArrayType())
     {
@@ -234,17 +233,17 @@ llvm::Value* ConstantSymbol::ArrayIrObject(Emitter& emitter, bool create)
         throw Exception(GetRootModuleForCurrentThread(), "internal error: array value expected", GetSpan());
     }
     ArrayValue* arrayValue = static_cast<ArrayValue*>(value.get());
-    llvm::ArrayType* irArrayType = llvm::cast<llvm::ArrayType>(type->IrType(emitter));
-    llvm::Constant* irArrayObject = emitter.Module()->getOrInsertGlobal(ToUtf8(MangledName()), irArrayType);
+    void* irArrayType = type->IrType(emitter);
+    void* irArrayObject = emitter.GetOrInsertGlobal(ToUtf8(MangledName()), irArrayType);
     if (create)
     {
-        llvm::GlobalVariable* arrayObjectGlobal = llvm::cast<llvm::GlobalVariable>(irArrayObject);
-        arrayObjectGlobal->setInitializer(llvm::cast<llvm::Constant>(arrayValue->IrValue(emitter)));
+        void* arrayObjectGlobal = irArrayObject;
+        emitter.SetInitializer(arrayObjectGlobal, arrayValue->IrValue(emitter));
     }
     return irArrayObject;
 }
 
-llvm::Value* ConstantSymbol::StructureIrObject(Emitter& emitter, bool create)
+void* ConstantSymbol::StructureIrObject(Emitter& emitter, bool create)
 {
     if (!type->IsClassTypeSymbol())
     {
@@ -259,12 +258,12 @@ llvm::Value* ConstantSymbol::StructureIrObject(Emitter& emitter, bool create)
         throw Exception(GetRootModuleForCurrentThread(), "internal error: structured value expected", GetSpan());
     }
     StructuredValue* structuredValue = static_cast<StructuredValue*>(value.get());
-    llvm::StructType* irStructureType = llvm::cast<llvm::StructType>(type->IrType(emitter));
-    llvm::Constant* irStructureObject = emitter.Module()->getOrInsertGlobal(ToUtf8(MangledName()), irStructureType);
+    void* irStructureType = type->IrType(emitter);
+    void* irStructureObject = emitter.GetOrInsertGlobal(ToUtf8(MangledName()), irStructureType);
     if (create)
     {
-        llvm::GlobalVariable* structureObjectGlobal = llvm::cast<llvm::GlobalVariable>(irStructureObject);
-        structureObjectGlobal->setInitializer(llvm::cast<llvm::Constant>(structuredValue->IrValue(emitter)));
+        void* structureObjectGlobal = irStructureObject;
+        emitter.SetInitializer(structureObjectGlobal, structuredValue->IrValue(emitter));
     }
     return irStructureObject;
 }

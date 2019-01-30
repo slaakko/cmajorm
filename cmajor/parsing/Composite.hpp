@@ -11,7 +11,7 @@ namespace cmajor { namespace parsing {
 
 class Visitor;
 
-class UnaryParser : public Parser
+class PARSING_API UnaryParser : public Parser
 {
 public:
     UnaryParser(const std::u32string& name_, Parser* child_, const std::u32string& info_);
@@ -20,7 +20,7 @@ private:
     Parser* child;
 };
 
-class OptionalParser : public UnaryParser
+class PARSING_API OptionalParser : public UnaryParser
 {
 public:
     OptionalParser(Parser* child_);
@@ -28,7 +28,7 @@ public:
     void Accept(Visitor& visitor) override;
 };
 
-class PositiveParser : public UnaryParser
+class PARSING_API PositiveParser : public UnaryParser
 {
 public:
     PositiveParser(Parser* child_);
@@ -36,7 +36,7 @@ public:
     void Accept(Visitor& visitor) override;
 };
 
-class KleeneStarParser : public UnaryParser
+class PARSING_API KleeneStarParser : public UnaryParser
 {
 public:
     KleeneStarParser(Parser* child_);
@@ -44,7 +44,7 @@ public:
     void Accept(Visitor& visitor) override;
 };
 
-class ExpectationParser : public UnaryParser
+class PARSING_API ExpectationParser : public UnaryParser
 {
 public:
     ExpectationParser(Parser* child_);
@@ -52,7 +52,7 @@ public:
     void Accept(Visitor& visitor) override;
 };
 
-class TokenParser : public UnaryParser
+class PARSING_API TokenParser : public UnaryParser
 {
 public:
     TokenParser(Parser* child_);
@@ -60,7 +60,7 @@ public:
     void Accept(Visitor& visitor) override;
 };
 
-class GroupingParser : public UnaryParser
+class PARSING_API GroupingParser : public UnaryParser
 {
 public:
     GroupingParser(Parser* child_);
@@ -68,7 +68,7 @@ public:
     void Accept(Visitor& visitor) override;
 };
 
-class BinaryParser : public Parser
+class PARSING_API BinaryParser : public Parser
 {
 public:
     BinaryParser(const std::u32string& name_, Parser* left_, Parser* right_, const std::u32string& info_);
@@ -79,7 +79,7 @@ private:
     Parser* right;
 };
 
-class SequenceParser : public BinaryParser
+class PARSING_API SequenceParser : public BinaryParser
 {
 public:
     SequenceParser(Parser* left_, Parser* right_);
@@ -87,7 +87,7 @@ public:
     void Accept(Visitor& visitor) override;
 };
 
-class AlternativeParser : public BinaryParser
+class PARSING_API AlternativeParser : public BinaryParser
 {
 public:
     AlternativeParser(Parser* left_, Parser* right_);
@@ -95,7 +95,7 @@ public:
     void Accept(Visitor& visitor) override;
 };
 
-class DifferenceParser : public BinaryParser
+class PARSING_API DifferenceParser : public BinaryParser
 {
 public:
     DifferenceParser(Parser* left_, Parser* right_);
@@ -103,7 +103,7 @@ public:
     void Accept(Visitor& visitor) override;
 };
 
-class ExclusiveOrParser : public BinaryParser
+class PARSING_API ExclusiveOrParser : public BinaryParser
 {
 public:
     ExclusiveOrParser(Parser* left_, Parser* right_);
@@ -111,7 +111,7 @@ public:
     void Accept(Visitor& visitor) override;
 };
 
-class IntersectionParser : public BinaryParser
+class PARSING_API IntersectionParser : public BinaryParser
 {
 public:
     IntersectionParser(Parser* left_, Parser* right_);
@@ -119,7 +119,7 @@ public:
     void Accept(Visitor& visitor) override;
 };
 
-class ListParser : public UnaryParser
+class PARSING_API ListParser : public UnaryParser
 {
 public:
     ListParser(Parser* left_, Parser* right_);

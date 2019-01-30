@@ -5,6 +5,7 @@
 
 #ifndef CMAJOR_AST_VISITOR_INCLUDED
 #define CMAJOR_AST_VISITOR_INCLUDED
+#include <cmajor/ast/AstApi.hpp>
 
 namespace cmajor { namespace ast {
 
@@ -183,7 +184,7 @@ class ThisNode;
 class BaseNode;
 class ParenthesizedExpressionNode;
 
-class Visitor
+class AST_API Visitor
 {
 public:
     virtual ~Visitor();

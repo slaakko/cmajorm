@@ -5,6 +5,7 @@
 
 #ifndef CMAJOR_UTIL_HANDLE_INCLUDED
 #define CMAJOR_UTIL_HANDLE_INCLUDED
+#include <cmajor/util/UtilApi.hpp>
 #if defined(_WIN32)
 #include <io.h>
 #elif defined(__linux) || defined(__posix) || defined(__unix)
@@ -15,7 +16,7 @@
 
 namespace cmajor { namespace util {
 
-class Handle
+class UTIL_API Handle
 {
 public:
     Handle(int handle_) : handle(handle_)

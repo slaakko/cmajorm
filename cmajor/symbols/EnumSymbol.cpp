@@ -177,11 +177,11 @@ std::u32string EnumTypeSymbol::Id() const
     return MangledName();
 }
 
-llvm::DIType* EnumTypeSymbol::CreateDIType(Emitter& emitter)
+void* EnumTypeSymbol::CreateDIType(Emitter& emitter)
 {
     uint64_t sizeInBits = SizeInBits(emitter);
     uint32_t alignInBits = AlignmentInBits(emitter);
-    std::vector<llvm::Metadata*> elements;
+    std::vector<void*> elements;
     std::vector<EnumConstantSymbol*> enumConstants = GetEnumConstants();
     for (EnumConstantSymbol* enumConstant : enumConstants)
     {
@@ -204,10 +204,9 @@ llvm::DIType* EnumTypeSymbol::CreateDIType(Emitter& emitter)
                 value = longValue->GetValue();
             }
         }
-        elements.push_back(emitter.DIBuilder()->createEnumerator(ToUtf8(enumConstant->Name()), value));
+        elements.push_back(emitter.CreateDITypeForEnumConstant(ToUtf8(enumConstant->Name()), value));
     }
-    return emitter.DIBuilder()->createEnumerationType(nullptr, ToUtf8(Name()), emitter.GetFile(GetSpan().FileIndex()), GetSpan().LineNumber(), sizeInBits, alignInBits, 
-        emitter.DIBuilder()->getOrCreateArray(elements), underlyingType->GetDIType(emitter), ToUtf8(MangledName())); 
+    return emitter.CreateDITypeForEnumType(ToUtf8(Name()), ToUtf8(MangledName()), GetSpan(), elements, sizeInBits, alignInBits, underlyingType->GetDIType(emitter));
 }
 
 void EnumTypeSymbol::Check()

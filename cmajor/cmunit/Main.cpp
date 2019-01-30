@@ -18,8 +18,8 @@
 #include <cmajor/binder/StatementBinder.hpp>
 #include <cmajor/binder/ControlFlowAnalyzer.hpp>
 #include <cmajor/build/Build.hpp>
-#include <cmajor/emitter/Emitter.hpp>
-#include <cmajor/build/Build.hpp>
+#include <cmajor/codegen/EmittingContext.hpp>
+#include <cmajor/codegen/Interface.hpp>
 #include <cmajor/parser/Project.hpp>
 #include <cmajor/parser/Solution.hpp>
 #include <cmajor/parser/CompileUnit.hpp>
@@ -67,11 +67,10 @@ using namespace cmajor::parser;
 using namespace cmajor::parsing;
 using namespace cmajor::build;
 using namespace cmajor::binder;
-using namespace cmajor::emitter;
 using namespace cmajor::dom;
 using namespace cmajor::xpath;
 
-const char* version = "3.2.0";
+const char* version = "3.3.0";
 
 void PrintHelp()
 {
@@ -122,7 +121,7 @@ void BindStatements(BoundCompileUnit& boundCompileUnit)
     boundCompileUnit.GetCompileUnitNode()->Accept(statementBinder);
 }
 
-void CreateMainUnit(std::vector<std::string>& objectFilePaths, Module& module, EmittingContext& emittingContext, AttributeBinder* attributeBinder, const std::string& testName, 
+void CreateMainUnit(std::vector<std::string>& objectFilePaths, Module& module, cmajor::codegen::EmittingContext& emittingContext, AttributeBinder* attributeBinder, const std::string& testName,
     int32_t numAssertions, const std::string& unitTestFilePath)
 {
     CompileUnitNode mainCompileUnit(Span(), boost::filesystem::path(module.OriginalFilePath()).parent_path().append("__main__.cm").generic_string());
@@ -253,7 +252,7 @@ void TestUnit(FileTable* fileTable, cmajor::ast::Project* project, CompileUnitNo
         cmajor::symbols::MetaInit(rootModule->GetSymbolTable());
         CreateSymbols(rootModule->GetSymbolTable(), testUnit);
         std::vector<std::string> objectFilePaths;
-        EmittingContext emittingContext;
+        cmajor::codegen::EmittingContext emittingContext(GetOptimizationLevel());
         {
             UnitTest unitTest;
             std::unique_ptr<BoundCompileUnit> boundCompileUnit = BindTypes(*rootModule, testUnit, &attributeBinder);
@@ -344,17 +343,18 @@ std::vector<std::pair<std::unique_ptr<CompileUnitNode>, std::string>> SplitIntoT
     CloneContext makeUnitTestUnitContext;
     makeUnitTestUnitContext.SetMakeTestUnits();
     std::unique_ptr<CompileUnitNode> environmentNode(static_cast<CompileUnitNode*>(compileUnit->Clone(makeUnitTestUnitContext)));
-    for (std::unique_ptr<FunctionNode>& unitTestFunction : makeUnitTestUnitContext.UnitTestFunctions())
+    for (FunctionNode* unitTestFunction : makeUnitTestUnitContext.UnitTestFunctions())
     {
         std::string unitTestName = ToUtf8(unitTestFunction->GroupId());
         CloneContext testUnitContext;
         std::pair<std::unique_ptr<CompileUnitNode>, std::string> testUnit = std::make_pair(
             std::unique_ptr<CompileUnitNode>(static_cast<CompileUnitNode*>(environmentNode->Clone(testUnitContext))), unitTestName);
         NamespaceNode* ns = testUnit.first->GlobalNs();
-        FunctionNode* unitTestFun = unitTestFunction.release();
+        FunctionNode* unitTestFun = unitTestFunction;
         ns->AddMember(unitTestFun);
         testUnits.push_back(std::move(testUnit));
     }
+    makeUnitTestUnitContext.UnitTestFunctions().clear();
     return testUnits;
 }
 

@@ -5,11 +5,12 @@
 
 #ifndef CMAJOR_UTIL_MUTEX_INCLUDED
 #define CMAJOR_UTIL_MUTEX_INCLUDED
+#include <cmajor/util/UtilApi.hpp>
 #include <mutex>
 
 namespace cmajor {namespace util {
 
-class MutexOwner
+class UTIL_API MutexOwner
 {
 public:
     MutexOwner(char id_);
@@ -22,7 +23,7 @@ private:
 
 class Mutex;
 
-class OwnerGuard
+class UTIL_API OwnerGuard
 {
 public:
     OwnerGuard(Mutex& mtx_, MutexOwner& owner_);
@@ -32,7 +33,7 @@ private:
     MutexOwner& owner;
 };
 
-class LockGuard
+class UTIL_API LockGuard
 {
 public:
     LockGuard(Mutex& mtx_, MutexOwner& owner_);
@@ -45,7 +46,7 @@ private:
     bool locked;
 };
 
-class Mutex
+class UTIL_API Mutex
 {
 public:
     Mutex(char id_);

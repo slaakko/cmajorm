@@ -5,6 +5,7 @@
 
 #ifndef CMAJOR_PARSING_VISITOR_INCLUDED
 #define CMAJOR_PARSING_VISITOR_INCLUDED
+#include <cmajor/parsing/ParsingApi.hpp>
 
 namespace cmajor { namespace parsing {
 
@@ -82,7 +83,7 @@ class KeywordParser;
 class KeywordListParser;
 class RangeParser;
 
-class Visitor
+class PARSING_API Visitor
 {
 public:
     virtual void Visit(CharParser& parser) {}

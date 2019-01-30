@@ -58,8 +58,8 @@ ClassTypeConversion::ClassTypeConversion(const std::u32string& name_, Conversion
 void ClassTypeConversion::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span)
 {
     emitter.SetCurrentDebugLocation(span);
-    llvm::Value* value = emitter.Stack().Pop();
-    emitter.Stack().Push(emitter.Builder().CreateBitCast(value, targetType->IrType(emitter)));
+    void* value = emitter.Stack().Pop();
+    emitter.Stack().Push(emitter.CreateBitCast(value, targetType->IrType(emitter)));
 }
 
 class NullPtrToPtrConversion : public FunctionSymbol
@@ -90,8 +90,8 @@ NullPtrToPtrConversion::NullPtrToPtrConversion(TypeSymbol* nullPtrType_, TypeSym
 void NullPtrToPtrConversion::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span)
 {
     emitter.SetCurrentDebugLocation(span);
-    llvm::Value* value = emitter.Stack().Pop();
-    emitter.Stack().Push(emitter.Builder().CreateBitCast(value, targetPointerType->IrType(emitter)));
+    void* value = emitter.Stack().Pop();
+    emitter.Stack().Push(emitter.CreateBitCast(value, targetPointerType->IrType(emitter)));
 }
 
 std::unique_ptr<Value> NullPtrToPtrConversion::ConvertValue(const std::unique_ptr<Value>& value) const
@@ -134,8 +134,8 @@ VoidPtrToPtrConversion::VoidPtrToPtrConversion(TypeSymbol* voidPtrType_, TypeSym
 void VoidPtrToPtrConversion::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span)
 {
     emitter.SetCurrentDebugLocation(span);
-    llvm::Value* value = emitter.Stack().Pop();
-    emitter.Stack().Push(emitter.Builder().CreateBitCast(value, targetPointerType->IrType(emitter)));
+    void* value = emitter.Stack().Pop();
+    emitter.Stack().Push(emitter.CreateBitCast(value, targetPointerType->IrType(emitter)));
 }
 
 class PtrToVoidPtrConversion : public FunctionSymbol
@@ -165,8 +165,8 @@ PtrToVoidPtrConversion::PtrToVoidPtrConversion(TypeSymbol* sourcePtrType_, TypeS
 void PtrToVoidPtrConversion::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span)
 {
     emitter.SetCurrentDebugLocation(span);
-    llvm::Value* value = emitter.Stack().Pop();
-    emitter.Stack().Push(emitter.Builder().CreateBitCast(value, voidPtrType->IrType(emitter)));
+    void* value = emitter.Stack().Pop();
+    emitter.Stack().Push(emitter.CreateBitCast(value, voidPtrType->IrType(emitter)));
 }
 
 class PtrToULongConversion : public FunctionSymbol
@@ -196,8 +196,8 @@ PtrToULongConversion::PtrToULongConversion(TypeSymbol* ptrType_, TypeSymbol* ulo
 void PtrToULongConversion::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span)
 {
     emitter.SetCurrentDebugLocation(span);
-    llvm::Value* value = emitter.Stack().Pop();
-    emitter.Stack().Push(emitter.Builder().CreatePtrToInt(value, ulongType->IrType(emitter)));
+    void* value = emitter.Stack().Pop();
+    emitter.Stack().Push(emitter.CreatePtrToInt(value, ulongType->IrType(emitter)));
 }
 
 class ULongToVoidPtrConversion : public FunctionSymbol
@@ -227,8 +227,8 @@ ULongToVoidPtrConversion::ULongToVoidPtrConversion(TypeSymbol* ulongType_, TypeS
 void ULongToVoidPtrConversion::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span)
 {
     emitter.SetCurrentDebugLocation(span);
-    llvm::Value* value = emitter.Stack().Pop();
-    emitter.Stack().Push(emitter.Builder().CreateIntToPtr(value, voidPtrType->IrType(emitter)));
+    void* value = emitter.Stack().Pop();
+    emitter.Stack().Push(emitter.CreateIntToPtr(value, voidPtrType->IrType(emitter)));
 }
 
 BoundCompileUnit::BoundCompileUnit(Module& module_, CompileUnitNode* compileUnitNode_, AttributeBinder* attributeBinder_) :

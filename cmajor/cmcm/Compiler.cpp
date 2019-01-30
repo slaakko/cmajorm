@@ -179,7 +179,7 @@ void AddWarningsTo(cmajor::dom::Element* diagnosticsElement, cmajor::symbols::Mo
     }
 }
 
-const char* version = "3.2.0";
+const char* version = "3.3.0";
 
 extern "C" int Compile(const char16_t* compileXmlRequest)
 {

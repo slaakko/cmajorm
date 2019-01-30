@@ -16,15 +16,15 @@ GenObject::~GenObject()
 {
 }
 
-void LlvmValue::Load(Emitter& emitter, OperationFlags flags)
-{ 
-    emitter.Stack().Push(value); 
+void NativeValue::Load(Emitter& emitter, OperationFlags flags)
+{
+    emitter.Stack().Push(value);
 }
 
-void LlvmValue::Store(Emitter& emitter, OperationFlags flags)
-{ 
-    llvm::Value* val = emitter.Stack().Pop();
-    emitter.Builder().CreateStore(val, value);
+void NativeValue::Store(Emitter& emitter, OperationFlags flags)
+{
+    void* val = emitter.Stack().Pop();
+    emitter.CreateStore(val, value);
 }
 
 } } // namespace cmajor::ir

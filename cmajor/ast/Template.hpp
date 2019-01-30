@@ -12,7 +12,7 @@ namespace cmajor { namespace ast {
 
 class IdentifierNode;
 
-class TemplateIdNode : public Node
+class AST_API TemplateIdNode : public Node
 {
 public:
     TemplateIdNode(const Span& span_);
@@ -30,7 +30,7 @@ private:
     NodeList<Node> templateArguments;
 };
 
-class TemplateParameterNode : public Node
+class AST_API TemplateParameterNode : public Node
 {
 public:
     TemplateParameterNode(const Span& span_);

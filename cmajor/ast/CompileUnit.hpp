@@ -6,10 +6,11 @@
 #ifndef CMAJOR_AST_COMPILE_UNIT_INCLUDED
 #define CMAJOR_AST_COMPILE_UNIT_INCLUDED
 #include <cmajor/ast/Namespace.hpp>
+#include <cmajor/common/Common.hpp>
 
 namespace cmajor { namespace ast {
 
-class CompileUnitNode : public Node
+class AST_API CompileUnitNode : public Node, public cmajor::common::ColumnSpanProvider
 {
 public:
     CompileUnitNode(const Span& span_);
@@ -21,7 +22,7 @@ public:
     NamespaceNode* GlobalNs() { return globalNs.get(); }
     void ComputeLineStarts(const std::u32string& sourceFileContent);
     const std::vector<int32_t>& LineStarts() { return lineStarts; }
-    int GetColumn(const Span& span) const;
+    int GetColumn(const Span& span) const override;
     void SetSynthesizedUnit() { isSynthesizedUnit = true; }
     bool IsSynthesizedUnit() const { return isSynthesizedUnit; }
 private:

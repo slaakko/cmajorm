@@ -10,7 +10,7 @@
 
 namespace cmajor { namespace symbols {
 
-class ArrayTypeSymbol : public TypeSymbol
+class SYMBOLS_API ArrayTypeSymbol : public TypeSymbol
 {
 public:
     ArrayTypeSymbol(const Span& span_, const std::u32string& name_);
@@ -18,9 +18,9 @@ public:
     void Write(SymbolWriter& writer) override;
     void Read(SymbolReader& reader) override;
     void EmplaceType(TypeSymbol* typeSymbol, int index) override;
-    llvm::Type* IrType(Emitter& emitter) override;
-    llvm::Constant* CreateDefaultIrValue(Emitter& emitter) override;
-    llvm::DIType* CreateDIType(Emitter& emitter) override;
+    void* IrType(Emitter& emitter) override;
+    void* CreateDefaultIrValue(Emitter& emitter) override;
+    void* CreateDIType(Emitter& emitter) override;
     bool IsArrayType() const override { return true; }
     TypeSymbol* ElementType() const { return elementType; }
     int64_t Size() const { return size; }
@@ -33,7 +33,7 @@ private:
     int64_t size;
 };
 
-class ArrayLengthFunction : public FunctionSymbol
+class SYMBOLS_API ArrayLengthFunction : public FunctionSymbol
 {
 public:
     ArrayLengthFunction(const Span& span_, const std::u32string& name_);
@@ -51,7 +51,7 @@ private:
     ArrayTypeSymbol* arrayType;
 };
 
-class ArrayBeginFunction : public FunctionSymbol
+class SYMBOLS_API ArrayBeginFunction : public FunctionSymbol
 {
 public:
     ArrayBeginFunction(const Span& span_, const std::u32string& name_);
@@ -67,7 +67,7 @@ private:
     ArrayTypeSymbol* arrayType;
 };
 
-class ArrayEndFunction : public FunctionSymbol
+class SYMBOLS_API ArrayEndFunction : public FunctionSymbol
 {
 public:
     ArrayEndFunction(const Span& span_, const std::u32string& name_);
@@ -83,7 +83,7 @@ private:
     ArrayTypeSymbol* arrayType;
 };
 
-class ArrayCBeginFunction : public FunctionSymbol
+class SYMBOLS_API ArrayCBeginFunction : public FunctionSymbol
 {
 public:
     ArrayCBeginFunction(const Span& span_, const std::u32string& name_);
@@ -99,7 +99,7 @@ private:
     ArrayTypeSymbol* arrayType;
 };
 
-class ArrayCEndFunction : public FunctionSymbol
+class SYMBOLS_API ArrayCEndFunction : public FunctionSymbol
 {
 public:
     ArrayCEndFunction(const Span& span_, const std::u32string& name_);
@@ -115,7 +115,7 @@ private:
     ArrayTypeSymbol* arrayType;
 };
 
-class ArrayTypeDefaultConstructor : public FunctionSymbol
+class SYMBOLS_API ArrayTypeDefaultConstructor : public FunctionSymbol
 {
 public:
     ArrayTypeDefaultConstructor(ArrayTypeSymbol* arrayType_, FunctionSymbol* elementTypeDefaultConstructor_, const Span& span_);
@@ -129,7 +129,7 @@ private:
     FunctionSymbol* elementTypeDefaultConstructor;
 };
 
-class ArrayTypeCopyConstructor : public FunctionSymbol
+class SYMBOLS_API ArrayTypeCopyConstructor : public FunctionSymbol
 {
 public:
     ArrayTypeCopyConstructor(ArrayTypeSymbol* arrayType_, FunctionSymbol* elementTypeCopyConstructor_, const Span& span_);
@@ -143,7 +143,7 @@ private:
     FunctionSymbol* elementTypeCopyConstructor;
 };
 
-class ArrayTypeMoveConstructor : public FunctionSymbol
+class SYMBOLS_API ArrayTypeMoveConstructor : public FunctionSymbol
 {
 public:
     ArrayTypeMoveConstructor(ArrayTypeSymbol* arrayType_, FunctionSymbol* elementTypeMoveConstructor_, const Span& span_);
@@ -157,7 +157,7 @@ private:
     FunctionSymbol* elementTypeMoveConstructor;
 };
 
-class ArrayTypeCopyAssignment : public FunctionSymbol
+class SYMBOLS_API ArrayTypeCopyAssignment : public FunctionSymbol
 {
 public:
     ArrayTypeCopyAssignment(ArrayTypeSymbol* arrayType_, FunctionSymbol* elementTypeCopyAssignment_, const Span& span_);
@@ -171,7 +171,7 @@ private:
     FunctionSymbol* elementTypeCopyAssignment;
 };
 
-class ArrayTypeMoveAssignment : public FunctionSymbol
+class SYMBOLS_API ArrayTypeMoveAssignment : public FunctionSymbol
 {
 public:
     ArrayTypeMoveAssignment(ArrayTypeSymbol* arrayType_, FunctionSymbol* elementTypeMoveAssignment_, const Span& span_);
@@ -185,7 +185,7 @@ private:
     FunctionSymbol* elementTypeMoveAssignment;
 };
 
-class ArrayTypeElementAccess : public FunctionSymbol
+class SYMBOLS_API ArrayTypeElementAccess : public FunctionSymbol
 {
 public:
     ArrayTypeElementAccess(ArrayTypeSymbol* arrayType_, const Span& span_);

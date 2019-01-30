@@ -5,8 +5,8 @@
 
 #ifndef CMAJOR_IR_GEN_OBJECT_INCLUDED
 #define CMAJOR_IR_GEN_OBJECT_INCLUDED
+#include <cmajor/ir/IrApi.hpp>
 #include <stdint.h>
-#include <llvm/IR/Value.h>
 
 namespace cmajor { namespace ir {
 
@@ -44,7 +44,7 @@ inline OperationFlags SetDerefCount(OperationFlags flags, uint8_t n)
     return OperationFlags(flags | OperationFlags(n << 8));
 }
 
-class GenObject
+class IR_API GenObject
 {
 public:
     GenObject();
@@ -57,14 +57,14 @@ private:
     void* type;
 };
 
-class LlvmValue : public GenObject
+class IR_API NativeValue : public GenObject
 {
 public:
-    LlvmValue(llvm::Value* value_) : value(value_) {}
+    NativeValue(void* value_) : value(value_) {}
     void Load(Emitter& emitter, OperationFlags flags) override;
     void Store(Emitter& emitter, OperationFlags flags) override;
 private:
-    llvm::Value* value;
+    void* value;
 };
 
 } } // namespace cmajor::ir

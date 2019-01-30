@@ -14,7 +14,7 @@ class FunctionGroupSymbol;
 class ConceptGroupSymbol;
 class ClassGroupTypeSymbol;
 
-class ContainerSymbol : public Symbol
+class SYMBOLS_API ContainerSymbol : public Symbol
 {
 public:
     ContainerSymbol(SymbolType symbolType_, const Span& span_, const std::u32string& name_);
@@ -44,7 +44,7 @@ private:
     ClassGroupTypeSymbol* MakeClassGroupTypeSymbol(const std::u32string& groupName, const Span& span);
 };
 
-class DeclarationBlock : public ContainerSymbol
+class SYMBOLS_API DeclarationBlock : public ContainerSymbol
 {
 public:
     DeclarationBlock(const Span& span_, const std::u32string& name_);

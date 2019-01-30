@@ -5,6 +5,7 @@
 
 #ifndef CMAJOR_SYMBOLS_SCOPE_INCLUDED
 #define CMAJOR_SYMBOLS_SCOPE_INCLUDED
+#include <cmajor/symbols/SymbolsApi.hpp>
 #include <cmajor/ast/Namespace.hpp>
 #include <cmajor/parsing/Scanner.hpp>
 #include <unordered_map>
@@ -44,7 +45,7 @@ inline ScopeLookup operator~(ScopeLookup subject)
     return ScopeLookup(~uint8_t(subject));
 }
 
-class Scope
+class SYMBOLS_API Scope
 {
 public:
     virtual ~Scope();
@@ -52,7 +53,7 @@ public:
     virtual Symbol* Lookup(const std::u32string& name, ScopeLookup lookup) const = 0;
 };
 
-class ContainerScope : public Scope
+class SYMBOLS_API ContainerScope : public Scope
 {
 public:
     ContainerScope();
@@ -77,7 +78,7 @@ private:
     std::unordered_map<std::u32string, Symbol*> symbolMap;
 };
 
-class FileScope : public Scope
+class SYMBOLS_API FileScope : public Scope
 {
 public:
     FileScope(Module* module_);

@@ -9,7 +9,7 @@
 
 namespace cmajor { namespace symbols {
 
-class TemplateParameterSymbol : public TypeSymbol
+class SYMBOLS_API TemplateParameterSymbol : public TypeSymbol
 {
 public:
     TemplateParameterSymbol(const Span& span_, const std::u32string& name_);
@@ -17,8 +17,8 @@ public:
     void Write(SymbolWriter& writer);
     void Read(SymbolReader& reader);
     void EmplaceType(TypeSymbol* typeSymbol, int index) override;
-    llvm::Type* IrType(Emitter& emitter) override { Assert(false, "tried to get ir type of template parameter"); return nullptr; }
-    llvm::Constant* CreateDefaultIrValue(Emitter& emitter) override { Assert(false, "tried to create defualt ir value of template parameter"); return nullptr; }
+    void* IrType(Emitter& emitter) override { Assert(false, "tried to get ir type of template parameter"); return nullptr; }
+    void* CreateDefaultIrValue(Emitter& emitter) override { Assert(false, "tried to create defualt ir value of template parameter"); return nullptr; }
     TypeSymbol* Unify(TypeSymbol* type, const Span& span) override;
     bool ContainsTemplateParameter() const override { return true; }
     bool HasDefault() const { return hasDefault; }
@@ -33,7 +33,7 @@ private:
     TypeSymbol* defaultType;
 };
 
-class BoundTemplateParameterSymbol : public Symbol
+class SYMBOLS_API BoundTemplateParameterSymbol : public Symbol
 {
 public:
     BoundTemplateParameterSymbol(const Span& span_, const std::u32string& name_);

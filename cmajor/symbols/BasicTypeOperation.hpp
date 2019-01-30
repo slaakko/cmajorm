@@ -16,7 +16,6 @@
 #include <cmajor/symbols/Value.hpp>
 #include <cmajor/util/Unicode.hpp>
 #include <cmajor/ir/Emitter.hpp>
-#include <llvm/IR/Constants.h>
 
 namespace cmajor { namespace symbols {
 
@@ -25,216 +24,216 @@ using namespace cmajor::unicode;
 struct BasicTypeNot
 {
     static const char32_t* GroupName() { return U"operator!"; }
-    static llvm::Value* Generate(llvm::IRBuilder<>& builder, llvm::Value* arg) { return builder.CreateNot(arg); }
+    static void* Generate(Emitter& emitter, void* arg) { return emitter.CreateNot(arg); }
 };
 
 struct BasicTypeUnaryPlus
 {
     static const char32_t* GroupName() { return U"operator+"; }
-    static llvm::Value* Generate(llvm::IRBuilder<>& builder, llvm::Value* arg) { return arg; }
+    static void* Generate(Emitter& emitter, void* arg) { return arg; }
 };
 
 struct BasicTypeIntUnaryMinus
 {
     static const char32_t* GroupName() { return U"operator-"; }
-    static llvm::Value* Generate(llvm::IRBuilder<>& builder, llvm::Value* arg) { return builder.CreateNeg(arg); }
+    static void* Generate(Emitter& emitter, void* arg) { return emitter.CreateNeg(arg); }
 };
 
 struct BasicTypeFloatUnaryMinus
 {
     static const char32_t* GroupName() { return U"operator-"; }
-    static llvm::Value* Generate(llvm::IRBuilder<>& builder, llvm::Value* arg) { return builder.CreateFNeg(arg); }
+    static void* Generate(Emitter& emitter, void* arg) { return emitter.CreateFNeg(arg); }
 };
 
 struct BasicTypeComplement
 {
     static const char32_t* GroupName() { return U"operator~"; }
-    static llvm::Value* Generate(llvm::IRBuilder<>& builder, llvm::Value* arg) { return builder.CreateNot(arg); }
+    static void* Generate(Emitter& emitter, void* arg) { return emitter.CreateNot(arg); }
 };
 
 struct BasicTypeAdd
 {
     static const char32_t* GroupName() { return U"operator+"; }
-    static llvm::Value* Generate(llvm::IRBuilder<>& builder, llvm::Value* left, llvm::Value* right) { return builder.CreateAdd(left, right); }
+    static void* Generate(Emitter& emitter, void* left, void* right) { return emitter.CreateAdd(left, right); }
 };
 
 struct BasicTypeFAdd
 {
     static const char32_t* GroupName() { return U"operator+"; }
-    static llvm::Value* Generate(llvm::IRBuilder<>& builder, llvm::Value* left, llvm::Value* right) { return builder.CreateFAdd(left, right); }
+    static void* Generate(Emitter& emitter, void* left, void* right) { return emitter.CreateFAdd(left, right); }
 };
 
 struct BasicTypeSub
 {
     static const char32_t* GroupName() { return U"operator-"; }
-    static llvm::Value* Generate(llvm::IRBuilder<>& builder, llvm::Value* left, llvm::Value* right) { return builder.CreateSub(left, right); }
+    static void* Generate(Emitter& emitter, void* left, void* right) { return emitter.CreateSub(left, right); }
 };
 
 struct BasicTypeFSub
 {
     static const char32_t* GroupName() { return U"operator-"; }
-    static llvm::Value* Generate(llvm::IRBuilder<>& builder, llvm::Value* left, llvm::Value* right) { return builder.CreateFSub(left, right); }
+    static void* Generate(Emitter& emitter, void* left, void* right) { return emitter.CreateFSub(left, right); }
 };
 
 struct BasicTypeMul
 {
     static const char32_t* GroupName() { return U"operator*"; }
-    static llvm::Value* Generate(llvm::IRBuilder<>& builder, llvm::Value* left, llvm::Value* right) { return builder.CreateMul(left, right); }
+    static void* Generate(Emitter& emitter, void* left, void* right) { return emitter.CreateMul(left, right); }
 };
 
 struct BasicTypeFMul
 {
     static const char32_t* GroupName() { return U"operator*"; }
-    static llvm::Value* Generate(llvm::IRBuilder<>& builder, llvm::Value* left, llvm::Value* right) { return builder.CreateFMul(left, right); }
+    static void* Generate(Emitter& emitter, void* left, void* right) { return emitter.CreateFMul(left, right); }
 };
 
 struct BasicTypeUDiv
 {
     static const char32_t* GroupName() { return U"operator/"; }
-    static llvm::Value* Generate(llvm::IRBuilder<>& builder, llvm::Value* left, llvm::Value* right) { return builder.CreateUDiv(left, right); }
+    static void* Generate(Emitter& emitter, void* left, void* right) { return emitter.CreateUDiv(left, right); }
 };
 
 struct BasicTypeSDiv
 {
     static const char32_t* GroupName() { return U"operator/"; }
-    static llvm::Value* Generate(llvm::IRBuilder<>& builder, llvm::Value* left, llvm::Value* right) { return builder.CreateSDiv(left, right); }
+    static void* Generate(Emitter& emitter, void* left, void* right) { return emitter.CreateSDiv(left, right); }
 };
 
 struct BasicTypeFDiv
 {
     static const char32_t* GroupName() { return U"operator/"; }
-    static llvm::Value* Generate(llvm::IRBuilder<>& builder, llvm::Value* left, llvm::Value* right) { return builder.CreateFDiv(left, right); }
+    static void* Generate(Emitter& emitter, void* left, void* right) { return emitter.CreateFDiv(left, right); }
 };
 
 struct BasicTypeURem
 {
     static const char32_t* GroupName() { return U"operator%"; }
-    static llvm::Value* Generate(llvm::IRBuilder<>& builder, llvm::Value* left, llvm::Value* right) { return builder.CreateURem(left, right); }
+    static void* Generate(Emitter& emitter, void* left, void* right) { return emitter.CreateURem(left, right); }
 };
 
 struct BasicTypeSRem
 {
     static const char32_t* GroupName() { return U"operator%"; }
-    static llvm::Value* Generate(llvm::IRBuilder<>& builder, llvm::Value* left, llvm::Value* right) { return builder.CreateSRem(left, right); }
+    static void* Generate(Emitter& emitter, void* left, void* right) { return emitter.CreateSRem(left, right); }
 };
 
 struct BasicTypeAnd
 {
     static const char32_t* GroupName() { return U"operator&"; }
-    static llvm::Value* Generate(llvm::IRBuilder<>& builder, llvm::Value* left, llvm::Value* right) { return builder.CreateAnd(left, right); }
+    static void* Generate(Emitter& emitter, void* left, void* right) { return emitter.CreateAnd(left, right); }
 };
 
 struct BasicTypeOr
 {
     static const char32_t* GroupName() { return U"operator|"; }
-    static llvm::Value* Generate(llvm::IRBuilder<>& builder, llvm::Value* left, llvm::Value* right) { return builder.CreateOr(left, right); }
+    static void* Generate(Emitter& emitter, void* left, void* right) { return emitter.CreateOr(left, right); }
 };
 
 struct BasicTypeXor
 {
     static const char32_t* GroupName() { return U"operator^"; }
-    static llvm::Value* Generate(llvm::IRBuilder<>& builder, llvm::Value* left, llvm::Value* right) { return builder.CreateXor(left, right); }
+    static void* Generate(Emitter& emitter, void* left, void* right) { return emitter.CreateXor(left, right); }
 };
 
 struct BasicTypeShl
 {
     static const char32_t* GroupName() { return U"operator<<"; }
-    static llvm::Value* Generate(llvm::IRBuilder<>& builder, llvm::Value* left, llvm::Value* right) { return builder.CreateShl(left, right); }
+    static void* Generate(Emitter& emitter, void* left, void* right) { return emitter.CreateShl(left, right); }
 };
 
 struct BasicTypeAShr
 {
     static const char32_t* GroupName() { return U"operator>>"; }
-    static llvm::Value* Generate(llvm::IRBuilder<>& builder, llvm::Value* left, llvm::Value* right) { return builder.CreateAShr(left, right); }
+    static void* Generate(Emitter& emitter, void* left, void* right) { return emitter.CreateAShr(left, right); }
 };
 
 struct BasicTypeLShr
 {
     static const char32_t* GroupName() { return U"operator>>"; }
-    static llvm::Value* Generate(llvm::IRBuilder<>& builder, llvm::Value* left, llvm::Value* right) { return builder.CreateLShr(left, right); }
+    static void* Generate(Emitter& emitter, void* left, void* right) { return emitter.CreateLShr(left, right); }
 };
 
 struct DefaultInt1
 {
-    static llvm::Value* Generate(llvm::IRBuilder<>& builder) { return builder.getInt1(false); }
+    static void* Generate(Emitter& emitter) { return emitter.CreateIrValueForBool(false); }
     static std::unique_ptr<Value> ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span) { return std::unique_ptr<Value>(new BoolValue(span, false)); }
 };
 
 struct DefaultSInt8
 {
-    static llvm::Value* Generate(llvm::IRBuilder<>& builder) { return builder.getInt8(0); }
+    static void* Generate(Emitter& emitter) { return emitter.CreateIrValueForSByte(0); }
     static std::unique_ptr<Value> ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span) { return std::unique_ptr<Value>(new SByteValue(span, 0)); }
 };
 
 struct DefaultUInt8
 {
-    static llvm::Value* Generate(llvm::IRBuilder<>& builder) { return builder.getInt8(0); }
+    static void* Generate(Emitter& emitter) { return emitter.CreateIrValueForByte(0); }
     static std::unique_ptr<Value> ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span) { return std::unique_ptr<Value>(new ByteValue(span, 0)); }
 };
 
 struct DefaultSInt16
 {
-    static llvm::Value* Generate(llvm::IRBuilder<>& builder) { return builder.getInt16(0); }
+    static void* Generate(Emitter& emitter) { return emitter.CreateIrValueForShort(0); }
     static std::unique_ptr<Value> ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span) { return std::unique_ptr<Value>(new ShortValue(span, 0)); }
 };
 
 struct DefaultUInt16
 {
-    static llvm::Value* Generate(llvm::IRBuilder<>& builder) { return builder.getInt16(0); }
+    static void* Generate(Emitter& emitter) { return emitter.CreateIrValueForUShort(0); }
     static std::unique_ptr<Value> ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span) { return std::unique_ptr<Value>(new UShortValue(span, 0)); }
 };
 
 struct DefaultSInt32
 {
-    static llvm::Value* Generate(llvm::IRBuilder<>& builder) { return builder.getInt32(0); }
+    static void* Generate(Emitter& emitter) { return emitter.CreateIrValueForInt(0); }
     static std::unique_ptr<Value> ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span) { return std::unique_ptr<Value>(new IntValue(span, 0)); }
 };
 
 struct DefaultUInt32
 {
-    static llvm::Value* Generate(llvm::IRBuilder<>& builder) { return builder.getInt32(0); }
+    static void* Generate(Emitter& emitter) { return emitter.CreateIrValueForUInt(0); }
     static std::unique_ptr<Value> ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span) { return std::unique_ptr<Value>(new UIntValue(span, 0)); }
 };
 
 struct DefaultSInt64
 {
-    static llvm::Value* Generate(llvm::IRBuilder<>& builder) { return builder.getInt64(0); }
+    static void* Generate(Emitter& emitter) { return emitter.CreateIrValueForLong(0); }
     static std::unique_ptr<Value> ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span) { return std::unique_ptr<Value>(new LongValue(span, 0)); }
 };
 
 struct DefaultUInt64
 {
-    static llvm::Value* Generate(llvm::IRBuilder<>& builder) { return builder.getInt64(0); }
+    static void* Generate(Emitter& emitter) { return emitter.CreateIrValueForULong(0); }
     static std::unique_ptr<Value> ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span) { return std::unique_ptr<Value>(new ULongValue(span, 0)); }
 };
 
 struct DefaultFloat
 {
-    static llvm::Value* Generate(llvm::IRBuilder<>& builder) { return llvm::ConstantFP::get(llvm::Type::getFloatTy(builder.getContext()), 0.0); }
+    static void* Generate(Emitter& emitter) { return emitter.CreateIrValueForFloat(0.0); }
     static std::unique_ptr<Value> ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span) { return std::unique_ptr<Value>(new FloatValue(span, 0.0)); }
 };
 
 struct DefaultDouble
 {
-    static llvm::Value* Generate(llvm::IRBuilder<>& builder) { return llvm::ConstantFP::get(llvm::Type::getDoubleTy(builder.getContext()), 0.0); }
+    static void* Generate(Emitter& emitter) { return emitter.CreateIrValueForDouble(0.0); }
     static std::unique_ptr<Value> ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span) { return std::unique_ptr<Value>(new DoubleValue(span, 0.0)); }
 };
 
 struct DefaultChar
 {
-    static llvm::Value* Generate(llvm::IRBuilder<>& builder) { return builder.getInt8(0); }
+    static void* Generate(Emitter& emitter) { return emitter.CreateIrValueForChar('\0'); }
     static std::unique_ptr<Value> ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span) { return std::unique_ptr<Value>(new CharValue(span, '\0')); }
 };
 
 struct DefaultWChar
 {
-    static llvm::Value* Generate(llvm::IRBuilder<>& builder) { return builder.getInt16(0); }
+    static void* Generate(Emitter& emitter) { return emitter.CreateIrValueForWChar('\0'); }
     static std::unique_ptr<Value> ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span) { return std::unique_ptr<Value>(new WCharValue(span, '\0')); }
 };
 
 struct DefaultUChar
 {
-    static llvm::Value* Generate(llvm::IRBuilder<>& builder) { return builder.getInt32(0); }
+    static void* Generate(Emitter& emitter) { return emitter.CreateIrValueForUChar('\0'); }
     static std::unique_ptr<Value> ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span) { return std::unique_ptr<Value>(new UCharValue(span, '\0')); }
 };
 
@@ -243,7 +242,7 @@ struct BasicTypeIntegerEquality
     static const char32_t* GroupName() { return U"operator=="; }
     static bool IsIntegerOpEqual() { return true; }
     static bool IsFloatingOpEqual() { return false; }
-    static llvm::Value* Generate(llvm::IRBuilder<>& builder, llvm::Value* left, llvm::Value* right) { return builder.CreateICmpEQ(left, right); }
+    static void* Generate(Emitter& emitter, void* left, void* right) { return emitter.CreateICmpEQ(left, right); }
 };
 
 struct BasicTypeFloatingEquality
@@ -251,7 +250,7 @@ struct BasicTypeFloatingEquality
     static const char32_t* GroupName() { return U"operator=="; }
     static bool IsIntegerOpEqual() { return false; }
     static bool IsFloatingOpEqual() { return true;  }
-    static llvm::Value* Generate(llvm::IRBuilder<>& builder, llvm::Value* left, llvm::Value* right) { return builder.CreateFCmpOEQ(left, right); }
+    static void* Generate(Emitter& emitter, void* left, void* right) { return emitter.CreateFCmpOEQ(left, right); }
 };
 
 struct BasicTypeUnsignedIntegerLessThan
@@ -259,7 +258,7 @@ struct BasicTypeUnsignedIntegerLessThan
     static const char32_t* GroupName() { return U"operator<"; }
     static bool IsIntegerOpEqual() { return false; }
     static bool IsFloatingOpEqual() { return false; }
-    static llvm::Value* Generate(llvm::IRBuilder<>& builder, llvm::Value* left, llvm::Value* right) { return builder.CreateICmpULT(left, right); }
+    static void* Generate(Emitter& emitter, void* left, void* right) { return emitter.CreateICmpULT(left, right); }
 };
 
 struct BasicTypeSignedIntegerLessThan
@@ -267,7 +266,7 @@ struct BasicTypeSignedIntegerLessThan
     static const char32_t* GroupName() { return U"operator<"; }
     static bool IsIntegerOpEqual() { return false; }
     static bool IsFloatingOpEqual() { return false; }
-    static llvm::Value* Generate(llvm::IRBuilder<>& builder, llvm::Value* left, llvm::Value* right) { return builder.CreateICmpSLT(left, right); }
+    static void* Generate(Emitter& emitter, void* left, void* right) { return emitter.CreateICmpSLT(left, right); }
 };
 
 struct BasicTypeFloatingLessThan
@@ -275,57 +274,57 @@ struct BasicTypeFloatingLessThan
     static const char32_t* GroupName() { return U"operator<"; }
     static bool IsIntegerOpEqual() { return false; }
     static bool IsFloatingOpEqual() { return false; }
-    static llvm::Value* Generate(llvm::IRBuilder<>& builder, llvm::Value* left, llvm::Value* right) { return builder.CreateFCmpOLT(left, right); }
+    static void* Generate(Emitter& emitter, void* left, void* right) { return emitter.CreateFCmpOLT(left, right); }
 };
 
 struct BasicTypeSignExtension
 {
-    static llvm::Value* Generate(llvm::IRBuilder<>& builder, llvm::Value* operand, llvm::Type* destinationType) { return builder.CreateSExt(operand, destinationType); }
+    static void* Generate(Emitter& emitter, void* operand, void* destinationType) { return emitter.CreateSExt(operand, destinationType); }
 };
 
 struct BasicTypeZeroExtension
 {
-    static llvm::Value* Generate(llvm::IRBuilder<>& builder, llvm::Value* operand, llvm::Type* destinationType) { return builder.CreateZExt(operand, destinationType); }
+    static void* Generate(Emitter& emitter, void* operand, void* destinationType) { return emitter.CreateZExt(operand, destinationType); }
 };
 
 struct BasicTypeFloatingExtension
 {
-    static llvm::Value* Generate(llvm::IRBuilder<>& builder, llvm::Value* operand, llvm::Type* destinationType) { return builder.CreateFPExt(operand, destinationType); }
+    static void* Generate(Emitter& emitter, void* operand, void* destinationType) { return emitter.CreateFPExt(operand, destinationType); }
 };
 
 struct BasicTypeTruncation
 {
-    static llvm::Value* Generate(llvm::IRBuilder<>& builder, llvm::Value* operand, llvm::Type* destinationType) { return builder.CreateTrunc(operand, destinationType); }
+    static void* Generate(Emitter& emitter, void* operand, void* destinationType) { return emitter.CreateTrunc(operand, destinationType); }
 };
 
 struct BasicTypeFloatingTruncation
 {
-    static llvm::Value* Generate(llvm::IRBuilder<>& builder, llvm::Value* operand, llvm::Type* destinationType) { return builder.CreateFPTrunc(operand, destinationType); }
+    static void* Generate(Emitter& emitter, void* operand, void* destinationType) { return emitter.CreateFPTrunc(operand, destinationType); }
 };
 
 struct BasicTypeBitCast
 {
-    static llvm::Value* Generate(llvm::IRBuilder<>& builder, llvm::Value* operand, llvm::Type* destinationType) { return builder.CreateBitCast(operand, destinationType); }
+    static void* Generate(Emitter& emitter, void* operand, void* destinationType) { return emitter.CreateBitCast(operand, destinationType); }
 };
 
 struct BasicTypeUnsignedIntToFloating
 {
-    static llvm::Value* Generate(llvm::IRBuilder<>& builder, llvm::Value* operand, llvm::Type* destinationType) { return builder.CreateUIToFP(operand, destinationType); }
+    static void* Generate(Emitter& emitter, void* operand, void* destinationType) { return emitter.CreateUIToFP(operand, destinationType); }
 };
 
 struct BasicTypeSignedIntToFloating
 {
-    static llvm::Value* Generate(llvm::IRBuilder<>& builder, llvm::Value* operand, llvm::Type* destinationType) { return builder.CreateSIToFP(operand, destinationType); }
+    static void* Generate(Emitter& emitter, void* operand, void* destinationType) { return emitter.CreateSIToFP(operand, destinationType); }
 };
 
 struct BasicTypeFloatingToUnsignedInt
 {
-    static llvm::Value* Generate(llvm::IRBuilder<>& builder, llvm::Value* operand, llvm::Type* destinationType) { return builder.CreateFPToUI(operand, destinationType); };
+    static void* Generate(Emitter& emitter, void* operand, void* destinationType) { return emitter.CreateFPToUI(operand, destinationType); }
 };
 
 struct BasicTypeFloatingToSignedInt
 {
-    static llvm::Value* Generate(llvm::IRBuilder<>& builder, llvm::Value* operand, llvm::Type* destinationType) { return builder.CreateFPToSI(operand, destinationType); };
+    static void* Generate(Emitter& emitter, void* operand, void* destinationType) { return emitter.CreateFPToSI(operand, destinationType); }
 };
 
 template<typename UnOp>
@@ -363,9 +362,9 @@ void BasicTypeUnaryOperation<UnOp>::GenerateCall(Emitter& emitter, std::vector<G
 {
     Assert(genObjects.size() == 1, "unary operation needs one object");
     genObjects[0]->Load(emitter, OperationFlags::none);
-    llvm::Value* arg = emitter.Stack().Pop();
+    void* arg = emitter.Stack().Pop();
     emitter.SetCurrentDebugLocation(span);
-    emitter.Stack().Push(UnOp::Generate(emitter.Builder(), arg));
+    emitter.Stack().Push(UnOp::Generate(emitter, arg));
 }
 
 class BasicTypeUnaryPlusOperation : public BasicTypeUnaryOperation<BasicTypeUnaryPlus>
@@ -436,11 +435,11 @@ void BasicTypeBinaryOperation<BinOp>::GenerateCall(Emitter& emitter, std::vector
 {
     Assert(genObjects.size() == 2, "binary operation needs two objects");
     genObjects[0]->Load(emitter, OperationFlags::none);
-    llvm::Value* left = emitter.Stack().Pop();
+    void* left = emitter.Stack().Pop();
     genObjects[1]->Load(emitter, OperationFlags::none);
-    llvm::Value* right = emitter.Stack().Pop();
+    void* right = emitter.Stack().Pop();
     emitter.SetCurrentDebugLocation(span);
-    emitter.Stack().Push(BinOp::Generate(emitter.Builder(), left, right));
+    emitter.Stack().Push(BinOp::Generate(emitter, left, right));
 }
 
 class BasicTypeAddOperation : public BasicTypeBinaryOperation<BasicTypeAdd>
@@ -585,7 +584,7 @@ template<typename DefaultOp>
 void BasicTypeDefaultCtor<DefaultOp>::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span)
 {
     Assert(genObjects.size() == 1, "default constructor needs one object");
-    emitter.Stack().Push(DefaultOp::Generate(emitter.Builder()));
+    emitter.Stack().Push(DefaultOp::Generate(emitter));
     genObjects[0]->Store(emitter, OperationFlags::functionCallFlags & flags);
 }
 
@@ -834,9 +833,9 @@ void BasicTypeConversion<ConversionOp>::EmplaceType(TypeSymbol* typeSymbol, int 
 template <typename ConversionOp>
 void BasicTypeConversion<ConversionOp>::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span)
 {
-    llvm::Value* value = emitter.Stack().Pop();
+    void* value = emitter.Stack().Pop();
     emitter.SetCurrentDebugLocation(span);
-    emitter.Stack().Push(ConversionOp::Generate(emitter.Builder(), value, targetType->IrType(emitter)));
+    emitter.Stack().Push(ConversionOp::Generate(emitter, value, targetType->IrType(emitter)));
 }
 
 template <typename ConversionOp>
@@ -1059,10 +1058,10 @@ void BasicTypeComparisonOperation<ComparisonOp>::GenerateCall(Emitter& emitter, 
 {
     Assert(genObjects.size() == 2, "comparison operation needs two objects");
     genObjects[0]->Load(emitter, OperationFlags::none);
-    llvm::Value* left = emitter.Stack().Pop();
+    void* left = emitter.Stack().Pop();
     genObjects[1]->Load(emitter, OperationFlags::none);
-    llvm::Value* right = emitter.Stack().Pop();
-    emitter.Stack().Push(ComparisonOp::Generate(emitter.Builder(), left, right));
+    void* right = emitter.Stack().Pop();
+    emitter.Stack().Push(ComparisonOp::Generate(emitter, left, right));
 }
 
 class BasicTypeIntegerEqualityOperation : public BasicTypeComparisonOperation<BasicTypeIntegerEquality>

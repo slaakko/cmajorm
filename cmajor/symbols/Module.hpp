@@ -13,7 +13,7 @@
 
 namespace cmajor { namespace symbols {
 
-bool IsSystemModule(const std::u32string& moduleName);
+SYMBOLS_API bool IsSystemModule(const std::u32string& moduleName);
 
 extern const char* cmajorModuleTag;
 
@@ -56,7 +56,7 @@ std::string ModuleFlagStr(ModuleFlags flags);
 
 class Module;
 
-class ModuleDependency
+class SYMBOLS_API ModuleDependency
 {
 public:
     ModuleDependency(Module* module_);
@@ -69,7 +69,7 @@ private:
     std::vector<Module*> referencedModules;
 };
 
-class FileTable
+class SYMBOLS_API FileTable
 {
 public:
     int16_t RegisterFilePath(const std::string& filePath);
@@ -83,7 +83,7 @@ private:
     std::vector<std::string> filePaths;
 };
 
-class Module
+class SYMBOLS_API Module
 {
 public:
     Module();
@@ -196,11 +196,11 @@ private:
     void CheckUpToDate();
 };
 
-Module* GetRootModuleForCurrentThread();
-void SetRootModuleForCurrentThread(Module* rootModule_);
+SYMBOLS_API Module* GetRootModuleForCurrentThread();
+SYMBOLS_API void SetRootModuleForCurrentThread(Module* rootModule_);
 
-void InitModule();
-void DoneModule();
+SYMBOLS_API void InitModule();
+SYMBOLS_API void DoneModule();
 
 } } // namespace cmajor::symbols
 

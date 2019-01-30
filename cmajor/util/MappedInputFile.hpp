@@ -5,6 +5,7 @@
 
 #ifndef CMAJOR_UTIL_MAPPED_INPUT_FILE_INCLUDED
 #define CMAJOR_UTIL_MAPPED_INPUT_FILE_INCLUDED
+#include <cmajor/util/UtilApi.hpp>
 #include <string>
 #include <stdint.h>
 
@@ -12,7 +13,7 @@ namespace cmajor { namespace util {
 
 class MappedInputFileImpl;
 
-class MappedInputFile
+class UTIL_API MappedInputFile
 {
 public:
     MappedInputFile(const std::string& fileName_);
@@ -23,7 +24,7 @@ private:
     MappedInputFileImpl* impl;
 };
 
-std::string ReadFile(const std::string& fileName);
+UTIL_API std::string ReadFile(const std::string& fileName);
 
 } } // namespace cmajor::util
 

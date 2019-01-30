@@ -5,11 +5,12 @@
 
 #ifndef CMAJOR_SYMBOLS_INIT_DONE_INCLUDED
 #define CMAJOR_SYMBOLS_INIT_DONE_INCLUDED
+#include <cmajor/symbols/SymbolsApi.hpp>
 
 namespace cmajor { namespace symbols {
 
-void Init();
-void Done();
+SYMBOLS_API void Init();
+SYMBOLS_API void Done();
 
 } } // namespace cmajor::symbols
 

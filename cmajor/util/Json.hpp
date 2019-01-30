@@ -5,6 +5,7 @@
 
 #ifndef CMAJOR_UTIL_JSON_INCLUDED
 #define CMAJOR_UTIL_JSON_INCLUDED
+#include <cmajor/util/UtilApi.hpp>
 #include <string>
 #include <map>
 #include <memory>
@@ -17,10 +18,12 @@ enum class JsonValueType
     object, array, string, number, boolean, null
 };
 
-class JsonValue
+class UTIL_API JsonValue
 {
 public:
     JsonValue(JsonValueType type_);
+    JsonValue(const JsonValue&) = delete;
+    JsonValue& operator=(const JsonValue&) = delete;
     virtual ~JsonValue();
     JsonValueType Type() const { return type; }
     virtual std::string ToString() const = 0;
@@ -28,7 +31,7 @@ private:
     JsonValueType type;
 };
 
-class JsonString : public JsonValue
+class UTIL_API JsonString : public JsonValue
 {
 public:
     JsonString();
@@ -41,7 +44,7 @@ private:
     std::u32string value;
 };
 
-class JsonNumber : public JsonValue
+class UTIL_API JsonNumber : public JsonValue
 {
 public:
     JsonNumber();
@@ -52,7 +55,7 @@ private:
     double value;
 };
 
-class JsonBool : public JsonValue
+class UTIL_API JsonBool : public JsonValue
 {
 public:
     JsonBool();
@@ -63,7 +66,7 @@ private:
     bool value;
 };
 
-class JsonObject : public JsonValue
+class UTIL_API JsonObject : public JsonValue
 {
 public:
     JsonObject();
@@ -75,7 +78,7 @@ private:
     std::map<std::u32string, JsonValue*> fieldMap;
 };
 
-class JsonArray : public JsonValue
+class UTIL_API JsonArray : public JsonValue
 {
 public:
     JsonArray();
@@ -87,7 +90,7 @@ private:
     std::vector<std::unique_ptr<JsonValue>> items;
 };
 
-class JsonNull : public JsonValue
+class UTIL_API JsonNull : public JsonValue
 {
 public:
     JsonNull();

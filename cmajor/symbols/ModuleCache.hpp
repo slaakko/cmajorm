@@ -5,18 +5,19 @@
 
 #ifndef CMAJOR_SYMBOLS_MODULE_CACHE_INCLUDED
 #define CMAJOR_SYMBOLS_MODULE_CACHE_INCLUDED
+#include <cmajor/symbols/SymbolsApi.hpp>
 #include <cmajor/symbols/Module.hpp>
 
 namespace cmajor { namespace symbols {
 
-void PrepareModuleForCompilation(Module* rootModule, const std::vector<std::string>& references);
-Module* GetModuleFromModuleCache(const std::string& moduleFilePath);
-void PutModuleToModuleCache(std::unique_ptr<Module>&& module);
-void InitModuleCache();
-void DoneModuleCache();
-void ResetModuleCache();
-void SetUseModuleCache(bool useModuleCache_);
-bool UseModuleCache();
+SYMBOLS_API void PrepareModuleForCompilation(Module* rootModule, const std::vector<std::string>& references);
+SYMBOLS_API Module* GetModuleFromModuleCache(const std::string& moduleFilePath);
+SYMBOLS_API void PutModuleToModuleCache(std::unique_ptr<Module>&& module);
+SYMBOLS_API void InitModuleCache();
+SYMBOLS_API void DoneModuleCache();
+SYMBOLS_API void ResetModuleCache();
+SYMBOLS_API void SetUseModuleCache(bool useModuleCache_);
+SYMBOLS_API bool UseModuleCache();
 
 } } // namespace cmajor::symbols
 

@@ -10,7 +10,7 @@
 
 namespace cmajor { namespace symbols {
 
-class ConstantSymbol : public Symbol
+class SYMBOLS_API ConstantSymbol : public Symbol
 {
 public:
     ConstantSymbol(const Span& span_, const std::u32string& name_);
@@ -31,8 +31,8 @@ public:
     void SetType(TypeSymbol* typeSymbol) { type = typeSymbol; }
     void SetValue(Value* value_);
     Value* GetValue();
-    llvm::Value* ArrayIrObject(Emitter& emitter, bool create);
-    llvm::Value* StructureIrObject(Emitter& emitter, bool create);
+    void* ArrayIrObject(Emitter& emitter, bool create);
+    void* StructureIrObject(Emitter& emitter, bool create);
     std::u32string Info() const override { return Name(); }
     const char* ClassName() const override { return "ConstantSymbol"; }
     void SetStrValue(const std::u32string& strValue_) { strValue = strValue_; }

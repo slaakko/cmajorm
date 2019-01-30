@@ -118,11 +118,11 @@ bool ClassTemplateSpecializationSymbol::IsPrototypeTemplateSpecialization() cons
     return IsPrototype();
 }
 
-llvm::Type* ClassTemplateSpecializationSymbol::IrType(Emitter& emitter)
+void* ClassTemplateSpecializationSymbol::IrType(Emitter& emitter)
 {
     if (IsRecursive())
     {
-        llvm::Type* localIrType = emitter.GetIrTypeByTypeId(TypeId());
+        void* localIrType = emitter.GetIrTypeByTypeId(TypeId());
         if (!localIrType)
         {
             localIrType = ClassTypeSymbol::IrType(emitter);

@@ -108,27 +108,27 @@ void InterfaceTypeSymbol::SetSpecifiers(Specifiers specifiers)
     }
 }
 
-llvm::Type* InterfaceTypeSymbol::IrType(Emitter& emitter)
+void* InterfaceTypeSymbol::IrType(Emitter& emitter)
 {
-    llvm::Type* localIrType = emitter.GetIrTypeByTypeId(TypeId());
+    void* localIrType = emitter.GetIrTypeByTypeId(TypeId());
     if (!localIrType)
     {
-        std::vector<llvm::Type*> elemTypes;
-        elemTypes.push_back(emitter.Builder().getInt8PtrTy());
-        elemTypes.push_back(emitter.Builder().getInt8PtrTy());
-        localIrType = llvm::StructType::get(emitter.Context(), elemTypes);
+        std::vector<void*> elemTypes;
+        elemTypes.push_back(emitter.GetIrTypeForVoidPtrType());
+        elemTypes.push_back(emitter.GetIrTypeForVoidPtrType());
+        localIrType = emitter.GetIrTypeForStructType(elemTypes);
         emitter.SetIrTypeByTypeId(TypeId(), localIrType);
     }
     return localIrType;
 }
 
-llvm::Constant* InterfaceTypeSymbol::CreateDefaultIrValue(Emitter& emitter)
+void* InterfaceTypeSymbol::CreateDefaultIrValue(Emitter& emitter)
 {
-    llvm::Type* irType = IrType(emitter);
-    std::vector<llvm::Constant*> arrayOfDefaults;
-    arrayOfDefaults.push_back(llvm::Constant::getNullValue(emitter.Builder().getInt8PtrTy()));
-    arrayOfDefaults.push_back(llvm::Constant::getNullValue(emitter.Builder().getInt8PtrTy()));
-    return llvm::ConstantStruct::get(llvm::cast<llvm::StructType>(irType), arrayOfDefaults);
+    void* irType = IrType(emitter);
+    std::vector<void*> arrayOfDefaults;
+    arrayOfDefaults.push_back(emitter.CreateDefaultIrValueForVoidPtrType());
+    arrayOfDefaults.push_back(emitter.CreateDefaultIrValueForVoidPtrType());
+    return emitter.CreateDefaultIrValueForStruct(irType, arrayOfDefaults);
 }
 
 void InterfaceTypeSymbol::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, MemberFunctionSymbol* interfaceMemberFunction, const Span& span)
@@ -142,23 +142,10 @@ void InterfaceTypeSymbol::GenerateCall(Emitter& emitter, std::vector<GenObject*>
     {
         genObjects[0]->Load(emitter, OperationFlags::none);
     }
-    llvm::Value* interfaceTypePtr = emitter.Stack().Pop();
-    ArgVector objectIndeces;
-    objectIndeces.push_back(emitter.Builder().getInt32(0));
-    objectIndeces.push_back(emitter.Builder().getInt32(0));
-    llvm::Value* objectPtrPtr = emitter.Builder().CreateGEP(interfaceTypePtr, objectIndeces);
-    llvm::Value* objectPtr = emitter.Builder().CreateLoad(objectPtrPtr);
-    ArgVector interfaceIndeces;
-    interfaceIndeces.push_back(emitter.Builder().getInt32(0));
-    interfaceIndeces.push_back(emitter.Builder().getInt32(1));
-    llvm::Value* interfacePtrPtr = emitter.Builder().CreateGEP(interfaceTypePtr, interfaceIndeces);
-    llvm::Value* interfacePtr = emitter.Builder().CreateLoad(interfacePtrPtr);
-    llvm::Value* imtPtr = emitter.Builder().CreateBitCast(interfacePtr, llvm::PointerType::get(emitter.Builder().getInt8PtrTy(), 0));
-    ArgVector methodIndeces;
-    methodIndeces.push_back(emitter.Builder().getInt32(interfaceMemberFunction->ImtIndex()));
-    llvm::Value* methodPtrPtr = emitter.Builder().CreateGEP(imtPtr, methodIndeces);
-    llvm::Value* methodPtr = emitter.Builder().CreateLoad(methodPtrPtr);
-    llvm::Value* callee = emitter.Builder().CreateBitCast(methodPtr, llvm::PointerType::get(interfaceMemberFunction->IrType(emitter), 0));
+    void* interfaceTypePtr = emitter.Stack().Pop();
+    void* objectPtr = emitter.GetObjectFromInterface(interfaceTypePtr);
+    void* imtPtr = emitter.GetImtPtrFromInterface(interfaceTypePtr);
+    void* callee = emitter.GetInterfaceMethod(imtPtr, interfaceMemberFunction->ImtIndex(), interfaceMemberFunction->IrType(emitter));
     int na = genObjects.size();
     for (int i = 1; i < na; ++i)
     {
@@ -166,7 +153,7 @@ void InterfaceTypeSymbol::GenerateCall(Emitter& emitter, std::vector<GenObject*>
         genObject->Load(emitter, flags & OperationFlags::functionCallFlags);
     }
     emitter.SetCurrentDebugLocation(span);
-    ArgVector args;
+    std::vector<void*> args;
     int n = interfaceMemberFunction->Parameters().size();
     if (interfaceMemberFunction->ReturnsClassInterfaceOrClassDelegateByValue())
     {
@@ -176,19 +163,17 @@ void InterfaceTypeSymbol::GenerateCall(Emitter& emitter, std::vector<GenObject*>
     args[0] = objectPtr;
     for (int i = 0; i < n - 1; ++i)
     {
-        llvm::Value* arg = emitter.Stack().Pop();
+        void* arg = emitter.Stack().Pop();
         args[n - i - 1] = arg;
     }
-    llvm::BasicBlock* handlerBlock = emitter.HandlerBlock();
-    llvm::BasicBlock* cleanupBlock = emitter.CleanupBlock();
+    void* handlerBlock = emitter.HandlerBlock();
+    void* cleanupBlock = emitter.CleanupBlock();
     bool newCleanupNeeded = emitter.NewCleanupNeeded();
     Pad* currentPad = emitter.CurrentPad();
-    std::vector<llvm::OperandBundleDef> bundles;
+    std::vector<void*> bundles;
     if (currentPad != nullptr)
     {
-        std::vector<llvm::Value*> inputs;
-        inputs.push_back(currentPad->value);
-        bundles.push_back(llvm::OperandBundleDef("funclet", inputs));
+        bundles.push_back(currentPad->value);
     }
     if (interfaceMemberFunction->ReturnType()->GetSymbolType() != SymbolType::voidTypeSymbol && !interfaceMemberFunction->ReturnsClassInterfaceOrClassDelegateByValue())
     {
@@ -196,27 +181,22 @@ void InterfaceTypeSymbol::GenerateCall(Emitter& emitter, std::vector<GenObject*>
         {
             if (currentPad == nullptr)
             {
-                emitter.Stack().Push(emitter.Builder().CreateCall(callee, args));
+                emitter.Stack().Push(emitter.CreateCall(callee, args));
             }
             else
             {
-                llvm::CallInst* callInst = llvm::CallInst::Create(callee, args, bundles, "", emitter.CurrentBasicBlock());
-                if (emitter.DIBuilder())
-                {
-                    callInst->setDebugLoc(emitter.GetDebugLocation(span));
-                }
-                emitter.Stack().Push(callInst);
+                emitter.Stack().Push(emitter.CreateCallInst(callee, args, bundles, span));
             }
         }
         else
         {
-            llvm::BasicBlock* nextBlock = llvm::BasicBlock::Create(emitter.Context(), "next", emitter.Function());
+            void* nextBlock = emitter.CreateBasicBlock("next");
             if (newCleanupNeeded)
             {
                 emitter.CreateCleanup();
                 cleanupBlock = emitter.CleanupBlock();
             }
-            llvm::BasicBlock* unwindBlock = cleanupBlock;
+            void* unwindBlock = cleanupBlock;
             if (unwindBlock == nullptr)
             {
                 unwindBlock = handlerBlock;
@@ -224,16 +204,11 @@ void InterfaceTypeSymbol::GenerateCall(Emitter& emitter, std::vector<GenObject*>
             }
             if (currentPad == nullptr)
             {
-                emitter.Stack().Push(emitter.Builder().CreateInvoke(callee, nextBlock, unwindBlock, args));
+                emitter.Stack().Push(emitter.CreateInvoke(callee, nextBlock, unwindBlock, args));
             }
             else
             {
-                llvm::InvokeInst* invokeInst = llvm::InvokeInst::Create(callee, nextBlock, unwindBlock, args, bundles, "", emitter.CurrentBasicBlock());
-                if (emitter.DIBuilder())
-                {
-                    invokeInst->setDebugLoc(emitter.GetDebugLocation(span));
-                }
-                emitter.Stack().Push(invokeInst);
+                emitter.Stack().Push(emitter.CreateInvokeInst(callee, nextBlock, unwindBlock, args, bundles, span));
             }
             emitter.SetCurrentBasicBlock(nextBlock);
         }
@@ -244,26 +219,22 @@ void InterfaceTypeSymbol::GenerateCall(Emitter& emitter, std::vector<GenObject*>
         {
             if (currentPad == nullptr)
             {
-                emitter.Builder().CreateCall(callee, args);
+                emitter.CreateCall(callee, args);
             }
             else
             {
-                llvm::CallInst* callInst = llvm::CallInst::Create(callee, args, bundles, "", emitter.CurrentBasicBlock());
-                if (emitter.DIBuilder())
-                {
-                    callInst->setDebugLoc(emitter.GetDebugLocation(span));
-                }
+                emitter.CreateCallInst(callee, args, bundles, span);
             }
         }
         else
         {
-            llvm::BasicBlock* nextBlock = llvm::BasicBlock::Create(emitter.Context(), "next", emitter.Function());
+            void* nextBlock = emitter.CreateBasicBlock("next");
             if (newCleanupNeeded)
             {
                 emitter.CreateCleanup();
                 cleanupBlock = emitter.CleanupBlock();
             }
-            llvm::BasicBlock* unwindBlock = cleanupBlock;
+            void* unwindBlock = cleanupBlock;
             if (unwindBlock == nullptr)
             {
                 unwindBlock = handlerBlock;
@@ -271,15 +242,11 @@ void InterfaceTypeSymbol::GenerateCall(Emitter& emitter, std::vector<GenObject*>
             }
             if (currentPad == nullptr)
             {
-                emitter.Builder().CreateInvoke(callee, nextBlock, unwindBlock, args);
+                emitter.CreateInvoke(callee, nextBlock, unwindBlock, args);
             }
             else
             {
-                llvm::InvokeInst* invokeInst = llvm::InvokeInst::Create(callee, nextBlock, unwindBlock, args, bundles, "", emitter.CurrentBasicBlock());
-                if (emitter.DIBuilder())
-                {
-                    invokeInst->setDebugLoc(emitter.GetDebugLocation(span));
-                }
+                emitter.CreateInvokeInst(callee, nextBlock, unwindBlock, args, bundles, span);
             }
             emitter.SetCurrentBasicBlock(nextBlock);
         }
@@ -319,17 +286,11 @@ void InterfaceTypeDefaultConstructor::GenerateCall(Emitter& emitter, std::vector
     {
         genObjects[0]->Load(emitter, OperationFlags::none);
     }
-    llvm::Value* interfaceTypePtr = emitter.Stack().Pop();
-    ArgVector objectIndeces;
-    objectIndeces.push_back(emitter.Builder().getInt32(0));
-    objectIndeces.push_back(emitter.Builder().getInt32(0));
-    llvm::Value* objectPtr = emitter.Builder().CreateGEP(interfaceTypePtr, objectIndeces);
-    emitter.Builder().CreateStore(llvm::Constant::getNullValue(emitter.Builder().getInt8PtrTy()), objectPtr);
-    ArgVector interfaceIndeces;
-    interfaceIndeces.push_back(emitter.Builder().getInt32(0));
-    interfaceIndeces.push_back(emitter.Builder().getInt32(1));
-    llvm::Value* interfacePtr = emitter.Builder().CreateGEP(interfaceTypePtr, interfaceIndeces);
-    emitter.Builder().CreateStore(llvm::Constant::getNullValue(emitter.Builder().getInt8PtrTy()), interfacePtr);
+    void* interfaceTypePtr = emitter.Stack().Pop();
+    void* objectPtr = emitter.GetObjectPtrFromInterface(interfaceTypePtr);
+    emitter.CreateStore(emitter.CreateDefaultIrValueForVoidPtrType(), objectPtr);
+    void* interfacePtr = emitter.GetImtPtrFromInterface(interfaceTypePtr);
+    emitter.CreateStore(emitter.CreateDefaultIrValueForVoidPtrType(), interfacePtr);
 }
 
 InterfaceTypeCopyConstructor::InterfaceTypeCopyConstructor(InterfaceTypeSymbol* interfaceType_, const Span& span_) : FunctionSymbol(span_, U"@interfaceCopyCtor")
@@ -356,23 +317,17 @@ void InterfaceTypeCopyConstructor::GenerateCall(Emitter& emitter, std::vector<Ge
     {
         genObjects[0]->Load(emitter, OperationFlags::none);
     }
-    llvm::Value* interfaceTypePtr = emitter.Stack().Pop();
+    void* interfaceTypePtr = emitter.Stack().Pop();
     genObjects[1]->Load(emitter, OperationFlags::none);
-    llvm::Value* thatPtr = emitter.Stack().Pop();
-    ArgVector objectIndeces;
-    objectIndeces.push_back(emitter.Builder().getInt32(0));
-    objectIndeces.push_back(emitter.Builder().getInt32(0));
-    llvm::Value* objectPtr = emitter.Builder().CreateGEP(interfaceTypePtr, objectIndeces);
-    llvm::Value* thatObjectPtr = emitter.Builder().CreateGEP(thatPtr, objectIndeces);
-    llvm::Value* thatObject = emitter.Builder().CreateLoad(thatObjectPtr);
-    emitter.Builder().CreateStore(thatObject, objectPtr);
-    ArgVector interfaceIndeces;
-    interfaceIndeces.push_back(emitter.Builder().getInt32(0));
-    interfaceIndeces.push_back(emitter.Builder().getInt32(1));
-    llvm::Value* interfacePtr = emitter.Builder().CreateGEP(interfaceTypePtr, interfaceIndeces);
-    llvm::Value* thatInterfacePtr = emitter.Builder().CreateGEP(thatPtr, interfaceIndeces);
-    llvm::Value* thatInterfaceObject = emitter.Builder().CreateLoad(thatInterfacePtr);
-    emitter.Builder().CreateStore(thatInterfaceObject, interfacePtr);
+    void* thatPtr = emitter.Stack().Pop();
+    void* objectPtr = emitter.GetObjectPtrFromInterface(interfaceTypePtr);
+    void* thatObjectPtr = emitter.GetObjectPtrFromInterface(thatPtr);
+    void* thatObject = emitter.CreateLoad(thatObjectPtr);
+    emitter.CreateStore(thatObject, objectPtr);
+    void* interfacePtr = emitter.GetImtPtrFromInterface(interfaceTypePtr);
+    void* thatInterfacePtr = emitter.GetImtPtrFromInterface(thatPtr);
+    void* thatInterfaceObject = emitter.CreateLoad(thatInterfacePtr);
+    emitter.CreateStore(thatInterfaceObject, interfacePtr);
 }
 
 InterfaceTypeMoveConstructor::InterfaceTypeMoveConstructor(InterfaceTypeSymbol* interfaceType_, const Span& span_) : FunctionSymbol(span_, U"@interfaceMoveCtor")
@@ -399,23 +354,17 @@ void InterfaceTypeMoveConstructor::GenerateCall(Emitter& emitter, std::vector<Ge
     {
         genObjects[0]->Load(emitter, OperationFlags::none);
     }
-    llvm::Value* interfaceTypePtr = emitter.Stack().Pop();
+    void* interfaceTypePtr = emitter.Stack().Pop();
     genObjects[1]->Load(emitter, OperationFlags::none);
-    llvm::Value* thatPtr = emitter.Stack().Pop();
-    ArgVector objectIndeces;
-    objectIndeces.push_back(emitter.Builder().getInt32(0));
-    objectIndeces.push_back(emitter.Builder().getInt32(0));
-    llvm::Value* objectPtr = emitter.Builder().CreateGEP(interfaceTypePtr, objectIndeces);
-    llvm::Value* thatObjectPtr = emitter.Builder().CreateGEP(thatPtr, objectIndeces);
-    llvm::Value* thatObject = emitter.Builder().CreateLoad(thatObjectPtr);
-    emitter.Builder().CreateStore(thatObject, objectPtr);
-    ArgVector interfaceIndeces;
-    interfaceIndeces.push_back(emitter.Builder().getInt32(0));
-    interfaceIndeces.push_back(emitter.Builder().getInt32(1));
-    llvm::Value* interfacePtr = emitter.Builder().CreateGEP(interfaceTypePtr, interfaceIndeces);
-    llvm::Value* thatInterfacePtr = emitter.Builder().CreateGEP(thatPtr, interfaceIndeces);
-    llvm::Value* thatInterfaceObject = emitter.Builder().CreateLoad(thatInterfacePtr);
-    emitter.Builder().CreateStore(thatInterfaceObject, interfacePtr);
+    void* thatPtr = emitter.Stack().Pop();
+    void* objectPtr = emitter.GetObjectPtrFromInterface(interfaceTypePtr);
+    void* thatObjectPtr = emitter.GetObjectPtrFromInterface(thatPtr);
+    void* thatObject = emitter.CreateLoad(thatObjectPtr);
+    emitter.CreateStore(thatObject, objectPtr);
+    void* interfacePtr = emitter.GetImtPtrFromInterface(interfaceTypePtr);
+    void* thatInterfacePtr = emitter.GetImtPtrFromInterface(thatPtr);
+    void* thatInterfaceObject = emitter.CreateLoad(thatInterfacePtr);
+    emitter.CreateStore(thatInterfaceObject, interfacePtr);
 }
 
 InterfaceTypeCopyAssignment::InterfaceTypeCopyAssignment(InterfaceTypeSymbol* interfaceType_, const Span& span_) : FunctionSymbol(span_, U"@interfaceCopyAssignment")
@@ -444,23 +393,17 @@ void InterfaceTypeCopyAssignment::GenerateCall(Emitter& emitter, std::vector<Gen
     {
         genObjects[0]->Load(emitter, OperationFlags::none);
     }
-    llvm::Value* interfaceTypePtr = emitter.Stack().Pop();
+    void* interfaceTypePtr = emitter.Stack().Pop();
     genObjects[1]->Load(emitter, OperationFlags::none);
-    llvm::Value* thatPtr = emitter.Stack().Pop();
-    ArgVector objectIndeces;
-    objectIndeces.push_back(emitter.Builder().getInt32(0));
-    objectIndeces.push_back(emitter.Builder().getInt32(0));
-    llvm::Value* objectPtr = emitter.Builder().CreateGEP(interfaceTypePtr, objectIndeces);
-    llvm::Value* thatObjectPtr = emitter.Builder().CreateGEP(thatPtr, objectIndeces);
-    llvm::Value* thatObject = emitter.Builder().CreateLoad(thatObjectPtr);
-    emitter.Builder().CreateStore(thatObject, objectPtr);
-    ArgVector interfaceIndeces;
-    interfaceIndeces.push_back(emitter.Builder().getInt32(0));
-    interfaceIndeces.push_back(emitter.Builder().getInt32(1));
-    llvm::Value* interfacePtr = emitter.Builder().CreateGEP(interfaceTypePtr, interfaceIndeces);
-    llvm::Value* thatInterfacePtr = emitter.Builder().CreateGEP(thatPtr, interfaceIndeces);
-    llvm::Value* thatInterfaceObject = emitter.Builder().CreateLoad(thatInterfacePtr);
-    emitter.Builder().CreateStore(thatInterfaceObject, interfacePtr);
+    void* thatPtr = emitter.Stack().Pop();
+    void* objectPtr = emitter.GetObjectPtrFromInterface(interfaceTypePtr);
+    void* thatObjectPtr = emitter.GetObjectPtrFromInterface(thatPtr);
+    void* thatObject = emitter.CreateLoad(thatObjectPtr);
+    emitter.CreateStore(thatObject, objectPtr);
+    void* interfacePtr = emitter.GetImtPtrFromInterface(interfaceTypePtr);
+    void* thatInterfacePtr = emitter.GetImtPtrFromInterface(thatPtr);
+    void* thatInterfaceObject = emitter.CreateLoad(thatInterfacePtr);
+    emitter.CreateStore(thatInterfaceObject, interfacePtr);
 }
 
 InterfaceTypeMoveAssignment::InterfaceTypeMoveAssignment(InterfaceTypeSymbol* interfaceType_, const Span& span_) : FunctionSymbol(span_, U"@interfaceMoveAssignment")
@@ -489,23 +432,17 @@ void InterfaceTypeMoveAssignment::GenerateCall(Emitter& emitter, std::vector<Gen
     {
         genObjects[0]->Load(emitter, OperationFlags::none);
     }
-    llvm::Value* interfaceTypePtr = emitter.Stack().Pop();
+    void* interfaceTypePtr = emitter.Stack().Pop();
     genObjects[1]->Load(emitter, OperationFlags::none);
-    llvm::Value* thatPtr = emitter.Stack().Pop();
-    ArgVector objectIndeces;
-    objectIndeces.push_back(emitter.Builder().getInt32(0));
-    objectIndeces.push_back(emitter.Builder().getInt32(0));
-    llvm::Value* objectPtr = emitter.Builder().CreateGEP(interfaceTypePtr, objectIndeces);
-    llvm::Value* thatObjectPtr = emitter.Builder().CreateGEP(thatPtr, objectIndeces);
-    llvm::Value* thatObject = emitter.Builder().CreateLoad(thatObjectPtr);
-    emitter.Builder().CreateStore(thatObject, objectPtr);
-    ArgVector interfaceIndeces;
-    interfaceIndeces.push_back(emitter.Builder().getInt32(0));
-    interfaceIndeces.push_back(emitter.Builder().getInt32(1));
-    llvm::Value* interfacePtr = emitter.Builder().CreateGEP(interfaceTypePtr, interfaceIndeces);
-    llvm::Value* thatInterfacePtr = emitter.Builder().CreateGEP(thatPtr, interfaceIndeces);
-    llvm::Value* thatInterfaceObject = emitter.Builder().CreateLoad(thatInterfacePtr);
-    emitter.Builder().CreateStore(thatInterfaceObject, interfacePtr);
+    void* thatPtr = emitter.Stack().Pop();
+    void* objectPtr = emitter.GetObjectPtrFromInterface(interfaceTypePtr);
+    void* thatObjectPtr = emitter.GetObjectPtrFromInterface(thatPtr);
+    void* thatObject = emitter.CreateLoad(thatObjectPtr);
+    emitter.CreateStore(thatObject, objectPtr);
+    void* interfacePtr = emitter.GetImtPtrFromInterface(interfaceTypePtr);
+    void* thatInterfacePtr = emitter.GetImtPtrFromInterface(thatPtr);
+    void* thatInterfaceObject = emitter.CreateLoad(thatInterfacePtr);
+    emitter.CreateStore(thatInterfaceObject, interfacePtr);
 }
 
 ClassToInterfaceConversion::ClassToInterfaceConversion(ClassTypeSymbol* sourceClassType_, InterfaceTypeSymbol* targetInterfaceType_, int32_t interfaceIndex_, const Span& span_) : 
@@ -523,34 +460,17 @@ std::vector<LocalVariableSymbol*> ClassToInterfaceConversion::CreateTemporariesT
 
 void ClassToInterfaceConversion::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span)
 {
-    llvm::Value* classPtr = emitter.Stack().Pop();
-    llvm::Value* classPtrAsVoidPtr = emitter.Builder().CreateBitCast(classPtr, emitter.Builder().getInt8PtrTy());
-    ArgVector objectIndeces;
-    objectIndeces.push_back(emitter.Builder().getInt32(0));
-    objectIndeces.push_back(emitter.Builder().getInt32(0));
-    //llvm::Value* objectPtr = emitter.Builder().CreateGEP(temporaryInterfaceObjectVar->IrObject(emitter), objectIndeces);
+    void* classPtr = emitter.Stack().Pop();
+    void* classPtrAsVoidPtr = emitter.CreateBitCast(classPtr, emitter.GetIrTypeForVoidPtrType());
     genObjects[0]->Load(emitter, OperationFlags::addr);
-    llvm::Value* temporaryInterfaceObjectVar = emitter.Stack().Pop();
-    llvm::Value* objectPtr = emitter.Builder().CreateGEP(temporaryInterfaceObjectVar, objectIndeces);
-    emitter.Builder().CreateStore(classPtrAsVoidPtr, objectPtr);
-    llvm::Value* vmtObjectPtr = sourceClassType->VmtObject(emitter, false);
-    ArgVector imtsArrayIndeces;
-    imtsArrayIndeces.push_back(emitter.Builder().getInt32(0));
-    imtsArrayIndeces.push_back(emitter.Builder().getInt32(imtsVmtIndexOffset)); // new layout: 4
-    llvm::Value* imtsArrayPtrPtr = emitter.Builder().CreateGEP(vmtObjectPtr, imtsArrayIndeces);
-    llvm::Value* imtsArrayPtr = emitter.Builder().CreateBitCast(imtsArrayPtrPtr, llvm::PointerType::get(llvm::PointerType::get(emitter.Builder().getInt8PtrTy(), 0), 0));
-    llvm::Value* imtArray = emitter.Builder().CreateLoad(imtsArrayPtr);
-    ArgVector imtArrayIndeces;
-    imtArrayIndeces.push_back(emitter.Builder().getInt32(interfaceIndex));
-    llvm::Value* imtArrayPtr = emitter.Builder().CreateGEP(imtArray, imtArrayIndeces);
-    llvm::Value* imt = emitter.Builder().CreateLoad(imtArrayPtr);
-    ArgVector imtIndeces;
-    imtIndeces.push_back(emitter.Builder().getInt32(0));
-    imtIndeces.push_back(emitter.Builder().getInt32(1));
-    //llvm::Value* imtPtr = emitter.Builder().CreateGEP(temporaryInterfaceObjectVar->IrObject(emitter), imtIndeces);
-    llvm::Value* imtPtr = emitter.Builder().CreateGEP(temporaryInterfaceObjectVar, imtIndeces);
-    emitter.Builder().CreateStore(imt, imtPtr);
-    //emitter.Stack().Push(temporaryInterfaceObjectVar->IrObject(emitter));
+    void* temporaryInterfaceObjectVar = emitter.Stack().Pop();
+    void* objectPtr = emitter.GetObjectPtrFromInterface(temporaryInterfaceObjectVar);
+    emitter.CreateStore(classPtrAsVoidPtr, objectPtr);
+    void* vmtObjectPtr = sourceClassType->VmtObject(emitter, false);
+    void* imtArray = emitter.GetImtArray(vmtObjectPtr, imtsVmtIndexOffset);
+    void* imt = emitter.GetImt(imtArray, interfaceIndex);
+    void* imtPtr = emitter.GetImtPtrFromInterface(temporaryInterfaceObjectVar);
+    emitter.CreateStore(imt, imtPtr);
     emitter.Stack().Push(temporaryInterfaceObjectVar);
 }
 

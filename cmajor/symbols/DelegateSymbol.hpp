@@ -12,7 +12,7 @@ namespace cmajor { namespace symbols {
 
 class ParameterSymbol;
 
-class DelegateTypeSymbol : public TypeSymbol
+class SYMBOLS_API DelegateTypeSymbol : public TypeSymbol
 {
 public:
     DelegateTypeSymbol(const Span& span_, const std::u32string& name_);
@@ -26,8 +26,8 @@ public:
     bool IsDelegateType() const override { return true; }
     void Accept(SymbolCollector* collector) override;
     void Dump(CodeFormatter& formatter) override;
-    llvm::Type* IrType(Emitter& emitter) override;
-    llvm::Constant* CreateDefaultIrValue(Emitter& emitter) override;
+    void* IrType(Emitter& emitter) override;
+    void* CreateDefaultIrValue(Emitter& emitter) override;
     //llvm::DIType* CreateDIType(Emitter& emitter) override; todo
     void SetSpecifiers(Specifiers specifiers);
     int Arity() const { return parameters.size(); }
@@ -47,7 +47,7 @@ private:
     std::unique_ptr<ParameterSymbol> returnParam;
 };
 
-class DelegateTypeDefaultConstructor : public FunctionSymbol
+class SYMBOLS_API DelegateTypeDefaultConstructor : public FunctionSymbol
 {
 public:
     DelegateTypeDefaultConstructor(const Span& span_, const std::u32string& name_);
@@ -64,7 +64,7 @@ private:
     DelegateTypeSymbol* delegateType;
 };
 
-class DelegateTypeCopyConstructor : public FunctionSymbol
+class SYMBOLS_API DelegateTypeCopyConstructor : public FunctionSymbol
 {
 public:
     DelegateTypeCopyConstructor(const Span& span_, const std::u32string& name_);
@@ -75,7 +75,7 @@ public:
     const char* ClassName() const override { return "DelegateTypeCopyConstructor"; }
 };
 
-class DelegateTypeMoveConstructor : public FunctionSymbol
+class SYMBOLS_API DelegateTypeMoveConstructor : public FunctionSymbol
 {
 public:
     DelegateTypeMoveConstructor(const Span& span_, const std::u32string& name_);
@@ -86,7 +86,7 @@ public:
     const char* ClassName() const override { return "DelegateTypeMoveConstructor"; }
 };
 
-class DelegateTypeCopyAssignment : public FunctionSymbol
+class SYMBOLS_API DelegateTypeCopyAssignment : public FunctionSymbol
 {
 public:
     DelegateTypeCopyAssignment(const Span& span_, const std::u32string& name_);
@@ -97,7 +97,7 @@ public:
     const char* ClassName() const override { return "DelegateTypeCopyAssignment"; }
 };
 
-class DelegateTypeMoveAssignment : public FunctionSymbol
+class SYMBOLS_API DelegateTypeMoveAssignment : public FunctionSymbol
 {
 public:
     DelegateTypeMoveAssignment(const Span& span_, const std::u32string& name_);
@@ -108,7 +108,7 @@ public:
     const char* ClassName() const override { return "DelegateTypeMoveAssignment"; }
 };
 
-class DelegateTypeReturn : public FunctionSymbol
+class SYMBOLS_API DelegateTypeReturn : public FunctionSymbol
 {
 public:
     DelegateTypeReturn(const Span& span_, const std::u32string& name_);
@@ -119,7 +119,7 @@ public:
     const char* ClassName() const override { return "DelegateTypeReturn"; }
 };
 
-class DelegateTypeEquality : public FunctionSymbol
+class SYMBOLS_API DelegateTypeEquality : public FunctionSymbol
 {
 public:
     DelegateTypeEquality(const Span& span_, const std::u32string& name_);
@@ -130,7 +130,7 @@ public:
     const char* ClassName() const override { return "DelegateTypeEquality"; }
 };
 
-class FunctionToDelegateConversion : public FunctionSymbol
+class SYMBOLS_API FunctionToDelegateConversion : public FunctionSymbol
 {
 public:
     FunctionToDelegateConversion(const Span& span_, const std::u32string& name_);
@@ -149,7 +149,7 @@ private:
     FunctionSymbol* function;
 };
 
-class DelegateToVoidPtrConversion : public FunctionSymbol
+class SYMBOLS_API DelegateToVoidPtrConversion : public FunctionSymbol
 {
 public:
     DelegateToVoidPtrConversion(TypeSymbol* delegateType_, TypeSymbol* voidPtrType_);
@@ -165,7 +165,7 @@ private:
     TypeSymbol* voidPtrType;
 };
 
-class VoidPtrToDelegateConversion : public FunctionSymbol
+class SYMBOLS_API VoidPtrToDelegateConversion : public FunctionSymbol
 {
 public:
     VoidPtrToDelegateConversion(TypeSymbol* voidPtrType_, TypeSymbol* delegateType_, TypeSymbol* ulongType_);
@@ -182,7 +182,7 @@ private:
     TypeSymbol* ulongType;
 };
 
-class ClassDelegateTypeSymbol : public TypeSymbol
+class SYMBOLS_API ClassDelegateTypeSymbol : public TypeSymbol
 {
 public:
     ClassDelegateTypeSymbol(const Span& span_, const std::u32string& name_);
@@ -196,8 +196,8 @@ public:
     bool IsClassDelegateType() const override { return true; }
     void Accept(SymbolCollector* collector) override;
     void Dump(CodeFormatter& formatter) override;
-    llvm::Type* IrType(Emitter& emitter) override;
-    llvm::Constant* CreateDefaultIrValue(Emitter& emitter) override;
+    void* IrType(Emitter& emitter) override;
+    void* CreateDefaultIrValue(Emitter& emitter) override;
     //llvm::DIType* CreateDIType(Emitter& emitter) override; todo
     void SetSpecifiers(Specifiers specifiers);
     int Arity() const { return parameters.size(); }
@@ -223,7 +223,7 @@ private:
     FunctionSymbol* copyConstructor;
 };
 
-class ClassDelegateTypeDefaultConstructor : public FunctionSymbol
+class SYMBOLS_API ClassDelegateTypeDefaultConstructor : public FunctionSymbol
 {
 public:
     ClassDelegateTypeDefaultConstructor(const Span& span_, const std::u32string& name_);
@@ -241,7 +241,7 @@ private:
     ClassDelegateTypeSymbol* classDelegateType;
 };
 
-class ClassDelegateTypeCopyConstructor : public FunctionSymbol
+class SYMBOLS_API ClassDelegateTypeCopyConstructor : public FunctionSymbol
 {
 public:
     ClassDelegateTypeCopyConstructor(const Span& span_, const std::u32string& name_);
@@ -254,7 +254,7 @@ public:
     const char* ClassName() const override { return "ClassDelegateTypeCopyConstructor"; }
 };
 
-class ClassDelegateTypeMoveConstructor : public FunctionSymbol
+class SYMBOLS_API ClassDelegateTypeMoveConstructor : public FunctionSymbol
 {
 public:
     ClassDelegateTypeMoveConstructor(const Span& span_, const std::u32string& name_);
@@ -266,7 +266,7 @@ public:
     const char* ClassName() const override { return "ClassDelegateTypeMoveConstructor"; }
 };
 
-class ClassDelegateTypeCopyAssignment : public FunctionSymbol
+class SYMBOLS_API ClassDelegateTypeCopyAssignment : public FunctionSymbol
 {
 public:
     ClassDelegateTypeCopyAssignment(const Span& span_, const std::u32string& name_);
@@ -278,7 +278,7 @@ public:
     const char* ClassName() const override { return "ClassDelegateTypeCopyAssignment"; }
 };
 
-class ClassDelegateTypeMoveAssignment : public FunctionSymbol
+class SYMBOLS_API ClassDelegateTypeMoveAssignment : public FunctionSymbol
 {
 public:
     ClassDelegateTypeMoveAssignment(const Span& span_, const std::u32string& name_);
@@ -290,7 +290,7 @@ public:
     const char* ClassName() const override { return "ClassDelegateTypeMoveAssignment"; }
 };
 
-class ClassDelegateTypeEquality : public FunctionSymbol
+class SYMBOLS_API ClassDelegateTypeEquality : public FunctionSymbol
 {
 public:
     ClassDelegateTypeEquality(const Span& span_, const std::u32string& name_);
@@ -302,7 +302,7 @@ public:
     const char* ClassName() const override { return "ClassDelegateTypeEquality"; }
 };
 
-class MemberFunctionToClassDelegateConversion : public FunctionSymbol
+class SYMBOLS_API MemberFunctionToClassDelegateConversion : public FunctionSymbol
 {
 public:
     MemberFunctionToClassDelegateConversion(const Span& span_, const std::u32string& name_);

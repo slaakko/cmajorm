@@ -5,6 +5,7 @@
 
 #ifndef CMAJOR_SYMBOLS_SYMBOL_CREATOR_VISITOR_INCLUDED
 #define CMAJOR_SYMBOLS_SYMBOL_CREATOR_VISITOR_INCLUDED
+#include <cmajor/symbols/SymbolsApi.hpp>
 #include <cmajor/ast/Visitor.hpp>
 #include <stack>
 #include <stdint.h>
@@ -16,7 +17,7 @@ using namespace cmajor::ast;
 class SymbolTable;
 class ClassTemplateSpecializationSymbol;
 
-class SymbolCreatorVisitor : public Visitor
+class SYMBOLS_API SymbolCreatorVisitor : public Visitor
 {
 public:
     SymbolCreatorVisitor(SymbolTable& symbolTable_);

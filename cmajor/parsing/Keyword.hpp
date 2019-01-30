@@ -12,7 +12,7 @@ namespace cmajor { namespace parsing {
 
 class Rule;
 
-class KeywordParser : public Parser
+class PARSING_API KeywordParser : public Parser
 {
 public:
     KeywordParser(const std::u32string& keyword_);
@@ -31,7 +31,7 @@ private:
     void CreateKeywordRule();
 };
 
-class KeywordListParser : public Parser
+class PARSING_API KeywordListParser : public Parser
 {
 public:
     typedef std::set<std::u32string> KeywordSet;
@@ -51,8 +51,8 @@ private:
     Rule* selectorRule;
 };
 
-void KeywordInit();
-void KeywordDone();
+PARSING_API void KeywordInit();
+PARSING_API void KeywordDone();
 
 } } // namespace cmajor::parsing
 
