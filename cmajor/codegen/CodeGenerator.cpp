@@ -8,6 +8,7 @@
 #ifdef _WIN32
 #include <cmajor/codegenwin/WindowsCodeGenerator.hpp>
 #endif
+#include <cmajor/codegensx/SystemXCodeGenerator.hpp>
 
 namespace cmajor { namespace codegen {
 
@@ -22,7 +23,7 @@ cmajor::codegenbase::CodeGenerator* CreateCodeGenerator(cmajor::ir::EmittingCont
         }
         case cmajor::mid::BackEndKind::cmsxBackEnd:
         {
-            return nullptr;
+            return new cmajor::codegensx::SystemXCodeGenerator(emittingContext);
         }
     }
     return nullptr;

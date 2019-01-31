@@ -42,13 +42,13 @@ enum class GlobalFlags : uint32_t
     debugCompile = 1 << 23
 };
 
-enum class CompileTarget : int
+enum class BackEnd : int
 {
     llvm = 0, cmsx = 1
 };
 
-SYMBOLS_API void SetCompileTarget(CompileTarget compileTarget_);
-SYMBOLS_API CompileTarget GetCompileTarget();
+SYMBOLS_API void SetBackEnd(BackEnd backend_);
+SYMBOLS_API BackEnd GetBackEnd();
 
 SYMBOLS_API void ResetGlobalFlags();
 SYMBOLS_API void SetGlobalFlag(GlobalFlags flag);

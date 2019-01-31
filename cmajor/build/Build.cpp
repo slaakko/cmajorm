@@ -58,7 +58,6 @@
 #include <list>
 #include <condition_variable>
 
-//using namespace cmajor::emitter;
 using namespace cmajor::parser;
 using namespace cmajor::parsing;
 using namespace cmajor::ast;
@@ -346,7 +345,7 @@ void BindStatements(BoundCompileUnit& boundCompileUnit)
 
 #ifdef _WIN32
 
-void GenerateLibrary(Module* module, const std::vector<std::string>& objectFilePaths, const std::string& libraryFilePath)
+void GenerateLibraryLlvm(Module* module, const std::vector<std::string>& objectFilePaths, const std::string& libraryFilePath)
 {
     if (GetGlobalFlag(GlobalFlags::verbose) && !GetGlobalFlag(GlobalFlags::unitTest))
     {
@@ -382,9 +381,46 @@ void GenerateLibrary(Module* module, const std::vector<std::string>& objectFileP
     }
 }
 
+void GenerateLibrarySystemX(Module* module, const std::vector<std::string>& objectFilePaths, const std::string& libraryFilePath)
+{
+    if (GetGlobalFlag(GlobalFlags::verbose))
+    {
+        LogMessage(module->LogStreamId(), "Creating library...");
+    }
+    boost::filesystem::remove(libraryFilePath);
+    module->SetCurrentToolName(U"cmsxar");
+    std::vector<std::string> args;
+    args.push_back("-o=" + QuotedPath(libraryFilePath));
+    int n = objectFilePaths.size();
+    for (int i = 0; i < n; ++i)
+    {
+        args.push_back(QuotedPath(objectFilePaths[i]));
+    }
+    std::string libErrorFilePath = Path::Combine(Path::GetDirectoryName(libraryFilePath), "cmsxar.error");
+    std::string libCommandLine = "cmfileredirector -2 " + libErrorFilePath + " cmsxar";
+    for (const std::string& arg : args)
+    {
+        libCommandLine.append(1, ' ').append(arg);
+    }
+    try
+    {
+        System(libCommandLine);
+        boost::filesystem::remove(boost::filesystem::path(libErrorFilePath));
+    }
+    catch (const std::exception& ex)
+    {
+        std::string errors = ReadFile(libErrorFilePath);
+        throw std::runtime_error("generating library '" + libraryFilePath + "' failed: " + ex.what() + ":\nerrors:\n" + errors);
+    }
+    if (GetGlobalFlag(GlobalFlags::verbose))
+    {
+        LogMessage(module->LogStreamId(), "==> " + libraryFilePath);
+    }
+}
+
 #else
 
-void GenerateLibrary(Module* module, const std::vector<std::string>& objectFilePaths, const std::string& libraryFilePath)
+void GenerateLibraryLlvm(Module* module, const std::vector<std::string>& objectFilePaths, const std::string& libraryFilePath)
 {
     if (GetGlobalFlag(GlobalFlags::verbose) && !GetGlobalFlag(GlobalFlags::unitTest))
     {
@@ -423,6 +459,18 @@ void GenerateLibrary(Module* module, const std::vector<std::string>& objectFileP
 
 #endif
 
+void GenerateLibrary(Module* module, const std::vector<std::string>& objectFilePaths, const std::string& libraryFilePath)
+{
+    if (GetBackEnd() == cmajor::symbols::BackEnd::llvm)
+    {
+        GenerateLibraryLlvm(module, objectFilePaths, libraryFilePath);
+    }
+    else if (GetBackEnd() == cmajor::symbols::BackEnd::cmsx)
+    {
+        GenerateLibrarySystemX(module, objectFilePaths, libraryFilePath);
+    }
+}
+
 #ifdef _WIN32
 
 void CreateDefFile(const std::string& defFilePath, Module& module)
@@ -449,7 +497,7 @@ void CreateDefFile(const std::string& defFilePath, Module& module)
     }
 }
 
-void Link(const std::string& executableFilePath, const std::string& libraryFilePath, const std::vector<std::string>& libraryFilePaths, Module& module)
+void LinkLlvm(const std::string& executableFilePath, const std::string& libraryFilePath, const std::vector<std::string>& libraryFilePaths, Module& module)
 {
     if (GetGlobalFlag(GlobalFlags::verbose) && !GetGlobalFlag(GlobalFlags::unitTest))
     {
@@ -472,10 +520,6 @@ void Link(const std::string& executableFilePath, const std::string& libraryFileP
     args.push_back("/debug");
     args.push_back("/out:" + QuotedPath(executableFilePath));
     args.push_back("/stack:16777216");
-    // We don't need these any more...
-    // std::string defFilePath = GetFullPath(boost::filesystem::path(libraryFilePath).replace_extension(".def").generic_string());
-    // CreateDefFile(defFilePath, module);
-    // args.push_back("/def:" + QuotedPath(defFilePath));
     std::string cmrtLibName = "cmrt330.lib";
     if (GetGlobalFlag(GlobalFlags::linkWithDebugRuntime))
     {
@@ -499,6 +543,47 @@ void Link(const std::string& executableFilePath, const std::string& libraryFileP
         linkErrorFilePath = Path::Combine(Path::GetDirectoryName(executableFilePath), "lld-link.error");
         linkCommandLine = "cmfileredirector -2 " + linkErrorFilePath + " lld-link";
     }
+    for (const std::string& arg : args)
+    {
+        linkCommandLine.append(1, ' ').append(arg);
+    }
+    try
+    {
+        System(linkCommandLine);
+        boost::filesystem::remove(boost::filesystem::path(linkErrorFilePath));
+    }
+    catch (const std::exception& ex)
+    {
+        std::string errors = ReadFile(linkErrorFilePath);
+        throw std::runtime_error("linking executable '" + executableFilePath + "' failed: " + ex.what() + ":\nerrors:\n" + errors);
+    }
+    if (GetGlobalFlag(GlobalFlags::verbose) && !GetGlobalFlag(GlobalFlags::unitTest))
+    {
+        LogMessage(module.LogStreamId(), "==> " + executableFilePath);
+    }
+}
+
+void LinkSystemX(const std::string& executableFilePath, const std::string& libraryFilePath, const std::vector<std::string>& libraryFilePaths, Module& module)
+{
+    if (GetGlobalFlag(GlobalFlags::verbose))
+    {
+        LogMessage(module.LogStreamId(), "Linking...");
+    }
+    module.SetCurrentToolName(U"cmsxlink");
+    boost::filesystem::path bdp = executableFilePath;
+    bdp.remove_filename();
+    boost::filesystem::create_directories(bdp);
+    std::vector<std::string> args;
+    args.push_back("--out=" + QuotedPath(executableFilePath));
+    int n = libraryFilePaths.size();
+    for (int i = 0; i < n; ++i)
+    {
+        args.push_back(QuotedPath(libraryFilePaths[i]));
+    }
+    std::string linkCommandLine;
+    std::string linkErrorFilePath;
+    linkErrorFilePath = Path::Combine(Path::GetDirectoryName(executableFilePath), "cmsxlink.error");
+    linkCommandLine = "cmfileredirector -2 " + linkErrorFilePath + " cmsxlink";
     for (const std::string& arg : args)
     {
         linkCommandLine.append(1, ' ').append(arg);
@@ -547,7 +632,7 @@ void CreateDynamicListFile(const std::string& dynamicListFilePath, Module& modul
     formatter.WriteLine("};");
 }
 
-void Link(const std::string& executableFilePath, const std::string& libraryFilePath, const std::vector<std::string>& libraryFilePaths, Module& module)
+void LinkLlvm(const std::string& executableFilePath, const std::string& libraryFilePath, const std::vector<std::string>& libraryFilePaths, Module& module)
 {
     if (GetGlobalFlag(GlobalFlags::verbose) && !GetGlobalFlag(GlobalFlags::unitTest))
     {
@@ -564,10 +649,6 @@ void Link(const std::string& executableFilePath, const std::string& libraryFileP
     {
         args.push_back("-L" + std::string(cmajorLibDir));
     }
-    // We don't need these any more...
-    // std::string dynamicListFilePath = GetFullPath(boost::filesystem::path(libraryFilePath).replace_extension(".export").generic_string());
-    // CreateDynamicListFile(dynamicListFilePath, module);
-    // args.push_back("-Wl,--dynamic-list=" + dynamicListFilePath);
     args.push_back("-Xlinker --start-group");
     int n = libraryFilePaths.size();
     args.push_back(QuotedPath(libraryFilePaths.back()));
@@ -615,6 +696,18 @@ void Link(const std::string& executableFilePath, const std::string& libraryFileP
 }
 
 #endif
+
+void Link(const std::string& executableFilePath, const std::string& libraryFilePath, const std::vector<std::string>& libraryFilePaths, Module& module)
+{
+    if (GetBackEnd() == cmajor::symbols::BackEnd::llvm)
+    {
+        LinkLlvm(executableFilePath, libraryFilePath, libraryFilePaths, module);
+    }
+    else if (GetBackEnd() == cmajor::symbols::BackEnd::cmsx)
+    {
+        LinkSystemX(executableFilePath, libraryFilePath, libraryFilePaths, module);
+    }
+}
 
 void CleanProject(Project* project)
 {
@@ -706,7 +799,7 @@ void CreateJsonRegistrationUnit(std::vector<std::string>& objectFilePaths, Modul
     objectFilePaths.push_back(boundJsonCompileUnit.ObjectFilePath());
 }
 
-void CreateMainUnit(std::vector<std::string>& objectFilePaths, Module& module, cmajor::codegen::EmittingContext& emittingContext, AttributeBinder* attributeBinder)
+void CreateMainUnitLlvm(std::vector<std::string>& objectFilePaths, Module& module, cmajor::codegen::EmittingContext& emittingContext, AttributeBinder* attributeBinder)
 {
     CompileUnitNode mainCompileUnit(Span(), boost::filesystem::path(module.OriginalFilePath()).parent_path().append("__main__.cm").generic_string());
     mainCompileUnit.SetSynthesizedUnit();
@@ -830,6 +923,55 @@ void CreateMainUnit(std::vector<std::string>& objectFilePaths, Module& module, c
     objectFilePaths.push_back(boundMainCompileUnit.ObjectFilePath());
 }
 
+void CreateMainUnitSystemX(std::vector<std::string>& objectFilePaths, Module& module, cmajor::codegen::EmittingContext& emittingContext, AttributeBinder* attributeBinder)
+{
+    CompileUnitNode mainCompileUnit(Span(), boost::filesystem::path(module.OriginalFilePath()).parent_path().append("__main__.cm").generic_string());
+    mainCompileUnit.SetSynthesizedUnit();
+    FunctionNode* mainFunction(new FunctionNode(Span(), Specifiers::public_, new IntNode(Span()), U"main", nullptr));
+    mainFunction->AddParameter(new ParameterNode(Span(), new IntNode(Span()), new IdentifierNode(Span(), U"argc")));
+    mainFunction->AddParameter(new ParameterNode(Span(), new PointerNode(Span(), new PointerNode(Span(), new CharNode(Span()))), new IdentifierNode(Span(), U"argv")));
+    mainFunction->SetProgramMain();
+    CompoundStatementNode* mainFunctionBody = new CompoundStatementNode(Span());
+    ConstructionStatementNode* constructExitCode = new ConstructionStatementNode(Span(), new IntNode(Span()), new IdentifierNode(Span(), U"exitCode"));
+    mainFunctionBody->AddStatement(constructExitCode);
+    FunctionSymbol* userMain = module.GetSymbolTable().MainFunctionSymbol();
+    InvokeNode* invokeMain = new InvokeNode(Span(), new IdentifierNode(Span(), userMain->GroupName()));
+    if (!userMain->Parameters().empty())
+    {
+        invokeMain->AddArgument(new IdentifierNode(Span(), U"argc"));
+        invokeMain->AddArgument(new IdentifierNode(Span(), U"argv"));
+    }
+    StatementNode* callMainStatement = nullptr;
+    if (!userMain->ReturnType() || userMain->ReturnType()->IsVoidType())
+    {
+        callMainStatement = new ExpressionStatementNode(Span(), invokeMain);
+    }
+    else
+    {
+        callMainStatement = new AssignmentStatementNode(Span(), new IdentifierNode(Span(), U"exitCode"), invokeMain);
+    }
+    mainFunctionBody->AddStatement(callMainStatement);
+    ReturnStatementNode* returnStatement = new ReturnStatementNode(Span(), new IdentifierNode(Span(), U"exitCode"));
+    mainFunctionBody->AddStatement(returnStatement);
+    mainFunction->SetBody(mainFunctionBody);
+    mainCompileUnit.GlobalNs()->AddMember(mainFunction);
+    SymbolCreatorVisitor symbolCreator(module.GetSymbolTable());
+    mainCompileUnit.Accept(symbolCreator);
+    BoundCompileUnit boundMainCompileUnit(module, &mainCompileUnit, attributeBinder);
+    boundMainCompileUnit.PushBindingTypes();
+    TypeBinder typeBinder(boundMainCompileUnit);
+    mainCompileUnit.Accept(typeBinder);
+    boundMainCompileUnit.PopBindingTypes();
+    StatementBinder statementBinder(boundMainCompileUnit);
+    mainCompileUnit.Accept(statementBinder);
+    if (boundMainCompileUnit.HasGotos())
+    {
+        AnalyzeControlFlow(boundMainCompileUnit);
+    }
+    cmajor::codegen::GenerateCode(emittingContext, boundMainCompileUnit);
+    objectFilePaths.push_back(boundMainCompileUnit.ObjectFilePath());
+}
+
 void SetDefines(Module* module, const std::string& definesFilePath)
 {
     module->ClearDefines();
@@ -868,7 +1010,12 @@ void InstallSystemLibraries(Module* systemInstallModule)
     {
         LogMessage(systemInstallModule->LogStreamId(), "Installing system libraries...");
     }
-    boost::filesystem::path systemLibDir = CmajorSystemLibDir(GetConfig());
+    cmajor::ast::BackEnd backend = cmajor::ast::BackEnd::llvm;
+    if (GetBackEnd() == cmajor::symbols::BackEnd::cmsx)
+    {
+        backend = cmajor::ast::BackEnd::cmsx;
+    }
+    boost::filesystem::path systemLibDir = CmajorSystemLibDir(GetConfig(), backend);
     boost::filesystem::create_directories(systemLibDir);
     for (Module* systemModule : systemInstallModule->AllReferencedModules())
     {
@@ -1285,7 +1432,14 @@ void BuildProject(Project* project, std::unique_ptr<Module>& rootModule, bool& s
                 {
                     CreateJsonRegistrationUnit(objectFilePaths, *rootModule, emittingContext, &attributeBinder);
                 }
-                CreateMainUnit(objectFilePaths, *rootModule, emittingContext, &attributeBinder);
+                if (GetBackEnd() == cmajor::symbols::BackEnd::llvm)
+                {
+                    CreateMainUnitLlvm(objectFilePaths, *rootModule, emittingContext, &attributeBinder);
+                }
+                else if (GetBackEnd() == cmajor::symbols::BackEnd::cmsx)
+                {
+                    CreateMainUnitSystemX(objectFilePaths, *rootModule, emittingContext, &attributeBinder);
+                }
             }
             if (!objectFilePaths.empty())
             {
@@ -1347,7 +1501,12 @@ void BuildProject(const std::string& projectFilePath, std::unique_ptr<Module>& r
     std::string config = GetConfig();
     MappedInputFile projectFile(projectFilePath);
     std::u32string p(ToUtf32(std::string(projectFile.Begin(), projectFile.End())));
-    std::unique_ptr<Project> project(projectGrammar->Parse(&p[0], &p[0] + p.length(), 0, projectFilePath, config));
+    cmajor::ast::BackEnd backend = cmajor::ast::BackEnd::llvm;
+    if (GetBackEnd() == cmajor::symbols::BackEnd::cmsx)
+    {
+        backend = cmajor::ast::BackEnd::cmsx;
+    }
+    std::unique_ptr<Project> project(projectGrammar->Parse(&p[0], &p[0] + p.length(), 0, projectFilePath, config, backend));
     project->ResolveDeclarations();
     if (GetGlobalFlag(GlobalFlags::clean))
     {
@@ -1533,7 +1692,12 @@ void BuildSolution(const std::string& solutionFilePath, std::vector<std::unique_
         const std::string& relativeProjectFilePath = solution->RelativeProjectFilePaths()[i];
         MappedInputFile projectFile(projectFilePath);
         std::u32string p(ToUtf32(std::string(projectFile.Begin(), projectFile.End())));
-        std::unique_ptr<Project> project(projectGrammar->Parse(&p[0], &p[0] + p.length(), 0, projectFilePath, config));
+        cmajor::ast::BackEnd backend = cmajor::ast::BackEnd::llvm;
+        if (GetBackEnd() == cmajor::symbols::BackEnd::cmsx)
+        {
+            backend = cmajor::ast::BackEnd::cmsx;
+        }
+        std::unique_ptr<Project> project(projectGrammar->Parse(&p[0], &p[0] + p.length(), 0, projectFilePath, config, backend));
         project->SetRelativeFilePath(relativeProjectFilePath);
         project->ResolveDeclarations();
         solution->AddProject(std::move(project));
@@ -1682,7 +1846,7 @@ void BuildMsBuildProject(const std::string& projectName, const std::string& proj
     const std::vector<std::string>& sourceFiles, const std::vector<std::string>& referenceFiles, std::unique_ptr<Module>& rootModule)
 {
     std::string projectFilePath = GetFullPath(Path::Combine(projectDirectory, projectName + ".cmproj"));
-    std::unique_ptr<Project> project(new Project(ToUtf32(projectName), projectFilePath, GetConfig()));
+    std::unique_ptr<Project> project(new Project(ToUtf32(projectName), projectFilePath, GetConfig(), cmajor::ast::BackEnd::llvm));
     if (target == "program")
     {
         project->AddDeclaration(new TargetDeclaration(Target::program));

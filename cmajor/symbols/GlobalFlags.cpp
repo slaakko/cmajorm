@@ -8,20 +8,19 @@
 
 namespace cmajor { namespace symbols {
 
-CompileTarget compileTarget = CompileTarget::llvm;
-
+BackEnd backend = BackEnd::llvm;
 GlobalFlags globalFlags = GlobalFlags::none;
 int optimizationLevel = -1;
 int numBuildThreads = -1;
 
-void SetCompileTarget(CompileTarget compileTarget_)
+void SetBackEnd(BackEnd backend_)
 {
-    compileTarget = compileTarget_;
+    backend = backend_;
 }
 
-CompileTarget GetCompileTarget()
+BackEnd GetBackEnd()
 {
-    return compileTarget;
+    return backend;
 }
 
 inline GlobalFlags operator|(GlobalFlags flags, GlobalFlags flag)

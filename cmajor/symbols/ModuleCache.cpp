@@ -6,6 +6,7 @@
 #include <cmajor/symbols/ModuleCache.hpp>
 #include <cmajor/symbols/Module.hpp>
 #include <cmajor/symbols/DebugFlags.hpp>
+#include <cmajor/symbols/GlobalFlags.hpp>
 #include <cmajor/util/Unicode.hpp>
 #include <cmajor/util/Log.hpp>
 

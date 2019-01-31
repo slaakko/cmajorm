@@ -15,8 +15,8 @@ namespace cmajor.parser
         using stdlib.spaces_and_comments;
         skip spaces_and_comments;
 
-        Project(std::string config) : cmajor::ast::Project*
-            ::= keyword("project") qualified_id ';'{ value = new cmajor::ast::Project(qualified_id, fileName, config); }
+        Project(std::string config, BackEnd backend) : cmajor::ast::Project*
+            ::= keyword("project") qualified_id ';'{ value = new cmajor::ast::Project(qualified_id, fileName, config, backend); }
                 (Declaration{ value->AddDeclaration(Declaration); })*
             ;
 

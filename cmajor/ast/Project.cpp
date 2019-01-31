@@ -21,18 +21,34 @@ std::string CmajorRootDir()
     return std::string(e);
 }
 
-std::string CmajorSystemLibDir(const std::string& config)
+std::string CmajorSystemLibDir(const std::string& config, BackEnd backend)
 {
-    boost::filesystem::path sld(CmajorRootDir());
-    sld /= "system";
-    sld /= "lib";
-    sld /= config;
-    return GetFullPath(sld.generic_string());
+    if (backend == BackEnd::llvm)
+    {
+        boost::filesystem::path sld(CmajorRootDir());
+        sld /= "system";
+        sld /= "lib";
+        sld /= config;
+        return GetFullPath(sld.generic_string());
+    }
+    else if (backend == BackEnd::cmsx)
+    {
+        boost::filesystem::path sld(CmajorRootDir());
+        sld /= "projects";
+        sld /= "cmsx";
+        sld /= "system";
+        sld /= "lib";
+        return GetFullPath(sld.generic_string());
+    }
+    else
+    {
+        return std::string();
+    }
 }
 
-std::string CmajorSystemModuleFilePath(const std::string& config)
+std::string CmajorSystemModuleFilePath(const std::string& config, BackEnd backend)
 {
-    boost::filesystem::path smfp(CmajorSystemLibDir(config));
+    boost::filesystem::path smfp(CmajorSystemLibDir(config, backend));
     smfp /= "System.cmm";
     return GetFullPath(smfp.generic_string());
 }
@@ -61,11 +77,11 @@ TargetDeclaration::TargetDeclaration(Target target_) : ProjectDeclaration(Projec
 {
 }
 
-Project::Project(const std::u32string& name_, const std::string& filePath_, const std::string& config_) :
+Project::Project(const std::u32string& name_, const std::string& filePath_, const std::string& config_, BackEnd backend) :
     name(name_), filePath(filePath_), config(config_), target(Target::program), basePath(filePath), isSystemProject(false), logStreamId(0), built(false)
 {
     basePath.remove_filename();
-    systemLibDir = CmajorSystemLibDir(config);
+    systemLibDir = CmajorSystemLibDir(config, backend);
     boost::filesystem::path mfp(filePath);
     boost::filesystem::path fn = mfp.filename();
     mfp.remove_filename();
@@ -76,7 +92,14 @@ Project::Project(const std::u32string& name_, const std::string& filePath_, cons
     moduleFilePath = GetFullPath(mfp.generic_string());
     boost::filesystem::path lfp(mfp);
 #ifdef _WIN32
-    lfp.replace_extension(".lib");
+    if (backend == BackEnd::cmsx)
+    {
+        lfp.replace_extension(".a");
+    }
+    else if (backend == BackEnd::llvm)
+    {
+        lfp.replace_extension(".lib");
+    }
 #else
     lfp.replace_extension(".a");
 #endif
@@ -87,7 +110,14 @@ Project::Project(const std::u32string& name_, const std::string& filePath_, cons
     efp /= config;
     efp /= fn;
 #ifdef _WIN32
-    efp.replace_extension(".exe");
+    if (backend == BackEnd::cmsx)
+    {
+        efp.replace_extension();
+    }
+    else if (backend == BackEnd::llvm)
+    {
+        efp.replace_extension(".exe");
+    }
 #else
     efp.replace_extension();
 #endif

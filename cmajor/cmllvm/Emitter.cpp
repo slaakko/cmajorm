@@ -508,7 +508,7 @@ void* Emitter::CreateSExt(void* operand, void* destinationType)
 
 void* Emitter::CreateZExt(void* operand, void* destinationType)
 {
-    return builder.CreateSExt(static_cast<llvm::Value*>(operand), static_cast<llvm::Type*>(destinationType));
+    return builder.CreateZExt(static_cast<llvm::Value*>(operand), static_cast<llvm::Type*>(destinationType));
 }
 
 void* Emitter::CreateFPExt(void* operand, void* destinationType)

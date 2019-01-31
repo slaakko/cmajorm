@@ -378,7 +378,12 @@ void Import(Module* rootModule, Module* module, const std::vector<std::string>& 
             std::string searchedDirectories;
             if (!rootModule->IsSystemModule())
             {
-                mfp = CmajorSystemLibDir(config);
+                cmajor::ast::BackEnd backend = cmajor::ast::BackEnd::llvm;
+                if (GetBackEnd() == cmajor::symbols::BackEnd::cmsx)
+                {
+                    backend = cmajor::ast::BackEnd::cmsx;
+                }
+                mfp = CmajorSystemLibDir(config, backend);
                 searchedDirectories.append("\n").append(mfp.generic_string());
                 mfp /= mfn;
                 if (!boost::filesystem::exists(mfp))
@@ -422,7 +427,12 @@ void Import(Module* rootModule, Module* module, const std::vector<std::string>& 
             std::string searchedDirectories;
             if (!rootModule->IsSystemModule())
             {
-                mfp = CmajorSystemLibDir(config);
+                cmajor::ast::BackEnd backend = cmajor::ast::BackEnd::llvm;
+                if (GetBackEnd() == cmajor::symbols::BackEnd::cmsx)
+                {
+                    backend = cmajor::ast::BackEnd::cmsx;
+                }
+                mfp = CmajorSystemLibDir(config, backend);
                 mfp /= mfn;
                 if (!boost::filesystem::exists(mfp))
                 {
@@ -482,7 +492,12 @@ void ImportModulesWithReferences(Module* rootModule, Module* module, const std::
     std::vector<std::string> allReferences = references;
     if (!rootModule->IsSystemModule() && !GetGlobalFlag(GlobalFlags::profile))
     {
-        allReferences.push_back(CmajorSystemModuleFilePath(GetConfig()));
+        cmajor::ast::BackEnd backend = cmajor::ast::BackEnd::llvm;
+        if (GetBackEnd() == cmajor::symbols::BackEnd::cmsx)
+        {
+            backend = cmajor::ast::BackEnd::cmsx;
+        }
+        allReferences.push_back(CmajorSystemModuleFilePath(GetConfig(), backend));
     }
     Import(rootModule, module, allReferences, importSet, modules, moduleDependencyMap, readMap);
 #ifdef MODULE_READING_DEBUG
@@ -553,7 +568,14 @@ Module::Module(const std::string& filePath)  :
     if (!fileTable.IsEmpty())
     {
 #ifdef _WIN32
-        libraryFilePath = GetFullPath(boost::filesystem::path(originalFilePath).replace_extension(".lib").generic_string());
+        if (GetBackEnd() == BackEnd::cmsx)
+        {
+            libraryFilePath = GetFullPath(boost::filesystem::path(originalFilePath).replace_extension(".a").generic_string());
+        }
+        else if (GetBackEnd() == BackEnd::llvm)
+        {
+            libraryFilePath = GetFullPath(boost::filesystem::path(originalFilePath).replace_extension(".lib").generic_string());
+        }
 #else
         libraryFilePath = GetFullPath(boost::filesystem::path(originalFilePath).replace_extension(".a").generic_string());
 #endif
@@ -611,7 +633,14 @@ void Module::PrepareForCompilation(const std::vector<std::string>& references)
     if (!this->fileTable.IsEmpty())
     {
 #ifdef _WIN32
-        libraryFilePath = GetFullPath(boost::filesystem::path(originalFilePath).replace_extension(".lib").generic_string());
+        if (GetBackEnd() == BackEnd::cmsx)
+        {
+            libraryFilePath = GetFullPath(boost::filesystem::path(originalFilePath).replace_extension(".a").generic_string());
+        }
+        else if (GetBackEnd() == BackEnd::llvm)
+        {
+            libraryFilePath = GetFullPath(boost::filesystem::path(originalFilePath).replace_extension(".lib").generic_string());
+        }
 #else
         libraryFilePath = GetFullPath(boost::filesystem::path(originalFilePath).replace_extension(".a").generic_string());
 #endif
@@ -763,7 +792,14 @@ void Module::ReadHeader(SymbolReader& reader, Module* rootModule, std::unordered
     if (!fileTable.IsEmpty())
     {
 #ifdef _WIN32
-        libraryFilePath = GetFullPath(boost::filesystem::path(filePathReadFrom).replace_extension(".lib").generic_string());
+        if (GetBackEnd() == BackEnd::cmsx)
+        {
+            libraryFilePath = GetFullPath(boost::filesystem::path(filePathReadFrom).replace_extension(".a").generic_string());
+        }
+        else if (GetBackEnd() == BackEnd::llvm)
+        {
+            libraryFilePath = GetFullPath(boost::filesystem::path(filePathReadFrom).replace_extension(".lib").generic_string());
+        }
 #else
         libraryFilePath = GetFullPath(boost::filesystem::path(filePathReadFrom).replace_extension(".a").generic_string());
 #endif
@@ -960,10 +996,18 @@ void Module::CheckUpToDate()
         boost::filesystem::path sfp(fileTable.GetFilePath(i));
         if (boost::filesystem::exists(sfp))
         {
+            boost::filesystem::path objectFilePath;
 #ifdef _WIN32
-            boost::filesystem::path objectFilePath = libDirPath / sfp.filename().replace_extension(".obj");
+            if (GetBackEnd() == BackEnd::llvm)
+            {
+                objectFilePath = libDirPath / sfp.filename().replace_extension(".obj");
+            }
+            else if (GetBackEnd() == BackEnd::cmsx)
+            {
+                objectFilePath = libDirPath / sfp.filename().replace_extension(".o");
+            }
 #else
-            boost::filesystem::path objectFilePath = libDirPath / sfp.filename().replace_extension(".o");
+            objectFilePath = libDirPath / sfp.filename().replace_extension(".o");
 #endif
             if (boost::filesystem::exists(objectFilePath))
             {

@@ -102,7 +102,7 @@ int main(int argc, const char** argv)
         {
             MappedInputFile projectFile(projectFilePath);
             std::u32string p(ToUtf32(std::string(projectFile.Begin(), projectFile.End())));
-            std::unique_ptr<cmajor::ast::Project> project(projectGrammar->Parse(&p[0], &p[0] + p.length(), 0, projectFilePath, "debug"));
+            std::unique_ptr<cmajor::ast::Project> project(projectGrammar->Parse(&p[0], &p[0] + p.length(), 0, projectFilePath, "debug", cmajor::ast::BackEnd::llvm));
             project->ResolveDeclarations();
             std::string cmprojFilePath = GetFullPath(Path::ChangeExtension(projectFilePath, ".cmproj"));
             boost::uuids::uuid guid = boost::uuids::random_generator()();

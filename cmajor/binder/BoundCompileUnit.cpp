@@ -242,10 +242,18 @@ BoundCompileUnit::BoundCompileUnit(Module& module_, CompileUnitNode* compileUnit
         boost::filesystem::path directory = module.DirectoryPath();
         boost::filesystem::path llfp = (directory / fileName).replace_extension(".ll");
         boost::filesystem::path optllfp = (directory / fileName).replace_extension(".opt.ll");
+        boost::filesystem::path objfp;
 #ifdef _WIN32
-        boost::filesystem::path objfp = (directory / fileName).replace_extension(".obj");
+        if (GetBackEnd() == BackEnd::llvm)
+        {
+            objfp = (directory / fileName).replace_extension(".obj");
+        }
+        else if (GetBackEnd() == BackEnd::cmsx)
+        {
+            objfp = (directory / fileName).replace_extension(".o");
+        }
 #else
-        boost::filesystem::path objfp = (directory / fileName).replace_extension(".o");
+        objfp = (directory / fileName).replace_extension(".o");
 #endif
         llFilePath = GetFullPath(llfp.generic_string());
         optLLFilePath = GetFullPath(optllfp.generic_string());

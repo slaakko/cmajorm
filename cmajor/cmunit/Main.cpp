@@ -452,7 +452,7 @@ bool TestProject(const std::string& projectFileName, const std::string& onlySour
     }
     MappedInputFile projectFile(projectFileName);
     std::u32string p(ToUtf32(std::string(projectFile.Begin(), projectFile.End())));
-    std::unique_ptr<cmajor::ast::Project> project(projectGrammar->Parse(&p[0], &p[0] + p.length(), 0, projectFileName, config));
+    std::unique_ptr<cmajor::ast::Project> project(projectGrammar->Parse(&p[0], &p[0] + p.length(), 0, projectFileName, config, cmajor::ast::BackEnd::llvm));
     project->ResolveDeclarations();
     if (project->GetTarget() != Target::unitTest)
     {

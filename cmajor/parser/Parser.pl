@@ -198,7 +198,7 @@ namespace cmajor.parser
     }
     grammar Project
     {
-        Project(std::string config): cmajor::ast::Project*;
+        Project(std::string config, BackEnd backend): cmajor::ast::Project*;
         Declaration: ProjectDeclaration*;
         ReferenceDeclaration: ProjectDeclaration*;
         SourceFileDeclaration: ProjectDeclaration*;

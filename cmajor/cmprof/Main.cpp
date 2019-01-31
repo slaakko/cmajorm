@@ -635,7 +635,7 @@ void ReadProject(const std::string& projectFilePath, cmajor::ast::Solution& solu
     MappedInputFile projectFile(projectFilePath);
     std::u32string p(ToUtf32(std::string(projectFile.Begin(), projectFile.End())));
     std::string config = "profile";
-    std::unique_ptr<cmajor::ast::Project> project(projectGrammar->Parse(&p[0], &p[0] + p.length(), 0, projectFilePath, config));
+    std::unique_ptr<cmajor::ast::Project> project(projectGrammar->Parse(&p[0], &p[0] + p.length(), 0, projectFilePath, config, cmajor::ast::BackEnd::llvm));
     if (!IsSystemModule(project->Name()))
     {
         std::string systemProjectFilePath = Path::Combine(Path::Combine(Path::Combine(CmajorRootDir(), "system"), "System"), "System.cmp");

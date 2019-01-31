@@ -13,9 +13,14 @@
 
 namespace cmajor { namespace ast {
 
+enum class BackEnd
+{
+    llvm, cmsx
+};
+
 AST_API std::string CmajorRootDir();
-AST_API std::string CmajorSystemLibDir(const std::string& config);
-AST_API std::string CmajorSystemModuleFilePath(const std::string& config);
+AST_API std::string CmajorSystemLibDir(const std::string& config, BackEnd backend);
+AST_API std::string CmajorSystemModuleFilePath(const std::string& config, BackEnd backend);
 
 enum class ProjectDeclarationType : uint8_t
 {
@@ -78,7 +83,7 @@ private:
 class AST_API Project
 {
 public:
-    Project(const std::u32string& name_, const std::string& filePath_, const std::string& config_);
+    Project(const std::u32string& name_, const std::string& filePath_, const std::string& config_, BackEnd backend);
     Project(const Project&) = delete;
     Project& operator=(const Project&) = delete;
     const std::u32string& Name() const { return name; }

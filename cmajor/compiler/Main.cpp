@@ -46,25 +46,25 @@ struct InitDone
     }
 };
 
-struct CompileTargetSelector
+struct BackendSelector
 {
-    CompileTargetSelector(cmajor::symbols::CompileTarget compileTarget)
+    BackendSelector(cmajor::symbols::BackEnd backend)
     {
-        switch (compileTarget)
+        switch (backend)
         {
-            case cmajor::symbols::CompileTarget::llvm:
+            case cmajor::symbols::BackEnd::llvm:
             {
                 CmmInit(cmajor::mid::BackEndKind::llvmBackEnd);
                 break;
             }
-            case cmajor::symbols::CompileTarget::cmsx:
+            case cmajor::symbols::BackEnd::cmsx:
             {
                 CmmInit(cmajor::mid::BackEndKind::cmsxBackEnd);
                 break;
             }
         }
     }
-    ~CompileTargetSelector()
+    ~BackendSelector()
     {
         CmmDone();
     }
@@ -87,8 +87,8 @@ void PrintHelp()
         "--config=CONFIG (-c=CONFIG)\n" <<
         "   set configuration to CONFIG (debug | release)\n" <<
         "   default is debug\n" <<
-        "--compile-target=COMPILE_TARGET (-ct=COMPILE_TARGET)\n" <<
-        "   set compile target to COMPILE_TARGET : (llvm | cmsx)\n" <<
+        "--backend=BACKEND (-be=BACKEND)\n" <<
+        "   set compiler back-end to BACKEND : (llvm | cmsx)\n" <<
         "   default is llvm\n" <<
         "--optimization-level=LEVEL (-O=LEVEL)\n" <<
         "   set optimization level to LEVEL=0-3\n" <<
@@ -330,15 +330,15 @@ int main(int argc, const char** argv)
                                     throw std::runtime_error("unknown configuration '" + components[1] + "'");
                                 }
                             }
-                            else if (components[0] == "--compile-target" || components[0] == "-ct")
+                            else if (components[0] == "--backend" || components[0] == "-be")
                             {
                                 if (components[1] == "llvm")
                                 {
-                                    SetCompileTarget(CompileTarget::llvm);
+                                    SetBackEnd(cmajor::symbols::BackEnd::llvm);
                                 }
                                 else if (components[1] == "cmsx")
                                 {
-                                    SetCompileTarget(CompileTarget::cmsx);
+                                    SetBackEnd(cmajor::symbols::BackEnd::cmsx);
                                 }
                                 else
                                 {
@@ -430,7 +430,7 @@ int main(int argc, const char** argv)
             noDebugInfo = true;
 #endif
             SetUseModuleCache(useModuleCache);
-            CompileTargetSelector compileTarget(GetCompileTarget());
+            BackendSelector backend(GetBackEnd());
             if (!GetGlobalFlag(GlobalFlags::release) && !noDebugInfo)
             {
                 SetGlobalFlag(GlobalFlags::generateDebugInfo);

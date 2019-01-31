@@ -1,5 +1,5 @@
-#ifndef Project_hpp_8344
-#define Project_hpp_8344
+#ifndef Project_hpp_2478
+#define Project_hpp_2478
 
 #include <cmajor/parsing/Grammar.hpp>
 #include <cmajor/parsing/Keyword.hpp>
@@ -13,7 +13,7 @@ class Project : public cmajor::parsing::Grammar
 public:
     static Project* Create();
     static Project* Create(cmajor::parsing::ParsingDomain* parsingDomain);
-    cmajor::ast::Project* Parse(const char32_t* start, const char32_t* end, int fileIndex, const std::string& fileName, std::string config);
+    cmajor::ast::Project* Parse(const char32_t* start, const char32_t* end, int fileIndex, const std::string& fileName, std::string config, BackEnd backend);
 private:
     Project(cmajor::parsing::ParsingDomain* parsingDomain_);
     void CreateRules() override;
@@ -30,4 +30,4 @@ private:
 
 } } // namespace cmajor.parser
 
-#endif // Project_hpp_8344
+#endif // Project_hpp_2478

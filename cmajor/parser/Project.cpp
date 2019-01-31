@@ -36,7 +36,7 @@ Project::Project(cmajor::parsing::ParsingDomain* parsingDomain_): cmajor::parsin
     SetOwner(0);
 }
 
-cmajor::ast::Project* Project::Parse(const char32_t* start, const char32_t* end, int fileIndex, const std::string& fileName, std::string config)
+cmajor::ast::Project* Project::Parse(const char32_t* start, const char32_t* end, int fileIndex, const std::string& fileName, std::string config, BackEnd backend)
 {
     cmajor::parsing::Scanner scanner(start, end, fileName, fileIndex, SkipRule());
     std::unique_ptr<cmajor::parsing::XmlLog> xmlLog;
@@ -50,6 +50,7 @@ cmajor::ast::Project* Project::Parse(const char32_t* start, const char32_t* end,
     std::unique_ptr<cmajor::parsing::ParsingData> parsingData(new cmajor::parsing::ParsingData(GetParsingDomain()->GetNumRules()));
     scanner.SetParsingData(parsingData.get());
     stack.push(std::unique_ptr<cmajor::parsing::Object>(new ValueObject<std::string>(config)));
+    stack.push(std::unique_ptr<cmajor::parsing::Object>(new ValueObject<BackEnd>(backend)));
     cmajor::parsing::Match match = cmajor::parsing::Grammar::Parse(scanner, stack, parsingData.get());
     cmajor::parsing::Span stop = scanner.GetSpan();
     if (Log())
@@ -80,12 +81,16 @@ public:
         cmajor::parsing::Rule(name_, enclosingScope_, id_, definition_)
     {
         AddInheritedAttribute(AttrOrVariable(ToUtf32("std::string"), ToUtf32("config")));
+        AddInheritedAttribute(AttrOrVariable(ToUtf32("BackEnd"), ToUtf32("backend")));
         SetValueTypeName(ToUtf32("cmajor::ast::Project*"));
     }
     void Enter(cmajor::parsing::ObjectStack& stack, cmajor::parsing::ParsingData* parsingData) override
     {
         parsingData->PushContext(Id(), new Context());
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
+        std::unique_ptr<cmajor::parsing::Object> backend_value = std::move(stack.top());
+        context->backend = *static_cast<cmajor::parsing::ValueObject<BackEnd>*>(backend_value.get());
+        stack.pop();
         std::unique_ptr<cmajor::parsing::Object> config_value = std::move(stack.top());
         context->config = *static_cast<cmajor::parsing::ValueObject<std::string>*>(config_value.get());
         stack.pop();
@@ -113,7 +118,7 @@ public:
     void A0Action(const char32_t* matchBegin, const char32_t* matchEnd, const Span& span, const std::string& fileName, ParsingData* parsingData, bool& pass)
     {
         Context* context = static_cast<Context*>(parsingData->GetContext(Id()));
-        context->value = new cmajor::ast::Project(context->fromqualified_id, fileName, context->config);
+        context->value = new cmajor::ast::Project(context->fromqualified_id, fileName, context->config, context->backend);
     }
     void A1Action(const char32_t* matchBegin, const char32_t* matchEnd, const Span& span, const std::string& fileName, ParsingData* parsingData, bool& pass)
     {
@@ -143,8 +148,9 @@ public:
 private:
     struct Context : cmajor::parsing::Context
     {
-        Context(): config(), value(), fromqualified_id(), fromDeclaration() {}
+        Context(): config(), backend(), value(), fromqualified_id(), fromDeclaration() {}
         std::string config;
+        BackEnd backend;
         cmajor::ast::Project* value;
         std::u32string fromqualified_id;
         ProjectDeclaration* fromDeclaration;

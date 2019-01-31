@@ -10,12 +10,10 @@ namespace cmajor { namespace mid {
 
 void LLvmBackEnd::Init()
 {
-    // todo
 }
 
 void LLvmBackEnd::Done()
 {
-    // todo
 }
 
 cmajor::ir::EmittingContext* LLvmBackEnd::CreateEmittingContext(int optimizationLevel)

@@ -10,7 +10,7 @@
 namespace cmajor { namespace mid {
 
 LLvmBackEnd llvmBackEnd;
-//CmsxBackEnd cmsxBackEnd;
+CmsxBackEnd cmsxBackEnd;
 
 BackEnd* backEnd = &llvmBackEnd;
 
@@ -23,7 +23,7 @@ void SetBackEnd(BackEndKind backEndKind)
     switch (backEndKind)
     {
         case BackEndKind::llvmBackEnd: backEnd = &llvmBackEnd; break;
-        //case BackEndKind::cmsxBackEnd: backEnd = &cmsxBackEnd; break;
+        case BackEndKind::cmsxBackEnd: backEnd = &cmsxBackEnd; break;
     }
 }
 
