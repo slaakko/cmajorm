@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using CodeFormatter = System.Text.CodeFormatter;
 
 namespace cmsx.intermediate
 {
@@ -296,6 +297,10 @@ namespace cmsx.intermediate
             val->type = type;
             AddValue(val);
             return val;
+        }
+        public void PrintTypes(CodeFormatter& formatter)
+        {
+            typeRepository.PrintTypes(formatter);
         }
         private void AddValue(Value* value)
         {

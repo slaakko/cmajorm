@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using CodeFormatter = System.Text.CodeFormatter;
 
 namespace cmsx.intermediate
 {
@@ -11,6 +12,9 @@ namespace cmsx.intermediate
         public virtual Value* MakeValue(const string& fromStr, Context& context) const
         {
             throw Exception("cannot make '" + Name() + "' type value from string '" + fromStr + "'");
+        }
+        public virtual void PrintDeclaration(CodeFormatter& formatter)
+        {
         }
     }
 
@@ -497,6 +501,24 @@ namespace cmsx.intermediate
         {
             throw Exception("cannot make default value of type '" + Name() + "'");
         }
+        public override void PrintDeclaration(CodeFormatter& formatter)
+        {
+            formatter.Write(typeId + " = { ");
+            bool first = true;
+            for (Type* memberType : memberTypes)
+            {
+                if (first)
+                {
+                    first = false;
+                }
+                else
+                {
+                    formatter.Write(", ");
+                }
+                formatter.Write(memberType->Name());
+            }
+            formatter.WriteLine(" }");
+        }
         private string typeId;
         private List<Type*> memberTypes;
     }
@@ -528,6 +550,12 @@ namespace cmsx.intermediate
         public override Value* DefaultValue() const
         {
             throw Exception("cannot make default value of type '" + Name() + "'");
+        }
+        public override void PrintDeclaration(CodeFormatter& formatter)
+        {
+            formatter.Write(typeId + " = [");
+            formatter.Write(ToString(size) + " x " + elementType->Name());
+            formatter.WriteLine("]");
         }
         private string typeId;
         private Type* elementType;
@@ -565,6 +593,24 @@ namespace cmsx.intermediate
         public override Value* DefaultValue() const
         {
             throw Exception("cannot make default value of type '" + Name() + "'");
+        }
+        public override void PrintDeclaration(CodeFormatter& formatter)
+        {
+            formatter.Write(typeId + " = function " + returnType->Name() + "(");
+            bool first = true;
+            for (Type* paramType : paramTypes)
+            {
+                if (first)
+                {
+                    first = false;
+                }
+                else
+                {
+                    formatter.Write(", ");
+                }
+                formatter.Write(paramType->Name());
+            }
+            formatter.WriteLine(")");
         }
         private string typeId;
         private Type* returnType;
@@ -788,6 +834,18 @@ namespace cmsx.intermediate
             ResolveStructureTypes();
             ResolveArrayTypes();
             ResolveFunctionTypes();
+        }
+        public void PrintTypes(CodeFormatter& formatter)
+        {
+            formatter.WriteLine("types");
+            formatter.WriteLine("{");
+            formatter.IncIndent();
+            for (const UniquePtr<Type>& type : types)
+            {
+                type->PrintDeclaration(formatter);
+            }
+            formatter.DecIndent();
+            formatter.WriteLine("}");
         }
         private void ResolvePointerTypes()
         {

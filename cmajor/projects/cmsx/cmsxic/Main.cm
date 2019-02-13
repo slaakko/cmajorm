@@ -12,12 +12,20 @@ void PrintHelp()
     Console.Out() <<
         "Cmajor System X Intermediate Code Compiler version " << Version() << endl() <<
         "Usage: cmsxic [options] { <file.i> }" << endl() <<
-        "Compile given System X intermediate code files (*.i) to System X assembly files (*.s)" << endl() <<
+        "Compiles given System X intermediate code files (*.i) to System X assembly files (*.s)" << endl() <<
         "Options:" << endl() <<
         "--help (-h)" << endl() <<
         "   Print help" << endl() <<
         "--verbose (-v)" << endl() <<
         "   Be verbose" << endl() <<
+        "--debug (-d)" << endl() <<
+        "   Print debugging messages to stdout" << endl() <<
+        "--stages (-s)" << endl() <<
+        "   Generate intermediate stage files (*.iN) N = 0, 1, 2, ..." << endl() <<
+        "   and combined assembly code file (*.is)" << endl() <<
+        "--optimization-level=N (-O=N)" << endl() <<
+        "   Set optimization level to N=0-3." << endl() <<
+        "   Default is 0." << endl() <<
         endl();
 }
 
@@ -25,13 +33,31 @@ int main(int argc, const char** argv)
 {
     try
     {
-        bool verbose = false;
         List<string> intermediateCodeFileNames;
         for (int i = 1; i < argc; ++i)
         {
             string arg = argv[i];
             if (arg.StartsWith("-"))
             {
+                if (arg.Find('=') != -1)
+                {
+                    List<string> components = arg.Split('=');
+                    if (components.Count() != 2)
+                    {
+                        throw Exception("unknown option '" + arg + "'");
+                    }
+                    string option = components[0];
+                    string value = components[1];
+                    if (option == "--optimization-level" || option == "-O")
+                    {
+                        int level = ParseInt(value);
+                        if (level < 0 || level > 3)
+                        {
+                            throw Exception("invalid optimization level (must be 0-3)");
+                        }
+                        cmsx.intermediate.Flags.SetOptimizationLevel(level);
+                    }
+                }
                 if (arg ==  "--help" || arg == "-h")
                 {
                     PrintHelp();
@@ -39,7 +65,19 @@ int main(int argc, const char** argv)
                 }
                 else if (arg == "--verbose" || arg == "-v")
                 {
-                    verbose = true;
+                    cmsx.intermediate.Flags.Set(cmsx.intermediate.Flag.verbose);
+                }
+                else if (arg == "--debug" || arg == "-d")
+                {
+                    cmsx.intermediate.Flags.Set(cmsx.intermediate.Flag.debug);
+                }
+                else if (arg == "--stages" || arg == "-s")
+                {
+                    cmsx.intermediate.Flags.Set(cmsx.intermediate.Flag.stages);
+                }
+                else
+                {
+                    throw Exception("unknown option '" + arg + "'");
                 }
             }
             else
@@ -54,11 +92,11 @@ int main(int argc, const char** argv)
         }
         for (const string& intermediateCodeFileName : intermediateCodeFileNames)
         {
-            if (verbose)
+            if (cmsx.intermediate.Flags.Get(cmsx.intermediate.Flag.verbose))
             {
                 Console.Out() << "> " << intermediateCodeFileName << endl();
             }
-            cmsx.intermediate.Compile(intermediateCodeFileName, verbose);
+            cmsx.intermediate.Compile(intermediateCodeFileName);
         }
     }
     catch (const Exception& ex)

@@ -1,5 +1,7 @@
 using System;
 using System.Collections;
+using System.IO;
+using CodeFormatter = System.Text.CodeFormatter;
 
 namespace cmsx.intermediate
 {
@@ -34,20 +36,42 @@ namespace cmsx.intermediate
         }
         public void Validate()
         {
-            Validate(false);
-        }
-        public void Validate(bool debug)
-        {
             for (const UniquePtr<Function>& function : functions)
             {
                 try
                 {
-                    function->Validate(debug);
+                    function->Validate();
                 }
                 catch (const Exception& ex)
                 {
                     throw Exception("validation of function " + function->name + " in file '" + fileName + "' failed: " + ex.Message());
                 }
+            }
+        }
+        public void Print(int stage)
+        {
+            string filePath = Path.ChangeExtension(fileName, ".i" + ToString(stage));
+            StreamWriter writer = File.CreateText(filePath);
+            CodeFormatter formatter(writer);
+            formatter.SetIndentSize(8);
+            context.PrintTypes(formatter);
+            formatter.WriteLine();
+            bool first = true;
+            for (const UniquePtr<Function>& function : functions)
+            {
+                if (first)
+                {
+                    first = false;
+                }
+                else
+                {
+                    formatter.WriteLine();
+                }
+                function->Print(formatter);
+            }
+            if (Flags.Get(Flag.verbose))
+            {
+                Console.Out() << "==> " << filePath << endl();
             }
         }
         public Context& context;

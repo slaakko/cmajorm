@@ -1,11 +1,12 @@
 using System;
 using System.Collections;
+using CodeFormatter = System.Text.CodeFormatter;
 
 namespace cmsx.intermediate
 {
     public class Function
     {
-        public nothrow Function(Context& context_, FunctionType* type_, const string& name_) : context(context_), type(type_), name(name_)
+        public nothrow Function(Context& context_, FunctionType* type_, const string& name_) : context(context_), type(type_), name(name_), nextValueNumber(0)
         {
         }
         public BasicBlock* AddBasicBlock(uint id)
@@ -57,15 +58,15 @@ namespace cmsx.intermediate
                 throw Exception("instruction '" + instruction->Name() + "' id " + ToString(id) + " at line '" + ToString(instruction->line) + "' already mapped at line " + ToString(it->second->line));
             }
         }
-        public void Validate(bool debug)
+        public void Validate()
         {
-            if (debug)
+            if (Flags.Get(Flag.debug))
             {
                 Console.Out() << "validating " << name << "..." << endl();
             }
             for (const UniquePtr<BasicBlock>& bb : basicBlocks)
             {
-                bb->Validate(debug);
+                bb->Validate();
             }
         }
         public Value* ResolveOperand(int line, Value* operand)
@@ -113,6 +114,31 @@ namespace cmsx.intermediate
                 return null;
             }
         }
+        public void Print(CodeFormatter& formatter)
+        {
+            formatter.WriteLine("function @" + name);
+            formatter.WriteLine("{");
+            formatter.IncIndent();
+            bool first = true;
+            for (const UniquePtr<BasicBlock>& basicBlock : basicBlocks)
+            {
+                if (first)
+                {
+                    first = false;
+                }
+                else
+                {
+                    formatter.WriteLine();
+                }
+                basicBlock->Print(formatter);
+            }
+            formatter.DecIndent();
+            formatter.WriteLine("}");
+        }
+        public nothrow inline int GetNextValueNumber()
+        {
+            return nextValueNumber++;
+        }
         public Context& context;
         public FunctionType* type;
         public string name;
@@ -120,5 +146,6 @@ namespace cmsx.intermediate
         private List<UniquePtr<Value>> values;
         private HashMap<uint, IdValue*> idValueMap;
         private HashMap<uint, Instruction*> instructionMap;
+        private int nextValueNumber;
     }
 }

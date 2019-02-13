@@ -19,7 +19,7 @@ void BasicBlock::AddInstruction(Instruction* instruction)
 
 void BasicBlock::Write(CodeFormatter& formatter, Function& function, Context& context)
 {
-    int indent = formatter.CurrentIndent();
+    int indent = formatter.IndentSize();
     formatter.DecIndent();
     formatter.Write(Format("@" + std::to_string(id), indent, FormatWidth::min));
     bool first = true;

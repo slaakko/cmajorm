@@ -1,12 +1,17 @@
 using System;
+using System.IO;
 
 namespace cmsx.intermediate
 {
-    public void Compile(const string& intermediateCodeFileName, bool verbose)
+    public void Compile(const string& intermediateCodeFileName)
     {
         Context context;
         ParseIntermediateCodeFile(intermediateCodeFileName, &context);
         context.compileUnit.MapInstructions();
         context.compileUnit.Validate();
+        if (Flags.Get(Flag.stages))
+        {
+            context.compileUnit.Print(0);
+        }
     }
 }

@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using CodeFormatter = System.Text.CodeFormatter;
 
 namespace cmsx.intermediate
 {
@@ -13,11 +14,23 @@ namespace cmsx.intermediate
         {
             if (line == 0)
             {
-                throw Exception("internal error : " + Name() + " instruction has no line number information");
+                throw Exception("internal error : " + OperationName() + " instruction has no line number information");
             }
             if (parent == null)
             {
-                throw Exception("internal error : " + Name() + " instruction at line " + ToString(line) + " has no parent");
+                throw Exception("internal error : " + OperationName() + " instruction at line " + ToString(line) + " has no parent");
+            }
+        }
+        public abstract nothrow string OperationName() const;
+        public virtual void Print(CodeFormatter& formatter)
+        {
+            if (this is ValueInstruction*)
+            {
+                formatter.Write(OperationName());
+            }
+            else
+            {
+                formatter.Write(Format(OperationName(), 7));
             }
         }
         public BasicBlock* parent;
@@ -32,7 +45,7 @@ namespace cmsx.intermediate
 
     public abstract class ValueInstruction : Instruction
     {
-        public nothrow ValueInstruction(Value* result_, int line_) : base(line_), result(result_)
+        public nothrow ValueInstruction(Value* result_, int line_) : base(line_), result(result_), valueNumber(-1)
         {
         }
         public override void Validate(Function& function, int numArgs)
@@ -40,15 +53,27 @@ namespace cmsx.intermediate
             base->Validate(function, numArgs);
             if (result == null)
             {
-                throw Exception("internal error : " + Name() + " value instruction at line " + ToString(line) + " has no result value");
+                throw Exception("internal error : " + OperationName() + " value instruction at line " + ToString(line) + " has no result value");
             }
             type = result->type;
             if (type == null)
             {
-                throw Exception("internal error : " + Name() + " result type of " + Name() + " instruction at line " + ToString(line) + " is null");
+                throw Exception("internal error : " + OperationName() + " result type of " + OperationName() + " instruction at line " + ToString(line) + " is null");
             }
         }
+        public override nothrow string Name() const
+        {
+            return "$" + ToString(valueNumber);
+        }
+        public override void Print(CodeFormatter& formatter)
+        {
+            formatter.Write(Format(type->Name(), 7, FormatWidth.min));
+            valueNumber = parent->function.GetNextValueNumber();
+            formatter.Write(" " + Name() + " = ");
+            base->Print(formatter);
+        }
         public Value* result;
+        public int valueNumber;
     }
 
     public abstract class UnaryInstruction : ValueInstruction
@@ -61,7 +86,7 @@ namespace cmsx.intermediate
             base->Validate(function, numArgs);
             if (arg == null)
             {
-                throw Exception("internal error : operand of " + Name() + " instruction at line " + ToString(line) + " is null");
+                throw Exception("internal error : operand of " + OperationName() + " instruction at line " + ToString(line) + " is null");
             }
             arg = function.ResolveOperand(line, arg);
         }
@@ -69,8 +94,13 @@ namespace cmsx.intermediate
         {
             if (type != arg->type)
             {
-                throw Exception("error: the operand type '" + arg->type->Name() + " and result type '" + type->Name() + " differ for instruction " + Name() + " at line " + ToString(line));
+                throw Exception("error: the operand type '" + arg->type->Name() + " and result type '" + type->Name() + " differ for instruction " + OperationName() + " at line " + ToString(line));
             }
+        }
+        public override void Print(CodeFormatter& formatter)
+        {
+            base->Print(formatter);
+            formatter.Write(" " + arg->type->Name() + " " + arg->Name());
         }
         public Value* arg;
     }
@@ -85,11 +115,11 @@ namespace cmsx.intermediate
             base->Validate(function, numArgs);
             if (left == null)
             {
-                throw Exception("internal error : left operand of " + Name() + " instruction at line " + ToString(line) + " is null");
+                throw Exception("internal error : left operand of " + OperationName() + " instruction at line " + ToString(line) + " is null");
             }
             if (right == null)
             {
-                throw Exception("internal error : right operand of " + Name() + " instruction at line " + ToString(line) + " is null");
+                throw Exception("internal error : right operand of " + OperationName() + " instruction at line " + ToString(line) + " is null");
             }
             left = function.ResolveOperand(line, left);
             right = function.ResolveOperand(line, right);
@@ -98,8 +128,13 @@ namespace cmsx.intermediate
         {
             if (type != left->type || type != right->type)
             {
-                throw Exception("error: the result type '" + type->Name() + "' differs from the operand types '" + left->type->Name() + " in the " + Name() + " instruction at line " + ToString(line));
+                throw Exception("error: the result type '" + type->Name() + "' differs from the operand types '" + left->type->Name() + " in the " + OperationName() + " instruction at line " + ToString(line));
             }
+        }
+        public override void Print(CodeFormatter& formatter)
+        {
+            base->Print(formatter);
+            formatter.Write(" " + left->type->Name() + " " + left->Name() + ", " + right->type->Name() + " " + right->Name());
         }
         public Value* left;
         public Value* right;
@@ -110,7 +145,7 @@ namespace cmsx.intermediate
         public nothrow NotInstruction(Value* result_, Value* arg_, int line_) : base(result_, arg_, line_)
         {
         }
-        public override nothrow string Name() const
+        public override nothrow string OperationName() const
         {
             return "not";
         }
@@ -126,7 +161,7 @@ namespace cmsx.intermediate
         public nothrow NegInstruction(Value* result_, Value* arg_, int line_) : base(result_, arg_, line_)
         {
         }
-        public override nothrow string Name() const
+        public override nothrow string OperationName() const
         {
             return "neg";
         }
@@ -142,7 +177,7 @@ namespace cmsx.intermediate
         public nothrow AddInstruction(Value* result_, Value* left_, Value* right_, int line_) : base(result_, left_, right_, line_)
         {
         }
-        public override nothrow string Name() const
+        public override nothrow string OperationName() const
         {
             return "add";
         }
@@ -158,7 +193,7 @@ namespace cmsx.intermediate
         public nothrow SubInstruction(Value* result_, Value* left_, Value* right_, int line_) : base(result_, left_, right_, line_)
         {
         }
-        public override nothrow string Name() const
+        public override nothrow string OperationName() const
         {
             return "sub";
         }
@@ -174,7 +209,7 @@ namespace cmsx.intermediate
         public nothrow MulInstruction(Value* result_, Value* left_, Value* right_, int line_) : base(result_, left_, right_, line_)
         {
         }
-        public override nothrow string Name() const
+        public override nothrow string OperationName() const
         {
             return "mul";
         }
@@ -190,7 +225,7 @@ namespace cmsx.intermediate
         public nothrow DivInstruction(Value* result_, Value* left_, Value* right_, int line_) : base(result_, left_, right_, line_)
         {
         }
-        public override nothrow string Name() const
+        public override nothrow string OperationName() const
         {
             return "div";
         }
@@ -206,7 +241,7 @@ namespace cmsx.intermediate
         public nothrow ModInstruction(Value* result_, Value* left_, Value* right_, int line_) : base(result_, left_, right_, line_)
         {
         }
-        public override nothrow string Name() const
+        public override nothrow string OperationName() const
         {
             return "mod";
         }
@@ -222,7 +257,7 @@ namespace cmsx.intermediate
         public nothrow AndInstruction(Value* result_, Value* left_, Value* right_, int line_) : base(result_, left_, right_, line_)
         {
         }
-        public override nothrow string Name() const
+        public override nothrow string OperationName() const
         {
             return "and";
         }
@@ -238,7 +273,7 @@ namespace cmsx.intermediate
         public nothrow OrInstruction(Value* result_, Value* left_, Value* right_, int line_) : base(result_, left_, right_, line_)
         {
         }
-        public override nothrow string Name() const
+        public override nothrow string OperationName() const
         {
             return "or";
         }
@@ -254,7 +289,7 @@ namespace cmsx.intermediate
         public nothrow XorInstruction(Value* result_, Value* left_, Value* right_, int line_) : base(result_, left_, right_, line_)
         {
         }
-        public override nothrow string Name() const
+        public override nothrow string OperationName() const
         {
             return "xor";
         }
@@ -270,7 +305,7 @@ namespace cmsx.intermediate
         public nothrow ShlInstruction(Value* result_, Value* left_, Value* right_, int line_) : base(result_, left_, right_, line_)
         {
         }
-        public override nothrow string Name() const
+        public override nothrow string OperationName() const
         {
             return "shl";
         }
@@ -286,7 +321,7 @@ namespace cmsx.intermediate
         public nothrow ShrInstruction(Value* result_, Value* left_, Value* right_, int line_) : base(result_, left_, right_, line_)
         {
         }
-        public override nothrow string Name() const
+        public override nothrow string OperationName() const
         {
             return "shr";
         }
@@ -302,7 +337,7 @@ namespace cmsx.intermediate
         public nothrow EqualInstruction(Value* result_, Value* left_, Value* right_, int line_) : base(result_, left_, right_, line_)
         {
         }
-        public override nothrow string Name() const
+        public override nothrow string OperationName() const
         {
             return "equal";
         }
@@ -311,11 +346,11 @@ namespace cmsx.intermediate
             base->Validate(function, numArgs);
             if (left->type != right->type)
             {
-                throw Exception("error: the left operand type '" + left->type->Name() + " differs from the right operand type '" + right->type->Name() + " in the " + Name() + " instruction at line " + ToString(line));
+                throw Exception("error: the left operand type '" + left->type->Name() + " differs from the right operand type '" + right->type->Name() + " in the " + OperationName() + " instruction at line " + ToString(line));
             }
             if (!(type is BoolType*))
             {
-                throw Exception("error: the result type '" + type->Name() + "' in the " + Name() + " instruction at line " + ToString(line) + " differs from bool");
+                throw Exception("error: the result type '" + type->Name() + "' in the " + OperationName() + " instruction at line " + ToString(line) + " differs from bool");
             }
         }
     }
@@ -325,7 +360,7 @@ namespace cmsx.intermediate
         public nothrow LessInstruction(Value* result_, Value* left_, Value* right_, int line_) : base(result_, left_, right_, line_)
         {
         }
-        public override nothrow string Name() const
+        public override nothrow string OperationName() const
         {
             return "less";
         }
@@ -334,11 +369,11 @@ namespace cmsx.intermediate
             base->Validate(function, numArgs);
             if (left->type != right->type)
             {
-                throw Exception("error: the left operand type '" + left->type->Name() + " differs from the right operand type '" + right->type->Name() + " in the " + Name() + " instruction at line " + ToString(line));
+                throw Exception("error: the left operand type '" + left->type->Name() + " differs from the right operand type '" + right->type->Name() + " in the " + OperationName() + " instruction at line " + ToString(line));
             }
             if (!(type is BoolType*))
             {
-                throw Exception("error: the result type '" + type->Name() + "' in the " + Name() + " instruction at line " + ToString(line) + " differs from bool");
+                throw Exception("error: the result type '" + type->Name() + "' in the " + OperationName() + " instruction at line " + ToString(line) + " differs from bool");
             }
         }
     }
@@ -348,7 +383,7 @@ namespace cmsx.intermediate
         public nothrow SignExtendInstruction(Value* result_, Value* arg_, int line_) : base(result_, arg_, line_)
         {
         }
-        public override nothrow string Name() const
+        public override nothrow string OperationName() const
         {
             return "signextend";
         }
@@ -357,11 +392,11 @@ namespace cmsx.intermediate
             base->Validate(function, numArgs);
             if (!(arg->type is IntegerType*) && !(arg->type is BoolType*))
             {
-                throw Exception("error: the operand type '" + arg->type->Name() + "' in the " + Name() + " instruction at line " + ToString(line) + " must be an integer or bool type");
+                throw Exception("error: the operand type '" + arg->type->Name() + "' in the " + OperationName() + " instruction at line " + ToString(line) + " must be an integer or bool type");
             }
             if (!(type is IntegerType*))
             {
-                throw Exception("error: the result type '" + type->Name() + " in the " + Name() + " instruction at line " + ToString(line) + " must be an integer type");
+                throw Exception("error: the result type '" + type->Name() + " in the " + OperationName() + " instruction at line " + ToString(line) + " must be an integer type");
             }
         }
     }
@@ -371,7 +406,7 @@ namespace cmsx.intermediate
         public nothrow ZeroExtendInstruction(Value* result_, Value* arg_, int line_) : base(result_, arg_, line_)
         {
         }
-        public override nothrow string Name() const
+        public override nothrow string OperationName() const
         {
             return "zeroextend";
         }
@@ -380,11 +415,11 @@ namespace cmsx.intermediate
             base->Validate(function, numArgs);
             if (!(arg->type is IntegerType*) && !(arg->type is BoolType*))
             {
-                throw Exception("error: the operand type '" + arg->type->Name() + "' in the " + Name() + " instruction at line " + ToString(line) + " must be an integer or bool type");
+                throw Exception("error: the operand type '" + arg->type->Name() + "' in the " + OperationName() + " instruction at line " + ToString(line) + " must be an integer or bool type");
             }
             if (!(type is IntegerType*))
             {
-                throw Exception("error: the result type '" + type->Name() + " in the " + Name() + " instruction at line " + ToString(line) + " must be an integer type");
+                throw Exception("error: the result type '" + type->Name() + " in the " + OperationName() + " instruction at line " + ToString(line) + " must be an integer type");
             }
         }
     }
@@ -394,7 +429,7 @@ namespace cmsx.intermediate
         public nothrow TruncateInstruction(Value* result_, Value* arg_, int line_) : base(result_, arg_, line_)
         {
         }
-        public override nothrow string Name() const
+        public override nothrow string OperationName() const
         {
             return "truncate";
         }
@@ -403,11 +438,11 @@ namespace cmsx.intermediate
             base->Validate(function, numArgs);
             if (!(arg->type is IntegerType*))
             {
-                throw Exception("error: the operand type '" + arg->type->Name() + "' in the " + Name() + " instruction at line " + ToString(line) + " must be an integer type");
+                throw Exception("error: the operand type '" + arg->type->Name() + "' in the " + OperationName() + " instruction at line " + ToString(line) + " must be an integer type");
             }
             if (!(type is IntegerType*))
             {
-                throw Exception("error: the result type '" + type->Name() + "' for the " + Name() + " instruction at line " + ToString(line) + " must be an integer type");
+                throw Exception("error: the result type '" + type->Name() + "' for the " + OperationName() + " instruction at line " + ToString(line) + " must be an integer type");
             }
         }
     }
@@ -417,7 +452,7 @@ namespace cmsx.intermediate
         public nothrow BitCastInstruction(Value* result_, Value* arg_, int line_) : base(result_, arg_, line_)
         {
         }
-        public override nothrow string Name() const
+        public override nothrow string OperationName() const
         {
             return "bitcast";
         }
@@ -426,11 +461,11 @@ namespace cmsx.intermediate
             base->Validate(function, numArgs);
             if (!(arg->type is PtrType*))
             {
-                throw Exception("error: the operand type '" + arg->type->Name() + "' in the " + Name() + " instruction at line " + ToString(line) + " must be a pointer type");
+                throw Exception("error: the operand type '" + arg->type->Name() + "' in the " + OperationName() + " instruction at line " + ToString(line) + " must be a pointer type");
             }
             if (!(type is PtrType*))
             {
-                throw Exception("error: the result type '" + type->Name() + "' in the " + Name() + " instruction at line " + ToString(line) + " must be a pointer type");
+                throw Exception("error: the result type '" + type->Name() + "' in the " + OperationName() + " instruction at line " + ToString(line) + " must be a pointer type");
             }
         }
     }
@@ -440,7 +475,7 @@ namespace cmsx.intermediate
         public nothrow IntToFloatInstruction(Value* result_, Value* arg_, int line_) : base(result_, arg_, line_)
         {
         }
-        public override nothrow string Name() const
+        public override nothrow string OperationName() const
         {
             return "inttofloat";
         }
@@ -449,11 +484,11 @@ namespace cmsx.intermediate
             base->Validate(function, numArgs);
             if (!(arg->type is IntegerType*))
             {
-                throw Exception("error: the operand type '" + arg->type->Name() + " in the " + Name() + " instruction at line " + ToString(line) + " must be an integer type");
+                throw Exception("error: the operand type '" + arg->type->Name() + " in the " + OperationName() + " instruction at line " + ToString(line) + " must be an integer type");
             }
             if (!(type is FloatingType*))
             {
-                throw Exception("error: the result type '" + type->Name() + "' in the " + Name() + " instruction at line " + ToString(line) + " must be a floating type");
+                throw Exception("error: the result type '" + type->Name() + "' in the " + OperationName() + " instruction at line " + ToString(line) + " must be a floating type");
             }
         }
     }
@@ -463,7 +498,7 @@ namespace cmsx.intermediate
         public nothrow FloatToIntInstruction(Value* result_, Value* arg_, int line_) : base(result_, arg_, line_)
         {
         }
-        public override nothrow string Name() const
+        public override nothrow string OperationName() const
         {
             return "floattoint";
         }
@@ -472,11 +507,11 @@ namespace cmsx.intermediate
             base->Validate(function, numArgs);
             if (!(arg->type is FloatingType*))
             {
-                throw Exception("error: the operand type '" + arg->type->Name() + "' in the " + Name() + " instruction at line " + ToString(line) + " must be a floating type");
+                throw Exception("error: the operand type '" + arg->type->Name() + "' in the " + OperationName() + " instruction at line " + ToString(line) + " must be a floating type");
             }
             if (!(type is IntegerType*))
             {
-                throw Exception("error: the result type '" + type->Name() + "' in the " + Name() + " instruction at line " + ToString(line) + " must be an integer type");
+                throw Exception("error: the result type '" + type->Name() + "' in the " + OperationName() + " instruction at line " + ToString(line) + " must be an integer type");
             }
         }
     }
@@ -486,7 +521,7 @@ namespace cmsx.intermediate
         public nothrow IntToPtrInstruction(Value* result_, Value* arg_, int line_) : base(result_, arg_, line_)
         {
         }
-        public override nothrow string Name() const
+        public override nothrow string OperationName() const
         {
             return "inttoptr";
         }
@@ -495,11 +530,11 @@ namespace cmsx.intermediate
             base->Validate(function, numArgs);
             if (!(arg->type is IntegerType*))
             {
-                throw Exception("error: the operand type '" + arg->type->Name() + "' in the " + Name() + " instruction at line " + ToString(line) + " must be an integer type");
+                throw Exception("error: the operand type '" + arg->type->Name() + "' in the " + OperationName() + " instruction at line " + ToString(line) + " must be an integer type");
             }
             if (!(type is PtrType*))
             {
-                throw Exception("error: the result type '" + type->Name() + "' in the " + Name() + " instruction at line " + ToString(line) + " must be a pointer type");
+                throw Exception("error: the result type '" + type->Name() + "' in the " + OperationName() + " instruction at line " + ToString(line) + " must be a pointer type");
             }
         }
     }
@@ -509,7 +544,7 @@ namespace cmsx.intermediate
         public nothrow PtrToIntInstruction(Value* result_, Value* arg_, int line_) : base(result_, arg_, line_)
         {
         }
-        public override nothrow string Name() const
+        public override nothrow string OperationName() const
         {
             return "ptrtoint";
         }
@@ -518,11 +553,11 @@ namespace cmsx.intermediate
             base->Validate(function, numArgs);
             if (!(arg->type is PtrType*))
             {
-                throw Exception("error: the operand type '" + arg->type->Name() + "' in the " + Name() + " instruction at line " + ToString(line) + " must be a pointer type");
+                throw Exception("error: the operand type '" + arg->type->Name() + "' in the " + OperationName() + " instruction at line " + ToString(line) + " must be a pointer type");
             }
             if (!(type is IntegerType*))
             {
-                throw Exception("error: the result type '" + type->Name() + "' in the " + Name() + " instruction at line " + ToString(line) + " must be an integer type");
+                throw Exception("error: the result type '" + type->Name() + "' in the " + OperationName() + " instruction at line " + ToString(line) + " must be an integer type");
             }
         }
     }
@@ -532,7 +567,7 @@ namespace cmsx.intermediate
         public nothrow ParamInstruction(Value* result_, int line_) : base(result_, line_)
         {
         }
-        public override nothrow string Name() const
+        public override nothrow string OperationName() const
         {
             return "param";
         }
@@ -541,7 +576,7 @@ namespace cmsx.intermediate
             base->Validate(function, numArgs);
             if (!(type is ScalarType*))
             {
-                throw Exception("error: the result type '" + type->Name() + "' in the " + Name() + " instruction at line " + ToString(line) + " must be a scalar type");
+                throw Exception("error: the result type '" + type->Name() + "' in the " + OperationName() + " instruction at line " + ToString(line) + " must be a scalar type");
             }
         }
     }
@@ -551,7 +586,7 @@ namespace cmsx.intermediate
         public nothrow LocalInstruction(Value* result_, Type* localType_, int line_) : base(result_, line_), localType(localType_)
         {
         }
-        public override nothrow string Name() const
+        public override nothrow string OperationName() const
         {
             return "local";
         }
@@ -560,17 +595,22 @@ namespace cmsx.intermediate
             base->Validate(function, numArgs);
             if (localType == null)
             {
-                throw Exception("internal error : local type operand of " + Name() + " instruction at line " + ToString(line) + " is null");
+                throw Exception("internal error : local type operand of " + OperationName() + " instruction at line " + ToString(line) + " is null");
             }
             if (!(type is PtrType*))
             {
-                throw Exception("error: the result type '" + type->Name() + "' in the " + Name() + " instruction at line " + ToString(line) + " must be a pointer type");
+                throw Exception("error: the result type '" + type->Name() + "' in the " + OperationName() + " instruction at line " + ToString(line) + " must be a pointer type");
             }
             PtrType* ptrType = cast<PtrType*>(type);
             if (ptrType->BaseType() != localType)
             {
-                throw Exception("error: the base type of result pointer type for the " + Name() + " instruction at line " + ToString(line) + " must be same as the local type '" + localType->Name() + "'");
+                throw Exception("error: the base type of result pointer type for the " + OperationName() + " instruction at line " + ToString(line) + " must be same as the local type '" + localType->Name() + "'");
             }
+        }
+        public override void Print(CodeFormatter& formatter)
+        {
+            base->Print(formatter);
+            formatter.Write(" " + localType->Name());
         }
         public Type* localType;
     }
@@ -580,7 +620,7 @@ namespace cmsx.intermediate
         public nothrow LoadInstruction(Value* result_, Value* ptr_, int line_) : base(result_, line_), ptr(ptr_)
         {
         }
-        public override nothrow string Name() const
+        public override nothrow string OperationName() const
         {
             return "load";
         }
@@ -589,17 +629,22 @@ namespace cmsx.intermediate
             base->Validate(function, numArgs);
             if (ptr == null)
             {
-                throw Exception("internal error : ptr operand of " + Name() + " instruction at line " + ToString(line) + " is null");
+                throw Exception("internal error : ptr operand of " + OperationName() + " instruction at line " + ToString(line) + " is null");
             }
             if (!(ptr->type is PtrType*))
             {
-                throw Exception("error: the operand type '" + ptr->type->Name() + "' in the " + Name() + " instruction at line " + ToString(line) + " must be a pointer type");
+                throw Exception("error: the operand type '" + ptr->type->Name() + "' in the " + OperationName() + " instruction at line " + ToString(line) + " must be a pointer type");
             }
             PtrType* ptrType = cast<PtrType*>(ptr->type);
             if (ptrType->BaseType() != type)
             {
-                throw Exception("error: the result type '" + type->Name() + "' in the " + Name() + " instruction at line " + ToString(line) + " must be same as the base type of the operand pointer type");
+                throw Exception("error: the result type '" + type->Name() + "' in the " + OperationName() + " instruction at line " + ToString(line) + " must be same as the base type of the operand pointer type");
             }
+        }
+        public override void Print(CodeFormatter& formatter)
+        {
+            base->Print(formatter);
+            formatter.Write(" " + ptr->type->Name() + " " + ptr->Name());
         }
         public Value* ptr;
     }
@@ -613,26 +658,35 @@ namespace cmsx.intermediate
         {
             return "store";
         }
+        public override nothrow string OperationName() const
+        {
+            return "store";
+        }
         public override void Validate(Function& function, int numArgs)
         {
             base->Validate(function, numArgs);
             if (value == null)
             {
-                throw Exception("internal error: value operand of " + Name() + " instruction at line " + ToString(line) + " is null");
+                throw Exception("internal error: value operand of " + OperationName() + " instruction at line " + ToString(line) + " is null");
             }
             if (ptr == null)
             {
-                throw Exception("internal error: ptr operand of " + Name() + " instruction at line " + ToString(line) + " is null");
+                throw Exception("internal error: ptr operand of " + OperationName() + " instruction at line " + ToString(line) + " is null");
             }
             if (!(ptr->type is PtrType*))
             {
-                throw Exception("error: the second operand type '" + ptr->type->Name() + "' in the " + Name() + " instruction at line " + ToString(line) + " must be a pointer type");
+                throw Exception("error: the second operand type '" + ptr->type->Name() + "' in the " + OperationName() + " instruction at line " + ToString(line) + " must be a pointer type");
             }
             PtrType* ptrType = cast<PtrType*>(ptr->type);
             if (ptrType->BaseType() != value->type)
             {
-                throw Exception("error: the first operand type '" + value->type->Name() + "' in the " + Name() + " instruction at line " + ToString(line) + " must be same as the base type of the second operand pointer type");
+                throw Exception("error: the first operand type '" + value->type->Name() + "' in the " + OperationName() + " instruction at line " + ToString(line) + " must be same as the base type of the second operand pointer type");
             }
+        }
+        public override void Print(CodeFormatter& formatter)
+        {
+            base->Print(formatter);
+            formatter.Write(" " + value->type->Name() + " " + value->Name() + ", " + ptr->type->Name() + " " + ptr->Name());
         }
         public Value* value;
         public Value* ptr;
@@ -643,7 +697,7 @@ namespace cmsx.intermediate
         public nothrow ElemAddrInstruction(Value* result_, Value* ptr_, Value* index_, int line_) : base(result_, line_), ptr(ptr_), index(index_)
         {
         }
-        public override nothrow string Name() const
+        public override nothrow string OperationName() const
         {
             return "elemaddr";
         }
@@ -652,24 +706,29 @@ namespace cmsx.intermediate
             base->Validate(function, numArgs);
             if (ptr == null)
             {
-                throw Exception("internal error : ptr operand of " + Name() + " instruction at line " + ToString(line) + " is null");
+                throw Exception("internal error : ptr operand of " + OperationName() + " instruction at line " + ToString(line) + " is null");
             }
             if (index == null)
             {
-                throw Exception("internal error : index operand of " + Name() + " instruction at line " + ToString(line) + " is null");
+                throw Exception("internal error : index operand of " + OperationName() + " instruction at line " + ToString(line) + " is null");
             }
             if (!(ptr->type is PtrType*))
             {
-                throw Exception("error: the first operand type '" + ptr->type->Name() + "' in the " + Name() + " instruction at line " + ToString(line) + " must be a pointer type");
+                throw Exception("error: the first operand type '" + ptr->type->Name() + "' in the " + OperationName() + " instruction at line " + ToString(line) + " must be a pointer type");
             }
             if (!(type is PtrType*))
             {
-                throw Exception("error: the result type '" + type->Name() + "' in the " + Name() + " instruction at line " + ToString(line) + " must be a pointer type");
+                throw Exception("error: the result type '" + type->Name() + "' in the " + OperationName() + " instruction at line " + ToString(line) + " must be a pointer type");
             }
             if (!(index->type is IntegerType*))
             {
-                throw Exception("error: the second operand type '" + index->type->Name() + "' in the " + Name() + " instruction at line " + ToString(line) + " must be an integer type");
+                throw Exception("error: the second operand type '" + index->type->Name() + "' in the " + OperationName() + " instruction at line " + ToString(line) + " must be an integer type");
             }
+        }
+        public override void Print(CodeFormatter& formatter)
+        {
+            base->Print(formatter);
+            formatter.Write(" " + ptr->type->Name() + " " + ptr->Name() + ", " + index->type->Name() + " " + index->Name());
         }
         public Value* ptr;
         public Value* index;
@@ -680,7 +739,7 @@ namespace cmsx.intermediate
         public nothrow PtrOffsetInstruction(Value* result_, Value* ptr_, Value* offset_, int line_) : base(result_, line_), ptr(ptr_), offset(offset_)
         {
         }
-        public override nothrow string Name() const
+        public override nothrow string OperationName() const
         {
             return "ptroffset";
         }
@@ -689,28 +748,33 @@ namespace cmsx.intermediate
             base->Validate(function, numArgs);
             if (ptr == null)
             {
-                throw Exception("internal error : ptr operand of " + Name() + " instruction at line " + ToString(line) + " is null");
+                throw Exception("internal error : ptr operand of " + OperationName() + " instruction at line " + ToString(line) + " is null");
             }
             if (offset == null)
             {
-                throw Exception("internal error : offset operand of " + Name() + " instruction at line " + ToString(line) + " is null");
+                throw Exception("internal error : offset operand of " + OperationName() + " instruction at line " + ToString(line) + " is null");
             }
             if (!(ptr->type is PtrType*))
             {
-                throw Exception("error: the first operand type '" + ptr->type->Name() + "' in the " + Name() + " instruction at line " + ToString(line) + " must be a pointer type");
+                throw Exception("error: the first operand type '" + ptr->type->Name() + "' in the " + OperationName() + " instruction at line " + ToString(line) + " must be a pointer type");
             }
             if (!(type is PtrType*))
             {
-                throw Exception("error: the result type '" + type->Name() + "' in the " + Name() + " instruction at line " + ToString(line) + " must be a pointer type");
+                throw Exception("error: the result type '" + type->Name() + "' in the " + OperationName() + " instruction at line " + ToString(line) + " must be a pointer type");
             }
             if (ptr->type != type)
             {
-                throw Exception("error: the result type '" + type->Name() + "' in the " + Name() + " instruction at line " + ToString(line) + " must be same as the first operand type");
+                throw Exception("error: the result type '" + type->Name() + "' in the " + OperationName() + " instruction at line " + ToString(line) + " must be same as the first operand type");
             }
             if (!(offset->type is IntegerType*))
             {
-                throw Exception("error: the second operand type '" + offset->type->Name() + " in the " + Name() + " instruction at line " + ToString(line) + " must be an integer type");
+                throw Exception("error: the second operand type '" + offset->type->Name() + " in the " + OperationName() + " instruction at line " + ToString(line) + " must be an integer type");
             }
+        }
+        public override void Print(CodeFormatter& formatter)
+        {
+            base->Print(formatter);
+            formatter.Write(" " + ptr->type->Name() + " " + ptr->Name() + ", " + offset->type->Name() + " " + offset->Name());
         }
         public Value* ptr;
         public Value* offset;
@@ -721,7 +785,7 @@ namespace cmsx.intermediate
         public nothrow PtrDiffInstruction(Value* result_, Value* leftPtr_, Value* rightPtr_, int line_) : base(result_, line_), leftPtr(leftPtr_), rightPtr(rightPtr_)
         {
         }
-        public override nothrow string Name() const
+        public override nothrow string OperationName() const
         {
             return "ptrdiff";
         }
@@ -730,28 +794,33 @@ namespace cmsx.intermediate
             base->Validate(function, numArgs);
             if (leftPtr == null)
             {
-                throw Exception("internal error : left operand of " + Name() + " instruction at line " + ToString(line) + " is null");
+                throw Exception("internal error : left operand of " + OperationName() + " instruction at line " + ToString(line) + " is null");
             }
             if (rightPtr == null)
             {
-                throw Exception("internal error : right operand of " + Name() + " instruction at line " + ToString(line) + " is null");
+                throw Exception("internal error : right operand of " + OperationName() + " instruction at line " + ToString(line) + " is null");
             }
             if (!(leftPtr->type is PtrType*))
             {
-                throw Exception("error: the first operand type '" + leftPtr->type->Name() + "' in the " + Name() + " instruction at line " + ToString(line) + " must be a pointer type");
+                throw Exception("error: the first operand type '" + leftPtr->type->Name() + "' in the " + OperationName() + " instruction at line " + ToString(line) + " must be a pointer type");
             }
             if (!(rightPtr->type is PtrType*))
             {
-                throw Exception("error: the second operand type '" + rightPtr->type->Name() + "' in the " + Name() + " instruction at line " + ToString(line) + " must be a pointer type");
+                throw Exception("error: the second operand type '" + rightPtr->type->Name() + "' in the " + OperationName() + " instruction at line " + ToString(line) + " must be a pointer type");
             }
             if (leftPtr->type != rightPtr->type)
             {
-                throw Exception("error: the first operand type '" + leftPtr->type->Name() + "' and second operand type '" + rightPtr->type->Name() + " in the " + Name() + " instruction at line " + ToString(line) + " must be the same pointer type");
+                throw Exception("error: the first operand type '" + leftPtr->type->Name() + "' and second operand type '" + rightPtr->type->Name() + " in the " + OperationName() + " instruction at line " + ToString(line) + " must be the same pointer type");
             }
             if (!(type is IntegerType*))
             {
-                throw Exception("error: the result type '" + type->Name() + "' in the " + Name() + " instruction at line " + ToString(line) + " must be an integer type");
+                throw Exception("error: the result type '" + type->Name() + "' in the " + OperationName() + " instruction at line " + ToString(line) + " must be an integer type");
             }
+        }
+        public override void Print(CodeFormatter& formatter)
+        {
+            base->Print(formatter);
+            formatter.Write(" " + leftPtr->type->Name() + " " + leftPtr->Name() + ", " + rightPtr->type->Name() + " " + rightPtr->Name());
         }
         public Value* leftPtr;
         public Value* rightPtr;
@@ -766,17 +835,26 @@ namespace cmsx.intermediate
         {
             return "arg";
         }
+        public override nothrow string OperationName() const
+        {
+            return "arg";
+        }
         public override void Validate(Function& function, int numArgs)
         {
             base->Validate(function, numArgs);
             if (arg == null)
             {
-                throw Exception("internal error : operand of " + Name() + " instruction at line " + ToString(line) + " is null");
+                throw Exception("internal error : operand of " + OperationName() + " instruction at line " + ToString(line) + " is null");
             }
             if (!(arg->type is ScalarType*))
             {
-                throw Exception("error: the operand type '" + arg->type->Name() + "' in the " + Name() + " instruction at line " + ToString(line) + " must be a scalar type");
+                throw Exception("error: the operand type '" + arg->type->Name() + "' in the " + OperationName() + " instruction at line " + ToString(line) + " must be a scalar type");
             }
+        }
+        public override void Print(CodeFormatter& formatter)
+        {
+            base->Print(formatter);
+            formatter.Write(" " + arg->type->Name() + " " + arg->Name());
         }
         public Value* arg;
     }
@@ -790,14 +868,23 @@ namespace cmsx.intermediate
         {
             return "jmp";
         }
+        public override nothrow string OperationName() const
+        {
+            return "jmp";
+        }
         public override void Validate(Function& function, int numArgs)
         {
             base->Validate(function, numArgs);
             targetBlock = function.GetBasicBlock(target);
             if (targetBlock == null)
             {
-                throw Exception("error: the target block for the " + Name() + " instruction at line " + ToString(line) + " not found");
+                throw Exception("error: the target block for the " + OperationName() + " instruction at line " + ToString(line) + " not found");
             }
+        }
+        public override void Print(CodeFormatter& formatter)
+        {
+            base->Print(formatter);
+            formatter.Write(" " + targetBlock->Name());
         }
         public uint target;
         public BasicBlock* targetBlock;
@@ -813,19 +900,28 @@ namespace cmsx.intermediate
         {
             return "branch";
         }
+        public override nothrow string OperationName() const
+        {
+            return "branch";
+        }
         public override void Validate(Function& function, int numArgs)
         {
             base->Validate(function, numArgs);
             trueTargetBlock = function.GetBasicBlock(trueTarget);
             if (trueTargetBlock == null)
             {
-                throw Exception("error: the true target block for the " + Name() + " instruction at line " + ToString(line) + " not found");
+                throw Exception("error: the true target block for the " + OperationName() + " instruction at line " + ToString(line) + " not found");
             }
             falseTargetBlock = function.GetBasicBlock(falseTarget);
             if (trueTargetBlock == null)
             {
-                throw Exception("error: the false target block for the " + Name() + " instruction at line " + ToString(line) + " not found");
+                throw Exception("error: the false target block for the " + OperationName() + " instruction at line " + ToString(line) + " not found");
             }
+        }
+        public override void Print(CodeFormatter& formatter)
+        {
+            base->Print(formatter);
+            formatter.Write(" " + cond->type->Name() + " " + cond->Name() + ", " + trueTargetBlock->Name() + ", " + falseTargetBlock->Name());
         }
         public Value* cond;
         public uint trueTarget;
@@ -843,12 +939,16 @@ namespace cmsx.intermediate
         {
             return "call void";
         }
+        public override nothrow string OperationName() const
+        {
+            return "call";
+        }
         public override void Validate(Function& function, int numArgs)
         {
             base->Validate(function, numArgs);
             if (callee == null)
             {
-                throw Exception("internal error : callee operand of " + Name() + " instruction at line " + ToString(line) + " is null");
+                throw Exception("internal error : callee operand of " + OperationName() + " instruction at line " + ToString(line) + " is null");
             }
             Type* calleeType = callee->type;
             if (calleeType is PtrType*)
@@ -858,13 +958,18 @@ namespace cmsx.intermediate
             }
             if (!(calleeType is FunctionType*))
             {
-                throw Exception("error: the type of the callee in the " + Name() + " instruction at line " + ToString(line) + " must be a function type or a pointer-to-function type");
+                throw Exception("error: the type of the callee in the " + OperationName() + " instruction at line " + ToString(line) + " must be a function type or a pointer-to-function type");
             }
             FunctionType* functionType = cast<FunctionType*>(calleeType);
             if (functionType->ParamTypes().Count() != numArgs)
             {
-                throw Exception("error: wrong number of preceding arg instructions for " + Name() + " instruction at line " + ToString(line));
+                throw Exception("error: wrong number of preceding arg instructions for " + OperationName() + " instruction at line " + ToString(line));
             }
+        }
+        public override void Print(CodeFormatter& formatter)
+        {
+            base->Print(formatter);
+            formatter.Write(" " + callee->type->Name() + " " + callee->PrintName());
         }
         public Value* callee;
     }
@@ -874,7 +979,7 @@ namespace cmsx.intermediate
         public nothrow FunctionCallInstruction(Value* result_, Value* callee_, int line_) : base(result_, line_), callee(callee_)
         {
         }
-        public override nothrow string Name() const
+        public override nothrow string OperationName() const
         {
             return "call";
         }
@@ -883,7 +988,7 @@ namespace cmsx.intermediate
             base->Validate(function, numArgs);
             if (callee == null)
             {
-                throw Exception("internal error : callee operand of " + Name() + " instruction at line " + ToString(line) + " is null");
+                throw Exception("internal error : callee operand of " + OperationName() + " instruction at line " + ToString(line) + " is null");
             }
             Type* calleeType = callee->type;
             if (calleeType is PtrType*)
@@ -893,13 +998,18 @@ namespace cmsx.intermediate
             }
             if (!(calleeType is FunctionType*))
             {
-                throw Exception("error: the type of the callee in the " + Name() + " instruction at line " + ToString(line) + " must be a function type or a pointer-to-function type");
+                throw Exception("error: the type of the callee in the " + OperationName() + " instruction at line " + ToString(line) + " must be a function type or a pointer-to-function type");
             }
             FunctionType* functionType = cast<FunctionType*>(calleeType);
             if (functionType->ParamTypes().Count() != numArgs)
             {
-                throw Exception("error: wrong number of preceding arg instructions for " + Name() + " instruction at line " + ToString(line));
+                throw Exception("error: wrong number of preceding arg instructions for " + OperationName() + " instruction at line " + ToString(line));
             }
+        }
+        public override void Print(CodeFormatter& formatter)
+        {
+            base->Print(formatter);
+            formatter.Write(" " + callee->type->Name() + " " + callee->PrintName());
         }
         public Value* callee;
     }
@@ -913,6 +1023,10 @@ namespace cmsx.intermediate
         {
             return "ret";
         }
+        public override nothrow string OperationName() const
+        {
+            return "ret";
+        }
         public override void Validate(Function& function, int numArgs)
         {
             base->Validate(function, numArgs);
@@ -920,8 +1034,20 @@ namespace cmsx.intermediate
             {
                 if (!(value->type is ScalarType*))
                 {
-                    throw Exception("error: the value type '" + value->type->Name() + "' in the " + Name() + " instruction at line " + ToString(line) + " must be a scalar type");
+                    throw Exception("error: the value type '" + value->type->Name() + "' in the " + OperationName() + " instruction at line " + ToString(line) + " must be a scalar type");
                 }
+            }
+        }
+        public override void Print(CodeFormatter& formatter)
+        {
+            base->Print(formatter);
+            if (value == null)
+            {
+                formatter.Write(" void");
+            }
+            else
+            {
+                formatter.Write(" " + value->type->Name() + " " + value->Name());
             }
         }
         public Value* value;
@@ -940,28 +1066,32 @@ namespace cmsx.intermediate
         {
             return "switch";
         }
+        public override nothrow string OperationName() const
+        {
+            return "switch";
+        }
         public override void Validate(Function& function, int numArgs)
         {
             base->Validate(function, numArgs);
             if (cond == null)
             {
-                throw Exception("internal error : cond operand of " + Name() + " instruction at line " + ToString(line) + " is null");
+                throw Exception("internal error : cond operand of " + OperationName() + " instruction at line " + ToString(line) + " is null");
             }
             if (!(cond->type is BoolType*))
             {
-                throw Exception("error: the condition type '" + cond->type->Name() + "' in the " + Name() + " instruction at line " + ToString(line) + " must be a bool type");
+                throw Exception("error: the condition type '" + cond->type->Name() + "' in the " + OperationName() + " instruction at line " + ToString(line) + " must be a bool type");
             }
             for (const Pair<Value*, uint>& p : destinations)
             {
                 Value* value = p.first;
                 if (value == null)
                 {
-                    throw Exception("internal error : value operand of " + Name() + " instruction at line " + ToString(line) + " is null");
+                    throw Exception("internal error : value operand of " + OperationName() + " instruction at line " + ToString(line) + " is null");
                 }
                 uint dest = p.second;
                 if (!(value->type is IntegerType*))
                 {
-                    throw Exception("error: the " + ToString(dest) + "'th case expression type '" + value->type->Name() + "' in the " + Name() + " instruction at line " + ToString(line) + " must be an integer type");
+                    throw Exception("error: the " + ToString(dest) + "'th case expression type '" + value->type->Name() + "' in the " + OperationName() + " instruction at line " + ToString(line) + " must be an integer type");
                 }
                 BasicBlock* bb = function.GetBasicBlock(dest);
                 if (bb != null)
@@ -970,8 +1100,28 @@ namespace cmsx.intermediate
                 }
                 else
                 {
-                    throw Exception("error: the case target block " + ToString(dest) + " for the " + Name() + " instruction at line " + ToString(line) + " not found");
+                    throw Exception("error: the case target block " + ToString(dest) + " for the " + OperationName() + " instruction at line " + ToString(line) + " not found");
                 }
+            }
+        }
+        public override void Print(CodeFormatter& formatter)
+        {
+            base->Print(formatter);
+            formatter.Write(" " + cond->type->Name() + " " + cond->Name() + ", [");
+            bool first = true;
+            for (const Pair<Value*, BasicBlock*>& p : destinationBlocks)
+            {
+                Value* value = p.first;
+                BasicBlock* bb = p.second;
+                if (first)
+                {
+                    first = false;
+                }
+                else
+                {
+                    formatter.Write(" : ");
+                }
+                formatter.Write(value->type->Name() + " " + value->Name() + ", " + bb->Name());
             }
         }
         public Value* cond;

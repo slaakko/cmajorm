@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using CodeFormatter = System.Text.CodeFormatter;
 
 namespace cmsx.intermediate
 {
@@ -37,9 +38,9 @@ namespace cmsx.intermediate
                 }
             }
         }
-        public void Validate(bool debug)
+        public void Validate()
         {
-            if (debug)
+            if (Flags.Get(Flag.debug))
             {
                 Console.Out() << id << endl();
             }
@@ -49,7 +50,7 @@ namespace cmsx.intermediate
             for (long i = 0; i < n; ++i)
             {
                 Instruction* instruction = instructions[i].Get();
-                if (debug)
+                if (Flags.Get(Flag.debug))
                 {
                     Console.Out() << instruction->Name() << endl();
                 }
@@ -88,6 +89,27 @@ namespace cmsx.intermediate
             {
                 throw Exception("error: wrong number of param instructions for function " + function.name);
             }
+        }
+        public void Print(CodeFormatter& formatter)
+        {
+            int indentSize = formatter.IndentSize();
+            formatter.DecIndent();
+            formatter.Write(Format(Name(), indentSize, FormatWidth.min));
+            bool first = true;
+            for (const UniquePtr<Instruction>& instruction : instructions)
+            {
+                instruction->Print(formatter);
+                formatter.WriteLine();
+                if (first)
+                {
+                    first = false;
+                    formatter.IncIndent();
+                }
+            }
+        }
+        public nothrow string Name() const
+        {
+            return "@" + ToString(id);
         }
         public Function& function;
         public uint id;

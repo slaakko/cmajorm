@@ -7,6 +7,10 @@ namespace cmsx.intermediate
         public default nothrow Value();
         public default virtual ~Value();
         public abstract nothrow string Name() const;
+        public virtual nothrow string PrintName() const
+        {
+            return Name();
+        }
         public Type* type;
         public int line;
     }
@@ -186,6 +190,10 @@ namespace cmsx.intermediate
         public override nothrow string Name() const
         {
             return symbol;
+        }
+        public override nothrow string PrintName() const
+        {
+            return "@" + Name();
         }
         public string symbol;
     }

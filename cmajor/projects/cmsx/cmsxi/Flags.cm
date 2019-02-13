@@ -1,0 +1,38 @@
+using System;
+
+namespace cmsx.intermediate
+{
+    public enum Flag
+    {
+        none = 0,
+        verbose = 1 << 0,
+        debug = 1 << 1,
+        stages = 1 << 2
+    }
+
+    public class Flags
+    {
+        static nothrow Flags() : flags(Flag.none), optimizationLevel(0)
+        {
+        }
+        public static nothrow inline bool Get(Flag flag)
+        {
+            return cast<Flag>(flags & flag) != Flag.none;
+        }
+        public static nothrow inline void Set(Flag flag)
+        {
+            flags = cast<Flag>(flags | flag);
+        }
+        public static nothrow inline void SetOptimizationLevel(int level)
+        {
+            optimizationLevel = level;
+        }
+        public static nothrow inline int GetOptimizationLevel()
+        {
+            return optimizationLevel;
+        }
+        private static Flag flags;
+        private static int optimizationLevel;
+    }
+}
+
