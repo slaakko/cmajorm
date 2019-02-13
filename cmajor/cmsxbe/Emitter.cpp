@@ -4,10 +4,13 @@
 // =================================
 
 #include <cmajor/cmsxbe/Emitter.hpp>
+#include <cmajor/cmsxi/Context.hpp>
+#include <cmajor/cmsxi/Type.hpp>
 
 namespace cmsxbe {
 
-Emitter::Emitter(cmsxbe::EmittingContext* emittingContext_) : cmajor::ir::Emitter(&stack), emittingContext(emittingContext_)
+Emitter::Emitter(cmsxbe::EmittingContext* emittingContext_) :
+    cmajor::ir::Emitter(&stack), emittingContext(emittingContext_), context(emittingContext->GetContext()), compileUnit(nullptr), currentFunction(nullptr)
 {
 }
 
@@ -18,98 +21,87 @@ void Emitter::SetEmittingDelegate(cmajor::ir::EmittingDelegate* emittingDelegate
 
 void* Emitter::GetIrTypeForBool()
 {
-    // todo
-    return nullptr;
+    return context->GetBoolType();
 }
 
 void* Emitter::GetIrTypeForSByte()
 {
-    // todo
-    return nullptr;
+    return context->GetSByteType();
 }
 
 void* Emitter::GetIrTypeForByte()
 {
-    // todo
-    return nullptr;
+    return context->GetByteType();
 }
 
 void* Emitter::GetIrTypeForShort()
 {
-    // todo
-    return nullptr;
+    return context->GetShortType();
 }
 
 void* Emitter::GetIrTypeForUShort()
 {
-    // todo
-    return nullptr;
+    return context->GetUShortType();
 }
 
 void* Emitter::GetIrTypeForInt()
 {
-    // todo
-    return nullptr;
+    return context->GetIntType();
 }
 
 void* Emitter::GetIrTypeForUInt()
 {
-    // todo
-    return nullptr;
+    return context->GetUIntType();
 }
 
 void* Emitter::GetIrTypeForLong()
 {
-    // todo
-    return nullptr;
+    return context->GetLongType();
 }
 
 void* Emitter::GetIrTypeForULong()
 {
-    // todo
-    return nullptr;
+    return context->GetULongType();
 }
 
 void* Emitter::GetIrTypeForFloat()
 {
-    // todo
-    return nullptr;
+    return context->GetFloatType();
 }
 
 void* Emitter::GetIrTypeForDouble()
 {
-    // todo
-    return nullptr;
+    return context->GetDoubleType();
 }
 
 void* Emitter::GetIrTypeForChar()
 {
-    // todo
-    return nullptr;
+    return context->GetByteType();
 }
 
 void* Emitter::GetIrTypeForWChar()
 {
-    // todo
-    return nullptr;
+    return context->GetUShortType();
 }
 
 void* Emitter::GetIrTypeForUChar()
 {
-    // todo
-    return nullptr;
+    return context->GetUIntType();
 }
 
 void* Emitter::GetIrTypeForVoid()
 {
-    // todo
-    return nullptr;
+    return context->GetVoidType();
 }
 
 void* Emitter::GetIrTypeForFunction(void* retType, const std::vector<void*>& paramTypes)
 {
-    // todo
-    return nullptr;
+    std::vector<cmsxi::Type*> parameterTypes;
+    for (void* paramType : paramTypes)
+    {
+        parameterTypes.push_back(static_cast<cmsxi::Type*>(paramType));
+    }
+    return context->GetFunctionType(static_cast<cmsxi::Type*>(retType), parameterTypes);
 }
 
 void* Emitter::GetIrTypeForVariableParamFunction(void* retType)
@@ -120,60 +112,81 @@ void* Emitter::GetIrTypeForVariableParamFunction(void* retType)
 
 void* Emitter::GetIrTypeByTypeId(const boost::uuids::uuid& typeId)
 {
-    // todo
-    return nullptr;
+    auto it = irTypeTypeIdMap.find(typeId);
+    if (it != irTypeTypeIdMap.cend())
+    {
+        return it->second;
+    }
+    else
+    {
+        return nullptr;
+    }
 }
 
 void Emitter::SetIrTypeByTypeId(const boost::uuids::uuid& typeId, void* irType)
 {
-    // todo
+    irTypeTypeIdMap[typeId] = static_cast<cmsxi::Type*>(irType);
 }
 
 void* Emitter::GetIrTypeForArrayType(void* elementType, int64_t size)
 {
-    // todo
-    return nullptr;
+    return context->GetArrayType(static_cast<cmsxi::Type*>(elementType), size);
 }
 
 void* Emitter::GetIrTypeForClassType(const std::vector<void*>& elementTypes)
 {
-    // todo
-    return nullptr;
+    std::vector<cmsxi::Type*> memberTypes;
+    for (void* elementType : elementTypes)
+    {
+        memberTypes.push_back(static_cast<cmsxi::Type*>(elementType));
+    }
+    return context->GetStructureType(memberTypes);
 }
 
 void* Emitter::CreateFwdIrTypeForClassType()
 {
-    // todo
-    return nullptr;
+    return context->CreateStructureType();
 }
 
 void Emitter::SetFwdIrTypeBody(void* forwardDeclaredType, const std::vector<void*>& elementTypes)
 {
-    // todo
+    std::vector<cmsxi::Type*> memberTypes;
+    for (void* elementType : elementTypes)
+    {
+        memberTypes.push_back(static_cast<cmsxi::Type*>(elementType));
+    }
+    cmsxi::StructureType* structureType = static_cast<cmsxi::StructureType*>(forwardDeclaredType);
+    structureType->SetMemberTypes(memberTypes);
 }
 
 void* Emitter::GetIrTypeForDelegateType(void* retType, const std::vector<void*>& paramTypes)
 {
-    // todo
-    return nullptr;
+    std::vector<cmsxi::Type*> parameterTypes;
+    for (void* paramType : paramTypes)
+    {
+        parameterTypes.push_back(static_cast<cmsxi::Type*>(paramType));
+    }
+    return context->GetPtrType(context->GetFunctionType(static_cast<cmsxi::Type*>(retType), parameterTypes));
 }
 
 void* Emitter::GetIrTypeForVoidPtrType()
 {
-    // todo
-    return nullptr;
+    return context->GetPtrType(context->GetVoidType());
 }
 
 void* Emitter::GetIrTypeForStructType(const std::vector<void*>& elementTypes)
 {
-    // todo
-    return nullptr;
+    std::vector<cmsxi::Type*> memberTypes;
+    for (void* elementType : elementTypes)
+    {
+        memberTypes.push_back(static_cast<cmsxi::Type*>(elementType));
+    }
+    return context->GetStructureType(memberTypes);
 }
 
 void* Emitter::GetIrTypeForPtrType(void* baseIrType)
 {
-    // todo
-    return nullptr;
+    return context->GetPtrType(static_cast<cmsxi::Type*>(baseIrType));
 }
 
 void* Emitter::CreateDefaultIrValueForArrayType(void* arrayIrType, const std::vector<void*>& arrayOfDefaults)
@@ -184,86 +197,72 @@ void* Emitter::CreateDefaultIrValueForArrayType(void* arrayIrType, const std::ve
 
 void* Emitter::CreateDefaultIrValueForBool()
 {
-    // todo
-    return nullptr;
+    return context->GetDefaultBoolValue();
 }
 
 void* Emitter::CreateDefaultIrValueForSByte()
 {
-    // todo
-    return nullptr;
+    return context->GetDefaultSByteValue();
 }
 
 void* Emitter::CreateDefaultIrValueForByte()
 {
-    // todo
-    return nullptr;
+    return context->GetDefaultByteValue();
 }
 
 void* Emitter::CreateDefaultIrValueForShort()
 {
-    // todo
-    return nullptr;
+    return context->GetDefaultShortValue();
 }
 
 void* Emitter::CreateDefaultIrValueForUShort()
 {
-    // todo
-    return nullptr;
+    return context->GetDefaultUShortValue();
 }
 
 void* Emitter::CreateDefaultIrValueForInt()
 {
-    // todo
-    return nullptr;
+    return context->GetDefaultIntValue();
 }
 
 void* Emitter::CreateDefaultIrValueForUInt()
 {
-    // todo
-    return nullptr;
+    return context->GetDefaultUIntValue();
 }
 
 void* Emitter::CreateDefaultIrValueForLong()
 {
-    // todo
-    return nullptr;
+    return context->GetDefaultLongValue();
 }
 
 void* Emitter::CreateDefaultIrValueForULong()
 {
-    // todo
-    return nullptr;
+    return context->GetDefaultULongValue();
 }
 
 void* Emitter::CreateDefaultIrValueForFloat()
 {
-    // todo
-    return nullptr;
+    return context->GetDefaultFloatValue();
 }
 
 void* Emitter::CreateDefaultIrValueForDouble()
 {
-    // todo
-    return nullptr;
+    return context->GetDefaultDoubleValue();
 }
 
 void* Emitter::CreateDefaultIrValueForChar()
 {
-    // todo
-    return nullptr;
+    return context->GetDefaultByteValue();
 }
 
 void* Emitter::CreateDefaultIrValueForWChar()
 {
-    // todo
-    return nullptr;
+    return context->GetDefaultUShortValue();
 }
 
 void* Emitter::CreateDefaultIrValueForUChar()
 {
-    // todo
-    return nullptr;
+    return context->GetDefaultUIntValue();
 }
 
 void* Emitter::CreateDefaultIrValueForStruct(void* irType, const std::vector<void*>& defaultMembers)
@@ -280,8 +279,7 @@ void* Emitter::CreateDefaultIrValueForDelegateType(void* irType)
 
 void* Emitter::CreateDefaultIrValueForVoidPtrType()
 {
-    // todo
-    return nullptr;
+    return context->GetNullValue(static_cast<cmsxi::PtrType*>(context->GetPtrType(context->GetVoidType())));
 }
 
 void* Emitter::CreateDefaultIrValueForDerivedType(void* irType)
@@ -292,92 +290,77 @@ void* Emitter::CreateDefaultIrValueForDerivedType(void* irType)
 
 void* Emitter::CreateDefaultIrValueForPtrType(void* irType)
 {
-    // todo
-    return nullptr;
+    return context->GetNullValue(static_cast<cmsxi::PtrType*>(irType));
 }
 
 void* Emitter::CreateIrValueForBool(bool value)
 {
-    // todo
-    return nullptr;
+    return context->GetBoolValue(value);
 }
 
 void* Emitter::CreateIrValueForSByte(int8_t value)
 {
-    // todo
-    return nullptr;
+    return context->GetSByteValue(value);
 }
 
 void* Emitter::CreateIrValueForByte(uint8_t value)
 {
-    // todo
-    return nullptr;
+    return context->GetByteValue(value);
 }
 
 void* Emitter::CreateIrValueForShort(int16_t value)
 {
-    // todo
-    return nullptr;
+    return context->GetShortValue(value);
 }
 
 void* Emitter::CreateIrValueForUShort(uint16_t value)
 {
-    // todo
-    return nullptr;
+    return context->GetUShortValue(value);
 }
 
 void* Emitter::CreateIrValueForInt(int32_t value)
 {
-    // todo
-    return nullptr;
+    return context->GetIntValue(value);
 }
 
 void* Emitter::CreateIrValueForUInt(uint32_t value)
 {
-    // todo
-    return nullptr;
+    return context->GetUIntValue(value);
 }
 
 void* Emitter::CreateIrValueForLong(int64_t value)
 {
-    // todo
-    return nullptr;
+    return context->GetLongValue(value);
 }
 
 void* Emitter::CreateIrValueForULong(uint64_t value)
 {
-    // todo
-    return nullptr;
+    return context->GetULongValue(value);
 }
 
 void* Emitter::CreateIrValueForFloat(float value)
 {
-    // todo
-    return nullptr;
+    return context->GetFloatValue(value);
 }
 
 void* Emitter::CreateIrValueForDouble(double value)
 {
-    // todo
-    return nullptr;
+    return context->GetDoubleValue(value);
 }
 
 void* Emitter::CreateIrValueForChar(uint8_t value)
 {
-    // todo
-    return nullptr;
+    return context->GetByteValue(value);
 }
 
 void* Emitter::CreateIrValueForWChar(uint16_t value)
 {
-    // todo
-    return nullptr;
+    return context->GetUShortValue(value);
 }
 
 void* Emitter::CreateIrValueForUChar(uint32_t value)
 {
-    // todo
-    return nullptr;
+    return context->GetUIntValue(value);
 }
 
 void* Emitter::CreateIrValueForWString(void* wstringConstant)
@@ -639,13 +622,15 @@ void Emitter::MapClassPtr(const boost::uuids::uuid& typeId, void* classPtr)
 uint64_t Emitter::GetSizeInBits(void* irType)
 {
     // todo
-    return uint64_t();
+    return 0;
+    //return static_cast<cmsxi::Type*>(irType)->SizeInBits();
 }
 
 uint64_t Emitter::GetAlignmentInBits(void* irType)
 {
     // todo
-    return uint64_t();
+    return 0;
+    //return static_cast<cmsxi::Type*>(irType)->AlignmentInBits();
 }
 
 void Emitter::SetCurrentDebugLocation(const Span& span)
@@ -655,202 +640,172 @@ void Emitter::SetCurrentDebugLocation(const Span& span)
 
 void* Emitter::GetArrayBeginAddress(void* arrayPtr)
 {
-    // todo
-    return nullptr;
+    return context->CreateElemAddr(static_cast<cmsxi::Value*>(arrayPtr), context->GetLongValue(0));
 }
 
 void* Emitter::GetArrayEndAddress(void* arrayPtr, uint64_t size)
 {
-    // todo
-    return nullptr;
+    return context->CreateElemAddr(static_cast<cmsxi::Value*>(arrayPtr), context->GetLongValue(size));
 }
 
 void* Emitter::CreateBasicBlock(const std::string& name)
 {
-    // todo
-    return nullptr;
+    return currentFunction->CreateBasicBlock();
 }
 
 void Emitter::CreateBr(void* targetBasicBlock)
 {
-    // todo
+    context->CreateJump(static_cast<cmsxi::BasicBlock*>(targetBasicBlock));
 }
 
 void* Emitter::CurrentBasicBlock() const
 {
-    // todo
-    return nullptr;
+    return context->GetCurrentBasicBlock();
 }
 
 void Emitter::SetCurrentBasicBlock(void* basicBlock)
 {
-    // todo
+    context->SetCurrentBasicBlock(static_cast<cmsxi::BasicBlock*>(basicBlock));
 }
 
 void Emitter::CreateCondBr(void* cond, void* trueBasicBlock, void* falseBasicBlock)
 {
-    // todo
+    context->CreateBranch(static_cast<cmsxi::Value*>(cond), static_cast<cmsxi::BasicBlock*>(trueBasicBlock), static_cast<cmsxi::BasicBlock*>(falseBasicBlock));
 }
 
 void* Emitter::CreateArrayIndexAddress(void* arrayPtr, void* index)
 {
-    // todo
-    return nullptr;
+    return context->CreateElemAddr(static_cast<cmsxi::Value*>(arrayPtr), static_cast<cmsxi::Value*>(index));
 }
 
 void Emitter::CreateStore(void* value, void* ptr)
 {
-    // todo
+    context->CreateStore(static_cast<cmsxi::Value*>(value), static_cast<cmsxi::Value*>(ptr));
 }
 
 void* Emitter::CreateLoad(void* ptr)
 {
-    // todo
-    return nullptr;
+    return context->CreateLoad(static_cast<cmsxi::Value*>(ptr));
 }
 
 void* Emitter::CreateAdd(void* left, void* right)
 {
-    // todo
-    return nullptr;
+    return context->CreateAdd(static_cast<cmsxi::Value*>(left), static_cast<cmsxi::Value*>(right));
 }
 
 void* Emitter::CreateFAdd(void* left, void* right)
 {
-    // todo
-    return nullptr;
+    return context->CreateAdd(static_cast<cmsxi::Value*>(left), static_cast<cmsxi::Value*>(right));
 }
 
 void* Emitter::CreateSub(void* left, void* right)
 {
-    // todo
-    return nullptr;
+    return context->CreateSub(static_cast<cmsxi::Value*>(left), static_cast<cmsxi::Value*>(right));
 }
 
 void* Emitter::CreateFSub(void* left, void* right)
 {
-    // todo
-    return nullptr;
+    return context->CreateSub(static_cast<cmsxi::Value*>(left), static_cast<cmsxi::Value*>(right));
 }
 
 void* Emitter::CreateMul(void* left, void* right)
 {
-    // todo
-    return nullptr;
+    return context->CreateMul(static_cast<cmsxi::Value*>(left), static_cast<cmsxi::Value*>(right));
 }
 
 void* Emitter::CreateFMul(void* left, void* right)
 {
-    // todo
-    return nullptr;
+    return context->CreateMul(static_cast<cmsxi::Value*>(left), static_cast<cmsxi::Value*>(right));
 }
 
 void* Emitter::CreateUDiv(void* left, void* right)
 {
-    // todo
-    return nullptr;
+    return context->CreateDiv(static_cast<cmsxi::Value*>(left), static_cast<cmsxi::Value*>(right));
 }
 
 void* Emitter::CreateSDiv(void* left, void* right)
 {
-    // todo
-    return nullptr;
+    return context->CreateDiv(static_cast<cmsxi::Value*>(left), static_cast<cmsxi::Value*>(right));
 }
 
 void* Emitter::CreateFDiv(void* left, void* right)
 {
-    // todo
-    return nullptr;
+    return context->CreateDiv(static_cast<cmsxi::Value*>(left), static_cast<cmsxi::Value*>(right));
 }
 
 void* Emitter::CreateURem(void* left, void* right)
 {
-    // todo
-    return nullptr;
+    return context->CreateMod(static_cast<cmsxi::Value*>(left), static_cast<cmsxi::Value*>(right));
 }
 
 void* Emitter::CreateSRem(void* left, void* right)
 {
-    // todo
-    return nullptr;
+    return context->CreateMod(static_cast<cmsxi::Value*>(left), static_cast<cmsxi::Value*>(right));
 }
 
 void* Emitter::CreateAnd(void* left, void* right)
 {
-    // todo
-    return nullptr;
+    return context->CreateAnd(static_cast<cmsxi::Value*>(left), static_cast<cmsxi::Value*>(right));
 }
 
 void* Emitter::CreateOr(void* left, void* right)
 {
-    // todo
-    return nullptr;
+    return context->CreateOr(static_cast<cmsxi::Value*>(left), static_cast<cmsxi::Value*>(right));
 }
 
 void* Emitter::CreateXor(void* left, void* right)
 {
-    // todo
-    return nullptr;
+    return context->CreateXor(static_cast<cmsxi::Value*>(left), static_cast<cmsxi::Value*>(right));
 }
 
 void* Emitter::CreateShl(void* left, void* right)
 {
-    // todo
-    return nullptr;
+    return context->CreateShl(static_cast<cmsxi::Value*>(left), static_cast<cmsxi::Value*>(right));
 }
 
 void* Emitter::CreateAShr(void* left, void* right)
 {
-    // todo
-    return nullptr;
+    return context->CreateShr(static_cast<cmsxi::Value*>(left), static_cast<cmsxi::Value*>(right));
 }
 
 void* Emitter::CreateLShr(void* left, void* right)
 {
-    // todo
-    return nullptr;
+    return context->CreateShr(static_cast<cmsxi::Value*>(left), static_cast<cmsxi::Value*>(right));
 }
 
 void* Emitter::CreateICmpEQ(void* left, void* right)
 {
-    // todo
-    return nullptr;
+    return context->CreateEqual(static_cast<cmsxi::Value*>(left), static_cast<cmsxi::Value*>(right));
 }
 
 void* Emitter::CreateFCmpOEQ(void* left, void* right)
 {
-    // todo
-    return nullptr;
+    return context->CreateEqual(static_cast<cmsxi::Value*>(left), static_cast<cmsxi::Value*>(right));
 }
 
-void* Emitter::CreateICmpULT(void* leftValue, void* rightValue)
+void* Emitter::CreateICmpULT(void* left, void* right)
 {
-    // todo
-    return nullptr;
+    return context->CreateLess(static_cast<cmsxi::Value*>(left), static_cast<cmsxi::Value*>(right));
 }
 
-void* Emitter::CreateICmpSLT(void* leftValue, void* rightValue)
+void* Emitter::CreateICmpSLT(void* left, void* right)
 {
-    // todo
-    return nullptr;
+    return context->CreateLess(static_cast<cmsxi::Value*>(left), static_cast<cmsxi::Value*>(right));
 }
 
-void* Emitter::CreateFCmpOLT(void* leftValue, void* rightValue)
+void* Emitter::CreateFCmpOLT(void* left, void* right)
 {
-    // todo
-    return nullptr;
+    return context->CreateLess(static_cast<cmsxi::Value*>(left), static_cast<cmsxi::Value*>(right));
 }
 
 void* Emitter::CreateSExt(void* operand, void* destinationType)
 {
-    // todo
-    return nullptr;
+    return context->CreateSignExtend(static_cast<cmsxi::Value*>(operand), static_cast<cmsxi::Type*>(destinationType));
 }
 
 void* Emitter::CreateZExt(void* operand, void* destinationType)
 {
-    // todo
-    return nullptr;
+    return context->CreateZeroExtend(static_cast<cmsxi::Value*>(operand), static_cast<cmsxi::Type*>(destinationType));
 }
 
 void* Emitter::CreateFPExt(void* operand, void* destinationType)
@@ -861,8 +816,7 @@ void* Emitter::CreateFPExt(void* operand, void* destinationType)
 
 void* Emitter::CreateTrunc(void* operand, void* destinationType)
 {
-    // todo
-    return nullptr;
+    return context->CreateTruncate(static_cast<cmsxi::Value*>(operand), static_cast<cmsxi::Type*>(destinationType));
 }
 
 void* Emitter::CreateFPTrunc(void* operand, void* destinationType)
@@ -873,62 +827,52 @@ void* Emitter::CreateFPTrunc(void* operand, void* destinationType)
 
 void* Emitter::CreateBitCast(void* operand, void* destinationType)
 {
-    // todo
-    return nullptr;
+    return context->CreateBitCast(static_cast<cmsxi::Value*>(operand), static_cast<cmsxi::Type*>(destinationType));
 }
 
 void* Emitter::CreateUIToFP(void* operand, void* destinationType)
 {
-    // todo
-    return nullptr;
+    return context->CreateIntToFloat(static_cast<cmsxi::Value*>(operand), static_cast<cmsxi::Type*>(destinationType));
 }
 
 void* Emitter::CreateSIToFP(void* operand, void* destinationType)
 {
-    // todo
-    return nullptr;
+    return context->CreateIntToFloat(static_cast<cmsxi::Value*>(operand), static_cast<cmsxi::Type*>(destinationType));
 }
 
 void* Emitter::CreateFPToUI(void* operand, void* destinationType)
 {
-    // todo
-    return nullptr;
+    return context->CreateFloatToInt(static_cast<cmsxi::Value*>(operand), static_cast<cmsxi::Type*>(destinationType));
 }
 
 void* Emitter::CreateFPToSI(void* operand, void* destinationType)
 {
-    // todo
-    return nullptr;
+    return context->CreateFloatToInt(static_cast<cmsxi::Value*>(operand), static_cast<cmsxi::Type*>(destinationType));
 }
 
 void* Emitter::CreateIntToPtr(void* intValue, void* destinationType)
 {
-    // todo
-    return nullptr;
+    return context->CreateIntToPtr(static_cast<cmsxi::Value*>(intValue), static_cast<cmsxi::Type*>(destinationType));
 }
 
 void* Emitter::CreatePtrToInt(void* ptrValue, void* destinationType)
 {
-    // todo
-    return nullptr;
+    return context->CreatePtrToInt(static_cast<cmsxi::Value*>(ptrValue), static_cast<cmsxi::Type*>(destinationType));
 }
 
 void* Emitter::CreateNot(void* value)
 {
-    // todo
-    return nullptr;
+    return context->CreateNot(static_cast<cmsxi::Value*>(value));
 }
 
 void* Emitter::CreateNeg(void* value)
 {
-    // todo
-    return nullptr;
+    return context->CreateNeg(static_cast<cmsxi::Value*>(value));
 }
 
 void* Emitter::CreateFNeg(void* value)
 {
-    // todo
-    return nullptr;
+    return context->CreateNeg(static_cast<cmsxi::Value*>(value));
 }
 
 std::string Emitter::GetVmtObjectName(void* symbol) const
@@ -1006,8 +950,7 @@ void* Emitter::GetOrInsertAnyFunctionComdat(const std::string& name, void* funct
 
 void* Emitter::GetOrInsertFunction(const std::string& name, void* type)
 {
-    // todo
-    return nullptr;
+    return compileUnit->GetOrInsertFunction(name, static_cast<cmsxi::FunctionType*>(type));
 }
 
 void Emitter::SetInitializer(void* global, void* initializer)
@@ -1057,7 +1000,7 @@ void* Emitter::CleanupBlock()
 bool Emitter::NewCleanupNeeded()
 {
     // todo
-    return nullptr;
+    return false;
 }
 
 void Emitter::CreateCleanup()
@@ -1126,20 +1069,39 @@ void* Emitter::CreateClassDIType(void* classPtr)
 
 void* Emitter::CreateCall(void* callee, const std::vector<void*>& args)
 {
-    // todo
-    return nullptr;
+    for (void* arg : args)
+    {
+        cmsxi::Value* argument = static_cast<cmsxi::Value*>(arg);
+        context->CreateArg(argument);
+    }
+    cmsxi::Value* calleeValue = static_cast<cmsxi::Value*>(callee);
+    return context->CreateCall(calleeValue);
 }
 
 void* Emitter::CreateCallInst(void* callee, const std::vector<void*>& args, const std::vector<void*>& bundles, const Span& span)
 {
-    // todo
-    return nullptr;
+    for (void* arg : args)
+    {
+        cmsxi::Value* argument = static_cast<cmsxi::Value*>(arg);
+        context->CreateArg(argument);
+    }
+    cmsxi::Value* calleeValue = static_cast<cmsxi::Value*>(callee);
+    return context->CreateCall(calleeValue);
 }
 
 void* Emitter::CreateCallInstToBasicBlock(void* callee, const std::vector<void*>& args, const std::vector<void*>& bundles, void* basicBlock, const Span& span)
 {
-    // todo
-    return nullptr;
+    void* prevBasicBlock = context->GetCurrentBasicBlock();
+    SetCurrentBasicBlock(basicBlock);
+    for (void* arg : args)
+    {
+        cmsxi::Value* argument = static_cast<cmsxi::Value*>(arg);
+        context->CreateArg(argument);
+    }
+    cmsxi::Value* calleeValue = static_cast<cmsxi::Value*>(callee);
+    cmsxi::Instruction* callInst = context->CreateCall(calleeValue);
+    SetCurrentBasicBlock(prevBasicBlock);
+    return callInst;
 }
 
 void* Emitter::CreateInvoke(void* callee, void* normalBlock, void* unwindBlock, const std::vector<void*>& args)
@@ -1167,96 +1129,114 @@ void Emitter::SetCurrentDIBuilder(void* diBuilder_)
 
 void* Emitter::GetObjectFromClassDelegate(void* classDelegatePtr)
 {
-    // todo
-    return nullptr;
+    return context->CreateElemAddr(static_cast<cmsxi::Value*>(classDelegatePtr), context->GetLongValue(0));
 }
 
 void* Emitter::GetDelegateFromClassDelegate(void* classDelegatePtr)
 {
-    // todo
-    return nullptr;
+    return context->CreateElemAddr(static_cast<cmsxi::Value*>(classDelegatePtr), context->GetLongValue(1));
 }
 
 void* Emitter::GetObjectFromInterface(void* interfaceTypePtr)
 {
-    // todo
-    return nullptr;
+    cmsxi::Value* addr = context->CreateElemAddr(static_cast<cmsxi::Value*>(interfaceTypePtr), context->GetLongValue(0));
+    return context->CreateLoad(addr);
 }
 
 void* Emitter::GetObjectPtrFromInterface(void* interfaceTypePtr)
 {
-    // todo
-    return nullptr;
+    return context->CreateElemAddr(static_cast<cmsxi::Value*>(interfaceTypePtr), context->GetLongValue(0));
 }
 
 void* Emitter::GetImtPtrFromInterface(void* interfaceTypePtr)
 {
-    // todo
-    return nullptr;
+    cmsxi::Value* interfacePtrAddr = context->CreateElemAddr(static_cast<cmsxi::Value*>(interfaceTypePtr), context->GetLongValue(1));
+    cmsxi::Value* interfacePtr = context->CreateLoad(interfacePtrAddr);
+    return context->CreateBitCast(interfacePtr, context->GetPtrType(context->GetVoidType()));
 }
 
 void* Emitter::GetInterfaceMethod(void* imtPtr, int32_t methodIndex, void* interfaceMethodType)
 {
-    // todo
-    return nullptr;
+    cmsxi::Value* methodPtrPtr = context->CreatePtrOffset(static_cast<cmsxi::Value*>(imtPtr), context->GetLongValue(methodIndex));
+    cmsxi::Value* methodPtr = context->CreateLoad(methodPtrPtr);
+    cmsxi::Value* callee = context->CreateBitCast(methodPtr, context->GetPtrType(static_cast<cmsxi::Type*>(interfaceMethodType)));
+    return callee;
 }
 
 void* Emitter::GetFunctionIrType(void* functionSymbol) const
 {
-    // todo
-    return nullptr;
+    auto it = functionIrTypeMap.find(functionSymbol);
+    if (it != functionIrTypeMap.cend())
+    {
+        return it->second;
+    }
+    else
+    {
+        return nullptr;
+    }
 }
 
 void Emitter::SetFunctionIrType(void* symbol, void* irType)
 {
-    // todo
+    functionIrTypeMap[symbol] = static_cast<cmsxi::FunctionType*>(irType);
 }
 
 void* Emitter::GetVmtPtr(void* thisPtr, int32_t vmtPtrIndex, void* vmtPtrType)
 {
-    // todo
-    return nullptr;
+    cmsxi::Value* vmtPtrPtr = context->CreateElemAddr(static_cast<cmsxi::Value*>(thisPtr), context->GetLongValue(vmtPtrIndex));
+    cmsxi::Value* vmtPtr = context->CreateLoad(vmtPtrPtr);
+    return context->CreateBitCast(vmtPtr, static_cast<cmsxi::Type*>(vmtPtrType));
 }
 
 void* Emitter::GetMethodPtr(void* vmtPtr, int32_t vmtIndex)
 {
-    // todo
-    return nullptr;
+    cmsxi::Value* funPtrPtr = context->CreateElemAddr(static_cast<cmsxi::Value*>(vmtPtr), context->GetLongValue(vmtIndex));
+    return context->CreateLoad(funPtrPtr);
 }
 
 void* Emitter::GetImtArray(void* vmtObjectPtr, int32_t imtsVmtIndexOffset)
 {
-    // todo
-    return nullptr;
+    cmsxi::Value* imtsArrayPtrPtr = context->CreateElemAddr(static_cast<cmsxi::Value*>(vmtObjectPtr), context->GetLongValue(imtsVmtIndexOffset));
+    cmsxi::Value* imtsArrayPtr = context->CreateBitCast(imtsArrayPtrPtr, context->GetPtrType(context->GetPtrType(context->GetVoidType())));
+    return context->CreateLoad(imtsArrayPtr);
 }
 
 void* Emitter::GetImt(void* imtArray, int32_t interfaceIndex)
 {
-    // todo
-    return nullptr;
+    cmsxi::Value* imtArrayPtr = context->CreatePtrOffset(static_cast<cmsxi::Value*>(imtArray), context->GetLongValue(interfaceIndex));
+    return context->CreateLoad(imtArrayPtr);
 }
 
 void* Emitter::GetIrObject(void* symbol) const
 {
-    // todo
-    return nullptr;
+    auto it = irObjectMap.find(symbol);
+    if (it != irObjectMap.cend())
+    {
+        return it->second;
+    }
+    else
+    {
+        throw std::runtime_error("emitter: IR object not found");
+    }
 }
 
 void Emitter::SetIrObject(void* symbol, void* irObject)
 {
-    // todo
+    irObjectMap[symbol] = static_cast<cmsxi::Value*>(irObject);
 }
 
 void* Emitter::GetMemberVariablePtr(void* classPtr, int32_t memberVariableLayoutIndex)
 {
-    // todo
-    return nullptr;
+    cmsxi::Value* clsPtr = static_cast<cmsxi::Value*>(classPtr);
+    return context->CreateElemAddr(clsPtr, context->GetLongValue(memberVariableLayoutIndex));
 }
 
 void* Emitter::SizeOf(void* ptrType)
 {
-    // todo
-    return nullptr;
+    cmsxi::Value* nullPtr = context->GetNullValue(static_cast<cmsxi::PtrType*>(ptrType));
+    cmsxi::Value* one = context->CreatePtrOffset(nullPtr, context->GetLongValue(1));
+    cmsxi::Value* size = context->CreatePtrToInt(one, context->GetLongType());
+    return size;
 }
 
 void Emitter::SetLineNumber(int32_t lineNumber)
@@ -1294,14 +1274,12 @@ void* Emitter::GetClassName(void* vmtPtr, int32_t classNameVmtIndexOffset)
 
 void* Emitter::ComputeAddress(void* ptr, void* index)
 {
-    // todo
-    return nullptr;
+    return context->CreatePtrOffset(static_cast<cmsxi::Value*>(ptr), static_cast<cmsxi::Value*>(index));
 }
 
 void* Emitter::CreatePtrDiff(void* left, void* right)
 {
-    // todo
-    return nullptr;
+    return context->CreatePtrDiff(static_cast<cmsxi::Value*>(left), static_cast<cmsxi::Value*>(right));
 }
 
 uint32_t Emitter::GetPrivateFlag()
@@ -1330,18 +1308,17 @@ uint32_t Emitter::GetNoFlags()
 
 void* Emitter::CreateModule(const std::string& moduleName)
 {
-    // todo
-    return nullptr;
+    return new cmsxi::CompileUnit(moduleName);
 }
 
 void Emitter::DestroyModule(void* module)
 {
-    // todo
+    delete static_cast<cmsxi::CompileUnit*>(module);
 }
 
 void Emitter::SetModule(void* module_)
 {
-    // todo
+    compileUnit = static_cast<cmsxi::CompileUnit*>(module_);
 }
 
 void Emitter::SetTargetTriple(const std::string& targetTriple)
@@ -1462,11 +1439,12 @@ void Emitter::AddInlineFunctionAttribute(void* function)
 void Emitter::SetFunctionLinkageToLinkOnceODRLinkage(void* function)
 {
     // todo
+    //static_cast<cmsxi::Function*>(function)->SetLinkOnce();
 }
 
 void Emitter::SetFunction(void* function_)
 {
-    // todo
+    currentFunction = static_cast<cmsxi::Function*>(function_);
 }
 
 void Emitter::SetInPrologue(bool inPrologue_)
@@ -1518,8 +1496,7 @@ void Emitter::SetDISubprogram(void* function, void* subprogram)
 
 void* Emitter::CreateAlloca(void* irType)
 {
-    // todo
-    return nullptr;
+    return context->CreateLocal(static_cast<cmsxi::Type*>(irType));
 }
 
 void* Emitter::CreateDIParameterVariable(const std::string& name, int index, const Span& span, void* irType, void* allocaInst)
@@ -1536,8 +1513,7 @@ void* Emitter::CreateDIAutoVariable(const std::string& name, const Span& span, v
 
 void* Emitter::GetFunctionArgument(void* function, int argumentIndex)
 {
-    // todo
-    return nullptr;
+    return static_cast<cmsxi::Function*>(function)->GetParam(argumentIndex);
 }
 
 void Emitter::SetDebugLoc(void* callInst)
@@ -1547,14 +1523,12 @@ void Emitter::SetDebugLoc(void* callInst)
 
 void* Emitter::CreateRet(void* value)
 {
-    // todo
-    return nullptr;
+    return context->CreateRet(static_cast<cmsxi::Value*>(value));
 }
 
 void* Emitter::CreateRetVoid()
 {
-    // todo
-    return nullptr;
+    return context->CreateRet(nullptr);
 }
 
 void Emitter::SetPersonalityFunction(void* function, void* personalityFunction)
@@ -1580,13 +1554,13 @@ void* Emitter::CreateLexicalBlock(const Span& span)
 
 void* Emitter::CreateSwitch(void* condition, void* defaultDest, unsigned numCases)
 {
-    // todo
-    return nullptr;
+    return context->CreateSwitch(static_cast<cmsxi::Value*>(condition));
 }
 
 void Emitter::AddCase(void* switchInst, void* caseValue, void* caseDest)
 {
-    // todo
+    cmsxi::SwitchInstruction* inst = static_cast<cmsxi::SwitchInstruction*>(switchInst);
+    inst->AddCase(static_cast<cmsxi::Value*>(caseValue), static_cast<cmsxi::BasicBlock*>(caseDest));
 }
 
 } // namespace cmsxbe

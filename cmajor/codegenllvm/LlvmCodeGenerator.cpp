@@ -1027,7 +1027,6 @@ void LlvmCodeGenerator::Visit(BoundConstant& boundConstant)
 {
     boundConstant.Load(*emitter, OperationFlags::none);
     GenJumpingBoolCode();
-
 }
 
 void LlvmCodeGenerator::Visit(BoundEnumConstant& boundEnumConstant)
@@ -1130,7 +1129,6 @@ void LlvmCodeGenerator::Visit(BoundTypeNameExpression& boundTypeNameExpression)
 void LlvmCodeGenerator::Visit(BoundBitCast& boundBitCast)
 {
     boundBitCast.Load(*emitter, OperationFlags::none);
-
 }
 
 void LlvmCodeGenerator::Visit(BoundFunctionPtr& boundFunctionPtr)

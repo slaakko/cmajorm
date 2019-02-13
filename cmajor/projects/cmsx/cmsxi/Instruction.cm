@@ -1,0 +1,981 @@
+using System;
+using System.Collections;
+
+namespace cmsx.intermediate
+{
+    public abstract class Instruction : Value
+    {
+        public nothrow Instruction(int line_) : base(), parent(null)
+        {
+            base->line = line_;
+        }
+        public virtual void Validate(Function& function, int numArgs)
+        {
+            if (line == 0)
+            {
+                throw Exception("internal error : " + Name() + " instruction has no line number information");
+            }
+            if (parent == null)
+            {
+                throw Exception("internal error : " + Name() + " instruction at line " + ToString(line) + " has no parent");
+            }
+        }
+        public BasicBlock* parent;
+    }
+
+    public abstract class TerminatorInstruction : Instruction
+    {
+        public nothrow TerminatorInstruction(int line_) : base(line_)
+        {
+        }
+    }
+
+    public abstract class ValueInstruction : Instruction
+    {
+        public nothrow ValueInstruction(Value* result_, int line_) : base(line_), result(result_)
+        {
+        }
+        public override void Validate(Function& function, int numArgs)
+        {
+            base->Validate(function, numArgs);
+            if (result == null)
+            {
+                throw Exception("internal error : " + Name() + " value instruction at line " + ToString(line) + " has no result value");
+            }
+            type = result->type;
+            if (type == null)
+            {
+                throw Exception("internal error : " + Name() + " result type of " + Name() + " instruction at line " + ToString(line) + " is null");
+            }
+        }
+        public Value* result;
+    }
+
+    public abstract class UnaryInstruction : ValueInstruction
+    {
+        public nothrow UnaryInstruction(Value* result_, Value* arg_, int line_) : base(result_, line_), arg(arg_)
+        {
+        }
+        public override void Validate(Function& function, int numArgs)
+        {
+            base->Validate(function, numArgs);
+            if (arg == null)
+            {
+                throw Exception("internal error : operand of " + Name() + " instruction at line " + ToString(line) + " is null");
+            }
+            arg = function.ResolveOperand(line, arg);
+        }
+        public void ValidateTypes()
+        {
+            if (type != arg->type)
+            {
+                throw Exception("error: the operand type '" + arg->type->Name() + " and result type '" + type->Name() + " differ for instruction " + Name() + " at line " + ToString(line));
+            }
+        }
+        public Value* arg;
+    }
+
+    public abstract class BinaryInstruction : ValueInstruction
+    {
+        public nothrow BinaryInstruction(Value* result_, Value* left_, Value* right_, int line_) : base(result_, line_), left(left_), right(right_)
+        {
+        }
+        public override void Validate(Function& function, int numArgs)
+        {
+            base->Validate(function, numArgs);
+            if (left == null)
+            {
+                throw Exception("internal error : left operand of " + Name() + " instruction at line " + ToString(line) + " is null");
+            }
+            if (right == null)
+            {
+                throw Exception("internal error : right operand of " + Name() + " instruction at line " + ToString(line) + " is null");
+            }
+            left = function.ResolveOperand(line, left);
+            right = function.ResolveOperand(line, right);
+        }
+        public void ValidateTypes()
+        {
+            if (type != left->type || type != right->type)
+            {
+                throw Exception("error: the result type '" + type->Name() + "' differs from the operand types '" + left->type->Name() + " in the " + Name() + " instruction at line " + ToString(line));
+            }
+        }
+        public Value* left;
+        public Value* right;
+    }
+
+    public class NotInstruction : UnaryInstruction
+    {
+        public nothrow NotInstruction(Value* result_, Value* arg_, int line_) : base(result_, arg_, line_)
+        {
+        }
+        public override nothrow string Name() const
+        {
+            return "not";
+        }
+        public override void Validate(Function& function, int numArgs)
+        {
+            base->Validate(function, numArgs);
+            ValidateTypes();
+        }
+    }
+
+    public class NegInstruction : UnaryInstruction
+    {
+        public nothrow NegInstruction(Value* result_, Value* arg_, int line_) : base(result_, arg_, line_)
+        {
+        }
+        public override nothrow string Name() const
+        {
+            return "neg";
+        }
+        public override void Validate(Function& function, int numArgs)
+        {
+            base->Validate(function, numArgs);
+            ValidateTypes();
+        }
+    }
+
+    public class AddInstruction : BinaryInstruction
+    {
+        public nothrow AddInstruction(Value* result_, Value* left_, Value* right_, int line_) : base(result_, left_, right_, line_)
+        {
+        }
+        public override nothrow string Name() const
+        {
+            return "add";
+        }
+        public override void Validate(Function& function, int numArgs)
+        {
+            base->Validate(function, numArgs);
+            ValidateTypes();
+        }
+    }
+
+    public class SubInstruction : BinaryInstruction
+    {
+        public nothrow SubInstruction(Value* result_, Value* left_, Value* right_, int line_) : base(result_, left_, right_, line_)
+        {
+        }
+        public override nothrow string Name() const
+        {
+            return "sub";
+        }
+        public override void Validate(Function& function, int numArgs)
+        {
+            base->Validate(function, numArgs);
+            ValidateTypes();
+        }
+    }
+
+    public class MulInstruction : BinaryInstruction
+    {
+        public nothrow MulInstruction(Value* result_, Value* left_, Value* right_, int line_) : base(result_, left_, right_, line_)
+        {
+        }
+        public override nothrow string Name() const
+        {
+            return "mul";
+        }
+        public override void Validate(Function& function, int numArgs)
+        {
+            base->Validate(function, numArgs);
+            ValidateTypes();
+        }
+    }
+
+    public class DivInstruction : BinaryInstruction
+    {
+        public nothrow DivInstruction(Value* result_, Value* left_, Value* right_, int line_) : base(result_, left_, right_, line_)
+        {
+        }
+        public override nothrow string Name() const
+        {
+            return "div";
+        }
+        public override void Validate(Function& function, int numArgs)
+        {
+            base->Validate(function, numArgs);
+            ValidateTypes();
+        }
+    }
+
+    public class ModInstruction : BinaryInstruction
+    {
+        public nothrow ModInstruction(Value* result_, Value* left_, Value* right_, int line_) : base(result_, left_, right_, line_)
+        {
+        }
+        public override nothrow string Name() const
+        {
+            return "mod";
+        }
+        public override void Validate(Function& function, int numArgs)
+        {
+            base->Validate(function, numArgs);
+            ValidateTypes();
+        }
+    }
+
+    public class AndInstruction : BinaryInstruction
+    {
+        public nothrow AndInstruction(Value* result_, Value* left_, Value* right_, int line_) : base(result_, left_, right_, line_)
+        {
+        }
+        public override nothrow string Name() const
+        {
+            return "and";
+        }
+        public override void Validate(Function& function, int numArgs)
+        {
+            base->Validate(function, numArgs);
+            ValidateTypes();
+        }
+    }
+
+    public class OrInstruction : BinaryInstruction
+    {
+        public nothrow OrInstruction(Value* result_, Value* left_, Value* right_, int line_) : base(result_, left_, right_, line_)
+        {
+        }
+        public override nothrow string Name() const
+        {
+            return "or";
+        }
+        public override void Validate(Function& function, int numArgs)
+        {
+            base->Validate(function, numArgs);
+            ValidateTypes();
+        }
+    }
+    
+    public class XorInstruction : BinaryInstruction
+    {
+        public nothrow XorInstruction(Value* result_, Value* left_, Value* right_, int line_) : base(result_, left_, right_, line_)
+        {
+        }
+        public override nothrow string Name() const
+        {
+            return "xor";
+        }
+        public override void Validate(Function& function, int numArgs)
+        {
+            base->Validate(function, numArgs);
+            ValidateTypes();
+        }
+    }
+
+    public class ShlInstruction : BinaryInstruction
+    {
+        public nothrow ShlInstruction(Value* result_, Value* left_, Value* right_, int line_) : base(result_, left_, right_, line_)
+        {
+        }
+        public override nothrow string Name() const
+        {
+            return "shl";
+        }
+        public override void Validate(Function& function, int numArgs)
+        {
+            base->Validate(function, numArgs);
+            ValidateTypes();
+        }
+    }
+
+    public class ShrInstruction : BinaryInstruction
+    {
+        public nothrow ShrInstruction(Value* result_, Value* left_, Value* right_, int line_) : base(result_, left_, right_, line_)
+        {
+        }
+        public override nothrow string Name() const
+        {
+            return "shr";
+        }
+        public override void Validate(Function& function, int numArgs)
+        {
+            base->Validate(function, numArgs);
+            ValidateTypes();
+        }
+    }
+
+    public class EqualInstruction : BinaryInstruction
+    {
+        public nothrow EqualInstruction(Value* result_, Value* left_, Value* right_, int line_) : base(result_, left_, right_, line_)
+        {
+        }
+        public override nothrow string Name() const
+        {
+            return "equal";
+        }
+        public override void Validate(Function& function, int numArgs)
+        {
+            base->Validate(function, numArgs);
+            if (left->type != right->type)
+            {
+                throw Exception("error: the left operand type '" + left->type->Name() + " differs from the right operand type '" + right->type->Name() + " in the " + Name() + " instruction at line " + ToString(line));
+            }
+            if (!(type is BoolType*))
+            {
+                throw Exception("error: the result type '" + type->Name() + "' in the " + Name() + " instruction at line " + ToString(line) + " differs from bool");
+            }
+        }
+    }
+
+    public class LessInstruction : BinaryInstruction
+    {
+        public nothrow LessInstruction(Value* result_, Value* left_, Value* right_, int line_) : base(result_, left_, right_, line_)
+        {
+        }
+        public override nothrow string Name() const
+        {
+            return "less";
+        }
+        public override void Validate(Function& function, int numArgs)
+        {
+            base->Validate(function, numArgs);
+            if (left->type != right->type)
+            {
+                throw Exception("error: the left operand type '" + left->type->Name() + " differs from the right operand type '" + right->type->Name() + " in the " + Name() + " instruction at line " + ToString(line));
+            }
+            if (!(type is BoolType*))
+            {
+                throw Exception("error: the result type '" + type->Name() + "' in the " + Name() + " instruction at line " + ToString(line) + " differs from bool");
+            }
+        }
+    }
+
+    public class SignExtendInstruction : UnaryInstruction
+    {
+        public nothrow SignExtendInstruction(Value* result_, Value* arg_, int line_) : base(result_, arg_, line_)
+        {
+        }
+        public override nothrow string Name() const
+        {
+            return "signextend";
+        }
+        public override void Validate(Function& function, int numArgs)
+        {
+            base->Validate(function, numArgs);
+            if (!(arg->type is IntegerType*) && !(arg->type is BoolType*))
+            {
+                throw Exception("error: the operand type '" + arg->type->Name() + "' in the " + Name() + " instruction at line " + ToString(line) + " must be an integer or bool type");
+            }
+            if (!(type is IntegerType*))
+            {
+                throw Exception("error: the result type '" + type->Name() + " in the " + Name() + " instruction at line " + ToString(line) + " must be an integer type");
+            }
+        }
+    }
+
+    public class ZeroExtendInstruction : UnaryInstruction
+    {
+        public nothrow ZeroExtendInstruction(Value* result_, Value* arg_, int line_) : base(result_, arg_, line_)
+        {
+        }
+        public override nothrow string Name() const
+        {
+            return "zeroextend";
+        }
+        public override void Validate(Function& function, int numArgs)
+        {
+            base->Validate(function, numArgs);
+            if (!(arg->type is IntegerType*) && !(arg->type is BoolType*))
+            {
+                throw Exception("error: the operand type '" + arg->type->Name() + "' in the " + Name() + " instruction at line " + ToString(line) + " must be an integer or bool type");
+            }
+            if (!(type is IntegerType*))
+            {
+                throw Exception("error: the result type '" + type->Name() + " in the " + Name() + " instruction at line " + ToString(line) + " must be an integer type");
+            }
+        }
+    }
+
+    public class TruncateInstruction : UnaryInstruction
+    {
+        public nothrow TruncateInstruction(Value* result_, Value* arg_, int line_) : base(result_, arg_, line_)
+        {
+        }
+        public override nothrow string Name() const
+        {
+            return "truncate";
+        }
+        public override void Validate(Function& function, int numArgs)
+        {
+            base->Validate(function, numArgs);
+            if (!(arg->type is IntegerType*))
+            {
+                throw Exception("error: the operand type '" + arg->type->Name() + "' in the " + Name() + " instruction at line " + ToString(line) + " must be an integer type");
+            }
+            if (!(type is IntegerType*))
+            {
+                throw Exception("error: the result type '" + type->Name() + "' for the " + Name() + " instruction at line " + ToString(line) + " must be an integer type");
+            }
+        }
+    }
+
+    public class BitCastInstruction : UnaryInstruction
+    {
+        public nothrow BitCastInstruction(Value* result_, Value* arg_, int line_) : base(result_, arg_, line_)
+        {
+        }
+        public override nothrow string Name() const
+        {
+            return "bitcast";
+        }
+        public override void Validate(Function& function, int numArgs)
+        {
+            base->Validate(function, numArgs);
+            if (!(arg->type is PtrType*))
+            {
+                throw Exception("error: the operand type '" + arg->type->Name() + "' in the " + Name() + " instruction at line " + ToString(line) + " must be a pointer type");
+            }
+            if (!(type is PtrType*))
+            {
+                throw Exception("error: the result type '" + type->Name() + "' in the " + Name() + " instruction at line " + ToString(line) + " must be a pointer type");
+            }
+        }
+    }
+
+    public class IntToFloatInstruction : UnaryInstruction
+    {
+        public nothrow IntToFloatInstruction(Value* result_, Value* arg_, int line_) : base(result_, arg_, line_)
+        {
+        }
+        public override nothrow string Name() const
+        {
+            return "inttofloat";
+        }
+        public override void Validate(Function& function, int numArgs)
+        {
+            base->Validate(function, numArgs);
+            if (!(arg->type is IntegerType*))
+            {
+                throw Exception("error: the operand type '" + arg->type->Name() + " in the " + Name() + " instruction at line " + ToString(line) + " must be an integer type");
+            }
+            if (!(type is FloatingType*))
+            {
+                throw Exception("error: the result type '" + type->Name() + "' in the " + Name() + " instruction at line " + ToString(line) + " must be a floating type");
+            }
+        }
+    }
+
+    public class FloatToIntInstruction : UnaryInstruction
+    {
+        public nothrow FloatToIntInstruction(Value* result_, Value* arg_, int line_) : base(result_, arg_, line_)
+        {
+        }
+        public override nothrow string Name() const
+        {
+            return "floattoint";
+        }
+        public override void Validate(Function& function, int numArgs)
+        {
+            base->Validate(function, numArgs);
+            if (!(arg->type is FloatingType*))
+            {
+                throw Exception("error: the operand type '" + arg->type->Name() + "' in the " + Name() + " instruction at line " + ToString(line) + " must be a floating type");
+            }
+            if (!(type is IntegerType*))
+            {
+                throw Exception("error: the result type '" + type->Name() + "' in the " + Name() + " instruction at line " + ToString(line) + " must be an integer type");
+            }
+        }
+    }
+
+    public class IntToPtrInstruction : UnaryInstruction
+    {
+        public nothrow IntToPtrInstruction(Value* result_, Value* arg_, int line_) : base(result_, arg_, line_)
+        {
+        }
+        public override nothrow string Name() const
+        {
+            return "inttoptr";
+        }
+        public override void Validate(Function& function, int numArgs)
+        {
+            base->Validate(function, numArgs);
+            if (!(arg->type is IntegerType*))
+            {
+                throw Exception("error: the operand type '" + arg->type->Name() + "' in the " + Name() + " instruction at line " + ToString(line) + " must be an integer type");
+            }
+            if (!(type is PtrType*))
+            {
+                throw Exception("error: the result type '" + type->Name() + "' in the " + Name() + " instruction at line " + ToString(line) + " must be a pointer type");
+            }
+        }
+    }
+
+    public class PtrToIntInstruction : UnaryInstruction
+    {
+        public nothrow PtrToIntInstruction(Value* result_, Value* arg_, int line_) : base(result_, arg_, line_)
+        {
+        }
+        public override nothrow string Name() const
+        {
+            return "ptrtoint";
+        }
+        public override void Validate(Function& function, int numArgs)
+        {
+            base->Validate(function, numArgs);
+            if (!(arg->type is PtrType*))
+            {
+                throw Exception("error: the operand type '" + arg->type->Name() + "' in the " + Name() + " instruction at line " + ToString(line) + " must be a pointer type");
+            }
+            if (!(type is IntegerType*))
+            {
+                throw Exception("error: the result type '" + type->Name() + "' in the " + Name() + " instruction at line " + ToString(line) + " must be an integer type");
+            }
+        }
+    }
+
+    public class ParamInstruction : ValueInstruction
+    {
+        public nothrow ParamInstruction(Value* result_, int line_) : base(result_, line_)
+        {
+        }
+        public override nothrow string Name() const
+        {
+            return "param";
+        }
+        public override void Validate(Function& function, int numArgs)
+        {
+            base->Validate(function, numArgs);
+            if (!(type is ScalarType*))
+            {
+                throw Exception("error: the result type '" + type->Name() + "' in the " + Name() + " instruction at line " + ToString(line) + " must be a scalar type");
+            }
+        }
+    }
+
+    public class LocalInstruction : ValueInstruction
+    {
+        public nothrow LocalInstruction(Value* result_, Type* localType_, int line_) : base(result_, line_), localType(localType_)
+        {
+        }
+        public override nothrow string Name() const
+        {
+            return "local";
+        }
+        public override void Validate(Function& function, int numArgs)
+        {
+            base->Validate(function, numArgs);
+            if (localType == null)
+            {
+                throw Exception("internal error : local type operand of " + Name() + " instruction at line " + ToString(line) + " is null");
+            }
+            if (!(type is PtrType*))
+            {
+                throw Exception("error: the result type '" + type->Name() + "' in the " + Name() + " instruction at line " + ToString(line) + " must be a pointer type");
+            }
+            PtrType* ptrType = cast<PtrType*>(type);
+            if (ptrType->BaseType() != localType)
+            {
+                throw Exception("error: the base type of result pointer type for the " + Name() + " instruction at line " + ToString(line) + " must be same as the local type '" + localType->Name() + "'");
+            }
+        }
+        public Type* localType;
+    }
+
+    public class LoadInstruction : ValueInstruction
+    {
+        public nothrow LoadInstruction(Value* result_, Value* ptr_, int line_) : base(result_, line_), ptr(ptr_)
+        {
+        }
+        public override nothrow string Name() const
+        {
+            return "load";
+        }
+        public override void Validate(Function& function, int numArgs)
+        {
+            base->Validate(function, numArgs);
+            if (ptr == null)
+            {
+                throw Exception("internal error : ptr operand of " + Name() + " instruction at line " + ToString(line) + " is null");
+            }
+            if (!(ptr->type is PtrType*))
+            {
+                throw Exception("error: the operand type '" + ptr->type->Name() + "' in the " + Name() + " instruction at line " + ToString(line) + " must be a pointer type");
+            }
+            PtrType* ptrType = cast<PtrType*>(ptr->type);
+            if (ptrType->BaseType() != type)
+            {
+                throw Exception("error: the result type '" + type->Name() + "' in the " + Name() + " instruction at line " + ToString(line) + " must be same as the base type of the operand pointer type");
+            }
+        }
+        public Value* ptr;
+    }
+
+    public class StoreInstruction : Instruction
+    {
+        public nothrow StoreInstruction(Value* value_, Value* ptr_, int line_) : base(line_), value(value_), ptr(ptr_)
+        {
+        }
+        public override nothrow string Name() const
+        {
+            return "store";
+        }
+        public override void Validate(Function& function, int numArgs)
+        {
+            base->Validate(function, numArgs);
+            if (value == null)
+            {
+                throw Exception("internal error: value operand of " + Name() + " instruction at line " + ToString(line) + " is null");
+            }
+            if (ptr == null)
+            {
+                throw Exception("internal error: ptr operand of " + Name() + " instruction at line " + ToString(line) + " is null");
+            }
+            if (!(ptr->type is PtrType*))
+            {
+                throw Exception("error: the second operand type '" + ptr->type->Name() + "' in the " + Name() + " instruction at line " + ToString(line) + " must be a pointer type");
+            }
+            PtrType* ptrType = cast<PtrType*>(ptr->type);
+            if (ptrType->BaseType() != value->type)
+            {
+                throw Exception("error: the first operand type '" + value->type->Name() + "' in the " + Name() + " instruction at line " + ToString(line) + " must be same as the base type of the second operand pointer type");
+            }
+        }
+        public Value* value;
+        public Value* ptr;
+    }
+
+    public class ElemAddrInstruction : ValueInstruction
+    {
+        public nothrow ElemAddrInstruction(Value* result_, Value* ptr_, Value* index_, int line_) : base(result_, line_), ptr(ptr_), index(index_)
+        {
+        }
+        public override nothrow string Name() const
+        {
+            return "elemaddr";
+        }
+        public override void Validate(Function& function, int numArgs)
+        {
+            base->Validate(function, numArgs);
+            if (ptr == null)
+            {
+                throw Exception("internal error : ptr operand of " + Name() + " instruction at line " + ToString(line) + " is null");
+            }
+            if (index == null)
+            {
+                throw Exception("internal error : index operand of " + Name() + " instruction at line " + ToString(line) + " is null");
+            }
+            if (!(ptr->type is PtrType*))
+            {
+                throw Exception("error: the first operand type '" + ptr->type->Name() + "' in the " + Name() + " instruction at line " + ToString(line) + " must be a pointer type");
+            }
+            if (!(type is PtrType*))
+            {
+                throw Exception("error: the result type '" + type->Name() + "' in the " + Name() + " instruction at line " + ToString(line) + " must be a pointer type");
+            }
+            if (!(index->type is IntegerType*))
+            {
+                throw Exception("error: the second operand type '" + index->type->Name() + "' in the " + Name() + " instruction at line " + ToString(line) + " must be an integer type");
+            }
+        }
+        public Value* ptr;
+        public Value* index;
+    }
+
+    public class PtrOffsetInstruction : ValueInstruction
+    {
+        public nothrow PtrOffsetInstruction(Value* result_, Value* ptr_, Value* offset_, int line_) : base(result_, line_), ptr(ptr_), offset(offset_)
+        {
+        }
+        public override nothrow string Name() const
+        {
+            return "ptroffset";
+        }
+        public override void Validate(Function& function, int numArgs)
+        {
+            base->Validate(function, numArgs);
+            if (ptr == null)
+            {
+                throw Exception("internal error : ptr operand of " + Name() + " instruction at line " + ToString(line) + " is null");
+            }
+            if (offset == null)
+            {
+                throw Exception("internal error : offset operand of " + Name() + " instruction at line " + ToString(line) + " is null");
+            }
+            if (!(ptr->type is PtrType*))
+            {
+                throw Exception("error: the first operand type '" + ptr->type->Name() + "' in the " + Name() + " instruction at line " + ToString(line) + " must be a pointer type");
+            }
+            if (!(type is PtrType*))
+            {
+                throw Exception("error: the result type '" + type->Name() + "' in the " + Name() + " instruction at line " + ToString(line) + " must be a pointer type");
+            }
+            if (ptr->type != type)
+            {
+                throw Exception("error: the result type '" + type->Name() + "' in the " + Name() + " instruction at line " + ToString(line) + " must be same as the first operand type");
+            }
+            if (!(offset->type is IntegerType*))
+            {
+                throw Exception("error: the second operand type '" + offset->type->Name() + " in the " + Name() + " instruction at line " + ToString(line) + " must be an integer type");
+            }
+        }
+        public Value* ptr;
+        public Value* offset;
+    }
+
+    public class PtrDiffInstruction : ValueInstruction
+    {
+        public nothrow PtrDiffInstruction(Value* result_, Value* leftPtr_, Value* rightPtr_, int line_) : base(result_, line_), leftPtr(leftPtr_), rightPtr(rightPtr_)
+        {
+        }
+        public override nothrow string Name() const
+        {
+            return "ptrdiff";
+        }
+        public override void Validate(Function& function, int numArgs)
+        {
+            base->Validate(function, numArgs);
+            if (leftPtr == null)
+            {
+                throw Exception("internal error : left operand of " + Name() + " instruction at line " + ToString(line) + " is null");
+            }
+            if (rightPtr == null)
+            {
+                throw Exception("internal error : right operand of " + Name() + " instruction at line " + ToString(line) + " is null");
+            }
+            if (!(leftPtr->type is PtrType*))
+            {
+                throw Exception("error: the first operand type '" + leftPtr->type->Name() + "' in the " + Name() + " instruction at line " + ToString(line) + " must be a pointer type");
+            }
+            if (!(rightPtr->type is PtrType*))
+            {
+                throw Exception("error: the second operand type '" + rightPtr->type->Name() + "' in the " + Name() + " instruction at line " + ToString(line) + " must be a pointer type");
+            }
+            if (leftPtr->type != rightPtr->type)
+            {
+                throw Exception("error: the first operand type '" + leftPtr->type->Name() + "' and second operand type '" + rightPtr->type->Name() + " in the " + Name() + " instruction at line " + ToString(line) + " must be the same pointer type");
+            }
+            if (!(type is IntegerType*))
+            {
+                throw Exception("error: the result type '" + type->Name() + "' in the " + Name() + " instruction at line " + ToString(line) + " must be an integer type");
+            }
+        }
+        public Value* leftPtr;
+        public Value* rightPtr;
+    }
+
+    public class ArgInstruction : Instruction
+    {
+        public nothrow ArgInstruction(Value* arg_, int line_) : base(line_), arg(arg_)
+        {
+        }
+        public override nothrow string Name() const
+        {
+            return "arg";
+        }
+        public override void Validate(Function& function, int numArgs)
+        {
+            base->Validate(function, numArgs);
+            if (arg == null)
+            {
+                throw Exception("internal error : operand of " + Name() + " instruction at line " + ToString(line) + " is null");
+            }
+            if (!(arg->type is ScalarType*))
+            {
+                throw Exception("error: the operand type '" + arg->type->Name() + "' in the " + Name() + " instruction at line " + ToString(line) + " must be a scalar type");
+            }
+        }
+        public Value* arg;
+    }
+
+    public class JumpInstruction : TerminatorInstruction
+    {
+        public nothrow JumpInstruction(uint target_, int line_) : base(line_), target(target_), targetBlock(null)
+        {
+        }
+        public override nothrow string Name() const
+        {
+            return "jmp";
+        }
+        public override void Validate(Function& function, int numArgs)
+        {
+            base->Validate(function, numArgs);
+            targetBlock = function.GetBasicBlock(target);
+            if (targetBlock == null)
+            {
+                throw Exception("error: the target block for the " + Name() + " instruction at line " + ToString(line) + " not found");
+            }
+        }
+        public uint target;
+        public BasicBlock* targetBlock;
+    }
+
+    public class BranchInstruction : TerminatorInstruction
+    {
+        public nothrow BranchInstruction(Value* cond_, uint trueTarget_, uint falseTarget_, int line_) :
+            base(line_), cond(cond_), trueTarget(trueTarget_), trueTargetBlock(null), falseTarget(falseTarget_), falseTargetBlock(null)
+        {
+        }
+        public override nothrow string Name() const
+        {
+            return "branch";
+        }
+        public override void Validate(Function& function, int numArgs)
+        {
+            base->Validate(function, numArgs);
+            trueTargetBlock = function.GetBasicBlock(trueTarget);
+            if (trueTargetBlock == null)
+            {
+                throw Exception("error: the true target block for the " + Name() + " instruction at line " + ToString(line) + " not found");
+            }
+            falseTargetBlock = function.GetBasicBlock(falseTarget);
+            if (trueTargetBlock == null)
+            {
+                throw Exception("error: the false target block for the " + Name() + " instruction at line " + ToString(line) + " not found");
+            }
+        }
+        public Value* cond;
+        public uint trueTarget;
+        public BasicBlock* trueTargetBlock;
+        public uint falseTarget;
+        public BasicBlock* falseTargetBlock;
+    }
+
+    public class ProcedureCallInstruction : Instruction
+    {
+        public nothrow ProcedureCallInstruction(Value* callee_, int line_) : base(line_), callee(callee_)
+        {
+        }
+        public override nothrow string Name() const
+        {
+            return "call void";
+        }
+        public override void Validate(Function& function, int numArgs)
+        {
+            base->Validate(function, numArgs);
+            if (callee == null)
+            {
+                throw Exception("internal error : callee operand of " + Name() + " instruction at line " + ToString(line) + " is null");
+            }
+            Type* calleeType = callee->type;
+            if (calleeType is PtrType*)
+            {
+                PtrType* ptrType = cast<PtrType*>(calleeType);
+                calleeType = ptrType->BaseType();
+            }
+            if (!(calleeType is FunctionType*))
+            {
+                throw Exception("error: the type of the callee in the " + Name() + " instruction at line " + ToString(line) + " must be a function type or a pointer-to-function type");
+            }
+            FunctionType* functionType = cast<FunctionType*>(calleeType);
+            if (functionType->ParamTypes().Count() != numArgs)
+            {
+                throw Exception("error: wrong number of preceding arg instructions for " + Name() + " instruction at line " + ToString(line));
+            }
+        }
+        public Value* callee;
+    }
+
+    public class FunctionCallInstruction : ValueInstruction
+    {
+        public nothrow FunctionCallInstruction(Value* result_, Value* callee_, int line_) : base(result_, line_), callee(callee_)
+        {
+        }
+        public override nothrow string Name() const
+        {
+            return "call";
+        }
+        public override void Validate(Function& function, int numArgs)
+        {
+            base->Validate(function, numArgs);
+            if (callee == null)
+            {
+                throw Exception("internal error : callee operand of " + Name() + " instruction at line " + ToString(line) + " is null");
+            }
+            Type* calleeType = callee->type;
+            if (calleeType is PtrType*)
+            {
+                PtrType* ptrType = cast<PtrType*>(calleeType);
+                calleeType = ptrType->BaseType();
+            }
+            if (!(calleeType is FunctionType*))
+            {
+                throw Exception("error: the type of the callee in the " + Name() + " instruction at line " + ToString(line) + " must be a function type or a pointer-to-function type");
+            }
+            FunctionType* functionType = cast<FunctionType*>(calleeType);
+            if (functionType->ParamTypes().Count() != numArgs)
+            {
+                throw Exception("error: wrong number of preceding arg instructions for " + Name() + " instruction at line " + ToString(line));
+            }
+        }
+        public Value* callee;
+    }
+
+    public class RetInstruction : TerminatorInstruction
+    {
+        public nothrow RetInstruction(Value* value_, int line_) : base(line_), value(value_)
+        {
+        }
+        public override nothrow string Name() const
+        {
+            return "ret";
+        }
+        public override void Validate(Function& function, int numArgs)
+        {
+            base->Validate(function, numArgs);
+            if (value != null)
+            {
+                if (!(value->type is ScalarType*))
+                {
+                    throw Exception("error: the value type '" + value->type->Name() + "' in the " + Name() + " instruction at line " + ToString(line) + " must be a scalar type");
+                }
+            }
+        }
+        public Value* value;
+    }
+
+    public class SwitchInstruction : TerminatorInstruction
+    {
+        public nothrow SwitchInstruction(Value* cond_, int line_) : base(line_),  cond(cond_)
+        {
+        }
+        public nothrow void AddCase(Value* caseValue, uint caseTarget)
+        {
+            destinations.Add(MakePair(caseValue, caseTarget));
+        }
+        public override nothrow string Name() const
+        {
+            return "switch";
+        }
+        public override void Validate(Function& function, int numArgs)
+        {
+            base->Validate(function, numArgs);
+            if (cond == null)
+            {
+                throw Exception("internal error : cond operand of " + Name() + " instruction at line " + ToString(line) + " is null");
+            }
+            if (!(cond->type is BoolType*))
+            {
+                throw Exception("error: the condition type '" + cond->type->Name() + "' in the " + Name() + " instruction at line " + ToString(line) + " must be a bool type");
+            }
+            for (const Pair<Value*, uint>& p : destinations)
+            {
+                Value* value = p.first;
+                if (value == null)
+                {
+                    throw Exception("internal error : value operand of " + Name() + " instruction at line " + ToString(line) + " is null");
+                }
+                uint dest = p.second;
+                if (!(value->type is IntegerType*))
+                {
+                    throw Exception("error: the " + ToString(dest) + "'th case expression type '" + value->type->Name() + "' in the " + Name() + " instruction at line " + ToString(line) + " must be an integer type");
+                }
+                BasicBlock* bb = function.GetBasicBlock(dest);
+                if (bb != null)
+                {
+                    destinationBlocks.Add(MakePair(value, bb));
+                }
+                else
+                {
+                    throw Exception("error: the case target block " + ToString(dest) + " for the " + Name() + " instruction at line " + ToString(line) + " not found");
+                }
+            }
+        }
+        public Value* cond;
+        public List<Pair<Value*, uint>> destinations;
+        public List<Pair<Value*, BasicBlock*>> destinationBlocks;
+    }
+}

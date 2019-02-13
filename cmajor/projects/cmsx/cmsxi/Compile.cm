@@ -1,0 +1,12 @@
+using System;
+
+namespace cmsx.intermediate
+{
+    public void Compile(const string& intermediateCodeFileName, bool verbose)
+    {
+        Context context;
+        ParseIntermediateCodeFile(intermediateCodeFileName, &context);
+        context.compileUnit.MapInstructions();
+        context.compileUnit.Validate();
+    }
+}

@@ -1,0 +1,909 @@
+using System;
+using System.Collections;
+
+namespace cmsx.intermediate
+{
+    public abstract class Type
+    {
+        public default virtual ~Type();
+        public abstract nothrow string Name() const;
+        public abstract Value* DefaultValue() const;
+        public virtual Value* MakeValue(const string& fromStr, Context& context) const
+        {
+            throw Exception("cannot make '" + Name() + "' type value from string '" + fromStr + "'");
+        }
+    }
+
+    public abstract class ScalarType : Type
+    {
+    }
+
+    public class VoidType : ScalarType
+    {
+        public override nothrow string Name() const
+        {
+            return "void";
+        }
+        public override Value* DefaultValue() const
+        {
+            throw Exception("cannot make default value of type '" + Name() + "'");
+        }
+    }
+
+    public class BoolType : ScalarType
+    {
+        public nothrow BoolType() : falseValue(false), trueValue(true)
+        {
+            falseValue.type = this;
+            trueValue.type = this;
+        }
+        public override nothrow string Name() const
+        {
+            return "bool";
+        }
+        public override Value* DefaultValue() const
+        {
+            return &falseValue;
+        }
+        public override Value* MakeValue(const string& fromStr, Context& context) const
+        {
+            bool value = ParseBool(fromStr);
+            if (value)
+            {
+                return &trueValue;
+            }
+            else
+            {
+                return &falseValue;
+            }
+        }
+        private BoolValue falseValue;
+        private BoolValue trueValue;
+    }
+
+    public abstract class IntegerType : ScalarType
+    {
+    }
+
+    public abstract class SignedIntegerType : IntegerType
+    {
+    }
+
+    public abstract class UnsignedIntegerType : IntegerType
+    {
+    }
+
+    public abstract class FloatingType : ScalarType
+    {
+    }
+
+    public class SByteType : SignedIntegerType
+    {
+        public nothrow SByteType() : defaultValue()
+        {
+            defaultValue.type = this;
+        }
+        public override nothrow string Name() const
+        {
+            return "sbyte";
+        }
+        public override Value* DefaultValue() const
+        {
+            return &defaultValue;
+        }
+        public override Value* MakeValue(const string& fromStr, Context& context) const
+        {
+            long longValue = ParseLong(fromStr);
+            if (longValue >= MinValue<sbyte>() && longValue <= MaxValue<sbyte>())
+            {
+                sbyte value = cast<sbyte>(longValue);
+                if (value == defaultValue.value)
+                {
+                    return &defaultValue;
+                }
+                else
+                {
+                    return context.MakeSByteValue(this, value);
+                }
+            }
+            else
+            {
+                throw Exception("type '" + Name() + "' value '" + fromStr + "' out of bounds");
+            }
+        }
+        private SByteValue defaultValue;
+    }
+
+    public class ByteType : UnsignedIntegerType
+    {
+        public nothrow ByteType() : defaultValue()
+        {
+            defaultValue.type = this;
+        }
+        public override nothrow string Name() const
+        {
+            return "byte";
+        }
+        public override Value* DefaultValue() const
+        {
+            return &defaultValue;
+        }
+        public override Value* MakeValue(const string& fromStr, Context& context) const
+        {
+            ulong ulongValue = ParseULong(fromStr);
+            if (ulongValue >= MinValue<byte>() && ulongValue <= MaxValue<byte>())
+            {
+                byte value = cast<byte>(ulongValue);
+                if (value == defaultValue.value)
+                {
+                    return &defaultValue;
+                }
+                else
+                {
+                    return context.MakeByteValue(this, value);
+                }
+            }
+            else
+            {
+                throw Exception("type '" + Name() + "' value '" + fromStr + "' out of bounds");
+            }
+        }
+        private ByteValue defaultValue;
+    }
+
+    public class ShortType : SignedIntegerType
+    {
+        public nothrow ShortType() : defaultValue()
+        {
+            defaultValue.type = this;
+        }
+        public override nothrow string Name() const
+        {
+            return "short";
+        }
+        public override Value* DefaultValue() const
+        {
+            return &defaultValue;
+        }
+        public override Value* MakeValue(const string& fromStr, Context& context) const
+        {
+            long longValue = ParseLong(fromStr);
+            if (longValue >= MinValue<short>() && longValue <= MaxValue<short>())
+            {
+                short value = cast<short>(longValue);
+                if (value == defaultValue.value)
+                {
+                    return &defaultValue;
+                }
+                else
+                {
+                    return context.MakeShortValue(this, value);
+                }
+            }
+            else
+            {
+                throw Exception("type '" + Name() + "' value '" + fromStr + "' out of bounds");
+            }
+        }
+        private ShortValue defaultValue;
+    }
+
+    public class UShortType : UnsignedIntegerType
+    {
+        public nothrow UShortType() : defaultValue()
+        {
+            defaultValue.type = this;
+        }
+        public override nothrow string Name() const
+        {
+            return "ushort";
+        }
+        public override Value* DefaultValue() const
+        {
+            return &defaultValue;
+        }
+        public override Value* MakeValue(const string& fromStr, Context& context) const
+        {
+            ulong ulongValue = ParseULong(fromStr);
+            if (ulongValue >= MinValue<ushort>() && ulongValue <= MaxValue<ushort>())
+            {
+                ushort value = cast<ushort>(ulongValue);
+                if (value == defaultValue.value)
+                {
+                    return &defaultValue;
+                }
+                else
+                {
+                    return context.MakeUShortValue(this, value);
+                }
+            }
+            else
+            {
+                throw Exception("type '" + Name() + "' value '" + fromStr + "' out of bounds");
+            }
+        }
+        private UShortValue defaultValue;
+    }
+
+    public class IntType : SignedIntegerType
+    {
+        public nothrow IntType() : defaultValue()
+        {
+            defaultValue.type = this;
+        }
+        public override nothrow string Name() const
+        {
+            return "int";
+        }
+        public override Value* DefaultValue() const
+        {
+            return &defaultValue;
+        }
+        public override Value* MakeValue(const string& fromStr, Context& context) const
+        {
+            long longValue = ParseLong(fromStr);
+            if (longValue >= MinValue<int>() && longValue <= MaxValue<int>())
+            {
+                int value = cast<int>(longValue);
+                if (value == defaultValue.value)
+                {
+                    return &defaultValue;
+                }
+                else
+                {
+                    return context.MakeIntValue(this, value);
+                }
+            }
+            else
+            {
+                throw Exception("type '" + Name() + "' value '" + fromStr + "' out of bounds");
+            }
+        }
+        private IntValue defaultValue;
+    }
+
+    public class UIntType : UnsignedIntegerType
+    {
+        public nothrow UIntType() : defaultValue()
+        {
+            defaultValue.type = this;
+        }
+        public override nothrow string Name() const
+        {
+            return "uint";
+        }
+        public override Value* DefaultValue() const
+        {
+            return &defaultValue;
+        }
+        public override Value* MakeValue(const string& fromStr, Context& context) const
+        {
+            ulong ulongValue = ParseULong(fromStr);
+            if (ulongValue >= MinValue<uint>() && ulongValue <= MaxValue<uint>())
+            {
+                uint value = cast<uint>(ulongValue);
+                if (value == defaultValue.value)
+                {
+                    return &defaultValue;
+                }
+                else
+                {
+                    return context.MakeUIntValue(this, value);
+                }
+            }
+            else
+            {
+                throw Exception("type '" + Name() + "' value '" + fromStr + "' out of bounds");
+            }
+        }
+        private UIntValue defaultValue;
+    }
+
+    public class LongType : SignedIntegerType
+    {
+        public nothrow LongType() : defaultValue()
+        {
+            defaultValue.type = this;
+        }
+        public override nothrow string Name() const
+        {
+            return "long";
+        }
+        public override Value* DefaultValue() const
+        {
+            return &defaultValue;
+        }
+        public override Value* MakeValue(const string& fromStr, Context& context) const
+        {
+            long longValue = ParseLong(fromStr);
+            if (longValue >= MinValue<long>() && longValue <= MaxValue<long>())
+            {
+                long value = longValue;
+                if (value == defaultValue.value)
+                {
+                    return &defaultValue;
+                }
+                else
+                {
+                    return context.MakeLongValue(this, value);
+                }
+            }
+            else
+            {
+                throw Exception("type '" + Name() + "' value '" + fromStr + "' out of bounds");
+            }
+        }
+        private LongValue defaultValue;
+    }
+
+    public class ULongType : UnsignedIntegerType
+    {
+        public nothrow ULongType() : defaultValue()
+        {
+            defaultValue.type = this;
+        }
+        public override nothrow string Name() const
+        {
+            return "ulong";
+        }
+        public override Value* DefaultValue() const
+        {
+            return &defaultValue;
+        }
+        public override Value* MakeValue(const string& fromStr, Context& context) const
+        {
+            ulong ulongValue = ParseULong(fromStr);
+            if (ulongValue >= MinValue<ulong>() && ulongValue <= MaxValue<ulong>())
+            {
+                ulong value = ulongValue;
+                if (value == defaultValue.value)
+                {
+                    return &defaultValue;
+                }
+                else
+                {
+                    return context.MakeULongValue(this, value);
+                }
+            }
+            else
+            {
+                throw Exception("type '" + Name() + "' value '" + fromStr + "' out of bounds");
+            }
+        }
+        private ULongValue defaultValue;
+    }
+
+    public class FloatType : FloatingType
+    {
+        public nothrow FloatType() : defaultValue()
+        {
+            defaultValue.type = this;
+        }
+        public override nothrow string Name() const
+        {
+            return "float";
+        }
+        public override Value* DefaultValue() const
+        {
+            return &defaultValue;
+        }
+        public override Value* MakeValue(const string& fromStr, Context& context) const
+        {
+            double doubleValue = ParseDouble(fromStr);
+            float value = cast<float>(doubleValue);
+            if (value == defaultValue.value)
+            {
+                return &defaultValue;
+            }
+            else
+            {
+                return context.MakeFloatValue(this, value);
+            }
+        }
+        private FloatValue defaultValue;
+    }
+
+    public class DoubleType : FloatingType
+    {
+        public nothrow DoubleType() : defaultValue()
+        {
+            defaultValue.type = this;
+        }
+        public override nothrow string Name() const
+        {
+            return "double";
+        }
+        public override Value* DefaultValue() const
+        {
+            return &defaultValue;
+        }
+        public override Value* MakeValue(const string& fromStr, Context& context) const
+        {
+            double doubleValue = ParseDouble(fromStr);
+            double value = doubleValue;
+            if (value == defaultValue.value)
+            {
+                return &defaultValue;
+            }
+            else
+            {
+                return context.MakeDoubleValue(this, value);
+            }
+        }
+        private DoubleValue defaultValue;
+    }
+
+    public class PtrType : ScalarType
+    {
+        public nothrow PtrType() : baseType(null), defaultValue()
+        {
+            defaultValue.type = this;
+        }
+        public nothrow PtrType(Type* baseType_) : baseType(baseType_), defaultValue(this)
+        {
+        }
+        public override nothrow string Name() const
+        {
+            return baseType->Name() + "*";
+        }
+        public nothrow inline Type* BaseType() const
+        {
+            return baseType;
+        }
+        public nothrow inline void SetBaseType(Type* baseType_)
+        {
+            baseType = baseType_;
+        }
+        public override Value* DefaultValue() const
+        {
+            return &defaultValue;
+        }
+        public override Value* MakeValue(const string& fromStr, Context& context) const
+        {
+            if (fromStr == "null")
+            {
+                return &defaultValue;
+            }
+            else
+            {
+                throw Exception("cannot make '" + Name() + "' type value from string '" + fromStr + "'");
+            }
+        }
+        private Type* baseType;
+        private NullValue defaultValue;
+    }
+
+    public abstract class AggregateType : Type
+    {
+    }
+
+    public class StructureType : AggregateType
+    {
+        public nothrow StructureType(const string& typeId_) : typeId(typeId_)
+        {
+        }
+        public nothrow StructureType(const string& typeId_, const List<Type*>& memberTypes_) : typeId(typeId_), memberTypes(memberTypes_)
+        {
+        }
+        public nothrow void SetMemberTypes(List<Type*>&& memberTypes_)
+        {
+            memberTypes = Rvalue(memberTypes_);
+        }
+        public override nothrow string Name() const
+        {
+            return typeId;
+        }
+        public override Value* DefaultValue() const
+        {
+            throw Exception("cannot make default value of type '" + Name() + "'");
+        }
+        private string typeId;
+        private List<Type*> memberTypes;
+    }
+
+    public class ArrayType : AggregateType
+    {
+        public nothrow ArrayType(const string& typeId_, long size_) : typeId(typeId_), size(size_)
+        {
+        }
+        public nothrow ArrayType(const string& typeId_, Type* elementType_, long size_) : typeId(typeId_), elementType(elementType_), size(size_)
+        {
+        }
+        public nothrow inline Type* ElementType() const
+        {
+            return elementType;
+        }
+        public nothrow inline void SetElementType(Type* elementType_)
+        {
+            elementType = elementType_;
+        }
+        public nothrow inline long Size() const
+        {
+            return size;
+        }
+        public override nothrow string Name() const
+        {
+            return typeId;
+        }
+        public override Value* DefaultValue() const
+        {
+            throw Exception("cannot make default value of type '" + Name() + "'");
+        }
+        private string typeId;
+        private Type* elementType;
+        private long size;
+    }
+
+    public class FunctionType : AggregateType
+    {
+        public nothrow FunctionType(const string& typeId_) : typeId(typeId_)
+        {
+        }
+        public nothrow FunctionType(const string& typeId_, Type* returnType_, const List<Type*>& paramTypes_) : typeId(typeId_), returnType(returnType_), paramTypes(paramTypes_)
+        {
+        }
+        public nothrow inline Type* ReturnType() const
+        {
+            return returnType;
+        }
+        public nothrow inline void SetReturnType(Type* returnType_)
+        {
+            returnType = returnType_;
+        }
+        public nothrow inline const List<Type*>& ParamTypes() const
+        {
+            return paramTypes;
+        }
+        public nothrow void SetParamTypes(List<Type*>&& paramTypes_)
+        {
+            paramTypes = Rvalue(paramTypes_);
+        }
+        public override nothrow string Name() const
+        {
+            return typeId;
+        }
+        public override Value* DefaultValue() const
+        {
+            throw Exception("cannot make default value of type '" + Name() + "'");
+        }
+        private string typeId;
+        private Type* returnType;
+        private List<Type*> paramTypes;
+    }
+
+    public class TypeRepository
+    {
+        public TypeRepository()
+        {
+            typeMap[voidType.Name()] = &voidType;
+            typeMap[boolType.Name()] = &boolType;
+            typeMap[sbyteType.Name()] = &sbyteType;
+            typeMap[byteType.Name()] = &byteType;
+            typeMap[shortType.Name()] = &shortType;
+            typeMap[ushortType.Name()] = &ushortType;
+            typeMap[intType.Name()] = &intType;
+            typeMap[uintType.Name()] = &uintType;
+            typeMap[longType.Name()] = &longType;
+            typeMap[ulongType.Name()] = &ulongType;
+            typeMap[floatType.Name()] = &floatType;
+            typeMap[doubleType.Name()] = &doubleType;
+        }
+        public nothrow inline Type* GetVoidType() const
+        {
+            return &voidType;
+        }
+        public nothrow inline Type* GetBoolType() const
+        {
+            return &boolType;
+        }
+        public nothrow inline Type* GetSByteType() const
+        {
+            return &sbyteType;
+        }
+        public nothrow inline Type* GetByteType() const
+        {
+            return &byteType;
+        }
+        public nothrow inline Type* GetShortType() const
+        {
+            return &shortType;
+        }
+        public nothrow inline Type* GetUShortType() const
+        {
+            return &ushortType;
+        }
+        public nothrow inline Type* GetIntType() const
+        {
+            return &intType;
+        }
+        public nothrow inline Type* GetUIntType() const
+        {
+            return &uintType;
+        }
+        public nothrow inline Type* GetLongType() const
+        {
+            return &longType;
+        }
+        public nothrow inline Type* GetULongType() const
+        {
+            return &ulongType;
+        }
+        public nothrow inline Type* GetFloatType() const
+        {
+            return &floatType;
+        }
+        public nothrow inline Type* GetDoubleType() const
+        {
+            return &doubleType;
+        }
+        public Type* GetTypeById(const string& typeId)
+        {
+            HashMap<string, Type*>.ConstIterator it = typeMap.CFind(typeId);
+            if (it != typeMap.CEnd())
+            {
+                return it->second;
+            }
+            else
+            {
+                return null;
+            }
+        }
+        public Type* GetPtrType(Type* baseType)
+        {
+            HashMap<Type*, PtrType*>.ConstIterator it = ptrTypeMap.CFind(baseType);
+            if (it != ptrTypeMap.CEnd())
+            {
+                return it->second;
+            }
+            else
+            {
+                PtrType* ptrType = new PtrType(baseType);
+                typeMap[ptrType->Name()] = ptrType;
+                ptrTypeMap[baseType] = ptrType;
+                types.Add(UniquePtr<Type>(ptrType));
+                return  ptrType;
+            }
+        }
+        public void AddPtrType(const string& typeId)
+        {
+            HashMap<string, Type*>.ConstIterator it1 = typeMap.CFind(typeId);
+            if (it1 == typeMap.CEnd())
+            {
+                #assert(typeId.EndsWith("*"));
+                string baseTypeId = typeId.Substring(0, typeId.Length() - 1);
+                HashMap<string, Type*>.ConstIterator it = typeMap.CFind(baseTypeId);
+                if (it != typeMap.CEnd())
+                {
+                    Type* baseType = it->second;
+                    PtrType* ptrType = new PtrType(baseType);
+                    typeMap[ptrType->Name()] = ptrType;
+                    ptrTypeMap[baseType] = ptrType;
+                    types.Add(UniquePtr<Type>(ptrType));
+                }
+                else
+                {
+                    PtrType* ptrType = new PtrType();
+                    typeMap[typeId] = ptrType;
+                    types.Add(UniquePtr<Type>(ptrType));
+                    unresolvedPtrTypes.Add(MakePair(ptrType, baseTypeId));
+                }
+            }
+        }
+        public void AddStructureType(const string& typeId, const List<string>& memberTypeIds)
+        {
+            HashMap<string, Type*>.ConstIterator it1 = typeMap.CFind(typeId);
+            if (it1 == typeMap.CEnd())
+            {
+                List<Type*> memberTypes;
+                for (const string& memberTypeId : memberTypeIds)
+                {
+                    HashMap<string, Type*>.ConstIterator it = typeMap.CFind(memberTypeId);
+                    if (it != typeMap.CEnd())
+                    {
+                        memberTypes.Add(it->second);
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+                if (memberTypes.Count() == memberTypeIds.Count())
+                {
+                    StructureType* structureType = new StructureType(typeId, memberTypes);
+                    typeMap[typeId] = structureType;
+                    types.Add(UniquePtr<Type>(structureType));
+                }
+                else
+                {
+                    StructureType* structureType = new StructureType(typeId);
+                    typeMap[typeId] = structureType;
+                    types.Add(UniquePtr<Type>(structureType));
+                    unresolvedStructureTypes.Add(MakePair(structureType, memberTypeIds));
+                }
+            }
+        }
+        public void AddArrayType(const string& typeId, const string& elementTypeId, long size)
+        {
+            HashMap<string, Type*>.ConstIterator it1 = typeMap.CFind(typeId);
+            if (it1 == typeMap.CEnd())
+            {
+                HashMap<string, Type*>.ConstIterator it = typeMap.CFind(elementTypeId);
+                if (it != typeMap.CEnd())
+                {
+                    Type* elementType = it->second;
+                    ArrayType* arrayType = new ArrayType(typeId, elementType, size);
+                    typeMap[typeId] = arrayType;
+                    types.Add(UniquePtr<Type>(arrayType));
+                }
+                else
+                {
+                    ArrayType* arrayType = new ArrayType(typeId, size);
+                    typeMap[typeId] = arrayType;
+                    types.Add(UniquePtr<Type>(arrayType));
+                    unresolvedArrayTypes.Add(MakePair(arrayType, elementTypeId));
+                }
+            }
+        }
+        public void AddFunctionType(const string& typeId, const string& returnTypeId, const List<string>& paramTypeIds)
+        {
+            HashMap<string, Type*>.ConstIterator it1 = typeMap.CFind(typeId);
+            if (it1 == typeMap.CEnd())
+            {
+                HashMap<string, Type*>.ConstIterator it = typeMap.CFind(returnTypeId);
+                if (it != typeMap.CEnd())
+                {
+                    Type* returnType = it->second;
+                    List<Type*> paramTypes;
+                    for (const string& paramTypeId : paramTypeIds)
+                    {
+                        HashMap<string, Type*>.ConstIterator it = typeMap.CFind(paramTypeId);
+                        if (it != typeMap.CEnd())
+                        {
+                            paramTypes.Add(it->second);
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+                    if (paramTypes.Count() == paramTypeIds.Count())
+                    {
+                        FunctionType* functionType = new FunctionType(typeId, returnType, paramTypes);
+                        typeMap[typeId] = functionType;
+                        types.Add(UniquePtr<Type>(functionType));
+                    }
+                    else
+                    {
+                        FunctionType* functionType = new FunctionType(typeId);
+                        typeMap[typeId] = functionType;
+                        types.Add(UniquePtr<Type>(functionType));
+                        unresolvedFunctionTypes.Add(MakePair(functionType, MakePair(returnTypeId, paramTypeIds)));
+                    }
+                }
+            }
+        }
+        public void ResolveTypes()
+        {
+            ResolvePointerTypes();
+            ResolveStructureTypes();
+            ResolveArrayTypes();
+            ResolveFunctionTypes();
+        }
+        private void ResolvePointerTypes()
+        {
+            for (const Pair<PtrType*, string>& p : unresolvedPtrTypes)
+            {
+                PtrType* ptrType = p.first;
+                const string& baseTypeId = p.second;
+                HashMap<string, Type*>.ConstIterator it = typeMap.CFind(baseTypeId);
+                if (it != typeMap.CEnd())
+                {
+                    Type* baseType = it->second;
+                    ptrType->SetBaseType(baseType);
+                    ptrTypeMap[baseType] = ptrType;
+                }
+                else
+                {
+                    throw Exception("base type '" + baseTypeId + "' for pointer type '" + ptrType->Name() + "' not resolved");
+                }
+            }
+            unresolvedPtrTypes.Clear();
+        }
+        private void ResolveStructureTypes()
+        {
+            for (const Pair<StructureType*, List<string>>& p : unresolvedStructureTypes)
+            {
+                StructureType* structureType = p.first;
+                const List<string>& memberTypeIds = p.second;
+                List<Type*> memberTypes;
+                for (const string& memberTypeId : memberTypeIds)
+                {
+                    HashMap<string, Type*>.ConstIterator it = typeMap.CFind(memberTypeId);
+                    if (it != typeMap.CEnd())
+                    {
+                        memberTypes.Add(it->second);
+                    }
+                    else
+                    {
+                        throw Exception("member type '" + memberTypeId + "' for structure type '" + structureType->Name() + "' not resolved");
+                    }
+                }
+                structureType->SetMemberTypes(Rvalue(memberTypes));
+            }
+            unresolvedStructureTypes.Clear();
+        }
+        private void ResolveArrayTypes()
+        {
+            for (const Pair<ArrayType*, string>& p : unresolvedArrayTypes)
+            {
+                ArrayType* arrayType = p.first;
+                const string& elementTypeId = p.second;
+                HashMap<string, Type*>.ConstIterator it = typeMap.CFind(elementTypeId);
+                if (it != typeMap.CEnd())
+                {
+                    arrayType->SetElementType(it->second);
+                }
+                else
+                {
+                    throw Exception("element type '" + elementTypeId + "' for array type '" + arrayType->Name() + "' not resolved");
+                }
+            }
+            unresolvedArrayTypes.Clear();
+        }
+        private void ResolveFunctionTypes()
+        {
+            for (const Pair<FunctionType*, Pair<string, List<string>>>& p : unresolvedFunctionTypes)
+            {
+                FunctionType* functionType = p.first;
+                const Pair<string, List<string>>& ids = p.second;
+                const string& returnTypeId = ids.first;
+                Type* returnType = null;
+                HashMap<string, Type*>.ConstIterator it = typeMap.CFind(returnTypeId);
+                if (it != typeMap.CEnd())
+                {
+                    returnType = it->second;
+                }
+                else
+                {
+                    throw Exception("return type '" + returnTypeId + "' for function type '" + functionType->Name() + "' not resolved");
+                }
+                const List<string>& paramTypeIds = ids.second;
+                List<Type*> paramTypes;
+                for (const string& paramTypeId : paramTypeIds)
+                {
+                    HashMap<string, Type*>.ConstIterator it = typeMap.CFind(paramTypeId);
+                    if (it != typeMap.CEnd())
+                    {
+                        paramTypes.Add(it->second);
+                    }
+                    else
+                    {
+                        throw Exception("parameter type '" + paramTypeId + "' for function type '" + functionType->Name() + "' not resolved");
+                    }
+                }
+                functionType->SetReturnType(returnType);
+                functionType->SetParamTypes(Rvalue(paramTypes));
+            }
+            unresolvedFunctionTypes.Clear();
+        }
+        private VoidType voidType;
+        private BoolType boolType;
+        private SByteType sbyteType;
+        private ByteType byteType;
+        private ShortType shortType;
+        private UShortType ushortType;
+        private IntType intType;
+        private UIntType uintType;
+        private LongType longType;
+        private ULongType ulongType;
+        private FloatType floatType;
+        private DoubleType doubleType;
+        private HashMap<string, Type*> typeMap;
+        private HashMap<Type*, PtrType*> ptrTypeMap;
+        private List<UniquePtr<Type>> types;
+        private List<Pair<PtrType*, string>> unresolvedPtrTypes;
+        private List<Pair<StructureType*, List<string>>> unresolvedStructureTypes;
+        private List<Pair<ArrayType*, string>> unresolvedArrayTypes;
+        private List<Pair<FunctionType*, Pair<string, List<string>>>> unresolvedFunctionTypes;
+    }
+}

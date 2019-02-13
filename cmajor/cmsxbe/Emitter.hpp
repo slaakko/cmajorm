@@ -7,7 +7,10 @@
 #define CMAJOR_CMSXBE_EMITTER_INCLUDED
 #include <cmajor/cmsxbe/EmittingContext.hpp>
 #include <cmajor/cmsxbe/ValueStack.hpp>
+#include <cmajor/cmsxi/CompileUnit.hpp>
 #include <cmajor/ir/Emitter.hpp>
+#include <boost/uuid/uuid.hpp>
+#include <boost/functional/hash.hpp>
 
 namespace cmsxbe {
 
@@ -296,6 +299,12 @@ public:
 private:
     cmsxbe::EmittingContext* emittingContext;
     ValueStack stack;
+    cmsxi::Context* context;
+    cmsxi::CompileUnit* compileUnit;
+    std::unordered_map<void*, cmsxi::FunctionType*> functionIrTypeMap;
+    std::unordered_map<boost::uuids::uuid, cmsxi::Type*, boost::hash<boost::uuids::uuid>> irTypeTypeIdMap;
+    cmsxi::Function* currentFunction;
+    std::unordered_map<void*, cmsxi::Value*> irObjectMap;
 };
 
 } // namespace cmsxbe

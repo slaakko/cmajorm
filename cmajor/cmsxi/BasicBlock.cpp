@@ -1,0 +1,38 @@
+// =================================
+// Copyright (c) 2019 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+#include <cmajor/cmsxi/BasicBlock.hpp>
+#include <cmajor/util/TextUtils.hpp>
+
+namespace cmsxi {
+
+BasicBlock::BasicBlock(int id_) : id(id_)
+{
+}
+
+void BasicBlock::AddInstruction(Instruction* instruction)
+{
+    instructions.push_back(std::unique_ptr<Instruction>(instruction));
+}
+
+void BasicBlock::Write(CodeFormatter& formatter, Function& function, Context& context)
+{
+    int indent = formatter.CurrentIndent();
+    formatter.DecIndent();
+    formatter.Write(Format("@" + std::to_string(id), indent, FormatWidth::min));
+    bool first = true;
+    for (const auto& inst : instructions)
+    {
+        inst->Write(formatter, function, context);
+        formatter.WriteLine();
+        if (first)
+        {
+            formatter.IncIndent();
+            first = false;
+        }
+    }
+}
+
+} // namespace cmsxi

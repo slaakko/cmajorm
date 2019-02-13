@@ -215,6 +215,13 @@ namespace cmsx.object
                 fp->linkage = Linkage.internal_;
                 fp->value = Value(Value.Flag.register, cmsx.machine.regFP, fp);
                 AddSymbol(fp);
+                Symbol* ix = new Symbol();
+                ix->index = -1;
+                ix->name = "ix";
+                ix->segment = Segment.unknown;
+                ix->linkage = Linkage.internal_;
+                ix->value = Value(Value.Flag.register, cmsx.machine.regIX, ix);
+                AddSymbol(ix);
                 Symbol* rA = new Symbol();
                 rA->index = -1;
                 rA->name = "rA";

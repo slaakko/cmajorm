@@ -1,0 +1,70 @@
+using System;
+using System.Collections;
+using System.IO;
+
+const char* Version()
+{
+    return "0.1.0";
+}
+
+void PrintHelp()
+{
+    Console.Out() <<
+        "Cmajor System X Intermediate Code Compiler version " << Version() << endl() <<
+        "Usage: cmsxic [options] { <file.i> }" << endl() <<
+        "Compile given System X intermediate code files (*.i) to System X assembly files (*.s)" << endl() <<
+        "Options:" << endl() <<
+        "--help (-h)" << endl() <<
+        "   Print help" << endl() <<
+        "--verbose (-v)" << endl() <<
+        "   Be verbose" << endl() <<
+        endl();
+}
+
+int main(int argc, const char** argv)
+{
+    try
+    {
+        bool verbose = false;
+        List<string> intermediateCodeFileNames;
+        for (int i = 1; i < argc; ++i)
+        {
+            string arg = argv[i];
+            if (arg.StartsWith("-"))
+            {
+                if (arg ==  "--help" || arg == "-h")
+                {
+                    PrintHelp();
+                    return 0;
+                }
+                else if (arg == "--verbose" || arg == "-v")
+                {
+                    verbose = true;
+                }
+            }
+            else
+            {
+                intermediateCodeFileNames.Add(GetFullPath(arg));
+            }
+        }
+        if (intermediateCodeFileNames.IsEmpty())
+        {
+            PrintHelp();
+            throw Exception("no intermediate code files given");
+        }
+        for (const string& intermediateCodeFileName : intermediateCodeFileNames)
+        {
+            if (verbose)
+            {
+                Console.Out() << "> " << intermediateCodeFileName << endl();
+            }
+            cmsx.intermediate.Compile(intermediateCodeFileName, verbose);
+        }
+    }
+    catch (const Exception& ex)
+    {
+        Console.Error() << ex.Message() << endl();
+        return 1;
+    }
+    return 0;
+}

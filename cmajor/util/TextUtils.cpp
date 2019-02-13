@@ -482,4 +482,24 @@ std::string CurrentThreadIdStr()
     return s.str();
 }
 
+std::string Format(const std::string& s, int width)
+{
+    return Format(s, width, FormatWidth::exact);
+}
+
+std::string Format(const std::string& s, int width, FormatWidth fw)
+{
+    if (fw == FormatWidth::min)
+    {
+        width = std::max(width, int(s.length()));
+    }
+    std::string result(width, ' ');
+    int n = std::min(int(s.length()), width);
+    for (int i = 0; i < n; ++i)
+    {
+        result[i] = s[i];
+    }
+    return result;
+}
+
 } } // namespace cmajor::util

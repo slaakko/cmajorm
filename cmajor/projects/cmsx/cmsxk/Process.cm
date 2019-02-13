@@ -446,6 +446,7 @@ namespace cmsx.kernel
         ulong prevDX = regs.Get(regDX);
         ulong prevEX = regs.Get(regEX);
         ulong prevFP = regs.Get(regFP);
+        ulong prevIX = regs.Get(regIX);
         ulong prevPC = regs.GetPC();
         ulong prevRL = regs.GetSpecial(Registers.rL);
         ulong prevRG = regs.GetSpecial(Registers.rG);
@@ -457,6 +458,7 @@ namespace cmsx.kernel
         regs.Set(regDX, 0u);
         regs.Set(regEX, 0u);
         regs.Set(regFP, 0u);
+        regs.Set(regIX, 0u);
         regs.SetSpecial(Registers.rL, 0u);
         regs.SetSpecial(Registers.rG, firstGlobalReg);
         process->sp = machine.GetProcessor().SaveContext(process->memoryTable.virtualTranslationRegisterValue, sp, &process->regAXAddress, &process->regBXAddress);
@@ -466,6 +468,7 @@ namespace cmsx.kernel
         regs.Set(regDX, prevDX);
         regs.Set(regEX, prevEX);
         regs.Set(regFP, prevFP);
+        regs.Set(regIX, prevIX);
         regs.SetPC(prevPC);
         regs.SetSpecial(Registers.rL, prevRL);
         regs.SetSpecial(Registers.rG, prevRG);

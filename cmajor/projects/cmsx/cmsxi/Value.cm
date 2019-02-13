@@ -1,0 +1,192 @@
+using System;
+
+namespace cmsx.intermediate
+{
+    public abstract class Value
+    {
+        public default nothrow Value();
+        public default virtual ~Value();
+        public abstract nothrow string Name() const;
+        public Type* type;
+        public int line;
+    }
+
+    public class BoolValue : Value
+    {
+        public default nothrow BoolValue();
+        public nothrow BoolValue(bool value_) : value(value_)
+        {
+        }
+        public override nothrow string Name() const
+        {
+            return ToString(value);
+        }
+        public bool value;
+    }
+
+    public class SByteValue : Value
+    {
+        public default nothrow SByteValue();
+        public nothrow SByteValue(sbyte value_) : value(value_)
+        {
+        }
+        public override nothrow string Name() const
+        {
+            return ToString(value);
+        }
+        public sbyte value;
+    }
+
+    public class ByteValue : Value
+    {
+        public default nothrow ByteValue();
+        public nothrow ByteValue(byte value_) : value(value_)
+        {
+        }
+        public override nothrow string Name() const
+        {
+            return ToString(value);
+        }
+        public byte value;
+    }
+
+    public class ShortValue : Value
+    {
+        public default nothrow ShortValue();
+        public nothrow ShortValue(short value_) : value(value_)
+        {
+        }
+        public override nothrow string Name() const
+        {
+            return ToString(value);
+        }
+        public short value;
+    }
+
+    public class UShortValue : Value
+    {
+        public default nothrow UShortValue();
+        public nothrow UShortValue(ushort value_) : value(value_)
+        {
+        }
+        public override nothrow string Name() const
+        {
+            return ToString(value);
+        }
+        public ushort value;
+    }
+
+    public class IntValue : Value
+    {
+        public default nothrow IntValue();
+        public nothrow IntValue(int value_) : value(value_)
+        {
+        }
+        public override nothrow string Name() const
+        {
+            return ToString(value);
+        }
+        public int value;
+    }
+
+    public class UIntValue : Value
+    {
+        public default nothrow UIntValue();
+        public nothrow UIntValue(uint value_) : value(value_)
+        {
+        }
+        public override nothrow string Name() const
+        {
+            return ToString(value);
+        }
+        public uint value;
+    }
+
+    public class LongValue : Value
+    {
+        public default nothrow LongValue();
+        public nothrow LongValue(long value_) : value(value_)
+        {
+        }
+        public override nothrow string Name() const
+        {
+            return ToString(value);
+        }
+        public long value;
+    }
+
+    public class ULongValue : Value
+    {
+        public default nothrow ULongValue();
+        public nothrow ULongValue(ulong value_) : value(value_)
+        {
+        }
+        public override nothrow string Name() const
+        {
+            return ToString(value);
+        }
+        public ulong value;
+    }
+
+    public class FloatValue : Value
+    {
+        public default nothrow FloatValue();
+        public nothrow FloatValue(float value_) : value(value_)
+        {
+        }
+        public override nothrow string Name() const
+        {
+            return ToString(value);
+        }
+        public float value;
+    }
+
+    public class DoubleValue : Value
+    {
+        public default nothrow DoubleValue();
+        public nothrow DoubleValue(double value_) : value(value_)
+        {
+        }
+        public override nothrow string Name() const
+        {
+            return ToString(value);
+        }
+        public double value;
+    }
+
+    public class NullValue : Value
+    {
+        public nothrow NullValue(PtrType* ptrType_) : ptrType(ptrType_)
+        {
+        }
+        public override nothrow string Name() const
+        {
+            return "null";
+        }
+        public PtrType* ptrType;
+    }
+
+    public class IdValue : Value
+    {
+        public IdValue(uint id_) : base(), id(id_)
+        {
+        }
+        public override nothrow string Name() const
+        {
+            return "$" + ToString(id);
+        }
+        public uint id;
+    }
+
+    public class SymbolValue : Value
+    {
+        public nothrow SymbolValue(const string& symbol_) : base(), symbol(symbol_)
+        {
+        }
+        public override nothrow string Name() const
+        {
+            return symbol;
+        }
+        public string symbol;
+    }
+}

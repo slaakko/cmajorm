@@ -7,8 +7,10 @@
 #define CMAJOR_CODEGENSX_SYSTEMX_CODEGENERATOR_INCLUDED
 #include <cmajor/codegensx/CodeGenSxApi.hpp>
 #include <cmajor/codegenbase/CodeGenerator.hpp>
-#include <cmajor/cmsx/CompileUnit.hpp>
+#include <cmajor/cmsxi/CompileUnit.hpp>
 #include <cmajor/binder/BoundNodeVisitor.hpp>
+#include <cmajor/binder/BoundStatement.hpp>
+#include <cmajor/binder/BoundClass.hpp>
 #include <cmajor/symbols/SymbolTable.hpp>
 #include <cmajor/symbols/Module.hpp>
 
@@ -21,14 +23,91 @@ class CODEGENSX_API SystemXCodeGenerator : public cmajor::codegenbase::CodeGener
 {
 public:
     SystemXCodeGenerator(cmajor::ir::EmittingContext& emittingContext_);
+    SystemXCodeGenerator(const SystemXCodeGenerator&) = delete;
+    SystemXCodeGenerator& operator=(const SystemXCodeGenerator&) = delete;
     void GenerateCode(void* boundCompileUnit) override;
     void Visit(BoundCompileUnit& boundCompileUnit) override;
+    void Visit(BoundNamespace& boundNamespace) override;
+    void Visit(BoundClass& boundClass) override;
+    void Visit(BoundFunction& boundFunction) override;
+    void Visit(BoundCompoundStatement& boundCompoundStatement) override;
+    void Visit(BoundReturnStatement& boundReturnStatement) override;
+    void Visit(BoundGotoCaseStatement& boundGotoCaseStatement) override;
+    void Visit(BoundGotoDefaultStatement& boundGotoDefaultStatement) override;
+    void Visit(BoundBreakStatement& boundBreakStatement) override;
+    void Visit(BoundContinueStatement& boundContinueStatement) override;
+    void Visit(BoundGotoStatement& boundGotoStatement) override;
+    void Visit(BoundSequenceStatement& boundSequenceStatement) override;
+    void Visit(BoundIfStatement& boundIfStatement) override;
+    void Visit(BoundWhileStatement& boundWhileStatement) override;
+    void Visit(BoundDoStatement& boundDoStatement) override;
+    void Visit(BoundForStatement& boundForStatement) override;
+    void Visit(BoundSwitchStatement& boundSwitchStatement) override;
+    void Visit(BoundCaseStatement& boundCaseStatement) override;
+    void Visit(BoundDefaultStatement& boundDefaultStatement) override;
+    void Visit(BoundExpressionStatement& boundExpressionStatement) override;
+    void Visit(BoundConstructionStatement& boundConstructionStatement) override;
+    void Visit(BoundAssignmentStatement& boundAssignmentStatement) override;
+    void Visit(BoundEmptyStatement& boundEmptyStatement) override;
+    void Visit(BoundSetVmtPtrStatement& boundSetVmtPtrStatement) override;
+    void Visit(BoundParameter& boundParameter) override;
+    void Visit(BoundLocalVariable& boundLocalVariable) override;
+    void Visit(BoundMemberVariable& boundMemberVariable) override;
+    void Visit(BoundConstant& boundConstant) override;
+    void Visit(BoundEnumConstant& boundEnumConstant) override;
+    void Visit(BoundLiteral& boundLiteral) override;
+    void Visit(BoundTemporary& boundTemporary) override;
+    void Visit(BoundSizeOfExpression& boundSizeOfExpression) override;
+    void Visit(BoundAddressOfExpression& boundAddressOfExpression) override;
+    void Visit(BoundDereferenceExpression& boundDereferenceExpression) override;
+    void Visit(BoundReferenceToPointerExpression& boundReferenceToPointerExpression) override;
+    void Visit(BoundFunctionCall& boundFunctionCall) override;
+    void Visit(BoundDelegateCall& boundDelegateCall) override;
+    void Visit(BoundClassDelegateCall& boundClassDelegateCall) override;
+    void Visit(BoundConversion& boundConversion) override;
+    void Visit(BoundConstructExpression& boundConstructExpression) override;
+    void Visit(BoundConstructAndReturnTemporaryExpression& boundConstructAndReturnTemporaryExpression) override;
+    void Visit(BoundClassOrClassDelegateConversionResult& boundClassOrClassDelegateConversionResult) override;
+    void Visit(BoundIsExpression& boundIsExpression) override;
+    void Visit(BoundAsExpression& boundAsExpression) override;
+    void Visit(BoundTypeNameExpression& boundTypeNameExpression) override;
+    void Visit(BoundBitCast& boundBitCast) override;
+    void Visit(BoundFunctionPtr& boundFunctionPtr) override;
+    void Visit(BoundDisjunction& boundDisjunction) override;
+    void Visit(BoundConjunction& boundConjunction) override;
+    void GenJumpingBoolCode();
+    void SetTarget(BoundStatement* labeledStatement);
+    void ExitBlocks(BoundCompoundStatement* targetBlock);
 private:
     cmajor::ir::Emitter* emitter;
     cmajor::ir::EmittingContext* emittingContext;
     SymbolTable* symbolTable;
     Module* module;
-    std::unique_ptr<cmsx::CompileUnit> compileUnit;
+    BoundCompileUnit* compileUnit;
+    cmsxi::CompileUnit* nativeCompileUnit;
+    void* function;
+    void* entryBasicBlock;
+    bool lastInstructionWasRet;
+    bool destructorCallGenerated;
+    bool genJumpingBoolCode;
+    void* trueBlock;
+    void* falseBlock;
+    void* breakTarget;
+    void* continueTarget;
+    BoundStatement* sequenceSecond;
+    BoundFunction* currentFunction;
+    BoundCompoundStatement* currentBlock;
+    BoundCompoundStatement* breakTargetBlock;
+    BoundCompoundStatement* continueTargetBlock;
+    std::unordered_map<BoundStatement*, void*> labeledStatementMap;
+    std::unordered_map<BoundCompoundStatement*, std::vector<std::unique_ptr<BoundFunctionCall>>> blockDestructionMap;
+    std::vector<BoundCompoundStatement*> blocks;
+    void* lastAlloca;
+    BoundClass* currentClass;
+    std::stack<BoundClass*> classStack;
+    bool basicBlockOpen;
+    void* defaultDest;
+    std::unordered_map<IntegralValue, void*, IntegralValueHash>* currentCaseMap;
 };
 
 } } // namespace cmajor::codegensx

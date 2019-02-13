@@ -10,6 +10,7 @@
 #include <cmajor/symbols/SymbolWriter.hpp>
 #include <cmajor/symbols/SymbolReader.hpp>
 #include <cmajor/symbols/Module.hpp>
+#include <cmajor/symbols/GlobalFlags.hpp>
 #include <cmajor/util/Unicode.hpp>
 #include <boost/uuid/uuid_generators.hpp>
 
@@ -553,7 +554,7 @@ void* DerivedTypeSymbol::IrType(Emitter& emitter)
     void* localIrType = emitter.GetIrTypeByTypeId(TypeId());
     if (!localIrType)
     {
-        if (baseType->IsVoidType())
+        if (baseType->IsVoidType() && GetBackEnd() == BackEnd::llvm)
         {
             localIrType = emitter.GetIrTypeForByte();
         }

@@ -155,85 +155,85 @@ struct BasicTypeLShr
 
 struct DefaultInt1
 {
-    static void* Generate(Emitter& emitter) { return emitter.CreateIrValueForBool(false); }
+    static void* Generate(Emitter& emitter) { return emitter.CreateDefaultIrValueForBool(); }
     static std::unique_ptr<Value> ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span) { return std::unique_ptr<Value>(new BoolValue(span, false)); }
 };
 
 struct DefaultSInt8
 {
-    static void* Generate(Emitter& emitter) { return emitter.CreateIrValueForSByte(0); }
+    static void* Generate(Emitter& emitter) { return emitter.CreateDefaultIrValueForSByte(); }
     static std::unique_ptr<Value> ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span) { return std::unique_ptr<Value>(new SByteValue(span, 0)); }
 };
 
 struct DefaultUInt8
 {
-    static void* Generate(Emitter& emitter) { return emitter.CreateIrValueForByte(0); }
+    static void* Generate(Emitter& emitter) { return emitter.CreateDefaultIrValueForByte(); }
     static std::unique_ptr<Value> ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span) { return std::unique_ptr<Value>(new ByteValue(span, 0)); }
 };
 
 struct DefaultSInt16
 {
-    static void* Generate(Emitter& emitter) { return emitter.CreateIrValueForShort(0); }
+    static void* Generate(Emitter& emitter) { return emitter.CreateDefaultIrValueForShort(); }
     static std::unique_ptr<Value> ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span) { return std::unique_ptr<Value>(new ShortValue(span, 0)); }
 };
 
 struct DefaultUInt16
 {
-    static void* Generate(Emitter& emitter) { return emitter.CreateIrValueForUShort(0); }
+    static void* Generate(Emitter& emitter) { return emitter.CreateDefaultIrValueForUShort(); }
     static std::unique_ptr<Value> ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span) { return std::unique_ptr<Value>(new UShortValue(span, 0)); }
 };
 
 struct DefaultSInt32
 {
-    static void* Generate(Emitter& emitter) { return emitter.CreateIrValueForInt(0); }
+    static void* Generate(Emitter& emitter) { return emitter.CreateDefaultIrValueForInt(); }
     static std::unique_ptr<Value> ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span) { return std::unique_ptr<Value>(new IntValue(span, 0)); }
 };
 
 struct DefaultUInt32
 {
-    static void* Generate(Emitter& emitter) { return emitter.CreateIrValueForUInt(0); }
+    static void* Generate(Emitter& emitter) { return emitter.CreateDefaultIrValueForUInt(); }
     static std::unique_ptr<Value> ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span) { return std::unique_ptr<Value>(new UIntValue(span, 0)); }
 };
 
 struct DefaultSInt64
 {
-    static void* Generate(Emitter& emitter) { return emitter.CreateIrValueForLong(0); }
+    static void* Generate(Emitter& emitter) { return emitter.CreateDefaultIrValueForLong(); }
     static std::unique_ptr<Value> ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span) { return std::unique_ptr<Value>(new LongValue(span, 0)); }
 };
 
 struct DefaultUInt64
 {
-    static void* Generate(Emitter& emitter) { return emitter.CreateIrValueForULong(0); }
+    static void* Generate(Emitter& emitter) { return emitter.CreateDefaultIrValueForULong(); }
     static std::unique_ptr<Value> ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span) { return std::unique_ptr<Value>(new ULongValue(span, 0)); }
 };
 
 struct DefaultFloat
 {
-    static void* Generate(Emitter& emitter) { return emitter.CreateIrValueForFloat(0.0); }
+    static void* Generate(Emitter& emitter) { return emitter.CreateDefaultIrValueForFloat(); }
     static std::unique_ptr<Value> ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span) { return std::unique_ptr<Value>(new FloatValue(span, 0.0)); }
 };
 
 struct DefaultDouble
 {
-    static void* Generate(Emitter& emitter) { return emitter.CreateIrValueForDouble(0.0); }
+    static void* Generate(Emitter& emitter) { return emitter.CreateDefaultIrValueForDouble(); }
     static std::unique_ptr<Value> ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span) { return std::unique_ptr<Value>(new DoubleValue(span, 0.0)); }
 };
 
 struct DefaultChar
 {
-    static void* Generate(Emitter& emitter) { return emitter.CreateIrValueForChar('\0'); }
+    static void* Generate(Emitter& emitter) { return emitter.CreateDefaultIrValueForChar(); }
     static std::unique_ptr<Value> ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span) { return std::unique_ptr<Value>(new CharValue(span, '\0')); }
 };
 
 struct DefaultWChar
 {
-    static void* Generate(Emitter& emitter) { return emitter.CreateIrValueForWChar('\0'); }
+    static void* Generate(Emitter& emitter) { return emitter.CreateDefaultIrValueForWChar(); }
     static std::unique_ptr<Value> ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span) { return std::unique_ptr<Value>(new WCharValue(span, '\0')); }
 };
 
 struct DefaultUChar
 {
-    static void* Generate(Emitter& emitter) { return emitter.CreateIrValueForUChar('\0'); }
+    static void* Generate(Emitter& emitter) { return emitter.CreateDefaultIrValueForUChar(); }
     static std::unique_ptr<Value> ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span) { return std::unique_ptr<Value>(new UCharValue(span, '\0')); }
 };
 
@@ -635,7 +635,6 @@ class BasicTypeDefaultUInt32Operation : public BasicTypeDefaultCtor<DefaultUInt3
 public:
     BasicTypeDefaultUInt32Operation(const Span& span_, const std::u32string& name_);
 };
-
 
 class BasicTypeDefaultSInt64Operation : public BasicTypeDefaultCtor<DefaultSInt64>
 {

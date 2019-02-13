@@ -1,0 +1,388 @@
+namespace cmsx.intermediate
+{
+    grammar IntermediateCodeFileGrammar
+    {
+        using stdlib.identifier;
+        using stdlib.newline;
+        using stdlib.uint;
+        using stdlib.long;
+        using stdlib.spaces;
+        skip spaces;
+
+        IntermediateCodeFile(cmsx.intermediate.Context* context)
+            ::= empty{ context->SetFileName(fileName); } TypeDeclarations(context)? Functions(context)?
+            ;
+
+        TypeDeclarations(cmsx.intermediate.Context* context)
+            ::= (keyword("types") '{'! TypeDeclaration(context)* '}'!){ context->ResolveTypes(); }
+            ;
+
+        Functions(cmsx.intermediate.Context* context)
+            ::= Function(context)*
+            ;
+
+        Function(cmsx.intermediate.Context* context)
+            ::= FunctionHeader(context):function{ context->SetCurrentFunction(function); } '{'! BasicBlock(context, function)* '}'!
+            ;
+
+        FunctionHeader(cmsx.intermediate.Context* context) : Function*
+            ::= keyword("function") TypeExpr(context):functionType! identifier:functionId!{ value = context->AddFunction(span.lineNumber, functionType, ToUtf8(functionId)); }
+            ;
+
+        BasicBlock(cmsx.intermediate.Context* context, Function* function, var BasicBlock* bb)
+            ::= token(Label:id{ bb = function->AddBasicBlock(id); } S InstructionLine(context, bb)+ EmptyLine?)
+            ;
+
+        EmptyLine
+            ::= token(S? newline)
+            ;
+
+        InstructionLine(cmsx.intermediate.Context* context, BasicBlock* bb)
+            ::= token(S? Instruction(context) S? newline!){ bb->AddInstruction(Instruction); }
+            ;
+
+        Instruction(cmsx.intermediate.Context* context) : Instruction*
+            ::= StoreInstruction(context){ value = StoreInstruction; }
+            |   ArgInstruction(context){ value = ArgInstruction; }
+            |   JumpInstruction(context){ value = JumpInstruction; }
+            |   BranchInstruction(context){ value = BranchInstruction; }
+            |   ProcedureCallInstruction(context){ value = ProcedureCallInstruction; }
+            |   RetInstruction(context){ value = RetInstruction; }
+            |   SwitchInstruction(context){ value = SwitchInstruction; }
+            |   ValueInstruction(context){ value = ValueInstruction; }
+            ;
+
+        StoreInstruction(cmsx.intermediate.Context* context) : Instruction*
+            ::= (keyword("store") S TypeExpr(context):type! S Value(context, type):val! Comma! TypeExpr(context):ptrType! S Value(context, ptrType):ptr!){ value = new StoreInstruction(val, ptr, span.lineNumber); }
+            ;
+
+        ArgInstruction(cmsx.intermediate.Context* context) : Instruction*
+            ::= (keyword("arg") S TypeExpr(context):type! S Value(context, type):arg!){ value = new ArgInstruction(arg, span.lineNumber); }
+            ;
+
+        JumpInstruction(cmsx.intermediate.Context* context) : Instruction*
+            ::= (keyword("jmp") S Label:target!){ value = new JumpInstruction(target, span.lineNumber); }
+            ;
+
+        BranchInstruction(cmsx.intermediate.Context* context) : Instruction*
+            ::= (keyword("branch") S TypeExpr(context):type! S Value(context, type):cond! Comma! Label:trueTarget! Comma! Label:falseTarget!){ value = new BranchInstruction(cond, trueTarget, falseTarget, span.lineNumber); }
+            ;
+
+        ProcedureCallInstruction(cmsx.intermediate.Context* context) : Instruction*
+            ::= (keyword("call") S TypeExpr(context):functionType! S Value(context, functionType):callee!){ value = new ProcedureCallInstruction(callee, span.lineNumber); }
+            ;
+
+        RetInstruction(cmsx.intermediate.Context* context) : Instruction*
+            ::= keyword("ret") S (keyword("void"){ value = new RetInstruction(null, span.lineNumber); } | TypeExpr(context):type S Value(context, type):val{ value = new RetInstruction(val, span.lineNumber); })
+            ;
+
+        SwitchInstruction(cmsx.intermediate.Context* context) : SwitchInstruction*
+            ::= (keyword("switch") S TypeExpr(context):type! S Value(context, type):cond!){ value = new SwitchInstruction(cond, span.lineNumber); } Comma!
+                '['! S? (TypeExpr(context):caseType S Value(context, caseType):caseValue Comma Label:caseTarget){ value->AddCase(caseValue, caseTarget); } % (S? ':' S?) ']'!
+            ;
+
+        ValueInstruction(cmsx.intermediate.Context* context) : Instruction*
+            ::= (TypeExpr(context):type S Value(context, type):result! S? '=' S? Operation(context, result)!){ value = Operation; }
+            ;
+
+        Operation(cmsx.intermediate.Context* context, Value* result) : Instruction*
+            ::= UnaryInstruction(context, result){ value = UnaryInstruction; }
+            |   BinaryInstruction(context, result){ value = BinaryInstruction; }
+            |   ParamInstruction(context, result){ value = ParamInstruction; }
+            |   LocalInstruction(context, result){ value = LocalInstruction; }
+            |   LoadInstruction(context, result){ value = LoadInstruction; }
+            |   ElemAddrInstruction(context, result){ value = ElemAddrInstruction; }
+            |   PtrOffsetInstruction(context, result){ value = PtrOffsetInstruction; }
+            |   PtrDiffInstruction(context, result){ value = PtrDiffInstruction; }
+            |   FunctionCallInstruction(context, result){ value = FunctionCallInstruction; }
+            ;
+
+        UnaryInstruction(cmsx.intermediate.Context* context, Value* result) : Instruction*
+            ::= NotInstruction(context, result){ value = NotInstruction; }
+            |   NegInstruction(context, result){ value = NegInstruction; }
+            |   SignExtendInstruction(context, result){ value = SignExtendInstruction; }
+            |   ZeroExtendInstruction(context, result){ value = ZeroExtendInstruction; }
+            |   TruncateInstruction(context, result){ value = TruncateInstruction; }
+            |   BitCastInstruction(context, result){ value = BitCastInstruction; }
+            |   IntToFloatInstruction(context, result){ value = IntToFloatInstruction; }
+            |   FloatToIntInstruction(context, result){ value = FloatToIntInstruction; }
+            |   IntToPtrInstruction(context, result){ value = IntToPtrInstruction; }
+            |   PtrToIntInstruction(context, result){ value = PtrToIntInstruction; }
+            ;
+
+        NotInstruction(cmsx.intermediate.Context* context, Value* result) : Instruction*
+            ::= (keyword("not") S Operand(context):arg!){ value = new NotInstruction(result, arg, span.lineNumber); }
+            ;
+
+        NegInstruction(cmsx.intermediate.Context* context, Value* result) : Instruction*
+            ::= (keyword("neg") S Operand(context):arg!){ value = new NegInstruction(result, arg, span.lineNumber); }
+            ;
+
+        SignExtendInstruction(cmsx.intermediate.Context* context, Value* result) : Instruction*
+            ::= (keyword("signextend") S Operand(context):arg!){ value = new SignExtendInstruction(result, arg, span.lineNumber); }
+            ;
+
+        ZeroExtendInstruction(cmsx.intermediate.Context* context, Value* result) : Instruction*
+            ::= (keyword("zeroextend") S Operand(context):arg!){ value = new ZeroExtendInstruction(result, arg, span.lineNumber); }
+            ;
+
+        TruncateInstruction(cmsx.intermediate.Context* context, Value* result) : Instruction*
+            ::= (keyword("truncate") S Operand(context):arg!){ value = new TruncateInstruction(result, arg, span.lineNumber); }
+            ;
+
+        BitCastInstruction(cmsx.intermediate.Context* context, Value* result) : Instruction*
+            ::= (keyword("bitcast") S Operand(context):arg!){ value = new BitCastInstruction(result, arg, span.lineNumber); }
+            ;
+
+        IntToFloatInstruction(cmsx.intermediate.Context* context, Value* result) : Instruction*
+            ::= (keyword("inttofloat") S Operand(context):arg!){ value = new IntToFloatInstruction(result, arg, span.lineNumber); }
+            ;
+
+        FloatToIntInstruction(cmsx.intermediate.Context* context, Value* result) : Instruction*
+            ::= (keyword("floattoint") S Operand(context):arg!){ value = new FloatToIntInstruction(result, arg, span.lineNumber); }
+            ;
+
+        IntToPtrInstruction(cmsx.intermediate.Context* context, Value* result) : Instruction*
+            ::= (keyword("inttoptr") S Operand(context):arg!){ value = new IntToPtrInstruction(result, arg, span.lineNumber); }
+            ;
+
+        PtrToIntInstruction(cmsx.intermediate.Context* context, Value* result) : Instruction*
+            ::= (keyword("ptrtoint") S Operand(context):arg!){ value = new PtrToIntInstruction(result, arg, span.lineNumber); }
+            ;
+
+        BinaryInstruction(cmsx.intermediate.Context* context, Value* result) : Instruction*
+            ::= AddInstruction(context, result){ value = AddInstruction; }
+            |   SubInstruction(context, result){ value = SubInstruction; }
+            |   MulInstruction(context, result){ value = MulInstruction; }
+            |   DivInstruction(context, result){ value = DivInstruction; }
+            |   ModInstruction(context, result){ value = ModInstruction; }
+            |   AndInstruction(context, result){ value = AndInstruction; }
+            |   OrInstruction(context, result){ value = OrInstruction; }
+            |   XorInstruction(context, result){ value = XorInstruction; }
+            |   ShlInstruction(context, result){ value = ShlInstruction; }
+            |   ShrInstruction(context, result){ value = ShrInstruction; }
+            |   EqualInstruction(context, result){ value = EqualInstruction; }
+            |   LessInstruction(context, result){ value = LessInstruction; }
+            ;
+
+        AddInstruction(cmsx.intermediate.Context* context, Value* result) : Instruction*
+            ::= (keyword("add") S Operand(context):left! Comma! Operand(context):right!){ value = new AddInstruction(result, left, right, span.lineNumber); }
+            ;
+
+        SubInstruction(cmsx.intermediate.Context* context, Value* result) : Instruction*
+            ::= (keyword("sub") S Operand(context):left! Comma! Operand(context):right!){ value = new SubInstruction(result, left, right, span.lineNumber); }
+            ;
+
+        MulInstruction(cmsx.intermediate.Context* context, Value* result) : Instruction*
+            ::= (keyword("mul") S Operand(context):left! Comma! Operand(context):right!){ value = new MulInstruction(result, left, right, span.lineNumber); }
+            ;
+
+        DivInstruction(cmsx.intermediate.Context* context, Value* result) : Instruction*
+            ::= (keyword("div") S Operand(context):left! Comma! Operand(context):right!){ value = new DivInstruction(result, left, right, span.lineNumber); }
+            ;
+
+        ModInstruction(cmsx.intermediate.Context* context, Value* result) : Instruction*
+            ::= (keyword("mod") S Operand(context):left! Comma! Operand(context):right!){ value = new ModInstruction(result, left, right, span.lineNumber); }
+            ;
+
+        AndInstruction(cmsx.intermediate.Context* context, Value* result) : Instruction*
+            ::= (keyword("and") S Operand(context):left! Comma! Operand(context):right!){ value = new AndInstruction(result, left, right, span.lineNumber); }
+            ;
+
+        OrInstruction(cmsx.intermediate.Context* context, Value* result) : Instruction*
+            ::= (keyword("or") S Operand(context):left! Comma! Operand(context):right!){ value = new OrInstruction(result, left, right, span.lineNumber); }
+            ;
+
+        XorInstruction(cmsx.intermediate.Context* context, Value* result) : Instruction*
+            ::= (keyword("xor") S Operand(context):left! Comma! Operand(context):right!){ value = new XorInstruction(result, left, right, span.lineNumber); }
+            ;
+
+        ShlInstruction(cmsx.intermediate.Context* context, Value* result) : Instruction*
+            ::= (keyword("shl") S Operand(context):left! Comma! Operand(context):right!){ value = new ShlInstruction(result, left, right, span.lineNumber); }
+            ;
+
+        ShrInstruction(cmsx.intermediate.Context* context, Value* result) : Instruction*
+            ::= (keyword("shr") S Operand(context):left! Comma! Operand(context):right!){ value = new ShrInstruction(result, left, right, span.lineNumber); }
+            ;
+
+        EqualInstruction(cmsx.intermediate.Context* context, Value* result) : Instruction*
+            ::= (keyword("equal") S Operand(context):left! Comma! Operand(context):right!){ value = new EqualInstruction(result, left, right, span.lineNumber); }
+            ;
+
+        LessInstruction(cmsx.intermediate.Context* context, Value* result) : Instruction*
+            ::= (keyword("less") S Operand(context):left! Comma! Operand(context):right!){ value = new LessInstruction(result, left, right, span.lineNumber); }
+            ;
+
+        ParamInstruction(cmsx.intermediate.Context* context, Value* result) : Instruction*
+            ::= keyword("param"){ value = new ParamInstruction(result, span.lineNumber); }
+            ;
+
+        LocalInstruction(cmsx.intermediate.Context* context, Value* result) : Instruction*
+            ::= (keyword("local") S TypeExpr(context):localType!){ value = new LocalInstruction(result, localType, span.lineNumber); }
+            ;
+
+        LoadInstruction(cmsx.intermediate.Context* context, Value* result) : Instruction*
+            ::= (keyword("load") S Operand(context):ptr!){ value = new LoadInstruction(result, ptr, span.lineNumber); }
+            ;
+
+        ElemAddrInstruction(cmsx.intermediate.Context* context, Value* result) : Instruction*
+            ::= (keyword("elemaddr") S Operand(context):ptr! Comma! Operand(context):index!){ value = new ElemAddrInstruction(result, ptr, index, span.lineNumber); }
+            ;
+
+        PtrOffsetInstruction(cmsx.intermediate.Context* context, Value* result) : Instruction*
+            ::= (keyword("ptroffset") S Operand(context):ptr! Comma! Operand(context):offset!){ value = new PtrOffsetInstruction(result, ptr, offset, span.lineNumber); }
+            ;
+
+        PtrDiffInstruction(cmsx.intermediate.Context* context, Value* result) : Instruction*
+            ::= (keyword("ptrdiff") S Operand(context):leftPtr! Comma! Operand(context):rightPtr!){ value = new PtrDiffInstruction(result, leftPtr, rightPtr, span.lineNumber); }
+            ;
+
+        FunctionCallInstruction(cmsx.intermediate.Context* context, Value* result) : Instruction*
+            ::= (keyword("call") S TypeExpr(context):functionType! S Value(context, functionType):callee!){ value = new FunctionCallInstruction(result, callee, span.lineNumber); }
+            ;
+
+        Operand(cmsx.intermediate.Context* context) : Value*
+            ::= (TypeExpr(context):type S Value(context, type):val!){ value = val; }
+            ;
+
+        Label : uint
+            ::= token('@' uint:x){ value = x; }
+            ;
+
+        Value(cmsx.intermediate.Context* context, Type* type) : Value*
+            ::= IdValue(context, type){ value = IdValue; }
+            |   SymbolValue(context, type){ value = SymbolValue; }
+            |   LiteralValue(context, type){ value = LiteralValue; }
+            ;
+
+        IdValue(cmsx.intermediate.Context* context, Type* type) : Value*
+            ::= ('$' uint:x){ value = context->currentFunction->MakeIdValue(span.lineNumber, x, type); }
+            ;
+
+        SymbolValue(cmsx.intermediate.Context* context, Type* type) : Value*
+            ::= token('@' identifier){ value = context->MakeSymbolValue(span.lineNumber, ToUtf8(identifier), type); }
+            ;
+
+        LiteralValue(cmsx.intermediate.Context* context, Type* type) : Value*
+            ::= (token(anychar - (',' | S | newline))+){ value = context->MakeLiteralValue(span.lineNumber, ToUtf8(ustring(matchBegin, matchEnd)), type); }
+            ;
+
+        S
+            ::= [ \t]+
+            ;
+
+        Comma
+            ::= S? ',' S?
+            ;
+
+        TypeDeclaration(cmsx.intermediate.Context* context)
+            ::= StrTypeId(context):typeId '='! keyword("type")!
+            (   StructureType(typeId, context)
+            |   ArrayType(typeId, context)
+            |   FunctionType(typeId, context)
+            )
+            ;
+
+        StructureType(string typeId, cmsx.intermediate.Context* context, var List<string> memberTypeIds)
+            ::= ('{' (StrTypeId(context)!{ memberTypeIds.Add(StrTypeId); } % ',')? '}'!){ context->AddStructureType(typeId, memberTypeIds); } 
+            ;
+
+        ArrayType(string typeId, cmsx.intermediate.Context* context)
+            ::= ('[' long:size! 'x'! StrTypeId(context):elementTypeId! ']'!){ context->AddArrayType(typeId, elementTypeId, size); }
+            ;
+
+        FunctionType(string typeId, cmsx.intermediate.Context* context, var List<string> paramTypeIds)
+            ::= (keyword("function") StrTypeId(context):returnTypeId! '('! (StrTypeId(context):paramType{ paramTypeIds.Add(paramType); } % ',')? ')'!)
+            {
+                context->AddFunctionType(typeId, returnTypeId, paramTypeIds);
+            }
+            ;
+
+        StrTypeId(cmsx.intermediate.Context* context) : string
+            ::=
+            (   token("$T" uint){ value = ToUtf8(ustring(matchBegin, matchEnd)); }
+            |   (keyword_list(identifier, ["void", "bool", "sbyte", "byte", "short", "ushort", "int", "uint", "long", "ulong", "float", "double"])){ value = ToUtf8(ustring(matchBegin, matchEnd)); }
+            )   (('*'){ value.Append('*'); context->AddPtrType(value); })*
+            ;
+
+        TypeExpr(cmsx.intermediate.Context* context) : Type*
+            ::= PostfixTypeExpr(context){ value = PostfixTypeExpr; }
+            ;
+
+        PostfixTypeExpr(cmsx.intermediate.Context* context) : Type*
+            ::= PrimaryTypeExpr(context){ value = PrimaryTypeExpr; } ('*'{ value = context->GetPtrType(value); })*
+            ;
+
+        PrimaryTypeExpr(cmsx.intermediate.Context* context) : Type*
+            ::= TypeId(context){ value = TypeId; }
+            |   PrimitiveType(context){ value = PrimitiveType; }
+            ;
+
+        TypeId(cmsx.intermediate.Context* context) : Type*
+            ::= token("$T" uint){ value = context->GetTypeById(span.lineNumber, ToUtf8(ustring(matchBegin, matchEnd))); }
+            ;
+
+        PrimitiveType(cmsx.intermediate.Context* context) : Type*
+            ::= VoidType(context){ value = VoidType; }
+            |   BoolType(context){ value = BoolType; }
+            |   SByteType(context){ value = SByteType; }
+            |   ByteType(context){ value = ByteType; }
+            |   ShortType(context){ value = ShortType; }
+            |   UShortType(context){ value = UShortType; }
+            |   IntType(context){ value = IntType; }
+            |   UIntType(context){ value = UIntType; }
+            |   LongType(context){ value = LongType; }
+            |   ULongType(context){ value = ULongType; }
+            |   FloatType(context){ value = FloatType; }
+            |   DoubleType(context){ value = DoubleType; }
+            ;
+
+        VoidType(cmsx.intermediate.Context* context) : Type*
+            ::= keyword("void"){ value = context->GetVoidType(); }
+            ;
+
+        BoolType(cmsx.intermediate.Context* context) : Type*
+            ::= keyword("bool"){ value = context->GetBoolType(); }
+            ;
+            
+        SByteType(cmsx.intermediate.Context* context) : Type*
+            ::= keyword("sbyte"){ value = context->GetSByteType(); }
+            ;
+
+        ByteType(cmsx.intermediate.Context* context) : Type*
+            ::= keyword("byte"){ value = context->GetByteType(); }
+            ;
+
+        ShortType(cmsx.intermediate.Context* context) : Type*
+            ::= keyword("short"){ value = context->GetShortType(); }
+            ;
+
+        UShortType(cmsx.intermediate.Context* context) : Type*
+            ::= keyword("ushort"){ value = context->GetUShortType(); }
+            ;
+
+        IntType(cmsx.intermediate.Context* context) : Type*
+            ::= keyword("int"){ value = context->GetIntType(); }
+            ;
+
+        UIntType(cmsx.intermediate.Context* context) : Type*
+            ::= keyword("uint"){ value = context->GetUIntType(); }
+            ;
+            
+        LongType(cmsx.intermediate.Context* context) : Type*
+            ::= keyword("long"){ value = context->GetLongType(); }
+            ;
+
+        ULongType(cmsx.intermediate.Context* context) : Type*
+            ::= keyword("ulong"){ value = context->GetULongType(); }
+            ;
+
+        FloatType(cmsx.intermediate.Context* context) : Type*
+            ::= keyword("float"){ value = context->GetFloatType(); }
+            ;
+
+        DoubleType(cmsx.intermediate.Context* context) : Type*
+            ::= keyword("double"){ value = context->GetDoubleType(); }
+            ;
+    }
+}

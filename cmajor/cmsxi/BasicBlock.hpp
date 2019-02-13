@@ -1,0 +1,29 @@
+// =================================
+// Copyright (c) 2019 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+#ifndef CMAJOR_CMSXI_BASIC_BLOCK_INCLUDED
+#define CMAJOR_CMSXI_BASIC_BLOCK_INCLUDED
+#include <cmajor/cmsxi/Instruction.hpp>
+#include <vector>
+
+namespace cmsxi {
+
+class CMSXI_API BasicBlock
+{
+public:
+    BasicBlock(int id_);
+    BasicBlock(const BasicBlock&) = delete;
+    BasicBlock& operator=(const BasicBlock&) = delete;
+    void AddInstruction(Instruction* instruction);
+    int Id() const { return id; }
+    void Write(CodeFormatter& formatter, Function& function, Context& context);
+private:
+    int id;
+    std::vector<std::unique_ptr<Instruction>> instructions;
+};
+
+} // namespace cmsxi
+
+#endif // CMAJOR_CMSXI_BASIC_BLOCK_INCLUDED

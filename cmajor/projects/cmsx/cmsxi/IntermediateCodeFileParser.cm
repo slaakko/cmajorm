@@ -1,0 +1,31 @@
+using System;
+using System.IO;
+
+namespace cmsx.intermediate
+{
+    public class IntermediateCodeFileParser
+    {
+        static IntermediateCodeFileParser() : instance(new IntermediateCodeFileParser())
+        {
+        }
+        public static IntermediateCodeFileParser& Instance()
+        {
+            return *instance;
+        }
+        public void Parse(const string& intermediateCodeFileName, Context* context)
+        {
+            ustring content = ToUtf32(File.ReadAllText(intermediateCodeFileName));
+            grammar->Parse(content.Chars(), content.Chars() + content.Length(), 0, intermediateCodeFileName, context);
+        }
+        private IntermediateCodeFileParser() : grammar(new IntermediateCodeFileGrammar())
+        {
+        }
+        private static UniquePtr<IntermediateCodeFileParser> instance;
+        private IntermediateCodeFileGrammar* grammar; 
+    }
+
+    public void ParseIntermediateCodeFile(const string& intermediateCodeFileName, Context* context)
+    {
+        IntermediateCodeFileParser.Instance().Parse(intermediateCodeFileName, context);
+    }
+}

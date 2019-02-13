@@ -12,6 +12,11 @@
 
 namespace cmajor { namespace util {
 
+enum class FormatWidth
+{
+    exact, min
+};
+
 UTIL_API std::string Trim(const std::string& s);
 UTIL_API std::string TrimAll(const std::string& s);
 UTIL_API std::u32string Trim(const std::u32string& s);
@@ -42,6 +47,8 @@ UTIL_API std::string ToHexString(uint64_t x);
 UTIL_API int Log10(int n);
 UTIL_API std::u32string FormatNumber(int n, int numDigits);
 UTIL_API std::string CurrentThreadIdStr();
+UTIL_API std::string Format(const std::string& s, int width);
+UTIL_API std::string Format(const std::string& s, int width, FormatWidth fw);
 
 } } // namespace cmajor::util
 

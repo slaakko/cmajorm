@@ -1,0 +1,124 @@
+using System;
+using System.Collections;
+
+namespace cmsx.intermediate
+{
+    public class Function
+    {
+        public nothrow Function(Context& context_, FunctionType* type_, const string& name_) : context(context_), type(type_), name(name_)
+        {
+        }
+        public BasicBlock* AddBasicBlock(uint id)
+        {
+            BasicBlock* bb = new BasicBlock(*this, id);
+            basicBlocks.Add(UniquePtr<BasicBlock>(bb));
+            return bb;
+        }
+        public Value* MakeIdValue(int lineNumber, uint id, Type* type)
+        {
+            HashMap<uint, IdValue*>.ConstIterator it = idValueMap.CFind(id);
+            if (it != idValueMap.CEnd())
+            {
+                IdValue* idValue = it->second;
+                if (idValue->type != type)
+                {
+                    throw Exception("type " + type->Name() + " conflicts type " + idValue->type->Name() + " in earlier definition at line " + ToString(idValue->line) +
+                        " (" + context.compileUnit.fileName + ":" + ToString(lineNumber) + ")");
+                }
+                return idValue;
+            }
+            else
+            {
+                IdValue* idValue = new IdValue(id);
+                idValue->type = type;
+                idValue->line = lineNumber;
+                values.Add(UniquePtr<Value>(idValue));
+                idValueMap[id] = idValue;
+                return idValue;
+            }
+        }
+        public void MapInstructions()
+        {
+            uint nextIdNumber = 0u;
+            for (const UniquePtr<BasicBlock>& bb : basicBlocks)
+            {
+                bb->MapInstructions(nextIdNumber);
+            }
+        }
+        public void MapInstruction(uint id, Instruction* instruction)
+        {
+            HashMap<uint, Instruction*>.ConstIterator it = instructionMap.CFind(id);
+            if (it == instructionMap.CEnd())
+            {
+                instructionMap[id] = instruction;
+            }
+            else
+            {
+                throw Exception("instruction '" + instruction->Name() + "' id " + ToString(id) + " at line '" + ToString(instruction->line) + "' already mapped at line " + ToString(it->second->line));
+            }
+        }
+        public void Validate(bool debug)
+        {
+            if (debug)
+            {
+                Console.Out() << "validating " << name << "..." << endl();
+            }
+            for (const UniquePtr<BasicBlock>& bb : basicBlocks)
+            {
+                bb->Validate(debug);
+            }
+        }
+        public Value* ResolveOperand(int line, Value* operand)
+        {
+            if (operand != null)
+            {
+                IdValue* idValue = operand as IdValue*;
+                if (idValue != null)
+                {
+                    uint id = idValue->id;
+                    HashMap<uint, Instruction*>.ConstIterator it = instructionMap.CFind(id);
+                    if (it != instructionMap.CEnd())
+                    {
+                        Instruction* instruction = it->second;
+                        if (idValue->type != instruction->type)
+                        {
+                            throw Exception("error : type conflict for operand '" + operand->Name() + "' at line " + ToString(operand->line) + " with " + instruction->Name() +
+                                " instruction at line " + ToString(instruction->line));
+                        }
+                        return instruction;
+                    }
+                    else
+                    {
+                        throw Exception("error : id of operand '" + operand->Name() + "' at line " + ToString(operand->line) + "' is not found from instruction map");
+                    }
+                }
+                else
+                {
+                    return operand;
+                }
+            }
+            else
+            {
+                throw Exception("internal error : operand is null at line " + ToString(line));
+            }
+        }
+        public BasicBlock* GetBasicBlock(uint target)
+        {
+            if (target < basicBlocks.Count())
+            {
+                return basicBlocks[target].Get();
+            }
+            else
+            {
+                return null;
+            }
+        }
+        public Context& context;
+        public FunctionType* type;
+        public string name;
+        private List<UniquePtr<BasicBlock>> basicBlocks;
+        private List<UniquePtr<Value>> values;
+        private HashMap<uint, IdValue*> idValueMap;
+        private HashMap<uint, Instruction*> instructionMap;
+    }
+}

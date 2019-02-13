@@ -1,0 +1,59 @@
+const int N = 10;
+
+void Swap(int[N]& intList, int i, int j)
+{
+    int temp = intList[i];
+    intList[i] = intList[j];
+    intList[j] = temp;
+}
+
+int Partition(int[N]& intList, int left, int right)
+{
+    int i = left;
+    int j = right;
+    int pivot = intList[(left + right) / 2];
+    while (i <= j)
+    {
+        while (intList[i] < pivot) ++i;
+        while (intList[j] > pivot) --j;
+        if (i <= j)
+        {
+            Swap(intList, i, j);
+            ++i;
+            --j;
+        }
+    }
+    return i;
+}
+
+void QuickSort(int[N]& intList, int left, int right)
+{
+    int index = Partition(intList, left, right);
+    if (left < index - 1)
+    {
+        QuickSort(intList, left, index - 1);
+    }
+    if (index < right)
+    {
+        QuickSort(intList, index, right);
+    }
+}
+
+void QuickSort(int[N]& intList)
+{
+    if (N > 0)
+    {
+        QuickSort(intList, 0, N - 1);
+    }
+}
+
+int main()
+{
+    int[N] intList;
+    for (int i = 0; i < N; ++i)
+    {
+        intList[i] = i;
+    }
+    QuickSort(intList);
+    return 0;
+}

@@ -6,6 +6,7 @@
 #ifndef CMAJOR_CMSXBE_EMITTING_CONTEXT_INCLUDED
 #define CMAJOR_CMSXBE_EMITTING_CONTEXT_INCLUDED
 #include <cmajor/ir/EmittingContext.hpp>
+#include <cmajor/cmsxi/Context.hpp>
 
 namespace cmsxbe {
 
@@ -17,9 +18,11 @@ public:
     const std::string& TargetTriple() const override { return targetTriple; }
     void* DataLayout() override { return nullptr; }
     void* TargetMachine() override { return nullptr; }
+    cmsxi::Context* GetContext() { return &context; }
 private:
     int optimizationLevel;
     std::string targetTriple;
+    cmsxi::Context context;
 };
 
 } // namespace cmsxbe

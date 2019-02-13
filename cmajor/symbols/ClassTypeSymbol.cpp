@@ -1604,6 +1604,10 @@ void AssignKeys(std::vector<ClassInfo*>& classesByPriority)
     {
         cls->key = key;
         key = NextPrime(key + 1);
+        if (key < cls->key)
+        {
+            throw std::runtime_error("error assigning class key for class " + ToUtf8(cls->cls->FullName()) + ": overflow, too many polymorphic classes");
+        }
     }
 }
 
@@ -1613,7 +1617,13 @@ uint64_t ComputeClassId(ClassInfo* cls)
     ClassInfo* baseClass = cls->baseClassInfo;
     while (baseClass)
     {
-        classId *= baseClass->key;
+        uint64_t key = baseClass->key;
+        uint64_t product = classId * key;
+        if (product / classId != key || product % key != 0)
+        {
+            throw std::runtime_error("error computing class key for class " + ToUtf8(cls->cls->FullName()) + ": overflow, too many polymorphic classes");
+        }
+        classId = product;
         baseClass = baseClass->baseClassInfo;
     }
     if (classId == 0)

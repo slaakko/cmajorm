@@ -1,0 +1,320 @@
+using System;
+using System.Collections;
+
+namespace cmsx.intermediate
+{
+    public class Context
+    {
+        public nothrow Context() : compileUnit(*this), currentFunction(null), currentBasicBlock(null)
+        {
+        }
+        public nothrow inline TypeRepository& GetTypeRepository()
+        {
+            return typeRepository;
+        }
+        public nothrow inline Function* CurrentFunction() const
+        {
+            return currentFunction;
+        }
+        public nothrow inline void SetCurrentFunction(Function* currentFunction_)
+        {
+            currentFunction = currentFunction_;
+        }
+        public nothrow inline BasicBlock* CurrentBasicBlock() const
+        {
+            return currentBasicBlock;
+        }
+        public nothrow inline void SetCurrentBasicBlock(BasicBlock* basicBlock)
+        {
+            currentBasicBlock = basicBlock;
+        }
+        public nothrow inline Type* GetVoidType() const
+        {
+            return typeRepository.GetVoidType();
+        }
+        public nothrow inline Type* GetBoolType() const
+        {
+            return typeRepository.GetBoolType();
+        }
+        public nothrow inline Type* GetSByteType() const
+        {
+            return typeRepository.GetSByteType();
+        }
+        public nothrow inline Type* GetByteType() const
+        {
+            return typeRepository.GetByteType();
+        }
+        public nothrow inline Type* GetShortType() const
+        {
+            return typeRepository.GetShortType();
+        }
+        public nothrow inline Type* GetUShortType() const
+        {
+            return typeRepository.GetUShortType();
+        }
+        public nothrow inline Type* GetIntType() const
+        {
+            return typeRepository.GetIntType();
+        }
+        public nothrow inline Type* GetUIntType() const
+        {
+            return typeRepository.GetUIntType();
+        }
+        public nothrow inline Type* GetLongType() const
+        {
+            return typeRepository.GetLongType();
+        }
+        public nothrow inline Type* GetULongType() const
+        {
+            return typeRepository.GetULongType();
+        }
+        public nothrow inline Type* GetFloatType() const
+        {
+            return typeRepository.GetFloatType();
+        }
+        public nothrow inline Type* GetDoubleType() const
+        {
+            return typeRepository.GetDoubleType();
+        }
+        public void AddPtrType(const string& typeId)
+        {
+            typeRepository.AddPtrType(typeId);
+        }
+        public void AddStructureType(const string& typeId, const List<string>& memberTypeIds)
+        {
+            typeRepository.AddStructureType(typeId, memberTypeIds);
+        }
+        public void AddArrayType(const string& typeId, const string& elementTypeId, long size)
+        {
+            typeRepository.AddArrayType(typeId, elementTypeId, size);
+        }
+        public void AddFunctionType(const string& typeId, const string& returnTypeId, const List<string>& paramTypeIds)
+        {
+            typeRepository.AddFunctionType(typeId, returnTypeId, paramTypeIds);
+        }
+        public void ResolveTypes()
+        {
+            typeRepository.ResolveTypes();
+        }
+        public nothrow void SetFileName(const string& fileName)
+        {
+            compileUnit.SetFileName(fileName);
+        }
+        public Function* AddFunction(int lineNumber, Type* type, const string& name)
+        {
+            return compileUnit.AddFunction(lineNumber, type, name);
+        }
+        public Type* GetTypeById(int lineNumber, const string& typeId) const
+        {
+            Type* type = typeRepository.GetTypeById(typeId);
+            if (type != null)
+            {
+                return type;
+            }
+            else
+            {
+                throw Exception("type for id '" + typeId + "' not found (" + compileUnit.fileName + ":" + ToString(lineNumber) + ")");
+            }
+        }
+        public Type* GetPtrType(Type* baseType)
+        {
+            return typeRepository.GetPtrType(baseType);
+        }
+        public Value* MakeSymbolValue(int lineNumber, const string& symbol, Type* type)
+        {
+            HashMap<string, SymbolValue*>.ConstIterator it = symbolValueMap.CFind(symbol);
+            if (it != symbolValueMap.CEnd())
+            {
+                SymbolValue* symbolValue = it->second;
+                if (symbolValue->type != type)
+                {
+                    throw Exception("type " + type->Name() + " conflicts type " + symbolValue->type->Name() + " in earlier definition at line " + ToString(symbolValue->line) +
+                        " (" + compileUnit.fileName + ":" + ToString(lineNumber) + ")");
+                }                    
+                return symbolValue;
+            }
+            else
+            {
+                SymbolValue* symbolValue = new SymbolValue(symbol);
+                symbolValue->type = type;
+                symbolValue->line = lineNumber;
+                values.Add(UniquePtr<Value>(symbolValue));
+                symbolValueMap[symbol] = symbolValue;
+                return symbolValue;
+            }
+        }
+        public Value* MakeLiteralValue(int lineNumber, const string& fromStr, Type* type)
+        {
+            try
+            {
+                return type->MakeValue(fromStr, *this);
+            }
+            catch (const Exception& ex)
+            {
+                throw Exception(ex.Message() + " (" + compileUnit.fileName + ":" + ToString(lineNumber) + ")");
+            }
+            return null;
+        }
+        public Value* MakeSByteValue(SByteType* type, sbyte value)
+        {
+            HashMap<sbyte, Value*>.ConstIterator it = sbyteValueMap.CFind(value);
+            if (it != sbyteValueMap.CEnd())
+            {
+                return it->second;
+            }
+            else
+            {
+                SByteValue* val = new SByteValue(value);
+                val->type = type;
+                AddValue(val);
+                sbyteValueMap[value] = val;
+                return val;
+            }
+        }
+        public Value* MakeByteValue(ByteType* type, byte value)
+        {
+            HashMap<byte, Value*>.ConstIterator it = byteValueMap.CFind(value);
+            if (it != byteValueMap.CEnd())
+            {
+                return it->second;
+            }
+            else
+            {
+                ByteValue* val = new ByteValue(value);
+                val->type = type;
+                AddValue(val);
+                byteValueMap[value] = val;
+                return val;
+            }
+        }
+        public Value* MakeShortValue(ShortType* type, short value)
+        {
+            HashMap<short, Value*>.ConstIterator it = shortValueMap.CFind(value);
+            if (it != shortValueMap.CEnd())
+            {
+                return it->second;
+            }
+            else
+            {
+                ShortValue* val = new ShortValue(value);
+                val->type = type;
+                AddValue(val);
+                shortValueMap[value] = val;
+                return val;
+            }
+        }
+        public Value* MakeUShortValue(UShortType* type, ushort value)
+        {
+            HashMap<ushort, Value*>.ConstIterator it = ushortValueMap.CFind(value);
+            if (it != ushortValueMap.CEnd())
+            {
+                return it->second;
+            }
+            else
+            {
+                UShortValue* val = new UShortValue(value);
+                val->type = type;
+                AddValue(val);
+                ushortValueMap[value] = val;
+                return val;
+            }
+        }
+        public Value* MakeIntValue(IntType* type, int value)
+        {
+            HashMap<int, Value*>.ConstIterator it = intValueMap.CFind(value);
+            if (it != intValueMap.CEnd())
+            {
+                return it->second;
+            }
+            else
+            {
+                IntValue* val = new IntValue(value);
+                val->type = type;
+                AddValue(val);
+                intValueMap[value] = val;
+                return val;
+            }
+        }
+        public Value* MakeUIntValue(UIntType* type, uint value)
+        {
+            HashMap<uint, Value*>.ConstIterator it = uintValueMap.CFind(value);
+            if (it != uintValueMap.CEnd())
+            {
+                return it->second;
+            }
+            else
+            {
+                UIntValue* val = new UIntValue(value);
+                val->type = type;
+                AddValue(val);
+                uintValueMap[value] = val;
+                return val;
+            }
+        }
+        public Value* MakeLongValue(LongType* type, long value)
+        {
+            HashMap<long, Value*>.ConstIterator it = longValueMap.CFind(value);
+            if (it != longValueMap.CEnd())
+            {
+                return it->second;
+            }
+            else
+            {
+                LongValue* val = new LongValue(value);
+                val->type = type;
+                AddValue(val);
+                longValueMap[value] = val;
+                return val;
+            }
+        }
+        public Value* MakeULongValue(ULongType* type, ulong value)
+        {
+            HashMap<ulong, Value*>.ConstIterator it = ulongValueMap.CFind(value);
+            if (it != ulongValueMap.CEnd())
+            {
+                return it->second;
+            }
+            else
+            {
+                ULongValue* val = new ULongValue(value);
+                val->type = type;
+                AddValue(val);
+                ulongValueMap[value] = val;
+                return val;
+            }
+        }
+        public Value* MakeFloatValue(FloatType* type, float value)
+        {
+            FloatValue* val = new FloatValue(value);
+            val->type = type;
+            AddValue(val);
+            return val;
+        }
+        public Value* MakeDoubleValue(DoubleType* type, double value)
+        {
+            DoubleValue* val = new DoubleValue(value);
+            val->type = type;
+            AddValue(val);
+            return val;
+        }
+        private void AddValue(Value* value)
+        {
+            values.Add(UniquePtr<Value>(value));
+        }
+        public CompileUnit compileUnit;
+        public Function* currentFunction;
+        private TypeRepository typeRepository;
+        private BasicBlock* currentBasicBlock;
+        private List<UniquePtr<Value>> values;
+        private HashMap<uint, IdValue*> idValueMap;
+        private HashMap<string, SymbolValue*> symbolValueMap;
+        private HashMap<sbyte, Value*> sbyteValueMap;
+        private HashMap<byte, Value*> byteValueMap;
+        private HashMap<short, Value*> shortValueMap;
+        private HashMap<ushort, Value*> ushortValueMap;
+        private HashMap<int, Value*> intValueMap;
+        private HashMap<uint, Value*> uintValueMap;
+        private HashMap<long, Value*> longValueMap;
+        private HashMap<ulong, Value*> ulongValueMap;
+    }
+}

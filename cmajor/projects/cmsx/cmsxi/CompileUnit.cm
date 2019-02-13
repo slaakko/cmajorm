@@ -1,0 +1,57 @@
+using System;
+using System.Collections;
+
+namespace cmsx.intermediate
+{
+    public class CompileUnit
+    {
+        public nothrow CompileUnit(Context& context_) : context(context_)
+        {
+        }
+        public nothrow void SetFileName(const string& fileName_)
+        {
+            fileName = fileName_;
+        }
+        public Function* AddFunction(int lineNumber, Type* type, const string& name)
+        {
+            if (type is FunctionType*)
+            {
+                Function* function = new Function(context, cast<FunctionType*>(type), name);
+                functions.Add(UniquePtr<Function>(function));
+                return function;
+            }
+            else
+            {
+                throw Exception("function type expected (" + fileName + ":" + ToString(lineNumber) + ")");
+            }
+        }
+        public void MapInstructions()
+        {
+            for (const UniquePtr<Function>& function : functions)
+            {
+                function->MapInstructions();
+            }
+        }
+        public void Validate()
+        {
+            Validate(false);
+        }
+        public void Validate(bool debug)
+        {
+            for (const UniquePtr<Function>& function : functions)
+            {
+                try
+                {
+                    function->Validate(debug);
+                }
+                catch (const Exception& ex)
+                {
+                    throw Exception("validation of function " + function->name + " in file '" + fileName + "' failed: " + ex.Message());
+                }
+            }
+        }
+        public Context& context;
+        public string fileName;
+        private List<UniquePtr<Function>> functions;
+    }
+}
