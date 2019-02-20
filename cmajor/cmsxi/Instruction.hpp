@@ -341,11 +341,12 @@ private:
 class CMSXI_API SwitchInstruction : public Instruction
 {
 public:
-    SwitchInstruction(Value* cond_);
+    SwitchInstruction(Value* cond_, BasicBlock* defaultDest_);
     void AddCase(Value* caseValue, BasicBlock* dest);
     void Write(CodeFormatter& formatter, Function& function, Context& context) override;
 private:
     Value* cond;
+    BasicBlock* defaultDest;
     std::vector<std::pair<Value*, BasicBlock*>> destinations;
 };
 

@@ -302,12 +302,49 @@ namespace cmsx.intermediate
         {
             typeRepository.PrintTypes(formatter);
         }
-        private void AddValue(Value* value)
+        public void AddValue(Value* value)
         {
             values.Add(UniquePtr<Value>(value));
         }
+        public nothrow LiteralOperand* GetLiteralOperand(ulong value)
+        {
+            HashMap<ulong, LiteralOperand*>.ConstIterator it = literalOperandMap.CFind(value);
+            if (it != literalOperandMap.CEnd())
+            {
+                return it->second;
+            }
+            else
+            {
+                LiteralOperand* literalOperand = new LiteralOperand(value);
+                operands.Add(UniquePtr<Operand>(literalOperand));
+                literalOperandMap[value] =  literalOperand;
+                return literalOperand;
+            }
+        }
+        public nothrow LiteralOperand* CreateLiteralOperand()
+        {
+            LiteralOperand* literalOperand = new LiteralOperand();
+            operands.Add(UniquePtr<Operand>(literalOperand));
+            return literalOperand;
+        }
+        public nothrow SymbolOperand* GetSymbolOperand(const string& value)
+        {
+            HashMap<string, SymbolOperand*>.ConstIterator it = symbolOperandMap.CFind(value);
+            if (it != symbolOperandMap.CEnd())
+            {
+                return it->second;
+            }
+            else
+            {
+                SymbolOperand* symbolOperand = new SymbolOperand(value);
+                operands.Add(UniquePtr<Operand>(symbolOperand));
+                symbolOperandMap[value] = symbolOperand;
+                return symbolOperand;
+            }
+        }
         public CompileUnit compileUnit;
         public Function* currentFunction;
+        public Registers regs;
         private TypeRepository typeRepository;
         private BasicBlock* currentBasicBlock;
         private List<UniquePtr<Value>> values;
@@ -321,5 +358,8 @@ namespace cmsx.intermediate
         private HashMap<uint, Value*> uintValueMap;
         private HashMap<long, Value*> longValueMap;
         private HashMap<ulong, Value*> ulongValueMap;
+        private List<UniquePtr<Operand>> operands;
+        private HashMap<ulong, LiteralOperand*> literalOperandMap;
+        private HashMap<string, SymbolOperand*> symbolOperandMap;
     }
 }

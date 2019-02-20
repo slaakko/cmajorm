@@ -11,11 +11,47 @@ namespace cmsx.intermediate
         {
             return Name();
         }
+        public virtual nothrow string IndexStr() const
+        {
+            return Name();
+        }
+        public virtual nothrow Location* HomeLocation() const
+        {
+            return null;
+        }
+        public virtual nothrow bool IsImmediate(byte& immediateValue) const
+        {
+            return false;
+        }
+        public virtual void GenerateSetValue(Register* reg, MachineCode& machineCode, int line)
+        {
+            throw Exception("error: tried to generate set for '" + string(type->Name()) + "' value (line " + ToString(line) + ")");            
+        }
+        public virtual Value* SignExtendTo(Type* targetType, int line)
+        {
+            throw Exception("error: tried to sign extend '" + type->Name() + "' type value to '" + targetType->Name() + " type value (line " + ToString(line) + ")");            
+        }
+        public virtual Value* ZeroExtendTo(Type* targetType, int line)
+        {
+            throw Exception("error: tried to zero extend '" + type->Name() + "' type value to '" + targetType->Name() + " type value (line " + ToString(line) + ")");            
+        }
+        public virtual Value* TruncateTo(Type* targetType, int line)
+        {
+            throw Exception("error: tried to truncate '" + type->Name() + "' type value to '" + targetType->Name() + " type value (line " + ToString(line) + ")");            
+        }
         public Type* type;
         public int line;
     }
 
-    public class BoolValue : Value
+    public class ConstantValue : Value
+    {
+        public override nothrow string Name() const
+        {
+            return "constant";
+        }
+    }
+
+    public class BoolValue : ConstantValue
     {
         public default nothrow BoolValue();
         public nothrow BoolValue(bool value_) : value(value_)
@@ -25,10 +61,28 @@ namespace cmsx.intermediate
         {
             return ToString(value);
         }
+        public override void GenerateSetValue(Register* reg, MachineCode& machineCode, int line)
+        {
+            MachineInstruction* setInst = machineCode.GetInstruction(cmsx.assembly.SET);
+            setInst->AddOperand(reg);
+            setInst->AddOperand(machineCode.context.GetLiteralOperand(cast<ulong>(value)));
+        }
+        public override Value* SignExtendTo(Type* targetType, int line)
+        {
+            return targetType->MakeValue(cmsx.util.SignExtend(cast<byte>(value)));
+        }
+        public override Value* ZeroExtendTo(Type* targetType, int line)
+        {
+            return targetType->MakeValue(cast<ulong>(value));
+        }
+        public override Value* TruncateTo(Type* targetType, int line)
+        {
+            return targetType->MakeValue(cast<ulong>(value));
+        }
         public bool value;
     }
 
-    public class SByteValue : Value
+    public class SByteValue : ConstantValue
     {
         public default nothrow SByteValue();
         public nothrow SByteValue(sbyte value_) : value(value_)
@@ -38,10 +92,36 @@ namespace cmsx.intermediate
         {
             return ToString(value);
         }
+        public override nothrow bool IsImmediate(byte& immediateValue) const
+        {
+            if (value >= 0)
+            {
+                immediateValue = cast<byte>(value);
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+        public override void GenerateSetValue(Register* reg, MachineCode& machineCode, int line)
+        {
+            MachineInstruction* setInst = machineCode.GetInstruction(cmsx.assembly.SET);
+            setInst->AddOperand(reg);
+            setInst->AddOperand(machineCode.context.GetLiteralOperand(cast<byte>(value)));
+        }
+        public override Value* SignExtendTo(Type* targetType, int line)
+        {
+            return targetType->MakeValue(cmsx.util.SignExtend(cast<byte>(value)));
+        }
+        public override Value* TruncateTo(Type* targetType, int line)
+        {
+            return targetType->MakeValue(cast<ulong>(value));
+        }
         public sbyte value;
     }
 
-    public class ByteValue : Value
+    public class ByteValue : ConstantValue
     {
         public default nothrow ByteValue();
         public nothrow ByteValue(byte value_) : value(value_)
@@ -51,10 +131,33 @@ namespace cmsx.intermediate
         {
             return ToString(value);
         }
+        public override nothrow bool IsImmediate(byte& immediateValue) const
+        {
+            immediateValue = value;
+            return true;
+        }
+        public override void GenerateSetValue(Register* reg, MachineCode& machineCode, int line)
+        {
+            MachineInstruction* setInst = machineCode.GetInstruction(cmsx.assembly.SET);
+            setInst->AddOperand(reg);
+            setInst->AddOperand(machineCode.context.GetLiteralOperand(value));
+        }
+        public override Value* SignExtendTo(Type* targetType, int line)
+        {
+            return targetType->MakeValue(cmsx.util.SignExtend(value));
+        }
+        public override Value* ZeroExtendTo(Type* targetType, int line)
+        {
+            return targetType->MakeValue(value);
+        }
+        public override Value* TruncateTo(Type* targetType, int line)
+        {
+            return targetType->MakeValue(cast<ulong>(value));
+        }
         public byte value;
     }
 
-    public class ShortValue : Value
+    public class ShortValue : ConstantValue
     {
         public default nothrow ShortValue();
         public nothrow ShortValue(short value_) : value(value_)
@@ -64,10 +167,36 @@ namespace cmsx.intermediate
         {
             return ToString(value);
         }
+        public override nothrow bool IsImmediate(byte& immediateValue) const
+        {
+            if (value >= 0 && value <= 255)
+            {
+                immediateValue = cast<byte>(value);
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+        public override void GenerateSetValue(Register* reg, MachineCode& machineCode, int line)
+        {
+            MachineInstruction* setInst = machineCode.GetInstruction(cmsx.assembly.SET);
+            setInst->AddOperand(reg);
+            setInst->AddOperand(machineCode.context.GetLiteralOperand(cast<ushort>(value)));
+        }
+        public override Value* SignExtendTo(Type* targetType, int line)
+        {
+            return targetType->MakeValue(cmsx.util.SignExtend(cast<ushort>(value)));
+        }
+        public override Value* TruncateTo(Type* targetType, int line)
+        {
+            return targetType->MakeValue(cast<ulong>(value));
+        }
         public short value;
     }
 
-    public class UShortValue : Value
+    public class UShortValue : ConstantValue
     {
         public default nothrow UShortValue();
         public nothrow UShortValue(ushort value_) : value(value_)
@@ -77,10 +206,40 @@ namespace cmsx.intermediate
         {
             return ToString(value);
         }
+        public override nothrow bool IsImmediate(byte& immediateValue) const
+        {
+            if (value <= 255u)
+            {
+                immediateValue = cast<byte>(value);
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+        public override void GenerateSetValue(Register* reg, MachineCode& machineCode, int line)
+        {
+            MachineInstruction* setInst = machineCode.GetInstruction(cmsx.assembly.SET);
+            setInst->AddOperand(reg);
+            setInst->AddOperand(machineCode.context.GetLiteralOperand(value));
+        }
+        public override Value* SignExtendTo(Type* targetType, int line)
+        {
+            return targetType->MakeValue(cmsx.util.SignExtend(value));
+        }
+        public override Value* ZeroExtendTo(Type* targetType, int line)
+        {
+            return targetType->MakeValue(value);
+        }
+        public override Value* TruncateTo(Type* targetType, int line)
+        {
+            return targetType->MakeValue(cast<ulong>(value));
+        }
         public ushort value;
     }
 
-    public class IntValue : Value
+    public class IntValue : ConstantValue
     {
         public default nothrow IntValue();
         public nothrow IntValue(int value_) : value(value_)
@@ -90,10 +249,44 @@ namespace cmsx.intermediate
         {
             return ToString(value);
         }
+        public override nothrow bool IsImmediate(byte& immediateValue) const
+        {
+            if (value >= 0 && value <= 255)
+            {
+                immediateValue = cast<byte>(value);
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+        public override void GenerateSetValue(Register* reg, MachineCode& machineCode, int line)
+        {
+            ushort low = cast<ushort>(value);
+            MachineInstruction* setInst = machineCode.GetInstruction(cmsx.assembly.SET);
+            setInst->AddOperand(reg);
+            setInst->AddOperand(machineCode.context.GetLiteralOperand(low));
+            ushort high = cast<ushort>(value >> 16);
+            if (high != 0u)
+            {
+                MachineInstruction* orMLInst =  machineCode.GetInstruction(cmsx.machine.ORML);
+                orMLInst->AddOperand(reg);
+                orMLInst->AddOperand(machineCode.context.GetLiteralOperand(high));
+            }
+        }
+        public override Value* SignExtendTo(Type* targetType, int line)
+        {
+            return targetType->MakeValue(cmsx.util.SignExtend(cast<uint>(value)));
+        }
+        public override Value* TruncateTo(Type* targetType, int line)
+        {
+            return targetType->MakeValue(cast<ulong>(value));
+        }
         public int value;
     }
 
-    public class UIntValue : Value
+    public class UIntValue : ConstantValue
     {
         public default nothrow UIntValue();
         public nothrow UIntValue(uint value_) : value(value_)
@@ -103,10 +296,48 @@ namespace cmsx.intermediate
         {
             return ToString(value);
         }
+        public override nothrow bool IsImmediate(byte& immediateValue) const
+        {
+            if (value <= 255u)
+            {
+                immediateValue = cast<byte>(value);
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+        public override void GenerateSetValue(Register* reg, MachineCode& machineCode, int line)
+        {
+            MachineInstruction* setInst = machineCode.GetInstruction(cmsx.assembly.SET);
+            setInst->AddOperand(reg);
+            ushort low = cast<ushort>(value);
+            setInst->AddOperand(machineCode.context.GetLiteralOperand(low));
+            ushort high = cast<ushort>(value >> 16u);
+            if (high != 0u)
+            {
+                MachineInstruction* orMLInst =  machineCode.GetInstruction(cmsx.machine.ORML);
+                orMLInst->AddOperand(reg);
+                orMLInst->AddOperand(machineCode.context.GetLiteralOperand(high));
+            }
+        }
+        public override Value* SignExtendTo(Type* targetType, int line)
+        {
+            return targetType->MakeValue(cmsx.util.SignExtend(value));
+        }
+        public override Value* ZeroExtendTo(Type* targetType, int line)
+        {
+            return targetType->MakeValue(value);
+        }
+        public override Value* TruncateTo(Type* targetType, int line)
+        {
+            return targetType->MakeValue(cast<ulong>(value));
+        }
         public uint value;
     }
 
-    public class LongValue : Value
+    public class LongValue : ConstantValue
     {
         public default nothrow LongValue();
         public nothrow LongValue(long value_) : value(value_)
@@ -116,10 +347,58 @@ namespace cmsx.intermediate
         {
             return ToString(value);
         }
+        public override nothrow bool IsImmediate(byte& immediateValue) const
+        {
+            if (value >= 0 && value <= 255)
+            {
+                immediateValue = cast<byte>(value);
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+        public override void GenerateSetValue(Register* reg, MachineCode& machineCode, int line)
+        {
+            ushort low = cast<ushort>(value);
+            MachineInstruction* setInst = machineCode.GetInstruction(cmsx.assembly.SET);
+            setInst->AddOperand(reg);
+            setInst->AddOperand(machineCode.context.GetLiteralOperand(low));
+            ushort ml = cast<ushort>(value >> 16u);
+            if (ml != 0u)
+            {
+                MachineInstruction* orMLInst =  machineCode.GetInstruction(cmsx.machine.ORML);
+                orMLInst->AddOperand(reg);
+                orMLInst->AddOperand(machineCode.context.GetLiteralOperand(ml));
+            }
+            ushort mh = cast<ushort>(value >> 32u);
+            if (mh != 0u)
+            {
+                MachineInstruction* orMHInst =  machineCode.GetInstruction(cmsx.machine.ORMH);
+                orMHInst->AddOperand(reg);
+                orMHInst->AddOperand(machineCode.context.GetLiteralOperand(mh));
+            }
+            ushort h = cast<ushort>(value >> 48u);
+            if (h != 0u)
+            {
+                MachineInstruction* orHInst =  machineCode.GetInstruction(cmsx.machine.ORH);
+                orHInst->AddOperand(reg);
+                orHInst->AddOperand(machineCode.context.GetLiteralOperand(h));
+            }
+        }
+        public override Value* SignExtendTo(Type* targetType, int line)
+        {
+            return targetType->MakeValue(cast<ulong>(value));
+        }
+        public override Value* TruncateTo(Type* targetType, int line)
+        {
+            return targetType->MakeValue(cast<ulong>(value));
+        }
         public long value;
     }
 
-    public class ULongValue : Value
+    public class ULongValue : ConstantValue
     {
         public default nothrow ULongValue();
         public nothrow ULongValue(ulong value_) : value(value_)
@@ -129,10 +408,62 @@ namespace cmsx.intermediate
         {
             return ToString(value);
         }
+        public override nothrow bool IsImmediate(byte& immediateValue) const
+        {
+            if (value <= 255u)
+            {
+                immediateValue = cast<byte>(value);
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+        public override void GenerateSetValue(Register* reg, MachineCode& machineCode, int line)
+        {
+            ushort low = cast<ushort>(value);
+            MachineInstruction* setInst = machineCode.GetInstruction(cmsx.assembly.SET);
+            setInst->AddOperand(reg);
+            setInst->AddOperand(machineCode.context.GetLiteralOperand(low));
+            ushort ml = cast<ushort>(value >> 16u);
+            if (ml != 0)
+            {
+                MachineInstruction* orMLInst =  machineCode.GetInstruction(cmsx.machine.ORML);
+                orMLInst->AddOperand(reg);
+                orMLInst->AddOperand(machineCode.context.GetLiteralOperand(ml));
+            }
+            ushort mh = cast<ushort>(value >> 32u);
+            if (mh != 0u)
+            {
+                MachineInstruction* orMHInst =  machineCode.GetInstruction(cmsx.machine.ORMH);
+                orMHInst->AddOperand(reg);
+                orMHInst->AddOperand(machineCode.context.GetLiteralOperand(mh));
+            }
+            ushort h = cast<ushort>(value >> 48u);
+            if (h != 0u)
+            {
+                MachineInstruction* orHInst =  machineCode.GetInstruction(cmsx.machine.ORH);
+                orHInst->AddOperand(reg);
+                orHInst->AddOperand(machineCode.context.GetLiteralOperand(h));
+            }
+        }
+        public override Value* SignExtendTo(Type* targetType, int line)
+        {
+            return targetType->MakeValue(value);
+        }
+        public override Value* ZeroExtendTo(Type* targetType, int line)
+        {
+            return targetType->MakeValue(value);
+        }
+        public override Value* TruncateTo(Type* targetType, int line)
+        {
+            return targetType->MakeValue(value);
+        }
         public ulong value;
     }
 
-    public class FloatValue : Value
+    public class FloatValue : ConstantValue
     {
         public default nothrow FloatValue();
         public nothrow FloatValue(float value_) : value(value_)
@@ -140,12 +471,27 @@ namespace cmsx.intermediate
         }
         public override nothrow string Name() const
         {
-            return ToString(value);
+            return ToString(value, 1, 15);
+        }
+        public override void GenerateSetValue(Register* reg, MachineCode& machineCode, int line)
+        {
+            MachineInstruction* setInst = machineCode.GetInstruction(cmsx.assembly.SET);
+            setInst->AddOperand(reg);
+            uint x = *cast<uint*>(cast<void*>(&value));
+            ushort low = cast<ushort>(x);
+            setInst->AddOperand(machineCode.context.GetLiteralOperand(low));
+            ushort ml = cast<ushort>(x >> 16u);
+            if (ml != 0)
+            {
+                MachineInstruction* orMLInst =  machineCode.GetInstruction(cmsx.machine.ORML);
+                orMLInst->AddOperand(reg);
+                orMLInst->AddOperand(machineCode.context.GetLiteralOperand(ml));
+            }
         }
         public float value;
     }
 
-    public class DoubleValue : Value
+    public class DoubleValue : ConstantValue
     {
         public default nothrow DoubleValue();
         public nothrow DoubleValue(double value_) : value(value_)
@@ -153,19 +499,55 @@ namespace cmsx.intermediate
         }
         public override nothrow string Name() const
         {
-            return ToString(value);
+            return ToString(value, 1, 15);
+        }
+        public override void GenerateSetValue(Register* reg, MachineCode& machineCode, int line)
+        {
+            MachineInstruction* setInst = machineCode.GetInstruction(cmsx.assembly.SET);
+            setInst->AddOperand(reg);
+            ulong x = *cast<ulong*>(cast<void*>(&value));
+            ushort low = cast<ushort>(x);
+            setInst->AddOperand(machineCode.context.GetLiteralOperand(low));
+            ushort ml = cast<ushort>(x >> 16u);
+            if (ml != 0)
+            {
+                MachineInstruction* orMLInst =  machineCode.GetInstruction(cmsx.machine.ORML);
+                orMLInst->AddOperand(reg);
+                orMLInst->AddOperand(machineCode.context.GetLiteralOperand(ml));
+            }
+            ushort mh = cast<ushort>(x >> 32u);
+            if (mh != 0u)
+            {
+                MachineInstruction* orMHInst =  machineCode.GetInstruction(cmsx.machine.ORMH);
+                orMHInst->AddOperand(reg);
+                orMHInst->AddOperand(machineCode.context.GetLiteralOperand(mh));
+            }
+            ushort h = cast<ushort>(x >> 48u);
+            if (h != 0u)
+            {
+                MachineInstruction* orHInst =  machineCode.GetInstruction(cmsx.machine.ORH);
+                orHInst->AddOperand(reg);
+                orHInst->AddOperand(machineCode.context.GetLiteralOperand(h));
+            }
         }
         public double value;
     }
 
-    public class NullValue : Value
+    public class NullValue : ConstantValue
     {
         public nothrow NullValue(PtrType* ptrType_) : ptrType(ptrType_)
         {
+            type = ptrType;
         }
         public override nothrow string Name() const
         {
             return "null";
+        }
+        public override void GenerateSetValue(Register* reg, MachineCode& machineCode, int line)
+        {
+            MachineInstruction* setInst = machineCode.GetInstruction(cmsx.assembly.SET);
+            setInst->AddOperand(reg);
+            setInst->AddOperand(machineCode.context.GetLiteralOperand(0u));
         }
         public PtrType* ptrType;
     }

@@ -1,0 +1,63 @@
+using System;
+using CodeFormatter = System.Text.CodeFormatter;
+
+namespace cmsx.intermediate
+{
+    public abstract class Operand
+    {
+        public default virtual ~Operand();
+        public virtual nothrow void Print(CodeFormatter& formatter)
+        {
+        }
+    }
+
+    public class LiteralOperand : Operand
+    {
+        public nothrow LiteralOperand() : value(0u)
+        {
+        }
+        public nothrow LiteralOperand(ulong value_) : value(value_)
+        {
+        }
+        public nothrow inline void SetValue(ulong value_)
+        {
+            value = value_;
+        }
+        public override nothrow void Print(CodeFormatter& formatter)
+        {
+            formatter << ToString(value);
+        }
+        public ulong value;
+    }
+
+    public class FloatingLiteralOperand : Operand
+    {
+        public nothrow FloatingLiteralOperand() : value(0.0)
+        {
+        }
+        public nothrow FloatingLiteralOperand(double value_) : value(value_)
+        {
+        }
+        public nothrow inline void SetValue(double value_)
+        {
+            value = value_;
+        }
+        public override nothrow void Print(CodeFormatter& formatter)
+        {
+            formatter << ToString(value, 1, 15);
+        }
+        public double value;
+    }
+
+    public class SymbolOperand : Operand
+    {
+        public nothrow SymbolOperand(const string& value_) : value(value_)
+        {
+        }
+        public override nothrow void Print(CodeFormatter& formatter)
+        {
+            formatter << value;
+        }
+        public string value;
+    }
+}

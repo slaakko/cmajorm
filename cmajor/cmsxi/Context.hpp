@@ -95,7 +95,7 @@ public:
     Instruction* CreateRet(Value* value);
     Instruction* CreateJump(BasicBlock* dest);
     Instruction* CreateBranch(Value* cond, BasicBlock* trueDest, BasicBlock* falseDest);
-    Instruction* CreateSwitch(Value* cond);
+    Instruction* CreateSwitch(Value* cond, BasicBlock* defaultDest);
 private:
     TypeRepository typeRepository;
     std::vector<std::unique_ptr<Value>> values;

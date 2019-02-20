@@ -1,0 +1,330 @@
+using System;
+using System.IO;
+using System.Collections;
+using CodeFormatter = System.Text.CodeFormatter;
+
+namespace cmsx.intermediate
+{
+    public class RegisterDescriptor
+    {
+        public nothrow RegisterDescriptor(Register* reg_) : reg(reg_), loaded(false)
+        {
+        }
+        public void DebugPrint(CodeFormatter& formatter)
+        {
+            reg->DebugPrint(formatter);
+            formatter << "(";
+            bool first = true;
+            for (Value* value : values)
+            {
+                if (first)
+                {
+                    first = false;
+                }
+                else
+                {
+                    formatter << ", ";
+                }
+                formatter << value->Name();
+            }
+            formatter << ")";
+        }
+        public nothrow void SetValue(Value* value)
+        {
+            values.Clear();
+            values.Add(value);
+            loaded = false;
+        }
+        public nothrow void AddValue(Value* value)
+        {
+            for (Value* v : values)
+            {
+                if (v == value) return;
+            }
+            values.Add(value);
+        }
+        public nothrow inline bool HasValue(Value* value)
+        {
+            return Find(values.CBegin(), values.CEnd(), value) != values.CEnd();
+        }
+        public nothrow inline bool IsEmpty() const
+        {
+            return values.IsEmpty();
+        }
+        public Register* reg;
+        public List<Value*> values;
+        public bool loaded;
+    }
+
+    public class RegisterDescriptors
+    {
+        public nothrow RegisterDescriptors(Registers& regs_) : regs(regs_)
+        {
+            byte np = regs.GetNumParamRegisters();
+            for (byte i = 0u; i < np; ++i)
+            {
+                registerDescriptors.Add(RegisterDescriptor(regs.GetParamRegister(i)));
+            }
+            byte nl = regs.GetNumLocalRegisters();
+            for (byte i = 0u; i < nl; ++i)
+            {
+                registerDescriptors.Add(RegisterDescriptor(regs.GetLocalRegister(i)));
+            }
+            for (RegisterDescriptor& descriptor : registerDescriptors)
+            {
+                registerDescriptorMap[descriptor.reg] = &descriptor;
+            }
+        }
+        public nothrow RegisterDescriptor* GetRegisterDescriptor(Register* reg) const
+        {
+            HashMap<Register*, RegisterDescriptor*>.ConstIterator it = registerDescriptorMap.CFind(reg);
+            if (it != registerDescriptorMap.CEnd())
+            {
+                return it->second;
+            }
+            else
+            {
+                #assert(false);
+                return null;
+            }
+        }
+        public RegisterDescriptor* GetLocalRegDescriptor(const List<Register*>& dontUse, AddressDescriptors& addressDescriptors, MachineCode& machineCode, int line)
+        {
+            byte n = regs.GetNumLocalRegisters();
+            for (byte i = 0u; i < n; ++i)
+            {
+                LocalRegister* localReg = regs.GetLocalRegister(i);
+                if (Find(dontUse.CBegin(), dontUse.CEnd(), localReg) != dontUse.CEnd()) continue;
+                RegisterDescriptor* registerDescriptor = GetRegisterDescriptor(localReg);
+                if (registerDescriptor->IsEmpty())
+                {
+                    return registerDescriptor; // found empty reg, use it
+                }
+            }
+            List<Pair<RegisterDescriptor*, int>> descriptorScores;
+            for (byte i = 0u; i < n; ++i)
+            {
+                LocalRegister* localReg = regs.GetLocalRegister(i);
+                if (Find(dontUse.CBegin(), dontUse.CEnd(), localReg) != dontUse.CEnd()) continue;
+                RegisterDescriptor* registerDescriptor = GetRegisterDescriptor(localReg);
+                if (registerDescriptor->loaded) continue;
+                int score = 0;
+                for (Value* value : registerDescriptor->values)
+                {
+                    if (!(value is ConstantValue*) && value->HomeLocation() != null)
+                    {
+                        AddressDescriptor* addressDescriptor = addressDescriptors.GetAddressDescriptor(value);
+                        bool foundSomewhereElse = true;
+                        for (Location* loc : addressDescriptor->locations)
+                        {
+                            if ((loc is MemoryLocation*))
+                            {
+                                foundSomewhereElse = true;
+                                break;
+                            }
+                        }
+                        if (!foundSomewhereElse)
+                        {
+                            ++score;
+                        }
+                    }
+                }
+                descriptorScores.Add(MakePair(registerDescriptor, score));
+            }
+            Pair<RegisterDescriptor*, int> descriptorScore = GetMinScoreDescriptor(descriptorScores);
+            RegisterDescriptor* registerDescriptor = descriptorScore.first;
+            int score = descriptorScore.second;
+            MakeRegisterDescriptorEmpty(*registerDescriptor, addressDescriptors, machineCode, line);
+            return registerDescriptor;
+        }
+        public void DebugPrint(CodeFormatter& formatter)
+        {
+            formatter << "register descriptors: { " << endl();
+            formatter.IncIndent();
+            for (const RegisterDescriptor& descriptor : registerDescriptors)
+            {
+                descriptor.DebugPrint(formatter);
+                formatter << endl();
+            }
+            formatter.DecIndent();
+            formatter << "}" << endl();
+        }
+        private Registers& regs;
+        private List<RegisterDescriptor> registerDescriptors;
+        private HashMap<Register*, RegisterDescriptor*> registerDescriptorMap;
+    }
+
+    internal class ScoreLess : Rel<Pair<RegisterDescriptor*, int>>
+    {
+        public inline nothrow bool operator()(const Pair<RegisterDescriptor*, int>& left, const Pair<RegisterDescriptor*, int>& right) const
+        {
+            return left.second < right.second;
+        }
+    }
+
+    internal Pair<RegisterDescriptor*, int> GetMinScoreDescriptor(const List<Pair<RegisterDescriptor*, int>>& descriptorScores)
+    {
+        #assert(!descriptorScores.IsEmpty());
+        List<Pair<RegisterDescriptor*, int>>.ConstIterator it = MinElement(descriptorScores.CBegin(), descriptorScores.CEnd(), ScoreLess());
+        #assert(it != descriptorScores.CEnd());
+        return *it;
+    }
+
+    public void MakeRegisterDescriptorEmpty(RegisterDescriptor& registerDescriptor, AddressDescriptors& addressDescriptors, MachineCode& machineCode, int line)
+    {
+        for (Value* value : registerDescriptor.values)
+        {
+            if (value is ConstantValue*) continue;
+            Type* type = value->type;
+            #assert(type is ScalarType*);
+            int storeOpCode = type->GetStoreOp(line);
+            AddressDescriptor* addressDescriptor = addressDescriptors.GetAddressDescriptor(value);
+            bool saved = false;
+            if (addressDescriptor != null)
+            {
+                for (Location* loc : addressDescriptor->locations)
+                {
+                    if (loc is MemoryLocation*)
+                    {
+                        loc->GenerateStore(storeOpCode, registerDescriptor.reg, machineCode);
+                        saved = true;
+                        break;
+                    }
+                }
+            }
+            if (!saved)
+            {
+                Location* homeLocation = value->HomeLocation();
+                if (homeLocation != null)
+                {
+                    homeLocation->GenerateStore(storeOpCode, registerDescriptor.reg, machineCode);
+                }
+            }
+        }
+        addressDescriptors.RemoveRegister(registerDescriptor.reg);
+        registerDescriptor.values.Clear();
+    }
+
+    public RegisterDescriptor* GetOperandReg(Value* operand, Register* reservedReg, RegisterDescriptors& registerDescriptors, AddressDescriptors& addressDescriptors, MachineCode& machineCode, int line)
+    {
+        AddressDescriptor* addressDescriptor = addressDescriptors.GetAddressDescriptor(operand);
+        if (addressDescriptor != null)
+        {
+            Location* loc = addressDescriptor->GetLocation();
+            if (loc != null)
+            {
+                if (loc is Register*)
+                {
+                    Register* reg = cast<Register*>(loc);
+                    return registerDescriptors.GetRegisterDescriptor(reg);
+                }
+            }
+        }
+        List<Register*> dontUse;
+        if (reservedReg != null)
+        {
+            dontUse.Add(reservedReg);
+        }
+        return registerDescriptors.GetLocalRegDescriptor(dontUse, addressDescriptors, machineCode, line);
+    }
+
+    public void GetReg(Value* x, Value* y, Value* z, bool useRegYForX, RegisterDescriptors& registerDescriptors, AddressDescriptors& addressDescriptors, MachineCode& machineCode, int line, 
+        RegisterDescriptor*& rx, RegisterDescriptor*& ry, RegisterDescriptor*& rz)
+    {
+        ry = GetOperandReg(y, null, registerDescriptors, addressDescriptors, machineCode, line);
+        if (z != null)
+        {
+            rz = GetOperandReg(z, ry->reg, registerDescriptors, addressDescriptors, machineCode, line);
+        }
+        if (useRegYForX)
+        {
+            rx = ry;
+        }
+        else
+        {
+            List<Register*> dontUse;
+            dontUse.Add(ry->reg);
+            if (rz != null)
+            {
+                dontUse.Add(rz->reg);
+            }
+            rx = registerDescriptors.GetLocalRegDescriptor(dontUse, addressDescriptors, machineCode, line);
+        }
+    }
+
+    public void LoadOperandValue(Value* operand, RegisterDescriptor* targetRegisterDescriptor, AddressDescriptors& addressDescriptors, MachineCode& machineCode, int line)
+    {
+        if (targetRegisterDescriptor->HasValue(operand)) return; // already loaded
+        AddressDescriptor* addressDescriptor = addressDescriptors.GetAddressDescriptor(operand);
+        Location* loc = addressDescriptor->GetLocation();
+        if (loc == null)
+        {
+            loc = operand->HomeLocation();
+        }
+        if (loc != null)
+        {
+            Type* type = operand->type;
+            int loadOpCode = type->GetLoadOp(line);
+            loc->GenerateLoad(loadOpCode, targetRegisterDescriptor->reg, machineCode);
+            targetRegisterDescriptor->SetValue(operand);
+            addressDescriptor->AddLocation(targetRegisterDescriptor->reg);
+        }
+        else
+        {
+            throw Exception("error: could not load operand value, location for operand '" + operand->Name() + "' not found (line " + ToString(line) + ")");
+        }
+    }
+
+    public void LoadOperandAddress(Value* operand, RegisterDescriptor* targetRegisterDescriptor, AddressDescriptors& addressDescriptors, MachineCode& machineCode, int line)
+    {
+        if (targetRegisterDescriptor->HasValue(operand)) return; // already loaded
+        AddressDescriptor* addressDescriptor = addressDescriptors.GetAddressDescriptor(operand);
+        Location* loc = addressDescriptor->GetLocation();
+        if (loc == null)
+        {
+            loc = operand->HomeLocation();
+        }
+        if (loc != null)
+        {
+            loc->GenerateLoadAddress(targetRegisterDescriptor->reg, machineCode);
+        }
+        else
+        {
+            throw Exception("error: could not load operand address, location for operand '" + operand->Name() + "' not found (line " + ToString(line) + ")");
+        }
+    }
+
+    public bool CanUseRegYForX(Value* y, RegisterDescriptors& registerDescriptors, AddressDescriptors& addressDescriptors)
+    {
+        if (y is LoadInstruction*)
+        {
+            AddressDescriptor* adY = addressDescriptors.GetAddressDescriptor(y);
+            Location* locY = adY->GetLocation();
+            if (locY == null) return true;
+            if (locY is LocalRegister*)
+            {
+                RegisterDescriptor* regY = registerDescriptors.GetRegisterDescriptor(cast<Register*>(locY));
+                if (regY->values.Count() <= 2)
+                {
+                    LoadInstruction* loadY = cast<LoadInstruction*>(y);
+                    if (regY->HasValue(loadY))
+                    {
+                        if (regY->values.Count() == 2)
+                        {
+                            Value* ptr = loadY->ptr;
+                            if (regY->HasValue(ptr))
+                            {
+                                return true;
+                            }
+                        }
+                        else
+                        {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    }
+}

@@ -1,0 +1,90 @@
+using System;
+using System.IO;
+using System.Collections;
+using CodeFormatter = System.Text.CodeFormatter;
+
+namespace cmsx.intermediate
+{
+    public const int separatorInstructionOpCode = -1;
+
+    public class MachineInstruction
+    {
+        public nothrow MachineInstruction(int opCode_) : opCode(opCode_)
+        {
+        }
+        public nothrow void SetLabel(const string& label_)
+        {
+            label = label_;
+        }
+        public nothrow void AddOperand(Operand* operand)
+        {
+            operands.Add(operand);
+        }
+        public nothrow void Print(CodeFormatter& formatter, int labelWidth)
+        {
+            if (opCode == separatorInstructionOpCode) return;
+            formatter << Format(label, labelWidth, FormatWidth.min) << " " << Format(cmsx.assembly.GetOpCodeStr(opCode), cmsx.machine.OpCodeMap.Instance().MaxOpCodeNameLength(), FormatWidth.min) << " ";
+            long n = operands.Count();
+            for (long i = 0; i < n; ++i)
+            {
+                if (i > 0)
+                {
+                    formatter << ",";
+                }
+                Operand* operand = operands[i];
+                operand->Print(formatter);
+            }
+        }
+        private string label;
+        private int opCode;
+        private List<Operand*> operands;
+    }
+
+    public class MachineCode
+    {
+        public nothrow MachineCode(Context& context_) : context(context_)
+        {
+        }
+        public nothrow inline long CurrentIndex() const
+        {
+            return machineInstructions.Count();
+        }
+        public nothrow MachineInstruction* GetInstruction(int opCode, const string& label)
+        {
+            MachineInstruction* inst = GetInstruction(opCode);
+            inst->SetLabel(label);
+            return inst;
+        }
+        public nothrow MachineInstruction* GetInstruction(int opCode)
+        {
+            MachineInstruction* machineInstruction = new MachineInstruction(opCode);
+            machineInstructions.Add(UniquePtr<MachineInstruction>(machineInstruction));
+            return machineInstruction;
+        }
+        public nothrow void PrintRange(long startIndex, long endIndex, CodeFormatter& formatter)
+        {
+            PrintRange(startIndex, endIndex, formatter, 6);
+        }
+        public nothrow void PrintRange(long startIndex, long endIndex, CodeFormatter& formatter, int labelWidth)
+        {
+            for (long i = startIndex; i < endIndex; ++i)
+            {
+                MachineInstruction* inst = machineInstructions[i].Get();
+                inst->Print(formatter, labelWidth);
+                formatter.WriteLine();
+            }
+        }
+        public nothrow void Print(CodeFormatter& formatter)
+        {
+            PrintRange(0, machineInstructions.Count(), formatter, 80);
+        }
+        public nothrow void Print(const string& filePath)
+        {
+            StreamWriter writer = File.CreateText(filePath);
+            CodeFormatter formatter(writer);
+            Print(formatter);
+        }
+        public Context& context;
+        private List<UniquePtr<MachineInstruction>> machineInstructions;
+    }
+}

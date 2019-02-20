@@ -1363,6 +1363,7 @@ namespace cmsx.assembly
             instructions[cmsx.machine.LDTU] = loadInst;
             instructions[cmsx.machine.LDOU] = loadInst;
             instructions[cmsx.machine.LDHT] = loadInst;
+            instructions[cmsx.machine.LDSF] = loadInst;
 
             StoreInstruction* storeInst = new StoreInstruction();
             instructionList.Add(UniquePtr<AssemblyInstruction>(storeInst));
@@ -1375,6 +1376,7 @@ namespace cmsx.assembly
             instructions[cmsx.machine.STTU] = storeInst;
             instructions[cmsx.machine.STOU] = storeInst;
             instructions[cmsx.machine.STHT] = storeInst;
+            instructions[cmsx.machine.STSF] = storeInst;
 
             StoreConstantInstruction* storeConstantInst = new StoreConstantInstruction();
             instructionList.Add(UniquePtr<AssemblyInstruction>(storeConstantInst));
@@ -1456,6 +1458,9 @@ namespace cmsx.assembly
             instructions[cmsx.machine.FIXU] = fprInst;
             instructions[cmsx.machine.FLOT] = fprInst;
             instructions[cmsx.machine.FLOTU] = fprInst;
+            instructions[cmsx.machine.SFLOT] = fprInst;
+            instructions[cmsx.machine.SFLOTU] = fprInst;
+
 
             WydeImmediateInstruction* wydeImmediateInst = new WydeImmediateInstruction();
             instructionList.Add(UniquePtr<AssemblyInstruction>(wydeImmediateInst));

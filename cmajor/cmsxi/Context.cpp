@@ -333,9 +333,9 @@ Instruction* Context::CreateBranch(Value* cond, BasicBlock* trueDest, BasicBlock
     return inst;
 }
 
-Instruction* Context::CreateSwitch(Value* cond)
+Instruction* Context::CreateSwitch(Value* cond, BasicBlock* defaultDest)
 {
-    Instruction* inst = new SwitchInstruction(cond);
+    Instruction* inst = new SwitchInstruction(cond, defaultDest);
     currentBasicBlock->AddInstruction(inst);
     return inst;
 }

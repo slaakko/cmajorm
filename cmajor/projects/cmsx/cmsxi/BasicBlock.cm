@@ -6,13 +6,14 @@ namespace cmsx.intermediate
 {
     public class BasicBlock
     {
-        public nothrow BasicBlock(Function& function_, uint id_) : function(function_), id(id_)
+        public nothrow BasicBlock(Function& function_, uint id_) : function(function_), id(id_), registerDescriptors(function.context.regs), empty(true)
         {
         }
         public nothrow void AddInstruction(Instruction* instruction)
         {
             instruction->parent = this;
             instructions.Add(UniquePtr<Instruction>(instruction));
+            empty = false;
         }
         public void MapInstructions(uint& nextIdNumber)
         {
@@ -21,46 +22,38 @@ namespace cmsx.intermediate
                 ValueInstruction* valueInst = instruction.Get() as ValueInstruction*;
                 if (valueInst != null)
                 {
-                    IdValue* idValue = valueInst->result as IdValue*;
+                    IdValue* idValue = valueInst->Result() as IdValue*;
                     if (idValue != null)
                     {
                         if (idValue->id != nextIdNumber)
                         {
-                            throw Exception("error: value number " + ToString(nextIdNumber) + " expected for " + instruction->Name() + " instruction at line " + ToString(instruction->line));
+                            throw Exception("error: value number " + ToString(nextIdNumber) + " expected for " + instruction->OperationName() + " instruction at line " + ToString(instruction->line));
                         }
                         function.MapInstruction(idValue->id, instruction.Get());
                         nextIdNumber = nextIdNumber + 1u;
                     }
                     else
                     {
-                        throw Exception("internal error: value instruction '" + instruction->Name() + "' at line " + ToString(instruction->line) + " has no id value");
+                        throw Exception("internal error: value instruction '" + instruction->OperationName() + "' at line " + ToString(instruction->line) + " has no id value");
                     }
                 }
             }
         }
         public void Validate()
         {
-            if (Flags.Get(Flag.debug))
-            {
-                Console.Out() << id << endl();
-            }
             long n = instructions.Count();
             int numParams = 0;
             int numArgs = 0;
             for (long i = 0; i < n; ++i)
             {
                 Instruction* instruction = instructions[i].Get();
-                if (Flags.Get(Flag.debug))
-                {
-                    Console.Out() << instruction->Name() << endl();
-                }
                 if (i < n - 1 && (instruction is TerminatorInstruction*))
                 {
-                    throw Exception("error: terminator instruction " + instruction->Name() + " at line " + ToString(instruction->line) + " found in the middle of a basic block");
+                    throw Exception("error: terminator instruction " + instruction->OperationName() + " at line " + ToString(instruction->line) + " found in the middle of a basic block");
                 }
                 else if (i == n - 1 && !(instruction is TerminatorInstruction*))
                 {
-                    throw Exception("error: the last instruction of a basic block, the " + instruction->Name() + " instruction at line " + ToString(instruction->line) + " must be a terminator instruction");
+                    throw Exception("error: the last instruction of a basic block, the " + instruction->OperationName() + " instruction at line " + ToString(instruction->line) + " must be a terminator instruction");
                 }
                 bool resetArgs = true;
                 if (instruction is ArgInstruction*)
@@ -90,29 +83,152 @@ namespace cmsx.intermediate
                 throw Exception("error: wrong number of param instructions for function " + function.name);
             }
         }
-        public void Print(CodeFormatter& formatter)
+        public void Print(CodeFormatter& formatter, int stage)
         {
+            if (instructions.IsEmpty())
+            {
+                return;
+            }
             int indentSize = formatter.IndentSize();
             formatter.DecIndent();
-            formatter.Write(Format(Name(), indentSize, FormatWidth.min));
+            formatter << Format(Name(), indentSize, FormatWidth.min);
             bool first = true;
             for (const UniquePtr<Instruction>& instruction : instructions)
             {
                 instruction->Print(formatter);
-                formatter.WriteLine();
+                if (livenessAndNextUseComputed)
+                {
+                    instruction->PrintLivenessAndNextUse(60, formatter);
+                }
                 if (first)
                 {
                     first = false;
+                    int fieldPos = 60;
+                    if (livenessAndNextUseComputed)
+                    {
+                        fieldPos = 100;
+                    }
+                    formatter << string(' ', Max(cast<long>(1), fieldPos - formatter.Pos()));
+                    if (predecessors.IsEmpty())
+                    {
+                        if (id != 0u)
+                        {
+                            formatter << "no predecessors!";
+                        }
+                        else
+                        {
+                            formatter << "predecessors: -";
+                        }
+                    }
+                    else
+                    {
+                        formatter << "predecessors: ";
+                        bool f = true;
+                        for (BasicBlock* predecessor : predecessors)
+                        {
+                            if (f)
+                            {
+                                f = false;
+                            }
+                            else
+                            {
+                                formatter << ", ";
+                            }
+                            formatter << predecessor->Name();
+                        }
+                    }
                     formatter.IncIndent();
+                }
+                bool machineCodePrinted = false;
+                if (stage == printMachineCodeStage)
+                {
+                    instruction->PrintMachineCode(formatter, machineCodePrinted);
+                }
+                if (!machineCodePrinted)
+                {
+                    formatter.WriteLine();
                 }
             }
         }
         public nothrow string Name() const
         {
+            if (id == prologId)
+            {
+                return "";
+            }
             return "@" + ToString(id);
+        }
+        public nothrow void AddPredecessor(BasicBlock* predecessor)
+        {
+            for (BasicBlock* bb : predecessors)
+            {
+                if (bb == predecessor) return;
+            }
+            predecessors.Add(predecessor);
+        }
+        public nothrow void ComputeLivenessAndNextUse()
+        {
+            livenessAndNextUseComputed = true;
+            long n = instructions.Count();
+            for (long i = 0; i < n; ++i)
+            {
+                Instruction* instruction = instructions[i].Get();
+                if (instruction is LocalInstruction* || instruction is ParamInstruction*)
+                {
+                    livenessAndNextUseMap[instruction] = MakePair(Liveness.live, cast<Value*>(null));
+                }
+            }
+            for (long i = n - 1; i >= 0; --i)
+            {
+                Instruction* instruction = instructions[i].Get();
+                instruction->ComputeLivenessAndNextUse();
+            }
+        }
+        public nothrow const Pair<Liveness, Value*>* GetCurrentLivenessAndNextUse(Value* value)
+        {
+            HashMap<Value*, Pair<Liveness, Value*>>.ConstIterator it = livenessAndNextUseMap.CFind(value);
+            if (it != livenessAndNextUseMap.CEnd())
+            {
+                return &it->second;
+            }
+            else
+            {
+                return null;
+            }
+        }
+        public nothrow void SetValueLivenessAndNextUse(Value* value, Liveness liveness, Value* nextUse)
+        {
+            HashMap<Value*, Pair<Liveness, Value*>>.ConstIterator it = livenessAndNextUseMap.CFind(value);
+            if (it != livenessAndNextUseMap.CEnd())
+            {
+                livenessAndNextUseMap[value] = MakePair(liveness, nextUse);
+            }
+        }
+        public void GenerateCode(MachineCode& machineCode, CodeFormatter& formatter)
+        {
+            function.addressDescriptors.RemoveRegisterLocations();
+            long n = instructions.Count();
+            for (long i = 0; i < n; ++i)
+            {
+                Instruction* instruction = instructions[i].Get();
+                instruction->GenerateCode(machineCode, formatter);
+            }
+        }
+        public nothrow inline bool IsEmpty() const
+        {
+            return empty;
+        }
+        public nothrow inline void SetEmpty(bool empty_)
+        {
+            empty = empty_;
         }
         public Function& function;
         public uint id;
+        public RegisterDescriptors registerDescriptors;
+        private bool empty;
         private List<UniquePtr<Instruction>> instructions;
+        private List<BasicBlock*> predecessors;
+        private HashMap<Value*, Pair<Liveness, Value*>> livenessAndNextUseMap;
+        private bool livenessAndNextUseComputed;
     }
 }

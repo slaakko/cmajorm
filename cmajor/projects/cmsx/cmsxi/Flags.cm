@@ -12,7 +12,7 @@ namespace cmsx.intermediate
 
     public class Flags
     {
-        static nothrow Flags() : flags(Flag.none), optimizationLevel(0)
+        static nothrow Flags() : flags(Flag.none), optimizationLevel(0), numLocalRegs(8u)
         {
         }
         public static nothrow inline bool Get(Flag flag)
@@ -31,8 +31,17 @@ namespace cmsx.intermediate
         {
             return optimizationLevel;
         }
+        public static nothrow inline void SetNumLocalRegs(byte numLocalRegs_)
+        {
+            numLocalRegs = numLocalRegs_;
+        }
+        public static nothrow inline byte NumLocalRegs() 
+        {
+            return numLocalRegs;
+        }
         private static Flag flags;
         private static int optimizationLevel;
+        private static byte numLocalRegs;
     }
 }
 

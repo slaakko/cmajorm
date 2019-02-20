@@ -13,8 +13,34 @@ namespace cmsx.intermediate
         {
             throw Exception("cannot make '" + Name() + "' type value from string '" + fromStr + "'");
         }
+        public virtual Value* MakeValue(ulong val) const
+        {
+            throw Exception("cannot make '" + Name() + "' type value from value '" + ToString(val) + "'");
+        }
         public virtual void PrintDeclaration(CodeFormatter& formatter)
         {
+        }
+        public nothrow virtual void ComputeSizeAndOffsets()
+        {
+        }
+        public virtual int GetLoadOp(int line) const
+        {
+            throw Exception("error: tried to generate load to '" + Name() + "' type value (line " + ToString(line) + ")");
+        }
+        public virtual int GetStoreOp(int line) const
+        {
+            throw Exception("error: tried to generate store of '" + Name() + "' type value (line " + ToString(line) + ")");
+        }
+        public abstract nothrow long Alignment();
+        public abstract nothrow long Size();
+        public virtual Operand* HexAllOnes(Context& context, int line) const
+        {
+            throw Exception("error: tried to get hex all ones for '" + Name() + "' type (line " + ToString(line) + ")");
+            return null;
+        }
+        public virtual void GenerateMinusOne(MachineCode& machineCode, Register* reg, int line)
+        {
+            throw Exception("error: tried to genereate minus one for '" + Name() + "' type (line " + ToString(line) + ")");
         }
     }
 
@@ -31,6 +57,16 @@ namespace cmsx.intermediate
         public override Value* DefaultValue() const
         {
             throw Exception("cannot make default value of type '" + Name() + "'");
+        }
+        public override nothrow long Alignment()
+        {
+            #assert(false); 
+            return 0;
+        }
+        public override nothrow long Size()
+        {
+            #assert(false); 
+            return 0;
         }
     }
 
@@ -60,6 +96,30 @@ namespace cmsx.intermediate
             {
                 return &falseValue;
             }
+        }
+        public override nothrow long Alignment()
+        {
+            return 1;
+        }
+        public override nothrow long Size()
+        {
+            return 1;
+        }
+        public override int GetLoadOp(int line) const
+        {
+            return cmsx.machine.LDBU;
+        }
+        public override int GetStoreOp(int line) const
+        {
+            return cmsx.machine.STBU;
+        }
+        public override Operand* HexAllOnes(Context& context, int line) const
+        {
+            return context.GetSymbolOperand("#1");
+        }
+        public override Value* MakeValue(ulong val) const
+        {
+            return new BoolValue(cast<bool>(val));
         }
         private BoolValue falseValue;
         private BoolValue trueValue;
@@ -115,6 +175,36 @@ namespace cmsx.intermediate
                 throw Exception("type '" + Name() + "' value '" + fromStr + "' out of bounds");
             }
         }
+        public override nothrow long Alignment()
+        {
+            return 1;
+        }
+        public override nothrow long Size()
+        {
+            return 1;
+        }
+        public override int GetLoadOp(int line) const
+        {
+            return cmsx.machine.LDB;
+        }
+        public override int GetStoreOp(int line) const
+        {
+            return cmsx.machine.STB;
+        }
+        public override Operand* HexAllOnes(Context& context, int line) const
+        {
+            return context.GetSymbolOperand("#" + ToHexString(cast<byte>(-1)));
+        }
+        public override void GenerateMinusOne(MachineCode& machineCode, Register* reg, int line)
+        {
+            MachineInstruction* inst = machineCode.GetInstruction(cmsx.assembly.SET);
+            inst->AddOperand(reg);
+            inst->AddOperand(HexAllOnes(machineCode.context, line));
+        }
+        public override Value* MakeValue(ulong val) const
+        {
+            return new SByteValue(cast<sbyte>(val));
+        }
         private SByteValue defaultValue;
     }
 
@@ -151,6 +241,36 @@ namespace cmsx.intermediate
             {
                 throw Exception("type '" + Name() + "' value '" + fromStr + "' out of bounds");
             }
+        }
+        public override nothrow long Alignment()
+        {
+            return 1;
+        }
+        public override nothrow long Size()
+        {
+            return 1;
+        }
+        public override int GetLoadOp(int line) const
+        {
+            return cmsx.machine.LDBU;
+        }
+        public override int GetStoreOp(int line) const
+        {
+            return cmsx.machine.STBU;
+        }
+        public override Operand* HexAllOnes(Context& context, int line) const
+        {
+            return context.GetSymbolOperand("#" + ToHexString(cast<byte>(-1)));
+        }
+        public override void GenerateMinusOne(MachineCode& machineCode, Register* reg, int line)
+        {
+            MachineInstruction* inst = machineCode.GetInstruction(cmsx.assembly.SET);
+            inst->AddOperand(reg);
+            inst->AddOperand(HexAllOnes(machineCode.context, line));
+        }
+        public override Value* MakeValue(ulong val) const
+        {
+            return new ByteValue(cast<byte>(val));
         }
         private ByteValue defaultValue;
     }
@@ -189,6 +309,36 @@ namespace cmsx.intermediate
                 throw Exception("type '" + Name() + "' value '" + fromStr + "' out of bounds");
             }
         }
+        public override nothrow long Alignment()
+        {
+            return 2;
+        }
+        public override nothrow long Size()
+        {
+            return 2;
+        }
+        public override int GetLoadOp(int line) const
+        {
+            return cmsx.machine.LDW;
+        }
+        public override int GetStoreOp(int line) const
+        {
+            return cmsx.machine.STW;
+        }
+        public override Operand* HexAllOnes(Context& context, int line) const
+        {
+            return context.GetSymbolOperand("#" + ToHexString(cast<ushort>(-1)));
+        }
+        public override void GenerateMinusOne(MachineCode& machineCode, Register* reg, int line)
+        {
+            MachineInstruction* inst = machineCode.GetInstruction(cmsx.assembly.SET);
+            inst->AddOperand(reg);
+            inst->AddOperand(HexAllOnes(machineCode.context, line));
+        }
+        public override Value* MakeValue(ulong val) const
+        {
+            return new ShortValue(cast<short>(val));
+        }
         private ShortValue defaultValue;
     }
 
@@ -225,6 +375,36 @@ namespace cmsx.intermediate
             {
                 throw Exception("type '" + Name() + "' value '" + fromStr + "' out of bounds");
             }
+        }
+        public override nothrow long Alignment()
+        {
+            return 2;
+        }
+        public override nothrow long Size()
+        {
+            return 2;
+        }
+        public override int GetLoadOp(int line) const
+        {
+            return cmsx.machine.LDWU;
+        }
+        public override int GetStoreOp(int line) const
+        {
+            return cmsx.machine.STWU;
+        }
+        public override Operand* HexAllOnes(Context& context, int line) const
+        {
+            return context.GetSymbolOperand("#" + ToHexString(cast<ushort>(-1)));
+        }
+        public override void GenerateMinusOne(MachineCode& machineCode, Register* reg, int line)
+        {
+            MachineInstruction* inst = machineCode.GetInstruction(cmsx.assembly.SET);
+            inst->AddOperand(reg);
+            inst->AddOperand(HexAllOnes(machineCode.context, line));
+        }
+        public override Value* MakeValue(ulong val) const
+        {
+            return new UShortValue(cast<ushort>(val));
         }
         private UShortValue defaultValue;
     }
@@ -263,6 +443,40 @@ namespace cmsx.intermediate
                 throw Exception("type '" + Name() + "' value '" + fromStr + "' out of bounds");
             }
         }
+        public override nothrow long Alignment()
+        {
+            return 4;
+        }
+        public override nothrow long Size()
+        {
+            return 4;
+        }
+        public override int GetLoadOp(int line) const
+        {
+            return cmsx.machine.LDT;
+        }
+        public override int GetStoreOp(int line) const
+        {
+            return cmsx.machine.STT;
+        }
+        public override Operand* HexAllOnes(Context& context, int line) const
+        {
+            return context.GetSymbolOperand("#" + ToHexString(cast<uint>(-1)));
+        }
+        public override void GenerateMinusOne(MachineCode& machineCode, Register* reg, int line)
+        {
+            Operand* allOnes = machineCode.context.GetUShortType()->HexAllOnes(machineCode.context, line);
+            MachineInstruction* setInst = machineCode.GetInstruction(cmsx.assembly.SET);
+            setInst->AddOperand(reg);
+            setInst->AddOperand(allOnes);
+            MachineInstruction* orMlInst = machineCode.GetInstruction(cmsx.machine.ORML);
+            orMlInst->AddOperand(reg);
+            orMlInst->AddOperand(allOnes);
+        }
+        public override Value* MakeValue(ulong val) const
+        {
+            return new IntValue(cast<int>(val));
+        }
         private IntValue defaultValue;
     }
 
@@ -299,6 +513,40 @@ namespace cmsx.intermediate
             {
                 throw Exception("type '" + Name() + "' value '" + fromStr + "' out of bounds");
             }
+        }
+        public override nothrow long Alignment()
+        {
+            return 4;
+        }
+        public override nothrow long Size()
+        {
+            return 4;
+        }
+        public override int GetLoadOp(int line) const
+        {
+            return cmsx.machine.LDTU;
+        }
+        public override int GetStoreOp(int line) const
+        {
+            return cmsx.machine.STTU;
+        }
+        public override Operand* HexAllOnes(Context& context, int line) const
+        {
+            return context.GetSymbolOperand("#" + ToHexString(cast<uint>(-1)));
+        }
+        public override void GenerateMinusOne(MachineCode& machineCode, Register* reg, int line)
+        {
+            Operand* allOnes = machineCode.context.GetUShortType()->HexAllOnes(machineCode.context, line);
+            MachineInstruction* setInst = machineCode.GetInstruction(cmsx.assembly.SET);
+            setInst->AddOperand(reg);
+            setInst->AddOperand(allOnes);
+            MachineInstruction* orMlInst = machineCode.GetInstruction(cmsx.machine.ORML);
+            orMlInst->AddOperand(reg);
+            orMlInst->AddOperand(allOnes);
+        }
+        public override Value* MakeValue(ulong val) const
+        {
+            return new UIntValue(cast<uint>(val));
         }
         private UIntValue defaultValue;
     }
@@ -337,6 +585,46 @@ namespace cmsx.intermediate
                 throw Exception("type '" + Name() + "' value '" + fromStr + "' out of bounds");
             }
         }
+        public override nothrow long Alignment()
+        {
+            return 8;
+        }
+        public override nothrow long Size()
+        {
+            return 8;
+        }
+        public override int GetLoadOp(int line) const
+        {
+            return cmsx.machine.LDO;
+        }
+        public override int GetStoreOp(int line) const
+        {
+            return cmsx.machine.STO;
+        }
+        public override Operand* HexAllOnes(Context& context, int line) const
+        {
+            return context.GetSymbolOperand("#" + ToHexString(cast<ulong>(-1)));
+        }
+        public override void GenerateMinusOne(MachineCode& machineCode, Register* reg, int line)
+        {
+            Operand* allOnes = machineCode.context.GetUShortType()->HexAllOnes(machineCode.context, line);
+            MachineInstruction* setInst = machineCode.GetInstruction(cmsx.assembly.SET);
+            setInst->AddOperand(reg);
+            setInst->AddOperand(allOnes);
+            MachineInstruction* orMlInst = machineCode.GetInstruction(cmsx.machine.ORML);
+            orMlInst->AddOperand(reg);
+            orMlInst->AddOperand(allOnes);
+            MachineInstruction* orMhInst = machineCode.GetInstruction(cmsx.machine.ORMH);
+            orMhInst->AddOperand(reg);
+            orMhInst->AddOperand(allOnes);
+            MachineInstruction* orHInst = machineCode.GetInstruction(cmsx.machine.ORH);
+            orHInst->AddOperand(reg);
+            orHInst->AddOperand(allOnes);
+        }
+        public override Value* MakeValue(ulong val) const
+        {
+            return new LongValue(cast<long>(val));
+        }
         private LongValue defaultValue;
     }
 
@@ -374,6 +662,46 @@ namespace cmsx.intermediate
                 throw Exception("type '" + Name() + "' value '" + fromStr + "' out of bounds");
             }
         }
+        public override nothrow long Alignment()
+        {
+            return 8;
+        }
+        public override nothrow long Size()
+        {
+            return 8;
+        }
+        public override int GetLoadOp(int line) const
+        {
+            return cmsx.machine.LDOU;
+        }
+        public override int GetStoreOp(int line) const
+        {
+            return cmsx.machine.STOU;
+        }
+        public override Operand* HexAllOnes(Context& context, int line) const
+        {
+            return context.GetSymbolOperand("#" + ToHexString(cast<ulong>(-1)));
+        }
+        public override void GenerateMinusOne(MachineCode& machineCode, Register* reg, int line)
+        {
+            Operand* allOnes = machineCode.context.GetUShortType()->HexAllOnes(machineCode.context, line);
+            MachineInstruction* setInst = machineCode.GetInstruction(cmsx.assembly.SET);
+            setInst->AddOperand(reg);
+            setInst->AddOperand(allOnes);
+            MachineInstruction* orMlInst = machineCode.GetInstruction(cmsx.machine.ORML);
+            orMlInst->AddOperand(reg);
+            orMlInst->AddOperand(allOnes);
+            MachineInstruction* orMhInst = machineCode.GetInstruction(cmsx.machine.ORMH);
+            orMhInst->AddOperand(reg);
+            orMhInst->AddOperand(allOnes);
+            MachineInstruction* orHInst = machineCode.GetInstruction(cmsx.machine.ORH);
+            orHInst->AddOperand(reg);
+            orHInst->AddOperand(allOnes);
+        }
+        public override Value* MakeValue(ulong val) const
+        {
+            return new ULongValue(val);
+        }
         private ULongValue defaultValue;
     }
 
@@ -393,8 +721,7 @@ namespace cmsx.intermediate
         }
         public override Value* MakeValue(const string& fromStr, Context& context) const
         {
-            double doubleValue = ParseDouble(fromStr);
-            float value = cast<float>(doubleValue);
+            float value = ParseFloat(fromStr);
             if (value == defaultValue.value)
             {
                 return &defaultValue;
@@ -403,6 +730,22 @@ namespace cmsx.intermediate
             {
                 return context.MakeFloatValue(this, value);
             }
+        }
+        public override nothrow long Alignment()
+        {
+            return 4;
+        }
+        public override nothrow long Size()
+        {
+            return 4;
+        }
+        public override int GetLoadOp(int line) const
+        {
+            return cmsx.machine.LDSF;
+        }
+        public override int GetStoreOp(int line) const
+        {
+            return cmsx.machine.STSF;
         }
         private FloatValue defaultValue;
     }
@@ -433,6 +776,22 @@ namespace cmsx.intermediate
             {
                 return context.MakeDoubleValue(this, value);
             }
+        }
+        public override nothrow long Alignment()
+        {
+            return 8;
+        }
+        public override nothrow long Size()
+        {
+            return 8;
+        }
+        public override int GetLoadOp(int line) const
+        {
+            return cmsx.machine.LDOU;
+        }
+        public override int GetStoreOp(int line) const
+        {
+            return cmsx.machine.STOU;
         }
         private DoubleValue defaultValue;
     }
@@ -473,6 +832,22 @@ namespace cmsx.intermediate
                 throw Exception("cannot make '" + Name() + "' type value from string '" + fromStr + "'");
             }
         }
+        public override nothrow long Alignment()
+        {
+            return 8;
+        }
+        public override nothrow long Size()
+        {
+            return 8;
+        }
+        public override int GetLoadOp(int line) const
+        {
+            return cmsx.machine.LDOU;
+        }
+        public override int GetStoreOp(int line) const
+        {
+            return cmsx.machine.STOU;
+        }
         private Type* baseType;
         private NullValue defaultValue;
     }
@@ -483,10 +858,10 @@ namespace cmsx.intermediate
 
     public class StructureType : AggregateType
     {
-        public nothrow StructureType(const string& typeId_) : typeId(typeId_)
+        public nothrow StructureType(const string& typeId_) : typeId(typeId_), memberTypes(), memberOffsets(), size(0)
         {
         }
-        public nothrow StructureType(const string& typeId_, const List<Type*>& memberTypes_) : typeId(typeId_), memberTypes(memberTypes_)
+        public nothrow StructureType(const string& typeId_, const List<Type*>& memberTypes_) : typeId(typeId_), memberTypes(memberTypes_), memberOffsets(), size(0)
         {
         }
         public nothrow void SetMemberTypes(List<Type*>&& memberTypes_)
@@ -503,32 +878,69 @@ namespace cmsx.intermediate
         }
         public override void PrintDeclaration(CodeFormatter& formatter)
         {
-            formatter.Write(typeId + " = { ");
+            formatter << typeId << " = { ";
+            long n = memberTypes.Count();
+            #assert(n == memberOffsets.Count());
+            for (long i = 0; i < n; ++i)
+            {
+                Type* memberType = memberTypes[i];
+                long memberOffset = memberOffsets[i];
+                if (i > 0)
+                {
+                    formatter << ", ";
+                }
+                formatter << memberType->Name() << " : offset=" << ToString(memberOffset);
+            }
+            formatter << " } size=" << ToString(Size()) << ", alignment=" << ToString(Alignment()) << endl();
+        }
+        public override nothrow long Alignment()
+        {
+            return 8;
+        }
+        public override nothrow long Size()
+        {
+            return size;
+        }
+        public nothrow override void ComputeSizeAndOffsets()
+        {
+            if (size != 0) return;
+            long offset = 0;
             bool first = true;
             for (Type* memberType : memberTypes)
             {
+                long memberOffset = offset;
                 if (first)
                 {
                     first = false;
                 }
                 else
                 {
-                    formatter.Write(", ");
+                    long alignment = memberType->Alignment();
+                    memberOffset = alignment * ((offset - 1) / alignment + 1);
                 }
-                formatter.Write(memberType->Name());
+                memberOffsets.Add(memberOffset);
+                memberType->ComputeSizeAndOffsets();
+                offset = memberOffset + memberType->Size();
             }
-            formatter.WriteLine(" }");
+            #assert(offset != 0);
+            size = 8 * ((offset - 1) / 8 + 1);
+        }
+        public nothrow long GetMemberOffset(long memberIndex) const
+        {
+            return memberOffsets[memberIndex];
         }
         private string typeId;
         private List<Type*> memberTypes;
+        private List<long> memberOffsets;
+        private long size;
     }
 
     public class ArrayType : AggregateType
     {
-        public nothrow ArrayType(const string& typeId_, long size_) : typeId(typeId_), size(size_)
+        public nothrow ArrayType(const string& typeId_, long elementCount_) : typeId(typeId_), elementCount(elementCount_)
         {
         }
-        public nothrow ArrayType(const string& typeId_, Type* elementType_, long size_) : typeId(typeId_), elementType(elementType_), size(size_)
+        public nothrow ArrayType(const string& typeId_, Type* elementType_, long elementCount_) : typeId(typeId_), elementType(elementType_), elementCount(elementCount_)
         {
         }
         public nothrow inline Type* ElementType() const
@@ -539,9 +951,9 @@ namespace cmsx.intermediate
         {
             elementType = elementType_;
         }
-        public nothrow inline long Size() const
+        public nothrow inline long ElementCount() const
         {
-            return size;
+            return elementCount;
         }
         public override nothrow string Name() const
         {
@@ -553,13 +965,25 @@ namespace cmsx.intermediate
         }
         public override void PrintDeclaration(CodeFormatter& formatter)
         {
-            formatter.Write(typeId + " = [");
-            formatter.Write(ToString(size) + " x " + elementType->Name());
-            formatter.WriteLine("]");
+            formatter << typeId << " = [";
+            formatter << ToString(elementCount) << " x " << elementType->Name();
+            formatter << "] size=" << ToString(Size()) << ", alignment=" << ToString(Alignment()) << endl();
+        }
+        public nothrow override void ComputeSizeAndOffsets()
+        {
+            elementType->ComputeSizeAndOffsets();
+        }
+        public override nothrow long Alignment()
+        {
+            return 8;
+        }
+        public override nothrow long Size()
+        {
+            return elementCount * elementType->Size();
         }
         private string typeId;
         private Type* elementType;
-        private long size;
+        private long elementCount;
     }
 
     public class FunctionType : AggregateType
@@ -596,7 +1020,7 @@ namespace cmsx.intermediate
         }
         public override void PrintDeclaration(CodeFormatter& formatter)
         {
-            formatter.Write(typeId + " = function " + returnType->Name() + "(");
+            formatter << typeId << " = function " << returnType->Name() << "(";
             bool first = true;
             for (Type* paramType : paramTypes)
             {
@@ -606,11 +1030,21 @@ namespace cmsx.intermediate
                 }
                 else
                 {
-                    formatter.Write(", ");
+                    formatter << ", ";
                 }
-                formatter.Write(paramType->Name());
+                formatter << paramType->Name();
             }
-            formatter.WriteLine(")");
+            formatter << ")" << endl();
+        }
+        public override nothrow long Alignment()
+        {
+            #assert(false); 
+            return 0;
+        }
+        public override nothrow long Size()
+        {
+            #assert(false); 
+            return 0;
         }
         private string typeId;
         private Type* returnType;
@@ -834,6 +1268,7 @@ namespace cmsx.intermediate
             ResolveStructureTypes();
             ResolveArrayTypes();
             ResolveFunctionTypes();
+            ComputeSizesAndOffsets();
         }
         public void PrintTypes(CodeFormatter& formatter)
         {
@@ -943,6 +1378,13 @@ namespace cmsx.intermediate
                 functionType->SetParamTypes(Rvalue(paramTypes));
             }
             unresolvedFunctionTypes.Clear();
+        }
+        private nothrow void ComputeSizesAndOffsets()
+        {
+            for (UniquePtr<Type>& type : types)
+            {
+                type->ComputeSizeAndOffsets();
+            }
         }
         private VoidType voidType;
         private BoolType boolType;

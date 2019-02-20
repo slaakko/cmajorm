@@ -1554,7 +1554,7 @@ void* Emitter::CreateLexicalBlock(const Span& span)
 
 void* Emitter::CreateSwitch(void* condition, void* defaultDest, unsigned numCases)
 {
-    return context->CreateSwitch(static_cast<cmsxi::Value*>(condition));
+    return context->CreateSwitch(static_cast<cmsxi::Value*>(condition), static_cast<cmsxi::BasicBlock*>(defaultDest));
 }
 
 void Emitter::AddCase(void* switchInst, void* caseValue, void* caseDest)

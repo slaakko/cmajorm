@@ -4,9 +4,14 @@ using CodeFormatter = System.Text.CodeFormatter;
 
 namespace cmsx.intermediate
 {
+    public const uint prologId = cast<uint>(-1);
+    public const uint epilogId = cast<uint>(-2);
+
     public class Function
     {
-        public nothrow Function(Context& context_, FunctionType* type_, const string& name_) : context(context_), type(type_), name(name_), nextValueNumber(0)
+        public nothrow Function(Context& context_, FunctionType* type_, const string& name_) :
+            context(context_), type(type_), name(name_), addressDescriptors(), locations(context.regs), nextValueNumber(0), nextInstructionIndex(0), frameSizeOperand(null),
+            prolog(*this, prologId), epilog(*this, epilogId)
         {
         }
         public BasicBlock* AddBasicBlock(uint id)
@@ -55,15 +60,11 @@ namespace cmsx.intermediate
             }
             else
             {
-                throw Exception("instruction '" + instruction->Name() + "' id " + ToString(id) + " at line '" + ToString(instruction->line) + "' already mapped at line " + ToString(it->second->line));
+                throw Exception("instruction '" + instruction->OperationName() + "' id " + ToString(id) + " at line '" + ToString(instruction->line) + "' already mapped at line " + ToString(it->second->line));
             }
         }
         public void Validate()
         {
-            if (Flags.Get(Flag.debug))
-            {
-                Console.Out() << "validating " << name << "..." << endl();
-            }
             for (const UniquePtr<BasicBlock>& bb : basicBlocks)
             {
                 bb->Validate();
@@ -83,7 +84,7 @@ namespace cmsx.intermediate
                         Instruction* instruction = it->second;
                         if (idValue->type != instruction->type)
                         {
-                            throw Exception("error : type conflict for operand '" + operand->Name() + "' at line " + ToString(operand->line) + " with " + instruction->Name() +
+                            throw Exception("error : type conflict for operand '" + operand->Name() + "' at line " + ToString(operand->line) + " with " + instruction->OperationName() +
                                 " instruction at line " + ToString(instruction->line));
                         }
                         return instruction;
@@ -114,8 +115,10 @@ namespace cmsx.intermediate
                 return null;
             }
         }
-        public void Print(CodeFormatter& formatter)
+        public void Print(CodeFormatter& formatter, int stage)
         {
+            nextInstructionIndex = 0;
+            nextValueNumber = 0;
             formatter.WriteLine("function @" + name);
             formatter.WriteLine("{");
             formatter.IncIndent();
@@ -130,22 +133,93 @@ namespace cmsx.intermediate
                 {
                     formatter.WriteLine();
                 }
-                basicBlock->Print(formatter);
+                basicBlock->Print(formatter, stage);
             }
             formatter.DecIndent();
             formatter.WriteLine("}");
+        }
+        public nothrow inline int GetNextInstructionIndex()
+        {
+            return nextInstructionIndex++;
         }
         public nothrow inline int GetNextValueNumber()
         {
             return nextValueNumber++;
         }
+        public nothrow void ComputeLivenessAndNextUse()
+        {
+            for (const UniquePtr<BasicBlock>& bb : basicBlocks)
+            {
+                bb->ComputeLivenessAndNextUse();
+            }
+        }
+        public void GenerateDeclaration(MachineCode& machineCode)
+        {
+            MachineInstruction* externInst = machineCode.GetInstruction(cmsx.assembly.EXTERN);
+            externInst->AddOperand(machineCode.context.GetSymbolOperand(name));
+        }
+        public void GenerateCode(MachineCode& machineCode, CodeFormatter& formatter)
+        {
+            nextInstructionIndex = 0;
+            nextValueNumber = 0;
+            epilog.id = cast<uint>(basicBlocks.Count());
+            CreateProlog(machineCode);
+            if (Flags.Get(Flag.debug))
+            {
+                formatter.WriteLine("function @" + name);
+                formatter.WriteLine("{");
+                formatter.IncIndent();
+            }
+            for (const UniquePtr<BasicBlock>& basicBlock : basicBlocks)
+            {
+                basicBlock->GenerateCode(machineCode, formatter);
+            }
+            if (Flags.Get(Flag.debug))
+            {
+                formatter.DecIndent();
+                formatter.WriteLine("}");
+            }
+            CreateEpilog(machineCode);
+            frameSizeOperand->SetValue(cast<ulong>(locations.offset));
+        }
+        private void CreateProlog(MachineCode& machineCode)
+        {
+            MachineInstruction* funcInst = machineCode.GetInstruction(cmsx.assembly.FUNC, name);
+            MachineInstruction* stoInst = machineCode.GetInstruction(cmsx.machine.STO);
+            stoInst->AddOperand(context.regs.GetFP());
+            stoInst->AddOperand(context.regs.GetSP());
+            stoInst->AddOperand(context.GetLiteralOperand(0u));
+            MachineInstruction* setInst = machineCode.GetInstruction(cmsx.assembly.SET);
+            setInst->AddOperand(context.regs.GetFP());
+            setInst->AddOperand(context.regs.GetSP());
+            MachineInstruction* inclInst = machineCode.GetInstruction(cmsx.machine.INCL);
+            inclInst->AddOperand(context.regs.GetSP());
+            frameSizeOperand = context.CreateLiteralOperand();
+            inclInst->AddOperand(frameSizeOperand);
+            prolog.SetEmpty(false);
+        }
+        private void CreateEpilog(MachineCode& machineCode)
+        {
+            MachineInstruction* setInst = machineCode.GetInstruction(cmsx.assembly.SET, epilog.Name());
+            setInst->AddOperand(context.regs.GetSP());
+            setInst->AddOperand(context.regs.GetFP());
+            machineCode.GetInstruction(cmsx.machine.RET);
+            machineCode.GetInstruction(cmsx.assembly.ENDF, name);
+            epilog.SetEmpty(false);
+        }
         public Context& context;
         public FunctionType* type;
         public string name;
+        public AddressDescriptors addressDescriptors;
+        public Locations locations;
+        public BasicBlock prolog;
+        public BasicBlock epilog;
         private List<UniquePtr<BasicBlock>> basicBlocks;
         private List<UniquePtr<Value>> values;
         private HashMap<uint, IdValue*> idValueMap;
         private HashMap<uint, Instruction*> instructionMap;
+        private int nextInstructionIndex;
         private int nextValueNumber;
+        private LiteralOperand* frameSizeOperand;
     }
 }

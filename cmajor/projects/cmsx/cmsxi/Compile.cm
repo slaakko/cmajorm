@@ -9,9 +9,17 @@ namespace cmsx.intermediate
         ParseIntermediateCodeFile(intermediateCodeFileName, &context);
         context.compileUnit.MapInstructions();
         context.compileUnit.Validate();
+        //context.compileUnit.ComputeLivenessAndNextUse();
         if (Flags.Get(Flag.stages))
         {
             context.compileUnit.Print(0);
         }
+        MachineCode machineCode(context);
+        context.compileUnit.GenerateCode(machineCode);
+        if (Flags.Get(Flag.stages))
+        {
+            context.compileUnit.Print(printMachineCodeStage);
+        }
+        machineCode.Print(Path.ChangeExtension(context.compileUnit.fileName, ".s"));
     }
 }

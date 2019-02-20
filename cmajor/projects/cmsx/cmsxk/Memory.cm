@@ -113,7 +113,7 @@ namespace cmsx.kernel
                 ulong pageAddress = mem.AllocatePage();
                 ulong pte = MakePageTableEntry(pageAddress, addressSpaceNumber, protection);
                 WriteMemoryULong(entryAddress, pte);
-                #if (MEM_DEBUG)
+                #if (MEMORY_DEBUG)
                     Console.Out() << "entry address: " << ToHexString(entryAddress) << ", page address: " << ToHexString(pageAddress) << ", pte: " << ToHexString(pte) << endl();
                 #endif
             }
@@ -121,7 +121,7 @@ namespace cmsx.kernel
             {
                 if (singleIndirectEntryNumber != 0u)
                 {
-                    #if (MEM_DEBUG)
+                    #if (MEMORY_DEBUG)
                         Console.Out() << "indirect entries:" << endl();
                     #endif
                     ulong entryAddress = rootPageAddress + 8u * singleIndirectEntryNumber;
@@ -144,7 +144,7 @@ namespace cmsx.kernel
                         pte = MakePageTableEntry(singleIndirectPageAddress, addressSpaceNumber, protection);
                         WriteMemoryULong(entryAddress, pte);
                     }
-                    #if (MEM_DEBUG)
+                    #if (MEMORY_DEBUG)
                         Console.Out() << "single indirect entry address: " << ToHexString(entryAddress) << ", page address: " << ToHexString(pageAddress) << ", pte: " << ToHexString(pte) << endl();
                     #endif
                     singleIndirectEntryNumber = 0u;
@@ -154,7 +154,7 @@ namespace cmsx.kernel
                 ushort digit1 = 0u;
                 ushort digit2 = 0u;
                 ExtractDigitsFromPageNumber(pageNum, digit0, digit1, digit2);
-                #if (MEM_DEBUG)
+                #if (MEMORY_DEBUG)
                     Console.Out() << "page number: " << ToHexString(pageNum) << ", d0: " << ToHexString(digit0) << ", d1: " << ToHexString(digit1) <<
                         ", d2: " << ToHexString(digit2) << endl();
                 #endif
@@ -164,7 +164,7 @@ namespace cmsx.kernel
                     ulong pageAddress = mem.AllocatePage();
                     ulong pte = MakePageTableEntry(pageAddress, addressSpaceNumber, protection);
                     WriteMemoryULong(entryAddress, pte);
-                    #if (MEM_DEBUG)
+                    #if (MEMORY_DEBUG)
                         Console.Out() << "si-entry address: " << ToHexString(entryAddress) << ", page address: " << ToHexString(pageAddress) << ", pte: " << ToHexString(pte) << endl();
                     #endif
                 }
@@ -192,7 +192,7 @@ namespace cmsx.kernel
                             pte = MakePageTableEntry(doubleIndirectPageAddress, addressSpaceNumber, protection);
                             WriteMemoryULong(entryAddress, pte);
                         }
-                        #if (MEM_DEBUG)
+                        #if (MEMORY_DEBUG)
                             Console.Out() << "double indirect entry address: " << ToHexString(entryAddress) << ", page address: " << ToHexString(pageAddress) << ", pte: " << ToHexString(pte) << endl();
                         #endif
                         doubleIndirectEntryNumber = 0u;
@@ -219,7 +219,7 @@ namespace cmsx.kernel
                             pte = MakePageTableEntry(singleIndirectPageAddress, addressSpaceNumber, protection);
                             WriteMemoryULong(entryAddress, pte);
                         }
-                        #if (MEM_DEBUG)
+                        #if (MEMORY_DEBUG)
                             Console.Out() << "di-entry address: " << ToHexString(entryAddress) << ", page address: " << ToHexString(pageAddress) << ", pte: " << ToHexString(pte) << endl();
                         #endif
                     }
@@ -227,7 +227,7 @@ namespace cmsx.kernel
                     ulong siPageAddress = mem.AllocatePage();
                     ulong siPte = MakePageTableEntry(siPageAddress, addressSpaceNumber, protection);
                     WriteMemoryULong(siEntryAddress, siPte);
-                    #if (MEM_DEBUG)
+                    #if (MEMORY_DEBUG)
                         Console.Out() << "di-si-entry address: " << ToHexString(siEntryAddress) << ", page address: " << ToHexString(siPageAddress) << ", pte: " << ToHexString(siPte) << endl();
                     #endif
                 }
@@ -255,7 +255,7 @@ namespace cmsx.kernel
                             pte = MakePageTableEntry(tripleIndirectPageAddress, addressSpaceNumber, protection);
                             WriteMemoryULong(entryAddress, pte);
                         }
-                        #if (MEM_DEBUG)
+                        #if (MEMORY_DEBUG)
                             Console.Out() << "triple indirect entry address: " << ToHexString(entryAddress) << ", page address: " << ToHexString(pageAddress) << ", pte: " << ToHexString(pte) << endl();
                         #endif
                         tripleIndirectEntryNumber = 0u;
@@ -282,7 +282,7 @@ namespace cmsx.kernel
                             pte = MakePageTableEntry(doubleIndirectPageAddress, addressSpaceNumber, protection);
                             WriteMemoryULong(entryAddress, pte);
                         }
-                        #if (MEM_DEBUG)
+                        #if (MEMORY_DEBUG)
                             Console.Out() << "ti-entry address: " << ToHexString(entryAddress) << ", page address: " << ToHexString(pageAddress) << ", pte: " << ToHexString(pte) << endl();
                         #endif
                     }
@@ -308,7 +308,7 @@ namespace cmsx.kernel
                             pte = MakePageTableEntry(singleIndirectPageAddress, addressSpaceNumber, protection);
                             WriteMemoryULong(entryAddress, pte);
                         }
-                        #if (MEM_DEBUG)
+                        #if (MEMORY_DEBUG)
                             Console.Out() << "ti-di-entry address: " << ToHexString(entryAddress) << ", page address: " << ToHexString(pageAddress) << ", pte: " << ToHexString(pte) << endl();
                         #endif
                     }
@@ -316,7 +316,7 @@ namespace cmsx.kernel
                     ulong siPageAddress = mem.AllocatePage();
                     ulong siPte = MakePageTableEntry(siPageAddress, addressSpaceNumber, protection);
                     WriteMemoryULong(siEntryAddress, siPte);
-                    #if (MEM_DEBUG)
+                    #if (MEMORY_DEBUG)
                         Console.Out() << "ti-di-si-entry address: " << ToHexString(siEntryAddress) << ", page address: " << ToHexString(siPageAddress) << ", pte: " << ToHexString(siPte) << endl();
                     #endif
                 }
@@ -380,7 +380,7 @@ namespace cmsx.kernel
                     UnpackPageTableEntry(pte, pageAddress, pteAddressSpaceNumber, protection);
                     if (protection != Protection.notPresent && pageAddress != 0u)
                     {
-                        #if (MEM_DEBUG)
+                        #if (MEMORY_DEBUG)
                             Console.Out() << "entry address: " << ToHexString(entryAddress) << ", page address: " << ToHexString(pageAddress) << ", pte: " << ToHexString(pte) << endl();
                         #endif
                         mem.FreePage(pageAddress);
@@ -421,7 +421,7 @@ namespace cmsx.kernel
                 ushort digit1 = 0u;
                 ushort digit2 = 0u;
                 ExtractDigitsFromPageNumber(pageNum, digit0, digit1, digit2);
-                #if (MEM_DEBUG)
+                #if (MEMORY_DEBUG)
                     Console.Out() << "page number: " << ToHexString(pageNum) << ", d0: " << ToHexString(digit0) << ", d1: " << ToHexString(digit1) <<
                         ", d2: " << ToHexString(digit2) << endl();
                 #endif
@@ -441,7 +441,7 @@ namespace cmsx.kernel
                         UnpackPageTableEntry(pte, pageAddress, pteAddressSpaceNumber, protection);
                         if (protection != Protection.notPresent && pageAddress != 0u)
                         {
-                            #if (MEM_DEBUG)
+                            #if (MEMORY_DEBUG)
                                 Console.Out() << "entry address: " << ToHexString(entryAddress) << ", page address: " << ToHexString(pageAddress) << ", pte: " << ToHexString(pte) << endl();
                             #endif
                             mem.FreePage(pageAddress);
@@ -523,7 +523,7 @@ namespace cmsx.kernel
                                 UnpackPageTableEntry(pte, pageAddress, pteAddressSpaceNumber, protection);
                                 if (protection != Protection.notPresent && pageAddress != 0u)
                                 {
-                                #if (MEM_DEBUG)
+                                #if (MEMORY_DEBUG)
                                     Console.Out() << "entry address: " << ToHexString(entryAddress) << ", page address: " << ToHexString(pageAddress) << ", pte: " << ToHexString(pte) << endl();
                                 #endif
                                     mem.FreePage(pageAddress);
@@ -645,7 +645,7 @@ namespace cmsx.kernel
                                     UnpackPageTableEntry(pte, pageAddress, pteAddressSpaceNumber, protection);
                                     if (protection != Protection.notPresent && pageAddress != 0u)
                                     {
-                                    #if (MEM_DEBUG)
+                                    #if (MEMORY_DEBUG)
                                         Console.Out() << "entry address: " << ToHexString(entryAddress) << ", page address: " << ToHexString(pageAddress) << ", pte: " << ToHexString(pte) << endl();
                                     #endif
                                         mem.FreePage(pageAddress);

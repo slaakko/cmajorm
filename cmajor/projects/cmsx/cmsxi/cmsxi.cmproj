@@ -10,6 +10,7 @@
   <Import Project="$(CustomProjectExtensionsPath)Cmajor.props" />
   <Import Project="$(CustomProjectExtensionsPath)Cmajor.targets" />
   <ItemGroup>
+    <CmCompile Include="AddressDescriptor.cm" />
     <CmCompile Include="BasicBlock.cm" />
     <CmCompile Include="Compile.cm" />
     <CmCompile Include="CompileUnit.cm" />
@@ -19,6 +20,11 @@
     <CmCompile Include="Instruction.cm" />
     <CmCompile Include="IntermediateCodeFileGrammar.cm" />
     <CmCompile Include="IntermediateCodeFileParser.cm" />
+    <CmCompile Include="Location.cm" />
+    <CmCompile Include="MachineCode.cm" />
+    <CmCompile Include="Operand.cm" />
+    <CmCompile Include="Register.cm" />
+    <CmCompile Include="RegisterDescriptor.cm" />
     <CmCompile Include="Type.cm" />
     <CmCompile Include="Value.cm" />
   </ItemGroup>
@@ -26,5 +32,10 @@
     <None Include="IntermediateCodeFileGrammar.parser" />
     <None Include="IntermediateCodeFileGrammar.pl" />
     <None Include="IntermediateCodeFileGrammar.pp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\cmsxa\cmsxa.cmproj" />
+    <ProjectReference Include="..\cmsxm\cmsxm.cmproj" />
+    <ProjectReference Include="..\cmsxu\cmsxu.cmproj" />
   </ItemGroup>
 </Project>

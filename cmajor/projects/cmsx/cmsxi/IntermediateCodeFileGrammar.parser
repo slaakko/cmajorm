@@ -77,7 +77,7 @@ namespace cmsx.intermediate
             ;
 
         SwitchInstruction(cmsx.intermediate.Context* context) : SwitchInstruction*
-            ::= (keyword("switch") S TypeExpr(context):type! S Value(context, type):cond!){ value = new SwitchInstruction(cond, span.lineNumber); } Comma!
+            ::= (keyword("switch") S TypeExpr(context):type! S Value(context, type):cond! S Label:defaultTarget!){ value = new SwitchInstruction(cond, defaultTarget, span.lineNumber); } Comma!
                 '['! S? (TypeExpr(context):caseType S Value(context, caseType):caseValue Comma Label:caseTarget){ value->AddCase(caseValue, caseTarget); } % (S? ':' S?) ']'!
             ;
 
@@ -284,11 +284,13 @@ namespace cmsx.intermediate
             ;
 
         StructureType(string typeId, cmsx.intermediate.Context* context, var List<string> memberTypeIds)
-            ::= ('{' (StrTypeId(context)!{ memberTypeIds.Add(StrTypeId); } % ',')? '}'!){ context->AddStructureType(typeId, memberTypeIds); } 
+            ::= ('{' ((StrTypeId(context)!{ memberTypeIds.Add(StrTypeId); } (':' "offset" '=' long)?) % ',')? '}'!){ context->AddStructureType(typeId, memberTypeIds); }
+                (keyword("size") '=' long:sz ',' keyword("alignment") '=' long:al)?
             ;
 
         ArrayType(string typeId, cmsx.intermediate.Context* context)
             ::= ('[' long:size! 'x'! StrTypeId(context):elementTypeId! ']'!){ context->AddArrayType(typeId, elementTypeId, size); }
+                (keyword("size") '=' long:sz ',' keyword("alignment") '=' long:al)?
             ;
 
         FunctionType(string typeId, cmsx.intermediate.Context* context, var List<string> paramTypeIds)

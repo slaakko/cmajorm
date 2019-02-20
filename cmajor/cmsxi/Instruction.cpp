@@ -452,7 +452,6 @@ void PtrOffsetInstruction::Write(CodeFormatter& formatter, Function& function, C
 {
     WriteResult(formatter, function, context);
     formatter.Write(" = ptroffset ");
-    formatter.Write(", ");
     formatter.Write(ptr->GetType(context)->Name());
     formatter.Write(" ");
     formatter.Write(ptr->Name());
@@ -475,7 +474,6 @@ void PtrDiffInstruction::Write(CodeFormatter& formatter, Function& function, Con
 {
     WriteResult(formatter, function, context);
     formatter.Write(" = ptrdiff ");
-    formatter.Write(", ");
     formatter.Write(leftPtr->GetType(context)->Name());
     formatter.Write(" ");
     formatter.Write(leftPtr->Name());
@@ -570,7 +568,7 @@ void BranchInstruction::Write(CodeFormatter& formatter, Function& function, Cont
     formatter.Write("@" + std::to_string(falseDest->Id()));
 }
 
-SwitchInstruction::SwitchInstruction(Value* cond_) : Instruction(), cond(cond_), destinations()
+SwitchInstruction::SwitchInstruction(Value* cond_, BasicBlock* defaultDest_) : Instruction(), cond(cond_), defaultDest(defaultDest_), destinations()
 {
 }
 
@@ -585,6 +583,8 @@ void SwitchInstruction::Write(CodeFormatter& formatter, Function& function, Cont
     formatter.Write(cond->GetType(context)->Name());
     formatter.Write(" ");
     formatter.Write(cond->Name());
+    formatter.Write(" ");
+    formatter.Write("@" + std::to_string(defaultDest->Id()));
     formatter.Write(", [");
     bool first = true;
     for (const auto& p : destinations)

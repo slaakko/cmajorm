@@ -48,6 +48,21 @@ namespace cmsx.assembly
             codes[".DATA"] = DATA;
             codes["LDA"] = LDA;
             codes["SET"] = SET;
+            names[IS] = "IS";
+            names[EXTERN] = "EXTERN";
+            names[LINKONCE] = "LINKONCE";
+            names[FUNC] = "FUNC";
+            names[ENDF] = "ENDF";
+            names[STRUCT] = "STRUCT";
+            names[ENDS] = "ENDS";
+            names[BYTE] = "BYTE";
+            names[WYDE] = "WYDE";
+            names[TETRA] = "TETRA";
+            names[OCTA] = "OCTA";
+            names[CODE] = ".CODE";
+            names[DATA] = ".DATA";
+            names[LDA] = "LDA";
+            names[SET] = "SET";
         }
         public nothrow int GetCode(const string& name) const
         {
@@ -58,8 +73,33 @@ namespace cmsx.assembly
             }
             return -1;
         }
+        public string GetName(int code) const
+        {
+            HashMap<int, string>.ConstIterator it = names.CFind(code);
+            if (it != names.CEnd())
+            {
+                return it->second;
+            }
+            else
+            {
+                throw Exception("name for code '" + ToString(code) + "' not found");
+            }
+        }
         private static UniquePtr<PseudoOpMap> instance;
         private HashMap<string, int> codes;
+        private HashMap<int, string> names;
+    }
+
+    public string GetOpCodeStr(int opCode)
+    {
+        if (opCode < 256)
+        {
+            return cmsx.machine.GetOpCodeName(cast<byte>(opCode));
+        }
+        else
+        {
+            return PseudoOpMap.Instance().GetName(opCode);
+        }
     }
 
     public abstract class Node

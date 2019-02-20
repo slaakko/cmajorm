@@ -1,0 +1,34 @@
+using System;
+
+namespace cmsx.util
+{
+    public inline nothrow ulong SignExtend<T>(T value) where System.Meta.IsBasicType<T>()
+    {
+        return cast<ulong>(cast<long>(value << (64 - 8 * sizeof(T))) >> (64 - 8 * sizeof(T)));
+    }
+
+    constexpr nothrow inline bool IsPowerOfTwo(ulong x)
+    {
+        ulong m = 2u;
+        while (m <= x)
+        {
+            if (x == m) return true;
+            ulong s = m << 1u;
+            if (s < m) return false;
+            m = s;
+        }
+        return false;
+    }
+
+    constexpr nothrow inline ulong Log2(ulong x)
+    {
+        ulong log2 = 0u;
+        x = x >> 1u;
+        while (x != 0u)
+        {
+            ++log2;
+            x = x >> 1u;
+        }
+        return log2;
+    }
+}

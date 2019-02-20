@@ -260,7 +260,7 @@ namespace cmsx.machine
             ulong zz = regs.Get(z);
             ulong a = yy + zz;
             byte b = mem.ReadByte(a, Protection.read);
-            ulong xx = SignExtend(b);
+            ulong xx = cmsx.util.SignExtend(b);
             regs.Set(x, xx);
         }
         public nothrow override bool IsAbsoluteAddressInst() const
@@ -280,7 +280,7 @@ namespace cmsx.machine
             ulong zz = z;
             ulong a = yy + zz;
             byte b = mem.ReadByte(a, Protection.read);
-            ulong xx = SignExtend(b);
+            ulong xx = cmsx.util.SignExtend(b);
             regs.Set(x, xx);
         }
         public nothrow override bool IsZReg() const
@@ -304,7 +304,7 @@ namespace cmsx.machine
             ulong zz = regs.Get(z);
             ulong a = yy + zz;
             ushort w = mem.ReadUShort(a, Protection.read);
-            ulong xx = SignExtend(w);
+            ulong xx = cmsx.util.SignExtend(w);
             regs.Set(x, xx);
         }
         public nothrow override bool IsAbsoluteAddressInst() const
@@ -324,7 +324,7 @@ namespace cmsx.machine
             ulong zz = z;
             ulong a = yy + zz;
             ushort w = mem.ReadUShort(a, Protection.read);
-            ulong xx = SignExtend(w);
+            ulong xx = cmsx.util.SignExtend(w);
             regs.Set(x, xx);
         }
         public nothrow override bool IsZReg() const
@@ -348,7 +348,7 @@ namespace cmsx.machine
             ulong zz = regs.Get(z);
             ulong a = yy + zz;
             uint u = mem.ReadUInt(a, Protection.read);
-            ulong xx = SignExtend(u);
+            ulong xx = cmsx.util.SignExtend(u);
             regs.Set(x, xx);
         }
         public nothrow override bool IsAbsoluteAddressInst() const
@@ -368,7 +368,7 @@ namespace cmsx.machine
             ulong zz = z;
             ulong a = yy + zz;
             uint u = mem.ReadUInt(a, Protection.read);
-            ulong xx = SignExtend(u);
+            ulong xx = cmsx.util.SignExtend(u);
             regs.Set(x, xx);
         }
         public nothrow override bool IsZReg() const
@@ -638,6 +638,22 @@ namespace cmsx.machine
         public nothrow override bool IsAbsoluteAddressInst() const
         {
             return true;
+        }
+    }
+
+    public class Ldsf : Instruction
+    {
+        public nothrow Ldsf() : base(LDSF)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong yy = regs.Get(y);
+            ulong zz = regs.Get(z);
+            ulong a = yy + zz;
+            uint u = mem.ReadUInt(a, Protection.read);
+            ulong xx = u;
+            regs.Set(x, xx);
         }
     }
 
@@ -1012,6 +1028,25 @@ namespace cmsx.machine
         public nothrow override bool IsZReg() const
         {
             return false;
+        }
+        public nothrow override bool IsAbsoluteAddressInst() const
+        {
+            return true;
+        }
+    }
+
+    public class Stsf : Instruction
+    {
+        public nothrow Stsf() : base(STSF)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong yy = regs.Get(y);
+            ulong zz = regs.Get(z);
+            ulong a = yy + zz;
+            uint u = cast<uint>(regs.Get(x) & 0xFFFFFFFFu);
+            mem.WriteUInt(a, u, Protection.write);
         }
         public nothrow override bool IsAbsoluteAddressInst() const
         {
@@ -3084,6 +3119,20 @@ namespace cmsx.machine
         }
     }
 
+    public class SFlot : Instruction
+    {
+        public nothrow SFlot() : base(SFLOT)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            long zz = cast<long>(regs.Get(z));
+            float xd = cast<float>(zz);
+            ulong xx = *cast<uint*>(cast<void*>(&xd));
+            regs.Set(x, xx);
+        }
+    }
+
     public class Floti : Instruction
     {
         public nothrow Floti() : base(FLOTI)
@@ -3102,6 +3151,20 @@ namespace cmsx.machine
         }
     }
 
+    public class SFloti : Instruction
+    {
+        public nothrow SFloti() : base(SFLOTI)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            long zz = z;
+            float xd = cast<float>(zz);
+            ulong xx = *cast<uint*>(cast<void*>(&xd));
+            regs.Set(x, xx);
+        }
+    }
+
     public class Flotu : Instruction
     {
         public nothrow Flotu() : base(FLOTU)
@@ -3112,6 +3175,20 @@ namespace cmsx.machine
             ulong zz = regs.Get(z);
             double xd = zz;
             ulong xx = *cast<ulong*>(cast<void*>(&xd));
+            regs.Set(x, xx);
+        }
+    }
+
+    public class SFlotu : Instruction
+    {
+        public nothrow SFlotu() : base(SFLOTU)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong zz = cast<ulong>(regs.Get(z));
+            float xd = cast<float>(zz);
+            ulong xx = *cast<uint*>(cast<void*>(&xd));
             regs.Set(x, xx);
         }
     }
@@ -3131,6 +3208,20 @@ namespace cmsx.machine
         public nothrow override bool IsZReg() const
         {
             return false;
+        }
+    }
+
+    public class SFlotui : Instruction
+    {
+        public nothrow SFlotui() : base(SFLOTUI)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong zz = z;
+            float xd = cast<float>(zz);
+            ulong xx = *cast<uint*>(cast<void*>(&xd));
+            regs.Set(x, xx);
         }
     }
 

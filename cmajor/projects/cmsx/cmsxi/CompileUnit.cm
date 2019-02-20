@@ -5,6 +5,8 @@ using CodeFormatter = System.Text.CodeFormatter;
 
 namespace cmsx.intermediate
 {
+    public const int printMachineCodeStage = 9999;
+
     public class CompileUnit
     {
         public nothrow CompileUnit(Context& context_) : context(context_)
@@ -50,10 +52,18 @@ namespace cmsx.intermediate
         }
         public void Print(int stage)
         {
-            string filePath = Path.ChangeExtension(fileName, ".i" + ToString(stage));
+            string filePath;
+            if (stage == printMachineCodeStage)
+            {
+                filePath = Path.ChangeExtension(fileName, ".is");
+            }
+            else
+            {
+                filePath = Path.ChangeExtension(fileName, ".i" + ToString(stage));
+            }
             StreamWriter writer = File.CreateText(filePath);
             CodeFormatter formatter(writer);
-            formatter.SetIndentSize(8);
+            formatter.SetIndentSize(5);
             context.PrintTypes(formatter);
             formatter.WriteLine();
             bool first = true;
@@ -67,11 +77,39 @@ namespace cmsx.intermediate
                 {
                     formatter.WriteLine();
                 }
-                function->Print(formatter);
+                function->Print(formatter, stage);
             }
             if (Flags.Get(Flag.verbose))
             {
                 Console.Out() << "==> " << filePath << endl();
+            }
+        }
+        public nothrow void ComputeLivenessAndNextUse()
+        {
+            for (const UniquePtr<Function>& function : functions)
+            {
+                function->ComputeLivenessAndNextUse();
+            }
+        }
+        public void GenerateCode(MachineCode& machineCode)
+        {
+            StreamWriter* writer = &Console.Out();
+            UniquePtr<StreamWriter> debugWriter;
+            if (Flags.Get(Flag.debug))
+            {
+                string filePath = Path.ChangeExtension(fileName, ".id");
+                debugWriter.Reset(new StreamWriter(File.CreateText(filePath)));
+                writer = debugWriter.Get();
+            }
+            CodeFormatter formatter(*writer);
+            for (const UniquePtr<Function>& function : functions)
+            {
+                function->GenerateDeclaration(machineCode);
+            }
+            for (const UniquePtr<Function>& function : functions)
+            {
+                machineCode.GetInstruction(separatorInstructionOpCode);
+                function->GenerateCode(machineCode, formatter);
             }
         }
         public Context& context;

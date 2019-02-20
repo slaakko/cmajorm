@@ -282,6 +282,7 @@ Type* TypeRepository::GetStructureType(const std::vector<Type*>& memberTypes)
     else
     {
         StructureType* structureType = new StructureType(types.size());
+        structureType->SetMemberTypes(memberTypes);
         structureTypeMap[memberTypes] = structureType;
         types.push_back(std::unique_ptr<Type>(structureType));
         return structureType;

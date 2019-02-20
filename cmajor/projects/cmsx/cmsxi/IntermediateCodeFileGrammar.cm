@@ -1244,6 +1244,8 @@ namespace cmsx.intermediate
                 NonterminalParser* condNonterminalParser = GetNonterminal(ToUtf32("cond"));
                 condNonterminalParser->SetPre(Precond);
                 condNonterminalParser->SetPost(Postcond);
+                NonterminalParser* defaultTargetNonterminalParser = GetNonterminal(ToUtf32("defaultTarget"));
+                defaultTargetNonterminalParser->SetPost(PostdefaultTarget);
                 NonterminalParser* caseTypeNonterminalParser = GetNonterminal(ToUtf32("caseType"));
                 caseTypeNonterminalParser->SetPre(PrecaseType);
                 caseTypeNonterminalParser->SetPost(PostcaseType);
@@ -1256,7 +1258,7 @@ namespace cmsx.intermediate
             public void A0Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                context->value = new SwitchInstruction(context->fromcond, span.lineNumber);
+                context->value = new SwitchInstruction(context->fromcond, context->fromdefaultTarget, span.lineNumber);
             }
             public void A1Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
@@ -1290,6 +1292,15 @@ namespace cmsx.intermediate
                 {
                     UniquePtr<Object> fromcond_value = stack.Pop();
                     context->fromcond = *cast<ValueObject<Value*>*>(fromcond_value.Get());
+                }
+            }
+            public void PostdefaultTarget(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                if (matched)
+                {
+                    UniquePtr<Object> fromdefaultTarget_value = stack.Pop();
+                    context->fromdefaultTarget = *cast<ValueObject<uint>*>(fromdefaultTarget_value.Get());
                 }
             }
             public void PrecaseType(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
@@ -1332,13 +1343,14 @@ namespace cmsx.intermediate
             }
             public class Context : System.Text.Parsing.Context
             {
-                public Context() : context(), value(), fromtype(), fromcond(), fromcaseType(), fromcaseValue(), fromcaseTarget()
+                public Context() : context(), value(), fromtype(), fromcond(), fromdefaultTarget(), fromcaseType(), fromcaseValue(), fromcaseTarget()
                 {
                 }
                 public cmsx.intermediate.Context* context;
                 public SwitchInstruction* value;
                 public Type* fromtype;
                 public Value* fromcond;
+                public uint fromdefaultTarget;
                 public Type* fromcaseType;
                 public Value* fromcaseValue;
                 public uint fromcaseTarget;
@@ -5041,6 +5053,12 @@ namespace cmsx.intermediate
                 NonterminalParser* strTypeIdNonterminalParser = GetNonterminal(ToUtf32("StrTypeId"));
                 strTypeIdNonterminalParser->SetPre(PreStrTypeId);
                 strTypeIdNonterminalParser->SetPost(PostStrTypeId);
+                NonterminalParser* longNonterminalParser = GetNonterminal(ToUtf32("long"));
+                longNonterminalParser->SetPost(Postlong);
+                NonterminalParser* szNonterminalParser = GetNonterminal(ToUtf32("sz"));
+                szNonterminalParser->SetPost(Postsz);
+                NonterminalParser* alNonterminalParser = GetNonterminal(ToUtf32("al"));
+                alNonterminalParser->SetPost(Postal);
             }
             public void A0Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
@@ -5066,15 +5084,45 @@ namespace cmsx.intermediate
                     context->fromStrTypeId = *cast<ValueObject<string>*>(fromStrTypeId_value.Get());
                 }
             }
+            public void Postlong(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                if (matched)
+                {
+                    UniquePtr<Object> fromlong_value = stack.Pop();
+                    context->fromlong = *cast<ValueObject<long>*>(fromlong_value.Get());
+                }
+            }
+            public void Postsz(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                if (matched)
+                {
+                    UniquePtr<Object> fromsz_value = stack.Pop();
+                    context->fromsz = *cast<ValueObject<long>*>(fromsz_value.Get());
+                }
+            }
+            public void Postal(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                if (matched)
+                {
+                    UniquePtr<Object> fromal_value = stack.Pop();
+                    context->fromal = *cast<ValueObject<long>*>(fromal_value.Get());
+                }
+            }
             public class Context : System.Text.Parsing.Context
             {
-                public Context() : typeId(), context(), memberTypeIds(), fromStrTypeId()
+                public Context() : typeId(), context(), memberTypeIds(), fromStrTypeId(), fromlong(), fromsz(), fromal()
                 {
                 }
                 public string typeId;
                 public cmsx.intermediate.Context* context;
                 public List<string> memberTypeIds;
                 public string fromStrTypeId;
+                public long fromlong;
+                public long fromsz;
+                public long fromal;
             }
         }
 
@@ -5107,6 +5155,10 @@ namespace cmsx.intermediate
                 NonterminalParser* elementTypeIdNonterminalParser = GetNonterminal(ToUtf32("elementTypeId"));
                 elementTypeIdNonterminalParser->SetPre(PreelementTypeId);
                 elementTypeIdNonterminalParser->SetPost(PostelementTypeId);
+                NonterminalParser* szNonterminalParser = GetNonterminal(ToUtf32("sz"));
+                szNonterminalParser->SetPost(Postsz);
+                NonterminalParser* alNonterminalParser = GetNonterminal(ToUtf32("al"));
+                alNonterminalParser->SetPost(Postal);
             }
             public void A0Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
@@ -5136,15 +5188,35 @@ namespace cmsx.intermediate
                     context->fromelementTypeId = *cast<ValueObject<string>*>(fromelementTypeId_value.Get());
                 }
             }
+            public void Postsz(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                if (matched)
+                {
+                    UniquePtr<Object> fromsz_value = stack.Pop();
+                    context->fromsz = *cast<ValueObject<long>*>(fromsz_value.Get());
+                }
+            }
+            public void Postal(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                if (matched)
+                {
+                    UniquePtr<Object> fromal_value = stack.Pop();
+                    context->fromal = *cast<ValueObject<long>*>(fromal_value.Get());
+                }
+            }
             public class Context : System.Text.Parsing.Context
             {
-                public Context() : typeId(), context(), fromsize(), fromelementTypeId()
+                public Context() : typeId(), context(), fromsize(), fromelementTypeId(), fromsz(), fromal()
                 {
                 }
                 public string typeId;
                 public cmsx.intermediate.Context* context;
                 public long fromsize;
                 public string fromelementTypeId;
+                public long fromsz;
+                public long fromal;
             }
         }
 
@@ -6658,13 +6730,18 @@ namespace cmsx.intermediate
                                                 new System.Text.Parsing.SequenceParser(
                                                     new System.Text.Parsing.SequenceParser(
                                                         new System.Text.Parsing.SequenceParser(
-                                                            new System.Text.Parsing.KeywordParser(ToUtf32("switch")),
+                                                            new System.Text.Parsing.SequenceParser(
+                                                                new System.Text.Parsing.SequenceParser(
+                                                                    new System.Text.Parsing.KeywordParser(ToUtf32("switch")),
+                                                                    new System.Text.Parsing.NonterminalParser(ToUtf32("S"), ToUtf32("S"), 0)),
+                                                                new System.Text.Parsing.ExpectationParser(
+                                                                    new System.Text.Parsing.NonterminalParser(ToUtf32("type"), ToUtf32("TypeExpr"), 1))),
                                                             new System.Text.Parsing.NonterminalParser(ToUtf32("S"), ToUtf32("S"), 0)),
                                                         new System.Text.Parsing.ExpectationParser(
-                                                            new System.Text.Parsing.NonterminalParser(ToUtf32("type"), ToUtf32("TypeExpr"), 1))),
+                                                            new System.Text.Parsing.NonterminalParser(ToUtf32("cond"), ToUtf32("Value"), 2))),
                                                     new System.Text.Parsing.NonterminalParser(ToUtf32("S"), ToUtf32("S"), 0)),
                                                 new System.Text.Parsing.ExpectationParser(
-                                                    new System.Text.Parsing.NonterminalParser(ToUtf32("cond"), ToUtf32("Value"), 2))))),
+                                                    new System.Text.Parsing.NonterminalParser(ToUtf32("defaultTarget"), ToUtf32("Label"), 0))))),
                                     new System.Text.Parsing.ExpectationParser(
                                         new System.Text.Parsing.NonterminalParser(ToUtf32("Comma"), ToUtf32("Comma"), 0))),
                                 new System.Text.Parsing.ExpectationParser(
@@ -7232,36 +7309,79 @@ namespace cmsx.intermediate
                                 new System.Text.Parsing.NonterminalParser(ToUtf32("ArrayType"), ToUtf32("ArrayType"), 2)),
                             new System.Text.Parsing.NonterminalParser(ToUtf32("FunctionType"), ToUtf32("FunctionType"), 2))))));
             AddRule(new StructureTypeRule(ToUtf32("StructureType"), GetScope(), Domain()->GetNextRuleId(),
-                new System.Text.Parsing.ActionParser(ToUtf32("A0"),
-                    new System.Text.Parsing.GroupingParser(
-                        new System.Text.Parsing.SequenceParser(
+                new System.Text.Parsing.SequenceParser(
+                    new System.Text.Parsing.ActionParser(ToUtf32("A0"),
+                        new System.Text.Parsing.GroupingParser(
                             new System.Text.Parsing.SequenceParser(
-                                new System.Text.Parsing.CharParser('{'),
-                                new System.Text.Parsing.OptionalParser(
-                                    new System.Text.Parsing.GroupingParser(
-                                        new System.Text.Parsing.ListParser(
-                                            new System.Text.Parsing.ActionParser(ToUtf32("A1"),
-                                                new System.Text.Parsing.ExpectationParser(
-                                                    new System.Text.Parsing.NonterminalParser(ToUtf32("StrTypeId"), ToUtf32("StrTypeId"), 1))),
-                                            new System.Text.Parsing.CharParser(','))))),
-                            new System.Text.Parsing.ExpectationParser(
-                                new System.Text.Parsing.CharParser('}')))))));
-            AddRule(new ArrayTypeRule(ToUtf32("ArrayType"), GetScope(), Domain()->GetNextRuleId(),
-                new System.Text.Parsing.ActionParser(ToUtf32("A0"),
-                    new System.Text.Parsing.GroupingParser(
-                        new System.Text.Parsing.SequenceParser(
+                                new System.Text.Parsing.SequenceParser(
+                                    new System.Text.Parsing.CharParser('{'),
+                                    new System.Text.Parsing.OptionalParser(
+                                        new System.Text.Parsing.GroupingParser(
+                                            new System.Text.Parsing.ListParser(
+                                                new System.Text.Parsing.GroupingParser(
+                                                    new System.Text.Parsing.SequenceParser(
+                                                        new System.Text.Parsing.ActionParser(ToUtf32("A1"),
+                                                            new System.Text.Parsing.ExpectationParser(
+                                                                new System.Text.Parsing.NonterminalParser(ToUtf32("StrTypeId"), ToUtf32("StrTypeId"), 1))),
+                                                        new System.Text.Parsing.OptionalParser(
+                                                            new System.Text.Parsing.GroupingParser(
+                                                                new System.Text.Parsing.SequenceParser(
+                                                                    new System.Text.Parsing.SequenceParser(
+                                                                        new System.Text.Parsing.SequenceParser(
+                                                                            new System.Text.Parsing.CharParser(':'),
+                                                                            new System.Text.Parsing.StringParser(ToUtf32("offset"))),
+                                                                        new System.Text.Parsing.CharParser('=')),
+                                                                    new System.Text.Parsing.NonterminalParser(ToUtf32("long"), ToUtf32("long"), 0)))))),
+                                                new System.Text.Parsing.CharParser(','))))),
+                                new System.Text.Parsing.ExpectationParser(
+                                    new System.Text.Parsing.CharParser('}'))))),
+                    new System.Text.Parsing.OptionalParser(
+                        new System.Text.Parsing.GroupingParser(
                             new System.Text.Parsing.SequenceParser(
                                 new System.Text.Parsing.SequenceParser(
                                     new System.Text.Parsing.SequenceParser(
-                                        new System.Text.Parsing.CharParser('['),
+                                        new System.Text.Parsing.SequenceParser(
+                                            new System.Text.Parsing.SequenceParser(
+                                                new System.Text.Parsing.SequenceParser(
+                                                    new System.Text.Parsing.KeywordParser(ToUtf32("size")),
+                                                    new System.Text.Parsing.CharParser('=')),
+                                                new System.Text.Parsing.NonterminalParser(ToUtf32("sz"), ToUtf32("long"), 0)),
+                                            new System.Text.Parsing.CharParser(',')),
+                                        new System.Text.Parsing.KeywordParser(ToUtf32("alignment"))),
+                                    new System.Text.Parsing.CharParser('=')),
+                                new System.Text.Parsing.NonterminalParser(ToUtf32("al"), ToUtf32("long"), 0)))))));
+            AddRule(new ArrayTypeRule(ToUtf32("ArrayType"), GetScope(), Domain()->GetNextRuleId(),
+                new System.Text.Parsing.SequenceParser(
+                    new System.Text.Parsing.ActionParser(ToUtf32("A0"),
+                        new System.Text.Parsing.GroupingParser(
+                            new System.Text.Parsing.SequenceParser(
+                                new System.Text.Parsing.SequenceParser(
+                                    new System.Text.Parsing.SequenceParser(
+                                        new System.Text.Parsing.SequenceParser(
+                                            new System.Text.Parsing.CharParser('['),
+                                            new System.Text.Parsing.ExpectationParser(
+                                                new System.Text.Parsing.NonterminalParser(ToUtf32("size"), ToUtf32("long"), 0))),
                                         new System.Text.Parsing.ExpectationParser(
-                                            new System.Text.Parsing.NonterminalParser(ToUtf32("size"), ToUtf32("long"), 0))),
+                                            new System.Text.Parsing.CharParser('x'))),
                                     new System.Text.Parsing.ExpectationParser(
-                                        new System.Text.Parsing.CharParser('x'))),
+                                        new System.Text.Parsing.NonterminalParser(ToUtf32("elementTypeId"), ToUtf32("StrTypeId"), 1))),
                                 new System.Text.Parsing.ExpectationParser(
-                                    new System.Text.Parsing.NonterminalParser(ToUtf32("elementTypeId"), ToUtf32("StrTypeId"), 1))),
-                            new System.Text.Parsing.ExpectationParser(
-                                new System.Text.Parsing.CharParser(']')))))));
+                                    new System.Text.Parsing.CharParser(']'))))),
+                    new System.Text.Parsing.OptionalParser(
+                        new System.Text.Parsing.GroupingParser(
+                            new System.Text.Parsing.SequenceParser(
+                                new System.Text.Parsing.SequenceParser(
+                                    new System.Text.Parsing.SequenceParser(
+                                        new System.Text.Parsing.SequenceParser(
+                                            new System.Text.Parsing.SequenceParser(
+                                                new System.Text.Parsing.SequenceParser(
+                                                    new System.Text.Parsing.KeywordParser(ToUtf32("size")),
+                                                    new System.Text.Parsing.CharParser('=')),
+                                                new System.Text.Parsing.NonterminalParser(ToUtf32("sz"), ToUtf32("long"), 0)),
+                                            new System.Text.Parsing.CharParser(',')),
+                                        new System.Text.Parsing.KeywordParser(ToUtf32("alignment"))),
+                                    new System.Text.Parsing.CharParser('=')),
+                                new System.Text.Parsing.NonterminalParser(ToUtf32("al"), ToUtf32("long"), 0)))))));
             AddRule(new FunctionTypeRule(ToUtf32("FunctionType"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.ActionParser(ToUtf32("A0"),
                     new System.Text.Parsing.GroupingParser(

@@ -12,10 +12,14 @@ namespace System.IO
         public StreamWriter(const SharedPtr<ByteStream>& stream_) : stream(stream_)
         {
         }
+        public void Write(const char* x, long length)
+        {
+            void* buf = x;
+            stream->Write(cast<byte*>(buf), length);
+        }
         public void Write(const string& x)
         {
-            void* buf = x.Chars();
-            stream->Write(cast<byte*>(buf), x.Length());
+            Write(x.Chars(), x.Length());
         }
         public void Write(const wstring& x)
         {
@@ -91,7 +95,7 @@ namespace System.IO
         }
         public void WriteLine()
         {
-            Write("\n");
+            Write("\n", 1);
         }
         public void WriteLine(const string& x)
         {

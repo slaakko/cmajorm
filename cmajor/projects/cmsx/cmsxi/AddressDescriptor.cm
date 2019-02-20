@@ -1,0 +1,170 @@
+using System;
+using System.IO;
+using System.Collections;
+using CodeFormatter = System.Text.CodeFormatter;
+
+namespace cmsx.intermediate
+{
+    public class AddressDescriptor
+    {
+        public nothrow AddressDescriptor(Value* variable_) : variable(variable_)
+        {
+        }
+        public void DebugPrint(CodeFormatter& formatter)
+        {
+            formatter << "addr." << variable->Name() << "(";
+            bool first = true;
+            for (Location* location : locations)
+            {
+                if (first)
+                {
+                    first = false;
+                }
+                else
+                {
+                    formatter << ", ";
+                }
+                location->DebugPrint(formatter);
+            }
+            formatter << ")";
+        }
+        public void AddLocation(Location* location)
+        {
+            for (Location* loc : locations)
+            {
+                if (loc == location) return;
+            }
+            locations.Add(location);
+        }
+        public void SetLocation(Location* location)
+        {
+            locations.Clear();
+            locations.Add(location);
+        }
+        public nothrow Location* GetLocation() const
+        {
+            Location* location = null;
+            for (Location* loc : locations)
+            {
+                if (loc is Register*)
+                {
+                    return loc;
+                }
+                else
+                {
+                    location = loc;
+                }
+            }
+            return location;
+        }
+        public nothrow Location* GetMemoryLocation() const
+        {
+            Location* location = null;
+            for (Location* loc : locations)
+            {
+                if (loc is MemoryLocation*)
+                {
+                    return loc;
+                }
+                else
+                {
+                    location = loc;
+                }
+            }
+            return location;
+        }
+        public nothrow bool HasLocation(Location* location) const
+        {
+            for (Location* loc : locations)
+            {
+                if (loc == location) return true;
+            }
+            return false;
+        }
+        public inline nothrow bool IsEmpty() const
+        {
+            return locations.IsEmpty();
+        }
+        public nothrow void RemoveLocation(Location* location)
+        {
+            List<Location*>.Iterator it = Find(locations.Begin(), locations.End(), location);
+            if (it != locations.End())
+            {
+                locations.Remove(it);
+            }
+        }
+        public nothrow void RemoveRegisterLocations()
+        {
+            List<Location*> newLocations;
+            for (Location* location : locations)
+            {
+                if (!(location is Register*))
+                {
+                    newLocations.Add(location);
+                }
+            }
+            Swap(locations, newLocations);
+        }
+        public Value* variable;
+        public List<Location*> locations;
+    }
+
+    public class AddressDescriptors
+    {
+        public default nothrow AddressDescriptors();
+        suppress AddressDescriptors(const AddressDescriptors&);
+        suppress void operator=(const AddressDescriptors&);
+        suppress AddressDescriptors(AddressDescriptors&&);
+        suppress void operator=(AddressDescriptors&&);
+        public AddressDescriptor* GetAddressDescriptor(Value* value)
+        {
+            HashMap<Value*, AddressDescriptor*>.ConstIterator it = addressDescriptorMap.CFind(value);
+            if (it != addressDescriptorMap.CEnd())
+            {
+                return it->second;
+            }
+            AddressDescriptor* addressDescriptor = new AddressDescriptor(value);
+            addressDescriptors.Add(UniquePtr<AddressDescriptor>(addressDescriptor));
+            addressDescriptorMap[value] = addressDescriptor;
+            return addressDescriptor;
+        }
+        public void RemoveRegisterFromAllBut(Value* x, Register* rx)
+        {
+            for (const UniquePtr<AddressDescriptor>& addressDescriptor : addressDescriptors)
+            {
+                if (addressDescriptor->variable != x)
+                {
+                    addressDescriptor->RemoveLocation(rx);
+                }
+            }
+        }
+        public nothrow void RemoveRegister(Register* reg)
+        {
+            for (const UniquePtr<AddressDescriptor>& addressDescriptor : addressDescriptors)
+            {
+                addressDescriptor->RemoveLocation(reg);
+            }
+        }
+        public nothrow void RemoveRegisterLocations()
+        {
+            for (const UniquePtr<AddressDescriptor>& addressDescriptor : addressDescriptors)
+            {
+                addressDescriptor->RemoveRegisterLocations();
+            }
+        }
+        public void DebugPrint(CodeFormatter& formatter)
+        {
+            formatter << "address descriptors: { " << endl();
+            formatter.IncIndent();
+            for (const UniquePtr<AddressDescriptor>& descriptor : addressDescriptors)
+            {
+                descriptor->DebugPrint(formatter);
+                formatter << endl();
+            }
+            formatter.DecIndent();
+            formatter << "}" << endl();
+        }
+        private List<UniquePtr<AddressDescriptor>> addressDescriptors;
+        private HashMap<Value*, AddressDescriptor*> addressDescriptorMap;
+    }
+}

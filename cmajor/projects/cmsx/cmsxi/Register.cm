@@ -1,0 +1,128 @@
+using System;
+using CodeFormatter = System.Text.CodeFormatter;
+
+namespace cmsx.intermediate
+{
+    public abstract class Register : Location
+    {
+        public nothrow Register(const string& name_) : name(name_)
+        {
+        }
+        public override void DebugPrint(CodeFormatter& formatter)
+        {
+            formatter << "reg." << name;
+        }
+        public nothrow override void Print(CodeFormatter& formatter)
+        {
+            formatter << name;
+        }
+        public override void GenerateLoad(int loadOpCode, Register* destinationReg, MachineCode& machineCode)
+        {
+            MachineInstruction* loadInstruction = machineCode.GetInstruction(loadOpCode);
+            loadInstruction->AddOperand(destinationReg);
+            loadInstruction->AddOperand(this);
+            loadInstruction->AddOperand(machineCode.context.GetLiteralOperand(0u));
+        }
+        public override void GenerateLoadAddress(Register* destinationReg, MachineCode& machineCode)
+        {
+            MachineInstruction* setInstruction = machineCode.GetInstruction(cmsx.assembly.SET);
+            setInstruction->AddOperand(destinationReg);
+            setInstruction->AddOperand(this);
+        }
+        public override void GenerateStore(int storeOpCode, Register* valueReg, MachineCode& machineCode)
+        {
+            MachineInstruction* storeInstruction = machineCode.GetInstruction(storeOpCode);
+            storeInstruction->AddOperand(valueReg);
+            storeInstruction->AddOperand(this);
+            storeInstruction->AddOperand(machineCode.context.GetLiteralOperand(0u));
+        }
+        public string name;
+    }
+
+    public abstract class ParamRegister : Register
+    {
+        public nothrow ParamRegister(const string& name_) : base(name_)
+        {
+        }
+    }
+
+    public class Ix : Register
+    {
+        public nothrow Ix() : base("ix")
+        {
+        }
+    }
+
+    public class FP : Register
+    {
+        public nothrow FP() : base("fp")
+        {
+        }
+    }
+
+    public class SP : Register
+    {
+        public nothrow SP() : base("sp")
+        {
+        }
+    }
+
+    public class LocalRegister : Register
+    {
+        public nothrow LocalRegister(byte number_) : base("$" + ToString(number_)), number(number_)
+        {
+        }
+        public byte number;
+    }
+
+    public class Registers
+    {
+        public nothrow Registers()
+        {
+            paramRegisters.Add(ParamRegister("ax"));
+            paramRegisters.Add(ParamRegister("bx"));
+            paramRegisters.Add(ParamRegister("cx"));
+            paramRegisters.Add(ParamRegister("dx"));
+            paramRegisters.Add(ParamRegister("ex"));
+            byte n = Flags.NumLocalRegs();
+            for (byte i = 0u; i < n; ++i)
+            {
+                localRegisters.Add(LocalRegister(i));
+            }
+        }
+        public nothrow inline byte GetNumParamRegisters() const
+        {
+            return cast<byte>(paramRegisters.Count());
+        }
+        public nothrow inline ParamRegister* GetParamRegister(byte index) const
+        {
+            return &paramRegisters[index];
+        }
+        public nothrow inline byte GetNumLocalRegisters() const
+        {
+            return cast<byte>(localRegisters.Count());
+        }
+        public nothrow inline LocalRegister* GetLocalRegister(byte index)
+        {
+            return &localRegisters[index];
+        }
+        public nothrow inline Ix* GetIx()
+        {
+            return &ix;
+        }
+        public nothrow inline FP* GetFP()
+        {
+            return &fp;
+        }
+        public nothrow inline SP* GetSP()
+        {
+            return &sp;
+        }
+        private List<ParamRegister> paramRegisters;
+        private List<LocalRegister> localRegisters;
+        private Ix ix;
+        private FP fp;
+        private SP sp;
+    }
+}
+

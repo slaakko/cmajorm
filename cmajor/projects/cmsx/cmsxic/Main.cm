@@ -26,6 +26,8 @@ void PrintHelp()
         "--optimization-level=N (-O=N)" << endl() <<
         "   Set optimization level to N=0-3." << endl() <<
         "   Default is 0." << endl() <<
+        "--local-regs=N (-l=N)" << endl() <<
+        "   Set number of local registers to N, where N must be >= 4." << endl() <<
         endl();
 }
 
@@ -57,27 +59,39 @@ int main(int argc, const char** argv)
                         }
                         cmsx.intermediate.Flags.SetOptimizationLevel(level);
                     }
-                }
-                if (arg ==  "--help" || arg == "-h")
-                {
-                    PrintHelp();
-                    return 0;
-                }
-                else if (arg == "--verbose" || arg == "-v")
-                {
-                    cmsx.intermediate.Flags.Set(cmsx.intermediate.Flag.verbose);
-                }
-                else if (arg == "--debug" || arg == "-d")
-                {
-                    cmsx.intermediate.Flags.Set(cmsx.intermediate.Flag.debug);
-                }
-                else if (arg == "--stages" || arg == "-s")
-                {
-                    cmsx.intermediate.Flags.Set(cmsx.intermediate.Flag.stages);
+                    else if (option == "--local-regs" || option == "-l")
+                    {
+                        byte numLocalRegs = ParseByte(value);
+                        cmsx.intermediate.Flags.SetNumLocalRegs(numLocalRegs);
+                    }
+                    else
+                    {
+                        throw Exception("unknown option '" + arg + "'");
+                    }
                 }
                 else
                 {
-                    throw Exception("unknown option '" + arg + "'");
+                    if (arg ==  "--help" || arg == "-h")
+                    {
+                        PrintHelp();
+                        return 0;
+                    }
+                    else if (arg == "--verbose" || arg == "-v")
+                    {
+                        cmsx.intermediate.Flags.Set(cmsx.intermediate.Flag.verbose);
+                    }
+                    else if (arg == "--debug" || arg == "-d")
+                    {
+                        cmsx.intermediate.Flags.Set(cmsx.intermediate.Flag.debug);
+                    }
+                    else if (arg == "--stages" || arg == "-s")
+                    {
+                        cmsx.intermediate.Flags.Set(cmsx.intermediate.Flag.stages);
+                    }
+                    else
+                    {
+                        throw Exception("unknown option '" + arg + "'");
+                    }
                 }
             }
             else
