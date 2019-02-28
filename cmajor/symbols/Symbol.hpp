@@ -55,7 +55,7 @@ enum class SymbolType : uint8_t
     basicTypeReturn,
     basicTypeImplicitSignExtension, basicTypeImplicitZeroExtension, basicTypeExplicitSignExtension, basicTypeExplicitZeroExtension, basicTypeTruncation, basicTypeBitCast,
     basicTypeImplicitUnsignedIntToFloating, basicTypeImplicitSignedIntToFloating, basicTypeExplicitUnsignedIntToFloating, basicTypeExplicitSignedIntToFloating, 
-    basicTypeFloatingToUnsignedInt, basicTypeFloatingToSignedInt, basicTypeFloatingExtension, basicTypeFloatingTruncation, 
+    basicTypeFloatingToUnsignedInt, basicTypeFloatingToSignedInt, basicTypeFloatingExtension, basicTypeFloatingTruncation, trap,
     enumTypeDefaultConstructor, enumTypeCopyConstructor, enumTypeMoveConstructor, enumTypeCopyAssignment, enumTypeMoveAssignment, enumTypeReturn, enumTypeEquality, 
     enumTypeToUnderlyingType, underlyingToEnumType, 
     delegateTypeDefaultConstructor, delegateTypeCopyConstructor, delegateTypeMoveConstructor, delegateTypeCopyAssignment, delegateTypeMoveAssignment, delegateTypeReturn, delegateTypeEquality,

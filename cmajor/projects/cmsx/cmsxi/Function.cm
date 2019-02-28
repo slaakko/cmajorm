@@ -10,7 +10,7 @@ namespace cmsx.intermediate
     public class Function
     {
         public nothrow Function(Context& context_, FunctionType* type_, const string& name_) :
-            context(context_), type(type_), name(name_), addressDescriptors(), locations(context.regs), nextValueNumber(0), nextInstructionIndex(0), frameSizeOperand(null),
+            context(context_), type(type_), name(name_), addressDescriptors(), frameLocations(context.regs), nextValueNumber(0), nextInstructionIndex(0), nextArgIndex(0), frameSizeOperand(null),
             prolog(*this, prologId), epilog(*this, epilogId)
         {
         }
@@ -146,6 +146,14 @@ namespace cmsx.intermediate
         {
             return nextValueNumber++;
         }
+        public nothrow inline int GetNextArgIndex()
+        {
+            return nextArgIndex++;
+        }
+        public nothrow inline void ResetNextArgIndex()
+        {
+             nextArgIndex = 0;
+        }
         public nothrow void ComputeLivenessAndNextUse()
         {
             for (const UniquePtr<BasicBlock>& bb : basicBlocks)
@@ -155,7 +163,7 @@ namespace cmsx.intermediate
         }
         public void GenerateDeclaration(MachineCode& machineCode)
         {
-            MachineInstruction* externInst = machineCode.GetInstruction(cmsx.assembly.EXTERN);
+            MachineInstruction* externInst = machineCode.GetInstruction(cmsx.assembly.EXTERN, null);
             externInst->AddOperand(machineCode.context.GetSymbolOperand(name));
         }
         public void GenerateCode(MachineCode& machineCode, CodeFormatter& formatter)
@@ -180,19 +188,19 @@ namespace cmsx.intermediate
                 formatter.WriteLine("}");
             }
             CreateEpilog(machineCode);
-            frameSizeOperand->SetValue(cast<ulong>(locations.offset));
+            frameSizeOperand->SetValue(cast<ulong>(frameLocations.paramOffset));
         }
         private void CreateProlog(MachineCode& machineCode)
         {
             MachineInstruction* funcInst = machineCode.GetInstruction(cmsx.assembly.FUNC, name);
-            MachineInstruction* stoInst = machineCode.GetInstruction(cmsx.machine.STO);
+            MachineInstruction* stoInst = machineCode.GetInstruction(cmsx.machine.STO, null);
             stoInst->AddOperand(context.regs.GetFP());
             stoInst->AddOperand(context.regs.GetSP());
             stoInst->AddOperand(context.GetLiteralOperand(0u));
-            MachineInstruction* setInst = machineCode.GetInstruction(cmsx.assembly.SET);
+            MachineInstruction* setInst = machineCode.GetInstruction(cmsx.assembly.SET, null);
             setInst->AddOperand(context.regs.GetFP());
             setInst->AddOperand(context.regs.GetSP());
-            MachineInstruction* inclInst = machineCode.GetInstruction(cmsx.machine.INCL);
+            MachineInstruction* inclInst = machineCode.GetInstruction(cmsx.machine.INCL, null);
             inclInst->AddOperand(context.regs.GetSP());
             frameSizeOperand = context.CreateLiteralOperand();
             inclInst->AddOperand(frameSizeOperand);
@@ -203,7 +211,11 @@ namespace cmsx.intermediate
             MachineInstruction* setInst = machineCode.GetInstruction(cmsx.assembly.SET, epilog.Name());
             setInst->AddOperand(context.regs.GetSP());
             setInst->AddOperand(context.regs.GetFP());
-            machineCode.GetInstruction(cmsx.machine.RET);
+            MachineInstruction* loadFPInst = machineCode.GetInstruction(cmsx.machine.LDO, null);
+            loadFPInst->AddOperand(context.regs.GetFP());
+            loadFPInst->AddOperand(context.regs.GetSP());
+            loadFPInst->AddOperand(context.GetLiteralOperand(0u));
+            machineCode.GetInstruction(cmsx.machine.RET, null);
             machineCode.GetInstruction(cmsx.assembly.ENDF, name);
             epilog.SetEmpty(false);
         }
@@ -211,7 +223,7 @@ namespace cmsx.intermediate
         public FunctionType* type;
         public string name;
         public AddressDescriptors addressDescriptors;
-        public Locations locations;
+        public FrameLocations frameLocations;
         public BasicBlock prolog;
         public BasicBlock epilog;
         private List<UniquePtr<BasicBlock>> basicBlocks;
@@ -220,6 +232,7 @@ namespace cmsx.intermediate
         private HashMap<uint, Instruction*> instructionMap;
         private int nextInstructionIndex;
         private int nextValueNumber;
+        private int nextArgIndex;
         private LiteralOperand* frameSizeOperand;
     }
 }

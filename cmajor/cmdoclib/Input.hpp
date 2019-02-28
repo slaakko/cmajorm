@@ -5,14 +5,15 @@
 
 #ifndef CMAJOR_CMDOCLIB_INPUT_INCLUDED
 #define CMAJOR_CMDOCLIB_INPUT_INCLUDED
+#include <cmajor/cmdoclib/CmDocLibApi.hpp>
 #include <cmajor/dom/Document.hpp>
 #include <mutex>
 
 namespace cmajor { namespace cmdoclib {
 
-std::mutex& GetInputMutex();
+CMDOCLIB_API std::mutex& GetInputMutex();
 
-struct Input
+struct CMDOCLIB_API Input
 {
     std::string baseDir;
     std::string solutionFilePath;
@@ -26,10 +27,10 @@ struct Input
     std::vector<std::unique_ptr<dom::Document>> externalModuleDocs;
 };
 
-Input ReadInputXml(const std::string& cmDocFilePath);
-void SetInputPtr(Input* inputPtr);
-Input* GetInputPtr();
-void SetEmptyLibraryPrefix(const std::u32string& moduleName);
+CMDOCLIB_API Input ReadInputXml(const std::string& cmDocFilePath);
+CMDOCLIB_API void SetInputPtr(Input* inputPtr);
+CMDOCLIB_API Input* GetInputPtr();
+CMDOCLIB_API void SetEmptyLibraryPrefix(const std::u32string& moduleName);
 
 } } // namespace cmajor::cmdoclib
 

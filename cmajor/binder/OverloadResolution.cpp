@@ -477,8 +477,12 @@ bool FindConversions(BoundCompileUnit& boundCompileUnit, FunctionSymbol* functio
         functionMatch.referenceMustBeInitialized = true;
         return false;
     }
-    Assert(arity == function->Arity(), "wrong arity");
-    for (int i = 0; i < arity; ++i)
+    int n = std::min(arity, function->Arity());
+    if (!function->IsVarArg())
+    {
+        Assert(arity == function->Arity(), "wrong arity");
+    }
+    for (int i = 0; i < n; ++i)
     {
         BoundExpression* argument = arguments[i].get();
         TypeSymbol* sourceType = argument->GetType();
@@ -922,7 +926,8 @@ std::unique_ptr<BoundFunctionCall> CreateBoundFunctionCall(FunctionSymbol* bestF
     Module* module = &boundCompileUnit.GetModule();
     std::unique_ptr<BoundFunctionCall> boundFunctionCall(new BoundFunctionCall(module, span, bestFun));
     int arity = arguments.size();
-    for (int i = 0; i < arity; ++i)
+    int n = std::min(arity, bestFun->Arity());
+    for (int i = 0; i < n; ++i)
     {
         std::unique_ptr<BoundExpression>& argument = arguments[i];
         if (i == 0 && !bestFun->IsConstructorDestructorOrNonstaticMemberFunction() && 
@@ -1115,6 +1120,11 @@ std::unique_ptr<BoundFunctionCall> CreateBoundFunctionCall(FunctionSymbol* bestF
                 argument.reset(new BoundAddressOfExpression(module, std::move(argument), type));
             }
         }
+        boundFunctionCall->AddArgument(std::move(argument));
+    }
+    for (int i = n; i < arity; ++i)
+    {
+        std::unique_ptr<BoundExpression>& argument = arguments[i];
         boundFunctionCall->AddArgument(std::move(argument));
     }
     if (boundFunction)

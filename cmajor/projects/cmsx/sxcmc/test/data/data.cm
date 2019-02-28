@@ -1,0 +1,37 @@
+public const int[3] three = [ 1, 2, 3 ];
+
+class Bar
+{
+    public nothrow Bar() : i(1), v(2)
+    {
+    }
+    public constexpr nothrow Bar(int i_, long v_) : i(i_), v(v_)
+    {
+    }
+    public int i;
+    public long v;
+}
+
+public const Bar bar = { 2, 3 };
+
+class Foo
+{
+    static nothrow Foo() : x(1), y(true), bar(), bytes()
+    {
+    }
+    public static int x;
+    public static bool y;
+    public static Bar bar;
+    public static byte[16] bytes;
+}
+
+void foo()
+{
+    Foo f;
+    int x = f.x;
+    bool y = f.y;
+    Bar& b = f.bar;
+    int i = b.i;
+    long v = b.v;
+    byte z = f.bytes[0];
+}

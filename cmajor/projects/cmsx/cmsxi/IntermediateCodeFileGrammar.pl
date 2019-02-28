@@ -4,6 +4,7 @@ namespace cmsx.intermediate
     {
         IntermediateCodeFile(cmsx.intermediate.Context* context);
         TypeDeclarations(cmsx.intermediate.Context* context);
+        DataDefinitions(cmsx.intermediate.Context* context);
         Functions(cmsx.intermediate.Context* context);
         Function(cmsx.intermediate.Context* context);
         FunctionHeader(cmsx.intermediate.Context* context) : Function*;
@@ -51,6 +52,7 @@ namespace cmsx.intermediate
         PtrOffsetInstruction(cmsx.intermediate.Context* context, Value* result) : Instruction*;
         PtrDiffInstruction(cmsx.intermediate.Context* context, Value* result) : Instruction*;
         FunctionCallInstruction(cmsx.intermediate.Context* context, Value* result) : Instruction*;
+        TrapInstruction(cmsx.intermediate.Context* context, Value* result) : Instruction*;
         Operand(cmsx.intermediate.Context* context) : Value*;
         Label : uint;
         Value(cmsx.intermediate.Context* context, Type* type) : Value*;
@@ -81,5 +83,32 @@ namespace cmsx.intermediate
         ULongType(cmsx.intermediate.Context* context) : Type*;
         FloatType(cmsx.intermediate.Context* context) : Type*;
         DoubleType(cmsx.intermediate.Context* context) : Type*;
+        DataDefinition(cmsx.intermediate.Context* context);
+        Constant(cmsx.intermediate.Context* context) : ConstantValue*;
+        BoolConstant(cmsx.intermediate.Context* context) : ConstantValue*;
+        BoolValue : bool;
+        SByteConstant(cmsx.intermediate.Context* context) : ConstantValue*;
+        SByteValue : sbyte;
+        ByteConstant(cmsx.intermediate.Context* context) : ConstantValue*;
+        ByteValue : byte;
+        ShortConstant(cmsx.intermediate.Context* context) : ConstantValue*;
+        ShortValue : short;
+        UShortConstant(cmsx.intermediate.Context* context) : ConstantValue*;
+        UShortValue : ushort;
+        IntConstant(cmsx.intermediate.Context* context) : ConstantValue*;
+        IntValue : int;
+        UIntConstant(cmsx.intermediate.Context* context) : ConstantValue*;
+        UIntValue : uint;
+        LongConstant(cmsx.intermediate.Context* context) : ConstantValue*;
+        LongValue : long;
+        ULongConstant(cmsx.intermediate.Context* context) : ConstantValue*;
+        ULongValue : ulong;
+        FloatConstant(cmsx.intermediate.Context* context) : ConstantValue*;
+        FloatValue : float;
+        DoubleConstant(cmsx.intermediate.Context* context) : ConstantValue*;
+        DoubleValue : double;
+        PtrConstant(cmsx.intermediate.Context* context) : ConstantValue*;
+        ArrayConstant(cmsx.intermediate.Context* context) : ArrayValue*;
+        StructureConstant(cmsx.intermediate.Context* context) : StructureValue*;
     }
 }

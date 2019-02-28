@@ -38,7 +38,7 @@ public:
     Type(int id_);
     virtual ~Type();
     virtual std::string Name() const;
-    virtual Value* DefaultValue();
+    virtual ConstantValue* DefaultValue();
     int Id() const { return id; }
     void Write(CodeFormatter& formatter);
     virtual void WriteDeclaration(CodeFormatter& formatter);
@@ -67,7 +67,7 @@ class CMSXI_API BoolType : public PrimitiveType
 {
 public:
     BoolType();
-    Value* DefaultValue() override { return &defaultValue; }
+    ConstantValue* DefaultValue() override { return &defaultValue; }
 private:
     BoolValue defaultValue;
 };
@@ -76,7 +76,7 @@ class CMSXI_API SByteType : public PrimitiveType
 {
 public:
     SByteType();
-    Value* DefaultValue() override { return &defaultValue; }
+    ConstantValue* DefaultValue() override { return &defaultValue; }
 private:
     SByteValue defaultValue;
 };
@@ -85,7 +85,7 @@ class CMSXI_API ByteType : public PrimitiveType
 {
 public:
     ByteType();
-    Value* DefaultValue() override { return &defaultValue; }
+    ConstantValue* DefaultValue() override { return &defaultValue; }
 private:
     ByteValue defaultValue;
 };
@@ -94,7 +94,7 @@ class CMSXI_API ShortType : public PrimitiveType
 {
 public:
     ShortType();
-    Value* DefaultValue() override { return &defaultValue; }
+    ConstantValue* DefaultValue() override { return &defaultValue; }
 private:
     ShortValue defaultValue;
 };
@@ -103,7 +103,7 @@ class CMSXI_API UShortType : public PrimitiveType
 {
 public:
     UShortType();
-    Value* DefaultValue() override { return &defaultValue; }
+    ConstantValue* DefaultValue() override { return &defaultValue; }
 private:
     UShortValue defaultValue;
 };
@@ -112,7 +112,7 @@ class CMSXI_API IntType : public PrimitiveType
 {
 public:
     IntType();
-    Value* DefaultValue() override { return &defaultValue; }
+    ConstantValue* DefaultValue() override { return &defaultValue; }
 private:
     IntValue defaultValue;
 };
@@ -121,7 +121,7 @@ class CMSXI_API UIntType : public PrimitiveType
 {
 public:
     UIntType();
-    Value* DefaultValue() override { return &defaultValue; }
+    ConstantValue* DefaultValue() override { return &defaultValue; }
 private:
     UIntValue defaultValue;
 };
@@ -130,7 +130,7 @@ class CMSXI_API LongType : public PrimitiveType
 {
 public:
     LongType();
-    Value* DefaultValue() override { return &defaultValue; }
+    ConstantValue* DefaultValue() override { return &defaultValue; }
 private:
     LongValue defaultValue;
 };
@@ -139,7 +139,7 @@ class CMSXI_API ULongType : public PrimitiveType
 {
 public:
     ULongType();
-    Value* DefaultValue() override { return &defaultValue; }
+    ConstantValue* DefaultValue() override { return &defaultValue; }
 private:
     ULongValue defaultValue;
 };
@@ -148,7 +148,7 @@ class CMSXI_API FloatType : public PrimitiveType
 {
 public:
     FloatType();
-    Value* DefaultValue() override { return &defaultValue; }
+    ConstantValue* DefaultValue() override { return &defaultValue; }
 private:
     FloatValue defaultValue;
 };
@@ -157,7 +157,7 @@ class CMSXI_API DoubleType : public PrimitiveType
 {
 public:
     DoubleType();
-    Value* DefaultValue() override { return &defaultValue; }
+    ConstantValue* DefaultValue() override { return &defaultValue; }
 private:
     DoubleValue defaultValue;
 };
@@ -167,7 +167,7 @@ class CMSXI_API PtrType : public Type
 public:
     PtrType(Type* baseType_);
     std::string Name() const override;
-    Value* DefaultValue() override { return &defaultValue; }
+    ConstantValue* DefaultValue() override { return &defaultValue; }
     Type* BaseType() const { return baseType; }
 private:
     Type* baseType;

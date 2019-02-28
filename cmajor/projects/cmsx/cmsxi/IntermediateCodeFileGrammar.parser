@@ -4,17 +4,30 @@ namespace cmsx.intermediate
     {
         using stdlib.identifier;
         using stdlib.newline;
+        using stdlib.bool;
+        using stdlib.sbyte;
+        using stdlib.byte;
+        using stdlib.short;
+        using stdlib.ushort;
+        using stdlib.int;
         using stdlib.uint;
         using stdlib.long;
+        using stdlib.ulong;
+        using stdlib.float;
+        using stdlib.double;
         using stdlib.spaces;
         skip spaces;
 
         IntermediateCodeFile(cmsx.intermediate.Context* context)
-            ::= empty{ context->SetFileName(fileName); } TypeDeclarations(context)? Functions(context)?
+            ::= empty{ context->SetFileName(fileName); } TypeDeclarations(context)? DataDefinitions(context)? Functions(context)?
             ;
 
         TypeDeclarations(cmsx.intermediate.Context* context)
             ::= (keyword("types") '{'! TypeDeclaration(context)* '}'!){ context->ResolveTypes(); }
+            ;
+
+        DataDefinitions(cmsx.intermediate.Context* context)
+            ::= (keyword("data") '{'! DataDefinition(context)* '}'!){ context->ValidateGlobalVariables(); }
             ;
 
         Functions(cmsx.intermediate.Context* context)
@@ -73,7 +86,7 @@ namespace cmsx.intermediate
             ;
 
         RetInstruction(cmsx.intermediate.Context* context) : Instruction*
-            ::= keyword("ret") S (keyword("void"){ value = new RetInstruction(null, span.lineNumber); } | TypeExpr(context):type S Value(context, type):val{ value = new RetInstruction(val, span.lineNumber); })
+            ::= keyword("ret") S ((keyword("void") - "void*"){ value = new RetInstruction(null, span.lineNumber); } | TypeExpr(context):type S Value(context, type):val{ value = new RetInstruction(val, span.lineNumber); })
             ;
 
         SwitchInstruction(cmsx.intermediate.Context* context) : SwitchInstruction*
@@ -95,6 +108,7 @@ namespace cmsx.intermediate
             |   PtrOffsetInstruction(context, result){ value = PtrOffsetInstruction; }
             |   PtrDiffInstruction(context, result){ value = PtrDiffInstruction; }
             |   FunctionCallInstruction(context, result){ value = FunctionCallInstruction; }
+            |   TrapInstruction(context, result){ value = TrapInstruction; }
             ;
 
         UnaryInstruction(cmsx.intermediate.Context* context, Value* result) : Instruction*
@@ -241,6 +255,16 @@ namespace cmsx.intermediate
             ::= (keyword("call") S TypeExpr(context):functionType! S Value(context, functionType):callee!){ value = new FunctionCallInstruction(result, callee, span.lineNumber); }
             ;
 
+        TrapInstruction(cmsx.intermediate.Context* context, Value* result) : Instruction*
+            ::= (keyword("trap") S
+                TypeExpr(context):type1! S Value(context, type1):val1! Comma!
+                TypeExpr(context):type2! S Value(context, type2):val2! Comma!
+                TypeExpr(context):type3! S Value(context, type3):val3!)
+            {
+                value = new TrapInstruction(result, val1, val2, val3, span.lineNumber);
+            }
+            ;
+
         Operand(cmsx.intermediate.Context* context) : Value*
             ::= (TypeExpr(context):type S Value(context, type):val!){ value = val; }
             ;
@@ -385,6 +409,128 @@ namespace cmsx.intermediate
 
         DoubleType(cmsx.intermediate.Context* context) : Type*
             ::= keyword("double"){ value = context->GetDoubleType(); }
+            ;
+
+        DataDefinition(cmsx.intermediate.Context* context)
+            ::= TypeExpr(context):type identifier:name! (';'{ context->AddGlobalVariable(type, ToUtf8(name), cast<ConstantValue*>(null), span.lineNumber); }
+            |   '='! Constant(context){ context->AddGlobalVariable(type, ToUtf8(name), Constant, span.lineNumber); })
+            ;
+
+        Constant(cmsx.intermediate.Context* context) : ConstantValue*
+            ::= BoolConstant(context){ value = BoolConstant; }
+            |   SByteConstant(context){ value = SByteConstant; }
+            |   ByteConstant(context){ value = ByteConstant; }
+            |   ShortConstant(context){ value = ShortConstant; }
+            |   UShortConstant(context){ value = UShortConstant; }
+            |   IntConstant(context){ value = IntConstant; }
+            |   UIntConstant(context){ value = UIntConstant; }
+            |   LongConstant(context){ value = LongConstant; }
+            |   ULongConstant(context){ value = ULongConstant; }
+            |   FloatConstant(context){ value = FloatConstant; }
+            |   DoubleConstant(context){ value = DoubleConstant; }
+            |   PtrConstant(context){ value = PtrConstant; }
+            |   ArrayConstant(context){ value = ArrayConstant; }
+            |   StructureConstant(context){ value = StructureConstant; }
+            ;
+
+        BoolConstant(cmsx.intermediate.Context* context) : ConstantValue*
+            ::= (BoolType(context):type BoolValue:val){ value = cast<BoolType*>(type)->MakeBoolValue(val); }
+            ;
+
+        BoolValue : bool
+            ::= bool:x{ value = x; }
+            ;
+
+        SByteConstant(cmsx.intermediate.Context* context) : ConstantValue*
+            ::= SByteType(context):type SByteValue:val{ value = context->MakeSByteValue(cast<SByteType*>(type), val); }
+            ;
+
+        SByteValue : sbyte
+            ::= sbyte:x{ value = x; }
+            ;
+
+        ByteConstant(cmsx.intermediate.Context* context) : ConstantValue*
+            ::= ByteType(context):type ByteValue:val{ value = context->MakeByteValue(cast<ByteType*>(type), val); }
+            ;
+
+        ByteValue : byte
+            ::= byte:x{ value = x; }
+            ;
+
+        ShortConstant(cmsx.intermediate.Context* context) : ConstantValue*
+            ::= ShortType(context):type ShortValue:val{ value = context->MakeShortValue(cast<ShortType*>(type), val); }
+            ;
+
+        ShortValue : short
+            ::= short:x{ value = x; }
+            ;
+
+        UShortConstant(cmsx.intermediate.Context* context) : ConstantValue*
+            ::= UShortType(context):type UShortValue:val{ value = context->MakeUShortValue(cast<UShortType*>(type), val); }
+            ;
+
+        UShortValue : ushort
+            ::= ushort:x{ value = x; }
+            ;
+
+        IntConstant(cmsx.intermediate.Context* context) : ConstantValue*
+            ::= IntType(context):type IntValue:val{ value = context->MakeIntValue(cast<IntType*>(type), val); }
+            ;
+
+        IntValue : int
+            ::= int:x{ value = x; }
+            ;
+
+        UIntConstant(cmsx.intermediate.Context* context) : ConstantValue*
+            ::= UIntType(context):type UIntValue:val{ value = context->MakeUIntValue(cast<UIntType*>(type), val); }
+            ;
+
+        UIntValue : uint
+            ::= uint:x{ value = x; }
+            ;
+
+        LongConstant(cmsx.intermediate.Context* context) : ConstantValue*
+            ::= LongType(context):type LongValue:val{ value = context->MakeLongValue(cast<LongType*>(type), val); }
+            ;
+
+        LongValue : long
+            ::= long:x{ value = x; }
+            ;
+
+        ULongConstant(cmsx.intermediate.Context* context) : ConstantValue*
+            ::= ULongType(context):type ULongValue:val{ value = context->MakeULongValue(cast<ULongType*>(type), val); }
+            ;
+
+        ULongValue : ulong
+            ::= ulong:x{ value = x; }
+            ;
+
+        FloatConstant(cmsx.intermediate.Context* context) : ConstantValue*
+            ::= FloatType(context):type FloatValue:val{ value = context->MakeFloatValue(cast<FloatType*>(type), val); }
+            ;
+
+        FloatValue : float
+            ::= float:x{ value = x; }
+            ;
+
+        DoubleConstant(cmsx.intermediate.Context* context) : ConstantValue*
+            ::= DoubleType(context):type DoubleValue:val{ value = context->MakeDoubleValue(cast<DoubleType*>(type), val); }
+            ;
+
+        DoubleValue : double
+            ::= double:x{ value = x; }
+            ;
+
+        PtrConstant(cmsx.intermediate.Context* context) : ConstantValue*
+            ::= (TypeExpr(context):type{ pass = IsPtrType(type); } keyword("null")){ value = cast<PtrType*>(type)->DefaultValue(); }
+            ;
+
+        ArrayConstant(cmsx.intermediate.Context* context) : ArrayValue*
+            ::= '['{ value = context->MakeArrayValue(); } (Constant(context):element{ value->AddElement(element); } % ',')? ']'
+            ;
+
+        StructureConstant(cmsx.intermediate.Context* context) : StructureValue*
+            ::= '{'{ value = context->MakeStructureValue(); } (Constant(context):member{ value->AddMember(member); } % ',')? '}'
             ;
     }
 }

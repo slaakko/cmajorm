@@ -5,7 +5,7 @@
 
 #ifndef CMAJOR_CMSXI_CONTEXT_INCLUDED
 #define CMAJOR_CMSXI_CONTEXT_INCLUDED
-#include <cmajor/cmsxi/Type.hpp>
+#include <cmajor/cmsxi/Data.hpp>
 
 namespace cmsxi {
 
@@ -18,6 +18,7 @@ class CMSXI_API Context
 public:
     Context();
     TypeRepository& GetTypeRepository() { return typeRepository; }
+    DataRepository& GetDataRepository() { return dataRepository; }
     Type* GetVoidType() { return typeRepository.GetVoidType(); }
     Type* GetBoolType() { return typeRepository.GetBoolType(); }
     Type* GetSByteType() { return typeRepository.GetSByteType(); }
@@ -35,29 +36,31 @@ public:
     Type* CreateStructureType() { return typeRepository.CreateStructureType(); }
     Type* GetArrayType(Type* elementType, uint64_t size) { return typeRepository.GetArrayType(elementType, size); }
     Type* GetFunctionType(Type* returnType, const std::vector<Type*>& paramTypes) { return typeRepository.GetFunctionType(returnType, paramTypes); }
-    Value* GetDefaultBoolValue() { return GetBoolType()->DefaultValue(); }
-    Value* GetDefaultSByteValue() { return GetSByteType()->DefaultValue(); }
-    Value* GetDefaultByteValue() { return GetByteType()->DefaultValue(); }
-    Value* GetDefaultShortValue() { return GetShortType()->DefaultValue(); }
-    Value* GetDefaultUShortValue() { return GetUShortType()->DefaultValue(); }
-    Value* GetDefaultIntValue() { return GetIntType()->DefaultValue(); }
-    Value* GetDefaultUIntValue() { return GetUIntType()->DefaultValue(); }
-    Value* GetDefaultLongValue() { return GetLongType()->DefaultValue(); }
-    Value* GetDefaultULongValue() { return GetULongType()->DefaultValue(); }
-    Value* GetDefaultFloatValue() { return GetFloatType()->DefaultValue(); }
-    Value* GetDefaultDoubleValue() { return GetDoubleType()->DefaultValue(); }
-    Value* GetNullValue(PtrType* ptrType) { return ptrType->DefaultValue(); }
-    Value* GetBoolValue(bool value);
-    Value* GetSByteValue(int8_t value);
-    Value* GetByteValue(uint8_t value);
-    Value* GetShortValue(int16_t value);
-    Value* GetUShortValue(uint16_t value);
-    Value* GetIntValue(int32_t value);
-    Value* GetUIntValue(uint32_t value);
-    Value* GetLongValue(int64_t value);
-    Value* GetULongValue(uint64_t value);
-    Value* GetFloatValue(float value);
-    Value* GetDoubleValue(double value);
+    ConstantValue* GetDefaultBoolValue() { return GetBoolType()->DefaultValue(); }
+    ConstantValue* GetDefaultSByteValue() { return GetSByteType()->DefaultValue(); }
+    ConstantValue* GetDefaultByteValue() { return GetByteType()->DefaultValue(); }
+    ConstantValue* GetDefaultShortValue() { return GetShortType()->DefaultValue(); }
+    ConstantValue* GetDefaultUShortValue() { return GetUShortType()->DefaultValue(); }
+    ConstantValue* GetDefaultIntValue() { return GetIntType()->DefaultValue(); }
+    ConstantValue* GetDefaultUIntValue() { return GetUIntType()->DefaultValue(); }
+    ConstantValue* GetDefaultLongValue() { return GetLongType()->DefaultValue(); }
+    ConstantValue* GetDefaultULongValue() { return GetULongType()->DefaultValue(); }
+    ConstantValue* GetDefaultFloatValue() { return GetFloatType()->DefaultValue(); }
+    ConstantValue* GetDefaultDoubleValue() { return GetDoubleType()->DefaultValue(); }
+    ConstantValue* GetNullValue(PtrType* ptrType) { return ptrType->DefaultValue(); }
+    ConstantValue* GetBoolValue(bool value);
+    ConstantValue* GetSByteValue(int8_t value);
+    ConstantValue* GetByteValue(uint8_t value);
+    ConstantValue* GetShortValue(int16_t value);
+    ConstantValue* GetUShortValue(uint16_t value);
+    ConstantValue* GetIntValue(int32_t value);
+    ConstantValue* GetUIntValue(uint32_t value);
+    ConstantValue* GetLongValue(int64_t value);
+    ConstantValue* GetULongValue(uint64_t value);
+    ConstantValue* GetFloatValue(float value);
+    ConstantValue* GetDoubleValue(double value);
+    ArrayValue* GetArrayValue(Type* arrayType, const std::vector<ConstantValue*>& elements);
+    StructureValue* GetStructureValue(Type* structureType, const std::vector<ConstantValue*>& members);
     void AddValue(Value* value);
     void SetCurrentBasicBlock(BasicBlock* bb) { currentBasicBlock = bb; }
     BasicBlock* GetCurrentBasicBlock() const { return currentBasicBlock; }
@@ -96,8 +99,11 @@ public:
     Instruction* CreateJump(BasicBlock* dest);
     Instruction* CreateBranch(Value* cond, BasicBlock* trueDest, BasicBlock* falseDest);
     Instruction* CreateSwitch(Value* cond, BasicBlock* defaultDest);
+    Instruction* CreateTrap(const std::vector<Value*>& args);
+    GlobalVariable* GetOrInsertGlobal(const std::string& name, Type* type);
 private:
     TypeRepository typeRepository;
+    DataRepository dataRepository;
     std::vector<std::unique_ptr<Value>> values;
     Function* currentFunction;
     BasicBlock* currentBasicBlock;

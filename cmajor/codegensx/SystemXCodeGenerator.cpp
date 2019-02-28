@@ -40,7 +40,7 @@ SystemXCodeGenerator::SystemXCodeGenerator(cmajor::ir::EmittingContext& emitting
     cmajor::codegenbase::CodeGenerator(emittingContext_), emitter(GetEmitter()), emittingContext(&emittingContext_), symbolTable(nullptr), module(nullptr), compileUnit(nullptr),
     nativeCompileUnit(nullptr), function(nullptr), entryBasicBlock(nullptr), lastInstructionWasRet(false), destructorCallGenerated(false), genJumpingBoolCode(false),
     trueBlock(nullptr), falseBlock(nullptr), breakTarget(nullptr), continueTarget(nullptr), sequenceSecond(nullptr), currentFunction(nullptr), currentBlock(nullptr),
-    breakTargetBlock(nullptr), continueTargetBlock(nullptr), lastAlloca(nullptr), currentClass(nullptr), basicBlockOpen(false), defaultDest(nullptr)
+    breakTargetBlock(nullptr), continueTargetBlock(nullptr), lastAlloca(nullptr), currentClass(nullptr), basicBlockOpen(false), defaultDest(nullptr), currentCaseMap(nullptr)
 {
 }
 
@@ -54,8 +54,8 @@ void SystemXCodeGenerator::Visit(BoundCompileUnit& boundCompileUnit)
 {
     symbolTable = &boundCompileUnit.GetSymbolTable();
     module = &boundCompileUnit.GetModule();
-    std::string filePath = Path::ChangeExtension(boundCompileUnit.ObjectFilePath(), ".i");
-    NativeModule nativeModule(emitter, filePath);
+    std::string intermediateFilePath = Path::ChangeExtension(boundCompileUnit.ObjectFilePath(), ".i");
+    NativeModule nativeModule(emitter, intermediateFilePath);
     compileUnit = &boundCompileUnit;
     nativeCompileUnit = static_cast<cmsxi::CompileUnit*>(nativeModule.module);
     int n = boundCompileUnit.BoundNodes().size();
@@ -65,8 +65,21 @@ void SystemXCodeGenerator::Visit(BoundCompileUnit& boundCompileUnit)
         node->Accept(*this);
     }
     nativeCompileUnit->Write(*static_cast<cmsxbe::EmittingContext*>(emittingContext)->GetContext());
-/*
+    std::string intermediateCompileCommand;
+    std::string intermediateCompileErrorFilePath = intermediateFilePath + ".error";
+    intermediateCompileCommand.append("cmfileredirector -2 " + intermediateCompileErrorFilePath + " cmsxic ").append(intermediateFilePath);
+    try
+    {
+        System(intermediateCompileCommand);
+        boost::filesystem::remove(boost::filesystem::path(intermediateCompileErrorFilePath));
+    }
+    catch (const std::exception& ex)
+    {
+        std::string errors = ReadFile(intermediateCompileErrorFilePath);
+        throw std::runtime_error("compiling intermediate code '" + intermediateFilePath + "' failed: " + ex.what() + ":\nerrors:\n" + errors);
+    }
     std::string assembleCommand;
+    std::string assemblyFilePath = Path::ChangeExtension(boundCompileUnit.ObjectFilePath(), ".s");
     std::string assemblyErrorFilePath = assemblyFilePath + ".error";
     assembleCommand.append("cmfileredirector -2 " + assemblyErrorFilePath + " cmsxas ").append(assemblyFilePath);
     try
@@ -79,7 +92,6 @@ void SystemXCodeGenerator::Visit(BoundCompileUnit& boundCompileUnit)
         std::string errors = ReadFile(assemblyErrorFilePath);
         throw std::runtime_error("assembling '" + assemblyFilePath + "' failed: " + ex.what() + ":\nerrors:\n" + errors);
     }
-*/
 }
 
 void SystemXCodeGenerator::Visit(BoundNamespace& boundNamespace)
@@ -444,6 +456,7 @@ void SystemXCodeGenerator::Visit(BoundContinueStatement& boundContinueStatement)
     destructorCallGenerated = false;
     lastInstructionWasRet = false;
     basicBlockOpen = false;
+    prevWasTerminator = false;
     SetTarget(&boundContinueStatement);
     Assert(continueTarget && continueTargetBlock, "continue target not set");
 /*
@@ -474,6 +487,7 @@ void SystemXCodeGenerator::Visit(BoundGotoStatement& boundGotoStatement)
     destructorCallGenerated = false;
     lastInstructionWasRet = false;
     basicBlockOpen = false;
+    prevWasTerminator = false;
     SetTarget(&boundGotoStatement);
 /*
     Pad* prevCurrentPad = currentPad;

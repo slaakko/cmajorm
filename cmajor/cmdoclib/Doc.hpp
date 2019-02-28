@@ -5,12 +5,13 @@
 
 #ifndef CMAJOR_CMDOCLIB_DOC_INCLUDED
 #define CMAJOR_CMDOCLIB_DOC_INCLUDED
+#include <cmajor/cmdoclib/CmDocLibApi.hpp>
 #include <string>
 #include <vector>
 
 namespace cmajor { namespace cmdoclib {
 
-void BuildDocs(const std::u32string& solutionName, const std::vector<std::u32string>& moduleNames, std::vector<std::string>& grammarFilePaths);
+CMDOCLIB_API void BuildDocs(const std::u32string& solutionName, const std::vector<std::u32string>& moduleNames, std::vector<std::string>& grammarFilePaths);
 
 } } // namespace cmajor::cmdoclib
 

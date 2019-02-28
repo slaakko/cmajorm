@@ -270,8 +270,8 @@ function drawInheritanceDiagram() {
     var diagramNodes = [
         { name: "cmsx.object.BinaryFile", id: "diagram_node_0", level: 0, subject: true, hasDerivedNodes: true, link: "../../cmsxo/doc/class_BinaryFile_A6208ACB7AD8280018BCB4C0D3287F7C8B9B49E2.html" },
         { name: "cmsx.object.ExecutableFile", id: "diagram_node_1", level: 1, subject: false, hasDerivedNodes: false, link: "../../cmsxo/doc/class_ExecutableFile_F3744EB0BC40E8A03A280DA1BB9132A0FECC790B.html" },
-        { name: "cmsx.object.LibraryFile", id: "diagram_node_2", level: 1, subject: false, hasDerivedNodes: false, link: "../../cmsxo/doc/class_LibraryFile_C743FCDAB5BC284196644851D86C0075FE881C8D.html" },
-        { name: "cmsx.object.ObjectFile", id: "diagram_node_3", level: 1, subject: false, hasDerivedNodes: false, link: "../../cmsxo/doc/class_ObjectFile_7E5D680818795C51384A8C6F31776510B3F0EB97.html" }];
+        { name: "cmsx.object.LibraryFile", id: "diagram_node_3", level: 1, subject: false, hasDerivedNodes: false, link: "../../cmsxo/doc/class_LibraryFile_C743FCDAB5BC284196644851D86C0075FE881C8D.html" },
+        { name: "cmsx.object.ObjectFile", id: "diagram_node_2", level: 1, subject: false, hasDerivedNodes: false, link: "../../cmsxo/doc/class_ObjectFile_7E5D680818795C51384A8C6F31776510B3F0EB97.html" }];
     drawDiagram(diagramNodes);
 }
 

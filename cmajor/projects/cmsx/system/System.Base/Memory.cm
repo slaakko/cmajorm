@@ -1,0 +1,23 @@
+namespace System
+{
+    internal class Block
+    {
+        public nothrow Block() : next(this), size(0u)
+        {
+        }
+        public nothrow Block(Block* next_, ulong size_) : next(next_), size(size_)
+        {
+        }
+        public Block* next;
+        public ulong size;
+    }
+
+    internal class Memory
+    {
+        static nothrow Memory() : baseBlock(), free(&baseBlock)
+        {
+        }
+        public static Block baseBlock;
+        public static Block* free;
+    }
+}

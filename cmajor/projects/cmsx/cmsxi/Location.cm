@@ -8,42 +8,68 @@ namespace cmsx.intermediate
     public abstract class Location : Operand
     {
         public abstract void DebugPrint(CodeFormatter& formatter);
-        public abstract void GenerateLoad(int loadOpCode, Register* destinationReg, MachineCode& machineCode);
-        public abstract void GenerateLoadAddress(Register* destinationReg, MachineCode& machineCode);
-        public abstract void GenerateStore(int storeOpCode, Register* valueReg, MachineCode& machineCode);
+        public abstract void GenerateLoad(int loadOpCode, Register* destinationReg, MachineCode& machineCode, Instruction* inst);
+        public abstract void GenerateLoadAddress(Register* destinationReg, MachineCode& machineCode, Instruction* inst);
+        public abstract void GenerateStore(int storeOpCode, Register* valueReg, MachineCode& machineCode, Instruction* inst);
     }
 
-    public class Locations
+    public class FrameLocations
     {
-        public Locations(Registers& regs_) : regs(regs_), offset(8)
+        public FrameLocations(Registers& regs_) : regs(regs_), paramOffset(8), argOffset(8)
         {
         }
         public FrameLocation* GetFrameLocation(long size)
         {
             FrameLocation* location = null;
-            if (offset < MaxValue<byte>())
+            if (paramOffset < MaxValue<byte>())
             {
-                location = new NearFrameLocation(cast<byte>(offset), regs.GetFP());
+                location = new NearFrameLocation(cast<byte>(paramOffset), regs.GetFP());
             }
-            else if (offset < MaxValue<ushort>())
+            else if (paramOffset < MaxValue<ushort>())
             {
-                location = new MediumFrameLocation(cast<ushort>(offset), regs.GetFP(), regs.GetIx());
+                location = new MediumFrameLocation(cast<ushort>(paramOffset), regs.GetFP(), regs.GetIx());
             }
-            else if (offset < MaxValue<uint>())
+            else if (paramOffset < MaxValue<uint>())
             {
-                location = new FarFrameLocation(cast<uint>(offset), regs.GetFP(), regs.GetIx());
+                location = new FarFrameLocation(cast<uint>(paramOffset), regs.GetFP(), regs.GetIx());
             }
             else
             {
                 throw Exception("frame too big");
             }
-            offset = offset + size;
-            offset = 8 * ((offset - 1) / 8 + 1);
-            list.Add(UniquePtr<Location>(location));
+            paramOffset = paramOffset + size;
+            paramOffset = 8 * ((paramOffset - 1) / 8 + 1);
+            paramLocations.Add(UniquePtr<Location>(location));
             return location;
         }
-        public long offset;
-        private List<UniquePtr<Location>> list;
+        public FrameLocation* GetArgLocation()
+        {
+            FrameLocation* location = null;
+            if (argOffset < MaxValue<byte>())
+            {
+                location = new NearFrameLocation(cast<byte>(argOffset), regs.GetSP());
+            }
+            else if (argOffset < MaxValue<ushort>())
+            {
+                location = new MediumFrameLocation(cast<ushort>(argOffset), regs.GetSP(), regs.GetIx());
+            }
+            else if (argOffset < MaxValue<uint>())
+            {
+                location = new FarFrameLocation(cast<uint>(argOffset), regs.GetSP(), regs.GetIx());
+            }
+            argOffset = argOffset + 8;
+            argLocations.Add(UniquePtr<Location>(location));
+            return location;
+        }
+        public nothrow void ResetArgLocations()
+        {
+            argLocations.Clear();
+            argOffset = 8;
+        }
+        public long paramOffset;
+        public long argOffset;
+        private List<UniquePtr<Location>> paramLocations;
+        private List<UniquePtr<Location>> argLocations;
         private Registers& regs;
     }
 
@@ -64,23 +90,23 @@ namespace cmsx.intermediate
         {
             formatter << "frame.near(" << offset << ")";
         }
-        public override void GenerateLoad(int loadOpCode, Register* destinationReg, MachineCode& machineCode)
+        public override void GenerateLoad(int loadOpCode, Register* destinationReg, MachineCode& machineCode, Instruction* inst)
         {
-            MachineInstruction* loadInstruction = machineCode.GetInstruction(loadOpCode);
+            MachineInstruction* loadInstruction = machineCode.GetInstruction(loadOpCode, inst);
             loadInstruction->AddOperand(destinationReg);
             loadInstruction->AddOperand(baseReg);
             loadInstruction->AddOperand(machineCode.context.GetLiteralOperand(offset));
         }
-        public override void GenerateLoadAddress(Register* destinationReg, MachineCode& machineCode)
+        public override void GenerateLoadAddress(Register* destinationReg, MachineCode& machineCode, Instruction* inst)
         {
-            MachineInstruction* loadAddressInstruction = machineCode.GetInstruction(cmsx.assembly.LDA);
+            MachineInstruction* loadAddressInstruction = machineCode.GetInstruction(cmsx.assembly.LDA, inst);
             loadAddressInstruction->AddOperand(destinationReg);
             loadAddressInstruction->AddOperand(baseReg);
             loadAddressInstruction->AddOperand(machineCode.context.GetLiteralOperand(offset));
         }
-        public override void GenerateStore(int storeOpCode, Register* valueReg, MachineCode& machineCode)
+        public override void GenerateStore(int storeOpCode, Register* valueReg, MachineCode& machineCode, Instruction* inst)
         {
-            MachineInstruction* storeInstruction = machineCode.GetInstruction(storeOpCode);
+            MachineInstruction* storeInstruction = machineCode.GetInstruction(storeOpCode, inst);
             storeInstruction->AddOperand(valueReg);
             storeInstruction->AddOperand(baseReg);
             storeInstruction->AddOperand(machineCode.context.GetLiteralOperand(offset));
@@ -98,32 +124,32 @@ namespace cmsx.intermediate
         {
             formatter << "frame.medium(" << baseReg->name + ":" << offset << ")";
         }
-        public override void GenerateLoad(int loadOpCode, Register* destinationReg, MachineCode& machineCode)
+        public override void GenerateLoad(int loadOpCode, Register* destinationReg, MachineCode& machineCode, Instruction* inst)
         {
-            MachineInstruction* setIxInstruction = machineCode.GetInstruction(cmsx.assembly.SET);
+            MachineInstruction* setIxInstruction = machineCode.GetInstruction(cmsx.assembly.SET, inst);
             setIxInstruction->AddOperand(ixReg);
             setIxInstruction->AddOperand(machineCode.context.GetLiteralOperand(offset));
-            MachineInstruction* loadInstruction = machineCode.GetInstruction(loadOpCode);
+            MachineInstruction* loadInstruction = machineCode.GetInstruction(loadOpCode, inst);
             loadInstruction->AddOperand(destinationReg);
             loadInstruction->AddOperand(baseReg);
             loadInstruction->AddOperand(ixReg);
         }
-        public override void GenerateLoadAddress(Register* destinationReg, MachineCode& machineCode)
+        public override void GenerateLoadAddress(Register* destinationReg, MachineCode& machineCode, Instruction* inst)
         {
-            MachineInstruction* setIxInstruction = machineCode.GetInstruction(cmsx.assembly.SET);
+            MachineInstruction* setIxInstruction = machineCode.GetInstruction(cmsx.assembly.SET, inst);
             setIxInstruction->AddOperand(ixReg);
             setIxInstruction->AddOperand(machineCode.context.GetLiteralOperand(offset));
-            MachineInstruction* loadAddressInstruction = machineCode.GetInstruction(cmsx.assembly.LDA);
+            MachineInstruction* loadAddressInstruction = machineCode.GetInstruction(cmsx.assembly.LDA, inst);
             loadAddressInstruction->AddOperand(destinationReg);
             loadAddressInstruction->AddOperand(baseReg);
             loadAddressInstruction->AddOperand(ixReg);
         }
-        public override void GenerateStore(int storeOpCode, Register* valueReg, MachineCode& machineCode)
+        public override void GenerateStore(int storeOpCode, Register* valueReg, MachineCode& machineCode, Instruction* inst)
         {
-            MachineInstruction* setIxInstruction = machineCode.GetInstruction(cmsx.assembly.SET);
+            MachineInstruction* setIxInstruction = machineCode.GetInstruction(cmsx.assembly.SET, inst);
             setIxInstruction->AddOperand(ixReg);
             setIxInstruction->AddOperand(machineCode.context.GetLiteralOperand(offset));
-            MachineInstruction* storeInstruction = machineCode.GetInstruction(storeOpCode);
+            MachineInstruction* storeInstruction = machineCode.GetInstruction(storeOpCode, inst);
             storeInstruction->AddOperand(valueReg);
             storeInstruction->AddOperand(baseReg);
             storeInstruction->AddOperand(ixReg);
@@ -142,41 +168,41 @@ namespace cmsx.intermediate
         {
             formatter << "frame.far(" << baseReg->name + ":" << offset << ")";
         }
-        public override void GenerateLoad(int loadOpCode, Register* destinationReg, MachineCode& machineCode)
+        public override void GenerateLoad(int loadOpCode, Register* destinationReg, MachineCode& machineCode, Instruction* inst)
         {
-            MachineInstruction* setIxInstruction = machineCode.GetInstruction(cmsx.assembly.SET);
+            MachineInstruction* setIxInstruction = machineCode.GetInstruction(cmsx.assembly.SET, inst);
             setIxInstruction->AddOperand(ixReg);
             setIxInstruction->AddOperand(machineCode.context.GetLiteralOperand(offset & MaxValue<ushort>()));
-            MachineInstruction* orMlInstruction = machineCode.GetInstruction(cmsx.machine.ORML);
+            MachineInstruction* orMlInstruction = machineCode.GetInstruction(cmsx.machine.ORML, inst);
             orMlInstruction->AddOperand(ixReg);
             orMlInstruction->AddOperand(machineCode.context.GetLiteralOperand((offset >> 16u)));
-            MachineInstruction* loadInstruction = machineCode.GetInstruction(loadOpCode);
+            MachineInstruction* loadInstruction = machineCode.GetInstruction(loadOpCode, inst);
             loadInstruction->AddOperand(destinationReg);
             loadInstruction->AddOperand(baseReg);
             loadInstruction->AddOperand(ixReg);
         }
-        public override void GenerateLoadAddress(Register* destinationReg, MachineCode& machineCode)
+        public override void GenerateLoadAddress(Register* destinationReg, MachineCode& machineCode, Instruction* inst)
         {
-            MachineInstruction* setIxInstruction = machineCode.GetInstruction(cmsx.assembly.SET);
+            MachineInstruction* setIxInstruction = machineCode.GetInstruction(cmsx.assembly.SET, inst);
             setIxInstruction->AddOperand(ixReg);
             setIxInstruction->AddOperand(machineCode.context.GetLiteralOperand(offset & MaxValue<ushort>()));
-            MachineInstruction* orMlInstruction = machineCode.GetInstruction(cmsx.machine.ORML);
+            MachineInstruction* orMlInstruction = machineCode.GetInstruction(cmsx.machine.ORML, inst);
             orMlInstruction->AddOperand(ixReg);
             orMlInstruction->AddOperand(machineCode.context.GetLiteralOperand((offset >> 16u)));
-            MachineInstruction* loadAddressInstruction = machineCode.GetInstruction(cmsx.assembly.LDA);
+            MachineInstruction* loadAddressInstruction = machineCode.GetInstruction(cmsx.assembly.LDA, inst);
             loadAddressInstruction->AddOperand(destinationReg);
             loadAddressInstruction->AddOperand(baseReg);
             loadAddressInstruction->AddOperand(ixReg);
         }
-        public override void GenerateStore(int storeOpCode, Register* valueReg, MachineCode& machineCode)
+        public override void GenerateStore(int storeOpCode, Register* valueReg, MachineCode& machineCode, Instruction* inst)
         {
-            MachineInstruction* setIxInstruction = machineCode.GetInstruction(cmsx.assembly.SET);
+            MachineInstruction* setIxInstruction = machineCode.GetInstruction(cmsx.assembly.SET, inst);
             setIxInstruction->AddOperand(ixReg);
             setIxInstruction->AddOperand(machineCode.context.GetLiteralOperand(offset & MaxValue<ushort>()));
-            MachineInstruction* orMlInstruction = machineCode.GetInstruction(cmsx.machine.ORML);
+            MachineInstruction* orMlInstruction = machineCode.GetInstruction(cmsx.machine.ORML, inst);
             orMlInstruction->AddOperand(ixReg);
             orMlInstruction->AddOperand(machineCode.context.GetLiteralOperand((offset >> 16u)));
-            MachineInstruction* storeInstruction = machineCode.GetInstruction(storeOpCode);
+            MachineInstruction* storeInstruction = machineCode.GetInstruction(storeOpCode, inst);
             storeInstruction->AddOperand(valueReg);
             storeInstruction->AddOperand(baseReg);
             storeInstruction->AddOperand(ixReg);
@@ -184,5 +210,46 @@ namespace cmsx.intermediate
         public uint offset;
         public Register* baseReg;
         public Register* ixReg;
+    }
+
+    public class DataLocation : MemoryLocation
+    {
+        public nothrow DataLocation(SymbolOperand* symbolOperand_) : symbolOperand(symbolOperand_)
+        {
+        }
+        public override void DebugPrint(CodeFormatter& formatter)
+        {
+            formatter << "data(" << symbolOperand->value << ")";
+        }
+        public override void GenerateLoad(int loadOpCode, Register* destinationReg, MachineCode& machineCode, Instruction* inst)
+        {
+            MachineInstruction* loadInstruction = machineCode.GetInstruction(cmsx.machine.LDOU, inst);
+            loadInstruction->AddOperand(destinationReg);
+            loadInstruction->AddOperand(symbolOperand);
+        }            
+        public override void GenerateLoadAddress(Register* destinationReg, MachineCode& machineCode, Instruction* inst)
+        {
+            throw Exception("GenerateLoadAddress not implemented for data locations");
+        }
+        public override void GenerateStore(int storeOpCode, Register* valueReg, MachineCode& machineCode, Instruction* inst)
+        {
+            throw Exception("GenerateStore not implemented for data locations");
+        }
+        private SymbolOperand* symbolOperand;
+    }
+
+    public class DataLocations
+    {
+        public nothrow DataLocations()
+        {
+        }
+        public DataLocation* GetDataLocation(SymbolOperand* symbolOperand)
+        {
+            DataLocation* dataLocation = new DataLocation(symbolOperand);
+            locations.Add(UniquePtr<Location>(dataLocation));
+            return dataLocation;
+        }
+        private List<UniquePtr<Location>> locations;
+
     }
 }

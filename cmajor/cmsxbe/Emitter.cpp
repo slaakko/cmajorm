@@ -191,8 +191,13 @@ void* Emitter::GetIrTypeForPtrType(void* baseIrType)
 
 void* Emitter::CreateDefaultIrValueForArrayType(void* arrayIrType, const std::vector<void*>& arrayOfDefaults)
 {
-    // todo
-    return nullptr;
+    std::vector<cmsxi::ConstantValue*> arrayOfConstants;
+    for (void* constant : arrayOfDefaults)
+    {
+        arrayOfConstants.push_back(static_cast<cmsxi::ConstantValue*>(constant));
+    }
+    cmsxi::Type* arrayType = static_cast<cmsxi::Type*>(arrayIrType);
+    return context->GetArrayValue(arrayType, arrayOfConstants);
 }
 
 void* Emitter::CreateDefaultIrValueForBool()
@@ -267,14 +272,17 @@ void* Emitter::CreateDefaultIrValueForUChar()
 
 void* Emitter::CreateDefaultIrValueForStruct(void* irType, const std::vector<void*>& defaultMembers)
 {
-    // todo
-    return nullptr;
+    std::vector<cmsxi::ConstantValue*> arrayOfDefaults;
+    for (void* constant : defaultMembers)
+    {
+        arrayOfDefaults.push_back(static_cast<cmsxi::ConstantValue*>(constant));
+    }
+    return context->GetStructureValue(static_cast<cmsxi::StructureType*>(irType), arrayOfDefaults);
 }
 
 void* Emitter::CreateDefaultIrValueForDelegateType(void* irType)
 {
-    // todo
-    return nullptr;
+    return context->GetNullValue(static_cast<cmsxi::PtrType*>(irType));
 }
 
 void* Emitter::CreateDefaultIrValueForVoidPtrType()
@@ -284,8 +292,7 @@ void* Emitter::CreateDefaultIrValueForVoidPtrType()
 
 void* Emitter::CreateDefaultIrValueForDerivedType(void* irType)
 {
-    // todo
-    return nullptr;
+    return static_cast<cmsxi::Type*>(irType)->DefaultValue();
 }
 
 void* Emitter::CreateDefaultIrValueForPtrType(void* irType)
@@ -377,14 +384,22 @@ void* Emitter::CreateIrValueForUString(void* ustringConstant)
 
 void* Emitter::CreateIrValueForConstantArray(void* arrayIrType, const std::vector<void*>& elementConstants)
 {
-    // todo
-    return nullptr;
+    std::vector<cmsxi::ConstantValue*> elements;
+    for (void* elementConstant : elementConstants)
+    {
+        elements.push_back(static_cast<cmsxi::ConstantValue*>(elementConstant));
+    }
+    return context->GetArrayValue(static_cast<cmsxi::ArrayType*>(arrayIrType), elements);
 }
 
 void* Emitter::CreateIrValueForConstantStruct(void* structIrType, const std::vector<void*>& elementConstants)
 {
-    // todo
-    return nullptr;
+    std::vector<cmsxi::ConstantValue*> memberConstants;
+    for (void* elementConstant : elementConstants)
+    {
+        memberConstants.push_back(static_cast<cmsxi::ConstantValue*>(elementConstant));
+    }
+    return context->GetStructureValue(static_cast<cmsxi::StructureType*>(structIrType), memberConstants);
 }
 
 void* Emitter::CreateIrValueForUuid(void* uuidConstant)
@@ -910,30 +925,43 @@ void Emitter::SetVmtObjectType(void* symbol, void* vmtObjectType)
 
 void* Emitter::GetStaticObjectType(void* symbol) const
 {
-    // todo
-    return nullptr;
+    auto it = staticTypeMap.find(symbol);
+    if (it != staticTypeMap.cend())
+    {
+        return it->second;
+    }
+    else
+    {
+        return nullptr;
+    }
 }
 
 void Emitter::SetStaticObjectType(void* symbol, void* type)
 {
-    // todo
+    staticTypeMap[symbol] = static_cast<cmsxi::StructureType*>(type);
 }
 
 std::string Emitter::GetStaticObjectName(void* symbol) const
 {
-    // todo
-    return std::string();
+    auto it = staticObjectNameMap.find(symbol);
+    if (it != staticObjectNameMap.cend())
+    {
+        return it->second;
+    }
+    else
+    {
+        return std::string();
+    }
 }
 
 void Emitter::SetStaticObjectName(void* symbol, const std::string& staticObjectName)
 {
-    // todo
+    staticObjectNameMap[symbol] = staticObjectName;
 }
 
 void* Emitter::GetOrInsertGlobal(const std::string& name, void* type)
 {
-    // todo
-    return nullptr;
+    return context->GetOrInsertGlobal(name, static_cast<cmsxi::Type*>(type));
 }
 
 void* Emitter::GetOrInsertAnyComdat(const std::string& name, void* global)
@@ -955,7 +983,8 @@ void* Emitter::GetOrInsertFunction(const std::string& name, void* type)
 
 void Emitter::SetInitializer(void* global, void* initializer)
 {
-    // todo
+    cmsxi::GlobalVariable* globalVar = static_cast<cmsxi::GlobalVariable*>(global);
+    globalVar->SetInitializer(static_cast<cmsxi::ConstantValue*>(initializer));
 }
 
 void Emitter::SetPrivateLinkage(void* global)
@@ -965,24 +994,22 @@ void Emitter::SetPrivateLinkage(void* global)
 
 bool Emitter::IsVmtObjectCreated(void* symbol) const
 {
-    // todo
-    return bool();
+    return vmtObjectCreatedSet.find(symbol) != vmtObjectCreatedSet.cend();
 }
 
 void Emitter::SetVmtObjectCreated(void* symbol)
 {
-    // todo
+    vmtObjectCreatedSet.insert(symbol);
 }
 
 bool Emitter::IsStaticObjectCreated(void* symbol) const
 {
-    // todo
-    return bool();
+    return staticObjectCreatedSet.find(symbol) != staticObjectCreatedSet.cend();
 }
 
 void Emitter::SetStaticObjectCreated(void* symbol)
 {
-    // todo
+    staticObjectCreatedSet.insert(symbol);
 }
 
 void* Emitter::HandlerBlock()
@@ -1561,6 +1588,16 @@ void Emitter::AddCase(void* switchInst, void* caseValue, void* caseDest)
 {
     cmsxi::SwitchInstruction* inst = static_cast<cmsxi::SwitchInstruction*>(switchInst);
     inst->AddCase(static_cast<cmsxi::Value*>(caseValue), static_cast<cmsxi::BasicBlock*>(caseDest));
+}
+
+void* Emitter::GenerateTrap(const std::vector<void*>& args)
+{
+    std::vector<cmsxi::Value*> arguments;
+    for (void* arg : args)
+    {
+        arguments.push_back(static_cast<cmsxi::Value*>(arg));
+    }
+    return context->CreateTrap(arguments);
 }
 
 } // namespace cmsxbe

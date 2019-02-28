@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 
 namespace cmsx.machine
 {
@@ -19,6 +20,10 @@ namespace cmsx.machine
         public virtual string FormatTrap(byte y)
         {
             return ToString(y);
+        }
+        public virtual string GetTags(ulong address)
+        {
+            return string();
         }
         public virtual string FormatShortOffset(ulong address, byte y, byte z, bool forward)
         {
@@ -164,8 +169,10 @@ namespace cmsx.machine
             result.Append(' ');
             result.Append(ToHexString(z));
             result.Append(' ');
+            string tags = formatter.GetTags(address);
+            result.Append(tags);
             string label = formatter.GetLabel(address);
-            result.Append(Format(label, 32));
+            result.Append(Format(label, 80));
             result.Append(' ');
             int n = OpCodeMap.Instance().MaxOpCodeNameLength();
             result.Append(Format(OpCodeMap.Instance().GetName(opCode), n));
@@ -209,6 +216,10 @@ namespace cmsx.machine
         public nothrow virtual bool IsAbsoluteAddressInst() const
         {
             return false;
+        }
+        public nothrow virtual List<ulong> GetTargetAddresses(ulong pc, Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            return List<ulong>(1, pc + 4u);
         }
         public byte opCode;
     }
@@ -3517,6 +3528,11 @@ namespace cmsx.machine
         {
             return true;
         }
+        public nothrow override List<ulong> GetTargetAddresses(ulong pc, Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong to = pc + (((cast<ulong>(x) << 16u) | (cast<ulong>(y) << 8u) | cast<ulong>(z)) << 2u);
+            return List<ulong>(1, to);
+        }
     }
 
     public class Jmpb : Instruction
@@ -3539,6 +3555,12 @@ namespace cmsx.machine
         public nothrow override bool IsJumpInst() const
         {
             return true;
+        }
+        public nothrow override List<ulong> GetTargetAddresses(ulong pc, Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong offset = ((cast<ulong>(x) << 16u) | (cast<ulong>(y) << 8u) | cast<ulong>(z)) << 2u;
+            ulong to = pc - offset;
+            return List<ulong>(1, to);
         }
     }
 
@@ -3644,6 +3666,13 @@ namespace cmsx.machine
         {
             return true;
         }
+        public nothrow override List<ulong> GetTargetAddresses(ulong pc, Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong yy = regs.Get(y);
+            ulong zz = regs.Get(z);
+            ulong to = yy + zz;
+            return List<ulong>(1, to);
+        }
     }
 
     public class Calli : Instruction
@@ -3690,6 +3719,13 @@ namespace cmsx.machine
         {
             return true;
         }
+        public nothrow override List<ulong> GetTargetAddresses(ulong pc, Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong yy = regs.Get(y);
+            ulong zz = z;
+            ulong to = yy + zz;
+            return List<ulong>(1, to);
+        }
     }
 
     public class Ret : Instruction
@@ -3724,6 +3760,13 @@ namespace cmsx.machine
         {
             return true;
         }
+        public nothrow override List<ulong> GetTargetAddresses(ulong pc, Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong sp = regs.Get(regSP);
+            sp = sp - 8u;
+            ulong ret = mem.ReadULong(sp, Protection.read);
+            return List<ulong>(1, ret);
+        }
     }
 
     public class Bn : Instruction
@@ -3750,6 +3793,14 @@ namespace cmsx.machine
         public nothrow override bool IsJumpInst() const
         {
             return true;
+        }
+        public nothrow override List<ulong> GetTargetAddresses(ulong pc, Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            List<ulong> addresses;
+            ulong to = pc + (((cast<ulong>(y) << 8u) | cast<ulong>(z)) << 2u);
+            addresses.Add(to);
+            addresses.Add(pc + 4u);
+            return addresses;
         }
     }
 
@@ -3783,6 +3834,15 @@ namespace cmsx.machine
         {
             return false;
         }
+        public nothrow override List<ulong> GetTargetAddresses(ulong pc, Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            List<ulong> addresses;
+            ulong offset = ((cast<ulong>(y) << 8u) | cast<ulong>(z)) << 2u;
+            ulong to = pc - offset;
+            addresses.Add(to);
+            addresses.Add(pc + 4u);
+            return addresses;
+        }
     }
 
     public class Bz : Instruction
@@ -3809,6 +3869,14 @@ namespace cmsx.machine
         public nothrow override bool IsJumpInst() const
         {
             return true;
+        }
+        public nothrow override List<ulong> GetTargetAddresses(ulong pc, Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            List<ulong> addresses;
+            ulong to = pc + (((cast<ulong>(y) << 8u) | cast<ulong>(z)) << 2u);
+            addresses.Add(to);
+            addresses.Add(pc + 4u);
+            return addresses;
         }
     }
 
@@ -3842,6 +3910,15 @@ namespace cmsx.machine
         {
             return false;
         }
+        public nothrow override List<ulong> GetTargetAddresses(ulong pc, Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            List<ulong> addresses;
+            ulong offset = ((cast<ulong>(y) << 8u) | cast<ulong>(z)) << 2u;
+            ulong to = pc - offset;
+            addresses.Add(to);
+            addresses.Add(pc + 4u);
+            return addresses;
+        }
     }
 
     public class Bp : Instruction
@@ -3869,7 +3946,15 @@ namespace cmsx.machine
         {
             return true;
         }
-    }
+        public nothrow override List<ulong> GetTargetAddresses(ulong pc, Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            List<ulong> addresses;
+            ulong to = pc + (((cast<ulong>(y) << 8u) | cast<ulong>(z)) << 2u);
+            addresses.Add(to);
+            addresses.Add(pc + 4u);
+            return addresses;
+        }
+}
 
     public class Bpb : Instruction
     {
@@ -3901,6 +3986,15 @@ namespace cmsx.machine
         {
             return false;
         }
+        public nothrow override List<ulong> GetTargetAddresses(ulong pc, Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            List<ulong> addresses;
+            ulong offset = ((cast<ulong>(y) << 8u) | cast<ulong>(z)) << 2u;
+            ulong to = pc - offset;
+            addresses.Add(to);
+            addresses.Add(pc + 4u);
+            return addresses;
+        }
     }
 
     public class Bod : Instruction
@@ -3927,6 +4021,14 @@ namespace cmsx.machine
         public nothrow override bool IsJumpInst() const
         {
             return true;
+        }
+        public nothrow override List<ulong> GetTargetAddresses(ulong pc, Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            List<ulong> addresses;
+            ulong to = pc + (((cast<ulong>(y) << 8u) | cast<ulong>(z)) << 2u);
+            addresses.Add(to);
+            addresses.Add(pc + 4u);
+            return addresses;
         }
     }
 
@@ -3960,6 +4062,15 @@ namespace cmsx.machine
         {
             return false;
         }
+        public nothrow override List<ulong> GetTargetAddresses(ulong pc, Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            List<ulong> addresses;
+            ulong offset = ((cast<ulong>(y) << 8u) | cast<ulong>(z)) << 2u;
+            ulong to = pc - offset;
+            addresses.Add(to);
+            addresses.Add(pc + 4u);
+            return addresses;
+        }
     }
 
     public class Bnn : Instruction
@@ -3987,7 +4098,15 @@ namespace cmsx.machine
         {
             return true;
         }
-}
+        public nothrow override List<ulong> GetTargetAddresses(ulong pc, Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            List<ulong> addresses;
+            ulong to = pc + (((cast<ulong>(y) << 8u) | cast<ulong>(z)) << 2u);
+            addresses.Add(to);
+            addresses.Add(pc + 4u);
+            return addresses;
+        }
+    }
 
     public class Bnnb : Instruction
     {
@@ -4019,6 +4138,15 @@ namespace cmsx.machine
         {
             return false;
         }
+        public nothrow override List<ulong> GetTargetAddresses(ulong pc, Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            List<ulong> addresses;
+            ulong offset = ((cast<ulong>(y) << 8u) | cast<ulong>(z)) << 2u;
+            ulong to = pc - offset;
+            addresses.Add(to);
+            addresses.Add(pc + 4u);
+            return addresses;
+        }
     }
 
     public class Bnz : Instruction
@@ -4045,6 +4173,14 @@ namespace cmsx.machine
         public nothrow override bool IsJumpInst() const
         {
             return true;
+        }
+        public nothrow override List<ulong> GetTargetAddresses(ulong pc, Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            List<ulong> addresses;
+            ulong to = pc + (((cast<ulong>(y) << 8u) | cast<ulong>(z)) << 2u);
+            addresses.Add(to);
+            addresses.Add(pc + 4u);
+            return addresses;
         }
     }
 
@@ -4078,6 +4214,15 @@ namespace cmsx.machine
         {
             return false;
         }
+        public nothrow override List<ulong> GetTargetAddresses(ulong pc, Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            List<ulong> addresses;
+            ulong offset = ((cast<ulong>(y) << 8u) | cast<ulong>(z)) << 2u;
+            ulong to = pc - offset;
+            addresses.Add(to);
+            addresses.Add(pc + 4u);
+            return addresses;
+        }
     }
 
     public class Bnp : Instruction
@@ -4104,6 +4249,14 @@ namespace cmsx.machine
         public nothrow override bool IsJumpInst() const
         {
             return true;
+        }
+        public nothrow override List<ulong> GetTargetAddresses(ulong pc, Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            List<ulong> addresses;
+            ulong to = pc + (((cast<ulong>(y) << 8u) | cast<ulong>(z)) << 2u);
+            addresses.Add(to);
+            addresses.Add(pc + 4u);
+            return addresses;
         }
     }
 
@@ -4137,6 +4290,15 @@ namespace cmsx.machine
         {
             return false;
         }
+        public nothrow override List<ulong> GetTargetAddresses(ulong pc, Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            List<ulong> addresses;
+            ulong offset = ((cast<ulong>(y) << 8u) | cast<ulong>(z)) << 2u;
+            ulong to = pc - offset;
+            addresses.Add(to);
+            addresses.Add(pc + 4u);
+            return addresses;
+        }
     }
 
     public class Bev : Instruction
@@ -4163,6 +4325,14 @@ namespace cmsx.machine
         public nothrow override bool IsJumpInst() const
         {
             return true;
+        }
+        public nothrow override List<ulong> GetTargetAddresses(ulong pc, Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            List<ulong> addresses;
+            ulong to = pc + (((cast<ulong>(y) << 8u) | cast<ulong>(z)) << 2u);
+            addresses.Add(to);
+            addresses.Add(pc + 4u);
+            return addresses;
         }
     }
 
@@ -4196,6 +4366,15 @@ namespace cmsx.machine
         {
             return false;
         }
+        public nothrow override List<ulong> GetTargetAddresses(ulong pc, Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            List<ulong> addresses;
+            ulong offset = ((cast<ulong>(y) << 8u) | cast<ulong>(z)) << 2u;
+            ulong to = pc - offset;
+            addresses.Add(to);
+            addresses.Add(pc + 4u);
+            return addresses;
+        }
     }
 
     public class Pbn : Instruction
@@ -4222,6 +4401,14 @@ namespace cmsx.machine
         public nothrow override bool IsJumpInst() const
         {
             return true;
+        }
+        public nothrow override List<ulong> GetTargetAddresses(ulong pc, Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            List<ulong> addresses;
+            ulong to = pc + (((cast<ulong>(y) << 8u) | cast<ulong>(z)) << 2u);
+            addresses.Add(to);
+            addresses.Add(pc + 4u);
+            return addresses;
         }
     }
 
@@ -4255,6 +4442,15 @@ namespace cmsx.machine
         {
             return false;
         }
+        public nothrow override List<ulong> GetTargetAddresses(ulong pc, Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            List<ulong> addresses;
+            ulong offset = ((cast<ulong>(y) << 8u) | cast<ulong>(z)) << 2u;
+            ulong to = pc - offset;
+            addresses.Add(to);
+            addresses.Add(pc + 4u);
+            return addresses;
+        }
     }
 
     public class Pbz : Instruction
@@ -4282,7 +4478,15 @@ namespace cmsx.machine
         {
             return true;
         }
-}
+        public nothrow override List<ulong> GetTargetAddresses(ulong pc, Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            List<ulong> addresses;
+            ulong to = pc + (((cast<ulong>(y) << 8u) | cast<ulong>(z)) << 2u);
+            addresses.Add(to);
+            addresses.Add(pc + 4u);
+            return addresses;
+        }
+    }
 
     public class Pbzb : Instruction
     {
@@ -4314,6 +4518,15 @@ namespace cmsx.machine
         {
             return false;
         }
+        public nothrow override List<ulong> GetTargetAddresses(ulong pc, Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            List<ulong> addresses;
+            ulong offset = ((cast<ulong>(y) << 8u) | cast<ulong>(z)) << 2u;
+            ulong to = pc - offset;
+            addresses.Add(to);
+            addresses.Add(pc + 4u);
+            return addresses;
+        }
     }
 
     public class Pbp : Instruction
@@ -4340,6 +4553,14 @@ namespace cmsx.machine
         public nothrow override bool IsJumpInst() const
         {
             return true;
+        }
+        public nothrow override List<ulong> GetTargetAddresses(ulong pc, Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            List<ulong> addresses;
+            ulong to = pc + (((cast<ulong>(y) << 8u) | cast<ulong>(z)) << 2u);
+            addresses.Add(to);
+            addresses.Add(pc + 4u);
+            return addresses;
         }
     }
 
@@ -4373,6 +4594,15 @@ namespace cmsx.machine
         {
             return false;
         }
+        public nothrow override List<ulong> GetTargetAddresses(ulong pc, Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            List<ulong> addresses;
+            ulong offset = ((cast<ulong>(y) << 8u) | cast<ulong>(z)) << 2u;
+            ulong to = pc - offset;
+            addresses.Add(to);
+            addresses.Add(pc + 4u);
+            return addresses;
+        }
     }
 
     public class Pbod : Instruction
@@ -4399,6 +4629,14 @@ namespace cmsx.machine
         public nothrow override bool IsJumpInst() const
         {
             return true;
+        }
+        public nothrow override List<ulong> GetTargetAddresses(ulong pc, Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            List<ulong> addresses;
+            ulong to = pc + (((cast<ulong>(y) << 8u) | cast<ulong>(z)) << 2u);
+            addresses.Add(to);
+            addresses.Add(pc + 4u);
+            return addresses;
         }
     }
 
@@ -4432,6 +4670,15 @@ namespace cmsx.machine
         {
             return false;
         }
+        public nothrow override List<ulong> GetTargetAddresses(ulong pc, Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            List<ulong> addresses;
+            ulong offset = ((cast<ulong>(y) << 8u) | cast<ulong>(z)) << 2u;
+            ulong to = pc - offset;
+            addresses.Add(to);
+            addresses.Add(pc + 4u);
+            return addresses;
+        }
     }
 
     public class Pbnn : Instruction
@@ -4458,6 +4705,14 @@ namespace cmsx.machine
         public nothrow override bool IsJumpInst() const
         {
             return true;
+        }
+        public nothrow override List<ulong> GetTargetAddresses(ulong pc, Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            List<ulong> addresses;
+            ulong to = pc + (((cast<ulong>(y) << 8u) | cast<ulong>(z)) << 2u);
+            addresses.Add(to);
+            addresses.Add(pc + 4u);
+            return addresses;
         }
     }
 
@@ -4491,6 +4746,15 @@ namespace cmsx.machine
         {
             return false;
         }
+        public nothrow override List<ulong> GetTargetAddresses(ulong pc, Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            List<ulong> addresses;
+            ulong offset = ((cast<ulong>(y) << 8u) | cast<ulong>(z)) << 2u;
+            ulong to = pc - offset;
+            addresses.Add(to);
+            addresses.Add(pc + 4u);
+            return addresses;
+        }
     }
 
     public class Pbnz : Instruction
@@ -4518,7 +4782,15 @@ namespace cmsx.machine
         {
             return true;
         }
-}
+        public nothrow override List<ulong> GetTargetAddresses(ulong pc, Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            List<ulong> addresses;
+            ulong to = pc + (((cast<ulong>(y) << 8u) | cast<ulong>(z)) << 2u);
+            addresses.Add(to);
+            addresses.Add(pc + 4u);
+            return addresses;
+        }
+    }
 
     public class Pbnzb : Instruction
     {
@@ -4550,6 +4822,15 @@ namespace cmsx.machine
         {
             return false;
         }
+        public nothrow override List<ulong> GetTargetAddresses(ulong pc, Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            List<ulong> addresses;
+            ulong offset = ((cast<ulong>(y) << 8u) | cast<ulong>(z)) << 2u;
+            ulong to = pc - offset;
+            addresses.Add(to);
+            addresses.Add(pc + 4u);
+            return addresses;
+        }
     }
 
     public class Pbnp : Instruction
@@ -4576,6 +4857,14 @@ namespace cmsx.machine
         public nothrow override bool IsJumpInst() const
         {
             return true;
+        }
+        public nothrow override List<ulong> GetTargetAddresses(ulong pc, Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            List<ulong> addresses;
+            ulong to = pc + (((cast<ulong>(y) << 8u) | cast<ulong>(z)) << 2u);
+            addresses.Add(to);
+            addresses.Add(pc + 4u);
+            return addresses;
         }
     }
 
@@ -4609,6 +4898,15 @@ namespace cmsx.machine
         {
             return false;
         }
+        public nothrow override List<ulong> GetTargetAddresses(ulong pc, Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            List<ulong> addresses;
+            ulong offset = ((cast<ulong>(y) << 8u) | cast<ulong>(z)) << 2u;
+            ulong to = pc - offset;
+            addresses.Add(to);
+            addresses.Add(pc + 4u);
+            return addresses;
+        }
     }
 
     public class Pbev : Instruction
@@ -4635,6 +4933,14 @@ namespace cmsx.machine
         public nothrow override bool IsJumpInst() const
         {
             return true;
+        }
+        public nothrow override List<ulong> GetTargetAddresses(ulong pc, Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            List<ulong> addresses;
+            ulong to = pc + (((cast<ulong>(y) << 8u) | cast<ulong>(z)) << 2u);
+            addresses.Add(to);
+            addresses.Add(pc + 4u);
+            return addresses;
         }
     }
 
@@ -4667,6 +4973,15 @@ namespace cmsx.machine
         public nothrow override bool IsForwardInst() const
         {
             return false;
+        }
+        public nothrow override List<ulong> GetTargetAddresses(ulong pc, Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            List<ulong> addresses;
+            ulong offset = ((cast<ulong>(y) << 8u) | cast<ulong>(z)) << 2u;
+            ulong to = pc - offset;
+            addresses.Add(to);
+            addresses.Add(pc + 4u);
+            return addresses;
         }
     }
 

@@ -36,6 +36,7 @@ namespace cmsx.kernel
             Machine& machine = GetMachine();
             ProcessTable& processTable = GetProcessTable();
             ExecutableFile* executable = cast<ExecutableFile*>(binaryFile.Get());
+            executable->AddSymbolsToAddressMap();
             Section* codeSection = executable->GetCodeSection();
             Section* dataSection = executable->GetDataSection();
             string name = Path.GetFileName(programFileName);
@@ -67,6 +68,10 @@ namespace cmsx.kernel
             Section poolSection = MakePoolSection(argv);
             if (!poolSection.data.IsEmpty())
             {
+                if (poolSection.data.Count() > executable->PoolSize())
+                {
+                    Panic("loader error: arguments too big (> " + ToString(executable->PoolSize()) + " bytes) in program '" + programFileName + "'");
+                }
                 int result = WriteProcessMemory(machine, process, poolSegmentBaseAddress, poolSection.data.Begin().Ptr(), cast<ulong>(poolSection.data.Count()),
                     Protection.write);
                 if (result != 0)
@@ -75,17 +80,25 @@ namespace cmsx.kernel
                 }
                 int ax = cast<int>(argv.Count());
                 ulong bx = poolSegmentBaseAddress;
-                result = WriteProcessMemory(machine, process, process->regAXAddress, cast<ulong>(ax), 8u);
+                result = WriteProcessMemory(machine, process, process->regAXAddress, cast<ulong>(ax), 8u, Protection.write);
                 if (result != 0)
                 {
                     Panic("loader error: error writing to stack segment of program '" + programFileName + "'");
                 }
-                result = WriteProcessMemory(machine, process, process->regBXAddress, bx, 8u);
+                result = WriteProcessMemory(machine, process, process->regBXAddress, bx, 8u, Protection.write);
                 if (result != 0)
                 {
                     Panic("loader error: error writing to stack segment of program '" + programFileName + "'");
                 }
             }
+            ulong poolDataLength = executable->PoolSize();
+            ulong poolStart = poolSegmentBaseAddress + poolDataLength;
+            ulong poolEnd = poolSegmentBaseAddress + poolDataLength;
+            process->poolStart = poolStart;
+            process->poolEnd = poolEnd;
+            executable = cast<ExecutableFile*>(binaryFile.Release());
+            Kernel& kernel = Kernel.Instance();
+            kernel.SetExecutable(executable);
             return process->pid;
         }
         else

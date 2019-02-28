@@ -54,6 +54,7 @@ public:
     void Check() override;
 private:
     std::unordered_map<int, std::vector<FunctionSymbol*>> arityFunctionListMap;
+    std::vector<FunctionSymbol*> varArgFunctions;
 };
 
 enum class ConversionType : uint8_t
@@ -81,7 +82,8 @@ enum class FunctionSymbolFlags : uint32_t
     hasTry = 1 << 14,
     hasSource = 1 << 15,
     includeConstraint = 1 << 16,
-    copy = 1 << 17
+    copy = 1 << 17,
+    varArg = 1 << 18
 };
 
 inline FunctionSymbolFlags operator|(FunctionSymbolFlags left, FunctionSymbolFlags right)
@@ -194,6 +196,8 @@ public:
     void SetHasTry() { SetFlag(FunctionSymbolFlags::hasTry); }
     bool IsCopy() const { return GetFlag(FunctionSymbolFlags::copy); }
     void SetCopy() { SetFlag(FunctionSymbolFlags::copy); }
+    bool IsVarArg() const { return GetFlag(FunctionSymbolFlags::varArg); }
+    void SetVarArg() { SetFlag(FunctionSymbolFlags::varArg); }
     virtual bool DontThrow() const { return IsNothrow() || IsBasicTypeOperation(); }
     FunctionSymbolFlags GetFunctionSymbolFlags() const { return flags; }
     bool GetFlag(FunctionSymbolFlags flag) const { return (flags & flag) != FunctionSymbolFlags::none; }

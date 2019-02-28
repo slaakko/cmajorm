@@ -34,7 +34,7 @@ Type::~Type()
 {
 }
 
-Value* Type::DefaultValue()
+ConstantValue* Type::DefaultValue()
 {
     Assert(false, "default value not implemented");
     return nullptr;
@@ -243,6 +243,7 @@ TypeRepository::TypeRepository()
 
 void TypeRepository::Write(CodeFormatter& formatter)
 {
+    if (types.empty()) return;
     formatter.WriteLine("types");
     formatter.WriteLine("{");
     formatter.IncIndent();

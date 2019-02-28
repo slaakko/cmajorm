@@ -321,6 +321,7 @@ public:
     virtual void* CreateLexicalBlock(const Span& span) = 0;
     virtual void* CreateSwitch(void* condition, void* defaultDest, unsigned numCases) = 0;
     virtual void AddCase(void* switchInst, void* caseValue, void* caseDest) = 0;
+    virtual void* GenerateTrap(const std::vector<void*>& args) = 0;
 private:
     ValueStack* stack;
 };

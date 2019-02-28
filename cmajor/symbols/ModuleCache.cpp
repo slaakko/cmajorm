@@ -7,6 +7,7 @@
 #include <cmajor/symbols/Module.hpp>
 #include <cmajor/symbols/DebugFlags.hpp>
 #include <cmajor/symbols/GlobalFlags.hpp>
+#include <cmajor/symbols/Trap.hpp>
 #include <cmajor/util/Unicode.hpp>
 #include <cmajor/util/Log.hpp>
 
@@ -138,6 +139,10 @@ void PrepareModuleForCompilation(Module* rootModule, const std::vector<std::stri
     std::lock_guard<std::recursive_mutex> lock(mtx);
     rootModule->PrepareForCompilation(references);
     cmajor::symbols::MetaInit(rootModule->GetSymbolTable());
+    if (GetBackEnd() == BackEnd::cmsx && rootModule->Name() == U"System.Core")
+    {
+        cmajor::symbols::InitTrap(rootModule->GetSymbolTable());
+    }
 }
 
 Module* GetModuleFromModuleCache(const std::string& moduleFilePath)

@@ -15,6 +15,7 @@
 #include <cmajor/symbols/Exception.hpp>
 #include <cmajor/symbols/ClassTypeSymbol.hpp>
 #include <cmajor/symbols/InterfaceTypeSymbol.hpp>
+#include <cmajor/symbols/GlobalFlags.hpp>
 #include <cmajor/ast/Identifier.hpp>
 #include <cmajor/ast/Expression.hpp>
 #include <cmajor/util/Unicode.hpp>
@@ -3102,24 +3103,27 @@ void GenerateStaticClassInitialization(StaticConstructorSymbol* staticConstructo
         std::unique_ptr<BoundIfStatement> ifStatement(new BoundIfStatement(module, span, std::unique_ptr<BoundExpression>(new BoundMemberVariable(module, span, classType->InitializedVar())),
             std::unique_ptr<BoundStatement>(new BoundReturnStatement(module, std::unique_ptr<BoundFunctionCall>(nullptr), span)), std::unique_ptr<BoundStatement>(nullptr)));
         boundCompoundStatement->AddStatement(std::move(ifStatement));
-        IdentifierNode staticInitCriticalSection(span, U"System.Runtime.StaticInitCriticalSection");
-        TypeSymbol* staticInitCriticalSectionClassType = ResolveType(&staticInitCriticalSection, boundCompileUnit, containerScope);
-        std::vector<FunctionScopeLookup> constructorLookups;
-        constructorLookups.push_back(FunctionScopeLookup(ScopeLookup::this_and_base_and_parent, containerScope));
-        constructorLookups.push_back(FunctionScopeLookup(ScopeLookup::this_, staticInitCriticalSectionClassType->ClassInterfaceOrNsScope()));
-        constructorLookups.push_back(FunctionScopeLookup(ScopeLookup::fileScopes, nullptr));
-        std::vector<std::unique_ptr<BoundExpression>> constructorArguments;
-        constructorArguments.push_back(std::unique_ptr<BoundExpression>(new BoundAddressOfExpression(module, std::unique_ptr<BoundExpression>(
-            new BoundLocalVariable(module, span, staticConstructorSymbol->CreateTemporary(staticInitCriticalSectionClassType, span))),
-            staticInitCriticalSectionClassType->AddPointer(span))));
-        constructorArguments.push_back(std::unique_ptr<BoundExpression>(new BoundLiteral(module, std::unique_ptr<Value>(new UuidValue(span,
-            boundCompileUnit.Install(classType->TypeId()))), boundCompileUnit.GetSymbolTable().GetTypeByName(U"void")->AddPointer(span))));
-        std::unique_ptr<BoundConstructionStatement> constructionStatement(new BoundConstructionStatement(module, ResolveOverload(U"@constructor", containerScope, constructorLookups, constructorArguments,
-            boundCompileUnit, boundFunction, span)));
-        boundCompoundStatement->AddStatement(std::move(constructionStatement));
-        std::unique_ptr<BoundIfStatement> ifStatement2(new BoundIfStatement(module, span, std::unique_ptr<BoundExpression>(new BoundMemberVariable(module, span, classType->InitializedVar())),
-            std::unique_ptr<BoundStatement>(new BoundReturnStatement(module, std::unique_ptr<BoundFunctionCall>(nullptr), span)), std::unique_ptr<BoundStatement>(nullptr)));
-        boundCompoundStatement->AddStatement(std::move(ifStatement2));
+        if (GetBackEnd() == BackEnd::llvm)
+        {
+            IdentifierNode staticInitCriticalSection(span, U"System.Runtime.StaticInitCriticalSection");
+            TypeSymbol* staticInitCriticalSectionClassType = ResolveType(&staticInitCriticalSection, boundCompileUnit, containerScope);
+            std::vector<FunctionScopeLookup> constructorLookups;
+            constructorLookups.push_back(FunctionScopeLookup(ScopeLookup::this_and_base_and_parent, containerScope));
+            constructorLookups.push_back(FunctionScopeLookup(ScopeLookup::this_, staticInitCriticalSectionClassType->ClassInterfaceOrNsScope()));
+            constructorLookups.push_back(FunctionScopeLookup(ScopeLookup::fileScopes, nullptr));
+            std::vector<std::unique_ptr<BoundExpression>> constructorArguments;
+            constructorArguments.push_back(std::unique_ptr<BoundExpression>(new BoundAddressOfExpression(module, std::unique_ptr<BoundExpression>(
+                new BoundLocalVariable(module, span, staticConstructorSymbol->CreateTemporary(staticInitCriticalSectionClassType, span))),
+                staticInitCriticalSectionClassType->AddPointer(span))));
+            constructorArguments.push_back(std::unique_ptr<BoundExpression>(new BoundLiteral(module, std::unique_ptr<Value>(new UuidValue(span,
+                boundCompileUnit.Install(classType->TypeId()))), boundCompileUnit.GetSymbolTable().GetTypeByName(U"void")->AddPointer(span))));
+            std::unique_ptr<BoundConstructionStatement> constructionStatement(new BoundConstructionStatement(module, ResolveOverload(U"@constructor", containerScope, constructorLookups, constructorArguments,
+                boundCompileUnit, boundFunction, span)));
+            boundCompoundStatement->AddStatement(std::move(constructionStatement));
+            std::unique_ptr<BoundIfStatement> ifStatement2(new BoundIfStatement(module, span, std::unique_ptr<BoundExpression>(new BoundMemberVariable(module, span, classType->InitializedVar())),
+                std::unique_ptr<BoundStatement>(new BoundReturnStatement(module, std::unique_ptr<BoundFunctionCall>(nullptr), span)), std::unique_ptr<BoundStatement>(nullptr)));
+            boundCompoundStatement->AddStatement(std::move(ifStatement2));
+        }
         std::vector<FunctionScopeLookup> assignmentLookups;
         assignmentLookups.push_back(FunctionScopeLookup(ScopeLookup::this_and_base_and_parent, containerScope));
         assignmentLookups.push_back(FunctionScopeLookup(ScopeLookup::fileScopes, nullptr));

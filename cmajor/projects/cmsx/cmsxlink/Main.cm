@@ -23,9 +23,6 @@ void PrintHelp()
     Console.Out() << "--stack=STACKSIZE (-s=STACKSIZE)" << endl();
     Console.Out() << "  set stack segment size to STACKSIZE bytes." << endl();
     Console.Out() << "  default is 64K bytes." << endl();
-    Console.Out() << "--pool=POOLSIZE (-p=POOLSIZE)" << endl();
-    Console.Out() << "  set pool segment size to POOLSIZE bytes." << endl();
-    Console.Out() << "  default is 64K bytes." << endl();
 }
 
 int main(int argc, const char** argv)
@@ -38,13 +35,11 @@ int main(int argc, const char** argv)
             throw Exception("please set CMAJOR_ROOT environment variable to /path/to/cmajor directory");
         }
         string mainPath = Path.Combine(cmajorRootDir, "projects/cmsx/cmsxrt/Main.o");
-        string systemPath = Path.Combine(cmajorRootDir, "projects/cmsx/cmsxrt/System.a");
         List<string> fileNames;
         fileNames.Add(GetFullPath(mainPath));
-        fileNames.Add(GetFullPath(systemPath));
         bool verbose = false;
         ulong stackSize = 64u * cast<ulong>(1024u);
-        ulong poolSize = 64u * cast<ulong>(1024u);
+        ulong poolSize = 4u * cast<ulong>(1024u);
         string executableFileName = GetFullPath("a.out");
         bool userFilesGiven = false;
         for (int i = 1; i < argc; ++i)
@@ -64,10 +59,6 @@ int main(int argc, const char** argv)
                         else if (components[0] == "-s" || components[0] == "--stack")
                         {
                             stackSize = ParseULong(components[1]);
-                        }
-                        else if (components[0] == "-p" || components[0] == "--pool")
-                        {
-                            poolSize = ParseULong(components[1]);
                         }
                         else
                         {

@@ -275,6 +275,61 @@ extern "C" RT_API void RtAttrSet(int attrs)
     attrset(attrs);
 }
 
+extern "C" RT_API void RtStartColor()
+{
+    start_color();
+}
+
+extern "C" RT_API void RtInitPair(short n, short foregroundColor, short backgroundColor)
+{
+    init_pair(n, foregroundColor, backgroundColor);
+}
+
+extern "C" RT_API int RtColorPair(short n)
+{
+    return COLOR_PAIR(n);
+}
+
+extern "C" RT_API short RtWhite()
+{
+    return COLOR_WHITE;
+}
+
+extern "C" RT_API short RtBlack()
+{
+    return COLOR_BLACK;
+}
+
+extern "C" RT_API short RtBlue()
+{
+    return COLOR_BLUE;
+}
+
+extern "C" RT_API short RtGreen()
+{
+    return COLOR_GREEN;
+}
+
+extern "C" RT_API short RtRed()
+{
+    return COLOR_RED;
+}
+
+extern "C" RT_API short RtCyan()
+{
+    return COLOR_CYAN;
+}
+
+extern "C" RT_API short RtMagenta()
+{
+    return COLOR_MAGENTA;
+}
+
+extern "C" RT_API short RtYellow()
+{
+    return COLOR_YELLOW;
+}
+
 extern "C" RT_API bool RtRunningOnWsl()
 {
     return runningOnWsl;

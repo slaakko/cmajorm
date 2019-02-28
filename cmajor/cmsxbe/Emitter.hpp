@@ -296,6 +296,7 @@ public:
     void* CreateLexicalBlock(const Span& span) override;
     void* CreateSwitch(void* condition, void* defaultDest, unsigned numCases) override;
     void AddCase(void* switchInst, void* caseValue, void* caseDest) override;
+    void* GenerateTrap(const std::vector<void*>& args) override;
 private:
     cmsxbe::EmittingContext* emittingContext;
     ValueStack stack;
@@ -305,6 +306,10 @@ private:
     std::unordered_map<boost::uuids::uuid, cmsxi::Type*, boost::hash<boost::uuids::uuid>> irTypeTypeIdMap;
     cmsxi::Function* currentFunction;
     std::unordered_map<void*, cmsxi::Value*> irObjectMap;
+    std::unordered_set<void*> vmtObjectCreatedSet;
+    std::unordered_set<void*> staticObjectCreatedSet;
+    std::unordered_map<void*, cmsxi::StructureType*> staticTypeMap;
+    std::unordered_map<void*, std::string> staticObjectNameMap;
 };
 
 } // namespace cmsxbe

@@ -5,6 +5,8 @@
 
 #ifndef CMAJOR_CMDOCLIB_CONSTRAINT_INCLUDED
 #define CMAJOR_CMDOCLIB_CONSTRAINT_INCLUDED
+#include <cmajor/cmdoclib/CmDocLibApi.hpp>
+#include <cmajor/binder/TypeBinder.hpp>
 #include <cmajor/binder/BoundCompileUnit.hpp>
 
 namespace cmajor { namespace cmdoclib {
@@ -13,7 +15,8 @@ using namespace cmajor::ast;
 using namespace cmajor::symbols;
 using namespace cmajor::binder;
 
-void BindConstraintSymbols(Node* node, ContainerScope* containerScope, BoundCompileUnit& boundCompileUnit);
+CMDOCLIB_API void SetConstraintSymbolBinder();
+CMDOCLIB_API void BindConstraintSymbols(Node* node, ContainerScope* containerScope, BoundCompileUnit& boundCompileUnit);
 
 } } // namespace cmajor::cmdoclib
 

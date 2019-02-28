@@ -8,7 +8,25 @@
 #include <cmajor/ast/Expression.hpp>
 
 namespace cmajor { namespace cmdoclib {
-    
+
+class ConstraintSymbolBinder : public cmajor::binder::ConstraintSymbolBinder
+{
+public:
+    void BindConstraintSymbols(Node* node, ContainerScope* containerScope, BoundCompileUnit& boundCompileUnit) override;
+};
+
+ConstraintSymbolBinder constraintSymbolBinder;
+
+void SetConstraintSymbolBinder()
+{
+    cmajor::binder::SetConstraintSymbolBinder(&constraintSymbolBinder);
+}
+
+void ConstraintSymbolBinder::BindConstraintSymbols(Node* node, ContainerScope* containerScope, BoundCompileUnit& boundCompileUnit)
+{
+    cmajor::cmdoclib::BindConstraintSymbols(node, containerScope, boundCompileUnit);
+}
+
 class ConstraintBinderVisitor : public Visitor
 {
 public:

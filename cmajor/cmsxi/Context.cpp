@@ -18,81 +18,95 @@ void Context::AddValue(Value* value)
     values.push_back(std::unique_ptr<Value>(value));
 }
 
-Value* Context::GetBoolValue(bool value)
+ConstantValue* Context::GetBoolValue(bool value)
 {
-    Value* boolValue = new BoolValue(value);
+    ConstantValue* boolValue = new BoolValue(value);
     AddValue(boolValue);
     return boolValue;
 }
 
-Value* Context::GetSByteValue(int8_t value)
+ConstantValue* Context::GetSByteValue(int8_t value)
 {
-    Value* sbyteValue = new SByteValue(value);
+    ConstantValue* sbyteValue = new SByteValue(value);
     AddValue(sbyteValue);
     return sbyteValue;
 }
 
-Value* Context::GetByteValue(uint8_t value)
+ConstantValue* Context::GetByteValue(uint8_t value)
 {
-    Value* byteValue = new ByteValue(value);
+    ConstantValue* byteValue = new ByteValue(value);
     AddValue(byteValue);
     return byteValue;
 }
 
-Value* Context::GetShortValue(int16_t value)
+ConstantValue* Context::GetShortValue(int16_t value)
 {
-    Value* shortValue = new ShortValue(value);
+    ConstantValue* shortValue = new ShortValue(value);
     AddValue(shortValue);
     return shortValue;
 }
 
-Value* Context::GetUShortValue(uint16_t value)
+ConstantValue* Context::GetUShortValue(uint16_t value)
 {
-    Value* ushortValue = new UShortValue(value);
+    ConstantValue* ushortValue = new UShortValue(value);
     AddValue(ushortValue);
     return ushortValue;
 }
 
-Value* Context::GetIntValue(int32_t value)
+ConstantValue* Context::GetIntValue(int32_t value)
 {
-    Value* intValue = new IntValue(value);
+    ConstantValue* intValue = new IntValue(value);
     AddValue(intValue);
     return intValue;
 }
 
-Value* Context::GetUIntValue(uint32_t value)
+ConstantValue* Context::GetUIntValue(uint32_t value)
 {
-    Value* uintValue = new UIntValue(value);
+    ConstantValue* uintValue = new UIntValue(value);
     AddValue(uintValue);
     return uintValue;
 }
 
-Value* Context::GetLongValue(int64_t value)
+ConstantValue* Context::GetLongValue(int64_t value)
 {
-    Value* longValue = new LongValue(value);
+    ConstantValue* longValue = new LongValue(value);
     AddValue(longValue);
     return longValue;
 }
 
-Value* Context::GetULongValue(uint64_t value)
+ConstantValue* Context::GetULongValue(uint64_t value)
 {
-    Value* ulongValue = new ULongValue(value);
+    ConstantValue* ulongValue = new ULongValue(value);
     AddValue(ulongValue);
     return ulongValue;
 }
 
-Value* Context::GetFloatValue(float value)
+ConstantValue* Context::GetFloatValue(float value)
 {
-    Value* floatValue = new FloatValue(value);
+    ConstantValue* floatValue = new FloatValue(value);
     AddValue(floatValue);
     return floatValue;
 }
 
-Value* Context::GetDoubleValue(double value)
+ConstantValue* Context::GetDoubleValue(double value)
 {
-    Value* doubleValue = new DoubleValue(value);
+    ConstantValue* doubleValue = new DoubleValue(value);
     AddValue(doubleValue);
     return doubleValue;
+}
+
+ArrayValue* Context::GetArrayValue(Type* arrayType, const std::vector<ConstantValue*>& elements)
+{
+    ArrayValue* arrayValue = new ArrayValue(arrayType, elements);
+    AddValue(arrayValue);
+    return arrayValue;
+}
+
+StructureValue* Context::GetStructureValue(Type* structureType, const std::vector<ConstantValue*>& members)
+{
+    StructureValue* structureValue = new StructureValue(structureType, members);
+    AddValue(structureValue);
+    return structureValue;
 }
 
 Instruction* Context::CreateNot(Value* arg)
@@ -338,6 +352,42 @@ Instruction* Context::CreateSwitch(Value* cond, BasicBlock* defaultDest)
     Instruction* inst = new SwitchInstruction(cond, defaultDest);
     currentBasicBlock->AddInstruction(inst);
     return inst;
+}
+
+Instruction* Context::CreateTrap(const std::vector<Value*>& args)
+{
+    Value* b0 = nullptr;
+    Value* b1 = nullptr;
+    Value* b2 = nullptr;
+    int n = args.size();
+    for (int i = 0; i < n; ++i)
+    {
+        Value* arg = args[i];
+        if (i == 0)
+        {
+            b0 = arg;
+        }
+        else if (i == 1)
+        {
+            b1 = arg;
+        }
+        else if (i == 2)
+        {
+            b2 = arg;
+        }
+        else
+        {
+            CreateArg(arg);
+        }
+    }
+    Instruction* inst = new TrapInstruction(b0, b1, b2);
+    currentBasicBlock->AddInstruction(inst);
+    return inst;
+}
+
+GlobalVariable* Context::GetOrInsertGlobal(const std::string& name, Type* type)
+{
+    return dataRepository.GetOrInsertGlobal(name, type);
 }
 
 } // namespace cmsxi

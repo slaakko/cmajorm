@@ -9,7 +9,6 @@
 #include <cmajor/binder/Concept.hpp>
 #include <cmajor/binder/Evaluator.hpp>
 #include <cmajor/binder/AttributeBinder.hpp>
-#include <cmajor/cmdoclib/Constraint.hpp>
 #include <cmajor/ast/CompileUnit.hpp>
 #include <cmajor/ast/Identifier.hpp>
 #include <cmajor/symbols/FunctionSymbol.hpp>
@@ -26,6 +25,17 @@
 namespace cmajor { namespace binder {
 
 using namespace cmajor::unicode;
+
+ConstraintSymbolBinder* constraintSymbolBinder = nullptr;
+
+ConstraintSymbolBinder::~ConstraintSymbolBinder()
+{
+}
+
+void SetConstraintSymbolBinder(ConstraintSymbolBinder* constraintSymbolBinder_)
+{
+    constraintSymbolBinder = constraintSymbolBinder_;
+}
 
 class UsingNodeAdder : public Visitor
 {
@@ -144,7 +154,7 @@ void TypeBinder::Visit(FunctionNode& functionNode)
     currentFunctionSymbol = functionSymbol;
     if (GetGlobalFlag(GlobalFlags::cmdoc) && functionNode.WhereConstraint())
     {
-        cmdoclib::BindConstraintSymbols(functionNode.WhereConstraint(), containerScope, boundCompileUnit);
+        constraintSymbolBinder->BindConstraintSymbols(functionNode.WhereConstraint(), containerScope, boundCompileUnit);
     }
     if (functionSymbol->IsFunctionTemplate())
     {
@@ -157,7 +167,7 @@ void TypeBinder::Visit(FunctionNode& functionNode)
     }
     if (GetGlobalFlag(GlobalFlags::cmdoc) && functionSymbol->Constraint())
     {
-        cmdoclib::BindConstraintSymbols(functionSymbol->Constraint(), functionSymbol->GetContainerScope(), boundCompileUnit);
+        constraintSymbolBinder->BindConstraintSymbols(functionSymbol->Constraint(), functionSymbol->GetContainerScope(), boundCompileUnit);
     }
     containerScope = functionSymbol->GetContainerScope();
     Specifiers specifiers = functionNode.GetSpecifiers();
@@ -228,7 +238,7 @@ void TypeBinder::BindClassTemplate(ClassTypeSymbol* classTemplate, ClassNode* cl
         classTemplate->SetConstraint(static_cast<ConstraintNode*>(classNode->WhereConstraint()->Clone(cloneContext)));
         if (GetGlobalFlag(GlobalFlags::cmdoc))
         {
-            cmdoclib::BindConstraintSymbols(classNode->WhereConstraint(), classTemplate->GetContainerScope(), boundCompileUnit);
+            constraintSymbolBinder->BindConstraintSymbols(classNode->WhereConstraint(), classTemplate->GetContainerScope(), boundCompileUnit);
         }
     }
     classTemplate->SetAccess(classNode->GetSpecifiers() & Specifiers::access_);
@@ -245,7 +255,7 @@ void TypeBinder::BindClassTemplate(ClassTypeSymbol* classTemplate, ClassNode* cl
     classTemplate->SetPrototype(prototype);
     if (GetGlobalFlag(GlobalFlags::cmdoc) && prototype->Constraint())
     {
-        cmdoclib::BindConstraintSymbols(prototype->Constraint(), prototype->GetContainerScope(), boundCompileUnit);
+        constraintSymbolBinder->BindConstraintSymbols(prototype->Constraint(), prototype->GetContainerScope(), boundCompileUnit);
     }
 }
 
@@ -275,7 +285,7 @@ void TypeBinder::BindClass(ClassTypeSymbol* classTypeSymbol, ClassNode* classNod
         classTypeSymbol->SetConstraint(static_cast<ConstraintNode*>(classNode->WhereConstraint()->Clone(cloneContext)));
         if (GetGlobalFlag(GlobalFlags::cmdoc))
         {
-            cmdoclib::BindConstraintSymbols(classNode->WhereConstraint(), containerScope, boundCompileUnit);
+            constraintSymbolBinder->BindConstraintSymbols(classNode->WhereConstraint(), containerScope, boundCompileUnit);
         }
     }
     classTypeSymbol->ComputeName();
@@ -376,11 +386,11 @@ void TypeBinder::Visit(StaticConstructorNode& staticConstructorNode)
     staticConstructorSymbol->ComputeName();
     if (GetGlobalFlag(GlobalFlags::cmdoc) && staticConstructorNode.WhereConstraint())
     {
-        cmdoclib::BindConstraintSymbols(staticConstructorNode.WhereConstraint(), containerScope, boundCompileUnit);
+        constraintSymbolBinder->BindConstraintSymbols(staticConstructorNode.WhereConstraint(), containerScope, boundCompileUnit);
     }
     if (GetGlobalFlag(GlobalFlags::cmdoc) && staticConstructorSymbol->Constraint())
     {
-        cmdoclib::BindConstraintSymbols(staticConstructorSymbol->Constraint(), containerScope, boundCompileUnit);
+        constraintSymbolBinder->BindConstraintSymbols(staticConstructorSymbol->Constraint(), containerScope, boundCompileUnit);
     }
     if (staticConstructorNode.Body())
     {
@@ -451,11 +461,11 @@ void TypeBinder::Visit(ConstructorNode& constructorNode)
     constructorSymbol->ComputeName();
     if (GetGlobalFlag(GlobalFlags::cmdoc) && constructorNode.WhereConstraint())
     {
-        cmdoclib::BindConstraintSymbols(constructorNode.WhereConstraint(), containerScope, boundCompileUnit);
+        constraintSymbolBinder->BindConstraintSymbols(constructorNode.WhereConstraint(), containerScope, boundCompileUnit);
     }
     if (GetGlobalFlag(GlobalFlags::cmdoc) && constructorSymbol->Constraint())
     {
-        cmdoclib::BindConstraintSymbols(constructorSymbol->Constraint(), containerScope, boundCompileUnit);
+        constraintSymbolBinder->BindConstraintSymbols(constructorSymbol->Constraint(), containerScope, boundCompileUnit);
     }
     for (ParameterSymbol* parameterSymbol : constructorSymbol->Parameters())
     {
@@ -530,11 +540,11 @@ void TypeBinder::Visit(DestructorNode& destructorNode)
     destructorSymbol->ComputeName();
     if (GetGlobalFlag(GlobalFlags::cmdoc) && destructorNode.WhereConstraint())
     {
-        cmdoclib::BindConstraintSymbols(destructorNode.WhereConstraint(), containerScope, boundCompileUnit);
+        constraintSymbolBinder->BindConstraintSymbols(destructorNode.WhereConstraint(), containerScope, boundCompileUnit);
     }
     if (GetGlobalFlag(GlobalFlags::cmdoc) && destructorSymbol->Constraint())
     {
-        cmdoclib::BindConstraintSymbols(destructorSymbol->Constraint(), containerScope, boundCompileUnit);
+        constraintSymbolBinder->BindConstraintSymbols(destructorSymbol->Constraint(), containerScope, boundCompileUnit);
     }
     if (destructorNode.Body())
     {
@@ -606,11 +616,11 @@ void TypeBinder::Visit(MemberFunctionNode& memberFunctionNode)
     memberFunctionSymbol->ComputeName();
     if (GetGlobalFlag(GlobalFlags::cmdoc) && memberFunctionNode.WhereConstraint())
     {
-        cmdoclib::BindConstraintSymbols(memberFunctionNode.WhereConstraint(), containerScope, boundCompileUnit);
+        constraintSymbolBinder->BindConstraintSymbols(memberFunctionNode.WhereConstraint(), containerScope, boundCompileUnit);
     }
     if (GetGlobalFlag(GlobalFlags::cmdoc) && memberFunctionSymbol->Constraint())
     {
-        cmdoclib::BindConstraintSymbols(memberFunctionSymbol->Constraint(), containerScope, boundCompileUnit);
+        constraintSymbolBinder->BindConstraintSymbols(memberFunctionSymbol->Constraint(), containerScope, boundCompileUnit);
     }
     for (ParameterSymbol* parameterSymbol : memberFunctionSymbol->Parameters())
     {
@@ -694,11 +704,11 @@ void TypeBinder::Visit(ConversionFunctionNode& conversionFunctionNode)
     conversionFunctionSymbol->ComputeName();
     if (GetGlobalFlag(GlobalFlags::cmdoc) && conversionFunctionNode.WhereConstraint())
     {
-        cmdoclib::BindConstraintSymbols(conversionFunctionNode.WhereConstraint(), containerScope, boundCompileUnit);
+        constraintSymbolBinder->BindConstraintSymbols(conversionFunctionNode.WhereConstraint(), containerScope, boundCompileUnit);
     }
     if (GetGlobalFlag(GlobalFlags::cmdoc) && conversionFunctionSymbol->Constraint())
     {
-        cmdoclib::BindConstraintSymbols(conversionFunctionSymbol->Constraint(), containerScope, boundCompileUnit);
+        constraintSymbolBinder->BindConstraintSymbols(conversionFunctionSymbol->Constraint(), containerScope, boundCompileUnit);
     }
     if (conversionFunctionSymbol->ReturnsClassInterfaceOrClassDelegateByValue())
     {
@@ -946,7 +956,7 @@ void TypeBinder::BindConcept(ConceptSymbol* conceptSymbol, ConceptNode* conceptN
         {
             symbolTable.MapSymbol(conceptNode->TypeParameters()[i], conceptSymbol->TemplateParameters()[i]);
         }
-        cmdoclib::BindConstraintSymbols(conceptNode, containerScope, boundCompileUnit);
+        constraintSymbolBinder->BindConstraintSymbols(conceptNode, containerScope, boundCompileUnit);
     }
     conceptSymbol->SetSpecifiers(conceptNode->GetSpecifiers());
     conceptSymbol->ComputeName();

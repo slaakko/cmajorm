@@ -91,6 +91,32 @@ namespace cmsx.intermediate
                 function->ComputeLivenessAndNextUse();
             }
         }
+        public GlobalVariable* GetGlobalVariable(const string& globalVariableName) const
+        {
+            HashMap<string, GlobalVariable*>.ConstIterator it = globalVariableMap.CFind(globalVariableName);
+            if (it != globalVariableMap.CEnd())
+            {
+                return it->second;
+            }
+            else
+            {
+                throw Exception("global variable '" + globalVariableName + "' not found");
+            }
+        }
+        public void AddGlobalVariable(Type* type, const string& name, ConstantValue* initializer, int line)
+        {
+            Location* dataLocation = dataLocations.GetDataLocation(context.GetSymbolOperand(name));
+            GlobalVariable* globalVariable = new GlobalVariable(type, name, initializer, line, dataLocation);
+            globalVariables.Add(UniquePtr<GlobalVariable>(globalVariable));
+            globalVariableMap[name] = globalVariable;
+        }
+        public void ValidateGlobalVariables()
+        {
+            for (const UniquePtr<GlobalVariable>& globalVariable : globalVariables)
+            {
+                globalVariable->Validate();
+            }
+        }
         public void GenerateCode(MachineCode& machineCode)
         {
             StreamWriter* writer = &Console.Out();
@@ -102,18 +128,37 @@ namespace cmsx.intermediate
                 writer = debugWriter.Get();
             }
             CodeFormatter formatter(*writer);
+            for (const UniquePtr<GlobalVariable>& globalVariable : globalVariables)
+            {
+                globalVariable->GenerateDeclaration(machineCode);
+            }
             for (const UniquePtr<Function>& function : functions)
             {
                 function->GenerateDeclaration(machineCode);
             }
+            if (!globalVariables.IsEmpty())
+            {
+                machineCode.GetInstruction(separatorInstructionOpCode, null);
+                machineCode.GetInstruction(cmsx.assembly.DATA, null);
+                machineCode.GetInstruction(separatorInstructionOpCode, null);
+                for (const UniquePtr<GlobalVariable>& globalVariable : globalVariables)
+                {
+                    globalVariable->GenerateDefinition(machineCode, context);
+                }
+                machineCode.GetInstruction(separatorInstructionOpCode, null);
+                machineCode.GetInstruction(cmsx.assembly.CODE, null);
+            }
             for (const UniquePtr<Function>& function : functions)
             {
-                machineCode.GetInstruction(separatorInstructionOpCode);
+                machineCode.GetInstruction(separatorInstructionOpCode, null);
                 function->GenerateCode(machineCode, formatter);
             }
         }
         public Context& context;
         public string fileName;
+        private List<UniquePtr<GlobalVariable>> globalVariables;
+        private HashMap<string, GlobalVariable*> globalVariableMap;
         private List<UniquePtr<Function>> functions;
+        private DataLocations dataLocations;
     }
 }

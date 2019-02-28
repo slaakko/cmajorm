@@ -1,0 +1,1039 @@
+using System;
+using System.Collections;
+
+namespace cmsx.debug
+{
+    public enum State
+    {
+        running, exit
+    }
+
+    public enum CommandResult
+    {
+        ret, cont 
+    }
+
+    public const short blackOnWhite = 1;
+    public const short whiteOnBlue = 2;
+    public const short cyanOnBlue = 3;
+    public const short whiteOnRed = 4;
+    public const short redOnWhite = 5;
+    public const short whiteOnCyan = 6;
+
+    public class Screen
+    {
+        public nothrow Screen()
+        {
+            RtInitScreen();
+            RtNoEcho();
+            RtRaw();
+            RtKeyPad();
+            GetDimensions();
+            RtStartColor();
+            RtInitPair(blackOnWhite, RtBlack(), RtWhite());
+            RtInitPair(whiteOnBlue, RtWhite(), RtBlue());
+            RtInitPair(cyanOnBlue, RtCyan(), RtBlue());
+            RtInitPair(whiteOnRed, RtWhite(), RtRed());
+            RtInitPair(redOnWhite, RtRed(), RtWhite());
+            RtInitPair(whiteOnCyan, RtWhite(), RtCyan());
+        }
+        public ~Screen()
+        {
+            RtDoneScreen();
+        }
+        public nothrow void MoveCursorTo(int row, int col)
+        {
+            RtMove(row, col);
+        }
+        public nothrow void Update()
+        {
+            Window* window = focusedWindow->next;
+            while (window != focusedWindow)
+            {
+                if (window->visible)
+                {
+                    window->Draw();
+                }
+                window = window->next;
+            }
+            focusedWindow->Draw();
+            focusedWindow->ShowCursor();
+            RtRefresh();
+        }
+        public nothrow void GetDimensions()
+        {
+            RtGetMaxYX(&rows, &cols);
+            commandWindowHeight = 3;
+            outputWindowHeight = 10;
+        }
+        public int rows;
+        public int cols;
+        public int outputWindowHeight;
+        public int commandWindowHeight;
+        public Window* focusedWindow;
+    }
+
+    public static class Box
+    {
+        static Box() : chars(), doubleChars()
+        {
+            chars.Append(cast<uchar>(0x250C));
+            chars.Append(cast<uchar>(0x2500));
+            chars.Append(cast<uchar>(0x2502));
+            chars.Append(cast<uchar>(0x2510));
+            chars.Append(cast<uchar>(0x2514));
+            chars.Append(cast<uchar>(0x2518));
+            doubleChars.Append(cast<uchar>(0x2554));
+            doubleChars.Append(cast<uchar>(0x2550));
+            doubleChars.Append(cast<uchar>(0x2551));
+            doubleChars.Append(cast<uchar>(0x2557));
+            doubleChars.Append(cast<uchar>(0x255A));
+            doubleChars.Append(cast<uchar>(0x255D));
+        }
+        public static ustring* GetChars()
+        {
+            return &chars;
+        }
+        public static ustring* GetDoubleChars()
+        {
+            return &doubleChars;
+        }
+        public static ustring chars;
+        public static ustring doubleChars;
+    }
+
+    public abstract class Window
+    {
+        public default virtual ~Window();
+        public void SetDebugger(Debugger* debugger_)
+        {
+            debugger = debugger_;
+        }
+        public abstract void Draw();
+        public void DrawFrame()
+        {
+            ustring* frameChars = null;
+            if (screen->focusedWindow == this)
+            {
+                frameChars = Box.GetDoubleChars();
+            }
+            else
+            {
+                frameChars = Box.GetChars();
+            }
+            RtAttrOn(RtColorPair(color));
+            screen->MoveCursorTo(Top(), Left());
+            int leftTop = cast<int>((*frameChars)[0]);
+            RtAddCh(leftTop);
+            int horizontal  = cast<int>((*frameChars)[1]);
+            for (int i = Left() + 1; i < Left() + Width() - 1; ++i)
+            {
+                screen->MoveCursorTo(Top(), i);
+                RtAddCh(horizontal);
+                screen->MoveCursorTo(Top() + Height() - 1, i);
+                RtAddCh(horizontal);
+            }
+            int rightTop = cast<int>((*frameChars)[3]);
+            screen->MoveCursorTo(Top(), Left() + Width() - 1);
+            RtAddCh(rightTop);
+            int vertical = cast<int>((*frameChars)[2]);
+            for (int i = Top() + 1; i < Top() + Height() - 1; ++i)
+            {
+                screen->MoveCursorTo(i, Left());
+                RtAddCh(vertical);
+                screen->MoveCursorTo(i, Left() + Width() - 1);
+                RtAddCh(vertical);
+            }
+            int leftBottom = cast<int>((*frameChars)[4]);
+            screen->MoveCursorTo(Top() + Height() - 1, Left());
+            RtAddCh(leftBottom);
+            int rightBottom = cast<int>((*frameChars)[5]);
+            screen->MoveCursorTo(Top() + Height() - 1, Left() + Width() - 1);
+            RtAddCh(rightBottom);
+            RtAttrOff(RtColorPair(color));
+        }
+        public abstract CommandResult HandleKey(int key, Debugger* debugger);
+        public int Top()
+        {
+            if (zoomed)
+            {
+                return 1;
+            }
+            else
+            {
+                return top;
+            }
+        }
+        public int Height()
+        {
+            if (zoomed)
+            {
+                return screen->rows;
+            }
+            else
+            {
+                return height;
+            }
+        }
+        public int Left()
+        {
+            if (zoomed)
+            {
+                return 0;
+            }
+            else
+            {
+                return left;
+            }
+        }
+        public int Width()
+        {
+            if (zoomed)
+            {
+                return screen->cols;
+            }
+            else
+            {
+                return width;
+            }
+        }
+        public void ShowCursor()
+        {
+            screen->MoveCursorTo(cursorRow, cursorCol);
+        }
+        public Screen* screen;
+        public Debugger* debugger;
+        public short color;
+        public bool visible;
+        public bool zoomed;
+        public int top;
+        public int height;
+        public int left;
+        public int width;
+        public int cursorRow;
+        public int cursorCol;
+        public Window* next;
+    }
+
+    public const uint debugBreakInst = (cmsx.machine.TRAP << 24u) | (0u << 16u) | (cmsx.kernel.debugBreakSystemCall << 8u) | (0u << 0u);
+    public const uint stoiFpSpInst = (cmsx.machine.STOI << 24u) | (cmsx.machine.regFP << 16u) | (cmsx.machine.regSP << 8u) | (0u << 0u);
+    public const uint oriFpSpInst = (cmsx.machine.ORI << 24u) | (cmsx.machine.regFP << 16u) | (cmsx.machine.regSP << 8u) | (0u << 0u);
+    public const uint retInst = (cmsx.machine.RET << 24u) | (0u << 16u) | (0u << 8u) | (0u << 0u);
+
+    public nothrow bool InProlog(uint currentInst)
+    {
+        return currentInst == stoiFpSpInst || currentInst == oriFpSpInst;
+    }
+
+    public nothrow bool InEpilog(uint currentInst)
+    {
+        return currentInst == retInst;
+    }
+
+    public uint ReadInst(cmsx.kernel.Process* process, ulong address)
+    {
+        ulong inst = 0u;
+        if (cmsx.kernel.ReadProcessMemory(cmsx.machine.GetMachine(), process, address, inst, 4u) != 0)
+        {
+            cmsx.machine.Panic("debugger: could not read process memory");
+        }
+        return cast<uint>(inst);
+    }
+
+    public void WriteInst(cmsx.kernel.Process* process, ulong address, uint inst)
+    {
+        if (cmsx.kernel.WriteProcessMemory(cmsx.machine.GetMachine(), process, address, inst, 4u, cmsx.machine.Protection.execute) != 0)
+        {
+            cmsx.machine.Panic("debugger: could not write process memory");
+        }
+    }
+
+    public class Breakpoint
+    {
+        public enum Kind
+        {
+            step, hard
+        }
+        public nothrow Breakpoint(Kind kind_, ulong address_, uint inst_) : kind(kind_), address(address_), inst(inst_), fp(0u)
+        {
+        }
+        public Kind kind;
+        public ulong address;
+        public uint inst;
+        public ulong fp;
+    }
+
+    public class Breakpoints
+    {
+        public nothrow Breakpoint* GetBreakpoint(ulong address) const
+        {
+            HashMap<ulong, Breakpoint>.ConstIterator it = breakpoints.CFind(address);
+            if (it != breakpoints.CEnd())
+            {
+                return &it->second;
+            }
+            else
+            {
+                return null;
+            }
+        }
+        public nothrow void SetBreakpoint(const Breakpoint& bp)
+        {
+            breakpoints[bp.address] = bp;
+        }
+        public nothrow void RemoveBreakpoint(ulong address)
+        {
+            breakpoints.Remove(address);
+        }
+        private HashMap<ulong, Breakpoint> breakpoints;
+    }
+
+    public class HeaderLine
+    {
+        public nothrow HeaderLine() : header()
+        {
+        }
+        public void SetHeader(const string& header_)
+        {
+            header = header_;
+        }
+        public void Draw(Screen* screen)
+        {
+            int col = 0;
+            bool hilite = false;
+            RtAttrOn(RtColorPair(blackOnWhite));
+            for (char c : header)
+            {
+                if (c == '*')
+                {
+                    if (!hilite)
+                    {
+                        RtAttrOff(RtColorPair(blackOnWhite));
+                        RtAttrOn(RtColorPair(redOnWhite));
+                        hilite = true;
+                    }
+                    else
+                    {
+                        RtAttrOff(RtColorPair(redOnWhite));
+                        RtAttrOn(RtColorPair(blackOnWhite));
+                        hilite = false;
+                    }
+                }
+                else
+                {
+                    int ch = cast<int>(c);
+                    screen->MoveCursorTo(0, col);
+                    RtAddCh(ch);
+                    ++col;
+                }
+            }
+            for (int i = col; i < screen->cols; ++i)
+            {
+                int ch = cast<int>(' ');
+                screen->MoveCursorTo(0, i);
+                RtAddCh(ch);
+            }
+            RtAttrOff(RtColorPair(blackOnWhite));
+        }
+        private string header;
+    }
+
+    public class DissamblyFormatter : cmsx.machine.Formatter
+    {
+        public nothrow DissamblyFormatter() : symbolTable(null)
+        {
+        }
+        public nothrow void SetSymbolTable(cmsx.object.SymbolTable* symbolTable_)
+        {
+            symbolTable = symbolTable_;
+        }
+        public nothrow void SetBreakpoints(Breakpoints* breakpoints_)
+        {
+            breakpoints = breakpoints_;
+        }
+        public nothrow void SetPC(ulong pc)
+        {
+            this->pc = pc;
+        }
+        public override string FormatRegisterNumber(byte x)
+        {
+            cmsx.object.Symbol* registerSymbol = symbolTable->GetRegisterSymbol(x);
+            if (registerSymbol != null)
+            {
+                return registerSymbol->name;
+            }
+            else
+            {
+                return base->FormatRegisterNumber(x);
+            }
+        }
+        public override string GetLabel(ulong address)
+        {
+            cmsx.object.Symbol* symbol = symbolTable->GetSymbolByAddress(address);
+            if (symbol != null)
+            {
+                if (!symbol->localName.IsEmpty())
+                {
+                    return symbol->localName;
+                }
+                else
+                {
+                    return symbol->name;
+                }
+            }
+            else
+            {
+                return string();
+            }
+        }
+        public override string GetTags(ulong address)
+        {
+            string tags;
+            if (breakpoints->GetBreakpoint(address) != null)
+            {
+                tags = tags + "*";
+            }
+            else
+            {
+                tags = tags + " ";
+            }
+            if (address == pc)
+            {
+                tags = tags + ">";
+            }
+            else
+            {
+                tags = tags + " ";
+            }
+            tags = tags + " ";
+            return tags;
+        }
+        private cmsx.object.SymbolTable* symbolTable;
+        private ulong pc;
+        private Breakpoints* breakpoints;
+    }
+
+    public class Disassembly : Window
+    {
+        public nothrow Disassembly(Breakpoints* breakpoints_) : disassemblyFormatter(), breakpoints(breakpoints_)
+        {
+            header.SetHeader("*ESC* Exit *F1* Help *F2* Enter Command *F4* Output *F5* Run *F6* Memory *F8* Change Focus *F9* Toggle Breakpoint *F10* Step Over *F11* Step Into *F12* Step Out");
+        }
+        public nothrow void SetSymbolTable(cmsx.object.SymbolTable* symbolTable)
+        {
+            disassemblyFormatter.SetSymbolTable(symbolTable);
+        }
+        public nothrow void SetBreakpoints(Breakpoints* breakpoints)
+        {
+            disassemblyFormatter.SetBreakpoints(breakpoints);
+        }
+        public nothrow void SetScreen(Screen* screen_)
+        {
+            screen = screen_;
+            color = whiteOnBlue;
+            top = 1;
+            left = 0;
+            height = screen->rows - top - screen->commandWindowHeight - screen->outputWindowHeight;
+            width = screen->cols - left;
+            cursorRow = top;
+            cursorCol = left;
+        }
+        public override CommandResult HandleKey(int key, Debugger* debugger)
+        {
+            switch (key)
+            {
+                case keyDown:
+                {
+                    debugger->middle = debugger->middle + 4u;
+                    return CommandResult.cont;
+                }
+                case keyUp:
+                {
+                    if (debugger->start >= 4u)
+                    {
+                        debugger->middle = debugger->middle - 4u;
+                    }
+                    return CommandResult.cont;
+                }
+                case keyPgDown:
+                {
+                    debugger->middle = debugger->middle + 4u * debugger->numInstsInWindow;
+                    return CommandResult.cont;
+                }
+                case keyPgUp:
+                {
+                    if (debugger->start >= 4 * debugger->numInstsInWindow)
+                    {
+                        debugger->middle = debugger->middle - 4u * debugger->numInstsInWindow;
+                    }
+                    return CommandResult.cont;
+                }
+                case keyHome:
+                {
+                    debugger->middle = debugger->pc;
+                    return CommandResult.cont;
+                }
+                case keyF5:
+                {
+                    debugger->Run();
+                    return CommandResult.ret;
+                }
+                case keyF9:
+                {
+                    debugger->ToggleBreakpoint(debugger->middle);
+                    return CommandResult.cont;
+                }
+                case keyF10:
+                {
+                    debugger->StepOver();
+                    return CommandResult.ret;
+                }
+                case keyF11:
+                {
+                    debugger->StepInto();
+                    return CommandResult.ret;
+                }
+                case keyF12:
+                {
+                    debugger->StepOut();
+                    return CommandResult.ret;
+                }
+            }
+            return CommandResult.cont;
+        }
+        public void RetrieveInstructions(ulong pc, cmsx.kernel.Process* process)
+        {
+            ulong numInstsInWindow = cast<ulong>(Height() - 2);
+            ulong start = pc - 4u * (numInstsInWindow / 2u);
+            ulong end = start + (4u * numInstsInWindow);
+            for (ulong address = start; address < end; address = address + 4u)
+            {
+                HashMap<ulong, long>.ConstIterator it = instructions.CFind(address);
+                if (it == instructions.CEnd())
+                {
+                    if (address < entryPointAddress || address >= instructionEndAddress)
+                    {
+                        instructions[address] = -1;
+                    }
+                    else
+                    {
+                        uint inst = ReadInst(process, address);
+                        Breakpoint* bp = breakpoints->GetBreakpoint(address);
+                        if (bp != null)
+                        {
+                            inst = bp->inst;
+                        }
+                        instructions[address] = cast<long>(inst);
+                    }
+                }
+            }
+        }
+        public override void Draw()
+        {
+            header.Draw(screen);
+            DrawFrame();
+            disassemblyFormatter.SetPC(debugger->pc);
+            RetrieveInstructions(debugger->middle, debugger->process);
+            ulong numInstsInWindow = cast<ulong>(Height() - 2);
+            ulong start = debugger->middle - 4u * (numInstsInWindow / 2u);
+            ulong end = start + (4u * numInstsInWindow);
+            int row = Top() + 1;
+            cursorRow = row;
+            cursorCol = Left() + 1;
+            for (ulong address = start; address < end; address = address + 4u)
+            {
+                screen->MoveCursorTo(row, Left() + 1);
+                ustring line = GetInstructionLine(address);
+                if (address == debugger->middle)
+                {
+                    if (breakpoints->GetBreakpoint(address) != null)
+                    {
+                        RtAttrOn(RtColorPair(redOnWhite));
+                    }
+                    else
+                    {
+                        RtAttrOn(RtColorPair(blackOnWhite));
+                    }
+                }
+                else if (breakpoints->GetBreakpoint(address) != null)
+                {
+                    RtAttrOn(RtColorPair(whiteOnRed));
+                }
+                else if (address == debugger->pc)
+                {
+                    RtAttrOn(RtColorPair(cyanOnBlue));
+                }
+                else
+                {
+                    RtAttrOn(RtColorPair(color));
+                }
+                for (int col = Left() + 1; col < Left() + Width() - 1; ++col)
+                {
+                    int ch = cast<int>(' ');
+                    int charIndex = col - (Left() + 1);
+                    if (charIndex < line.Length())
+                    {
+                        ch = cast<int>(line[charIndex]);
+                    }
+                    RtAddCh(ch);
+                }
+                if (address == debugger->middle)
+                {
+                    if (breakpoints->GetBreakpoint(address) != null)
+                    {
+                        RtAttrOff(RtColorPair(redOnWhite));
+                    }
+                    else
+                    {
+                        RtAttrOff(RtColorPair(blackOnWhite));
+                    }
+                    cursorRow = row;
+                }
+                else if (breakpoints->GetBreakpoint(address) != null)
+                {
+                    RtAttrOff(RtColorPair(whiteOnRed));
+                }
+                else if (address == debugger->pc)
+                {
+                    RtAttrOff(RtColorPair(cyanOnBlue));
+                }
+                else
+                {
+                    RtAttrOff(RtColorPair(color));
+                }
+                ++row;
+            }
+            if (screen->focusedWindow == this)
+            {
+                screen->MoveCursorTo(cursorRow, cursorCol);
+            }
+        }
+        public nothrow void SetEntryEntryPointAddress(ulong entryPointAddress_)
+        {
+            entryPointAddress = entryPointAddress_;
+        }
+        public nothrow void SetInstructionEndAddress(ulong instructionEndAddress_)
+        {
+            instructionEndAddress = instructionEndAddress_;
+        }
+        private ustring GetInstructionLine(ulong address)
+        {
+            HashMap<ulong, long>.ConstIterator it = instructions.CFind(address);
+            long instruction = -1;
+            if (it != instructions.CEnd())
+            {
+                instruction = it->second;
+            }
+            if (instruction == -1)
+            {
+                string result = "#" + ToHexString(address);
+                return ToUtf32(result);
+            }
+            uint inst = cast<uint>(instruction);
+            byte opCode = cast<byte>(inst >> 24u);
+            byte x = cast<byte>(inst >> 16u);
+            byte y = cast<byte>(inst >> 8u);
+            byte z = cast<byte>(inst);
+            string instructionLine = cmsx.machine.FormatInstruction(address, opCode, x, y, z, disassemblyFormatter);
+            return ToUtf32(instructionLine);
+        }
+        private HeaderLine header;
+        private Breakpoints* breakpoints;
+        private DissamblyFormatter disassemblyFormatter;
+        private HashMap<ulong, long> instructions;
+        private ulong entryPointAddress;
+        private ulong instructionEndAddress;
+    }
+
+    public class Output : Window
+    {
+        public nothrow Output()
+        {
+            header.SetHeader("*ESC* Exit *F1* Help *F2* Enter Command *F3* Disassembly *F6* Memory *F8* Change Focus");
+        }
+        public void SetScreen(Screen* screen_)
+        {
+            screen = screen_;
+            color = whiteOnCyan;
+            top = screen->rows - screen->commandWindowHeight - screen->outputWindowHeight;
+            left = 0;
+            height = screen->outputWindowHeight;
+            width = screen->cols - left;
+            cursorRow = top;
+            cursorCol = left;
+            topLineIndex = 0;
+        }
+        public override void Draw()
+        {
+            header.Draw(screen);
+            DrawFrame();
+            int n = Top() + Height() - 1;
+            cursorCol = Left() + 1;
+            for (int i = Top() + 1; i < n; ++i)
+            {
+                int lineIndex = topLineIndex + i - (Top() + 1);
+                screen->MoveCursorTo(i, Left() + 1);
+                ustring line;
+                if (lineIndex < lines.Count())
+                {
+                    line = ToUtf32(lines[lineIndex]);
+                }
+                RtAttrOn(RtColorPair(color));
+                for (int j = Left() + 1; j < Left() + Width() - Left() - 1; ++j)
+                {
+                    int charIndex = j - (Left() + 1);
+                    int ch = cast<int>(' ');
+                    if (charIndex < line.Length())
+                    {
+                        ch = cast<int>(line[charIndex]);
+                    }
+                    RtAddCh(ch);
+                }
+                RtAttrOff(RtColorPair(color));
+                cursorRow = i;
+            }
+            if (screen->focusedWindow == this)
+            {
+                screen->MoveCursorTo(cursorRow, cursorCol);
+            }
+        }
+        public override CommandResult HandleKey(int key, Debugger* debugger)
+        {
+            return CommandResult.cont;
+        }
+        private HeaderLine header;
+        private List<string> lines;
+        private int topLineIndex;
+    }
+
+    public class CommandWindow : Window
+    {
+        public nothrow CommandWindow()
+        {
+            header.SetHeader("*ESC* Exit *F1* Help *F3* Disassembly *F4* Output *F6* Memory *F8* Change Focus");
+        }
+        public void SetScreen(Screen* screen_)
+        {
+            screen = screen_;
+            color = blackOnWhite;
+            top = screen->rows - screen->commandWindowHeight;
+            left = 0;
+            height = screen->commandWindowHeight;
+            width = screen->cols - left;
+            cursorRow = top + height - 2;
+            cursorCol = left + 2;
+        }
+        public override void Draw()
+        {
+            header.Draw(screen);
+            DrawFrame();
+            RtAttrOn(RtColorPair(color));
+            int n = Top() + Height() - 1;
+            for (int i = Top() + 1; i < n; ++i)
+            {
+                for (int j = Left() + 1; j < Left() + Width() - Left() - 1; ++j)
+                {
+                    screen->MoveCursorTo(i, j);
+                    int ch = cast<int>(' ');
+                    RtAddCh(ch);
+                }
+            }
+            RtAttrOff(RtColorPair(color));
+        }
+        public override CommandResult HandleKey(int key, Debugger* debugger)
+        {
+            return CommandResult.cont;
+        }
+        private HeaderLine header;
+    }
+
+    public class Debugger : cmsx.kernel.Debugger
+    {
+        public nothrow Debugger() : screen(), symbolTable(null), breakpoints(), disassembly(&breakpoints), output(), commandWindow()
+        {
+        }
+        public override void Init(Process* process)
+        {
+            screen.Reset(new Screen());
+            cmsx.kernel.Kernel& kernel = cmsx.kernel.Kernel.Instance();
+            cmsx.object.ExecutableFile* executable = kernel.Executable();
+            symbolTable = &executable->GetSymbolTable();
+            disassembly.SetSymbolTable(symbolTable);
+            disassembly.SetBreakpoints(&breakpoints);
+            disassembly.SetScreen(screen.Get());
+            output.SetScreen(screen.Get());
+            commandWindow.SetScreen(screen.Get());
+            programEntryPoint = process->EntryPoint();
+            disassembly.SetEntryEntryPointAddress(programEntryPoint);
+            disassembly.SetInstructionEndAddress(programEntryPoint + executable->GetCodeSection()->length);
+            uint entryPointInst = ReadInst(process, programEntryPoint);
+            stepBreakpoints.Add(Breakpoint(Breakpoint.Kind.step, programEntryPoint, entryPointInst));
+            WriteInst(process, programEntryPoint, debugBreakInst);
+            disassembly.SetDebugger(this);
+            disassembly.visible = true;
+            disassembly.next = &output;
+            output.SetDebugger(this);
+            output.visible = true;
+            output.next = &commandWindow;
+            commandWindow.SetDebugger(this);
+            commandWindow.visible = true;
+            commandWindow.next = &disassembly;
+            screen->focusedWindow = &disassembly;
+            state = State.running;
+        }
+        public override void Run(Process* process)
+        {
+            this->process = process;
+            machine = &cmsx.machine.GetMachine();
+            inst = -1;
+            cmsx.machine.Registers& regs = machine->GetRegisters();
+            if (state == State.running)
+            {
+                pc = regs.GetSpecial(cmsx.machine.Registers.rW);
+                if (SkipStepBreakpoint(this->pc, regs.Get(cmsx.machine.regFP), *machine))
+                {
+                    return;
+                }
+                inst = RemoveStepBreakpoints(process, pc);
+                Breakpoint* bp = breakpoints.GetBreakpoint(pc);
+                if (bp != null)
+                {
+                    if (inst == -1)
+                    {
+                        inst = bp->inst;
+                    }
+                }
+                middle = pc;
+                screen->Update();
+                int ch = RtGetCh();
+                while (ch != keyEscape)
+                {
+                    ulong prevMiddle = middle;
+                    numInstsInWindow = cast<ulong>(disassembly.Height() - 2);
+                    start = middle - 4u * (numInstsInWindow / 2u);
+                    if (ch == keyResize)
+                    {
+                        screen->GetDimensions();
+                        screen->Update();
+                    }
+                    else if (ch == keyF2)
+                    {
+                        commandWindow.visible = true;
+                        screen->focusedWindow = &commandWindow;
+                        screen->Update();
+                    }
+                    else if (ch == keyF3)
+                    {
+                        disassembly.visible = true;
+                        screen->focusedWindow = &disassembly;
+                        screen->Update();
+                    }
+                    else if (ch == keyF4)
+                    {
+                        output.visible = true;
+                        screen->focusedWindow = &output;
+                        screen->Update();
+                    }
+                    else if (ch == keyF8)
+                    {
+                        Window* next = screen->focusedWindow->next;
+                        while (!next->visible)
+                        {
+                            next = next->next;
+                        }
+                        screen->focusedWindow = next;
+                        screen->Update();
+                    }
+                    else
+                    {
+                        CommandResult result = screen->focusedWindow->HandleKey(ch, this);
+                        if (result == CommandResult.ret)
+                        {
+                            return;
+                        }
+                    }
+                    if (middle != prevMiddle)
+                    {
+                        screen->Update();
+                    }
+                    ch = RtGetCh();
+                }
+            }
+            else if (state == State.exit)
+            {
+                int ch = RtGetCh();
+                while (ch != keyEscape)
+                {
+                    ch = RtGetCh();
+                }
+            }
+        }
+        public override void Done()
+        {
+            screen.Reset();
+        }
+        public override void Exit(Process* process)
+        {
+            state = State.exit;
+        }
+        private bool SkipStepBreakpoint(ulong address, ulong fp, cmsx.machine.Machine& machine)
+        {
+            for (const Breakpoint& stepBp : stepBreakpoints)
+            {
+                if (stepBp.address == address)
+                {
+                    if (stepBp.fp != 0u)
+                    {
+                        if (stepBp.fp != fp)
+                        {
+                            machine.GetRegisters().SetSpecial(cmsx.machine.Registers.rXX, stepBp.inst);
+                            return true;
+                        }
+                    }
+                }
+            }
+            return false;
+        }
+        private long RemoveStepBreakpoints(Process* process, ulong address)
+        {
+            long inst = -1;
+            for (const Breakpoint& stepBp : stepBreakpoints)
+            {
+                if (address == stepBp.address)
+                {
+                    inst = stepBp.inst;
+                }
+                WriteInst(process, stepBp.address, stepBp.inst);
+            }
+            stepBreakpoints.Clear();
+            return inst;
+        }
+        private uint GetInst(Process* process, ulong pc, long inst)
+        {
+            if (inst != -1)
+            {
+                return cast<uint>(inst);
+            }
+            else
+            {
+                Breakpoint* bp = breakpoints.GetBreakpoint(pc);
+                if (bp != null)
+                {
+                    return bp->inst;
+                }
+            }
+            return ReadInst(process, pc);
+        }
+        public void ToggleBreakpoint(ulong address)
+        {
+            Breakpoint* bp = breakpoints.GetBreakpoint(address);
+            if (bp != null)
+            {
+                WriteInst(process, address, bp->inst);
+                breakpoints.RemoveBreakpoint(address);
+                screen->Update();
+            }
+            else
+            {
+                uint inst = GetInst(process, address, -1);
+                Breakpoint bp(Breakpoint.Kind.hard, address, inst);
+                breakpoints.SetBreakpoint(bp);
+                WriteInst(process, address, debugBreakInst);
+                screen->Update();
+            }
+        }
+        public void Run()
+        {
+            uint i = GetInst(process, pc, inst);
+            machine->GetRegisters().SetSpecial(cmsx.machine.Registers.rXX, i);
+        }
+        public void StepInto()
+        {
+            uint i = GetInst(process, pc, inst);
+            WriteInst(process, pc, i);
+            byte opCode = cast<byte>(i >> 24u);
+            byte x = cast<byte>(i >> 16u);
+            byte y = cast<byte>(i >> 8u);
+            byte z = cast<byte>(i);
+            cmsx.machine.Instruction* instruction = machine->GetInst(opCode);
+            ulong prevRV = machine->GetRegisters().GetSpecial(cmsx.machine.Registers.rV);
+            MemoryTable& memoryTable = process->memoryTable;
+            machine->GetRegisters().SetSpecial(cmsx.machine.Registers.rV, memoryTable.virtualTranslationRegisterValue);
+            List<ulong> targetAddresses = instruction->GetTargetAddresses(pc, machine->GetRegisters(), machine->GetMemory(), x, y, z);
+            machine->GetRegisters().SetSpecial(cmsx.machine.Registers.rV, prevRV);
+            for (ulong address : targetAddresses)
+            {
+                Breakpoint bp(Breakpoint.Kind.step, address, GetInst(process, address, -1));
+                stepBreakpoints.Add(bp);
+                WriteInst(process, address, debugBreakInst);
+            }
+            machine->GetRegisters().SetSpecial(cmsx.machine.Registers.rXX, i);
+            if (instruction->IsJumpInst() || (instruction is cmsx.machine.Trap*))
+            {
+                machine->GetRegisters().SetPC(pc);
+            }
+        }
+        public void StepOver()
+        {
+            uint i = GetInst(process, pc, inst);
+            byte opCode = cast<byte>(i >> 24u);
+            if (opCode == cmsx.machine.CALL || opCode == cmsx.machine.CALLI)
+            {
+                Breakpoint bp(Breakpoint.Kind.step, pc + 4u, GetInst(process, pc + 4u, -1));
+                bp.fp = machine->GetRegisters().Get(cmsx.machine.regFP);
+                stepBreakpoints.Add(bp);
+                WriteInst(process, pc + 4u, debugBreakInst);
+                machine->GetRegisters().SetSpecial(cmsx.machine.Registers.rXX, i);
+                machine->GetRegisters().SetPC(pc);
+            }
+            else
+            {
+                StepInto();
+            }
+        }
+        public void StepOut()
+        {
+            uint i = GetInst(process, pc, inst);
+            ulong retAddress = 0u;
+            if (InProlog(i))
+            {
+                ulong sp = machine->GetRegisters().Get(cmsx.machine.regSP);
+                if (ReadProcessMemory(*machine, process, sp - 8u, retAddress, 8u) != 0)
+                {
+                    cmsx.machine.Panic("debugger: could not read process memory");
+                }
+            }
+            else if (InEpilog(i))
+            {
+                StepInto();
+            }
+            else
+            {
+                ulong fp = machine->GetRegisters().Get(cmsx.machine.regFP);
+                if (ReadProcessMemory(*machine, process, fp - 8u, retAddress, 8u) != 0)
+                {
+                    cmsx.machine.Panic("debugger: could not read process memory");
+                }
+            }
+            Breakpoint bp(Breakpoint.Kind.step, retAddress, GetInst(process, retAddress, -1));
+            stepBreakpoints.Add(bp);
+            WriteInst(process, retAddress, debugBreakInst);
+        }
+        public cmsx.machine.Machine* machine;
+        public cmsx.kernel.Process* process;
+        public long inst;
+        public ulong pc;
+        public ulong middle;
+        public ulong start;
+        public ulong numInstsInWindow;
+        private State state;
+        private UniquePtr<Screen> screen;
+        private cmsx.object.SymbolTable* symbolTable;
+        private Breakpoints breakpoints;
+        private List<Breakpoint> stepBreakpoints;
+        private Disassembly disassembly;
+        private Output output;
+        private CommandWindow commandWindow;
+        private ulong programEntryPoint;
+    }
+}

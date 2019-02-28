@@ -1,0 +1,36 @@
+public const byte sys_exit = 0u;
+public const byte sys_wait = 1u;
+public const byte sys_fork = 2u;
+public const byte sys_write = 3u;
+public const byte sys_pool_end = 4u;
+public const byte sys_set_pool_end = 5u;
+
+public cdecl nothrow void exit(byte exitCode)
+{
+    trap(0u, sys_exit, 0u, exitCode);
+}
+
+public cdecl nothrow int wait(ushort* exitCodeAddress)
+{
+    return cast<int>(trap(0u, sys_wait, 0u, exitCodeAddress));
+}
+
+public cdecl nothrow int fork()
+{
+    return cast<int>(trap(0u, sys_fork, 0u));
+}
+
+public cdecl nothrow long write(int handle, void* buffer, ulong count)
+{
+    return trap(0u, sys_write, 0u, handle, buffer, count);
+}
+
+public cdecl nothrow void* pool_end()
+{
+    return cast<void*>(cast<ulong>(trap(0u, sys_pool_end, 0u)));
+}
+
+public cdecl nothrow long set_pool_end(void* poolEnd)
+{
+    return trap(0u, sys_set_pool_end, 0u, poolEnd);
+}

@@ -120,6 +120,10 @@ namespace cmsx.intermediate
             formatter.DecIndent();
             printed = true;
         }
+        public nothrow bool IsLeader() const
+        {
+            return parent->GetLeader() == this;
+        }
         public BasicBlock* parent;
         public int index;
         public HashMap<Value*, Pair<Liveness, Value*>> livenessAndNextUse;
@@ -396,27 +400,27 @@ namespace cmsx.intermediate
             RegisterDescriptors& registerDescriptors = parent->registerDescriptors;
             AddressDescriptors& addressDescriptors = parent->function.addressDescriptors;
             bool useRegYForX = CanUseRegYForX(y, registerDescriptors, addressDescriptors);
-            GetReg(x, y, z, useRegYForX, registerDescriptors, addressDescriptors, machineCode, line, rx, ry, rz);
+            GetReg(x, y, z, useRegYForX, registerDescriptors, addressDescriptors, machineCode, line, rx, ry, rz, this);
             if (y is ConstantValue*)
             {
-                y->GenerateSetValue(ry->reg, machineCode, line);
+                y->GenerateSetValue(ry->reg, machineCode, line, this);
             }
             else
             {
-                LoadOperandValue(y, ry, addressDescriptors, machineCode, line);
+                LoadOperandValue(y, ry, addressDescriptors, machineCode, line, this);
             }
             if (z != null)
             {
                 if (z is ConstantValue*)
                 {
-                    z->GenerateSetValue(rz->reg, machineCode, line);
+                    z->GenerateSetValue(rz->reg, machineCode, line, this);
                 }
                 else
                 {
-                    LoadOperandValue(z, rz, addressDescriptors, machineCode, line);
+                    LoadOperandValue(z, rz, addressDescriptors, machineCode, line, this);
                 }
             }
-            MachineInstruction* machineInstruction = machineCode.GetInstruction(binOpCode);
+            MachineInstruction* machineInstruction = machineCode.GetInstruction(binOpCode, this);
             machineInstruction->AddOperand(rx->reg);
             machineInstruction->AddOperand(ry->reg);
             if (z != null)
@@ -477,23 +481,23 @@ namespace cmsx.intermediate
             RegisterDescriptors& registerDescriptors = parent->registerDescriptors;
             AddressDescriptors& addressDescriptors = parent->function.addressDescriptors;
             bool useRegYForX = CanUseRegYForX(y, registerDescriptors, addressDescriptors);
-            GetReg(x, y, z, useRegYForX, registerDescriptors, addressDescriptors, machineCode, line, rx, ry, rz);
+            GetReg(x, y, z, useRegYForX, registerDescriptors, addressDescriptors, machineCode, line, rx, ry, rz, this);
             if (y is ConstantValue*)
             {
-                y->GenerateSetValue(ry->reg, machineCode, line);
+                y->GenerateSetValue(ry->reg, machineCode, line, this);
             }
             else
             {
-                LoadOperandValue(y, ry, addressDescriptors, machineCode, line);
+                LoadOperandValue(y, ry, addressDescriptors, machineCode, line, this);
             }
             if (z != null)
             {
-                type->GenerateMinusOne(machineCode, rz->reg, line);
+                type->GenerateMinusOne(machineCode, rz->reg, line, this);
                 ConstantValue* constantValue = new ConstantValue();
                 machineCode.context.AddValue(constantValue);
                 rz->SetValue(constantValue);
             }
-            MachineInstruction* machineInstruction = machineCode.GetInstruction(cmsx.machine.XOR);
+            MachineInstruction* machineInstruction = machineCode.GetInstruction(cmsx.machine.XOR, this);
             machineInstruction->AddOperand(rx->reg);
             machineInstruction->AddOperand(ry->reg);
             if (z != null)
@@ -547,14 +551,14 @@ namespace cmsx.intermediate
             RegisterDescriptors& registerDescriptors = parent->registerDescriptors;
             AddressDescriptors& addressDescriptors = parent->function.addressDescriptors;
             bool useRegYForX = CanUseRegYForX(y, registerDescriptors, addressDescriptors);
-            GetReg(x, y, z, useRegYForX, registerDescriptors, addressDescriptors, machineCode, line, rx, ry, rz);
+            GetReg(x, y, z, useRegYForX, registerDescriptors, addressDescriptors, machineCode, line, rx, ry, rz, this);
             if (y is ConstantValue*)
             {
-                y->GenerateSetValue(ry->reg, machineCode, line);
+                y->GenerateSetValue(ry->reg, machineCode, line, this);
             }
             else
             {
-                LoadOperandValue(y, ry, addressDescriptors, machineCode, line);
+                LoadOperandValue(y, ry, addressDescriptors, machineCode, line, this);
             }
             int negOpCode = -1;
             if (y->type is SignedIntegerType*)
@@ -569,7 +573,7 @@ namespace cmsx.intermediate
             {
                 throw Exception("error: tried to generate negate operator instruction for type '" + type->Name() + "' in the " + OperationName() + " instruction at line " + ToString(line));
             }
-            MachineInstruction* machineInstruction = machineCode.GetInstruction(negOpCode);
+            MachineInstruction* machineInstruction = machineCode.GetInstruction(negOpCode, this);
             machineInstruction->AddOperand(rx->reg);
             machineInstruction->AddOperand(ry->reg);
             rx->SetValue(x);
@@ -677,7 +681,7 @@ namespace cmsx.intermediate
             if (resultLoc is Register*)
             {
                 Register* resultReg = cast<Register*>(resultLoc);
-                MachineInstruction* machineInstruction = machineCode.GetInstruction(cmsx.machine.GET);
+                MachineInstruction* machineInstruction = machineCode.GetInstruction(cmsx.machine.GET, this);
                 machineInstruction->AddOperand(resultReg);
                 machineInstruction->AddOperand(machineCode.context.GetSymbolOperand(cmsx.machine.GetMachine().GetRegisters().GetSpecialRegName(cmsx.machine.Registers.rR)));
             }
@@ -800,7 +804,7 @@ namespace cmsx.intermediate
             if (loc is Register*)
             {
                 Register* reg = cast<Register*>(loc);
-                MachineInstruction* zsz = machineCode.GetInstruction(cmsx.machine.ZSZ);
+                MachineInstruction* zsz = machineCode.GetInstruction(cmsx.machine.ZSZ, this);
                 zsz->AddOperand(reg);
                 zsz->AddOperand(reg);
                 zsz->AddOperand(machineCode.context.GetLiteralOperand(1u));
@@ -853,7 +857,7 @@ namespace cmsx.intermediate
             if (loc is Register*)
             {
                 Register* reg = cast<Register*>(loc);
-                MachineInstruction* zsn = machineCode.GetInstruction(cmsx.machine.ZSN);
+                MachineInstruction* zsn = machineCode.GetInstruction(cmsx.machine.ZSN, this);
                 zsn->AddOperand(reg);
                 zsn->AddOperand(reg);
                 zsn->AddOperand(machineCode.context.GetLiteralOperand(1u));
@@ -910,33 +914,35 @@ namespace cmsx.intermediate
             if (y is ConstantValue*)
             {
                 List<Register*> dontUse;
-                rx = registerDescriptors.GetLocalRegDescriptor(dontUse, addressDescriptors, machineCode, line);
+                rx = registerDescriptors.GetLocalRegDescriptor(dontUse, addressDescriptors, machineCode, line, this);
                 Value* value = y->SignExtendTo(type, line);
                 machineCode.context.AddValue(value);
-                value->GenerateSetValue(rx->reg, machineCode, line);
+                value->GenerateSetValue(rx->reg, machineCode, line, this);
             }
             else
             {
                 bool useRegYForX = CanUseRegYForX(y, registerDescriptors, addressDescriptors);
-                GetReg(x, y, z, useRegYForX, registerDescriptors, addressDescriptors, machineCode, line, rx, ry, rz);
-                LoadOperandValue(y, ry, addressDescriptors, machineCode, line);
+                GetReg(x, y, z, useRegYForX, registerDescriptors, addressDescriptors, machineCode, line, rx, ry, rz, this);
+                LoadOperandValue(y, ry, addressDescriptors, machineCode, line, this);
                 ulong numShiftBits = 64u - 8u * cast<ulong>(y->type->Size());
                 Operand* numShiftBitsOperand = machineCode.context.GetLiteralOperand(numShiftBits);
-                MachineInstruction* shiftLeftInst = machineCode.GetInstruction(cmsx.machine.SLU);
+                MachineInstruction* shiftLeftInst = machineCode.GetInstruction(cmsx.machine.SLU, this);
                 shiftLeftInst->AddOperand(rx->reg);
                 shiftLeftInst->AddOperand(ry->reg);
                 shiftLeftInst->AddOperand(numShiftBitsOperand);
-                MachineInstruction* shiftRightInst = machineCode.GetInstruction(cmsx.machine.SR);
+                MachineInstruction* shiftRightInst = machineCode.GetInstruction(cmsx.machine.SR, this);
                 shiftRightInst->AddOperand(rx->reg);
                 shiftRightInst->AddOperand(rx->reg);
                 shiftRightInst->AddOperand(numShiftBitsOperand);
                 List<Register*> dontUse;
-                rz = registerDescriptors.GetLocalRegDescriptor(dontUse, addressDescriptors, machineCode, line);
-                type->GenerateMinusOne(machineCode, rz->reg, line);
+                dontUse.Add(rx->reg);
+                dontUse.Add(ry->reg);
+                rz = registerDescriptors.GetLocalRegDescriptor(dontUse, addressDescriptors, machineCode, line, this);
+                type->GenerateMinusOne(machineCode, rz->reg, line, this);
                 ConstantValue* constantValue = new ConstantValue();
                 machineCode.context.AddValue(constantValue);
                 rz->SetValue(constantValue);
-                MachineInstruction* andInst = machineCode.GetInstruction(cmsx.machine.AND);
+                MachineInstruction* andInst = machineCode.GetInstruction(cmsx.machine.AND, this);
                 andInst->AddOperand(rx->reg);
                 andInst->AddOperand(rx->reg);
                 andInst->AddOperand(rz->reg);
@@ -993,17 +999,17 @@ namespace cmsx.intermediate
             if (y is ConstantValue*)
             {
                 List<Register*> dontUse;
-                rx = registerDescriptors.GetLocalRegDescriptor(dontUse, addressDescriptors, machineCode, line);
+                rx = registerDescriptors.GetLocalRegDescriptor(dontUse, addressDescriptors, machineCode, line, this);
                 Value* value = y->ZeroExtendTo(type, line);
                 machineCode.context.AddValue(value);
-                value->GenerateSetValue(rx->reg, machineCode, line);
+                value->GenerateSetValue(rx->reg, machineCode, line, this);
             }
             else
             {
                 bool useRegYForX = CanUseRegYForX(y, registerDescriptors, addressDescriptors);
-                GetReg(x, y, z, useRegYForX, registerDescriptors, addressDescriptors, machineCode, line, rx, ry, rz);
-                LoadOperandValue(y, ry, addressDescriptors, machineCode, line);
-                MachineInstruction* machineInstruction = machineCode.GetInstruction(cmsx.assembly.SET);
+                GetReg(x, y, z, useRegYForX, registerDescriptors, addressDescriptors, machineCode, line, rx, ry, rz, this);
+                LoadOperandValue(y, ry, addressDescriptors, machineCode, line, this);
+                MachineInstruction* machineInstruction = machineCode.GetInstruction(cmsx.assembly.SET, this);
                 machineInstruction->AddOperand(rx->reg);
                 machineInstruction->AddOperand(ry->reg);
             }
@@ -1059,25 +1065,27 @@ namespace cmsx.intermediate
             if (y is ConstantValue*)
             {
                 List<Register*> dontUse;
-                rx = registerDescriptors.GetLocalRegDescriptor(dontUse, addressDescriptors, machineCode, line);
+                rx = registerDescriptors.GetLocalRegDescriptor(dontUse, addressDescriptors, machineCode, line, this);
                 Value* value = y->TruncateTo(type, line);
                 machineCode.context.AddValue(value);
-                value->GenerateSetValue(rx->reg, machineCode, line);
+                value->GenerateSetValue(rx->reg, machineCode, line, this);
             }
             else
             {
                 bool useRegYForX = CanUseRegYForX(y, registerDescriptors, addressDescriptors);
-                GetReg(x, y, z, useRegYForX, registerDescriptors, addressDescriptors, machineCode, line, rx, ry, rz);
-                LoadOperandValue(y, ry, addressDescriptors, machineCode, line);
+                GetReg(x, y, z, useRegYForX, registerDescriptors, addressDescriptors, machineCode, line, rx, ry, rz, this);
+                LoadOperandValue(y, ry, addressDescriptors, machineCode, line, this);
                 List<Register*> dontUse;
-                rz = registerDescriptors.GetLocalRegDescriptor(dontUse, addressDescriptors, machineCode, line);
-                type->GenerateMinusOne(machineCode, rz->reg, line);
+                dontUse.Add(rx->reg);
+                dontUse.Add(ry->reg);
+                rz = registerDescriptors.GetLocalRegDescriptor(dontUse, addressDescriptors, machineCode, line, this);
+                type->GenerateMinusOne(machineCode, rz->reg, line, this);
                 ConstantValue* constantValue = new ConstantValue();
                 machineCode.context.AddValue(constantValue);
                 rz->SetValue(constantValue);
-                MachineInstruction* andInst = machineCode.GetInstruction(cmsx.machine.AND);
+                MachineInstruction* andInst = machineCode.GetInstruction(cmsx.machine.AND, this);
                 andInst->AddOperand(rx->reg);
-                andInst->AddOperand(rx->reg);
+                andInst->AddOperand(ry->reg);
                 andInst->AddOperand(rz->reg);
             }
             rx->SetValue(x);
@@ -1109,13 +1117,13 @@ namespace cmsx.intermediate
         public override void Validate(Function& function, int numArgs)
         {
             base->Validate(function, numArgs);
-            if (!(arg->type is PtrType*))
+            if (!(arg->type is ScalarType*))
             {
-                throw Exception("error: the operand type '" + arg->type->Name() + "' in the " + OperationName() + " instruction at line " + ToString(line) + " must be a pointer type");
+                throw Exception("error: the operand type '" + arg->type->Name() + "' in the " + OperationName() + " instruction at line " + ToString(line) + " must be a scalar type");
             }
-            if (!(type is PtrType*))
+            if (!(type is ScalarType*))
             {
-                throw Exception("error: the result type '" + type->Name() + "' in the " + OperationName() + " instruction at line " + ToString(line) + " must be a pointer type");
+                throw Exception("error: the result type '" + type->Name() + "' in the " + OperationName() + " instruction at line " + ToString(line) + " must be a scalar type");
             }
         }
         public override void GenerateCode(MachineCode& machineCode, CodeFormatter& formatter)
@@ -1132,15 +1140,15 @@ namespace cmsx.intermediate
             if (y is ConstantValue*)
             {
                 List<Register*> dontUse;
-                rx = registerDescriptors.GetLocalRegDescriptor(dontUse, addressDescriptors, machineCode, line);
-                y->GenerateSetValue(rx->reg, machineCode, line);
+                rx = registerDescriptors.GetLocalRegDescriptor(dontUse, addressDescriptors, machineCode, line, this);
+                y->GenerateSetValue(rx->reg, machineCode, line, this);
             }
             else
             {
                 bool useRegYForX = CanUseRegYForX(y, registerDescriptors, addressDescriptors);
-                GetReg(x, y, z, useRegYForX, registerDescriptors, addressDescriptors, machineCode, line, rx, ry, rz);
-                LoadOperandValue(y, ry, addressDescriptors, machineCode, line);
-                MachineInstruction* machineInstruction = machineCode.GetInstruction(cmsx.assembly.SET);
+                GetReg(x, y, z, useRegYForX, registerDescriptors, addressDescriptors, machineCode, line, rx, ry, rz, this);
+                LoadOperandValue(y, ry, addressDescriptors, machineCode, line, this);
+                MachineInstruction* machineInstruction = machineCode.GetInstruction(cmsx.assembly.SET, this);
                 machineInstruction->AddOperand(rx->reg);
                 machineInstruction->AddOperand(ry->reg);
             }
@@ -1194,14 +1202,14 @@ namespace cmsx.intermediate
             RegisterDescriptors& registerDescriptors = parent->registerDescriptors;
             AddressDescriptors& addressDescriptors = parent->function.addressDescriptors;
             bool useRegYForX = CanUseRegYForX(y, registerDescriptors, addressDescriptors);
-            GetReg(x, y, z, useRegYForX, registerDescriptors, addressDescriptors, machineCode, line, rx, ry, rz);
+            GetReg(x, y, z, useRegYForX, registerDescriptors, addressDescriptors, machineCode, line, rx, ry, rz, this);
             if (y is ConstantValue*)
             {
-                y->GenerateSetValue(ry->reg, machineCode, line);
+                y->GenerateSetValue(ry->reg, machineCode, line, this);
             }
             else
             {
-                LoadOperandValue(y, ry, addressDescriptors, machineCode, line);
+                LoadOperandValue(y, ry, addressDescriptors, machineCode, line, this);
             }
             int flotInst = -1;
             if (y->type is SignedIntegerType*)
@@ -1230,7 +1238,7 @@ namespace cmsx.intermediate
             {
                 throw Exception("error: tried to generate fixed to floating conversion for type '" + y->type->Name() + "' in the " + OperationName() + " instruction at line " + ToString(line));
             }
-            MachineInstruction* machineInstruction = machineCode.GetInstruction(flotInst);
+            MachineInstruction* machineInstruction = machineCode.GetInstruction(flotInst, this);
             machineInstruction->AddOperand(rx->reg);
             machineInstruction->AddOperand(ry->reg);
             rx->SetValue(x);
@@ -1283,14 +1291,14 @@ namespace cmsx.intermediate
             RegisterDescriptors& registerDescriptors = parent->registerDescriptors;
             AddressDescriptors& addressDescriptors = parent->function.addressDescriptors;
             bool useRegYForX = CanUseRegYForX(y, registerDescriptors, addressDescriptors);
-            GetReg(x, y, z, useRegYForX, registerDescriptors, addressDescriptors, machineCode, line, rx, ry, rz);
+            GetReg(x, y, z, useRegYForX, registerDescriptors, addressDescriptors, machineCode, line, rx, ry, rz, this);
             if (y is ConstantValue*)
             {
-                y->GenerateSetValue(ry->reg, machineCode, line);
+                y->GenerateSetValue(ry->reg, machineCode, line, this);
             }
             else
             {
-                LoadOperandValue(y, ry, addressDescriptors, machineCode, line);
+                LoadOperandValue(y, ry, addressDescriptors, machineCode, line, this);
             }
             int fixInst = -1;
             if (type is SignedIntegerType*)
@@ -1305,7 +1313,7 @@ namespace cmsx.intermediate
             {
                 throw Exception("error: tried to generate floating to fixed conversion for type '" + type->Name() + "' in the " + OperationName() + " instruction at line " + ToString(line));
             }
-            MachineInstruction* machineInstruction = machineCode.GetInstruction(fixInst);
+            MachineInstruction* machineInstruction = machineCode.GetInstruction(fixInst, this);
             machineInstruction->AddOperand(rx->reg);
             machineInstruction->AddOperand(ry->reg);
             rx->SetValue(x);
@@ -1358,16 +1366,16 @@ namespace cmsx.intermediate
             RegisterDescriptor* ry = null;
             RegisterDescriptor* rz = null;
             bool useRegYForX = CanUseRegYForX(y, registerDescriptors, addressDescriptors);
-            GetReg(x, y, z, useRegYForX, registerDescriptors, addressDescriptors, machineCode, line, rx, ry, rz);
+            GetReg(x, y, z, useRegYForX, registerDescriptors, addressDescriptors, machineCode, line, rx, ry, rz, this);
             if (y is ConstantValue*)
             {
-                y->GenerateSetValue(ry->reg, machineCode, line);
+                y->GenerateSetValue(ry->reg, machineCode, line, this);
             }
             else
             {
-                LoadOperandValue(y, ry, addressDescriptors, machineCode, line);
+                LoadOperandValue(y, ry, addressDescriptors, machineCode, line, this);
             }
-            MachineInstruction* machineInstruction = machineCode.GetInstruction(cmsx.assembly.SET);
+            MachineInstruction* machineInstruction = machineCode.GetInstruction(cmsx.assembly.SET, this);
             machineInstruction->AddOperand(rx->reg);
             machineInstruction->AddOperand(ry->reg);
             rx->SetValue(x);
@@ -1420,16 +1428,16 @@ namespace cmsx.intermediate
             RegisterDescriptor* ry = null;
             RegisterDescriptor* rz = null;
             bool useRegYForX = CanUseRegYForX(y, registerDescriptors, addressDescriptors);
-            GetReg(x, y, z, useRegYForX, registerDescriptors, addressDescriptors, machineCode, line, rx, ry, rz);
+            GetReg(x, y, z, useRegYForX, registerDescriptors, addressDescriptors, machineCode, line, rx, ry, rz, this);
             if (y is ConstantValue*)
             {
-                y->GenerateSetValue(ry->reg, machineCode, line);
+                y->GenerateSetValue(ry->reg, machineCode, line, this);
             }
             else
             {
-                LoadOperandValue(y, ry, addressDescriptors, machineCode, line);
+                LoadOperandValue(y, ry, addressDescriptors, machineCode, line, this);
             }
-            MachineInstruction* machineInstruction = machineCode.GetInstruction(cmsx.assembly.SET);
+            MachineInstruction* machineInstruction = machineCode.GetInstruction(cmsx.assembly.SET, this);
             machineInstruction->AddOperand(rx->reg);
             machineInstruction->AddOperand(ry->reg);
             rx->SetValue(x);
@@ -1467,7 +1475,7 @@ namespace cmsx.intermediate
             BeginGenerateCode(machineCode);
             RegisterDescriptors& registerDescriptors = parent->registerDescriptors;
             AddressDescriptors& addressDescriptors = parent->function.addressDescriptors;
-            homeLocation = parent->function.locations.GetFrameLocation(type->Size());
+            homeLocation = parent->function.frameLocations.GetFrameLocation(type->Size());
             Registers& regs = parent->function.context.regs;
             if (index < regs.GetNumParamRegisters())
             {
@@ -1536,7 +1544,7 @@ namespace cmsx.intermediate
             RegisterDescriptors& registerDescriptors = parent->registerDescriptors;
             AddressDescriptors& addressDescriptors = parent->function.addressDescriptors;
             BeginGenerateCode(machineCode);
-            homeLocation = parent->function.locations.GetFrameLocation(localType->Size());
+            homeLocation = parent->function.frameLocations.GetFrameLocation(localType->Size());
             EndGenerateCode();
             if (Flags.Get(Flag.debug))
             {
@@ -1612,7 +1620,7 @@ namespace cmsx.intermediate
             RegisterDescriptors& registerDescriptors = parent->registerDescriptors;
             AddressDescriptors& addressDescriptors = parent->function.addressDescriptors;
             List<Register*> dontUse;
-            RegisterDescriptor* destinationRegisterDescriptor = registerDescriptors.GetLocalRegDescriptor(dontUse, addressDescriptors, machineCode, line);
+            RegisterDescriptor* destinationRegisterDescriptor = registerDescriptors.GetLocalRegDescriptor(dontUse, addressDescriptors, machineCode, line, this);
             AddressDescriptor* ptrAddressDescriptor = addressDescriptors.GetAddressDescriptor(ptr);
             Location* location = ptr->HomeLocation();
             if (location == null)
@@ -1623,7 +1631,7 @@ namespace cmsx.intermediate
             {
                 homeLocation = location;
                 int loadOpCode = type->GetLoadOp(line);
-                location->GenerateLoad(loadOpCode, destinationRegisterDescriptor->reg, machineCode);
+                location->GenerateLoad(loadOpCode, destinationRegisterDescriptor->reg, machineCode, this);
                 destinationRegisterDescriptor->SetValue(this);
                 destinationRegisterDescriptor->AddValue(ptr);
                 destinationRegisterDescriptor->loaded = true;
@@ -1721,9 +1729,9 @@ namespace cmsx.intermediate
             if (value is ConstantValue*)
             {
                 List<Register*> dontUse;
-                RegisterDescriptor* valueRegisterDescriptor = registerDescriptors.GetLocalRegDescriptor(dontUse, addressDescriptors, machineCode, line);
+                RegisterDescriptor* valueRegisterDescriptor = registerDescriptors.GetLocalRegDescriptor(dontUse, addressDescriptors, machineCode, line, this);
                 valueReg = valueRegisterDescriptor->reg;
-                value->GenerateSetValue(valueRegisterDescriptor->reg, machineCode, line);
+                value->GenerateSetValue(valueRegisterDescriptor->reg, machineCode, line, this);
             }
             else
             {
@@ -1742,9 +1750,9 @@ namespace cmsx.intermediate
                     else
                     {
                         List<Register*> dontUse;
-                        RegisterDescriptor* destinationRegisterDescriptor = registerDescriptors.GetLocalRegDescriptor(dontUse, addressDescriptors, machineCode, line);
+                        RegisterDescriptor* destinationRegisterDescriptor = registerDescriptors.GetLocalRegDescriptor(dontUse, addressDescriptors, machineCode, line, this);
                         int loadOpCode = value->type->GetLoadOp(line);
-                        valueLoc->GenerateLoad(loadOpCode, destinationRegisterDescriptor->reg, machineCode);
+                        valueLoc->GenerateLoad(loadOpCode, destinationRegisterDescriptor->reg, machineCode, this);
                         valueReg = destinationRegisterDescriptor->reg;
                         destinationRegisterDescriptor->SetValue(value);
                         valueAddressDescriptor->AddLocation(valueReg);
@@ -1764,7 +1772,7 @@ namespace cmsx.intermediate
             if (ptrLoc != null)
             {
                 int storeOpCode = value->type->GetStoreOp(line);
-                ptrLoc->GenerateStore(storeOpCode, valueReg, machineCode);
+                ptrLoc->GenerateStore(storeOpCode, valueReg, machineCode, this);
                 ptrAddressDescriptor->AddLocation(ptrLoc);
             }
             else
@@ -1817,7 +1825,7 @@ namespace cmsx.intermediate
             if (!(baseType is ArrayType* || baseType is StructureType*))
             {
                 throw Exception("error: the first operand type '" + ptr->type->Name() + "' in the " + OperationName() + " instruction at line " + ToString(line) +
-                " must be a pointer-to-array or pointer-to-structure type");
+                    " must be a pointer-to-array or pointer-to-structure type");
             }
             if (!(type is PtrType*))
             {
@@ -1878,13 +1886,13 @@ namespace cmsx.intermediate
                     throw Exception("error: when the base type of the first operand is a structure type, the second operand in the " + OperationName() + " instruction at line " + ToString(line) + " must be a long constant");
                 }
             }
-            if (baseType is ArrayType*)
+            else if (baseType is ArrayType*)
             {
                 z = index;
             }
             else
             {
-                throw Exception("error: the base type of the first operand must be a pointer-to-array type or a pointer-to-structure type in the " + OperationName() + " instruction at line " + ToString(line) + " must be a long constant");
+                throw Exception("error: the base type of the first operand must be a pointer-to-array type or a pointer-to-structure type in the " + OperationName() + " instruction at line " + ToString(line));
             }
             RegisterDescriptor* rx = null;
             RegisterDescriptor* ry = null;
@@ -1892,10 +1900,10 @@ namespace cmsx.intermediate
             RegisterDescriptors& registerDescriptors = parent->registerDescriptors;
             AddressDescriptors& addressDescriptors = parent->function.addressDescriptors;
             bool useRegYForX = false;
-            GetReg(x, y, z, useRegYForX, registerDescriptors, addressDescriptors, machineCode, line, rx, ry, rz);
+            GetReg(x, y, z, useRegYForX, registerDescriptors, addressDescriptors, machineCode, line, rx, ry, rz, this);
             if (y is ConstantValue*)
             {
-                y->GenerateSetValue(ry->reg, machineCode, line);
+                y->GenerateSetValue(ry->reg, machineCode, line, this);
             }
             else
             {
@@ -1905,22 +1913,22 @@ namespace cmsx.intermediate
                     LocalInstruction* local = cast<LocalInstruction*>(ptr);
                     if ((local->localType is ArrayType*) || (local->localType is StructureType*))
                     {
-                        LoadOperandAddress(y, ry, addressDescriptors, machineCode, line);
+                        LoadOperandAddress(y, ry, addressDescriptors, machineCode, line, this);
                         operandLoaded = true;
                     }
                 }
                 if (!operandLoaded)
                 {
-                    LoadOperandValue(y, ry, addressDescriptors, machineCode, line);
+                    LoadOperandValue(y, ry, addressDescriptors, machineCode, line, this);
                 }
             }
             if (z is ConstantValue*)
             {
-                z->GenerateSetValue(rz->reg, machineCode, line);
+                z->GenerateSetValue(rz->reg, machineCode, line, this);
             }
             else
             {
-                LoadOperandValue(z, rz, addressDescriptors, machineCode, line);
+                LoadOperandValue(z, rz, addressDescriptors, machineCode, line, this);
             }
             Register* ix = null;
             if (baseType is ArrayType*)
@@ -1931,13 +1939,13 @@ namespace cmsx.intermediate
                 LongValue* sizeValue = new LongValue(size);
                 machineCode.context.AddValue(sizeValue);
                 ix = machineCode.context.regs.GetIx();
-                sizeValue->GenerateSetValue(ix, machineCode, line);
-                MachineInstruction* mulInstruction = machineCode.GetInstruction(cmsx.machine.MUL);
+                sizeValue->GenerateSetValue(ix, machineCode, line, this);
+                MachineInstruction* mulInstruction = machineCode.GetInstruction(cmsx.machine.MUL, this);
                 mulInstruction->AddOperand(ix);
                 mulInstruction->AddOperand(rz->reg);
                 mulInstruction->AddOperand(ix);
             }
-            MachineInstruction* machineInstruction = machineCode.GetInstruction(cmsx.assembly.LDA);
+            MachineInstruction* machineInstruction = machineCode.GetInstruction(cmsx.assembly.LDA, this);
             machineInstruction->AddOperand(rx->reg);
             machineInstruction->AddOperand(ry->reg);
             if (ix != null)
@@ -2058,14 +2066,14 @@ namespace cmsx.intermediate
             RegisterDescriptors& registerDescriptors = parent->registerDescriptors;
             AddressDescriptors& addressDescriptors = parent->function.addressDescriptors;
             bool useRegYForX = CanUseRegYForX(y, registerDescriptors, addressDescriptors);
-            GetReg(x, y, z, useRegYForX, registerDescriptors, addressDescriptors, machineCode, line, rx, ry, rz);
+            GetReg(x, y, z, useRegYForX, registerDescriptors, addressDescriptors, machineCode, line, rx, ry, rz, this);
             if (y is ConstantValue*)
             {
-                y->GenerateSetValue(ry->reg, machineCode, line);
+                y->GenerateSetValue(ry->reg, machineCode, line, this);
             }
             else
             {
-                LoadOperandValue(y, ry, addressDescriptors, machineCode, line);
+                LoadOperandValue(y, ry, addressDescriptors, machineCode, line, this);
             }
             if (z != null)
             {
@@ -2075,12 +2083,12 @@ namespace cmsx.intermediate
                     LongValue* offsetValue = cast<LongValue*>(z);
                     LongValue* sizedOffsetValue = new LongValue(offsetValue->value * size);
                     machineCode.context.AddValue(sizedOffsetValue);
-                    sizedOffsetValue->GenerateSetValue(rz->reg, machineCode, line);
+                    sizedOffsetValue->GenerateSetValue(rz->reg, machineCode, line, this);
                 }
                 else
                 {
-                    LoadOperandValue(z, rz, addressDescriptors, machineCode, line);
-                    MachineInstruction* mulInst = machineCode.GetInstruction(cmsx.machine.MUL);
+                    LoadOperandValue(z, rz, addressDescriptors, machineCode, line, this);
+                    MachineInstruction* mulInst = machineCode.GetInstruction(cmsx.machine.MUL, this);
                     mulInst->AddOperand(rz->reg);
                     mulInst->AddOperand(rz->reg);
                     if (size <= MaxValue<byte>())
@@ -2092,12 +2100,12 @@ namespace cmsx.intermediate
                         LongValue* sizeValue = new LongValue(size);
                         machineCode.context.AddValue(sizeValue);
                         Register* ix = machineCode.context.regs.GetIx();
-                        sizeValue->GenerateSetValue(ix, machineCode, line);
+                        sizeValue->GenerateSetValue(ix, machineCode, line, this);
                         mulInst->AddOperand(ix);
                     }
                 }
             }
-            MachineInstruction* machineInstruction = machineCode.GetInstruction(cmsx.assembly.LDA);
+            MachineInstruction* machineInstruction = machineCode.GetInstruction(cmsx.assembly.LDA, this);
             machineInstruction->AddOperand(rx->reg);
             machineInstruction->AddOperand(ry->reg);
             if (z != null)
@@ -2206,28 +2214,28 @@ namespace cmsx.intermediate
             RegisterDescriptors& registerDescriptors = parent->registerDescriptors;
             AddressDescriptors& addressDescriptors = parent->function.addressDescriptors;
             bool useRegYForX = CanUseRegYForX(y, registerDescriptors, addressDescriptors);
-            GetReg(x, y, z, useRegYForX, registerDescriptors, addressDescriptors, machineCode, line, rx, ry, rz);
+            GetReg(x, y, z, useRegYForX, registerDescriptors, addressDescriptors, machineCode, line, rx, ry, rz, this);
             if (y is ConstantValue*)
             {
-                y->GenerateSetValue(ry->reg, machineCode, line);
+                y->GenerateSetValue(ry->reg, machineCode, line, this);
             }
             else
             {
-                LoadOperandValue(y, ry, addressDescriptors, machineCode, line);
+                LoadOperandValue(y, ry, addressDescriptors, machineCode, line, this);
             }
             if (z is ConstantValue*)
             {
-                z->GenerateSetValue(rz->reg, machineCode, line);
+                z->GenerateSetValue(rz->reg, machineCode, line, this);
             }
             else
             {
-                LoadOperandValue(z, rz, addressDescriptors, machineCode, line);
+                LoadOperandValue(z, rz, addressDescriptors, machineCode, line, this);
             }
-            MachineInstruction* subInstruction = machineCode.GetInstruction(cmsx.machine.SUBU);
+            MachineInstruction* subInstruction = machineCode.GetInstruction(cmsx.machine.SUBU, this);
             subInstruction->AddOperand(rx->reg);
             subInstruction->AddOperand(ry->reg);
             subInstruction->AddOperand(rz->reg);
-            MachineInstruction* divInstruction = machineCode.GetInstruction(cmsx.machine.DIVU);
+            MachineInstruction* divInstruction = machineCode.GetInstruction(cmsx.machine.DIVU, this);
             divInstruction->AddOperand(rx->reg);
             divInstruction->AddOperand(rx->reg);
             if (size <= MaxValue<byte>())
@@ -2239,7 +2247,7 @@ namespace cmsx.intermediate
                 LongValue* sizeValue = new LongValue(size);
                 machineCode.context.AddValue(sizeValue);
                 Register* ix = machineCode.context.regs.GetIx();
-                sizeValue->GenerateSetValue(ix, machineCode, line);
+                sizeValue->GenerateSetValue(ix, machineCode, line, this);
                 divInstruction->AddOperand(ix);
             }
             rx->SetValue(x);
@@ -2263,7 +2271,7 @@ namespace cmsx.intermediate
 
     public class ArgInstruction : Instruction
     {
-        public nothrow ArgInstruction(Value* arg_, int line_) : base(line_), arg(arg_)
+        public nothrow ArgInstruction(Value* arg_, int line_) : base(line_), arg(arg_), numArgs(0), argIndex(-1)
         {
         }
         public override nothrow string Name() const
@@ -2277,6 +2285,7 @@ namespace cmsx.intermediate
         public override void Validate(Function& function, int numArgs)
         {
             base->Validate(function, numArgs);
+            arg = function.ResolveOperand(line, arg);
             if (arg == null)
             {
                 throw Exception("internal error : operand of " + OperationName() + " instruction at line " + ToString(line) + " is null");
@@ -2285,6 +2294,7 @@ namespace cmsx.intermediate
             {
                 throw Exception("error: the operand type '" + arg->type->Name() + "' in the " + OperationName() + " instruction at line " + ToString(line) + " must be a scalar type");
             }
+            argIndex = parent->function.GetNextArgIndex();
         }
         public override void Print(CodeFormatter& formatter)
         {
@@ -2305,7 +2315,89 @@ namespace cmsx.intermediate
             base->EndComputeLivenessAndNextUse();
             parent->SetValueLivenessAndNextUse(arg, Liveness.live, this);
         }
+        public override void GenerateCode(MachineCode& machineCode, CodeFormatter& formatter)
+        {
+            BeginGenerateCode(machineCode);
+            RegisterDescriptors& registerDescriptors = parent->registerDescriptors;
+            AddressDescriptors& addressDescriptors = parent->function.addressDescriptors;
+            #assert(argIndex >= 0 && numArgs >= 0);
+            int numParamRegs = machineCode.context.regs.GetNumParamRegisters();
+            Register* ix = machineCode.context.regs.GetIx();
+            Register* sp = machineCode.context.regs.GetSP();
+            if (argIndex == 0 && numArgs > numParamRegs)
+            {
+                if (trap)
+                {
+                    throw Exception("too many arguments for trap at line " + ToString(line));
+                }
+                byte numUsedLocalRegs = registerDescriptors.GetNumUsedLocalRegs();
+                ulong spOffset = 8u * (numUsedLocalRegs + 3u);
+                ULongValue* spOffsetValue = new ULongValue(spOffset);
+                spOffsetValue->GenerateSetValue(ix, machineCode, line, this);
+                MachineInstruction* ldaInst = machineCode.GetInstruction(cmsx.assembly.LDA, this);
+                ldaInst->AddOperand(sp);
+                ldaInst->AddOperand(sp);
+                ldaInst->AddOperand(ix);
+                MachineInstruction* storeInst = machineCode.GetInstruction(cmsx.machine.STOU, this);
+                storeInst->AddOperand(ix);
+                storeInst->AddOperand(sp);
+                storeInst->AddOperand(machineCode.context.GetLiteralOperand(0u));
+            }
+            Location* argLocation = parent->function.frameLocations.GetArgLocation();
+            Register* argReg = null;
+            if (argIndex < numParamRegs)
+            {
+                argReg = machineCode.context.regs.GetParamRegister(cast<byte>(argIndex));
+            }
+            else
+            {
+                argReg = machineCode.context.regs.GetLocalRegister(registerDescriptors.GetNumUsedLocalRegs());
+            }
+            RegisterDescriptor* argRegDescriptor = registerDescriptors.GetRegisterDescriptor(argReg);
+            bool loaded = false;
+            if (arg is LocalInstruction*)
+            {
+                LocalInstruction* localInst = cast<LocalInstruction*>(arg);
+                if (localInst->localType is StructureType* || localInst->localType is ArrayType*)
+                {
+                    LoadOperandAddress(arg, argRegDescriptor, addressDescriptors, machineCode, line, this);
+                    loaded = true;
+                }
+            }
+            else if (arg is ConstantValue*)
+            {
+                arg->GenerateSetValue(argRegDescriptor->reg, machineCode, line, this);
+                loaded = true;
+            }
+            if (!loaded)
+            {
+                AddressDescriptor* addressDescriptor = addressDescriptors.GetAddressDescriptor(arg);
+                Location* loc = addressDescriptor->GetLocation();
+                if (loc == null)
+                {
+                    loc = arg->HomeLocation();
+                }
+                if (loc != null && (loc is Register*))
+                {
+                    MachineInstruction* setInst = machineCode.GetInstruction(cmsx.assembly.SET, this);
+                    setInst->AddOperand(argRegDescriptor->reg); 
+                    setInst->AddOperand(loc);
+                }
+                else
+                {
+                    LoadOperandValue(arg, argRegDescriptor, addressDescriptors, machineCode, line, this);
+                }
+            }
+            if (argIndex >= numParamRegs)
+            {
+                argLocation->GenerateStore(arg->type->GetStoreOp(line), argReg, machineCode, this); 
+            }
+            EndGenerateCode();
+        }
         public Value* arg;
+        public int numArgs;
+        public bool trap;
+        private int argIndex;
     }
 
     public class JumpInstruction : TerminatorInstruction
@@ -2339,7 +2431,7 @@ namespace cmsx.intermediate
         public override void GenerateCode(MachineCode& machineCode, CodeFormatter& formatter)
         {
             BeginGenerateCode(machineCode);
-            MachineInstruction* jumpInst = machineCode.GetInstruction(cmsx.machine.JMP);
+            MachineInstruction* jumpInst = machineCode.GetInstruction(cmsx.machine.JMP, this);
             jumpInst->AddOperand(machineCode.context.GetSymbolOperand("@" + ToString(targetBlock->id)));
             EndGenerateCode();
         }
@@ -2402,34 +2494,44 @@ namespace cmsx.intermediate
             BeginGenerateCode(machineCode);
             RegisterDescriptors& registerDescriptors = parent->registerDescriptors;
             AddressDescriptors& addressDescriptors = parent->function.addressDescriptors;
-            MachineInstruction* branchInst = machineCode.GetInstruction(cmsx.machine.BP);
             Register* reg = null;
-            AddressDescriptor* condAddressDescriptor = addressDescriptors.GetAddressDescriptor(cond);
-            Location* location = condAddressDescriptor->GetLocation();
-            if (location == null)
+            if (cond is ConstantValue*)
             {
-                location = cond->HomeLocation();
+                List<Register*> dontUse;
+                RegisterDescriptor* condRegDescriptor = registerDescriptors.GetLocalRegDescriptor(dontUse, addressDescriptors, machineCode, line, this);
+                reg = condRegDescriptor->reg;
+                cond->GenerateSetValue(reg, machineCode, line, this);
             }
-            if (location != null)
+            else
             {
-                if (location is Register*)
+                AddressDescriptor* condAddressDescriptor = addressDescriptors.GetAddressDescriptor(cond);
+                Location* location = condAddressDescriptor->GetLocation();
+                if (location == null)
                 {
-                    reg = cast<Register*>(location);
+                    location = cond->HomeLocation();
                 }
-                else
+                if (location != null)
                 {
-                    List<Register*> dontUse;
-                    RegisterDescriptor* condRegDescriptor = registerDescriptors.GetLocalRegDescriptor(dontUse, addressDescriptors, machineCode, line);
-                    reg = condRegDescriptor->reg;
-                    int loadOpCode = cond->type->GetLoadOp(line);
-                    location->GenerateLoad(loadOpCode, reg, machineCode);
+                    if (location is Register*)
+                    {
+                        reg = cast<Register*>(location);
+                    }
+                    else
+                    {
+                        List<Register*> dontUse;
+                        RegisterDescriptor* condRegDescriptor = registerDescriptors.GetLocalRegDescriptor(dontUse, addressDescriptors, machineCode, line, this);
+                        reg = condRegDescriptor->reg;
+                        int loadOpCode = cond->type->GetLoadOp(line);
+                        location->GenerateLoad(loadOpCode, reg, machineCode, this);
+                    }
                 }
             }
+            MachineInstruction* branchInst = machineCode.GetInstruction(cmsx.machine.BP, this);
             if (reg != null)
             {
                 branchInst->AddOperand(reg);
                 branchInst->AddOperand(machineCode.context.GetSymbolOperand("@" + ToString(trueTargetBlock->id)));
-                MachineInstruction* jumpInst = machineCode.GetInstruction(cmsx.machine.JMP);
+                MachineInstruction* jumpInst = machineCode.GetInstruction(cmsx.machine.JMP, this);
                 jumpInst->AddOperand(machineCode.context.GetSymbolOperand("@" + ToString(falseTargetBlock->id)));
                 EndGenerateCode();
             }
@@ -2461,6 +2563,7 @@ namespace cmsx.intermediate
         public override void Validate(Function& function, int numArgs)
         {
             base->Validate(function, numArgs);
+            callee = function.ResolveOperand(line, callee);
             if (callee == null)
             {
                 throw Exception("internal error : callee operand of " + OperationName() + " instruction at line " + ToString(line) + " is null");
@@ -2480,6 +2583,7 @@ namespace cmsx.intermediate
             {
                 throw Exception("error: wrong number of preceding arg instructions for " + OperationName() + " instruction at line " + ToString(line));
             }
+            parent->function.ResetNextArgIndex();
         }
         public override void Print(CodeFormatter& formatter)
         {
@@ -2499,6 +2603,52 @@ namespace cmsx.intermediate
         {
             base->EndComputeLivenessAndNextUse();
             parent->SetValueLivenessAndNextUse(callee, Liveness.live, this);
+        }
+        public override void GenerateCode(MachineCode& machineCode, CodeFormatter& formatter)
+        {
+            BeginGenerateCode(machineCode);
+            RegisterDescriptors& registerDescriptors = parent->registerDescriptors;
+            AddressDescriptors& addressDescriptors = parent->function.addressDescriptors;
+            Type* calleeType = callee->type;
+            if (calleeType is PtrType*)
+            {
+                PtrType* ptrType = cast<PtrType*>(calleeType);
+                calleeType = ptrType->BaseType();
+            }
+            if (!(calleeType is FunctionType*))
+            {
+                throw Exception("error: the type of the callee in the " + OperationName() + " instruction at line " + ToString(line) + " must be a function type or a pointer-to-function type");
+            }
+            FunctionType* functionType = cast<FunctionType*>(calleeType);
+            int numParamRegs = machineCode.context.regs.GetNumParamRegisters();
+            if (functionType->ParamTypes().Count() > numParamRegs)
+            {
+                Register* ix = machineCode.context.regs.GetIx();
+                Register* sp = machineCode.context.regs.GetSP();
+                MachineInstruction* loadInst = machineCode.GetInstruction(cmsx.machine.LDOU, this);
+                loadInst->AddOperand(ix);
+                loadInst->AddOperand(sp);
+                loadInst->AddOperand(machineCode.context.GetLiteralOperand(0u));
+                MachineInstruction* subInst = machineCode.GetInstruction(cmsx.machine.SUBU, this);
+                subInst->AddOperand(sp);
+                subInst->AddOperand(sp);
+                subInst->AddOperand(ix);
+            }
+            parent->function.frameLocations.ResetArgLocations();
+            Register* xReg = machineCode.context.regs.GetLocalRegister(registerDescriptors.GetNumUsedLocalRegs());
+            MachineInstruction* callInst = machineCode.GetInstruction(cmsx.machine.CALL, this);
+            callInst->AddOperand(xReg);
+            Operand* operand = null;
+            if (callee is SymbolValue*)
+            {
+                operand = machineCode.context.GetSymbolOperand(callee->Name());
+            }
+            else
+            {
+                LoadOperandValue(callee, registerDescriptors.GetRegisterDescriptor(xReg), addressDescriptors, machineCode, line, this);
+            }
+            callInst->AddOperand(operand);
+            EndGenerateCode();
         }
         public Value* callee;
     }
@@ -2534,6 +2684,7 @@ namespace cmsx.intermediate
             {
                 throw Exception("error: wrong number of preceding arg instructions for " + OperationName() + " instruction at line " + ToString(line));
             }
+            parent->function.ResetNextArgIndex();
         }
         public override void Print(CodeFormatter& formatter)
         {
@@ -2554,7 +2705,160 @@ namespace cmsx.intermediate
             base->EndComputeLivenessAndNextUse();
             parent->SetValueLivenessAndNextUse(callee, Liveness.live, this);
         }
+        public override void GenerateCode(MachineCode& machineCode, CodeFormatter& formatter)
+        {
+            BeginGenerateCode(machineCode);
+            RegisterDescriptors& registerDescriptors = parent->registerDescriptors;
+            AddressDescriptors& addressDescriptors = parent->function.addressDescriptors;
+            Type* calleeType = callee->type;
+            if (calleeType is PtrType*)
+            {
+                PtrType* ptrType = cast<PtrType*>(calleeType);
+                calleeType = ptrType->BaseType();
+            }
+            if (!(calleeType is FunctionType*))
+            {
+                throw Exception("error: the type of the callee in the " + OperationName() + " instruction at line " + ToString(line) + " must be a function type or a pointer-to-function type");
+            }
+            FunctionType* functionType = cast<FunctionType*>(calleeType);
+            int numParamRegs = machineCode.context.regs.GetNumParamRegisters();
+            if (functionType->ParamTypes().Count() > numParamRegs)
+            {
+                Register* ix = machineCode.context.regs.GetIx();
+                Register* sp = machineCode.context.regs.GetSP();
+                MachineInstruction* loadInst = machineCode.GetInstruction(cmsx.machine.LDOU, this);
+                loadInst->AddOperand(ix);
+                loadInst->AddOperand(sp);
+                loadInst->AddOperand(machineCode.context.GetLiteralOperand(0u));
+                MachineInstruction* subInst = machineCode.GetInstruction(cmsx.machine.SUBU, this);
+                subInst->AddOperand(sp);
+                subInst->AddOperand(sp);
+                subInst->AddOperand(ix);
+            }
+            parent->function.frameLocations.ResetArgLocations();
+            Register* xReg = machineCode.context.regs.GetLocalRegister(registerDescriptors.GetNumUsedLocalRegs());
+            MachineInstruction* callInst = machineCode.GetInstruction(cmsx.machine.CALL, this);
+            callInst->AddOperand(xReg);
+            Operand* operand = null;
+            if (callee is SymbolValue*)
+            {
+                operand = machineCode.context.GetSymbolOperand(callee->Name());
+            }
+            else
+            {
+                LoadOperandValue(callee, registerDescriptors.GetRegisterDescriptor(xReg), addressDescriptors, machineCode, line, this);
+            }
+            callInst->AddOperand(operand);
+            List<Register*> dontUse;
+            RegisterDescriptor* resultRegDescriptor = registerDescriptors.GetLocalRegDescriptor(dontUse, addressDescriptors, machineCode, line, this);
+            Register* resultReg = resultRegDescriptor->reg;
+            MachineInstruction* setInst = machineCode.GetInstruction(cmsx.assembly.SET, this);
+            Registers& regs = machineCode.context.regs;
+            Register* ax = regs.GetParamRegister(0u);
+            setInst->AddOperand(resultReg);
+            setInst->AddOperand(ax);
+            resultRegDescriptor->SetValue(this);
+            AddressDescriptor* resultAddressDescriptor = addressDescriptors.GetAddressDescriptor(this);
+            resultAddressDescriptor->SetLocation(resultReg);
+            addressDescriptors.RemoveRegisterFromAllBut(this, resultReg);
+            EndGenerateCode(); 
+        }
         public Value* callee;
+    }
+
+    public class TrapInstruction : ValueInstruction
+    {
+        public nothrow TrapInstruction(Value* result_, Value* b0_, Value* b1_, Value* b2_, int line_) : base(result_, line_), b0(b0_), b1(b1_), b2(b2_)
+        {
+        }
+        public override nothrow string OperationName() const
+        {
+            return "trap";
+        }
+        public override void Validate(Function& function, int numArgs)
+        {
+            base->Validate(function, numArgs);
+            b0 = function.ResolveOperand(line, b0);
+            if (b0 == null)
+            {
+                throw Exception("error: parameter 0 in the " + OperationName() + " instruction at line " + ToString(line) + " is null");
+            }
+            if (!(b0->type is ByteType*))
+            {
+                throw Exception("error: type of parameter 0 in the " + OperationName() + " instruction at line " + ToString(line) + " must be byte");
+            }
+            if (!(b0 is ByteValue*))
+            {
+                throw Exception("error: parameter 0 in the " + OperationName() + " instruction at line " + ToString(line) + " must be literal byte");
+            }
+            b1 = function.ResolveOperand(line, b1);
+            if (b1 == null)
+            {
+                throw Exception("error: parameter 1 in the " + OperationName() + " instruction at line " + ToString(line) + " is null");
+            }
+            if (!(b1->type is ByteType*))
+            {
+                throw Exception("error: type of parameter 1 in the " + OperationName() + " instruction at line " + ToString(line) + " must be byte");
+            }
+            if (!(b1 is ByteValue*))
+            {
+                throw Exception("error: parameter 1 in the " + OperationName() + " instruction at line " + ToString(line) + " must be a literal byte");
+            }
+            b2 = function.ResolveOperand(line, b2);
+            if (b2 == null)
+            {
+                throw Exception("error: parameter 2 in the " + OperationName() + " instruction at line " + ToString(line) + " is null");
+            }
+            if (!(b2->type is ByteType*))
+            {
+                throw Exception("error: type of parameter 2 in the " + OperationName() + " instruction at line " + ToString(line) + " must be byte");
+            }
+            if (!(b2 is ByteValue*))
+            {
+                throw Exception("error: parameter 2 in the " + OperationName() + " instruction at line " + ToString(line) + " must be a literal byte");
+            }
+            parent->function.ResetNextArgIndex();
+        }
+        public override void Print(CodeFormatter& formatter)
+        {
+            base->Print(formatter);
+            formatter << " " << b0->type->Name() << " " << b0->Name() << "," << b1->type->Name() << " " << b1->Name() << "," << b2->type->Name() << " " << b2->Name();
+        }
+        public override void GenerateCode(MachineCode& machineCode, CodeFormatter& formatter)
+        {
+            BeginGenerateCode(machineCode);
+            RegisterDescriptors& registerDescriptors = parent->registerDescriptors;
+            AddressDescriptors& addressDescriptors = parent->function.addressDescriptors;
+            MachineInstruction* trapInst = machineCode.GetInstruction(cmsx.machine.TRAP, this);
+            byte byte0 = 0u;
+            #assert(b0 is ByteValue*);
+            byte0 = cast<ByteValue*>(b0)->value;
+            trapInst->AddOperand(machineCode.context.GetLiteralOperand(byte0));
+            byte byte1 = 0u;
+            #assert(b1 is ByteValue*);
+            byte1 = cast<ByteValue*>(b1)->value;
+            trapInst->AddOperand(machineCode.context.GetLiteralOperand(byte1));
+            byte byte2 = 0u;
+            #assert(b2 is ByteValue*);
+            byte2 = cast<ByteValue*>(b2)->value;
+            trapInst->AddOperand(machineCode.context.GetLiteralOperand(byte2));
+            List<Register*> dontUse;
+            RegisterDescriptor* resultRegDescriptor = registerDescriptors.GetLocalRegDescriptor(dontUse, addressDescriptors, machineCode, line, this);
+            Register* resultReg = resultRegDescriptor->reg;
+            Registers& regs = machineCode.context.regs;
+            Register* ax = regs.GetParamRegister(0u);
+            MachineInstruction* setInst = machineCode.GetInstruction(cmsx.assembly.SET, this);
+            setInst->AddOperand(resultReg);
+            setInst->AddOperand(ax);
+            resultRegDescriptor->SetValue(this);
+            AddressDescriptor* resultAddressDescriptor = addressDescriptors.GetAddressDescriptor(this);
+            resultAddressDescriptor->SetLocation(resultReg);
+            addressDescriptors.RemoveRegisterFromAllBut(this, resultReg);
+            EndGenerateCode();
+        }
+        public Value* b0;
+        public Value* b1;
+        public Value* b2;
     }
 
     public class RetInstruction : TerminatorInstruction
@@ -2621,25 +2925,43 @@ namespace cmsx.intermediate
             BeginGenerateCode(machineCode);
             if (value != null)
             {
-                AddressDescriptor* valueAddressDescriptor = addressDescriptors.GetAddressDescriptor(value);
                 Registers& regs = machineCode.context.regs;
                 Register* ax = regs.GetParamRegister(0u);
-                if (!valueAddressDescriptor->HasLocation(ax))
+                if (value is ConstantValue*)
                 {
-                    Location* loc = valueAddressDescriptor->GetLocation();
-                    if (loc is Register*)
+                    value->GenerateSetValue(ax, machineCode, line, this);
+                }
+                else
+                {
+                    AddressDescriptor* valueAddressDescriptor = addressDescriptors.GetAddressDescriptor(value);
+                    if (!valueAddressDescriptor->HasLocation(ax))
                     {
-                        MachineInstruction* setInstruction = machineCode.GetInstruction(cmsx.assembly.SET);
-                        setInstruction->AddOperand(ax);
-                        setInstruction->AddOperand(loc);
-                    }
-                    else
-                    {
-                        loc->GenerateLoad(value->type->GetLoadOp(line), ax, machineCode); 
+                        Location* loc = valueAddressDescriptor->GetLocation();
+                        if (loc == null)
+                        {
+                            loc = value->HomeLocation();
+                        }
+                        if (loc != null)
+                        {
+                            if (loc is Register*)
+                            {
+                                MachineInstruction* setInstruction = machineCode.GetInstruction(cmsx.assembly.SET, this);
+                                setInstruction->AddOperand(ax);
+                                setInstruction->AddOperand(loc);
+                            }
+                            else
+                            {
+                                loc->GenerateLoad(value->type->GetLoadOp(line), ax, machineCode, this); 
+                            }
+                        }
+                        else
+                        {
+                            throw Exception("location for value not found in the " + OperationName() + " instruction at line " + ToString(line));
+                        }
                     }
                 }
             }
-            MachineInstruction* jumpInst = machineCode.GetInstruction(cmsx.machine.JMP);
+            MachineInstruction* jumpInst = machineCode.GetInstruction(cmsx.machine.JMP, this);
             jumpInst->AddOperand(machineCode.context.GetSymbolOperand("@" + ToString(parent->function.epilog.id)));
             EndGenerateCode();
             if (Flags.Get(Flag.debug))
@@ -2792,29 +3114,29 @@ namespace cmsx.intermediate
             RegisterDescriptors& registerDescriptors = parent->registerDescriptors;
             AddressDescriptors& addressDescriptors = parent->function.addressDescriptors;
             bool useRegYForX = CanUseRegYForX(y, registerDescriptors, addressDescriptors);
-            GetReg(x, y, z, useRegYForX, registerDescriptors, addressDescriptors, machineCode, line, rx, ry, rz);
+            GetReg(x, y, z, useRegYForX, registerDescriptors, addressDescriptors, machineCode, line, rx, ry, rz, this);
             if (y is ConstantValue*)
             {
-                y->GenerateSetValue(ry->reg, machineCode, line);
+                y->GenerateSetValue(ry->reg, machineCode, line, this);
             }
             else
             {
-                LoadOperandValue(y, ry, addressDescriptors, machineCode, line);
+                LoadOperandValue(y, ry, addressDescriptors, machineCode, line, this);
             }
             for (const Pair<Value*, BasicBlock*>& destinationBlock : destinationBlocks)
             {
                 Value* caseValue = destinationBlock.first;
                 BasicBlock* caseTargetBlock = destinationBlock.second;
-                caseValue->GenerateSetValue(rz->reg, machineCode, line);
-                MachineInstruction* comparisonInstruction = machineCode.GetInstruction(binOpCode);
+                caseValue->GenerateSetValue(rz->reg, machineCode, line, this);
+                MachineInstruction* comparisonInstruction = machineCode.GetInstruction(binOpCode, this);
                 comparisonInstruction->AddOperand(rx->reg);
                 comparisonInstruction->AddOperand(ry->reg);
                 comparisonInstruction->AddOperand(rz->reg);
-                MachineInstruction* branchInstruction = machineCode.GetInstruction(cmsx.machine.BZ);
+                MachineInstruction* branchInstruction = machineCode.GetInstruction(cmsx.machine.BZ, this);
                 branchInstruction->AddOperand(rx->reg);
                 branchInstruction->AddOperand(machineCode.context.GetSymbolOperand("@" + ToString(caseTargetBlock->id)));
             }
-            MachineInstruction* jumpInstruction = machineCode.GetInstruction(cmsx.machine.JMP);
+            MachineInstruction* jumpInstruction = machineCode.GetInstruction(cmsx.machine.JMP, this);
             jumpInstruction->AddOperand(machineCode.context.GetSymbolOperand("@" + ToString(defaultDestination->id)));
             EndGenerateCode();
             if (Flags.Get(Flag.debug))

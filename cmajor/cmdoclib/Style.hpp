@@ -5,10 +5,11 @@
 
 #ifndef CMAJOR_CMDOCLIB_STYLE_INCLUDED
 #define CMAJOR_CMDOCLIB_STYLE_INCLUDED
+#include <cmajor/cmdoclib/CmDocLibApi.hpp>
 
 namespace cmajor { namespace cmdoclib {
 
-void GenerateStyleFile();
+CMDOCLIB_API void GenerateStyleFile();
 
 } } // namespace cmajor::cmdoclib
 

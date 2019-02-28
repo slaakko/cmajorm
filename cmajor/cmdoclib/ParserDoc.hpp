@@ -12,7 +12,7 @@
 
 namespace cmajor { namespace cmdoclib {
 
-struct GrammarInfo
+struct CMDOCLIB_API GrammarInfo
 {
     GrammarInfo(const std::u32string& grammarName_, const std::u32string& grammarId_, const std::string& grammarFileName_) :
         grammarName(grammarName_), grammarId(grammarId_), grammarFileName(grammarFileName_)
@@ -23,7 +23,7 @@ struct GrammarInfo
     std::string grammarFileName;
 };
 
-struct ByGrammarName
+struct CMDOCLIB_API ByGrammarName
 {
     bool operator()(const GrammarInfo& left, const GrammarInfo& right) const
     {
@@ -31,8 +31,8 @@ struct ByGrammarName
     }
 };
 
-void GeneratePPXml(cmajor::ast::Project* project);
-void BuildParserDocs(Input* input, const std::string& ppXmlFilePath, const std::string& grammarXmlFilePath, const std::string& relativeModuleDir, 
+CMDOCLIB_API void GeneratePPXml(cmajor::ast::Project* project);
+CMDOCLIB_API void BuildParserDocs(Input* input, const std::string& ppXmlFilePath, const std::string& grammarXmlFilePath, const std::string& relativeModuleDir,
     std::vector<std::string>& grammarFilePaths, const std::u32string& moduleName, std::vector<GrammarInfo>& grammars);
 
 } } // namespace cmajor::cmdoclib

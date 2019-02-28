@@ -7,7 +7,10 @@ namespace cmsx.kernel
     public const byte waitSystemCall = 1u;
     public const byte forkSystemCall = 2u;
     public const byte writeSystemCall = 3u;
-    public const byte numSystemCalls = 4u;
+    public const byte poolEndSystemCall = 4u;
+    public const byte setPoolEndSystemCall = 5u;
+    public const byte debugBreakSystemCall = 6u;
+    public const byte numSystemCalls = 7u;
 
     public delegate long TrapHandler(Machine& machine, byte trapX, byte trapY, byte trapZ, ulong trapAX, ulong trapBX, ulong trapCX, ulong trapDX, ulong trapEX);
 
@@ -37,6 +40,8 @@ namespace cmsx.kernel
             {
                 machine.GetProcessor().Exit();
             }
+            Debugger* debugger = kernel.GetDebugger();
+            debugger->Exit(process);
             return 0;
         }
         else
@@ -105,6 +110,69 @@ namespace cmsx.kernel
         else
         {
             Panic("write called for a process that is not running!");
+        }
+        return 0;
+    }
+
+    public long PoolEnd(Machine& machine, byte x, byte y, byte z, ulong ax, ulong bx, ulong cx, ulong dx, ulong ex)
+    {
+        if (x != 0u || y != poolEndSystemCall || z != 0u)
+        {
+            Panic("invalid pool_end parameters: " + ToString(x) + ", " + ToString(y) + ", " + ToString(z));
+        }
+        Kernel& kernel = Kernel.Instance();
+        ProcessTable& processTable = kernel.GetProcessTable();
+        Process* process = processTable.GetRunning();
+        if (process != null)
+        {
+            long retval = cast<long>(process->poolEnd);
+            return retval;
+        }
+        else
+        {
+            Panic("pool_end called for a process that is not running!");
+        }
+        return 0;
+    }
+
+    public long SetPoolEnd(Machine& machine, byte x, byte y, byte z, ulong ax, ulong bx, ulong cx, ulong dx, ulong ex)
+    {
+        if (x != 0u || y != setPoolEndSystemCall || z != 0u)
+        {
+            Panic("invalid set_pool_end parameters: " + ToString(x) + ", " + ToString(y) + ", " + ToString(z));
+        }
+        Kernel& kernel = Kernel.Instance();
+        ProcessTable& processTable = kernel.GetProcessTable();
+        Process* process = processTable.GetRunning();
+        if (process != null)
+        {
+            return SetPoolEndProcess(machine, process, ax);
+        }
+        else
+        {
+            Panic("set_pool_end called for a process that is not running!");
+        }
+        return 0;
+    }
+
+    public long DebugBreak(Machine& machine, byte x, byte y, byte z, ulong ax, ulong bx, ulong cx, ulong dx, ulong ex)
+    {
+        if (x != 0u || y != debugBreakSystemCall || z != 0u)
+        {
+            Panic("invalid debug break parameters: " + ToString(x) + ", " + ToString(y) + ", " + ToString(z));
+        }
+        Kernel& kernel = Kernel.Instance();
+        ProcessTable& processTable = kernel.GetProcessTable();
+        Process* process = processTable.GetRunning();
+        if (process != null)
+        {
+            Debugger* debugger = kernel.GetDebugger();
+            debugger->Run(process);
+            return cast<long>(machine.GetRegisters().Get(regAX));
+        }
+        else
+        {
+            Panic("debug break called for a process that is not running!");
         }
         return 0;
     }

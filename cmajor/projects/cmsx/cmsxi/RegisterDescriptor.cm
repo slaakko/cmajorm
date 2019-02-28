@@ -58,7 +58,7 @@ namespace cmsx.intermediate
 
     public class RegisterDescriptors
     {
-        public nothrow RegisterDescriptors(Registers& regs_) : regs(regs_)
+        public nothrow RegisterDescriptors(Registers& regs_) : regs(regs_), numUsedLocalRegs(0u)
         {
             byte np = regs.GetNumParamRegisters();
             for (byte i = 0u; i < np; ++i)
@@ -88,7 +88,7 @@ namespace cmsx.intermediate
                 return null;
             }
         }
-        public RegisterDescriptor* GetLocalRegDescriptor(const List<Register*>& dontUse, AddressDescriptors& addressDescriptors, MachineCode& machineCode, int line)
+        public RegisterDescriptor* GetLocalRegDescriptor(const List<Register*>& dontUse, AddressDescriptors& addressDescriptors, MachineCode& machineCode, int line, Instruction* inst)
         {
             byte n = regs.GetNumLocalRegisters();
             for (byte i = 0u; i < n; ++i)
@@ -98,6 +98,7 @@ namespace cmsx.intermediate
                 RegisterDescriptor* registerDescriptor = GetRegisterDescriptor(localReg);
                 if (registerDescriptor->IsEmpty())
                 {
+                    numUsedLocalRegs = Max(numUsedLocalRegs, i + 1u);
                     return registerDescriptor; // found empty reg, use it
                 }
             }
@@ -134,7 +135,8 @@ namespace cmsx.intermediate
             Pair<RegisterDescriptor*, int> descriptorScore = GetMinScoreDescriptor(descriptorScores);
             RegisterDescriptor* registerDescriptor = descriptorScore.first;
             int score = descriptorScore.second;
-            MakeRegisterDescriptorEmpty(*registerDescriptor, addressDescriptors, machineCode, line);
+            MakeRegisterDescriptorEmpty(*registerDescriptor, addressDescriptors, machineCode, line, inst);
+            numUsedLocalRegs = Max(numUsedLocalRegs, cast<LocalRegister*>(registerDescriptor->reg)->number + 1u);
             return registerDescriptor;
         }
         public void DebugPrint(CodeFormatter& formatter)
@@ -149,9 +151,14 @@ namespace cmsx.intermediate
             formatter.DecIndent();
             formatter << "}" << endl();
         }
+        public nothrow inline byte GetNumUsedLocalRegs()
+        {
+            return numUsedLocalRegs;
+        }
         private Registers& regs;
         private List<RegisterDescriptor> registerDescriptors;
         private HashMap<Register*, RegisterDescriptor*> registerDescriptorMap;
+        private byte numUsedLocalRegs;
     }
 
     internal class ScoreLess : Rel<Pair<RegisterDescriptor*, int>>
@@ -170,7 +177,7 @@ namespace cmsx.intermediate
         return *it;
     }
 
-    public void MakeRegisterDescriptorEmpty(RegisterDescriptor& registerDescriptor, AddressDescriptors& addressDescriptors, MachineCode& machineCode, int line)
+    public void MakeRegisterDescriptorEmpty(RegisterDescriptor& registerDescriptor, AddressDescriptors& addressDescriptors, MachineCode& machineCode, int line, Instruction* inst)
     {
         for (Value* value : registerDescriptor.values)
         {
@@ -186,7 +193,7 @@ namespace cmsx.intermediate
                 {
                     if (loc is MemoryLocation*)
                     {
-                        loc->GenerateStore(storeOpCode, registerDescriptor.reg, machineCode);
+                        loc->GenerateStore(storeOpCode, registerDescriptor.reg, machineCode, inst);
                         saved = true;
                         break;
                     }
@@ -197,7 +204,7 @@ namespace cmsx.intermediate
                 Location* homeLocation = value->HomeLocation();
                 if (homeLocation != null)
                 {
-                    homeLocation->GenerateStore(storeOpCode, registerDescriptor.reg, machineCode);
+                    homeLocation->GenerateStore(storeOpCode, registerDescriptor.reg, machineCode, inst);
                 }
             }
         }
@@ -205,7 +212,8 @@ namespace cmsx.intermediate
         registerDescriptor.values.Clear();
     }
 
-    public RegisterDescriptor* GetOperandReg(Value* operand, Register* reservedReg, RegisterDescriptors& registerDescriptors, AddressDescriptors& addressDescriptors, MachineCode& machineCode, int line)
+    public RegisterDescriptor* GetOperandReg(Value* operand, Register* reservedReg, RegisterDescriptors& registerDescriptors, AddressDescriptors& addressDescriptors,
+        MachineCode& machineCode, int line, Instruction* inst)
     {
         AddressDescriptor* addressDescriptor = addressDescriptors.GetAddressDescriptor(operand);
         if (addressDescriptor != null)
@@ -225,16 +233,16 @@ namespace cmsx.intermediate
         {
             dontUse.Add(reservedReg);
         }
-        return registerDescriptors.GetLocalRegDescriptor(dontUse, addressDescriptors, machineCode, line);
+        return registerDescriptors.GetLocalRegDescriptor(dontUse, addressDescriptors, machineCode, line, inst);
     }
 
     public void GetReg(Value* x, Value* y, Value* z, bool useRegYForX, RegisterDescriptors& registerDescriptors, AddressDescriptors& addressDescriptors, MachineCode& machineCode, int line, 
-        RegisterDescriptor*& rx, RegisterDescriptor*& ry, RegisterDescriptor*& rz)
+        RegisterDescriptor*& rx, RegisterDescriptor*& ry, RegisterDescriptor*& rz, Instruction* inst)
     {
-        ry = GetOperandReg(y, null, registerDescriptors, addressDescriptors, machineCode, line);
+        ry = GetOperandReg(y, null, registerDescriptors, addressDescriptors, machineCode, line, inst);
         if (z != null)
         {
-            rz = GetOperandReg(z, ry->reg, registerDescriptors, addressDescriptors, machineCode, line);
+            rz = GetOperandReg(z, ry->reg, registerDescriptors, addressDescriptors, machineCode, line, inst);
         }
         if (useRegYForX)
         {
@@ -248,11 +256,11 @@ namespace cmsx.intermediate
             {
                 dontUse.Add(rz->reg);
             }
-            rx = registerDescriptors.GetLocalRegDescriptor(dontUse, addressDescriptors, machineCode, line);
+            rx = registerDescriptors.GetLocalRegDescriptor(dontUse, addressDescriptors, machineCode, line, inst);
         }
     }
 
-    public void LoadOperandValue(Value* operand, RegisterDescriptor* targetRegisterDescriptor, AddressDescriptors& addressDescriptors, MachineCode& machineCode, int line)
+    public void LoadOperandValue(Value* operand, RegisterDescriptor* targetRegisterDescriptor, AddressDescriptors& addressDescriptors, MachineCode& machineCode, int line, Instruction* inst)
     {
         if (targetRegisterDescriptor->HasValue(operand)) return; // already loaded
         AddressDescriptor* addressDescriptor = addressDescriptors.GetAddressDescriptor(operand);
@@ -265,7 +273,7 @@ namespace cmsx.intermediate
         {
             Type* type = operand->type;
             int loadOpCode = type->GetLoadOp(line);
-            loc->GenerateLoad(loadOpCode, targetRegisterDescriptor->reg, machineCode);
+            loc->GenerateLoad(loadOpCode, targetRegisterDescriptor->reg, machineCode, inst);
             targetRegisterDescriptor->SetValue(operand);
             addressDescriptor->AddLocation(targetRegisterDescriptor->reg);
         }
@@ -275,7 +283,7 @@ namespace cmsx.intermediate
         }
     }
 
-    public void LoadOperandAddress(Value* operand, RegisterDescriptor* targetRegisterDescriptor, AddressDescriptors& addressDescriptors, MachineCode& machineCode, int line)
+    public void LoadOperandAddress(Value* operand, RegisterDescriptor* targetRegisterDescriptor, AddressDescriptors& addressDescriptors, MachineCode& machineCode, int line, Instruction* inst)
     {
         if (targetRegisterDescriptor->HasValue(operand)) return; // already loaded
         AddressDescriptor* addressDescriptor = addressDescriptors.GetAddressDescriptor(operand);
@@ -286,7 +294,7 @@ namespace cmsx.intermediate
         }
         if (loc != null)
         {
-            loc->GenerateLoadAddress(targetRegisterDescriptor->reg, machineCode);
+            loc->GenerateLoadAddress(targetRegisterDescriptor->reg, machineCode, inst);
         }
         else
         {

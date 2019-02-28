@@ -5,21 +5,28 @@ namespace cmsx.intermediate
 {
     public void Compile(const string& intermediateCodeFileName)
     {
-        Context context;
-        ParseIntermediateCodeFile(intermediateCodeFileName, &context);
-        context.compileUnit.MapInstructions();
-        context.compileUnit.Validate();
-        //context.compileUnit.ComputeLivenessAndNextUse();
-        if (Flags.Get(Flag.stages))
+        try
         {
-            context.compileUnit.Print(0);
+            Context context;
+            ParseIntermediateCodeFile(intermediateCodeFileName, &context);
+            context.compileUnit.MapInstructions();
+            context.compileUnit.Validate();
+            //context.compileUnit.ComputeLivenessAndNextUse();
+            if (Flags.Get(Flag.stages))
+            {
+                context.compileUnit.Print(0);
+            }
+            MachineCode machineCode(context);
+            context.compileUnit.GenerateCode(machineCode);
+            if (Flags.Get(Flag.stages))
+            {
+                context.compileUnit.Print(printMachineCodeStage);
+            }
+            machineCode.Print(Path.ChangeExtension(context.compileUnit.fileName, ".s"));
         }
-        MachineCode machineCode(context);
-        context.compileUnit.GenerateCode(machineCode);
-        if (Flags.Get(Flag.stages))
+        catch (const Exception& ex)
         {
-            context.compileUnit.Print(printMachineCodeStage);
+            throw Exception(ex.Message() + " in file '" + intermediateCodeFileName + "'");
         }
-        machineCode.Print(Path.ChangeExtension(context.compileUnit.fileName, ".s"));
     }
 }

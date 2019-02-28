@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 
 namespace cmsx.intermediate
 {
@@ -23,7 +24,7 @@ namespace cmsx.intermediate
         {
             return false;
         }
-        public virtual void GenerateSetValue(Register* reg, MachineCode& machineCode, int line)
+        public virtual void GenerateSetValue(Register* reg, MachineCode& machineCode, int line, Instruction* inst)
         {
             throw Exception("error: tried to generate set for '" + string(type->Name()) + "' value (line " + ToString(line) + ")");            
         }
@@ -39,6 +40,14 @@ namespace cmsx.intermediate
         {
             throw Exception("error: tried to truncate '" + type->Name() + "' type value to '" + targetType->Name() + " type value (line " + ToString(line) + ")");            
         }
+        public virtual void Validate(Type* type, const string& index)
+        {
+            Type* thisType = this->type;
+            if (thisType != type)
+            {
+                throw Exception("error: type conflict: element " + index + " has type '" + thisType->Name() + "', type '" + type->Name() + "' expected");
+            }
+        }
         public Type* type;
         public int line;
     }
@@ -48,6 +57,14 @@ namespace cmsx.intermediate
         public override nothrow string Name() const
         {
             return "constant";
+        }
+        public virtual void GenerateCode(MachineCode& machineCode, string& label, Context& context)
+        {
+            throw Exception("error: tried to generate code for " + string(typename(*this)));
+        }
+        public virtual Operand* MakeDataOperand(Context& context) const
+        {
+            throw Exception("error: tried to make data operand for " + string(typename(*this)));
         }
     }
 
@@ -61,9 +78,9 @@ namespace cmsx.intermediate
         {
             return ToString(value);
         }
-        public override void GenerateSetValue(Register* reg, MachineCode& machineCode, int line)
+        public override void GenerateSetValue(Register* reg, MachineCode& machineCode, int line, Instruction* inst)
         {
-            MachineInstruction* setInst = machineCode.GetInstruction(cmsx.assembly.SET);
+            MachineInstruction* setInst = machineCode.GetInstruction(cmsx.assembly.SET, inst);
             setInst->AddOperand(reg);
             setInst->AddOperand(machineCode.context.GetLiteralOperand(cast<ulong>(value)));
         }
@@ -78,6 +95,16 @@ namespace cmsx.intermediate
         public override Value* TruncateTo(Type* targetType, int line)
         {
             return targetType->MakeValue(cast<ulong>(value));
+        }
+        public override void GenerateCode(MachineCode& machineCode, string& label, Context& context)
+        {
+            MachineInstruction* byteInst = machineCode.GetInstruction(cmsx.assembly.BYTE, label);
+            byteInst->AddOperand(MakeDataOperand(context));
+            label.Clear();
+        }
+        public override Operand* MakeDataOperand(Context& context) const
+        {
+            return context.GetLiteralOperand(cast<byte>(value));
         }
         public bool value;
     }
@@ -104,9 +131,9 @@ namespace cmsx.intermediate
                 return false;
             }
         }
-        public override void GenerateSetValue(Register* reg, MachineCode& machineCode, int line)
+        public override void GenerateSetValue(Register* reg, MachineCode& machineCode, int line, Instruction* inst)
         {
-            MachineInstruction* setInst = machineCode.GetInstruction(cmsx.assembly.SET);
+            MachineInstruction* setInst = machineCode.GetInstruction(cmsx.assembly.SET, inst);
             setInst->AddOperand(reg);
             setInst->AddOperand(machineCode.context.GetLiteralOperand(cast<byte>(value)));
         }
@@ -117,6 +144,16 @@ namespace cmsx.intermediate
         public override Value* TruncateTo(Type* targetType, int line)
         {
             return targetType->MakeValue(cast<ulong>(value));
+        }
+        public override void GenerateCode(MachineCode& machineCode, string& label, Context& context)
+        {
+            MachineInstruction* byteInst = machineCode.GetInstruction(cmsx.assembly.BYTE, label);
+            byteInst->AddOperand(MakeDataOperand(context));
+            label.Clear();
+        }
+        public override Operand* MakeDataOperand(Context& context) const
+        {
+            return context.GetLiteralOperand(cast<byte>(value));
         }
         public sbyte value;
     }
@@ -136,9 +173,9 @@ namespace cmsx.intermediate
             immediateValue = value;
             return true;
         }
-        public override void GenerateSetValue(Register* reg, MachineCode& machineCode, int line)
+        public override void GenerateSetValue(Register* reg, MachineCode& machineCode, int line, Instruction* inst)
         {
-            MachineInstruction* setInst = machineCode.GetInstruction(cmsx.assembly.SET);
+            MachineInstruction* setInst = machineCode.GetInstruction(cmsx.assembly.SET, inst);
             setInst->AddOperand(reg);
             setInst->AddOperand(machineCode.context.GetLiteralOperand(value));
         }
@@ -153,6 +190,16 @@ namespace cmsx.intermediate
         public override Value* TruncateTo(Type* targetType, int line)
         {
             return targetType->MakeValue(cast<ulong>(value));
+        }
+        public override void GenerateCode(MachineCode& machineCode, string& label, Context& context)
+        {
+            MachineInstruction* byteInst = machineCode.GetInstruction(cmsx.assembly.BYTE, label);
+            byteInst->AddOperand(MakeDataOperand(context));
+            label.Clear();
+        }
+        public override Operand* MakeDataOperand(Context& context) const
+        {
+            return context.GetLiteralOperand(value);
         }
         public byte value;
     }
@@ -179,9 +226,9 @@ namespace cmsx.intermediate
                 return false;
             }
         }
-        public override void GenerateSetValue(Register* reg, MachineCode& machineCode, int line)
+        public override void GenerateSetValue(Register* reg, MachineCode& machineCode, int line, Instruction* inst)
         {
-            MachineInstruction* setInst = machineCode.GetInstruction(cmsx.assembly.SET);
+            MachineInstruction* setInst = machineCode.GetInstruction(cmsx.assembly.SET, inst);
             setInst->AddOperand(reg);
             setInst->AddOperand(machineCode.context.GetLiteralOperand(cast<ushort>(value)));
         }
@@ -192,6 +239,16 @@ namespace cmsx.intermediate
         public override Value* TruncateTo(Type* targetType, int line)
         {
             return targetType->MakeValue(cast<ulong>(value));
+        }
+        public override void GenerateCode(MachineCode& machineCode, string& label, Context& context)
+        {
+            MachineInstruction* wydeInst = machineCode.GetInstruction(cmsx.assembly.WYDE, label);
+            wydeInst->AddOperand(MakeDataOperand(context));
+            label.Clear();
+        }
+        public override Operand* MakeDataOperand(Context& context) const
+        {
+            return context.GetLiteralOperand(cast<ushort>(value));
         }
         public short value;
     }
@@ -218,9 +275,9 @@ namespace cmsx.intermediate
                 return false;
             }
         }
-        public override void GenerateSetValue(Register* reg, MachineCode& machineCode, int line)
+        public override void GenerateSetValue(Register* reg, MachineCode& machineCode, int line, Instruction* inst)
         {
-            MachineInstruction* setInst = machineCode.GetInstruction(cmsx.assembly.SET);
+            MachineInstruction* setInst = machineCode.GetInstruction(cmsx.assembly.SET, inst);
             setInst->AddOperand(reg);
             setInst->AddOperand(machineCode.context.GetLiteralOperand(value));
         }
@@ -235,6 +292,16 @@ namespace cmsx.intermediate
         public override Value* TruncateTo(Type* targetType, int line)
         {
             return targetType->MakeValue(cast<ulong>(value));
+        }
+        public override void GenerateCode(MachineCode& machineCode, string& label, Context& context)
+        {
+            MachineInstruction* wydeInst = machineCode.GetInstruction(cmsx.assembly.WYDE, label);
+            wydeInst->AddOperand(MakeDataOperand(context));
+            label.Clear();
+        }
+        public override Operand* MakeDataOperand(Context& context) const
+        {
+            return context.GetLiteralOperand(value);
         }
         public ushort value;
     }
@@ -261,16 +328,16 @@ namespace cmsx.intermediate
                 return false;
             }
         }
-        public override void GenerateSetValue(Register* reg, MachineCode& machineCode, int line)
+        public override void GenerateSetValue(Register* reg, MachineCode& machineCode, int line, Instruction* inst)
         {
             ushort low = cast<ushort>(value);
-            MachineInstruction* setInst = machineCode.GetInstruction(cmsx.assembly.SET);
+            MachineInstruction* setInst = machineCode.GetInstruction(cmsx.assembly.SET, inst);
             setInst->AddOperand(reg);
             setInst->AddOperand(machineCode.context.GetLiteralOperand(low));
             ushort high = cast<ushort>(value >> 16);
             if (high != 0u)
             {
-                MachineInstruction* orMLInst =  machineCode.GetInstruction(cmsx.machine.ORML);
+                MachineInstruction* orMLInst =  machineCode.GetInstruction(cmsx.machine.ORML, inst);
                 orMLInst->AddOperand(reg);
                 orMLInst->AddOperand(machineCode.context.GetLiteralOperand(high));
             }
@@ -282,6 +349,16 @@ namespace cmsx.intermediate
         public override Value* TruncateTo(Type* targetType, int line)
         {
             return targetType->MakeValue(cast<ulong>(value));
+        }
+        public override void GenerateCode(MachineCode& machineCode, string& label, Context& context)
+        {
+            MachineInstruction* tetraInst = machineCode.GetInstruction(cmsx.assembly.TETRA, label);
+            tetraInst->AddOperand(MakeDataOperand(context));
+            label.Clear();
+        }
+        public override Operand* MakeDataOperand(Context& context) const
+        {
+            return context.GetLiteralOperand(cast<uint>(value));
         }
         public int value;
     }
@@ -308,16 +385,16 @@ namespace cmsx.intermediate
                 return false;
             }
         }
-        public override void GenerateSetValue(Register* reg, MachineCode& machineCode, int line)
+        public override void GenerateSetValue(Register* reg, MachineCode& machineCode, int line, Instruction* inst)
         {
-            MachineInstruction* setInst = machineCode.GetInstruction(cmsx.assembly.SET);
+            MachineInstruction* setInst = machineCode.GetInstruction(cmsx.assembly.SET, inst);
             setInst->AddOperand(reg);
             ushort low = cast<ushort>(value);
             setInst->AddOperand(machineCode.context.GetLiteralOperand(low));
             ushort high = cast<ushort>(value >> 16u);
             if (high != 0u)
             {
-                MachineInstruction* orMLInst =  machineCode.GetInstruction(cmsx.machine.ORML);
+                MachineInstruction* orMLInst =  machineCode.GetInstruction(cmsx.machine.ORML, inst);
                 orMLInst->AddOperand(reg);
                 orMLInst->AddOperand(machineCode.context.GetLiteralOperand(high));
             }
@@ -333,6 +410,16 @@ namespace cmsx.intermediate
         public override Value* TruncateTo(Type* targetType, int line)
         {
             return targetType->MakeValue(cast<ulong>(value));
+        }
+        public override void GenerateCode(MachineCode& machineCode, string& label, Context& context)
+        {
+            MachineInstruction* tetraInst = machineCode.GetInstruction(cmsx.assembly.TETRA, label);
+            tetraInst->AddOperand(MakeDataOperand(context));
+            label.Clear();
+        }
+        public override Operand* MakeDataOperand(Context& context) const
+        {
+            return context.GetLiteralOperand(value);
         }
         public uint value;
     }
@@ -359,30 +446,30 @@ namespace cmsx.intermediate
                 return false;
             }
         }
-        public override void GenerateSetValue(Register* reg, MachineCode& machineCode, int line)
+        public override void GenerateSetValue(Register* reg, MachineCode& machineCode, int line, Instruction* inst)
         {
             ushort low = cast<ushort>(value);
-            MachineInstruction* setInst = machineCode.GetInstruction(cmsx.assembly.SET);
+            MachineInstruction* setInst = machineCode.GetInstruction(cmsx.assembly.SET, inst);
             setInst->AddOperand(reg);
             setInst->AddOperand(machineCode.context.GetLiteralOperand(low));
             ushort ml = cast<ushort>(value >> 16u);
             if (ml != 0u)
             {
-                MachineInstruction* orMLInst =  machineCode.GetInstruction(cmsx.machine.ORML);
+                MachineInstruction* orMLInst =  machineCode.GetInstruction(cmsx.machine.ORML, inst);
                 orMLInst->AddOperand(reg);
                 orMLInst->AddOperand(machineCode.context.GetLiteralOperand(ml));
             }
             ushort mh = cast<ushort>(value >> 32u);
             if (mh != 0u)
             {
-                MachineInstruction* orMHInst =  machineCode.GetInstruction(cmsx.machine.ORMH);
+                MachineInstruction* orMHInst =  machineCode.GetInstruction(cmsx.machine.ORMH, inst);
                 orMHInst->AddOperand(reg);
                 orMHInst->AddOperand(machineCode.context.GetLiteralOperand(mh));
             }
             ushort h = cast<ushort>(value >> 48u);
             if (h != 0u)
             {
-                MachineInstruction* orHInst =  machineCode.GetInstruction(cmsx.machine.ORH);
+                MachineInstruction* orHInst =  machineCode.GetInstruction(cmsx.machine.ORH, inst);
                 orHInst->AddOperand(reg);
                 orHInst->AddOperand(machineCode.context.GetLiteralOperand(h));
             }
@@ -394,6 +481,16 @@ namespace cmsx.intermediate
         public override Value* TruncateTo(Type* targetType, int line)
         {
             return targetType->MakeValue(cast<ulong>(value));
+        }
+        public override void GenerateCode(MachineCode& machineCode, string& label, Context& context)
+        {
+            MachineInstruction* octaInst = machineCode.GetInstruction(cmsx.assembly.OCTA, label);
+            octaInst->AddOperand(MakeDataOperand(context));
+            label.Clear();
+        }
+        public override Operand* MakeDataOperand(Context& context) const
+        {
+            return context.GetLiteralOperand(cast<ulong>(value));
         }
         public long value;
     }
@@ -420,30 +517,30 @@ namespace cmsx.intermediate
                 return false;
             }
         }
-        public override void GenerateSetValue(Register* reg, MachineCode& machineCode, int line)
+        public override void GenerateSetValue(Register* reg, MachineCode& machineCode, int line, Instruction* inst)
         {
             ushort low = cast<ushort>(value);
-            MachineInstruction* setInst = machineCode.GetInstruction(cmsx.assembly.SET);
+            MachineInstruction* setInst = machineCode.GetInstruction(cmsx.assembly.SET, inst);
             setInst->AddOperand(reg);
             setInst->AddOperand(machineCode.context.GetLiteralOperand(low));
             ushort ml = cast<ushort>(value >> 16u);
             if (ml != 0)
             {
-                MachineInstruction* orMLInst =  machineCode.GetInstruction(cmsx.machine.ORML);
+                MachineInstruction* orMLInst =  machineCode.GetInstruction(cmsx.machine.ORML, inst);
                 orMLInst->AddOperand(reg);
                 orMLInst->AddOperand(machineCode.context.GetLiteralOperand(ml));
             }
             ushort mh = cast<ushort>(value >> 32u);
             if (mh != 0u)
             {
-                MachineInstruction* orMHInst =  machineCode.GetInstruction(cmsx.machine.ORMH);
+                MachineInstruction* orMHInst =  machineCode.GetInstruction(cmsx.machine.ORMH, inst);
                 orMHInst->AddOperand(reg);
                 orMHInst->AddOperand(machineCode.context.GetLiteralOperand(mh));
             }
             ushort h = cast<ushort>(value >> 48u);
             if (h != 0u)
             {
-                MachineInstruction* orHInst =  machineCode.GetInstruction(cmsx.machine.ORH);
+                MachineInstruction* orHInst =  machineCode.GetInstruction(cmsx.machine.ORH, inst);
                 orHInst->AddOperand(reg);
                 orHInst->AddOperand(machineCode.context.GetLiteralOperand(h));
             }
@@ -460,6 +557,16 @@ namespace cmsx.intermediate
         {
             return targetType->MakeValue(value);
         }
+        public override void GenerateCode(MachineCode& machineCode, string& label, Context& context)
+        {
+            MachineInstruction* octaInst = machineCode.GetInstruction(cmsx.assembly.OCTA, label);
+            octaInst->AddOperand(MakeDataOperand(context));
+            label.Clear();
+        }
+        public override Operand* MakeDataOperand(Context& context) const
+        {
+            return context.GetLiteralOperand(value);
+        }
         public ulong value;
     }
 
@@ -473,9 +580,9 @@ namespace cmsx.intermediate
         {
             return ToString(value, 1, 15);
         }
-        public override void GenerateSetValue(Register* reg, MachineCode& machineCode, int line)
+        public override void GenerateSetValue(Register* reg, MachineCode& machineCode, int line, Instruction* inst)
         {
-            MachineInstruction* setInst = machineCode.GetInstruction(cmsx.assembly.SET);
+            MachineInstruction* setInst = machineCode.GetInstruction(cmsx.assembly.SET, inst);
             setInst->AddOperand(reg);
             uint x = *cast<uint*>(cast<void*>(&value));
             ushort low = cast<ushort>(x);
@@ -483,10 +590,20 @@ namespace cmsx.intermediate
             ushort ml = cast<ushort>(x >> 16u);
             if (ml != 0)
             {
-                MachineInstruction* orMLInst =  machineCode.GetInstruction(cmsx.machine.ORML);
+                MachineInstruction* orMLInst =  machineCode.GetInstruction(cmsx.machine.ORML, inst);
                 orMLInst->AddOperand(reg);
                 orMLInst->AddOperand(machineCode.context.GetLiteralOperand(ml));
             }
+        }
+        public override void GenerateCode(MachineCode& machineCode, string& label, Context& context)
+        {
+            MachineInstruction* tetraInst = machineCode.GetInstruction(cmsx.assembly.TETRA, label);
+            tetraInst->AddOperand(MakeDataOperand(context));
+            label.Clear();
+        }
+        public override Operand* MakeDataOperand(Context& context) const
+        {
+            return context.GetLiteralOperand(*cast<uint*>(cast<void*>(&value)));
         }
         public float value;
     }
@@ -501,9 +618,9 @@ namespace cmsx.intermediate
         {
             return ToString(value, 1, 15);
         }
-        public override void GenerateSetValue(Register* reg, MachineCode& machineCode, int line)
+        public override void GenerateSetValue(Register* reg, MachineCode& machineCode, int line, Instruction* inst)
         {
-            MachineInstruction* setInst = machineCode.GetInstruction(cmsx.assembly.SET);
+            MachineInstruction* setInst = machineCode.GetInstruction(cmsx.assembly.SET, inst);
             setInst->AddOperand(reg);
             ulong x = *cast<ulong*>(cast<void*>(&value));
             ushort low = cast<ushort>(x);
@@ -511,24 +628,34 @@ namespace cmsx.intermediate
             ushort ml = cast<ushort>(x >> 16u);
             if (ml != 0)
             {
-                MachineInstruction* orMLInst =  machineCode.GetInstruction(cmsx.machine.ORML);
+                MachineInstruction* orMLInst =  machineCode.GetInstruction(cmsx.machine.ORML, inst);
                 orMLInst->AddOperand(reg);
                 orMLInst->AddOperand(machineCode.context.GetLiteralOperand(ml));
             }
             ushort mh = cast<ushort>(x >> 32u);
             if (mh != 0u)
             {
-                MachineInstruction* orMHInst =  machineCode.GetInstruction(cmsx.machine.ORMH);
+                MachineInstruction* orMHInst =  machineCode.GetInstruction(cmsx.machine.ORMH, inst);
                 orMHInst->AddOperand(reg);
                 orMHInst->AddOperand(machineCode.context.GetLiteralOperand(mh));
             }
             ushort h = cast<ushort>(x >> 48u);
             if (h != 0u)
             {
-                MachineInstruction* orHInst =  machineCode.GetInstruction(cmsx.machine.ORH);
+                MachineInstruction* orHInst =  machineCode.GetInstruction(cmsx.machine.ORH, inst);
                 orHInst->AddOperand(reg);
                 orHInst->AddOperand(machineCode.context.GetLiteralOperand(h));
             }
+        }
+        public override void GenerateCode(MachineCode& machineCode, string& label, Context& context)
+        {
+            MachineInstruction* octaInst = machineCode.GetInstruction(cmsx.assembly.OCTA, label);
+            octaInst->AddOperand(MakeDataOperand(context));
+            label.Clear();
+        }
+        public override Operand* MakeDataOperand(Context& context) const
+        {
+            return context.GetLiteralOperand(*cast<ulong*>(cast<void*>(&value)));
         }
         public double value;
     }
@@ -543,13 +670,118 @@ namespace cmsx.intermediate
         {
             return "null";
         }
-        public override void GenerateSetValue(Register* reg, MachineCode& machineCode, int line)
+        public override void GenerateSetValue(Register* reg, MachineCode& machineCode, int line, Instruction* inst)
         {
-            MachineInstruction* setInst = machineCode.GetInstruction(cmsx.assembly.SET);
+            MachineInstruction* setInst = machineCode.GetInstruction(cmsx.assembly.SET, inst);
             setInst->AddOperand(reg);
             setInst->AddOperand(machineCode.context.GetLiteralOperand(0u));
         }
+        public override void GenerateCode(MachineCode& machineCode, string& label, Context& context)
+        {
+            MachineInstruction* octaInst = machineCode.GetInstruction(cmsx.assembly.OCTA, label);
+            octaInst->AddOperand(MakeDataOperand(context));
+            label.Clear();
+        }
+        public override Operand* MakeDataOperand(Context& context) const
+        {
+            return context.GetLiteralOperand(0u);
+        }
         public PtrType* ptrType;
+    }
+
+    public class PtrValue : Value
+    {
+        public nothrow PtrValue(PtrType* ptrType_, GlobalVariable* globalVariable_) : globalVariable(globalVariable_)
+        {
+            type = ptrType_;
+        }
+        public override nothrow string Name() const
+        {
+            return globalVariable->Name();
+        }
+        public override nothrow Location* HomeLocation() const
+        {
+            return globalVariable->HomeLocation();
+        }
+        private GlobalVariable* globalVariable;
+    }
+
+    public class ArrayValue : ConstantValue
+    {
+        public nothrow ArrayValue()
+        {
+        }
+        public void AddElement(ConstantValue* element)
+        {
+            elements.Add(element);
+        }
+        public override void Validate(Type* type, const string& index)
+        {
+            if (!(type is ArrayType*))
+            {
+                throw Exception("error: element " + index + " not an array value ('" + type->Name() + "')");
+            }
+            ArrayType* arrayType = cast<ArrayType*>(type);
+            if (arrayType->ElementCount() != elements.Count())
+            {
+                throw Exception("error: element " + index + " has " + ToString(elements.Count()) + " elements, " + ToString(arrayType->ElementCount()) + " elements expected");
+            }
+            this->type = arrayType;
+            int i = 0;
+            for (ConstantValue* element : elements)
+            {
+                element->Validate(arrayType->ElementType(), index + "." + ToString(i));
+                ++i;
+            }
+        }
+        public override void GenerateCode(MachineCode& machineCode, string& label, Context& context)
+        {
+            ArrayType* arrayType = cast<ArrayType*>(type);
+            MachineInstruction* inst = arrayType->ElementType()->GetDataInstruction(machineCode, line);
+            for (ConstantValue* element : elements)
+            {
+                inst->AddOperand(element->MakeDataOperand(context));
+            }
+            label.Clear();
+        }
+        public List<ConstantValue*> elements;
+    }
+
+    public class StructureValue : ConstantValue
+    {
+        public nothrow StructureValue()
+        {
+        }
+        public void AddMember(ConstantValue* member)
+        {
+            members.Add(member);
+        }
+        public override void Validate(Type* type, const string& index)
+        {
+            if (!(type is StructureType*))
+            {
+                throw Exception("error: element " + index + " is not a structure value ('" + type->Name() + "')");
+            }
+            StructureType* structureType = cast<StructureType*>(type);
+            if (structureType->memberTypes.Count() != members.Count())
+            {
+                throw Exception("error: element " + index + " has " + ToString(members.Count()) + " members, " + ToString(structureType->memberTypes.Count()) + " members expected");
+            }
+            this->type = structureType;
+            long n = members.Count();
+            for (long i = 0; i < n; ++i)
+            {
+                members[i]->Validate(structureType->memberTypes[i], index + "." + ToString(i));
+            }
+        }
+        public override void GenerateCode(MachineCode& machineCode, string& label, Context& context)
+        {
+            for (ConstantValue* member : members)
+            {
+                member->GenerateCode(machineCode, label, context);
+            }
+        }
+        public List<ConstantValue*> members;
     }
 
     public class IdValue : Value

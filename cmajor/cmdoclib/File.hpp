@@ -5,11 +5,12 @@
 
 #ifndef CMAJOR_CMDOCLIB_FILE_INCLUDED
 #define CMAJOR_CMDOCLIB_FILE_INCLUDED
+#include <cmajor/cmdoclib/CmDocLibApi.hpp>
 #include <string>
 
 namespace cmajor { namespace cmdoclib {
 
-struct File
+struct CMDOCLIB_API File
 {
     std::u32string name;
     std::string htmlFilePath;

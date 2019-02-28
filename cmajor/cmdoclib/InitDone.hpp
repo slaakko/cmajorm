@@ -5,11 +5,12 @@
 
 #ifndef CMAJOR_CMDOCLIB_INITDONE_INCLUDED
 #define CMAJOR_CMDOCLIB_INITDONE_INCLUDED
+#include <cmajor/cmdoclib/CmDocLibApi.hpp>
 
 namespace cmajor { namespace cmdoclib {
 
-void Init();
-void Done();
+CMDOCLIB_API void Init();
+CMDOCLIB_API void Done();
 
 } } // namespace cmajor::cmdoclib
 

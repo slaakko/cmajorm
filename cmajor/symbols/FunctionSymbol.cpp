@@ -190,10 +190,17 @@ void FunctionGroupSymbol::AddFunction(FunctionSymbol* function)
 {
     if (function->IsProgramMain()) return;
     Assert(function->GroupName() == Name(), "wrong function group");
-    int arity = function->Arity();
-    std::vector<FunctionSymbol*>& functionList = arityFunctionListMap[arity];
-    functionList.push_back(function);
-    function->SetFunctionGroup(this);
+    if (function->IsVarArg())
+    {
+        varArgFunctions.push_back(function);
+    }
+    else
+    {
+        int arity = function->Arity();
+        std::vector<FunctionSymbol*>& functionList = arityFunctionListMap[arity];
+        functionList.push_back(function);
+        function->SetFunctionGroup(this);
+    }
 }
 
 void FunctionGroupSymbol::RemoveFunction(FunctionSymbol* function)
@@ -213,6 +220,13 @@ void FunctionGroupSymbol::CollectViableFunctions(int arity, ViableFunctionSet& v
         for (FunctionSymbol* function : functionList)
         {
             viableFunctions.Insert(function);
+        }
+    }
+    for (FunctionSymbol* varArgFunction : varArgFunctions)
+    {
+        if (arity >= varArgFunction->Arity())
+        {
+            viableFunctions.Insert(varArgFunction);
         }
     }
 }

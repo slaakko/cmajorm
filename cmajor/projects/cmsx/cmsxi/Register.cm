@@ -16,22 +16,22 @@ namespace cmsx.intermediate
         {
             formatter << name;
         }
-        public override void GenerateLoad(int loadOpCode, Register* destinationReg, MachineCode& machineCode)
+        public override void GenerateLoad(int loadOpCode, Register* destinationReg, MachineCode& machineCode, Instruction* inst)
         {
-            MachineInstruction* loadInstruction = machineCode.GetInstruction(loadOpCode);
+            MachineInstruction* loadInstruction = machineCode.GetInstruction(loadOpCode, inst);
             loadInstruction->AddOperand(destinationReg);
             loadInstruction->AddOperand(this);
             loadInstruction->AddOperand(machineCode.context.GetLiteralOperand(0u));
         }
-        public override void GenerateLoadAddress(Register* destinationReg, MachineCode& machineCode)
+        public override void GenerateLoadAddress(Register* destinationReg, MachineCode& machineCode, Instruction* inst)
         {
-            MachineInstruction* setInstruction = machineCode.GetInstruction(cmsx.assembly.SET);
+            MachineInstruction* setInstruction = machineCode.GetInstruction(cmsx.assembly.SET, inst);
             setInstruction->AddOperand(destinationReg);
             setInstruction->AddOperand(this);
         }
-        public override void GenerateStore(int storeOpCode, Register* valueReg, MachineCode& machineCode)
+        public override void GenerateStore(int storeOpCode, Register* valueReg, MachineCode& machineCode, Instruction* inst)
         {
-            MachineInstruction* storeInstruction = machineCode.GetInstruction(storeOpCode);
+            MachineInstruction* storeInstruction = machineCode.GetInstruction(storeOpCode, inst);
             storeInstruction->AddOperand(valueReg);
             storeInstruction->AddOperand(this);
             storeInstruction->AddOperand(machineCode.context.GetLiteralOperand(0u));

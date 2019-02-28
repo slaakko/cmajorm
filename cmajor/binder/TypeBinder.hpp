@@ -23,6 +23,15 @@ using namespace cmajor::symbols;
 class BoundCompileUnit;
 class AttributeBinder;
 
+class BINDER_API ConstraintSymbolBinder
+{
+public:
+    virtual ~ConstraintSymbolBinder();
+    virtual void BindConstraintSymbols(Node* node, ContainerScope* containerScope, BoundCompileUnit& boundCompileUnit) = 0;
+};
+
+BINDER_API void SetConstraintSymbolBinder(ConstraintSymbolBinder* constraintSymbolBinder_);
+
 class BINDER_API TypeBinder : public Visitor
 {
 public:

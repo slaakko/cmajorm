@@ -25,7 +25,7 @@ public:
     Instruction();
     Type* GetType(Context& context) override;
     virtual void Write(CodeFormatter& formatter, Function& function, Context& context) = 0;
-    std::string Name() override;
+    std::string Name(Context& context) override;
     void WriteResult(CodeFormatter& formatter, Function& function, Context& context);
 private:
     int resultId;
@@ -348,6 +348,18 @@ private:
     Value* cond;
     BasicBlock* defaultDest;
     std::vector<std::pair<Value*, BasicBlock*>> destinations;
+};
+
+class CMSXI_API TrapInstruction : public Instruction
+{
+public:
+    TrapInstruction(Value* b0_, Value* b1_, Value* b2_);
+    Type* GetType(Context& context) override;
+    void Write(CodeFormatter& formatter, Function& function, Context& context) override;
+private:
+    Value* b0;
+    Value* b1;
+    Value* b2;
 };
 
 } // namespace cmsxi

@@ -4,6 +4,18 @@ using System.Threading;
 using cmsx.machine;
 using cmsx.kernel;
 
+class DebuggerProvider
+{
+    static DebuggerProvider() : debugger(new cmsx.debug.Debugger())
+    {
+    }
+    public static nothrow cmsx.debug.Debugger* GetDebugger()
+    {
+        return debugger.Get();
+    }
+    private static UniquePtr<cmsx.debug.Debugger> debugger;
+}
+
 void Init(Machine& machine)
 {
     Kernel& kernel = Kernel.Instance();
@@ -18,6 +30,10 @@ void Init(Machine& machine)
     BootProc boot = Boot;
     ulong bootProcValue = cast<ulong>(cast<void*>(boot));
     mem.WriteULong(bootProcAddress, bootProcValue, Protection.write);
+    if (Machine.GetFlag(Machine.Flags.debug))
+    {
+        kernel.SetDebugger(DebuggerProvider.GetDebugger());
+    }
 }
 
 void Run(Machine& machine)
@@ -28,6 +44,11 @@ void Run(Machine& machine)
 void Terminate(Machine& machine)
 {
     Kernel& kernel = Kernel.Instance();
+    if (Machine.GetFlag(Machine.Flags.debug))
+    {
+        Debugger* debugger = DebuggerProvider.GetDebugger();
+        debugger->Done();
+    }
     if (Machine.GetFlag(Machine.Flags.runProgram))
     {
         int pid = kernel.GetProgramPID();
@@ -119,8 +140,8 @@ public void PrintHelp()
     Console.Out() << "  be verbose" << endl();
     Console.Out() << "--quiet (-q)" << endl();
     Console.Out() << "  be quiet" << endl();
-    //Console.Out() << "--debug (-d)" << endl();
-    //Console.Out() << "  debug EXECUTABLE" << endl();
+    Console.Out() << "--debug (-d)" << endl();
+    Console.Out() << "  debug EXECUTABLE" << endl();
 }
 
 int main(int argc, const char** argv)

@@ -13,7 +13,7 @@ namespace cmsx.kernel
         {
             return *instance;
         }
-        private nothrow Kernel() : machine(GetMachine()), processTable(GetProcessTable())
+        private nothrow Kernel() : machine(GetMachine()), processTable(GetProcessTable()), baseDebugger(), debugger(&baseDebugger)
         {
         }
         public void Init()
@@ -57,6 +57,22 @@ namespace cmsx.kernel
         {
             return programPID;
         }
+        public inline nothrow Debugger* GetDebugger()
+        {
+            return debugger;
+        }
+        public inline nothrow void SetDebugger(Debugger* debugger_)
+        {
+            debugger = debugger_;
+        }
+        public nothrow void SetExecutable(cmsx.object.ExecutableFile* executable_)
+        {
+            executable.Reset(executable_);
+        }
+        public nothrow cmsx.object.ExecutableFile* Executable() const
+        {
+            return executable.Get();
+        }
         private static UniquePtr<Kernel> instance;
         private Machine& machine;
         private ProcessTable& processTable;
@@ -64,5 +80,8 @@ namespace cmsx.kernel
         private string programFileName;
         private List<string> programArguments;
         private int programPID;
+        private Debugger baseDebugger;
+        private Debugger* debugger;
+        private UniquePtr<cmsx.object.ExecutableFile> executable;
     }
 }

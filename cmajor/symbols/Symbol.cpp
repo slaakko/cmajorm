@@ -24,6 +24,7 @@
 #include <cmajor/symbols/ConceptSymbol.hpp>
 #include <cmajor/symbols/FunctionSymbol.hpp>
 #include <cmajor/symbols/Module.hpp>
+#include <cmajor/symbols/Trap.hpp>
 #include <cmajor/util/Unicode.hpp>
 #include <cmajor/util/Sha1.hpp>
 
@@ -47,7 +48,7 @@ const char* symbolTypeStr[uint8_t(SymbolType::maxSymbol)] =
     "basicTypeCopyAssignment", "basicTypeMoveAssignment", "basicTypeReturn",
     "basicTypeImplicitSignExtension", "basicTypeImplicitZeroExtension", "basicTypeExplicitSignExtension", "basicTypeExplicitZeroExtension", "basicTypeTruncation", "basicTypeBitCast",
     "basicTypeImplicitUnsignedIntToFloating", "basicTypeImplicitSignedIntToFloating", "basicTypeExplicitUnsignedIntToFloating", "basicTypeExplicitSignedIntToFloating",
-    "basicTypeFloatingToUnsignedInt", "basicTypeFloatingToSignedInt", "basicTypeFloatingExtension", "basicTypeFloatingTruncation",
+    "basicTypeFloatingToUnsignedInt", "basicTypeFloatingToSignedInt", "basicTypeFloatingExtension", "basicTypeFloatingTruncation", "trap",
     "enumTypeDefaultConstructor", "enumTypeCopyConstructor", "enumTypeMoveConstructor", "enumTypeCopyAssignment", "enumTypeMoveAssignment", "enumTypeReturn", "enumTypeEquality", 
     "enumTypeToUnderlyingType", "underlyingToEnumType",
     "delegateTypeDefaultConstructor", "delegateTypeCopyConstructor", "delegateTypeMoveConstructor", "delegateTypeCopyAssignment", "delegateTypeMoveAssignment", "delegateTypeReturn", 
@@ -1090,6 +1091,7 @@ SymbolFactory::SymbolFactory()
     Register(SymbolType::basicTypeFloatingToSignedInt, new ConcreteSymbolCreator<BasicTypeFloatingToSignedIntOperation>());
     Register(SymbolType::basicTypeFloatingExtension, new ConcreteSymbolCreator<BasicTypeFloatingExtensionOperation>());
     Register(SymbolType::basicTypeFloatingTruncation, new ConcreteSymbolCreator<BasicTypeFloatingTruncationOperation>());
+    Register(SymbolType::trap, new ConcreteSymbolCreator<TrapFunction>());
     Register(SymbolType::enumTypeDefaultConstructor, new ConcreteSymbolCreator<EnumTypeDefaultConstructor>());
     Register(SymbolType::enumTypeCopyConstructor, new ConcreteSymbolCreator<EnumTypeCopyConstructor>());
     Register(SymbolType::enumTypeMoveConstructor, new ConcreteSymbolCreator<EnumTypeMoveConstructor>());

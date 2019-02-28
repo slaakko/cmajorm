@@ -1741,4 +1741,9 @@ void* Emitter::CreateCatchPad(void* parentPad, const std::vector<void*>& args)
     return builder.CreateCatchPad(static_cast<llvm::Value*>(parentPad), arguments);
 }
 
+void* Emitter::GenerateTrap(const std::vector<void*>& args)
+{
+    return nullptr;
+}
+
 } // namespace cmllvm

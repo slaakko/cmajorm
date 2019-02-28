@@ -15,9 +15,9 @@ namespace cmajor { namespace cmdoclib {
 using namespace cmajor::symbols;
 using namespace cmajor::ast;
 
-bool SymbolTableXmlFilesUpToDate(Project* project);
-void GenerateSymbolTableXml(Module* rootModule, std::unordered_map<int, File>& fileMap);
-void ReadExternalModuleDocuments(Input* input);
+CMDOCLIB_API bool SymbolTableXmlFilesUpToDate(Project* project);
+CMDOCLIB_API void GenerateSymbolTableXml(Module* rootModule, std::unordered_map<int, File>& fileMap);
+CMDOCLIB_API void ReadExternalModuleDocuments(Input* input);
 
 } } // namespace cmajor::cmdoclib
 

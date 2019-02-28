@@ -35,6 +35,7 @@ void CompileUnit::Write(Context& context)
     CodeFormatter formatter(file);
     formatter.SetIndentSize(8);
     context.GetTypeRepository().Write(formatter);
+    context.GetDataRepository().Write(context, formatter);
     bool first = true;
     for (const auto& f : functions)
     {

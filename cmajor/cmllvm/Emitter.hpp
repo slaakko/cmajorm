@@ -314,6 +314,7 @@ public:
     void* GetGlobalWStringConstant(int stringId) override { return emittingDelegate->GetGlobalWStringConstant(stringId); }
     void* GetGlobalUStringConstant(int stringId) override { return emittingDelegate->GetGlobalUStringConstant(stringId); }
     void* GetGlobalUuidConstant(int uuidId) override { return emittingDelegate->GetGlobalUuidConstant(uuidId); }
+    void* GenerateTrap(const std::vector<void*>& args) override;
 private:
     cmajor::ir::EmittingContext& emittingContext;
     cmajor::ir::EmittingDelegate* emittingDelegate;

@@ -88,6 +88,7 @@ private:
     void* function;
     void* entryBasicBlock;
     bool lastInstructionWasRet;
+    bool prevWasTerminator;
     bool destructorCallGenerated;
     bool genJumpingBoolCode;
     void* trueBlock;

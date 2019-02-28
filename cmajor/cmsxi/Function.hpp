@@ -20,7 +20,7 @@ public:
     uint64_t GetNextResultNumber() { return nextResultNumber++; }
     Type* GetType(Context& context) override { return type; }
     Value* GetParam(int index) const;
-    std::string Name() override { return "@" + name; }
+    std::string Name(Context& context) override { return "@" + name; }
     void Write(CodeFormatter& formatter, Context& context);
 private:
     std::string name;

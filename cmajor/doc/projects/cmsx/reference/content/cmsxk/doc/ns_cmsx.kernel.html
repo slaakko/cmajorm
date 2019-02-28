@@ -234,6 +234,10 @@
     <td xml:space="preserve"><a href="../../cmsxk/doc/ns_cmsx.kernel.html#function_PageFaultHandler_E97769AA53BE7F8C16DBD8333868E200AFE9F736">PageFaultHandler</a>(<a href="../../cmsxm/doc/class_Machine_F7663CCABD183952965566D1944B82FAFEDE0822.html">Machine</a>&amp;&nbsp;machine, <span class="kw">byte</span>&nbsp;irq)</td>
    </tr>
    <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">long</span></td>
+    <td xml:space="preserve"><a href="../../cmsxk/doc/ns_cmsx.kernel.html#function_PoolEnd_727D0B822212AE53CF2D0DB1D33274121E978BD8">PoolEnd</a>(<a href="../../cmsxm/doc/class_Machine_F7663CCABD183952965566D1944B82FAFEDE0822.html">Machine</a>&amp;&nbsp;machine, <span class="kw">byte</span>&nbsp;x, <span class="kw">byte</span>&nbsp;y, <span class="kw">byte</span>&nbsp;z, <span class="kw">ulong</span>&nbsp;ax, <span class="kw">ulong</span>&nbsp;bx, <span class="kw">ulong</span>&nbsp;cx, <span class="kw">ulong</span>&nbsp;dx, <span class="kw">ulong</span>&nbsp;ex)</td>
+   </tr>
+   <tr>
     <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">int</span></td>
     <td xml:space="preserve"><a href="../../cmsxk/doc/ns_cmsx.kernel.html#function_ReadProcessMemory_106F6565F5BA549850BB42D52469CFAF76A56F23">ReadProcessMemory</a>(<a href="../../cmsxm/doc/class_Machine_F7663CCABD183952965566D1944B82FAFEDE0822.html">Machine</a>&amp;&nbsp;machine, <a href="../../cmsxk/doc/class_Process_96BF1BFE7F4BA73B2BD2D2BA6C0FA69CD799B3B3.html">Process</a>*&nbsp;process, <span class="kw">ulong</span>&nbsp;address, <span class="kw">byte</span>*&nbsp;buffer, <span class="kw">ulong</span>&nbsp;size)</td>
    </tr>
@@ -252,6 +256,14 @@
    <tr>
     <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">void</span></td>
     <td xml:space="preserve"><a href="../../cmsxk/doc/ns_cmsx.kernel.html#function_SecurityViolationHandler_F56C94AFB21C58ED59AA2FF54325F455483DE61F">SecurityViolationHandler</a>(<a href="../../cmsxm/doc/class_Machine_F7663CCABD183952965566D1944B82FAFEDE0822.html">Machine</a>&amp;&nbsp;machine, <span class="kw">byte</span>&nbsp;irq)</td>
+   </tr>
+   <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">long</span></td>
+    <td xml:space="preserve"><a href="../../cmsxk/doc/ns_cmsx.kernel.html#function_SetPoolEnd_9681F00B040796C4DB209D8466035D4C327C3260">SetPoolEnd</a>(<a href="../../cmsxm/doc/class_Machine_F7663CCABD183952965566D1944B82FAFEDE0822.html">Machine</a>&amp;&nbsp;machine, <span class="kw">byte</span>&nbsp;x, <span class="kw">byte</span>&nbsp;y, <span class="kw">byte</span>&nbsp;z, <span class="kw">ulong</span>&nbsp;ax, <span class="kw">ulong</span>&nbsp;bx, <span class="kw">ulong</span>&nbsp;cx, <span class="kw">ulong</span>&nbsp;dx, <span class="kw">ulong</span>&nbsp;ex)</td>
+   </tr>
+   <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">long</span></td>
+    <td xml:space="preserve"><a href="../../cmsxk/doc/ns_cmsx.kernel.html#function_SetPoolEndProcess_1227591784F3682FABA0B36877F5C78ED53D1F7D">SetPoolEndProcess</a>(<a href="../../cmsxm/doc/class_Machine_F7663CCABD183952965566D1944B82FAFEDE0822.html">Machine</a>&amp;&nbsp;machine, <a href="../../cmsxk/doc/class_Process_96BF1BFE7F4BA73B2BD2D2BA6C0FA69CD799B3B3.html">Process</a>*&nbsp;process, <span class="kw">ulong</span>&nbsp;poolEndAddress)</td>
    </tr>
    <tr>
     <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span></td>
@@ -363,7 +375,15 @@
    </tr>
    <tr>
     <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">byte</span>&nbsp;numSystemCalls</td>
+    <td xml:space="preserve">6u</td>
+   </tr>
+   <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">byte</span>&nbsp;poolEndSystemCall</td>
     <td xml:space="preserve">4u</td>
+   </tr>
+   <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">byte</span>&nbsp;setPoolEndSystemCall</td>
+    <td xml:space="preserve">5u</td>
    </tr>
    <tr>
     <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">byte</span>&nbsp;waitSystemCall</td>
@@ -378,7 +398,7 @@
   <h3 id="function_AddProcessToList_57C81FFD2E7C0EAF8E926E65E378B945754BBD43" xml:space="preserve">AddProcessToList&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span>&nbsp;AddProcessToList(<a href="../../cmsxk/doc/class_Process_96BF1BFE7F4BA73B2BD2D2BA6C0FA69CD799B3B3.html">Process</a>**&nbsp;head, <a href="../../cmsxk/doc/class_Process_96BF1BFE7F4BA73B2BD2D2BA6C0FA69CD799B3B3.html">Process</a>*&nbsp;process)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/Process.cm.html#252">252</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/Process.cm.html">cmsxk/Process.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/Process.cm.html#254">254</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/Process.cm.html">cmsxk/Process.cm</a></span>
   <br/>
   <br/>
   <hr/>
@@ -399,7 +419,7 @@
   <h3 id="function_Boot_3915FBF9D98C3A78E916031F325B59D7A80B449B" xml:space="preserve">Boot&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">void</span>&nbsp;Boot(<a href="../../cmsxm/doc/class_Machine_F7663CCABD183952965566D1944B82FAFEDE0822.html">Machine</a>&amp;&nbsp;machine)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/Boot.cm.html#61">61</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/Boot.cm.html">cmsxk/Boot.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/Boot.cm.html#67">67</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/Boot.cm.html">cmsxk/Boot.cm</a></span>
   <br/>
   <br/>
   <hr/>
@@ -434,14 +454,14 @@
   <h3 id="function_CloneProcess_369827A8372C90418149A69667098831212751AD" xml:space="preserve">CloneProcess&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<a href="../../cmsxk/doc/class_Process_96BF1BFE7F4BA73B2BD2D2BA6C0FA69CD799B3B3.html">Process</a>*&nbsp;CloneProcess(<a href="../../cmsxk/doc/class_ProcessTable_F10E41AD59CB671F43FCE2CF42A7612259663CF6.html">ProcessTable</a>&amp;&nbsp;processTable, <a href="../../cmsxk/doc/class_Process_96BF1BFE7F4BA73B2BD2D2BA6C0FA69CD799B3B3.html">Process</a>*&nbsp;parent)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/Process.cm.html#232">232</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/Process.cm.html">cmsxk/Process.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/Process.cm.html#234">234</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/Process.cm.html">cmsxk/Process.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="function_CloneProcessMemory_F597A63D905718D44764CA401086CB0457BED9FC" xml:space="preserve">CloneProcessMemory&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span>&nbsp;CloneProcessMemory(<a href="../../cmsxm/doc/class_Machine_F7663CCABD183952965566D1944B82FAFEDE0822.html">Machine</a>&amp;&nbsp;machine, <a href="../../cmsxk/doc/class_Process_96BF1BFE7F4BA73B2BD2D2BA6C0FA69CD799B3B3.html">Process</a>*&nbsp;child, <a href="../../cmsxk/doc/class_Process_96BF1BFE7F4BA73B2BD2D2BA6C0FA69CD799B3B3.html">Process</a>*&nbsp;parent)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/Process.cm.html#474">474</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/Process.cm.html">cmsxk/Process.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/Process.cm.html#518">518</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/Process.cm.html">cmsxk/Process.cm</a></span>
   <br/>
   <br/>
   <hr/>
@@ -462,14 +482,14 @@
   <h3 id="function_CreateInitAndIdleProcesses_BE819E069B6BD1725A89341DF95CD43C4B56044B" xml:space="preserve">CreateInitAndIdleProcesses&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">void</span>&nbsp;CreateInitAndIdleProcesses(<a href="../../cmsxm/doc/class_Machine_F7663CCABD183952965566D1944B82FAFEDE0822.html">Machine</a>&amp;&nbsp;machine, <a href="../../cmsxk/doc/class_ProcessTable_F10E41AD59CB671F43FCE2CF42A7612259663CF6.html">ProcessTable</a>&amp;&nbsp;processTable)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/Process.cm.html#626">626</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/Process.cm.html">cmsxk/Process.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/Process.cm.html#670">670</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/Process.cm.html">cmsxk/Process.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="function_CreateProcess_BF7447BC08726BF5E5F1EAF2B75786AFCC3E06F9" xml:space="preserve">CreateProcess&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<a href="../../cmsxk/doc/class_Process_96BF1BFE7F4BA73B2BD2D2BA6C0FA69CD799B3B3.html">Process</a>*&nbsp;CreateProcess(<a href="../../cmsxk/doc/class_ProcessTable_F10E41AD59CB671F43FCE2CF42A7612259663CF6.html">ProcessTable</a>&amp;&nbsp;processTable, <span class="kw">const</span>&nbsp;<a href="../../../../../../system/content/System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html">String</a>&lt;<span class="kw">char</span>>&amp;&nbsp;name, <span class="kw">ulong</span>&nbsp;textSegmentBaseAddress, <span class="kw">ulong</span>&nbsp;textSegmentSize, <span class="kw">ulong</span>&nbsp;dataSegmentSize, <span class="kw">ulong</span>&nbsp;poolSegmentSize, <span class="kw">ulong</span>&nbsp;stackSegmentSize)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/Process.cm.html#226">226</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/Process.cm.html">cmsxk/Process.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/Process.cm.html#228">228</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/Process.cm.html">cmsxk/Process.cm</a></span>
   <br/>
   <br/>
   <hr/>
@@ -483,7 +503,7 @@
   <h3 id="function_CreateSingleProcess_F3FF5D666B347D180A790C43BD089305CC73D2DE" xml:space="preserve">CreateSingleProcess&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<a href="../../cmsxk/doc/class_Process_96BF1BFE7F4BA73B2BD2D2BA6C0FA69CD799B3B3.html">Process</a>*&nbsp;CreateSingleProcess(<a href="../../cmsxm/doc/class_Machine_F7663CCABD183952965566D1944B82FAFEDE0822.html">Machine</a>&amp;&nbsp;machine, <a href="../../cmsxk/doc/class_ProcessTable_F10E41AD59CB671F43FCE2CF42A7612259663CF6.html">ProcessTable</a>&amp;&nbsp;processTable, <span class="kw">const</span>&nbsp;<a href="../../../../../../system/content/System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html">String</a>&lt;<span class="kw">char</span>>&amp;&nbsp;name, <span class="kw">ulong</span>&nbsp;textSegmentBaseAddress, <span class="kw">ulong</span>&nbsp;textSegmentSize, <span class="kw">ulong</span>&nbsp;dataSegmentSize, <span class="kw">ulong</span>&nbsp;poolSegmentSize, <span class="kw">ulong</span>&nbsp;stackSegmentSize)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/Process.cm.html#612">612</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/Process.cm.html">cmsxk/Process.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/Process.cm.html#656">656</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/Process.cm.html">cmsxk/Process.cm</a></span>
   <br/>
   <br/>
   <hr/>
@@ -497,28 +517,28 @@
   <h3 id="function_Exit_90C244EAF0C0D3EE3A721B1A8F5D1CC3B4EFE8F5" xml:space="preserve">Exit&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">long</span>&nbsp;Exit(<a href="../../cmsxm/doc/class_Machine_F7663CCABD183952965566D1944B82FAFEDE0822.html">Machine</a>&amp;&nbsp;machine, <span class="kw">byte</span>&nbsp;x, <span class="kw">byte</span>&nbsp;y, <span class="kw">byte</span>&nbsp;z, <span class="kw">ulong</span>&nbsp;ax, <span class="kw">ulong</span>&nbsp;bx, <span class="kw">ulong</span>&nbsp;cx, <span class="kw">ulong</span>&nbsp;dx, <span class="kw">ulong</span>&nbsp;ex)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/SystemCall.cm.html#19">19</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/SystemCall.cm.html">cmsxk/SystemCall.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/SystemCall.cm.html#21">21</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/SystemCall.cm.html">cmsxk/SystemCall.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="function_ExitProcess_2AE75925AD45EF4EABC3DE15B59793A30485DA88" xml:space="preserve">ExitProcess&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">int</span>&nbsp;ExitProcess(<a href="../../cmsxm/doc/class_Machine_F7663CCABD183952965566D1944B82FAFEDE0822.html">Machine</a>&amp;&nbsp;machine, <a href="../../cmsxk/doc/class_ProcessTable_F10E41AD59CB671F43FCE2CF42A7612259663CF6.html">ProcessTable</a>&amp;&nbsp;processTable, <a href="../../cmsxk/doc/class_Process_96BF1BFE7F4BA73B2BD2D2BA6C0FA69CD799B3B3.html">Process</a>*&nbsp;process, <span class="kw">ushort</span>&nbsp;exitCode)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/Process.cm.html#344">344</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/Process.cm.html">cmsxk/Process.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/Process.cm.html#346">346</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/Process.cm.html">cmsxk/Process.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="function_Fork_84220E851192907B16AD93282A8A5A9964569BAD" xml:space="preserve">Fork&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">long</span>&nbsp;Fork(<a href="../../cmsxm/doc/class_Machine_F7663CCABD183952965566D1944B82FAFEDE0822.html">Machine</a>&amp;&nbsp;machine, <span class="kw">byte</span>&nbsp;x, <span class="kw">byte</span>&nbsp;y, <span class="kw">byte</span>&nbsp;z, <span class="kw">ulong</span>&nbsp;ax, <span class="kw">ulong</span>&nbsp;bx, <span class="kw">ulong</span>&nbsp;cx, <span class="kw">ulong</span>&nbsp;dx, <span class="kw">ulong</span>&nbsp;ex)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/SystemCall.cm.html#70">70</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/SystemCall.cm.html">cmsxk/SystemCall.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/SystemCall.cm.html#72">72</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/SystemCall.cm.html">cmsxk/SystemCall.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="function_ForkProcess_B5B6D759AFA280E64178E234106F9E4E8B8BC1B9" xml:space="preserve">ForkProcess&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">int</span>&nbsp;ForkProcess(<a href="../../cmsxm/doc/class_Machine_F7663CCABD183952965566D1944B82FAFEDE0822.html">Machine</a>&amp;&nbsp;machine, <a href="../../cmsxk/doc/class_ProcessTable_F10E41AD59CB671F43FCE2CF42A7612259663CF6.html">ProcessTable</a>&amp;&nbsp;processTable, <a href="../../cmsxk/doc/class_Process_96BF1BFE7F4BA73B2BD2D2BA6C0FA69CD799B3B3.html">Process</a>*&nbsp;parent)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/Process.cm.html#428">428</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/Process.cm.html">cmsxk/Process.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/Process.cm.html#430">430</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/Process.cm.html">cmsxk/Process.cm</a></span>
   <br/>
   <br/>
   <hr/>
@@ -539,14 +559,14 @@
   <h3 id="function_FreeProcess_9323EF1B25E76B331494195344BB1D17C263C89E" xml:space="preserve">FreeProcess&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span>&nbsp;FreeProcess(<a href="../../cmsxk/doc/class_ProcessTable_F10E41AD59CB671F43FCE2CF42A7612259663CF6.html">ProcessTable</a>&amp;&nbsp;processTable, <a href="../../cmsxk/doc/class_Process_96BF1BFE7F4BA73B2BD2D2BA6C0FA69CD799B3B3.html">Process</a>*&nbsp;process)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/Process.cm.html#237">237</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/Process.cm.html">cmsxk/Process.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/Process.cm.html#239">239</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/Process.cm.html">cmsxk/Process.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="function_FreeProcessMemory_2C3D47FD782872186BB71C1955FAF766BA1A4845" xml:space="preserve">FreeProcessMemory&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span>&nbsp;FreeProcessMemory(<a href="../../cmsxm/doc/class_Memory_27683CF353D0B5510170AC366952DB43A1B0607A.html">Memory</a>&amp;&nbsp;mem, <a href="../../cmsxk/doc/class_Process_96BF1BFE7F4BA73B2BD2D2BA6C0FA69CD799B3B3.html">Process</a>*&nbsp;process)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/Process.cm.html#482">482</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/Process.cm.html">cmsxk/Process.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/Process.cm.html#526">526</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/Process.cm.html">cmsxk/Process.cm</a></span>
   <br/>
   <br/>
   <hr/>
@@ -567,21 +587,21 @@
   <h3 id="function_GetProcess_CE401D705FB89E5F8FB2B3CCDD46929FAFD22B23" xml:space="preserve">GetProcess&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<a href="../../cmsxk/doc/class_Process_96BF1BFE7F4BA73B2BD2D2BA6C0FA69CD799B3B3.html">Process</a>*&nbsp;GetProcess(<a href="../../cmsxk/doc/class_ProcessTable_F10E41AD59CB671F43FCE2CF42A7612259663CF6.html">ProcessTable</a>&amp;&nbsp;processTable, <span class="kw">int</span>&nbsp;pid)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/Process.cm.html#242">242</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/Process.cm.html">cmsxk/Process.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/Process.cm.html#244">244</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/Process.cm.html">cmsxk/Process.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="function_GetProcessTable_9A9BB2F6014F2310F2521B7B2936C9A5CB57229F" xml:space="preserve">GetProcessTable&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<a href="../../cmsxk/doc/class_ProcessTable_F10E41AD59CB671F43FCE2CF42A7612259663CF6.html">ProcessTable</a>&amp;&nbsp;GetProcessTable()</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/Process.cm.html#221">221</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/Process.cm.html">cmsxk/Process.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/Process.cm.html#223">223</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/Process.cm.html">cmsxk/Process.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="function_GetRunningProcess_AA2658F97E32A8393909A04553205EC29F144F4B" xml:space="preserve">GetRunningProcess&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<a href="../../cmsxk/doc/class_Process_96BF1BFE7F4BA73B2BD2D2BA6C0FA69CD799B3B3.html">Process</a>*&nbsp;GetRunningProcess(<a href="../../cmsxk/doc/class_ProcessTable_F10E41AD59CB671F43FCE2CF42A7612259663CF6.html">ProcessTable</a>&amp;&nbsp;processTable)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/Process.cm.html#247">247</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/Process.cm.html">cmsxk/Process.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/Process.cm.html#249">249</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/Process.cm.html">cmsxk/Process.cm</a></span>
   <br/>
   <br/>
   <hr/>
@@ -595,7 +615,7 @@
   <h3 id="function_InitializeIdleProcess_AB99844A80A71DE0F8AD82066509D3876E0EDD78" xml:space="preserve">InitializeIdleProcess&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span>&nbsp;InitializeIdleProcess(<a href="../../cmsxm/doc/class_Machine_F7663CCABD183952965566D1944B82FAFEDE0822.html">Machine</a>&amp;&nbsp;machine, <a href="../../cmsxk/doc/class_ProcessTable_F10E41AD59CB671F43FCE2CF42A7612259663CF6.html">ProcessTable</a>&amp;&nbsp;processTable, <a href="../../cmsxk/doc/class_Process_96BF1BFE7F4BA73B2BD2D2BA6C0FA69CD799B3B3.html">Process</a>*&nbsp;idleProcess)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/Process.cm.html#574">574</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/Process.cm.html">cmsxk/Process.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/Process.cm.html#618">618</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/Process.cm.html">cmsxk/Process.cm</a></span>
   <br/>
   <br/>
   <hr/>
@@ -623,7 +643,7 @@
   <h3 id="function_InitializeProcessMemory_BED7A36A541D20AA5AB61853AD14A941B0B1ABFC" xml:space="preserve">InitializeProcessMemory&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span>&nbsp;InitializeProcessMemory(<a href="../../cmsxm/doc/class_Machine_F7663CCABD183952965566D1944B82FAFEDE0822.html">Machine</a>&amp;&nbsp;machine, <a href="../../cmsxk/doc/class_Process_96BF1BFE7F4BA73B2BD2D2BA6C0FA69CD799B3B3.html">Process</a>*&nbsp;process, <span class="kw">ulong</span>&nbsp;textSegmentBaseAddress, <span class="kw">ulong</span>&nbsp;textSegmentSize, <span class="kw">ulong</span>&nbsp;dataSegmentSize, <span class="kw">ulong</span>&nbsp;poolSegmentSize, <span class="kw">ulong</span>&nbsp;stackSegmentSize)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/Process.cm.html#436">436</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/Process.cm.html">cmsxk/Process.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/Process.cm.html#477">477</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/Process.cm.html">cmsxk/Process.cm</a></span>
   <br/>
   <br/>
   <hr/>
@@ -651,7 +671,7 @@
   <h3 id="function_LinkReadyProcessesToRunningList_00D93B54B2FFE15808978EB4055F4E4A59A25E57" xml:space="preserve">LinkReadyProcessesToRunningList&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span>&nbsp;LinkReadyProcessesToRunningList(<a href="../../cmsxk/doc/class_ProcessTable_F10E41AD59CB671F43FCE2CF42A7612259663CF6.html">ProcessTable</a>&amp;&nbsp;processTable)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/Process.cm.html#303">303</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/Process.cm.html">cmsxk/Process.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/Process.cm.html#305">305</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/Process.cm.html">cmsxk/Process.cm</a></span>
   <br/>
   <br/>
   <hr/>
@@ -672,14 +692,14 @@
   <h3 id="function_MakeProcessExitCode_411B4E0180BF96EAB59E26A36AF782FE3CE0C2E0" xml:space="preserve">MakeProcessExitCode&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">inline</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">ushort</span>&nbsp;MakeProcessExitCode(<span class="kw">byte</span>&nbsp;signalNumber, <span class="kw">byte</span>&nbsp;userExitCode)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/Process.cm.html#317">317</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/Process.cm.html">cmsxk/Process.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/Process.cm.html#319">319</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/Process.cm.html">cmsxk/Process.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="function_MakeSystemCallPtrAddress_01A776777A9747C6B4EEF3057A14347CA6CBC641" xml:space="preserve">MakeSystemCallPtrAddress&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">inline</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">ulong</span>&nbsp;MakeSystemCallPtrAddress(<span class="kw">int</span>&nbsp;systemCall)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/SystemCall.cm.html#14">14</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/SystemCall.cm.html">cmsxk/SystemCall.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/SystemCall.cm.html#16">16</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/SystemCall.cm.html">cmsxk/SystemCall.cm</a></span>
   <br/>
   <br/>
   <hr/>
@@ -690,31 +710,38 @@
   <br/>
   <br/>
   <hr/>
+  <h3 id="function_PoolEnd_727D0B822212AE53CF2D0DB1D33274121E978BD8" xml:space="preserve">PoolEnd&nbsp;Function</h3>
+  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">long</span>&nbsp;PoolEnd(<a href="../../cmsxm/doc/class_Machine_F7663CCABD183952965566D1944B82FAFEDE0822.html">Machine</a>&amp;&nbsp;machine, <span class="kw">byte</span>&nbsp;x, <span class="kw">byte</span>&nbsp;y, <span class="kw">byte</span>&nbsp;z, <span class="kw">ulong</span>&nbsp;ax, <span class="kw">ulong</span>&nbsp;bx, <span class="kw">ulong</span>&nbsp;cx, <span class="kw">ulong</span>&nbsp;dx, <span class="kw">ulong</span>&nbsp;ex)</h4>
+  <h5>Definition</h5>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/SystemCall.cm.html#114">114</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/SystemCall.cm.html">cmsxk/SystemCall.cm</a></span>
+  <br/>
+  <br/>
+  <hr/>
   <h3 id="function_ReadProcessMemory_106F6565F5BA549850BB42D52469CFAF76A56F23" xml:space="preserve">ReadProcessMemory&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">int</span>&nbsp;ReadProcessMemory(<a href="../../cmsxm/doc/class_Machine_F7663CCABD183952965566D1944B82FAFEDE0822.html">Machine</a>&amp;&nbsp;machine, <a href="../../cmsxk/doc/class_Process_96BF1BFE7F4BA73B2BD2D2BA6C0FA69CD799B3B3.html">Process</a>*&nbsp;process, <span class="kw">ulong</span>&nbsp;address, <span class="kw">byte</span>*&nbsp;buffer, <span class="kw">ulong</span>&nbsp;size)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/Process.cm.html#506">506</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/Process.cm.html">cmsxk/Process.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/Process.cm.html#550">550</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/Process.cm.html">cmsxk/Process.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="function_ReadProcessMemory_257E1C3A67C0275C0DBF19EF98C00D00E4A3DCA1" xml:space="preserve">ReadProcessMemory&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">int</span>&nbsp;ReadProcessMemory(<a href="../../cmsxm/doc/class_Machine_F7663CCABD183952965566D1944B82FAFEDE0822.html">Machine</a>&amp;&nbsp;machine, <a href="../../cmsxk/doc/class_Process_96BF1BFE7F4BA73B2BD2D2BA6C0FA69CD799B3B3.html">Process</a>*&nbsp;process, <span class="kw">ulong</span>&nbsp;address, <span class="kw">ulong</span>&amp;&nbsp;value, <span class="kw">byte</span>&nbsp;size)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/Process.cm.html#487">487</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/Process.cm.html">cmsxk/Process.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/Process.cm.html#531">531</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/Process.cm.html">cmsxk/Process.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="function_RemoveProcessFromList_87BD20447C3C22E29AA3677FF318E40AAFA7A565" xml:space="preserve">RemoveProcessFromList&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<a href="../../cmsxk/doc/class_Process_96BF1BFE7F4BA73B2BD2D2BA6C0FA69CD799B3B3.html">Process</a>*&nbsp;RemoveProcessFromList(<a href="../../cmsxk/doc/class_Process_96BF1BFE7F4BA73B2BD2D2BA6C0FA69CD799B3B3.html">Process</a>**&nbsp;head)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/Process.cm.html#271">271</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/Process.cm.html">cmsxk/Process.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/Process.cm.html#273">273</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/Process.cm.html">cmsxk/Process.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="function_Schedule_A72784A35257EFE47182FE0124C01E5BE68499D8" xml:space="preserve">Schedule&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span>&nbsp;Schedule(<a href="../../cmsxm/doc/class_Machine_F7663CCABD183952965566D1944B82FAFEDE0822.html">Machine</a>&amp;&nbsp;machine, <a href="../../cmsxk/doc/class_ProcessTable_F10E41AD59CB671F43FCE2CF42A7612259663CF6.html">ProcessTable</a>&amp;&nbsp;processTable)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/Process.cm.html#728">728</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/Process.cm.html">cmsxk/Process.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/Process.cm.html#772">772</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/Process.cm.html">cmsxk/Process.cm</a></span>
   <br/>
   <br/>
   <hr/>
@@ -725,10 +752,24 @@
   <br/>
   <br/>
   <hr/>
+  <h3 id="function_SetPoolEnd_9681F00B040796C4DB209D8466035D4C327C3260" xml:space="preserve">SetPoolEnd&nbsp;Function</h3>
+  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">long</span>&nbsp;SetPoolEnd(<a href="../../cmsxm/doc/class_Machine_F7663CCABD183952965566D1944B82FAFEDE0822.html">Machine</a>&amp;&nbsp;machine, <span class="kw">byte</span>&nbsp;x, <span class="kw">byte</span>&nbsp;y, <span class="kw">byte</span>&nbsp;z, <span class="kw">ulong</span>&nbsp;ax, <span class="kw">ulong</span>&nbsp;bx, <span class="kw">ulong</span>&nbsp;cx, <span class="kw">ulong</span>&nbsp;dx, <span class="kw">ulong</span>&nbsp;ex)</h4>
+  <h5>Definition</h5>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/SystemCall.cm.html#135">135</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/SystemCall.cm.html">cmsxk/SystemCall.cm</a></span>
+  <br/>
+  <br/>
+  <hr/>
+  <h3 id="function_SetPoolEndProcess_1227591784F3682FABA0B36877F5C78ED53D1F7D" xml:space="preserve">SetPoolEndProcess&nbsp;Function</h3>
+  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">long</span>&nbsp;SetPoolEndProcess(<a href="../../cmsxm/doc/class_Machine_F7663CCABD183952965566D1944B82FAFEDE0822.html">Machine</a>&amp;&nbsp;machine, <a href="../../cmsxk/doc/class_Process_96BF1BFE7F4BA73B2BD2D2BA6C0FA69CD799B3B3.html">Process</a>*&nbsp;process, <span class="kw">ulong</span>&nbsp;poolEndAddress)</h4>
+  <h5>Definition</h5>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/Process.cm.html#438">438</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/Process.cm.html">cmsxk/Process.cm</a></span>
+  <br/>
+  <br/>
+  <hr/>
   <h3 id="function_SetProcessReadyToRun_EF95A64345AA4644E44E6A7C9015EA92C29C3469" xml:space="preserve">SetProcessReadyToRun&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span>&nbsp;SetProcessReadyToRun(<a href="../../cmsxk/doc/class_ProcessTable_F10E41AD59CB671F43FCE2CF42A7612259663CF6.html">ProcessTable</a>&amp;&nbsp;processTable, <a href="../../cmsxk/doc/class_Process_96BF1BFE7F4BA73B2BD2D2BA6C0FA69CD799B3B3.html">Process</a>*&nbsp;process)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/Process.cm.html#295">295</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/Process.cm.html">cmsxk/Process.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/Process.cm.html#297">297</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/Process.cm.html">cmsxk/Process.cm</a></span>
   <br/>
   <br/>
   <hr/>
@@ -756,7 +797,7 @@
   <h3 id="function_SleepProcess_DAC3C0A2A512303AE27E81FAC00357ADCAA9BD32" xml:space="preserve">SleepProcess&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span>&nbsp;SleepProcess(<a href="../../cmsxk/doc/class_Process_96BF1BFE7F4BA73B2BD2D2BA6C0FA69CD799B3B3.html">Process</a>*&nbsp;process, <span class="kw">ulong</span>&nbsp;event, <span class="kw">ulong</span>&nbsp;eventData)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/Process.cm.html#328">328</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/Process.cm.html">cmsxk/Process.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/Process.cm.html#330">330</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/Process.cm.html">cmsxk/Process.cm</a></span>
   <br/>
   <br/>
   <hr/>
@@ -770,28 +811,28 @@
   <h3 id="function_UnpackProcessExitCode_5623897AFBA9A2EC8C9D748EAF0B4B4709AAD1CF" xml:space="preserve">UnpackProcessExitCode&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">inline</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span>&nbsp;UnpackProcessExitCode(<span class="kw">ushort</span>&nbsp;exitCode, <span class="kw">byte</span>&amp;&nbsp;signalNumber, <span class="kw">byte</span>&amp;&nbsp;userExitCode)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/Process.cm.html#322">322</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/Process.cm.html">cmsxk/Process.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/Process.cm.html#324">324</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/Process.cm.html">cmsxk/Process.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="function_Wait_92F03124B8A4523E8B3BCF32C7475B48FE837C4C" xml:space="preserve">Wait&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">long</span>&nbsp;Wait(<a href="../../cmsxm/doc/class_Machine_F7663CCABD183952965566D1944B82FAFEDE0822.html">Machine</a>&amp;&nbsp;machine, <span class="kw">byte</span>&nbsp;x, <span class="kw">byte</span>&nbsp;y, <span class="kw">byte</span>&nbsp;z, <span class="kw">ulong</span>&nbsp;ax, <span class="kw">ulong</span>&nbsp;bx, <span class="kw">ulong</span>&nbsp;cx, <span class="kw">ulong</span>&nbsp;dx, <span class="kw">ulong</span>&nbsp;ex)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/SystemCall.cm.html#49">49</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/SystemCall.cm.html">cmsxk/SystemCall.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/SystemCall.cm.html#51">51</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/SystemCall.cm.html">cmsxk/SystemCall.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="function_WaitProcess_469BAD2E6DA2363C1B1811E135711A477B562DEC" xml:space="preserve">WaitProcess&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">int</span>&nbsp;WaitProcess(<a href="../../cmsxm/doc/class_Machine_F7663CCABD183952965566D1944B82FAFEDE0822.html">Machine</a>&amp;&nbsp;machine, <a href="../../cmsxk/doc/class_ProcessTable_F10E41AD59CB671F43FCE2CF42A7612259663CF6.html">ProcessTable</a>&amp;&nbsp;processTable, <a href="../../cmsxk/doc/class_Process_96BF1BFE7F4BA73B2BD2D2BA6C0FA69CD799B3B3.html">Process</a>*&nbsp;process, <span class="kw">ulong</span>&nbsp;exitCodeAddress)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/Process.cm.html#393">393</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/Process.cm.html">cmsxk/Process.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/Process.cm.html#395">395</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/Process.cm.html">cmsxk/Process.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="function_WakeUpProcess_44FBF6EAFDE1D7C2008F33CAC72FCB693499E8CC" xml:space="preserve">WakeUpProcess&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span>&nbsp;WakeUpProcess(<a href="../../cmsxk/doc/class_ProcessTable_F10E41AD59CB671F43FCE2CF42A7612259663CF6.html">ProcessTable</a>&amp;&nbsp;processTable, <a href="../../cmsxk/doc/class_Process_96BF1BFE7F4BA73B2BD2D2BA6C0FA69CD799B3B3.html">Process</a>*&nbsp;process)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/Process.cm.html#336">336</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/Process.cm.html">cmsxk/Process.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/Process.cm.html#338">338</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/Process.cm.html">cmsxk/Process.cm</a></span>
   <br/>
   <br/>
   <hr/>
@@ -805,21 +846,21 @@
   <h3 id="function_Write_885C3F337EE0135C44EAB83A1C3B1ED67BE6AF89" xml:space="preserve">Write&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">long</span>&nbsp;Write(<a href="../../cmsxm/doc/class_Machine_F7663CCABD183952965566D1944B82FAFEDE0822.html">Machine</a>&amp;&nbsp;machine, <span class="kw">byte</span>&nbsp;x, <span class="kw">byte</span>&nbsp;y, <span class="kw">byte</span>&nbsp;z, <span class="kw">ulong</span>&nbsp;ax, <span class="kw">ulong</span>&nbsp;bx, <span class="kw">ulong</span>&nbsp;cx, <span class="kw">ulong</span>&nbsp;dx, <span class="kw">ulong</span>&nbsp;ex)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/SystemCall.cm.html#91">91</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/SystemCall.cm.html">cmsxk/SystemCall.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/SystemCall.cm.html#93">93</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/SystemCall.cm.html">cmsxk/SystemCall.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="function_WriteProcessMemory_495B32008321266B98920AE0DA4D68B2448772BC" xml:space="preserve">WriteProcessMemory&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">int</span>&nbsp;WriteProcessMemory(<a href="../../cmsxm/doc/class_Machine_F7663CCABD183952965566D1944B82FAFEDE0822.html">Machine</a>&amp;&nbsp;machine, <a href="../../cmsxk/doc/class_Process_96BF1BFE7F4BA73B2BD2D2BA6C0FA69CD799B3B3.html">Process</a>*&nbsp;process, <span class="kw">ulong</span>&nbsp;targetAddress, <span class="kw">byte</span>*&nbsp;source, <span class="kw">ulong</span>&nbsp;size, <a href="../../cmsxm/doc/enumerated_type_Protection_1B2FA453547A50F798735457C7E73FF5F96C558F.html">Protection</a>&nbsp;access)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/Process.cm.html#549">549</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/Process.cm.html">cmsxk/Process.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/Process.cm.html#593">593</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/Process.cm.html">cmsxk/Process.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="function_WriteProcessMemory_2A6E1673399534EF26232F13F468A6E6934524BA" xml:space="preserve">WriteProcessMemory&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">int</span>&nbsp;WriteProcessMemory(<a href="../../cmsxm/doc/class_Machine_F7663CCABD183952965566D1944B82FAFEDE0822.html">Machine</a>&amp;&nbsp;machine, <a href="../../cmsxk/doc/class_Process_96BF1BFE7F4BA73B2BD2D2BA6C0FA69CD799B3B3.html">Process</a>*&nbsp;process, <span class="kw">ulong</span>&nbsp;address, <span class="kw">ulong</span>&nbsp;value, <span class="kw">byte</span>&nbsp;size)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/Process.cm.html#523">523</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/Process.cm.html">cmsxk/Process.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/Process.cm.html#567">567</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/Process.cm.html">cmsxk/Process.cm</a></span>
   <br/>
   <br/>
   <hr/>

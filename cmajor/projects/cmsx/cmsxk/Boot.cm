@@ -56,6 +56,15 @@ namespace cmsx.kernel
         TrapHandler writeSystemCallHandler = Write;
         ulong writeSystemCallAddress = cast<ulong>(cast<void*>(writeSystemCallHandler));
         mem.WriteULong(MakeSystemCallPtrAddress(writeSystemCall), writeSystemCallAddress, Protection.write);
+        TrapHandler poolEndSystemCallHandler = PoolEnd;
+        ulong poolEndSystemCallAddress = cast<ulong>(cast<void*>(poolEndSystemCallHandler));
+        mem.WriteULong(MakeSystemCallPtrAddress(poolEndSystemCall), poolEndSystemCallAddress, Protection.write);
+        TrapHandler setPoolEndSystemCallHandler = SetPoolEnd;
+        ulong setPoolEndSystemCallAddress = cast<ulong>(cast<void*>(setPoolEndSystemCallHandler));
+        mem.WriteULong(MakeSystemCallPtrAddress(setPoolEndSystemCall), setPoolEndSystemCallAddress, Protection.write);
+        TrapHandler debugBreakSystemCallHandler = DebugBreak;
+        ulong debugBreakSystemCallAddress = cast<ulong>(cast<void*>(debugBreakSystemCallHandler));
+        mem.WriteULong(MakeSystemCallPtrAddress(debugBreakSystemCall), debugBreakSystemCallAddress, Protection.write);
     }
 
     public void Boot(Machine& machine)
@@ -79,6 +88,12 @@ namespace cmsx.kernel
         else
         {
             CreateInitAndIdleProcesses(machine, processTable);
+        }
+        if (pid != -1)
+        {
+            Process* process = processTable.GetProcess(pid);
+            Debugger* debugger = kernel.GetDebugger();
+            debugger->Init(process);
         }
         Schedule(machine, processTable);
         SetProcessorToUserMode(regs);

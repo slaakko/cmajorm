@@ -17,7 +17,14 @@ namespace cmsx.machine
         public void Run()
         {
             Boot();
-            DoRun();
+            if (Machine.GetFlag(Machine.Flags.debug))
+            {
+                DoRunDebug();
+            }
+            else
+            {
+                DoRun();
+            }
             DoExit();
         }
         public void Exit()
@@ -162,9 +169,33 @@ namespace cmsx.machine
                 inst->Execute(regs, mem, x, y, z);
                 SetPC(inst, pc, prevPC);
                 IncrementCycleCounter();
-                CheckInterrupts();
-                DecrementIntervalCounter();
+                CheckInterrupts(inst, x, y, z);
+                DecrementIntervalCounter(inst, x, y, z);
                 pc = regs.GetPC();
+            }
+        }
+        private void DoRunDebug()
+        {
+            ClockDriver clockDriver(Clock.Instance());
+            Memory& mem = machine.GetMemory();
+            ulong pc = regs.GetPC();
+            while (pc != invalidAddress && !exiting)
+            {
+                ulong prevPC = pc;
+                byte x = 0u;
+                byte y = 0u;
+                byte z = 0u;
+                Instruction* inst = FetchInstruction(pc, mem, x, y, z);
+                while (inst != null)
+                {
+                    inst->Execute(regs, mem, x, y, z);
+                    SetPC(inst, pc, prevPC);
+                    IncrementCycleCounter();
+                    inst = null;
+                    CheckInterrupts(inst, x, y, z);
+                    DecrementIntervalCounter(inst, x, y, z);
+                    pc = regs.GetPC();
+                }
             }
         }
         private void Boot()
@@ -229,7 +260,7 @@ namespace cmsx.machine
             ++cycleCounter;
             regs.SetSpecial(Registers.rC, cycleCounter);
         }
-        private nothrow void DecrementIntervalCounter()
+        private nothrow void DecrementIntervalCounter(Instruction*& inst, byte& x, byte& y, byte& z)
         {
             ulong intervalCounter = regs.GetSpecial(Registers.rI);
             if (intervalCounter != 0u)
@@ -240,7 +271,7 @@ namespace cmsx.machine
                 {
                     ulong prevRQ = regs.GetSpecial(Registers.rQ);
                     regs.SetSpecial(Registers.rQ, INTERVAL_INTERRUPT_BIT);
-                    CheckInterrupts();
+                    CheckInterrupts(inst, x, y, z);
                     regs.SetSpecial(Registers.rQ, prevRQ);
                 }
             }
@@ -258,8 +289,9 @@ namespace cmsx.machine
             }
             regs.SetSpecial(Registers.rW, prevPC);
         }
-        private nothrow void CheckInterrupts()
+        private nothrow void CheckInterrupts(Instruction*& inst, byte& x, byte& y, byte& z)
         {
+            regs.SetSpecial(Registers.rXX, 0u);
             ulong rq = regs.GetSpecial(Registers.rQ);
             ulong rk = regs.GetSpecial(Registers.rK);
             ulong bits = rq & rk;
@@ -281,6 +313,11 @@ namespace cmsx.machine
                     handlerPtrAddress = handlerPtrAddress + 8u;
                     irqBit = irqBit << 1u;
                 }
+            }
+            ulong rxx = regs.GetSpecial(Registers.rXX);
+            if (rxx != 0u)
+            {
+                MakeInstruction(cast<uint>(rxx), inst, x, y, z);
             }
         }
         private void HandleInterrupt(byte irq, ulong handlerPtrAddress)
@@ -308,6 +345,14 @@ namespace cmsx.machine
             {
                 SetProcessorToUserMode(regs);
             }
+        }
+        private void MakeInstruction(uint inst, Instruction*& instruction, byte& x, byte& y, byte& z)
+        {
+            byte opCode = cast<byte>(inst >> 24u);
+            x = cast<byte>(inst >> 16u);
+            y = cast<byte>(inst >> 8u);
+            z = cast<byte>(inst);
+            instruction = machine.GetInst(opCode);
         }
         private Machine& machine;
         private Registers regs;

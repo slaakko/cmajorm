@@ -1,0 +1,55 @@
+using System;
+using System.Collections;
+using CodeFormatter = System.Text.CodeFormatter;
+
+namespace cmsx.intermediate
+{
+    public class GlobalVariable : Value
+    {
+        public nothrow GlobalVariable(Type* type_, const string& name_, ConstantValue* initializer_, int line_, Location* homeLocation_) :
+            base(), name(name_), initializer(initializer_), homeLocation(homeLocation_)
+        {
+            base->type = type_;
+            base->line = line_;
+        }
+        public override nothrow Location* HomeLocation() const
+        {
+            return homeLocation;
+        }
+        public override nothrow string Name() const
+        {
+            return name;
+        }
+        public void Validate()
+        {
+            try
+            {
+                if (initializer != null)
+                {
+                    initializer->Validate(type, "1");
+                }
+            }
+            catch (const Exception& ex)
+            {
+                throw Exception(ex.Message() + " at line " + ToString(line));
+            }
+        }
+        public void GenerateDeclaration(MachineCode& machineCode)
+        {
+            MachineInstruction* externInst = machineCode.GetInstruction(cmsx.assembly.EXTERN, null);
+            externInst->AddOperand(machineCode.context.GetSymbolOperand(name));
+        }
+        public void GenerateDefinition(MachineCode& machineCode, Context& context)
+        {
+            MachineInstruction* structInst = machineCode.GetInstruction(cmsx.assembly.STRUCT, name);
+            MachineInstruction* octaInst = machineCode.GetInstruction(cmsx.assembly.OCTA, null);
+            string dataLabel = name + "_data";
+            octaInst->AddOperand(machineCode.context.GetSymbolOperand(dataLabel));
+            initializer->GenerateCode(machineCode, dataLabel, context);
+            MachineInstruction* endSInst = machineCode.GetInstruction(cmsx.assembly.ENDS, name);
+        }
+        public string name;
+        public ConstantValue* initializer;
+        public Location* homeLocation;
+    }
+}

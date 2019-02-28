@@ -15,6 +15,10 @@ namespace cmsx.intermediate
             instructions.Add(UniquePtr<Instruction>(instruction));
             empty = false;
         }
+        public nothrow Instruction* GetLeader() const
+        {
+            return instructions.Front().Get();
+        }
         public void MapInstructions(uint& nextIdNumber)
         {
             for (const UniquePtr<Instruction>& instruction : instructions)
@@ -41,9 +45,11 @@ namespace cmsx.intermediate
         }
         public void Validate()
         {
+            function.ResetNextArgIndex();
             long n = instructions.Count();
             int numParams = 0;
             int numArgs = 0;
+            List<ArgInstruction*> args;
             for (long i = 0; i < n; ++i)
             {
                 Instruction* instruction = instructions[i].Get();
@@ -60,6 +66,7 @@ namespace cmsx.intermediate
                 {
                     ++numArgs;
                     resetArgs = false;
+                    args.Add(cast<ArgInstruction*>(instruction));
                 }
                 else if (instruction is ParamInstruction*)
                 {
@@ -72,10 +79,22 @@ namespace cmsx.intermediate
                         throw Exception("error: a non-entry block contains a param instruction (line " + ToString(instruction->line) + ")");
                     }
                 }
+                else if ((instruction is FunctionCallInstruction*) || (instruction is ProcedureCallInstruction*) || (instruction is TrapInstruction*))
+                {
+                    for (ArgInstruction* arg : args)
+                    {
+                        arg->numArgs = numArgs;
+                        if (instruction is TrapInstruction*)
+                        {
+                            arg->trap = true;
+                        }
+                    }
+                }
                 instruction->Validate(function, numArgs);
                 if (resetArgs)
                 {
                     numArgs = 0;
+                    args.Clear();
                 }
             }
             if (id == 0u && numParams != function.type->ParamTypes().Count())

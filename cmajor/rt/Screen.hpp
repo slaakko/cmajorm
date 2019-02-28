@@ -33,6 +33,17 @@ extern "C" RT_API void RtGetNStr(char* str, int size);
 extern "C" RT_API void RtAttrOn(int attrs);
 extern "C" RT_API void RtAttrOff(int attrs);
 extern "C" RT_API void RtAttrSet(int attrs);
+extern "C" RT_API void RtStartColor();
+extern "C" RT_API void RtInitPair(short n, short backgroundColor, short foregroundColor);
+extern "C" RT_API int RtColorPair(short n);
+extern "C" RT_API short RtWhite();
+extern "C" RT_API short RtBlack();
+extern "C" RT_API short RtBlue();
+extern "C" RT_API short RtGreen();
+extern "C" RT_API short RtRed();
+extern "C" RT_API short RtCyan();
+extern "C" RT_API short RtMagenta();
+extern "C" RT_API short RtYellow();
 extern "C" RT_API bool RtRunningOnWsl();
 
 // Key codes returned by RtGetCh function:

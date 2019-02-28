@@ -13,17 +13,17 @@ namespace cmajor { namespace cmdoclib {
 
 using namespace cmajor::symbols;
 
-void ReadGlobals(const std::vector<std::u32string>& moduleNames);
-void WriteGlobals(const std::vector<std::u32string>& moduleNames);
-void AddDerivedClass(ClassTypeSymbol* baseClass, ClassTypeSymbol* derivedClass);
-std::vector<std::u32string> GetDerivedClassIds(const std::u32string& moduleName, const std::u32string& baseClassId);
-void AddConceptRefinement(ConceptSymbol* refinedConcept, ConceptSymbol* concept);
-std::vector<std::u32string> GetDerivedConceptIds(const std::u32string& moduleName, const std::u32string& refinedConceptId);
-void WriteModuleXml(const std::string& targetDir, const std::vector<std::u32string>& moduleNames);
-void ReadGrammars(Input* input);
-void WriteGrammars(Input* input, const std::vector<std::string>& grammarFilePaths);
-void GlobalInit();
-void GlobalDone();
+CMDOCLIB_API void ReadGlobals(const std::vector<std::u32string>& moduleNames);
+CMDOCLIB_API void WriteGlobals(const std::vector<std::u32string>& moduleNames);
+CMDOCLIB_API void AddDerivedClass(ClassTypeSymbol* baseClass, ClassTypeSymbol* derivedClass);
+CMDOCLIB_API std::vector<std::u32string> GetDerivedClassIds(const std::u32string& moduleName, const std::u32string& baseClassId);
+CMDOCLIB_API void AddConceptRefinement(ConceptSymbol* refinedConcept, ConceptSymbol* concept);
+CMDOCLIB_API std::vector<std::u32string> GetDerivedConceptIds(const std::u32string& moduleName, const std::u32string& refinedConceptId);
+CMDOCLIB_API void WriteModuleXml(const std::string& targetDir, const std::vector<std::u32string>& moduleNames);
+CMDOCLIB_API void ReadGrammars(Input* input);
+CMDOCLIB_API void WriteGrammars(Input* input, const std::vector<std::string>& grammarFilePaths);
+CMDOCLIB_API void GlobalInit();
+CMDOCLIB_API void GlobalDone();
 
 } } // namespace cmajor::cmdoclib
 

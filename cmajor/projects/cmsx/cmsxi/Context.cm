@@ -117,7 +117,7 @@ namespace cmsx.intermediate
                 throw Exception("type for id '" + typeId + "' not found (" + compileUnit.fileName + ":" + ToString(lineNumber) + ")");
             }
         }
-        public Type* GetPtrType(Type* baseType)
+        public PtrType* GetPtrType(Type* baseType)
         {
             return typeRepository.GetPtrType(baseType);
         }
@@ -156,9 +156,9 @@ namespace cmsx.intermediate
             }
             return null;
         }
-        public Value* MakeSByteValue(SByteType* type, sbyte value)
+        public ConstantValue* MakeSByteValue(SByteType* type, sbyte value)
         {
-            HashMap<sbyte, Value*>.ConstIterator it = sbyteValueMap.CFind(value);
+            HashMap<sbyte, ConstantValue*>.ConstIterator it = sbyteValueMap.CFind(value);
             if (it != sbyteValueMap.CEnd())
             {
                 return it->second;
@@ -172,9 +172,9 @@ namespace cmsx.intermediate
                 return val;
             }
         }
-        public Value* MakeByteValue(ByteType* type, byte value)
+        public ConstantValue* MakeByteValue(ByteType* type, byte value)
         {
-            HashMap<byte, Value*>.ConstIterator it = byteValueMap.CFind(value);
+            HashMap<byte, ConstantValue*>.ConstIterator it = byteValueMap.CFind(value);
             if (it != byteValueMap.CEnd())
             {
                 return it->second;
@@ -188,9 +188,9 @@ namespace cmsx.intermediate
                 return val;
             }
         }
-        public Value* MakeShortValue(ShortType* type, short value)
+        public ConstantValue* MakeShortValue(ShortType* type, short value)
         {
-            HashMap<short, Value*>.ConstIterator it = shortValueMap.CFind(value);
+            HashMap<short, ConstantValue*>.ConstIterator it = shortValueMap.CFind(value);
             if (it != shortValueMap.CEnd())
             {
                 return it->second;
@@ -204,9 +204,9 @@ namespace cmsx.intermediate
                 return val;
             }
         }
-        public Value* MakeUShortValue(UShortType* type, ushort value)
+        public ConstantValue* MakeUShortValue(UShortType* type, ushort value)
         {
-            HashMap<ushort, Value*>.ConstIterator it = ushortValueMap.CFind(value);
+            HashMap<ushort, ConstantValue*>.ConstIterator it = ushortValueMap.CFind(value);
             if (it != ushortValueMap.CEnd())
             {
                 return it->second;
@@ -220,9 +220,9 @@ namespace cmsx.intermediate
                 return val;
             }
         }
-        public Value* MakeIntValue(IntType* type, int value)
+        public ConstantValue* MakeIntValue(IntType* type, int value)
         {
-            HashMap<int, Value*>.ConstIterator it = intValueMap.CFind(value);
+            HashMap<int, ConstantValue*>.ConstIterator it = intValueMap.CFind(value);
             if (it != intValueMap.CEnd())
             {
                 return it->second;
@@ -236,9 +236,9 @@ namespace cmsx.intermediate
                 return val;
             }
         }
-        public Value* MakeUIntValue(UIntType* type, uint value)
+        public ConstantValue* MakeUIntValue(UIntType* type, uint value)
         {
-            HashMap<uint, Value*>.ConstIterator it = uintValueMap.CFind(value);
+            HashMap<uint, ConstantValue*>.ConstIterator it = uintValueMap.CFind(value);
             if (it != uintValueMap.CEnd())
             {
                 return it->second;
@@ -252,9 +252,9 @@ namespace cmsx.intermediate
                 return val;
             }
         }
-        public Value* MakeLongValue(LongType* type, long value)
+        public ConstantValue* MakeLongValue(LongType* type, long value)
         {
-            HashMap<long, Value*>.ConstIterator it = longValueMap.CFind(value);
+            HashMap<long, ConstantValue*>.ConstIterator it = longValueMap.CFind(value);
             if (it != longValueMap.CEnd())
             {
                 return it->second;
@@ -268,9 +268,9 @@ namespace cmsx.intermediate
                 return val;
             }
         }
-        public Value* MakeULongValue(ULongType* type, ulong value)
+        public ConstantValue* MakeULongValue(ULongType* type, ulong value)
         {
-            HashMap<ulong, Value*>.ConstIterator it = ulongValueMap.CFind(value);
+            HashMap<ulong, ConstantValue*>.ConstIterator it = ulongValueMap.CFind(value);
             if (it != ulongValueMap.CEnd())
             {
                 return it->second;
@@ -284,17 +284,29 @@ namespace cmsx.intermediate
                 return val;
             }
         }
-        public Value* MakeFloatValue(FloatType* type, float value)
+        public ConstantValue* MakeFloatValue(FloatType* type, float value)
         {
             FloatValue* val = new FloatValue(value);
             val->type = type;
             AddValue(val);
             return val;
         }
-        public Value* MakeDoubleValue(DoubleType* type, double value)
+        public ConstantValue* MakeDoubleValue(DoubleType* type, double value)
         {
             DoubleValue* val = new DoubleValue(value);
             val->type = type;
+            AddValue(val);
+            return val;
+        }
+        public ArrayValue* MakeArrayValue()
+        {
+            ArrayValue* val = new ArrayValue();
+            AddValue(val);
+            return val;
+        }
+        public StructureValue* MakeStructureValue()
+        {
+            StructureValue* val = new StructureValue();
             AddValue(val);
             return val;
         }
@@ -342,6 +354,18 @@ namespace cmsx.intermediate
                 return symbolOperand;
             }
         }
+        public GlobalVariable* GetGlobalVariable(const string& globalVariableName) const
+        {
+            return compileUnit.GetGlobalVariable(globalVariableName);
+        }
+        public void AddGlobalVariable(Type* type, const string& name, ConstantValue* initializer, int line)
+        {
+            compileUnit.AddGlobalVariable(type, name, initializer, line);
+        }
+        public void ValidateGlobalVariables()
+        {
+            compileUnit.ValidateGlobalVariables();
+        }
         public CompileUnit compileUnit;
         public Function* currentFunction;
         public Registers regs;
@@ -350,14 +374,14 @@ namespace cmsx.intermediate
         private List<UniquePtr<Value>> values;
         private HashMap<uint, IdValue*> idValueMap;
         private HashMap<string, SymbolValue*> symbolValueMap;
-        private HashMap<sbyte, Value*> sbyteValueMap;
-        private HashMap<byte, Value*> byteValueMap;
-        private HashMap<short, Value*> shortValueMap;
-        private HashMap<ushort, Value*> ushortValueMap;
-        private HashMap<int, Value*> intValueMap;
-        private HashMap<uint, Value*> uintValueMap;
-        private HashMap<long, Value*> longValueMap;
-        private HashMap<ulong, Value*> ulongValueMap;
+        private HashMap<sbyte, ConstantValue*> sbyteValueMap;
+        private HashMap<byte, ConstantValue*> byteValueMap;
+        private HashMap<short, ConstantValue*> shortValueMap;
+        private HashMap<ushort, ConstantValue*> ushortValueMap;
+        private HashMap<int, ConstantValue*> intValueMap;
+        private HashMap<uint, ConstantValue*> uintValueMap;
+        private HashMap<long, ConstantValue*> longValueMap;
+        private HashMap<ulong, ConstantValue*> ulongValueMap;
         private List<UniquePtr<Operand>> operands;
         private HashMap<ulong, LiteralOperand*> literalOperandMap;
         private HashMap<string, SymbolOperand*> symbolOperandMap;

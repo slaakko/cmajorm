@@ -42,7 +42,7 @@ namespace cmsx.intermediate
 
     public class MachineCode
     {
-        public nothrow MachineCode(Context& context_) : context(context_)
+        public nothrow MachineCode(Context& context_) : context(context_), prevInst(null)
         {
         }
         public nothrow inline long CurrentIndex() const
@@ -51,13 +51,18 @@ namespace cmsx.intermediate
         }
         public nothrow MachineInstruction* GetInstruction(int opCode, const string& label)
         {
-            MachineInstruction* inst = GetInstruction(opCode);
+            MachineInstruction* inst = GetInstruction(opCode, null);
             inst->SetLabel(label);
             return inst;
         }
-        public nothrow MachineInstruction* GetInstruction(int opCode)
+        public nothrow MachineInstruction* GetInstruction(int opCode, Instruction* inst)
         {
             MachineInstruction* machineInstruction = new MachineInstruction(opCode);
+            if (inst != null && inst != prevInst && inst->IsLeader())
+            {
+                machineInstruction->SetLabel(inst->parent->Name());
+                prevInst = inst;
+            }
             machineInstructions.Add(UniquePtr<MachineInstruction>(machineInstruction));
             return machineInstruction;
         }
@@ -86,5 +91,6 @@ namespace cmsx.intermediate
         }
         public Context& context;
         private List<UniquePtr<MachineInstruction>> machineInstructions;
+        private Instruction* prevInst;
     }
 }

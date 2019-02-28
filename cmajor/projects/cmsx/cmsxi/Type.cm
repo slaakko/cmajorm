@@ -38,9 +38,13 @@ namespace cmsx.intermediate
             throw Exception("error: tried to get hex all ones for '" + Name() + "' type (line " + ToString(line) + ")");
             return null;
         }
-        public virtual void GenerateMinusOne(MachineCode& machineCode, Register* reg, int line)
+        public virtual void GenerateMinusOne(MachineCode& machineCode, Register* reg, int line, Instruction* inst)
         {
-            throw Exception("error: tried to genereate minus one for '" + Name() + "' type (line " + ToString(line) + ")");
+            throw Exception("error: tried to generate minus one for '" + Name() + "' type (line " + ToString(line) + ")");
+        }
+        public virtual MachineInstruction* GetDataInstruction(MachineCode& machineCode, int line) const
+        {
+            throw Exception("error: tried to generate data instruction for '" + Name() + "' type (line " + ToString(line) + ")");
         }
     }
 
@@ -81,7 +85,7 @@ namespace cmsx.intermediate
         {
             return "bool";
         }
-        public override Value* DefaultValue() const
+        public override ConstantValue* DefaultValue() const
         {
             return &falseValue;
         }
@@ -120,6 +124,14 @@ namespace cmsx.intermediate
         public override Value* MakeValue(ulong val) const
         {
             return new BoolValue(cast<bool>(val));
+        }
+        public nothrow inline BoolValue* MakeBoolValue(bool val) const
+        {
+            if (val) return &trueValue; else return &falseValue;
+        }
+        public override MachineInstruction* GetDataInstruction(MachineCode& machineCode, int line) const
+        {
+            return machineCode.GetInstruction(cmsx.assembly.BYTE, null);
         }
         private BoolValue falseValue;
         private BoolValue trueValue;
@@ -195,15 +207,19 @@ namespace cmsx.intermediate
         {
             return context.GetSymbolOperand("#" + ToHexString(cast<byte>(-1)));
         }
-        public override void GenerateMinusOne(MachineCode& machineCode, Register* reg, int line)
+        public override void GenerateMinusOne(MachineCode& machineCode, Register* reg, int line, Instruction* inst)
         {
-            MachineInstruction* inst = machineCode.GetInstruction(cmsx.assembly.SET);
-            inst->AddOperand(reg);
-            inst->AddOperand(HexAllOnes(machineCode.context, line));
+            MachineInstruction* machineInst = machineCode.GetInstruction(cmsx.assembly.SET, inst);
+            machineInst->AddOperand(reg);
+            machineInst->AddOperand(HexAllOnes(machineCode.context, line));
         }
         public override Value* MakeValue(ulong val) const
         {
             return new SByteValue(cast<sbyte>(val));
+        }
+        public override MachineInstruction* GetDataInstruction(MachineCode& machineCode, int line) const
+        {
+            return machineCode.GetInstruction(cmsx.assembly.BYTE, null);
         }
         private SByteValue defaultValue;
     }
@@ -262,15 +278,19 @@ namespace cmsx.intermediate
         {
             return context.GetSymbolOperand("#" + ToHexString(cast<byte>(-1)));
         }
-        public override void GenerateMinusOne(MachineCode& machineCode, Register* reg, int line)
+        public override void GenerateMinusOne(MachineCode& machineCode, Register* reg, int line, Instruction* inst)
         {
-            MachineInstruction* inst = machineCode.GetInstruction(cmsx.assembly.SET);
-            inst->AddOperand(reg);
-            inst->AddOperand(HexAllOnes(machineCode.context, line));
+            MachineInstruction* machineInst = machineCode.GetInstruction(cmsx.assembly.SET, inst);
+            machineInst->AddOperand(reg);
+            machineInst->AddOperand(HexAllOnes(machineCode.context, line));
         }
         public override Value* MakeValue(ulong val) const
         {
             return new ByteValue(cast<byte>(val));
+        }
+        public override MachineInstruction* GetDataInstruction(MachineCode& machineCode, int line) const
+        {
+            return machineCode.GetInstruction(cmsx.assembly.BYTE, null);
         }
         private ByteValue defaultValue;
     }
@@ -329,15 +349,19 @@ namespace cmsx.intermediate
         {
             return context.GetSymbolOperand("#" + ToHexString(cast<ushort>(-1)));
         }
-        public override void GenerateMinusOne(MachineCode& machineCode, Register* reg, int line)
+        public override void GenerateMinusOne(MachineCode& machineCode, Register* reg, int line, Instruction* inst)
         {
-            MachineInstruction* inst = machineCode.GetInstruction(cmsx.assembly.SET);
-            inst->AddOperand(reg);
-            inst->AddOperand(HexAllOnes(machineCode.context, line));
+            MachineInstruction* machineInst = machineCode.GetInstruction(cmsx.assembly.SET, inst);
+            machineInst->AddOperand(reg);
+            machineInst->AddOperand(HexAllOnes(machineCode.context, line));
         }
         public override Value* MakeValue(ulong val) const
         {
             return new ShortValue(cast<short>(val));
+        }
+        public override MachineInstruction* GetDataInstruction(MachineCode& machineCode, int line) const
+        {
+            return machineCode.GetInstruction(cmsx.assembly.WYDE, null);
         }
         private ShortValue defaultValue;
     }
@@ -396,15 +420,19 @@ namespace cmsx.intermediate
         {
             return context.GetSymbolOperand("#" + ToHexString(cast<ushort>(-1)));
         }
-        public override void GenerateMinusOne(MachineCode& machineCode, Register* reg, int line)
+        public override void GenerateMinusOne(MachineCode& machineCode, Register* reg, int line, Instruction* inst)
         {
-            MachineInstruction* inst = machineCode.GetInstruction(cmsx.assembly.SET);
-            inst->AddOperand(reg);
-            inst->AddOperand(HexAllOnes(machineCode.context, line));
+            MachineInstruction* machineInst = machineCode.GetInstruction(cmsx.assembly.SET, inst);
+            machineInst->AddOperand(reg);
+            machineInst->AddOperand(HexAllOnes(machineCode.context, line));
         }
         public override Value* MakeValue(ulong val) const
         {
             return new UShortValue(cast<ushort>(val));
+        }
+        public override MachineInstruction* GetDataInstruction(MachineCode& machineCode, int line) const
+        {
+            return machineCode.GetInstruction(cmsx.assembly.WYDE, null);
         }
         private UShortValue defaultValue;
     }
@@ -463,19 +491,23 @@ namespace cmsx.intermediate
         {
             return context.GetSymbolOperand("#" + ToHexString(cast<uint>(-1)));
         }
-        public override void GenerateMinusOne(MachineCode& machineCode, Register* reg, int line)
+        public override void GenerateMinusOne(MachineCode& machineCode, Register* reg, int line, Instruction* inst)
         {
             Operand* allOnes = machineCode.context.GetUShortType()->HexAllOnes(machineCode.context, line);
-            MachineInstruction* setInst = machineCode.GetInstruction(cmsx.assembly.SET);
+            MachineInstruction* setInst = machineCode.GetInstruction(cmsx.assembly.SET, inst);
             setInst->AddOperand(reg);
             setInst->AddOperand(allOnes);
-            MachineInstruction* orMlInst = machineCode.GetInstruction(cmsx.machine.ORML);
+            MachineInstruction* orMlInst = machineCode.GetInstruction(cmsx.machine.ORML, inst);
             orMlInst->AddOperand(reg);
             orMlInst->AddOperand(allOnes);
         }
         public override Value* MakeValue(ulong val) const
         {
             return new IntValue(cast<int>(val));
+        }
+        public override MachineInstruction* GetDataInstruction(MachineCode& machineCode, int line) const
+        {
+            return machineCode.GetInstruction(cmsx.assembly.TETRA, null);
         }
         private IntValue defaultValue;
     }
@@ -534,19 +566,23 @@ namespace cmsx.intermediate
         {
             return context.GetSymbolOperand("#" + ToHexString(cast<uint>(-1)));
         }
-        public override void GenerateMinusOne(MachineCode& machineCode, Register* reg, int line)
+        public override void GenerateMinusOne(MachineCode& machineCode, Register* reg, int line, Instruction* inst)
         {
             Operand* allOnes = machineCode.context.GetUShortType()->HexAllOnes(machineCode.context, line);
-            MachineInstruction* setInst = machineCode.GetInstruction(cmsx.assembly.SET);
+            MachineInstruction* setInst = machineCode.GetInstruction(cmsx.assembly.SET, inst);
             setInst->AddOperand(reg);
             setInst->AddOperand(allOnes);
-            MachineInstruction* orMlInst = machineCode.GetInstruction(cmsx.machine.ORML);
+            MachineInstruction* orMlInst = machineCode.GetInstruction(cmsx.machine.ORML, inst);
             orMlInst->AddOperand(reg);
             orMlInst->AddOperand(allOnes);
         }
         public override Value* MakeValue(ulong val) const
         {
             return new UIntValue(cast<uint>(val));
+        }
+        public override MachineInstruction* GetDataInstruction(MachineCode& machineCode, int line) const
+        {
+            return machineCode.GetInstruction(cmsx.assembly.TETRA, null);
         }
         private UIntValue defaultValue;
     }
@@ -605,25 +641,29 @@ namespace cmsx.intermediate
         {
             return context.GetSymbolOperand("#" + ToHexString(cast<ulong>(-1)));
         }
-        public override void GenerateMinusOne(MachineCode& machineCode, Register* reg, int line)
+        public override void GenerateMinusOne(MachineCode& machineCode, Register* reg, int line, Instruction* inst)
         {
             Operand* allOnes = machineCode.context.GetUShortType()->HexAllOnes(machineCode.context, line);
-            MachineInstruction* setInst = machineCode.GetInstruction(cmsx.assembly.SET);
+            MachineInstruction* setInst = machineCode.GetInstruction(cmsx.assembly.SET, inst);
             setInst->AddOperand(reg);
             setInst->AddOperand(allOnes);
-            MachineInstruction* orMlInst = machineCode.GetInstruction(cmsx.machine.ORML);
+            MachineInstruction* orMlInst = machineCode.GetInstruction(cmsx.machine.ORML, inst);
             orMlInst->AddOperand(reg);
             orMlInst->AddOperand(allOnes);
-            MachineInstruction* orMhInst = machineCode.GetInstruction(cmsx.machine.ORMH);
+            MachineInstruction* orMhInst = machineCode.GetInstruction(cmsx.machine.ORMH, inst);
             orMhInst->AddOperand(reg);
             orMhInst->AddOperand(allOnes);
-            MachineInstruction* orHInst = machineCode.GetInstruction(cmsx.machine.ORH);
+            MachineInstruction* orHInst = machineCode.GetInstruction(cmsx.machine.ORH, inst);
             orHInst->AddOperand(reg);
             orHInst->AddOperand(allOnes);
         }
         public override Value* MakeValue(ulong val) const
         {
             return new LongValue(cast<long>(val));
+        }
+        public override MachineInstruction* GetDataInstruction(MachineCode& machineCode, int line) const
+        {
+            return machineCode.GetInstruction(cmsx.assembly.OCTA, null);
         }
         private LongValue defaultValue;
     }
@@ -682,25 +722,29 @@ namespace cmsx.intermediate
         {
             return context.GetSymbolOperand("#" + ToHexString(cast<ulong>(-1)));
         }
-        public override void GenerateMinusOne(MachineCode& machineCode, Register* reg, int line)
+        public override void GenerateMinusOne(MachineCode& machineCode, Register* reg, int line, Instruction* inst)
         {
             Operand* allOnes = machineCode.context.GetUShortType()->HexAllOnes(machineCode.context, line);
-            MachineInstruction* setInst = machineCode.GetInstruction(cmsx.assembly.SET);
+            MachineInstruction* setInst = machineCode.GetInstruction(cmsx.assembly.SET, inst);
             setInst->AddOperand(reg);
             setInst->AddOperand(allOnes);
-            MachineInstruction* orMlInst = machineCode.GetInstruction(cmsx.machine.ORML);
+            MachineInstruction* orMlInst = machineCode.GetInstruction(cmsx.machine.ORML, inst);
             orMlInst->AddOperand(reg);
             orMlInst->AddOperand(allOnes);
-            MachineInstruction* orMhInst = machineCode.GetInstruction(cmsx.machine.ORMH);
+            MachineInstruction* orMhInst = machineCode.GetInstruction(cmsx.machine.ORMH, inst);
             orMhInst->AddOperand(reg);
             orMhInst->AddOperand(allOnes);
-            MachineInstruction* orHInst = machineCode.GetInstruction(cmsx.machine.ORH);
+            MachineInstruction* orHInst = machineCode.GetInstruction(cmsx.machine.ORH, inst);
             orHInst->AddOperand(reg);
             orHInst->AddOperand(allOnes);
         }
         public override Value* MakeValue(ulong val) const
         {
             return new ULongValue(val);
+        }
+        public override MachineInstruction* GetDataInstruction(MachineCode& machineCode, int line) const
+        {
+            return machineCode.GetInstruction(cmsx.assembly.OCTA, null);
         }
         private ULongValue defaultValue;
     }
@@ -746,6 +790,10 @@ namespace cmsx.intermediate
         public override int GetStoreOp(int line) const
         {
             return cmsx.machine.STSF;
+        }
+        public override MachineInstruction* GetDataInstruction(MachineCode& machineCode, int line) const
+        {
+            return machineCode.GetInstruction(cmsx.assembly.TETRA, null);
         }
         private FloatValue defaultValue;
     }
@@ -793,6 +841,10 @@ namespace cmsx.intermediate
         {
             return cmsx.machine.STOU;
         }
+        public override MachineInstruction* GetDataInstruction(MachineCode& machineCode, int line) const
+        {
+            return machineCode.GetInstruction(cmsx.assembly.OCTA, null);
+        }
         private DoubleValue defaultValue;
     }
 
@@ -817,7 +869,7 @@ namespace cmsx.intermediate
         {
             baseType = baseType_;
         }
-        public override Value* DefaultValue() const
+        public override ConstantValue* DefaultValue() const
         {
             return &defaultValue;
         }
@@ -829,7 +881,10 @@ namespace cmsx.intermediate
             }
             else
             {
-                throw Exception("cannot make '" + Name() + "' type value from string '" + fromStr + "'");
+                GlobalVariable* globalVariable = context.GetGlobalVariable(fromStr);
+                PtrValue* ptrValue = new PtrValue(this, globalVariable);
+                context.AddValue(ptrValue);
+                return ptrValue;
             }
         }
         public override nothrow long Alignment()
@@ -848,8 +903,17 @@ namespace cmsx.intermediate
         {
             return cmsx.machine.STOU;
         }
+        public override MachineInstruction* GetDataInstruction(MachineCode& machineCode, int line) const
+        {
+            return machineCode.GetInstruction(cmsx.assembly.OCTA, null);
+        }
         private Type* baseType;
         private NullValue defaultValue;
+    }
+
+    public nothrow bool IsPtrType(Type* type)
+    {
+        return type is PtrType*;
     }
 
     public abstract class AggregateType : Type
@@ -929,10 +993,10 @@ namespace cmsx.intermediate
         {
             return memberOffsets[memberIndex];
         }
-        private string typeId;
-        private List<Type*> memberTypes;
-        private List<long> memberOffsets;
-        private long size;
+        public string typeId;
+        public List<Type*> memberTypes;
+        public List<long> memberOffsets;
+        public long size;
     }
 
     public class ArrayType : AggregateType
@@ -1128,7 +1192,7 @@ namespace cmsx.intermediate
                 return null;
             }
         }
-        public Type* GetPtrType(Type* baseType)
+        public PtrType* GetPtrType(Type* baseType)
         {
             HashMap<Type*, PtrType*>.ConstIterator it = ptrTypeMap.CFind(baseType);
             if (it != ptrTypeMap.CEnd())
