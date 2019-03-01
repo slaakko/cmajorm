@@ -37,27 +37,27 @@ namespace cmsx.kernel
         Memory& mem = machine.GetMemory();
         memoryTable.rootPageAddress = mem.AllocateRootPage();
         memoryTable.addressSpaceNumber = GetNextAddressSpaceNumber();
-        memoryTable.segmentDescriptors[textSegmentIndex] = CreateSegmentDescriptor(pageSize, pageSize);
-        memoryTable.segmentDescriptors[dataSegmentIndex] = CreateSegmentDescriptor(0u, pageSize);
-        memoryTable.segmentDescriptors[poolSegmentIndex] = CreateSegmentDescriptor(0u, pageSize);
-        memoryTable.segmentDescriptors[stackSegmentIndex] = CreateSegmentDescriptor(0u, pageSize);
+        memoryTable.segmentDescriptors[textSegmentIndex] = CreateSegmentDescriptor(pageSize, textSegmentBaseAddress, pageSize);
+        memoryTable.segmentDescriptors[dataSegmentIndex] = CreateSegmentDescriptor(0u, dataSegmentBaseAddress, pageSize);
+        memoryTable.segmentDescriptors[poolSegmentIndex] = CreateSegmentDescriptor(0u, poolSegmentBaseAddress, pageSize);
+        memoryTable.segmentDescriptors[stackSegmentIndex] = CreateSegmentDescriptor(0u, stackSegmentBaseAddress, pageSize);
         memoryTable.virtualTranslationRegisterValue = MakeVirtualTranslationRegisterValue(memoryTable.rootPageAddress, memoryTable.addressSpaceNumber);
     }
 
     public nothrow void InitializeMemoryTable(Machine& machine, MemoryTable& memoryTable,
-        ulong textSegmentBaseAddress, ulong textSegmentSize, ulong dataSegmentSize, ulong poolSegmentSize, ulong stackSegmentSize)
+        ulong textSegmentStartAddress, ulong textSegmentSize, ulong dataSegmentSize, ulong poolSegmentSize, ulong stackSegmentSize)
     {
         Memory& mem = machine.GetMemory();
         memoryTable.rootPageAddress = mem.AllocateRootPage();
         memoryTable.addressSpaceNumber = GetNextAddressSpaceNumber();
-        if (textSegmentBaseAddress == 0u)
+        if (textSegmentStartAddress == 0u)
         {
-            textSegmentBaseAddress = pageSize;
+            textSegmentStartAddress = pageSize;
         }
-        memoryTable.segmentDescriptors[textSegmentIndex] = CreateSegmentDescriptor(textSegmentBaseAddress, textSegmentSize);
-        memoryTable.segmentDescriptors[dataSegmentIndex] = CreateSegmentDescriptor(0u, dataSegmentSize);
-        memoryTable.segmentDescriptors[poolSegmentIndex] = CreateSegmentDescriptor(0u, poolSegmentSize);
-        memoryTable.segmentDescriptors[stackSegmentIndex] = CreateSegmentDescriptor(0u, stackSegmentSize);
+        memoryTable.segmentDescriptors[textSegmentIndex] = CreateSegmentDescriptor(textSegmentStartAddress, textSegmentBaseAddress, textSegmentSize);
+        memoryTable.segmentDescriptors[dataSegmentIndex] = CreateSegmentDescriptor(0u, dataSegmentBaseAddress, dataSegmentSize);
+        memoryTable.segmentDescriptors[poolSegmentIndex] = CreateSegmentDescriptor(0u, poolSegmentBaseAddress, poolSegmentSize);
+        memoryTable.segmentDescriptors[stackSegmentIndex] = CreateSegmentDescriptor(0u, stackSegmentBaseAddress, stackSegmentSize);
         memoryTable.virtualTranslationRegisterValue = MakeVirtualTranslationRegisterValue(memoryTable.rootPageAddress, memoryTable.addressSpaceNumber);
     }
 
@@ -1369,7 +1369,7 @@ namespace cmsx.kernel
         {
             targetMemoryTable.rootPageAddress = mem.AllocateRootPage();
         }
-        SegmentDescriptor* targetSegmentDescriptor = CreateSegmentDescriptor(sourceSegmentDescriptor->startAddress, sourceSegmentDescriptor->length);
+        SegmentDescriptor* targetSegmentDescriptor = CreateSegmentDescriptor(sourceSegmentDescriptor->startAddress, sourceSegmentDescriptor->baseAddress, sourceSegmentDescriptor->length);
         if (targetSegmentDescriptor == null) return false;
         ulong startPageNumber = 0u;
         ulong numPages = 0u;
@@ -1389,7 +1389,7 @@ namespace cmsx.kernel
         {
             targetMemoryTable.rootPageAddress = mem.AllocateRootPage();
         }
-        SegmentDescriptor* targetSegmentDescriptor = CreateSegmentDescriptor(sourceSegmentDescriptor->startAddress, sourceSegmentDescriptor->length);
+        SegmentDescriptor* targetSegmentDescriptor = CreateSegmentDescriptor(sourceSegmentDescriptor->startAddress, sourceSegmentDescriptor->baseAddress, sourceSegmentDescriptor->length);
         if (targetSegmentDescriptor == null) return false;
         ulong startPageNumber = 0u;
         ulong numPages = 0u;

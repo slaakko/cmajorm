@@ -6,13 +6,14 @@ namespace cmsx.kernel
 
     public class SegmentDescriptor
     {
-        public nothrow SegmentDescriptor() : startAddress(0u), length(0u), useCount(1u), next(null)
+        public nothrow SegmentDescriptor() : startAddress(0u), baseAddress(0u), length(0u), useCount(1u), next(null)
         {
         }
-        public nothrow SegmentDescriptor(ulong startAddress_, ulong length_) : startAddress(startAddress_), length(length_), useCount(1u), next(null)
+        public nothrow SegmentDescriptor(ulong startAddress_, ulong baseAddress_, ulong length_) : startAddress(startAddress_), baseAddress(baseAddress_), length(length_), useCount(1u), next(null)
         {
         }
         public ulong startAddress;  // address of the first byte 
+        public ulong baseAddress;   // segment base address;
         public ulong length;        // length of the segment in bytes
         public byte useCount;       // use count
         public SegmentDescriptor* next; // next free segment descriptor in free list
@@ -57,12 +58,13 @@ namespace cmsx.kernel
         private long unusedSegmentDescriptorIndex;
     }
 
-    public nothrow SegmentDescriptor* CreateSegmentDescriptor(ulong startAddress, ulong length)
+    public nothrow SegmentDescriptor* CreateSegmentDescriptor(ulong startAddress, ulong baseAddress, ulong length)
     {
         SegmentDescriptor* sd = SegmentTable.Instance().AllocateSegmentDescriptor();
         if (sd != null)
         {
             sd->startAddress = startAddress;
+            sd->baseAddress = baseAddress;
             sd->length = length;
             sd->useCount = 1u;
             sd->next = null;

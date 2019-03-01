@@ -10,7 +10,7 @@ namespace cmsx.debug
 
     public enum CommandResult
     {
-        ret, cont 
+        ret, cont, update
     }
 
     public const short blackOnWhite = 1;
@@ -104,6 +104,9 @@ namespace cmsx.debug
 
     public abstract class Window
     {
+        public nothrow Window(const string& name_) : name(name_)
+        {
+        }
         public default virtual ~Window();
         public void SetDebugger(Debugger* debugger_)
         {
@@ -151,8 +154,23 @@ namespace cmsx.debug
             screen->MoveCursorTo(Top() + Height() - 1, Left() + Width() - 1);
             RtAddCh(rightBottom);
             RtAttrOff(RtColorPair(color));
+            if (!name.IsEmpty())
+            {
+                RtAttrOn(RtColorPair(color));
+                screen->MoveCursorTo(Top(), Left() + 2);
+                string s;
+                s.Append(' ');
+                s.Append(name);
+                s.Append(' ');
+                for (char c : s)
+                {
+                    int ch = cast<int>(c);
+                    RtAddCh(ch);
+                }
+                RtAttrOff(RtColorPair(color));
+            }
         }
-        public abstract CommandResult HandleKey(int key, Debugger* debugger);
+        public abstract CommandResult HandleKey(int key);
         public int Top()
         {
             if (zoomed)
@@ -201,6 +219,7 @@ namespace cmsx.debug
         {
             screen->MoveCursorTo(cursorRow, cursorCol);
         }
+        public string name;
         public Screen* screen;
         public Debugger* debugger;
         public short color;
@@ -415,9 +434,9 @@ namespace cmsx.debug
 
     public class Disassembly : Window
     {
-        public nothrow Disassembly(Breakpoints* breakpoints_) : disassemblyFormatter(), breakpoints(breakpoints_)
+        public nothrow Disassembly(Breakpoints* breakpoints_) : base("Disassembly"), disassemblyFormatter(), breakpoints(breakpoints_)
         {
-            header.SetHeader("*ESC* Exit *F1* Help *F2* Enter Command *F4* Output *F5* Run *F6* Memory *F8* Change Focus *F9* Toggle Breakpoint *F10* Step Over *F11* Step Into *F12* Step Out");
+            header.SetHeader("*ESC* Exit *F1* Help *F2* Enter Command *F4* Output *F5* Run *F6* Memory *F8* Focus Next *F9* Toggle Breakpoint *F10* Step Over *F11* Step Into *F12* Step Out");
         }
         public nothrow void SetSymbolTable(cmsx.object.SymbolTable* symbolTable)
         {
@@ -438,14 +457,14 @@ namespace cmsx.debug
             cursorRow = top;
             cursorCol = left;
         }
-        public override CommandResult HandleKey(int key, Debugger* debugger)
+        public override CommandResult HandleKey(int key)
         {
             switch (key)
             {
                 case keyDown:
                 {
                     debugger->middle = debugger->middle + 4u;
-                    return CommandResult.cont;
+                    return CommandResult.update;
                 }
                 case keyUp:
                 {
@@ -453,12 +472,12 @@ namespace cmsx.debug
                     {
                         debugger->middle = debugger->middle - 4u;
                     }
-                    return CommandResult.cont;
+                    return CommandResult.update;
                 }
                 case keyPgDown:
                 {
                     debugger->middle = debugger->middle + 4u * debugger->numInstsInWindow;
-                    return CommandResult.cont;
+                    return CommandResult.update;
                 }
                 case keyPgUp:
                 {
@@ -466,12 +485,12 @@ namespace cmsx.debug
                     {
                         debugger->middle = debugger->middle - 4u * debugger->numInstsInWindow;
                     }
-                    return CommandResult.cont;
+                    return CommandResult.update;
                 }
                 case keyHome:
                 {
                     debugger->middle = debugger->pc;
-                    return CommandResult.cont;
+                    return CommandResult.update;
                 }
                 case keyF5:
                 {
@@ -481,7 +500,7 @@ namespace cmsx.debug
                 case keyF9:
                 {
                     debugger->ToggleBreakpoint(debugger->middle);
-                    return CommandResult.cont;
+                    return CommandResult.update;
                 }
                 case keyF10:
                 {
@@ -645,11 +664,352 @@ namespace cmsx.debug
         private ulong instructionEndAddress;
     }
 
+    public class Memory : Window
+    {
+        public enum Format
+        {
+            bytes, wydes, tetras, octas
+        }
+        public nothrow Memory() :
+            base("Memory - data segment"), header(), segmentIndex(cmsx.machine.dataSegmentIndex), start(0u), end(0u), bufferStartAddress(0u), topAddress(0u), numBytesInRow(0), init(true),
+            format(Format.bytes)
+        {
+            header.SetHeader("*ESC* Exit *F1* Help *F2* Enter Command *F3* Disassembly *F4* Output *F8* Focus Next *D* Data Segment *P* Pool Segment *S* Stack Segment *B* Bytes *W* Wydes *T* Tetras *O* Octas");
+        }
+        public nothrow void SetScreen(Screen* screen_)
+        {
+            screen = screen_;
+            color = whiteOnBlue;
+            top = 1;
+            left = 0;
+            height = screen->rows - top - screen->commandWindowHeight - screen->outputWindowHeight;
+            width = screen->cols - left;
+            cursorRow = top + 1;
+            cursorCol = left + 1;
+            numBytesInRow = 16;
+        }
+        public override void Draw()
+        {
+            header.Draw(screen);
+            DrawFrame();
+            RtAttrOn(RtColorPair(color));
+            if (init)
+            {
+                ResolveLimits(debugger->process);
+                init = false;
+            }
+            int n = Height() - 2;
+            for (int i = 0; i < n; ++i)
+            {
+                int row = Top() + 1 + i;
+                int col = Left() + 1;
+                screen->MoveCursorTo(row, col);
+                ulong addr = topAddress + cast<ulong>(i * numBytesInRow);
+                string line = GetLine(addr);
+                for (int j = 0; j < Width() - 2; ++j)
+                {
+                    int ch = cast<int>(' ');
+                    if (j < line.Length())
+                    {
+                        ch = cast<int>(line[j]);
+                    }
+                    RtAddCh(ch);
+                }
+            }
+            RtAttrOff(RtColorPair(color));
+        }
+        public override CommandResult HandleKey(int key)
+        {
+            switch (key)
+            {
+                case keyHome: GoStart(); return CommandResult.update;
+                case keyEnd: GoEnd(); return CommandResult.update;
+                case keyUp: GoUp(); return CommandResult.update;
+                case keyDown: GoDown(); return CommandResult.update;
+                case keyPgUp: GoPageUp(); return CommandResult.update;
+                case keyPgDown: GoPageDown(); return CommandResult.update;
+                case cast<int>('d') : segmentIndex = cmsx.machine.dataSegmentIndex; name = "Memory - data segment"; init = true; return CommandResult.update;
+                case cast<int>('p') : segmentIndex = cmsx.machine.poolSegmentIndex; name = "Memory - pool segment"; init = true; return CommandResult.update;
+                case cast<int>('s') : segmentIndex = cmsx.machine.stackSegmentIndex; name = "Memory - stack segment"; init = true; return CommandResult.update;
+                case cast<int>('b') : format = Format.bytes; init = true; return CommandResult.update;
+                case cast<int>('w') : format = Format.wydes; init = true; return CommandResult.update;
+                case cast<int>('t') : format = Format.tetras; init = true; return CommandResult.update;
+                case cast<int>('o') : format = Format.octas; init = true; return CommandResult.update;
+            }
+            return CommandResult.cont;
+        }
+        private long NumBytesInWindow()
+        {
+            long numBytesInWindow = (cast<long>(Height()) - 2) * numBytesInRow;
+            return numBytesInWindow;
+        }
+        private void GoStart()
+        {
+            topAddress = start;
+        }
+        private void GoEnd()
+        {
+            long addr = cast<long>(end);
+            addr = addr - NumBytesInWindow();
+            if (addr < cast<long>(start))
+            {
+                addr = cast<long>(start);
+            }
+            topAddress = cast<ulong>(addr);
+        }
+        private void GoUp()
+        {
+            topAddress = Max(start, topAddress - cast<ulong>(numBytesInRow));
+        }
+        private void GoDown()
+        {
+            topAddress = topAddress + cast<ulong>(numBytesInRow);
+            if (topAddress + cast<ulong>(NumBytesInWindow()) >= end)
+            {
+                GoEnd();
+            }
+        }
+        private void GoPageUp()
+        {
+            long addr = cast<long>(topAddress);
+            addr = addr - NumBytesInWindow();
+            if (addr < cast<long>(start))
+            {
+                addr = cast<long>(start);
+            }
+            topAddress = cast<ulong>(addr);
+        }
+        private void GoPageDown()
+        {
+            long numBytesInWindow = NumBytesInWindow();
+            long addr = cast<long>(topAddress);
+            addr = addr + numBytesInWindow;
+            if (addr + numBytesInWindow >= cast<long>(end))
+            {
+                GoEnd();
+            }
+            else
+            {
+                topAddress = cast<ulong>(addr);
+            }
+        }
+        private void ResolveLimits(cmsx.kernel.Process* process)
+        {
+            cmsx.kernel.SegmentDescriptor* segmentDescriptor = process->memoryTable.segmentDescriptors[segmentIndex];
+            start = segmentDescriptor->baseAddress + segmentDescriptor->startAddress;
+            end = start + segmentDescriptor->length;
+            topAddress = start;
+            bufferStartAddress = 0u;
+        }
+        private string GetLine(ulong addr)
+        {
+            if (addr >= end)
+            {
+                return string();
+            }
+            string line = "#";
+            line.Append(ToHexString(addr));
+            if (format == Format.bytes)
+            {
+                string chars;
+                for (int j = 0; j < numBytesInRow; ++j)
+                {
+                    if (j == numBytesInRow / 2)
+                    {
+                        line.Append(" -");
+                    }
+                    int x = GetByte(addr + cast<ulong>(j));
+                    if (x != -1)
+                    {
+                        byte b = cast<byte>(x);
+                        line.Append(' ').Append(ToHexString(b));
+                        char c = cast<char>(b);
+                        if (!IsPrintable(c))
+                        {
+                            c = '.';
+                        }
+                        chars.Append(c);
+                    }
+                    else
+                    {
+                        line.Append("   ");
+                        chars.Append(' ');
+                    }
+                }
+                line.Append(' ');
+                line.Append(chars);
+                return line;
+            }
+            else if (format == Format.wydes)
+            {
+                for (int j = 0; j < numBytesInRow / 2; ++j)
+                {
+                    if (j == numBytesInRow / 4)
+                    {
+                        line.Append(" -");
+                    }
+                    int x = GetWyde(addr + cast<ulong>(j * 2));
+                    if (x != -1)
+                    {
+                        ushort w = cast<ushort>(x);
+                        line.Append(' ').Append(ToHexString(w));
+                    }
+                    else
+                    {
+                        line.Append(' ', 4 + 1);
+                    }
+                }
+                return line;
+            }
+            else if (format == Format.tetras)
+            {
+                for (int j = 0; j < numBytesInRow / 4; ++j)
+                {
+                    if (j == numBytesInRow / 8)
+                    {
+                        line.Append(" -");
+                    }
+                    long x = GetTetra(addr + cast<ulong>(j * 4));
+                    if (x != -1)
+                    {
+                        uint i = cast<uint>(x);
+                        line.Append(' ').Append(ToHexString(i));
+                    }
+                    else
+                    {
+                        line.Append(' ', 8 + 1);
+                    }
+                }
+                return line;
+            }
+            else if (format == Format.octas)
+            {
+                for (int j = 0; j < numBytesInRow / 8; ++j)
+                {
+                    if (j == numBytesInRow / 16)
+                    {
+                        line.Append(" -");
+                    }
+                    Pair<ulong, bool> x = GetOcta(addr + cast<ulong>(j * 8));
+                    if (x.second)
+                    {
+                        line.Append(' ').Append(ToHexString(x.first));
+                    }
+                    else
+                    {
+                        line.Append(' ', 16 + 1);
+                    }
+                }
+                return line;
+            }
+            else
+            {
+                return string();
+            }
+        }
+        private int GetByte(ulong addr)
+        {
+            bool fillBuf = false;
+            if (bufferStartAddress == 0u)
+            {
+                bufferStartAddress = start;
+                fillBuf = true;
+            }
+            while (bufferStartAddress >= start && addr < bufferStartAddress)
+            {
+                bufferStartAddress = bufferStartAddress - cast<ulong>(buffer.Length());
+                fillBuf = true;
+            }
+            while (bufferStartAddress + cast<ulong>(buffer.Length()) < end && addr >= bufferStartAddress + cast<ulong>(buffer.Length()))
+            {
+                bufferStartAddress = bufferStartAddress + cast<ulong>(buffer.Length());
+                fillBuf = true;
+            }
+            if (fillBuf)
+            {
+                FillBuffer();
+            }
+            if (addr >= bufferStartAddress && addr < bufferStartAddress + cast<ulong>(buffer.Length()))
+            {
+                return buffer[cast<long>(addr - bufferStartAddress)];
+            }
+            return -1;
+        }
+        private int GetWyde(ulong addr)
+        {
+            int b1 = GetByte(addr);
+            int b2 = GetByte(addr + 1u);
+            if (b1 != -1 && b2 != -1)
+            {
+                return cast<ushort>(b1) << 8u | cast<ushort>(b2);
+            }
+            else
+            {
+                return -1;
+            }
+        }
+        private long GetTetra(ulong addr)
+        {
+            int b1 = GetByte(addr);
+            int b2 = GetByte(addr + 1u);
+            int b3 = GetByte(addr + 2u);
+            int b4 = GetByte(addr + 3u);
+            if (b1 != -1 && b2 != -1 && b3 != -1 && b4 != -1)
+            {
+                return cast<uint>(b1) << 24u | cast<uint>(b2) << 16u | cast<uint>(b3) << 8u | cast<uint>(b4);
+            }
+            else
+            {
+                return -1;
+            }
+        }
+        private Pair<ulong, bool> GetOcta(ulong addr)
+        {
+            int b1 = GetByte(addr);
+            int b2 = GetByte(addr + 1u);
+            int b3 = GetByte(addr + 2u);
+            int b4 = GetByte(addr + 3u);
+            int b5 = GetByte(addr + 4u);
+            int b6 = GetByte(addr + 5u);
+            int b7 = GetByte(addr + 6u);
+            int b8 = GetByte(addr + 7u);
+            if (b1 != -1 && b2 != -1 && b3 != -1 && b4 != -1 && b5 != -1 && b6 != -1 && b7 != -1 && b8 != -1)
+            {
+                return MakePair(
+                    cast<ulong>(b1) << 56u | cast<ulong>(b2) << 48u | cast<ulong>(b3) << 40u | cast<ulong>(b4) << 32u | cast<ulong>(b5) << 24u | cast<ulong>(b6) << 16u | cast<ulong>(b7) << 8u | cast<ulong>(b8),
+                    true);
+            }
+            else
+            {
+                return MakePair(cast<ulong>(0u), false);
+            }
+        }
+        private void FillBuffer()
+        {
+            ulong size = Min(end - bufferStartAddress, cast<ulong>(buffer.Length()));
+            int result = cmsx.kernel.ReadProcessMemory(*debugger->machine, debugger->process, bufferStartAddress, &buffer[0], size);
+            if (result != 0)
+            {
+                cmsx.machine.Panic("debugger: could not read process memory");
+            }
+        }
+        private HeaderLine header;
+        private byte segmentIndex;
+        private ulong start;
+        private ulong end;
+        private ulong topAddress;
+        private byte[4096] buffer;
+        private ulong bufferStartAddress;
+        private int numBytesInRow;
+        private bool init;
+        private Format format;
+    }
+
     public class Output : Window
     {
-        public nothrow Output()
+        public nothrow Output() : base("Output")
         {
-            header.SetHeader("*ESC* Exit *F1* Help *F2* Enter Command *F3* Disassembly *F6* Memory *F8* Change Focus");
+            header.SetHeader("*ESC* Exit *F1* Help *F2* Enter Command *F3* Disassembly *F6* Memory *F8* Focus Next");
         }
         public void SetScreen(Screen* screen_)
         {
@@ -697,7 +1057,7 @@ namespace cmsx.debug
                 screen->MoveCursorTo(cursorRow, cursorCol);
             }
         }
-        public override CommandResult HandleKey(int key, Debugger* debugger)
+        public override CommandResult HandleKey(int key)
         {
             return CommandResult.cont;
         }
@@ -708,9 +1068,9 @@ namespace cmsx.debug
 
     public class CommandWindow : Window
     {
-        public nothrow CommandWindow()
+        public nothrow CommandWindow() : base("Command")
         {
-            header.SetHeader("*ESC* Exit *F1* Help *F3* Disassembly *F4* Output *F6* Memory *F8* Change Focus");
+            header.SetHeader("*ESC* Exit *F1* Help *F3* Disassembly *F4* Output *F6* Memory *F8* Focus Next");
         }
         public void SetScreen(Screen* screen_)
         {
@@ -740,7 +1100,7 @@ namespace cmsx.debug
             }
             RtAttrOff(RtColorPair(color));
         }
-        public override CommandResult HandleKey(int key, Debugger* debugger)
+        public override CommandResult HandleKey(int key)
         {
             return CommandResult.cont;
         }
@@ -761,6 +1121,7 @@ namespace cmsx.debug
             disassembly.SetSymbolTable(symbolTable);
             disassembly.SetBreakpoints(&breakpoints);
             disassembly.SetScreen(screen.Get());
+            memory.SetScreen(screen.Get());
             output.SetScreen(screen.Get());
             commandWindow.SetScreen(screen.Get());
             programEntryPoint = process->EntryPoint();
@@ -771,7 +1132,10 @@ namespace cmsx.debug
             WriteInst(process, programEntryPoint, debugBreakInst);
             disassembly.SetDebugger(this);
             disassembly.visible = true;
-            disassembly.next = &output;
+            disassembly.next = &memory;
+            memory.SetDebugger(this);
+            memory.visible = false;
+            memory.next = &output;
             output.SetDebugger(this);
             output.visible = true;
             output.next = &commandWindow;
@@ -825,6 +1189,7 @@ namespace cmsx.debug
                     else if (ch == keyF3)
                     {
                         disassembly.visible = true;
+                        memory.visible = false;
                         screen->focusedWindow = &disassembly;
                         screen->Update();
                     }
@@ -832,6 +1197,13 @@ namespace cmsx.debug
                     {
                         output.visible = true;
                         screen->focusedWindow = &output;
+                        screen->Update();
+                    }
+                    else if (ch == keyF6)
+                    {
+                        disassembly.visible = false;
+                        memory.visible = true;
+                        screen->focusedWindow = &memory;
                         screen->Update();
                     }
                     else if (ch == keyF8)
@@ -846,15 +1218,15 @@ namespace cmsx.debug
                     }
                     else
                     {
-                        CommandResult result = screen->focusedWindow->HandleKey(ch, this);
+                        CommandResult result = screen->focusedWindow->HandleKey(ch);
                         if (result == CommandResult.ret)
                         {
                             return;
                         }
-                    }
-                    if (middle != prevMiddle)
-                    {
-                        screen->Update();
+                        else if (result == CommandResult.update)
+                        {
+                            screen->Update();
+                        }
                     }
                     ch = RtGetCh();
                 }
@@ -1032,6 +1404,7 @@ namespace cmsx.debug
         private Breakpoints breakpoints;
         private List<Breakpoint> stepBreakpoints;
         private Disassembly disassembly;
+        private Memory memory;
         private Output output;
         private CommandWindow commandWindow;
         private ulong programEntryPoint;

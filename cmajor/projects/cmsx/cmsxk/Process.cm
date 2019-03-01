@@ -479,11 +479,11 @@ namespace cmsx.kernel
     }
 
     public nothrow void InitializeProcessMemory(Machine& machine, Process* process,
-        ulong textSegmentBaseAddress, ulong textSegmentSize, ulong dataSegmentSize, ulong poolSegmentSize, ulong stackSegmentSize)
+        ulong textSegmentStartAddress, ulong textSegmentSize, ulong dataSegmentSize, ulong poolSegmentSize, ulong stackSegmentSize)
     {
-        InitializeMemoryTable(machine, process->memoryTable, textSegmentBaseAddress, textSegmentSize, dataSegmentSize, poolSegmentSize, stackSegmentSize);
+        InitializeMemoryTable(machine, process->memoryTable, textSegmentStartAddress, textSegmentSize, dataSegmentSize, poolSegmentSize, stackSegmentSize);
         AllocateMemory(machine.GetMemory(), process->memoryTable);
-        ulong sp = stackSegmentBaseAddress + process->memoryTable.segmentDescriptors[stackSegmentIndex]->startAddress;
+        ulong sp = process->memoryTable.segmentDescriptors[stackSegmentIndex]->baseAddress + process->memoryTable.segmentDescriptors[stackSegmentIndex]->startAddress;
         Registers& regs = machine.GetRegisters();
         ulong prevAX = regs.Get(regAX);
         ulong prevBX = regs.Get(regBX);
