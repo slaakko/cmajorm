@@ -14,6 +14,12 @@
         EXTERN Main
 
 Main    FUNC
+        STO fp,sp,0
+        SET fp,sp
+        INCL sp,#8
         CALL $0,main
         CALL $0,exit
+        SET sp,fp
+        LDO fp,sp,0
+        RET
 Main    ENDF

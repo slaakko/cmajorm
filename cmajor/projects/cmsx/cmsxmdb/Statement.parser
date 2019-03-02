@@ -1,0 +1,27 @@
+using System;
+
+namespace cmsx.debug
+{
+    grammar StatementGrammar
+    {
+        using ExprGrammar.Expression;
+        skip Spaces;
+
+        Statement : Node*
+            ::= PrintStatement{ value = PrintStatement; }
+            |   TraceStatement{ value = TraceStatement; }
+            ;
+
+        PrintStatement : Node*
+            ::= ((keyword("print") | keyword("p")) Expression:expr){ value = new PrintStatementNode(span, expr); }
+            ;
+
+        TraceStatement : Node*
+            ::= ((keyword("trace") | keyword("t")) Expression:expr?){ value = new TraceStatementNode(span, expr); }
+            ;
+
+        Spaces
+            ::= [ \t]+
+            ;
+    }
+}

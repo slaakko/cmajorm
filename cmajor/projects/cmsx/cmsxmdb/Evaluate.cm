@@ -1,0 +1,534 @@
+using System;
+using System.Text.Parsing;
+
+namespace cmsx.debug
+{
+    public class EvaluationException : Exception
+    {
+        public nothrow EvaluationException(const string& message_, const Span& span_) : base(message_), span(span_)
+        {
+        }
+        public Span span;
+    }
+    
+    public enum Type : byte
+    {
+        byte_ = 0u, wyde = 1u, tetra = 2u, octa = 3u, char_ = 4u, string = 5u
+    }
+
+    public enum Modifier : byte
+    {
+        none = 0u, signed = 1u, hex = 2u
+    }
+
+    public enum Operator : byte
+    {
+        unaryPlus, unaryMinus, complement, deref, mul, div, mod, shiftLeft, shiftRight, and_, add, sub, or_, xor_
+    }
+
+    public ustring OperatorStr(Operator op)
+    {
+        switch (op)
+        {
+            case Operator.unaryPlus: return u"+";
+            case Operator.unaryMinus: return u"-";
+            case Operator.complement: return u"~";
+            case Operator.deref: return u"*";
+            case Operator.mul: return u"*";
+            case Operator.div: return u"/";
+            case Operator.mod: return u"%";
+            case Operator.shiftLeft: return u"<<";
+            case Operator.shiftRight: return u">>";
+            case Operator.and_: return u"&";
+            case Operator.add: return u"+";
+            case Operator.sub: return u"-";
+            case Operator.or_: return u"|";
+            case Operator.xor_: return u"^";
+        }
+        return ustring();
+    }
+
+    public class ResultFormat
+    {
+        public nothrow ResultFormat() : type(Type.octa), modifier(Modifier.none)
+        {
+        }
+        public Type type;
+        public Modifier modifier;
+    }
+
+    public ustring TypeStr(Type type)
+    {
+        switch (type)
+        {
+            case Type.byte_: return u"b";
+            case Type.wyde: return u"w";
+            case Type.tetra: return u"t";
+            case Type.octa: return u"o";
+            case Type.char_: return u"c";
+            case Type.string: return u"s";
+        }
+        return ustring();
+    }
+
+    public ustring ModifierStr(Modifier modifier)
+    {
+        switch (modifier)
+        {
+            case Modifier.none: return ustring();
+            case Modifier.signed: return u"s";
+            case Modifier.hex: return u"x";
+        }
+        return ustring();
+    }
+
+    public ustring FormatStr(ResultFormat format)
+    {
+        return TypeStr(format.type) + ModifierStr(format.modifier);
+    }
+
+    public abstract class Node
+    {
+        public nothrow Node(const Span& span_) : span(span_)
+        {
+        }
+        public default virtual ~Node();
+        public abstract void Accept(Visitor& visitor);
+        public Span span;
+    }
+
+    public abstract class UnaryNode : Node
+    {
+        public nothrow UnaryNode(const Span& span_, Node* child_) : base(span_), child(child_)
+        {
+        }
+        public UniquePtr<Node> child;
+    }
+
+    public abstract class BinaryNode : Node
+    {
+        public nothrow BinaryNode(const Span& span_, Node* left_, Node* right_) : base(span_), left(left_), right(right_)
+        {
+        }
+        public UniquePtr<Node> left;
+        public UniquePtr<Node> right;
+    }
+
+    public class SegmentNode : Node
+    {
+        public nothrow SegmentNode(const Span& span_, byte segmentIndex_) : base(span_), segmentIndex(segmentIndex_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public byte segmentIndex;
+    }
+
+    public class RegNumberNode : Node
+    {
+        public nothrow RegNumberNode(const Span& span_, byte reg_) : base(span_), reg(reg_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public byte reg;
+    }
+
+    public class DecNumberNode : Node
+    {
+        public nothrow DecNumberNode(const Span& span_, ulong value_) : base(span_), value(value_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public ulong value;
+    }
+
+    public class HexNumberNode : Node
+    {
+        public nothrow HexNumberNode(const Span& span_, ulong value_) : base(span_), value(value_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public ulong value;
+    }
+
+    public class SymbolNode : Node
+    {
+        public nothrow SymbolNode(const Span& span_, const ustring& id_) : base(span_), id(id_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public ustring id;
+    }
+
+    public class ParenthesizedExpressionNode : UnaryNode
+    {
+        public nothrow ParenthesizedExpressionNode(const Span& span_, Node* child_) : base(span_, child_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+    }
+
+    public class UnaryExpressionNode : UnaryNode
+    {
+        public nothrow UnaryExpressionNode(const Span& span_, Node* child_, Operator op_) : base(span_, child_), op(op_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public Operator op;
+    }
+
+    public class BinaryExpressionNode : BinaryNode
+    {
+        public nothrow BinaryExpressionNode(const Span& span_, Node* left_, Node* right_, Operator op_) : base(span_, left_, right_), op(op_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public Operator op;
+    }
+
+    public class FormatExpressionNode : UnaryNode
+    {
+        public nothrow FormatExpressionNode(const Span& span_, Node* child_, ResultFormat format_) : base(span_, child_), format(format_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public ResultFormat format;
+    }
+
+    public class PrintStatementNode : Node
+    {
+        public nothrow PrintStatementNode(const Span& span_, Node* expression_) : base(span_), expression(expression_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public UniquePtr<Node> expression;
+    }
+
+    public class TraceStatementNode : Node
+    {
+        public nothrow TraceStatementNode(const Span& span_, Node* expression_) : base(span_), expression(expression_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public UniquePtr<Node> expression;
+    }
+
+    public class Parser
+    {
+        static Parser() : instance(new Parser())
+        {
+        }
+        public static Parser& Instance()
+        {
+            return *instance;
+        }
+        private Parser() : grammar(new StatementGrammar())
+        {
+        }
+        public UniquePtr<Node> Parse(const ustring& line)
+        {
+            UniquePtr<Node> node = grammar->Parse(line.Chars(), line.Chars() + line.Length(), 0, "");
+            return node;
+        }
+        private static UniquePtr<Parser> instance;
+        private StatementGrammar* grammar;
+    }
+
+    public void Evaluate(Debugger* debugger, const ustring& line)
+    {
+        try
+        {
+            UniquePtr<Node> node = Parser.Instance().Parse(line);
+            Evaluator evaluator(debugger);
+            node->Accept(evaluator);
+        }
+        catch (const ExpectationFailure& ex)
+        {
+            string error = "error: " + ex.Message();
+            debugger->AddOutputLine(ToUtf32(error), 0u);
+        }
+        catch (const ParsingException& ex)
+        {
+            string error = "error: " + ex.Message();
+            debugger->AddOutputLine(ToUtf32(error), 0u);
+        }
+        catch (const EvaluationException& ex)
+        {
+            string error = "error: " + ex.Message();
+            debugger->AddOutputLine(ToUtf32(error), 0u);
+            debugger->AddOutputLine(line, 0u);
+            debugger->AddOutputLine(ustring(' ', ex.span.start) + u"^", 0u);
+        }
+        catch (const Exception& ex)
+        {
+            string error = "error: " + ex.Message();
+            debugger->AddOutputLine(ToUtf32(error), 0u);
+        }
+    }
+
+    public class Visitor
+    {
+        public virtual void Visit(SegmentNode& node)
+        {
+        }
+        public virtual void Visit(RegNumberNode& node)
+        {
+        }
+        public virtual void Visit(DecNumberNode& node)
+        {
+        }
+        public virtual void Visit(HexNumberNode& node)
+        {
+        }
+        public virtual void Visit(SymbolNode& node)
+        {
+        }
+        public virtual void Visit(ParenthesizedExpressionNode& node)
+        {
+        }
+        public virtual void Visit(UnaryExpressionNode& node)
+        {
+        }
+        public virtual void Visit(BinaryExpressionNode& node)
+        {
+        }
+        public virtual void Visit(FormatExpressionNode& node)
+        {
+        }
+        public virtual void Visit(PrintStatementNode& node)
+        {
+        }
+        public virtual void Visit(TraceStatementNode& node)
+        {
+        }
+    }
+
+    public class Evaluator : Visitor
+    {
+        public nothrow Evaluator(Debugger* debugger_) : debugger(debugger_)
+        {
+        }
+        public override void Visit(PrintStatementNode& node)
+        {
+            node.expression->Accept(*this);
+            str.Append(u" = ");
+            switch (format.modifier)
+            {
+                case Modifier.none:
+                {
+                    switch (format.type)
+                    {
+                        case Type.byte_: str.Append(ToUtf32(ToString(cast<byte>(value)))); break;
+                        case Type.wyde: str.Append(ToUtf32(ToString(cast<ushort>(value)))); break;
+                        case Type.tetra: str.Append(ToUtf32(ToString(cast<uint>(value)))); break;
+                        case Type.octa: str.Append(ToUtf32(ToString(cast<ulong>(value)))); break;
+                        case Type.char_: str.Append(u'\'').Append(ToUtf32(ToString(cast<char>(value)))).Append(u'\''); break;
+                        case Type.string: str.Append(u"\"").Append(debugger->ReadStringFromMemory(value)).Append(u"\""); break;
+                    }
+                    break;
+                }
+                case Modifier.signed:
+                {
+                    switch (format.type)
+                    {
+                        case Type.byte_: str.Append(ToUtf32(ToString(cast<sbyte>(value)))); break;
+                        case Type.wyde: str.Append(ToUtf32(ToString(cast<short>(value)))); break;
+                        case Type.tetra: str.Append(ToUtf32(ToString(cast<int>(value)))); break;
+                        case Type.octa: str.Append(ToUtf32(ToString(cast<long>(value)))); break;
+                    }
+                    break;
+                }
+                case Modifier.hex:
+                {
+                    switch (format.type)
+                    {
+                        case Type.byte_: str.Append(u"#" + ToUtf32(ToHexString(cast<byte>(value)))); break;
+                        case Type.wyde: str.Append(u"#" + ToUtf32(ToHexString(cast<ushort>(value)))); break;
+                        case Type.tetra: str.Append(u"#" + ToUtf32(ToHexString(cast<uint>(value)))); break;
+                        case Type.octa: str.Append(u"#" + ToUtf32(ToHexString(cast<ulong>(value)))); break;
+                    }
+                    break;
+                }
+            }
+            debugger->AddOutputLine(str, value);
+        }
+        public override void Visit(TraceStatementNode& node)
+        {
+            str = u"trace";
+            if (node.expression.Get() != null)
+            {
+                str.Append(u" ");
+                node.expression->Accept(*this);
+            }
+            else
+            {
+                value = 10u;
+            }
+            str.Append(u":");
+            debugger->AddOutputLine(str, 0u);
+            debugger->Trace(value);
+        }
+        public override void Visit(FormatExpressionNode& node)
+        {
+            format = node.format;
+            node.child->Accept(*this);
+            ustring formatStr;
+            formatStr = FormatStr(format);
+            if (!formatStr.IsEmpty())
+            {
+                str.Append('.').Append(formatStr);
+            }
+        }
+        public override void Visit(BinaryExpressionNode& node)
+        {
+            node.left->Accept(*this);
+            ulong left = value;
+            str.Append(u" ").Append(OperatorStr(node.op)).Append(u" ");
+            node.right->Accept(*this);
+            ulong right = value;
+            bool error = false;
+            switch (node.op)
+            {
+                case Operator.mul: value = left * right; break;
+                case Operator.div: value = left / right; break;
+                case Operator.mod: value = left % right; break;
+                case Operator.shiftLeft: value = left << right; break;
+                case Operator.shiftRight: value = left >> right; break;
+                case Operator.and_: value = left & right; break;
+                case Operator.add: value = left + right; break;
+                case Operator.sub: value = left - right; break;
+                case Operator.or_: value = left | right; break;
+                case Operator.xor_: value = left ^ right; break;
+                default: error = true; break;
+            }
+            if (error)
+            {
+                throw EvaluationException("unknown binary operator", node.span);
+            }
+        }
+        public override void Visit(UnaryExpressionNode& node)
+        {
+            bool error = false;
+            try
+            {
+                str.Append(OperatorStr(node.op));
+                node.child->Accept(*this);
+                switch (node.op)
+                {
+                    case Operator.unaryPlus: break;
+                    case Operator.unaryMinus: value = -value; break;
+                    case Operator.complement: value = ~value; break;
+                    case Operator.deref:
+                    {
+                        byte size = 8u;
+                        switch (format.type)
+                        {
+                            case Type.byte_: size = 1u; break;
+                            case Type.wyde: size = 2u; break;
+                            case Type.tetra: size = 4u; break;
+                            case Type.octa: size = 8u; break;
+                            case Type.char_: size = 1u; break;
+                        }
+                        value = debugger->ReadMemoryContent(value, size);
+                        break;
+                    }
+                    default: error = true; break;
+                }
+            }
+            catch (const Exception& ex)
+            {
+                throw EvaluationException(ex.Message(), node.span);
+            }
+            if (error)
+            {
+                throw EvaluationException("unknown unary operator", node.span);
+            }
+        }
+        public override void Visit(ParenthesizedExpressionNode& node)
+        {
+            str.Append(u"(");
+            node.child->Accept(*this);
+            str.Append(u")");
+        }
+        public override void Visit(SymbolNode& node)
+        {
+            try
+            {
+                str.Append(node.id);
+                value = debugger->GetSymbolValue(ToUtf8(node.id));
+            }
+            catch (const Exception& ex)
+            {
+                throw EvaluationException(ex.Message(), node.span);
+            }
+        }
+        public override void Visit(DecNumberNode& node)
+        {
+            str.Append(ToUtf32(ToString(node.value)));
+            value = node.value;
+        }
+        public override void Visit(HexNumberNode& node)
+        {
+            str.Append(u"#" + ToUtf32(ToHexString(node.value)));
+            value = node.value;
+        }
+        public override void Visit(RegNumberNode& node)
+        {
+            str.Append(u"$").Append(ToUtf32(ToString(node.reg)));
+            value = debugger->GetRegisterValue(node.reg);
+        }
+        public override void Visit(SegmentNode& node)
+        {
+            bool error = false;
+            switch (node.segmentIndex)
+            {
+                case cmsx.machine.textSegmentIndex: str.Append(u"$t"); value = cmsx.machine.textSegmentBaseAddress; break;
+                case cmsx.machine.dataSegmentIndex: str.Append(u"$d"); value = cmsx.machine.dataSegmentBaseAddress; break;
+                case cmsx.machine.poolSegmentIndex: str.Append(u"$p"); value = cmsx.machine.poolSegmentBaseAddress; break;
+                case cmsx.machine.stackSegmentIndex: str.Append(u"$s"); value = cmsx.machine.stackSegmentBaseAddress; break;
+                case cmsx.machine.numSegments: str.Append(u"$k"); value = cmsx.machine.kernelBaseAddress; break;
+                default: error = true; break;
+            }
+            if (error)
+            {
+                throw EvaluationException("invalid segment index " + ToString(node.segmentIndex), node.span);
+            }
+        }
+        private Debugger* debugger;
+        private ulong value;
+        private ResultFormat format;
+        private ustring str;
+    }
+}

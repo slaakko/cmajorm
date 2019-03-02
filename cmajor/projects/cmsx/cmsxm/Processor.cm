@@ -188,6 +188,12 @@ namespace cmsx.machine
                 Instruction* inst = FetchInstruction(pc, mem, x, y, z);
                 while (inst != null)
                 {
+                    if (pc == breakAddr && breakInst != 0u)
+                    {
+                        WriteInstruction(breakAddr, breakInst, mem);
+                        breakAddr = 0u;
+                        breakInst = 0u;
+                    }
                     inst->Execute(regs, mem, x, y, z);
                     SetPC(inst, pc, prevPC);
                     IncrementCycleCounter();
@@ -253,6 +259,10 @@ namespace cmsx.machine
             pc = pc + 1u;
             Instruction* inst = machine.GetInst(opCode);
             return inst;
+        }
+        private nothrow void WriteInstruction(ulong addr, uint inst, Memory& mem)
+        {
+            mem.WriteUInt(addr, inst, Protection.execute);
         }
         private nothrow void IncrementCycleCounter()
         {
@@ -354,8 +364,20 @@ namespace cmsx.machine
             z = cast<byte>(inst);
             instruction = machine.GetInst(opCode);
         }
+        public void SetBreak(ulong breakAddr, uint breakInst)
+        {
+            this->breakAddr = breakAddr;
+            this->breakInst = breakInst;
+        }
+        public void ClearBreak()
+        {
+            this->breakAddr = 0u;
+            this->breakInst = 0u;
+        }
         private Machine& machine;
         private Registers regs;
         private bool exiting;
+        private ulong breakAddr;
+        private uint breakInst;
     }
 }

@@ -1,0 +1,100 @@
+using System;
+
+namespace cmsx.debug
+{
+    grammar ExprGrammar
+    {
+        using stdlib.identifier;
+        using stdlib.hex;
+        using stdlib.ulong;
+        using stdlib.byte;
+
+        Expression : Node*
+            ::= FormatExpression{ value = FormatExpression; }
+            ;
+
+        WeakOperator : Operator
+            ::= '+'{ value = Operator.add; }
+            |   '-'{ value = Operator.sub; }
+            |   '|'{ value = Operator.or_; }
+            |   '^'{ value = Operator.xor_; }
+            ;
+
+        StrongOperator : Operator
+            ::= '*'{ value = Operator.mul; }
+            |   '/'{ value = Operator.div; }
+            |   '%'{ value = Operator.mod; }
+            |   "<<"{ value = Operator.shiftLeft; }
+            |   ">>"{ value = Operator.shiftRight; }
+            |   '&'{ value = Operator.and_; }
+            ;
+
+        UnaryOperator : Operator
+            ::= '+'{ value = Operator.unaryPlus; }
+            |   '-'{ value = Operator.unaryMinus; }
+            |   '~'{ value = Operator.complement; }
+            |   '*'{ value = Operator.deref; }
+            ;
+
+        Format : ResultFormat
+            ::= ( ('b' | '1'){ value.type = Type.byte_; }
+                | ('w' | '2'){ value.type = Type.wyde; }
+                | ('t' | '4'){ value.type = Type.tetra; }
+                | ('o' | '8'){ value.type = Type.octa; }
+                | 'c'{ value.type = Type.char_; }
+                | 's'{ value.type = Type.string; }
+                )
+                ('s'{ value.modifier = Modifier.signed; } | 'x'{ value.modifier = Modifier.hex; })?
+            ;
+
+        FormatExpression : Node*
+            ::= BinaryExpression{ value = BinaryExpression; } ('.' Format:f{ value = new FormatExpressionNode(span, value, f); })?
+            ;
+
+        BinaryExpression : Node*
+            ::= Term:left{ value = left; } (WeakOperator:op Term:right{ value = new BinaryExpressionNode(span, value, right, op); })*
+            ;
+
+        Term : Node*
+            ::= UnaryExpression:left{ value = left; } (StrongOperator:op UnaryExpression:right{ value = new BinaryExpressionNode(span, value, right, op); })*
+            ;
+
+        UnaryExpression : Node*
+            ::= ('(' Expression:expr')'){ value = new ParenthesizedExpressionNode(span, expr); }
+            |   UnaryOperator:op UnaryExpression:child{ value = new UnaryExpressionNode(span, child, op); }
+            |   PrimaryExpression{ value = PrimaryExpression; }
+            ;
+
+        PrimaryExpression : Node*
+            ::= Segment{ value = Segment; }
+            |   RegNumber{ value = RegNumber; }
+            |   DecNumber{ value = DecNumber; }
+            |   HexNumber{ value = HexNumber; }
+            |   Symbol{ value = Symbol; }
+            ;
+
+        Segment : SegmentNode*
+            ::= "$t"{ value = new SegmentNode(span, cmsx.machine.textSegmentIndex); }
+            |   "$d"{ value = new SegmentNode(span, cmsx.machine.dataSegmentIndex); }
+            |   "$p"{ value = new SegmentNode(span, cmsx.machine.poolSegmentIndex); }
+            |   "$s"{ value = new SegmentNode(span, cmsx.machine.stackSegmentIndex); }
+            |   "$k"{ value = new SegmentNode(span, cmsx.machine.numSegments); }
+            ;
+
+        RegNumber : RegNumberNode*
+            ::= ('$' byte:x){ value = new RegNumberNode(span, x); }
+            ;
+
+        DecNumber : DecNumberNode*
+            ::= ulong:x{ value = new DecNumberNode(span, x); }
+            ;
+
+        HexNumber : HexNumberNode*
+            ::= ('#' hex:x){ value = new HexNumberNode(span, x); }
+            ;
+
+        Symbol : SymbolNode*
+            ::= identifier:id{ value = new SymbolNode(span, id); }
+            ;
+    }
+}

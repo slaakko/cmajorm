@@ -13,6 +13,14 @@ namespace cmsx.debug
         ret, cont, update
     }
 
+    class ByStart : Rel<cmsx.object.Symbol*>
+    {
+        public bool operator()(cmsx.object.Symbol* left, cmsx.object.Symbol* right) const
+        {
+            return left->start < right->start;
+        }
+    }
+
     public const short blackOnWhite = 1;
     public const short whiteOnBlue = 2;
     public const short cyanOnBlue = 3;
@@ -718,6 +726,12 @@ namespace cmsx.debug
             }
             RtAttrOff(RtColorPair(color));
         }
+        public void ShowAddress(byte segment, ulong address)
+        {
+            segmentIndex = segment;
+            topAddress = address;
+            init = true;
+        }
         public override CommandResult HandleKey(int key)
         {
             switch (key)
@@ -1009,7 +1023,7 @@ namespace cmsx.debug
     {
         public nothrow Output() : base("Output")
         {
-            header.SetHeader("*ESC* Exit *F1* Help *F2* Enter Command *F3* Disassembly *F6* Memory *F8* Focus Next");
+            header.SetHeader("*ESC* Exit *F1* Help *F2* Enter Command *F3* Disassembly *F6* Memory *F8* Focus Next *C* Clear");
         }
         public void SetScreen(Screen* screen_)
         {
@@ -1019,7 +1033,7 @@ namespace cmsx.debug
             left = 0;
             height = screen->outputWindowHeight;
             width = screen->cols - left;
-            cursorRow = top;
+            cursorRow = top + height - 2;
             cursorCol = left;
             topLineIndex = 0;
         }
@@ -1029,29 +1043,33 @@ namespace cmsx.debug
             DrawFrame();
             int n = Top() + Height() - 1;
             cursorCol = Left() + 1;
+            RtAttrOn(RtColorPair(color));
             for (int i = Top() + 1; i < n; ++i)
             {
                 int lineIndex = topLineIndex + i - (Top() + 1);
-                screen->MoveCursorTo(i, Left() + 1);
                 ustring line;
-                if (lineIndex < lines.Count())
+                if (lineIndex >= 0 && lineIndex < lines.Count())
                 {
-                    line = ToUtf32(lines[lineIndex]);
+                    line = lines[lineIndex].first;
                 }
-                RtAttrOn(RtColorPair(color));
-                for (int j = Left() + 1; j < Left() + Width() - Left() - 1; ++j)
+                int m = Width() - 1;
+                for (int j = Left() + 1; j < m; ++j)
                 {
+                    screen->MoveCursorTo(i, j);
                     int charIndex = j - (Left() + 1);
                     int ch = cast<int>(' ');
-                    if (charIndex < line.Length())
+                    if (charIndex >= 0 && charIndex < line.Length())
                     {
-                        ch = cast<int>(line[charIndex]);
+                        uchar c = line[charIndex];
+                        if (IsGraphic(c))
+                        {
+                            ch = cast<int>(c);
+                        }
                     }
                     RtAddCh(ch);
                 }
-                RtAttrOff(RtColorPair(color));
-                cursorRow = i;
             }
+            RtAttrOff(RtColorPair(color));
             if (screen->focusedWindow == this)
             {
                 screen->MoveCursorTo(cursorRow, cursorCol);
@@ -1059,10 +1077,108 @@ namespace cmsx.debug
         }
         public override CommandResult HandleKey(int key)
         {
+            switch (key)
+            {
+                case keyEnter:
+                {
+                    int lineIndex = topLineIndex + cursorRow - (Top() + 1);
+                    if (lineIndex >= 0 && lineIndex < lines.Count())
+                    {
+                        ulong address = lines[lineIndex].second;
+                        if (address != 0u)
+                        {
+                            debugger->ShowAddress(address);
+                            return CommandResult.update;
+                        }
+                    }
+                    break;
+                }
+                case keyUp:
+                {
+                    if (cursorRow > Top() + 1)
+                    {
+                        --cursorRow;
+                        return CommandResult.update;
+                    }
+                    else if (topLineIndex > 0)
+                    {
+                        topLineIndex = topLineIndex - 1;
+                        return CommandResult.update;
+                    }
+                    break;
+                }
+                case keyDown:
+                {
+                    if (cursorRow < Top() + Height() - 2)
+                    {
+                        ++cursorRow;
+                        return CommandResult.update;
+                    }
+                    else
+                    {
+                        int n = Height() - 2;
+                        if (topLineIndex < lines.Count() - n)
+                        {
+                            topLineIndex = topLineIndex + 1;
+                            return CommandResult.update;
+                        }
+                    }
+                    break;
+                }
+                case cast<int>('c'):
+                {
+                    lines.Clear();
+                    int n = Height() - 2;
+                    topLineIndex = cast<int>(lines.Count() - n);
+                    cursorRow = Top() + Height() - 2;
+                    return CommandResult.update;
+                }
+            }
             return CommandResult.cont;
         }
+        public void AddChar(uchar c, ulong address)
+        {
+            if (lines.IsEmpty())
+            {
+                lines.Add(MakePair(ustring(), cast<ulong>(0u)));
+            }
+            if (IsGraphic(c))
+            {
+                lines.Back().first.Append(c);
+                lines.Back().second = address;
+            }
+            else
+            {
+                if (c == '\n')
+                {
+                    lines.Add(MakePair(ustring(), cast<ulong>(0u)));
+                }
+                else if (cast<int>(c) < 128)
+                {
+                    lines.Back().first.Append(ToUtf32(MakeCharLiteral(cast<char>(c))));
+                    lines.Back().second = address;
+                }
+            }
+        }
+        public void AddLine(const ustring& line, ulong address)
+        {
+            for (uchar c : line)
+            {
+                AddChar(c, address);
+            }
+            if (!lines.IsEmpty())
+            {
+                if (!lines.Back().first.IsEmpty())
+                {
+                    lines.Add(MakePair(ustring(), cast<ulong>(0u)));
+                }
+            }
+            int n = Height() - 2;
+            topLineIndex = cast<int>(lines.Count() - n);
+            cursorRow = Top() + Height() - 2;
+        }
         private HeaderLine header;
-        private List<string> lines;
+        private List<Pair<ustring, ulong>> lines;
         private int topLineIndex;
     }
 
@@ -1082,6 +1198,8 @@ namespace cmsx.debug
             width = screen->cols - left;
             cursorRow = top + height - 2;
             cursorCol = left + 2;
+            pos = 0;
+            prevWasTab = false;
         }
         public override void Draw()
         {
@@ -1094,17 +1212,199 @@ namespace cmsx.debug
                 for (int j = Left() + 1; j < Left() + Width() - Left() - 1; ++j)
                 {
                     screen->MoveCursorTo(i, j);
+                    int index = j - (Left() + 2);
                     int ch = cast<int>(' ');
+                    if (i == Top() + 1 && index >= 0 && index < line.Length())
+                    {
+                        ch = cast<int>(line[index]);
+                    }
                     RtAddCh(ch);
                 }
             }
+            if (!matches.IsEmpty())
+            {
+                string m = " " + ToString(matchIndex + 1) + "/" + ToString(matches.Count()) + " ";
+                screen->MoveCursorTo(n, cast<int>(Width() - 2 - m.Length()));
+                for (char c : m)
+                {
+                    RtAddCh(cast<int>(c));
+                }
+            }
+            if (screen->focusedWindow == this)
+            {
+                screen->MoveCursorTo(cursorRow, cursorCol);
+            }
             RtAttrOff(RtColorPair(color));
+        }
+        public void ClearMatches()
+        {
+            prevWasTab = false;
+            matches.Clear();
+            matchIndex = 0;
         }
         public override CommandResult HandleKey(int key)
         {
+            switch (key)
+            {
+                case keyEnter:
+                {
+                    ClearMatches();
+                    Evaluate(debugger, line);
+                    history.Add(line);
+                    historyIndex = cast<int>(history.Count());
+                    line.Clear();
+                    pos = 0;
+                    cursorCol = Left() + 2;
+                    return CommandResult.update;
+                }
+                case keyTab:
+                {
+                    if (!prevWasTab)
+                    {
+                        debugger->FindSymbolsMatchingPrefix(line, matches);
+                        matchIndex = 0;
+                    }
+                    else if (!matches.IsEmpty())
+                    {
+                        matchIndex = cast<int>((matchIndex + 1) % matches.Count());
+                    }
+                    if (matchIndex >= 0 && matchIndex < matches.Count())
+                    {
+                        line = matches[matchIndex];
+                    }
+                    pos = cast<int>(line.Length());
+                    cursorCol = Left() + 2 + pos;
+                    prevWasTab = true;
+                    return CommandResult.update;
+                }
+                case keyBackspace:
+                {
+                    ClearMatches();
+                    if (pos > 0)
+                    {
+                        line = line.Substring(0, pos - 1) + line.Substring(pos);
+                        --pos;
+                        cursorCol = cursorCol - 1;
+                        return CommandResult.update;
+                    }
+                    break;
+                }
+                case keyDel:
+                {
+                    ClearMatches();
+                    if (pos < line.Length())
+                    {
+                        ++pos;
+                        cursorCol = cursorCol + 1;
+                        line = line.Substring(0, pos - 1) + line.Substring(pos);
+                        --pos;
+                        cursorCol = cursorCol - 1;
+                        return CommandResult.update;
+                    }
+                    break;
+                }
+                case keyHome:
+                {
+                    ClearMatches();
+                    pos = 0;
+                    cursorCol = Left() + 2;
+                    return CommandResult.update;
+                }
+                case keyEnd:
+                {
+                    prevWasTab = false;
+                    pos = cast<int>(line.Length());
+                    cursorCol = Left() + 2 + pos;
+                    return CommandResult.update;
+                }
+                case keyLeft:
+                {
+                    ClearMatches();
+                    if (pos > 0)
+                    {
+                        --pos;
+                        cursorCol = cursorCol - 1;
+                        return CommandResult.update;
+                    }
+                    break;
+                }
+                case keyRight:
+                {
+                    ClearMatches();
+                    if (pos < line.Length())
+                    {
+                        ++pos;
+                        cursorCol = cursorCol + 1;
+                        return CommandResult.update;
+                    }
+                    break;
+                }
+                case keyUp:
+                {
+                    ClearMatches();
+                    if (historyIndex > 0)
+                    {
+                        --historyIndex;
+                        if (historyIndex >= 0 && historyIndex < history.Count())
+                        {
+                            line = history[historyIndex];
+                            pos = cast<int>(line.Length());
+                            cursorCol = Left() + 2 + pos;
+                            return CommandResult.update;
+                        }
+                    }
+                    break;
+                }
+                case keyDown:
+                {
+                    ClearMatches();
+                    if (historyIndex < history.Count())
+                    {
+                        ++historyIndex;
+                        if (historyIndex >= 0 && historyIndex < history.Count())
+                        {
+                            line = history[historyIndex];
+                            pos = cast<int>(line.Length());
+                            cursorCol = Left() + 2 + pos;
+                            return CommandResult.update;
+                        }
+                    }
+                    line = ustring();
+                    pos = 0;
+                    cursorCol = Left() + 2;
+                    return CommandResult.update;
+                }
+                default:
+                {
+                    ClearMatches();
+                    uchar c = cast<uchar>(key);
+                    if (IsGraphic(c))
+                    {
+                        if (pos < line.Length())
+                        {
+                            line = line.Substring(0, pos) + ustring(c, 1) + line.Substring(pos);
+                        }
+                        else
+                        {
+                            line.Append(c);
+                        }
+                        cursorCol = cursorCol + 1;
+                        ++pos;
+                        return CommandResult.update;
+                    }
+                    break;
+                }
+            }
             return CommandResult.cont;
         }
         private HeaderLine header;
+        private List<ustring> history;
+        private ustring line;
+        private int pos;
+        private int historyIndex;
+        private bool prevWasTab;
+        private List<ustring> matches;
+        private int matchIndex;
     }
 
     public class Debugger : cmsx.kernel.Debugger
@@ -1167,6 +1467,7 @@ namespace cmsx.debug
                         inst = bp->inst;
                     }
                 }
+                machine->GetProcessor().ClearBreak();
                 middle = pc;
                 screen->Update();
                 int ch = RtGetCh();
@@ -1296,6 +1597,11 @@ namespace cmsx.debug
             }
             return ReadInst(process, pc);
         }
+        public void AddOutputLine(const ustring& line, ulong address)
+        {
+            output.AddLine(line, address);
+            screen->Update();
+        }
         public void ToggleBreakpoint(ulong address)
         {
             Breakpoint* bp = breakpoints.GetBreakpoint(address);
@@ -1323,6 +1629,11 @@ namespace cmsx.debug
         {
             uint i = GetInst(process, pc, inst);
             WriteInst(process, pc, i);
+            Breakpoint* bp = breakpoints.GetBreakpoint(pc);
+            if (bp != null)
+            {
+                machine->GetProcessor().SetBreak(bp->address, debugBreakInst);
+            }
             byte opCode = cast<byte>(i >> 24u);
             byte x = cast<byte>(i >> 16u);
             byte y = cast<byte>(i >> 8u);
@@ -1390,6 +1701,238 @@ namespace cmsx.debug
             Breakpoint bp(Breakpoint.Kind.step, retAddress, GetInst(process, retAddress, -1));
             stepBreakpoints.Add(bp);
             WriteInst(process, retAddress, debugBreakInst);
+        }
+        public ulong GetSymbolValue(const string& id)
+        {
+            cmsx.object.Symbol* symbol = symbolTable->GetSymbol(id);
+            if (symbol != null)
+            {
+                if (symbol->value.GetFlag(cmsx.object.Value.Flag.register))
+                {
+                    return GetRegisterValue(cast<byte>(symbol->value.value));
+                }
+                SegmentDescriptor* segmentDescriptor = null;
+                switch (symbol->segment)
+                {
+                    case cmsx.object.Segment.text: segmentDescriptor = process->memoryTable.segmentDescriptors[cmsx.machine.textSegmentIndex]; break;
+                    case cmsx.object.Segment.data: segmentDescriptor = process->memoryTable.segmentDescriptors[cmsx.machine.dataSegmentIndex]; break;
+                    case cmsx.object.Segment.pool: segmentDescriptor = process->memoryTable.segmentDescriptors[cmsx.machine.poolSegmentIndex]; break;
+                    case cmsx.object.Segment.stack: segmentDescriptor = process->memoryTable.segmentDescriptors[cmsx.machine.stackSegmentIndex]; break;
+                }
+                if (segmentDescriptor != null)
+                {
+                    return segmentDescriptor->baseAddress + segmentDescriptor->startAddress + symbol->value.value; 
+                }
+                return symbol->value.value;
+            }
+            else
+            {
+                throw Exception("unknown symbol '" + id + "'");
+            }
+        }
+        public void FindSymbolsMatchingPrefix(const ustring& line, List<ustring>& matches)
+        {
+            matches.Clear();
+            ustring prefix;
+            long start = 0u;
+            for (start = line.Length() - 1; start >= 0; --start)
+            {
+                if (line[start] == ' ')
+                {
+                    break;
+                }
+            }
+            start = start + 1;
+            prefix = line.Substring(start);
+            string prefixStr = ToUtf8(prefix);
+            if (!prefixStr.IsEmpty())
+            {
+                for (const UniquePtr<cmsx.object.Symbol>& symbol : symbolTable->Symbols())
+                {
+                    if (symbol->name.StartsWith(prefixStr))
+                    {
+                        matches.Add(TrimAll(line.Substring(0, start) + u" " + ToUtf32(symbol->name)));
+                    }
+                }
+            }
+        }
+        public ulong GetRegisterValue(byte regNumber)
+        {
+            return machine->GetRegisters().Get(regNumber);
+        }
+        public ustring ReadStringFromMemory(ulong address)
+        {
+            string s;
+            byte x = cast<byte>(ReadMemoryContent(address, 1u));
+            while (x != 0u)
+            {
+                s.Append(cast<char>(x));
+                ++address;
+                x = cast<byte>(ReadMemoryContent(address, 1u));
+            }
+            return ToUtf32(s);
+        }
+        public ulong ReadMemoryContent(ulong address, byte size)
+        {
+            SegmentDescriptor* segmentDescriptor = null;
+            if (address >= cmsx.machine.textSegmentBaseAddress && address < cmsx.machine.dataSegmentBaseAddress)
+            {
+                segmentDescriptor = process->memoryTable.segmentDescriptors[cmsx.machine.textSegmentIndex];
+            }
+            else if (address >= cmsx.machine.dataSegmentBaseAddress && address < cmsx.machine.poolSegmentBaseAddress)
+            {
+                segmentDescriptor = process->memoryTable.segmentDescriptors[cmsx.machine.dataSegmentIndex];
+            }
+            else if (address >= cmsx.machine.poolSegmentBaseAddress && address < cmsx.machine.stackSegmentBaseAddress)
+            {
+                segmentDescriptor = process->memoryTable.segmentDescriptors[cmsx.machine.poolSegmentIndex];
+            }
+            else if (address >= cmsx.machine.stackSegmentBaseAddress && address < cmsx.machine.kernelBaseAddress)
+            {
+                segmentDescriptor = process->memoryTable.segmentDescriptors[cmsx.machine.stackSegmentIndex];
+            }
+            if (segmentDescriptor == null)
+            {
+                throw Exception("invalid access to virtual address #" + ToHexString(address));
+            }
+            if (address >= segmentDescriptor->baseAddress + segmentDescriptor->startAddress && address <= segmentDescriptor->baseAddress + segmentDescriptor->startAddress + segmentDescriptor->length)
+            {
+                ulong value = 0u;
+                int result = cmsx.kernel.ReadProcessMemory(*machine, process, address, value, size);
+                if (result == 0)
+                {
+                    return value;
+                }
+                else
+                {
+                    throw Exception("could not read process memory from virtual address #" + ToHexString(address));
+                }
+            }
+            else
+            {
+                throw Exception("invalid access to virtual address #" + ToHexString(address));
+            }
+            return 0u;
+        }
+        public void ShowAddress(ulong address)
+        {
+            SegmentDescriptor* segmentDescriptor = null;
+            byte segmentIndex = cmsx.machine.numSegments;
+            if (address >= cmsx.machine.textSegmentBaseAddress && address < cmsx.machine.dataSegmentBaseAddress)
+            {
+                segmentDescriptor = process->memoryTable.segmentDescriptors[cmsx.machine.textSegmentIndex];
+                segmentIndex = cmsx.machine.textSegmentIndex;
+            }
+            else if (address >= cmsx.machine.dataSegmentBaseAddress && address < cmsx.machine.poolSegmentBaseAddress)
+            {
+                segmentDescriptor = process->memoryTable.segmentDescriptors[cmsx.machine.dataSegmentIndex];
+                segmentIndex = cmsx.machine.dataSegmentIndex;
+            }
+            else if (address >= cmsx.machine.poolSegmentBaseAddress && address < cmsx.machine.stackSegmentBaseAddress)
+            {
+                segmentDescriptor = process->memoryTable.segmentDescriptors[cmsx.machine.poolSegmentIndex];
+                segmentIndex = cmsx.machine.poolSegmentIndex;
+            }
+            else if (address >= cmsx.machine.stackSegmentBaseAddress && address < cmsx.machine.kernelBaseAddress)
+            {
+                segmentDescriptor = process->memoryTable.segmentDescriptors[cmsx.machine.stackSegmentIndex];
+                segmentIndex = cmsx.machine.stackSegmentIndex;
+            }
+            if (address >= segmentDescriptor->baseAddress + segmentDescriptor->startAddress && address <= segmentDescriptor->baseAddress + segmentDescriptor->startAddress + segmentDescriptor->length)
+            {
+                switch (segmentIndex)
+                {
+                    case cmsx.machine.textSegmentIndex:
+                    {
+                        disassembly.visible = true;
+                        memory.visible = false;
+                        middle = address;
+                        break;
+                    }
+                    case cmsx.machine.dataSegmentIndex: case cmsx.machine.poolSegmentIndex: case cmsx.machine.stackSegmentIndex:
+                    {
+                        memory.visible = true;
+                        disassembly.visible = false;
+                        memory.ShowAddress(segmentIndex, address);
+                        break;
+                    }
+                }
+            }
+        }
+        public void Trace(ulong count)
+        {
+            List<ulong> addresses;
+            addresses.Add(pc);
+            ulong sp = machine->GetRegisters().Get(cmsx.machine.regSP);
+            ulong fp = machine->GetRegisters().Get(cmsx.machine.regFP);
+            ulong address = pc;
+            ulong prevFP = pc;
+            ulong retAddress = 0u;
+            ulong frame = 0u;
+            while (frame < count && prevFP != 0u)
+            {
+                uint inst = ReadInst(process, address);
+                if (InProlog(inst))
+                {
+                    if (ReadProcessMemory(*machine, process, sp - 8u, retAddress, 8u) != 0)
+                    {
+                        cmsx.machine.Panic("debugger: could not read process memory");
+                    }
+                    ++frame;
+                    address = retAddress;
+                    if (address != 0u)
+                    {
+                        addresses.Add(address);
+                    }
+                }
+                if (ReadProcessMemory(*machine, process, fp - 8u, retAddress, 8u) != 0)
+                {
+                    cmsx.machine.Panic("debugger: could not read process memory");
+                }
+                if (ReadProcessMemory(*machine, process, fp, prevFP, 8u) != 0)
+                {
+                    cmsx.machine.Panic("debugger: could not read process memory");
+                }
+                ++frame;
+                address = retAddress;
+                if (address != 0u)
+                {
+                    addresses.Add(address);
+                }
+                fp = prevFP;
+            }
+            List<cmsx.object.Symbol*> functionSymbols;
+            for (const UniquePtr<cmsx.object.Symbol>& symbol : symbolTable->Symbols())
+            {
+                if (symbol->value.GetFlag(cmsx.object.Value.Flag.function))
+                {
+                    functionSymbols.Add(symbol.Get());
+                }
+            }
+            Sort(functionSymbols, ByStart());
+            for (long i = addresses.Count() - 1; i >= 0; --i)
+            {
+                ulong address = addresses[i];
+                cmsx.object.Symbol s;
+                s.start = address;
+                List<cmsx.object.Symbol*>.ConstIterator it = LowerBound(functionSymbols.CBegin(), functionSymbols.CEnd(), &s, ByStart());
+                string functionName;
+                if (it == functionSymbols.CEnd())
+                {
+                    --it;
+                }
+                cmsx.object.Symbol* found = *it;
+                if (found->start > address && it != functionSymbols.CBegin())
+                {
+                    --it;
+                    found = *it;
+                }
+                if (address >= found->start && address < found->start + found->length)
+                {
+                    functionName = found->name;
+                }
+                output.AddLine(ToUtf32(Format(ToString(i), 3, FormatJustify.right)) + u": #" + ToUtf32(ToHexString(address)) + u" : " + ToUtf32(functionName), address);
+            }
         }
         public cmsx.machine.Machine* machine;
         public cmsx.kernel.Process* process;
