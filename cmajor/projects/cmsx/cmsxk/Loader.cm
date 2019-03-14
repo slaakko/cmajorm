@@ -96,6 +96,9 @@ namespace cmsx.kernel
             ulong poolEnd = poolSegmentBaseAddress + poolDataLength;
             process->poolStart = poolStart;
             process->poolEnd = poolEnd;
+            Symbol* functionTableSymbol = executable->GetSymbolTable().GetSymbol("@function_table");
+            process->functionTableAddress = dataSegmentBaseAddress + functionTableSymbol->start;
+            process->functionTableLength = functionTableSymbol->length;
             executable = cast<ExecutableFile*>(binaryFile.Release());
             Kernel& kernel = Kernel.Instance();
             kernel.SetExecutable(executable);

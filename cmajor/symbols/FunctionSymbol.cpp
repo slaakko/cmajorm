@@ -876,7 +876,7 @@ void FunctionSymbol::GenerateVirtualCall(Emitter& emitter, std::vector<GenObject
                 thisPtr = emitter.CreateBitCast(thisPtr, vmtPtrHolderClass->AddPointer(GetSpan())->IrType(emitter));
             }
             void* vmtPtr = emitter.GetVmtPtr(thisPtr, vmtPtrHolderClass->VmtPtrIndex(), classType->VmtPtrType(emitter));
-            void* methodPtr = emitter.GetMethodPtr(vmtPtr, VmtIndex() + functionVmtIndexOffset);
+            void* methodPtr = emitter.GetMethodPtr(vmtPtr, VmtIndex() + GetFunctionVmtIndexOffset());
             callee = emitter.CreateBitCast(methodPtr, emitter.GetIrTypeForPtrType(IrType(emitter)));
         }
     }

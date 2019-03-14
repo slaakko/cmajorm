@@ -8,7 +8,7 @@
 
 namespace cmsxi {
 
-GlobalVariable::GlobalVariable(Type* type_, const std::string& name_) : type(type_), name(name_), initializer(nullptr)
+GlobalVariable::GlobalVariable(Type* type_, const std::string& name_) : type(type_), name(name_), initializer(nullptr), linkOnce(false)
 {
 }
 
@@ -25,12 +25,16 @@ Type* GlobalVariable::GetType(Context& context)
 void GlobalVariable::Write(Context& context, CodeFormatter& formatter)
 {
     formatter.Write(type->Name());
+    if (linkOnce)
+    {
+        formatter.Write(" once");
+    }
     formatter.Write(" ");
     formatter.Write(name);
     if (initializer)
     {
         formatter.Write(" = ");
-        if (initializer->IsAggregateValue())
+        if (initializer->IsAggregateValue() || initializer->IsStringValue())
         {
             formatter.Write(initializer->Name(context));
         }
@@ -47,7 +51,7 @@ void GlobalVariable::Write(Context& context, CodeFormatter& formatter)
     }
 }
 
-DataRepository::DataRepository() : globalVariableDefinitions(), globalVariableMap()
+DataRepository::DataRepository() : globalVariableDefinitions(), globalVariableMap(), nextStringId(0)
 {
 }
 
@@ -61,6 +65,14 @@ GlobalVariable* DataRepository::GetOrInsertGlobal(const std::string& name, Type*
     GlobalVariable* globalVariable = new GlobalVariable(type, name);
     globalVariableDefinitions.push_back(std::unique_ptr<GlobalVariable>(globalVariable));
     globalVariableMap[name] = globalVariable;
+    return globalVariable;
+}
+
+GlobalVariable* DataRepository::CreateGlobalStringPtr(Context& context, const std::string& stringValue)
+{
+    GlobalVariable* globalVariable = new GlobalVariable(context.GetByteType(), "string" + std::to_string(nextStringId++) + "_" + compileUnitId);
+    globalVariable->SetInitializer(context.GetStringValue(globalVariable->GetType(context), stringValue));
+    globalVariableDefinitions.push_back(std::unique_ptr<GlobalVariable>(globalVariable));
     return globalVariable;
 }
 
@@ -78,6 +90,11 @@ void DataRepository::Write(Context& context, CodeFormatter& formatter)
     formatter.DecIndent();
     formatter.WriteLine("}");
     formatter.WriteLine();
+}
+
+void DataRepository::SetCompileUnitId(const std::string& compileUnitId_)
+{
+    compileUnitId = compileUnitId_;
 }
 
 } // namespace cmsxi

@@ -22,6 +22,8 @@ public:
     Value* GetParam(int index) const;
     std::string Name(Context& context) override { return "@" + name; }
     void Write(CodeFormatter& formatter, Context& context);
+    void SetLinkOnce() { linkOnce = true; }
+    void SetMdId(int mdId_) { mdId = mdId_; }
 private:
     std::string name;
     FunctionType* type;
@@ -29,6 +31,8 @@ private:
     std::unique_ptr<BasicBlock> entryBlock;
     std::vector<std::unique_ptr<BasicBlock>> basicBlocks;
     uint64_t nextResultNumber;
+    bool linkOnce;
+    int mdId;
 };
 
 } // namespace cmsxi

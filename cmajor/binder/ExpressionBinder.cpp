@@ -2371,13 +2371,20 @@ void ExpressionBinder::Visit(NewNode& newNode)
     CloneContext cloneContext;
     InvokeNode* invokeMemAlloc = nullptr;
     bool memDebug = boundCompileUnit.GetModule().IsSymbolDefined(U"MEM_DEBUG");
-    if (memDebug)
+    if (GetBackEnd() == BackEnd::llvm)
     {
-        invokeMemAlloc = new InvokeNode(newNode.GetSpan(), new IdentifierNode(newNode.GetSpan(), U"RtMemAllocInfo"));
+        if (memDebug)
+        {
+            invokeMemAlloc = new InvokeNode(newNode.GetSpan(), new IdentifierNode(newNode.GetSpan(), U"RtMemAllocInfo"));
+        }
+        else
+        {
+            invokeMemAlloc = new InvokeNode(newNode.GetSpan(), new IdentifierNode(newNode.GetSpan(), U"RtMemAlloc"));
+        }
     }
-    else
+    else if (GetBackEnd() == BackEnd::cmsx)
     {
-        invokeMemAlloc = new InvokeNode(newNode.GetSpan(), new IdentifierNode(newNode.GetSpan(), U"RtMemAlloc"));
+        invokeMemAlloc = new InvokeNode(newNode.GetSpan(), new DotNode(newNode.GetSpan(), new IdentifierNode(newNode.GetSpan(), U"System"), new IdentifierNode(newNode.GetSpan(), U"MemAlloc")));
     }
     invokeMemAlloc->AddArgument(new SizeOfNode(newNode.GetSpan(), newNode.TypeExpr()->Clone(cloneContext)));
     if (memDebug)

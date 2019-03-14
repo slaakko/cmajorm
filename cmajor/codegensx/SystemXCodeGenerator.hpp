@@ -13,13 +13,14 @@
 #include <cmajor/binder/BoundClass.hpp>
 #include <cmajor/symbols/SymbolTable.hpp>
 #include <cmajor/symbols/Module.hpp>
+#include <cmajor/ir/Emitter.hpp>
 
 namespace cmajor { namespace codegensx {
 
 using namespace cmajor::binder;
 using namespace cmajor::symbols;
 
-class CODEGENSX_API SystemXCodeGenerator : public cmajor::codegenbase::CodeGenerator, public BoundNodeVisitor
+class CODEGENSX_API SystemXCodeGenerator : public cmajor::codegenbase::CodeGenerator, public BoundNodeVisitor, public cmajor::ir::EmittingDelegate
 {
 public:
     SystemXCodeGenerator(cmajor::ir::EmittingContext& emittingContext_);
@@ -78,6 +79,10 @@ public:
     void GenJumpingBoolCode();
     void SetTarget(BoundStatement* labeledStatement);
     void ExitBlocks(BoundCompoundStatement* targetBlock);
+    void* GetGlobalStringPtr(int stringId) override;
+    void* GetGlobalWStringConstant(int stringId) override;
+    void* GetGlobalUStringConstant(int stringId) override;
+    void* GetGlobalUuidConstant(int uuidId) override;
 private:
     cmajor::ir::Emitter* emitter;
     cmajor::ir::EmittingContext* emittingContext;
@@ -109,6 +114,11 @@ private:
     bool basicBlockOpen;
     void* defaultDest;
     std::unordered_map<IntegralValue, void*, IntegralValueHash>* currentCaseMap;
+    std::unordered_map<int, void*> utf8stringMap;
+    std::unordered_map<int, void*> utf16stringMap;
+    std::unordered_map<int, void*> utf32stringMap;
+    std::unordered_map<int, void*> uuidMap;
+    std::string compileUnitId;
 };
 
 } } // namespace cmajor::codegensx

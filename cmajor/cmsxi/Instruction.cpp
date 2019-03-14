@@ -385,6 +385,10 @@ void StoreInstruction::Write(CodeFormatter& formatter, Function& function, Conte
 
 ArgInstruction::ArgInstruction(Value* arg_) : Instruction(), arg(arg_)
 {
+    if (arg == nullptr)
+    {
+        int x = 0;
+    }
 }
 
 void ArgInstruction::Write(CodeFormatter& formatter, Function& function, Context& context)

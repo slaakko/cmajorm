@@ -1,9 +1,16 @@
+// =================================
+// Copyright (c) 2019 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
 public const byte sys_exit = 0u;
 public const byte sys_wait = 1u;
 public const byte sys_fork = 2u;
 public const byte sys_write = 3u;
 public const byte sys_pool_end = 4u;
 public const byte sys_set_pool_end = 5u;
+public const byte sys_debug_break = 6u;
+public const byte sys_stack_trace = 7u;
 
 public cdecl nothrow void exit(byte exitCode)
 {
@@ -20,7 +27,7 @@ public cdecl nothrow int fork()
     return cast<int>(trap(0u, sys_fork, 0u));
 }
 
-public cdecl nothrow long write(int handle, void* buffer, ulong count)
+public cdecl nothrow long write(int handle, void* buffer, long count)
 {
     return trap(0u, sys_write, 0u, handle, buffer, count);
 }
@@ -33,4 +40,9 @@ public cdecl nothrow void* pool_end()
 public cdecl nothrow long set_pool_end(void* poolEnd)
 {
     return trap(0u, sys_set_pool_end, 0u, poolEnd);
+}
+
+public cdecl nothrow long stack_trace(void* buffer, long count)
+{
+    return trap(0u, sys_stack_trace, 0u, buffer, count);
 }

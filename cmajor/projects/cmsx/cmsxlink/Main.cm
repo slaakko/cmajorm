@@ -5,7 +5,7 @@ using cmsx.object;
 
 public nothrow const char* Version()
 {
-    return "0.1.0";
+    return "0.2.0";
 }
 
 void PrintHelp()
@@ -20,9 +20,13 @@ void PrintHelp()
     Console.Out() << "--out=FILE (-o=FILE)" << endl();
     Console.Out() << "  set output file name to FILE." << endl();
     Console.Out() << "  default is 'a.out'." << endl();
+    Console.Out() << "--clsid=FILE (-c=FILE)" << endl();
+    Console.Out() << "  read class id's from FILE." << endl();
     Console.Out() << "--stack=STACKSIZE (-s=STACKSIZE)" << endl();
     Console.Out() << "  set stack segment size to STACKSIZE bytes." << endl();
     Console.Out() << "  default is 64K bytes." << endl();
+    Console.Out() << "--debug (-d)" << endl();
+    Console.Out() << "  debug linking" << endl();
 }
 
 int main(int argc, const char** argv)
@@ -38,10 +42,13 @@ int main(int argc, const char** argv)
         List<string> fileNames;
         fileNames.Add(GetFullPath(mainPath));
         bool verbose = false;
+        bool debug = false;
         ulong stackSize = 64u * cast<ulong>(1024u);
         ulong poolSize = 4u * cast<ulong>(1024u);
         string executableFileName = GetFullPath("a.out");
+        string clsIdFileName;
         bool userFilesGiven = false;
+        bool removeUnusedCode = true;
         for (int i = 1; i < argc; ++i)
         {
             string arg = argv[i];
@@ -55,6 +62,10 @@ int main(int argc, const char** argv)
                         if (components[0] == "-o" || components[0] == "--out")
                         {
                             executableFileName = GetFullPath(components[1]);
+                        }
+                        else if (components[0] == "-c" || components[0] == "--clsid")
+                        {
+                            clsIdFileName = GetFullPath(components[1]);
                         }
                         else if (components[0] == "-s" || components[0] == "--stack")
                         {
@@ -78,6 +89,10 @@ int main(int argc, const char** argv)
                 {
                     PrintHelp();
                     return 0;
+                }
+                else if (arg == "-d" || arg == "--debug")
+                {
+                    debug = true;
                 }
                 else
                 {
@@ -104,6 +119,11 @@ int main(int argc, const char** argv)
         {
             Console.Out() << "Cmajor System X Linker version " << Version() << endl();
         }
+        ClassIdMap classIdMap;
+        if (!clsIdFileName.IsEmpty())
+        {
+            classIdMap.Read(clsIdFileName);
+        }
         List<UniquePtr<BinaryFile>> binaryFiles;
         for (const string& fileName : fileNames)
         {
@@ -116,7 +136,7 @@ int main(int argc, const char** argv)
             binaryFiles.Add(Rvalue(binaryFile));
         }
         ExecutableFile executable(executableFileName, true, stackSize, poolSize);
-        Link(executable, binaryFiles);
+        Link(executable, binaryFiles, classIdMap, removeUnusedCode, debug);
         if (verbose)
         {
             Console.Out() << "==> " << executableFileName << endl();

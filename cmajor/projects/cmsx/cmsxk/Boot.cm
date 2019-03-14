@@ -5,7 +5,7 @@ namespace cmsx.kernel
 {
     public const char* KernelVersion()
     {
-        return "0.1.0";
+        return "0.2.0";
     }
 
     public nothrow void InitializeInterruptVector(Machine& machine)
@@ -65,6 +65,9 @@ namespace cmsx.kernel
         TrapHandler debugBreakSystemCallHandler = DebugBreak;
         ulong debugBreakSystemCallAddress = cast<ulong>(cast<void*>(debugBreakSystemCallHandler));
         mem.WriteULong(MakeSystemCallPtrAddress(debugBreakSystemCall), debugBreakSystemCallAddress, Protection.write);
+        TrapHandler stackTraceSystemCallHandler = StackTrace;
+        ulong stackTraceSystemCallAddress = cast<ulong>(cast<void*>(stackTraceSystemCallHandler));
+        mem.WriteULong(MakeSystemCallPtrAddress(stackTraceSystemCall), stackTraceSystemCallAddress, Protection.write);
     }
 
     public void Boot(Machine& machine)

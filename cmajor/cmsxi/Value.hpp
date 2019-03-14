@@ -25,6 +25,7 @@ public:
     virtual std::string Name(Context& context) = 0;
     virtual bool IsLongValue() const { return false; }
     virtual bool IsAggregateValue() const { return false; }
+    virtual bool IsStringValue() const { return false; }
 };
 
 class CMSXI_API ConstantValue : public Value
@@ -169,7 +170,7 @@ private:
 class CMSXI_API ArrayValue : public ConstantValue
 {
 public:
-    ArrayValue(Type* type_, const std::vector<ConstantValue*>& elements_);
+    ArrayValue(Type* type_, const std::vector<ConstantValue*>& elements_, const std::string& prefix_);
     std::string Name(Context& context) override;
     Type* GetType(Context& context) override { return type; }
     void AddElement(ConstantValue* element);
@@ -177,6 +178,7 @@ public:
 private:
     Type* type;
     std::vector<ConstantValue*> elements;
+    std::string prefix;
 };
 
 class CMSXI_API StructureValue : public ConstantValue
@@ -190,6 +192,39 @@ public:
 private:
     Type* type;
     std::vector<ConstantValue*> members;
+};
+
+class CMSXI_API StringValue : public ConstantValue
+{
+public:
+    StringValue(Type* type_, const std::string& value_);
+    std::string Name(Context& context) override;
+    Type* GetType(Context& context) override;
+    bool IsStringValue() const override { return true; }
+private:
+    Type* type;
+    std::string value;
+};
+
+class CMSXI_API ConversionValue : public ConstantValue
+{
+public:
+    ConversionValue(Type* type_, ConstantValue* from_);
+    std::string Name(Context& context) override;
+    Type* GetType(Context& context) override;
+private:
+    Type* type;
+    ConstantValue* from;
+};
+
+class CMSXI_API ClsIdValue : public ConstantValue
+{
+public:
+    ClsIdValue(const std::string& typeId_);
+    std::string Name(Context& context) override;
+    Type* GetType(Context& context) override;
+private:
+    std::string typeId;
 };
 
 } // namespace cmsxi

@@ -467,7 +467,7 @@ void ClassToInterfaceConversion::GenerateCall(Emitter& emitter, std::vector<GenO
     void* objectPtr = emitter.GetObjectPtrFromInterface(temporaryInterfaceObjectVar);
     emitter.CreateStore(classPtrAsVoidPtr, objectPtr);
     void* vmtObjectPtr = sourceClassType->VmtObject(emitter, false);
-    void* imtArray = emitter.GetImtArray(vmtObjectPtr, imtsVmtIndexOffset);
+    void* imtArray = emitter.GetImtArray(vmtObjectPtr, GetImtsVmtIndexOffset());
     void* imt = emitter.GetImt(imtArray, interfaceIndex);
     void* imtPtr = emitter.GetImtPtrFromInterface(temporaryInterfaceObjectVar);
     emitter.CreateStore(imt, imtPtr);

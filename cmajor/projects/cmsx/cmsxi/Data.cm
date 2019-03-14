@@ -6,8 +6,8 @@ namespace cmsx.intermediate
 {
     public class GlobalVariable : Value
     {
-        public nothrow GlobalVariable(Type* type_, const string& name_, ConstantValue* initializer_, int line_, Location* homeLocation_) :
-            base(), name(name_), initializer(initializer_), homeLocation(homeLocation_)
+        public nothrow GlobalVariable(Type* type_, const string& name_, ConstantValue* initializer_, int line_, Location* homeLocation_, bool once_) :
+            base(), name(name_), initializer(initializer_), homeLocation(homeLocation_), once(once_)
         {
             base->type = type_;
             base->line = line_;
@@ -36,8 +36,16 @@ namespace cmsx.intermediate
         }
         public void GenerateDeclaration(MachineCode& machineCode)
         {
-            MachineInstruction* externInst = machineCode.GetInstruction(cmsx.assembly.EXTERN, null);
-            externInst->AddOperand(machineCode.context.GetSymbolOperand(name));
+            if (once)
+            {
+                MachineInstruction* linkOnceInst = machineCode.GetInstruction(cmsx.assembly.LINKONCE, null);
+                linkOnceInst->AddOperand(machineCode.context.GetSymbolOperand(name));
+            }
+            else
+            {
+                MachineInstruction* externInst = machineCode.GetInstruction(cmsx.assembly.EXTERN, null);
+                externInst->AddOperand(machineCode.context.GetSymbolOperand(name));
+            }
         }
         public void GenerateDefinition(MachineCode& machineCode, Context& context)
         {
@@ -48,8 +56,28 @@ namespace cmsx.intermediate
             initializer->GenerateCode(machineCode, dataLabel, context);
             MachineInstruction* endSInst = machineCode.GetInstruction(cmsx.assembly.ENDS, name);
         }
+        public void Print(CodeFormatter& formatter)
+        {
+            formatter.Write(type->Name());
+            if (once)
+            {
+                formatter.Write(" once");
+            }
+            formatter.Write(" ");
+            formatter.Write(name);
+            if (initializer != null)
+            {
+                formatter.Write(" = ");
+                formatter.Write(initializer->Name());
+            }
+            else
+            {
+                formatter.Write(";");
+            }
+        }
         public string name;
         public ConstantValue* initializer;
         public Location* homeLocation;
+        public bool once;
     }
 }

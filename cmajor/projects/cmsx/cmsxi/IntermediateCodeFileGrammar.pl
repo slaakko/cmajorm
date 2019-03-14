@@ -3,11 +3,12 @@ namespace cmsx.intermediate
     grammar IntermediateCodeFileGrammar
     {
         IntermediateCodeFile(cmsx.intermediate.Context* context);
+        CompileUnitHeader(cmsx.intermediate.Context* context, var string compileUnitId, var MDStructRef* mdRef);
         TypeDeclarations(cmsx.intermediate.Context* context);
         DataDefinitions(cmsx.intermediate.Context* context);
         Functions(cmsx.intermediate.Context* context);
         Function(cmsx.intermediate.Context* context);
-        FunctionHeader(cmsx.intermediate.Context* context) : Function*;
+        FunctionHeader(cmsx.intermediate.Context* context, var bool once) : Function*;
         BasicBlock(cmsx.intermediate.Context* context, Function* function, var BasicBlock* bb);
         EmptyLine;
         InstructionLine(cmsx.intermediate.Context* context, BasicBlock* bb);
@@ -57,8 +58,8 @@ namespace cmsx.intermediate
         Label : uint;
         Value(cmsx.intermediate.Context* context, Type* type) : Value*;
         IdValue(cmsx.intermediate.Context* context, Type* type) : Value*;
-        SymbolValue(cmsx.intermediate.Context* context, Type* type) : Value*;
-        LiteralValue(cmsx.intermediate.Context* context, Type* type) : Value*;
+        SymbolValue(cmsx.intermediate.Context* context, Type* type) : ConstantValue*;
+        LiteralValue(cmsx.intermediate.Context* context, Type* type) : ConstantValue*;
         S;
         Comma;
         TypeDeclaration(cmsx.intermediate.Context* context);
@@ -83,7 +84,7 @@ namespace cmsx.intermediate
         ULongType(cmsx.intermediate.Context* context) : Type*;
         FloatType(cmsx.intermediate.Context* context) : Type*;
         DoubleType(cmsx.intermediate.Context* context) : Type*;
-        DataDefinition(cmsx.intermediate.Context* context);
+        DataDefinition(cmsx.intermediate.Context* context, var bool once);
         Constant(cmsx.intermediate.Context* context) : ConstantValue*;
         BoolConstant(cmsx.intermediate.Context* context) : ConstantValue*;
         BoolValue : bool;
@@ -107,8 +108,22 @@ namespace cmsx.intermediate
         FloatValue : float;
         DoubleConstant(cmsx.intermediate.Context* context) : ConstantValue*;
         DoubleValue : double;
+        ConversionConstant(cmsx.intermediate.Context* context) : ConstantValue*;
+        ClsIdConstant(cmsx.intermediate.Context* context) : ConstantValue*;
         PtrConstant(cmsx.intermediate.Context* context) : ConstantValue*;
+        SymbolConstant(cmsx.intermediate.Context* context) : ConstantValue*;
         ArrayConstant(cmsx.intermediate.Context* context) : ArrayValue*;
         StructureConstant(cmsx.intermediate.Context* context) : StructureValue*;
+        StringConstant(cmsx.intermediate.Context* context) : StringValue*;
+        StringArrayConstant(cmsx.intermediate.Context* context) : StringArrayValue*;
+        StringArrayPrefix : char;
+        Metadata(cmsx.intermediate.Context* context);
+        MDItem(cmsx.intermediate.Context* context) : MDItem*;
+        MDBool(cmsx.intermediate.Context* context) : MDBool*;
+        MDLong(cmsx.intermediate.Context* context) : MDLong*;
+        MDString(cmsx.intermediate.Context* context) : MDString*;
+        MDStructRef(cmsx.intermediate.Context* context) : MDStructRef*;
+        MDStruct(cmsx.intermediate.Context* context) : MDStruct*;
+        MDField(cmsx.intermediate.Context* context, MDStruct* parent);
     }
 }

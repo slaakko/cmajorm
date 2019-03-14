@@ -4,7 +4,7 @@ using cmsx.machine;
 
 namespace cmsx.kernel
 {
-    public long Write(Machine& machine, Process* process, int handle, ulong bufferAddress, ulong count)
+    public long Write(Machine& machine, Process* process, int handle, ulong bufferAddress, long count)
     {
         if (handle != stdout && handle != stderr)
         {
@@ -12,8 +12,8 @@ namespace cmsx.kernel
         }
         else if (count > 0)
         {
-            UniquePtr<byte> buffer(cast<byte*>(RtMemAlloc(cast<long>(count))));
-            int rv = ReadProcessMemory(machine, process, bufferAddress, buffer.Get(), count);
+            UniquePtr<byte> buffer(cast<byte*>(RtMemAlloc(count)));
+            int rv = ReadProcessMemory(machine, process, bufferAddress, buffer.Get(), cast<ulong>(count));
             if (rv != 0)
             {
                 return -1;
@@ -33,13 +33,13 @@ namespace cmsx.kernel
             }
             try
             {
-                stream->Write(buffer.Get(), cast<long>(count));
+                stream->Write(buffer.Get(), count);
             }
             catch (const Exception& ex)
             {
                 return -1;
             }
-            return cast<long>(count);
+            return count;
         }
         return 0;
     }

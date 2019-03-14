@@ -101,9 +101,9 @@ namespace cmsx.intermediate
         {
             compileUnit.SetFileName(fileName);
         }
-        public Function* AddFunction(int lineNumber, Type* type, const string& name)
+        public Function* AddFunction(int lineNumber, Type* type, const string& name, bool once, MDStructRef* md)
         {
-            return compileUnit.AddFunction(lineNumber, type, name);
+            return compileUnit.AddFunction(lineNumber, type, name, once, md);
         }
         public Type* GetTypeById(int lineNumber, const string& typeId) const
         {
@@ -121,7 +121,7 @@ namespace cmsx.intermediate
         {
             return typeRepository.GetPtrType(baseType);
         }
-        public Value* MakeSymbolValue(int lineNumber, const string& symbol, Type* type)
+        public ConstantValue* MakeSymbolValue(int lineNumber, const string& symbol, Type* type)
         {
             HashMap<string, SymbolValue*>.ConstIterator it = symbolValueMap.CFind(symbol);
             if (it != symbolValueMap.CEnd())
@@ -144,7 +144,7 @@ namespace cmsx.intermediate
                 return symbolValue;
             }
         }
-        public Value* MakeLiteralValue(int lineNumber, const string& fromStr, Type* type)
+        public ConstantValue* MakeLiteralValue(int lineNumber, const string& fromStr, Type* type)
         {
             try
             {
@@ -310,6 +310,38 @@ namespace cmsx.intermediate
             AddValue(val);
             return val;
         }
+        public StringValue* MakeStringValue(const string& value)
+        {
+            StringValue* val = new StringValue(value);
+            val->type = GetByteType();
+            AddValue(val);
+            return val;
+        }
+        public StringArrayValue* MakeStringArrayValue(char prefix)
+        {
+            StringArrayValue* val = new StringArrayValue(prefix);
+            bool error = false;
+            switch (prefix)
+            {
+                case 'w' : val->type = GetUShortType(); break;
+                case 'u' : val->type = GetUIntType(); break;
+                case 'b' : val->type = GetByteType(); break;
+                default: error = true; break;
+            }
+            if (error)
+            {
+                throw Exception("invalid prefix '" + ToString(prefix) + "'");
+            }
+            AddValue(val);
+            return val;
+        }
+        public ConversionValue* MakeConversionValue(Type* targetType, ConstantValue* from, int lineNumber)
+        {
+            ConversionValue* val = new ConversionValue(targetType, from);
+            val->line = lineNumber;
+            AddValue(val);
+            return val;
+        }
         public void PrintTypes(CodeFormatter& formatter)
         {
             typeRepository.PrintTypes(formatter);
@@ -354,17 +386,61 @@ namespace cmsx.intermediate
                 return symbolOperand;
             }
         }
+        public nothrow Operand* GetStringOperand(const string& value)
+        {
+            StringOperand* stringOperand = new StringOperand(value);
+            operands.Add(UniquePtr<Operand>(stringOperand));
+            return stringOperand;
+        }
+        public nothrow Operand* GetClsIdOperand(const string& typeId)
+        {
+            ClsIdOperand* clsIdOperand = new ClsIdOperand(typeId);
+            operands.Add(UniquePtr<Operand>(clsIdOperand));
+            return clsIdOperand;
+        }
         public GlobalVariable* GetGlobalVariable(const string& globalVariableName) const
         {
             return compileUnit.GetGlobalVariable(globalVariableName);
         }
-        public void AddGlobalVariable(Type* type, const string& name, ConstantValue* initializer, int line)
+        public void AddGlobalVariable(Type* type, const string& name, ConstantValue* initializer, int line, bool once)
         {
-            compileUnit.AddGlobalVariable(type, name, initializer, line);
+            compileUnit.AddGlobalVariable(type, name, initializer, line, once);
         }
         public void ValidateGlobalVariables()
         {
             compileUnit.ValidateGlobalVariables();
+        }
+        public ClsIdValue* MakeClsIdValue(Type* type, const string& typeId, int line)
+        {
+            ClsIdValue* val = new ClsIdValue(typeId);
+            val->type = type;
+            val->line = line;
+            AddValue(val);
+            return val;
+        }
+        public void SetCompileUnitInfo(const string& compileUnitId, MDStructRef* mdRef)
+        {
+            compileUnit.AddInfo(compileUnitId, mdRef);
+        }
+        public MDBool* CreateMDBool(bool value)
+        {
+            return compileUnit.metadata.CreateMDBool(value);
+        }
+        public MDLong* CreateMDLong(long value)
+        {
+            return compileUnit.metadata.CreateMDLong(value);
+        }
+        public MDString* CreateMDString(const string& value)
+        {
+            return compileUnit.metadata.CreateMDString(value);
+        }
+        public MDStructRef* CreateMDStructRef(int id)
+        {
+            return compileUnit.metadata.CreateMDStructRef(id);
+        }
+        public MDStruct* CreateMDStruct(int id)
+        {
+            return compileUnit.metadata.CreateMDStruct(id);
         }
         public CompileUnit compileUnit;
         public Function* currentFunction;

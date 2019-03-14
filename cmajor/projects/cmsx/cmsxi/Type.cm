@@ -9,11 +9,11 @@ namespace cmsx.intermediate
         public default virtual ~Type();
         public abstract nothrow string Name() const;
         public abstract Value* DefaultValue() const;
-        public virtual Value* MakeValue(const string& fromStr, Context& context) const
+        public virtual ConstantValue* MakeValue(const string& fromStr, Context& context) const
         {
             throw Exception("cannot make '" + Name() + "' type value from string '" + fromStr + "'");
         }
-        public virtual Value* MakeValue(ulong val) const
+        public virtual ConstantValue* MakeValue(ulong val) const
         {
             throw Exception("cannot make '" + Name() + "' type value from value '" + ToString(val) + "'");
         }
@@ -89,7 +89,7 @@ namespace cmsx.intermediate
         {
             return &falseValue;
         }
-        public override Value* MakeValue(const string& fromStr, Context& context) const
+        public override ConstantValue* MakeValue(const string& fromStr, Context& context) const
         {
             bool value = ParseBool(fromStr);
             if (value)
@@ -121,7 +121,7 @@ namespace cmsx.intermediate
         {
             return context.GetSymbolOperand("#1");
         }
-        public override Value* MakeValue(ulong val) const
+        public override ConstantValue* MakeValue(ulong val) const
         {
             return new BoolValue(cast<bool>(val));
         }
@@ -167,7 +167,7 @@ namespace cmsx.intermediate
         {
             return &defaultValue;
         }
-        public override Value* MakeValue(const string& fromStr, Context& context) const
+        public override ConstantValue* MakeValue(const string& fromStr, Context& context) const
         {
             long longValue = ParseLong(fromStr);
             if (longValue >= MinValue<sbyte>() && longValue <= MaxValue<sbyte>())
@@ -213,7 +213,7 @@ namespace cmsx.intermediate
             machineInst->AddOperand(reg);
             machineInst->AddOperand(HexAllOnes(machineCode.context, line));
         }
-        public override Value* MakeValue(ulong val) const
+        public override ConstantValue* MakeValue(ulong val) const
         {
             return new SByteValue(cast<sbyte>(val));
         }
@@ -238,7 +238,7 @@ namespace cmsx.intermediate
         {
             return &defaultValue;
         }
-        public override Value* MakeValue(const string& fromStr, Context& context) const
+        public override ConstantValue* MakeValue(const string& fromStr, Context& context) const
         {
             ulong ulongValue = ParseULong(fromStr);
             if (ulongValue >= MinValue<byte>() && ulongValue <= MaxValue<byte>())
@@ -284,7 +284,7 @@ namespace cmsx.intermediate
             machineInst->AddOperand(reg);
             machineInst->AddOperand(HexAllOnes(machineCode.context, line));
         }
-        public override Value* MakeValue(ulong val) const
+        public override ConstantValue* MakeValue(ulong val) const
         {
             return new ByteValue(cast<byte>(val));
         }
@@ -309,7 +309,7 @@ namespace cmsx.intermediate
         {
             return &defaultValue;
         }
-        public override Value* MakeValue(const string& fromStr, Context& context) const
+        public override ConstantValue* MakeValue(const string& fromStr, Context& context) const
         {
             long longValue = ParseLong(fromStr);
             if (longValue >= MinValue<short>() && longValue <= MaxValue<short>())
@@ -355,7 +355,7 @@ namespace cmsx.intermediate
             machineInst->AddOperand(reg);
             machineInst->AddOperand(HexAllOnes(machineCode.context, line));
         }
-        public override Value* MakeValue(ulong val) const
+        public override ConstantValue* MakeValue(ulong val) const
         {
             return new ShortValue(cast<short>(val));
         }
@@ -380,7 +380,7 @@ namespace cmsx.intermediate
         {
             return &defaultValue;
         }
-        public override Value* MakeValue(const string& fromStr, Context& context) const
+        public override ConstantValue* MakeValue(const string& fromStr, Context& context) const
         {
             ulong ulongValue = ParseULong(fromStr);
             if (ulongValue >= MinValue<ushort>() && ulongValue <= MaxValue<ushort>())
@@ -426,7 +426,7 @@ namespace cmsx.intermediate
             machineInst->AddOperand(reg);
             machineInst->AddOperand(HexAllOnes(machineCode.context, line));
         }
-        public override Value* MakeValue(ulong val) const
+        public override ConstantValue* MakeValue(ulong val) const
         {
             return new UShortValue(cast<ushort>(val));
         }
@@ -451,7 +451,7 @@ namespace cmsx.intermediate
         {
             return &defaultValue;
         }
-        public override Value* MakeValue(const string& fromStr, Context& context) const
+        public override ConstantValue* MakeValue(const string& fromStr, Context& context) const
         {
             long longValue = ParseLong(fromStr);
             if (longValue >= MinValue<int>() && longValue <= MaxValue<int>())
@@ -501,7 +501,7 @@ namespace cmsx.intermediate
             orMlInst->AddOperand(reg);
             orMlInst->AddOperand(allOnes);
         }
-        public override Value* MakeValue(ulong val) const
+        public override ConstantValue* MakeValue(ulong val) const
         {
             return new IntValue(cast<int>(val));
         }
@@ -526,7 +526,7 @@ namespace cmsx.intermediate
         {
             return &defaultValue;
         }
-        public override Value* MakeValue(const string& fromStr, Context& context) const
+        public override ConstantValue* MakeValue(const string& fromStr, Context& context) const
         {
             ulong ulongValue = ParseULong(fromStr);
             if (ulongValue >= MinValue<uint>() && ulongValue <= MaxValue<uint>())
@@ -576,7 +576,7 @@ namespace cmsx.intermediate
             orMlInst->AddOperand(reg);
             orMlInst->AddOperand(allOnes);
         }
-        public override Value* MakeValue(ulong val) const
+        public override ConstantValue* MakeValue(ulong val) const
         {
             return new UIntValue(cast<uint>(val));
         }
@@ -601,7 +601,7 @@ namespace cmsx.intermediate
         {
             return &defaultValue;
         }
-        public override Value* MakeValue(const string& fromStr, Context& context) const
+        public override ConstantValue* MakeValue(const string& fromStr, Context& context) const
         {
             long longValue = ParseLong(fromStr);
             if (longValue >= MinValue<long>() && longValue <= MaxValue<long>())
@@ -657,7 +657,7 @@ namespace cmsx.intermediate
             orHInst->AddOperand(reg);
             orHInst->AddOperand(allOnes);
         }
-        public override Value* MakeValue(ulong val) const
+        public override ConstantValue* MakeValue(ulong val) const
         {
             return new LongValue(cast<long>(val));
         }
@@ -682,7 +682,7 @@ namespace cmsx.intermediate
         {
             return &defaultValue;
         }
-        public override Value* MakeValue(const string& fromStr, Context& context) const
+        public override ConstantValue* MakeValue(const string& fromStr, Context& context) const
         {
             ulong ulongValue = ParseULong(fromStr);
             if (ulongValue >= MinValue<ulong>() && ulongValue <= MaxValue<ulong>())
@@ -738,7 +738,7 @@ namespace cmsx.intermediate
             orHInst->AddOperand(reg);
             orHInst->AddOperand(allOnes);
         }
-        public override Value* MakeValue(ulong val) const
+        public override ConstantValue* MakeValue(ulong val) const
         {
             return new ULongValue(val);
         }
@@ -763,7 +763,7 @@ namespace cmsx.intermediate
         {
             return &defaultValue;
         }
-        public override Value* MakeValue(const string& fromStr, Context& context) const
+        public override ConstantValue* MakeValue(const string& fromStr, Context& context) const
         {
             float value = ParseFloat(fromStr);
             if (value == defaultValue.value)
@@ -812,7 +812,7 @@ namespace cmsx.intermediate
         {
             return &defaultValue;
         }
-        public override Value* MakeValue(const string& fromStr, Context& context) const
+        public override ConstantValue* MakeValue(const string& fromStr, Context& context) const
         {
             double doubleValue = ParseDouble(fromStr);
             double value = doubleValue;
@@ -873,7 +873,7 @@ namespace cmsx.intermediate
         {
             return &defaultValue;
         }
-        public override Value* MakeValue(const string& fromStr, Context& context) const
+        public override ConstantValue* MakeValue(const string& fromStr, Context& context) const
         {
             if (fromStr == "null")
             {

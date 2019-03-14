@@ -1256,7 +1256,7 @@ void* Emitter::CreateIrValueForUString(void* ustringConstant)
     return builder.CreateGEP(static_cast<llvm::Value*>(ustringConstant), indeces);
 }
 
-void* Emitter::CreateIrValueForConstantArray(void* arrayIrType, const std::vector<void*>& elements)
+void* Emitter::CreateIrValueForConstantArray(void* arrayIrType, const std::vector<void*>& elements, const std::string& prefix)
 {
     std::vector<llvm::Constant*> elementConstants;
     for (void* elementConstant : elements)
@@ -1282,6 +1282,11 @@ void* Emitter::CreateIrValueForUuid(void* uuidConstant)
     indeces.push_back(builder.getInt32(0));
     indeces.push_back(builder.getInt32(0));
     return builder.CreateBitCast(builder.CreateGEP(static_cast<llvm::Value*>(uuidConstant), indeces), builder.getInt8PtrTy());
+}
+
+void* Emitter::GetConversionValue(void* type, void* from)
+{
+    return nullptr;
 }
 
 void* Emitter::CreateDITypeForBool()
@@ -1744,6 +1749,53 @@ void* Emitter::CreateCatchPad(void* parentPad, const std::vector<void*>& args)
 void* Emitter::GenerateTrap(const std::vector<void*>& args)
 {
     return nullptr;
+}
+
+void Emitter::SetCompileUnitId(const std::string& compileUnitId)
+{
+}
+
+void* Emitter::GetClsIdValue(const std::string& typeId)
+{
+    return nullptr;
+}
+
+void* Emitter::CreateMDBool(bool value)
+{
+    return nullptr;
+}
+
+void* Emitter::CreateMDLong(int64_t value)
+{
+    return nullptr;
+}
+
+void* Emitter::CreateMDString(const std::string& value)
+{
+    return nullptr;
+}
+
+void* Emitter::CreateMDStructRef(int id)
+{
+    return nullptr;
+}
+
+void* Emitter::CreateMDStruct()
+{
+    return nullptr;
+}
+
+int Emitter::GetMDStructId(void* mdStruct)
+{
+    return 0;
+}
+
+void Emitter::AddMDItem(void* mdStruct, const std::string& fieldName, void* mdItem)
+{
+}
+
+void Emitter::SetFunctionMdId(void* function, int mdId)
+{
 }
 
 } // namespace cmllvm

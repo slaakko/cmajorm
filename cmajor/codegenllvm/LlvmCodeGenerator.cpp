@@ -1206,7 +1206,7 @@ void* LlvmCodeGenerator::GetGlobalWStringConstant(int stringId)
         void* stringObject = emitter->GetOrInsertGlobal("wstring" + std::to_string(stringId), arrayType);
         void* stringGlobal = stringObject;
         emitter->SetPrivateLinkage(stringGlobal);
-        void* constant = emitter->CreateIrValueForConstantArray(arrayType, wcharConstants);
+        void* constant = emitter->CreateIrValueForConstantArray(arrayType, wcharConstants, std::string());
         emitter->SetInitializer(stringGlobal, constant);
         void* stringValue = stringGlobal;
         utf16stringMap[stringId] = stringValue;
@@ -1235,7 +1235,7 @@ void* LlvmCodeGenerator::GetGlobalUStringConstant(int stringId)
         void* stringObject = emitter->GetOrInsertGlobal("ustring" + std::to_string(stringId), arrayType);
         void* stringGlobal = stringObject;
         emitter->SetPrivateLinkage(stringGlobal);
-        void* constant = emitter->CreateIrValueForConstantArray(arrayType, ucharConstants);
+        void* constant = emitter->CreateIrValueForConstantArray(arrayType, ucharConstants, std::string());
         emitter->SetInitializer(stringGlobal, constant);
         void* stringValue = stringGlobal;
         utf32stringMap[stringId] = stringValue;
@@ -1263,7 +1263,7 @@ void* LlvmCodeGenerator::GetGlobalUuidConstant(int uuidId)
         void* uuidObject = emitter->GetOrInsertGlobal("uuid" + std::to_string(uuidId), arrayType);
         void* uuidGlobal = uuidObject;
         emitter->SetPrivateLinkage(uuidGlobal);
-        void* constant = emitter->CreateIrValueForConstantArray(arrayType, byteConstants);
+        void* constant = emitter->CreateIrValueForConstantArray(arrayType, byteConstants, std::string());
         emitter->SetInitializer(uuidGlobal, constant);
         void* uuidValue = uuidGlobal;
         uuidMap[uuidId] = uuidValue;

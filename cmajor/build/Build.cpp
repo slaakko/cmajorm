@@ -569,14 +569,17 @@ void LinkSystemX(const std::string& executableFilePath, const std::string& libra
     {
         LogMessage(module.LogStreamId(), "Linking...");
     }
+    std::string classIdFileName = Path::ChangeExtension(libraryFilePath, ".clsid");
+    MakeClassIdFile(module.GetSymbolTable().PolymorphicClasses(), classIdFileName);
     module.SetCurrentToolName(U"cmsxlink");
     boost::filesystem::path bdp = executableFilePath;
     bdp.remove_filename();
     boost::filesystem::create_directories(bdp);
     std::vector<std::string> args;
+    args.push_back("--clsid=" + QuotedPath(classIdFileName));
     args.push_back("--out=" + QuotedPath(executableFilePath));
     int n = libraryFilePaths.size();
-    for (int i = 0; i < n; ++i)
+    for (int i = n - 1; i >= 0; --i)
     {
         args.push_back(QuotedPath(libraryFilePaths[i]));
     }
@@ -969,7 +972,7 @@ void CreateMainUnitSystemX(std::vector<std::string>& objectFilePaths, Module& mo
         AnalyzeControlFlow(boundMainCompileUnit);
     }
     cmajor::codegen::GenerateCode(emittingContext, boundMainCompileUnit);
-    objectFilePaths.push_back(boundMainCompileUnit.ObjectFilePath());
+    objectFilePaths.insert(objectFilePaths.begin(), boundMainCompileUnit.ObjectFilePath());
 }
 
 void SetDefines(Module* module, const std::string& definesFilePath)

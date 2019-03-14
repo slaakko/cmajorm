@@ -10,13 +10,14 @@
 namespace cmsxbe {
 
 Emitter::Emitter(cmsxbe::EmittingContext* emittingContext_) :
-    cmajor::ir::Emitter(&stack), emittingContext(emittingContext_), context(emittingContext->GetContext()), compileUnit(nullptr), currentFunction(nullptr)
+    cmajor::ir::Emitter(&stack), emittingContext(emittingContext_), emittingDelegate(nullptr), context(nullptr), compileUnit(nullptr), currentFunction(nullptr),
+    objectPointer(nullptr)
 {
 }
 
 void Emitter::SetEmittingDelegate(cmajor::ir::EmittingDelegate* emittingDelegate_)
 {
-    // todo
+    emittingDelegate = emittingDelegate_;
 }
 
 void* Emitter::GetIrTypeForBool()
@@ -197,7 +198,7 @@ void* Emitter::CreateDefaultIrValueForArrayType(void* arrayIrType, const std::ve
         arrayOfConstants.push_back(static_cast<cmsxi::ConstantValue*>(constant));
     }
     cmsxi::Type* arrayType = static_cast<cmsxi::Type*>(arrayIrType);
-    return context->GetArrayValue(arrayType, arrayOfConstants);
+    return context->GetArrayValue(arrayType, arrayOfConstants, std::string());
 }
 
 void* Emitter::CreateDefaultIrValueForBool()
@@ -372,24 +373,22 @@ void* Emitter::CreateIrValueForUChar(uint32_t value)
 
 void* Emitter::CreateIrValueForWString(void* wstringConstant)
 {
-    // todo
-    return nullptr;
+    return static_cast<cmsxi::Value*>(wstringConstant);
 }
 
 void* Emitter::CreateIrValueForUString(void* ustringConstant)
 {
-    // todo
-    return nullptr;
+    return static_cast<cmsxi::Value*>(ustringConstant);
 }
 
-void* Emitter::CreateIrValueForConstantArray(void* arrayIrType, const std::vector<void*>& elementConstants)
+void* Emitter::CreateIrValueForConstantArray(void* arrayIrType, const std::vector<void*>& elementConstants, const std::string& prefix)
 {
     std::vector<cmsxi::ConstantValue*> elements;
     for (void* elementConstant : elementConstants)
     {
         elements.push_back(static_cast<cmsxi::ConstantValue*>(elementConstant));
     }
-    return context->GetArrayValue(static_cast<cmsxi::ArrayType*>(arrayIrType), elements);
+    return context->GetArrayValue(static_cast<cmsxi::ArrayType*>(arrayIrType), elements, prefix);
 }
 
 void* Emitter::CreateIrValueForConstantStruct(void* structIrType, const std::vector<void*>& elementConstants)
@@ -404,38 +403,38 @@ void* Emitter::CreateIrValueForConstantStruct(void* structIrType, const std::vec
 
 void* Emitter::CreateIrValueForUuid(void* uuidConstant)
 {
-    // todo
-    return nullptr;
+    cmsxi::Value* arg = context->CreatePtrOffset(static_cast<cmsxi::Value*>(uuidConstant), context->GetLongValue(0));
+    return context->CreateBitCast(arg, context->GetPtrType(context->GetVoidType()));
 }
 
-void* Emitter::CreateGlobalStringPtr(const std::string& name)
+void* Emitter::GetConversionValue(void* type, void* from)
 {
-    // todo
-    return nullptr;
+    return context->GetConversionValue(static_cast<cmsxi::Type*>(type), static_cast<cmsxi::ConstantValue*>(from));
+}
+
+void* Emitter::CreateGlobalStringPtr(const std::string& stringValue)
+{
+    return context->CreateGlobalStringPtr(stringValue);
 }
 
 void* Emitter::GetGlobalStringPtr(int stringId)
 {
-    // todo
-    return nullptr;
+    return emittingDelegate->GetGlobalStringPtr(stringId);
 }
 
 void* Emitter::GetGlobalWStringConstant(int stringId)
 {
-    // todo
-    return nullptr;
+    return emittingDelegate->GetGlobalWStringConstant(stringId);
 }
 
 void* Emitter::GetGlobalUStringConstant(int stringId)
 {
-    // todo
-    return nullptr;
+    return emittingDelegate->GetGlobalUStringConstant(stringId);
 }
 
 void* Emitter::GetGlobalUuidConstant(int uuidId)
 {
-    // todo
-    return nullptr;
+    return emittingDelegate->GetGlobalUuidConstant(uuidId);
 }
 
 void* Emitter::CreateDITypeForBool()
@@ -966,13 +965,13 @@ void* Emitter::GetOrInsertGlobal(const std::string& name, void* type)
 
 void* Emitter::GetOrInsertAnyComdat(const std::string& name, void* global)
 {
-    // todo
+    static_cast<cmsxi::GlobalVariable*>(global)->SetLinkOnce();
     return nullptr;
 }
 
 void* Emitter::GetOrInsertAnyFunctionComdat(const std::string& name, void* function)
 {
-    // todo
+    static_cast<cmsxi::Function*>(function)->SetLinkOnce();
     return nullptr;
 }
 
@@ -1273,30 +1272,33 @@ void Emitter::SetLineNumber(int32_t lineNumber)
 
 void Emitter::SaveObjectPointer(void* objectPointer_)
 {
-    // todo
+    if (objectPointer == nullptr)
+    {
+        objectPointer = static_cast<cmsxi::Value*>(objectPointer_);
+    }
 }
 
 void Emitter::SetObjectPointer(void* objectPointer_)
 {
-    // todo
+    objectPointer = static_cast<cmsxi::Value*>(objectPointer_);
 }
 
 void* Emitter::GetObjectPointer()
 {
-    // todo
-    return nullptr;
+    return objectPointer;
 }
 
 void* Emitter::GetClassIdPtr(void* vmtPtr)
 {
-    // todo
-    return nullptr;
+    cmsxi::Value* classIdPtr = context->CreateElemAddr(static_cast<cmsxi::Value*>(vmtPtr), context->GetLongValue(0));
+    return classIdPtr;
 }
 
 void* Emitter::GetClassName(void* vmtPtr, int32_t classNameVmtIndexOffset)
 {
-    // todo
-    return nullptr;
+    cmsxi::Value* classNamePtr = context->CreateElemAddr(static_cast<cmsxi::Value*>(vmtPtr), context->GetLongValue(classNameVmtIndexOffset));
+    cmsxi::Value* className = context->CreateLoad(classNamePtr);
+    return className;
 }
 
 void* Emitter::ComputeAddress(void* ptr, void* index)
@@ -1346,6 +1348,7 @@ void Emitter::DestroyModule(void* module)
 void Emitter::SetModule(void* module_)
 {
     compileUnit = static_cast<cmsxi::CompileUnit*>(module_);
+    context = compileUnit->GetContext();
 }
 
 void Emitter::SetTargetTriple(const std::string& targetTriple)
@@ -1598,6 +1601,56 @@ void* Emitter::GenerateTrap(const std::vector<void*>& args)
         arguments.push_back(static_cast<cmsxi::Value*>(arg));
     }
     return context->CreateTrap(arguments);
+}
+
+void Emitter::SetCompileUnitId(const std::string& compileUnitId)
+{
+    context->SetCompileUnitId(compileUnitId);
+}
+
+void* Emitter::GetClsIdValue(const std::string& typeId)
+{
+    return context->GetClsIdValue(typeId);
+}
+
+void* Emitter::CreateMDBool(bool value)
+{
+    return context->CreateMDBool(value);
+}
+
+void* Emitter::CreateMDLong(int64_t value)
+{
+    return context->CreateMDLong(value);
+}
+
+void* Emitter::CreateMDString(const std::string& value)
+{
+    return context->CreateMDString(value);
+}
+
+void* Emitter::CreateMDStructRef(int id)
+{
+    return context->CreateMDStructRef(id);
+}
+
+int Emitter::GetMDStructId(void* mdStruct)
+{
+    return static_cast<cmsxi::MDStruct*>(mdStruct)->Id();
+}
+
+void* Emitter::CreateMDStruct()
+{
+    return context->CreateMDStruct();
+}
+
+void Emitter::AddMDItem(void* mdStruct, const std::string& fieldName, void* mdItem)
+{
+    context->AddMDStructItem(static_cast<cmsxi::MDStruct*>(mdStruct), fieldName, static_cast<cmsxi::MDItem*>(mdItem));
+}
+
+void Emitter::SetFunctionMdId(void* function, int mdId)
+{
+    static_cast<cmsxi::Function*>(function)->SetMdId(mdId);
 }
 
 } // namespace cmsxbe

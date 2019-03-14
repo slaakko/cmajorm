@@ -236,6 +236,10 @@ namespace cmsx.object
             {
                 return new LinkSection(this);
             }
+            else if (sectionName == "DBUG")
+            {
+                return new DebugSection(this);
+            }
             else
             {
                 throw Exception("unknown section '" + sectionName + " in file " + fileName);
@@ -306,6 +310,7 @@ namespace cmsx.object
                 AddSection(new DataSection(this));
                 AddSection(new SymbolSection(this));
                 AddSection(new LinkSection(this));
+                AddSection(new DebugSection(this));
             }
         }
         public ObjectFile(const string& fileName_, bool initSymbolTable) : this(fileName_, true, initSymbolTable)
@@ -330,6 +335,10 @@ namespace cmsx.object
             {
                 linkSection = section;
             }
+            else if (section is DebugSection*)
+            {
+                debugSection = section;
+            }
         }
         public override nothrow Section* GetCodeSection()  const
         {
@@ -347,6 +356,7 @@ namespace cmsx.object
         public Section* dataSection;
         public Section* symbolSection;
         public Section* linkSection;
+        public Section* debugSection;
     }
 
     public class LibraryFile : BinaryFile
@@ -715,6 +725,19 @@ namespace cmsx.object
             EmitByte(b1);
             EmitByte(b0);
         }
+        public void Align(ulong alignment)
+        {
+            ulong at = Address();
+            ulong a = at & (alignment - 1u);
+            if (a != 0u)
+            {
+                ulong offset = alignment - a;
+                for (ulong i = 0u; i < offset; ++i)
+                {
+                    EmitByte(0u);
+                }
+            }
+        }
         public BinaryFile* file;
         public string name;
         public List<byte> data;
@@ -888,7 +911,7 @@ namespace cmsx.object
             ulong baseAddr = BaseAddress() + address;
             string currentBytes;
             string currentChars;
-            string currentHeader = "#" + ToHexString(baseAddr) + " " + Format(formatter.GetLabel(baseAddr), 32);
+            string currentHeader = "#" + ToHexString(baseAddr) + " " + Format(formatter.GetLabel(baseAddr), 80, FormatWidth.min);
             int b = GetByte();
             while (b != -1)
             {
@@ -898,7 +921,7 @@ namespace cmsx.object
                     writer.WriteLine(currentHeader + " " + currentBytes + " " + currentChars);
                     currentBytes.Clear();
                     currentChars.Clear();
-                    currentHeader = "#" + ToHexString(baseAddr) + " " + Format(formatter.GetLabel(baseAddr), 32);
+                    currentHeader = "#" + ToHexString(baseAddr) + " " + Format(formatter.GetLabel(baseAddr), 80, FormatWidth.min);
                     if (startOffsetIndex < startOffsets.Count())
                     {
                         startOffset = startOffsets[startOffsetIndex];
@@ -1041,6 +1064,14 @@ namespace cmsx.object
                 symbol->start = start;
                 symbol->length = length;
                 symbol->section = section;
+                uint parentIndex = GetUInt();
+                symbol->parentIndex = cast<int>(parentIndex);
+                uint linkStart = GetUInt();
+                uint linkEnd = GetUInt();
+                symbol->linkStart = cast<int>(linkStart);
+                symbol->linkEnd = cast<int>(linkEnd);
+                int alignment = GetByte();
+                symbol->alignment = cast<byte>(alignment);
                 file->GetSymbolTable().AddSymbol(symbol, false);
             }
             ulong numInternalSymbols = GetULong();
@@ -1073,6 +1104,14 @@ namespace cmsx.object
                 symbol->start = start;
                 symbol->length = length;
                 symbol->section = section;
+                uint parentIndex = GetUInt();
+                symbol->parentIndex = cast<int>(parentIndex);
+                uint linkStart = GetUInt();
+                uint linkEnd = GetUInt();
+                symbol->linkStart = cast<int>(linkStart);
+                symbol->linkEnd = cast<int>(linkEnd);
+                int alignment = GetByte();
+                symbol->alignment = cast<byte>(alignment);
                 file->GetSymbolTable().AddInternalSymbol(symbol, false);
             }
         }
@@ -1104,6 +1143,10 @@ namespace cmsx.object
             EmitValue(symbol->value);
             EmitULong(symbol->start);
             EmitULong(symbol->length);
+            EmitUInt(cast<uint>(symbol->parentIndex));
+            EmitUInt(cast<uint>(symbol->linkStart));
+            EmitUInt(cast<uint>(symbol->linkEnd));
+            EmitByte(symbol->alignment);
         }
         public void EmitValue(const Value& value)
         {
@@ -1132,7 +1175,7 @@ namespace cmsx.object
                 }
                 symbolLine.Append(Format(absoluteAddress, 17));
                 symbolLine.Append(" ").Append(Format(ToString(symbol->index), 11));
-                symbolLine.Append(" ").Append(Format(symbol->name, 32));
+                symbolLine.Append(" ").Append(Format(symbol->name, 80, FormatWidth.min));
                 symbolLine.Append(" ").Append(Format(SegmentStr(symbol->segment), 7));
                 symbolLine.Append(" ").Append(Format(LinkageStr(symbol->linkage), 9)); 
                 symbolLine.Append(" ").Append(ValueStr(symbol->value));
@@ -1140,7 +1183,10 @@ namespace cmsx.object
                 {
                     symbolLine.Append(" ").Append("#").Append(ToHexString(symbol->start));
                     symbolLine.Append(" ").Append("#").Append(ToHexString(symbol->length));
+                    symbolLine.Append(" ").Append(ToString(symbol->linkStart));
+                    symbolLine.Append(" ").Append(ToString(symbol->linkEnd));
                 }
+                symbolLine.Append(" ").Append(ToString(symbol->alignment));
                 writer.WriteLine(symbolLine);
             }
             for (const UniquePtr<Symbol>& symbol : symbolTable.InternalSymbols())
@@ -1153,7 +1199,7 @@ namespace cmsx.object
                 }
                 symbolLine.Append(Format(absoluteAddress, 17));
                 symbolLine.Append(" ").Append(Format(ToString(symbol->index), 11));
-                symbolLine.Append(" ").Append(Format(symbol->name, 32));
+                symbolLine.Append(" ").Append(Format(symbol->name, 80, FormatWidth.min));
                 symbolLine.Append(" ").Append(Format(SegmentStr(symbol->segment), 7));
                 symbolLine.Append(" ").Append(Format(LinkageStr(symbol->linkage), 9)); 
                 symbolLine.Append(" ").Append(ValueStr(symbol->value));
@@ -1162,6 +1208,7 @@ namespace cmsx.object
                     symbolLine.Append(" ").Append("#").Append(ToHexString(symbol->start));
                     symbolLine.Append(" ").Append("#").Append(ToHexString(symbol->length));
                 }
+                symbolLine.Append(" ").Append(ToString(symbol->alignment));
                 writer.WriteLine(symbolLine);
             }
         }
@@ -1181,17 +1228,21 @@ namespace cmsx.object
             BinaryFileFormatter formatter(*file);
             base->Dump(writer);
             pos = 0u;
+            long p = pos;
             int x = GetByte();
             while (x != -1)
             {
                 LinkCode linkCode = cast<LinkCode>(cast<byte>(x));
-                string linkLine = Format(LinkCodeStr(linkCode), maxLinkCodeStrLength);
+                string linkLine = Format(ToString(p), 5, FormatWidth.min, FormatJustify.right);
+                linkLine.Append(" ").Append(Format(LinkCodeStr(linkCode), maxLinkCodeStrLength));
                 switch (linkCode)
                 {
                     case LinkCode.forwardLongJump:
                     {
                         uint index = GetUInt();
-                        linkLine.Append(" ").Append(Format(ToString(index), 11));
+                        linkLine.Append(" ").Append(Format(ToString(index), 5, FormatWidth.min, FormatJustify.right));
+                        Symbol* s = file->GetSymbolTable().GetSymbol(cast<int>(index));
+                        linkLine.Append(" ").Append(s->name);
                         ulong address = GetULong();
                         linkLine.Append(" #").Append(ToHexString(address));
                         break;
@@ -1199,7 +1250,9 @@ namespace cmsx.object
                     case LinkCode.forwardShortJump:
                     {
                         uint index = GetUInt();
-                        linkLine.Append(" ").Append(Format(ToString(index), 11));
+                        linkLine.Append(" ").Append(Format(ToString(index), 5, FormatWidth.min, FormatJustify.right));
+                        Symbol* s = file->GetSymbolTable().GetSymbol(cast<int>(index));
+                        linkLine.Append(" ").Append(s->name);
                         ulong address = GetULong();
                         linkLine.Append(" #").Append(ToHexString(address));
                         break;
@@ -1207,7 +1260,9 @@ namespace cmsx.object
                     case LinkCode.absoluteAddrValue:
                     {
                         uint index = GetUInt();
-                        linkLine.Append(" ").Append(Format(ToString(index), 11));
+                        linkLine.Append(" ").Append(Format(ToString(index), 5, FormatWidth.min, FormatJustify.right));
+                        Symbol* s = file->GetSymbolTable().GetSymbol(cast<int>(index));
+                        linkLine.Append(" ").Append(s->name);
                         ulong address = GetULong();
                         linkLine.Append(" #").Append(ToHexString(address));
                         break;
@@ -1215,7 +1270,9 @@ namespace cmsx.object
                     case LinkCode.farJump:
                     {
                         uint index = GetUInt();
-                        linkLine.Append(" ").Append(Format(ToString(index), 11));
+                        linkLine.Append(" ").Append(Format(ToString(index), 5, FormatWidth.min, FormatJustify.right));
+                        Symbol* s = file->GetSymbolTable().GetSymbol(cast<int>(index));
+                        linkLine.Append(" ").Append(s->name);
                         ulong address = GetULong();
                         linkLine.Append(" #").Append(ToHexString(address));
                         break;
@@ -1223,21 +1280,61 @@ namespace cmsx.object
                     case LinkCode.farOcta:
                     {
                         uint index = GetUInt();
-                        linkLine.Append(" ").Append(Format(ToString(index), 11));
+                        linkLine.Append(" ").Append(Format(ToString(index), 5, FormatWidth.min, FormatJustify.right));
+                        Symbol* s = file->GetSymbolTable().GetSymbol(cast<int>(index));
+                        linkLine.Append(" ").Append(s->name);
                         ulong address = GetULong();
                         linkLine.Append(" #").Append(ToHexString(address));
                         break;
                     }
-                    case LinkCode.once:
+                    case LinkCode.clsid:
                     {
-                        uint index = GetUInt();
-                        linkLine.Append(" ").Append(Format(ToString(index), 11));
+                        ulong address = GetULong();
+                        linkLine.Append(" #").Append(ToHexString(address));
+                        ulong typeId1 = GetULong();
+                        ulong typeId2 = GetULong();
+                        Uuid typeId(typeId1, typeId2);
+                        linkLine.Append(" #").Append(ToString(typeId));
                         break;
                     }
                 }
                 writer.WriteLine(linkLine);
+                p = pos;
                 x = GetByte();
             }
+        }
+    }
+
+    public class DebugSection : Section
+    {
+        public nothrow DebugSection(BinaryFile* file_) : base(file_, "DBUG")
+        {
+        }
+        public override void Dump(StreamWriter& writer)
+        {
+            BinaryFileFormatter formatter(*file);
+            base->Dump(writer);
+            pos = 0u;
+            int x = GetByte();
+            while (x != -1)
+            {
+                DebugRecordCode debugRecordCode = cast<DebugRecordCode>(cast<byte>(x));
+                string debugLine = Format(DebugRecordCodeStr(debugRecordCode), maxDebugCodeStrLength);
+                if (debugRecordCode == DebugRecordCode.functionInfo)
+                {
+                    uint functionSymbolIndex = GetUInt();
+                    string functionFullName = GetString();
+                    debugLine.Append(" ").Append(ToString(functionSymbolIndex)).Append(' ').Append(functionFullName);
+                }
+                writer.WriteLine(debugLine);
+                x = GetByte();
+            }
+        }
+        public void EmitFunctionInfo(const FunctionInfo& functionInfo)
+        {
+            EmitByte(cast<byte>(DebugRecordCode.functionInfo));
+            EmitUInt(functionInfo.functionSymbolIndex);
+            EmitString(functionInfo.fullName);
         }
     }
 }

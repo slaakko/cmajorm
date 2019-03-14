@@ -13,6 +13,7 @@
 #include <cmajor/symbols/EnumSymbol.hpp>
 #include <cmajor/symbols/ClassTypeSymbol.hpp>
 #include <cmajor/symbols/InterfaceTypeSymbol.hpp>
+#include <cmajor/symbols/GlobalFlags.hpp>
 #include <cmajor/ir/Emitter.hpp>
 #include <cmajor/util/Unicode.hpp>
 
@@ -1436,71 +1437,99 @@ BoundExpression* BoundIsExpression::Clone()
 
 void BoundIsExpression::Load(Emitter& emitter, OperationFlags flags)
 {
-    expr->Load(emitter, OperationFlags::none);
-    void* thisPtr = emitter.Stack().Pop();
-    TypeSymbol* exprType = static_cast<TypeSymbol*>(expr->GetType());
-    Assert(exprType->IsPointerType(), "pointer type expected");
-    TypeSymbol* leftType = exprType->RemovePointer(GetSpan());
-    Assert(leftType->IsClassTypeSymbol(), "class type expected");
-    ClassTypeSymbol* leftClassType = static_cast<ClassTypeSymbol*>(leftType);
-    ClassTypeSymbol* leftVmtPtrHolderClass = leftClassType->VmtPtrHolderClass();
-    if (leftClassType != leftVmtPtrHolderClass)
+    if (GetBackEnd() == BackEnd::llvm)
     {
-        thisPtr = emitter.CreateBitCast(thisPtr, leftVmtPtrHolderClass->AddPointer(GetSpan())->IrType(emitter));
+        expr->Load(emitter, OperationFlags::none);
+        void* thisPtr = emitter.Stack().Pop();
+        TypeSymbol* exprType = static_cast<TypeSymbol*>(expr->GetType());
+        Assert(exprType->IsPointerType(), "pointer type expected");
+        TypeSymbol* leftType = exprType->RemovePointer(GetSpan());
+        Assert(leftType->IsClassTypeSymbol(), "class type expected");
+        ClassTypeSymbol* leftClassType = static_cast<ClassTypeSymbol*>(leftType);
+        ClassTypeSymbol* leftVmtPtrHolderClass = leftClassType->VmtPtrHolderClass();
+        if (leftClassType != leftVmtPtrHolderClass)
+        {
+            thisPtr = emitter.CreateBitCast(thisPtr, leftVmtPtrHolderClass->AddPointer(GetSpan())->IrType(emitter));
+        }
+        void* vmtPtr = emitter.GetVmtPtr(thisPtr, leftVmtPtrHolderClass->VmtPtrIndex(), leftClassType->VmtPtrType(emitter));
+        void* leftClassIdPtr = emitter.GetClassIdPtr(vmtPtr);
+        void* leftClassId = emitter.CreatePtrToInt(emitter.CreateLoad(leftClassIdPtr), emitter.GetIrTypeForULong());
+        void* leftClassIdNull = emitter.CreateICmpEQ(leftClassId, emitter.CreateDefaultIrValueForULong());
+        void* leftTrueBlock = emitter.CreateBasicBlock("leftTrue");
+        void* leftFalseBlock = emitter.CreateBasicBlock("leftFalse");
+        void* leftContinueBlock = emitter.CreateBasicBlock("leftContinue");
+        emitter.CreateCondBr(leftClassIdNull, leftTrueBlock, leftFalseBlock);
+        emitter.SetCurrentBasicBlock(leftTrueBlock);
+        void* retType = emitter.GetIrTypeForULong();
+        std::vector<void*> paramTypes;
+        paramTypes.push_back(emitter.GetIrTypeForVoidPtrType());
+        void* dynamicInitFnType = emitter.GetIrTypeForFunction(retType, paramTypes);
+        void* dynamicInitFn = emitter.GetOrInsertFunction("RtDynamicInitVmt", dynamicInitFnType);
+        std::vector<void*> leftArgs;
+        leftArgs.push_back(emitter.CreateBitCast(leftClassIdPtr, emitter.GetIrTypeForVoidPtrType()));
+        void* computedLeftClassId = emitter.CreateCall(dynamicInitFn, leftArgs);
+        emitter.Stack().Push(computedLeftClassId);
+        leftClassIdVar->Store(emitter, OperationFlags::none);
+        emitter.CreateBr(leftContinueBlock);
+        emitter.SetCurrentBasicBlock(leftFalseBlock);
+        emitter.Stack().Push(leftClassId);
+        leftClassIdVar->Store(emitter, OperationFlags::none);
+        emitter.CreateBr(leftContinueBlock);
+        emitter.SetCurrentBasicBlock(leftContinueBlock);
+        void* rightClassTypeVmtObject = rightClassType->VmtObject(emitter, false);
+        void* rightClassIdPtr = emitter.GetClassIdPtr(rightClassTypeVmtObject);
+        void* rightClassId = emitter.CreatePtrToInt(emitter.CreateLoad(rightClassIdPtr), emitter.GetIrTypeForULong());
+        void* rightClassIdNull = emitter.CreateICmpEQ(rightClassId, emitter.CreateDefaultIrValueForULong());
+        void* rightTrueBlock = emitter.CreateBasicBlock("rightTrue");
+        void* rightFalseBlock = emitter.CreateBasicBlock("rightFalse");
+        void* rightContinueBlock = emitter.CreateBasicBlock("rightContinue");
+        emitter.CreateCondBr(rightClassIdNull, rightTrueBlock, rightFalseBlock);
+        emitter.SetCurrentBasicBlock(rightTrueBlock);
+        std::vector<void*> rightArgs;
+        rightArgs.push_back(emitter.CreateBitCast(rightClassIdPtr, emitter.GetIrTypeForVoidPtrType()));
+        void* computedRightClassId = emitter.CreateCall(dynamicInitFn, rightArgs);
+        emitter.Stack().Push(computedRightClassId);
+        rightClassIdVar->Store(emitter, OperationFlags::none);
+        emitter.CreateBr(rightContinueBlock);
+        emitter.SetCurrentBasicBlock(rightFalseBlock);
+        emitter.Stack().Push(rightClassId);
+        rightClassIdVar->Store(emitter, OperationFlags::none);
+        emitter.CreateBr(rightContinueBlock);
+        emitter.SetCurrentBasicBlock(rightContinueBlock);
+        leftClassIdVar->Load(emitter, OperationFlags::none);
+        void* loadedLeftClassId = emitter.Stack().Pop();
+        rightClassIdVar->Load(emitter, OperationFlags::none);
+        void* loadedRightClassId = emitter.Stack().Pop();
+        void* remainder = emitter.CreateURem(loadedLeftClassId, loadedRightClassId);
+        void* remainderIsZero = emitter.CreateICmpEQ(remainder, emitter.CreateDefaultIrValueForULong());
+        emitter.Stack().Push(remainderIsZero);
+        DestroyTemporaries(emitter);
     }
-    void* vmtPtr = emitter.GetVmtPtr(thisPtr, leftVmtPtrHolderClass->VmtPtrIndex(), leftClassType->VmtPtrType(emitter));
-    void* leftClassIdPtr = emitter.GetClassIdPtr(vmtPtr);
-    void* leftClassId = emitter.CreatePtrToInt(emitter.CreateLoad(leftClassIdPtr), emitter.GetIrTypeForULong());
-    void* leftClassIdNull = emitter.CreateICmpEQ(leftClassId, emitter.CreateDefaultIrValueForULong());
-    void* leftTrueBlock = emitter.CreateBasicBlock("leftTrue");
-    void* leftFalseBlock = emitter.CreateBasicBlock("leftFalse");
-    void* leftContinueBlock = emitter.CreateBasicBlock("leftContinue");
-    emitter.CreateCondBr(leftClassIdNull, leftTrueBlock, leftFalseBlock);
-    emitter.SetCurrentBasicBlock(leftTrueBlock);
-    void* retType = emitter.GetIrTypeForULong();
-    std::vector<void*> paramTypes;
-    paramTypes.push_back(emitter.GetIrTypeForVoidPtrType());
-    void* dynamicInitFnType = emitter.GetIrTypeForFunction(retType, paramTypes);
-    void* dynamicInitFn = emitter.GetOrInsertFunction("RtDynamicInitVmt", dynamicInitFnType);
-    std::vector<void*> leftArgs;
-    leftArgs.push_back(emitter.CreateBitCast(leftClassIdPtr, emitter.GetIrTypeForVoidPtrType()));
-    void* computedLeftClassId = emitter.CreateCall(dynamicInitFn, leftArgs);
-    emitter.Stack().Push(computedLeftClassId);
-    leftClassIdVar->Store(emitter, OperationFlags::none);
-    emitter.CreateBr(leftContinueBlock);
-    emitter.SetCurrentBasicBlock(leftFalseBlock);
-    emitter.Stack().Push(leftClassId);
-    leftClassIdVar->Store(emitter, OperationFlags::none);
-    emitter.CreateBr(leftContinueBlock);
-    emitter.SetCurrentBasicBlock(leftContinueBlock);
-    void* rightClassTypeVmtObject = rightClassType->VmtObject(emitter, false);
-    void* rightClassIdPtr = emitter.GetClassIdPtr(rightClassTypeVmtObject);
-    void* rightClassId = emitter.CreatePtrToInt(emitter.CreateLoad(rightClassIdPtr), emitter.GetIrTypeForULong());
-    void* rightClassIdNull = emitter.CreateICmpEQ(rightClassId, emitter.CreateDefaultIrValueForULong());
-    void* rightTrueBlock = emitter.CreateBasicBlock("rightTrue");
-    void* rightFalseBlock = emitter.CreateBasicBlock("rightFalse");
-    void* rightContinueBlock = emitter.CreateBasicBlock("rightContinue");
-    emitter.CreateCondBr(rightClassIdNull, rightTrueBlock, rightFalseBlock);
-    emitter.SetCurrentBasicBlock(rightTrueBlock);
-    std::vector<void*> rightArgs;
-    rightArgs.push_back(emitter.CreateBitCast(rightClassIdPtr, emitter.GetIrTypeForVoidPtrType()));
-    void* computedRightClassId = emitter.CreateCall(dynamicInitFn, rightArgs);
-    emitter.Stack().Push(computedRightClassId);
-    rightClassIdVar->Store(emitter, OperationFlags::none);
-    emitter.CreateBr(rightContinueBlock);
-    emitter.SetCurrentBasicBlock(rightFalseBlock);
-    emitter.Stack().Push(rightClassId);
-    rightClassIdVar->Store(emitter, OperationFlags::none);
-    emitter.CreateBr(rightContinueBlock);
-    emitter.SetCurrentBasicBlock(rightContinueBlock);
-    leftClassIdVar->Load(emitter, OperationFlags::none);
-    void* loadedLeftClassId = emitter.Stack().Pop();
-    rightClassIdVar->Load(emitter, OperationFlags::none);
-    void* loadedRightClassId = emitter.Stack().Pop();
-    void* remainder = emitter.CreateURem(loadedLeftClassId, loadedRightClassId);
-    void* remainderIsZero = emitter.CreateICmpEQ(remainder, emitter.CreateDefaultIrValueForULong());
-    emitter.Stack().Push(remainderIsZero);
-    DestroyTemporaries(emitter);
+    else if (GetBackEnd() == BackEnd::cmsx)
+    {
+        expr->Load(emitter, OperationFlags::none);
+        void* thisPtr = emitter.Stack().Pop();
+        TypeSymbol* exprType = static_cast<TypeSymbol*>(expr->GetType());
+        Assert(exprType->IsPointerType(), "pointer type expected");
+        TypeSymbol* leftType = exprType->RemovePointer(GetSpan());
+        Assert(leftType->IsClassTypeSymbol(), "class type expected");
+        ClassTypeSymbol* leftClassType = static_cast<ClassTypeSymbol*>(leftType);
+        ClassTypeSymbol* leftVmtPtrHolderClass = leftClassType->VmtPtrHolderClass();
+        if (leftClassType != leftVmtPtrHolderClass)
+        {
+            thisPtr = emitter.CreateBitCast(thisPtr, leftVmtPtrHolderClass->AddPointer(GetSpan())->IrType(emitter));
+        }
+        void* vmtPtr = emitter.GetVmtPtr(thisPtr, leftVmtPtrHolderClass->VmtPtrIndex(), leftClassType->VmtPtrType(emitter));
+        void* leftClassIdPtr = emitter.GetClassIdPtr(vmtPtr);
+        void* leftClassId = emitter.CreatePtrToInt(emitter.CreateLoad(leftClassIdPtr), emitter.GetIrTypeForULong());
+        void* rightClassTypeVmtObject = rightClassType->VmtObject(emitter, false);
+        void* rightClassIdPtr = emitter.GetClassIdPtr(rightClassTypeVmtObject);
+        void* rightClassId = emitter.CreatePtrToInt(emitter.CreateLoad(rightClassIdPtr), emitter.GetIrTypeForULong());
+        void* remainder = emitter.CreateURem(leftClassId, rightClassId);
+        void* remainderIsZero = emitter.CreateICmpEQ(remainder, emitter.CreateDefaultIrValueForULong());
+        emitter.Stack().Push(remainderIsZero);
+        DestroyTemporaries(emitter);
+    }
 }
 
 void BoundIsExpression::Store(Emitter& emitter, OperationFlags flags)
@@ -1543,84 +1572,125 @@ BoundExpression* BoundAsExpression::Clone()
 
 void BoundAsExpression::Load(Emitter& emitter, OperationFlags flags)
 {
-    expr->Load(emitter, OperationFlags::none);
-    void* thisPtr = emitter.Stack().Pop();
-    TypeSymbol* exprType = static_cast<TypeSymbol*>(expr->GetType());
-    Assert(exprType->IsPointerType(), "pointer type expected");
-    TypeSymbol* leftType = exprType->RemovePointer(GetSpan());
-    Assert(leftType->IsClassTypeSymbol(), "class type expected");
-    ClassTypeSymbol* leftClassType = static_cast<ClassTypeSymbol*>(leftType);
-    ClassTypeSymbol* leftVmtPtrHolderClass = leftClassType->VmtPtrHolderClass();
-    if (leftClassType != leftVmtPtrHolderClass)
+    if (GetBackEnd() == BackEnd::llvm)
     {
-        thisPtr = emitter.CreateBitCast(thisPtr, leftVmtPtrHolderClass->AddPointer(GetSpan())->IrType(emitter));
+        expr->Load(emitter, OperationFlags::none);
+        void* thisPtr = emitter.Stack().Pop();
+        TypeSymbol* exprType = static_cast<TypeSymbol*>(expr->GetType());
+        Assert(exprType->IsPointerType(), "pointer type expected");
+        TypeSymbol* leftType = exprType->RemovePointer(GetSpan());
+        Assert(leftType->IsClassTypeSymbol(), "class type expected");
+        ClassTypeSymbol* leftClassType = static_cast<ClassTypeSymbol*>(leftType);
+        ClassTypeSymbol* leftVmtPtrHolderClass = leftClassType->VmtPtrHolderClass();
+        if (leftClassType != leftVmtPtrHolderClass)
+        {
+            thisPtr = emitter.CreateBitCast(thisPtr, leftVmtPtrHolderClass->AddPointer(GetSpan())->IrType(emitter));
+        }
+        void* vmtPtr = emitter.GetVmtPtr(thisPtr, leftVmtPtrHolderClass->VmtPtrIndex(), leftClassType->VmtPtrType(emitter));
+        void* leftClassIdPtr = emitter.GetClassIdPtr(vmtPtr);
+        void* leftClassId = emitter.CreatePtrToInt(emitter.CreateLoad(leftClassIdPtr), emitter.GetIrTypeForULong());
+        void* leftClassIdNull = emitter.CreateICmpEQ(leftClassId, emitter.CreateDefaultIrValueForULong());
+        void* leftTrueBlock = emitter.CreateBasicBlock("leftTrue");
+        void* leftFalseBlock = emitter.CreateBasicBlock("leftFalse");
+        void* leftContinueBlock = emitter.CreateBasicBlock("leftContinue");
+        emitter.CreateCondBr(leftClassIdNull, leftTrueBlock, leftFalseBlock);
+        emitter.SetCurrentBasicBlock(leftTrueBlock);
+        void* retType = emitter.GetIrTypeForULong();
+        std::vector<void*> paramTypes;
+        paramTypes.push_back(emitter.GetIrTypeForVoidPtrType());
+        void* dynamicInitFnType = emitter.GetIrTypeForFunction(retType, paramTypes);
+        void* dynamicInitFn = emitter.GetOrInsertFunction("RtDynamicInitVmt", dynamicInitFnType);
+        std::vector<void*> leftArgs;
+        leftArgs.push_back(emitter.CreateBitCast(leftClassIdPtr, emitter.GetIrTypeForVoidPtrType()));
+        void* computedLeftClassId = emitter.CreateCall(dynamicInitFn, leftArgs);
+        emitter.Stack().Push(computedLeftClassId);
+        leftClassIdVar->Store(emitter, OperationFlags::none);
+        emitter.CreateBr(leftContinueBlock);
+        emitter.SetCurrentBasicBlock(leftFalseBlock);
+        emitter.Stack().Push(leftClassId);
+        leftClassIdVar->Store(emitter, OperationFlags::none);
+        emitter.CreateBr(leftContinueBlock);
+        emitter.SetCurrentBasicBlock(leftContinueBlock);
+        void* rightClassTypeVmtObject = rightClassType->VmtObject(emitter, false);
+        void* rightClassIdPtr = emitter.GetClassIdPtr(rightClassTypeVmtObject);
+        void* rightClassId = emitter.CreatePtrToInt(emitter.CreateLoad(rightClassIdPtr), emitter.GetIrTypeForULong());
+        void* rightClassIdNull = emitter.CreateICmpEQ(rightClassId, emitter.CreateDefaultIrValueForULong());
+        void* rightTrueBlock = emitter.CreateBasicBlock("rightTrue");
+        void* rightFalseBlock = emitter.CreateBasicBlock("rightFalse");
+        void* rightContinueBlock = emitter.CreateBasicBlock("rightContinue");
+        emitter.CreateCondBr(rightClassIdNull, rightTrueBlock, rightFalseBlock);
+        emitter.SetCurrentBasicBlock(rightTrueBlock);
+        std::vector<void*> rightArgs;
+        rightArgs.push_back(emitter.CreateBitCast(rightClassIdPtr, emitter.GetIrTypeForVoidPtrType()));
+        void* computedRightClassId = emitter.CreateCall(dynamicInitFn, rightArgs);
+        emitter.Stack().Push(computedRightClassId);
+        rightClassIdVar->Store(emitter, OperationFlags::none);
+        emitter.CreateBr(rightContinueBlock);
+        emitter.SetCurrentBasicBlock(rightFalseBlock);
+        emitter.Stack().Push(rightClassId);
+        rightClassIdVar->Store(emitter, OperationFlags::none);
+        emitter.CreateBr(rightContinueBlock);
+        emitter.SetCurrentBasicBlock(rightContinueBlock);
+        leftClassIdVar->Load(emitter, OperationFlags::none);
+        void* loadedLeftClassId = emitter.Stack().Pop();
+        rightClassIdVar->Load(emitter, OperationFlags::none);
+        void* loadedRightClassId = emitter.Stack().Pop();
+        void* remainder = emitter.CreateURem(loadedLeftClassId, loadedRightClassId);
+        void* remainderIsZero = emitter.CreateICmpEQ(remainder, emitter.CreateDefaultIrValueForULong());
+        void* trueBlock = emitter.CreateBasicBlock("true");
+        void* falseBlock = emitter.CreateBasicBlock("false");
+        void* continueBlock = emitter.CreateBasicBlock("continue");
+        emitter.CreateCondBr(remainderIsZero, trueBlock, falseBlock);
+        emitter.SetCurrentBasicBlock(trueBlock);
+        emitter.Stack().Push(emitter.CreateBitCast(thisPtr, rightClassType->AddPointer(GetSpan())->IrType(emitter)));
+        variable->Store(emitter, OperationFlags::none);
+        emitter.CreateBr(continueBlock);
+        emitter.SetCurrentBasicBlock(falseBlock);
+        emitter.Stack().Push(emitter.CreateDefaultIrValueForPtrType(rightClassType->AddPointer(GetSpan())->IrType(emitter)));
+        variable->Store(emitter, OperationFlags::none);
+        emitter.CreateBr(continueBlock);
+        emitter.SetCurrentBasicBlock(continueBlock);
+        variable->Load(emitter, OperationFlags::none);
+        DestroyTemporaries(emitter);
     }
-    void* vmtPtr = emitter.GetVmtPtr(thisPtr, leftVmtPtrHolderClass->VmtPtrIndex(), leftClassType->VmtPtrType(emitter));
-    void* leftClassIdPtr = emitter.GetClassIdPtr(vmtPtr);
-    void* leftClassId = emitter.CreatePtrToInt(emitter.CreateLoad(leftClassIdPtr), emitter.GetIrTypeForULong());
-    void* leftClassIdNull = emitter.CreateICmpEQ(leftClassId, emitter.CreateDefaultIrValueForULong());
-    void* leftTrueBlock = emitter.CreateBasicBlock("leftTrue");
-    void* leftFalseBlock = emitter.CreateBasicBlock("leftFalse");
-    void* leftContinueBlock = emitter.CreateBasicBlock("leftContinue");
-    emitter.CreateCondBr(leftClassIdNull, leftTrueBlock, leftFalseBlock);
-    emitter.SetCurrentBasicBlock(leftTrueBlock);
-    void* retType = emitter.GetIrTypeForULong();
-    std::vector<void*> paramTypes;
-    paramTypes.push_back(emitter.GetIrTypeForVoidPtrType());
-    void* dynamicInitFnType = emitter.GetIrTypeForFunction(retType, paramTypes);
-    void* dynamicInitFn = emitter.GetOrInsertFunction("RtDynamicInitVmt", dynamicInitFnType);
-    std::vector<void*> leftArgs;
-    leftArgs.push_back(emitter.CreateBitCast(leftClassIdPtr, emitter.GetIrTypeForVoidPtrType()));
-    void* computedLeftClassId = emitter.CreateCall(dynamicInitFn, leftArgs);
-    emitter.Stack().Push(computedLeftClassId);
-    leftClassIdVar->Store(emitter, OperationFlags::none);
-    emitter.CreateBr(leftContinueBlock);
-    emitter.SetCurrentBasicBlock(leftFalseBlock);
-    emitter.Stack().Push(leftClassId);
-    leftClassIdVar->Store(emitter, OperationFlags::none);
-    emitter.CreateBr(leftContinueBlock);
-    emitter.SetCurrentBasicBlock(leftContinueBlock);
-    void* rightClassTypeVmtObject = rightClassType->VmtObject(emitter, false);
-    void* rightClassIdPtr = emitter.GetClassIdPtr(rightClassTypeVmtObject);
-    void* rightClassId = emitter.CreatePtrToInt(emitter.CreateLoad(rightClassIdPtr), emitter.GetIrTypeForULong());
-    void* rightClassIdNull = emitter.CreateICmpEQ(rightClassId, emitter.CreateDefaultIrValueForULong());
-    void* rightTrueBlock = emitter.CreateBasicBlock("rightTrue");
-    void* rightFalseBlock = emitter.CreateBasicBlock("rightFalse");
-    void* rightContinueBlock = emitter.CreateBasicBlock("rightContinue");
-    emitter.CreateCondBr(rightClassIdNull, rightTrueBlock, rightFalseBlock);
-    emitter.SetCurrentBasicBlock(rightTrueBlock);
-    std::vector<void*> rightArgs;
-    rightArgs.push_back(emitter.CreateBitCast(rightClassIdPtr, emitter.GetIrTypeForVoidPtrType()));
-    void* computedRightClassId = emitter.CreateCall(dynamicInitFn, rightArgs);
-    emitter.Stack().Push(computedRightClassId);
-    rightClassIdVar->Store(emitter, OperationFlags::none);
-    emitter.CreateBr(rightContinueBlock);
-    emitter.SetCurrentBasicBlock(rightFalseBlock);
-    emitter.Stack().Push(rightClassId);
-    rightClassIdVar->Store(emitter, OperationFlags::none);
-    emitter.CreateBr(rightContinueBlock);
-    emitter.SetCurrentBasicBlock(rightContinueBlock);
-    leftClassIdVar->Load(emitter, OperationFlags::none);
-    void* loadedLeftClassId = emitter.Stack().Pop();
-    rightClassIdVar->Load(emitter, OperationFlags::none);
-    void* loadedRightClassId = emitter.Stack().Pop();
-    void* remainder = emitter.CreateURem(loadedLeftClassId, loadedRightClassId);
-    void* remainderIsZero = emitter.CreateICmpEQ(remainder, emitter.CreateDefaultIrValueForULong());
-    void* trueBlock = emitter.CreateBasicBlock("true");
-    void* falseBlock = emitter.CreateBasicBlock("false");
-    void* continueBlock = emitter.CreateBasicBlock("continue");
-    emitter.CreateCondBr(remainderIsZero, trueBlock, falseBlock);
-    emitter.SetCurrentBasicBlock(trueBlock);
-    emitter.Stack().Push(emitter.CreateBitCast(thisPtr, rightClassType->AddPointer(GetSpan())->IrType(emitter)));
-    variable->Store(emitter, OperationFlags::none);
-    emitter.CreateBr(continueBlock);
-    emitter.SetCurrentBasicBlock(falseBlock);
-    emitter.Stack().Push(emitter.CreateDefaultIrValueForPtrType(rightClassType->AddPointer(GetSpan())->IrType(emitter)));
-    variable->Store(emitter, OperationFlags::none);
-    emitter.CreateBr(continueBlock);
-    emitter.SetCurrentBasicBlock(continueBlock);
-    variable->Load(emitter, OperationFlags::none);
-    DestroyTemporaries(emitter);
+    else if (GetBackEnd() == BackEnd::cmsx)
+    {
+        expr->Load(emitter, OperationFlags::none);
+        void* thisPtr = emitter.Stack().Pop();
+        TypeSymbol* exprType = static_cast<TypeSymbol*>(expr->GetType());
+        Assert(exprType->IsPointerType(), "pointer type expected");
+        TypeSymbol* leftType = exprType->RemovePointer(GetSpan());
+        Assert(leftType->IsClassTypeSymbol(), "class type expected");
+        ClassTypeSymbol* leftClassType = static_cast<ClassTypeSymbol*>(leftType);
+        ClassTypeSymbol* leftVmtPtrHolderClass = leftClassType->VmtPtrHolderClass();
+        if (leftClassType != leftVmtPtrHolderClass)
+        {
+            thisPtr = emitter.CreateBitCast(thisPtr, leftVmtPtrHolderClass->AddPointer(GetSpan())->IrType(emitter));
+        }
+        void* vmtPtr = emitter.GetVmtPtr(thisPtr, leftVmtPtrHolderClass->VmtPtrIndex(), leftClassType->VmtPtrType(emitter));
+        void* leftClassIdPtr = emitter.GetClassIdPtr(vmtPtr);
+        void* leftClassId = emitter.CreatePtrToInt(emitter.CreateLoad(leftClassIdPtr), emitter.GetIrTypeForULong());
+        void* rightClassTypeVmtObject = rightClassType->VmtObject(emitter, false);
+        void* rightClassIdPtr = emitter.GetClassIdPtr(rightClassTypeVmtObject);
+        void* rightClassId = emitter.CreatePtrToInt(emitter.CreateLoad(rightClassIdPtr), emitter.GetIrTypeForULong());
+        void* remainder = emitter.CreateURem(leftClassId, rightClassId);
+        void* remainderIsZero = emitter.CreateICmpEQ(remainder, emitter.CreateDefaultIrValueForULong());
+        void* trueBlock = emitter.CreateBasicBlock("true");
+        void* falseBlock = emitter.CreateBasicBlock("false");
+        void* continueBlock = emitter.CreateBasicBlock("continue");
+        emitter.CreateCondBr(remainderIsZero, trueBlock, falseBlock);
+        emitter.SetCurrentBasicBlock(trueBlock);
+        emitter.Stack().Push(emitter.CreateBitCast(thisPtr, rightClassType->AddPointer(GetSpan())->IrType(emitter)));
+        variable->Store(emitter, OperationFlags::none);
+        emitter.CreateBr(continueBlock);
+        emitter.SetCurrentBasicBlock(falseBlock);
+        emitter.Stack().Push(emitter.CreateDefaultIrValueForPtrType(rightClassType->AddPointer(GetSpan())->IrType(emitter)));
+        variable->Store(emitter, OperationFlags::none);
+        emitter.CreateBr(continueBlock);
+        emitter.SetCurrentBasicBlock(continueBlock);
+        variable->Load(emitter, OperationFlags::none);
+        DestroyTemporaries(emitter);
+    }
 }
 
 void BoundAsExpression::Store(Emitter& emitter, OperationFlags flags)
@@ -1670,7 +1740,7 @@ void BoundTypeNameExpression::Load(Emitter& emitter, OperationFlags flags)
         thisPtr = emitter.CreateBitCast(thisPtr, vmtPtrHolderClass->AddPointer(GetSpan())->IrType(emitter));
     }
     void* vmtPtr = emitter.GetVmtPtr(thisPtr, vmtPtrHolderClass->VmtPtrIndex(), classType->VmtPtrType(emitter));
-    void* className = emitter.GetClassName(vmtPtr, classNameVmtIndexOffset);
+    void* className = emitter.GetClassName(vmtPtr, GetClassNameVmtIndexOffset());
     emitter.Stack().Push(className);
     DestroyTemporaries(emitter);
 }

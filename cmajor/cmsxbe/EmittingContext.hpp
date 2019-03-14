@@ -18,11 +18,9 @@ public:
     const std::string& TargetTriple() const override { return targetTriple; }
     void* DataLayout() override { return nullptr; }
     void* TargetMachine() override { return nullptr; }
-    cmsxi::Context* GetContext() { return &context; }
 private:
     int optimizationLevel;
     std::string targetTriple;
-    cmsxi::Context context;
 };
 
 } // namespace cmsxbe

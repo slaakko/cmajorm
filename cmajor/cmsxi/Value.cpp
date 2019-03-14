@@ -5,6 +5,7 @@
 
 #include <cmajor/cmsxi/Value.hpp>
 #include <cmajor/cmsxi/Context.hpp>
+#include <cmajor/util/TextUtils.hpp>
 
 namespace cmsxi {
 
@@ -228,13 +229,13 @@ std::string NullValue::Name(Context& context)
     return "null";
 }
 
-ArrayValue::ArrayValue(Type* type_, const std::vector<ConstantValue*>& elements_) : ConstantValue(), type(type_), elements(elements_)
+ArrayValue::ArrayValue(Type* type_, const std::vector<ConstantValue*>& elements_, const std::string& prefix_) : ConstantValue(), type(type_), elements(elements_), prefix(prefix_)
 {
 }
 
 std::string ArrayValue::Name(Context& context)
 {
-    std::string name = "[ ";
+    std::string name = prefix + "[ ";
     bool first = true;
     for (ConstantValue* element : elements)
     {
@@ -303,6 +304,69 @@ std::string StructureValue::Name(Context& context)
 void StructureValue::AddMember(ConstantValue* member)
 {
     members.push_back(member);
+}
+
+StringValue::StringValue(Type* type_, const std::string& value_) : ConstantValue(), type(type_), value(value_)
+{
+}
+
+std::string StringValue::Name(Context& context)
+{
+    std::string name("\"");
+    for (char c : value)
+    {
+        if (c == '"')
+        {
+            name.append("\\").append(cmajor::util::ToHexString(static_cast<uint8_t>(c)));
+        }
+        else if (c >= 32 && c < 127)
+        {
+            name.append(1, c);
+        }
+        else
+        {
+            name.append("\\").append(cmajor::util::ToHexString(static_cast<uint8_t>(c)));
+        }
+    }
+    name.append("\\").append(cmajor::util::ToHexString(static_cast<uint8_t>(0)));
+    name.append("\"");
+    return name;
+}
+
+Type* StringValue::GetType(Context& context)
+{
+    return type;
+}
+
+ConversionValue::ConversionValue(Type* type_, ConstantValue* from_) : ConstantValue(), type(type_), from(from_)
+{
+}
+
+std::string ConversionValue::Name(Context& context)
+{
+    std::string name = "conv(";
+    name.append(from->GetType(context)->Name()).append(1, ' ').append(from->Name(context)).append(1, ')');
+    return name;
+}
+
+Type* ConversionValue::GetType(Context& context)
+{
+    return type;
+}
+
+ClsIdValue::ClsIdValue(const std::string& typeId_) : ConstantValue(), typeId(typeId_)
+{
+}
+
+std::string ClsIdValue::Name(Context& context)
+{
+    std::string name = "clsid(" + typeId + ")";
+    return name;
+}
+
+Type* ClsIdValue::GetType(Context& context)
+{
+    return context.GetPtrType(context.GetVoidType());
 }
 
 } // namespace cmsxi

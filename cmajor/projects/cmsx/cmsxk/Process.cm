@@ -78,6 +78,8 @@ namespace cmsx.kernel
         public ulong eventData;
         public ulong poolStart;
         public ulong poolEnd;
+        public ulong functionTableAddress;
+        public ulong functionTableLength;
     }
 
     public class ProcessTable
@@ -478,6 +480,87 @@ namespace cmsx.kernel
         return 0;
     }
 
+    public nothrow long GetProcessStackTrace(Machine& machine, Process* process, ulong fp, ulong buffer, long count)
+    {
+        if (process->functionTableAddress == 0u || process->functionTableLength == 0u) return -1;
+        if (buffer < poolSegmentBaseAddress || buffer >= stackSegmentBaseAddress) return -1;
+        if (count <= 0) return -1;
+        List<cmsx.object.FunctionTableEntry> functionTable;
+        int result = ReadFunctionTableFromProcessMemory(machine, process, process->functionTableAddress, process->functionTableLength, functionTable);
+        if (result != 0) return -1;
+        List<ulong> pcs;
+        string stackTrace = "STACK TRACE:\n";
+        ulong pc = 0u;
+        result = ReadProcessMemory(machine, process, fp - 8u, pc, 8u);
+        while (result == 0 && pc != 0u)
+        {
+            pcs.Add(pc);
+            ulong prevFP = 0u;
+            result = ReadProcessMemory(machine, process, fp, prevFP, 8u);
+            if (result == 0)
+            {
+                fp = prevFP;
+                result = ReadProcessMemory(machine, process, fp - 8u, pc, 8u);
+            }
+        }
+        List<cmsx.object.FunctionTableEntry>.ConstIterator first = functionTable.CBegin();
+        List<cmsx.object.FunctionTableEntry>.ConstIterator last = functionTable.CEnd();
+        long n = pcs.Count();
+        for (long i = n - 1; i >= 0; --i)
+        {
+            ulong pc = pcs[i];
+            List<cmsx.object.FunctionTableEntry>.ConstIterator first = functionTable.CBegin();
+            List<cmsx.object.FunctionTableEntry>.ConstIterator last = functionTable.CEnd();
+            cmsx.object.FunctionTableEntry entry(pc, 0u, 0u, 0u);
+            List<cmsx.object.FunctionTableEntry>.ConstIterator it = LowerBound(first, last, entry);
+            if (it != first && it == last)
+            {
+                --it;
+            }
+            if (entry.start < it->start && it != first)
+            {
+                --it;
+            }
+            if (it != last && entry.start >= it->start && entry.start < it->start + it->length)
+            {
+                ulong fullNameAddress = it->fullNameAddress;
+                string fullName;
+                result = ReadStringFromProcessMemory(machine, process, dataSegmentBaseAddress + fullNameAddress, fullName);
+                if (result != 0)
+                {
+                    return -1;
+                }
+                ulong mangledNameAddress = it->mangledNameAddress;
+                string mangledName;
+                result = ReadStringFromProcessMemory(machine, process, dataSegmentBaseAddress + mangledNameAddress, mangledName);
+                if (result != 0)
+                {
+                    return -1;
+                }
+                stackTrace.Append(ToString(i)).Append(": ").Append(fullName).Append(" : ").Append(mangledName).Append('\n');
+            }
+        }
+        stackTrace.Append('\n');
+        if (count < stackTrace.Length())
+        {
+            stackTrace = stackTrace.Substring(stackTrace.Length() - count);
+        }
+        if (count > stackTrace.Length())
+        {
+            count = stackTrace.Length();
+        }
+        long len = Max(cast<long>(0), count - 1);
+        if (len > 0)
+        {
+            result = WriteProcessMemory(machine, process, buffer, cast<byte*>(cast<void*>(stackTrace.Chars())), cast<ulong>(len), Protection.write);
+        }
+        if (result == 0)
+        {
+            result = WriteProcessMemory(machine, process, buffer + cast<ulong>(len), 0u, 1u, Protection.write);
+        }
+        return result;
+    }
+
     public nothrow void InitializeProcessMemory(Machine& machine, Process* process,
         ulong textSegmentStartAddress, ulong textSegmentSize, ulong dataSegmentSize, ulong poolSegmentSize, ulong stackSegmentSize)
     {
@@ -563,6 +646,45 @@ namespace cmsx.kernel
             *buffer = mem.ReadByte(address, Protection.read);
             ++buffer;
             ++address;
+        }
+        regs.SetSpecial(Registers.rV, prevRV);
+        return 0;
+    }
+
+    public nothrow int ReadStringFromProcessMemory(Machine& machine, Process* process, ulong address, string& s)
+    {
+        Memory& mem = machine.GetMemory();
+        Registers& regs = machine.GetRegisters();
+        ulong prevRV = regs.GetSpecial(Registers.rV);
+        MemoryTable& memoryTable = process->memoryTable;
+        regs.SetSpecial(Registers.rV, memoryTable.virtualTranslationRegisterValue);
+        byte x = mem.ReadByte(address, Protection.read);
+        while (x != 0u)
+        {
+            s.Append(cast<char>(x));
+            ++address;
+            x = mem.ReadByte(address, Protection.read);
+        }
+        regs.SetSpecial(Registers.rV, prevRV);
+        return 0;
+    }
+
+    public nothrow int ReadFunctionTableFromProcessMemory(Machine& machine, Process* process, ulong functionTableAddress, ulong functionTableLength, List<cmsx.object.FunctionTableEntry>& functionTable)
+    {
+        Memory& mem = machine.GetMemory();
+        Registers& regs = machine.GetRegisters();
+        ulong prevRV = regs.GetSpecial(Registers.rV);
+        MemoryTable& memoryTable = process->memoryTable;
+        regs.SetSpecial(Registers.rV, memoryTable.virtualTranslationRegisterValue);
+        ulong functionTableEndAddress = functionTableAddress + functionTableLength;
+        for (ulong address = functionTableAddress; address < functionTableEndAddress; address = address + cast<ulong>(sizeof(cmsx.object.FunctionTableEntry)))
+        {
+            cmsx.object.FunctionTableEntry entry;
+            entry.start = mem.ReadULong(address, Protection.read);
+            entry.length = mem.ReadULong(address + 8u, Protection.read);
+            entry.mangledNameAddress = mem.ReadULong(address + 16u, Protection.read);
+            entry.fullNameAddress = mem.ReadULong(address + 24u, Protection.read);
+            functionTable.Add(entry);
         }
         regs.SetSpecial(Registers.rV, prevRV);
         return 0;

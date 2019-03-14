@@ -68,7 +68,15 @@ namespace cmsx.intermediate
         }
     }
 
-    public class BoolValue : ConstantValue
+    public class LiteralValue : ConstantValue
+    {
+        public override nothrow string Name() const
+        {
+            return "literal";
+        }
+    }
+
+    public class BoolValue : LiteralValue
     {
         public default nothrow BoolValue();
         public nothrow BoolValue(bool value_) : value(value_)
@@ -84,15 +92,15 @@ namespace cmsx.intermediate
             setInst->AddOperand(reg);
             setInst->AddOperand(machineCode.context.GetLiteralOperand(cast<ulong>(value)));
         }
-        public override Value* SignExtendTo(Type* targetType, int line)
+        public override ConstantValue* SignExtendTo(Type* targetType, int line)
         {
             return targetType->MakeValue(cmsx.util.SignExtend(cast<byte>(value)));
         }
-        public override Value* ZeroExtendTo(Type* targetType, int line)
+        public override ConstantValue* ZeroExtendTo(Type* targetType, int line)
         {
             return targetType->MakeValue(cast<ulong>(value));
         }
-        public override Value* TruncateTo(Type* targetType, int line)
+        public override ConstantValue* TruncateTo(Type* targetType, int line)
         {
             return targetType->MakeValue(cast<ulong>(value));
         }
@@ -109,7 +117,7 @@ namespace cmsx.intermediate
         public bool value;
     }
 
-    public class SByteValue : ConstantValue
+    public class SByteValue : LiteralValue
     {
         public default nothrow SByteValue();
         public nothrow SByteValue(sbyte value_) : value(value_)
@@ -137,11 +145,11 @@ namespace cmsx.intermediate
             setInst->AddOperand(reg);
             setInst->AddOperand(machineCode.context.GetLiteralOperand(cast<byte>(value)));
         }
-        public override Value* SignExtendTo(Type* targetType, int line)
+        public override ConstantValue* SignExtendTo(Type* targetType, int line)
         {
             return targetType->MakeValue(cmsx.util.SignExtend(cast<byte>(value)));
         }
-        public override Value* TruncateTo(Type* targetType, int line)
+        public override ConstantValue* TruncateTo(Type* targetType, int line)
         {
             return targetType->MakeValue(cast<ulong>(value));
         }
@@ -158,7 +166,7 @@ namespace cmsx.intermediate
         public sbyte value;
     }
 
-    public class ByteValue : ConstantValue
+    public class ByteValue : LiteralValue
     {
         public default nothrow ByteValue();
         public nothrow ByteValue(byte value_) : value(value_)
@@ -179,15 +187,15 @@ namespace cmsx.intermediate
             setInst->AddOperand(reg);
             setInst->AddOperand(machineCode.context.GetLiteralOperand(value));
         }
-        public override Value* SignExtendTo(Type* targetType, int line)
+        public override ConstantValue* SignExtendTo(Type* targetType, int line)
         {
             return targetType->MakeValue(cmsx.util.SignExtend(value));
         }
-        public override Value* ZeroExtendTo(Type* targetType, int line)
+        public override ConstantValue* ZeroExtendTo(Type* targetType, int line)
         {
             return targetType->MakeValue(value);
         }
-        public override Value* TruncateTo(Type* targetType, int line)
+        public override ConstantValue* TruncateTo(Type* targetType, int line)
         {
             return targetType->MakeValue(cast<ulong>(value));
         }
@@ -204,7 +212,7 @@ namespace cmsx.intermediate
         public byte value;
     }
 
-    public class ShortValue : ConstantValue
+    public class ShortValue : LiteralValue
     {
         public default nothrow ShortValue();
         public nothrow ShortValue(short value_) : value(value_)
@@ -232,11 +240,11 @@ namespace cmsx.intermediate
             setInst->AddOperand(reg);
             setInst->AddOperand(machineCode.context.GetLiteralOperand(cast<ushort>(value)));
         }
-        public override Value* SignExtendTo(Type* targetType, int line)
+        public override ConstantValue* SignExtendTo(Type* targetType, int line)
         {
             return targetType->MakeValue(cmsx.util.SignExtend(cast<ushort>(value)));
         }
-        public override Value* TruncateTo(Type* targetType, int line)
+        public override ConstantValue* TruncateTo(Type* targetType, int line)
         {
             return targetType->MakeValue(cast<ulong>(value));
         }
@@ -253,7 +261,7 @@ namespace cmsx.intermediate
         public short value;
     }
 
-    public class UShortValue : ConstantValue
+    public class UShortValue : LiteralValue
     {
         public default nothrow UShortValue();
         public nothrow UShortValue(ushort value_) : value(value_)
@@ -281,15 +289,15 @@ namespace cmsx.intermediate
             setInst->AddOperand(reg);
             setInst->AddOperand(machineCode.context.GetLiteralOperand(value));
         }
-        public override Value* SignExtendTo(Type* targetType, int line)
+        public override ConstantValue* SignExtendTo(Type* targetType, int line)
         {
             return targetType->MakeValue(cmsx.util.SignExtend(value));
         }
-        public override Value* ZeroExtendTo(Type* targetType, int line)
+        public override ConstantValue* ZeroExtendTo(Type* targetType, int line)
         {
             return targetType->MakeValue(value);
         }
-        public override Value* TruncateTo(Type* targetType, int line)
+        public override ConstantValue* TruncateTo(Type* targetType, int line)
         {
             return targetType->MakeValue(cast<ulong>(value));
         }
@@ -306,7 +314,7 @@ namespace cmsx.intermediate
         public ushort value;
     }
 
-    public class IntValue : ConstantValue
+    public class IntValue : LiteralValue
     {
         public default nothrow IntValue();
         public nothrow IntValue(int value_) : value(value_)
@@ -342,11 +350,11 @@ namespace cmsx.intermediate
                 orMLInst->AddOperand(machineCode.context.GetLiteralOperand(high));
             }
         }
-        public override Value* SignExtendTo(Type* targetType, int line)
+        public override ConstantValue* SignExtendTo(Type* targetType, int line)
         {
             return targetType->MakeValue(cmsx.util.SignExtend(cast<uint>(value)));
         }
-        public override Value* TruncateTo(Type* targetType, int line)
+        public override ConstantValue* TruncateTo(Type* targetType, int line)
         {
             return targetType->MakeValue(cast<ulong>(value));
         }
@@ -363,7 +371,7 @@ namespace cmsx.intermediate
         public int value;
     }
 
-    public class UIntValue : ConstantValue
+    public class UIntValue : LiteralValue
     {
         public default nothrow UIntValue();
         public nothrow UIntValue(uint value_) : value(value_)
@@ -399,15 +407,15 @@ namespace cmsx.intermediate
                 orMLInst->AddOperand(machineCode.context.GetLiteralOperand(high));
             }
         }
-        public override Value* SignExtendTo(Type* targetType, int line)
+        public override ConstantValue* SignExtendTo(Type* targetType, int line)
         {
             return targetType->MakeValue(cmsx.util.SignExtend(value));
         }
-        public override Value* ZeroExtendTo(Type* targetType, int line)
+        public override ConstantValue* ZeroExtendTo(Type* targetType, int line)
         {
             return targetType->MakeValue(value);
         }
-        public override Value* TruncateTo(Type* targetType, int line)
+        public override ConstantValue* TruncateTo(Type* targetType, int line)
         {
             return targetType->MakeValue(cast<ulong>(value));
         }
@@ -424,7 +432,7 @@ namespace cmsx.intermediate
         public uint value;
     }
 
-    public class LongValue : ConstantValue
+    public class LongValue : LiteralValue
     {
         public default nothrow LongValue();
         public nothrow LongValue(long value_) : value(value_)
@@ -474,11 +482,11 @@ namespace cmsx.intermediate
                 orHInst->AddOperand(machineCode.context.GetLiteralOperand(h));
             }
         }
-        public override Value* SignExtendTo(Type* targetType, int line)
+        public override ConstantValue* SignExtendTo(Type* targetType, int line)
         {
             return targetType->MakeValue(cast<ulong>(value));
         }
-        public override Value* TruncateTo(Type* targetType, int line)
+        public override ConstantValue* TruncateTo(Type* targetType, int line)
         {
             return targetType->MakeValue(cast<ulong>(value));
         }
@@ -495,7 +503,7 @@ namespace cmsx.intermediate
         public long value;
     }
 
-    public class ULongValue : ConstantValue
+    public class ULongValue : LiteralValue
     {
         public default nothrow ULongValue();
         public nothrow ULongValue(ulong value_) : value(value_)
@@ -545,15 +553,15 @@ namespace cmsx.intermediate
                 orHInst->AddOperand(machineCode.context.GetLiteralOperand(h));
             }
         }
-        public override Value* SignExtendTo(Type* targetType, int line)
+        public override ConstantValue* SignExtendTo(Type* targetType, int line)
         {
             return targetType->MakeValue(value);
         }
-        public override Value* ZeroExtendTo(Type* targetType, int line)
+        public override ConstantValue* ZeroExtendTo(Type* targetType, int line)
         {
             return targetType->MakeValue(value);
         }
-        public override Value* TruncateTo(Type* targetType, int line)
+        public override ConstantValue* TruncateTo(Type* targetType, int line)
         {
             return targetType->MakeValue(value);
         }
@@ -570,7 +578,7 @@ namespace cmsx.intermediate
         public ulong value;
     }
 
-    public class FloatValue : ConstantValue
+    public class FloatValue : LiteralValue
     {
         public default nothrow FloatValue();
         public nothrow FloatValue(float value_) : value(value_)
@@ -608,7 +616,7 @@ namespace cmsx.intermediate
         public float value;
     }
 
-    public class DoubleValue : ConstantValue
+    public class DoubleValue : LiteralValue
     {
         public default nothrow DoubleValue();
         public nothrow DoubleValue(double value_) : value(value_)
@@ -660,7 +668,7 @@ namespace cmsx.intermediate
         public double value;
     }
 
-    public class NullValue : ConstantValue
+    public class NullValue : LiteralValue
     {
         public nothrow NullValue(PtrType* ptrType_) : ptrType(ptrType_)
         {
@@ -689,7 +697,7 @@ namespace cmsx.intermediate
         public PtrType* ptrType;
     }
 
-    public class PtrValue : Value
+    public class PtrValue : ConstantValue
     {
         public nothrow PtrValue(PtrType* ptrType_, GlobalVariable* globalVariable_) : globalVariable(globalVariable_)
         {
@@ -703,10 +711,18 @@ namespace cmsx.intermediate
         {
             return globalVariable->HomeLocation();
         }
+        public override Operand* MakeDataOperand(Context& context) const
+        {
+            return context.GetSymbolOperand(globalVariable->name);
+        }
         private GlobalVariable* globalVariable;
     }
 
-    public class ArrayValue : ConstantValue
+    public abstract class AggregateValue : ConstantValue
+    {
+    }
+
+    public class ArrayValue : AggregateValue
     {
         public nothrow ArrayValue()
         {
@@ -738,16 +754,43 @@ namespace cmsx.intermediate
         {
             ArrayType* arrayType = cast<ArrayType*>(type);
             MachineInstruction* inst = arrayType->ElementType()->GetDataInstruction(machineCode, line);
+            inst->SetLabel(label);
             for (ConstantValue* element : elements)
             {
                 inst->AddOperand(element->MakeDataOperand(context));
             }
             label.Clear();
         }
+        public override nothrow string Name() const
+        {
+            string name = "[ ";
+            bool first = true;
+            for (ConstantValue* element : elements)
+            {
+                if (first)
+                {
+                    first = false;
+                }
+                else
+                {
+                    name.Append(", ");
+                }
+                if (element is AggregateValue*)
+                {
+                    name.Append(element->Name());
+                }
+                else
+                {
+                    name.Append(element->type->Name()).Append(' ').Append(element->Name());
+                }
+            }
+            name.Append(" ]");
+            return name;
+        }
         public List<ConstantValue*> elements;
     }
 
-    public class StructureValue : ConstantValue
+    public class StructureValue : AggregateValue
     {
         public nothrow StructureValue()
         {
@@ -781,7 +824,167 @@ namespace cmsx.intermediate
                 member->GenerateCode(machineCode, label, context);
             }
         }
+        public override nothrow string Name() const
+        {
+            string name = "{ ";
+            bool first = true;
+            for (ConstantValue* member : members)
+            {
+                if (first)
+                {
+                    first = false;
+                }
+                else
+                {
+                    name.Append(", ");
+                }
+                if (member is AggregateValue*)
+                {
+                    name.Append(member->Name());
+                }
+                else
+                {
+                    name.Append(member->type->Name()).Append(' ').Append(member->Name());
+                }
+            }
+            name.Append(" }");
+            return name;
+        }
         public List<ConstantValue*> members;
+    }
+
+    public class StringValue : ConstantValue
+    {
+        public nothrow StringValue(const string& value_) : base(), value(value_)
+        {
+        }
+        public override void GenerateCode(MachineCode& machineCode, string& label, Context& context)
+        {
+            MachineInstruction* inst = machineCode.GetInstruction(cmsx.assembly.BYTE, label);
+            int state = 0;
+            string str;
+            string hex;
+            for (char c : value)
+            {
+                switch (state)
+                {
+                    case 0:
+                    {
+                        if (c == '\\')
+                        {
+                            if (!str.IsEmpty())
+                            {
+                                inst->AddOperand(context.GetStringOperand(str));
+                                str.Clear();
+                            }
+                            hex.Clear();
+                            state = 1;
+                        }
+                        else
+                        {
+                            str.Append(c);
+                        }
+                        break;
+                    }
+                    case 1:
+                    {
+                        hex.Append(c);
+                        state = 2;
+                        break;
+                    }
+                    case 2:
+                    {
+                        hex.Append(c);
+                        inst->AddOperand(context.GetLiteralOperand(ParseHexByte(hex)));
+                        hex.Clear();
+                        state = 0;
+                        break;
+                    }
+                }
+            }
+            if (state == 0)
+            {
+                if (!str.IsEmpty())
+                {
+                    inst->AddOperand(context.GetStringOperand(str));
+                }
+            }
+            else if (state == 1)
+            {
+                throw Exception("two hex characters expected (line=" + ToString(line) + ")");
+            }
+            else if (state == 2)
+            {
+                throw Exception("one hex character expected (line=" + ToString(line) + ")");
+            }
+        }
+        public override nothrow string Name() const
+        {
+            string name = "\"";
+            name.Append(value);
+            name.Append("\"");
+            return name;
+        }
+        public string value;
+    }
+
+    public class StringArrayValue : ArrayValue
+    {
+        public nothrow StringArrayValue(char prefix_) : base(), prefix(prefix_)
+        {
+        }
+        public override void Validate(Type* type, const string& index)
+        {
+            if (this->type != type)
+            {
+                Type* thisType = this->type;
+                throw Exception("error: type conflict: element " + index + " has type '" + thisType->Name() + "', type '" + type->Name() + "' expected");
+            }
+            int i = 0;
+            for (ConstantValue* element : elements)
+            {
+                element->Validate(type, index + "." + ToString(i));
+                ++i;
+            }
+        }
+        public override void GenerateCode(MachineCode& machineCode, string& label, Context& context)
+        {
+            MachineInstruction* inst = type->GetDataInstruction(machineCode, line);
+            inst->SetLabel(label);
+            for (ConstantValue* element : elements)
+            {
+                inst->AddOperand(element->MakeDataOperand(context));
+            }
+            label.Clear();
+        }
+        public override nothrow string Name() const
+        {
+            string name = ToString(prefix) + base->Name();
+            return name;
+        }
+        private char prefix;
+    }
+
+    public class ConversionValue : ConstantValue
+    {
+        public nothrow ConversionValue(Type* targetType_, ConstantValue* from_) : base(), from(from_)
+        {
+            type = targetType_;
+        }
+        public override nothrow string Name() const
+        {
+            return "conv(" + from->type->Name() + " " + from->Name() + ")";
+        }
+        public override Operand* MakeDataOperand(Context& context) const
+        {
+            return from->MakeDataOperand(context);
+        }
+        public override void GenerateCode(MachineCode& machineCode, string& label, Context& context)
+        {
+            MachineInstruction* inst = type->GetDataInstruction(machineCode, line);
+            inst->AddOperand(from->MakeDataOperand(context));
+        }
+        private ConstantValue* from;
     }
 
     public class IdValue : Value
@@ -796,7 +999,7 @@ namespace cmsx.intermediate
         public uint id;
     }
 
-    public class SymbolValue : Value
+    public class SymbolValue : ConstantValue
     {
         public nothrow SymbolValue(const string& symbol_) : base(), symbol(symbol_)
         {
@@ -809,6 +1012,26 @@ namespace cmsx.intermediate
         {
             return "@" + Name();
         }
+        public override Operand* MakeDataOperand(Context& context) const
+        {
+            return context.GetSymbolOperand(symbol);
+        }
         public string symbol;
+    }
+
+    public class ClsIdValue : ConstantValue
+    {
+        public ClsIdValue(const string& typeId_) : base(), typeId(typeId_)
+        {
+        }
+        public override nothrow string Name() const
+        {
+            return "$CLSID(" + typeId + ")";
+        }
+        public override Operand* MakeDataOperand(Context& context) const
+        {
+            return context.GetClsIdOperand(typeId);
+        }
+        private string typeId;
     }
 }

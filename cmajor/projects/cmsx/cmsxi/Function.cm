@@ -9,9 +9,9 @@ namespace cmsx.intermediate
 
     public class Function
     {
-        public nothrow Function(Context& context_, FunctionType* type_, const string& name_) :
+        public nothrow Function(Context& context_, FunctionType* type_, const string& name_, bool once_, MDStructRef* md_) :
             context(context_), type(type_), name(name_), addressDescriptors(), frameLocations(context.regs), nextValueNumber(0), nextInstructionIndex(0), nextArgIndex(0), frameSizeOperand(null),
-            prolog(*this, prologId), epilog(*this, epilogId)
+            prolog(*this, prologId), epilog(*this, epilogId), once(once_), md(md_)
         {
         }
         public BasicBlock* AddBasicBlock(uint id)
@@ -119,7 +119,12 @@ namespace cmsx.intermediate
         {
             nextInstructionIndex = 0;
             nextValueNumber = 0;
-            formatter.WriteLine("function @" + name);
+            string onceStr;
+            if (once)
+            {
+                onceStr = " once";
+            }
+            formatter.WriteLine("function " + type->Name() + onceStr + " @" + name);
             formatter.WriteLine("{");
             formatter.IncIndent();
             bool first = true;
@@ -163,8 +168,16 @@ namespace cmsx.intermediate
         }
         public void GenerateDeclaration(MachineCode& machineCode)
         {
-            MachineInstruction* externInst = machineCode.GetInstruction(cmsx.assembly.EXTERN, null);
-            externInst->AddOperand(machineCode.context.GetSymbolOperand(name));
+            if (once )
+            {
+                MachineInstruction* linkOnceInst = machineCode.GetInstruction(cmsx.assembly.LINKONCE, null);
+                linkOnceInst->AddOperand(machineCode.context.GetSymbolOperand(name));
+            }
+            else
+            {
+                MachineInstruction* externInst = machineCode.GetInstruction(cmsx.assembly.EXTERN, null);
+                externInst->AddOperand(machineCode.context.GetSymbolOperand(name));
+            }
         }
         public void GenerateCode(MachineCode& machineCode, CodeFormatter& formatter)
         {
@@ -226,6 +239,7 @@ namespace cmsx.intermediate
         public FrameLocations frameLocations;
         public BasicBlock prolog;
         public BasicBlock epilog;
+        public MDStructRef* md;
         private List<UniquePtr<BasicBlock>> basicBlocks;
         private List<UniquePtr<Value>> values;
         private HashMap<uint, IdValue*> idValueMap;
@@ -234,5 +248,6 @@ namespace cmsx.intermediate
         private int nextValueNumber;
         private int nextArgIndex;
         private LiteralOperand* frameSizeOperand;
+        private bool once;
     }
 }

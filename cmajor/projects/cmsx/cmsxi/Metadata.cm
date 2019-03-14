@@ -1,0 +1,122 @@
+using System;
+using System.Collections;
+using CodeFormatter = System.Text.CodeFormatter;
+
+namespace cmsx.intermediate
+{
+    public abstract class MDItem
+    {
+        public default virtual ~MDItem();
+    }
+
+    public class MDBool : MDItem
+    {
+        public nothrow MDBool(bool value_) : value(value_)
+        {
+        }
+        public bool value;
+    }
+
+    public class MDLong : MDItem
+    {
+        public nothrow MDLong(long value_) : value(value_)
+        {
+        }
+        public long value;
+    }
+
+    public class MDString : MDItem
+    {
+        public nothrow MDString(const string& value_) : value(value_)
+        {
+        }
+        public string value;
+    }
+
+    public class MDStructRef : MDItem
+    {
+        public nothrow MDStructRef(int id_) : id(id_)
+        {
+        }
+        public int id;
+    }
+
+    public class MDStruct : MDItem
+    {
+        public nothrow MDStruct(int id_) : id(id_)
+        {
+        }
+        public void AddItem(const string& fieldName, MDItem* item)
+        {
+            itemMap[fieldName] = item;
+        }
+        public MDItem* GetItem(const string& fieldName) const
+        {
+            HashMap<string, MDItem*>.ConstIterator it = itemMap.CFind(fieldName);
+            if (it != itemMap.CEnd())
+            {
+                return it->second;
+            }
+            else
+            {
+                throw Exception("metadata item '" + fieldName + "' not found");
+            }
+        }
+        public int id;
+        public HashMap<string, MDItem*> itemMap;
+    }
+
+    public class Metadata
+    {
+        public MDBool* CreateMDBool(bool value)
+        {
+            MDBool* item = new MDBool(value);
+            AddItem(item);
+            return item;
+        }
+        public MDLong* CreateMDLong(long value)
+        {
+            MDLong* item = new MDLong(value);
+            AddItem(item);
+            return item;
+        }
+        public MDString* CreateMDString(const string& value)
+        {
+            MDString* item = new MDString(value);
+            AddItem(item);
+            return item;
+        }
+        public MDStructRef* CreateMDStructRef(int id)
+        {
+            MDStructRef* item = new MDStructRef(id);
+            AddItem(item);
+            return item;
+        }
+        public MDStruct* CreateMDStruct(int id)
+        {
+            MDStruct* s = new MDStruct(id);
+            structs.Add(UniquePtr<MDStruct>(s));
+            structMap[id] = s;
+            return s;
+        }
+        public MDStruct* GetMDStruct(int id)
+        {
+            HashMap<int, MDStruct*>.ConstIterator it = structMap.CFind(id);
+            if (it != structMap.CEnd())
+            {
+                return it->second;
+            }
+            else
+            {
+                throw Exception("metadata structure " + ToString(id) + " not found");
+            }
+        }
+        private void AddItem(MDItem* item)
+        {
+            items.Add(UniquePtr<MDItem>(item));
+        }
+        private List<UniquePtr<MDItem>> items;
+        private List<UniquePtr<MDStruct>> structs;
+        private HashMap<int, MDStruct*> structMap;
+    }
+}

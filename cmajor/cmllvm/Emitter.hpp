@@ -90,9 +90,10 @@ public:
     void* CreateIrValueForUChar(uint32_t value) override;
     void* CreateIrValueForWString(void* wstringConstant) override;
     void* CreateIrValueForUString(void* ustringConstant) override;
-    void* CreateIrValueForConstantArray(void* arrayIrType, const std::vector<void*>& elementConstants) override;
+    void* CreateIrValueForConstantArray(void* arrayIrType, const std::vector<void*>& elementConstants, const std::string& prefix) override;
     void* CreateIrValueForConstantStruct(void* structIrType, const std::vector<void*>& elementConstants) override;
     void* CreateIrValueForUuid(void* uuidConstant) override;
+    void* GetConversionValue(void* type, void* from) override;
     void* CreateDITypeForBool() override;
     void* CreateDITypeForSByte() override;
     void* CreateDITypeForByte() override;
@@ -315,6 +316,16 @@ public:
     void* GetGlobalUStringConstant(int stringId) override { return emittingDelegate->GetGlobalUStringConstant(stringId); }
     void* GetGlobalUuidConstant(int uuidId) override { return emittingDelegate->GetGlobalUuidConstant(uuidId); }
     void* GenerateTrap(const std::vector<void*>& args) override;
+    void SetCompileUnitId(const std::string& compileUnitId) override;
+    void* GetClsIdValue(const std::string& typeId) override;
+    void* CreateMDBool(bool value) override;
+    void* CreateMDLong(int64_t value) override;
+    void* CreateMDString(const std::string& value) override;
+    void* CreateMDStructRef(int id) override;
+    void* CreateMDStruct() override;
+    int GetMDStructId(void* mdStruct) override;
+    void AddMDItem(void* mdStruct, const std::string& fieldName, void* mdItem) override;
+    void SetFunctionMdId(void* function, int mdId) override;
 private:
     cmajor::ir::EmittingContext& emittingContext;
     cmajor::ir::EmittingDelegate* emittingDelegate;

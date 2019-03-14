@@ -708,7 +708,7 @@ namespace cmsx.assembly
                     {
                         if (z.flags == Value.Flag.undefined)
                         {
-                            assembler.EmitOpCode(opCode + 1u);
+                            assembler.EmitOpCode(opCode);
                             assembler.EmitRegisterValue("X", x);
                             assembler.EmitPureByteValue("Y", Value(Value.Flag.pure, 0u, null));
                             assembler.EmitRegisterValue("Z", y);
@@ -1054,9 +1054,40 @@ namespace cmsx.assembly
                             assembler.EmitPureByteValue("Z", Value(Value.Flag.pure, 0u, null));
                         }
                     }
+                    else if (y.flags == Value.Flag.register)
+                    {
+                        if (z.flags == Value.Flag.register)
+                        {
+                            assembler.EmitOpCode(opCode);
+                            assembler.EmitRegisterValue("X", x);
+                            assembler.EmitRegisterValue("Y", y);
+                            assembler.EmitRegisterValue("Z", z);
+                        }
+                        else if (z.GetFlag(Value.Flag.pure))
+                        {
+                            if (z.value <= MaxValue<byte>())
+                            {
+                                assembler.EmitOpCode(opCode + 1u);
+                                assembler.EmitRegisterValue("X", x);
+                                assembler.EmitRegisterValue("Y", y);
+                                assembler.EmitPureByteValue("Z", z);
+                            }
+                            else 
+                            {
+                                Error("Z operand of " + inst->opCode->name + " instruction must be either a register number or a pure byte value", inst->span);
+                            }
+                        }
+                        else if (z.flags == Value.Flag.undefined)
+                        {
+                            assembler.EmitOpCode(opCode + 1u);
+                            assembler.EmitRegisterValue("X", x);
+                            assembler.EmitRegisterValue("Y", y);
+                            assembler.EmitPureByteValue("Z", Value(Value.Flag.pure, 0u, null));
+                        }
+                    }
                     else
                     {
-                        Error("Y operand of " + inst->opCode->name + " instruction must be a symbol", inst->span);
+                        Error("Y operand of " + inst->opCode->name + " instruction must be either a symbol or a register number", inst->span);
                     }
                 }
                 else
@@ -1312,6 +1343,51 @@ namespace cmsx.assembly
         }
     }
 
+    public class FuncInfoInstruction : AssemblyInstruction
+    {
+        public override void Assemble(Assembler& assembler, Instruction* inst)
+        {
+            OperandList& operandList = *inst->operandList;
+            Stage prevStage = assembler.stage;
+            assembler.stage = Stage.funcInfo;
+            if (operandList.operands.Count() == 2)
+            {
+                Value function = assembler.Evaluate(operandList.operands[0].Get());
+                if (function.symbol != null)
+                {
+                    if (function.symbol->index != -1)
+                    {
+                        uint functionSymbolIndex = cast<uint>(function.symbol->index);
+                        assembler.Evaluate(operandList.operands[1].Get());
+                        const string& functionFullName = assembler.str;
+                        if (!functionFullName.IsEmpty())
+                        {
+                            FunctionInfo functionInfo(functionSymbolIndex, functionFullName);
+                            cast<DebugSection*>(assembler.objectFile.debugSection)->EmitFunctionInfo(functionInfo);
+                        }
+                        else
+                        {
+                            Error("second operand of " + inst->opCode->name + " instruction must be a string", inst->span);
+                        }
+                    }
+                    else
+                    {
+                        Error("first operand of " + inst->opCode->name + " instruction must be a defined function symbol", inst->span);
+                    }
+                }
+                else
+                {
+                    Error("first operand of " + inst->opCode->name + " instruction must be a function symbol", inst->span);
+                }
+            }
+            else
+            {
+                Error(inst->opCode->name + " needs two operands", inst->span);
+            }
+            assembler.stage = prevStage;
+        }
+    }
+
     public class AssemblyInstructionMap
     {
         static AssemblyInstructionMap() : instance(new AssemblyInstructionMap())
@@ -1351,6 +1427,9 @@ namespace cmsx.assembly
             OctaInstruction* octaInst = new OctaInstruction();
             instructionList.Add(UniquePtr<AssemblyInstruction>(octaInst));
             instructions[OCTA] = octaInst;
+            FuncInfoInstruction* funcInfoInst = new FuncInfoInstruction();
+            instructionList.Add(UniquePtr<AssemblyInstruction>(funcInfoInst));
+            instructions[FUNCINFO] = funcInfoInst;
 
             LoadInstruction* loadInst = new LoadInstruction();
             instructionList.Add(UniquePtr<AssemblyInstruction>(loadInst));

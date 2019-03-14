@@ -14,6 +14,7 @@
 #include <cmajor/symbols/TemplateSymbol.hpp>
 #include <cmajor/symbols/Module.hpp>
 #include <cmajor/symbols/SymbolCollector.hpp>
+#include <cmajor/symbols/GlobalFlags.hpp>
 #include <cmajor/ast/Literal.hpp>
 #include <cmajor/ast/TypeExpr.hpp>
 #include <cmajor/ast/BasicType.hpp>
@@ -21,12 +22,71 @@
 #include <cmajor/util/Sha1.hpp>
 #include <cmajor/util/Uuid.hpp>
 #include <cmajor/util/Prime.hpp>
+#include <cmajor/util/TextUtils.hpp>
 #include <boost/uuid/uuid_generators.hpp>
 #include <boost/uuid/uuid_io.hpp>
 
 namespace cmajor { namespace symbols {
 
 using namespace cmajor::unicode;
+
+int32_t GetClassIdVmtIndexOffset()
+{
+    return 0;
+}
+
+int32_t GetTypeIdVmtIndexOffset()
+{
+    return 1;
+}
+
+int32_t GetClassNameVmtIndexOffset()
+{
+    if (GetBackEnd() == BackEnd::llvm)
+    {
+        return 3;
+    }
+    else if (GetBackEnd() == BackEnd::cmsx)
+    {
+        return 1;
+    }
+    else
+    {
+        return 0;
+    }
+}
+
+int32_t GetImtsVmtIndexOffset()
+{
+    if (GetBackEnd() == BackEnd::llvm)
+    {
+        return 4;
+    }
+    else if (GetBackEnd() == BackEnd::cmsx)
+    {
+        return 2;
+    }
+    else
+    {
+        return 0;
+    }
+}
+
+int32_t GetFunctionVmtIndexOffset()
+{
+    if (GetBackEnd() == BackEnd::llvm)
+    {
+        return 5;
+    }
+    else if (GetBackEnd() == BackEnd::cmsx)
+    {
+        return 3;
+    }
+    else
+    {
+        return 0;
+    }
+}
 
 ClassGroupTypeSymbol::ClassGroupTypeSymbol(const Span& span_, const std::u32string& name_) : TypeSymbol(SymbolType::classGroupTypeSymbol, span_, name_)
 {
@@ -1346,7 +1406,7 @@ ClassTypeSymbol* ClassTypeSymbol::VmtPtrHolderClass()
 
 void* ClassTypeSymbol::VmtPtrType(Emitter& emitter)
 {
-    void* vmtArrayType = emitter.GetIrTypeForArrayType(emitter.GetIrTypeForVoidPtrType(), vmt.size() + functionVmtIndexOffset);
+    void* vmtArrayType = emitter.GetIrTypeForArrayType(emitter.GetIrTypeForVoidPtrType(), vmt.size() + GetFunctionVmtIndexOffset());
     void* vmtPtrType = emitter.GetIrTypeForPtrType(vmtArrayType);
     return vmtPtrType;
 }
@@ -1366,7 +1426,7 @@ void* ClassTypeSymbol::CreateImt(Emitter& emitter, int index)
         void* interfaceFun = emitter.GetOrInsertFunction(ToUtf8(memFun->MangledName()), memFun->IrType(emitter));
         irImt.push_back(emitter.CreateBitCast(interfaceFun, emitter.GetIrTypeForVoidPtrType()));
     }
-    emitter.SetInitializer(imtObject, emitter.CreateIrValueForConstantArray(imtType, irImt));
+    emitter.SetInitializer(imtObject, emitter.CreateIrValueForConstantArray(imtType, irImt, std::string()));
     return imtObject;
 }
 
@@ -1383,7 +1443,7 @@ void* ClassTypeSymbol::CreateImts(Emitter& emitter)
         void* irImt = CreateImt(emitter, i);
         imtsArray.push_back(emitter.CreateBitCast(irImt, emitter.GetIrTypeForVoidPtrType()));
     }
-    emitter.SetInitializer(imtsArrayObject, emitter.CreateIrValueForConstantArray(imtsArrayType, imtsArray));
+    emitter.SetInitializer(imtsArrayObject, emitter.CreateIrValueForConstantArray(imtsArrayType, imtsArray, std::string()));
     return imtsArrayObject;
 }
 
@@ -1393,8 +1453,13 @@ void* ClassTypeSymbol::VmtObject(Emitter& emitter, bool create)
     void* localVmtObjectType = emitter.GetVmtObjectType(this);
     if (!localVmtObjectType)
     {
-        localVmtObjectType = emitter.GetIrTypeForArrayType(emitter.GetIrTypeForVoidPtrType(), vmt.size() + functionVmtIndexOffset);
+        localVmtObjectType = emitter.GetIrTypeForArrayType(emitter.GetIrTypeForVoidPtrType(), vmt.size() + GetFunctionVmtIndexOffset());
         emitter.SetVmtObjectType(this, localVmtObjectType);
+    }
+    void* className = nullptr;
+    if (!emitter.IsVmtObjectCreated(this) && create)
+    {
+        className = emitter.CreateGlobalStringPtr(ToUtf8(FullName()));
     }
     void* vmtObject = emitter.GetOrInsertGlobal(VmtObjectName(emitter), localVmtObjectType);
     if (!emitter.IsVmtObjectCreated(this) && create)
@@ -1403,40 +1468,78 @@ void* ClassTypeSymbol::VmtObject(Emitter& emitter, bool create)
         std::string vmtObjectName = VmtObjectName(emitter);
         void* comdat = emitter.GetOrInsertAnyComdat(vmtObjectName, vmtObject);
         std::vector<void*> vmtArray;
-        vmtArray.push_back(emitter.CreateDefaultIrValueForVoidPtrType()); // 64-bit class id, initially 0, dynamically initialized
-        uint64_t typeId1 = 0;
-        uint64_t typeId2 = 0;
-        UuidToInts(TypeId(), typeId1, typeId2);
-//      16-byte type id:
-        vmtArray.push_back(emitter.CreateIntToPtr(emitter.CreateIrValueForULong(typeId1), emitter.GetIrTypeForVoidPtrType()));
-        vmtArray.push_back(emitter.CreateIntToPtr(emitter.CreateIrValueForULong(typeId2), emitter.GetIrTypeForVoidPtrType()));
-        void* className = emitter.CreateGlobalStringPtr(ToUtf8(FullName()));
-        vmtArray.push_back(emitter.CreateBitCast(className, emitter.GetIrTypeForVoidPtrType())); // class name pointer
-        if (!implementedInterfaces.empty())
+        if (GetBackEnd() == BackEnd::llvm)
         {
-            void* itabsArrayObject = CreateImts(emitter);
-            vmtArray.push_back(emitter.CreateBitCast(itabsArrayObject, emitter.GetIrTypeForVoidPtrType())); // interface method table pointer
-        }
-        else
-        {
-            vmtArray.push_back(emitter.CreateDefaultIrValueForVoidPtrType());
-        }
-//      virtual method table:
-        int n = vmt.size();
-        for (int i = 0; i < n; ++i)
-        {
-            FunctionSymbol* virtualFunction = vmt[i];
-            if (!virtualFunction || virtualFunction->IsAbstract())
+            vmtArray.push_back(emitter.CreateDefaultIrValueForVoidPtrType()); // 64-bit class id, initially 0, dynamically initialized
+            uint64_t typeId1 = 0;
+            uint64_t typeId2 = 0;
+            UuidToInts(TypeId(), typeId1, typeId2);
+            //      16-byte type id:
+            vmtArray.push_back(emitter.CreateIntToPtr(emitter.CreateIrValueForULong(typeId1), emitter.GetIrTypeForVoidPtrType()));
+            vmtArray.push_back(emitter.CreateIntToPtr(emitter.CreateIrValueForULong(typeId2), emitter.GetIrTypeForVoidPtrType()));
+            vmtArray.push_back(emitter.CreateBitCast(className, emitter.GetIrTypeForVoidPtrType())); // class name pointer
+            if (!implementedInterfaces.empty())
             {
-                vmtArray.push_back(emitter.CreateDefaultIrValueForVoidPtrType());
+                void* itabsArrayObject = CreateImts(emitter);
+                vmtArray.push_back(emitter.CreateBitCast(itabsArrayObject, emitter.GetIrTypeForVoidPtrType())); // interface method table pointer
             }
             else
             {
-                void* functionObject = emitter.GetOrInsertFunction(ToUtf8(virtualFunction->MangledName()), virtualFunction->IrType(emitter));
-                vmtArray.push_back(emitter.CreateBitCast(functionObject, emitter.GetIrTypeForVoidPtrType()));
+                vmtArray.push_back(emitter.CreateDefaultIrValueForVoidPtrType());
+            }
+            //      virtual method table:
+            int n = vmt.size();
+            for (int i = 0; i < n; ++i)
+            {
+                FunctionSymbol* virtualFunction = vmt[i];
+                if (!virtualFunction || virtualFunction->IsAbstract())
+                {
+                    vmtArray.push_back(emitter.CreateDefaultIrValueForVoidPtrType());
+                }
+                else
+                {
+                    void* functionObject = emitter.GetOrInsertFunction(ToUtf8(virtualFunction->MangledName()), virtualFunction->IrType(emitter));
+                    vmtArray.push_back(emitter.CreateBitCast(functionObject, emitter.GetIrTypeForVoidPtrType()));
+                }
             }
         }
-        void* initializer = emitter.CreateIrValueForConstantArray(localVmtObjectType, vmtArray);
+        else if (GetBackEnd() == BackEnd::cmsx)
+        {
+            uint64_t typeId1 = 0;
+            uint64_t typeId2 = 0;
+            std::string typeId;
+            for (uint8_t x : TypeId())
+            {
+                typeId.append(cmajor::util::ToHexString(x));
+            }
+            vmtArray.push_back(emitter.GetClsIdValue(typeId)); // 64-bit class id
+            vmtArray.push_back(emitter.GetConversionValue(emitter.GetIrTypeForVoidPtrType(), className)); // class name pointer
+            if (!implementedInterfaces.empty())
+            {
+                void* itabsArrayObject = CreateImts(emitter);
+                vmtArray.push_back(emitter.GetConversionValue(emitter.GetIrTypeForVoidPtrType(), itabsArrayObject)); // interface method table pointer
+            }
+            else
+            {
+                vmtArray.push_back(emitter.CreateDefaultIrValueForVoidPtrType());
+            }
+            //      virtual method table:
+            int n = vmt.size();
+            for (int i = 0; i < n; ++i)
+            {
+                FunctionSymbol* virtualFunction = vmt[i];
+                if (!virtualFunction || virtualFunction->IsAbstract())
+                {
+                    vmtArray.push_back(emitter.CreateDefaultIrValueForVoidPtrType());
+                }
+                else
+                {
+                    void* functionObject = emitter.GetOrInsertFunction(ToUtf8(virtualFunction->MangledName()), virtualFunction->IrType(emitter));
+                    vmtArray.push_back(emitter.GetConversionValue(emitter.GetIrTypeForVoidPtrType(), functionObject));
+                }
+            }
+        }
+        void* initializer = emitter.CreateIrValueForConstantArray(localVmtObjectType, vmtArray, std::string());
         emitter.SetInitializer(vmtObject, initializer);
     }
     return vmtObject;
@@ -1690,6 +1793,29 @@ ConstantNode* MakeStaticClassArray(const std::unordered_set<ClassTypeSymbol*>& c
     ConstantNode* staticClassIdArray = new ConstantNode(Span(), Specifiers::internal_, new ArrayNode(Span(), new ULongNode(Span()),
         CreateIntegerLiteralNode(Span(), arrayLength, false)), new IdentifierNode(Span(), arrayName), staticTypeIdArrayLiteral);
     return staticClassIdArray;
+}
+
+void MakeClassIdFile(const std::unordered_set<ClassTypeSymbol*>& polymorphicClasses, const std::string& classIdFileName)
+{
+    cmajor::util::BinaryWriter binaryWriter(classIdFileName);
+    std::unordered_map<boost::uuids::uuid, ClassInfo, boost::hash<boost::uuids::uuid>> classIdMap;
+    for (ClassTypeSymbol* cls : polymorphicClasses)
+    {
+        classIdMap[cls->TypeId()] = ClassInfo(cls);
+    }
+    ResolveBaseClasses(classIdMap);
+    AssignLevels(classIdMap);
+    std::vector<ClassInfo*> classesByPriority = GetClassesByPriority(classIdMap);
+    AssignKeys(classesByPriority);
+    AssignClassIds(classesByPriority);
+    uint64_t n = polymorphicClasses.size();
+    binaryWriter.Write(n);
+    for (ClassInfo* info : classesByPriority)
+    {
+        const boost::uuids::uuid& typeId = info->cls->TypeId();
+        binaryWriter.Write(typeId);
+        binaryWriter.Write(info->id);
+    }
 }
 
 } } // namespace cmajor::symbols

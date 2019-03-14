@@ -23,7 +23,8 @@ namespace cmsx.intermediate
         public nothrow void Print(CodeFormatter& formatter, int labelWidth)
         {
             if (opCode == separatorInstructionOpCode) return;
-            formatter << Format(label, labelWidth, FormatWidth.min) << " " << Format(cmsx.assembly.GetOpCodeStr(opCode), cmsx.machine.OpCodeMap.Instance().MaxOpCodeNameLength(), FormatWidth.min) << " ";
+            formatter << Format(label, labelWidth, FormatWidth.min) << " " << Format(cmsx.assembly.GetOpCodeStr(opCode),
+                Max(cmsx.machine.OpCodeMap.Instance().MaxOpCodeNameLength(), cmsx.assembly.PseudoOpMap.Instance().MaxOpCodeNameLength()), FormatWidth.min) << " ";
             long n = operands.Count();
             for (long i = 0; i < n; ++i)
             {

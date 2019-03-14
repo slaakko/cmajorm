@@ -80,7 +80,7 @@ void* ArrayTypeSymbol::CreateDefaultIrValue(Emitter& emitter)
     {
         arrayOfDefaults.push_back(elementType->CreateDefaultIrValue(emitter));
     }
-    return emitter.CreateIrValueForConstantArray(irType, arrayOfDefaults);
+    return emitter.CreateIrValueForConstantArray(irType, arrayOfDefaults, std::string());
 }
 
 void* ArrayTypeSymbol::CreateDIType(Emitter& emitter)

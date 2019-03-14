@@ -22,11 +22,16 @@ namespace cmsx.assembly
             ::= '"' ([^"\n]*){ value = new StringConstant(span, ustring(matchBegin, matchEnd)); } '"'
             ;
 
+        ClsIdConstant : ClsIdConstant*
+            ::= "$CLSID" '(' (hexdigit+){ value = new ClsIdConstant(span, ToUtf8(ustring(matchBegin, matchEnd))); } ')'
+            ;
+
         Constant : Constant*
             ::= DecimalConstant{ value = DecimalConstant; }
             |   HexConstant{ value = HexConstant; }
             |   CharacterConstant{ value = CharacterConstant; }
             |   StringConstant{ value = StringConstant; }
+            |   ClsIdConstant{ value = ClsIdConstant; }
             ;
 
         LocalSymbol : SymbolNode*
@@ -133,6 +138,7 @@ namespace cmsx.assembly
         ModeLine(List<UniquePtr<Instruction>>* instructionList)
             ::= token(S? '.' [cC][oO][dD][eE]){ instructionList->Add(UniquePtr<Instruction>(new Instruction(span, null, new OpCode(span, ".CODE"), null))); } S? NL
             |   token(S? '.' [dD][aA][tT][aA]){ instructionList->Add(UniquePtr<Instruction>(new Instruction(span, null, new OpCode(span, ".DATA"), null))); } S? NL
+            |   token(S? '.' [dD][eE][bB][uU][gG]){ instructionList->Add(UniquePtr<Instruction>(new Instruction(span, null, new OpCode(span, ".DEBUG"), null))); } S? NL
             ;
 
         AssemblyLine(List<UniquePtr<Instruction>>* instructionList)

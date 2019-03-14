@@ -18,9 +18,11 @@ namespace cmsx.assembly
     public const int OCTA = 266;
     public const int CODE = 267;
     public const int DATA = 268;
-    public const int LDA = 269;
-    public const int SET = 270;
-    public const int numInsts = SET + 1;
+    public const int DEBUG = 269;
+    public const int LDA = 270;
+    public const int SET = 271;
+    public const int FUNCINFO = 272;
+    public const int numInsts = FUNCINFO + 1;
 
     public class PseudoOpMap
     {
@@ -46,8 +48,10 @@ namespace cmsx.assembly
             codes["OCTA"] = OCTA;
             codes[".CODE"] = CODE;
             codes[".DATA"] = DATA;
+            codes[".DEBUG"] = DEBUG;
             codes["LDA"] = LDA;
             codes["SET"] = SET;
+            codes["FUNCINFO"] = FUNCINFO;
             names[IS] = "IS";
             names[EXTERN] = "EXTERN";
             names[LINKONCE] = "LINKONCE";
@@ -61,8 +65,17 @@ namespace cmsx.assembly
             names[OCTA] = "OCTA";
             names[CODE] = ".CODE";
             names[DATA] = ".DATA";
+            names[DEBUG] = ".DEBUG";
             names[LDA] = "LDA";
             names[SET] = "SET";
+            names[FUNCINFO] = "FUNCINFO";
+            for (const Pair<int, string>& codeName : names)
+            {
+                if (codeName.second.Length() > maxOpCodeNameLength)
+                {
+                    maxOpCodeNameLength = cast<int>(codeName.second.Length());
+                }
+            }
         }
         public nothrow int GetCode(const string& name) const
         {
@@ -85,9 +98,14 @@ namespace cmsx.assembly
                 throw Exception("name for code '" + ToString(code) + "' not found");
             }
         }
+        public int MaxOpCodeNameLength() const
+        {
+            return maxOpCodeNameLength;
+        }
         private static UniquePtr<PseudoOpMap> instance;
         private HashMap<string, int> codes;
         private HashMap<int, string> names;
+        private int maxOpCodeNameLength;
     }
 
     public string GetOpCodeStr(int opCode)
@@ -171,6 +189,18 @@ namespace cmsx.assembly
             visitor.Visit(*this);
         }
         public ustring value;
+    }
+
+    public class ClsIdConstant : Constant
+    {
+        public nothrow ClsIdConstant(const Span& span_, const string& typeId_) : base(span_), typeId(typeId_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public string typeId;
     }
 
     public class SymbolNode : Node
@@ -334,6 +364,7 @@ namespace cmsx.assembly
         Assembler assembler(objectFilePath);
         assembler.Assemble(instructions);
         cmsx.object.LinkInternal(assembler.objectFile);
+        assembler.objectFile.Finalize();
         if (verbose)
         {
             Console.Out() << "==> " << objectFilePath << endl();

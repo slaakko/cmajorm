@@ -85,9 +85,10 @@ public:
     void* CreateIrValueForUChar(uint32_t value) override;
     void* CreateIrValueForWString(void* wstringConstant) override;
     void* CreateIrValueForUString(void* ustringConstant) override;
-    void* CreateIrValueForConstantArray(void* arrayIrType, const std::vector<void*>& elementConstants) override;
+    void* CreateIrValueForConstantArray(void* arrayIrType, const std::vector<void*>& elementConstants, const std::string& prefix) override;
     void* CreateIrValueForConstantStruct(void* structIrType, const std::vector<void*>& elementConstants) override;
     void* CreateIrValueForUuid(void* uuidConstant) override;
+    void* GetConversionValue(void* type, void* from) override;
     void* CreateGlobalStringPtr(const std::string& name) override;
     void* GetGlobalStringPtr(int stringId) override;
     void* GetGlobalWStringConstant(int stringId) override;
@@ -297,11 +298,22 @@ public:
     void* CreateSwitch(void* condition, void* defaultDest, unsigned numCases) override;
     void AddCase(void* switchInst, void* caseValue, void* caseDest) override;
     void* GenerateTrap(const std::vector<void*>& args) override;
+    void SetCompileUnitId(const std::string& compileUnitId) override;
+    void* GetClsIdValue(const std::string& typeId) override;
+    void* CreateMDBool(bool value) override;
+    void* CreateMDLong(int64_t value) override;
+    void* CreateMDString(const std::string& value) override;
+    void* CreateMDStructRef(int id) override;
+    int GetMDStructId(void* mdStruct) override;
+    void* CreateMDStruct() override;
+    void AddMDItem(void* mdStruct, const std::string& fieldName, void* mdItem) override;
+    void SetFunctionMdId(void* function, int mdId) override;
 private:
     cmsxbe::EmittingContext* emittingContext;
+    cmajor::ir::EmittingDelegate* emittingDelegate;
     ValueStack stack;
-    cmsxi::Context* context;
     cmsxi::CompileUnit* compileUnit;
+    cmsxi::Context* context;
     std::unordered_map<void*, cmsxi::FunctionType*> functionIrTypeMap;
     std::unordered_map<boost::uuids::uuid, cmsxi::Type*, boost::hash<boost::uuids::uuid>> irTypeTypeIdMap;
     cmsxi::Function* currentFunction;
@@ -310,6 +322,7 @@ private:
     std::unordered_set<void*> staticObjectCreatedSet;
     std::unordered_map<void*, cmsxi::StructureType*> staticTypeMap;
     std::unordered_map<void*, std::string> staticObjectNameMap;
+    cmsxi::Value* objectPointer;
 };
 
 } // namespace cmsxbe

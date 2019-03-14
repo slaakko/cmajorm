@@ -9,7 +9,7 @@
 
 namespace cmsxi {
 
-Context::Context() : currentFunction(nullptr), currentBasicBlock(nullptr)
+Context::Context() : currentFunction(nullptr), currentBasicBlock(nullptr), metadata()
 {
 }
 
@@ -95,9 +95,9 @@ ConstantValue* Context::GetDoubleValue(double value)
     return doubleValue;
 }
 
-ArrayValue* Context::GetArrayValue(Type* arrayType, const std::vector<ConstantValue*>& elements)
+ArrayValue* Context::GetArrayValue(Type* arrayType, const std::vector<ConstantValue*>& elements, const std::string& prefix)
 {
-    ArrayValue* arrayValue = new ArrayValue(arrayType, elements);
+    ArrayValue* arrayValue = new ArrayValue(arrayType, elements, prefix);
     AddValue(arrayValue);
     return arrayValue;
 }
@@ -107,6 +107,27 @@ StructureValue* Context::GetStructureValue(Type* structureType, const std::vecto
     StructureValue* structureValue = new StructureValue(structureType, members);
     AddValue(structureValue);
     return structureValue;
+}
+
+StringValue* Context::GetStringValue(Type* stringType, const std::string& value)
+{
+    StringValue* stringValue = new StringValue(stringType, value);
+    AddValue(stringValue);
+    return stringValue;
+}
+
+ConversionValue* Context::GetConversionValue(Type* type, ConstantValue* from)
+{
+    ConversionValue* conversionValue = new ConversionValue(type, from);
+    AddValue(conversionValue);
+    return conversionValue;
+}
+
+ClsIdValue* Context::GetClsIdValue(const std::string& typeId)
+{
+    ClsIdValue* clsIdValue = new ClsIdValue(typeId);
+    AddValue(clsIdValue);
+    return clsIdValue;
 }
 
 Instruction* Context::CreateNot(Value* arg)
@@ -388,6 +409,21 @@ Instruction* Context::CreateTrap(const std::vector<Value*>& args)
 GlobalVariable* Context::GetOrInsertGlobal(const std::string& name, Type* type)
 {
     return dataRepository.GetOrInsertGlobal(name, type);
+}
+
+GlobalVariable* Context::CreateGlobalStringPtr(const std::string& stringValue)
+{
+    return dataRepository.CreateGlobalStringPtr(*this, stringValue);
+}
+
+void Context::SetCompileUnitId(const std::string& compileUnitId_)
+{
+    dataRepository.SetCompileUnitId(compileUnitId_);
+}
+
+void Context::AddMDStructItem(MDStruct* mdStruct, const std::string& fieldName, MDItem* item)
+{
+    mdStruct->AddItem(fieldName, item);
 }
 
 } // namespace cmsxi

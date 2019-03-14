@@ -60,4 +60,28 @@ namespace cmsx.intermediate
         }
         public string value;
     }
+
+    public class StringOperand : Operand
+    {
+        public nothrow StringOperand(const string& value_) : value(value_)
+        {
+        }
+        public override nothrow void Print(CodeFormatter& formatter)
+        {
+            formatter << '"' << value << '"';
+        }
+        public string value;
+    }
+
+    public class ClsIdOperand : Operand
+    {
+        public nothrow ClsIdOperand(const string& typeId_) : typeId(typeId_)
+        {
+        }
+        public override nothrow void Print(CodeFormatter& formatter)
+        {
+            formatter << "$CLSID(" << typeId << ')';
+        }
+        public string typeId;
+    }
 }

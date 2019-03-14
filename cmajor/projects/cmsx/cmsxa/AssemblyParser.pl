@@ -6,6 +6,7 @@ namespace cmsx.assembly
         HexConstant : HexConstant*;
         CharacterConstant : CharacterConstant*;
         StringConstant : StringConstant*;
+        ClsIdConstant : ClsIdConstant*;
         Constant : Constant*;
         LocalSymbol : SymbolNode*;
         Symbol : SymbolNode*;

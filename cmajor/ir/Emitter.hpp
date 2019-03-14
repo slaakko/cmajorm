@@ -30,14 +30,14 @@ public:
     virtual void* GetGlobalWStringConstant(int stringId) = 0;
     virtual void* GetGlobalUStringConstant(int stringId) = 0;
     virtual void* GetGlobalUuidConstant(int uuidId) = 0;
-    virtual void SetLineNumber(int32_t lineNumber) = 0;
-    virtual void* HandlerBlock() = 0;
-    virtual void* CleanupBlock() = 0;
-    virtual bool NewCleanupNeeded() = 0;
-    virtual void CreateCleanup() = 0;
-    virtual std::string GetSourceFilePath(int32_t fileIndex) = 0;
-    virtual cmajor::ir::Pad* CurrentPad() = 0;
-    virtual void* CreateClassDIType(void* classPtr) = 0;
+    virtual void SetLineNumber(int32_t lineNumber) {}
+    virtual void* HandlerBlock() { return nullptr; }
+    virtual void* CleanupBlock() { return nullptr; }
+    virtual bool NewCleanupNeeded() { return false; }
+    virtual void CreateCleanup() { }
+    virtual std::string GetSourceFilePath(int32_t fileIndex) { return std::string(); }
+    virtual cmajor::ir::Pad* CurrentPad() { return nullptr; }
+    virtual void* CreateClassDIType(void* classPtr) { return nullptr; }
 };
 
 class IR_API Emitter
@@ -110,9 +110,10 @@ public:
     virtual void* CreateIrValueForUChar(uint32_t value) = 0;
     virtual void* CreateIrValueForWString(void* wstringConstant) = 0;
     virtual void* CreateIrValueForUString(void* ustringConstant) = 0;
-    virtual void* CreateIrValueForConstantArray(void* arrayIrType, const std::vector<void*>& elementConstants) = 0;
+    virtual void* CreateIrValueForConstantArray(void* arrayIrType, const std::vector<void*>& elementConstants, const std::string& prefix) = 0;
     virtual void* CreateIrValueForConstantStruct(void* structIrType, const std::vector<void*>& elementConstants) = 0;
     virtual void* CreateIrValueForUuid(void* uuidConstant) = 0;
+    virtual void* GetConversionValue(void* type, void* from) = 0;
     virtual void* CreateGlobalStringPtr(const std::string& name) = 0;
     virtual void* GetGlobalStringPtr(int stringId) = 0;
     virtual void* GetGlobalWStringConstant(int stringId) = 0;
@@ -322,6 +323,16 @@ public:
     virtual void* CreateSwitch(void* condition, void* defaultDest, unsigned numCases) = 0;
     virtual void AddCase(void* switchInst, void* caseValue, void* caseDest) = 0;
     virtual void* GenerateTrap(const std::vector<void*>& args) = 0;
+    virtual void SetCompileUnitId(const std::string& compileUnitId) = 0;
+    virtual void* GetClsIdValue(const std::string& typeId) = 0;
+    virtual void* CreateMDBool(bool value) = 0;
+    virtual void* CreateMDLong(int64_t value) = 0;
+    virtual void* CreateMDString(const std::string& value) = 0;
+    virtual void* CreateMDStructRef(int id) = 0;
+    virtual void* CreateMDStruct() = 0;
+    virtual int GetMDStructId(void* mdStruct) = 0;
+    virtual void AddMDItem(void* mdStruct, const std::string& fieldName, void* mdItem) = 0;
+    virtual void SetFunctionMdId(void* function, int mdId) = 0;
 private:
     ValueStack* stack;
 };

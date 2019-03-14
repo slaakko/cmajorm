@@ -38,6 +38,7 @@ std::string CmajorSystemLibDir(const std::string& config, BackEnd backend)
         sld /= "cmsx";
         sld /= "system";
         sld /= "lib";
+        sld /= config;
         return GetFullPath(sld.generic_string());
     }
     else

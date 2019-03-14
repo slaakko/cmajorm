@@ -4029,7 +4029,7 @@ void* ArrayValue::IrValue(Emitter& emitter)
     {
         elementConstants.push_back(elementValues[i]->IrValue(emitter));
     }
-    return emitter.CreateIrValueForConstantArray(type->IrType(emitter), elementConstants);
+    return emitter.CreateIrValueForConstantArray(type->IrType(emitter), elementConstants, std::string());
 }
 
 void ArrayValue::Write(BinaryWriter& writer)

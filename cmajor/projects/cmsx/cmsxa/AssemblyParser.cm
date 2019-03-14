@@ -210,6 +210,45 @@ namespace cmsx.assembly
             }
         }
 
+        public class ClsIdConstantRule : System.Text.Parsing.RuleParser
+        {
+            public ClsIdConstantRule(const ustring& name_, Scope* enclosingScope_, int id_, Parser* definition_) : base(name_, enclosingScope_, id_, definition_)
+            {
+                SetValueTypeName(ToUtf32("ClsIdConstant*"));
+            }
+            public override void Enter(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
+            {
+                parsingData->PushContext(Id(), new Context());
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+            }
+            public override void Leave(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                if (matched)
+                {
+                    stack.Push(UniquePtr<Object>(new ValueObject<ClsIdConstant*>(context->value)));
+                }
+                parsingData->PopContext(Id());
+            }
+            public override void Link()
+            {
+                ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
+                a0ActionParser->SetAction(A0Action);
+            }
+            public void A0Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                context->value = new ClsIdConstant(span, ToUtf8(ustring(matchBegin, matchEnd)));
+            }
+            public class Context : System.Text.Parsing.Context
+            {
+                public Context() : value()
+                {
+                }
+                public ClsIdConstant* value;
+            }
+        }
+
         public class ConstantRule : System.Text.Parsing.RuleParser
         {
             public ConstantRule(const ustring& name_, Scope* enclosingScope_, int id_, Parser* definition_) : base(name_, enclosingScope_, id_, definition_)
@@ -240,6 +279,8 @@ namespace cmsx.assembly
                 a2ActionParser->SetAction(A2Action);
                 ActionParser* a3ActionParser = GetAction(ToUtf32("A3"));
                 a3ActionParser->SetAction(A3Action);
+                ActionParser* a4ActionParser = GetAction(ToUtf32("A4"));
+                a4ActionParser->SetAction(A4Action);
                 NonterminalParser* decimalConstantNonterminalParser = GetNonterminal(ToUtf32("DecimalConstant"));
                 decimalConstantNonterminalParser->SetPost(PostDecimalConstant);
                 NonterminalParser* hexConstantNonterminalParser = GetNonterminal(ToUtf32("HexConstant"));
@@ -248,6 +289,8 @@ namespace cmsx.assembly
                 characterConstantNonterminalParser->SetPost(PostCharacterConstant);
                 NonterminalParser* stringConstantNonterminalParser = GetNonterminal(ToUtf32("StringConstant"));
                 stringConstantNonterminalParser->SetPost(PostStringConstant);
+                NonterminalParser* clsIdConstantNonterminalParser = GetNonterminal(ToUtf32("ClsIdConstant"));
+                clsIdConstantNonterminalParser->SetPost(PostClsIdConstant);
             }
             public void A0Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
@@ -268,6 +311,11 @@ namespace cmsx.assembly
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
                 context->value = context->fromStringConstant;
+            }
+            public void A4Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                context->value = context->fromClsIdConstant;
             }
             public void PostDecimalConstant(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
             {
@@ -305,9 +353,18 @@ namespace cmsx.assembly
                     context->fromStringConstant = *cast<ValueObject<StringConstant*>*>(fromStringConstant_value.Get());
                 }
             }
+            public void PostClsIdConstant(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                if (matched)
+                {
+                    UniquePtr<Object> fromClsIdConstant_value = stack.Pop();
+                    context->fromClsIdConstant = *cast<ValueObject<ClsIdConstant*>*>(fromClsIdConstant_value.Get());
+                }
+            }
             public class Context : System.Text.Parsing.Context
             {
-                public Context() : value(), fromDecimalConstant(), fromHexConstant(), fromCharacterConstant(), fromStringConstant()
+                public Context() : value(), fromDecimalConstant(), fromHexConstant(), fromCharacterConstant(), fromStringConstant(), fromClsIdConstant()
                 {
                 }
                 public Constant* value;
@@ -315,6 +372,7 @@ namespace cmsx.assembly
                 public HexConstant* fromHexConstant;
                 public CharacterConstant* fromCharacterConstant;
                 public StringConstant* fromStringConstant;
+                public ClsIdConstant* fromClsIdConstant;
             }
         }
 
@@ -1366,6 +1424,8 @@ namespace cmsx.assembly
                 a0ActionParser->SetAction(A0Action);
                 ActionParser* a1ActionParser = GetAction(ToUtf32("A1"));
                 a1ActionParser->SetAction(A1Action);
+                ActionParser* a2ActionParser = GetAction(ToUtf32("A2"));
+                a2ActionParser->SetAction(A2Action);
             }
             public void A0Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
@@ -1376,6 +1436,11 @@ namespace cmsx.assembly
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
                 context->instructionList->Add(UniquePtr<Instruction>(new Instruction(span, null, new OpCode(span, ".DATA"), null)));
+            }
+            public void A2Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                context->instructionList->Add(UniquePtr<Instruction>(new Instruction(span, null, new OpCode(span, ".DEBUG"), null)));
             }
             public class Context : System.Text.Parsing.Context
             {
@@ -1499,18 +1564,32 @@ namespace cmsx.assembly
                                 new System.Text.Parsing.KleeneStarParser(
                                     new System.Text.Parsing.CharSetParser(ToUtf32("\"\n"), true))))),
                     new System.Text.Parsing.CharParser('\"'))));
+            AddRule(new ClsIdConstantRule(ToUtf32("ClsIdConstant"), GetScope(), Domain()->GetNextRuleId(),
+                new System.Text.Parsing.SequenceParser(
+                    new System.Text.Parsing.SequenceParser(
+                        new System.Text.Parsing.SequenceParser(
+                            new System.Text.Parsing.StringParser(ToUtf32("$CLSID")),
+                            new System.Text.Parsing.CharParser('(')),
+                        new System.Text.Parsing.ActionParser(ToUtf32("A0"),
+                            new System.Text.Parsing.GroupingParser(
+                                new System.Text.Parsing.PositiveParser(
+                                    new System.Text.Parsing.HexDigitParser())))),
+                    new System.Text.Parsing.CharParser(')'))));
             AddRule(new ConstantRule(ToUtf32("Constant"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.AlternativeParser(
                     new System.Text.Parsing.AlternativeParser(
                         new System.Text.Parsing.AlternativeParser(
-                            new System.Text.Parsing.ActionParser(ToUtf32("A0"),
-                                new System.Text.Parsing.NonterminalParser(ToUtf32("DecimalConstant"), ToUtf32("DecimalConstant"), 0)),
-                            new System.Text.Parsing.ActionParser(ToUtf32("A1"),
-                                new System.Text.Parsing.NonterminalParser(ToUtf32("HexConstant"), ToUtf32("HexConstant"), 0))),
-                        new System.Text.Parsing.ActionParser(ToUtf32("A2"),
-                            new System.Text.Parsing.NonterminalParser(ToUtf32("CharacterConstant"), ToUtf32("CharacterConstant"), 0))),
-                    new System.Text.Parsing.ActionParser(ToUtf32("A3"),
-                        new System.Text.Parsing.NonterminalParser(ToUtf32("StringConstant"), ToUtf32("StringConstant"), 0)))));
+                            new System.Text.Parsing.AlternativeParser(
+                                new System.Text.Parsing.ActionParser(ToUtf32("A0"),
+                                    new System.Text.Parsing.NonterminalParser(ToUtf32("DecimalConstant"), ToUtf32("DecimalConstant"), 0)),
+                                new System.Text.Parsing.ActionParser(ToUtf32("A1"),
+                                    new System.Text.Parsing.NonterminalParser(ToUtf32("HexConstant"), ToUtf32("HexConstant"), 0))),
+                            new System.Text.Parsing.ActionParser(ToUtf32("A2"),
+                                new System.Text.Parsing.NonterminalParser(ToUtf32("CharacterConstant"), ToUtf32("CharacterConstant"), 0))),
+                        new System.Text.Parsing.ActionParser(ToUtf32("A3"),
+                            new System.Text.Parsing.NonterminalParser(ToUtf32("StringConstant"), ToUtf32("StringConstant"), 0))),
+                    new System.Text.Parsing.ActionParser(ToUtf32("A4"),
+                        new System.Text.Parsing.NonterminalParser(ToUtf32("ClsIdConstant"), ToUtf32("ClsIdConstant"), 0)))));
             AddRule(new LocalSymbolRule(ToUtf32("LocalSymbol"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.ActionParser(ToUtf32("A0"),
                     new System.Text.Parsing.TokenParser(
@@ -1764,41 +1843,63 @@ namespace cmsx.assembly
                     new System.Text.Parsing.NonterminalParser(ToUtf32("NL"), ToUtf32("NL"), 0))));
             AddRule(new ModeLineRule(ToUtf32("ModeLine"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.AlternativeParser(
+                    new System.Text.Parsing.AlternativeParser(
+                        new System.Text.Parsing.SequenceParser(
+                            new System.Text.Parsing.SequenceParser(
+                                new System.Text.Parsing.ActionParser(ToUtf32("A0"),
+                                    new System.Text.Parsing.TokenParser(
+                                        new System.Text.Parsing.SequenceParser(
+                                            new System.Text.Parsing.SequenceParser(
+                                                new System.Text.Parsing.SequenceParser(
+                                                    new System.Text.Parsing.SequenceParser(
+                                                        new System.Text.Parsing.SequenceParser(
+                                                            new System.Text.Parsing.OptionalParser(
+                                                                new System.Text.Parsing.NonterminalParser(ToUtf32("S"), ToUtf32("S"), 0)),
+                                                            new System.Text.Parsing.CharParser('.')),
+                                                        new System.Text.Parsing.CharSetParser(ToUtf32("cC"))),
+                                                    new System.Text.Parsing.CharSetParser(ToUtf32("oO"))),
+                                                new System.Text.Parsing.CharSetParser(ToUtf32("dD"))),
+                                            new System.Text.Parsing.CharSetParser(ToUtf32("eE"))))),
+                                new System.Text.Parsing.OptionalParser(
+                                    new System.Text.Parsing.NonterminalParser(ToUtf32("S"), ToUtf32("S"), 0))),
+                            new System.Text.Parsing.NonterminalParser(ToUtf32("NL"), ToUtf32("NL"), 0)),
+                        new System.Text.Parsing.SequenceParser(
+                            new System.Text.Parsing.SequenceParser(
+                                new System.Text.Parsing.ActionParser(ToUtf32("A1"),
+                                    new System.Text.Parsing.TokenParser(
+                                        new System.Text.Parsing.SequenceParser(
+                                            new System.Text.Parsing.SequenceParser(
+                                                new System.Text.Parsing.SequenceParser(
+                                                    new System.Text.Parsing.SequenceParser(
+                                                        new System.Text.Parsing.SequenceParser(
+                                                            new System.Text.Parsing.OptionalParser(
+                                                                new System.Text.Parsing.NonterminalParser(ToUtf32("S"), ToUtf32("S"), 0)),
+                                                            new System.Text.Parsing.CharParser('.')),
+                                                        new System.Text.Parsing.CharSetParser(ToUtf32("dD"))),
+                                                    new System.Text.Parsing.CharSetParser(ToUtf32("aA"))),
+                                                new System.Text.Parsing.CharSetParser(ToUtf32("tT"))),
+                                            new System.Text.Parsing.CharSetParser(ToUtf32("aA"))))),
+                                new System.Text.Parsing.OptionalParser(
+                                    new System.Text.Parsing.NonterminalParser(ToUtf32("S"), ToUtf32("S"), 0))),
+                            new System.Text.Parsing.NonterminalParser(ToUtf32("NL"), ToUtf32("NL"), 0))),
                     new System.Text.Parsing.SequenceParser(
                         new System.Text.Parsing.SequenceParser(
-                            new System.Text.Parsing.ActionParser(ToUtf32("A0"),
+                            new System.Text.Parsing.ActionParser(ToUtf32("A2"),
                                 new System.Text.Parsing.TokenParser(
                                     new System.Text.Parsing.SequenceParser(
                                         new System.Text.Parsing.SequenceParser(
                                             new System.Text.Parsing.SequenceParser(
                                                 new System.Text.Parsing.SequenceParser(
                                                     new System.Text.Parsing.SequenceParser(
-                                                        new System.Text.Parsing.OptionalParser(
-                                                            new System.Text.Parsing.NonterminalParser(ToUtf32("S"), ToUtf32("S"), 0)),
-                                                        new System.Text.Parsing.CharParser('.')),
-                                                    new System.Text.Parsing.CharSetParser(ToUtf32("cC"))),
-                                                new System.Text.Parsing.CharSetParser(ToUtf32("oO"))),
-                                            new System.Text.Parsing.CharSetParser(ToUtf32("dD"))),
-                                        new System.Text.Parsing.CharSetParser(ToUtf32("eE"))))),
-                            new System.Text.Parsing.OptionalParser(
-                                new System.Text.Parsing.NonterminalParser(ToUtf32("S"), ToUtf32("S"), 0))),
-                        new System.Text.Parsing.NonterminalParser(ToUtf32("NL"), ToUtf32("NL"), 0)),
-                    new System.Text.Parsing.SequenceParser(
-                        new System.Text.Parsing.SequenceParser(
-                            new System.Text.Parsing.ActionParser(ToUtf32("A1"),
-                                new System.Text.Parsing.TokenParser(
-                                    new System.Text.Parsing.SequenceParser(
-                                        new System.Text.Parsing.SequenceParser(
-                                            new System.Text.Parsing.SequenceParser(
-                                                new System.Text.Parsing.SequenceParser(
-                                                    new System.Text.Parsing.SequenceParser(
-                                                        new System.Text.Parsing.OptionalParser(
-                                                            new System.Text.Parsing.NonterminalParser(ToUtf32("S"), ToUtf32("S"), 0)),
-                                                        new System.Text.Parsing.CharParser('.')),
-                                                    new System.Text.Parsing.CharSetParser(ToUtf32("dD"))),
-                                                new System.Text.Parsing.CharSetParser(ToUtf32("aA"))),
-                                            new System.Text.Parsing.CharSetParser(ToUtf32("tT"))),
-                                        new System.Text.Parsing.CharSetParser(ToUtf32("aA"))))),
+                                                        new System.Text.Parsing.SequenceParser(
+                                                            new System.Text.Parsing.OptionalParser(
+                                                                new System.Text.Parsing.NonterminalParser(ToUtf32("S"), ToUtf32("S"), 0)),
+                                                            new System.Text.Parsing.CharParser('.')),
+                                                        new System.Text.Parsing.CharSetParser(ToUtf32("dD"))),
+                                                    new System.Text.Parsing.CharSetParser(ToUtf32("eE"))),
+                                                new System.Text.Parsing.CharSetParser(ToUtf32("bB"))),
+                                            new System.Text.Parsing.CharSetParser(ToUtf32("uU"))),
+                                        new System.Text.Parsing.CharSetParser(ToUtf32("gG"))))),
                             new System.Text.Parsing.OptionalParser(
                                 new System.Text.Parsing.NonterminalParser(ToUtf32("S"), ToUtf32("S"), 0))),
                         new System.Text.Parsing.NonterminalParser(ToUtf32("NL"), ToUtf32("NL"), 0)))));

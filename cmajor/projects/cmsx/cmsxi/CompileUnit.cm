@@ -16,11 +16,16 @@ namespace cmsx.intermediate
         {
             fileName = fileName_;
         }
-        public Function* AddFunction(int lineNumber, Type* type, const string& name)
+        public void AddInfo(const string& id_, MDStructRef* mdRef_)
+        {
+            id = id_;
+            mdRef = mdRef_;
+        }
+        public Function* AddFunction(int lineNumber, Type* type, const string& name, bool once, MDStructRef* md)
         {
             if (type is FunctionType*)
             {
-                Function* function = new Function(context, cast<FunctionType*>(type), name);
+                Function* function = new Function(context, cast<FunctionType*>(type), name, once, md);
                 functions.Add(UniquePtr<Function>(function));
                 return function;
             }
@@ -65,6 +70,20 @@ namespace cmsx.intermediate
             CodeFormatter formatter(writer);
             formatter.SetIndentSize(5);
             context.PrintTypes(formatter);
+            if (!globalVariables.IsEmpty())
+            {
+                formatter.WriteLine();
+                formatter.WriteLine("data");
+                formatter.WriteLine("{");
+                formatter.IncIndent();
+                for (UniquePtr<GlobalVariable>& globalVariable : globalVariables)
+                {
+                    globalVariable->Print(formatter);
+                    formatter.WriteLine();
+                }
+                formatter.DecIndent();
+                formatter.WriteLine("}");
+            }
             formatter.WriteLine();
             bool first = true;
             for (const UniquePtr<Function>& function : functions)
@@ -103,10 +122,10 @@ namespace cmsx.intermediate
                 throw Exception("global variable '" + globalVariableName + "' not found");
             }
         }
-        public void AddGlobalVariable(Type* type, const string& name, ConstantValue* initializer, int line)
+        public void AddGlobalVariable(Type* type, const string& name, ConstantValue* initializer, int line, bool once)
         {
             Location* dataLocation = dataLocations.GetDataLocation(context.GetSymbolOperand(name));
-            GlobalVariable* globalVariable = new GlobalVariable(type, name, initializer, line, dataLocation);
+            GlobalVariable* globalVariable = new GlobalVariable(type, name, initializer, line, dataLocation, once);
             globalVariables.Add(UniquePtr<GlobalVariable>(globalVariable));
             globalVariableMap[name] = globalVariable;
         }
@@ -148,17 +167,49 @@ namespace cmsx.intermediate
                 machineCode.GetInstruction(separatorInstructionOpCode, null);
                 machineCode.GetInstruction(cmsx.assembly.CODE, null);
             }
+            List<Function*> debugInfoFuncs;
             for (const UniquePtr<Function>& function : functions)
             {
                 machineCode.GetInstruction(separatorInstructionOpCode, null);
                 function->GenerateCode(machineCode, formatter);
+                if (function->md != null)
+                {
+                    debugInfoFuncs.Add(function.Get());
+                }
+            }
+            if (!debugInfoFuncs.IsEmpty())
+            {
+                machineCode.GetInstruction(separatorInstructionOpCode, null);
+                machineCode.GetInstruction(cmsx.assembly.DEBUG, null);
+                machineCode.GetInstruction(separatorInstructionOpCode, null);
+                for (Function* debugInfoFunc : debugInfoFuncs)
+                {
+                    MDStructRef* md = debugInfoFunc->md;
+                    MDStruct* mdStruct = metadata.GetMDStruct(md->id);
+                    MDItem* fullNameItem = mdStruct->GetItem("fullName");
+                    string functionFullName;
+                    if (fullNameItem is MDString*)
+                    {
+                        functionFullName = cast<MDString*>(fullNameItem)->value;
+                    }
+                    else
+                    {
+                        throw Exception("metadata string expected");
+                    }
+                    MachineInstruction* funcInfoInst = machineCode.GetInstruction(cmsx.assembly.FUNCINFO, null);
+                    funcInfoInst->AddOperand(context.GetSymbolOperand(debugInfoFunc->name));
+                    funcInfoInst->AddOperand(context.GetStringOperand(functionFullName));
+                }
             }
         }
         public Context& context;
         public string fileName;
+        public Metadata metadata;
         private List<UniquePtr<GlobalVariable>> globalVariables;
         private HashMap<string, GlobalVariable*> globalVariableMap;
         private List<UniquePtr<Function>> functions;
         private DataLocations dataLocations;
+        private string id;
+        private MDStructRef* mdRef;
     }
 }

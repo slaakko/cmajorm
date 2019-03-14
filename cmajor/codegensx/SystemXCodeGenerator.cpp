@@ -14,6 +14,7 @@
 #include <cmajor/util/System.hpp>
 #include <cmajor/util/Unicode.hpp>
 #include <cmajor/util/Error.hpp>
+#include <cmajor/util/Sha1.hpp>
 #include <boost/filesystem.hpp>
 
 namespace cmajor { namespace codegensx {
@@ -42,6 +43,7 @@ SystemXCodeGenerator::SystemXCodeGenerator(cmajor::ir::EmittingContext& emitting
     trueBlock(nullptr), falseBlock(nullptr), breakTarget(nullptr), continueTarget(nullptr), sequenceSecond(nullptr), currentFunction(nullptr), currentBlock(nullptr),
     breakTargetBlock(nullptr), continueTargetBlock(nullptr), lastAlloca(nullptr), currentClass(nullptr), basicBlockOpen(false), defaultDest(nullptr), currentCaseMap(nullptr)
 {
+    emitter->SetEmittingDelegate(this);
 }
 
 void SystemXCodeGenerator::GenerateCode(void* boundCompileUnit)
@@ -52,19 +54,23 @@ void SystemXCodeGenerator::GenerateCode(void* boundCompileUnit)
 
 void SystemXCodeGenerator::Visit(BoundCompileUnit& boundCompileUnit)
 {
-    symbolTable = &boundCompileUnit.GetSymbolTable();
-    module = &boundCompileUnit.GetModule();
     std::string intermediateFilePath = Path::ChangeExtension(boundCompileUnit.ObjectFilePath(), ".i");
     NativeModule nativeModule(emitter, intermediateFilePath);
+    compileUnitId = GetSha1MessageDigest(boundCompileUnit.SourceFilePath());
+    emitter->SetCompileUnitId(compileUnitId);
+    symbolTable = &boundCompileUnit.GetSymbolTable();
+    module = &boundCompileUnit.GetModule();
     compileUnit = &boundCompileUnit;
     nativeCompileUnit = static_cast<cmsxi::CompileUnit*>(nativeModule.module);
+    nativeCompileUnit->SetId(compileUnitId);
+    nativeCompileUnit->SetSourceFilePath(boundCompileUnit.SourceFilePath());
     int n = boundCompileUnit.BoundNodes().size();
     for (int i = 0; i < n; ++i)
     {
         BoundNode* node = boundCompileUnit.BoundNodes()[i].get();
         node->Accept(*this);
     }
-    nativeCompileUnit->Write(*static_cast<cmsxbe::EmittingContext*>(emittingContext)->GetContext());
+    nativeCompileUnit->Write();
     std::string intermediateCompileCommand;
     std::string intermediateCompileErrorFilePath = intermediateFilePath + ".error";
     intermediateCompileCommand.append("cmfileredirector -2 " + intermediateCompileErrorFilePath + " cmsxic ").append(intermediateFilePath);
@@ -130,6 +136,13 @@ void SystemXCodeGenerator::Visit(BoundFunction& boundFunction)
     lastAlloca = nullptr;
     labeledStatementMap.clear();
     function = emitter->GetOrInsertFunction(ToUtf8(functionSymbol->MangledName()), functionType);
+    if (functionSymbol->HasSource())
+    {
+        void* mdStruct = emitter->CreateMDStruct();
+        emitter->AddMDItem(mdStruct, "fullName", emitter->CreateMDString(ToUtf8(functionSymbol->FullName())));
+        int mdId = emitter->GetMDStructId(mdStruct);
+        emitter->SetFunctionMdId(function, mdId);
+    }
     if (GetGlobalFlag(GlobalFlags::release) && functionSymbol->IsInline())
     {
         emitter->AddInlineFunctionAttribute(function);
@@ -1131,6 +1144,107 @@ void SystemXCodeGenerator::ExitBlocks(BoundCompoundStatement* targetBlock)
                 }
             }
         }
+    }
+}
+
+void* SystemXCodeGenerator::GetGlobalStringPtr(int stringId)
+{
+    auto it = utf8stringMap.find(stringId);
+    if (it != utf8stringMap.cend())
+    {
+        return it->second;
+    }
+    else
+    {
+        void* stringValue = emitter->CreateGlobalStringPtr(compileUnit->GetUtf8String(stringId));
+        utf8stringMap[stringId] = stringValue;
+        return stringValue;
+    }
+}
+
+void* SystemXCodeGenerator::GetGlobalWStringConstant(int stringId)
+{
+    auto it = utf16stringMap.find(stringId);
+    if (it != utf16stringMap.cend())
+    {
+        return it->second;
+    }
+    else
+    {
+        const std::u16string& str = compileUnit->GetUtf16String(stringId);
+        uint64_t length = str.length();
+        std::vector<void*> wcharConstants;
+        for (char16_t c : str)
+        {
+            wcharConstants.push_back(emitter->CreateIrValueForUShort(static_cast<uint16_t>(c)));
+        }
+        wcharConstants.push_back(emitter->CreateIrValueForUShort(static_cast<uint16_t>(0)));
+        void* arrayType = emitter->GetIrTypeForArrayType(emitter->GetIrTypeForUShort(), length + 1);
+        void* stringObject = emitter->GetOrInsertGlobal("wstring" + std::to_string(stringId) + "_" + compileUnitId, emitter->GetIrTypeForUShort());
+        void* stringGlobal = stringObject;
+        emitter->SetPrivateLinkage(stringGlobal);
+        void* constant = emitter->CreateIrValueForConstantArray(arrayType, wcharConstants, "w");
+        emitter->SetInitializer(stringGlobal, constant);
+        void* stringValue = stringGlobal;
+        utf16stringMap[stringId] = stringValue;
+        return stringValue;
+    }
+}
+
+void* SystemXCodeGenerator::GetGlobalUStringConstant(int stringId)
+{
+    auto it = utf32stringMap.find(stringId);
+    if (it != utf32stringMap.cend())
+    {
+        return it->second;
+    }
+    else
+    {
+        const std::u32string& str = compileUnit->GetUtf32String(stringId);
+        uint64_t length = str.length();
+        std::vector<void*> ucharConstants;
+        for (char32_t c : str)
+        {
+            ucharConstants.push_back(emitter->CreateIrValueForUInt(static_cast<uint32_t>(c)));
+        }
+        ucharConstants.push_back(emitter->CreateIrValueForUInt(static_cast<uint32_t>(0)));
+        void* arrayType = emitter->GetIrTypeForArrayType(emitter->GetIrTypeForUInt(), length + 1);
+        void* stringObject = emitter->GetOrInsertGlobal("ustring" + std::to_string(stringId) + "_" + compileUnitId, emitter->GetIrTypeForUInt());
+        void* stringGlobal = stringObject;
+        emitter->SetPrivateLinkage(stringGlobal);
+        void* constant = emitter->CreateIrValueForConstantArray(arrayType, ucharConstants, "u");
+        emitter->SetInitializer(stringGlobal, constant);
+        void* stringValue = stringGlobal;
+        utf32stringMap[stringId] = stringValue;
+        return stringValue;
+    }
+}
+
+void* SystemXCodeGenerator::GetGlobalUuidConstant(int uuidId)
+{
+    auto it = uuidMap.find(uuidId);
+    if (it != uuidMap.cend())
+    {
+        return it->second;
+    }
+    else
+    {
+        const boost::uuids::uuid& uuid = compileUnit->GetUuid(uuidId);
+        uint64_t length = uuid.static_size();
+        std::vector<void*> byteConstants;
+        for (boost::uuids::uuid::value_type x : uuid)
+        {
+            byteConstants.push_back(emitter->CreateIrValueForByte(static_cast<int8_t>(x)));
+        }
+        void* arrayType = emitter->GetIrTypeForArrayType(emitter->GetIrTypeForByte(), length);
+        void* uuidObject = emitter->GetOrInsertGlobal("uuid" + std::to_string(uuidId) + "_" + compileUnitId, emitter->GetIrTypeForByte());
+        void* uuidGlobal = uuidObject;
+        emitter->SetPrivateLinkage(uuidGlobal);
+        void* constant = emitter->CreateIrValueForConstantArray(arrayType, byteConstants, "b");
+        emitter->SetInitializer(uuidGlobal, constant);
+        void* uuidValue = uuidGlobal;
+        uuidMap[uuidId] = uuidValue;
+        return uuidValue;
     }
 }
 

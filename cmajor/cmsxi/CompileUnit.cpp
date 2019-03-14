@@ -9,8 +9,20 @@
 
 namespace cmsxi {
 
-CompileUnit::CompileUnit(const std::string& filePath_) : filePath(filePath_)
+CompileUnit::CompileUnit(const std::string& filePath_) : filePath(filePath_), context(), cu(nullptr)
 {
+}
+
+void CompileUnit::SetId(const std::string& id_)
+{
+    id = id_;
+}
+
+void CompileUnit::SetSourceFilePath(const std::string& sourceFilePath_)
+{
+    sourceFilePath = sourceFilePath_;
+    cu = context.CreateMDStruct();
+    cu->AddItem("sourceFilePath", context.CreateMDString(sourceFilePath));
 }
 
 Function* CompileUnit::GetOrInsertFunction(const std::string& name, FunctionType* type)
@@ -29,11 +41,17 @@ Function* CompileUnit::GetOrInsertFunction(const std::string& name, FunctionType
     }
 }
 
-void CompileUnit::Write(Context& context)
+void CompileUnit::Write()
 {
     std::ofstream file(filePath);
     CodeFormatter formatter(file);
     formatter.SetIndentSize(8);
+    formatter.Write("cu(");
+    formatter.Write(id);
+    formatter.Write(",");
+    cu->Write(formatter);
+    formatter.WriteLine(")");
+    formatter.WriteLine();
     context.GetTypeRepository().Write(formatter);
     context.GetDataRepository().Write(context, formatter);
     bool first = true;
@@ -49,6 +67,7 @@ void CompileUnit::Write(Context& context)
         }
         f->Write(formatter, context);
     }
+    context.GetMetadata().Write(formatter);
 }
 
 } // namespace cmsxi

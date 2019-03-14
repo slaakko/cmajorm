@@ -6,6 +6,7 @@
 #ifndef CMAJOR_CMSXI_CONTEXT_INCLUDED
 #define CMAJOR_CMSXI_CONTEXT_INCLUDED
 #include <cmajor/cmsxi/Data.hpp>
+#include <cmajor/cmsxi/Metadata.hpp>
 
 namespace cmsxi {
 
@@ -19,6 +20,7 @@ public:
     Context();
     TypeRepository& GetTypeRepository() { return typeRepository; }
     DataRepository& GetDataRepository() { return dataRepository; }
+    Metadata& GetMetadata() { return metadata; }
     Type* GetVoidType() { return typeRepository.GetVoidType(); }
     Type* GetBoolType() { return typeRepository.GetBoolType(); }
     Type* GetSByteType() { return typeRepository.GetSByteType(); }
@@ -59,8 +61,11 @@ public:
     ConstantValue* GetULongValue(uint64_t value);
     ConstantValue* GetFloatValue(float value);
     ConstantValue* GetDoubleValue(double value);
-    ArrayValue* GetArrayValue(Type* arrayType, const std::vector<ConstantValue*>& elements);
+    ArrayValue* GetArrayValue(Type* arrayType, const std::vector<ConstantValue*>& elements, const std::string& prefix);
     StructureValue* GetStructureValue(Type* structureType, const std::vector<ConstantValue*>& members);
+    StringValue* GetStringValue(Type* stringType, const std::string& value);
+    ConversionValue* GetConversionValue(Type* type, ConstantValue* from);
+    ClsIdValue* GetClsIdValue(const std::string& typeId);
     void AddValue(Value* value);
     void SetCurrentBasicBlock(BasicBlock* bb) { currentBasicBlock = bb; }
     BasicBlock* GetCurrentBasicBlock() const { return currentBasicBlock; }
@@ -101,9 +106,18 @@ public:
     Instruction* CreateSwitch(Value* cond, BasicBlock* defaultDest);
     Instruction* CreateTrap(const std::vector<Value*>& args);
     GlobalVariable* GetOrInsertGlobal(const std::string& name, Type* type);
+    GlobalVariable* CreateGlobalStringPtr(const std::string& stringValue);
+    void SetCompileUnitId(const std::string& compileUnitId_);
+    MDBool* CreateMDBool(bool value) { return metadata.CreateMDBool(value); }
+    MDLong* CreateMDLong(int64_t value) { return metadata.CreateMDLong(value); }
+    MDString* CreateMDString(const std::string& value) { return metadata.CreateMDString(value); }
+    MDStructRef* CreateMDStructRef(int id) { return metadata.CreateMDStructRef(id); }
+    MDStruct* CreateMDStruct() { return metadata.CreateMDStruct();  }
+    void AddMDStructItem(MDStruct* mdStruct, const std::string& fieldName, MDItem* item);
 private:
     TypeRepository typeRepository;
     DataRepository dataRepository;
+    Metadata metadata;
     std::vector<std::unique_ptr<Value>> values;
     Function* currentFunction;
     BasicBlock* currentBasicBlock;

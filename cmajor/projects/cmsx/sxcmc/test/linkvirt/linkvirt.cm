@@ -1,0 +1,22 @@
+class Foo
+{
+    public default virtual ~Foo();
+    public virtual void foo()
+    {
+        write(1, "foo\n", 4);
+    }
+}
+
+class Bar : Foo
+{
+    public override void foo()
+    {
+        write(1, "bar\n", 4);
+    }
+}
+
+void main()
+{
+    Foo* foo = new Foo();
+    foo->foo();
+}

@@ -69,11 +69,19 @@ inline ClassTypeSymbolFlags operator~(ClassTypeSymbolFlags operand)
     return ClassTypeSymbolFlags(~uint8_t(operand));
 }
 
+SYMBOLS_API int32_t GetClassIdVmtIndexOffset();     // 64-bit class id
+SYMBOLS_API int32_t GetTypeIdVmtIndexOffset();      // 16-byte type id
+SYMBOLS_API int32_t GetClassNameVmtIndexOffset();   // class name pointer
+SYMBOLS_API int32_t GetImtsVmtIndexOffset();        // interface method table pointer
+SYMBOLS_API int32_t GetFunctionVmtIndexOffset();    // virtual method table
+
+/*
 const int32_t classIdVmtIndexOffset = 0;    // 64-bit class id
 const int32_t typeIdVmtIndexOffset = 1;     // 16-byte type id
 const int32_t classNameVmtIndexOffset = 3;  // class name pointer
 const int32_t imtsVmtIndexOffset = 4;       // interface method table pointer
 const int32_t functionVmtIndexOffset = 5;   // virtual method table
+*/
 
 class SYMBOLS_API ClassTypeSymbol : public TypeSymbol
 {
@@ -225,6 +233,7 @@ private:
 
 SYMBOLS_API ConstantNode* MakePolymorphicClassArray(const std::unordered_set<ClassTypeSymbol*>& polymorphicClasses, const std::u32string& arrayName);
 SYMBOLS_API ConstantNode* MakeStaticClassArray(const std::unordered_set<ClassTypeSymbol*>& classesHavingStaticConstructor, const std::u32string& arrayName);
+SYMBOLS_API void MakeClassIdFile(const std::unordered_set<ClassTypeSymbol*>& polymorphicClasses, const std::string& classIdFileName);
 
 } } // namespace cmajor::symbols
 

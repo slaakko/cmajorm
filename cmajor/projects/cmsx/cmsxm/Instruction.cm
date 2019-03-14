@@ -144,7 +144,14 @@ namespace cmsx.machine
             }
             else
             {
-                result.Append(formatter.FormatRegisterNumber(y));
+                if (IsNegateInstruction())
+                {
+                    result.Append(ToString(y));
+                }
+                else
+                {
+                    result.Append(formatter.FormatRegisterNumber(y));
+                }
                 result.Append(',');
                 if (IsZReg())
                 {
@@ -172,7 +179,7 @@ namespace cmsx.machine
             string tags = formatter.GetTags(address);
             result.Append(tags);
             string label = formatter.GetLabel(address);
-            result.Append(Format(label, 80));
+            result.Append(Format(label, 80, FormatWidth.min));
             result.Append(' ');
             int n = OpCodeMap.Instance().MaxOpCodeNameLength();
             result.Append(Format(OpCodeMap.Instance().GetName(opCode), n));
@@ -214,6 +221,10 @@ namespace cmsx.machine
             return false;
         }
         public nothrow virtual bool IsAbsoluteAddressInst() const
+        {
+            return false;
+        }
+        public nothrow virtual bool IsNegateInstruction() const
         {
             return false;
         }
@@ -1536,6 +1547,10 @@ namespace cmsx.machine
             long xx = yy - zz;
             regs.Set(x, cast<ulong>(xx));
         }
+        public override nothrow bool IsNegateInstruction() const
+        {
+            return true;
+        }
     }
 
     public class Negi : Instruction
@@ -1555,6 +1570,10 @@ namespace cmsx.machine
         {
             return false;
         }
+        public override nothrow bool IsNegateInstruction() const
+        {
+            return true;
+        }
     }
 
     public class Negu : Instruction
@@ -1568,6 +1587,10 @@ namespace cmsx.machine
             ulong zz = regs.Get(z);
             ulong xx = yy - zz;
             regs.Set(x, xx);
+        }
+        public override nothrow bool IsNegateInstruction() const
+        {
+            return true;
         }
     }
 
@@ -1586,6 +1609,10 @@ namespace cmsx.machine
         public nothrow override bool IsZReg() const
         {
             return false;
+        }
+        public override nothrow bool IsNegateInstruction() const
+        {
+            return true;
         }
     }
 

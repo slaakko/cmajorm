@@ -1651,7 +1651,7 @@ namespace cmsx.debug
                 WriteInst(process, address, debugBreakInst);
             }
             machine->GetRegisters().SetSpecial(cmsx.machine.Registers.rXX, i);
-            if (instruction->IsJumpInst() || (instruction is cmsx.machine.Trap*))
+            if (instruction->IsJumpInst() || i == 0u)
             {
                 machine->GetRegisters().SetPC(pc);
             }

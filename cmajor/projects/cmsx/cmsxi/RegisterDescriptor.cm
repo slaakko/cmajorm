@@ -112,7 +112,7 @@ namespace cmsx.intermediate
                 int score = 0;
                 for (Value* value : registerDescriptor->values)
                 {
-                    if (!(value is ConstantValue*) && value->HomeLocation() != null)
+                    if (!(value is LiteralValue*) && value->HomeLocation() != null)
                     {
                         AddressDescriptor* addressDescriptor = addressDescriptors.GetAddressDescriptor(value);
                         bool foundSomewhereElse = true;
@@ -181,7 +181,7 @@ namespace cmsx.intermediate
     {
         for (Value* value : registerDescriptor.values)
         {
-            if (value is ConstantValue*) continue;
+            if (value is LiteralValue*) continue;
             Type* type = value->type;
             #assert(type is ScalarType*);
             int storeOpCode = type->GetStoreOp(line);

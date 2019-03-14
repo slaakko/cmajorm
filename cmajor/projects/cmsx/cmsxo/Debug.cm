@@ -1,0 +1,52 @@
+using System;
+using System.Collections;
+
+namespace cmsx.object
+{
+    public enum DebugRecordCode : byte
+    {
+        functionInfo = 0u
+    }
+
+    public const int maxDebugCodeStrLength = 12;
+
+    public string DebugRecordCodeStr(DebugRecordCode debugRecordCode)
+    {
+        switch (debugRecordCode)
+        {
+            case DebugRecordCode.functionInfo: return "FUNCTIONINFO";
+        }
+        return "";
+    }
+
+    public class FunctionInfo
+    {
+        public nothrow FunctionInfo(uint functionSymbolIndex_, const string& fullName_) : functionSymbolIndex(functionSymbolIndex_), fullName(fullName_)
+        {
+        }
+        public uint functionSymbolIndex;
+        public string fullName;
+    }
+
+    public class FunctionTableEntry
+    {
+        public nothrow FunctionTableEntry(ulong start_, ulong length_, ulong mangledNameAddress_, ulong fullNameAddress_) :
+            start(start_), length(length_), mangledNameAddress(mangledNameAddress_), fullNameAddress(fullNameAddress_)
+        {
+        }
+        public ulong start;
+        public ulong length;
+        public ulong mangledNameAddress;
+        public ulong fullNameAddress;
+    }
+
+    public bool operator==(const FunctionTableEntry& left, const FunctionTableEntry& right)
+    {
+        return left.start == right.start;
+    }
+
+    public bool operator<(const FunctionTableEntry& left, const FunctionTableEntry& right)
+    {
+        return left.start < right.start;
+    }
+}

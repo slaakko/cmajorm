@@ -17,10 +17,12 @@ public:
     Type* GetType(Context& context) override;
     void SetInitializer(ConstantValue* initializer_) { initializer = initializer_; }
     void Write(Context& context, CodeFormatter& formatter);
+    void SetLinkOnce() { linkOnce = true; }
 private:
     Type* type;
     std::string name;
     ConstantValue* initializer;
+    bool linkOnce;
 };
 
 class CMSXI_API DataRepository
@@ -30,10 +32,14 @@ public:
     DataRepository(const DataRepository&) = delete;
     DataRepository& operator=(const DataRepository&) = delete;
     GlobalVariable* GetOrInsertGlobal(const std::string& name, Type* type);
+    GlobalVariable* CreateGlobalStringPtr(Context& context, const std::string& stringValue);
     void Write(Context& context, CodeFormatter& formatter);
+    void SetCompileUnitId(const std::string& compileUnitId_);
 private:
     std::vector<std::unique_ptr<GlobalVariable>> globalVariableDefinitions;
     std::unordered_map<std::string, GlobalVariable*> globalVariableMap;
+    int nextStringId;
+    std::string compileUnitId;
 };
 
 } // namespace cmsxi

@@ -401,7 +401,7 @@ namespace cmsx.intermediate
             AddressDescriptors& addressDescriptors = parent->function.addressDescriptors;
             bool useRegYForX = CanUseRegYForX(y, registerDescriptors, addressDescriptors);
             GetReg(x, y, z, useRegYForX, registerDescriptors, addressDescriptors, machineCode, line, rx, ry, rz, this);
-            if (y is ConstantValue*)
+            if (y is LiteralValue*)
             {
                 y->GenerateSetValue(ry->reg, machineCode, line, this);
             }
@@ -411,7 +411,7 @@ namespace cmsx.intermediate
             }
             if (z != null)
             {
-                if (z is ConstantValue*)
+                if (z is LiteralValue*)
                 {
                     z->GenerateSetValue(rz->reg, machineCode, line, this);
                 }
@@ -482,7 +482,7 @@ namespace cmsx.intermediate
             AddressDescriptors& addressDescriptors = parent->function.addressDescriptors;
             bool useRegYForX = CanUseRegYForX(y, registerDescriptors, addressDescriptors);
             GetReg(x, y, z, useRegYForX, registerDescriptors, addressDescriptors, machineCode, line, rx, ry, rz, this);
-            if (y is ConstantValue*)
+            if (y is LiteralValue*)
             {
                 y->GenerateSetValue(ry->reg, machineCode, line, this);
             }
@@ -552,7 +552,7 @@ namespace cmsx.intermediate
             AddressDescriptors& addressDescriptors = parent->function.addressDescriptors;
             bool useRegYForX = CanUseRegYForX(y, registerDescriptors, addressDescriptors);
             GetReg(x, y, z, useRegYForX, registerDescriptors, addressDescriptors, machineCode, line, rx, ry, rz, this);
-            if (y is ConstantValue*)
+            if (y is LiteralValue*)
             {
                 y->GenerateSetValue(ry->reg, machineCode, line, this);
             }
@@ -911,7 +911,7 @@ namespace cmsx.intermediate
             RegisterDescriptor* rz = null;
             RegisterDescriptors& registerDescriptors = parent->registerDescriptors;
             AddressDescriptors& addressDescriptors = parent->function.addressDescriptors;
-            if (y is ConstantValue*)
+            if (y is LiteralValue*)
             {
                 List<Register*> dontUse;
                 rx = registerDescriptors.GetLocalRegDescriptor(dontUse, addressDescriptors, machineCode, line, this);
@@ -996,7 +996,7 @@ namespace cmsx.intermediate
             RegisterDescriptor* rz = null;
             RegisterDescriptors& registerDescriptors = parent->registerDescriptors;
             AddressDescriptors& addressDescriptors = parent->function.addressDescriptors;
-            if (y is ConstantValue*)
+            if (y is LiteralValue*)
             {
                 List<Register*> dontUse;
                 rx = registerDescriptors.GetLocalRegDescriptor(dontUse, addressDescriptors, machineCode, line, this);
@@ -1062,7 +1062,7 @@ namespace cmsx.intermediate
             RegisterDescriptor* rz = null;
             RegisterDescriptors& registerDescriptors = parent->registerDescriptors;
             AddressDescriptors& addressDescriptors = parent->function.addressDescriptors;
-            if (y is ConstantValue*)
+            if (y is LiteralValue*)
             {
                 List<Register*> dontUse;
                 rx = registerDescriptors.GetLocalRegDescriptor(dontUse, addressDescriptors, machineCode, line, this);
@@ -1137,13 +1137,26 @@ namespace cmsx.intermediate
             RegisterDescriptor* rz = null;
             RegisterDescriptors& registerDescriptors = parent->registerDescriptors;
             AddressDescriptors& addressDescriptors = parent->function.addressDescriptors;
-            if (y is ConstantValue*)
+            bool loaded = false;
+            if (y is LiteralValue*)
             {
                 List<Register*> dontUse;
                 rx = registerDescriptors.GetLocalRegDescriptor(dontUse, addressDescriptors, machineCode, line, this);
                 y->GenerateSetValue(rx->reg, machineCode, line, this);
+                loaded = true;
             }
-            else
+            else if (y is LocalInstruction*)
+            {
+                LocalInstruction* localInst = cast<LocalInstruction*>(y);
+                if (localInst->localType is StructureType* || localInst->localType is ArrayType*)
+                {
+                    List<Register*> dontUse;
+                    rx = registerDescriptors.GetLocalRegDescriptor(dontUse, addressDescriptors, machineCode, line, this);
+                    LoadOperandAddress(y, rx, addressDescriptors, machineCode, line, this);
+                    loaded = true;
+                }
+            }
+            if (!loaded)
             {
                 bool useRegYForX = CanUseRegYForX(y, registerDescriptors, addressDescriptors);
                 GetReg(x, y, z, useRegYForX, registerDescriptors, addressDescriptors, machineCode, line, rx, ry, rz, this);
@@ -1203,7 +1216,7 @@ namespace cmsx.intermediate
             AddressDescriptors& addressDescriptors = parent->function.addressDescriptors;
             bool useRegYForX = CanUseRegYForX(y, registerDescriptors, addressDescriptors);
             GetReg(x, y, z, useRegYForX, registerDescriptors, addressDescriptors, machineCode, line, rx, ry, rz, this);
-            if (y is ConstantValue*)
+            if (y is LiteralValue*)
             {
                 y->GenerateSetValue(ry->reg, machineCode, line, this);
             }
@@ -1292,7 +1305,7 @@ namespace cmsx.intermediate
             AddressDescriptors& addressDescriptors = parent->function.addressDescriptors;
             bool useRegYForX = CanUseRegYForX(y, registerDescriptors, addressDescriptors);
             GetReg(x, y, z, useRegYForX, registerDescriptors, addressDescriptors, machineCode, line, rx, ry, rz, this);
-            if (y is ConstantValue*)
+            if (y is LiteralValue*)
             {
                 y->GenerateSetValue(ry->reg, machineCode, line, this);
             }
@@ -1367,7 +1380,7 @@ namespace cmsx.intermediate
             RegisterDescriptor* rz = null;
             bool useRegYForX = CanUseRegYForX(y, registerDescriptors, addressDescriptors);
             GetReg(x, y, z, useRegYForX, registerDescriptors, addressDescriptors, machineCode, line, rx, ry, rz, this);
-            if (y is ConstantValue*)
+            if (y is LiteralValue*)
             {
                 y->GenerateSetValue(ry->reg, machineCode, line, this);
             }
@@ -1429,7 +1442,7 @@ namespace cmsx.intermediate
             RegisterDescriptor* rz = null;
             bool useRegYForX = CanUseRegYForX(y, registerDescriptors, addressDescriptors);
             GetReg(x, y, z, useRegYForX, registerDescriptors, addressDescriptors, machineCode, line, rx, ry, rz, this);
-            if (y is ConstantValue*)
+            if (y is LiteralValue*)
             {
                 y->GenerateSetValue(ry->reg, machineCode, line, this);
             }
@@ -1622,7 +1635,15 @@ namespace cmsx.intermediate
             List<Register*> dontUse;
             RegisterDescriptor* destinationRegisterDescriptor = registerDescriptors.GetLocalRegDescriptor(dontUse, addressDescriptors, machineCode, line, this);
             AddressDescriptor* ptrAddressDescriptor = addressDescriptors.GetAddressDescriptor(ptr);
-            Location* location = ptr->HomeLocation();
+            Location* location = null;
+            if (ptr is LoadInstruction*)
+            {
+                location = ptrAddressDescriptor->GetLocation();
+            }
+            else
+            {
+                location = ptr->HomeLocation();
+            }
             if (location == null)
             {
                 location = ptrAddressDescriptor->GetMemoryLocation();
@@ -1726,14 +1747,28 @@ namespace cmsx.intermediate
             RegisterDescriptors& registerDescriptors = parent->registerDescriptors;
             AddressDescriptors& addressDescriptors = parent->function.addressDescriptors;
             Register* valueReg = null;
-            if (value is ConstantValue*)
+            bool loaded = false;
+            if (value is LiteralValue*)
             {
                 List<Register*> dontUse;
                 RegisterDescriptor* valueRegisterDescriptor = registerDescriptors.GetLocalRegDescriptor(dontUse, addressDescriptors, machineCode, line, this);
                 valueReg = valueRegisterDescriptor->reg;
                 value->GenerateSetValue(valueRegisterDescriptor->reg, machineCode, line, this);
+                loaded = true;
             }
-            else
+            else if (value is LocalInstruction*)
+            {
+                LocalInstruction* localInst = cast<LocalInstruction*>(value);
+                if (localInst->localType is StructureType* || localInst->localType is ArrayType*)
+                {
+                    List<Register*> dontUse;
+                    RegisterDescriptor* valueRegisterDescriptor = registerDescriptors.GetLocalRegDescriptor(dontUse, addressDescriptors, machineCode, line, this);
+                    LoadOperandAddress(value, valueRegisterDescriptor, addressDescriptors, machineCode, line, this);
+                    valueReg = valueRegisterDescriptor->reg;
+                    loaded = true;
+                }
+            }
+            if (!loaded)
             {
                 AddressDescriptor* valueAddressDescriptor = addressDescriptors.GetAddressDescriptor(value);
                 Location* valueLoc = valueAddressDescriptor->GetLocation();
@@ -1764,10 +1799,18 @@ namespace cmsx.intermediate
                 }
             }
             AddressDescriptor* ptrAddressDescriptor = addressDescriptors.GetAddressDescriptor(ptr);
-            Location* ptrLoc = ptrAddressDescriptor->GetLocation();
-            if (ptrLoc == null)
+            Location* ptrLoc = null;
+            if (ptr is LoadInstruction*)
+            {
+                ptrLoc = ptrAddressDescriptor->GetLocation();
+            }
+            else
             {
                 ptrLoc = ptr->HomeLocation();
+            }
+            if (ptrLoc == null)
+            {
+                ptrLoc = ptrAddressDescriptor->GetMemoryLocation();
             }
             if (ptrLoc != null)
             {
@@ -1901,7 +1944,7 @@ namespace cmsx.intermediate
             AddressDescriptors& addressDescriptors = parent->function.addressDescriptors;
             bool useRegYForX = false;
             GetReg(x, y, z, useRegYForX, registerDescriptors, addressDescriptors, machineCode, line, rx, ry, rz, this);
-            if (y is ConstantValue*)
+            if (y is LiteralValue*)
             {
                 y->GenerateSetValue(ry->reg, machineCode, line, this);
             }
@@ -1922,7 +1965,7 @@ namespace cmsx.intermediate
                     LoadOperandValue(y, ry, addressDescriptors, machineCode, line, this);
                 }
             }
-            if (z is ConstantValue*)
+            if (z is LiteralValue*)
             {
                 z->GenerateSetValue(rz->reg, machineCode, line, this);
             }
@@ -2067,7 +2110,7 @@ namespace cmsx.intermediate
             AddressDescriptors& addressDescriptors = parent->function.addressDescriptors;
             bool useRegYForX = CanUseRegYForX(y, registerDescriptors, addressDescriptors);
             GetReg(x, y, z, useRegYForX, registerDescriptors, addressDescriptors, machineCode, line, rx, ry, rz, this);
-            if (y is ConstantValue*)
+            if (y is LiteralValue*)
             {
                 y->GenerateSetValue(ry->reg, machineCode, line, this);
             }
@@ -2077,7 +2120,7 @@ namespace cmsx.intermediate
             }
             if (z != null)
             {
-                if (z is ConstantValue*)
+                if (z is LiteralValue*)
                 {
                     #assert(z is LongValue*);
                     LongValue* offsetValue = cast<LongValue*>(z);
@@ -2215,7 +2258,7 @@ namespace cmsx.intermediate
             AddressDescriptors& addressDescriptors = parent->function.addressDescriptors;
             bool useRegYForX = CanUseRegYForX(y, registerDescriptors, addressDescriptors);
             GetReg(x, y, z, useRegYForX, registerDescriptors, addressDescriptors, machineCode, line, rx, ry, rz, this);
-            if (y is ConstantValue*)
+            if (y is LiteralValue*)
             {
                 y->GenerateSetValue(ry->reg, machineCode, line, this);
             }
@@ -2223,7 +2266,7 @@ namespace cmsx.intermediate
             {
                 LoadOperandValue(y, ry, addressDescriptors, machineCode, line, this);
             }
-            if (z is ConstantValue*)
+            if (z is LiteralValue*)
             {
                 z->GenerateSetValue(rz->reg, machineCode, line, this);
             }
@@ -2364,7 +2407,7 @@ namespace cmsx.intermediate
                     loaded = true;
                 }
             }
-            else if (arg is ConstantValue*)
+            else if (arg is LiteralValue*)
             {
                 arg->GenerateSetValue(argRegDescriptor->reg, machineCode, line, this);
                 loaded = true;
@@ -2495,7 +2538,7 @@ namespace cmsx.intermediate
             RegisterDescriptors& registerDescriptors = parent->registerDescriptors;
             AddressDescriptors& addressDescriptors = parent->function.addressDescriptors;
             Register* reg = null;
-            if (cond is ConstantValue*)
+            if (cond is LiteralValue*)
             {
                 List<Register*> dontUse;
                 RegisterDescriptor* condRegDescriptor = registerDescriptors.GetLocalRegDescriptor(dontUse, addressDescriptors, machineCode, line, this);
@@ -2636,18 +2679,34 @@ namespace cmsx.intermediate
             }
             parent->function.frameLocations.ResetArgLocations();
             Register* xReg = machineCode.context.regs.GetLocalRegister(registerDescriptors.GetNumUsedLocalRegs());
-            MachineInstruction* callInst = machineCode.GetInstruction(cmsx.machine.CALL, this);
-            callInst->AddOperand(xReg);
-            Operand* operand = null;
+            Operand* calleeOperand = null;
+            Operand* zOperand = null;
             if (callee is SymbolValue*)
             {
-                operand = machineCode.context.GetSymbolOperand(callee->Name());
+                calleeOperand = machineCode.context.GetSymbolOperand(callee->Name());
             }
             else
             {
-                LoadOperandValue(callee, registerDescriptors.GetRegisterDescriptor(xReg), addressDescriptors, machineCode, line, this);
+                AddressDescriptor* calleeAddressDescriptor = addressDescriptors.GetAddressDescriptor(callee);
+                Location* loc = calleeAddressDescriptor->GetLocation();
+                if (loc != null && loc is Register*)
+                {
+                    calleeOperand = loc;
+                }
+                else
+                {
+                    LoadOperandValue(callee, registerDescriptors.GetRegisterDescriptor(xReg), addressDescriptors, machineCode, line, this);
+                    calleeOperand = xReg;
+                }
+                zOperand = machineCode.context.GetLiteralOperand(0u);
             }
-            callInst->AddOperand(operand);
+            MachineInstruction* callInst = machineCode.GetInstruction(cmsx.machine.CALL, this);
+            callInst->AddOperand(xReg);
+            callInst->AddOperand(calleeOperand);
+            if (zOperand != null)
+            {
+                callInst->AddOperand(zOperand);
+            }
             EndGenerateCode();
         }
         public Value* callee;
@@ -2737,18 +2796,34 @@ namespace cmsx.intermediate
             }
             parent->function.frameLocations.ResetArgLocations();
             Register* xReg = machineCode.context.regs.GetLocalRegister(registerDescriptors.GetNumUsedLocalRegs());
-            MachineInstruction* callInst = machineCode.GetInstruction(cmsx.machine.CALL, this);
-            callInst->AddOperand(xReg);
-            Operand* operand = null;
+            Operand* calleeOperand = null;
+            Operand* zOperand = null;
             if (callee is SymbolValue*)
             {
-                operand = machineCode.context.GetSymbolOperand(callee->Name());
+                calleeOperand = machineCode.context.GetSymbolOperand(callee->Name());
             }
             else
             {
-                LoadOperandValue(callee, registerDescriptors.GetRegisterDescriptor(xReg), addressDescriptors, machineCode, line, this);
+                AddressDescriptor* calleeAddressDescriptor = addressDescriptors.GetAddressDescriptor(callee);
+                Location* loc = calleeAddressDescriptor->GetLocation();
+                if (loc != null && loc is Register*)
+                {
+                    calleeOperand = loc;
+                }
+                else
+                {
+                    LoadOperandValue(callee, registerDescriptors.GetRegisterDescriptor(xReg), addressDescriptors, machineCode, line, this);
+                    calleeOperand = xReg;
+                }
+                zOperand = machineCode.context.GetLiteralOperand(0u);
             }
-            callInst->AddOperand(operand);
+            MachineInstruction* callInst = machineCode.GetInstruction(cmsx.machine.CALL, this);
+            callInst->AddOperand(xReg);
+            callInst->AddOperand(calleeOperand);
+            if (zOperand != null)
+            {
+                callInst->AddOperand(zOperand);
+            }
             List<Register*> dontUse;
             RegisterDescriptor* resultRegDescriptor = registerDescriptors.GetLocalRegDescriptor(dontUse, addressDescriptors, machineCode, line, this);
             Register* resultReg = resultRegDescriptor->reg;
@@ -2927,7 +3002,7 @@ namespace cmsx.intermediate
             {
                 Registers& regs = machineCode.context.regs;
                 Register* ax = regs.GetParamRegister(0u);
-                if (value is ConstantValue*)
+                if (value is LiteralValue*)
                 {
                     value->GenerateSetValue(ax, machineCode, line, this);
                 }
@@ -3115,7 +3190,7 @@ namespace cmsx.intermediate
             AddressDescriptors& addressDescriptors = parent->function.addressDescriptors;
             bool useRegYForX = CanUseRegYForX(y, registerDescriptors, addressDescriptors);
             GetReg(x, y, z, useRegYForX, registerDescriptors, addressDescriptors, machineCode, line, rx, ry, rz, this);
-            if (y is ConstantValue*)
+            if (y is LiteralValue*)
             {
                 y->GenerateSetValue(ry->reg, machineCode, line, this);
             }

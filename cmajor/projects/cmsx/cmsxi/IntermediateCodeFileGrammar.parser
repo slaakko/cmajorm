@@ -15,11 +15,19 @@ namespace cmsx.intermediate
         using stdlib.ulong;
         using stdlib.float;
         using stdlib.double;
+        using stdlib.string;
         using stdlib.spaces;
         skip spaces;
 
         IntermediateCodeFile(cmsx.intermediate.Context* context)
-            ::= empty{ context->SetFileName(fileName); } TypeDeclarations(context)? DataDefinitions(context)? Functions(context)?
+            ::= empty{ context->SetFileName(fileName); } CompileUnitHeader(context) TypeDeclarations(context)? DataDefinitions(context)? Functions(context)? Metadata(context)?
+            ;
+
+        CompileUnitHeader(cmsx.intermediate.Context* context, var string compileUnitId, var MDStructRef* mdRef)
+            ::= (keyword("cu") '(' (hexdigit+){ compileUnitId = ToUtf8(ustring(matchBegin, matchEnd)); } ',' MDStructRef(context){ mdRef = MDStructRef; } ')')
+            {
+                context->SetCompileUnitInfo(compileUnitId, mdRef);
+            }
             ;
 
         TypeDeclarations(cmsx.intermediate.Context* context)
@@ -38,8 +46,11 @@ namespace cmsx.intermediate
             ::= FunctionHeader(context):function{ context->SetCurrentFunction(function); } '{'! BasicBlock(context, function)* '}'!
             ;
 
-        FunctionHeader(cmsx.intermediate.Context* context) : Function*
-            ::= keyword("function") TypeExpr(context):functionType! identifier:functionId!{ value = context->AddFunction(span.lineNumber, functionType, ToUtf8(functionId)); }
+        FunctionHeader(cmsx.intermediate.Context* context, var bool once) : Function*
+            ::= keyword("function") TypeExpr(context):functionType! (keyword("once"){ once = true; })? identifier:functionId! (MDStructRef(context):md?)
+            {
+                value = context->AddFunction(span.lineNumber, functionType, ToUtf8(functionId), once, md);
+            }
             ;
 
         BasicBlock(cmsx.intermediate.Context* context, Function* function, var BasicBlock* bb)
@@ -283,12 +294,12 @@ namespace cmsx.intermediate
             ::= ('$' uint:x){ value = context->currentFunction->MakeIdValue(span.lineNumber, x, type); }
             ;
 
-        SymbolValue(cmsx.intermediate.Context* context, Type* type) : Value*
+        SymbolValue(cmsx.intermediate.Context* context, Type* type) : ConstantValue*
             ::= token('@' identifier){ value = context->MakeSymbolValue(span.lineNumber, ToUtf8(identifier), type); }
             ;
 
-        LiteralValue(cmsx.intermediate.Context* context, Type* type) : Value*
-            ::= (token(anychar - (',' | S | newline))+){ value = context->MakeLiteralValue(span.lineNumber, ToUtf8(ustring(matchBegin, matchEnd)), type); }
+        LiteralValue(cmsx.intermediate.Context* context, Type* type) : ConstantValue*
+            ::= (token(anychar - (',' | S | ')' | newline))+){ value = context->MakeLiteralValue(span.lineNumber, ToUtf8(ustring(matchBegin, matchEnd)), type); }
             ;
 
         S
@@ -411,13 +422,17 @@ namespace cmsx.intermediate
             ::= keyword("double"){ value = context->GetDoubleType(); }
             ;
 
-        DataDefinition(cmsx.intermediate.Context* context)
-            ::= TypeExpr(context):type identifier:name! (';'{ context->AddGlobalVariable(type, ToUtf8(name), cast<ConstantValue*>(null), span.lineNumber); }
-            |   '='! Constant(context){ context->AddGlobalVariable(type, ToUtf8(name), Constant, span.lineNumber); })
+        DataDefinition(cmsx.intermediate.Context* context, var bool once)
+            ::= TypeExpr(context):type (keyword("once"){ once = true; })? identifier:name! (';'{ context->AddGlobalVariable(type, ToUtf8(name), cast<ConstantValue*>(null), span.lineNumber, once); }
+            |   '='! Constant(context){ context->AddGlobalVariable(type, ToUtf8(name), Constant, span.lineNumber, once); })
             ;
 
         Constant(cmsx.intermediate.Context* context) : ConstantValue*
-            ::= BoolConstant(context){ value = BoolConstant; }
+            ::= ConversionConstant(context){ value = ConversionConstant; }
+            |   ClsIdConstant(context){ value = ClsIdConstant; }
+            |   PtrConstant(context){ value = PtrConstant; }
+            |   SymbolConstant(context){ value = SymbolConstant; }
+            |   BoolConstant(context){ value = BoolConstant; }
             |   SByteConstant(context){ value = SByteConstant; }
             |   ByteConstant(context){ value = ByteConstant; }
             |   ShortConstant(context){ value = ShortConstant; }
@@ -428,9 +443,10 @@ namespace cmsx.intermediate
             |   ULongConstant(context){ value = ULongConstant; }
             |   FloatConstant(context){ value = FloatConstant; }
             |   DoubleConstant(context){ value = DoubleConstant; }
-            |   PtrConstant(context){ value = PtrConstant; }
             |   ArrayConstant(context){ value = ArrayConstant; }
             |   StructureConstant(context){ value = StructureConstant; }
+            |   StringConstant(context){ value = StringConstant; }
+            |   StringArrayConstant(context){ value = StringArrayConstant; }
             ;
 
         BoolConstant(cmsx.intermediate.Context* context) : ConstantValue*
@@ -521,8 +537,21 @@ namespace cmsx.intermediate
             ::= double:x{ value = x; }
             ;
 
+        ConversionConstant(cmsx.intermediate.Context* context) : ConstantValue*
+            ::= (TypeExpr(context):targetType keyword("conv") '('! Constant(context):from! ')'!){ value = context->MakeConversionValue(targetType, from, span.lineNumber); }
+            ;
+
+        ClsIdConstant(cmsx.intermediate.Context* context) : ConstantValue*
+            ::= TypeExpr(context):type keyword("clsid") '('! (hexdigit+){ value = context->MakeClsIdValue(type, ToUtf8(ustring(matchBegin, matchEnd)), span.lineNumber); } ')'!
+            ;
+
         PtrConstant(cmsx.intermediate.Context* context) : ConstantValue*
-            ::= (TypeExpr(context):type{ pass = IsPtrType(type); } keyword("null")){ value = cast<PtrType*>(type)->DefaultValue(); }
+            ::= (TypeExpr(context):type1{ pass = IsPtrType(type1); } keyword("null")){ value = cast<PtrType*>(type1)->DefaultValue(); }
+            |   (TypeExpr(context):type2{ pass = IsPtrType(type2); } LiteralValue(context, type2)){ value = LiteralValue; }
+            ;
+
+        SymbolConstant(cmsx.intermediate.Context* context) : ConstantValue*
+            ::= TypeExpr(context):type SymbolValue(context, type){ value = SymbolValue; }
             ;
 
         ArrayConstant(cmsx.intermediate.Context* context) : ArrayValue*
@@ -531,6 +560,56 @@ namespace cmsx.intermediate
 
         StructureConstant(cmsx.intermediate.Context* context) : StructureValue*
             ::= '{'{ value = context->MakeStructureValue(); } (Constant(context):member{ value->AddMember(member); } % ',')? '}'
+            ;
+
+        StringConstant(cmsx.intermediate.Context* context) : StringValue*
+            ::= token('"' ([^"]*){ value = context->MakeStringValue(ToUtf8(ustring(matchBegin, matchEnd))); } '"')
+            ;
+
+        StringArrayConstant(cmsx.intermediate.Context* context) : StringArrayValue*
+            ::= StringArrayPrefix:prefix '['{ value = context->MakeStringArrayValue(prefix); } (Constant(context):element{ value->AddElement(element); } % ',')? ']'
+            ;
+
+        StringArrayPrefix : char
+            ::= 'w'{ value = 'w'; }
+            |   'u'{ value = 'u'; }
+            |   'b'{ value = 'b'; }
+            ;
+
+        Metadata(cmsx.intermediate.Context* context)
+            ::= keyword("metadata") '{'! MDStruct(context)* '}'!
+            ;
+
+        MDItem(cmsx.intermediate.Context* context) : MDItem*
+            ::= MDBool(context){ value = MDBool; }
+            |   MDLong(context){ value = MDLong; }
+            |   MDString(context){ value = MDString; }
+            |   MDStructRef(context){ value = MDStructRef; }
+            ;
+
+        MDBool(cmsx.intermediate.Context* context) : MDBool*
+            ::= keyword("true"){ value = context->CreateMDBool(true); }
+            |   keyword("false"){ value = context->CreateMDBool(false); }
+            ;
+
+        MDLong(cmsx.intermediate.Context* context) : MDLong*
+            ::= long:x{ value = context->CreateMDLong(x); }
+            ;
+
+        MDString(cmsx.intermediate.Context* context) : MDString*
+            ::= string:s{ value = context->CreateMDString(ToUtf8(s)); }
+            ;
+
+        MDStructRef(cmsx.intermediate.Context* context) : MDStructRef*
+            ::= ('!' int:id){ value = context->CreateMDStructRef(id); }
+            ;
+
+        MDStruct(cmsx.intermediate.Context* context) : MDStruct*
+            ::= '!' int:id{ value = context->CreateMDStruct(id); } '=' '{' (MDField(context, value):field % ',')? '}'
+            ;
+
+        MDField(cmsx.intermediate.Context* context, MDStruct* parent) 
+            ::= (identifier:fieldName ':' MDItem(context):item){ parent->AddItem(ToUtf8(fieldName), item); }
             ;
     }
 }

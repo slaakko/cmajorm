@@ -5,7 +5,7 @@ namespace cmsx.object
 {
     public enum LinkCode : byte
     {
-        forwardLongJump = 0u, forwardShortJump = 1u, absoluteAddrValue = 2u, farJump = 3u, farOcta = 4u, once = 5u
+        forwardLongJump = 0u, forwardShortJump = 1u, absoluteAddrValue = 2u, farJump = 3u, farOcta = 4u, clsid = 5u
     }
 
     public const int maxLinkCodeStrLength = 17;
@@ -18,7 +18,7 @@ namespace cmsx.object
             case LinkCode.forwardShortJump: return "LINKFWDSHORTJMP";
             case LinkCode.absoluteAddrValue: return "LINKABSOLUTEADDR";
             case LinkCode.farOcta: return "LINKFAROCTA";
-            case LinkCode.once: return "LINKONCE";
+            case LinkCode.clsid: return "LINKCLSID";
         }
         return "";
     }
@@ -29,7 +29,7 @@ namespace cmsx.object
         {
         }
         public default virtual ~LinkCommand();
-        public virtual void Execute(ulong value)
+        public virtual void Execute(ulong value, bool debug)
         {
         }
         public ObjectFile* objectFile;
@@ -48,8 +48,12 @@ namespace cmsx.object
         public nothrow LinkAbsoluteAddressCommand(ObjectFile* objectFile_, ulong address_) : base(objectFile_, address_)
         {
         }
-        public override void Execute(ulong value)
+        public override void Execute(ulong value, bool debug)
         {
+            if (debug)
+            {
+                Console.Out() << objectFile->FileName() << ": LINKABSOLUTEADDR(" << ToHexString(address) << " : " << ToHexString(value) << ")" << endl();
+            }
             byte b0 = cast<byte>(value);
             value = value >> 8u;
             byte b1 = cast<byte>(value);
@@ -82,47 +86,105 @@ namespace cmsx.object
         public nothrow LinkFarOctaCommand(ObjectFile* objectFile_, ulong address_) : base(objectFile_, address_)
         {
         }
-        public override void Execute(ulong value)
+        public override void Execute(ulong value, bool debug)
         {
+            if (debug)
+            {
+                Console.Out() << objectFile->FileName() << ": LINKFAROCTA(" << ToHexString(address) << " : " << ToHexString(value) << ")" << endl();
+            }
             objectFile->dataSection->EmitULong(address, value);
         }
     }
 
+    public class LinkClsIdCommand : LinkCommand
+    {
+        public nothrow LinkClsIdCommand(ObjectFile* objectFile_, ulong address_, ulong classId_) : base(objectFile_, address_), classId(classId_)
+        {
+        }
+        public override void Execute(ulong value, bool debug)
+        {
+            if (debug)
+            {
+                Console.Out() << objectFile->FileName() << ": LINKCLSID(" << ToHexString(address) << " : " << ToHexString(classId) << ")" << endl();
+            }
+            objectFile->dataSection->EmitULong(address, classId);
+        }
+        private ulong classId;
+    }
+
     public class CopyRange
     {
-        public nothrow CopyRange(Section* fromSection_, Section* toSection_, ulong startPos_, ulong length_) : fromSection(fromSection_), toSection(toSection_), startPos(startPos_), length(length_)
+        public nothrow CopyRange(Section* fromSection_, Section* toSection_, ulong startPos_, ulong length_, byte alignment_) :
+            fromSection(fromSection_), toSection(toSection_), startPos(startPos_), length(length_), alignment(alignment_)
         {
+        }
+        public string Str() const
+        {
+            return "copy from " + fromSection->file->FileName() + " " +  fromSection->name + " section to target " + toSection->file->FileName() + " " + toSection->name + " section: [" + ToHexString(startPos) + ":" + ToHexString(length) + "] align " + ToString(alignment);
         }
         public Section* fromSection;
         public Section* toSection;
         public ulong startPos;
         public ulong length;
+        public byte alignment;
     }
 
     public class LinkTable
     {
+        public nothrow LinkTable(const ClassIdMap& classIdMap_) : classIdMap(classIdMap_)
+        {
+        }
         public void AddLinkCommand(const string& symbolName, LinkCommand* command)
         {
             List<LinkCommand*>& commands = linkCommandMap[symbolName];
             commands.Add(command);
         }
-        public void ExecuteLinkCommands(const string& symbolName, ulong value)
+        public void ExecuteLinkCommands(const string& symbolName, ulong value, bool debug)
         {
             Map<string, List<LinkCommand*>>.ConstIterator it = linkCommandMap.CFind(symbolName);
             if (it != linkCommandMap.CEnd())
             {
                 List<LinkCommand*>& commands = it->second;
+                if (debug)
+                {
+                    Console.Out() << "executing link commands for symbol " << symbolName << " with value " << ToHexString(value) << endl();
+                }
                 for (LinkCommand* command : commands)
                 {
-                    command->Execute(value);
+                    command->Execute(value, debug);
                     delete command;
                 }
                 linkCommandMap.Remove(symbolName);
             }
         }
-        public void AddCopyRange(const CopyRange& copyRange)
+        public void AddCopyRange(const CopyRange& copyRange, bool debug)
         {
+            if (copyRange.length == 0u)
+            {
+                return;
+            }
+            if (!copyRanges.IsEmpty())
+            {
+                CopyRange& prev = copyRanges.Back();
+                if (prev.fromSection == copyRange.fromSection && prev.toSection == copyRange.toSection && prev.startPos + prev.length == copyRange.startPos)
+                {
+                    if (debug)
+                    {
+                        Console.Out() << "extended " << prev.Str();
+                    }
+                    prev.length = prev.length + copyRange.length;
+                    if (debug)
+                    {
+                        Console.Out() << " length to " << ToHexString(prev.length) << endl();
+                    }
+                    return;
+                }
+            }
             copyRanges.Add(copyRange);
+            if (debug)
+            {
+                Console.Out() << "added " << copyRange.Str() << endl();
+            }
         }
         public void ReportUnresolvedSymbols()
         {
@@ -140,22 +202,51 @@ namespace cmsx.object
                 throw Exception("linking failed because unresolved external symbols detected");
             }
         }
-        public void CopyRanges()
+        public void CopyRanges(bool debug)
         {
             for (const CopyRange& copyRange : copyRanges)
             {
                 ulong n = copyRange.length;
                 if (n > 0u)
                 {
+                    if (debug)
+                    {
+                        Console.Out() << copyRange.Str() << endl();
+                    }
                     Section* fromSection = copyRange.fromSection;
                     Section* toSection = copyRange.toSection;
                     ulong startPos = copyRange.startPos;
+                    toSection->Align(copyRange.alignment);
                     for (ulong i = 0u; i < n; ++i)
                     {
                         toSection->data.Add(fromSection->data[cast<long>(startPos + i)]);
                     }
                 }
             }
+        }
+        public ulong CodeByteCount() const 
+        {
+            ulong count = 0u;
+            for (const CopyRange& copyRange : copyRanges)
+            {
+                if (copyRange.fromSection is CodeSection*)
+                {
+                    count = count + copyRange.length;
+                }
+            }
+            return count;
+        }
+        public ulong GetClassId(const Uuid& typeId) const
+        {
+            return classIdMap.GetClassId(typeId);
+        }
+        public void AddUsedSymbolName(const string& symbolName)
+        {
+            usedSymbolNames.Insert(symbolName);
+        }
+        public bool IsUsedSymbolName(const string& symbolName)
+        {
+            return usedSymbolNames.CFind(symbolName) != usedSymbolNames.CEnd();
         }
         public ~LinkTable()
         {
@@ -167,8 +258,28 @@ namespace cmsx.object
                 }
             }
         }
+        public void AddUnprocessedSymbol(Symbol* symbol, Section* section, SymbolTable* symbolTable)
+        {
+            List<Pair<Symbol*, Pair<Section*, SymbolTable*>>>& unprocessedSymbolList = unprocessedSymbolLists[symbol->name];
+            unprocessedSymbolList.Add(MakePair(symbol, MakePair(section, symbolTable)));
+        }
+        public List<Pair<Symbol*, Pair<Section*, SymbolTable*>>>* GetUnprocessedSymbolList(const string& symbolName)
+        {
+            HashMap<string, List<Pair<Symbol*, Pair<Section*, SymbolTable*>>>>.ConstIterator it = unprocessedSymbolLists.CFind(symbolName);
+            if (it != unprocessedSymbolLists.CEnd())
+            {
+                return &it->second;
+            }
+            else
+            {
+                return null;
+            }
+        }
         private Map<string, List<LinkCommand*>> linkCommandMap;
         private List<CopyRange> copyRanges;
+        private const ClassIdMap& classIdMap;
+        private HashSet<string> usedSymbolNames;
+        private HashMap<string, List<Pair<Symbol*, Pair<Section*, SymbolTable*>>>> unprocessedSymbolLists;
     }
 
     public void LinkInternal(ObjectFile& objectFile)
@@ -240,11 +351,15 @@ namespace cmsx.object
                     newLinkSection.EmitULong(address);
                     break;
                 }
-                case LinkCode.once:
+                case LinkCode.clsid:
                 {
-                    uint index = linkSection->GetUInt();
-                    newLinkSection.EmitByte(LinkCode.once);
-                    newLinkSection.EmitUInt(cast<uint>(index));
+                    ulong address = linkSection->GetULong();
+                    ulong typeId1 = linkSection->GetULong();
+                    ulong typeId2 = linkSection->GetULong();
+                    newLinkSection.EmitByte(LinkCode.clsid);
+                    newLinkSection.EmitULong(address);
+                    newLinkSection.EmitULong(typeId1);
+                    newLinkSection.EmitULong(typeId2);
                     break;
                 }
             }
@@ -253,55 +368,102 @@ namespace cmsx.object
         Swap(linkSection->data, newLinkSection.data);
     }
 
-    public void ProcessSymbols(LinkTable& linkTable, ExecutableFile& executable, ObjectFile* objectFile)
+    public void ProcessSymbols(LinkTable& linkTable, ExecutableFile& executable, ObjectFile* objectFile, bool removeUnusedCode, bool debug)
     {
+        if (debug)
+        {
+            Console.Out() << "begin processing symbols" << endl();
+        }
         SymbolTable& objectFileSymbolTable = objectFile->GetSymbolTable();
-        objectFile->codeSection->removeOffset = 0u;
-        objectFile->dataSection->removeOffset = 0u;
+        Section* codeSection = objectFile->codeSection;
+        codeSection->copyStartPos = 0u;
+        codeSection->copyTargetSection = executable.codeSection;
+        codeSection->removeOffset = 0u;
+        ulong codeSectionLength = codeSection->length;
+        Section* dataSection = objectFile->dataSection;
+        dataSection->copyTargetSection = executable.dataSection;
+        dataSection->copyStartPos = 0u;
+        dataSection->removeOffset = 0u;
+        ulong dataSectionLength = dataSection->length;
         SymbolTable& executableSymbolTable = executable.GetSymbolTable();
+        List<Symbol*> linkSymbols;
         for (const UniquePtr<Symbol>& symbol : objectFileSymbolTable.Symbols())
         {
             if (symbol->linkage == Linkage.internal_)
             {
-                if (symbol->value.GetFlag(Value.Flag.address) && symbol->value.GetFlag(Value.Flag.address) && (symbol->segment == Segment.text || symbol->segment == Segment.data))
+                if (symbol->value.GetFlag(Value.Flag.address) && (symbol->segment == Segment.text || symbol->segment == Segment.data))
                 {
-                    symbol->value.value = symbol->value.value - symbol->section->removeOffset;
-                    symbol->start = symbol->section->baseAddress + symbol->value.value;
-                    Symbol* executableSymbol = symbol->Clone();
-                    #assert(executableSymbol->section != null);
-                    if (executableSymbol->section is DataSection*)
+                    bool process = true;
+                    if (symbol->parentIndex != -1)
                     {
-                        executable.dataSection->AddSymbol(executableSymbol);
+                        Symbol* parentSymbol = objectFileSymbolTable.GetSymbol(symbol->parentIndex);
+                        if (parentSymbol != null && (parentSymbol->linkage == Linkage.remove || removeUnusedCode && !parentSymbol->value.GetFlag(Value.Flag.used)))
+                        {
+                            process = false;
+                        }
                     }
-                    executableSymbolTable.AddInternalSymbol(executableSymbol, true);
-                }
-            }
-            else if (symbol->linkage == Linkage.external || symbol->linkage == Linkage.undefined)
-            {
-                if (symbol->value.GetFlag(Value.Flag.address) && symbol->value.GetFlag(Value.Flag.address) && (symbol->segment == Segment.text || symbol->segment == Segment.data))
-                {
-                    Symbol* prevSymbol = executableSymbolTable.GetSymbol(symbol->name);
-                    if (prevSymbol != null)
+                    if (process)
                     {
-                        #assert(prevSymbol->section != null);
-                        #assert(symbol->section != null);
-                        throw Exception("Duplicate external symbol '" + symbol->name +
-                            "'. Original defined in " + prevSymbol->section->name + " section of file " + prevSymbol->section->file->FileName() + 
-                            ". Duplicate detected in " + symbol->section->name + " section of file " + symbol->section->file->FileName() + ".");
-                    }
-                    else
-                    {
-                        symbol->value.value = symbol->value.value - symbol->section->removeOffset;
-                        symbol->start = symbol->section->baseAddress + symbol->value.value;
+                        symbol->start = symbol->section->baseAddress + symbol->value.value - symbol->section->removeOffset;
                         Symbol* executableSymbol = symbol->Clone();
-                        executableSymbol->linkage = Linkage.external;
                         #assert(executableSymbol->section != null);
                         if (executableSymbol->section is DataSection*)
                         {
                             executable.dataSection->AddSymbol(executableSymbol);
                         }
-                        executableSymbolTable.AddSymbol(executableSymbol);
-                        linkTable.ExecuteLinkCommands(symbol->name, symbol->start);
+                        executableSymbolTable.AddInternalSymbol(executableSymbol, true);
+                    }
+                }
+            }
+            else if (symbol->linkage == Linkage.external || symbol->linkage == Linkage.undefined)
+            {
+                if (debug)
+                {
+                    Console.Out() << "begin processing " << LinkageStr(symbol->linkage) << " symbol " << symbol->name << " : " << ToHexString(symbol->value.value) << ":" << ToHexString(symbol->length) << ":" << ToString(symbol->alignment) << endl();
+                }
+                if (symbol->value.GetFlag(Value.Flag.address) && (symbol->segment == Segment.text || symbol->segment == Segment.data))
+                {
+                    if (symbol->value.GetFlag(Value.Flag.definition))
+                    {
+                        Symbol* prevSymbol = executableSymbolTable.GetSymbol(symbol->name);
+                        if (prevSymbol != null)
+                        {
+                            #assert(prevSymbol->section != null);
+                            #assert(symbol->section != null);
+                            throw Exception("Duplicate external symbol '" + symbol->name +
+                                "'. Original defined in " + prevSymbol->section->name + " section of file " + prevSymbol->section->file->FileName() + 
+                                ". Duplicate detected in " + symbol->section->name + " section of file " + symbol->section->file->FileName() + ".");
+                        }
+                        else
+                        {
+                            if (symbol->value.GetFlag(Value.Flag.used) || !removeUnusedCode)
+                            {
+                                symbol->start = symbol->section->baseAddress + symbol->value.value - symbol->section->removeOffset;
+                                Symbol* executableSymbol = symbol->Clone();
+                                executableSymbol->linkage = Linkage.external;
+                                #assert(executableSymbol->section != null);
+                                if (executableSymbol->section is DataSection*)
+                                {
+                                    executable.dataSection->AddSymbol(executableSymbol);
+                                }
+                                executableSymbolTable.AddSymbol(executableSymbol);
+                                linkTable.ExecuteLinkCommands(symbol->name, symbol->start, debug);
+                                linkTable.AddCopyRange(CopyRange(symbol->section, symbol->section->copyTargetSection, symbol->value.value, symbol->length, symbol->alignment), debug);
+                                symbol->section->copyStartPos = symbol->value.value + symbol->length;
+                                linkSymbols.Add(symbol.Get());
+                            }
+                            else
+                            {
+                                if (debug)
+                                {
+                                    Console.Out() << "setting unused " << LinkageStr(symbol->linkage) << " symbol " << symbol->name << " linkage to remove" << endl();
+                                }
+                                symbol->linkage = Linkage.remove;
+                                symbol->section->copyStartPos = symbol->value.value + symbol->length;
+                                symbol->section->removeOffset = symbol->section->removeOffset + symbol->length;
+                                symbol->section->length = symbol->section->length - symbol->length;
+                            }
+                        }
                     }
                 }
                 else if (symbol->value.flags == Value.Flag.undefined)
@@ -311,52 +473,98 @@ namespace cmsx.object
                     {
                         symbol->start = prevSymbol->start;
                         symbol->linkage = Linkage.external;
+                        if (debug)
+                        {
+                            Console.Out() << "define symbol " << symbol->name << " start " << ToHexString(symbol->start) << endl();
+                        }
                     }
+                }
+                if (debug)
+                {
+                    Console.Out() << "end processing " << LinkageStr(symbol->linkage) << " symbol " << symbol->name << " : " << ToHexString(symbol->start) << " : " << ToHexString(symbol->value.value) << ":" << ToHexString(symbol->length) << ":" << ToString(symbol->alignment) << endl();
                 }
             }
             else if (symbol->linkage == Linkage.once)
             {
-                if (symbol->value.GetFlag(Value.Flag.address) && symbol->value.GetFlag(Value.Flag.address) && (symbol->segment == Segment.text || symbol->segment == Segment.data))
+                if (debug)
                 {
-                    Symbol* prevSymbol = executableSymbolTable.GetSymbol(symbol->name);
-                    if (prevSymbol == null)
+                    Console.Out() << "begin processing " << LinkageStr(symbol->linkage) << " symbol " << symbol->name << " : " << ToHexString(symbol->value.value) << ":" << ToHexString(symbol->length) << ":" << ToString(symbol->alignment) << endl();
+                }
+                if (symbol->value.GetFlag(Value.Flag.address) && (symbol->segment == Segment.text || symbol->segment == Segment.data))
+                {
+                    if (symbol->value.GetFlag(Value.Flag.definition))
                     {
-                        symbol->value.value = symbol->value.value - symbol->section->removeOffset;
-                        symbol->start = symbol->section->baseAddress + symbol->value.value;
-                        Symbol* executableSymbol = symbol->Clone();
-                        #assert(executableSymbol->section != null);
-                        if (executableSymbol->section is DataSection*)
+                        Symbol* prevSymbol = executableSymbolTable.GetSymbol(symbol->name);
+                        if (prevSymbol == null)
                         {
-                            executable.dataSection->AddSymbol(executableSymbol);
+                            if (symbol->value.GetFlag(Value.Flag.used) || !removeUnusedCode)
+                            {
+                                symbol->start = symbol->section->baseAddress + symbol->value.value - symbol->section->removeOffset;
+                                Symbol* executableSymbol = symbol->Clone();
+                                #assert(executableSymbol->section != null);
+                                if (executableSymbol->section is DataSection*)
+                                {
+                                    executable.dataSection->AddSymbol(executableSymbol);
+                                }
+                                executableSymbolTable.AddSymbol(executableSymbol);
+                                linkTable.ExecuteLinkCommands(symbol->name, symbol->start, debug);
+                                linkTable.AddCopyRange(CopyRange(symbol->section, symbol->section->copyTargetSection, symbol->value.value, symbol->length, symbol->alignment), debug);
+                                symbol->section->copyStartPos = symbol->value.value + symbol->length;
+                                linkSymbols.Add(symbol.Get());
+                            }
+                            else
+                            {
+                                if (debug)
+                                {
+                                    Console.Out() << "setting unused " << LinkageStr(symbol->linkage) << " symbol " << symbol->name << " linkage to remove" << endl();
+                                }
+                                symbol->linkage = Linkage.remove;
+                                symbol->section->copyStartPos = symbol->value.value + symbol->length;
+                                symbol->section->removeOffset = symbol->section->removeOffset + symbol->length;
+                                symbol->section->length = symbol->section->length - symbol->length;
+                            }
                         }
-                        executableSymbolTable.AddSymbol(executableSymbol);
-                        linkTable.ExecuteLinkCommands(symbol->name, symbol->start);
+                        else
+                        {
+                            if (debug)
+                            {
+                                Console.Out() << "setting " << LinkageStr(symbol->linkage) << " symbol " << symbol->name << " linkage to remove" << endl();
+                            }
+                            symbol->linkage = Linkage.remove;
+                            symbol->section->copyStartPos = symbol->value.value + symbol->length;
+                            symbol->section->removeOffset = symbol->section->removeOffset + symbol->length;
+                            symbol->section->length = symbol->section->length - symbol->length;
+                        }
                     }
-                    else
-                    {
-                        symbol->linkage = Linkage.remove;
-                        symbol->section->removeOffset = symbol->section->removeOffset + symbol->length;
-                    }
+                }
+                if (debug)
+                {
+                    Console.Out() << "end processing " << LinkageStr(symbol->linkage) << " symbol " << symbol->name << " : " << ToHexString(symbol->start) << " : " << ToHexString(symbol->value.value) << ":" << ToHexString(symbol->length) << ":" << ToString(symbol->alignment) << endl();
                 }
             }
         }
+        if (debug)
+        {
+            Console.Out() << "end processing symbols" << endl();
+        }
+        for (Symbol* linkSymbol : linkSymbols)
+        {
+            ProcessLinkSection(linkTable, executable, objectFile, linkSymbol, debug);
+        }
     }
 
-    public void ProcessLinkSection(LinkTable& linkTable, ExecutableFile& executable, ObjectFile* objectFile)
+    public void ProcessLinkSection(LinkTable& linkTable, ExecutableFile& executable, ObjectFile* objectFile, Symbol* forSymbol, bool debug)
     {
+        if (debug)
+        {
+            Console.Out() << "begin processing link section" << endl();
+        }
         SymbolTable& executableSymbolTable = executable.GetSymbolTable();
-        Section* codeSection = objectFile->codeSection;
-        codeSection->copyStartPos = 0u;
-        codeSection->copyTargetSection = executable.codeSection;
-        Section* dataSection = objectFile->dataSection;
-        dataSection->copyStartPos = 0u;
-        dataSection->copyTargetSection = executable.dataSection;
         Section* linkSection = objectFile->linkSection;
-        linkSection->pos = 0u;
+        long prevPos = linkSection->pos;
+        linkSection->pos = cast<long>(forSymbol->linkStart);
         int x = linkSection->GetByte();
-        ulong prevCodeSectionLength = codeSection->length;
-        ulong prevDataSectionLength = dataSection->length;
-        while (x != -1)
+        while (x != -1 && linkSection->pos < cast<long>(forSymbol->linkEnd))
         {
             LinkCode linkCode = cast<LinkCode>(cast<byte>(x));
             Symbol* symbol = null;
@@ -368,7 +576,12 @@ namespace cmsx.object
                     uint index = linkSection->GetUInt();
                     ulong address = linkSection->GetULong();
                     symbol = objectFile->GetSymbolTable().GetSymbol(cast<int>(index));
-                    if (symbol->value.flags == Value.Flag.undefined)
+                    bool linkageIsRemove = false;
+                    if (symbol->linkage == Linkage.remove)
+                    {
+                        //linkageIsRemove = true;
+                    }
+                    if (symbol->value.flags == Value.Flag.undefined || linkageIsRemove)
                     {
                         Symbol* executableSymbol = executableSymbolTable.GetSymbol(symbol->name);
                         if (executableSymbol != null)
@@ -384,7 +597,12 @@ namespace cmsx.object
                     uint index = linkSection->GetUInt();
                     ulong address = linkSection->GetULong();
                     symbol = objectFile->GetSymbolTable().GetSymbol(cast<int>(index));
-                    if (symbol->value.flags == Value.Flag.undefined)
+                    bool linkageIsRemove = false;
+                    if (symbol->linkage == Linkage.remove)
+                    {
+                        //linkageIsRemove = true;
+                    }
+                    if (symbol->value.flags == Value.Flag.undefined || linkageIsRemove)
                     {
                         Symbol* executableSymbol = executableSymbolTable.GetSymbol(symbol->name);
                         if (executableSymbol != null)
@@ -395,19 +613,15 @@ namespace cmsx.object
                     linkCommand.Reset(new LinkFarOctaCommand(objectFile, address));
                     break;
                 }
-                case LinkCode.once:
+                case LinkCode.clsid:
                 {
-                    uint index = linkSection->GetUInt();
-                    symbol = objectFile->GetSymbolTable().GetSymbol(cast<int>(index));
-                    if (symbol->value.flags == Value.Flag.undefined)
-                    {
-                        Symbol* executableSymbol = executableSymbolTable.GetSymbol(symbol->name);
-                        if (executableSymbol != null)
-                        {
-                            symbol = executableSymbol;
-                        }
-                    }
-                    linkCommand.Reset(new LinkOnceCommand(objectFile));
+                    ulong address = linkSection->GetULong();
+                    ulong typeId1 = linkSection->GetULong();
+                    ulong typeId2 = linkSection->GetULong();
+                    Uuid typeId(typeId1, typeId2);
+                    linkCommand.Reset(new LinkClsIdCommand(objectFile, address, linkTable.GetClassId(typeId)));
+                    linkCommand->Execute(0u, debug);
+                    linkCommand.Reset();
                     break;
                 }
                 default:
@@ -419,21 +633,9 @@ namespace cmsx.object
             }
             if (!linkCommand.IsNull() && symbol != null)
             {
-                if (symbol->linkage == Linkage.remove)
-                {
-                    if (symbol->value.value >= symbol->section->copyStartPos)
-                    {
-                        linkTable.AddCopyRange(CopyRange(symbol->section, symbol->section->copyTargetSection, symbol->section->copyStartPos, symbol->value.value - symbol->section->copyStartPos));
-                    }
-                    symbol->section->copyStartPos = symbol->value.value + symbol->length;
-                    symbol->section->length = symbol->section->length - symbol->length;
-                }
                 if (symbol->value.GetFlag(Value.Flag.address))
                 {
-                    if (symbol->value.value >= symbol->section->copyStartPos)
-                    {
-                        linkCommand->Execute(symbol->start);
-                    }
+                    linkCommand->Execute(symbol->start, debug);
                 }
                 else if (symbol->value.flags == Value.Flag.undefined)
                 {
@@ -442,32 +644,36 @@ namespace cmsx.object
             }
             x = linkSection->GetByte();
         }
-        if (codeSection->copyStartPos < prevCodeSectionLength)
+        if (debug)
         {
-            linkTable.AddCopyRange(CopyRange(codeSection, codeSection->copyTargetSection, codeSection->copyStartPos, prevCodeSectionLength - codeSection->copyStartPos));
+            Console.Out() << "end processing link section" << endl();
         }
-        if (dataSection->copyStartPos < prevDataSectionLength)
-        {
-            linkTable.AddCopyRange(CopyRange(dataSection, dataSection->copyTargetSection, dataSection->copyStartPos, prevDataSectionLength - dataSection->copyStartPos));
-        }
-        codeSection->copyStartPos = 0u;
-        codeSection->copyTargetSection = null;
-        dataSection->copyStartPos = 0u;
-        dataSection->copyTargetSection = null;
     }
 
-    public void LinkObjectFile(LinkTable& linkTable, ExecutableFile& executable, ObjectFile* objectFile, Section*& prevCodeSection, Section*& prevDataSection)
+    public void LinkObjectFile(LinkTable& linkTable, ExecutableFile& executable, ObjectFile* objectFile, Section*& prevCodeSection, Section*& prevDataSection, bool removeUnusedCode, bool debug)
     {
+        if (debug)
+        {
+            Console.Out() << "begin linking " << objectFile->FileName() << endl();
+        }
         SymbolTable& executableSymbolTable = executable.GetSymbolTable();
         Section* codeSection = objectFile->codeSection;
         if (prevCodeSection == null)
         {
             codeSection->baseAddress = cmsx.machine.textSegmentBaseAddress + 4096u;
             executable.codeSection->baseAddress = codeSection->baseAddress;
+            if (debug)
+            {
+                Console.Out() << "setting code section base address to " << ToHexString(codeSection->baseAddress) << endl();
+            }
         }
         else
         {
             codeSection->baseAddress = prevCodeSection->baseAddress + prevCodeSection->length;
+            if (debug)
+            {
+                Console.Out() << "setting code section base address to " << ToHexString(codeSection->baseAddress) << endl();
+            }
         }
         prevCodeSection = codeSection;
         Section* dataSection = objectFile->dataSection;
@@ -475,19 +681,239 @@ namespace cmsx.object
         {
             dataSection->baseAddress = cmsx.machine.dataSegmentBaseAddress;
             executable.dataSection->baseAddress = dataSection->baseAddress;
+            if (debug)
+            {
+                Console.Out() << "setting data section base address to " << ToHexString(dataSection->baseAddress) << endl();
+            }
         }
         else
         {
             dataSection->baseAddress = prevDataSection->baseAddress + prevDataSection->length;
+            if (debug)
+            {
+                Console.Out() << "setting data section base address to " << ToHexString(dataSection->baseAddress) << endl();
+            }
         }
         prevDataSection = dataSection;
-        ProcessSymbols(linkTable, executable, objectFile);
-        ProcessLinkSection(linkTable, executable, objectFile);
+        ProcessSymbols(linkTable, executable, objectFile, removeUnusedCode, debug);
+        if (debug)
+        {
+            Console.Out() << "end linking " << objectFile->FileName() << endl();
+        }
     }
 
-    public void Link(ExecutableFile& executable, List<UniquePtr<BinaryFile>>& binaryFiles)
+    public void ProcessUsedSymbol(Symbol* symbol, SymbolTable& symbolTable, LinkTable& linkTable, Section* linkSection, bool debug)
     {
-        LinkTable linkTable;
+        if (symbol->value.GetFlag(Value.Flag.used)) return;
+        if (debug)
+        {
+            Console.Out() << "begin processing used symbol " << symbol->name << endl();
+        }
+        symbol->value.SetUsed();
+        if (symbol->linkStart != -1 && symbol->linkEnd != -1)
+        {
+            long prevPos = linkSection->pos;
+            linkSection->pos = cast<long>(symbol->linkStart);
+            int x = linkSection->GetByte();
+            while (x != -1 && linkSection->pos < cast<long>(symbol->linkEnd))
+            {
+                LinkCode linkCode = cast<LinkCode>(cast<byte>(x));
+                Symbol* s = null;
+                switch (linkCode)
+                {
+                    case LinkCode.absoluteAddrValue:
+                    {
+                        uint index = linkSection->GetUInt();
+                        ulong address = linkSection->GetULong();
+                        s = symbolTable.GetSymbol(cast<int>(index));
+                        break;
+                    }
+                    case LinkCode.farOcta:
+                    {
+                        uint index = linkSection->GetUInt();
+                        ulong address = linkSection->GetULong();
+                        s = symbolTable.GetSymbol(cast<int>(index));
+                        break;
+                    }
+                    case LinkCode.clsid:
+                    {
+                        ulong address = linkSection->GetULong();
+                        ulong typeId1 = linkSection->GetULong();
+                        ulong typeId2 = linkSection->GetULong();
+                        break;
+                    }
+                }
+                if (s != null)
+                {
+                    if (debug)
+                    {
+                        Console.Out() << "adding symbol " + s->name + " to used symbol names" << endl();
+                    }
+                    linkTable.AddUsedSymbolName(s->name);
+                    List<Pair<Symbol*, Pair<Section*, SymbolTable*>>>* unprocessedSymbols = linkTable.GetUnprocessedSymbolList(s->name);
+                    if (unprocessedSymbols != null)
+                    {
+                        List<Pair<Symbol*, Pair<Section*, SymbolTable*>>> symbols;
+                        Swap(*unprocessedSymbols, symbols);
+                        for (const Pair<Symbol*, Pair<Section*, SymbolTable*>>& p : symbols)
+                        {
+                            Symbol* unprocessedSymbol = p.first;
+                            Section* section = p.second.first;
+                            SymbolTable* stab = p.second.second; 
+                            ProcessUsedSymbol(unprocessedSymbol, *stab, linkTable, section, debug);
+                        }
+                    }
+                }
+                x = linkSection->GetByte();
+            }
+            linkSection->pos = prevPos;
+        }
+        else
+        {
+            throw Exception("link start and end not set");
+        }
+        if (debug)
+        {
+            Console.Out() << "end processing used symbol " << symbol->name << endl();
+        }
+    }
+
+    public void MarkUsedSymbols(LinkTable& linkTable, ObjectFile* objectFile, bool debug)
+    {
+        if (debug)
+        {
+            Console.Out() << "begin marking used symbols for object file " << objectFile->FileName() << endl();
+        }
+        SymbolTable& objectFileSymbolTable = objectFile->GetSymbolTable();
+        for (const UniquePtr<Symbol>& symbol : objectFileSymbolTable.Symbols())
+        {
+            if (symbol->value.GetFlag(Value.Flag.definition) && symbol->value.GetFlag(Value.Flag.address) && (symbol->linkage == Linkage.external || symbol->linkage == Linkage.once) &&
+                (symbol->segment == Segment.text || symbol->segment == Segment.data))
+            {
+                if (linkTable.IsUsedSymbolName(symbol->name))
+                {
+                    ProcessUsedSymbol(symbol.Get(), objectFile->GetSymbolTable(), linkTable, objectFile->linkSection, debug);
+                }
+                else
+                {
+                    linkTable.AddUnprocessedSymbol(symbol.Get(), objectFile->linkSection, &objectFile->GetSymbolTable());
+                }
+            }
+        }
+        if (debug)
+        {
+            Console.Out() << "end marking used symbols for object file " << objectFile->FileName() << endl();
+        }
+    }
+
+    public void ProcessDebugSection(ExecutableFile& executable, ObjectFile* objectFile, List<FunctionTableEntry>& functionTable)
+    {
+        Section* debugSection = objectFile->debugSection;
+        Section* executableDataSection = executable.dataSection;
+        if (debugSection != null)
+        {
+            int x = debugSection->GetByte();
+            while (x != -1)
+            {
+                DebugRecordCode debugRecordCode = cast<DebugRecordCode>(cast<byte>(x));
+                if (debugRecordCode == DebugRecordCode.functionInfo)
+                {
+                    uint functionSymbolIndex = debugSection->GetUInt();
+                    string functionFullName = debugSection->GetString();
+                    Symbol* functionSymbol = objectFile->GetSymbolTable().GetSymbol(cast<int>(functionSymbolIndex));
+                    if (functionSymbol != null)
+                    {
+                        const string& functionName = functionSymbol->name;
+                        Symbol* finalFunctionSymbol = executable.GetSymbolTable().GetSymbol(functionName);
+                        if (finalFunctionSymbol != null)
+                        {
+                            ulong mangledNameAddress = executableDataSection->Address();
+                            executableDataSection->EmitString(finalFunctionSymbol->name);
+                            ulong fullNameAddress = executableDataSection->Address();
+                            executableDataSection->EmitString(functionFullName);
+                            FunctionTableEntry entry(finalFunctionSymbol->start, finalFunctionSymbol->length, mangledNameAddress, fullNameAddress);
+                            functionTable.Add(entry);
+                        }
+                    }
+                }
+                else
+                {
+                    throw Exception("unknown debug record in object file '" + objectFile->FileName() + "'");
+                }
+                x = debugSection->GetByte();
+            }
+        }
+    }
+
+    public void MakeFuctionTable(ExecutableFile& executable, List<UniquePtr<BinaryFile>>& binaryFiles)
+    {
+        Section* executableDataSection = executable.dataSection;
+        executableDataSection->pos = executableDataSection->data.Count();
+        List<FunctionTableEntry> functionTable;
+        for (const UniquePtr<BinaryFile>& binaryFile : binaryFiles)
+        {
+            if (binaryFile.Get() is ObjectFile*)
+            {
+                ObjectFile* objectFile = cast<ObjectFile*>(binaryFile.Get());
+                ProcessDebugSection(executable, objectFile, functionTable);
+            }
+            else if (binaryFile.Get() is LibraryFile*)
+            {
+                LibraryFile* libraryFile = cast<LibraryFile*>(binaryFile.Get());
+                for (const UniquePtr<ObjectFile>& objectFile : libraryFile->objectFiles)
+                {
+                    ProcessDebugSection(executable, objectFile.Get(), functionTable);
+                }
+            }
+        }
+        Sort(functionTable);
+        executableDataSection->Align(8u);
+        ulong functionTableAddress = executableDataSection->Address();
+        for (const FunctionTableEntry& entry : functionTable)
+        {
+            executableDataSection->EmitULong(entry.start);
+            executableDataSection->EmitULong(entry.length);
+            executableDataSection->EmitULong(entry.mangledNameAddress);
+            executableDataSection->EmitULong(entry.fullNameAddress);
+        }
+        Symbol* functionTableSymbol = new Symbol();
+        functionTableSymbol->name = "@function_table";
+        functionTableSymbol->segment = Segment.data;
+        functionTableSymbol->linkage = Linkage.external;
+        functionTableSymbol->value = Value(cast<Value.Flag>(Value.Flag.pure | Value.Flag.address), functionTableAddress, functionTableSymbol);
+        functionTableSymbol->start = functionTableAddress;
+        functionTableSymbol->length = executableDataSection->Address() - functionTableSymbol->start;
+        functionTableSymbol->section = executableDataSection;
+        executable.GetSymbolTable().AddSymbol(functionTableSymbol);
+    }
+
+    public void Link(ExecutableFile& executable, List<UniquePtr<BinaryFile>>& binaryFiles, const ClassIdMap& classIdMap, bool removeUnusedCode, bool debug)
+    {
+        LinkTable linkTable(classIdMap);
+        linkTable.AddUsedSymbolName("Main");
+        if (removeUnusedCode)
+        {
+            for (const UniquePtr<BinaryFile>& binaryFile : binaryFiles)
+            {
+                if (binaryFile.Get() is ObjectFile*)
+                {
+                    ObjectFile* objectFile = cast<ObjectFile*>(binaryFile.Get());
+                    MarkUsedSymbols(linkTable, objectFile, debug);
+                }
+                else if (binaryFile.Get() is LibraryFile*)
+                {
+                    LibraryFile* libraryFile = cast<LibraryFile*>(binaryFile.Get());
+                    for (const UniquePtr<ObjectFile>& objectFile : libraryFile->objectFiles)
+                    {
+                        MarkUsedSymbols(linkTable, objectFile.Get(), debug);
+                    }
+                }
+                else
+                {
+                    throw Exception("cannot link '" + binaryFile->FileName() + "': not an object or library file");
+                }
+            }
+        }
         CodeSection* prevCodeSection = null;
         DataSection* prevDataSection = null;
         for (const UniquePtr<BinaryFile>& binaryFile : binaryFiles)
@@ -495,14 +921,14 @@ namespace cmsx.object
             if (binaryFile.Get() is ObjectFile*)
             {
                 ObjectFile* objectFile = cast<ObjectFile*>(binaryFile.Get());
-                LinkObjectFile(linkTable, executable, objectFile, prevCodeSection, prevDataSection);
+                LinkObjectFile(linkTable, executable, objectFile, prevCodeSection, prevDataSection, removeUnusedCode, debug);
             }
             else if (binaryFile.Get() is LibraryFile*)
             {
                 LibraryFile* libraryFile = cast<LibraryFile*>(binaryFile.Get());
                 for (const UniquePtr<ObjectFile>& objectFile : libraryFile->objectFiles)
                 {
-                    LinkObjectFile(linkTable, executable, objectFile.Get(), prevCodeSection, prevDataSection);
+                    LinkObjectFile(linkTable, executable, objectFile.Get(), prevCodeSection, prevDataSection, removeUnusedCode, debug);
                 }
             }
             else
@@ -511,7 +937,8 @@ namespace cmsx.object
             }
         }
         linkTable.ReportUnresolvedSymbols();
-        linkTable.CopyRanges();
+        linkTable.CopyRanges(debug);
+        MakeFuctionTable(executable, binaryFiles);
         executable.Finalize();
         executable.Write();
     }

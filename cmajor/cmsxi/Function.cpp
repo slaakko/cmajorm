@@ -8,7 +8,7 @@
 
 namespace cmsxi {
 
-Function::Function(const std::string& name_, FunctionType* type_) : Value(), name(name_), type(type_), nextResultNumber(0)
+Function::Function(const std::string& name_, FunctionType* type_) : Value(), name(name_), type(type_), nextResultNumber(0), linkOnce(false), mdId(-1)
 {
     entryBlock.reset(new BasicBlock(basicBlocks.size()));
     for (Type* paramType : type->ParamTypes())
@@ -41,7 +41,17 @@ Value* Function::GetParam(int index) const
 void Function::Write(CodeFormatter& formatter, Context& context)
 {
     if (basicBlocks.empty()) return;
-    formatter.WriteLine("function " + type->Name() + " " + name);
+    std::string once;
+    if (linkOnce)
+    {
+        once = " once";
+    }
+    std::string mdIdStr;
+    if (mdId != -1)
+    {
+        mdIdStr = " !" + std::to_string(mdId);
+    }
+    formatter.WriteLine("function " + type->Name() + once + " " + name + mdIdStr);
     formatter.WriteLine("{");
     formatter.IncIndent();
     bool first = true;
