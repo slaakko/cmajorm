@@ -557,7 +557,7 @@ namespace cmsx.object
     {
         if (debug)
         {
-            Console.Out() << "begin processing link section" << endl();
+            Console.Out() << "begin processing link section for symbol " << forSymbol->name << " [" << forSymbol->linkStart << ":" << forSymbol->linkEnd << "]" << endl();
         }
         SymbolTable& executableSymbolTable = executable.GetSymbolTable();
         Section* linkSection = objectFile->linkSection;
@@ -579,7 +579,7 @@ namespace cmsx.object
                     bool linkageIsRemove = false;
                     if (symbol->linkage == Linkage.remove)
                     {
-                        //linkageIsRemove = true;
+                        linkageIsRemove = true;
                     }
                     if (symbol->value.flags == Value.Flag.undefined || linkageIsRemove)
                     {
@@ -600,7 +600,7 @@ namespace cmsx.object
                     bool linkageIsRemove = false;
                     if (symbol->linkage == Linkage.remove)
                     {
-                        //linkageIsRemove = true;
+                        linkageIsRemove = true;
                     }
                     if (symbol->value.flags == Value.Flag.undefined || linkageIsRemove)
                     {
@@ -646,7 +646,7 @@ namespace cmsx.object
         }
         if (debug)
         {
-            Console.Out() << "end processing link section" << endl();
+            Console.Out() << "end processing link section for symbol " << forSymbol->name << " [" << forSymbol->linkStart << ":" << forSymbol->linkEnd << "]" << endl();
         }
     }
 
