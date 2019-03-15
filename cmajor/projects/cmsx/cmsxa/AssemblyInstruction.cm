@@ -156,12 +156,75 @@ namespace cmsx.assembly
     {
         public override void Assemble(Assembler& assembler, Instruction* inst)
         {
-            if (inst->operandList->operands.Count() > 0)
+            OperandList& operandList = *inst->operandList;
+            if (operandList.operands.Count() > 0)
             {
-                Stage prevStage = assembler.stage;
-                assembler.stage = Stage.octas;
-                inst->operandList->Accept(assembler);
-                assembler.stage = prevStage;
+                if (assembler.inSpec)
+                {
+                    Stage prevStage = assembler.stage;
+                    assembler.stage = Stage.spec;
+                    Value discriminator = assembler.Evaluate(operandList.operands[0].Get());
+                    if (discriminator.value == FUNCINFO)
+                    {
+                        Stage prevStage = assembler.stage;
+                        assembler.stage = Stage.funcInfo;
+                        if (operandList.operands.Count() == 3)
+                        {
+                            Value function = assembler.Evaluate(operandList.operands[1].Get());
+                            if (function.symbol != null)
+                            {
+                                if (function.symbol->index != -1)
+                                {
+                                    uint functionSymbolIndex = cast<uint>(function.symbol->index);
+                                    assembler.Evaluate(operandList.operands[2].Get());
+                                    string functionFullName = assembler.str;
+                                    if (!functionFullName.IsEmpty())
+                                    {
+                                        FunctionInfo functionInfo(functionSymbolIndex, functionFullName);
+                                        if (assembler.objectFile.debugSection is DebugSection*)
+                                        {
+                                            DebugSection* debugSection = cast<DebugSection*>(assembler.objectFile.debugSection);
+                                            debugSection->EmitFunctionInfo(functionInfo);
+                                        }
+                                        else
+                                        {
+                                            Error("debug section expected", inst->span);
+                                        }
+                                    }
+                                    else
+                                    {
+                                        Error("third operand of OCTA in SPEC function info instruction must be a string", inst->span);
+                                    }
+                                }
+                                else
+                                {
+                                    Error("second operand of OCTA in SPEC function info instruction must be a defined function symbol", inst->span);
+                                }
+                            }
+                            else
+                            {
+                                Error("second operand of OCTA in SPEC function info instruction must be a function symbol", inst->span);
+                            }
+                        }
+                        else
+                        {
+                            Error("OCTA in SPEC function info needs three operands", inst->span);
+                        }
+                        assembler.stage = prevStage;
+                    }
+                    else
+                    {
+                        Error("unknown discriminator for OCTA in SPEC", inst->span);
+                    }
+                    assembler.stage = prevStage;
+                }
+                else
+                {
+                    Stage prevStage = assembler.stage;
+                    assembler.stage = Stage.octas;
+                    inst->operandList->Accept(assembler);
+                    assembler.stage = prevStage;
+                }
             }
             else
             {
@@ -1343,48 +1406,20 @@ namespace cmsx.assembly
         }
     }
 
-    public class FuncInfoInstruction : AssemblyInstruction
+    public class BSpecInstruction : AssemblyInstruction
     {
         public override void Assemble(Assembler& assembler, Instruction* inst)
         {
-            OperandList& operandList = *inst->operandList;
-            Stage prevStage = assembler.stage;
-            assembler.stage = Stage.funcInfo;
-            if (operandList.operands.Count() == 2)
-            {
-                Value function = assembler.Evaluate(operandList.operands[0].Get());
-                if (function.symbol != null)
-                {
-                    if (function.symbol->index != -1)
-                    {
-                        uint functionSymbolIndex = cast<uint>(function.symbol->index);
-                        assembler.Evaluate(operandList.operands[1].Get());
-                        const string& functionFullName = assembler.str;
-                        if (!functionFullName.IsEmpty())
-                        {
-                            FunctionInfo functionInfo(functionSymbolIndex, functionFullName);
-                            cast<DebugSection*>(assembler.objectFile.debugSection)->EmitFunctionInfo(functionInfo);
-                        }
-                        else
-                        {
-                            Error("second operand of " + inst->opCode->name + " instruction must be a string", inst->span);
-                        }
-                    }
-                    else
-                    {
-                        Error("first operand of " + inst->opCode->name + " instruction must be a defined function symbol", inst->span);
-                    }
-                }
-                else
-                {
-                    Error("first operand of " + inst->opCode->name + " instruction must be a function symbol", inst->span);
-                }
-            }
-            else
-            {
-                Error(inst->opCode->name + " needs two operands", inst->span);
-            }
-            assembler.stage = prevStage;
+            assembler.specStack.Push(assembler.inSpec);
+            assembler.inSpec = true;
+        }
+    }
+
+    public class ESpecInstruction : AssemblyInstruction
+    {
+        public override void Assemble(Assembler& assembler, Instruction* inst)
+        {
+            assembler.inSpec = assembler.specStack.Pop();
         }
     }
 
@@ -1427,9 +1462,12 @@ namespace cmsx.assembly
             OctaInstruction* octaInst = new OctaInstruction();
             instructionList.Add(UniquePtr<AssemblyInstruction>(octaInst));
             instructions[OCTA] = octaInst;
-            FuncInfoInstruction* funcInfoInst = new FuncInfoInstruction();
-            instructionList.Add(UniquePtr<AssemblyInstruction>(funcInfoInst));
-            instructions[FUNCINFO] = funcInfoInst;
+            BSpecInstruction* bspecInst = new BSpecInstruction();
+            instructionList.Add(UniquePtr<AssemblyInstruction>(bspecInst));
+            instructions[BSPEC] = bspecInst;
+            ESpecInstruction* especInst = new ESpecInstruction();
+            instructionList.Add(UniquePtr<AssemblyInstruction>(especInst));
+            instructions[ESPEC] = especInst;
 
             LoadInstruction* loadInst = new LoadInstruction();
             instructionList.Add(UniquePtr<AssemblyInstruction>(loadInst));

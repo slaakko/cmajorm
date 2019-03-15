@@ -196,9 +196,12 @@ namespace cmsx.intermediate
                     {
                         throw Exception("metadata string expected");
                     }
-                    MachineInstruction* funcInfoInst = machineCode.GetInstruction(cmsx.assembly.FUNCINFO, null);
-                    funcInfoInst->AddOperand(context.GetSymbolOperand(debugInfoFunc->name));
-                    funcInfoInst->AddOperand(context.GetStringOperand(functionFullName));
+                    MachineInstruction* bspecInst = machineCode.GetInstruction(cmsx.assembly.BSPEC, null);
+                    MachineInstruction* octaInst = machineCode.GetInstruction(cmsx.assembly.OCTA, null);
+                    octaInst->AddOperand(context.GetLiteralOperand(cmsx.assembly.FUNCINFO));
+                    octaInst->AddOperand(context.GetSymbolOperand(debugInfoFunc->name));
+                    octaInst->AddOperand(context.GetStringOperand(functionFullName));
+                    MachineInstruction* especInst = machineCode.GetInstruction(cmsx.assembly.ESPEC, null);
                 }
             }
         }

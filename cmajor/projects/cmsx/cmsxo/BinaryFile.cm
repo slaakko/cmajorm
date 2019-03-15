@@ -294,6 +294,17 @@ namespace cmsx.object
         {
             return fileName;
         }
+        public virtual void ReplaceLinkSection(UniquePtr<Section>& newLinkSection)
+        {
+            for (UniquePtr<Section>& section : sections)
+            {
+                if (section.Get() is LinkSection*)
+                {
+                    Swap(section, newLinkSection);
+                    return;
+                }
+            }
+        }
         private string fileName;
         private UniquePtr<Section> headerSection;
         private List<UniquePtr<Section>> sections;
@@ -351,6 +362,11 @@ namespace cmsx.object
         public override void AddSymbolsToAddressMap()
         {
             symbolSection->AddSymbolsToAddressMap();
+        }
+        public override void ReplaceLinkSection(UniquePtr<Section>& newLinkSection)
+        {
+            linkSection = newLinkSection.Get();
+            base->ReplaceLinkSection(newLinkSection);
         }
         public Section* codeSection;
         public Section* dataSection;
@@ -823,7 +839,7 @@ namespace cmsx.object
             }
             BinaryFileFormatter formatter(*file);
             base->Dump(writer);
-            pos = 0u;
+            pos = 0;
             ulong address = 0u;
             int opc = GetByte();
             while (opc != -1)
@@ -906,7 +922,7 @@ namespace cmsx.object
                     startOffset = cast<ulong>(-1);
                 }
             }
-            pos = 0u;
+            pos = 0;
             ulong address = 0u;
             ulong baseAddr = BaseAddress() + address;
             string currentBytes;
@@ -953,17 +969,7 @@ namespace cmsx.object
         }
         public override void Finalize()
         {
-            ulong alignment = 8u;
-            ulong at = Address();
-            ulong a = at & (alignment - 1u);
-            if (a != 0u)
-            {
-                ulong offset = alignment - a;
-                for (ulong i = 0u; i < offset; ++i)
-                {
-                    EmitByte(0u);
-                }
-            }
+            Align(8u);
         }
         private List<Symbol*> symbols;
         private List<ulong> startOffsets;
@@ -1033,7 +1039,7 @@ namespace cmsx.object
         public override void Read(System.IO.BinaryReader& reader)
         {
             base->Read(reader);
-            pos = 0u;
+            pos = 0;
             ulong numSymbols = GetULong();
             for (ulong i = 0u; i < numSymbols; ++i)
             {
@@ -1227,12 +1233,16 @@ namespace cmsx.object
             }
             BinaryFileFormatter formatter(*file);
             base->Dump(writer);
-            pos = 0u;
+            pos = 0;
             long p = pos;
             int x = GetByte();
             while (x != -1)
             {
                 LinkCode linkCode = cast<LinkCode>(cast<byte>(x));
+                if (linkCode == LinkCode.end)
+                {
+                    break;
+                }
                 string linkLine = Format(ToString(p), 5, FormatWidth.min, FormatJustify.right);
                 linkLine.Append(" ").Append(Format(LinkCodeStr(linkCode), maxLinkCodeStrLength));
                 switch (linkCode)
@@ -1303,6 +1313,10 @@ namespace cmsx.object
                 x = GetByte();
             }
         }
+        public override void Finalize()
+        {
+            EmitByte(LinkCode.end);
+        }
     }
 
     public class DebugSection : Section
@@ -1314,17 +1328,25 @@ namespace cmsx.object
         {
             BinaryFileFormatter formatter(*file);
             base->Dump(writer);
-            pos = 0u;
+            pos = 0;
             int x = GetByte();
             while (x != -1)
             {
                 DebugRecordCode debugRecordCode = cast<DebugRecordCode>(cast<byte>(x));
+                if (debugRecordCode == DebugRecordCode.end)
+                {
+                    break;
+                }
                 string debugLine = Format(DebugRecordCodeStr(debugRecordCode), maxDebugCodeStrLength);
                 if (debugRecordCode == DebugRecordCode.functionInfo)
                 {
                     uint functionSymbolIndex = GetUInt();
                     string functionFullName = GetString();
                     debugLine.Append(" ").Append(ToString(functionSymbolIndex)).Append(' ').Append(functionFullName);
+                }
+                else
+                {
+                    throw Exception("unknown debug record code " + ToString(debugRecordCode));
                 }
                 writer.WriteLine(debugLine);
                 x = GetByte();
@@ -1335,6 +1357,10 @@ namespace cmsx.object
             EmitByte(cast<byte>(DebugRecordCode.functionInfo));
             EmitUInt(functionInfo.functionSymbolIndex);
             EmitString(functionInfo.fullName);
+        }
+        public override void Finalize()
+        {
+            EmitByte(DebugRecordCode.end);
         }
     }
 }

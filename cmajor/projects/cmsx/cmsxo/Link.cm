@@ -5,7 +5,7 @@ namespace cmsx.object
 {
     public enum LinkCode : byte
     {
-        forwardLongJump = 0u, forwardShortJump = 1u, absoluteAddrValue = 2u, farJump = 3u, farOcta = 4u, clsid = 5u
+        forwardLongJump = 1u, forwardShortJump = 2u, absoluteAddrValue = 3u, farJump = 4u, farOcta = 5u, clsid = 6u, end = 7u
     }
 
     public const int maxLinkCodeStrLength = 17;
@@ -284,7 +284,7 @@ namespace cmsx.object
 
     public void LinkInternal(ObjectFile& objectFile)
     {
-        LinkSection newLinkSection;
+        UniquePtr<Section> newLinkSection(new LinkSection(&objectFile));
         SymbolTable& symbolTable = objectFile.GetSymbolTable();
         Section* linkSection = objectFile.linkSection;
         #assert(linkSection != null);
@@ -337,18 +337,18 @@ namespace cmsx.object
                 {
                     uint index = linkSection->GetUInt();
                     ulong address = linkSection->GetULong();
-                    newLinkSection.EmitByte(LinkCode.absoluteAddrValue);
-                    newLinkSection.EmitUInt(cast<uint>(index));
-                    newLinkSection.EmitULong(address);
+                    newLinkSection->EmitByte(LinkCode.absoluteAddrValue);
+                    newLinkSection->EmitUInt(cast<uint>(index));
+                    newLinkSection->EmitULong(address);
                     break;
                 }
                 case LinkCode.farOcta:
                 {
                     uint index = linkSection->GetUInt();
                     ulong address = linkSection->GetULong();
-                    newLinkSection.EmitByte(LinkCode.farOcta);
-                    newLinkSection.EmitUInt(cast<uint>(index));
-                    newLinkSection.EmitULong(address);
+                    newLinkSection->EmitByte(LinkCode.farOcta);
+                    newLinkSection->EmitUInt(cast<uint>(index));
+                    newLinkSection->EmitULong(address);
                     break;
                 }
                 case LinkCode.clsid:
@@ -356,16 +356,16 @@ namespace cmsx.object
                     ulong address = linkSection->GetULong();
                     ulong typeId1 = linkSection->GetULong();
                     ulong typeId2 = linkSection->GetULong();
-                    newLinkSection.EmitByte(LinkCode.clsid);
-                    newLinkSection.EmitULong(address);
-                    newLinkSection.EmitULong(typeId1);
-                    newLinkSection.EmitULong(typeId2);
+                    newLinkSection->EmitByte(LinkCode.clsid);
+                    newLinkSection->EmitULong(address);
+                    newLinkSection->EmitULong(typeId1);
+                    newLinkSection->EmitULong(typeId2);
                     break;
                 }
             }
             x = linkSection->GetByte();
         }
-        Swap(linkSection->data, newLinkSection.data);
+        objectFile.ReplaceLinkSection(newLinkSection);
     }
 
     public void ProcessSymbols(LinkTable& linkTable, ExecutableFile& executable, ObjectFile* objectFile, bool removeUnusedCode, bool debug)
@@ -816,6 +816,10 @@ namespace cmsx.object
             while (x != -1)
             {
                 DebugRecordCode debugRecordCode = cast<DebugRecordCode>(cast<byte>(x));
+                if (debugRecordCode == DebugRecordCode.end)
+                {
+                    break;
+                }
                 if (debugRecordCode == DebugRecordCode.functionInfo)
                 {
                     uint functionSymbolIndex = debugSection->GetUInt();

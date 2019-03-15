@@ -7,7 +7,7 @@ namespace cmsx.assembly
 {
     public enum Stage : byte 
     {
-        resolve = 0u, assemble = 1u, is_ = 2u, setExternal = 3u, setLinkOnce = 4u, bytes = 5u, wydes = 6u, tetras = 7u, octas = 8u, clsid = 9u, funcInfo = 10u
+        resolve = 0u, assemble = 1u, is_ = 2u, setExternal = 3u, setLinkOnce = 4u, bytes = 5u, wydes = 6u, tetras = 7u, octas = 8u, clsid = 9u, spec = 10u, funcInfo = 11u
     }
 
     public void Error(const string& message, const Span& span)
@@ -319,7 +319,7 @@ namespace cmsx.assembly
                     currentSection = objectFile.dataSection;
                     return;
                 }
-                else if (currentInstruction->opCode->value == DEBUG)
+                else if (opc == DEBUG)
                 {
                     currentSegment = Segment.data;
                     currentSection = objectFile.debugSection;
@@ -327,7 +327,10 @@ namespace cmsx.assembly
                 }
                 currentSymbol = null;
                 currentAlignment = 1u;
-                AlignAt();
+                if (currentSection != objectFile.debugSection)
+                {
+                    AlignAt();
+                }
                 if (!inst.label.IsNull())
                 {
                     if (opc == EXTERN || opc == LINKONCE)
@@ -1116,6 +1119,8 @@ namespace cmsx.assembly
         public Symbol* currentSymbol;
         public Segment currentSegment;
         public string str;
+        public bool inSpec;
+        public Stack<bool> specStack;
         private Symbol* currentFunctionSymbol;
         private Symbol* currentStructureSymbol;
         private Instruction* currentInstruction;

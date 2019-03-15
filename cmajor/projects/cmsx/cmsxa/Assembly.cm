@@ -21,8 +21,11 @@ namespace cmsx.assembly
     public const int DEBUG = 269;
     public const int LDA = 270;
     public const int SET = 271;
-    public const int FUNCINFO = 272;
-    public const int numInsts = FUNCINFO + 1;
+    public const int BSPEC = 272;
+    public const int ESPEC = 273;
+    public const int numInsts = ESPEC + 1;
+
+    public const ulong FUNCINFO = 0u; // function info discriminator
 
     public class PseudoOpMap
     {
@@ -51,7 +54,8 @@ namespace cmsx.assembly
             codes[".DEBUG"] = DEBUG;
             codes["LDA"] = LDA;
             codes["SET"] = SET;
-            codes["FUNCINFO"] = FUNCINFO;
+            codes["BSPEC"] = BSPEC;
+            codes["ESPEC"] = ESPEC;
             names[IS] = "IS";
             names[EXTERN] = "EXTERN";
             names[LINKONCE] = "LINKONCE";
@@ -68,7 +72,8 @@ namespace cmsx.assembly
             names[DEBUG] = ".DEBUG";
             names[LDA] = "LDA";
             names[SET] = "SET";
-            names[FUNCINFO] = "FUNCINFO";
+            names[BSPEC] = "BSPEC";
+            names[ESPEC] = "ESPEC";
             for (const Pair<int, string>& codeName : names)
             {
                 if (codeName.second.Length() > maxOpCodeNameLength)
