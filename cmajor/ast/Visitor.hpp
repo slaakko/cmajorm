@@ -177,6 +177,7 @@ class PostfixIncrementNode;
 class PostfixDecrementNode;
 class SizeOfNode;
 class TypeNameNode;
+class TypeIdNode;
 class CastNode;
 class ConstructNode;
 class NewNode;
@@ -356,6 +357,7 @@ public:
     virtual void Visit(PostfixDecrementNode& postfixDecrementNode) {}
     virtual void Visit(SizeOfNode& sizeOfNode) {}
     virtual void Visit(TypeNameNode& typeNameNode) {}
+    virtual void Visit(TypeIdNode& typeIdNode) {}
     virtual void Visit(CastNode& castNode) {}
     virtual void Visit(ConstructNode& constructNode) {}
     virtual void Visit(NewNode& newNode) {}

@@ -11,7 +11,9 @@ namespace cmsx.kernel
     public const byte setPoolEndSystemCall = 5u;
     public const byte debugBreakSystemCall = 6u;
     public const byte stackTraceSystemCall = 7u;
-    public const byte numSystemCalls = 8u;
+    public const byte throwSystemCall = 8u;
+    public const byte catchSystemCall = 9u;
+    public const byte numSystemCalls = 10u;
 
     public delegate long TrapHandler(Machine& machine, byte trapX, byte trapY, byte trapZ, ulong trapAX, ulong trapBX, ulong trapCX, ulong trapDX, ulong trapEX);
 
@@ -197,6 +199,51 @@ namespace cmsx.kernel
         else
         {
             Panic("stack trace called for a process that is not running!");
+        }
+        return 0;
+    }
+
+    public long Throw(Machine& machine, byte x, byte y, byte z, ulong ax, ulong bx, ulong cx, ulong dx, ulong ex)
+    {
+        if (x != 0u || y != throwSystemCall || z != 0u)
+        {
+            Panic("invalid throw parameters: " + ToString(x) + ", " + ToString(y) + ", " + ToString(z));
+        }
+        Kernel& kernel = Kernel.Instance();
+        ProcessTable& processTable = kernel.GetProcessTable();
+        Process* process = processTable.GetRunning();
+        if (process != null)
+        {
+            ulong exceptionAddress = ax;
+            ulong exceptionTypeId = bx;
+            ulong fp = machine.GetRegisters().Get(regFP);
+            process->currentExceptionAddress = exceptionAddress;
+            process->currentExceptionTypeId = exceptionTypeId;
+        }
+        else
+        {
+            Panic("throw called for a process that is not running!");
+        }
+        return 0;
+    }
+
+    public long Catch(Machine& machine, byte x, byte y, byte z, ulong ax, ulong bx, ulong cx, ulong dx, ulong ex)
+    {
+        if (x != 0u || y != catchSystemCall || z != 0u)
+        {
+            Panic("invalid catch parameters: " + ToString(x) + ", " + ToString(y) + ", " + ToString(z));
+        }
+        Kernel& kernel = Kernel.Instance();
+        ProcessTable& processTable = kernel.GetProcessTable();
+        Process* process = processTable.GetRunning();
+        if (process != null)
+        {
+            ulong exceptionAddress = process->currentExceptionAddress;
+            return cast<long>(exceptionAddress); 
+        }
+        else
+        {
+            Panic("catch called for a process that is not running!");
         }
         return 0;
     }

@@ -177,11 +177,60 @@ namespace cmsx.intermediate
                     debugInfoFuncs.Add(function.Get());
                 }
             }
+            machineCode.GetInstruction(separatorInstructionOpCode, null);
+            machineCode.GetInstruction(cmsx.assembly.DEBUG, null);
+            machineCode.GetInstruction(separatorInstructionOpCode, null);
+            MDStruct* compileUnitStruct = metadata.GetMDStruct(mdRef->id);
+            MDItem* sourceFileNameItem = compileUnitStruct->GetItem("sourceFileName");
+            HashMap<string, int> sourceFileNameMap;
+            string sourceFileName;
+            if (sourceFileNameItem is MDString*)
+            {
+                sourceFileName = cast<MDString*>(sourceFileNameItem)->value;
+                sourceFileNameMap[sourceFileName] = mdRef->id;
+            }
+            else
+            {
+                throw Exception("metadata string expected");
+            }
+            for (Function* debugInfoFunc : debugInfoFuncs)
+            {
+                MDStructRef* md = debugInfoFunc->md;
+                MDStruct* mdStruct = metadata.GetMDStruct(md->id);
+                MDItem* sourceFileItem = mdStruct->GetItem("sourceFile");
+                if (sourceFileItem is MDStructRef*)
+                {
+                    MDStructRef* mdRef = cast<MDStructRef*>(sourceFileItem);
+                    MDStruct* sourceFileStruct = metadata.GetMDStruct(mdRef->id);
+                    MDItem* sourceFileNameItem = sourceFileStruct->GetItem("sourceFileName");
+                    if (sourceFileNameItem is MDString*)
+                    {
+                        sourceFileName = cast<MDString*>(sourceFileNameItem)->value;
+                        sourceFileNameMap[sourceFileName] = mdRef->id;
+                    }
+                    else
+                    {
+                        throw Exception("metadata string expected");
+                    }
+                }
+                else
+                {
+                    throw Exception("metadata ref expected");
+                }
+            }
+            for (const Pair<string, int>& sourceFile : sourceFileNameMap)
+            {
+                const string& sourceFileName = sourceFile.first;
+                int sourceFileNameId = sourceFile.second;
+                MachineInstruction* bspecInst = machineCode.GetInstruction(cmsx.assembly.BSPEC, null);
+                MachineInstruction* octaInst = machineCode.GetInstruction(cmsx.assembly.OCTA, null);
+                octaInst->AddOperand(context.GetLiteralOperand(cmsx.assembly.FILEINFO));
+                octaInst->AddOperand(context.GetStringOperand(sourceFileName));
+                octaInst->AddOperand(context.GetLiteralOperand(cast<ulong>(sourceFileNameId)));
+                MachineInstruction* especInst = machineCode.GetInstruction(cmsx.assembly.ESPEC, null);
+            }
             if (!debugInfoFuncs.IsEmpty())
             {
-                machineCode.GetInstruction(separatorInstructionOpCode, null);
-                machineCode.GetInstruction(cmsx.assembly.DEBUG, null);
-                machineCode.GetInstruction(separatorInstructionOpCode, null);
                 for (Function* debugInfoFunc : debugInfoFuncs)
                 {
                     MDStructRef* md = debugInfoFunc->md;
@@ -196,11 +245,23 @@ namespace cmsx.intermediate
                     {
                         throw Exception("metadata string expected");
                     }
+                    MDItem* sourceFileItem = mdStruct->GetItem("sourceFile");
+                    int sourceFileNameId = 0;
+                    if (sourceFileItem is MDStructRef*)
+                    {
+                        sourceFileNameId = cast<MDStructRef*>(sourceFileItem)->id;
+                    }
+                    else
+                    {
+                        throw Exception("metadata ref expected");
+                    }
                     MachineInstruction* bspecInst = machineCode.GetInstruction(cmsx.assembly.BSPEC, null);
                     MachineInstruction* octaInst = machineCode.GetInstruction(cmsx.assembly.OCTA, null);
                     octaInst->AddOperand(context.GetLiteralOperand(cmsx.assembly.FUNCINFO));
                     octaInst->AddOperand(context.GetSymbolOperand(debugInfoFunc->name));
                     octaInst->AddOperand(context.GetStringOperand(functionFullName));
+                    octaInst->AddOperand(context.GetLiteralOperand(cast<ulong>(sourceFileNameId)));
+                    octaInst->AddOperand(context.GetLiteralOperand(debugInfoFunc->frameSize));
                     MachineInstruction* especInst = machineCode.GetInstruction(cmsx.assembly.ESPEC, null);
                 }
             }

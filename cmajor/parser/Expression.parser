@@ -303,6 +303,7 @@ namespace cmajor.parser
             |   keyword("base", identifier){ value = new BaseNode(span); }
             |   SizeOfExpr(ctx){ value = SizeOfExpr; }
             |   TypeNameExpr(ctx){ value = TypeNameExpr; }
+            |   TypeIdExpr(ctx){ value = TypeIdExpr; }
             |   CastExpr(ctx){ value = CastExpr; }
             |   ConstructExpr(ctx){ value = ConstructExpr; }
             |   NewExpr(ctx){ value = NewExpr; }
@@ -314,6 +315,10 @@ namespace cmajor.parser
 
         TypeNameExpr(ParsingContext* ctx) : Node*
             ::= (keyword("typename") '('! Expression(ctx)! ')'!){ value = new TypeNameNode(span, Expression); }
+            ;
+
+        TypeIdExpr(ParsingContext* ctx) : Node*
+            ::= (keyword("typeid") '('! Expression(ctx)! ')'!){ value = new TypeIdNode(span, Expression); }
             ;
 
         CastExpr(ParsingContext* ctx) : Node*

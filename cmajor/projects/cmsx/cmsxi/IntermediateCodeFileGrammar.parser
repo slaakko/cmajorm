@@ -62,7 +62,7 @@ namespace cmsx.intermediate
             ;
 
         InstructionLine(cmsx.intermediate.Context* context, BasicBlock* bb)
-            ::= token(S? Instruction(context) S? newline!){ bb->AddInstruction(Instruction); }
+            ::= token(S? Instruction(context) (S MDStructRef(context):lineInfo)? S? newline!){ bb->AddInstruction(Instruction, lineInfo); }
             ;
 
         Instruction(cmsx.intermediate.Context* context) : Instruction*
@@ -74,6 +74,7 @@ namespace cmsx.intermediate
             |   RetInstruction(context){ value = RetInstruction; }
             |   SwitchInstruction(context){ value = SwitchInstruction; }
             |   ValueInstruction(context){ value = ValueInstruction; }
+            |   NoOperationInstruction(context){ value = NoOperationInstruction; }
             ;
 
         StoreInstruction(cmsx.intermediate.Context* context) : Instruction*
@@ -103,6 +104,10 @@ namespace cmsx.intermediate
         SwitchInstruction(cmsx.intermediate.Context* context) : SwitchInstruction*
             ::= (keyword("switch") S TypeExpr(context):type! S Value(context, type):cond! S Label:defaultTarget!){ value = new SwitchInstruction(cond, defaultTarget, span.lineNumber); } Comma!
                 '['! S? (TypeExpr(context):caseType S Value(context, caseType):caseValue Comma Label:caseTarget){ value->AddCase(caseValue, caseTarget); } % (S? ':' S?) ']'!
+            ;
+
+        NoOperationInstruction(cmsx.intermediate.Context* context) : Instruction*
+            ::= keyword("nop"){ value = new NoOperationInstruction(span.lineNumber); }
             ;
 
         ValueInstruction(cmsx.intermediate.Context* context) : Instruction*

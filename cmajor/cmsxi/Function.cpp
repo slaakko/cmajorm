@@ -4,16 +4,18 @@
 // =================================
 
 #include <cmajor/cmsxi/Function.hpp>
+#include <cmajor/cmsxi/Context.hpp>
 #include <cmajor/util/Error.hpp>
 
 namespace cmsxi {
 
-Function::Function(const std::string& name_, FunctionType* type_) : Value(), name(name_), type(type_), nextResultNumber(0), linkOnce(false), mdId(-1)
+Function::Function(const std::string& name_, FunctionType* type_, Context& context) : Value(), name(name_), type(type_), nextResultNumber(0), linkOnce(false), mdId(-1)
 {
     entryBlock.reset(new BasicBlock(basicBlocks.size()));
     for (Type* paramType : type->ParamTypes())
     {
         Instruction* paramInst = new ParamInstruction(paramType);
+        context.AddLineInfo(paramInst);
         entryBlock->AddInstruction(paramInst);
         params.push_back(paramInst);
     }

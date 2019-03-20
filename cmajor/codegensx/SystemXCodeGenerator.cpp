@@ -15,6 +15,7 @@
 #include <cmajor/util/Unicode.hpp>
 #include <cmajor/util/Error.hpp>
 #include <cmajor/util/Sha1.hpp>
+#include <cmajor/util/TextUtils.hpp>
 #include <boost/filesystem.hpp>
 
 namespace cmajor { namespace codegensx {
@@ -41,7 +42,8 @@ SystemXCodeGenerator::SystemXCodeGenerator(cmajor::ir::EmittingContext& emitting
     cmajor::codegenbase::CodeGenerator(emittingContext_), emitter(GetEmitter()), emittingContext(&emittingContext_), symbolTable(nullptr), module(nullptr), compileUnit(nullptr),
     nativeCompileUnit(nullptr), function(nullptr), entryBasicBlock(nullptr), lastInstructionWasRet(false), destructorCallGenerated(false), genJumpingBoolCode(false),
     trueBlock(nullptr), falseBlock(nullptr), breakTarget(nullptr), continueTarget(nullptr), sequenceSecond(nullptr), currentFunction(nullptr), currentBlock(nullptr),
-    breakTargetBlock(nullptr), continueTargetBlock(nullptr), lastAlloca(nullptr), currentClass(nullptr), basicBlockOpen(false), defaultDest(nullptr), currentCaseMap(nullptr)
+    breakTargetBlock(nullptr), continueTargetBlock(nullptr), lastAlloca(nullptr), currentClass(nullptr), basicBlockOpen(false), defaultDest(nullptr), currentCaseMap(nullptr),
+    generateLineNumbers(false), currentTryBlockId(-1), nextTryBlockId(0), currentTryNextBlock(nullptr)
 {
     emitter->SetEmittingDelegate(this);
 }
@@ -58,6 +60,8 @@ void SystemXCodeGenerator::Visit(BoundCompileUnit& boundCompileUnit)
     NativeModule nativeModule(emitter, intermediateFilePath);
     compileUnitId = GetSha1MessageDigest(boundCompileUnit.SourceFilePath());
     emitter->SetCompileUnitId(compileUnitId);
+    emitter->SetCurrentLineNumber(0);
+    generateLineNumbers = false;
     symbolTable = &boundCompileUnit.GetSymbolTable();
     module = &boundCompileUnit.GetModule();
     compileUnit = &boundCompileUnit;
@@ -135,11 +139,24 @@ void SystemXCodeGenerator::Visit(BoundFunction& boundFunction)
     basicBlockOpen = false;
     lastAlloca = nullptr;
     labeledStatementMap.clear();
+    if (functionSymbol->HasSource())
+    {
+        generateLineNumbers = true;
+        emitter->SetCurrentLineNumber(boundFunction.Body()->GetSpan().LineNumber());
+    }
+    else
+    {
+        generateLineNumbers = false;
+        emitter->SetCurrentLineNumber(0);
+    }
     function = emitter->GetOrInsertFunction(ToUtf8(functionSymbol->MangledName()), functionType);
     if (functionSymbol->HasSource())
     {
         void* mdStruct = emitter->CreateMDStruct();
+        emitter->AddMDItem(mdStruct, "nodeType", emitter->CreateMDLong(funcInfoNodeType));
         emitter->AddMDItem(mdStruct, "fullName", emitter->CreateMDString(ToUtf8(functionSymbol->FullName())));
+        void* mdFile = emitter->GetMDStructRefForSourceFile(module->GetFilePath(functionSymbol->GetSpan().FileIndex()));
+        emitter->AddMDItem(mdStruct, "sourceFile", mdFile);
         int mdId = emitter->GetMDStructId(mdStruct);
         emitter->SetFunctionMdId(function, mdId);
     }
@@ -284,6 +301,10 @@ void SystemXCodeGenerator::Visit(BoundFunction& boundFunction)
 
 void SystemXCodeGenerator::Visit(BoundCompoundStatement& boundCompoundStatement)
 {
+    if (generateLineNumbers)
+    {
+        emitter->SetCurrentLineNumber(boundCompoundStatement.GetSpan().LineNumber());
+    }
     destructorCallGenerated = false;
     lastInstructionWasRet = false;
     basicBlockOpen = false;
@@ -321,6 +342,10 @@ void SystemXCodeGenerator::Visit(BoundSequenceStatement& boundSequenceStatement)
 
 void SystemXCodeGenerator::Visit(BoundReturnStatement& boundReturnStatement)
 {
+    if (generateLineNumbers)
+    {
+        emitter->SetCurrentLineNumber(boundReturnStatement.GetSpan().LineNumber());
+    }
     destructorCallGenerated = false;
     lastInstructionWasRet = false;
     basicBlockOpen = false;
@@ -362,26 +387,15 @@ void SystemXCodeGenerator::Visit(BoundReturnStatement& boundReturnStatement)
 
 void SystemXCodeGenerator::Visit(BoundGotoCaseStatement& boundGotoCaseStatement)
 {
+    if (generateLineNumbers)
+    {
+        emitter->SetCurrentLineNumber(boundGotoCaseStatement.GetSpan().LineNumber());
+    }
     destructorCallGenerated = false;
     lastInstructionWasRet = false;
     basicBlockOpen = false;
     SetTarget(&boundGotoCaseStatement);
     Assert(breakTargetBlock, "break target not set");
-/*
-    Pad* prevCurrentPad = currentPad;
-    BoundStatement* parent = currentBlock;
-    while (currentPad != nullptr && parent && parent != breakTargetBlock)
-    {
-        if (parent->GetBoundNodeType() == BoundNodeType::boundTryStatement)
-        {
-            void* fromCatchTarget = emitter->CreateBasicBlock("fromCatch");
-            emitter->CreateCatchRet(currentPad->value, fromCatchTarget);
-            emitter->SetCurrentBasicBlock(fromCatchTarget);
-            currentPad = currentPad->parent;
-        }
-        parent = parent->Parent();
-    }
-*/
     ExitBlocks(breakTargetBlock);
     IntegralValue integralCaseValue(boundGotoCaseStatement.CaseValue());
     auto it = currentCaseMap->find(integralCaseValue);
@@ -394,31 +408,19 @@ void SystemXCodeGenerator::Visit(BoundGotoCaseStatement& boundGotoCaseStatement)
     {
         throw Exception(module, "case not found", boundGotoCaseStatement.GetSpan());
     }
-    //currentPad = prevCurrentPad;
 }
 
 void SystemXCodeGenerator::Visit(BoundGotoDefaultStatement& boundGotoDefaultStatement)
 {
+    if (generateLineNumbers)
+    {
+        emitter->SetCurrentLineNumber(boundGotoDefaultStatement.GetSpan().LineNumber());
+    }
     destructorCallGenerated = false;
     lastInstructionWasRet = false;
     basicBlockOpen = false;
     SetTarget(&boundGotoDefaultStatement);
     Assert(breakTargetBlock, "break target not set");
-/*
-    Pad* prevCurrentPad = currentPad;
-    BoundStatement* parent = currentBlock;
-    while (currentPad != nullptr && parent && parent != breakTargetBlock)
-    {
-        if (parent->GetBoundNodeType() == BoundNodeType::boundTryStatement)
-        {
-            void* fromCatchTarget = emitter->CreateBasicBlock("fromCatch");
-            emitter->CreateCatchRet(currentPad->value, fromCatchTarget);
-            emitter->SetCurrentBasicBlock(fromCatchTarget);
-            currentPad = currentPad->parent;
-        }
-        parent = parent->Parent();
-    }
-*/
     ExitBlocks(breakTargetBlock);
     if (defaultDest)
     {
@@ -428,31 +430,19 @@ void SystemXCodeGenerator::Visit(BoundGotoDefaultStatement& boundGotoDefaultStat
     {
         throw Exception(module, "no default destination", boundGotoDefaultStatement.GetSpan());
     }
-    //currentPad = prevCurrentPad;
 }
 
 void SystemXCodeGenerator::Visit(BoundBreakStatement& boundBreakStatement)
 {
+    if (generateLineNumbers)
+    {
+        emitter->SetCurrentLineNumber(boundBreakStatement.GetSpan().LineNumber());
+    }
     destructorCallGenerated = false;
     lastInstructionWasRet = false;
     basicBlockOpen = false;
     SetTarget(&boundBreakStatement);
     Assert(breakTarget && breakTargetBlock, "break target not set");
-/*
-    Pad* prevCurrentPad = currentPad;
-    BoundStatement* parent = currentBlock;
-    while (currentPad != nullptr && parent && parent != breakTargetBlock)
-    {
-        if (parent->GetBoundNodeType() == BoundNodeType::boundTryStatement)
-        {
-            void* fromCatchTarget = emitter->CreateBasicBlock("fromCatch");
-            emitter->CreateCatchRet(currentPad->value, fromCatchTarget);
-            emitter->SetCurrentBasicBlock(fromCatchTarget);
-            currentPad = currentPad->parent;
-        }
-        parent = parent->Parent();
-    }
-*/
     ExitBlocks(breakTargetBlock);
     emitter->CreateBr(breakTarget);
     if (!currentCaseMap) // not in switch
@@ -461,62 +451,38 @@ void SystemXCodeGenerator::Visit(BoundBreakStatement& boundBreakStatement)
         emitter->SetCurrentBasicBlock(nextBlock);
         basicBlockOpen = true;
     }
-    //currentPad = prevCurrentPad;
 }
 
 void SystemXCodeGenerator::Visit(BoundContinueStatement& boundContinueStatement)
 {
+    if (generateLineNumbers)
+    {
+        emitter->SetCurrentLineNumber(boundContinueStatement.GetSpan().LineNumber());
+    }
     destructorCallGenerated = false;
     lastInstructionWasRet = false;
     basicBlockOpen = false;
     prevWasTerminator = false;
     SetTarget(&boundContinueStatement);
     Assert(continueTarget && continueTargetBlock, "continue target not set");
-/*
-    Pad* prevCurrentPad = currentPad;
-    BoundStatement* parent = currentBlock;
-    while (currentPad != nullptr && parent && parent != continueTargetBlock)
-    {
-        if (parent->GetBoundNodeType() == BoundNodeType::boundTryStatement)
-        {
-            void* fromCatchTarget = emitter->CreateBasicBlock("fromCatch");
-            emitter->CreateCatchRet(currentPad->value, fromCatchTarget);
-            emitter->SetCurrentBasicBlock(fromCatchTarget);
-            currentPad = currentPad->parent;
-        }
-        parent = parent->Parent();
-    }
-*/
     ExitBlocks(continueTargetBlock);
     emitter->CreateBr(continueTarget);
     void* nextBlock = emitter->CreateBasicBlock("next");
     emitter->SetCurrentBasicBlock(nextBlock);
     basicBlockOpen = true;
-    // currentPad = prevCurrentPad;
 }
 
 void SystemXCodeGenerator::Visit(BoundGotoStatement& boundGotoStatement)
 {
+    if (generateLineNumbers)
+    {
+        emitter->SetCurrentLineNumber(boundGotoStatement.GetSpan().LineNumber());
+    }
     destructorCallGenerated = false;
     lastInstructionWasRet = false;
     basicBlockOpen = false;
     prevWasTerminator = false;
     SetTarget(&boundGotoStatement);
-/*
-    Pad* prevCurrentPad = currentPad;
-    BoundStatement* parent = currentBlock;
-    while (currentPad != nullptr && parent && parent != boundGotoStatement.TargetBlock())
-    {
-        if (parent->GetBoundNodeType() == BoundNodeType::boundTryStatement)
-        {
-            void* fromCatchTarget = emitter->CreateBasicBlock("fromCatch");
-            emitter->CreateCatchRet(currentPad->value, fromCatchTarget);
-            emitter->SetCurrentBasicBlock(fromCatchTarget);
-            currentPad = currentPad->parent;
-        }
-        parent = parent->Parent();
-    }
-*/
     ExitBlocks(boundGotoStatement.TargetBlock());
     auto it = labeledStatementMap.find(boundGotoStatement.TargetStatement());
     if (it != labeledStatementMap.cend())
@@ -531,11 +497,14 @@ void SystemXCodeGenerator::Visit(BoundGotoStatement& boundGotoStatement)
     void* nextBlock = emitter->CreateBasicBlock("next");
     emitter->SetCurrentBasicBlock(nextBlock);
     basicBlockOpen = true;
-    //currentPad = prevCurrentPad;
 }
 
 void SystemXCodeGenerator::Visit(BoundIfStatement& boundIfStatement)
 {
+    if (generateLineNumbers)
+    {
+        emitter->SetCurrentLineNumber(boundIfStatement.GetSpan().LineNumber());
+    }
     destructorCallGenerated = false;
     lastInstructionWasRet = false;
     basicBlockOpen = false;
@@ -573,6 +542,10 @@ void SystemXCodeGenerator::Visit(BoundIfStatement& boundIfStatement)
 
 void SystemXCodeGenerator::Visit(BoundWhileStatement& boundWhileStatement)
 {
+    if (generateLineNumbers)
+    {
+        emitter->SetCurrentLineNumber(boundWhileStatement.GetSpan().LineNumber());
+    }
     destructorCallGenerated = false;
     lastInstructionWasRet = false;
     basicBlockOpen = false;
@@ -610,6 +583,10 @@ void SystemXCodeGenerator::Visit(BoundWhileStatement& boundWhileStatement)
 
 void SystemXCodeGenerator::Visit(BoundDoStatement& boundDoStatement)
 {
+    if (generateLineNumbers)
+    {
+        emitter->SetCurrentLineNumber(boundDoStatement.GetSpan().LineNumber());
+    }
     destructorCallGenerated = false;
     lastInstructionWasRet = false;
     basicBlockOpen = false;
@@ -649,6 +626,10 @@ void SystemXCodeGenerator::Visit(BoundDoStatement& boundDoStatement)
 
 void SystemXCodeGenerator::Visit(BoundForStatement& boundForStatement)
 {
+    if (generateLineNumbers)
+    {
+        emitter->SetCurrentLineNumber(boundForStatement.GetSpan().LineNumber());
+    }
     destructorCallGenerated = false;
     lastInstructionWasRet = false;
     basicBlockOpen = false;
@@ -693,6 +674,10 @@ void SystemXCodeGenerator::Visit(BoundForStatement& boundForStatement)
 
 void SystemXCodeGenerator::Visit(BoundSwitchStatement& boundSwitchStatement)
 {
+    if (generateLineNumbers)
+    {
+        emitter->SetCurrentLineNumber(boundSwitchStatement.GetSpan().LineNumber());
+    }
     destructorCallGenerated = false;
     lastInstructionWasRet = false;
     basicBlockOpen = false;
@@ -760,6 +745,10 @@ void SystemXCodeGenerator::Visit(BoundSwitchStatement& boundSwitchStatement)
 
 void SystemXCodeGenerator::Visit(BoundCaseStatement& boundCaseStatement)
 {
+    if (generateLineNumbers)
+    {
+        emitter->SetCurrentLineNumber(boundCaseStatement.GetSpan().LineNumber());
+    }
     destructorCallGenerated = false;
     lastInstructionWasRet = false;
     basicBlockOpen = false;
@@ -788,6 +777,10 @@ void SystemXCodeGenerator::Visit(BoundCaseStatement& boundCaseStatement)
 
 void SystemXCodeGenerator::Visit(BoundDefaultStatement& boundDefaultStatement)
 {
+    if (generateLineNumbers)
+    {
+        emitter->SetCurrentLineNumber(boundDefaultStatement.GetSpan().LineNumber());
+    }
     destructorCallGenerated = false;
     lastInstructionWasRet = false;
     basicBlockOpen = false;
@@ -805,6 +798,10 @@ void SystemXCodeGenerator::Visit(BoundDefaultStatement& boundDefaultStatement)
 
 void SystemXCodeGenerator::Visit(BoundConstructionStatement& boundConstructionStatement)
 {
+    if (generateLineNumbers)
+    {
+        emitter->SetCurrentLineNumber(boundConstructionStatement.GetSpan().LineNumber());
+    }
     destructorCallGenerated = false;
     lastInstructionWasRet = false;
     basicBlockOpen = false;
@@ -848,6 +845,10 @@ void SystemXCodeGenerator::Visit(BoundConstructionStatement& boundConstructionSt
 
 void SystemXCodeGenerator::Visit(BoundAssignmentStatement& boundAssignmentStatement)
 {
+    if (generateLineNumbers)
+    {
+        emitter->SetCurrentLineNumber(boundAssignmentStatement.GetSpan().LineNumber());
+    }
     destructorCallGenerated = false;
     lastInstructionWasRet = false;
     basicBlockOpen = false;
@@ -857,6 +858,10 @@ void SystemXCodeGenerator::Visit(BoundAssignmentStatement& boundAssignmentStatem
 
 void SystemXCodeGenerator::Visit(BoundExpressionStatement& boundExpressionStatement)
 {
+    if (generateLineNumbers)
+    {
+        emitter->SetCurrentLineNumber(boundExpressionStatement.GetSpan().LineNumber());
+    }
     destructorCallGenerated = false;
     lastInstructionWasRet = false;
     basicBlockOpen = false;
@@ -870,6 +875,10 @@ void SystemXCodeGenerator::Visit(BoundExpressionStatement& boundExpressionStatem
 
 void SystemXCodeGenerator::Visit(BoundEmptyStatement& boundEmptyStatement)
 {
+    if (generateLineNumbers)
+    {
+        emitter->SetCurrentLineNumber(boundEmptyStatement.GetSpan().LineNumber());
+    }
     destructorCallGenerated = false;
     lastInstructionWasRet = false;
     basicBlockOpen = false;
@@ -894,6 +903,101 @@ void SystemXCodeGenerator::Visit(BoundSetVmtPtrStatement& boundSetVmtPtrStatemen
     void* ptr = emitter->GetMemberVariablePtr(classPtrValue, vmtPtrIndex);
     void* vmtPtr = emitter->CreateBitCast(boundSetVmtPtrStatement.ClassType()->VmtObject(*emitter, false), emitter->GetIrTypeForVoidPtrType());
     emitter->CreateStore(vmtPtr, ptr);
+}
+
+void SystemXCodeGenerator::Visit(BoundThrowStatement& boundThrowStatement)
+{
+    if (generateLineNumbers)
+    {
+        emitter->SetCurrentLineNumber(boundThrowStatement.GetSpan().LineNumber());
+    }
+    destructorCallGenerated = false;
+    lastInstructionWasRet = false;
+    basicBlockOpen = false;
+    SetTarget(&boundThrowStatement);
+    boundThrowStatement.ThrowCallExpr()->Accept(*this);
+}
+
+void SystemXCodeGenerator::Visit(BoundTryStatement& boundTryStatement)
+{
+    if (generateLineNumbers)
+    {
+        emitter->SetCurrentLineNumber(boundTryStatement.GetSpan().LineNumber());
+    }
+    destructorCallGenerated = false;
+    lastInstructionWasRet = false;
+    basicBlockOpen = false;
+    SetTarget(&boundTryStatement);
+    int64_t parentTryBlockId = currentTryBlockId;
+    currentTryBlockId = nextTryBlockId++;
+    void* nop1 = emitter->CreateNop();
+    void* beginTry = emitter->CreateMDStruct();
+    emitter->AddMDItem(beginTry, "nodeType", emitter->CreateMDLong(beginTryNodeType));
+    emitter->AddMDItem(beginTry, "tryBlockId", emitter->CreateMDLong(currentTryBlockId));
+    emitter->AddMDItem(beginTry, "parentTryBlockId", emitter->CreateMDLong(parentTryBlockId));
+    int beginTryId = emitter->GetMDStructId(beginTry);
+    void* beginTryMdRef = emitter->CreateMDStructRef(beginTryId);
+    emitter->SetMetadataRef(nop1, beginTryMdRef);
+    boundTryStatement.TryBlock()->Accept(*this);
+    void* nop2 = emitter->CreateNop();
+    void* endTry = emitter->CreateMDStruct();
+    emitter->AddMDItem(endTry, "nodeType", emitter->CreateMDLong(endTryNodeType));
+    emitter->AddMDItem(endTry, "tryBlockId", emitter->CreateMDLong(currentTryBlockId));
+    int endTryId = emitter->GetMDStructId(endTry);
+    void* endTryMdRef = emitter->CreateMDStructRef(endTryId);
+    emitter->SetMetadataRef(nop2, endTryMdRef);
+    void* tryNextBlock = emitter->CreateBasicBlock("tryNext");
+    emitter->CreateBr(tryNextBlock);
+    void* prevTryNextBlock = currentTryNextBlock;
+    currentTryNextBlock = tryNextBlock;
+    for (const auto& c : boundTryStatement.Catches())
+    {
+        c->Accept(*this);
+    }
+    emitter->SetCurrentBasicBlock(tryNextBlock);
+    currentTryBlockId = parentTryBlockId;
+    currentTryNextBlock = prevTryNextBlock;
+    basicBlockOpen = true;
+}
+
+void SystemXCodeGenerator::Visit(BoundCatchStatement& boundCatchStatement)
+{
+    if (generateLineNumbers)
+    {
+        emitter->SetCurrentLineNumber(boundCatchStatement.GetSpan().LineNumber());
+    }
+    destructorCallGenerated = false;
+    lastInstructionWasRet = false;
+    basicBlockOpen = false;
+    SetTarget(&boundCatchStatement);
+    void* catchBlock = emitter->CreateBasicBlock("catch");
+    emitter->SetCurrentBasicBlock(catchBlock);
+    int64_t catchBlockId = emitter->GetBasicBlockId(catchBlock);
+    void* nop1 = emitter->CreateNop();
+    void* beginCatch = emitter->CreateMDStruct();
+    emitter->AddMDItem(beginCatch, "nodeType", emitter->CreateMDLong(beginCatchNodeType));
+    emitter->AddMDItem(beginCatch, "tryBlockId", emitter->CreateMDLong(currentTryBlockId));
+    emitter->AddMDItem(beginCatch, "catchBlockId", emitter->CreateMDLong(catchBlockId));
+    const boost::uuids::uuid& uuid = compileUnit->GetUuid(boundCatchStatement.CatchedTypeUuidId());
+    std::string uuidStr;
+    for (const auto x : uuid)
+    {
+        uuidStr.append(cmajor::util::ToHexString(x));
+    }
+    emitter->AddMDItem(beginCatch, "catchedTypeId", emitter->CreateMDString(uuidStr));
+    int beginCatchId = emitter->GetMDStructId(beginCatch);
+    void* beginCatchMdRef = emitter->CreateMDStructRef(beginCatchId);
+    emitter->SetMetadataRef(nop1, beginCatchMdRef);
+    boundCatchStatement.CatchBlock()->Accept(*this);
+    void* nop2 = emitter->CreateNop();
+    void* endCatch = emitter->CreateMDStruct();
+    emitter->AddMDItem(endCatch, "nodeType", emitter->CreateMDLong(endCatchNodeType));
+    emitter->AddMDItem(endCatch, "catchBlockId", emitter->CreateMDLong(catchBlockId));
+    int endCatchId = emitter->GetMDStructId(endCatch);
+    void* endCatchMdRef = emitter->CreateMDStructRef(endCatchId);
+    emitter->SetMetadataRef(nop2, endCatchMdRef);
+    emitter->CreateBr(currentTryNextBlock);
+    emitter->SetCurrentBasicBlock(currentTryNextBlock);
 }
 
 void SystemXCodeGenerator::Visit(BoundParameter& boundParameter)

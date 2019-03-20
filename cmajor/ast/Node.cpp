@@ -50,7 +50,7 @@ const char* nodeTypeStr[] =
     "dotNode", "arrowNode", "equivalenceNode", "implicationNode", "disjunctionNode", "conjunctionNode", "bitOrNode", "bitXorNode", "bitAndNode", "equalNode", "notEqualNode", "lessNode", "greaterNode",
     "lessOrEqualNode", "greaterOrEqualNode", "shiftLeftNode", "shiftRightNode", 
     "addNode", "subNode", "mulNode", "divNode", "remNode", "notNode", "unaryPlusNode", "unaryMinusNode", "prefixIncrementNode", "prefixDecrementNode", "complementNode", "derefNode", "addrOfNode",
-    "isNode", "asNode", "indexingNode", "invokeNode", "postfixIncrementNode", "postfixDecrementNode", "sizeOfNode", "typeNameNode", "castNode", "constructNode", "newNode", "thisNode", "baseNode",
+    "isNode", "asNode", "indexingNode", "invokeNode", "postfixIncrementNode", "postfixDecrementNode", "sizeOfNode", "typeNameNode", "typeIdNode", "castNode", "constructNode", "newNode", "thisNode", "baseNode",
     "conditionalCompilationDisjunctionNode", "conditionalCompilationConjunctionNode", "conditionalCompilationNotNode", "conditionalCompilationPrimaryNode", "conditionalCompilationPartNode", 
     "conditionalCompilationStatementNode", "uuidLiteralNode", "cursorIdNode", "parenthesizedExpressionNode",
     "maxNode"
@@ -318,6 +318,7 @@ NodeFactory::NodeFactory()
     Register(NodeType::postfixDecrementNode, new ConcreteNodeCreator<PostfixDecrementNode>());
     Register(NodeType::sizeOfNode, new ConcreteNodeCreator<SizeOfNode>());
     Register(NodeType::typeNameNode, new ConcreteNodeCreator<TypeNameNode>());
+    Register(NodeType::typeIdNode, new ConcreteNodeCreator<TypeIdNode>());
     Register(NodeType::castNode, new ConcreteNodeCreator<CastNode>());
     Register(NodeType::constructNode, new ConcreteNodeCreator<ConstructNode>());
     Register(NodeType::newNode, new ConcreteNodeCreator<NewNode>());

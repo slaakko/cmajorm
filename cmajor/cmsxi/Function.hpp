@@ -10,10 +10,12 @@
 
 namespace cmsxi {
 
+class Context;
+
 class CMSXI_API Function : public Value
 {
 public:
-    Function(const std::string& name_, FunctionType* type_);
+    Function(const std::string& name_, FunctionType* type_, Context& context);
     Function(const Function&) = delete;
     Function& operator=(const Function&) = delete;
     BasicBlock* CreateBasicBlock();

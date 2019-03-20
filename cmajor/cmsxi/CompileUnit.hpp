@@ -24,7 +24,7 @@ public:
     Context* GetContext() { return &context; }
 private:
     Context context;
-    MDStruct* cu;
+    MDStructRef* cu;
     std::string id;
     std::string sourceFilePath;
     std::string filePath;

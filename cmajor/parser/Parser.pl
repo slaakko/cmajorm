@@ -126,6 +126,7 @@ namespace cmajor.parser
         Primary(ParsingContext* ctx): Node*;
         SizeOfExpr(ParsingContext* ctx): Node*;
         TypeNameExpr(ParsingContext* ctx): Node*;
+        TypeIdExpr(ParsingContext* ctx): Node*;
         CastExpr(ParsingContext* ctx): Node*;
         ConstructExpr(ParsingContext* ctx): Node*;
         NewExpr(ParsingContext* ctx): Node*;

@@ -135,6 +135,7 @@ public:
     void* GetArrayBeginAddress(void* arrayPtr) override;
     void* GetArrayEndAddress(void* arrayPtr, uint64_t size) override;
     void* CreateBasicBlock(const std::string& name) override;
+    int GetBasicBlockId(void* basicBlock) override;
     void CreateBr(void* targetBasicBlock) override;
     void* CurrentBasicBlock() const override;
     void SetCurrentBasicBlock(void* basicBlock) override;
@@ -179,6 +180,7 @@ public:
     void* CreateNot(void* value) override;
     void* CreateNeg(void* value) override;
     void* CreateFNeg(void* value) override;
+    void* CreateNop() override;
     std::string GetVmtObjectName(void* symbol) const override;
     void SetVmtObjectName(void* symbol, const std::string& vmtObjectName) override;
     std::string GetImtArrayObjectName(void* symbol) const override;
@@ -308,6 +310,9 @@ public:
     void* CreateMDStruct() override;
     void AddMDItem(void* mdStruct, const std::string& fieldName, void* mdItem) override;
     void SetFunctionMdId(void* function, int mdId) override;
+    void SetCurrentLineNumber(int currentLineNumber) override;
+    void* GetMDStructRefForSourceFile(const std::string& sourceFileName) override;
+    void SetMetadataRef(void* inst, void* mdStructRef) override;
 private:
     cmsxbe::EmittingContext* emittingContext;
     cmajor::ir::EmittingDelegate* emittingDelegate;

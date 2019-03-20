@@ -448,6 +448,21 @@ private:
     std::unique_ptr<BoundExpression> classPtr;
 };
 
+class BINDER_API BoundTypeIdExpression : public BoundExpression
+{
+public:
+    BoundTypeIdExpression(Module* module_, std::unique_ptr<BoundExpression>&& classPtr_, TypeSymbol* ulongType_);
+    BoundExpression* Clone() override;
+    void Load(Emitter& emitter, OperationFlags flags) override;
+    void Store(Emitter& emitter, OperationFlags flags) override;
+    void Accept(BoundNodeVisitor& visitor) override;
+    bool HasValue() const override { return true; }
+    bool ContainsExceptionCapture() const override;
+    BoundExpression* ClassPtr() { return classPtr.get(); }
+private:
+    std::unique_ptr<BoundExpression> classPtr;
+};
+
 class BINDER_API BoundBitCast : public BoundExpression
 {
 public:

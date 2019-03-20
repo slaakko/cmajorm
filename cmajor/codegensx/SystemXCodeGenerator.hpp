@@ -20,6 +20,14 @@ namespace cmajor { namespace codegensx {
 using namespace cmajor::binder;
 using namespace cmajor::symbols;
 
+const int64_t fileInfoNodeType = 0;
+const int64_t funcInfoNodeType = 1;
+const int64_t lineInfoNodeType = 2;
+const int64_t beginTryNodeType = 3;
+const int64_t endTryNodeType = 4;
+const int64_t beginCatchNodeType = 5;
+const int64_t endCatchNodeType = 6;
+
 class CODEGENSX_API SystemXCodeGenerator : public cmajor::codegenbase::CodeGenerator, public BoundNodeVisitor, public cmajor::ir::EmittingDelegate
 {
 public:
@@ -51,6 +59,9 @@ public:
     void Visit(BoundAssignmentStatement& boundAssignmentStatement) override;
     void Visit(BoundEmptyStatement& boundEmptyStatement) override;
     void Visit(BoundSetVmtPtrStatement& boundSetVmtPtrStatement) override;
+    void Visit(BoundThrowStatement& boundThrowStatement) override;
+    void Visit(BoundTryStatement& boundTryStatement) override;
+    void Visit(BoundCatchStatement& boundCatchStatement) override;
     void Visit(BoundParameter& boundParameter) override;
     void Visit(BoundLocalVariable& boundLocalVariable) override;
     void Visit(BoundMemberVariable& boundMemberVariable) override;
@@ -119,6 +130,10 @@ private:
     std::unordered_map<int, void*> utf32stringMap;
     std::unordered_map<int, void*> uuidMap;
     std::string compileUnitId;
+    bool generateLineNumbers;
+    int64_t currentTryBlockId;
+    int64_t nextTryBlockId;
+    void* currentTryNextBlock;
 };
 
 } } // namespace cmajor::codegensx

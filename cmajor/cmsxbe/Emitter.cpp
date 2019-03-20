@@ -667,6 +667,11 @@ void* Emitter::CreateBasicBlock(const std::string& name)
     return currentFunction->CreateBasicBlock();
 }
 
+int Emitter::GetBasicBlockId(void* basicBlock)
+{
+    return static_cast<cmsxi::BasicBlock*>(basicBlock)->Id();
+}
+
 void Emitter::CreateBr(void* targetBasicBlock)
 {
     context->CreateJump(static_cast<cmsxi::BasicBlock*>(targetBasicBlock));
@@ -887,6 +892,11 @@ void* Emitter::CreateNeg(void* value)
 void* Emitter::CreateFNeg(void* value)
 {
     return context->CreateNeg(static_cast<cmsxi::Value*>(value));
+}
+
+void* Emitter::CreateNop()
+{
+    return context->CreateNop();
 }
 
 std::string Emitter::GetVmtObjectName(void* symbol) const
@@ -1651,6 +1661,21 @@ void Emitter::AddMDItem(void* mdStruct, const std::string& fieldName, void* mdIt
 void Emitter::SetFunctionMdId(void* function, int mdId)
 {
     static_cast<cmsxi::Function*>(function)->SetMdId(mdId);
+}
+
+void Emitter::SetCurrentLineNumber(int currentLineNumber)
+{
+    context->SetCurrentLineNumber(currentLineNumber);
+}
+
+void* Emitter::GetMDStructRefForSourceFile(const std::string& sourceFileName)
+{
+    return context->GetMDStructRefForSourceFile(sourceFileName);
+}
+
+void Emitter::SetMetadataRef(void* inst, void* mdStructRef)
+{
+    context->SetMetadataRef(static_cast<cmsxi::Instruction*>(inst), static_cast<cmsxi::MDStructRef*>(mdStructRef));
 }
 
 } // namespace cmsxbe

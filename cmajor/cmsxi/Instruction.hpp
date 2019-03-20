@@ -18,6 +18,7 @@ class Type;
 class BasicBlock;
 class Function;
 class Context;
+class MDStructRef;
 
 class CMSXI_API Instruction : public Value
 {
@@ -27,8 +28,12 @@ public:
     virtual void Write(CodeFormatter& formatter, Function& function, Context& context) = 0;
     std::string Name(Context& context) override;
     void WriteResult(CodeFormatter& formatter, Function& function, Context& context);
+    void SetMetadataRef(MDStructRef* metadataRef_) { metadataRef = metadataRef_; }
+    void WriteMetadataRef(CodeFormatter& formatter);
+    virtual bool IsNoOperation() const { return false; }
 private:
     int resultId;
+    MDStructRef* metadataRef;
 };
 
 class CMSXI_API UnaryInstruction : public Instruction
@@ -360,6 +365,14 @@ private:
     Value* b0;
     Value* b1;
     Value* b2;
+};
+
+class CMSXI_API NoOperationInstruction : public Instruction
+{
+public:
+    NoOperationInstruction();
+    void Write(CodeFormatter& formatter, Function& function, Context& context) override;
+    bool IsNoOperation() const override { return true; }
 };
 
 } // namespace cmsxi

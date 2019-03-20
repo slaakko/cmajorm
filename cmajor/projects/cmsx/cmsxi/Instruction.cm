@@ -103,6 +103,147 @@ namespace cmsx.intermediate
         }
         public void BeginGenerateCode(MachineCode& machineCode)
         {
+            if (metadata != null)
+            {
+                MDStruct* metadataStruct = machineCode.context.compileUnit.metadata.GetMDStruct(metadata->id);
+                MDItem* nodeTypeItem = metadataStruct->GetItem("nodeType");
+                if (nodeTypeItem is MDLong*)
+                {
+                    long nodeType = cast<MDLong*>(nodeTypeItem)->value;
+                    if (nodeType == cast<long>(cmsx.assembly.LINEINFO))
+                    {
+                        MDItem* lineInfoItem = metadataStruct->GetItem("line");
+                        if (lineInfoItem is MDLong*)
+                        {
+                            lineNumber = cast<uint>(cast<MDLong*>(lineInfoItem)->value);
+                            if (machineCode.currentLineNumber == 0u)
+                            {
+                                machineCode.currentLineNumber = lineNumber;
+                            }
+                            else if (machineCode.currentLineNumber != lineNumber)
+                            {
+                                machineCode.EmitLineNumberInfo();
+                                machineCode.currentLineNumber = lineNumber;
+                            }
+                        }
+                        else
+                        {
+                            throw Exception("MDLong expected");
+                        }
+                    }
+                    else if (nodeType == cast<long>(cmsx.assembly.BEGINTRY))
+                    {
+                        MDItem* tryBlockItem = metadataStruct->GetItem("tryBlockId");
+                        if (tryBlockItem is MDLong*)
+                        {
+                            long tryBlockId = cast<MDLong*>(tryBlockItem)->value;
+                            MDItem* parentTryBlockItem = metadataStruct->GetItem("parentTryBlockId");
+                            if (parentTryBlockItem is MDLong*)
+                            {
+                                long parentTryBlockId = cast<MDLong*>(parentTryBlockItem)->value;
+                                MachineInstruction* bspecInst = machineCode.GetInstruction(cmsx.assembly.BSPEC, this);
+                                MachineInstruction* octaInst = machineCode.GetInstruction(cmsx.assembly.OCTA, null);
+                                octaInst->AddOperand(machineCode.context.GetLiteralOperand(cmsx.assembly.BEGINTRY));
+                                octaInst->AddOperand(machineCode.context.GetLiteralOperand(cast<ulong>(tryBlockId)));
+                                octaInst->AddOperand(machineCode.context.GetLiteralOperand(cast<ulong>(parentTryBlockId)));
+                                MachineInstruction* especInst = machineCode.GetInstruction(cmsx.assembly.ESPEC, null);
+                            }
+                            else
+                            {
+                                throw Exception("MDLong expected");
+                            }
+                        }
+                        else
+                        {
+                            throw Exception("MDLong expected");
+                        }
+                    }
+                    else if (nodeType == cast<long>(cmsx.assembly.ENDTRY))
+                    {
+                        MDItem* tryBlockItem = metadataStruct->GetItem("tryBlockId");
+                        if (tryBlockItem is MDLong*)
+                        {
+                            long tryBlockId = cast<MDLong*>(tryBlockItem)->value;
+                            MachineInstruction* bspecInst = machineCode.GetInstruction(cmsx.assembly.BSPEC, this);
+                            MachineInstruction* octaInst = machineCode.GetInstruction(cmsx.assembly.OCTA, null);
+                            octaInst->AddOperand(machineCode.context.GetLiteralOperand(cmsx.assembly.ENDTRY));
+                            octaInst->AddOperand(machineCode.context.GetLiteralOperand(cast<ulong>(tryBlockId)));
+                            MachineInstruction* especInst = machineCode.GetInstruction(cmsx.assembly.ESPEC, null);
+                        }
+                        else
+                        {
+                            throw Exception("MDLong expected");
+                        }
+                    }
+                    else if (nodeType == cast<long>(cmsx.assembly.BEGINCATCH))
+                    {
+                        MDItem* catchBlockItem = metadataStruct->GetItem("catchBlockId");
+                        if (catchBlockItem is MDLong*)
+                        {
+                            long catchBlockId = cast<MDLong*>(catchBlockItem)->value;
+                            MDItem* tryBlockItem = metadataStruct->GetItem("tryBlockId");
+                            if (tryBlockItem is MDLong*)
+                            {
+                                long tryBlockId = cast<MDLong*>(tryBlockItem)->value;
+                                MDItem* catchedTypeIdItem = metadataStruct->GetItem("catchedTypeId");
+                                if (catchedTypeIdItem is MDString*)
+                                {
+                                    string catchedTypeId = cast<MDString*>(catchedTypeIdItem)->value;
+                                    string catchedTypeIdStr1 = catchedTypeId.Substring(0, 16);
+                                    string catchedTypeIdStr2 = catchedTypeId.Substring(16, 16);
+                                    ulong catchedTypeId1 = ParseHexULong(catchedTypeIdStr1);
+                                    ulong catchedTypeId2 = ParseHexULong(catchedTypeIdStr2);
+                                    MachineInstruction* bspecInst = machineCode.GetInstruction(cmsx.assembly.BSPEC, this);
+                                    MachineInstruction* octaInst = machineCode.GetInstruction(cmsx.assembly.OCTA, null);
+                                    octaInst->AddOperand(machineCode.context.GetLiteralOperand(cmsx.assembly.BEGINCATCH));
+                                    octaInst->AddOperand(machineCode.context.GetLiteralOperand(cast<ulong>(catchBlockId)));
+                                    octaInst->AddOperand(machineCode.context.GetLiteralOperand(cast<ulong>(tryBlockId)));
+                                    octaInst->AddOperand(machineCode.context.GetLiteralOperand(catchedTypeId1));
+                                    octaInst->AddOperand(machineCode.context.GetLiteralOperand(catchedTypeId2));
+                                    MachineInstruction* especInst = machineCode.GetInstruction(cmsx.assembly.ESPEC, null);
+                                }
+                                else
+                                {
+                                    throw Exception("MDString expected");
+                                }
+                            }
+                            else
+                            {
+                                throw Exception("MDLong expected");
+                            }
+                        }
+                        else
+                        {
+                            throw Exception("MDLong expected");
+                        }
+                    }
+                    else if (nodeType == cast<long>(cmsx.assembly.ENDCATCH))
+                    {
+                        MDItem* catchBlockItem = metadataStruct->GetItem("catchBlockId");
+                        if (catchBlockItem is MDLong*)
+                        {
+                            long catchBlockId = cast<MDLong*>(catchBlockItem)->value;
+                            MachineInstruction* bspecInst = machineCode.GetInstruction(cmsx.assembly.BSPEC, this);
+                            MachineInstruction* octaInst = machineCode.GetInstruction(cmsx.assembly.OCTA, null);
+                            octaInst->AddOperand(machineCode.context.GetLiteralOperand(cmsx.assembly.ENDCATCH));
+                            octaInst->AddOperand(machineCode.context.GetLiteralOperand(cast<ulong>(catchBlockId)));
+                            MachineInstruction* especInst = machineCode.GetInstruction(cmsx.assembly.ESPEC, null);
+                        }
+                        else
+                        {
+                            throw Exception("MDLong expected");
+                        }
+                    }
+                    else
+                    {
+                        throw Exception("unknown metadata nodeType");
+                    }
+                }
+                else
+                {
+                    throw Exception("MDLong expected");
+                }
+            }
             this->machineCode = &machineCode;
             startMachineInstructionIndex = machineCode.CurrentIndex();
         }
@@ -130,6 +271,8 @@ namespace cmsx.intermediate
         public MachineCode* machineCode;
         public long startMachineInstructionIndex;
         public long endMachineInstructionIndex;
+        public MDStructRef* metadata;
+        public uint lineNumber;
     }
 
     public abstract class TerminatorInstruction : Instruction
@@ -449,6 +592,26 @@ namespace cmsx.intermediate
         public Value* left;
         public Value* right;
         public Operator binOp;
+    }
+
+    public class NoOperationInstruction : Instruction
+    {
+        public nothrow NoOperationInstruction(int line_) : base(line_)
+        {
+        }
+        public override nothrow string Name() const
+        {
+            return "nop";
+        }
+        public override nothrow string OperationName() const
+        {
+            return "nop";
+        }
+        public override void GenerateCode(MachineCode& machineCode, CodeFormatter& formatter)
+        {
+            BeginGenerateCode(machineCode);
+            EndGenerateCode();
+        }
     }
 
     public class NotInstruction : UnaryInstruction

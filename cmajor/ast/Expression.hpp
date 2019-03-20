@@ -453,6 +453,22 @@ private:
     bool static_;
 };
 
+class AST_API TypeIdNode : public Node
+{
+public:
+    TypeIdNode(const Span& span_);
+    TypeIdNode(const Span& span_, Node* expression_);
+    Node* Clone(CloneContext& cloneContext) const override;
+    void Accept(Visitor& visitor) override;
+    void Write(AstWriter& writer) override;
+    void Read(AstReader& reader) override;
+    const Node* Expression() const { return expression.get(); }
+    Node* Expression() { return expression.get(); }
+    std::string ToString() const override;
+private:
+    std::unique_ptr<Node> expression;
+};
+
 class AST_API CastNode : public Node
 {
 public:

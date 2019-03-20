@@ -36,25 +36,31 @@ namespace cmsx.intermediate
         }
         public void GenerateDeclaration(MachineCode& machineCode)
         {
-            if (once)
+            if (initializer != null)
             {
-                MachineInstruction* linkOnceInst = machineCode.GetInstruction(cmsx.assembly.LINKONCE, null);
-                linkOnceInst->AddOperand(machineCode.context.GetSymbolOperand(name));
-            }
-            else
-            {
-                MachineInstruction* externInst = machineCode.GetInstruction(cmsx.assembly.EXTERN, null);
-                externInst->AddOperand(machineCode.context.GetSymbolOperand(name));
+                if (once)
+                {
+                    MachineInstruction* linkOnceInst = machineCode.GetInstruction(cmsx.assembly.LINKONCE, null);
+                    linkOnceInst->AddOperand(machineCode.context.GetSymbolOperand(name));
+                }
+                else
+                {
+                    MachineInstruction* externInst = machineCode.GetInstruction(cmsx.assembly.EXTERN, null);
+                    externInst->AddOperand(machineCode.context.GetSymbolOperand(name));
+                }
             }
         }
         public void GenerateDefinition(MachineCode& machineCode, Context& context)
         {
-            MachineInstruction* structInst = machineCode.GetInstruction(cmsx.assembly.STRUCT, name);
-            MachineInstruction* octaInst = machineCode.GetInstruction(cmsx.assembly.OCTA, null);
-            string dataLabel = name + "_data";
-            octaInst->AddOperand(machineCode.context.GetSymbolOperand(dataLabel));
-            initializer->GenerateCode(machineCode, dataLabel, context);
-            MachineInstruction* endSInst = machineCode.GetInstruction(cmsx.assembly.ENDS, name);
+            if (initializer != null)
+            {
+                MachineInstruction* structInst = machineCode.GetInstruction(cmsx.assembly.STRUCT, name);
+                MachineInstruction* octaInst = machineCode.GetInstruction(cmsx.assembly.OCTA, null);
+                string dataLabel = name + "_data";
+                octaInst->AddOperand(machineCode.context.GetSymbolOperand(dataLabel));
+                initializer->GenerateCode(machineCode, dataLabel, context);
+                MachineInstruction* endSInst = machineCode.GetInstruction(cmsx.assembly.ENDS, name);
+            }
         }
         public void Print(CodeFormatter& formatter)
         {

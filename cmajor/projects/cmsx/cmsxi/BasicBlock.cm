@@ -9,15 +9,27 @@ namespace cmsx.intermediate
         public nothrow BasicBlock(Function& function_, uint id_) : function(function_), id(id_), registerDescriptors(function.context.regs), empty(true)
         {
         }
-        public nothrow void AddInstruction(Instruction* instruction)
+        public nothrow void AddInstruction(Instruction* instruction, MDStructRef* metadata)
         {
             instruction->parent = this;
+            instruction->metadata = metadata;
             instructions.Add(UniquePtr<Instruction>(instruction));
             empty = false;
         }
         public nothrow Instruction* GetLeader() const
         {
             return instructions.Front().Get();
+        }
+        public nothrow Instruction* GetLastInstruction() const
+        {
+            if (!instructions.IsEmpty())
+            {
+                return instructions.Back().Get();
+            }
+            else
+            {
+                return null;
+            }
         }
         public void MapInstructions(uint& nextIdNumber)
         {

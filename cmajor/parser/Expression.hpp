@@ -1,5 +1,5 @@
-#ifndef Expression_hpp_22807
-#define Expression_hpp_22807
+#ifndef Expression_hpp_10315
+#define Expression_hpp_10315
 
 #include <cmajor/parsing/Grammar.hpp>
 #include <cmajor/parsing/Keyword.hpp>
@@ -37,6 +37,7 @@ private:
     class PrimaryRule;
     class SizeOfExprRule;
     class TypeNameExprRule;
+    class TypeIdExprRule;
     class CastExprRule;
     class ConstructExprRule;
     class NewExprRule;
@@ -47,4 +48,4 @@ private:
 
 } } // namespace cmajor.parser
 
-#endif // Expression_hpp_22807
+#endif // Expression_hpp_10315

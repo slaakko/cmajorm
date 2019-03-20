@@ -11,7 +11,7 @@ namespace cmsx.intermediate
     {
         public nothrow Function(Context& context_, FunctionType* type_, const string& name_, bool once_, MDStructRef* md_) :
             context(context_), type(type_), name(name_), addressDescriptors(), frameLocations(context.regs), nextValueNumber(0), nextInstructionIndex(0), nextArgIndex(0), frameSizeOperand(null),
-            prolog(*this, prologId), epilog(*this, epilogId), once(once_), md(md_)
+            prolog(*this, prologId), epilog(*this, epilogId), once(once_), md(md_), frameSize(0u)
         {
         }
         public BasicBlock* AddBasicBlock(uint id)
@@ -181,6 +181,7 @@ namespace cmsx.intermediate
         }
         public void GenerateCode(MachineCode& machineCode, CodeFormatter& formatter)
         {
+            machineCode.currentLineNumber = 0u;
             nextInstructionIndex = 0;
             nextValueNumber = 0;
             epilog.id = cast<uint>(basicBlocks.Count());
@@ -195,13 +196,23 @@ namespace cmsx.intermediate
             {
                 basicBlock->GenerateCode(machineCode, formatter);
             }
+            if (!basicBlocks.IsEmpty())
+            {
+                const UniquePtr<BasicBlock>& lastBasicBlock = basicBlocks.Back();
+                Instruction* lastInst = lastBasicBlock->GetLastInstruction();
+                if (lastInst != null && lastInst->lineNumber != 0u)
+                {
+                    machineCode.EmitLineNumberInfo();
+                }
+            }
             if (Flags.Get(Flag.debug))
             {
                 formatter.DecIndent();
                 formatter.WriteLine("}");
             }
             CreateEpilog(machineCode);
-            frameSizeOperand->SetValue(cast<ulong>(frameLocations.paramOffset));
+            frameSize = cast<ulong>(frameLocations.paramOffset);
+            frameSizeOperand->SetValue(frameSize);
         }
         private void CreateProlog(MachineCode& machineCode)
         {
@@ -240,6 +251,7 @@ namespace cmsx.intermediate
         public BasicBlock prolog;
         public BasicBlock epilog;
         public MDStructRef* md;
+        public ulong frameSize;
         private List<UniquePtr<BasicBlock>> basicBlocks;
         private List<UniquePtr<Value>> values;
         private HashMap<uint, IdValue*> idValueMap;

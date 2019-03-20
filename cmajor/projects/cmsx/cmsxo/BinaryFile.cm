@@ -904,6 +904,12 @@ namespace cmsx.object
             {
                 throw Exception("file is null");
             }
+            Symbol* debugInfoSymbol = file->GetSymbolTable().GetSymbol("@debug_info");
+            long maxPos = MaxValue<long>();
+            if (debugInfoSymbol != null)
+            {
+                maxPos = cast<long>(debugInfoSymbol->value.value);
+            }
             BinaryFileFormatter formatter(*file);
             base->Dump(writer);
             ulong startOffset = cast<ulong>(-1);
@@ -931,6 +937,10 @@ namespace cmsx.object
             int b = GetByte();
             while (b != -1)
             {
+                if (pos >= maxPos)
+                {
+                    break;
+                }
                 baseAddr = BaseAddress() + address;
                 if (baseAddr == startOffset)
                 {
@@ -966,10 +976,159 @@ namespace cmsx.object
             {
                 writer.WriteLine(currentHeader + " " + currentBytes + " " + currentChars);
             }
+            writer.WriteLine();
+            if (debugInfoSymbol != null)
+            {
+                writer.WriteLine("DEBUG INFO");
+                writer.WriteLine("start:  " + ToHexString(debugInfoSymbol->start));
+                writer.WriteLine("length: " + ToHexString(debugInfoSymbol->length));
+                writer.WriteLine();
+                Symbol* functionTableSymbol = file->GetSymbolTable().GetSymbol("@function_table");
+                DumpFunctionTable(functionTableSymbol, writer);
+            }
         }
         public override void Finalize()
         {
             Align(8u);
+        }
+        private void DumpFunctionTable(Symbol* functionTableSymbol, StreamWriter& writer)
+        {
+            writer.WriteLine("FUNCTION TABLE");
+            writer.WriteLine("start:  " + ToHexString(functionTableSymbol->start));
+            writer.WriteLine("length: " + ToHexString(functionTableSymbol->length));
+            writer.WriteLine();
+            long prevPos = pos;
+            long functionTableStartPos = cast<long>(functionTableSymbol->value.value);
+            long functionTableEndPos = functionTableStartPos + cast<long>(functionTableSymbol->length);
+            pos = functionTableStartPos;
+            while (pos < functionTableEndPos)
+            {
+                DumpFunctionTableEntry(writer);
+            }
+        }
+        private void DumpFunctionTableEntry(StreamWriter& writer)
+        {
+            writer.WriteLine("FUNCTION TABLE ENTRY");
+            ulong start = GetULong();
+            Symbol* functionSymbol = file->GetSymbolTable().GetSymbolByAddress(start);
+            ulong length = GetULong();
+            ulong mangledNameAddress = GetULong();
+            ulong fullNameAddress = GetULong();
+            ulong sourceFileNameAddress = GetULong();
+            ulong lineNumberTableStartAddress = GetULong();
+            ulong lineNumberTableEndAddress = GetULong();
+            ulong exceptionTableAddress = GetULong();
+            writer.Write("                start: " + ToHexString(start));
+            if (functionSymbol != null)
+            {
+                writer.Write(" " + functionSymbol->name);
+            }
+            writer.WriteLine();
+            writer.WriteLine("               length: " + ToHexString(length));
+            writer.WriteLine("          mangledName: " + ToHexString(mangledNameAddress) + " " + GetString(mangledNameAddress));
+            writer.WriteLine("             fullName: " + ToHexString(fullNameAddress) + " " + GetString(fullNameAddress));
+            writer.WriteLine("       sourceFileName: " + ToHexString(sourceFileNameAddress) + " " + GetString(sourceFileNameAddress));
+            writer.WriteLine(" lineNumberTableStart: " + ToHexString(lineNumberTableStartAddress));
+            writer.WriteLine("   lineNumberTableEnd: " + ToHexString(lineNumberTableEndAddress));
+            writer.Write    ("      lineNumberTable: ");
+            DumpLineNumberTable(lineNumberTableStartAddress, lineNumberTableEndAddress, writer);
+            writer.WriteLine();
+            writer.WriteLine("exceptionTableAddress: " + ToHexString(exceptionTableAddress));
+            if (exceptionTableAddress != 0u)
+            {
+                DumpExceptionTable(exceptionTableAddress, writer);
+            }
+            writer.WriteLine();
+        }
+        private string GetString(ulong address)
+        {
+            long prevPos = pos;
+            pos = cast<long>(address);
+            string s = GetString();
+            pos = prevPos;
+            return s;
+        }
+        private void DumpLineNumberTable(ulong lineNumberTableStartAddress, ulong lineNumberTableEndAddress, StreamWriter& writer)
+        {
+            if (lineNumberTableStartAddress == lineNumberTableEndAddress) return;
+            writer.Write("[");
+            long prevPos = pos;
+            pos = cast<long>(lineNumberTableStartAddress);
+            bool first = true;
+            while (pos < cast<long>(lineNumberTableEndAddress))
+            {
+                if (first)
+                {
+                    first = false;
+                }
+                else
+                {
+                    writer.Write(" : ");
+                }
+                uint offset = GetUInt();
+                uint line = GetUInt();
+                writer.Write("offset: " + ToString(offset) + ", line: " + ToString(line));
+            }
+            writer.Write("]");
+            pos = prevPos;
+        }
+        private void DumpExceptionTable(ulong exceptionTableAddress, StreamWriter& writer)
+        {
+            writer.WriteLine();
+            writer.WriteLine("EXCEPTION TABLE " + ToHexString(exceptionTableAddress));
+            long prevPos = pos;
+            pos = cast<long>(exceptionTableAddress);
+            ulong numDispatchTableEntries = GetULong();
+            Set<ulong> exceptionBlockTableAddressSet;
+            for (ulong i = 0u; i < numDispatchTableEntries; ++i)
+            {
+                uint offset = GetUInt();
+                uint length = GetUInt();
+                ulong exceptionBlockTableAddress = GetULong();
+                writer.WriteLine("offset: " + ToString(offset) + ", length: " + ToString(length) + ", exception block table address: " + ToHexString(exceptionBlockTableAddress));
+                exceptionBlockTableAddressSet.Insert(exceptionBlockTableAddress);
+            }
+            for (ulong exceptionBlockTableAddress : exceptionBlockTableAddressSet)
+            {
+                writer.WriteLine();
+                writer.WriteLine("EXCEPTION BLOCK TABLE " + ToHexString(exceptionBlockTableAddress));
+                long prevPos = pos;
+                pos = cast<long>(exceptionBlockTableAddress);
+                while (true)
+                {
+                    ulong discriminator = GetULong();
+                    if (discriminator == handlerBlockDiscriminator)
+                    {
+                        writer.WriteLine();
+                        writer.WriteLine("HANDLER BLOCK");
+                        ulong catchedClassId = GetULong();
+                        ulong handlerAddress = GetULong();
+                        writer.WriteLine("catched class id: " + ToString(catchedClassId));
+                        writer.Write("handlerAddress:   " + ToHexString(handlerAddress) + " ");
+                        Symbol* handlerSymbol = file->GetSymbolTable().GetSymbolByAddress(handlerAddress);
+                        if (handlerSymbol != null)
+                        {
+                            writer.Write(handlerSymbol->name);
+                        }
+                        writer.WriteLine();
+                    }
+                    else if (discriminator == cleanupBlockDiscriminator)
+                    {
+                        writer.WriteLine();
+                        writer.WriteLine("CLEANUP BLOCK");
+                    }
+                    else if (discriminator == endBlockDiscriminator)
+                    {
+                        break;
+                    }
+                    else
+                    {
+                        throw Exception("unknonwn exception block table discriminator " + ToString(discriminator));
+                    }
+                }
+                pos = prevPos;  
+            }
+            pos = prevPos;
         }
         private List<Symbol*> symbols;
         private List<ulong> startOffsets;
@@ -1078,6 +1237,8 @@ namespace cmsx.object
                 symbol->linkEnd = cast<int>(linkEnd);
                 int alignment = GetByte();
                 symbol->alignment = cast<byte>(alignment);
+                uint frameSize = GetUInt();
+                symbol->frameSize = frameSize;
                 file->GetSymbolTable().AddSymbol(symbol, false);
             }
             ulong numInternalSymbols = GetULong();
@@ -1118,6 +1279,8 @@ namespace cmsx.object
                 symbol->linkEnd = cast<int>(linkEnd);
                 int alignment = GetByte();
                 symbol->alignment = cast<byte>(alignment);
+                uint frameSize = GetUInt();
+                symbol->frameSize = frameSize;
                 file->GetSymbolTable().AddInternalSymbol(symbol, false);
             }
         }
@@ -1153,6 +1316,7 @@ namespace cmsx.object
             EmitUInt(cast<uint>(symbol->linkStart));
             EmitUInt(cast<uint>(symbol->linkEnd));
             EmitByte(symbol->alignment);
+            EmitUInt(symbol->frameSize);
         }
         public void EmitValue(const Value& value)
         {
@@ -1193,6 +1357,7 @@ namespace cmsx.object
                     symbolLine.Append(" ").Append(ToString(symbol->linkEnd));
                 }
                 symbolLine.Append(" ").Append(ToString(symbol->alignment));
+                symbolLine.Append(" ").Append(ToString(symbol->frameSize));
                 writer.WriteLine(symbolLine);
             }
             for (const UniquePtr<Symbol>& symbol : symbolTable.InternalSymbols())
@@ -1338,11 +1503,64 @@ namespace cmsx.object
                     break;
                 }
                 string debugLine = Format(DebugRecordCodeStr(debugRecordCode), maxDebugCodeStrLength);
-                if (debugRecordCode == DebugRecordCode.functionInfo)
+                if (debugRecordCode == DebugRecordCode.fileInfo)
+                {
+                    string sourceFileName = GetString();
+                    uint sourceFileNameId = GetUInt();
+                    debugLine.Append(" ").Append(sourceFileName).Append(" ").Append(ToString(sourceFileNameId));
+                }
+                else if (debugRecordCode == DebugRecordCode.functionInfo)
                 {
                     uint functionSymbolIndex = GetUInt();
                     string functionFullName = GetString();
-                    debugLine.Append(" ").Append(ToString(functionSymbolIndex)).Append(' ').Append(functionFullName);
+                    uint sourceFileNameId = GetUInt();
+                    uint frameSize = GetUInt();
+                    debugLine.Append(" ").Append(ToString(functionSymbolIndex)).Append(' ').Append(functionFullName).Append(' ').Append(ToString(sourceFileNameId)).Append(' ').Append(ToString(frameSize));
+                }
+                else if (debugRecordCode == DebugRecordCode.startFunc)
+                {
+                    uint functionSymbolIndex = GetUInt();
+                    Symbol* functionSymbol = file->GetSymbolTable().GetSymbol(cast<int>(functionSymbolIndex));
+                    debugLine.Append(" ").Append(ToString(functionSymbolIndex)).Append(' ').Append(functionSymbol->name);
+                }
+                else if (debugRecordCode == DebugRecordCode.endFunc)
+                {
+                    uint functionSymbolIndex = GetUInt();
+                    Symbol* functionSymbol = file->GetSymbolTable().GetSymbol(cast<int>(functionSymbolIndex));
+                    debugLine.Append(" ").Append(ToString(functionSymbolIndex)).Append(' ').Append(functionSymbol->name);
+                }
+                else if (debugRecordCode == DebugRecordCode.lineInfo)
+                {
+                    uint offset = GetUInt();
+                    uint line = GetUInt();
+                    debugLine.Append(" ").Append(ToString(offset)).Append(' ').Append(ToString(line));
+                }
+                else if (debugRecordCode == DebugRecordCode.beginTry)
+                {
+                    uint tryBlockId = GetUInt();
+                    uint parentTryBlockId = GetUInt();
+                    uint offset = GetUInt();
+                    debugLine.Append(" ").Append(ToString(tryBlockId)).Append(' ').Append(ToString(parentTryBlockId)).Append(' ').Append(ToString(offset));
+                }
+                else if (debugRecordCode == DebugRecordCode.endTry)
+                {
+                    uint tryBlockId = GetUInt();
+                    uint offset = GetUInt();
+                    debugLine.Append(" ").Append(ToString(tryBlockId)).Append(' ').Append(ToString(offset));
+                }
+                else if (debugRecordCode == DebugRecordCode.beginCatch)
+                {
+                    uint catchBlockId = GetUInt();
+                    uint tryBlockId = GetUInt();
+                    ulong catchTypeId1 = GetULong();
+                    ulong catchTypeId2 = GetULong();
+                    Uuid catchedTypeId(catchTypeId1, catchTypeId2);
+                    debugLine.Append(" ").Append(ToString(catchBlockId)).Append(' ').Append(ToString(tryBlockId)).Append(' ').Append(ToString(catchedTypeId));
+                }
+                else if (debugRecordCode == DebugRecordCode.endCatch)
+                {
+                    uint catchBlockId = GetUInt();
+                    debugLine.Append(" ").Append(ToString(catchBlockId));
                 }
                 else
                 {
@@ -1357,6 +1575,56 @@ namespace cmsx.object
             EmitByte(cast<byte>(DebugRecordCode.functionInfo));
             EmitUInt(functionInfo.functionSymbolIndex);
             EmitString(functionInfo.fullName);
+            EmitUInt(functionInfo.sourceFileNameId);
+            EmitUInt(functionInfo.frameSize);
+        }
+        public void EmitLineInfo(const LineInfo& lineInfo)
+        {
+            EmitByte(cast<byte>(DebugRecordCode.lineInfo));
+            EmitUInt(lineInfo.offset);
+            EmitUInt(lineInfo.lineNumber);
+        }
+        public void EmitSourceFileName(const string& sourceFileName, uint sourceFileNameId)
+        {
+            EmitByte(cast<byte>(DebugRecordCode.fileInfo));
+            EmitString(sourceFileName);
+            EmitUInt(sourceFileNameId);
+        }
+        public void EmitStartFunc(uint functionSymbolIndex)
+        {
+            EmitByte(cast<byte>(DebugRecordCode.startFunc));
+            EmitUInt(functionSymbolIndex);
+        }
+        public void EmitEndFunc(uint functionSymbolIndex)
+        {
+            EmitByte(cast<byte>(DebugRecordCode.endFunc));
+            EmitUInt(functionSymbolIndex);
+        }
+        public void EmitBeginTry(uint tryBlockId, uint parentTryBlockId, uint offset)
+        {
+            EmitByte(cast<byte>(DebugRecordCode.beginTry));
+            EmitUInt(tryBlockId);
+            EmitUInt(parentTryBlockId);
+            EmitUInt(offset);
+        }
+        public void EmitEndTry(uint tryBlockId, uint offset)
+        {
+            EmitByte(cast<byte>(DebugRecordCode.endTry));
+            EmitUInt(tryBlockId);
+            EmitUInt(offset);
+        }
+        public void EmitBeginCatch(uint catchBlockId, uint tryBlockId, ulong catchedTypeId1, ulong catchedTypeId2)
+        {
+            EmitByte(cast<byte>(DebugRecordCode.beginCatch));
+            EmitUInt(catchBlockId);
+            EmitUInt(tryBlockId);
+            EmitULong(catchedTypeId1);
+            EmitULong(catchedTypeId2);
+        }
+        public void EmitEndCatch(uint catchBlockId)
+        {
+            EmitByte(cast<byte>(DebugRecordCode.endCatch));
+            EmitUInt(catchBlockId);
         }
         public override void Finalize()
         {

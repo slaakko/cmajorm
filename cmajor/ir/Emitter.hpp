@@ -160,6 +160,7 @@ public:
     virtual void* GetArrayBeginAddress(void* arrayPtr) = 0;
     virtual void* GetArrayEndAddress(void* arrayPtr, uint64_t size) = 0;
     virtual void* CreateBasicBlock(const std::string& name) = 0;
+    virtual int GetBasicBlockId(void* basicBlock) = 0;
     virtual void CreateBr(void* targetBasicBlock) = 0;
     virtual void* CurrentBasicBlock() const = 0;
     virtual void SetCurrentBasicBlock(void* basicBlock) = 0;
@@ -204,6 +205,7 @@ public:
     virtual void* CreateNot(void* value) = 0;
     virtual void* CreateNeg(void* value) = 0;
     virtual void* CreateFNeg(void* value) = 0;
+    virtual void* CreateNop() = 0;
     virtual std::string GetVmtObjectName(void* symbol) const = 0;
     virtual void SetVmtObjectName(void* symbol, const std::string& vmtObjectName) = 0;
     virtual std::string GetImtArrayObjectName(void* symbol) const = 0;
@@ -333,6 +335,9 @@ public:
     virtual int GetMDStructId(void* mdStruct) = 0;
     virtual void AddMDItem(void* mdStruct, const std::string& fieldName, void* mdItem) = 0;
     virtual void SetFunctionMdId(void* function, int mdId) = 0;
+    virtual void* GetMDStructRefForSourceFile(const std::string& sourceFileName) = 0;
+    virtual void SetCurrentLineNumber(int currentLineNumber) = 0;
+    virtual void SetMetadataRef(void* inst, void* mdStructRef) = 0;
 private:
     ValueStack* stack;
 };

@@ -1042,6 +1042,43 @@ std::string TypeNameNode::ToString() const
     return "typename(" + expression->ToString() + ")";
 }
 
+TypeIdNode::TypeIdNode(const Span& span_) : Node(NodeType::typeIdNode, span_), expression()
+{
+}
+
+TypeIdNode::TypeIdNode(const Span& span_, Node* expression_) : Node(NodeType::typeIdNode, span_), expression(expression_)
+{
+    expression->SetParent(this);
+}
+
+Node* TypeIdNode::Clone(CloneContext& cloneContext) const
+{
+    return new TypeIdNode(GetSpan(), expression->Clone(cloneContext));
+}
+
+void TypeIdNode::Accept(Visitor& visitor)
+{
+    visitor.Visit(*this);
+}
+
+void TypeIdNode::Write(AstWriter& writer)
+{
+    Node::Write(writer);
+    writer.Write(expression.get());
+}
+
+void TypeIdNode::Read(AstReader& reader)
+{
+    Node::Read(reader);
+    expression.reset(reader.ReadNode());
+    expression->SetParent(this);
+}
+
+std::string TypeIdNode::ToString() const
+{
+    return "typeid(" + expression->ToString() + ")";
+}
+
 CastNode::CastNode(const Span& span_) : Node(NodeType::castNode, span_), targetTypeExpr(), sourceExpr()
 {
 }

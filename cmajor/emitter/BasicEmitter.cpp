@@ -1302,6 +1302,11 @@ void BasicEmitter::Visit(BoundTypeNameExpression& boundTypeNameExpression)
     boundTypeNameExpression.Load(*this, OperationFlags::none);
 }
 
+void BasicEmitter::Visit(BoundTypeIdExpression& boundTypeIdExpression)
+{
+    boundTypeIdExpression.Load(*this, OperationFlags::none);
+}
+
 void BasicEmitter::Visit(BoundBitCast& boundBitCast)
 {
     boundBitCast.Load(*this, OperationFlags::none);

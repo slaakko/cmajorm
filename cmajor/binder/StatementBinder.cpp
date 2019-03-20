@@ -1561,11 +1561,21 @@ void StatementBinder::Visit(ThrowStatementNode& throwStatementNode)
                 NewNode* newNode = new NewNode(span, new IdentifierNode(span, exceptionClassType->FullName()));
                 CloneContext cloneContext;
                 newNode->AddArgument(throwStatementNode.Expression()->Clone(cloneContext));
-                InvokeNode invokeNode(span, new IdentifierNode(span, U"RtThrowException"));
-                invokeNode.AddArgument(newNode);
-                invokeNode.AddArgument(new UuidLiteralNode(span, exceptionClassType->TypeId())); 
-                std::unique_ptr<BoundExpression> throwCallExpr = BindExpression(&invokeNode, boundCompileUnit, currentFunction, containerScope, this);
-                AddStatement(new BoundThrowStatement(module, span, std::move(throwCallExpr)));
+                if (GetBackEnd() == BackEnd::llvm)
+                {
+                    InvokeNode invokeNode(span, new IdentifierNode(span, U"RtThrowException"));
+                    invokeNode.AddArgument(newNode);
+                    invokeNode.AddArgument(new UuidLiteralNode(span, exceptionClassType->TypeId()));
+                    std::unique_ptr<BoundExpression> throwCallExpr = BindExpression(&invokeNode, boundCompileUnit, currentFunction, containerScope, this);
+                    AddStatement(new BoundThrowStatement(module, span, std::move(throwCallExpr)));
+                }
+                else if (GetBackEnd() == BackEnd::cmsx)
+                {
+                    InvokeNode invokeNode(span, new DotNode(span, new IdentifierNode(span, U"System"), new IdentifierNode(span, U"Throw")));
+                    invokeNode.AddArgument(newNode);
+                    std::unique_ptr<BoundExpression> throwCallExpr = BindExpression(&invokeNode, boundCompileUnit, currentFunction, containerScope, this);
+                    AddStatement(new BoundThrowStatement(module, span, std::move(throwCallExpr)));
+                }
             }
             else
             {
@@ -1640,9 +1650,18 @@ void StatementBinder::Visit(CatchNode& catchNode)
     CompoundStatementNode handlerBlock(span);
     handlerBlock.SetEndBraceSpan(catchNode.CatchBlock()->EndBraceSpan());
     handlerBlock.SetParent(catchNode.Parent());
-    ConstructionStatementNode* getExceptionAddr = new ConstructionStatementNode(span, new PointerNode(span, new IdentifierNode(span, U"void")), new IdentifierNode(span, U"@exceptionAddr"));
-    getExceptionAddr->AddArgument(new InvokeNode(span, new IdentifierNode(span, U"RtGetException")));
-    handlerBlock.AddStatement(getExceptionAddr);
+    if (GetBackEnd() == BackEnd::llvm)
+    {
+        ConstructionStatementNode* getExceptionAddr = new ConstructionStatementNode(span, new PointerNode(span, new IdentifierNode(span, U"void")), new IdentifierNode(span, U"@exceptionAddr"));
+        getExceptionAddr->AddArgument(new InvokeNode(span, new IdentifierNode(span, U"RtGetException")));
+        handlerBlock.AddStatement(getExceptionAddr);
+    }
+    else if (GetBackEnd() == BackEnd::cmsx)
+    {
+        ConstructionStatementNode* getExceptionAddr = new ConstructionStatementNode(span, new PointerNode(span, new IdentifierNode(span, U"void")), new IdentifierNode(span, U"@exceptionAddr"));
+        getExceptionAddr->AddArgument(new InvokeNode(span, new IdentifierNode(span, U"do_catch")));
+        handlerBlock.AddStatement(getExceptionAddr);
+    }
     PointerNode exceptionPtrTypeNode(span, new IdentifierNode(span, catchedType->BaseType()->FullName()));
     CloneContext cloneContext;
     ConstructionStatementNode* constructExceptionPtr = new ConstructionStatementNode(span, exceptionPtrTypeNode.Clone(cloneContext), new IdentifierNode(span, U"@exceptionPtr"));

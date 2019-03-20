@@ -21,8 +21,7 @@ void CompileUnit::SetId(const std::string& id_)
 void CompileUnit::SetSourceFilePath(const std::string& sourceFilePath_)
 {
     sourceFilePath = sourceFilePath_;
-    cu = context.CreateMDStruct();
-    cu->AddItem("sourceFilePath", context.CreateMDString(sourceFilePath));
+    cu = context.GetMDStructRefForSourceFile(sourceFilePath);
 }
 
 Function* CompileUnit::GetOrInsertFunction(const std::string& name, FunctionType* type)
@@ -34,7 +33,7 @@ Function* CompileUnit::GetOrInsertFunction(const std::string& name, FunctionType
     }
     else
     {
-        Function* function = new Function(name, type);
+        Function* function = new Function(name, type, context);
         functions.push_back(std::unique_ptr<Function>(function));
         functionMap[name] = function;
         return function;

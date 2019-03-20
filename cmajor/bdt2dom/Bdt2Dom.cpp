@@ -80,6 +80,7 @@ public:
     void Visit(BoundIsExpression& boundIsExpression) override;
     void Visit(BoundAsExpression& boundAsExpression) override;
     void Visit(BoundTypeNameExpression& boundTypeNameExpression) override;
+    void Visit(BoundTypeIdExpression& boundTypeIdExpression) override;
     void Visit(BoundBitCast& boundBitCast) override;
     void Visit(BoundFunctionPtr& boundFunctionPtr) override;
     void Visit(BoundDisjunction& boundDisjunction) override;
@@ -864,6 +865,24 @@ void Bdt2DomVisitor::Visit(BoundTypeNameExpression& boundTypeNameExpression)
         currentElement->AppendChild(std::unique_ptr<dom::Node>(typeElement.release()));
     }
     boundTypeNameExpression.ClassPtr()->Accept(*this);
+    prevElement->AppendChild(std::unique_ptr<dom::Node>(typeNameElement.release()));
+    currentElement = prevElement;
+}
+
+void Bdt2DomVisitor::Visit(BoundTypeIdExpression& boundTypeIdExpression)
+{
+    CheckCurrentElement();
+    std::unique_ptr<dom::Element> typeNameElement(new dom::Element(U"BoundTypeIdExpression"));
+    dom::Element* prevElement = currentElement;
+    currentElement = typeNameElement.get();
+    if (boundTypeIdExpression.GetType())
+    {
+        std::unique_ptr<dom::Element> typeElement(new dom::Element(U"type"));
+        int typeId = typeMap.GetOrInsertType(boundTypeIdExpression.GetType());
+        typeElement->SetAttribute(U"ref", U"type_" + ToUtf32(std::to_string(typeId)));
+        currentElement->AppendChild(std::unique_ptr<dom::Node>(typeElement.release()));
+    }
+    boundTypeIdExpression.ClassPtr()->Accept(*this);
     prevElement->AppendChild(std::unique_ptr<dom::Node>(typeNameElement.release()));
     currentElement = prevElement;
 }

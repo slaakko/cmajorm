@@ -203,6 +203,7 @@ public:
     void Visit(PostfixDecrementNode& postfixDecrementNode) override;
     void Visit(SizeOfNode& sizeOfNode) override;
     void Visit(TypeNameNode& typeNameNode) override;
+    void Visit(TypeIdNode& typeIdNode) override;
     void Visit(CastNode& castNode) override;
     void Visit(ConstructNode& constructNode) override;
     void Visit(NewNode& newNode) override;
@@ -2147,6 +2148,17 @@ void Ast2DomVisitor::Visit(TypeNameNode& typeNameNode)
     currentElement = typeNameElement.get();
     typeNameNode.Expression()->Accept(*this);
     prevElement->AppendChild(std::unique_ptr<dom::Node>(typeNameElement.release()));
+    currentElement = prevElement;
+}
+
+void Ast2DomVisitor::Visit(TypeIdNode& typeIdNode)
+{
+    CheckCurrentElement();
+    std::unique_ptr<dom::Element> typeIdElement(new dom::Element(U"TypeIdNode"));
+    dom::Element* prevElement = currentElement;
+    currentElement = typeIdElement.get();
+    typeIdNode.Expression()->Accept(*this);
+    prevElement->AppendChild(std::unique_ptr<dom::Node>(typeIdElement.release()));
     currentElement = prevElement;
 }
 

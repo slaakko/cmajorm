@@ -68,6 +68,12 @@ namespace cmsx.kernel
         TrapHandler stackTraceSystemCallHandler = StackTrace;
         ulong stackTraceSystemCallAddress = cast<ulong>(cast<void*>(stackTraceSystemCallHandler));
         mem.WriteULong(MakeSystemCallPtrAddress(stackTraceSystemCall), stackTraceSystemCallAddress, Protection.write);
+        TrapHandler throwSystemCallHandler = Throw;
+        ulong throwSystemCallAddress = cast<ulong>(cast<void*>(throwSystemCallHandler));
+        mem.WriteULong(MakeSystemCallPtrAddress(throwSystemCall), throwSystemCallAddress, Protection.write);
+        TrapHandler catchSystemCallHandler = Catch;
+        ulong catchSystemCallAddress = cast<ulong>(cast<void*>(catchSystemCallHandler));
+        mem.WriteULong(MakeSystemCallPtrAddress(catchSystemCall), catchSystemCallAddress, Protection.write);
     }
 
     public void Boot(Machine& machine)

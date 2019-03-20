@@ -105,6 +105,7 @@ public:
     Instruction* CreateBranch(Value* cond, BasicBlock* trueDest, BasicBlock* falseDest);
     Instruction* CreateSwitch(Value* cond, BasicBlock* defaultDest);
     Instruction* CreateTrap(const std::vector<Value*>& args);
+    Instruction* CreateNop();
     GlobalVariable* GetOrInsertGlobal(const std::string& name, Type* type);
     GlobalVariable* CreateGlobalStringPtr(const std::string& stringValue);
     void SetCompileUnitId(const std::string& compileUnitId_);
@@ -114,6 +115,10 @@ public:
     MDStructRef* CreateMDStructRef(int id) { return metadata.CreateMDStructRef(id); }
     MDStruct* CreateMDStruct() { return metadata.CreateMDStruct();  }
     void AddMDStructItem(MDStruct* mdStruct, const std::string& fieldName, MDItem* item);
+    void SetCurrentLineNumber(int lineNumber);
+    void AddLineInfo(Instruction* inst);
+    MDStructRef* GetMDStructRefForSourceFile(const std::string& sourceFileName);
+    void SetMetadataRef(Instruction* inst, MDStructRef* metadataRef);
 private:
     TypeRepository typeRepository;
     DataRepository dataRepository;
@@ -121,6 +126,9 @@ private:
     std::vector<std::unique_ptr<Value>> values;
     Function* currentFunction;
     BasicBlock* currentBasicBlock;
+    int currentLineNumber;
+    std::unordered_map<int, MDStructRef*> lineNumberInfoMap;
+    std::unordered_map<std::string, MDStructRef*> sourceFileMap;
 };
 
 } // namespace cmsxi

@@ -1764,6 +1764,59 @@ bool BoundTypeNameExpression::ContainsExceptionCapture() const
     return classPtr->ContainsExceptionCapture();
 }
 
+BoundTypeIdExpression::BoundTypeIdExpression(Module* module_, std::unique_ptr<BoundExpression>&& classPtr_, TypeSymbol* ulongType_) :
+    BoundExpression(module_, classPtr_->GetSpan(), BoundNodeType::boundTypeIdExpression, ulongType_), classPtr(std::move(classPtr_))
+{
+    classPtr->MoveTemporaryDestructorCallsTo(*this);
+}
+
+BoundExpression* BoundTypeIdExpression::Clone()
+{
+    std::unique_ptr<BoundExpression> clonedClassPtr;
+    clonedClassPtr.reset(classPtr->Clone());
+    return new BoundTypeIdExpression(GetModule(), std::move(clonedClassPtr), GetType());
+}
+
+void BoundTypeIdExpression::Load(Emitter& emitter, OperationFlags flags)
+{
+    classPtr->Load(emitter, OperationFlags::none);
+    void* thisPtr = emitter.Stack().Pop();
+    TypeSymbol* classPtrType = static_cast<TypeSymbol*>(classPtr->GetType());
+    Assert(classPtrType->IsPointerType(), "pointer type expected");
+    TypeSymbol* type = classPtrType->BaseType();
+    Assert(type->IsClassTypeSymbol(), "class type expected");
+    ClassTypeSymbol* classType = static_cast<ClassTypeSymbol*>(type);
+    ClassTypeSymbol* vmtPtrHolderClass = classType->VmtPtrHolderClass();
+    if (classType != vmtPtrHolderClass)
+    {
+        thisPtr = emitter.CreateBitCast(thisPtr, vmtPtrHolderClass->AddPointer(GetSpan())->IrType(emitter));
+    }
+    void* vmtPtr = emitter.GetVmtPtr(thisPtr, vmtPtrHolderClass->VmtPtrIndex(), classType->VmtPtrType(emitter));
+    void* classIdPtr = emitter.GetClassIdPtr(vmtPtr);
+    void* classId = emitter.CreatePtrToInt(emitter.CreateLoad(classIdPtr), emitter.GetIrTypeForULong());
+    emitter.Stack().Push(classId);
+    DestroyTemporaries(emitter);
+}
+
+void BoundTypeIdExpression::Store(Emitter& emitter, OperationFlags flags)
+{
+    throw Exception(GetModule(), "cannot store to typeid expression", GetSpan());
+}
+
+void BoundTypeIdExpression::Accept(BoundNodeVisitor& visitor)
+{
+    visitor.Visit(*this);
+}
+
+bool BoundTypeIdExpression::ContainsExceptionCapture() const
+{
+    if (BoundExpression::ContainsExceptionCapture())
+    {
+        return true;
+    }
+    return classPtr->ContainsExceptionCapture();
+}
+
 BoundBitCast::BoundBitCast(Module* module_, std::unique_ptr<BoundExpression>&& expr_, TypeSymbol* type_) : 
     BoundExpression(module_, expr_->GetSpan(), BoundNodeType::boundBitCast, type_), expr(std::move(expr_))
 {

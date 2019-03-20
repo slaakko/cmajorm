@@ -692,6 +692,7 @@ public:
     void Visit(PostfixDecrementNode& postfixDecrementNode) override;
     void Visit(SizeOfNode& sizeOfNode) override;
     void Visit(TypeNameNode& typeNameNode) override;
+    void Visit(TypeIdNode& typeIdNode) override;
     void Visit(CastNode& castNode) override;
     void Visit(ConstructNode& constructNode) override;
     void Visit(NewNode& newNode) override;
@@ -3906,6 +3907,18 @@ void Evaluator::Visit(TypeNameNode& typeNameNode)
     else
     {
         ThrowCannotEvaluateStatically(module, span, typeNameNode.GetSpan());
+    }
+}
+
+void Evaluator::Visit(TypeIdNode& typeIdNode)
+{
+    if (dontThrow)
+    {
+        error = true;
+    }
+    else
+    {
+        ThrowCannotEvaluateStatically(module, span, typeIdNode.GetSpan());
     }
 }
 

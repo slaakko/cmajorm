@@ -135,6 +135,7 @@ public:
     void* GetArrayBeginAddress(void* arrayPtr) override;
     void* GetArrayEndAddress(void* arrayPtr, uint64_t size) override;
     void* CreateBasicBlock(const std::string& name) override;
+    int GetBasicBlockId(void* basicBlock) override;
     void CreateBr(void* targetBasicBlock) override;
     void CreateCondBr(void* cond, void* trueBasicBlock, void* falseBasicBlock) override;
     void* CreateArrayIndexAddress(void* arrayPtr, void* index) override;
@@ -177,6 +178,7 @@ public:
     void* CreateNot(void* value) override;
     void* CreateNeg(void* value) override;
     void* CreateFNeg(void* value) override;
+    void* CreateNop() override;
     void* GetOrInsertGlobal(const std::string& name, void* type) override;
     void* GetOrInsertAnyComdat(const std::string& name, void* global) override;
     void* GetOrInsertAnyFunctionComdat(const std::string& name, void* function) override;
@@ -326,6 +328,9 @@ public:
     int GetMDStructId(void* mdStruct) override;
     void AddMDItem(void* mdStruct, const std::string& fieldName, void* mdItem) override;
     void SetFunctionMdId(void* function, int mdId) override;
+    void SetCurrentLineNumber(int currentLineNumber) override;
+    void* GetMDStructRefForSourceFile(const std::string& sourceFileName) override;
+    void SetMetadataRef(void* inst, void* mdStructRef) override;
 private:
     cmajor::ir::EmittingContext& emittingContext;
     cmajor::ir::EmittingDelegate* emittingDelegate;

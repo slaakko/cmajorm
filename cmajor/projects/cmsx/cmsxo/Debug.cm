@@ -5,7 +5,7 @@ namespace cmsx.object
 {
     public enum DebugRecordCode : byte
     {
-        functionInfo = 1u, end = 2u
+        fileInfo = 1u, functionInfo = 2u, lineInfo = 3u, startFunc = 4u, endFunc = 5u, beginTry = 6u, endTry = 7u, beginCatch = 8u, endCatch = 9u, end = 10u
     }
 
     public const int maxDebugCodeStrLength = 12;
@@ -14,30 +14,56 @@ namespace cmsx.object
     {
         switch (debugRecordCode)
         {
+            case DebugRecordCode.fileInfo : return "FILEINFO";
             case DebugRecordCode.functionInfo: return "FUNCTIONINFO";
+            case DebugRecordCode.lineInfo: return "LINEINFO";
+            case DebugRecordCode.startFunc: return "STARTFUNC";
+            case DebugRecordCode.endFunc: return "ENDFUNC";
+            case DebugRecordCode.beginTry: return "BEGINTRY";
+            case DebugRecordCode.endTry: return "ENDTRY";
+            case DebugRecordCode.beginCatch: return "BEGINCATCH";
+            case DebugRecordCode.endCatch: return "ENDCATCH";
         }
         return "";
     }
 
     public class FunctionInfo
     {
-        public nothrow FunctionInfo(uint functionSymbolIndex_, const string& fullName_) : functionSymbolIndex(functionSymbolIndex_), fullName(fullName_)
+        public nothrow FunctionInfo(uint functionSymbolIndex_, const string& fullName_, uint sourceFileNameId_, uint frameSize_) :
+            functionSymbolIndex(functionSymbolIndex_), fullName(fullName_), sourceFileNameId(sourceFileNameId_), frameSize(frameSize_)
         {
         }
         public uint functionSymbolIndex;
         public string fullName;
+        public uint sourceFileNameId;
+        public uint frameSize;
+    }
+
+    public class LineInfo
+    {
+        public nothrow LineInfo(uint offset_, uint lineNumber_) : offset(offset_), lineNumber(lineNumber_)
+        {
+        }
+        public uint offset;
+        public uint lineNumber;
     }
 
     public class FunctionTableEntry
     {
-        public nothrow FunctionTableEntry(ulong start_, ulong length_, ulong mangledNameAddress_, ulong fullNameAddress_) :
-            start(start_), length(length_), mangledNameAddress(mangledNameAddress_), fullNameAddress(fullNameAddress_)
+        public nothrow FunctionTableEntry(ulong start_, ulong length_, ulong mangledNameAddress_, ulong fullNameAddress_, ulong sourceFileNameAddress_,
+            ulong lineNumberTableStartAddress_, ulong lineNumberTableEndAddress_, ulong exceptionTableAddress_) :
+            start(start_), length(length_), mangledNameAddress(mangledNameAddress_), fullNameAddress(fullNameAddress_), sourceFileNameAddress(sourceFileNameAddress_),
+            lineNumberTableStartAddress(lineNumberTableStartAddress_), lineNumberTableEndAddress(lineNumberTableEndAddress_), exceptionTableAddress(exceptionTableAddress_)
         {
         }
         public ulong start;
         public ulong length;
         public ulong mangledNameAddress;
         public ulong fullNameAddress;
+        public ulong sourceFileNameAddress;
+        public ulong lineNumberTableStartAddress;
+        public ulong lineNumberTableEndAddress;
+        public ulong exceptionTableAddress;
     }
 
     public bool operator==(const FunctionTableEntry& left, const FunctionTableEntry& right)
@@ -48,5 +74,106 @@ namespace cmsx.object
     public bool operator<(const FunctionTableEntry& left, const FunctionTableEntry& right)
     {
         return left.start < right.start;
+    }
+
+    public class LineNumberTableLimits
+    {
+        public ulong startAddress;
+        public ulong endAddress;
+    }
+
+    public class LineNumberTableEntry
+    {
+        public nothrow LineNumberTableEntry(uint offset_, uint lineNumber_) : offset(offset_), lineNumber(lineNumber_)
+        {
+        }
+        public uint offset;
+        public uint lineNumber;
+    }
+
+    public bool operator==(const LineNumberTableEntry& left, const LineNumberTableEntry& right)
+    {
+        return left.offset == right.offset;
+    }
+
+    public bool operator<(const LineNumberTableEntry& left, const LineNumberTableEntry& right)
+    {
+        return left.offset < right.offset;
+    }
+
+    public class ExceptionBlock
+    {
+        public nothrow ExceptionBlock(ulong discriminator_) : discriminator(discriminator_)
+        {
+        }
+        public default virtual ~ExceptionBlock();
+        public ulong discriminator;
+    }
+
+    public const ulong endBlockDiscriminator = 0u;
+    public const ulong handlerBlockDiscriminator = 1u;
+    public const ulong cleanupBlockDiscriminator = 2u;
+
+    public class HandlerBlock : ExceptionBlock
+    {
+        public nothrow HandlerBlock(ulong catchedClassId_, ulong handlerAddress_) : base(handlerBlockDiscriminator), catchedClassId(catchedClassId_), handlerAddress(handlerAddress_)
+        {
+        }
+        public ulong catchedClassId;
+        public ulong handlerAddress;
+    }
+
+    public class DispatchTableEntry
+    {
+        public nothrow DispatchTableEntry(uint offset_, uint length_, ulong exceptionBlockTableAddress_) : offset(offset_), length(length_), exceptionBlockTableAddress(exceptionBlockTableAddress_)
+        {
+        }
+        public uint offset;
+        public uint length;
+        public ulong exceptionBlockTableAddress;
+    }
+
+    public bool operator==(const DispatchTableEntry& left, const DispatchTableEntry& right)
+    {
+        return left.offset == right.offset;
+    }
+
+    public bool operator<(const DispatchTableEntry& left, const DispatchTableEntry& right)
+    {
+        return left.offset < right.offset;
+    }
+
+    public class FunctionExceptionData
+    {
+        public nothrow FunctionExceptionData() : functionName(), tryBlocks(), cleanupBlocksNotEmpty(false)
+        {
+        }
+        public TryBlock* GetTryBlock(uint tryBlockId) const
+        {
+            for (const TryBlock& tryBlock : tryBlocks)
+            {
+                if (tryBlock.id == tryBlockId) return &tryBlock;
+            }
+            return null;
+        }
+        public nothrow bool IsEmpty() const
+        {
+            return tryBlocks.IsEmpty() && !cleanupBlocksNotEmpty;
+        }
+        public string functionName;
+        public List<TryBlock> tryBlocks;
+        public bool cleanupBlocksNotEmpty;
+    }
+
+    public class TryBlock
+    {
+        public nothrow TryBlock(uint id_, uint parentId_, uint offset_) : id(id_), parentId(parentId_), offset(offset_), length(0u)
+        {
+        }
+        public uint id;
+        public uint parentId;
+        public uint offset;
+        public uint length;
+        public List<HandlerBlock> handlerBlocks;
     }
 }

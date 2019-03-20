@@ -19,6 +19,10 @@ enum class MDItemKind : uint8_t
     bool_ = 0u, long_ = 1u, string = 2u, structRef = 3u, struct_ = 4u
 };
 
+const int64_t fileInfoNodeType = 0;
+const int64_t funcInfoNodeType = 1;
+const int64_t lineInfoNodeType = 2;
+
 class MDItem
 {
 public:

@@ -116,6 +116,7 @@ public:
     void Visit(PostfixDecrementNode& postfixDecrementNode) override;
     void Visit(SizeOfNode& sizeOfNode) override;
     void Visit(TypeNameNode& typeNameNode) override;
+    void Visit(TypeIdNode& typeNameNode) override;
     void Visit(CastNode& castNode) override;
     void Visit(ConstructNode& constructNode) override;
     void Visit(NewNode& newNode) override;
@@ -2231,6 +2232,38 @@ void ExpressionBinder::Visit(TypeNameNode& typeNameNode)
     {
         expression.reset(new BoundLiteral(module, std::unique_ptr<Value>(new StringValue(typeNameNode.GetSpan(), boundCompileUnit.Install(ToUtf8(expr->GetType()->FullName())))),
             symbolTable.GetTypeByName(U"char")->AddConst(typeNameNode.GetSpan())->AddPointer(typeNameNode.GetSpan())));
+    }
+}
+
+void ExpressionBinder::Visit(TypeIdNode& typeIdNode)
+{
+    std::unique_ptr<BoundExpression> expr = BindExpression(typeIdNode.Expression(), boundCompileUnit, boundFunction, containerScope, statementBinder, false, false, true, false);
+    if (expr->GetType()->IsPointerType())
+    {
+        TypeSymbol* exprBaseType = expr->GetType()->RemovePointer(span);
+        if (exprBaseType->IsClassTypeSymbol())
+        {
+            ClassTypeSymbol* exprClassType = static_cast<ClassTypeSymbol*>(exprBaseType);
+            if (exprClassType->IsPolymorphic())
+            {
+                expression.reset(new BoundTypeIdExpression(module, std::move(expr), symbolTable.GetTypeByName(U"ulong")));
+            }
+            else
+            {
+                throw Exception(module, "typeid can be applied to a pointer to a polymorphic class type expression",
+                    typeIdNode.GetSpan(), boundFunction->GetFunctionSymbol()->GetSpan());
+            }
+        }
+        else
+        {
+            throw Exception(module, "typeid can be applied to a pointer to a polymorphic class type expression",
+                typeIdNode.GetSpan(), boundFunction->GetFunctionSymbol()->GetSpan());
+        }
+    }
+    else
+    {
+        throw Exception(module, "typeid can be applied to a pointer to a polymorphic class type expression", 
+            typeIdNode.GetSpan(), boundFunction->GetFunctionSymbol()->GetSpan());
     }
 }
 

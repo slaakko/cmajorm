@@ -363,6 +363,11 @@ void* Emitter::CreateBasicBlock(const std::string& name)
     return llvm::BasicBlock::Create(context, name, Function());
 }
 
+int Emitter::GetBasicBlockId(void* basicBlock)
+{
+    return -1;
+}
+
 void Emitter::CreateBr(void* targetBasicBlock)
 {
     builder.CreateBr(static_cast<llvm::BasicBlock*>(targetBasicBlock));
@@ -574,6 +579,11 @@ void* Emitter::CreateNeg(void* value)
 void* Emitter::CreateFNeg(void* value)
 {
     return builder.CreateFNeg(static_cast<llvm::Value*>(value));
+}
+
+void* Emitter::CreateNop()
+{
+    return nullptr;
 }
 
 void* Emitter::GetOrInsertGlobal(const std::string& name, void* type)
@@ -1795,6 +1805,19 @@ void Emitter::AddMDItem(void* mdStruct, const std::string& fieldName, void* mdIt
 }
 
 void Emitter::SetFunctionMdId(void* function, int mdId)
+{
+}
+
+void Emitter::SetCurrentLineNumber(int currentLineNumber)
+{
+}
+
+void* Emitter::GetMDStructRefForSourceFile(const std::string& sourceFileName)
+{
+    return nullptr;
+}
+
+void Emitter::SetMetadataRef(void* inst, void* mdStructRef)
 {
 }
 

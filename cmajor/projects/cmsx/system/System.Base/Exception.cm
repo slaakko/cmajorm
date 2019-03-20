@@ -1,0 +1,39 @@
+// =================================
+// Copyright (c) 2019 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+namespace System
+{
+    public class Exception
+    {
+        public nothrow Exception(const string& message_) : message(message_)
+        {
+        }
+        public virtual default ~Exception();
+        public nothrow const string& Message() const
+        {
+            return message;
+        }
+        public nothrow const string& StackTrace() const
+        {
+            return stackTrace;
+        }
+        public void SetStackTrace(string&& stackTrace_)
+        {
+            stackTrace = stackTrace_;
+        }
+        public string ToString() const
+        {
+            return string(typename(*this)) + ": " + message + "\n" + stackTrace;
+        }
+        private string message;
+        private string stackTrace;
+    }
+    
+    public void Throw(Exception* ex)
+    {
+        ex->SetStackTrace(GetStackTrace());
+        do_throw(ex, typeid(ex));
+    }
+}

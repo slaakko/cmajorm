@@ -60,6 +60,7 @@ class BoundClassOrClassDelegateConversionResult;
 class BoundIsExpression;
 class BoundAsExpression;
 class BoundTypeNameExpression;
+class BoundTypeIdExpression;
 class BoundBitCast;
 class BoundFunctionPtr;
 class BoundDisjunction;
@@ -123,6 +124,7 @@ public:
     virtual void Visit(BoundIsExpression& boundIsExpression) {}
     virtual void Visit(BoundAsExpression& boundAsExpression) {}
     virtual void Visit(BoundTypeNameExpression& boundTypeNameExpression) {}
+    virtual void Visit(BoundTypeIdExpression& boundTypeIdExpression) {}
     virtual void Visit(BoundBitCast& boundBitCast) {}
     virtual void Visit(BoundFunctionPtr& boundFunctionPtr) {}
     virtual void Visit(BoundDisjunction& boundDisjunction) {}

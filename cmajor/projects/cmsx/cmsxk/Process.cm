@@ -80,6 +80,8 @@ namespace cmsx.kernel
         public ulong poolEnd;
         public ulong functionTableAddress;
         public ulong functionTableLength;
+        public ulong currentExceptionAddress;
+        public ulong currentExceptionTypeId;
     }
 
     public class ProcessTable
@@ -511,7 +513,7 @@ namespace cmsx.kernel
             ulong pc = pcs[i];
             List<cmsx.object.FunctionTableEntry>.ConstIterator first = functionTable.CBegin();
             List<cmsx.object.FunctionTableEntry>.ConstIterator last = functionTable.CEnd();
-            cmsx.object.FunctionTableEntry entry(pc, 0u, 0u, 0u);
+            cmsx.object.FunctionTableEntry entry(pc, 0u, 0u, 0u, 0u, 0u, 0u, 0u);
             List<cmsx.object.FunctionTableEntry>.ConstIterator it = LowerBound(first, last, entry);
             if (it != first && it == last)
             {
@@ -537,7 +539,45 @@ namespace cmsx.kernel
                 {
                     return -1;
                 }
-                stackTrace.Append(ToString(i)).Append(": ").Append(fullName).Append(" : ").Append(mangledName).Append('\n');
+                ulong sourceFileNameAddress = it->sourceFileNameAddress;
+                string sourceFileName;
+                if (sourceFileNameAddress != 0u)
+                {
+                    result = ReadStringFromProcessMemory(machine, process, dataSegmentBaseAddress + sourceFileNameAddress, sourceFileName);
+                }
+                string lineNumberStr;
+                ulong lineNumberTableStartAddress = it->lineNumberTableStartAddress;
+                ulong lineNumberTableEndAddress = it->lineNumberTableEndAddress;
+                List<cmsx.object.LineNumberTableEntry> lineNumberTable;
+                result = ReadLineNumberTableFromProcessMemory(machine, process, dataSegmentBaseAddress + lineNumberTableStartAddress, dataSegmentBaseAddress + lineNumberTableEndAddress,
+                    lineNumberTable);
+                if (result != 0)
+                {
+                    return -1;
+                }
+                List<cmsx.object.LineNumberTableEntry>.ConstIterator lnFirst = lineNumberTable.CBegin();
+                List<cmsx.object.LineNumberTableEntry>.ConstIterator lnLast = lineNumberTable.CEnd();
+                cmsx.object.LineNumberTableEntry lnEntry(cast<uint>(pc - it->start), 0u);
+                List<cmsx.object.LineNumberTableEntry>.ConstIterator lnIt = LowerBound(lnFirst, lnLast, lnEntry);
+                if (lnIt != lnFirst && lnIt == lnLast)
+                {
+                    --lnIt;
+                }
+                if (lnIt != lnFirst && lnIt != lnLast && lnEntry.offset > lnIt->offset)
+                {
+                    --lnIt;
+                }
+                if (lnIt != lnLast)
+                {
+                    uint lineNumber = lnIt->lineNumber;
+                    lineNumberStr.Append(':').Append(ToString(lineNumber));
+                }
+                string sourceFileNameStr;
+                if (!sourceFileName.IsEmpty())
+                {
+                    sourceFileNameStr.Append(" : ").Append(sourceFileName);
+                }
+                stackTrace.Append(ToString(i)).Append(": ").Append(fullName).Append(" : ").Append(mangledName).Append(sourceFileNameStr).Append(lineNumberStr).Append('\n');
             }
         }
         stackTrace.Append('\n');
@@ -684,7 +724,30 @@ namespace cmsx.kernel
             entry.length = mem.ReadULong(address + 8u, Protection.read);
             entry.mangledNameAddress = mem.ReadULong(address + 16u, Protection.read);
             entry.fullNameAddress = mem.ReadULong(address + 24u, Protection.read);
+            entry.sourceFileNameAddress = mem.ReadULong(address + 32u, Protection.read);
+            entry.lineNumberTableStartAddress = mem.ReadULong(address + 40u, Protection.read);
+            entry.lineNumberTableEndAddress = mem.ReadULong(address + 48u, Protection.read);
+            entry.exceptionTableAddress = mem.ReadULong(address + 56u, Protection.read);
             functionTable.Add(entry);
+        }
+        regs.SetSpecial(Registers.rV, prevRV);
+        return 0;
+    }
+
+    public nothrow int ReadLineNumberTableFromProcessMemory(Machine& machine, Process* process, ulong lineNumberTableStartAddress, ulong lineNumberTableEndAddress,
+        List<cmsx.object.LineNumberTableEntry>& lineNumberTable)
+    {
+        Memory& mem = machine.GetMemory();
+        Registers& regs = machine.GetRegisters();
+        ulong prevRV = regs.GetSpecial(Registers.rV);
+        MemoryTable& memoryTable = process->memoryTable;
+        regs.SetSpecial(Registers.rV, memoryTable.virtualTranslationRegisterValue);
+        for (ulong address = lineNumberTableStartAddress; address < lineNumberTableEndAddress; address = address + cast<ulong>(sizeof(cmsx.object.LineNumberTableEntry)))
+        {
+            cmsx.object.LineNumberTableEntry entry;
+            entry.offset = mem.ReadUInt(address, Protection.read);
+            entry.lineNumber = mem.ReadUInt(address + 4u, Protection.read);
+            lineNumberTable.Add(entry);
         }
         regs.SetSpecial(Registers.rV, prevRV);
         return 0;

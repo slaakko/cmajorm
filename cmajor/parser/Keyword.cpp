@@ -97,6 +97,7 @@ Keyword::Keyword(cmajor::parsing::ParsingDomain* parsingDomain_): cmajor::parsin
     keywords0.push_back(ToUtf32("true"));
     keywords0.push_back(ToUtf32("try"));
     keywords0.push_back(ToUtf32("typedef"));
+    keywords0.push_back(ToUtf32("typeid"));
     keywords0.push_back(ToUtf32("typename"));
     keywords0.push_back(ToUtf32("uchar"));
     keywords0.push_back(ToUtf32("uint"));

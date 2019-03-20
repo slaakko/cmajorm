@@ -67,6 +67,14 @@ namespace cmsx.intermediate
             machineInstructions.Add(UniquePtr<MachineInstruction>(machineInstruction));
             return machineInstruction;
         }
+        public nothrow void EmitLineNumberInfo()
+        {
+            MachineInstruction* bspecInst = GetInstruction(cmsx.assembly.BSPEC, null);
+            MachineInstruction* octaInst = GetInstruction(cmsx.assembly.OCTA, null);
+            octaInst->AddOperand(context.GetLiteralOperand(cmsx.assembly.LINEINFO));
+            octaInst->AddOperand(context.GetLiteralOperand(currentLineNumber));
+            MachineInstruction* especInst = GetInstruction(cmsx.assembly.ESPEC, null);
+        }
         public nothrow void PrintRange(long startIndex, long endIndex, CodeFormatter& formatter)
         {
             PrintRange(startIndex, endIndex, formatter, 6);
@@ -91,6 +99,7 @@ namespace cmsx.intermediate
             Print(formatter);
         }
         public Context& context;
+        public uint currentLineNumber;
         private List<UniquePtr<MachineInstruction>> machineInstructions;
         private Instruction* prevInst;
     }

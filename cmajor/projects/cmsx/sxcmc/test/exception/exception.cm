@@ -1,0 +1,14 @@
+using System;
+
+void main()
+{
+    try
+    {
+        throw Exception("foo");
+    }
+    catch (const Exception& ex)
+    {
+        string str = ex.ToString();
+        write(2, str.Chars(), str.Length());
+    }
+}

@@ -806,10 +806,104 @@ namespace cmsx.object
         }
     }
 
-    public void ProcessDebugSection(ExecutableFile& executable, ObjectFile* objectFile, List<FunctionTableEntry>& functionTable)
+    public List<DispatchTableEntry> InsertIntoDispatchTable(const List<DispatchTableEntry>& dispatchTable, const DispatchTableEntry& entry)
+    {
+        bool inserted = false;
+        List<DispatchTableEntry> newDispatchTable;
+        for (const DispatchTableEntry& prevEntry : dispatchTable)
+        {
+            if (entry.offset < prevEntry.offset)
+            {
+                newDispatchTable.Add(entry);
+                newDispatchTable.Add(prevEntry);
+                inserted = true;
+            }
+            else if (entry.offset >= prevEntry.offset + prevEntry.length)
+            {
+                newDispatchTable.Add(prevEntry);
+            }
+            else if (entry.offset >= prevEntry.offset && entry.offset < prevEntry.offset + prevEntry.length)
+            {
+                if (entry.offset + entry.length <= prevEntry.offset + prevEntry.length)
+                {
+                    DispatchTableEntry startEntry(prevEntry.offset, entry.offset - prevEntry.offset, prevEntry.exceptionBlockTableAddress);
+                    if (startEntry.length > 0)
+                    {
+                        newDispatchTable.Add(startEntry);
+                    }
+                    newDispatchTable.Add(entry);
+                    inserted = true;
+                    DispatchTableEntry endEntry(entry.offset + entry.length, (prevEntry.offset + prevEntry.length) - (entry.offset + entry.length), prevEntry.exceptionBlockTableAddress);
+                    if (endEntry.length > 0)
+                    {
+                        newDispatchTable.Add(endEntry);
+                    }
+                }
+                else
+                {
+                    throw Exception("invalid dispatch table entry (not contained by the parent entry");
+                }
+            }
+            else
+            {
+                newDispatchTable.Add(prevEntry);
+            }
+        }
+        if (!inserted)
+        {
+            newDispatchTable.Add(entry);
+        }
+        return newDispatchTable;
+    }
+
+    public ulong MakeExceptionTable(ExecutableFile& executable, const FunctionExceptionData& functionExceptionData)
+    {
+        Section* executableDataSection = executable.dataSection;
+        executableDataSection->Align(8u);
+        List<DispatchTableEntry> dispatchTable;
+        for (const TryBlock& tryBlock : functionExceptionData.tryBlocks)
+        {
+            if (tryBlock.length > 0)
+            {
+                ulong exceptionBlockTableAddress = 0u;
+                for (const HandlerBlock& handlerBlock : tryBlock.handlerBlocks)
+                {
+                    if (exceptionBlockTableAddress == 0u)
+                    {
+                        exceptionBlockTableAddress = executableDataSection->Address();
+                    }
+                    executableDataSection->EmitULong(handlerBlock.discriminator);
+                    executableDataSection->EmitULong(handlerBlock.catchedClassId);
+                    executableDataSection->EmitULong(handlerBlock.handlerAddress);
+                }
+                executableDataSection->EmitULong(endBlockDiscriminator);
+                DispatchTableEntry entry(tryBlock.offset, tryBlock.length, exceptionBlockTableAddress);
+                dispatchTable = InsertIntoDispatchTable(dispatchTable, entry);
+            }
+        }
+        executableDataSection->Align(8u);
+        ulong exceptionTableAddress = executableDataSection->Address();
+        executableDataSection->EmitULong(cast<ulong>(dispatchTable.Count()));
+        for (long i = 0; i < dispatchTable.Count(); ++i)
+        {
+            const DispatchTableEntry& entry = dispatchTable[i];
+            executableDataSection->EmitUInt(entry.offset);
+            executableDataSection->EmitUInt(entry.length);
+            executableDataSection->EmitULong(entry.exceptionBlockTableAddress);
+        }
+        return exceptionTableAddress;
+    }
+
+    public void ProcessDebugSection(ExecutableFile& executable, ObjectFile* objectFile, HashMap<string, ulong>& stringAddressMap, List<FunctionTableEntry>& functionTable,
+        HashSet<ulong>& functionAddressSet, const ClassIdMap& classIdMap)
     {
         Section* debugSection = objectFile->debugSection;
         Section* executableDataSection = executable.dataSection;
+        HashMap<uint, ulong> sourceFileIdAddressMap;
+        HashMap<string, LineNumberTableLimits> lineNumberTableMap;
+        HashMap<string, ulong> exceptionTableAddressMap;
+        FunctionExceptionData functionExceptionData;
+        bool processFunc = false;
         if (debugSection != null)
         {
             int x = debugSection->GetByte();
@@ -820,24 +914,199 @@ namespace cmsx.object
                 {
                     break;
                 }
-                if (debugRecordCode == DebugRecordCode.functionInfo)
+                if (debugRecordCode == DebugRecordCode.fileInfo)
+                {
+                    string sourceFileNameName = debugSection->GetString();
+                    uint sourceFileNameId = debugSection->GetUInt();
+                    HashMap<string, ulong>.ConstIterator it = stringAddressMap.CFind(sourceFileNameName);
+                    ulong sourceFileNameAddress = 0u;
+                    if (it == stringAddressMap.CEnd())
+                    {
+                        sourceFileNameAddress = executableDataSection->Address();
+                        executableDataSection->EmitString(sourceFileNameName);
+                        stringAddressMap[sourceFileNameName] = sourceFileNameAddress;
+                    }
+                    else
+                    {
+                        sourceFileNameAddress = it->second;
+                    }
+                    sourceFileIdAddressMap[sourceFileNameId] = sourceFileNameAddress;
+                }
+                else if (debugRecordCode == DebugRecordCode.functionInfo)
                 {
                     uint functionSymbolIndex = debugSection->GetUInt();
                     string functionFullName = debugSection->GetString();
+                    uint sourceFileNameId = debugSection->GetUInt();
+                    uint frameSize = debugSection->GetUInt();
+                    HashMap<uint, ulong>.ConstIterator sit = sourceFileIdAddressMap.CFind(sourceFileNameId);
+                    ulong sourceFileNameAddress = 0u;
+                    if (sit != sourceFileIdAddressMap.CEnd())
+                    {
+                        sourceFileNameAddress = sit->second;
+                    }
+                    else
+                    {
+                        throw Exception("source file name address not found");
+                    }
                     Symbol* functionSymbol = objectFile->GetSymbolTable().GetSymbol(cast<int>(functionSymbolIndex));
                     if (functionSymbol != null)
                     {
-                        const string& functionName = functionSymbol->name;
-                        Symbol* finalFunctionSymbol = executable.GetSymbolTable().GetSymbol(functionName);
+                        Symbol* finalFunctionSymbol = executable.GetSymbolTable().GetSymbol(functionSymbol->name);
                         if (finalFunctionSymbol != null)
                         {
-                            ulong mangledNameAddress = executableDataSection->Address();
-                            executableDataSection->EmitString(finalFunctionSymbol->name);
-                            ulong fullNameAddress = executableDataSection->Address();
-                            executableDataSection->EmitString(functionFullName);
-                            FunctionTableEntry entry(finalFunctionSymbol->start, finalFunctionSymbol->length, mangledNameAddress, fullNameAddress);
-                            functionTable.Add(entry);
+                            if (functionAddressSet.CFind(finalFunctionSymbol->start) == functionAddressSet.CEnd())
+                            {
+                                functionAddressSet.Insert(finalFunctionSymbol->start);
+                                HashMap<string, ulong>.ConstIterator it1 = stringAddressMap.CFind(finalFunctionSymbol->name);
+                                finalFunctionSymbol->frameSize = frameSize;
+                                ulong mangledNameAddress = 0u;
+                                if (it1 == stringAddressMap.CEnd())
+                                {
+                                    mangledNameAddress = executableDataSection->Address();
+                                    executableDataSection->EmitString(finalFunctionSymbol->name);
+                                    stringAddressMap[finalFunctionSymbol->name] = mangledNameAddress;
+                                }
+                                else
+                                {
+                                    mangledNameAddress = it1->second;
+                                }
+                                HashMap<string, ulong>.ConstIterator it2 = stringAddressMap.CFind(functionFullName);
+                                ulong fullNameAddress = 0u;
+                                if (it2 == stringAddressMap.CEnd())
+                                {
+                                    fullNameAddress = executableDataSection->Address();
+                                    executableDataSection->EmitString(functionFullName);
+                                    stringAddressMap[functionFullName] = fullNameAddress;
+                                }
+                                else
+                                {
+                                    fullNameAddress = it2->second;
+                                }
+                                ulong exceptionTableAddress = 0u;
+                                HashMap<string, ulong>.ConstIterator it3 = exceptionTableAddressMap.CFind(functionSymbol->name);
+                                if (it3 != exceptionTableAddressMap.CEnd())
+                                {
+                                    exceptionTableAddress = it3->second;
+                                }
+                                LineNumberTableLimits& lineNumberTable = lineNumberTableMap[functionSymbol->name];
+                                FunctionTableEntry entry(finalFunctionSymbol->start, finalFunctionSymbol->length, mangledNameAddress, fullNameAddress, sourceFileNameAddress,
+                                    lineNumberTable.startAddress, lineNumberTable.endAddress, exceptionTableAddress);
+                                functionTable.Add(entry);
+                            }
                         }
+                    }
+                }
+                else if (debugRecordCode == DebugRecordCode.startFunc)
+                {
+                    uint functionSymbolIndex = debugSection->GetUInt();
+                    Symbol* functionSymbol = objectFile->GetSymbolTable().GetSymbol(cast<int>(functionSymbolIndex));
+                    if (functionSymbol->linkage == Linkage.remove)
+                    {
+                        processFunc = false;
+                    }
+                    else
+                    {
+                        processFunc = true;
+                        executableDataSection->Align(4u);
+                        LineNumberTableLimits lineNumberTable;
+                        lineNumberTable.startAddress = executableDataSection->Address();
+                        lineNumberTableMap[functionSymbol->name] = lineNumberTable;
+                        functionExceptionData = FunctionExceptionData();
+                        functionExceptionData.functionName = functionSymbol->name;
+                    }
+                }
+                else if (debugRecordCode == DebugRecordCode.endFunc)
+                {
+                    uint functionSymbolIndex = debugSection->GetUInt();
+                    if (processFunc)
+                    {
+                        Symbol* functionSymbol = objectFile->GetSymbolTable().GetSymbol(cast<int>(functionSymbolIndex));
+                        LineNumberTableLimits& lineNumberTable = lineNumberTableMap[functionSymbol->name];
+                        lineNumberTable.endAddress = executableDataSection->Address();
+                        if (!functionExceptionData.IsEmpty())
+                        {
+                            exceptionTableAddressMap[functionSymbol->name] = MakeExceptionTable(executable, functionExceptionData);
+                            functionExceptionData = FunctionExceptionData();
+                        }
+                    }
+                }
+                else if (debugRecordCode == DebugRecordCode.lineInfo)
+                {
+                    uint offset = debugSection->GetUInt();
+                    uint lineNumber = debugSection->GetUInt();
+                    if (processFunc)
+                    {
+                        executableDataSection->EmitUInt(offset);
+                        executableDataSection->EmitUInt(lineNumber);
+                    }
+                }
+                else if (debugRecordCode == DebugRecordCode.beginTry)
+                {
+                    uint tryBlockId = debugSection->GetUInt();
+                    uint parentTryBlockId = debugSection->GetUInt();
+                    uint offset = debugSection->GetUInt();
+                    if (processFunc)
+                    {
+                        TryBlock tryBlock(tryBlockId, parentTryBlockId, offset);
+                        functionExceptionData.tryBlocks.Add(tryBlock);
+                    }
+                }
+                else if (debugRecordCode == DebugRecordCode.endTry)
+                {
+                    uint tryBlockId = debugSection->GetUInt();
+                    uint offset = debugSection->GetUInt();
+                    if (processFunc)
+                    {
+                        TryBlock* tryBlock = functionExceptionData.GetTryBlock(tryBlockId);
+                        if (tryBlock != null)
+                        {
+                            tryBlock->length = offset - tryBlock->offset;
+                        }
+                        else
+                        {
+                            throw Exception("try block id " + ToString(tryBlockId) + " not found");
+                        }
+                    }
+                }
+                else if (debugRecordCode == DebugRecordCode.beginCatch)
+                {
+                    uint catchBlockId = debugSection->GetUInt();
+                    uint tryBlockId = debugSection->GetUInt();
+                    ulong catchedTypeId1 = debugSection->GetULong();
+                    ulong catchedTypeId2 = debugSection->GetULong();
+                    Uuid catchedTypeId(catchedTypeId1, catchedTypeId2);
+                    ulong catchedClassId = classIdMap.GetClassId(catchedTypeId);
+                    if (processFunc)
+                    {
+                        string catchBlockSymbolName = functionExceptionData.functionName;
+                        catchBlockSymbolName.Append('@').Append(ToString(catchBlockId));
+                        Symbol* handlerAddessSymbol = executable.GetSymbolTable().GetInternalSymbol(catchBlockSymbolName);
+                        if (handlerAddessSymbol != null)
+                        {
+                            ulong handlerAddress = handlerAddessSymbol->start;
+                            TryBlock* tryBlock = functionExceptionData.GetTryBlock(tryBlockId);
+                            if (tryBlock != null)
+                            {
+                                HandlerBlock handlerBlock(catchedClassId, handlerAddress);
+                                tryBlock->handlerBlocks.Add(handlerBlock);
+                            }
+                            else
+                            {
+                                throw Exception("try block id " + ToString(tryBlockId) + " not found");
+                            }
+                        }
+                        else
+                        {
+                            throw Exception("handler address for symbol '" + catchBlockSymbolName + "' not found from the symbol table of the executable");
+                        }
+                    }
+                }
+                else if (debugRecordCode == DebugRecordCode.endCatch)
+                {
+                    uint catchBlockId = debugSection->GetUInt();
+                    if (processFunc)
+                    {
+                        // todo
                     }
                 }
                 else
@@ -849,36 +1118,51 @@ namespace cmsx.object
         }
     }
 
-    public void MakeFuctionTable(ExecutableFile& executable, List<UniquePtr<BinaryFile>>& binaryFiles)
+    public void MakeFuctionTable(ExecutableFile& executable, List<UniquePtr<BinaryFile>>& binaryFiles, const ClassIdMap& classIdMap)
     {
         Section* executableDataSection = executable.dataSection;
+        long prevPos = executableDataSection->pos;
+        executableDataSection->pos = executableDataSection->data.Count();
+        executableDataSection->Align(8u);
+        Symbol* debugInfoSymbol = new Symbol();
+        debugInfoSymbol->name = "@debug_info";
+        debugInfoSymbol->segment = Segment.data;
+        debugInfoSymbol->linkage = Linkage.external;
+        debugInfoSymbol->value = Value(cast<Value.Flag>(Value.Flag.pure | Value.Flag.address), executableDataSection->Address(), debugInfoSymbol);
+        debugInfoSymbol->start = cmsx.machine.dataSegmentBaseAddress + executableDataSection->Address();
         executableDataSection->pos = executableDataSection->data.Count();
         List<FunctionTableEntry> functionTable;
+        HashSet<ulong> functionAddressSet;
+        HashMap<string, ulong> sourceFileNameAddressMap;
         for (const UniquePtr<BinaryFile>& binaryFile : binaryFiles)
         {
             if (binaryFile.Get() is ObjectFile*)
             {
                 ObjectFile* objectFile = cast<ObjectFile*>(binaryFile.Get());
-                ProcessDebugSection(executable, objectFile, functionTable);
+                ProcessDebugSection(executable, objectFile, sourceFileNameAddressMap, functionTable, functionAddressSet, classIdMap);
             }
             else if (binaryFile.Get() is LibraryFile*)
             {
                 LibraryFile* libraryFile = cast<LibraryFile*>(binaryFile.Get());
                 for (const UniquePtr<ObjectFile>& objectFile : libraryFile->objectFiles)
                 {
-                    ProcessDebugSection(executable, objectFile.Get(), functionTable);
+                    ProcessDebugSection(executable, objectFile.Get(), sourceFileNameAddressMap, functionTable, functionAddressSet, classIdMap);
                 }
             }
         }
         Sort(functionTable);
         executableDataSection->Align(8u);
-        ulong functionTableAddress = executableDataSection->Address();
+        ulong functionTableAddress = cmsx.machine.dataSegmentBaseAddress + executableDataSection->Address();
         for (const FunctionTableEntry& entry : functionTable)
         {
             executableDataSection->EmitULong(entry.start);
             executableDataSection->EmitULong(entry.length);
             executableDataSection->EmitULong(entry.mangledNameAddress);
             executableDataSection->EmitULong(entry.fullNameAddress);
+            executableDataSection->EmitULong(entry.sourceFileNameAddress);
+            executableDataSection->EmitULong(entry.lineNumberTableStartAddress);
+            executableDataSection->EmitULong(entry.lineNumberTableEndAddress);
+            executableDataSection->EmitULong(entry.exceptionTableAddress);
         }
         Symbol* functionTableSymbol = new Symbol();
         functionTableSymbol->name = "@function_table";
@@ -886,9 +1170,13 @@ namespace cmsx.object
         functionTableSymbol->linkage = Linkage.external;
         functionTableSymbol->value = Value(cast<Value.Flag>(Value.Flag.pure | Value.Flag.address), functionTableAddress, functionTableSymbol);
         functionTableSymbol->start = functionTableAddress;
-        functionTableSymbol->length = executableDataSection->Address() - functionTableSymbol->start;
+        functionTableSymbol->length = cmsx.machine.dataSegmentBaseAddress + executableDataSection->Address() - functionTableSymbol->start;
         functionTableSymbol->section = executableDataSection;
         executable.GetSymbolTable().AddSymbol(functionTableSymbol);
+        debugInfoSymbol->length = cmsx.machine.dataSegmentBaseAddress + executableDataSection->Address() - debugInfoSymbol->start;
+        debugInfoSymbol->section = executableDataSection;
+        executable.GetSymbolTable().AddSymbol(debugInfoSymbol);
+        executableDataSection->pos = prevPos;
     }
 
     public void Link(ExecutableFile& executable, List<UniquePtr<BinaryFile>>& binaryFiles, const ClassIdMap& classIdMap, bool removeUnusedCode, bool debug)
@@ -942,7 +1230,7 @@ namespace cmsx.object
         }
         linkTable.ReportUnresolvedSymbols();
         linkTable.CopyRanges(debug);
-        MakeFuctionTable(executable, binaryFiles);
+        MakeFuctionTable(executable, binaryFiles, classIdMap);
         executable.Finalize();
         executable.Write();
     }

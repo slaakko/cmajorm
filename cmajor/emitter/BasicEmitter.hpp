@@ -79,6 +79,7 @@ public:
     void Visit(BoundIsExpression& boundIsExpression) override;
     void Visit(BoundAsExpression& boundAsExpression) override;
     void Visit(BoundTypeNameExpression& boundTypeNameExpression) override;
+    void Visit(BoundTypeIdExpression& boundTypeIdExpression) override;
     void Visit(BoundBitCast& boundBitCast) override;
     void Visit(BoundFunctionPtr& boundFunctionPtr) override;
     void Visit(BoundDisjunction& boundDisjunction) override;
