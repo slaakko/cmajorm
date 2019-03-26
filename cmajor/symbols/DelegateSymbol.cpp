@@ -11,6 +11,7 @@
 #include <cmajor/symbols/Exception.hpp>
 #include <cmajor/symbols/SymbolCollector.hpp>
 #include <cmajor/symbols/Module.hpp>
+#include <cmajor/symbols/GlobalFlags.hpp>
 #include <cmajor/util/Unicode.hpp>
 #include <boost/uuid/uuid_io.hpp>
 
@@ -280,7 +281,11 @@ void DelegateTypeSymbol::GenerateCall(Emitter& emitter, std::vector<GenObject*>&
         }
         else
         {
-            void* nextBlock = emitter.CreateBasicBlock("next");
+            void* nextBlock = nullptr;
+            if (GetBackEnd() == BackEnd::llvm) 
+            {
+                nextBlock = emitter.CreateBasicBlock("next");
+            }
             if (newCleanupNeeded)
             {
                 emitter.CreateCleanup();
@@ -301,7 +306,10 @@ void DelegateTypeSymbol::GenerateCall(Emitter& emitter, std::vector<GenObject*>&
                 void* invokeInst = emitter.CreateInvokeInst(callee, nextBlock, unwindBlock, args, bundles, span);
                 emitter.Stack().Push(invokeInst);
             }
-            emitter.SetCurrentBasicBlock(nextBlock);
+            if (GetBackEnd() == BackEnd::llvm)
+            {
+                emitter.SetCurrentBasicBlock(nextBlock);
+            }
         }
     }
     else
@@ -319,7 +327,11 @@ void DelegateTypeSymbol::GenerateCall(Emitter& emitter, std::vector<GenObject*>&
         }
         else
         {
-            void* nextBlock = emitter.CreateBasicBlock("next");
+            void* nextBlock = nullptr;
+            if (GetBackEnd() == BackEnd::llvm)
+            {
+                nextBlock = emitter.CreateBasicBlock("next");
+            }
             if (newCleanupNeeded)
             {
                 emitter.CreateCleanup();
@@ -339,7 +351,10 @@ void DelegateTypeSymbol::GenerateCall(Emitter& emitter, std::vector<GenObject*>&
             {
                 emitter.CreateInvokeInst(callee, nextBlock, unwindBlock, args, bundles, span);
             }
-            emitter.SetCurrentBasicBlock(nextBlock);
+            if (GetBackEnd() == BackEnd::llvm)
+            {
+                emitter.SetCurrentBasicBlock(nextBlock);
+            }
         }
     }
 }

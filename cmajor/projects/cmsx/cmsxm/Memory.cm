@@ -264,13 +264,18 @@ namespace cmsx.machine
         public nothrow Memory(Machine& machine_) : machine(machine_)
         {
         }
-        public nothrow ulong AllocatePage()
+        public ulong AllocatePage()
         {
             ulong pageAddress = OsAllocateMemoryPage(pageSize);
+            if (pageAddress == 0u)
+            {
+                Console.Error() << "out of memory" << endl();
+                throw Exception("out of memory");
+            }
             pageFrameMap[pageAddress] = new PageFrame();
             return pageAddress;
         }
-        public nothrow ulong AllocateRootPage()
+        public ulong AllocateRootPage()
         {
             ulong rootPageAddress = AllocatePage();
             return rootPageAddress;

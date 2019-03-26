@@ -242,7 +242,6 @@ namespace cmsx.debug
         public Window* next;
     }
 
-    public const uint debugBreakInst = (cmsx.machine.TRAP << 24u) | (0u << 16u) | (cmsx.kernel.debugBreakSystemCall << 8u) | (0u << 0u);
     public const uint stoiFpSpInst = (cmsx.machine.STOI << 24u) | (cmsx.machine.regFP << 16u) | (cmsx.machine.regSP << 8u) | (0u << 0u);
     public const uint oriFpSpInst = (cmsx.machine.ORI << 24u) | (cmsx.machine.regFP << 16u) | (cmsx.machine.regSP << 8u) | (0u << 0u);
     public const uint retInst = (cmsx.machine.RET << 24u) | (0u << 16u) | (0u << 8u) | (0u << 0u);
@@ -260,18 +259,26 @@ namespace cmsx.debug
     public uint ReadInst(cmsx.kernel.Process* process, ulong address)
     {
         ulong inst = 0u;
-        if (cmsx.kernel.ReadProcessMemory(cmsx.machine.GetMachine(), process, address, inst, 4u) != 0)
+        try
         {
-            cmsx.machine.Panic("debugger: could not read process memory");
+            cmsx.kernel.ReadProcessMemory(cmsx.machine.GetMachine(), process, address, inst, 4u);
+        }
+        catch (Exception& ex)
+        {
+            cmsx.machine.Panic("debugger could not read process memory: " + ex.ToString());
         }
         return cast<uint>(inst);
     }
 
     public void WriteInst(cmsx.kernel.Process* process, ulong address, uint inst)
     {
-        if (cmsx.kernel.WriteProcessMemory(cmsx.machine.GetMachine(), process, address, inst, 4u, cmsx.machine.Protection.execute) != 0)
+        try
         {
-            cmsx.machine.Panic("debugger: could not write process memory");
+            cmsx.kernel.WriteProcessMemory(cmsx.machine.GetMachine(), process, address, inst, 4u, cmsx.machine.Protection.execute);
+        }
+        catch (Exception& ex)
+        {
+            cmsx.machine.Panic("debugger could not writer to process memory: " + ex.ToString());
         }
     }
 
@@ -1001,10 +1008,13 @@ namespace cmsx.debug
         private void FillBuffer()
         {
             ulong size = Min(end - bufferStartAddress, cast<ulong>(buffer.Length()));
-            int result = cmsx.kernel.ReadProcessMemory(*debugger->machine, debugger->process, bufferStartAddress, &buffer[0], size);
-            if (result != 0)
+            try
             {
-                cmsx.machine.Panic("debugger: could not read process memory");
+                cmsx.kernel.ReadProcessMemory(*debugger->machine, debugger->process, bufferStartAddress, &buffer[0], size);
+            }
+            catch (const Exception& ex)
+            {
+                cmsx.machine.Panic("debugger: could not read process memory: " + ex.ToString());
             }
         }
         private HeaderLine header;
@@ -1549,6 +1559,15 @@ namespace cmsx.debug
         {
             state = State.exit;
         }
+        public override void WriteOutput(byte* buffer, long count)
+        {
+            string s(cast<const char*>(cast<void*>(buffer)), count);
+            ustring u(ToUtf32(s));
+            for (uchar c : u)
+            {
+                output.AddChar(c, 0u);
+            }
+        }
         private bool SkipStepBreakpoint(ulong address, ulong fp, cmsx.machine.Machine& machine)
         {
             for (const Breakpoint& stepBp : stepBreakpoints)
@@ -1681,9 +1700,13 @@ namespace cmsx.debug
             if (InProlog(i))
             {
                 ulong sp = machine->GetRegisters().Get(cmsx.machine.regSP);
-                if (ReadProcessMemory(*machine, process, sp - 8u, retAddress, 8u) != 0)
+                try
                 {
-                    cmsx.machine.Panic("debugger: could not read process memory");
+                    ReadProcessMemory(*machine, process, sp - 8u, retAddress, 8u);
+                }
+                catch (const Exception& ex)
+                {
+                    cmsx.machine.Panic("debugger: could not read process memory: " + ex.ToString());
                 }
             }
             else if (InEpilog(i))
@@ -1693,9 +1716,13 @@ namespace cmsx.debug
             else
             {
                 ulong fp = machine->GetRegisters().Get(cmsx.machine.regFP);
-                if (ReadProcessMemory(*machine, process, fp - 8u, retAddress, 8u) != 0)
+                try
                 {
-                    cmsx.machine.Panic("debugger: could not read process memory");
+                    ReadProcessMemory(*machine, process, fp - 8u, retAddress, 8u);
+                }
+                catch (const Exception& ex)
+                {
+                    cmsx.machine.Panic("debugger: could not read process memory: " + ex.ToString());
                 }
             }
             Breakpoint bp(Breakpoint.Kind.step, retAddress, GetInst(process, retAddress, -1));
@@ -1798,14 +1825,14 @@ namespace cmsx.debug
             if (address >= segmentDescriptor->baseAddress + segmentDescriptor->startAddress && address <= segmentDescriptor->baseAddress + segmentDescriptor->startAddress + segmentDescriptor->length)
             {
                 ulong value = 0u;
-                int result = cmsx.kernel.ReadProcessMemory(*machine, process, address, value, size);
-                if (result == 0)
+                try
                 {
+                    cmsx.kernel.ReadProcessMemory(*machine, process, address, value, size);
                     return value;
                 }
-                else
+                catch (const Exception& ex)
                 {
-                    throw Exception("could not read process memory from virtual address #" + ToHexString(address));
+                    throw Exception("could not read process memory from virtual address #" + ToHexString(address) + ": " + ex.Message());
                 }
             }
             else
@@ -1874,9 +1901,13 @@ namespace cmsx.debug
                 uint inst = ReadInst(process, address);
                 if (InProlog(inst))
                 {
-                    if (ReadProcessMemory(*machine, process, sp - 8u, retAddress, 8u) != 0)
+                    try
                     {
-                        cmsx.machine.Panic("debugger: could not read process memory");
+                        ReadProcessMemory(*machine, process, sp - 8u, retAddress, 8u);
+                    }
+                    catch (const Exception& ex)
+                    {
+                        cmsx.machine.Panic("debugger: could not read process memory: " + ex.ToString());
                     }
                     ++frame;
                     address = retAddress;
@@ -1885,13 +1916,14 @@ namespace cmsx.debug
                         addresses.Add(address);
                     }
                 }
-                if (ReadProcessMemory(*machine, process, fp - 8u, retAddress, 8u) != 0)
+                try
                 {
-                    cmsx.machine.Panic("debugger: could not read process memory");
+                    ReadProcessMemory(*machine, process, fp - 8u, retAddress, 8u);
+                    ReadProcessMemory(*machine, process, fp, prevFP, 8u);
                 }
-                if (ReadProcessMemory(*machine, process, fp, prevFP, 8u) != 0)
+                catch (const Exception& ex)
                 {
-                    cmsx.machine.Panic("debugger: could not read process memory");
+                    cmsx.machine.Panic("debugger: could not read process memory: " + ex.ToString());
                 }
                 ++frame;
                 address = retAddress;

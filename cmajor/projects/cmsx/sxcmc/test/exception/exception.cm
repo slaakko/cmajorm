@@ -1,14 +1,104 @@
 using System;
 
-void main()
+class Object
 {
+    public nothrow Object()
+    {
+        write(1, "Object()\n", 9);
+    }
+    public ~Object()
+    {
+        write(1, "~Object()\n", 10);
+    }
+}
+
+void canThrow()
+{
+    throw Exception("canThrow");
+}
+
+void cleanup()
+{
+    Object object;
+    canThrow();
+}
+
+void bar()
+{
+    throw Exception("bar");
+}
+
+void foo()
+{
+    string fun = "\ncaught by foo";
     try
     {
-        throw Exception("foo");
+        bar();
     }
     catch (const Exception& ex)
     {
         string str = ex.ToString();
+        str.Append(fun);
         write(2, str.Chars(), str.Length());
     }
+}
+
+void direct()
+{
+    string fun = "\ncaught by direct";
+    try
+    {
+        throw Exception("direct");
+    }
+    catch (const Exception& ex)
+    {
+        string str = ex.ToString();
+        str.Append(fun);
+        write(2, str.Chars(), str.Length());
+    }
+}
+
+public class MyEx : Exception
+{
+    public nothrow MyEx(const string& message_) : base(message_)
+    {
+    }
+}
+
+void skip()
+{
+    string fun = "\ncaught by skip";
+    try
+    {
+        throw Exception("skip");
+    }
+    catch (const MyEx& ex)
+    {
+        string str = ex.ToString();
+        str.Append(fun);
+        write(2, str.Chars(), str.Length());
+    }
+}
+
+void skipCatch()
+{
+    string fun = "\ncaught by skipCatch";
+    try
+    {
+        skip();
+    }
+    catch (const Exception& ex)
+    {
+        string str = ex.ToString();
+        str.Append(fun);
+        write(2, str.Chars(), str.Length());
+    }
+}
+
+void main()
+{
+    //direct();
+    foo();
+    //skipCatch();
+    //cleanup();
 }

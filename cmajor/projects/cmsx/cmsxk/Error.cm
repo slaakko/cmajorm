@@ -1,0 +1,46 @@
+using System;
+
+namespace cmsx.kernel
+{
+    public const int EFAIL = 1;
+    public const int EBADF = 2;
+    public const int EMEM = 3;
+    public const int RLIMITEXCEEDED = 4;
+    public const int EINVAL = 5;
+
+    public string ErrorCodeStr(int errorCode)
+    {
+        switch (errorCode)
+        {
+            case EFAIL: return "EFAIL";
+            case EBADF: return "EBADF";
+            case EMEM: return "EMEM";
+            case RLIMITEXCEEDED: return "RLIMITEXCEEDED";
+            case EINVAL: return "EINVAL";
+        }
+        return "";
+    }
+
+    public string ErrorMsg(int errorCode)
+    {
+        switch (errorCode)
+        {
+            case EFAIL: return "Host system failure";
+            case EBADF: return "Bad file descriptor";
+            case EMEM: return "Memory error";
+            case RLIMITEXCEEDED: return "Resource limit exceeed";
+            case EINVAL: return "Invalid argument";
+        }
+        return "";
+    }
+
+    public class SystemError : Exception
+    {
+        public nothrow SystemError(int errorCode_, const string& message_) :
+            base(ErrorCodeStr(errorCode_) + "(" + ToString(errorCode_) + "): " + ErrorMsg(errorCode_) + ": " + message_), errorCode(errorCode_)
+        {
+        }
+        public int errorCode;
+    }
+}
+

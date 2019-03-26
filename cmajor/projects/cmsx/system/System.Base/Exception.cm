@@ -19,13 +19,15 @@ namespace System
         {
             return stackTrace;
         }
-        public void SetStackTrace(string&& stackTrace_)
+        public void SetStackTrace(const string& stackTrace_)
         {
             stackTrace = stackTrace_;
         }
-        public string ToString() const
+        public virtual string ToString() const
         {
-            return string(typename(*this)) + ": " + message + "\n" + stackTrace;
+            string s;
+            s.Append(typename(*this)).Append(": ").Append(message).Append('\n').Append(stackTrace);
+            return s;
         }
         private string message;
         private string stackTrace;

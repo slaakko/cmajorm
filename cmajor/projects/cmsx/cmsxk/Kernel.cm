@@ -13,7 +13,7 @@ namespace cmsx.kernel
         {
             return *instance;
         }
-        private nothrow Kernel() : machine(GetMachine()), processTable(GetProcessTable()), baseDebugger(), debugger(&baseDebugger)
+        private nothrow Kernel() : machine(GetMachine()), sessionTable(GetSessionTable()), processTable(GetProcessTable()), baseDebugger(), debugger(&baseDebugger)
         {
         }
         public void Init()
@@ -24,6 +24,10 @@ namespace cmsx.kernel
         public inline nothrow Machine& GetMachine()
         {
             return machine;
+        }
+        public inline nothrow SessionTable& GetSessionTable()
+        {
+            return sessionTable;
         }
         public inline nothrow ProcessTable& GetProcessTable()
         {
@@ -65,6 +69,10 @@ namespace cmsx.kernel
         {
             debugger = debugger_;
         }
+        public inline nothrow bool HasUserDebugger() const
+        {
+            return debugger != &baseDebugger;
+        }
         public nothrow void SetExecutable(cmsx.object.ExecutableFile* executable_)
         {
             executable.Reset(executable_);
@@ -73,8 +81,21 @@ namespace cmsx.kernel
         {
             return executable.Get();
         }
+        public nothrow GlobalFileTable& FileTable()
+        {
+            return globalFileTable;
+        }
+        public nothrow void SetCurrentSession(Session* currentSession_)
+        {
+            currentSession = currentSession_;
+        }
+        public nothrow Session* CurrentSession() const
+        {
+            return currentSession;
+        }
         private static UniquePtr<Kernel> instance;
         private Machine& machine;
+        private SessionTable& sessionTable;
         private ProcessTable& processTable;
         private MemoryTable memoryTable;
         private string programFileName;
@@ -83,5 +104,7 @@ namespace cmsx.kernel
         private Debugger baseDebugger;
         private Debugger* debugger;
         private UniquePtr<cmsx.object.ExecutableFile> executable;
+        private GlobalFileTable globalFileTable;
+        private Session* currentSession;
     }
 }

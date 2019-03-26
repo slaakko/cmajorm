@@ -13,6 +13,7 @@ public const byte sys_debug_break = 6u;
 public const byte sys_stack_trace = 7u;
 public const byte sys_throw = 8u;
 public const byte sys_catch = 9u;
+public const byte sys_resume = 10u;
 
 public cdecl nothrow void exit(byte exitCode)
 {
@@ -57,4 +58,9 @@ public cdecl void do_throw(void* ex, ulong exTypeId)
 public cdecl nothrow void* do_catch()
 {
     return cast<void*>(cast<ulong>(trap(0u, sys_catch, 0u)));
+}
+
+public cdecl nothrow void do_resume()
+{
+    trap(0u, sys_resume, 0u);
 }

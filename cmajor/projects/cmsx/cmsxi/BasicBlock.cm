@@ -69,7 +69,7 @@ namespace cmsx.intermediate
                 {
                     throw Exception("error: terminator instruction " + instruction->OperationName() + " at line " + ToString(instruction->line) + " found in the middle of a basic block");
                 }
-                else if (i == n - 1 && !(instruction is TerminatorInstruction*))
+                else if (i == n - 1 && !(instruction is TerminatorInstruction*) && !(instruction is NoOperationInstruction*))
                 {
                     throw Exception("error: the last instruction of a basic block, the " + instruction->OperationName() + " instruction at line " + ToString(instruction->line) + " must be a terminator instruction");
                 }

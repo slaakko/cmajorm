@@ -28,7 +28,7 @@ namespace cmsx.kernel
         return poolSection;
     }
 
-    public int Load(const string& programFileName, const List<string>& programArguments)
+    public int Load(const string& programFileName, const List<string>& programArguments, int sid)
     {
         UniquePtr<BinaryFile> binaryFile = ReadBinaryFile(programFileName);
         if (binaryFile.Get() is ExecutableFile*)
@@ -46,54 +46,28 @@ namespace cmsx.kernel
             {
                 argv.Add(arg);
             }
-            Process* process = CreateSingleProcess(machine, processTable, name, codeSection->BaseAddress(), codeSection->Length(), dataSection->Length(), executable->PoolSize(), executable->StackSize());
+            Section poolSection = MakePoolSection(argv);
+            long poolDataLength = poolSection.data.Count();
+            long poolSize = Align(poolDataLength, cast<long>(pageSize));
+            Process* process = CreateSingleProcess(machine, processTable, name, codeSection->BaseAddress(), codeSection->Length(), dataSection->Length(), cast<ulong>(poolSize), executable->StackSize(), sid);
             if (codeSection->Length() > 0u)
             {
-                int result = WriteProcessMemory(machine, process, codeSection->BaseAddress(), codeSection->data.Begin().Ptr(), cast<ulong>(codeSection->data.Count()),
-                    Protection.execute);
-                if (result != 0)
-                {
-                    Panic("loader error: error writing to code segment of program '" + programFileName + "'");
-                }
+                WriteProcessMemory(machine, process, codeSection->BaseAddress(), codeSection->data.Begin().Ptr(), cast<ulong>(codeSection->data.Count()), Protection.execute);
             }
             if (dataSection->Length() > 0u)
             {
-                int result = WriteProcessMemory(machine, process, dataSection->BaseAddress(), dataSection->data.Begin().Ptr(), cast<ulong>(dataSection->data.Count()),
-                    Protection.write);
-                if (result != 0)
-                {
-                    Panic("loader error: error writing to data segment of program '" + programFileName + "'");
-                }
+                WriteProcessMemory(machine, process, dataSection->BaseAddress(), dataSection->data.Begin().Ptr(), cast<ulong>(dataSection->data.Count()), Protection.write);
             }
-            Section poolSection = MakePoolSection(argv);
             if (!poolSection.data.IsEmpty())
             {
-                if (poolSection.data.Count() > executable->PoolSize())
-                {
-                    Panic("loader error: arguments too big (> " + ToString(executable->PoolSize()) + " bytes) in program '" + programFileName + "'");
-                }
-                int result = WriteProcessMemory(machine, process, poolSegmentBaseAddress, poolSection.data.Begin().Ptr(), cast<ulong>(poolSection.data.Count()),
-                    Protection.write);
-                if (result != 0)
-                {
-                    Panic("loader error: error writing to pool segment of program '" + programFileName + "'");
-                }
+                WriteProcessMemory(machine, process, poolSegmentBaseAddress, poolSection.data.Begin().Ptr(), cast<ulong>(poolSection.data.Count()), Protection.write);
                 int ax = cast<int>(argv.Count());
                 ulong bx = poolSegmentBaseAddress;
-                result = WriteProcessMemory(machine, process, process->regAXAddress, cast<ulong>(ax), 8u, Protection.write);
-                if (result != 0)
-                {
-                    Panic("loader error: error writing to stack segment of program '" + programFileName + "'");
-                }
-                result = WriteProcessMemory(machine, process, process->regBXAddress, bx, 8u, Protection.write);
-                if (result != 0)
-                {
-                    Panic("loader error: error writing to stack segment of program '" + programFileName + "'");
-                }
+                WriteProcessMemory(machine, process, process->regAXAddress, cast<ulong>(ax), 8u, Protection.write);
+                WriteProcessMemory(machine, process, process->regBXAddress, bx, 8u, Protection.write);
             }
-            ulong poolDataLength = executable->PoolSize();
-            ulong poolStart = poolSegmentBaseAddress + poolDataLength;
-            ulong poolEnd = poolSegmentBaseAddress + poolDataLength;
+            ulong poolStart = poolSegmentBaseAddress + cast<ulong>(poolSize);
+            ulong poolEnd = poolSegmentBaseAddress + cast<ulong>(poolSize);
             process->poolStart = poolStart;
             process->poolEnd = poolEnd;
             Symbol* functionTableSymbol = executable->GetSymbolTable().GetSymbol("@function_table");

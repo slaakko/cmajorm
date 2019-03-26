@@ -16,12 +16,17 @@ using namespace cmajor::util;
 
 enum class MDItemKind : uint8_t
 {
-    bool_ = 0u, long_ = 1u, string = 2u, structRef = 3u, struct_ = 4u
+    bool_ = 0u, long_ = 1u, string = 2u, structRef = 3u, struct_ = 4u, basicBlockRef = 5u
 };
 
 const int64_t fileInfoNodeType = 0;
 const int64_t funcInfoNodeType = 1;
 const int64_t lineInfoNodeType = 2;
+const int64_t beginTryNodeType = 3;
+const int64_t endTryNodeType = 4;
+const int64_t catchNodeType = 5;
+const int64_t beginCleanupNodeType = 6;
+const int64_t endCleanupNodeType = 7;
 
 class MDItem
 {
@@ -83,6 +88,15 @@ private:
     std::vector<std::pair<std::string, MDItem*>> items;
 };
 
+class MDBasicBlockRef : public MDItem
+{
+public:
+    MDBasicBlockRef(void* bb_);
+    void Write(CodeFormatter& formatter) override;
+private:
+    void* bb;
+};
+
 class Metadata
 {
 public:
@@ -94,6 +108,7 @@ public:
     MDString* CreateMDString(const std::string& value);
     MDStructRef* CreateMDStructRef(int id);
     MDStruct* CreateMDStruct();
+    MDBasicBlockRef* CreateMDBasicBlockRef(void* bb);
     void Write(CodeFormatter& formatter);
 private:
     void AddItem(MDItem* item);

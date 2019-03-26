@@ -1,0 +1,217 @@
+using System;
+using System.Collections;
+using System.IO;
+using cmsx.machine;
+
+namespace cmsx.kernel
+{
+    public void ReadExceptionTableFromProcessMemory(Machine& machine, Process* process, ulong exceptionTableAddress, uint& frameSize, List<cmsx.object.DispatchTableEntry>& dispatchTable)
+    {
+        Memory& mem = machine.GetMemory();
+        Registers& regs = machine.GetRegisters();
+        ulong prevRV = regs.GetSpecial(Registers.rV);
+        MemoryTable& memoryTable = process->memoryTable;
+        regs.SetSpecial(Registers.rV, memoryTable.virtualTranslationRegisterValue);
+        frameSize = mem.ReadUInt(exceptionTableAddress, Protection.read);
+        uint numDispatchTableEntries = mem.ReadUInt(exceptionTableAddress + 4u, Protection.read);
+        ulong dispatchTableEntryAddress = exceptionTableAddress + 8u;
+        for (uint i = 0u; i < numDispatchTableEntries; ++i)
+        {
+            cmsx.object.DispatchTableEntry entry;
+            entry.offset = mem.ReadUInt(dispatchTableEntryAddress, Protection.read);
+            entry.length = mem.ReadUInt(dispatchTableEntryAddress + 4u, Protection.read);
+            entry.exceptionBlockTableAddress = mem.ReadULong(dispatchTableEntryAddress + 8u, Protection.read);
+            dispatchTable.Add(entry);
+            dispatchTableEntryAddress = dispatchTableEntryAddress + 16u;
+        }
+        regs.SetSpecial(Registers.rV, prevRV);
+    }
+
+    public void ReadExceptionBlockTableFromProcessMemory(Machine& machine, Process* process, ulong exceptionBlockTableAddress, List<UniquePtr<cmsx.object.ExceptionBlock>>& exceptionBlockTable)
+    {
+        Memory& mem = machine.GetMemory();
+        Registers& regs = machine.GetRegisters();
+        ulong prevRV = regs.GetSpecial(Registers.rV);
+        MemoryTable& memoryTable = process->memoryTable;
+        regs.SetSpecial(Registers.rV, memoryTable.virtualTranslationRegisterValue);
+        ulong discriminator = mem.ReadULong(exceptionBlockTableAddress, Protection.read);
+        ulong exceptionBlockEntryAddress = exceptionBlockTableAddress + 8u;
+        while (discriminator != cmsx.object.endBlockDiscriminator)
+        {
+            if (discriminator == cmsx.object.handlerBlockDiscriminator)
+            {
+                ulong catchedClassId = mem.ReadULong(exceptionBlockEntryAddress, Protection.read);
+                ulong handlerAddress = mem.ReadULong(exceptionBlockEntryAddress + 8u, Protection.read);
+                UniquePtr<cmsx.object.ExceptionBlock> handlerBlock(new cmsx.object.HandlerBlock(catchedClassId, handlerAddress));
+                exceptionBlockTable.Add(Rvalue(handlerBlock));
+                discriminator = mem.ReadULong(exceptionBlockEntryAddress + 16u, Protection.read);
+                exceptionBlockEntryAddress = exceptionBlockEntryAddress + 24u;
+            }
+            else if (discriminator == cmsx.object.cleanupBlockDiscriminator)
+            {
+                ulong cleanupAddress = mem.ReadULong(exceptionBlockEntryAddress, Protection.read);
+                ulong parentTableAddress = mem.ReadULong(exceptionBlockEntryAddress + 8u, Protection.read);
+                UniquePtr<cmsx.object.ExceptionBlock> cleanupBlock(new cmsx.object.CleanupBlock(cleanupAddress, parentTableAddress));
+                exceptionBlockTable.Add(Rvalue(cleanupBlock));
+                discriminator = mem.ReadULong(exceptionBlockEntryAddress + 16u, Protection.read);
+                exceptionBlockEntryAddress = exceptionBlockEntryAddress + 24u;
+            }
+        }
+        regs.SetSpecial(Registers.rV, prevRV);
+    }
+
+    public ulong GetHandlerAddress(Machine& machine, Process* process, ulong exceptionBlockTableAddress, ulong exceptionClassId)
+    {
+        List<UniquePtr<cmsx.object.ExceptionBlock>> exceptionBlockTable;
+        ReadExceptionBlockTableFromProcessMemory(machine, process, exceptionBlockTableAddress, exceptionBlockTable);
+        for (const UniquePtr<cmsx.object.ExceptionBlock>& exceptionBlock : exceptionBlockTable)
+        {
+            if (exceptionBlock.Get() is cmsx.object.HandlerBlock*)
+            {
+                cmsx.object.HandlerBlock* handlerBlock = cast<cmsx.object.HandlerBlock*>(exceptionBlock.Get());
+                ulong catchedClassId = handlerBlock->catchedClassId;
+                if (exceptionClassId % catchedClassId == 0u)
+                {
+                    ulong handlerAddress = handlerBlock->handlerAddress;
+                    return handlerAddress; 
+                }
+            }
+        }
+        return 0u;
+    }
+
+    public void DispatchException(Machine& machine, Process* process, ulong fp)
+    {
+        process->handlerAddress = 0u;
+        process->currentExceptionFrameSize = 0u;
+        ulong exceptionClassId = process->currentExceptionClassId;
+        List<cmsx.object.FunctionTableEntry> functionTable;
+        ReadFunctionTableFromProcessMemory(machine, process, process->functionTableAddress, process->functionTableLength, functionTable);
+        ulong pc = 0u;
+        ulong callPC = 0u;
+        ulong prevFP = 0u;
+        ReadProcessMemory(machine, process, fp, prevFP, 8u);
+        ReadProcessMemory(machine, process, fp - 8u, pc, 8u);
+        while (pc != 0u)
+        {
+            callPC = pc - 4u;
+            fp = prevFP;
+            List<cmsx.object.FunctionTableEntry>.ConstIterator first = functionTable.CBegin();
+            List<cmsx.object.FunctionTableEntry>.ConstIterator last = functionTable.CEnd();
+            cmsx.object.FunctionTableEntry entry(callPC, 0u, 0u, 0u, 0u, 0u, 0u, 0u);
+            List<cmsx.object.FunctionTableEntry>.ConstIterator it = LowerBound(first, last, entry);
+            if (it != first && it == last)
+            {
+                --it;
+            }
+            if (it != first && it != last && entry.start < it->start)
+            {
+                --it;
+            }
+            if (it != last && entry.start >= it->start && entry.start < it->start + it->length)
+            {
+                const cmsx.object.FunctionTableEntry& functionTableEntry = *it;
+                ulong functionStart = functionTableEntry.start;
+                ulong exceptionTableAddress = functionTableEntry.exceptionTableAddress;
+                if (exceptionTableAddress != 0u)
+                {
+                    uint frameSize = 0u;
+                    List<cmsx.object.DispatchTableEntry> dispatchTable;
+                    ReadExceptionTableFromProcessMemory(machine, process, cmsx.machine.dataSegmentBaseAddress + exceptionTableAddress, frameSize, dispatchTable);
+                    process->currentExceptionFrameSize = frameSize;
+                    List<cmsx.object.DispatchTableEntry>.ConstIterator diFirst = dispatchTable.CBegin();
+                    List<cmsx.object.DispatchTableEntry>.ConstIterator diLast = dispatchTable.CEnd();
+                    cmsx.object.DispatchTableEntry diEntry(cast<uint>(callPC - functionStart), 0u, 0u, null);
+                    List<cmsx.object.DispatchTableEntry>.ConstIterator dit = LowerBound(diFirst, diLast, diEntry);
+                    if (dit != diFirst && dit == diLast)
+                    {
+                        --dit;
+                    }
+                    if (dit != diFirst && dit != diLast && diEntry.offset < dit->offset)
+                    {
+                        --dit;
+                    }
+                    if (dit != diLast && diEntry.offset >= dit->offset && diEntry.offset < dit->offset + dit->length)
+                    {
+                        const cmsx.object.DispatchTableEntry& dispatchTableEntry = *dit;
+                        ulong exceptionBlockTableAddress = cmsx.machine.dataSegmentBaseAddress + dispatchTableEntry.exceptionBlockTableAddress;
+                        List<UniquePtr<cmsx.object.ExceptionBlock>> exceptionBlockTable;
+                        ReadExceptionBlockTableFromProcessMemory(machine, process, exceptionBlockTableAddress, exceptionBlockTable);
+                        for (const UniquePtr<cmsx.object.ExceptionBlock>& exceptionBlock : exceptionBlockTable)
+                        {
+                            if (exceptionBlock.Get() is cmsx.object.HandlerBlock*)
+                            {
+                                cmsx.object.HandlerBlock* handlerBlock = cast<cmsx.object.HandlerBlock*>(exceptionBlock.Get());
+                                ulong catchedClassId = handlerBlock->catchedClassId;
+                                if (exceptionClassId % catchedClassId == 0u)
+                                {
+                                    ulong handlerAddress = handlerBlock->handlerAddress;
+                                    machine.GetRegisters().Set(regFP, fp);
+                                    machine.GetRegisters().Set(regSP, fp + frameSize);
+                                    machine.GetRegisters().SetPC(handlerAddress);
+                                    Kernel& kernel = Kernel.Instance();
+                                    if (kernel.HasUserDebugger())
+                                    {
+                                        Debugger* debugger = kernel.GetDebugger();
+                                        machine.GetRegisters().SetSpecial(cmsx.machine.Registers.rW, handlerAddress);
+                                        debugger->Run(process);
+                                    }
+                                    return;
+                                }
+                            }
+                            else if (exceptionBlock.Get() is cmsx.object.CleanupBlock*)
+                            {
+                                cmsx.object.CleanupBlock* cleanupBlock = cast<cmsx.object.CleanupBlock*>(exceptionBlock.Get());
+                                ulong cleanupAddress = cleanupBlock->cleanupAddress;
+                                ulong parentTableAddress = cleanupBlock->parentTableAddress;
+                                if (parentTableAddress != 0u)
+                                {
+                                    ulong handlerAddress = GetHandlerAddress(machine, process, cmsx.machine.dataSegmentBaseAddress + parentTableAddress, exceptionClassId);
+                                    if (handlerAddress != 0u)
+                                    {
+                                        process->handlerAddress = handlerAddress;
+                                    }
+                                }
+                                machine.GetRegisters().Set(regFP, fp);
+                                machine.GetRegisters().Set(regSP, fp + frameSize);
+                                machine.GetRegisters().SetPC(cleanupAddress);
+                                return;
+                            }
+                        }
+                    }
+                }
+            }
+            ReadProcessMemory(machine, process, fp - 8u, pc, 8u);
+            ReadProcessMemory(machine, process, fp, prevFP, 8u);
+        }
+        throw SystemError(EFAIL, "dispatch exception failed: exception handler not found");
+    }
+
+    public void ContinueExceptionDispatch(Machine& machine, Process* process, ulong fp)
+    {
+        ulong prevFP = 0u;
+        ReadProcessMemory(machine, process, fp, prevFP, 8u);
+        fp = prevFP;
+        if (process->handlerAddress != 0u)
+        {
+            ulong handlerAddress = process->handlerAddress;
+            ulong frameSize = process->currentExceptionFrameSize;
+            process->handlerAddress = 0u;
+            process->currentExceptionFrameSize = 0u;
+            machine.GetRegisters().Set(regFP, fp);
+            machine.GetRegisters().Set(regSP, fp + frameSize);
+            machine.GetRegisters().SetPC(handlerAddress);
+            Kernel& kernel = Kernel.Instance();
+            if (kernel.HasUserDebugger())
+            {
+                Debugger* debugger = kernel.GetDebugger();
+                machine.GetRegisters().SetSpecial(cmsx.machine.Registers.rW, handlerAddress);
+                debugger->Run(process);
+            }
+        }
+        else
+        {
+            DispatchException(machine, process, fp);
+        }
+    }
+}

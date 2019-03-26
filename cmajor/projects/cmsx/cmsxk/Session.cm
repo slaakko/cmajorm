@@ -1,0 +1,85 @@
+using System;
+using System.Collections;
+
+namespace cmsx.kernel
+{
+    public const long numSessionSlots = 128;
+
+    public class Session
+    {
+        public nothrow Session() : sid(-1), nextFree(null)
+        {
+        }
+        public nothrow Session(int sid_) : sid(sid_), nextFree(null)
+        {
+        }
+        public int sid;
+        public Session* nextFree;
+    }
+
+    public class SessionTable
+    {
+        static SessionTable() : instance(new SessionTable())
+        {
+        }
+        public static SessionTable& Instance()
+        {
+            return *instance;
+        }
+        private nothrow SessionTable() : nextFreeSessionSlot(0), nextSid(0), free(null)
+        {
+        }
+        public Session* CreateSession()
+        {
+            Session* session = null;
+            if (free != null)
+            {
+                session = free;
+                free = free->nextFree;
+            }
+            else if (nextFreeSessionSlot < numSessionSlots)
+            {
+                session = &sessions[nextFreeSessionSlot++];
+            }
+            else
+            {
+                throw SystemError(RLIMITEXCEEDED, "maximum number of open sessions (" + ToString(numSessionSlots) + ") exceeeded");
+            }
+            session->sid = nextSid++;
+            session->nextFree = null;
+            sessionMap[session->sid] = session;
+            return session;
+        }
+        public void FreeSession(Session* session)
+        {
+            sessionMap.Remove(session->sid);
+            session->nextFree = free;
+            session->sid = -1;
+            free = session;
+        }
+        public Session* GetSession(int sid) const
+        {
+            HashMap<int, Session*>.ConstIterator it = sessionMap.CFind(sid);
+            if (it != sessionMap.CEnd())
+            {
+                return it->second;
+            }
+            else
+            {
+                throw SystemError(EINVAL, "invalid session identifier");
+            }
+        }
+        private static UniquePtr<SessionTable> instance;
+        private int nextFreeSessionSlot;
+        private int nextSid;
+        private Session[numSessionSlots] sessions;
+        private HashMap<int, Session*> sessionMap;
+        private Session* free;
+    }
+
+    public SessionTable& GetSessionTable()
+    {
+        return SessionTable.Instance();
+    }
+}
+

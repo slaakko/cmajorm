@@ -1023,25 +1023,22 @@ void Emitter::SetStaticObjectCreated(void* symbol)
 
 void* Emitter::HandlerBlock()
 {
-    // todo
-    return nullptr;
+    return emittingDelegate->HandlerBlock();
 }
 
 void* Emitter::CleanupBlock()
 {
-    // todo
-    return nullptr;
+    return emittingDelegate->CleanupBlock();
 }
 
 bool Emitter::NewCleanupNeeded()
 {
-    // todo
-    return false;
+    return emittingDelegate->NewCleanupNeeded();
 }
 
 void Emitter::CreateCleanup()
 {
-    // todo
+    return emittingDelegate->CreateCleanup();
 }
 
 cmajor::ir::Pad* Emitter::CurrentPad()
@@ -1142,14 +1139,34 @@ void* Emitter::CreateCallInstToBasicBlock(void* callee, const std::vector<void*>
 
 void* Emitter::CreateInvoke(void* callee, void* normalBlock, void* unwindBlock, const std::vector<void*>& args)
 {
-    // todo
-    return nullptr;
+    void* cleanupBlock = CleanupBlock();
+    if (unwindBlock == cleanupBlock)
+    {
+        void* nop1 = CreateNop();
+        void* beginCleanup = CreateMDStruct();
+        AddMDItem(beginCleanup, "nodeType", CreateMDLong(cmsxi::beginCleanupNodeType));
+        AddMDItem(beginCleanup, "cleanupBlockId", CreateMDBasicBlockRef(cleanupBlock));
+        int beginCleanupId = GetMDStructId(beginCleanup);
+        void* beginCleanupMdRef = CreateMDStructRef(beginCleanupId);
+        SetMetadataRef(nop1, beginCleanupMdRef);
+    }
+    void* call = CreateCall(callee, args);
+    if (unwindBlock == cleanupBlock)
+    {
+        void* nop2 = CreateNop();
+        void* endCleanup = CreateMDStruct();
+        AddMDItem(endCleanup, "nodeType", CreateMDLong(cmsxi::endCleanupNodeType));
+        AddMDItem(endCleanup, "cleanupBlockId", CreateMDBasicBlockRef(cleanupBlock));
+        int endCleanupId = GetMDStructId(endCleanup);
+        void* endCleanupMdRef = CreateMDStructRef(endCleanupId);
+        SetMetadataRef(nop2, endCleanupMdRef);
+    }
+    return call;
 }
 
 void* Emitter::CreateInvokeInst(void* callee, void* normalBlock, void* unwindBlock, const std::vector<void*>& args, const std::vector<void*>& bundles, const Span& span)
 {
-    // todo
-    return nullptr;
+    return CreateInvoke(callee, normalBlock, unwindBlock, args);
 }
 
 void* Emitter::DIBuilder()
@@ -1306,8 +1323,10 @@ void* Emitter::GetClassIdPtr(void* vmtPtr)
 
 void* Emitter::GetClassName(void* vmtPtr, int32_t classNameVmtIndexOffset)
 {
-    cmsxi::Value* classNamePtr = context->CreateElemAddr(static_cast<cmsxi::Value*>(vmtPtr), context->GetLongValue(classNameVmtIndexOffset));
-    cmsxi::Value* className = context->CreateLoad(classNamePtr);
+    cmsxi::Value* classNamePtrPtr = context->CreateElemAddr(static_cast<cmsxi::Value*>(vmtPtr), context->GetLongValue(classNameVmtIndexOffset));
+    cmsxi::Value* classNamePtr = context->CreateLoad(classNamePtrPtr);
+    cmsxi::Value* classNameCharPtr = context->CreateBitCast(classNamePtr, context->GetPtrType(context->GetPtrType(context->GetByteType())));
+    cmsxi::Value* className = context->CreateLoad(classNameCharPtr);
     return className;
 }
 
@@ -1653,6 +1672,11 @@ void* Emitter::CreateMDStruct()
     return context->CreateMDStruct();
 }
 
+void* Emitter::CreateMDBasicBlockRef(void* bb)
+{
+    return context->CreateMDBasicBlockRef(bb);
+}
+
 void Emitter::AddMDItem(void* mdStruct, const std::string& fieldName, void* mdItem)
 {
     context->AddMDStructItem(static_cast<cmsxi::MDStruct*>(mdStruct), fieldName, static_cast<cmsxi::MDItem*>(mdItem));
@@ -1676,6 +1700,11 @@ void* Emitter::GetMDStructRefForSourceFile(const std::string& sourceFileName)
 void Emitter::SetMetadataRef(void* inst, void* mdStructRef)
 {
     context->SetMetadataRef(static_cast<cmsxi::Instruction*>(inst), static_cast<cmsxi::MDStructRef*>(mdStructRef));
+}
+
+void Emitter::FinalizeFunction(void* function)
+{
+    static_cast<cmsxi::Function*>(function)->Finalize();
 }
 
 } // namespace cmsxbe

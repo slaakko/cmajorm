@@ -697,6 +697,13 @@ namespace cmsx.object
             EmitByte(b1);
             EmitByte(b0);
         }
+        public void EmitUInt(ulong address, uint x)
+        {
+            long prevPos = pos;
+            pos = cast<long>(address);
+            EmitUInt(x);
+            pos = prevPos;
+        }
         public ulong GetULong()
         {
             List<byte> b;
@@ -1078,55 +1085,78 @@ namespace cmsx.object
             writer.WriteLine("EXCEPTION TABLE " + ToHexString(exceptionTableAddress));
             long prevPos = pos;
             pos = cast<long>(exceptionTableAddress);
-            ulong numDispatchTableEntries = GetULong();
+            ulong frameSize = GetUInt();
+            writer.WriteLine("frame size: " + ToString(frameSize));
+            ulong numDispatchTableEntries = GetUInt();
+            writer.WriteLine();
+            writer.WriteLine("DISPATCH TABLE (" + ToString(numDispatchTableEntries) + " entries)");
             Set<ulong> exceptionBlockTableAddressSet;
             for (ulong i = 0u; i < numDispatchTableEntries; ++i)
             {
                 uint offset = GetUInt();
                 uint length = GetUInt();
                 ulong exceptionBlockTableAddress = GetULong();
-                writer.WriteLine("offset: " + ToString(offset) + ", length: " + ToString(length) + ", exception block table address: " + ToHexString(exceptionBlockTableAddress));
+                writer.WriteLine(ToString(i) + ": offset: " + ToString(offset) + ", length: " + ToString(length) + ", exception block table address: " + ToHexString(exceptionBlockTableAddress));
                 exceptionBlockTableAddressSet.Insert(exceptionBlockTableAddress);
             }
-            for (ulong exceptionBlockTableAddress : exceptionBlockTableAddressSet)
+            while (!exceptionBlockTableAddressSet.IsEmpty())
             {
-                writer.WriteLine();
-                writer.WriteLine("EXCEPTION BLOCK TABLE " + ToHexString(exceptionBlockTableAddress));
-                long prevPos = pos;
-                pos = cast<long>(exceptionBlockTableAddress);
-                while (true)
+                Set<ulong> newExceptionBlockTableAddressSet;
+                for (ulong exceptionBlockTableAddress : exceptionBlockTableAddressSet)
                 {
-                    ulong discriminator = GetULong();
-                    if (discriminator == handlerBlockDiscriminator)
+                    writer.WriteLine();
+                    writer.WriteLine("EXCEPTION BLOCK TABLE " + ToHexString(exceptionBlockTableAddress));
+                    long prevPos = pos;
+                    pos = cast<long>(exceptionBlockTableAddress);
+                    while (true)
                     {
-                        writer.WriteLine();
-                        writer.WriteLine("HANDLER BLOCK");
-                        ulong catchedClassId = GetULong();
-                        ulong handlerAddress = GetULong();
-                        writer.WriteLine("catched class id: " + ToString(catchedClassId));
-                        writer.Write("handlerAddress:   " + ToHexString(handlerAddress) + " ");
-                        Symbol* handlerSymbol = file->GetSymbolTable().GetSymbolByAddress(handlerAddress);
-                        if (handlerSymbol != null)
+                        ulong discriminator = GetULong();
+                        if (discriminator == handlerBlockDiscriminator)
                         {
-                            writer.Write(handlerSymbol->name);
+                            writer.WriteLine();
+                            writer.WriteLine("HANDLER BLOCK");
+                            ulong catchedClassId = GetULong();
+                            ulong handlerAddress = GetULong();
+                            writer.WriteLine("catched class id:   " + ToString(catchedClassId));
+                            writer.Write("handlerAddress:     " + ToHexString(handlerAddress) + " ");
+                            Symbol* handlerSymbol = file->GetSymbolTable().GetSymbolByAddress(handlerAddress);
+                            if (handlerSymbol != null)
+                            {
+                                writer.Write(handlerSymbol->name);
+                            }
+                            writer.WriteLine();
                         }
-                        writer.WriteLine();
+                        else if (discriminator == cleanupBlockDiscriminator)
+                        {
+                            writer.WriteLine();
+                            writer.WriteLine("CLEANUP BLOCK");
+                            ulong cleanupAddress = GetULong();
+                            ulong  parentTableAddress = GetULong();
+                            writer.Write("cleanup address:    " + ToHexString(cleanupAddress) + " ");
+                            Symbol* cleanupSymbol = file->GetSymbolTable().GetSymbolByAddress(cleanupAddress);
+                            if (cleanupSymbol != null)
+                            {
+                                writer.Write(cleanupSymbol->name);
+                            }
+                            writer.WriteLine();
+                            writer.WriteLine("parent table addr:  " + ToHexString(parentTableAddress));
+                            if (parentTableAddress != 0u)
+                            {
+                                newExceptionBlockTableAddressSet.Insert(parentTableAddress);
+                            }
+                        }
+                        else if (discriminator == endBlockDiscriminator)
+                        {
+                            break;
+                        }
+                        else
+                        {
+                            throw Exception("unknonwn exception block table discriminator " + ToString(discriminator));
+                        }
                     }
-                    else if (discriminator == cleanupBlockDiscriminator)
-                    {
-                        writer.WriteLine();
-                        writer.WriteLine("CLEANUP BLOCK");
-                    }
-                    else if (discriminator == endBlockDiscriminator)
-                    {
-                        break;
-                    }
-                    else
-                    {
-                        throw Exception("unknonwn exception block table discriminator " + ToString(discriminator));
-                    }
+                    pos = prevPos;  
                 }
-                pos = prevPos;  
+                Swap(exceptionBlockTableAddressSet, newExceptionBlockTableAddressSet);
             }
             pos = prevPos;
         }
@@ -1237,8 +1267,6 @@ namespace cmsx.object
                 symbol->linkEnd = cast<int>(linkEnd);
                 int alignment = GetByte();
                 symbol->alignment = cast<byte>(alignment);
-                uint frameSize = GetUInt();
-                symbol->frameSize = frameSize;
                 file->GetSymbolTable().AddSymbol(symbol, false);
             }
             ulong numInternalSymbols = GetULong();
@@ -1279,8 +1307,6 @@ namespace cmsx.object
                 symbol->linkEnd = cast<int>(linkEnd);
                 int alignment = GetByte();
                 symbol->alignment = cast<byte>(alignment);
-                uint frameSize = GetUInt();
-                symbol->frameSize = frameSize;
                 file->GetSymbolTable().AddInternalSymbol(symbol, false);
             }
         }
@@ -1316,7 +1342,6 @@ namespace cmsx.object
             EmitUInt(cast<uint>(symbol->linkStart));
             EmitUInt(cast<uint>(symbol->linkEnd));
             EmitByte(symbol->alignment);
-            EmitUInt(symbol->frameSize);
         }
         public void EmitValue(const Value& value)
         {
@@ -1357,7 +1382,6 @@ namespace cmsx.object
                     symbolLine.Append(" ").Append(ToString(symbol->linkEnd));
                 }
                 symbolLine.Append(" ").Append(ToString(symbol->alignment));
-                symbolLine.Append(" ").Append(ToString(symbol->frameSize));
                 writer.WriteLine(symbolLine);
             }
             for (const UniquePtr<Symbol>& symbol : symbolTable.InternalSymbols())
@@ -1548,7 +1572,7 @@ namespace cmsx.object
                     uint offset = GetUInt();
                     debugLine.Append(" ").Append(ToString(tryBlockId)).Append(' ').Append(ToString(offset));
                 }
-                else if (debugRecordCode == DebugRecordCode.beginCatch)
+                else if (debugRecordCode == DebugRecordCode.catch_)
                 {
                     uint catchBlockId = GetUInt();
                     uint tryBlockId = GetUInt();
@@ -1557,10 +1581,17 @@ namespace cmsx.object
                     Uuid catchedTypeId(catchTypeId1, catchTypeId2);
                     debugLine.Append(" ").Append(ToString(catchBlockId)).Append(' ').Append(ToString(tryBlockId)).Append(' ').Append(ToString(catchedTypeId));
                 }
-                else if (debugRecordCode == DebugRecordCode.endCatch)
+                else if (debugRecordCode == DebugRecordCode.beginCleanup)
                 {
-                    uint catchBlockId = GetUInt();
-                    debugLine.Append(" ").Append(ToString(catchBlockId));
+                    uint cleanupBlockId = GetUInt();
+                    uint offset = GetUInt();
+                    debugLine.Append(" ").Append(ToString(cleanupBlockId)).Append(' ').Append(' ').Append(ToString(offset));
+                }
+                else if (debugRecordCode == DebugRecordCode.endCleanup)
+                {
+                    uint cleanupBlockId = GetUInt();
+                    uint offset = GetUInt();
+                    debugLine.Append(" ").Append(ToString(cleanupBlockId)).Append(' ').Append(' ').Append(ToString(offset));
                 }
                 else
                 {
@@ -1613,18 +1644,25 @@ namespace cmsx.object
             EmitUInt(tryBlockId);
             EmitUInt(offset);
         }
-        public void EmitBeginCatch(uint catchBlockId, uint tryBlockId, ulong catchedTypeId1, ulong catchedTypeId2)
+        public void EmitCatch(uint catchBlockId, uint tryBlockId, ulong catchedTypeId1, ulong catchedTypeId2)
         {
-            EmitByte(cast<byte>(DebugRecordCode.beginCatch));
+            EmitByte(cast<byte>(DebugRecordCode.catch_));
             EmitUInt(catchBlockId);
             EmitUInt(tryBlockId);
             EmitULong(catchedTypeId1);
             EmitULong(catchedTypeId2);
         }
-        public void EmitEndCatch(uint catchBlockId)
+        public void EmitBeginCleanup(uint cleanupBlockId, uint offset)
         {
-            EmitByte(cast<byte>(DebugRecordCode.endCatch));
-            EmitUInt(catchBlockId);
+            EmitByte(cast<byte>(DebugRecordCode.beginCleanup));
+            EmitUInt(cleanupBlockId);
+            EmitUInt(offset);
+        }
+        public void EmitEndCleanup(uint cleanupBlockId, uint offset)
+        {
+            EmitByte(cast<byte>(DebugRecordCode.endCleanup));
+            EmitUInt(cleanupBlockId);
+            EmitUInt(offset);
         }
         public override void Finalize()
         {

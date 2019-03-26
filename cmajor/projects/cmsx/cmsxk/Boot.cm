@@ -74,6 +74,9 @@ namespace cmsx.kernel
         TrapHandler catchSystemCallHandler = Catch;
         ulong catchSystemCallAddress = cast<ulong>(cast<void*>(catchSystemCallHandler));
         mem.WriteULong(MakeSystemCallPtrAddress(catchSystemCall), catchSystemCallAddress, Protection.write);
+        TrapHandler resumeSystemCallHandler = Resume;
+        ulong resumeSystemCallAddress = cast<ulong>(cast<void*>(resumeSystemCallHandler));
+        mem.WriteULong(MakeSystemCallPtrAddress(resumeSystemCall), resumeSystemCallAddress, Protection.write);
     }
 
     public void Boot(Machine& machine)
@@ -87,16 +90,19 @@ namespace cmsx.kernel
         InitializeInterruptVector(machine);
         InitializeSystemCalls(machine);
         Kernel& kernel = Kernel.Instance();
+        SessionTable& sessionTable = kernel.GetSessionTable();
+        Session* currentSession = sessionTable.CreateSession();
+        kernel.SetCurrentSession(currentSession);
         ProcessTable& processTable = kernel.GetProcessTable();
         int pid = -1;
         if (Machine.GetFlag(Machine.Flags.runProgram))
         {
-            pid = Load(kernel.GetProgramFileName(), kernel.GetProgramArguments());
+            pid = Load(kernel.GetProgramFileName(), kernel.GetProgramArguments(), currentSession->sid);
             kernel.SetProgramPID(pid);
         }
         else
         {
-            CreateInitAndIdleProcesses(machine, processTable);
+            CreateInitAndIdleProcesses(machine, processTable, currentSession->sid);
         }
         if (pid != -1)
         {

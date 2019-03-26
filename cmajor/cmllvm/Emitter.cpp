@@ -1795,6 +1795,11 @@ void* Emitter::CreateMDStruct()
     return nullptr;
 }
 
+void* Emitter::CreateMDBasicBlockRef(void* bb)
+{
+    return nullptr;
+}
+
 int Emitter::GetMDStructId(void* mdStruct)
 {
     return 0;
@@ -1818,6 +1823,10 @@ void* Emitter::GetMDStructRefForSourceFile(const std::string& sourceFileName)
 }
 
 void Emitter::SetMetadataRef(void* inst, void* mdStructRef)
+{
+}
+
+void Emitter::FinalizeFunction(void* function)
 {
 }
 

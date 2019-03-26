@@ -25,8 +25,14 @@ const int64_t funcInfoNodeType = 1;
 const int64_t lineInfoNodeType = 2;
 const int64_t beginTryNodeType = 3;
 const int64_t endTryNodeType = 4;
-const int64_t beginCatchNodeType = 5;
-const int64_t endCatchNodeType = 6;
+const int64_t catchNodeType = 5;
+
+struct Cleanup
+{
+    Cleanup(void* cleanupBlock_) : cleanupBlock(cleanupBlock_) {}
+    void* cleanupBlock;
+    std::vector<std::unique_ptr<BoundFunctionCall>> destructors;
+};
 
 class CODEGENSX_API SystemXCodeGenerator : public cmajor::codegenbase::CodeGenerator, public BoundNodeVisitor, public cmajor::ir::EmittingDelegate
 {
@@ -94,6 +100,11 @@ public:
     void* GetGlobalWStringConstant(int stringId) override;
     void* GetGlobalUStringConstant(int stringId) override;
     void* GetGlobalUuidConstant(int uuidId) override;
+    void* HandlerBlock() override;
+    void* CleanupBlock() override;
+    bool NewCleanupNeeded() override;
+    void CreateCleanup() override;
+    void GenerateCodeForCleanups();
 private:
     cmajor::ir::Emitter* emitter;
     cmajor::ir::EmittingContext* emittingContext;
@@ -118,6 +129,7 @@ private:
     BoundCompoundStatement* continueTargetBlock;
     std::unordered_map<BoundStatement*, void*> labeledStatementMap;
     std::unordered_map<BoundCompoundStatement*, std::vector<std::unique_ptr<BoundFunctionCall>>> blockDestructionMap;
+    std::vector<std::unique_ptr<Cleanup>> cleanups;
     std::vector<BoundCompoundStatement*> blocks;
     void* lastAlloca;
     BoundClass* currentClass;
@@ -134,6 +146,9 @@ private:
     int64_t currentTryBlockId;
     int64_t nextTryBlockId;
     void* currentTryNextBlock;
+    void* handlerBlock;
+    void* cleanupBlock;
+    bool newCleanupNeeded;
 };
 
 } } // namespace cmajor::codegensx

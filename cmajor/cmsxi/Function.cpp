@@ -9,9 +9,9 @@
 
 namespace cmsxi {
 
-Function::Function(const std::string& name_, FunctionType* type_, Context& context) : Value(), name(name_), type(type_), nextResultNumber(0), linkOnce(false), mdId(-1)
+Function::Function(const std::string& name_, FunctionType* type_, Context& context) : Value(), name(name_), type(type_), nextResultNumber(0), linkOnce(false), mdId(-1), nextBBNumber(0)
 {
-    entryBlock.reset(new BasicBlock(basicBlocks.size()));
+    entryBlock.reset(new BasicBlock(nextBBNumber++));
     for (Type* paramType : type->ParamTypes())
     {
         Instruction* paramInst = new ParamInstruction(paramType);
@@ -29,9 +29,22 @@ BasicBlock* Function::CreateBasicBlock()
         basicBlocks.push_back(std::move(entryBlock));
         return bb;
     }
-    BasicBlock* bb = new BasicBlock(basicBlocks.size());
+    BasicBlock* bb = new BasicBlock(nextBBNumber++);
     basicBlocks.push_back(std::unique_ptr<BasicBlock>(bb));
     return bb;
+}
+
+void Function::Finalize()
+{
+    nextBBNumber = 0;
+    for (auto& bb : basicBlocks)
+    {
+        if (bb->IsEmpty())
+        {
+            continue;
+        }
+        bb->SetId(nextBBNumber++);
+    }
 }
 
 Value* Function::GetParam(int index) const
@@ -59,6 +72,10 @@ void Function::Write(CodeFormatter& formatter, Context& context)
     bool first = true;
     for (const auto& bb : basicBlocks)
     {
+        if (bb->IsEmpty())
+        {
+            continue;
+        }
         if (first)
         {
             first = false;

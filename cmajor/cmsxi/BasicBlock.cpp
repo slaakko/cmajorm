@@ -20,7 +20,12 @@ void BasicBlock::AddInstruction(Instruction* instruction)
 void BasicBlock::Write(CodeFormatter& formatter, Function& function, Context& context)
 {
     int indent = formatter.IndentSize();
-    formatter.DecIndent();
+    bool indentDecremented = false;
+    if (formatter.CurrentIndent() > 0)
+    {
+        formatter.DecIndent();
+        indentDecremented = true;
+    }
     formatter.Write(Format("@" + std::to_string(id), indent, FormatWidth::min));
     bool first = true;
     for (const auto& inst : instructions)
@@ -29,7 +34,10 @@ void BasicBlock::Write(CodeFormatter& formatter, Function& function, Context& co
         formatter.WriteLine();
         if (first)
         {
-            formatter.IncIndent();
+            if (indentDecremented)
+            {
+                formatter.IncIndent();
+            }
             first = false;
         }
     }

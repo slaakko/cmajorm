@@ -806,7 +806,7 @@ namespace cmsx.object
         }
     }
 
-    public List<DispatchTableEntry> InsertIntoDispatchTable(const List<DispatchTableEntry>& dispatchTable, const DispatchTableEntry& entry)
+    public List<DispatchTableEntry> InsertIntoDispatchTable(const List<DispatchTableEntry>& dispatchTable, const DispatchTableEntry& entry, Section* dataSection)
     {
         bool inserted = false;
         List<DispatchTableEntry> newDispatchTable;
@@ -826,14 +826,23 @@ namespace cmsx.object
             {
                 if (entry.offset + entry.length <= prevEntry.offset + prevEntry.length)
                 {
-                    DispatchTableEntry startEntry(prevEntry.offset, entry.offset - prevEntry.offset, prevEntry.exceptionBlockTableAddress);
+                    if ((prevEntry.dispatchBlock is TryBlock*) && (entry.dispatchBlock is CleanupDispatchBlock*))
+                    {
+                        ulong parentTableAddress = prevEntry.exceptionBlockTableAddress;
+                        long prevPos = dataSection->pos;
+                        dataSection->pos = cast<long>(entry.exceptionBlockTableAddress + 16u);
+                        dataSection->EmitULong(parentTableAddress);
+                        dataSection->pos = prevPos;
+                    }
+                    DispatchTableEntry startEntry(prevEntry.offset, entry.offset - prevEntry.offset, prevEntry.exceptionBlockTableAddress, prevEntry.dispatchBlock);
                     if (startEntry.length > 0)
                     {
                         newDispatchTable.Add(startEntry);
                     }
                     newDispatchTable.Add(entry);
                     inserted = true;
-                    DispatchTableEntry endEntry(entry.offset + entry.length, (prevEntry.offset + prevEntry.length) - (entry.offset + entry.length), prevEntry.exceptionBlockTableAddress);
+                    DispatchTableEntry endEntry(entry.offset + entry.length, (prevEntry.offset + prevEntry.length) - (entry.offset + entry.length), prevEntry.exceptionBlockTableAddress,
+                        prevEntry.dispatchBlock);
                     if (endEntry.length > 0)
                     {
                         newDispatchTable.Add(endEntry);
@@ -877,13 +886,27 @@ namespace cmsx.object
                     executableDataSection->EmitULong(handlerBlock.handlerAddress);
                 }
                 executableDataSection->EmitULong(endBlockDiscriminator);
-                DispatchTableEntry entry(tryBlock.offset, tryBlock.length, exceptionBlockTableAddress);
-                dispatchTable = InsertIntoDispatchTable(dispatchTable, entry);
+                DispatchTableEntry entry(tryBlock.offset, tryBlock.length, exceptionBlockTableAddress, &tryBlock);
+                dispatchTable = InsertIntoDispatchTable(dispatchTable, entry, executableDataSection);
+            }
+        }
+        for (const CleanupDispatchBlock& cleanupDispatchBlock : functionExceptionData.cleanupDispatchBlocks)
+        {
+            if (cleanupDispatchBlock.length > 0)
+            {
+                ulong exceptionBlockTableAddress = executableDataSection->Address();
+                executableDataSection->EmitULong(cleanupDispatchBlock.cleanupBlock.discriminator);
+                executableDataSection->EmitULong(cleanupDispatchBlock.cleanupBlock.cleanupAddress);
+                executableDataSection->EmitULong(cleanupDispatchBlock.cleanupBlock.parentTableAddress);
+                executableDataSection->EmitULong(endBlockDiscriminator);
+                DispatchTableEntry entry(cleanupDispatchBlock.offset, cleanupDispatchBlock.length, exceptionBlockTableAddress, &cleanupDispatchBlock);
+                dispatchTable = InsertIntoDispatchTable(dispatchTable, entry, executableDataSection);
             }
         }
         executableDataSection->Align(8u);
         ulong exceptionTableAddress = executableDataSection->Address();
-        executableDataSection->EmitULong(cast<ulong>(dispatchTable.Count()));
+        executableDataSection->EmitUInt(functionExceptionData.frameSize);
+        executableDataSection->EmitUInt(cast<uint>(dispatchTable.Count()));
         for (long i = 0; i < dispatchTable.Count(); ++i)
         {
             const DispatchTableEntry& entry = dispatchTable[i];
@@ -895,8 +918,12 @@ namespace cmsx.object
     }
 
     public void ProcessDebugSection(ExecutableFile& executable, ObjectFile* objectFile, HashMap<string, ulong>& stringAddressMap, List<FunctionTableEntry>& functionTable,
-        HashSet<ulong>& functionAddressSet, const ClassIdMap& classIdMap)
+        HashSet<ulong>& functionAddressSet, const ClassIdMap& classIdMap, bool debug)
     {
+        if (debug)
+        {
+            Console.Out() << "begin processing debug section of " << objectFile->FileName() << endl();
+        }
         Section* debugSection = objectFile->debugSection;
         Section* executableDataSection = executable.dataSection;
         HashMap<uint, ulong> sourceFileIdAddressMap;
@@ -958,7 +985,6 @@ namespace cmsx.object
                             {
                                 functionAddressSet.Insert(finalFunctionSymbol->start);
                                 HashMap<string, ulong>.ConstIterator it1 = stringAddressMap.CFind(finalFunctionSymbol->name);
-                                finalFunctionSymbol->frameSize = frameSize;
                                 ulong mangledNameAddress = 0u;
                                 if (it1 == stringAddressMap.CEnd())
                                 {
@@ -987,6 +1013,7 @@ namespace cmsx.object
                                 if (it3 != exceptionTableAddressMap.CEnd())
                                 {
                                     exceptionTableAddress = it3->second;
+                                    executable.dataSection->EmitUInt(exceptionTableAddress, frameSize);
                                 }
                                 LineNumberTableLimits& lineNumberTable = lineNumberTableMap[functionSymbol->name];
                                 FunctionTableEntry entry(finalFunctionSymbol->start, finalFunctionSymbol->length, mangledNameAddress, fullNameAddress, sourceFileNameAddress,
@@ -1013,6 +1040,7 @@ namespace cmsx.object
                         lineNumberTableMap[functionSymbol->name] = lineNumberTable;
                         functionExceptionData = FunctionExceptionData();
                         functionExceptionData.functionName = functionSymbol->name;
+                        Symbol* finalFunctionSymbol = executable.GetSymbolTable().GetSymbol(functionSymbol->name);
                     }
                 }
                 else if (debugRecordCode == DebugRecordCode.endFunc)
@@ -1068,7 +1096,7 @@ namespace cmsx.object
                         }
                     }
                 }
-                else if (debugRecordCode == DebugRecordCode.beginCatch)
+                else if (debugRecordCode == DebugRecordCode.catch_)
                 {
                     uint catchBlockId = debugSection->GetUInt();
                     uint tryBlockId = debugSection->GetUInt();
@@ -1101,12 +1129,44 @@ namespace cmsx.object
                         }
                     }
                 }
-                else if (debugRecordCode == DebugRecordCode.endCatch)
+                else if (debugRecordCode == DebugRecordCode.beginCleanup)
                 {
-                    uint catchBlockId = debugSection->GetUInt();
+                    uint cleanupBlockId = debugSection->GetUInt();
+                    uint offset = debugSection->GetUInt();
                     if (processFunc)
                     {
-                        // todo
+                        CleanupDispatchBlock cleanupDispatchBlock(cleanupBlockId, offset);
+                        string cleanupBlockSymbolName = functionExceptionData.functionName;
+                        cleanupBlockSymbolName.Append('@').Append(ToString(cleanupBlockId));
+                        Symbol* cleanupAddessSymbol = executable.GetSymbolTable().GetInternalSymbol(cleanupBlockSymbolName);
+                        if (cleanupAddessSymbol != null)
+                        {
+                            ulong cleanupAddess = cleanupAddessSymbol->start;
+                            CleanupBlock cleanupBlock(cleanupAddess, 0u);
+                            cleanupDispatchBlock.cleanupBlock = cleanupBlock;
+                        }
+                        else
+                        {
+                            throw Exception("cleanup address for symbol '" + cleanupBlockSymbolName + "' not found from the symbol table of the executable");
+                        }
+                        functionExceptionData.cleanupDispatchBlocks.Add(cleanupDispatchBlock);
+                    }
+                }
+                else if (debugRecordCode == DebugRecordCode.endCleanup)
+                {
+                    uint cleanupBlockId = debugSection->GetUInt();
+                    uint offset = debugSection->GetUInt();
+                    if (processFunc)
+                    {
+                        CleanupDispatchBlock* cleanupDispatchBlock = functionExceptionData.GetCleanupDispatchBlock(cleanupBlockId);
+                        if (cleanupDispatchBlock != null)
+                        {
+                            cleanupDispatchBlock->length = offset - cleanupDispatchBlock->offset;
+                        }
+                        else
+                        {
+                            throw Exception("cleanup block id " + ToString(cleanupBlockId) + " not found");
+                        }
                     }
                 }
                 else
@@ -1116,9 +1176,13 @@ namespace cmsx.object
                 x = debugSection->GetByte();
             }
         }
+        if (debug)
+        {
+            Console.Out() << "end processing debug section of " << objectFile->FileName() << endl();
+        }
     }
 
-    public void MakeFuctionTable(ExecutableFile& executable, List<UniquePtr<BinaryFile>>& binaryFiles, const ClassIdMap& classIdMap)
+    public void MakeFuctionTable(ExecutableFile& executable, List<UniquePtr<BinaryFile>>& binaryFiles, const ClassIdMap& classIdMap, bool debug)
     {
         Section* executableDataSection = executable.dataSection;
         long prevPos = executableDataSection->pos;
@@ -1139,14 +1203,14 @@ namespace cmsx.object
             if (binaryFile.Get() is ObjectFile*)
             {
                 ObjectFile* objectFile = cast<ObjectFile*>(binaryFile.Get());
-                ProcessDebugSection(executable, objectFile, sourceFileNameAddressMap, functionTable, functionAddressSet, classIdMap);
+                ProcessDebugSection(executable, objectFile, sourceFileNameAddressMap, functionTable, functionAddressSet, classIdMap, debug);
             }
             else if (binaryFile.Get() is LibraryFile*)
             {
                 LibraryFile* libraryFile = cast<LibraryFile*>(binaryFile.Get());
                 for (const UniquePtr<ObjectFile>& objectFile : libraryFile->objectFiles)
                 {
-                    ProcessDebugSection(executable, objectFile.Get(), sourceFileNameAddressMap, functionTable, functionAddressSet, classIdMap);
+                    ProcessDebugSection(executable, objectFile.Get(), sourceFileNameAddressMap, functionTable, functionAddressSet, classIdMap, debug);
                 }
             }
         }
@@ -1230,7 +1294,7 @@ namespace cmsx.object
         }
         linkTable.ReportUnresolvedSymbols();
         linkTable.CopyRanges(debug);
-        MakeFuctionTable(executable, binaryFiles, classIdMap);
+        MakeFuctionTable(executable, binaryFiles, classIdMap, debug);
         executable.Finalize();
         executable.Write();
     }

@@ -17,7 +17,9 @@ public:
     BasicBlock(const BasicBlock&) = delete;
     BasicBlock& operator=(const BasicBlock&) = delete;
     void AddInstruction(Instruction* instruction);
+    bool IsEmpty() const { return instructions.empty(); }
     int Id() const { return id; }
+    void SetId(int id_) { id = id_; }
     void Write(CodeFormatter& formatter, Function& function, Context& context);
 private:
     int id;

@@ -88,7 +88,7 @@ namespace cmsx.kernel
         }
     }
 
-    public nothrow void AllocateMemoryPages(Memory& mem, ulong rootPageAddress, byte segmentIndex, ulong startPageNumber, ulong numPages, ushort addressSpaceNumber)
+    public void AllocateMemoryPages(Memory& mem, ulong rootPageAddress, byte segmentIndex, ulong startPageNumber, ulong numPages, ushort addressSpaceNumber)
     {
         Protection protection = MakeDefaultPageProtection(segmentIndex);
         ulong firstRootPageEntryNumber = MakeSegmentOffset(segmentIndex);
@@ -329,7 +329,7 @@ namespace cmsx.kernel
         }
     }
 
-    public nothrow void FreeMemoryPages(Memory& mem, ulong rootPageAddress, byte segmentIndex, ulong startPageNumber, ulong numPages)
+    public void FreeMemoryPages(Memory& mem, ulong rootPageAddress, byte segmentIndex, ulong startPageNumber, ulong numPages)
     {
         ulong firstRootPageEntryNumber = MakeSegmentOffset(segmentIndex);
         ulong lastDirectRootPageEntryNumber = firstRootPageEntryNumber + numDirectEntries - 1u;
@@ -683,7 +683,7 @@ namespace cmsx.kernel
         }
     }
 
-    public nothrow void ShareMemoryPages(Memory& mem, ulong targetRootPageAddress, byte segmentIndex, ulong startPageNumber, ulong numPages, ushort targetAddressSpaceNumber,
+    public void ShareMemoryPages(Memory& mem, ulong targetRootPageAddress, byte segmentIndex, ulong startPageNumber, ulong numPages, ushort targetAddressSpaceNumber,
         ulong sourceRootPageAddress, ushort sourceAddressSpaceNumber, Protection pageProtection)
     {
         ulong firstRootPageEntryNumber = MakeSegmentOffset(segmentIndex);
@@ -964,7 +964,7 @@ namespace cmsx.kernel
         }
     }
 
-    public nothrow void CopyMemoryPages(Memory& mem, ulong targetRootPageAddress, byte segmentIndex, ulong startPageNumber, ulong numPages, ushort targetAddressSpaceNumber,
+    public void CopyMemoryPages(Memory& mem, ulong targetRootPageAddress, byte segmentIndex, ulong startPageNumber, ulong numPages, ushort targetAddressSpaceNumber,
         ulong sourceRootPageAddress, ushort sourceAddressSpaceNumber, Protection pageProtection)
     {
         ulong firstRootPageEntryNumber = MakeSegmentOffset(segmentIndex);
@@ -1229,8 +1229,7 @@ namespace cmsx.kernel
         }
     }
 
-
-    public nothrow void AllocateMemory(Memory& mem, const MemoryTable& memoryTable)
+    public void AllocateMemory(Memory& mem, const MemoryTable& memoryTable)
     {
         for (byte i = 0u; i < numSegments; ++i)
         {
@@ -1245,7 +1244,7 @@ namespace cmsx.kernel
         }
     }
 
-    public nothrow void FreeMemory(Memory& mem, MemoryTable& memoryTable)
+    public void FreeMemory(Memory& mem, MemoryTable& memoryTable)
     {
         for (byte i = 0u; i < numSegments; ++i)
         {
@@ -1269,12 +1268,12 @@ namespace cmsx.kernel
         memoryTable.rootPageAddress = 0u;
     }
 
-    public nothrow bool CloneMemory(Memory& mem, MemoryTable& targetMemoryTable, MemoryTable& sourceMemoryTable)
+    public void CloneMemory(Memory& mem, MemoryTable& targetMemoryTable, MemoryTable& sourceMemoryTable)
     {
-        return CloneMemory(mem, targetMemoryTable, sourceMemoryTable, true);
+        CloneMemory(mem, targetMemoryTable, sourceMemoryTable, true);
     }
 
-    public nothrow bool CloneMemory(Memory& mem, MemoryTable& targetMemoryTable, MemoryTable& sourceMemoryTable, bool copyOnWrite)
+    public void CloneMemory(Memory& mem, MemoryTable& targetMemoryTable, MemoryTable& sourceMemoryTable, bool copyOnWrite)
     {
         for (byte i = 0u; i < numSegments; ++i)
         {
@@ -1283,119 +1282,145 @@ namespace cmsx.kernel
             {
                 if (i == textSegmentIndex)
                 {
-                    if (!ShareSegment(mem, i, targetMemoryTable, sourceMemoryTable, MakeDefaultPageProtection(i)))
-                    {
-                        return false;
-                    }
+                    ShareSegment(mem, i, targetMemoryTable, sourceMemoryTable, MakeDefaultPageProtection(i));
                 }
                 else
                 {
                     if (copyOnWrite)
                     {
-                        if (!ShareSegment(mem, i, targetMemoryTable, sourceMemoryTable, Protection.copyOnWrite))
-                        {
-                            return false;
-                        }
+                        ShareSegment(mem, i, targetMemoryTable, sourceMemoryTable, Protection.copyOnWrite);
                     }
                     else
                     {
-                        if (!CopySegment(mem, i, targetMemoryTable, sourceMemoryTable, MakeDefaultPageProtection(i)))
-                        {
-                            return false;
-                        }
+                        CopySegment(mem, i, targetMemoryTable, sourceMemoryTable, MakeDefaultPageProtection(i));
                     }
                 }
             }
         }
-        return true;
     }
 
-    public nothrow bool GrowSegment(Memory& mem, MemoryTable& memoryTable, byte segmentIndex, ulong numBytes)
+    public void GrowSegment(Memory& mem, MemoryTable& memoryTable, byte segmentIndex, ulong numBytes)
     {
-        if (segmentIndex >= numSegments) return false;
-        if (numBytes == 0u) return true;
-        SegmentDescriptor* sd = memoryTable.segmentDescriptors[segmentIndex];
-        if (sd== null) return false;
-        ulong startPageNumber = 0u;
-        ulong numPages = 0u;
-        CalculatePageNumbers(*sd, startPageNumber, numPages);
-        startPageNumber = startPageNumber + numPages;
-        numPages = 0u;
-        if (numBytes > 0)
+        if (segmentIndex >= numSegments)
         {
-            numPages = (numBytes - 1u) / pageSize + 1u;
+            throw Exception("invalid segment index " + ToString(segmentIndex));
         }
-        AllocateMemoryPages(mem, memoryTable.rootPageAddress, segmentIndex, startPageNumber, numPages, memoryTable.addressSpaceNumber);
-        ulong oldLength = sd->length;
-        ulong newLength = oldLength + numPages * pageSize;
-        sd->length = newLength;
-        return true;
+        if (numBytes > 0u)
+        {
+            SegmentDescriptor* sd = memoryTable.segmentDescriptors[segmentIndex];
+            if (sd == null)
+            {
+                throw Exception("segment desciptor for segment index " + ToString(segmentIndex) + " is null");
+            }
+            ulong startPageNumber = 0u;
+            ulong numPages = 0u;
+            CalculatePageNumbers(*sd, startPageNumber, numPages);
+            startPageNumber = startPageNumber + numPages;
+            numPages = 0u;
+            if (numBytes > 0)
+            {
+                numPages = (numBytes - 1u) / pageSize + 1u;
+            }
+            AllocateMemoryPages(mem, memoryTable.rootPageAddress, segmentIndex, startPageNumber, numPages, memoryTable.addressSpaceNumber);
+            ulong oldLength = sd->length;
+            ulong newLength = oldLength + numPages * pageSize;
+            sd->length = newLength;
+        }
     }
 
-    public nothrow bool ShrinkSegment(Memory& mem, MemoryTable& memoryTable, byte segmentIndex, ulong numBytes)
+    public void ShrinkSegment(Memory& mem, MemoryTable& memoryTable, byte segmentIndex, ulong numBytes)
     {
-        if (segmentIndex >= numSegments) return false;
-        if (numBytes == 0u) return true;
-        SegmentDescriptor* sd = memoryTable.segmentDescriptors[segmentIndex];
-        if (sd == null) return false;
-        ulong startPageNumber = 0u;
-        ulong numPages = 0u;
-        CalculatePageNumbers(*sd, startPageNumber, numPages);
-        startPageNumber = startPageNumber + numPages;
-        numPages = 0u;
-        if (numBytes > 0)
+        if (segmentIndex >= numSegments)
         {
-            numPages = (numBytes - 1u) / pageSize + 1u;
+            throw Exception("invalid segment index " + ToString(segmentIndex));
         }
-        if (startPageNumber < numPages)
+        if (numBytes >= 0)
         {
-            return false; 
+            SegmentDescriptor* sd = memoryTable.segmentDescriptors[segmentIndex];
+            if (sd == null)
+            {
+                throw Exception("segment descriptor for segment index " + ToString(segmentIndex) + " is null");
+            }
+            ulong startPageNumber = 0u;
+            ulong numPages = 0u;
+            CalculatePageNumbers(*sd, startPageNumber, numPages);
+            startPageNumber = startPageNumber + numPages;
+            numPages = 0u;
+            if (numBytes > 0)
+            {
+                numPages = (numBytes - 1u) / pageSize + 1u;
+            }
+            if (startPageNumber < numPages)
+            {
+                throw Exception("internal error: start page number less than number of pages");
+            }
+            startPageNumber = startPageNumber - numPages;
+            FreeMemoryPages(mem, memoryTable.rootPageAddress, segmentIndex, startPageNumber, numPages);
+            ulong oldLength = sd->length;
+            ulong newLength = oldLength - numPages * pageSize;
+            sd->length = newLength;
         }
-        startPageNumber = startPageNumber - numPages;
-        FreeMemoryPages(mem, memoryTable.rootPageAddress, segmentIndex, startPageNumber, numPages);
-        ulong oldLength = sd->length;
-        ulong newLength = oldLength - numPages * pageSize;
-        sd->length = newLength;
-        return true;
     }
 
-    public nothrow bool ShareSegment(Memory& mem, byte segmentIndex, MemoryTable& targetMemoryTable, const MemoryTable& sourceMemoryTable, Protection protection)
+    public void ShareSegment(Memory& mem, byte segmentIndex, MemoryTable& targetMemoryTable, const MemoryTable& sourceMemoryTable, Protection protection)
     {
-        if (segmentIndex >= numSegments) return false;
-        if (targetMemoryTable.segmentDescriptors[segmentIndex] != null) return false;
+        if (segmentIndex >= numSegments)
+        {
+            throw Exception("share segment: invalid segment index " + ToString(segmentIndex));
+        }
+        if (targetMemoryTable.segmentDescriptors[segmentIndex] != null)
+        {
+            throw Exception("internal error: share segment: target segment descriptor not null"); 
+        }
         SegmentDescriptor* sourceSegmentDescriptor = sourceMemoryTable.segmentDescriptors[segmentIndex];
-        if (sourceSegmentDescriptor == null) return false;
+        if (sourceSegmentDescriptor == null)
+        {
+            throw Exception("internal error: share segment: source segment descriptor is null"); 
+        }
         if (targetMemoryTable.rootPageAddress == 0u)
         {
             targetMemoryTable.rootPageAddress = mem.AllocateRootPage();
         }
         SegmentDescriptor* targetSegmentDescriptor = CreateSegmentDescriptor(sourceSegmentDescriptor->startAddress, sourceSegmentDescriptor->baseAddress, sourceSegmentDescriptor->length);
-        if (targetSegmentDescriptor == null) return false;
+        if (targetSegmentDescriptor == null)
+        {
+            throw Exception("internal error: share segment: target segment descriptor is null"); 
+        }
         ulong startPageNumber = 0u;
         ulong numPages = 0u;
         CalculatePageNumbers(*targetSegmentDescriptor, startPageNumber, numPages);
         ShareMemoryPages(mem, targetMemoryTable.rootPageAddress, segmentIndex, startPageNumber, numPages, targetMemoryTable.addressSpaceNumber,
             sourceMemoryTable.rootPageAddress, sourceMemoryTable.addressSpaceNumber, protection);
-        return true;
     }
 
-    public nothrow bool CopySegment(Memory& mem, byte segmentIndex, MemoryTable& targetMemoryTable, const MemoryTable& sourceMemoryTable, Protection protection)
+    public void CopySegment(Memory& mem, byte segmentIndex, MemoryTable& targetMemoryTable, const MemoryTable& sourceMemoryTable, Protection protection)
     {
-        if (segmentIndex >= numSegments) return false;
-        if (targetMemoryTable.segmentDescriptors[segmentIndex] != null) return false;
+        if (segmentIndex >= numSegments)
+        {
+            throw Exception("share segment: invalid segment index " + ToString(segmentIndex));
+        }
+        if (targetMemoryTable.segmentDescriptors[segmentIndex] != null)
+        {
+            throw Exception("internal error: share segment: target segment descriptor not null"); 
+        }
         SegmentDescriptor* sourceSegmentDescriptor = sourceMemoryTable.segmentDescriptors[segmentIndex];
-        if (sourceSegmentDescriptor == null) return false;
+        if (sourceSegmentDescriptor == null)
+        {
+            throw Exception("internal error: share segment: source segment descriptor is null"); 
+        }
         if (targetMemoryTable.rootPageAddress == 0u)
         {
             targetMemoryTable.rootPageAddress = mem.AllocateRootPage();
         }
         SegmentDescriptor* targetSegmentDescriptor = CreateSegmentDescriptor(sourceSegmentDescriptor->startAddress, sourceSegmentDescriptor->baseAddress, sourceSegmentDescriptor->length);
-        if (targetSegmentDescriptor == null) return false;
+        if (targetSegmentDescriptor == null)
+        {
+            throw Exception("internal error: share segment: target segment descriptor is null"); 
+        }
         ulong startPageNumber = 0u;
         ulong numPages = 0u;
         CalculatePageNumbers(*targetSegmentDescriptor, startPageNumber, numPages);
         CopyMemoryPages(mem, targetMemoryTable.rootPageAddress, segmentIndex, startPageNumber, numPages, targetMemoryTable.addressSpaceNumber,
             sourceMemoryTable.rootPageAddress, sourceMemoryTable.addressSpaceNumber, protection);
-        return true;
     }
 }

@@ -5,7 +5,7 @@ namespace cmsx.object
 {
     public enum DebugRecordCode : byte
     {
-        fileInfo = 1u, functionInfo = 2u, lineInfo = 3u, startFunc = 4u, endFunc = 5u, beginTry = 6u, endTry = 7u, beginCatch = 8u, endCatch = 9u, end = 10u
+        fileInfo = 1u, functionInfo = 2u, lineInfo = 3u, startFunc = 4u, endFunc = 5u, beginTry = 6u, endTry = 7u, catch_ = 8u, beginCleanup = 9u, endCleanup = 10u, end = 11u
     }
 
     public const int maxDebugCodeStrLength = 12;
@@ -21,8 +21,9 @@ namespace cmsx.object
             case DebugRecordCode.endFunc: return "ENDFUNC";
             case DebugRecordCode.beginTry: return "BEGINTRY";
             case DebugRecordCode.endTry: return "ENDTRY";
-            case DebugRecordCode.beginCatch: return "BEGINCATCH";
-            case DebugRecordCode.endCatch: return "ENDCATCH";
+            case DebugRecordCode.catch_: return "CATCH";
+            case DebugRecordCode.beginCleanup: return "BEGINCLEANUP";
+            case DebugRecordCode.endCleanup: return "ENDCLEANUP";
         }
         return "";
     }
@@ -123,14 +124,25 @@ namespace cmsx.object
         public ulong handlerAddress;
     }
 
+    public class CleanupBlock : ExceptionBlock
+    {
+        public nothrow CleanupBlock(ulong cleanupAddress_, ulong parentTableAddress_) : base(cleanupBlockDiscriminator), cleanupAddress(cleanupAddress_), parentTableAddress(parentTableAddress_)
+        {
+        }
+        public ulong cleanupAddress;
+        public ulong parentTableAddress;
+    }
+
     public class DispatchTableEntry
     {
-        public nothrow DispatchTableEntry(uint offset_, uint length_, ulong exceptionBlockTableAddress_) : offset(offset_), length(length_), exceptionBlockTableAddress(exceptionBlockTableAddress_)
+        public nothrow DispatchTableEntry(uint offset_, uint length_, ulong exceptionBlockTableAddress_, DispatchBlock* dispatchBlock_) :
+            offset(offset_), length(length_), exceptionBlockTableAddress(exceptionBlockTableAddress_), dispatchBlock(dispatchBlock_)
         {
         }
         public uint offset;
         public uint length;
         public ulong exceptionBlockTableAddress;
+        public DispatchBlock* dispatchBlock;
     }
 
     public bool operator==(const DispatchTableEntry& left, const DispatchTableEntry& right)
@@ -145,7 +157,7 @@ namespace cmsx.object
 
     public class FunctionExceptionData
     {
-        public nothrow FunctionExceptionData() : functionName(), tryBlocks(), cleanupBlocksNotEmpty(false)
+        public nothrow FunctionExceptionData() : functionName(), tryBlocks(), cleanupDispatchBlocks()
         {
         }
         public TryBlock* GetTryBlock(uint tryBlockId) const
@@ -156,16 +168,30 @@ namespace cmsx.object
             }
             return null;
         }
+        public CleanupDispatchBlock* GetCleanupDispatchBlock(uint cleanupBlockId) const
+        {
+            for (const CleanupDispatchBlock& cleanupDispatchBlock : cleanupDispatchBlocks)
+            {
+                if (cleanupDispatchBlock.id == cleanupBlockId) return &cleanupDispatchBlock;
+            }
+            return null;
+        }
         public nothrow bool IsEmpty() const
         {
-            return tryBlocks.IsEmpty() && !cleanupBlocksNotEmpty;
+            return tryBlocks.IsEmpty() && cleanupDispatchBlocks.IsEmpty();
         }
         public string functionName;
+        public uint frameSize;
         public List<TryBlock> tryBlocks;
-        public bool cleanupBlocksNotEmpty;
+        public List<CleanupDispatchBlock> cleanupDispatchBlocks;
     }
 
-    public class TryBlock
+    public abstract class DispatchBlock
+    {
+        public default virtual ~DispatchBlock();
+    }
+
+    public class TryBlock : DispatchBlock
     {
         public nothrow TryBlock(uint id_, uint parentId_, uint offset_) : id(id_), parentId(parentId_), offset(offset_), length(0u)
         {
@@ -175,5 +201,16 @@ namespace cmsx.object
         public uint offset;
         public uint length;
         public List<HandlerBlock> handlerBlocks;
+    }
+
+    public class CleanupDispatchBlock : DispatchBlock
+    {
+        public nothrow CleanupDispatchBlock(uint id_, uint offset_) : id(id_), offset(offset_), length(0u)
+        {
+        }
+        public uint id;
+        public uint offset;
+        public uint length;
+        public CleanupBlock cleanupBlock;
     }
 }

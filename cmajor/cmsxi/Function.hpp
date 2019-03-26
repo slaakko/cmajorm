@@ -19,6 +19,7 @@ public:
     Function(const Function&) = delete;
     Function& operator=(const Function&) = delete;
     BasicBlock* CreateBasicBlock();
+    void Finalize();
     uint64_t GetNextResultNumber() { return nextResultNumber++; }
     Type* GetType(Context& context) override { return type; }
     Value* GetParam(int index) const;
@@ -35,6 +36,7 @@ private:
     uint64_t nextResultNumber;
     bool linkOnce;
     int mdId;
+    int nextBBNumber;
 };
 
 } // namespace cmsxi

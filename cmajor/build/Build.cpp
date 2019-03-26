@@ -395,6 +395,10 @@ void GenerateLibrarySystemX(Module* module, const std::vector<std::string>& obje
     for (int i = 0; i < n; ++i)
     {
         args.push_back(QuotedPath(objectFilePaths[i]));
+        if (GetGlobalFlag(GlobalFlags::verbose))
+        {
+            LogMessage(module->LogStreamId(), "> " + QuotedPath(objectFilePaths[i]));
+        }
     }
     std::string libErrorFilePath = Path::Combine(Path::GetDirectoryName(libraryFilePath), "cmsxar.error");
     std::string libCommandLine = "cmfileredirector -2 " + libErrorFilePath + " cmsxar";
@@ -930,6 +934,7 @@ void CreateMainUnitSystemX(std::vector<std::string>& objectFilePaths, Module& mo
 {
     CompileUnitNode mainCompileUnit(Span(), boost::filesystem::path(module.OriginalFilePath()).parent_path().append("__main__.cm").generic_string());
     mainCompileUnit.SetSynthesizedUnit();
+    mainCompileUnit.GlobalNs()->AddMember(new NamespaceImportNode(Span(), new IdentifierNode(Span(), U"System")));
     FunctionNode* mainFunction(new FunctionNode(Span(), Specifiers::public_, new IntNode(Span()), U"main", nullptr));
     mainFunction->AddParameter(new ParameterNode(Span(), new IntNode(Span()), new IdentifierNode(Span(), U"argc")));
     mainFunction->AddParameter(new ParameterNode(Span(), new PointerNode(Span(), new PointerNode(Span(), new CharNode(Span()))), new IdentifierNode(Span(), U"argv")));
@@ -937,6 +942,7 @@ void CreateMainUnitSystemX(std::vector<std::string>& objectFilePaths, Module& mo
     CompoundStatementNode* mainFunctionBody = new CompoundStatementNode(Span());
     ConstructionStatementNode* constructExitCode = new ConstructionStatementNode(Span(), new IntNode(Span()), new IdentifierNode(Span(), U"exitCode"));
     mainFunctionBody->AddStatement(constructExitCode);
+    CompoundStatementNode* tryBlock = new CompoundStatementNode(Span());
     FunctionSymbol* userMain = module.GetSymbolTable().MainFunctionSymbol();
     InvokeNode* invokeMain = new InvokeNode(Span(), new IdentifierNode(Span(), userMain->GroupName()));
     if (!userMain->Parameters().empty())
@@ -953,7 +959,14 @@ void CreateMainUnitSystemX(std::vector<std::string>& objectFilePaths, Module& mo
     {
         callMainStatement = new AssignmentStatementNode(Span(), new IdentifierNode(Span(), U"exitCode"), invokeMain);
     }
-    mainFunctionBody->AddStatement(callMainStatement);
+    tryBlock->AddStatement(callMainStatement);
+    TryStatementNode* tryStatement = new TryStatementNode(Span(), tryBlock);
+    CompoundStatementNode* catchBlock = new CompoundStatementNode(Span());
+    AssignmentStatementNode* assignExitCodeStatement = new AssignmentStatementNode(Span(), new IdentifierNode(Span(), U"exitCode"), new IntLiteralNode(Span(), 1));
+    catchBlock->AddStatement(assignExitCodeStatement);
+    CatchNode* catchAll = new CatchNode(Span(), new ConstNode(Span(), new LValueRefNode(Span(), new IdentifierNode(Span(), U"System.Exception"))), new IdentifierNode(Span(), U"ex"), catchBlock);
+    tryStatement->AddCatch(catchAll);
+    mainFunctionBody->AddStatement(tryStatement);
     ReturnStatementNode* returnStatement = new ReturnStatementNode(Span(), new IdentifierNode(Span(), U"exitCode"));
     mainFunctionBody->AddStatement(returnStatement);
     mainFunction->SetBody(mainFunctionBody);

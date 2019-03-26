@@ -114,6 +114,7 @@ public:
     MDString* CreateMDString(const std::string& value) { return metadata.CreateMDString(value); }
     MDStructRef* CreateMDStructRef(int id) { return metadata.CreateMDStructRef(id); }
     MDStruct* CreateMDStruct() { return metadata.CreateMDStruct();  }
+    MDBasicBlockRef* CreateMDBasicBlockRef(void* bb) { return metadata.CreateMDBasicBlockRef(bb); }
     void AddMDStructItem(MDStruct* mdStruct, const std::string& fieldName, MDItem* item);
     void SetCurrentLineNumber(int lineNumber);
     void AddLineInfo(Instruction* inst);

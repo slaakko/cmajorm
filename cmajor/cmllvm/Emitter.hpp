@@ -325,12 +325,14 @@ public:
     void* CreateMDString(const std::string& value) override;
     void* CreateMDStructRef(int id) override;
     void* CreateMDStruct() override;
+    void* CreateMDBasicBlockRef(void* bb) override;
     int GetMDStructId(void* mdStruct) override;
     void AddMDItem(void* mdStruct, const std::string& fieldName, void* mdItem) override;
     void SetFunctionMdId(void* function, int mdId) override;
     void SetCurrentLineNumber(int currentLineNumber) override;
     void* GetMDStructRefForSourceFile(const std::string& sourceFileName) override;
     void SetMetadataRef(void* inst, void* mdStructRef) override;
+    void FinalizeFunction(void* function) override;
 private:
     cmajor::ir::EmittingContext& emittingContext;
     cmajor::ir::EmittingDelegate* emittingDelegate;

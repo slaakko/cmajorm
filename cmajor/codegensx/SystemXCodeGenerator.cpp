@@ -43,7 +43,7 @@ SystemXCodeGenerator::SystemXCodeGenerator(cmajor::ir::EmittingContext& emitting
     nativeCompileUnit(nullptr), function(nullptr), entryBasicBlock(nullptr), lastInstructionWasRet(false), destructorCallGenerated(false), genJumpingBoolCode(false),
     trueBlock(nullptr), falseBlock(nullptr), breakTarget(nullptr), continueTarget(nullptr), sequenceSecond(nullptr), currentFunction(nullptr), currentBlock(nullptr),
     breakTargetBlock(nullptr), continueTargetBlock(nullptr), lastAlloca(nullptr), currentClass(nullptr), basicBlockOpen(false), defaultDest(nullptr), currentCaseMap(nullptr),
-    generateLineNumbers(false), currentTryBlockId(-1), nextTryBlockId(0), currentTryNextBlock(nullptr)
+    generateLineNumbers(false), currentTryBlockId(-1), nextTryBlockId(0), currentTryNextBlock(nullptr), handlerBlock(nullptr), cleanupBlock(nullptr), newCleanupNeeded(false)
 {
     emitter->SetEmittingDelegate(this);
 }
@@ -133,12 +133,20 @@ void SystemXCodeGenerator::Visit(BoundFunction& boundFunction)
     if (!boundFunction.Body()) return;
     currentFunction = &boundFunction;
     FunctionSymbol* functionSymbol = boundFunction.GetFunctionSymbol();
+    if (functionSymbol->GroupName() == U"foo")
+    {
+        int x = 0;
+    }
     void* functionType = functionSymbol->IrType(*emitter);
     destructorCallGenerated = false;
     lastInstructionWasRet = false;
     basicBlockOpen = false;
     lastAlloca = nullptr;
+    handlerBlock = nullptr;
+    cleanupBlock = nullptr;
+    newCleanupNeeded = false;
     labeledStatementMap.clear();
+    cleanups.clear();
     if (functionSymbol->HasSource())
     {
         generateLineNumbers = true;
@@ -297,6 +305,8 @@ void SystemXCodeGenerator::Visit(BoundFunction& boundFunction)
             lastInstructionWasRet = true;
         }
     }
+    GenerateCodeForCleanups();
+    emitter->FinalizeFunction(function);
 }
 
 void SystemXCodeGenerator::Visit(BoundCompoundStatement& boundCompoundStatement)
@@ -821,7 +831,7 @@ void SystemXCodeGenerator::Visit(BoundConstructionStatement& boundConstructionSt
                     ClassTypeSymbol* classType = static_cast<ClassTypeSymbol*>(firstArgumentBaseType);
                     if (classType->Destructor())
                     {
-                        // newCleanupNeeded = true; todo exceptions
+                        newCleanupNeeded = true; 
                         std::unique_ptr<BoundExpression> classPtrArgument(firstArgument->Clone());
                         std::unique_ptr<BoundFunctionCall> destructorCall(new BoundFunctionCall(module, currentBlock->EndSpan(), classType->Destructor()));
                         destructorCall->AddArgument(std::move(classPtrArgument));
@@ -928,6 +938,10 @@ void SystemXCodeGenerator::Visit(BoundTryStatement& boundTryStatement)
     lastInstructionWasRet = false;
     basicBlockOpen = false;
     SetTarget(&boundTryStatement);
+    void* prevHandlerBlock = handlerBlock;
+    void* prevCleanupBlock = cleanupBlock;
+    handlerBlock = emitter->CreateBasicBlock("handlers");
+    cleanupBlock = nullptr;
     int64_t parentTryBlockId = currentTryBlockId;
     currentTryBlockId = nextTryBlockId++;
     void* nop1 = emitter->CreateNop();
@@ -950,6 +964,7 @@ void SystemXCodeGenerator::Visit(BoundTryStatement& boundTryStatement)
     emitter->CreateBr(tryNextBlock);
     void* prevTryNextBlock = currentTryNextBlock;
     currentTryNextBlock = tryNextBlock;
+    handlerBlock = prevHandlerBlock;
     for (const auto& c : boundTryStatement.Catches())
     {
         c->Accept(*this);
@@ -957,6 +972,7 @@ void SystemXCodeGenerator::Visit(BoundTryStatement& boundTryStatement)
     emitter->SetCurrentBasicBlock(tryNextBlock);
     currentTryBlockId = parentTryBlockId;
     currentTryNextBlock = prevTryNextBlock;
+    cleanupBlock = prevCleanupBlock;
     basicBlockOpen = true;
 }
 
@@ -972,30 +988,22 @@ void SystemXCodeGenerator::Visit(BoundCatchStatement& boundCatchStatement)
     SetTarget(&boundCatchStatement);
     void* catchBlock = emitter->CreateBasicBlock("catch");
     emitter->SetCurrentBasicBlock(catchBlock);
-    int64_t catchBlockId = emitter->GetBasicBlockId(catchBlock);
     void* nop1 = emitter->CreateNop();
-    void* beginCatch = emitter->CreateMDStruct();
-    emitter->AddMDItem(beginCatch, "nodeType", emitter->CreateMDLong(beginCatchNodeType));
-    emitter->AddMDItem(beginCatch, "tryBlockId", emitter->CreateMDLong(currentTryBlockId));
-    emitter->AddMDItem(beginCatch, "catchBlockId", emitter->CreateMDLong(catchBlockId));
+    void* catch_ = emitter->CreateMDStruct();
+    emitter->AddMDItem(catch_, "nodeType", emitter->CreateMDLong(catchNodeType));
+    emitter->AddMDItem(catch_, "tryBlockId", emitter->CreateMDLong(currentTryBlockId));
+    emitter->AddMDItem(catch_, "catchBlockId", emitter->CreateMDBasicBlockRef(catchBlock));
     const boost::uuids::uuid& uuid = compileUnit->GetUuid(boundCatchStatement.CatchedTypeUuidId());
     std::string uuidStr;
     for (const auto x : uuid)
     {
         uuidStr.append(cmajor::util::ToHexString(x));
     }
-    emitter->AddMDItem(beginCatch, "catchedTypeId", emitter->CreateMDString(uuidStr));
-    int beginCatchId = emitter->GetMDStructId(beginCatch);
-    void* beginCatchMdRef = emitter->CreateMDStructRef(beginCatchId);
-    emitter->SetMetadataRef(nop1, beginCatchMdRef);
+    emitter->AddMDItem(catch_, "catchedTypeId", emitter->CreateMDString(uuidStr));
+    int catchId = emitter->GetMDStructId(catch_);
+    void* catchMdRef = emitter->CreateMDStructRef(catchId);
+    emitter->SetMetadataRef(nop1, catchMdRef);
     boundCatchStatement.CatchBlock()->Accept(*this);
-    void* nop2 = emitter->CreateNop();
-    void* endCatch = emitter->CreateMDStruct();
-    emitter->AddMDItem(endCatch, "nodeType", emitter->CreateMDLong(endCatchNodeType));
-    emitter->AddMDItem(endCatch, "catchBlockId", emitter->CreateMDLong(catchBlockId));
-    int endCatchId = emitter->GetMDStructId(endCatch);
-    void* endCatchMdRef = emitter->CreateMDStructRef(endCatchId);
-    emitter->SetMetadataRef(nop2, endCatchMdRef);
     emitter->CreateBr(currentTryNextBlock);
     emitter->SetCurrentBasicBlock(currentTryNextBlock);
 }
@@ -1244,7 +1252,7 @@ void SystemXCodeGenerator::ExitBlocks(BoundCompoundStatement* targetBlock)
                     }
                     destructorCall->Accept(*this);
                     destructorCallGenerated = true;
-                    // newCleanupNeeded = true; todo exceptions
+                    newCleanupNeeded = true; 
                 }
             }
         }
@@ -1349,6 +1357,78 @@ void* SystemXCodeGenerator::GetGlobalUuidConstant(int uuidId)
         void* uuidValue = uuidGlobal;
         uuidMap[uuidId] = uuidValue;
         return uuidValue;
+    }
+}
+
+void* SystemXCodeGenerator::HandlerBlock()
+{
+    return handlerBlock;
+}
+
+void* SystemXCodeGenerator::CleanupBlock()
+{
+    return cleanupBlock;
+}
+
+bool SystemXCodeGenerator::NewCleanupNeeded()
+{
+    return newCleanupNeeded;
+}
+
+void SystemXCodeGenerator::CreateCleanup()
+{
+    cleanupBlock = emitter->CreateBasicBlock("cleanup");
+    BoundCompoundStatement* targetBlock = nullptr;
+    BoundStatement* parent = currentBlock->Parent();
+    while (parent && parent->GetBoundNodeType() != BoundNodeType::boundTryStatement)
+    {
+        parent = parent->Parent();
+    }
+    if (parent)
+    {
+        targetBlock = parent->Block();
+    }
+    Cleanup* cleanup = new Cleanup(cleanupBlock);
+    int n = blocks.size();
+    for (int i = n - 1; i >= 0; --i)
+    {
+        BoundCompoundStatement* block = blocks[i];
+        if (block == targetBlock)
+        {
+            break;
+        }
+        auto it = blockDestructionMap.find(block);
+        if (it != blockDestructionMap.cend())
+        {
+            std::vector<std::unique_ptr<BoundFunctionCall>>& destructorCallVec = it->second;
+            int nd = destructorCallVec.size();
+            for (int i = nd - 1; i >= 0; --i)
+            {
+                std::unique_ptr<BoundFunctionCall>& destructorCall = destructorCallVec[i];
+                if (destructorCall)
+                {
+                    cleanup->destructors.push_back(std::unique_ptr<BoundFunctionCall>(static_cast<BoundFunctionCall*>(destructorCall->Clone())));
+                }
+            }
+        }
+    }
+    cleanups.push_back(std::unique_ptr<Cleanup>(cleanup));
+    newCleanupNeeded = false;
+}
+
+void SystemXCodeGenerator::GenerateCodeForCleanups()
+{
+    for (const std::unique_ptr<Cleanup>& cleanup : cleanups)
+    {
+        emitter->SetCurrentBasicBlock(cleanup->cleanupBlock);
+        for (const std::unique_ptr<BoundFunctionCall>& destructorCall : cleanup->destructors)
+        {
+            destructorCall->Accept(*this);
+        }
+        void* resumeFunctionType = emitter->GetIrTypeForFunction(emitter->GetIrTypeForVoid(), std::vector<void*>());
+        void* callee = emitter->GetOrInsertFunction("do_resume", resumeFunctionType);
+        emitter->CreateCall(callee, std::vector<void*>());
+        emitter->CreateRetVoid();
     }
 }
 

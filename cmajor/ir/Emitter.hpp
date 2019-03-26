@@ -332,12 +332,14 @@ public:
     virtual void* CreateMDString(const std::string& value) = 0;
     virtual void* CreateMDStructRef(int id) = 0;
     virtual void* CreateMDStruct() = 0;
+    virtual void* CreateMDBasicBlockRef(void* bb) = 0;
     virtual int GetMDStructId(void* mdStruct) = 0;
     virtual void AddMDItem(void* mdStruct, const std::string& fieldName, void* mdItem) = 0;
     virtual void SetFunctionMdId(void* function, int mdId) = 0;
     virtual void* GetMDStructRefForSourceFile(const std::string& sourceFileName) = 0;
     virtual void SetCurrentLineNumber(int currentLineNumber) = 0;
     virtual void SetMetadataRef(void* inst, void* mdStructRef) = 0;
+    virtual void FinalizeFunction(void* function) = 0;
 private:
     ValueStack* stack;
 };

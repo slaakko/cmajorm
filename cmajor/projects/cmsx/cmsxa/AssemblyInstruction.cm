@@ -286,7 +286,7 @@ namespace cmsx.assembly
                         }
                         else
                         {
-                            Error("OCTA in SPEC line begin try needs three operands", inst->span);
+                            Error("OCTA in SPEC begin try needs three operands", inst->span);
                         }
                         assembler.stage = prevStage;
                     }
@@ -310,11 +310,11 @@ namespace cmsx.assembly
                         }
                         else
                         {
-                            Error("OCTA in SPEC line end try needs two operands", inst->span);
+                            Error("OCTA in SPEC end try needs two operands", inst->span);
                         }
                         assembler.stage = prevStage;
                     }
-                    else if (discriminator.value == BEGINCATCH)
+                    else if (discriminator.value == CATCH)
                     {
                         Stage prevStage = assembler.stage;
                         assembler.stage = Stage.exceptionInfo;
@@ -327,7 +327,7 @@ namespace cmsx.assembly
                             if (assembler.objectFile.debugSection is DebugSection*)
                             {
                                 DebugSection* debugSection = cast<DebugSection*>(assembler.objectFile.debugSection);
-                                debugSection->EmitBeginCatch(cast<uint>(catchBlockId.value), cast<uint>(tryBlockId.value), catchedTypeId1.value, catchedTypeId2.value);
+                                debugSection->EmitCatch(cast<uint>(catchBlockId.value), cast<uint>(tryBlockId.value), catchedTypeId1.value, catchedTypeId2.value);
                             }
                             else
                             {
@@ -336,26 +336,55 @@ namespace cmsx.assembly
                         }
                         else
                         {
-                            Error("OCTA in SPEC line begin catch needs five operands", inst->span);
+                            Error("OCTA in SPEC catch needs five operands", inst->span);
                         }
                         assembler.stage = prevStage;
                     }
-                    else if (discriminator.value == ENDCATCH)
+                    else if (discriminator.value == BEGINCLEANUP)
                     {
                         Stage prevStage = assembler.stage;
                         assembler.stage = Stage.exceptionInfo;
                         if (operandList.operands.Count() == 2)
                         {
-                            Value catchBlockId = assembler.Evaluate(operandList.operands[1].Get());
+                            Value cleanupBlockId = assembler.Evaluate(operandList.operands[1].Get());
                             if (assembler.objectFile.debugSection is DebugSection*)
                             {
                                 DebugSection* debugSection = cast<DebugSection*>(assembler.objectFile.debugSection);
-                                debugSection->EmitEndCatch(cast<uint>(catchBlockId.value));
+                                uint offset = cast<uint>(assembler.currentSection->BaseAddress() + assembler.currentSection->Address() - assembler.currentFunctionSymbol->start);
+                                debugSection->EmitBeginCleanup(cast<uint>(cleanupBlockId.value), offset);
+                            }
+                            else
+                            {
+                                Error("debug section expected", inst->span);
                             }
                         }
                         else
                         {
-                            Error("OCTA in SPEC line end catch needs two operands", inst->span);
+                            Error("OCTA in SPEC begin cleanup needs two operands", inst->span);
+                        }
+                        assembler.stage = prevStage;
+                    }
+                    else if (discriminator.value == ENDCLEANUP)
+                    {
+                        Stage prevStage = assembler.stage;
+                        assembler.stage = Stage.exceptionInfo;
+                        if (operandList.operands.Count() == 2)
+                        {
+                            Value cleanupBlockId = assembler.Evaluate(operandList.operands[1].Get());
+                            if (assembler.objectFile.debugSection is DebugSection*)
+                            {
+                                DebugSection* debugSection = cast<DebugSection*>(assembler.objectFile.debugSection);
+                                uint offset = cast<uint>(assembler.currentSection->BaseAddress() + assembler.currentSection->Address() - assembler.currentFunctionSymbol->start);
+                                debugSection->EmitEndCleanup(cast<uint>(cleanupBlockId.value), offset);
+                            }
+                            else
+                            {
+                                Error("debug section expected", inst->span);
+                            }
+                        }
+                        else
+                        {
+                            Error("OCTA in SPEC begin cleanup needs two operands", inst->span);
                         }
                         assembler.stage = prevStage;
                     }

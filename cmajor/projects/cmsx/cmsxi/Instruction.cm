@@ -175,7 +175,7 @@ namespace cmsx.intermediate
                             throw Exception("MDLong expected");
                         }
                     }
-                    else if (nodeType == cast<long>(cmsx.assembly.BEGINCATCH))
+                    else if (nodeType == cast<long>(cmsx.assembly.CATCH))
                     {
                         MDItem* catchBlockItem = metadataStruct->GetItem("catchBlockId");
                         if (catchBlockItem is MDLong*)
@@ -195,7 +195,7 @@ namespace cmsx.intermediate
                                     ulong catchedTypeId2 = ParseHexULong(catchedTypeIdStr2);
                                     MachineInstruction* bspecInst = machineCode.GetInstruction(cmsx.assembly.BSPEC, this);
                                     MachineInstruction* octaInst = machineCode.GetInstruction(cmsx.assembly.OCTA, null);
-                                    octaInst->AddOperand(machineCode.context.GetLiteralOperand(cmsx.assembly.BEGINCATCH));
+                                    octaInst->AddOperand(machineCode.context.GetLiteralOperand(cmsx.assembly.CATCH));
                                     octaInst->AddOperand(machineCode.context.GetLiteralOperand(cast<ulong>(catchBlockId)));
                                     octaInst->AddOperand(machineCode.context.GetLiteralOperand(cast<ulong>(tryBlockId)));
                                     octaInst->AddOperand(machineCode.context.GetLiteralOperand(catchedTypeId1));
@@ -217,17 +217,34 @@ namespace cmsx.intermediate
                             throw Exception("MDLong expected");
                         }
                     }
-                    else if (nodeType == cast<long>(cmsx.assembly.ENDCATCH))
+                    else if (nodeType == cast<long>(cmsx.assembly.BEGINCLEANUP))
                     {
-                        MDItem* catchBlockItem = metadataStruct->GetItem("catchBlockId");
-                        if (catchBlockItem is MDLong*)
+                        MDItem* cleanupBlockItem = metadataStruct->GetItem("cleanupBlockId");
+                        if (cleanupBlockItem is MDLong*)
                         {
-                            long catchBlockId = cast<MDLong*>(catchBlockItem)->value;
+                            long cleanupBlockId = cast<MDLong*>(cleanupBlockItem)->value;
                             MachineInstruction* bspecInst = machineCode.GetInstruction(cmsx.assembly.BSPEC, this);
                             MachineInstruction* octaInst = machineCode.GetInstruction(cmsx.assembly.OCTA, null);
-                            octaInst->AddOperand(machineCode.context.GetLiteralOperand(cmsx.assembly.ENDCATCH));
-                            octaInst->AddOperand(machineCode.context.GetLiteralOperand(cast<ulong>(catchBlockId)));
-                            MachineInstruction* especInst = machineCode.GetInstruction(cmsx.assembly.ESPEC, null);
+                            octaInst->AddOperand(machineCode.context.GetLiteralOperand(cmsx.assembly.BEGINCLEANUP));
+                            octaInst->AddOperand(machineCode.context.GetLiteralOperand(cast<ulong>(cleanupBlockId)));
+                            MachineInstruction* especInst = machineCode.GetInstruction(cmsx.assembly.ESPEC, null); 
+                        }
+                        else
+                        {
+                            throw Exception("MDLong expected");
+                        }
+                    }
+                    else if (nodeType == cast<long>(cmsx.assembly.ENDCLEANUP))
+                    {
+                        MDItem* cleanupBlockItem = metadataStruct->GetItem("cleanupBlockId");
+                        if (cleanupBlockItem is MDLong*)
+                        {
+                            long cleanupBlockId = cast<MDLong*>(cleanupBlockItem)->value;
+                            MachineInstruction* bspecInst = machineCode.GetInstruction(cmsx.assembly.BSPEC, this);
+                            MachineInstruction* octaInst = machineCode.GetInstruction(cmsx.assembly.OCTA, null);
+                            octaInst->AddOperand(machineCode.context.GetLiteralOperand(cmsx.assembly.ENDCLEANUP));
+                            octaInst->AddOperand(machineCode.context.GetLiteralOperand(cast<ulong>(cleanupBlockId)));
+                            MachineInstruction* especInst = machineCode.GetInstruction(cmsx.assembly.ESPEC, null); 
                         }
                         else
                         {

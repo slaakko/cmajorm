@@ -13,7 +13,10 @@ namespace cmsx.kernel
     public const byte stackTraceSystemCall = 7u;
     public const byte throwSystemCall = 8u;
     public const byte catchSystemCall = 9u;
-    public const byte numSystemCalls = 10u;
+    public const byte resumeSystemCall = 10u;
+    public const byte numSystemCalls = 11u;
+
+    public const uint debugBreakInst = (TRAP << 24u) | (0u << 16u) | (debugBreakSystemCall << 8u) | (0u << 0u);
 
     public delegate long TrapHandler(Machine& machine, byte trapX, byte trapY, byte trapZ, ulong trapAX, ulong trapBX, ulong trapCX, ulong trapDX, ulong trapEX);
 
@@ -34,10 +37,19 @@ namespace cmsx.kernel
         if (process != null)
         {
             ushort exitCode = MakeProcessExitCode(0u, cast<byte>(ax));
-            int retval = ExitProcess(machine, processTable, process, exitCode);
-            if (retval != 0)
+            try
             {
-                Panic("exit failed!");
+                ExitProcess(machine, processTable, process, exitCode);
+            }
+            catch (const SystemError& systemError)
+            {
+                process->lastError = systemError;
+                return -1;
+            }
+            catch (const Exception& ex)
+            {
+                process->lastError = SystemError(EFAIL, "exit failed: " + ex.ToString());
+                return -1;
             }
             if (Machine.GetFlag(Machine.Flags.runProgram) && process->pid == kernel.GetProgramPID())
             {
@@ -65,8 +77,21 @@ namespace cmsx.kernel
         Process* process = processTable.GetRunning();
         if (process != null)
         {
-            int retval = WaitProcess(machine, processTable, process, ax);
-            return retval;
+            try
+            {
+                int retval = WaitProcess(machine, processTable, process, ax);
+                return retval;
+            }
+            catch (const SystemError& systemError)
+            {
+                process->lastError = systemError;
+                return -1;
+            }
+            catch (const Exception& ex)
+            {
+                process->lastError = SystemError(EFAIL, "wait failed: " + ex.ToString());
+                return -1;
+            }
         }
         else
         {
@@ -86,8 +111,21 @@ namespace cmsx.kernel
         Process* process = processTable.GetRunning();
         if (process != null)
         {
-            int retval = ForkProcess(machine, processTable, process);
-            return retval;
+            try
+            {
+                int retval = ForkProcess(machine, processTable, process);
+                return retval;
+            }
+            catch (const SystemError& systemError)
+            {
+                process->lastError = systemError;
+                return -1;
+            }
+            catch (const Exception& ex)
+            {
+                process->lastError = SystemError(EFAIL, "fork failed: " + ex.ToString());
+                return -1;
+            }
         }
         else
         {
@@ -107,8 +145,21 @@ namespace cmsx.kernel
         Process* process = processTable.GetRunning();
         if (process != null)
         {
-            long retval = Write(machine, process, cast<int>(ax), bx, cast<long>(cx));
-            return retval;
+            try
+            {
+                long retval = Write(machine, process, cast<int>(ax), bx, cast<long>(cx));
+                return retval;
+            }
+            catch (const SystemError& systemError)
+            {
+                process->lastError = systemError;
+                return -1;
+            }
+            catch (const Exception& ex)
+            {
+                process->lastError = SystemError(EFAIL, "write failed: " + ex.ToString());
+                return -1;
+            }
         }
         else
         {
@@ -149,7 +200,20 @@ namespace cmsx.kernel
         Process* process = processTable.GetRunning();
         if (process != null)
         {
-            return SetPoolEndProcess(machine, process, ax);
+            try
+            {
+                return SetPoolEndProcess(machine, process, ax);
+            }
+            catch (const SystemError& systemError)
+            {
+                process->lastError = systemError;
+                return -1;
+            }
+            catch (const Exception& ex)
+            {
+                process->lastError = SystemError(EFAIL, "write failed: " + ex.ToString());
+                return -1;
+            }
         }
         else
         {
@@ -194,7 +258,20 @@ namespace cmsx.kernel
             ulong fp = machine.GetRegisters().Get(regFP);
             ulong buffer = ax;
             long count = cast<long>(bx);
-            return GetProcessStackTrace(machine, process, fp, buffer, count);
+            try
+            {
+                GetProcessStackTrace(machine, process, fp, buffer, count);
+            }
+            catch (const SystemError& systemError)
+            {
+                process->lastError = systemError;
+                return -1;
+            }
+            catch (const Exception& ex)
+            {
+                process->lastError = SystemError(EFAIL, "stacktrace failed: " + ex.ToString());
+                return -1;
+            }
         }
         else
         {
@@ -215,10 +292,24 @@ namespace cmsx.kernel
         if (process != null)
         {
             ulong exceptionAddress = ax;
-            ulong exceptionTypeId = bx;
+            ulong exceptionClassId = bx;
             ulong fp = machine.GetRegisters().Get(regFP);
             process->currentExceptionAddress = exceptionAddress;
-            process->currentExceptionTypeId = exceptionTypeId;
+            process->currentExceptionClassId = exceptionClassId;
+            try
+            {
+                DispatchException(machine, process, fp);
+            }
+            catch (const SystemError& systemError)
+            {
+                process->lastError = systemError;
+                return -1;
+            }
+            catch (const Exception& ex)
+            {
+                process->lastError = SystemError(EFAIL, "throw failed: " + ex.ToString());
+                return -1;
+            }
         }
         else
         {
@@ -244,6 +335,41 @@ namespace cmsx.kernel
         else
         {
             Panic("catch called for a process that is not running!");
+        }
+        return 0;
+    }
+
+    public long Resume(Machine& machine, byte x, byte y, byte z, ulong ax, ulong bx, ulong cx, ulong dx, ulong ex)
+    {
+        if (x != 0u || y != resumeSystemCall || z != 0u)
+        {
+            Panic("invalid resume parameters: " + ToString(x) + ", " + ToString(y) + ", " + ToString(z));
+        }
+        Kernel& kernel = Kernel.Instance();
+        ProcessTable& processTable = kernel.GetProcessTable();
+        Process* process = processTable.GetRunning();
+        if (process != null)
+        {
+            ulong fp = machine.GetRegisters().Get(regFP);
+            try
+            {
+                ContinueExceptionDispatch(machine, process, fp);
+            }
+            catch (const SystemError& systemError)
+            {
+                process->lastError = systemError;
+                return -1;
+            }
+            catch (const Exception& ex)
+            {
+                process->lastError = SystemError(EFAIL, "resume failed: " + ex.ToString());
+                return -1;
+            }
+            return 0;
+        }
+        else
+        {
+            Panic("resume called for a process that is not running!");
         }
         return 0;
     }

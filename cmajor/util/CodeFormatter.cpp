@@ -12,7 +12,7 @@ void CodeFormatter::Write(const std::string& text)
 {
     if (atBeginningOfLine)
     {
-        if (indent != 0)
+        if (indent > 0)
         {
             stream << std::string(indentSize * indent, ' ');
             atBeginningOfLine = false;

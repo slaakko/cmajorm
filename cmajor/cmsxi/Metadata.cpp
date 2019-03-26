@@ -4,6 +4,7 @@
 // =================================
 
 #include <cmajor/cmsxi/Metadata.hpp>
+#include <cmajor/cmsxi/BasicBlock.hpp>
 #include <cmajor/util/TextUtils.hpp>
 
 namespace cmsxi {
@@ -96,6 +97,16 @@ void MDStruct::AddItem(const std::string& fieldName, MDItem* item)
     items.push_back(std::make_pair(fieldName, item));
 }
 
+MDBasicBlockRef::MDBasicBlockRef(void* bb_) : MDItem(MDItemKind::basicBlockRef), bb(bb_)
+{
+}
+
+void MDBasicBlockRef::Write(CodeFormatter& formatter)
+{
+    BasicBlock* basicBlock = static_cast<BasicBlock*>(bb);
+    formatter.Write(std::to_string(basicBlock->Id()));
+}
+
 Metadata::Metadata() : mdTrue(true), mdFalse(false)
 {
 }
@@ -142,6 +153,13 @@ MDStruct* Metadata::CreateMDStruct()
 {
     MDStruct* item = new MDStruct(structs.size());
     structs.push_back(std::unique_ptr<MDStruct>(item));
+    return item;
+}
+
+MDBasicBlockRef* Metadata::CreateMDBasicBlockRef(void* bb)
+{
+    MDBasicBlockRef* item = new MDBasicBlockRef(bb);
+    AddItem(item);
     return item;
 }
 
