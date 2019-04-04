@@ -286,8 +286,7 @@ namespace System
         }
         public nothrow string ToString(bool omitDashes, bool omitColons, bool omitMins, bool omitSecs)
         {
-            string dateTime;
-            dateTime.Append(date.ToString(omitDashes));
+            string dateTime = date.ToString(omitDashes);
             dateTime.Append('T');
             int hh = Hours() % 24;
             int mm = Minutes() % 60;

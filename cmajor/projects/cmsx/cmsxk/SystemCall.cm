@@ -702,8 +702,28 @@ namespace cmsx.kernel
         {
             try
             {
-                throw SystemError(ENOTSUPPORTED, "not implemented yet");
-                return 0;
+                ulong yearAddress = ax;
+                ulong monthAddress = bx;
+                ulong dayAddress = cx;
+                if (yearAddress == 0u)
+                {
+                    throw SystemError(EINVAL, "year pointer is null");
+                }
+                else if (monthAddress == 0u)
+                {
+                    throw SystemError(EINVAL, "month pointer is null");
+                }
+                else if (dayAddress == 0u)
+                {
+                    throw SystemError(EINVAL, "day pointer is null");
+                }
+                Date date = System.GetCurrentDate();
+                short year = date.Year();
+                sbyte month = date.GetMonth();
+                sbyte day = date.Day();
+                WriteProcessMemory(machine, process, yearAddress, cast<ulong>(year), 2u, Protection.write);
+                WriteProcessMemory(machine, process, monthAddress, cast<ulong>(month), 1u, Protection.write);
+                WriteProcessMemory(machine, process, dayAddress, cast<ulong>(day), 1u, Protection.write);
             }
             catch (const SystemError& systemError)
             {
@@ -736,8 +756,36 @@ namespace cmsx.kernel
         {
             try
             {
-                throw SystemError(ENOTSUPPORTED, "not implemented yet");
-                return 0;
+                ulong yearAddress = ax;
+                ulong monthAddress = bx;
+                ulong dayAddress = cx;
+                ulong secsAddress = dx;
+                if (yearAddress == 0u)
+                {
+                    throw SystemError(EINVAL, "year pointer is null");
+                }
+                else if (monthAddress == 0u)
+                {
+                    throw SystemError(EINVAL, "month pointer is null");
+                }
+                else if (dayAddress == 0u)
+                {
+                    throw SystemError(EINVAL, "day pointer is null");
+                }
+                else if (secsAddress == 0u)
+                {
+                    throw SystemError(EINVAL, "secs pointer is null");
+                }
+                DateTime dateTime = GetCurrentDateTime();
+                Date date = dateTime.GetDate();
+                short year = date.Year();
+                sbyte month = date.GetMonth();
+                sbyte day = date.Day();
+                int secs = dateTime.Seconds();
+                WriteProcessMemory(machine, process, yearAddress, cast<ulong>(year), 2u, Protection.write);
+                WriteProcessMemory(machine, process, monthAddress, cast<ulong>(month), 1u, Protection.write);
+                WriteProcessMemory(machine, process, dayAddress, cast<ulong>(day), 1u, Protection.write);
+                WriteProcessMemory(machine, process, secsAddress, cast<ulong>(secs), 4u, Protection.write);
             }
             catch (const SystemError& systemError)
             {

@@ -2586,7 +2586,7 @@ namespace cmsx.intermediate
                     throw Exception("too many arguments for trap at line " + ToString(line));
                 }
                 byte numUsedLocalRegs = registerDescriptors.GetNumUsedLocalRegs();
-                ulong spOffset = 8u * (numUsedLocalRegs + 3u);
+                ulong spOffset = 8u * (numUsedLocalRegs + 4u);
                 ULongValue* spOffsetValue = new ULongValue(spOffset);
                 spOffsetValue->GenerateSetValue(ix, machineCode, line, this);
                 MachineInstruction* ldaInst = machineCode.GetInstruction(cmsx.assembly.LDA, this);

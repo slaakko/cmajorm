@@ -20,18 +20,30 @@ namespace cmsx.kernel
         ProcessTable& processTable = kernel.GetProcessTable();
         Process* process = processTable.GetRunning();
         string runningProcessName = "?";
+        string stackTrace;
         if (process != null)
         {
             runningProcessName = process->name;
+            stackTrace = GetProcessStackTrace(machine, process, machine.GetRegisters().Get(cmsx.machine.regFP));
         }
         Panic("page fault at virtual address " + ToHexString(virtualAddress) + " , page protection = " + GetProtectionStr(pageProtection) + ", " + GetProtectionStr(protection) + " needed (running process=" +
-            runningProcessName + ")");
+            runningProcessName + ")\n" + stackTrace);
     }
 
     public void SecurityViolationHandler(Machine& machine, byte irq)
     {
         ulong virtualAddress = machine.GetRegisters().GetSpecial(Registers.rZZ);
-        Panic("security violation, virtual address = " + ToHexString(virtualAddress) + ", processor not in kernel mode");
+        Kernel& kernel = Kernel.Instance();
+        ProcessTable& processTable = kernel.GetProcessTable();
+        Process* process = processTable.GetRunning();
+        string runningProcessName = "?";
+        string stackTrace;
+        if (process != null)
+        {
+            runningProcessName = process->name;
+            stackTrace = GetProcessStackTrace(machine, process, machine.GetRegisters().Get(cmsx.machine.regFP));
+        }
+        Panic("security violation, virtual address = " + ToHexString(virtualAddress) + ", processor not in kernel mode (running process=" + runningProcessName + ")\n" + stackTrace);
     }
 
     public void SoftwareInterruptHandler(Machine& machine, byte irq)

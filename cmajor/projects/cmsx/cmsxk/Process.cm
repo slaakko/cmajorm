@@ -498,16 +498,8 @@ namespace cmsx.kernel
         return 0;
     }
 
-    public void GetProcessStackTrace(Machine& machine, Process* process, ulong fp, ulong buffer, long count)
+    public string GetProcessStackTrace(Machine& machine, Process* process, ulong fp)
     {
-        if (buffer < poolSegmentBaseAddress || buffer >= stackSegmentBaseAddress)
-        {
-            throw SystemError(EINVAL, "invalid buffer virtual address " + ToHexString(buffer));
-        }
-        if (count <= 0)
-        {
-            throw SystemError(EINVAL, "invalid count " + ToString(count));
-        }
         List<cmsx.object.FunctionTableEntry> functionTable;
         ReadFunctionTableFromProcessMemory(machine, process, process->functionTableAddress, process->functionTableLength, functionTable);
         List<ulong> pcs;
@@ -591,6 +583,20 @@ namespace cmsx.kernel
             }
         }
         stackTrace.Append('\n');
+        return stackTrace;
+    }
+
+    public void GetProcessStackTrace(Machine& machine, Process* process, ulong fp, ulong buffer, long count)
+    {
+        if (buffer < poolSegmentBaseAddress || buffer >= stackSegmentBaseAddress)
+        {
+            throw SystemError(EINVAL, "invalid buffer virtual address " + ToHexString(buffer));
+        }
+        if (count <= 0)
+        {
+            throw SystemError(EINVAL, "invalid count " + ToString(count));
+        }
+        string stackTrace = GetProcessStackTrace(machine, process, fp);
         if (count < stackTrace.Length())
         {
             stackTrace = stackTrace.Substring(stackTrace.Length() - count);
