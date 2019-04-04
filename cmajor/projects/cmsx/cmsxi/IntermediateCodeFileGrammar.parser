@@ -315,6 +315,10 @@ namespace cmsx.intermediate
             ::= S? ',' S?
             ;
 
+        VariableName : ustring
+            ::= token((idstart | '_' | '@') (idcont | '@')*){ value = ustring(matchBegin, matchEnd); }
+            ;
+
         TypeDeclaration(cmsx.intermediate.Context* context)
             ::= StrTypeId(context):typeId '='! keyword("type")!
             (   StructureType(typeId, context)
@@ -428,7 +432,7 @@ namespace cmsx.intermediate
             ;
 
         DataDefinition(cmsx.intermediate.Context* context, var bool once)
-            ::= TypeExpr(context):type (keyword("once"){ once = true; })? identifier:name! (';'{ context->AddGlobalVariable(type, ToUtf8(name), cast<ConstantValue*>(null), span.lineNumber, once); }
+            ::= TypeExpr(context):type (keyword("once"){ once = true; })? VariableName:name! (';'{ context->AddGlobalVariable(type, ToUtf8(name), cast<ConstantValue*>(null), span.lineNumber, once); }
             |   '='! Constant(context){ context->AddGlobalVariable(type, ToUtf8(name), Constant, span.lineNumber, once); })
             ;
 

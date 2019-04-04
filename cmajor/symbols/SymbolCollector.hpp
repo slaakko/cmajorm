@@ -45,6 +45,7 @@ public:
     void AddInterface(InterfaceTypeSymbol* interface_);
     void AddTypedef(TypedefSymbol* typedef_);
     void AddMemberVariable(MemberVariableSymbol* memberVariable);
+    void AddGlobalVariable(GlobalVariableSymbol* globalVariable);
     void SortByFullName();
     void SortByDocName();
     const std::vector<BasicTypeSymbol*>& BasicTypes() const { return basicTypes; }
@@ -73,6 +74,7 @@ private:
     std::vector<EnumTypeSymbol*> enumeratedTypes;
     std::vector<EnumConstantSymbol*> enumerationConstants;
     std::vector<MemberVariableSymbol*> memberVariables;
+    std::vector<GlobalVariableSymbol*> globalVariables;
 };
 
 } } // namespace cmajor::symbols

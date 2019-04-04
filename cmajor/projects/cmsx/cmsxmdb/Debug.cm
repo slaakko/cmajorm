@@ -1417,9 +1417,149 @@ namespace cmsx.debug
         private int matchIndex;
     }
 
+    public class InputWindow : Window
+    {
+        public nothrow InputWindow() : base("Input")
+        {
+            header.SetHeader("*ESC* Exit");
+        }
+        public void SetScreen(Screen* screen_)
+        {
+            screen = screen_;
+            color = blackOnWhite;
+            top = screen->rows - screen->commandWindowHeight;
+            left = 0;
+            height = screen->commandWindowHeight;
+            width = screen->cols - left;
+            cursorRow = top + height - 2;
+            cursorCol = left + 2;
+            pos = 0;
+        }
+        public override void Draw()
+        {
+            header.Draw(screen);
+            DrawFrame();
+            RtAttrOn(RtColorPair(color));
+            int n = Top() + Height() - 1;
+            for (int i = Top() + 1; i < n; ++i)
+            {
+                for (int j = Left() + 1; j < Left() + Width() - Left() - 1; ++j)
+                {
+                    screen->MoveCursorTo(i, j);
+                    int index = j - (Left() + 2);
+                    int ch = cast<int>(' ');
+                    if (i == Top() + 1 && index >= 0 && index < line.Length())
+                    {
+                        ch = cast<int>(line[index]);
+                    }
+                    RtAddCh(ch);
+                }
+            }
+            if (screen->focusedWindow == this)
+            {
+                screen->MoveCursorTo(cursorRow, cursorCol);
+            }
+            RtAttrOff(RtColorPair(color));
+        }
+        public override CommandResult HandleKey(int key)
+        {
+            switch (key)
+            {
+                case keyEnter:
+                {
+                    resultLine = line;
+                    line.Clear();
+                    pos = 0;
+                    cursorCol = Left() + 2;
+                    return CommandResult.ret;
+                }
+                case keyBackspace:
+                {
+                    if (pos > 0)
+                    {
+                        line = line.Substring(0, pos - 1) + line.Substring(pos);
+                        --pos;
+                        cursorCol = cursorCol - 1;
+                        return CommandResult.update;
+                    }
+                    break;
+                }
+                case keyDel:
+                {
+                    if (pos < line.Length())
+                    {
+                        ++pos;
+                        cursorCol = cursorCol + 1;
+                        line = line.Substring(0, pos - 1) + line.Substring(pos);
+                        --pos;
+                        cursorCol = cursorCol - 1;
+                        return CommandResult.update;
+                    }
+                    break;
+                }
+                case keyHome:
+                {
+                    pos = 0;
+                    cursorCol = Left() + 2;
+                    return CommandResult.update;
+                }
+                case keyEnd:
+                {
+                    pos = cast<int>(line.Length());
+                    cursorCol = Left() + 2 + pos;
+                    return CommandResult.update;
+                }
+                case keyLeft:
+                {
+                    if (pos > 0)
+                    {
+                        --pos;
+                        cursorCol = cursorCol - 1;
+                        return CommandResult.update;
+                    }
+                    break;
+                }
+                case keyRight:
+                {
+                    if (pos < line.Length())
+                    {
+                        ++pos;
+                        cursorCol = cursorCol + 1;
+                        return CommandResult.update;
+                    }
+                    break;
+                }
+                default:
+                {
+                    uchar c = cast<uchar>(key);
+                    if (IsGraphic(c))
+                    {
+                        if (pos < line.Length())
+                        {
+                            line = line.Substring(0, pos) + ustring(c, 1) + line.Substring(pos);
+                        }
+                        else
+                        {
+                            line.Append(c);
+                        }
+                        cursorCol = cursorCol + 1;
+                        ++pos;
+                        return CommandResult.update;
+                    }
+                    break;
+                }
+            }
+            return CommandResult.cont;
+        }
+        private HeaderLine header;
+        private ustring line;
+        private int pos;
+        public ustring resultLine;
+    }
+
     public class Debugger : cmsx.kernel.Debugger
     {
-        public nothrow Debugger() : screen(), symbolTable(null), breakpoints(), disassembly(&breakpoints), output(), commandWindow()
+        public nothrow Debugger() : screen(), symbolTable(null), breakpoints(), disassembly(&breakpoints), output(), commandWindow(), inputWindow()
         {
         }
         public override void Init(Process* process)
@@ -1434,6 +1574,7 @@ namespace cmsx.debug
             memory.SetScreen(screen.Get());
             output.SetScreen(screen.Get());
             commandWindow.SetScreen(screen.Get());
+            inputWindow.SetScreen(screen.Get());
             programEntryPoint = process->EntryPoint();
             disassembly.SetEntryEntryPointAddress(programEntryPoint);
             disassembly.SetInstructionEndAddress(programEntryPoint + executable->GetCodeSection()->length);
@@ -1452,6 +1593,8 @@ namespace cmsx.debug
             commandWindow.SetDebugger(this);
             commandWindow.visible = true;
             commandWindow.next = &disassembly;
+            inputWindow.visible = false;
+            inputWindow.next = &inputWindow;
             screen->focusedWindow = &disassembly;
             state = State.running;
         }
@@ -1567,6 +1710,60 @@ namespace cmsx.debug
             {
                 output.AddChar(c, 0u);
             }
+        }
+        public override bool Eof() const
+        {
+            return eof;
+        }
+        public override void ResetEof()
+        {
+            eof = false;
+        }
+        public override string ReadInputLine()
+        {
+            if (eof)
+            {
+                return string();
+            }
+            Window* prevFocusedWindow = screen->focusedWindow;
+            commandWindow.visible = false;
+            inputWindow.visible = true;
+            screen->focusedWindow = &inputWindow;
+            screen->Update();
+            int ch = RtGetCh();
+            string resultLine;
+            while (true)
+            {
+                if (ch == keyEscape)
+                {
+                    resultLine.Clear();
+                    eof = true;
+                    break;
+                }
+                else if (ch == keyControlD)
+                {
+                    eof = true;
+                    break;
+                }
+                else
+                {
+                    CommandResult result = screen->focusedWindow->HandleKey(ch);
+                    if (result == CommandResult.ret)
+                    {
+                        resultLine = ToUtf8(inputWindow.resultLine) + "\n";
+                        break;
+                    }
+                    else if (result == CommandResult.update)
+                    {
+                        screen->Update();
+                    }
+                }
+                ch = RtGetCh();
+            }
+            commandWindow.visible = true;
+            inputWindow.visible = false;
+            screen->focusedWindow = prevFocusedWindow;
+            return resultLine;
         }
         private bool SkipStepBreakpoint(ulong address, ulong fp, cmsx.machine.Machine& machine)
         {
@@ -1982,6 +2179,8 @@ namespace cmsx.debug
         private Memory memory;
         private Output output;
         private CommandWindow commandWindow;
+        private InputWindow inputWindow;
         private ulong programEntryPoint;
+        private bool eof;
     }
 }

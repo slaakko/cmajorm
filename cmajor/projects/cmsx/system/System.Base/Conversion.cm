@@ -7,8 +7,6 @@ using System.Concepts;
 
 namespace System
 {
-
-/*
     public class ConversionException : Exception
     {
         public nothrow ConversionException(const string& message) : base(message)
@@ -20,7 +18,6 @@ namespace System
     {
         throw ConversionException(message);
     }
-*/
 
     public nothrow string ToString<I, U>(I x) where I is SignedInteger and U is UnsignedInteger and ExplicitlyConvertible<I, U> and ExplicitlyConvertible<U, byte>
     {
@@ -102,7 +99,6 @@ namespace System
         return ToString<ulong>(x);
     }
 
-/*
     public nothrow string ToString(float f)
     {
         return ToString(cast<double>(f));
@@ -158,7 +154,6 @@ namespace System
         ustring s(c);
         return ToUtf8(s);
     }
-*/
 
     public nothrow string ToString(bool b)
     {
@@ -214,7 +209,6 @@ namespace System
         return ToHexString<ulong>(u);
     }
 
-/*
     public nothrow bool ParseSigned<T>(const string& s, T& x) where T is SignedInteger
     {
         x = cast<T>(0);
@@ -465,7 +459,7 @@ namespace System
             {
                 exponent = -exponent;
             }
-            x = x * cast<T>(RtPow(10.0, exponent));
+            x = x * cast<T>(pow(10.0, exponent));
         }
         return true;
     }
@@ -940,7 +934,4 @@ namespace System
         }
         return dateTime;
     }
-    
-*/
-
 }

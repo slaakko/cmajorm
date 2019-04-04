@@ -19,6 +19,7 @@
 #include <cmajor/ast/Enumeration.hpp>
 #include <cmajor/ast/TypeExpr.hpp>
 #include <cmajor/ast/Expression.hpp>
+#include <cmajor/ast/GlobalVariable.hpp>
 #include <cmajor/dom/Element.hpp>
 #include <cmajor/dom/CharacterData.hpp>
 #include <cmajor/util/Unicode.hpp>
@@ -210,6 +211,7 @@ public:
     void Visit(ThisNode& thisNode) override;
     void Visit(BaseNode& baseNode) override;
     void Visit(ParenthesizedExpressionNode& parenthesizedExpressionNode) override;
+    void Visit(GlobalVariableNode& globalVariableNode) override;
 private:
     std::unique_ptr<dom::Element> compileUnitElement;
     dom::Element* currentElement;
@@ -2228,6 +2230,22 @@ void Ast2DomVisitor::Visit(ParenthesizedExpressionNode& parenthesizedExpressionN
     currentElement = parenElement.get();
     parenthesizedExpressionNode.Subject()->Accept(*this);
     prevElement->AppendChild(std::unique_ptr<dom::Node>(parenElement.release()));
+    currentElement = prevElement;
+}
+
+void Ast2DomVisitor::Visit(GlobalVariableNode& globalVariableNode)
+{
+    CheckCurrentElement();
+    std::unique_ptr<dom::Element> globalVariableElement(new dom::Element(U"GlobalVariableNode"));
+    dom::Element* prevElement = currentElement;
+    currentElement = globalVariableElement.get();
+    globalVariableNode.Id()->Accept(*this); 
+    globalVariableNode.TypeExpr()->Accept(*this);
+    if (globalVariableNode.Initializer())
+    {
+        globalVariableNode.Initializer()->Accept(*this);
+    }
+    prevElement->AppendChild(std::unique_ptr<dom::Node>(globalVariableElement.release()));
     currentElement = prevElement;
 }
 

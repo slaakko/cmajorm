@@ -398,6 +398,10 @@ namespace cmsx.intermediate
             operands.Add(UniquePtr<Operand>(clsIdOperand));
             return clsIdOperand;
         }
+        public GlobalVariable* GetGlobalVariableNothrow(const string& globalVariableName) const
+        {
+            return compileUnit.GetGlobalVariableNothrow(globalVariableName);
+        }
         public GlobalVariable* GetGlobalVariable(const string& globalVariableName) const
         {
             return compileUnit.GetGlobalVariable(globalVariableName);

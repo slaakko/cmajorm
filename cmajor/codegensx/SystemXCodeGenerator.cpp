@@ -58,7 +58,7 @@ void SystemXCodeGenerator::Visit(BoundCompileUnit& boundCompileUnit)
 {
     std::string intermediateFilePath = Path::ChangeExtension(boundCompileUnit.ObjectFilePath(), ".i");
     NativeModule nativeModule(emitter, intermediateFilePath);
-    compileUnitId = GetSha1MessageDigest(boundCompileUnit.SourceFilePath());
+    compileUnitId = boundCompileUnit.Id();
     emitter->SetCompileUnitId(compileUnitId);
     emitter->SetCurrentLineNumber(0);
     generateLineNumbers = false;
@@ -133,7 +133,7 @@ void SystemXCodeGenerator::Visit(BoundFunction& boundFunction)
     if (!boundFunction.Body()) return;
     currentFunction = &boundFunction;
     FunctionSymbol* functionSymbol = boundFunction.GetFunctionSymbol();
-    if (functionSymbol->GroupName() == U"foo")
+    if (functionSymbol->GroupName() == U"ToString")
     {
         int x = 0;
     }
@@ -1171,6 +1171,12 @@ void SystemXCodeGenerator::Visit(BoundConjunction& boundConjunction)
         boundConjunction.Right()->Accept(*this);
         boundConjunction.DestroyTemporaries(*emitter);
     }
+}
+
+void SystemXCodeGenerator::Visit(BoundGlobalVariable& boundGlobalVariable)
+{
+    GlobalVariableSymbol* globalVariableSymbol = boundGlobalVariable.GetGlobalVariableSymbol();
+    globalVariableSymbol->CreateIrObject(*emitter);
 }
 
 void SystemXCodeGenerator::GenJumpingBoolCode()

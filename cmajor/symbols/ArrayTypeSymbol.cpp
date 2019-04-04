@@ -444,8 +444,6 @@ std::vector<LocalVariableSymbol*> ArrayTypeDefaultConstructor::CreateTemporaries
 void ArrayTypeDefaultConstructor::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span)
 {
     Assert(genObjects.size() == 2, "array type default constructor needs two objects: one array type object and one loop variable temporary");
-    genObjects[0]->Load(emitter, OperationFlags::addr);
-    void* ptr = emitter.Stack().Pop();
     emitter.Stack().Push(emitter.CreateIrValueForLong(0));
     GenObject* loopVar = genObjects[1];
     loopVar->Store(emitter, OperationFlags::none);
@@ -460,6 +458,8 @@ void ArrayTypeDefaultConstructor::GenerateCall(Emitter& emitter, std::vector<Gen
     void* less = emitter.CreateICmpULT(index, size);
     emitter.CreateCondBr(less, init, next);
     emitter.SetCurrentBasicBlock(init);
+    genObjects[0]->Load(emitter, OperationFlags::addr);
+    void* ptr = emitter.Stack().Pop();
     void* elementPtr = emitter.CreateArrayIndexAddress(ptr, index);
     NativeValue elementPtrValue(elementPtr);
     std::vector<GenObject*> elementGenObjects;
@@ -509,10 +509,6 @@ std::vector<LocalVariableSymbol*> ArrayTypeCopyConstructor::CreateTemporariesTo(
 void ArrayTypeCopyConstructor::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span)
 {
     Assert(genObjects.size() == 3, "copy constructor needs three objects: two array type objects and one loop variable temporary");
-    genObjects[0]->Load(emitter, OperationFlags::addr);
-    void* ptr = emitter.Stack().Pop();
-    genObjects[1]->Load(emitter, OperationFlags::none);
-    void* sourcePtr = emitter.Stack().Pop();
     emitter.Stack().Push(emitter.CreateIrValueForLong(0));
     GenObject* loopVar = genObjects[2];
     loopVar->Store(emitter, OperationFlags::none);
@@ -527,6 +523,10 @@ void ArrayTypeCopyConstructor::GenerateCall(Emitter& emitter, std::vector<GenObj
     void* less = emitter.CreateICmpULT(index, size);
     emitter.CreateCondBr(less, init, next);
     emitter.SetCurrentBasicBlock(init);
+    genObjects[0]->Load(emitter, OperationFlags::addr);
+    void* ptr = emitter.Stack().Pop();
+    genObjects[1]->Load(emitter, OperationFlags::none);
+    void* sourcePtr = emitter.Stack().Pop();
     void* elementPtr = emitter.CreateArrayIndexAddress(ptr, index);
     NativeValue elementPtrValue(elementPtr);
     std::vector<GenObject*> elementGenObjects;
@@ -585,10 +585,6 @@ std::vector<LocalVariableSymbol*> ArrayTypeMoveConstructor::CreateTemporariesTo(
 void ArrayTypeMoveConstructor::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span)
 {
     Assert(genObjects.size() == 3, "move constructor needs three objects: two array type objects and one loop variable temporary");
-    genObjects[0]->Load(emitter, OperationFlags::addr);
-    void* ptr = emitter.Stack().Pop();
-    genObjects[1]->Load(emitter, OperationFlags::none);
-    void* sourcePtr = emitter.Stack().Pop();
     emitter.Stack().Push(emitter.CreateIrValueForLong(0));
     GenObject* loopVar = genObjects[2];
     loopVar->Store(emitter, OperationFlags::none);
@@ -603,6 +599,10 @@ void ArrayTypeMoveConstructor::GenerateCall(Emitter& emitter, std::vector<GenObj
     void* less = emitter.CreateICmpULT(index, size);
     emitter.CreateCondBr(less, init, next);
     emitter.SetCurrentBasicBlock(init);
+    genObjects[0]->Load(emitter, OperationFlags::addr);
+    void* ptr = emitter.Stack().Pop();
+    genObjects[1]->Load(emitter, OperationFlags::none);
+    void* sourcePtr = emitter.Stack().Pop();
     void* elementPtr = emitter.CreateArrayIndexAddress(ptr, index);
     NativeValue elementPtrValue(elementPtr);
     std::vector<GenObject*> elementGenObjects;
@@ -657,10 +657,6 @@ std::vector<LocalVariableSymbol*> ArrayTypeCopyAssignment::CreateTemporariesTo(F
 void ArrayTypeCopyAssignment::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span)
 {
     Assert(genObjects.size() == 3, "copy assignment needs three objects: two array type objects and one loop variable temporary");
-    genObjects[0]->Load(emitter, OperationFlags::addr);
-    void* ptr = emitter.Stack().Pop();
-    genObjects[1]->Load(emitter, OperationFlags::none);
-    void* sourcePtr = emitter.Stack().Pop();
     emitter.Stack().Push(emitter.CreateIrValueForLong(0));
     GenObject* loopVar = genObjects[2];
     loopVar->Store(emitter, OperationFlags::none);
@@ -675,6 +671,10 @@ void ArrayTypeCopyAssignment::GenerateCall(Emitter& emitter, std::vector<GenObje
     void* less = emitter.CreateICmpULT(index, size);
     emitter.CreateCondBr(less, init, next);
     emitter.SetCurrentBasicBlock(init);
+    genObjects[0]->Load(emitter, OperationFlags::addr);
+    void* ptr = emitter.Stack().Pop();
+    genObjects[1]->Load(emitter, OperationFlags::none);
+    void* sourcePtr = emitter.Stack().Pop();
     void* elementPtr = emitter.CreateArrayIndexAddress(ptr, index);
     NativeValue elementPtrValue(elementPtr);
     std::vector<GenObject*> elementGenObjects;
@@ -735,10 +735,6 @@ std::vector<LocalVariableSymbol*> ArrayTypeMoveAssignment::CreateTemporariesTo(F
 void ArrayTypeMoveAssignment::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span)
 {
     Assert(genObjects.size() == 3, "move assignment needs three objects: two array type objects and one loop variable temporary");
-    genObjects[0]->Load(emitter, OperationFlags::addr);
-    void* ptr = emitter.Stack().Pop();
-    genObjects[1]->Load(emitter, OperationFlags::none);
-    void* sourcePtr = emitter.Stack().Pop();
     emitter.Stack().Push(emitter.CreateIrValueForLong(0));
     GenObject* loopVar = genObjects[2];
     loopVar->Store(emitter, OperationFlags::none);
@@ -753,6 +749,10 @@ void ArrayTypeMoveAssignment::GenerateCall(Emitter& emitter, std::vector<GenObje
     void* less = emitter.CreateICmpULT(index, size);
     emitter.CreateCondBr(less, init, next);
     emitter.SetCurrentBasicBlock(init);
+    genObjects[0]->Load(emitter, OperationFlags::addr);
+    void* ptr = emitter.Stack().Pop();
+    genObjects[1]->Load(emitter, OperationFlags::none);
+    void* sourcePtr = emitter.Stack().Pop();
     void* elementPtr = emitter.CreateArrayIndexAddress(ptr, index);
     NativeValue elementPtrValue(elementPtr);
     std::vector<GenObject*> elementGenObjects;

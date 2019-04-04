@@ -950,6 +950,17 @@ void SymbolTable::AddConstant(ConstantNode& constantNode)
     container->AddMember(constantSymbol);
 }
 
+void SymbolTable::AddGlobalVariable(GlobalVariableNode& globalVariableNode)
+{
+    GlobalVariableSymbol* globalVariableSymbol = new GlobalVariableSymbol(globalVariableNode.GetSpan(), globalVariableNode.Id()->Str(), globalVariableNode.CompileUnit()->Id(),
+        globalVariableNode.CompileUnit()->FilePath());
+    globalVariableSymbol->SetSpecifiers(globalVariableNode.GetSpecifiers());
+    globalVariableSymbol->SetCompileUnit(currentCompileUnit);
+    globalVariableSymbol->SetModule(module);
+    MapNode(&globalVariableNode, globalVariableSymbol);
+    container->AddMember(globalVariableSymbol);
+}
+
 void SymbolTable::BeginEnumType(EnumTypeNode& enumTypeNode)
 {
     EnumTypeSymbol* enumTypeSymbol = new EnumTypeSymbol(enumTypeNode.GetSpan(), enumTypeNode.Id()->Str());

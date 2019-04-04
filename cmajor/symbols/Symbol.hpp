@@ -63,7 +63,7 @@ enum class SymbolType : uint8_t
     classDelegateTypeDefaultConstructor, classDelegateTypeCopyConstructor, classDelegateTypeMoveConstructor, classDelegateTypeCopyAssignment, classDelegateTypeMoveAssignment, 
     classDelegateTypeEquality, memberFunctionToClassDelegateSymbol, 
     arrayLengthFunctionSymbol, arrayBeginFunctionSymbol, arrayEndFunctionSymbol, arrayCBeginFunctionSymbol, arrayCEndFunctionSymbol,
-    namespaceTypeSymbol, functionGroupTypeSymbol, memberExpressionTypeSymbol, valueSymbol, variableValueSymbol,
+    namespaceTypeSymbol, functionGroupTypeSymbol, memberExpressionTypeSymbol, variableValueSymbol, globalVariableSymbol, globalVariableGroupSymbol,
     maxSymbol
 };
 
@@ -123,6 +123,7 @@ public:
     virtual bool IsClassTypeSymbol() const { return false; }
     virtual bool IsParentSymbol() const { return false; }
     virtual bool IsVariableSymbol() const { return false; }
+    virtual bool IsGlobalVariableSymbol() const { return false; }
     virtual void Accept(SymbolCollector* collector) {}
     virtual const ContainerScope* GetContainerScope() const;
     virtual ContainerScope* GetContainerScope();

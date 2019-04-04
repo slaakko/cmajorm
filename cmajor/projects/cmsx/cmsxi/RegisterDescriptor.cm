@@ -145,6 +145,7 @@ namespace cmsx.intermediate
             formatter.IncIndent();
             for (const RegisterDescriptor& descriptor : registerDescriptors)
             {
+                if (descriptor.IsEmpty()) continue;
                 descriptor.DebugPrint(formatter);
                 formatter << endl();
             }

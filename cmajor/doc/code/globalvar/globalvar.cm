@@ -1,0 +1,13 @@
+public int unique_global_variable = 1; // public global variables must be unique within a program
+
+private int file_level_global_variable = 2; // there can be many private variables with this name in other compile units
+
+public class Foo
+{
+    int x;
+    char y;
+}
+
+public Foo foo; // foo will be default-initialized: foo.x = 0 and foo.y = '\0'.
+
+public Foo* foo_ptr; // foo_ptr will be default-initialized to null pointer.

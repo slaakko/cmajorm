@@ -3851,18 +3851,23 @@ PointerValue::PointerValue(const Span& span_, TypeSymbol* type_, const void* ptr
 
 void* PointerValue::IrValue(Emitter& emitter)
 {
-    Assert(false, "ir value for pointer value not supported");
-    return nullptr;
+    if (ptr)
+    {
+        throw std::runtime_error("IrValue for non-null pointers not supported");
+    }
+    else
+    {
+        return emitter.CreateDefaultIrValueForPtrType(type->IrType(emitter));
+    }
 }
 
 void PointerValue::Write(BinaryWriter& writer)
 {
-    Assert(false, "write for pointer value not supported");
 }
 
 void PointerValue::Read(BinaryReader& reader)
 {
-    Assert(false, "write for ustring value not supported");
+    ptr = nullptr;
 }
 
 Value* PointerValue::As(TypeSymbol* targetType, bool cast, const Span& span, bool dontThrow) const
@@ -4266,6 +4271,7 @@ std::unique_ptr<Value> ReadValue(BinaryReader& reader, const Span& span)
         case ValueType::charValue: value.reset(new CharValue(Span(), '\0')); break;
         case ValueType::wcharValue: value.reset(new WCharValue(Span(), '\0')); break;
         case ValueType::ucharValue: value.reset(new UCharValue(Span(), '\0')); break;
+        case ValueType::pointerValue: value.reset(new PointerValue(Span(), nullptr, nullptr)); break;
     }
     if (value)
     {

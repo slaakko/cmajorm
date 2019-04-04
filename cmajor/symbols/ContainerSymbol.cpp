@@ -87,6 +87,12 @@ void ContainerSymbol::AddMember(Symbol* member)
         ClassGroupTypeSymbol* classGroupTypeSymbol = MakeClassGroupTypeSymbol(classTypeSymbol->GroupName(), classTypeSymbol->GetSpan());
         classGroupTypeSymbol->AddClass(classTypeSymbol);
     }
+    else if (member->GetSymbolType() == SymbolType::globalVariableSymbol)
+    {
+        GlobalVariableSymbol* globalVariableSymbol = static_cast<GlobalVariableSymbol*>(member);
+        GlobalVariableGroupSymbol* globalVariableGroupSymbol = MakeGlobalVariableGroupSymbol(globalVariableSymbol->GroupName(), globalVariableSymbol->GetSpan());
+        globalVariableGroupSymbol->AddGlobalVariable(globalVariableSymbol);
+    }
     else
     {
         containerScope.Install(member);
@@ -113,6 +119,12 @@ void ContainerSymbol::AddOwnedMember(Symbol* ownedMember)
         ClassTypeSymbol* classTypeSymbol = static_cast<ClassTypeSymbol*>(ownedMember);
         ClassGroupTypeSymbol* classGroupTypeSymbol = MakeClassGroupTypeSymbol(classTypeSymbol->GroupName(), classTypeSymbol->GetSpan());
         classGroupTypeSymbol->AddClass(classTypeSymbol);
+    }
+    else if (ownedMember->GetSymbolType() == SymbolType::globalVariableSymbol)
+    {
+        GlobalVariableSymbol* globalVariableSymbol = static_cast<GlobalVariableSymbol*>(ownedMember);
+        GlobalVariableGroupSymbol* globalVariableGroupSymbol = MakeGlobalVariableGroupSymbol(globalVariableSymbol->GroupName(), globalVariableSymbol->GetSpan());
+        globalVariableGroupSymbol->AddGlobalVariable(globalVariableSymbol);
     }
     else
     {
@@ -195,6 +207,25 @@ ClassGroupTypeSymbol* ContainerSymbol::MakeClassGroupTypeSymbol(const std::u32st
     }
 }
 
+GlobalVariableGroupSymbol* ContainerSymbol::MakeGlobalVariableGroupSymbol(const std::u32string& groupName, const Span& span)
+{
+    Symbol* symbol = containerScope.Lookup(groupName);
+    if (!symbol)
+    {
+        GlobalVariableGroupSymbol* globalVariableGroupSymbol = new GlobalVariableGroupSymbol(span, groupName);
+        AddMember(globalVariableGroupSymbol);
+        return globalVariableGroupSymbol;
+    }
+    if (symbol->GetSymbolType() == SymbolType::globalVariableGroupSymbol)
+    {
+        return static_cast<GlobalVariableGroupSymbol*>(symbol);
+    }
+    else
+    {
+        throw Exception(GetRootModuleForCurrentThread(), "name of symbol '" + ToUtf8(symbol->FullName()) + "' conflicts with a global variable group '" + ToUtf8(groupName) + "'", symbol->GetSpan(), span);
+    }
+}
+
 void ContainerSymbol::AppendChildElements(dom::Element* element, TypeMap& typeMap) const
 {
     for (const std::unique_ptr<Symbol>& member : members)
@@ -202,11 +233,13 @@ void ContainerSymbol::AppendChildElements(dom::Element* element, TypeMap& typeMa
         if (member->IsFunctionSymbol()) continue;
         if (member->IsClassTypeSymbol()) continue;
         if (member->GetSymbolType() == SymbolType::conceptSymbol) continue;
+        if (member->GetSymbolType() == SymbolType::globalVariableSymbol) continue;
         if (member->GetSymbolType() != SymbolType::namespaceSymbol && !member->IsProject()) continue;
         if (member->GetSymbolType() == SymbolType::namespaceSymbol ||
             member->GetSymbolType() == SymbolType::classGroupTypeSymbol ||
             member->GetSymbolType() == SymbolType::functionGroupSymbol ||
-            member->GetSymbolType() == SymbolType::conceptGroupSymbol)
+            member->GetSymbolType() == SymbolType::conceptGroupSymbol ||
+            member->GetSymbolType() == SymbolType::globalVariableGroupSymbol)
         {
             if (!member->HasProjectMembers()) continue;
         }
@@ -225,7 +258,8 @@ bool ContainerSymbol::HasProjectMembers() const
         if (member->GetSymbolType() == SymbolType::namespaceSymbol || 
             member->GetSymbolType() == SymbolType::classGroupTypeSymbol || 
             member->GetSymbolType() == SymbolType::functionGroupSymbol || 
-            member->GetSymbolType() == SymbolType::conceptGroupSymbol)
+            member->GetSymbolType() == SymbolType::conceptGroupSymbol ||
+            member->GetSymbolType() == SymbolType::globalVariableGroupSymbol)
         {
             if (member->HasProjectMembers()) return true;
         }

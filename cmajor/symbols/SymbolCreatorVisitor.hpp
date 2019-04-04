@@ -59,6 +59,7 @@ public:
     void Visit(ConstantNode& constantNode) override;
     void Visit(EnumTypeNode& enumTypeNode) override;
     void Visit(EnumConstantNode& enumConstantNode) override;
+    void Visit(GlobalVariableNode& globalVariableNode) override;
     void SetLeaveFunction() { leaveFunction = true; }
 private:
     SymbolTable& symbolTable;

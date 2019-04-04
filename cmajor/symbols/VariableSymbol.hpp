@@ -5,7 +5,7 @@
 
 #ifndef CMAJOR_SYMBOLS_VARIABLE_SYMBOL_INCLUDED
 #define CMAJOR_SYMBOLS_VARIABLE_SYMBOL_INCLUDED
-#include <cmajor/symbols/Symbol.hpp>
+#include <cmajor/symbols/Value.hpp>
 #include <cmajor/symbols/TypeMap.hpp>
 #include <cmajor/ir/Emitter.hpp>
 
@@ -67,7 +67,7 @@ public:
     bool IsExportSymbol() const override;
     void Accept(SymbolCollector* collector) override;
     void Dump(CodeFormatter& formatter) override;
-    std::string TypeString() const override { return "variable"; }
+    std::string TypeString() const override { return "member_variable"; }
     std::string Syntax() const override;
     void SetSpecifiers(Specifiers specifiers);
     int32_t LayoutIndex() const { return layoutIndex; }
@@ -78,6 +78,51 @@ public:
     void Check() override;
 private:
     int32_t layoutIndex;
+};
+
+class GlobalVariableSymbol;
+
+class SYMBOLS_API GlobalVariableGroupSymbol : public Symbol
+{
+public:
+    GlobalVariableGroupSymbol(const Span& span_, const std::u32string& name_);
+    bool IsExportSymbol() const override { return false; }
+    std::string TypeString() const override { return "global_variable_group"; }
+    void ComputeMangledName() override;
+    void AddGlobalVariable(GlobalVariableSymbol* globalVariableSymbol);
+    std::u32string Info() const override { return Name(); }
+    const char* ClassName() const override { return "GlobalVariableGroupSymbol"; }
+    void CollectGlobalVariables(const std::string& compileUnitFilePath, std::vector<GlobalVariableSymbol*>& globalVariables) const;
+private:
+    std::vector<std::pair<GlobalVariableSymbol*, std::string>> globalVariableSymbols;
+};
+
+class SYMBOLS_API GlobalVariableSymbol : public VariableSymbol
+{
+public:
+    GlobalVariableSymbol(const Span& span_, const std::u32string& groupName_, const std::string& compileUnitId, const std::string& compileUnitFilePath_);
+    GlobalVariableSymbol(const Span& span_, const std::u32string& name_);
+    void Write(SymbolWriter& writer) override;
+    void Read(SymbolReader& reader) override;
+    bool IsExportSymbol() const override;
+    bool IsGlobalVariableSymbol() const override { return true; }
+    void Accept(SymbolCollector* collector) override;
+    void Dump(CodeFormatter& formatter) override;
+    std::string TypeString() const override { return "global_variable"; }
+    void ComputeMangledName() override;
+    std::string Syntax() const override;
+    void SetSpecifiers(Specifiers specifiers);
+    const char* ClassName() const override { return "GlobalVariableSymbol"; }
+    void SetInitializer(std::unique_ptr<Value>&& initializer_);
+    Value* Initializer() const { return initializer.get(); }
+    void* IrObject(Emitter& emitter) override;
+    void CreateIrObject(Emitter& emitter);
+    const std::u32string& GroupName() const { return groupName; }
+    const std::string& CompileUnitFilePath() const { return compileUnitFilePath; }
+private:
+    std::u32string groupName;
+    std::string compileUnitFilePath;
+    std::unique_ptr<Value> initializer;
 };
 
 } } // namespace cmajor::symbols

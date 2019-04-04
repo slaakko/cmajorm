@@ -1,0 +1,124 @@
+// =================================
+// Copyright (c) 2019 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+namespace System.Os
+{
+    public nothrow void Exit(byte exitCode)
+    {
+        exit(exitCode);
+    }
+    
+    public int Wait(ushort* exitCodeAddress)
+    {
+        int result = wait(exitCodeAddress);
+        if (result == -1)
+        {
+            ThrowSystemError();
+        }
+        return result;
+    }
+    
+    public int Fork()
+    {
+        int result = fork();
+        if (result == -1)
+        {
+            ThrowSystemError();
+        }
+        return result;
+    }
+    
+    public int Create(const char* path, int mode)
+    {
+        int result = create(path, mode);
+        if (result == -1)
+        {
+            ThrowSystemError();
+        }
+        return result;
+    }
+    
+    public int Open(const char* path, int flags, int mode)
+    {
+        int result = open(path, flags, mode);
+        if (result == -1)
+        {
+            ThrowSystemError();
+        }
+        return result;
+    }
+    
+    public void Close(int fd)
+    {
+        int result = close(fd);
+        if (result == -1)
+        {
+            ThrowSystemError();
+        }
+    }
+    
+    public long Read(int fd, void* buffer, long count)
+    {
+        long result = read(fd, buffer, count);
+        if (result == -1)
+        {
+            ThrowSystemError();
+        }
+        return result;
+    }
+    
+    public long Write(int fd, void* buffer, long count)
+    {
+        long result = write(fd, buffer, count);
+        if (result == -1)
+        {
+            ThrowSystemError();
+        }
+        return result;
+    }
+    
+    public long Seek(int fd, long pos, byte origin)
+    {
+        long result = seek(fd, pos, origin);
+        if (result == -1)
+        {
+            ThrowSystemError();
+        }
+        return result;
+    }
+    
+    public long Tell(int fd)
+    {
+        long result = tell(fd);
+        if (result == -1)
+        {
+            ThrowSystemError();
+        }
+        return result;
+    }
+    
+    public nothrow void* PoolEnd()
+    {
+        return pool_end();
+    }
+    
+    public void SetPoolEnd(void* poolEnd)
+    {
+        long result = set_pool_end(poolEnd);
+        if (result == -1)
+        {
+            ThrowSystemError();
+        }
+    }
+
+    public void StackTrace(void* buffer, long count)
+    {
+        long result = stack_trace(buffer, count);
+        if (result == -1)
+        {
+            ThrowSystemError();
+        }
+    }
+}

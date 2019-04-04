@@ -51,9 +51,7 @@ namespace cmsx.machine
                     ConditionVariableStatus status = stop.WaitFor(mtx, Duration.FromMilliseconds(tick));
                     if (status == ConditionVariableStatus.timeout)
                     {
-                        ulong rq = machine.GetRegisters().GetSpecial(Registers.rQ);
-                        rq = rq | CLOCK_BIT;
-                        machine.GetRegisters().SetSpecial(Registers.rQ, rq);
+                        machine.GetRegisters().SetInterrupt(CLOCK_BIT);
                     }
                 }
             }

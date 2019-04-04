@@ -76,6 +76,7 @@ public:
     const std::string& LLFilePath() const { return llFilePath; }
     const std::string& OptLLFilePath() const { return optLLFilePath; }
     const std::string& ObjectFilePath() const { return objectFilePath; }
+    const std::string& Id() const { return compileUnitNode->Id(); }
     void SetHasGotos() { hasGotos = true; }
     bool HasGotos() const { return hasGotos; }
     ClassTemplateRepository& GetClassTemplateRepository() { return classTemplateRepository; }
@@ -95,6 +96,7 @@ public:
     void SetImmutable() { immutable = true; }
     void AddGlobalNs(std::unique_ptr<NamespaceNode>&& globalNs);
     void AddFunctionSymbol(std::unique_ptr<FunctionSymbol>&& functionSymbol);
+    int GetNextExitEntryIndex() { return nextExitEntryIndex++; }
 private:
     Module& module;
     SymbolTable& symbolTable;
@@ -129,6 +131,7 @@ private:
     bool immutable;
     std::unordered_map<boost::uuids::uuid, FunctionSymbol*, boost::hash<boost::uuids::uuid>> copyConstructorMap;
     std::vector<std::unique_ptr<FunctionSymbol>> copyConstructors;
+    int nextExitEntryIndex;
 };
 
 } } // namespace cmajor::binder

@@ -49,6 +49,7 @@ public:
     virtual bool IsComplexValue() const { return false; }
     virtual std::string ToString() const { return std::string(); }
     virtual TypeSymbol* GetType(SymbolTable* symbolTable) = 0;
+    virtual void SetType(TypeSymbol* type_) {}
     const Span& GetSpan() const { return span; }
     ValueType GetValueType() const { return valueType; }
     std::unique_ptr<dom::Element> ToDomElement();
@@ -385,6 +386,7 @@ public:
     void Read(BinaryReader& reader) override;
     Value* As(TypeSymbol* targetType, bool cast, const Span& span, bool dontThrow) const override;
     TypeSymbol* GetType(SymbolTable* symbolTable) override;
+    void SetType(TypeSymbol* type_) override { type = type_; }
     TypeSymbol* PointeeType() const;
     const void* GetValue() const { return ptr; }
     Value* Add(int64_t offset) const;
@@ -410,6 +412,7 @@ public:
     bool IsComplexValue() const override { return true; }
     Value* As(TypeSymbol* targetType, bool cast, const Span& span, bool dontThrow) const override;
     TypeSymbol* GetType(SymbolTable* symbolTable) override { return type; }
+    void SetType(TypeSymbol* type_) { type = type_; }
     const std::vector<std::unique_ptr<Value>>& Elements() const { return elementValues; }
     std::vector<std::unique_ptr<Value>>& Elements() { return elementValues; }
     const char* ClassName() const override { return "ArrayValue"; }

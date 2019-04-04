@@ -23,6 +23,7 @@
 #include <cmajor/ast/Class.hpp>
 #include <cmajor/ast/Interface.hpp>
 #include <cmajor/ast/Concept.hpp>
+#include <cmajor/ast/GlobalVariable.hpp>
 
 namespace cmajor { namespace ast {
 
@@ -52,7 +53,7 @@ const char* nodeTypeStr[] =
     "addNode", "subNode", "mulNode", "divNode", "remNode", "notNode", "unaryPlusNode", "unaryMinusNode", "prefixIncrementNode", "prefixDecrementNode", "complementNode", "derefNode", "addrOfNode",
     "isNode", "asNode", "indexingNode", "invokeNode", "postfixIncrementNode", "postfixDecrementNode", "sizeOfNode", "typeNameNode", "typeIdNode", "castNode", "constructNode", "newNode", "thisNode", "baseNode",
     "conditionalCompilationDisjunctionNode", "conditionalCompilationConjunctionNode", "conditionalCompilationNotNode", "conditionalCompilationPrimaryNode", "conditionalCompilationPartNode", 
-    "conditionalCompilationStatementNode", "uuidLiteralNode", "cursorIdNode", "parenthesizedExpressionNode",
+    "conditionalCompilationStatementNode", "uuidLiteralNode", "cursorIdNode", "parenthesizedExpressionNode", "globalVariableNode",
     "maxNode"
 };
 
@@ -212,6 +213,7 @@ NodeFactory::NodeFactory()
     Register(NodeType::delegateNode, new ConcreteNodeCreator<DelegateNode>());
     Register(NodeType::classDelegateNode, new ConcreteNodeCreator<ClassDelegateNode>());
 
+    Register(NodeType::parenthesizedConstraintNode, new ConcreteNodeCreator<ParenthesizedConstraintNode>());
     Register(NodeType::disjunctiveConstraintNode, new ConcreteNodeCreator<DisjunctiveConstraintNode>());
     Register(NodeType::conjunctiveConstraintNode, new ConcreteNodeCreator<ConjunctiveConstraintNode>());
     Register(NodeType::whereConstraintNode, new ConcreteNodeCreator<WhereConstraintNode>());
@@ -333,7 +335,7 @@ NodeFactory::NodeFactory()
     Register(NodeType::uuidLiteralNode, new ConcreteNodeCreator<UuidLiteralNode>());
     Register(NodeType::cursorIdNode, new ConcreteNodeCreator<CursorIdNode>());
     Register(NodeType::parenthesizedExpressionNode, new ConcreteNodeCreator<ParenthesizedExpressionNode>());
-    Register(NodeType::parenthesizedConstraintNode, new ConcreteNodeCreator<ParenthesizedConstraintNode>());
+    Register(NodeType::globalVariableNode, new ConcreteNodeCreator<GlobalVariableNode>());
 }
 
 void NodeFactory::Register(NodeType nodeType, NodeCreator* creator)

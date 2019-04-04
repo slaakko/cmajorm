@@ -5385,6 +5385,45 @@ namespace cmsx.intermediate
             }
         }
 
+        public class VariableNameRule : System.Text.Parsing.RuleParser
+        {
+            public VariableNameRule(const ustring& name_, Scope* enclosingScope_, int id_, Parser* definition_) : base(name_, enclosingScope_, id_, definition_)
+            {
+                SetValueTypeName(ToUtf32("ustring"));
+            }
+            public override void Enter(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
+            {
+                parsingData->PushContext(Id(), new Context());
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+            }
+            public override void Leave(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                if (matched)
+                {
+                    stack.Push(UniquePtr<Object>(new ValueObject<ustring>(context->value)));
+                }
+                parsingData->PopContext(Id());
+            }
+            public override void Link()
+            {
+                ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
+                a0ActionParser->SetAction(A0Action);
+            }
+            public void A0Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                context->value = ustring(matchBegin, matchEnd);
+            }
+            public class Context : System.Text.Parsing.Context
+            {
+                public Context() : value()
+                {
+                }
+                public ustring value;
+            }
+        }
+
         public class TypeDeclarationRule : System.Text.Parsing.RuleParser
         {
             public TypeDeclarationRule(const ustring& name_, Scope* enclosingScope_, int id_, Parser* definition_) : base(name_, enclosingScope_, id_, definition_)
@@ -10997,6 +11036,21 @@ namespace cmsx.intermediate
                         new System.Text.Parsing.CharParser(',')),
                     new System.Text.Parsing.OptionalParser(
                         new System.Text.Parsing.NonterminalParser(ToUtf32("S"), ToUtf32("S"), 0)))));
+            AddRule(new VariableNameRule(ToUtf32("VariableName"), GetScope(), Domain()->GetNextRuleId(),
+                new System.Text.Parsing.ActionParser(ToUtf32("A0"),
+                    new System.Text.Parsing.TokenParser(
+                        new System.Text.Parsing.SequenceParser(
+                            new System.Text.Parsing.GroupingParser(
+                                new System.Text.Parsing.AlternativeParser(
+                                    new System.Text.Parsing.AlternativeParser(
+                                        new System.Text.Parsing.IdStartParser(),
+                                        new System.Text.Parsing.CharParser('_')),
+                                    new System.Text.Parsing.CharParser('@'))),
+                            new System.Text.Parsing.KleeneStarParser(
+                                new System.Text.Parsing.GroupingParser(
+                                    new System.Text.Parsing.AlternativeParser(
+                                        new System.Text.Parsing.IdContParser(),
+                                        new System.Text.Parsing.CharParser('@')))))))));
             AddRule(new TypeDeclarationRule(ToUtf32("TypeDeclaration"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.SequenceParser(
                     new System.Text.Parsing.SequenceParser(
@@ -11228,7 +11282,7 @@ namespace cmsx.intermediate
                                     new System.Text.Parsing.ActionParser(ToUtf32("A0"),
                                         new System.Text.Parsing.KeywordParser(ToUtf32("once")))))),
                         new System.Text.Parsing.ExpectationParser(
-                            new System.Text.Parsing.NonterminalParser(ToUtf32("name"), ToUtf32("identifier"), 0))),
+                            new System.Text.Parsing.NonterminalParser(ToUtf32("name"), ToUtf32("VariableName"), 0))),
                     new System.Text.Parsing.GroupingParser(
                         new System.Text.Parsing.AlternativeParser(
                             new System.Text.Parsing.ActionParser(ToUtf32("A1"),

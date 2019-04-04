@@ -61,14 +61,14 @@ namespace cmajor.parser
     grammar CompileUnit
     {
         CompileUnit(ParsingContext* ctx): CompileUnitNode*;
-        NamespaceContent(ParsingContext* ctx, NamespaceNode* ns);
+        NamespaceContent(ParsingContext* ctx, CompileUnitNode* cu, NamespaceNode* ns);
         UsingDirectives(ParsingContext* ctx, NamespaceNode* ns);
         UsingDirective(ParsingContext* ctx, NamespaceNode* ns);
         UsingAliasDirective(var std::unique_ptr<IdentifierNode> id): Node*;
         UsingNamespaceDirective: Node*;
-        Definitions(ParsingContext* ctx, NamespaceNode* ns);
-        Definition(ParsingContext* ctx, NamespaceNode* ns): Node*;
-        NamespaceDefinition(ParsingContext* ctx, NamespaceNode* ns): NamespaceNode*;
+        Definitions(ParsingContext* ctx, CompileUnitNode* cu, NamespaceNode* ns);
+        Definition(ParsingContext* ctx, CompileUnitNode* cu, NamespaceNode* ns): Node*;
+        NamespaceDefinition(ParsingContext* ctx, CompileUnitNode* cu, NamespaceNode* ns): NamespaceNode*;
         TypedefDeclaration(ParsingContext* ctx): TypedefNode*;
         ConceptDefinition(ParsingContext* ctx): ConceptNode*;
         FunctionDefinition(ParsingContext* ctx): FunctionNode*;
@@ -78,6 +78,7 @@ namespace cmajor.parser
         ConstantDefinition(ParsingContext* ctx): ConstantNode*;
         DelegateDefinition(ParsingContext* ctx): DelegateNode*;
         ClassDelegateDefinition(ParsingContext* ctx): ClassDelegateNode*;
+        GlobalVariableDefinition(ParsingContext* ctx, CompileUnitNode* cu): GlobalVariableNode*;
     }
     grammar Concept
     {
@@ -139,6 +140,10 @@ namespace cmajor.parser
         Function(ParsingContext* ctx, var std::unique_ptr<FunctionNode> fun, var Span s, var Span specifierSpan, var Span groupIdSpan, var std::unique_ptr<Attributes> attributes): FunctionNode*;
         FunctionGroupId(ParsingContext* ctx, var std::unique_ptr<IdentifierNode> id): std::u32string;
         OperatorFunctionGroupId(ParsingContext* ctx, var std::unique_ptr<Node> typeExpr): std::u32string;
+    }
+    grammar GlobalVariable
+    {
+        GlobalVariable(ParsingContext* ctx, CompileUnitNode* cu): GlobalVariableNode*;
     }
     grammar Identifier
     {

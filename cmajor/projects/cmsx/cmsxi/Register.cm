@@ -102,8 +102,12 @@ namespace cmsx.intermediate
         {
             return cast<byte>(localRegisters.Count());
         }
-        public nothrow inline LocalRegister* GetLocalRegister(byte index)
+        public LocalRegister* GetLocalRegister(byte index)
         {
+            if (index >= localRegisters.Count())
+            {
+                throw Exception("number of local registers (" + ToString(localRegisters.Count()) + ") exceeded");
+            }
             return &localRegisters[index];
         }
         public nothrow inline Ix* GetIx()

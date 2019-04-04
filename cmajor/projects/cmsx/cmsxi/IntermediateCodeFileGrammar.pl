@@ -63,6 +63,7 @@ namespace cmsx.intermediate
         LiteralValue(cmsx.intermediate.Context* context, Type* type) : ConstantValue*;
         S;
         Comma;
+        VariableName : ustring;
         TypeDeclaration(cmsx.intermediate.Context* context);
         StructureType(string typeId, cmsx.intermediate.Context* context, var List<string> memberTypeIds);
         ArrayType(string typeId, cmsx.intermediate.Context* context);

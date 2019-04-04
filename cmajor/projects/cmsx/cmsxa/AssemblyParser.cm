@@ -1604,16 +1604,20 @@ namespace cmsx.assembly
                             new System.Text.Parsing.GroupingParser(
                                 new System.Text.Parsing.AlternativeParser(
                                     new System.Text.Parsing.AlternativeParser(
-                                        new System.Text.Parsing.IdStartParser(),
-                                        new System.Text.Parsing.CharParser(':')),
-                                    new System.Text.Parsing.CharParser('_'))),
+                                        new System.Text.Parsing.AlternativeParser(
+                                            new System.Text.Parsing.IdStartParser(),
+                                            new System.Text.Parsing.CharParser(':')),
+                                        new System.Text.Parsing.CharParser('_')),
+                                    new System.Text.Parsing.CharParser('@'))),
                             new System.Text.Parsing.KleeneStarParser(
                                 new System.Text.Parsing.GroupingParser(
                                     new System.Text.Parsing.AlternativeParser(
                                         new System.Text.Parsing.AlternativeParser(
-                                            new System.Text.Parsing.IdContParser(),
-                                            new System.Text.Parsing.CharParser(':')),
-                                        new System.Text.Parsing.CharParser('_')))))))));
+                                            new System.Text.Parsing.AlternativeParser(
+                                                new System.Text.Parsing.IdContParser(),
+                                                new System.Text.Parsing.CharParser(':')),
+                                            new System.Text.Parsing.CharParser('_')),
+                                        new System.Text.Parsing.CharParser('@')))))))));
             AddRule(new AtRule(ToUtf32("At"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.ActionParser(ToUtf32("A0"),
                     new System.Text.Parsing.CharParser('@'))));

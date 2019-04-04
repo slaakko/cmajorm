@@ -1,0 +1,46 @@
+using System;
+
+class Node
+{
+    public void* x;
+    public void* y;
+    public Node* next;
+}
+
+public class NodeList
+{
+    static nothrow NodeList() : head(null)
+    {
+    }
+    public static Node* head;
+}
+
+void walk()
+{
+    Node* node = NodeList.head;
+    while (node != null)
+    {
+        void* x = node->x;
+        void* y = node->y;
+        node = node->next;
+    }
+}
+
+void add(Node* node, void* x, void* y)
+{
+    node->x = x;
+    node->y = y;
+    node->next = NodeList.head;
+    NodeList.head = node;
+}
+
+void main()
+{
+    Node n0;
+    add(&n0, null, null);
+    Node n1;
+    add(&n1, null, null);
+    Node n2;
+    add(&n2, null, null);
+    walk();
+}

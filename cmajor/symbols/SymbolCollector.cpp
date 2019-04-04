@@ -72,6 +72,11 @@ void SymbolCollector::AddMemberVariable(MemberVariableSymbol* memberVariable)
     memberVariables.push_back(memberVariable);
 }
 
+void SymbolCollector::AddGlobalVariable(GlobalVariableSymbol* globalVariable)
+{
+    globalVariables.push_back(globalVariable);
+}
+
 bool ByFullName::operator()(Symbol* left, Symbol* right) const
 {
     return left->FullName() < right->FullName();
@@ -90,6 +95,7 @@ void SymbolCollector::SortByFullName()
     std::sort(constants.begin(), constants.end(), ByFullName());
     std::sort(enumeratedTypes.begin(), enumeratedTypes.end(), ByFullName());
     std::sort(memberVariables.begin(), memberVariables.end(), ByFullName());
+    std::sort(globalVariables.begin(), globalVariables.end(), ByFullName());
 }
 
 bool ByDocName::operator()(Symbol* left, Symbol* right) const
@@ -110,6 +116,7 @@ void SymbolCollector::SortByDocName()
     std::sort(constants.begin(), constants.end(), ByDocName());
     std::sort(enumeratedTypes.begin(), enumeratedTypes.end(), ByDocName());
     std::sort(memberVariables.begin(), memberVariables.end(), ByDocName());
+    std::sort(globalVariables.begin(), globalVariables.end(), ByDocName());
 }
 
 bool SymbolCollector::IsEmpty() const
@@ -124,6 +131,8 @@ bool SymbolCollector::IsEmpty() const
     if (!classDelegates.empty()) return false;
     if (!constants.empty()) return false;
     if (!enumeratedTypes.empty()) return false;
+    if (!memberVariables.empty()) return false;
+    if (!globalVariables.empty()) return false;
     return true;
 }
 

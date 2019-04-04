@@ -1,0 +1,118 @@
+// =================================
+// Copyright (c) 2019 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+
+namespace System.IO
+{
+    public const int stdin = 0;
+    public const int stdout = 1;
+    public const int stderr = 2;
+
+    public enum OpenFlags : int
+    {
+        none = 0u,
+        read = 1u << 0u,
+        write = 1u << 1u,
+        append = 1u << 2u,
+        text = 1u << 3u
+    }
+
+    public enum Origin : byte
+    {
+        seekSet, seekCur, seekEnd
+    }
+    
+    public class FileStream : Stream
+    {
+        public nothrow FileStream(int fd_) : this(fd_, false)
+        {
+        }
+        public nothrow FileStream(int fd_, bool closeOnExit_) : fd(fd_), closeOnExit(closeOnExit_)
+        {
+        }
+        public FileStream(const string& filePath, OpenFlags flags) : fd(-1), closeOnExit(false)
+        {
+            Open(filePath, flags);
+        }
+        suppress FileStream(const FileStream&);
+        suppress void operator=(const FileStream&);
+        public nothrow FileStream(FileStream&& that) : fd(that.fd), closeOnExit(that.closeOnExit)
+        {
+            that.fd = -1;
+            that.closeOnExit = false;
+        }
+        public default nothrow void operator=(FileStream&&);
+        public override ~FileStream()
+        {
+            try
+            {
+                Close();
+            }
+            catch (const Exception& ex)
+            {
+            }
+        }
+        public inline nothrow bool IsOpen() const
+        {
+            return fd != -1;
+        }
+        public void Open(const string& filePath, OpenFlags flags)
+        {
+            Close();
+            fd = System.Os.Open(filePath.Chars(), flags, 0);
+            closeOnExit = true;
+        }
+        public void Close()
+        {
+            if (fd != -1 && closeOnExit)
+            {
+                System.Os.Close(fd);
+                fd = -1;
+                closeOnExit = false;
+            }
+        }
+        public override int ReadByte()
+        {
+            byte x;
+            long retval = Read(&x, 1);
+            if (retval == 0)
+            {
+                return -1;
+            }
+            return x;
+        }
+        public override long Read(byte* buf, long count)
+        {
+            return System.Os.Read(fd, buf, count);
+        }
+        public override long Write(byte x)
+        {
+            return Write(&x, 1);
+        }
+        public override long Write(byte* buf, long count)
+        {
+            return System.Os.Write(fd, buf, count);
+        }
+        public override long Seek(long pos, Origin origin)
+        {
+            return System.Os.Seek(fd, pos, origin);
+        }
+        public override long Tell()
+        {
+            return System.Os.Tell(fd);
+        }
+        public nothrow inline int Descriptor() const
+        {
+            return fd;
+        }
+        public nothrow override bool IsHostTextFile() const
+        {
+            return is_host_text_file(fd) == 1;
+        }
+        private int fd;
+        private bool closeOnExit;
+    }
+}

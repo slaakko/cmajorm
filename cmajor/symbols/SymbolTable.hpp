@@ -18,6 +18,7 @@
 #include <cmajor/ast/Delegate.hpp>
 #include <cmajor/ast/Typedef.hpp>
 #include <cmajor/ast/Constant.hpp>
+#include <cmajor/ast/GlobalVariable.hpp>
 #include <cmajor/ast/Enumeration.hpp>
 #include <boost/functional/hash.hpp>
 
@@ -150,6 +151,7 @@ public:
     void AddLocalVariable(IdentifierNode& identifierNode);
     void AddTypedef(TypedefNode& typedefNode);
     void AddConstant(ConstantNode& constantNode);
+    void AddGlobalVariable(GlobalVariableNode& globalVariableNode);
     void BeginEnumType(EnumTypeNode& enumTypeNode);
     void EndEnumType();
     void AddEnumConstant(EnumConstantNode& enumConstantNode);

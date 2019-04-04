@@ -33,6 +33,7 @@ namespace cmsx.machine
         }
         public nothrow ulong SaveContext(ulong virtualTranslateionRegisterValue, ulong sp, ulong* regAXAddress, ulong* regBXAddress)
         {
+            //Console.Out() << "> save context: " << ToHexString(sp) << endl();
             Memory& mem = machine.GetMemory();
             ulong prevRV = regs.GetSpecial(Registers.rV);
             regs.SetSpecial(Registers.rV, virtualTranslateionRegisterValue);
@@ -99,10 +100,12 @@ namespace cmsx.machine
             mem.WriteULong(sp, regs.GetSpecial(Registers.rG), Protection.write);
             sp = sp + 8u;
             regs.SetSpecial(Registers.rV, prevRV);
+            //Console.Out() << "< save context: " << ToHexString(sp) << endl();
             return sp;
         }
-        public nothrow void UnsaveContext(ulong virtualTranslateionRegisterValue, ulong sp)
+        public nothrow ulong UnsaveContext(ulong virtualTranslateionRegisterValue, ulong sp)
         {
+            //Console.Out() << "> unsave context: " << ToHexString(sp) << endl();
             Memory& mem = machine.GetMemory();
             regs.SetSpecial(Registers.rV, virtualTranslateionRegisterValue);
             sp = sp - 8u;
@@ -153,6 +156,8 @@ namespace cmsx.machine
             sp = sp - 8u;
             regs.SetPC(mem.ReadULong(sp, Protection.read));
             regs.Set(regSP, sp);
+            //Console.Out() << "< unsave context: " << ToHexString(sp) << endl();
+            return sp;
         }
         private void DoRun()
         {
@@ -279,10 +284,8 @@ namespace cmsx.machine
                 regs.SetSpecial(Registers.rI, intervalCounter);
                 if (intervalCounter == 0u)
                 {
-                    ulong prevRQ = regs.GetSpecial(Registers.rQ);
-                    regs.SetSpecial(Registers.rQ, INTERVAL_INTERRUPT_BIT);
+                    regs.SetInterrupt(INTERVAL_INTERRUPT_BIT);
                     CheckInterrupts(inst, x, y, z);
-                    regs.SetSpecial(Registers.rQ, prevRQ);
                 }
             }
         }
@@ -302,26 +305,22 @@ namespace cmsx.machine
         private nothrow void CheckInterrupts(Instruction*& inst, byte& x, byte& y, byte& z)
         {
             regs.SetSpecial(Registers.rXX, 0u);
-            ulong rq = regs.GetSpecial(Registers.rQ);
+            ulong rq = regs.GetInterruptBits();
             ulong rk = regs.GetSpecial(Registers.rK);
             ulong bits = rq & rk;
             if (bits != 0u)
             {
                 Memory& mem = machine.GetMemory();
-                ulong handlerPtrAddress = regs.GetSpecial(Registers.rTT);
-                ulong irqBit = 1u;
-                for (byte irq = 0u; irq < irqMax; ++irq)
+                for (int irq = irqMax - 1; irq >= 0; --irq)
                 {
-                    byte bit = cast<byte>(bits & 1u);
-                    if (bit != 0u)
+                    ulong handlerPtrAddress = regs.GetSpecial(Registers.rTT) + 8u * cast<ulong>(irq);
+                    ulong irqBit = cast<ulong>(1) << cast<ulong>(irq);
+                    bool irqBitSet = (bits & irqBit) != 0u;
+                    if (irqBitSet)
                     {
-                        HandleInterrupt(irq, handlerPtrAddress);
-                        rq = rq & ~irqBit;
-                        regs.SetSpecial(Registers.rQ, rq);
+                        HandleInterrupt(cast<byte>(irq), handlerPtrAddress);
+                        regs.ResetInterrupt(irqBit);
                     }
-                    bits = bits >> 1u;
-                    handlerPtrAddress = handlerPtrAddress + 8u;
-                    irqBit = irqBit << 1u;
                 }
             }
             ulong rxx = regs.GetSpecial(Registers.rXX);

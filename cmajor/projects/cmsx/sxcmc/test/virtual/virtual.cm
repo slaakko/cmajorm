@@ -5,9 +5,7 @@ class Foo
     public default virtual ~Foo();
     public virtual void foo()
     {
-        void* m = MemAlloc(4096);
-        long r = stack_trace(m, 4096);
-        MemFree(m);
+        Console.WriteLine("foo");
     }
 }
 
@@ -15,6 +13,7 @@ class Bar : Foo
 {
     public override void foo()
     {
+        Console.WriteLine("bar");
     }
 }
 

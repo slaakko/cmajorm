@@ -11,6 +11,7 @@ source <Delegate.parser>;
 source <Enumeration.parser>;
 source <Expression.parser>;
 source <Function.parser>;
+source <GlobalVariable.parser>;
 source <Identifier.parser>;
 source <Interface.parser>;
 source <Json.parser>;

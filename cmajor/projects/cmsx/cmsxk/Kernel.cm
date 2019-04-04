@@ -13,7 +13,7 @@ namespace cmsx.kernel
         {
             return *instance;
         }
-        private nothrow Kernel() : machine(GetMachine()), sessionTable(GetSessionTable()), processTable(GetProcessTable()), baseDebugger(), debugger(&baseDebugger)
+        private nothrow Kernel() : machine(GetMachine()), sessionTable(GetSessionTable()), processTable(GetProcessTable()), baseDebugger(), debugger(&baseDebugger), consoleDriver(null)
         {
         }
         public void Init()
@@ -93,6 +93,14 @@ namespace cmsx.kernel
         {
             return currentSession;
         }
+        public nothrow ConsoleDriver* GetConsoleDriver()
+        {
+            return consoleDriver;
+        }
+        public nothrow void SetConsoleDriver(ConsoleDriver* consoleDriver_)
+        {
+            consoleDriver = consoleDriver_;
+        }
         private static UniquePtr<Kernel> instance;
         private Machine& machine;
         private SessionTable& sessionTable;
@@ -106,5 +114,6 @@ namespace cmsx.kernel
         private UniquePtr<cmsx.object.ExecutableFile> executable;
         private GlobalFileTable globalFileTable;
         private Session* currentSession;
+        private ConsoleDriver* consoleDriver;
     }
 }

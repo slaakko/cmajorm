@@ -7,6 +7,8 @@ namespace cmsx.kernel
     public const int EMEM = 3;
     public const int RLIMITEXCEEDED = 4;
     public const int EINVAL = 5;
+    public const int ENOTSUPPORTED = 6;
+    public const int EIO = 7;
 
     public string ErrorCodeStr(int errorCode)
     {
@@ -17,6 +19,8 @@ namespace cmsx.kernel
             case EMEM: return "EMEM";
             case RLIMITEXCEEDED: return "RLIMITEXCEEDED";
             case EINVAL: return "EINVAL";
+            case ENOTSUPPORTED: return "ENOTSUPPORTED";
+            case EIO: return "EIO";
         }
         return "";
     }
@@ -28,8 +32,10 @@ namespace cmsx.kernel
             case EFAIL: return "Host system failure";
             case EBADF: return "Bad file descriptor";
             case EMEM: return "Memory error";
-            case RLIMITEXCEEDED: return "Resource limit exceeed";
+            case RLIMITEXCEEDED: return "Resource limit exceeeded";
             case EINVAL: return "Invalid argument";
+            case ENOTSUPPORTED: return "Operation not supported";
+            case EIO: return "I/O error";
         }
         return "";
     }

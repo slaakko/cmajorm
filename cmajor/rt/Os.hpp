@@ -16,5 +16,12 @@ extern "C" RT_API uint8_t OsReadMemoryByte(uint64_t address);
 extern "C" RT_API void* OsGetStdHandle(int32_t stdInOutOrErr);
 extern "C" RT_API bool OsRegisterConsoleCallback(void* consoleInputHandle, uint64_t callBackValue);
 extern "C" RT_API bool OsReadConsoleInput(void* consoleInputHandle, char32_t* c);
+extern "C" RT_API bool OsGetConsoleScreenBufferInfo(void* consoleOutputHandle, int32_t* cursorPosX, int32_t* cursorPosY, int32_t* screenSizeX, int32_t* screenSizeY);
+extern "C" RT_API bool OsSetConsoleCursorPosition(void* consoleOutputHandle, int cursorPosX, int cursorPosY);
+extern "C" RT_API bool OsWriteConsole(void* consoleOutputHandle, const char32_t* chars);
+extern "C" RT_API uint32_t OsGetConsoleCP();
+extern "C" RT_API bool OsSetConsoleCP(uint32_t cp);
+extern "C" RT_API uint32_t OsGetConsoleOutputCP();
+extern "C" RT_API bool OsSetConsoleOutputCP(uint32_t cp);
 
 #endif // CMAJOR_RT_OS_INCLUDED

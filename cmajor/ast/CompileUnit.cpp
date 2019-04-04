@@ -6,6 +6,7 @@
 #include <cmajor/ast/CompileUnit.hpp>
 #include <cmajor/ast/Identifier.hpp>
 #include <cmajor/ast/Visitor.hpp>
+#include <cmajor/util/Sha1.hpp>
 #include <algorithm>
 
 namespace cmajor { namespace ast {
@@ -69,6 +70,15 @@ int CompileUnitNode::GetColumn(const Span& span) const
         }
     }
     return 1;
+}
+
+const std::string& CompileUnitNode::Id() 
+{
+    if (id.empty())
+    {
+        id = GetSha1MessageDigest(filePath);
+    }
+    return id;
 }
 
 } } // namespace cmajor::ast

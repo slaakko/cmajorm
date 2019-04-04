@@ -29,7 +29,7 @@ enum class BoundNodeType : uint8_t
     boundConstructExpression, boundIsExpression, boundAsExpression, boundTypeNameExpression, boundTypeIdExpression, boundDisjunction, boundConjunction,
     boundAtomicConstraint, boundDisjunctiveConstraint, boundConjunctiveConstraint, boundConcept,
     boundTypeExpression, boundNamespaceExpression, boundFunctionGroupExpression, boundMemberExpression,
-    boundNamespace, boundEnumTypeDefinition
+    boundNamespace, boundEnumTypeDefinition, boundGlobalVariable
 };
 
 class BoundNodeVisitor;

@@ -3,7 +3,7 @@ using cmsx.machine;
 
 namespace cmsx.kernel
 {
-    public nothrow void ClockHandler(Machine& machine, byte irq)
+    public nothrow void ClockInterruptHandler(Machine& machine, byte irq)
     {
         Kernel& kernel = Kernel.Instance();
         Schedule(machine, kernel.GetProcessTable());
@@ -16,7 +16,16 @@ namespace cmsx.kernel
         Protection protection = Protection.notPresent;
         UnpackProtection(yy, pageProtection, protection);
         ulong virtualAddress = machine.GetRegisters().GetSpecial(Registers.rZZ);
-        Panic("page fault at virtual address " + ToHexString(virtualAddress) + " , page protection = " + GetProtectionStr(pageProtection) + ", " + GetProtectionStr(protection) + " needed");
+        Kernel& kernel = Kernel.Instance();
+        ProcessTable& processTable = kernel.GetProcessTable();
+        Process* process = processTable.GetRunning();
+        string runningProcessName = "?";
+        if (process != null)
+        {
+            runningProcessName = process->name;
+        }
+        Panic("page fault at virtual address " + ToHexString(virtualAddress) + " , page protection = " + GetProtectionStr(pageProtection) + ", " + GetProtectionStr(protection) + " needed (running process=" +
+            runningProcessName + ")");
     }
 
     public void SecurityViolationHandler(Machine& machine, byte irq)
@@ -62,5 +71,15 @@ namespace cmsx.kernel
     public nothrow void IntervalInterruptHandler(Machine& machine, byte irq)
     {
         // todo
+    }
+
+    public nothrow void KeyboardInterruptHandler(Machine& machine, byte irq)
+    {
+        Kernel& kernel = Kernel.Instance();
+        ConsoleDriver* consoleDriver = kernel.GetConsoleDriver();
+        if (consoleDriver != null)
+        {
+            consoleDriver->HandleBufferedInput();
+        }
     }
 }

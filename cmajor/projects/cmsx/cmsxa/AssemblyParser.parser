@@ -39,7 +39,7 @@ namespace cmsx.assembly
             ;
 
         Symbol : SymbolNode*
-            ::= token((idstart | ':' | '_') (idcont | ':' | '_' )*){ value = new SymbolNode(span, ToUtf8(ustring(matchBegin, matchEnd)), false); }
+            ::= token((idstart | ':' | '_' ) (idcont | ':' | '_' | '@')*){ value = new SymbolNode(span, ToUtf8(ustring(matchBegin, matchEnd)), false); }
             ;
 
         At : At*

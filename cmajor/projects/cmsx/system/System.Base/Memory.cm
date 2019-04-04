@@ -14,7 +14,7 @@ namespace System
         public long size;
     }
 
-    public nothrow void* MemAlloc(long numBytes)
+    public nothrow void* malloc(long numBytes)
     {
         Block* block = Memory.AllocateBlock(numBytes);
         if (block == null)
@@ -24,6 +24,19 @@ namespace System
         else
         {
             return block + 1;
+        }
+    }
+
+    public void* MemAlloc(long numBytes)
+    {
+        void* ptr = malloc(numBytes);
+        if (ptr == null)
+        {
+            ThrowSystemError();
+        }
+        else
+        {
+            return ptr;
         }
     }
     

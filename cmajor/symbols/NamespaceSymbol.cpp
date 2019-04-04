@@ -37,6 +37,10 @@ void NamespaceSymbol::Import(NamespaceSymbol* that, SymbolTable& symbolTable)
             {
                 continue;
             }
+            if (symbol->GetSymbolType() == SymbolType::globalVariableGroupSymbol)
+            {
+                continue;
+            }
             symbolTable.Container()->AddOwnedMember(symbol.get());
         }
     }

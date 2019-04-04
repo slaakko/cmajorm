@@ -9,8 +9,10 @@
 #include <cmajor/binder/Concept.hpp>
 #include <cmajor/binder/Evaluator.hpp>
 #include <cmajor/binder/AttributeBinder.hpp>
+#include <cmajor/binder/BoundExpression.hpp>
 #include <cmajor/ast/CompileUnit.hpp>
 #include <cmajor/ast/Identifier.hpp>
+#include <cmajor/ast/GlobalVariable.hpp>
 #include <cmajor/symbols/FunctionSymbol.hpp>
 #include <cmajor/symbols/VariableSymbol.hpp>
 #include <cmajor/symbols/DelegateSymbol.hpp>
@@ -81,7 +83,7 @@ void UsingNodeAdder::Visit(NamespaceImportNode& namespaceImportNode)
 
 TypeBinder::TypeBinder(BoundCompileUnit& boundCompileUnit_) : 
     boundCompileUnit(boundCompileUnit_), symbolTable(boundCompileUnit.GetSymbolTable()), module(&boundCompileUnit.GetModule()), 
-    containerScope(), enumType(nullptr), currentFunctionSymbol(nullptr), typeResolverFlags(TypeResolverFlags::none)
+    containerScope(), enumType(nullptr), currentFunctionSymbol(nullptr), typeResolverFlags(TypeResolverFlags::none), boundGlobalVariable(nullptr)
 {
 }
 
@@ -1358,6 +1360,37 @@ void TypeBinder::Visit(EnumConstantNode& enumConstantNode)
     std::unique_ptr<Value> value = Evaluate(enumConstantNode.GetValue(), enumType->UnderlyingType(), containerScope, boundCompileUnit, false, nullptr, enumConstantNode.GetSpan());
     enumConstantSymbol->SetValue(value.release());
     enumConstantSymbol->ResetEvaluating();
+}
+
+void TypeBinder::Visit(GlobalVariableNode& globalVariableNode)
+{
+    Symbol* symbol = symbolTable.GetSymbol(&globalVariableNode);
+    Assert(symbol->GetSymbolType() == SymbolType::globalVariableSymbol, "global variable symbol expected");
+    GlobalVariableSymbol* globalVariableSymbol = static_cast<GlobalVariableSymbol*>(symbol);
+    if (GetGlobalFlag(GlobalFlags::cmdoc))
+    {
+        symbolTable.MapSymbol(globalVariableNode.Id(), globalVariableSymbol);
+    }
+    globalVariableSymbol->SetSpecifiers(globalVariableNode.GetSpecifiers());
+    globalVariableSymbol->ComputeMangledName();
+    ContainerScope* prevContainerScope = containerScope;
+    containerScope = globalVariableSymbol->GetContainerScope();
+    TypeSymbol* typeSymbol = ResolveType(globalVariableNode.TypeExpr(), boundCompileUnit, containerScope, typeResolverFlags);
+    globalVariableSymbol->SetType(typeSymbol);
+    if (globalVariableNode.Initializer())
+    {
+        std::unique_ptr<Value> value;
+        value = Evaluate(globalVariableNode.Initializer(), typeSymbol, containerScope, boundCompileUnit, false, nullptr, globalVariableNode.GetSpan());
+        Value* val = value.get();
+        if (val)
+        {
+            globalVariableSymbol->SetType(value->GetType(&symbolTable));
+            globalVariableSymbol->SetInitializer(std::move(value));
+        }
+    }
+    boundGlobalVariable = new BoundGlobalVariable(module, globalVariableSymbol->GetSpan(), globalVariableSymbol);
+    boundCompileUnit.AddBoundNode(std::unique_ptr<BoundNode>(boundGlobalVariable));
+    containerScope = prevContainerScope;
 }
 
 void TypeBinder::CreateMemberSymbols()

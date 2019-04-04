@@ -68,6 +68,7 @@ class BoundConjunction;
 class BoundAtomicConstraint;
 class BoundDisjunctiveConstraint;
 class BoundConjunctiveConstraint;
+class BoundGlobalVariable;
 
 class BINDER_API BoundNodeVisitor
 {
@@ -132,6 +133,7 @@ public:
     virtual void Visit(BoundAtomicConstraint& boundAtomicConstraint) {}
     virtual void Visit(BoundDisjunctiveConstraint& boundDisjunctiveConstraint) {}
     virtual void Visit(BoundConjunctiveConstraint& boundConjunctiveConstraint) {}
+    virtual void Visit(BoundGlobalVariable& boundGlobalVariable) {}
 };
 
 } } // namespace cmajor::binder

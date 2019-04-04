@@ -93,6 +93,7 @@ public:
     void Visit(BoundFunctionPtr& boundFunctionPtr) override;
     void Visit(BoundDisjunction& boundDisjunction) override;
     void Visit(BoundConjunction& boundConjunction) override;
+    void Visit(BoundGlobalVariable& boundGlobalVariable) override;
     void GenJumpingBoolCode();
     void SetTarget(BoundStatement* labeledStatement);
     void ExitBlocks(BoundCompoundStatement* targetBlock);

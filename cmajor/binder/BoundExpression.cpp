@@ -451,6 +451,75 @@ std::unique_ptr<Value> BoundLiteral::ToValue(BoundCompileUnit& boundCompileUnit)
     return std::unique_ptr<Value>();
 }
 
+BoundGlobalVariable::BoundGlobalVariable(Module* module_, const Span& span_, GlobalVariableSymbol* globalVariableSymbol_) :
+    BoundExpression(module_, span_, BoundNodeType::boundGlobalVariable, globalVariableSymbol_->GetType()), globalVariableSymbol(globalVariableSymbol_)
+{
+}
+
+BoundExpression* BoundGlobalVariable::Clone()
+{
+    return new BoundGlobalVariable(GetModule(), GetSpan(), globalVariableSymbol);
+}
+
+void BoundGlobalVariable::Load(Emitter& emitter, OperationFlags flags)
+{
+    emitter.SetCurrentDebugLocation(GetSpan());
+    void* globalVariablePtr = globalVariableSymbol->IrObject(emitter);
+    if ((flags & OperationFlags::addr) != OperationFlags::none)
+    {
+        emitter.Stack().Push(globalVariablePtr);
+    }
+    else if ((flags & OperationFlags::deref) != OperationFlags::none)
+    {
+        void* value = emitter.CreateLoad(globalVariablePtr);
+        uint8_t n = GetDerefCount(flags);
+        for (uint8_t i = 0; i < n; ++i)
+        {
+            value = emitter.CreateLoad(value);
+        }
+        emitter.Stack().Push(value);
+    }
+    else
+    {
+        emitter.Stack().Push(emitter.CreateLoad(globalVariablePtr));
+    }
+    DestroyTemporaries(emitter);
+}
+
+void BoundGlobalVariable::Store(Emitter& emitter, OperationFlags flags)
+{
+    emitter.SetCurrentDebugLocation(GetSpan());
+    if ((flags & OperationFlags::addr) != OperationFlags::none)
+    {
+        throw Exception(GetModule(), "cannot store to the address of a global variable", GetSpan());
+    }
+    else
+    {
+        void* value = emitter.Stack().Pop();
+        void* ptr = globalVariableSymbol->IrObject(emitter);
+        if ((flags & OperationFlags::deref) != OperationFlags::none)
+        {
+            void* loadedPtr = emitter.CreateLoad(ptr);
+            uint8_t n = GetDerefCount(flags);
+            for (uint8_t i = 1; i < n; ++i)
+            {
+                loadedPtr = emitter.CreateLoad(loadedPtr);
+            }
+            emitter.CreateStore(value, loadedPtr);
+        }
+        else
+        {
+            emitter.CreateStore(value, ptr);
+        }
+    }
+    DestroyTemporaries(emitter);
+}
+
+void BoundGlobalVariable::Accept(BoundNodeVisitor& visitor)
+{
+    visitor.Visit(*this);
+}
+
 BoundTemporary::BoundTemporary(Module* module_, std::unique_ptr<BoundExpression>&& rvalueExpr_, std::unique_ptr<BoundLocalVariable>&& backingStore_) :
     BoundExpression(module_, rvalueExpr_->GetSpan(), BoundNodeType::boundTemporary, rvalueExpr_->GetType()), rvalueExpr(std::move(rvalueExpr_)), backingStore(std::move(backingStore_))
 {

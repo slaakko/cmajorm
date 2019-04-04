@@ -22,6 +22,7 @@ using namespace cmajor::symbols;
 
 class BoundCompileUnit;
 class AttributeBinder;
+class BoundGlobalVariable;
 
 class BINDER_API ConstraintSymbolBinder
 {
@@ -81,10 +82,12 @@ public:
     void Visit(ConstantNode& constantNode) override;
     void Visit(EnumTypeNode& enumTypeNode) override;
     void Visit(EnumConstantNode& enumConstantNode) override;
+    void Visit(GlobalVariableNode& globalVariableNode) override;
 
     void SetContainerScope(ContainerScope* containerScope_) { containerScope = containerScope_; }
     void SetCurrentFunctionSymbol(FunctionSymbol* currentFunctionSymbol_) { currentFunctionSymbol = currentFunctionSymbol_; }
     void CreateMemberSymbols();
+    BoundGlobalVariable* GetBoundGlobalVariable() const { return boundGlobalVariable; }
 private:
     BoundCompileUnit& boundCompileUnit;
     SymbolTable& symbolTable;
@@ -95,6 +98,7 @@ private:
     FunctionSymbol* currentFunctionSymbol;
     std::stack<bool> conditionalCompilationStack;
     TypeResolverFlags typeResolverFlags;
+    BoundGlobalVariable* boundGlobalVariable;
 };
 
 } } // namespace cmajor::binder

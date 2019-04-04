@@ -184,6 +184,7 @@ class NewNode;
 class ThisNode;
 class BaseNode;
 class ParenthesizedExpressionNode;
+class GlobalVariableNode;
 
 class AST_API Visitor
 {
@@ -364,6 +365,7 @@ public:
     virtual void Visit(ThisNode& thisNode) {}
     virtual void Visit(BaseNode& baseNode) {}
     virtual void Visit(ParenthesizedExpressionNode& parenthesizedExpressionNode) {}
+    virtual void Visit(GlobalVariableNode& globalVariableNode) {}
 };
 
 } } // namespace cmajor::ast

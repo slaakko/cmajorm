@@ -56,7 +56,7 @@ const char* symbolTypeStr[uint8_t(SymbolType::maxSymbol)] =
     "classDelegateTypeDefaultConstructor", "classDelegateTypeCopyConstructor", "classDelegateTypeMoveConstructor", "classDelegateTypeCopyAssignment", "classDelegateTypeMoveAssignment",
     "classDelegateTypeEquality", "memberFunctionToClassDelegateSymbol", 
     "arrayLengthFunctionSymbol", "arrayBeginFunctionSymbol", "arrayEndFunctionSymbol", "arrayCBeginFunctionSymbol", "arrayCEndFunctionSymbol",
-    "namespaceTypeSymbol", "functionGroupTypeSymbol", "memberExpressionTypeSymbol", "valueSymbol", "variableValueSymbol"
+    "namespaceTypeSymbol", "functionGroupTypeSymbol", "memberExpressionTypeSymbol", "variableValueSymbol", "globalVariableSymbol", "globalVariableGroupSymbol"
 };
 
 std::string SymbolTypeStr(SymbolType symbolType)
@@ -252,7 +252,14 @@ void Symbol::SetAccess(Specifiers accessSpecifiers)
     bool classMember = true;
     if (!cls)
     {
-        access = SymbolAccess::internal_;
+        if (this->IsGlobalVariableSymbol())
+        {
+            access = SymbolAccess::private_;
+        }
+        else
+        {
+            access = SymbolAccess::internal_;
+        }
         classMember = false;
         ContainerSymbol* intf = ContainingInterfaceNoThrow();
         if (intf)
@@ -281,13 +288,13 @@ void Symbol::SetAccess(Specifiers accessSpecifiers)
     }
     else if (accessSpecifiers == Specifiers::private_)
     {
-        if (classMember)
+        if (classMember || this->IsGlobalVariableSymbol())
         {
             access = SymbolAccess::private_;
         }
         else
         {
-            throw Exception(GetRootModuleForCurrentThread(), "only class members can have private access", GetSpan());
+            throw Exception(GetRootModuleForCurrentThread(), "only class members and global variables can have private access", GetSpan());
         }
     }
     else if (accessSpecifiers != Specifiers::none)
@@ -1121,6 +1128,7 @@ SymbolFactory::SymbolFactory()
     Register(SymbolType::arrayEndFunctionSymbol, new ConcreteSymbolCreator<ArrayEndFunction>());
     Register(SymbolType::arrayCBeginFunctionSymbol, new ConcreteSymbolCreator<ArrayCBeginFunction>());
     Register(SymbolType::arrayCEndFunctionSymbol, new ConcreteSymbolCreator<ArrayCEndFunction>());
+    Register(SymbolType::globalVariableSymbol, new ConcreteSymbolCreator<GlobalVariableSymbol>());
 }
 
 Symbol* SymbolFactory::CreateSymbol(SymbolType symbolType, const Span& span, const std::u32string& name)

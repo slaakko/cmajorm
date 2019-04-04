@@ -9,6 +9,7 @@ namespace cmsx.kernel
     public const int idlePID = 0x7FFFFFFF;
     public const ulong noEvent = 0u;
     public const ulong childExitEvent = 1u;
+    public const ulong consoleInputEvent = 2u;
 
     public class Process 
     {
@@ -17,7 +18,7 @@ namespace cmsx.kernel
             free = 0u, created = 1u, readyToRun = 2u, running = 3u, asleep = 5u, zombie = 6u
         }
         public nothrow Process() : pid(noPID), pgid(noPID), state(State.free), parent(null), firstChild(null), lastChild(null), nextSibling(null),
-            nextFree(null), nextReadyToRun(null), prevReadyToRun(null), memoryTable(), sp(0u), regAXAddress(0u), regBXAddress(0u), exitCode(0u), event(noEvent), eventData(0u)
+            nextFree(null), nextReadyToRun(null), prevReadyToRun(null), memoryTable(), sp(0u), regAXAddress(0u), regBXAddress(0u), exitCode(0u), event(noEvent), eventData1(0u), eventData2(0u)
         {
         }
         public nothrow void AddChild(Process* child)
@@ -78,7 +79,8 @@ namespace cmsx.kernel
         public ulong regBXAddress;
         public ushort exitCode;
         public ulong event;
-        public ulong eventData;
+        public ulong eventData1;
+        public ulong eventData2;
         public ulong poolStart;
         public ulong poolEnd;
         public ulong functionTableAddress;
@@ -347,25 +349,28 @@ namespace cmsx.kernel
         userExitCode = cast<byte>(exitCode);
     }
 
-    public nothrow void SleepProcess(Process* process, ulong event, ulong eventData)
+    public nothrow void SleepProcess(Process* process, ulong event, ulong eventData1, ulong eventData2)
     {
         #assert(process->state == Process.State.running);
         process->state = Process.State.asleep;
         process->event = event;
-        process->eventData = eventData;
+        process->eventData1 = eventData1;
+        process->eventData2 = eventData2;
     }
 
     public nothrow void WakeUpProcess(ProcessTable& processTable, Process* process)
     {
         #assert(process->state == Process.State.asleep);
         process->event = 0u;
-        process->eventData = 0u;
+        process->eventData1 = 0u;
+        process->eventData2 = 0u;
         SetProcessReadyToRun(processTable, process);
     }
 
     public void ExitProcess(Machine& machine, ProcessTable& processTable, Process* process, ushort exitCode)
     {
         #assert(process->pid != idlePID);
+        process->fileTable.ReleaseFiles();
         FreeProcessMemory(machine.GetMemory(), process);
         process->exitCode = exitCode;
         process->state = Process.State.zombie;
@@ -388,9 +393,9 @@ namespace cmsx.kernel
         {
             if (parent->state == Process.State.asleep && parent->event == childExitEvent)
             {
-                if (parent->eventData != 0u)
+                if (parent->eventData1 != 0u)
                 {
-                    WriteProcessMemory(machine, parent, parent->eventData, exitCode, 2u, Protection.write);
+                    WriteProcessMemory(machine, parent, parent->eventData1, exitCode, 2u, Protection.write);
                 }
                 if (parent->regAXAddress != 0u)
                 {
@@ -430,7 +435,7 @@ namespace cmsx.kernel
                 prevChild = child;
                 child = child->nextSibling;
             }
-            SleepProcess(process, childExitEvent, exitCodeAddress);
+            SleepProcess(process, childExitEvent, exitCodeAddress, 0u);
             Schedule(machine, processTable);
             return 0;
         }
@@ -444,7 +449,7 @@ namespace cmsx.kernel
         return child->pid;
     }
 
-    public long SetPoolEndProcess(Machine& machine, Process* process, ulong poolEndAddress)
+    public int SetPoolEndProcess(Machine& machine, Process* process, ulong poolEndAddress)
     {
         if (poolEndAddress < poolSegmentBaseAddress || poolEndAddress >= stackSegmentBaseAddress)
         {
@@ -512,11 +517,19 @@ namespace cmsx.kernel
         while (pc != 0u)
         {
             pcs.Add(pc);
-            ulong prevFP = 0u;
-            ReadProcessMemory(machine, process, fp, prevFP, 8u);
-            fp = prevFP;
-            ReadProcessMemory(machine, process, fp - 8u, pc, 8u);
+            try
+            {
+                ulong prevFP = 0u;
+                ReadProcessMemory(machine, process, fp, prevFP, 8u);
+                fp = prevFP;
+                ReadProcessMemory(machine, process, fp - 8u, pc, 8u);
+            }
+            catch (const Exception& ex)
+            {
+                pc = 0u;
+            }
         }
+        machine.GetRegisters().ResetInterrupt(cmsx.machine.R_BIT);
         long n = pcs.Count();
         for (long i = n - 1; i >= 0; --i)
         {
@@ -592,6 +605,34 @@ namespace cmsx.kernel
             WriteProcessMemory(machine, process, buffer, cast<byte*>(cast<void*>(stackTrace.Chars())), cast<ulong>(len), Protection.write);
         }
         WriteProcessMemory(machine, process, buffer + cast<ulong>(len), 0u, 1u, Protection.write);
+    }
+
+    public void GetProcessSystemError(Machine& machine, Process* process, ulong errorCodeAddress, ulong bufferAddress, long count)
+    {
+        if (errorCodeAddress != 0u && errorCodeAddress < dataSegmentBaseAddress)
+        {
+            throw SystemError(EINVAL, "invalid error code virtual address " + ToHexString(errorCodeAddress));
+        }
+        if (bufferAddress < poolSegmentBaseAddress || bufferAddress >= stackSegmentBaseAddress)
+        {
+            throw SystemError(EINVAL, "invalid buffer virtual address " + ToHexString(bufferAddress));
+        }
+        if (count <= 0)
+        {
+            throw SystemError(EINVAL, "invalid count " + ToString(count));
+        }
+        if (errorCodeAddress != 0u)
+        {
+            int errorCode = process->lastError.errorCode;
+            WriteProcessMemory(machine, process, errorCodeAddress, cast<ulong>(errorCode), 4u, Protection.write);
+        }
+        string errorMessage = process->lastError.Message();
+        long len = Max(cast<long>(0), count - 1);
+        if (len > 0)
+        {
+            WriteProcessMemory(machine, process, bufferAddress, cast<byte*>(cast<void*>(errorMessage.Chars())), cast<ulong>(len), Protection.write);
+        }
+        WriteProcessMemory(machine, process, bufferAddress + cast<ulong>(len), 0u, 1u, Protection.write);
     }
 
     public nothrow void InitializeProcessMemory(Machine& machine, Process* process,
@@ -875,7 +916,7 @@ namespace cmsx.kernel
         ++addr;
         mem.WriteByte(addr, 0u, Protection.execute);
         ++addr;
-        mem.WriteByte(addr, forkSystemCall, Protection.execute);
+        mem.WriteByte(addr, sys_fork, Protection.execute);
         ++addr;
         mem.WriteByte(addr, 0u, Protection.execute);
         ++addr;
@@ -902,7 +943,7 @@ namespace cmsx.kernel
         ++addr;
         mem.WriteByte(addr, 0u, Protection.execute);
         ++addr;
-        mem.WriteByte(addr, exitSystemCall, Protection.execute);
+        mem.WriteByte(addr, sys_exit, Protection.execute);
         ++addr;
         mem.WriteByte(addr, 0u, Protection.execute);
         ++addr;
@@ -920,7 +961,7 @@ namespace cmsx.kernel
         ++addr;
         mem.WriteByte(addr, 0u, Protection.execute);
         ++addr;
-        mem.WriteByte(addr, waitSystemCall, Protection.execute);
+        mem.WriteByte(addr, sys_wait, Protection.execute);
         ++addr;
         mem.WriteByte(addr, 0u, Protection.execute);
         ++addr;
@@ -938,7 +979,7 @@ namespace cmsx.kernel
         ++addr;
         mem.WriteByte(addr, 0u, Protection.execute);
         ++addr;
-        mem.WriteByte(addr, exitSystemCall, Protection.execute);
+        mem.WriteByte(addr, sys_exit, Protection.execute);
         ++addr;
         mem.WriteByte(addr, 0u, Protection.execute);
         ++addr;
@@ -952,10 +993,9 @@ namespace cmsx.kernel
         Processor& processor = machine.GetProcessor();
         Process* running  = processTable.GetRunning();
         Process* prevRunning = running;
-        Process*  idle = processTable.GetIdle();
+        Process* idle = processTable.GetIdle();
         if (running == idle)
         {
-            running->sp = processor.SaveContext(running->memoryTable.virtualTranslationRegisterValue, running->sp, &running->regAXAddress, &running->regBXAddress);
             running = null;
             processTable.SetRunning(running);
         }
@@ -979,7 +1019,9 @@ namespace cmsx.kernel
             {
                 if (prevRunning->state != Process.State.zombie)
                 {
-                    prevRunning->sp = processor.SaveContext(prevRunning->memoryTable.virtualTranslationRegisterValue, prevRunning->sp, &prevRunning->regAXAddress, &prevRunning->regBXAddress);
+                    ulong sp = machine.GetRegisters().Get(cmsx.machine.regSP);
+                    prevRunning->sp = processor.SaveContext(prevRunning->memoryTable.virtualTranslationRegisterValue, sp, &prevRunning->regAXAddress, &prevRunning->regBXAddress);
+                    //prevRunning->sp = processor.SaveContext(prevRunning->memoryTable.virtualTranslationRegisterValue, prevRunning->sp, &prevRunning->regAXAddress, &prevRunning->regBXAddress);
                 }
                 if (prevRunning->state == Process.State.running)
                 {
@@ -990,7 +1032,7 @@ namespace cmsx.kernel
                     RemoveProcessFromList(&prevRunning);
                 }
             }
-            processor.UnsaveContext(running->memoryTable.virtualTranslationRegisterValue, running->sp);
+            running->sp = processor.UnsaveContext(running->memoryTable.virtualTranslationRegisterValue, running->sp);
         }
         else
         {

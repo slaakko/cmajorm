@@ -715,7 +715,7 @@ namespace cmsx.intermediate
         {
             return context.GetSymbolOperand(globalVariable->name);
         }
-        private GlobalVariable* globalVariable;
+        public GlobalVariable* globalVariable;
     }
 
     public abstract class AggregateValue : ConstantValue
@@ -1015,6 +1015,11 @@ namespace cmsx.intermediate
         public override Operand* MakeDataOperand(Context& context) const
         {
             return context.GetSymbolOperand(symbol);
+        }
+        public override void GenerateCode(MachineCode& machineCode, string& label, Context& context)
+        {
+            MachineInstruction* inst = machineCode.GetInstruction(cmsx.assembly.OCTA, label);
+            inst->AddOperand(MakeDataOperand(context));
         }
         public string symbol;
     }

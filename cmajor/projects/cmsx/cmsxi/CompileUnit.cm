@@ -110,12 +110,24 @@ namespace cmsx.intermediate
                 function->ComputeLivenessAndNextUse();
             }
         }
-        public GlobalVariable* GetGlobalVariable(const string& globalVariableName) const
+        public GlobalVariable* GetGlobalVariableNothrow(const string& globalVariableName) const
         {
             HashMap<string, GlobalVariable*>.ConstIterator it = globalVariableMap.CFind(globalVariableName);
             if (it != globalVariableMap.CEnd())
             {
                 return it->second;
+            }
+            else
+            {
+                return null;
+            }
+        }
+        public GlobalVariable* GetGlobalVariable(const string& globalVariableName) const
+        {
+            GlobalVariable* globalVar = GetGlobalVariableNothrow(globalVariableName);
+            if (globalVar != null)
+            {
+                return globalVar;
             }
             else
             {

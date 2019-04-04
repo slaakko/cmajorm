@@ -4,16 +4,43 @@ using cmsx.machine;
 
 namespace cmsx.kernel
 {
+    public enum Origin : byte
+    {
+        seekSet, seekCur, seekEnd
+    }
+
+    public const long RESULT_BLOCKED = -2;
+
+    public long Read(Machine& machine, Process* process, int fd, ulong bufferAddress, long count)
+    {
+        File* file = process->fileTable.GetFile(fd);
+        if (count > 0)
+        {
+            return file->Read(machine, process, bufferAddress, count);
+        }
+        return 0;
+    }
+
     public long Write(Machine& machine, Process* process, int fd, ulong bufferAddress, long count)
     {
         File* file = process->fileTable.GetFile(fd);
         if (count > 0)
         {
-            UniquePtr<byte> buffer(cast<byte*>(RtMemAlloc(count)));
-            ReadProcessMemory(machine, process, bufferAddress, buffer.Get(), cast<ulong>(count));
-            return file->Write(buffer.Get(), count);
+            return file->Write(machine, process, bufferAddress, count);
         }
         return 0;
+    }
+
+    public long Seek(Machine& machine, Process* process, int fd, long pos, Origin origin)
+    {
+        File* file = process->fileTable.GetFile(fd);
+        return file->Seek(pos, origin);
+    }
+
+    public long Tell(Machine& machine, Process* process, int fd)
+    {
+        File* file = process->fileTable.GetFile(fd);
+        return file->Tell();
     }
 
     public abstract class File
@@ -21,13 +48,21 @@ namespace cmsx.kernel
         public nothrow File(const string& name_) : name(name_)
         {
         }
-        public virtual long Write(byte* buffer, long count)
+        public virtual long Write(Machine& machine, Process* writer, ulong bufferAddress, long count)
         {
             throw SystemError(EBADF, name + " not open for writing");
         }
-        public virtual long Read(byte* buffer, long count)
+        public virtual long Read(Machine& machine, Process* reader, ulong bufferAddress, long count)
         {
             throw SystemError(EBADF, name + " not open for reading");
+        }
+        public virtual long Seek(long pos, Origin origin)
+        {
+            throw SystemError(ENOTSUPPORTED, name + " does not support seek");
+        }
+        public virtual long Tell()
+        {
+            throw SystemError(ENOTSUPPORTED, name + " does not support tell");
         }
         public virtual File* Share()
         {
@@ -39,18 +74,57 @@ namespace cmsx.kernel
         public string name;
     }
 
+    public class DebuggerInputFile : File
+    {
+        public nothrow DebuggerInputFile() : base("CONSOLE INPUT (DEBUGGER)")
+        {
+        }
+        public override long Read(Machine& machine, Process* reader, ulong bufferAddress, long count)
+        {
+            try
+            {
+                if (bufferedInput.IsEmpty())
+                {
+                    Kernel& kernel = Kernel.Instance();
+                    Debugger* debugger = kernel.GetDebugger();
+                    bufferedInput = debugger->ReadInputLine();
+                    if (bufferedInput.IsEmpty())
+                    {
+                        if (debugger->Eof())
+                        {
+                            debugger->ResetEof();
+                            return 0;
+                        }
+                    }
+                }
+                long n = Min(count, bufferedInput.Length());
+                WriteProcessMemory(machine, reader, bufferAddress, cast<byte*>(cast<void*>(bufferedInput.Chars())), cast<ulong>(n), Protection.write);
+                bufferedInput = bufferedInput.Substring(n);
+                return n;
+            }
+            catch (const Exception& ex)
+            {
+                throw SystemError(EFAIL, ex.Message());
+            }
+            return -1;
+        }
+        private string bufferedInput;
+    }
+
     public class DebuggerOutputFile : File
     {
         public nothrow DebuggerOutputFile() : base("CONSOLE OUTPUT (DEBUGGER)")
         {
         }
-        public override long Write(byte* buffer, long count)
+        public override long Write(Machine& machine, Process* writer, ulong bufferAddress, long count)
         {
             try
             {
                 Kernel& kernel = Kernel.Instance();
                 Debugger* debugger = kernel.GetDebugger();
-                debugger->WriteOutput(buffer, count);
+                UniquePtr<byte> buffer(cast<byte*>(RtMemAlloc(count)));
+                ReadProcessMemory(machine, writer, bufferAddress, buffer.Get(), cast<ulong>(count));
+                debugger->WriteOutput(buffer.Get(), count);
                 return count;
             }
             catch (const Exception& ex)
@@ -59,6 +133,69 @@ namespace cmsx.kernel
             }
             return -1;
         }
+    }
+
+    public class ConsoleInputFile : File
+    {
+        public nothrow ConsoleInputFile() : base("CONSOLE INPUT")
+        {
+        }
+        public override long Read(Machine& machine, Process* reader, ulong bufferAddress, long count)
+        {
+            try
+            {
+                Kernel& kernel = Kernel.Instance();
+                Session* session = kernel.CurrentSession();
+                if (session->fgpid == reader->pid)
+                {
+                    if (bufferedInput.IsEmpty())
+                    {
+                        ConsoleDriver* consoleDriver = kernel.GetConsoleDriver();
+                        if (consoleDriver->HasLine())
+                        {
+                            bufferedInput = consoleDriver->GetLine();
+                        }
+                        else if (consoleDriver->Eof())
+                        {
+                            consoleDriver->ResetEof();
+                            return 0;
+                        }
+                        else
+                        {
+                            EnqueueReadRequest(reader, bufferAddress, count);
+                            return RESULT_BLOCKED;
+                        }
+                    }
+                    long n = Min(count, bufferedInput.Length());
+                    WriteProcessMemory(machine, reader, bufferAddress, cast<byte*>(cast<void*>(bufferedInput.Chars())), cast<ulong>(n), Protection.write);
+                    bufferedInput = bufferedInput.Substring(n);
+                    return n;
+                }
+                else
+                {
+                    EnqueueReadRequest(reader, bufferAddress, count);
+                    return RESULT_BLOCKED;
+                }
+            }
+            catch (const Exception& ex)
+            {
+                throw SystemError(EFAIL, ex.Message());
+            }
+            return -1;
+        }
+        public nothrow inline bool HasBufferedInput() const
+        {
+            return !bufferedInput.IsEmpty();
+        }
+        public nothrow void SetBufferedInput(const string& line)
+        {
+            bufferedInput = line;
+        }
+        private void EnqueueReadRequest(Process* reader, ulong bufferAddress, long count)
+        {
+            SleepProcess(reader, consoleInputEvent, bufferAddress, cast<ulong>(count));
+        }
+        private string bufferedInput;
     }
 
     public class ConsoleOutputFile : File
@@ -66,12 +203,15 @@ namespace cmsx.kernel
         public nothrow ConsoleOutputFile() : base("CONSOLE OUTPUT")
         {
         }
-        public override long Write(byte* buffer, long count)
+        public override long Write(Machine& machine, Process* writer, ulong bufferAddress, long count)
         {
             try
             {
-                ByteStream* stream = Console.Out().ContainedStream().Get();
-                stream->Write(buffer, count);
+                UniquePtr<byte> buffer(cast<byte*>(RtMemAlloc(count)));
+                ReadProcessMemory(machine, writer, bufferAddress, buffer.Get(), cast<ulong>(count));
+                Kernel& kernel = Kernel.Instance();
+                ConsoleDriver* consoleDriver = kernel.GetConsoleDriver();
+                consoleDriver->WriteToConsole(buffer.Get(), count);
                 return count;
             }
             catch (const Exception& ex)
@@ -82,7 +222,7 @@ namespace cmsx.kernel
         }
     }
 
-    public const long openFileMax = 1024;
+    public const long openFileMax = 32;
 
     public class ProcessFileTable
     {
@@ -130,20 +270,42 @@ namespace cmsx.kernel
                 }
             }
         }
+        public void ReleaseFiles()
+        {
+            for (long i = 0; i < openFileMax; ++i)
+            {
+                File* file = files[i];
+                if (file != null)
+                {
+                    file->Release();
+                    files[i] = null;
+                }
+            }
+        }
         private File*[openFileMax] files;
     }
 
     public class GlobalFileTable
     {
-        public nothrow inline File* GetDebuggerOutputFile()
+        public nothrow inline DebuggerInputFile* GetDebuggerInputFile()
+        {
+            return &debuggerInputFile;
+        }
+        public nothrow inline DebuggerOutputFile* GetDebuggerOutputFile()
         {
             return &debuggerOutputFile;
         }
-        public nothrow inline File* GetConsoleOutputFile()
+        public nothrow inline ConsoleInputFile* GetConsoleInputFile()
+        {
+            return &consoleInputFile;
+        }
+        public nothrow inline ConsoleOutputFile* GetConsoleOutputFile()
         {
             return &consoleOutputFile;
         }
+        private DebuggerInputFile debuggerInputFile;
         private DebuggerOutputFile debuggerOutputFile;
+        private ConsoleInputFile consoleInputFile;
         private ConsoleOutputFile consoleOutputFile;
     }
 
@@ -153,11 +315,13 @@ namespace cmsx.kernel
         GlobalFileTable& globalFileTable = kernel.FileTable();
         if (kernel.HasUserDebugger())
         {
+            fileTable.SetFile(0, globalFileTable.GetDebuggerInputFile());
             fileTable.SetFile(1, globalFileTable.GetDebuggerOutputFile());
             fileTable.SetFile(2, globalFileTable.GetDebuggerOutputFile());
         }
         else
         {
+            fileTable.SetFile(0, globalFileTable.GetConsoleInputFile());
             fileTable.SetFile(1, globalFileTable.GetConsoleOutputFile());
             fileTable.SetFile(2, globalFileTable.GetConsoleOutputFile());
         }

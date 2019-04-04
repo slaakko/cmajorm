@@ -1,5 +1,5 @@
-#ifndef CompileUnit_hpp_22553
-#define CompileUnit_hpp_22553
+#ifndef CompileUnit_hpp_8376
+#define CompileUnit_hpp_8376
 
 #include <cmajor/parsing/Grammar.hpp>
 #include <cmajor/parsing/Keyword.hpp>
@@ -37,8 +37,9 @@ private:
     class ConstantDefinitionRule;
     class DelegateDefinitionRule;
     class ClassDelegateDefinitionRule;
+    class GlobalVariableDefinitionRule;
 };
 
 } } // namespace cmajor.parser
 
-#endif // CompileUnit_hpp_22553
+#endif // CompileUnit_hpp_8376

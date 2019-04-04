@@ -1,0 +1,19 @@
+// =================================
+// Copyright (c) 2019 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+namespace System.Unicode
+{
+    public class UnicodeException : Exception
+    {
+        public nothrow UnicodeException(const string& message_) : base(message_)
+        {
+        }
+    }
+    
+    public void ThrowUnicodeException(const string& message)
+    {
+        throw UnicodeException(message);
+    }
+}

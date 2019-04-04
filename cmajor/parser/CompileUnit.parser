@@ -14,6 +14,7 @@
 [cpp]#include <cmajor/parser/Enumeration.hpp>
 [cpp]#include <cmajor/parser/Constant.hpp>
 [cpp]#include <cmajor/parser/Delegate.hpp>
+[cpp]#include <cmajor/parser/GlobalVariable.hpp>
 
 namespace cmajor.parser
 {
@@ -32,17 +33,18 @@ namespace cmajor.parser
         using Constant.Constant;
         using Delegate.Delegate;
         using Delegate.ClassDelegate;
+        using GlobalVariable.GlobalVariable;
         using stdlib.spaces_and_comments;
         skip spaces_and_comments;
         
         CompileUnit(ParsingContext* ctx) : CompileUnitNode*
             ::= empty{ value = new CompileUnitNode(span, fileName); }
-                NamespaceContent(ctx, value->GlobalNs())
+                NamespaceContent(ctx, value, value->GlobalNs())
             ;
 
-        NamespaceContent(ParsingContext* ctx, NamespaceNode* ns)
+        NamespaceContent(ParsingContext* ctx, CompileUnitNode* cu, NamespaceNode* ns)
             ::= UsingDirectives(ctx, ns)
-                Definitions(ctx, ns)
+                Definitions(ctx, cu, ns)
             ;
 
         UsingDirectives(ParsingContext* ctx, NamespaceNode* ns)
@@ -62,12 +64,12 @@ namespace cmajor.parser
             ::= (keyword("using") QualifiedId! ';'!){ value = new NamespaceImportNode(span, QualifiedId); }
             ;
 
-        Definitions(ParsingContext* ctx, NamespaceNode* ns)
-            ::= (Definition(ctx, ns){ ns->AddMember(Definition); })*
+        Definitions(ParsingContext* ctx, CompileUnitNode* cu, NamespaceNode* ns)
+            ::= (Definition(ctx, cu, ns){ ns->AddMember(Definition); })*
             ;
 
-        Definition(ParsingContext* ctx, NamespaceNode* ns) : Node*
-            ::= NamespaceDefinition(ctx, ns){ value = NamespaceDefinition; }
+        Definition(ParsingContext* ctx, CompileUnitNode* cu, NamespaceNode* ns) : Node*
+            ::= NamespaceDefinition(ctx, cu, ns){ value = NamespaceDefinition; }
             |   TypedefDeclaration(ctx){ value = TypedefDeclaration; }
             |   ConceptDefinition(ctx){ value = ConceptDefinition; }
             |   FunctionDefinition(ctx){ value = FunctionDefinition; }
@@ -77,10 +79,11 @@ namespace cmajor.parser
             |   ConstantDefinition(ctx){ value = ConstantDefinition; }
             |   DelegateDefinition(ctx){ value = DelegateDefinition; }
             |   ClassDelegateDefinition(ctx){ value = ClassDelegateDefinition; }
+            |   GlobalVariableDefinition(ctx, cu){ value = GlobalVariableDefinition; }
             ;
 
-        NamespaceDefinition(ParsingContext* ctx, NamespaceNode* ns) : NamespaceNode*
-            ::= (keyword("namespace") QualifiedId!){ value = new NamespaceNode(span, QualifiedId); } '{'! NamespaceContent(ctx, value)! '}'!
+        NamespaceDefinition(ParsingContext* ctx, CompileUnitNode* cu, NamespaceNode* ns) : NamespaceNode*
+            ::= (keyword("namespace") QualifiedId!){ value = new NamespaceNode(span, QualifiedId); } '{'! NamespaceContent(ctx, cu, value)! '}'!
             ;
 
         TypedefDeclaration(ParsingContext* ctx) : TypedefNode*
@@ -117,6 +120,10 @@ namespace cmajor.parser
 
         ClassDelegateDefinition(ParsingContext* ctx) : ClassDelegateNode*
             ::= ClassDelegate(ctx){ value = ClassDelegate; }
+            ;
+
+        GlobalVariableDefinition(ParsingContext* ctx, CompileUnitNode* cu) : GlobalVariableNode*
+            ::= GlobalVariable(ctx, cu){ value = GlobalVariable; }
             ;
     }
 }

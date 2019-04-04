@@ -6,17 +6,31 @@
 public const byte sys_exit = 0u;
 public const byte sys_wait = 1u;
 public const byte sys_fork = 2u;
-public const byte sys_write = 3u;
-public const byte sys_pool_end = 4u;
-public const byte sys_set_pool_end = 5u;
-public const byte sys_debug_break = 6u;
-public const byte sys_stack_trace = 7u;
-public const byte sys_throw = 8u;
-public const byte sys_catch = 9u;
-public const byte sys_resume = 10u;
+public const byte sys_create = 3u;
+public const byte sys_open = 4u;
+public const byte sys_close = 5u;
+public const byte sys_read = 6u;
+public const byte sys_write = 7u;
+public const byte sys_seek = 8u;
+public const byte sys_tell = 9u;
+public const byte sys_pool_end = 10u;
+public const byte sys_set_pool_end = 11u;
+public const byte sys_debug_break = 12u;
+public const byte sys_stack_trace = 13u;
+public const byte sys_throw = 14u;
+public const byte sys_catch = 15u;
+public const byte sys_resume = 16u;
+public const byte sys_get_system_error = 17u;
+public const byte sys_get_current_time_point = 18u;
+public const byte sys_sleep = 19u;
+public const byte sys_get_current_date = 20u;
+public const byte sys_get_current_date_time = 21u;
+public const byte sys_pow = 22u;
+public const byte sys_is_host_text_file = 23u;
 
 public cdecl nothrow void exit(byte exitCode)
 {
+    run_at_exits();
     trap(0u, sys_exit, 0u, exitCode);
 }
 
@@ -30,9 +44,39 @@ public cdecl nothrow int fork()
     return cast<int>(trap(0u, sys_fork, 0u));
 }
 
-public cdecl nothrow long write(int handle, void* buffer, long count)
+public cdecl nothrow int create(const char* path, int mode)
 {
-    return trap(0u, sys_write, 0u, handle, buffer, count);
+    return cast<int>(trap(0u, sys_create, 0u, path, mode));
+}
+
+public cdecl nothrow int open(const char* path, int flags, int mode)
+{
+    return cast<int>(trap(0u, sys_open, 0u, path, flags, mode));
+}
+
+public cdecl nothrow int close(int fd)
+{
+    return cast<int>(trap(0u, sys_close, 0u, fd));
+}
+
+public cdecl nothrow long read(int fd, void* buffer, long count)
+{
+    return trap(0u, sys_read, 0u, fd, buffer, count);
+}
+
+public cdecl nothrow long write(int fd, void* buffer, long count)
+{
+    return trap(0u, sys_write, 0u, fd, buffer, count);
+}
+
+public cdecl nothrow long seek(int fd, long pos, byte origin)
+{
+    return trap(0u, sys_seek, 0u, fd, pos, origin);
+}
+
+public cdecl nothrow long tell(int fd)
+{
+    return trap(0u, sys_tell, 0u, fd);
 }
 
 public cdecl nothrow void* pool_end()
@@ -40,14 +84,14 @@ public cdecl nothrow void* pool_end()
     return cast<void*>(cast<ulong>(trap(0u, sys_pool_end, 0u)));
 }
 
-public cdecl nothrow long set_pool_end(void* poolEnd)
+public cdecl nothrow int set_pool_end(void* poolEnd)
 {
-    return trap(0u, sys_set_pool_end, 0u, poolEnd);
+    return cast<int>(trap(0u, sys_set_pool_end, 0u, poolEnd));
 }
 
-public cdecl nothrow long stack_trace(void* buffer, long count)
+public cdecl nothrow int stack_trace(void* buffer, long count)
 {
-    return trap(0u, sys_stack_trace, 0u, buffer, count);
+    return cast<int>(trap(0u, sys_stack_trace, 0u, buffer, count));
 }
 
 public cdecl void do_throw(void* ex, ulong exTypeId)
@@ -63,4 +107,42 @@ public cdecl nothrow void* do_catch()
 public cdecl nothrow void do_resume()
 {
     trap(0u, sys_resume, 0u);
+}
+
+public cdecl nothrow int get_system_error(int* errorCode, void* buffer, long count)
+{
+    return cast<int>(trap(0u, sys_get_system_error, 0u, errorCode, buffer, count));
+}
+
+public cdecl nothrow long get_current_time_point()
+{
+    return trap(0u, sys_get_current_time_point, 0u);
+}
+
+public cdecl nothrow int sleep(long duration)
+{
+    return cast<int>(trap(0u, sys_sleep, 0u, duration));
+}
+
+public cdecl nothrow int get_current_date(short* y, sbyte* m, sbyte* d)
+{
+    return cast<int>(trap(0u, sys_get_current_date, 0u, y, m, d));
+}
+
+public cdecl nothrow int get_current_date_time(short* y, sbyte* m, sbyte* d, int* secs)
+{
+    return cast<int>(trap(0u, sys_get_current_date_time, 0u, y, m, d, secs));
+}
+
+public cdecl nothrow double pow(double x, double y)
+{
+    long lx = *cast<long*>(cast<void*>(&x));
+    long ly = *cast<long*>(cast<void*>(&y));
+    long result = trap(0u, sys_pow, 0u, lx, ly);
+    return *cast<double*>(cast<void*>(&result));
+}
+
+public cdecl nothrow int is_host_text_file(int fd)
+{
+    return cast<int>(trap(0u, sys_is_host_text_file, 0u, fd));
 }

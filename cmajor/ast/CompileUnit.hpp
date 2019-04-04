@@ -25,11 +25,13 @@ public:
     int GetColumn(const Span& span) const override;
     void SetSynthesizedUnit() { isSynthesizedUnit = true; }
     bool IsSynthesizedUnit() const { return isSynthesizedUnit; }
+    const std::string& Id();
 private:
     std::string filePath;
     std::unique_ptr<NamespaceNode> globalNs;
     std::vector<int32_t> lineStarts;
     bool isSynthesizedUnit;
+    std::string id;
 };
 
 } } // namespace cmajor::ast

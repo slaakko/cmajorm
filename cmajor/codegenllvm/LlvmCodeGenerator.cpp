@@ -1170,6 +1170,12 @@ void LlvmCodeGenerator::Visit(BoundConjunction& boundConjunction)
     }
 }
 
+void LlvmCodeGenerator::Visit(BoundGlobalVariable& boundGlobalVariable)
+{
+    GlobalVariableSymbol* globalVariableSymbol = boundGlobalVariable.GetGlobalVariableSymbol();
+    globalVariableSymbol->CreateIrObject(*emitter);
+}
+
 void* LlvmCodeGenerator::GetGlobalStringPtr(int stringId)
 {
     auto it = utf8stringMap.find(stringId);

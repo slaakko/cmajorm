@@ -33,6 +33,10 @@ namespace cmsx.intermediate
         }
         public abstract nothrow long Alignment();
         public abstract nothrow long Size();
+        public virtual nothrow Type* BaseType() const
+        {
+            return this;
+        }
         public virtual Operand* HexAllOnes(Context& context, int line) const
         {
             throw Exception("error: tried to get hex all ones for '" + Name() + "' type (line " + ToString(line) + ")");
@@ -857,13 +861,13 @@ namespace cmsx.intermediate
         public nothrow PtrType(Type* baseType_) : baseType(baseType_), defaultValue(this)
         {
         }
+        public nothrow override Type* BaseType() const
+        {
+            return baseType;
+        }
         public override nothrow string Name() const
         {
             return baseType->Name() + "*";
-        }
-        public nothrow inline Type* BaseType() const
-        {
-            return baseType;
         }
         public nothrow inline void SetBaseType(Type* baseType_)
         {

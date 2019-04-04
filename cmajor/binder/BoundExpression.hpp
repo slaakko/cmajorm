@@ -166,6 +166,23 @@ private:
     std::unique_ptr<Value> value;
 };
 
+class BINDER_API BoundGlobalVariable : public BoundExpression
+{
+public:
+    BoundGlobalVariable(Module* module_, const Span& span_, GlobalVariableSymbol* globalVariableSymbol_);
+    GlobalVariableSymbol* GetGlobalVariableSymbol() const { return globalVariableSymbol; }
+    BoundExpression* Clone() override;
+    bool IsLvalueExpression() const override { return true; }
+    bool HasValue() const override { return true; }
+    void Load(Emitter& emitter, OperationFlags flags) override;
+    void Store(Emitter& emitter, OperationFlags flags) override;
+    void Accept(BoundNodeVisitor& visitor) override;
+    std::string TypeString() const override { return "global variable"; }
+private:
+    GlobalVariableSymbol* globalVariableSymbol;
+};
+
+
 class BINDER_API BoundTemporary : public BoundExpression
 {
 public:

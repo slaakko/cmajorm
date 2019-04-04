@@ -1,0 +1,295 @@
+using System;
+using System.Threading;
+using System.IO;
+using System.Collections;
+using System.Unicode;
+using cmsx.machine;
+
+namespace cmsx.kernel
+{
+    public delegate void ConsoleInputCallback();
+
+    public Kernel& GetKernel()
+    {
+        return Kernel.Instance();
+    }
+
+    public class ConsoleDriver
+    {
+        static ConsoleDriver() : instance(new ConsoleDriver())
+        {
+        }
+        public static ConsoleDriver& Instance()
+        {
+            return *instance;
+        }
+        private ConsoleDriver() : consoleInputHandle(OsGetStdHandle(stdin)), consoleOutputHandle(OsGetStdHandle(stdout)), machine(GetMachine()), pos(0)
+        {
+            ConsoleInputCallback callback = ConsoleInputWaitingCallback;
+            ulong callBackValue = cast<ulong>(cast<void*>(callback));
+            bool retVal = OsRegisterConsoleCallback(consoleInputHandle, callBackValue);
+            if (!retVal)
+            {
+                Panic("Console driver callback initialization failed");
+            }
+        }
+        public void GetDimensions()
+        {
+            if (!OsGetConsoleScreenBufferInfo(consoleOutputHandle, &cursorPosX, &cursorPosY, &screenSizeX, &screenSizeY))
+            {
+                Panic("Console driver screen buffer info initialization failed");
+            }
+        }
+        public nothrow inline bool Eof() const
+        {
+            return eof;
+        }
+        public nothrow inline void ResetEof()
+        {
+            eof = false;
+        }
+        public nothrow bool HasLine() const
+        {
+            return !lines.IsEmpty();
+        }
+        public nothrow string GetLine() const
+        {
+            return ToUtf8(lines.RemoveFirst());
+        }
+        public nothrow inline void* GetConsoleInputHandle()
+        {
+            return consoleInputHandle;
+        }
+        public nothrow inline void* GetConsoleOutputHandle()
+        {
+            return consoleOutputHandle;
+        }
+        public void WriteToConsole(byte* buffer, long count)
+        {
+            ustring u;
+            for (long i = 0; i < count; ++i)
+            {
+                byte x = buffer[i];
+                unicodeEngine.Put(x);
+                if (unicodeEngine.ResultReady())
+                {
+                    uchar c = unicodeEngine.Get();
+                    if (c != '\r')
+                    {
+                        u.Append(c);
+                    }
+                }
+            }
+            if (!u.IsEmpty())
+            {
+                bool result = OsWriteConsole(consoleOutputHandle, u.Chars());
+                GetDimensions();
+            }
+        }
+        public void KeyPressed(uchar c)
+        {
+            AddCharToInputBuffer(c);
+            machine.GetRegisters().SetInterrupt(KEYBOARD_BIT);
+        }
+        public void HandleBufferedInput()
+        {
+            ustring chars = GetCharsFromInputBuffer();
+            for (uchar c : chars)
+            {
+                switch (c)
+                {
+                    case cast<uchar>(keyEnter): HandleEnter(); break;
+                    case cast<uchar>(keyControlD): HandleEof(); break;
+                    case cast<uchar>(keyHome): HandleHome(); break;
+                    case cast<uchar>(keyEnd): HandleEnd(); break;
+                    case cast<uchar>(keyLeft): HandleLeft(); break;
+                    case cast<uchar>(keyRight): HandleRight(); break;
+                    case cast<uchar>(keyDel): HandleDelete(); break;
+                    case cast<uchar>(keyBackspace): HandleBackspace(); break;
+                    default: HandleChar(c); break;
+                }
+            }
+        }
+        private void DeliverInputLine()
+        {
+            Machine& machine = GetMachine();
+            Kernel& kernel = GetKernel();
+            Session* session = kernel.CurrentSession();
+            if (session->fgpid != -1)
+            {
+                ProcessTable& processTable = kernel.GetProcessTable();
+                Process* reader = processTable.GetProcess(session->fgpid);
+                if (reader != null)
+                {
+                    if (reader->state == Process.State.asleep && reader->event == consoleInputEvent)
+                    {
+                        ulong bufferAddress = reader->eventData1;
+                        long count = cast<long>(reader->eventData2);
+                        GlobalFileTable& fileTable = kernel.FileTable();
+                        ConsoleInputFile* consoleInputFile = fileTable.GetConsoleInputFile();
+                        if (!consoleInputFile->HasBufferedInput())
+                        {
+                            if (HasLine())
+                            {
+                                consoleInputFile->SetBufferedInput(GetLine());
+                            }
+                        }
+                        long result = consoleInputFile->Read(machine, reader, bufferAddress, count);
+                        #assert(result != RESULT_BLOCKED);
+                        WriteProcessMemory(machine, reader, reader->regAXAddress, cast<ulong>(result), 8u, Protection.write);
+                        WakeUpProcess(processTable, reader);
+                        Process* running = processTable.GetRunning();
+                        if (running == processTable.GetIdle())
+                        {
+                            Schedule(machine, processTable);
+                        }
+                    }
+                }
+            }
+        }
+        private void HandleEnter()
+        {
+            line.Append('\n');
+            lines.Add(line);
+            line.Clear();
+            DeliverInputLine();
+            pos = 0;
+            ++cursorPosY;
+            SetCursorPos(0, cursorPosY);
+        }
+        private void HandleEof()
+        {
+            eof = true;
+            DeliverInputLine();
+        }
+        private void HandleHome()
+        {
+            pos = 0;
+            SetCursorPos(0, cursorPosY);
+        }
+        private void HandleEnd()
+        {
+            pos = cast<int>(line.Length());
+            SetCursorPos(pos, cursorPosY);
+        }
+        private void HandleLeft()
+        {
+            if (pos > 0)
+            {
+                --pos;
+                SetCursorPos(pos, cursorPosY);
+            }
+        }
+        private void HandleRight()
+        {
+            if (pos < line.Length())
+            {
+                ++pos;
+                SetCursorPos(pos, cursorPosY);
+            }
+        }
+        private void HandleDelete()
+        {
+            if (pos < line.Length())
+            {
+                ++pos;
+                line = line.Substring(0, pos - 1) + line.Substring(pos);
+                --pos;
+                UpdateLine();
+            }
+        }
+        private void HandleBackspace()
+        {
+            if (pos > 0)
+            {
+                line = line.Substring(0, pos - 1) + line.Substring(pos);
+                --pos;
+                SetCursorPos(pos, cursorPosY);
+                UpdateLine();
+            }
+        }
+        private void HandleChar(uchar c)
+        {
+            if (IsGraphic(c) && cursorPosX < screenSizeX - 1)
+            {
+                if (pos < line.Length())
+                {
+                    line = line.Substring(0, pos) + ustring(c, 1) + line.Substring(pos);
+                }
+                else
+                {
+                    line.Append(c);
+                }
+                ++pos;
+                SetCursorPos(pos, cursorPosY);
+                UpdateLine();
+            }
+        }
+        private void AddCharToInputBuffer(uchar c)
+        {
+            LockGuard<Mutex> lock(inputBufferMutex);
+            inputBuffer.Append(c);
+        }
+        private ustring GetCharsFromInputBuffer()
+        {
+            LockGuard<Mutex> lock(inputBufferMutex);
+            ustring chars;
+            Swap(chars, inputBuffer);
+            return chars;
+        }
+        private void SetCursorPos(int x, int y)
+        {
+            cursorPosX = x;
+            cursorPosY = y;
+            OsSetConsoleCursorPosition(consoleOutputHandle, x, y);
+        }
+        private void UpdateLine()
+        {
+            ustring updateLine;
+            for (int i = 0; i < screenSizeX; ++i)
+            {
+                if (i < line.Length())
+                {
+                    updateLine.Append(line[i]);
+                }
+                else
+                {
+                    updateLine.Append(' ');
+                }
+            }
+            OsSetConsoleCursorPosition(consoleOutputHandle, 0, cursorPosY);
+            OsWriteConsole(consoleOutputHandle, updateLine.Chars());
+            OsSetConsoleCursorPosition(consoleOutputHandle, cursorPosX, cursorPosY);
+        }
+        private static UniquePtr<ConsoleDriver> instance;
+        private void* consoleInputHandle;
+        private void* consoleOutputHandle;
+        private Machine& machine;
+        private ustring inputBuffer;
+        private Mutex inputBufferMutex;
+        private ustring line;
+        private List<ustring> lines;
+        private bool eof;
+        private int pos;
+        private int cursorPosX;
+        private int cursorPosY;
+        private int screenSizeX;
+        private int screenSizeY;
+        private UnicodeEngine unicodeEngine;
+    }
+
+    public void ConsoleInputWaitingCallback()
+    {
+        uchar c = '\0';
+        bool retVal = OsReadConsoleInput(ConsoleDriver.Instance().GetConsoleInputHandle(), &c);
+        if (retVal && c != '\0')
+        {
+            ConsoleDriver.Instance().KeyPressed(c);
+        }
+    }
+
+    public ConsoleDriver& GetConsoleDriver()
+    {
+        return ConsoleDriver.Instance();
+    }
+}

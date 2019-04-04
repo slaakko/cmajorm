@@ -223,17 +223,31 @@ namespace cmsx.intermediate
         }
         public override void GenerateLoad(int loadOpCode, Register* destinationReg, MachineCode& machineCode, Instruction* inst)
         {
-            MachineInstruction* loadInstruction = machineCode.GetInstruction(cmsx.machine.LDOU, inst);
+            Register* ptrReg = machineCode.context.regs.GetIx();
+            MachineInstruction* loadAddressInstruction = machineCode.GetInstruction(cmsx.machine.LDOU, inst);
+            loadAddressInstruction->AddOperand(ptrReg);
+            loadAddressInstruction->AddOperand(symbolOperand);
+            MachineInstruction* loadInstruction = machineCode.GetInstruction(loadOpCode, null);
             loadInstruction->AddOperand(destinationReg);
-            loadInstruction->AddOperand(symbolOperand);
+            loadInstruction->AddOperand(ptrReg);
+            loadInstruction->AddOperand(machineCode.context.GetLiteralOperand(0u));
         }            
         public override void GenerateLoadAddress(Register* destinationReg, MachineCode& machineCode, Instruction* inst)
         {
-            throw Exception("GenerateLoadAddress not implemented for data locations");
+            MachineInstruction* loadAddressInstruction = machineCode.GetInstruction(cmsx.machine.LDOU, inst);
+            loadAddressInstruction->AddOperand(destinationReg);
+            loadAddressInstruction->AddOperand(symbolOperand);
         }
         public override void GenerateStore(int storeOpCode, Register* valueReg, MachineCode& machineCode, Instruction* inst)
         {
-            throw Exception("GenerateStore not implemented for data locations");
+            Register* ptrReg = machineCode.context.regs.GetIx();
+            MachineInstruction* loadAddressInstruction = machineCode.GetInstruction(cmsx.machine.LDOU, inst);
+            loadAddressInstruction->AddOperand(ptrReg);
+            loadAddressInstruction->AddOperand(symbolOperand);
+            MachineInstruction* storeInstruction = machineCode.GetInstruction(storeOpCode, null);
+            storeInstruction->AddOperand(valueReg);
+            storeInstruction->AddOperand(ptrReg);
+            storeInstruction->AddOperand(machineCode.context.GetLiteralOperand(0u));
         }
         private SymbolOperand* symbolOperand;
     }

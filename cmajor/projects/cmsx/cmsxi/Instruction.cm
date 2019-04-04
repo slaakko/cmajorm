@@ -624,6 +624,10 @@ namespace cmsx.intermediate
         {
             return "nop";
         }
+        public override void Validate(Function& function, int numArgs)
+        {
+            base->Validate(function, numArgs);
+        }
         public override void GenerateCode(MachineCode& machineCode, CodeFormatter& formatter)
         {
             BeginGenerateCode(machineCode);
@@ -994,15 +998,6 @@ namespace cmsx.intermediate
                 throw Exception("error: result not found in register in the " + OperationName() + " instruction at line " + ToString(line));
             }
             EndGenerateCode();
-            if (Flags.Get(Flag.debug))
-            {
-                Print(formatter);
-                formatter.WriteLine();
-                formatter.IncIndent();
-                registerDescriptors.DebugPrint(formatter);
-                addressDescriptors.DebugPrint(formatter);
-                formatter.DecIndent();
-            }
         }
     }
 
@@ -1047,15 +1042,6 @@ namespace cmsx.intermediate
                 throw Exception("error: result not found in register in the " + OperationName() + " instruction at line " + ToString(line));
             }
             EndGenerateCode();
-            if (Flags.Get(Flag.debug))
-            {
-                Print(formatter);
-                formatter.WriteLine();
-                formatter.IncIndent();
-                registerDescriptors.DebugPrint(formatter);
-                addressDescriptors.DebugPrint(formatter);
-                formatter.DecIndent();
-            }
         }
     }
 
@@ -1297,13 +1283,22 @@ namespace cmsx.intermediate
         public override void Validate(Function& function, int numArgs)
         {
             base->Validate(function, numArgs);
-            if (!(arg->type is ScalarType*))
+            if (!((arg->type is ScalarType*) || (arg->type is FunctionType*)))
             {
-                throw Exception("error: the operand type '" + arg->type->Name() + "' in the " + OperationName() + " instruction at line " + ToString(line) + " must be a scalar type");
+                throw Exception("error: the operand type '" + arg->type->Name() + "' in the " + OperationName() + " instruction at line " + ToString(line) + " must be a scalar or function type");
             }
             if (!(type is ScalarType*))
             {
                 throw Exception("error: the result type '" + type->Name() + "' in the " + OperationName() + " instruction at line " + ToString(line) + " must be a scalar type");
+            }
+            if (arg is SymbolValue*)
+            {
+                string addrValueName = arg->Name() + "_addr";
+                GlobalVariable* addrVar = function.context.GetGlobalVariableNothrow(addrValueName);
+                if (addrVar == null)
+                {
+                    function.context.AddGlobalVariable(function.context.GetPtrType(function.context.GetVoidType()), addrValueName, cast<SymbolValue*>(arg), 0, true);
+                }
             }
         }
         public override void GenerateCode(MachineCode& machineCode, CodeFormatter& formatter)
@@ -1327,14 +1322,36 @@ namespace cmsx.intermediate
             }
             else if (y is LocalInstruction*)
             {
-                LocalInstruction* localInst = cast<LocalInstruction*>(y);
-                if (localInst->localType is StructureType* || localInst->localType is ArrayType*)
+                List<Register*> dontUse;
+                rx = registerDescriptors.GetLocalRegDescriptor(dontUse, addressDescriptors, machineCode, line, this);
+                LoadOperandAddress(y, rx, addressDescriptors, machineCode, line, this);
+                loaded = true;
+            }
+            else if (y is PtrValue*)
+            {
+                PtrValue* ptrValue = cast<PtrValue*>(y);
+                Type* type = ptrValue->globalVariable->type;
+                if (type is ArrayType* || type is StructureType*)
                 {
                     List<Register*> dontUse;
                     rx = registerDescriptors.GetLocalRegDescriptor(dontUse, addressDescriptors, machineCode, line, this);
                     LoadOperandAddress(y, rx, addressDescriptors, machineCode, line, this);
                     loaded = true;
                 }
+            }
+            else if (y is SymbolValue*)
+            {
+                string addrValueName = y->Name() + "_addr";
+                MachineInstruction* loadAddrInstruction = machineCode.GetInstruction(cmsx.machine.LDOU, this);
+                List<Register*> dontUse;
+                rx = registerDescriptors.GetLocalRegDescriptor(dontUse, addressDescriptors, machineCode, line, this);
+                loadAddrInstruction->AddOperand(rx->reg);
+                loadAddrInstruction->AddOperand(machineCode.context.GetSymbolOperand(addrValueName));
+                MachineInstruction* loadInstruction = machineCode.GetInstruction(cmsx.machine.LDOU, this);
+                loadInstruction->AddOperand(rx->reg);
+                loadInstruction->AddOperand(rx->reg);
+                loadInstruction->AddOperand(machineCode.context.GetLiteralOperand(0u));
+                loaded = true;
             }
             if (!loaded)
             {
@@ -1891,7 +1908,9 @@ namespace cmsx.intermediate
                 throw Exception("error: the second operand type '" + ptr->type->Name() + "' in the " + OperationName() + " instruction at line " + ToString(line) + " must be a pointer type");
             }
             PtrType* ptrType = cast<PtrType*>(ptr->type);
-            if (ptrType->BaseType() != value->type)
+            Type* baseType = ptrType->BaseType();
+            Type* valueType = value->type;
+            if (!(((valueType is FloatType*) && (baseType is DoubleType*) || (valueType is DoubleType*) && (baseType is FloatType*)) || baseType == valueType)) 
             {
                 throw Exception("error: the first operand type '" + value->type->Name() + "' in the " + OperationName() + " instruction at line " + ToString(line) + " must be same as the base type of the second operand pointer type");
             }
@@ -1938,15 +1957,11 @@ namespace cmsx.intermediate
             }
             else if (value is LocalInstruction*)
             {
-                LocalInstruction* localInst = cast<LocalInstruction*>(value);
-                if (localInst->localType is StructureType* || localInst->localType is ArrayType*)
-                {
-                    List<Register*> dontUse;
-                    RegisterDescriptor* valueRegisterDescriptor = registerDescriptors.GetLocalRegDescriptor(dontUse, addressDescriptors, machineCode, line, this);
-                    LoadOperandAddress(value, valueRegisterDescriptor, addressDescriptors, machineCode, line, this);
-                    valueReg = valueRegisterDescriptor->reg;
-                    loaded = true;
-                }
+                List<Register*> dontUse;
+                RegisterDescriptor* valueRegisterDescriptor = registerDescriptors.GetLocalRegDescriptor(dontUse, addressDescriptors, machineCode, line, this);
+                LoadOperandAddress(value, valueRegisterDescriptor, addressDescriptors, machineCode, line, this);
+                valueReg = valueRegisterDescriptor->reg;
+                loaded = true;
             }
             if (!loaded)
             {
@@ -1994,7 +2009,19 @@ namespace cmsx.intermediate
             }
             if (ptrLoc != null)
             {
-                int storeOpCode = value->type->GetStoreOp(line);
+                int storeOpCode = 0;
+                if ((value->type is DoubleType*) && (ptr->type->BaseType() is FloatType*))
+                {
+                    storeOpCode = ptr->type->BaseType()->GetStoreOp(line);
+                }
+                else if ((value->type is FloatType*) && (ptr->type->BaseType() is DoubleType*))
+                {
+                    storeOpCode = ptr->type->BaseType()->GetStoreOp(line);
+                }
+                else
+                {
+                    storeOpCode = value->type->GetStoreOp(line);
+                }
                 ptrLoc->GenerateStore(storeOpCode, valueReg, machineCode, this);
                 ptrAddressDescriptor->AddLocation(ptrLoc);
             }
@@ -2139,6 +2166,11 @@ namespace cmsx.intermediate
                         LoadOperandAddress(y, ry, addressDescriptors, machineCode, line, this);
                         operandLoaded = true;
                     }
+                }
+                else if (ptr is PtrValue*)
+                {
+                    LoadOperandAddress(y, ry, addressDescriptors, machineCode, line, this);
+                    operandLoaded = true;
                 }
                 if (!operandLoaded)
                 {
@@ -2580,12 +2612,8 @@ namespace cmsx.intermediate
             bool loaded = false;
             if (arg is LocalInstruction*)
             {
-                LocalInstruction* localInst = cast<LocalInstruction*>(arg);
-                if (localInst->localType is StructureType* || localInst->localType is ArrayType*)
-                {
-                    LoadOperandAddress(arg, argRegDescriptor, addressDescriptors, machineCode, line, this);
-                    loaded = true;
-                }
+                LoadOperandAddress(arg, argRegDescriptor, addressDescriptors, machineCode, line, this);
+                loaded = true;
             }
             else if (arg is LiteralValue*)
             {
@@ -2606,6 +2634,27 @@ namespace cmsx.intermediate
                     setInst->AddOperand(argRegDescriptor->reg); 
                     setInst->AddOperand(loc);
                 }
+                else if (arg is PtrValue*)
+                {
+                    PtrValue* ptrValue = cast<PtrValue*>(arg);
+                    ConstantValue* initializer = ptrValue->globalVariable->initializer;
+                    if (initializer != null && initializer is StringValue*)
+                    {
+                        LoadOperandAddress(arg, argRegDescriptor, addressDescriptors, machineCode, line, this);
+                    }
+                    else
+                    {
+                        Type* type = ptrValue->globalVariable->type;
+                        if (type is ArrayType* || type is StructureType*)
+                        {
+                            LoadOperandAddress(arg, argRegDescriptor, addressDescriptors, machineCode, line, this);
+                        }
+                        else
+                        {
+                            LoadOperandValue(arg, argRegDescriptor, addressDescriptors, machineCode, line, this);
+                        }
+                    }
+                }
                 else
                 {
                     LoadOperandValue(arg, argRegDescriptor, addressDescriptors, machineCode, line, this);
@@ -2616,6 +2665,15 @@ namespace cmsx.intermediate
                 argLocation->GenerateStore(arg->type->GetStoreOp(line), argReg, machineCode, this); 
             }
             EndGenerateCode();
+            if (Flags.Get(Flag.debug))
+            {
+                Print(formatter);
+                formatter.WriteLine();
+                formatter.IncIndent();
+                registerDescriptors.DebugPrint(formatter);
+                addressDescriptors.DebugPrint(formatter);
+                formatter.DecIndent();
+            }
         }
         public Value* arg;
         public int numArgs;
@@ -2858,6 +2916,7 @@ namespace cmsx.intermediate
                 subInst->AddOperand(ix);
             }
             parent->function.frameLocations.ResetArgLocations();
+            int x = registerDescriptors.GetNumUsedLocalRegs();
             Register* xReg = machineCode.context.regs.GetLocalRegister(registerDescriptors.GetNumUsedLocalRegs());
             Operand* calleeOperand = null;
             Operand* zOperand = null;
@@ -2888,6 +2947,15 @@ namespace cmsx.intermediate
                 callInst->AddOperand(zOperand);
             }
             EndGenerateCode();
+            if (Flags.Get(Flag.debug))
+            {
+                Print(formatter);
+                formatter.WriteLine();
+                formatter.IncIndent();
+                registerDescriptors.DebugPrint(formatter);
+                addressDescriptors.DebugPrint(formatter);
+                formatter.DecIndent();
+            }
         }
         public Value* callee;
     }
@@ -2904,6 +2972,7 @@ namespace cmsx.intermediate
         public override void Validate(Function& function, int numArgs)
         {
             base->Validate(function, numArgs);
+            callee = function.ResolveOperand(line, callee);
             if (callee == null)
             {
                 throw Exception("internal error : callee operand of " + OperationName() + " instruction at line " + ToString(line) + " is null");
@@ -3017,6 +3086,15 @@ namespace cmsx.intermediate
             resultAddressDescriptor->SetLocation(resultReg);
             addressDescriptors.RemoveRegisterFromAllBut(this, resultReg);
             EndGenerateCode(); 
+            if (Flags.Get(Flag.debug))
+            {
+                Print(formatter);
+                formatter.WriteLine();
+                formatter.IncIndent();
+                registerDescriptors.DebugPrint(formatter);
+                addressDescriptors.DebugPrint(formatter);
+                formatter.DecIndent();
+            }
         }
         public Value* callee;
     }
@@ -3110,6 +3188,15 @@ namespace cmsx.intermediate
             resultAddressDescriptor->SetLocation(resultReg);
             addressDescriptors.RemoveRegisterFromAllBut(this, resultReg);
             EndGenerateCode();
+            if (Flags.Get(Flag.debug))
+            {
+                Print(formatter);
+                formatter.WriteLine();
+                formatter.IncIndent();
+                registerDescriptors.DebugPrint(formatter);
+                addressDescriptors.DebugPrint(formatter);
+                formatter.DecIndent();
+            }
         }
         public Value* b0;
         public Value* b1;

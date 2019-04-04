@@ -248,7 +248,8 @@ void* Emitter::CreateDefaultIrValueForULong()
 
 void* Emitter::CreateDefaultIrValueForFloat()
 {
-    return context->GetDefaultFloatValue();
+    return context->GetDefaultDoubleValue(); // float literals represented in MMIX internally as doubles
+    //return context->GetDefaultFloatValue();
 }
 
 void* Emitter::CreateDefaultIrValueForDouble()
@@ -348,7 +349,8 @@ void* Emitter::CreateIrValueForULong(uint64_t value)
 
 void* Emitter::CreateIrValueForFloat(float value)
 {
-    return context->GetFloatValue(value);
+    return context->GetDoubleValue(value); // float literals represented in MMIX internally as doubles
+    //return context->GetFloatValue(value);
 }
 
 void* Emitter::CreateIrValueForDouble(double value)
@@ -829,8 +831,7 @@ void* Emitter::CreateZExt(void* operand, void* destinationType)
 
 void* Emitter::CreateFPExt(void* operand, void* destinationType)
 {
-    // todo
-    return nullptr;
+    return operand;
 }
 
 void* Emitter::CreateTrunc(void* operand, void* destinationType)
@@ -840,8 +841,7 @@ void* Emitter::CreateTrunc(void* operand, void* destinationType)
 
 void* Emitter::CreateFPTrunc(void* operand, void* destinationType)
 {
-    // todo
-    return nullptr;
+    return context->CreateBitCast(static_cast<cmsxi::Value*>(operand), static_cast<cmsxi::Type*>(destinationType));
 }
 
 void* Emitter::CreateBitCast(void* operand, void* destinationType)
@@ -891,7 +891,21 @@ void* Emitter::CreateNeg(void* value)
 
 void* Emitter::CreateFNeg(void* value)
 {
-    return context->CreateNeg(static_cast<cmsxi::Value*>(value));
+    cmsxi::Value* val = static_cast<cmsxi::Value*>(value);
+    if (val->GetType(*context)->Id() == cmsxi::doubleTypeId)
+    {
+        cmsxi::ConstantValue* minusOne = context->GetDoubleValue(-1.0);
+        return context->CreateMul(minusOne, val);
+    }
+    else if (val->GetType(*context)->Id() == cmsxi::floatTypeId)
+    {
+        cmsxi::ConstantValue* minusOne = context->GetFloatValue(-1.0f);
+        return context->CreateMul(minusOne, val);
+    }
+    else
+    {
+        throw std::runtime_error("invalid FNeg operand type");
+    }
 }
 
 void* Emitter::CreateNop()

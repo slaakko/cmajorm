@@ -493,6 +493,50 @@ void ExpressionBinder::BindSymbol(Symbol* symbol, IdentifierNode* idNode)
             expression.reset(new BoundNamespaceExpression(module, span, ns));
             break;
         }
+        case SymbolType::globalVariableGroupSymbol:
+        {
+            GlobalVariableGroupSymbol* globalVariableGroup = static_cast<GlobalVariableGroupSymbol*>(symbol);
+            std::vector<GlobalVariableSymbol*> globalVariables;
+            globalVariableGroup->CollectGlobalVariables(boundCompileUnit.GetCompileUnitNode()->FilePath(), globalVariables);
+            if (globalVariables.empty())
+            {
+                throw Exception(module, "global variable group '" + ToUtf8(globalVariableGroup->Name()) + "' contains no relevant public or internal global variables", span);
+            }
+            else if (globalVariables.size() == 1)
+            {
+                GlobalVariableSymbol* globalVariableSymbol = globalVariables.front();
+                if (globalVariableSymbol->Access() == SymbolAccess::private_ && globalVariableSymbol->CompileUnitFilePath() != boundCompileUnit.GetCompileUnitNode()->FilePath())
+                {
+                    throw Exception(module, "global variable group '" + ToUtf8(globalVariableGroup->Name()) +
+                        "' does not contain a public or internal global variable with the given name but do contain a private global variable defined in the compile unit " +
+                        globalVariableSymbol->CompileUnitFilePath(), span, globalVariableSymbol->GetSpan());
+                }
+                else
+                {
+                    expression.reset(new BoundGlobalVariable(module, span, globalVariableSymbol));
+                }
+            }
+            else
+            {
+                std::string compileUnits;
+                bool first = true;
+                for (GlobalVariableSymbol* globalVariableSymbol : globalVariables)
+                {
+                    if (first)
+                    {
+                        first = false;
+                    }
+                    else
+                    {
+                        compileUnits.append(", ");
+                    }
+                    compileUnits.append(globalVariableSymbol->CompileUnitFilePath());
+                }
+                throw Exception(module, "global variable group '" + ToUtf8(globalVariableGroup->Name()) +
+                    "' does not contain a public or internal global variable with the given name but do contain private global variables defined in the following compile units: " + compileUnits, span);
+            }
+            break;
+        }
         default:
         {
             throw Exception(module, "could not bind '" + ToUtf8(symbol->FullName()) + "'", span, symbol->GetSpan());

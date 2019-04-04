@@ -21,9 +21,12 @@ namespace cmsx.kernel
         InterruptHandler intervalInterruptHandler = IntervalInterruptHandler;
         ulong intervalInterruptHandlerAddress = cast<ulong>(cast<void*>(intervalInterruptHandler));
         mem.WriteULong(MakeInterruptHandlerPtrAddress(irqInterval), intervalInterruptHandlerAddress, Protection.write);
-        InterruptHandler clockHandler = ClockHandler;
-        ulong clockHandlerAddress = cast<ulong>(cast<void*>(clockHandler));
-        mem.WriteULong(MakeInterruptHandlerPtrAddress(irqClock), clockHandlerAddress, Protection.write);
+        InterruptHandler clockInterruptHandler = ClockInterruptHandler;
+        ulong clockInterruptHandlerAddress = cast<ulong>(cast<void*>(clockInterruptHandler));
+        mem.WriteULong(MakeInterruptHandlerPtrAddress(irqClock), clockInterruptHandlerAddress, Protection.write);
+        InterruptHandler keyboardInterruptHandler = KeyboardInterruptHandler;
+        ulong keyboardInterruptHandlerAddress = cast<ulong>(cast<void*>(keyboardInterruptHandler));
+        mem.WriteULong(MakeInterruptHandlerPtrAddress(irqKeyboard), keyboardInterruptHandlerAddress, Protection.write);
         InterruptHandler pageFaultHandler = PageFaultHandler;
         ulong pageFaultHandlerAddress = cast<ulong>(cast<void*>(pageFaultHandler));
         mem.WriteULong(MakeInterruptHandlerPtrAddress(irqR), pageFaultHandlerAddress, Protection.write);
@@ -46,37 +49,76 @@ namespace cmsx.kernel
         }
         TrapHandler exitSystemCallHandler = Exit;
         ulong exitSystemCallAddress = cast<ulong>(cast<void*>(exitSystemCallHandler));
-        mem.WriteULong(MakeSystemCallPtrAddress(exitSystemCall), exitSystemCallAddress, Protection.write);
+        mem.WriteULong(MakeSystemCallPtrAddress(sys_exit), exitSystemCallAddress, Protection.write);
         TrapHandler waitSystemCallHandler = Wait;
         ulong waitSystemCallAddress = cast<ulong>(cast<void*>(waitSystemCallHandler));
-        mem.WriteULong(MakeSystemCallPtrAddress(waitSystemCall), waitSystemCallAddress, Protection.write);
+        mem.WriteULong(MakeSystemCallPtrAddress(sys_wait), waitSystemCallAddress, Protection.write);
         TrapHandler forkSystemCallHandler = Fork;
         ulong forkSystemCallAddress = cast<ulong>(cast<void*>(forkSystemCallHandler));
-        mem.WriteULong(MakeSystemCallPtrAddress(forkSystemCall), forkSystemCallAddress, Protection.write);
+        mem.WriteULong(MakeSystemCallPtrAddress(sys_fork), forkSystemCallAddress, Protection.write);
+        TrapHandler createSystemCallHandler = Create;
+        ulong createSystemCallAddress = cast<ulong>(cast<void*>(createSystemCallHandler));
+        mem.WriteULong(MakeSystemCallPtrAddress(sys_create), createSystemCallAddress, Protection.write);
+        TrapHandler openSystemCallHandler = Open;
+        ulong openSystemCallAddress = cast<ulong>(cast<void*>(openSystemCallHandler));
+        mem.WriteULong(MakeSystemCallPtrAddress(sys_open), openSystemCallAddress, Protection.write);
+        TrapHandler closeSystemCallHandler = Close;
+        ulong closeSystemCallAddress = cast<ulong>(cast<void*>(closeSystemCallHandler));
+        mem.WriteULong(MakeSystemCallPtrAddress(sys_close), closeSystemCallAddress, Protection.write);
+        TrapHandler readSystemCallHandler = Read;
+        ulong readSystemCallAddress = cast<ulong>(cast<void*>(readSystemCallHandler));
+        mem.WriteULong(MakeSystemCallPtrAddress(sys_read), readSystemCallAddress, Protection.write);
         TrapHandler writeSystemCallHandler = Write;
         ulong writeSystemCallAddress = cast<ulong>(cast<void*>(writeSystemCallHandler));
-        mem.WriteULong(MakeSystemCallPtrAddress(writeSystemCall), writeSystemCallAddress, Protection.write);
+        mem.WriteULong(MakeSystemCallPtrAddress(sys_write), writeSystemCallAddress, Protection.write);
+        TrapHandler seekSystemCallHandler = Seek;
+        ulong seekSystemCallAddress = cast<ulong>(cast<void*>(seekSystemCallHandler));
+        mem.WriteULong(MakeSystemCallPtrAddress(sys_seek), seekSystemCallAddress, Protection.write);
+        TrapHandler tellSystemCallHandler = Tell;
+        ulong tellSystemCallAddress = cast<ulong>(cast<void*>(tellSystemCallHandler));
+        mem.WriteULong(MakeSystemCallPtrAddress(sys_tell), tellSystemCallAddress, Protection.write);
         TrapHandler poolEndSystemCallHandler = PoolEnd;
         ulong poolEndSystemCallAddress = cast<ulong>(cast<void*>(poolEndSystemCallHandler));
-        mem.WriteULong(MakeSystemCallPtrAddress(poolEndSystemCall), poolEndSystemCallAddress, Protection.write);
+        mem.WriteULong(MakeSystemCallPtrAddress(sys_pool_end), poolEndSystemCallAddress, Protection.write);
         TrapHandler setPoolEndSystemCallHandler = SetPoolEnd;
         ulong setPoolEndSystemCallAddress = cast<ulong>(cast<void*>(setPoolEndSystemCallHandler));
-        mem.WriteULong(MakeSystemCallPtrAddress(setPoolEndSystemCall), setPoolEndSystemCallAddress, Protection.write);
+        mem.WriteULong(MakeSystemCallPtrAddress(sys_set_pool_end), setPoolEndSystemCallAddress, Protection.write);
         TrapHandler debugBreakSystemCallHandler = DebugBreak;
         ulong debugBreakSystemCallAddress = cast<ulong>(cast<void*>(debugBreakSystemCallHandler));
-        mem.WriteULong(MakeSystemCallPtrAddress(debugBreakSystemCall), debugBreakSystemCallAddress, Protection.write);
+        mem.WriteULong(MakeSystemCallPtrAddress(sys_debug_break), debugBreakSystemCallAddress, Protection.write);
         TrapHandler stackTraceSystemCallHandler = StackTrace;
         ulong stackTraceSystemCallAddress = cast<ulong>(cast<void*>(stackTraceSystemCallHandler));
-        mem.WriteULong(MakeSystemCallPtrAddress(stackTraceSystemCall), stackTraceSystemCallAddress, Protection.write);
+        mem.WriteULong(MakeSystemCallPtrAddress(sys_stack_trace), stackTraceSystemCallAddress, Protection.write);
         TrapHandler throwSystemCallHandler = Throw;
         ulong throwSystemCallAddress = cast<ulong>(cast<void*>(throwSystemCallHandler));
-        mem.WriteULong(MakeSystemCallPtrAddress(throwSystemCall), throwSystemCallAddress, Protection.write);
+        mem.WriteULong(MakeSystemCallPtrAddress(sys_throw), throwSystemCallAddress, Protection.write);
         TrapHandler catchSystemCallHandler = Catch;
         ulong catchSystemCallAddress = cast<ulong>(cast<void*>(catchSystemCallHandler));
-        mem.WriteULong(MakeSystemCallPtrAddress(catchSystemCall), catchSystemCallAddress, Protection.write);
+        mem.WriteULong(MakeSystemCallPtrAddress(sys_catch), catchSystemCallAddress, Protection.write);
         TrapHandler resumeSystemCallHandler = Resume;
         ulong resumeSystemCallAddress = cast<ulong>(cast<void*>(resumeSystemCallHandler));
-        mem.WriteULong(MakeSystemCallPtrAddress(resumeSystemCall), resumeSystemCallAddress, Protection.write);
+        mem.WriteULong(MakeSystemCallPtrAddress(sys_resume), resumeSystemCallAddress, Protection.write);
+        TrapHandler getSystemErrorSystemCallHandler = GetSystemError;
+        ulong getSystemErrorSystemCallAddress = cast<ulong>(cast<void*>(getSystemErrorSystemCallHandler));
+        mem.WriteULong(MakeSystemCallPtrAddress(sys_get_system_error), getSystemErrorSystemCallAddress, Protection.write);
+        TrapHandler getCurrentTimePointSystemCallHandler = GetCurrentTimePoint;
+        ulong getCurrentTimePointSystemCallAddress = cast<ulong>(cast<void*>(getCurrentTimePointSystemCallHandler));
+        mem.WriteULong(MakeSystemCallPtrAddress(sys_get_current_time_point), getCurrentTimePointSystemCallAddress, Protection.write);
+        TrapHandler sleepSystemCallHandler = Sleep;
+        ulong sleepSystemCallAddress = cast<ulong>(cast<void*>(sleepSystemCallHandler));
+        mem.WriteULong(MakeSystemCallPtrAddress(sys_sleep), sleepSystemCallAddress, Protection.write);
+        TrapHandler getCurrentDateSystemCallHandler = GetCurrentDate;
+        ulong getCurrentDateSystemCallAddress = cast<ulong>(cast<void*>(getCurrentDateSystemCallHandler));
+        mem.WriteULong(MakeSystemCallPtrAddress(sys_get_current_date), getCurrentDateSystemCallAddress, Protection.write);
+        TrapHandler getCurrentDateTimeSystemCallHandler = GetCurrentDateTime;
+        ulong getCurrentDateTimeSystemCallAddress = cast<ulong>(cast<void*>(getCurrentDateTimeSystemCallHandler));
+        mem.WriteULong(MakeSystemCallPtrAddress(sys_get_current_date_time), getCurrentDateTimeSystemCallAddress, Protection.write);
+        TrapHandler powSystemCallHandler = Pow;
+        ulong powSystemCallAddress = cast<ulong>(cast<void*>(powSystemCallHandler));
+        mem.WriteULong(MakeSystemCallPtrAddress(sys_pow), powSystemCallAddress, Protection.write);
+        TrapHandler isHostTextFileSystemCallHandler = IsHostTextFile;
+        ulong isHostTextFileSystemCallAddress = cast<ulong>(cast<void*>(isHostTextFileSystemCallHandler));
+        mem.WriteULong(MakeSystemCallPtrAddress(sys_is_host_text_file), isHostTextFileSystemCallAddress, Protection.write);
     }
 
     public void Boot(Machine& machine)
@@ -93,6 +135,10 @@ namespace cmsx.kernel
         SessionTable& sessionTable = kernel.GetSessionTable();
         Session* currentSession = sessionTable.CreateSession();
         kernel.SetCurrentSession(currentSession);
+        if (!kernel.HasUserDebugger())
+        {
+            kernel.SetConsoleDriver(&cmsx.kernel.GetConsoleDriver());
+        }
         ProcessTable& processTable = kernel.GetProcessTable();
         int pid = -1;
         if (Machine.GetFlag(Machine.Flags.runProgram))
@@ -123,6 +169,11 @@ namespace cmsx.kernel
             {
                 Console.Out() << "running program '" << kernel.GetProgramFileName() << "' as process " << pid << endl();
             }
+        }
+        ConsoleDriver* consoleDriver = kernel.GetConsoleDriver();
+        if (consoleDriver != null)
+        {
+            consoleDriver->GetDimensions();
         }
     }
 }

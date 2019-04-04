@@ -76,6 +76,8 @@ namespace cmsx.kernel
             executable = cast<ExecutableFile*>(binaryFile.Release());
             Kernel& kernel = Kernel.Instance();
             kernel.SetExecutable(executable);
+            Session* session = kernel.CurrentSession();
+            session->fgpid = process->pid;
             return process->pid;
         }
         else

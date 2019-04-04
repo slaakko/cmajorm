@@ -78,6 +78,7 @@ public:
     void Visit(BoundFunctionPtr& boundFunctionPtr) override;
     void Visit(BoundDisjunction& boundDisjunction) override;
     void Visit(BoundConjunction& boundConjunction) override;
+    void Visit(BoundGlobalVariable& boundGlobalVariable) override;
     void* GetGlobalStringPtr(int stringId) override;
     void* GetGlobalWStringConstant(int stringId) override;
     void* GetGlobalUStringConstant(int stringId) override;

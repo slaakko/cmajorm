@@ -129,7 +129,35 @@ const int keyControlPgDown = specialKeyStart + 38;
 const int keyControlHome = specialKeyStart + 39;
 const int keyControlEnd = specialKeyStart + 40;
 
-const int specialKeyEnd = specialKeyStart + 40;
+const int keyControlDel = specialKeyStart + 41;
+const int keyControlF1 = specialKeyStart + 42;
+const int keyControlF2 = specialKeyStart + 43;
+const int keyControlF3 = specialKeyStart + 44;
+const int keyControlF4 = specialKeyStart + 45;
+const int keyControlF5 = specialKeyStart + 46;
+const int keyControlF6 = specialKeyStart + 47;
+const int keyControlF7 = specialKeyStart + 48;
+const int keyControlF8 = specialKeyStart + 49;
+const int keyControlF9 = specialKeyStart + 50;
+const int keyControlF10 = specialKeyStart + 51;
+const int keyControlF11 = specialKeyStart + 52;
+const int keyControlF12 = specialKeyStart + 53;
+const int keyShiftPgUp = specialKeyStart + 54;
+const int keyShiftPgDown = specialKeyStart + 55;
+const int keyShiftF1 = specialKeyStart + 56;
+const int keyShiftF2 = specialKeyStart + 57;
+const int keyShiftF3 = specialKeyStart + 58;
+const int keyShiftF4 = specialKeyStart + 59;
+const int keyShiftF5 = specialKeyStart + 60;
+const int keyShiftF6 = specialKeyStart + 61;
+const int keyShiftF7 = specialKeyStart + 62;
+const int keyShiftF8 = specialKeyStart + 63;
+const int keyShiftF9 = specialKeyStart + 64;
+const int keyShiftF10 = specialKeyStart + 65;
+const int keyShiftF11 = specialKeyStart + 66;
+const int keyShiftF12 = specialKeyStart + 67;
+
+const int specialKeyEnd = specialKeyStart + 67;
 
 namespace cmajor { namespace rt {
 

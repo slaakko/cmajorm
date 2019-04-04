@@ -244,7 +244,7 @@ namespace cmsx.machine
         {
             ulong trap = (cast<ulong>(x) << 16u) | (cast<ulong>(y) << 8u) | cast<ulong>(z);
             regs.SetSpecial(Registers.rX, trap);
-            regs.SetSpecial(Registers.rQ, regs.GetSpecial(Registers.rQ) | SOFTWARE_INTERRUPT_BIT);
+            regs.SetInterrupt(SOFTWARE_INTERRUPT_BIT);
         }
         public override string FormatParams(ulong address, byte x, byte y, byte z, Formatter& formatter)
         {
@@ -674,8 +674,40 @@ namespace cmsx.machine
             ulong zz = regs.Get(z);
             ulong a = yy + zz;
             uint u = mem.ReadUInt(a, Protection.read);
-            ulong xx = u;
-            regs.Set(x, xx);
+            float f = *cast<float*>(cast<void*>(&u));
+            double d = f;
+            ulong xx = *cast<ulong*>(cast<void*>(&d));
+            regs.Set(x, xx); 
+        }
+        public nothrow override bool IsAbsoluteAddressInst() const
+        {
+            return true;
+        }
+    }
+
+    public class Ldsfi : Instruction
+    {
+        public nothrow Ldsfi() : base(LDSFI)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong yy = regs.Get(y);
+            ulong zz = z;
+            ulong a = yy + zz;
+            uint u = mem.ReadUInt(a, Protection.read);
+            float f = *cast<float*>(cast<void*>(&u));
+            double d = f;
+            ulong xx = *cast<ulong*>(cast<void*>(&d));
+            regs.Set(x, xx); 
+        }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
+        }
+        public nothrow override bool IsAbsoluteAddressInst() const
+        {
+            return true;
         }
     }
 
@@ -1067,8 +1099,37 @@ namespace cmsx.machine
             ulong yy = regs.Get(y);
             ulong zz = regs.Get(z);
             ulong a = yy + zz;
-            uint u = cast<uint>(regs.Get(x) & 0xFFFFFFFFu);
+            ulong v = regs.Get(x);
+            double d = *cast<double*>(cast<void*>(&v));
+            float f = cast<float>(d);
+            uint u = *cast<uint*>(cast<void*>(&f));
             mem.WriteUInt(a, u, Protection.write);
+        }
+        public nothrow override bool IsAbsoluteAddressInst() const
+        {
+            return true;
+        }
+    }
+
+    public class Stsfi : Instruction
+    {
+        public nothrow Stsfi() : base(STSFI)
+        {
+        }
+        public override void Execute(Registers& regs, Memory& mem, byte x, byte y, byte z)
+        {
+            ulong yy = regs.Get(y);
+            ulong zz = z;
+            ulong a = yy + zz;
+            ulong v = regs.Get(x);
+            double d = *cast<double*>(cast<void*>(&v));
+            float f = cast<float>(d);
+            uint u = *cast<uint*>(cast<void*>(&f));
+            mem.WriteUInt(a, u, Protection.write);
+        }
+        public nothrow override bool IsZReg() const
+        {
+            return false;
         }
         public nothrow override bool IsAbsoluteAddressInst() const
         {

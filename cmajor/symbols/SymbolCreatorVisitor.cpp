@@ -443,4 +443,9 @@ void SymbolCreatorVisitor::Visit(EnumConstantNode& enumConstantNode)
     symbolTable.AddEnumConstant(enumConstantNode);
 }
 
+void SymbolCreatorVisitor::Visit(GlobalVariableNode& globalVariableNode)
+{
+    symbolTable.AddGlobalVariable(globalVariableNode);
+}
+
 } } // namespace cmajor::symbols
