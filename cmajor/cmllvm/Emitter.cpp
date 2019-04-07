@@ -586,6 +586,11 @@ void* Emitter::CreateNop()
     return nullptr;
 }
 
+void* Emitter::CreateSave()
+{
+    return nullptr;
+}
+
 void* Emitter::GetOrInsertGlobal(const std::string& name, void* type)
 {
     return module->getOrInsertGlobal(name, static_cast<llvm::Type*>(type));

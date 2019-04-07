@@ -105,9 +105,13 @@ namespace System.IO
         {
             return baseStream;
         }
-        public nothrow override bool IsHostTextFile() const
+        public override bool IsHostTextFile() const
         {
             return baseStream->IsHostTextFile();
+        }
+        public override bool IsConsole() const
+        {
+            return baseStream->IsConsole();
         }
         private void FillBuf()
         {

@@ -1,16 +1,10 @@
-const int N = 10;
+using System;
+using System.Collections;
 
-void Swap(int[N]& intList, int i, int j)
+long Partition(List<int>& intList, long left, long right)
 {
-    int temp = intList[i];
-    intList[i] = intList[j];
-    intList[j] = temp;
-}
-
-int Partition(int[N]& intList, int left, int right)
-{
-    int i = left;
-    int j = right;
+    long i = left;
+    long j = right;
     int pivot = intList[(left + right) / 2];
     while (i <= j)
     {
@@ -18,7 +12,7 @@ int Partition(int[N]& intList, int left, int right)
         while (intList[j] > pivot) --j;
         if (i <= j)
         {
-            Swap(intList, i, j);
+            Swap(intList[i], intList[j]);
             ++i;
             --j;
         }
@@ -26,9 +20,9 @@ int Partition(int[N]& intList, int left, int right)
     return i;
 }
 
-void QuickSort(int[N]& intList, int left, int right)
+void QuickSort(List<int>& intList, long left, long right)
 {
-    int index = Partition(intList, left, right);
+    long index = Partition(intList, left, right);
     if (left < index - 1)
     {
         QuickSort(intList, left, index - 1);
@@ -39,21 +33,56 @@ void QuickSort(int[N]& intList, int left, int right)
     }
 }
 
-void QuickSort(int[N]& intList)
+void QuickSort(List<int>& intList)
 {
-    if (N > 0)
+    if (!intList.IsEmpty())
     {
-        QuickSort(intList, 0, N - 1);
+        QuickSort(intList, 0, intList.Count() - 1);
     }
 }
 
-int main()
+void Print(const List<int>& intList)
 {
-    int[N] intList;
-    for (int i = 0; i < N; ++i)
+    bool first = true;
+    for (int x : intList)
     {
-        intList[i] = i;
+        if (first)
+        {
+            first = false;
+        }
+        else
+        {
+            Console.Out() << ", ";
+        }
+        Console.Out() << x;
     }
-    QuickSort(intList);
+    Console.Out() << endl();
+}
+
+int main(int argc, const char** argv)
+{
+    try
+    {
+        long N = 10;
+        if (argc > 1)
+        {
+            string arg = argv[1];
+            N = ParseLong(arg);
+        }
+        List<int> intList;
+        for (int i = 0; i < N; ++i)
+        {
+            intList.Add(cast<int>(Random()));
+        }
+        Print(intList);
+        QuickSort(intList);
+        Print(intList);
+        
+    }
+    catch (const Exception& ex)
+    {
+        Console.Error() << ex.ToString() << endl();
+        return 1;
+    }
     return 0;
 }

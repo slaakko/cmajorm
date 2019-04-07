@@ -1,0 +1,72 @@
+using System;
+using System.Collections;
+
+class Phones
+{
+    public Phones()
+    {
+        phones[u"Gödel"] = 12345;
+        phones[u"Knuth"] = 23456;
+        phones[u"Stroustrup"] = 34567;
+    }
+    public int GetNumber(const ustring& name) const
+    {
+        HashMap<ustring, int>.ConstIterator it = phones.CFind(name);
+        if (it != phones.CEnd())
+        {
+            return it->second;
+        }
+        else
+        {
+            return -1;
+        }
+    }
+    private HashMap<ustring, int> phones;
+}
+
+int main(int argc, const char** argv)
+{
+    try
+    {
+        Phones phones;
+        bool eof = false;
+        while (!eof)
+        {
+            ustring name;
+            if (argc > 1)
+            {
+                name = ToUtf32(argv[1]);
+                eof = true;
+            }
+            else
+            {
+                Console.Write("enter name (CTRL-D ends): ");
+                name = ToUtf32(Console.ReadLine());
+                eof = Console.In().Eof();
+            }
+            if (name.IsEmpty())
+            {
+                Console.WriteLine();
+            }
+            else
+            {
+                int number = phones.GetNumber(name);
+                if (number != -1)
+                {
+                    Console.Out() << "phone of " << name << " is " << number << endl();
+                }
+                else
+                {
+                    throw Exception("phone number for " + ToUtf8(name) + " not found");
+                }
+            }
+        }
+        Console.Out() << "bye!" << endl();
+    }
+    catch (const Exception& ex)
+    {
+        Console.Error() << ex.ToString() << endl();
+        return 2;
+    }
+    return 0;
+}

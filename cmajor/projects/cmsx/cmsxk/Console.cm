@@ -23,7 +23,9 @@ namespace cmsx.kernel
         {
             return *instance;
         }
-        private ConsoleDriver() : consoleInputHandle(OsGetStdHandle(stdin)), consoleOutputHandle(OsGetStdHandle(stdout)), machine(GetMachine()), pos(0)
+        private ConsoleDriver() :
+            consoleInputHandle(OsGetStdHandle(stdin)), consoleOutputHandle(OsGetStdHandle(stdout)), machine(GetMachine()),
+            pos(0), cursorPosX(0), cursorPosY(0), outputEndCursorPosX(0), outputEndCursorPosY(0)
         {
             ConsoleInputCallback callback = ConsoleInputWaitingCallback;
             ulong callBackValue = cast<ulong>(cast<void*>(callback));
@@ -84,6 +86,8 @@ namespace cmsx.kernel
             {
                 bool result = OsWriteConsole(consoleOutputHandle, u.Chars());
                 GetDimensions();
+                outputEndCursorPosX = cursorPosX;
+                outputEndCursorPosY = cursorPosY;
             }
         }
         public void KeyPressed(uchar c)
@@ -93,6 +97,7 @@ namespace cmsx.kernel
         }
         public void HandleBufferedInput()
         {
+            GetDimensions();
             ustring chars = GetCharsFromInputBuffer();
             for (uchar c : chars)
             {
@@ -156,28 +161,37 @@ namespace cmsx.kernel
             pos = 0;
             ++cursorPosY;
             SetCursorPos(0, cursorPosY);
+            outputEndCursorPosX = 0;
+            outputEndCursorPosX = cursorPosY;
         }
         private void HandleEof()
         {
             eof = true;
+            lines.Add(line);
+            line.Clear();
             DeliverInputLine();
+            pos = 0;
+            ++cursorPosY;
+            SetCursorPos(0, cursorPosY);
+            outputEndCursorPosX = 0;
+            outputEndCursorPosX = cursorPosY;
         }
         private void HandleHome()
         {
             pos = 0;
-            SetCursorPos(0, cursorPosY);
+            SetCursorPos(outputEndCursorPosX, outputEndCursorPosY);
         }
         private void HandleEnd()
         {
             pos = cast<int>(line.Length());
-            SetCursorPos(pos, cursorPosY);
+            SetCursorPos(outputEndCursorPosX + pos, outputEndCursorPosY);
         }
         private void HandleLeft()
         {
             if (pos > 0)
             {
                 --pos;
-                SetCursorPos(pos, cursorPosY);
+                SetCursorPos(outputEndCursorPosX + pos, outputEndCursorPosY);
             }
         }
         private void HandleRight()
@@ -185,7 +199,7 @@ namespace cmsx.kernel
             if (pos < line.Length())
             {
                 ++pos;
-                SetCursorPos(pos, cursorPosY);
+                SetCursorPos(outputEndCursorPosX + pos, outputEndCursorPosY);
             }
         }
         private void HandleDelete()
@@ -204,8 +218,8 @@ namespace cmsx.kernel
             {
                 line = line.Substring(0, pos - 1) + line.Substring(pos);
                 --pos;
-                SetCursorPos(pos, cursorPosY);
                 UpdateLine();
+                SetCursorPos(outputEndCursorPosX + pos, outputEndCursorPosY);
             }
         }
         private void HandleChar(uchar c)
@@ -221,8 +235,8 @@ namespace cmsx.kernel
                     line.Append(c);
                 }
                 ++pos;
-                SetCursorPos(pos, cursorPosY);
                 UpdateLine();
+                SetCursorPos(outputEndCursorPosX + pos, outputEndCursorPosY);
             }
         }
         private void AddCharToInputBuffer(uchar c)
@@ -245,21 +259,37 @@ namespace cmsx.kernel
         }
         private void UpdateLine()
         {
+            int prevCursorPosX = cursorPosX;
+            int prevCursorPosY = cursorPosY;
+            SetCursorPos(outputEndCursorPosX, outputEndCursorPosY);
             ustring updateLine;
-            for (int i = 0; i < screenSizeX; ++i)
+            cursorPosX = outputEndCursorPosX;
+            cursorPosY = outputEndCursorPosY;
+            for (int i = 0; i < line.Length(); ++i)
             {
-                if (i < line.Length())
+                if (cursorPosX + i < screenSizeX)
                 {
                     updateLine.Append(line[i]);
                 }
                 else
                 {
-                    updateLine.Append(' ');
+                    OsWriteConsole(consoleOutputHandle, updateLine.Chars());
+                    updateLine.Clear();
+                    cursorPosX = 0;
+                    ++cursorPosY;
                 }
             }
-            OsSetConsoleCursorPosition(consoleOutputHandle, 0, cursorPosY);
+            if (!updateLine.IsEmpty())
+            {
+                OsWriteConsole(consoleOutputHandle, updateLine.Chars());
+                updateLine.Clear();                
+            }
+            for (int i = cursorPosX; i < screenSizeX; ++i)
+            {
+                updateLine.Append(' ');
+            }
             OsWriteConsole(consoleOutputHandle, updateLine.Chars());
-            OsSetConsoleCursorPosition(consoleOutputHandle, cursorPosX, cursorPosY);
+            SetCursorPos(prevCursorPosX, prevCursorPosY);
         }
         private static UniquePtr<ConsoleDriver> instance;
         private void* consoleInputHandle;
@@ -273,6 +303,8 @@ namespace cmsx.kernel
         private int pos;
         private int cursorPosX;
         private int cursorPosY;
+        private int outputEndCursorPosX;
+        private int outputEndCursorPosY;
         private int screenSizeX;
         private int screenSizeY;
         private UnicodeEngine unicodeEngine;

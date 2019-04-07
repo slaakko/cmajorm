@@ -31,7 +31,11 @@ namespace System.IO
             string streamClassName = typename(*this);
             throw SystemError(ENOTSUPPORTED, streamClassName + " stream does not support tell");
         }
-        public nothrow virtual bool IsHostTextFile() const
+        public virtual bool IsHostTextFile() const
+        {
+            return false;
+        }
+        public virtual bool IsConsole() const
         {
             return false;
         }

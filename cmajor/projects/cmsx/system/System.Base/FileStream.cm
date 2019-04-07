@@ -108,9 +108,13 @@ namespace System.IO
         {
             return fd;
         }
-        public nothrow override bool IsHostTextFile() const
+        public override bool IsHostTextFile() const
         {
-            return is_host_text_file(fd) == 1;
+            return System.Os.IsHostTextFile(fd);
+        }
+        public override bool IsConsole() const
+        {
+            return System.Os.IsConsole(fd);
         }
         private int fd;
         private bool closeOnExit;

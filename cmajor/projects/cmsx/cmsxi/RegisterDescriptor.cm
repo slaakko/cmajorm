@@ -156,6 +156,10 @@ namespace cmsx.intermediate
         {
             return numUsedLocalRegs;
         }
+        public nothrow inline void SetNumUsedLocalRegs(byte numUsedLocalRegs_)
+        {
+            numUsedLocalRegs = numUsedLocalRegs_;
+        }
         private Registers& regs;
         private List<RegisterDescriptor> registerDescriptors;
         private HashMap<Register*, RegisterDescriptor*> registerDescriptorMap;

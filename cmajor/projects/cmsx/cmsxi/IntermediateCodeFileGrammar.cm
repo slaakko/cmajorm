@@ -674,6 +674,8 @@ namespace cmsx.intermediate
                 a7ActionParser->SetAction(A7Action);
                 ActionParser* a8ActionParser = GetAction(ToUtf32("A8"));
                 a8ActionParser->SetAction(A8Action);
+                ActionParser* a9ActionParser = GetAction(ToUtf32("A9"));
+                a9ActionParser->SetAction(A9Action);
                 NonterminalParser* storeInstructionNonterminalParser = GetNonterminal(ToUtf32("StoreInstruction"));
                 storeInstructionNonterminalParser->SetPre(PreStoreInstruction);
                 storeInstructionNonterminalParser->SetPost(PostStoreInstruction);
@@ -701,6 +703,9 @@ namespace cmsx.intermediate
                 NonterminalParser* noOperationInstructionNonterminalParser = GetNonterminal(ToUtf32("NoOperationInstruction"));
                 noOperationInstructionNonterminalParser->SetPre(PreNoOperationInstruction);
                 noOperationInstructionNonterminalParser->SetPost(PostNoOperationInstruction);
+                NonterminalParser* saveInstructionNonterminalParser = GetNonterminal(ToUtf32("SaveInstruction"));
+                saveInstructionNonterminalParser->SetPre(PreSaveInstruction);
+                saveInstructionNonterminalParser->SetPost(PostSaveInstruction);
             }
             public void A0Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
@@ -746,6 +751,11 @@ namespace cmsx.intermediate
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
                 context->value = context->fromNoOperationInstruction;
+            }
+            public void A9Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                context->value = context->fromSaveInstruction;
             }
             public void PreStoreInstruction(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
             {
@@ -873,9 +883,23 @@ namespace cmsx.intermediate
                     context->fromNoOperationInstruction = *cast<ValueObject<Instruction*>*>(fromNoOperationInstruction_value.Get());
                 }
             }
+            public void PreSaveInstruction(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                stack.Push(UniquePtr<Object>(new ValueObject<cmsx.intermediate.Context*>(context->context)));
+            }
+            public void PostSaveInstruction(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                if (matched)
+                {
+                    UniquePtr<Object> fromSaveInstruction_value = stack.Pop();
+                    context->fromSaveInstruction = *cast<ValueObject<Instruction*>*>(fromSaveInstruction_value.Get());
+                }
+            }
             public class Context : System.Text.Parsing.Context
             {
-                public Context() : context(), value(), fromStoreInstruction(), fromArgInstruction(), fromJumpInstruction(), fromBranchInstruction(), fromProcedureCallInstruction(), fromRetInstruction(), fromSwitchInstruction(), fromValueInstruction(), fromNoOperationInstruction()
+                public Context() : context(), value(), fromStoreInstruction(), fromArgInstruction(), fromJumpInstruction(), fromBranchInstruction(), fromProcedureCallInstruction(), fromRetInstruction(), fromSwitchInstruction(), fromValueInstruction(), fromNoOperationInstruction(), fromSaveInstruction()
                 {
                 }
                 public cmsx.intermediate.Context* context;
@@ -889,6 +913,7 @@ namespace cmsx.intermediate
                 public SwitchInstruction* fromSwitchInstruction;
                 public Instruction* fromValueInstruction;
                 public Instruction* fromNoOperationInstruction;
+                public Instruction* fromSaveInstruction;
             }
         }
 
@@ -1595,6 +1620,49 @@ namespace cmsx.intermediate
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
                 context->value = new NoOperationInstruction(span.lineNumber);
+            }
+            public class Context : System.Text.Parsing.Context
+            {
+                public Context() : context(), value()
+                {
+                }
+                public cmsx.intermediate.Context* context;
+                public Instruction* value;
+            }
+        }
+
+        public class SaveInstructionRule : System.Text.Parsing.RuleParser
+        {
+            public SaveInstructionRule(const ustring& name_, Scope* enclosingScope_, int id_, Parser* definition_) : base(name_, enclosingScope_, id_, definition_)
+            {
+                AddInheritedAttribute(AttrOrVar(ToUtf32("cmsx.intermediate.Context*"), ToUtf32("context")));
+                SetValueTypeName(ToUtf32("Instruction*"));
+            }
+            public override void Enter(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
+            {
+                parsingData->PushContext(Id(), new Context());
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                UniquePtr<Object> context_value = stack.Pop();
+                context->context = *cast<ValueObject<cmsx.intermediate.Context*>*>(context_value.Get());
+            }
+            public override void Leave(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                if (matched)
+                {
+                    stack.Push(UniquePtr<Object>(new ValueObject<Instruction*>(context->value)));
+                }
+                parsingData->PopContext(Id());
+            }
+            public override void Link()
+            {
+                ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
+                a0ActionParser->SetAction(A0Action);
+            }
+            public void A0Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                context->value = new SaveInstruction(span.lineNumber);
             }
             public class Context : System.Text.Parsing.Context
             {
@@ -5825,7 +5893,7 @@ namespace cmsx.intermediate
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
                 context->value.Append('*');
-                context->context->AddPtrType(context->value);
+                context->context->AddPtrType(context->value, span.lineNumber);
             }
             public void Postuint(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
             {
@@ -10293,24 +10361,27 @@ namespace cmsx.intermediate
                                     new System.Text.Parsing.AlternativeParser(
                                         new System.Text.Parsing.AlternativeParser(
                                             new System.Text.Parsing.AlternativeParser(
-                                                new System.Text.Parsing.ActionParser(ToUtf32("A0"),
-                                                    new System.Text.Parsing.NonterminalParser(ToUtf32("StoreInstruction"), ToUtf32("StoreInstruction"), 1)),
-                                                new System.Text.Parsing.ActionParser(ToUtf32("A1"),
-                                                    new System.Text.Parsing.NonterminalParser(ToUtf32("ArgInstruction"), ToUtf32("ArgInstruction"), 1))),
-                                            new System.Text.Parsing.ActionParser(ToUtf32("A2"),
-                                                new System.Text.Parsing.NonterminalParser(ToUtf32("JumpInstruction"), ToUtf32("JumpInstruction"), 1))),
-                                        new System.Text.Parsing.ActionParser(ToUtf32("A3"),
-                                            new System.Text.Parsing.NonterminalParser(ToUtf32("BranchInstruction"), ToUtf32("BranchInstruction"), 1))),
-                                    new System.Text.Parsing.ActionParser(ToUtf32("A4"),
-                                        new System.Text.Parsing.NonterminalParser(ToUtf32("ProcedureCallInstruction"), ToUtf32("ProcedureCallInstruction"), 1))),
-                                new System.Text.Parsing.ActionParser(ToUtf32("A5"),
-                                    new System.Text.Parsing.NonterminalParser(ToUtf32("RetInstruction"), ToUtf32("RetInstruction"), 1))),
-                            new System.Text.Parsing.ActionParser(ToUtf32("A6"),
-                                new System.Text.Parsing.NonterminalParser(ToUtf32("SwitchInstruction"), ToUtf32("SwitchInstruction"), 1))),
-                        new System.Text.Parsing.ActionParser(ToUtf32("A7"),
-                            new System.Text.Parsing.NonterminalParser(ToUtf32("ValueInstruction"), ToUtf32("ValueInstruction"), 1))),
-                    new System.Text.Parsing.ActionParser(ToUtf32("A8"),
-                        new System.Text.Parsing.NonterminalParser(ToUtf32("NoOperationInstruction"), ToUtf32("NoOperationInstruction"), 1)))));
+                                                new System.Text.Parsing.AlternativeParser(
+                                                    new System.Text.Parsing.ActionParser(ToUtf32("A0"),
+                                                        new System.Text.Parsing.NonterminalParser(ToUtf32("StoreInstruction"), ToUtf32("StoreInstruction"), 1)),
+                                                    new System.Text.Parsing.ActionParser(ToUtf32("A1"),
+                                                        new System.Text.Parsing.NonterminalParser(ToUtf32("ArgInstruction"), ToUtf32("ArgInstruction"), 1))),
+                                                new System.Text.Parsing.ActionParser(ToUtf32("A2"),
+                                                    new System.Text.Parsing.NonterminalParser(ToUtf32("JumpInstruction"), ToUtf32("JumpInstruction"), 1))),
+                                            new System.Text.Parsing.ActionParser(ToUtf32("A3"),
+                                                new System.Text.Parsing.NonterminalParser(ToUtf32("BranchInstruction"), ToUtf32("BranchInstruction"), 1))),
+                                        new System.Text.Parsing.ActionParser(ToUtf32("A4"),
+                                            new System.Text.Parsing.NonterminalParser(ToUtf32("ProcedureCallInstruction"), ToUtf32("ProcedureCallInstruction"), 1))),
+                                    new System.Text.Parsing.ActionParser(ToUtf32("A5"),
+                                        new System.Text.Parsing.NonterminalParser(ToUtf32("RetInstruction"), ToUtf32("RetInstruction"), 1))),
+                                new System.Text.Parsing.ActionParser(ToUtf32("A6"),
+                                    new System.Text.Parsing.NonterminalParser(ToUtf32("SwitchInstruction"), ToUtf32("SwitchInstruction"), 1))),
+                            new System.Text.Parsing.ActionParser(ToUtf32("A7"),
+                                new System.Text.Parsing.NonterminalParser(ToUtf32("ValueInstruction"), ToUtf32("ValueInstruction"), 1))),
+                        new System.Text.Parsing.ActionParser(ToUtf32("A8"),
+                            new System.Text.Parsing.NonterminalParser(ToUtf32("NoOperationInstruction"), ToUtf32("NoOperationInstruction"), 1))),
+                    new System.Text.Parsing.ActionParser(ToUtf32("A9"),
+                        new System.Text.Parsing.NonterminalParser(ToUtf32("SaveInstruction"), ToUtf32("SaveInstruction"), 1)))));
             AddRule(new StoreInstructionRule(ToUtf32("StoreInstruction"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.ActionParser(ToUtf32("A0"),
                     new System.Text.Parsing.GroupingParser(
@@ -10472,6 +10543,9 @@ namespace cmsx.intermediate
             AddRule(new NoOperationInstructionRule(ToUtf32("NoOperationInstruction"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.ActionParser(ToUtf32("A0"),
                     new System.Text.Parsing.KeywordParser(ToUtf32("nop")))));
+            AddRule(new SaveInstructionRule(ToUtf32("SaveInstruction"), GetScope(), Domain()->GetNextRuleId(),
+                new System.Text.Parsing.ActionParser(ToUtf32("A0"),
+                    new System.Text.Parsing.KeywordParser(ToUtf32("save")))));
             AddRule(new ValueInstructionRule(ToUtf32("ValueInstruction"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.ActionParser(ToUtf32("A0"),
                     new System.Text.Parsing.GroupingParser(

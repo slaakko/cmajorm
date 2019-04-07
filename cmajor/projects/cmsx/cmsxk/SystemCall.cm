@@ -27,7 +27,9 @@ namespace cmsx.kernel
     public const byte sys_get_current_date_time = 21u;
     public const byte sys_pow = 22u;
     public const byte sys_is_host_text_file = 23u;
-    public const byte numSystemCalls = sys_is_host_text_file + 1u;
+    public const byte sys_is_console = 24u;
+    public const byte sys_get_random_seed = 25u;
+    public const byte numSystemCalls = sys_get_random_seed + 1u;
 
     public const uint debugBreakInst = (TRAP << 24u) | (0u << 16u) | (sys_debug_break << 8u) | (0u << 0u);
 
@@ -831,8 +833,15 @@ namespace cmsx.kernel
         {
             try
             {
-                throw SystemError(ENOTSUPPORTED, "not implemented yet");
-                return 0;
+                int fd = cast<int>(ax);
+                if (IsHostTextFile(process, fd))
+                {
+                    return 1;
+                }
+                else
+                {
+                    return 0;
+                }
             }
             catch (const SystemError& systemError)
             {
@@ -848,6 +857,80 @@ namespace cmsx.kernel
         else
         {
             Panic("is_host_text_file called for a process that is not running!");
+        }
+        return 0;
+    }
+
+    public long IsConsole(Machine& machine, byte x, byte y, byte z, ulong ax, ulong bx, ulong cx, ulong dx, ulong ex)
+    {
+        if (x != 0u || y != sys_is_console || z != 0u)
+        {
+            Panic("invalid is_console parameters: " + ToString(x) + ", " + ToString(y) + ", " + ToString(z));
+        }
+        Kernel& kernel = Kernel.Instance();
+        ProcessTable& processTable = kernel.GetProcessTable();
+        Process* process = processTable.GetRunning();
+        if (process != null)
+        {
+            try
+            {
+                int fd = cast<int>(ax);
+                if (IsConsole(process, fd))
+                {
+                    return 1;
+                }
+                else
+                {
+                    return 0;
+                }
+            }
+            catch (const SystemError& systemError)
+            {
+                process->lastError = systemError;
+                return -1;
+            }
+            catch (const Exception& ex)
+            {
+                process->lastError = SystemError(EFAIL, "is_host_text_file failed: " + ex.ToString());
+                return -1;
+            }
+        }
+        else
+        {
+            Panic("is_host_text_file called for a process that is not running!");
+        }
+        return 0;
+    }
+
+    public long GetRandomSeed(Machine& machine, byte x, byte y, byte z, ulong ax, ulong bx, ulong cx, ulong dx, ulong ex)
+    {
+        if (x != 0u || y != sys_get_random_seed || z != 0u)
+        {
+            Panic("invalid get_random_seed parameters: " + ToString(x) + ", " + ToString(y) + ", " + ToString(z));
+        }
+        Kernel& kernel = Kernel.Instance();
+        ProcessTable& processTable = kernel.GetProcessTable();
+        Process* process = processTable.GetRunning();
+        if (process != null)
+        {
+            try
+            {
+                return RtGetRandomSeed();
+            }
+            catch (const SystemError& systemError)
+            {
+                process->lastError = systemError;
+                return -1;
+            }
+            catch (const Exception& ex)
+            {
+                process->lastError = SystemError(EFAIL, "get_random_seed failed: " + ex.ToString());
+                return -1;
+            }
+        }
+        else
+        {
+            Panic("get_random_seed called for a process that is not running!");
         }
         return 0;
     }

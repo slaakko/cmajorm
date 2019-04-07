@@ -156,7 +156,11 @@ namespace System
     
     public nothrow void Sleep(const Duration& duration)
     {
-        sleep(duration.Rep());
+        int result = sleep(duration.Rep());
+        if (result == -1)
+        {
+            ThrowSystemError();
+        }
     }
     
     public enum Month : sbyte

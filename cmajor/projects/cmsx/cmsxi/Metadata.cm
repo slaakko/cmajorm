@@ -62,6 +62,11 @@ namespace cmsx.intermediate
                 throw Exception("metadata item '" + fieldName + "' not found");
             }
         }
+        public bool HasItem(const string& fieldName) const
+        {
+            HashMap<string, MDItem*>.ConstIterator it = itemMap.CFind(fieldName);
+            return it != itemMap.CEnd();
+        }
         public int id;
         public HashMap<string, MDItem*> itemMap;
     }

@@ -913,6 +913,11 @@ void* Emitter::CreateNop()
     return context->CreateNop();
 }
 
+void* Emitter::CreateSave()
+{
+    return context->CreateSave();
+}
+
 std::string Emitter::GetVmtObjectName(void* symbol) const
 {
     // todo
@@ -1160,6 +1165,10 @@ void* Emitter::CreateInvoke(void* callee, void* normalBlock, void* unwindBlock, 
         void* beginCleanup = CreateMDStruct();
         AddMDItem(beginCleanup, "nodeType", CreateMDLong(cmsxi::beginCleanupNodeType));
         AddMDItem(beginCleanup, "cleanupBlockId", CreateMDBasicBlockRef(cleanupBlock));
+        if (emittingDelegate->InTryBlock())
+        {
+            AddMDItem(beginCleanup, "tryBlockId", CreateMDLong(emittingDelegate->CurrentTryBlockId()));
+        }
         int beginCleanupId = GetMDStructId(beginCleanup);
         void* beginCleanupMdRef = CreateMDStructRef(beginCleanupId);
         SetMetadataRef(nop1, beginCleanupMdRef);

@@ -119,6 +119,12 @@ namespace cmsx.kernel
         TrapHandler isHostTextFileSystemCallHandler = IsHostTextFile;
         ulong isHostTextFileSystemCallAddress = cast<ulong>(cast<void*>(isHostTextFileSystemCallHandler));
         mem.WriteULong(MakeSystemCallPtrAddress(sys_is_host_text_file), isHostTextFileSystemCallAddress, Protection.write);
+        TrapHandler isConsoleSystemCallHandler = IsConsole;
+        ulong isConsoleSystemCallAddress = cast<ulong>(cast<void*>(isConsoleSystemCallHandler));
+        mem.WriteULong(MakeSystemCallPtrAddress(sys_is_console), isConsoleSystemCallAddress, Protection.write);
+        TrapHandler getRandomSeedSystemCallHandler = GetRandomSeed;
+        ulong getRandomSeedSystemCallAddress = cast<ulong>(cast<void*>(getRandomSeedSystemCallHandler));
+        mem.WriteULong(MakeSystemCallPtrAddress(sys_get_random_seed), getRandomSeedSystemCallAddress, Protection.write);
     }
 
     public void Boot(Machine& machine)

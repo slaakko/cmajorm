@@ -8,6 +8,7 @@
 #include <cmajor/rt/RtApi.hpp>
 #include <stdint.h>
 
+extern "C" RT_API uint32_t RtGetRandomSeed();
 extern "C" RT_API void RtInitRand(uint32_t seed);
 extern "C" RT_API uint32_t RtRandom();
 extern "C" RT_API uint64_t RtRandom64();

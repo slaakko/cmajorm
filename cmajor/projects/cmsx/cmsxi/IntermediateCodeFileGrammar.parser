@@ -75,6 +75,7 @@ namespace cmsx.intermediate
             |   SwitchInstruction(context){ value = SwitchInstruction; }
             |   ValueInstruction(context){ value = ValueInstruction; }
             |   NoOperationInstruction(context){ value = NoOperationInstruction; }
+            |   SaveInstruction(context){ value = SaveInstruction; }
             ;
 
         StoreInstruction(cmsx.intermediate.Context* context) : Instruction*
@@ -108,6 +109,10 @@ namespace cmsx.intermediate
 
         NoOperationInstruction(cmsx.intermediate.Context* context) : Instruction*
             ::= keyword("nop"){ value = new NoOperationInstruction(span.lineNumber); }
+            ;
+
+        SaveInstruction(cmsx.intermediate.Context* context) : Instruction*
+            ::= keyword("save"){ value = new SaveInstruction(span.lineNumber); }
             ;
 
         ValueInstruction(cmsx.intermediate.Context* context) : Instruction*
@@ -348,7 +353,7 @@ namespace cmsx.intermediate
             ::=
             (   token("$T" uint){ value = ToUtf8(ustring(matchBegin, matchEnd)); }
             |   (keyword_list(identifier, ["void", "bool", "sbyte", "byte", "short", "ushort", "int", "uint", "long", "ulong", "float", "double"])){ value = ToUtf8(ustring(matchBegin, matchEnd)); }
-            )   (('*'){ value.Append('*'); context->AddPtrType(value); })*
+            )   (('*'){ value.Append('*'); context->AddPtrType(value, span.lineNumber); })*
             ;
 
         TypeExpr(cmsx.intermediate.Context* context) : Type*

@@ -168,11 +168,11 @@ namespace cmsx.object
             }
             return null;
         }
-        public CleanupDispatchBlock* GetCleanupDispatchBlock(uint cleanupBlockId) const
+        public CleanupDispatchBlock* GetOpenCleanupDispatchBlock(uint cleanupBlockId) const
         {
             for (const CleanupDispatchBlock& cleanupDispatchBlock : cleanupDispatchBlocks)
             {
-                if (cleanupDispatchBlock.id == cleanupBlockId) return &cleanupDispatchBlock;
+                if (cleanupDispatchBlock.id == cleanupBlockId && cleanupDispatchBlock.length == 0u) return &cleanupDispatchBlock;
             }
             return null;
         }
@@ -193,7 +193,7 @@ namespace cmsx.object
 
     public class TryBlock : DispatchBlock
     {
-        public nothrow TryBlock(uint id_, uint parentId_, uint offset_) : id(id_), parentId(parentId_), offset(offset_), length(0u)
+        public nothrow TryBlock(uint id_, uint parentId_, uint offset_) : id(id_), parentId(parentId_), offset(offset_), length(0u), exceptionBlockTableAddress(0u)
         {
         }
         public uint id;
@@ -201,16 +201,18 @@ namespace cmsx.object
         public uint offset;
         public uint length;
         public List<HandlerBlock> handlerBlocks;
+        public ulong exceptionBlockTableAddress;
     }
 
     public class CleanupDispatchBlock : DispatchBlock
     {
-        public nothrow CleanupDispatchBlock(uint id_, uint offset_) : id(id_), offset(offset_), length(0u)
+        public nothrow CleanupDispatchBlock(uint id_, TryBlock* tryBlock_, uint offset_) : id(id_), tryBlock(tryBlock_), offset(offset_), length(0u)
         {
         }
         public uint id;
         public uint offset;
         public uint length;
         public CleanupBlock cleanupBlock;
+        public TryBlock* tryBlock;
     }
 }

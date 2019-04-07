@@ -344,14 +344,15 @@ namespace cmsx.assembly
                     {
                         Stage prevStage = assembler.stage;
                         assembler.stage = Stage.exceptionInfo;
-                        if (operandList.operands.Count() == 2)
+                        if (operandList.operands.Count() == 3)
                         {
                             Value cleanupBlockId = assembler.Evaluate(operandList.operands[1].Get());
+                            Value tryBlockId = assembler.Evaluate(operandList.operands[2].Get());
                             if (assembler.objectFile.debugSection is DebugSection*)
                             {
                                 DebugSection* debugSection = cast<DebugSection*>(assembler.objectFile.debugSection);
                                 uint offset = cast<uint>(assembler.currentSection->BaseAddress() + assembler.currentSection->Address() - assembler.currentFunctionSymbol->start);
-                                debugSection->EmitBeginCleanup(cast<uint>(cleanupBlockId.value), offset);
+                                debugSection->EmitBeginCleanup(cast<uint>(cleanupBlockId.value), cast<uint>(tryBlockId.value), offset);
                             }
                             else
                             {
@@ -360,7 +361,7 @@ namespace cmsx.assembly
                         }
                         else
                         {
-                            Error("OCTA in SPEC begin cleanup needs two operands", inst->span);
+                            Error("OCTA in SPEC begin cleanup needs three operands", inst->span);
                         }
                         assembler.stage = prevStage;
                     }

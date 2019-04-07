@@ -223,10 +223,24 @@ namespace cmsx.intermediate
                         if (cleanupBlockItem is MDLong*)
                         {
                             long cleanupBlockId = cast<MDLong*>(cleanupBlockItem)->value;
+                            long tryBlockId = -1;
+                            if (metadataStruct->HasItem("tryBlockId"))
+                            {
+                                MDItem* tryBlockIdItem = metadataStruct->GetItem("tryBlockId");
+                                if (tryBlockIdItem is MDLong*)
+                                {
+                                    tryBlockId = cast<MDLong*>(tryBlockIdItem)->value;
+                                }
+                                else
+                                {
+                                    throw Exception("MDLong expected");
+                                }
+                            }
                             MachineInstruction* bspecInst = machineCode.GetInstruction(cmsx.assembly.BSPEC, this);
                             MachineInstruction* octaInst = machineCode.GetInstruction(cmsx.assembly.OCTA, null);
                             octaInst->AddOperand(machineCode.context.GetLiteralOperand(cmsx.assembly.BEGINCLEANUP));
                             octaInst->AddOperand(machineCode.context.GetLiteralOperand(cast<ulong>(cleanupBlockId)));
+                            octaInst->AddOperand(machineCode.context.GetLiteralOperand(cast<ulong>(tryBlockId)));
                             MachineInstruction* especInst = machineCode.GetInstruction(cmsx.assembly.ESPEC, null); 
                         }
                         else
@@ -632,6 +646,61 @@ namespace cmsx.intermediate
         {
             BeginGenerateCode(machineCode);
             EndGenerateCode();
+        }
+    }
+
+    public class SaveInstruction : Instruction
+    {
+        public nothrow SaveInstruction(int line_) : base(line_)
+        {
+        }
+        public override nothrow string Name() const
+        {
+            return "save";
+        }
+        public override nothrow string OperationName() const
+        {
+            return "save";
+        }
+        public override void Validate(Function& function, int numArgs)
+        {
+            base->Validate(function, numArgs);
+        }
+        public override void GenerateCode(MachineCode& machineCode, CodeFormatter& formatter)
+        {
+            BeginGenerateCode(machineCode);
+            AddressDescriptors& addressDescriptors = parent->function.addressDescriptors;
+            RegisterDescriptors& registerDescriptors = parent->registerDescriptors;
+            int numParamRegs = machineCode.context.regs.GetNumParamRegisters();
+            int numParams = cast<int>(parent->function.type->ParamTypes().Count());
+            int numSaveRegs = Min(numParamRegs, numParams);
+            for (int i = 0; i < numSaveRegs; ++i)
+            {
+                Register* paramReg = machineCode.context.regs.GetParamRegister(cast<byte>(i));
+                Register* saveReg = machineCode.context.regs.GetLocalRegister(cast<byte>(i));
+                MachineInstruction* setInst = machineCode.GetInstruction(cmsx.assembly.SET, null);
+                setInst->AddOperand(saveReg);
+                setInst->AddOperand(paramReg);
+                Value* regParam = parent->function.regParams[i];
+                AddressDescriptor* addressDescriptor = addressDescriptors.GetAddressDescriptor(regParam);
+                addressDescriptor->RemoveLocation(paramReg);
+                addressDescriptor->AddLocation(saveReg);
+                RegisterDescriptor* paramRegisterDescriptor = registerDescriptors.GetRegisterDescriptor(paramReg);
+                paramRegisterDescriptor->values.Clear();
+                RegisterDescriptor* saveRegisterDescriptor = registerDescriptors.GetRegisterDescriptor(saveReg);
+                saveRegisterDescriptor->SetValue(regParam);
+            }
+            registerDescriptors.SetNumUsedLocalRegs(cast<byte>(numSaveRegs));
+            EndGenerateCode();
+            if (Flags.Get(Flag.debug))
+            {
+                Print(formatter);
+                formatter.WriteLine();
+                formatter.IncIndent();
+                registerDescriptors.DebugPrint(formatter);
+                addressDescriptors.DebugPrint(formatter);
+                formatter.DecIndent();
+            }
         }
     }
 
@@ -1100,18 +1169,6 @@ namespace cmsx.intermediate
                 shiftRightInst->AddOperand(rx->reg);
                 shiftRightInst->AddOperand(rx->reg);
                 shiftRightInst->AddOperand(numShiftBitsOperand);
-                List<Register*> dontUse;
-                dontUse.Add(rx->reg);
-                dontUse.Add(ry->reg);
-                rz = registerDescriptors.GetLocalRegDescriptor(dontUse, addressDescriptors, machineCode, line, this);
-                type->GenerateMinusOne(machineCode, rz->reg, line, this);
-                ConstantValue* constantValue = new ConstantValue();
-                machineCode.context.AddValue(constantValue);
-                rz->SetValue(constantValue);
-                MachineInstruction* andInst = machineCode.GetInstruction(cmsx.machine.AND, this);
-                andInst->AddOperand(rx->reg);
-                andInst->AddOperand(rx->reg);
-                andInst->AddOperand(rz->reg);
             }
             rx->SetValue(x);
             AddressDescriptor* adx = addressDescriptors.GetAddressDescriptor(x);
@@ -1253,6 +1310,19 @@ namespace cmsx.intermediate
                 andInst->AddOperand(rx->reg);
                 andInst->AddOperand(ry->reg);
                 andInst->AddOperand(rz->reg);
+                if (x->type is SignedIntegerType*)
+                {
+                    ulong numShiftBits = 64u - 8u * cast<ulong>(x->type->Size());
+                    Operand* numShiftBitsOperand = machineCode.context.GetLiteralOperand(numShiftBits);
+                    MachineInstruction* shiftLeftInst = machineCode.GetInstruction(cmsx.machine.SLU, this);
+                    shiftLeftInst->AddOperand(rx->reg);
+                    shiftLeftInst->AddOperand(rx->reg);
+                    shiftLeftInst->AddOperand(numShiftBitsOperand);
+                    MachineInstruction* shiftRightInst = machineCode.GetInstruction(cmsx.machine.SR, this);
+                    shiftRightInst->AddOperand(rx->reg);
+                    shiftRightInst->AddOperand(rx->reg);
+                    shiftRightInst->AddOperand(numShiftBitsOperand);
+                }
             }
             rx->SetValue(x);
             AddressDescriptor* adx = addressDescriptors.GetAddressDescriptor(x);
@@ -1694,6 +1764,7 @@ namespace cmsx.intermediate
                 registerDescriptor->SetValue(this);
                 AddressDescriptor* addressDescriptor = addressDescriptors.GetAddressDescriptor(this);
                 addressDescriptor->AddLocation(paramReg);
+                parent->function.regParams.Add(this);
             }
             else
             {
@@ -2638,7 +2709,7 @@ namespace cmsx.intermediate
                 {
                     PtrValue* ptrValue = cast<PtrValue*>(arg);
                     ConstantValue* initializer = ptrValue->globalVariable->initializer;
-                    if (initializer != null && initializer is StringValue*)
+                    if (initializer != null && ((initializer is StringValue*) || (initializer is StringArrayValue*)))
                     {
                         LoadOperandAddress(arg, argRegDescriptor, addressDescriptors, machineCode, line, this);
                     }

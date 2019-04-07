@@ -1212,7 +1212,7 @@ namespace cmsx.intermediate
                 return  ptrType;
             }
         }
-        public void AddPtrType(const string& typeId)
+        public void AddPtrType(const string& typeId, int line)
         {
             HashMap<string, Type*>.ConstIterator it1 = typeMap.CFind(typeId);
             if (it1 == typeMap.CEnd())
@@ -1224,7 +1224,7 @@ namespace cmsx.intermediate
                 {
                     Type* baseType = it->second;
                     PtrType* ptrType = new PtrType(baseType);
-                    typeMap[ptrType->Name()] = ptrType;
+                    typeMap[typeId] = ptrType;
                     ptrTypeMap[baseType] = ptrType;
                     types.Add(UniquePtr<Type>(ptrType));
                 }

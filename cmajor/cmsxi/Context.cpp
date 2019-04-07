@@ -449,6 +449,13 @@ Instruction* Context::CreateNop()
     return inst;
 }
 
+Instruction* Context::CreateSave()
+{
+    Instruction* inst = new SaveInstruction();
+    currentBasicBlock->AddInstruction(inst);
+    return inst;
+}
+
 GlobalVariable* Context::GetOrInsertGlobal(const std::string& name, Type* type)
 {
     return dataRepository.GetOrInsertGlobal(name, type);

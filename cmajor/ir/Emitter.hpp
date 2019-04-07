@@ -34,6 +34,8 @@ public:
     virtual void* HandlerBlock() { return nullptr; }
     virtual void* CleanupBlock() { return nullptr; }
     virtual bool NewCleanupNeeded() { return false; }
+    virtual bool InTryBlock() const { return false; }
+    virtual int CurrentTryBlockId() const { return 0; }
     virtual void CreateCleanup() { }
     virtual std::string GetSourceFilePath(int32_t fileIndex) { return std::string(); }
     virtual cmajor::ir::Pad* CurrentPad() { return nullptr; }
@@ -206,6 +208,7 @@ public:
     virtual void* CreateNeg(void* value) = 0;
     virtual void* CreateFNeg(void* value) = 0;
     virtual void* CreateNop() = 0;
+    virtual void* CreateSave() = 0;
     virtual std::string GetVmtObjectName(void* symbol) const = 0;
     virtual void SetVmtObjectName(void* symbol, const std::string& vmtObjectName) = 0;
     virtual std::string GetImtArrayObjectName(void* symbol) const = 0;

@@ -808,6 +808,19 @@ namespace cmsx.object
 
     public List<DispatchTableEntry> InsertIntoDispatchTable(const List<DispatchTableEntry>& dispatchTable, const DispatchTableEntry& entry, Section* dataSection)
     {
+        if (entry.dispatchBlock is CleanupDispatchBlock*)
+        {
+            CleanupDispatchBlock* cleanupDispatchBlock = cast<CleanupDispatchBlock*>(entry.dispatchBlock);
+            TryBlock* parentTryBlock = cleanupDispatchBlock->tryBlock;
+            if (parentTryBlock != null)
+            {
+                ulong parentTableAddress = parentTryBlock->exceptionBlockTableAddress;
+                long prevPos = dataSection->pos;
+                dataSection->pos = cast<long>(entry.exceptionBlockTableAddress + 16u);
+                dataSection->EmitULong(parentTableAddress);
+                dataSection->pos = prevPos;
+            }
+        }
         bool inserted = false;
         List<DispatchTableEntry> newDispatchTable;
         for (const DispatchTableEntry& prevEntry : dispatchTable)
@@ -826,14 +839,6 @@ namespace cmsx.object
             {
                 if (entry.offset + entry.length <= prevEntry.offset + prevEntry.length)
                 {
-                    if ((prevEntry.dispatchBlock is TryBlock*) && (entry.dispatchBlock is CleanupDispatchBlock*))
-                    {
-                        ulong parentTableAddress = prevEntry.exceptionBlockTableAddress;
-                        long prevPos = dataSection->pos;
-                        dataSection->pos = cast<long>(entry.exceptionBlockTableAddress + 16u);
-                        dataSection->EmitULong(parentTableAddress);
-                        dataSection->pos = prevPos;
-                    }
                     DispatchTableEntry startEntry(prevEntry.offset, entry.offset - prevEntry.offset, prevEntry.exceptionBlockTableAddress, prevEntry.dispatchBlock);
                     if (startEntry.length > 0)
                     {
@@ -850,7 +855,8 @@ namespace cmsx.object
                 }
                 else
                 {
-                    throw Exception("invalid dispatch table entry (not contained by the parent entry");
+                    throw Exception("invalid dispatch table entry (not contained by the parent entry): previous entry offset: " + ToString(prevEntry.offset) +
+                    ", previous entry length: " + ToString(prevEntry.length) + ", entry offset: " + ToString(entry.offset) + ", entry length: " + ToString(entry.length));
                 }
             }
             else
@@ -867,54 +873,63 @@ namespace cmsx.object
 
     public ulong MakeExceptionTable(ExecutableFile& executable, const FunctionExceptionData& functionExceptionData)
     {
-        Section* executableDataSection = executable.dataSection;
-        executableDataSection->Align(8u);
-        List<DispatchTableEntry> dispatchTable;
-        for (const TryBlock& tryBlock : functionExceptionData.tryBlocks)
+        try
         {
-            if (tryBlock.length > 0)
+            Section* executableDataSection = executable.dataSection;
+            executableDataSection->Align(8u);
+            List<DispatchTableEntry> dispatchTable;
+            for (TryBlock& tryBlock : functionExceptionData.tryBlocks)
             {
-                ulong exceptionBlockTableAddress = 0u;
-                for (const HandlerBlock& handlerBlock : tryBlock.handlerBlocks)
+                if (tryBlock.length > 0)
                 {
-                    if (exceptionBlockTableAddress == 0u)
+                    ulong exceptionBlockTableAddress = 0u;
+                    for (const HandlerBlock& handlerBlock : tryBlock.handlerBlocks)
                     {
-                        exceptionBlockTableAddress = executableDataSection->Address();
+                        if (exceptionBlockTableAddress == 0u)
+                        {
+                            exceptionBlockTableAddress = executableDataSection->Address();
+                            tryBlock.exceptionBlockTableAddress = exceptionBlockTableAddress;
+                        }
+                        executableDataSection->EmitULong(handlerBlock.discriminator);
+                        executableDataSection->EmitULong(handlerBlock.catchedClassId);
+                        executableDataSection->EmitULong(handlerBlock.handlerAddress);
                     }
-                    executableDataSection->EmitULong(handlerBlock.discriminator);
-                    executableDataSection->EmitULong(handlerBlock.catchedClassId);
-                    executableDataSection->EmitULong(handlerBlock.handlerAddress);
+                    executableDataSection->EmitULong(endBlockDiscriminator);
+                    DispatchTableEntry entry(tryBlock.offset, tryBlock.length, exceptionBlockTableAddress, &tryBlock);
+                    dispatchTable = InsertIntoDispatchTable(dispatchTable, entry, executableDataSection);
                 }
-                executableDataSection->EmitULong(endBlockDiscriminator);
-                DispatchTableEntry entry(tryBlock.offset, tryBlock.length, exceptionBlockTableAddress, &tryBlock);
-                dispatchTable = InsertIntoDispatchTable(dispatchTable, entry, executableDataSection);
             }
-        }
-        for (const CleanupDispatchBlock& cleanupDispatchBlock : functionExceptionData.cleanupDispatchBlocks)
-        {
-            if (cleanupDispatchBlock.length > 0)
+            for (const CleanupDispatchBlock& cleanupDispatchBlock : functionExceptionData.cleanupDispatchBlocks)
             {
-                ulong exceptionBlockTableAddress = executableDataSection->Address();
-                executableDataSection->EmitULong(cleanupDispatchBlock.cleanupBlock.discriminator);
-                executableDataSection->EmitULong(cleanupDispatchBlock.cleanupBlock.cleanupAddress);
-                executableDataSection->EmitULong(cleanupDispatchBlock.cleanupBlock.parentTableAddress);
-                executableDataSection->EmitULong(endBlockDiscriminator);
-                DispatchTableEntry entry(cleanupDispatchBlock.offset, cleanupDispatchBlock.length, exceptionBlockTableAddress, &cleanupDispatchBlock);
-                dispatchTable = InsertIntoDispatchTable(dispatchTable, entry, executableDataSection);
+                if (cleanupDispatchBlock.length > 0)
+                {
+                    ulong exceptionBlockTableAddress = executableDataSection->Address();
+                    executableDataSection->EmitULong(cleanupDispatchBlock.cleanupBlock.discriminator);
+                    executableDataSection->EmitULong(cleanupDispatchBlock.cleanupBlock.cleanupAddress);
+                    executableDataSection->EmitULong(cleanupDispatchBlock.cleanupBlock.parentTableAddress);
+                    executableDataSection->EmitULong(endBlockDiscriminator);
+                    DispatchTableEntry entry(cleanupDispatchBlock.offset, cleanupDispatchBlock.length, exceptionBlockTableAddress, &cleanupDispatchBlock);
+                    dispatchTable = InsertIntoDispatchTable(dispatchTable, entry, executableDataSection);
+                }
             }
+            executableDataSection->Align(8u);
+            ulong exceptionTableAddress = executableDataSection->Address();
+            executableDataSection->EmitUInt(functionExceptionData.frameSize);
+            executableDataSection->EmitUInt(cast<uint>(dispatchTable.Count()));
+            for (long i = 0; i < dispatchTable.Count(); ++i)
+            {
+                const DispatchTableEntry& entry = dispatchTable[i];
+                executableDataSection->EmitUInt(entry.offset);
+                executableDataSection->EmitUInt(entry.length);
+                executableDataSection->EmitULong(entry.exceptionBlockTableAddress);
+            }
+            return exceptionTableAddress;
         }
-        executableDataSection->Align(8u);
-        ulong exceptionTableAddress = executableDataSection->Address();
-        executableDataSection->EmitUInt(functionExceptionData.frameSize);
-        executableDataSection->EmitUInt(cast<uint>(dispatchTable.Count()));
-        for (long i = 0; i < dispatchTable.Count(); ++i)
+        catch (const Exception& ex)
         {
-            const DispatchTableEntry& entry = dispatchTable[i];
-            executableDataSection->EmitUInt(entry.offset);
-            executableDataSection->EmitUInt(entry.length);
-            executableDataSection->EmitULong(entry.exceptionBlockTableAddress);
+            throw Exception(ex.Message() + " (function=" + functionExceptionData.functionName + ")");
         }
-        return exceptionTableAddress;
+        return 0u;
     }
 
     public void ProcessDebugSection(ExecutableFile& executable, ObjectFile* objectFile, HashMap<string, ulong>& stringAddressMap, List<FunctionTableEntry>& functionTable,
@@ -1120,22 +1135,33 @@ namespace cmsx.object
                             }
                             else
                             {
-                                throw Exception("try block id " + ToString(tryBlockId) + " not found");
+                                throw Exception("try block id " + ToString(tryBlockId) + " not found (function=" + functionExceptionData.functionName + ")");
                             }
                         }
                         else
                         {
-                            throw Exception("handler address for symbol '" + catchBlockSymbolName + "' not found from the symbol table of the executable");
+                            throw Exception("handler address for symbol '" + catchBlockSymbolName + "' not found from the symbol table of the executable (function=" +
+                            functionExceptionData.functionName + ")");
                         }
                     }
                 }
                 else if (debugRecordCode == DebugRecordCode.beginCleanup)
                 {
                     uint cleanupBlockId = debugSection->GetUInt();
+                    uint tryBlockId = debugSection->GetUInt();
                     uint offset = debugSection->GetUInt();
                     if (processFunc)
                     {
-                        CleanupDispatchBlock cleanupDispatchBlock(cleanupBlockId, offset);
+                        TryBlock* tryBlock = null;
+                        if (cast<int>(tryBlockId) != -1)
+                        {
+                            tryBlock = functionExceptionData.GetTryBlock(tryBlockId);
+                            if (tryBlock == null)
+                            {
+                                throw Exception("try block id " + ToString(tryBlockId) + " not found from the function exception data (function=" + functionExceptionData.functionName + ")");
+                            }
+                        }
+                        CleanupDispatchBlock cleanupDispatchBlock(cleanupBlockId, tryBlock, offset);
                         string cleanupBlockSymbolName = functionExceptionData.functionName;
                         cleanupBlockSymbolName.Append('@').Append(ToString(cleanupBlockId));
                         Symbol* cleanupAddessSymbol = executable.GetSymbolTable().GetInternalSymbol(cleanupBlockSymbolName);
@@ -1147,7 +1173,7 @@ namespace cmsx.object
                         }
                         else
                         {
-                            throw Exception("cleanup address for symbol '" + cleanupBlockSymbolName + "' not found from the symbol table of the executable");
+                            throw Exception("cleanup address for symbol '" + cleanupBlockSymbolName + "' not found from the symbol table of the executable (function=" + functionExceptionData.functionName + ")");
                         }
                         functionExceptionData.cleanupDispatchBlocks.Add(cleanupDispatchBlock);
                     }
@@ -1158,7 +1184,7 @@ namespace cmsx.object
                     uint offset = debugSection->GetUInt();
                     if (processFunc)
                     {
-                        CleanupDispatchBlock* cleanupDispatchBlock = functionExceptionData.GetCleanupDispatchBlock(cleanupBlockId);
+                        CleanupDispatchBlock* cleanupDispatchBlock = functionExceptionData.GetOpenCleanupDispatchBlock(cleanupBlockId);
                         if (cleanupDispatchBlock != null)
                         {
                             cleanupDispatchBlock->length = offset - cleanupDispatchBlock->offset;

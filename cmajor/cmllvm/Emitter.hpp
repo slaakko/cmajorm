@@ -179,6 +179,7 @@ public:
     void* CreateNeg(void* value) override;
     void* CreateFNeg(void* value) override;
     void* CreateNop() override;
+    void* CreateSave() override;
     void* GetOrInsertGlobal(const std::string& name, void* type) override;
     void* GetOrInsertAnyComdat(const std::string& name, void* global) override;
     void* GetOrInsertAnyFunctionComdat(const std::string& name, void* function) override;

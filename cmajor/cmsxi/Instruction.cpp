@@ -693,4 +693,13 @@ void NoOperationInstruction::Write(CodeFormatter& formatter, Function& function,
     WriteMetadataRef(formatter);
 }
 
+SaveInstruction::SaveInstruction() : Instruction()
+{
+}
+
+void SaveInstruction::Write(CodeFormatter& formatter, Function& function, Context& context)
+{
+    formatter.Write("save");
+}
+
 } // namespace cmsxi

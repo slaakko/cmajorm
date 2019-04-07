@@ -18,17 +18,15 @@
 #include <string.h>
 #include <stdio.h>
 
-namespace cmajor { namespace rt {
-
 #ifdef _WIN32
 
-unsigned int get_random_seed_from_system()
+uint32_t RtGetRandomSeed()
 {
     unsigned int seed = 0;
     errno_t retval = rand_s(&seed);
     if (retval != 0)
     {
-        perror("get_random_seed_from_system() failed");
+        perror("RtGetRandomSeed() failed");
         exit(1);
     }
     return seed;
@@ -36,18 +34,18 @@ unsigned int get_random_seed_from_system()
 
 #else
 
-unsigned int get_random_seed_from_system()
+uint32_t RtGetRandomSeed()
 {
     unsigned int seed = 0;
     int fn = open("/dev/urandom", O_RDONLY);
     if (fn == -1)
     {
-        perror("get_random_seed_from_system() failed");
+        perror("RtGetRandomSeed() failed");
         exit(1);
     }
     if (read(fn, &seed, 4) != 4)
     {
-        perror("get_random_seed_from_system() failed");
+        perror("RtGetRandomSeed() failed");
         exit(1);
     }
     close(fn);
@@ -55,6 +53,8 @@ unsigned int get_random_seed_from_system()
 }
 
 #endif
+
+namespace cmajor { namespace rt {
 
 class MT
 {
@@ -72,7 +72,7 @@ public:
     }
     void InitWithRandomSeed()
     {
-        uint32_t seed = get_random_seed_from_system();
+        uint32_t seed = RtGetRandomSeed();
         Init(seed);
     }
     void Init(uint32_t seed)

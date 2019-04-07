@@ -27,6 +27,8 @@ public const byte sys_get_current_date = 20u;
 public const byte sys_get_current_date_time = 21u;
 public const byte sys_pow = 22u;
 public const byte sys_is_host_text_file = 23u;
+public const byte sys_is_console = 24u;
+public const byte sys_get_random_seed = 25u;
 
 public cdecl nothrow void exit(byte exitCode)
 {
@@ -145,4 +147,14 @@ public cdecl nothrow double pow(double x, double y)
 public cdecl nothrow int is_host_text_file(int fd)
 {
     return cast<int>(trap(0u, sys_is_host_text_file, 0u, fd));
+}
+
+public cdecl nothrow int is_console(int fd)
+{
+    return cast<int>(trap(0u, sys_is_console, 0u, fd));
+}
+
+public cdecl nothrow long get_random_seed()
+{
+    return trap(0u, sys_get_random_seed, 0u);
 }

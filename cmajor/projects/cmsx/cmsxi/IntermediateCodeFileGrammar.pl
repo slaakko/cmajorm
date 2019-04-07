@@ -21,6 +21,7 @@ namespace cmsx.intermediate
         RetInstruction(cmsx.intermediate.Context* context) : Instruction*;
         SwitchInstruction(cmsx.intermediate.Context* context) : SwitchInstruction*;
         NoOperationInstruction(cmsx.intermediate.Context* context) : Instruction*;
+        SaveInstruction(cmsx.intermediate.Context* context) : Instruction*;
         ValueInstruction(cmsx.intermediate.Context* context) : Instruction*;
         Operation(cmsx.intermediate.Context* context, Value* result) : Instruction*;
         UnaryInstruction(cmsx.intermediate.Context* context, Value* result) : Instruction*;

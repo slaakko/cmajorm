@@ -181,6 +181,7 @@ public:
     void* CreateNeg(void* value) override;
     void* CreateFNeg(void* value) override;
     void* CreateNop() override;
+    void* CreateSave() override;
     std::string GetVmtObjectName(void* symbol) const override;
     void SetVmtObjectName(void* symbol, const std::string& vmtObjectName) override;
     std::string GetImtArrayObjectName(void* symbol) const override;

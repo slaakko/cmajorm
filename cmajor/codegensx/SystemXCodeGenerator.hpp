@@ -106,6 +106,8 @@ public:
     bool NewCleanupNeeded() override;
     void CreateCleanup() override;
     void GenerateCodeForCleanups();
+    bool InTryBlock() const override;
+    int CurrentTryBlockId() const override;
 private:
     cmajor::ir::Emitter* emitter;
     cmajor::ir::EmittingContext* emittingContext;
@@ -150,6 +152,7 @@ private:
     void* handlerBlock;
     void* cleanupBlock;
     bool newCleanupNeeded;
+    bool inTryBlock;
 };
 
 } } // namespace cmajor::codegensx

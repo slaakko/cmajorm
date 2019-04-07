@@ -962,6 +962,13 @@ void CreateMainUnitSystemX(std::vector<std::string>& objectFilePaths, Module& mo
     tryBlock->AddStatement(callMainStatement);
     TryStatementNode* tryStatement = new TryStatementNode(Span(), tryBlock);
     CompoundStatementNode* catchBlock = new CompoundStatementNode(Span());
+    InvokeNode* consoleError = new InvokeNode(Span(), new DotNode(Span(), new IdentifierNode(Span(), U"System.Console"), new IdentifierNode(Span(), U"Error")));
+    DotNode* writeLine = new DotNode(Span(), consoleError, new IdentifierNode(Span(), U"WriteLine"));
+    InvokeNode* printEx = new InvokeNode(Span(), writeLine);
+    InvokeNode* exToString = new InvokeNode(Span(), new DotNode(Span(), new IdentifierNode(Span(), U"ex"), new IdentifierNode(Span(), U"ToString")));
+    printEx->AddArgument(exToString);
+    ExpressionStatementNode* printExStatement = new ExpressionStatementNode(Span(), printEx);
+    catchBlock->AddStatement(printExStatement);
     AssignmentStatementNode* assignExitCodeStatement = new AssignmentStatementNode(Span(), new IdentifierNode(Span(), U"exitCode"), new IntLiteralNode(Span(), 1));
     catchBlock->AddStatement(assignExitCodeStatement);
     CatchNode* catchAll = new CatchNode(Span(), new ConstNode(Span(), new LValueRefNode(Span(), new IdentifierNode(Span(), U"System.Exception"))), new IdentifierNode(Span(), U"ex"), catchBlock);

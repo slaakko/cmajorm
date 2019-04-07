@@ -43,7 +43,8 @@ SystemXCodeGenerator::SystemXCodeGenerator(cmajor::ir::EmittingContext& emitting
     nativeCompileUnit(nullptr), function(nullptr), entryBasicBlock(nullptr), lastInstructionWasRet(false), destructorCallGenerated(false), genJumpingBoolCode(false),
     trueBlock(nullptr), falseBlock(nullptr), breakTarget(nullptr), continueTarget(nullptr), sequenceSecond(nullptr), currentFunction(nullptr), currentBlock(nullptr),
     breakTargetBlock(nullptr), continueTargetBlock(nullptr), lastAlloca(nullptr), currentClass(nullptr), basicBlockOpen(false), defaultDest(nullptr), currentCaseMap(nullptr),
-    generateLineNumbers(false), currentTryBlockId(-1), nextTryBlockId(0), currentTryNextBlock(nullptr), handlerBlock(nullptr), cleanupBlock(nullptr), newCleanupNeeded(false)
+    generateLineNumbers(false), currentTryBlockId(-1), nextTryBlockId(0), currentTryNextBlock(nullptr), handlerBlock(nullptr), cleanupBlock(nullptr), newCleanupNeeded(false),
+    inTryBlock(false)
 {
     emitter->SetEmittingDelegate(this);
 }
@@ -68,6 +69,16 @@ void SystemXCodeGenerator::Visit(BoundCompileUnit& boundCompileUnit)
     nativeCompileUnit = static_cast<cmsxi::CompileUnit*>(nativeModule.module);
     nativeCompileUnit->SetId(compileUnitId);
     nativeCompileUnit->SetSourceFilePath(boundCompileUnit.SourceFilePath());
+    ConstantArrayRepository& constantArrayRepository = boundCompileUnit.GetConstantArrayRepository();
+    for (ConstantSymbol* constantSymbol : constantArrayRepository.ConstantArrays())
+    {
+        constantSymbol->ArrayIrObject(*emitter, true);
+    }
+    ConstantStructureRepository& constantStructureRepository = boundCompileUnit.GetConstantStructureRepository();
+    for (ConstantSymbol* constantSymbol : constantStructureRepository.ConstantStructures())
+    {
+        constantSymbol->StructureIrObject(*emitter, true);
+    }
     int n = boundCompileUnit.BoundNodes().size();
     for (int i = 0; i < n; ++i)
     {
@@ -216,6 +227,22 @@ void SystemXCodeGenerator::Visit(BoundFunction& boundFunction)
         void* allocaInst = emitter->CreateAlloca(localVariable->GetType()->IrType(*emitter));
         emitter->SetIrObject(localVariable, allocaInst);
         lastAlloca = allocaInst;
+    }
+    bool byValueComplexParams = false;
+    for (int i = 0; i < np; ++i)
+    {
+        ParameterSymbol* parameter = functionSymbol->Parameters()[i];
+        if (parameter->GetType()->IsClassTypeSymbol() ||
+            (parameter->GetType()->GetSymbolType() == SymbolType::classDelegateTypeSymbol) ||
+            (parameter->GetType()->GetSymbolType() == SymbolType::interfaceTypeSymbol))
+        {
+            byValueComplexParams = true;
+            break;
+        }
+    }
+    if (byValueComplexParams)
+    {
+        emitter->CreateSave();
     }
     for (int i = 0; i < np; ++i)
     {
@@ -952,7 +979,10 @@ void SystemXCodeGenerator::Visit(BoundTryStatement& boundTryStatement)
     int beginTryId = emitter->GetMDStructId(beginTry);
     void* beginTryMdRef = emitter->CreateMDStructRef(beginTryId);
     emitter->SetMetadataRef(nop1, beginTryMdRef);
+    bool prevInTryBlock = inTryBlock;
+    inTryBlock = true;
     boundTryStatement.TryBlock()->Accept(*this);
+    inTryBlock = prevInTryBlock;
     void* nop2 = emitter->CreateNop();
     void* endTry = emitter->CreateMDStruct();
     emitter->AddMDItem(endTry, "nodeType", emitter->CreateMDLong(endTryNodeType));
@@ -1379,6 +1409,16 @@ void* SystemXCodeGenerator::CleanupBlock()
 bool SystemXCodeGenerator::NewCleanupNeeded()
 {
     return newCleanupNeeded;
+}
+
+bool SystemXCodeGenerator::InTryBlock() const
+{
+    return inTryBlock;
+}
+
+int SystemXCodeGenerator::CurrentTryBlockId() const
+{
+    return currentTryBlockId;
 }
 
 void SystemXCodeGenerator::CreateCleanup()
