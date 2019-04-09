@@ -125,6 +125,15 @@ namespace cmsx.kernel
         TrapHandler getRandomSeedSystemCallHandler = GetRandomSeed;
         ulong getRandomSeedSystemCallAddress = cast<ulong>(cast<void*>(getRandomSeedSystemCallHandler));
         mem.WriteULong(MakeSystemCallPtrAddress(sys_get_random_seed), getRandomSeedSystemCallAddress, Protection.write);
+        TrapHandler fileExistsSystemCallHandler = FileExists;
+        ulong fileExistsSystemCallAddress = cast<ulong>(cast<void*>(fileExistsSystemCallHandler));
+        mem.WriteULong(MakeSystemCallPtrAddress(sys_file_exists), fileExistsSystemCallAddress, Protection.write);
+        TrapHandler getFileSizeSystemCallHandler = GetFileSize;
+        ulong getFileSizeSystemCallAddress = cast<ulong>(cast<void*>(getFileSizeSystemCallHandler));
+        mem.WriteULong(MakeSystemCallPtrAddress(sys_get_file_size), getFileSizeSystemCallAddress, Protection.write);
+        TrapHandler unlinkSystemCallHandler = Unlink;
+        ulong unlinkSystemCallAddress = cast<ulong>(cast<void*>(unlinkSystemCallHandler));
+        mem.WriteULong(MakeSystemCallPtrAddress(sys_unlink), unlinkSystemCallAddress, Protection.write);
     }
 
     public void Boot(Machine& machine)

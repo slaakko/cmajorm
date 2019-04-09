@@ -41,6 +41,13 @@ namespace cmsx.intermediate
                 function->MapInstructions();
             }
         }
+        public void CombineBasicBlocks()
+        {
+            for (const UniquePtr<Function>& function : functions)
+            {
+                function->CombineBasicBlocks();
+            }
+        }
         public void Validate()
         {
             for (const UniquePtr<Function>& function : functions)

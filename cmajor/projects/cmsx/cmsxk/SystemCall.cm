@@ -29,7 +29,10 @@ namespace cmsx.kernel
     public const byte sys_is_host_text_file = 23u;
     public const byte sys_is_console = 24u;
     public const byte sys_get_random_seed = 25u;
-    public const byte numSystemCalls = sys_get_random_seed + 1u;
+    public const byte sys_file_exists = 26u;
+    public const byte sys_get_file_size = 27u;
+    public const byte sys_unlink = 28u;
+    public const byte numSystemCalls = sys_unlink + 1u;
 
     public const uint debugBreakInst = (TRAP << 24u) | (0u << 16u) | (sys_debug_break << 8u) | (0u << 0u);
 
@@ -931,6 +934,105 @@ namespace cmsx.kernel
         else
         {
             Panic("get_random_seed called for a process that is not running!");
+        }
+        return 0;
+    }
+
+    public long FileExists(Machine& machine, byte x, byte y, byte z, ulong ax, ulong bx, ulong cx, ulong dx, ulong ex)
+    {
+        if (x != 0u || y != sys_file_exists || z != 0u)
+        {
+            Panic("invalid file_exists parameters: " + ToString(x) + ", " + ToString(y) + ", " + ToString(z));
+        }
+        Kernel& kernel = Kernel.Instance();
+        ProcessTable& processTable = kernel.GetProcessTable();
+        Process* process = processTable.GetRunning();
+        if (process != null)
+        {
+            try
+            {
+                throw SystemError(ENOTSUPPORTED, "not implemented yet");
+            }
+            catch (const SystemError& systemError)
+            {
+                process->lastError = systemError;
+                return -1;
+            }
+            catch (const Exception& ex)
+            {
+                process->lastError = SystemError(EFAIL, "file_exists failed: " + ex.ToString());
+                return -1;
+            }
+        }
+        else
+        {
+            Panic("file_exists called for a process that is not running!");
+        }
+        return 0;
+    }
+
+    public long GetFileSize(Machine& machine, byte x, byte y, byte z, ulong ax, ulong bx, ulong cx, ulong dx, ulong ex)
+    {
+        if (x != 0u || y != sys_get_file_size || z != 0u)
+        {
+            Panic("invalid get_file_size parameters: " + ToString(x) + ", " + ToString(y) + ", " + ToString(z));
+        }
+        Kernel& kernel = Kernel.Instance();
+        ProcessTable& processTable = kernel.GetProcessTable();
+        Process* process = processTable.GetRunning();
+        if (process != null)
+        {
+            try
+            {
+                throw SystemError(ENOTSUPPORTED, "not implemented yet");
+            }
+            catch (const SystemError& systemError)
+            {
+                process->lastError = systemError;
+                return -1;
+            }
+            catch (const Exception& ex)
+            {
+                process->lastError = SystemError(EFAIL, "get_file_size failed: " + ex.ToString());
+                return -1;
+            }
+        }
+        else
+        {
+            Panic("get_file_size called for a process that is not running!");
+        }
+        return 0;
+    }
+
+    public long Unlink(Machine& machine, byte x, byte y, byte z, ulong ax, ulong bx, ulong cx, ulong dx, ulong ex)
+    {
+        if (x != 0u || y != sys_unlink || z != 0u)
+        {
+            Panic("invalid unlink parameters: " + ToString(x) + ", " + ToString(y) + ", " + ToString(z));
+        }
+        Kernel& kernel = Kernel.Instance();
+        ProcessTable& processTable = kernel.GetProcessTable();
+        Process* process = processTable.GetRunning();
+        if (process != null)
+        {
+            try
+            {
+                throw SystemError(ENOTSUPPORTED, "not implemented yet");
+            }
+            catch (const SystemError& systemError)
+            {
+                process->lastError = systemError;
+                return -1;
+            }
+            catch (const Exception& ex)
+            {
+                process->lastError = SystemError(EFAIL, "unlink failed: " + ex.ToString());
+                return -1;
+            }
+        }
+        else
+        {
+            Panic("unlink called for a process that is not running!");
         }
         return 0;
     }

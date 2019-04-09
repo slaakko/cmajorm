@@ -125,6 +125,12 @@ namespace cmsx.intermediate
         {
             return context.GetSymbolOperand("#1");
         }
+        public override void GenerateMinusOne(MachineCode& machineCode, Register* reg, int line, Instruction* inst)
+        {
+            MachineInstruction* machineInst = machineCode.GetInstruction(cmsx.assembly.SET, inst);
+            machineInst->AddOperand(reg);
+            machineInst->AddOperand(HexAllOnes(machineCode.context, line));
+        }
         public override ConstantValue* MakeValue(ulong val) const
         {
             return new BoolValue(cast<bool>(val));

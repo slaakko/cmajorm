@@ -144,7 +144,7 @@ void SystemXCodeGenerator::Visit(BoundFunction& boundFunction)
     if (!boundFunction.Body()) return;
     currentFunction = &boundFunction;
     FunctionSymbol* functionSymbol = boundFunction.GetFunctionSymbol();
-    if (functionSymbol->GroupName() == U"ToString")
+    if (functionSymbol->MangledName() == U"member_function_op_index_Map_String_uchar_int_Less_String_uchar_64DC84AFB6F4D4B426E8C5586707122612E3419C")
     {
         int x = 0;
     }

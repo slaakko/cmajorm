@@ -1,0 +1,90 @@
+// =================================
+// Copyright (c) 2019 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Collections;
+using System.Os;
+
+namespace System.IO
+{
+    public static class File
+    {
+        public static nothrow bool Exists(const string& filePath)
+        {
+            return FileExists(filePath.Chars());
+        }
+        public static long Size(const string& filePath)
+        {
+            return GetFileSize(filePath.Chars());
+        }
+        public static StreamWriter CreateText(const string& filePath)
+        {
+            return StreamWriter(SharedPtr<Stream>(new BufferedStream(SharedPtr<Stream>(
+                new FileStream(filePath, cast<OpenFlags>(OpenFlags.write | OpenFlags.create | OpenFlags.truncate | OpenFlags.text))))));
+        }
+        public static BinaryWriter CreateBinary(const string& filePath)
+        {
+            return BinaryWriter(SharedPtr<Stream>(new BufferedStream(SharedPtr<Stream>(
+                new FileStream(filePath, cast<OpenFlags>(OpenFlags.write | OpenFlags.create | OpenFlags.truncate))))));
+        }
+        public static StreamWriter AppendText(const string& filePath)
+        {
+            return StreamWriter(SharedPtr<Stream>(new BufferedStream(SharedPtr<Stream>(
+                new FileStream(filePath, cast<OpenFlags>(OpenFlags.append | OpenFlags.text))))));
+        }
+        public static StreamReader OpenRead(const string& filePath)
+        {
+            return StreamReader(SharedPtr<Stream>(new BufferedStream(SharedPtr<Stream>(
+                new FileStream(filePath, cast<OpenFlags>(OpenFlags.read | OpenFlags.text))))));
+        }
+        public static BinaryReader OpenBinary(const string& filePath)
+        {
+            return BinaryReader(SharedPtr<Stream>(new BufferedStream(SharedPtr<Stream>(
+                new FileStream(filePath, OpenFlags.read)))));
+        }
+        public static string ReadAllText(const string& filePath)
+        {
+            StreamReader reader = OpenRead(filePath);
+            string content = reader.ReadToEnd();
+            if (content.Length() >= 3 && cast<byte>(content[0]) == 0xEFu && cast<byte>(content[1]) == 0xBBu && cast<byte>(content[2]) == 0xBFu)
+            {
+                return content.Substring(3);
+            }
+            else
+            {
+                return content;
+            }
+        }
+        public static List<string> ReadAllLines(const string& filePath)
+        {
+            List<string> lines;
+            bool start = true;
+            StreamReader reader = OpenRead(filePath);
+            string line = reader.ReadLine();
+            while (!reader.Eof())
+            {
+                if (start)
+                {
+                    if (line.Length() >= 3 && cast<byte>(line[0]) == 0xEFu && cast<byte>(line[1]) == 0xBBu && cast<byte>(line[2]) == 0xBFu)
+                    {
+                        line = line.Substring(3);
+                    }
+                    start = false;
+                }
+                lines.Add(line);
+                line = reader.ReadLine();
+            }
+            if (!line.IsEmpty())
+            {
+                lines.Add(line);
+            }
+            return lines;
+        }
+        public static void Remove(const string& filePath)
+        {
+            RemoveFile(filePath.Chars());
+        }
+    }
+}

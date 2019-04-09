@@ -1027,7 +1027,6 @@ namespace cmsx.kernel
                 {
                     ulong sp = machine.GetRegisters().Get(cmsx.machine.regSP);
                     prevRunning->sp = processor.SaveContext(prevRunning->memoryTable.virtualTranslationRegisterValue, sp, &prevRunning->regAXAddress, &prevRunning->regBXAddress);
-                    //prevRunning->sp = processor.SaveContext(prevRunning->memoryTable.virtualTranslationRegisterValue, prevRunning->sp, &prevRunning->regAXAddress, &prevRunning->regBXAddress);
                 }
                 if (prevRunning->state == Process.State.running)
                 {

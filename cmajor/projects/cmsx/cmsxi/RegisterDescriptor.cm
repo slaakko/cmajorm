@@ -316,25 +316,10 @@ namespace cmsx.intermediate
             if (locY == null) return true;
             if (locY is LocalRegister*)
             {
-                RegisterDescriptor* regY = registerDescriptors.GetRegisterDescriptor(cast<Register*>(locY));
-                if (regY->values.Count() <= 2)
+                LoadInstruction* loadY = cast<LoadInstruction*>(y);
+                if (loadY->numUses <= 1)
                 {
-                    LoadInstruction* loadY = cast<LoadInstruction*>(y);
-                    if (regY->HasValue(loadY))
-                    {
-                        if (regY->values.Count() == 2)
-                        {
-                            Value* ptr = loadY->ptr;
-                            if (regY->HasValue(ptr))
-                            {
-                                return true;
-                            }
-                        }
-                        else
-                        {
-                            return true;
-                        }
-                    }
+                    return true;
                 }
             }
         }

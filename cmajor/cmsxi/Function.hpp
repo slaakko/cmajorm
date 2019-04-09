@@ -19,6 +19,7 @@ public:
     Function(const Function&) = delete;
     Function& operator=(const Function&) = delete;
     BasicBlock* CreateBasicBlock();
+    BasicBlock* CreateCleanupBasicBlock();
     void Finalize();
     uint64_t GetNextResultNumber() { return nextResultNumber++; }
     Type* GetType(Context& context) override { return type; }
@@ -33,6 +34,7 @@ private:
     std::vector<Instruction*> params;
     std::unique_ptr<BasicBlock> entryBlock;
     std::vector<std::unique_ptr<BasicBlock>> basicBlocks;
+    std::vector<std::unique_ptr<BasicBlock>> cleanupBasicBlocks;
     uint64_t nextResultNumber;
     bool linkOnce;
     int mdId;

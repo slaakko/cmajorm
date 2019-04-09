@@ -150,4 +150,34 @@ namespace System.Os
             ThrowSystemError();
         }
         return result != 0;
-    }}
+    }
+    
+    public bool FileExists(const char* filePath)
+    {
+        int result = file_exists(filePath);
+        if (result == -1)
+        {
+            ThrowSystemError();
+        }
+        return result != 0;
+    }
+    
+    public long GetFileSize(const char* filePath)
+    {
+        long result = get_file_size(filePath);
+        if (result == -1)
+        {
+            ThrowSystemError();
+        }
+        return result;
+    }
+    
+    public void RemoveFile(const char* filePath)
+    {
+        int result = unlink(filePath);
+        if (result == -1)
+        {
+            ThrowSystemError();
+        }
+    }
+}

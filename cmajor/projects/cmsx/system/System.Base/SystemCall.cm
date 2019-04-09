@@ -29,6 +29,9 @@ public const byte sys_pow = 22u;
 public const byte sys_is_host_text_file = 23u;
 public const byte sys_is_console = 24u;
 public const byte sys_get_random_seed = 25u;
+public const byte sys_file_exists = 26u;
+public const byte sys_get_file_size = 27u;
+public const byte sys_unlink = 28u;
 
 public cdecl nothrow void exit(byte exitCode)
 {
@@ -157,4 +160,19 @@ public cdecl nothrow int is_console(int fd)
 public cdecl nothrow long get_random_seed()
 {
     return trap(0u, sys_get_random_seed, 0u);
+}
+
+public cdecl nothrow int file_exists(const char* filePath)
+{
+    return cast<int>(trap(0u, sys_file_exists, 0u, filePath));
+}
+
+public cdecl nothrow long get_file_size(const char* filePath)
+{
+    return trap(0u, sys_get_file_size, 0u, filePath);
+}
+
+public cdecl nothrow int unlink(const char* filePath)
+{
+    return cast<int>(trap(0u, sys_unlink, 0u, filePath));
 }

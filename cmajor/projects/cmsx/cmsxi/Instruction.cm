@@ -26,7 +26,7 @@ namespace cmsx.intermediate
 
     public abstract class Instruction : Value
     {
-        public nothrow Instruction(int line_) : base(), parent(null), index(-1)
+        public nothrow Instruction(int line_) : base(), parent(null), index(-1), numUses(0)
         {
             base->line = line_;
         }
@@ -296,6 +296,10 @@ namespace cmsx.intermediate
         {
             return parent->GetLeader() == this;
         }
+        public override nothrow void IncNumUses()
+        {
+            ++numUses;
+        }
         public BasicBlock* parent;
         public int index;
         public HashMap<Value*, Pair<Liveness, Value*>> livenessAndNextUse;
@@ -304,6 +308,7 @@ namespace cmsx.intermediate
         public long endMachineInstructionIndex;
         public MDStructRef* metadata;
         public uint lineNumber;
+        public int numUses;
     }
 
     public abstract class TerminatorInstruction : Instruction
@@ -386,6 +391,7 @@ namespace cmsx.intermediate
                 throw Exception("internal error : operand of " + OperationName() + " instruction at line " + ToString(line) + " is null");
             }
             arg = function.ResolveOperand(line, arg);
+            arg->IncNumUses();
         }
         public void ValidateTypes()
         {
@@ -433,7 +439,9 @@ namespace cmsx.intermediate
                 throw Exception("internal error : right operand of " + OperationName() + " instruction at line " + ToString(line) + " is null");
             }
             left = function.ResolveOperand(line, left);
+            left->IncNumUses();
             right = function.ResolveOperand(line, right);
+            right->IncNumUses();
         }
         public void ValidateTypes()
         {
@@ -1269,9 +1277,9 @@ namespace cmsx.intermediate
             {
                 throw Exception("error: the operand type '" + arg->type->Name() + "' in the " + OperationName() + " instruction at line " + ToString(line) + " must be an integer type");
             }
-            if (!(type is IntegerType*))
+            if (!((type is IntegerType*) || (type is BoolType*)))
             {
-                throw Exception("error: the result type '" + type->Name() + "' for the " + OperationName() + " instruction at line " + ToString(line) + " must be an integer type");
+                throw Exception("error: the result type '" + type->Name() + "' for the " + OperationName() + " instruction at line " + ToString(line) + " must be an integer or Boolean type");
             }
         }
         public override void GenerateCode(MachineCode& machineCode, CodeFormatter& formatter)
@@ -1847,7 +1855,7 @@ namespace cmsx.intermediate
 
     public class LoadInstruction : ValueInstruction
     {
-        public nothrow LoadInstruction(Value* result_, Value* ptr_, int line_) : base(result_, line_), ptr(ptr_), homeLocation(null)
+        public nothrow LoadInstruction(Value* result_, Value* ptr_, int line_) : base(result_, line_), ptr(ptr_)
         {
         }
         public override nothrow string OperationName() const
@@ -1891,10 +1899,6 @@ namespace cmsx.intermediate
             base->EndComputeLivenessAndNextUse();
             parent->SetValueLivenessAndNextUse(ptr, Liveness.live, this);
         }
-        public override nothrow Location* HomeLocation() const
-        {
-            return homeLocation;
-        }
         public override void GenerateCode(MachineCode& machineCode, CodeFormatter& formatter)
         {
             BeginGenerateCode(machineCode);
@@ -1918,16 +1922,13 @@ namespace cmsx.intermediate
             }
             if (location != null)
             {
-                homeLocation = location;
                 int loadOpCode = type->GetLoadOp(line);
                 location->GenerateLoad(loadOpCode, destinationRegisterDescriptor->reg, machineCode, this);
                 destinationRegisterDescriptor->SetValue(this);
-                destinationRegisterDescriptor->AddValue(ptr);
                 destinationRegisterDescriptor->loaded = true;
                 addressDescriptors.RemoveRegisterFromAllBut(this, destinationRegisterDescriptor->reg);
                 AddressDescriptor* resultAddressDescriptor = addressDescriptors.GetAddressDescriptor(this);
                 resultAddressDescriptor->AddLocation(destinationRegisterDescriptor->reg);
-                ptrAddressDescriptor->AddLocation(destinationRegisterDescriptor->reg);
             }
             else
             {
@@ -1945,7 +1946,6 @@ namespace cmsx.intermediate
             }
         }
         public Value* ptr;
-        private Location* homeLocation;
     }
 
     public class StoreInstruction : Instruction
@@ -2616,6 +2616,7 @@ namespace cmsx.intermediate
             {
                 throw Exception("internal error : operand of " + OperationName() + " instruction at line " + ToString(line) + " is null");
             }
+            arg->IncNumUses();
             if (!(arg->type is ScalarType*))
             {
                 throw Exception("error: the operand type '" + arg->type->Name() + "' in the " + OperationName() + " instruction at line " + ToString(line) + " must be a scalar type");
@@ -2784,7 +2785,7 @@ namespace cmsx.intermediate
         {
             BeginGenerateCode(machineCode);
             MachineInstruction* jumpInst = machineCode.GetInstruction(cmsx.machine.JMP, this);
-            jumpInst->AddOperand(machineCode.context.GetSymbolOperand("@" + ToString(targetBlock->id)));
+            jumpInst->AddOperand(machineCode.context.GetSymbolOperand("@" + ToString(targetBlock->Id())));
             EndGenerateCode();
         }
         public uint target;
@@ -2882,9 +2883,9 @@ namespace cmsx.intermediate
             if (reg != null)
             {
                 branchInst->AddOperand(reg);
-                branchInst->AddOperand(machineCode.context.GetSymbolOperand("@" + ToString(trueTargetBlock->id)));
+                branchInst->AddOperand(machineCode.context.GetSymbolOperand("@" + ToString(trueTargetBlock->Id())));
                 MachineInstruction* jumpInst = machineCode.GetInstruction(cmsx.machine.JMP, this);
-                jumpInst->AddOperand(machineCode.context.GetSymbolOperand("@" + ToString(falseTargetBlock->id)));
+                jumpInst->AddOperand(machineCode.context.GetSymbolOperand("@" + ToString(falseTargetBlock->Id())));
                 EndGenerateCode();
             }
             else
@@ -3374,8 +3375,11 @@ namespace cmsx.intermediate
                     }
                 }
             }
-            MachineInstruction* jumpInst = machineCode.GetInstruction(cmsx.machine.JMP, this);
-            jumpInst->AddOperand(machineCode.context.GetSymbolOperand("@" + ToString(parent->function.epilog.id)));
+            if (parent->Instructions().Count() == 1 || parent != parent->function.basicBlocks.Back().Get())
+            {
+                MachineInstruction* jumpInst = machineCode.GetInstruction(cmsx.machine.JMP, this);
+                jumpInst->AddOperand(machineCode.context.GetSymbolOperand("@" + ToString(parent->function.epilog.Id())));
+            }
             EndGenerateCode();
             if (Flags.Get(Flag.debug))
             {
@@ -3547,10 +3551,10 @@ namespace cmsx.intermediate
                 comparisonInstruction->AddOperand(rz->reg);
                 MachineInstruction* branchInstruction = machineCode.GetInstruction(cmsx.machine.BZ, this);
                 branchInstruction->AddOperand(rx->reg);
-                branchInstruction->AddOperand(machineCode.context.GetSymbolOperand("@" + ToString(caseTargetBlock->id)));
+                branchInstruction->AddOperand(machineCode.context.GetSymbolOperand("@" + ToString(caseTargetBlock->Id())));
             }
             MachineInstruction* jumpInstruction = machineCode.GetInstruction(cmsx.machine.JMP, this);
-            jumpInstruction->AddOperand(machineCode.context.GetSymbolOperand("@" + ToString(defaultDestination->id)));
+            jumpInstruction->AddOperand(machineCode.context.GetSymbolOperand("@" + ToString(defaultDestination->Id())));
             EndGenerateCode();
             if (Flags.Get(Flag.debug))
             {

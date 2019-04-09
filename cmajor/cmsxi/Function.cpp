@@ -34,9 +34,20 @@ BasicBlock* Function::CreateBasicBlock()
     return bb;
 }
 
+BasicBlock* Function::CreateCleanupBasicBlock()
+{
+    BasicBlock* cubb = new BasicBlock(-1);
+    cleanupBasicBlocks.push_back(std::unique_ptr<BasicBlock>(cubb));
+    return cubb;
+}
+
 void Function::Finalize()
 {
     nextBBNumber = 0;
+    for (std::unique_ptr<BasicBlock>& cubb : cleanupBasicBlocks)
+    {
+        basicBlocks.push_back(std::move(cubb));
+    }
     for (auto& bb : basicBlocks)
     {
         if (bb->IsEmpty())

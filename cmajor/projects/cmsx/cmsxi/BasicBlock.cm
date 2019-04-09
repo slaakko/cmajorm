@@ -31,6 +31,10 @@ namespace cmsx.intermediate
                 return null;
             }
         }
+        public nothrow List<UniquePtr<Instruction>>& Instructions()
+        {
+            return instructions;
+        }
         public void MapInstructions(uint& nextIdNumber)
         {
             for (const UniquePtr<Instruction>& instruction : instructions)
@@ -242,6 +246,10 @@ namespace cmsx.intermediate
             for (long i = 0; i < n; ++i)
             {
                 Instruction* instruction = instructions[i].Get();
+                if (i == 35)
+                {
+                    int x = 0;
+                }
                 instruction->GenerateCode(machineCode, formatter);
             }
         }
@@ -253,9 +261,21 @@ namespace cmsx.intermediate
         {
             empty = empty_;
         }
+        public nothrow inline List<BasicBlock*>& Predecessors()
+        {
+            return predecessors;
+        }
+        public nothrow inline void SetId(uint id_)
+        {
+            id = id_;
+        }
+        public nothrow inline uint Id() const
+        {
+            return id;
+        }
         public Function& function;
-        public uint id;
         public RegisterDescriptors registerDescriptors;
+        private uint id;
         private bool empty;
         private List<UniquePtr<Instruction>> instructions;
         private List<BasicBlock*> predecessors;

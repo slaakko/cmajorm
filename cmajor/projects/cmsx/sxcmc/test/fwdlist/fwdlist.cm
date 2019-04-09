@@ -5,12 +5,12 @@ int main()
 {
     try
     {
-        LinkedList<int> list;
-        list.Add(1);
-        list.Add(2);
-        list.Add(3);
+        ForwardList<int> f;
+        f.InsertFront(1);
+        f.InsertFront(2);
+        f.InsertFront(3);
         bool first = true;
-        for (int x : list)
+        for (int x : f)
         {
             if (first)
             {
@@ -22,10 +22,10 @@ int main()
             }
             Console.Out() << x;
         }
+        f.RemoveFront();
+        f.RemoveFront();
+        f.RemoveFront();
         Console.Out() << endl();
-        list.RemoveFirst();
-        list.RemoveFirst();
-        list.RemoveFirst();
     }
     catch (const Exception& ex)
     {

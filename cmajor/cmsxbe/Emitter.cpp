@@ -666,7 +666,14 @@ void* Emitter::GetArrayEndAddress(void* arrayPtr, uint64_t size)
 
 void* Emitter::CreateBasicBlock(const std::string& name)
 {
-    return currentFunction->CreateBasicBlock();
+    if (name == "cleanup")
+    {
+        return currentFunction->CreateCleanupBasicBlock();
+    }
+    else
+    {
+        return currentFunction->CreateBasicBlock();
+    }
 }
 
 int Emitter::GetBasicBlockId(void* basicBlock)

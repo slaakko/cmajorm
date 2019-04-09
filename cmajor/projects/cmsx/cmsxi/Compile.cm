@@ -11,6 +11,7 @@ namespace cmsx.intermediate
             ParseIntermediateCodeFile(intermediateCodeFileName, &context);
             context.compileUnit.MapInstructions();
             context.compileUnit.Validate();
+            context.compileUnit.CombineBasicBlocks();
             //context.compileUnit.ComputeLivenessAndNextUse();
             if (Flags.Get(Flag.stages))
             {

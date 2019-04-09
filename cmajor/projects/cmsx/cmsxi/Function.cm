@@ -184,7 +184,14 @@ namespace cmsx.intermediate
             machineCode.currentLineNumber = 0u;
             nextInstructionIndex = 0;
             nextValueNumber = 0;
-            epilog.id = cast<uint>(basicBlocks.Count());
+            if (!basicBlocks.IsEmpty())
+            {
+                epilog.SetId(basicBlocks.Back()->Id() + 1u);
+            }
+            else
+            {
+                epilog.SetId(1u);
+            }
             CreateProlog(machineCode);
             if (Flags.Get(Flag.debug))
             {
@@ -243,6 +250,42 @@ namespace cmsx.intermediate
             machineCode.GetInstruction(cmsx.assembly.ENDF, name);
             epilog.SetEmpty(false);
         }
+        public void CombineBasicBlocks()
+        {
+            List<UniquePtr<BasicBlock>> newBasicBlocks;
+            long n = basicBlocks.Count();
+            for (long i = 0; i < n; ++i)
+            {
+                UniquePtr<BasicBlock>& bb = basicBlocks[i];
+                if (i < n - 1)
+                {
+                    if (!bb->IsEmpty())
+                    {
+                        UniquePtr<BasicBlock>& next = basicBlocks[i + 1];
+                        if (next->Predecessors().Count() == 1 && next->Predecessors().Front() == bb.Get())
+                        {
+                            Instruction* lastInst = bb->GetLastInstruction();
+                            if (lastInst is JumpInstruction*)
+                            {
+                                JumpInstruction* jump = cast<JumpInstruction*>(lastInst);
+                                if (jump->targetBlock == next.Get())
+                                {
+                                    bb->Instructions().RemoveLast();
+                                    for (UniquePtr<Instruction>& inst : next->Instructions())
+                                    {
+                                        inst->parent = bb.Get();
+                                        bb->Instructions().Add(Rvalue(inst));
+                                    }
+                                    ++i;
+                                }
+                            }
+                        }
+                    }
+                }
+                newBasicBlocks.Add(Rvalue(bb));
+            }
+            Swap(basicBlocks, newBasicBlocks);
+        }
         public Context& context;
         public FunctionType* type;
         public string name;
@@ -253,7 +296,7 @@ namespace cmsx.intermediate
         public MDStructRef* md;
         public ulong frameSize;
         public List<ParamInstruction*> regParams;
-        private List<UniquePtr<BasicBlock>> basicBlocks;
+        public List<UniquePtr<BasicBlock>> basicBlocks;
         private List<UniquePtr<Value>> values;
         private HashMap<uint, IdValue*> idValueMap;
         private HashMap<uint, Instruction*> instructionMap;
