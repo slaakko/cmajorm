@@ -481,7 +481,14 @@ namespace cmsx.intermediate
             int binOpCode = -1;
             if (type is BoolType*)
             {
-                if (left->type is SignedIntegerType*)
+                if (left->type is BoolType*)
+                {
+                    switch (binOp)
+                    {
+                        case Operator.equal: binOpCode = cmsx.machine.CMPU; break;
+                    }
+                }
+                else if (left->type is SignedIntegerType*)
                 {
                     switch (binOp)
                     {
