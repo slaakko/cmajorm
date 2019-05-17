@@ -13,8 +13,14 @@ namespace cmsx.kernel
         {
             return *instance;
         }
-        private nothrow Kernel() : machine(GetMachine()), sessionTable(GetSessionTable()), processTable(GetProcessTable()), baseDebugger(), debugger(&baseDebugger), consoleDriver(null)
+        private nothrow Kernel() : machine(GetMachine()), sessionTable(GetSessionTable()), processTable(GetProcessTable()), baseDebugger(), debugger(&baseDebugger), consoleDriver(null),
+            kernelEvent(OsCreateEvent())
         {
+            stopKernelThreads = StopKernelThreads;
+        }
+        public ~Kernel()
+        {
+            OsCloseEvent(kernelEvent);
         }
         public void Init()
         {
@@ -101,6 +107,26 @@ namespace cmsx.kernel
         {
             consoleDriver = consoleDriver_;
         }
+        public void SetKernelEvent()
+        {
+            OsSetEvent(kernelEvent);
+        }
+        public void WaitKernelEvent()
+        {
+            OsWaitEvent(kernelEvent);
+        }
+        public inline nothrow bool Waiting() const
+        {
+            return waiting;
+        }
+        public nothrow inline void SetWaiting()
+        {
+            waiting = true;
+        }
+        public nothrow inline void ResetWaiting()
+        {
+            waiting = false;
+        }
         private static UniquePtr<Kernel> instance;
         private Machine& machine;
         private SessionTable& sessionTable;
@@ -115,5 +141,12 @@ namespace cmsx.kernel
         private GlobalFileTable globalFileTable;
         private Session* currentSession;
         private ConsoleDriver* consoleDriver;
+        private void* kernelEvent;
+        private bool waiting;
+    }
+    
+    public void StopKernelThreads()
+    {
+        GetDiskDriver().Stop();
     }
 }

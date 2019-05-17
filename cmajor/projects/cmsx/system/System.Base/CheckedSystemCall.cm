@@ -180,4 +180,42 @@ namespace System.Os
             ThrowSystemError();
         }
     }
+    
+    public void Mkdir(const char* path)
+    {
+        int result = mkdir(path);
+        if (result == -1)
+        {
+            ThrowSystemError();
+        }
+    }
+    
+    public int OpenDir(const char* dirPath)
+    {
+        int result = opendir(dirPath);
+        if (result == -1)
+        {
+            ThrowSystemError();
+        }
+        return result;
+    }
+    
+    public int ReadDir(int dd, int* inodeNumber, char* entryName)
+    {
+        int result = readdir(dd,inodeNumber, entryName);
+        if (result == -1)
+        {
+            ThrowSystemError();
+        }
+        return result;
+    }
+    
+    public void CloseDir(int dd)
+    {
+        int result = closedir(dd);
+        if (result == -1)
+        {
+            ThrowSystemError();
+        }
+    }
 }

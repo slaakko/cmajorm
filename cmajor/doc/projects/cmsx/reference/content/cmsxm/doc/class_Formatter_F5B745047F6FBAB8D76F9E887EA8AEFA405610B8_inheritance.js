@@ -269,6 +269,7 @@ function drawDiagram(diagramNodes) {
 function drawInheritanceDiagram() {
     var diagramNodes = [
         { name: "cmsx.machine.Formatter", id: "diagram_node_0", level: 0, subject: true, hasDerivedNodes: true, link: "../../cmsxm/doc/class_Formatter_F5B745047F6FBAB8D76F9E887EA8AEFA405610B8.html" },
+        { name: "cmsx.debug.DissamblyFormatter", id: "diagram_node_2", level: 1, subject: false, hasDerivedNodes: false, link: "../../cmsxmdb/doc/class_DissamblyFormatter_E77C6F676031AC001A2645B27E19EBDCA94B46B9.html" },
         { name: "cmsx.object.BinaryFileFormatter", id: "diagram_node_1", level: 1, subject: false, hasDerivedNodes: false, link: "../../cmsxo/doc/class_BinaryFileFormatter_FA3F4CDE62538E3DCD2E88847C4E52CEE99BE226.html" }];
     drawDiagram(diagramNodes);
 }

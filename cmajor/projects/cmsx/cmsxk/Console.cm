@@ -128,8 +128,6 @@ namespace cmsx.kernel
                 {
                     if (reader->state == Process.State.asleep && reader->event == consoleInputEvent)
                     {
-                        ulong bufferAddress = reader->eventData1;
-                        long count = cast<long>(reader->eventData2);
                         GlobalFileTable& fileTable = kernel.FileTable();
                         ConsoleInputFile* consoleInputFile = fileTable.GetConsoleInputFile();
                         if (!consoleInputFile->HasBufferedInput())
@@ -139,9 +137,6 @@ namespace cmsx.kernel
                                 consoleInputFile->SetBufferedInput(GetLine());
                             }
                         }
-                        long result = consoleInputFile->Read(machine, reader, bufferAddress, count);
-                        #assert(result != RESULT_BLOCKED);
-                        WriteProcessMemory(machine, reader, reader->regAXAddress, cast<ulong>(result), 8u, Protection.write);
                         WakeUpProcess(processTable, reader);
                         Process* running = processTable.GetRunning();
                         if (running == processTable.GetIdle())

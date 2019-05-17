@@ -1,0 +1,42 @@
+using System;
+using System.Collections;
+
+namespace cmsx.kernel
+{
+    public class MountTable
+    {
+        static MountTable() : instance(new MountTable())
+        {
+        }
+        public static nothrow MountTable& Instance()
+        {
+            return *instance;
+        }
+        public void InitializeFileSystems()
+        {
+            for (UniquePtr<FileSystem>& fs : fileSystems)
+            {
+                fs->Init();
+            }
+        }
+        public FileSystem* GetFileSystem(int fsNumber) const
+        {
+            if (fsNumber < 0 || fsNumber >= fileSystems.Count())
+            {
+                throw SystemError(EINVAL, "invalid file system number");
+            }
+            return fileSystems[fsNumber].Get();
+        }
+        private MountTable()
+        {
+            fileSystems.Add(UniquePtr<FileSystem>(new RootFileSystem()));
+        }
+        private static UniquePtr<MountTable> instance;
+        private List<UniquePtr<FileSystem>> fileSystems;
+    }
+
+    public nothrow MountTable& GetMountTable()
+    {
+        return MountTable.Instance();
+    }
+}

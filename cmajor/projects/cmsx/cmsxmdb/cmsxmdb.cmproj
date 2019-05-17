@@ -1,30 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <PropertyGroup Label="Globals">
-    <CustomProjectExtensionsPath>$(LocalAppData)\CustomProjectSystems\Cmajor\</CustomProjectExtensionsPath>
-    <ProjectGuid>abcc1bd5-d9e5-418d-bcfc-49f07b92be32</ProjectGuid>
-  </PropertyGroup>
-  <PropertyGroup>
-    <TargetType>library</TargetType>
-  </PropertyGroup>
-  <Import Project="$(CustomProjectExtensionsPath)Cmajor.props" />
-  <Import Project="$(CustomProjectExtensionsPath)Cmajor.targets" />
-  <ItemGroup>
-    <CmCompile Include="Debug.cm" />
-    <CmCompile Include="Evaluate.cm" />
-    <CmCompile Include="Expr.cm" />
-    <CmCompile Include="Statement.cm" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Expr.parser" />
-    <None Include="Evaluator.pl" />
-    <None Include="Evaluator.pp" />
-    <None Include="Statement.parser" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\cmsxk\cmsxk.cmproj" />
-    <ProjectReference Include="..\cmsxm\cmsxm.cmproj" />
-    <ProjectReference Include="..\cmsxo\cmsxo.cmproj" />
-    <ProjectReference Include="..\cmsxu\cmsxu.cmproj" />
-  </ItemGroup>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+ <PropertyGroup Label="Globals">
+  <CustomProjectExtensionsPath>$(LocalAppData)\CustomProjectSystems\Cmajor\</CustomProjectExtensionsPath>
+  <ProjectGuid>cad159f9-59b7-460e-adec-e0ad45964264</ProjectGuid>
+ </PropertyGroup>
+ <PropertyGroup>
+  <TargetType>library</TargetType>
+ </PropertyGroup>
+ <ItemGroup>
+  <CmCompile Include="Debug.cm"/>
+  <CmCompile Include="Evaluate.cm"/>
+  <CmCompile Include="Expr.cm"/>
+  <CmCompile Include="Statement.cm"/>
+ </ItemGroup>
+ <ItemGroup/>
+ <ItemGroup>
+  <ProjectReference Include="../cmsxk/cmsxk.cmproj"/>
+  <ProjectReference Include="../cmsxm/cmsxm.cmproj"/>
+  <ProjectReference Include="../cmsxo/cmsxo.cmproj"/>
+  <ProjectReference Include="../cmsxu/cmsxu.cmproj"/>
+ </ItemGroup>
+ <Import Project="$(CustomProjectExtensionsPath)Cmajor.props"/>
+ <Import Project="$(CustomProjectExtensionsPath)Cmajor.targets"/>
 </Project>

@@ -1607,6 +1607,7 @@ unsigned Emitter::GetFunctionFlags(bool isStatic, unsigned accessFlags, bool isE
     return flags;
 }
 
+/*
 void* Emitter::CreateDIMethod(const std::string& name, const std::string& mangledName, const Span& span, void* subroutineType, unsigned virtuality, unsigned vtableIndex, void* vtableHolder,
     unsigned flags)
 {
@@ -1615,11 +1616,31 @@ void* Emitter::CreateDIMethod(const std::string& name, const std::string& mangle
         static_cast<llvm::DINode::DIFlags>(flags));
     return subprogram;
 }
+*/
 
+void* Emitter::CreateDIMethod(const std::string& name, const std::string& mangledName, const Span& span, void* subroutineType, unsigned virtuality, unsigned vtableIndex, void* vtableHolder,
+    unsigned flags)
+{
+    void* subprogram = diBuilder->createMethod(static_cast<llvm::DIScope*>(CurrentScope()), name, mangledName, static_cast<llvm::DIFile*>(GetDebugInfoForFile(span.FileIndex())),
+        span.LineNumber(), static_cast<llvm::DISubroutineType*>(subroutineType), vtableIndex, 0, static_cast<llvm::DIType*>(vtableHolder),
+        static_cast<llvm::DINode::DIFlags>(flags), llvm::DISubprogram::SPFlagDefinition);
+    return subprogram;
+}
+
+/*
 void* Emitter::CreateDIFunction(const std::string& name, const std::string& mangledName, const Span& span, void* subroutineType, unsigned flags)
 {
     void* subprogram = diBuilder->createFunction(static_cast<llvm::DIScope*>(CurrentScope()), name, mangledName, static_cast<llvm::DIFile*>(GetDebugInfoForFile(span.FileIndex())),
         span.LineNumber(), static_cast<llvm::DISubroutineType*>(subroutineType), false, true, span.LineNumber(), static_cast<llvm::DINode::DIFlags>(flags));
+    return subprogram;
+}
+*/
+
+void* Emitter::CreateDIFunction(const std::string& name, const std::string& mangledName, const Span& span, void* subroutineType, unsigned flags)
+{
+    void* subprogram = diBuilder->createFunction(static_cast<llvm::DIScope*>(CurrentScope()), name, mangledName, static_cast<llvm::DIFile*>(GetDebugInfoForFile(span.FileIndex())),
+        span.LineNumber(), static_cast<llvm::DISubroutineType*>(subroutineType), span.LineNumber(), static_cast<llvm::DINode::DIFlags>(flags),
+        llvm::DISubprogram::SPFlagDefinition);
     return subprogram;
 }
 

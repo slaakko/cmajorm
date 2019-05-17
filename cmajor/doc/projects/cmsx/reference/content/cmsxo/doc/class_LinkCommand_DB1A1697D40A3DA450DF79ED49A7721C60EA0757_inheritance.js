@@ -270,8 +270,9 @@ function drawInheritanceDiagram() {
     var diagramNodes = [
         { name: "cmsx.object.LinkCommand", id: "diagram_node_0", level: 0, subject: true, hasDerivedNodes: true, link: "../../cmsxo/doc/class_LinkCommand_DB1A1697D40A3DA450DF79ED49A7721C60EA0757.html" },
         { name: "cmsx.object.LinkAbsoluteAddressCommand", id: "diagram_node_1", level: 1, subject: false, hasDerivedNodes: false, link: "../../cmsxo/doc/class_LinkAbsoluteAddressCommand_6219538DE295347627DBC4FD4990C184DE074489.html" },
-        { name: "cmsx.object.LinkFarOctaCommand", id: "diagram_node_2", level: 1, subject: false, hasDerivedNodes: false, link: "../../cmsxo/doc/class_LinkFarOctaCommand_028F0D83A6D64437A8AA298EE4A4D404AB6212F8.html" },
-        { name: "cmsx.object.LinkOnceCommand", id: "diagram_node_3", level: 1, subject: false, hasDerivedNodes: false, link: "../../cmsxo/doc/class_LinkOnceCommand_642F6808547FC0704E553E003370A3A9F3CA9736.html" }];
+        { name: "cmsx.object.LinkClsIdCommand", id: "diagram_node_2", level: 1, subject: false, hasDerivedNodes: false, link: "../../cmsxo/doc/class_LinkClsIdCommand_93C76020C160572C4CA41AC11040A9ECDBC12F9A.html" },
+        { name: "cmsx.object.LinkFarOctaCommand", id: "diagram_node_3", level: 1, subject: false, hasDerivedNodes: false, link: "../../cmsxo/doc/class_LinkFarOctaCommand_028F0D83A6D64437A8AA298EE4A4D404AB6212F8.html" },
+        { name: "cmsx.object.LinkOnceCommand", id: "diagram_node_4", level: 1, subject: false, hasDerivedNodes: false, link: "../../cmsxo/doc/class_LinkOnceCommand_642F6808547FC0704E553E003370A3A9F3CA9736.html" }];
     drawDiagram(diagramNodes);
 }
 

@@ -270,9 +270,10 @@ function drawInheritanceDiagram() {
     var diagramNodes = [
         { name: "cmsx.assembly.Node", id: "diagram_node_0", level: 0, subject: false, hasDerivedNodes: true, link: "../../cmsxa/doc/class_Node_2715F608FDBE3E87758991A0E1A2BA84AF2DF044.html" },
         { name: "cmsx.assembly.Constant", id: "diagram_node_1", level: 1, subject: true, hasDerivedNodes: true, link: "../../cmsxa/doc/class_Constant_15BC3F833B6A2470E27F6C21FE1B8BEA04721B2D.html" },
-        { name: "cmsx.assembly.CharacterConstant", id: "diagram_node_3", level: 2, subject: false, hasDerivedNodes: false, link: "../../cmsxa/doc/class_CharacterConstant_86508FE9508E3E0C43E3FA5247553D75D436FDF6.html" },
-        { name: "cmsx.assembly.IntegralConstant", id: "diagram_node_4", level: 2, subject: false, hasDerivedNodes: false, link: "../../cmsxa/doc/class_IntegralConstant_D8571D9ECDC69065A30784B297D42F85BDD224D9.html" },
-        { name: "cmsx.assembly.StringConstant", id: "diagram_node_2", level: 2, subject: false, hasDerivedNodes: false, link: "../../cmsxa/doc/class_StringConstant_76CCAF837B42D94B512D94C4C0664E5CC0C9AAB2.html" }];
+        { name: "cmsx.assembly.CharacterConstant", id: "diagram_node_2", level: 2, subject: false, hasDerivedNodes: false, link: "../../cmsxa/doc/class_CharacterConstant_86508FE9508E3E0C43E3FA5247553D75D436FDF6.html" },
+        { name: "cmsx.assembly.ClsIdConstant", id: "diagram_node_4", level: 2, subject: false, hasDerivedNodes: false, link: "../../cmsxa/doc/class_ClsIdConstant_56244896F7894FC36ED4CD2490DB16C5F25F647C.html" },
+        { name: "cmsx.assembly.IntegralConstant", id: "diagram_node_5", level: 2, subject: false, hasDerivedNodes: false, link: "../../cmsxa/doc/class_IntegralConstant_D8571D9ECDC69065A30784B297D42F85BDD224D9.html" },
+        { name: "cmsx.assembly.StringConstant", id: "diagram_node_3", level: 2, subject: false, hasDerivedNodes: false, link: "../../cmsxa/doc/class_StringConstant_76CCAF837B42D94B512D94C4C0664E5CC0C9AAB2.html" }];
     drawDiagram(diagramNodes);
 }
 

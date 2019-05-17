@@ -1,16 +1,88 @@
 using System;
+using System.Collections;
 using cmsx.machine;
 
 namespace cmsx.kernel
 {
+    public ulong kernelFiberStackSize = 64u * 1024u;
+
+    public delegate void SystemCallFiberDelegate(void* processParam);
+
+    public class ProcessDueTimeLess : Rel<Process*>
+    {
+        public nothrow bool operator()(Process* left, Process* right) const
+        {
+            #assert(left->state == Process.State.asleep);
+            #assert(left->event == wakeupEvent);
+            #assert(right->state == Process.State.asleep);
+            #assert(right->event == wakeupEvent);
+            long leftDueTime = cast<long>(left->eventData1);
+            long rightDueTime = cast<long>(right->eventData1);
+            return leftDueTime < rightDueTime;
+        }
+    }
+
+    public class SleepingProcessQueue
+    {
+        static SleepingProcessQueue() : instance(new SleepingProcessQueue())
+        {
+        }
+        public static SleepingProcessQueue& Instance()
+        {
+            return *instance;
+        }
+        public void AddProcess(Process* process)
+        {
+            sleepingProcesses.Insert(process);
+        }
+        public List<Process*> GetProcessesToWakeUp(long dueTime)
+        {
+            List<Process*> processesToWakeUp;
+            while (!sleepingProcesses.IsEmpty())
+            {
+                Process* process = *sleepingProcesses.Begin();
+                #assert(process->state == Process.State.asleep);
+                #assert(process->event == wakeupEvent);
+                long processDueTime = cast<long>(process->eventData1);
+                if (processDueTime <= dueTime)
+                {
+                    sleepingProcesses.Remove(sleepingProcesses.Begin());
+                    processesToWakeUp.Add(process);
+                }
+                else
+                {
+                    break;
+                }
+            }
+            return processesToWakeUp;
+        }
+        private static UniquePtr<SleepingProcessQueue> instance;
+        private Set<Process*, ProcessDueTimeLess> sleepingProcesses;
+    }
+
     public nothrow void ClockInterruptHandler(Machine& machine, byte irq)
     {
+        if (Log())
+        {
+            LogMessage("intr", "clock");
+        }
         Kernel& kernel = Kernel.Instance();
-        Schedule(machine, kernel.GetProcessTable());
+        ProcessTable& processTable = kernel.GetProcessTable();
+        List<Process*> processesToWakeUp = SleepingProcessQueue.Instance().GetProcessesToWakeUp(Now().Rep());
+        for (Process* process : processesToWakeUp)
+        {
+            Console.WriteLine("wake up process " + process->name);
+            WakeUpProcess(processTable, process);
+        }
+        Schedule(machine, processTable);
     }
 
     public void PageFaultHandler(Machine& machine, byte irq)
     {
+        if (Log())
+        {
+            LogMessage("intr", "pagefault");
+        }
         ulong yy = machine.GetRegisters().GetSpecial(Registers.rYY);
         Protection pageProtection = Protection.notPresent;
         Protection protection = Protection.notPresent;
@@ -32,6 +104,10 @@ namespace cmsx.kernel
 
     public void SecurityViolationHandler(Machine& machine, byte irq)
     {
+        if (Log())
+        {
+            LogMessage("intr", "security");
+        }
         ulong virtualAddress = machine.GetRegisters().GetSpecial(Registers.rZZ);
         Kernel& kernel = Kernel.Instance();
         ProcessTable& processTable = kernel.GetProcessTable();
@@ -48,6 +124,10 @@ namespace cmsx.kernel
 
     public void SoftwareInterruptHandler(Machine& machine, byte irq)
     {
+        if (Log())
+        {
+            LogMessage("intr", "software");
+        }
         Registers& regs = machine.GetRegisters();
         ulong prevRV = regs.GetSpecial(Registers.rV);
         ulong kernelRV = MakeVirtualTranslationRegisterValue(machine.GetKernelRootPageAddress(), kernelAddressSpaceNumber);
@@ -62,27 +142,42 @@ namespace cmsx.kernel
         ulong trapDX = regs.Get(regDX);
         ulong trapEX = regs.Get(regEX);
         ulong trapOffset = cast<ulong>(trapY) << 3u;
-        ulong trapBaseAddress = regs.GetSpecial(Registers.rT);
-        ulong trapHandlerPtrAddress = trapTableBaseAddress + trapOffset;
-        ulong trapHandlerAddress = machine.GetMemory().ReadULong(trapHandlerPtrAddress, Protection.read);
+        ulong systemCallTableBaseAddress = regs.GetSpecial(Registers.rT);
+        ulong systemCallHandlerPtrAddress = systemCallTableBaseAddress + trapOffset;
+        ulong systemCallHandlerAddress = machine.GetMemory().ReadULong(systemCallHandlerPtrAddress, Protection.read);
         regs.SetSpecial(Registers.rV, prevRV);
-        if (trapHandlerAddress == 0u)
+        if (systemCallHandlerAddress == 0u)
         {
             Panic("handler for trap " + ToString(trapY) + " is null");
         }
-        TrapHandler trap = cast<TrapHandler>(cast<void*>(trapHandlerAddress));
-        long result = trap(machine, trapX, trapY, trapZ, trapAX, trapBX, trapCX, trapDX, trapEX);
-        ulong currentRV = regs.GetSpecial(Registers.rV);
-        if (currentRV == prevRV) // if context not switched
+        SystemCallHandler handler = cast<SystemCallHandler>(cast<void*>(systemCallHandlerAddress));
+        Kernel& kernel = Kernel.Instance();
+        ProcessTable& processTable = kernel.GetProcessTable();
+        Process* process = processTable.GetRunning();
+        if (process == null)
         {
-            ulong returnValue = cast<ulong>(result);
-            regs.Set(regAX, returnValue);
+            Panic("system call called for a process that is not running");
         }
+        if (process->fiber == null)
+        {
+            SystemCallFiberDelegate systemCallFiber = SystemCallFiber;
+            void* systemCallFiberStartAddress = cast<void*>(systemCallFiber);
+            process->fiber = OsCreateFiber(kernelFiberStackSize, systemCallFiberStartAddress, process);
+        }
+        process->mode = Process.Mode.runningKernel;
+        process->systemCall = SystemCall(&machine, &kernel, &processTable, process, handler, trapX, trapY, trapZ, trapAX, trapBX, trapCX, trapDX, trapEX);
+        OsSwitchToFiber(process->fiber);
     }
 
     public nothrow void IntervalInterruptHandler(Machine& machine, byte irq)
     {
         // todo
+    }
+
+    public nothrow void DiskInterruptHandler(Machine& machine, byte irq)
+    {
+        DiskDriver& diskDriver = GetDiskDriver();
+        diskDriver.HandleIOCompletions();
     }
 
     public nothrow void KeyboardInterruptHandler(Machine& machine, byte irq)
@@ -92,6 +187,63 @@ namespace cmsx.kernel
         if (consoleDriver != null)
         {
             consoleDriver->HandleBufferedInput();
+        }
+    }
+
+    public void KernelInterruptReturn()
+    {
+        if (Log())
+        {
+            LogMessage("intr.return", "begin");
+        }
+        Machine& machine = GetMachine();
+        Kernel& kernel = Kernel.Instance();
+        ProcessTable& processTable = kernel.GetProcessTable();
+        Process* process = processTable.GetRunning();
+        if (process == null)
+        {
+            Panic("no process is running");
+        }
+        while (process->state == Process.State.zombie || process->state == Process.State.asleep || process->mode == Process.Mode.runningKernel && process->state == Process.State.running)
+        {
+            if (process->state == Process.State.zombie)
+            {
+                if (process->fiber != null)
+                {
+                    OsDeleteFiber(process->fiber);
+                    process->fiber = null;
+                }
+                Schedule(machine, processTable);
+                process = processTable.GetRunning(); 
+            }
+            else if (process->state == Process.State.asleep)
+            {
+                Schedule(machine, processTable);
+                process = processTable.GetRunning();
+            }
+            else if (process->mode == Process.Mode.runningKernel && process->state == Process.State.running)
+            {
+                if (Log())
+                {
+                    LogMessage("intr.return", "runkernel");
+                }
+                OsSwitchToFiber(process->fiber);
+            }
+        }
+        if (process->systemCallReady)
+        {
+            long result = process->systemCall.result;
+            ulong returnValue = cast<ulong>(result);
+            if (Log())
+            {
+                LogMessage("intr.return", "return=" + ToString(returnValue));
+            }
+            Registers& regs = machine.GetRegisters();
+            regs.Set(regAX, returnValue);
+        }
+        if (Log())
+        {
+            LogMessage("intr.return", "end");
         }
     }
 }

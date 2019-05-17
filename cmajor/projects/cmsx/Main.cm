@@ -43,6 +43,8 @@ void Run(Machine& machine)
 
 void Terminate(Machine& machine)
 {
+    GetBlockManager().Flush();
+    GetDiskDriver().Stop();
     Kernel& kernel = Kernel.Instance();
     if (Machine.GetFlag(Machine.Flags.debug))
     {
@@ -55,7 +57,7 @@ void Terminate(Machine& machine)
         Process* process = kernel.GetProcessTable().GetProcess(pid);
         if (process != null && Machine.GetFlag(Machine.Flags.verbose))
         {
-            Console.Out() << "program exited with code " << process->exitCode << "." << endl();
+            Console.Out() << "process exited with code " << process->exitCode << "." << endl();
         }
     }
     Registers& regs = machine.GetRegisters();
@@ -142,6 +144,10 @@ public void PrintHelp()
     Console.Out() << "  be quiet" << endl();
     Console.Out() << "--debug (-d)" << endl();
     Console.Out() << "  debug EXECUTABLE" << endl();
+    Console.Out() << "--log (-l)" << endl();
+    Console.Out() << "  log to stdout" << endl();
+    Console.Out() << "--logfile=FILE (-f=FILE)" << endl();
+    Console.Out() << "  log to FILE" << endl();
 }
 
 int main(int argc, const char** argv)
@@ -157,26 +163,53 @@ int main(int argc, const char** argv)
             string arg = argv[i];
             if (cmsxOptions && arg.StartsWith("-"))
             {
-                if (arg == "--help" || arg == "-h")
+                if (arg.Find('=') != -1)
                 {
-                    PrintHelp();
-                    return 0;
-                }
-                else if (arg == "--verbose" || arg == "-v")
-                {
-                    Machine.SetFlag(Machine.Flags.verbose);
-                }
-                else if (arg == "--quiet" || arg == "-q")
-                {
-                    Machine.SetFlag(Machine.Flags.quiet);
-                }
-                else if (arg == "--debug" || arg == "-d")
-                {
-                    Machine.SetFlag(Machine.Flags.debug);
+                    List<string> components = arg.Split('=');
+                    if (components.Count() == 2)
+                    {
+                        if (components[0] == "--logfile" || components[0] == "-f")
+                        {
+                            string logFile = components[1];
+                            SetLog(logFile);
+                        }
+                        else
+                        {
+                            throw Exception("unknown option '" + arg + "'");
+                        }
+                    }
+                    else
+                    {
+                        throw Exception("invalid option '" + arg + "'");
+                    }
                 }
                 else
                 {
-                    throw Exception("unknown option '" + arg + "'");
+                    if (arg == "--help" || arg == "-h")
+                    {
+                        PrintHelp();
+                        return 0;
+                    }
+                    else if (arg == "--verbose" || arg == "-v")
+                    {
+                        Machine.SetFlag(Machine.Flags.verbose);
+                    }
+                    else if (arg == "--quiet" || arg == "-q")
+                    {
+                        Machine.SetFlag(Machine.Flags.quiet);
+                    }
+                    else if (arg == "--debug" || arg == "-d")
+                    {
+                        Machine.SetFlag(Machine.Flags.debug);
+                    }
+                    else if (arg == "--log" || arg == "-l")
+                    {
+                        SetLog();
+                    }
+                    else
+                    {
+                        throw Exception("unknown option '" + arg + "'");
+                    }
                 }
             }
             else if (programFileName.IsEmpty())

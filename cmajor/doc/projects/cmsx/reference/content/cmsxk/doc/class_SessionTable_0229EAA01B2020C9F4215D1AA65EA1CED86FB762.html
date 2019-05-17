@@ -1,0 +1,113 @@
+<html>
+ <head>
+  <meta charset="utf-8"/>
+  <title>SessionTable Class</title>
+  <link href="../../../style/style.css" rel="stylesheet" type="text/css"/>
+ </head>
+ <body>
+  <h1>SessionTable Class</h1>
+  <h2>Definition</h2>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/Session.cm.html#21">21</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/Session.cm.html">cmsxk/Session.cm</a></span>
+  <h2>Constructors &amp; Destructor</h2>
+  <table>
+   <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">static</span></td>
+    <td xml:space="preserve"><a href="../../cmsxk/doc/class_SessionTable_0229EAA01B2020C9F4215D1AA65EA1CED86FB762.html#static_constructor_SessionTable_93200D6853CDE5BDD3DF279D7B43ADDF1C61201F">SessionTable</a>()</td>
+   </tr>
+   <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">private</span>&nbsp;<span class="kw">nothrow</span></td>
+    <td xml:space="preserve"><a href="../../cmsxk/doc/class_SessionTable_0229EAA01B2020C9F4215D1AA65EA1CED86FB762.html#default_constructor_SessionTable_1448A5A2248178D14D387970373AD3250CC25357">SessionTable</a>()</td>
+   </tr>
+  </table>
+  <h2>Member Functions</h2>
+  <table>
+   <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<a href="../../cmsxk/doc/class_Session_C9D9466418A5AF8E2E4E37FFAB6C2E58DE04C2DB.html">Session</a>*</td>
+    <td xml:space="preserve"><a href="../../cmsxk/doc/class_SessionTable_0229EAA01B2020C9F4215D1AA65EA1CED86FB762.html#member_function_CreateSession_SessionTable_F4BBE9BC643BBE2E622E84211AFE150E21E62EEE">CreateSession</a>()</td>
+   </tr>
+   <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">void</span></td>
+    <td xml:space="preserve"><a href="../../cmsxk/doc/class_SessionTable_0229EAA01B2020C9F4215D1AA65EA1CED86FB762.html#member_function_FreeSession_SessionTable_9EBB2370F83164948AA4318C9846FC5031C026B5">FreeSession</a>(<a href="../../cmsxk/doc/class_Session_C9D9466418A5AF8E2E4E37FFAB6C2E58DE04C2DB.html">Session</a>*&nbsp;session)</td>
+   </tr>
+   <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<a href="../../cmsxk/doc/class_Session_C9D9466418A5AF8E2E4E37FFAB6C2E58DE04C2DB.html">Session</a>*</td>
+    <td xml:space="preserve"><a href="../../cmsxk/doc/class_SessionTable_0229EAA01B2020C9F4215D1AA65EA1CED86FB762.html#member_function_GetSession_SessionTable_12D6423F22447DB02076CE857A0170F7E3EFB0EA">GetSession</a>(<span class="kw">int</span>&nbsp;sid)&nbsp;<span class="kw">const</span></td>
+   </tr>
+   <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">static</span>&nbsp;<a href="../../cmsxk/doc/class_SessionTable_0229EAA01B2020C9F4215D1AA65EA1CED86FB762.html">SessionTable</a>&amp;</td>
+    <td xml:space="preserve"><a href="../../cmsxk/doc/class_SessionTable_0229EAA01B2020C9F4215D1AA65EA1CED86FB762.html#member_function_Instance_SessionTable_78C6E02428111C549169CD054ED7A17D8FD41937">Instance</a>()</td>
+   </tr>
+  </table>
+  <h2>Member Variables</h2>
+  <table>
+   <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">private</span>&nbsp;<a href="../../cmsxk/doc/class_Session_C9D9466418A5AF8E2E4E37FFAB6C2E58DE04C2DB.html">Session</a>*</td>
+    <td xml:space="preserve">free</td>
+   </tr>
+   <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">private</span>&nbsp;<span class="kw">static</span>&nbsp;<a href="../../../../../../system/content/System.Base/doc/class_UniquePtr_T_793F841C13E9DD3A6869243C74F1D948C0E04009.html">UniquePtr</a>&lt;<a href="../../cmsxk/doc/class_SessionTable_0229EAA01B2020C9F4215D1AA65EA1CED86FB762.html">SessionTable</a>></td>
+    <td xml:space="preserve">instance</td>
+   </tr>
+   <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">private</span>&nbsp;<span class="kw">int</span></td>
+    <td xml:space="preserve">nextFreeSessionSlot</td>
+   </tr>
+   <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">private</span>&nbsp;<span class="kw">int</span></td>
+    <td xml:space="preserve">nextSid</td>
+   </tr>
+   <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">private</span>&nbsp;<a href="../../../../../../system/content/System.Base/doc/class_HashMap_K_T_H_C_D555F9108F5700505E1FCCC02041016E58EE9314.html">HashMap</a>&lt;<span class="kw">int</span>, <a href="../../cmsxk/doc/class_Session_C9D9466418A5AF8E2E4E37FFAB6C2E58DE04C2DB.html">Session</a>*, <a href="../../../../../../system/content/System.Base/doc/class_Hasher_T_9E06FCD9B56B8B3B7E7F8286BE8179D3B1CB8325.html">Hasher</a>&lt;<span class="kw">int</span>>, <a href="../../../../../../system/content/System.Base/doc/class_EqualTo_T_763B7164C155EA5D8436A30331F33E4E7267599E.html">EqualTo</a>&lt;<span class="kw">int</span>>></td>
+    <td xml:space="preserve">sessionMap</td>
+   </tr>
+   <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">private</span>&nbsp;<a href="../../cmsxk/doc/class_Session_C9D9466418A5AF8E2E4E37FFAB6C2E58DE04C2DB.html">Session</a>[128]</td>
+    <td xml:space="preserve">sessions</td>
+   </tr>
+  </table>
+  <h2>Constructor&amp; Destructor Details</h2>
+  <h3 id="static_constructor_SessionTable_93200D6853CDE5BDD3DF279D7B43ADDF1C61201F" xml:space="preserve">SessionTable&nbsp;Static Constructor</h3>
+  <h4 xml:space="preserve"><span class="kw">static</span>&nbsp;SessionTable()</h4>
+  <h5>Definition</h5>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/Session.cm.html#23">23</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/Session.cm.html">cmsxk/Session.cm</a></span>
+  <br/>
+  <br/>
+  <hr/>
+  <h3 id="default_constructor_SessionTable_1448A5A2248178D14D387970373AD3250CC25357" xml:space="preserve">SessionTable&nbsp;Constructor</h3>
+  <h4 xml:space="preserve"><span class="kw">private</span>&nbsp;<span class="kw">nothrow</span>&nbsp;SessionTable()</h4>
+  <h5>Definition</h5>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/Session.cm.html#30">30</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/Session.cm.html">cmsxk/Session.cm</a></span>
+  <br/>
+  <br/>
+  <hr/>
+  <h2>Member Function Details</h2>
+  <h3 id="member_function_CreateSession_SessionTable_F4BBE9BC643BBE2E622E84211AFE150E21E62EEE" xml:space="preserve">CreateSession&nbsp;Member Function</h3>
+  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<a href="../../cmsxk/doc/class_Session_C9D9466418A5AF8E2E4E37FFAB6C2E58DE04C2DB.html">Session</a>*&nbsp;CreateSession()</h4>
+  <h5>Definition</h5>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/Session.cm.html#33">33</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/Session.cm.html">cmsxk/Session.cm</a></span>
+  <br/>
+  <br/>
+  <hr/>
+  <h3 id="member_function_FreeSession_SessionTable_9EBB2370F83164948AA4318C9846FC5031C026B5" xml:space="preserve">FreeSession&nbsp;Member Function</h3>
+  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">void</span>&nbsp;FreeSession(<a href="../../cmsxk/doc/class_Session_C9D9466418A5AF8E2E4E37FFAB6C2E58DE04C2DB.html">Session</a>*&nbsp;session)</h4>
+  <h5>Definition</h5>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/Session.cm.html#54">54</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/Session.cm.html">cmsxk/Session.cm</a></span>
+  <br/>
+  <br/>
+  <hr/>
+  <h3 id="member_function_GetSession_SessionTable_12D6423F22447DB02076CE857A0170F7E3EFB0EA" xml:space="preserve">GetSession&nbsp;Member Function</h3>
+  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<a href="../../cmsxk/doc/class_Session_C9D9466418A5AF8E2E4E37FFAB6C2E58DE04C2DB.html">Session</a>*&nbsp;GetSession(<span class="kw">int</span>&nbsp;sid)</h4>
+  <h5>Definition</h5>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/Session.cm.html#61">61</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/Session.cm.html">cmsxk/Session.cm</a></span>
+  <br/>
+  <br/>
+  <hr/>
+  <h3 id="member_function_Instance_SessionTable_78C6E02428111C549169CD054ED7A17D8FD41937" xml:space="preserve">Instance&nbsp;Static Member Function</h3>
+  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">static</span>&nbsp;<a href="../../cmsxk/doc/class_SessionTable_0229EAA01B2020C9F4215D1AA65EA1CED86FB762.html">SessionTable</a>&amp;&nbsp;Instance()</h4>
+  <h5>Definition</h5>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/Session.cm.html#26">26</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/Session.cm.html">cmsxk/Session.cm</a></span>
+  <br/>
+  <br/>
+  <hr/>
+ </body>
+</html>

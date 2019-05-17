@@ -12,7 +12,7 @@
   <table>
    <tr>
     <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span></td>
-    <td xml:space="preserve"><a href="../../cmsxi/doc/class_Function_4610EE771813274E953E4489341937E7A4170B6C.html#constructor_Function_1ACAE3B10B26656F401724697C048F01974DF24C">Function</a>(<a href="../../cmsxi/doc/class_Context_626104DB77A27C849A57E15345A750ACBB9AA96A.html">Context</a>&amp;&nbsp;context_, <a href="../../cmsxi/doc/class_FunctionType_1BC9B539BE3FDBFBC0363FB7160BB9736CBA69C7.html">FunctionType</a>*&nbsp;type_, <span class="kw">const</span>&nbsp;<a href="../../../../../../system/content/System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html">String</a>&lt;<span class="kw">char</span>>&amp;&nbsp;name_)</td>
+    <td xml:space="preserve"><a href="../../cmsxi/doc/class_Function_4610EE771813274E953E4489341937E7A4170B6C.html#constructor_Function_948D878996416941EE6881402FC55A684B388A7C">Function</a>(<a href="../../cmsxi/doc/class_Context_626104DB77A27C849A57E15345A750ACBB9AA96A.html">Context</a>&amp;&nbsp;context_, <a href="../../cmsxi/doc/class_FunctionType_1BC9B539BE3FDBFBC0363FB7160BB9736CBA69C7.html">FunctionType</a>*&nbsp;type_, <span class="kw">const</span>&nbsp;<a href="../../../../../../system/content/System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html">String</a>&lt;<span class="kw">char</span>>&amp;&nbsp;name_, <span class="kw">bool</span>&nbsp;once_, <a href="../../cmsxi/doc/class_MDStructRef_26072651C07C7EB988246DBF2A99C4FA35C94CD7.html">MDStructRef</a>*&nbsp;md_)</td>
    </tr>
   </table>
   <h2>Member Functions</h2>
@@ -20,6 +20,10 @@
    <tr>
     <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<a href="../../cmsxi/doc/class_BasicBlock_DF255E7A633F93AC88501B4027F2A2969533A06F.html">BasicBlock</a>*</td>
     <td xml:space="preserve"><a href="../../cmsxi/doc/class_Function_4610EE771813274E953E4489341937E7A4170B6C.html#member_function_AddBasicBlock_Function_AAD8F04606BB81E8F1E7E0F3FC00E6D781226B58">AddBasicBlock</a>(<span class="kw">uint</span>&nbsp;id)</td>
+   </tr>
+   <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">void</span></td>
+    <td xml:space="preserve"><a href="../../cmsxi/doc/class_Function_4610EE771813274E953E4489341937E7A4170B6C.html#member_function_CombineBasicBlocks_Function_444DC91F1CF1FF513DD8A9ED12FF6F7676CC6039">CombineBasicBlocks</a>()</td>
    </tr>
    <tr>
     <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span></td>
@@ -93,7 +97,7 @@
     <td xml:space="preserve">addressDescriptors</td>
    </tr>
    <tr>
-    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">private</span>&nbsp;<a href="../../../../../../system/content/System.Base/doc/class_List_T_4E42CF5913BEB21F5260DEFEC239180C94460B11.html">List</a>&lt;<a href="../../../../../../system/content/System.Base/doc/class_UniquePtr_T_793F841C13E9DD3A6869243C74F1D948C0E04009.html">UniquePtr</a>&lt;<a href="../../cmsxi/doc/class_BasicBlock_DF255E7A633F93AC88501B4027F2A2969533A06F.html">BasicBlock</a>>></td>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<a href="../../../../../../system/content/System.Base/doc/class_List_T_4E42CF5913BEB21F5260DEFEC239180C94460B11.html">List</a>&lt;<a href="../../../../../../system/content/System.Base/doc/class_UniquePtr_T_793F841C13E9DD3A6869243C74F1D948C0E04009.html">UniquePtr</a>&lt;<a href="../../cmsxi/doc/class_BasicBlock_DF255E7A633F93AC88501B4027F2A2969533A06F.html">BasicBlock</a>>></td>
     <td xml:space="preserve">basicBlocks</td>
    </tr>
    <tr>
@@ -103,6 +107,14 @@
    <tr>
     <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<a href="../../cmsxi/doc/class_BasicBlock_DF255E7A633F93AC88501B4027F2A2969533A06F.html">BasicBlock</a></td>
     <td xml:space="preserve">epilog</td>
+   </tr>
+   <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<a href="../../cmsxi/doc/class_FrameLocations_4292E1F122A69D56490B2221D56FC67C793E7823.html">FrameLocations</a></td>
+    <td xml:space="preserve">frameLocations</td>
+   </tr>
+   <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">ulong</span></td>
+    <td xml:space="preserve">frameSize</td>
    </tr>
    <tr>
     <td class="rightAlignedCol" xml:space="preserve"><span class="kw">private</span>&nbsp;<a href="../../cmsxi/doc/class_LiteralOperand_7FE2403AC52465CB5E9F4B0F9CD0986E2B93E627.html">LiteralOperand</a>*</td>
@@ -117,8 +129,8 @@
     <td xml:space="preserve">instructionMap</td>
    </tr>
    <tr>
-    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<a href="../../cmsxi/doc/class_Locations_F959858BD6892204EDC9D8A10B7495AD2921B004.html">Locations</a></td>
-    <td xml:space="preserve">locations</td>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<a href="../../cmsxi/doc/class_MDStructRef_26072651C07C7EB988246DBF2A99C4FA35C94CD7.html">MDStructRef</a>*</td>
+    <td xml:space="preserve">md</td>
    </tr>
    <tr>
     <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<a href="../../../../../../system/content/System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html">String</a>&lt;<span class="kw">char</span>></td>
@@ -137,8 +149,16 @@
     <td xml:space="preserve">nextValueNumber</td>
    </tr>
    <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">private</span>&nbsp;<span class="kw">bool</span></td>
+    <td xml:space="preserve">once</td>
+   </tr>
+   <tr>
     <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<a href="../../cmsxi/doc/class_BasicBlock_DF255E7A633F93AC88501B4027F2A2969533A06F.html">BasicBlock</a></td>
     <td xml:space="preserve">prolog</td>
+   </tr>
+   <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<a href="../../../../../../system/content/System.Base/doc/class_List_T_4E42CF5913BEB21F5260DEFEC239180C94460B11.html">List</a>&lt;<a href="../../cmsxi/doc/class_ParamInstruction_805B3BFA4FFB1600D5C8F63F77BC29989D74FC4F.html">ParamInstruction</a>*></td>
+    <td xml:space="preserve">regParams</td>
    </tr>
    <tr>
     <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<a href="../../cmsxi/doc/class_FunctionType_1BC9B539BE3FDBFBC0363FB7160BB9736CBA69C7.html">FunctionType</a>*</td>
@@ -150,8 +170,8 @@
    </tr>
   </table>
   <h2>Constructor&amp; Destructor Details</h2>
-  <h3 id="constructor_Function_1ACAE3B10B26656F401724697C048F01974DF24C" xml:space="preserve">Function&nbsp;Constructor</h3>
-  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;Function(<a href="../../cmsxi/doc/class_Context_626104DB77A27C849A57E15345A750ACBB9AA96A.html">Context</a>&amp;&nbsp;context_, <a href="../../cmsxi/doc/class_FunctionType_1BC9B539BE3FDBFBC0363FB7160BB9736CBA69C7.html">FunctionType</a>*&nbsp;type_, <span class="kw">const</span>&nbsp;<a href="../../../../../../system/content/System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html">String</a>&lt;<span class="kw">char</span>>&amp;&nbsp;name_)</h4>
+  <h3 id="constructor_Function_948D878996416941EE6881402FC55A684B388A7C" xml:space="preserve">Function&nbsp;Constructor</h3>
+  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;Function(<a href="../../cmsxi/doc/class_Context_626104DB77A27C849A57E15345A750ACBB9AA96A.html">Context</a>&amp;&nbsp;context_, <a href="../../cmsxi/doc/class_FunctionType_1BC9B539BE3FDBFBC0363FB7160BB9736CBA69C7.html">FunctionType</a>*&nbsp;type_, <span class="kw">const</span>&nbsp;<a href="../../../../../../system/content/System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html">String</a>&lt;<span class="kw">char</span>>&amp;&nbsp;name_, <span class="kw">bool</span>&nbsp;once_, <a href="../../cmsxi/doc/class_MDStructRef_26072651C07C7EB988246DBF2A99C4FA35C94CD7.html">MDStructRef</a>*&nbsp;md_)</h4>
   <h5>Definition</h5>
   <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxi/file/Function.cm.html#12">12</a>&nbsp;of&nbsp;<a href="../../cmsxi/file/Function.cm.html">cmsxi/Function.cm</a></span>
   <br/>
@@ -165,38 +185,45 @@
   <br/>
   <br/>
   <hr/>
+  <h3 id="member_function_CombineBasicBlocks_Function_444DC91F1CF1FF513DD8A9ED12FF6F7676CC6039" xml:space="preserve">CombineBasicBlocks&nbsp;Member Function</h3>
+  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">void</span>&nbsp;CombineBasicBlocks()</h4>
+  <h5>Definition</h5>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxi/file/Function.cm.html#253">253</a>&nbsp;of&nbsp;<a href="../../cmsxi/file/Function.cm.html">cmsxi/Function.cm</a></span>
+  <br/>
+  <br/>
+  <hr/>
   <h3 id="member_function_ComputeLivenessAndNextUse_Function_98A096A35FD734A75A71FB44B0BCABB1D7923163" xml:space="preserve">ComputeLivenessAndNextUse&nbsp;Member Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span>&nbsp;ComputeLivenessAndNextUse()</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxi/file/Function.cm.html#157">157</a>&nbsp;of&nbsp;<a href="../../cmsxi/file/Function.cm.html">cmsxi/Function.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxi/file/Function.cm.html#162">162</a>&nbsp;of&nbsp;<a href="../../cmsxi/file/Function.cm.html">cmsxi/Function.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="member_function_CreateEpilog_Function_51B5A6438B38DD757FFF0273709BF174DF4BFFF6" xml:space="preserve">CreateEpilog&nbsp;Member Function</h3>
   <h4 xml:space="preserve"><span class="kw">private</span>&nbsp;<span class="kw">void</span>&nbsp;CreateEpilog(<a href="../../cmsxi/doc/class_MachineCode_DB0C1263C7B40380BA26404218C7D5773F3B36BA.html">MachineCode</a>&amp;&nbsp;machineCode)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxi/file/Function.cm.html#209">209</a>&nbsp;of&nbsp;<a href="../../cmsxi/file/Function.cm.html">cmsxi/Function.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxi/file/Function.cm.html#240">240</a>&nbsp;of&nbsp;<a href="../../cmsxi/file/Function.cm.html">cmsxi/Function.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="member_function_CreateProlog_Function_E314CD149570F63701A02A568DE8A894D333B3BD" xml:space="preserve">CreateProlog&nbsp;Member Function</h3>
   <h4 xml:space="preserve"><span class="kw">private</span>&nbsp;<span class="kw">void</span>&nbsp;CreateProlog(<a href="../../cmsxi/doc/class_MachineCode_DB0C1263C7B40380BA26404218C7D5773F3B36BA.html">MachineCode</a>&amp;&nbsp;machineCode)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxi/file/Function.cm.html#193">193</a>&nbsp;of&nbsp;<a href="../../cmsxi/file/Function.cm.html">cmsxi/Function.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxi/file/Function.cm.html#224">224</a>&nbsp;of&nbsp;<a href="../../cmsxi/file/Function.cm.html">cmsxi/Function.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="member_function_GenerateCode_Function_6A0761498FAF159DFD711DED664756C6E57BC045" xml:space="preserve">GenerateCode&nbsp;Member Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">void</span>&nbsp;GenerateCode(<a href="../../cmsxi/doc/class_MachineCode_DB0C1263C7B40380BA26404218C7D5773F3B36BA.html">MachineCode</a>&amp;&nbsp;machineCode, <a href="../../../../../../system/content/System.Base/doc/class_CodeFormatter_38898A0914E7D27753F0D42E65A18EC272984F99.html">CodeFormatter</a>&amp;&nbsp;formatter)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxi/file/Function.cm.html#169">169</a>&nbsp;of&nbsp;<a href="../../cmsxi/file/Function.cm.html">cmsxi/Function.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxi/file/Function.cm.html#182">182</a>&nbsp;of&nbsp;<a href="../../cmsxi/file/Function.cm.html">cmsxi/Function.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="member_function_GenerateDeclaration_Function_69EF24743B03F7BFBAB497BA7055EA6B569FE758" xml:space="preserve">GenerateDeclaration&nbsp;Member Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">void</span>&nbsp;GenerateDeclaration(<a href="../../cmsxi/doc/class_MachineCode_DB0C1263C7B40380BA26404218C7D5773F3B36BA.html">MachineCode</a>&amp;&nbsp;machineCode)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxi/file/Function.cm.html#164">164</a>&nbsp;of&nbsp;<a href="../../cmsxi/file/Function.cm.html">cmsxi/Function.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxi/file/Function.cm.html#169">169</a>&nbsp;of&nbsp;<a href="../../cmsxi/file/Function.cm.html">cmsxi/Function.cm</a></span>
   <br/>
   <br/>
   <hr/>
@@ -210,21 +237,21 @@
   <h3 id="member_function_GetNextArgIndex_Function_4B0E466E8D6A1BF44A6B9D08D4654C0AAB778C27" xml:space="preserve">GetNextArgIndex&nbsp;Member Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">inline</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">int</span>&nbsp;GetNextArgIndex()</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxi/file/Function.cm.html#149">149</a>&nbsp;of&nbsp;<a href="../../cmsxi/file/Function.cm.html">cmsxi/Function.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxi/file/Function.cm.html#154">154</a>&nbsp;of&nbsp;<a href="../../cmsxi/file/Function.cm.html">cmsxi/Function.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="member_function_GetNextInstructionIndex_Function_56B566ADF3A6E0E092FA4B9BF5244B1746DA7ED2" xml:space="preserve">GetNextInstructionIndex&nbsp;Member Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">inline</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">int</span>&nbsp;GetNextInstructionIndex()</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxi/file/Function.cm.html#141">141</a>&nbsp;of&nbsp;<a href="../../cmsxi/file/Function.cm.html">cmsxi/Function.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxi/file/Function.cm.html#146">146</a>&nbsp;of&nbsp;<a href="../../cmsxi/file/Function.cm.html">cmsxi/Function.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="member_function_GetNextValueNumber_Function_574C3C818E1435A78C79B18C2DC16638CF49A527" xml:space="preserve">GetNextValueNumber&nbsp;Member Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">inline</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">int</span>&nbsp;GetNextValueNumber()</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxi/file/Function.cm.html#145">145</a>&nbsp;of&nbsp;<a href="../../cmsxi/file/Function.cm.html">cmsxi/Function.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxi/file/Function.cm.html#150">150</a>&nbsp;of&nbsp;<a href="../../cmsxi/file/Function.cm.html">cmsxi/Function.cm</a></span>
   <br/>
   <br/>
   <hr/>
@@ -259,7 +286,7 @@
   <h3 id="member_function_ResetNextArgIndex_Function_E62F71F79670D93A12AF86A1E195EAB182BB3ADD" xml:space="preserve">ResetNextArgIndex&nbsp;Member Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">inline</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span>&nbsp;ResetNextArgIndex()</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxi/file/Function.cm.html#153">153</a>&nbsp;of&nbsp;<a href="../../cmsxi/file/Function.cm.html">cmsxi/Function.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxi/file/Function.cm.html#158">158</a>&nbsp;of&nbsp;<a href="../../cmsxi/file/Function.cm.html">cmsxi/Function.cm</a></span>
   <br/>
   <br/>
   <hr/>

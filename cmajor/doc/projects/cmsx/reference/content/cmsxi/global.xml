@@ -3,11 +3,11 @@
         <baseClass classId="class_BinaryInstruction_08C442F5ED9A7D52121855254F6041AB7638A2E6">
             <derivedClass classId="class_AddInstruction_0B16B30C9897CAC555F57BB71D50D23F14560991"/>
             <derivedClass classId="class_AndInstruction_7D8B9FE1E6398AD3263DEBB95835DD51930F045E"/>
-            <derivedClass classId="class_ShlInstruction_3FA5AE59780212F9F39EAFDE04E40BC3DED730A3"/>
-            <derivedClass classId="class_MulInstruction_39816FCB8CD7660853CBE82E1EB198FD4EF4916F"/>
             <derivedClass classId="class_DivInstruction_4E48982E8D214590A5940C6733B43677A26880A7"/>
-            <derivedClass classId="class_ModInstruction_58BA0F21F75CEC55AD8B6A29C0471C202108B159"/>
+            <derivedClass classId="class_MulInstruction_39816FCB8CD7660853CBE82E1EB198FD4EF4916F"/>
+            <derivedClass classId="class_ShlInstruction_3FA5AE59780212F9F39EAFDE04E40BC3DED730A3"/>
             <derivedClass classId="class_EqualInstruction_923BD0DEA90221CBB0F457E6AAA23A0F93265533"/>
+            <derivedClass classId="class_ModInstruction_58BA0F21F75CEC55AD8B6A29C0471C202108B159"/>
             <derivedClass classId="class_LessInstruction_3CA7A9F9878AC16CC962AF9DC1193FF4EE8851ED"/>
             <derivedClass classId="class_OrInstruction_336769D20B8FA6267A18231AE3831856D6465B48"/>
             <derivedClass classId="class_ShrInstruction_DA68839D5B1ADE7D105AEFA0C18F6D1E18132266"/>
@@ -18,9 +18,85 @@
             <derivedClass classId="class_AggregateType_51D2C347BD7D8684C3EF4AF3E3332A5484E5ADF7"/>
             <derivedClass classId="class_ScalarType_5341F9001A6FFDDF82FD76BC23120B1D83899F59"/>
         </baseClass>
-        <baseClass classId="class_Location_BE5B0B4F6121C4382E496712B4F67F5152B95437">
-            <derivedClass classId="class_MemoryLocation_9EA8F174A6AEB6FFA1B4C51FB4A35E2CD3B55280"/>
-            <derivedClass classId="class_Register_7971689F6E9F4EC50736F8814BD96321B11B0DE6"/>
+        <baseClass classId="class_ConstantValue_6CBE7195C18A92AA788961FEB9859AF11A2CA755">
+            <derivedClass classId="class_AggregateValue_E29E107A41FC02B5858FD93FD1825EB5783627D2"/>
+            <derivedClass classId="class_ClsIdValue_FD276061C5F59451C712E3FBDD4D1934EEBF3894"/>
+            <derivedClass classId="class_ConversionValue_EC3CA0C06F4A14896431B29C0E313598C5A05AD3"/>
+            <derivedClass classId="class_LiteralValue_006CAA6E1EE9CC77613D2DAB1C0AB5A26A1C4ED9"/>
+            <derivedClass classId="class_PtrValue_68E803AF38D536593E2D81031FCDF6CFE8BBE78F"/>
+            <derivedClass classId="class_StringValue_11FBA4F2B7E89F699C5EA8DF35629D1D77930FDB"/>
+            <derivedClass classId="class_SymbolValue_6012FED2F52BFDE4E970311F55551FE8DA1D1471"/>
+        </baseClass>
+        <baseClass classId="class_AggregateValue_E29E107A41FC02B5858FD93FD1825EB5783627D2">
+            <derivedClass classId="class_ArrayValue_EEF0C9382F538AEDF258F1F8F76F8E1B07D21C9D"/>
+            <derivedClass classId="class_StructureValue_BAFF1F85DE90EAA78180C3A5DD601028C90CADE0"/>
+        </baseClass>
+        <baseClass classId="class_ValueInstruction_417B4E9734C5B191C070E73F51D43C8545054B69">
+            <derivedClass classId="class_BinaryInstruction_08C442F5ED9A7D52121855254F6041AB7638A2E6"/>
+            <derivedClass classId="class_ElemAddrInstruction_3834E2AD56BCC2E27A51A96A92D17486F2C1408B"/>
+            <derivedClass classId="class_UnaryInstruction_83DFD4DD0B93E1F3583BA15151745AA9DF839635"/>
+            <derivedClass classId="class_FunctionCallInstruction_D52079DBA3BE58C3F0641F5E4EC76A8EC789D158"/>
+            <derivedClass classId="class_LocalInstruction_7E0436EB9D76A7661F6823E59DED6004A7358F23"/>
+            <derivedClass classId="class_ParamInstruction_805B3BFA4FFB1600D5C8F63F77BC29989D74FC4F"/>
+            <derivedClass classId="class_TrapInstruction_0D64725C22BFE6EBF7678B8DDAFAC6B9223B5E92"/>
+            <derivedClass classId="class_LoadInstruction_B530E075DCF44DFAACB54BDBD6A0EF22892D39BB"/>
+            <derivedClass classId="class_PtrDiffInstruction_3C87B69AEAD3D5898F21B768971AAA6E4BFACFC3"/>
+            <derivedClass classId="class_PtrOffsetInstruction_733661BF8D265FD0B1E1A50054F0A87738556F6F"/>
+        </baseClass>
+        <baseClass classId="class_Instruction_5E05DB58E4B1651C9C3A965474ED1B4E9BB774F7">
+            <derivedClass classId="class_ArgInstruction_334E473535551F11DB88F79CB6952BC833BAADF2"/>
+            <derivedClass classId="class_NoOperationInstruction_5BECEC50DA56A252E12BFBC7F7F351B79D425233"/>
+            <derivedClass classId="class_ValueInstruction_417B4E9734C5B191C070E73F51D43C8545054B69"/>
+            <derivedClass classId="class_ProcedureCallInstruction_131FDA3D39C9399AE34FD808B9BF6DB69B8EDDC2"/>
+            <derivedClass classId="class_SaveInstruction_DC035B16DBCB4AFAFE646180CDB718017759FE5F"/>
+            <derivedClass classId="class_StoreInstruction_6FCE8FED07DA28924AFA8415525D7FD125F83554"/>
+            <derivedClass classId="class_TerminatorInstruction_1454E78CD531C17EB8C9D99CA2E9331DB79537B2"/>
+        </baseClass>
+        <baseClass classId="class_AggregateType_51D2C347BD7D8684C3EF4AF3E3332A5484E5ADF7">
+            <derivedClass classId="class_ArrayType_6929064D09BB7E71B65C1D3ECBE473E25C04D0EF"/>
+            <derivedClass classId="class_FunctionType_1BC9B539BE3FDBFBC0363FB7160BB9736CBA69C7"/>
+            <derivedClass classId="class_StructureType_31431E5648AD6EEE03D36C6DBEC299ADAD96CA6D"/>
+        </baseClass>
+        <baseClass classId="class_Operand_2425BC89158F8E5670C9742FBDFCAE1C588EF162">
+            <derivedClass classId="class_ClsIdOperand_71E5AF3849F4245737B5E4C9CFDEB7FC950DDA41"/>
+            <derivedClass classId="class_Location_BE5B0B4F6121C4382E496712B4F67F5152B95437"/>
+            <derivedClass classId="class_FloatingLiteralOperand_BD4EA7113AF77C34A632052EE6DE9F43A2635EB8"/>
+            <derivedClass classId="class_LiteralOperand_7FE2403AC52465CB5E9F4B0F9CD0986E2B93E627"/>
+            <derivedClass classId="class_StringOperand_048C360386E816D4E9847F7CE7B3BDE10C81600E"/>
+            <derivedClass classId="class_SymbolOperand_30D5FD9BD886AA7A72BAA0EDA260A90E9F26366D"/>
+        </baseClass>
+        <baseClass classId="class_UnaryInstruction_83DFD4DD0B93E1F3583BA15151745AA9DF839635">
+            <derivedClass classId="class_BitCastInstruction_0DFE589DF2F64E1988E1854FF9EB4A02D72BF89F"/>
+            <derivedClass classId="class_IntToFloatInstruction_9DA26DE1992B1FEFA92BACE1E6D44DEBA2F018E9"/>
+            <derivedClass classId="class_TruncateInstruction_B22EF09C6EBE2155A1B2CF8575D726740281BCAA"/>
+            <derivedClass classId="class_FloatToIntInstruction_EB7C8C7569608621D19BD776DC6F11B228CAC34B"/>
+            <derivedClass classId="class_IntToPtrInstruction_BF9B98A1CD09DE7C2E357FEDA391233200D18AC3"/>
+            <derivedClass classId="class_NegInstruction_488EF344D5729AA5AB8D574DA3F27ED289BDBA12"/>
+            <derivedClass classId="class_NotInstruction_A35DFCD9C51C7775A539653F67EF5C1BBAF6F211"/>
+            <derivedClass classId="class_PtrToIntInstruction_2823760026B2F5090BC7AB36A3D07B0791CCA539"/>
+            <derivedClass classId="class_SignExtendInstruction_1004F75A8D85849750C671247EA722F0EA502FEE"/>
+            <derivedClass classId="class_ZeroExtendInstruction_BAF183E9484C28A803CAB87844250BF17FB97DF4"/>
+        </baseClass>
+        <baseClass classId="class_ScalarType_5341F9001A6FFDDF82FD76BC23120B1D83899F59">
+            <derivedClass classId="class_BoolType_00E85F1C6859641D35CB3E07242DBB19F26539C0"/>
+            <derivedClass classId="class_VoidType_91AFF78E25104A6173AE68390DA2491609F7C592"/>
+            <derivedClass classId="class_FloatingType_3322427DD690E73BB5742929515818DB26EB3E3E"/>
+            <derivedClass classId="class_IntegerType_B0834ABB9B82C74D13793706188813AE3154F0F6"/>
+            <derivedClass classId="class_PtrType_5CD5EAEDC7CAABDE88E0B1558B74D9F720333864"/>
+        </baseClass>
+        <baseClass classId="class_LiteralValue_006CAA6E1EE9CC77613D2DAB1C0AB5A26A1C4ED9">
+            <derivedClass classId="class_BoolValue_205C2DAEDFB80B6931D2E810BBDF7E6A16E9CD54"/>
+            <derivedClass classId="class_IntValue_91DF1E8EB01EB04DC64C21BF2D2D7E508360B691"/>
+            <derivedClass classId="class_NullValue_2BE4E68C1D93881AD0994C53C2E42EF5155565D8"/>
+            <derivedClass classId="class_ByteValue_7115CF5E68332E8ADA8BADEB356B893B5C61B5D1"/>
+            <derivedClass classId="class_DoubleValue_25546824C5571F8B04A0FB46A71BB3EBB8296DED"/>
+            <derivedClass classId="class_FloatValue_ABC1F20FB0D3B0F1804659B27CD7D6B7FC29554B"/>
+            <derivedClass classId="class_LongValue_2F8A26DC1D25D30EB96F33EAA7B3E2DC3FFB9E5F"/>
+            <derivedClass classId="class_ShortValue_87B3415FDEC7C98960533A6CBA5FC52A644387F0"/>
+            <derivedClass classId="class_SByteValue_1B481216AE0861E4AF18C29D7966870EDA74EA07"/>
+            <derivedClass classId="class_UIntValue_5292BA4E650BBCD809C006E6F252E4CCFE13AE4D"/>
+            <derivedClass classId="class_ULongValue_FA9640B50B01DFFB90B95206825ECB112548D967"/>
+            <derivedClass classId="class_UShortValue_E416282C50A294FD452C16D78E8CB375028578A9"/>
         </baseClass>
         <baseClass classId="class_TerminatorInstruction_1454E78CD531C17EB8C9D99CA2E9331DB79537B2">
             <derivedClass classId="class_BranchInstruction_84824F5FF566321186797BD8E7AAFA28DDFC9823"/>
@@ -28,111 +104,61 @@
             <derivedClass classId="class_RetInstruction_4EA5EBB4A2623792AA41B08C80648829BA0C446D"/>
             <derivedClass classId="class_SwitchInstruction_5CC05C5ABBF0EF6085A6B66BC1806650562AE67F"/>
         </baseClass>
-        <baseClass classId="class_Instruction_5E05DB58E4B1651C9C3A965474ED1B4E9BB774F7">
-            <derivedClass classId="class_ArgInstruction_334E473535551F11DB88F79CB6952BC833BAADF2"/>
-            <derivedClass classId="class_ProcedureCallInstruction_131FDA3D39C9399AE34FD808B9BF6DB69B8EDDC2"/>
-            <derivedClass classId="class_StoreInstruction_6FCE8FED07DA28924AFA8415525D7FD125F83554"/>
-            <derivedClass classId="class_TerminatorInstruction_1454E78CD531C17EB8C9D99CA2E9331DB79537B2"/>
-            <derivedClass classId="class_ValueInstruction_417B4E9734C5B191C070E73F51D43C8545054B69"/>
-        </baseClass>
-        <baseClass classId="class_AggregateType_51D2C347BD7D8684C3EF4AF3E3332A5484E5ADF7">
-            <derivedClass classId="class_ArrayType_6929064D09BB7E71B65C1D3ECBE473E25C04D0EF"/>
-            <derivedClass classId="class_StructureType_31431E5648AD6EEE03D36C6DBEC299ADAD96CA6D"/>
-            <derivedClass classId="class_FunctionType_1BC9B539BE3FDBFBC0363FB7160BB9736CBA69C7"/>
-        </baseClass>
-        <baseClass classId="class_ValueInstruction_417B4E9734C5B191C070E73F51D43C8545054B69">
-            <derivedClass classId="class_BinaryInstruction_08C442F5ED9A7D52121855254F6041AB7638A2E6"/>
-            <derivedClass classId="class_ElemAddrInstruction_3834E2AD56BCC2E27A51A96A92D17486F2C1408B"/>
-            <derivedClass classId="class_TrapInstruction_0D64725C22BFE6EBF7678B8DDAFAC6B9223B5E92"/>
-            <derivedClass classId="class_LocalInstruction_7E0436EB9D76A7661F6823E59DED6004A7358F23"/>
-            <derivedClass classId="class_ParamInstruction_805B3BFA4FFB1600D5C8F63F77BC29989D74FC4F"/>
-            <derivedClass classId="class_UnaryInstruction_83DFD4DD0B93E1F3583BA15151745AA9DF839635"/>
-            <derivedClass classId="class_FunctionCallInstruction_D52079DBA3BE58C3F0641F5E4EC76A8EC789D158"/>
-            <derivedClass classId="class_LoadInstruction_B530E075DCF44DFAACB54BDBD6A0EF22892D39BB"/>
-            <derivedClass classId="class_PtrDiffInstruction_3C87B69AEAD3D5898F21B768971AAA6E4BFACFC3"/>
-            <derivedClass classId="class_PtrOffsetInstruction_733661BF8D265FD0B1E1A50054F0A87738556F6F"/>
-        </baseClass>
-        <baseClass classId="class_ConstantValue_6CBE7195C18A92AA788961FEB9859AF11A2CA755">
-            <derivedClass classId="class_FloatValue_ABC1F20FB0D3B0F1804659B27CD7D6B7FC29554B"/>
-            <derivedClass classId="class_ArrayValue_EEF0C9382F538AEDF258F1F8F76F8E1B07D21C9D"/>
-            <derivedClass classId="class_NullValue_2BE4E68C1D93881AD0994C53C2E42EF5155565D8"/>
-            <derivedClass classId="class_IntValue_91DF1E8EB01EB04DC64C21BF2D2D7E508360B691"/>
-            <derivedClass classId="class_BoolValue_205C2DAEDFB80B6931D2E810BBDF7E6A16E9CD54"/>
-            <derivedClass classId="class_ByteValue_7115CF5E68332E8ADA8BADEB356B893B5C61B5D1"/>
-            <derivedClass classId="class_DoubleValue_25546824C5571F8B04A0FB46A71BB3EBB8296DED"/>
-            <derivedClass classId="class_LongValue_2F8A26DC1D25D30EB96F33EAA7B3E2DC3FFB9E5F"/>
-            <derivedClass classId="class_SByteValue_1B481216AE0861E4AF18C29D7966870EDA74EA07"/>
-            <derivedClass classId="class_ShortValue_87B3415FDEC7C98960533A6CBA5FC52A644387F0"/>
-            <derivedClass classId="class_StructureValue_BAFF1F85DE90EAA78180C3A5DD601028C90CADE0"/>
-            <derivedClass classId="class_UIntValue_5292BA4E650BBCD809C006E6F252E4CCFE13AE4D"/>
-            <derivedClass classId="class_ULongValue_FA9640B50B01DFFB90B95206825ECB112548D967"/>
-            <derivedClass classId="class_UShortValue_E416282C50A294FD452C16D78E8CB375028578A9"/>
-        </baseClass>
-        <baseClass classId="class_Operand_2425BC89158F8E5670C9742FBDFCAE1C588EF162">
-            <derivedClass classId="class_FloatingLiteralOperand_BD4EA7113AF77C34A632052EE6DE9F43A2635EB8"/>
-            <derivedClass classId="class_LiteralOperand_7FE2403AC52465CB5E9F4B0F9CD0986E2B93E627"/>
-            <derivedClass classId="class_Location_BE5B0B4F6121C4382E496712B4F67F5152B95437"/>
-            <derivedClass classId="class_SymbolOperand_30D5FD9BD886AA7A72BAA0EDA260A90E9F26366D"/>
-        </baseClass>
-        <baseClass classId="class_UnaryInstruction_83DFD4DD0B93E1F3583BA15151745AA9DF839635">
-            <derivedClass classId="class_TruncateInstruction_B22EF09C6EBE2155A1B2CF8575D726740281BCAA"/>
-            <derivedClass classId="class_IntToFloatInstruction_9DA26DE1992B1FEFA92BACE1E6D44DEBA2F018E9"/>
-            <derivedClass classId="class_BitCastInstruction_0DFE589DF2F64E1988E1854FF9EB4A02D72BF89F"/>
-            <derivedClass classId="class_FloatToIntInstruction_EB7C8C7569608621D19BD776DC6F11B228CAC34B"/>
-            <derivedClass classId="class_IntToPtrInstruction_BF9B98A1CD09DE7C2E357FEDA391233200D18AC3"/>
-            <derivedClass classId="class_PtrToIntInstruction_2823760026B2F5090BC7AB36A3D07B0791CCA539"/>
-            <derivedClass classId="class_NotInstruction_A35DFCD9C51C7775A539653F67EF5C1BBAF6F211"/>
-            <derivedClass classId="class_NegInstruction_488EF344D5729AA5AB8D574DA3F27ED289BDBA12"/>
-            <derivedClass classId="class_SignExtendInstruction_1004F75A8D85849750C671247EA722F0EA502FEE"/>
-            <derivedClass classId="class_ZeroExtendInstruction_BAF183E9484C28A803CAB87844250BF17FB97DF4"/>
-        </baseClass>
-        <baseClass classId="class_ScalarType_5341F9001A6FFDDF82FD76BC23120B1D83899F59">
-            <derivedClass classId="class_VoidType_91AFF78E25104A6173AE68390DA2491609F7C592"/>
-            <derivedClass classId="class_BoolType_00E85F1C6859641D35CB3E07242DBB19F26539C0"/>
-            <derivedClass classId="class_FloatingType_3322427DD690E73BB5742929515818DB26EB3E3E"/>
-            <derivedClass classId="class_IntegerType_B0834ABB9B82C74D13793706188813AE3154F0F6"/>
-            <derivedClass classId="class_PtrType_5CD5EAEDC7CAABDE88E0B1558B74D9F720333864"/>
+        <baseClass classId="class_Location_BE5B0B4F6121C4382E496712B4F67F5152B95437">
+            <derivedClass classId="class_MemoryLocation_9EA8F174A6AEB6FFA1B4C51FB4A35E2CD3B55280"/>
+            <derivedClass classId="class_Register_7971689F6E9F4EC50736F8814BD96321B11B0DE6"/>
         </baseClass>
         <baseClass classId="class_UnsignedIntegerType_00D617321A57A578C66E7A9CBB9AEB71A7AF6FCA">
             <derivedClass classId="class_ByteType_2045DE575B2FD2B24A328C39A563F5125B3B97DB"/>
             <derivedClass classId="class_UIntType_206270708B09DEEC37A656F74C06B210C448B029"/>
-            <derivedClass classId="class_UShortType_67AEF78631C7E7C2C04C1BEEDF47CC71DC142A9F"/>
             <derivedClass classId="class_ULongType_B06B4980803E022EF067B45CBCAFCE00C0E528F1"/>
+            <derivedClass classId="class_UShortType_67AEF78631C7E7C2C04C1BEEDF47CC71DC142A9F"/>
         </baseClass>
         <baseClass classId="class_Value_D184FDC4DCC37461ED1781E875D6610EE22D5D73">
-            <derivedClass classId="class_IdValue_5205C8BD1F67B50DCD771BFC2CD69F04EE8A24D7"/>
             <derivedClass classId="class_ConstantValue_6CBE7195C18A92AA788961FEB9859AF11A2CA755"/>
+            <derivedClass classId="class_IdValue_5205C8BD1F67B50DCD771BFC2CD69F04EE8A24D7"/>
+            <derivedClass classId="class_GlobalVariable_6F9B1DB4548E4E759C97758F6E6010AE21132A8C"/>
             <derivedClass classId="class_Instruction_5E05DB58E4B1651C9C3A965474ED1B4E9BB774F7"/>
-            <derivedClass classId="class_SymbolValue_6012FED2F52BFDE4E970311F55551FE8DA1D1471"/>
         </baseClass>
-        <baseClass classId="class_Register_7971689F6E9F4EC50736F8814BD96321B11B0DE6">
-            <derivedClass classId="class_FP_F3B47A9697C71403BEB5817F792156452DF24A49"/>
-            <derivedClass classId="class_Ix_F76726107DBDF54826878F82CB01ACE551FE8F5F"/>
-            <derivedClass classId="class_LocalRegister_9B85768A575607AEEC42AEE4A5F7D3F2B7BBAA19"/>
-            <derivedClass classId="class_SP_E8A548FC984023B817120A090ED5D4855AAB0AC6"/>
-            <derivedClass classId="class_ParamRegister_F8C2B4279D46A3E7625E652CD81B586786EDEADE"/>
+        <baseClass classId="class_MemoryLocation_9EA8F174A6AEB6FFA1B4C51FB4A35E2CD3B55280">
+            <derivedClass classId="class_DataLocation_A8AAC6AADAB2D49BC82B6E737EB5942BA39EA64A"/>
+            <derivedClass classId="class_FrameLocation_0D2C177BDA20C01C1A3EDA800FEFFD20AFF94190"/>
         </baseClass>
         <baseClass classId="class_FloatingType_3322427DD690E73BB5742929515818DB26EB3E3E">
             <derivedClass classId="class_DoubleType_DF3E582A53924E4123EDA70CA42FB8AF83B1CC95"/>
             <derivedClass classId="class_FloatType_5E5398F88798813EA3882BAE9BBB43926084CD13"/>
         </baseClass>
-        <baseClass classId="class_SignedIntegerType_4253D37F9A43CC5A24B108C70B6E431119A87F04">
-            <derivedClass classId="class_IntType_9F0F3BBDB2BAD41EF1B4F1BEE66BD19C7C7D62A0"/>
-            <derivedClass classId="class_ShortType_EE2EB9A4CF9ED0943AAE1811A9917D8172B01377"/>
-            <derivedClass classId="class_LongType_2EB1B705CBA999E90840DA1C9533DD6501C561D0"/>
-            <derivedClass classId="class_SByteType_9429E744FA26203065A216DC13C8AC745406C78C"/>
+        <baseClass classId="class_Register_7971689F6E9F4EC50736F8814BD96321B11B0DE6">
+            <derivedClass classId="class_FP_F3B47A9697C71403BEB5817F792156452DF24A49"/>
+            <derivedClass classId="class_Ix_F76726107DBDF54826878F82CB01ACE551FE8F5F"/>
+            <derivedClass classId="class_LocalRegister_9B85768A575607AEEC42AEE4A5F7D3F2B7BBAA19"/>
+            <derivedClass classId="class_ParamRegister_F8C2B4279D46A3E7625E652CD81B586786EDEADE"/>
+            <derivedClass classId="class_SP_E8A548FC984023B817120A090ED5D4855AAB0AC6"/>
         </baseClass>
         <baseClass classId="class_FrameLocation_0D2C177BDA20C01C1A3EDA800FEFFD20AFF94190">
-            <derivedClass classId="class_NearFrameLocation_548066652A9D1D01CEA53B6528F6453C2D34CD44"/>
             <derivedClass classId="class_FarFrameLocation_684B6C8DD92A5D6D2053A3B45AAAE6716061945D"/>
+            <derivedClass classId="class_NearFrameLocation_548066652A9D1D01CEA53B6528F6453C2D34CD44"/>
             <derivedClass classId="class_MediumFrameLocation_14E171D34C481865EA76A9F91D9B16A2EE2B789D"/>
         </baseClass>
-        <baseClass classId="class_MemoryLocation_9EA8F174A6AEB6FFA1B4C51FB4A35E2CD3B55280">
-            <derivedClass classId="class_FrameLocation_0D2C177BDA20C01C1A3EDA800FEFFD20AFF94190"/>
+        <baseClass classId="class_SignedIntegerType_4253D37F9A43CC5A24B108C70B6E431119A87F04">
+            <derivedClass classId="class_IntType_9F0F3BBDB2BAD41EF1B4F1BEE66BD19C7C7D62A0"/>
+            <derivedClass classId="class_LongType_2EB1B705CBA999E90840DA1C9533DD6501C561D0"/>
+            <derivedClass classId="class_ShortType_EE2EB9A4CF9ED0943AAE1811A9917D8172B01377"/>
+            <derivedClass classId="class_SByteType_9429E744FA26203065A216DC13C8AC745406C78C"/>
+        </baseClass>
+        <baseClass classId="class_MDItem_2D469459DD4519EBB8FF8D964078020552C634E1">
+            <derivedClass classId="class_MDBool_4C02F234A785E4D82A56D8939C4812BB30435AA2"/>
+            <derivedClass classId="class_MDLong_FAC238F938948412294AA9CC719CD6804446E220"/>
+            <derivedClass classId="class_MDString_300E834F03420CA2662E33B3153EA3062FE75B50"/>
+            <derivedClass classId="class_MDStruct_F2934ED4F15D407F601E7542300C2C8EAC2674BB"/>
+            <derivedClass classId="class_MDStructRef_26072651C07C7EB988246DBF2A99C4FA35C94CD7"/>
         </baseClass>
         <baseClass classId="class_IntegerType_B0834ABB9B82C74D13793706188813AE3154F0F6">
             <derivedClass classId="class_SignedIntegerType_4253D37F9A43CC5A24B108C70B6E431119A87F04"/>
             <derivedClass classId="class_UnsignedIntegerType_00D617321A57A578C66E7A9CBB9AEB71A7AF6FCA"/>
+        </baseClass>
+        <baseClass classId="class_ArrayValue_EEF0C9382F538AEDF258F1F8F76F8E1B07D21C9D">
+            <derivedClass classId="class_StringArrayValue_BD711150A1BD7F77ABB61F9AAE9E1BF413D303A3"/>
         </baseClass>
     </derivedClassMap>
 </global>

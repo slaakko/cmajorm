@@ -4,7 +4,12 @@ int main()
 {
     try
     {
+        Console.WriteLine("sleeping...");
+        TimePoint start = Now();
         Sleep(Duration.FromSeconds(3));
+        TimePoint end = Now();
+        Duration duration = end - start;
+        Console.WriteLine("wake up: " + ToString(duration.Milliseconds()));
     }
     catch (const Exception& ex)
     {

@@ -1,0 +1,98 @@
+using System;
+using System.Threading;
+
+namespace cmsx.kernel
+{
+    private bool log = false;
+    private string file;
+
+    public nothrow bool Log()
+    {
+        return log;
+    }
+
+    public nothrow void SetLog()
+    {
+        log = true;
+    }
+
+    public class LogFileWriter
+    {
+        static LogFileWriter() : instance(new LogFileWriter())
+        {
+        }
+        public static nothrow LogFileWriter& Instance()
+        {
+            return *instance;
+        }
+        private LogFileWriter() : writer(System.IO.File.CreateText(file))
+        {
+        }
+        public void Write(const string& msg)
+        {
+            writer << msg << endl();
+        }
+        private static UniquePtr<LogFileWriter> instance;
+        private System.IO.StreamWriter writer;
+    }
+
+    public nothrow void SetLog(const string& logFile)
+    {
+        log = true;
+        file = logFile;
+    }
+
+    private TimePoint start;
+
+    public nothrow void StartLog()
+    {
+        start = Now();
+    }
+
+    public class LogLock
+    {
+        static LogLock() : instance(new LogLock())
+        {
+        }
+        public static nothrow LogLock& Instance()
+        {
+            return *instance;
+        }
+        public nothrow Mutex& Mtx()
+        {
+            return mtx;
+        }
+        private static UniquePtr<LogLock> instance;
+        private Mutex mtx;
+    }
+
+    public nothrow void LogMessage(const string& method, const string& msg)
+    {
+        LockGuard<Mutex> lock(LogLock.Instance().Mtx());
+        string m;
+        Duration duration = Now() - start;
+        m.Append(DurationStr(duration)).Append(' ');
+        void* fiberData = OsGetFiberData();
+        Process* process = cast<Process*>(fiberData);
+        if (process == null)
+        {
+            m.Append("kernel");
+        }
+        else
+        {
+            m.Append(process->name);
+        }
+        m.Append(' ');
+        m.Append(method);
+        m.Append(' ');
+        m.Append(msg);
+        if (file.IsEmpty())
+        {
+            Console.Out() << m << endl();
+        }
+        else
+        {
+            LogFileWriter.Instance().Write(m);
+        }
+    }
+}

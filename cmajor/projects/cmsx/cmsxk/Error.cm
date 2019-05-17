@@ -5,10 +5,13 @@ namespace cmsx.kernel
     public const int EFAIL = 1;
     public const int EBADF = 2;
     public const int EMEM = 3;
-    public const int RLIMITEXCEEDED = 4;
+    public const int ERLIMITEXCEEDED = 4;
     public const int EINVAL = 5;
     public const int ENOTSUPPORTED = 6;
     public const int EIO = 7;
+    public const int EPERM = 8;
+    public const int EEXIST = 9;
+    public const int ENOENT = 10;
 
     public string ErrorCodeStr(int errorCode)
     {
@@ -17,10 +20,13 @@ namespace cmsx.kernel
             case EFAIL: return "EFAIL";
             case EBADF: return "EBADF";
             case EMEM: return "EMEM";
-            case RLIMITEXCEEDED: return "RLIMITEXCEEDED";
+            case ERLIMITEXCEEDED: return "ERLIMITEXCEEDED";
             case EINVAL: return "EINVAL";
             case ENOTSUPPORTED: return "ENOTSUPPORTED";
             case EIO: return "EIO";
+            case EPERM: return "EPERM";
+            case EEXIST: return "EEXIST";
+            case ENOENT: return "ENOENT";
         }
         return "";
     }
@@ -32,10 +38,13 @@ namespace cmsx.kernel
             case EFAIL: return "Host system failure";
             case EBADF: return "Bad file descriptor";
             case EMEM: return "Memory error";
-            case RLIMITEXCEEDED: return "Resource limit exceeeded";
+            case ERLIMITEXCEEDED: return "Resource limit exceeeded";
             case EINVAL: return "Invalid argument";
             case ENOTSUPPORTED: return "Operation not supported";
             case EIO: return "I/O error";
+            case EPERM: return "Permission denied";
+            case EEXIST : return "Path exists";
+            case ENOENT: return "No such file or directory";
         }
         return "";
     }

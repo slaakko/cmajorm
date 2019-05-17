@@ -273,14 +273,14 @@ function drawInheritanceDiagram() {
         { name: "cmsx.intermediate.ValueInstruction", id: "diagram_node_2", level: 2, subject: true, hasDerivedNodes: true, link: "../../cmsxi/doc/class_ValueInstruction_417B4E9734C5B191C070E73F51D43C8545054B69.html" },
         { name: "cmsx.intermediate.BinaryInstruction", id: "diagram_node_3", level: 3, subject: false, hasDerivedNodes: false, link: "../../cmsxi/doc/class_BinaryInstruction_08C442F5ED9A7D52121855254F6041AB7638A2E6.html" },
         { name: "cmsx.intermediate.ElemAddrInstruction", id: "diagram_node_4", level: 3, subject: false, hasDerivedNodes: false, link: "../../cmsxi/doc/class_ElemAddrInstruction_3834E2AD56BCC2E27A51A96A92D17486F2C1408B.html" },
-        { name: "cmsx.intermediate.FunctionCallInstruction", id: "diagram_node_9", level: 3, subject: false, hasDerivedNodes: false, link: "../../cmsxi/doc/class_FunctionCallInstruction_D52079DBA3BE58C3F0641F5E4EC76A8EC789D158.html" },
+        { name: "cmsx.intermediate.FunctionCallInstruction", id: "diagram_node_6", level: 3, subject: false, hasDerivedNodes: false, link: "../../cmsxi/doc/class_FunctionCallInstruction_D52079DBA3BE58C3F0641F5E4EC76A8EC789D158.html" },
         { name: "cmsx.intermediate.LoadInstruction", id: "diagram_node_10", level: 3, subject: false, hasDerivedNodes: false, link: "../../cmsxi/doc/class_LoadInstruction_B530E075DCF44DFAACB54BDBD6A0EF22892D39BB.html" },
-        { name: "cmsx.intermediate.LocalInstruction", id: "diagram_node_6", level: 3, subject: false, hasDerivedNodes: false, link: "../../cmsxi/doc/class_LocalInstruction_7E0436EB9D76A7661F6823E59DED6004A7358F23.html" },
-        { name: "cmsx.intermediate.ParamInstruction", id: "diagram_node_7", level: 3, subject: false, hasDerivedNodes: false, link: "../../cmsxi/doc/class_ParamInstruction_805B3BFA4FFB1600D5C8F63F77BC29989D74FC4F.html" },
+        { name: "cmsx.intermediate.LocalInstruction", id: "diagram_node_7", level: 3, subject: false, hasDerivedNodes: false, link: "../../cmsxi/doc/class_LocalInstruction_7E0436EB9D76A7661F6823E59DED6004A7358F23.html" },
+        { name: "cmsx.intermediate.ParamInstruction", id: "diagram_node_8", level: 3, subject: false, hasDerivedNodes: false, link: "../../cmsxi/doc/class_ParamInstruction_805B3BFA4FFB1600D5C8F63F77BC29989D74FC4F.html" },
         { name: "cmsx.intermediate.PtrDiffInstruction", id: "diagram_node_11", level: 3, subject: false, hasDerivedNodes: false, link: "../../cmsxi/doc/class_PtrDiffInstruction_3C87B69AEAD3D5898F21B768971AAA6E4BFACFC3.html" },
         { name: "cmsx.intermediate.PtrOffsetInstruction", id: "diagram_node_12", level: 3, subject: false, hasDerivedNodes: false, link: "../../cmsxi/doc/class_PtrOffsetInstruction_733661BF8D265FD0B1E1A50054F0A87738556F6F.html" },
-        { name: "cmsx.intermediate.TrapInstruction", id: "diagram_node_5", level: 3, subject: false, hasDerivedNodes: false, link: "../../cmsxi/doc/class_TrapInstruction_0D64725C22BFE6EBF7678B8DDAFAC6B9223B5E92.html" },
-        { name: "cmsx.intermediate.UnaryInstruction", id: "diagram_node_8", level: 3, subject: false, hasDerivedNodes: false, link: "../../cmsxi/doc/class_UnaryInstruction_83DFD4DD0B93E1F3583BA15151745AA9DF839635.html" }];
+        { name: "cmsx.intermediate.TrapInstruction", id: "diagram_node_9", level: 3, subject: false, hasDerivedNodes: false, link: "../../cmsxi/doc/class_TrapInstruction_0D64725C22BFE6EBF7678B8DDAFAC6B9223B5E92.html" },
+        { name: "cmsx.intermediate.UnaryInstruction", id: "diagram_node_5", level: 3, subject: false, hasDerivedNodes: false, link: "../../cmsxi/doc/class_UnaryInstruction_83DFD4DD0B93E1F3583BA15151745AA9DF839635.html" }];
     drawDiagram(diagramNodes);
 }
 

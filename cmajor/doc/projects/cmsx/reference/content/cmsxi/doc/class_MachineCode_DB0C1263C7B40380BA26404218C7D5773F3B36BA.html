@@ -7,7 +7,7 @@
  <body>
   <h1>MachineCode Class</h1>
   <h2>Definition</h2>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxi/file/MachineCode.cm.html#43">43</a>&nbsp;of&nbsp;<a href="../../cmsxi/file/MachineCode.cm.html">cmsxi/MachineCode.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxi/file/MachineCode.cm.html#44">44</a>&nbsp;of&nbsp;<a href="../../cmsxi/file/MachineCode.cm.html">cmsxi/MachineCode.cm</a></span>
   <h2>Constructors &amp; Destructor</h2>
   <table>
    <tr>
@@ -20,6 +20,10 @@
    <tr>
     <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">inline</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">long</span></td>
     <td xml:space="preserve"><a href="../../cmsxi/doc/class_MachineCode_DB0C1263C7B40380BA26404218C7D5773F3B36BA.html#member_function_CurrentIndex_MachineCode_6B6167BDDD056CACC38C1D3A16C5FAED53DEF159">CurrentIndex</a>()&nbsp;<span class="kw">const</span></td>
+   </tr>
+   <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span></td>
+    <td xml:space="preserve"><a href="../../cmsxi/doc/class_MachineCode_DB0C1263C7B40380BA26404218C7D5773F3B36BA.html#member_function_EmitLineNumberInfo_MachineCode_27A30FFC870BF0C9A02A882214EC26D91AE79CB0">EmitLineNumberInfo</a>()</td>
    </tr>
    <tr>
     <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<a href="../../cmsxi/doc/class_MachineInstruction_0216CA143581FFAF58A41A7C2AEED508F0C47A11.html">MachineInstruction</a>*</td>
@@ -53,6 +57,10 @@
     <td xml:space="preserve">context</td>
    </tr>
    <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">uint</span></td>
+    <td xml:space="preserve">currentLineNumber</td>
+   </tr>
+   <tr>
     <td class="rightAlignedCol" xml:space="preserve"><span class="kw">private</span>&nbsp;<a href="../../../../../../system/content/System.Base/doc/class_List_T_4E42CF5913BEB21F5260DEFEC239180C94460B11.html">List</a>&lt;<a href="../../../../../../system/content/System.Base/doc/class_UniquePtr_T_793F841C13E9DD3A6869243C74F1D948C0E04009.html">UniquePtr</a>&lt;<a href="../../cmsxi/doc/class_MachineInstruction_0216CA143581FFAF58A41A7C2AEED508F0C47A11.html">MachineInstruction</a>>></td>
     <td xml:space="preserve">machineInstructions</td>
    </tr>
@@ -65,7 +73,7 @@
   <h3 id="constructor_MachineCode_674D4D6DD22F006AC96A1C889D29D8C29FC86A83" xml:space="preserve">MachineCode&nbsp;Constructor</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;MachineCode(<a href="../../cmsxi/doc/class_Context_626104DB77A27C849A57E15345A750ACBB9AA96A.html">Context</a>&amp;&nbsp;context_)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxi/file/MachineCode.cm.html#45">45</a>&nbsp;of&nbsp;<a href="../../cmsxi/file/MachineCode.cm.html">cmsxi/MachineCode.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxi/file/MachineCode.cm.html#46">46</a>&nbsp;of&nbsp;<a href="../../cmsxi/file/MachineCode.cm.html">cmsxi/MachineCode.cm</a></span>
   <br/>
   <br/>
   <hr/>
@@ -73,49 +81,56 @@
   <h3 id="member_function_CurrentIndex_MachineCode_6B6167BDDD056CACC38C1D3A16C5FAED53DEF159" xml:space="preserve">CurrentIndex&nbsp;Member Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">inline</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">long</span>&nbsp;CurrentIndex()</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxi/file/MachineCode.cm.html#48">48</a>&nbsp;of&nbsp;<a href="../../cmsxi/file/MachineCode.cm.html">cmsxi/MachineCode.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxi/file/MachineCode.cm.html#49">49</a>&nbsp;of&nbsp;<a href="../../cmsxi/file/MachineCode.cm.html">cmsxi/MachineCode.cm</a></span>
+  <br/>
+  <br/>
+  <hr/>
+  <h3 id="member_function_EmitLineNumberInfo_MachineCode_27A30FFC870BF0C9A02A882214EC26D91AE79CB0" xml:space="preserve">EmitLineNumberInfo&nbsp;Member Function</h3>
+  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span>&nbsp;EmitLineNumberInfo()</h4>
+  <h5>Definition</h5>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxi/file/MachineCode.cm.html#70">70</a>&nbsp;of&nbsp;<a href="../../cmsxi/file/MachineCode.cm.html">cmsxi/MachineCode.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="member_function_GetInstruction_MachineCode_9BEB2E94B84C58526988D132BE5A5E23E629FF5D" xml:space="preserve">GetInstruction&nbsp;Member Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<a href="../../cmsxi/doc/class_MachineInstruction_0216CA143581FFAF58A41A7C2AEED508F0C47A11.html">MachineInstruction</a>*&nbsp;GetInstruction(<span class="kw">int</span>&nbsp;opCode, <a href="../../cmsxi/doc/class_Instruction_5E05DB58E4B1651C9C3A965474ED1B4E9BB774F7.html">Instruction</a>*&nbsp;inst)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxi/file/MachineCode.cm.html#58">58</a>&nbsp;of&nbsp;<a href="../../cmsxi/file/MachineCode.cm.html">cmsxi/MachineCode.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxi/file/MachineCode.cm.html#59">59</a>&nbsp;of&nbsp;<a href="../../cmsxi/file/MachineCode.cm.html">cmsxi/MachineCode.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="member_function_GetInstruction_MachineCode_324148CD9DA1A31EE62B9FFC70F643A359B32093" xml:space="preserve">GetInstruction&nbsp;Member Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<a href="../../cmsxi/doc/class_MachineInstruction_0216CA143581FFAF58A41A7C2AEED508F0C47A11.html">MachineInstruction</a>*&nbsp;GetInstruction(<span class="kw">int</span>&nbsp;opCode, <span class="kw">const</span>&nbsp;<a href="../../../../../../system/content/System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html">String</a>&lt;<span class="kw">char</span>>&amp;&nbsp;label)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxi/file/MachineCode.cm.html#52">52</a>&nbsp;of&nbsp;<a href="../../cmsxi/file/MachineCode.cm.html">cmsxi/MachineCode.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxi/file/MachineCode.cm.html#53">53</a>&nbsp;of&nbsp;<a href="../../cmsxi/file/MachineCode.cm.html">cmsxi/MachineCode.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="member_function_Print_MachineCode_294C207329D68E9BF3A45E9D6D0CD3505743ED30" xml:space="preserve">Print&nbsp;Member Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span>&nbsp;Print(<a href="../../../../../../system/content/System.Base/doc/class_CodeFormatter_38898A0914E7D27753F0D42E65A18EC272984F99.html">CodeFormatter</a>&amp;&nbsp;formatter)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxi/file/MachineCode.cm.html#82">82</a>&nbsp;of&nbsp;<a href="../../cmsxi/file/MachineCode.cm.html">cmsxi/MachineCode.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxi/file/MachineCode.cm.html#91">91</a>&nbsp;of&nbsp;<a href="../../cmsxi/file/MachineCode.cm.html">cmsxi/MachineCode.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="member_function_Print_MachineCode_82500A18DFE58520F9544F7A1184F0DB71FAEF77" xml:space="preserve">Print&nbsp;Member Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span>&nbsp;Print(<span class="kw">const</span>&nbsp;<a href="../../../../../../system/content/System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html">String</a>&lt;<span class="kw">char</span>>&amp;&nbsp;filePath)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxi/file/MachineCode.cm.html#86">86</a>&nbsp;of&nbsp;<a href="../../cmsxi/file/MachineCode.cm.html">cmsxi/MachineCode.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxi/file/MachineCode.cm.html#95">95</a>&nbsp;of&nbsp;<a href="../../cmsxi/file/MachineCode.cm.html">cmsxi/MachineCode.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="member_function_PrintRange_MachineCode_A7A691CC8F4B73DDD3DE34AF22D2E600C7EC8489" xml:space="preserve">PrintRange&nbsp;Member Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span>&nbsp;PrintRange(<span class="kw">long</span>&nbsp;startIndex, <span class="kw">long</span>&nbsp;endIndex, <a href="../../../../../../system/content/System.Base/doc/class_CodeFormatter_38898A0914E7D27753F0D42E65A18EC272984F99.html">CodeFormatter</a>&amp;&nbsp;formatter)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxi/file/MachineCode.cm.html#69">69</a>&nbsp;of&nbsp;<a href="../../cmsxi/file/MachineCode.cm.html">cmsxi/MachineCode.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxi/file/MachineCode.cm.html#78">78</a>&nbsp;of&nbsp;<a href="../../cmsxi/file/MachineCode.cm.html">cmsxi/MachineCode.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="member_function_PrintRange_MachineCode_C78A88AE4A1C9C579ECD331110217FB4DD9AAD4F" xml:space="preserve">PrintRange&nbsp;Member Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span>&nbsp;PrintRange(<span class="kw">long</span>&nbsp;startIndex, <span class="kw">long</span>&nbsp;endIndex, <a href="../../../../../../system/content/System.Base/doc/class_CodeFormatter_38898A0914E7D27753F0D42E65A18EC272984F99.html">CodeFormatter</a>&amp;&nbsp;formatter, <span class="kw">int</span>&nbsp;labelWidth)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxi/file/MachineCode.cm.html#73">73</a>&nbsp;of&nbsp;<a href="../../cmsxi/file/MachineCode.cm.html">cmsxi/MachineCode.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxi/file/MachineCode.cm.html#82">82</a>&nbsp;of&nbsp;<a href="../../cmsxi/file/MachineCode.cm.html">cmsxi/MachineCode.cm</a></span>
   <br/>
   <br/>
   <hr/>

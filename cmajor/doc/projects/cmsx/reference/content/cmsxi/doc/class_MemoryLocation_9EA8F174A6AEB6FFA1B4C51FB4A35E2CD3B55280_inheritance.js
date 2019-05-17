@@ -271,7 +271,8 @@ function drawInheritanceDiagram() {
         { name: "cmsx.intermediate.Operand", id: "diagram_node_0", level: 0, subject: false, hasDerivedNodes: true, link: "../../cmsxi/doc/class_Operand_2425BC89158F8E5670C9742FBDFCAE1C588EF162.html" },
         { name: "cmsx.intermediate.Location", id: "diagram_node_1", level: 1, subject: false, hasDerivedNodes: true, link: "../../cmsxi/doc/class_Location_BE5B0B4F6121C4382E496712B4F67F5152B95437.html" },
         { name: "cmsx.intermediate.MemoryLocation", id: "diagram_node_2", level: 2, subject: true, hasDerivedNodes: true, link: "../../cmsxi/doc/class_MemoryLocation_9EA8F174A6AEB6FFA1B4C51FB4A35E2CD3B55280.html" },
-        { name: "cmsx.intermediate.FrameLocation", id: "diagram_node_3", level: 3, subject: false, hasDerivedNodes: false, link: "../../cmsxi/doc/class_FrameLocation_0D2C177BDA20C01C1A3EDA800FEFFD20AFF94190.html" }];
+        { name: "cmsx.intermediate.DataLocation", id: "diagram_node_3", level: 3, subject: false, hasDerivedNodes: false, link: "../../cmsxi/doc/class_DataLocation_A8AAC6AADAB2D49BC82B6E737EB5942BA39EA64A.html" },
+        { name: "cmsx.intermediate.FrameLocation", id: "diagram_node_4", level: 3, subject: false, hasDerivedNodes: false, link: "../../cmsxi/doc/class_FrameLocation_0D2C177BDA20C01C1A3EDA800FEFFD20AFF94190.html" }];
     drawDiagram(diagramNodes);
 }
 

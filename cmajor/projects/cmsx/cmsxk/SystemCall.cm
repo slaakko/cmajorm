@@ -32,1008 +32,544 @@ namespace cmsx.kernel
     public const byte sys_file_exists = 26u;
     public const byte sys_get_file_size = 27u;
     public const byte sys_unlink = 28u;
+    public const byte sys_mkdir = 29u;
+    public const byte sys_opendir = 30u;
+    public const byte sys_readdir = 31u;
+    public const byte sys_closedir = 32u;
     public const byte numSystemCalls = sys_unlink + 1u;
 
-    public const uint debugBreakInst = (TRAP << 24u) | (0u << 16u) | (sys_debug_break << 8u) | (0u << 0u);
+    public nothrow string SystemCallName(byte systemCall)
+    {
+        switch (systemCall)
+        {
+            case sys_exit: return "sys_exit";
+            case sys_wait: return "sys_wait";
+            case sys_fork: return "sys_fork";
+            case sys_create: return "sys_create";
+            case sys_open: return "sys_open";
+            case sys_close: return "sys_close";
+            case sys_read: return "sys_read";
+            case sys_write: return "sys_write";
+            case sys_seek: return "sys_seek";
+            case sys_tell: return "sys_tell";
+            case sys_pool_end : return "sys_pool_end";
+            case sys_set_pool_end: return "sys_set_pool_end";
+            case sys_debug_break : return "sys_debug_break";
+            case sys_stack_trace: return "sys_stack_trace";
+            case sys_throw: return "sys_throw";
+            case sys_catch: return "sys_catch";
+            case sys_resume: return "sys_resume";
+            case sys_get_system_error: return "sys_get_system_error";
+            case sys_get_current_time_point: return "sys_get_current_time_point";
+            case sys_sleep: return "sys_sleep";
+            case sys_get_current_date: return "sys_get_current_date";
+            case sys_get_current_date_time: return "sys_get_current_date_time";
+            case sys_pow: return "sys_pow";
+            case sys_is_host_text_file: return "sys_is_host_text_file";
+            case sys_is_console: return "sys_is_console";
+            case sys_get_random_seed: return "sys_get_random_seed";
+            case sys_file_exists: return "sys_file_exists";
+            case sys_get_file_size: return "sys_get_file_size";
+            case sys_unlink: return "sys_unlink";
+            case sys_mkdir: return "sys_mkdir";
+            case sys_opendir: return "sys_opendir";
+            case sys_readdir: return "sys_readdir";
+            case sys_closedir: return "sys_closedir";
+        }
+        return string();
+    }
 
-    public delegate long TrapHandler(Machine& machine, byte trapX, byte trapY, byte trapZ, ulong trapAX, ulong trapBX, ulong trapCX, ulong trapDX, ulong trapEX);
+    public const uint debugBreakInst = (TRAP << 24u) | (0u << 16u) | (sys_debug_break << 8u) | (0u << 0u);
 
     public inline nothrow ulong MakeSystemCallPtrAddress(int systemCall)
     {
         return trapTableBaseAddress + cast<ulong>(systemCall) * 8u;
     }
 
-    public long Exit(Machine& machine, byte x, byte y, byte z, ulong ax, ulong bx, ulong cx, ulong dx, ulong ex)
+    public class SystemCall
     {
-        if (x != 0u || y != sys_exit || z != 0u)
+        public nothrow SystemCall(Machine* machine_, Kernel* kernel_, ProcessTable* processTable_, Process* process_,
+            SystemCallHandler handler_, byte x_, byte y_, byte z_, ulong ax_, ulong bx_, ulong cx_, ulong dx_, ulong ex_) :
+            machine(machine_), kernel(kernel_), processTable(processTable_), process(process_),
+            handler(handler_), x(x_), y(y_), z(z_), ax(ax_), bx(bx_), cx(cx_), dx(dx_), ex(ex_), result(0)
         {
-            Panic("invalid exit parameters: " + ToString(x) + ", " + ToString(y) + ", " + ToString(z));
         }
-        Kernel& kernel = Kernel.Instance();
-        ProcessTable& processTable = kernel.GetProcessTable();
-        Process* process = processTable.GetRunning();
-        if (process != null)
+        public nothrow string ToString() const
         {
-            ushort exitCode = MakeProcessExitCode(0u, cast<byte>(ax));
-            try
-            {
-                ExitProcess(machine, processTable, process, exitCode);
-            }
-            catch (const SystemError& systemError)
-            {
-                process->lastError = systemError;
-                return -1;
-            }
-            catch (const Exception& ex)
-            {
-                process->lastError = SystemError(EFAIL, "exit failed: " + ex.ToString());
-                return -1;
-            }
-            if (Machine.GetFlag(Machine.Flags.runProgram) && process->pid == kernel.GetProgramPID())
-            {
-                machine.GetProcessor().Exit();
-            }
-            Debugger* debugger = kernel.GetDebugger();
-            debugger->Exit(process);
-            return 0;
+            string s;
+            s.Append(SystemCallName(y)).Append(".ax=").Append(ToHexString(ax)).Append(".bx=").Append(ToHexString(bx)).Append(".cx=").Append(ToHexString(cx)).Append(".dx=");
+            s.Append(ToHexString(dx)).Append(".ex=").Append(ToHexString(ex)).Append(".result=").Append(ToHexString(result));
+            return s;
         }
-        else
-        {
-            Panic("exit called for a process that is not running!");
-        }
-        return 0;
+        public Machine* machine;
+        public Kernel* kernel;
+        public ProcessTable* processTable;
+        public Process* process;
+        public SystemCallHandler handler;
+        public byte x;
+        public byte y;
+        public byte z;
+        public ulong ax;
+        public ulong bx;
+        public ulong cx;
+        public ulong dx;
+        public ulong ex;
+        public long result;
     }
 
-    public long Wait(Machine& machine, byte x, byte y, byte z, ulong ax, ulong bx, ulong cx, ulong dx, ulong ex)
-    {
-        if (x != 0u || y != sys_wait || z != 0u)
-        {
-            Panic("invalid wait parameters: " + ToString(x) + ", " + ToString(y) + ", " + ToString(z));
-        }
-        Kernel& kernel = Kernel.Instance();
-        ProcessTable& processTable = kernel.GetProcessTable();
-        Process* process = processTable.GetRunning();
-        if (process != null)
-        {
-            try
-            {
-                int retval = WaitProcess(machine, processTable, process, ax);
-                return retval;
-            }
-            catch (const SystemError& systemError)
-            {
-                process->lastError = systemError;
-                return -1;
-            }
-            catch (const Exception& ex)
-            {
-                process->lastError = SystemError(EFAIL, "wait failed: " + ex.ToString());
-                return -1;
-            }
-        }
-        else
-        {
-            Panic("wait called for a process that is not running!");
-        }
-        return 0;
-    }
+    public delegate void SystemCallHandler(SystemCall& sc);
 
-    public long Fork(Machine& machine, byte x, byte y, byte z, ulong ax, ulong bx, ulong cx, ulong dx, ulong ex)
+    public void SystemCallFiber(void* processParam)
     {
-        if (x != 0u || y != sys_fork || z != 0u)
-        {
-            Panic("invalid fork parameters: " + ToString(x) + ", " + ToString(y) + ", " + ToString(z));
-        }
-        Kernel& kernel = Kernel.Instance();
-        ProcessTable& processTable = kernel.GetProcessTable();
-        Process* process = processTable.GetRunning();
-        if (process != null)
+        Process* process = cast<Process*>(processParam);
+        while (true)
         {
             try
             {
-                int retval = ForkProcess(machine, processTable, process);
-                return retval;
-            }
-            catch (const SystemError& systemError)
-            {
-                process->lastError = systemError;
-                return -1;
-            }
-            catch (const Exception& ex)
-            {
-                process->lastError = SystemError(EFAIL, "fork failed: " + ex.ToString());
-                return -1;
-            }
-        }
-        else
-        {
-            Panic("fork called for a process that is not running!");
-        }
-        return 0;
-    }
-
-    public long Create(Machine& machine, byte x, byte y, byte z, ulong ax, ulong bx, ulong cx, ulong dx, ulong ex)
-    {
-        if (x != 0u || y != sys_create || z != 0u)
-        {
-            Panic("invalid create parameters: " + ToString(x) + ", " + ToString(y) + ", " + ToString(z));
-        }
-        Kernel& kernel = Kernel.Instance();
-        ProcessTable& processTable = kernel.GetProcessTable();
-        Process* process = processTable.GetRunning();
-        if (process != null)
-        {
-            try
-            {
-                throw SystemError(ENOTSUPPORTED, "not implemented yet");
-                int retval = 0; // todo
-                return retval;
-            }
-            catch (const SystemError& systemError)
-            {
-                process->lastError = systemError;
-                return -1;
-            }
-            catch (const Exception& ex)
-            {
-                process->lastError = SystemError(EFAIL, "create failed: " + ex.ToString());
-                return -1;
-            }
-        }
-        else
-        {
-            Panic("create called for a process that is not running!");
-        }
-        return 0;
-    }
-
-    public long Open(Machine& machine, byte x, byte y, byte z, ulong ax, ulong bx, ulong cx, ulong dx, ulong ex)
-    {
-        if (x != 0u || y != sys_open || z != 0u)
-        {
-            Panic("invalid open parameters: " + ToString(x) + ", " + ToString(y) + ", " + ToString(z));
-        }
-        Kernel& kernel = Kernel.Instance();
-        ProcessTable& processTable = kernel.GetProcessTable();
-        Process* process = processTable.GetRunning();
-        if (process != null)
-        {
-            try
-            {
-                throw SystemError(ENOTSUPPORTED, "not implemented yet");
-                int retval = 0; // todo
-                return retval;
-            }
-            catch (const SystemError& systemError)
-            {
-                process->lastError = systemError;
-                return -1;
-            }
-            catch (const Exception& ex)
-            {
-                process->lastError = SystemError(EFAIL, "open failed: " + ex.ToString());
-                return -1;
-            }
-        }
-        else
-        {
-            Panic("open called for a process that is not running!");
-        }
-        return 0;
-    }
-
-    public long Close(Machine& machine, byte x, byte y, byte z, ulong ax, ulong bx, ulong cx, ulong dx, ulong ex)
-    {
-        if (x != 0u || y != sys_close || z != 0u)
-        {
-            Panic("invalid close parameters: " + ToString(x) + ", " + ToString(y) + ", " + ToString(z));
-        }
-        Kernel& kernel = Kernel.Instance();
-        ProcessTable& processTable = kernel.GetProcessTable();
-        Process* process = processTable.GetRunning();
-        if (process != null)
-        {
-            try
-            {
-                throw SystemError(ENOTSUPPORTED, "not implemented yet");
-                int retval = 0; // todo
-                return retval;
-            }
-            catch (const SystemError& systemError)
-            {
-                process->lastError = systemError;
-                return -1;
-            }
-            catch (const Exception& ex)
-            {
-                process->lastError = SystemError(EFAIL, "close failed: " + ex.ToString());
-                return -1;
-            }
-        }
-        else
-        {
-            Panic("close called for a process that is not running!");
-        }
-        return 0;
-    }
-
-    public long Read(Machine& machine, byte x, byte y, byte z, ulong ax, ulong bx, ulong cx, ulong dx, ulong ex)
-    {
-        if (x != 0u || y != sys_read || z != 0u)
-        {
-            Panic("invalid read parameters: " + ToString(x) + ", " + ToString(y) + ", " + ToString(z));
-        }
-        Kernel& kernel = Kernel.Instance();
-        ProcessTable& processTable = kernel.GetProcessTable();
-        Process* process = processTable.GetRunning();
-        if (process != null)
-        {
-            try
-            {
-                long retval = Read(machine, process, cast<int>(ax), bx, cast<long>(cx));
-                if (retval == RESULT_BLOCKED)
+                process->systemCallReady = false;
+                const SystemCall& sc = process->systemCall;
+                if (Log())
                 {
-                    Schedule(machine, processTable);
-                    return 0;
+                    LogMessage("sc.begin", sc.ToString());
                 }
-                return retval;
+                SystemCallHandler handler = sc.handler;
+                handler(sc);
             }
             catch (const SystemError& systemError)
             {
                 process->lastError = systemError;
-                return -1;
+                process->systemCall.result = -1;
             }
             catch (const Exception& ex)
             {
-                process->lastError = SystemError(EFAIL, "read failed: " + ex.ToString());
-                return -1;
+                process->lastError = SystemError(EFAIL, "system call failed: " + ex.ToString());
+                process->systemCall.result = -1;
             }
-        }
-        else
-        {
-            Panic("read called for a process that is not running!");
-        }
-        return 0;
-    }
-
-    public long Write(Machine& machine, byte x, byte y, byte z, ulong ax, ulong bx, ulong cx, ulong dx, ulong ex)
-    {
-        if (x != 0u || y != sys_write || z != 0u)
-        {
-            Panic("invalid write parameters: " + ToString(x) + ", " + ToString(y) + ", " + ToString(z));
-        }
-        Kernel& kernel = Kernel.Instance();
-        ProcessTable& processTable = kernel.GetProcessTable();
-        Process* process = processTable.GetRunning();
-        if (process != null)
-        {
-            try
+            if (Log())
             {
-                long retval = Write(machine, process, cast<int>(ax), bx, cast<long>(cx));
-                if (retval == RESULT_BLOCKED)
+                string msg = process->systemCall.ToString();
+                if (process->systemCall.result == -1)
                 {
-                    Schedule(machine, processTable);
-                    return 0;
+                    msg.Append(".error=").Append(process->lastError.ToString());
                 }
-                return retval;
+                LogMessage("sc.end", msg);
             }
-            catch (const SystemError& systemError)
-            {
-                process->lastError = systemError;
-                return -1;
-            }
-            catch (const Exception& ex)
-            {
-                process->lastError = SystemError(EFAIL, "write failed: " + ex.ToString());
-                return -1;
-            }
+            process->systemCallReady = true;
+            process->mode = Process.Mode.runningUser;
+            OsSwitchToFiber(mainFiber);
         }
-        else
-        {
-            Panic("write called for a process that is not running!");
-        }
-        return 0;
     }
 
-    public long Seek(Machine& machine, byte x, byte y, byte z, ulong ax, ulong bx, ulong cx, ulong dx, ulong ex)
+    public void Exit(SystemCall& sc)
     {
-        if (x != 0u || y != sys_seek || z != 0u)
+        if (sc.x != 0u || sc.y != sys_exit || sc.z != 0u)
         {
-            Panic("invalid seek parameters: " + ToString(x) + ", " + ToString(y) + ", " + ToString(z));
+            Panic("invalid exit parameters: " + ToString(sc.x) + ", " + ToString(sc.y) + ", " + ToString(sc.z));
         }
-        Kernel& kernel = Kernel.Instance();
-        ProcessTable& processTable = kernel.GetProcessTable();
-        Process* process = processTable.GetRunning();
-        if (process != null)
+        ushort exitCode = MakeProcessExitCode(0u, cast<byte>(sc.ax));
+        ExitProcess(*sc.machine, *sc.processTable, sc.process, exitCode);
+        if (Machine.GetFlag(Machine.Flags.runProgram) && sc.process->pid == sc.kernel->GetProgramPID())
         {
-            try
-            {
-                int fd = cast<int>(ax);
-                long pos = cast<long>(bx);
-                Origin origin = cast<Origin>(cast<byte>(cx));
-                long retval = Seek(machine, process, fd, pos, origin);
-                return retval;
-            }
-            catch (const SystemError& systemError)
-            {
-                process->lastError = systemError;
-                return -1;
-            }
-            catch (const Exception& ex)
-            {
-                process->lastError = SystemError(EFAIL, "seek failed: " + ex.ToString());
-                return -1;
-            }
+            sc.machine->GetProcessor().Exit();
         }
-        else
-        {
-            Panic("seek called for a process that is not running!");
-        }
-        return 0;
+        Debugger* debugger = sc.kernel->GetDebugger();
+        debugger->Exit(sc.process);
     }
 
-    public long Tell(Machine& machine, byte x, byte y, byte z, ulong ax, ulong bx, ulong cx, ulong dx, ulong ex)
+    public void Wait(SystemCall& sc)
     {
-        if (x != 0u || y != sys_seek || z != 0u)
+        if (sc.x != 0u || sc.y != sys_wait || sc.z != 0u)
         {
-            Panic("invalid tell parameters: " + ToString(x) + ", " + ToString(y) + ", " + ToString(z));
+            Panic("invalid wait parameters: " + ToString(sc.x) + ", " + ToString(sc.y) + ", " + ToString(sc.z));
         }
-        Kernel& kernel = Kernel.Instance();
-        ProcessTable& processTable = kernel.GetProcessTable();
-        Process* process = processTable.GetRunning();
-        if (process != null)
-        {
-            try
-            {
-                int fd = cast<int>(ax);
-                long retval = Tell(machine, process, fd);
-                return retval;
-            }
-            catch (const SystemError& systemError)
-            {
-                process->lastError = systemError;
-                return -1;
-            }
-            catch (const Exception& ex)
-            {
-                process->lastError = SystemError(EFAIL, "tell failed: " + ex.ToString());
-                return -1;
-            }
-        }
-        else
-        {
-            Panic("tell called for a process that is not running!");
-        }
-        return 0;
+        int retval = WaitProcess(*sc.machine, *sc.processTable, sc.process, sc.ax);
+        sc.result = retval;
     }
 
-    public long PoolEnd(Machine& machine, byte x, byte y, byte z, ulong ax, ulong bx, ulong cx, ulong dx, ulong ex)
+    public void Fork(SystemCall& sc)
     {
-        if (x != 0u || y != sys_pool_end || z != 0u)
+        if (sc.x != 0u || sc.y != sys_fork || sc.z != 0u)
         {
-            Panic("invalid pool_end parameters: " + ToString(x) + ", " + ToString(y) + ", " + ToString(z));
+            Panic("invalid fork parameters: " + ToString(sc.x) + ", " + ToString(sc.y) + ", " + ToString(sc.z));
         }
-        Kernel& kernel = Kernel.Instance();
-        ProcessTable& processTable = kernel.GetProcessTable();
-        Process* process = processTable.GetRunning();
-        if (process != null)
-        {
-            long retval = cast<long>(process->poolEnd);
-            return retval;
-        }
-        else
-        {
-            Panic("pool_end called for a process that is not running!");
-        }
-        return 0;
+        int retval = ForkProcess(*sc.machine, *sc.processTable, sc.process);
+        sc.result = retval;
     }
 
-    public long SetPoolEnd(Machine& machine, byte x, byte y, byte z, ulong ax, ulong bx, ulong cx, ulong dx, ulong ex)
+    public void Create(SystemCall& sc)
     {
-        if (x != 0u || y != sys_set_pool_end || z != 0u)
+        if (sc.x != 0u || sc.y != sys_create || sc.z != 0u)
         {
-            Panic("invalid set_pool_end parameters: " + ToString(x) + ", " + ToString(y) + ", " + ToString(z));
+            Panic("invalid create parameters: " + ToString(sc.x) + ", " + ToString(sc.y) + ", " + ToString(sc.z));
         }
-        Kernel& kernel = Kernel.Instance();
-        ProcessTable& processTable = kernel.GetProcessTable();
-        Process* process = processTable.GetRunning();
-        if (process != null)
-        {
-            try
-            {
-                return SetPoolEndProcess(machine, process, ax);
-            }
-            catch (const SystemError& systemError)
-            {
-                process->lastError = systemError;
-                return -1;
-            }
-            catch (const Exception& ex)
-            {
-                process->lastError = SystemError(EFAIL, "set_pool_end failed: " + ex.ToString());
-                return -1;
-            }
-        }
-        else
-        {
-            Panic("set_pool_end called for a process that is not running!");
-        }
-        return 0;
+        sc.result = Create(*sc.machine, sc.process, cast<ulong>(sc.ax), cast<int>(sc.bx));
     }
 
-    public long DebugBreak(Machine& machine, byte x, byte y, byte z, ulong ax, ulong bx, ulong cx, ulong dx, ulong ex)
+    public void Open(SystemCall& sc)
     {
-        if (x != 0u || y != sys_debug_break || z != 0u)
+        if (sc.x != 0u || sc.y != sys_open || sc.z != 0u)
         {
-            Panic("invalid debug break parameters: " + ToString(x) + ", " + ToString(y) + ", " + ToString(z));
+            Panic("invalid open parameters: " + ToString(sc.x) + ", " + ToString(sc.y) + ", " + ToString(sc.z));
         }
-        Kernel& kernel = Kernel.Instance();
-        ProcessTable& processTable = kernel.GetProcessTable();
-        Process* process = processTable.GetRunning();
-        if (process != null)
-        {
-            Debugger* debugger = kernel.GetDebugger();
-            debugger->Run(process);
-            return cast<long>(machine.GetRegisters().Get(regAX));
-        }
-        else
-        {
-            Panic("debug break called for a process that is not running!");
-        }
-        return 0;
+        sc.result = Open(*sc.machine, sc.process, cast<ulong>(sc.ax), cast<OpenFlags>(cast<int>(sc.bx)), cast<int>(sc.cx));
     }
 
-    public long StackTrace(Machine& machine, byte x, byte y, byte z, ulong ax, ulong bx, ulong cx, ulong dx, ulong ex)
+    public void Close(SystemCall& sc)
     {
-        if (x != 0u || y != sys_stack_trace || z != 0u)
+        if (sc.x != 0u || sc.y != sys_close || sc.z != 0u)
         {
-            Panic("invalid stack trace parameters: " + ToString(x) + ", " + ToString(y) + ", " + ToString(z));
+            Panic("invalid close parameters: " + ToString(sc.x) + ", " + ToString(sc.y) + ", " + ToString(sc.z));
         }
-        Kernel& kernel = Kernel.Instance();
-        ProcessTable& processTable = kernel.GetProcessTable();
-        Process* process = processTable.GetRunning();
-        if (process != null)
-        {
-            ulong fp = machine.GetRegisters().Get(regFP);
-            ulong buffer = ax;
-            long count = cast<long>(bx);
-            try
-            {
-                GetProcessStackTrace(machine, process, fp, buffer, count);
-            }
-            catch (const SystemError& systemError)
-            {
-                process->lastError = systemError;
-                return -1;
-            }
-            catch (const Exception& ex)
-            {
-                process->lastError = SystemError(EFAIL, "stack_trace failed: " + ex.ToString());
-                return -1;
-            }
-        }
-        else
-        {
-            Panic("stack trace called for a process that is not running!");
-        }
-        return 0;
+        throw SystemError(ENOTSUPPORTED, "not implemented yet");
     }
 
-    public long Throw(Machine& machine, byte x, byte y, byte z, ulong ax, ulong bx, ulong cx, ulong dx, ulong ex)
+    public void Read(SystemCall& sc)
     {
-        if (x != 0u || y != sys_throw || z != 0u)
+        if (sc.x != 0u || sc.y != sys_read || sc.z != 0u)
         {
-            Panic("invalid throw parameters: " + ToString(x) + ", " + ToString(y) + ", " + ToString(z));
+            Panic("invalid read parameters: " + ToString(sc.x) + ", " + ToString(sc.y) + ", " + ToString(sc.z));
         }
-        Kernel& kernel = Kernel.Instance();
-        ProcessTable& processTable = kernel.GetProcessTable();
-        Process* process = processTable.GetRunning();
-        if (process != null)
-        {
-            ulong exceptionAddress = ax;
-            ulong exceptionClassId = bx;
-            ulong fp = machine.GetRegisters().Get(regFP);
-            process->currentExceptionAddress = exceptionAddress;
-            process->currentExceptionClassId = exceptionClassId;
-            try
-            {
-                DispatchException(machine, process, fp);
-            }
-            catch (const SystemError& systemError)
-            {
-                process->lastError = systemError;
-                return -1;
-            }
-            catch (const Exception& ex)
-            {
-                process->lastError = SystemError(EFAIL, "throw failed: " + ex.ToString());
-                return -1;
-            }
-        }
-        else
-        {
-            Panic("throw called for a process that is not running!");
-        }
-        return 0;
+        long retval = Read(*sc.machine, sc.process, cast<int>(sc.ax), sc.bx, cast<long>(sc.cx));
+        sc.result = retval;
     }
 
-    public long Catch(Machine& machine, byte x, byte y, byte z, ulong ax, ulong bx, ulong cx, ulong dx, ulong ex)
+    public void Write(SystemCall& sc)
     {
-        if (x != 0u || y != sys_catch || z != 0u)
+        if (sc.x != 0u || sc.y != sys_write || sc.z != 0u)
         {
-            Panic("invalid catch parameters: " + ToString(x) + ", " + ToString(y) + ", " + ToString(z));
+            Panic("invalid write parameters: " + ToString(sc.x) + ", " + ToString(sc.y) + ", " + ToString(sc.z));
         }
-        Kernel& kernel = Kernel.Instance();
-        ProcessTable& processTable = kernel.GetProcessTable();
-        Process* process = processTable.GetRunning();
-        if (process != null)
-        {
-            ulong exceptionAddress = process->currentExceptionAddress;
-            return cast<long>(exceptionAddress); 
-        }
-        else
-        {
-            Panic("catch called for a process that is not running!");
-        }
-        return 0;
+        long retval = Write(*sc.machine, sc.process, cast<int>(sc.ax), sc.bx, cast<long>(sc.cx));
+        sc.result = retval;
     }
 
-    public long Resume(Machine& machine, byte x, byte y, byte z, ulong ax, ulong bx, ulong cx, ulong dx, ulong ex)
+    public void Seek(SystemCall& sc)
     {
-        if (x != 0u || y != sys_resume || z != 0u)
+        if (sc.x != 0u || sc.y != sys_seek || sc.z != 0u)
         {
-            Panic("invalid resume parameters: " + ToString(x) + ", " + ToString(y) + ", " + ToString(z));
+            Panic("invalid seek parameters: " + ToString(sc.x) + ", " + ToString(sc.y) + ", " + ToString(sc.z));
         }
-        Kernel& kernel = Kernel.Instance();
-        ProcessTable& processTable = kernel.GetProcessTable();
-        Process* process = processTable.GetRunning();
-        if (process != null)
-        {
-            ulong fp = machine.GetRegisters().Get(regFP);
-            try
-            {
-                ContinueExceptionDispatch(machine, process, fp);
-            }
-            catch (const SystemError& systemError)
-            {
-                process->lastError = systemError;
-                return -1;
-            }
-            catch (const Exception& ex)
-            {
-                process->lastError = SystemError(EFAIL, "resume failed: " + ex.ToString());
-                return -1;
-            }
-            return 0;
-        }
-        else
-        {
-            Panic("resume called for a process that is not running!");
-        }
-        return 0;
+        int fd = cast<int>(sc.ax);
+        long pos = cast<long>(sc.bx);
+        Origin origin = cast<Origin>(cast<byte>(sc.cx));
+        long retval = Seek(*sc.machine, sc.process, fd, pos, origin);
+        sc.result = retval;
     }
 
-    public long GetSystemError(Machine& machine, byte x, byte y, byte z, ulong ax, ulong bx, ulong cx, ulong dx, ulong ex)
+    public void Tell(SystemCall& sc)
     {
-        if (x != 0u || y != sys_get_system_error || z != 0u)
+        if (sc.x != 0u || sc.y != sys_seek || sc.z != 0u)
         {
-            Panic("invalid get_system_error parameters: " + ToString(x) + ", " + ToString(y) + ", " + ToString(z));
+            Panic("invalid tell parameters: " + ToString(sc.x) + ", " + ToString(sc.y) + ", " + ToString(sc.z));
         }
-        Kernel& kernel = Kernel.Instance();
-        ProcessTable& processTable = kernel.GetProcessTable();
-        Process* process = processTable.GetRunning();
-        if (process != null)
-        {
-            try
-            {
-                ulong errorCodeAddress = ax;
-                ulong bufferAddress = bx;
-                long count = cast<long>(cx);
-                GetProcessSystemError(machine, process, errorCodeAddress, bufferAddress, count);
-                return 0;
-            }
-            catch (const SystemError& systemError)
-            {
-                process->lastError = systemError;
-                return -1;
-            }
-            catch (const Exception& ex)
-            {
-                process->lastError = SystemError(EFAIL, "get_system_error failed: " + ex.ToString());
-                return -1;
-            }
-        }
-        else
-        {
-            Panic("get_system_error called for a process that is not running!");
-        }
-        return 0;
+        int fd = cast<int>(sc.ax);
+        long retval = Tell(*sc.machine, sc.process, fd);
+        sc.result = retval;
     }
 
-    public long GetCurrentTimePoint(Machine& machine, byte x, byte y, byte z, ulong ax, ulong bx, ulong cx, ulong dx, ulong ex)
+    public void PoolEnd(SystemCall& sc)
     {
-        if (x != 0u || y != sys_get_current_time_point || z != 0u)
+        if (sc.x != 0u || sc.y != sys_pool_end || sc.z != 0u)
         {
-            Panic("invalid get_current_time_point parameters: " + ToString(x) + ", " + ToString(y) + ", " + ToString(z));
+            Panic("invalid pool_end parameters: " + ToString(sc.x) + ", " + ToString(sc.y) + ", " + ToString(sc.z));
+        }
+        long retval = cast<long>(sc.process->poolEnd);
+        sc.result = retval;
+    }
+
+    public void SetPoolEnd(SystemCall& sc)
+    {
+        if (sc.x != 0u || sc.y != sys_set_pool_end || sc.z != 0u)
+        {
+            Panic("invalid set_pool_end parameters: " + ToString(sc.x) + ", " + ToString(sc.y) + ", " + ToString(sc.z));
+        }
+        sc.result = SetPoolEndProcess(*sc.machine, sc.process, sc.ax);
+    }
+
+    public void DebugBreak(SystemCall& sc)
+    {
+        if (sc.x != 0u || sc.y != sys_debug_break || sc.z != 0u)
+        {
+            Panic("invalid debug break parameters: " + ToString(sc.x) + ", " + ToString(sc.y) + ", " + ToString(sc.z));
+        }
+        Debugger* debugger = sc.kernel->GetDebugger();
+        debugger->Run(sc.process);
+        sc.result = cast<long>(sc.machine->GetRegisters().Get(regAX));
+    }
+
+    public void StackTrace(SystemCall& sc)
+    {
+        if (sc.x != 0u || sc.y != sys_stack_trace || sc.z != 0u)
+        {
+            Panic("invalid stack trace parameters: " + ToString(sc.x) + ", " + ToString(sc.y) + ", " + ToString(sc.z));
+        }
+        ulong fp = sc.machine->GetRegisters().Get(regFP);
+        ulong buffer = sc.ax;
+        long count = cast<long>(sc.bx);
+        GetProcessStackTrace(*sc.machine, sc.process, fp, buffer, count);
+        sc.result = 0;
+    }
+
+    public void Throw(SystemCall& sc)
+    {
+        if (sc.x != 0u || sc.y != sys_throw || sc.z != 0u)
+        {
+            Panic("invalid throw parameters: " + ToString(sc.x) + ", " + ToString(sc.y) + ", " + ToString(sc.z));
+        }
+        ulong exceptionAddress = sc.ax;
+        ulong exceptionClassId = sc.bx;
+        ulong fp = sc.machine->GetRegisters().Get(regFP);
+        sc.process->currentExceptionAddress = exceptionAddress;
+        sc.process->currentExceptionClassId = exceptionClassId;
+        DispatchException(*sc.machine, sc.process, fp);
+        sc.result = 0;
+    }
+
+    public void Catch(SystemCall& sc)
+    {
+        if (sc.x != 0u || sc.y != sys_catch || sc.z != 0u)
+        {
+            Panic("invalid catch parameters: " + ToString(sc.x) + ", " + ToString(sc.y) + ", " + ToString(sc.z));
+        }
+        ulong exceptionAddress = sc.process->currentExceptionAddress;
+        sc.result = cast<long>(exceptionAddress); 
+    }
+
+    public void Resume(SystemCall& sc)
+    {
+        if (sc.x != 0u || sc.y != sys_resume || sc.z != 0u)
+        {
+            Panic("invalid resume parameters: " + ToString(sc.x) + ", " + ToString(sc.y) + ", " + ToString(sc.z));
+        }
+        ulong fp = sc.machine->GetRegisters().Get(regFP);
+        ContinueExceptionDispatch(*sc.machine, sc.process, fp);
+        sc.result = 0;
+    }
+
+    public void GetSystemError(SystemCall& sc)
+    {
+        if (sc.x != 0u || sc.y != sys_get_system_error || sc.z != 0u)
+        {
+            Panic("invalid get_system_error parameters: " + ToString(sc.x) + ", " + ToString(sc.y) + ", " + ToString(sc.z));
+        }
+        ulong errorCodeAddress = sc.ax;
+        ulong bufferAddress = sc.bx;
+        long count = cast<long>(sc.cx);
+        GetProcessSystemError(*sc.machine, sc.process, errorCodeAddress, bufferAddress, count);
+        sc.result = 0;
+    }
+
+    public void GetCurrentTimePoint(SystemCall& sc)
+    {
+        if (sc.x != 0u || sc.y != sys_get_current_time_point || sc.z != 0u)
+        {
+            Panic("invalid get_current_time_point parameters: " + ToString(sc.x) + ", " + ToString(sc.y) + ", " + ToString(sc.z));
         }
         long currentTimePoint = System.Now().Rep();
-        return currentTimePoint;
+        sc.result = currentTimePoint;
     }
 
-    public long Sleep(Machine& machine, byte x, byte y, byte z, ulong ax, ulong bx, ulong cx, ulong dx, ulong ex)
+    public void Sleep(SystemCall& sc)
     {
-        if (x != 0u || y != sys_sleep || z != 0u)
+        if (sc.x != 0u || sc.y != sys_sleep || sc.z != 0u)
         {
-            Panic("invalid sleep parameters: " + ToString(x) + ", " + ToString(y) + ", " + ToString(z));
+            Panic("invalid sleep parameters: " + ToString(sc.x) + ", " + ToString(sc.y) + ", " + ToString(sc.z));
         }
-        Kernel& kernel = Kernel.Instance();
-        ProcessTable& processTable = kernel.GetProcessTable();
-        Process* process = processTable.GetRunning();
-        if (process != null)
+        Duration sleepDuration(cast<long>(sc.ax));
+        if (sleepDuration.Rep() < 0)
         {
-            try
-            {
-                throw SystemError(ENOTSUPPORTED, "not implemented yet");
-                return 0;
-            }
-            catch (const SystemError& systemError)
-            {
-                process->lastError = systemError;
-                return -1;
-            }
-            catch (const Exception& ex)
-            {
-                process->lastError = SystemError(EFAIL, "sleep failed: " + ex.ToString());
-                return -1;
-            }
+            throw SystemError(EINVAL, "invalid sleep duration");
         }
-        else
-        {
-            Panic("sleep called for a process that is not running!");
-        }
-        return 0;
+        TimePoint dueTime = System.Now() + sleepDuration;
+        SleepProcess(sc.process, wakeupEvent, cast<ulong>(dueTime.Rep()), 0u);
+        SleepingProcessQueue.Instance().AddProcess(sc.process);
+        sc.result = 0;
     }
 
-    public long GetCurrentDate(Machine& machine, byte x, byte y, byte z, ulong ax, ulong bx, ulong cx, ulong dx, ulong ex)
+    public void GetCurrentDate(SystemCall& sc)
     {
-        if (x != 0u || y != sys_get_current_date || z != 0u)
+        if (sc.x != 0u || sc.y != sys_get_current_date || sc.z != 0u)
         {
-            Panic("invalid get_current_date parameters: " + ToString(x) + ", " + ToString(y) + ", " + ToString(z));
+            Panic("invalid get_current_date parameters: " + ToString(sc.x) + ", " + ToString(sc.y) + ", " + ToString(sc.z));
         }
-        Kernel& kernel = Kernel.Instance();
-        ProcessTable& processTable = kernel.GetProcessTable();
-        Process* process = processTable.GetRunning();
-        if (process != null)
+        ulong yearAddress = sc.ax;
+        ulong monthAddress = sc.bx;
+        ulong dayAddress = sc.cx;
+        if (yearAddress == 0u)
         {
-            try
-            {
-                ulong yearAddress = ax;
-                ulong monthAddress = bx;
-                ulong dayAddress = cx;
-                if (yearAddress == 0u)
-                {
-                    throw SystemError(EINVAL, "year pointer is null");
-                }
-                else if (monthAddress == 0u)
-                {
-                    throw SystemError(EINVAL, "month pointer is null");
-                }
-                else if (dayAddress == 0u)
-                {
-                    throw SystemError(EINVAL, "day pointer is null");
-                }
-                Date date = System.GetCurrentDate();
-                short year = date.Year();
-                sbyte month = date.GetMonth();
-                sbyte day = date.Day();
-                WriteProcessMemory(machine, process, yearAddress, cast<ulong>(year), 2u, Protection.write);
-                WriteProcessMemory(machine, process, monthAddress, cast<ulong>(month), 1u, Protection.write);
-                WriteProcessMemory(machine, process, dayAddress, cast<ulong>(day), 1u, Protection.write);
-            }
-            catch (const SystemError& systemError)
-            {
-                process->lastError = systemError;
-                return -1;
-            }
-            catch (const Exception& ex)
-            {
-                process->lastError = SystemError(EFAIL, "get_current_date failed: " + ex.ToString());
-                return -1;
-            }
+            throw SystemError(EINVAL, "year pointer is null");
         }
-        else
+        else if (monthAddress == 0u)
         {
-            Panic("get_current_date called for a process that is not running!");
+            throw SystemError(EINVAL, "month pointer is null");
         }
-        return 0;
+        else if (dayAddress == 0u)
+        {
+            throw SystemError(EINVAL, "day pointer is null");
+        }
+        Date date = System.GetCurrentDate();
+        short year = date.Year();
+        sbyte month = date.GetMonth();
+        sbyte day = date.Day();
+        WriteProcessMemory(*sc.machine, sc.process, yearAddress, cast<ulong>(year), 2u, Protection.write);
+        WriteProcessMemory(*sc.machine, sc.process, monthAddress, cast<ulong>(month), 1u, Protection.write);
+        WriteProcessMemory(*sc.machine, sc.process, dayAddress, cast<ulong>(day), 1u, Protection.write);
     }
 
-    public long GetCurrentDateTime(Machine& machine, byte x, byte y, byte z, ulong ax, ulong bx, ulong cx, ulong dx, ulong ex)
+    public void GetCurrentDateTime(SystemCall& sc)
     {
-        if (x != 0u || y != sys_get_current_date_time || z != 0u)
+        if (sc.x != 0u || sc.y != sys_get_current_date_time || sc.z != 0u)
         {
-            Panic("invalid get_current_date_time parameters: " + ToString(x) + ", " + ToString(y) + ", " + ToString(z));
+            Panic("invalid get_current_date_time parameters: " + ToString(sc.x) + ", " + ToString(sc.y) + ", " + ToString(sc.z));
         }
-        Kernel& kernel = Kernel.Instance();
-        ProcessTable& processTable = kernel.GetProcessTable();
-        Process* process = processTable.GetRunning();
-        if (process != null)
+        ulong yearAddress = sc.ax;
+        ulong monthAddress = sc.bx;
+        ulong dayAddress = sc.cx;
+        ulong secsAddress = sc.dx;
+        if (yearAddress == 0u)
         {
-            try
-            {
-                ulong yearAddress = ax;
-                ulong monthAddress = bx;
-                ulong dayAddress = cx;
-                ulong secsAddress = dx;
-                if (yearAddress == 0u)
-                {
-                    throw SystemError(EINVAL, "year pointer is null");
-                }
-                else if (monthAddress == 0u)
-                {
-                    throw SystemError(EINVAL, "month pointer is null");
-                }
-                else if (dayAddress == 0u)
-                {
-                    throw SystemError(EINVAL, "day pointer is null");
-                }
-                else if (secsAddress == 0u)
-                {
-                    throw SystemError(EINVAL, "secs pointer is null");
-                }
-                DateTime dateTime = GetCurrentDateTime();
-                Date date = dateTime.GetDate();
-                short year = date.Year();
-                sbyte month = date.GetMonth();
-                sbyte day = date.Day();
-                int secs = dateTime.Seconds();
-                WriteProcessMemory(machine, process, yearAddress, cast<ulong>(year), 2u, Protection.write);
-                WriteProcessMemory(machine, process, monthAddress, cast<ulong>(month), 1u, Protection.write);
-                WriteProcessMemory(machine, process, dayAddress, cast<ulong>(day), 1u, Protection.write);
-                WriteProcessMemory(machine, process, secsAddress, cast<ulong>(secs), 4u, Protection.write);
-            }
-            catch (const SystemError& systemError)
-            {
-                process->lastError = systemError;
-                return -1;
-            }
-            catch (const Exception& ex)
-            {
-                process->lastError = SystemError(EFAIL, "get_current_date_time failed: " + ex.ToString());
-                return -1;
-            }
+            throw SystemError(EINVAL, "year pointer is null");
         }
-        else
+        else if (monthAddress == 0u)
         {
-            Panic("get_current_date_time called for a process that is not running!");
+            throw SystemError(EINVAL, "month pointer is null");
         }
-        return 0;
+        else if (dayAddress == 0u)
+        {
+            throw SystemError(EINVAL, "day pointer is null");
+        }
+        else if (secsAddress == 0u)
+        {
+            throw SystemError(EINVAL, "secs pointer is null");
+        }
+        DateTime dateTime = GetCurrentDateTime();
+        Date date = dateTime.GetDate();
+        short year = date.Year();
+        sbyte month = date.GetMonth();
+        sbyte day = date.Day();
+        int secs = dateTime.Seconds();
+        WriteProcessMemory(*sc.machine, sc.process, yearAddress, cast<ulong>(year), 2u, Protection.write);
+        WriteProcessMemory(*sc.machine, sc.process, monthAddress, cast<ulong>(month), 1u, Protection.write);
+        WriteProcessMemory(*sc.machine, sc.process, dayAddress, cast<ulong>(day), 1u, Protection.write);
+        WriteProcessMemory(*sc.machine, sc.process, secsAddress, cast<ulong>(secs), 4u, Protection.write);
     }
 
-    public long Pow(Machine& machine, byte x, byte y, byte z, ulong ax, ulong bx, ulong cx, ulong dx, ulong ex)
+    public void Pow(SystemCall& sc)
     {
-        if (x != 0u || y != sys_pow || z != 0u)
+        if (sc.x != 0u || sc.y != sys_pow || sc.z != 0u)
         {
-            Panic("invalid pow parameters: " + ToString(x) + ", " + ToString(y) + ", " + ToString(z));
+            Panic("invalid pow parameters: " + ToString(sc.x) + ", " + ToString(sc.y) + ", " + ToString(sc.z));
         }
-        double x = *cast<double*>(cast<void*>(&ax));
-        double y = *cast<double*>(cast<void*>(&bx));
+        double x = *cast<double*>(cast<void*>(&sc.ax));
+        double y = *cast<double*>(cast<void*>(&sc.bx));
         double r = Pow(x, y);
-        long result = *cast<long*>(cast<void*>(&r));
-        return result;
+        sc.result = *cast<long*>(cast<void*>(&r));
     }
 
-    public long IsHostTextFile(Machine& machine, byte x, byte y, byte z, ulong ax, ulong bx, ulong cx, ulong dx, ulong ex)
+    public void IsHostTextFile(SystemCall& sc)
     {
-        if (x != 0u || y != sys_is_host_text_file || z != 0u)
+        if (sc.x != 0u || sc.y != sys_is_host_text_file || sc.z != 0u)
         {
-            Panic("invalid is_host_text_file parameters: " + ToString(x) + ", " + ToString(y) + ", " + ToString(z));
+            Panic("invalid is_host_text_file parameters: " + ToString(sc.x) + ", " + ToString(sc.y) + ", " + ToString(sc.z));
         }
-        Kernel& kernel = Kernel.Instance();
-        ProcessTable& processTable = kernel.GetProcessTable();
-        Process* process = processTable.GetRunning();
-        if (process != null)
+        int fd = cast<int>(sc.ax);
+        if (IsHostTextFile(sc.process, fd))
         {
-            try
-            {
-                int fd = cast<int>(ax);
-                if (IsHostTextFile(process, fd))
-                {
-                    return 1;
-                }
-                else
-                {
-                    return 0;
-                }
-            }
-            catch (const SystemError& systemError)
-            {
-                process->lastError = systemError;
-                return -1;
-            }
-            catch (const Exception& ex)
-            {
-                process->lastError = SystemError(EFAIL, "is_host_text_file failed: " + ex.ToString());
-                return -1;
-            }
+            sc.result = 1;
         }
         else
         {
-            Panic("is_host_text_file called for a process that is not running!");
+            sc.result = 0;
         }
-        return 0;
     }
 
-    public long IsConsole(Machine& machine, byte x, byte y, byte z, ulong ax, ulong bx, ulong cx, ulong dx, ulong ex)
+    public void IsConsole(SystemCall& sc)
     {
-        if (x != 0u || y != sys_is_console || z != 0u)
+        if (sc.x != 0u || sc.y != sys_is_console || sc.z != 0u)
         {
-            Panic("invalid is_console parameters: " + ToString(x) + ", " + ToString(y) + ", " + ToString(z));
+            Panic("invalid is_console parameters: " + ToString(sc.x) + ", " + ToString(sc.y) + ", " + ToString(sc.z));
         }
-        Kernel& kernel = Kernel.Instance();
-        ProcessTable& processTable = kernel.GetProcessTable();
-        Process* process = processTable.GetRunning();
-        if (process != null)
+        int fd = cast<int>(sc.ax);
+        if (IsConsole(sc.process, fd))
         {
-            try
-            {
-                int fd = cast<int>(ax);
-                if (IsConsole(process, fd))
-                {
-                    return 1;
-                }
-                else
-                {
-                    return 0;
-                }
-            }
-            catch (const SystemError& systemError)
-            {
-                process->lastError = systemError;
-                return -1;
-            }
-            catch (const Exception& ex)
-            {
-                process->lastError = SystemError(EFAIL, "is_host_text_file failed: " + ex.ToString());
-                return -1;
-            }
+            sc.result = 1;
         }
         else
         {
-            Panic("is_host_text_file called for a process that is not running!");
+            sc.result = 0;
         }
-        return 0;
     }
 
-    public long GetRandomSeed(Machine& machine, byte x, byte y, byte z, ulong ax, ulong bx, ulong cx, ulong dx, ulong ex)
+    public void GetRandomSeed(SystemCall& sc)
     {
-        if (x != 0u || y != sys_get_random_seed || z != 0u)
+        if (sc.x != 0u || sc.y != sys_get_random_seed || sc.z != 0u)
         {
-            Panic("invalid get_random_seed parameters: " + ToString(x) + ", " + ToString(y) + ", " + ToString(z));
+            Panic("invalid get_random_seed parameters: " + ToString(sc.x) + ", " + ToString(sc.y) + ", " + ToString(sc.z));
         }
-        Kernel& kernel = Kernel.Instance();
-        ProcessTable& processTable = kernel.GetProcessTable();
-        Process* process = processTable.GetRunning();
-        if (process != null)
-        {
-            try
-            {
-                return RtGetRandomSeed();
-            }
-            catch (const SystemError& systemError)
-            {
-                process->lastError = systemError;
-                return -1;
-            }
-            catch (const Exception& ex)
-            {
-                process->lastError = SystemError(EFAIL, "get_random_seed failed: " + ex.ToString());
-                return -1;
-            }
-        }
-        else
-        {
-            Panic("get_random_seed called for a process that is not running!");
-        }
-        return 0;
+        sc.result = RtGetRandomSeed();
     }
 
-    public long FileExists(Machine& machine, byte x, byte y, byte z, ulong ax, ulong bx, ulong cx, ulong dx, ulong ex)
+    public void FileExists(SystemCall& sc)
     {
-        if (x != 0u || y != sys_file_exists || z != 0u)
+        if (sc.x != 0u || sc.y != sys_file_exists || sc.z != 0u)
         {
-            Panic("invalid file_exists parameters: " + ToString(x) + ", " + ToString(y) + ", " + ToString(z));
+            Panic("invalid file_exists parameters: " + ToString(sc.x) + ", " + ToString(sc.y) + ", " + ToString(sc.z));
         }
-        Kernel& kernel = Kernel.Instance();
-        ProcessTable& processTable = kernel.GetProcessTable();
-        Process* process = processTable.GetRunning();
-        if (process != null)
-        {
-            try
-            {
-                throw SystemError(ENOTSUPPORTED, "not implemented yet");
-            }
-            catch (const SystemError& systemError)
-            {
-                process->lastError = systemError;
-                return -1;
-            }
-            catch (const Exception& ex)
-            {
-                process->lastError = SystemError(EFAIL, "file_exists failed: " + ex.ToString());
-                return -1;
-            }
-        }
-        else
-        {
-            Panic("file_exists called for a process that is not running!");
-        }
-        return 0;
+        throw SystemError(ENOTSUPPORTED, "not implemented yet");
     }
 
-    public long GetFileSize(Machine& machine, byte x, byte y, byte z, ulong ax, ulong bx, ulong cx, ulong dx, ulong ex)
+    public void GetFileSize(SystemCall& sc)
     {
-        if (x != 0u || y != sys_get_file_size || z != 0u)
+        if (sc.x != 0u || sc.y != sys_get_file_size || sc.z != 0u)
         {
-            Panic("invalid get_file_size parameters: " + ToString(x) + ", " + ToString(y) + ", " + ToString(z));
+            Panic("invalid get_file_size parameters: " + ToString(sc.x) + ", " + ToString(sc.y) + ", " + ToString(sc.z));
         }
-        Kernel& kernel = Kernel.Instance();
-        ProcessTable& processTable = kernel.GetProcessTable();
-        Process* process = processTable.GetRunning();
-        if (process != null)
-        {
-            try
-            {
-                throw SystemError(ENOTSUPPORTED, "not implemented yet");
-            }
-            catch (const SystemError& systemError)
-            {
-                process->lastError = systemError;
-                return -1;
-            }
-            catch (const Exception& ex)
-            {
-                process->lastError = SystemError(EFAIL, "get_file_size failed: " + ex.ToString());
-                return -1;
-            }
-        }
-        else
-        {
-            Panic("get_file_size called for a process that is not running!");
-        }
-        return 0;
+        throw SystemError(ENOTSUPPORTED, "not implemented yet");
     }
 
-    public long Unlink(Machine& machine, byte x, byte y, byte z, ulong ax, ulong bx, ulong cx, ulong dx, ulong ex)
+    public void Unlink(SystemCall& sc)
     {
-        if (x != 0u || y != sys_unlink || z != 0u)
+        if (sc.x != 0u || sc.y != sys_unlink || sc.z != 0u)
         {
-            Panic("invalid unlink parameters: " + ToString(x) + ", " + ToString(y) + ", " + ToString(z));
+            Panic("invalid unlink parameters: " + ToString(sc.x) + ", " + ToString(sc.y) + ", " + ToString(sc.z));
         }
-        Kernel& kernel = Kernel.Instance();
-        ProcessTable& processTable = kernel.GetProcessTable();
-        Process* process = processTable.GetRunning();
-        if (process != null)
+        throw SystemError(ENOTSUPPORTED, "not implemented yet");
+    }
+
+    public void Mkdir(SystemCall& sc)
+    {
+        if (sc.x != 0u || sc.y != sys_mkdir || sc.z != 0u)
         {
-            try
-            {
-                throw SystemError(ENOTSUPPORTED, "not implemented yet");
-            }
-            catch (const SystemError& systemError)
-            {
-                process->lastError = systemError;
-                return -1;
-            }
-            catch (const Exception& ex)
-            {
-                process->lastError = SystemError(EFAIL, "unlink failed: " + ex.ToString());
-                return -1;
-            }
+            Panic("invalid mkdir parameters: " + ToString(sc.x) + ", " + ToString(sc.y) + ", " + ToString(sc.z));
         }
-        else
+        Mkdir(*sc.machine, sc.process, cast<ulong>(sc.ax));
+    }
+
+    public void OpenDir(SystemCall& sc)
+    {
+        if (sc.x != 0u || sc.y != sys_opendir || sc.z != 0u)
         {
-            Panic("unlink called for a process that is not running!");
+            Panic("invalid opendir parameters: " + ToString(sc.x) + ", " + ToString(sc.y) + ", " + ToString(sc.z));
         }
-        return 0;
+        sc.result = OpenDir(*sc.machine, sc.process, cast<ulong>(sc.ax));
+    }
+
+    public void ReadDir(SystemCall& sc)
+    {
+        if (sc.x != 0u || sc.y != sys_readdir || sc.z != 0u)
+        {
+            Panic("invalid readdir parameters: " + ToString(sc.x) + ", " + ToString(sc.y) + ", " + ToString(sc.z));
+        }
+        sc.result = ReadDir(*sc.machine, sc.process, cast<int>(sc.ax), sc.bx, sc.cx);
+    }
+
+    public void CloseDir(SystemCall& sc)
+    {
+        if (sc.x != 0u || sc.y != sys_closedir || sc.z != 0u)
+        {
+            Panic("invalid closedir parameters: " + ToString(sc.x) + ", " + ToString(sc.y) + ", " + ToString(sc.z));
+        }
+        CloseDir(*sc.machine, sc.process, cast<int>(sc.ax));
+        sc.result = 0;
     }
 }

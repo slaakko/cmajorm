@@ -269,7 +269,8 @@ function drawDiagram(diagramNodes) {
 function drawInheritanceDiagram() {
     var diagramNodes = [
         { name: "cmsx.intermediate.Value", id: "diagram_node_0", level: 0, subject: false, hasDerivedNodes: true, link: "../../cmsxi/doc/class_Value_D184FDC4DCC37461ED1781E875D6610EE22D5D73.html" },
-        { name: "cmsx.intermediate.SymbolValue", id: "diagram_node_1", level: 1, subject: true, hasDerivedNodes: false, link: "../../cmsxi/doc/class_SymbolValue_6012FED2F52BFDE4E970311F55551FE8DA1D1471.html" }];
+        { name: "cmsx.intermediate.ConstantValue", id: "diagram_node_1", level: 1, subject: false, hasDerivedNodes: true, link: "../../cmsxi/doc/class_ConstantValue_6CBE7195C18A92AA788961FEB9859AF11A2CA755.html" },
+        { name: "cmsx.intermediate.SymbolValue", id: "diagram_node_2", level: 2, subject: true, hasDerivedNodes: false, link: "../../cmsxi/doc/class_SymbolValue_6012FED2F52BFDE4E970311F55551FE8DA1D1471.html" }];
     drawDiagram(diagramNodes);
 }
 

@@ -465,7 +465,7 @@ namespace cmsx.machine
             }
             return pte;
         }
-        public nothrow ulong TranslateAddress(ulong virtualAddress, Protection access)
+        public nothrow ulong TranslateAddress(ulong virtualAddress, Protection access, bool pageFault)
         {
             if (CheckSecurityViolation(virtualAddress))
             {
@@ -489,7 +489,10 @@ namespace cmsx.machine
             }
             else if (pte == 0u || (pageProtection & access) != access)
             {
-                PageFault(virtualAddress, pageProtection, access);
+                if (pageFault)
+                {
+                    PageFault(virtualAddress, pageProtection, access);
+                }
                 return invalidAddress;
             }
             ulong physicalAddress = pageAddress + offset;
@@ -497,7 +500,11 @@ namespace cmsx.machine
         }
         public nothrow byte ReadByte(ulong virtualAddress, Protection access)
         {
-            ulong address = TranslateAddress(virtualAddress, access);
+            return ReadByte(virtualAddress, access, true);
+        }
+        public nothrow byte ReadByte(ulong virtualAddress, Protection access, bool pageFault)
+        {
+            ulong address = TranslateAddress(virtualAddress, access, pageFault);
             if (address != invalidAddress)
             {
                 return ReadMemoryByte(address);
@@ -509,7 +516,11 @@ namespace cmsx.machine
         }
         public nothrow void WriteByte(ulong virtualAddress, byte b, Protection access)
         {
-            ulong address = TranslateAddress(virtualAddress, access);
+            WriteByte(virtualAddress, b, access, true);
+        }
+        public nothrow void WriteByte(ulong virtualAddress, byte b, Protection access, bool pageFault)
+        {
+            ulong address = TranslateAddress(virtualAddress, access, pageFault);
             if (address != invalidAddress)
             {
                 WriteMemoryByte(address, b);
@@ -517,7 +528,11 @@ namespace cmsx.machine
         }
         public nothrow ushort ReadUShort(ulong virtualAddress, Protection access)
         {
-            ulong address = TranslateAddress(virtualAddress, access);
+            return ReadUShort(virtualAddress, access, true);
+        }
+        public nothrow ushort ReadUShort(ulong virtualAddress, Protection access, bool pageFault)
+        {
+            ulong address = TranslateAddress(virtualAddress, access, pageFault);
             if (address != invalidAddress)
             {
                 return ReadMemoryUShort(address);
@@ -529,7 +544,11 @@ namespace cmsx.machine
         }
         public nothrow void WriteUShort(ulong virtualAddress, ushort u, Protection access)
         {
-            ulong address = TranslateAddress(virtualAddress, access);
+            WriteUShort(virtualAddress, u, access, true);
+        }
+        public nothrow void WriteUShort(ulong virtualAddress, ushort u, Protection access, bool pageFault)
+        {
+            ulong address = TranslateAddress(virtualAddress, access, pageFault);
             if (address != invalidAddress)
             {
                 WriteMemoryUShort(address, u);
@@ -537,7 +556,11 @@ namespace cmsx.machine
         }
         public nothrow uint ReadUInt(ulong virtualAddress, Protection access)
         {
-            ulong address = TranslateAddress(virtualAddress, access);
+            return ReadUInt(virtualAddress, access, true);
+        }
+        public nothrow uint ReadUInt(ulong virtualAddress, Protection access, bool pageFault)
+        {
+            ulong address = TranslateAddress(virtualAddress, access, pageFault);
             if (address != invalidAddress)
             {
                 return ReadMemoryUInt(address);
@@ -549,7 +572,11 @@ namespace cmsx.machine
         }
         public nothrow void WriteUInt(ulong virtualAddress, uint u, Protection access)
         {
-            ulong address = TranslateAddress(virtualAddress, access);
+            WriteUInt(virtualAddress, u, access, true);
+        }
+        public nothrow void WriteUInt(ulong virtualAddress, uint u, Protection access, bool pageFault)
+        {
+            ulong address = TranslateAddress(virtualAddress, access, pageFault);
             if (address != invalidAddress)
             {
                 WriteMemoryUInt(address, u);
@@ -557,7 +584,11 @@ namespace cmsx.machine
         }
         public nothrow ulong ReadULong(ulong virtualAddress, Protection access)
         {
-            ulong address = TranslateAddress(virtualAddress, access);
+            return ReadULong(virtualAddress, access, true);
+        }
+        public nothrow ulong ReadULong(ulong virtualAddress, Protection access, bool pageFault)
+        {
+            ulong address = TranslateAddress(virtualAddress, access, pageFault);
             if (address != invalidAddress)
             {
                 return ReadMemoryULong(address);
@@ -569,7 +600,11 @@ namespace cmsx.machine
         }
         public nothrow void WriteULong(ulong virtualAddress, ulong u, Protection access)
         {
-            ulong address = TranslateAddress(virtualAddress, access);
+            WriteULong(virtualAddress, u, access, true);
+        }
+        public nothrow void WriteULong(ulong virtualAddress, ulong u, Protection access, bool pageFault)
+        {
+            ulong address = TranslateAddress(virtualAddress, access, pageFault);
             if (address != invalidAddress)
             {
                 WriteMemoryULong(address, u);

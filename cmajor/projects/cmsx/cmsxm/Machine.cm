@@ -3,10 +3,29 @@ using System.Collections;
 
 namespace cmsx.machine
 {
+    public delegate void KernelShutdownFunc();
+
+    public KernelShutdownFunc stopKernelThreads;
+
+    private bool panicThrows = true;
+
+    public nothrow bool PanicThrows()
+    {
+        return panicThrows;
+    }
+
     public void Panic(const string& message)
     {
-        Clock.Instance().Stop();
-        throw Exception(message);
+        if (PanicThrows())
+        {
+            Clock.Instance().Stop();
+            stopKernelThreads();
+            throw Exception(message);
+        }
+        else
+        {
+            System.Console.WriteLine(message);
+        }
     }
 
     public class Machine

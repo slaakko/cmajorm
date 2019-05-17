@@ -1,0 +1,1369 @@
+using System;
+using System.Collections;
+using cmsx.util;
+
+namespace cmsx.kernel
+{
+    public const int blockSize = 4096;
+    public const int numBitsInBitmapBlock = blockSize * 8;
+    public const int numULongsInBitmapBlock = blockSize / 8;
+    public const int numBlockNumbersInBlock = blockSize / 4;
+    public const int invalidBlockNumber = 0;
+    public const int maxCachedSuperBlocks = 16;
+    public const int maxCachedBitmapBlocks = 16;
+    public const int maxCachedINodeBlocks = 16;
+    public const int maxCachedBlockNumberBlocks = 16;
+    public const int maxCachedFileBlocks = 16;
+    public const int maxCachedDirectoryBlocks = 16;
+    public const int nameMax = 252;
+
+    public enum BlockKind : byte
+    {
+        superBlock, bitmapBlock, inodeBlock, blockNumberBlock, fileBlock, directoryBlock
+    }
+
+    public nothrow string BlockKindStr(BlockKind kind)
+    {
+        switch (kind)
+        {
+            case BlockKind.superBlock: return "super";
+            case BlockKind.bitmapBlock: return "bitmap";
+            case BlockKind.inodeBlock: return "inode";
+            case BlockKind.blockNumberBlock: return "blocknum";
+            case BlockKind.fileBlock: return "file";
+            case BlockKind.directoryBlock: return "dir";
+        }
+        return string();
+    }
+
+    public class BlockKey
+    {
+        public nothrow BlockKey(int blockNumber_, int fsNumber_, BlockKind kind_) : blockNumber(blockNumber_), fsNumber(fsNumber_), kind(kind_)
+        {
+        }
+        public nothrow string ToString() const
+        {
+            string s;
+            s.Append("block.").Append(BlockKindStr(kind)).Append('.').Append(ToString(fsNumber)).Append('.').Append(ToString(blockNumber));
+            return s;
+        }
+        public int blockNumber;
+        public int fsNumber;
+        public BlockKind kind;
+    }
+
+    public nothrow bool operator==(const BlockKey& left, const BlockKey& right)
+    {
+        return left.blockNumber == right.blockNumber && left.fsNumber == right.fsNumber && left.kind == right.kind;
+    }
+
+    public class BlockKeyHash : UnaryFun<BlockKey, ulong>
+    {
+        public nothrow inline ulong operator()(const BlockKey& key) const
+        {
+            return cast<ulong>(1099511628211 * key.fsNumber + 16777619 * cast<byte>(key.kind) + key.blockNumber);
+        }
+    }
+
+    public abstract class Block
+    {
+        public enum Flags : byte
+        {
+            none = 0u,
+            locked = 1u << 0u,
+            valid = 1u << 1u,
+            dirty = 1u << 2u,
+            old = 1u << 3u
+        }
+        public nothrow string BlockFlagStr(Flags flags)
+        {
+            string s = "flags";
+            if ((flags & Flags.locked) != Flags.none)
+            {
+                s.Append(".locked");
+            }
+            if ((flags & Flags.valid) != Flags.none)
+            {
+                s.Append(".valid");
+            }
+            if ((flags & Flags.dirty) != Flags.none)
+            {
+                s.Append(".dirty");
+            }
+            if ((flags & Flags.old) != Flags.none)
+            {
+                s.Append(".old");
+            }
+            return s;
+        }
+        public nothrow Block(const BlockKey& key_, BlockCache* cache_) : key(key_), cache(cache_), flags(Flags.none), iterator()
+        {
+        }
+        public default virtual ~Block();
+        public nothrow string ToString() const
+        {
+            string s;
+            s.Append(key.ToString());
+            s.Append('.').Append(BlockFlagStr(flags));
+            return s;
+        }
+        public virtual void Read(MemoryReader& reader)
+        {
+        }
+        public virtual void Write(MemoryWriter& writer)
+        {
+            ResetFlag(Flags.dirty);
+        }
+        public nothrow inline bool GetFlag(Flags flag) const
+        {
+            return (flags & flag) != Flags.none;
+        }
+        public nothrow inline void SetFlag(Flags flag)
+        {
+            flags = cast<Flags>(flags | flag);
+            if (flag == Flags.dirty)
+            {
+                cache->AddDirtyBlock(this);
+            }
+        }
+        public nothrow inline void ResetFlag(Flags flag)
+        {
+            flags = cast<Flags>(flags & ~flag);
+        }
+        public nothrow inline void ResetFlags()
+        {
+            flags = Flags.none;
+        }
+        public nothrow inline BlockKey& Key() const
+        {
+            return key;
+        }
+        public nothrow void SetKey(const BlockKey& key_)
+        {
+            key = key_;
+        }
+        public void AddWaitingProcess(Process* process)
+        {
+            waitingProcesses.Add(process);
+        }
+        public nothrow List<Process*> GetWaitingProcesses()
+        {
+            List<Process*> processes;
+            Swap(processes, waitingProcesses);
+            return processes;
+        }
+        public nothrow LinkedList<Block*>.Iterator GetIterator() const
+        {
+            return iterator;
+        }
+        public nothrow void SetIterator(LinkedList<Block*>.Iterator iterator_)
+        {
+            iterator = iterator_;
+        }
+        private BlockKey key;
+        private BlockCache* cache;
+        private Flags flags;
+        private List<Process*> waitingProcesses;
+        private LinkedList<Block*>.Iterator iterator;
+    }
+
+    public class SuperBlock : Block
+    {
+        public nothrow SuperBlock(BlockCache* cache_) :
+            base(BlockKey(0, 0, BlockKind.superBlock), cache_), 
+            firstINodeBitmapBlockNumber(0), numINodeBitmapBlocks(0), firstBlockBitmapBlockNumber(0), numBlockBitmapBlocks(0), firstINodeBlockNumber(0), numINodeBlocks(0), firstDataBlockNumber(0),
+            rootDirINodeNumber(0), lastBlockNumber(-1)
+        {
+        }
+        public override void Read(MemoryReader& reader)
+        {
+            base->Read(reader);
+            firstINodeBitmapBlockNumber = reader.ReadInt();
+            numINodeBitmapBlocks = reader.ReadInt();
+            firstBlockBitmapBlockNumber = reader.ReadInt();
+            numBlockBitmapBlocks = reader.ReadInt();
+            firstINodeBlockNumber = reader.ReadInt();
+            numINodeBlocks = reader.ReadInt();
+            firstDataBlockNumber = reader.ReadInt();
+            rootDirINodeNumber = reader.ReadInt();
+            lastBlockNumber = reader.ReadInt();
+        }
+        public override void Write(MemoryWriter& writer)
+        {
+            base->Write(writer);
+            writer.Write(firstINodeBitmapBlockNumber);
+            writer.Write(numINodeBitmapBlocks);
+            writer.Write(firstBlockBitmapBlockNumber);
+            writer.Write(numBlockBitmapBlocks);
+            writer.Write(firstINodeBlockNumber);
+            writer.Write(numINodeBlocks);
+            writer.Write(firstDataBlockNumber);
+            writer.Write(rootDirINodeNumber);
+            writer.Write(lastBlockNumber);
+        }
+        public nothrow inline int GetFirstINodeBitmapBlockNumber() const
+        {
+            return firstINodeBitmapBlockNumber;
+        }
+        public nothrow void SetFirstINodeBitmapBlockNumber(int firstINodeBitmapBlockNumber_)
+        {
+            firstINodeBitmapBlockNumber = firstINodeBitmapBlockNumber_;
+            SetFlag(Block.Flags.dirty);
+        }
+        public nothrow inline int GetNumINodeBitmapBlocks() const
+        {
+            return numINodeBitmapBlocks;
+        }
+        public nothrow void SetNumINodeBitmapBlocks(int numINodeBitmapBlocks_)
+        {
+            numINodeBitmapBlocks = numINodeBitmapBlocks_;
+            SetFlag(Block.Flags.dirty);
+        }
+        public nothrow inline int GetFirstBlockBitmapBlockNumber() const
+        {
+            return firstBlockBitmapBlockNumber;
+        }
+        public nothrow void SetFirstBlockBitmapBlockNumber(int firstBlockBitmapBlockNumber_)
+        {
+            firstBlockBitmapBlockNumber = firstBlockBitmapBlockNumber_;
+            SetFlag(Block.Flags.dirty);
+        }
+        public nothrow inline int GetNumBlockBitmapBlocks() const
+        {
+            return numBlockBitmapBlocks;
+        }
+        public nothrow void SetNumBlockBitmapBlocks(int numBlockBitmapBlocks_)
+        {
+            numBlockBitmapBlocks = numBlockBitmapBlocks_;
+            SetFlag(Block.Flags.dirty);
+        }
+        public nothrow inline int GetFirstINodeBlockNumber() const
+        {
+            return firstINodeBlockNumber;
+        }
+        public nothrow void SetFirstINodeBlockNumber(int firstINodeBlockNumber_)
+        {
+            firstINodeBlockNumber = firstINodeBlockNumber_;
+            SetFlag(Block.Flags.dirty);
+        }
+        public nothrow inline int GetNumINodeBlocks() const
+        {
+            return numINodeBlocks;
+        }
+        public nothrow void SetNumINodeBlocks(int numINodeBlocks_)
+        {
+            numINodeBlocks = numINodeBlocks_;
+            SetFlag(Block.Flags.dirty);
+        }
+        public nothrow inline int GetFirstDataBlockNumber() const
+        {
+            return firstDataBlockNumber;
+        }
+        public nothrow void SetFirstDataBlockNumber(int firstDataBlockNumber_)
+        {
+            firstDataBlockNumber = firstDataBlockNumber_;
+            SetFlag(Block.Flags.dirty);
+        }
+        public nothrow inline int GetRootDirINodeNumber() const
+        {
+            return rootDirINodeNumber;
+        }
+        public nothrow void SetRootDirINodeNumber(int rootDirINodeNumber_)
+        {
+            rootDirINodeNumber = rootDirINodeNumber_;
+            SetFlag(Block.Flags.dirty);
+        }
+        public nothrow inline int GetLastBlockNumber() const
+        {
+            return lastBlockNumber;
+        }
+        public nothrow void SetLastBlockNumber(int lastBlockNumber_)
+        {
+            lastBlockNumber = lastBlockNumber_;
+            SetFlag(Block.Flags.dirty);
+        }
+        private int firstINodeBitmapBlockNumber;
+        private int numINodeBitmapBlocks;
+        private int firstBlockBitmapBlockNumber;
+        private int numBlockBitmapBlocks;
+        private int firstINodeBlockNumber;
+        private int numINodeBlocks;
+        private int firstDataBlockNumber;
+        private int rootDirINodeNumber;
+        private int lastBlockNumber;
+    }
+
+    public class BitmapBlock : Block
+    {
+        public nothrow BitmapBlock(BlockCache* cache_) : base(BlockKey(0, 0, BlockKind.bitmapBlock), cache_)
+        {
+        }
+        public override void Read(MemoryReader& reader)
+        {
+            base->Read(reader);
+            long n = bits.Length();
+            for (long i = 0; i < n; ++i)
+            {
+                ulong b = reader.ReadULong();
+                bits[i] = b;
+            }
+        }
+        public override void Write(MemoryWriter& writer)
+        {
+            base->Write(writer);
+            long n = bits.Length();
+            for (long i = 0; i < n; ++i)
+            {
+                writer.Write(bits[i]);
+            }
+        }
+        public nothrow int GetFirstZeroBitIndex() const
+        {
+            long n = bits.Length();
+            for (long i = 0; i < n; ++i)
+            {
+                if (bits[i] != MaxValue<ulong>())
+                {
+                    ulong b = bits[i];
+                    for (byte j = 0u; j < 64u; ++j)
+                    {
+                        if ((b & (1u << j)) == 0u)
+                        {
+                            return cast<int>(i) * 64 + j;
+                        }
+                    }
+                }
+            }
+            return -1;
+        }
+        public nothrow bool GetBit(int index) const
+        {
+            int i = index / 64;
+            byte j = cast<byte>(index % 64);
+            return (bits[i] & (1u << j)) != 0u;
+        }
+        public nothrow void SetBit(int index)
+        {
+            int i = index / 64;
+            byte j = cast<byte>(index % 64);
+            bits[i] = bits[i] | (1u << j);
+            SetFlag(Flags.dirty);
+        }
+        public nothrow void ResetBit(int index)
+        {
+            int i = index / 64;
+            byte j = cast<byte>(index % 64);
+            bits[i] = bits[i] & ~(1u << j);
+            SetFlag(Flags.dirty);
+        }
+        private ulong[numULongsInBitmapBlock] bits;
+    }
+
+    public class BlockNumberBlock : Block
+    {
+        public nothrow BlockNumberBlock(BlockCache* cache_) : base(BlockKey(0, 0, BlockKind.blockNumberBlock), cache_)
+        {
+        }
+        public override void Read(MemoryReader& reader)
+        {
+            base->Read(reader);
+            for (int i = 0; i < numBlockNumbersInBlock; ++i)
+            {
+                blockNumbers[i] = reader.ReadInt();
+            }
+        }
+        public override void Write(MemoryWriter& writer)
+        {
+            base->Write(writer);
+            for (int i = 0; i < numBlockNumbersInBlock; ++i)
+            {
+                writer.Write(blockNumbers[i]);
+            }
+        }
+        public nothrow void Clear()
+        {
+            for (int i = 0; i < numBlockNumbersInBlock; ++i)
+            {
+                blockNumbers[i] = 0;
+            }
+            SetFlag(Block.Flags.dirty);
+        }
+        public nothrow inline int GetBlockNumber(int index) const
+        {
+            #assert(index >= 0 && index < numBlockNumbersInBlock);
+            return blockNumbers[index];
+        }
+        public nothrow inline void SetBlockNumber(int index, int blockNumber)
+        {
+            blockNumbers[index] = blockNumber;
+            SetFlag(Block.Flags.dirty);
+        }
+        private int[numBlockNumbersInBlock] blockNumbers;
+    }
+
+    public class FileBlock : Block
+    {
+        public nothrow FileBlock(BlockCache* cache_) : base(BlockKey(0, 0, BlockKind.fileBlock), cache_)
+        {
+        }
+        public override void Read(MemoryReader& reader)
+        {
+            base->Read(reader);
+            for (long i = 0; i < blockSize; ++i)
+            {
+                data[i] = reader.ReadByte();
+            }
+        }
+        public override void Write(MemoryWriter& writer)
+        {
+            base->Write(writer);
+            for (long i = 0; i < blockSize; ++i)
+            {
+                writer.Write(data[i]);
+            }
+        }
+        public nothrow inline byte GetByte(long index) const
+        {
+            return data[index];
+        }
+        public nothrow inline void SetByte(long index, byte x)
+        {
+            data[index] = x;
+        }
+        public void Clear()
+        {
+            for (int i = 0; i < blockSize; ++i)
+            {
+                data[i] = 0u;
+            }
+            SetFlag(Block.Flags.dirty);
+        }
+        private byte[blockSize] data;
+    }
+
+    public class DirectoryEntry
+    {
+        public nothrow DirectoryEntry(int inodeNumber_, const string& name_) : inodeNumber(inodeNumber_)
+        {
+            #assert(name_.Length() < nameMax);
+            for (long i = 0; i < nameMax; ++i)
+            {
+                if (i < name_.Length())
+                {
+                    name[i] = name_[i];
+                }
+                else
+                {
+                    name[i] = '\0';
+                }
+            }
+        }
+        public void Read(MemoryReader& reader)
+        {
+            inodeNumber = reader.ReadInt();
+            for (long i = 0; i < nameMax; ++i)
+            {
+                name[i] = cast<char>(reader.ReadByte());
+            }
+        }
+        public void Write(MemoryWriter& writer)
+        {
+            writer.Write(inodeNumber);
+            for (long i = 0; i < nameMax; ++i)
+            {
+                writer.Write(cast<byte>(name[i]));
+            }
+        }
+        public int inodeNumber;
+        public char[nameMax] name;
+    }
+
+    public const int directoryEntrySize = 4 + nameMax;
+    public const int numDirectoryEntriesInBlock = blockSize / directoryEntrySize;
+
+    public class DirectorySlot
+    {
+        public nothrow DirectorySlot() : blockNumber(invalidBlockNumber), fsNumber(0), offset(-1)
+        {
+        }
+        public nothrow DirectorySlot(int blockNumber_, int fsNumber_, long offset_) : blockNumber(blockNumber_), fsNumber(fsNumber_), offset(offset_)
+        {
+        }
+        public int blockNumber;
+        public int fsNumber;
+        public long offset;
+    }
+
+    public class DirectoryBlock : Block
+    {
+        public nothrow DirectoryBlock(BlockCache* cache_) : base(BlockKey(0, 0, BlockKind.directoryBlock), cache_)
+        {
+        }
+        public override void Read(MemoryReader& reader)
+        {
+            base->Read(reader);
+            long n = entries.Length();
+            for (long i = 0; i < n; ++i)
+            {
+                entries[i].Read(reader);
+            }
+        }
+        public override void Write(MemoryWriter& writer)
+        {
+            base->Write(writer);
+            long n = entries.Length();
+            for (long i = 0; i < n; ++i)
+            {
+                entries[i].Write(writer);
+            }
+        }
+        public nothrow inline const DirectoryEntry& GetDirectoryEntry(int index) const
+        {
+            #assert(index >= 0 && index < entries.Length());
+            return entries[index];
+        }
+        public nothrow inline DirectoryEntry& GetDirectoryEntry(int index)
+        {
+            #assert(index >= 0 && index < entries.Length());
+            return entries[index];
+        }
+        private DirectoryEntry[numDirectoryEntriesInBlock] entries;
+    }
+
+    public class BlockBitmap
+    {
+        public nothrow BlockBitmap(int fsNumber_) : fsNumber(fsNumber_)
+        {
+        }
+        public int AllocateBlockNumber()
+        {
+            if (Log())
+            {
+                LogMessage("fs.bbm.allocateblocknumber", "begin");
+            }
+            Block* sb = GetBlockManager().ReadBlock(BlockKey(0, fsNumber, BlockKind.superBlock), null);
+            #assert(sb is SuperBlock*);
+            BlockPutter superBlockPutter(sb);
+            SuperBlock* superBlock = cast<SuperBlock*>(sb);
+            int firstNumber = superBlock->GetFirstBlockBitmapBlockNumber();
+            int n = superBlock->GetNumBlockBitmapBlocks();
+            for (int i = 0; i < n; ++i)
+            {
+                Block* block = null;
+                if (superBlock->GetLastBlockNumber() < firstNumber + i)
+                {
+                    block = GetBlockManager().GetBlock(BlockKey(firstNumber + i, fsNumber, BlockKind.bitmapBlock), superBlock);
+                }
+                else
+                {
+                    block = GetBlockManager().ReadBlock(BlockKey(firstNumber + i, fsNumber, BlockKind.bitmapBlock), superBlock);
+                }
+                #assert(block is BitmapBlock*);
+                BlockPutter putter(block);
+                BitmapBlock* bitmapBlock = cast<BitmapBlock*>(block);
+                int index = bitmapBlock->GetFirstZeroBitIndex();
+                if (index != -1)
+                {
+                    bitmapBlock->SetBit(index);
+                    int blockNumber = superBlock->GetFirstDataBlockNumber() + i * numBitsInBitmapBlock + index;
+                    if (Log())
+                    {
+                        LogMessage("fs.bbm.allocateblocknumber", "end.blocknumber=" + ToString(blockNumber));
+                    }
+                    return blockNumber;
+                }
+            }
+            throw SystemError(ERLIMITEXCEEDED, "file system " + ToString(fsNumber) + " has no free blocks");
+        }
+        public nothrow void SetBlockFree(int blockNumber)
+        {
+            if (Log())
+            {
+                LogMessage("fs.bbm.setblockfree", "begin.blocknumber=" + ToString(blockNumber));
+            }
+            Block* sb = GetBlockManager().ReadBlock(BlockKey(0, fsNumber, BlockKind.superBlock), null);
+            #assert(sb is SuperBlock*);
+            BlockPutter superBlockPutter(sb);
+            SuperBlock* superBlock = cast<SuperBlock*>(sb);
+            blockNumber = blockNumber - superBlock->GetFirstDataBlockNumber();
+            int firstNumber = superBlock->GetFirstBlockBitmapBlockNumber();
+            int bitmapBlockIndex = blockNumber / numBitsInBitmapBlock;
+            Block* block = GetBlockManager().ReadBlock(BlockKey(firstNumber + bitmapBlockIndex, superBlock->Key().fsNumber, BlockKind.bitmapBlock), superBlock);
+            #assert(block is BitmapBlock*);
+            BlockPutter putter(block);
+            BitmapBlock* bitmapBlock = cast<BitmapBlock*>(block);
+            int index = blockNumber % numBitsInBitmapBlock;
+            bitmapBlock->ResetBit(index);
+            if (Log())
+            {
+                LogMessage("fs.bbm.setblockfree", "end." + block->ToString());
+            }
+        }
+        private int fsNumber;
+    }
+
+    public class BlockCache
+    {
+        public nothrow BlockCache(BlockKind blockKind_, int maxCachedBlocks) : blockKind(blockKind_)
+        {
+            for (int i = 0; i < maxCachedBlocks; ++i)
+            {
+                Block* block = CreateBlock();
+                blocks.Add(UniquePtr<Block>(block));
+                freeBlockList.Add(block);
+                block->SetIterator(LinkedList<Block*>.Iterator(&freeBlockList, freeBlockList.Tail()));
+            }
+        }
+        public void RemoveBlockFromFreeList(Block* block)
+        {
+            LinkedList<Block*>.Iterator iterator = block->GetIterator();
+            if (iterator != freeBlockList.End())
+            {
+                freeBlockList.Remove(iterator);
+                block->SetIterator(freeBlockList.End());
+            }
+        }
+        public void PutBlockToFreeList(Block* block, bool tail)
+        {
+            if (tail)
+            {
+                freeBlockList.Add(block);
+                block->SetIterator(LinkedList<Block*>.Iterator(&freeBlockList, freeBlockList.Tail()));
+            }
+            else
+            {
+                LinkedList<Block*>.Iterator iterator = freeBlockList.InsertFront(block);
+                block->SetIterator(iterator);
+            }
+        }
+        public nothrow LinkedList<Block*>* GetFreeBlockList() const
+        {
+            return &freeBlockList;
+        }
+        public void AddWaitingProcess(Process* process)
+        {
+            waitingProcesses.Add(process);
+        }
+        public nothrow List<Process*> GetWaitingProcesses()
+        {
+            List<Process*> processes;
+            Swap(processes, waitingProcesses);
+            return processes;
+        }
+        public nothrow void AddDirtyBlock(Block* dirtyBlock)
+        {
+            dirtyBlocks.Insert(dirtyBlock);
+        }
+        public void Flush()
+        {
+            for (Block* block : dirtyBlocks)
+            {
+                if (block->GetFlag(Block.Flags.dirty))
+                {
+                    GetBlockManager().WriteBlock(block, null);
+                }
+            }
+        }
+        private Block* CreateBlock()
+        {
+            switch (blockKind)
+            {
+                case BlockKind.superBlock:
+                {
+                    return new SuperBlock(this);
+                }
+                case BlockKind.bitmapBlock:
+                {
+                    return new BitmapBlock(this);
+                }
+                case BlockKind.inodeBlock:
+                {
+                    return new INodeBlock(this);
+                }
+                case BlockKind.blockNumberBlock:
+                {
+                    return new BlockNumberBlock(this);
+                }
+                case BlockKind.fileBlock:
+                {
+                    return new FileBlock(this);
+                }
+                case BlockKind.directoryBlock:
+                {
+                    return new DirectoryBlock(this);
+                }
+            }
+            return null;
+        }
+        private BlockKind blockKind;
+        private List<UniquePtr<Block>> blocks;
+        private LinkedList<Block*> freeBlockList;
+        private List<Process*> waitingProcesses;
+        private Set<Block*> dirtyBlocks;
+    }
+
+    public class BlockManager
+    {
+        static BlockManager() : instance(new BlockManager())
+        {
+        }
+        public static nothrow BlockManager& Instance()
+        {
+            return *instance;
+        }
+        public nothrow Block* GetBlock(const BlockKey& key, SuperBlock* sb)
+        {
+            if (Log())
+            {
+                LogMessage("fs.bmgr.getblock.begin", key.ToString());
+            }
+            while (true)
+            {
+                HashMap<BlockKey, Block*, BlockKeyHash>.ConstIterator it = blockMap.CFind(key);
+                if (it != blockMap.CEnd())
+                {
+                    Block* block = it->second;
+                    if (block->GetFlag(Block.Flags.locked))
+                    {
+                        void* fiberData = OsGetFiberData();
+                        Process* process = cast<Process*>(fiberData);
+                        block->AddWaitingProcess(process);
+                        SleepProcess(process, blockUnlockedEvent, cast<ulong>(cast<void*>(block)), 0u);
+                        continue;
+                    }
+                    else
+                    {
+                        block->SetFlag(Block.Flags.locked);
+                        RemoveBlockFromFreeList(block);
+                        if (Log())
+                        {
+                            LogMessage("fs.bmgr.getblock.end.found", block->ToString());
+                        }
+                        return block;
+                    }
+                }
+                else
+                {
+                    LinkedList<Block*>* list = GetFreeBlockList(key.kind);
+                    #assert(list != null);
+                    if (list->IsEmpty())
+                    {
+                        void* fiberData = OsGetFiberData();
+                        Process* process = cast<Process*>(fiberData);
+                        AddWaitingProcess(process, key.kind);
+                        SleepProcess(process, anyBlockFreeEvent, cast<byte>(key.kind), 0u);
+                        continue;
+                    }
+                    else
+                    {
+                        Block* block = list->Front();
+                        list->RemoveFirst();
+                        block->SetIterator(list->End());
+                        if (block->GetFlag(Block.Flags.dirty))
+                        {
+                            WriteBlock(block, sb);
+                            continue;
+                        }
+                        else
+                        {
+                            blockMap.Remove(block->Key());
+                            block->SetKey(key);
+                            blockMap[key] = block;
+                            block->ResetFlags();
+                            block->SetFlag(Block.Flags.locked);
+                            if (Log())
+                            {
+                                LogMessage("fs.bmgr.getblock.end.free", block->ToString());
+                            }
+                            return block;
+                        }
+                    }
+                }
+            }
+        }
+        public nothrow void PutBlock(Block* block)
+        {
+            if (Log())
+            {
+                LogMessage("fs.bmgr.putblock.begin", block->ToString());
+            }
+            List<Process*> anyProcesses = GetWaitingProcesses(block->Key().kind);
+            Kernel& kernel = GetKernel();
+            ProcessTable& processTable = kernel.GetProcessTable();
+            for (Process* process : anyProcesses)
+            {
+                WakeUpProcess(processTable, process);
+            }
+            List<Process*> blockProcesses = block->GetWaitingProcesses();
+            for (Process* process : blockProcesses)
+            {
+                WakeUpProcess(processTable, process);
+            }
+            if (block->GetFlag(Block.Flags.valid) && !block->GetFlag(Block.Flags.old))
+            {
+                PutBlockToFreeList(block, true);
+            }
+            else
+            {
+                PutBlockToFreeList(block, false);
+            }
+            block->ResetFlag(Block.Flags.locked);
+            if (Log())
+            {
+                LogMessage("fs.bmgr.putblock.end", block->ToString());
+            }
+        }
+        public nothrow Block* ReadBlock(const BlockKey& key, SuperBlock* sb)
+        {
+            if (Log())
+            {
+                LogMessage("fs.bmgr.readblock.begin", key.ToString());
+            }
+            Block* block = GetBlock(key, sb);
+            if (block->GetFlag(Block.Flags.valid))
+            {
+                if (Log())
+                {
+                    LogMessage("fs.bmgr.readblock.end.cache", block->ToString()); 
+                }
+                return block;
+            }
+            long bytesRead = GetDiskDriver().Read(block);
+            block->SetFlag(Block.Flags.valid);
+            if (Log())
+            {
+                LogMessage("fs.bmgr.readblock.end.read", block->ToString());
+            }
+            return block;
+        }
+        public nothrow void WriteBlock(Block* block, SuperBlock* superBlock)
+        {
+            if (Log())
+            {
+                LogMessage("fs.bmgr.writeblock.begin", block->ToString());
+            }
+            long bytesWritten = GetDiskDriver().Write(block);
+            if (block->GetFlag(Block.Flags.dirty))
+            {
+                block->ResetFlag(Block.Flags.dirty);
+                block->SetFlag(Block.Flags.old);
+            }
+            int blockNumber = block->Key().blockNumber;
+            FileSystem* fs = GetMountTable().GetFileSystem(block->Key().fsNumber);
+            fs->SetLastBlockNumber(blockNumber, superBlock);
+            if (Log())
+            {
+                LogMessage("fs.bmgr.writeblock.end", block->ToString());
+            }
+        }
+        public void FreeBlocks(INode* inode)
+        {
+            if (Log())
+            {
+                LogMessage("fs.bmgr.freeblocks.begin", inode->ToString());
+            }
+            FileSystem* fs = GetMountTable().GetFileSystem(inode->Key().fsNumber);
+            for (int i = 0; i < numDirectBlockNumbers; ++i)
+            {
+                int blockNumber = inode->GetDirectBlockNumber(i);
+                if (blockNumber != 0)
+                {
+                    Block* block = GetBlock(BlockKey(blockNumber, inode->Key().fsNumber, BlockKind.fileBlock), null);
+                    #assert(block is FileBlock*);
+                    FileBlock* fileBlock = cast<FileBlock*>(block);
+                    fileBlock->Clear();
+                    BlockPutter putter(block);
+                    WriteBlock(block, null);
+                    fs->SetBlockFree(blockNumber);
+                    inode->SetDirectBlockNumber(i, 0);
+                }
+                int singleIndirectBlockNumber = inode->GetSingleIndirectBlockNumber();
+                if (singleIndirectBlockNumber != 0)
+                {
+                    Block* block = ReadBlock(BlockKey(singleIndirectBlockNumber, inode->Key().fsNumber, BlockKind.blockNumberBlock), null);
+                    #assert(block is BlockNumberBlock*);
+                    BlockPutter putter(block);
+                    BlockNumberBlock* singleIndirectBlock = cast<BlockNumberBlock*>(block);
+                    for (int i = 0; i < numBlockNumbersInBlock; ++i)
+                    {
+                        int blockNumber = singleIndirectBlock->GetBlockNumber(i);
+                        if (blockNumber != 0)
+                        {
+                            Block* block = GetBlock(BlockKey(blockNumber, inode->Key().fsNumber, BlockKind.fileBlock), null);
+                            #assert(block is FileBlock*);
+                            FileBlock* fileBlock = cast<FileBlock*>(block);
+                            fileBlock->Clear();
+                            BlockPutter putter(block);
+                            WriteBlock(block, null);
+                            fs->SetBlockFree(blockNumber);
+                        }
+                    }
+                    singleIndirectBlock->Clear();
+                    WriteBlock(block, null);
+                    fs->SetBlockFree(singleIndirectBlockNumber);
+                    inode->SetSingleIndirectBlockNumber(0);
+                }
+                int doubleIndirectBlockNumber = inode->GetDoubleIndirectBlockNumber();
+                if (doubleIndirectBlockNumber != 0)
+                {
+                    Block* block = ReadBlock(BlockKey(doubleIndirectBlockNumber, inode->Key().fsNumber, BlockKind.blockNumberBlock), null);
+                    #assert(block is BlockNumberBlock*);
+                    BlockPutter putter(block);
+                    BlockNumberBlock* doubleIndirectBlock = cast<BlockNumberBlock*>(block);
+                    for (int i = 0; i < numBlockNumbersInBlock; ++i)
+                    {
+                        int singleIndirectBlockNumber = doubleIndirectBlock->GetBlockNumber(i);
+                        if (singleIndirectBlockNumber != 0)
+                        {
+                            Block* block = ReadBlock(BlockKey(singleIndirectBlockNumber, inode->Key().fsNumber, BlockKind.blockNumberBlock), null);
+                            #assert(block is BlockNumberBlock*);
+                            BlockPutter putter(block);
+                            BlockNumberBlock* singleIndirectBlock = cast<BlockNumberBlock*>(block);
+                            for (int i = 0; i < numBlockNumbersInBlock; ++i)
+                            {
+                                int blockNumber = singleIndirectBlock->GetBlockNumber(i);
+                                if (blockNumber != 0)
+                                {
+                                    Block* block = GetBlock(BlockKey(blockNumber, inode->Key().fsNumber, BlockKind.fileBlock), null);
+                                    #assert(block is FileBlock*);
+                                    FileBlock* fileBlock = cast<FileBlock*>(block);
+                                    fileBlock->Clear();
+                                    BlockPutter putter(block);
+                                    WriteBlock(block, null);
+                                    fs->SetBlockFree(blockNumber);
+                                }
+                            }
+                            singleIndirectBlock->Clear();
+                            WriteBlock(block, null);
+                            fs->SetBlockFree(singleIndirectBlockNumber);
+                        }
+                    }
+                    doubleIndirectBlock->Clear();
+                    WriteBlock(block, null);
+                    fs->SetBlockFree(doubleIndirectBlockNumber);
+                    inode->SetDoubleIndirectBlockNumber(0);
+                }
+                int tripleIndirectBlockNumber = inode->GetTripleIndirectBlockNumber();
+                if (tripleIndirectBlockNumber != 0)
+                {
+                    Block* block = ReadBlock(BlockKey(tripleIndirectBlockNumber, inode->Key().fsNumber, BlockKind.blockNumberBlock), null);
+                    #assert(block is BlockNumberBlock*);
+                    BlockPutter putter(block);
+                    BlockNumberBlock* tripleIndirectBlock = cast<BlockNumberBlock*>(block);
+                    for (int i = 0; i < numBlockNumbersInBlock; ++i)
+                    {
+                        int doubleIndirectBlockNumber = tripleIndirectBlock->GetBlockNumber(i);
+                        if (doubleIndirectBlockNumber != 0)
+                        {
+                            Block* block = ReadBlock(BlockKey(doubleIndirectBlockNumber, inode->Key().fsNumber, BlockKind.blockNumberBlock), null);
+                            #assert(block is BlockNumberBlock*);
+                            BlockPutter putter(block);
+                            BlockNumberBlock* doubleIndirectBlock = cast<BlockNumberBlock*>(block);
+                            for (int i = 0; i < numBlockNumbersInBlock; ++i)
+                            {
+                                int singleIndirectBlockNumber = doubleIndirectBlock->GetBlockNumber(i);
+                                if (singleIndirectBlockNumber != 0)
+                                {
+                                    Block* block = ReadBlock(BlockKey(singleIndirectBlockNumber, inode->Key().fsNumber, BlockKind.blockNumberBlock), null);
+                                    #assert(block is BlockNumberBlock*);
+                                    BlockPutter putter(block);
+                                    BlockNumberBlock* singleIndirectBlock = cast<BlockNumberBlock*>(block);
+                                    for (int i = 0; i < numBlockNumbersInBlock; ++i)
+                                    {
+                                        int blockNumber = singleIndirectBlock->GetBlockNumber(i);
+                                        if (blockNumber != 0)
+                                        {
+                                            Block* block = GetBlock(BlockKey(blockNumber, inode->Key().fsNumber, BlockKind.fileBlock), null);
+                                            #assert(block is FileBlock*);
+                                            FileBlock* fileBlock = cast<FileBlock*>(block);
+                                            fileBlock->Clear();
+                                            BlockPutter putter(block);
+                                            WriteBlock(block, null);
+                                            fs->SetBlockFree(blockNumber);
+                                        }
+                                    }
+                                    singleIndirectBlock->Clear();
+                                    WriteBlock(block, null);
+                                    fs->SetBlockFree(singleIndirectBlockNumber);
+                                }
+                            }
+                            doubleIndirectBlock->Clear();
+                            WriteBlock(block, null);
+                            fs->SetBlockFree(doubleIndirectBlockNumber);
+                        }
+                    }
+                    tripleIndirectBlock->Clear();
+                    WriteBlock(block, null);
+                    fs->SetBlockFree(tripleIndirectBlockNumber);
+                    inode->SetTripleIndirectBlockNumber(0);
+                }
+            }
+            if (Log())
+            {
+                LogMessage("fs.bmgr.freeblocks.end", inode->ToString());
+            }
+        }
+        public void GetBlockNumber(INode* inode, long offset, int& blockNumber, int& blockOffset, bool allocate)
+        {
+            if (Log())
+            {
+                LogMessage("fs.bmgr.getblocknumber.begin", inode->ToString() + ".offset=" + ToString(offset) + ".allocate=" + ToString(allocate));
+            }
+            int logicalBlockNumber = cast<int>(offset / blockSize);
+            blockOffset = cast<int>(offset % blockSize);
+            if (logicalBlockNumber < numDirectBlockNumbers)
+            {
+                blockNumber = inode->GetDirectBlockNumber(logicalBlockNumber);
+                if (blockNumber == 0)
+                {
+                    if (allocate)
+                    {
+                        FileSystem* fs = GetMountTable().GetFileSystem(inode->Key().fsNumber);
+                        blockNumber = fs->AllocateBlockNumber();
+                        inode->SetDirectBlockNumber(logicalBlockNumber, blockNumber);
+                    }
+                    else
+                    {
+                        if (Log())
+                        {
+                            LogMessage("fs.bmgr.getblocknumber.end", "blocknumber=" + ToString(blockNumber) + ".blockoffset=" + ToString(blockOffset));
+                        }
+                        return;
+                    }
+                }
+            }
+            else
+            {
+                logicalBlockNumber = logicalBlockNumber - numDirectBlockNumbers;
+                if (logicalBlockNumber < numBlockNumbersInBlock)
+                {
+                    int singleIndirectBlockNumber = inode->GetSingleIndirectBlockNumber();
+                    if (singleIndirectBlockNumber == 0)
+                    {
+                        if (allocate)
+                        {
+                            FileSystem* fs = GetMountTable().GetFileSystem(inode->Key().fsNumber);
+                            singleIndirectBlockNumber = fs->AllocateBlockNumber();
+                            inode->SetSingleIndirectBlockNumber(singleIndirectBlockNumber);
+                            Block* block = GetBlock(BlockKey(singleIndirectBlockNumber, inode->Key().fsNumber, BlockKind.blockNumberBlock), null);
+                            #assert(block is BlockNumberBlock*);
+                            BlockPutter putter(block);
+                            BlockNumberBlock* singleIndirectBlock = cast<BlockNumberBlock*>(block);
+                            singleIndirectBlock->Clear();
+                            WriteBlock(block, null);
+                        }
+                        else
+                        {
+                            blockNumber = 0;
+                            if (Log())
+                            {
+                                LogMessage("fs.bmgr.getblocknumber.end", "blocknumber=" + ToString(blockNumber) + ".blockoffset=" + ToString(blockOffset));
+                            }
+                            return;
+                        }
+                    }
+                    Block* block = ReadBlock(BlockKey(singleIndirectBlockNumber, inode->Key().fsNumber, BlockKind.blockNumberBlock), null);
+                    #assert(block is BlockNumberBlock*);
+                    BlockPutter putter(block);
+                    BlockNumberBlock* singleIndirectBlock = cast<BlockNumberBlock*>(block);
+                    blockNumber = singleIndirectBlock->GetBlockNumber(logicalBlockNumber);
+                    if (blockNumber == 0)
+                    {
+                        if (allocate)
+                        {
+                            FileSystem* fs = GetMountTable().GetFileSystem(inode->Key().fsNumber);
+                            blockNumber = fs->AllocateBlockNumber();
+                            singleIndirectBlock->SetBlockNumber(logicalBlockNumber, blockNumber);
+                        }
+                        else
+                        {
+                            if (Log())
+                            {
+                                LogMessage("fs.bmgr.getblocknumber.end", "blocknumber=" + ToString(blockNumber) + ".blockoffset=" + ToString(blockOffset));
+                            }
+                            return;
+                        }
+                    }
+                }
+                else
+                {
+                    logicalBlockNumber = logicalBlockNumber - numBlockNumbersInBlock;
+                    if (logicalBlockNumber < numBlockNumbersInBlock * numBlockNumbersInBlock)
+                    {
+                        int doubleIndirectBlockNumber = inode->GetDoubleIndirectBlockNumber();
+                        if (doubleIndirectBlockNumber == 0)
+                        {
+                            if (allocate)
+                            {
+                                FileSystem* fs = GetMountTable().GetFileSystem(inode->Key().fsNumber);
+                                doubleIndirectBlockNumber = fs->AllocateBlockNumber();
+                                inode->SetDoubleIndirectBlockNumber(doubleIndirectBlockNumber);
+                                Block* block = GetBlock(BlockKey(doubleIndirectBlockNumber, inode->Key().fsNumber, BlockKind.blockNumberBlock), null);
+                                #assert(block is BlockNumberBlock*);
+                                BlockNumberBlock* doubleIndirectBlock = cast<BlockNumberBlock*>(block);
+                                doubleIndirectBlock->Clear();
+                                BlockPutter putter(block);
+                                WriteBlock(block, null);
+                            }
+                            else
+                            {
+                                blockNumber = 0;
+                                if (Log())
+                                {
+                                    LogMessage("fs.bmgr.getblocknumber.end", "blocknumber=" + ToString(blockNumber) + ".blockoffset=" + ToString(blockOffset));
+                                }
+                                return;
+                            }
+                        }
+                        Block* block = ReadBlock(BlockKey(doubleIndirectBlockNumber, inode->Key().fsNumber, BlockKind.blockNumberBlock), null);
+                        #assert(block is BlockNumberBlock*);
+                        BlockPutter putter(block);
+                        BlockNumberBlock* doubleIndirectBlock = cast<BlockNumberBlock*>(block);
+                        int singleIndirectBlockNumber = doubleIndirectBlock->GetBlockNumber(logicalBlockNumber / numBlockNumbersInBlock);
+                        if (singleIndirectBlockNumber == 0)
+                        {
+                            if (allocate)
+                            {
+                                FileSystem* fs = GetMountTable().GetFileSystem(inode->Key().fsNumber);
+                                singleIndirectBlockNumber = fs->AllocateBlockNumber();
+                                doubleIndirectBlock->SetBlockNumber(logicalBlockNumber / numBlockNumbersInBlock, singleIndirectBlockNumber);
+                                Block* block = GetBlock(BlockKey(singleIndirectBlockNumber, inode->Key().fsNumber, BlockKind.blockNumberBlock), null);
+                                #assert(block is BlockNumberBlock*);
+                                BlockNumberBlock* singleIndirectBlock = cast<BlockNumberBlock*>(block);
+                                singleIndirectBlock->Clear();
+                                BlockPutter putter(block);
+                                WriteBlock(block, null);
+                            }
+                            else
+                            {
+                                blockNumber = 0;
+                                if (Log())
+                                {
+                                    LogMessage("fs.bmgr.getblocknumber.end", "blocknumber=" + ToString(blockNumber) + ".blockoffset=" + ToString(blockOffset));
+                                }
+                                return;
+                            }
+                        }
+                        {
+                            Block* block = ReadBlock(BlockKey(singleIndirectBlockNumber, inode->Key().fsNumber, BlockKind.blockNumberBlock), null);
+                            #assert(block is BlockNumberBlock*);
+                            BlockPutter putter(block);
+                            BlockNumberBlock* singleIndirectBlock = cast<BlockNumberBlock*>(block);
+                            blockNumber = singleIndirectBlock->GetBlockNumber(logicalBlockNumber % numBlockNumbersInBlock);
+                            if (blockNumber == 0)
+                            {
+                                if (allocate)
+                                {
+                                    FileSystem* fs = GetMountTable().GetFileSystem(inode->Key().fsNumber);
+                                    blockNumber = fs->AllocateBlockNumber();
+                                    singleIndirectBlock->SetBlockNumber(logicalBlockNumber % numBlockNumbersInBlock, blockNumber);
+                                }
+                                else
+                                {
+                                    if (Log())
+                                    {
+                                        LogMessage("fs.bmgr.getblocknumber.end", "blocknumber=" + ToString(blockNumber) + ".blockoffset=" + ToString(blockOffset));
+                                    }
+                                    return;
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        logicalBlockNumber = logicalBlockNumber - numBlockNumbersInBlock * numBlockNumbersInBlock;
+                        if (logicalBlockNumber < numBlockNumbersInBlock * numBlockNumbersInBlock * numBlockNumbersInBlock)
+                        {
+                            int tripleIndirectBlockNumber = inode->GetTripleIndirectBlockNumber();
+                            if (tripleIndirectBlockNumber == 0)
+                            {
+                                if (allocate)
+                                {
+                                    FileSystem* fs = GetMountTable().GetFileSystem(inode->Key().fsNumber);
+                                    tripleIndirectBlockNumber = fs->AllocateBlockNumber();
+                                    inode->SetTripleIndirectBlockNumber(tripleIndirectBlockNumber);
+                                    Block* block = GetBlock(BlockKey(tripleIndirectBlockNumber, inode->Key().fsNumber, BlockKind.blockNumberBlock), null);
+                                    #assert(block is BlockNumberBlock*);
+                                    BlockNumberBlock* tripleIndirectBlock = cast<BlockNumberBlock*>(block);
+                                    tripleIndirectBlock->Clear();
+                                    BlockPutter putter(block);
+                                    WriteBlock(block, null);
+                                }
+                                else
+                                {
+                                    blockNumber = 0;
+                                    if (Log())
+                                    {
+                                        LogMessage("fs.bmgr.getblocknumber.end", "blocknumber=" + ToString(blockNumber) + ".blockoffset=" + ToString(blockOffset));;
+                                    }
+                                    return; 
+                                }
+                            }
+                            Block* block = ReadBlock(BlockKey(tripleIndirectBlockNumber, inode->Key().fsNumber, BlockKind.blockNumberBlock), null);
+                            #assert(block is BlockNumberBlock*);
+                            BlockPutter putter(block);
+                            BlockNumberBlock* tripleIndirectBlock = cast<BlockNumberBlock*>(block);
+                            int doubleIndirectBlockNumber = tripleIndirectBlock->GetBlockNumber(logicalBlockNumber / (numBlockNumbersInBlock * numBlockNumbersInBlock));
+                            if (doubleIndirectBlockNumber == 0)
+                            {
+                                if (allocate)
+                                {
+                                    FileSystem* fs = GetMountTable().GetFileSystem(inode->Key().fsNumber);
+                                    doubleIndirectBlockNumber = fs->AllocateBlockNumber();
+                                    tripleIndirectBlock->SetBlockNumber(logicalBlockNumber / (numBlockNumbersInBlock * numBlockNumbersInBlock), doubleIndirectBlockNumber);
+                                    Block* block = GetBlock(BlockKey(doubleIndirectBlockNumber, inode->Key().fsNumber, BlockKind.blockNumberBlock), null);
+                                    #assert(block is BlockNumberBlock*);
+                                    BlockNumberBlock* doubleIndirectBlock = cast<BlockNumberBlock*>(block);
+                                    doubleIndirectBlock->Clear();
+                                    BlockPutter putter(block);
+                                    WriteBlock(block, null);
+                                }
+                                else
+                                {
+                                    blockNumber = 0;
+                                    if (Log())
+                                    {
+                                        LogMessage("fs.bmgr.getblocknumber.end", "blocknumber=" + ToString(blockNumber) + ".blockoffset=" + ToString(blockOffset));
+                                    }
+                                    return;
+                                }
+                            }
+                            {
+                                Block* block = ReadBlock(BlockKey(doubleIndirectBlockNumber, inode->Key().fsNumber, BlockKind.blockNumberBlock), null);
+                                #assert(block is BlockNumberBlock*);
+                                BlockPutter putter(block);
+                                BlockNumberBlock* doubleIndirectBlock = cast<BlockNumberBlock*>(block);
+                                int singleIndirectBlockNumber = doubleIndirectBlock->GetBlockNumber((logicalBlockNumber % (numBlockNumbersInBlock * numBlockNumbersInBlock)) / numBlockNumbersInBlock);
+                                if (singleIndirectBlockNumber == 0)
+                                {
+                                    if (allocate)
+                                    {
+                                        FileSystem* fs = GetMountTable().GetFileSystem(inode->Key().fsNumber);
+                                        singleIndirectBlockNumber = fs->AllocateBlockNumber();
+                                        doubleIndirectBlock->SetBlockNumber((logicalBlockNumber % (numBlockNumbersInBlock * numBlockNumbersInBlock)) / numBlockNumbersInBlock, singleIndirectBlockNumber);
+                                        Block* block = GetBlock(BlockKey(singleIndirectBlockNumber, inode->Key().fsNumber, BlockKind.blockNumberBlock), null);
+                                        #assert(block is BlockNumberBlock*);
+                                        BlockNumberBlock* singleIndirectBlock = cast<BlockNumberBlock*>(block);
+                                        singleIndirectBlock->Clear();
+                                        BlockPutter putter(block);
+                                        WriteBlock(block, null);
+                                    }
+                                    else
+                                    {
+                                        blockNumber = 0;
+                                        if (Log())
+                                        {
+                                            LogMessage("fs.bmgr.getblocknumber.end", "blocknumber=" + ToString(blockNumber) + ".blockoffset=" + ToString(blockOffset));
+                                        }
+                                        return;
+                                    }
+                                }
+                                {
+                                    Block* block = ReadBlock(BlockKey(singleIndirectBlockNumber, inode->Key().fsNumber, BlockKind.blockNumberBlock), null);
+                                    #assert(block is BlockNumberBlock*);
+                                    BlockPutter putter(block);
+                                    BlockNumberBlock* singleIndirectBlock = cast<BlockNumberBlock*>(block);
+                                    blockNumber = singleIndirectBlock->GetBlockNumber((logicalBlockNumber % (numBlockNumbersInBlock * numBlockNumbersInBlock)) % numBlockNumbersInBlock);
+                                    if (blockNumber == 0)
+                                    {
+                                        if (allocate)
+                                        {
+                                            FileSystem* fs = GetMountTable().GetFileSystem(inode->Key().fsNumber);
+                                            blockNumber = fs->AllocateBlockNumber();
+                                            singleIndirectBlock->SetBlockNumber((logicalBlockNumber % (numBlockNumbersInBlock * numBlockNumbersInBlock)) % numBlockNumbersInBlock, blockNumber);
+                                        }
+                                        else
+                                        {
+                                            if (Log())
+                                            {
+                                                LogMessage("fs.bmgr.getblocknumber.end", "blocknumber=" + ToString(blockNumber) + ".blockoffset=" + ToString(blockOffset));
+                                            }
+                                            return;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        else
+                        {
+                            throw SystemError(EINVAL, "file offset too big");
+                        }
+                    }
+                }
+            }
+            if (Log())
+            {
+                LogMessage("fs.bmgr.getblocknumber.end", "blocknumber=" + ToString(blockNumber) + ".blockoffset=" + ToString(blockOffset));
+            }
+        }
+        public void Flush()
+        {
+            if (Log())
+            {
+                LogMessage("fs.bmgr.flush", "begin");
+            }
+            for (UniquePtr<BlockCache>& cache : caches)
+            {
+                cache->Flush();
+            }
+            if (Log())
+            {
+                LogMessage("fs.bmgr.flush", "end");
+            }
+        }
+        private nothrow BlockManager() 
+        {
+            caches.Add(UniquePtr<BlockCache>(new BlockCache(BlockKind.superBlock, maxCachedSuperBlocks)));
+            caches.Add(UniquePtr<BlockCache>(new BlockCache(BlockKind.bitmapBlock, maxCachedBitmapBlocks)));
+            caches.Add(UniquePtr<BlockCache>(new BlockCache(BlockKind.inodeBlock, maxCachedINodeBlocks)));
+            caches.Add(UniquePtr<BlockCache>(new BlockCache(BlockKind.blockNumberBlock, maxCachedBlockNumberBlocks)));
+            caches.Add(UniquePtr<BlockCache>(new BlockCache(BlockKind.fileBlock, maxCachedFileBlocks)));
+            caches.Add(UniquePtr<BlockCache>(new BlockCache(BlockKind.directoryBlock, maxCachedDirectoryBlocks)));
+        }
+        private void RemoveBlockFromFreeList(Block* block)
+        {
+            BlockCache* cache = caches[cast<byte>(block->Key().kind)].Get();
+            cache->RemoveBlockFromFreeList(block);
+        }
+        private void PutBlockToFreeList(Block* block, bool tail)
+        {
+            BlockCache* cache = caches[cast<byte>(block->Key().kind)].Get();
+            cache->PutBlockToFreeList(block, tail);
+        }
+        private LinkedList<Block*>* GetFreeBlockList(BlockKind kind)
+        {
+            BlockCache* cache = caches[cast<byte>(kind)].Get();
+            return cache->GetFreeBlockList();
+        }
+        private void AddWaitingProcess(Process* process, BlockKind kind)
+        {
+            BlockCache* cache = caches[cast<byte>(kind)].Get();
+            cache->AddWaitingProcess(process);
+        }
+        private List<Process*> GetWaitingProcesses(BlockKind kind)
+        {
+            BlockCache* cache = caches[cast<byte>(kind)].Get();
+            return cache->GetWaitingProcesses();
+        }
+        private static UniquePtr<BlockManager> instance;
+        private HashMap<BlockKey, Block*, BlockKeyHash> blockMap;
+        private List<UniquePtr<BlockCache>> caches;
+    }
+
+    public nothrow BlockManager& GetBlockManager()
+    {
+        return BlockManager.Instance();
+    }
+
+    public class BlockPutter
+    {
+        public nothrow BlockPutter(Block* block_) : block(block_)
+        {
+        }
+        public ~BlockPutter()
+        {
+            GetBlockManager().PutBlock(block);
+        }
+        private Block* block;
+    }
+}

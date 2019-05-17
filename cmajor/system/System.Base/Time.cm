@@ -158,6 +158,33 @@ namespace System
     {
         RtSleep(duration.Rep());
     }
+
+    public nothrow string DurationStr(const Duration& duration)
+    {
+        string s;
+        long hh = duration.Hours() % 24;
+        s.Append(cast<char>(cast<byte>('0') + cast<byte>(hh / 10 % 10)));
+        s.Append(cast<char>(cast<byte>('0') + cast<byte>(hh % 10)));
+        s.Append(':');
+        long mm = duration.Minutes() % 60;
+        s.Append(cast<char>(cast<byte>('0') + cast<byte>(mm / 10 % 10)));
+        s.Append(cast<char>(cast<byte>('0') + cast<byte>(mm % 10)));
+        s.Append(':');
+        long ss = duration.Seconds() % 60;
+        s.Append(cast<char>(cast<byte>('0') + cast<byte>(ss / 10 % 10)));
+        s.Append(cast<char>(cast<byte>('0') + cast<byte>(ss % 10)));
+        s.Append('.');
+        long ms = duration.Milliseconds() % 1000;
+        s.Append(cast<char>(cast<byte>('0') + cast<byte>(ms / 100 % 10)));
+        s.Append(cast<char>(cast<byte>('0') + cast<byte>(ms / 10 % 10)));
+        s.Append(cast<char>(cast<byte>('0') + cast<byte>(ms % 10)));
+        s.Append('.');
+        long us = duration.Microseconds() % 1000;
+        s.Append(cast<char>(cast<byte>('0') + cast<byte>(us / 100 % 10)));
+        s.Append(cast<char>(cast<byte>('0') + cast<byte>(us / 10 % 10)));
+        s.Append(cast<char>(cast<byte>('0') + cast<byte>(us % 10)));
+        return s;
+    }
     
     public enum Month : sbyte
     {

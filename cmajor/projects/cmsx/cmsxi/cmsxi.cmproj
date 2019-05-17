@@ -1,14 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup Label="Globals">
     <CustomProjectExtensionsPath>$(LocalAppData)\CustomProjectSystems\Cmajor\</CustomProjectExtensionsPath>
-    <ProjectGuid>847c6885-56bf-4d68-819f-7e707ce27126</ProjectGuid>
+    <ProjectGuid>e5024167-1bfe-4e2e-812b-4919ff665441</ProjectGuid>
   </PropertyGroup>
   <PropertyGroup>
     <TargetType>library</TargetType>
   </PropertyGroup>
-  <Import Project="$(CustomProjectExtensionsPath)Cmajor.props" />
-  <Import Project="$(CustomProjectExtensionsPath)Cmajor.targets" />
   <ItemGroup>
     <CmCompile Include="AddressDescriptor.cm" />
     <CmCompile Include="BasicBlock.cm" />
@@ -36,8 +34,10 @@
     <None Include="IntermediateCodeFileGrammar.pp" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\cmsxa\cmsxa.cmproj" />
-    <ProjectReference Include="..\cmsxm\cmsxm.cmproj" />
-    <ProjectReference Include="..\cmsxu\cmsxu.cmproj" />
+    <ProjectReference Include="../cmsxa/cmsxa.cmproj" />
+    <ProjectReference Include="../cmsxm/cmsxm.cmproj" />
+    <ProjectReference Include="../cmsxu/cmsxu.cmproj" />
   </ItemGroup>
+  <Import Project="$(CustomProjectExtensionsPath)Cmajor.props" />
+  <Import Project="$(CustomProjectExtensionsPath)Cmajor.targets" />
 </Project>

@@ -47,6 +47,10 @@
     <td xml:space="preserve"><a href="../../cmsxi/doc/class_Instruction_5E05DB58E4B1651C9C3A965474ED1B4E9BB774F7.html#member_function_GenerateCode_Instruction_F0F944F80A8312456F668779A7EEBD31347C9C80">GenerateCode</a>(<a href="../../cmsxi/doc/class_MachineCode_DB0C1263C7B40380BA26404218C7D5773F3B36BA.html">MachineCode</a>&amp;&nbsp;machineCode, <a href="../../../../../../system/content/System.Base/doc/class_CodeFormatter_38898A0914E7D27753F0D42E65A18EC272984F99.html">CodeFormatter</a>&amp;&nbsp;formatter)</td>
    </tr>
    <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">override</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span></td>
+    <td xml:space="preserve"><a href="../../cmsxi/doc/class_Instruction_5E05DB58E4B1651C9C3A965474ED1B4E9BB774F7.html#member_function_IncNumUses_Instruction_A888E3AD4708854548BB334394DEA2A8113B23EC">IncNumUses</a>()</td>
+   </tr>
+   <tr>
     <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">override</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<a href="../../../../../../system/content/System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html">String</a>&lt;<span class="kw">char</span>></td>
     <td xml:space="preserve"><a href="../../cmsxi/doc/class_Instruction_5E05DB58E4B1651C9C3A965474ED1B4E9BB774F7.html#member_function_IndexStr_Instruction_E4BBA7B158240AE7C4DC94CE266DC464DE92644B">IndexStr</a>()&nbsp;<span class="kw">const</span></td>
    </tr>
@@ -86,12 +90,24 @@
     <td xml:space="preserve">index</td>
    </tr>
    <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">uint</span></td>
+    <td xml:space="preserve">lineNumber</td>
+   </tr>
+   <tr>
     <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<a href="../../../../../../system/content/System.Base/doc/class_HashMap_K_T_H_C_D555F9108F5700505E1FCCC02041016E58EE9314.html">HashMap</a>&lt;<a href="../../cmsxi/doc/class_Value_D184FDC4DCC37461ED1781E875D6610EE22D5D73.html">Value</a>*, <a href="../../../../../../system/content/System.Base/doc/class_Pair_T_U_F2AB6847487837870009F01B70FA9E7FF2466BDA.html">Pair</a>&lt;<a href="../../cmsxi/doc/enumerated_type_Liveness_3CB9834BDB998FD94B3915F51AFFFCA1CA0885FE.html">Liveness</a>, <a href="../../cmsxi/doc/class_Value_D184FDC4DCC37461ED1781E875D6610EE22D5D73.html">Value</a>*>, <a href="../../../../../../system/content/System.Base/doc/class_Hasher_T_9E06FCD9B56B8B3B7E7F8286BE8179D3B1CB8325.html">Hasher</a>&lt;<a href="../../cmsxi/doc/class_Value_D184FDC4DCC37461ED1781E875D6610EE22D5D73.html">Value</a>*>, <a href="../../../../../../system/content/System.Base/doc/class_EqualTo_T_763B7164C155EA5D8436A30331F33E4E7267599E.html">EqualTo</a>&lt;<a href="../../cmsxi/doc/class_Value_D184FDC4DCC37461ED1781E875D6610EE22D5D73.html">Value</a>*>></td>
     <td xml:space="preserve">livenessAndNextUse</td>
    </tr>
    <tr>
     <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<a href="../../cmsxi/doc/class_MachineCode_DB0C1263C7B40380BA26404218C7D5773F3B36BA.html">MachineCode</a>*</td>
     <td xml:space="preserve">machineCode</td>
+   </tr>
+   <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<a href="../../cmsxi/doc/class_MDStructRef_26072651C07C7EB988246DBF2A99C4FA35C94CD7.html">MDStructRef</a>*</td>
+    <td xml:space="preserve">metadata</td>
+   </tr>
+   <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">int</span></td>
+    <td xml:space="preserve">numUses</td>
    </tr>
    <tr>
     <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<a href="../../cmsxi/doc/class_BasicBlock_DF255E7A633F93AC88501B4027F2A2969533A06F.html">BasicBlock</a>*</td>
@@ -142,7 +158,7 @@
   <h3 id="member_function_EndGenerateCode_Instruction_3EC50661306BC621ECC6FC2083513445BAA59CF8" xml:space="preserve">EndGenerateCode&nbsp;Member Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">void</span>&nbsp;EndGenerateCode()</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxi/file/Instruction.cm.html#109">109</a>&nbsp;of&nbsp;<a href="../../cmsxi/file/Instruction.cm.html">cmsxi/Instruction.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxi/file/Instruction.cm.html#281">281</a>&nbsp;of&nbsp;<a href="../../cmsxi/file/Instruction.cm.html">cmsxi/Instruction.cm</a></span>
   <br/>
   <br/>
   <hr/>
@@ -150,6 +166,13 @@
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">virtual</span>&nbsp;<span class="kw">void</span>&nbsp;GenerateCode(<a href="../../cmsxi/doc/class_MachineCode_DB0C1263C7B40380BA26404218C7D5773F3B36BA.html">MachineCode</a>&amp;&nbsp;machineCode, <a href="../../../../../../system/content/System.Base/doc/class_CodeFormatter_38898A0914E7D27753F0D42E65A18EC272984F99.html">CodeFormatter</a>&amp;&nbsp;formatter)</h4>
   <h5>Definition</h5>
   <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxi/file/Instruction.cm.html#100">100</a>&nbsp;of&nbsp;<a href="../../cmsxi/file/Instruction.cm.html">cmsxi/Instruction.cm</a></span>
+  <br/>
+  <br/>
+  <hr/>
+  <h3 id="member_function_IncNumUses_Instruction_A888E3AD4708854548BB334394DEA2A8113B23EC" xml:space="preserve">IncNumUses&nbsp;Member Function</h3>
+  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">override</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span>&nbsp;IncNumUses()</h4>
+  <h5>Definition</h5>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxi/file/Instruction.cm.html#299">299</a>&nbsp;of&nbsp;<a href="../../cmsxi/file/Instruction.cm.html">cmsxi/Instruction.cm</a></span>
   <br/>
   <br/>
   <hr/>
@@ -163,7 +186,7 @@
   <h3 id="member_function_IsLeader_Instruction_DEED1EFBB436A013676359A908CB87D2DBECA5F1" xml:space="preserve">IsLeader&nbsp;Member Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">bool</span>&nbsp;IsLeader()</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxi/file/Instruction.cm.html#123">123</a>&nbsp;of&nbsp;<a href="../../cmsxi/file/Instruction.cm.html">cmsxi/Instruction.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxi/file/Instruction.cm.html#295">295</a>&nbsp;of&nbsp;<a href="../../cmsxi/file/Instruction.cm.html">cmsxi/Instruction.cm</a></span>
   <br/>
   <br/>
   <hr/>
@@ -191,7 +214,7 @@
   <h3 id="member_function_PrintMachineCode_Instruction_F0443A42262E37EC1BED1BAF0C9B5B0144D1D358" xml:space="preserve">PrintMachineCode&nbsp;Member Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">void</span>&nbsp;PrintMachineCode(<a href="../../../../../../system/content/System.Base/doc/class_CodeFormatter_38898A0914E7D27753F0D42E65A18EC272984F99.html">CodeFormatter</a>&amp;&nbsp;formatter, <span class="kw">bool</span>&amp;&nbsp;printed)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxi/file/Instruction.cm.html#113">113</a>&nbsp;of&nbsp;<a href="../../cmsxi/file/Instruction.cm.html">cmsxi/Instruction.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxi/file/Instruction.cm.html#285">285</a>&nbsp;of&nbsp;<a href="../../cmsxi/file/Instruction.cm.html">cmsxi/Instruction.cm</a></span>
   <br/>
   <br/>
   <hr/>

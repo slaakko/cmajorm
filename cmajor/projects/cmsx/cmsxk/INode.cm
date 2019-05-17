@@ -1,0 +1,928 @@
+using System;
+using System.Collections;
+using cmsx.util;
+
+namespace cmsx.kernel
+{
+    public const int invalidINodeNumber = 0;
+    public const int inodeSize = 128;
+    public const int numINodesInBlock = blockSize / inodeSize;
+    public const int maxCachedINodes = 1024;
+    public const int numDirectBlockNumbers = 17;
+
+    public enum FileType : int
+    {
+        free = 0, regular = 1, directory = 2, characterSpecial = 3, blockSpecial = 4, fifo = 5
+    }
+
+    public enum Access : int
+    {
+        none =  0,
+        read = 1 << 0,
+        write = 1 << 1,
+        execute = 1 << 2
+    }
+
+    public nothrow string AccessStr(Access access)
+    {
+        string s;
+        if ((access & Access.read) != Access.none)
+        {
+            s.Append("R");
+        }
+        if ((access & Access.write) != Access.none)
+        {
+            s.Append("W");
+        }
+        if ((access & Access.execute) != Access.none)
+        {
+            s.Append("X");
+        }
+        if (s.IsEmpty())
+        {
+            s.Append("-");
+        }
+        return s;
+    }
+
+    public nothrow inline int EncodeMode(FileType fileType, Access ownerAccess, Access groupAccess, Access otherAccess)
+    {
+        return cast<int>(fileType) | (cast<int>(ownerAccess) << 3) | (cast<int>(groupAccess) << 6) | (cast<int>(otherAccess) << 9);
+    }
+
+    public nothrow inline void DecodeMode(int mode, FileType& fileType, Access& ownerAccess, Access& groupAccess, Access& otherAccess)
+    {
+        fileType = cast<FileType>(mode & 7);
+        ownerAccess = cast<Access>((mode >> 3) & 7);
+        groupAccess = cast<Access>((mode >> 6) & 7);
+        otherAccess = cast<Access>((mode >> 9) & 7);
+    }
+
+    public nothrow inline int GetINodeBlockNumber(int inodeNumber, int firstINodeBlockNumber)
+    {
+        return (inodeNumber - 1) / numINodesInBlock + firstINodeBlockNumber;
+    }
+
+    public nothrow inline int GetINodeIndex(int inodeNumber)
+    {
+        return (inodeNumber - 1) % numINodesInBlock;
+    }
+
+    public class INodeKey
+    {
+        public nothrow INodeKey(int inodeNumber_, int fsNumber_) : inodeNumber(inodeNumber_), fsNumber(fsNumber_)
+        {
+        }
+        public nothrow string ToString() const
+        {
+            string s;
+            s.Append("inode.").Append(ToString(fsNumber)).Append('.').Append(ToString(inodeNumber));
+            return s;
+        }
+        public int inodeNumber;
+        public int fsNumber;
+    }
+
+    public nothrow bool operator==(const INodeKey& left, const INodeKey& right)
+    {
+        return left.inodeNumber == right.inodeNumber && left.fsNumber == right.fsNumber;
+    }
+
+    public class INodeKeyHash : UnaryFun<INodeKey, ulong>
+    {
+        public nothrow inline ulong operator()(const INodeKey& key) const
+        {
+            return cast<ulong>(1099511628211 * key.fsNumber + key.inodeNumber);
+        }
+    }
+
+    public class INode
+    {
+        public enum Flags : byte
+        {
+            none = 0u,
+            locked = 1u << 0u,
+            dirty = 1u << 1u,
+            mountPoint = 1u << 2u
+        }
+        public nothrow string FlagStr(Flags flags)
+        {
+            string s = "flags";
+            if ((flags & Flags.locked) != Flags.none)
+            {
+                s.Append(".locked");
+            }
+            if ((flags & Flags.dirty) != Flags.none)
+            {
+                s.Append(".dirty");
+            }
+            if ((flags & Flags.mountPoint) != Flags.none)
+            {
+                s.Append(".mountPoint");
+            }
+            return s;
+        }
+        public nothrow INode() : key(INodeKey(invalidINodeNumber, 0)), flags(Flags.none), useCount(0), iterator(),
+            mode(0), uid(-1), gid(-1), fileSize(0), ctime(), mtime(), atime(), nlinks(1u), 
+            singleIndirectBlockNumber(invalidBlockNumber), doubleIndirectBlockNumber(invalidBlockNumber), tripleIndirectBlockNumber(invalidBlockNumber)
+        {
+            long n = directBlockNumbers.Length();
+            for (long i = 0; i < n; ++i)
+            {
+                directBlockNumbers[i] = invalidBlockNumber;
+            }
+        }
+        public nothrow string ToString() const
+        {
+            string s;
+            s.Append(key.ToString()).Append('.').Append(FlagStr(flags)).Append(".count=").Append(ToString(useCount)).Append(".nlinks=").Append(ToString(nlinks));
+            return s;
+        }
+        public nothrow inline const INodeKey& Key() const
+        {
+            return key;
+        }
+        public nothrow void SetKey(const INodeKey& key_)
+        {
+            key = key_;
+        }
+        public nothrow inline bool GetFlag(Flags flag) const
+        {
+            return (flags & flag) != Flags.none;
+        }
+        public nothrow inline void SetFlag(Flags flag)
+        {
+            flags = cast<Flags>(flags | flag);
+        }
+        public nothrow inline void ResetFlag(Flags flag)
+        {
+            flags = cast<Flags>(flags & ~flag);
+        }
+        public nothrow inline void ResetFlags()
+        {
+            flags = Flags.none;
+        }
+        public nothrow inline int GetUseCount() const
+        {
+            return useCount;
+        }
+        public nothrow inline void SetUseCount(int useCount_)
+        {
+            useCount = useCount_;
+        }
+        public void Read(MemoryReader& reader)
+        {
+            mode = reader.ReadInt();
+            DecodeMode(mode, fileType, ownerAccess, groupAccess, otherAccess);
+            uid = reader.ReadInt();
+            gid = reader.ReadInt();
+            fileSize = reader.ReadLong();
+            ctime = reader.ReadDateTime();
+            mtime = reader.ReadDateTime();
+            atime = reader.ReadDateTime();
+            nlinks = reader.ReadInt();
+            long n = directBlockNumbers.Length();
+            for (long i = 0; i < n; ++i)
+            {
+                directBlockNumbers[i] = reader.ReadInt();
+            }
+            singleIndirectBlockNumber = reader.ReadInt();
+            doubleIndirectBlockNumber = reader.ReadInt();
+            tripleIndirectBlockNumber = reader.ReadInt();
+        }
+        public void Write(MemoryWriter& writer)
+        {
+            mode = EncodeMode(fileType, ownerAccess, groupAccess, otherAccess);
+            writer.Write(mode);
+            writer.Write(uid);
+            writer.Write(gid);
+            writer.Write(fileSize);
+            writer.Write(ctime);
+            writer.Write(mtime);
+            writer.Write(atime);
+            writer.Write(nlinks);
+            long n = directBlockNumbers.Length();
+            for (long i = 0; i < n; ++i)
+            {
+                writer.Write(directBlockNumbers[i]);
+            }
+            writer.Write(singleIndirectBlockNumber);
+            writer.Write(doubleIndirectBlockNumber);
+            writer.Write(tripleIndirectBlockNumber);
+        }
+        public nothrow inline FileType Type() const
+        {
+            return fileType;
+        }
+        public nothrow inline void SetType(FileType fileType_)
+        {
+            fileType = fileType_;
+            SetMTime();
+            SetFlag(Flags.dirty);
+        }
+        public nothrow inline int UID() const
+        {
+            return uid;
+        }
+        public nothrow inline void SetUID(int uid_)
+        {
+            uid = uid_;
+            SetMTime();
+            SetFlag(Flags.dirty);
+        }
+        public nothrow inline int GID() const
+        {
+            return gid;
+        }
+        public nothrow inline void SetGID(int gid_)
+        {
+            gid = gid_;
+            SetMTime();
+            SetFlag(Flags.dirty);
+        }
+        public nothrow inline Access OwnerAccess() const
+        {
+            return ownerAccess;
+        }
+        public nothrow inline void SetOwnerAccess(Access ownerAccess_)
+        {
+            ownerAccess = ownerAccess_;
+            SetMTime();
+            SetFlag(Flags.dirty);
+        }
+        public nothrow inline Access GroupAccess() const
+        {
+            return groupAccess;
+        }
+        public nothrow inline void SetGroupAccess(Access groupAccess_)
+        {
+            groupAccess = groupAccess_;
+            SetMTime();
+            SetFlag(Flags.dirty);
+        }
+        public nothrow inline Access OtherAccess() const
+        {
+            return otherAccess;
+        }
+        public nothrow inline void SetOtherAccess(Access otherAccess_)
+        {
+            otherAccess = otherAccess_;
+            SetMTime();
+            SetFlag(Flags.dirty);
+        }
+        public nothrow void SetCTime()
+        {
+            ctime = GetCurrentDateTime();
+            SetFlag(Flags.dirty);
+        }
+        public nothrow void SetMTime()
+        {
+            mtime = GetCurrentDateTime();
+            SetFlag(Flags.dirty);
+        }
+        public nothrow void SetATime()
+        {
+            atime = GetCurrentDateTime();
+            SetFlag(Flags.dirty);
+        }
+        public nothrow inline int GetNumLinks() const
+        {
+            return nlinks;
+        }
+        public nothrow inline void SetNumLinks(int nlinks_)
+        {
+            nlinks = nlinks_;
+            SetMTime();
+            SetFlag(Flags.dirty);
+        }
+        public void AddWaitingProcess(Process* process)
+        {
+            waitingProcesses.Add(process);
+        }
+        public nothrow List<Process*> GetWaitingProcesses()
+        {
+            List<Process*> processes;
+            Swap(processes, waitingProcesses);
+            return processes;
+        }
+        public nothrow LinkedList<INode*>.Iterator GetIterator() const
+        {
+            return iterator;
+        }
+        public nothrow void SetIterator(LinkedList<INode*>.Iterator iterator_)
+        {
+            iterator = iterator_;
+        }
+        public nothrow inline int GetDirectBlockNumber(int index) const
+        {
+            #assert(index >= 0 && index < numDirectBlockNumbers);
+            return directBlockNumbers[index];
+        }
+        public nothrow inline void SetDirectBlockNumber(int index, int blockNumber)
+        {
+            directBlockNumbers[index] = blockNumber;
+            SetFlag(Flags.dirty);
+        }
+        public nothrow inline int GetSingleIndirectBlockNumber() const
+        {
+            return singleIndirectBlockNumber;
+        }
+        public nothrow inline void SetSingleIndirectBlockNumber(int singleIndirectBlockNumber_)
+        {
+            singleIndirectBlockNumber = singleIndirectBlockNumber_;
+            SetFlag(Flags.dirty);
+        }
+        public nothrow inline int GetDoubleIndirectBlockNumber() const
+        {
+            return doubleIndirectBlockNumber;
+        }
+        public nothrow inline void SetDoubleIndirectBlockNumber(int doubleIndirectBlockNumber_)
+        {
+            doubleIndirectBlockNumber = doubleIndirectBlockNumber_;
+            SetFlag(Flags.dirty);
+        }
+        public nothrow inline int GetTripleIndirectBlockNumber() const
+        {
+            return tripleIndirectBlockNumber;
+        }
+        public nothrow inline void SetTripleIndirectBlockNumber(int tripleIndirectBlockNumber_)
+        {
+            tripleIndirectBlockNumber = tripleIndirectBlockNumber_;
+            SetFlag(Flags.dirty);
+        }
+        public nothrow inline long GetFileSize() const
+        {
+            return fileSize;
+        }
+        public nothrow inline void SetFileSize(long fileSize_)
+        {
+            fileSize = fileSize_;
+            SetMTime();
+            SetFlag(Flags.dirty);
+        }
+        public void CheckPermissions(int uid, int gid, Access access)
+        {
+            if (this->uid == uid)
+            {
+                if ((access & ownerAccess) == access)
+                {
+                    return;
+                }
+                else
+                {
+                    throw SystemError(EPERM, "no " + AccessStr(access) + " access");
+                }
+            }
+            if (this->gid == gid)
+            {
+                if ((access & groupAccess) == access)
+                {
+                    return;
+                }
+                else
+                {
+                    throw SystemError(EPERM, "no " + AccessStr(access) + " access");
+                }
+            }
+            if ((access & otherAccess) == access)
+            {
+                return;
+            }
+            else
+            {
+                throw SystemError(EPERM, "no " + AccessStr(access) + " access");
+            }
+        }
+        private INodeKey key;
+        private Flags flags;
+        private int useCount;
+        private List<Process*> waitingProcesses;
+        private LinkedList<INode*>.Iterator iterator;
+        private int mode;
+        private int uid;
+        private int gid;
+        private long fileSize;
+        private DateTime ctime;
+        private DateTime mtime;
+        private DateTime atime;
+        private int nlinks;
+        private int[numDirectBlockNumbers] directBlockNumbers; 
+        private int singleIndirectBlockNumber;
+        private int doubleIndirectBlockNumber;
+        private int tripleIndirectBlockNumber;
+        private FileType fileType;
+        private Access ownerAccess;
+        private Access groupAccess;
+        private Access otherAccess;
+    }
+
+    public class INodeBlock : Block
+    {
+        public nothrow INodeBlock(BlockCache* cache_) : base(BlockKey(0, 0, BlockKind.inodeBlock), cache_)
+        {
+        }
+        public override void Read(MemoryReader& reader)
+        {
+            base->Read(reader);
+            for (long i = 0; i < inodes.Length(); ++i)
+            {
+                inodes[i].Read(reader);
+            }
+        }
+        public override void Write(MemoryWriter& writer)
+        {
+            base->Write(writer);
+            for (long i = 0; i < inodes.Length(); ++i)
+            {
+                inodes[i].Write(writer);
+            }
+        }
+        public nothrow inline INode* GetINode(int index) const
+        {
+            #assert(index >= 0 && index < inodes.Length());
+            return &inodes[index];
+        }
+        private INode[numINodesInBlock] inodes;
+    }
+
+    public class INodeBitmap
+    {
+        public INodeBitmap(int fsNumber_) : fsNumber(fsNumber_)
+        {
+            Block* sb = GetBlockManager().ReadBlock(BlockKey(0, fsNumber, BlockKind.superBlock), null);
+            #assert(sb is SuperBlock*);
+            BlockPutter superBlockPutter(sb);
+            SuperBlock* superBlock = cast<SuperBlock*>(sb);
+            int firstNumber = superBlock->GetFirstINodeBitmapBlockNumber();
+            int bitmapBlockIndex = 0;
+            Block* block = GetBlockManager().GetBlock(BlockKey(firstNumber + bitmapBlockIndex, superBlock->Key().fsNumber, BlockKind.bitmapBlock), superBlock);
+            #assert(block is BitmapBlock*);
+            BlockPutter putter(block);
+            BitmapBlock* bitmapBlock = cast<BitmapBlock*>(block);
+            bitmapBlock->SetBit(0);
+        }
+        public int GetFreeINodeNumber()
+        {
+            if (Log())
+            {
+                LogMessage("fs.ibm.getfreeinodenumber", "begin");
+            }
+            Block* sb = GetBlockManager().ReadBlock(BlockKey(0, fsNumber, BlockKind.superBlock), null);
+            #assert(sb is SuperBlock*);
+            BlockPutter superBlockPutter(sb);
+            SuperBlock* superBlock = cast<SuperBlock*>(sb);
+            int firstNumber = superBlock->GetFirstINodeBitmapBlockNumber();
+            int n = superBlock->GetNumINodeBitmapBlocks();
+            for (int i = 0; i < n; ++i)
+            {
+                Block* block = null;
+                if (superBlock->GetLastBlockNumber() < firstNumber + i)
+                {
+                    block = GetBlockManager().GetBlock(BlockKey(firstNumber + i, superBlock->Key().fsNumber, BlockKind.bitmapBlock), superBlock);
+                }
+                else
+                {
+                    block = GetBlockManager().ReadBlock(BlockKey(firstNumber + i, superBlock->Key().fsNumber, BlockKind.bitmapBlock), superBlock);
+                }
+                #assert(block is BitmapBlock*);
+                BlockPutter putter(block);
+                BitmapBlock* bitmapBlock = cast<BitmapBlock*>(block);
+                int index = bitmapBlock->GetFirstZeroBitIndex();
+                if (index != -1)
+                {
+                    bitmapBlock->SetBit(index);
+                    int inodeNumber = numBitsInBitmapBlock * i + index;
+                    if (Log())
+                    {
+                        LogMessage("fs.ibm.getfreeinodenumber", "end.inode=" + ToString(inodeNumber));
+                    }
+                    return inodeNumber;
+                }
+                GetBlockManager().WriteBlock(block, superBlock);
+            }
+            throw SystemError(ERLIMITEXCEEDED, "no free inodes");
+        }
+        public void SetFreeINodeNumber(int inodeNumber)
+        {
+            if (Log())
+            {
+                LogMessage("fs.ibm.setfreeinodenumber", "begin.inode=" + ToString(inodeNumber));
+            }
+            Block* sb = GetBlockManager().ReadBlock(BlockKey(0, fsNumber, BlockKind.superBlock), null);
+            #assert(sb is SuperBlock*);
+            BlockPutter superBlockPutter(sb);
+            SuperBlock* superBlock = cast<SuperBlock*>(sb);
+            int blockNumber = inodeNumber / numBitsInBitmapBlock;
+            int index = inodeNumber % numBitsInBitmapBlock;
+            int firstNumber = superBlock->GetFirstINodeBitmapBlockNumber();
+            Block* block = null;
+            if (superBlock->GetLastBlockNumber() < firstNumber + blockNumber)
+            {
+                block = GetBlockManager().GetBlock(BlockKey(firstNumber + blockNumber, superBlock->Key().fsNumber, BlockKind.bitmapBlock), superBlock);
+            }
+            else
+            {
+                block = GetBlockManager().ReadBlock(BlockKey(firstNumber + blockNumber, superBlock->Key().fsNumber, BlockKind.bitmapBlock), superBlock);
+            }
+            #assert(block is BitmapBlock*);
+            {
+                BlockPutter putter(block);
+                BitmapBlock* bitmapBlock = cast<BitmapBlock*>(block);
+                bitmapBlock->ResetBit(index);
+                GetBlockManager().WriteBlock(block, superBlock);
+            }
+            if (Log())
+            {
+                LogMessage("fs.ibm.setfreeinodenumber", "end.inode=" + ToString(inodeNumber));
+            }
+        }
+        private int fsNumber;
+    }
+
+    public class INodeManager
+    {
+        static INodeManager() : instance(new INodeManager())
+        {
+        }
+        public static INodeManager& Instance()
+        {
+            return *instance;
+        }
+        public INode* GetINode(const INodeKey& key)
+        {
+            if (Log())
+            {
+                LogMessage("fs.imgr.getinode.begin", key.ToString());
+            }
+            while (true)
+            {
+                HashMap<INodeKey, INode*, INodeKeyHash>.ConstIterator it = inodeMap.CFind(key);
+                if (it != inodeMap.CEnd())
+                {
+                    INode* inode = it->second;
+                    if (inode->GetFlag(INode.Flags.locked))
+                    {
+                        void* fiberData = OsGetFiberData();
+                        Process* process = cast<Process*>(fiberData);
+                        inode->AddWaitingProcess(process);
+                        SleepProcess(process, inodeUnlockedEvent, cast<ulong>(cast<void*>(inode)), 0u);
+                        continue;
+                    }
+                    else
+                    {
+                        // todo mount point
+                        inode->SetFlag(INode.Flags.locked);
+                        RemoveINodeFromFreeList(inode);
+                        inode->SetUseCount(inode->GetUseCount() + 1);
+                        if (Log())
+                        {
+                            LogMessage("fs.imgr.getinode.end", inode->ToString());
+                        }
+                        return inode;
+                    }
+                }
+                else
+                {
+                    if (freeINodeList.IsEmpty())
+                    {
+                        throw SystemError(ERLIMITEXCEEDED, "no free inodes in inode cache");
+                    }
+                    INode* inode = freeINodeList.Front();
+                    freeINodeList.RemoveFirst();
+                    inode->SetIterator(freeINodeList.End());
+                    inodeMap.Remove(inode->Key());
+                    inode->SetKey(key);
+                    inodeMap[key] = inode;
+                    inode->SetFlag(INode.Flags.locked);
+                    FileSystem* fileSystem = GetMountTable().GetFileSystem(key.fsNumber);
+                    int inodeBlockNumber = GetINodeBlockNumber(key.inodeNumber, fileSystem->GetFirstINodeBlockNumber());
+                    Block* block = null;
+                    if (fileSystem->LastBlockNumber() < inodeBlockNumber)
+                    {
+                        block = GetBlockManager().GetBlock(BlockKey(inodeBlockNumber, key.fsNumber, BlockKind.inodeBlock), null);
+                    }
+                    else
+                    {
+                        block = GetBlockManager().ReadBlock(BlockKey(inodeBlockNumber, key.fsNumber, BlockKind.inodeBlock), null);
+                    }
+                    #assert(block is INodeBlock*);
+                    BlockPutter putter(block);
+                    INodeBlock* inodeBlock = cast<INodeBlock*>(block);
+                    INode* source = inodeBlock->GetINode(GetINodeIndex(key.inodeNumber));
+                    UniquePtr<byte> mem(cast<byte*>(MemAlloc(inodeSize)));
+                    MemoryWriter writer(mem.Get(), inodeSize);
+                    source->Write(writer);
+                    MemoryReader reader(mem.Get(), inodeSize);
+                    inode->Read(reader);
+                    inode->ResetFlags();
+                    inode->SetFlag(INode.Flags.locked);
+                    inode->SetUseCount(1);
+                    inode->SetNumLinks(1);
+                    if (Log())
+                    {
+                        LogMessage("fs.imgr.getinode.end", inode->ToString());
+                    }
+                    return inode;
+                }
+            }
+        }
+        public nothrow void PutINode(INode* inode)
+        {
+            if (Log())
+            {
+                LogMessage("fs.imgr.putinode.begin", inode->ToString());
+            }
+            inode->SetFlag(INode.Flags.locked);
+            inode->SetUseCount(inode->GetUseCount() - 1);
+            if (inode->GetUseCount() == 0)
+            {
+                if (Log())
+                {
+                    LogMessage("fs.imgr.putinode.count=0", inode->ToString());
+                }
+                if (inode->GetNumLinks() == 0u)
+                {
+                    if (Log())
+                    {
+                        LogMessage("fs.imgr.putinode.nlinks=0", inode->ToString());
+                    }
+                    GetBlockManager().FreeBlocks(inode);
+                    inode->SetType(FileType.free);
+                    FileSystem* fs = GetMountTable().GetFileSystem(inode->Key().fsNumber);
+                    fs->SetFreeINodeNumber(inode->Key().inodeNumber);
+                }
+                if (inode->GetFlag(INode.Flags.dirty))
+                {
+                    FileSystem* fileSystem = GetMountTable().GetFileSystem(inode->Key().fsNumber);
+                    int inodeBlockNumber = GetINodeBlockNumber(inode->Key().inodeNumber, fileSystem->GetFirstINodeBlockNumber());
+                    Block* block = null;
+                    if (fileSystem->LastBlockNumber() < inodeBlockNumber)
+                    {
+                        block = GetBlockManager().GetBlock(BlockKey(inodeBlockNumber, inode->Key().fsNumber, BlockKind.inodeBlock), null);
+                    }
+                    else
+                    {
+                        block = GetBlockManager().ReadBlock(BlockKey(inodeBlockNumber, inode->Key().fsNumber, BlockKind.inodeBlock), null);
+                    }
+                    BlockPutter putter(block);
+                    #assert(block is INodeBlock*);
+                    INodeBlock* inodeBlock = cast<INodeBlock*>(block);
+                    INode* target = inodeBlock->GetINode(GetINodeIndex(inode->Key().inodeNumber));
+                    UniquePtr<byte> mem(cast<byte*>(MemAlloc(inodeSize)));
+                    MemoryWriter writer(mem.Get(), inodeSize);
+                    inode->Write(writer);
+                    MemoryReader reader(mem.Get(), inodeSize);
+                    target->Read(reader);
+                    block->SetFlag(Block.Flags.dirty);
+                    GetBlockManager().WriteBlock(block, null);
+                    inode->ResetFlag(INode.Flags.dirty);
+                }
+                freeINodeList.Add(inode);
+                inode->SetIterator(LinkedList<INode*>.Iterator(&freeINodeList, freeINodeList.Tail()));
+            }
+            inode->ResetFlag(INode.Flags.locked);
+            Kernel& kernel = GetKernel();
+            ProcessTable& processTable = kernel.GetProcessTable();
+            List<Process*> waitingProcesses = inode->GetWaitingProcesses();
+            for (Process* process : waitingProcesses)
+            {
+                WakeUpProcess(processTable, process);
+            }
+            if (Log())
+            {
+                LogMessage("fs.imgr.putinode.end", inode->ToString());
+            }
+        }
+        public INode* PathToINode(Process* process, const string& path, bool createEntry, INode*& parent, DirectorySlot& freeDirectorySlot, string& name)
+        {
+            if (Log())
+            {
+                LogMessage("fs.imgr.pathtoinode.begin", path);
+            }
+            FileSystem* fs = GetMountTable().GetFileSystem(0);
+            if (createEntry)
+            {
+                DirectorySlot slot;
+                freeDirectorySlot = slot;
+                name.Clear();
+            }
+            INode* inode = null;
+            if (path.IsEmpty() || path[0] != '/')
+            {
+                if (process != null)
+                {
+                    inode = GetINode(process->workingDirINodeKey);
+                }
+                else
+                {
+                    inode = GetINode(fs->GetRootDirINodeKey());
+                }
+            }
+            else
+            {
+                if (process != null)
+                {
+                    inode = GetINode(process->rootDirINodeKey);
+                }
+                else
+                {
+                    inode = GetINode(fs->GetRootDirINodeKey());
+                }
+            }
+            if (!createEntry && path == "/")
+            {
+                return inode;
+            }
+            INodePutter inodePutter(inode);
+            List<string> pathComponents = path.Split('/');
+            long pn = pathComponents.Count();
+            if (pn < 2 && createEntry)
+            {
+                parent = inode;
+                inodePutter.ResetINode();
+            }
+            for (long pi = 0; pi < pn; ++pi)
+            {
+                const string& pathComponent = pathComponents[pi];
+                if (createEntry)
+                {
+                    if (pi == pn - 1)
+                    {
+                        name = pathComponent;
+                    }
+                    else if (pathComponent.IsEmpty())
+                    {
+                        if (pi == pn - 2)
+                        {
+                            parent = inode;
+                            inodePutter.ResetINode();
+                        }
+                        continue;
+                    }
+                }
+                if (inode->Type() == FileType.directory)
+                {
+                    if (process != null)
+                    {
+                        inode->CheckPermissions(process->uid, process->gid, Access.execute);
+                        if (inode->Key() == process->rootDirINodeKey && pathComponent == "..") continue;
+                    }
+                    else
+                    {
+                        if (inode->Key() == fs->GetRootDirINodeKey() && pathComponent == "..") continue;
+                    }
+                    long offset = 0;
+                    long directorySize = inode->GetFileSize();
+                    bool found = false;
+                    while (offset < directorySize && !found)
+                    {
+                        int blockNumber = 0;
+                        int blockOffset = 0;
+                        GetBlockManager().GetBlockNumber(inode, offset, blockNumber, blockOffset, false);
+                        if (blockNumber == 0)
+                        {
+                            return null;
+                        }
+                        Block* block = GetBlockManager().ReadBlock(BlockKey(blockNumber, inode->Key().fsNumber, BlockKind.directoryBlock), null);
+                        #assert(block is DirectoryBlock*);
+                        BlockPutter blockPutter(block);
+                        DirectoryBlock* directoryBlock = cast<DirectoryBlock*>(block);
+                        for (int i = 0; i < numDirectoryEntriesInBlock; ++i)
+                        {
+                            const DirectoryEntry& entry = directoryBlock->GetDirectoryEntry(i);
+                            if (entry.inodeNumber == 0)
+                            {
+                                if (createEntry && pi == pn - 1 && freeDirectorySlot.offset == -1)
+                                {
+                                    DirectorySlot slot(blockNumber, inode->Key().fsNumber, offset);
+                                    freeDirectorySlot = slot;
+                                }
+                                continue;
+                            }
+                            string entryName = &entry.name[0];
+                            if (pathComponent == entryName)
+                            {
+                                inode = GetINode(INodeKey(entry.inodeNumber, inode->Key().fsNumber));
+                                if (createEntry && pi == pn - 2)
+                                {
+                                    parent = inode;
+                                }
+                                else
+                                {
+                                    inodePutter.ResetINode(inode);
+                                }
+                                found = true;
+                                break;
+                            }
+                            offset = offset + directoryEntrySize;
+                        }
+                    }
+                    if (!found && pi == pn - 1)
+                    {
+                        if (freeDirectorySlot.offset == -1)
+                        {
+                            DirectorySlot slot(invalidBlockNumber, inode->Key().fsNumber, offset);
+                            freeDirectorySlot = slot;
+                        }
+                        return null;
+                    }
+                }
+                else
+                {
+                    if (process != null)
+                    {
+                        throw SystemError(EINVAL, "path component '" + pathComponent + "' does not denote a directory");
+                    }
+                }
+            }
+            inodePutter.ResetINode();
+            if (Log())
+            {
+                LogMessage("fs.imgr.pathtoinode.end", inode->ToString());
+            }
+            return inode;
+        }
+        private INodeManager()
+        {
+            for (long i = 0; i < maxCachedINodes; ++i)
+            {
+                INode* inode = new INode();
+                inodes.Add(UniquePtr<INode>(inode));
+                freeINodeList.Add(inode);
+                inode->SetIterator(LinkedList<INode*>.Iterator(&freeINodeList, freeINodeList.Tail()));
+            }
+        }
+        private void RemoveINodeFromFreeList(INode* inode)
+        {
+            LinkedList<INode*>.Iterator iterator = inode->GetIterator();
+            if (iterator != freeINodeList.End())
+            {
+                freeINodeList.Remove(iterator);
+                inode->SetIterator(freeINodeList.End());
+            }
+        }
+        private static UniquePtr<INodeManager> instance;
+        private HashMap<INodeKey, INode*, INodeKeyHash> inodeMap;
+        private LinkedList<INode*> freeINodeList;
+        private List<UniquePtr<INode>> inodes;
+    }
+
+    public nothrow INodeManager& GetINodeManager()
+    {
+        return INodeManager.Instance();
+    }
+
+    public class INodePutter
+    {
+        public nothrow INodePutter() : inode(null)
+        {
+        }
+        public nothrow INodePutter(INode* inode_) : inode(inode_)
+        {
+        }
+        public nothrow inline void ResetINode()
+        {
+            inode = null;
+        }
+        public nothrow void ResetINode(INode* newINode)
+        {
+            if (inode != newINode)
+            {
+                if (inode != null)
+                {
+                    GetINodeManager().PutINode(inode);
+                }
+                inode = newINode;
+            }
+        }
+        public ~INodePutter()
+        {
+            if (inode != null)
+            {
+                GetINodeManager().PutINode(inode);
+            }
+        }
+        private SuperBlock* sb;
+        private INode* inode;
+    }
+
+    public class INodeLock
+    {
+        public nothrow INodeLock(INode* inode_) : inode(inode_)
+        {
+            inode->SetFlag(INode.Flags.locked);
+        }
+        public ~INodeLock()
+        {
+            inode->ResetFlag(INode.Flags.locked);
+            Kernel& kernel = GetKernel();
+            ProcessTable& processTable = kernel.GetProcessTable();
+            List<Process*> waitingProcesses = inode->GetWaitingProcesses();
+            for (Process* process : waitingProcesses)
+            {
+                WakeUpProcess(processTable, process);
+            }
+        }
+        private INode* inode;
+    }
+}

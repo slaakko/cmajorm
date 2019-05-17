@@ -11,7 +11,9 @@ namespace cmsx.machine
     public const ulong INTERVAL_INTERRUPT_BIT = cast<ulong>(1u) << irqInterval;
     public const byte irqClock = 2u;
     public const ulong CLOCK_BIT = cast<ulong>(1u) << irqClock;
-    public const byte irqKeyboard = 3u;
+    public const byte irqDisk = 3u;
+    public const ulong DISK_BIT = cast<ulong>(1u) << irqDisk;
+    public const byte irqKeyboard = 4u;
     public const ulong KEYBOARD_BIT = cast<ulong>(1u) << irqKeyboard;
 
     public const byte irqR = 32u; // read page fault
@@ -74,8 +76,20 @@ namespace cmsx.machine
         regs.SetInterrupt(S_BIT);
     }
 
+    private bool issuePageFault = true;
+
+    public nothrow bool IssuePageFault()
+    {
+        return issuePageFault;
+    }
+
     public nothrow void InvokePageFault(Registers& regs, ulong virtualAddress, Protection pageProtection, Protection access)
     {
+        if (!IssuePageFault())
+        {
+            Console.Error() << regs.GetPC() << endl();
+            return;
+        }
         regs.SetSpecial(Registers.rYY, PackProtection(pageProtection, access));
         regs.SetSpecial(Registers.rZZ, virtualAddress);
         LockGuard<Mutex> lock(regs.GetInterruptMutex());

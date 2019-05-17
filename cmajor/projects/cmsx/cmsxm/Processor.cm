@@ -5,6 +5,8 @@ namespace cmsx.machine
     public delegate void BootProc(Machine& machine);
     public const ulong bootProcAddress = kernelBaseAddress + dataSegmentBaseAddress;
 
+    public delegate void InterruptReturnDelegate();
+
     public class Processor
     {
         public nothrow Processor(Machine& machine_) : machine(machine_), regs(), exiting(false)
@@ -31,9 +33,12 @@ namespace cmsx.machine
         {
             exiting = true;
         }
+        public nothrow void SetInterruptReturn(InterruptReturnDelegate interruptReturn_)
+        {
+            interruptReturn = interruptReturn_;
+        }
         public nothrow ulong SaveContext(ulong virtualTranslateionRegisterValue, ulong sp, ulong* regAXAddress, ulong* regBXAddress)
         {
-            //Console.Out() << "> save context: " << ToHexString(sp) << endl();
             Memory& mem = machine.GetMemory();
             ulong prevRV = regs.GetSpecial(Registers.rV);
             regs.SetSpecial(Registers.rV, virtualTranslateionRegisterValue);
@@ -100,12 +105,10 @@ namespace cmsx.machine
             mem.WriteULong(sp, regs.GetSpecial(Registers.rG), Protection.write);
             sp = sp + 8u;
             regs.SetSpecial(Registers.rV, prevRV);
-            //Console.Out() << "< save context: " << ToHexString(sp) << endl();
             return sp;
         }
         public nothrow ulong UnsaveContext(ulong virtualTranslateionRegisterValue, ulong sp)
         {
-            //Console.Out() << "> unsave context: " << ToHexString(sp) << endl();
             Memory& mem = machine.GetMemory();
             regs.SetSpecial(Registers.rV, virtualTranslateionRegisterValue);
             sp = sp - 8u;
@@ -156,7 +159,6 @@ namespace cmsx.machine
             sp = sp - 8u;
             regs.SetPC(mem.ReadULong(sp, Protection.read));
             regs.Set(regSP, sp);
-            //Console.Out() << "< unsave context: " << ToHexString(sp) << endl();
             return sp;
         }
         private void DoRun()
@@ -345,6 +347,10 @@ namespace cmsx.machine
             {
                 InterruptHandler handler = cast<InterruptHandler>(cast<void*>(handlerAddress));
                 handler(machine, irq);
+                if (interruptReturn != InterruptReturnDelegate())
+                {
+                    interruptReturn();
+                }
             }
             else
             {
@@ -378,5 +384,6 @@ namespace cmsx.machine
         private bool exiting;
         private ulong breakAddr;
         private uint breakInst;
+        private InterruptReturnDelegate interruptReturn;
     }
 }

@@ -272,15 +272,15 @@ function drawInheritanceDiagram() {
         { name: "cmsx.intermediate.Instruction", id: "diagram_node_1", level: 1, subject: false, hasDerivedNodes: true, link: "../../cmsxi/doc/class_Instruction_5E05DB58E4B1651C9C3A965474ED1B4E9BB774F7.html" },
         { name: "cmsx.intermediate.ValueInstruction", id: "diagram_node_2", level: 2, subject: false, hasDerivedNodes: true, link: "../../cmsxi/doc/class_ValueInstruction_417B4E9734C5B191C070E73F51D43C8545054B69.html" },
         { name: "cmsx.intermediate.UnaryInstruction", id: "diagram_node_3", level: 3, subject: true, hasDerivedNodes: true, link: "../../cmsxi/doc/class_UnaryInstruction_83DFD4DD0B93E1F3583BA15151745AA9DF839635.html" },
-        { name: "cmsx.intermediate.BitCastInstruction", id: "diagram_node_6", level: 4, subject: false, hasDerivedNodes: false, link: "../../cmsxi/doc/class_BitCastInstruction_0DFE589DF2F64E1988E1854FF9EB4A02D72BF89F.html" },
+        { name: "cmsx.intermediate.BitCastInstruction", id: "diagram_node_4", level: 4, subject: false, hasDerivedNodes: false, link: "../../cmsxi/doc/class_BitCastInstruction_0DFE589DF2F64E1988E1854FF9EB4A02D72BF89F.html" },
         { name: "cmsx.intermediate.FloatToIntInstruction", id: "diagram_node_7", level: 4, subject: false, hasDerivedNodes: false, link: "../../cmsxi/doc/class_FloatToIntInstruction_EB7C8C7569608621D19BD776DC6F11B228CAC34B.html" },
         { name: "cmsx.intermediate.IntToFloatInstruction", id: "diagram_node_5", level: 4, subject: false, hasDerivedNodes: false, link: "../../cmsxi/doc/class_IntToFloatInstruction_9DA26DE1992B1FEFA92BACE1E6D44DEBA2F018E9.html" },
         { name: "cmsx.intermediate.IntToPtrInstruction", id: "diagram_node_8", level: 4, subject: false, hasDerivedNodes: false, link: "../../cmsxi/doc/class_IntToPtrInstruction_BF9B98A1CD09DE7C2E357FEDA391233200D18AC3.html" },
-        { name: "cmsx.intermediate.NegInstruction", id: "diagram_node_11", level: 4, subject: false, hasDerivedNodes: false, link: "../../cmsxi/doc/class_NegInstruction_488EF344D5729AA5AB8D574DA3F27ED289BDBA12.html" },
+        { name: "cmsx.intermediate.NegInstruction", id: "diagram_node_9", level: 4, subject: false, hasDerivedNodes: false, link: "../../cmsxi/doc/class_NegInstruction_488EF344D5729AA5AB8D574DA3F27ED289BDBA12.html" },
         { name: "cmsx.intermediate.NotInstruction", id: "diagram_node_10", level: 4, subject: false, hasDerivedNodes: false, link: "../../cmsxi/doc/class_NotInstruction_A35DFCD9C51C7775A539653F67EF5C1BBAF6F211.html" },
-        { name: "cmsx.intermediate.PtrToIntInstruction", id: "diagram_node_9", level: 4, subject: false, hasDerivedNodes: false, link: "../../cmsxi/doc/class_PtrToIntInstruction_2823760026B2F5090BC7AB36A3D07B0791CCA539.html" },
+        { name: "cmsx.intermediate.PtrToIntInstruction", id: "diagram_node_11", level: 4, subject: false, hasDerivedNodes: false, link: "../../cmsxi/doc/class_PtrToIntInstruction_2823760026B2F5090BC7AB36A3D07B0791CCA539.html" },
         { name: "cmsx.intermediate.SignExtendInstruction", id: "diagram_node_12", level: 4, subject: false, hasDerivedNodes: false, link: "../../cmsxi/doc/class_SignExtendInstruction_1004F75A8D85849750C671247EA722F0EA502FEE.html" },
-        { name: "cmsx.intermediate.TruncateInstruction", id: "diagram_node_4", level: 4, subject: false, hasDerivedNodes: false, link: "../../cmsxi/doc/class_TruncateInstruction_B22EF09C6EBE2155A1B2CF8575D726740281BCAA.html" },
+        { name: "cmsx.intermediate.TruncateInstruction", id: "diagram_node_6", level: 4, subject: false, hasDerivedNodes: false, link: "../../cmsxi/doc/class_TruncateInstruction_B22EF09C6EBE2155A1B2CF8575D726740281BCAA.html" },
         { name: "cmsx.intermediate.ZeroExtendInstruction", id: "diagram_node_13", level: 4, subject: false, hasDerivedNodes: false, link: "../../cmsxi/doc/class_ZeroExtendInstruction_BAF183E9484C28A803CAB87844250BF17FB97DF4.html" }];
     drawDiagram(diagramNodes);
 }

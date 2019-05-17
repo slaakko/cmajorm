@@ -1,0 +1,40 @@
+// =================================
+// Copyright (c) 2019 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+
+namespace System.IO
+{
+    public const int nameMax = 252;
+    
+    public class DirectoryEntry
+    {
+        public int inodeNumber;
+        public char[nameMax] entryName;
+    }
+    
+    public class DirectoryReader
+    {
+        public nothrow DirectoryReader(const string& dirPath) : dd(System.Os.OpenDir(dirPath.Chars()))
+        {
+        }
+        public bool Read(DirectoryEntry& dirEntry)
+        {
+            int result = System.Os.ReadDir(dd, &dirEntry.inodeNumber, &dirEntry.entryName[0]);
+            return result == 1;
+        }
+        public ~DirectoryReader()
+        {
+            try
+            {
+                System.Os.CloseDir(dd);
+            }
+            catch (const Exception&)
+            {
+            }
+        }
+        private int dd;
+    }
+}

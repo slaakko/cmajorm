@@ -1,0 +1,25 @@
+using System;
+using cmsx.util;
+
+namespace cmsx.kernel
+{
+    public abstract class FileSystem
+    {
+        public default virtual ~FileSystem();
+        public abstract void Init();
+        public abstract int Create(Process* process, const string& path, int mode, bool truncate);
+        public abstract int Open(Process* process, const string& path, OpenFlags flags, int mode);
+        public abstract void MakeDirectory(Process* process, const string& path);
+        public abstract int OpenDirectory(Process* process, const string& path);
+        public abstract int ReadDirectory(Process* process, DirectoryFile& dirFile, ulong inodeNumberAddress, ulong entryNameAddress);
+        public abstract nothrow HostFile* GetHostFile() const;
+        public abstract int AllocateBlockNumber();
+        public abstract nothrow void SetBlockFree(int blockNumber);
+        public abstract int GetFreeINodeNumber();
+        public abstract void SetFreeINodeNumber(int inodeNumber);
+        public abstract nothrow int GetFirstINodeBlockNumber() const;
+        public abstract nothrow INodeKey GetRootDirINodeKey() const;
+        public abstract nothrow int LastBlockNumber() const;
+        public abstract nothrow void SetLastBlockNumber(int blockNumber, SuperBlock* sb);
+    }
+}

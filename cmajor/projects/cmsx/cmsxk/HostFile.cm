@@ -1,0 +1,70 @@
+using System;
+
+namespace cmsx.kernel
+{
+    public ulong hostFileCompletionKey = 0u;
+
+    public class HostFile
+    {
+        public HostFile(const string& hostFilePath_) : hostFilePath(hostFilePath_), fileHandle(null), completionPort(null), evnt(null)
+        {
+            if (System.IO.File.Exists(hostFilePath))
+            {
+                fileHandle = OsOpenHostFile(hostFilePath.Chars());
+            }
+            else
+            {
+                fileHandle = OsCreateHostFile(hostFilePath.Chars());
+            }
+            if (fileHandle == null)
+            {
+                throw Exception("error opening host file '" + hostFilePath + "': open failed");
+            }
+            completionPort = OsCreateIoCompletionPort(fileHandle, hostFileCompletionKey);
+            if (completionPort == null)
+            {
+                throw Exception("error opening host file '" + hostFilePath + "': creating I/O completion port failed");
+            }
+            evnt = OsCreateEvent();
+            if (evnt == null)
+            {
+                throw Exception("error opening host file '" + hostFilePath + "': creating event failed");
+            }
+        }
+        public ~HostFile()
+        {
+            if (evnt != null)
+            {
+                OsCloseEvent(evnt);
+            }
+            if (completionPort != null)
+            {
+                OsCloseIoCompletionPort(completionPort);
+            }
+            if (fileHandle != null)
+            {
+                OsCloseHostFile(fileHandle);
+            }
+        }
+        public inline nothrow const string& GetHostFilePath() const
+        {
+            return hostFilePath;
+        }
+        public inline nothrow void* GetFileHandle() const
+        {
+            return fileHandle;
+        }
+        public inline nothrow void* GetEventHandle() const
+        {
+            return evnt;
+        }
+        public inline nothrow void* GetCompletionPortHandle()
+        {
+            return completionPort;
+        }
+        private string hostFilePath;
+        private void* fileHandle;
+        private void* completionPort;
+        private void* evnt;
+    }
+}

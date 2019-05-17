@@ -272,9 +272,9 @@ function drawInheritanceDiagram() {
         { name: "cmsx.intermediate.Location", id: "diagram_node_1", level: 1, subject: false, hasDerivedNodes: true, link: "../../cmsxi/doc/class_Location_BE5B0B4F6121C4382E496712B4F67F5152B95437.html" },
         { name: "cmsx.intermediate.MemoryLocation", id: "diagram_node_2", level: 2, subject: false, hasDerivedNodes: true, link: "../../cmsxi/doc/class_MemoryLocation_9EA8F174A6AEB6FFA1B4C51FB4A35E2CD3B55280.html" },
         { name: "cmsx.intermediate.FrameLocation", id: "diagram_node_3", level: 3, subject: true, hasDerivedNodes: true, link: "../../cmsxi/doc/class_FrameLocation_0D2C177BDA20C01C1A3EDA800FEFFD20AFF94190.html" },
-        { name: "cmsx.intermediate.FarFrameLocation", id: "diagram_node_5", level: 4, subject: false, hasDerivedNodes: false, link: "../../cmsxi/doc/class_FarFrameLocation_684B6C8DD92A5D6D2053A3B45AAAE6716061945D.html" },
+        { name: "cmsx.intermediate.FarFrameLocation", id: "diagram_node_4", level: 4, subject: false, hasDerivedNodes: false, link: "../../cmsxi/doc/class_FarFrameLocation_684B6C8DD92A5D6D2053A3B45AAAE6716061945D.html" },
         { name: "cmsx.intermediate.MediumFrameLocation", id: "diagram_node_6", level: 4, subject: false, hasDerivedNodes: false, link: "../../cmsxi/doc/class_MediumFrameLocation_14E171D34C481865EA76A9F91D9B16A2EE2B789D.html" },
-        { name: "cmsx.intermediate.NearFrameLocation", id: "diagram_node_4", level: 4, subject: false, hasDerivedNodes: false, link: "../../cmsxi/doc/class_NearFrameLocation_548066652A9D1D01CEA53B6528F6453C2D34CD44.html" }];
+        { name: "cmsx.intermediate.NearFrameLocation", id: "diagram_node_5", level: 4, subject: false, hasDerivedNodes: false, link: "../../cmsxi/doc/class_NearFrameLocation_548066652A9D1D01CEA53B6528F6453C2D34CD44.html" }];
     drawDiagram(diagramNodes);
 }
 

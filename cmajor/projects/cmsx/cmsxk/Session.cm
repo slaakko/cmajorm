@@ -44,7 +44,7 @@ namespace cmsx.kernel
             }
             else
             {
-                throw SystemError(RLIMITEXCEEDED, "maximum number of open sessions (" + ToString(numSessionSlots) + ") exceeeded");
+                throw SystemError(ERLIMITEXCEEDED, "maximum number of open sessions (" + ToString(numSessionSlots) + ") exceeeded");
             }
             session->sid = nextSid++;
             session->nextFree = null;

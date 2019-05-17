@@ -32,6 +32,10 @@ public const byte sys_get_random_seed = 25u;
 public const byte sys_file_exists = 26u;
 public const byte sys_get_file_size = 27u;
 public const byte sys_unlink = 28u;
+public const byte sys_mkdir = 29u;
+public const byte sys_opendir = 30u;
+public const byte sys_readdir = 31u;
+public const byte sys_closedir = 32u;
 
 public cdecl nothrow void exit(byte exitCode)
 {
@@ -175,4 +179,24 @@ public cdecl nothrow long get_file_size(const char* filePath)
 public cdecl nothrow int unlink(const char* filePath)
 {
     return cast<int>(trap(0u, sys_unlink, 0u, filePath));
+}
+
+public cdecl nothrow int mkdir(const char* path)
+{
+    return cast<int>(trap(0u, sys_mkdir, 0u, path));
+}
+
+public cdecl nothrow int opendir(const char* dirPath)
+{
+    return cast<int>(trap(0u, sys_opendir, 0u, dirPath));
+}
+
+public cdecl nothrow int readdir(int dd, int* inodeNumber, char* entryName)
+{
+    return cast<int>(trap(0u, sys_readdir, 0u, dd, inodeNumber, entryName));
+}
+
+public cdecl nothrow int closedir(int dd)
+{
+    return cast<int>(trap(0u, sys_closedir, 0u, dd));
 }

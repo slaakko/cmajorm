@@ -1,15 +1,62 @@
 using System;
 using System.IO;
+using System.Collections;
 using cmsx.machine;
+using cmsx.util;
 
 namespace cmsx.kernel
 {
+    public const long openFileMax = 32;
+
     public enum Origin : byte
     {
         seekSet, seekCur, seekEnd
     }
 
     public const long RESULT_BLOCKED = -2;
+
+    public enum OpenFlags : int
+    {
+        none = 0u,
+        read = 1u << 0u,
+        write = 1u << 1u,
+        create = 1 << 2u,
+        append = 1u << 3u,
+        truncate = 1u << 4u,
+        text = 1u << 5u
+    }
+
+    public int Create(Machine& machine, Process* process, ulong pathAddress, int mode)
+    {
+        if (pathAddress == 0u)
+        {
+            throw SystemError(EINVAL, "path address is null");
+        }
+        string path;
+        ReadStringFromProcessMemory(machine, process, pathAddress, path);
+        if (path.IsEmpty())
+        {
+            throw SystemError(EINVAL, "path address is empty");
+        }
+        FileSystem* fs = GetMountTable().GetFileSystem(0);
+        return fs->Create(process, path, mode, true);
+    }
+
+    public int Open(Machine& machine, Process* process, ulong pathAddress, OpenFlags flags, int mode)
+    {
+        if (pathAddress == 0u)
+        {
+            throw SystemError(EINVAL, "path address is null");
+        }
+        string path;
+        ReadStringFromProcessMemory(machine, process, pathAddress, path);
+        if (path.IsEmpty())
+        {
+            throw SystemError(EINVAL, "path is empty");
+        }
+        FileSystem* fs = GetMountTable().GetFileSystem(0);
+        return fs->Open(process, path, flags, mode);
+    }
 
     public long Read(Machine& machine, Process* process, int fd, ulong bufferAddress, long count)
     {
@@ -53,6 +100,74 @@ namespace cmsx.kernel
     {
         File* file = process->fileTable.GetFile(fd);
         return file->IsConsole();
+    }
+
+    public void Mkdir(Machine& machine, Process* process, ulong pathAddress)
+    {
+        if (pathAddress == 0u)
+        {
+            throw SystemError(EINVAL, "path address is null");
+        }
+        string path;
+        ReadStringFromProcessMemory(machine, process, pathAddress, path);
+        if (path.IsEmpty())
+        {
+            throw SystemError(EINVAL, "path is empty");
+        }
+        FileSystem* fs = GetMountTable().GetFileSystem(0);
+        fs->MakeDirectory(process, path);
+    }
+
+    public int OpenDir(Machine& machine, Process* process, ulong pathAddress)
+    {
+        if (pathAddress == 0u)
+        {
+            throw SystemError(EINVAL, "path address is null");
+        }
+        string path;
+        ReadStringFromProcessMemory(machine, process, pathAddress, path);
+        if (path.IsEmpty())
+        {
+            throw SystemError(EINVAL, "path is empty");
+        }
+        FileSystem* fs = GetMountTable().GetFileSystem(0);
+        return fs->OpenDirectory(process, path);
+    }
+
+    public int ReadDir(Machine& machine, Process* process, int fd, ulong inodeNumberAddress, ulong entryNameAddress)
+    {
+        if (inodeNumberAddress == 0u)
+        {
+            throw SystemError(EINVAL, "inode number address is null");
+        }
+        if (entryNameAddress == 0u)
+        {
+            throw SystemError(EINVAL, "entry name address is null");
+        }
+        File* file = process->fileTable.GetFile(fd);
+        if (file is DirectoryFile*)
+        {
+            DirectoryFile* dir = cast<DirectoryFile*>(file);
+            return dir->Read(process, inodeNumberAddress, entryNameAddress);
+        }
+        else
+        {
+            throw SystemError(EBADF, "file descriptor '" + ToString(fd) + "' does not denote a directory");
+        }
+    }
+
+    public void CloseDir(Machine& machine, Process* process, int fd)
+    {
+        File* file = process->fileTable.GetFile(fd);
+        if (file is DirectoryFile*)
+        {
+            file->Release();
+            process->fileTable.SetFile(fd, null);
+        }
+        else
+        {
+            throw SystemError(EBADF, "file descriptor '" + ToString(fd) + "' does not denote a directory");
+        }
     }
 
     public abstract class File
@@ -172,37 +287,38 @@ namespace cmsx.kernel
         {
             try
             {
-                Kernel& kernel = Kernel.Instance();
-                Session* session = kernel.CurrentSession();
-                if (session->fgpid == reader->pid)
+                while (true)
                 {
-                    if (bufferedInput.IsEmpty())
+                    Kernel& kernel = Kernel.Instance();
+                    Session* session = kernel.CurrentSession();
+                    if (session->fgpid == reader->pid)
                     {
-                        ConsoleDriver* consoleDriver = kernel.GetConsoleDriver();
-                        if (consoleDriver->HasLine())
+                        if (bufferedInput.IsEmpty())
                         {
-                            bufferedInput = consoleDriver->GetLine();
+                            ConsoleDriver* consoleDriver = kernel.GetConsoleDriver();
+                            if (consoleDriver->HasLine())
+                            {
+                                bufferedInput = consoleDriver->GetLine();
+                            }
+                            else if (consoleDriver->Eof())
+                            {
+                                consoleDriver->ResetEof();
+                                return 0;
+                            }
+                            else
+                            {
+                                EnqueueReadRequest(reader, bufferAddress, count);
+                            }
                         }
-                        else if (consoleDriver->Eof())
-                        {
-                            consoleDriver->ResetEof();
-                            return 0;
-                        }
-                        else
-                        {
-                            EnqueueReadRequest(reader, bufferAddress, count);
-                            return RESULT_BLOCKED;
-                        }
+                        long n = Min(count, bufferedInput.Length());
+                        WriteProcessMemory(machine, reader, bufferAddress, cast<byte*>(cast<void*>(bufferedInput.Chars())), cast<ulong>(n), Protection.write);
+                        bufferedInput = bufferedInput.Substring(n);
+                        return n;
                     }
-                    long n = Min(count, bufferedInput.Length());
-                    WriteProcessMemory(machine, reader, bufferAddress, cast<byte*>(cast<void*>(bufferedInput.Chars())), cast<ulong>(n), Protection.write);
-                    bufferedInput = bufferedInput.Substring(n);
-                    return n;
-                }
-                else
-                {
-                    EnqueueReadRequest(reader, bufferAddress, count);
-                    return RESULT_BLOCKED;
+                    else
+                    {
+                        EnqueueReadRequest(reader, bufferAddress, count);
+                    }
                 }
             }
             catch (const Exception& ex)
@@ -258,7 +374,222 @@ namespace cmsx.kernel
         }
     }
 
-    public const long openFileMax = 32;
+    public class RegularFile : File
+    {
+        public nothrow RegularFile(const string& name_, FilePtr* filePtr_) : base(name_), filePtr(filePtr_)
+        {
+        }
+        public override long Write(Machine& machine, Process* writer, ulong bufferAddress, long count)
+        {
+            if ((filePtr->Flags() & OpenFlags.write) == OpenFlags.none)
+            {
+                throw SystemError(EBADF, name + " not open for writing");
+            }
+            return filePtr->Write(machine, writer, bufferAddress, count);
+        }
+        public override long Read(Machine& machine, Process* reader, ulong bufferAddress, long count)
+        {
+            if ((filePtr->Flags() & OpenFlags.read) == OpenFlags.none)
+            {
+                throw SystemError(EBADF, name + " not open for reading");
+            }
+            return filePtr->Read(machine, reader, bufferAddress, count);
+        }
+        public override File* Share()
+        {
+            return new RegularFile(name, filePtr->Share());
+        }
+        public override void Release()
+        {
+            filePtr->Release();
+            delete this;
+        }
+        private FilePtr* filePtr;
+    }
+
+    public class DirectoryFile : File
+    {
+        public nothrow DirectoryFile(INode* dirINode_) : base("dir"), dirINode(dirINode_), offset(0)
+        {
+        }
+        public int Read(Process* process, ulong inodeNumberAddress, ulong entryNameAddress)
+        {
+            if (dirINode == null)
+            {
+                throw SystemError(EINVAL, "directory inode is null");
+            }
+            FileSystem* fs = GetMountTable().GetFileSystem(dirINode->Key().fsNumber);
+            return fs->ReadDirectory(process, *this, inodeNumberAddress, entryNameAddress);
+        }
+        public inline nothrow INode* DirINode() const
+        {
+            return dirINode;
+        }
+        public inline nothrow long Offset() const
+        {
+            return offset;
+        }
+        public inline nothrow void SetOffset(long offset_)
+        {
+            offset = offset_;
+        }
+        public override File* Share()
+        {
+            if (dirINode != null)
+            {
+                dirINode->SetUseCount(dirINode->GetUseCount() + 1);
+            }
+            return new DirectoryFile(dirINode);
+        }
+        public override void Release()
+        {
+            if (dirINode != null)
+            {
+                GetINodeManager().PutINode(dirINode);
+            }
+            delete this;
+        }
+        private INode* dirINode;
+        private long offset;
+    }
+
+    public class FilePtr
+    {
+        public nothrow FilePtr(INode* inode_, OpenFlags flags_) : inode(inode_), pos(0), flags(flags_), useCount(1)
+        {
+            if ((flags& OpenFlags.append) != OpenFlags.none)
+            {
+                pos = inode->GetFileSize();
+            }
+        }
+        public long Write(Machine& machine, Process* writer, ulong bufferAddress, long count)
+        {
+            while (inode->GetFlag(INode.Flags.locked))
+            {
+                inode->AddWaitingProcess(writer);
+                SleepProcess(writer, inodeUnlockedEvent, cast<ulong>(cast<void*>(inode)), 0u);
+            }
+            long bytesWritten = 0;
+            {
+                INodeLock lock(inode);
+                ulong offset = 0u;
+                while (count > 0)
+                {
+                    int blockNumber = 0;
+                    int blockOffset = 0;
+                    GetBlockManager().GetBlockNumber(inode, pos, blockNumber, blockOffset, true);
+                    long bytesToWrite = Min(count, blockSize - blockOffset);
+                    Block* block = null;
+                    if (blockOffset != 0 || bytesToWrite != blockSize)
+                    {
+                        block = GetBlockManager().ReadBlock(BlockKey(blockNumber, inode->Key().fsNumber, BlockKind.fileBlock), null);
+                    }
+                    else
+                    {
+                        block = GetBlockManager().GetBlock(BlockKey(blockNumber, inode->Key().fsNumber, BlockKind.fileBlock), null);
+                    }
+                    #assert(block is FileBlock*);
+                    BlockPutter blockPutter(block);
+                    FileBlock* fileBlock = cast<FileBlock*>(block);
+                    UniquePtr<byte> buffer(cast<byte*>(RtMemAlloc(bytesToWrite)));
+                    ReadProcessMemory(machine, writer, bufferAddress + offset, buffer.Get(), cast<ulong>(bytesToWrite));
+                    MemoryReader reader(buffer.Get(), bytesToWrite);
+                    for (long i = 0; i < bytesToWrite; ++i)
+                    {
+                        byte x = reader.ReadByte();
+                        fileBlock->SetByte(blockOffset + i, x);
+                    }
+                    fileBlock->SetFlag(Block.Flags.dirty);
+                    GetBlockManager().WriteBlock(block, null);
+                    count = count - bytesToWrite;
+                    pos = pos + bytesToWrite;
+                    offset = offset + cast<ulong>(bytesToWrite);
+                    bytesWritten = bytesWritten + bytesToWrite;
+                }
+                if (pos > inode->GetFileSize())
+                {
+                    inode->SetFileSize(pos);
+                }
+            }
+            return bytesWritten;
+        }
+        public long Read(Machine& machine, Process* reader, ulong bufferAddress, long count)
+        {
+            while (inode->GetFlag(INode.Flags.locked))
+            {
+                inode->AddWaitingProcess(reader);
+                SleepProcess(reader, inodeUnlockedEvent, cast<ulong>(cast<void*>(inode)), 0u);
+            }
+            long bytesRead = 0;
+            {
+                INodeLock lock(inode);
+                ulong offset = 0u;
+                while (count > 0)
+                {
+                    int blockNumber = 0;
+                    int blockOffset = 0;
+                    GetBlockManager().GetBlockNumber(inode, pos, blockNumber, blockOffset, false);
+                    long bytesToRead = Min(count, blockSize - blockOffset);
+                    long bytesLeft = Max(inode->GetFileSize() - pos, 0);
+                    bytesToRead = Min(bytesToRead, bytesLeft);
+                    if (bytesToRead == 0)
+                    {
+                        break;
+                    }
+                    Block* block = null;
+                    UniquePtr<byte> buffer(cast<byte*>(RtMemAlloc(bytesToRead)));
+                    MemoryWriter writer(buffer.Get(), bytesToRead);
+                    if (blockNumber != 0)
+                    {
+                        block = GetBlockManager().ReadBlock(BlockKey(blockNumber, inode->Key().fsNumber, BlockKind.fileBlock), null);
+                        #assert(block is FileBlock*);
+                        BlockPutter blockPutter(block);
+                        FileBlock* fileBlock = cast<FileBlock*>(block);
+                        for (long i = 0; i < bytesToRead; ++i)
+                        {
+                            byte x = fileBlock->GetByte(blockOffset + i);
+                            writer.Write(x);
+                        }
+                    }
+                    else
+                    {
+                        for (long i = 0; i < bytesToRead; ++i)
+                        {
+                            byte x = 0u;
+                            writer.Write(x);
+                        }
+                    }
+                    WriteProcessMemory(machine, reader, bufferAddress + offset, buffer.Get(), cast<ulong>(bytesToRead), Protection.write);
+                    count = count - bytesToRead;
+                    pos = pos + bytesToRead;
+                    offset = offset + cast<ulong>(bytesToRead);
+                    bytesRead = bytesRead + bytesToRead;
+                }
+            }
+            return bytesRead;
+        }
+        public FilePtr* Share()
+        {
+            ++useCount;
+            return this;
+        }
+        public void Release()
+        {
+            --useCount;
+            if (useCount == 0)
+            {
+                delete this;
+            }
+        }
+        public nothrow inline OpenFlags Flags() const
+        {
+            return flags;
+        }
+        private INode* inode;
+        private long pos;
+        private OpenFlags flags;
+        private int useCount;
+    }
 
     public class ProcessFileTable
     {
@@ -282,7 +613,7 @@ namespace cmsx.kernel
             }
             else if (fd >= openFileMax)
             {
-                throw SystemError(EBADF, "value exceeds max number of open files");
+                throw SystemError(EBADF, "value exceeds maximum number of open files");
             }
             File* file = files[fd];
             if (file == null)
@@ -290,6 +621,18 @@ namespace cmsx.kernel
                 throw SystemError(EBADF, "file not open");
             }
             return file;
+        }
+        public int GetEmptyFileSlot()
+        {
+            for (long i = 0; i < openFileMax; ++i)
+            {
+                File* file = files[i];
+                if (file == null)
+                {
+                    return cast<int>(i);
+                }
+            }
+            throw SystemError(ERLIMITEXCEEDED, "maximum number of open files (" + ToString(openFileMax) + ") exceeded");
         }
         public void ShareFilesTo(ProcessFileTable& that)
         {

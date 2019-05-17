@@ -1,0 +1,52 @@
+using System;
+using System.Text;
+using System.IO;
+
+static class Path
+{
+    public static string Combine(const string& left, const string& right)
+    {
+        if (left.EndsWith("/"))
+        {
+            return left + right;
+        }
+        else
+        {
+            return left + "/" + right;
+        }
+    }
+}
+
+void DirWalk(CodeFormatter& formatter, const string& dirPath)
+{
+    formatter << dirPath << endl();
+    formatter.IncIndent();
+    DirectoryReader reader(dirPath);
+    DirectoryEntry dirEntry;
+    while (reader.Read(dirEntry))
+    {
+        string entryName = &dirEntry.entryName[0];
+        formatter << "[" << entryName << ":" << dirEntry.inodeNumber << "]" << endl();
+        if (entryName != "." && entryName != "..")
+        {
+            string subDirPath = Path.Combine(dirPath, entryName);
+            DirWalk(formatter, subDirPath);
+        }
+    }
+    formatter.DecIndent();
+}
+
+int main()
+{
+    try
+    {
+        CodeFormatter formatter(Console.Out());
+        DirWalk(formatter, "/");
+    }
+    catch (const Exception& ex)
+    {
+        Console.Error() << ex.ToString() << endl();
+        return 1;
+    }
+    return 0;
+}

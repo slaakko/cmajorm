@@ -1,21 +1,25 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup Label="Globals">
     <CustomProjectExtensionsPath>$(LocalAppData)\CustomProjectSystems\Cmajor\</CustomProjectExtensionsPath>
-    <ProjectGuid>d92ee834-a1dc-427c-8ee6-3fb578a79169</ProjectGuid>
+    <ProjectGuid>bccd25b6-964a-41c2-b403-3362edc90b11</ProjectGuid>
   </PropertyGroup>
   <PropertyGroup>
     <TargetType>program</TargetType>
+    <StartItem>
+    </StartItem>
   </PropertyGroup>
-  <Import Project="$(CustomProjectExtensionsPath)Cmajor.props" />
-  <Import Project="$(CustomProjectExtensionsPath)Cmajor.targets" />
   <ItemGroup>
     <CmCompile Include="Main.cm" />
   </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
-    <ProjectReference Include="cmsxmdb\cmsxmdb.cmproj" />
-    <ProjectReference Include="cmsxk\cmsxk.cmproj" />
-    <ProjectReference Include="cmsxm\cmsxm.cmproj" />
-    <ProjectReference Include="cmsxu\cmsxu.cmproj" />
+    <ProjectReference Include="cmsxk/cmsxk.cmproj" />
+    <ProjectReference Include="cmsxm/cmsxm.cmproj" />
+    <ProjectReference Include="cmsxmdb/cmsxmdb.cmproj" />
+    <ProjectReference Include="cmsxa/cmsxa.cmproj" />
+    <ProjectReference Include="cmsxu/cmsxu.cmproj" />
   </ItemGroup>
+  <Import Project="$(CustomProjectExtensionsPath)Cmajor.props" />
+  <Import Project="$(CustomProjectExtensionsPath)Cmajor.targets" />
 </Project>

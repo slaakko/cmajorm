@@ -270,7 +270,8 @@ function drawInheritanceDiagram() {
     var diagramNodes = [
         { name: "cmsx.intermediate.Value", id: "diagram_node_0", level: 0, subject: false, hasDerivedNodes: true, link: "../../cmsxi/doc/class_Value_D184FDC4DCC37461ED1781E875D6610EE22D5D73.html" },
         { name: "cmsx.intermediate.ConstantValue", id: "diagram_node_1", level: 1, subject: false, hasDerivedNodes: true, link: "../../cmsxi/doc/class_ConstantValue_6CBE7195C18A92AA788961FEB9859AF11A2CA755.html" },
-        { name: "cmsx.intermediate.UIntValue", id: "diagram_node_2", level: 2, subject: true, hasDerivedNodes: false, link: "../../cmsxi/doc/class_UIntValue_5292BA4E650BBCD809C006E6F252E4CCFE13AE4D.html" }];
+        { name: "cmsx.intermediate.LiteralValue", id: "diagram_node_2", level: 2, subject: false, hasDerivedNodes: true, link: "../../cmsxi/doc/class_LiteralValue_006CAA6E1EE9CC77613D2DAB1C0AB5A26A1C4ED9.html" },
+        { name: "cmsx.intermediate.UIntValue", id: "diagram_node_3", level: 3, subject: true, hasDerivedNodes: false, link: "../../cmsxi/doc/class_UIntValue_5292BA4E650BBCD809C006E6F252E4CCFE13AE4D.html" }];
     drawDiagram(diagramNodes);
 }
 

@@ -203,24 +203,187 @@ extern "C" RT_API bool OsWriteConsole(void* consoleOutputHandle, const char32_t*
     return WriteConsoleW(consoleOutputHandle, w.c_str(), w.length(), &numCharsWritten, nullptr);
 }
 
-extern "C" RT_API uint32_t OsGetConsoleCP()
+extern "C" RT_API void* OsCreateHostFile(const char* filePath)
 {
-    return GetConsoleCP();
+    HANDLE handle = CreateFileA(filePath, GENERIC_READ | GENERIC_WRITE, 0, NULL, CREATE_NEW, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_RANDOM_ACCESS | FILE_FLAG_OVERLAPPED, NULL);
+    if (handle == INVALID_HANDLE_VALUE)
+    {
+        return nullptr;
+    }
+    else
+    {
+        return handle;
+    }
 }
 
-extern "C" RT_API bool OsSetConsoleCP(uint32_t cp)
+extern "C" RT_API void* OsOpenHostFile(const char* filePath)
 {
-    return SetConsoleCP(cp);
+    HANDLE handle = CreateFileA(filePath, GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_RANDOM_ACCESS | FILE_FLAG_OVERLAPPED, NULL);
+    if (handle == INVALID_HANDLE_VALUE)
+    {
+        return nullptr;
+    }
+    else
+    {
+        return handle;
+    }
 }
 
-extern "C" RT_API uint32_t OsGetConsoleOutputCP()
+extern "C" RT_API void OsCloseHostFile(void* fileHandle)
 {
-    return GetConsoleOutputCP();
+    CloseHandle(fileHandle);
 }
 
-extern "C" RT_API bool OsSetConsoleOutputCP(uint32_t cp)
+extern "C" RT_API void* OsCreateIoCompletionPort(void* fileHandle, uint64_t completionKey)
 {
-    return SetConsoleOutputCP(cp);
+    HANDLE handle = CreateIoCompletionPort(fileHandle, NULL, completionKey, 0);
+    if (handle == NULL)
+    {
+        return nullptr;
+    }
+    else
+    {
+        return handle;
+    }
+}
+
+extern "C" RT_API void OsCloseIoCompletionPort(void* completionPortHandle)
+{
+    CloseHandle(completionPortHandle);
+}
+
+extern "C" RT_API bool OsGetQueuedCompletionStatus(void* completionPortHandle, uint64_t* numberOfBytes, uint64_t* completionKey, void** overlappedPtr)
+{
+    DWORD numBytes = 0;
+    LPOVERLAPPED overlapped = nullptr;
+    bool retval = GetQueuedCompletionStatus(completionPortHandle, &numBytes, completionKey, &overlapped, INFINITE);
+    if (retval)
+    {
+        *numberOfBytes = numBytes;
+        *overlappedPtr = static_cast<void*>(overlapped);
+    }
+    return retval;
+}
+
+extern "C" RT_API bool OsPostQueuedCompletionStatus(void* completionPortHandle, uint64_t numberOfBytes, uint64_t completionKey)
+{
+    bool retval = PostQueuedCompletionStatus(completionPortHandle, numberOfBytes, completionKey, NULL);
+    return retval;
+}
+
+extern "C" RT_API void* OsCreateOverlapped(uint64_t offset, void* evnt)
+{
+    OVERLAPPED* overlapped = new OVERLAPPED();
+    std::memset(overlapped, 0, sizeof(OVERLAPPED));
+    overlapped->Offset = static_cast<uint32_t>(offset);
+    overlapped->OffsetHigh = static_cast<uint32_t>(offset >> 32);
+    overlapped->hEvent = evnt;
+    return overlapped;
+}
+
+extern "C" RT_API void OsDestroyOverlapped(void* overlapped)
+{
+    delete overlapped;
+}
+
+extern "C" RT_API bool OsReadFile(void* fileHandle, void* buffer, uint32_t numberOfBytesToRead, void* overlapped)
+{
+    bool retval = ReadFile(fileHandle, buffer, numberOfBytesToRead, NULL, static_cast<LPOVERLAPPED>(overlapped));
+    return retval;
+}
+
+extern "C" RT_API bool OsWriteFile(void* fileHandle, void* buffer, uint32_t numberOfBytesToWrite, void* overlapped)
+{
+    bool retval = WriteFile(fileHandle, buffer, numberOfBytesToWrite, NULL, static_cast<LPOVERLAPPED>(overlapped));
+    return retval;
+}
+
+extern "C" RT_API void* OsCreateEvent()
+{
+    HANDLE handle = CreateEventA(NULL, false, false, NULL);
+    return handle;
+}
+
+extern "C" RT_API bool OsSetEvent(void* eventHandle)
+{
+    bool retval = SetEvent(eventHandle);
+    return retval;
+}
+
+extern "C" RT_API bool OsResetEvent(void* eventHandle)
+{
+    bool retval = ResetEvent(eventHandle);
+    return retval;
+}
+
+extern "C" RT_API void OsWaitEvent(void* eventHandle)
+{
+    WaitForSingleObject(eventHandle, INFINITE);
+}
+
+extern "C" RT_API void OsCloseEvent(void* eventHandle)
+{
+    CloseHandle(eventHandle);
+}
+
+extern "C" RT_API int32_t OsWaitForMultipleObjects(uint32_t count, void** handles)
+{
+    uint32_t retval = WaitForMultipleObjects(count, handles, false, INFINITE);
+    if (retval == WAIT_FAILED)
+    {
+        return -1;
+    }
+    else if (retval == WAIT_TIMEOUT)
+    {
+        return -2;
+    }
+    else if (retval >= WAIT_OBJECT_0 && retval < WAIT_OBJECT_0 + count)
+    {
+        return retval - WAIT_OBJECT_0;
+    }
+    else if (retval >= WAIT_ABANDONED_0 && retval < WAIT_ABANDONED_0 + count)
+    {
+        return -3;
+    }
+    else
+    {
+        return -4;
+    }
+}
+
+extern "C" RT_API void* OsConvertThreadToFiber(void* param)
+{
+    return ConvertThreadToFiber(param);
+}
+
+extern "C" RT_API void* OsCreateFiber(uint64_t stackSize, void* startAddress, void* param)
+{
+    return CreateFiber(stackSize, (LPFIBER_START_ROUTINE)startAddress, param);
+}
+
+extern "C" RT_API void OsSwitchToFiber(void* fiber)
+{
+    SwitchToFiber(fiber);
+}
+
+extern "C" RT_API void* OsGetFiberData()
+{
+    return GetFiberData();
+}
+
+extern "C" RT_API void OsDeleteFiber(void* fiber)
+{
+    DeleteFiber(fiber);
+}
+
+extern "C" RT_API uint64_t OsGetLastError()
+{
+    return GetLastError();
+}
+
+extern "C" RT_API void OsFormatMessage(uint64_t errorCode, char* buffer)
+{
+    FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, nullptr, errorCode, LANG_SYSTEM_DEFAULT, buffer, 4096, nullptr);
 }
 
 #endif 
