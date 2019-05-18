@@ -12,6 +12,8 @@ namespace cmsx.kernel
         public abstract void MakeDirectory(Process* process, const string& path);
         public abstract int OpenDirectory(Process* process, const string& path);
         public abstract int ReadDirectory(Process* process, DirectoryFile& dirFile, ulong inodeNumberAddress, ulong entryNameAddress);
+        public abstract string GetCurrentWorkingDirectory(Process* process);
+        public abstract void Stat(Process* process, const string& path, ulong statStructAddress);
         public abstract nothrow HostFile* GetHostFile() const;
         public abstract int AllocateBlockNumber();
         public abstract nothrow void SetBlockFree(int blockNumber);

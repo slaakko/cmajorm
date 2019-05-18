@@ -261,7 +261,7 @@ namespace cmsx.debug
         ulong inst = 0u;
         try
         {
-            cmsx.kernel.ReadProcessMemory(cmsx.machine.GetMachine(), process, address, inst, 4u);
+            cmsx.kernel.ReadProcessMemory(cmsx.machine.GetMachine(), process, address, inst, 4u, false);
         }
         catch (Exception& ex)
         {
@@ -1010,7 +1010,7 @@ namespace cmsx.debug
             ulong size = Min(end - bufferStartAddress, cast<ulong>(buffer.Length()));
             try
             {
-                cmsx.kernel.ReadProcessMemory(*debugger->machine, debugger->process, bufferStartAddress, &buffer[0], size);
+                cmsx.kernel.ReadProcessMemory(*debugger->machine, debugger->process, bufferStartAddress, &buffer[0], size, false);
             }
             catch (const Exception& ex)
             {
@@ -1899,7 +1899,7 @@ namespace cmsx.debug
                 ulong sp = machine->GetRegisters().Get(cmsx.machine.regSP);
                 try
                 {
-                    ReadProcessMemory(*machine, process, sp - 8u, retAddress, 8u);
+                    ReadProcessMemory(*machine, process, sp - 8u, retAddress, 8u, false);
                 }
                 catch (const Exception& ex)
                 {
@@ -1915,7 +1915,7 @@ namespace cmsx.debug
                 ulong fp = machine->GetRegisters().Get(cmsx.machine.regFP);
                 try
                 {
-                    ReadProcessMemory(*machine, process, fp - 8u, retAddress, 8u);
+                    ReadProcessMemory(*machine, process, fp - 8u, retAddress, 8u, false);
                 }
                 catch (const Exception& ex)
                 {
@@ -2024,7 +2024,7 @@ namespace cmsx.debug
                 ulong value = 0u;
                 try
                 {
-                    cmsx.kernel.ReadProcessMemory(*machine, process, address, value, size);
+                    cmsx.kernel.ReadProcessMemory(*machine, process, address, value, size, false);
                     return value;
                 }
                 catch (const Exception& ex)
@@ -2100,7 +2100,7 @@ namespace cmsx.debug
                 {
                     try
                     {
-                        ReadProcessMemory(*machine, process, sp - 8u, retAddress, 8u);
+                        ReadProcessMemory(*machine, process, sp - 8u, retAddress, 8u, false);
                     }
                     catch (const Exception& ex)
                     {
@@ -2115,8 +2115,8 @@ namespace cmsx.debug
                 }
                 try
                 {
-                    ReadProcessMemory(*machine, process, fp - 8u, retAddress, 8u);
-                    ReadProcessMemory(*machine, process, fp, prevFP, 8u);
+                    ReadProcessMemory(*machine, process, fp - 8u, retAddress, 8u, false);
+                    ReadProcessMemory(*machine, process, fp, prevFP, 8u, false);
                 }
                 catch (const Exception& ex)
                 {

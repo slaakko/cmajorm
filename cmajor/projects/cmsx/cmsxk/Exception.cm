@@ -90,8 +90,8 @@ namespace cmsx.kernel
         ulong pc = 0u;
         ulong callPC = 0u;
         ulong prevFP = 0u;
-        ReadProcessMemory(machine, process, fp, prevFP, 8u);
-        ReadProcessMemory(machine, process, fp - 8u, pc, 8u);
+        ReadProcessMemory(machine, process, fp, prevFP, 8u, false);
+        ReadProcessMemory(machine, process, fp - 8u, pc, 8u, false);
         while (pc != 0u)
         {
             callPC = pc - 4u;
@@ -181,8 +181,8 @@ namespace cmsx.kernel
                     }
                 }
             }
-            ReadProcessMemory(machine, process, fp - 8u, pc, 8u);
-            ReadProcessMemory(machine, process, fp, prevFP, 8u);
+            ReadProcessMemory(machine, process, fp - 8u, pc, 8u, false);
+            ReadProcessMemory(machine, process, fp, prevFP, 8u, false);
         }
         throw SystemError(EFAIL, "dispatch exception failed: exception handler not found");
     }
@@ -190,7 +190,7 @@ namespace cmsx.kernel
     public void ContinueExceptionDispatch(Machine& machine, Process* process, ulong fp)
     {
         ulong prevFP = 0u;
-        ReadProcessMemory(machine, process, fp, prevFP, 8u);
+        ReadProcessMemory(machine, process, fp, prevFP, 8u, false);
         fp = prevFP;
         if (process->handlerAddress != 0u)
         {

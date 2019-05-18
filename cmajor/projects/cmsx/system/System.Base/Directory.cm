@@ -8,6 +8,7 @@ using System;
 namespace System.IO
 {
     public const int nameMax = 252;
+    public const int pathMax = 4096;
     
     public class DirectoryEntry
     {
@@ -36,5 +37,253 @@ namespace System.IO
             }
         }
         private int dd;
+    }
+    
+    public string GetCurrentWorkingDirectory()
+    {
+        Buffer buffer(pathMax);
+        char* buf = cast<char*>(cast<void*>(buffer.Mem()));
+        long count = buffer.Size();
+        System.Os.GetCWD(buf, count);
+        return string(buf);
+    }
+    
+    public nothrow ulong DateTimeToULong(const DateTime& dt)
+    {
+        ulong value = 0u;
+        MemoryWriter writer(cast<byte*>(cast<void*>(&value)), 8u);
+        writer.Write(dt);
+        return value;
+    }
+
+    public nothrow DateTime ULongToDateTime(ulong value)
+    {
+        MemoryReader reader(cast<byte*>(cast<void*>(&value)), 8u);
+        return reader.ReadDateTime();
+    }
+    
+    public enum FileType : int
+    {
+        free = 0, regular = 1, directory = 2, characterSpecial = 3, blockSpecial = 4, fifo = 5
+    }
+    
+    public nothrow string FileTypeStr(FileType fileType)
+    {
+        switch (fileType)
+        {
+            case FileType.free: return "free";
+            case FileType.regular: return "regular";
+            case FileType.directory: return "directory";
+            case FileType.characterSpecial: return "characterSpecial";
+            case FileType.blockSpecial: return "blockSpecial";
+            case FileType.fifo: return "fifo";
+        }
+        return string();
+    }
+    
+    public enum Access : int
+    {
+        none =  0,
+        read = 1 << 0,
+        write = 1 << 1,
+        execute = 1 << 2
+    }
+
+    public nothrow string AccessStr(Access access)
+    {
+        string s;
+        if ((access & Access.read) != Access.none)
+        {
+            s.Append("read");
+        }
+        if ((access & Access.write) != Access.none)
+        {
+            if (!s.IsEmpty())
+            {
+                s.Append('-');
+            }
+            s.Append("write");
+        }
+        if ((access & Access.execute) != Access.none)
+        {
+            if (!s.IsEmpty())
+            {
+                s.Append('-');
+            }
+            s.Append("execute");
+        }
+        if (s.IsEmpty())
+        {
+            s.Append("-");
+        }
+        return s;
+    }
+
+    public nothrow inline int EncodeMode(FileType fileType, Access ownerAccess, Access groupAccess, Access otherAccess, bool mountPoint)
+    {
+        int mntpnt = cast<int>(mountPoint);
+        return cast<int>(fileType) | (cast<int>(ownerAccess) << 3) | (cast<int>(groupAccess) << 6) | (cast<int>(otherAccess) << 9) | (cast<int>(mntpnt << 12));
+    }
+
+    public nothrow inline void DecodeMode(int mode, FileType& fileType, Access& ownerAccess, Access& groupAccess, Access& otherAccess, bool& mountPoint)
+    {
+        fileType = cast<FileType>(mode & 7);
+        ownerAccess = cast<Access>((mode >> 3) & 7);
+        groupAccess = cast<Access>((mode >> 6) & 7);
+        otherAccess = cast<Access>((mode >> 9) & 7);
+        if (((mode >> 12) & 1) != 0)
+        {
+            mountPoint = true;
+        }
+        else
+        {
+            mountPoint = false;
+        }
+    }
+        
+    public class StatBuf
+    {
+        public int inodeNumber;
+        public int fsNumber;
+        public int mode;
+        public int uid;
+        public int gid;
+        public int nlinks;
+        public long fileSize;
+        public ulong ctime;
+        public ulong mtime;
+        public ulong atime;
+    }
+    
+    public class StatInfo
+    {
+        public nothrow inline int INodeNumber() const
+        {
+            return inodeNumber;
+        }
+        public nothrow inline void SetINodeNumber(int inodeNumber_)
+        {
+            inodeNumber = inodeNumber_;
+        }
+        public nothrow inline int FSNumber() const
+        {
+            return fsNumber;
+        }
+        public nothrow inline void SetFSNumber(int fsNumber_)
+        {
+            fsNumber = fsNumber_;
+        }
+        public nothrow inline int GetMode() const
+        {
+            return EncodeMode(fileType, ownerAccess, groupAccess, otherAccess, mountPoint);
+        }
+        public nothrow inline void SetMode(int mode)
+        {
+            DecodeMode(mode, fileType, ownerAccess, groupAccess, otherAccess, mountPoint);
+        }
+        public nothrow inline FileType& Type() const
+        {
+            return fileType;
+        }
+        public nothrow inline Access OwnerAccess() const
+        {
+            return ownerAccess;
+        }
+        public nothrow inline Access GroupAccess() const
+        {
+            return groupAccess;
+        }
+        public nothrow inline Access OtherAccess() const
+        {
+            return otherAccess;
+        }
+        public nothrow inline bool MountPoint() const
+        {
+            return mountPoint;
+        }
+        public nothrow inline int UID() const
+        {
+            return uid;
+        }        
+        public nothrow inline void SetUID(int uid_)
+        {
+            uid = uid_;
+        }
+        public nothrow inline int GID() const
+        {
+            return gid;
+        }
+        public nothrow inline void SetGID(int gid_)
+        {
+            gid = gid_;
+        }
+        public nothrow inline int GetNumLinks() const
+        {
+            return nlinks;
+        }
+        public nothrow inline void SetNumLinks(int nlinks_)
+        {
+            nlinks = nlinks_;
+        }
+        public nothrow inline long GetFileSize() const
+        {
+            return fileSize;
+        }
+        public nothrow inline void SetFileSize(long fileSize_)
+        {
+            fileSize = fileSize_;
+        }
+        public nothrow inline const DateTime& CTime() const
+        {
+            return ctime;
+        }
+        public nothrow void SetCTime(ulong ctimeValue)
+        {
+            ctime = ULongToDateTime(ctimeValue);
+        }
+        public nothrow inline const DateTime& MTime() const
+        {
+            return mtime;
+        }
+        public nothrow void SetMTime(ulong mtimeValue)
+        {
+            mtime = ULongToDateTime(mtimeValue);
+        }
+        public nothrow inline const DateTime& ATime() const
+        {
+            return atime;
+        }
+        public nothrow void SetATime(ulong atimeValue)
+        {
+            atime = ULongToDateTime(atimeValue);
+        }
+        private int inodeNumber;
+        private int fsNumber;
+        private FileType fileType;
+        private Access ownerAccess;
+        private Access groupAccess;
+        private Access otherAccess;
+        private bool mountPoint;
+        private int uid;
+        private int gid;
+        private int nlinks;
+        private long fileSize;
+        private DateTime ctime;
+        private DateTime mtime;
+        private DateTime atime;
+    }
+    
+    public nothrow void StatBufToStatInfo(StatBuf& statBuf, StatInfo& statInfo)
+    {
+        statInfo.SetINodeNumber(statBuf.inodeNumber);
+        statInfo.SetFSNumber(statBuf.fsNumber);
+        statInfo.SetMode(statBuf.mode);
+        statInfo.SetUID(statBuf.uid);
+        statInfo.SetGID(statBuf.gid);
+        statInfo.SetNumLinks(statBuf.nlinks);
+        statInfo.SetFileSize(statBuf.fileSize);
+        statInfo.SetCTime(statBuf.ctime);
+        statInfo.SetMTime(statBuf.mtime);
+        statInfo.SetATime(statBuf.atime);
     }
 }

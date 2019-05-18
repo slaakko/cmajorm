@@ -3,6 +3,8 @@
 // Distributed under the MIT license
 // =================================
 
+using System.IO;
+
 namespace System.Os
 {
     public nothrow void Exit(byte exitCode)
@@ -217,5 +219,25 @@ namespace System.Os
         {
             ThrowSystemError();
         }
+    }
+    
+    public void GetCWD(char* buffer, long count)
+    {
+        int result = getcwd(buffer, count);
+        if (result == -1)
+        {
+            ThrowSystemError();
+        }
+    }
+    
+    public void Stat(const char* path, StatInfo& statInfo)
+    {
+        StatBuf statBuf;
+        int result = stat(path, &statBuf);
+        if (result == -1)
+        {
+            ThrowSystemError();
+        }
+        StatBufToStatInfo(statBuf, statInfo);
     }
 }

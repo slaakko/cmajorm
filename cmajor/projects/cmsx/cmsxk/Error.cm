@@ -12,6 +12,7 @@ namespace cmsx.kernel
     public const int EPERM = 8;
     public const int EEXIST = 9;
     public const int ENOENT = 10;
+    public const int ERANGE = 11;
 
     public string ErrorCodeStr(int errorCode)
     {
@@ -27,6 +28,7 @@ namespace cmsx.kernel
             case EPERM: return "EPERM";
             case EEXIST: return "EEXIST";
             case ENOENT: return "ENOENT";
+            case ERANGE: return "ERANGE";
         }
         return "";
     }
@@ -45,6 +47,7 @@ namespace cmsx.kernel
             case EPERM: return "Permission denied";
             case EEXIST : return "Path exists";
             case ENOENT: return "No such file or directory";
+            case ERANGE: return "Result too large";
         }
         return "";
     }

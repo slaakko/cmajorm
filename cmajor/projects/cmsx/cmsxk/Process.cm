@@ -809,6 +809,11 @@ namespace cmsx.kernel
 
     public void ReadProcessMemory(Machine& machine, Process* process, ulong address, byte* buffer, ulong size)
     {
+        ReadProcessMemory(machine, process, address, buffer, size, true);
+    }
+
+    public void ReadProcessMemory(Machine& machine, Process* process, ulong address, byte* buffer, ulong size, bool pageFault)
+    {
         Memory& mem = machine.GetMemory();
         Registers& regs = machine.GetRegisters();
         ulong prevRV = regs.GetSpecial(Registers.rV);
@@ -816,7 +821,7 @@ namespace cmsx.kernel
         regs.SetSpecial(Registers.rV, memoryTable.virtualTranslationRegisterValue);
         for (ulong i = 0u; i < size; ++i)
         {
-            *buffer = mem.ReadByte(address, Protection.read);
+            *buffer = mem.ReadByte(address, Protection.read, pageFault);
             ++buffer;
             ++address;
         }

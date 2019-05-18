@@ -145,29 +145,78 @@ namespace cmsx.kernel
             throw SystemError(EINVAL, "entry name address is null");
         }
         File* file = process->fileTable.GetFile(fd);
-        if (file is DirectoryFile*)
+        if (file != null)
         {
-            DirectoryFile* dir = cast<DirectoryFile*>(file);
-            return dir->Read(process, inodeNumberAddress, entryNameAddress);
+            if (file is DirectoryFile*)
+            {
+                DirectoryFile* dir = cast<DirectoryFile*>(file);
+                return dir->Read(process, inodeNumberAddress, entryNameAddress);
+            }
+            else
+            {
+                throw SystemError(EBADF, "file descriptor '" + ToString(fd) + "' does not denote a directory");
+            }
         }
         else
         {
-            throw SystemError(EBADF, "file descriptor '" + ToString(fd) + "' does not denote a directory");
+            throw SystemError(EBADF, "directory '" + ToString(fd) + "' not open");
         }
     }
 
     public void CloseDir(Machine& machine, Process* process, int fd)
     {
         File* file = process->fileTable.GetFile(fd);
-        if (file is DirectoryFile*)
+        if (file != null)
         {
-            file->Release();
-            process->fileTable.SetFile(fd, null);
+            if (file is DirectoryFile*)
+            {
+                file->Release();
+                process->fileTable.SetFile(fd, null);
+            }
+            else
+            {
+                throw SystemError(EBADF, "file descriptor '" + ToString(fd) + "' does not denote a directory");
+            }
         }
         else
         {
-            throw SystemError(EBADF, "file descriptor '" + ToString(fd) + "' does not denote a directory");
+            throw SystemError(EBADF, "directory '" + ToString(fd) + "' not open");
         }
+    }
+
+    public void GetCWD(Machine& machine, Process* process, ulong pathBufferAddress, long count)
+    {
+        if (pathBufferAddress == 0u)
+        {
+            throw SystemError(EINVAL, "path buffer address is null");
+        }
+        if (count < 0)
+        {
+            throw SystemError(EINVAL, "invalid count");
+        }
+        FileSystem* fs = GetMountTable().GetFileSystem(process->workingDirINodeKey.fsNumber);
+        string currentWorkindDirectory = fs->GetCurrentWorkingDirectory(process);
+        if (currentWorkindDirectory.Length() >= count)
+        {
+            throw SystemError(ERANGE, "path buffer not big enough");
+        }
+        WriteProcessMemory(machine, process, pathBufferAddress, cast<byte*>(cast<void*>(currentWorkindDirectory.Chars())), cast<ulong>(currentWorkindDirectory.Length() + 1), Protection.write);
+    }
+
+    public void Stat(Machine& machine, Process* process, ulong pathAddress, ulong statStructAddress)
+    {
+        if (pathAddress == 0u)
+        {
+            throw SystemError(EINVAL, "path address is null");
+        }
+        string path;
+        ReadStringFromProcessMemory(machine, process, pathAddress, path);
+        if (path.IsEmpty())
+        {
+            throw SystemError(EINVAL, "path is empty");
+        }
+        FileSystem* fs = GetMountTable().GetFileSystem(0);
+        fs->Stat(process, path, statStructAddress);
     }
 
     public abstract class File
@@ -511,6 +560,7 @@ namespace cmsx.kernel
                     inode->SetFileSize(pos);
                 }
             }
+            inode->SetMTime();
             return bytesWritten;
         }
         public long Read(Machine& machine, Process* reader, ulong bufferAddress, long count)
@@ -566,6 +616,7 @@ namespace cmsx.kernel
                     bytesRead = bytesRead + bytesToRead;
                 }
             }
+            inode->SetATime();
             return bytesRead;
         }
         public FilePtr* Share()

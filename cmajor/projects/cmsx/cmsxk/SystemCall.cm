@@ -36,7 +36,9 @@ namespace cmsx.kernel
     public const byte sys_opendir = 30u;
     public const byte sys_readdir = 31u;
     public const byte sys_closedir = 32u;
-    public const byte numSystemCalls = sys_unlink + 1u;
+    public const byte sys_getcwd = 33u;
+    public const byte sys_stat = 34u;
+    public const byte numSystemCalls = sys_stat + 1u;
 
     public nothrow string SystemCallName(byte systemCall)
     {
@@ -75,6 +77,8 @@ namespace cmsx.kernel
             case sys_opendir: return "sys_opendir";
             case sys_readdir: return "sys_readdir";
             case sys_closedir: return "sys_closedir";
+            case sys_getcwd: return "sys_getcwd";
+            case sys_stat: return "sys_stat";
         }
         return string();
     }
@@ -570,6 +574,26 @@ namespace cmsx.kernel
             Panic("invalid closedir parameters: " + ToString(sc.x) + ", " + ToString(sc.y) + ", " + ToString(sc.z));
         }
         CloseDir(*sc.machine, sc.process, cast<int>(sc.ax));
+        sc.result = 0;
+    }
+
+    public void GetCWD(SystemCall& sc)
+    {
+        if (sc.x != 0u || sc.y != sys_getcwd || sc.z != 0u)
+        {
+            Panic("invalid getcwd parameters: " + ToString(sc.x) + ", " + ToString(sc.y) + ", " + ToString(sc.z));
+        }
+        GetCWD(*sc.machine, sc.process, sc.ax, cast<long>(sc.bx));
+        sc.result = 0;
+    }
+
+    public void Stat(SystemCall& sc)
+    {
+        if (sc.x != 0u || sc.y != sys_stat || sc.z != 0u)
+        {
+            Panic("invalid stat parameters: " + ToString(sc.x) + ", " + ToString(sc.y) + ", " + ToString(sc.z));
+        }
+        Stat(*sc.machine, sc.process, sc.ax, sc.bx);
         sc.result = 0;
     }
 }

@@ -151,6 +151,12 @@ namespace cmsx.kernel
         SystemCallHandler closedirSystemCallHandler = CloseDir;
         ulong closedirSystemCallAddress = cast<ulong>(cast<void*>(closedirSystemCallHandler));
         mem.WriteULong(MakeSystemCallPtrAddress(sys_closedir), closedirSystemCallAddress, Protection.write);
+        SystemCallHandler getcwdSystemCallHandler = GetCWD;
+        ulong getcwdSystemCallAddress = cast<ulong>(cast<void*>(getcwdSystemCallHandler));
+        mem.WriteULong(MakeSystemCallPtrAddress(sys_getcwd), getcwdSystemCallAddress, Protection.write);
+        SystemCallHandler statSystemCallHandler = Stat;
+        ulong statSystemCallAddress = cast<ulong>(cast<void*>(statSystemCallHandler));
+        mem.WriteULong(MakeSystemCallPtrAddress(sys_stat), statSystemCallAddress, Protection.write);
     }
 
     public void Boot(Machine& machine)

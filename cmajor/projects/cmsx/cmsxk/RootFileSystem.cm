@@ -69,6 +69,7 @@ namespace cmsx.kernel
                 if (truncate)
                 {
                     GetBlockManager().FreeBlocks(inode);
+                    inode->SetMTime();
                 }
             }
             else
@@ -108,6 +109,7 @@ namespace cmsx.kernel
                 if (created)
                 {
                     GetBlockManager().WriteBlock(directoryBlock, null);
+                    parent->SetMTime();
                 }
                 else
                 {
@@ -215,6 +217,7 @@ namespace cmsx.kernel
                 if (created)
                 {
                     GetBlockManager().WriteBlock(directoryBlock, null);
+                    parent->SetMTime();
                 }
                 else
                 {
@@ -269,7 +272,7 @@ namespace cmsx.kernel
             {
                 GetBlockManager().WriteBlock(dirBlock, null);
                 inode->SetFileSize(n * directoryEntrySize);
-                inode->SetCTime();
+                inode->SetMTime();
             }
             else
             {
@@ -342,6 +345,124 @@ namespace cmsx.kernel
                 }
             }
             return 0;
+        }
+        public override string GetCurrentWorkingDirectory(Process* process)
+        {
+            if (Log())
+            {
+                LogMessage("fs.root.getcurrentworkingdirectory", "begin");
+            }
+            INode* rootINode = GetINodeManager().GetINode(process->rootDirINodeKey);
+            INodeLock rootINodeLock(rootINode);
+            INode* dirINode = rootINode;
+            INodeLock dirINodeLock;
+            if (process->workingDirINodeKey != process->rootDirINodeKey)
+            {
+                dirINode = GetINodeManager().GetINode(process->workingDirINodeKey);
+                dirINodeLock.Reset(dirINode);
+            }
+            INode* prevINode = null;
+            bool first = true;
+            string currentWorkindDirectoryPath;
+            while (prevINode != rootINode)
+            {
+                INode* parentINode = null;
+                bool found = false;
+                for (long offset = 0; !found && offset < dirINode->GetFileSize();)
+                {
+                    int blockNumber = 0;
+                    int blockOffset = 0;
+                    GetBlockManager().GetBlockNumber(dirINode, offset, blockNumber, blockOffset, false);
+                    if (blockNumber == 0)
+                    {
+                        throw SystemError(EFAIL, "could not get block number for directory inode");
+                    }
+                    Block* block = GetBlockManager().ReadBlock(BlockKey(blockNumber, dirINode->Key().fsNumber, BlockKind.directoryBlock), null);
+                    BlockPutter putter(block);
+                    #assert(block is DirectoryBlock*);
+                    DirectoryBlock* directoryBlock = cast<DirectoryBlock*>(block);
+                    for (int index = blockOffset / directoryEntrySize; index < numDirectoryEntriesInBlock && offset < dirINode->GetFileSize(); ++index)
+                    {
+                        const DirectoryEntry& directoryEntry = directoryBlock->GetDirectoryEntry(index);
+                        string entryName = &directoryEntry.name[0];
+                        if (!first && directoryEntry.inodeNumber == prevINode->Key().inodeNumber)
+                        {
+                            currentWorkindDirectoryPath = Path.Combine(entryName, currentWorkindDirectoryPath);
+                            found = true;
+                        }
+                        if (entryName == "..")
+                        {
+                            INodeKey key(directoryEntry.inodeNumber, dirINode->Key().fsNumber);
+                            if (key != dirINode->Key())
+                            {
+                                parentINode = GetINodeManager().GetINode(key);
+                            }
+                            else
+                            {
+                                parentINode = dirINode;
+                            }
+                        }
+                        offset = offset + directoryEntrySize;
+                    }
+                }
+                if (parentINode == null)
+                {
+                    throw SystemError(EFAIL, "parent inode entry not found");
+                }
+                if (found)
+                {
+                    prevINode = dirINode;
+                    dirINode = parentINode;
+                    if (dirINode != rootINode)
+                    {
+                        dirINodeLock.Reset(dirINode);
+                    }
+                }
+                else if (first)
+                {
+                    prevINode = dirINode;
+                    dirINode = parentINode;
+                    if (dirINode != rootINode)
+                    {
+                        dirINodeLock.Reset(dirINode);
+                    }
+                    first = false;
+                }
+                else
+                {
+                    throw SystemError(EFAIL, "could not find matching directory inode from parent inode");
+                }
+            }
+            currentWorkindDirectoryPath = Path.Combine("/", currentWorkindDirectoryPath);
+            if (Log())
+            {
+                LogMessage("fs.root.getcurrentworkingdirectory", "end.cwd=" + currentWorkindDirectoryPath);
+            }
+            return currentWorkindDirectoryPath;
+        }
+        public override void Stat(Process* process, const string& path, ulong statStructAddress)
+        {
+            DirectorySlot freeDirectorySlot;
+            INode* parent = null;
+            string name;
+            INode* inode = GetINodeManager().PathToINode(process, path, false, parent, freeDirectorySlot, name);
+            if (inode == null)
+            {
+                throw SystemError(ENOENT, "path '" + path + "' does not exist");
+            }
+            INodePutter putter(inode);
+            Machine& machine = GetMachine();
+            WriteProcessMemory(machine, process, statStructAddress, cast<ulong>(inode->Key().inodeNumber), 4u, Protection.write);
+            WriteProcessMemory(machine, process, statStructAddress + 4u, cast<ulong>(inode->Key().fsNumber), 4u, Protection.write);
+            WriteProcessMemory(machine, process, statStructAddress + 8u, cast<ulong>(inode->Mode()), 4u, Protection.write);
+            WriteProcessMemory(machine, process, statStructAddress + 12u, cast<ulong>(inode->UID()), 4u, Protection.write);
+            WriteProcessMemory(machine, process, statStructAddress + 16u, cast<ulong>(inode->GID()), 4u, Protection.write);
+            WriteProcessMemory(machine, process, statStructAddress + 20u, cast<ulong>(inode->GetNumLinks()), 4u, Protection.write);
+            WriteProcessMemory(machine, process, statStructAddress + 24u, cast<ulong>(inode->GetFileSize()), 8u, Protection.write);
+            WriteProcessMemory(machine, process, statStructAddress + 32u, cast<ulong>(inode->CTimeAsULong()), 8u, Protection.write);
+            WriteProcessMemory(machine, process, statStructAddress + 40u, cast<ulong>(inode->MTimeAsULong()), 8u, Protection.write);
+            WriteProcessMemory(machine, process, statStructAddress + 48u, cast<ulong>(inode->ATimeAsULong()), 8u, Protection.write);
+            
         }
         public override int AllocateBlockNumber()
         {
