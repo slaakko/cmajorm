@@ -230,14 +230,25 @@ namespace System.Os
         }
     }
     
-    public void Stat(const char* path, StatInfo& statInfo)
+    public void ChDir(const char* path)
     {
-        StatBuf statBuf;
-        int result = stat(path, &statBuf);
+        int result = chdir(path);
         if (result == -1)
         {
             ThrowSystemError();
         }
-        StatBufToStatInfo(statBuf, statInfo);
+    }
+    
+    public const int statBufSize = 56;
+
+    public void Stat(const char* path, StatInfo& statInfo)
+    {
+        byte[statBufSize] statBuf;
+        int result = stat(path, &statBuf[0]);
+        if (result == -1)
+        {
+            ThrowSystemError();
+        }
+        StatBufToStatInfo(&statBuf[0], statInfo);
     }
 }

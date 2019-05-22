@@ -83,11 +83,13 @@ namespace cmsx.kernel
         {
             LogMessage("intr", "pagefault");
         }
-        ulong yy = machine.GetRegisters().GetSpecial(Registers.rYY);
+        Registers& regs = machine.GetRegisters();
+        ulong yy = regs.GetSpecial(Registers.rYY);
         Protection pageProtection = Protection.notPresent;
         Protection protection = Protection.notPresent;
         UnpackProtection(yy, pageProtection, protection);
         ulong virtualAddress = machine.GetRegisters().GetSpecial(Registers.rZZ);
+        string registers = regs.ToString();
         Kernel& kernel = Kernel.Instance();
         ProcessTable& processTable = kernel.GetProcessTable();
         Process* process = processTable.GetRunning();
@@ -99,7 +101,7 @@ namespace cmsx.kernel
             stackTrace = GetProcessStackTrace(machine, process, machine.GetRegisters().Get(cmsx.machine.regFP));
         }
         Panic("page fault at virtual address " + ToHexString(virtualAddress) + " , page protection = " + GetProtectionStr(pageProtection) + ", " + GetProtectionStr(protection) + " needed (running process=" +
-            runningProcessName + ")\n" + stackTrace);
+            runningProcessName + ")\n" + stackTrace + "\nRegisters:\n" + registers);
     }
 
     public void SecurityViolationHandler(Machine& machine, byte irq)
@@ -230,7 +232,7 @@ namespace cmsx.kernel
                 OsSwitchToFiber(process->fiber);
             }
         }
-        if (process->systemCallReady)
+        if (process->systemCallReady && !process->systemCall.IsDebugBreak())
         {
             long result = process->systemCall.result;
             ulong returnValue = cast<ulong>(result);

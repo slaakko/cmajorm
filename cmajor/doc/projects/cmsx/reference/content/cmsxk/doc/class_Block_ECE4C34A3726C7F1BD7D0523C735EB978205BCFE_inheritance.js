@@ -269,9 +269,12 @@ function drawDiagram(diagramNodes) {
 function drawInheritanceDiagram() {
     var diagramNodes = [
         { name: "cmsx.kernel.Block", id: "diagram_node_0", level: 0, subject: true, hasDerivedNodes: true, link: "../../cmsxk/doc/class_Block_ECE4C34A3726C7F1BD7D0523C735EB978205BCFE.html" },
-        { name: "cmsx.kernel.BitmapBlock", id: "diagram_node_1", level: 1, subject: false, hasDerivedNodes: false, link: "../../cmsxk/doc/class_BitmapBlock_EF23F0CF0C9829AE06AB6B8AB6367AE7BE278714.html" },
-        { name: "cmsx.kernel.INodeBlock", id: "diagram_node_2", level: 1, subject: false, hasDerivedNodes: false, link: "../../cmsxk/doc/class_INodeBlock_47E250A74219D77606997F7B8458741BCF00702D.html" },
-        { name: "cmsx.kernel.RootFSSuperBlock", id: "diagram_node_3", level: 1, subject: false, hasDerivedNodes: false, link: "../../cmsxk/doc/class_RootFSSuperBlock_3D199183181BD61344D26118741506E54D149EEE.html" }];
+        { name: "cmsx.kernel.BitmapBlock", id: "diagram_node_2", level: 1, subject: false, hasDerivedNodes: false, link: "../../cmsxk/doc/class_BitmapBlock_EF23F0CF0C9829AE06AB6B8AB6367AE7BE278714.html" },
+        { name: "cmsx.kernel.BlockNumberBlock", id: "diagram_node_3", level: 1, subject: false, hasDerivedNodes: false, link: "../../cmsxk/doc/class_BlockNumberBlock_6CB8FCB59934F730D6875A7C08187FE96D422448.html" },
+        { name: "cmsx.kernel.DirectoryBlock", id: "diagram_node_6", level: 1, subject: false, hasDerivedNodes: false, link: "../../cmsxk/doc/class_DirectoryBlock_728B501C72AA6FE2DA0E619EAA35B85E68C4BC26.html" },
+        { name: "cmsx.kernel.FileBlock", id: "diagram_node_1", level: 1, subject: false, hasDerivedNodes: false, link: "../../cmsxk/doc/class_FileBlock_950C7F1CAEFD3B750A9D218047AE82B232E24AAE.html" },
+        { name: "cmsx.kernel.INodeBlock", id: "diagram_node_4", level: 1, subject: false, hasDerivedNodes: false, link: "../../cmsxk/doc/class_INodeBlock_47E250A74219D77606997F7B8458741BCF00702D.html" },
+        { name: "cmsx.kernel.SuperBlock", id: "diagram_node_5", level: 1, subject: false, hasDerivedNodes: false, link: "../../cmsxk/doc/class_SuperBlock_80A68AA31A5A4B4551DF365F8AB8EC76B78831F3.html" }];
     drawDiagram(diagramNodes);
 }
 

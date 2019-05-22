@@ -327,7 +327,7 @@ namespace cmsx.kernel
                     ulong b = bits[i];
                     for (byte j = 0u; j < 64u; ++j)
                     {
-                        if ((b & (1u << j)) == 0u)
+                        if ((b & (cast<ulong>(1u) << j)) == 0u)
                         {
                             return cast<int>(i) * 64 + j;
                         }
@@ -340,20 +340,20 @@ namespace cmsx.kernel
         {
             int i = index / 64;
             byte j = cast<byte>(index % 64);
-            return (bits[i] & (1u << j)) != 0u;
+            return (bits[i] & (cast<ulong>(1u) << j)) != 0u;
         }
         public nothrow void SetBit(int index)
         {
             int i = index / 64;
             byte j = cast<byte>(index % 64);
-            bits[i] = bits[i] | (1u << j);
+            bits[i] = bits[i] | (cast<ulong>(1u) << j);
             SetFlag(Flags.dirty);
         }
         public nothrow void ResetBit(int index)
         {
             int i = index / 64;
             byte j = cast<byte>(index % 64);
-            bits[i] = bits[i] & ~(1u << j);
+            bits[i] = bits[i] & ~(cast<ulong>(1u) << j);
             SetFlag(Flags.dirty);
         }
         private ulong[numULongsInBitmapBlock] bits;

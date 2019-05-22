@@ -271,8 +271,8 @@ function drawInheritanceDiagram() {
         { name: "cmsx.assembly.Node", id: "diagram_node_0", level: 0, subject: false, hasDerivedNodes: true, link: "../../cmsxa/doc/class_Node_2715F608FDBE3E87758991A0E1A2BA84AF2DF044.html" },
         { name: "cmsx.assembly.Constant", id: "diagram_node_1", level: 1, subject: false, hasDerivedNodes: true, link: "../../cmsxa/doc/class_Constant_15BC3F833B6A2470E27F6C21FE1B8BEA04721B2D.html" },
         { name: "cmsx.assembly.IntegralConstant", id: "diagram_node_2", level: 2, subject: true, hasDerivedNodes: true, link: "../../cmsxa/doc/class_IntegralConstant_D8571D9ECDC69065A30784B297D42F85BDD224D9.html" },
-        { name: "cmsx.assembly.DecimalConstant", id: "diagram_node_3", level: 3, subject: false, hasDerivedNodes: false, link: "../../cmsxa/doc/class_DecimalConstant_7F7D6E98D6B55C6C1EAB1C61428B8C49F537DA34.html" },
-        { name: "cmsx.assembly.HexConstant", id: "diagram_node_4", level: 3, subject: false, hasDerivedNodes: false, link: "../../cmsxa/doc/class_HexConstant_BF0FFF7E43279163DE41CB32CEA58AE2B8B18FB7.html" }];
+        { name: "cmsx.assembly.DecimalConstant", id: "diagram_node_4", level: 3, subject: false, hasDerivedNodes: false, link: "../../cmsxa/doc/class_DecimalConstant_7F7D6E98D6B55C6C1EAB1C61428B8C49F537DA34.html" },
+        { name: "cmsx.assembly.HexConstant", id: "diagram_node_3", level: 3, subject: false, hasDerivedNodes: false, link: "../../cmsxa/doc/class_HexConstant_BF0FFF7E43279163DE41CB32CEA58AE2B8B18FB7.html" }];
     drawDiagram(diagramNodes);
 }
 

@@ -9,6 +9,7 @@ namespace cmsx.kernel
     public const int numINodesInBlock = blockSize / inodeSize;
     public const int maxCachedINodes = 1024;
     public const int numDirectBlockNumbers = 17;
+    public const int statBufSize = 56;
 
     public enum FileType : int
     {
@@ -125,20 +126,6 @@ namespace cmsx.kernel
         {
             return cast<ulong>(1099511628211 * key.fsNumber + key.inodeNumber);
         }
-    }
-
-    public nothrow ulong DateTimeToULong(const DateTime& dt)
-    {
-        ulong value = 0u;
-        MemoryWriter writer(cast<byte*>(cast<void*>(&value)), 8u);
-        writer.Write(dt);
-        return value;
-    }
-
-    public nothrow DateTime ULongToDateTime(ulong value)
-    {
-        MemoryReader reader(cast<byte*>(cast<void*>(&value)), 8u);
-        return reader.ReadDateTime();
     }
 
     public class INode
@@ -323,10 +310,6 @@ namespace cmsx.kernel
         {
             return ctime;
         }
-        public nothrow ulong CTimeAsULong() const
-        {
-            return DateTimeToULong(ctime);
-        }
         public nothrow void SetCTime()
         {
             ctime = GetCurrentDateTime();
@@ -336,10 +319,6 @@ namespace cmsx.kernel
         {
             return mtime;
         }
-        public nothrow ulong MTimeAsULong() const
-        {
-            return DateTimeToULong(mtime);
-        }
         public nothrow void SetMTime()
         {
             mtime = GetCurrentDateTime();
@@ -348,10 +327,6 @@ namespace cmsx.kernel
         public inline nothrow const DateTime& ATime() const
         {
             return atime;
-        }
-        public nothrow ulong ATimeAsULong() const
-        {
-            return DateTimeToULong(atime);
         }
         public nothrow void SetATime()
         {

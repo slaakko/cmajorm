@@ -271,12 +271,12 @@ function drawInheritanceDiagram() {
         { name: "cmsx.intermediate.Value", id: "diagram_node_0", level: 0, subject: false, hasDerivedNodes: true, link: "../../cmsxi/doc/class_Value_D184FDC4DCC37461ED1781E875D6610EE22D5D73.html" },
         { name: "cmsx.intermediate.Instruction", id: "diagram_node_1", level: 1, subject: true, hasDerivedNodes: true, link: "../../cmsxi/doc/class_Instruction_5E05DB58E4B1651C9C3A965474ED1B4E9BB774F7.html" },
         { name: "cmsx.intermediate.ArgInstruction", id: "diagram_node_2", level: 2, subject: false, hasDerivedNodes: false, link: "../../cmsxi/doc/class_ArgInstruction_334E473535551F11DB88F79CB6952BC833BAADF2.html" },
-        { name: "cmsx.intermediate.NoOperationInstruction", id: "diagram_node_3", level: 2, subject: false, hasDerivedNodes: false, link: "../../cmsxi/doc/class_NoOperationInstruction_5BECEC50DA56A252E12BFBC7F7F351B79D425233.html" },
+        { name: "cmsx.intermediate.NoOperationInstruction", id: "diagram_node_4", level: 2, subject: false, hasDerivedNodes: false, link: "../../cmsxi/doc/class_NoOperationInstruction_5BECEC50DA56A252E12BFBC7F7F351B79D425233.html" },
         { name: "cmsx.intermediate.ProcedureCallInstruction", id: "diagram_node_5", level: 2, subject: false, hasDerivedNodes: false, link: "../../cmsxi/doc/class_ProcedureCallInstruction_131FDA3D39C9399AE34FD808B9BF6DB69B8EDDC2.html" },
         { name: "cmsx.intermediate.SaveInstruction", id: "diagram_node_6", level: 2, subject: false, hasDerivedNodes: false, link: "../../cmsxi/doc/class_SaveInstruction_DC035B16DBCB4AFAFE646180CDB718017759FE5F.html" },
         { name: "cmsx.intermediate.StoreInstruction", id: "diagram_node_7", level: 2, subject: false, hasDerivedNodes: false, link: "../../cmsxi/doc/class_StoreInstruction_6FCE8FED07DA28924AFA8415525D7FD125F83554.html" },
         { name: "cmsx.intermediate.TerminatorInstruction", id: "diagram_node_8", level: 2, subject: false, hasDerivedNodes: false, link: "../../cmsxi/doc/class_TerminatorInstruction_1454E78CD531C17EB8C9D99CA2E9331DB79537B2.html" },
-        { name: "cmsx.intermediate.ValueInstruction", id: "diagram_node_4", level: 2, subject: false, hasDerivedNodes: false, link: "../../cmsxi/doc/class_ValueInstruction_417B4E9734C5B191C070E73F51D43C8545054B69.html" }];
+        { name: "cmsx.intermediate.ValueInstruction", id: "diagram_node_3", level: 2, subject: false, hasDerivedNodes: false, link: "../../cmsxi/doc/class_ValueInstruction_417B4E9734C5B191C070E73F51D43C8545054B69.html" }];
     drawDiagram(diagramNodes);
 }
 

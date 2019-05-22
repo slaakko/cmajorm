@@ -141,22 +141,22 @@ namespace System.IO
         }
     }
         
-    public class StatBuf
-    {
-        public int inodeNumber;
-        public int fsNumber;
-        public int mode;
-        public int uid;
-        public int gid;
-        public int nlinks;
-        public long fileSize;
-        public ulong ctime;
-        public ulong mtime;
-        public ulong atime;
-    }
-    
     public class StatInfo
     {
+        public nothrow void Read(MemoryReader& reader)
+        {
+            inodeNumber = reader.ReadInt();
+            fsNumber = reader.ReadInt();
+            int mode = reader.ReadInt();
+            SetMode(mode);
+            uid = reader.ReadInt();
+            gid = reader.ReadInt();
+            nlinks = reader.ReadInt();
+            fileSize = reader.ReadLong();
+            ctime = reader.ReadDateTime();
+            mtime = reader.ReadDateTime();
+            atime = reader.ReadDateTime();
+        }
         public nothrow inline int INodeNumber() const
         {
             return inodeNumber;
@@ -181,7 +181,7 @@ namespace System.IO
         {
             DecodeMode(mode, fileType, ownerAccess, groupAccess, otherAccess, mountPoint);
         }
-        public nothrow inline FileType& Type() const
+        public nothrow inline FileType Type() const
         {
             return fileType;
         }
@@ -237,25 +237,25 @@ namespace System.IO
         {
             return ctime;
         }
-        public nothrow void SetCTime(ulong ctimeValue)
+        public nothrow void SetCTime(const DateTime& ctime_)
         {
-            ctime = ULongToDateTime(ctimeValue);
+            ctime = ctime_;
         }
         public nothrow inline const DateTime& MTime() const
         {
             return mtime;
         }
-        public nothrow void SetMTime(ulong mtimeValue)
+        public nothrow void SetMTime(const DateTime& mtime_)
         {
-            mtime = ULongToDateTime(mtimeValue);
+            mtime = mtime_;
         }
         public nothrow inline const DateTime& ATime() const
         {
             return atime;
         }
-        public nothrow void SetATime(ulong atimeValue)
+        public nothrow void SetATime(const DateTime& atime_)
         {
-            atime = ULongToDateTime(atimeValue);
+            atime = atime_;
         }
         private int inodeNumber;
         private int fsNumber;
@@ -273,17 +273,9 @@ namespace System.IO
         private DateTime atime;
     }
     
-    public nothrow void StatBufToStatInfo(StatBuf& statBuf, StatInfo& statInfo)
+    public nothrow void StatBufToStatInfo(byte* statBuf, StatInfo& statInfo)
     {
-        statInfo.SetINodeNumber(statBuf.inodeNumber);
-        statInfo.SetFSNumber(statBuf.fsNumber);
-        statInfo.SetMode(statBuf.mode);
-        statInfo.SetUID(statBuf.uid);
-        statInfo.SetGID(statBuf.gid);
-        statInfo.SetNumLinks(statBuf.nlinks);
-        statInfo.SetFileSize(statBuf.fileSize);
-        statInfo.SetCTime(statBuf.ctime);
-        statInfo.SetMTime(statBuf.mtime);
-        statInfo.SetATime(statBuf.atime);
+        MemoryReader reader(statBuf, System.Os.statBufSize);
+        statInfo.Read(reader);
     }
 }

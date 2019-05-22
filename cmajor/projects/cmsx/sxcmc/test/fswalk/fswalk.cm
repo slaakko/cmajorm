@@ -1,4 +1,5 @@
 using System;
+using System.Os;
 using System.Text;
 using System.IO;
 
@@ -26,11 +27,32 @@ void DirWalk(CodeFormatter& formatter, const string& dirPath)
     while (reader.Read(dirEntry))
     {
         string entryName = &dirEntry.entryName[0];
-        formatter << "[" << entryName << ":" << dirEntry.inodeNumber << "]" << endl();
+        formatter << entryName << endl();
         if (entryName != "." && entryName != "..")
         {
-            string subDirPath = Path.Combine(dirPath, entryName);
-            DirWalk(formatter, subDirPath);
+            string subPath = Path.Combine(dirPath, entryName);
+            StatInfo statInfo;
+            Stat(subPath.Chars(), statInfo);
+            formatter.IncIndent();
+            formatter << "inode: " << statInfo.INodeNumber() << endl();
+            formatter << "fs: " << statInfo.FSNumber() << endl();
+            formatter << "type: " << FileTypeStr(statInfo.Type()) << endl();
+            formatter << "owner: " << AccessStr(statInfo.OwnerAccess()) << endl();
+            formatter << "group: " << AccessStr(statInfo.GroupAccess()) << endl();
+            formatter << "other: " << AccessStr(statInfo.OtherAccess()) << endl();
+            formatter << "mountPoint: " << ToString(statInfo.MountPoint()) << endl();
+            formatter << "uid: " << statInfo.UID() << endl();
+            formatter << "gid: " << statInfo.GID() << endl();
+            formatter << "nlinks: " << statInfo.GetNumLinks() << endl();
+            formatter << "filesize: " << statInfo.GetFileSize() << endl();
+            formatter << "ctime: " << statInfo.CTime().ToString() << endl();
+            formatter << "mtime: " << statInfo.MTime().ToString() << endl();
+            formatter << "atime: " << statInfo.ATime().ToString() << endl();
+            formatter.DecIndent();
+            if (statInfo.Type() == FileType.directory)
+            {
+                DirWalk(formatter, subPath);
+            }
         }
     }
     formatter.DecIndent();

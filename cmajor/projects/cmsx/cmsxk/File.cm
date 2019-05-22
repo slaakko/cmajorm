@@ -203,7 +203,7 @@ namespace cmsx.kernel
         WriteProcessMemory(machine, process, pathBufferAddress, cast<byte*>(cast<void*>(currentWorkindDirectory.Chars())), cast<ulong>(currentWorkindDirectory.Length() + 1), Protection.write);
     }
 
-    public void Stat(Machine& machine, Process* process, ulong pathAddress, ulong statStructAddress)
+    public void ChDir(Machine& machine, Process* process, ulong pathAddress)
     {
         if (pathAddress == 0u)
         {
@@ -216,7 +216,23 @@ namespace cmsx.kernel
             throw SystemError(EINVAL, "path is empty");
         }
         FileSystem* fs = GetMountTable().GetFileSystem(0);
-        fs->Stat(process, path, statStructAddress);
+        fs->ChDir(process, path);
+    }
+
+    public void Stat(Machine& machine, Process* process, ulong pathAddress, ulong statBufAddress)
+    {
+        if (pathAddress == 0u)
+        {
+            throw SystemError(EINVAL, "path address is null");
+        }
+        string path;
+        ReadStringFromProcessMemory(machine, process, pathAddress, path);
+        if (path.IsEmpty())
+        {
+            throw SystemError(EINVAL, "path is empty");
+        }
+        FileSystem* fs = GetMountTable().GetFileSystem(0);
+        fs->Stat(process, path, statBufAddress);
     }
 
     public abstract class File

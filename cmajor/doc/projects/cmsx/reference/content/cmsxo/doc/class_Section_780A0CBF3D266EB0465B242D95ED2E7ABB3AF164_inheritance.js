@@ -270,13 +270,13 @@ function drawInheritanceDiagram() {
     var diagramNodes = [
         { name: "cmsx.object.Section", id: "diagram_node_0", level: 0, subject: true, hasDerivedNodes: true, link: "../../cmsxo/doc/class_Section_780A0CBF3D266EB0465B242D95ED2E7ABB3AF164.html" },
         { name: "cmsx.object.CodeSection", id: "diagram_node_1", level: 1, subject: false, hasDerivedNodes: false, link: "../../cmsxo/doc/class_CodeSection_E809D40076F5D4E2D93ABC9F6685BBA968DA9A53.html" },
-        { name: "cmsx.object.DataSection", id: "diagram_node_2", level: 1, subject: false, hasDerivedNodes: false, link: "../../cmsxo/doc/class_DataSection_95C05BBA5F1FF98DEEC153D1DE048F979D8D52F3.html" },
+        { name: "cmsx.object.DataSection", id: "diagram_node_4", level: 1, subject: false, hasDerivedNodes: false, link: "../../cmsxo/doc/class_DataSection_95C05BBA5F1FF98DEEC153D1DE048F979D8D52F3.html" },
         { name: "cmsx.object.DebugSection", id: "diagram_node_3", level: 1, subject: false, hasDerivedNodes: false, link: "../../cmsxo/doc/class_DebugSection_0F3CDAB41A79F530049DB3EA3185D5EDD000A3AE.html" },
         { name: "cmsx.object.ExecutableFileHeaderSection", id: "diagram_node_5", level: 1, subject: false, hasDerivedNodes: false, link: "../../cmsxo/doc/class_ExecutableFileHeaderSection_4D0B705CDF549FC3AE584DA41CCAE8141720F4FD.html" },
         { name: "cmsx.object.LibraryFileHeaderSection", id: "diagram_node_6", level: 1, subject: false, hasDerivedNodes: false, link: "../../cmsxo/doc/class_LibraryFileHeaderSection_E2E4A072882AFDE0EE5636F428D62C9BBC89C317.html" },
         { name: "cmsx.object.LinkSection", id: "diagram_node_7", level: 1, subject: false, hasDerivedNodes: false, link: "../../cmsxo/doc/class_LinkSection_E34CEC79455BF72701FDB0C1A511CC197FE05B27.html" },
         { name: "cmsx.object.ObjectFileHeaderSection", id: "diagram_node_8", level: 1, subject: false, hasDerivedNodes: false, link: "../../cmsxo/doc/class_ObjectFileHeaderSection_3331B98326F943A4291E5BD7CF41926EFF74D684.html" },
-        { name: "cmsx.object.SymbolSection", id: "diagram_node_4", level: 1, subject: false, hasDerivedNodes: false, link: "../../cmsxo/doc/class_SymbolSection_C66F846E9D30844AE83F77DAF6B72B2683A826F4.html" }];
+        { name: "cmsx.object.SymbolSection", id: "diagram_node_2", level: 1, subject: false, hasDerivedNodes: false, link: "../../cmsxo/doc/class_SymbolSection_C66F846E9D30844AE83F77DAF6B72B2683A826F4.html" }];
     drawDiagram(diagramNodes);
 }
 

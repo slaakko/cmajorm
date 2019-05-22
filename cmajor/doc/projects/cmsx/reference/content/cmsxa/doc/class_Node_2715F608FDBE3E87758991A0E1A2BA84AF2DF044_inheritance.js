@@ -270,13 +270,13 @@ function drawInheritanceDiagram() {
     var diagramNodes = [
         { name: "cmsx.assembly.Node", id: "diagram_node_0", level: 0, subject: true, hasDerivedNodes: true, link: "../../cmsxa/doc/class_Node_2715F608FDBE3E87758991A0E1A2BA84AF2DF044.html" },
         { name: "cmsx.assembly.At", id: "diagram_node_1", level: 1, subject: false, hasDerivedNodes: false, link: "../../cmsxa/doc/class_At_F67BD044C85784A8591E0A6EC847236F1F6758DC.html" },
-        { name: "cmsx.assembly.BinaryExpression", id: "diagram_node_2", level: 1, subject: false, hasDerivedNodes: false, link: "../../cmsxa/doc/class_BinaryExpression_27DCB45366FEC8A67CF3C7A580C8AFD88C220160.html" },
-        { name: "cmsx.assembly.Constant", id: "diagram_node_4", level: 1, subject: false, hasDerivedNodes: false, link: "../../cmsxa/doc/class_Constant_15BC3F833B6A2470E27F6C21FE1B8BEA04721B2D.html" },
-        { name: "cmsx.assembly.Instruction", id: "diagram_node_6", level: 1, subject: false, hasDerivedNodes: false, link: "../../cmsxa/doc/class_Instruction_932A59F71819956048821063FACD931FFF029AC8.html" },
+        { name: "cmsx.assembly.BinaryExpression", id: "diagram_node_3", level: 1, subject: false, hasDerivedNodes: false, link: "../../cmsxa/doc/class_BinaryExpression_27DCB45366FEC8A67CF3C7A580C8AFD88C220160.html" },
+        { name: "cmsx.assembly.Constant", id: "diagram_node_5", level: 1, subject: false, hasDerivedNodes: false, link: "../../cmsxa/doc/class_Constant_15BC3F833B6A2470E27F6C21FE1B8BEA04721B2D.html" },
+        { name: "cmsx.assembly.Instruction", id: "diagram_node_7", level: 1, subject: false, hasDerivedNodes: false, link: "../../cmsxa/doc/class_Instruction_932A59F71819956048821063FACD931FFF029AC8.html" },
         { name: "cmsx.assembly.OpCode", id: "diagram_node_8", level: 1, subject: false, hasDerivedNodes: false, link: "../../cmsxa/doc/class_OpCode_6EC769E8A708EEB909FE8D02452FF11E5F5CC09D.html" },
-        { name: "cmsx.assembly.OperandList", id: "diagram_node_7", level: 1, subject: false, hasDerivedNodes: false, link: "../../cmsxa/doc/class_OperandList_0F5AA41633CF259FB09864943F2537461A937CAB.html" },
-        { name: "cmsx.assembly.ParenthesizedExpression", id: "diagram_node_5", level: 1, subject: false, hasDerivedNodes: false, link: "../../cmsxa/doc/class_ParenthesizedExpression_D855A6715382F84A842AFA786A2E27BEE720427D.html" },
-        { name: "cmsx.assembly.SymbolNode", id: "diagram_node_3", level: 1, subject: false, hasDerivedNodes: false, link: "../../cmsxa/doc/class_SymbolNode_702D80A9609AF2C696217BEEA422A490AFEA3E08.html" },
+        { name: "cmsx.assembly.OperandList", id: "diagram_node_6", level: 1, subject: false, hasDerivedNodes: false, link: "../../cmsxa/doc/class_OperandList_0F5AA41633CF259FB09864943F2537461A937CAB.html" },
+        { name: "cmsx.assembly.ParenthesizedExpression", id: "diagram_node_4", level: 1, subject: false, hasDerivedNodes: false, link: "../../cmsxa/doc/class_ParenthesizedExpression_D855A6715382F84A842AFA786A2E27BEE720427D.html" },
+        { name: "cmsx.assembly.SymbolNode", id: "diagram_node_2", level: 1, subject: false, hasDerivedNodes: false, link: "../../cmsxa/doc/class_SymbolNode_702D80A9609AF2C696217BEEA422A490AFEA3E08.html" },
         { name: "cmsx.assembly.UnaryExpression", id: "diagram_node_9", level: 1, subject: false, hasDerivedNodes: false, link: "../../cmsxa/doc/class_UnaryExpression_18BDC57311BD594AC3626D9AD018DD254926832C.html" }];
     drawDiagram(diagramNodes);
 }

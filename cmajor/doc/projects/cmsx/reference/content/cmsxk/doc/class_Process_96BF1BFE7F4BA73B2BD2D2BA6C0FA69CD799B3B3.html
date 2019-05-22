@@ -7,7 +7,7 @@
  <body>
   <h1>Process Class</h1>
   <h2>Definition</h2>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/Process.cm.html#14">14</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/Process.cm.html">cmsxk/Process.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/Process.cm.html#49">49</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/Process.cm.html">cmsxk/Process.cm</a></span>
   <h2>Constructors &amp; Destructor</h2>
   <table>
    <tr>
@@ -32,6 +32,10 @@
   </table>
   <h2>Enumerated Types</h2>
   <table>
+   <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">enum</span></td>
+    <td xml:space="preserve"><a href="../../cmsxk/doc/enumerated_type_Mode_2B3FF06DAF13119EA8D844FF34CD9329B008E82C.html">Mode</a></td>
+   </tr>
    <tr>
     <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">enum</span></td>
     <td xml:space="preserve"><a href="../../cmsxk/doc/enumerated_type_State_B09FF88BE811EB55ED98181B028B5C0BCDE74696.html">State</a></td>
@@ -68,6 +72,10 @@
     <td xml:space="preserve">exitCode</td>
    </tr>
    <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">void</span>*</td>
+    <td xml:space="preserve">fiber</td>
+   </tr>
+   <tr>
     <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<a href="../../cmsxk/doc/class_ProcessFileTable_53B77910027C16D692A95AE29AC800C1E2F9B43C.html">ProcessFileTable</a></td>
     <td xml:space="preserve">fileTable</td>
    </tr>
@@ -84,6 +92,10 @@
     <td xml:space="preserve">functionTableLength</td>
    </tr>
    <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">int</span></td>
+    <td xml:space="preserve">gid</td>
+   </tr>
+   <tr>
     <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">ulong</span></td>
     <td xml:space="preserve">handlerAddress</td>
    </tr>
@@ -98,6 +110,10 @@
    <tr>
     <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<a href="../../cmsxk/doc/class_MemoryTable_C9F5B3ED8B0B95B21D1E8270900E2EC55AEA3E99.html">MemoryTable</a></td>
     <td xml:space="preserve">memoryTable</td>
+   </tr>
+   <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<a href="../../cmsxk/doc/enumerated_type_Mode_2B3FF06DAF13119EA8D844FF34CD9329B008E82C.html">Mode</a></td>
+    <td xml:space="preserve">mode</td>
    </tr>
    <tr>
     <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<a href="../../../../../../system/content/System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html">String</a>&lt;<span class="kw">char</span>></td>
@@ -148,6 +164,10 @@
     <td xml:space="preserve">regBXAddress</td>
    </tr>
    <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<a href="../../cmsxk/doc/class_INodeKey_D7A9808D7A5112D72E843460CC4BC9CA7116C35D.html">INodeKey</a></td>
+    <td xml:space="preserve">rootDirINodeKey</td>
+   </tr>
+   <tr>
     <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">int</span></td>
     <td xml:space="preserve">sid</td>
    </tr>
@@ -159,12 +179,28 @@
     <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<a href="../../cmsxk/doc/enumerated_type_State_B09FF88BE811EB55ED98181B028B5C0BCDE74696.html">State</a></td>
     <td xml:space="preserve">state</td>
    </tr>
+   <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<a href="../../cmsxk/doc/class_SystemCall_425036F1A2EA65BB659575BADA8BEB43BBCCE4E1.html">SystemCall</a></td>
+    <td xml:space="preserve">systemCall</td>
+   </tr>
+   <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">bool</span></td>
+    <td xml:space="preserve">systemCallReady</td>
+   </tr>
+   <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">int</span></td>
+    <td xml:space="preserve">uid</td>
+   </tr>
+   <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<a href="../../cmsxk/doc/class_INodeKey_D7A9808D7A5112D72E843460CC4BC9CA7116C35D.html">INodeKey</a></td>
+    <td xml:space="preserve">workingDirINodeKey</td>
+   </tr>
   </table>
   <h2>Constructor&amp; Destructor Details</h2>
   <h3 id="default_constructor_Process_D4ADB44F282AA1F8494F245A00840267DC3C3AE4" xml:space="preserve">Process&nbsp;Constructor</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;Process()</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/Process.cm.html#20">20</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/Process.cm.html">cmsxk/Process.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/Process.cm.html#59">59</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/Process.cm.html">cmsxk/Process.cm</a></span>
   <br/>
   <br/>
   <hr/>
@@ -172,21 +208,21 @@
   <h3 id="member_function_AddChild_Process_48A8851A86C4B648120582D091A7054FE7A8B878" xml:space="preserve">AddChild&nbsp;Member Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span>&nbsp;AddChild(<a href="../../cmsxk/doc/class_Process_96BF1BFE7F4BA73B2BD2D2BA6C0FA69CD799B3B3.html">Process</a>*&nbsp;child)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/Process.cm.html#24">24</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/Process.cm.html">cmsxk/Process.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/Process.cm.html#64">64</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/Process.cm.html">cmsxk/Process.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="member_function_EntryPoint_Process_7C1113B74FF166D31F03F75B634456E6315A4444" xml:space="preserve">EntryPoint&nbsp;Member Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">ulong</span>&nbsp;EntryPoint()</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/Process.cm.html#59">59</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/Process.cm.html">cmsxk/Process.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/Process.cm.html#99">99</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/Process.cm.html">cmsxk/Process.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="member_function_RemoveChild_Process_7DED053F85E3D012EF4A090A8A329ADE8C3584C4" xml:space="preserve">RemoveChild&nbsp;Member Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span>&nbsp;RemoveChild(<a href="../../cmsxk/doc/class_Process_96BF1BFE7F4BA73B2BD2D2BA6C0FA69CD799B3B3.html">Process</a>*&nbsp;prevChild, <a href="../../cmsxk/doc/class_Process_96BF1BFE7F4BA73B2BD2D2BA6C0FA69CD799B3B3.html">Process</a>*&nbsp;child)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/Process.cm.html#40">40</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/Process.cm.html">cmsxk/Process.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/Process.cm.html#80">80</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/Process.cm.html">cmsxk/Process.cm</a></span>
   <br/>
   <br/>
   <hr/>

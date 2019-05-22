@@ -1,11 +1,23 @@
 using System;
 using System.Os;
 
-int main()
+public void PrintUsage()
+{
+    Console.Out() << 
+        "Usage: mkdir <path>" << endl() <<
+        "Create directory <path>." << endl();
+}
+
+int main(int argc, const char** argv)
 {
     try
     {
-        Mkdir("/bin");
+        if (argc != 2)
+        {
+            PrintUsage();
+            return 1;
+        }
+        Mkdir(argv[1]);
     }
     catch (const Exception& ex)
     {

@@ -269,14 +269,14 @@ function drawDiagram(diagramNodes) {
 function drawInheritanceDiagram() {
     var diagramNodes = [
         { name: "cmsx.debug.Node", id: "diagram_node_0", level: 0, subject: true, hasDerivedNodes: true, link: "../../cmsxmdb/doc/class_Node_ED1039662C0065B650CA93EBCF276CC814935644.html" },
-        { name: "cmsx.debug.BinaryNode", id: "diagram_node_1", level: 1, subject: false, hasDerivedNodes: false, link: "../../cmsxmdb/doc/class_BinaryNode_3F8F649AD917A87A77AF50A0B98D3B9CC90A6302.html" },
+        { name: "cmsx.debug.BinaryNode", id: "diagram_node_2", level: 1, subject: false, hasDerivedNodes: false, link: "../../cmsxmdb/doc/class_BinaryNode_3F8F649AD917A87A77AF50A0B98D3B9CC90A6302.html" },
         { name: "cmsx.debug.DecNumberNode", id: "diagram_node_3", level: 1, subject: false, hasDerivedNodes: false, link: "../../cmsxmdb/doc/class_DecNumberNode_41012AB2F4852C85CB1663165BB4B05BB948C84E.html" },
         { name: "cmsx.debug.HexNumberNode", id: "diagram_node_4", level: 1, subject: false, hasDerivedNodes: false, link: "../../cmsxmdb/doc/class_HexNumberNode_F0EEC09C57F9611C51A91C5C06941E5841E32BB4.html" },
-        { name: "cmsx.debug.PrintStatementNode", id: "diagram_node_5", level: 1, subject: false, hasDerivedNodes: false, link: "../../cmsxmdb/doc/class_PrintStatementNode_CF20353D8533C6D9100EEB686D06B36F78F238AD.html" },
+        { name: "cmsx.debug.PrintStatementNode", id: "diagram_node_6", level: 1, subject: false, hasDerivedNodes: false, link: "../../cmsxmdb/doc/class_PrintStatementNode_CF20353D8533C6D9100EEB686D06B36F78F238AD.html" },
         { name: "cmsx.debug.RegNumberNode", id: "diagram_node_7", level: 1, subject: false, hasDerivedNodes: false, link: "../../cmsxmdb/doc/class_RegNumberNode_B7E79B501D0AD6BCDA20E2C52D3F5A4846C66454.html" },
-        { name: "cmsx.debug.SegmentNode", id: "diagram_node_6", level: 1, subject: false, hasDerivedNodes: false, link: "../../cmsxmdb/doc/class_SegmentNode_9A6B9FB8900C011621F81249A93E5446C60B02E2.html" },
+        { name: "cmsx.debug.SegmentNode", id: "diagram_node_5", level: 1, subject: false, hasDerivedNodes: false, link: "../../cmsxmdb/doc/class_SegmentNode_9A6B9FB8900C011621F81249A93E5446C60B02E2.html" },
         { name: "cmsx.debug.SymbolNode", id: "diagram_node_8", level: 1, subject: false, hasDerivedNodes: false, link: "../../cmsxmdb/doc/class_SymbolNode_395AB3459E8190626C36A2D092FD43FC1E8FBF52.html" },
-        { name: "cmsx.debug.TraceStatementNode", id: "diagram_node_2", level: 1, subject: false, hasDerivedNodes: false, link: "../../cmsxmdb/doc/class_TraceStatementNode_E69AAF7DC965A7CF940B18D6209E46A47D81D6AD.html" },
+        { name: "cmsx.debug.TraceStatementNode", id: "diagram_node_1", level: 1, subject: false, hasDerivedNodes: false, link: "../../cmsxmdb/doc/class_TraceStatementNode_E69AAF7DC965A7CF940B18D6209E46A47D81D6AD.html" },
         { name: "cmsx.debug.UnaryNode", id: "diagram_node_9", level: 1, subject: false, hasDerivedNodes: false, link: "../../cmsxmdb/doc/class_UnaryNode_A24CDC9C24AB502E5644F3B1943DC3B1F84CFE86.html" }];
     drawDiagram(diagramNodes);
 }

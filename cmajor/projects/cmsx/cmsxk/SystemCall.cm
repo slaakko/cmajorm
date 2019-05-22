@@ -37,7 +37,8 @@ namespace cmsx.kernel
     public const byte sys_readdir = 31u;
     public const byte sys_closedir = 32u;
     public const byte sys_getcwd = 33u;
-    public const byte sys_stat = 34u;
+    public const byte sys_chdir = 34u;
+    public const byte sys_stat = 35u;
     public const byte numSystemCalls = sys_stat + 1u;
 
     public nothrow string SystemCallName(byte systemCall)
@@ -78,6 +79,7 @@ namespace cmsx.kernel
             case sys_readdir: return "sys_readdir";
             case sys_closedir: return "sys_closedir";
             case sys_getcwd: return "sys_getcwd";
+            case sys_chdir: return "sys_chdir";
             case sys_stat: return "sys_stat";
         }
         return string();
@@ -104,6 +106,10 @@ namespace cmsx.kernel
             s.Append(SystemCallName(y)).Append(".ax=").Append(ToHexString(ax)).Append(".bx=").Append(ToHexString(bx)).Append(".cx=").Append(ToHexString(cx)).Append(".dx=");
             s.Append(ToHexString(dx)).Append(".ex=").Append(ToHexString(ex)).Append(".result=").Append(ToHexString(result));
             return s;
+        }
+        public nothrow bool IsDebugBreak() const
+        {
+            return x == 0u && y == sys_debug_break && z == 0u;
         }
         public Machine* machine;
         public Kernel* kernel;
@@ -298,7 +304,6 @@ namespace cmsx.kernel
         }
         Debugger* debugger = sc.kernel->GetDebugger();
         debugger->Run(sc.process);
-        sc.result = cast<long>(sc.machine->GetRegisters().Get(regAX));
     }
 
     public void StackTrace(SystemCall& sc)
@@ -584,6 +589,16 @@ namespace cmsx.kernel
             Panic("invalid getcwd parameters: " + ToString(sc.x) + ", " + ToString(sc.y) + ", " + ToString(sc.z));
         }
         GetCWD(*sc.machine, sc.process, sc.ax, cast<long>(sc.bx));
+        sc.result = 0;
+    }
+
+    public void ChDir(SystemCall& sc)
+    {
+        if (sc.x != 0u || sc.y != sys_chdir || sc.z != 0u)
+        {
+            Panic("invalid chdir parameters: " + ToString(sc.x) + ", " + ToString(sc.y) + ", " + ToString(sc.z));
+        }
+        ChDir(*sc.machine, sc.process, sc.ax);
         sc.result = 0;
     }
 

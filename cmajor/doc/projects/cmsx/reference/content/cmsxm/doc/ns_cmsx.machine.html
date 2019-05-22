@@ -1448,6 +1448,10 @@
     <td xml:space="preserve"><a href="../../cmsxm/doc/ns_cmsx.machine.html#function_IsProcessorInKernelMode_3BE90724DCDCACCF7840820D9A94DACD92A6163D">IsProcessorInKernelMode</a>(<a href="../../cmsxm/doc/class_Registers_C454B634EBC16B04713098024D17633A35E20066.html">Registers</a>&amp;&nbsp;regs)</td>
    </tr>
    <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">bool</span></td>
+    <td xml:space="preserve"><a href="../../cmsxm/doc/ns_cmsx.machine.html#function_IssuePageFault_4F606044D89C32696E073155C6BF080327761310">IssuePageFault</a>()</td>
+   </tr>
+   <tr>
     <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<a href="../../cmsxm/doc/enumerated_type_Protection_1B2FA453547A50F798735457C7E73FF5F96C558F.html">Protection</a></td>
     <td xml:space="preserve"><a href="../../cmsxm/doc/ns_cmsx.machine.html#function_MakeDefaultPageProtection_2E53CC115E7BE0621698E79E2D87D583612D0EF7">MakeDefaultPageProtection</a>(<span class="kw">byte</span>&nbsp;segmentIndex)</td>
    </tr>
@@ -1474,6 +1478,10 @@
    <tr>
     <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">void</span></td>
     <td xml:space="preserve"><a href="../../cmsxm/doc/ns_cmsx.machine.html#function_Panic_3B54B70158D282DE2BD79B60F5B1AD51BE10D068">Panic</a>(<span class="kw">const</span>&nbsp;<a href="../../../../../../system/content/System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html">String</a>&lt;<span class="kw">char</span>>&amp;&nbsp;message)</td>
+   </tr>
+   <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">bool</span></td>
+    <td xml:space="preserve"><a href="../../cmsxm/doc/ns_cmsx.machine.html#function_PanicThrows_A46C0A864C71D57297ED31BB2DF5CB1E217F976A">PanicThrows</a>()</td>
    </tr>
    <tr>
     <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">byte</span></td>
@@ -1562,6 +1570,16 @@
      InterruptHandler(<a href="../../cmsxm/doc/class_Machine_F7663CCABD183952965566D1944B82FAFEDE0822.html">Machine</a>
      &amp;&nbsp;machine, <span class="kw">byte</span>
      &nbsp;irq)</td>
+   </tr>
+   <tr id="delegate_InterruptReturnDelegate_45F59D931BA4872DAD2B93116E1B879F7B618180">
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">delegate</span>&nbsp;<span class="kw">void</span></td>
+    <td>
+     InterruptReturnDelegate()</td>
+   </tr>
+   <tr id="delegate_KernelShutdownFunc_5E361E83E3FE2BE53157A7D5FD323B635CE46767">
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">delegate</span>&nbsp;<span class="kw">void</span></td>
+    <td>
+     KernelShutdownFunc()</td>
    </tr>
   </table>
   <h2>Enumerated Types</h2>
@@ -1800,6 +1818,10 @@
    <tr>
     <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">byte</span>&nbsp;CSZI</td>
     <td xml:space="preserve">0x63u</td>
+   </tr>
+   <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">ulong</span>&nbsp;DISK_BIT</td>
+    <td xml:space="preserve">cast&lt;ulong>(1u) &lt;&lt; irqDisk</td>
    </tr>
    <tr>
     <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">byte</span>&nbsp;DIV</td>
@@ -2698,6 +2720,10 @@
     <td xml:space="preserve">2u</td>
    </tr>
    <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">byte</span>&nbsp;irqDisk</td>
+    <td xml:space="preserve">3u</td>
+   </tr>
+   <tr>
     <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">byte</span>&nbsp;irqInterval</td>
     <td xml:space="preserve">1u</td>
    </tr>
@@ -2707,7 +2733,7 @@
    </tr>
    <tr>
     <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">byte</span>&nbsp;irqKeyboard</td>
-    <td xml:space="preserve">3u</td>
+    <td xml:space="preserve">4u</td>
    </tr>
    <tr>
     <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">byte</span>&nbsp;irqMax</td>
@@ -2941,14 +2967,14 @@
   <h3 id="function_DisableAllInterrupts_5CF7ED2E108AFB5EC7B3DB28E7C8021FBECF142C" xml:space="preserve">DisableAllInterrupts&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span>&nbsp;DisableAllInterrupts(<a href="../../cmsxm/doc/class_Registers_C454B634EBC16B04713098024D17633A35E20066.html">Registers</a>&amp;&nbsp;regs)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxm/file/Interrupt.cm.html#60">60</a>&nbsp;of&nbsp;<a href="../../cmsxm/file/Interrupt.cm.html">cmsxm/Interrupt.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxm/file/Interrupt.cm.html#62">62</a>&nbsp;of&nbsp;<a href="../../cmsxm/file/Interrupt.cm.html">cmsxm/Interrupt.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="function_EnableAllInterrupts_F057304927FE3138E17FA168290C451D06EC6023" xml:space="preserve">EnableAllInterrupts&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span>&nbsp;EnableAllInterrupts(<a href="../../cmsxm/doc/class_Registers_C454B634EBC16B04713098024D17633A35E20066.html">Registers</a>&amp;&nbsp;regs)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxm/file/Interrupt.cm.html#65">65</a>&nbsp;of&nbsp;<a href="../../cmsxm/file/Interrupt.cm.html">cmsxm/Interrupt.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxm/file/Interrupt.cm.html#67">67</a>&nbsp;of&nbsp;<a href="../../cmsxm/file/Interrupt.cm.html">cmsxm/Interrupt.cm</a></span>
   <br/>
   <br/>
   <hr/>
@@ -2969,14 +2995,14 @@
   <h3 id="function_GetInterruptName_041C388EBF5F43BEA8EC8AA8006E362628D98851" xml:space="preserve">GetInterruptName&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<a href="../../../../../../system/content/System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html">String</a>&lt;<span class="kw">char</span>>&nbsp;GetInterruptName(<span class="kw">int</span>&nbsp;irq)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxm/file/Interrupt.cm.html#110">110</a>&nbsp;of&nbsp;<a href="../../cmsxm/file/Interrupt.cm.html">cmsxm/Interrupt.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxm/file/Interrupt.cm.html#124">124</a>&nbsp;of&nbsp;<a href="../../cmsxm/file/Interrupt.cm.html">cmsxm/Interrupt.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="function_GetMachine_0B03AB8A142B1755B31AEAAED7387A9CFD4FA796" xml:space="preserve">GetMachine&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<a href="../../cmsxm/doc/class_Machine_F7663CCABD183952965566D1944B82FAFEDE0822.html">Machine</a>&amp;&nbsp;GetMachine()</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxm/file/Machine.cm.html#320">320</a>&nbsp;of&nbsp;<a href="../../cmsxm/file/Machine.cm.html">cmsxm/Machine.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxm/file/Machine.cm.html#339">339</a>&nbsp;of&nbsp;<a href="../../cmsxm/file/Machine.cm.html">cmsxm/Machine.cm</a></span>
   <br/>
   <br/>
   <hr/>
@@ -3018,14 +3044,21 @@
   <h3 id="function_InvokePageFault_850DA84C44F5218A196FFAFD2E62968DC3063855" xml:space="preserve">InvokePageFault&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span>&nbsp;InvokePageFault(<a href="../../cmsxm/doc/class_Registers_C454B634EBC16B04713098024D17633A35E20066.html">Registers</a>&amp;&nbsp;regs, <span class="kw">ulong</span>&nbsp;virtualAddress, <a href="../../cmsxm/doc/enumerated_type_Protection_1B2FA453547A50F798735457C7E73FF5F96C558F.html">Protection</a>&nbsp;pageProtection, <a href="../../cmsxm/doc/enumerated_type_Protection_1B2FA453547A50F798735457C7E73FF5F96C558F.html">Protection</a>&nbsp;access)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxm/file/Interrupt.cm.html#77">77</a>&nbsp;of&nbsp;<a href="../../cmsxm/file/Interrupt.cm.html">cmsxm/Interrupt.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxm/file/Interrupt.cm.html#86">86</a>&nbsp;of&nbsp;<a href="../../cmsxm/file/Interrupt.cm.html">cmsxm/Interrupt.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="function_IsProcessorInKernelMode_3BE90724DCDCACCF7840820D9A94DACD92A6163D" xml:space="preserve">IsProcessorInKernelMode&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">bool</span>&nbsp;IsProcessorInKernelMode(<a href="../../cmsxm/doc/class_Registers_C454B634EBC16B04713098024D17633A35E20066.html">Registers</a>&amp;&nbsp;regs)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxm/file/Interrupt.cm.html#55">55</a>&nbsp;of&nbsp;<a href="../../cmsxm/file/Interrupt.cm.html">cmsxm/Interrupt.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxm/file/Interrupt.cm.html#57">57</a>&nbsp;of&nbsp;<a href="../../cmsxm/file/Interrupt.cm.html">cmsxm/Interrupt.cm</a></span>
+  <br/>
+  <br/>
+  <hr/>
+  <h3 id="function_IssuePageFault_4F606044D89C32696E073155C6BF080327761310" xml:space="preserve">IssuePageFault&nbsp;Function</h3>
+  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">bool</span>&nbsp;IssuePageFault()</h4>
+  <h5>Definition</h5>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxm/file/Interrupt.cm.html#81">81</a>&nbsp;of&nbsp;<a href="../../cmsxm/file/Interrupt.cm.html">cmsxm/Interrupt.cm</a></span>
   <br/>
   <br/>
   <hr/>
@@ -3039,7 +3072,7 @@
   <h3 id="function_MakeInterruptHandlerPtrAddress_348555F10586F255BE353D4D0B8D41FF6B52E207" xml:space="preserve">MakeInterruptHandlerPtrAddress&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">inline</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">ulong</span>&nbsp;MakeInterruptHandlerPtrAddress(<span class="kw">byte</span>&nbsp;irq)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxm/file/Interrupt.cm.html#40">40</a>&nbsp;of&nbsp;<a href="../../cmsxm/file/Interrupt.cm.html">cmsxm/Interrupt.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxm/file/Interrupt.cm.html#42">42</a>&nbsp;of&nbsp;<a href="../../cmsxm/file/Interrupt.cm.html">cmsxm/Interrupt.cm</a></span>
   <br/>
   <br/>
   <hr/>
@@ -3074,7 +3107,14 @@
   <h3 id="function_Panic_3B54B70158D282DE2BD79B60F5B1AD51BE10D068" xml:space="preserve">Panic&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">void</span>&nbsp;Panic(<span class="kw">const</span>&nbsp;<a href="../../../../../../system/content/System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html">String</a>&lt;<span class="kw">char</span>>&amp;&nbsp;message)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxm/file/Machine.cm.html#6">6</a>&nbsp;of&nbsp;<a href="../../cmsxm/file/Machine.cm.html">cmsxm/Machine.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxm/file/Machine.cm.html#17">17</a>&nbsp;of&nbsp;<a href="../../cmsxm/file/Machine.cm.html">cmsxm/Machine.cm</a></span>
+  <br/>
+  <br/>
+  <hr/>
+  <h3 id="function_PanicThrows_A46C0A864C71D57297ED31BB2DF5CB1E217F976A" xml:space="preserve">PanicThrows&nbsp;Function</h3>
+  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">bool</span>&nbsp;PanicThrows()</h4>
+  <h5>Definition</h5>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxm/file/Machine.cm.html#12">12</a>&nbsp;of&nbsp;<a href="../../cmsxm/file/Machine.cm.html">cmsxm/Machine.cm</a></span>
   <br/>
   <br/>
   <hr/>
@@ -3137,21 +3177,21 @@
   <h3 id="function_SetProcessorToKernelMode_E3230FFB0C1DAF42B06D6E325AB5EFB9648E69F9" xml:space="preserve">SetProcessorToKernelMode&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span>&nbsp;SetProcessorToKernelMode(<a href="../../cmsxm/doc/class_Registers_C454B634EBC16B04713098024D17633A35E20066.html">Registers</a>&amp;&nbsp;regs)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxm/file/Interrupt.cm.html#45">45</a>&nbsp;of&nbsp;<a href="../../cmsxm/file/Interrupt.cm.html">cmsxm/Interrupt.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxm/file/Interrupt.cm.html#47">47</a>&nbsp;of&nbsp;<a href="../../cmsxm/file/Interrupt.cm.html">cmsxm/Interrupt.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="function_SetProcessorToUserMode_5C3CCCC83ED9E80EBFFB0CB88FDE484C05580BF4" xml:space="preserve">SetProcessorToUserMode&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span>&nbsp;SetProcessorToUserMode(<a href="../../cmsxm/doc/class_Registers_C454B634EBC16B04713098024D17633A35E20066.html">Registers</a>&amp;&nbsp;regs)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxm/file/Interrupt.cm.html#50">50</a>&nbsp;of&nbsp;<a href="../../cmsxm/file/Interrupt.cm.html">cmsxm/Interrupt.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxm/file/Interrupt.cm.html#52">52</a>&nbsp;of&nbsp;<a href="../../cmsxm/file/Interrupt.cm.html">cmsxm/Interrupt.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="function_SetSecurityViolation_640D2E54A4F43F1ED2EC97C973BA712E4F43F6DA" xml:space="preserve">SetSecurityViolation&nbsp;Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span>&nbsp;SetSecurityViolation(<a href="../../cmsxm/doc/class_Registers_C454B634EBC16B04713098024D17633A35E20066.html">Registers</a>&amp;&nbsp;regs, <span class="kw">ulong</span>&nbsp;virtualAddress)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxm/file/Interrupt.cm.html#70">70</a>&nbsp;of&nbsp;<a href="../../cmsxm/file/Interrupt.cm.html">cmsxm/Interrupt.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxm/file/Interrupt.cm.html#72">72</a>&nbsp;of&nbsp;<a href="../../cmsxm/file/Interrupt.cm.html">cmsxm/Interrupt.cm</a></span>
   <br/>
   <br/>
   <hr/>

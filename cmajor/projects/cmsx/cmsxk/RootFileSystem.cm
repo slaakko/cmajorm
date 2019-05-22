@@ -440,7 +440,20 @@ namespace cmsx.kernel
             }
             return currentWorkindDirectoryPath;
         }
-        public override void Stat(Process* process, const string& path, ulong statStructAddress)
+        public override void ChDir(Process* process, const string& path)
+        {
+            DirectorySlot freeDirectorySlot;
+            INode* parent = null;
+            string name;
+            INode* inode = GetINodeManager().PathToINode(process, path, false, parent, freeDirectorySlot, name);
+            if (inode == null)
+            {
+                throw SystemError(ENOENT, "path '" + path + "' does not exist");
+            }
+            INodePutter putter(inode);
+            process->workingDirINodeKey = inode->Key();
+        }
+        public override void Stat(Process* process, const string& path, ulong statBufAddress)
         {
             DirectorySlot freeDirectorySlot;
             INode* parent = null;
@@ -452,17 +465,19 @@ namespace cmsx.kernel
             }
             INodePutter putter(inode);
             Machine& machine = GetMachine();
-            WriteProcessMemory(machine, process, statStructAddress, cast<ulong>(inode->Key().inodeNumber), 4u, Protection.write);
-            WriteProcessMemory(machine, process, statStructAddress + 4u, cast<ulong>(inode->Key().fsNumber), 4u, Protection.write);
-            WriteProcessMemory(machine, process, statStructAddress + 8u, cast<ulong>(inode->Mode()), 4u, Protection.write);
-            WriteProcessMemory(machine, process, statStructAddress + 12u, cast<ulong>(inode->UID()), 4u, Protection.write);
-            WriteProcessMemory(machine, process, statStructAddress + 16u, cast<ulong>(inode->GID()), 4u, Protection.write);
-            WriteProcessMemory(machine, process, statStructAddress + 20u, cast<ulong>(inode->GetNumLinks()), 4u, Protection.write);
-            WriteProcessMemory(machine, process, statStructAddress + 24u, cast<ulong>(inode->GetFileSize()), 8u, Protection.write);
-            WriteProcessMemory(machine, process, statStructAddress + 32u, cast<ulong>(inode->CTimeAsULong()), 8u, Protection.write);
-            WriteProcessMemory(machine, process, statStructAddress + 40u, cast<ulong>(inode->MTimeAsULong()), 8u, Protection.write);
-            WriteProcessMemory(machine, process, statStructAddress + 48u, cast<ulong>(inode->ATimeAsULong()), 8u, Protection.write);
-            
+            byte[statBufSize] statBuf;
+            MemoryWriter writer(&statBuf[0], statBuf.Length());
+            writer.Write(inode->Key().inodeNumber);
+            writer.Write(inode->Key().fsNumber);
+            writer.Write(inode->Mode());
+            writer.Write(inode->UID());
+            writer.Write(inode->GID());
+            writer.Write(inode->GetNumLinks());
+            writer.Write(inode->GetFileSize());
+            writer.Write(inode->CTime());
+            writer.Write(inode->MTime());
+            writer.Write(inode->ATime());
+            WriteProcessMemory(machine, process, statBufAddress, &statBuf[0], cast<ulong>(statBuf.Length()), Protection.write);
         }
         public override int AllocateBlockNumber()
         {

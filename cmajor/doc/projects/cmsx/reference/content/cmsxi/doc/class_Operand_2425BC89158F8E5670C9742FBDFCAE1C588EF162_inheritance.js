@@ -269,10 +269,10 @@ function drawDiagram(diagramNodes) {
 function drawInheritanceDiagram() {
     var diagramNodes = [
         { name: "cmsx.intermediate.Operand", id: "diagram_node_0", level: 0, subject: true, hasDerivedNodes: true, link: "../../cmsxi/doc/class_Operand_2425BC89158F8E5670C9742FBDFCAE1C588EF162.html" },
-        { name: "cmsx.intermediate.ClsIdOperand", id: "diagram_node_1", level: 1, subject: false, hasDerivedNodes: false, link: "../../cmsxi/doc/class_ClsIdOperand_71E5AF3849F4245737B5E4C9CFDEB7FC950DDA41.html" },
+        { name: "cmsx.intermediate.ClsIdOperand", id: "diagram_node_2", level: 1, subject: false, hasDerivedNodes: false, link: "../../cmsxi/doc/class_ClsIdOperand_71E5AF3849F4245737B5E4C9CFDEB7FC950DDA41.html" },
         { name: "cmsx.intermediate.FloatingLiteralOperand", id: "diagram_node_3", level: 1, subject: false, hasDerivedNodes: false, link: "../../cmsxi/doc/class_FloatingLiteralOperand_BD4EA7113AF77C34A632052EE6DE9F43A2635EB8.html" },
         { name: "cmsx.intermediate.LiteralOperand", id: "diagram_node_4", level: 1, subject: false, hasDerivedNodes: false, link: "../../cmsxi/doc/class_LiteralOperand_7FE2403AC52465CB5E9F4B0F9CD0986E2B93E627.html" },
-        { name: "cmsx.intermediate.Location", id: "diagram_node_2", level: 1, subject: false, hasDerivedNodes: false, link: "../../cmsxi/doc/class_Location_BE5B0B4F6121C4382E496712B4F67F5152B95437.html" },
+        { name: "cmsx.intermediate.Location", id: "diagram_node_1", level: 1, subject: false, hasDerivedNodes: false, link: "../../cmsxi/doc/class_Location_BE5B0B4F6121C4382E496712B4F67F5152B95437.html" },
         { name: "cmsx.intermediate.StringOperand", id: "diagram_node_5", level: 1, subject: false, hasDerivedNodes: false, link: "../../cmsxi/doc/class_StringOperand_048C360386E816D4E9847F7CE7B3BDE10C81600E.html" },
         { name: "cmsx.intermediate.SymbolOperand", id: "diagram_node_6", level: 1, subject: false, hasDerivedNodes: false, link: "../../cmsxi/doc/class_SymbolOperand_30D5FD9BD886AA7A72BAA0EDA260A90E9F26366D.html" }];
     drawDiagram(diagramNodes);

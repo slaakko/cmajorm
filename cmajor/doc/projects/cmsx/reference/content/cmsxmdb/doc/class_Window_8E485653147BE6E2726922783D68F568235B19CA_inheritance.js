@@ -269,10 +269,10 @@ function drawDiagram(diagramNodes) {
 function drawInheritanceDiagram() {
     var diagramNodes = [
         { name: "cmsx.debug.Window", id: "diagram_node_0", level: 0, subject: true, hasDerivedNodes: true, link: "../../cmsxmdb/doc/class_Window_8E485653147BE6E2726922783D68F568235B19CA.html" },
-        { name: "cmsx.debug.CommandWindow", id: "diagram_node_1", level: 1, subject: false, hasDerivedNodes: false, link: "../../cmsxmdb/doc/class_CommandWindow_EBEDBB2CAC1DB22330ED6C3059C7661E733F3D90.html" },
+        { name: "cmsx.debug.CommandWindow", id: "diagram_node_2", level: 1, subject: false, hasDerivedNodes: false, link: "../../cmsxmdb/doc/class_CommandWindow_EBEDBB2CAC1DB22330ED6C3059C7661E733F3D90.html" },
         { name: "cmsx.debug.Disassembly", id: "diagram_node_3", level: 1, subject: false, hasDerivedNodes: false, link: "../../cmsxmdb/doc/class_Disassembly_92B5C90E37833AB84782B8B19AA4ADE9B3DB21DD.html" },
         { name: "cmsx.debug.InputWindow", id: "diagram_node_4", level: 1, subject: false, hasDerivedNodes: false, link: "../../cmsxmdb/doc/class_InputWindow_931B45CBA5EC81A49C0AB668DBCBF674ED019F15.html" },
-        { name: "cmsx.debug.Memory", id: "diagram_node_2", level: 1, subject: false, hasDerivedNodes: false, link: "../../cmsxmdb/doc/class_Memory_C983D4B6B38EF37ADA491E8A54EF8F3490DFD197.html" },
+        { name: "cmsx.debug.Memory", id: "diagram_node_1", level: 1, subject: false, hasDerivedNodes: false, link: "../../cmsxmdb/doc/class_Memory_C983D4B6B38EF37ADA491E8A54EF8F3490DFD197.html" },
         { name: "cmsx.debug.Output", id: "diagram_node_5", level: 1, subject: false, hasDerivedNodes: false, link: "../../cmsxmdb/doc/class_Output_EBC9DB6543ED7AE14F65B8E3E1A05CF84279FB3C.html" }];
     drawDiagram(diagramNodes);
 }

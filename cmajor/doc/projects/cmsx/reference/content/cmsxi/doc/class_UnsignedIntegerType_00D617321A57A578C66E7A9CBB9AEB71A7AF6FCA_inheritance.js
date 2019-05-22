@@ -274,8 +274,8 @@ function drawInheritanceDiagram() {
         { name: "cmsx.intermediate.UnsignedIntegerType", id: "diagram_node_3", level: 3, subject: true, hasDerivedNodes: true, link: "../../cmsxi/doc/class_UnsignedIntegerType_00D617321A57A578C66E7A9CBB9AEB71A7AF6FCA.html" },
         { name: "cmsx.intermediate.ByteType", id: "diagram_node_4", level: 4, subject: false, hasDerivedNodes: false, link: "../../cmsxi/doc/class_ByteType_2045DE575B2FD2B24A328C39A563F5125B3B97DB.html" },
         { name: "cmsx.intermediate.UIntType", id: "diagram_node_5", level: 4, subject: false, hasDerivedNodes: false, link: "../../cmsxi/doc/class_UIntType_206270708B09DEEC37A656F74C06B210C448B029.html" },
-        { name: "cmsx.intermediate.ULongType", id: "diagram_node_6", level: 4, subject: false, hasDerivedNodes: false, link: "../../cmsxi/doc/class_ULongType_B06B4980803E022EF067B45CBCAFCE00C0E528F1.html" },
-        { name: "cmsx.intermediate.UShortType", id: "diagram_node_7", level: 4, subject: false, hasDerivedNodes: false, link: "../../cmsxi/doc/class_UShortType_67AEF78631C7E7C2C04C1BEEDF47CC71DC142A9F.html" }];
+        { name: "cmsx.intermediate.ULongType", id: "diagram_node_7", level: 4, subject: false, hasDerivedNodes: false, link: "../../cmsxi/doc/class_ULongType_B06B4980803E022EF067B45CBCAFCE00C0E528F1.html" },
+        { name: "cmsx.intermediate.UShortType", id: "diagram_node_6", level: 4, subject: false, hasDerivedNodes: false, link: "../../cmsxi/doc/class_UShortType_67AEF78631C7E7C2C04C1BEEDF47CC71DC142A9F.html" }];
     drawDiagram(diagramNodes);
 }
 

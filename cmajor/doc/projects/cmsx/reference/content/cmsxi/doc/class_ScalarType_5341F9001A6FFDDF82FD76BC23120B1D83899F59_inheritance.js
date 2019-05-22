@@ -270,11 +270,11 @@ function drawInheritanceDiagram() {
     var diagramNodes = [
         { name: "cmsx.intermediate.Type", id: "diagram_node_0", level: 0, subject: false, hasDerivedNodes: true, link: "../../cmsxi/doc/class_Type_393488CEAF1419035267DD493BD6F8EC930655F3.html" },
         { name: "cmsx.intermediate.ScalarType", id: "diagram_node_1", level: 1, subject: true, hasDerivedNodes: true, link: "../../cmsxi/doc/class_ScalarType_5341F9001A6FFDDF82FD76BC23120B1D83899F59.html" },
-        { name: "cmsx.intermediate.BoolType", id: "diagram_node_2", level: 2, subject: false, hasDerivedNodes: false, link: "../../cmsxi/doc/class_BoolType_00E85F1C6859641D35CB3E07242DBB19F26539C0.html" },
+        { name: "cmsx.intermediate.BoolType", id: "diagram_node_3", level: 2, subject: false, hasDerivedNodes: false, link: "../../cmsxi/doc/class_BoolType_00E85F1C6859641D35CB3E07242DBB19F26539C0.html" },
         { name: "cmsx.intermediate.FloatingType", id: "diagram_node_4", level: 2, subject: false, hasDerivedNodes: false, link: "../../cmsxi/doc/class_FloatingType_3322427DD690E73BB5742929515818DB26EB3E3E.html" },
         { name: "cmsx.intermediate.IntegerType", id: "diagram_node_5", level: 2, subject: false, hasDerivedNodes: false, link: "../../cmsxi/doc/class_IntegerType_B0834ABB9B82C74D13793706188813AE3154F0F6.html" },
         { name: "cmsx.intermediate.PtrType", id: "diagram_node_6", level: 2, subject: false, hasDerivedNodes: false, link: "../../cmsxi/doc/class_PtrType_5CD5EAEDC7CAABDE88E0B1558B74D9F720333864.html" },
-        { name: "cmsx.intermediate.VoidType", id: "diagram_node_3", level: 2, subject: false, hasDerivedNodes: false, link: "../../cmsxi/doc/class_VoidType_91AFF78E25104A6173AE68390DA2491609F7C592.html" }];
+        { name: "cmsx.intermediate.VoidType", id: "diagram_node_2", level: 2, subject: false, hasDerivedNodes: false, link: "../../cmsxi/doc/class_VoidType_91AFF78E25104A6173AE68390DA2491609F7C592.html" }];
     drawDiagram(diagramNodes);
 }
 

@@ -271,8 +271,8 @@ function drawInheritanceDiagram() {
         { name: "cmsx.intermediate.Type", id: "diagram_node_0", level: 0, subject: false, hasDerivedNodes: true, link: "../../cmsxi/doc/class_Type_393488CEAF1419035267DD493BD6F8EC930655F3.html" },
         { name: "cmsx.intermediate.AggregateType", id: "diagram_node_1", level: 1, subject: true, hasDerivedNodes: true, link: "../../cmsxi/doc/class_AggregateType_51D2C347BD7D8684C3EF4AF3E3332A5484E5ADF7.html" },
         { name: "cmsx.intermediate.ArrayType", id: "diagram_node_2", level: 2, subject: false, hasDerivedNodes: false, link: "../../cmsxi/doc/class_ArrayType_6929064D09BB7E71B65C1D3ECBE473E25C04D0EF.html" },
-        { name: "cmsx.intermediate.FunctionType", id: "diagram_node_3", level: 2, subject: false, hasDerivedNodes: false, link: "../../cmsxi/doc/class_FunctionType_1BC9B539BE3FDBFBC0363FB7160BB9736CBA69C7.html" },
-        { name: "cmsx.intermediate.StructureType", id: "diagram_node_4", level: 2, subject: false, hasDerivedNodes: false, link: "../../cmsxi/doc/class_StructureType_31431E5648AD6EEE03D36C6DBEC299ADAD96CA6D.html" }];
+        { name: "cmsx.intermediate.FunctionType", id: "diagram_node_4", level: 2, subject: false, hasDerivedNodes: false, link: "../../cmsxi/doc/class_FunctionType_1BC9B539BE3FDBFBC0363FB7160BB9736CBA69C7.html" },
+        { name: "cmsx.intermediate.StructureType", id: "diagram_node_3", level: 2, subject: false, hasDerivedNodes: false, link: "../../cmsxi/doc/class_StructureType_31431E5648AD6EEE03D36C6DBEC299ADAD96CA6D.html" }];
     drawDiagram(diagramNodes);
 }
 

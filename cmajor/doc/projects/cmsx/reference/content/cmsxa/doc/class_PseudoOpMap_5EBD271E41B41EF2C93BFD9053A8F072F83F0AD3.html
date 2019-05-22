@@ -23,10 +23,10 @@
   <table>
    <tr>
     <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">int</span></td>
-    <td xml:space="preserve"><a href="../../cmsxa/doc/class_PseudoOpMap_5EBD271E41B41EF2C93BFD9053A8F072F83F0AD3.html#member_function_GetCode_PseudoOpMap_8CD0EE62027223F056822717378DC534AF7D4E8D">GetCode</a>(<span class="kw">const</span>&nbsp;<a href="../../../../../../system/content/System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html">String</a>&lt;<span class="kw">char</span>>&amp;&nbsp;name)&nbsp;<span class="kw">const</span></td>
+    <td xml:space="preserve"><a href="../../cmsxa/doc/class_PseudoOpMap_5EBD271E41B41EF2C93BFD9053A8F072F83F0AD3.html#member_function_GetCode_PseudoOpMap_8CD0EE62027223F056822717378DC534AF7D4E8D">GetCode</a>(TYPE&nbsp;name)&nbsp;<span class="kw">const</span></td>
    </tr>
    <tr>
-    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<a href="../../../../../../system/content/System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html">String</a>&lt;<span class="kw">char</span>></td>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;RETURN_TYPE</td>
     <td xml:space="preserve"><a href="../../cmsxa/doc/class_PseudoOpMap_5EBD271E41B41EF2C93BFD9053A8F072F83F0AD3.html#member_function_GetName_PseudoOpMap_6189EED0CD11369B4CA9BF17F154E0A0D6E06BE1">GetName</a>(<span class="kw">int</span>&nbsp;code)&nbsp;<span class="kw">const</span></td>
    </tr>
    <tr>
@@ -41,7 +41,7 @@
   <h2>Member Variables</h2>
   <table>
    <tr>
-    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">private</span>&nbsp;<a href="../../../../../../system/content/System.Base/doc/class_HashMap_K_T_H_C_D555F9108F5700505E1FCCC02041016E58EE9314.html">HashMap</a>&lt;<a href="../../../../../../system/content/System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html">String</a>&lt;<span class="kw">char</span>>, <span class="kw">int</span>, <a href="../../../../../../system/content/System.Base/doc/class_Hasher_T_9E06FCD9B56B8B3B7E7F8286BE8179D3B1CB8325.html">Hasher</a>&lt;<a href="../../../../../../system/content/System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html">String</a>&lt;<span class="kw">char</span>>>, <a href="../../../../../../system/content/System.Base/doc/class_EqualTo_T_763B7164C155EA5D8436A30331F33E4E7267599E.html">EqualTo</a>&lt;<a href="../../../../../../system/content/System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html">String</a>&lt;<span class="kw">char</span>>>></td>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">private</span>&nbsp;<a href="../../../../../../system/content/System.Base/doc/class_HashMap_K_T_H_C_D555F9108F5700505E1FCCC02041016E58EE9314.html">HashMap</a>&lt;TEMPLATE_ARGUMENT_TYPE, <span class="kw">int</span>, TEMPLATE_ARGUMENT_TYPE, TEMPLATE_ARGUMENT_TYPE></td>
     <td xml:space="preserve">codes</td>
    </tr>
    <tr>
@@ -53,7 +53,7 @@
     <td xml:space="preserve">maxOpCodeNameLength</td>
    </tr>
    <tr>
-    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">private</span>&nbsp;<a href="../../../../../../system/content/System.Base/doc/class_HashMap_K_T_H_C_D555F9108F5700505E1FCCC02041016E58EE9314.html">HashMap</a>&lt;<span class="kw">int</span>, <a href="../../../../../../system/content/System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html">String</a>&lt;<span class="kw">char</span>>, <a href="../../../../../../system/content/System.Base/doc/class_Hasher_T_9E06FCD9B56B8B3B7E7F8286BE8179D3B1CB8325.html">Hasher</a>&lt;<span class="kw">int</span>>, <a href="../../../../../../system/content/System.Base/doc/class_EqualTo_T_763B7164C155EA5D8436A30331F33E4E7267599E.html">EqualTo</a>&lt;<span class="kw">int</span>>></td>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">private</span>&nbsp;<a href="../../../../../../system/content/System.Base/doc/class_HashMap_K_T_H_C_D555F9108F5700505E1FCCC02041016E58EE9314.html">HashMap</a>&lt;<span class="kw">int</span>, TEMPLATE_ARGUMENT_TYPE, <a href="../../../../../../system/content/System.Base/doc/class_Hasher_T_9E06FCD9B56B8B3B7E7F8286BE8179D3B1CB8325.html">Hasher</a>&lt;<span class="kw">int</span>>, <a href="../../../../../../system/content/System.Base/doc/class_EqualTo_T_763B7164C155EA5D8436A30331F33E4E7267599E.html">EqualTo</a>&lt;<span class="kw">int</span>>></td>
     <td xml:space="preserve">names</td>
    </tr>
   </table>
@@ -74,14 +74,14 @@
   <hr/>
   <h2>Member Function Details</h2>
   <h3 id="member_function_GetCode_PseudoOpMap_8CD0EE62027223F056822717378DC534AF7D4E8D" xml:space="preserve">GetCode&nbsp;Member Function</h3>
-  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">int</span>&nbsp;GetCode(<span class="kw">const</span>&nbsp;<a href="../../../../../../system/content/System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html">String</a>&lt;<span class="kw">char</span>>&amp;&nbsp;name)</h4>
+  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">int</span>&nbsp;GetCode(TYPE&nbsp;name)</h4>
   <h5>Definition</h5>
   <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxa/file/Assembly.cm.html#92">92</a>&nbsp;of&nbsp;<a href="../../cmsxa/file/Assembly.cm.html">cmsxa/Assembly.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="member_function_GetName_PseudoOpMap_6189EED0CD11369B4CA9BF17F154E0A0D6E06BE1" xml:space="preserve">GetName&nbsp;Member Function</h3>
-  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<a href="../../../../../../system/content/System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html">String</a>&lt;<span class="kw">char</span>>&nbsp;GetName(<span class="kw">int</span>&nbsp;code)</h4>
+  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;RETURN_TYPE&nbsp;GetName(<span class="kw">int</span>&nbsp;code)</h4>
   <h5>Definition</h5>
   <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxa/file/Assembly.cm.html#101">101</a>&nbsp;of&nbsp;<a href="../../cmsxa/file/Assembly.cm.html">cmsxa/Assembly.cm</a></span>
   <br/>

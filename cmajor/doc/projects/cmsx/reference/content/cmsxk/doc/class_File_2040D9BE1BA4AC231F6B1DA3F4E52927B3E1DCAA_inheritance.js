@@ -271,8 +271,10 @@ function drawInheritanceDiagram() {
         { name: "cmsx.kernel.File", id: "diagram_node_0", level: 0, subject: true, hasDerivedNodes: true, link: "../../cmsxk/doc/class_File_2040D9BE1BA4AC231F6B1DA3F4E52927B3E1DCAA.html" },
         { name: "cmsx.kernel.ConsoleInputFile", id: "diagram_node_1", level: 1, subject: false, hasDerivedNodes: false, link: "../../cmsxk/doc/class_ConsoleInputFile_774AA07FF1CE69034377700C4DD222E7DD6773BD.html" },
         { name: "cmsx.kernel.ConsoleOutputFile", id: "diagram_node_2", level: 1, subject: false, hasDerivedNodes: false, link: "../../cmsxk/doc/class_ConsoleOutputFile_CB9BF62B71A339F71222E769A6CA598B63F427A3.html" },
-        { name: "cmsx.kernel.DebuggerInputFile", id: "diagram_node_3", level: 1, subject: false, hasDerivedNodes: false, link: "../../cmsxk/doc/class_DebuggerInputFile_29E79967845438CA21FEF29C491B550B6B28872C.html" },
-        { name: "cmsx.kernel.DebuggerOutputFile", id: "diagram_node_4", level: 1, subject: false, hasDerivedNodes: false, link: "../../cmsxk/doc/class_DebuggerOutputFile_8E7C9762D9AA624FA04C5D8CFDC57DECD069510C.html" }];
+        { name: "cmsx.kernel.DebuggerInputFile", id: "diagram_node_4", level: 1, subject: false, hasDerivedNodes: false, link: "../../cmsxk/doc/class_DebuggerInputFile_29E79967845438CA21FEF29C491B550B6B28872C.html" },
+        { name: "cmsx.kernel.DebuggerOutputFile", id: "diagram_node_6", level: 1, subject: false, hasDerivedNodes: false, link: "../../cmsxk/doc/class_DebuggerOutputFile_8E7C9762D9AA624FA04C5D8CFDC57DECD069510C.html" },
+        { name: "cmsx.kernel.DirectoryFile", id: "diagram_node_3", level: 1, subject: false, hasDerivedNodes: false, link: "../../cmsxk/doc/class_DirectoryFile_C0909A8EA80AC7BB2E94C786D21B767218572AA3.html" },
+        { name: "cmsx.kernel.RegularFile", id: "diagram_node_5", level: 1, subject: false, hasDerivedNodes: false, link: "../../cmsxk/doc/class_RegularFile_E2B0245C8065883868F723856CB8E0C08A026C48.html" }];
     drawDiagram(diagramNodes);
 }
 

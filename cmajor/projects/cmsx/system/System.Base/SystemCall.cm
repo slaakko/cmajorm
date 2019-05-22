@@ -37,7 +37,8 @@ public const byte sys_opendir = 30u;
 public const byte sys_readdir = 31u;
 public const byte sys_closedir = 32u;
 public const byte sys_getcwd = 33u;
-public const byte sys_stat = 34u;
+public const byte sys_chdir = 34u;
+public const byte sys_stat = 35u;
 
 public cdecl nothrow void exit(byte exitCode)
 {
@@ -208,7 +209,12 @@ public cdecl nothrow int getcwd(char* buffer, long count)
     return cast<int>(trap(0u, sys_getcwd, 0u, buffer, count));
 }
 
-public cdecl nothrow int stat(const char* path, System.IO.StatBuf* statBuf)
+public cdecl nothrow int chdir(const char* path)
+{
+    return cast<int>(trap(0u, sys_chdir, 0u, path));
+}
+
+public cdecl nothrow int stat(const char* path, byte* statBuf)
 {
     return cast<int>(trap(0u, sys_stat, 0u, path, statBuf));
 }

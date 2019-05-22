@@ -179,6 +179,20 @@ namespace cmsx.machine
         {
             pc = pc_;
         }
+        public nothrow string ToString() const
+        {
+            string s;
+            s.Append("pc=").Append(ToHexString(pc)).Append("\n");
+            s.Append("sp=").Append(ToHexString(Get(regSP))).Append("\n");
+            s.Append("fp=").Append(ToHexString(Get(regFP))).Append("\n");
+            s.Append("ix=").Append(ToHexString(Get(regIX))).Append("\n");
+            s.Append("ax=").Append(ToHexString(Get(regAX))).Append("\n");
+            s.Append("bx=").Append(ToHexString(Get(regBX))).Append("\n");
+            s.Append("cx=").Append(ToHexString(Get(regCX))).Append("\n");
+            s.Append("dx=").Append(ToHexString(Get(regDX))).Append("\n");
+            s.Append("ex=").Append(ToHexString(Get(regEX))).Append("\n");
+            return s;
+        }
         private ulong[256] localRegs;
         private ulong[256] globalRegs;
         private ulong pc;

@@ -2041,6 +2041,19 @@ namespace cmsx.intermediate
                 valueReg = valueRegisterDescriptor->reg;
                 loaded = true;
             }
+            else if (value is PtrValue*)
+            {
+                PtrValue* ptrValue = cast<PtrValue*>(value);
+                ConstantValue* initializer = ptrValue->globalVariable->initializer;
+                if (initializer != null && ((initializer is StringValue*) || (initializer is StringArrayValue*)))
+                {
+                    List<Register*> dontUse;
+                    RegisterDescriptor* valueRegisterDescriptor = registerDescriptors.GetLocalRegDescriptor(dontUse, addressDescriptors, machineCode, line, this);
+                    valueReg = valueRegisterDescriptor->reg;
+                    LoadOperandAddress(value, valueRegisterDescriptor, addressDescriptors, machineCode, line, this);
+                    loaded = true;
+                }
+            }
             if (!loaded)
             {
                 AddressDescriptor* valueAddressDescriptor = addressDescriptors.GetAddressDescriptor(value);
@@ -3537,8 +3550,7 @@ namespace cmsx.intermediate
             RegisterDescriptor* rz = null;
             RegisterDescriptors& registerDescriptors = parent->registerDescriptors;
             AddressDescriptors& addressDescriptors = parent->function.addressDescriptors;
-            bool useRegYForX = CanUseRegYForX(y, registerDescriptors, addressDescriptors);
-            GetReg(x, y, z, useRegYForX, registerDescriptors, addressDescriptors, machineCode, line, rx, ry, rz, this);
+            GetReg(x, y, z, false, registerDescriptors, addressDescriptors, machineCode, line, rx, ry, rz, this);
             if (y is LiteralValue*)
             {
                 y->GenerateSetValue(ry->reg, machineCode, line, this);
