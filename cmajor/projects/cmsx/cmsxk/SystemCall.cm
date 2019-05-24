@@ -526,7 +526,8 @@ namespace cmsx.kernel
         {
             Panic("invalid unlink parameters: " + ToString(sc.x) + ", " + ToString(sc.y) + ", " + ToString(sc.z));
         }
-        throw SystemError(ENOTSUPPORTED, "not implemented yet");
+        Unlink(*sc.machine, sc.process, sc.ax);
+        sc.result = 0;
     }
 
     public void Mkdir(SystemCall& sc)
@@ -535,7 +536,7 @@ namespace cmsx.kernel
         {
             Panic("invalid mkdir parameters: " + ToString(sc.x) + ", " + ToString(sc.y) + ", " + ToString(sc.z));
         }
-        Mkdir(*sc.machine, sc.process, cast<ulong>(sc.ax));
+        Mkdir(*sc.machine, sc.process, sc.ax);
     }
 
     public void OpenDir(SystemCall& sc)
@@ -544,7 +545,7 @@ namespace cmsx.kernel
         {
             Panic("invalid opendir parameters: " + ToString(sc.x) + ", " + ToString(sc.y) + ", " + ToString(sc.z));
         }
-        sc.result = OpenDir(*sc.machine, sc.process, cast<ulong>(sc.ax));
+        sc.result = OpenDir(*sc.machine, sc.process, sc.ax);
     }
 
     public void ReadDir(SystemCall& sc)

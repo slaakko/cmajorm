@@ -154,9 +154,9 @@ namespace System.Os
         return result != 0;
     }
     
-    public void RemoveFile(const char* filePath)
+    public void Unlink(const char* path)
     {
-        int result = unlink(filePath);
+        int result = unlink(path);
         if (result == -1)
         {
             ThrowSystemError();

@@ -167,9 +167,9 @@ public cdecl nothrow long get_random_seed()
     return trap(0u, sys_get_random_seed, 0u);
 }
 
-public cdecl nothrow int unlink(const char* filePath)
+public cdecl nothrow int unlink(const char* path)
 {
-    return cast<int>(trap(0u, sys_unlink, 0u, filePath));
+    return cast<int>(trap(0u, sys_unlink, 0u, path));
 }
 
 public cdecl nothrow int mkdir(const char* path)

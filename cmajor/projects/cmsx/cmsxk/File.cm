@@ -116,6 +116,22 @@ namespace cmsx.kernel
         return file->IsConsole();
     }
 
+    public void Unlink(Machine& machine, Process* process, ulong pathAddress)
+    {
+        if (pathAddress == 0u)
+        {
+            throw SystemError(EINVAL, "path address is null");
+        }
+        string path;
+        ReadStringFromProcessMemory(machine, process, pathAddress, path);
+        if (path.IsEmpty())
+        {
+            throw SystemError(EINVAL, "path is empty");
+        }
+        FileSystem* fs = GetMountTable().GetFileSystem(0);
+        fs->Unlink(process, path);
+    }
+
     public void Mkdir(Machine& machine, Process* process, ulong pathAddress)
     {
         if (pathAddress == 0u)

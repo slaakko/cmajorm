@@ -163,6 +163,72 @@ namespace cmsx.kernel
             inodePutter.ResetINode();
             return fd;
         }
+        public override void Unlink(Process* process, const string& path)
+        {
+            if (Log())
+            {
+                LogMessage("fs.root.unlink", path);
+            }
+            string parentPath = Path.GetDirectoryName(path);
+            string entryName = Path.GetFileName(path);
+            INode* parent = GetINodeManager().PathToINode(process, parentPath);
+            if (parent == null)
+            {
+                throw SystemError(ENOENT, "directory '" + parentPath + "' does not exist");
+            }
+            INodePutter parentPutter(parent);
+            parent->ResetFlag(INode.Flags.locked);
+            INode* inode = GetINodeManager().PathToINode(process, path);
+            parent->SetFlag(INode.Flags.locked);
+            if (inode == null)
+            {
+                throw SystemError(ENOENT, "path '" + path + "' does not exist");
+            }
+            INodePutter inodePutter(inode);
+            if (Log())
+            {
+                LogMessage("fs.root.unlink", "parent=" + parent->ToString());
+                LogMessage("fs.root.unlink", "inode=" + inode->ToString());
+            }
+            long offset = 0;
+            bool entryReset = false;
+            while (!entryReset && offset < parent->GetFileSize())
+            {
+                int blockNumber = 0;
+                int blockOffset = 0;
+                GetBlockManager().GetBlockNumber(parent, offset, blockNumber, blockOffset, false);
+                if (blockNumber == 0)
+                {
+                    throw SystemError(EFAIL, "directory block number not found from inode of '" + parentPath + "'");
+                }
+                Block* block = GetBlockManager().ReadBlock(BlockKey(blockNumber, parent->Key().fsNumber, BlockKind.directoryBlock), null);
+                BlockPutter putter(block);
+                #assert(block is DirectoryBlock*);
+                DirectoryBlock* directoryBlock = cast<DirectoryBlock*>(block);
+                for (int index = blockOffset / directoryEntrySize; index < numDirectoryEntriesInBlock && offset < parent->GetFileSize(); ++index)
+                {
+                    DirectoryEntry& entry = directoryBlock->GetDirectoryEntry(index);
+                    string name = &entry.name[0];
+                    if (name == entryName)
+                    {
+                        entry.inodeNumber = 0;
+                        GetBlockManager().WriteBlock(block, null);
+                        entryReset = true;
+                        break;
+                    }
+                    offset = offset + directoryEntrySize;
+                }
+            }
+            if (!entryReset)
+            {
+                throw SystemError(EFAIL, "directory entry for '" + path + "' not found");
+            }
+            inode->SetNumLinks(inode->GetNumLinks() - 1);
+            if (Log())
+            {
+                LogMessage("fs.root.unlink", "return.inode=" + inode->ToString());
+            }
+        }
         public override void MakeDirectory(Process* process, const string& path)
         {
             if (Log())

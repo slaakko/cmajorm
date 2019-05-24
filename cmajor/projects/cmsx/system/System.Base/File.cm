@@ -108,7 +108,14 @@ namespace System.IO
         }
         public static void Remove(const string& filePath)
         {
-            RemoveFile(filePath.Chars());
+            if (Exists(filePath))
+            {
+                Unlink(filePath.Chars());
+            }
+            else
+            {
+                throw SystemError(ENOENT, "could not remove file: file '" + filePath + "' does not exist");
+            }
         }
     }
 }

@@ -5,6 +5,7 @@
 
 using System;
 using System.Collections;
+using System.Os;
 
 namespace System.IO
 {
@@ -15,7 +16,7 @@ namespace System.IO
     {
         public static bool Exists(const string& directoryPath)
         {
-            byte[System.Os.statBufSize] statBuf;
+            byte[statBufSize] statBuf;
             int result = stat(directoryPath.Chars(), &statBuf[0]);
             if (result == -1) 
             {
@@ -26,6 +27,17 @@ namespace System.IO
                 StatInfo statInfo;
                 StatBufToStatInfo(&statBuf[0], statInfo);
                 return statInfo.Type() == FileType.directory;
+            }
+        }
+        public static void Remove(const string& directoryPath)
+        {
+            if (Exists(directoryPath))
+            {
+                Unlink(directoryPath.Chars());
+            }
+            else
+            {
+                throw SystemError(ENOENT, "could not remove directory: directory '" + directoryPath + "' does not exist");
             }
         }
     }
@@ -52,14 +64,14 @@ namespace System.IO
         }
         if (!Directory.Exists(dir))
         {
-            System.Os.Mkdir(dir.Chars());
+            Mkdir(dir.Chars());
         }
         for (int i = next; i < n; ++i)
         {
             dir = Path.Combine(dir, components[i]);
             if (!Directory.Exists(dir))
             {
-                System.Os.Mkdir(dir.Chars());
+                Mkdir(dir.Chars());
             }
         }
     }
@@ -72,19 +84,19 @@ namespace System.IO
     
     public class DirectoryReader
     {
-        public nothrow DirectoryReader(const string& dirPath) : dd(System.Os.OpenDir(dirPath.Chars()))
+        public nothrow DirectoryReader(const string& dirPath) : dd(OpenDir(dirPath.Chars()))
         {
         }
         public bool Read(DirectoryEntry& dirEntry)
         {
-            int result = System.Os.ReadDir(dd, &dirEntry.inodeNumber, &dirEntry.entryName[0]);
+            int result = ReadDir(dd, &dirEntry.inodeNumber, &dirEntry.entryName[0]);
             return result == 1;
         }
         public ~DirectoryReader()
         {
             try
             {
-                System.Os.CloseDir(dd);
+                CloseDir(dd);
             }
             catch (const Exception&)
             {
@@ -98,7 +110,7 @@ namespace System.IO
         Buffer buffer(pathMax);
         char* buf = cast<char*>(cast<void*>(buffer.Mem()));
         long count = buffer.Size();
-        System.Os.GetCWD(buf, count);
+        GetCWD(buf, count);
         return string(buf);
     }
     
@@ -315,7 +327,7 @@ namespace System.IO
     
     public nothrow void StatBufToStatInfo(byte* statBuf, StatInfo& statInfo)
     {
-        MemoryReader reader(statBuf, System.Os.statBufSize);
+        MemoryReader reader(statBuf, statBufSize);
         statInfo.Read(reader);
     }
 }

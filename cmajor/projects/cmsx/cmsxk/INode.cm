@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Collections;
 using cmsx.util;
 
@@ -815,9 +816,22 @@ namespace cmsx.kernel
                 parent = inode;
                 inodePutter.ResetINode();
             }
+            string dir;
             for (long pi = 0; pi < pn; ++pi)
             {
                 const string& pathComponent = pathComponents[pi];
+                if (pathComponent.IsEmpty())
+                {
+                    dir = "/";
+                    if (!createEntry)
+                    {
+                        continue;
+                    }
+                }
+                else
+                {
+                    dir = Path.Combine(dir, pathComponent);
+                }
                 if (createEntry)
                 {
                     if (pi == pn - 1)
@@ -891,14 +905,21 @@ namespace cmsx.kernel
                             offset = offset + directoryEntrySize;
                         }
                     }
-                    if (!found && pi == pn - 1)
+                    if (!found)
                     {
-                        if (freeDirectorySlot.offset == -1)
+                        if (pi == pn - 1)
                         {
-                            DirectorySlot slot(invalidBlockNumber, inode->Key().fsNumber, offset);
-                            freeDirectorySlot = slot;
+                            if (freeDirectorySlot.offset == -1)
+                            {
+                                DirectorySlot slot(invalidBlockNumber, inode->Key().fsNumber, offset);
+                                freeDirectorySlot = slot;
+                            }
+                            return null;
                         }
-                        return null;
+                        else if (pi < pn - 1 && process != null)
+                        {
+                            throw SystemError(ENOENT, "directory '" + dir + "' not found");
+                        }
                     }
                 }
                 else
