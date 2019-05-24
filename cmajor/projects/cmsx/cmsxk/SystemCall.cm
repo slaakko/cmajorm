@@ -29,14 +29,15 @@ namespace cmsx.kernel
     public const byte sys_is_host_text_file = 23u;
     public const byte sys_is_console = 24u;
     public const byte sys_get_random_seed = 25u;
-    public const byte sys_unlink = 26u;
-    public const byte sys_mkdir = 27u;
-    public const byte sys_opendir = 28u;
-    public const byte sys_readdir = 29u;
-    public const byte sys_closedir = 30u;
-    public const byte sys_getcwd = 31u;
-    public const byte sys_chdir = 32u;
-    public const byte sys_stat = 33u;
+    public const byte sys_link = 26u;
+    public const byte sys_unlink = 27u;
+    public const byte sys_mkdir = 28u;
+    public const byte sys_opendir = 29u;
+    public const byte sys_readdir = 30u;
+    public const byte sys_closedir = 31u;
+    public const byte sys_getcwd = 32u;
+    public const byte sys_chdir = 33u;
+    public const byte sys_stat = 34u;
     public const byte numSystemCalls = sys_stat + 1u;
 
     public nothrow string SystemCallName(byte systemCall)
@@ -69,6 +70,7 @@ namespace cmsx.kernel
             case sys_is_host_text_file: return "sys_is_host_text_file";
             case sys_is_console: return "sys_is_console";
             case sys_get_random_seed: return "sys_get_random_seed";
+            case sys_link: return "sys_link";
             case sys_unlink: return "sys_unlink";
             case sys_mkdir: return "sys_mkdir";
             case sys_opendir: return "sys_opendir";
@@ -518,6 +520,15 @@ namespace cmsx.kernel
             Panic("invalid get_random_seed parameters: " + ToString(sc.x) + ", " + ToString(sc.y) + ", " + ToString(sc.z));
         }
         sc.result = RtGetRandomSeed();
+    }
+
+    public void Link(SystemCall& sc)
+    {
+        if (sc.x != 0u || sc.y != sys_link || sc.z != 0u)
+        {
+            Panic("invalid link parameters: " + ToString(sc.x) + ", " + ToString(sc.y) + ", " + ToString(sc.z));
+        }
+        Link(*sc.machine, sc.process, sc.ax, sc.bx);
     }
 
     public void Unlink(SystemCall& sc)

@@ -685,7 +685,10 @@ namespace cmsx.kernel
                     inode->ResetFlags();
                     inode->SetFlag(INode.Flags.locked);
                     inode->SetUseCount(1);
-                    inode->SetNumLinks(1);
+                    if (inode->GetNumLinks() == 0)
+                    {
+                        inode->SetNumLinks(1);
+                    }
                     if (Log())
                     {
                         LogMessage("fs.imgr.getinode.end", inode->ToString());

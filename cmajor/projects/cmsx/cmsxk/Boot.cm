@@ -130,6 +130,9 @@ namespace cmsx.kernel
         SystemCallHandler getRandomSeedSystemCallHandler = GetRandomSeed;
         ulong getRandomSeedSystemCallAddress = cast<ulong>(cast<void*>(getRandomSeedSystemCallHandler));
         mem.WriteULong(MakeSystemCallPtrAddress(sys_get_random_seed), getRandomSeedSystemCallAddress, Protection.write);
+        SystemCallHandler linkSystemCallHandler = Link;
+        ulong linkSystemCallAddress = cast<ulong>(cast<void*>(linkSystemCallHandler));
+        mem.WriteULong(MakeSystemCallPtrAddress(sys_link), linkSystemCallAddress, Protection.write);
         SystemCallHandler unlinkSystemCallHandler = Unlink;
         ulong unlinkSystemCallAddress = cast<ulong>(cast<void*>(unlinkSystemCallHandler));
         mem.WriteULong(MakeSystemCallPtrAddress(sys_unlink), unlinkSystemCallAddress, Protection.write);

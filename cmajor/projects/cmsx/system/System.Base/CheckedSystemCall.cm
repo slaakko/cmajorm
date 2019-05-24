@@ -154,6 +154,15 @@ namespace System.Os
         return result != 0;
     }
     
+    public void Link(const char* sourcePath, const char* targetPath)
+    {
+        int result = link(sourcePath, targetPath);
+        if (result == -1)
+        {
+            ThrowSystemError();
+        }
+    }
+    
     public void Unlink(const char* path)
     {
         int result = unlink(path);

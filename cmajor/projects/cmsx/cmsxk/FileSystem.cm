@@ -9,6 +9,7 @@ namespace cmsx.kernel
         public abstract void Init();
         public abstract int Create(Process* process, const string& path, int mode, bool truncate);
         public abstract int Open(Process* process, const string& path, OpenFlags flags, int mode);
+        public abstract void Link(Process* process, const string& sourcePath, const string& targetPath);
         public abstract void Unlink(Process* process, const string& path);
         public abstract void MakeDirectory(Process* process, const string& path);
         public abstract int OpenDirectory(Process* process, const string& path);

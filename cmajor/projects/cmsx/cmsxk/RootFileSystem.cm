@@ -94,7 +94,7 @@ namespace cmsx.kernel
                 Block* block = null;
                 if (freeDirectorySlot.blockNumber != invalidBlockNumber)
                 {
-                    block = GetBlockManager().ReadBlock(BlockKey(freeDirectorySlot.blockNumber, inode->Key().fsNumber, BlockKind.directoryBlock), null);
+                    block = GetBlockManager().ReadBlock(BlockKey(freeDirectorySlot.blockNumber, parent->Key().fsNumber, BlockKind.directoryBlock), null);
                 }
                 else
                 {
@@ -162,6 +162,90 @@ namespace cmsx.kernel
             process->fileTable.SetFile(fd, regularFile);
             inodePutter.ResetINode();
             return fd;
+        }
+        public override void Link(Process* process, const string& sourcePath, const string& targetPath)
+        {
+            if (Log())
+            {
+                LogMessage("fs.root.link", sourcePath + "->" + targetPath);
+            }
+            INode* source = GetINodeManager().PathToINode(process, sourcePath);
+            if (source == null)
+            {
+                throw SystemError(ENOENT, "source path '" + sourcePath + "' does not exist");
+            }
+            if (Log())
+            {
+                LogMessage("fs.root.link", "source=" + source->ToString());
+            }
+            INodePutter sourcePutter(source);
+            DirectorySlot freeDirectorySlot;
+            INode* parent = null;
+            string name;
+            INode* inode = GetINodeManager().PathToINode(process, targetPath, true, parent, freeDirectorySlot, name);
+            INodePutter parentPutter(parent);
+            if (inode != null)
+            {
+                throw SystemError(EEXIST, "target path '" + targetPath + "' already exists");
+            }
+            if (name.IsEmpty())
+            {
+                throw SystemError(EINVAL, "invalid path name '" + targetPath + "'");
+            }
+            if (parent == null)
+            {
+                throw SystemError(EINVAL, "parent path of path '" + targetPath + "' not found ");
+            }
+            if (Log())
+            {
+                LogMessage("fs.root.link", "parent=" + parent->ToString());
+            }
+            parent->CheckPermissions(process->uid, process->gid, Access.write);
+            if (source->Key().fsNumber != parent->Key().fsNumber)
+            {
+                throw SystemError(EINVAL, "cannot link across file systems: source file system number: " + ToString(source->Key().fsNumber) + ", target file system number: " + ToString(parent->Key().fsNumber));
+            }
+            FileSystem* fs = GetMountTable().GetFileSystem(parent->Key().fsNumber);
+            Block* block = null;
+            if (freeDirectorySlot.blockNumber != invalidBlockNumber)
+            {
+                block = GetBlockManager().ReadBlock(BlockKey(freeDirectorySlot.blockNumber, parent->Key().fsNumber, BlockKind.directoryBlock), null);
+            }
+            else
+            {
+                int blockNumber = 0;
+                int blockOffset = 0;
+                GetBlockManager().GetBlockNumber(parent, freeDirectorySlot.offset, blockNumber, blockOffset, true);
+                block = GetBlockManager().GetBlock(BlockKey(blockNumber, parent->Key().fsNumber, BlockKind.directoryBlock), null);
+            }
+            BlockPutter blockPutter(block);
+            DirectoryBlock* directoryBlock = cast<DirectoryBlock*>(block);
+            bool created = false;
+            for (int i = 0; i < numDirectoryEntriesInBlock; ++i)
+            {
+                DirectoryEntry& entry = directoryBlock->GetDirectoryEntry(i);
+                if (entry.inodeNumber == 0)
+                {
+                    entry.inodeNumber = source->Key().inodeNumber;
+                    StrCopy(&entry.name[0], name.Chars(), nameMax);
+                    if (freeDirectorySlot.blockNumber == invalidBlockNumber || freeDirectorySlot.offset >= parent->GetFileSize())
+                    {
+                        parent->SetFileSize(parent->GetFileSize() + directoryEntrySize);
+                    }
+                    created = true;
+                    break;
+                }
+            }
+            if (created)
+            {
+                GetBlockManager().WriteBlock(directoryBlock, null);
+                parent->SetMTime();
+                source->SetNumLinks(source->GetNumLinks() + 1);
+            }
+            else
+            {
+                throw SystemError(EFAIL, "no room for target directory entry");
+            }
         }
         public override void Unlink(Process* process, const string& path)
         {
@@ -234,6 +318,10 @@ namespace cmsx.kernel
             if (Log())
             {
                 LogMessage("fs.root.makedirectory", path);
+            }
+            if (process != null && path == "/")
+            {
+                throw SystemError(EEXIST, "directory '" + path + "' already exists");
             }
             DirectorySlot freeDirectorySlot;
             INode* parent = null;

@@ -29,14 +29,15 @@ public const byte sys_pow = 22u;
 public const byte sys_is_host_text_file = 23u;
 public const byte sys_is_console = 24u;
 public const byte sys_get_random_seed = 25u;
-public const byte sys_unlink = 26u;
-public const byte sys_mkdir = 27u;
-public const byte sys_opendir = 28u;
-public const byte sys_readdir = 29u;
-public const byte sys_closedir = 30u;
-public const byte sys_getcwd = 31u;
-public const byte sys_chdir = 32u;
-public const byte sys_stat = 33u;
+public const byte sys_link = 26u;
+public const byte sys_unlink = 27u;
+public const byte sys_mkdir = 28u;
+public const byte sys_opendir = 29u;
+public const byte sys_readdir = 30u;
+public const byte sys_closedir = 31u;
+public const byte sys_getcwd = 32u;
+public const byte sys_chdir = 33u;
+public const byte sys_stat = 34u;
 
 public cdecl nothrow void exit(byte exitCode)
 {
@@ -165,6 +166,11 @@ public cdecl nothrow int is_console(int fd)
 public cdecl nothrow long get_random_seed()
 {
     return trap(0u, sys_get_random_seed, 0u);
+}
+
+public cdecl nothrow int link(const char* sourcePath, const char* targetPath)
+{
+    return cast<int>(trap(0u, sys_link, 0u, sourcePath, targetPath));
 }
 
 public cdecl nothrow int unlink(const char* path)
