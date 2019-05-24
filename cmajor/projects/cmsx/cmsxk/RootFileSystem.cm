@@ -64,11 +64,16 @@ namespace cmsx.kernel
             {
                 throw SystemError(EINVAL, "invalid path name '" + path + "'");
             }
+            if (parent == null)
+            {
+                throw SystemError(EINVAL, "parent path of path '" + path + "' not found ");
+            }
             if (inode != null)
             {
                 if (truncate)
                 {
                     GetBlockManager().FreeBlocks(inode);
+                    inode->SetFileSize(0);
                     inode->SetMTime();
                 }
             }
@@ -80,6 +85,12 @@ namespace cmsx.kernel
                 INodeKey key(inodeNumber, parent->Key().fsNumber);
                 inode = GetINodeManager().GetINode(key);
                 inodePutter.ResetINode(inode);
+                inode->SetType(FileType.regular);
+                inode->SetMode(mode);
+                inode->SetUID(process->uid);
+                inode->SetGID(process->gid);
+                inode->SetFileSize(0);
+                inode->SetMTime();
                 Block* block = null;
                 if (freeDirectorySlot.blockNumber != invalidBlockNumber)
                 {
@@ -90,7 +101,7 @@ namespace cmsx.kernel
                     int blockNumber = 0;
                     int blockOffset = 0;
                     GetBlockManager().GetBlockNumber(parent, freeDirectorySlot.offset, blockNumber, blockOffset, true);
-                    block = GetBlockManager().GetBlock(BlockKey(blockNumber, inode->Key().fsNumber, BlockKind.directoryBlock), null);
+                    block = GetBlockManager().GetBlock(BlockKey(blockNumber, parent->Key().fsNumber, BlockKind.directoryBlock), null);
                 }
                 BlockPutter blockPutter(block);
                 DirectoryBlock* directoryBlock = cast<DirectoryBlock*>(block);
@@ -102,6 +113,10 @@ namespace cmsx.kernel
                     {
                         entry.inodeNumber = inode->Key().inodeNumber;
                         StrCopy(&entry.name[0], name.Chars(), nameMax);
+                        if (freeDirectorySlot.blockNumber == invalidBlockNumber || freeDirectorySlot.offset >= parent->GetFileSize())
+                        {
+                            parent->SetFileSize(parent->GetFileSize() + directoryEntrySize);
+                        }
                         created = true;
                         break;
                     }
@@ -116,7 +131,13 @@ namespace cmsx.kernel
                     throw SystemError(EFAIL, "no room for directory entry");
                 }
             }
-            return 0;
+            INodeLock lock(inode);
+            int fd = process->fileTable.GetEmptyFileSlot();
+            FilePtr* filePtr = new FilePtr(inode, cast<OpenFlags>(OpenFlags.read | OpenFlags.write | OpenFlags.create | OpenFlags.truncate));
+            RegularFile* regularFile = new RegularFile(name, filePtr);
+            process->fileTable.SetFile(fd, regularFile);
+            inodePutter.ResetINode();
+            return fd;
         }
         public override int Open(Process* process, const string& path, OpenFlags flags, int mode)
         {
@@ -128,15 +149,19 @@ namespace cmsx.kernel
             {
                 return Create(process, path, mode, (flags & OpenFlags.truncate) != OpenFlags.none);
             }
-            DirectorySlot freeDirectorySlot;
-            INode* parent = null;
-            string name;
-            INode* inode = GetINodeManager().PathToINode(process, path, false, parent, freeDirectorySlot, name);
+            INode* inode = GetINodeManager().PathToINode(process, path);
             if (inode == null)
             {
                 throw SystemError(ENOENT, "path '" + path + "' does not exist");
             }
-            return 0;
+            INodePutter inodePutter(inode);
+            INodeLock lock(inode);
+            int fd = process->fileTable.GetEmptyFileSlot();
+            FilePtr* filePtr = new FilePtr(inode, flags);
+            RegularFile* regularFile = new RegularFile(Path.GetFileName(path), filePtr);
+            process->fileTable.SetFile(fd, regularFile);
+            inodePutter.ResetINode();
+            return fd;
         }
         public override void MakeDirectory(Process* process, const string& path)
         {
@@ -206,7 +231,7 @@ namespace cmsx.kernel
                     {
                         entry.inodeNumber = inode->Key().inodeNumber;
                         StrCopy(&entry.name[0], name.Chars(), nameMax);
-                        if (freeDirectorySlot.blockNumber == invalidBlockNumber || freeDirectorySlot.offset >= inode->GetFileSize())
+                        if (freeDirectorySlot.blockNumber == invalidBlockNumber || freeDirectorySlot.offset >= parent->GetFileSize())
                         {
                             parent->SetFileSize(parent->GetFileSize() + directoryEntrySize);
                         }
@@ -285,10 +310,7 @@ namespace cmsx.kernel
             {
                 LogMessage("fs.root.opendirectory", path);
             }
-            DirectorySlot freeDirectorySlot;
-            INode* parent = null;
-            string name;
-            INode* dirINode = GetINodeManager().PathToINode(process, path, false, parent, freeDirectorySlot, name);
+            INode* dirINode = GetINodeManager().PathToINode(process, path);
             if (dirINode == null)
             {
                 throw SystemError(ENOENT, "path '" + path + "' does not exist");
@@ -395,7 +417,14 @@ namespace cmsx.kernel
                             INodeKey key(directoryEntry.inodeNumber, dirINode->Key().fsNumber);
                             if (key != dirINode->Key())
                             {
-                                parentINode = GetINodeManager().GetINode(key);
+                                if (key != rootINode->Key())
+                                {
+                                    parentINode = GetINodeManager().GetINode(key);
+                                }
+                                else
+                                {
+                                    parentINode = rootINode;
+                                }
                             }
                             else
                             {
@@ -442,10 +471,7 @@ namespace cmsx.kernel
         }
         public override void ChDir(Process* process, const string& path)
         {
-            DirectorySlot freeDirectorySlot;
-            INode* parent = null;
-            string name;
-            INode* inode = GetINodeManager().PathToINode(process, path, false, parent, freeDirectorySlot, name);
+            INode* inode = GetINodeManager().PathToINode(process, path);
             if (inode == null)
             {
                 throw SystemError(ENOENT, "path '" + path + "' does not exist");
@@ -455,10 +481,7 @@ namespace cmsx.kernel
         }
         public override void Stat(Process* process, const string& path, ulong statBufAddress)
         {
-            DirectorySlot freeDirectorySlot;
-            INode* parent = null;
-            string name;
-            INode* inode = GetINodeManager().PathToINode(process, path, false, parent, freeDirectorySlot, name);
+            INode* inode = GetINodeManager().PathToINode(process, path);
             if (inode == null)
             {
                 throw SystemError(ENOENT, "path '" + path + "' does not exist");
@@ -525,9 +548,12 @@ namespace cmsx.kernel
         }
         public override nothrow void SetLastBlockNumber(int blockNumber, SuperBlock* sb)
         {
-            if (sb != null && sb->Key().fsNumber == 0 && sb->GetLastBlockNumber() < blockNumber)
+            if (sb != null && sb->Key().fsNumber == 0)
             {
-                sb->SetLastBlockNumber(blockNumber);
+                if (sb->GetLastBlockNumber() < blockNumber)
+                {
+                    sb->SetLastBlockNumber(blockNumber);
+                }
             }
             else
             {

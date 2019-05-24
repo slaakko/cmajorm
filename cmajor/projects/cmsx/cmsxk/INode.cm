@@ -256,6 +256,12 @@ namespace cmsx.kernel
         {
             return mode;
         }
+        public void SetMode(int mode)
+        {
+            FileType type;
+            Flags f;
+            DecodeMode(mode, type, ownerAccess, groupAccess, otherAccess, f);
+        }
         public nothrow inline int UID() const
         {
             return uid;
@@ -503,11 +509,24 @@ namespace cmsx.kernel
             SuperBlock* superBlock = cast<SuperBlock*>(sb);
             int firstNumber = superBlock->GetFirstINodeBitmapBlockNumber();
             int bitmapBlockIndex = 0;
-            Block* block = GetBlockManager().GetBlock(BlockKey(firstNumber + bitmapBlockIndex, superBlock->Key().fsNumber, BlockKind.bitmapBlock), superBlock);
+            Block* block = null;
+            if (Log())
+            {
+                LogMessage("fs.ibm.init", ToString(firstNumber + bitmapBlockIndex));
+            }
+            if (superBlock->GetLastBlockNumber() < firstNumber + bitmapBlockIndex)
+            {
+                block = GetBlockManager().GetBlock(BlockKey(firstNumber + bitmapBlockIndex, superBlock->Key().fsNumber, BlockKind.bitmapBlock), superBlock);
+            }
+            else
+            {
+                block = GetBlockManager().ReadBlock(BlockKey(firstNumber + bitmapBlockIndex, superBlock->Key().fsNumber, BlockKind.bitmapBlock), superBlock);
+            }
             #assert(block is BitmapBlock*);
             BlockPutter putter(block);
             BitmapBlock* bitmapBlock = cast<BitmapBlock*>(block);
             bitmapBlock->SetBit(0);
+            GetBlockManager().WriteBlock(block, superBlock);
         }
         public int GetFreeINodeNumber()
         {
@@ -544,9 +563,9 @@ namespace cmsx.kernel
                     {
                         LogMessage("fs.ibm.getfreeinodenumber", "end.inode=" + ToString(inodeNumber));
                     }
+                    GetBlockManager().WriteBlock(block, superBlock);
                     return inodeNumber;
                 }
-                GetBlockManager().WriteBlock(block, superBlock);
             }
             throw SystemError(ERLIMITEXCEEDED, "no free inodes");
         }
@@ -740,6 +759,13 @@ namespace cmsx.kernel
             {
                 LogMessage("fs.imgr.putinode.end", inode->ToString());
             }
+        }
+        public INode* PathToINode(Process* process, const string& path)
+        {
+            DirectorySlot freeDirectorySlot;
+            INode* parent = null;
+            string name;
+            return PathToINode(process, path, false, parent, freeDirectorySlot, name);
         }
         public INode* PathToINode(Process* process, const string& path, bool createEntry, INode*& parent, DirectorySlot& freeDirectorySlot, string& name)
         {

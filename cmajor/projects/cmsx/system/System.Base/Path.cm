@@ -77,6 +77,12 @@ namespace System.IO
     
     public static class Path
     {
+        public static bool Exists(const string& path)
+        {
+            byte[System.Os.statBufSize] statBuf;
+            int result = stat(path.Chars(), &statBuf[0]);
+            return result != -1;
+        }
         public static nothrow string MakeCanonical(const string& path)
         {
             string result;

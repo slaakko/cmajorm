@@ -4,11 +4,65 @@
 // =================================
 
 using System;
+using System.Collections;
 
 namespace System.IO
 {
     public const int nameMax = 252;
     public const int pathMax = 4096;
+    
+    public static class Directory
+    {
+        public static bool Exists(const string& directoryPath)
+        {
+            byte[System.Os.statBufSize] statBuf;
+            int result = stat(directoryPath.Chars(), &statBuf[0]);
+            if (result == -1) 
+            {
+                return false;
+            }
+            else
+            {
+                StatInfo statInfo;
+                StatBufToStatInfo(&statBuf[0], statInfo);
+                return statInfo.Type() == FileType.directory;
+            }
+        }
+    }
+    
+    public void CreateDirectories(const string& directoryPath)
+    {
+        if (directoryPath.IsEmpty())
+        {
+            throw InvalidPathException("directory path is empty");
+        }
+        List<string> components = directoryPath.Split('/');
+        int n = cast<int>(components.Count());
+        string dir;
+        int next = 0;
+        if (components[0].IsEmpty())
+        {
+            dir = "/" + components[1];
+            next = 2;
+        }
+        else
+        {
+            dir = components[0];
+            next = 1;
+        }
+        if (!Directory.Exists(dir))
+        {
+            System.Os.Mkdir(dir.Chars());
+        }
+        for (int i = next; i < n; ++i)
+        {
+            dir = Path.Combine(dir, components[i]);
+            if (!Directory.Exists(dir))
+            {
+                System.Os.Mkdir(dir.Chars());
+            }
+        }
+    }
     
     public class DirectoryEntry
     {
@@ -46,20 +100,6 @@ namespace System.IO
         long count = buffer.Size();
         System.Os.GetCWD(buf, count);
         return string(buf);
-    }
-    
-    public nothrow ulong DateTimeToULong(const DateTime& dt)
-    {
-        ulong value = 0u;
-        MemoryWriter writer(cast<byte*>(cast<void*>(&value)), 8u);
-        writer.Write(dt);
-        return value;
-    }
-
-    public nothrow DateTime ULongToDateTime(ulong value)
-    {
-        MemoryReader reader(cast<byte*>(cast<void*>(&value)), 8u);
-        return reader.ReadDateTime();
     }
     
     public enum FileType : int

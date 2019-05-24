@@ -5,12 +5,9 @@ int main()
 {
     try
     {
-        Buffer buffer(pathMax);
-        char* buf = cast<char*>(cast<void*>(buffer.Mem()));
-        long count = buffer.Size();
-        System.Os.GetCWD(buf, count);
-        string cwd = buf;
-        Console.WriteLine(cwd);
+        System.Os.ChDir("/home/slaakko");
+        string wd = GetCurrentWorkingDirectory();
+        Console.WriteLine(wd);
     }
     catch (const Exception& ex)
     {

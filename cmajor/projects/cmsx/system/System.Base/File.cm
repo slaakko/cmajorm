@@ -11,13 +11,37 @@ namespace System.IO
 {
     public static class File
     {
-        public static nothrow bool Exists(const string& filePath)
+        public static bool Exists(const string& filePath)
         {
-            return FileExists(filePath.Chars());
+            byte[statBufSize] statBuf;
+            int result = stat(filePath.Chars(), &statBuf[0]);
+            if (result == -1) 
+            {
+                return false;
+            }
+            else
+            {
+                StatInfo statInfo;
+                StatBufToStatInfo(&statBuf[0], statInfo);
+                return statInfo.Type() == FileType.regular;
+            }
         }
         public static long Size(const string& filePath)
         {
-            return GetFileSize(filePath.Chars());
+            if (filePath.IsEmpty())
+            {
+                throw InvalidPathException("file path is empty");
+            }
+            StatInfo statInfo;
+            Stat(filePath.Chars(), statInfo);
+            if (statInfo.Type() == FileType.regular)
+            {
+                return statInfo.GetFileSize();
+            }
+            else
+            {
+                throw InvalidPathException("path '" + filePath + "' is not a file path");
+            }
         }
         public static StreamWriter CreateText(const string& filePath)
         {

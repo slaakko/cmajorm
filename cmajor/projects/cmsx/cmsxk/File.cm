@@ -58,6 +58,20 @@ namespace cmsx.kernel
         return fs->Open(process, path, flags, mode);
     }
 
+    public void Close(Machine& machine, Process* process, int fd)
+    {
+        File* file = process->fileTable.GetFile(fd);
+        if (file != null)
+        {
+            file->Release();
+            process->fileTable.SetFile(fd, null);
+        }
+        else
+        {
+            throw SystemError(EBADF, "file '" + ToString(fd) + "' not open");
+        }
+    }
+
     public long Read(Machine& machine, Process* process, int fd, ulong bufferAddress, long count)
     {
         File* file = process->fileTable.GetFile(fd);
@@ -460,6 +474,14 @@ namespace cmsx.kernel
             }
             return filePtr->Read(machine, reader, bufferAddress, count);
         }
+        public override long Seek(long pos, Origin origin)
+        {
+            return filePtr->Seek(pos, origin);
+        }
+        public override long Tell()
+        {
+            return filePtr->Tell();
+        }
         public override File* Share()
         {
             return new RegularFile(name, filePtr->Share());
@@ -529,6 +551,10 @@ namespace cmsx.kernel
         }
         public long Write(Machine& machine, Process* writer, ulong bufferAddress, long count)
         {
+            if (Log())
+            {
+                LogMessage("fileptr.write", "begin");
+            }
             while (inode->GetFlag(INode.Flags.locked))
             {
                 inode->AddWaitingProcess(writer);
@@ -545,7 +571,7 @@ namespace cmsx.kernel
                     GetBlockManager().GetBlockNumber(inode, pos, blockNumber, blockOffset, true);
                     long bytesToWrite = Min(count, blockSize - blockOffset);
                     Block* block = null;
-                    if (blockOffset != 0 || bytesToWrite != blockSize)
+                    if (inode->GetFileSize() > pos && (blockOffset != 0 || bytesToWrite != blockSize))
                     {
                         block = GetBlockManager().ReadBlock(BlockKey(blockNumber, inode->Key().fsNumber, BlockKind.fileBlock), null);
                     }
@@ -635,6 +661,20 @@ namespace cmsx.kernel
             inode->SetATime();
             return bytesRead;
         }
+        public long Seek(long p, Origin origin)
+        {
+            switch (origin)
+            {
+                case Origin.seekSet: pos = p; return pos;
+                case Origin.seekCur: pos = pos + p; return pos;
+                case Origin.seekEnd: pos = inode->GetFileSize() + p; return pos;
+            }
+            return -1;
+        }
+        public long Tell()
+        {
+            return pos;
+        }
         public FilePtr* Share()
         {
             ++useCount;
@@ -645,6 +685,10 @@ namespace cmsx.kernel
             --useCount;
             if (useCount == 0)
             {
+                if (inode != null)
+                {
+                    GetINodeManager().PutINode(inode);
+                }
                 delete this;
             }
         }

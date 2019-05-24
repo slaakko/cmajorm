@@ -29,16 +29,14 @@ namespace cmsx.kernel
     public const byte sys_is_host_text_file = 23u;
     public const byte sys_is_console = 24u;
     public const byte sys_get_random_seed = 25u;
-    public const byte sys_file_exists = 26u;
-    public const byte sys_get_file_size = 27u;
-    public const byte sys_unlink = 28u;
-    public const byte sys_mkdir = 29u;
-    public const byte sys_opendir = 30u;
-    public const byte sys_readdir = 31u;
-    public const byte sys_closedir = 32u;
-    public const byte sys_getcwd = 33u;
-    public const byte sys_chdir = 34u;
-    public const byte sys_stat = 35u;
+    public const byte sys_unlink = 26u;
+    public const byte sys_mkdir = 27u;
+    public const byte sys_opendir = 28u;
+    public const byte sys_readdir = 29u;
+    public const byte sys_closedir = 30u;
+    public const byte sys_getcwd = 31u;
+    public const byte sys_chdir = 32u;
+    public const byte sys_stat = 33u;
     public const byte numSystemCalls = sys_stat + 1u;
 
     public nothrow string SystemCallName(byte systemCall)
@@ -71,8 +69,6 @@ namespace cmsx.kernel
             case sys_is_host_text_file: return "sys_is_host_text_file";
             case sys_is_console: return "sys_is_console";
             case sys_get_random_seed: return "sys_get_random_seed";
-            case sys_file_exists: return "sys_file_exists";
-            case sys_get_file_size: return "sys_get_file_size";
             case sys_unlink: return "sys_unlink";
             case sys_mkdir: return "sys_mkdir";
             case sys_opendir: return "sys_opendir";
@@ -149,6 +145,11 @@ namespace cmsx.kernel
             {
                 process->lastError = systemError;
                 process->systemCall.result = -1;
+                string s = SystemCallName(process->systemCall.y);
+                s.Append(" failed\n");
+                Kernel& kernel = GetKernel();
+                Debugger* debugger = kernel.GetDebugger();
+                debugger->WriteOutput(cast<byte*>(cast<void*>(s.Chars())), s.Length());
             }
             catch (const Exception& ex)
             {
@@ -230,7 +231,8 @@ namespace cmsx.kernel
         {
             Panic("invalid close parameters: " + ToString(sc.x) + ", " + ToString(sc.y) + ", " + ToString(sc.z));
         }
-        throw SystemError(ENOTSUPPORTED, "not implemented yet");
+        Close(*sc.machine, sc.process, cast<int>(sc.ax));
+        sc.result = 0;
     }
 
     public void Read(SystemCall& sc)
@@ -516,24 +518,6 @@ namespace cmsx.kernel
             Panic("invalid get_random_seed parameters: " + ToString(sc.x) + ", " + ToString(sc.y) + ", " + ToString(sc.z));
         }
         sc.result = RtGetRandomSeed();
-    }
-
-    public void FileExists(SystemCall& sc)
-    {
-        if (sc.x != 0u || sc.y != sys_file_exists || sc.z != 0u)
-        {
-            Panic("invalid file_exists parameters: " + ToString(sc.x) + ", " + ToString(sc.y) + ", " + ToString(sc.z));
-        }
-        throw SystemError(ENOTSUPPORTED, "not implemented yet");
-    }
-
-    public void GetFileSize(SystemCall& sc)
-    {
-        if (sc.x != 0u || sc.y != sys_get_file_size || sc.z != 0u)
-        {
-            Panic("invalid get_file_size parameters: " + ToString(sc.x) + ", " + ToString(sc.y) + ", " + ToString(sc.z));
-        }
-        throw SystemError(ENOTSUPPORTED, "not implemented yet");
     }
 
     public void Unlink(SystemCall& sc)

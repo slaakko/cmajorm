@@ -100,6 +100,9 @@ namespace cmsx.kernel
             runningProcessName = process->name;
             stackTrace = GetProcessStackTrace(machine, process, machine.GetRegisters().Get(cmsx.machine.regFP));
         }
+        Debugger* debugger = kernel.GetDebugger();
+        debugger->WriteOutput(cast<byte*>(cast<void*>("page fault\n")), 11);
+        debugger->Run(process);
         Panic("page fault at virtual address " + ToHexString(virtualAddress) + " , page protection = " + GetProtectionStr(pageProtection) + ", " + GetProtectionStr(protection) + " needed (running process=" +
             runningProcessName + ")\n" + stackTrace + "\nRegisters:\n" + registers);
     }
@@ -234,6 +237,7 @@ namespace cmsx.kernel
         }
         if (process->systemCallReady && !process->systemCall.IsDebugBreak())
         {
+            process->systemCallReady = false;
             long result = process->systemCall.result;
             ulong returnValue = cast<ulong>(result);
             if (Log())

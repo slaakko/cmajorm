@@ -877,126 +877,126 @@ namespace cmsx.kernel
                     fs->SetBlockFree(blockNumber);
                     inode->SetDirectBlockNumber(i, 0);
                 }
-                int singleIndirectBlockNumber = inode->GetSingleIndirectBlockNumber();
-                if (singleIndirectBlockNumber != 0)
+            }
+            int singleIndirectBlockNumber = inode->GetSingleIndirectBlockNumber();
+            if (singleIndirectBlockNumber != 0)
+            {
+                Block* block = ReadBlock(BlockKey(singleIndirectBlockNumber, inode->Key().fsNumber, BlockKind.blockNumberBlock), null);
+                #assert(block is BlockNumberBlock*);
+                BlockPutter putter(block);
+                BlockNumberBlock* singleIndirectBlock = cast<BlockNumberBlock*>(block);
+                for (int i = 0; i < numBlockNumbersInBlock; ++i)
                 {
-                    Block* block = ReadBlock(BlockKey(singleIndirectBlockNumber, inode->Key().fsNumber, BlockKind.blockNumberBlock), null);
-                    #assert(block is BlockNumberBlock*);
-                    BlockPutter putter(block);
-                    BlockNumberBlock* singleIndirectBlock = cast<BlockNumberBlock*>(block);
-                    for (int i = 0; i < numBlockNumbersInBlock; ++i)
+                    int blockNumber = singleIndirectBlock->GetBlockNumber(i);
+                    if (blockNumber != 0)
                     {
-                        int blockNumber = singleIndirectBlock->GetBlockNumber(i);
-                        if (blockNumber != 0)
-                        {
-                            Block* block = GetBlock(BlockKey(blockNumber, inode->Key().fsNumber, BlockKind.fileBlock), null);
-                            #assert(block is FileBlock*);
-                            FileBlock* fileBlock = cast<FileBlock*>(block);
-                            fileBlock->Clear();
-                            BlockPutter putter(block);
-                            WriteBlock(block, null);
-                            fs->SetBlockFree(blockNumber);
-                        }
+                        Block* block = GetBlock(BlockKey(blockNumber, inode->Key().fsNumber, BlockKind.fileBlock), null);
+                        #assert(block is FileBlock*);
+                        FileBlock* fileBlock = cast<FileBlock*>(block);
+                        fileBlock->Clear();
+                        BlockPutter putter(block);
+                        WriteBlock(block, null);
+                        fs->SetBlockFree(blockNumber);
                     }
-                    singleIndirectBlock->Clear();
-                    WriteBlock(block, null);
-                    fs->SetBlockFree(singleIndirectBlockNumber);
-                    inode->SetSingleIndirectBlockNumber(0);
                 }
-                int doubleIndirectBlockNumber = inode->GetDoubleIndirectBlockNumber();
-                if (doubleIndirectBlockNumber != 0)
+                singleIndirectBlock->Clear();
+                WriteBlock(block, null);
+                fs->SetBlockFree(singleIndirectBlockNumber);
+                inode->SetSingleIndirectBlockNumber(0);
+            }
+            int doubleIndirectBlockNumber = inode->GetDoubleIndirectBlockNumber();
+            if (doubleIndirectBlockNumber != 0)
+            {
+                Block* block = ReadBlock(BlockKey(doubleIndirectBlockNumber, inode->Key().fsNumber, BlockKind.blockNumberBlock), null);
+                #assert(block is BlockNumberBlock*);
+                BlockPutter putter(block);
+                BlockNumberBlock* doubleIndirectBlock = cast<BlockNumberBlock*>(block);
+                for (int i = 0; i < numBlockNumbersInBlock; ++i)
                 {
-                    Block* block = ReadBlock(BlockKey(doubleIndirectBlockNumber, inode->Key().fsNumber, BlockKind.blockNumberBlock), null);
-                    #assert(block is BlockNumberBlock*);
-                    BlockPutter putter(block);
-                    BlockNumberBlock* doubleIndirectBlock = cast<BlockNumberBlock*>(block);
-                    for (int i = 0; i < numBlockNumbersInBlock; ++i)
+                    int singleIndirectBlockNumber = doubleIndirectBlock->GetBlockNumber(i);
+                    if (singleIndirectBlockNumber != 0)
                     {
-                        int singleIndirectBlockNumber = doubleIndirectBlock->GetBlockNumber(i);
-                        if (singleIndirectBlockNumber != 0)
+                        Block* block = ReadBlock(BlockKey(singleIndirectBlockNumber, inode->Key().fsNumber, BlockKind.blockNumberBlock), null);
+                        #assert(block is BlockNumberBlock*);
+                        BlockPutter putter(block);
+                        BlockNumberBlock* singleIndirectBlock = cast<BlockNumberBlock*>(block);
+                        for (int i = 0; i < numBlockNumbersInBlock; ++i)
                         {
-                            Block* block = ReadBlock(BlockKey(singleIndirectBlockNumber, inode->Key().fsNumber, BlockKind.blockNumberBlock), null);
-                            #assert(block is BlockNumberBlock*);
-                            BlockPutter putter(block);
-                            BlockNumberBlock* singleIndirectBlock = cast<BlockNumberBlock*>(block);
-                            for (int i = 0; i < numBlockNumbersInBlock; ++i)
+                            int blockNumber = singleIndirectBlock->GetBlockNumber(i);
+                            if (blockNumber != 0)
                             {
-                                int blockNumber = singleIndirectBlock->GetBlockNumber(i);
-                                if (blockNumber != 0)
-                                {
-                                    Block* block = GetBlock(BlockKey(blockNumber, inode->Key().fsNumber, BlockKind.fileBlock), null);
-                                    #assert(block is FileBlock*);
-                                    FileBlock* fileBlock = cast<FileBlock*>(block);
-                                    fileBlock->Clear();
-                                    BlockPutter putter(block);
-                                    WriteBlock(block, null);
-                                    fs->SetBlockFree(blockNumber);
-                                }
+                                Block* block = GetBlock(BlockKey(blockNumber, inode->Key().fsNumber, BlockKind.fileBlock), null);
+                                #assert(block is FileBlock*);
+                                FileBlock* fileBlock = cast<FileBlock*>(block);
+                                fileBlock->Clear();
+                                BlockPutter putter(block);
+                                WriteBlock(block, null);
+                                fs->SetBlockFree(blockNumber);
                             }
-                            singleIndirectBlock->Clear();
-                            WriteBlock(block, null);
-                            fs->SetBlockFree(singleIndirectBlockNumber);
                         }
+                        singleIndirectBlock->Clear();
+                        WriteBlock(block, null);
+                        fs->SetBlockFree(singleIndirectBlockNumber);
                     }
-                    doubleIndirectBlock->Clear();
-                    WriteBlock(block, null);
-                    fs->SetBlockFree(doubleIndirectBlockNumber);
-                    inode->SetDoubleIndirectBlockNumber(0);
                 }
-                int tripleIndirectBlockNumber = inode->GetTripleIndirectBlockNumber();
-                if (tripleIndirectBlockNumber != 0)
+                doubleIndirectBlock->Clear();
+                WriteBlock(block, null);
+                fs->SetBlockFree(doubleIndirectBlockNumber);
+                inode->SetDoubleIndirectBlockNumber(0);
+            }
+            int tripleIndirectBlockNumber = inode->GetTripleIndirectBlockNumber();
+            if (tripleIndirectBlockNumber != 0)
+            {
+                Block* block = ReadBlock(BlockKey(tripleIndirectBlockNumber, inode->Key().fsNumber, BlockKind.blockNumberBlock), null);
+                #assert(block is BlockNumberBlock*);
+                BlockPutter putter(block);
+                BlockNumberBlock* tripleIndirectBlock = cast<BlockNumberBlock*>(block);
+                for (int i = 0; i < numBlockNumbersInBlock; ++i)
                 {
-                    Block* block = ReadBlock(BlockKey(tripleIndirectBlockNumber, inode->Key().fsNumber, BlockKind.blockNumberBlock), null);
-                    #assert(block is BlockNumberBlock*);
-                    BlockPutter putter(block);
-                    BlockNumberBlock* tripleIndirectBlock = cast<BlockNumberBlock*>(block);
-                    for (int i = 0; i < numBlockNumbersInBlock; ++i)
+                    int doubleIndirectBlockNumber = tripleIndirectBlock->GetBlockNumber(i);
+                    if (doubleIndirectBlockNumber != 0)
                     {
-                        int doubleIndirectBlockNumber = tripleIndirectBlock->GetBlockNumber(i);
-                        if (doubleIndirectBlockNumber != 0)
+                        Block* block = ReadBlock(BlockKey(doubleIndirectBlockNumber, inode->Key().fsNumber, BlockKind.blockNumberBlock), null);
+                        #assert(block is BlockNumberBlock*);
+                        BlockPutter putter(block);
+                        BlockNumberBlock* doubleIndirectBlock = cast<BlockNumberBlock*>(block);
+                        for (int i = 0; i < numBlockNumbersInBlock; ++i)
                         {
-                            Block* block = ReadBlock(BlockKey(doubleIndirectBlockNumber, inode->Key().fsNumber, BlockKind.blockNumberBlock), null);
-                            #assert(block is BlockNumberBlock*);
-                            BlockPutter putter(block);
-                            BlockNumberBlock* doubleIndirectBlock = cast<BlockNumberBlock*>(block);
-                            for (int i = 0; i < numBlockNumbersInBlock; ++i)
+                            int singleIndirectBlockNumber = doubleIndirectBlock->GetBlockNumber(i);
+                            if (singleIndirectBlockNumber != 0)
                             {
-                                int singleIndirectBlockNumber = doubleIndirectBlock->GetBlockNumber(i);
-                                if (singleIndirectBlockNumber != 0)
+                                Block* block = ReadBlock(BlockKey(singleIndirectBlockNumber, inode->Key().fsNumber, BlockKind.blockNumberBlock), null);
+                                #assert(block is BlockNumberBlock*);
+                                BlockPutter putter(block);
+                                BlockNumberBlock* singleIndirectBlock = cast<BlockNumberBlock*>(block);
+                                for (int i = 0; i < numBlockNumbersInBlock; ++i)
                                 {
-                                    Block* block = ReadBlock(BlockKey(singleIndirectBlockNumber, inode->Key().fsNumber, BlockKind.blockNumberBlock), null);
-                                    #assert(block is BlockNumberBlock*);
-                                    BlockPutter putter(block);
-                                    BlockNumberBlock* singleIndirectBlock = cast<BlockNumberBlock*>(block);
-                                    for (int i = 0; i < numBlockNumbersInBlock; ++i)
+                                    int blockNumber = singleIndirectBlock->GetBlockNumber(i);
+                                    if (blockNumber != 0)
                                     {
-                                        int blockNumber = singleIndirectBlock->GetBlockNumber(i);
-                                        if (blockNumber != 0)
-                                        {
-                                            Block* block = GetBlock(BlockKey(blockNumber, inode->Key().fsNumber, BlockKind.fileBlock), null);
-                                            #assert(block is FileBlock*);
-                                            FileBlock* fileBlock = cast<FileBlock*>(block);
-                                            fileBlock->Clear();
-                                            BlockPutter putter(block);
-                                            WriteBlock(block, null);
-                                            fs->SetBlockFree(blockNumber);
-                                        }
+                                        Block* block = GetBlock(BlockKey(blockNumber, inode->Key().fsNumber, BlockKind.fileBlock), null);
+                                        #assert(block is FileBlock*);
+                                        FileBlock* fileBlock = cast<FileBlock*>(block);
+                                        fileBlock->Clear();
+                                        BlockPutter putter(block);
+                                        WriteBlock(block, null);
+                                        fs->SetBlockFree(blockNumber);
                                     }
-                                    singleIndirectBlock->Clear();
-                                    WriteBlock(block, null);
-                                    fs->SetBlockFree(singleIndirectBlockNumber);
                                 }
+                                singleIndirectBlock->Clear();
+                                WriteBlock(block, null);
+                                fs->SetBlockFree(singleIndirectBlockNumber);
                             }
-                            doubleIndirectBlock->Clear();
-                            WriteBlock(block, null);
-                            fs->SetBlockFree(doubleIndirectBlockNumber);
                         }
+                        doubleIndirectBlock->Clear();
+                        WriteBlock(block, null);
+                        fs->SetBlockFree(doubleIndirectBlockNumber);
                     }
-                    tripleIndirectBlock->Clear();
-                    WriteBlock(block, null);
-                    fs->SetBlockFree(tripleIndirectBlockNumber);
-                    inode->SetTripleIndirectBlockNumber(0);
                 }
+                tripleIndirectBlock->Clear();
+                WriteBlock(block, null);
+                fs->SetBlockFree(tripleIndirectBlockNumber);
+                inode->SetTripleIndirectBlockNumber(0);
             }
             if (Log())
             {
