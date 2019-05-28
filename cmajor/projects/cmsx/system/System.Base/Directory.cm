@@ -171,26 +171,17 @@ namespace System.IO
         return s;
     }
 
-    public nothrow inline int EncodeMode(FileType fileType, Access ownerAccess, Access groupAccess, Access otherAccess, bool mountPoint)
+    public nothrow inline int EncodeMode(FileType fileType, Access ownerAccess, Access groupAccess, Access otherAccess)
     {
-        int mntpnt = cast<int>(mountPoint);
-        return cast<int>(fileType) | (cast<int>(ownerAccess) << 3) | (cast<int>(groupAccess) << 6) | (cast<int>(otherAccess) << 9) | (cast<int>(mntpnt << 12));
+        return cast<int>(fileType) | (cast<int>(ownerAccess) << 3) | (cast<int>(groupAccess) << 6) | (cast<int>(otherAccess) << 9);
     }
 
-    public nothrow inline void DecodeMode(int mode, FileType& fileType, Access& ownerAccess, Access& groupAccess, Access& otherAccess, bool& mountPoint)
+    public nothrow inline void DecodeMode(int mode, FileType& fileType, Access& ownerAccess, Access& groupAccess, Access& otherAccess)
     {
         fileType = cast<FileType>(mode & 7);
         ownerAccess = cast<Access>((mode >> 3) & 7);
         groupAccess = cast<Access>((mode >> 6) & 7);
         otherAccess = cast<Access>((mode >> 9) & 7);
-        if (((mode >> 12) & 1) != 0)
-        {
-            mountPoint = true;
-        }
-        else
-        {
-            mountPoint = false;
-        }
     }
         
     public class StatInfo
@@ -227,11 +218,11 @@ namespace System.IO
         }
         public nothrow inline int GetMode() const
         {
-            return EncodeMode(fileType, ownerAccess, groupAccess, otherAccess, mountPoint);
+            return EncodeMode(fileType, ownerAccess, groupAccess, otherAccess);
         }
         public nothrow inline void SetMode(int mode)
         {
-            DecodeMode(mode, fileType, ownerAccess, groupAccess, otherAccess, mountPoint);
+            DecodeMode(mode, fileType, ownerAccess, groupAccess, otherAccess);
         }
         public nothrow inline FileType Type() const
         {
@@ -248,10 +239,6 @@ namespace System.IO
         public nothrow inline Access OtherAccess() const
         {
             return otherAccess;
-        }
-        public nothrow inline bool MountPoint() const
-        {
-            return mountPoint;
         }
         public nothrow inline int UID() const
         {
@@ -315,7 +302,6 @@ namespace System.IO
         private Access ownerAccess;
         private Access groupAccess;
         private Access otherAccess;
-        private bool mountPoint;
         private int uid;
         private int gid;
         private int nlinks;

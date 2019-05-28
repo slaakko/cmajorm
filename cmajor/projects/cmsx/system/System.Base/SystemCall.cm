@@ -38,6 +38,7 @@ public const byte sys_closedir = 31u;
 public const byte sys_getcwd = 32u;
 public const byte sys_chdir = 33u;
 public const byte sys_stat = 34u;
+public const byte sys_umask = 35u;
 
 public cdecl nothrow void exit(byte exitCode)
 {
@@ -211,4 +212,9 @@ public cdecl nothrow int chdir(const char* path)
 public cdecl nothrow int stat(const char* path, byte* statBuf)
 {
     return cast<int>(trap(0u, sys_stat, 0u, path, statBuf));
+}
+
+public cdecl nothrow int umask(int mask)
+{
+    return cast<int>(trap(0u, sys_umask, 0u, mask));
 }

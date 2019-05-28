@@ -157,6 +157,9 @@ namespace cmsx.kernel
         SystemCallHandler statSystemCallHandler = Stat;
         ulong statSystemCallAddress = cast<ulong>(cast<void*>(statSystemCallHandler));
         mem.WriteULong(MakeSystemCallPtrAddress(sys_stat), statSystemCallAddress, Protection.write);
+        SystemCallHandler umaskSystemCallHandler = UMask;
+        ulong umaskSystemCallAddress = cast<ulong>(cast<void*>(umaskSystemCallHandler));
+        mem.WriteULong(MakeSystemCallPtrAddress(sys_umask), umaskSystemCallAddress, Protection.write);
     }
 
     public void Boot(Machine& machine)

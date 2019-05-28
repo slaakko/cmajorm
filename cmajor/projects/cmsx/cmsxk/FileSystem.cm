@@ -76,6 +76,11 @@ namespace cmsx.kernel
                 inode = GetINodeManager()->GetINode(key);
                 inodePutter.ResetINode(inode);
                 inode->SetType(FileType.regular);
+                if (mode == 0)
+                {
+                    mode = EncodeMode(FileType.regular, cast<Access>(Access.read | Access.write), cast<Access>(Access.read | Access.write), cast<Access>(Access.read | Access.write), INode.Flags.none);
+                }
+                mode = mode & ~process->umask;
                 inode->SetMode(mode);
                 inode->SetUID(process->uid);
                 inode->SetGID(process->gid);
@@ -430,16 +435,15 @@ namespace cmsx.kernel
             {
                 inode->SetOwnerAccess(cast<Access>(Access.read | Access.write | Access.execute));
                 inode->SetGroupAccess(cast<Access>(Access.read | Access.write | Access.execute));
-                inode->SetOtherAccess(cast<Access>(Access.execute));
+                inode->SetOtherAccess(cast<Access>(Access.read | Access.write | Access.execute));
                 inode->SetUID(0);
                 inode->SetGID(0);
             }
             else
             {
-                // todo
                 inode->SetOwnerAccess(cast<Access>(Access.read | Access.write | Access.execute));
                 inode->SetGroupAccess(cast<Access>(Access.read | Access.write | Access.execute));
-                inode->SetOtherAccess(cast<Access>(Access.execute));
+                inode->SetOtherAccess(cast<Access>(Access.read | Access.write | Access.execute));
                 if (process == null)
                 {
                     inode->SetUID(0);
@@ -450,6 +454,10 @@ namespace cmsx.kernel
                     inode->SetUID(process->uid);
                     inode->SetGID(process->gid);
                 }
+            }
+            if (process != null)
+            {
+                inode->SetMode(inode->Mode() & ~process->umask);
             }
             GetBlockManager()->GetBlockNumber(inode, 0, blockNumber, blockOffset, true);
             Block* blck = GetBlockManager()->GetBlock(BlockKey(blockNumber, inode->Key().fsNumber, BlockKind.directoryBlock), null);

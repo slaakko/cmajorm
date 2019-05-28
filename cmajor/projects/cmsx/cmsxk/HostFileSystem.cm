@@ -111,9 +111,9 @@ namespace cmsx.kernel
                 inode->SetFileSize(fileSize);
                 inode->SetUID(0);
                 inode->SetGID(0);
-                inode->SetOwnerAccess(cast<Access>(Access.read | Access.write | Access.execute));
-                inode->SetGroupAccess(cast<Access>(Access.read | Access.write | Access.execute));
-                inode->SetOtherAccess(cast<Access>(Access.read | Access.write | Access.execute));
+                inode->SetOwnerAccess(cast<Access>(Access.read | Access.write));
+                inode->SetGroupAccess(cast<Access>(Access.read | Access.write));
+                inode->SetOtherAccess(cast<Access>(Access.read | Access.write));
                 byte[8] ctimeBuf;
                 byte[8] mtimeBuf;
                 byte[8] atimeBuf;
@@ -141,6 +141,26 @@ namespace cmsx.kernel
                 inode->SetOwnerAccess(cast<Access>(Access.read | Access.write | Access.execute));
                 inode->SetGroupAccess(cast<Access>(Access.read | Access.write | Access.execute));
                 inode->SetOtherAccess(cast<Access>(Access.read | Access.write | Access.execute));
+                string hostFilePath = inodeManager.GetHostFilePath(GetHostFileIndex(inode->Key().fsNumber));
+                byte[8] ctimeBuf;
+                byte[8] mtimeBuf;
+                byte[8] atimeBuf;
+                if (OsGetFileTimes(hostFilePath.Chars(), &ctimeBuf[0], &mtimeBuf[0], &atimeBuf[0]))
+                {
+                    MemoryReader ctimeReader(&ctimeBuf[0], 8);
+                    DateTime ctime = ctimeReader.ReadDateTime();
+                    inode->SetCTime(ctime);
+                    MemoryReader mtimeReader(&mtimeBuf[0], 8);
+                    DateTime mtime = mtimeReader.ReadDateTime();
+                    inode->SetMTime(mtime);
+                    MemoryReader atimeReader(&atimeBuf[0], 8);
+                    DateTime atime = atimeReader.ReadDateTime();
+                    inode->SetATime(atime);
+                }
+                else
+                {
+                    throw SystemError(EFAIL, "could not retrieve file times for host file '" + hostFilePath + "'");
+                }
             }
             inode->SetMode();
         }

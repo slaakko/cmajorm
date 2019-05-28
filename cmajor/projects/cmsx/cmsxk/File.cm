@@ -291,6 +291,13 @@ namespace cmsx.kernel
         fs->Stat(process, path, statBufAddress);
     }
 
+    public int UMask(Machine& machine, Process* process, int mask)
+    {
+        int prevUMask = process->umask;
+        process->umask = mask & 0777;
+        return prevUMask;
+    }
+
     public abstract class File
     {
         public nothrow File(const string& name_) : name(name_)

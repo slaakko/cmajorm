@@ -38,7 +38,8 @@ namespace cmsx.kernel
     public const byte sys_getcwd = 32u;
     public const byte sys_chdir = 33u;
     public const byte sys_stat = 34u;
-    public const byte numSystemCalls = sys_stat + 1u;
+    public const byte sys_umask = 35u;
+    public const byte numSystemCalls = sys_umask + 1u;
 
     public nothrow string SystemCallName(byte systemCall)
     {
@@ -606,5 +607,14 @@ namespace cmsx.kernel
         }
         Stat(*sc.machine, sc.process, sc.ax, sc.bx);
         sc.result = 0;
+    }
+
+    public void UMask(SystemCall& sc)
+    {
+        if (sc.x != 0u || sc.y != sys_umask || sc.z != 0u)
+        {
+            Panic("invalid umask parameters: " + ToString(sc.x) + ", " + ToString(sc.y) + ", " + ToString(sc.z));
+        }
+        sc.result = UMask(*sc.machine, sc.process, cast<int>(sc.ax));
     }
 }

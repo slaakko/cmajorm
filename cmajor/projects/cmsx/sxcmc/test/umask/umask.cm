@@ -1,0 +1,79 @@
+using System;
+using System.Collections;
+
+public nothrow string ToOctalStr(int x)
+{
+    int o0 = (x >> 6) & 7;
+    int o1 = (x >> 3) & 7;
+    int o2 = x & 7;
+    string s;
+    s.Append(cast<char>(o0 + cast<int>('0')));
+    s.Append(cast<char>(o1 + cast<int>('0')));
+    s.Append(cast<char>(o2 + cast<int>('0')));
+    return s;
+}
+
+void PrintUsage()
+{
+    Console.Out() << "umask [options] [<mask>]" << endl() <<
+        "Set or print file and directory creation mask where <mask> is three octal digits representing inverted owner, group and others permission mask." << endl() <<
+        "Default umask is 000, so that by default files are created with permissions 666 and directories with permissions 777." << endl() << 
+        "Options:" << endl() <<
+        "-h | --help" << endl() <<
+        "   Print help" << endl();
+}
+
+int main(int argc, const char** argv)
+{
+    try
+    {
+        int mask = 0777;
+        List<string> args;
+        for (int i = 1; i < argc; ++i)
+        {
+            string arg = argv[i];
+            if (arg.StartsWith("-"))
+            {
+                if (arg == "-h" || arg == "--help")
+                {
+                    PrintUsage();
+                    return 1;
+                }
+                else
+                {
+                    throw Exception("invalid option '" + arg + "'");
+                }
+            }
+            else 
+            {
+                args.Add(arg);
+            }
+        }
+        if (args.Count() == 1)
+        {
+            string m = args[0];
+            if (m.Length() != 3)
+            {
+                throw Exception("invalid octal mask " + m + ", use three octal digits representing owner, group and others permission mask");
+            }
+            mask = cast<int>(ParseOctal(m));
+        }
+        else if (args.Count() > 1)
+        {
+            PrintUsage();
+            return 1;
+        }
+        int prevMask = umask(mask);
+        if (args.IsEmpty())
+        {
+            umask(prevMask);
+            Console.Out() << ToOctalStr(prevMask) << endl();
+        }
+    }
+    catch (const Exception& ex)
+    {
+        Console.Error() << ex.Message() << endl();
+        return 1;
+    }
+    return 0;
+}

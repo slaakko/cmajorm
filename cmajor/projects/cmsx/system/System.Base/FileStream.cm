@@ -35,9 +35,12 @@ namespace System.IO
         public nothrow FileStream(int fd_, bool closeOnExit_) : fd(fd_), closeOnExit(closeOnExit_)
         {
         }
-        public FileStream(const string& filePath, OpenFlags flags) : fd(-1), closeOnExit(false)
+        public FileStream(const string& filePath, OpenFlags flags) : this(filePath, flags, 0)
         {
-            Open(filePath, flags);
+        }
+        public FileStream(const string& filePath, OpenFlags flags, int mode) : fd(-1), closeOnExit(false)
+        {
+            Open(filePath, flags, mode);
         }
         suppress FileStream(const FileStream&);
         suppress void operator=(const FileStream&);
@@ -61,10 +64,10 @@ namespace System.IO
         {
             return fd != -1;
         }
-        public void Open(const string& filePath, OpenFlags flags)
+        public void Open(const string& filePath, OpenFlags flags, int mode)
         {
             Close();
-            fd = System.Os.Open(filePath.Chars(), flags, 0);
+            fd = System.Os.Open(filePath.Chars(), flags, mode);
             closeOnExit = true;
         }
         public void Close()

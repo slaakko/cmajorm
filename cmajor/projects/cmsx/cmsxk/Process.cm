@@ -58,7 +58,7 @@ namespace cmsx.kernel
         }
         public nothrow Process() : pid(noPID), pgid(noPID), state(State.free), mode(Mode.runningUser), parent(null), firstChild(null), lastChild(null), nextSibling(null),
             nextFree(null), nextReadyToRun(null), prevReadyToRun(null), memoryTable(), sp(0u), regAXAddress(0u), regBXAddress(0u), exitCode(0u), event(noEvent), eventData1(0u), eventData2(0u),
-            systemCallReady(false)
+            systemCallReady(false), umask(0)
         {
         }
         public nothrow void AddChild(Process* child)
@@ -119,6 +119,7 @@ namespace cmsx.kernel
         public ProcessFileTable fileTable;
         public INodeKey rootDirINodeKey;
         public INodeKey workingDirINodeKey;
+        public int umask;
         public ulong sp;
         public ulong regAXAddress;
         public ulong regBXAddress;
@@ -191,6 +192,7 @@ namespace cmsx.kernel
             FileSystem* fs = GetMountTable().GetFileSystem(0);
             process->rootDirINodeKey = fs->GetRootDirINodeKey();
             process->workingDirINodeKey = process->rootDirINodeKey;
+            process->umask = 0;
             AddProcessToProcessMap(process);
             return process;
         }
@@ -231,6 +233,7 @@ namespace cmsx.kernel
             parent->fileTable.ShareFilesTo(child->fileTable);
             child->rootDirINodeKey = parent->rootDirINodeKey;
             child->workingDirINodeKey = parent->workingDirINodeKey;
+            child->umask = parent->umask;
             AddProcessToProcessMap(child);
             parent->AddChild(child);
             return child;
