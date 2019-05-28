@@ -1,0 +1,425 @@
+using System;
+using System.Collections;
+using cmsx.machine;
+using cmsx.util;
+
+namespace cmsx.kernel
+{
+    public const uint INVALID_FILE_ATTRIBUTES = cast<uint>(-1);
+    public const uint FILE_ATTRIBUTE_ARCHIVE = 32u;
+    public const uint FILE_ATTRIBUTE_DIRECTORY = 16u;
+    public const uint FILE_ATTRIBUTE_NORMAL = 128u;
+
+    public class HostFileSystem : FileSystem
+    {
+        public HostFileSystem(int index_, const string& hostPath_, const string& mountDirPath_) :
+            base(hostPath_, index_, true), blockManager(this), inodeManager(this), hostPath(hostPath_), mountDirPath(mountDirPath_)
+        {
+        }
+        public nothrow override bool IsHostFileSystem() const
+        {
+            return true;
+        }
+        public override void Init()
+        {
+            if (Log())
+            {
+                LogMessage("fs.host", "init.begin.hostPath=" + hostPath + ".mountDirPath=" + mountDirPath);
+            }
+            FileSystem* rootFS = GetMountTable().GetFileSystem(0);
+            INode* parent = null;
+            DirectorySlot freeDirectorySlot;
+            string name;
+            INode* mountDirINode = rootFS->GetINodeManager()->PathToINode(null, mountDirPath, PathToINodeFlags.ignoreMountPoint, parent, freeDirectorySlot, name);
+            if (mountDirINode == null)
+            {
+                rootFS->MakeDirectory(null, mountDirPath);
+                mountDirINode = rootFS->GetINodeManager()->PathToINode(null, mountDirPath, PathToINodeFlags.ignoreMountPoint, parent, freeDirectorySlot, name);
+                mountDirINode->SetFlag(INode.Flags.mountPoint);
+                mountDirINode->SetFlag(INode.Flags.dirty);
+            }
+            INodePutter putter(mountDirINode);
+            mountDirINodeKey = mountDirINode->Key();
+            if (Log())
+            {
+                LogMessage("fs.host", "init.end.inode=" + mountDirINode->ToString());
+            }
+        }
+        public override int Open(Process* process, INode* inode, OpenFlags flags, const string& path, INodePutter& inodePutter)
+        {
+            HostFile* hostFile = GetHostFile(inode->Key().fsNumber);
+            void* fileHandle = hostFile->GetFileHandle();
+            long fileSize = OsGetFileSize(fileHandle);
+            inode->SetFileSize(fileSize);
+            return base->Open(process, inode, flags, path, inodePutter);
+        }
+        public override int OpenDirectory(Process* process, const string& path, INode* dirINode, INodePutter& inodePutter)
+        {
+            int fd = process->fileTable.GetEmptyFileSlot();
+            process->fileTable.SetFile(fd, new HostDirectoryFile(dirINode));
+            inodePutter.ResetINode();
+            dirINode->ResetFlag(INode.Flags.locked);
+            return fd;
+        }
+        public override int ReadDirectory(Process* process, DirectoryFile* dirFile, ulong inodeNumberAddress, ulong entryNameAddress)
+        {
+            #assert(dirFile is HostDirectoryFile*);
+            HostDirectoryFile* hostDirFile = cast<HostDirectoryFile*>(dirFile);
+            void* findHandle = hostDirFile->GetFindHandle();
+            if (findHandle == null)
+            {
+                INode* dirINode = dirFile->DirINode();
+                const string& hostFilePath = inodeManager.GetHostFilePath(GetHostFileIndex(dirINode->Key().fsNumber));
+                string pathMask = Path.Combine(hostFilePath, "*.*");
+                char[nameMax] fileName;
+                void* findHandle = OsFindFirstFile(pathMask.Chars(), &fileName[0]);
+                if (findHandle != null)
+                {
+                    hostDirFile->SetFindHandle(findHandle);
+                    WriteProcessMemory(GetMachine(), process, inodeNumberAddress, 0u, 4u, Protection.write);
+                    WriteProcessMemory(GetMachine(), process, entryNameAddress, cast<byte*>(cast<void*>(&fileName[0])), cast<ulong>(nameMax), Protection.write);
+                    return 1;
+                }
+                else
+                {
+                    return 0;
+                }
+            }
+            else
+            {
+                char[nameMax] fileName;
+                bool result = OsFindNextFile(findHandle, &fileName[0]);
+                if (result)
+                {
+                    WriteProcessMemory(GetMachine(), process, inodeNumberAddress, 0u, 4u, Protection.write);
+                    WriteProcessMemory(GetMachine(), process, entryNameAddress, cast<byte*>(cast<void*>(&fileName[0])), cast<ulong>(nameMax), Protection.write);
+                    return 1;
+                }
+                else
+                {
+                    return 0;
+                }
+            }
+        }
+        public override void FillINode(INode* inode)
+        {
+            if (inode->Type() == FileType.regular)
+            {
+                HostFile* hostFile = GetHostFile(inode->Key().fsNumber);
+                void* fileHandle = hostFile->GetFileHandle();
+                long fileSize = OsGetFileSize(fileHandle);
+                inode->SetFileSize(fileSize);
+                inode->SetUID(0);
+                inode->SetGID(0);
+                inode->SetOwnerAccess(cast<Access>(Access.read | Access.write | Access.execute));
+                inode->SetGroupAccess(cast<Access>(Access.read | Access.write | Access.execute));
+                inode->SetOtherAccess(cast<Access>(Access.read | Access.write | Access.execute));
+                byte[8] ctimeBuf;
+                byte[8] mtimeBuf;
+                byte[8] atimeBuf;
+                if (OsGetFileTimes(hostFile->GetHostFilePath().Chars(), &ctimeBuf[0], &mtimeBuf[0], &atimeBuf[0]))
+                {
+                    MemoryReader ctimeReader(&ctimeBuf[0], 8);
+                    DateTime ctime = ctimeReader.ReadDateTime();
+                    inode->SetCTime(ctime);
+                    MemoryReader mtimeReader(&mtimeBuf[0], 8);
+                    DateTime mtime = mtimeReader.ReadDateTime();
+                    inode->SetMTime(mtime);
+                    MemoryReader atimeReader(&atimeBuf[0], 8);
+                    DateTime atime = atimeReader.ReadDateTime();
+                    inode->SetATime(atime);
+                }
+                else
+                {
+                    throw SystemError(EFAIL, "could not retrieve file times for host file '" + hostFile->GetHostFilePath() + "'");
+                }
+            }
+            else if (inode->Type() == FileType.directory)
+            {
+                inode->SetUID(0);
+                inode->SetGID(0);
+                inode->SetOwnerAccess(cast<Access>(Access.read | Access.write | Access.execute));
+                inode->SetGroupAccess(cast<Access>(Access.read | Access.write | Access.execute));
+                inode->SetOtherAccess(cast<Access>(Access.read | Access.write | Access.execute));
+            }
+            inode->SetMode();
+        }
+        public override HostFile* GetHostFile(int fsNumber) const
+        {
+            return inodeManager.GetHostFile(GetHostFileIndex(fsNumber));
+        }
+        public override int AllocateBlockNumber()
+        {
+            throw SystemError(EFAIL, "cannot allocate block number: file system '" + Name() + "' is read-only");
+        }
+        public override void SetBlockFree(int blockNumber)
+        {
+            throw SystemError(EFAIL, "cannot set block free: file system '" + Name() + "' is read-only");
+        }
+        public override int GetFreeINodeNumber()
+        {
+            throw SystemError(EFAIL, "cannot get free inode number: file system '" + Name() + "' is read-only");
+        }
+        public override void SetFreeINodeNumber(int inodeNumber)
+        {
+            throw SystemError(EFAIL, "cannot set free inode number: file system '" + Name() + "' is read-only");
+        }
+        public override int GetFirstINodeBlockNumber() const
+        {
+            throw SystemError(EFAIL, "cannot get first inode block number: file system '" + Name() + "' is read-only");
+        }
+        public override INodeKey GetRootDirINodeKey() const
+        {
+            throw SystemError(EFAIL, "cannot get root inode key: file system '" + Name() + "' is read-only");
+        }
+        public override int LastBlockNumber() const
+        {
+            throw SystemError(EFAIL, "cannot get last block number: file system '" + Name() + "' is read-only");
+        }
+        public override void SetLastBlockNumber(int blockNumber, SuperBlock* sb)
+        {
+            throw SystemError(EFAIL, "cannot set last block number: file system '" + Name() + "' is read-only");
+        }
+        public override nothrow bool HasMountDirKey(const INodeKey& mountDirKey) const
+        {
+            return mountDirINodeKey == mountDirKey;
+        }
+        public override nothrow BlockManager* GetBlockManager()
+        {
+            return &blockManager;
+        }
+        public override nothrow INodeManager* GetINodeManager()
+        {
+            return &inodeManager;
+        }
+        public nothrow inline const string& HostPath() const
+        {
+            return hostPath;
+        }
+        private HostBlockManager blockManager;
+        private HostINodeManager inodeManager;
+        private string hostPath;
+        private string mountDirPath;
+        private INodeKey mountDirINodeKey;
+    }
+
+    public class HostBlockManager : BlockManager
+    {
+        public nothrow HostBlockManager(HostFileSystem* fs_) : fs(fs_)
+        {
+        }
+        public override nothrow string Name() const
+        {
+            return "fs.host.bmgr";
+        }
+        public override Block* GetBlock(const BlockKey& key, SuperBlock* sb)
+        {
+            if (Log())
+            {
+                LogMessage("fs.host.bmgr.getblock.begin", key.ToString());
+            }
+            if (key.kind == BlockKind.fileBlock)
+            {
+                FileBlock* fileBlock = new FileBlock(this, null);
+                fileBlock->SetKey(key);
+                return fileBlock;
+            }
+            else
+            {
+                throw SystemError(EFAIL, "block manager for file system '" + fs->Name() + "' supports only file blocks");
+            }
+        }
+        public override nothrow void PutBlock(Block* block)
+        {
+            delete block;
+        }
+        public override nothrow Block* ReadBlock(const BlockKey& key, SuperBlock* sb)
+        {
+            if (Log())
+            {
+                LogMessage("fs.host.bmgr.readblock.begin", key.ToString());
+            }
+            Block* block = GetBlock(key, sb);
+            long bytesRead = GetDiskDriver().Read(block);
+            if (Log())
+            {
+                LogMessage("fs.host.bmgr.readblock.end.read", block->ToString());
+            }
+            return block;
+        }
+        public override void WriteBlock(Block* block, SuperBlock* superBlock)
+        {
+            throw SystemError(EFAIL, "block manager for file system '" + fs->Name() + "' cannot write blocks");
+        }
+        public override void FreeBlocks(INode* inode)
+        {
+            throw SystemError(EFAIL, "block manager for file system '" + fs->Name() + "' cannot free blocks");
+        }
+        public override void GetBlockNumber(INode* inode, long offset, int& blockNumber, int& blockOffset, bool allocate)
+        {
+            if (Log())
+            {
+                LogMessage("fs.host.bmgr.getblocknumber.begin", inode->ToString() + ".offset=" + ToString(offset) + ".allocate=" + ToString(allocate));
+            }
+            if (allocate)
+            {
+                throw SystemError(EFAIL, "block manager for file system '" + fs->Name() + " cannot allocate block numbers");
+            }
+            int logicalBlockNumber = cast<int>(offset / blockSize);
+            blockNumber = logicalBlockNumber;
+            blockOffset = cast<int>(offset % blockSize);
+            if (Log())
+            {
+                LogMessage("fs.host.bmgr.getblocknumber.end", "blocknumber=" + ToString(blockNumber) + ".blockoffset=" + ToString(blockOffset));
+            }
+        }
+        public override void Flush()
+        {
+        }
+        private HostFileSystem* fs;
+    }
+
+    public class HostINodeManager : INodeManager
+    {
+        public HostINodeManager(HostFileSystem* fs_) : fs(fs_)
+        {
+        }
+        public override nothrow string Name() const
+        {
+            return "fs.host.imgr";
+        }
+        public override INode* GetINode(const INodeKey& key)
+        {
+            if (Log())
+            {
+                LogMessage("fs.host.imgr.getinode.begin", key.ToString());
+            }
+            INode* inode = new INode(this);
+            inode->SetKey(key);
+            return inode;
+        }
+        public override void PutINode(INode* inode)
+        {
+            if (Log())
+            {
+                LogMessage("fs.host.imgr.putinode.begin", inode->ToString());
+            }
+            int fsNumber = inode->Key().fsNumber;
+            int hostFileIndex = GetHostFileIndex(fsNumber);
+            string hostFilePath;
+            HashMap<int, Pair<string, HostFile*>>.ConstIterator it = hostFileIndexPathMap.CFind(hostFileIndex);
+            if (it != hostFileIndexPathMap.CEnd())
+            {
+                const Pair<string, HostFile*>& hostFilePair = it->second;
+                hostFilePath = hostFilePair.first;
+                if (hostFilePair.second != null)
+                {
+                    GetDiskDriver().RemoveHostFile(hostFilePath);
+                }
+                hostFileIndexPathMap.Remove(it->first);
+            }
+            else
+            {
+                throw SystemError(EFAIL, "host file for index " + ToString(hostFileIndex) + " not found from file system '" + fs->HostPath() + "'");
+            }
+            if (!hostFilePath.IsEmpty())
+            {
+                pathINodeMap.Remove(hostFilePath);
+            }
+            delete inode;
+        }
+        public override INode* PathToINode(Process* process, const string& path)
+        {
+            if (Log())
+            {
+                LogMessage("fs.host.imgr.pathtoinode.begin", path);
+            }
+            INode* parent = null;
+            DirectorySlot freeDirectorySlot;
+            string name;
+            return PathToINode(process, path, PathToINodeFlags.none, parent, freeDirectorySlot, name);
+        }
+        public override INode* PathToINode(Process* process, const string& path, PathToINodeFlags flags, INode*& parent, DirectorySlot& freeDirectorySlot, string& name)
+        {
+            string fullPath;
+            if (path.IsEmpty())
+            {
+                fullPath = fs->HostPath();
+            }
+            else
+            {
+                fullPath = GetFullPath(Path.Combine(fs->HostPath(), path));
+            }
+            HashMap<string, INode*>.ConstIterator it = pathINodeMap.CFind(fullPath);
+            if (it != pathINodeMap.CEnd())
+            {
+                return it->second;
+            }
+            int hostFileIndex = nextHostFileIndex++;
+            INodeKey key(hostFileIndex, MakeFSNumber(fs->Index(), hostFileIndex));
+            INode* inode = GetINode(key);
+            uint attrs = OsGetFileAttributes(fullPath.Chars());
+            if (attrs == INVALID_FILE_ATTRIBUTES)
+            {
+                return null;
+            }
+            else
+            {
+                if ((attrs & FILE_ATTRIBUTE_DIRECTORY) != 0)
+                {
+                    inode->SetType(FileType.directory);
+                }
+                else if ((attrs & (FILE_ATTRIBUTE_ARCHIVE | FILE_ATTRIBUTE_NORMAL)) != 0)
+                {
+                    inode->SetType(FileType.regular);
+                }
+            }
+            pathINodeMap[fullPath] = inode;
+            hostFileIndexPathMap[hostFileIndex] = MakePair(fullPath, cast<HostFile*>(null));
+            return inode;
+        }
+        public const string& GetHostFilePath(int hostFileIndex) const
+        {
+            HashMap<int, Pair<string, HostFile*>>.ConstIterator it = hostFileIndexPathMap.CFind(hostFileIndex);
+            if (it != hostFileIndexPathMap.CEnd())
+            {
+                return it->second.first;
+            }
+            else
+            {
+                throw SystemError(EFAIL, "host file path for index " + ToString(hostFileIndex) + " not found from file system '" + fs->HostPath() + "'");
+            }
+        }
+        public HostFile* GetHostFile(int hostFileIndex) const
+        {
+            if (Log())
+            {
+                LogMessage("fs.host.imgr.gethostfile.begin", ToString(hostFileIndex));
+            }
+            HashMap<int, Pair<string, HostFile*>>.Iterator it = hostFileIndexPathMap.Find(hostFileIndex);
+            if (it != hostFileIndexPathMap.End())
+            {
+                Pair<string, HostFile*>& hostFilePair = it->second;
+                if (hostFilePair.second != null)
+                {
+                    return hostFilePair.second;
+                }
+                HostFile* hostFile = GetDiskDriver().GetOrInsertHostFile(hostFilePair.first);
+                hostFilePair.second = hostFile;
+                if (Log())
+                {
+                    LogMessage("fs.host.imgr.gethostfile", "end.hostFilePath=" + hostFilePair.first);
+                }
+                return hostFile;
+            }
+            else
+            {
+                throw SystemError(EFAIL, "host file for index " + ToString(hostFileIndex) + " not found from file system '" + fs->HostPath() + "'");
+            }
+        }
+        private HostFileSystem* fs;
+        private HashMap<string, INode*> pathINodeMap;
+        private HashMap<int, Pair<string, HostFile*>> hostFileIndexPathMap;
+        private int nextHostFileIndex;
+    }
+}

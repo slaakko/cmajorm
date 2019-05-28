@@ -1,8 +1,17 @@
 using System;
 using System.Collections;
+using System.IO;
 
 namespace cmsx.kernel
 {
+    public const uint DRIVE_UNKNOWN = 0u;
+    public const uint DRIVE_NO_ROOT_DIR = 1u;
+    public const uint DRIVE_REMOVABLE = 2u;
+    public const uint DRIVE_FIXED = 3u;
+    public const uint DRIVE_REMOTE = 4u;
+    public const uint DRIVE_CDROM = 5u;
+    public const uint DRIVE_RAMDISK = 6u;
+
     public class MountTable
     {
         static MountTable() : instance(new MountTable())
@@ -12,24 +21,89 @@ namespace cmsx.kernel
         {
             return *instance;
         }
-        public void InitializeFileSystems()
+        public FileSystem* GetFileSystem(int fsNumber) const
+        {
+            int fileSystemIndex = GetFileSystemIndex(fsNumber);
+            if (fileSystemIndex < 0 || fileSystemIndex >= fileSystems.Count())
+            {
+                throw SystemError(EINVAL, "invalid file system number");
+            }
+            return fileSystems[fileSystemIndex].Get();
+        }
+        public FileSystem* GetMountedFileSystem(const string& dirPath, const INodeKey& mountDirKey) const
+        {
+            for (UniquePtr<FileSystem>& fs : fileSystems)
+            {
+                if (fs->HasMountDirKey(mountDirKey))
+                {
+                    if (Log())
+                    {
+                        LogMessage("fs.mountTable", "getmountedfilesystem.fs=" + fs->Name());
+                    }
+                    return fs.Get();
+                }
+            }
+            throw SystemError(EFAIL, "file system mounted on directory '" + dirPath + "' not found");
+        }
+        private MountTable()
+        {
+        }
+        public void Init()
+        {
+            if (Log())
+            {
+                LogMessage("fs.mountTable", "init");
+            }
+            string cmajorRootDir = RtGetEnvironmentVariable("CMAJOR_ROOT");
+            if (cmajorRootDir.IsEmpty())
+            {
+                throw Exception("CMAJOR_ROOT environment variable not set. Please set it to contain /path/to/cmajor directory");
+            }
+            string cmsxDir = Path.Combine(Path.Combine(cmajorRootDir, "projects"), "cmsx");
+            fileSystems.Add(UniquePtr<FileSystem>(new RootFileSystem(0)));
+            char[4096] logicalDrivesBuf;
+            bool retval = OsGetLogicalDrives(&logicalDrivesBuf[0], cast<int>(logicalDrivesBuf.Length()));
+            if (!retval)
+            {
+                throw SystemError(EFAIL, "could not get logical drives from system");
+            }
+            int fileSystemIndex = 1;
+            string logicalDrivesStr = &logicalDrivesBuf[0];
+            List<string> logicalDrives = logicalDrivesStr.Split(';');
+            for (const string& drive : logicalDrives)
+            {
+                uint driveType = OsGetDriveType(drive.Chars());
+                if (driveType == DRIVE_FIXED)
+                {
+                    string hostPath = GetFullPath(drive);
+                    string mountDirPath = "/mnt/" + ToLower(hostPath.Substring(0, 1));
+                    HostFileSystem* hostFileSystem = new HostFileSystem(fileSystemIndex++, hostPath, mountDirPath);
+                    fileSystems.Add(UniquePtr<FileSystem>(hostFileSystem));
+                }
+            }
+            string cmajorRootHostPath = GetFullPath(cmajorRootDir);
+            string cmajorMountDirPath = "/mnt/cmajor";
+            HostFileSystem* cmajorHostFileSystem = new HostFileSystem(fileSystemIndex++, cmajorRootHostPath, cmajorMountDirPath);
+            fileSystems.Add(UniquePtr<FileSystem>(cmajorHostFileSystem));
+            string cmsxHostPath = GetFullPath(cmsxDir);
+            string cmsxMountDirPath = "/mnt/cmsx";
+            HostFileSystem* cmsxHostFileSystem = new HostFileSystem(fileSystemIndex++, cmsxHostPath, cmsxMountDirPath);
+            fileSystems.Add(UniquePtr<FileSystem>(cmsxHostFileSystem));
+            InitializeFileSystems();
+        }
+        public void Flush()
+        {
+            for (UniquePtr<FileSystem>& fs : fileSystems)
+            {
+                fs->GetBlockManager()->Flush();
+            }
+        }
+        private void InitializeFileSystems()
         {
             for (UniquePtr<FileSystem>& fs : fileSystems)
             {
                 fs->Init();
             }
-        }
-        public FileSystem* GetFileSystem(int fsNumber) const
-        {
-            if (fsNumber < 0 || fsNumber >= fileSystems.Count())
-            {
-                throw SystemError(EINVAL, "invalid file system number");
-            }
-            return fileSystems[fsNumber].Get();
-        }
-        private MountTable()
-        {
-            fileSystems.Add(UniquePtr<FileSystem>(new RootFileSystem()));
         }
         private static UniquePtr<MountTable> instance;
         private List<UniquePtr<FileSystem>> fileSystems;

@@ -8,74 +8,79 @@
 
 namespace cmajor { namespace util {
 
-MemoryReader::MemoryReader(const uint8_t* begin_, const uint8_t* end_) : begin(begin_), end(end_), pos(0)
+MemoryReader::MemoryReader(uint8_t* ptr_, int64_t count_) : ptr(ptr_), pos(ptr), count(count_)
 {
 }
 
-uint8_t MemoryReader::GetByte()
+uint8_t MemoryReader::ReadByte()
 {
-    if (begin >= end)
+    if (pos - ptr >= count)
     {
-        throw std::runtime_error("MemoryReader: unexpected end of data");
+        throw std::runtime_error("memory reader: unexpected end of data");
     }
-    ++pos;
-    return *begin++;
+    return *pos++;
 }
 
-int8_t MemoryReader::GetSByte()
+int8_t MemoryReader::ReadSByte()
 {
-    uint8_t x = GetByte();
-    return static_cast<int8_t>(x);
+    return static_cast<int8_t>(ReadByte());
 }
 
-uint16_t MemoryReader::GetUShort()
+uint16_t MemoryReader::ReadUShort()
 {
-    uint8_t x[2];
-    x[0] = GetByte();
-    x[1] = GetByte();
-    return *reinterpret_cast<uint16_t*>(&x[0]);
+    uint8_t b0 = ReadByte();
+    uint8_t b1 = ReadByte();
+    return (static_cast<uint16_t>(b0) << 8u) | static_cast<uint16_t>(b1);
 }
 
-int16_t MemoryReader::GetShort()
+int16_t MemoryReader::ReadShort()
 {
-    uint16_t x = GetUShort();
-    return static_cast<int16_t>(x);
+    return static_cast<int16_t>(ReadUShort());
 }
 
-uint32_t MemoryReader::GetUInt()
+uint32_t MemoryReader::ReadUInt()
 {
-    uint8_t x[4];
-    x[0] = GetByte();
-    x[1] = GetByte();
-    x[2] = GetByte();
-    x[3] = GetByte();
-    return *reinterpret_cast<uint32_t*>(&x[0]);
+    uint8_t b0 = ReadByte();
+    uint8_t b1 = ReadByte();
+    uint8_t b2 = ReadByte();
+    uint8_t b3 = ReadByte();
+    return (static_cast<uint32_t>(b0) << 24u) | (static_cast<uint32_t>(b1) << 16u) | (static_cast<uint32_t>(b2) << 8u) | static_cast<uint32_t>(b3);
 }
 
-int32_t MemoryReader::GetInt()
+int32_t MemoryReader::ReadInt()
 {
-    uint32_t x = GetUInt();
-    return static_cast<int32_t>(x);
+    return static_cast<int32_t>(ReadUInt());
 }
 
-uint64_t MemoryReader::GetULong()
+uint64_t MemoryReader::ReadULong()
 {
-    uint8_t x[8];
-    x[0] = GetByte();
-    x[1] = GetByte();
-    x[2] = GetByte();
-    x[3] = GetByte();
-    x[4] = GetByte();
-    x[5] = GetByte();
-    x[6] = GetByte();
-    x[7] = GetByte();
-    return *reinterpret_cast<uint64_t*>(&x[0]);
+    uint8_t b0 = ReadByte();
+    uint8_t b1 = ReadByte();
+    uint8_t b2 = ReadByte();
+    uint8_t b3 = ReadByte();
+    uint8_t b4 = ReadByte();
+    uint8_t b5 = ReadByte();
+    uint8_t b6 = ReadByte();
+    uint8_t b7 = ReadByte();
+    return (static_cast<uint64_t>(b0) << 56u) | (static_cast<uint64_t>(b1) << 48u) | (static_cast<uint64_t>(b2) << 40u) | (static_cast<uint64_t>(b3) << 32u) |
+        (static_cast<uint64_t>(b4) << 24u) | (static_cast<uint64_t>(b5) << 16u) | (static_cast<uint64_t>(b6) << 8u) | static_cast<uint64_t>(b7);
 }
 
-int64_t MemoryReader::GetLong()
+int64_t MemoryReader::ReadLong()
 {
-    uint64_t x = GetULong();
-    return static_cast<int64_t>(x);
+    return static_cast<int64_t>(ReadULong());
 }
+
+DateTime MemoryReader::ReadDateTime()
+{
+    int16_t year = ReadShort();
+    Month month = static_cast<Month>(ReadSByte());
+    int8_t day = ReadSByte();
+    Date date(year, month, day);
+    int32_t secs = ReadInt();
+    DateTime dt(date, secs);
+    return dt;
+}
+
 
 } } // namespace cmajor::util

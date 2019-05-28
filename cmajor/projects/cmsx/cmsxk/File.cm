@@ -524,6 +524,10 @@ namespace cmsx.kernel
         {
             return filePtr->Tell();
         }
+        public override bool IsHostTextFile() const
+        {
+            return filePtr->IsHostTextFile();
+        }
         public override File* Share()
         {
             return new RegularFile(name, filePtr->Share());
@@ -541,14 +545,14 @@ namespace cmsx.kernel
         public nothrow DirectoryFile(INode* dirINode_) : base("dir"), dirINode(dirINode_), offset(0)
         {
         }
-        public int Read(Process* process, ulong inodeNumberAddress, ulong entryNameAddress)
+        public virtual int Read(Process* process, ulong inodeNumberAddress, ulong entryNameAddress)
         {
             if (dirINode == null)
             {
                 throw SystemError(EINVAL, "directory inode is null");
             }
             FileSystem* fs = GetMountTable().GetFileSystem(dirINode->Key().fsNumber);
-            return fs->ReadDirectory(process, *this, inodeNumberAddress, entryNameAddress);
+            return fs->ReadDirectory(process, this, inodeNumberAddress, entryNameAddress);
         }
         public inline nothrow INode* DirINode() const
         {
@@ -574,12 +578,50 @@ namespace cmsx.kernel
         {
             if (dirINode != null)
             {
-                GetINodeManager().PutINode(dirINode);
+                dirINode->Manager()->PutINode(dirINode);
             }
             delete this;
         }
         private INode* dirINode;
         private long offset;
+    }
+
+    public class HostDirectoryFile : DirectoryFile
+    {
+        public nothrow HostDirectoryFile(INode* dirINode_) : base(dirINode_), findHandle(null)
+        {
+        }
+        public override int Read(Process* process, ulong inodeNumberAddress, ulong entryNameAddress)
+        {
+            FileSystem* fs = GetMountTable().GetFileSystem(DirINode()->Key().fsNumber);
+            return fs->ReadDirectory(process, this, inodeNumberAddress, entryNameAddress);
+        }
+        public void* GetFindHandle() const
+        {
+            return findHandle;
+        }
+        public void SetFindHandle(void* findHandle_)
+        {
+            findHandle = findHandle_;
+        }
+        public override File* Share()
+        {
+            if (DirINode() != null)
+            {
+                DirINode()->SetUseCount(DirINode()->GetUseCount() + 1);
+            }
+            return new HostDirectoryFile(DirINode());
+        }
+        public override void Release()
+        {
+            if (findHandle != null)
+            {
+                OsFindClose(findHandle);
+                findHandle = null;
+            }
+            base->Release();
+        }
+        private void* findHandle;
     }
 
     public class FilePtr
@@ -604,22 +646,23 @@ namespace cmsx.kernel
             }
             long bytesWritten = 0;
             {
+                FileSystem* fs = GetMountTable().GetFileSystem(inode->Key().fsNumber);
                 INodeLock lock(inode);
                 ulong offset = 0u;
                 while (count > 0)
                 {
                     int blockNumber = 0;
                     int blockOffset = 0;
-                    GetBlockManager().GetBlockNumber(inode, pos, blockNumber, blockOffset, true);
+                    fs->GetBlockManager()->GetBlockNumber(inode, pos, blockNumber, blockOffset, true);
                     long bytesToWrite = Min(count, blockSize - blockOffset);
                     Block* block = null;
                     if (inode->GetFileSize() > pos && (blockOffset != 0 || bytesToWrite != blockSize))
                     {
-                        block = GetBlockManager().ReadBlock(BlockKey(blockNumber, inode->Key().fsNumber, BlockKind.fileBlock), null);
+                        block = fs->GetBlockManager()->ReadBlock(BlockKey(blockNumber, inode->Key().fsNumber, BlockKind.fileBlock), null);
                     }
                     else
                     {
-                        block = GetBlockManager().GetBlock(BlockKey(blockNumber, inode->Key().fsNumber, BlockKind.fileBlock), null);
+                        block = fs->GetBlockManager()->GetBlock(BlockKey(blockNumber, inode->Key().fsNumber, BlockKind.fileBlock), null);
                     }
                     #assert(block is FileBlock*);
                     BlockPutter blockPutter(block);
@@ -633,7 +676,7 @@ namespace cmsx.kernel
                         fileBlock->SetByte(blockOffset + i, x);
                     }
                     fileBlock->SetFlag(Block.Flags.dirty);
-                    GetBlockManager().WriteBlock(block, null);
+                    fs->GetBlockManager()->WriteBlock(block, null);
                     count = count - bytesToWrite;
                     pos = pos + bytesToWrite;
                     offset = offset + cast<ulong>(bytesToWrite);
@@ -654,6 +697,7 @@ namespace cmsx.kernel
                 inode->AddWaitingProcess(reader);
                 SleepProcess(reader, inodeUnlockedEvent, cast<ulong>(cast<void*>(inode)), 0u);
             }
+            FileSystem* fs = GetMountTable().GetFileSystem(inode->Key().fsNumber);
             long bytesRead = 0;
             {
                 INodeLock lock(inode);
@@ -662,7 +706,7 @@ namespace cmsx.kernel
                 {
                     int blockNumber = 0;
                     int blockOffset = 0;
-                    GetBlockManager().GetBlockNumber(inode, pos, blockNumber, blockOffset, false);
+                    fs->GetBlockManager()->GetBlockNumber(inode, pos, blockNumber, blockOffset, false);
                     long bytesToRead = Min(count, blockSize - blockOffset);
                     long bytesLeft = Max(inode->GetFileSize() - pos, 0);
                     bytesToRead = Min(bytesToRead, bytesLeft);
@@ -673,9 +717,9 @@ namespace cmsx.kernel
                     Block* block = null;
                     UniquePtr<byte> buffer(cast<byte*>(RtMemAlloc(bytesToRead)));
                     MemoryWriter writer(buffer.Get(), bytesToRead);
-                    if (blockNumber != 0)
+                    if (!fs->IsRootFileSystem() || blockNumber != 0)
                     {
-                        block = GetBlockManager().ReadBlock(BlockKey(blockNumber, inode->Key().fsNumber, BlockKind.fileBlock), null);
+                        block = fs->GetBlockManager()->ReadBlock(BlockKey(blockNumber, inode->Key().fsNumber, BlockKind.fileBlock), null);
                         #assert(block is FileBlock*);
                         BlockPutter blockPutter(block);
                         FileBlock* fileBlock = cast<FileBlock*>(block);
@@ -717,6 +761,18 @@ namespace cmsx.kernel
         {
             return pos;
         }
+        public bool IsHostTextFile() const
+        {
+            if ((flags & OpenFlags.text) != OpenFlags.none)
+            {
+                FileSystem* fs = GetMountTable().GetFileSystem(inode->Key().fsNumber);
+                return fs->IsHostFileSystem();
+            }
+            else
+            {
+                return false;
+            }
+        }
         public FilePtr* Share()
         {
             ++useCount;
@@ -729,7 +785,7 @@ namespace cmsx.kernel
             {
                 if (inode != null)
                 {
-                    GetINodeManager().PutINode(inode);
+                    inode->Manager()->PutINode(inode);
                 }
                 delete this;
             }

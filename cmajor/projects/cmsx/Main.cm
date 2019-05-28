@@ -43,7 +43,7 @@ void Run(Machine& machine)
 
 void Terminate(Machine& machine)
 {
-    GetBlockManager().Flush();
+    GetMountTable().Flush();
     GetDiskDriver().Stop();
     Kernel& kernel = Kernel.Instance();
     if (Machine.GetFlag(Machine.Flags.debug))

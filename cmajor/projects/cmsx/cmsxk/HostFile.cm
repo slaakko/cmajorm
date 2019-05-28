@@ -6,7 +6,7 @@ namespace cmsx.kernel
 
     public class HostFile
     {
-        public HostFile(const string& hostFilePath_) : hostFilePath(hostFilePath_), fileHandle(null), completionPort(null), evnt(null)
+        public HostFile(const string& hostFilePath_, int index_) : hostFilePath(hostFilePath_), fileHandle(null), completionPort(null), evnt(null), index(index_)
         {
             if (System.IO.File.Exists(hostFilePath))
             {
@@ -62,9 +62,14 @@ namespace cmsx.kernel
         {
             return completionPort;
         }
+        public inline nothrow int Index() const
+        {
+            return index;
+        }
         private string hostFilePath;
         private void* fileHandle;
         private void* completionPort;
         private void* evnt;
+        private int index;
     }
 }

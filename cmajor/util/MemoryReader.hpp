@@ -5,6 +5,7 @@
 
 #ifndef CMAJOR_UTIL_MEMORY_READER_INCLUDED
 #define CMAJOR_UTIL_MEMORY_READER_INCLUDED
+#include <cmajor/util/Time.hpp>
 #include <cmajor/util/UtilApi.hpp>
 #include <stdint.h>
 
@@ -13,20 +14,20 @@ namespace cmajor { namespace util {
 class UTIL_API MemoryReader
 {
 public:
-    MemoryReader(const uint8_t* begin_, const uint8_t* end_);
-    uint8_t GetByte();
-    int8_t GetSByte();
-    uint16_t GetUShort();
-    int16_t GetShort();
-    uint32_t GetUInt();
-    int32_t GetInt();
-    uint64_t GetULong();
-    int64_t GetLong();
-    uint32_t Pos() const { return pos; }
+    MemoryReader(uint8_t* ptr_, int64_t count_);
+    uint8_t ReadByte();
+    int8_t ReadSByte();
+    uint16_t ReadUShort();
+    int16_t ReadShort();
+    uint32_t ReadUInt();
+    int32_t ReadInt();
+    uint64_t ReadULong();
+    int64_t ReadLong();
+    DateTime ReadDateTime();
 private:
-    const uint8_t* begin;
-    const uint8_t* end;
-    uint32_t pos;
+    uint8_t* ptr;
+    uint8_t* pos;
+    int64_t count;
 };
 
 } } // namespace cmajor::util

@@ -177,7 +177,7 @@ namespace cmsx.kernel
         InitializeInterruptVector(machine);
         InitializeSystemCalls(machine);
         GetDiskDriver().Start();
-        GetMountTable().InitializeFileSystems();
+        GetMountTable().Init();
         Kernel& kernel = Kernel.Instance();
         SessionTable& sessionTable = kernel.GetSessionTable();
         Session* currentSession = sessionTable.CreateSession();

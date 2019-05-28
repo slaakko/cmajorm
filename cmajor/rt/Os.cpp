@@ -10,6 +10,9 @@
 #include <Windows.h>
 #endif
 #include <cmajor/util/Unicode.hpp>
+#include <cmajor/util/Path.hpp>
+#include <cmajor/util/Time.hpp>
+#include <cmajor/util/MemoryWriter.hpp>
 
 #ifdef _WIN32
 
@@ -205,7 +208,7 @@ extern "C" RT_API bool OsWriteConsole(void* consoleOutputHandle, const char32_t*
 
 extern "C" RT_API void* OsCreateHostFile(const char* filePath)
 {
-    HANDLE handle = CreateFileA(filePath, GENERIC_READ | GENERIC_WRITE, 0, NULL, CREATE_NEW, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_RANDOM_ACCESS | FILE_FLAG_OVERLAPPED, NULL);
+    HANDLE handle = CreateFileA(filePath, GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ, NULL, CREATE_NEW, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_RANDOM_ACCESS | FILE_FLAG_OVERLAPPED, NULL);
     if (handle == INVALID_HANDLE_VALUE)
     {
         return nullptr;
@@ -218,7 +221,7 @@ extern "C" RT_API void* OsCreateHostFile(const char* filePath)
 
 extern "C" RT_API void* OsOpenHostFile(const char* filePath)
 {
-    HANDLE handle = CreateFileA(filePath, GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_RANDOM_ACCESS | FILE_FLAG_OVERLAPPED, NULL);
+    HANDLE handle = CreateFileA(filePath, GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_RANDOM_ACCESS | FILE_FLAG_OVERLAPPED, NULL);
     if (handle == INVALID_HANDLE_VALUE)
     {
         return nullptr;
@@ -384,6 +387,171 @@ extern "C" RT_API uint64_t OsGetLastError()
 extern "C" RT_API void OsFormatMessage(uint64_t errorCode, char* buffer)
 {
     FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, nullptr, errorCode, LANG_SYSTEM_DEFAULT, buffer, 4096, nullptr);
+}
+
+extern "C" RT_API bool OsGetLogicalDrives(char* buffer, int bufSize)
+{
+    char d[4096];
+    int retval = GetLogicalDriveStringsA(4096, &d[0]);
+    if (retval == 0)
+    {
+        return false;
+    }
+    else
+    {
+        std::string s;
+        for (int i = 0; i < retval; ++i)
+        {
+            char c = d[i];
+            if (c == '\0')
+            {
+                s.append(1, ';');
+            }
+            else
+            {
+                s.append(1, c);
+            }
+        }
+        if (!s.empty() && s.back() == ';')
+        {
+            s.erase(s.end() - 1);
+        }
+        int i = 0;
+        for (char c : s)
+        {
+            if (i >= bufSize)
+            {
+                return false;
+            }
+            *buffer++ = c;
+            ++i;
+        }
+        if (i >= bufSize)
+        {
+            return false;
+        }
+        else
+        {
+            *buffer = '\0';
+        }
+        return true;
+    }
+}
+
+extern "C" RT_API uint32_t OsGetDriveType(const char* rootPathName)
+{
+    return GetDriveTypeA(rootPathName);
+}
+
+extern "C" RT_API int64_t OsGetFileSize(void* fileHandle)
+{
+    LARGE_INTEGER fileSize;
+    if (GetFileSizeEx(fileHandle, &fileSize))
+    {
+        return fileSize.QuadPart;
+    }
+    else
+    {
+        return -1;
+    }
+}
+
+extern "C" RT_API uint32_t OsGetFileAttributes(const char* filePath)
+{
+    uint32_t attrs = GetFileAttributes(filePath);
+    if (attrs != INVALID_FILE_ATTRIBUTES)
+    {
+        return attrs;
+    }
+    else
+    {
+        return static_cast<uint32_t>(-1);
+    }
+}
+
+extern "C" RT_API void* OsFindFirstFile(const char* pathMask, char* fileName)
+{
+    WIN32_FIND_DATAA findData;
+    HANDLE handle = FindFirstFileA(pathMask, &findData);
+    if (handle == INVALID_HANDLE_VALUE)
+    {
+        return nullptr;
+    }
+    else
+    {
+        std::string pathName = &findData.cFileName[0];
+        std::string fname = cmajor::util::Path::GetFileName(pathName);
+        strcpy(fileName, fname.c_str());
+        return handle;
+    }
+}
+
+extern "C" RT_API bool OsFindNextFile(void* findHandle, char* fileName)
+{
+    WIN32_FIND_DATAA findData;
+    bool result = FindNextFileA(findHandle, &findData);
+    if (result)
+    {
+        std::string pathName = &findData.cFileName[0];
+        std::string fname = cmajor::util::Path::GetFileName(pathName);
+        strcpy(fileName, fname.c_str());
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+extern "C" RT_API void OsFindClose(void* findHandle)
+{
+    FindClose(findHandle);
+}
+
+extern "C" RT_API bool OsGetFileTimes(const char* filePath, uint8_t* ctime, uint8_t* mtime, uint8_t* atime)
+{
+    WIN32_FILE_ATTRIBUTE_DATA fileInfo;
+    SYSTEMTIME systemTime;
+    if (GetFileAttributesEx(filePath, GetFileExInfoStandard, &fileInfo))
+    {
+        if (FileTimeToSystemTime(&fileInfo.ftCreationTime, &systemTime))
+        {
+            cmajor::util::DateTime dtCreationTime(cmajor::util::Date(systemTime.wYear, static_cast<cmajor::util::Month>(systemTime.wMonth), systemTime.wDay),
+                60 * 60 * systemTime.wHour + 60 * systemTime.wMinute + systemTime.wSecond);
+            cmajor::util::MemoryWriter ctimeWriter(ctime, 8);
+            ctimeWriter.Write(dtCreationTime);
+        }
+        else
+        {
+            return false;
+        }
+        if (FileTimeToSystemTime(&fileInfo.ftLastWriteTime, &systemTime))
+        {
+            cmajor::util::DateTime dtWriteTime(cmajor::util::Date(systemTime.wYear, static_cast<cmajor::util::Month>(systemTime.wMonth), systemTime.wDay),
+                60 * 60 * systemTime.wHour + 60 * systemTime.wMinute + systemTime.wSecond);
+            cmajor::util::MemoryWriter mtimeWriter(mtime, 8);
+            mtimeWriter.Write(dtWriteTime);
+        }
+        else
+        {
+            return false;
+        }
+        if (FileTimeToSystemTime(&fileInfo.ftLastAccessTime, &systemTime))
+        {
+            cmajor::util::DateTime dtAccessTime(cmajor::util::Date(systemTime.wYear, static_cast<cmajor::util::Month>(systemTime.wMonth), systemTime.wDay),
+                60 * 60 * systemTime.wHour + 60 * systemTime.wMinute + systemTime.wSecond);
+            cmajor::util::MemoryWriter atimeWriter(atime, 8);
+            atimeWriter.Write(dtAccessTime);
+        }
+        else
+        {
+            return false;
+        }
+    }
+    else
+    {
+        return false;
+    }
 }
 
 #endif 

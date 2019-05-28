@@ -43,5 +43,13 @@ extern "C" RT_API void* OsGetFiberData();
 extern "C" RT_API void OsDeleteFiber(void* fiber);
 extern "C" RT_API uint64_t OsGetLastError();
 extern "C" RT_API void OsFormatMessage(uint64_t errorCode, char* buffer);
+extern "C" RT_API bool OsGetLogicalDrives(char* buffer, int bufSize);
+extern "C" RT_API uint32_t OsGetDriveType(const char* rootPathName);
+extern "C" RT_API int64_t OsGetFileSize(void* fileHandle);
+extern "C" RT_API uint32_t OsGetFileAttributes(const char* filePath);
+extern "C" RT_API void* OsFindFirstFile(const char* pathMask, char* fileName);
+extern "C" RT_API bool OsFindNextFile(void* findHandle, char* fileName);
+extern "C" RT_API void OsFindClose(void* findHandle);
+extern "C" RT_API bool OsGetFileTimes(const char* filePath, uint8_t* ctime, uint8_t* mtime, uint8_t* atime);
 
 #endif // CMAJOR_RT_OS_INCLUDED

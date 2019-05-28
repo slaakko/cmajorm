@@ -98,7 +98,7 @@ namespace cmsx.kernel
             }
             else
             {
-                HostFile* hostFile = new HostFile(hostFilePath);
+                HostFile* hostFile = new HostFile(hostFilePath, cast<int>(hostFiles.Count()));
                 hostFileMap[hostFilePath] = hostFile;
                 hostFiles.Add(UniquePtr<HostFile>(hostFile));
                 hostFilesChanged = true;
@@ -106,6 +106,25 @@ namespace cmsx.kernel
                 OsSetEvent(interruptEventHandle);
                 OsWaitEvent(osFilesUpdatedEventHandle);
                 return hostFile;
+            }
+        }
+        public void RemoveHostFile(const string& hostFilePath)
+        {
+            HashMap<string, HostFile*>.ConstIterator it = hostFileMap.CFind(hostFilePath);
+            if (it != hostFileMap.CEnd())
+            {
+                HostFile* hostFile = it->second;
+                int index = hostFile->Index();
+                hostFiles.Remove(hostFiles.Begin() + index);
+                hostFileMap.Remove(hostFilePath);
+                hostFilesChanged = true;
+                OsResetEvent(osFilesUpdatedEventHandle);
+                OsSetEvent(interruptEventHandle);
+                OsWaitEvent(osFilesUpdatedEventHandle);
+            }
+            else
+            {
+                throw SystemError(EFAIL, "host file '" + hostFilePath + "' not found in disk driver");
             }
         }
         public void Start()
@@ -226,7 +245,7 @@ namespace cmsx.kernel
         public long Read(Block* block)
         {
             FileSystem* fs = GetMountTable().GetFileSystem(block->Key().fsNumber);
-            HostFile* hostFile = fs->GetHostFile();
+            HostFile* hostFile = fs->GetHostFile(block->Key().fsNumber);
             void* evnt = hostFile->GetEventHandle();
             ulong offset = cast<ulong>(block->Key().blockNumber * blockSize);
             Overlapped overlapped(offset, evnt);
@@ -278,7 +297,7 @@ namespace cmsx.kernel
         public long Write(Block* block)
         {
             FileSystem* fs = GetMountTable().GetFileSystem(block->Key().fsNumber);
-            HostFile* hostFile = fs->GetHostFile();
+            HostFile* hostFile = fs->GetHostFile(block->Key().fsNumber);
             void* evnt = hostFile->GetEventHandle();
             ulong offset = cast<ulong>(block->Key().blockNumber * blockSize);
             Overlapped overlapped(offset, evnt);

@@ -27,9 +27,9 @@ void DirWalk(CodeFormatter& formatter, const string& dirPath)
     while (reader.Read(dirEntry))
     {
         string entryName = &dirEntry.entryName[0];
-        formatter << entryName << endl();
-        if (entryName != "." && entryName != "..")
+        if (!entryName.StartsWith("."))
         {
+            formatter << entryName << endl();
             string subPath = Path.Combine(dirPath, entryName);
             StatInfo statInfo;
             Stat(subPath.Chars(), statInfo);
@@ -58,12 +58,22 @@ void DirWalk(CodeFormatter& formatter, const string& dirPath)
     formatter.DecIndent();
 }
 
-int main()
+void PrintUsage()
+{
+    Console.Out() << "Usage: fswalk <dirPath>" << endl();
+}
+
+int main(int argc, const char** argv)
 {
     try
     {
+        if (argc != 2)
+        {
+            PrintUsage();
+            return 1;
+        }
         CodeFormatter formatter(Console.Out());
-        DirWalk(formatter, "/");
+        DirWalk(formatter, argv[1]);
     }
     catch (const Exception& ex)
     {
