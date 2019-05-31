@@ -24,6 +24,7 @@ namespace cmsx.kernel
             if (superBlock->GetLastBlockNumber() < firstNumber + bitmapBlockIndex)
             {
                 block = fs->GetBlockManager()->GetBlock(BlockKey(firstNumber + bitmapBlockIndex, superBlock->Key().fsNumber, BlockKind.bitmapBlock), superBlock);
+                block->Clear();
             }
             else
             {
@@ -54,6 +55,7 @@ namespace cmsx.kernel
                 if (superBlock->GetLastBlockNumber() < firstNumber + i)
                 {
                     block = fs->GetBlockManager()->GetBlock(BlockKey(firstNumber + i, superBlock->Key().fsNumber, BlockKind.bitmapBlock), superBlock);
+                    block->Clear();
                 }
                 else
                 {
@@ -95,6 +97,7 @@ namespace cmsx.kernel
             if (superBlock->GetLastBlockNumber() < firstNumber + blockNumber)
             {
                 block = fs->GetBlockManager()->GetBlock(BlockKey(firstNumber + blockNumber, superBlock->Key().fsNumber, BlockKind.bitmapBlock), superBlock);
+                block->Clear();
             }
             else
             {
@@ -184,6 +187,7 @@ namespace cmsx.kernel
                     if (fileSystem->LastBlockNumber() < inodeBlockNumber)
                     {
                         block = fs->GetBlockManager()->GetBlock(BlockKey(inodeBlockNumber, key.fsNumber, BlockKind.inodeBlock), null);
+                        block->Clear();
                     }
                     else
                     {
@@ -247,6 +251,7 @@ namespace cmsx.kernel
                     if (fileSystem->LastBlockNumber() < inodeBlockNumber)
                     {
                         block = fs->GetBlockManager()->GetBlock(BlockKey(inodeBlockNumber, inode->Key().fsNumber, BlockKind.inodeBlock), null);
+                        block->Clear();
                     }
                     else
                     {
@@ -378,7 +383,14 @@ namespace cmsx.kernel
                 {
                     if (process != null)
                     {
-                        inode->CheckPermissions(process->uid, process->gid, Access.execute);
+                        try
+                        {
+                            inode->CheckPermissions(process->uid, process->gid, Access.execute);
+                        }
+                        catch (const Exception& ex)
+                        {
+                            throw FileSystemException("cannot browse directory '" + dir + "' using uid " + ToString(process->uid) + ": " + ex.Message());
+                        }
                         if (inode->Key() == process->rootDirINodeKey && pathComponent == "..") continue;
                     }
                     else

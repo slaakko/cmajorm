@@ -1,47 +1,81 @@
 using System;
 using System.Collections;
 
-public nothrow string ToOctalStr(int x)
-{
-    int o0 = (x >> 6) & 7;
-    int o1 = (x >> 3) & 7;
-    int o2 = x & 7;
-    string s;
-    s.Append(cast<char>(o0 + cast<int>('0')));
-    s.Append(cast<char>(o1 + cast<int>('0')));
-    s.Append(cast<char>(o2 + cast<int>('0')));
-    return s;
-}
-
 void PrintUsage()
 {
     Console.Out() << "umask [options] [<mask>]" << endl() <<
         "Set or print file and directory creation mask where <mask> is three octal digits representing inverted owner, group and others permission mask." << endl() <<
-        "Default umask is 000, so that by default files are created with permissions 666 and directories with permissions 777." << endl() << 
-        "Options:" << endl() <<
-        "-h | --help" << endl() <<
-        "   Print help" << endl();
+        "Default umask is 000, so that by default files are created with permissions 666 and directories with permissions 777." << endl() << endl() <<
+        "Options:" << endl() << endl() <<
+        "--help | -h" << endl() <<
+        "   Print help." << endl() << endl() <<
+        "--verbose | -v" << endl() <<
+        "   Be verbose." << endl() << endl() <<
+        "--diagnostics | -d" << endl() <<
+        "   Show stack trace in case of error." << endl() << endl() << 
+        endl();
 }
 
 int main(int argc, const char** argv)
 {
+    bool diagnostics = false;
     try
     {
-        int mask = 0777;
+        int mask = cast<int>(ParseOctal("777"));
         List<string> args;
+        bool verbose = false;
         for (int i = 1; i < argc; ++i)
         {
             string arg = argv[i];
-            if (arg.StartsWith("-"))
+            if (arg.StartsWith("--"))
             {
-                if (arg == "-h" || arg == "--help")
+                if (arg == "--help")
                 {
                     PrintUsage();
                     return 1;
                 }
+                else if (arg == "--diagnostics")
+                {
+                    diagnostics = true;
+                }
+                else if (arg == "--verbose")
+                {
+                    verbose = true;
+                }
                 else
                 {
-                    throw Exception("invalid option '" + arg + "'");
+                    throw Exception("unknown option '" + arg + "'");
+                }
+            }
+            else if (arg.StartsWith("-"))
+            {
+                string options = arg.Substring(1);
+                if (options.IsEmpty())
+                {
+                    throw Exception("unknown option '-'");
+                }
+                else 
+                {
+                    for (char o : options)
+                    {
+                        if (o == 'h')
+                        {
+                            PrintUsage();
+                            return 1;
+                        }
+                        else if (o == 'd')
+                        {
+                            diagnostics = true;
+                        }
+                        else if (o == 'v')
+                        {
+                            verbose = true;
+                        }
+                        else
+                        {
+                            throw Exception("unknown option '-" + string(o) + "'");
+                        }
+                    }
                 }
             }
             else 
@@ -52,10 +86,6 @@ int main(int argc, const char** argv)
         if (args.Count() == 1)
         {
             string m = args[0];
-            if (m.Length() != 3)
-            {
-                throw Exception("invalid octal mask " + m + ", use three octal digits representing owner, group and others permission mask");
-            }
             mask = cast<int>(ParseOctal(m));
         }
         else if (args.Count() > 1)
@@ -67,12 +97,30 @@ int main(int argc, const char** argv)
         if (args.IsEmpty())
         {
             umask(prevMask);
-            Console.Out() << ToOctalStr(prevMask) << endl();
+            Console.Out() << ToOctalString(cast<ulong>(prevMask), 3) << endl();
+        }
+        else
+        {
+            if (verbose)
+            {
+                Console.Out() << 
+                    "umask set to " << ToOctalString(cast<ulong>(mask), 3) << endl() <<
+                    "previous umask was " << ToOctalString(cast<ulong>(prevMask), 3) << endl() <<
+                    endl();
+            }
+
         }
     }
     catch (const Exception& ex)
     {
-        Console.Error() << ex.Message() << endl();
+        if (diagnostics)
+        {
+            Console.Error() << ex.ToString() << endl();
+        }
+        else
+        {
+            Console.Error() << ex.Message() << endl();
+        }
         return 1;
     }
     return 0;

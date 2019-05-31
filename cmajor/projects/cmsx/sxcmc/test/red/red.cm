@@ -1,0 +1,37 @@
+using System;
+using System.Os;
+using System.IO;
+
+int main(int argc, const char** argv)
+{
+    try
+    {   
+        ustring args;
+        for (int i = 1; i < argc; ++i)
+        {
+            if (i > 1)
+            {
+                args.Append(' ');
+            }
+            args.Append(ToUtf32(argv[i]));
+        }
+        if (args.IsEmpty())
+        {
+            args.Append(u"red");
+        }
+        if (Screen.Instance().HasColors())
+        {
+            Console.Out() << BeginColors(ConsoleColor.red, ConsoleColor.black) << args << EndColors() << endl();
+        }
+        else
+        {
+            Console.Out() << args << endl();
+        }
+    }
+    catch (const Exception& ex)
+    {
+        Console.Error() << ex.Message() << endl();
+        return 1;
+    }
+    return 0;
+}

@@ -121,12 +121,6 @@ namespace cmsx.kernel
         SystemCallHandler powSystemCallHandler = Pow;
         ulong powSystemCallAddress = cast<ulong>(cast<void*>(powSystemCallHandler));
         mem.WriteULong(MakeSystemCallPtrAddress(sys_pow), powSystemCallAddress, Protection.write);
-        SystemCallHandler isHostTextFileSystemCallHandler = IsHostTextFile;
-        ulong isHostTextFileSystemCallAddress = cast<ulong>(cast<void*>(isHostTextFileSystemCallHandler));
-        mem.WriteULong(MakeSystemCallPtrAddress(sys_is_host_text_file), isHostTextFileSystemCallAddress, Protection.write);
-        SystemCallHandler isConsoleSystemCallHandler = IsConsole;
-        ulong isConsoleSystemCallAddress = cast<ulong>(cast<void*>(isConsoleSystemCallHandler));
-        mem.WriteULong(MakeSystemCallPtrAddress(sys_is_console), isConsoleSystemCallAddress, Protection.write);
         SystemCallHandler getRandomSeedSystemCallHandler = GetRandomSeed;
         ulong getRandomSeedSystemCallAddress = cast<ulong>(cast<void*>(getRandomSeedSystemCallHandler));
         mem.WriteULong(MakeSystemCallPtrAddress(sys_get_random_seed), getRandomSeedSystemCallAddress, Protection.write);
@@ -160,6 +154,9 @@ namespace cmsx.kernel
         SystemCallHandler umaskSystemCallHandler = UMask;
         ulong umaskSystemCallAddress = cast<ulong>(cast<void*>(umaskSystemCallHandler));
         mem.WriteULong(MakeSystemCallPtrAddress(sys_umask), umaskSystemCallAddress, Protection.write);
+        SystemCallHandler ioctlSystemCallHandler = IOCtl;
+        ulong ioctlSystemCallAddress = cast<ulong>(cast<void*>(ioctlSystemCallHandler));
+        mem.WriteULong(MakeSystemCallPtrAddress(sys_ioctl), ioctlSystemCallAddress, Protection.write);
     }
 
     public void Boot(Machine& machine)

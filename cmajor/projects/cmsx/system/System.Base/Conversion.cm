@@ -208,7 +208,32 @@ namespace System
     {
         return ToHexString<ulong>(u);
     }
+    
+    public nothrow string ToOctalString(ulong x)
+    {
+        return ToOctalString(x, 0);
+    }
 
+    public nothrow string ToOctalString(ulong x, int minDigits)
+    {
+        #assert(minDigits >= 0);
+        string s;
+        ++minDigits;
+        do
+        {
+            s.Append(cast<char>(cast<int>(x & 7u) + cast<int>('0')));
+            x = x >> 3u;
+            --minDigits;
+        }
+        while (minDigits != 0 || x != 0u);
+        if (s[s.Length() - 1] != '0')
+        {
+            s.Append('0');
+        }
+        Reverse(s.Begin(), s.End());
+        return s;
+    }
+    
     public nothrow bool ParseSigned<T>(const string& s, T& x) where T is SignedInteger
     {
         x = cast<T>(0);

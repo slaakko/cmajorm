@@ -247,3 +247,8 @@ extern "C" RT_API void RtMemFree(void* ptr)
 {
     free(ptr);
 }
+
+extern "C" RT_API void RtMemZero(void* ptr, int64_t size)
+{
+    std::memset(ptr, 0, size);
+}

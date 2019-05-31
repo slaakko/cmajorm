@@ -1,113 +1,161 @@
 using System;
+using System.Collections;
+using System.Security;
 
-namespace System.Security
+void PrintHelp()
 {
-    public nothrow inline uint LeftRotate(uint x, uint n)
-    {
-        return (x << n) ^ (x >> (32u - n));
-    }
+    Console.Out() << 
+        "Usage: sha1 [options] [<file> | <message>]..." << endl() << 
+        "Compute and print a SHA1 message digest for each argument file or message." << endl() <<
+        "If no arguments are given, process standard input." << endl() << endl() <<
+        "Options:" << endl() << endl() <<
+        "--help | -h" << endl() <<
+        "   Print help." << endl() << endl() <<
+        "--verbose | -v" << endl() <<
+        "   Be verbose." << endl() << endl() <<
+        "--files | -f" << endl() <<
+        "   Treat arguments as file names. This is default option." << endl() << endl() <<
+        "--messages | -m" << endl() <<
+        "   Treat arguments as messages." << endl() << endl() <<
+        "--cumulative | -c" << endl() <<
+        "   Print digest for cumulative content." << endl() << endl();
+}
 
-    public class Sha1
+int main(int argc, const char** argv)
+{
+    try
     {
-        public nothrow Sha1()
+        List<string> args;
+        bool verbose = false;
+        bool messages = false;
+        bool cumulative = false;
+        for (int i = 1; i < argc; ++i)
         {
-            Reset();
-        }
-        public nothrow void Reset()
-        {
-            digest[0] = 0x67452301u;
-            digest[1] = 0xEFCDAB89u;
-            digest[2] = 0x98BADCFEu;
-            digest[3] = 0x10325476u;
-            digest[4] = 0xC3D2E1F0u;
-            byteIndex = 0u;
-            bitCount = 0u;
-        }
-        public nothrow void Process(byte x)
-        {
-            ProcessByte(x);
-            bitCount = bitCount + 8u;
-        }
-        public nothrow void Process(byte* begin, byte* end)
-        {
-            while (begin != end)
+            string arg = argv[i];
+            if (arg.StartsWith("--"))
             {
-                Process(*begin);
-                ++begin;
-            }            
-        }
-        public nothrow void Process(byte* buf, long count)
-        {
-            Process(buf, buf + count);
-        }
-        private nothrow void ProcessByte(byte x)
-        {
-            block[byteIndex++] = x;
-            if (byteIndex == 64u)
-            {
-                byteIndex = 0u;
-                ProcessBlock();
-            }
-        }
-        private nothrow void ProcessBlock()
-        {
-            uint[80] w;
-            for (int i = 0; i < 16; ++i)
-            {
-                w[i] = cast<uint>(block[4 * i]) << 24u;
-                w[i] = w[i] | cast<uint>(block[4 * i + 1]) << 16u;
-                w[i] = w[i] | cast<uint>(block[4 * i + 2]) << 8u;
-                w[i] = w[i] | cast<uint>(block[4 * i + 3]);
-            }
-            for (int i = 16; i < 80; ++i)
-            {
-                w[i] = LeftRotate(w[i - 3] ^ w[i - 8] ^ w[i - 14] ^ w[i - 16], 1u);
-            }
-            uint a = digest[0];
-            uint b = digest[1];
-            uint c = digest[2];
-            uint d = digest[3];
-            uint e = digest[4];
-            for (int i = 0; i < 80; ++i)
-            {
-                uint f;
-                uint k;
-                if (i < 20)
+                if (arg == "--help")
                 {
-                    f = (b & c) | (~b & d);
-                    k = 0x5A827999u;
+                    PrintHelp();
+                    return 1;
                 }
-                else if (i < 40)
+                else if (arg == "--verbose")
                 {
-                    f = b ^ c ^ d;
-                    k = 0x6ED9EBA1u;
+                    verbose = true;
                 }
-                else if (i < 60)
+                else if (arg == "--files")
                 {
-                    f = (b & c) | (b & d) | (c & d);
-                    k = 0x8F1BBCDCu;
+                    messages = false;
+                }
+                else if (arg == "--messages")
+                {
+                    messages = true;
+                }
+                else if (arg == "--cumulative")
+                {
+                    cumulative = true;
                 }
                 else
                 {
-                    f = b ^ c ^ d;
-                    k = 0xCA62C1D6u;
+                    throw Exception("unknown option '" + arg + "'");
                 }
-                uint temp = LeftRotate(a, 5u) + f + e + k + w[i];
-                e = d;
-                d = c;
-                c = LeftRotate(b, 30u);
-                b = a;
-                a = temp;
             }
-            digest[0] = digest[0] + a;
-            digest[1] = digest[1] + b;
-            digest[2] = digest[2] + c;
-            digest[3] = digest[3] + d;
-            digest[4] = digest[4] + e;
+            else if (arg.StartsWith("-"))
+            {
+                string options = arg.Substring(1);
+                if (options.IsEmpty())
+                {
+                    throw Exception("unknown option " + options);
+                }
+                else
+                {
+                    for (char o : options)
+                    {
+                        if (o == 'h')
+                        {
+                            PrintHelp();
+                            return 1;
+                        }
+                        else if (o == 'v')
+                        {
+                            verbose = true;
+                        }
+                        else if (o == 'f')
+                        {
+                            messages = false;
+                        }
+                        else if (o == 'm')
+                        {
+                            messages = true;
+                        }
+                        else if (o == 'c')
+                        {
+                            cumulative = true;
+                        }
+                        else
+                        {
+                            throw Exception("unknown option '-" + string(o)+  "'");
+                        }
+                    }
+                }
+            }
+            else 
+            {
+                args.Add(arg);
+            }
         }
-        private uint[5] digest;
-        private byte[64] block;
-        private byte byteIndex;
-        private ulong bitCount;
+        if (args.IsEmpty())
+        {
+            if (verbose)
+            {
+                Console.Out() << "enter content: ";
+            }
+            string digest = GetSha1MessageDigest(Console.In().ReadToEnd());
+            Console.Out() << digest << endl();
+        }
+        else if (!cumulative)
+        {
+            for (const string& arg : args)
+            {
+                if (verbose)
+                {
+                    Console.Out() << arg << ": ";
+                }
+                string digest;
+                if (messages)
+                {
+                    digest = GetSha1MessageDigest(arg);
+                }
+                else
+                {
+                    digest = GetSha1FileDigest(arg);
+                }
+                Console.Out() << digest << endl();
+            }
+        }
+        else
+        {
+            string digest;
+            if (messages)
+            {
+                string content;
+                for (const string& message : args)
+                {
+                    content.Append(message);
+                }
+                digest = GetSha1MessageDigest(content);
+            }
+            else
+            {
+                digest = GetCumulativeSha1FileDigest(args);
+            }
+            Console.Out() << digest << endl();
+        }
     }
+    catch (const Exception& ex)
+    {
+        Console.Error() << ex.Message() << endl();
+        return 1;
+    }
+    return 0;
 }

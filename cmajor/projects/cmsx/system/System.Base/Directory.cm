@@ -20,13 +20,28 @@ namespace System.IO
             int result = stat(directoryPath.Chars(), &statBuf[0]);
             if (result == -1) 
             {
-                return false;
+                SystemError systemError = GetSystemError();
+                if (systemError.errorCode == ENOENT)
+                {
+                    return false;
+                }
+                else
+                {
+                    ThrowSystemError();
+                }
             }
             else
             {
                 StatInfo statInfo;
                 StatBufToStatInfo(&statBuf[0], statInfo);
-                return statInfo.Type() == FileType.directory;
+                if (statInfo.Type() == FileType.directory)
+                {
+                    return true;
+                }
+                else
+                {
+                    throw FileSystemException("path '" + directoryPath + "' is not a directory path");
+                }
             }
         }
         public static void Remove(const string& directoryPath)
@@ -79,7 +94,7 @@ namespace System.IO
     public class DirectoryEntry
     {
         public int inodeNumber;
-        public char[nameMax] entryName;
+        public char[nameMax] name;
     }
     
     public class DirectoryReader
@@ -89,7 +104,7 @@ namespace System.IO
         }
         public bool Read(DirectoryEntry& dirEntry)
         {
-            int result = ReadDir(dd, &dirEntry.inodeNumber, &dirEntry.entryName[0]);
+            int result = ReadDir(dd, &dirEntry.inodeNumber, &dirEntry.name[0]);
             return result == 1;
         }
         public ~DirectoryReader()
@@ -136,9 +151,9 @@ namespace System.IO
     public enum Access : int
     {
         none =  0,
-        read = 1 << 0,
+        read = 1 << 2,
         write = 1 << 1,
-        execute = 1 << 2
+        execute = 1 << 0
     }
 
     public nothrow string AccessStr(Access access)
@@ -171,17 +186,57 @@ namespace System.IO
         return s;
     }
 
+    public nothrow string ShortAccessStr(Access access)
+    {
+        string s;
+        if ((access & Access.read) != Access.none)
+        {
+            s.Append('r');
+        }
+        else
+        {
+            s.Append('-');
+        }
+        if ((access & Access.write) != Access.none)
+        {
+            s.Append('w');
+        }
+        else
+        {
+            s.Append('-');
+        }
+        if ((access & Access.execute) != Access.none)
+        {
+            s.Append('x');
+        }
+        else
+        {
+            s.Append('-');
+        }
+        return s;
+    }
+
+    public nothrow string AccessModeStr(int mode)
+    {
+        string modeStr;
+        Access ownerAccess = cast<Access>((mode >> 6) & 7);
+        Access groupAccess = cast<Access>((mode >> 3) & 7);
+        Access otherAccess = cast<Access>(mode & 7);
+        modeStr.Append(ShortAccessStr(ownerAccess)).Append(ShortAccessStr(groupAccess)).Append(ShortAccessStr(otherAccess));
+        return modeStr;
+    }
+
     public nothrow inline int EncodeMode(FileType fileType, Access ownerAccess, Access groupAccess, Access otherAccess)
     {
-        return cast<int>(fileType) | (cast<int>(ownerAccess) << 3) | (cast<int>(groupAccess) << 6) | (cast<int>(otherAccess) << 9);
+        return (cast<int>(fileType) << 9) | (cast<int>(ownerAccess) << 6) | (cast<int>(groupAccess) << 3) | (cast<int>(otherAccess));
     }
 
     public nothrow inline void DecodeMode(int mode, FileType& fileType, Access& ownerAccess, Access& groupAccess, Access& otherAccess)
     {
-        fileType = cast<FileType>(mode & 7);
-        ownerAccess = cast<Access>((mode >> 3) & 7);
-        groupAccess = cast<Access>((mode >> 6) & 7);
-        otherAccess = cast<Access>((mode >> 9) & 7);
+        fileType = cast<FileType>((mode >> 9) & 7);
+        Access ownerAccess = cast<Access>((mode >> 6) & 7);
+        Access groupAccess = cast<Access>((mode >> 3) & 7);
+        Access otherAccess = cast<Access>(mode & 7);
     }
         
     public class StatInfo

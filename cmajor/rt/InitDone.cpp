@@ -20,10 +20,12 @@
 #include <cmajor/rt/Screen.hpp>
 #ifdef _WIN32
 #include <cmajor/rt/CommandLine.hpp>
+#include <Windows.h>
 #endif
 #include <cmajor/rt/Socket.hpp>
 #include <cmajor/rt/Environment.hpp>
 #include <csignal>
+
 
 extern "C" RT_API void RtInit(int64_t numberOfPolymorphicClassIds, const uint64_t* polymorphicClassIdArray, int64_t numberOfStaticClassIds, const uint64_t* staticClassIdArray)
 {

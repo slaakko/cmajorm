@@ -26,19 +26,18 @@ public const byte sys_sleep = 19u;
 public const byte sys_get_current_date = 20u;
 public const byte sys_get_current_date_time = 21u;
 public const byte sys_pow = 22u;
-public const byte sys_is_host_text_file = 23u;
-public const byte sys_is_console = 24u;
-public const byte sys_get_random_seed = 25u;
-public const byte sys_link = 26u;
-public const byte sys_unlink = 27u;
-public const byte sys_mkdir = 28u;
-public const byte sys_opendir = 29u;
-public const byte sys_readdir = 30u;
-public const byte sys_closedir = 31u;
-public const byte sys_getcwd = 32u;
-public const byte sys_chdir = 33u;
-public const byte sys_stat = 34u;
-public const byte sys_umask = 35u;
+public const byte sys_get_random_seed = 23u;
+public const byte sys_link = 24u;
+public const byte sys_unlink = 25u;
+public const byte sys_mkdir = 26u;
+public const byte sys_opendir = 27u;
+public const byte sys_readdir = 28u;
+public const byte sys_closedir = 29u;
+public const byte sys_getcwd = 30u;
+public const byte sys_chdir = 31u;
+public const byte sys_stat = 32u;
+public const byte sys_umask = 33u;
+public const byte sys_ioctl = 34u;
 
 public cdecl nothrow void exit(byte exitCode)
 {
@@ -154,16 +153,6 @@ public cdecl nothrow double pow(double x, double y)
     return *cast<double*>(cast<void*>(&result));
 }
 
-public cdecl nothrow int is_host_text_file(int fd)
-{
-    return cast<int>(trap(0u, sys_is_host_text_file, 0u, fd));
-}
-
-public cdecl nothrow int is_console(int fd)
-{
-    return cast<int>(trap(0u, sys_is_console, 0u, fd));
-}
-
 public cdecl nothrow long get_random_seed()
 {
     return trap(0u, sys_get_random_seed, 0u);
@@ -217,4 +206,9 @@ public cdecl nothrow int stat(const char* path, byte* statBuf)
 public cdecl nothrow int umask(int mask)
 {
     return cast<int>(trap(0u, sys_umask, 0u, mask));
+}
+
+public cdecl nothrow int ioctl(int fd, int item, byte* buffer, long count)
+{
+    return cast<int>(trap(0u, sys_ioctl, 0u, fd, item, buffer, count));
 }

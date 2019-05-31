@@ -319,6 +319,10 @@ std::string StringValue::Name(Context& context)
         {
             name.append("\\").append(cmajor::util::ToHexString(static_cast<uint8_t>(c)));
         }
+        else if (c == '\\')
+        {
+            name.append("\\").append(cmajor::util::ToHexString(static_cast<uint8_t>(c)));
+        }
         else if (c >= 32 && c < 127)
         {
             name.append(1, c);

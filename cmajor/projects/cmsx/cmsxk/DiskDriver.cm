@@ -49,6 +49,7 @@ namespace cmsx.kernel
     {
         public nothrow Buffer() : buffer(RtMemAlloc(blockSize))
         {
+            RtMemZero(buffer, blockSize);
         }
         public ~Buffer()
         {

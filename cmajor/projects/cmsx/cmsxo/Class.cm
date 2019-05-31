@@ -15,9 +15,16 @@ namespace cmsx.object
             ulong n = reader.ReadULong();
             for (ulong i = 0u; i < n; ++i)
             {
-                Uuid typeId = reader.ReadUuid();
-                ulong classId = reader.ReadULong();
-                classIdMap[typeId] = classId;
+                try
+                {
+                    Uuid typeId = reader.ReadUuid();
+                    ulong classId = reader.ReadULong();
+                    classIdMap[typeId] = classId;
+                }
+                catch (const Exception& ex)
+                {
+                    throw Exception("error reading class id map: " + ToString(n) + " total entries, trying to read entry " + ToString(i) + ": " + ex.ToString()); 
+                }
             }
         }
         public ulong GetClassId(const Uuid& typeId) const

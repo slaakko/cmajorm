@@ -1,0 +1,62 @@
+using System;
+using System.Os;
+
+namespace System.IO
+{
+    public class Screen
+    {
+        static Screen() : instance(new Screen())
+        {
+        }
+        public static nothrow Screen& Instance()
+        {
+            return *instance;
+        }
+        public nothrow inline bool HasConsole() const
+        {
+            return hasConsole;
+        }
+        public nothrow inline bool HasColors() const
+        {
+            return hasColors;
+        }
+        public nothrow inline int Height() const
+        {
+            return height;
+        }
+        public nothrow inline int Width() const
+        {
+            return width;
+        }
+        private Screen() : hasConsole(IsConsole(stdout)), hasColors(HasColors(stdout)), height(0), width(0)
+        {
+            if (hasColors)
+            {
+                GetConsoleColors(stdout, foregroundColor, backgroundColor);
+                BeginObeyColorStrings(stdout);
+                GetWindowSize(stdout, height, width);
+            }
+        }
+        public ~Screen()
+        {
+            try
+            {
+                if (hasColors)
+                {
+                    EndObeyColorStrings(stdout);
+                    SetConsoleColors(stdout, foregroundColor, backgroundColor);
+                }
+            }
+            catch (const Exception& ex)
+            {
+            }
+        }
+        private static UniquePtr<Screen> instance;
+        private bool hasConsole;
+        private bool hasColors;
+        private int height;
+        private int width;
+        private ConsoleColor foregroundColor;
+        private ConsoleColor backgroundColor;
+    }
+}

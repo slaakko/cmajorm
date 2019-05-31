@@ -177,9 +177,9 @@ extern "C" RT_API bool OsReadConsoleInput(void* consoleInputHandle, char32_t* c)
     return retVal;
 }
 
-extern "C" RT_API bool OsGetConsoleScreenBufferInfo(void* consoleOutputHandle, int32_t* cursorPosX, int32_t* cursorPosY, int32_t* screenSizeX, int32_t* screenSizeY)
+extern "C" RT_API bool OsGetConsoleScreenBufferInfo(void* consoleOutputHandle, int32_t* cursorPosX, int32_t* cursorPosY, int32_t* screenSizeX, int32_t* screenSizeY, uint16_t* attrs)
 {
-    if (!cursorPosX || !cursorPosY || !screenSizeX || !screenSizeY) return false;
+    if (!cursorPosX || !cursorPosY || !screenSizeX || !screenSizeY || !attrs) return false;
     CONSOLE_SCREEN_BUFFER_INFO consoleScreenBufferInfo;
     bool retVal = GetConsoleScreenBufferInfo(consoleOutputHandle, &consoleScreenBufferInfo);
     if (!retVal) return false;
@@ -187,6 +187,7 @@ extern "C" RT_API bool OsGetConsoleScreenBufferInfo(void* consoleOutputHandle, i
     *cursorPosY = consoleScreenBufferInfo.dwCursorPosition.Y;
     *screenSizeX = consoleScreenBufferInfo.dwSize.X;
     *screenSizeY = consoleScreenBufferInfo.dwSize.Y;
+    *attrs = consoleScreenBufferInfo.wAttributes;
     return true;
 }
 
@@ -204,6 +205,24 @@ extern "C" RT_API bool OsWriteConsole(void* consoleOutputHandle, const char32_t*
     std::u32string s(chars);
     std::u16string w(cmajor::unicode::ToUtf16(s));
     return WriteConsoleW(consoleOutputHandle, w.c_str(), w.length(), &numCharsWritten, nullptr);
+}
+
+extern "C" RT_API bool OsSetConsoleTextAttribute(uint16_t attrs)
+{
+    return SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), attrs);
+}
+
+extern "C" RT_API void* OsCreateConsoleOutputHandle()
+{
+    void* result = CreateFileA("CONOUT$", GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+    if (result == INVALID_HANDLE_VALUE)
+    {
+        return nullptr;
+    }
+    else
+    {
+        return result;
+    }
 }
 
 extern "C" RT_API void* OsCreateHostFile(const char* filePath)
@@ -547,6 +566,7 @@ extern "C" RT_API bool OsGetFileTimes(const char* filePath, uint8_t* ctime, uint
         {
             return false;
         }
+        return true;
     }
     else
     {

@@ -12,6 +12,7 @@ extern "C" RT_API void* RtMemAlloc(int64_t size);
 extern "C" RT_API void* RtMemAllocInfo(int64_t size, const char* info);
 extern "C" RT_API void RtDispose(void* ptr);
 extern "C" RT_API void RtMemFree(void* ptr);
+extern "C" RT_API void RtMemZero(void* ptr, int64_t size);
 
 namespace cmajor { namespace rt {
 

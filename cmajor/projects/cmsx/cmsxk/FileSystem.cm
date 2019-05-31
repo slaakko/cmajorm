@@ -53,7 +53,7 @@ namespace cmsx.kernel
             {
                 throw SystemError(EINVAL, "parent path of path '" + path + "' not found ");
             }
-            FileSystem* fs = GetMountTable().GetFileSystem(inode->Key().fsNumber);
+            FileSystem* fs = GetMountTable().GetFileSystem(parent->Key().fsNumber);
             if (fs->IsReadOnly())
             {
                 throw SystemError(EINVAL, "cannot create file " + path + "': file system '" + fs->Name() + "' is read-only");
@@ -69,7 +69,14 @@ namespace cmsx.kernel
             }
             else
             {
-                parent->CheckPermissions(process->uid, process->gid, Access.write);
+                try
+                {
+                    parent->CheckPermissions(process->uid, process->gid, Access.write);
+                }
+                catch (const Exception& ex)
+                {
+                    throw FileSystemException("cannot write to directory '" + Path.GetDirectoryName(path) + "' using uid " + ToString(process->uid) + ": " + ex.Message());
+                }
                 FileSystem* fs = GetMountTable().GetFileSystem(parent->Key().fsNumber);
                 int inodeNumber = fs->GetFreeINodeNumber();
                 INodeKey key(inodeNumber, parent->Key().fsNumber);
@@ -78,10 +85,10 @@ namespace cmsx.kernel
                 inode->SetType(FileType.regular);
                 if (mode == 0)
                 {
-                    mode = EncodeMode(FileType.regular, cast<Access>(Access.read | Access.write), cast<Access>(Access.read | Access.write), cast<Access>(Access.read | Access.write), INode.Flags.none);
+                    mode = EncodeMode(INode.Flags.none, FileType.regular, cast<Access>(Access.read | Access.write), cast<Access>(Access.read | Access.write), cast<Access>(Access.read | Access.write));
                 }
                 mode = mode & ~process->umask;
-                inode->SetMode(mode);
+                inode->SetAccessMode(mode);
                 inode->SetUID(process->uid);
                 inode->SetGID(process->gid);
                 inode->SetFileSize(0);
@@ -97,6 +104,7 @@ namespace cmsx.kernel
                     int blockOffset = 0;
                     GetBlockManager()->GetBlockNumber(parent, freeDirectorySlot.offset, blockNumber, blockOffset, true);
                     block = GetBlockManager()->GetBlock(BlockKey(blockNumber, parent->Key().fsNumber, BlockKind.directoryBlock), null);
+                    block->Clear();
                 }
                 BlockPutter blockPutter(block);
                 DirectoryBlock* directoryBlock = cast<DirectoryBlock*>(block);
@@ -208,7 +216,14 @@ namespace cmsx.kernel
             {
                 LogMessage("fs.link", "parent=" + parent->ToString());
             }
-            parent->CheckPermissions(process->uid, process->gid, Access.write);
+            try
+            {
+                parent->CheckPermissions(process->uid, process->gid, Access.write);
+            }
+            catch (const Exception& ex)
+            {
+                throw FileSystemException("cannot write to directory '" + Path.GetDirectoryName(targetPath) + "' using uid " + ToString(process->uid) + ": " + ex.Message());
+            }
             FileSystem* fs = GetMountTable().GetFileSystem(parent->Key().fsNumber);
             if (fs->IsReadOnly())
             {
@@ -229,6 +244,7 @@ namespace cmsx.kernel
                 int blockOffset = 0;
                 GetBlockManager()->GetBlockNumber(parent, freeDirectorySlot.offset, blockNumber, blockOffset, true);
                 block = GetBlockManager()->GetBlock(BlockKey(blockNumber, parent->Key().fsNumber, BlockKind.directoryBlock), null);
+                block->Clear();
             }
             BlockPutter blockPutter(block);
             DirectoryBlock* directoryBlock = cast<DirectoryBlock*>(block);
@@ -378,7 +394,14 @@ namespace cmsx.kernel
             }
             if (process != null)
             {
-                parent->CheckPermissions(process->uid, process->gid, Access.write);
+                try
+                {
+                    parent->CheckPermissions(process->uid, process->gid, Access.write);
+                }
+                catch (const Exception& ex)
+                {
+                    throw FileSystemException("cannot write to directory '" + Path.GetDirectoryName(path) + "' using uid " + ToString(process->uid) + ": " + ex.Message());
+                }
             }
             if (!name.IsEmpty())
             {
@@ -390,7 +413,7 @@ namespace cmsx.kernel
                 Block* block = null;
                 if (freeDirectorySlot.blockNumber != invalidBlockNumber)
                 {
-                    block = GetBlockManager()->ReadBlock(BlockKey(freeDirectorySlot.blockNumber, inode->Key().fsNumber, BlockKind.directoryBlock), null);
+                    block = GetBlockManager()->ReadBlock(BlockKey(freeDirectorySlot.blockNumber, parent->Key().fsNumber, BlockKind.directoryBlock), null);
                 }
                 else
                 {
@@ -398,6 +421,7 @@ namespace cmsx.kernel
                     int blockOffset = 0;
                     GetBlockManager()->GetBlockNumber(parent, freeDirectorySlot.offset, blockNumber, blockOffset, true);
                     block = GetBlockManager()->GetBlock(BlockKey(blockNumber, parent->Key().fsNumber, BlockKind.directoryBlock), null);
+                    block->Clear();
                 }
                 #assert(block is DirectoryBlock*);
                 BlockPutter blockPutter(block);
@@ -428,8 +452,6 @@ namespace cmsx.kernel
                     throw SystemError(EFAIL, "no room for directory entry");
                 }
             }
-            int blockNumber = 0;
-            int blockOffset = 0;
             inode->SetType(FileType.directory);
             if (path == "/" && process == null)
             {
@@ -457,10 +479,14 @@ namespace cmsx.kernel
             }
             if (process != null)
             {
-                inode->SetMode(inode->Mode() & ~process->umask);
+                inode->SetMode();
+                inode->SetAccessMode(inode->Mode() & ~process->umask);
             }
+            int blockNumber = 0;
+            int blockOffset = 0;
             GetBlockManager()->GetBlockNumber(inode, 0, blockNumber, blockOffset, true);
             Block* blck = GetBlockManager()->GetBlock(BlockKey(blockNumber, inode->Key().fsNumber, BlockKind.directoryBlock), null);
+            blck->Clear();
             BlockPutter putter(blck);
             DirectoryBlock* dirBlock = cast<DirectoryBlock*>(blck);
             int n = 0;
@@ -486,7 +512,7 @@ namespace cmsx.kernel
             if (crtd)
             {
                 GetBlockManager()->WriteBlock(dirBlock, null);
-                inode->SetFileSize(n * directoryEntrySize);
+                inode->SetFileSize(inode->GetFileSize() + n * directoryEntrySize);
                 inode->SetMTime();
             }
             else

@@ -26,7 +26,7 @@ void DirWalk(CodeFormatter& formatter, const string& dirPath)
     DirectoryEntry dirEntry;
     while (reader.Read(dirEntry))
     {
-        string entryName = &dirEntry.entryName[0];
+        string entryName = &dirEntry.name[0];
         if (!entryName.StartsWith("."))
         {
             formatter << entryName << endl();

@@ -17,13 +17,28 @@ namespace System.IO
             int result = stat(filePath.Chars(), &statBuf[0]);
             if (result == -1) 
             {
-                return false;
+                SystemError systemError = GetSystemError();
+                if (systemError.errorCode == ENOENT)
+                {
+                    return false;
+                }
+                else
+                {
+                    ThrowSystemError();
+                }
             }
             else
             {
                 StatInfo statInfo;
                 StatBufToStatInfo(&statBuf[0], statInfo);
-                return statInfo.Type() == FileType.regular;
+                if (statInfo.Type() == FileType.regular)
+                {
+                    return true;
+                }
+                else
+                {
+                    throw FileSystemException("path '" + filePath + "' is not a regular file path");
+                }
             }
         }
         public static long Size(const string& filePath)

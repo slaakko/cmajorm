@@ -13,7 +13,14 @@ namespace cmsx.kernel
         seekSet, seekCur, seekEnd
     }
 
-    public const long RESULT_BLOCKED = -2;
+    public const int IOCTL_IS_CONSOLE_ITEM = 1;
+    public const int IOCTL_IS_HOST_TEXT_FILE_ITEM = 2;
+    public const int IOCTL_HAS_COLORS_ITEM = 3;
+    public const int IOCTL_GET_WINDOW_SIZE_ITEM = 4;
+    public const int IOCTL_GET_COLORS_ITEM = 5;
+    public const int IOCTL_SET_COLORS_ITEM = 6;
+    public const int IOCTL_BEGIN_OBEY_COLOR_STRINGS_ITEM = 7;
+    public const int IOCTL_END_OBEY_COLOR_STRINGS_ITEM = 8;
 
     public enum OpenFlags : int
     {
@@ -102,18 +109,6 @@ namespace cmsx.kernel
     {
         File* file = process->fileTable.GetFile(fd);
         return file->Tell();
-    }
-
-    public bool IsHostTextFile(Process* process, int fd)
-    {
-        File* file = process->fileTable.GetFile(fd);
-        return file->IsHostTextFile();
-    }
-
-    public bool IsConsole(Process* process, int fd)
-    {
-        File* file = process->fileTable.GetFile(fd);
-        return file->IsConsole();
     }
 
     public void Link(Machine& machine, Process* process, ulong sourcePathAddress, ulong targetPathAddress)
@@ -294,8 +289,22 @@ namespace cmsx.kernel
     public int UMask(Machine& machine, Process* process, int mask)
     {
         int prevUMask = process->umask;
-        process->umask = mask & 0777;
+        process->umask = mask & cast<int>(ParseOctal("777"));
         return prevUMask;
+    }
+
+    public void IOCtl(Machine& machine, Process* process, int fd, int item, ulong bufferAddress, long count)
+    {
+        if (bufferAddress == 0u)
+        {
+            throw SystemError(EINVAL, "buffer address is null");
+        }
+        if (count < 0)
+        {
+            throw SystemError(EINVAL, "invalid count");
+        }
+        File* file = process->fileTable.GetFile(fd);
+        file->IOCtl(machine, process, item, bufferAddress, count);
     }
 
     public abstract class File
@@ -319,6 +328,74 @@ namespace cmsx.kernel
         {
             throw SystemError(ENOTSUPPORTED, name + " does not support tell");
         }
+        public virtual nothrow bool IsConsole() const
+        {
+            return false;
+        }
+        public virtual nothrow bool IsHostTextFile() const
+        {
+            return false;
+        }
+        public virtual nothrow bool HasColors() const
+        {
+            return false;
+        }
+        public virtual void IOCtl(Machine& machine, Process* process, int item, ulong bufferAddress, long count)
+        {
+            bool itemFound = true;
+            switch (item)
+            {
+                case IOCTL_IS_CONSOLE_ITEM:
+                {
+                    GetConsoleStatus(machine, process, bufferAddress, count);
+                    break;
+                }
+                case IOCTL_IS_HOST_TEXT_FILE_ITEM:
+                {
+                    GetHostTextFileStatus(machine, process, bufferAddress, count);
+                    break;
+                }
+                case IOCTL_HAS_COLORS_ITEM:
+                {
+                    GetColorStatus(machine, process, bufferAddress, count);
+                    break;
+                }
+                case IOCTL_GET_WINDOW_SIZE_ITEM:
+                {
+                    GetWindowDimensions(machine, process, bufferAddress, count);
+                    break;
+                }
+                case IOCTL_GET_COLORS_ITEM:
+                {
+                    GetConsoleColors(machine, process, bufferAddress, count);
+                    break;
+                }
+                case IOCTL_SET_COLORS_ITEM:
+                {
+                    SetConsoleColors(machine, process, bufferAddress, count);
+                    break;
+                }
+                case IOCTL_BEGIN_OBEY_COLOR_STRINGS_ITEM:
+                {
+                    BeginObeyColorStrings();
+                    break;
+                }
+                case IOCTL_END_OBEY_COLOR_STRINGS_ITEM:
+                {
+                    EndObeyColorStrings();
+                    break;
+                }
+                default:
+                {
+                    itemFound = false;
+                    break;
+                }
+            }
+            if (!itemFound)
+            {
+                throw SystemError(EINVAL, "unknown ioctl item " + ToString(item) + " for " + name);
+            }
+        }
         public virtual File* Share()
         {
             return this;
@@ -326,13 +403,109 @@ namespace cmsx.kernel
         public virtual void Release()
         {
         }
-        public virtual bool IsHostTextFile() const
+        private void GetConsoleStatus(Machine& machine, Process* process, ulong bufferAddress, long count)
         {
-            return false;
+            if (count < 1)
+            {
+                throw SystemError(ERANGE, "buffer size for IOCTL_IS_CONSOLE_ITEM must be at least 1 byte");
+            }
+            byte[1] buffer;
+            MemoryWriter writer(&buffer[0], buffer.Length());
+            writer.Write(cast<byte>(IsConsole()));
+            WriteProcessMemory(machine, process, bufferAddress, &buffer[0], cast<ulong>(buffer.Length()), Protection.write);
         }
-        public virtual bool IsConsole() const
+        private void GetHostTextFileStatus(Machine& machine, Process* process, ulong bufferAddress, long count)
         {
-            return false;
+            if (count < 1)
+            {
+                throw SystemError(ERANGE, "buffer size for IOCTL_IS_HOST_TEXT_FILE_ITEM must be at least 1 byte");
+            }
+            byte[1] buffer;
+            MemoryWriter writer(&buffer[0], buffer.Length());
+            writer.Write(cast<byte>(IsHostTextFile()));
+            WriteProcessMemory(machine, process, bufferAddress, &buffer[0], cast<ulong>(buffer.Length()), Protection.write);
+        }
+        private void GetColorStatus(Machine& machine, Process* process, ulong bufferAddress, long count)
+        {
+            if (count < 1)
+            {
+                throw SystemError(ERANGE, "buffer size for IOCTL_HAS_COLORS_ITEM must be at least 1 byte");
+            }
+            byte[1] buffer;
+            MemoryWriter writer(&buffer[0], buffer.Length());
+            writer.Write(cast<byte>(HasColors()));
+            WriteProcessMemory(machine, process, bufferAddress, &buffer[0], cast<ulong>(buffer.Length()), Protection.write);
+        }
+        private void GetWindowDimensions(Machine& machine, Process* process, ulong bufferAddress, long count)
+        {
+            if (count < 8)
+            {
+                throw SystemError(ERANGE, "buffer size for IOCTL_GET_WINDOW_SIZE_ITEM must be at least 8 bytes");
+            }
+            int rows = 0;
+            int cols = 0;
+            if (IsConsole())
+            {
+                GetConsoleDriver().GetDimensions(rows, cols);
+            }
+            byte[8] buffer;
+            MemoryWriter writer(&buffer[0], buffer.Length());
+            writer.Write(rows);
+            writer.Write(cols);
+            WriteProcessMemory(machine, process, bufferAddress, &buffer[0], cast<ulong>(buffer.Length()), Protection.write);
+        }
+        private void GetConsoleColors(Machine& machine, Process* process, ulong bufferAddress, long count)
+        {
+            if (count < 2)
+            {
+                throw SystemError(ERANGE, "buffer size for IOCTL_GET_COLORS_ITEM must be at least 2 bytes");
+            }
+            byte[2] buffer;
+            MemoryWriter writer(&buffer[0], buffer.Length());
+            if (IsConsole())
+            {
+                ConsoleColor foregroundColor;
+                ConsoleColor backgroundColor;
+                GetConsoleDriver().GetConsoleColors(foregroundColor, backgroundColor);
+                writer.Write(cast<byte>(foregroundColor));
+                writer.Write(cast<byte>(backgroundColor));
+            }
+            else
+            {
+                writer.Write(cast<byte>(0u));
+                writer.Write(cast<byte>(0u));
+            }
+            WriteProcessMemory(machine, process, bufferAddress, &buffer[0], cast<ulong>(buffer.Length()), Protection.write);
+        }
+        private void SetConsoleColors(Machine& machine, Process* process, ulong bufferAddress, long count)
+        {
+            if (count < 2)
+            {
+                throw SystemError(ERANGE, "buffer size for IOCTL_SET_COLORS_ITEM must be at least 2 bytes");
+            }
+            if (IsConsole())
+            {
+                byte[2] buffer;
+                ReadProcessMemory(machine, process, bufferAddress, &buffer[0], cast<ulong>(buffer.Length()));
+                MemoryReader reader(&buffer[0], buffer.Length());
+                ConsoleColor foregroundColor = cast<ConsoleColor>(reader.ReadByte());
+                ConsoleColor backgroundColor = cast<ConsoleColor>(reader.ReadByte());
+                GetConsoleDriver().SetConsoleColors(foregroundColor, backgroundColor);
+            }
+        }
+        private void BeginObeyColorStrings()
+        {
+            if (IsConsole())
+            {
+                GetConsoleDriver().BeginObeyColorStrings();
+            }
+        }
+        private void EndObeyColorStrings()
+        {
+            if (IsConsole())
+            {
+                GetConsoleDriver().EndObeyColorStrings();
+            }
         }
         public string name;
     }
@@ -371,7 +544,7 @@ namespace cmsx.kernel
             }
             return -1;
         }
-        public override bool IsConsole() const
+        public override nothrow bool IsConsole() const
         {
             return true;
         }
@@ -400,7 +573,7 @@ namespace cmsx.kernel
             }
             return -1;
         }
-        public override bool IsConsole() const
+        public override nothrow bool IsConsole() const
         {
             return true;
         }
@@ -455,7 +628,7 @@ namespace cmsx.kernel
             }
             return -1;
         }
-        public override bool IsConsole() const
+        public override nothrow bool IsConsole() const
         {
             return true;
         }
@@ -496,7 +669,11 @@ namespace cmsx.kernel
             }
             return -1;
         }
-        public override bool IsConsole() const
+        public override nothrow bool IsConsole() const
+        {
+            return true;
+        }
+        public override nothrow bool HasColors() const
         {
             return true;
         }
@@ -531,7 +708,7 @@ namespace cmsx.kernel
         {
             return filePtr->Tell();
         }
-        public override bool IsHostTextFile() const
+        public override nothrow bool IsHostTextFile() const
         {
             return filePtr->IsHostTextFile();
         }
@@ -658,18 +835,21 @@ namespace cmsx.kernel
                 ulong offset = 0u;
                 while (count > 0)
                 {
+                    int logicalBlockNumber = cast<int>(pos / blockSize);
                     int blockNumber = 0;
                     int blockOffset = 0;
                     fs->GetBlockManager()->GetBlockNumber(inode, pos, blockNumber, blockOffset, true);
                     long bytesToWrite = Min(count, blockSize - blockOffset);
                     Block* block = null;
-                    if (inode->GetFileSize() > pos && (blockOffset != 0 || bytesToWrite != blockSize))
+                    bool clearBlock = false;
+                    if (inode->GetNumBlocks() > logicalBlockNumber && (blockOffset != 0 || bytesToWrite != blockSize))
                     {
                         block = fs->GetBlockManager()->ReadBlock(BlockKey(blockNumber, inode->Key().fsNumber, BlockKind.fileBlock), null);
                     }
                     else
                     {
                         block = fs->GetBlockManager()->GetBlock(BlockKey(blockNumber, inode->Key().fsNumber, BlockKind.fileBlock), null);
+                        block->Clear();
                     }
                     #assert(block is FileBlock*);
                     BlockPutter blockPutter(block);
@@ -768,7 +948,7 @@ namespace cmsx.kernel
         {
             return pos;
         }
-        public bool IsHostTextFile() const
+        public nothrow bool IsHostTextFile() const
         {
             if ((flags & OpenFlags.text) != OpenFlags.none)
             {
@@ -825,16 +1005,16 @@ namespace cmsx.kernel
         {
             if (fd < 0)
             {
-                throw SystemError(EBADF, "value negative");
+                throw SystemError(EBADF, "descriptor value is negative");
             }
             else if (fd >= openFileMax)
             {
-                throw SystemError(EBADF, "value exceeds maximum number of open files");
+                throw SystemError(EBADF, "descriptor value exceeds maximum number of open files");
             }
             File* file = files[fd];
             if (file == null)
             {
-                throw SystemError(EBADF, "file not open");
+                throw SystemError(EBADF, "file " + ToString(fd) + " not open");
             }
             return file;
         }

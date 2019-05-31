@@ -68,18 +68,14 @@ namespace cmsx.kernel
         return s;
     }
 
-    public nothrow inline int EncodeMode(FileType fileType, Access ownerAccess, Access groupAccess, Access otherAccess, INode.Flags flags)
+    public nothrow inline int EncodeMode(INode.Flags flags, FileType fileType, Access ownerAccess, Access groupAccess, Access otherAccess)
     {
         int mntpnt = cast<int>((flags & INode.Flags.mountPoint) != INode.Flags.none);
-        return cast<int>(fileType) | (cast<int>(ownerAccess) << 3) | (cast<int>(groupAccess) << 6) | (cast<int>(otherAccess) << 9) | (cast<int>(mntpnt) << 12);
+        return (mntpnt << 12) | (cast<int>(fileType) << 9) | (cast<int>(ownerAccess) << 6) | (cast<int>(groupAccess) << 3) | (cast<int>(otherAccess));
     }
 
-    public nothrow inline void DecodeMode(int mode, FileType& fileType, Access& ownerAccess, Access& groupAccess, Access& otherAccess, INode.Flags& flags)
+    public nothrow inline void DecodeMode(int mode, INode.Flags& flags, FileType& fileType, Access& ownerAccess, Access& groupAccess, Access& otherAccess)
     {
-        fileType = cast<FileType>(mode & 7);
-        ownerAccess = cast<Access>((mode >> 3) & 7);
-        groupAccess = cast<Access>((mode >> 6) & 7);
-        otherAccess = cast<Access>((mode >> 9) & 7);
         if (((mode >> 12) & 1) != 0)
         {
             flags = cast<INode.Flags>(flags | INode.Flags.mountPoint);
@@ -88,6 +84,10 @@ namespace cmsx.kernel
         {
             flags = cast<INode.Flags>(flags & ~INode.Flags.mountPoint);
         }
+        fileType = cast<FileType>((mode >> 9) & 7);
+        ownerAccess = cast<Access>((mode >> 6) & 7);
+        groupAccess = cast<Access>((mode >> 3) & 7);
+        otherAccess = cast<Access>(mode & 7);
     }
 
     public nothrow inline int GetINodeBlockNumber(int inodeNumber, int firstINodeBlockNumber)
@@ -220,7 +220,7 @@ namespace cmsx.kernel
         public void Read(MemoryReader& reader)
         {
             mode = reader.ReadInt();
-            DecodeMode(mode, fileType, ownerAccess, groupAccess, otherAccess, flags);
+            DecodeMode(mode, flags, fileType, ownerAccess, groupAccess, otherAccess);
             uid = reader.ReadInt();
             gid = reader.ReadInt();
             fileSize = reader.ReadLong();
@@ -239,7 +239,7 @@ namespace cmsx.kernel
         }
         public void Write(MemoryWriter& writer)
         {
-            mode = EncodeMode(fileType, ownerAccess, groupAccess, otherAccess, flags);
+            mode = EncodeMode(flags, fileType, ownerAccess, groupAccess, otherAccess);
             writer.Write(mode);
             writer.Write(uid);
             writer.Write(gid);
@@ -273,13 +273,13 @@ namespace cmsx.kernel
         }
         public nothrow void SetMode()
         {
-            mode = EncodeMode(fileType, ownerAccess, groupAccess, otherAccess, flags);
+            mode = EncodeMode(flags, fileType, ownerAccess, groupAccess, otherAccess);
         }
-        public void SetMode(int mode)
+        public void SetAccessMode(int accessMode)
         {
-            FileType type;
             Flags f;
-            DecodeMode(mode, type, ownerAccess, groupAccess, otherAccess, f);
+            FileType t;
+            DecodeMode(accessMode, f, t, ownerAccess, groupAccess, otherAccess);
         }
         public nothrow inline int UID() const
         {
@@ -448,6 +448,17 @@ namespace cmsx.kernel
             SetCTime();
             SetFlag(Flags.dirty);
         }
+        public nothrow inline int GetNumBlocks() const
+        {
+            if (fileSize == 0)
+            {
+                return 0;
+            }
+            else
+            {
+                return cast<int>((fileSize - 1) / blockSize + 1);
+            }
+        }
         public void CheckPermissions(int uid, int gid, Access access)
         {
             if (this->uid == uid)
@@ -480,6 +491,31 @@ namespace cmsx.kernel
             {
                 throw SystemError(EPERM, "no " + AccessStr(access) + " access");
             }
+        }
+        public nothrow void Clear()
+        {
+            ResetFlags();
+            useCount = 1;
+            mode = 0;
+            uid = -1;
+            gid = -1;
+            fileSize = 0;
+            ctime = DateTime();
+            mtime = DateTime();
+            atime = DateTime();
+            nlinks = 0;
+            long n = directBlockNumbers.Length();
+            for (long i = 0; i < n; ++i)
+            {
+                directBlockNumbers[i] = 0;
+            }
+            singleIndirectBlockNumber = 0;
+            doubleIndirectBlockNumber = 0;
+            tripleIndirectBlockNumber = 0;
+            fileType = FileType.free;
+            ownerAccess = Access.none;
+            groupAccess = Access.none;
+            otherAccess = Access.none;
         }
         public nothrow inline INodeManager* Manager()
         {
@@ -529,6 +565,15 @@ namespace cmsx.kernel
             {
                 inodes[i].Write(writer);
             }
+        }
+        public override nothrow void Clear()
+        {
+            long n = inodes.Length();
+            for (long i = 0; i < n; ++i)
+            {
+                inodes[i].Clear();
+            }
+            base->Clear();
         }
         public nothrow inline INode* GetINode(int index) const
         {

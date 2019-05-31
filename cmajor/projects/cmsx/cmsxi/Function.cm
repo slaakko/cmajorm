@@ -181,45 +181,52 @@ namespace cmsx.intermediate
         }
         public void GenerateCode(MachineCode& machineCode, CodeFormatter& formatter)
         {
-            machineCode.currentLineNumber = 0u;
-            nextInstructionIndex = 0;
-            nextValueNumber = 0;
-            if (!basicBlocks.IsEmpty())
+            try
             {
-                epilog.SetId(basicBlocks.Back()->Id() + 1u);
-            }
-            else
-            {
-                epilog.SetId(1u);
-            }
-            CreateProlog(machineCode);
-            if (Flags.Get(Flag.debug))
-            {
-                formatter.WriteLine("function @" + name);
-                formatter.WriteLine("{");
-                formatter.IncIndent();
-            }
-            for (const UniquePtr<BasicBlock>& basicBlock : basicBlocks)
-            {
-                basicBlock->GenerateCode(machineCode, formatter);
-            }
-            if (!basicBlocks.IsEmpty())
-            {
-                const UniquePtr<BasicBlock>& lastBasicBlock = basicBlocks.Back();
-                Instruction* lastInst = lastBasicBlock->GetLastInstruction();
-                if (lastInst != null && lastInst->lineNumber != 0u)
+                machineCode.currentLineNumber = 0u;
+                nextInstructionIndex = 0;
+                nextValueNumber = 0;
+                if (!basicBlocks.IsEmpty())
                 {
-                    machineCode.EmitLineNumberInfo();
+                    epilog.SetId(basicBlocks.Back()->Id() + 1u);
                 }
+                else
+                {
+                    epilog.SetId(1u);
+                }
+                CreateProlog(machineCode);
+                if (Flags.Get(Flag.debug))
+                {
+                    formatter.WriteLine("function @" + name);
+                    formatter.WriteLine("{");
+                    formatter.IncIndent();
+                }
+                for (const UniquePtr<BasicBlock>& basicBlock : basicBlocks)
+                {
+                    basicBlock->GenerateCode(machineCode, formatter);
+                }
+                if (!basicBlocks.IsEmpty())
+                {
+                    const UniquePtr<BasicBlock>& lastBasicBlock = basicBlocks.Back();
+                    Instruction* lastInst = lastBasicBlock->GetLastInstruction();
+                    if (lastInst != null && lastInst->lineNumber != 0u)
+                    {
+                        machineCode.EmitLineNumberInfo();
+                    }
+                }
+                if (Flags.Get(Flag.debug))
+                {
+                    formatter.DecIndent();
+                    formatter.WriteLine("}");
+                }
+                CreateEpilog(machineCode);
+                frameSize = cast<ulong>(frameLocations.paramOffset);
+                frameSizeOperand->SetValue(frameSize);
             }
-            if (Flags.Get(Flag.debug))
+            catch (const Exception& ex)
             {
-                formatter.DecIndent();
-                formatter.WriteLine("}");
+                throw Exception("error compiling function '" + name + "': " + ex.Message());
             }
-            CreateEpilog(machineCode);
-            frameSize = cast<ulong>(frameLocations.paramOffset);
-            frameSizeOperand->SetValue(frameSize);
         }
         private void CreateProlog(MachineCode& machineCode)
         {

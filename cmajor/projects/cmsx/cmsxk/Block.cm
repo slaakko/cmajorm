@@ -114,6 +114,10 @@ namespace cmsx.kernel
         {
             ResetFlag(Flags.dirty);
         }
+        public virtual nothrow void Clear()
+        {
+            SetFlag(Flags.dirty);
+        }
         public nothrow inline bool GetFlag(Flags flag) const
         {
             return (flags & flag) != Flags.none;
@@ -287,6 +291,19 @@ namespace cmsx.kernel
             lastBlockNumber = lastBlockNumber_;
             SetFlag(Block.Flags.dirty);
         }
+        public nothrow override void Clear()
+        {
+            firstINodeBitmapBlockNumber = 0;
+            numINodeBitmapBlocks = 0;
+            firstBlockBitmapBlockNumber = 0;
+            numBlockBitmapBlocks = 0;
+            firstINodeBlockNumber = 0;
+            numINodeBlocks = 0;
+            firstDataBlockNumber = 0;
+            rootDirINodeNumber = 0;
+            lastBlockNumber = 0;
+            base->Clear();
+        }
         private int firstINodeBitmapBlockNumber;
         private int numINodeBitmapBlocks;
         private int firstBlockBitmapBlockNumber;
@@ -361,6 +378,15 @@ namespace cmsx.kernel
             bits[i] = bits[i] & ~(cast<ulong>(1u) << j);
             SetFlag(Flags.dirty);
         }
+        public override nothrow void Clear()
+        {
+            long n = bits.Length();
+            for (long i = 0; i < n; ++i)
+            {
+                bits[i] = 0u;
+            }
+            base->Clear();
+        }
         private ulong[numULongsInBitmapBlock] bits;
     }
 
@@ -385,13 +411,13 @@ namespace cmsx.kernel
                 writer.Write(blockNumbers[i]);
             }
         }
-        public nothrow void Clear()
+        public override nothrow void Clear()
         {
             for (int i = 0; i < numBlockNumbersInBlock; ++i)
             {
                 blockNumbers[i] = 0;
             }
-            SetFlag(Block.Flags.dirty);
+            base->Clear();
         }
         public nothrow inline int GetBlockNumber(int index) const
         {
@@ -435,13 +461,13 @@ namespace cmsx.kernel
         {
             data[index] = x;
         }
-        public void Clear()
+        public override nothrow void Clear()
         {
             for (int i = 0; i < blockSize; ++i)
             {
                 data[i] = 0u;
             }
-            SetFlag(Block.Flags.dirty);
+            base->Clear();
         }
         private byte[blockSize] data;
     }
@@ -531,6 +557,15 @@ namespace cmsx.kernel
         {
             #assert(index >= 0 && index < entries.Length());
             return entries[index];
+        }
+        public override nothrow void Clear()
+        {
+            long n = entries.Length();
+            for (long i = 0; i < n; ++i)
+            {
+                entries[i] = DirectoryEntry();
+            }
+            base->Clear();
         }
         private DirectoryEntry[numDirectoryEntriesInBlock] entries;
     }

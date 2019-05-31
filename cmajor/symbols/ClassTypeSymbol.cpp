@@ -25,6 +25,7 @@
 #include <cmajor/util/TextUtils.hpp>
 #include <boost/uuid/uuid_generators.hpp>
 #include <boost/uuid/uuid_io.hpp>
+#include <iostream>
 
 namespace cmajor { namespace symbols {
 
@@ -1795,6 +1796,8 @@ ConstantNode* MakeStaticClassArray(const std::unordered_set<ClassTypeSymbol*>& c
     return staticClassIdArray;
 }
 
+#define CLASS_ID_FILE_DEBUG 0
+
 void MakeClassIdFile(const std::unordered_set<ClassTypeSymbol*>& polymorphicClasses, const std::string& classIdFileName)
 {
     cmajor::util::BinaryWriter binaryWriter(classIdFileName);
@@ -1808,13 +1811,21 @@ void MakeClassIdFile(const std::unordered_set<ClassTypeSymbol*>& polymorphicClas
     std::vector<ClassInfo*> classesByPriority = GetClassesByPriority(classIdMap);
     AssignKeys(classesByPriority);
     AssignClassIds(classesByPriority);
-    uint64_t n = polymorphicClasses.size();
+    uint64_t n = classesByPriority.size();
+#if (CLASS_ID_FILE_DEBUG)
+    std::cerr << n << " classes" << std::endl;
+#endif
     binaryWriter.Write(n);
+    uint64_t i = 0;
     for (ClassInfo* info : classesByPriority)
     {
         const boost::uuids::uuid& typeId = info->cls->TypeId();
         binaryWriter.Write(typeId);
         binaryWriter.Write(info->id);
+#if (CLASS_ID_FILE_DEBUG)
+        std::cerr << "class" << i << std::endl;
+#endif
+        ++i;
     }
 }
 

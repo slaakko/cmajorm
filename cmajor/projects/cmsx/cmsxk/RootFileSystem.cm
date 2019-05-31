@@ -194,6 +194,7 @@ namespace cmsx.kernel
                 int numINodeBlocks = (maxFiles - 1) / numINodesInBlock + 1;
                 {
                     Block* block = blockManager.GetBlock(BlockKey(0, 0, BlockKind.superBlock), null);
+                    block->Clear();
                     #assert(block is SuperBlock*);
                     BlockPutter putter(block);
                     SuperBlock* superBlock = cast<SuperBlock*>(block);

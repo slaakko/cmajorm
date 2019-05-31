@@ -134,26 +134,6 @@ namespace System.Os
         return cast<uint>(seed);
     }
     
-    public bool IsHostTextFile(int fd)
-    {
-        int result = is_host_text_file(fd);
-        if (result == -1)
-        {
-            ThrowSystemError();
-        }
-        return result != 0;
-    }
-
-    public bool IsConsole(int fd)
-    {
-        int result = is_console(fd);
-        if (result == -1)
-        {
-            ThrowSystemError();
-        }
-        return result != 0;
-    }
-    
     public void Link(const char* sourcePath, const char* targetPath)
     {
         int result = link(sourcePath, targetPath);
@@ -239,5 +219,131 @@ namespace System.Os
             ThrowSystemError();
         }
         StatBufToStatInfo(&statBuf[0], statInfo);
+    }
+    
+    public const int IOCTL_IS_CONSOLE_ITEM = 1;
+    public const int IOCTL_IS_HOST_TEXT_FILE_ITEM = 2;
+    public const int IOCTL_HAS_COLORS_ITEM = 3;
+    public const int IOCTL_GET_WINDOW_SIZE_ITEM = 4;
+    public const int IOCTL_GET_COLORS_ITEM = 5;
+    public const int IOCTL_SET_COLORS_ITEM = 6;
+    public const int IOCTL_BEGIN_OBEY_COLOR_STRINGS_ITEM = 7;
+    public const int IOCTL_END_OBEY_COLOR_STRINGS_ITEM = 8;
+        
+    public bool IsConsole(int fd)
+    {
+        byte[1] buffer;
+        int result = ioctl(fd, IOCTL_IS_CONSOLE_ITEM, &buffer[0], buffer.Length());
+        if (result == -1)
+        {
+            ThrowSystemError();
+        }
+        MemoryReader reader(&buffer[0], buffer.Length());
+        bool isConsole = cast<bool>(reader.ReadByte());
+        return isConsole;
+    }
+    
+    public bool IsHostTextFile(int fd)
+    {
+        byte[1] buffer;
+        int result = ioctl(fd, IOCTL_IS_HOST_TEXT_FILE_ITEM, &buffer[0], buffer.Length());
+        if (result == -1)
+        {
+            ThrowSystemError();
+        }
+        MemoryReader reader(&buffer[0], buffer.Length());
+        bool isHostTextFile = cast<bool>(reader.ReadByte());
+        return isHostTextFile;
+    }
+    
+    public bool HasColors(int fd)
+    {
+        byte[1] buffer;
+        int result = ioctl(fd, IOCTL_HAS_COLORS_ITEM, &buffer[0], buffer.Length());
+        if (result == -1)
+        {
+            ThrowSystemError();
+        }
+        MemoryReader reader(&buffer[0], buffer.Length());
+        bool hasColors = cast<bool>(reader.ReadByte());
+        return hasColors;
+    }
+
+    public void GetWindowSize(int fd, int& rows, int& cols)
+    {
+        byte[8] buffer;
+        int result = ioctl(fd, IOCTL_GET_WINDOW_SIZE_ITEM, &buffer[0], buffer.Length());
+        if (result == -1)
+        {   
+            ThrowSystemError();
+        }
+        MemoryReader reader(&buffer[0], buffer.Length());
+        rows = reader.ReadInt();
+        cols = reader.ReadInt();
+    }
+    
+    public enum ConsoleColor : byte
+    {
+        black = 0u, darkBlue = 1u, darkGreen = 2u, darkCyan = 3u, darkRed = 4u, darkYellow = 6u, gray = 7u,
+        darkGray = 8u, blue = 9u, green = 10u, cyan = 11u, red = 12u, magenta = 13u, yellow = 14u, white = 15u
+    }
+    
+    public void GetConsoleColors(int fd, ConsoleColor& foregroundColor, ConsoleColor& backgroundColor)
+    {
+        byte[2] buffer;
+        int result = ioctl(fd, IOCTL_GET_COLORS_ITEM, &buffer[0], buffer.Length());
+        if (result == -1)
+        {   
+            ThrowSystemError();
+        }
+        MemoryReader reader(&buffer[0], buffer.Length());
+        foregroundColor = cast<ConsoleColor>(reader.ReadByte());
+        backgroundColor = cast<ConsoleColor>(reader.ReadByte());
+    }
+    
+    public void SetConsoleColors(int fd, ConsoleColor foregroundColor, ConsoleColor backgroundColor)
+    {
+        byte[2] buffer;
+        MemoryWriter writer(&buffer[0], buffer.Length());
+        writer.Write(cast<byte>(foregroundColor));
+        writer.Write(cast<byte>(backgroundColor));
+        int result = ioctl(fd, IOCTL_SET_COLORS_ITEM, &buffer[0], buffer.Length());
+        if (result == -1)
+        {   
+            ThrowSystemError();
+        }
+    }
+    
+    public void BeginObeyColorStrings(int fd)
+    {
+        byte[1] buffer;
+        int result = ioctl(fd, IOCTL_BEGIN_OBEY_COLOR_STRINGS_ITEM, &buffer[0], buffer.Length());
+        if (result == -1)
+        {   
+            ThrowSystemError();
+        }
+    }
+    
+    public void EndObeyColorStrings(int fd)
+    {
+        byte[1] buffer;
+        int result = ioctl(fd, IOCTL_END_OBEY_COLOR_STRINGS_ITEM, &buffer[0], buffer.Length());
+        if (result == -1)
+        {   
+            ThrowSystemError();
+        }
+    }
+
+    public const uchar beginColors = cast<uchar>(0x100000u);    // begin Unicode supplemental private use area B
+    public const uchar endColors = cast<uchar>(0x10FFFDu);      // end Unicode supplemental private use area B
+
+    public nothrow inline uchar BeginColors(ConsoleColor foregroundColor, ConsoleColor backgroundColor)
+    {
+        return cast<uchar>(cast<uint>(beginColors) | cast<uint>(cast<ushort>(cast<byte>(foregroundColor)) | (cast<ushort>(cast<byte>(backgroundColor)) << 8u)));
+    }
+
+    public nothrow inline uchar EndColors()
+    {
+        return endColors;
     }
 }

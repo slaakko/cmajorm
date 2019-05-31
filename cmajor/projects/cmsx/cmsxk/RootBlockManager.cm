@@ -28,6 +28,7 @@ namespace cmsx.kernel
                 if (superBlock->GetLastBlockNumber() < firstNumber + i)
                 {
                     block = fs->GetBlockManager()->GetBlock(BlockKey(firstNumber + i, fsNumber, BlockKind.bitmapBlock), superBlock);
+                    block->Clear();
                 }
                 else
                 {
@@ -352,9 +353,9 @@ namespace cmsx.kernel
                 if (blockNumber != 0)
                 {
                     Block* block = GetBlock(BlockKey(blockNumber, inode->Key().fsNumber, BlockKind.fileBlock), null);
+                    block->Clear();
                     #assert(block is FileBlock*);
                     FileBlock* fileBlock = cast<FileBlock*>(block);
-                    fileBlock->Clear();
                     BlockPutter putter(block);
                     WriteBlock(block, null);
                     fs->SetBlockFree(blockNumber);
@@ -374,9 +375,9 @@ namespace cmsx.kernel
                     if (blockNumber != 0)
                     {
                         Block* block = GetBlock(BlockKey(blockNumber, inode->Key().fsNumber, BlockKind.fileBlock), null);
+                        block->Clear();
                         #assert(block is FileBlock*);
                         FileBlock* fileBlock = cast<FileBlock*>(block);
-                        fileBlock->Clear();
                         BlockPutter putter(block);
                         WriteBlock(block, null);
                         fs->SetBlockFree(blockNumber);
@@ -409,9 +410,9 @@ namespace cmsx.kernel
                             if (blockNumber != 0)
                             {
                                 Block* block = GetBlock(BlockKey(blockNumber, inode->Key().fsNumber, BlockKind.fileBlock), null);
+                                block->Clear();
                                 #assert(block is FileBlock*);
                                 FileBlock* fileBlock = cast<FileBlock*>(block);
-                                fileBlock->Clear();
                                 BlockPutter putter(block);
                                 WriteBlock(block, null);
                                 fs->SetBlockFree(blockNumber);
@@ -458,9 +459,9 @@ namespace cmsx.kernel
                                     if (blockNumber != 0)
                                     {
                                         Block* block = GetBlock(BlockKey(blockNumber, inode->Key().fsNumber, BlockKind.fileBlock), null);
+                                        block->Clear();
                                         #assert(block is FileBlock*);
                                         FileBlock* fileBlock = cast<FileBlock*>(block);
-                                        fileBlock->Clear();
                                         BlockPutter putter(block);
                                         WriteBlock(block, null);
                                         fs->SetBlockFree(blockNumber);
@@ -529,10 +530,10 @@ namespace cmsx.kernel
                             singleIndirectBlockNumber = fs->AllocateBlockNumber();
                             inode->SetSingleIndirectBlockNumber(singleIndirectBlockNumber);
                             Block* block = GetBlock(BlockKey(singleIndirectBlockNumber, inode->Key().fsNumber, BlockKind.blockNumberBlock), null);
+                            block->Clear();
                             #assert(block is BlockNumberBlock*);
                             BlockPutter putter(block);
                             BlockNumberBlock* singleIndirectBlock = cast<BlockNumberBlock*>(block);
-                            singleIndirectBlock->Clear();
                             WriteBlock(block, null);
                         }
                         else
@@ -582,9 +583,9 @@ namespace cmsx.kernel
                                 doubleIndirectBlockNumber = fs->AllocateBlockNumber();
                                 inode->SetDoubleIndirectBlockNumber(doubleIndirectBlockNumber);
                                 Block* block = GetBlock(BlockKey(doubleIndirectBlockNumber, inode->Key().fsNumber, BlockKind.blockNumberBlock), null);
+                                block->Clear();
                                 #assert(block is BlockNumberBlock*);
                                 BlockNumberBlock* doubleIndirectBlock = cast<BlockNumberBlock*>(block);
-                                doubleIndirectBlock->Clear();
                                 BlockPutter putter(block);
                                 WriteBlock(block, null);
                             }
@@ -611,9 +612,9 @@ namespace cmsx.kernel
                                 singleIndirectBlockNumber = fs->AllocateBlockNumber();
                                 doubleIndirectBlock->SetBlockNumber(logicalBlockNumber / numBlockNumbersInBlock, singleIndirectBlockNumber);
                                 Block* block = GetBlock(BlockKey(singleIndirectBlockNumber, inode->Key().fsNumber, BlockKind.blockNumberBlock), null);
+                                block->Clear();
                                 #assert(block is BlockNumberBlock*);
                                 BlockNumberBlock* singleIndirectBlock = cast<BlockNumberBlock*>(block);
-                                singleIndirectBlock->Clear();
                                 BlockPutter putter(block);
                                 WriteBlock(block, null);
                             }
@@ -666,9 +667,9 @@ namespace cmsx.kernel
                                     tripleIndirectBlockNumber = fs->AllocateBlockNumber();
                                     inode->SetTripleIndirectBlockNumber(tripleIndirectBlockNumber);
                                     Block* block = GetBlock(BlockKey(tripleIndirectBlockNumber, inode->Key().fsNumber, BlockKind.blockNumberBlock), null);
+                                    block->Clear();
                                     #assert(block is BlockNumberBlock*);
                                     BlockNumberBlock* tripleIndirectBlock = cast<BlockNumberBlock*>(block);
-                                    tripleIndirectBlock->Clear();
                                     BlockPutter putter(block);
                                     WriteBlock(block, null);
                                 }
@@ -695,9 +696,9 @@ namespace cmsx.kernel
                                     doubleIndirectBlockNumber = fs->AllocateBlockNumber();
                                     tripleIndirectBlock->SetBlockNumber(logicalBlockNumber / (numBlockNumbersInBlock * numBlockNumbersInBlock), doubleIndirectBlockNumber);
                                     Block* block = GetBlock(BlockKey(doubleIndirectBlockNumber, inode->Key().fsNumber, BlockKind.blockNumberBlock), null);
+                                    block->Clear();
                                     #assert(block is BlockNumberBlock*);
                                     BlockNumberBlock* doubleIndirectBlock = cast<BlockNumberBlock*>(block);
-                                    doubleIndirectBlock->Clear();
                                     BlockPutter putter(block);
                                     WriteBlock(block, null);
                                 }
@@ -725,9 +726,9 @@ namespace cmsx.kernel
                                         singleIndirectBlockNumber = fs->AllocateBlockNumber();
                                         doubleIndirectBlock->SetBlockNumber((logicalBlockNumber % (numBlockNumbersInBlock * numBlockNumbersInBlock)) / numBlockNumbersInBlock, singleIndirectBlockNumber);
                                         Block* block = GetBlock(BlockKey(singleIndirectBlockNumber, inode->Key().fsNumber, BlockKind.blockNumberBlock), null);
+                                        block->Clear();
                                         #assert(block is BlockNumberBlock*);
                                         BlockNumberBlock* singleIndirectBlock = cast<BlockNumberBlock*>(block);
-                                        singleIndirectBlock->Clear();
                                         BlockPutter putter(block);
                                         WriteBlock(block, null);
                                     }

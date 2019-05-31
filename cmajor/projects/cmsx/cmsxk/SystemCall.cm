@@ -26,20 +26,19 @@ namespace cmsx.kernel
     public const byte sys_get_current_date = 20u;
     public const byte sys_get_current_date_time = 21u;
     public const byte sys_pow = 22u;
-    public const byte sys_is_host_text_file = 23u;
-    public const byte sys_is_console = 24u;
-    public const byte sys_get_random_seed = 25u;
-    public const byte sys_link = 26u;
-    public const byte sys_unlink = 27u;
-    public const byte sys_mkdir = 28u;
-    public const byte sys_opendir = 29u;
-    public const byte sys_readdir = 30u;
-    public const byte sys_closedir = 31u;
-    public const byte sys_getcwd = 32u;
-    public const byte sys_chdir = 33u;
-    public const byte sys_stat = 34u;
-    public const byte sys_umask = 35u;
-    public const byte numSystemCalls = sys_umask + 1u;
+    public const byte sys_get_random_seed = 23u;
+    public const byte sys_link = 24u;
+    public const byte sys_unlink = 25u;
+    public const byte sys_mkdir = 26u;
+    public const byte sys_opendir = 27u;
+    public const byte sys_readdir = 28u;
+    public const byte sys_closedir = 29u;
+    public const byte sys_getcwd = 30u;
+    public const byte sys_chdir = 31u;
+    public const byte sys_stat = 32u;
+    public const byte sys_umask = 33u;
+    public const byte sys_ioctl = 34u;
+    public const byte numSystemCalls = sys_ioctl + 1u;
 
     public nothrow string SystemCallName(byte systemCall)
     {
@@ -68,8 +67,6 @@ namespace cmsx.kernel
             case sys_get_current_date: return "sys_get_current_date";
             case sys_get_current_date_time: return "sys_get_current_date_time";
             case sys_pow: return "sys_pow";
-            case sys_is_host_text_file: return "sys_is_host_text_file";
-            case sys_is_console: return "sys_is_console";
             case sys_get_random_seed: return "sys_get_random_seed";
             case sys_link: return "sys_link";
             case sys_unlink: return "sys_unlink";
@@ -80,6 +77,8 @@ namespace cmsx.kernel
             case sys_getcwd: return "sys_getcwd";
             case sys_chdir: return "sys_chdir";
             case sys_stat: return "sys_stat";
+            case sys_umask: return "sys_umask";
+            case sys_ioctl: return "sys_ioctl";
         }
         return string();
     }
@@ -480,40 +479,6 @@ namespace cmsx.kernel
         sc.result = *cast<long*>(cast<void*>(&r));
     }
 
-    public void IsHostTextFile(SystemCall& sc)
-    {
-        if (sc.x != 0u || sc.y != sys_is_host_text_file || sc.z != 0u)
-        {
-            Panic("invalid is_host_text_file parameters: " + ToString(sc.x) + ", " + ToString(sc.y) + ", " + ToString(sc.z));
-        }
-        int fd = cast<int>(sc.ax);
-        if (IsHostTextFile(sc.process, fd))
-        {
-            sc.result = 1;
-        }
-        else
-        {
-            sc.result = 0;
-        }
-    }
-
-    public void IsConsole(SystemCall& sc)
-    {
-        if (sc.x != 0u || sc.y != sys_is_console || sc.z != 0u)
-        {
-            Panic("invalid is_console parameters: " + ToString(sc.x) + ", " + ToString(sc.y) + ", " + ToString(sc.z));
-        }
-        int fd = cast<int>(sc.ax);
-        if (IsConsole(sc.process, fd))
-        {
-            sc.result = 1;
-        }
-        else
-        {
-            sc.result = 0;
-        }
-    }
-
     public void GetRandomSeed(SystemCall& sc)
     {
         if (sc.x != 0u || sc.y != sys_get_random_seed || sc.z != 0u)
@@ -616,5 +581,15 @@ namespace cmsx.kernel
             Panic("invalid umask parameters: " + ToString(sc.x) + ", " + ToString(sc.y) + ", " + ToString(sc.z));
         }
         sc.result = UMask(*sc.machine, sc.process, cast<int>(sc.ax));
+    }
+
+    public void IOCtl(SystemCall& sc)
+    {
+        if (sc.x != 0u || sc.y != sys_ioctl || sc.z != 0u)
+        {
+            Panic("invalid ioctl parameters: " + ToString(sc.x) + ", " + ToString(sc.y) + ", " + ToString(sc.z));
+        }
+        IOCtl(*sc.machine, sc.process, cast<int>(sc.ax), cast<int>(sc.bx), sc.cx, cast<long>(sc.dx));
+        sc.result = 0;
     }
 }

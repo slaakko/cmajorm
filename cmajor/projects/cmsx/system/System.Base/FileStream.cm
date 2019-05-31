@@ -21,10 +21,47 @@ namespace System.IO
         truncate = 1u << 4u,
         text = 1u << 5u
     }
-
+    
+    public nothrow string OpenFlagStr(OpenFlags flags)
+    {
+        string s;
+        if ((flags & OpenFlags.read) != OpenFlags.none)
+        {
+            s.Append('r');
+        }
+        if ((flags & OpenFlags.write) != OpenFlags.none)
+        {
+            s.Append('w');
+        }
+        if ((flags & OpenFlags.create) != OpenFlags.none)
+        {
+            s.Append('c');
+        }
+        if ((flags & OpenFlags.append) != OpenFlags.none)
+        {
+            s.Append('a');
+        }
+        if ((flags & OpenFlags.truncate) != OpenFlags.none)
+        {
+            s.Append('u');
+        }
+        if ((flags & OpenFlags.text) != OpenFlags.none)
+        {
+            s.Append('t');
+        }
+        return s;
+    }
+    
     public enum Origin : byte
     {
         seekSet, seekCur, seekEnd
+    }
+    
+    public class FileSystemException : Exception
+    {
+        public nothrow FileSystemException(const string& message_) : base(message_)
+        {
+        }
     }
     
     public class FileStream : Stream
@@ -67,8 +104,15 @@ namespace System.IO
         public void Open(const string& filePath, OpenFlags flags, int mode)
         {
             Close();
-            fd = System.Os.Open(filePath.Chars(), flags, mode);
-            closeOnExit = true;
+            try
+            {
+                fd = System.Os.Open(filePath.Chars(), flags, mode); 
+                closeOnExit = true;
+            }
+            catch (const Exception& ex)
+            {
+                throw FileSystemException("error opening file '" + filePath + "' with flags '" + OpenFlagStr(flags) + "' and mode " + AccessModeStr(mode) + ": " + ex.Message());
+            }
         }
         public void Close()
         {
