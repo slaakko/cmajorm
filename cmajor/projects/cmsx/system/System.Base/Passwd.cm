@@ -1,0 +1,133 @@
+// =================================
+// Copyright (c) 2019 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.IO;
+using System.Collections;
+
+namespace System.Security
+{
+    public class SecurityException : Exception
+    {
+        public nothrow SecurityException(const string& message_) : base(message_)
+        {
+        }
+    }
+
+    public class User
+    {
+        public nothrow User(const string& username_, const string& hash_, int uid_, int gid_, const string& info_, const string& home_, const string& shell_) : 
+            username(username_), hash(hash_), uid(uid_), gid(gid_), info(info_), home(home_), shell(shell_)
+        {
+        }
+        public nothrow inline const string& Name() const
+        {
+            return username;
+        }
+        public nothrow inline const string& Hash() const
+        {
+            return hash;
+        }
+        public nothrow inline int UID() const
+        {
+            return uid;
+        }
+        public nothrow inline int GID() const
+        {
+            return gid;
+        }
+        public nothrow inline const string& Info() const
+        {
+            return info;
+        }
+        public nothrow inline const string& Home() const
+        {
+            return home;
+        }
+        public nothrow inline const string& Shell() const
+        {
+            return shell;
+        }
+        private string username;
+        private string hash;
+        private int uid;
+        private int gid;
+        private string info;
+        private string home;
+        private string shell;
+    }
+    
+    public class Group
+    {
+        public nothrow Group(const string& groupname_, const string& hash_, int gid_, const List<string>& users_) : 
+            groupname(groupname_), hash(hash_), gid(gid_), users(users_)
+        {
+        }
+        public nothrow inline const string& Name() const
+        {
+            return groupname;
+        }
+        public nothrow inline const string& Hash() const
+        {
+            return hash;
+        }
+        public nothrow inline int GID() const
+        {
+            return gid;
+        }
+        public nothrow inline const List<string>& Users() const
+        {
+            return users;
+        }
+        private string groupname;
+        private string hash;
+        private int gid;
+        private List<string> users;
+    }
+    
+    public User GetUser(int uid)
+    {
+        StreamReader reader = File.OpenRead("/etc/passwd");
+        int lineNumber = 0;
+        while (!reader.Eof())
+        {
+            string line = reader.ReadLine();
+            List<string> fields = line.Split(':');
+            if (fields.Count() != 7)
+            {
+                throw SecurityException("invalid line " + ToString(lineNumber) + " in /etc/passwd: wrong number of fields (" + ToString(fields.Count()) + "), should be 7.");
+            }
+            User user(fields[0], fields[1], ParseInt(fields[2]), ParseInt(fields[3]), fields[4], fields[5], fields[6]);
+            if (user.UID() == uid)
+            {
+                return user;
+            }
+            ++lineNumber;
+        }
+        throw SecurityException("no matching user account for UID " + ToString(uid) + " found from /etc/passwd");
+    }
+    
+    public Group GetGroup(int gid)
+    {
+        StreamReader reader = File.OpenRead("/etc/group");
+        int lineNumber = 0;
+        while (!reader.Eof())
+        {
+            string line = reader.ReadLine();
+            List<string> fields = line.Split(':');
+            if (fields.Count() != 4)
+            {
+                throw SecurityException("invalid line " + ToString(lineNumber) + " in /etc/group: wrong number of fields (" + ToString(fields.Count()) + "), should be 74");
+            }
+            Group group(fields[0], fields[1], ParseInt(fields[2]), ParseCSV(fields[3]));
+            if (group.GID() == gid)
+            {
+                return group;
+            }
+            ++lineNumber;
+        }
+        throw SecurityException("no matching group for GID " + ToString(gid) + " found from /etc/group");
+    }
+}

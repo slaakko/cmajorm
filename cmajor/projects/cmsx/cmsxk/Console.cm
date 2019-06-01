@@ -93,6 +93,10 @@ namespace cmsx.kernel
                 Panic("Console driver callback initialization failed");
             }
         }
+        public void Stop()
+        {
+            consoleInputHandle = null;
+        }
         public void GetDimensions(int& rows, int& cols)
         {
             GetDimensions();
@@ -454,11 +458,14 @@ namespace cmsx.kernel
 
     public void ConsoleInputWaitingCallback()
     {
-        uchar c = '\0';
-        bool retVal = OsReadConsoleInput(ConsoleDriver.Instance().GetConsoleInputHandle(), &c);
-        if (retVal && c != '\0')
+        if (ConsoleDriver.Instance().GetConsoleInputHandle() != null)
         {
-            ConsoleDriver.Instance().KeyPressed(c);
+            uchar c = '\0';
+            bool retVal = OsReadConsoleInput(ConsoleDriver.Instance().GetConsoleInputHandle(), &c);
+            if (retVal && c != '\0')
+            {
+                ConsoleDriver.Instance().KeyPressed(c);
+            }
         }
     }
 

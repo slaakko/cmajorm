@@ -392,10 +392,12 @@ namespace cmsx.kernel
                             throw FileSystemException("cannot browse directory '" + dir + "' using uid " + ToString(process->uid) + ": " + ex.Message());
                         }
                         if (inode->Key() == process->rootDirINodeKey && pathComponent == "..") continue;
+                        if (pathComponent == ".") continue;
                     }
                     else
                     {
                         if (inode->Key() == fs->GetRootDirINodeKey() && pathComponent == "..") continue;
+                        if (pathComponent == ".") continue;
                     }
                     long offset = 0;
                     long directorySize = inode->GetFileSize();

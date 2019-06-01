@@ -45,6 +45,7 @@ void Terminate(Machine& machine)
 {
     GetMountTable().Flush();
     GetDiskDriver().Stop();
+    GetConsoleDriver().Stop();
     Kernel& kernel = Kernel.Instance();
     if (Machine.GetFlag(Machine.Flags.debug))
     {

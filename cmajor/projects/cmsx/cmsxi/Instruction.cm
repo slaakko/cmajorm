@@ -2434,11 +2434,11 @@ namespace cmsx.intermediate
                 else
                 {
                     LoadOperandValue(z, rz, addressDescriptors, machineCode, line, this);
-                    MachineInstruction* mulInst = machineCode.GetInstruction(cmsx.machine.MUL, this);
-                    mulInst->AddOperand(rz->reg);
-                    mulInst->AddOperand(rz->reg);
                     if (size <= MaxValue<byte>())
                     {
+                        MachineInstruction* mulInst = machineCode.GetInstruction(cmsx.machine.MUL, this);
+                        mulInst->AddOperand(rz->reg);
+                        mulInst->AddOperand(rz->reg);
                         mulInst->AddOperand(machineCode.context.GetLiteralOperand(cast<ulong>(size)));
                     }
                     else
@@ -2447,6 +2447,9 @@ namespace cmsx.intermediate
                         machineCode.context.AddValue(sizeValue);
                         Register* ix = machineCode.context.regs.GetIx();
                         sizeValue->GenerateSetValue(ix, machineCode, line, this);
+                        MachineInstruction* mulInst = machineCode.GetInstruction(cmsx.machine.MUL, this);
+                        mulInst->AddOperand(rz->reg);
+                        mulInst->AddOperand(rz->reg);
                         mulInst->AddOperand(ix);
                     }
                 }

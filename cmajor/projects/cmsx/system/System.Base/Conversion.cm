@@ -4,6 +4,7 @@
 // =================================
 
 using System.Concepts;
+using System.Collections;
 
 namespace System
 {
@@ -958,5 +959,10 @@ namespace System
             ThrowConversionException("cannot parse date time from string '" + s + "': not in format YYYY[-]MM[-]DD or YYYY[-]MM[-]DDTHH[[:]MM[[:]SS]]");
         }
         return dateTime;
+    }
+    
+    public List<string> ParseCSV(const string& csv)
+    {
+        return csv.Split(',');
     }
 }

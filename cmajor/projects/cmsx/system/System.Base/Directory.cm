@@ -234,9 +234,9 @@ namespace System.IO
     public nothrow inline void DecodeMode(int mode, FileType& fileType, Access& ownerAccess, Access& groupAccess, Access& otherAccess)
     {
         fileType = cast<FileType>((mode >> 9) & 7);
-        Access ownerAccess = cast<Access>((mode >> 6) & 7);
-        Access groupAccess = cast<Access>((mode >> 3) & 7);
-        Access otherAccess = cast<Access>(mode & 7);
+        ownerAccess = cast<Access>((mode >> 6) & 7);
+        groupAccess = cast<Access>((mode >> 3) & 7);
+        otherAccess = cast<Access>(mode & 7);
     }
         
     public class StatInfo

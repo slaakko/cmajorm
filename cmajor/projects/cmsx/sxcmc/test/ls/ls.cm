@@ -512,7 +512,7 @@ nothrow List<ustring> MakeItemStrings(List<InfoEntry>& infoEntries, Column colum
     return itemStrings;
 }
 
-nothrow void BreakIntoLines(List<ustring>& itemStrings, List<ustring>& lines, bool longFormat, bool multicolumn, int screenWidth)
+nothrow void MakeLines(List<ustring>& itemStrings, List<ustring>& lines, bool longFormat, bool multicolumn, int screenWidth)
 {
     if (screenWidth == 0 || longFormat || !multicolumn)
     {
@@ -650,7 +650,7 @@ void ListFiles(const List<string>& files, Column columns, SortBy sortBy, bool re
             if (!itemStrings.IsEmpty())
             {
                 List<ustring> lines;
-                BreakIntoLines(itemStrings, lines, longFormat, multicolumn, screenWidth);
+                MakeLines(itemStrings, lines, longFormat, multicolumn, screenWidth);
                 PrintLines(lines);
             }
             if (recursive)
@@ -663,12 +663,15 @@ void ListFiles(const List<string>& files, Column columns, SortBy sortBy, bool re
             infoEntries.Add(infoEntry);
         }
     }
-    List<ustring> itemStrings = MakeItemStrings(infoEntries, columns, sortBy, reverse, hasColors);
-    if (!itemStrings.IsEmpty())
+    if (!infoEntries.IsEmpty())
     {
-        List<ustring> lines;
-        BreakIntoLines(itemStrings, lines, longFormat, multicolumn, screenWidth);
-        PrintLines(lines);
+        List<ustring> itemStrings = MakeItemStrings(infoEntries, columns, sortBy, reverse, hasColors);
+        if (!itemStrings.IsEmpty())
+        {
+            List<ustring> lines;
+            MakeLines(itemStrings, lines, longFormat, multicolumn, screenWidth);
+            PrintLines(lines);
+        }
     }
 }
 

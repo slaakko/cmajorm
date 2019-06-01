@@ -4,9 +4,9 @@ using System.Os;
 
 void PrintHelp()
 {
-    Console.Out() << "Usage: [options] mkpasswd" << endl() <<
+    Console.Out() << "Usage: [options] mketc" << endl() <<
         "Make /etc directory if it does not exist." << endl() <<
-        "Then make default /etc/passwd file." << endl() << endl() <<
+        "Then make default /etc/passwd and /etc/group files, if they do not exist." << endl() << endl() <<
         "Options:" << endl() << endl() <<
         "--help | -h" << endl() <<
         "   Print help." << endl() << endl() <<
@@ -103,7 +103,8 @@ int main(int argc, const char** argv)
                 Console.Out() << "/etc/passwd does not exist, creating...";
             }
             StreamWriter writer(SharedPtr<Stream>(new FileStream("/etc/passwd", cast<OpenFlags>(OpenFlags.write | OpenFlags.create | OpenFlags.truncate), cast<int>(ParseOctal("644")))));
-            writer << "root:root:142E4F84D6C5554052F32A6968E88EDCD56B118A" << endl();
+            // username:hash:uid:gid:info:home:shell
+            writer << "root:142E4F84D6C5554052F32A6968E88EDCD56B118A:0:0:root:/:/bin/cmsh\n";
             if (verbose)
             {
                 Console.Out() << "\b\b\b, done." << endl();
@@ -114,6 +115,27 @@ int main(int argc, const char** argv)
             if (verbose)
             {
                 Console.Out() << "/etc/passwd already exists." << endl();
+            }
+        }
+        if (!File.Exists("/etc/group"))
+        {
+            if (verbose)
+            {
+                Console.Out() << "/etc/group does not exist, creating...";
+            }
+            StreamWriter writer(SharedPtr<Stream>(new FileStream("/etc/group", cast<OpenFlags>(OpenFlags.write | OpenFlags.create | OpenFlags.truncate), cast<int>(ParseOctal("644")))));
+            // groupname::gid:usercsv
+            writer << "root::0:root\n";
+            if (verbose)
+            {
+                Console.Out() << "\b\b\b, done." << endl();
+            }
+        }
+        else
+        {
+            if (verbose)
+            {
+                Console.Out() << "/etc/group already exists." << endl();
             }
         }
         if (verbose)
