@@ -13,7 +13,7 @@ namespace cmsx.kernel
 
     public enum FileType : int
     {
-        free = 0, regular = 1, directory = 2, characterSpecial = 3, blockSpecial = 4, fifo = 5
+        free = 0, regular = 1, directory = 2, characterSpecial = 3, blockSpecial = 4, fifo = 5, symlink = 6
     }
 
     public nothrow string FileTypeStr(FileType fileType)
@@ -26,6 +26,7 @@ namespace cmsx.kernel
             case FileType.characterSpecial: return "characterSpecial";
             case FileType.blockSpecial: return "blockSpecial";
             case FileType.fifo: return "fifo";
+            case FileType.symlink: return "symlink";
         }
         return string();
     }
@@ -33,9 +34,9 @@ namespace cmsx.kernel
     public enum Access : int
     {
         none =  0,
-        read = 1 << 0,
+        read = 1 << 2,
         write = 1 << 1,
-        execute = 1 << 2
+        execute = 1 << 0
     }
 
     public nothrow string AccessStr(Access access)

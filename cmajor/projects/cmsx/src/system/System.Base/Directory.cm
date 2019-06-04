@@ -131,7 +131,7 @@ namespace System.IO
     
     public enum FileType : int
     {
-        free = 0, regular = 1, directory = 2, characterSpecial = 3, blockSpecial = 4, fifo = 5
+        free = 0, regular = 1, directory = 2, characterSpecial = 3, blockSpecial = 4, fifo = 5, symlink = 6
     }
     
     public nothrow string FileTypeStr(FileType fileType)
@@ -144,6 +144,7 @@ namespace System.IO
             case FileType.characterSpecial: return "characterSpecial";
             case FileType.blockSpecial: return "blockSpecial";
             case FileType.fifo: return "fifo";
+            case FileType.symlink: return "symlink";
         }
         return string();
     }

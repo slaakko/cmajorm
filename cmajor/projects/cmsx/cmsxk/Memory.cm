@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using cmsx.machine;
 
 namespace cmsx.kernel
@@ -24,12 +25,117 @@ namespace cmsx.kernel
         return AddressSpace.GetNextAddressSpaceNumber();
     }
 
+    public class GlobalMemoryTable
+    {
+        static GlobalMemoryTable() : instance(new GlobalMemoryTable())
+        {
+        }
+        public static GlobalMemoryTable& Instance()
+        {
+            return *instance;
+        }
+        private GlobalMemoryTable()
+        {
+        }
+        public void AddMemoryTable(MemoryTable* memoryTable)
+        {
+            addressSpaceMemoryTableMap[memoryTable->addressSpaceNumber] = memoryTable;
+        }
+        public void RemoveMemoryTable(MemoryTable* memoryTable)
+        {
+            addressSpaceMemoryTableMap.Remove(memoryTable->addressSpaceNumber);
+        }
+        public nothrow MemoryTable* GetMemoryTable(ushort addressSpaceNumber) const
+        {
+            HashMap<ushort, MemoryTable*>.ConstIterator it = addressSpaceMemoryTableMap.CFind(addressSpaceNumber);
+            if (it != addressSpaceMemoryTableMap.CEnd())
+            {
+                return it->second;
+            }
+            else
+            {
+                return null;
+            }
+        }
+        private static UniquePtr<GlobalMemoryTable> instance;
+        private HashMap<ushort, MemoryTable*> addressSpaceMemoryTableMap;
+    }
+
     public class MemoryTable
     {
         public ulong rootPageAddress;
         public ushort addressSpaceNumber;
         public SegmentDescriptor*[numSegments] segmentDescriptors;
         public ulong virtualTranslationRegisterValue;
+    }
+
+    public nothrow ulong KernelGetMaxStackSize(ushort addressSpaceNumber)
+    {
+        MemoryTable* memoryTable = GlobalMemoryTable.Instance().GetMemoryTable(addressSpaceNumber);
+        if (memoryTable != null)
+        {
+            SegmentDescriptor* stackSegmentDescriptor = memoryTable->segmentDescriptors[stackSegmentIndex];
+            if (stackSegmentDescriptor != null)
+            {
+                return stackSegmentDescriptor->maxLength;
+            }
+            else
+            {
+                return 0u;
+            }
+        }
+        else
+        {
+            return 0u;
+        }
+    }
+
+    public nothrow bool KernelGrowStack(ushort addressSpaceNumber)
+    {
+        try
+        {
+            MemoryTable* memoryTable = GlobalMemoryTable.Instance().GetMemoryTable(addressSpaceNumber);
+            if (memoryTable != null)
+            {
+                SegmentDescriptor* stackSegmentDescriptor = memoryTable->segmentDescriptors[stackSegmentIndex];
+                if (stackSegmentDescriptor != null)
+                {
+                    if (stackSegmentDescriptor->increment == 0u)
+                    {
+                        return false;
+                    }
+                    else if (stackSegmentDescriptor->length + stackSegmentDescriptor->increment <= stackSegmentDescriptor->maxLength)
+                    {
+                        GrowSegment(GetMachine().GetMemory(),  *memoryTable, stackSegmentIndex, stackSegmentDescriptor->increment);
+                        return true;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                return false;
+            }
+        }
+        catch (const Exception& ex)
+        {
+            Kernel& kernel = Kernel.Instance();
+            ProcessTable& processTable = kernel.GetProcessTable();
+            Process* process = processTable.GetRunning();
+            Debugger* debugger = kernel.GetDebugger();
+            string errorlf = "KernelGrowStack failed: " + ex.Message() + "\n";
+            debugger->WriteOutput(cast<byte*>(cast<void*>(errorlf.Chars())), errorlf.Length());
+            debugger->Run(process);
+            return false;
+        }
+        return false;
     }
 
     public nothrow void DefaultInitializeMemoryTable(Machine& machine, MemoryTable& memoryTable)
@@ -42,10 +148,11 @@ namespace cmsx.kernel
         memoryTable.segmentDescriptors[poolSegmentIndex] = CreateSegmentDescriptor(0u, poolSegmentBaseAddress, pageSize);
         memoryTable.segmentDescriptors[stackSegmentIndex] = CreateSegmentDescriptor(0u, stackSegmentBaseAddress, pageSize);
         memoryTable.virtualTranslationRegisterValue = MakeVirtualTranslationRegisterValue(memoryTable.rootPageAddress, memoryTable.addressSpaceNumber);
+        GlobalMemoryTable.Instance().AddMemoryTable(&memoryTable);
     }
 
     public nothrow void InitializeMemoryTable(Machine& machine, MemoryTable& memoryTable,
-        ulong textSegmentStartAddress, ulong textSegmentSize, ulong dataSegmentSize, ulong poolSegmentSize, ulong stackSegmentSize)
+        ulong textSegmentStartAddress, ulong textSegmentSize, ulong dataSegmentSize, ulong poolSegmentSize, ulong minStackSegmentSize, ulong maxStackSegmentSize, ulong stackSegmentIncrement)
     {
         Memory& mem = machine.GetMemory();
         memoryTable.rootPageAddress = mem.AllocateRootPage();
@@ -57,8 +164,9 @@ namespace cmsx.kernel
         memoryTable.segmentDescriptors[textSegmentIndex] = CreateSegmentDescriptor(textSegmentStartAddress, textSegmentBaseAddress, textSegmentSize);
         memoryTable.segmentDescriptors[dataSegmentIndex] = CreateSegmentDescriptor(0u, dataSegmentBaseAddress, dataSegmentSize);
         memoryTable.segmentDescriptors[poolSegmentIndex] = CreateSegmentDescriptor(0u, poolSegmentBaseAddress, poolSegmentSize);
-        memoryTable.segmentDescriptors[stackSegmentIndex] = CreateSegmentDescriptor(0u, stackSegmentBaseAddress, stackSegmentSize);
+        memoryTable.segmentDescriptors[stackSegmentIndex] = CreateSegmentDescriptor(0u, stackSegmentBaseAddress, minStackSegmentSize, maxStackSegmentSize, stackSegmentIncrement);
         memoryTable.virtualTranslationRegisterValue = MakeVirtualTranslationRegisterValue(memoryTable.rootPageAddress, memoryTable.addressSpaceNumber);
+        GlobalMemoryTable.Instance().AddMemoryTable(&memoryTable);
     }
 
     public nothrow void InitializeMemoryTableForCloning(Machine& machine, MemoryTable& memoryTable)
@@ -71,6 +179,7 @@ namespace cmsx.kernel
         memoryTable.segmentDescriptors[poolSegmentIndex] = null;
         memoryTable.segmentDescriptors[stackSegmentIndex] = null;
         memoryTable.virtualTranslationRegisterValue = MakeVirtualTranslationRegisterValue(memoryTable.rootPageAddress, memoryTable.addressSpaceNumber);
+        GlobalMemoryTable.Instance().AddMemoryTable(&memoryTable);
     }
 
     public nothrow void CalculatePageNumbers(const SegmentDescriptor& sd, ulong& startPageNumber, ulong& numPages)
@@ -1266,6 +1375,7 @@ namespace cmsx.kernel
         }
         mem.FreeRootPage(memoryTable.rootPageAddress);
         memoryTable.rootPageAddress = 0u;
+        GlobalMemoryTable.Instance().RemoveMemoryTable(&memoryTable);
     }
 
     public void CloneMemory(Memory& mem, MemoryTable& targetMemoryTable, MemoryTable& sourceMemoryTable)

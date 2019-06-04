@@ -56,6 +56,46 @@ namespace cmsx.machine
     public const ulong trapTableBaseAddress = interruptVectorEndAddress;
     public const ulong trapTableEndAddress = trapTableBaseAddress + cast<ulong>(maxTraps) * 8u;
 
+    public delegate ulong KernelMaxStackSizeFunction(ushort addressSpaceNumber);
+    public delegate bool KernelGrowStackFunction(ushort addressSpaceNumber);
+
+    private KernelMaxStackSizeFunction kernelMaxStackSizeFunction;
+    private KernelGrowStackFunction kernelGrowStackFunction;
+
+    public nothrow void SetKernelMaxStackSizeFunction(KernelMaxStackSizeFunction kernelMaxStackSizeFunction_)
+    {
+        kernelMaxStackSizeFunction = kernelMaxStackSizeFunction_;
+    }
+
+    public nothrow void SetKernelGrowStackFunction(KernelGrowStackFunction kernelGrowStackFunction_)
+    {
+        kernelGrowStackFunction = kernelGrowStackFunction_;
+    }
+
+    public nothrow ulong GetMaxStackSize(ushort addressSpaceNumber)
+    {
+        if (cast<void*>(kernelMaxStackSizeFunction) == null)
+        {
+            return 0u;
+        }
+        else
+        {
+            return kernelMaxStackSizeFunction(addressSpaceNumber);
+        }
+    }
+
+    public nothrow bool GrowStack(ushort addressSpaceNumber)
+    {
+        if (cast<void*>(kernelGrowStackFunction) == null)
+        {
+            return false;
+        }
+        else
+        {
+            return kernelGrowStackFunction(addressSpaceNumber);
+        }
+    }
+
     public class PageFrame
     {
         public nothrow PageFrame() : useCount(1u)
@@ -178,6 +218,10 @@ namespace cmsx.machine
 
     public nothrow void WriteMemoryByte(ulong address, byte b)
     {
+        if (address == 0u)
+        {
+            return;
+        }
         OsWriteMemoryByte(address, b);
     }
 
@@ -478,7 +522,44 @@ namespace cmsx.machine
             Protection pageProtection = Protection.notPresent;
             ulong pteAddress = 0u;
             ulong pte = GetPageTableEntry(virtualAddress, segmentIndex, pageAddress, offset, addressSpaceNumber, pageProtection, pteAddress);
-            if (pte != 0u && pageProtection == Protection.copyOnWrite && (access & Protection.write) != 0u)
+            if (pte == 0 && virtualAddress > stackSegmentBaseAddress && virtualAddress < kernelBaseAddress)
+            {
+                ulong maxStackSize = GetMaxStackSize(addressSpaceNumber);
+                ulong requiredStackSize = ((virtualAddress - stackSegmentBaseAddress - 1u) / pageSize + 1u) * pageSize;
+                if (requiredStackSize <= maxStackSize)
+                {
+                    bool grown = GrowStack(addressSpaceNumber);
+                    while (grown)
+                    {
+                        pte = GetPageTableEntry(virtualAddress, segmentIndex, pageAddress, offset, addressSpaceNumber, pageProtection, pteAddress);
+                        if (pte == 0)
+                        {
+                            grown = GrowStack(addressSpaceNumber);
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+                    if (pte == 0)
+                    {
+                        if (pageFault)
+                        {
+                            PageFault(virtualAddress, pageProtection, access);
+                        }
+                        return invalidAddress;
+                    }
+                }
+                else
+                {
+                    if (pageFault)
+                    {
+                        PageFault(virtualAddress, pageProtection, access);
+                    }
+                    return invalidAddress;
+                }
+            }
+            else if (pte != 0u && pageProtection == Protection.copyOnWrite && (access & Protection.write) != 0u)
             {
                 ulong newPageAddress = AllocatePage();
                 CopyPage(pageAddress, newPageAddress);

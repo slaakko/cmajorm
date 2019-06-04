@@ -128,7 +128,7 @@ namespace cmsx.object
         {
             if (fileVersion == ExecutableFileVersionStr())
             {
-                file.Reset(new ExecutableFile(fileName, false, false, 0u, 0u));
+                file.Reset(new ExecutableFile(fileName, false, false, 0u, 0u, 0u, 0u));
             }
             else
             {
@@ -427,8 +427,8 @@ namespace cmsx.object
 
     public class ExecutableFile : BinaryFile
     {
-        public ExecutableFile(const string& fileName_, bool createSections_, bool initSymbolTable, ulong stackSize_, ulong poolSize_) :
-            base(fileName_, new ExecutableFileHeaderSection(this, stackSize_, poolSize_), initSymbolTable)
+        public ExecutableFile(const string& fileName_, bool createSections_, bool initSymbolTable, ulong minStackSize_, ulong maxStackSize_, ulong stackSizeIncrement_, ulong initialPoolSize_) :
+            base(fileName_, new ExecutableFileHeaderSection(this, minStackSize_, maxStackSize_, stackSizeIncrement_, initialPoolSize_), initSymbolTable)
         {
             if (createSections_)
             {
@@ -437,29 +437,56 @@ namespace cmsx.object
                 AddSection(new SymbolSection(this));
             }
         }
-        public ExecutableFile(const string& fileName_, bool initSymbolTable, ulong stackSize_, ulong poolSize_) : this(fileName_, true, initSymbolTable, stackSize_, poolSize_)
+        public ExecutableFile(const string& fileName_, bool initSymbolTable, ulong minStackSize_, ulong maxStackSize_, ulong stackSizeIncrement_, ulong initialPoolSize_) :
+            this(fileName_, true, initSymbolTable, minStackSize_, maxStackSize_, stackSizeIncrement_, initialPoolSize_)
         {
         }
-        public nothrow ulong StackSize() const
+        public nothrow ulong MinStackSize() const
         {
             Section* headerSection = GetHeaderSection();
             if (headerSection is ExecutableFileHeaderSection*)
             {
                 ExecutableFileHeaderSection* executableFileHeaderSection = cast<ExecutableFileHeaderSection*>(headerSection);
-                return executableFileHeaderSection->stackSize;
+                return executableFileHeaderSection->minStackSize;
             }
             else
             {
                 return 0u;
             }
         }
-        public nothrow ulong PoolSize() const
+        public nothrow ulong MaxStackSize() const
         {
             Section* headerSection = GetHeaderSection();
             if (headerSection is ExecutableFileHeaderSection*)
             {
                 ExecutableFileHeaderSection* executableFileHeaderSection = cast<ExecutableFileHeaderSection*>(headerSection);
-                return executableFileHeaderSection->poolSize;
+                return executableFileHeaderSection->maxStackSize;
+            }
+            else
+            {
+                return 0u;
+            }
+        }
+        public nothrow ulong StackSizeIncrement() const
+        {
+            Section* headerSection = GetHeaderSection();
+            if (headerSection is ExecutableFileHeaderSection*)
+            {
+                ExecutableFileHeaderSection* executableFileHeaderSection = cast<ExecutableFileHeaderSection*>(headerSection);
+                return executableFileHeaderSection->stackSizeIncrement;
+            }
+            else
+            {
+                return 0u;
+            }
+        }
+        public nothrow ulong InitialPoolSize() const
+        {
+            Section* headerSection = GetHeaderSection();
+            if (headerSection is ExecutableFileHeaderSection*)
+            {
+                ExecutableFileHeaderSection* executableFileHeaderSection = cast<ExecutableFileHeaderSection*>(headerSection);
+                return executableFileHeaderSection->initialPoolSize;
             }
             else
             {
@@ -806,31 +833,38 @@ namespace cmsx.object
 
     public class ExecutableFileHeaderSection : Section
     {
-        public nothrow ExecutableFileHeaderSection(BinaryFile* file_, ulong stackSize_, ulong poolSize_) :
-            base(file_, "CMSXEXE" + ExecutableFileVersionStr()), stackSize(stackSize_), poolSize(poolSize_)
+        public nothrow ExecutableFileHeaderSection(BinaryFile* file_, ulong minStackSize_, ulong maxStackSize_, ulong stackSizeIncrement_, ulong initialPoolSize_) :
+            base(file_, "CMSXEXE" + ExecutableFileVersionStr()), minStackSize(minStackSize_), maxStackSize(maxStackSize_), stackSizeIncrement(stackSizeIncrement_), initialPoolSize(initialPoolSize_)
         {
         }
         public override void Write(System.IO.BinaryWriter& writer)
         {
             base->Write(writer);
-            WriteULong(writer, stackSize);
-            WriteULong(writer, poolSize);
+            WriteULong(writer, minStackSize);
+            WriteULong(writer, maxStackSize);
+            WriteULong(writer, stackSizeIncrement);
+            WriteULong(writer, initialPoolSize);
         }
         public override void Read(System.IO.BinaryReader& reader)
         {
             base->Read(reader);
-            stackSize = ReadULong(file->FileName(), reader);
-            poolSize = ReadULong(file->FileName(), reader);
+            minStackSize = ReadULong(file->FileName(), reader);
+            maxStackSize = ReadULong(file->FileName(), reader);
+            stackSizeIncrement = ReadULong(file->FileName(), reader);
+            initialPoolSize = ReadULong(file->FileName(), reader);
         }
         public override void Dump(StreamWriter& writer)
         {
             writer.WriteLine("HEADER section");
-            writer.WriteLine(Format("stack size:", 17) + " #" + ToHexString(stackSize));
-            writer.WriteLine(Format("pool size:", 17) + " #" + ToHexString(poolSize));
+            writer.WriteLine(Format("min stack size:", 17) + " #" + ToHexString(minStackSize));
+            writer.WriteLine(Format("max stack size:", 17) + " #" + ToHexString(maxStackSize));
+            writer.WriteLine(Format("initial pool size:", 17) + " #" + ToHexString(initialPoolSize));
             writer.WriteLine();
         }
-        public ulong stackSize;
-        public ulong poolSize;
+        public ulong minStackSize;
+        public ulong maxStackSize;
+        public ulong stackSizeIncrement;
+        public ulong initialPoolSize;
     }
 
     public class CodeSection : Section

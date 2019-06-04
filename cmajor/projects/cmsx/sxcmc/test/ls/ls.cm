@@ -102,14 +102,18 @@ class InfoEntry
 
 class Field
 {
-    public nothrow Field(const ustring& data_, FormatJustify justification_) : data(data_), justification(justification_)
+    public nothrow Field(const ustring& data_, FormatJustify justification_) : this(data_, cast<int>(data_.Length()), justification_)
+    {
+    }
+    public nothrow Field(const ustring& data_, int width_, FormatJustify justification_) : data(data_), width(width_), justification(justification_)
     {
     }
     public nothrow inline int Width() const
     {
-        return cast<int>(data.Length());
+        return width;
     }
     public ustring data;
+    public int width;
     public FormatJustify justification;
 }
 
@@ -172,7 +176,7 @@ nothrow ustring MakeAccessString(const InfoEntry& infoEntry)
     return accessStr;
 }
 
-nothrow ustring MakeEntryName(const InfoEntry& infoEntry, bool hasColors)
+nothrow ustring MakeEntryName(const InfoEntry& infoEntry, bool hasColors, int& width)
 {
     ustring entryName;
     if (hasColors)
@@ -211,6 +215,7 @@ nothrow ustring MakeEntryName(const InfoEntry& infoEntry, bool hasColors)
         }
     }
     entryName.Append(infoEntry.name);
+    width = cast<int>(infoEntry.name.Length());
     if (hasColors)
     {
         entryName.Append(endColorChar);
@@ -251,7 +256,9 @@ nothrow Item MakeItem(const InfoEntry& infoEntry, Column columns, bool hasColors
     }
     if ((columns & Column.name) != Column.none)
     {
-        item.name = Field(MakeEntryName(infoEntry, hasColors), FormatJustify.left);
+        int entryWidth = 0;
+        ustring entryName = MakeEntryName(infoEntry, hasColors, entryWidth);
+        item.name = Field(entryName, entryWidth, FormatJustify.left);
     }
     return item;
 } 
@@ -309,74 +316,91 @@ nothrow FieldWidths CalculateFieldWidths(const List<Item>& items, Column columns
     return fieldWidths;
 }
 
-nothrow ustring MakeItemString(const Item& item, Column columns, FieldWidths widths)
+nothrow Pair<ustring, int> MakeItemString(const Item& item, Column columns, FieldWidths widths)
 {
+    int width = 0;
     ustring itemString;
     if ((columns & Column.inode) != Column.none)
     {
         if (!itemString.IsEmpty())
         {
             itemString.Append(' ');
+            ++width;
         }
-        itemString.Append(Format(item.inode.data, widths.inodeWidth, FormatWidth.min, item.inode.justification));
+        itemString.Append(Format(item.inode.data, widths.inodeWidth, FormatWidth.min, item.inode.justification)) ;
+        width = width + item.inode.Width();
     }
     if ((columns & Column.access) != Column.none)
     {
         if (!itemString.IsEmpty())
         {
             itemString.Append(' ');
+            ++width;
         }
         itemString.Append(Format(item.access.data, widths.accessWidth, FormatWidth.min, item.access.justification));
+        width = width + item.access.Width();
     }
     if ((columns & Column.nlinks) != Column.none)
     {
         if (!itemString.IsEmpty())
         {
             itemString.Append(' ');
+            ++width;
         }
         itemString.Append(Format(item.nlinks.data, widths.nlinksWidth, FormatWidth.min, item.nlinks.justification));
+        width = width + item.nlinks.Width();
     }
     if ((columns & Column.size) != Column.none)
     {
         if (!itemString.IsEmpty())
         {
             itemString.Append(' ');
+            ++width;
         }
         itemString.Append(Format(item.size.data, widths.sizeWidth, FormatWidth.min, item.size.justification));
+        width = width + item.size.Width();
     }
     if ((columns & Column.ctime) != Column.none)
     {
         if (!itemString.IsEmpty())
         {
             itemString.Append(' ');
+            ++width;
         }
         itemString.Append(Format(item.ctime.data, widths.ctimeWidth, FormatWidth.min, item.ctime.justification));
+        width = width + item.ctime.Width();
     }
     if ((columns & Column.mtime) != Column.none)
     {
         if (!itemString.IsEmpty())
         {
             itemString.Append(' ');
+            ++width;
         }
         itemString.Append(Format(item.mtime.data, widths.mtimeWidth, FormatWidth.min, item.mtime.justification));
+        width = width + item.mtime.Width();
     }
     if ((columns & Column.atime) != Column.none)
     {
         if (!itemString.IsEmpty())
         {
             itemString.Append(' ');
+            ++width;
         }
         itemString.Append(Format(item.atime.data, widths.atimeWidth, FormatWidth.min, item.atime.justification));
+        width = width + item.atime.Width();
     }
     if ((columns & Column.name) != Column.none)
     {
         if (!itemString.IsEmpty())
         {
             itemString.Append(' ');
+            ++width;
         }
-        itemString.Append(Format(item.name.data, widths.nameWidth, FormatWidth.min, item.name.justification));
+        itemString.Append(Format(item.name.data, 0, FormatWidth.min, item.name.justification));
+        width = width + item.name.Width();
     }
-    return itemString;
+    return MakePair(itemString, width);
 }
 
 class SortRelation : Rel<InfoEntry>
@@ -495,10 +519,10 @@ class SortRelation : Rel<InfoEntry>
     private bool reverse;
 }
 
-nothrow List<ustring> MakeItemStrings(List<InfoEntry>& infoEntries, Column columns, SortBy sortBy, bool reverse, bool hasColors)
+nothrow List<Pair<ustring, int>> MakeItemStrings(List<InfoEntry>& infoEntries, Column columns, SortBy sortBy, bool reverse, bool hasColors)
 {
     List<Item> items;
-    List<ustring> itemStrings;
+    List<Pair<ustring, int>> itemStrings;
     Sort(infoEntries, SortRelation(sortBy, reverse));
     for (const InfoEntry& infoEntry : infoEntries)
     {
@@ -512,7 +536,7 @@ nothrow List<ustring> MakeItemStrings(List<InfoEntry>& infoEntries, Column colum
     return itemStrings;
 }
 
-nothrow void MakeLines(List<ustring>& itemStrings, List<ustring>& lines, bool longFormat, bool multicolumn, int screenWidth)
+nothrow void MakeLines(List<Pair<ustring, int>>& itemStrings, List<Pair<ustring, int>>& lines, bool longFormat, bool multicolumn, int screenWidth)
 {
     if (screenWidth == 0 || longFormat || !multicolumn)
     {
@@ -523,7 +547,7 @@ nothrow void MakeLines(List<ustring>& itemStrings, List<ustring>& lines, bool lo
         int maxItemStringLength = 0;
         int totalLength = 0;
         bool first = true;
-        for (const ustring& itemString : itemStrings)
+        for (const Pair<ustring, int>& itemString : itemStrings)
         {
             if (first)
             {
@@ -533,7 +557,7 @@ nothrow void MakeLines(List<ustring>& itemStrings, List<ustring>& lines, bool lo
             {
                 totalLength = totalLength + 2;
             }
-            int itemStringLength = cast<int>(itemString.Length());
+            int itemStringLength = cast<int>(itemString.second);
             if (itemStringLength > maxItemStringLength)
             {
                 maxItemStringLength = itemStringLength;
@@ -544,7 +568,7 @@ nothrow void MakeLines(List<ustring>& itemStrings, List<ustring>& lines, bool lo
         {
             ustring line;
             bool first = true;
-            for (const ustring& itemString : itemStrings)
+            for (const Pair<ustring, int>& itemString : itemStrings)
             {
                 if (first)
                 {
@@ -554,15 +578,16 @@ nothrow void MakeLines(List<ustring>& itemStrings, List<ustring>& lines, bool lo
                 {
                     line.Append(u"  ");
                 }
-                line.Append(itemString);
+                line.Append(itemString.first);
             }
-            lines.Add(line);
+            lines.Add(MakePair(line, cast<int>(0)));
         }
         else if (maxItemStringLength * 2 + 2 <= screenWidth)
         {
             ustring line;
+            int lineWidth = 0;
             bool first = true;
-            for (const ustring& itemString : itemStrings)
+            for (const Pair<ustring, int>& itemString : itemStrings)
             {
                 if (first)
                 {
@@ -571,18 +596,21 @@ nothrow void MakeLines(List<ustring>& itemStrings, List<ustring>& lines, bool lo
                 else
                 {
                     line.Append(u"  ");
+                    lineWidth = lineWidth + 2;
                 }
-                if (line.Length() + maxItemStringLength > screenWidth)
+                if (lineWidth + maxItemStringLength > screenWidth)
                 {
-                    lines.Add(line);
+                    lines.Add(MakePair(line, cast<int>(0)));
                     line.Clear();
+                    lineWidth = 0;
                     first = true;
                 }
-                line.Append(Format(itemString, maxItemStringLength));
+                line.Append(Format(itemString.first, maxItemStringLength, FormatWidth.min));
+                lineWidth = lineWidth + itemString.second;
             }
             if (!line.IsEmpty())
             {
-                lines.Add(line);
+                lines.Add(MakePair(line, cast<int>(0)));
             }
         }
         else
@@ -592,11 +620,11 @@ nothrow void MakeLines(List<ustring>& itemStrings, List<ustring>& lines, bool lo
     }
 }
 
-nothrow void PrintLines(const List<ustring>& lines)
+nothrow void PrintLines(const List<Pair<ustring, int>>& lines)
 {
-    for (const ustring& line : lines)
+    for (const Pair<ustring, int>& line : lines)
     {
-        Console.Out() << line << endl();
+        Console.Out() << line.first << endl();
     }
 }
 
@@ -646,10 +674,10 @@ void ListFiles(const List<string>& files, Column columns, SortBy sortBy, bool re
                 dirDirectoryEntries.Add(UniquePtr<DirectoryEntry>(dirEntry));
                 directoryInfoEntries.Add(InfoEntry(dirEntry, statInfo));
             }
-            List<ustring> itemStrings = MakeItemStrings(directoryInfoEntries, columns, sortBy, reverse, hasColors);
+            List<Pair<ustring, int>> itemStrings = MakeItemStrings(directoryInfoEntries, columns, sortBy, reverse, hasColors);
             if (!itemStrings.IsEmpty())
             {
-                List<ustring> lines;
+                List<Pair<ustring, int>> lines;
                 MakeLines(itemStrings, lines, longFormat, multicolumn, screenWidth);
                 PrintLines(lines);
             }
@@ -665,10 +693,10 @@ void ListFiles(const List<string>& files, Column columns, SortBy sortBy, bool re
     }
     if (!infoEntries.IsEmpty())
     {
-        List<ustring> itemStrings = MakeItemStrings(infoEntries, columns, sortBy, reverse, hasColors);
+        List<Pair<ustring, int>> itemStrings = MakeItemStrings(infoEntries, columns, sortBy, reverse, hasColors);
         if (!itemStrings.IsEmpty())
         {
-            List<ustring> lines;
+            List<Pair<ustring, int>> lines;
             MakeLines(itemStrings, lines, longFormat, multicolumn, screenWidth);
             PrintLines(lines);
         }

@@ -153,7 +153,8 @@ namespace cmsx.kernel
         private ProcessTable() : machine(GetMachine()), nextPID(0), free(null), init(null), running(null), ready(null), nextFreeProcessSlot(0)
         {
         }
-        public Process* CreateProcess(const string& name, ulong textSegmentBaseAddress, ulong textSegmentSize, ulong dataSegmentSize, ulong poolSegmentSize, ulong stackSegmentSize, int sid)
+        public Process* CreateProcess(const string& name, ulong textSegmentBaseAddress, ulong textSegmentSize, ulong dataSegmentSize, ulong poolSegmentSize,
+            ulong minStackSegmentSize, ulong maxStackSegmentSize, ulong stackSegmentIncrement, int sid)
         {
             Process* process = null;
             if (free != null)
@@ -187,7 +188,7 @@ namespace cmsx.kernel
             process->nextFree = null;
             process->nextReadyToRun = null;
             process->prevReadyToRun = null;
-            InitializeProcessMemory(machine, process, textSegmentBaseAddress, textSegmentSize, dataSegmentSize, poolSegmentSize, stackSegmentSize);
+            InitializeProcessMemory(machine, process, textSegmentBaseAddress, textSegmentSize, dataSegmentSize, poolSegmentSize, minStackSegmentSize, maxStackSegmentSize, stackSegmentIncrement);
             InitializeFileTable(machine, process->fileTable);
             FileSystem* fs = GetMountTable().GetFileSystem(0);
             process->rootDirINodeKey = fs->GetRootDirINodeKey();
@@ -308,9 +309,9 @@ namespace cmsx.kernel
     }
 
     public nothrow Process* CreateProcess(ProcessTable& processTable, const string& name,
-        ulong textSegmentBaseAddress, ulong textSegmentSize, ulong dataSegmentSize, ulong poolSegmentSize, ulong stackSegmentSize, int sid)
+        ulong textSegmentBaseAddress, ulong textSegmentSize, ulong dataSegmentSize, ulong poolSegmentSize, ulong minStackSegmentSize, ulong maxStackSegmentSize, ulong stackSegmentIncrement, int sid)
     {
-        return processTable.CreateProcess(name, textSegmentBaseAddress, textSegmentSize, dataSegmentSize, poolSegmentSize, stackSegmentSize, sid);
+        return processTable.CreateProcess(name, textSegmentBaseAddress, textSegmentSize, dataSegmentSize, poolSegmentSize, minStackSegmentSize, maxStackSegmentSize, stackSegmentIncrement, sid);
     }
 
     public nothrow Process* CloneProcess(ProcessTable& processTable, Process* parent)
@@ -729,9 +730,9 @@ namespace cmsx.kernel
     }
 
     public nothrow void InitializeProcessMemory(Machine& machine, Process* process,
-        ulong textSegmentStartAddress, ulong textSegmentSize, ulong dataSegmentSize, ulong poolSegmentSize, ulong stackSegmentSize)
+        ulong textSegmentStartAddress, ulong textSegmentSize, ulong dataSegmentSize, ulong poolSegmentSize, ulong minStackSegmentSize, ulong maxStackSegmentSize, ulong stackSegmentIncrement)
     {
-        InitializeMemoryTable(machine, process->memoryTable, textSegmentStartAddress, textSegmentSize, dataSegmentSize, poolSegmentSize, stackSegmentSize);
+        InitializeMemoryTable(machine, process->memoryTable, textSegmentStartAddress, textSegmentSize, dataSegmentSize, poolSegmentSize, minStackSegmentSize, maxStackSegmentSize, stackSegmentIncrement);
         AllocateMemory(machine.GetMemory(), process->memoryTable);
         ulong sp = process->memoryTable.segmentDescriptors[stackSegmentIndex]->baseAddress + process->memoryTable.segmentDescriptors[stackSegmentIndex]->startAddress;
         Registers& regs = machine.GetRegisters();
@@ -957,7 +958,7 @@ namespace cmsx.kernel
         idleProcess->nextFree = null;
         idleProcess->nextReadyToRun = idleProcess;
         idleProcess->prevReadyToRun = idleProcess;
-        InitializeProcessMemory(machine, idleProcess, 4096u, 4096u, 0u, 0u, 4096u);
+        InitializeProcessMemory(machine, idleProcess, 4096u, 4096u, 0u, 0u, 4096u, 4096u, 0u);
         Registers& regs = machine.GetRegisters();
         Memory& mem = machine.GetMemory();
         MemoryTable& memoryTable = idleProcess->memoryTable;
@@ -984,11 +985,12 @@ namespace cmsx.kernel
     }
 
     public Process* CreateSingleProcess(Machine& machine, ProcessTable& processTable, const string& name,
-        ulong textSegmentBaseAddress, ulong textSegmentSize, ulong dataSegmentSize, ulong poolSegmentSize, ulong stackSegmentSize, int sid)
+        ulong textSegmentBaseAddress, ulong textSegmentSize, ulong dataSegmentSize, ulong poolSegmentSize, ulong minStackSegmentSize, ulong maxStackSegmentSize, ulong stackSegmentIncrement, int sid)
     {
         Process* idleProcess = processTable.GetIdle();
         InitializeIdleProcess(machine, processTable, idleProcess);
-        Process* process = CreateProcess(processTable, name, textSegmentBaseAddress, textSegmentSize, dataSegmentSize, poolSegmentSize, stackSegmentSize, sid);
+        Process* process = CreateProcess(processTable, name, textSegmentBaseAddress, textSegmentSize, dataSegmentSize, poolSegmentSize,
+            minStackSegmentSize, maxStackSegmentSize, stackSegmentIncrement, sid);
         SetProcessReadyToRun(processTable, process);
         return process;
     }
@@ -997,7 +999,7 @@ namespace cmsx.kernel
     {
         Process* idleProcess = processTable.GetIdle();
         InitializeIdleProcess(machine, processTable, idleProcess);
-        Process* initProcess = CreateProcess(processTable, "init", 4096u, 4096u, 0u, 0u, 4096u, sid);
+        Process* initProcess = CreateProcess(processTable, "init", 4096u, 4096u, 0u, 0u, 4096u, 4096u, 0u, sid);
         processTable.SetInit(initProcess);
         Registers& regs = machine.GetRegisters();
         Memory& mem = machine.GetMemory();

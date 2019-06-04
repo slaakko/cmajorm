@@ -172,6 +172,8 @@ namespace cmsx.kernel
             Console.Out() << "Cmajor System X kernel version " << KernelVersion() << " booting...";
         }
         machine.GetProcessor().SetInterruptReturn(KernelInterruptReturn);
+        SetKernelMaxStackSizeFunction(KernelGetMaxStackSize);
+        SetKernelGrowStackFunction(KernelGrowStack);
         Registers& regs = machine.GetRegisters();
         DisableAllInterrupts(regs);
         InitializeInterruptVector(machine);

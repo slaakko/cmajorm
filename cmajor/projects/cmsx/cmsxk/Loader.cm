@@ -47,9 +47,10 @@ namespace cmsx.kernel
                 argv.Add(arg);
             }
             Section poolSection = MakePoolSection(argv);
-            long poolDataLength = poolSection.data.Count();
+            long poolDataLength = Max(cast<long>(executable->InitialPoolSize()), poolSection.data.Count());
             long poolSize = Align(poolDataLength, cast<long>(pageSize));
-            Process* process = CreateSingleProcess(machine, processTable, name, codeSection->BaseAddress(), codeSection->Length(), dataSection->Length(), cast<ulong>(poolSize), executable->StackSize(), sid);
+            Process* process = CreateSingleProcess(machine, processTable, name, codeSection->BaseAddress(), codeSection->Length(), dataSection->Length(), cast<ulong>(poolSize),
+                cast<ulong>(executable->MinStackSize()), cast<ulong>(executable->MaxStackSize()), cast<ulong>(executable->StackSizeIncrement()), sid);
             if (codeSection->Length() > 0u)
             {
                 WriteProcessMemory(machine, process, codeSection->BaseAddress(), codeSection->data.Begin().Ptr(), cast<ulong>(codeSection->data.Count()), Protection.execute);

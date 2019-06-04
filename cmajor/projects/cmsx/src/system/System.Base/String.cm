@@ -284,6 +284,26 @@ namespace System
             }
             return result;
         }
+        public List<String<CharT>> Split(const String<CharT>& s)
+        {
+            List<String<CharT>> result;
+            long start = 0;
+            while (start < len)
+            {
+                long end = Find(s, start);
+                if (end != -1)
+                {
+                    result.Add(Substring(start, end));
+                    start = end + s.len;
+                }
+                else
+                {
+                    result.Add(Substring(start));
+                    start = len;
+                }
+            }
+            return result;
+        }
         public nothrow inline long Find(CharT x) const
         {
             return Find(x, 0);

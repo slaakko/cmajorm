@@ -16,7 +16,7 @@ namespace cmsx.kernel
         private nothrow Kernel() : machine(GetMachine()), sessionTable(GetSessionTable()), processTable(GetProcessTable()), baseDebugger(), debugger(&baseDebugger), consoleDriver(null),
             kernelEvent(OsCreateEvent())
         {
-            stopKernelThreads = StopKernelThreads;
+            SetKernelShutdownFunc(StopKernelThreads);
         }
         public ~Kernel()
         {

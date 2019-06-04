@@ -1,0 +1,1718 @@
+// =================================
+// Copyright (c) 2019 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Collections;
+using System.IO;
+using System.Os;
+using System.Security;
+using System.Text;
+
+void PrintOptions1()
+{
+    Console.Out() << 
+        "--help | -h" << endl() <<
+        "   Print help." << endl() << endl() <<
+        "--long | -l" << endl() <<
+        "   Use long format." << endl() << endl() <<
+        "--all | -a" << endl() <<
+        "   List also files names starting with '.'" << endl() << endl() <<
+        "--no-columns | -1" << endl() <<
+        "   Do not break lines into columns." << endl() << endl() <<
+        "--columns=<N> | -<N>" << endl() <<
+        "   Set number of columns to <N> when not using long format." << endl() << 
+        "   If <N> is 0 (default), use as many columns as fit in screen." << endl() <<
+        "   If <N> is 1, print one entry per line." << endl() << 
+        "   If <N> > 1, print in exactly <N> columns." << endl() << endl() <<
+        "--no-colors | -o" << endl() <<
+        "   Do not use colors." << endl() << endl() <<
+        "--human | -m" << endl() << 
+        "   Print human readable sizes." << endl() << endl() <<
+        "--diagnostics | -d" << endl() <<
+        "   Show stack trace in case of error." << endl() << endl() <<
+        "--recursive | -R" << endl() <<
+        "   List subdirectories recursively." << endl() << endl() <<
+        "--reverse | -r" << endl() <<
+        "   Reverse sort order." << endl() << endl() <<
+        "--inode | -i" << endl() <<
+        "   Show inode number." << endl() << endl() <<
+        "--access | -x" << endl() <<
+        "   Show access permissions." << endl() << endl() <<
+        "--nlinks | -k" << endl() << 
+        "   Show number of hard links." << endl() << endl() <<
+        "--user | -e" << endl() <<
+        "   Show user and group." << endl() << endl() <<
+        "--id | -n" << endl() <<
+        "   Show numeric user and group id's." << endl() << endl() <<
+        "--size | -s" << endl() <<
+        "   Show file size." << endl() << endl() <<
+        "--ctime | -c" << endl() <<
+        "   Show inode modification time." << endl() << endl() <<
+        "--time | -t" << endl() <<
+        "   Show file modification time." << endl() << endl() <<
+        "--atime | -u" << endl() <<
+        "   Show last file access time." << endl() << endl();
+}
+
+void PrintOptions2()
+{
+    Console.Out() << 
+        "--sort=size | -S" << endl() <<
+        "   Sort by file size (largest file first)." << endl() << endl() <<
+        "--sort=inode | -I" << endl() <<
+        "   Sort by inode number." << endl() << endl() <<
+        "--sort=nlinks | -N" << endl() <<
+        "   Sort by number of hard links." << endl() << endl() <<
+        "--sort=user | -E" << endl() <<
+        "   Sort by user name." << endl() << endl() <<
+        "--sort=group | -R" << endl() <<
+        "   Sort by group name." << endl() << endl() <<
+        "--sort=uid | -D" << endl() <<
+        "   Sort by user ID." << endl() << endl() <<
+        "--sort=gid | -G" << endl() <<
+        "   Sort by user ID." << endl() << endl() <<
+        "--sort=ctime | -C" << endl() <<
+        "   Sort by inode modification time." << endl() << endl() <<
+        "--sort=time | -T" << endl() <<
+        "   Sort by file modification time." << endl() << endl() <<
+        "--sort=atime | -U" << endl() << 
+        "   Sort by last file access time." << endl() << endl() <<
+        endl();
+}
+
+void PrintOptions()
+{
+    Console.Out() << "Options:" << endl() << endl();
+    PrintOptions1();
+    PrintOptions2();
+}
+
+void PrintHelp()
+{
+    Console.Out() << "Usage: ls [options] [<files>]..." << endl();
+    Console.Out() << "List information about files. If no files specified, list contents of current directory." << endl() << endl();
+    PrintOptions();
+}
+
+private uchar regularColorChar = ' ';
+private uchar directoryColorChar = ' ';
+private uchar executableColorChar = ' ';
+private uchar fifoColorChar = ' ';
+private uchar symlinkColorChar = ' ';
+private uchar endColorChar = ' ';
+
+bool HasColors()
+{
+    return Screen.Instance().HasColors();
+}
+
+int GetScreenWidth()
+{
+    return Screen.Instance().Width();
+}
+
+void SetColorChars()
+{
+    regularColorChar = BeginColors(ConsoleColor.white, ConsoleColor.black);
+    directoryColorChar = BeginColors(ConsoleColor.cyan, ConsoleColor.black);
+    executableColorChar = BeginColors(ConsoleColor.green, ConsoleColor.black);
+    fifoColorChar = BeginColors(ConsoleColor.red, ConsoleColor.black);
+    symlinkColorChar = BeginColors(ConsoleColor.yellow, ConsoleColor.black);
+    endColorChar = EndColors();
+}
+
+enum Column : int
+{
+    none = 0, inode = 1 << 0, access = 1 << 1, nlinks = 1 << 2, user = 1 << 3, uid = 1 << 4, group = 1 << 5, gid = 1 << 6, size = 1 << 7, ctime = 1 << 8, mtime = 1 << 9, atime = 1 << 10, name = 1 << 11
+}
+
+enum SortBy
+{
+    name, inode, nlinks, user, uid, group, gid, size, ctime, mtime, atime
+}
+
+enum ItemKind
+{
+    regular, directory, executable, symlink, fifo
+}
+
+private Column shortColumns = Column.name;
+private Column longColumns = cast<Column>(Column.access | Column.nlinks | Column.user | Column.group | Column.size | Column.mtime | Column.name);
+
+nothrow FormatJustify GetColumnJustification(Column column)
+{
+    switch (column)
+    {
+        case Column.inode: return FormatJustify.right;
+        case Column.access: return FormatJustify.left;
+        case Column.nlinks: return FormatJustify.right;
+        case Column.user: return FormatJustify.left;
+        case Column.uid: return FormatJustify.right;
+        case Column.group: return FormatJustify.left;
+        case Column.gid: return FormatJustify.right;
+        case Column.size: return FormatJustify.right;
+        case Column.ctime: return FormatJustify.left;
+        case Column.mtime: return FormatJustify.left;
+        case Column.atime: return FormatJustify.left;
+        case Column.name: return FormatJustify.left;
+    }
+    return FormatJustify.left;
+}
+
+class InfoEntry
+{
+    public nothrow InfoEntry(DirectoryEntry* directoryEntry_, StatInfo* statInfo_) : directoryEntry(directoryEntry_), statInfo(statInfo_), name(ToUtf32(&directoryEntry->name[0]))
+    {
+    }
+    public DirectoryEntry* directoryEntry;
+    public StatInfo* statInfo;
+    public ustring name;
+}
+
+nothrow ustring GetUserName(const InfoEntry& entry, const Users& users)
+{
+    User* user = users.GetUser(entry.statInfo->UID());
+    if (user != null)
+    {
+        return ToUtf32(user->Name());
+    }
+    else
+    {
+        return u"<user " + ToUtf32(ToString(entry.statInfo->UID())) + u" not found>";
+    }
+}
+
+nothrow ustring GetGroupName(const InfoEntry& entry, const Groups& groups)
+{
+    Group* group  = groups.GetGroup(entry.statInfo->GID());
+    if (group != null)
+    {
+        return ToUtf32(group->Name());
+    }
+    else
+    {
+        return u"<group " + ToUtf32(ToString(entry.statInfo->GID())) + u" not found>";
+    }
+}
+
+nothrow ustring MakeEntryName(const ustring& name, ItemKind itemKind, bool hasColors)
+{
+    ustring entryName;
+    if (hasColors)
+    {
+        switch (itemKind)
+        {
+            case ItemKind.regular:
+            {
+                entryName.Append(regularColorChar);
+                break;
+            }
+            case ItemKind.executable:
+            {
+                entryName.Append(executableColorChar);
+                break;
+            }
+            case ItemKind.directory:
+            {
+                entryName.Append(directoryColorChar);
+                break;
+            }
+            case ItemKind.symlink:
+            {
+                entryName.Append(symlinkColorChar);
+                break;
+            }
+            case ItemKind.fifo:
+            {
+                entryName.Append(fifoColorChar);
+                break;
+            }
+            default:
+            {
+                entryName.Append(regularColorChar);
+                break;
+            }
+        }
+    }
+    entryName.Append(name);
+    if (hasColors)
+    {
+        entryName.Append(endColorChar);
+    }
+    return entryName;
+}
+
+class FieldWidths
+{
+    public int inodeWidth;
+    public int accessWidth;
+    public int nlinksWidth;
+    public int userWidth;
+    public int uidWidth;
+    public int groupWidth;
+    public int gidWidth;
+    public int sizeWidth;
+    public int ctimeWidth;
+    public int mtimeWidth;
+    public int atimeWidth;
+    public int nameWidth;
+}
+
+class Item
+{
+    public nothrow ustring ToString(Column columns, bool hasColors, const FieldWidths& fieldWidths) const
+    {
+        ustring str;
+        if ((columns & Column.inode) != Column.none)
+        {
+            if (!str.IsEmpty())
+            {
+                str.Append(' ');
+            }
+            str.Append(Format(inode, fieldWidths.inodeWidth, FormatWidth.min, GetColumnJustification(Column.inode)));
+        }
+        if ((columns & Column.access) != Column.none)
+        {
+            if (!str.IsEmpty())
+            {
+                str.Append(' ');
+            }
+            str.Append(Format(access, fieldWidths.accessWidth, FormatWidth.min, GetColumnJustification(Column.access)));
+        }
+        if ((columns & Column.nlinks) != Column.none)
+        {
+            if (!str.IsEmpty())
+            {
+                str.Append(' ');
+            }
+            str.Append(Format(nlinks, fieldWidths.nlinksWidth, FormatWidth.min, GetColumnJustification(Column.nlinks)));
+        }
+        if ((columns & Column.user) != Column.none)
+        {
+            if (!str.IsEmpty())
+            {
+                str.Append(' ');
+            }
+            str.Append(Format(user, fieldWidths.userWidth, FormatWidth.min, GetColumnJustification(Column.user)));
+        }
+        if ((columns & Column.uid) != Column.none)
+        {
+            if (!str.IsEmpty())
+            {
+                str.Append(' ');
+            }
+            str.Append(Format(uid, fieldWidths.uidWidth, FormatWidth.min, GetColumnJustification(Column.uid)));
+        }
+        if ((columns & Column.group) != Column.none)
+        {
+            if (!str.IsEmpty())
+            {
+                str.Append(' ');
+            }
+            str.Append(Format(group, fieldWidths.groupWidth, FormatWidth.min, GetColumnJustification(Column.group)));
+        }
+        if ((columns & Column.gid) != Column.none)
+        {
+            if (!str.IsEmpty())
+            {
+                str.Append(' ');
+            }
+            str.Append(Format(gid, fieldWidths.gidWidth, FormatWidth.min, GetColumnJustification(Column.gid)));
+        }
+        if ((columns & Column.size) != Column.none)
+        {
+            if (!str.IsEmpty())
+            {
+                str.Append(' ');
+            }
+            str.Append(Format(size, fieldWidths.sizeWidth, FormatWidth.min, GetColumnJustification(Column.size)));
+        }
+        if ((columns & Column.ctime) != Column.none)
+        {
+            if (!str.IsEmpty())
+            {
+                str.Append(' ');
+            }
+            str.Append(Format(ctime, fieldWidths.ctimeWidth, FormatWidth.min, GetColumnJustification(Column.ctime)));
+        }
+        if ((columns & Column.mtime) != Column.none)
+        {
+            if (!str.IsEmpty())
+            {
+                str.Append(' ');
+            }
+            str.Append(Format(mtime, fieldWidths.mtimeWidth, FormatWidth.min, GetColumnJustification(Column.mtime)));
+        }
+        if ((columns & Column.atime) != Column.none)
+        {
+            if (!str.IsEmpty())
+            {
+                str.Append(' ');
+            }
+            str.Append(Format(atime, fieldWidths.atimeWidth, FormatWidth.min, GetColumnJustification(Column.atime)));
+        }
+        if ((columns & Column.name) != Column.none)
+        {
+            if (!str.IsEmpty())
+            {
+                str.Append(' ');
+            }
+            str.Append(MakeEntryName(Format(name, fieldWidths.nameWidth, FormatWidth.min, GetColumnJustification(Column.name)), kind, hasColors));
+        }
+        return str;
+    }
+    public nothrow int Width(Column columns) const
+    {
+        int width = 0;
+        bool first = true;
+        if ((columns & Column.inode) != Column.none)
+        {
+            if (first)
+            {
+                first = false;
+            }
+            else
+            {
+                ++width;
+            }
+            width = width + cast<int>(inode.Length());
+        }
+        if ((columns & Column.access) != Column.none)
+        {
+            if (first)
+            {
+                first = false;
+            }
+            else
+            {
+                ++width;
+            }
+            width = width + cast<int>(access.Length());
+        }
+        if ((columns & Column.nlinks) != Column.none)
+        {
+            if (first)
+            {
+                first = false;
+            }
+            else
+            {
+                ++width;
+            }
+            width = width + cast<int>(nlinks.Length());
+        }
+        if ((columns & Column.user) != Column.none)
+        {
+            if (first)
+            {
+                first = false;
+            }
+            else
+            {
+                ++width;
+            }
+            width = width + cast<int>(user.Length());
+        }
+        if ((columns & Column.uid) != Column.none)
+        {
+            if (first)
+            {
+                first = false;
+            }
+            else
+            {
+                ++width;
+            }
+            width = width + cast<int>(uid.Length());
+        }
+        if ((columns & Column.group) != Column.none)
+        {
+            if (first)
+            {
+                first = false;
+            }
+            else
+            {
+                ++width;
+            }
+            width = width + cast<int>(group.Length());
+        }
+        if ((columns & Column.gid) != Column.none)
+        {
+            if (first)
+            {
+                first = false;
+            }
+            else
+            {
+                ++width;
+            }
+            width = width + cast<int>(gid.Length());
+        }
+        if ((columns & Column.size) != Column.none)
+        {
+            if (first)
+            {
+                first = false;
+            }
+            else
+            {
+                ++width;
+            }
+            width = width + cast<int>(size.Length());
+        }
+        if ((columns & Column.ctime) != Column.none)
+        {
+            if (first)
+            {
+                first = false;
+            }
+            else
+            {
+                ++width;
+            }
+            width = width + cast<int>(ctime.Length());
+        }
+        if ((columns & Column.mtime) != Column.none)
+        {
+            if (first)
+            {
+                first = false;
+            }
+            else
+            {
+                ++width;
+            }
+            width = width + cast<int>(mtime.Length());
+        }
+        if ((columns & Column.atime) != Column.none)
+        {
+            if (first)
+            {
+                first = false;
+            }
+            else
+            {
+                ++width;
+            }
+            width = width + cast<int>(atime.Length());
+        }
+        if ((columns & Column.name) != Column.none)
+        {
+            if (first)
+            {
+                first = false;
+            }
+            else
+            {
+                ++width;
+            }
+            width = width + cast<int>(name.Length());
+        }
+        return width;
+    }
+    public ustring inode;
+    public ustring access;
+    public ustring nlinks;
+    public ustring user;
+    public ustring uid;
+    public ustring group;
+    public ustring gid;
+    public ustring size;
+    public ustring ctime;
+    public ustring mtime;
+    public ustring atime;
+    public ustring name;
+    public ItemKind kind;
+}
+
+nothrow ustring GetAccessString(Access access)
+{
+    ustring accessStr;
+    if ((access & Access.read) != Access.none)
+    {
+        accessStr.Append('r');
+    }
+    else
+    {
+        accessStr.Append('-');
+    }
+    if ((access & Access.write) != Access.none)
+    {
+        accessStr.Append('w');
+    }
+    else
+    {
+        accessStr.Append('-');
+    }
+    if ((access & Access.execute) != Access.none)
+    {
+        accessStr.Append('x');
+    }
+    else
+    {
+        accessStr.Append('-');
+    }
+    return accessStr;
+}
+
+nothrow ustring MakeAccessString(const InfoEntry& infoEntry)
+{
+    ustring accessStr;
+    if (infoEntry.statInfo->Type() == FileType.directory)
+    {
+        accessStr.Append('d');
+    }
+    else if (infoEntry.statInfo->Type() == FileType.symlink)
+    {
+        accessStr.Append('l');
+    }
+    else 
+    {
+        accessStr.Append('-');
+    }
+    accessStr.Append(GetAccessString(infoEntry.statInfo->OwnerAccess()));
+    accessStr.Append(GetAccessString(infoEntry.statInfo->GroupAccess()));
+    accessStr.Append(GetAccessString(infoEntry.statInfo->OtherAccess()));
+    return accessStr;
+}
+
+nothrow ustring MakeSizeString(long size, bool humanReadableSize)
+{
+    ustring sizeStr;
+    if (!humanReadableSize)
+    {
+        sizeStr = ToUtf32(ToString(size));
+    }
+    else
+    {
+        long g = size / 1024 / 1024 / 1024;
+        if (g > 0)
+        {
+            long s = (size - 1) / 1024 / 1024 / 1024 + 1;
+            sizeStr = ToUtf32(ToString(s) + "G");
+        }
+        else
+        {
+            long m = size / 1024 / 1024;
+            if (m > 0)
+            {
+                long s = (size - 1) / 1024 / 1024 + 1;
+                sizeStr = ToUtf32(ToString(s) + "M");
+            }
+            else
+            {
+                long k = size / 1024;
+                if (k > 0)
+                {
+                    long s = (size - 1) / 1024 + 1;
+                    sizeStr = ToUtf32(ToString(s) + "K");
+                }
+                else
+                {
+                    sizeStr = ToUtf32(ToString(size));
+                }
+            }
+        }
+    }
+    return sizeStr;
+}
+
+nothrow Item MakeItem(const InfoEntry& infoEntry, Column columns, const Users& users, const Groups& groups, bool humanReadableSize)
+{
+    Item item;
+    if ((columns & Column.inode) != Column.none)
+    {
+        item.inode = ToUtf32(ToString(infoEntry.statInfo->INodeNumber()));
+    }
+    if ((columns & Column.access) != Column.none)
+    {
+        item.access = MakeAccessString(infoEntry);
+    }
+    if ((columns & Column.nlinks) != Column.none)
+    {
+        item.nlinks = ToUtf32(ToString(infoEntry.statInfo->GetNumLinks()));
+    }
+    if ((columns & Column.user) != Column.none)
+    {
+        item.user = GetUserName(infoEntry, users);
+    }
+    if ((columns & Column.uid) != Column.none)
+    {
+        item.uid = ToUtf32(ToString(infoEntry.statInfo->UID()));
+    }
+    if ((columns & Column.group) != Column.none)
+    {
+        item.group = GetGroupName(infoEntry, groups);
+    }
+    if ((columns & Column.gid) != Column.none)
+    {
+        item.gid = ToUtf32(ToString(infoEntry.statInfo->GID()));
+    }
+    if ((columns & Column.size) != Column.none)
+    {
+        item.size = MakeSizeString(infoEntry.statInfo->GetFileSize(), humanReadableSize);
+    }
+    if ((columns & Column.ctime) != Column.none)
+    {
+        item.ctime = ToUtf32(infoEntry.statInfo->CTime().ToString());
+    }
+    if ((columns & Column.mtime) != Column.none)
+    {
+        item.mtime = ToUtf32(infoEntry.statInfo->MTime().ToString());
+    }
+    if ((columns & Column.atime) != Column.none)
+    {
+        item.atime = ToUtf32(infoEntry.statInfo->ATime().ToString());
+    }
+    if ((columns & Column.name) != Column.none)
+    {
+        if (infoEntry.name.Find(' ') != -1)
+        {
+            item.name.Append('\'');
+            item.name.Append(infoEntry.name);
+            item.name.Append('\'');
+        }
+        else
+        {
+            item.name = infoEntry.name;
+        }
+    }
+    item.kind = ItemKind.regular;
+    if (infoEntry.statInfo->Type() == FileType.regular)
+    {
+        if ((infoEntry.statInfo->OwnerAccess() & Access.execute) != Access.none)
+        {
+            item.kind = ItemKind.executable;
+        }
+    }
+    else if (infoEntry.statInfo->Type() == FileType.directory)
+    {
+        item.kind = ItemKind.directory;
+    }
+    else if (infoEntry.statInfo->Type() == FileType.symlink)
+    {
+        item.kind = ItemKind.symlink;
+    }
+    else if (infoEntry.statInfo->Type() == FileType.fifo)
+    {
+        item.kind = ItemKind.fifo;
+    }
+    return item;
+} 
+
+nothrow FieldWidths CalculateFieldWidths(const List<Item>& items, Column columns)
+{
+    return CalculateFieldWidths(items, 0, cast<int>(items.Count()), columns);
+}
+
+nothrow FieldWidths CalculateFieldWidths(const List<Item>& items, int firstIndex, int lastIndex, Column columns)
+{
+    FieldWidths fieldWidths;
+    for (int i = firstIndex; i < lastIndex; ++i)
+    {
+        const Item& item = items[i];
+        if ((columns & Column.inode) != Column.none)
+        {
+            fieldWidths.inodeWidth = Max(cast<int>(item.inode.Length()), fieldWidths.inodeWidth);
+        }
+        if ((columns & Column.access) != Column.none)
+        {
+            fieldWidths.accessWidth = Max(cast<int>(item.access.Length()), fieldWidths.accessWidth);
+        }
+        if ((columns & Column.nlinks) != Column.none)
+        {
+            fieldWidths.nlinksWidth = Max(cast<int>(item.nlinks.Length()), fieldWidths.nlinksWidth);
+        }
+        if ((columns & Column.user) != Column.none)
+        {
+            fieldWidths.userWidth = Max(cast<int>(item.user.Length()), fieldWidths.userWidth);
+        }
+        if ((columns & Column.uid) != Column.none)
+        {
+            fieldWidths.uidWidth = Max(cast<int>(item.uid.Length()), fieldWidths.uidWidth);
+        }
+        if ((columns & Column.group) != Column.none)
+        {
+            fieldWidths.groupWidth = Max(cast<int>(item.group.Length()), fieldWidths.groupWidth);
+        }
+        if ((columns & Column.gid) != Column.none)
+        {
+            fieldWidths.gidWidth = Max(cast<int>(item.gid.Length()), fieldWidths.gidWidth);
+        }
+        if ((columns & Column.size) != Column.none)
+        {
+            fieldWidths.sizeWidth = Max(cast<int>(item.size.Length()), fieldWidths.sizeWidth);
+        }
+        if ((columns & Column.ctime) != Column.none)
+        {
+            fieldWidths.ctimeWidth = Max(cast<int>(item.ctime.Length()), fieldWidths.ctimeWidth);
+        }
+        if ((columns & Column.mtime) != Column.none)
+        {
+            fieldWidths.mtimeWidth = Max(cast<int>(item.mtime.Length()), fieldWidths.mtimeWidth);
+        }
+        if ((columns & Column.atime) != Column.none)
+        {
+            fieldWidths.atimeWidth = Max(cast<int>(item.atime.Length()), fieldWidths.atimeWidth);
+        }
+        if ((columns & Column.name) != Column.none)
+        {
+            fieldWidths.nameWidth = Max(cast<int>(item.name.Length()), fieldWidths.nameWidth);
+        }
+    }
+    return fieldWidths;
+}
+
+nothrow int CalculateItemWidth(const FieldWidths& fieldWidths, Column columns)
+{
+    int itemWidth = 0;
+    bool first = true;
+    if ((columns & Column.inode) != Column.none)
+    {
+        if (first)
+        {
+            first = false;
+        }
+        else
+        {
+            ++itemWidth;
+        }
+        itemWidth = itemWidth + fieldWidths.inodeWidth;
+    }
+    if ((columns & Column.access) != Column.none)
+    {
+        if (first)
+        {
+            first = false;
+        }
+        else
+        {
+            ++itemWidth;
+        }
+        itemWidth = itemWidth + fieldWidths.accessWidth;
+    }
+    if ((columns & Column.nlinks) != Column.none)
+    {
+        if (first)
+        {
+            first = false;
+        }
+        else
+        {
+            ++itemWidth;
+        }
+        itemWidth = itemWidth + fieldWidths.nlinksWidth;
+    }
+    if ((columns & Column.user) != Column.none)
+    {
+        if (first)
+        {
+            first = false;
+        }
+        else
+        {
+            ++itemWidth;
+        }
+        itemWidth = itemWidth + fieldWidths.userWidth;
+    }
+    if ((columns & Column.uid) != Column.none)
+    {
+        if (first)
+        {
+            first = false;
+        }
+        else
+        {
+            ++itemWidth;
+        }
+        itemWidth = itemWidth + fieldWidths.uidWidth;
+    }
+    if ((columns & Column.group) != Column.none)
+    {
+        if (first)
+        {
+            first = false;
+        }
+        else
+        {
+            ++itemWidth;
+        }
+        itemWidth = itemWidth + fieldWidths.groupWidth;
+    }
+    if ((columns & Column.gid) != Column.none)
+    {
+        if (first)
+        {
+            first = false;
+        }
+        else
+        {
+            ++itemWidth;
+        }
+        itemWidth = itemWidth + fieldWidths.gidWidth;
+    }
+    if ((columns & Column.size) != Column.none)
+    {
+        if (first)
+        {
+            first = false;
+        }
+        else
+        {
+            ++itemWidth;
+        }
+        itemWidth = itemWidth + fieldWidths.sizeWidth;
+    }
+    if ((columns & Column.ctime) != Column.none)
+    {
+        if (first)
+        {
+            first = false;
+        }
+        else
+        {
+            ++itemWidth;
+        }
+        itemWidth = itemWidth + fieldWidths.ctimeWidth;
+    }
+    if ((columns & Column.mtime) != Column.none)
+    {
+        if (first)
+        {
+            first = false;
+        }
+        else
+        {
+            ++itemWidth;
+        }
+        itemWidth = itemWidth + fieldWidths.mtimeWidth;
+    }
+    if ((columns & Column.atime) != Column.none)
+    {
+        if (first)
+        {
+            first = false;
+        }
+        else
+        {
+            ++itemWidth;
+        }
+        itemWidth = itemWidth + fieldWidths.atimeWidth;
+    }
+    if ((columns & Column.name) != Column.none)
+    {
+        if (first)
+        {
+            first = false;
+        }
+        else
+        {
+            ++itemWidth;
+        }
+        itemWidth = itemWidth + fieldWidths.nameWidth;
+    }
+    return itemWidth;
+}
+
+class SortRelation : Rel<InfoEntry>
+{
+    public nothrow SortRelation(SortBy sortBy_, bool reverse_, Users* users_, Groups* groups_) : sortBy(sortBy_), reverse(reverse_), users(users_), groups(groups_)
+    {
+    }
+    public nothrow bool operator()(const InfoEntry& left, const InfoEntry& right) const
+    {
+        if (sortBy == SortBy.name)
+        {
+            ustring leftName = ToUtf32(&left.directoryEntry->name[0]);
+            ustring rightName = ToUtf32(&right.directoryEntry->name[0]);
+            if (reverse)
+            {
+                return leftName > rightName;
+            }
+            else
+            {
+                return leftName < rightName;
+            }
+        }
+        else if (sortBy == SortBy.size)
+        {
+            long leftSize = left.statInfo->GetFileSize();
+            long rightSize = right.statInfo->GetFileSize();
+            if (reverse)
+            {
+                return leftSize < rightSize;    
+            }
+            else
+            {
+                return leftSize > rightSize;
+            }
+        }
+        else if (sortBy == SortBy.inode)
+        {
+            int leftINodeNumber = left.statInfo->INodeNumber();
+            int rightNodeNumber = right.statInfo->INodeNumber();
+            if (reverse)
+            {
+                return leftINodeNumber > rightNodeNumber;
+            }
+            else
+            {
+                return leftINodeNumber < rightNodeNumber;
+            }
+        }
+        else if (sortBy == SortBy.nlinks)
+        {
+            int leftNLinks = left.statInfo->GetNumLinks();
+            int rightNLinks = right.statInfo->GetNumLinks();
+            if (reverse)
+            {
+                return leftNLinks > rightNLinks;
+            }
+            else
+            {
+                return leftNLinks < rightNLinks;
+            }
+        }
+        else if (sortBy == SortBy.user)
+        {
+            ustring leftUserName = GetUserName(left, *users);
+            ustring rightUserName = GetUserName(right, *users);
+            if (reverse)
+            {
+                return leftUserName > rightUserName;
+            }
+            else
+            {
+                return leftUserName < rightUserName;
+            }
+        }
+        else if (sortBy == SortBy.group)
+        {
+            ustring leftGroupName = GetGroupName(left, *groups);
+            ustring rightGroupName = GetGroupName(right, *groups);
+            if (reverse)
+            {
+                return leftGroupName > rightGroupName;
+            }
+            else
+            {
+                return leftGroupName < rightGroupName;
+            }
+        }
+        else if (sortBy == SortBy.uid)
+        {
+            int leftUID = left.statInfo->UID();
+            int rightUID = right.statInfo->UID();
+            if (reverse)
+            {
+                return leftUID > rightUID;
+            }
+            else
+            {
+                return leftUID < rightUID;
+            }
+        }
+        else if (sortBy == SortBy.gid)
+        {
+            int leftGID = left.statInfo->GID();
+            int rightGID = right.statInfo->GID();
+            if (reverse)
+            {
+                return leftGID > rightGID;
+            }
+            else
+            {
+                return leftGID < rightGID;
+            }
+        }
+        else if (sortBy == SortBy.ctime)
+        {
+            const DateTime& leftCTime = left.statInfo->CTime();
+            const DateTime& rightCTime = right.statInfo->CTime();
+            if (reverse)
+            {
+                return leftCTime > rightCTime;
+            }
+            else
+            {
+                return leftCTime < rightCTime;
+            }
+        }
+        else if (sortBy == SortBy.mtime)
+        {
+            const DateTime& leftMTime = left.statInfo->MTime();
+            const DateTime& rightMTime = right.statInfo->MTime();
+            if (reverse)
+            {
+                return leftMTime > rightMTime;
+            }
+            else
+            {
+                return leftMTime < rightMTime;
+            }
+        }
+        else if (sortBy == SortBy.atime)
+        {
+            const DateTime& leftATime = left.statInfo->ATime();
+            const DateTime& rightATime = right.statInfo->ATime();
+            if (reverse)
+            {
+                return leftATime > rightATime;
+            }
+            else
+            {
+                return leftATime < rightATime;
+            }
+        }
+        else
+        {
+            ustring leftName = ToUtf32(&left.directoryEntry->name[0]);
+            ustring rightName = ToUtf32(&right.directoryEntry->name[0]);
+            if (reverse)
+            {
+                return leftName > rightName;
+            }
+            else
+            {
+                return leftName < rightName;
+            }
+        }
+    }
+    private SortBy sortBy;
+    private bool reverse;
+    private Users* users;
+    private Groups* groups;
+}
+
+nothrow List<Item> MakeItems(List<InfoEntry>& infoEntries, Column columns, SortBy sortBy, bool reverse, const Users& users, const Groups& groups, bool humanReadableSize)
+{
+    List<Item> items;
+    Sort(infoEntries, SortRelation(sortBy, reverse, &users, &groups));
+    for (const InfoEntry& infoEntry : infoEntries)
+    {
+        items.Add(MakeItem(infoEntry, columns, users, groups, humanReadableSize));
+    }
+    return items;
+}
+
+nothrow List<ustring> MakeLinePerItem(const List<Item>& items, Column columns, bool hasColors)
+{
+    List<ustring> lines;
+    FieldWidths fieldWidths = CalculateFieldWidths(items, columns);
+    for (const Item& item : items)
+    {
+        lines.Add(item.ToString(columns, hasColors, fieldWidths));
+    }
+    return lines;
+}
+
+nothrow int GetNumberOfColumns(int itemWidth, int screenWidth)
+{
+    int w = itemWidth;
+    int numberOfColumns = 1;
+    bool first = true;
+    while (w <= screenWidth)
+    {
+        if (first)
+        {
+            first = false;
+        }
+        else
+        {
+            w = w + 2;
+        }
+        w = w + itemWidth;
+        if (w <= screenWidth)
+        {
+            ++numberOfColumns;
+        }
+    }
+    return numberOfColumns;
+}
+
+nothrow inline int GetNumberOfLines(int itemCount, int numberOfColumns)
+{
+    if (itemCount > 0)
+    {
+        return cast<int>((itemCount - 1) / numberOfColumns + 1);
+    }
+    else
+    {
+        return 0;
+    }
+}
+
+nothrow List<FieldWidths> CalculateFieldWidthList(const List<Item>& items, Column columns, int numberOfLines, int numberOfColumns)
+{
+    List<FieldWidths> fieldWidthList;
+    int firstIndex = 0;
+    int lastIndex = cast<int>(Min(numberOfLines, items.Count()));
+    for (int i = 0; i < numberOfColumns; ++i)
+    {
+        fieldWidthList.Add(CalculateFieldWidths(items, firstIndex, lastIndex, columns));
+        firstIndex = lastIndex;
+        lastIndex = cast<int>(Min(lastIndex + numberOfLines, items.Count()));
+    }
+    return fieldWidthList;
+}
+
+nothrow void CalculateWidth(const List<Item>& items, Column columns, int numberOfColumns, int& width, int& numberOfLines)
+{
+    width = 0;
+    numberOfLines = GetNumberOfLines(cast<int>(items.Count()), numberOfColumns);
+    List<FieldWidths> fieldWidthList = CalculateFieldWidthList(items, columns, numberOfLines, numberOfColumns);
+    for (int c = 0; c < numberOfColumns; ++c)
+    {
+        int itemIndex = c * numberOfLines;
+        if (itemIndex < items.Count())
+        {
+            if (c > 0)
+            {
+                width = width + 2;
+            }
+            width = width + CalculateItemWidth(fieldWidthList[c], columns);
+        }
+    }
+}
+
+nothrow int CalculateNumberOfColumns(const List<Item>& items, Column columns, int screenWidth)
+{
+    FieldWidths fieldWidths = CalculateFieldWidths(items, columns);
+    int itemWidth = CalculateItemWidth(fieldWidths, columns);
+    int numberOfColumns = GetNumberOfColumns(itemWidth, screenWidth);
+    int width = 0;
+    int numberOfLines = 0;
+    CalculateWidth(items, columns, numberOfColumns, width, numberOfLines);
+    while (width <= screenWidth && numberOfLines > 1)
+    {
+        CalculateWidth(items, columns, numberOfColumns + 1, width, numberOfLines);
+        if (width <= screenWidth)
+        {
+            ++numberOfColumns;
+        }        
+    }
+    return numberOfColumns;
+}
+
+nothrow List<ustring> MakeLinesWithColumns(const List<Item>& items, int numberOfColumns, Column columns, bool hasColors)
+{
+    int numberOfLines = GetNumberOfLines(cast<int>(items.Count()), numberOfColumns);
+    List<FieldWidths> fieldWidthList = CalculateFieldWidthList(items, columns, numberOfLines, numberOfColumns);
+    List<ustring> lines;
+    for (int i = 0; i < numberOfLines; ++i)
+    {
+        ustring line;
+        for (int c = 0; c < numberOfColumns; ++c)
+        {
+            int itemIndex = c * numberOfLines + i;
+            if (itemIndex < items.Count())
+            {
+                if (c > 0)
+                {
+                    line.Append(u"  ");
+                }
+                const Item& item = items[itemIndex];
+                line.Append(item.ToString(columns, hasColors, fieldWidthList[c]));
+            }
+        }
+        if (!line.IsEmpty())
+        {
+            lines.Add(line);
+        }
+    }
+    return lines;
+}
+
+nothrow List<ustring> MakeLines(const List<Item>& items, Column columns, bool longFormat, bool multicolumn, int numberOfColumns, int screenWidth, bool hasColors)
+{
+    if (screenWidth == 0 || longFormat || !multicolumn || numberOfColumns == 1)
+    {
+        return MakeLinePerItem(items, columns, hasColors);
+    }
+    else 
+    {
+        if (numberOfColumns == 0)
+        {
+            numberOfColumns = CalculateNumberOfColumns(items, columns, screenWidth);
+        }
+        return MakeLinesWithColumns(items, numberOfColumns, columns, hasColors);
+    }
+}
+
+nothrow void PrintLines(const List<ustring>& lines)
+{
+    for (const ustring& line : lines)
+    {
+        Console.Out() << line << endl();
+    }
+}
+
+void ListFiles(const List<string>& files, Column columns, SortBy sortBy, bool reverse, bool hasColors, bool all, bool longFormat, bool multicolumn, int numberOfColumns, 
+    bool printDirectoryNames, bool recursive, int screenWidth, const Users& users, const Groups& groups, bool humanReadableSize)
+{
+    List<UniquePtr<StatInfo>> globalStatInfos;
+    List<UniquePtr<DirectoryEntry>> globalDirectoryEntries;
+    List<InfoEntry> infoEntries;
+    for (const string& file : files)
+    {
+        StatInfo* fileInfo = new StatInfo();
+        globalStatInfos.Add(UniquePtr<StatInfo>(fileInfo));
+        Stat(file.Chars(), *fileInfo);
+        DirectoryEntry* directoryEntry = new DirectoryEntry();
+        globalDirectoryEntries.Add(UniquePtr<DirectoryEntry>(directoryEntry));
+        directoryEntry->inodeNumber = fileInfo->INodeNumber();
+        StrCopy(&directoryEntry->name[0], file.Chars(), nameMax);
+        InfoEntry infoEntry(directoryEntry, fileInfo);
+        if (fileInfo->Type() == FileType.directory)
+        {
+            if (printDirectoryNames)
+            {
+                Console.Out() << "\n" << GetFullPath(file) << ":" << endl();
+            }
+            List<UniquePtr<StatInfo>> dirStatInfos;
+            List<UniquePtr<DirectoryEntry>> dirDirectoryEntries;
+            DirectoryReader reader(file);
+            DirectoryEntry directoryEntry;
+            List<InfoEntry> directoryInfoEntries;
+            List<string> subdirectories;
+            while (reader.Read(directoryEntry))
+            {
+                string entryName = &directoryEntry.name[0];
+                if (entryName.StartsWith(".") && !all)
+                {
+                    continue;
+                }
+                string entryPath = Path.Combine(file, entryName);
+                if (recursive && entryName != "." && entryName != "..")
+                {
+                    subdirectories.Add(entryPath);
+                }
+                StatInfo* statInfo = new StatInfo();
+                dirStatInfos.Add(UniquePtr<StatInfo>(statInfo));
+                Stat(entryPath.Chars(), *statInfo);
+                DirectoryEntry* dirEntry = new DirectoryEntry(directoryEntry);
+                dirDirectoryEntries.Add(UniquePtr<DirectoryEntry>(dirEntry));
+                directoryInfoEntries.Add(InfoEntry(dirEntry, statInfo));
+            }
+            List<Item> items = MakeItems(directoryInfoEntries, columns, sortBy, reverse, users, groups, humanReadableSize);
+            if (!items.IsEmpty())
+            {
+                List<ustring> lines = MakeLines(items, columns, longFormat, multicolumn, numberOfColumns, screenWidth, hasColors);
+                PrintLines(lines);
+            }
+            if (recursive)
+            {
+                ListFiles(subdirectories, columns, sortBy, reverse, hasColors, all, longFormat, multicolumn, numberOfColumns, true, true, screenWidth, users, groups, humanReadableSize);
+            }
+        }
+        else
+        {
+            infoEntries.Add(infoEntry);
+        }
+    }
+    if (!infoEntries.IsEmpty())
+    {
+        List<Item> items = MakeItems(infoEntries, columns, sortBy, reverse, users, groups, humanReadableSize);
+        if (!items.IsEmpty())
+        {
+            List<ustring> lines = MakeLines(items, columns, longFormat, multicolumn, numberOfColumns, screenWidth, hasColors);
+            PrintLines(lines);
+        }
+    }
+}
+
+int main(int argc, const char** argv)
+{
+    bool diagnostics = false;
+    try
+    {
+        Users users;
+        Groups groups;
+        int screenWidth = GetScreenWidth();
+        bool multicolumn = screenWidth > 0;
+        bool hasColors = HasColors();
+        bool all = false;
+        bool longFormat = false;
+        bool reverse = false;
+        bool recursive = false;
+        bool inodeColumn = false;
+        bool accessColumn = false;
+        bool nlinksColumn = false;
+        bool userAndGroupColumns = false;
+        bool numericUserAndGroupColumns = false;
+        bool sizeColumn = false;
+        bool ctimeColumn = false;
+        bool mtimeColumn = false;
+        bool atimeColumn = false;
+        int numberOfColumns = 0;
+        bool humanReadableSize = false;
+        List<string> files;
+        SortBy sortBy = SortBy.name;
+        for (int i = 1; i < argc; ++i)
+        {
+            string arg = argv[i];
+            if (arg.StartsWith("--"))
+            {
+                if (arg == "--help")
+                {
+                    PrintHelp();
+                    return 1;
+                }
+                else if (arg == "--all")
+                {
+                    all = true;
+                }
+                else if (arg == "--long")
+                {
+                    longFormat = true;
+                }
+                else if (arg == "--no-columns")
+                {
+                    multicolumn = false;
+                }
+                else if (arg == "--no-colors")
+                {
+                    hasColors = false;
+                }
+                else if (arg == "--human")
+                {
+                    humanReadableSize = true;
+                }
+                else if (arg == "--diagnostics")
+                {
+                    diagnostics = true;
+                }
+                else if (arg == "--reverse")
+                {
+                    reverse = true;
+                }
+                else if (arg == "--recursive")
+                {
+                    recursive = true;
+                }
+                else if (arg == "--inode")
+                {
+                    inodeColumn = true;
+                }
+                else if (arg == "--access")
+                {
+                    accessColumn = true;
+                }
+                else if (arg == "--nlinks")
+                {
+                    nlinksColumn = true;
+                }
+                else if (arg == "--user")
+                {
+                    userAndGroupColumns = true;
+                }
+                else if (arg == "--id")
+                {
+                    numericUserAndGroupColumns = true;
+                }
+                else if (arg == "--size")
+                {
+                    sizeColumn = true;
+                }
+                else if (arg == "--ctime")
+                {
+                    ctimeColumn = true;
+                }
+                else if (arg == "--time")
+                {
+                    mtimeColumn = true;
+                }
+                else if (arg == "--atime")
+                {
+                    atimeColumn = true;
+                }
+                else if (arg == "--sort=size")
+                {
+                    sortBy = SortBy.size;
+                }
+                else if (arg == "--sort=inode")
+                {
+                    sortBy = SortBy.inode;
+                }
+                else if (arg == "--sort=nlinks")
+                {
+                    sortBy = SortBy.nlinks;
+                }
+                else if (arg == "--sort=user") 
+                {
+                    sortBy = SortBy.user;
+                }
+                else if (arg == "--sort=group") 
+                {
+                    sortBy = SortBy.group;
+                }
+                else if (arg == "--sort=uid") 
+                {
+                    sortBy = SortBy.uid;
+                }
+                else if (arg == "--sort=gid") 
+                {
+                    sortBy = SortBy.gid;
+                }
+                else if (arg == "--sort=ctime")
+                {
+                    sortBy = SortBy.ctime;
+                }
+                else if (arg == "--sort=time")
+                {
+                    sortBy = SortBy.mtime;
+                }
+                else if (arg == "--sort=atime")
+                {
+                    sortBy = SortBy.atime;
+                }
+                else if (arg.Find('=') != -1)
+                {
+                    List<string> components = arg.Split('=');
+                    if (components.Count() == 2)
+                    {
+                        if (components[0] == "--columns")
+                        {
+                            numberOfColumns = ParseInt(components[1]);
+                            if (numberOfColumns == 1)
+                            {
+                                multicolumn = false;
+                            }
+                            else
+                            {
+                                multicolumn = true;
+                            }
+                        }
+                        else
+                        {
+                            throw Exception("unknown option '" + arg + "'");
+                        }
+                    }
+                    else
+                    {
+                        throw Exception("unknown option '" + arg + "'");
+                    }
+                }
+                else
+                {
+                    throw Exception("unknown option '" + arg + "'");
+                }
+            }
+            else if (arg.StartsWith("-"))
+            {
+                string options = arg.Substring(1);
+                if (options.IsEmpty())
+                {
+                    throw Exception("unknown option '" + arg + "'");
+                }
+                else
+                {
+                    for (char o : options)
+                    {
+                        if (o == 'h')
+                        {
+                            PrintHelp();
+                            return 1;
+                        }
+                        else if (o == 'a')
+                        {
+                            all = true;
+                        }
+                        else if (o == 'l')
+                        {
+                            longFormat = true;
+                        }
+                        else if (o == 'd')
+                        {
+                            diagnostics = true;
+                        }
+                        else if (o == 'r')
+                        {
+                            reverse = true;
+                        }
+                        else if (o == 'R')
+                        {
+                            recursive = true;
+                        }
+                        else if (o == 'o')
+                        {
+                            hasColors = false;
+                        }
+                        else if (o == 'm')
+                        {
+                            humanReadableSize = true;
+                        }
+                        else if (o == 'i')
+                        {
+                            inodeColumn = true;
+                        }
+                        else if (o == 'x')
+                        {
+                            accessColumn = true;
+                        }
+                        else if (o == 'k')
+                        {
+                            nlinksColumn = true;
+                        }
+                        else if (o == 'e')
+                        {   
+                            userAndGroupColumns = true;
+                        }
+                        else if (o == 'n')
+                        {
+                            numericUserAndGroupColumns = true;
+                        }
+                        else if (o == 's')
+                        {
+                            sizeColumn = true;
+                        }
+                        else if (o == 'c')
+                        {
+                            ctimeColumn = true;
+                        }
+                        else if (o == 't')
+                        {
+                            mtimeColumn = true;
+                        }
+                        else if (o == 'u')
+                        {
+                            atimeColumn = true;
+                        }
+                        else if (o == 'S')
+                        {
+                            sortBy = SortBy.size;
+                        }
+                        else if (o == 'N')
+                        {
+                            sortBy = SortBy.nlinks;
+                        }
+                        else if (o == 'I')
+                        {
+                            sortBy = SortBy.inode;
+                        }
+                        else if (o == 'E')
+                        {
+                            sortBy = SortBy.user;
+                        }
+                        else if (o == 'R')
+                        {
+                            sortBy = SortBy.group;
+                        }
+                        else if (o == 'D')
+                        {
+                            sortBy = SortBy.uid;
+                        }
+                        else if (o == 'G')
+                        {
+                            sortBy = SortBy.gid;
+                        }
+                        else if (o == 'C')
+                        {
+                            sortBy = SortBy.ctime;
+                        }
+                        else if (o == 'T')
+                        {
+                            sortBy = SortBy.mtime;
+                        }
+                        else if (o == 'U')
+                        {
+                            sortBy = SortBy.atime;
+                        }
+                        else if (o >= '0' && o <= '9')
+                        {
+                            numberOfColumns = cast<int>(o) - cast<int>('0');
+                            if (numberOfColumns == 1)
+                            {
+                                multicolumn = false;
+                            }
+                            else
+                            {
+                                multicolumn = true;
+                            }
+                        }
+                        else
+                        {
+                            throw Exception("unknown option '-" + string(o) + "'");
+                        }
+                    }
+                }
+            }
+            else
+            {
+                files.Add(arg);
+            }
+        }
+        if (hasColors)
+        {
+            SetColorChars();
+        }
+        Column columns = cast<Column>(shortColumns);
+        if (longFormat)
+        {
+            columns = cast<Column>(longColumns);
+        }
+        if (inodeColumn)
+        {
+            columns = cast<Column>(columns | Column.inode);
+        }
+        if (accessColumn)
+        {
+            columns = cast<Column>(columns | Column.access);
+        }
+        if (nlinksColumn)
+        {
+            columns = cast<Column>(columns | Column.nlinks);
+        }
+        if (userAndGroupColumns)
+        {
+            columns = cast<Column>(columns | Column.user | Column.group);
+        }
+        if (numericUserAndGroupColumns)
+        {
+            columns = cast<Column>(columns | Column.uid | Column.gid);
+        }
+        if (sizeColumn)
+        {
+            columns = cast<Column>(columns | Column.size);
+        }
+        if (ctimeColumn)
+        {
+            columns = cast<Column>(columns | Column.ctime);
+        }
+        if (mtimeColumn)
+        {
+            columns = cast<Column>(columns | Column.mtime);
+        }
+        if (atimeColumn)
+        {
+            columns = cast<Column>(columns | Column.atime);
+        }
+        if (files.IsEmpty())
+        {
+            files.Add(".");
+        }
+        if ((columns & (Column.user | Column.group)) != Column.none)
+        {
+            users = GetUsers();
+            groups = GetGroups();
+        }
+        bool printDirectoryNames = files.Count() > 1 || recursive;
+        ListFiles(files, columns, sortBy, reverse, hasColors, all, longFormat, multicolumn, numberOfColumns, printDirectoryNames, recursive, screenWidth, users, groups, humanReadableSize);
+    }
+    catch (const Exception& ex)
+    {
+        if (diagnostics)
+        {
+            Console.Error() << ex.ToString() << endl();
+        }
+        else
+        {
+            Console.Error() << ex.Message() << endl();
+        }
+        return 1;
+    }
+    return 0;
+}

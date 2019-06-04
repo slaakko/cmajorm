@@ -6,15 +6,18 @@ namespace cmsx.kernel
 
     public class SegmentDescriptor
     {
-        public nothrow SegmentDescriptor() : startAddress(0u), baseAddress(0u), length(0u), useCount(1u), next(null)
+        public nothrow SegmentDescriptor() : startAddress(0u), baseAddress(0u), length(0u), increment(0u), useCount(1u), next(null)
         {
         }
-        public nothrow SegmentDescriptor(ulong startAddress_, ulong baseAddress_, ulong length_) : startAddress(startAddress_), baseAddress(baseAddress_), length(length_), useCount(1u), next(null)
+        public nothrow SegmentDescriptor(ulong startAddress_, ulong baseAddress_, ulong length_, ulong maxLength_, ulong increment_) :
+            startAddress(startAddress_), baseAddress(baseAddress_), length(length_), maxLength(maxLength_), increment(increment_), useCount(1u), next(null)
         {
         }
         public ulong startAddress;  // address of the first byte 
         public ulong baseAddress;   // segment base address;
-        public ulong length;        // length of the segment in bytes
+        public ulong length;        // current length of the segment in bytes
+        public ulong maxLength;     // maximum length of the segment in bytes
+        public ulong increment;     // length increment in bytes
         public byte useCount;       // use count
         public SegmentDescriptor* next; // next free segment descriptor in free list
     }
@@ -60,12 +63,19 @@ namespace cmsx.kernel
 
     public nothrow SegmentDescriptor* CreateSegmentDescriptor(ulong startAddress, ulong baseAddress, ulong length)
     {
+        return CreateSegmentDescriptor(startAddress, baseAddress, length, length, 0u);
+    }
+
+    public nothrow SegmentDescriptor* CreateSegmentDescriptor(ulong startAddress, ulong baseAddress, ulong minLength, ulong maxLength, ulong increment)
+    {
         SegmentDescriptor* sd = SegmentTable.Instance().AllocateSegmentDescriptor();
         if (sd != null)
         {
             sd->startAddress = startAddress;
             sd->baseAddress = baseAddress;
-            sd->length = length;
+            sd->length = minLength;
+            sd->maxLength = maxLength;
+            sd->increment = increment;
             sd->useCount = 1u;
             sd->next = null;
             return sd;

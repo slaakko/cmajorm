@@ -5,7 +5,12 @@ namespace cmsx.machine
 {
     public delegate void KernelShutdownFunc();
 
-    public KernelShutdownFunc stopKernelThreads;
+    private KernelShutdownFunc kernelShutdownFunc;
+
+    public nothrow void SetKernelShutdownFunc(KernelShutdownFunc kernelShutdownFunc_)
+    {
+        kernelShutdownFunc = kernelShutdownFunc_;
+    }
 
     private bool panicThrows = true;
 
@@ -19,7 +24,10 @@ namespace cmsx.machine
         if (PanicThrows())
         {
             Clock.Instance().Stop();
-            stopKernelThreads();
+            if (cast<void*>(kernelShutdownFunc) != null)
+            {
+                kernelShutdownFunc();
+            }
             throw Exception(message);
         }
         else

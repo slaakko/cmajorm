@@ -95,15 +95,26 @@ namespace cmsx.kernel
         Process* process = processTable.GetRunning();
         string runningProcessName = "?";
         string stackTrace;
+        string error = "page fault";
         if (process != null)
         {
             runningProcessName = process->name;
-            stackTrace = GetProcessStackTrace(machine, process, machine.GetRegisters().Get(cmsx.machine.regFP));
+            if ((virtualAddress >= stackSegmentBaseAddress && virtualAddress < kernelBaseAddress))
+            {
+                Console.Error() << "stack overflow." << endl();
+                error = "stack overflow";
+            }
+            else
+            {
+                Console.Error() << "page fault." << endl();
+                stackTrace = GetProcessStackTrace(machine, process, machine.GetRegisters().Get(cmsx.machine.regFP));
+            }
         }
         Debugger* debugger = kernel.GetDebugger();
-        debugger->WriteOutput(cast<byte*>(cast<void*>("page fault\n")), 11);
+        string errorlf = error + "\n";
+        debugger->WriteOutput(cast<byte*>(cast<void*>(errorlf.Chars())), errorlf.Length());
         debugger->Run(process);
-        Panic("page fault at virtual address " + ToHexString(virtualAddress) + " , page protection = " + GetProtectionStr(pageProtection) + ", " + GetProtectionStr(protection) + " needed (running process=" +
+        Panic(error + " at virtual address " + ToHexString(virtualAddress) + " , page protection = " + GetProtectionStr(pageProtection) + ", " + GetProtectionStr(protection) + " needed (running process=" +
             runningProcessName + ")\n" + stackTrace + "\nRegisters:\n" + registers);
     }
 

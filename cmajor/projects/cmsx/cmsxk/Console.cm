@@ -246,6 +246,7 @@ namespace cmsx.kernel
         public void HandleBufferedInput()
         {
             GetDimensions();
+            outputEndCursorPosY = cursorPosY;
             ustring chars = GetCharsFromInputBuffer();
             for (uchar c : chars)
             {
