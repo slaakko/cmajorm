@@ -1313,7 +1313,7 @@ void ListFiles(const List<string>& files, Column columns, SortBy sortBy, bool re
             infoEntries.Add(infoEntry);
         }
     }
-    if (!infoEntries.IsEmpty())
+    if (!infoEntries.IsEmpty() && !recursive)
     {
         List<Item> items = MakeItems(infoEntries, columns, sortBy, reverse, users, groups, humanReadableSize);
         if (!items.IsEmpty())
