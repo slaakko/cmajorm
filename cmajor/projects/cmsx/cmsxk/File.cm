@@ -21,6 +21,8 @@ namespace cmsx.kernel
     public const int IOCTL_SET_COLORS_ITEM = 6;
     public const int IOCTL_BEGIN_OBEY_COLOR_STRINGS_ITEM = 7;
     public const int IOCTL_END_OBEY_COLOR_STRINGS_ITEM = 8;
+    public const int IOCTL_GET_ECHO_ITEM = 9;
+    public const int IOCTL_SET_ECHO_ITEM = 10;
 
     public enum OpenFlags : int
     {
@@ -340,6 +342,14 @@ namespace cmsx.kernel
         {
             return false;
         }
+        public virtual bool Echo() const
+        {
+            throw SystemError(ENOTSUPPORTED, name + " does not support ioctl(echo)");
+        }
+        public virtual void SetEcho(bool echo)
+        {
+            throw SystemError(ENOTSUPPORTED, name + " does not support ioctl(setecho)");
+        }
         public virtual void IOCtl(Machine& machine, Process* process, int item, ulong bufferAddress, long count)
         {
             bool itemFound = true;
@@ -383,6 +393,16 @@ namespace cmsx.kernel
                 case IOCTL_END_OBEY_COLOR_STRINGS_ITEM:
                 {
                     EndObeyColorStrings();
+                    break;
+                }
+                case IOCTL_GET_ECHO_ITEM:
+                {
+                    GetEcho(machine, process, bufferAddress, count);
+                    break;
+                }
+                case IOCTL_SET_ECHO_ITEM:
+                {
+                    SetEcho(machine, process, bufferAddress, count);
                     break;
                 }
                 default:
@@ -435,6 +455,29 @@ namespace cmsx.kernel
             MemoryWriter writer(&buffer[0], buffer.Length());
             writer.Write(cast<byte>(HasColors()));
             WriteProcessMemory(machine, process, bufferAddress, &buffer[0], cast<ulong>(buffer.Length()), Protection.write);
+        }
+        private void GetEcho(Machine& machine, Process* process, ulong bufferAddress, long count)
+        {
+            if (count < 1)
+            {
+                throw SystemError(ERANGE, "buffer size for IOCTL_GET_ECHO_ITEM must be at least 1 byte");
+            }
+            byte[1] buffer;
+            MemoryWriter writer(&buffer[0], buffer.Length());
+            writer.Write(cast<byte>(Echo()));
+            WriteProcessMemory(machine, process, bufferAddress, &buffer[0], cast<ulong>(buffer.Length()), Protection.write);
+        }
+        private void SetEcho(Machine& machine, Process* process, ulong bufferAddress, long count)
+        {
+            if (count < 1)
+            {
+                throw SystemError(ERANGE, "buffer size for IOCTL_SET_ECHO_ITEM must be at least 1 byte");
+            }
+            byte[1] buffer;
+            ReadProcessMemory(machine, process, bufferAddress, &buffer[0], cast<ulong>(buffer.Length()));
+            MemoryReader reader(&buffer[0], buffer.Length());
+            bool echo = cast<bool>(reader.ReadByte());
+            SetEcho(echo);
         }
         private void GetWindowDimensions(Machine& machine, Process* process, ulong bufferAddress, long count)
         {
@@ -643,6 +686,14 @@ namespace cmsx.kernel
         private void EnqueueReadRequest(Process* reader, ulong bufferAddress, long count)
         {
             SleepProcess(reader, consoleInputEvent, bufferAddress, cast<ulong>(count));
+        }
+        public override bool Echo() const
+        {
+            return GetConsoleDriver().Echo();
+        }
+        public override void SetEcho(bool echo)
+        {
+            GetConsoleDriver().SetEcho(echo);
         }
         private string bufferedInput;
     }

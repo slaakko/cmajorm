@@ -229,6 +229,8 @@ namespace System.Os
     public const int IOCTL_SET_COLORS_ITEM = 6;
     public const int IOCTL_BEGIN_OBEY_COLOR_STRINGS_ITEM = 7;
     public const int IOCTL_END_OBEY_COLOR_STRINGS_ITEM = 8;
+    public const int IOCTL_GET_ECHO_ITEM = 9;
+    public const int IOCTL_SET_ECHO_ITEM = 10;
         
     public bool IsConsole(int fd)
     {
@@ -345,5 +347,30 @@ namespace System.Os
     public nothrow inline uchar EndColors()
     {
         return endColors;
+    }
+
+    public bool Echo(int fd)
+    {
+        byte[1] buffer;
+        int result = ioctl(fd, IOCTL_GET_ECHO_ITEM, &buffer[0], buffer.Length());
+        if (result == -1)
+        {
+            ThrowSystemError();
+        }
+        MemoryReader reader(&buffer[0], buffer.Length());
+        bool echo = cast<bool>(reader.ReadByte());
+        return echo;
+    }
+
+    public void SetEcho(int fd, bool echo)
+    {
+        byte[1] buffer;
+        MemoryWriter writer(&buffer[0], buffer.Length());
+        writer.Write(cast<byte>(echo));
+        int result = ioctl(fd, IOCTL_SET_ECHO_ITEM, &buffer[0], buffer.Length());
+        if (result == -1)
+        {   
+            ThrowSystemError();
+        }
     }
 }
