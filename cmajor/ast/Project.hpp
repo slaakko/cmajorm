@@ -21,6 +21,8 @@ enum class BackEnd
 AST_API std::string CmajorRootDir();
 AST_API std::string CmajorSystemLibDir(const std::string& config, BackEnd backend);
 AST_API std::string CmajorSystemModuleFilePath(const std::string& config, BackEnd backend);
+AST_API void SetOutDir(const std::string& outDir_);
+AST_API const std::string& OutDir();
 
 enum class ProjectDeclarationType : uint8_t
 {
@@ -88,7 +90,8 @@ public:
     Project& operator=(const Project&) = delete;
     const std::u32string& Name() const { return name; }
     const std::string& FilePath() const { return filePath; }
-    const boost::filesystem::path& BasePath() const { return basePath; }
+    const boost::filesystem::path& SourceBasePath() const { return sourceBasePath; }
+    const boost::filesystem::path& OutdirBasePath() const { return outdirBasePath; }
     void AddDeclaration(ProjectDeclaration* declaration);
     void ResolveDeclarations();
     const std::string& ModuleFilePath() const { return moduleFilePath; }
@@ -124,7 +127,8 @@ private:
     std::string filePath;
     std::string config;
     Target target;
-    boost::filesystem::path basePath;
+    boost::filesystem::path sourceBasePath;
+    boost::filesystem::path outdirBasePath;
     boost::filesystem::path systemLibDir;
     std::vector<std::unique_ptr<ProjectDeclaration>> declarations;
     std::string relativeFilePath;
@@ -144,6 +148,7 @@ private:
     int logStreamId;
     int index;
 };
+
 
 } } // namespace cmajor::ast
 

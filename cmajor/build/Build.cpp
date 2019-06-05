@@ -1344,12 +1344,35 @@ void CompileMultiThreaded(Project* project, Module* rootModule, std::vector<std:
 
 void BuildProject(Project* project, std::unique_ptr<Module>& rootModule, bool& stop, bool resetRootModule)
 {
+    std::string config = GetConfig();
+    bool isSystemModule = IsSystemModule(project->Name());
+    if (isSystemModule)
+    {
+        project->SetSystemProject();
+    }
+    bool upToDate = false;
+    if (!GetGlobalFlag(GlobalFlags::rebuild))
+    {
+        cmajor::ast::BackEnd astBackEnd = cmajor::ast::BackEnd::llvm;
+        if (GetBackEnd() == cmajor::symbols::BackEnd::cmsx)
+        {
+            astBackEnd = cmajor::ast::BackEnd::cmsx;
+        }
+        upToDate = project->IsUpToDate(CmajorSystemModuleFilePath(config, astBackEnd));
+    }
+    if (upToDate)
+    {
+        if (GetGlobalFlag(GlobalFlags::verbose))
+        {
+            LogMessage(project->LogStreamId(), "===== Project '" + ToUtf8(project->Name()) + "' (" + project->FilePath() + ") is up-to-date.");
+        }
+        return;
+    }
     bool systemLibraryInstalled = false;
     if (project->GetTarget() == Target::unitTest)
     {
         throw std::runtime_error("cannot build unit test project '" + ToUtf8(project->Name()) + "' using cmc, use cmunit.");
     }
-    std::string config = GetConfig();
     if (GetGlobalFlag(GlobalFlags::verbose))
     {
         LogMessage(project->LogStreamId(), "===== Building project '" + ToUtf8(project->Name()) + "' (" + project->FilePath() + ") using " + config + " configuration.");

@@ -81,6 +81,7 @@ bool SystemModuleSet::IsSystemModule(const std::u32string& moduleName) const
     }
     return false;
 }
+
 bool IsSystemModule(const std::u32string& moduleName) 
 {
     return SystemModuleSet::Instance().IsSystemModule(moduleName);

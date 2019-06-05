@@ -215,6 +215,11 @@ extern "C" int Compile(const char16_t* compileXmlRequest)
         {
             cmajor::symbols::SetGlobalFlag(cmajor::symbols::GlobalFlags::clean);
         }
+        bool rebuild = compileRequestElement->GetAttribute(U"rebuild") == U"true";
+        if (rebuild)
+        {
+            cmajor::symbols::SetGlobalFlag(cmajor::symbols::GlobalFlags::rebuild);
+        }
         bool time = compileRequestElement->GetAttribute(U"time") == U"true";
         bool strictNothrow = compileRequestElement->GetAttribute(U"strict-nothrow") == U"true";
         if (strictNothrow)

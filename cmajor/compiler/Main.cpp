@@ -101,6 +101,10 @@ void PrintHelp()
         "   treat nothrow violation as an error\n" <<
         "--time (-t)\n" <<
         "   print duration of compilation\n" <<
+        "--outdir=OUTDIR (-o=OUTDIR)\n" <<
+        "   set output directory root to OUTDIR\n" <<
+        "--rebuild (-u)\n" <<
+        "   build although sources not changed\n" <<
         "--emit-llvm (-l)\n" <<
         "   emit intermediate LLVM code to file.ll files\n" <<
         "--emit-opt-llvm (-o)\n" <<
@@ -290,6 +294,10 @@ int main(int argc, const char** argv)
                     {
                         SetGlobalFlag(GlobalFlags::time);
                     }
+                    else if (arg == "--rebuild" || arg == "-u")
+                    {
+                        SetGlobalFlag(GlobalFlags::rebuild);
+                    }
                     else if (arg == "--define" || arg == "-D")
                     {
                         prevWasDefine = true;
@@ -387,6 +395,11 @@ int main(int argc, const char** argv)
                             {
                                 int numBuildThreads = boost::lexical_cast<int>(components[1]);
                                 SetNumBuildThreads(numBuildThreads);
+                            }
+                            else if (components[0] == "--outdir" || components[0] == "-o")
+                            {
+                                std::string outdir = components[1];
+                                SetOutDir(outdir);
                             }
                             else
                             {
@@ -506,6 +519,7 @@ int main(int argc, const char** argv)
             }
             if (GetGlobalFlag(GlobalFlags::msbuild))
             {
+                SetGlobalFlag(GlobalFlags::rebuild);
                 BuildMsBuildProject(projectName, projectDirectory, target, sourceFiles, referenceFiles, rootModule);
             }
             if (rootModule && !rootModule->WarningCollection().Warnings().empty())

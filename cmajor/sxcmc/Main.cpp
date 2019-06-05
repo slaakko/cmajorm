@@ -86,6 +86,10 @@ void PrintHelp()
         "   treat nothrow violation as an error\n" <<
         "--time (-t)\n" <<
         "   print duration of compilation\n" <<
+        "--outdir=OUTDIR (-o=OUTDIR)\n" <<
+        "   set output directory root to OUTDIR\n" <<
+        "--rebuild (-u)\n" <<
+        "   build although sources not changed\n" <<
         "--clean (-e)\n" <<
         "   clean given solutions and projects\n" <<
         "--debug-parse (-p)\n" <<
@@ -174,6 +178,10 @@ int main(int argc, const char** argv)
                     {
                         SetGlobalFlag(GlobalFlags::time);
                     }
+                    else if (arg == "--rebuild" || arg == "-u")
+                    {
+                        SetGlobalFlag(GlobalFlags::rebuild);
+                    }
                     else if (arg == "--define" || arg == "-D")
                     {
                         prevWasDefine = true;
@@ -256,6 +264,11 @@ int main(int argc, const char** argv)
                             {
                                 int numBuildThreads = boost::lexical_cast<int>(components[1]);
                                 SetNumBuildThreads(numBuildThreads);
+                            }
+                            else if (components[0] == "--outdir" || components[0] == "-o")
+                            {
+                                std::string outdir = components[1];
+                                SetOutDir(outdir);
                             }
                             else
                             {

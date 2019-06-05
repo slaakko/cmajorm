@@ -5,11 +5,14 @@
 
 #include <cmajor/ast/Project.hpp>
 #include <cmajor/util/Path.hpp>
+#include <cmajor/util/Unicode.hpp>
 #include <boost/filesystem.hpp>
+#include <iostream>
 
 namespace cmajor { namespace ast {
 
 using namespace cmajor::util;
+using namespace cmajor::unicode;
 
 std::string CmajorRootDir()
 {
@@ -47,6 +50,18 @@ std::string CmajorSystemLibDir(const std::string& config, BackEnd backend)
     }
 }
 
+std::string outDir;
+
+void SetOutDir(const std::string& outDir_)
+{
+    outDir = outDir_;
+}
+
+const std::string& OutDir()
+{
+    return outDir;
+}
+
 std::string CmajorSystemModuleFilePath(const std::string& config, BackEnd backend)
 {
     boost::filesystem::path smfp(CmajorSystemLibDir(config, backend));
@@ -79,13 +94,27 @@ TargetDeclaration::TargetDeclaration(Target target_) : ProjectDeclaration(Projec
 }
 
 Project::Project(const std::u32string& name_, const std::string& filePath_, const std::string& config_, BackEnd backend) :
-    name(name_), filePath(filePath_), config(config_), target(Target::program), basePath(filePath), isSystemProject(false), logStreamId(0), built(false)
+    name(name_), filePath(filePath_), config(config_), target(Target::program), sourceBasePath(filePath), outdirBasePath(filePath), isSystemProject(false), logStreamId(0), built(false)
 {
-    basePath.remove_filename();
+    if (!outDir.empty())
+    {
+        sourceBasePath.remove_filename();
+        outdirBasePath = outDir;
+        outdirBasePath /= ToUtf8(name);
+    }
+    else
+    {
+        sourceBasePath.remove_filename();
+        outdirBasePath = sourceBasePath;
+    }
     systemLibDir = CmajorSystemLibDir(config, backend);
     boost::filesystem::path mfp(filePath);
     boost::filesystem::path fn = mfp.filename();
     mfp.remove_filename();
+    if (!outDir.empty())
+    {
+        mfp = outdirBasePath;
+    }
     mfp /= "lib";
     mfp /= config;
     mfp /= fn;
@@ -107,6 +136,10 @@ Project::Project(const std::u32string& name_, const std::string& filePath_, cons
     libraryFilePath = GetFullPath(lfp.generic_string());
     boost::filesystem::path efp(filePath);
     efp.remove_filename();
+    if (!outDir.empty())
+    {
+        efp = outdirBasePath;
+    }
     efp /= "bin";
     efp /= config;
     efp /= fn;
@@ -147,7 +180,7 @@ void Project::ResolveDeclarations()
                 }
                 else
                 {
-                    boost::filesystem::path ar = basePath / rp;
+                    boost::filesystem::path ar = sourceBasePath / rp;
                     referencedProjectFilePaths.push_back(GetFullPath(ar.generic_string()));
                 }
                 boost::filesystem::path fn = rp.filename();
@@ -171,7 +204,7 @@ void Project::ResolveDeclarations()
                     rp.remove_filename();
                     if (rp.is_relative())
                     {
-                        rp = basePath / rp;
+                        rp = outdirBasePath / rp;
                     }
                     rp /= "lib";
                     rp /= config;
@@ -199,7 +232,7 @@ void Project::ResolveDeclarations()
                 relativeSourceFilePaths.push_back(sfp.generic_string());
                 if (sfp.is_relative())
                 {
-                    sfp = basePath / sfp;
+                    sfp = sourceBasePath / sfp;
                 }
                 if (sfp.extension() != ".cm")
                 {
@@ -266,6 +299,13 @@ bool Project::IsUpToDate(const std::string& systemModuleFilePath) const
     for (const std::string& sourceFilePath : sourceFilePaths)
     {
         if (boost::filesystem::last_write_time(sourceFilePath) > boost::filesystem::last_write_time(moduleFilePath))
+        {
+            return false;
+        }
+    }
+    for (const std::string& referenceFilePath : references)
+    {
+        if (boost::filesystem::last_write_time(referenceFilePath) > boost::filesystem::last_write_time(moduleFilePath))
         {
             return false;
         }

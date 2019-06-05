@@ -114,6 +114,10 @@ namespace cmsx.kernel
         {
             return eof;
         }
+        public nothrow inline void ResetEof()
+        {
+            eof = false;
+        }
         public nothrow inline bool Echo() const
         {
             return echo;
@@ -121,10 +125,6 @@ namespace cmsx.kernel
         public nothrow inline void SetEcho(bool echo_)
         {
             echo = echo_;
-        }
-        public nothrow inline void ResetEof()
-        {
-            eof = false;
         }
         public nothrow bool HasLine() const
         {
