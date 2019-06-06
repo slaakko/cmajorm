@@ -1,0 +1,12 @@
+project syntax;
+reference <StdLib.pl>;
+reference <../code/code.pl>;
+source <Composite.parser>;
+source <Element.parser>;
+source <Grammar.parser>;
+source <LibraryFile.parser>;
+source <ParserFile.parser>;
+source <Primary.parser>;
+source <Primitive.parser>;
+source <ProjectFile.parser>;
+source <Rule.parser>;

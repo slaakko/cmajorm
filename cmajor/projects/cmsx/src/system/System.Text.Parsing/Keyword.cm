@@ -1,0 +1,170 @@
+// =================================
+// Copyright (c) 2019 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Collections;
+
+namespace System.Text.Parsing
+{
+    public class IdentifierCharsRule
+    {
+        static IdentifierCharsRule() : instance(new IdentifierCharsRule())
+        {
+        }
+        public static IdentifierCharsRule& Instance() 
+        {
+            return *instance;
+        }
+        public inline nothrow RuleParser* GetRule() const
+        {
+            return rule.Get();
+        }
+        private IdentifierCharsRule() : 
+            rule(new RuleParser(u"identifier_chars", null, -1,
+                new PositiveParser(
+                    new AlternativeParser(
+                        new AlternativeParser(
+                            new AlternativeParser(
+                                new LetterParser(),
+                                new DigitParser()),
+                            new CharParser(u'_')),
+                        new CharParser(u'.')))))
+        {
+            rule->SetOwned();
+        }
+        public default ~IdentifierCharsRule();
+        private static UniquePtr<IdentifierCharsRule> instance;
+        private UniquePtr<RuleParser> rule;
+    }
+    
+    public class KeywordParser : Parser
+    {
+        public KeywordParser(const ustring& keyword_) : base(u"keyword", u"\"" + keyword_ + u"\""), keyword(keyword_), continuationRuleName()
+        {
+            continuationRule = IdentifierCharsRule.Instance().GetRule();
+            keywordStringParser = new StringParser(keyword);
+            Own(keywordStringParser);
+            CreateKeywordRule();
+        }
+        public KeywordParser(const ustring& keyword_, const ustring& continuationRuleName_) : 
+            base(u"keyword", u"\"" + keyword_ + u"\""), keyword(keyword_), continuationRuleName(continuationRuleName_)
+        {
+            continuationRule = IdentifierCharsRule.Instance().GetRule();
+            keywordStringParser = new StringParser(keyword);
+            Own(keywordStringParser);
+            CreateKeywordRule();
+        }
+        private void CreateKeywordRule()
+        {
+            keywordRule = new RuleParser(keyword, null, -1, 
+                new DifferenceParser(
+                    keywordStringParser,
+                    new TokenParser(
+                        new SequenceParser(
+                            keywordStringParser,
+                            continuationRule))));
+            Own(keywordRule);
+        }
+        public override Match Parse(Scanner& scanner, Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
+        {
+            return keywordRule->Parse(scanner, stack, parsingData);
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public inline nothrow const ustring& Keyword() const
+        {
+            return keyword;
+        }
+        public inline nothrow const ustring& ContinuationRuleName() const
+        {
+            return continuationRuleName;
+        }
+        public nothrow void SetContinuationRuleName(const ustring& continuationRuleName_)
+        {
+            continuationRuleName = continuationRuleName_;
+        }
+        public inline nothrow RuleParser* ContinuationRule() const
+        {
+            return continuationRule;
+        }
+        public void SetContinuationRule(RuleParser* continuationRule_)
+        {
+            continuationRule = continuationRule_;
+            Own(continuationRule);
+            CreateKeywordRule();
+        }
+        private ustring keyword;
+        private ustring continuationRuleName;
+        private RuleParser* continuationRule;
+        private Parser* keywordStringParser;
+        private RuleParser* keywordRule;
+    }
+    
+    public class KeywordListParser : Parser
+    {
+        public KeywordListParser(const ustring& selectorRuleName_, const List<ustring>& keywords_) : 
+            base(u"keywordList", u"keyword_list"), selectorRuleName(selectorRuleName_), selectorRule(null)
+        {
+            for (const ustring& keyword : keywords_)
+            {
+                keywords.Insert(keyword);
+            }
+        }
+        public inline nothrow const ustring& SelectorRuleName() const
+        {
+            return selectorRuleName;
+        }
+        public inline nothrow const ustring& KeywordListName() const
+        {
+            return keywordListName;
+        }
+        public nothrow void SetKeywordListName(const ustring& keywordListName_)
+        {
+            keywordListName = keywordListName_;
+        }
+        public inline nothrow const HashSet<ustring>& Keywords() const
+        {
+            return keywords;
+        }
+        public inline nothrow RuleParser* SelectorRule() const
+        {
+            return selectorRule;
+        }
+        public nothrow void SetSelectorRule(RuleParser* selectorRule_)
+        {
+            selectorRule = selectorRule_;
+        }
+        public override Match Parse(Scanner& scanner, Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
+        {
+            if (selectorRule != null)
+            {
+                Span save = scanner.GetSpan();
+                Match match = selectorRule->Parse(scanner, stack, parsingData);
+                if (match.Hit())
+                {
+                    const uchar* matchBegin = scanner.Start() + save.start;
+                    const uchar* matchEnd = scanner.Start() + scanner.GetSpan().start;
+                    ustring keyword(matchBegin, matchEnd);
+                    if (keywords.CFind(keyword) != keywords.CEnd())
+                    {
+                        return match;
+                    }
+                    scanner.SetSpan(save);
+                }
+            }
+            return Match.Nothing();
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        private ustring selectorRuleName;
+        private ustring keywordListName;
+        private HashSet<ustring> keywords;
+        private RuleParser* selectorRule;
+    }
+}

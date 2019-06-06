@@ -1,0 +1,114 @@
+using System;
+using System.Text;
+using System.Collections;
+using System.IO;
+using System.Text.Parsing;
+
+namespace Syntax
+{
+    public bool Changed(const string& parserFilePath, const string& cmFilePath)
+    {
+        if (!File.Exists(cmFilePath)) return true;
+        if (File.LastWriteTimeLess(cmFilePath, parserFilePath)) return true;
+        return false;
+    }
+    
+    internal class NamespaceContent
+    {
+        public void AddGrammar(Grammar* grammar)
+        {
+            grammars.Add(grammar);
+        }
+        public inline nothrow const List<Grammar*>& Grammars() const
+        {
+            return grammars;
+        }
+        private List<Grammar*> grammars;
+    }
+    
+    internal class ObjectSelectorVisitor : System.Text.Parsing.Visitor
+    {
+        public ObjectSelectorVisitor(int id_) : id(id_)
+        {
+        }
+        public override void BeginVisit(Grammar& grammar)
+        {
+            if (grammar.Owner() == id)
+            {
+                Namespace* ns = grammar.Ns();
+                NamespaceContent& nsContent = nsContentMap[ns];
+                nsContent.AddGrammar(&grammar);
+            }
+        }
+        public inline nothrow const Map<Namespace*, NamespaceContent>& NsContentMap() const
+        {
+            return nsContentMap;
+        }
+        private int id;
+        private Map<Namespace*, NamespaceContent> nsContentMap;
+    }
+    
+    internal void GenerateCode(ParserFileContent* parserFile)
+    {
+        const string& filePath = parserFile->FilePath();
+        string cmFilePath = Path.ChangeExtension(filePath, ".cm");
+        if (!Flags.Instance().ForceCodeGen() && !Changed(filePath, cmFilePath))
+        {
+            return;
+        }
+        StreamWriter cmFile = File.CreateText(cmFilePath);
+        CodeFormatter formatter(cmFile);
+        formatter.WriteLine("using System;");
+        formatter.WriteLine("using System.Collections;");
+        formatter.WriteLine("using System.Text.Parsing;");
+        for (const ustring& usingImport : parserFile->UsingImports())
+        {
+            if (usingImport == u"System" || usingImport == u"System.Collections" || usingImport == u"System.Text.Parsing") continue;
+            formatter.WriteLine("using " + ToUtf8(usingImport) + ";");
+        }
+        for (const ustring& usingAlias : parserFile->UsingAliases())
+        {
+            formatter.WriteLine("using " + ToUtf8(usingAlias) + ";");
+        }
+        formatter.WriteLine();
+        formatter.WriteLine("// this source file has been automatically generated from '" + Path.GetFileName(parserFile->FilePath()) + "' using cmsxpg version 1.0.0.");
+        formatter.WriteLine();
+        ObjectSelectorVisitor selectorVisitor(parserFile->Id());
+        parserFile->GetParsingDomain()->GlobalNamespace()->Accept(selectorVisitor);
+        const Map<Namespace*, NamespaceContent>& nsContentMap = selectorVisitor.NsContentMap();
+        for (const Pair<Namespace*, NamespaceContent>& p : nsContentMap)
+        {
+            Namespace* ns = p.first;
+            const NamespaceContent& nsContent = p.second;
+            if (!ns->FullName().IsEmpty())
+            {
+                formatter.WriteLine("namespace " + ToUtf8(ns->FullName()));
+                formatter.WriteLine("{");
+                formatter.IncIndent();
+            }
+            for (Grammar* grammar : nsContent.Grammars())
+            {
+                CodeGeneratorVisitor codeGeneratorVisitor(formatter);
+                grammar->Accept(codeGeneratorVisitor);
+            }
+            if (!ns->FullName().IsEmpty())
+            {
+                formatter.DecIndent();
+                formatter.Write("} ");
+                formatter.WriteLine("// " + ToUtf8(ns->FullName()));
+            }
+        }
+        if (Flags.Instance().Verbose())
+        {
+            Console.WriteLine("=> " + cmFilePath);
+        }        
+    }
+    
+    public void GenerateCode(List<UniquePtr<ParserFileContent>>& parserFiles)
+    {
+        for (const UniquePtr<ParserFileContent>& parserFile : parserFiles)
+        {
+            GenerateCode(parserFile.Get());
+        }
+    }
+}

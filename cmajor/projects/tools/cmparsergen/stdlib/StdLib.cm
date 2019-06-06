@@ -963,9 +963,9 @@ namespace System.Text.Parsing
             }
         }
 
-        public class escapeRule : System.Text.Parsing.RuleParser
+        public class hex_escapeRule : System.Text.Parsing.RuleParser
         {
-            public escapeRule(const ustring& name_, Scope* enclosingScope_, int id_, Parser* definition_) : base(name_, enclosingScope_, id_, definition_)
+            public hex_escapeRule(const ustring& name_, Scope* enclosingScope_, int id_, Parser* definition_) : base(name_, enclosingScope_, id_, definition_)
             {
                 SetValueTypeName(ToUtf32("uchar"));
             }
@@ -987,39 +987,185 @@ namespace System.Text.Parsing
             {
                 ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
                 a0ActionParser->SetAction(A0Action);
-                ActionParser* a1ActionParser = GetAction(ToUtf32("A1"));
-                a1ActionParser->SetAction(A1Action);
-                ActionParser* a2ActionParser = GetAction(ToUtf32("A2"));
-                a2ActionParser->SetAction(A2Action);
-                ActionParser* a3ActionParser = GetAction(ToUtf32("A3"));
-                a3ActionParser->SetAction(A3Action);
                 NonterminalParser* xNonterminalParser = GetNonterminal(ToUtf32("x"));
                 xNonterminalParser->SetPost(Postx);
-                NonterminalParser* o1NonterminalParser = GetNonterminal(ToUtf32("o1"));
-                o1NonterminalParser->SetPost(Posto1);
-                NonterminalParser* o2NonterminalParser = GetNonterminal(ToUtf32("o2"));
-                o2NonterminalParser->SetPost(Posto2);
-                NonterminalParser* o3NonterminalParser = GetNonterminal(ToUtf32("o3"));
-                o3NonterminalParser->SetPost(Posto3);
-                NonterminalParser* dNonterminalParser = GetNonterminal(ToUtf32("d"));
-                dNonterminalParser->SetPost(Postd);
             }
             public void A0Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
                 context->value = cast<uchar>(context->fromx);
             }
-            public void A1Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
+            public void Postx(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                if (matched)
+                {
+                    UniquePtr<Object> fromx_value = stack.Pop();
+                    context->fromx = *cast<ValueObject<uint>*>(fromx_value.Get());
+                }
+            }
+            public class Context : System.Text.Parsing.Context
+            {
+                public Context() : value(), fromx()
+                {
+                }
+                public uchar value;
+                public uint fromx;
+            }
+        }
+
+        public class octal_escapeRule : System.Text.Parsing.RuleParser
+        {
+            public octal_escapeRule(const ustring& name_, Scope* enclosingScope_, int id_, Parser* definition_) : base(name_, enclosingScope_, id_, definition_)
+            {
+                SetValueTypeName(ToUtf32("uchar"));
+            }
+            public override void Enter(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
+            {
+                parsingData->PushContext(Id(), new Context());
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+            }
+            public override void Leave(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                if (matched)
+                {
+                    stack.Push(UniquePtr<Object>(new ValueObject<uchar>(context->value)));
+                }
+                parsingData->PopContext(Id());
+            }
+            public override void Link()
+            {
+                ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
+                a0ActionParser->SetAction(A0Action);
+                NonterminalParser* o1NonterminalParser = GetNonterminal(ToUtf32("o1"));
+                o1NonterminalParser->SetPost(Posto1);
+                NonterminalParser* o2NonterminalParser = GetNonterminal(ToUtf32("o2"));
+                o2NonterminalParser->SetPost(Posto2);
+                NonterminalParser* o3NonterminalParser = GetNonterminal(ToUtf32("o3"));
+                o3NonterminalParser->SetPost(Posto3);
+            }
+            public void A0Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
                 context->value = cast<uchar>(64 * context->fromo1 + 8 * context->fromo2 + context->fromo3);
             }
-            public void A2Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
+            public void Posto1(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                if (matched)
+                {
+                    UniquePtr<Object> fromo1_value = stack.Pop();
+                    context->fromo1 = *cast<ValueObject<int>*>(fromo1_value.Get());
+                }
+            }
+            public void Posto2(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                if (matched)
+                {
+                    UniquePtr<Object> fromo2_value = stack.Pop();
+                    context->fromo2 = *cast<ValueObject<int>*>(fromo2_value.Get());
+                }
+            }
+            public void Posto3(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                if (matched)
+                {
+                    UniquePtr<Object> fromo3_value = stack.Pop();
+                    context->fromo3 = *cast<ValueObject<int>*>(fromo3_value.Get());
+                }
+            }
+            public class Context : System.Text.Parsing.Context
+            {
+                public Context() : value(), fromo1(), fromo2(), fromo3()
+                {
+                }
+                public uchar value;
+                public int fromo1;
+                public int fromo2;
+                public int fromo3;
+            }
+        }
+
+        public class decimal_escapeRule : System.Text.Parsing.RuleParser
+        {
+            public decimal_escapeRule(const ustring& name_, Scope* enclosingScope_, int id_, Parser* definition_) : base(name_, enclosingScope_, id_, definition_)
+            {
+                SetValueTypeName(ToUtf32("uchar"));
+            }
+            public override void Enter(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
+            {
+                parsingData->PushContext(Id(), new Context());
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+            }
+            public override void Leave(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                if (matched)
+                {
+                    stack.Push(UniquePtr<Object>(new ValueObject<uchar>(context->value)));
+                }
+                parsingData->PopContext(Id());
+            }
+            public override void Link()
+            {
+                ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
+                a0ActionParser->SetAction(A0Action);
+                NonterminalParser* dNonterminalParser = GetNonterminal(ToUtf32("d"));
+                dNonterminalParser->SetPost(Postd);
+            }
+            public void A0Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
                 context->value = cast<uchar>(context->fromd);
             }
-            public void A3Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
+            public void Postd(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                if (matched)
+                {
+                    UniquePtr<Object> fromd_value = stack.Pop();
+                    context->fromd = *cast<ValueObject<uint>*>(fromd_value.Get());
+                }
+            }
+            public class Context : System.Text.Parsing.Context
+            {
+                public Context() : value(), fromd()
+                {
+                }
+                public uchar value;
+                public uint fromd;
+            }
+        }
+
+        public class c_escapeRule : System.Text.Parsing.RuleParser
+        {
+            public c_escapeRule(const ustring& name_, Scope* enclosingScope_, int id_, Parser* definition_) : base(name_, enclosingScope_, id_, definition_)
+            {
+                SetValueTypeName(ToUtf32("uchar"));
+            }
+            public override void Enter(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
+            {
+                parsingData->PushContext(Id(), new Context());
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+            }
+            public override void Leave(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                if (matched)
+                {
+                    stack.Push(UniquePtr<Object>(new ValueObject<uchar>(context->value)));
+                }
+                parsingData->PopContext(Id());
+            }
+            public override void Link()
+            {
+                ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
+                a0ActionParser->SetAction(A0Action);
+            }
+            public void A0Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
                 uchar c = *matchBegin;
@@ -1072,62 +1218,120 @@ namespace System.Text.Parsing
                     }
                 }
             }
-            public void Postx(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
+            public class Context : System.Text.Parsing.Context
+            {
+                public Context() : value()
+                {
+                }
+                public uchar value;
+            }
+        }
+
+        public class escapeRule : System.Text.Parsing.RuleParser
+        {
+            public escapeRule(const ustring& name_, Scope* enclosingScope_, int id_, Parser* definition_) : base(name_, enclosingScope_, id_, definition_)
+            {
+                SetValueTypeName(ToUtf32("uchar"));
+            }
+            public override void Enter(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
+            {
+                parsingData->PushContext(Id(), new Context());
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+            }
+            public override void Leave(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
                 if (matched)
                 {
-                    UniquePtr<Object> fromx_value = stack.Pop();
-                    context->fromx = *cast<ValueObject<uint>*>(fromx_value.Get());
+                    stack.Push(UniquePtr<Object>(new ValueObject<uchar>(context->value)));
+                }
+                parsingData->PopContext(Id());
+            }
+            public override void Link()
+            {
+                ActionParser* a0ActionParser = GetAction(ToUtf32("A0"));
+                a0ActionParser->SetAction(A0Action);
+                ActionParser* a1ActionParser = GetAction(ToUtf32("A1"));
+                a1ActionParser->SetAction(A1Action);
+                ActionParser* a2ActionParser = GetAction(ToUtf32("A2"));
+                a2ActionParser->SetAction(A2Action);
+                ActionParser* a3ActionParser = GetAction(ToUtf32("A3"));
+                a3ActionParser->SetAction(A3Action);
+                NonterminalParser* hex_escapeNonterminalParser = GetNonterminal(ToUtf32("hex_escape"));
+                hex_escapeNonterminalParser->SetPost(Posthex_escape);
+                NonterminalParser* octal_escapeNonterminalParser = GetNonterminal(ToUtf32("octal_escape"));
+                octal_escapeNonterminalParser->SetPost(Postoctal_escape);
+                NonterminalParser* decimal_escapeNonterminalParser = GetNonterminal(ToUtf32("decimal_escape"));
+                decimal_escapeNonterminalParser->SetPost(Postdecimal_escape);
+                NonterminalParser* c_escapeNonterminalParser = GetNonterminal(ToUtf32("c_escape"));
+                c_escapeNonterminalParser->SetPost(Postc_escape);
+            }
+            public void A0Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                context->value = context->fromhex_escape;
+            }
+            public void A1Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                context->value = context->fromoctal_escape;
+            }
+            public void A2Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                context->value = context->fromdecimal_escape;
+            }
+            public void A3Action(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                context->value = context->fromc_escape;
+            }
+            public void Posthex_escape(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
+            {
+                Context* context = cast<Context*>(parsingData->GetContext(Id()));
+                if (matched)
+                {
+                    UniquePtr<Object> fromhex_escape_value = stack.Pop();
+                    context->fromhex_escape = *cast<ValueObject<uchar>*>(fromhex_escape_value.Get());
                 }
             }
-            public void Posto1(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
+            public void Postoctal_escape(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
                 if (matched)
                 {
-                    UniquePtr<Object> fromo1_value = stack.Pop();
-                    context->fromo1 = *cast<ValueObject<int>*>(fromo1_value.Get());
+                    UniquePtr<Object> fromoctal_escape_value = stack.Pop();
+                    context->fromoctal_escape = *cast<ValueObject<uchar>*>(fromoctal_escape_value.Get());
                 }
             }
-            public void Posto2(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
+            public void Postdecimal_escape(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
                 if (matched)
                 {
-                    UniquePtr<Object> fromo2_value = stack.Pop();
-                    context->fromo2 = *cast<ValueObject<int>*>(fromo2_value.Get());
+                    UniquePtr<Object> fromdecimal_escape_value = stack.Pop();
+                    context->fromdecimal_escape = *cast<ValueObject<uchar>*>(fromdecimal_escape_value.Get());
                 }
             }
-            public void Posto3(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
+            public void Postc_escape(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
             {
                 Context* context = cast<Context*>(parsingData->GetContext(Id()));
                 if (matched)
                 {
-                    UniquePtr<Object> fromo3_value = stack.Pop();
-                    context->fromo3 = *cast<ValueObject<int>*>(fromo3_value.Get());
-                }
-            }
-            public void Postd(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)
-            {
-                Context* context = cast<Context*>(parsingData->GetContext(Id()));
-                if (matched)
-                {
-                    UniquePtr<Object> fromd_value = stack.Pop();
-                    context->fromd = *cast<ValueObject<uint>*>(fromd_value.Get());
+                    UniquePtr<Object> fromc_escape_value = stack.Pop();
+                    context->fromc_escape = *cast<ValueObject<uchar>*>(fromc_escape_value.Get());
                 }
             }
             public class Context : System.Text.Parsing.Context
             {
-                public Context() : value(), fromx(), fromo1(), fromo2(), fromo3(), fromd()
+                public Context() : value(), fromhex_escape(), fromoctal_escape(), fromdecimal_escape(), fromc_escape()
                 {
                 }
                 public uchar value;
-                public uint fromx;
-                public int fromo1;
-                public int fromo2;
-                public int fromo3;
-                public uint fromd;
+                public uchar fromhex_escape;
+                public uchar fromoctal_escape;
+                public uchar fromdecimal_escape;
+                public uchar fromc_escape;
             }
         }
 
@@ -1463,7 +1667,10 @@ namespace System.Text.Parsing
                 new System.Text.Parsing.ActionParser(ToUtf32("A0"),
                     new System.Text.Parsing.TokenParser(
                         new System.Text.Parsing.SequenceParser(
-                            new System.Text.Parsing.IdStartParser(),
+                            new System.Text.Parsing.GroupingParser(
+                                new System.Text.Parsing.AlternativeParser(
+                                    new System.Text.Parsing.IdStartParser(),
+                                    new System.Text.Parsing.CharParser('_'))),
                             new System.Text.Parsing.KleeneStarParser(
                                 new System.Text.Parsing.IdContParser()))))));
             AddRule(new qualified_idRule(ToUtf32("qualified_id"), GetScope(), Domain()->GetNextRuleId(),
@@ -1476,6 +1683,27 @@ namespace System.Text.Parsing
                                     new System.Text.Parsing.SequenceParser(
                                         new System.Text.Parsing.CharParser('.'),
                                         new System.Text.Parsing.NonterminalParser(ToUtf32("rest"), ToUtf32("identifier"), 0)))))))));
+            AddRule(new hex_escapeRule(ToUtf32("hex_escape"), GetScope(), Domain()->GetNextRuleId(),
+                new System.Text.Parsing.SequenceParser(
+                    new System.Text.Parsing.CharSetParser(ToUtf32("xX")),
+                    new System.Text.Parsing.ActionParser(ToUtf32("A0"),
+                        new System.Text.Parsing.NonterminalParser(ToUtf32("x"), ToUtf32("hexdword"), 0)))));
+            AddRule(new octal_escapeRule(ToUtf32("octal_escape"), GetScope(), Domain()->GetNextRuleId(),
+                new System.Text.Parsing.ActionParser(ToUtf32("A0"),
+                    new System.Text.Parsing.GroupingParser(
+                        new System.Text.Parsing.SequenceParser(
+                            new System.Text.Parsing.SequenceParser(
+                                new System.Text.Parsing.NonterminalParser(ToUtf32("o1"), ToUtf32("octal_digit"), 0),
+                                new System.Text.Parsing.NonterminalParser(ToUtf32("o2"), ToUtf32("octal_digit"), 0)),
+                            new System.Text.Parsing.NonterminalParser(ToUtf32("o3"), ToUtf32("octal_digit"), 0))))));
+            AddRule(new decimal_escapeRule(ToUtf32("decimal_escape"), GetScope(), Domain()->GetNextRuleId(),
+                new System.Text.Parsing.SequenceParser(
+                    new System.Text.Parsing.CharSetParser(ToUtf32("dD")),
+                    new System.Text.Parsing.ActionParser(ToUtf32("A0"),
+                        new System.Text.Parsing.NonterminalParser(ToUtf32("d"), ToUtf32("uint"), 0)))));
+            AddRule(new c_escapeRule(ToUtf32("c_escape"), GetScope(), Domain()->GetNextRuleId(),
+                new System.Text.Parsing.ActionParser(ToUtf32("A0"),
+                    new System.Text.Parsing.CharSetParser(ToUtf32("dDxX"), true))));
             AddRule(new escapeRule(ToUtf32("escape"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.TokenParser(
                     new System.Text.Parsing.SequenceParser(
@@ -1484,23 +1712,14 @@ namespace System.Text.Parsing
                             new System.Text.Parsing.AlternativeParser(
                                 new System.Text.Parsing.AlternativeParser(
                                     new System.Text.Parsing.AlternativeParser(
-                                        new System.Text.Parsing.SequenceParser(
-                                            new System.Text.Parsing.CharSetParser(ToUtf32("xX")),
-                                            new System.Text.Parsing.ActionParser(ToUtf32("A0"),
-                                                new System.Text.Parsing.NonterminalParser(ToUtf32("x"), ToUtf32("hexdword"), 0))),
+                                        new System.Text.Parsing.ActionParser(ToUtf32("A0"),
+                                            new System.Text.Parsing.NonterminalParser(ToUtf32("hex_escape"), ToUtf32("hex_escape"), 0)),
                                         new System.Text.Parsing.ActionParser(ToUtf32("A1"),
-                                            new System.Text.Parsing.GroupingParser(
-                                                new System.Text.Parsing.SequenceParser(
-                                                    new System.Text.Parsing.SequenceParser(
-                                                        new System.Text.Parsing.NonterminalParser(ToUtf32("o1"), ToUtf32("octal_digit"), 0),
-                                                        new System.Text.Parsing.NonterminalParser(ToUtf32("o2"), ToUtf32("octal_digit"), 0)),
-                                                    new System.Text.Parsing.NonterminalParser(ToUtf32("o3"), ToUtf32("octal_digit"), 0))))),
-                                    new System.Text.Parsing.SequenceParser(
-                                        new System.Text.Parsing.CharSetParser(ToUtf32("dD")),
-                                        new System.Text.Parsing.ActionParser(ToUtf32("A2"),
-                                            new System.Text.Parsing.NonterminalParser(ToUtf32("d"), ToUtf32("uint"), 0)))),
+                                            new System.Text.Parsing.NonterminalParser(ToUtf32("octal_escape"), ToUtf32("octal_escape"), 0))),
+                                    new System.Text.Parsing.ActionParser(ToUtf32("A2"),
+                                        new System.Text.Parsing.NonterminalParser(ToUtf32("decimal_escape"), ToUtf32("decimal_escape"), 0))),
                                 new System.Text.Parsing.ActionParser(ToUtf32("A3"),
-                                    new System.Text.Parsing.CharSetParser(ToUtf32("dDxX"), true))))))));
+                                    new System.Text.Parsing.NonterminalParser(ToUtf32("c_escape"), ToUtf32("c_escape"), 0))))))));
             AddRule(new charRule(ToUtf32("char"), GetScope(), Domain()->GetNextRuleId(),
                 new System.Text.Parsing.TokenParser(
                     new System.Text.Parsing.SequenceParser(

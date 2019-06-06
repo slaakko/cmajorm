@@ -1,8 +1,8 @@
 // =================================
-// Copyright (c) 2018 Seppo Laakko
+// Copyright (c) 2019 Seppo Laakko
 // Distributed under the MIT license
 // =================================
- 
+
 using System;
 
 namespace System.Text.Parsing
@@ -190,7 +190,7 @@ namespace System.Text.Parsing
             ;
 
         identifier : ustring
-            ::= token(idstart idcont*)
+            ::= token((idstart | '_') idcont*)
             {
                 value = ustring(matchBegin, matchEnd);
             }
@@ -203,12 +203,20 @@ namespace System.Text.Parsing
             }
             ;
 
-        escape : uchar
-            ::= token('\\'
-            (   [xX] hexdword:x{ value = cast<uchar>(x); }
-            |   (octal_digit:o1 octal_digit:o2 octal_digit:o3){ value = cast<uchar>(64 * o1 + 8 * o2 + o3); }
-            |   [dD] uint:d{ value = cast<uchar>(d); }
-            |   [^dDxX]
+        hex_escape : uchar
+            ::= [xX] hexdword:x{ value = cast<uchar>(x); }
+            ;
+            
+        octal_escape : uchar
+            ::= (octal_digit:o1 octal_digit:o2 octal_digit:o3){ value = cast<uchar>(64 * o1 + 8 * o2 + o3); }
+            ;
+            
+        decimal_escape : uchar
+            ::= [dD] uint:d{ value = cast<uchar>(d); }
+            ;
+            
+        c_escape : uchar
+            ::= [^dDxX]
             {
                 uchar c = *matchBegin;
                 switch (c)
@@ -224,7 +232,16 @@ namespace System.Text.Parsing
                     default: value = c; break;
                 }
             }
-            )   )
+            ;
+
+        escape : uchar
+            ::= token('\\'
+                (   hex_escape{ value = hex_escape; }
+                |   octal_escape{ value = octal_escape; }
+                |   decimal_escape{ value = decimal_escape; }
+                |   c_escape{ value = c_escape; }
+                )   
+            )
             ;
 
         char : uchar

@@ -1,0 +1,66 @@
+using System;
+using System.Collections;
+using System.Text.Parsing;
+
+namespace Syntax
+{
+    public class ParserFileContent
+    {
+        public ParserFileContent(int id_, const string& filePath_, ParsingDomain* parsingDomain_) : id(id_), filePath(filePath_), parsingDomain(parsingDomain_)
+        {
+        }
+        public ~ParserFileContent()
+        {
+        }
+        public inline nothrow int Id() const
+        {
+            return id;
+        }
+        public inline nothrow const string& FilePath() const
+        {
+            return filePath;
+        }
+        public inline nothrow ParsingDomain* GetParsingDomain() const
+        {
+            return parsingDomain;
+        }
+        public void AddUsingAlias(const ustring& usingAlias)
+        {
+            usingAliases.Add(usingAlias);
+        }
+        public void AddUsingImport(const ustring& usingImport)
+        {
+            usingImports.Add(usingImport);
+        }
+        public inline nothrow const List<ustring>& UsingAliases() const
+        {
+            return usingAliases;
+        }
+        public inline nothrow const List<ustring>& UsingImports() const
+        {
+            return usingImports;
+        }
+        public void AddGrammar(Grammar* grammar)
+        {
+            grammar->SetOwner(id);
+            parsingDomain->AddGrammar(grammar);
+        }
+        public void BeginNamespace(const ustring& ns)
+        {
+            parsingDomain->BeginNamespace(ns);
+        }
+        public void EndNamespace()
+        {
+            parsingDomain->EndNamespace();
+        }
+        public inline nothrow Scope* CurrentScope() const
+        {
+            return parsingDomain->CurrentScope();
+        }
+        private int id;
+        private string filePath;
+        private ParsingDomain* parsingDomain;
+        private List<ustring> usingAliases;
+        private List<ustring> usingImports;
+    }
+}

@@ -1,0 +1,79 @@
+using System.Text.Parsing.CodeDom;
+using ParsingContext = Code.ParsingContext;
+
+namespace Syntax
+{
+    grammar PrimaryGrammar
+    {
+        using CompositeGrammar.Alternative;
+        using PrimitiveGrammar.Primitive;
+        using Code.ExpressionGrammar.ArgumentList;
+        using ElementGrammar.Identifier;
+        using Code.StatementGrammar.CompoundStatement;
+
+        Primary(ParsingContext* ctx) : System.Text.Parsing.Parser*
+            ::=
+            (   RuleCall(ctx){ value = RuleCall; }
+            |   Primitive{ value = Primitive; }
+            |   Grouping(ctx){ value = Grouping; }
+            |   Token(ctx){ value = Token; }
+            )
+            (   Expectation(value){ value = Expectation; })?
+            (   Action(ctx, value){ value = Action; })?
+            ;
+
+        RuleCall(ParsingContext* ctx, var ArgumentCollector argumentCollector) : System.Text.Parsing.Parser*
+            ::= ((token(Nonterminal:ntargs '(') ArgumentList(ctx, &argumentCollector) ')' | Nonterminal:nt) Alias?)
+                {
+                    ustring ruleName;
+                    if (!ntargs.IsEmpty())
+                    {
+                        ruleName = ntargs;
+                    }
+                    else
+                    {
+                        ruleName = nt;
+                    }
+                    ustring alias = Alias;
+                    ustring name = ruleName;
+                    if (!alias.IsEmpty())
+                    {
+                        name = alias;
+                    }
+                    System.Text.Parsing.NonterminalParser* parser = new System.Text.Parsing.NonterminalParser(name, ruleName);
+                    parser->SetSpan(span);
+                    parser->SetArguments(argumentCollector.Arguments());
+                    value = parser;
+                }
+            ;
+
+        Nonterminal : ustring
+            ::= Identifier{ value = Identifier; }
+            ;
+
+        Alias : ustring
+            ::= ':' Identifier{ value = Identifier; }
+            ;
+
+        Grouping(ParsingContext* ctx) : System.Text.Parsing.Parser*
+            ::= ('(' Alternative(ctx)! ')'!){ value = new GroupingParser(Alternative); }
+            ;
+
+        Token(ParsingContext* ctx) : System.Text.Parsing.Parser*
+            ::= (keyword("token") '('! Alternative(ctx)! ')'!){ value = new System.Text.Parsing.TokenParser(Alternative); }
+            ;
+
+        Expectation(System.Text.Parsing.Parser* child) : System.Text.Parsing.Parser*
+            ::= '!'{ value = new System.Text.Parsing.ExpectationParser(child); }
+            ;
+
+        Action(ParsingContext* ctx, System.Text.Parsing.Parser* child) : System.Text.Parsing.ActionParser*
+            ::= (CompoundStatement(ctx):successCode ('/' CompoundStatement(ctx):failureCode)?)
+            {
+                value = new System.Text.Parsing.ActionParser(u"", child);
+                value->SetSuccessCode(successCode);
+                value->SetFailureCode(failureCode);
+            }
+            ;
+    }
+}

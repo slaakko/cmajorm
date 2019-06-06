@@ -1,0 +1,120 @@
+using System.Text.Parsing.CodeDom;
+
+namespace Code
+{
+    grammar LiteralGrammar
+    {
+        using stdlib.digit_sequence;
+        using stdlib.sign;
+
+        Literal : Literal*
+            ::= BooleanLiteral{ value = BooleanLiteral; }
+            |   FloatingLiteral{ value = FloatingLiteral; }
+            |   IntegerLiteral{ value = IntegerLiteral; }
+            |   CharLiteral{ value = CharLiteral; }
+            |   StringLiteral{ value = StringLiteral; }
+            |   NullLiteral{ value = NullLiteral; }
+            ;
+
+        BooleanLiteral : Literal*
+            ::= keyword("true"){ value = new Literal(u"true"); }
+            |   keyword("false"){ value = new Literal(u"false"); }
+            ;
+
+        FloatingLiteral : Literal*
+            ::= token(FloatingLiteralValue [fF]?){ value = new Literal(Trim(ustring(matchBegin, matchEnd))); }
+            ;
+
+        FloatingLiteralValue
+            ::= token(FractionalFloatingLiteral | ExponentFloatingLiteral)
+            ;
+
+        FractionalFloatingLiteral
+            ::= token(digit_sequence? '.' digit_sequence ExponentPart?)
+            |   token(digit_sequence '.')
+            ;
+
+        ExponentFloatingLiteral
+            ::= token(digit_sequence ExponentPart)
+            ;
+
+        ExponentPart
+            ::= token([eE] sign digit_sequence)
+            ;
+
+        IntegerLiteral : Literal*
+            ::= token(IntegerLiteralValue [uU]?){ value = new Literal(Trim(ustring(matchBegin, matchEnd))); }
+            ;
+
+        IntegerLiteralValue
+            ::= token(HexIntegerLiteral | DecIntegerLiteral)
+            ;
+
+        HexIntegerLiteral
+            ::= token(("0x" | "0X") hexdigit+)
+            ;
+
+        DecIntegerLiteral
+            ::= token(digit_sequence)
+            ;
+
+        CharLiteral : Literal*
+            ::= token(  '\''
+                        (   ([^'\\\r\n]+)
+                        |   CharEscape
+                        )
+                        '\''!
+                ){ value = new Literal(ustring(matchBegin, matchEnd)); }
+            |   ('w' token(  '\''
+                        (   ([^'\\\r\n]+)
+                        |   CharEscape
+                        )
+                        '\''!)
+                ){ value = new Literal(Trim(ustring(matchBegin, matchEnd))); }
+            |   ('u' token(  '\''
+                        (   ([^'\\\r\n]+)
+                        |   CharEscape
+                        )
+                        '\''!)
+                ){ value = new Literal(Trim(ustring(matchBegin, matchEnd))); }
+            ;
+
+        StringLiteral : Literal*
+            ::= ('@' token('"' ([^"]*) '"')){ value = new Literal(Trim(ustring(matchBegin, matchEnd))); }
+            |   ('w' '@' token('"' ([^"]*) '"')){ value = new Literal(Trim(ustring(matchBegin, matchEnd))); }
+            |   ('u' '@' token('"' ([^"]*) '"')){ value = new Literal(Trim(ustring(matchBegin, matchEnd))); }
+            |   token('"'
+                        (   ([^"\\\r\n]+)
+                        |   CharEscape
+                        )*
+                    '"'){ value = new Literal(ustring(matchBegin, matchEnd)); }
+            |   ('w' token('"'
+                        (   ([^"\\\r\n]+)
+                        |   CharEscape
+                        )*
+                    '"')
+                ){ value = new Literal(Trim(ustring(matchBegin, matchEnd))); }
+            |   ('u' token('"'
+                        (   ([^"\\\r\n]+)
+                        |   CharEscape
+                        )*
+                    '"')
+                ){ value = new Literal(Trim(ustring(matchBegin, matchEnd))); }
+            ;
+
+        NullLiteral : Literal*
+            ::= keyword("null"){ value = new Literal(u"null"); }
+            ;
+
+        CharEscape
+            ::= token('\\'
+                (   [xX] hexdigit+
+                |   [dD] digit_sequence
+                |   [0-7]+
+                |   'u' hexdigit hexdigit hexdigit hexdigit
+                |   'U' hexdigit hexdigit hexdigit hexdigit hexdigit hexdigit hexdigit hexdigit
+                |   anychar
+                ))
+            ;
+    }
+}

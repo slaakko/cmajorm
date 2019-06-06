@@ -1,0 +1,180 @@
+using System;
+using System.IO;
+using System.Text;
+using System.Collections;
+using Syntax;
+
+internal void AddToLibraryDirectories(const string& libraryPath, List<string>& libraryDirectories)
+{
+    List<string> dirs = libraryPath.Split(';');
+    for (const string& dir : dirs)
+    {
+        libraryDirectories.Add(dir);
+    }
+}
+
+internal string Version() 
+{
+    return "1.0.0";
+}
+
+internal void PrintHelp()
+{
+    Console.WriteLine("Cmajor System X Parser Generator version " + Version());
+    Console.WriteLine();
+    Console.WriteLine("Usage: cmsxpg [options] { <project.pp> }");
+    Console.WriteLine();
+    Console.WriteLine("Read given parser project (.pp) files and ");
+    Console.WriteLine("generate Cmajor parser class for each grammar");
+    Console.WriteLine("specified in .parser source files.");
+    Console.WriteLine();
+    Console.WriteLine("Options:");
+    Console.WriteLine();
+    Console.WriteLine("--force (-F)");
+    Console.WriteLine("   Force source code generation although .parser file not changed.");
+    Console.WriteLine();
+    Console.WriteLine("--verbose (-v)");
+    Console.WriteLine("   Generate verbose output.");
+    Console.WriteLine();
+    Console.WriteLine("--lib <directories> (-L <directories>)");
+    Console.WriteLine("   Specify one or more library directories that contain parsing library (.pl) files.");
+    Console.WriteLine("   Directories should be separated by ';' character.");
+    Console.WriteLine();
+    Console.WriteLine("--threads=N (-t=N)");
+    Console.WriteLine("   Use N threads. If N=0 or --threads option not specified use as many threads as there are cores in the machine.");
+    Console.WriteLine();
+    Console.WriteLine("--debug=project (-dp)");
+    Console.WriteLine("   Log parsing project files to stderr.");
+    Console.WriteLine();
+    Console.WriteLine("--debug=library (-dl)");
+    Console.WriteLine("   Log parsing library files to stderr.");
+    Console.WriteLine();
+    Console.WriteLine("--debug=parse (-da)");
+    Console.WriteLine("   Log parsing parser files to stderr.");
+}
+
+internal int main(int argc, const char** argv)
+{
+    try
+    {
+        if (argc < 2)
+        {
+            PrintHelp();
+            return 0;
+        }
+        List<string> projectFiles;
+        List<string> libraryDirectories;
+        bool prevWasLib = false;
+        string cmajorRoot = RtGetEnvironmentVariable("CMAJOR_ROOT");
+        if (cmajorRoot.IsEmpty())
+        {
+            throw Exception("CMAJOR_ROOT environment variable not defined. Please set it to contain /path/to/cmajor directory.");
+        }
+        string libraryPath = Path.Combine(Path.Combine(Path.Combine(Path.Combine(Path.Combine(cmajorRoot, "projects"), "cmsx"), "src"), "system"), "System.Text.Parsing");
+        AddToLibraryDirectories(libraryPath, libraryDirectories);
+        for (int i = 1; i < argc; ++i)
+        {
+            string arg = argv[i];
+            if (arg.StartsWith("-"))
+            {
+                if (arg == "--force" || arg == "-F")
+                {
+                    Syntax.Flags.Instance().SetForceCodeGen();
+                }
+                else if (arg == "--verbose" || arg == "-v")
+                {
+                    Syntax.Flags.Instance().SetVerbose();
+                }
+                else if (arg == "--lib" || arg == "-L")
+                {
+                    prevWasLib = true;
+                }
+                else if (arg == "-dp")
+                {
+                    Syntax.Flags.Instance().SetDebugProject();
+                }
+                else if (arg == "-dl")
+                {
+                    Syntax.Flags.Instance().SetDebugLibrary();
+                }
+                else if (arg == "-da")
+                {
+                    Syntax.Flags.Instance().SetDebugParse();
+                }
+                else if (arg.Find('=') != -1)
+                {
+                    List<string> components = arg.Split('=');
+                    if (components.Count() != 2)
+                    {
+                        throw Exception("unknown option '" + arg + "'");
+                    }
+                    if (components[0] == "--debug")
+                    {
+                        if (components[1] == "project")
+                        {
+                            Syntax.Flags.Instance().SetDebugProject();
+                        }
+                        else if (components[1] == "library")
+                        {
+                            Syntax.Flags.Instance().SetDebugLibrary();
+                        }
+                        else if (components[1] == "parse")
+                        {
+                            Syntax.Flags.Instance().SetDebugParse();
+                        }
+                        else
+                        {
+                            throw Exception("unknown option '" + arg + "'");
+                        }
+                    }
+                    else if (components[0] == "--threads" || components[0] == "-t")
+                    {
+                        Syntax.Flags.Instance().SetNumThreads(ParseInt(components[1]));
+                    }
+                    else
+                    {
+                        throw Exception("unknown option '" + arg + "'");
+                    }
+                }
+                else
+                {
+                    throw Exception("unknown option '" + arg + "'");
+                }
+            }
+            else if (prevWasLib)
+            {
+                AddToLibraryDirectories(arg, libraryDirectories);
+                prevWasLib = false;
+            }
+            else
+            {
+                if (arg.EndsWith(".pp"))
+                {
+                    projectFiles.Add(GetFullPath(arg));
+                }
+                else
+                {
+                    throw Exception("invalid parser project file extension (not .pp) '" + arg + "'");
+                }
+            }
+        }
+        if (Syntax.Flags.Instance().DebugParse() && Syntax.Flags.Instance().NumThreads() != 1)
+        {
+            throw Exception("--debug=parse option requires --threads=1");
+        }
+        if (Syntax.Flags.Instance().NumThreads() < 0)
+        {
+            throw Exception("invalid thread count '" + ToString(Syntax.Flags.Instance().NumThreads()));
+        }
+        for (const string& projectFile : projectFiles)
+        {
+            Generate(projectFile, libraryDirectories);
+        }
+    }
+    catch (const Exception& ex)
+    {
+        Console.Error() << ex.Message() << endl();
+        return 1;
+    }
+    return 0;
+}

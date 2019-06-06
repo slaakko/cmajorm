@@ -1,0 +1,114 @@
+using System;
+using System.Collections;
+using System.Text.Parsing;
+
+// this source file has been automatically generated from 'Keyword.parser' using cmparsergen version 2.0.0.
+
+namespace Code
+{
+    public class KeywordGrammar : System.Text.Parsing.Grammar
+    {
+        public KeywordGrammar() : this(new ParsingDomain())
+        {
+        }
+        public KeywordGrammar(ParsingDomain* parsingDomain) : base(ToUtf32("KeywordGrammar"), parsingDomain->GetNamespaceScope(ToUtf32("Code")), parsingDomain)
+        {
+            SetOwner(0);
+            keywords0.Add(ToUtf32("explicit"));
+            keywords0.Add(ToUtf32("cdecl"));
+            keywords0.Add(ToUtf32("inline"));
+            keywords0.Add(ToUtf32("axiom"));
+            keywords0.Add(ToUtf32("enum"));
+            keywords0.Add(ToUtf32("long"));
+            keywords0.Add(ToUtf32("goto"));
+            keywords0.Add(ToUtf32("nothrow"));
+            keywords0.Add(ToUtf32("and"));
+            keywords0.Add(ToUtf32("using"));
+            keywords0.Add(ToUtf32("int"));
+            keywords0.Add(ToUtf32("true"));
+            keywords0.Add(ToUtf32("constexpr"));
+            keywords0.Add(ToUtf32("delegate"));
+            keywords0.Add(ToUtf32("class"));
+            keywords0.Add(ToUtf32("where"));
+            keywords0.Add(ToUtf32("concept"));
+            keywords0.Add(ToUtf32("break"));
+            keywords0.Add(ToUtf32("destroy"));
+            keywords0.Add(ToUtf32("for"));
+            keywords0.Add(ToUtf32("is"));
+            keywords0.Add(ToUtf32("sbyte"));
+            keywords0.Add(ToUtf32("or"));
+            keywords0.Add(ToUtf32("cast"));
+            keywords0.Add(ToUtf32("if"));
+            keywords0.Add(ToUtf32("null"));
+            keywords0.Add(ToUtf32("const"));
+            keywords0.Add(ToUtf32("suppress"));
+            keywords0.Add(ToUtf32("internal"));
+            keywords0.Add(ToUtf32("protected"));
+            keywords0.Add(ToUtf32("static"));
+            keywords0.Add(ToUtf32("private"));
+            keywords0.Add(ToUtf32("try"));
+            keywords0.Add(ToUtf32("sizeof"));
+            keywords0.Add(ToUtf32("virtual"));
+            keywords0.Add(ToUtf32("default"));
+            keywords0.Add(ToUtf32("base"));
+            keywords0.Add(ToUtf32("switch"));
+            keywords0.Add(ToUtf32("bool"));
+            keywords0.Add(ToUtf32("case"));
+            keywords0.Add(ToUtf32("catch"));
+            keywords0.Add(ToUtf32("delete"));
+            keywords0.Add(ToUtf32("typename"));
+            keywords0.Add(ToUtf32("ulong"));
+            keywords0.Add(ToUtf32("interface"));
+            keywords0.Add(ToUtf32("public"));
+            keywords0.Add(ToUtf32("void"));
+            keywords0.Add(ToUtf32("construct"));
+            keywords0.Add(ToUtf32("override"));
+            keywords0.Add(ToUtf32("float"));
+            keywords0.Add(ToUtf32("else"));
+            keywords0.Add(ToUtf32("typedef"));
+            keywords0.Add(ToUtf32("abstract"));
+            keywords0.Add(ToUtf32("byte"));
+            keywords0.Add(ToUtf32("short"));
+            keywords0.Add(ToUtf32("extern"));
+            keywords0.Add(ToUtf32("while"));
+            keywords0.Add(ToUtf32("not"));
+            keywords0.Add(ToUtf32("double"));
+            keywords0.Add(ToUtf32("continue"));
+            keywords0.Add(ToUtf32("as"));
+            keywords0.Add(ToUtf32("false"));
+            keywords0.Add(ToUtf32("wchar"));
+            keywords0.Add(ToUtf32("uchar"));
+            keywords0.Add(ToUtf32("ushort"));
+            keywords0.Add(ToUtf32("uint"));
+            keywords0.Add(ToUtf32("return"));
+            keywords0.Add(ToUtf32("new"));
+            keywords0.Add(ToUtf32("namespace"));
+            keywords0.Add(ToUtf32("this"));
+            keywords0.Add(ToUtf32("operator"));
+            keywords0.Add(ToUtf32("char"));
+            keywords0.Add(ToUtf32("throw"));
+            keywords0.Add(ToUtf32("do"));
+            RegisterParsingDomain(parsingDomain);
+            parsingDomain->AddGrammar(this);
+            CreateRules();
+            Link();
+        }
+        public override void GetReferencedGrammars()
+        {
+            ParsingDomain* pd = Domain();
+            Grammar* grammar0 = pd->GetGrammar(ToUtf32("System.Text.Parsing.stdlib"));
+            if (grammar0 == null)
+            {
+                grammar0 = new System.Text.Parsing.stdlib(pd);
+            }
+            AddGrammarReference(grammar0);
+        }
+        public override void CreateRules()
+        {
+            AddRuleLink(new System.Text.Parsing.RuleLink(ToUtf32("identifier"), this, ToUtf32("System.Text.Parsing.stdlib.identifier")));
+            AddRule(new System.Text.Parsing.RuleParser(ToUtf32("Keyword"), GetScope(), Domain()->GetNextRuleId(),
+                new System.Text.Parsing.KeywordListParser(ToUtf32("identifier"), keywords0)));
+        }
+        private List<ustring> keywords0;
+    }
+} // Code

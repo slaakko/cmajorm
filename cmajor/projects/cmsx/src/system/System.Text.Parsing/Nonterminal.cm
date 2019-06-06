@@ -1,0 +1,152 @@
+// =================================
+// Copyright (c) 2019 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Collections;
+
+namespace System.Text.Parsing
+{
+    public class delegate void PreCall(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData);
+    
+    public class delegate void PostCall(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched);
+    
+    public class ArgumentCollector : System.Text.Parsing.CodeDom.DomObject
+    {
+        public override void AddArgument(System.Text.Parsing.CodeDom.DomObject* argument)
+        {
+            arguments.Add(UniquePtr<System.Text.Parsing.CodeDom.DomObject>(argument));
+        }
+        public List<UniquePtr<System.Text.Parsing.CodeDom.DomObject>> Arguments() 
+        {
+            return Rvalue(arguments);
+        }
+        public override void Accept(System.Text.Parsing.CodeDom.Visitor& visitor)
+        {
+            throw Exception("cannot visit argument collector");
+        }
+        private List<UniquePtr<System.Text.Parsing.CodeDom.DomObject>> arguments;
+    }
+    
+    public class NonterminalParser : Parser
+    {
+        public NonterminalParser() : this(u"nonterminal", u"rule")
+        {
+        }
+        public NonterminalParser(const ustring& name_, const ustring& ruleName_) : this(name_, ruleName_, 0)
+        {
+        }
+        public NonterminalParser(const ustring& name_, const ustring& ruleName_, int numberOfArguments_) : 
+            base(name_, u"<" + name_ + u">"), ruleName(ruleName_), numberOfArguments(numberOfArguments_), arguments(), rule(null), preCall(), postCall()
+        {
+        }
+        public void AddArgument(System.Text.Parsing.CodeDom.DomObject* argument)
+        {
+            arguments.Add(UniquePtr<System.Text.Parsing.CodeDom.DomObject>(argument));
+        }
+        public inline nothrow const ustring& RuleName() const
+        {
+            return ruleName;
+        }
+        public nothrow void SetRuleName(const ustring& ruleName_)
+        {
+            ruleName = ruleName_;
+        }
+        public inline nothrow int NumberOfArguments() const
+        {
+            if (numberOfArguments != 0)
+            {
+                return numberOfArguments;
+            }
+            return cast<int>(arguments.Count());
+        }
+        public inline nothrow const List<UniquePtr<System.Text.Parsing.CodeDom.DomObject>>& Arguments() const
+        {
+            return arguments;
+        }
+        public void SetArguments(List<UniquePtr<System.Text.Parsing.CodeDom.DomObject>>&& arguments_)
+        {
+            arguments = arguments_;
+        }
+        public inline nothrow RuleParser* Rule() const
+        {
+            return rule;
+        }
+        public nothrow void SetRule(RuleParser* rule_)
+        {
+            rule = rule_;
+        }
+        public inline nothrow PreCall Pre() const
+        {
+            return preCall;
+        }
+        public nothrow void SetPre(PreCall preCall_)
+        {
+            preCall = preCall_;
+        }
+        public inline nothrow PostCall Post() const
+        {
+            return postCall;
+        }
+        public nothrow void SetPost(PostCall postCall_)
+        {
+            postCall = postCall_;
+        }
+        public nothrow ustring PreCallMethodName() const
+        {
+            return u"Pre" + Name();
+        }
+        public nothrow ustring PostCallMethodName() const
+        {
+            return u"Post" + Name();
+        }
+        public nothrow ustring ValueFieldName() const
+        {
+            return u"from" + Name();
+        }
+        public ustring VariableName() const
+        {
+            ustring name = Name();
+            if (name.IsEmpty())
+            {
+                return u"NonterminalParser";
+            }
+            else
+            {
+                return ToLower(name.Substring(0, 1)) + name.Substring(1) + u"NonterminalParser";
+            }
+        }
+        public nothrow bool IsSpecialized() const
+        {
+            return numberOfArguments > 0 || arguments.Count() > 0 || rule != null && rule->TakesOrReturnsValuesOrHasLocals();
+        }
+        public override Match Parse(Scanner& scanner, Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)
+        {
+            if (rule != null)
+            {
+                if (preCall != PreCall())
+                {
+                    preCall(stack, parsingData);
+                }
+                Match match = rule->Parse(scanner, stack, parsingData);
+                if (postCall != PostCall())
+                {
+                    postCall(stack, parsingData, match.Hit());
+                }
+                return match;
+            }
+            return Match.Nothing();
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        private ustring ruleName;
+        private int numberOfArguments;
+        private List<UniquePtr<System.Text.Parsing.CodeDom.DomObject>> arguments;
+        private RuleParser* rule;
+        private PreCall preCall;
+        private PostCall postCall;
+    }
+}

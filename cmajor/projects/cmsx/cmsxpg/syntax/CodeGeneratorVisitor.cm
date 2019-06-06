@@ -1,0 +1,893 @@
+using System;
+using System.Collections;
+using System.Text;
+using System.Text.Parsing;
+
+namespace Syntax
+{
+    public class KeywordListCreator : System.Text.Parsing.Visitor
+    {
+        public KeywordListCreator(CodeFormatter& formatter_) : formatter(formatter_), keywordListNumber(0), keywordRuleListNumber(0)
+        {
+        }
+        public override void Visit(KeywordListParser& parser)
+        {
+            string keywordListName = "keywords" + ToString(keywordListNumber++);
+            keywordListNames.Add(keywordListName);
+            for (const ustring& keyword : parser.Keywords())
+            {
+                string keywordStr = "ToUtf32(" + MakeStringLiteral(ToUtf8(keyword)) + ")";
+                formatter.WriteLine(keywordListName + ".Add(" + keywordStr + ");");
+            }
+            parser.SetKeywordListName(ToUtf32(keywordListName));
+        }
+        public nothrow inline const List<string>& KeywordListNames() const
+        {
+            return keywordListNames;
+        }
+        private CodeFormatter& formatter;
+        private int keywordListNumber;
+        private int keywordRuleListNumber;
+        private List<string> keywordListNames;
+    }
+    
+    public class CodeGeneratorVisitor : System.Text.Parsing.Visitor
+    {
+        public CodeGeneratorVisitor(CodeFormatter& formatter_) : formatter(formatter_)
+        {
+        }
+        public override void BeginVisit(Grammar& grammar)
+        {
+            string grammarType = ToUtf8(grammar.Name());
+            formatter.WriteLine("public class " + grammarType + " : System.Text.Parsing.Grammar");
+            formatter.WriteLine("{");
+            formatter.IncIndent();
+            string valueTypeName;
+            string parameters;
+            if (grammar.StartRule() != null)
+            {
+                valueTypeName = "void";
+                if (!grammar.StartRule()->ValueTypeName().IsEmpty())
+                {
+                    valueTypeName = ToUtf8(grammar.StartRule()->ValueTypeName());
+                }
+                if (grammar.StartRule()->TakesOrReturnsValuesOrHasLocals())
+                {
+                    long n = grammar.StartRule()->InheritedAttributes().Count();
+                    for (long i = 0; i < n; ++i)
+                    {
+                        const AttrOrVar& attr = grammar.StartRule()->InheritedAttributes()[i];
+                        parameters.Append(", " + ToUtf8(attr.Type()) + " " + ToUtf8(attr.Name()));
+                    }
+                }
+            }
+            formatter.WriteLine("public " + grammarType + "() : this(new ParsingDomain())");
+            formatter.WriteLine("{");
+            formatter.WriteLine("}");
+            string grammarNamespaceName = ToUtf8(grammar.Ns()->FullName());
+            formatter.WriteLine("public " + grammarType + "(ParsingDomain* parsingDomain) : base(ToUtf32(\"" + ToUtf8(grammar.Name()) +
+                "\"), parsingDomain->GetNamespaceScope(ToUtf32(\"" + grammarNamespaceName + "\")), parsingDomain)");
+            formatter.WriteLine("{");
+            formatter.IncIndent();
+            formatter.WriteLine("SetOwner(0);");
+            KeywordListCreator keywordListCreator(formatter);
+            for (RuleParser* rule : grammar.Rules())
+            {
+                rule->Accept(keywordListCreator);
+            }
+            keywordListNames = keywordListCreator.KeywordListNames();
+            formatter.WriteLine("RegisterParsingDomain(parsingDomain);");
+            formatter.WriteLine("parsingDomain->AddGrammar(this);");
+            formatter.WriteLine("CreateRules();");
+            formatter.WriteLine("Link();");
+            formatter.DecIndent();
+            formatter.WriteLine("}");
+            
+            if (grammar.StartRule() != null)
+            {
+                if (grammar.StartRule()->TakesOrReturnsValuesOrHasLocals())
+                {
+                    formatter.WriteLine("public " + valueTypeName + " " + "Parse(const uchar* start, const uchar* end, int fileIndex, const string& fileName" + parameters + ")");
+                    formatter.WriteLine("{");
+                    formatter.IncIndent();
+                    formatter.WriteLine("Scanner scanner(start, end, fileName, fileIndex, SkipRule());");
+                    formatter.WriteLine("UniquePtr<XmlLog> xmlLog;");
+                    formatter.WriteLine("if (Log() != null)");
+                    formatter.WriteLine("{");
+                    formatter.IncIndent();
+                    formatter.WriteLine("xmlLog.Reset(new XmlLog(*Log(), MaxLogLineLength()));");
+                    formatter.WriteLine("scanner.SetLog(xmlLog.Get());");
+                    formatter.WriteLine("xmlLog->WriteBeginRule(u\"parse\");");
+                    formatter.WriteLine("xmlLog->IncIndent();");
+                    formatter.DecIndent();
+                    formatter.WriteLine("}");
+                    formatter.WriteLine("Stack<UniquePtr<Object>> stack;");
+                    formatter.WriteLine("UniquePtr<ParsingData> parsingData(new ParsingData(Domain()->NumRules()));");
+                    formatter.WriteLine("scanner.SetParsingData(parsingData.Get());");
+                    
+                    long n = grammar.StartRule()->InheritedAttributes().Count();
+                    for (long i = 0; i < n; ++i)
+                    {
+                        const AttrOrVar& attr = grammar.StartRule()->InheritedAttributes()[i];
+                        formatter.WriteLine("stack.Push(UniquePtr<Object>(new ValueObject<" + ToUtf8(attr.Type()) + ">(" + ToUtf8(attr.Name()) + ")));");
+                    }
+                    
+                    formatter.WriteLine("Match match = base->Parse(scanner, stack, parsingData.Get());");
+                    formatter.WriteLine("Span stop = scanner.GetSpan();");
+                    formatter.WriteLine("if (Log() != null)");
+                    formatter.WriteLine("{");
+                    formatter.IncIndent();
+                    formatter.WriteLine("xmlLog->DecIndent();");
+                    formatter.WriteLine("xmlLog->WriteEndRule(u\"parse\");");
+                    formatter.DecIndent();
+                    formatter.WriteLine("}");
+                    formatter.WriteLine("if (!match.Hit() || stop.start != cast<int>(end - start))");
+                    formatter.WriteLine("{");
+                    formatter.IncIndent();
+                    formatter.WriteLine("if (StartRule() != null)");
+                    formatter.WriteLine("{");
+                    formatter.IncIndent();
+                    formatter.WriteLine("throw ExpectationFailure(StartRule()->Info(), fileName, stop, start, end);");
+                    formatter.DecIndent();
+                    formatter.WriteLine("}");
+                    formatter.WriteLine("else");
+                    formatter.WriteLine("{");
+                    formatter.IncIndent();
+                    formatter.WriteLine("throw ParsingException(\"grammar '\" + ToUtf8(Name()) + \"' has no start rule\", fileName, scanner.GetSpan(), start, end);");
+                    formatter.DecIndent();
+                    formatter.WriteLine("}");
+                    formatter.DecIndent();
+                    formatter.WriteLine("}");
+                    
+                    if (valueTypeName != "void")
+                    {
+                        formatter.WriteLine("UniquePtr<Object> value = stack.Pop();");
+                        formatter.WriteLine(valueTypeName + " result = *cast<ValueObject<" + valueTypeName + ">*>(value.Get());");
+                        formatter.WriteLine("return result;");
+                    }
+                    
+                    formatter.DecIndent();
+                    formatter.WriteLine("}");
+                    formatter.WriteLine();
+                }
+            }
+            long n = grammar.Rules().Count();
+            for (long i = 0; i < n; ++i)
+            {
+                RuleParser* rule = grammar.Rules()[i];
+                if (rule->IsSpecialized())
+                {
+                    formatter.WriteLine("public class " + ToUtf8(rule->SpecializedTypeName()) + " : System.Text.Parsing.RuleParser");
+                    formatter.WriteLine("{");
+                    formatter.IncIndent();
+                    // constructor:
+                    formatter.WriteLine("public " + ToUtf8(rule->SpecializedTypeName()) + "(const ustring& name_, Scope* enclosingScope_, int id_, Parser* definition_) : base(name_, enclosingScope_, id_, definition_)");
+                    formatter.WriteLine("{");
+                    formatter.IncIndent();
+                    long m = rule->InheritedAttributes().Count();
+                    for (long i = 0; i < m; ++i)
+                    {
+                        const AttrOrVar& attr = rule->InheritedAttributes()[i];
+                        formatter.WriteLine("AddInheritedAttribute(AttrOrVar(ToUtf32(\"" + ToUtf8(attr.Type()) + "\"), ToUtf32(\"" + ToUtf8(attr.Name()) + "\")));");
+                    }
+                    if (!rule->ValueTypeName().IsEmpty())
+                    {
+                        formatter.WriteLine("SetValueTypeName(ToUtf32(\"" + ToUtf8(rule->ValueTypeName()) + "\"));");
+                    }
+                    m = rule->LocalVariables().Count();
+                    for (long i = 0; i < m; ++i)
+                    {
+                        const AttrOrVar& var = rule->LocalVariables()[i];
+                        formatter.WriteLine("AddLocalVariable(AttrOrVar(ToUtf32(\"" + ToUtf8(var.Type()) + "\"), ToUtf32(\"" + ToUtf8(var.Name()) + "\")));");
+                    }
+                    formatter.DecIndent();
+                    formatter.WriteLine("}");
+                    
+                    // enter:
+                    formatter.WriteLine("public override void Enter(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)");
+                    formatter.WriteLine("{");
+                    formatter.IncIndent();
+                    formatter.WriteLine("parsingData->PushContext(Id(), new Context());");
+                    formatter.WriteLine("Context* context = cast<Context*>(parsingData->GetContext(Id()));");
+                    m = rule->InheritedAttributes().Count();
+                    for (long i = m - 1; i >= 0; --i)
+                    {
+                        const AttrOrVar& attr = rule->InheritedAttributes()[i];
+                        formatter.WriteLine("UniquePtr<Object> " + ToUtf8(attr.Name()) + "_value = stack.Pop();");
+                        formatter.WriteLine("context->" + ToUtf8(attr.Name()) + " = *cast<ValueObject<" + ToUtf8(attr.Type()) + ">*>(" + ToUtf8(attr.Name()) + "_value.Get());");
+                    }
+                    formatter.DecIndent();
+                    formatter.WriteLine("}");
+                    
+                    // leave:
+                    formatter.WriteLine("public override void Leave(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)");
+                    formatter.WriteLine("{");
+                    formatter.IncIndent();
+                    if (!rule->ValueTypeName().IsEmpty())
+                    {
+                        formatter.WriteLine("Context* context = cast<Context*>(parsingData->GetContext(Id()));");
+                        formatter.WriteLine("if (matched)");
+                        formatter.WriteLine("{");
+                        formatter.IncIndent();
+                        formatter.WriteLine("stack.Push(UniquePtr<Object>(new ValueObject<" + ToUtf8(rule->ValueTypeName()) + ">(context->value)));");
+                        formatter.DecIndent();
+                        formatter.WriteLine("}");
+                    }
+                    formatter.WriteLine("parsingData->PopContext(Id());");
+                    formatter.DecIndent();
+                    formatter.WriteLine("}");
+                    
+                    // link:
+                    formatter.WriteLine("public override void Link()");
+                    formatter.WriteLine("{");
+                    formatter.IncIndent();
+                    m = rule->Actions().Count();
+                    for (long i = 0; i < m; ++i)
+                    {
+                        ActionParser* action = rule->Actions()[i];
+                        formatter.WriteLine("ActionParser* " + ToUtf8(action->VariableName()) + " = GetAction(ToUtf32(\"" + ToUtf8(action->Name()) + "\"));");
+                        formatter.WriteLine(ToUtf8(action->VariableName()) + "->SetAction(" + ToUtf8(action->MethodName()) + ");");
+                        if (action->FailureCode() != null)
+                        {
+                            formatter.WriteLine(ToUtf8(action->VariableName()) + "->SetFailure(" + ToUtf8(action->MethodName()) + "Fail);");
+                        }
+                    }
+                    m = rule->Nonterminals().Count();
+                    for (long i = 0; i < m; ++i)
+                    {
+                        NonterminalParser* nonterminal = rule->Nonterminals()[i];
+                        if (nonterminal->IsSpecialized())
+                        {
+                            formatter.WriteLine("NonterminalParser* " + ToUtf8(nonterminal->VariableName()) + " = GetNonterminal(ToUtf32(\"" + ToUtf8(nonterminal->Name()) + "\"));");
+                            if (!nonterminal->Arguments().IsEmpty())
+                            {
+                                formatter.WriteLine(ToUtf8(nonterminal->VariableName()) + "->SetPre(" + ToUtf8(nonterminal->PreCallMethodName()) + ");");
+                            }
+                            if (!nonterminal->Rule()->ValueTypeName().IsEmpty())
+                            {
+                                formatter.WriteLine(ToUtf8(nonterminal->VariableName()) + "->SetPost(" + ToUtf8(nonterminal->PostCallMethodName()) + ");");
+                            }
+                        }
+                    }
+                    formatter.DecIndent();
+                    formatter.WriteLine("}");
+                    
+                    // action methods:
+                    m = rule->Actions().Count();
+                    for (long i = 0; i < m; ++i)
+                    {
+                        ActionParser* action = rule->Actions()[i];
+                        formatter.WriteLine("public void " + ToUtf8(action->MethodName()) +
+                            "(const uchar* matchBegin, const uchar* matchEnd, const Span& span, const string& fileName, ParsingData* parsingData, bool& pass)");
+                        formatter.SetStart(true);
+                        formatter.SetStartText("Context* context = cast<Context*>(parsingData->GetContext(Id()));");
+                        action->SuccessCode()->Print(formatter);
+                        if (action->FailureCode() != null)
+                        {
+                            formatter.WriteLine("public void " + ToUtf8(action->MethodName()) + "Fail(ParsingData* parsingData)");
+                            formatter.SetStart(true);
+                            formatter.SetStartText("Context* context = cast<Context*>(parsingData->GetContext(Id()));");
+                            action->FailureCode()->Print(formatter);
+                        }
+                    }
+                    
+                    // pre-post calls:
+                    m = rule->Nonterminals().Count();
+                    for (long i = 0; i < m; ++i)
+                    {
+                        NonterminalParser* nonterminal = rule->Nonterminals()[i];
+                        if (nonterminal->IsSpecialized())
+                        {
+                            if (!nonterminal->Arguments().IsEmpty())
+                            {
+                                formatter.WriteLine("public void " + ToUtf8(nonterminal->PreCallMethodName()) + "(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData)");
+                                formatter.WriteLine("{");
+                                formatter.IncIndent();
+                                formatter.WriteLine("Context* context = cast<Context*>(parsingData->GetContext(Id()));");
+                                long p = nonterminal->Arguments().Count();
+                                for (long j = 0; j < p; ++j)
+                                {
+                                    const UniquePtr<System.Text.Parsing.CodeDom.DomObject>& argument = nonterminal->Arguments()[j];
+                                    string argumentTypeName = ToUtf8(nonterminal->Rule()->InheritedAttributes()[j].Type());
+                                    formatter.Write("stack.Push(UniquePtr<Object>(new ValueObject<" + argumentTypeName + ">(");
+                                    argument->Print(formatter);
+                                    formatter.WriteLine(")));");
+                                }
+                                formatter.DecIndent();
+                                formatter.WriteLine("}");
+                            }
+                            if (!nonterminal->Rule()->ValueTypeName().IsEmpty())
+                            {
+                                formatter.WriteLine("public void " + ToUtf8(nonterminal->PostCallMethodName()) + "(Stack<UniquePtr<Object>>& stack, ParsingData* parsingData, bool matched)");
+                                formatter.WriteLine("{");
+                                formatter.IncIndent();
+                                formatter.WriteLine("Context* context = cast<Context*>(parsingData->GetContext(Id()));");
+                                formatter.WriteLine("if (matched)");
+                                formatter.WriteLine("{");
+                                formatter.IncIndent();
+                                formatter.WriteLine("UniquePtr<Object> " + ToUtf8(nonterminal->ValueFieldName()) + "_value = stack.Pop();");
+                                formatter.WriteLine("context->" + ToUtf8(nonterminal->ValueFieldName()) + " = *cast<ValueObject<" +
+                                    ToUtf8(nonterminal->Rule()->ValueTypeName()) + ">*>(" + ToUtf8(nonterminal->ValueFieldName()) + "_value.Get());");
+                                formatter.DecIndent();
+                                formatter.WriteLine("}");
+                                formatter.DecIndent();
+                                formatter.WriteLine("}");
+                                
+                            }
+                        }
+                    }
+                    
+                    // context:
+                    formatter.WriteLine("public class Context : System.Text.Parsing.Context");
+                    formatter.WriteLine("{");
+                    formatter.IncIndent();
+                    formatter.Write("public Context()");
+                    bool first = true;
+                    m = rule->InheritedAttributes().Count();
+                    for (long j = 0; j < m; ++j)
+                    {
+                        if (first) { first = false; formatter.Write(" : "); } else { formatter.Write(", "); }
+                        const AttrOrVar& attr = rule->InheritedAttributes()[j];
+                        formatter.Write(ToUtf8(attr.Name()) + "()");
+                    }
+                    if (!rule->ValueTypeName().IsEmpty())
+                    {
+                        if (first) { first = false; formatter.Write(" : "); } else { formatter.Write(", "); }
+                        formatter.Write("value()");
+                    }
+                    m = rule->LocalVariables().Count();
+                    for (long j = 0; j < m; ++j)
+                    {
+                        if (first) { first = false; formatter.Write(" : "); } else { formatter.Write(", "); }
+                        const AttrOrVar& var = rule->LocalVariables()[j];
+                        formatter.Write(ToUtf8(var.Name()) + "()");
+                    }
+                    m = rule->Nonterminals().Count();
+                    for (long j = 0; j < m; ++j)
+                    {
+                        NonterminalParser* nonterminal = rule->Nonterminals()[j];
+                        if (!nonterminal->Rule()->ValueTypeName().IsEmpty())
+                        {
+                            if (first) { first = false; formatter.Write(" : "); } else { formatter.Write(", "); }
+                            formatter.Write(ToUtf8(nonterminal->ValueFieldName()) + "()");
+                        }
+                    }
+                    formatter.WriteLine();
+                    formatter.WriteLine("{");
+                    formatter.WriteLine("}");
+                    m = rule->InheritedAttributes().Count();
+                    for (long j = 0; j < m; ++j)
+                    {
+                        const AttrOrVar& attr = rule->InheritedAttributes()[j];
+                        formatter.WriteLine("public " + ToUtf8(attr.Type()) + " " + ToUtf8(attr.Name()) + ";");
+                    }
+                    if (!rule->ValueTypeName().IsEmpty())
+                    {
+                        formatter.WriteLine("public " + ToUtf8(rule->ValueTypeName()) + " value;");
+                    }
+                    m = rule->LocalVariables().Count();
+                    for (long j = 0; j < m; ++j)
+                    {
+                        const AttrOrVar& var = rule->LocalVariables()[j];
+                        formatter.WriteLine("public " + ToUtf8(var.Type()) + " " + ToUtf8(var.Name()) + ";");
+                    }
+                    m = rule->Nonterminals().Count();
+                    for (long j = 0; j < m; ++j)
+                    {
+                        NonterminalParser* nonterminal = rule->Nonterminals()[j];
+                        if (!nonterminal->Rule()->ValueTypeName().IsEmpty())
+                        {
+                            formatter.WriteLine("public " + ToUtf8(nonterminal->Rule()->ValueTypeName()) + " " + ToUtf8(nonterminal->ValueFieldName()) + ";");
+                        }
+                    }
+                    formatter.DecIndent();
+                    formatter.WriteLine("}");
+                    formatter.DecIndent();
+                    formatter.WriteLine("}");
+                    formatter.WriteLine();
+                }
+            }
+            
+            formatter.WriteLine("public override void GetReferencedGrammars()");
+            formatter.WriteLine("{");
+            formatter.IncIndent();
+            int grammarIndex = 0;
+            if (!grammar.ReferencedGrammars().IsEmpty())
+            {
+                formatter.WriteLine("ParsingDomain* pd = Domain();");
+                for (Grammar* grammarReference : grammar.ReferencedGrammars())
+                {
+                    string grammarReferenceName = ToUtf8(grammarReference->FullName());
+                    string grammarVar = "grammar" + ToString(grammarIndex++);
+                    formatter.WriteLine("Grammar* " + grammarVar + " = pd->GetGrammar(ToUtf32(\"" + grammarReferenceName + "\"));");
+                    formatter.WriteLine("if (" + grammarVar + " == null)");
+                    formatter.WriteLine("{");
+                    formatter.IncIndent();
+                    formatter.WriteLine(grammarVar + " = new " + grammarReferenceName + "(pd);");
+                    formatter.DecIndent();
+                    formatter.WriteLine("}");
+                    formatter.WriteLine("AddGrammarReference(" + grammarVar + ");");
+                }
+            }
+            formatter.DecIndent();
+            formatter.WriteLine("}");
+            ruleIndex = 0;
+        }
+        public override void EndVisit(Grammar& grammar)
+        {
+            formatter.WriteLine("public override void CreateRules()");
+            formatter.WriteLine("{");
+            formatter.IncIndent();
+            for (int i = 0; i < ruleIndex; ++i)
+            {
+                formatter.WriteLine("CreateRule" + ToString(i) + "();");
+            }
+            
+            if (!grammar.StartRuleName().IsEmpty())
+            {
+                formatter.WriteLine("SetStartRuleName(ToUtf32(\"" + ToUtf8(grammar.StartRuleName()) + "\"));");
+            }
+            if (!grammar.SkipRuleName().IsEmpty())
+            {
+                formatter.WriteLine("SetSkipRuleName(ToUtf32(\"" + ToUtf8(grammar.SkipRuleName()) + "\"));");
+            }
+            formatter.DecIndent();
+            formatter.WriteLine("}");
+            
+            if (!keywordListNames.IsEmpty())
+            {
+                for (const string& keywordListName : keywordListNames)
+                {
+                    formatter.WriteLine("private List<ustring> " + keywordListName + ";");
+                }
+            }
+            formatter.DecIndent();
+            formatter.WriteLine("}");
+        }
+        public override void Visit(CharParser& parser)
+        {
+            formatter.Write("new System.Text.Parsing.CharParser('");
+            formatter.Write(ToUtf8(CharStr(parser.Char())));
+            formatter.Write("')");
+        }
+        public override void Visit(StringParser& parser)
+        {
+            formatter.Write("new System.Text.Parsing.StringParser(ToUtf32(\"" + StringStr(ToUtf8(parser.String())) + "\"))");
+        }
+        public override void Visit(CharSetParser& parser)
+        {
+            formatter.Write("new System.Text.Parsing.CharSetParser(ToUtf32(\"" + StringStr(ToUtf8(parser.Set())) + "\")");
+            if (parser.Inverse())
+            {
+                formatter.Write(", true)");
+            }
+            else
+            {
+                formatter.Write(")");
+            }
+        }
+        public override void Visit(KeywordParser& parser)
+        {
+            if (parser.ContinuationRuleName().IsEmpty())
+            {
+                formatter.Write("new System.Text.Parsing.KeywordParser(ToUtf32(\"" + StringStr(ToUtf8(parser.Keyword())) + "\"))");
+            }
+            else
+            {
+                formatter.Write("new System.Text.Parsing.KeywordParser(ToUtf32(\"" + StringStr(ToUtf8(parser.Keyword())) + "\"), ToUtf32(\"" + ToUtf8(parser.ContinuationRuleName()) + "\"))");
+            }
+        }
+        public override void Visit(KeywordListParser& parser)
+        {
+            formatter.Write("new System.Text.Parsing.KeywordListParser(ToUtf32(\"" + StringStr(ToUtf8(parser.SelectorRuleName())) + "\"), " + ToUtf8(parser.KeywordListName()) + ")");
+        }
+        public override void Visit(RangeParser& parser)
+        {
+            formatter.Write("new System.Text.Parsing.RangeParser(" + ToString(parser.Start()) + "u, " + ToString(parser.End()) + "u)");
+        }
+        public override void Visit(EmptyParser& parser)
+        {
+            formatter.Write("new System.Text.Parsing.EmptyParser()");
+        }
+        public override void Visit(SpaceParser& parser)
+        {
+            formatter.Write("new System.Text.Parsing.SpaceParser()");
+        }
+        public override void Visit(LetterParser& letterParser) 
+        {
+            formatter.Write("new System.Text.Parsing.LetterParser()");
+        }
+        public override void Visit(UpperLetterParser& upperLetterParser)
+        {
+            formatter.Write("new System.Text.Parsing.UpperLetterParser()");
+        }
+        public override void Visit(LowerLetterParser& lowerLetterParser)
+        {
+            formatter.Write("new System.Text.Parsing.LowerLetterParser()");
+        }
+        public override void Visit(TitleLetterParser& titleLetterParser)
+        {
+            formatter.Write("new System.Text.Parsing.TitleLetterParser()");
+        }
+        public override void Visit(ModifierLetterParser& modifierLetterParser)
+        {
+            formatter.Write("new System.Text.Parsing.ModifierLetterParser()");
+        }
+        public override void Visit(OtherLetterParser& otherLetterParser)
+        {
+            formatter.Write("new System.Text.Parsing.OtherLetterParser()");
+        }
+        public override void Visit(CasedLetterParser& casedLetterParser)
+        {
+            formatter.Write("new System.Text.Parsing.CasedLetterParser()");
+        }
+        public override void Visit(DigitParser& digitParser)
+        {
+            formatter.Write("new System.Text.Parsing.DigitParser()");
+        }
+        public override void Visit(HexDigitParser& hexDigitParser)
+        {
+            formatter.Write("new System.Text.Parsing.HexDigitParser()");
+        }
+        public override void Visit(MarkParser& markParser)
+        {
+            formatter.Write("new System.Text.Parsing.MarkParser()");
+        }
+        public override void Visit(NonspacingMarkParser& nonspacingMarkParser)
+        {
+            formatter.Write("new System.Text.Parsing.NonspacingMarkParser()");
+        }
+        public override void Visit(SpacingMarkParser& spacingMarkParser)
+        {
+            formatter.Write("new System.Text.Parsing.SpacingMarkParser()");
+        }
+        public override void Visit(EnclosingMarkParser& enclosingMarkParser)
+        {
+            formatter.Write("new System.Text.Parsing.EnclosingMarkParser()");
+        }
+        public override void Visit(NumberParser& numberParser)
+        {
+            formatter.Write("new System.Text.Parsing.NumberParser()");
+        }
+        public override void Visit(DecimalNumberParser& decimalNumberParser)
+        {
+            formatter.Write("new System.Text.Parsing.DecimalNumberParser()");
+        }
+        public override void Visit(LetterNumberParser& letterNumberParser)
+        {
+            formatter.Write("new System.Text.Parsing.LetterNumberParser()");
+        }
+        public override void Visit(OtherNumberParser& otherNumberParer)
+        {
+            formatter.Write("new System.Text.Parsing.OtherNumberParser()");
+        }
+        public override void Visit(PunctuationParser& punctuationParser)
+        {
+            formatter.Write("new System.Text.Parsing.PunctuationParser()");
+        }
+        public override void Visit(ConnectorPunctuationParser& connectorPunctuationParser)
+        {
+            formatter.Write("new System.Text.Parsing.ConnectorPunctuationParser()");
+        }
+        public override void Visit(DashPunctuationParser& dashPunctuationParser)
+        {
+            formatter.Write("new System.Text.Parsing.DashPunctuationParser()");
+        }
+        public override void Visit(OpenPunctuationParser& openPunctuationParser)
+        {
+            formatter.Write("new System.Text.Parsing.OpenPunctuationParser()");
+        }
+        public override void Visit(ClosePunctuationParser& closePunctuationParser)
+        {
+            formatter.Write("new System.Text.Parsing.ClosePunctuationParser()");
+        }
+        public override void Visit(InitialPunctuationParser& initialPunctuationParser)
+        {
+            formatter.Write("new System.Text.Parsing.InitialPunctuationParser()");
+        }
+        public override void Visit(FinalPunctuationParser& finalPunctuationParser)
+        {
+            formatter.Write("new System.Text.Parsing.FinalPunctuationParser()");
+        }
+        public override void Visit(OtherPunctuationParser& otherPunctuationParser)
+        {
+            formatter.Write("new System.Text.Parsing.OtherPunctuationParser()");
+        }
+        public override void Visit(SymbolParser& symbolParser)
+        {
+            formatter.Write("new System.Text.Parsing.SymbolParser()");
+        }
+        public override void Visit(MathSymbolParser& mathSymbolParser)
+        {
+            formatter.Write("new System.Text.Parsing.MathSymbolParser()");
+        }
+        public override void Visit(CurrencySymbolParser& currencySymbolParser)
+        {
+            formatter.Write("new System.Text.Parsing.CurrencySymbolParser()");
+        }
+        public override void Visit(ModifierSymbolParser& modifierSymbolParser)
+        {
+            formatter.Write("new System.Text.Parsing.ModifierSymbolParser()");
+        }
+        public override void Visit(OtherSymbolParser& otherSymbolParser)
+        {
+            formatter.Write("new System.Text.Parsing.OtherSymbolParser()");
+        }
+        public override void Visit(SeparatorParser& separatorParser)
+        {
+            formatter.Write("new System.Text.Parsing.SeparatorParser()");
+        }
+        public override void Visit(SpaceSeparatorParser& spaceSeparatorParser)
+        {
+            formatter.Write("new System.Text.Parsing.SpaceSeparatorParser()");
+        }
+        public override void Visit(LineSeparatorParser& lineSeparatorParser)
+        {
+            formatter.Write("new System.Text.Parsing.LineSeparatorParser()");
+        }
+        public override void Visit(ParagraphSeparatorParser& paragraphSeparatorParser)
+        {
+            formatter.Write("new System.Text.Parsing.ParagraphSeparatorParser()");
+        }
+        public override void Visit(OtherParser& otherParser)
+        {
+            formatter.Write("new System.Text.Parsing.OtherParser()");
+        }
+        public override void Visit(ControlParser& controlParser)
+        {
+            formatter.Write("new System.Text.Parsing.ControlParser()");
+        }
+        public override void Visit(FormatParser& formatParser)
+        {
+            formatter.Write("new System.Text.Parsing.FormatParser()");
+        }
+        public override void Visit(SurrogateParser& surrogateParser)
+        {
+            formatter.Write("new System.Text.Parsing.SurrogateParser()");
+        }
+        public override void Visit(PrivateUseParser& privateUseParser)
+        {
+            formatter.Write("new System.Text.Parsing.PrivateUseParser()");
+        }
+        public override void Visit(UnassignedParser& unassignedParser)
+        {
+            formatter.Write("new System.Text.Parsing.UnassignedParser()");
+        }
+        public override void Visit(GraphicParser& graphicParser)
+        {
+            formatter.Write("new System.Text.Parsing.GraphicParser()");
+        }
+        public override void Visit(BaseCharParser& baseCharParser)
+        {
+            formatter.Write("new System.Text.Parsing.BaseCharParser()");
+        }
+        public override void Visit(AlphabeticParser& alphabeticParser)
+        {
+            formatter.Write("new System.Text.Parsing.AlphabeticParser()");
+        }
+        public override void Visit(IdStartParser& idStartParser)
+        {
+            formatter.Write("new System.Text.Parsing.IdStartParser()");
+        }
+        public override void Visit(IdContParser& idContParser)
+        {
+            formatter.Write("new System.Text.Parsing.IdContParser()");
+        }
+        public override void Visit(AnyCharParser& anyCharParser)
+        {
+            formatter.Write("new System.Text.Parsing.AnyCharParser()");
+        }
+        public override void Visit(NonterminalParser& parser)
+        {
+            formatter.Write("new System.Text.Parsing.NonterminalParser(ToUtf32(\"" + ToUtf8(parser.Name()) + "\"), ToUtf32(\"" + ToUtf8(parser.RuleName()) + "\"), " +
+                ToString(parser.NumberOfArguments()) + ")");
+        }
+        public override void Visit(RuleLink& ruleLink)
+        {
+            formatter.WriteLine("private void CreateRule" + ToString(ruleIndex) + "()");
+            formatter.WriteLine("{");
+            formatter.IncIndent();
+            
+            formatter.WriteLine("AddRuleLink(new System.Text.Parsing.RuleLink(ToUtf32(\"" + ToUtf8(ruleLink.Name()) + "\"), this, ToUtf32(\"" + ToUtf8(ruleLink.LinkedRuleName()) + "\")));");
+
+            formatter.DecIndent();
+            formatter.WriteLine("}");
+            ++ruleIndex;
+        }
+        public override void BeginVisit(RuleParser& rule)
+        {
+            formatter.WriteLine("private void CreateRule" + ToString(ruleIndex) + "()");
+            formatter.WriteLine("{");
+            formatter.IncIndent();
+                
+            if (rule.IsSpecialized())
+            {
+                formatter.Write("AddRule(new " + ToUtf8(rule.SpecializedTypeName()) + "(ToUtf32(\"" + ToUtf8(rule.Name()) + "\"), GetScope(), Domain()->GetNextRuleId(),");
+            }
+            else
+            {
+                formatter.Write("AddRule(new System.Text.Parsing.RuleParser(ToUtf32(\"" + ToUtf8(rule.Name()) + "\"), GetScope(), Domain()->GetNextRuleId(),");
+            }
+            formatter.IncIndent();
+            formatter.WriteLine();
+        }
+        public override void EndVisit(RuleParser& rule) 
+        {
+            formatter.WriteLine("));");
+            formatter.DecIndent();
+            formatter.DecIndent();
+            formatter.WriteLine("}");
+            ++ruleIndex;
+        }
+        public override void BeginVisit(OptionalParser& parser)
+        {
+            formatter.Write("new System.Text.Parsing.OptionalParser(");
+            formatter.IncIndent();
+            formatter.WriteLine();
+        }
+        public override void EndVisit(OptionalParser& parser)
+        {
+            formatter.Write(")");
+            formatter.DecIndent();
+        }
+        public override void BeginVisit(PositiveParser& parser)
+        {
+            formatter.Write("new System.Text.Parsing.PositiveParser(");
+            formatter.IncIndent();
+            formatter.WriteLine();
+        }
+        public override void EndVisit(PositiveParser& parser)
+        {
+            formatter.Write(")");
+            formatter.DecIndent();
+        }
+        public override void BeginVisit(KleeneStarParser& parser)
+        {
+            formatter.Write("new System.Text.Parsing.KleeneStarParser(");
+            formatter.IncIndent();
+            formatter.WriteLine();
+        }
+        public override void EndVisit(KleeneStarParser& parser)
+        {
+            formatter.Write(")");
+            formatter.DecIndent();
+        }
+        public override void BeginVisit(ActionParser& parser)
+        {
+            formatter.Write("new System.Text.Parsing.ActionParser(ToUtf32(\"" + ToUtf8(parser.Name()) + "\"),");
+            formatter.IncIndent();
+            formatter.WriteLine();
+        }
+        public override void EndVisit(ActionParser& parser)
+        {
+            formatter.Write(")");
+            formatter.DecIndent();
+        }
+        public override void BeginVisit(ExpectationParser& parser)
+        {
+            formatter.Write("new System.Text.Parsing.ExpectationParser(");
+            formatter.IncIndent();
+            formatter.WriteLine();
+        }
+        public override void EndVisit(ExpectationParser& parser)
+        {
+            formatter.Write(")");
+            formatter.DecIndent();
+        }
+        public override void BeginVisit(TokenParser& parser)
+        {
+            formatter.Write("new System.Text.Parsing.TokenParser(");
+            formatter.IncIndent();
+            formatter.WriteLine();
+        }
+        public override void EndVisit(TokenParser& parser)
+        {
+            formatter.Write(")");
+            formatter.DecIndent();
+        }
+        public override void BeginVisit(GroupingParser& parser)
+        {
+            formatter.Write("new System.Text.Parsing.GroupingParser(");
+            formatter.IncIndent();
+            formatter.WriteLine();
+        }
+        public override void EndVisit(GroupingParser& parser)
+        {
+            formatter.Write(")");
+            formatter.DecIndent();
+        }
+        public override void BeginVisit(SequenceParser& parser)
+        {
+            formatter.Write("new System.Text.Parsing.SequenceParser(");
+            formatter.IncIndent();
+            formatter.WriteLine();
+        }
+        public override void Visit(SequenceParser& parser)
+        {
+            formatter.WriteLine(",");        
+        }
+        public override void EndVisit(SequenceParser& parser)
+        {
+            formatter.Write(")");
+            formatter.DecIndent();
+        }
+        public override void BeginVisit(AlternativeParser& parser)
+        {
+            formatter.Write("new System.Text.Parsing.AlternativeParser(");
+            formatter.IncIndent();
+            formatter.WriteLine();
+        }
+        public override void Visit(AlternativeParser& parser)
+        {
+            formatter.WriteLine(",");
+        }
+        public override void EndVisit(AlternativeParser& parser)
+        {
+            formatter.Write(")");
+            formatter.DecIndent();
+        }
+        public override void BeginVisit(DifferenceParser& parser)
+        {
+            formatter.Write("new System.Text.Parsing.DifferenceParser(");
+            formatter.IncIndent();
+            formatter.WriteLine();
+        }
+        public override void Visit(DifferenceParser& parser)
+        {
+            formatter.WriteLine(",");
+        }
+        public override void EndVisit(DifferenceParser& parser)
+        {
+            formatter.Write(")");
+            formatter.DecIndent();
+        }
+        public override void BeginVisit(IntersectionParser& parser)
+        {
+            formatter.Write("new System.Text.Parsing.IntersectionParser(");
+            formatter.IncIndent();
+            formatter.WriteLine();
+        }
+        public override void Visit(IntersectionParser& parser)
+        {
+            formatter.WriteLine(",");
+        }
+        public override void EndVisit(IntersectionParser& parser)
+        {
+            formatter.Write(")");
+            formatter.DecIndent();
+        }
+        public override void BeginVisit(ExclusiveOrParser& parser)
+        {
+            formatter.Write("new System.Text.Parsing.ExclusiveOrParser(");
+            formatter.IncIndent();
+            formatter.WriteLine();
+        }
+        public override void Visit(ExclusiveOrParser& parser)
+        {
+            formatter.WriteLine(",");
+        }
+        public override void EndVisit(ExclusiveOrParser& parser)
+        {
+            formatter.Write(")");
+            formatter.DecIndent();
+        }
+        public override void BeginVisit(ListParser& parser)
+        {
+            formatter.Write("new System.Text.Parsing.ListParser(");
+            formatter.IncIndent();
+            formatter.WriteLine();
+        }
+        public override void Visit(ListParser& parser)
+        {
+            formatter.WriteLine(",");
+        }
+        public override void EndVisit(ListParser& parser)
+        {
+            formatter.Write(")");
+            formatter.DecIndent();
+        }
+        private CodeFormatter& formatter;
+        private List<string> keywordListNames;
+        private int ruleIndex;
+    }
+}

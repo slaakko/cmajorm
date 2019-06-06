@@ -3674,16 +3674,16 @@ namespace Syntax
                 grammar0 = new System.Text.Parsing.stdlib(pd);
             }
             AddGrammarReference(grammar0);
-            Grammar* grammar1 = pd->GetGrammar(ToUtf32("Code.IdentifierGrammar"));
+            Grammar* grammar1 = pd->GetGrammar(ToUtf32("Syntax.ElementGrammar"));
             if (grammar1 == null)
             {
-                grammar1 = new Code.IdentifierGrammar(pd);
+                grammar1 = new Syntax.ElementGrammar(pd);
             }
             AddGrammarReference(grammar1);
-            Grammar* grammar2 = pd->GetGrammar(ToUtf32("Syntax.ElementGrammar"));
+            Grammar* grammar2 = pd->GetGrammar(ToUtf32("Code.IdentifierGrammar"));
             if (grammar2 == null)
             {
-                grammar2 = new Syntax.ElementGrammar(pd);
+                grammar2 = new Code.IdentifierGrammar(pd);
             }
             AddGrammarReference(grammar2);
         }

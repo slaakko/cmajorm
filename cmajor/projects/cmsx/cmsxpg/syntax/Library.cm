@@ -1,0 +1,116 @@
+using System;
+using System.IO;
+using System.Text;
+using System.Text.Parsing;
+using System.Collections;
+
+namespace Syntax
+{
+    public class LibraryFileGeneratorVisitor : Visitor
+    {
+        public LibraryFileGeneratorVisitor(CodeFormatter& formatter_) : formatter(formatter_)
+        {
+        }
+        public override void BeginVisit(Grammar& grammar)
+        {
+            if (!grammar.IsExternal())
+            {
+                List<Grammar*>& grammars = nsGrammarMap[grammar.Ns()];
+                grammars.Add(&grammar);
+            }
+        }
+        public void GenerateLibraryFile()
+        {
+            HashMap<Namespace*, List<Grammar*>>.ConstIterator e = nsGrammarMap.CEnd();
+            for (HashMap<Namespace*, List<Grammar*>>.ConstIterator i = nsGrammarMap.CBegin(); i != e; ++i)
+            {
+                Namespace* ns = i->first;
+                const List<Grammar*>& grammars = i->second;
+                if (!ns->FullName().IsEmpty())
+                {
+                    formatter.WriteLine("namespace " + ToUtf8(ns->FullName()));
+                    formatter.WriteLine("{");
+                    formatter.IncIndent();
+                }
+                long n = grammars.Count();
+                for (long i = 0; i < n; ++i)
+                {
+                    Grammar* grammar = grammars[i];
+                    formatter.WriteLine("grammar " + ToUtf8(grammar->Name()));
+                    formatter.WriteLine("{");
+                    formatter.IncIndent();
+                    const List<RuleParser*>& rules = grammar->Rules();
+                    long nr = rules.Count();
+                    for (long i = 0; i < nr; ++i)
+                    {
+                        RuleParser* rule = rules[i];
+                        string ruleLine = ToUtf8(rule->Name());
+                        if (!rule->InheritedAttributes().IsEmpty() || !rule->LocalVariables().IsEmpty())
+                        {
+                            ruleLine.Append("(");
+                            long ni = rule->InheritedAttributes().Count();
+                            bool first = true;
+                            for (long i = 0; i < ni; ++i)
+                            {
+                                const AttrOrVar& attr = rule->InheritedAttributes()[i];
+                                if (first)
+                                {
+                                    first = false;
+                                }
+                                else
+                                {
+                                    ruleLine.Append(", ");
+                                }
+                                ruleLine.Append(ToUtf8(attr.Type()) + " " + ToUtf8(attr.Name()));
+                            }
+                            long nl = rule->LocalVariables().Count();
+                            for (long i = 0; i < nl; ++i)
+                            {
+                                const AttrOrVar& var = rule->LocalVariables()[i];
+                                if (first)
+                                {
+                                    first = false;
+                                }
+                                else
+                                {
+                                    ruleLine.Append(", ");
+                                }
+                                ruleLine.Append("var " + ToUtf8(var.Type()) + " " + ToUtf8(var.Name()));
+                            }
+                            ruleLine.Append(")");
+                        }
+                        if (!rule->ValueTypeName().IsEmpty())
+                        {
+                            ruleLine.Append(" : ").Append(ToUtf8(rule->ValueTypeName()));
+                        }
+                        ruleLine.Append(";");
+                        formatter.WriteLine(ruleLine);
+                    }
+                    formatter.DecIndent();
+                    formatter.WriteLine("}");
+                }
+                if (!ns->FullName().IsEmpty())
+                {
+                    formatter.DecIndent();
+                    formatter.WriteLine("}");
+                }
+            }
+        }
+        private CodeFormatter& formatter;
+        private HashMap<Namespace*, List<Grammar*>> nsGrammarMap;
+    }
+    
+    public void GenerateLibraryFile(Project* project, ParsingDomain* parsingDomain)
+    {
+        string libraryFilePath = Path.ChangeExtension(project->FilePath(), ".pl");
+        StreamWriter plFile = File.CreateText(libraryFilePath);
+        CodeFormatter formatter(plFile);
+        LibraryFileGeneratorVisitor visitor(formatter);
+        parsingDomain->GlobalNamespace()->Accept(visitor);
+        visitor.GenerateLibraryFile();
+        if (Flags.Instance().Verbose())
+        {
+            Console.WriteLine("=> " + libraryFilePath);
+        }        
+    }
+}

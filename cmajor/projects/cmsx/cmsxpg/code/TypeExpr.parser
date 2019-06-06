@@ -1,0 +1,42 @@
+using System.Text.Parsing.CodeDom;
+
+namespace Code
+{
+    grammar TypeExprGrammar
+    {
+        using IdentifierGrammar.Identifier;
+        using ExpressionGrammar.Expression;
+        using BasicTypeGrammar.BasicType;
+        using IdentifierGrammar.TemplateId;
+
+        TypeExpr(ParsingContext* ctx) : DomObject*
+            ::= PrefixTypeExpr(ctx){ value = PrefixTypeExpr; }
+            ;
+
+        PrefixTypeExpr(ParsingContext* ctx) : DomObject*
+            ::= keyword("const") PostfixTypeExpr(ctx):constTypeExpr{ value = new Const(constTypeExpr); }
+            |   PostfixTypeExpr(ctx):pf{ value = pf; }
+            ;
+
+        PostfixTypeExpr(ParsingContext* ctx, var UniquePtr<Identifier> id, var UniquePtr<DomObject> typeExpr) : DomObject*
+            ::=
+            (   PrimaryTypeExpr(ctx){ typeExpr.Reset(PrimaryTypeExpr); }
+                (   '.' Identifier!{ id.Reset(Identifier); typeExpr.Reset(new Dot(typeExpr.Release(), Identifier->Name())); }
+                |   '*'{ typeExpr.Reset(new Pointer(typeExpr.Release())); }
+                |   "&&"{ typeExpr.Reset(new RvalueRef(typeExpr.Release())); }
+                |   '&'{ typeExpr.Reset(new LvalueRef(typeExpr.Release())); }
+                |   ('[' Expression(ctx):size? ']'!){ typeExpr.Reset(new Array(typeExpr.Release(), size)); }
+                )*
+            )
+            {
+                value = typeExpr.Release();
+            }
+            ;
+
+        PrimaryTypeExpr(ParsingContext* ctx) : DomObject*
+            ::= BasicType{ value = BasicType; }
+            |   TemplateId(ctx){ value = TemplateId; }
+            |   Identifier{ value = Identifier; }
+            ;
+    }
+}

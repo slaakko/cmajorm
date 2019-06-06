@@ -1,0 +1,841 @@
+// =================================
+// Copyright (c) 2019 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Collections;
+
+namespace System.Text.Parsing.CodeDom
+{
+    public abstract class Statement : DomObject
+    {
+        public Statement(const ustring& name_) : base(name_), noNewLine(false)
+        {
+        }
+        public const ustring& Label() const
+        {
+            return label;
+        }
+        public void SetLabel(const ustring& label_)
+        {
+            label = label_;
+        }
+        public bool NoNewLine() const
+        {
+            return noNewLine;
+        }
+        public void SetNoNewLine()
+        {
+            noNewLine = true;
+        }
+        private ustring label;
+        private bool noNewLine;
+    }
+    
+    public class CompoundStatement : Statement
+    {
+        public CompoundStatement() : base(u"compound")
+        {
+        }
+        public void AddStatement(Statement* statement)
+        {
+            statements.Add(UniquePtr<Statement>(statement));
+        }
+        public override void Print(CodeFormatter& formatter)
+        {
+            formatter.WriteLine('{');
+            formatter.IncIndent();
+            if (formatter.Start())
+            {
+                formatter.WriteLine(formatter.StartText());
+                formatter.SetStart(false);
+            }
+            for (const UniquePtr<Statement>& statement : statements)
+            {
+                statement->Print(formatter);
+            }
+            formatter.DecIndent();
+            formatter.WriteLine('}');
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+            for (const UniquePtr<Statement>& statement : statements)
+            {
+                statement->Accept(visitor);
+            }
+        }
+        private List<UniquePtr<Statement>> statements;
+    }
+    
+    public class ReturnStatement : Statement
+    {
+        public ReturnStatement(DomObject* expression_) : expression(expression_)
+        {
+        }
+        public override void Print(CodeFormatter& formatter)
+        {
+            formatter.Write("return");
+            if (!expression.IsNull())
+            {
+                formatter.Write(' ');
+                expression->Print(formatter);
+            }
+            formatter.Write(';');
+            if (!NoNewLine())
+            {
+                formatter.WriteLine();
+            }
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+            if (!expression.IsNull())
+            {
+                expression->Accept(visitor);
+            }
+        }
+        private UniquePtr<DomObject> expression;
+    }
+    
+    public class IfStatement : Statement
+    {
+        public IfStatement(DomObject* condition_, Statement* thenS_, Statement* elseS_) : base(u"if"), condition(condition_), thenS(thenS_), elseS(elseS_)
+        {
+        }
+        public override void Print(CodeFormatter& formatter)
+        {
+            formatter.Write("if (");
+            condition->Print(formatter);
+            formatter.Write(')');
+            if (thenS.Get() is CompoundStatement*)
+            {
+                formatter.WriteLine();
+            }
+            else 
+            {
+                formatter.Write(' ');
+                thenS->SetNoNewLine();
+            }
+            thenS->Print(formatter);
+            if (!elseS.IsNull())
+            {
+                if (elseS.Get() is CompoundStatement*)
+                {
+                    if (thenS->NoNewLine())
+                    {
+                        formatter.WriteLine();
+                    }
+                    formatter.WriteLine("else");
+                }
+                else
+                {
+                    if (thenS->NoNewLine())
+                    {
+                        formatter.Write(' ');
+                    }
+                    formatter.Write("else ");
+                }
+                elseS->Print(formatter);
+            }
+            else if (thenS->NoNewLine())
+            {
+                formatter.WriteLine();
+            }
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+            condition->Accept(visitor);
+            thenS->Accept(visitor);
+            if (!elseS.IsNull())
+            {
+                elseS->Accept(visitor);
+            }
+        }
+        private UniquePtr<DomObject> condition;
+        private UniquePtr<Statement> thenS;
+        private UniquePtr<Statement> elseS;
+    }
+    
+    public class WhileStatement : Statement
+    {
+        public WhileStatement(DomObject* condition_, Statement* statement_) : base(u"while"), condition(condition_), statement(statement_)
+        {
+        }
+        public override void Print(CodeFormatter& formatter)
+        {
+            formatter.Write("while (");
+            condition->Print(formatter);
+            formatter.Write(')');
+            if (statement.Get() is CompoundStatement*)
+            {
+                formatter.WriteLine();
+            }
+            else
+            {
+                formatter.Write(' ');
+            }
+            statement->Print(formatter);
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+            condition->Accept(visitor);
+            statement->Accept(visitor);
+        }
+        private UniquePtr<DomObject> condition;
+        private UniquePtr<Statement> statement;
+    }
+    
+    public class DoStatement : Statement
+    {
+        public DoStatement(DomObject* condition_, Statement* statement_) : base(u"do"), condition(condition_), statement(statement_)
+        {
+        }
+        public override void Print(CodeFormatter& formatter)
+        {
+            formatter.Write("do");
+            if (statement.Get() is CompoundStatement*)
+            {
+                formatter.WriteLine();
+            }
+            else
+            {
+                formatter.Write(' ');
+                statement->SetNoNewLine();
+            }
+            statement->Print(formatter);
+            formatter.Write(" while (");
+            condition->Print(formatter);
+            formatter.WriteLine(");");
+        }    
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+            condition->Accept(visitor);
+            statement->Accept(visitor);
+        }
+        private UniquePtr<DomObject> condition;
+        private UniquePtr<Statement> statement;
+    }
+    
+    public class ForStatement : Statement
+    {
+        public ForStatement(Statement* initS_, DomObject* condition_, Statement* loopS_, Statement* actionS_) : 
+            base(u"for"), initS(initS_), condition(condition_), loopS(loopS_), actionS(actionS_)
+        {
+        }
+        public override void Print(CodeFormatter& formatter)
+        {
+            formatter.Write("for (");
+            if (!initS.IsNull())
+            {
+                initS->SetNoNewLine();
+                initS->Print(formatter);
+            }
+            else 
+            {
+                formatter.Write(';');
+            }
+            if (!condition.IsNull())
+            {
+                formatter.Write(' ');
+                condition->Print(formatter);
+                formatter.Write(';');
+            }
+            else
+            {
+                formatter.Write(';');
+            }
+            if (!loopS.IsNull())
+            {
+                loopS->SetNoNewLine();
+                loopS->Print(formatter);
+            }
+            formatter.Write(')');
+            if (actionS.Get() is CompoundStatement*)
+            {
+                formatter.WriteLine();
+            }
+            else
+            {
+                formatter.Write(' ');
+            }
+            actionS->Print(formatter);
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+            if (!initS.IsNull())
+            {
+                initS->Accept(visitor);
+            }            
+            if (!condition.IsNull())
+            {
+                condition->Accept(visitor);
+            }
+            if (!loopS.IsNull())
+            {
+                loopS->Accept(visitor);
+            }
+            actionS->Accept(visitor);
+        }
+        private UniquePtr<Statement> initS;
+        private UniquePtr<DomObject> condition;
+        private UniquePtr<Statement> loopS;
+        private UniquePtr<Statement> actionS;
+    }
+    
+    public class BreakStatement : Statement
+    {
+        public BreakStatement() : base(u"break")
+        {
+        }
+        public override void Print(CodeFormatter& formatter)
+        {
+            formatter.Write("break;");
+            if (!NoNewLine())
+            {
+                formatter.WriteLine();
+            }
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+    }
+
+    public class ContinueStatement : Statement
+    {
+        public ContinueStatement() : base(u"continue")
+        {
+        }
+        public override void Print(CodeFormatter& formatter)
+        {
+            formatter.Write("continue;");
+            if (!NoNewLine())
+            {
+                formatter.WriteLine();
+            }
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+    }
+    
+    public class GotoStatement : Statement
+    {
+        public GotoStatement(const ustring& target_) : base(u"goto"), target(target_)
+        {
+        }
+        public override void Print(CodeFormatter& formatter)
+        {
+            formatter.Write("goto " + ToUtf8(target) + ";");
+            if (!NoNewLine())
+            {
+                formatter.WriteLine();
+            }
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        private ustring target;
+    }
+    
+    public class ConstructionStatement : Statement
+    {
+        public ConstructionStatement(DomObject* typeExpr_, DomObject* id_) : base(u"construction"), typeExpr(typeExpr_), id(id_), parens(false)
+        {
+        }
+        public override void AddArgument(DomObject* argument)
+        {
+            arguments.Add(UniquePtr<DomObject>(argument));
+        }
+        public override void Print(CodeFormatter& formatter)
+        {
+            typeExpr->Print(formatter);
+            formatter.Write(' ');
+            id->Print(formatter);
+            if (!arguments.IsEmpty())
+            {
+                if (parens)
+                {
+                    formatter.Write('(');
+                }
+                else
+                {
+                    formatter.Write(" = ");
+                }
+                bool first = true;
+                for (const UniquePtr<DomObject>& argument : arguments)
+                {
+                    if (first)
+                    {
+                        first = false;
+                    }
+                    else
+                    {
+                        formatter.Write(", ");
+                    }
+                    argument->Print(formatter);
+                }
+                if (parens)
+                {
+                    formatter.Write(')');
+                }
+            }            
+            formatter.Write(';');
+            if (!NoNewLine())
+            {
+                formatter.WriteLine();
+            }
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+            typeExpr->Accept(visitor);
+            id->Accept(visitor);
+            for (const UniquePtr<DomObject>& argument : arguments)
+            {
+                argument->Accept(visitor);
+            }
+        }
+        public nothrow void SetParens()
+        {
+            parens = true;
+        }
+        private UniquePtr<DomObject> typeExpr;
+        private UniquePtr<DomObject> id;
+        private List<UniquePtr<DomObject>> arguments;
+        private bool parens;
+    }
+    
+    public class DeleteStatement : Statement
+    {
+        public DeleteStatement(DomObject* expression_) : base(u"delete"), expression(expression_)
+        {
+        }
+        public override void Print(CodeFormatter& formatter)
+        {
+            formatter.Write("delete ");
+            expression->Print(formatter);
+            formatter.Write(';');
+            if (!NoNewLine())
+            {
+                formatter.WriteLine();
+            }
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+            expression->Accept(visitor);
+        }
+        private UniquePtr<DomObject> expression;
+    }
+    
+    public class DestroyStatement : Statement
+    {
+        public DestroyStatement(DomObject* expression_) : base(u"destroy"), expression(expression_)
+        {
+        }
+        public override void Print(CodeFormatter& formatter)
+        {
+            formatter.Write("destroy ");
+            expression->Print(formatter);
+            formatter.Write(';');
+            if (!NoNewLine())
+            {
+                formatter.WriteLine();
+            }
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+            expression->Accept(visitor);
+        }
+        private UniquePtr<DomObject> expression;
+    }
+    
+    public class AssignmentStatement : Statement
+    {
+        public AssignmentStatement(DomObject* targetExpr_, DomObject* sourceExpr_) : base(u"="), targetExpr(targetExpr_), sourceExpr(sourceExpr_)
+        {
+        }
+        public override void Print(CodeFormatter& formatter)
+        {
+            targetExpr->Print(formatter);
+            formatter.Write(" = ");
+            sourceExpr->Print(formatter);
+            formatter.Write(';');
+            if (!NoNewLine())
+            {
+                formatter.WriteLine();
+            }
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+            targetExpr->Accept(visitor);
+            sourceExpr->Accept(visitor);
+        }
+        private UniquePtr<DomObject> targetExpr;
+        private UniquePtr<DomObject> sourceExpr;
+    }
+    
+    public class ExpressionStatement : Statement
+    {
+        public ExpressionStatement(DomObject* expression_) : base(u"expression"), expression(expression_)
+        {
+        }
+        public override void Print(CodeFormatter& formatter)
+        {            
+            expression->Print(formatter);
+            formatter.Write(';');
+            if (!NoNewLine())
+            {
+                formatter.WriteLine();
+            }
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+            expression->Accept(visitor);
+        }
+        private UniquePtr<DomObject> expression;
+    }
+    
+    public class EmptyStatement : Statement
+    {
+        public EmptyStatement() : base(u"empty")
+        {
+        }
+        public override void Print(CodeFormatter& formatter)
+        {
+            formatter.Write(';');
+            if (!NoNewLine())
+            {
+                formatter.WriteLine();
+            }
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+    }
+    
+    public class RangeForStatement : Statement
+    {
+        public RangeForStatement(DomObject* typeExpr_, DomObject* id_, DomObject* container_, Statement* action_) : 
+            base(u"range-for"), typeExpr(typeExpr_), id(id_), container(container_), action(action_)
+        {
+        }
+        public override void Print(CodeFormatter& formatter)
+        {
+            formatter.Write("for (");
+            typeExpr->Print(formatter);
+            formatter.Write(' ');
+            id->Print(formatter);
+            formatter.Write(" : ");
+            container->Print(formatter);
+            formatter.Write(')');
+            if (action.Get() is CompoundStatement*)
+            {
+                formatter.WriteLine();
+            }
+            else
+            {                
+                formatter.Write(' ');
+            }
+            action->Print(formatter);
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+            typeExpr->Accept(visitor);
+            id->Accept(visitor);
+            container->Accept(visitor);
+            action->Accept(visitor);
+        }
+        private UniquePtr<DomObject> typeExpr;
+        private UniquePtr<DomObject> id;
+        private UniquePtr<DomObject> container;
+        private UniquePtr<Statement> action;
+    }
+    
+    public class CaseStatement : Statement
+    {
+        public CaseStatement() : base(u"case")
+        {
+        }
+        public void AddCaseExpr(DomObject* caseExpr)
+        {
+            caseExprs.Add(UniquePtr<DomObject>(caseExpr));
+        }
+        public void AddStatement(Statement* statement)
+        {
+            statements.Add(UniquePtr<Statement>(statement));
+        }
+        public override void Print(CodeFormatter& formatter)
+        {
+            for (const UniquePtr<DomObject>& caseExpr : caseExprs)
+            {
+                formatter.Write("case ");
+                caseExpr->Print(formatter);
+                formatter.Write(": ");
+            }
+            formatter.WriteLine();
+            formatter.WriteLine("{");
+            formatter.IncIndent();
+            for (const UniquePtr<Statement>& statement : statements)
+            {
+                statement->Print(formatter);
+            }
+            formatter.DecIndent();
+            formatter.WriteLine("}");
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+            for (const UniquePtr<DomObject>& caseExpr : caseExprs)
+            {
+                caseExpr->Accept(visitor);
+            }
+            for (const UniquePtr<Statement>& statement : statements)
+            {
+                statement->Accept(visitor);
+            }
+        }
+        private List<UniquePtr<DomObject>> caseExprs;
+        private List<UniquePtr<Statement>> statements;
+    }
+    
+    public class DefaultStatement : Statement
+    {
+        public DefaultStatement() : base(u"default")
+        {
+        }
+        public void AddStatement(Statement* statement)
+        {
+            statements.Add(UniquePtr<Statement>(statement));
+        }
+        public override void Print(CodeFormatter& formatter)
+        {
+            formatter.WriteLine("default:");            
+            formatter.WriteLine("{");
+            formatter.IncIndent();
+            for (const UniquePtr<Statement>& statement : statements)
+            {
+                statement->Print(formatter);
+            }
+            formatter.DecIndent();
+            formatter.WriteLine("}");
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+            for (const UniquePtr<Statement>& statement : statements)
+            {
+                statement->Accept(visitor);
+            }
+        }
+        private List<UniquePtr<Statement>> statements;
+    }
+
+    public class SwitchStatement : Statement
+    {
+        public SwitchStatement(DomObject* condition_) : base(u"switch"), condition(condition_)
+        {
+        }
+        public void AddCase(CaseStatement* caseS) 
+        {
+            cases.Add(UniquePtr<CaseStatement>(caseS));
+        }
+        public void SetDefault(DefaultStatement* defaultS_)
+        {
+            defaultS.Reset(defaultS_);
+        }
+        public override void Print(CodeFormatter& formatter)
+        {
+            formatter.Write("switch (");
+            condition->Print(formatter);
+            formatter.WriteLine(")");
+            formatter.WriteLine("{");
+            formatter.IncIndent();
+            for (const UniquePtr<CaseStatement>& caseS : cases)
+            {
+                caseS->Print(formatter);
+            }
+            if (!defaultS.IsNull())
+            {
+                defaultS->Print(formatter);
+            }
+            formatter.DecIndent();
+            formatter.WriteLine("}");
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+            condition->Accept(visitor);
+            for (const UniquePtr<CaseStatement>& caseS : cases)
+            {
+                caseS->Accept(visitor);
+            }
+            if (!defaultS.IsNull())
+            {
+                defaultS->Accept(visitor);
+            }
+        }
+        private UniquePtr<DomObject> condition;
+        private List<UniquePtr<CaseStatement>> cases;
+        private UniquePtr<DefaultStatement> defaultS;
+    }
+    
+    public class GotoCaseStatement : Statement
+    {
+        public GotoCaseStatement(DomObject* targetCase_) : base(u"goto case"), targetCase(targetCase_)
+        {
+        }
+        public override void Print(CodeFormatter& formatter)
+        {
+            formatter.Write("goto case ");
+            targetCase->Print(formatter);
+            formatter.Write(';');
+            if (!NoNewLine())
+            {
+                formatter.WriteLine();
+            }
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+            targetCase->Accept(visitor);
+        }
+        private UniquePtr<DomObject> targetCase;
+    }
+    
+    public class GotoDefaultStatement : Statement
+    {
+        public GotoDefaultStatement() : base(u"goto default")
+        {
+        }
+        public override void Print(CodeFormatter& formatter)
+        {
+            formatter.Write("goto default;");
+            if (!NoNewLine())
+            {
+                formatter.WriteLine();
+            }
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+    }
+    
+    public class ThrowStatement : Statement
+    {
+        public ThrowStatement(DomObject* expression_) : base(u"throw"), expression(expression_)
+        {
+        }
+        public override void Print(CodeFormatter& formatter)
+        {
+            formatter.Write("throw ");
+            expression->Print(formatter);
+            formatter.Write(';');
+            if (!NoNewLine())
+            {
+                formatter.WriteLine();
+            }
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+            expression->Accept(visitor);
+        }
+        private UniquePtr<DomObject> expression;
+    }
+    
+    public class Catch : DomObject
+    {
+        public Catch(DomObject* typeExpr_, DomObject* id_, CompoundStatement* catchBlock_) : base(u"catch"), typeExpr(typeExpr_), id(id_), catchBlock(catchBlock_)
+        {
+        }
+        public override void Print(CodeFormatter& formatter)
+        {
+            formatter.Write("catch (");
+            typeExpr->Print(formatter);
+            formatter.Write(' ');
+            id->Print(formatter);
+            formatter.WriteLine(')');
+            catchBlock->Print(formatter);
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+            typeExpr->Accept(visitor);
+            id->Accept(visitor);
+            catchBlock->Accept(visitor);
+        }
+        private UniquePtr<DomObject> typeExpr;
+        private UniquePtr<DomObject> id;
+        private UniquePtr<CompoundStatement> catchBlock;
+    }
+    
+    public class TryStatement : Statement
+    {
+        public TryStatement(CompoundStatement* tryBlock_) : base(u"try"), tryBlock(tryBlock_)
+        {            
+        }
+        public void AddCatch(Catch* catch_)
+        {
+            catches.Add(UniquePtr<Catch>(catch_));
+        }
+        public override void Print(CodeFormatter& formatter)
+        {
+            formatter.WriteLine("try");
+            tryBlock->Print(formatter);
+            for (const UniquePtr<Catch>& catch_ : catches)
+            {
+                catch_->Print(formatter);
+            }
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+            tryBlock->Accept(visitor);
+            for (const UniquePtr<Catch>& catch_ : catches)
+            {
+                catch_->Accept(visitor);
+            }
+        }
+        private UniquePtr<CompoundStatement> tryBlock;
+        private List<UniquePtr<Catch>> catches;
+    }
+    
+    public class AssertStatement : Statement
+    {
+        public AssertStatement(DomObject* assertExpr_) : base(u"assert"), assertExpr(assertExpr_)
+        {
+        }
+        public override void Print(CodeFormatter& formatter)
+        {
+            formatter.Write("#assert(");
+            assertExpr->Print(formatter);
+            formatter.Write(");");
+            if (!NoNewLine())
+            {
+                formatter.WriteLine();
+            }
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+            assertExpr->Accept(visitor);
+        }
+        private UniquePtr<DomObject> assertExpr;
+    }
+}

@@ -3023,34 +3023,34 @@ namespace Code
         public override void GetReferencedGrammars()
         {
             ParsingDomain* pd = Domain();
-            Grammar* grammar0 = pd->GetGrammar(ToUtf32("Code.TypeExprGrammar"));
+            Grammar* grammar0 = pd->GetGrammar(ToUtf32("Code.KeywordGrammar"));
             if (grammar0 == null)
             {
-                grammar0 = new Code.TypeExprGrammar(pd);
+                grammar0 = new Code.KeywordGrammar(pd);
             }
             AddGrammarReference(grammar0);
-            Grammar* grammar1 = pd->GetGrammar(ToUtf32("Code.ExpressionGrammar"));
+            Grammar* grammar1 = pd->GetGrammar(ToUtf32("Code.IdentifierGrammar"));
             if (grammar1 == null)
             {
-                grammar1 = new Code.ExpressionGrammar(pd);
+                grammar1 = new Code.IdentifierGrammar(pd);
             }
             AddGrammarReference(grammar1);
-            Grammar* grammar2 = pd->GetGrammar(ToUtf32("Code.IdentifierGrammar"));
+            Grammar* grammar2 = pd->GetGrammar(ToUtf32("Code.ExpressionGrammar"));
             if (grammar2 == null)
             {
-                grammar2 = new Code.IdentifierGrammar(pd);
+                grammar2 = new Code.ExpressionGrammar(pd);
             }
             AddGrammarReference(grammar2);
-            Grammar* grammar3 = pd->GetGrammar(ToUtf32("System.Text.Parsing.stdlib"));
+            Grammar* grammar3 = pd->GetGrammar(ToUtf32("Code.TypeExprGrammar"));
             if (grammar3 == null)
             {
-                grammar3 = new System.Text.Parsing.stdlib(pd);
+                grammar3 = new Code.TypeExprGrammar(pd);
             }
             AddGrammarReference(grammar3);
-            Grammar* grammar4 = pd->GetGrammar(ToUtf32("Code.KeywordGrammar"));
+            Grammar* grammar4 = pd->GetGrammar(ToUtf32("System.Text.Parsing.stdlib"));
             if (grammar4 == null)
             {
-                grammar4 = new Code.KeywordGrammar(pd);
+                grammar4 = new System.Text.Parsing.stdlib(pd);
             }
             AddGrammarReference(grammar4);
         }

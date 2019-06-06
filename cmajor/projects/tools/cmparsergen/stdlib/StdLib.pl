@@ -34,6 +34,10 @@ namespace System.Text.Parsing
         bool : bool;
         identifier : ustring;
         qualified_id : ustring;
+        hex_escape : uchar;
+        octal_escape : uchar;
+        decimal_escape : uchar;
+        c_escape : uchar;
         escape : uchar;
         char : uchar;
         string : ustring;

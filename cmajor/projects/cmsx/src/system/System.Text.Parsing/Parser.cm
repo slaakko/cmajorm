@@ -1,0 +1,45 @@
+// =================================
+// Copyright (c) 2019 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Collections;
+
+namespace System.Text.Parsing
+{
+    public abstract class Object
+    {
+        public virtual default ~Object();
+    }
+    
+    public class ValueObject<ValueType> : Object
+    {
+        public default ValueObject();
+        public ValueObject(const ValueType& value_) : value(value_)
+        {
+        }
+        public void operator=(const ValueType& value_) 
+        {
+            value = value_;
+        }
+        public operator ValueType() const 
+        {
+            return value;
+        }
+        private ValueType value;
+    }
+    
+    public abstract class Parser : ParsingObject
+    {
+        public nothrow Parser(const ustring& name_, const ustring& info_) : base(name_), info(info_)
+        {
+        }
+        public inline nothrow const ustring& Info() const
+        {
+            return info;
+        }
+        public abstract Match Parse(Scanner& scanner, Stack<UniquePtr<Object>>& stack, ParsingData* parsingData);
+        private ustring info;
+    }
+}

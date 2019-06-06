@@ -445,10 +445,10 @@ namespace Code
         public override void GetReferencedGrammars()
         {
             ParsingDomain* pd = Domain();
-            Grammar* grammar0 = pd->GetGrammar(ToUtf32("Code.ExpressionGrammar"));
+            Grammar* grammar0 = pd->GetGrammar(ToUtf32("Code.BasicTypeGrammar"));
             if (grammar0 == null)
             {
-                grammar0 = new Code.ExpressionGrammar(pd);
+                grammar0 = new Code.BasicTypeGrammar(pd);
             }
             AddGrammarReference(grammar0);
             Grammar* grammar1 = pd->GetGrammar(ToUtf32("Code.IdentifierGrammar"));
@@ -457,10 +457,10 @@ namespace Code
                 grammar1 = new Code.IdentifierGrammar(pd);
             }
             AddGrammarReference(grammar1);
-            Grammar* grammar2 = pd->GetGrammar(ToUtf32("Code.BasicTypeGrammar"));
+            Grammar* grammar2 = pd->GetGrammar(ToUtf32("Code.ExpressionGrammar"));
             if (grammar2 == null)
             {
-                grammar2 = new Code.BasicTypeGrammar(pd);
+                grammar2 = new Code.ExpressionGrammar(pd);
             }
             AddGrammarReference(grammar2);
         }

@@ -1,0 +1,25 @@
+using System.Text.Parsing.CodeDom;
+
+namespace Code
+{
+    grammar BasicTypeGrammar
+    {
+        BasicType : Type*
+            ::= keyword("bool"){ value = new BoolType(); }
+            |   keyword("sbyte"){ value = new SByteType(); }
+            |   keyword("byte"){ value = new ByteType(); }
+            |   keyword("short"){ value = new ShortType(); }
+            |   keyword("ushort"){ value = new UShortType(); }
+            |   keyword("int"){ value = new IntType(); }
+            |   keyword("uint"){ value = new UIntType(); }
+            |   keyword("long"){ value = new LongType(); }
+            |   keyword("ulong"){ value = new ULongType(); }
+            |   keyword("float"){ value = new FloatType(); }
+            |   keyword("double"){ value = new DoubleType(); }
+            |   keyword("char"){ value = new CharType(); }
+            |   keyword("wchar"){ value = new WCharType(); }
+            |   keyword("uchar"){ value = new UCharType(); }
+            |   keyword("void"){ value = new VoidType(); }
+            ;
+    }
+}

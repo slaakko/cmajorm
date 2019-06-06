@@ -486,6 +486,9 @@ namespace cmsx.intermediate
                     switch (binOp)
                     {
                         case Operator.equal: binOpCode = cmsx.machine.CMPU; break;
+                        case Operator.and_: binOpCode = cmsx.machine.AND; break;
+                        case Operator.or_: binOpCode = cmsx.machine.OR; break;
+                        case Operator.xor_: binOpCode = cmsx.machine.XOR; break;
                     }
                 }
                 else if (left->type is SignedIntegerType*)
