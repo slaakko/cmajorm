@@ -287,10 +287,14 @@ namespace cmdevenv
             buildSolutionToolStripMenuItem.Enabled = editing && solutionHasProjects;
             buildToolStripMenuItem1.Enabled = editing && solutionHasProjects;
             buildActiveProjectToolStripMenuItem.Enabled = editing && activeProjectSet && (solution.ActiveProject.Target == Target.program || solution.ActiveProject.Target == Target.library);
+            rebuildToolStripMenuItem.Enabled = editing && solutionHasProjects;
+            rebuildActiveProjcectToolStripMenuItem.Enabled = editing && activeProjectSet && (solution.ActiveProject.Target == Target.program || solution.ActiveProject.Target == Target.library);
+            rebuildToolStripMenuItem1.Enabled = editing && activeProjectSet && (solution.ActiveProject.Target == Target.program || solution.ActiveProject.Target == Target.library);
             runUnitTestsInCurrentSolutionToolStripMenuItem.Enabled = editing && solutionHasProjects;
             profileActiveProjectToolStripMenuItem1.Enabled = editing && activeProjectSet && solution.ActiveProject.Target == Target.program;
             runUnitTestsInActiveProjectToolStripMenuItem.Enabled = editing && activeProjectSet && solution.ActiveProject.Target == Target.unitTest;
             buildSolutionToolStripMenuItem.Enabled = editing && solutionHasProjects;
+            rebuildSolutionToolStripMenuItem.Enabled = editing && solutionHasProjects;
             cleanSolutionToolStripMenuItem.Enabled = editing && solutionHasProjects;
             cleanSolutionToolStripMenuItem2.Enabled = editing && solutionHasProjects;
             cleanActiveProjectToolStripMenuItem.Enabled = editing && activeProjectSet;
@@ -931,15 +935,27 @@ namespace cmdevenv
         }
         private void buildSolutionToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            BuildSolution();
+            BuildSolution(false);
+        }
+        private void rebuildSolutionToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            BuildSolution(true);
         }
         private void buildToolStripMenuItem1_Click(object sender, EventArgs e)
         {
-            BuildSolution();
+            BuildSolution(false);
+        }
+        private void rebuildToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            BuildSolution(true);
         }
         private void buildActiveProjectToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            BuildProject(solution.ActiveProject);
+            BuildProject(solution.ActiveProject, false);
+        }
+        private void rebuildActiveProjcectToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            BuildProject(solution.ActiveProject, true);
         }
         private void buildToolStripMenuItem2_Click(object sender, EventArgs e)
         {
@@ -949,7 +965,19 @@ namespace cmdevenv
                 Project selectedProject = selectedNode.Tag as Project;
                 if (selectedProject != null)
                 {
-                    BuildProject(selectedProject);
+                    BuildProject(selectedProject, false);
+                }
+            }
+        }
+        private void rebuildToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            TreeNode selectedNode = solutionExplorerTreeView.SelectedNode;
+            if (selectedNode != null)
+            {
+                Project selectedProject = selectedNode.Tag as Project;
+                if (selectedProject != null)
+                {
+                    BuildProject(selectedProject, true);
                 }
             }
         }
@@ -1004,7 +1032,7 @@ namespace cmdevenv
                 MessageBox.Show(ex.Message);
             }
         }
-        private void BuildSolution()
+        private void BuildSolution(bool rebuild)
         {
             try
             {
@@ -1040,7 +1068,7 @@ namespace cmdevenv
                     {
                         SetDefinesFor(project, config);
                     }
-                    compiler.DoCompile(solution.FilePath, config, strictNothrow, emitLlvm, emitOptLlvm, linkWithDebugRuntime, linkUsingMsLink, optimizationLevel, numBuildThreads);
+                    compiler.DoCompile(solution.FilePath, config, strictNothrow, emitLlvm, emitOptLlvm, linkWithDebugRuntime, linkUsingMsLink, optimizationLevel, numBuildThreads, rebuild);
                     infoTimer.Stop();
                     infoLabel.Text = "Building";
                 }
@@ -1051,7 +1079,7 @@ namespace cmdevenv
                 MessageBox.Show(ex.Message);
             }
         }
-        private void BuildProject(Project project)
+        private void BuildProject(Project project, bool rebuild)
         {
             try
             {
@@ -1078,7 +1106,7 @@ namespace cmdevenv
                 buildInProgress = true;
                 SetState(State.compiling);
                 SetDefinesFor(project, config);
-                compiler.DoCompile(project.FilePath, config, strictNothrow, emitLlvm, emitOptLlvm, linkWithDebugRuntime, linkUsingMsLink, optimizationLevel, numBuildThreads);
+                compiler.DoCompile(project.FilePath, config, strictNothrow, emitLlvm, emitOptLlvm, linkWithDebugRuntime, linkUsingMsLink, optimizationLevel, numBuildThreads, rebuild);
                 infoTimer.Stop();
                 infoLabel.Text = "Building";
             }
@@ -1648,7 +1676,7 @@ namespace cmdevenv
                 cancelToolStripMenuItem.Enabled = true;
                 buildInProgress = true;
                 SetState(State.compiling);
-                compiler.DoClean(solutionOrProjectFilePath, config); 
+                compiler.DoClean(solutionOrProjectFilePath, config);
                 infoTimer.Stop();
                 infoLabel.Text = "Cleaning";
             }

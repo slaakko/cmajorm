@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -34,7 +34,7 @@ namespace server
     public class CompileRequest : Request
     {
         public CompileRequest(string filePath, string config, bool strictNothrow, bool emitLlvm, bool emitOptLlvm, bool linkWithDebugRuntime, bool linkUsingMsLink, 
-            int optimizationLevel, int numBuildThreads)
+            int optimizationLevel, int numBuildThreads, bool rebuild)
         {
             this.filePath = filePath;
             this.config = config;
@@ -45,6 +45,7 @@ namespace server
             this.linkUsingMsLink = linkUsingMsLink;
             this.optimizationLevel = optimizationLevel;
             this.numBuildThreads = numBuildThreads;
+            this.rebuild = rebuild;
         }
         public override void Process(RequestHandler handler)
         {
@@ -86,6 +87,10 @@ namespace server
         {
             get { return numBuildThreads; }
         }
+        public bool Rebuild
+        {
+            get { return rebuild; }
+        }
         private string filePath;
         private string config;
         private bool strictNothrow;
@@ -95,6 +100,7 @@ namespace server
         private bool linkUsingMsLink;
         private int optimizationLevel;
         private int numBuildThreads;
+        private bool rebuild;
     }
 
     public class CleanRequest : Request

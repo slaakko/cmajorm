@@ -45,6 +45,7 @@ namespace cmdevenv
             this.systemLibraryToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.examplesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.parserGeneratorToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.systemXToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.unitTestsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator6 = new System.Windows.Forms.ToolStripSeparator();
             this.recentProjectsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -57,9 +58,11 @@ namespace cmdevenv
             this.formatContentToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.buildToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.buildSolutionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.rebuildSolutionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.cleanSolutionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem16 = new System.Windows.Forms.ToolStripSeparator();
             this.buildActiveProjectToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.rebuildActiveProjcectToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.cleanActiveProjectToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem12 = new System.Windows.Forms.ToolStripSeparator();
             this.cancelToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -113,6 +116,7 @@ namespace cmdevenv
             this.openProjectDialog = new System.Windows.Forms.OpenFileDialog();
             this.solutionContextMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.buildToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.rebuildToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.cleanSolutionToolStripMenuItem2 = new System.Windows.Forms.ToolStripMenuItem();
             this.runUnitTestsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem5 = new System.Windows.Forms.ToolStripSeparator();
@@ -124,6 +128,7 @@ namespace cmdevenv
             this.closeToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.projectContextMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.buildToolStripMenuItem2 = new System.Windows.Forms.ToolStripMenuItem();
+            this.rebuildToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.cleanProjectToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.profileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.runUnitTestsToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
@@ -171,7 +176,6 @@ namespace cmdevenv
             this.addExistingProjectFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.addProjectReferenceDialog = new System.Windows.Forms.OpenFileDialog();
             this.addExistingTextFileDialog = new System.Windows.Forms.OpenFileDialog();
-            this.systemXToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.editorSplitContainer)).BeginInit();
             this.editorSplitContainer.Panel2.SuspendLayout();
@@ -302,28 +306,35 @@ namespace cmdevenv
             // systemLibraryToolStripMenuItem
             // 
             this.systemLibraryToolStripMenuItem.Name = "systemLibraryToolStripMenuItem";
-            this.systemLibraryToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.systemLibraryToolStripMenuItem.Size = new System.Drawing.Size(161, 22);
             this.systemLibraryToolStripMenuItem.Text = "System Library";
             this.systemLibraryToolStripMenuItem.Click += new System.EventHandler(this.systemLibraryToolStripMenuItem_Click);
             // 
             // examplesToolStripMenuItem
             // 
             this.examplesToolStripMenuItem.Name = "examplesToolStripMenuItem";
-            this.examplesToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.examplesToolStripMenuItem.Size = new System.Drawing.Size(161, 22);
             this.examplesToolStripMenuItem.Text = "Examples";
             this.examplesToolStripMenuItem.Click += new System.EventHandler(this.examplesToolStripMenuItem_Click);
             // 
             // parserGeneratorToolStripMenuItem
             // 
             this.parserGeneratorToolStripMenuItem.Name = "parserGeneratorToolStripMenuItem";
-            this.parserGeneratorToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.parserGeneratorToolStripMenuItem.Size = new System.Drawing.Size(161, 22);
             this.parserGeneratorToolStripMenuItem.Text = "Parser Generator";
             this.parserGeneratorToolStripMenuItem.Click += new System.EventHandler(this.parserGeneratorToolStripMenuItem_Click);
+            // 
+            // systemXToolStripMenuItem
+            // 
+            this.systemXToolStripMenuItem.Name = "systemXToolStripMenuItem";
+            this.systemXToolStripMenuItem.Size = new System.Drawing.Size(161, 22);
+            this.systemXToolStripMenuItem.Text = "System X";
+            this.systemXToolStripMenuItem.Click += new System.EventHandler(this.systemXToolStripMenuItem_Click);
             // 
             // unitTestsToolStripMenuItem
             // 
             this.unitTestsToolStripMenuItem.Name = "unitTestsToolStripMenuItem";
-            this.unitTestsToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.unitTestsToolStripMenuItem.Size = new System.Drawing.Size(161, 22);
             this.unitTestsToolStripMenuItem.Text = "Unit Tests";
             this.unitTestsToolStripMenuItem.Click += new System.EventHandler(this.unitTestsToolStripMenuItem_Click);
             // 
@@ -396,9 +407,11 @@ namespace cmdevenv
             // 
             this.buildToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.buildSolutionToolStripMenuItem,
+            this.rebuildSolutionToolStripMenuItem,
             this.cleanSolutionToolStripMenuItem,
             this.toolStripMenuItem16,
             this.buildActiveProjectToolStripMenuItem,
+            this.rebuildActiveProjcectToolStripMenuItem,
             this.cleanActiveProjectToolStripMenuItem,
             this.toolStripMenuItem12,
             this.cancelToolStripMenuItem,
@@ -415,6 +428,13 @@ namespace cmdevenv
             this.buildSolutionToolStripMenuItem.Size = new System.Drawing.Size(228, 22);
             this.buildSolutionToolStripMenuItem.Text = "&Build Solution";
             this.buildSolutionToolStripMenuItem.Click += new System.EventHandler(this.buildSolutionToolStripMenuItem_Click);
+            // 
+            // rebuildSolutionToolStripMenuItem
+            // 
+            this.rebuildSolutionToolStripMenuItem.Name = "rebuildSolutionToolStripMenuItem";
+            this.rebuildSolutionToolStripMenuItem.Size = new System.Drawing.Size(228, 22);
+            this.rebuildSolutionToolStripMenuItem.Text = "&Rebuild Solution";
+            this.rebuildSolutionToolStripMenuItem.Click += new System.EventHandler(this.rebuildSolutionToolStripMenuItem_Click);
             // 
             // cleanSolutionToolStripMenuItem
             // 
@@ -435,6 +455,13 @@ namespace cmdevenv
             this.buildActiveProjectToolStripMenuItem.Size = new System.Drawing.Size(228, 22);
             this.buildActiveProjectToolStripMenuItem.Text = "Build Active &Project";
             this.buildActiveProjectToolStripMenuItem.Click += new System.EventHandler(this.buildActiveProjectToolStripMenuItem_Click);
+            // 
+            // rebuildActiveProjcectToolStripMenuItem
+            // 
+            this.rebuildActiveProjcectToolStripMenuItem.Name = "rebuildActiveProjcectToolStripMenuItem";
+            this.rebuildActiveProjcectToolStripMenuItem.Size = new System.Drawing.Size(228, 22);
+            this.rebuildActiveProjcectToolStripMenuItem.Text = "Rebuild Active Projcect";
+            this.rebuildActiveProjcectToolStripMenuItem.Click += new System.EventHandler(this.rebuildActiveProjcectToolStripMenuItem_Click);
             // 
             // cleanActiveProjectToolStripMenuItem
             // 
@@ -857,6 +884,7 @@ namespace cmdevenv
             // 
             this.solutionContextMenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.buildToolStripMenuItem1,
+            this.rebuildToolStripMenuItem,
             this.cleanSolutionToolStripMenuItem2,
             this.runUnitTestsToolStripMenuItem,
             this.toolStripMenuItem5,
@@ -865,33 +893,40 @@ namespace cmdevenv
             this.renameToolStripMenuItem,
             this.closeToolStripMenuItem1});
             this.solutionContextMenuStrip.Name = "solutionContextMenuStrip";
-            this.solutionContextMenuStrip.Size = new System.Drawing.Size(150, 148);
+            this.solutionContextMenuStrip.Size = new System.Drawing.Size(181, 192);
             // 
             // buildToolStripMenuItem1
             // 
             this.buildToolStripMenuItem1.Name = "buildToolStripMenuItem1";
-            this.buildToolStripMenuItem1.Size = new System.Drawing.Size(149, 22);
+            this.buildToolStripMenuItem1.Size = new System.Drawing.Size(180, 22);
             this.buildToolStripMenuItem1.Text = "Build";
             this.buildToolStripMenuItem1.Click += new System.EventHandler(this.buildToolStripMenuItem1_Click);
+            // 
+            // rebuildToolStripMenuItem
+            // 
+            this.rebuildToolStripMenuItem.Name = "rebuildToolStripMenuItem";
+            this.rebuildToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.rebuildToolStripMenuItem.Text = "Rebuild";
+            this.rebuildToolStripMenuItem.Click += new System.EventHandler(this.rebuildToolStripMenuItem_Click);
             // 
             // cleanSolutionToolStripMenuItem2
             // 
             this.cleanSolutionToolStripMenuItem2.Name = "cleanSolutionToolStripMenuItem2";
-            this.cleanSolutionToolStripMenuItem2.Size = new System.Drawing.Size(149, 22);
+            this.cleanSolutionToolStripMenuItem2.Size = new System.Drawing.Size(180, 22);
             this.cleanSolutionToolStripMenuItem2.Text = "Clean";
             this.cleanSolutionToolStripMenuItem2.Click += new System.EventHandler(this.cleanSolutionToolStripMenuItem2_Click);
             // 
             // runUnitTestsToolStripMenuItem
             // 
             this.runUnitTestsToolStripMenuItem.Name = "runUnitTestsToolStripMenuItem";
-            this.runUnitTestsToolStripMenuItem.Size = new System.Drawing.Size(149, 22);
+            this.runUnitTestsToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.runUnitTestsToolStripMenuItem.Text = "Run Unit Tests";
             this.runUnitTestsToolStripMenuItem.Click += new System.EventHandler(this.runUnitTestsToolStripMenuItem_Click);
             // 
             // toolStripMenuItem5
             // 
             this.toolStripMenuItem5.Name = "toolStripMenuItem5";
-            this.toolStripMenuItem5.Size = new System.Drawing.Size(146, 6);
+            this.toolStripMenuItem5.Size = new System.Drawing.Size(177, 6);
             // 
             // addToolStripMenuItem
             // 
@@ -899,7 +934,7 @@ namespace cmdevenv
             this.newProjectToolStripMenuItem1,
             this.existingProjectToolStripMenuItem});
             this.addToolStripMenuItem.Name = "addToolStripMenuItem";
-            this.addToolStripMenuItem.Size = new System.Drawing.Size(149, 22);
+            this.addToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.addToolStripMenuItem.Text = "Add";
             // 
             // newProjectToolStripMenuItem1
@@ -919,19 +954,19 @@ namespace cmdevenv
             // toolStripMenuItem6
             // 
             this.toolStripMenuItem6.Name = "toolStripMenuItem6";
-            this.toolStripMenuItem6.Size = new System.Drawing.Size(146, 6);
+            this.toolStripMenuItem6.Size = new System.Drawing.Size(177, 6);
             // 
             // renameToolStripMenuItem
             // 
             this.renameToolStripMenuItem.Name = "renameToolStripMenuItem";
-            this.renameToolStripMenuItem.Size = new System.Drawing.Size(149, 22);
+            this.renameToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.renameToolStripMenuItem.Text = "Rename";
             this.renameToolStripMenuItem.Click += new System.EventHandler(this.renameToolStripMenuItem_Click);
             // 
             // closeToolStripMenuItem1
             // 
             this.closeToolStripMenuItem1.Name = "closeToolStripMenuItem1";
-            this.closeToolStripMenuItem1.Size = new System.Drawing.Size(149, 22);
+            this.closeToolStripMenuItem1.Size = new System.Drawing.Size(180, 22);
             this.closeToolStripMenuItem1.Text = "Close";
             this.closeToolStripMenuItem1.Click += new System.EventHandler(this.closeToolStripMenuItem1_Click);
             // 
@@ -939,6 +974,7 @@ namespace cmdevenv
             // 
             this.projectContextMenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.buildToolStripMenuItem2,
+            this.rebuildToolStripMenuItem1,
             this.cleanProjectToolStripMenuItem,
             this.profileToolStripMenuItem,
             this.runUnitTestsToolStripMenuItem1,
@@ -956,7 +992,7 @@ namespace cmdevenv
             this.toolStripSeparator5,
             this.viewProjectToolStripMenuItem});
             this.projectContextMenuStrip.Name = "projectContextMenuStrip";
-            this.projectContextMenuStrip.Size = new System.Drawing.Size(181, 282);
+            this.projectContextMenuStrip.Size = new System.Drawing.Size(181, 304);
             this.projectContextMenuStrip.Opening += new System.ComponentModel.CancelEventHandler(this.projectContextMenuStrip_Opening);
             // 
             // buildToolStripMenuItem2
@@ -965,6 +1001,13 @@ namespace cmdevenv
             this.buildToolStripMenuItem2.Size = new System.Drawing.Size(180, 22);
             this.buildToolStripMenuItem2.Text = "Build";
             this.buildToolStripMenuItem2.Click += new System.EventHandler(this.buildToolStripMenuItem2_Click);
+            // 
+            // rebuildToolStripMenuItem1
+            // 
+            this.rebuildToolStripMenuItem1.Name = "rebuildToolStripMenuItem1";
+            this.rebuildToolStripMenuItem1.Size = new System.Drawing.Size(180, 22);
+            this.rebuildToolStripMenuItem1.Text = "Rebuild";
+            this.rebuildToolStripMenuItem1.Click += new System.EventHandler(this.rebuildToolStripMenuItem1_Click);
             // 
             // cleanProjectToolStripMenuItem
             // 
@@ -1275,13 +1318,6 @@ namespace cmdevenv
             this.addExistingTextFileDialog.DefaultExt = "txt";
             this.addExistingTextFileDialog.Filter = "Text files|*.txt|All files|*.*";
             // 
-            // systemXToolStripMenuItem
-            // 
-            this.systemXToolStripMenuItem.Name = "systemXToolStripMenuItem";
-            this.systemXToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.systemXToolStripMenuItem.Text = "System X";
-            this.systemXToolStripMenuItem.Click += new System.EventHandler(this.systemXToolStripMenuItem_Click);
-            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1466,6 +1502,10 @@ namespace cmdevenv
         private System.Windows.Forms.ToolStripSeparator toolStripMenuItem15;
         private System.Windows.Forms.ToolStripSeparator toolStripMenuItem18;
         private System.Windows.Forms.ToolStripMenuItem systemXToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem rebuildSolutionToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem rebuildActiveProjcectToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem rebuildToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem rebuildToolStripMenuItem1;
     }
 }
 

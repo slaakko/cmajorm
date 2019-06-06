@@ -183,26 +183,26 @@ enum class BlockId : uint16_t
     cjkRadicalsSup, cjkStrokes, cjkSymbols, compatJamo, controlPictures, coptic, copticEpactNumbers, countingRod, cuneiform,
     cuneiformNumbers, currencySymbols, cypriotSyllabary, cyrillic, cyrillicExtA, cyrillicExtB, cyrillicExtC, cyrillicSup,
     deseret, devanagari, devanagariExt, diacriticals, diariticalsForSymbols, diacriticalsSup, diacriticalsExt, dingbats, dogra, domino, duployan,
-    earlyDynasticCuneiform, egyptianHieroglyphs, elbasan, emoticons, enclosedAlphanum, enclosedAlphanumSup, enclosedCjk, enclosedIdeographicSup,
+    earlyDynasticCuneiform, egyptianHieroglyphs, egyptianHieroglyphFormatControls, elbasan, elymaic, emoticons, enclosedAlphanum, enclosedAlphanumSup, enclosedCjk, enclosedIdeographicSup,
     ethiopic, ethiopicExt, ethiopicExtA, ethiopicSup,
     geometricShapes, geometricShapesExt, georgian, georgianExt, georgianSup, glagolitic, glagoliticSup, gothic, grantha, greek, greekExt, gujarati, gunjalaGondi, gurmukhi,
     halfAndFullForms, halfMarks, hangul, hanifiRohingya, hanunoo, hatran, hebrew, highPuSurrogates, highSurrogates, hiragana,
     idc, ideographicSymbols, imperialAramaic, indicNumberForms, inscriptionalPahlavi, inscriptionalParthian, ipaExt, indicSiyaqNumbers,
-    jamo, jamoExtA, jamoExtB, javanese, kaithi, kanaExtA, kanaSup, kanbun, kangxi, kannada, katakana, katakanaExt, kayahLi, kharoshthi, khmer, khmerSymbols, khojki, khudawadi,
+    jamo, jamoExtA, jamoExtB, javanese, kaithi, kanaExtA, smallKanaExt, kanaSup, kanbun, kangxi, kannada, katakana, katakanaExt, kayahLi, kharoshthi, khmer, khmerSymbols, khojki, khudawadi,
     lao, latin1Sup, latinExtA, latinExtAdditional, latinExtB, latinExtC, latinExtD, latinExtE, lepcha, letterlikeSymbols, limbu,
     linearA, linearBIdeograms, linearBSyllabary, lisu, lowSurrogates, lycian, lydian,
     mahajani, mahjong, makasar, malayalam, mandaic, manichean, marchen, masaramGondi, mathAlphanum, mathOperators, mayanNumerals, medefaidrin, meeteiMayek, meeteiMayekExt, mendeKikakui, meroiticCursive, meroiticHieroglyphs,
     miao, miscArrows, miscMathSymbolsA, miscMathSymbolsB, miscPictographs, miscSymbols, miscTechnical, modi, modifierLetters, modifierToneLetters, mongolian, mongolianSup,
     mro, music, multani, myanmar, myanmarExtA, myanmarExtB,
-    nabataean, nb, newTaiLue, newa, nko, numberForms, nushu,
-    ocr, ogham, olChiki, oldHungarian, oldItalic, oldNorthArabian, oldPermic, oldPersian, oldSogdian, oldSouthArabian, oldTurkic, oriya, ornamentalDingbats, osage, osmanya,
+    nabataean, nb, nandinagari, newTaiLue, newa, nko, numberForms, nushu, nyiakengPuachueHmong,
+    ocr, ogham, olChiki, oldHungarian, oldItalic, oldNorthArabian, oldPermic, oldPersian, oldSogdian, oldSouthArabian, oldTurkic, oriya, ornamentalDingbats, osage, osmanya, ottomanSiyaqNumbers,
     pahawhHmong, palmyrene, pauCinHau, phagsPa, phaistos, phoenician, phoneticExt, phoneticExtSup, playingCards, psalterPahlavi, pua, punctuation,
     rejang, rumi, runic,
     samaritan, saurashtra, sharada, shavian, shorthandFormatControls, siddham, sinhala, sinhalaArchaicNumbers, smallForms, sogdian, soraSompeng, soyombo, specials, sundanese, sundaneseSup,
-    supArrowsA, supArrowsB, supArrowsC, supMathOperators, supPuaA, supPuaB, supPunctuation, supSymbolsAndPictographs, superAndSub, suttonSignWriting, sylotiNagri, syriac,
+    supArrowsA, supArrowsB, supArrowsC, supMathOperators, supPuaA, supPuaB, supPunctuation, supSymbolsAndPictographs, superAndSub, suttonSignWriting, sylotiNagri, symbolsAndPictographsExtA, syriac,
     syriacSup,
-    tagalog, tagbanwa, tags, taiLe, taiTham, taiViet, taiXuanJing, takri, tamil, tangut, tangutComponents, telugu, thaana, thai, tibetan, tifinagh, tirhuta, transportAndMap,
-    ucas, ucasExt, ugaritic, vai, vedicExt, verticalForms, vs, vsSup, warangCiti, yiRadicals, yiSyllables, yijing, zanabazarSquare
+    tagalog, tagbanwa, tags, taiLe, taiTham, taiViet, taiXuanJing, takri, tamil, tamilSup, tangut, tangutComponents, telugu, thaana, thai, tibetan, tifinagh, tirhuta, transportAndMap,
+    ucas, ucasExt, ugaritic, vai, vedicExt, verticalForms, vs, vsSup, wancho, warangCiti, yiRadicals, yiSyllables, yijing, zanabazarSquare
 };
 
 struct UTIL_API BlockIdHash
@@ -364,7 +364,8 @@ enum class AgeId : uint8_t
     age_8_0,
     age_9_0,
     age_10_0,
-    age_11_0
+    age_11_0,
+    age_12_0, age_12_1
 };
 
 struct UTIL_API AgeIdHash
@@ -420,15 +421,15 @@ enum class ScriptId : uint8_t
     bali, bamu, bass, batk, beng, bhks, bopo, brah, brai, bugi, buhd,
     cakm, cans, cari, cham, cher, copt, cprt, cyrl,
     deva, dogr, dsrt, dupl,
-    elba, egyp, ethi, 
+    elba, elym, egyp, ethi,
     geor, glag, gong, gonm, goth, gran, grek, gujr, guru,
-    hang, hani, hano, hatr, hebr, hira, hluw, hmng, hrkt, hung,
+    hang, hani, hano, hatr, hebr, hira, hluw, hmng, hmnp, hrkt, hung,
     ital, 
     java,
     kali, kana, khar, khmr, khoj, knda, kthi, 
     lana, laoo, latn, lepc, limb, lina, linb, lisu, lyci, lydi,
     mahj, maka, mand, mani, marc, medf, mend, merc, mero, mlym, modi, mong, mroo, mtei, mult, mymr,
-    narb, nbat, newa, nkoo, nshu,
+    nand, narb, nbat, newa, nkoo, nshu,
     ogam, olck, orkh, orya, osge, osma, 
     palm, pauc, perm, phag, phli, phlp, phnx, plrd, prti,
     qaai,
@@ -436,8 +437,9 @@ enum class ScriptId : uint8_t
     samr, sarb, saur, sgnw, shaw, shrd, sidd, sind, sinh, sogd, sogo, sora, soyo, sund, sylo, syrc,
     tagb, takr, tale, talu, taml, tang, tavt, telu, tfng, tglg, thaa, thai, tibt, tirh,
     ugar,
-    vaii, 
+    vaii,
     wara,
+    wcho,
     xpeo, xsux,
     yiii, zanb,
     zinh, zyyy, zzzz
@@ -601,7 +603,7 @@ private:
     ScriptId script;
 };
 
-constexpr int numInfosInPage = 1024;
+constexpr int numInfosInPage = 128;
 constexpr size_t characterInfoSize = sizeof(uint64_t) + sizeof(BlockId) + sizeof(GeneralCategoryId) + sizeof(AgeId) + sizeof(uint32_t) + sizeof(uint32_t) + sizeof(uint32_t) + 
     sizeof(uint32_t) + sizeof(ScriptId);
 constexpr size_t characterInfoPageSize = numInfosInPage * characterInfoSize;
@@ -1026,7 +1028,8 @@ private:
 
 const uint8_t cmajor_ucd_version_1 = '1';
 const uint8_t cmajor_ucd_version_2 = '2';
-const uint8_t current_cmajor_ucd_version = cmajor_ucd_version_2;
+const uint8_t cmajor_ucd_version_3 = '3';
+const uint8_t current_cmajor_ucd_version = cmajor_ucd_version_3;
 
 class UTIL_API CharacterTable
 {
@@ -1054,7 +1057,7 @@ private:
     void WriteHeader(BinaryWriter& writer);
     void ReadHeader(BinaryReader& reader);
     void ReadExtendedHeader(BinaryReader& reader);
-    const size_t headerSize = 16;
+    const size_t headerSize = 4096;
 };
 
 inline const CharacterInfo& GetCharacterInfo(char32_t codePoint) { return CharacterTable::Instance().GetCharacterInfo(codePoint); }

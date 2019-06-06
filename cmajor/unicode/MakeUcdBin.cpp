@@ -347,13 +347,15 @@ int main(int argc, const char** argv)
             return 2;
         }
         std::string xmlFileName = (boost::filesystem::path(cmajor_root) / boost::filesystem::path("unicode") / boost::filesystem::path("ucd.all.flat.xml")).generic_string();
-        std::cout << "processing " << xmlFileName << "..." << std::endl;
+        std::cout << "processing " << xmlFileName << "...";
         UnicodeCharacterDatabaseContentHandler contentHandler;
         ParseXmlFile(xmlFileName, &contentHandler);
         CharacterTable::Instance().Write();
+        std::cout << "\b\b\b, done." << std::endl;
     }
     catch (const std::exception& ex)
     {
+        std::cerr << std::endl;
         std::cerr << ex.what() << std::endl;
         return 1;
     }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -118,7 +118,7 @@ namespace server
         public override void HandleCompileRequest(CompileRequest request)
         {
             Compile(request.FilePath, request.Config, request.StrictNothrow, request.EmitLlvm, request.EmitOptLlvm, request.LinkWithDebugRuntime, request.LinkUsingMsLink,
-                request.OptimizationLevel, request.NumBuildThreads);
+                request.OptimizationLevel, request.NumBuildThreads, request.Rebuild);
         }
         public override void HandleCleanRequest(CleanRequest request)
         {
@@ -157,10 +157,10 @@ namespace server
             Done();
         }
         public void DoCompile(string filePath, string config, bool strictNothrow, bool emitLlvm, bool emitOptLlvm, bool linkWithDebugRuntime, bool linkUsingMsLink,
-            int optimizationLevel, int numBuildThreads)
+            int optimizationLevel, int numBuildThreads, bool rebuild)
         {
             Request request = new CompileRequest(filePath, config, strictNothrow, emitLlvm, emitOptLlvm, linkWithDebugRuntime, linkUsingMsLink, optimizationLevel,
-                numBuildThreads);
+                numBuildThreads, rebuild);
             lock (requestQueue)
             {
                 requestQueue.Enqueue(request);
@@ -206,7 +206,7 @@ namespace server
             }
         }
         private void Compile(string filePath, string config, bool strictNothrow, bool emitLlvm, bool emitOptLlvm, bool linkWithDebugRuntime, bool linkUsingMsLink,
-            int optimizationLevel, int numBuildThreads)
+            int optimizationLevel, int numBuildThreads, bool rebuild)
         {
             try
             {
@@ -219,6 +219,10 @@ namespace server
                 compileRequestElement.SetAttribute("config", config);
                 compileRequestElement.SetAttribute("verbose", "true");
                 compileRequestElement.SetAttribute("time", "true");
+                if (rebuild)
+                {
+                    compileRequestElement.SetAttribute("rebuild", "true");
+                }
                 if (strictNothrow)
                 {
                     compileRequestElement.SetAttribute("strict-nothrow", "true");

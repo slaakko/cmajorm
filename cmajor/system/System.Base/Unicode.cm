@@ -283,26 +283,26 @@ namespace System.Unicode
         cjkRadicalsSup, cjkStrokes, cjkSymbols, compatJamo, controlPictures, coptic, copticEpactNumbers, countingRod, cuneiform,
         cuneiformNumbers, currencySymbols, cypriotSyllabary, cyrillic, cyrillicExtA, cyrillicExtB, cyrillicExtC, cyrillicSup,
         deseret, devanagari, devanagariExt, diacriticals, diariticalsForSymbols, diacriticalsSup, diacriticalsExt, dingbats, dogra, domino, duployan,
-        earlyDynasticCuneiform, egyptianHieroglyphs, elbasan, emoticons, enclosedAlphanum, enclosedAlphanumSup, enclosedCjk, enclosedIdeographicSup,
+        earlyDynasticCuneiform, egyptianHieroglyphs, egyptianHieroglyphFormatControls, elbasan, elymaic, emoticons, enclosedAlphanum, enclosedAlphanumSup, enclosedCjk, enclosedIdeographicSup,
         ethiopic, ethiopicExt, ethiopicExtA, ethiopicSup,
         geometricShapes, geometricShapesExt, georgian, georgianExt, georgianSup, glagolitic, glagoliticSup, gothic, grantha, greek, greekExt, gujarati, gunjalaGondi, gurmukhi,
         halfAndFullForms, halfMarks, hangul, hanifiRohingya, hanunoo, hatran, hebrew, highPuSurrogates, highSurrogates, hiragana,
         idc, ideographicSymbols, imperialAramaic, indicNumberForms, inscriptionalPahlavi, inscriptionalParthian, ipaExt, indicSiyaqNumbers,
-        jamo, jamoExtA, jamoExtB, javanese, kaithi, kanaExtA, kanaSup, kanbun, kangxi, kannada, katakana, katakanaExt, kayahLi, kharoshthi, khmer, khmerSymbols, khojki, khudawadi,
+        jamo, jamoExtA, jamoExtB, javanese, kaithi, kanaExtA, smallKanaExt, kanaSup, kanbun, kangxi, kannada, katakana, katakanaExt, kayahLi, kharoshthi, khmer, khmerSymbols, khojki, khudawadi,
         lao, latin1Sup, latinExtA, latinExtAdditional, latinExtB, latinExtC, latinExtD, latinExtE, lepcha, letterlikeSymbols, limbu,
         linearA, linearBIdeograms, linearBSyllabary, lisu, lowSurrogates, lycian, lydian,
         mahajani, mahjong, makasar, malayalam, mandaic, manichean, marchen, masaramGondi, mathAlphanum, mathOperators, mayanNumerals, medefaidrin, meeteiMayek, meeteiMayekExt, mendeKikakui, meroiticCursive, meroiticHieroglyphs,
         miao, miscArrows, miscMathSymbolsA, miscMathSymbolsB, miscPictographs, miscSymbols, miscTechnical, modi, modifierLetters, modifierToneLetters, mongolian, mongolianSup,
         mro, music, multani, myanmar, myanmarExtA, myanmarExtB,
-        nabataean, nb, newTaiLue, newa, nko, numberForms, nushu,
-        ocr, ogham, olChiki, oldHungarian, oldItalic, oldNorthArabian, oldPermic, oldPersian, oldSogdian, oldSouthArabian, oldTurkic, oriya, ornamentalDingbats, osage, osmanya,
+        nabataean, nb, nandinagari, newTaiLue, newa, nko, numberForms, nushu, nyiakengPuachueHmong,
+        ocr, ogham, olChiki, oldHungarian, oldItalic, oldNorthArabian, oldPermic, oldPersian, oldSogdian, oldSouthArabian, oldTurkic, oriya, ornamentalDingbats, osage, osmanya, ottomanSiyaqNumbers,
         pahawhHmong, palmyrene, pauCinHau, phagsPa, phaistos, phoenician, phoneticExt, phoneticExtSup, playingCards, psalterPahlavi, pua, punctuation,
         rejang, rumi, runic,
         samaritan, saurashtra, sharada, shavian, shorthandFormatControls, siddham, sinhala, sinhalaArchaicNumbers, smallForms, sogdian, soraSompeng, soyombo, specials, sundanese, sundaneseSup,
-        supArrowsA, supArrowsB, supArrowsC, supMathOperators, supPuaA, supPuaB, supPunctuation, supSymbolsAndPictographs, superAndSub, suttonSignWriting, sylotiNagri, syriac,
-        syriacSup, 
-        tagalog, tagbanwa, tags, taiLe, taiTham, taiViet, taiXuanJing, takri, tamil, tangut, tangutComponents, telugu, thaana, thai, tibetan, tifinagh, tirhuta, transportAndMap,
-        ucas, ucasExt, ugaritic, vai, vedicExt, verticalForms, vs, vsSup, warangCiti, yiRadicals, yiSyllables, yijing, zanabazarSquare
+        supArrowsA, supArrowsB, supArrowsC, supMathOperators, supPuaA, supPuaB, supPunctuation, supSymbolsAndPictographs, superAndSub, suttonSignWriting, sylotiNagri, symbolsAndPictographsExtA, syriac,
+        syriacSup,
+        tagalog, tagbanwa, tags, taiLe, taiTham, taiViet, taiXuanJing, takri, tamil, tamilSup, tangut, tangutComponents, telugu, thaana, thai, tibetan, tifinagh, tirhuta, transportAndMap,
+        ucas, ucasExt, ugaritic, vai, vedicExt, verticalForms, vs, vsSup, wancho, warangCiti, yiRadicals, yiSyllables, yijing, zanabazarSquare
     }
 
     public class Block 
@@ -583,6 +583,7 @@ namespace System.Unicode
             blocks.Add(new Block(BlockId.rumi, "Rumi", "Rumi Numeral Symbols", cast<uchar>(0x10E60u), cast<uchar>(0x10E7Fu)));
             blocks.Add(new Block(BlockId.oldSogdian, "Old Sogdian", "Old Sogdian", cast<uchar>(0x10F00u), cast<uchar>(0x10F2Fu)));
             blocks.Add(new Block(BlockId.sogdian, "Sogdian", "Sogdian", cast<uchar>(0x10F30u), cast<uchar>(0x10F6Fu)));
+            blocks.Add(new Block(BlockId.elymaic, "Elymaic", "Elymaic", cast<uchar>(0x10FE0), cast<uchar>(0x10FFF))); // 12.0
             blocks.Add(new Block(BlockId.brahmi, "Brahmi", "Brahmi", cast<uchar>(0x11000u), cast<uchar>(0x1107Fu)));
             blocks.Add(new Block(BlockId.kaithi, "Kaithi", "Kaithi", cast<uchar>(0x11080u), cast<uchar>(0x110CFu)));
             blocks.Add(new Block(BlockId.soraSompeng, "Sora Sompeng", "Sora Sompeng", cast<uchar>(0x110D0u), cast<uchar>(0x110FFu)));
@@ -603,15 +604,21 @@ namespace System.Unicode
             blocks.Add(new Block(BlockId.ahom, "Ahom", "Ahom", cast<uchar>(0x11700u), cast<uchar>(0x1173Fu)));
             blocks.Add(new Block(BlockId.dogra, "Dogra", "Dogra", cast<uchar>(0x11800u), cast<uchar>(0x1184Fu)));
             blocks.Add(new Block(BlockId.warangCiti, "Warang Citi", "Warang Citi", cast<uchar>(0x118A0u), cast<uchar>(0x118FFu)));
+            blocks.Add(new Block(BlockId.nandinagari, "Nandinagari", "Nandinagari", cast<uchar>(0x119A0), cast<uchar>(0x119FF))); // 12.0
             blocks.Add(new Block(BlockId.zanabazarSquare, "Zanabazar Square", "Zanabazar Square", cast<uchar>(0x11A00u), cast<uchar>(0x11A4FFu)));
             blocks.Add(new Block(BlockId.soyombo, "Soyombo", "Soyombo", cast<uchar>(0x11A50u), cast<uchar>(0x11AAFu)));
             blocks.Add(new Block(BlockId.pauCinHau, "Pau Cin Hau", "Pau Cin Hau", cast<uchar>(0x11AC0u), cast<uchar>(0x11AFFu)));
             blocks.Add(new Block(BlockId.bhaisuki, "Bhaiksuki", "Bhaiksuki", cast<uchar>(0x11C00u), cast<uchar>(0x11C6Fu)));
             blocks.Add(new Block(BlockId.marchen, "Marchen", "Marchen", cast<uchar>(0x11C70u), cast<uchar>(0x11CBFu)));
+            blocks.Add(new Block(BlockId.masaramGondi, "Masaram Gondi", "Masaram Gondi", cast<uchar>(0x11D00), cast<uchar>(0x11D5F)));
+            blocks.Add(new Block(BlockId.gunjalaGondi, "Gunjala Gondi", "Gunjala Gondi", cast<uchar>(0x11D60), cast<uchar>(0x11DAF)));
+            blocks.Add(new Block(BlockId.makasar, "Makasar", "Makasar", cast<uchar>(0x11EE0), cast<uchar>(0x11EFF)));
+            blocks.Add(new Block(BlockId.tamilSup, "Tamil Sup", "Tamil Sup", cast<uchar>(0x11FC0), cast<uchar>(0x11FFE))); // 12.0
             blocks.Add(new Block(BlockId.cuneiform, "Cuneiform", "Cuneiform", cast<uchar>(0x12000u), cast<uchar>(0x123FFu)));
             blocks.Add(new Block(BlockId.cuneiformNumbers, "Cuneiform Numbers", "Cuneiform Numbers and Punctuation", cast<uchar>(0x12400u), cast<uchar>(0x1247Fu)));
             blocks.Add(new Block(BlockId.earlyDynasticCuneiform, "Early Dynastic Cuneiform", "Early Dynastic Cuneiform", cast<uchar>(0x12480u), cast<uchar>(0x1254Fu)));
             blocks.Add(new Block(BlockId.egyptianHieroglyphs, "Egyptian Hieroglyphs", "Egyptian Hieroglyphs", cast<uchar>(0x13000u), cast<uchar>(0x1342Fu)));
+            blocks.Add(new Block(BlockId.egyptianHieroglyphFormatControls, "Egyptian Hieroglyph Format Controls", "Egyptian Hieroglyph Format Controls", cast<uchar>(0x13430), cast<uchar>(0x1343F))); // 12.0
             blocks.Add(new Block(BlockId.anatolianHieroglyphs, "Anatolian Hieroglyphs", "Anatolian Hieroglyphs", cast<uchar>(0x14400u), cast<uchar>(0x1467Fu)));
             blocks.Add(new Block(BlockId.bamumSup, "Bamum Sup", "Bamum Supplement", cast<uchar>(0x16800u), cast<uchar>(0x16A3Fu)));
             blocks.Add(new Block(BlockId.mro, "Mro", "Mro", cast<uchar>(0x16A40u), cast<uchar>(0x16A6Fu)));
@@ -623,7 +630,8 @@ namespace System.Unicode
             blocks.Add(new Block(BlockId.tangut, "Tangut", "Tangut", cast<uchar>(0x17000u), cast<uchar>(0x187FFu)));
             blocks.Add(new Block(BlockId.tangutComponents, "Tangut Components", "Tangut Components", cast<uchar>(0x18800u), cast<uchar>(0x18AFFu)));
             blocks.Add(new Block(BlockId.kanaSup, "Kana Sup", "Kana Supplement", cast<uchar>(0x1B000u), cast<uchar>(0x1B0FFu)));
-            blocks.Add(new Block(BlockId.kanaExtA, "Kana Ext A", "Kana Extended-A", cast<uchar>(0x1B100u), cast<uchar>(0x1B12Fu))); 
+            blocks.Add(new Block(BlockId.kanaExtA, "Kana Ext A", "Kana Extended-A", cast<uchar>(0x1B100u), cast<uchar>(0x1B12Fu)));
+            blocks.Add(new Block(BlockId.smallKanaExt, "Small Kana Ext", "Small Kana Extension", cast<uchar>(0x1B130), cast<uchar>(0x1B16F))); // 12.0
             blocks.Add(new Block(BlockId.nushu, "Nushu", "Nushu", cast<uchar>(0x1B170u), cast<uchar>(0x1B2FFu))); 
             blocks.Add(new Block(BlockId.duployan, "Duployan", "Duployan", cast<uchar>(0x1BC00u), cast<uchar>(0x1BC9Fu)));
             blocks.Add(new Block(BlockId.shorthandFormatControls, "Shorthand Format Controls", "Shorthand Format Controls", cast<uchar>(0x1BCA0u), cast<uchar>(0x1BCAFu)));
@@ -636,8 +644,12 @@ namespace System.Unicode
             blocks.Add(new Block(BlockId.mathAlphanum, "Math Alphanum", "Mathematical Alphanumeric Symbols", cast<uchar>(0x1D400u), cast<uchar>(0x1D7FFu)));
             blocks.Add(new Block(BlockId.suttonSignWriting, "Sutton SignWriting", "Sutton SignWriting", cast<uchar>(0x1D800u), cast<uchar>(0x1DAAFu)));
             blocks.Add(new Block(BlockId.glagoliticSup, "Glagolitic Sup", "Glagolitic Supplement", cast<uchar>(0x1E000u), cast<uchar>(0x1E02Fu)));
+            blocks.Add(new Block(BlockId.nyiakengPuachueHmong, "Nyiakeng Puachue Hmong", "Nyiakeng Puachue Hmong", cast<uchar>(0x1E100), cast<uchar>(0x1E14F))); // 12.0
+            blocks.Add(new Block(BlockId.wancho, "Wancho", "Wancho", cast<uchar>(0x1E2C0), cast<uchar>(0x1E2FF))); // 12.0
             blocks.Add(new Block(BlockId.mendeKikakui, "Mende Kikakui", "Mende Kikakui", cast<uchar>(0x1E800u), cast<uchar>(0x1E8DFu)));
             blocks.Add(new Block(BlockId.adlam, "Adlam", "Adlam", cast<uchar>(0x1E900u), cast<uchar>(0x1E95Fu)));
+            blocks.Add(new Block(BlockId.indicSiyaqNumbers, "Indic Siyaq Numbers", "Indic Siyaq Numbers", cast<uchar>(0x1EC70), cast<uchar>(0x1ECBF)));
+            blocks.Add(new Block(BlockId.ottomanSiyaqNumbers, "Ottoman Siyaq Numbers", "Ottoman Siyaq Numbers", cast<uchar>(0x1ED00), cast<uchar>(0x1ED4F))); // 12.0
             blocks.Add(new Block(BlockId.arabicMath, "Arabic Math", "Arabic Mathematical Alphabetic Symbols", cast<uchar>(0x1EE00u), cast<uchar>(0x1EEFFu)));
             blocks.Add(new Block(BlockId.mahjong, "Mahjong", "Mahjong Tiles", cast<uchar>(0x1F000u), cast<uchar>(0x1F02Fu)));
             blocks.Add(new Block(BlockId.domino, "Domino", "Domino Tiles", cast<uchar>(0x1F030u), cast<uchar>(0x1F09Fu)));
@@ -653,6 +665,7 @@ namespace System.Unicode
             blocks.Add(new Block(BlockId.supArrowsC, "Sup Arrows C", "Supplemental Arrows-C", cast<uchar>(0x1F800u), cast<uchar>(0x1F8FFu)));
             blocks.Add(new Block(BlockId.supSymbolsAndPictographs, "Sup Symbols And Pictographs", "Supplemental Symbols and Pictographs", cast<uchar>(0x1F900u), cast<uchar>(0x1F9FFu)));
             blocks.Add(new Block(BlockId.chessSymbols, "Chess Symbols", "Chess Symbols", cast<uchar>(0x1FA00u), cast<uchar>(0x1FA6Fu)));
+            blocks.Add(new Block(BlockId.symbolsAndPictographsExtA, "Symbols And Pictographs Ext A", "Symbols And Pictographs Extended A", cast<uchar>(0x1FA70), cast<uchar>(0x1FAFF))); // 12.0
             blocks.Add(new Block(BlockId.cjkExtB, "CJK Ext B", "CJK Unified Ideographs Extension B", cast<uchar>(0x20000u), cast<uchar>(0x2A6DFu)));
             blocks.Add(new Block(BlockId.cjkExtC, "CJK Ext C", "CJK Unified Ideographs Extension C", cast<uchar>(0x2A700u), cast<uchar>(0x2B73Fu)));
             blocks.Add(new Block(BlockId.cjkExtD, "CJK Ext D", "CJK Unified Ideographs Extension D", cast<uchar>(0x2B740u), cast<uchar>(0x2B81Fu)));
@@ -870,7 +883,8 @@ namespace System.Unicode
         age_8_0,
         age_9_0,
         age_10_0,
-        age_11_0
+        age_11_0,
+        age_12_0, age_12_1
     }
 
     public class Age
@@ -939,6 +953,8 @@ namespace System.Unicode
             ages.Add(new Age(AgeId.age_9_0, "9.0"));
             ages.Add(new Age(AgeId.age_10_0, "10.0"));
             ages.Add(new Age(AgeId.age_11_0, "11.0"));
+            ages.Add(new Age(AgeId.age_12_0, "12.0"));
+            ages.Add(new Age(AgeId.age_12_1, "12.1"));
             for (Age* age : ages)
             {
                 ageIdMap[cast<uint>(cast<byte>(age->Id()))] = age;
@@ -974,25 +990,26 @@ namespace System.Unicode
         adlm, aghb, ahom, arab, armi, armn, avst,
         bali, bamu, bass, batk, beng, bhks, bopo, brah, brai, bugi, buhd,
         cakm, cans, cari, cham, cher, copt, cprt, cyrl,
-        deva, dogr, dsrt, dupl, 
-        elba, egyp, ethi, 
-        geor, glag, gong, gonm, goth, gran, grek, gujr, guru, 
-        hang, hani, hano, hatr, hebr, hira, hluw, hmng, hrkt, hung,
+        deva, dogr, dsrt, dupl,
+        elba, elym, egyp, ethi,
+        geor, glag, gong, gonm, goth, gran, grek, gujr, guru,
+        hang, hani, hano, hatr, hebr, hira, hluw, hmng, hmnp, hrkt, hung,
         ital, 
         java,
         kali, kana, khar, khmr, khoj, knda, kthi, 
         lana, laoo, latn, lepc, limb, lina, linb, lisu, lyci, lydi,
         mahj, maka, mand, mani, marc, medf, mend, merc, mero, mlym, modi, mong, mroo, mtei, mult, mymr,
-        narb, nbat, newa, nkoo, nshu,
+        nand, narb, nbat, newa, nkoo, nshu,
         ogam, olck, orkh, orya, osge, osma, 
         palm, pauc, perm, phag, phli, phlp, phnx, plrd, prti,
         qaai,
-        rjng, rohg, runr, 
-        samr, sarb, saur, sgnw, shaw, shrd, sidd, sind, sinh, sogd, sogo, sora, soyo, sund, sylo, syrc, 
+        rjng, rohg, runr,
+        samr, sarb, saur, sgnw, shaw, shrd, sidd, sind, sinh, sogd, sogo, sora, soyo, sund, sylo, syrc,
         tagb, takr, tale, talu, taml, tang, tavt, telu, tfng, tglg, thaa, thai, tibt, tirh,
         ugar,
-        vaii, 
+        vaii,
         wara,
+        wcho,
         xpeo, xsux,
         yiii, zanb,
         zinh, zyyy, zzzz
@@ -1090,6 +1107,7 @@ namespace System.Unicode
             scripts.Add(new Script(ScriptId.dupl, "Dupl", "Duployan"));
             scripts.Add(new Script(ScriptId.egyp, "Egyp", "Egyptian Hieroglyphs"));
             scripts.Add(new Script(ScriptId.elba, "Elba", "Elbasan"));
+            scripts.Add(new Script(ScriptId.elym, "Elym", "Elymaic")); // 12.0
             scripts.Add(new Script(ScriptId.ethi, "Ethi", "Ethiopian"));
             scripts.Add(new Script(ScriptId.geor, "Geor", "Georgian"));
             scripts.Add(new Script(ScriptId.glag, "Glag", "Glagolitic"));
@@ -1108,6 +1126,7 @@ namespace System.Unicode
             scripts.Add(new Script(ScriptId.hira, "Hira", "Hiragana"));
             scripts.Add(new Script(ScriptId.hluw, "Hluw", "Anatolian Hieroglyphs"));
             scripts.Add(new Script(ScriptId.hmng, "Hmng", "Pahawh Hmong"));
+            scripts.Add(new Script(ScriptId.hmnp, "Hmnp", "Nyiakeng Puachue Hmong")); // 12.0
             scripts.Add(new Script(ScriptId.hrkt, "Hrkt", "Katakana Or Hiragana"));
             scripts.Add(new Script(ScriptId.hung, "Hung", "Old Hungarian"));
             scripts.Add(new Script(ScriptId.ital, "Ital", "Old Italic"));
@@ -1145,6 +1164,7 @@ namespace System.Unicode
             scripts.Add(new Script(ScriptId.mtei, "Mtei", "Meetei Mayak"));
             scripts.Add(new Script(ScriptId.mult, "Mult", "Multani"));
             scripts.Add(new Script(ScriptId.mymr, "Mymr", "Myanmar"));
+            scripts.Add(new Script(ScriptId.nand, "Nand", "Nandinagari")); // 12.0
             scripts.Add(new Script(ScriptId.narb, "Narb", "Old North Arabian"));
             scripts.Add(new Script(ScriptId.nbat, "Nbat", "Nabataean"));
             scripts.Add(new Script(ScriptId.newa, "Newa", "Newa"));
@@ -1201,6 +1221,7 @@ namespace System.Unicode
             scripts.Add(new Script(ScriptId.ugar, "Ugar", "Ugaritic"));
             scripts.Add(new Script(ScriptId.vaii, "Vaii", "Vai"));
             scripts.Add(new Script(ScriptId.wara, "Wara", "Warang Citi"));
+            scripts.Add(new Script(ScriptId.wcho, "Wcho", "Wcho")); // 12.0
             scripts.Add(new Script(ScriptId.xpeo, "Xpeo", "Old Persian"));
             scripts.Add(new Script(ScriptId.xsux, "Xsux", "Cuneiform"));
             scripts.Add(new Script(ScriptId.yiii, "Yiii", "Yi"));
@@ -1315,7 +1336,7 @@ namespace System.Unicode
         private ScriptId script;
     }
 
-    public const long numInfosInPage = 1024;
+    public const long numInfosInPage = 128;
     public const uint characterInfoSize = 32u;
     public const uint characterInfoPageSize = cast<uint>(numInfosInPage) * characterInfoSize;
 
@@ -1953,7 +1974,8 @@ namespace System.Unicode
     
     public const byte cmajor_ucd_version_1 = cast<byte>('1');
     public const byte cmajor_ucd_version_2 = cast<byte>('2');
-    public const byte current_cmajor_ucd_version = cmajor_ucd_version_2;
+    public const byte cmajor_ucd_version_3 = cast<byte>('3');
+    public const byte current_cmajor_ucd_version = cmajor_ucd_version_3;
     
     public class CharacterTable
     {
@@ -2099,7 +2121,7 @@ namespace System.Unicode
         public ~CharacterTable()
         {
         }
-        private const uint headerSize = 16u;
+        private const uint headerSize = 4096u;
         private static UniquePtr<CharacterTable> instance;
         private List<byte> headerMagic;
         private bool headerRead;

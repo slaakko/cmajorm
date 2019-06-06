@@ -225,7 +225,7 @@ namespace cmsx.kernel
 
     public class HostBlockManager : BlockManager
     {
-        public nothrow HostBlockManager(HostFileSystem* fs_) : fs(fs_)
+        public nothrow HostBlockManager(HostFileSystem* fs_) : fs(fs_), cache(this, BlockKind.fileBlock, maxCachedFileBlocks)
         {
         }
         public override nothrow string Name() const
@@ -240,9 +240,61 @@ namespace cmsx.kernel
             }
             if (key.kind == BlockKind.fileBlock)
             {
-                FileBlock* fileBlock = new FileBlock(this, null);
-                fileBlock->SetKey(key);
-                return fileBlock;
+                while (true)
+                {
+                    HashMap<BlockKey, Block*, BlockKeyHash>.ConstIterator it = blockMap.CFind(key);
+                    if (it != blockMap.CEnd())
+                    {
+                        Block* block = it->second;
+                        if (block->GetFlag(Block.Flags.locked))
+                        {
+                            void* fiberData = OsGetFiberData();
+                            Process* process = cast<Process*>(fiberData);
+                            block->AddWaitingProcess(process);
+                            SleepProcess(process, blockUnlockedEvent, cast<ulong>(cast<void*>(block)), 0u);
+                            continue;
+                        }
+                        else
+                        {
+                            block->SetFlag(Block.Flags.locked);
+                            RemoveBlockFromFreeList(block);
+                            if (Log())
+                            {
+                                LogMessage("fs.host.bmgr.getblock.end.found", block->ToString());
+                            }
+                            return block;
+                        }
+                    }
+                    else
+                    {
+                        LinkedList<Block*>* list = GetFreeBlockList();
+                        #assert(list != null);
+                        if (list->IsEmpty())
+                        {
+                            void* fiberData = OsGetFiberData();
+                            Process* process = cast<Process*>(fiberData);
+                            AddWaitingProcess(process);
+                            SleepProcess(process, anyBlockFreeEvent, cast<byte>(key.kind), 0u);
+                            continue;
+                        }
+                        else
+                        {
+                            Block* block = list->Front();
+                            list->RemoveFirst();
+                            block->SetIterator(list->End());
+                            blockMap.Remove(block->Key());
+                            block->SetKey(key);
+                            blockMap[key] = block;
+                            block->ResetFlags();
+                            block->SetFlag(Block.Flags.locked);
+                            if (Log())
+                            {
+                                LogMessage("fs.host.bmgr.getblock.end.free", block->ToString());
+                            }
+                            return block;
+                        }
+                    }
+                }
             }
             else
             {
@@ -251,7 +303,35 @@ namespace cmsx.kernel
         }
         public override nothrow void PutBlock(Block* block)
         {
-            delete block;
+            if (Log())
+            {
+                LogMessage("fs.host.bmgr.putblock.begin", block->ToString());
+            }
+            List<Process*> anyProcesses = GetWaitingProcesses();
+            Kernel& kernel = GetKernel();
+            ProcessTable& processTable = kernel.GetProcessTable();
+            for (Process* process : anyProcesses)
+            {
+                WakeUpProcess(processTable, process);
+            }
+            List<Process*> blockProcesses = block->GetWaitingProcesses();
+            for (Process* process : blockProcesses)
+            {
+                WakeUpProcess(processTable, process);
+            }
+            if (block->GetFlag(Block.Flags.valid))
+            {
+                PutBlockToFreeList(block, true);
+            }
+            else
+            {
+                PutBlockToFreeList(block, false);
+            }
+            block->ResetFlag(Block.Flags.locked);
+            if (Log())
+            {
+                LogMessage("fs.host.bmgr.putblock.end", block->ToString());
+            }
         }
         public override nothrow Block* ReadBlock(const BlockKey& key, SuperBlock* sb)
         {
@@ -260,7 +340,16 @@ namespace cmsx.kernel
                 LogMessage("fs.host.bmgr.readblock.begin", key.ToString());
             }
             Block* block = GetBlock(key, sb);
+            if (block->GetFlag(Block.Flags.valid))
+            {
+                if (Log())
+                {
+                    LogMessage("fs.root.bmgr.readblock.end.cache", block->ToString()); 
+                }
+                return block;
+            }
             long bytesRead = GetDiskDriver().Read(block);
+            block->SetFlag(Block.Flags.valid);
             if (Log())
             {
                 LogMessage("fs.host.bmgr.readblock.end.read", block->ToString());
@@ -296,7 +385,29 @@ namespace cmsx.kernel
         public override void Flush()
         {
         }
+        private void RemoveBlockFromFreeList(Block* block)
+        {
+            cache.RemoveBlockFromFreeList(block);
+        }
+        private void PutBlockToFreeList(Block* block, bool tail)
+        {
+            cache.PutBlockToFreeList(block, tail);
+        }
+        private LinkedList<Block*>* GetFreeBlockList()
+        {
+            return cache.GetFreeBlockList();
+        }
+        private void AddWaitingProcess(Process* process)
+        {
+            cache.AddWaitingProcess(process);
+        }
+        private List<Process*> GetWaitingProcesses()
+        {
+            return cache.GetWaitingProcesses();
+        }
         private HostFileSystem* fs;
+        private HashMap<BlockKey, Block*, BlockKeyHash> blockMap;
+        private BlockCache cache;
     }
 
     public class HostINodeManager : INodeManager

@@ -925,6 +925,7 @@ BlockTable::BlockTable()
     blocks.push_back(Block(BlockId::rumi, "Rumi", "Rumi Numeral Symbols", 0x10E60, 0x10E7F));
     blocks.push_back(Block(BlockId::oldSogdian, "Old Sogdian", "Old Sogdian", 0x10F00, 0x10F2F));
     blocks.push_back(Block(BlockId::sogdian, "Sogdian", "Sogdian", 0x10F30, 0x10F6F));
+    blocks.push_back(Block(BlockId::elymaic, "Elymaic", "Elymaic", 0x10FE0, 0x10FFF)); // 12.0
     blocks.push_back(Block(BlockId::brahmi, "Brahmi", "Brahmi", 0x11000, 0x1107F));
     blocks.push_back(Block(BlockId::kaithi, "Kaithi", "Kaithi", 0x11080, 0x110CF));
     blocks.push_back(Block(BlockId::soraSompeng, "Sora Sompeng", "Sora Sompeng", 0x110D0, 0x110FF));
@@ -945,6 +946,7 @@ BlockTable::BlockTable()
     blocks.push_back(Block(BlockId::ahom, "Ahom", "Ahom", 0x11700, 0x1173F));
     blocks.push_back(Block(BlockId::dogra, "Dogra", "Dogra", 0x11800, 0x1184F));
     blocks.push_back(Block(BlockId::warangCiti, "Warang Citi", "Warang Citi", 0x118A0, 0x118FF));
+    blocks.push_back(Block(BlockId::nandinagari, "Nandinagari", "Nandinagari", 0x119A0, 0x119FF)); // 12.0
     blocks.push_back(Block(BlockId::zanabazarSquare, "Zanabazar Square", "Zanabazar Square", 0x11A00, 0x11A4FF));
     blocks.push_back(Block(BlockId::soyombo, "Soyombo", "Soyombo", 0x11A50, 0x11AAF));
     blocks.push_back(Block(BlockId::pauCinHau, "Pau Cin Hau", "Pau Cin Hau", 0x11AC0, 0x11AFF));
@@ -953,10 +955,12 @@ BlockTable::BlockTable()
     blocks.push_back(Block(BlockId::masaramGondi, "Masaram Gondi", "Masaram Gondi", 0x11D00, 0x11D5F));
     blocks.push_back(Block(BlockId::gunjalaGondi, "Gunjala Gondi", "Gunjala Gondi", 0x11D60, 0x11DAF));
     blocks.push_back(Block(BlockId::makasar, "Makasar", "Makasar", 0x11EE0, 0x11EFF));
+    blocks.push_back(Block(BlockId::tamilSup, "Tamil Sup", "Tamil Sup", 0x11FC0, 0x11FFE)); // 12.0
     blocks.push_back(Block(BlockId::cuneiform, "Cuneiform", "Cuneiform", 0x12000, 0x123FF));
     blocks.push_back(Block(BlockId::cuneiformNumbers, "Cuneiform Numbers", "Cuneiform Numbers and Punctuation", 0x12400, 0x1247F));
     blocks.push_back(Block(BlockId::earlyDynasticCuneiform, "Early Dynastic Cuneiform", "Early Dynastic Cuneiform", 0x12480, 0x1254F));
     blocks.push_back(Block(BlockId::egyptianHieroglyphs, "Egyptian Hieroglyphs", "Egyptian Hieroglyphs", 0x13000, 0x1342F));
+    blocks.push_back(Block(BlockId::egyptianHieroglyphFormatControls, "Egyptian Hieroglyph Format Controls", "Egyptian Hieroglyph Format Controls", 0x13430, 0x1343F)); // 12.0
     blocks.push_back(Block(BlockId::anatolianHieroglyphs, "Anatolian Hieroglyphs", "Anatolian Hieroglyphs", 0x14400, 0x1467F));
     blocks.push_back(Block(BlockId::bamumSup, "Bamum Sup", "Bamum Supplement", 0x16800, 0x16A3F));
     blocks.push_back(Block(BlockId::mro, "Mro", "Mro", 0x16A40, 0x16A6F));
@@ -969,6 +973,7 @@ BlockTable::BlockTable()
     blocks.push_back(Block(BlockId::tangutComponents, "Tangut Components", "Tangut Components", 0x18800, 0x18AFF));
     blocks.push_back(Block(BlockId::kanaSup, "Kana Sup", "Kana Supplement", 0x1B000, 0x1B0FF));
     blocks.push_back(Block(BlockId::kanaExtA, "Kana Ext A", "Kana Extended-A", 0x1B100, 0x1B12F));
+    blocks.push_back(Block(BlockId::smallKanaExt, "Small Kana Ext", "Small Kana Extension", 0x1B130, 0x1B16F)); // 12.0
     blocks.push_back(Block(BlockId::nushu, "Nushu", "Nushu", 0x1B170, 0x1B2FF));
     blocks.push_back(Block(BlockId::duployan, "Duployan", "Duployan", 0x1BC00, 0x1BC9F));
     blocks.push_back(Block(BlockId::shorthandFormatControls, "Shorthand Format Controls", "Shorthand Format Controls", 0x1BCA0, 0x1BCAF));
@@ -981,9 +986,12 @@ BlockTable::BlockTable()
     blocks.push_back(Block(BlockId::mathAlphanum, "Math Alphanum", "Mathematical Alphanumeric Symbols", 0x1D400, 0x1D7FF));
     blocks.push_back(Block(BlockId::suttonSignWriting, "Sutton SignWriting", "Sutton SignWriting", 0x1D800, 0x1DAAF));
     blocks.push_back(Block(BlockId::glagoliticSup, "Glagolitic Sup", "Glagolitic Supplement", 0x1E000, 0x1E02F));
+    blocks.push_back(Block(BlockId::nyiakengPuachueHmong, "Nyiakeng Puachue Hmong", "Nyiakeng Puachue Hmong", 0x1E100, 0x1E14F)); // 12.0
+    blocks.push_back(Block(BlockId::wancho, "Wancho", "Wancho", 0x1E2C0, 0x1E2FF)); // 12.0
     blocks.push_back(Block(BlockId::mendeKikakui, "Mende Kikakui", "Mende Kikakui", 0x1E800, 0x1E8DF));
     blocks.push_back(Block(BlockId::adlam, "Adlam", "Adlam", 0x1E900, 0x1E95F));
     blocks.push_back(Block(BlockId::indicSiyaqNumbers, "Indic Siyaq Numbers", "Indic Siyaq Numbers", 0x1EC70, 0x1ECBF));
+    blocks.push_back(Block(BlockId::ottomanSiyaqNumbers, "Ottoman Siyaq Numbers", "Ottoman Siyaq Numbers", 0x1ED00, 0x1ED4F)); // 12.0
     blocks.push_back(Block(BlockId::arabicMath, "Arabic Math", "Arabic Mathematical Alphabetic Symbols", 0x1EE00, 0x1EEFF));
     blocks.push_back(Block(BlockId::mahjong, "Mahjong", "Mahjong Tiles", 0x1F000, 0x1F02F));
     blocks.push_back(Block(BlockId::domino, "Domino", "Domino Tiles", 0x1F030, 0x1F09F));
@@ -999,6 +1007,7 @@ BlockTable::BlockTable()
     blocks.push_back(Block(BlockId::supArrowsC, "Sup Arrows C", "Supplemental Arrows-C", 0x1F800, 0x1F8FF));
     blocks.push_back(Block(BlockId::supSymbolsAndPictographs, "Sup Symbols And Pictographs", "Supplemental Symbols and Pictographs", 0x1F900, 0x1F9FF));
     blocks.push_back(Block(BlockId::chessSymbols, "Chess Symbols", "Chess Symbols", 0x1FA00, 0x1FA6F));
+    blocks.push_back(Block(BlockId::symbolsAndPictographsExtA, "Symbols And Pictographs Ext A", "Symbols And Pictographs Extended A", 0x1FA70, 0x1FAFF)); // 12.0
     blocks.push_back(Block(BlockId::cjkExtB, "CJK Ext B", "CJK Unified Ideographs Extension B", 0x20000, 0x2A6DF));
     blocks.push_back(Block(BlockId::cjkExtC, "CJK Ext C", "CJK Unified Ideographs Extension C", 0x2A700, 0x2B73F));
     blocks.push_back(Block(BlockId::cjkExtD, "CJK Ext D", "CJK Unified Ideographs Extension D", 0x2B740, 0x2B81F));
@@ -1200,6 +1209,8 @@ AgeTable::AgeTable()
     ages.push_back(Age(AgeId::age_9_0, "9.0"));
     ages.push_back(Age(AgeId::age_10_0, "10.0"));
     ages.push_back(Age(AgeId::age_11_0, "11.0"));
+    ages.push_back(Age(AgeId::age_12_0, "12.0"));
+    ages.push_back(Age(AgeId::age_12_1, "12.1"));
     for (const Age& age : ages)
     {
         ageIdMap[age.Id()] = &age;
@@ -1283,6 +1294,7 @@ ScriptTable::ScriptTable()
     scripts.push_back(Script(ScriptId::dupl, "Dupl", "Duployan"));
     scripts.push_back(Script(ScriptId::egyp, "Egyp", "Egyptian Hieroglyphs"));
     scripts.push_back(Script(ScriptId::elba, "Elba", "Elbasan"));
+    scripts.push_back(Script(ScriptId::elym, "Elym", "Elymaic")); // 12.0
     scripts.push_back(Script(ScriptId::ethi, "Ethi", "Ethiopian"));
     scripts.push_back(Script(ScriptId::geor, "Geor", "Georgian"));
     scripts.push_back(Script(ScriptId::glag, "Glag", "Glagolitic"));
@@ -1301,6 +1313,7 @@ ScriptTable::ScriptTable()
     scripts.push_back(Script(ScriptId::hira, "Hira", "Hiragana"));
     scripts.push_back(Script(ScriptId::hluw, "Hluw", "Anatolian Hieroglyphs"));
     scripts.push_back(Script(ScriptId::hmng, "Hmng", "Pahawh Hmong"));
+    scripts.push_back(Script(ScriptId::hmnp, "Hmnp", "Nyiakeng Puachue Hmong")); // 12.0
     scripts.push_back(Script(ScriptId::hrkt, "Hrkt", "Katakana Or Hiragana"));
     scripts.push_back(Script(ScriptId::hung, "Hung", "Old Hungarian"));
     scripts.push_back(Script(ScriptId::ital, "Ital", "Old Italic"));
@@ -1338,6 +1351,7 @@ ScriptTable::ScriptTable()
     scripts.push_back(Script(ScriptId::mtei, "Mtei", "Meetei Mayak"));
     scripts.push_back(Script(ScriptId::mult, "Mult", "Multani"));
     scripts.push_back(Script(ScriptId::mymr, "Mymr", "Myanmar"));
+    scripts.push_back(Script(ScriptId::nand, "Nand", "Nandinagari")); // 12.0
     scripts.push_back(Script(ScriptId::narb, "Narb", "Old North Arabian"));
     scripts.push_back(Script(ScriptId::nbat, "Nbat", "Nabataean"));
     scripts.push_back(Script(ScriptId::newa, "Newa", "Newa"));
@@ -1394,6 +1408,7 @@ ScriptTable::ScriptTable()
     scripts.push_back(Script(ScriptId::ugar, "Ugar", "Ugaritic"));
     scripts.push_back(Script(ScriptId::vaii, "Vaii", "Vai"));
     scripts.push_back(Script(ScriptId::wara, "Wara", "Warang Citi"));
+    scripts.push_back(Script(ScriptId::wcho, "Wcho", "Wcho")); // 12.0
     scripts.push_back(Script(ScriptId::xpeo, "Xpeo", "Old Persian"));
     scripts.push_back(Script(ScriptId::xsux, "Xsux", "Cuneiform"));
     scripts.push_back(Script(ScriptId::yiii, "Yiii", "Yi"));
@@ -2052,6 +2067,7 @@ void CharacterTable::Write()
     std::string ucdFilePath = CmajorUcdFilePath();
     BinaryWriter writer(ucdFilePath);
     WriteHeader(writer);
+    writer.Seek(headerSize);
     int n = pages.size();
     for (int i = 0; i < n; ++i)
     {
@@ -2106,6 +2122,7 @@ void CharacterTable::ReadHeader(BinaryReader& reader)
     }
     extendedHeaderStart = reader.ReadUInt();
     extendedHeaderEnd = reader.ReadUInt();
+    reader.Skip(headerSize - 16);
 }
 
 void CharacterTable::ReadExtendedHeader(BinaryReader& reader)
