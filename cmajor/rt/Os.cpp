@@ -531,14 +531,22 @@ extern "C" RT_API bool OsGetFileTimes(const char* filePath, uint8_t* ctime, uint
 {
     WIN32_FILE_ATTRIBUTE_DATA fileInfo;
     SYSTEMTIME systemTime;
+    SYSTEMTIME localTime;
     if (GetFileAttributesEx(filePath, GetFileExInfoStandard, &fileInfo))
     {
         if (FileTimeToSystemTime(&fileInfo.ftCreationTime, &systemTime))
         {
-            cmajor::util::DateTime dtCreationTime(cmajor::util::Date(systemTime.wYear, static_cast<cmajor::util::Month>(systemTime.wMonth), systemTime.wDay),
-                60 * 60 * systemTime.wHour + 60 * systemTime.wMinute + systemTime.wSecond);
-            cmajor::util::MemoryWriter ctimeWriter(ctime, 8);
-            ctimeWriter.Write(dtCreationTime);
+            if (SystemTimeToTzSpecificLocalTime(NULL, &systemTime, &localTime))
+            {
+                cmajor::util::DateTime dtCreationTime(cmajor::util::Date(localTime.wYear, static_cast<cmajor::util::Month>(localTime.wMonth), localTime.wDay),
+                    60 * 60 * localTime.wHour + 60 * localTime.wMinute + localTime.wSecond);
+                cmajor::util::MemoryWriter ctimeWriter(ctime, 8);
+                ctimeWriter.Write(dtCreationTime);
+            }
+            else
+            {
+                return false;
+            }
         }
         else
         {
@@ -546,10 +554,17 @@ extern "C" RT_API bool OsGetFileTimes(const char* filePath, uint8_t* ctime, uint
         }
         if (FileTimeToSystemTime(&fileInfo.ftLastWriteTime, &systemTime))
         {
-            cmajor::util::DateTime dtWriteTime(cmajor::util::Date(systemTime.wYear, static_cast<cmajor::util::Month>(systemTime.wMonth), systemTime.wDay),
-                60 * 60 * systemTime.wHour + 60 * systemTime.wMinute + systemTime.wSecond);
-            cmajor::util::MemoryWriter mtimeWriter(mtime, 8);
-            mtimeWriter.Write(dtWriteTime);
+            if (SystemTimeToTzSpecificLocalTime(NULL, &systemTime, &localTime))
+            {
+                cmajor::util::DateTime dtWriteTime(cmajor::util::Date(localTime.wYear, static_cast<cmajor::util::Month>(localTime.wMonth), localTime.wDay),
+                    60 * 60 * localTime.wHour + 60 * localTime.wMinute + localTime.wSecond);
+                cmajor::util::MemoryWriter mtimeWriter(mtime, 8);
+                mtimeWriter.Write(dtWriteTime);
+            }
+            else
+            {
+                return false;
+            }
         }
         else
         {
@@ -557,10 +572,17 @@ extern "C" RT_API bool OsGetFileTimes(const char* filePath, uint8_t* ctime, uint
         }
         if (FileTimeToSystemTime(&fileInfo.ftLastAccessTime, &systemTime))
         {
-            cmajor::util::DateTime dtAccessTime(cmajor::util::Date(systemTime.wYear, static_cast<cmajor::util::Month>(systemTime.wMonth), systemTime.wDay),
-                60 * 60 * systemTime.wHour + 60 * systemTime.wMinute + systemTime.wSecond);
-            cmajor::util::MemoryWriter atimeWriter(atime, 8);
-            atimeWriter.Write(dtAccessTime);
+            if (SystemTimeToTzSpecificLocalTime(NULL, &systemTime, &localTime))
+            {
+                cmajor::util::DateTime dtAccessTime(cmajor::util::Date(localTime.wYear, static_cast<cmajor::util::Month>(localTime.wMonth), localTime.wDay),
+                    60 * 60 * localTime.wHour + 60 * localTime.wMinute + localTime.wSecond);
+                cmajor::util::MemoryWriter atimeWriter(atime, 8);
+                atimeWriter.Write(dtAccessTime);
+            }
+            else
+            {
+                return false;
+            }
         }
         else
         {

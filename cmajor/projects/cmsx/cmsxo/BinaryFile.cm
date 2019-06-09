@@ -6,12 +6,17 @@ using cmsx.machine;
 namespace cmsx.object
 {
     public const char objectFileVersion_1 = '1';
+    public const char objectFileVersion_2 = '2'; 
     public const char libraryFileVersion_1 = '1';
+    public const char libraryFileVersion_2 = '2';
     public const char executableFileVersion_1 = '1';
+    public const char executableFileVersion_2 = '2';
 
-    public const char currentObjectFileVersion = objectFileVersion_1;
-    public const char currentLibraryFileVersion = libraryFileVersion_1;
-    public const char currentExecutableFileVersion = executableFileVersion_1;
+    public const char currentObjectFileVersion = objectFileVersion_2;
+    public const char currentLibraryFileVersion = libraryFileVersion_2;
+    public const char currentExecutableFileVersion = executableFileVersion_2;
+
+    public const ulong fileBlockSize = 4096u;
 
     public string ObjectFileVersionStr()
     {
@@ -96,9 +101,20 @@ namespace cmsx.object
         writer.Write(x0);
     }
 
-    public UniquePtr<BinaryFile> ReadBinaryFile(System.IO.BinaryReader& reader, const string& fileName)
+    public enum ReadOption : int
+    {
+        readAll = 0, readHeadersOnly = 1
+    }
+
+    public UniquePtr<BinaryFile> ReadBinaryFile(System.IO.BinaryReader& reader, const string& fileName, ReadOption readOption)
     {
         UniquePtr<BinaryFile> file;
+        ulong fileOffset = cast<ulong>(reader.Tell());
+        if (fileOffset > 0u)
+        {
+            fileOffset = ((fileOffset - 1u) / fileBlockSize + 1u) * fileBlockSize;
+        }
+        reader.Seek(cast<long>(fileOffset), Origin.seekSet);
         string fileHeaderName = ReadHeaderName(fileName, reader, 8);
         string headerBaseName = fileHeaderName.Substring(0, fileHeaderName.Length() - 1);
         string fileVersion = fileHeaderName.Substring(fileHeaderName.Length() - 1, 1);
@@ -139,8 +155,13 @@ namespace cmsx.object
         {
             throw Exception("invalid file " + fileName + " header '" + headerBaseName + "' not CMSXOBJ, CMSXLIB or CMSXEXE");
         }
-        file->Read(reader);
+        file->Read(reader, readOption);
         return file;
+    }
+
+    public UniquePtr<BinaryFile> ReadBinaryFile(System.IO.BinaryReader& reader, const string& fileName)
+    {
+        return ReadBinaryFile(reader, fileName, ReadOption.readAll);
     }
 
     public UniquePtr<BinaryFile> ReadBinaryFile(const string& fileName)
@@ -250,7 +271,7 @@ namespace cmsx.object
             System.IO.BinaryWriter writer = System.IO.File.CreateBinary(fileName);
             Write(writer);
         }
-        public virtual void Write(System.IO.BinaryWriter& writer)
+        public void WriteHeader(System.IO.BinaryWriter& writer)
         {
             WriteHeaderName(writer, headerSection->name);
             headerSection->Write(writer);
@@ -259,10 +280,15 @@ namespace cmsx.object
             for (const UniquePtr<Section>& section : sections)
             {
                 WriteHeaderName(writer, section->name);
-                section->Write(writer);
+                writer.Write(section->fileOffset);
+                writer.Write(section->length);
             }
+            WriteExtendedHeader(writer);
         }
-        public virtual void Read(System.IO.BinaryReader& reader)
+        public virtual void WriteExtendedHeader(System.IO.BinaryWriter& writer)
+        {
+        }
+        public void ReadHeader(System.IO.BinaryReader& reader)
         {
             headerSection->Read(reader);
             ulong numSections = ReadULong(fileName, reader);
@@ -270,9 +296,65 @@ namespace cmsx.object
             {
                 string sectionName = ReadHeaderName(fileName, reader, 4);
                 Section* section = CreateSection(sectionName);
+                section->fileOffset = reader.ReadULong();
+                section->length = reader.ReadULong();
                 AddSection(section);
-                section->Read(reader);
             }
+            ReadExtendedHeader(reader);
+        }
+        public virtual void ReadExtendedHeader(System.IO.BinaryReader& reader)
+        {
+        }
+        public void Write(System.IO.BinaryWriter& writer)
+        {
+            ulong prevFileOffset = cast<ulong>(writer.Tell());
+            if (prevFileOffset > 0u)
+            {
+                prevFileOffset = ((prevFileOffset - 1u) / fileBlockSize + 1u) * fileBlockSize;
+            }
+            writer.Seek(cast<long>(prevFileOffset), Origin.seekSet);
+            WriteHeader(writer);
+            for (const UniquePtr<Section>& section : sections)
+            {
+                ulong sectionFileOffset = cast<ulong>(writer.Tell());
+                if (sectionFileOffset > 0u)
+                {
+                    sectionFileOffset = ((sectionFileOffset - 1u) / fileBlockSize + 1u) * fileBlockSize;
+                }
+                writer.Seek(cast<long>(sectionFileOffset), Origin.seekSet);
+                section->fileOffset = sectionFileOffset;
+                section->Write(writer);
+            }
+            ulong currentFileOffset = cast<ulong>(writer.Tell());
+            if (currentFileOffset > 0u)
+            {
+                currentFileOffset = ((currentFileOffset - 1u) / fileBlockSize + 1u) * fileBlockSize;
+            }
+            writer.Seek(cast<long>(prevFileOffset), Origin.seekSet);
+            WriteHeader(writer);
+            writer.Seek(cast<long>(currentFileOffset), Origin.seekSet);
+            WriteExtended(writer);
+        }
+        public virtual void WriteExtended(System.IO.BinaryWriter& writer)
+        {
+        }
+        public void Read(System.IO.BinaryReader& reader, ReadOption readOption)
+        {
+            ReadHeader(reader);
+            if (readOption == ReadOption.readAll)
+            {
+                long n = sections.Count();
+                for (long i = 0; i < n; ++i)
+                {
+                    Section* section = sections[i].Get();
+                    reader.Seek(cast<long>(section->fileOffset), Origin.seekSet);
+                    section->Read(reader);
+                }
+                ReadExtended(reader);
+            }
+        }
+        public virtual void ReadExtended(System.IO.BinaryReader& reader)
+        {
         }
         public virtual void AddSymbolsToAddressMap()
         {
@@ -383,24 +465,37 @@ namespace cmsx.object
         public LibraryFile(const string& fileName_, bool initSymbolTable) : this(fileName_, true, initSymbolTable)
         {
         }
-        public override void Write(System.IO.BinaryWriter& writer)
+        public override void WriteExtendedHeader(System.IO.BinaryWriter& writer)
         {
-            base->Write(writer);
             ulong numObjectFiles = cast<ulong>(objectFiles.Count());
             WriteULong(writer, numObjectFiles);
             for (const UniquePtr<ObjectFile>& objectFile : objectFiles)
             {
                 writer.Write(objectFile->FileName());
+            }
+        }
+        public override void WriteExtended(System.IO.BinaryWriter& writer)
+        {
+            for (const UniquePtr<ObjectFile>& objectFile : objectFiles)
+            {
                 objectFile->Write(writer);
             }
         }
-        public override void Read(System.IO.BinaryReader& reader)
+        public override void ReadExtendedHeader(System.IO.BinaryReader& reader)
         {
-            base->Read(reader);
             ulong numObjectFiles = ReadULong(FileName(), reader);
             for (ulong i = 0u; i < numObjectFiles; ++i)
             {
                 string objectFileName = reader.ReadString();
+                objectFileNames.Add(objectFileName);
+            }
+        }
+        public override void ReadExtended(System.IO.BinaryReader& reader)
+        {
+            long n = objectFileNames.Count();
+            for (long i = 0u; i < n; ++i)
+            {
+                const string& objectFileName = objectFileNames[i];
                 UniquePtr<BinaryFile> binaryFile = ReadBinaryFile(reader, objectFileName);
                 if (binaryFile.Get() is ObjectFile*)
                 {
@@ -423,6 +518,7 @@ namespace cmsx.object
             }
         }
         public List<UniquePtr<ObjectFile>> objectFiles;
+        public List<string> objectFileNames;
     }
 
     public class ExecutableFile : BinaryFile
@@ -528,10 +624,10 @@ namespace cmsx.object
 
     public class Section
     {
-        public nothrow Section() : file(null), name(), pos(0), baseAddress(0u), length(0u), copyStartPos(0u), removeOffset(0u)
+        public nothrow Section() : file(null), name(), pos(0), baseAddress(0u), length(0u), copyStartPos(0u), removeOffset(0u), fileOffset(0u)
         {
         }
-        public nothrow Section(BinaryFile* file_, const string& name_) : file(file_), name(name_), pos(0), baseAddress(0u), length(0u), copyStartPos(0u), removeOffset(0u)
+        public nothrow Section(BinaryFile* file_, const string& name_) : file(file_), name(name_), pos(0), baseAddress(0u), length(0u), copyStartPos(0u), removeOffset(0u), fileOffset(0u)
         {
         }
         public default virtual ~Section();
@@ -797,6 +893,7 @@ namespace cmsx.object
         public ulong copyStartPos;
         public ulong removeOffset;
         public Section* copyTargetSection;
+        public ulong fileOffset;
     }
 
     public class ObjectFileHeaderSection : Section

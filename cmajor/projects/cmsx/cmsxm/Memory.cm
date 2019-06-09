@@ -21,6 +21,10 @@ namespace cmsx.machine
     public const ulong pageOffsetMask = 0x0FFFu;
     public const byte pageOffsetBits = 12u;
     public const ushort numPtesInPage = 512u;
+    public const ushort numDirectTranslationCaches = 16u;
+    public const int numTranslationCacheEntries = 4096;
+    public const ulong translationCacheIndexMask = (4096u / numSegments) - 1u;
+    public const int numTranslationCacheIndexSegmentEntries = 1024;
     public const ushort numSegmentPageEntriesInRootPage = numPtesInPage / numSegments; // 128
     public const ushort numDirectEntries = numSegmentPageEntriesInRootPage - 3u; // 128 - 3 = 125
     public const ushort pteOffsetMask = 0x1FFu; // 511
@@ -55,6 +59,23 @@ namespace cmsx.machine
     public const int maxTraps = 256;
     public const ulong trapTableBaseAddress = interruptVectorEndAddress;
     public const ulong trapTableEndAddress = trapTableBaseAddress + cast<ulong>(maxTraps) * 8u;
+
+    private bool useTranslationCache = true;
+
+    public nothrow inline bool UseTranslationCache()
+    {
+        return useTranslationCache;
+    }
+
+    public nothrow bool GetUseTranslationCache()
+    {
+        return useTranslationCache;
+    }
+
+    public nothrow void SetUseTranslationCacheValue(bool use)
+    {
+        useTranslationCache = use;
+    }
 
     public delegate ulong KernelMaxStackSizeFunction(ushort addressSpaceNumber);
     public delegate bool KernelGrowStackFunction(ushort addressSpaceNumber);
@@ -136,6 +157,16 @@ namespace cmsx.machine
         return s;
     }
 
+    public nothrow void PrintAddressValues(bool get, ushort addressSpaceNumber, ulong pageAddress, int entryIndex, ulong sourcePageNumber)
+    {
+        string getSetStr = "get";
+        if (!get)
+        {
+            getSetStr = "set";
+        }
+        Console.Out() << getSetStr << ": space=" << addressSpaceNumber << ", page=" << ToHexString(pageAddress) << ", entry=" << entryIndex << ", source=" << ToHexString(sourcePageNumber) << endl();
+    }
+
     public inline nothrow ulong GetPageNumber(ulong address)
     {
         ulong pageNumber = address / pageSize;
@@ -193,6 +224,11 @@ namespace cmsx.machine
     public inline nothrow byte GetSegmentIndex(ulong virtualAddress)
     {
         return cast<byte>((virtualAddress >> segmentNumberShift) & segmentNumberMask);
+    }
+
+    public inline nothrow ulong GetSegmentPart(ulong virtualAddress)
+    {
+        return cast<ulong>(GetSegmentIndex(virtualAddress)) << cast<ulong>(segmentNumberShift);
     }
 
     public inline nothrow ushort MakeSegmentOffset(byte segmentIndex)
@@ -301,6 +337,50 @@ namespace cmsx.machine
         WriteMemoryByte(a + 5u, m5);
         WriteMemoryByte(a + 6u, m6);
         WriteMemoryByte(a + 7u, m7);
+    }
+
+    public class AddressTranslationCacheEntry
+    {
+        public nothrow AddressTranslationCacheEntry() : sourcePageNumber(invalidAddress), targetPageNumber(invalidAddress)
+        {
+        }
+        public ulong sourcePageNumber;
+        public ulong targetPageNumber;
+    }
+
+    public class AddressTranslationCache
+    {
+        public nothrow AddressTranslationCache() : entries()
+        {
+        }
+        public nothrow void Clear()
+        {
+            for (int i = 0; i < numTranslationCacheEntries; ++i)
+            {
+                entries[i] = AddressTranslationCacheEntry();
+            }
+        }
+        public nothrow inline ulong GetEntry(ulong virtualAddress, int& entryIndex, ulong& sourcePageNumber)
+        {
+            entryIndex = cast<int>((virtualAddress >> pageOffsetBits) & translationCacheIndexMask) + numTranslationCacheIndexSegmentEntries * cast<int>(GetSegmentIndex(virtualAddress));
+            sourcePageNumber = GetSegmentPart(virtualAddress) | GetPageNumber(virtualAddress & virtualAddressBaseMask);
+            const AddressTranslationCacheEntry& entry = entries[entryIndex];
+            if (entry.sourcePageNumber == sourcePageNumber)
+            {
+                return entry.targetPageNumber;
+            }
+            else
+            {
+                return invalidAddress;
+            }
+        }
+        public nothrow inline void SetEntry(int entryIndex, ulong sourcePageNumber, ulong targetPageNumber)
+        {
+            AddressTranslationCacheEntry& entry = entries[entryIndex];
+            entry.sourcePageNumber = sourcePageNumber;
+            entry.targetPageNumber = targetPageNumber;
+        }
+        public AddressTranslationCacheEntry[numTranslationCacheEntries] entries;
     }
 
     public class Memory
@@ -509,16 +589,95 @@ namespace cmsx.machine
             }
             return pte;
         }
+        public nothrow inline AddressTranslationCache& GetTranslationCache(ushort addressSpaceNumber)
+        {
+            if (addressSpaceNumber < numDirectTranslationCaches)
+            {
+                return directTranslationCaches[addressSpaceNumber];
+            }
+            else
+            {
+                AddressTranslationCache* cache = mappedTranslationCaches[addressSpaceNumber];
+                if (cache != null)
+                {
+                    return *cache;
+                }
+                else
+                {
+                    cache = new AddressTranslationCache();
+                    mappedTranslationCaches[addressSpaceNumber] = cache;
+                    return *cache;
+                }
+            }
+        }
+        public nothrow void ClearTranslationCache(ushort addressSpaceNumber)
+        {
+            if (!UseTranslationCache()) return;
+            AddressTranslationCache& cache = GetTranslationCache(addressSpaceNumber);
+            cache.Clear();
+        }
+        public nothrow void DisposeTranslationCache(ushort addressSpaceNumber)
+        {
+            if (!UseTranslationCache()) return;
+            if (addressSpaceNumber < numDirectTranslationCaches)
+            {
+                directTranslationCaches[addressSpaceNumber].Clear();
+            }
+            else
+            {
+                AddressTranslationCache* cache = mappedTranslationCaches[addressSpaceNumber];
+                if (cache != null)
+                {
+                    delete cache;
+                    mappedTranslationCaches[addressSpaceNumber] = null;
+                }
+            }
+        }
+        public nothrow bool GetAddressFromTranslationCache(ulong virtualAddress, ushort& addressSpaceNumber, ulong& pageAddress, ushort& offset, int& entryIndex, ulong& sourcePageNumber)
+        {
+            ulong rv = machine.GetRegisters().GetSpecial(Registers.rV);
+            ulong rootPageAddress = 0u;
+            addressSpaceNumber = 0u;
+            UnpackVirtualTranslationRegisterValue(rv, rootPageAddress, addressSpaceNumber);
+            offset = cast<ushort>(virtualAddress & pageOffsetMask);
+            AddressTranslationCache& cache = GetTranslationCache(addressSpaceNumber);
+            pageAddress = cache.GetEntry(virtualAddress, entryIndex, sourcePageNumber);
+            if (pageAddress == invalidAddress)
+            {
+                pageAddress = 0u;
+                addressSpaceNumber = 0u;
+                return false;
+            }
+            else
+            {
+                return true;
+            }
+        }
+        public nothrow inline void SetAddressToTranslationCache(ushort addressSpaceNumber, ulong pageAddress, int entryIndex, ulong sourcePageNumber)
+        {
+            AddressTranslationCache& cache = GetTranslationCache(addressSpaceNumber);
+            cache.SetEntry(entryIndex, sourcePageNumber, pageAddress);
+        }
         public nothrow ulong TranslateAddress(ulong virtualAddress, Protection access, bool pageFault)
         {
+            ulong pageAddress = 0u;
+            ushort offset = 0u;
+            int entryIndex = 0;
+            ulong sourcePageNumber = 0u;
+            ushort addressSpaceNumber = 0u;
+            if (UseTranslationCache())
+            {
+                bool foundFromCache = GetAddressFromTranslationCache(virtualAddress, addressSpaceNumber, pageAddress, offset, entryIndex, sourcePageNumber);
+                if (foundFromCache)
+                {
+                    return pageAddress + offset;
+                }
+            }
             if (CheckSecurityViolation(virtualAddress))
             {
                 return invalidAddress;
             }
             byte segmentIndex = 0u;
-            ulong pageAddress = 0u;
-            ushort offset = 0u;
-            ushort addressSpaceNumber = 0u;
             Protection pageProtection = Protection.notPresent;
             ulong pteAddress = 0u;
             ulong pte = GetPageTableEntry(virtualAddress, segmentIndex, pageAddress, offset, addressSpaceNumber, pageProtection, pteAddress);
@@ -575,6 +734,10 @@ namespace cmsx.machine
                     PageFault(virtualAddress, pageProtection, access);
                 }
                 return invalidAddress;
+            }
+            if (UseTranslationCache())
+            {
+                SetAddressToTranslationCache(addressSpaceNumber, pageAddress, entryIndex, sourcePageNumber);
             }
             ulong physicalAddress = pageAddress + offset;
             return physicalAddress;
@@ -708,5 +871,7 @@ namespace cmsx.machine
         private HashMap<ulong, PageFrame*> pageFrameMap;
         private PageFrame* freePageFrameList;
         private Machine& machine;
+        private AddressTranslationCache[16] directTranslationCaches;
+        private HashMap<ushort, AddressTranslationCache*> mappedTranslationCaches;
     }
 }

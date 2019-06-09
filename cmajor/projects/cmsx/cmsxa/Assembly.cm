@@ -362,7 +362,7 @@ namespace cmsx.assembly
         private AssemblyGrammar* grammar;
     }
 
-    public void ProcessAssemblyFile(long index, const string& assemblyFilePath, bool verbose)
+    public void ProcessAssemblyFile(long index, const string& assemblyFilePath, bool verbose, const string& outdir)
     {
         if (verbose)
         {
@@ -373,6 +373,10 @@ namespace cmsx.assembly
         List<UniquePtr<Instruction>> instructions;
         AssemblyFileParser.Instance().Parse(index, assemblyFileContent, assemblyFilePath, &instructions);
         string objectFilePath = Path.ChangeExtension(assemblyFilePath, ".o");
+        if (!outdir.IsEmpty())
+        {
+            objectFilePath = Path.Combine(outdir, Path.GetFileNameWithoutExtension(assemblyFilePath) + ".o");
+        }
         Assembler assembler(objectFilePath);
         assembler.Assemble(instructions);
         cmsx.object.LinkInternal(assembler.objectFile);

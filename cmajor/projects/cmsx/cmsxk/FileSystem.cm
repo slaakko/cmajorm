@@ -346,7 +346,7 @@ namespace cmsx.kernel
                 LogMessage("fs.unlink", "return.inode=" + inode->ToString());
             }
         }
-        public void MakeDirectory(Process* process, const string& path)
+        public void MakeDirectory(Process* process, const string& path, int mode)
         {
             if (Log())
             {
@@ -455,17 +455,11 @@ namespace cmsx.kernel
             inode->SetType(FileType.directory);
             if (path == "/" && process == null)
             {
-                inode->SetOwnerAccess(cast<Access>(Access.read | Access.write | Access.execute));
-                inode->SetGroupAccess(cast<Access>(Access.read | Access.write | Access.execute));
-                inode->SetOtherAccess(cast<Access>(Access.read | Access.write | Access.execute));
                 inode->SetUID(0);
                 inode->SetGID(0);
             }
             else
             {
-                inode->SetOwnerAccess(cast<Access>(Access.read | Access.write | Access.execute));
-                inode->SetGroupAccess(cast<Access>(Access.read | Access.write | Access.execute));
-                inode->SetOtherAccess(cast<Access>(Access.read | Access.write | Access.execute));
                 if (process == null)
                 {
                     inode->SetUID(0);
@@ -477,11 +471,18 @@ namespace cmsx.kernel
                     inode->SetGID(process->gid);
                 }
             }
+            if (mode == 0)
+            {
+                mode = EncodeMode(INode.Flags.none, FileType.directory,
+                    cast<Access>(Access.read | Access.write | Access.execute),
+                    cast<Access>(Access.read | Access.write | Access.execute),
+                    cast<Access>(Access.read | Access.write | Access.execute));
+            }
             if (process != null)
             {
-                inode->SetMode();
-                inode->SetAccessMode(inode->Mode() & ~process->umask);
+                mode = mode & ~process->umask;
             }
+            inode->SetAccessMode(mode);
             int blockNumber = 0;
             int blockOffset = 0;
             GetBlockManager()->GetBlockNumber(inode, 0, blockNumber, blockOffset, true);
@@ -676,6 +677,36 @@ namespace cmsx.kernel
             writer.Write(inode->MTime());
             writer.Write(inode->ATime());
             WriteProcessMemory(machine, process, statBufAddress, &statBuf[0], cast<ulong>(statBuf.Length()), Protection.write);
+        }
+        public void ChangeMode(Process* process, const string& path, int mode)
+        {
+            INode* inode = GetINodeManager()->PathToINode(process, path);
+            if (inode == null)
+            {
+                throw SystemError(ENOENT, "path '" + path + "' does not exist");
+            }
+            INodePutter putter(inode);
+            FileSystem* fs = GetMountTable().GetFileSystem(inode->Key().fsNumber);
+            fs->ChangeMode(process, path, inode, mode);
+        }
+        public virtual void ChangeMode(Process* process, const string& path, INode* inode, int mode)
+        {
+            throw SystemError(EINVAL, "error changing mode of '" + path + "': file system '" + name + "' does not support chmod");
+        }
+        public void UpdateFileTimes(Process* process, const string& path, const DateTime& atime, const DateTime& mtime)
+        {
+            INode* inode = GetINodeManager()->PathToINode(process, path);
+            if (inode == null)
+            {
+                throw SystemError(ENOENT, "path '" + path + "' does not exist");
+            }
+            INodePutter putter(inode);
+            FileSystem* fs = GetMountTable().GetFileSystem(inode->Key().fsNumber);
+            fs->UpdateFileTimes(process, path, inode, atime, mtime);
+        }
+        public virtual void UpdateFileTimes(Process* process, const string& path, INode* inode, const DateTime& atime, const DateTime& mtime)
+        {
+            throw SystemError(EINVAL, "error updating file times of '" + path + "': file system '" + name + "' does not support utime");
         }
         public virtual void FillINode(INode* inode)
         {

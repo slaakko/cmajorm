@@ -101,6 +101,15 @@ namespace System.Os
         return result;
     }
     
+    public void Chmod(const char* path, int mode)
+    {
+        int result = chmod(path, mode);
+        if (result == -1)
+        {
+            ThrowSystemError();
+        }
+    }
+    
     public nothrow void* PoolEnd()
     {
         return pool_end();
@@ -154,7 +163,12 @@ namespace System.Os
     
     public void Mkdir(const char* path)
     {
-        int result = mkdir(path);
+        Mkdir(path, 0);
+    }
+    
+    public void Mkdir(const char* path, int mode)
+    {
+        int result = mkdir(path, mode);
         if (result == -1)
         {
             ThrowSystemError();
@@ -370,6 +384,19 @@ namespace System.Os
         int result = ioctl(fd, IOCTL_SET_ECHO_ITEM, &buffer[0], buffer.Length());
         if (result == -1)
         {   
+            ThrowSystemError();
+        }
+    }
+    
+    public void UTime(const char* path, const DateTime& atime, const DateTime& mtime)
+    {
+        byte[16] buffer;
+        MemoryWriter writer(&buffer[0], buffer.Length());
+        writer.Write(atime);
+        writer.Write(mtime);
+        int result = utime(path, &buffer[0]);
+        if (result == -1)
+        {
             ThrowSystemError();
         }
     }

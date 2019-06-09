@@ -169,6 +169,27 @@ namespace cmsx.kernel
         GlobalMemoryTable.Instance().AddMemoryTable(&memoryTable);
     }
 
+    public nothrow void InitializeMemoryTable(Machine& machine, MemoryTable& targetMemoryTable, const MemoryTable& sourceMemoryTable, ulong poolSegmentSize)
+    {
+        Memory& mem = machine.GetMemory();
+        targetMemoryTable.rootPageAddress = mem.AllocateRootPage();
+        targetMemoryTable.addressSpaceNumber = GetNextAddressSpaceNumber();
+        ShareSegment(mem, textSegmentIndex, targetMemoryTable, sourceMemoryTable, Protection.execute);
+        targetMemoryTable.segmentDescriptors[dataSegmentIndex] = CreateSegmentDescriptor(
+            sourceMemoryTable.segmentDescriptors[dataSegmentIndex]->startAddress,
+            sourceMemoryTable.segmentDescriptors[dataSegmentIndex]->baseAddress,
+            sourceMemoryTable.segmentDescriptors[dataSegmentIndex]->length);
+        targetMemoryTable.segmentDescriptors[poolSegmentIndex] = CreateSegmentDescriptor(0u, poolSegmentBaseAddress, poolSegmentSize);
+        targetMemoryTable.segmentDescriptors[stackSegmentIndex] = CreateSegmentDescriptor(
+            sourceMemoryTable.segmentDescriptors[stackSegmentIndex]->startAddress,
+            sourceMemoryTable.segmentDescriptors[stackSegmentIndex]->baseAddress,
+            sourceMemoryTable.segmentDescriptors[stackSegmentIndex]->length,
+            sourceMemoryTable.segmentDescriptors[stackSegmentIndex]->maxLength,
+            sourceMemoryTable.segmentDescriptors[stackSegmentIndex]->increment);
+        targetMemoryTable.virtualTranslationRegisterValue = MakeVirtualTranslationRegisterValue(targetMemoryTable.rootPageAddress, targetMemoryTable.addressSpaceNumber);
+        GlobalMemoryTable.Instance().AddMemoryTable(&targetMemoryTable);
+    }
+
     public nothrow void InitializeMemoryTableForCloning(Machine& machine, MemoryTable& memoryTable)
     {
         Memory& mem = machine.GetMemory();
@@ -1340,6 +1361,7 @@ namespace cmsx.kernel
 
     public void AllocateMemory(Memory& mem, const MemoryTable& memoryTable)
     {
+        mem.ClearTranslationCache(memoryTable.addressSpaceNumber);
         for (byte i = 0u; i < numSegments; ++i)
         {
             SegmentDescriptor* sd = memoryTable.segmentDescriptors[i];
@@ -1375,6 +1397,7 @@ namespace cmsx.kernel
         }
         mem.FreeRootPage(memoryTable.rootPageAddress);
         memoryTable.rootPageAddress = 0u;
+        mem.DisposeTranslationCache(memoryTable.addressSpaceNumber);
         GlobalMemoryTable.Instance().RemoveMemoryTable(&memoryTable);
     }
 
@@ -1385,6 +1408,7 @@ namespace cmsx.kernel
 
     public void CloneMemory(Memory& mem, MemoryTable& targetMemoryTable, MemoryTable& sourceMemoryTable, bool copyOnWrite)
     {
+        mem.ClearTranslationCache(targetMemoryTable.addressSpaceNumber);
         for (byte i = 0u; i < numSegments; ++i)
         {
             SegmentDescriptor* sd = sourceMemoryTable.segmentDescriptors[i];
@@ -1435,6 +1459,7 @@ namespace cmsx.kernel
             ulong oldLength = sd->length;
             ulong newLength = oldLength + numPages * pageSize;
             sd->length = newLength;
+            mem.ClearTranslationCache(memoryTable.addressSpaceNumber);
         }
     }
 
@@ -1469,6 +1494,7 @@ namespace cmsx.kernel
             ulong oldLength = sd->length;
             ulong newLength = oldLength - numPages * pageSize;
             sd->length = newLength;
+            mem.ClearTranslationCache(memoryTable.addressSpaceNumber);
         }
     }
 

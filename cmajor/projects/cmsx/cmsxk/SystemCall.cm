@@ -6,39 +6,42 @@ namespace cmsx.kernel
     public const byte sys_exit = 0u;
     public const byte sys_wait = 1u;
     public const byte sys_fork = 2u;
-    public const byte sys_create = 3u;
-    public const byte sys_open = 4u;
-    public const byte sys_close = 5u;
-    public const byte sys_read = 6u;
-    public const byte sys_write = 7u;
-    public const byte sys_seek = 8u;
-    public const byte sys_tell = 9u;
-    public const byte sys_pool_end = 10u;
-    public const byte sys_set_pool_end = 11u;
-    public const byte sys_debug_break = 12u;
-    public const byte sys_stack_trace = 13u;
-    public const byte sys_throw = 14u;
-    public const byte sys_catch = 15u;
-    public const byte sys_resume = 16u;
-    public const byte sys_get_system_error = 17u;
-    public const byte sys_get_current_time_point = 18u;
-    public const byte sys_sleep = 19u;
-    public const byte sys_get_current_date = 20u;
-    public const byte sys_get_current_date_time = 21u;
-    public const byte sys_pow = 22u;
-    public const byte sys_get_random_seed = 23u;
-    public const byte sys_link = 24u;
-    public const byte sys_unlink = 25u;
-    public const byte sys_mkdir = 26u;
-    public const byte sys_opendir = 27u;
-    public const byte sys_readdir = 28u;
-    public const byte sys_closedir = 29u;
-    public const byte sys_getcwd = 30u;
-    public const byte sys_chdir = 31u;
-    public const byte sys_stat = 32u;
-    public const byte sys_umask = 33u;
-    public const byte sys_ioctl = 34u;
-    public const byte numSystemCalls = sys_ioctl + 1u;
+    public const byte sys_exec = 3u;
+    public const byte sys_create = 4u;
+    public const byte sys_open = 5u;
+    public const byte sys_close = 6u;
+    public const byte sys_read = 7u;
+    public const byte sys_write = 8u;
+    public const byte sys_seek = 9u;
+    public const byte sys_tell = 10u;
+    public const byte sys_pool_end = 11u;
+    public const byte sys_set_pool_end = 12u;
+    public const byte sys_debug_break = 13u;
+    public const byte sys_stack_trace = 14u;
+    public const byte sys_throw = 15u;
+    public const byte sys_catch = 16u;
+    public const byte sys_resume = 17u;
+    public const byte sys_get_system_error = 18u;
+    public const byte sys_get_current_time_point = 19u;
+    public const byte sys_sleep = 20u;
+    public const byte sys_get_current_date = 21u;
+    public const byte sys_get_current_date_time = 22u;
+    public const byte sys_pow = 23u;
+    public const byte sys_get_random_seed = 24u;
+    public const byte sys_link = 25u;
+    public const byte sys_unlink = 26u;
+    public const byte sys_mkdir = 27u;
+    public const byte sys_opendir = 28u;
+    public const byte sys_readdir = 29u;
+    public const byte sys_closedir = 30u;
+    public const byte sys_getcwd = 31u;
+    public const byte sys_chdir = 32u;
+    public const byte sys_stat = 33u;
+    public const byte sys_umask = 34u;
+    public const byte sys_ioctl = 35u;
+    public const byte sys_chmod = 36u;
+    public const byte sys_utime = 37u;
+    public const byte numSystemCalls = sys_utime + 1u;
 
     public nothrow string SystemCallName(byte systemCall)
     {
@@ -47,6 +50,7 @@ namespace cmsx.kernel
             case sys_exit: return "sys_exit";
             case sys_wait: return "sys_wait";
             case sys_fork: return "sys_fork";
+            case sys_exec: return "sys_exec";
             case sys_create: return "sys_create";
             case sys_open: return "sys_open";
             case sys_close: return "sys_close";
@@ -79,6 +83,8 @@ namespace cmsx.kernel
             case sys_stat: return "sys_stat";
             case sys_umask: return "sys_umask";
             case sys_ioctl: return "sys_ioctl";
+            case sys_chmod: return "sys_chmod";
+            case sys_utime: return "sys_utime";
         }
         return string();
     }
@@ -181,7 +187,7 @@ namespace cmsx.kernel
         }
         ushort exitCode = MakeProcessExitCode(0u, cast<byte>(sc.ax));
         ExitProcess(*sc.machine, *sc.processTable, sc.process, exitCode);
-        if (Machine.GetFlag(Machine.Flags.runProgram) && sc.process->pid == sc.kernel->GetProgramPID())
+        if (sc.process->pid == sc.kernel->GetProgramPID())
         {
             sc.machine->GetProcessor().Exit();
         }
@@ -207,6 +213,16 @@ namespace cmsx.kernel
         }
         int retval = ForkProcess(*sc.machine, *sc.processTable, sc.process);
         sc.result = retval;
+    }
+
+    public void Exec(SystemCall& sc)
+    {
+        if (sc.x != 0u || sc.y != sys_exec || sc.z != 0u)
+        {
+            Panic("invalid exec parameters: " + ToString(sc.x) + ", " + ToString(sc.y) + ", " + ToString(sc.z));
+        }
+        Exec(*sc.machine, *sc.processTable, sc.process, cast<int>(sc.ax), cast<ulong>(sc.bx));
+        sc.result = 0;
     }
 
     public void Create(SystemCall& sc)
@@ -513,7 +529,7 @@ namespace cmsx.kernel
         {
             Panic("invalid mkdir parameters: " + ToString(sc.x) + ", " + ToString(sc.y) + ", " + ToString(sc.z));
         }
-        Mkdir(*sc.machine, sc.process, sc.ax);
+        Mkdir(*sc.machine, sc.process, sc.ax, cast<int>(sc.bx));
     }
 
     public void OpenDir(SystemCall& sc)
@@ -591,5 +607,24 @@ namespace cmsx.kernel
         }
         IOCtl(*sc.machine, sc.process, cast<int>(sc.ax), cast<int>(sc.bx), sc.cx, cast<long>(sc.dx));
         sc.result = 0;
+    }
+
+    public void Chmod(SystemCall& sc)
+    {
+        if (sc.x != 0u || sc.y != sys_chmod || sc.z != 0u)
+        {
+            Panic("invalid chmod parameters: " + ToString(sc.x) + ", " + ToString(sc.y) + ", " + ToString(sc.z));
+        }
+        Chmod(*sc.machine, sc.process, sc.ax, cast<int>(sc.bx));
+        sc.result = 0;
+    }
+
+    public void UTime(SystemCall& sc)
+    {
+        if (sc.x != 0u || sc.y != sys_utime || sc.z != 0u)
+        {
+            Panic("invalid utim parameters: " + ToString(sc.x) + ", " + ToString(sc.y) + ", " + ToString(sc.z));
+        }
+        UTime(*sc.machine, sc.process, sc.ax, sc.bx);
     }
 }

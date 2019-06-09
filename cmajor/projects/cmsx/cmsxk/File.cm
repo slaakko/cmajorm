@@ -155,7 +155,7 @@ namespace cmsx.kernel
         fs->Unlink(process, path);
     }
 
-    public void Mkdir(Machine& machine, Process* process, ulong pathAddress)
+    public void Mkdir(Machine& machine, Process* process, ulong pathAddress, int mode)
     {
         if (pathAddress == 0u)
         {
@@ -168,7 +168,7 @@ namespace cmsx.kernel
             throw SystemError(EINVAL, "path is empty");
         }
         FileSystem* fs = GetMountTable().GetFileSystem(0);
-        fs->MakeDirectory(process, path);
+        fs->MakeDirectory(process, path, mode);
     }
 
     public int OpenDir(Machine& machine, Process* process, ulong pathAddress)
@@ -307,6 +307,47 @@ namespace cmsx.kernel
         }
         File* file = process->fileTable.GetFile(fd);
         file->IOCtl(machine, process, item, bufferAddress, count);
+    }
+
+    public void Chmod(Machine& machine, Process* process, ulong pathAddress, int mode)
+    {
+        if (pathAddress == 0u)
+        {
+            throw SystemError(EINVAL, "path address is null");
+        }
+        string path;
+        ReadStringFromProcessMemory(machine, process, pathAddress, path);
+        if (path.IsEmpty())
+        {
+            throw SystemError(EINVAL, "path is empty");
+        }
+        FileSystem* fs = GetMountTable().GetFileSystem(0);
+        fs->ChangeMode(process, path, mode);
+    }
+
+    public void UTime(Machine& machine, Process* process, ulong pathAddress, ulong timeBufAddress)
+    {
+        if (pathAddress == 0u)
+        {
+            throw SystemError(EINVAL, "path address is null");
+        }
+        if (timeBufAddress == 0u)
+        {
+            throw SystemError(EINVAL, "time buffer address is null");
+        }
+        string path;
+        ReadStringFromProcessMemory(machine, process, pathAddress, path);
+        if (path.IsEmpty())
+        {
+            throw SystemError(EINVAL, "path is empty");
+        }
+        byte[16] buffer;
+        ReadProcessMemory(machine, process, timeBufAddress, &buffer[0], cast<ulong>(buffer.Length()));
+        MemoryReader reader(&buffer[0], buffer.Length());
+        DateTime atime = reader.ReadDateTime();
+        DateTime mtime = reader.ReadDateTime();
+        FileSystem* fs = GetMountTable().GetFileSystem(0);
+        fs->UpdateFileTimes(process, path, atime, mtime);
     }
 
     public abstract class File

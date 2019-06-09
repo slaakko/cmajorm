@@ -33,7 +33,7 @@ namespace cmsx.kernel
             INode* mountDirINode = rootFS->GetINodeManager()->PathToINode(null, mountDirPath, PathToINodeFlags.ignoreMountPoint, parent, freeDirectorySlot, name);
             if (mountDirINode == null)
             {
-                rootFS->MakeDirectory(null, mountDirPath);
+                rootFS->MakeDirectory(null, mountDirPath, cast<int>(ParseOctal("755")));
                 mountDirINode = rootFS->GetINodeManager()->PathToINode(null, mountDirPath, PathToINodeFlags.ignoreMountPoint, parent, freeDirectorySlot, name);
                 mountDirINode->SetFlag(INode.Flags.mountPoint);
                 mountDirINode->SetFlag(INode.Flags.dirty);
@@ -119,14 +119,18 @@ namespace cmsx.kernel
                 byte[8] atimeBuf;
                 if (OsGetFileTimes(hostFile->GetHostFilePath().Chars(), &ctimeBuf[0], &mtimeBuf[0], &atimeBuf[0]))
                 {
+                    Console.Out() << hostFile->GetHostFilePath() << endl();
                     MemoryReader ctimeReader(&ctimeBuf[0], 8);
                     DateTime ctime = ctimeReader.ReadDateTime();
+                    Console.Out() << ctime.ToString() << endl();
                     inode->SetCTime(ctime);
                     MemoryReader mtimeReader(&mtimeBuf[0], 8);
                     DateTime mtime = mtimeReader.ReadDateTime();
+                    Console.Out() << mtime.ToString() << endl();
                     inode->SetMTime(mtime);
                     MemoryReader atimeReader(&atimeBuf[0], 8);
                     DateTime atime = atimeReader.ReadDateTime();
+                    Console.Out() << atime.ToString() << endl();
                     inode->SetATime(atime);
                 }
                 else
@@ -427,6 +431,7 @@ namespace cmsx.kernel
             }
             INode* inode = new INode(this);
             inode->SetKey(key);
+            inode->SetUseCount(1);
             return inode;
         }
         public override void PutINode(INode* inode)
@@ -449,15 +454,15 @@ namespace cmsx.kernel
                 }
                 hostFileIndexPathMap.Remove(it->first);
             }
-            else
-            {
-                throw SystemError(EFAIL, "host file for index " + ToString(hostFileIndex) + " not found from file system '" + fs->HostPath() + "'");
-            }
             if (!hostFilePath.IsEmpty())
             {
                 pathINodeMap.Remove(hostFilePath);
             }
-            delete inode;
+            inode->SetUseCount(inode->GetUseCount() - 1);
+            if (inode->GetUseCount() == 0)
+            {
+                delete inode;
+            }
         }
         public override INode* PathToINode(Process* process, const string& path)
         {
@@ -484,7 +489,9 @@ namespace cmsx.kernel
             HashMap<string, INode*>.ConstIterator it = pathINodeMap.CFind(fullPath);
             if (it != pathINodeMap.CEnd())
             {
-                return it->second;
+                INode* inode = it->second;
+                inode->SetUseCount(inode->GetUseCount() + 1);
+                return inode;
             }
             int hostFileIndex = nextHostFileIndex++;
             INodeKey key(hostFileIndex, MakeFSNumber(fs->Index(), hostFileIndex));

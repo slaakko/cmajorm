@@ -1,0 +1,167 @@
+// =================================
+// Copyright (c) 2019 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.IO;
+using System.Os;
+
+void InstallBin(bool verbose)
+{
+    if (!Directory.Exists("/bin")) 
+    {
+        Mkdir("/bin", cast<int>(ParseOctal("755")));
+        if (verbose)
+        {
+            Console.Out() << "init: /bin created" << endl();
+        }
+    }
+    string hostBinDir = "/mnt/cmsx/bin";
+    DirectoryReader reader(hostBinDir);
+    DirectoryEntry dirEntry;
+    while (reader.Read(dirEntry))
+    {
+        string binFileName(&dirEntry.name[0]);
+        if (binFileName.StartsWith("."))
+        {
+            continue;
+        }
+        string binFilePath = Path.Combine("/bin", binFileName);
+        string hostBinFilePath = Path.Combine(hostBinDir, binFileName);
+        if (File.Copy(hostBinFilePath, binFilePath, cast<FileCopyOptions>(FileCopyOptions.update | FileCopyOptions.preserveTimes)))
+        {
+            Chmod(binFilePath.Chars(), cast<int>(ParseOctal("755")));
+            if (verbose)
+            {
+                Console.Out() << "init: " << hostBinFilePath << " -> " << binFilePath << endl();
+            }
+        }
+    }
+}
+
+void InstallEtc(bool verbose)
+{
+    if (!Directory.Exists("/etc")) 
+    {
+        Mkdir("/etc", cast<int>(ParseOctal("755")));
+        if (verbose)
+        {
+            Console.Out() << "init: /etc created" << endl();
+        }
+    }
+    if (!File.Exists("/etc/passwd"))
+    {
+        StreamWriter writer(SharedPtr<Stream>(new FileStream("/etc/passwd", cast<OpenFlags>(OpenFlags.write | OpenFlags.create | OpenFlags.truncate), cast<int>(ParseOctal("644")))));
+        // username:hash:uid:gid:info:home:shell
+        writer << "root:142E4F84D6C5554052F32A6968E88EDCD56B118A:0:0:root:/:/bin/cmsh\n";
+        if (verbose)
+        {
+            Console.Out() << "init: /etc/passwd created" << endl();
+        }
+    }
+    if (!File.Exists("/etc/group"))
+    {
+        StreamWriter writer(SharedPtr<Stream>(new FileStream("/etc/group", cast<OpenFlags>(OpenFlags.write | OpenFlags.create | OpenFlags.truncate), cast<int>(ParseOctal("644")))));
+        // groupname:gid:usercsv
+        writer << "root:0:root\n";
+        if (verbose)
+        {
+            Console.Out() << "init: /etc/group created" << endl();
+        }
+    }
+}
+
+void Install(bool verbose)
+{
+    if (verbose)
+    {
+        Console.Out() << "init: installing..." << endl();
+    }
+    InstallBin(verbose);
+    InstallEtc(verbose);
+    if (verbose)
+    {
+        Console.Out() << "init: installation done." << endl();
+    }
+}
+
+int main(int argc, const char** argv)
+{
+    try
+    {
+        string user;
+        bool install = false;
+        bool verbose = false;
+        for (int i = 1; i < argc; ++i)
+        {
+            string arg = argv[i];
+            if (arg.StartsWith("--"))
+            {
+                if (arg.StartsWith("--user="))
+                {
+                    user = arg.Substring(7);
+                }
+                else if (arg == "--install")
+                {
+                    install = true;
+                }
+                else if (arg == "--verbose")
+                {
+                    verbose = true;
+                }
+                else 
+                {
+                    throw Exception("unknown option '" + arg + "'");
+                }
+            }
+            else if (arg.StartsWith("-"))
+            {
+                if (arg.StartsWith("-u="))
+                {
+                    user = arg.Substring(3);
+                }
+                else
+                {
+                    string options = arg.Substring(1);
+                    for (char o : options)
+                    {
+                        if (o == 'i')
+                        {
+                            install = true;
+                        }
+                        else if (o == 'v')
+                        {
+                            verbose = true;
+                        }
+                        else
+                        {
+                            throw Exception("unknown option '" + arg + "'");
+                        }
+                    }
+                }
+            }
+            else
+            {
+                throw Exception("unknown argument '" + arg + "'");
+            }
+        }
+        if (verbose)
+        {
+            if (!user.IsEmpty())
+            {
+                Console.Out() << "init: user=" << user << endl();
+            }
+        }
+        if (install)
+        {
+            Install(verbose);
+        }
+    }
+    catch (const Exception& ex)
+    {
+        Console.Error() << "init: " << ex.Message() << endl();
+        return 1;
+    }
+    return 0;
+}

@@ -223,7 +223,10 @@ namespace System
         {
             s.Append(cast<char>(cast<int>(x & 7u) + cast<int>('0')));
             x = x >> 3u;
-            --minDigits;
+            if (minDigits > 0)
+            {
+                --minDigits;
+            }
         }
         while (minDigits != 0 || x != 0u);
         if (s[s.Length() - 1] != '0')

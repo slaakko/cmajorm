@@ -926,15 +926,13 @@ class SortRelation : Rel<InfoEntry>
     {
         if (sortBy == SortBy.name)
         {
-            ustring leftName = ToUtf32(&left.directoryEntry->name[0]);
-            ustring rightName = ToUtf32(&right.directoryEntry->name[0]);
             if (reverse)
             {
-                return leftName > rightName;
+                return left.name > right.name;
             }
             else
             {
-                return leftName < rightName;
+                return left.name < right.name;
             }
         }
         else if (sortBy == SortBy.size)
@@ -1069,15 +1067,13 @@ class SortRelation : Rel<InfoEntry>
         }
         else
         {
-            ustring leftName = ToUtf32(&left.directoryEntry->name[0]);
-            ustring rightName = ToUtf32(&right.directoryEntry->name[0]);
             if (reverse)
             {
-                return leftName > rightName;
+                return left.name > right.name;
             }
             else
             {
-                return leftName < rightName;
+                return left.name < right.name;
             }
         }
     }

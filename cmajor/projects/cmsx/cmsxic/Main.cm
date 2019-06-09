@@ -27,7 +27,7 @@ void PrintHelp()
         "   Set optimization level to N=0-3." << endl() <<
         "   Default is 0." << endl() <<
         "--local-regs=N (-l=N)" << endl() <<
-        "   Set number of local registers to N, where N must be >= 128." << endl() <<
+        "   Set number of local registers to N, where N must be >= 128 and <= 255." << endl() <<
         endl();
 }
 
@@ -39,58 +39,93 @@ int main(int argc, const char** argv)
         for (int i = 1; i < argc; ++i)
         {
             string arg = argv[i];
-            if (arg.StartsWith("-"))
+            if (arg.StartsWith("--"))
             {
-                if (arg.Find('=') != -1)
+                if (arg == "--help")
                 {
-                    List<string> components = arg.Split('=');
-                    if (components.Count() != 2)
+                    PrintHelp();
+                    return 1;
+                }
+                else if (arg == "--verbose")
+                {
+                    cmsx.intermediate.Flags.Set(cmsx.intermediate.Flag.verbose);
+                }
+                else if (arg == "--debug")
+                {
+                    cmsx.intermediate.Flags.Set(cmsx.intermediate.Flag.debug);
+                }
+                else if (arg == "--stages")
+                {
+                    cmsx.intermediate.Flags.Set(cmsx.intermediate.Flag.stages);
+                }
+                else if (arg.StartsWith("--optimization-level="))
+                {
+                    int level = ParseInt(arg.Substring(21));
+                    if (level < 0 || level > 3)
                     {
-                        throw Exception("unknown option '" + arg + "'");
+                        throw Exception("invalid optimization level (must be 0-3)");
                     }
-                    string option = components[0];
-                    string value = components[1];
-                    if (option == "--optimization-level" || option == "-O")
-                    {
-                        int level = ParseInt(value);
-                        if (level < 0 || level > 3)
-                        {
-                            throw Exception("invalid optimization level (must be 0-3)");
-                        }
-                        cmsx.intermediate.Flags.SetOptimizationLevel(level);
-                    }
-                    else if (option == "--local-regs" || option == "-l")
-                    {
-                        byte numLocalRegs = ParseByte(value);
-                        cmsx.intermediate.Flags.SetNumLocalRegs(numLocalRegs);
-                    }
-                    else
-                    {
-                        throw Exception("unknown option '" + arg + "'");
-                    }
+                    cmsx.intermediate.Flags.SetOptimizationLevel(level);
+                }
+                else if (arg.StartsWith("--local-regs="))
+                {
+                    byte numLocalRegs = ParseByte(arg.Substring(13));
+                    cmsx.intermediate.Flags.SetNumLocalRegs(numLocalRegs);
                 }
                 else
                 {
-                    if (arg ==  "--help" || arg == "-h")
+                    throw Exception("unknown option '" + arg + "'");
+                }
+            }
+            else if (arg.StartsWith("-"))
+            {
+                if (arg.StartsWith("-O="))
+                {
+                    int level = ParseInt(arg.Substring(3));
+                    if (level < 0 || level > 3)
                     {
-                        PrintHelp();
-                        return 0;
+                        throw Exception("invalid optimization level (must be 0-3)");
                     }
-                    else if (arg == "--verbose" || arg == "-v")
+                    cmsx.intermediate.Flags.SetOptimizationLevel(level);
+                }
+                else if (arg.StartsWith("-l="))
+                {
+                    byte numLocalRegs = ParseByte(arg.Substring(3));
+                    cmsx.intermediate.Flags.SetNumLocalRegs(numLocalRegs);
+                }
+                else
+                {
+                    string options = arg.Substring(1);
+                    if (options.IsEmpty())
                     {
-                        cmsx.intermediate.Flags.Set(cmsx.intermediate.Flag.verbose);
-                    }
-                    else if (arg == "--debug" || arg == "-d")
-                    {
-                        cmsx.intermediate.Flags.Set(cmsx.intermediate.Flag.debug);
-                    }
-                    else if (arg == "--stages" || arg == "-s")
-                    {
-                        cmsx.intermediate.Flags.Set(cmsx.intermediate.Flag.stages);
+                        throw Exception("unknown option '" + arg + "'");
                     }
                     else
                     {
-                        throw Exception("unknown option '" + arg + "'");
+                        for (char o : options)
+                        {
+                            if (o == 'h')
+                            {
+                                PrintHelp();
+                                return 1;
+                            }
+                            else if (o == 'v')
+                            {
+                                cmsx.intermediate.Flags.Set(cmsx.intermediate.Flag.verbose);
+                            }
+                            else if (o == 'd')
+                            {
+                                cmsx.intermediate.Flags.Set(cmsx.intermediate.Flag.debug);
+                            }
+                            else if (o == 's')
+                            {
+                                cmsx.intermediate.Flags.Set(cmsx.intermediate.Flag.stages);
+                            }
+                            else
+                            {
+                                throw Exception("unknown option '-" + string(o) + "'");
+                            }
+                        }
                     }
                 }
             }

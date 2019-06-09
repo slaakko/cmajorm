@@ -1,0 +1,420 @@
+using System;
+using System.IO;
+using System.Collections;
+using System.Threading;
+using cmsx.machine;
+using cmsx.kernel;
+
+class DebuggerProvider
+{
+    static DebuggerProvider() : debugger(new cmsx.debug.Debugger())
+    {
+    }
+    public static nothrow cmsx.debug.Debugger* GetDebugger()
+    {
+        return debugger.Get();
+    }
+    private static UniquePtr<cmsx.debug.Debugger> debugger;
+}
+
+void Init(Machine& machine)
+{
+    Kernel& kernel = Kernel.Instance();
+    kernel.Init();
+    MemoryTable& kernelMemoryTable = kernel.GetMemoryTable();
+    machine.SetKernelRootPageAddress(kernelMemoryTable.rootPageAddress);
+    Memory& mem = machine.GetMemory();
+    AllocateMemory(mem, kernelMemoryTable);
+    Registers& regs = machine.GetRegisters();
+    SetProcessorToKernelMode(regs);
+    regs.SetSpecial(Registers.rV, MakeVirtualTranslationRegisterValue(kernelMemoryTable.rootPageAddress, kernelMemoryTable.addressSpaceNumber));
+    BootProc boot = Boot;
+    ulong bootProcValue = cast<ulong>(cast<void*>(boot));
+    mem.WriteULong(bootProcAddress, bootProcValue, Protection.write);
+    if (Machine.GetFlag(Machine.Flags.debug))
+    {
+        kernel.SetDebugger(DebuggerProvider.GetDebugger());
+    }
+}
+
+void Run(Machine& machine)
+{
+    machine.Run();
+}
+
+void Terminate(Machine& machine)
+{
+    GetMountTable().Flush();
+    GetDiskDriver().Stop();
+    GetConsoleDriver().Stop();
+    Kernel& kernel = Kernel.Instance();
+    if (Machine.GetFlag(Machine.Flags.debug))
+    {
+        Debugger* debugger = DebuggerProvider.GetDebugger();
+        debugger->Done();
+    }
+    int pid = kernel.GetProgramPID();
+    if (pid != -1)
+    {
+        Process* process = kernel.GetProcessTable().GetProcess(pid);
+        if (process != null && Machine.GetFlag(Machine.Flags.verbose))
+        {
+            Console.Out() << "process exited with code " << process->exitCode << "." << endl();
+        }
+    }
+    Registers& regs = machine.GetRegisters();
+    SetProcessorToKernelMode(regs);
+    regs.SetSpecial(Registers.rV, MakeVirtualTranslationRegisterValue(machine.GetKernelRootPageAddress(), kernelAddressSpaceNumber));
+    MemoryTable& kernelMemoryTable = kernel.GetMemoryTable();
+    FreeMemory(machine.GetMemory(), kernelMemoryTable);
+}
+
+void MachineThreadFunction(void* machineParam)
+{
+    try
+    {
+        Machine* machine = cast<Machine*>(machineParam);
+        if (machine != null)
+        {
+            Init(*machine);
+            Run(*machine);
+            Terminate(*machine);
+        }
+    }
+    catch (const Exception& ex)
+    {
+        System.Console.Error() << ex.ToString() << endl();
+    }
+}
+
+class MachineDriver
+{
+    public MachineDriver(Machine& machine_) : machine(machine_), machineThread()
+    {
+    }
+    public void RunThread()
+    {
+        machineThread = Thread.StartFunction(MachineThreadFunction, &machine);
+    }
+    public ~MachineDriver()
+    {
+        machineThread.Join();
+    }
+    private Machine& machine;
+    private Thread machineThread;
+}
+
+void Run()
+{
+    Machine& machine = Machine.Instance();
+    MachineDriver machineDriver(machine);
+    machineDriver.RunThread();
+}
+
+public const char* Version()
+{
+   return "0.2.0";
+}
+
+public void PrintHelp()
+{
+    Console.Out() << "Cmajor System X Driver version " << Version() << endl();
+    Console.Out() << "Usage: cmsx [cmsx-options] [ EXECUTABLE [args] ]" << endl();
+    Console.Out() << "Run/debug EXECUTABLE in System X virtual machine with args." << endl();
+    Console.Out() << "cmsx-options:" << endl();
+    Console.Out() << "--help (-h)" << endl();
+    Console.Out() << "  print help" << endl();
+    Console.Out() << "--verbose (-v)" << endl();
+    Console.Out() << "  be verbose" << endl();
+    Console.Out() << "--quiet (-q)" << endl();
+    Console.Out() << "  be quiet" << endl();
+    Console.Out() << "--debug (-d)" << endl();
+    Console.Out() << "  debug EXECUTABLE" << endl();
+    Console.Out() << "--log (-l)" << endl();
+    Console.Out() << "  log to stdout" << endl();
+    Console.Out() << "--logfile=FILE (-f=FILE)" << endl();
+    Console.Out() << "  log to FILE" << endl();
+    Console.Out() << "--dont-use-translation-cache" << endl();
+    Console.Out() << "  Do not use address translation cache." << endl();
+}
+
+bool CopyFs()
+{
+    string rootFSPath;
+    string defaultFSPath;
+    try
+    {
+        string cmajorRootDir = RtGetEnvironmentVariable("CMAJOR_ROOT");
+        if (cmajorRootDir.IsEmpty())
+        {
+            throw Exception("CMAJOR_ROOT environment variable not set. Please set it to contain /path/to/cmajor directory");
+        }
+        string fsDirPath = GetFullPath(Path.Combine(Path.Combine(Path.Combine(cmajorRootDir, "projects"), "cmsx"), "fs"));
+        rootFSPath = GetFullPath(Path.Combine(fsDirPath, "rootfs"));
+        defaultFSPath = GetFullPath(Path.Combine(fsDirPath, "defaultfs"));
+        if (!System.IO.File.Exists(rootFSPath) && System.IO.File.Exists(defaultFSPath))
+        {
+            bool verbose = Machine.GetFlag(Machine.Flags.verbose);
+            if (verbose)
+            {
+                Console.Out() << "rootfs does not exist: copying from defaultfs...";
+            }
+            System.IO.File.Copy(defaultFSPath, rootFSPath);
+            if (verbose)
+            {
+                Console.Out() << "\b\b\b, done." << endl();
+            }
+            return true;
+        }
+    }
+    catch (const Exception& ex)
+    {
+        Console.Error() << endl();
+        throw Exception("could not copy '" + defaultFSPath + "' to '" + rootFSPath + "': " + ex.Message());
+    }
+    return false;
+}
+
+bool CheckValidUserAccount(const string& userAccount)
+{
+    if (userAccount.IsEmpty()) return false;
+    for (char c : userAccount)
+    {
+        bool validChar = (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9');
+        if (!validChar) return false;
+    }
+    return true;
+}
+
+void SetUser(const string& user, bool fsCopied)
+{
+    if (!user.IsEmpty())
+    {
+        if (!CheckValidUserAccount(user))
+        {
+            throw Exception(user + " is not a valid CMSX user account name. It must not be empty and must consist of letters a-z, A-Z and digits 0-9.");
+        }
+    }
+    string defaultUserAccount = user;
+    bool defaultUserAccountCreated = false;
+    string cmajorRootDir = RtGetEnvironmentVariable("CMAJOR_ROOT");
+    if (cmajorRootDir.IsEmpty())
+    {
+        throw Exception("CMAJOR_ROOT environment variable not set. Please set it to contain /path/to/cmajor directory");
+    }
+    string configDirPath = GetFullPath(Path.Combine(Path.Combine(Path.Combine(cmajorRootDir, "projects"), "cmsx"), "config"));
+    string defaultUserFilePath = GetFullPath(Path.Combine(configDirPath, "default-user"));
+    if (fsCopied)
+    {
+        if (System.IO.File.Exists(defaultUserFilePath))
+        {
+            System.IO.File.Remove(defaultUserFilePath);
+        }
+    }
+    if (!defaultUserAccount.IsEmpty())
+    {
+        try
+        {
+            StreamWriter writer = System.IO.File.CreateText(defaultUserFilePath);
+            writer << defaultUserAccount << endl();
+        }
+        catch (const Exception& ex)
+        {
+            throw Exception("could not create '" + defaultUserFilePath + "': " + ex.Message());
+        }
+    }
+    else if (System.IO.File.Exists(defaultUserFilePath))
+    {
+        try
+        {
+            StreamReader reader = System.IO.File.OpenRead(defaultUserFilePath);
+            defaultUserAccount = reader.ReadLine();
+        }
+        catch (const Exception& ex)
+        {
+            throw Exception("could not read '" + defaultUserFilePath + "': " + ex.Message());
+        }
+    }
+    else
+    {
+        Console.Out() << "CMSX default user account not set.\nEnter the name of a new CMSX user account to be created> ";
+        defaultUserAccount = Console.ReadLine();
+        while (true)
+        {
+            bool valid = CheckValidUserAccount(defaultUserAccount);
+            if (valid)
+            {
+                break;
+            }
+            else
+            {
+                Console.Out() << "String '" << defaultUserAccount << "' is not a valid CMSX user account name. It must not be empty and must consist of letters a-z, A-Z and digits 0-9." << endl();
+                Console.Out() << "Enter the name of a new CMSX user account to be created> ";
+                defaultUserAccount = Console.ReadLine();
+            }
+        }
+        try
+        {
+            StreamWriter writer = System.IO.File.CreateText(defaultUserFilePath);
+            writer << defaultUserAccount << endl();
+            defaultUserAccountCreated = true;
+        }
+        catch (const Exception& ex)
+        {
+            throw Exception("could not create '" + defaultUserFilePath + "': " + ex.Message());
+        }
+    }
+    if (defaultUserAccountCreated || fsCopied)
+    {
+        Machine.SetFlag(Machine.Flags.install);
+    }
+    Kernel& kernel = Kernel.Instance();
+    kernel.SetUser(defaultUserAccount);
+}
+
+int main(int argc, const char** argv)
+{
+    Debug.Start();
+    try
+    {
+        string programFileName;
+        List<string> programArguments;
+        bool cmsxOptions = true;
+        string user;
+        for (int i = 1; i < argc; ++i)
+        {
+            string arg = argv[i];
+            if (cmsxOptions)
+            {
+                if (arg.StartsWith("--"))
+                {
+                    if (arg == "--help")
+                    {
+                        PrintHelp();
+                        return 1;
+                    }
+                    else if (arg == "--verbose")
+                    {
+                        Machine.SetFlag(Machine.Flags.verbose);
+                    }
+                    else if (arg == "--quiet")
+                    {
+                        Machine.SetFlag(Machine.Flags.quiet);
+                    }
+                    else if (arg == "--debug")
+                    {
+                        Machine.SetFlag(Machine.Flags.debug);
+                    }
+                    else if (arg == "--log")
+                    {
+                        SetLog();
+                    }
+                    else if (arg == "--install")
+                    {
+                        Machine.SetFlag(Machine.Flags.install);
+                    }
+                    else if (arg == "--dont-use-translation-cache")
+                    {
+                        SetUseTranslationCacheValue(false);
+                    }
+                    else if (arg.StartsWith("--logfile="))
+                    {
+                        string logFile = arg.Substring(10);
+                        SetLog(logFile);
+                    }
+                    else if (arg.StartsWith("--user="))
+                    {
+                        user = arg.Substring(7);
+                    }
+                    else
+                    {
+                        throw Exception("unknown option '" + arg + "'");
+                    }
+                }
+                else if (arg.StartsWith("-"))
+                {
+                    if (arg.StartsWith("-f="))
+                    {
+                        string logFile = arg.Substring(3);
+                        SetLog(logFile);
+                    }
+                    else if (arg.StartsWith("-u="))
+                    {
+                        user = arg.Substring(3);
+                    }
+                    else
+                    {
+                        string options = arg.Substring(1);
+                        if (options.IsEmpty())
+                        {
+                            throw Exception("unknown option '" + arg + "'");
+                        }
+                        else
+                        {
+                            for (char o : options)
+                            {
+                                if (o == 'h')
+                                {
+                                    PrintHelp();
+                                    return 1;
+                                }
+                                else if (o == 'v')
+                                {
+                                    Machine.SetFlag(Machine.Flags.verbose);
+                                }
+                                else if (o == 'q')
+                                {
+                                    Machine.SetFlag(Machine.Flags.quiet);
+                                }
+                                else if (o == 'd')
+                                {
+                                    Machine.SetFlag(Machine.Flags.debug);
+                                }
+                                else if (o == 'l')
+                                {
+                                    SetLog();
+                                }
+                                else if (o == 'i')
+                                {
+                                    Machine.SetFlag(Machine.Flags.install);
+                                }
+                                else
+                                {
+                                    throw Exception("unknown option '" + arg + "'");
+                                }
+                            }
+                        }
+                    }
+                }
+                else if (programFileName.IsEmpty())
+                {
+                    programFileName = arg;
+                    cmsxOptions = false;
+                    Machine.SetFlag(Machine.Flags.runProgram);
+                }
+                else
+                {
+                    throw Exception("invalid argument '" + arg + "'");
+                }
+            }
+            else
+            {
+                programArguments.Add(arg);
+            }
+        }
+        if (Machine.GetFlag(Machine.Flags.runProgram))
+        {
+            Kernel.Instance().SetProgramFileName(programFileName);
+            Kernel.Instance().SetProgramArguments(programArguments);
+        }
+        bool copied = CopyFs();
+        SetUser(user, copied);
+        Run();
+    }
+    catch (const Exception& ex)
+    {
+        Console.Error() << ex.ToString() << endl();
+        return 1;
+    }
+    return 0;
+}

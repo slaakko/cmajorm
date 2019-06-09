@@ -281,6 +281,8 @@ namespace cmsx.kernel
             Flags f;
             FileType t;
             DecodeMode(accessMode, f, t, ownerAccess, groupAccess, otherAccess);
+            SetCTime();
+            SetFlag(Flags.dirty);
         }
         public nothrow inline int UID() const
         {

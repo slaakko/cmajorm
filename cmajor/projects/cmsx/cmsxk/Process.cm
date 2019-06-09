@@ -139,6 +139,7 @@ namespace cmsx.kernel
         public SystemError lastError;
         public bool systemCallReady;
         public void* fiber;
+        public INodeKey executableINodeKey;
     }
 
     public class ProcessTable
@@ -241,6 +242,7 @@ namespace cmsx.kernel
         }
         public nothrow void FreeProcess(Process* process)
         {
+            RemoveProcessFromExecutableINodeProcessMap(process);
             processMap.Remove(process->pid);
             *process = Process();
             process->nextFree = free;
@@ -290,6 +292,26 @@ namespace cmsx.kernel
         {
             processMap[process->pid] = process;
         }
+        public nothrow void AddProcessToExecutableINodeProcessMap(Process* process)
+        {
+            executableINodeProcessMap[process->executableINodeKey] = process;
+        }
+        public nothrow Process* GetProcessFromExecutableINodeProcessMap(const INodeKey& executableINodeKey) const
+        {
+            HashMap<INodeKey, Process*, INodeKeyHash>.ConstIterator it = executableINodeProcessMap.CFind(executableINodeKey);
+            if (it != executableINodeProcessMap.CEnd())
+            {
+                return it->second;
+            }
+            else
+            {
+                return null;
+            }
+        }
+        public nothrow void RemoveProcessFromExecutableINodeProcessMap(Process* process)
+        {
+            executableINodeProcessMap.Remove(process->executableINodeKey);
+        }
         private static UniquePtr<ProcessTable> instance;
         private Machine& machine;
         private Process[numProcessSlots] processSlots;
@@ -301,6 +323,7 @@ namespace cmsx.kernel
         private Process* init;
         private Process* running;
         private Process* ready;
+        private HashMap<INodeKey, Process*, INodeKeyHash> executableINodeProcessMap;
     }
 
     public nothrow ProcessTable& GetProcessTable()

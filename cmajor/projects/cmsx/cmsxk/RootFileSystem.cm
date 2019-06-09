@@ -54,7 +54,7 @@ namespace cmsx.kernel
             INode* mntINode = inodeManager.PathToINode(null, "/mnt");
             if (mntINode == null)
             {
-                MakeDirectory(null, "/mnt");
+                MakeDirectory(null, "/mnt", cast<int>(ParseOctal("755")));
             }
             else
             {
@@ -114,6 +114,48 @@ namespace cmsx.kernel
                 }
             }
             return 0;
+        }
+        public override void ChangeMode(Process* process, const string& path, INode* inode, int mode)
+        {
+            if (process->uid != inode->UID())
+            {
+                throw SystemError(EPERM, "error changing mode of '" + path + "': user id of the process (" + ToString(process->uid) + ") does not match the owner (" + ToString(inode->UID()) + ") of the file");
+            }
+            inode->SetAccessMode(mode);
+        }
+        public override void UpdateFileTimes(Process* process, const string& path, INode* inode, const DateTime& atime, const DateTime& mtime)
+        {
+            if (process->uid != inode->UID())
+            {
+                try
+                {
+                    if (atime != DateTime() || mtime != DateTime())
+                    {
+                        throw SystemError(EPERM, "access time or modification time not default and not owner of the file");
+                    }
+                    inode->CheckPermissions(process->uid, process->gid, Access.write);
+                }
+                catch (const Exception& ex)
+                {
+                    throw Exception("cannot change file '" + path + "' timestamps: " + ex.Message());
+                }
+            }
+            if (atime == DateTime())
+            {
+                inode->SetATime();
+            }
+            else
+            {
+                inode->SetATime(atime);
+            }
+            if (mtime == DateTime())
+            {
+                inode->SetMTime();
+            }
+            else
+            {
+                inode->SetMTime(mtime);
+            }
         }
         public override int AllocateBlockNumber()
         {
@@ -220,7 +262,7 @@ namespace cmsx.kernel
                 }
                 blockManager.Flush();
                 FileSystem* fs = GetMountTable().GetFileSystem(0);
-                fs->MakeDirectory(null, "/");
+                fs->MakeDirectory(null, "/", cast<int>(ParseOctal("755")));
                 blockManager.Flush();
             }
             catch (const Exception& ex)

@@ -1,4 +1,5 @@
 @echo off
-sxcmc --outdir=system --verbose ../src/system/System.cms
-sxcmc --outdir=coreutil --verbose ../src/coreutil/coreutil.cms
-sxcmc --outdir=init --verbose ../src/init/init.cms
+cmsxas --verbose --outdir=main/lib ../src/main/Main.s
+sxcmc --outdir=system --verbose --config=release ../src/system/System.cms
+sxcmc --outdir=coreutil --verbose --config=release ../src/coreutil/coreutil.cms
+sxcmc --outdir=. --verbose --config=release ../src/init/init.cmp

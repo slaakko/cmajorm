@@ -9,6 +9,15 @@ using System.Os;
 
 namespace System.IO
 {
+    public enum FileCopyOptions : int
+    {
+        none = 0, 
+        update = 1 << 0, // copy only if source modified after target
+        preserveMode = 1 << 1, 
+        preserveTimes = 1 << 2, 
+        preserveAll = preserveMode | preserveTimes
+    }
+
     public static class File
     {
         public static bool Exists(const string& filePath)
@@ -121,6 +130,36 @@ namespace System.IO
             }
             return lines;
         }
+        public static bool Copy(const string& sourceFilePath, const string& targetFilePath)
+        {
+            return Copy(sourceFilePath, targetFilePath, FileCopyOptions.none);
+        }
+        public static bool Copy(const string& sourceFilePath, const string& targetFilePath, FileCopyOptions options)
+        {
+            if ((options & FileCopyOptions.update) != FileCopyOptions.none)
+            {
+                if (Exists(targetFilePath) && ModificationTime(sourceFilePath) <= ModificationTime(targetFilePath))
+                {
+                    return false;
+                }
+            }
+            FileStream sourceFile(sourceFilePath, OpenFlags.read);
+            FileStream targetFile(targetFilePath, cast<OpenFlags>(OpenFlags.create | OpenFlags.truncate | OpenFlags.write));
+            sourceFile.CopyTo(targetFile);
+            if ((options & FileCopyOptions.preserveMode) != FileCopyOptions.none)
+            {
+                int mode = Mode(sourceFilePath);
+                Chmod(targetFilePath.Chars(), mode);
+            }
+            if ((options & FileCopyOptions.preserveTimes) != FileCopyOptions.none)
+            {
+                DateTime accessTime;
+                DateTime modificationTime;
+                GetTimes(sourceFilePath, accessTime, modificationTime);
+                SetTimes(targetFilePath, accessTime, modificationTime);
+            }
+            return true;
+        }
         public static void Remove(const string& filePath)
         {
             if (Exists(filePath))
@@ -131,6 +170,39 @@ namespace System.IO
             {
                 throw SystemError(ENOENT, "could not remove file: file '" + filePath + "' does not exist");
             }
+        }
+        public static int Mode(const string& filePath) const
+        {
+            StatInfo statInfo;
+            Stat(filePath.Chars(), statInfo);
+            return statInfo.GetMode();
+        }
+        public static DateTime AccessTime(const string& filePath)
+        {
+            StatInfo statInfo;
+            Stat(filePath.Chars(), statInfo);
+            return statInfo.ATime();
+        }
+        public static DateTime ModificationTime(const string& filePath)
+        {
+            StatInfo statInfo;
+            Stat(filePath.Chars(), statInfo);
+            return statInfo.MTime();
+        }
+        public static void GetTimes(const string& filePath, DateTime& accessTime, DateTime& modificationTime)
+        {
+            StatInfo statInfo;
+            Stat(filePath.Chars(), statInfo);
+            accessTime = statInfo.ATime();
+            modificationTime = statInfo.MTime();
+        }
+        public static void SetTimes(const string& filePath)
+        {
+            UTime(filePath.Chars(), DateTime(), DateTime()); 
+        }
+        public static void SetTimes(const string& filePath, const DateTime& accessTime, const DateTime& modificationTime)
+        {
+            UTime(filePath.Chars(), accessTime, modificationTime); 
         }
     }
 }

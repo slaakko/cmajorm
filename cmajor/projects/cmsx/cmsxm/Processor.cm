@@ -37,11 +37,11 @@ namespace cmsx.machine
         {
             interruptReturn = interruptReturn_;
         }
-        public nothrow ulong SaveContext(ulong virtualTranslateionRegisterValue, ulong sp, ulong* regAXAddress, ulong* regBXAddress)
+        public nothrow ulong SaveContext(ulong virtualTranslationRegisterValue, ulong sp, ulong* regAXAddress, ulong* regBXAddress)
         {
             Memory& mem = machine.GetMemory();
             ulong prevRV = regs.GetSpecial(Registers.rV);
-            regs.SetSpecial(Registers.rV, virtualTranslateionRegisterValue);
+            regs.SetSpecial(Registers.rV, virtualTranslationRegisterValue);
             mem.WriteULong(sp, regs.GetPC(), Protection.write);
             sp = sp + 8u;
             mem.WriteULong(sp, regs.GetSpecial(Registers.rA), Protection.write);
@@ -107,10 +107,10 @@ namespace cmsx.machine
             regs.SetSpecial(Registers.rV, prevRV);
             return sp;
         }
-        public nothrow ulong UnsaveContext(ulong virtualTranslateionRegisterValue, ulong sp)
+        public nothrow ulong UnsaveContext(ulong virtualTranslationRegisterValue, ulong sp)
         {
             Memory& mem = machine.GetMemory();
-            regs.SetSpecial(Registers.rV, virtualTranslateionRegisterValue);
+            regs.SetSpecial(Registers.rV, virtualTranslationRegisterValue);
             sp = sp - 8u;
             ulong rg = mem.ReadULong(sp, Protection.read);
             regs.SetSpecial(Registers.rG, rg);

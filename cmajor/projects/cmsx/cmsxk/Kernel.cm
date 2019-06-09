@@ -22,6 +22,14 @@ namespace cmsx.kernel
         {
             OsCloseEvent(kernelEvent);
         }
+        public nothrow void SetUser(const string& user_)
+        {
+            user = user_;
+        }
+        public nothrow inline const string& User() const
+        {
+            return user;
+        }
         public void Init()
         {
             DefaultInitializeMemoryTable(machine, memoryTable);
@@ -143,6 +151,7 @@ namespace cmsx.kernel
         private ConsoleDriver* consoleDriver;
         private void* kernelEvent;
         private bool waiting;
+        private string user;
     }
     
     public void StopKernelThreads()

@@ -59,6 +59,16 @@ namespace System.IO
     
     public void CreateDirectories(const string& directoryPath)
     {
+        CreateDirectories(directoryPath, 0);
+    }
+    
+    public void CreateDirectories(const string& directoryPath, int mode)
+    {
+        CreateDirectories(directoryPath, 0, false);
+    }
+    
+    public void CreateDirectories(const string& directoryPath, int mode, bool verbose)
+    {
         if (directoryPath.IsEmpty())
         {
             throw InvalidPathException("directory path is empty");
@@ -79,14 +89,19 @@ namespace System.IO
         }
         if (!Directory.Exists(dir))
         {
-            Mkdir(dir.Chars());
+            Mkdir(dir.Chars(), mode);
+            if (verbose)
+            {
+                Console.Out() << "created directory '" + dir + "'" << endl();
+            }
         }
         for (int i = next; i < n; ++i)
         {
             dir = Path.Combine(dir, components[i]);
             if (!Directory.Exists(dir))
             {
-                Mkdir(dir.Chars());
+                Mkdir(dir.Chars(), mode);
+                Console.Out() << "created directory '" + dir + "'" << endl();
             }
         }
     }

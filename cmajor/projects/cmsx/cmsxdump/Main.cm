@@ -14,10 +14,10 @@ void PrintHelp()
     Console.Out() << "Usage: cmsxdump [options] { FILE.o | FILE.a | FILE }" << endl();
     Console.Out() << "Dump contents of an object file FILE.o, a library file FILE.a or an executable file FILE to standard output." << endl();
     Console.Out() << "Options:" << endl();
-    Console.Out() << "--verbose (-v)" << endl();
-    Console.Out() << "  be verbose" << endl();
     Console.Out() << "--help (-h)" << endl();
     Console.Out() << "  print help" << endl();
+    Console.Out() << "--verbose (-v)" << endl();
+    Console.Out() << "  be verbose" << endl();
 }
 
 int main(int argc, const char** argv)
@@ -29,20 +29,47 @@ int main(int argc, const char** argv)
         for (int i = 1; i < argc; ++i)
         {
             string arg = argv[i];
-            if (arg.StartsWith("-"))
+            if (arg.StartsWith("--"))
             {
-                if (arg == "-h" || arg == "--help")
+                if (arg == "--help")
                 {
                     PrintHelp();
-                    return 0;
+                    return 1;
                 }
-                else if (arg == "-v" || arg == "--verbose")
+                else if (arg == "--verbose")
                 {
                     verbose = true;
                 }
                 else
                 {
                     throw Exception("unknown option '" + arg + "'");
+                }
+            }
+            else if (arg.StartsWith("-"))
+            {
+                string options = arg.Substring(1);
+                if (options.IsEmpty())
+                {
+                    throw Exception("unknown option '" + arg + "'");
+                }
+                else
+                {
+                    for (char o : options)
+                    {
+                        if (o == 'h')
+                        {
+                            PrintHelp();
+                            return 1;
+                        }
+                        else if (o == 'v')
+                        {
+                            verbose = true;
+                        }
+                        else
+                        {
+                            throw Exception("unknown option '-" + string(o) + "'");
+                        }
+                    }
                 }
             }
             else

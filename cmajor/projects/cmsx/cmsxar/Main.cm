@@ -31,39 +31,58 @@ int main(int argc, const char** argv)
         for (int i = 1; i < argc; ++i)
         {
             string arg = argv[i];
-            if (arg.StartsWith("-"))
+            if (arg.StartsWith("--"))
             {
-                if (arg.Find('=') != -1)
+                if (arg == "--help")
                 {
-                    List<string> components = arg.Split('=');
-                    if (components.Count() == 2)
-                    {
-                        if (components[0] == "-o" || components[0] == "--out")
-                        {
-                            libraryFileName = GetFullPath(components[1]);
-                        }
-                        else
-                        {
-                            throw Exception("unknown option '" + arg + "'");
-                        }
-                    }
-                    else
-                    {
-                        throw Exception("unknown option '" + arg + "'");
-                    }
+                    PrintHelp();
+                    return 1;
                 }
-                else if (arg == "-v" || arg == "--verbose")
+                else if (arg == "--verbose")
                 {
                     verbose = true;
                 }
-                else if (arg == "-h" || arg == "--help")
+                else if (arg.StartsWith("--out="))
                 {
-                    PrintHelp();
-                    return 0;
+                    libraryFileName = GetFullPath(arg.Substring(6));
                 }
                 else
                 {
                     throw Exception("unknown option '" + arg + "'");
+                }
+            }
+            else if (arg.StartsWith("-"))
+            {
+                if (arg.StartsWith("-o="))
+                {
+                    libraryFileName = GetFullPath(arg.Substring(3));
+                }
+                else
+                {
+                    string options = arg.Substring(1);
+                    if (options.IsEmpty())
+                    {
+                        throw Exception("unknown option '" + arg + "'");
+                    }
+                    else
+                    {
+                        for (char o : options)
+                        {
+                            if (o == 'h')
+                            {
+                                PrintHelp();
+                                return 1;
+                            }
+                            else if (o == 'v')
+                            {
+                                verbose = true;
+                            }
+                            else
+                            {
+                                throw Exception("unknown option '-" + string(o) + "'");
+                            }
+                        }
+                    }
                 }
             }
             else
@@ -105,7 +124,7 @@ int main(int argc, const char** argv)
             }
             else
             {
-                throw Exception("file '" + binaryFile->FileName() + "' is not a cmsx object file");
+                throw Exception("file '" + binaryFile->FileName() + "' is not a CMSX object file");
             }
         }
         libraryFile.Write();

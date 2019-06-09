@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using cmsx.machine;
 
 namespace cmsx.kernel
@@ -157,6 +158,12 @@ namespace cmsx.kernel
         SystemCallHandler ioctlSystemCallHandler = IOCtl;
         ulong ioctlSystemCallAddress = cast<ulong>(cast<void*>(ioctlSystemCallHandler));
         mem.WriteULong(MakeSystemCallPtrAddress(sys_ioctl), ioctlSystemCallAddress, Protection.write);
+        SystemCallHandler chmodSystemCallHandler = Chmod;
+        ulong chmodSystemCallAddress = cast<ulong>(cast<void*>(chmodSystemCallHandler)); 
+        mem.WriteULong(MakeSystemCallPtrAddress(sys_chmod), chmodSystemCallAddress, Protection.write);
+        SystemCallHandler utimeSystemCallHandler = UTime;
+        ulong utimeSystemCallAddress = cast<ulong>(cast<void*>(utimeSystemCallHandler)); 
+        mem.WriteULong(MakeSystemCallPtrAddress(sys_utime), utimeSystemCallAddress, Protection.write);
     }
 
     public void Boot(Machine& machine)
@@ -197,7 +204,25 @@ namespace cmsx.kernel
         }
         else
         {
-            CreateInitAndIdleProcesses(machine, processTable, currentSession->sid);
+            string cmajorRootDir = RtGetEnvironmentVariable("CMAJOR_ROOT");
+            if (cmajorRootDir.IsEmpty())
+            {
+                throw Exception("CMAJOR_ROOT environment variable not set. Please set it to contain /path/to/cmajor directory");
+            }
+            string initProgramFileName = System.IO.GetFullPath(System.IO.Path.Combine(System.IO.Path.Combine(System.IO.Path.Combine(System.IO.Path.Combine(System.IO.Path.Combine(
+                System.IO.Path.Combine(System.IO.Path.Combine(cmajorRootDir, "projects"), "cmsx"), "build"), "init"), "bin"), "release"), "init"));
+            List<string> initProgramArguments;
+            initProgramArguments.Add("--user=" + kernel.User());
+            if (Machine.GetFlag(Machine.Flags.install))
+            {
+                initProgramArguments.Add("--install");
+            }
+            if (Machine.GetFlag(Machine.Flags.verbose))
+            {
+                initProgramArguments.Add("--verbose");
+            }
+            pid = Load(initProgramFileName, initProgramArguments, currentSession->sid);
+            kernel.SetProgramPID(pid);
         }
         if (pid != -1)
         {
