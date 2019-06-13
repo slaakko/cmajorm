@@ -46,6 +46,7 @@ namespace cmsx.kernel
                     {
                         LogMessage("fs.root.bbm.allocateblocknumber", "end.blocknumber=" + ToString(blockNumber));
                     }
+                    fs->GetBlockManager()->WriteBlock(block, superBlock);
                     return blockNumber;
                 }
             }
@@ -71,6 +72,7 @@ namespace cmsx.kernel
             BitmapBlock* bitmapBlock = cast<BitmapBlock*>(block);
             int index = blockNumber % numBitsInBitmapBlock;
             bitmapBlock->ResetBit(index);
+            fs->GetBlockManager()->WriteBlock(block, superBlock);
             if (Log())
             {
                 LogMessage("fs.root.bbm.setblockfree", "end." + block->ToString());
@@ -211,13 +213,27 @@ namespace cmsx.kernel
                     {
                         void* fiberData = OsGetFiberData();
                         Process* process = cast<Process*>(fiberData);
-                        block->AddWaitingProcess(process);
-                        SleepProcess(process, blockUnlockedEvent, cast<ulong>(cast<void*>(block)), 0u);
-                        continue;
+                        if (block->Owner() != process)
+                        {
+                            block->AddWaitingProcess(process);
+                            SleepProcess(process, blockUnlockedEvent, cast<ulong>(cast<void*>(block)), 0u);
+                            continue;
+                        }
+                        else
+                        {
+                            if (Log())
+                            {
+                                LogMessage("fs.root.bmgr.getblock.end.found", block->ToString());
+                            }
+                            return block;
+                        }
                     }
                     else
                     {
                         block->SetFlag(Block.Flags.locked);
+                        void* fiberData = OsGetFiberData();
+                        Process* process = cast<Process*>(fiberData);
+                        block->SetOwner(process);
                         RemoveBlockFromFreeList(block);
                         if (Log())
                         {
@@ -246,21 +262,20 @@ namespace cmsx.kernel
                         if (block->GetFlag(Block.Flags.dirty))
                         {
                             WriteBlock(block, sb);
-                            continue;
                         }
-                        else
+                        blockMap.Remove(block->Key());
+                        block->SetKey(key);
+                        blockMap[key] = block;
+                        block->ResetFlags();
+                        block->SetFlag(Block.Flags.locked);
+                        void* fiberData = OsGetFiberData();
+                        Process* process = cast<Process*>(fiberData);
+                        block->SetOwner(process);
+                        if (Log())
                         {
-                            blockMap.Remove(block->Key());
-                            block->SetKey(key);
-                            blockMap[key] = block;
-                            block->ResetFlags();
-                            block->SetFlag(Block.Flags.locked);
-                            if (Log())
-                            {
-                                LogMessage("fs.root.bmgr.getblock.end.free", block->ToString());
-                            }
-                            return block;
+                            LogMessage("fs.root.bmgr.getblock.end.free", block->ToString());
                         }
+                        return block;
                     }
                 }
             }
@@ -271,6 +286,16 @@ namespace cmsx.kernel
             {
                 LogMessage("fs.root.bmgr.putblock.begin", block->ToString());
             }
+            if (block->GetFlag(Block.Flags.valid) && !block->GetFlag(Block.Flags.old))
+            {
+                PutBlockToFreeList(block, true);
+            }
+            else
+            {
+                PutBlockToFreeList(block, false);
+            }
+            block->ResetFlag(Block.Flags.locked);
+            block->ResetOwner();
             List<Process*> anyProcesses = GetWaitingProcesses(block->Key().kind);
             Kernel& kernel = GetKernel();
             ProcessTable& processTable = kernel.GetProcessTable();
@@ -283,15 +308,6 @@ namespace cmsx.kernel
             {
                 WakeUpProcess(processTable, process);
             }
-            if (block->GetFlag(Block.Flags.valid) && !block->GetFlag(Block.Flags.old))
-            {
-                PutBlockToFreeList(block, true);
-            }
-            else
-            {
-                PutBlockToFreeList(block, false);
-            }
-            block->ResetFlag(Block.Flags.locked);
             if (Log())
             {
                 LogMessage("fs.root.bmgr.putblock.end", block->ToString());
@@ -354,8 +370,6 @@ namespace cmsx.kernel
                 {
                     Block* block = GetBlock(BlockKey(blockNumber, inode->Key().fsNumber, BlockKind.fileBlock), null);
                     block->Clear();
-                    #assert(block is FileBlock*);
-                    FileBlock* fileBlock = cast<FileBlock*>(block);
                     BlockPutter putter(block);
                     WriteBlock(block, null);
                     fs->SetBlockFree(blockNumber);
@@ -376,15 +390,13 @@ namespace cmsx.kernel
                     {
                         Block* block = GetBlock(BlockKey(blockNumber, inode->Key().fsNumber, BlockKind.fileBlock), null);
                         block->Clear();
-                        #assert(block is FileBlock*);
-                        FileBlock* fileBlock = cast<FileBlock*>(block);
                         BlockPutter putter(block);
                         WriteBlock(block, null);
                         fs->SetBlockFree(blockNumber);
                     }
                 }
                 singleIndirectBlock->Clear();
-                WriteBlock(block, null);
+                WriteBlock(singleIndirectBlock, null);
                 fs->SetBlockFree(singleIndirectBlockNumber);
                 inode->SetSingleIndirectBlockNumber(0);
             }
@@ -411,20 +423,18 @@ namespace cmsx.kernel
                             {
                                 Block* block = GetBlock(BlockKey(blockNumber, inode->Key().fsNumber, BlockKind.fileBlock), null);
                                 block->Clear();
-                                #assert(block is FileBlock*);
-                                FileBlock* fileBlock = cast<FileBlock*>(block);
                                 BlockPutter putter(block);
                                 WriteBlock(block, null);
                                 fs->SetBlockFree(blockNumber);
                             }
                         }
                         singleIndirectBlock->Clear();
-                        WriteBlock(block, null);
+                        WriteBlock(singleIndirectBlock, null);
                         fs->SetBlockFree(singleIndirectBlockNumber);
                     }
                 }
                 doubleIndirectBlock->Clear();
-                WriteBlock(block, null);
+                WriteBlock(doubleIndirectBlock, null);
                 fs->SetBlockFree(doubleIndirectBlockNumber);
                 inode->SetDoubleIndirectBlockNumber(0);
             }
@@ -460,25 +470,23 @@ namespace cmsx.kernel
                                     {
                                         Block* block = GetBlock(BlockKey(blockNumber, inode->Key().fsNumber, BlockKind.fileBlock), null);
                                         block->Clear();
-                                        #assert(block is FileBlock*);
-                                        FileBlock* fileBlock = cast<FileBlock*>(block);
                                         BlockPutter putter(block);
                                         WriteBlock(block, null);
                                         fs->SetBlockFree(blockNumber);
                                     }
                                 }
                                 singleIndirectBlock->Clear();
-                                WriteBlock(block, null);
+                                WriteBlock(singleIndirectBlock, null);
                                 fs->SetBlockFree(singleIndirectBlockNumber);
                             }
                         }
                         doubleIndirectBlock->Clear();
-                        WriteBlock(block, null);
+                        WriteBlock(doubleIndirectBlock, null);
                         fs->SetBlockFree(doubleIndirectBlockNumber);
                     }
                 }
                 tripleIndirectBlock->Clear();
-                WriteBlock(block, null);
+                WriteBlock(tripleIndirectBlock, null);
                 fs->SetBlockFree(tripleIndirectBlockNumber);
                 inode->SetTripleIndirectBlockNumber(0);
             }
@@ -533,7 +541,6 @@ namespace cmsx.kernel
                             block->Clear();
                             #assert(block is BlockNumberBlock*);
                             BlockPutter putter(block);
-                            BlockNumberBlock* singleIndirectBlock = cast<BlockNumberBlock*>(block);
                             WriteBlock(block, null);
                         }
                         else
@@ -558,6 +565,7 @@ namespace cmsx.kernel
                             FileSystem* fs = GetMountTable().GetFileSystem(inode->Key().fsNumber);
                             blockNumber = fs->AllocateBlockNumber();
                             singleIndirectBlock->SetBlockNumber(logicalBlockNumber, blockNumber);
+                            WriteBlock(singleIndirectBlock, null);
                         }
                         else
                         {
@@ -585,7 +593,6 @@ namespace cmsx.kernel
                                 Block* block = GetBlock(BlockKey(doubleIndirectBlockNumber, inode->Key().fsNumber, BlockKind.blockNumberBlock), null);
                                 block->Clear();
                                 #assert(block is BlockNumberBlock*);
-                                BlockNumberBlock* doubleIndirectBlock = cast<BlockNumberBlock*>(block);
                                 BlockPutter putter(block);
                                 WriteBlock(block, null);
                             }
@@ -611,10 +618,10 @@ namespace cmsx.kernel
                                 FileSystem* fs = GetMountTable().GetFileSystem(inode->Key().fsNumber);
                                 singleIndirectBlockNumber = fs->AllocateBlockNumber();
                                 doubleIndirectBlock->SetBlockNumber(logicalBlockNumber / numBlockNumbersInBlock, singleIndirectBlockNumber);
+                                WriteBlock(doubleIndirectBlock, null);
                                 Block* block = GetBlock(BlockKey(singleIndirectBlockNumber, inode->Key().fsNumber, BlockKind.blockNumberBlock), null);
                                 block->Clear();
                                 #assert(block is BlockNumberBlock*);
-                                BlockNumberBlock* singleIndirectBlock = cast<BlockNumberBlock*>(block);
                                 BlockPutter putter(block);
                                 WriteBlock(block, null);
                             }
@@ -641,6 +648,7 @@ namespace cmsx.kernel
                                     FileSystem* fs = GetMountTable().GetFileSystem(inode->Key().fsNumber);
                                     blockNumber = fs->AllocateBlockNumber();
                                     singleIndirectBlock->SetBlockNumber(logicalBlockNumber % numBlockNumbersInBlock, blockNumber);
+                                    WriteBlock(singleIndirectBlock, null);
                                 }
                                 else
                                 {
@@ -669,7 +677,6 @@ namespace cmsx.kernel
                                     Block* block = GetBlock(BlockKey(tripleIndirectBlockNumber, inode->Key().fsNumber, BlockKind.blockNumberBlock), null);
                                     block->Clear();
                                     #assert(block is BlockNumberBlock*);
-                                    BlockNumberBlock* tripleIndirectBlock = cast<BlockNumberBlock*>(block);
                                     BlockPutter putter(block);
                                     WriteBlock(block, null);
                                 }
@@ -695,10 +702,10 @@ namespace cmsx.kernel
                                     FileSystem* fs = GetMountTable().GetFileSystem(inode->Key().fsNumber);
                                     doubleIndirectBlockNumber = fs->AllocateBlockNumber();
                                     tripleIndirectBlock->SetBlockNumber(logicalBlockNumber / (numBlockNumbersInBlock * numBlockNumbersInBlock), doubleIndirectBlockNumber);
+                                    WriteBlock(tripleIndirectBlock, null);
                                     Block* block = GetBlock(BlockKey(doubleIndirectBlockNumber, inode->Key().fsNumber, BlockKind.blockNumberBlock), null);
                                     block->Clear();
                                     #assert(block is BlockNumberBlock*);
-                                    BlockNumberBlock* doubleIndirectBlock = cast<BlockNumberBlock*>(block);
                                     BlockPutter putter(block);
                                     WriteBlock(block, null);
                                 }
@@ -725,10 +732,10 @@ namespace cmsx.kernel
                                         FileSystem* fs = GetMountTable().GetFileSystem(inode->Key().fsNumber);
                                         singleIndirectBlockNumber = fs->AllocateBlockNumber();
                                         doubleIndirectBlock->SetBlockNumber((logicalBlockNumber % (numBlockNumbersInBlock * numBlockNumbersInBlock)) / numBlockNumbersInBlock, singleIndirectBlockNumber);
+                                        WriteBlock(doubleIndirectBlock, null);
                                         Block* block = GetBlock(BlockKey(singleIndirectBlockNumber, inode->Key().fsNumber, BlockKind.blockNumberBlock), null);
                                         block->Clear();
                                         #assert(block is BlockNumberBlock*);
-                                        BlockNumberBlock* singleIndirectBlock = cast<BlockNumberBlock*>(block);
                                         BlockPutter putter(block);
                                         WriteBlock(block, null);
                                     }
@@ -755,6 +762,7 @@ namespace cmsx.kernel
                                             FileSystem* fs = GetMountTable().GetFileSystem(inode->Key().fsNumber);
                                             blockNumber = fs->AllocateBlockNumber();
                                             singleIndirectBlock->SetBlockNumber((logicalBlockNumber % (numBlockNumbersInBlock * numBlockNumbersInBlock)) % numBlockNumbersInBlock, blockNumber);
+                                            WriteBlock(singleIndirectBlock, null);
                                         }
                                         else
                                         {

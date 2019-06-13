@@ -642,7 +642,7 @@ namespace cmsx.debug
                 screen->MoveCursorTo(cursorRow, cursorCol);
             }
         }
-        public nothrow void SetEntryEntryPointAddress(ulong entryPointAddress_)
+        public nothrow void SetEntryPointAddress(ulong entryPointAddress_)
         {
             entryPointAddress = entryPointAddress_;
         }
@@ -1575,8 +1575,8 @@ namespace cmsx.debug
             output.SetScreen(screen.Get());
             commandWindow.SetScreen(screen.Get());
             inputWindow.SetScreen(screen.Get());
-            programEntryPoint = process->EntryPoint();
-            disassembly.SetEntryEntryPointAddress(programEntryPoint);
+            programEntryPoint = process->entryPoint;
+            disassembly.SetEntryPointAddress(programEntryPoint);
             disassembly.SetInstructionEndAddress(programEntryPoint + executable->GetCodeSection()->length);
             uint entryPointInst = ReadInst(process, programEntryPoint);
             stepBreakpoints.Add(Breakpoint(Breakpoint.Kind.step, programEntryPoint, entryPointInst));

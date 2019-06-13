@@ -71,7 +71,7 @@ namespace cmsx.kernel
         List<Process*> processesToWakeUp = SleepingProcessQueue.Instance().GetProcessesToWakeUp(Now().Rep());
         for (Process* process : processesToWakeUp)
         {
-            Console.WriteLine("wake up process " + process->name);
+            Console.WriteLine("wake up process " + ProcessName(process));
             WakeUpProcess(processTable, process);
         }
         Schedule(machine, processTable);
@@ -98,7 +98,7 @@ namespace cmsx.kernel
         string error = "page fault";
         if (process != null)
         {
-            runningProcessName = process->name;
+            runningProcessName = ProcessName(process);
             if ((virtualAddress >= stackSegmentBaseAddress && virtualAddress < kernelBaseAddress))
             {
                 Console.Error() << "stack overflow." << endl();
@@ -130,9 +130,10 @@ namespace cmsx.kernel
         Process* process = processTable.GetRunning();
         string runningProcessName = "?";
         string stackTrace;
+        Console.Error() << "security violation: virtual address = " << ToHexString(virtualAddress) << endl();
         if (process != null)
         {
-            runningProcessName = process->name;
+            runningProcessName = ProcessName(process);
             stackTrace = GetProcessStackTrace(machine, process, machine.GetRegisters().Get(cmsx.machine.regFP));
         }
         Panic("security violation, virtual address = " + ToHexString(virtualAddress) + ", processor not in kernel mode (running process=" + runningProcessName + ")\n" + stackTrace);
@@ -192,12 +193,20 @@ namespace cmsx.kernel
 
     public nothrow void DiskInterruptHandler(Machine& machine, byte irq)
     {
+        if (Log())
+        {
+            LogMessage("intr", "disk");
+        }
         DiskDriver& diskDriver = GetDiskDriver();
         diskDriver.HandleIOCompletions();
     }
 
     public nothrow void KeyboardInterruptHandler(Machine& machine, byte irq)
     {
+        if (Log())
+        {
+            LogMessage("intr", "kb");
+        }
         Kernel& kernel = Kernel.Instance();
         ConsoleDriver* consoleDriver = kernel.GetConsoleDriver();
         if (consoleDriver != null)
@@ -241,7 +250,7 @@ namespace cmsx.kernel
             {
                 if (Log())
                 {
-                    LogMessage("intr.return", "runkernel");
+                    LogMessage("intr.return", ProcessName(process) + ".runkernel");
                 }
                 OsSwitchToFiber(process->fiber);
             }
@@ -253,7 +262,7 @@ namespace cmsx.kernel
             ulong returnValue = cast<ulong>(result);
             if (Log())
             {
-                LogMessage("intr.return", "return=" + ToString(returnValue));
+                LogMessage("intr.return", ProcessName(process) + ".return=" + ToString(returnValue));
             }
             Registers& regs = machine.GetRegisters();
             regs.Set(regAX, returnValue);

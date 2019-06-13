@@ -30,6 +30,10 @@ namespace System.Security
         {
             return hash;
         }
+        public nothrow void SetHash(const string& hash_)
+        {
+            hash = hash_;
+        }
         public nothrow inline int UID() const
         {
             return uid;
@@ -50,6 +54,10 @@ namespace System.Security
         {
             return shell;
         }
+        public void Write(StreamWriter& writer)
+        {
+            writer << username << ":" << hash << ":" << uid << ":" << gid << ":" << info << ":" << home << ":" << shell << endl();
+        }
         private string username;
         private string hash;
         private int uid;
@@ -61,9 +69,16 @@ namespace System.Security
     
     public class Users
     {
+        public nothrow Users() : lastUserId(0)
+        {
+        }
         public void AddUser(const User& user)
         {
             users.Add(user);
+            if (user.UID() > lastUserId)
+            {
+                lastUserId = user.UID();
+            }
         }
         public User* GetUser(int uid) const
         {
@@ -77,15 +92,41 @@ namespace System.Security
                 return null;
             }
         }
+        public User* GetUser(const string& userName) const
+        {
+            HashMap<string, User*>.ConstIterator it = userNameUserMap.CFind(userName);
+            if (it != userNameUserMap.CEnd())
+            {
+                return it->second;
+            }
+            else
+            {
+                return null;
+            }
+        }
         public void Finalize()
         {
             for (User& user : users)
             {
                 uidUserMap[user.UID()] = &user;
+                userNameUserMap[user.Name()] = &user;
             }
+        }
+        public void Write(StreamWriter& writer)
+        {
+            for (const User& user : users)
+            {
+                user.Write(writer);
+            }
+        }
+        public nothrow int GetFreeUserId() const
+        {
+            return lastUserId + 1;
         }
         private List<User> users;
         private HashMap<int, User*> uidUserMap;
+        private HashMap<string, User*> userNameUserMap;
+        private int lastUserId;
     }
     
     public class Group
@@ -102,6 +143,10 @@ namespace System.Security
         {
             return gid;
         }
+        public void Write(StreamWriter& writer)
+        {
+            writer << groupname << ":" << gid << ":" << ToCsv(users) << endl();
+        }
         public nothrow inline const List<string>& Users() const
         {
             return users;
@@ -113,9 +158,16 @@ namespace System.Security
     
     public class Groups
     {
+        public nothrow Groups() : lastGroupId(0)
+        {
+        }
         public void AddGroup(const Group& group)
         {
             groups.Add(group);
+            if (group.GID() > lastGroupId)
+            {
+                lastGroupId = group.GID();
+            }
         }
         public Group* GetGroup(int gid) const
         {
@@ -136,8 +188,20 @@ namespace System.Security
                 gidGroupMap[group.GID()] = &group;
             }
         }
+        public void Write(StreamWriter& writer)
+        {
+            for (const Group& group : groups)
+            {
+                group.Write(writer);
+            }
+        }
+        public nothrow int GetFreeGroupId() const
+        {
+            return lastGroupId + 1;
+        }
         private List<Group> groups;
         private HashMap<int, Group*> gidGroupMap;
+        private int lastGroupId;
     }
     
     public User GetUser(int uid)
@@ -189,6 +253,12 @@ namespace System.Security
         return users;
     }
     
+    public void WriteUsers(const Users& users)
+    {
+        StreamWriter writer = File.CreateText("/etc/passwd");
+        users.Write(writer);
+    }
+    
     public Group GetGroup(int gid)
     {
         StreamReader reader = File.OpenRead("/etc/group");
@@ -236,5 +306,11 @@ namespace System.Security
         }
         groups.Finalize();
         return groups;
+    }
+
+    public void WriteGroups(const Groups& groups)
+    {
+        StreamWriter writer = File.CreateText("/etc/group");
+        groups.Write(writer);
     }
 }

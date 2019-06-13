@@ -136,6 +136,10 @@ namespace System.IO
         }
         public static bool Copy(const string& sourceFilePath, const string& targetFilePath, FileCopyOptions options)
         {
+            return Copy(sourceFilePath, targetFilePath, options, false);
+        }
+        public static bool Copy(const string& sourceFilePath, const string& targetFilePath, FileCopyOptions options, bool verbose)
+        {
             if ((options & FileCopyOptions.update) != FileCopyOptions.none)
             {
                 if (Exists(targetFilePath) && ModificationTime(sourceFilePath) <= ModificationTime(targetFilePath))
@@ -145,6 +149,10 @@ namespace System.IO
             }
             FileStream sourceFile(sourceFilePath, OpenFlags.read);
             FileStream targetFile(targetFilePath, cast<OpenFlags>(OpenFlags.create | OpenFlags.truncate | OpenFlags.write));
+            if (verbose)
+            {
+                Console.Out() << "copying " << sourceFilePath << "..." << endl();
+            }
             sourceFile.CopyTo(targetFile);
             if ((options & FileCopyOptions.preserveMode) != FileCopyOptions.none)
             {

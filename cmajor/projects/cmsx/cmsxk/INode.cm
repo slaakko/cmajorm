@@ -172,13 +172,25 @@ namespace cmsx.kernel
         }
         public nothrow INode(INodeManager* manager_) : manager(manager_), key(INodeKey(invalidINodeNumber, 0)), flags(Flags.none), useCount(0), iterator(),
             mode(0), uid(-1), gid(-1), fileSize(0), ctime(), mtime(), atime(), nlinks(1u), 
-            singleIndirectBlockNumber(invalidBlockNumber), doubleIndirectBlockNumber(invalidBlockNumber), tripleIndirectBlockNumber(invalidBlockNumber)
+            singleIndirectBlockNumber(invalidBlockNumber), doubleIndirectBlockNumber(invalidBlockNumber), tripleIndirectBlockNumber(invalidBlockNumber), owner(null)
         {
             long n = directBlockNumbers.Length();
             for (long i = 0; i < n; ++i)
             {
                 directBlockNumbers[i] = invalidBlockNumber;
             }
+        }
+        public nothrow inline Process* Owner() const
+        {
+            return owner;
+        }
+        public nothrow inline void SetOwner(Process* owner_)
+        {
+            owner = owner_;
+        }
+        public nothrow inline void ResetOwner()
+        {
+            owner = null;
         }
         public nothrow string ToString() const
         {
@@ -546,6 +558,7 @@ namespace cmsx.kernel
         private Access groupAccess;
         private Access otherAccess;
         private INodeManager* manager;
+        private Process* owner;
     }
 
     public class INodeBlock : Block

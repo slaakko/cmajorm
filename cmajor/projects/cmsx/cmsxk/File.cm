@@ -325,6 +325,22 @@ namespace cmsx.kernel
         fs->ChangeMode(process, path, mode);
     }
 
+    public void Chown(Machine& machine, Process* process, ulong pathAddress,  int uid, int gid)
+    {
+        if (pathAddress == 0u)
+        {
+            throw SystemError(EINVAL, "path address is null");
+        }
+        string path;
+        ReadStringFromProcessMemory(machine, process, pathAddress, path);
+        if (path.IsEmpty())
+        {
+            throw SystemError(EINVAL, "path is empty");
+        }
+        FileSystem* fs = GetMountTable().GetFileSystem(0);
+        fs->ChangeOwner(process, path, uid, gid);
+    }
+
     public void UTime(Machine& machine, Process* process, ulong pathAddress, ulong timeBufAddress)
     {
         if (pathAddress == 0u)
@@ -735,6 +751,10 @@ namespace cmsx.kernel
         public override void SetEcho(bool echo)
         {
             GetConsoleDriver().SetEcho(echo);
+        }
+        public override void Release()
+        {
+            GetConsoleDriver().SetEcho(true);
         }
         private string bufferedInput;
     }

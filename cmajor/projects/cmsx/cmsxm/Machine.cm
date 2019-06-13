@@ -74,6 +74,14 @@ namespace cmsx.machine
         {
             processor.Exit();
         }
+        public void SetException(const ExceptionPtr& ex)
+        {
+            exceptionPtr = ex;
+        }
+        public ExceptionPtr GetException()
+        {
+            return exceptionPtr;
+        }
         public inline nothrow Memory& GetMemory()
         {
             return memory;
@@ -343,6 +351,7 @@ namespace cmsx.machine
         private Processor processor;
         private Memory memory;
         private ulong kernelRootPageAddress;
+        private ExceptionPtr exceptionPtr;
     }
 
     public Machine& GetMachine()

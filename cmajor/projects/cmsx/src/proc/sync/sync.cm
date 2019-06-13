@@ -1,0 +1,25 @@
+// =================================
+// Copyright (c) 2019 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Os;
+
+int main(int argc, const char** argv)
+{
+    try
+    {
+        while (true)
+        {
+            Sleep(Duration.FromSeconds(5));
+            Sync();
+        }
+    }
+    catch (const Exception& ex)
+    {
+        Console.Error() << "sync: " << ex.Message() << endl();
+        return 1;
+    }
+    return 0;
+}

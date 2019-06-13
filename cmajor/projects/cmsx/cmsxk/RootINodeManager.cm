@@ -151,14 +151,28 @@ namespace cmsx.kernel
                     {
                         void* fiberData = OsGetFiberData();
                         Process* process = cast<Process*>(fiberData);
-                        inode->AddWaitingProcess(process);
-                        SleepProcess(process, inodeUnlockedEvent, cast<ulong>(cast<void*>(inode)), 0u);
-                        continue;
+                        if (inode->Owner() != process)
+                        {
+                            inode->AddWaitingProcess(process);
+                            SleepProcess(process, inodeUnlockedEvent, cast<ulong>(cast<void*>(inode)), 0u);
+                            continue;
+                        }
+                        else
+                        {
+                            inode->SetUseCount(inode->GetUseCount() + 1);
+                            if (Log())
+                            {
+                                LogMessage("fs.root.imgr.getinode.end", inode->ToString());
+                            }
+                            return inode;
+                        }
                     }
                     else
                     {
-                        // todo mount point
                         inode->SetFlag(INode.Flags.locked);
+                        void* fiberData = OsGetFiberData();
+                        Process* process = cast<Process*>(fiberData);
+                        inode->SetOwner(process);
                         RemoveINodeFromFreeList(inode);
                         inode->SetUseCount(inode->GetUseCount() + 1);
                         if (Log())
@@ -175,6 +189,9 @@ namespace cmsx.kernel
                         throw SystemError(ERLIMITEXCEEDED, "no free inodes in inode cache");
                     }
                     INode* inode = freeINodeList.Front();
+                    void* fiberData = OsGetFiberData();
+                    Process* process = cast<Process*>(fiberData);
+                    inode->SetOwner(process);
                     freeINodeList.RemoveFirst();
                     inode->SetIterator(freeINodeList.End());
                     inodeMap.Remove(inode->Key());
@@ -272,6 +289,7 @@ namespace cmsx.kernel
                 }
                 freeINodeList.Add(inode);
                 inode->SetIterator(LinkedList<INode*>.Iterator(&freeINodeList, freeINodeList.Tail()));
+                inode->ResetOwner();
             }
             inode->ResetFlag(INode.Flags.locked);
             Kernel& kernel = GetKernel();
@@ -343,13 +361,13 @@ namespace cmsx.kernel
                 parent = inode;
                 inodePutter.ResetINode();
             }
-            string dir;
+            string pc;
             for (long pi = 0; pi < pn; ++pi)
             {
                 const string& pathComponent = pathComponents[pi];
                 if (pathComponent.IsEmpty())
                 {
-                    dir = "/";
+                    pc = "/";
                     if (!createEntry)
                     {
                         continue;
@@ -357,11 +375,11 @@ namespace cmsx.kernel
                 }
                 else
                 {
-                    dir = Path.Combine(dir, pathComponent);
+                    pc = Path.Combine(pc, pathComponent);
                 }
                 if (Log())
                 {
-                    LogMessage("fs.root.imgr.pathtoinode.dir", dir);
+                    LogMessage("fs.root.imgr.pathtoinode.pc", pc);
                 }
                 if (createEntry)
                 {
@@ -389,7 +407,7 @@ namespace cmsx.kernel
                         }
                         catch (const Exception& ex)
                         {
-                            throw FileSystemException("cannot browse directory '" + dir + "' using uid " + ToString(process->uid) + ": " + ex.Message());
+                            throw FileSystemException("cannot browse directory '" + pc + "' using uid " + ToString(process->uid) + ": " + ex.Message());
                         }
                         if (inode->Key() == process->rootDirINodeKey && pathComponent == "..") continue;
                         if (pathComponent == ".") continue;
@@ -434,7 +452,7 @@ namespace cmsx.kernel
                                 if (!ignoreMountPoint && inode->GetFlag(INode.Flags.mountPoint))
                                 {
                                     inodePutter.ResetINode(inode);
-                                    FileSystem* mountedFileSystem = GetMountTable().GetMountedFileSystem(dir, inode->Key());
+                                    FileSystem* mountedFileSystem = GetMountTable().GetMountedFileSystem(pc, inode->Key());
                                     if (createEntry && mountedFileSystem->IsReadOnly())
                                     {
                                         throw SystemError(EFAIL, "cannot create entry: mounted file system '" + mountedFileSystem->Name() + "' is read-only");
@@ -469,7 +487,7 @@ namespace cmsx.kernel
                     {
                         if (pi == pn - 1)
                         {
-                            if (freeDirectorySlot.offset == -1)
+                            if (createEntry && freeDirectorySlot.offset == -1)
                             {
                                 DirectorySlot slot(invalidBlockNumber, inode->Key().fsNumber, offset);
                                 freeDirectorySlot = slot;
@@ -478,7 +496,7 @@ namespace cmsx.kernel
                         }
                         else if (pi < pn - 1 && process != null)
                         {
-                            throw SystemError(ENOENT, "directory '" + dir + "' not found");
+                            throw SystemError(ENOENT, "directory '" + pc + "' not found");
                         }
                     }
                 }

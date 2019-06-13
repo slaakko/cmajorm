@@ -295,11 +295,6 @@ namespace cmsx.kernel
                             }
                         }
                         WakeUpProcess(processTable, reader);
-                        Process* running = processTable.GetRunning();
-                        if (running == processTable.GetIdle())
-                        {
-                            Schedule(machine, processTable);
-                        }
                     }
                 }
             }

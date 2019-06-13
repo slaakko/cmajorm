@@ -3,6 +3,7 @@ using System.IO;
 using System.Collections;
 using cmsx.machine;
 using cmsx.object;
+using cmsx.util;
 
 namespace cmsx.kernel
 {
@@ -137,7 +138,7 @@ namespace cmsx.kernel
         return memoryStream;
     }
 
-    public void Exec(Machine& machine, ProcessTable& processTable, Process* process, int argc, ulong argvAddress)
+    public void Exec(Machine& machine, ProcessTable& processTable, Process* process, int argc, ulong argvAddress, long count)
     {
         if (argc < 1)
         {
@@ -147,20 +148,21 @@ namespace cmsx.kernel
         {
             throw SystemError(EINVAL, "exec: argv is null");
         }
+        if (count < 0)
+        {
+            throw SystemError(EINVAL, "exec: count is negative");
+        }
+        UniquePtr<byte> argv(cast<byte*>(RtMemAlloc(count)));
+        ReadProcessMemory(machine, process, argvAddress, argv.Get(), cast<ulong>(count));
+        MemoryReader reader(argv.Get(), count);
         List<string> args;
         for (int i = 0; i < argc; ++i)
         {
-            ulong argAddress = 0u;
-            ReadProcessMemory(machine, process, argvAddress, argAddress, 8u);
-            if (argAddress == 0u)
-            {
-                if (argAddress == 0u)
-                {
-                    throw SystemError(EINVAL, "exec: argument " + ToString(i) + " is null");
-                }
-            }
-            string arg;
-            ReadStringFromProcessMemory(machine, process, argAddress, arg);
+            long offset = reader.ReadLong();
+            long length = reader.ReadLong();
+            byte* argPtr = argv.Get() + offset;
+            MemoryReader argReader(argPtr, length);
+            string arg = argReader.ReadString();
             if (arg.IsEmpty())
             {
                 throw SystemError(EINVAL, "exec: argument " + ToString(i) + " is empty");
@@ -211,6 +213,19 @@ namespace cmsx.kernel
                     dataSection->Read(dataSectionReader);
                     WriteProcessMemory(machine, process, dataSection->BaseAddress(), dataSection->data.Begin().Ptr(), cast<ulong>(dataSection->data.Count()), Protection.write);
                 }
+                Section* symbolSection = executable->GetSymbolSection();
+                if (symbolSection->Length() > 0u)
+                {
+                    SharedPtr<ByteStream> symbolSectionMemoryStream = ReadFilePortionIntoMemoryStream(inode, cast<long>(symbolSection->fileOffset), cast<long>(symbolSection->length));
+                    BinaryReader symbolSectionReader(symbolSectionMemoryStream);
+                    symbolSection->Read(symbolSectionReader);
+                }
+                executable->AddSymbolsToAddressMap();
+                Symbol* mainFunctionSymbol = executable->GetSymbolTable().GetSymbol("Main");
+                process->entryPoint = mainFunctionSymbol->start;
+                Symbol* functionTableSymbol = executable->GetSymbolTable().GetSymbol("@function_table");
+                process->functionTableAddress = functionTableSymbol->start;
+                process->functionTableLength = functionTableSymbol->length;
             }
             else
             {
@@ -227,8 +242,12 @@ namespace cmsx.kernel
             if (binaryFile.Get() is ExecutableFile*)
             {
                 executable = cast<ExecutableFile*>(binaryFile.Get());
+                executable->AddSymbolsToAddressMap();
                 Section* codeSection = executable->GetCodeSection();
                 Section* dataSection = executable->GetDataSection();
+                Section* symbolSection = executable->GetSymbolSection();
+                Symbol* mainFunctionSymbol = executable->GetSymbolTable().GetSymbol("Main");
+                process->entryPoint = mainFunctionSymbol->start;
                 ulong textSegmentStartAddress = codeSection->BaseAddress();
                 if (textSegmentStartAddress == 0u)
                 {
@@ -249,16 +268,23 @@ namespace cmsx.kernel
                 {
                     WriteProcessMemory(machine, process, dataSection->BaseAddress(), dataSection->data.Begin().Ptr(), cast<ulong>(dataSection->data.Count()), Protection.write);
                 }
+                Symbol* functionTableSymbol = executable->GetSymbolTable().GetSymbol("@function_table");
+                process->functionTableAddress = functionTableSymbol->start;
+                process->functionTableLength = functionTableSymbol->length;
             }
             else
             {
                 throw SystemError(EINVAL, "file '" + executablePath + "' is not a CMSX executable");
             }
         }
-        process->fileTable.ReleaseFiles();
-        InitializeFileTable(machine, process->fileTable);
         process->executableINodeKey = executableINodeKey;
         processTable.AddProcessToExecutableINodeProcessMap(process);
+        ulong poolStart = poolSegmentBaseAddress + cast<ulong>(poolSize);
+        ulong poolEnd = poolSegmentBaseAddress + cast<ulong>(poolSize);
+        process->poolStart = poolStart;
+        process->poolEnd = poolEnd;
+        process->name = Path.GetFileName(executablePath);
+        SetProcessReadyToRun(processTable, process);
         if (!poolSection.data.IsEmpty())
         {
             WriteProcessMemory(machine, process, poolSegmentBaseAddress, poolSection.data.Begin().Ptr(), cast<ulong>(poolSection.data.Count()), Protection.write);
@@ -267,12 +293,7 @@ namespace cmsx.kernel
             WriteProcessMemory(machine, process, process->regAXAddress, cast<ulong>(ax), 8u, Protection.write);
             WriteProcessMemory(machine, process, process->regBXAddress, bx, 8u, Protection.write);
         }
-        ulong poolStart = poolSegmentBaseAddress + cast<ulong>(poolSize);
-        ulong poolEnd = poolSegmentBaseAddress + cast<ulong>(poolSize);
-        process->poolStart = poolStart;
-        process->poolEnd = poolEnd;
-        Symbol* functionTableSymbol = executable->GetSymbolTable().GetSymbol("@function_table");
-        process->functionTableAddress = functionTableSymbol->start;
-        process->functionTableLength = functionTableSymbol->length;
+        process->unsave = true;
+        Schedule(machine, processTable);
     }
 }

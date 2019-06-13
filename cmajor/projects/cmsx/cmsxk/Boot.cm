@@ -62,6 +62,12 @@ namespace cmsx.kernel
         SystemCallHandler forkSystemCallHandler = Fork;
         ulong forkSystemCallAddress = cast<ulong>(cast<void*>(forkSystemCallHandler));
         mem.WriteULong(MakeSystemCallPtrAddress(sys_fork), forkSystemCallAddress, Protection.write);
+        SystemCallHandler execSystemCallHandler = Exec;
+        ulong execSystemCallAddress = cast<ulong>(cast<void*>(execSystemCallHandler));
+        mem.WriteULong(MakeSystemCallPtrAddress(sys_exec), execSystemCallAddress, Protection.write);
+        SystemCallHandler killSystemCallHandler = Kill;
+        ulong killSystemCallAddress = cast<ulong>(cast<void*>(killSystemCallHandler)); 
+        mem.WriteULong(MakeSystemCallPtrAddress(sys_kill), killSystemCallAddress, Protection.write);
         SystemCallHandler createSystemCallHandler = Create;
         ulong createSystemCallAddress = cast<ulong>(cast<void*>(createSystemCallHandler));
         mem.WriteULong(MakeSystemCallPtrAddress(sys_create), createSystemCallAddress, Protection.write);
@@ -164,6 +170,9 @@ namespace cmsx.kernel
         SystemCallHandler utimeSystemCallHandler = UTime;
         ulong utimeSystemCallAddress = cast<ulong>(cast<void*>(utimeSystemCallHandler)); 
         mem.WriteULong(MakeSystemCallPtrAddress(sys_utime), utimeSystemCallAddress, Protection.write);
+        SystemCallHandler getuidSystemCallHandler = GetUid;
+        ulong getuidSystemCallAddress = cast<ulong>(cast<void*>(getuidSystemCallHandler)); 
+        mem.WriteULong(MakeSystemCallPtrAddress(sys_getuid), getuidSystemCallAddress, Protection.write);
     }
 
     public void Boot(Machine& machine)
@@ -210,7 +219,7 @@ namespace cmsx.kernel
                 throw Exception("CMAJOR_ROOT environment variable not set. Please set it to contain /path/to/cmajor directory");
             }
             string initProgramFileName = System.IO.GetFullPath(System.IO.Path.Combine(System.IO.Path.Combine(System.IO.Path.Combine(System.IO.Path.Combine(System.IO.Path.Combine(
-                System.IO.Path.Combine(System.IO.Path.Combine(cmajorRootDir, "projects"), "cmsx"), "build"), "init"), "bin"), "release"), "init"));
+                System.IO.Path.Combine(System.IO.Path.Combine(System.IO.Path.Combine(cmajorRootDir, "projects"), "cmsx"), "build"), "proc"), "init"), "bin"), "release"), "init"));
             List<string> initProgramArguments;
             initProgramArguments.Add("--user=" + kernel.User());
             if (Machine.GetFlag(Machine.Flags.install))
@@ -223,6 +232,7 @@ namespace cmsx.kernel
             }
             pid = Load(initProgramFileName, initProgramArguments, currentSession->sid);
             kernel.SetProgramPID(pid);
+            processTable.SetInit(processTable.GetProcess(pid));
         }
         if (pid != -1)
         {

@@ -187,6 +187,7 @@ namespace cmsx.kernel
                             if (!retval)
                             {
                                 ulong lastError = OsGetLastError();
+                                Console.Error() << "dd.error: " << ToString(lastError) << endl();
                                 Panic("OsGetQueuedCompletionStatus failed: error=" + ToString(lastError));
                             }
                             bool handleCompletions = false;
@@ -225,7 +226,11 @@ namespace cmsx.kernel
             }
             catch (const Exception& ex)
             {
-                Panic("error from disk driver run: " + ex.ToString());
+                Console.Error() << ex.Message() << endl();
+                ExceptionPtr exceptionPtr = CaptureCurrentException();
+                Machine& machine = GetMachine();
+                machine.SetException(exceptionPtr);
+                machine.Exit();
             }
         }
         public void HandleIOCompletions()

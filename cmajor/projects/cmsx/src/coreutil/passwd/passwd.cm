@@ -1,0 +1,187 @@
+// =================================
+// Copyright (c) 2019 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Collections;
+using System.Os;
+using System.Security;
+
+void PrintHelp()
+{
+    Console.Out() << 
+        "Usage: passwd [options] [USERNAME]" << endl() <<
+        "Change user password." << endl() << 
+        "If no USERNAME provided, change password of the current user." << endl() << endl() <<
+        "Options:" << endl() << endl() <<
+        "--help | -h" << endl() <<
+        "   Print help and exit." << endl() << endl() <<
+        "--diagnostics | -d" << endl() <<
+        "   Show stack trace in case of error." << endl() << endl();
+}
+
+int main(int argc, const char** argv)
+{
+    bool prevEcho = false;
+    bool diagnostics = false;
+    bool printUnchangedMessage = false;
+    try
+    {
+        List<string> userArgs;
+        for (int i = 1; i < argc; ++i)
+        {
+            string arg = argv[i];
+            if (arg.StartsWith("--"))
+            {
+                if (arg == "--help")
+                {
+                    PrintHelp();
+                    return 1;
+                }
+                else if (arg == "--diagnostics")
+                {
+                    diagnostics = true;
+                }
+                else
+                {
+                    throw Exception("unknown option '" + arg + "'");
+                }
+            }
+            else if (arg.StartsWith("-"))
+            {
+                string options = arg.Substring(1);
+                if (options.IsEmpty())
+                {
+                    throw Exception("unknown option '" + arg + "'");
+                }
+                else
+                {
+                    for (char o : options)
+                    {
+                        if (o == 'h')
+                        {
+                            PrintHelp();
+                            return 1;
+                        }
+                        else if (o == 'd')
+                        {
+                            diagnostics = true;
+                        }
+                        else
+                        {
+                            throw Exception("unknown option '-" + string(o) + "'");
+                        }
+                    }
+                }
+            }
+            else
+            {
+                userArgs.Add(arg);
+            }
+        }
+        if (!IsConsole(0))
+        {
+            throw Exception("passwd: input not coming from console");
+        }
+        prevEcho = Echo(0);
+        SetEcho(0, false);
+        Users users = GetUsers();
+        User* user = null;
+        if (userArgs.IsEmpty())
+        {
+            int uid = GetUid();
+            user = users.GetUser(uid);
+            if (user == null)
+            {
+                throw Exception("uid " + ToString(uid) + " not found from the /etc/passwd file");
+            }
+        }
+        else if (userArgs.Count() == 1)
+        {
+            int uid = GetUid();
+            user = users.GetUser(userArgs[0]);
+            if (user == null)
+            {
+                throw Exception("user " + userArgs[0] + " not found from the /etc/passwd file");
+            }
+            if (uid != user->UID() && uid != 0)
+            {
+                throw Exception("only root can changed passwords for other accounts");
+            }
+        }
+        else if (userArgs.Count() > 1)
+        {
+            PrintHelp();
+            throw Exception("more than one user account specified");
+        }
+        if (user->Hash().IsEmpty())
+        {
+            Console.Out() << "Setting password for " << user->Name() << "." << endl();
+        }
+        else
+        {
+            Console.Out() << "Changing password for " << user->Name() << "." << endl();
+            Console.Out() << "Current CMSX password: ";
+            string password = Console.In().ReadLine();
+            if (password.IsEmpty())
+            {
+                throw Exception("Unauthorized.");
+            }
+            else
+            {
+                string hash = GetSha1MessageDigest(password);
+                if (user->Hash() != hash)
+                {
+                    throw Exception("Unauthorized.");
+                }
+            }
+        }
+        Console.Out() << "Enter new CMSX password: ";
+        string password = Console.In().ReadLine();
+        while (password.IsEmpty())
+        {
+            Console.Out() << "Password cannot be empty." << endl();
+            Console.Out() << "Enter new CMSX password: ";
+            password = Console.In().ReadLine();
+        }
+        Console.Out() << "Retype new CMSX password: ";
+        string passwordRetyped = Console.In().ReadLine();
+        if (password != passwordRetyped)
+        {
+            Console.Out() << "Passwords do not match." << endl();
+            printUnchangedMessage = true;
+            throw Exception("Unauthorized.");
+        }
+        printUnchangedMessage = true;
+        string hash = GetSha1MessageDigest(password);
+        user->SetHash(hash);
+        WriteUsers(users);
+        Console.Out() << "Password changed." << endl();
+        SetEcho(0, prevEcho);
+    }
+    catch (const Exception& ex)
+    {
+        if (printUnchangedMessage)
+        {
+            Console.Out() << "passwd: Password unchanged." << endl();
+        }
+        if (diagnostics)
+        {
+            Console.Error() << ex.ToString() << endl();
+        }
+        else
+        {
+            Console.Error() << ex.Message() << endl();
+        }
+        try
+        {
+            SetEcho(0, prevEcho);
+        }
+        catch (const Exception&)
+        {
+        }
+        return 1;
+    }
+    return 0;
+}

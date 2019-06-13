@@ -1,0 +1,356 @@
+// =================================
+// Copyright (c) 2019 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.IO;
+using System.Os;
+using System.Security;
+
+void CheckValidUserName(const string& userName)
+{
+    if (userName.IsEmpty())
+    {
+        throw Exception("error: user name is empty");
+    }
+    for (char c : userName)
+    {
+        bool validChar = (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9');
+        if (!validChar)
+        {
+            throw Exception("error: " + userName + " is not a valid CMSX user account name. It must not be empty and must consist of letters a-z, A-Z and digits 0-9.");
+        }
+    }
+}
+
+void InstallBin(bool verbose)
+{
+    if (!Directory.Exists("/bin")) 
+    {
+        Mkdir("/bin", cast<int>(ParseOctal("755")));
+        if (verbose)
+        {
+            Console.Out() << "init: /bin created" << endl();
+        }
+    }
+    string hostBinDir = "/mnt/cmsx/bin";
+    DirectoryReader reader(hostBinDir);
+    DirectoryEntry dirEntry;
+    while (reader.Read(dirEntry))
+    {
+        string binFileName(&dirEntry.name[0]);
+        if (binFileName.StartsWith("."))
+        {
+            continue;
+        }
+        string binFilePath = Path.Combine("/bin", binFileName);
+        string hostBinFilePath = Path.Combine(hostBinDir, binFileName);
+        if (File.Copy(hostBinFilePath, binFilePath, cast<FileCopyOptions>(FileCopyOptions.update | FileCopyOptions.preserveTimes), verbose))
+        {
+            Chmod(binFilePath.Chars(), cast<int>(ParseOctal("755")));
+            if (verbose)
+            {
+                Console.Out() << "init: " << hostBinFilePath << " -> " << binFilePath << endl();
+            }
+        }
+    }
+}
+
+void InstallSystemBin(bool verbose)
+{
+    if (!Directory.Exists("/sbin")) 
+    {
+        Mkdir("/sbin", cast<int>(ParseOctal("755")));
+        if (verbose)
+        {
+            Console.Out() << "init: /sbin created" << endl();
+        }
+    }
+    string hostSBinDir = "/mnt/cmsx/sbin";
+    DirectoryReader reader(hostSBinDir);
+    DirectoryEntry dirEntry;
+    while (reader.Read(dirEntry))
+    {
+        string sbinFileName(&dirEntry.name[0]);
+        if (sbinFileName.StartsWith("."))
+        {
+            continue;
+        }
+        string sbinFilePath = Path.Combine("/sbin", sbinFileName);
+        string hostSBinFilePath = Path.Combine(hostSBinDir, sbinFileName);
+        if (File.Copy(hostSBinFilePath, sbinFilePath, cast<FileCopyOptions>(FileCopyOptions.update | FileCopyOptions.preserveTimes), verbose))
+        {
+            Chmod(sbinFilePath.Chars(), cast<int>(ParseOctal("755")));
+            if (verbose)
+            {
+                Console.Out() << "init: " << hostSBinFilePath << " -> " << sbinFilePath << endl();
+            }
+        }
+    }
+}
+
+void InstallEtc(bool verbose)
+{
+    if (!Directory.Exists("/etc")) 
+    {
+        Mkdir("/etc", cast<int>(ParseOctal("755")));
+        if (verbose)
+        {
+            Console.Out() << "init: /etc created" << endl();
+        }
+    }
+    if (!File.Exists("/etc/passwd"))
+    {
+        StreamWriter writer(SharedPtr<Stream>(new FileStream("/etc/passwd", cast<OpenFlags>(OpenFlags.write | OpenFlags.create | OpenFlags.truncate), cast<int>(ParseOctal("644")))));
+        // username:hash:uid:gid:info:home:shell
+        writer << "root:142E4F84D6C5554052F32A6968E88EDCD56B118A:0:0:root:/:/bin/cmsh\n";
+        if (verbose)
+        {
+            Console.Out() << "init: /etc/passwd created" << endl();
+        }
+    }
+    if (!File.Exists("/etc/group"))
+    {
+        StreamWriter writer(SharedPtr<Stream>(new FileStream("/etc/group", cast<OpenFlags>(OpenFlags.write | OpenFlags.create | OpenFlags.truncate), cast<int>(ParseOctal("644")))));
+        // groupname:gid:usercsv
+        writer << "root:0:root\n";
+        if (verbose)
+        {
+            Console.Out() << "init: /etc/group created" << endl();
+        }
+    }
+}
+
+void InstallHome(bool verbose)
+{
+    if (!Directory.Exists("/home"))
+    {
+        Mkdir("/home", cast<int>(ParseOctal("755")));
+        if (verbose)
+        {
+            Console.Out() << "init: /home created" << endl();
+        }
+    }
+}
+
+void SetUserPassword(const string& userName)
+{
+    int pid = Fork();
+    if (pid == 0)
+    {
+        Exec("/bin/passwd", List<string>(1, userName));
+    }
+    ushort exitCode = 0u;
+    int childPID = Wait(&exitCode);
+    if (exitCode != 0u)
+    {
+        throw Exception("error: passwd exited with code = " + ToString(exitCode));
+    }
+}
+
+void InstallUser(const string& userName, bool verbose)
+{
+    if (userName == "root")
+    {
+        return;
+    }
+    Users users = GetUsers();
+    User* user = users.GetUser(userName);
+    if (user == null)
+    {
+        Groups groups = GetGroups();
+        int uid = users.GetFreeUserId();
+        int gid = groups.GetFreeGroupId();    
+        User newUser(userName, string(), uid, gid, userName, Path.Combine("/home", userName), "/bin/cmsh");
+        users.AddUser(newUser);
+        Group newGroup(userName, gid, List<string>(1, userName));
+        groups.AddGroup(newGroup);
+        WriteUsers(users);
+        WriteGroups(groups);
+        users = GetUsers();
+        user = users.GetUser(userName);
+    }
+    if (user == null)
+    {
+        throw Exception("error: could not update /etc/passwd and /etc/group");
+    }
+    if (user->Hash().IsEmpty())
+    {
+        SetUserPassword(userName);
+        users = GetUsers();
+        user = users.GetUser(userName);
+        if (user == null)
+        {
+            throw Exception("error: could not update /etc/passwd and /etc/group");
+        }
+        if (user->Hash().IsEmpty())
+        {
+            throw Exception("error: user password not set");
+        }
+    }
+    if (!Directory.Exists(user->Home()))
+    {
+        CreateDirectories(user->Home());
+        if (verbose)
+        {
+            Console.Out() << "init: " << user->Home() << " created" << endl();
+        }
+        Chown(user->Home().Chars(), user->UID(), user->GID());
+        if (verbose)
+        {
+            Console.Out() << "init: owner of " << user->Home() << " set to " << userName << endl();
+        }
+    }
+}
+
+void Install(const string& userName, bool verbose)
+{
+    if (verbose)
+    {
+        Console.Out() << "init: installing..." << endl();
+    }
+    InstallBin(verbose);
+    InstallSystemBin(verbose);
+    InstallEtc(verbose);
+    InstallHome(verbose);
+    InstallUser(userName, verbose);
+    if (verbose)
+    {
+        Console.Out() << "init: installation done." << endl();
+    }
+}
+
+int StartSync(bool verbose)
+{
+    int pid = Fork();
+    if (pid == 0)
+    {
+        Exec("/sbin/sync", List<string>());
+    }
+    else
+    {
+        if (verbose)
+        {
+            Console.Out() << "init: sync started" << endl();
+        }
+        return pid;
+    }
+    return 0;
+}
+
+int StartShell(const string& shell, bool verbose)
+{
+    int pid = Fork();
+    if (pid == 0)
+    {
+        Exec(shell.Chars(), List<string>());
+    }
+    else
+    {
+        if (verbose)
+        {
+            Console.Out() << "init: " << shell << " started" << endl();
+        }
+        return pid;
+    }
+    return 0;
+}
+
+int main(int argc, const char** argv)
+{
+    try
+    {
+        string userName;
+        bool install = false;
+        bool verbose = false;
+        for (int i = 1; i < argc; ++i)
+        {
+            string arg = argv[i];
+            if (arg.StartsWith("--"))
+            {
+                if (arg.StartsWith("--user="))
+                {
+                    userName = arg.Substring(7);
+                }
+                else if (arg == "--install")
+                {
+                    install = true;
+                }
+                else if (arg == "--verbose")
+                {
+                    verbose = true;
+                }
+                else 
+                {
+                    throw Exception("error: unknown option '" + arg + "'");
+                }
+            }
+            else if (arg.StartsWith("-"))
+            {
+                if (arg.StartsWith("-u="))
+                {
+                    userName = arg.Substring(3);
+                }
+                else
+                {
+                    string options = arg.Substring(1);
+                    if (options.IsEmpty())
+                    {
+                        throw Exception("error: unknown option '" + arg + "'");
+                    }
+                    else
+                    {
+                        for (char o : options)
+                        {
+                            if (o == 'i')
+                            {
+                                install = true;
+                            }
+                            else if (o == 'v')
+                            {
+                                verbose = true;
+                            }
+                            else
+                            {
+                                throw Exception("error: unknown option '" + arg + "'");
+                            }
+                        }
+                    }
+                }
+            }
+            else
+            {
+                throw Exception("error: unknown argument '" + arg + "'");
+            }
+        }
+        if (userName.IsEmpty())
+        {
+            throw Exception("error: User not specified. Run cmsx with --user=USERNAME [--install] option.");
+        }
+        else 
+        {
+            CheckValidUserName(userName);
+        }
+        if (verbose)
+        {
+            Console.Out() << "init: user=" << userName << endl();
+        }
+        if (install)
+        {
+            Install(userName, verbose);
+        }
+        Users users = GetUsers();
+        User* user = users.GetUser(userName);
+        if (user == null)
+        {
+            throw Exception("error: user " + userName + " not found. Run cmsx with --install option.");
+        }
+    }
+    catch (const Exception& ex)
+    {
+        Console.Error() << "init: " << ex.Message() << endl();
+        return 1;
+    }
+    return 0;
+}

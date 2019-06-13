@@ -7,41 +7,46 @@ namespace cmsx.kernel
     public const byte sys_wait = 1u;
     public const byte sys_fork = 2u;
     public const byte sys_exec = 3u;
-    public const byte sys_create = 4u;
-    public const byte sys_open = 5u;
-    public const byte sys_close = 6u;
-    public const byte sys_read = 7u;
-    public const byte sys_write = 8u;
-    public const byte sys_seek = 9u;
-    public const byte sys_tell = 10u;
-    public const byte sys_pool_end = 11u;
-    public const byte sys_set_pool_end = 12u;
-    public const byte sys_debug_break = 13u;
-    public const byte sys_stack_trace = 14u;
-    public const byte sys_throw = 15u;
-    public const byte sys_catch = 16u;
-    public const byte sys_resume = 17u;
-    public const byte sys_get_system_error = 18u;
-    public const byte sys_get_current_time_point = 19u;
-    public const byte sys_sleep = 20u;
-    public const byte sys_get_current_date = 21u;
-    public const byte sys_get_current_date_time = 22u;
-    public const byte sys_pow = 23u;
-    public const byte sys_get_random_seed = 24u;
-    public const byte sys_link = 25u;
-    public const byte sys_unlink = 26u;
-    public const byte sys_mkdir = 27u;
-    public const byte sys_opendir = 28u;
-    public const byte sys_readdir = 29u;
-    public const byte sys_closedir = 30u;
-    public const byte sys_getcwd = 31u;
-    public const byte sys_chdir = 32u;
-    public const byte sys_stat = 33u;
-    public const byte sys_umask = 34u;
-    public const byte sys_ioctl = 35u;
-    public const byte sys_chmod = 36u;
-    public const byte sys_utime = 37u;
-    public const byte numSystemCalls = sys_utime + 1u;
+    public const byte sys_kill = 4u;
+    public const byte sys_create = 5u;
+    public const byte sys_open = 6u;
+    public const byte sys_close = 7u;
+    public const byte sys_read = 8u;
+    public const byte sys_write = 9u;
+    public const byte sys_seek = 10u;
+    public const byte sys_tell = 11u;
+    public const byte sys_pool_end = 12u;
+    public const byte sys_set_pool_end = 13u;
+    public const byte sys_debug_break = 14u;
+    public const byte sys_stack_trace = 15u;
+    public const byte sys_throw = 16u;
+    public const byte sys_catch = 17u;
+    public const byte sys_resume = 18u;
+    public const byte sys_get_system_error = 19u;
+    public const byte sys_get_current_time_point = 20u;
+    public const byte sys_sleep = 21u;
+    public const byte sys_get_current_date = 22u;
+    public const byte sys_get_current_date_time = 23u;
+    public const byte sys_pow = 24u;
+    public const byte sys_get_random_seed = 25u;
+    public const byte sys_link = 26u;
+    public const byte sys_unlink = 27u;
+    public const byte sys_mkdir = 28u;
+    public const byte sys_opendir = 29u;
+    public const byte sys_readdir = 30u;
+    public const byte sys_closedir = 31u;
+    public const byte sys_getcwd = 32u;
+    public const byte sys_chdir = 33u;
+    public const byte sys_stat = 34u;
+    public const byte sys_umask = 35u;
+    public const byte sys_ioctl = 36u;
+    public const byte sys_chmod = 37u;
+    public const byte sys_chown = 38u;
+    public const byte sys_utime = 39u;
+    public const byte sys_getuid = 40u;
+    public const byte sys_sync = 41u;
+    
+    public const byte numSystemCalls = sys_sync + 1u;
 
     public nothrow string SystemCallName(byte systemCall)
     {
@@ -51,6 +56,7 @@ namespace cmsx.kernel
             case sys_wait: return "sys_wait";
             case sys_fork: return "sys_fork";
             case sys_exec: return "sys_exec";
+            case sys_kill: return "sys_kill";
             case sys_create: return "sys_create";
             case sys_open: return "sys_open";
             case sys_close: return "sys_close";
@@ -84,7 +90,10 @@ namespace cmsx.kernel
             case sys_umask: return "sys_umask";
             case sys_ioctl: return "sys_ioctl";
             case sys_chmod: return "sys_chmod";
+            case sys_chown: return "sys_chown";
             case sys_utime: return "sys_utime";
+            case sys_getuid: return "sys_getuid";
+            case sys_sync: return "sys_sync";
         }
         return string();
     }
@@ -186,13 +195,15 @@ namespace cmsx.kernel
             Panic("invalid exit parameters: " + ToString(sc.x) + ", " + ToString(sc.y) + ", " + ToString(sc.z));
         }
         ushort exitCode = MakeProcessExitCode(0u, cast<byte>(sc.ax));
-        ExitProcess(*sc.machine, *sc.processTable, sc.process, exitCode);
-        if (sc.process->pid == sc.kernel->GetProgramPID())
-        {
-            sc.machine->GetProcessor().Exit();
-        }
         Debugger* debugger = sc.kernel->GetDebugger();
-        debugger->Exit(sc.process);
+        Processor& processor = sc.machine->GetProcessor();
+        Process* process = sc.process;
+        ExitProcess(*sc.machine, *sc.processTable, process, exitCode);
+        if (process->pid == sc.kernel->GetProgramPID())
+        {
+            processor.Exit();
+        }
+        debugger->Exit(process);
     }
 
     public void Wait(SystemCall& sc)
@@ -221,7 +232,17 @@ namespace cmsx.kernel
         {
             Panic("invalid exec parameters: " + ToString(sc.x) + ", " + ToString(sc.y) + ", " + ToString(sc.z));
         }
-        Exec(*sc.machine, *sc.processTable, sc.process, cast<int>(sc.ax), cast<ulong>(sc.bx));
+        Exec(*sc.machine, *sc.processTable, sc.process, cast<int>(sc.ax), cast<ulong>(sc.bx), cast<long>(sc.cx));
+        sc.result = cast<int>(sc.ax);
+    }
+
+    public void Kill(SystemCall& sc)
+    {
+        if (sc.x != 0u || sc.y != sys_kill || sc.z != 0u)
+        {
+            Panic("invalid kill parameters: " + ToString(sc.x) + ", " + ToString(sc.y) + ", " + ToString(sc.z));
+        }
+        SendSignalProcess(*sc.machine, *sc.processTable, sc.process, cast<int>(sc.ax), cast<int>(sc.bx));
         sc.result = 0;
     }
 
@@ -619,12 +640,41 @@ namespace cmsx.kernel
         sc.result = 0;
     }
 
+    public void Chown(SystemCall& sc)
+    {
+        if (sc.x != 0u || sc.y != sys_chown || sc.z != 0u)
+        {
+            Panic("invalid chmod parameters: " + ToString(sc.x) + ", " + ToString(sc.y) + ", " + ToString(sc.z));
+        }
+        Chown(*sc.machine, sc.process, sc.ax, cast<int>(sc.bx), cast<int>(sc.cx));
+        sc.result = 0;
+    }
+
     public void UTime(SystemCall& sc)
     {
         if (sc.x != 0u || sc.y != sys_utime || sc.z != 0u)
         {
-            Panic("invalid utim parameters: " + ToString(sc.x) + ", " + ToString(sc.y) + ", " + ToString(sc.z));
+            Panic("invalid utime parameters: " + ToString(sc.x) + ", " + ToString(sc.y) + ", " + ToString(sc.z));
         }
         UTime(*sc.machine, sc.process, sc.ax, sc.bx);
+    }
+
+    public void GetUid(SystemCall& sc)
+    {
+        if (sc.x != 0u || sc.y != sys_getuid || sc.z != 0u)
+        {
+            Panic("invalid getuid parameters: " + ToString(sc.x) + ", " + ToString(sc.y) + ", " + ToString(sc.z));
+        }
+        sc.result = sc.process->uid;
+    }
+
+    public void Sync(SystemCall& sc)
+    {
+        if (sc.x != 0u || sc.y != sys_sync || sc.z != 0u)
+        {
+            Panic("invalid sync parameters: " + ToString(sc.x) + ", " + ToString(sc.y) + ", " + ToString(sc.z));
+        }
+        GetMountTable().Flush();
+        sc.result = 0;
     }
 }

@@ -304,6 +304,20 @@ namespace cmsx.machine
             }
             regs.SetSpecial(Registers.rW, prevPC);
         }
+/*      previous interrupt checking code:
+
+                for (int irq = irqMax - 1; irq >= 0; --irq)
+                {
+                    ulong irqBit = cast<ulong>(1) << cast<ulong>(irq);
+                    bool irqBitSet = (bits & irqBit) != 0u;
+                    if (irqBitSet)
+                    {
+                        ulong handlerPtrAddress = regs.GetSpecial(Registers.rTT) + 8u * cast<ulong>(irq);
+                        HandleInterrupt(cast<byte>(irq), handlerPtrAddress);
+                        regs.ResetInterrupt(irqBit);
+                    }
+                }
+*/
         private nothrow void CheckInterrupts(Instruction*& inst, byte& x, byte& y, byte& z)
         {
             regs.SetSpecial(Registers.rXX, 0u);
@@ -312,23 +326,36 @@ namespace cmsx.machine
             ulong bits = rq & rk;
             if (bits != 0u)
             {
-                Memory& mem = machine.GetMemory();
-                for (int irq = irqMax - 1; irq >= 0; --irq)
+                uint low = cast<uint>(bits);
+                if (low != 0u)
                 {
-                    ulong handlerPtrAddress = regs.GetSpecial(Registers.rTT) + 8u * cast<ulong>(irq);
-                    ulong irqBit = cast<ulong>(1) << cast<ulong>(irq);
-                    bool irqBitSet = (bits & irqBit) != 0u;
-                    if (irqBitSet)
-                    {
-                        HandleInterrupt(cast<byte>(irq), handlerPtrAddress);
-                        regs.ResetInterrupt(irqBit);
-                    }
+                    CheckInterrupts(bits, irqFirstSetBegin, irqFirstSetEnd);
+                }
+                uint high = cast<uint>(bits >> 32u);
+                if (high != 0u)
+                {
+                    CheckInterrupts(bits, irqSecondSetBegin, irqSecondSetEnd);
+                    CheckInterrupts(bits, irqSoftware, irqMax);
                 }
             }
             ulong rxx = regs.GetSpecial(Registers.rXX);
             if (rxx != 0u)
             {
                 MakeInstruction(cast<uint>(rxx), inst, x, y, z);
+            }
+        }
+        private inline nothrow void CheckInterrupts(ulong bits, int first, int last)
+        {
+            for (int irq = first; irq < last; ++irq)
+            {
+                ulong irqBit = cast<ulong>(1) << cast<ulong>(irq);
+                bool irqBitSet = (bits & irqBit) != 0u;
+                if (irqBitSet)
+                {
+                    ulong handlerPtrAddress = regs.GetSpecial(Registers.rTT) + 8u * cast<ulong>(irq);
+                    HandleInterrupt(cast<byte>(irq), handlerPtrAddress);
+                    regs.ResetInterrupt(irqBit);
+                }
             }
         }
         private void HandleInterrupt(byte irq, ulong handlerPtrAddress)

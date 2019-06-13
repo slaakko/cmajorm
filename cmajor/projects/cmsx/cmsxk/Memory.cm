@@ -1403,11 +1403,7 @@ namespace cmsx.kernel
 
     public void CloneMemory(Memory& mem, MemoryTable& targetMemoryTable, MemoryTable& sourceMemoryTable)
     {
-        CloneMemory(mem, targetMemoryTable, sourceMemoryTable, true);
-    }
-
-    public void CloneMemory(Memory& mem, MemoryTable& targetMemoryTable, MemoryTable& sourceMemoryTable, bool copyOnWrite)
-    {
+        mem.ClearTranslationCache(sourceMemoryTable.addressSpaceNumber);
         mem.ClearTranslationCache(targetMemoryTable.addressSpaceNumber);
         for (byte i = 0u; i < numSegments; ++i)
         {
@@ -1420,14 +1416,7 @@ namespace cmsx.kernel
                 }
                 else
                 {
-                    if (copyOnWrite)
-                    {
-                        ShareSegment(mem, i, targetMemoryTable, sourceMemoryTable, Protection.copyOnWrite);
-                    }
-                    else
-                    {
-                        CopySegment(mem, i, targetMemoryTable, sourceMemoryTable, MakeDefaultPageProtection(i));
-                    }
+                    CopySegment(mem, i, targetMemoryTable, sourceMemoryTable, MakeDefaultPageProtection(i));
                 }
             }
         }
@@ -1522,6 +1511,7 @@ namespace cmsx.kernel
         {
             throw Exception("internal error: share segment: target segment descriptor is null"); 
         }
+        targetMemoryTable.segmentDescriptors[segmentIndex] = targetSegmentDescriptor;
         ulong startPageNumber = 0u;
         ulong numPages = 0u;
         CalculatePageNumbers(*targetSegmentDescriptor, startPageNumber, numPages);
@@ -1533,16 +1523,16 @@ namespace cmsx.kernel
     {
         if (segmentIndex >= numSegments)
         {
-            throw Exception("share segment: invalid segment index " + ToString(segmentIndex));
+            throw Exception("copy segment: invalid segment index " + ToString(segmentIndex));
         }
         if (targetMemoryTable.segmentDescriptors[segmentIndex] != null)
         {
-            throw Exception("internal error: share segment: target segment descriptor not null"); 
+            throw Exception("internal error: copy segment: target segment descriptor not null"); 
         }
         SegmentDescriptor* sourceSegmentDescriptor = sourceMemoryTable.segmentDescriptors[segmentIndex];
         if (sourceSegmentDescriptor == null)
         {
-            throw Exception("internal error: share segment: source segment descriptor is null"); 
+            throw Exception("internal error: copy segment: source segment descriptor is null"); 
         }
         if (targetMemoryTable.rootPageAddress == 0u)
         {
@@ -1551,8 +1541,9 @@ namespace cmsx.kernel
         SegmentDescriptor* targetSegmentDescriptor = CreateSegmentDescriptor(sourceSegmentDescriptor->startAddress, sourceSegmentDescriptor->baseAddress, sourceSegmentDescriptor->length);
         if (targetSegmentDescriptor == null)
         {
-            throw Exception("internal error: share segment: target segment descriptor is null"); 
+            throw Exception("internal error: copy segment: target segment descriptor is null"); 
         }
+        targetMemoryTable.segmentDescriptors[segmentIndex] = targetSegmentDescriptor;
         ulong startPageNumber = 0u;
         ulong numPages = 0u;
         CalculatePageNumbers(*targetSegmentDescriptor, startPageNumber, numPages);

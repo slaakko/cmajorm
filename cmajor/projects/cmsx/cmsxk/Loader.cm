@@ -39,6 +39,7 @@ namespace cmsx.kernel
             executable->AddSymbolsToAddressMap();
             Section* codeSection = executable->GetCodeSection();
             Section* dataSection = executable->GetDataSection();
+            Section* symbolSection = executable->GetSymbolSection();
             string name = Path.GetFileName(programFileName);
             List<string> argv;
             argv.Add(name);
@@ -49,7 +50,8 @@ namespace cmsx.kernel
             Section poolSection = MakePoolSection(argv);
             long poolDataLength = Max(cast<long>(executable->InitialPoolSize()), poolSection.data.Count());
             long poolSize = Align(poolDataLength, cast<long>(pageSize));
-            Process* process = CreateSingleProcess(machine, processTable, name, codeSection->BaseAddress(), codeSection->Length(), dataSection->Length(), cast<ulong>(poolSize),
+            Symbol* mainFunctionSymbol = executable->GetSymbolTable().GetSymbol("Main");
+            Process* process = CreateSingleProcess(machine, processTable, name, mainFunctionSymbol->start, codeSection->BaseAddress(), codeSection->Length(), dataSection->Length(), cast<ulong>(poolSize),
                 cast<ulong>(executable->MinStackSize()), cast<ulong>(executable->MaxStackSize()), cast<ulong>(executable->StackSizeIncrement()), sid);
             if (codeSection->Length() > 0u)
             {

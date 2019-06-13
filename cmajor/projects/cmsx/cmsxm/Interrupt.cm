@@ -5,16 +5,17 @@ namespace cmsx.machine
 {
     public const byte irqMax = 64u;
 
-    public const byte irqSoftware = 0u;
-    public const ulong SOFTWARE_INTERRUPT_BIT = cast<ulong>(1u) << irqSoftware;
-    public const byte irqInterval = 1u;
-    public const ulong INTERVAL_INTERRUPT_BIT = cast<ulong>(1u) << irqInterval;
-    public const byte irqClock = 2u;
+    public const byte irqClock = 0u;
     public const ulong CLOCK_BIT = cast<ulong>(1u) << irqClock;
-    public const byte irqDisk = 3u;
+    public const byte irqDisk = 1u;
     public const ulong DISK_BIT = cast<ulong>(1u) << irqDisk;
-    public const byte irqKeyboard = 4u;
+    public const byte irqKeyboard = 2u;
     public const ulong KEYBOARD_BIT = cast<ulong>(1u) << irqKeyboard;
+    public const byte irqInterval = 3u;
+    public const ulong INTERVAL_INTERRUPT_BIT = cast<ulong>(1u) << irqInterval;
+
+    public const int irqFirstSetBegin = 0;
+    public const int irqFirstSetEnd = 4;
 
     public const byte irqR = 32u; // read page fault
     public const ulong R_BIT = cast<ulong>(1u) << irqR;
@@ -34,6 +35,12 @@ namespace cmsx.machine
     public const ulong P_BIT = cast<ulong>(1u) << irqP;
 
     public const ulong MACHINE_INTERRUPT_BITS = R_BIT | W_BIT | X_BIT | N_BIT | K_BIT | COW_BIT | S_BIT | P_BIT;
+
+    public const int irqSecondSetBegin = 32;
+    public const int irqSecondSetEnd = 40;
+
+    public const byte irqSoftware = 63u;
+    public const ulong SOFTWARE_INTERRUPT_BIT = cast<ulong>(1u) << irqSoftware;
 
     public const ulong ALL_INTERRUPT_BITS = 0xFFFFFFFFFFFFFFFFu;
 

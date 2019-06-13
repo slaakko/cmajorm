@@ -71,9 +71,9 @@ void Terminate(Machine& machine)
 
 void MachineThreadFunction(void* machineParam)
 {
+    Machine* machine = cast<Machine*>(machineParam);
     try
     {
-        Machine* machine = cast<Machine*>(machineParam);
         if (machine != null)
         {
             Init(*machine);
@@ -83,7 +83,10 @@ void MachineThreadFunction(void* machineParam)
     }
     catch (const Exception& ex)
     {
-        System.Console.Error() << ex.ToString() << endl();
+        if (machine != null)
+        {
+            machine->SetException(CaptureCurrentException());
+        }
     }
 }
 
@@ -123,19 +126,17 @@ public void PrintHelp()
     Console.Out() << "Run/debug EXECUTABLE in System X virtual machine with args." << endl();
     Console.Out() << "cmsx-options:" << endl();
     Console.Out() << "--help (-h)" << endl();
-    Console.Out() << "  print help" << endl();
+    Console.Out() << "  Print help and exit." << endl();
     Console.Out() << "--verbose (-v)" << endl();
-    Console.Out() << "  be verbose" << endl();
+    Console.Out() << "  Be verbose." << endl();
     Console.Out() << "--quiet (-q)" << endl();
-    Console.Out() << "  be quiet" << endl();
+    Console.Out() << "  Be quiet." << endl();
     Console.Out() << "--debug (-d)" << endl();
-    Console.Out() << "  debug EXECUTABLE" << endl();
+    Console.Out() << "  Debug EXECUTABLE." << endl();
     Console.Out() << "--log (-l)" << endl();
-    Console.Out() << "  log to stdout" << endl();
+    Console.Out() << "  Log kernel operation to stdout." << endl();
     Console.Out() << "--logfile=FILE (-f=FILE)" << endl();
-    Console.Out() << "  log to FILE" << endl();
-    Console.Out() << "--dont-use-translation-cache" << endl();
-    Console.Out() << "  Do not use address translation cache." << endl();
+    Console.Out() << "  Log kernel operation to FILE." << endl();
 }
 
 bool CopyFs()
@@ -410,6 +411,11 @@ int main(int argc, const char** argv)
         bool copied = CopyFs();
         SetUser(user, copied);
         Run();
+        ExceptionPtr exceptionPtr = GetMachine().GetException();
+        if (exceptionPtr.Exception() != null)
+        {
+            ThrowCapturedException(exceptionPtr);
+        }
     }
     catch (const Exception& ex)
     {

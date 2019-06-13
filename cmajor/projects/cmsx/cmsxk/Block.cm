@@ -13,8 +13,8 @@ namespace cmsx.kernel
     public const int maxCachedBitmapBlocks = 16;
     public const int maxCachedINodeBlocks = 16;
     public const int maxCachedBlockNumberBlocks = 16;
-    public const int maxCachedFileBlocks = 16;
-    public const int maxCachedDirectoryBlocks = 16;
+    public const int maxCachedFileBlocks = 128;
+    public const int maxCachedDirectoryBlocks = 64;
     public const int nameMax = 252;
 
     public enum BlockKind : byte
@@ -96,8 +96,20 @@ namespace cmsx.kernel
             }
             return s;
         }
-        public nothrow Block(const BlockKey& key_, BlockManager* manager_, BlockCache* cache_) : key(key_), manager(manager_), cache(cache_), flags(Flags.none), iterator()
+        public nothrow Block(const BlockKey& key_, BlockManager* manager_, BlockCache* cache_) : key(key_), manager(manager_), cache(cache_), flags(Flags.none), iterator(), owner(null)
         {
+        }
+        public nothrow inline Process* Owner() const
+        {
+            return owner;
+        }
+        public nothrow inline void SetOwner(Process* owner_)
+        {
+            owner = owner_;
+        }
+        public nothrow inline void ResetOwner()
+        {
+            owner = null;
         }
         public default virtual ~Block();
         public nothrow string ToString() const
@@ -174,6 +186,7 @@ namespace cmsx.kernel
         private Flags flags;
         private List<Process*> waitingProcesses;
         private LinkedList<Block*>.Iterator iterator;
+        private Process* owner;
     }
 
     public class SuperBlock : Block

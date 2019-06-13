@@ -7,40 +7,44 @@ public const byte sys_exit = 0u;
 public const byte sys_wait = 1u;
 public const byte sys_fork = 2u;
 public const byte sys_exec = 3u;
-public const byte sys_create = 4u;
-public const byte sys_open = 5u;
-public const byte sys_close = 6u;
-public const byte sys_read = 7u;
-public const byte sys_write = 8u;
-public const byte sys_seek = 9u;
-public const byte sys_tell = 10u;
-public const byte sys_pool_end = 11u;
-public const byte sys_set_pool_end = 12u;
-public const byte sys_debug_break = 13u;
-public const byte sys_stack_trace = 14u;
-public const byte sys_throw = 15u;
-public const byte sys_catch = 16u;
-public const byte sys_resume = 17u;
-public const byte sys_get_system_error = 18u;
-public const byte sys_get_current_time_point = 19u;
-public const byte sys_sleep = 20u;
-public const byte sys_get_current_date = 21u;
-public const byte sys_get_current_date_time = 22u;
-public const byte sys_pow = 23u;
-public const byte sys_get_random_seed = 24u;
-public const byte sys_link = 25u;
-public const byte sys_unlink = 26u;
-public const byte sys_mkdir = 27u;
-public const byte sys_opendir = 28u;
-public const byte sys_readdir = 29u;
-public const byte sys_closedir = 30u;
-public const byte sys_getcwd = 31u;
-public const byte sys_chdir = 32u;
-public const byte sys_stat = 33u;
-public const byte sys_umask = 34u;
-public const byte sys_ioctl = 35u;
-public const byte sys_chmod = 36u;
-public const byte sys_utime = 37u;
+public const byte sys_kill = 4u;
+public const byte sys_create = 5u;
+public const byte sys_open = 6u;
+public const byte sys_close = 7u;
+public const byte sys_read = 8u;
+public const byte sys_write = 9u;
+public const byte sys_seek = 10u;
+public const byte sys_tell = 11u;
+public const byte sys_pool_end = 12u;
+public const byte sys_set_pool_end = 13u;
+public const byte sys_debug_break = 14u;
+public const byte sys_stack_trace = 15u;
+public const byte sys_throw = 16u;
+public const byte sys_catch = 17u;
+public const byte sys_resume = 18u;
+public const byte sys_get_system_error = 19u;
+public const byte sys_get_current_time_point = 20u;
+public const byte sys_sleep = 21u;
+public const byte sys_get_current_date = 22u;
+public const byte sys_get_current_date_time = 23u;
+public const byte sys_pow = 24u;
+public const byte sys_get_random_seed = 25u;
+public const byte sys_link = 26u;
+public const byte sys_unlink = 27u;
+public const byte sys_mkdir = 28u;
+public const byte sys_opendir = 29u;
+public const byte sys_readdir = 30u;
+public const byte sys_closedir = 31u;
+public const byte sys_getcwd = 32u;
+public const byte sys_chdir = 33u;
+public const byte sys_stat = 34u;
+public const byte sys_umask = 35u;
+public const byte sys_ioctl = 36u;
+public const byte sys_chmod = 37u;
+public const byte sys_chown = 38u;
+public const byte sys_utime = 39u;
+public const byte sys_getuid = 40u;
+public const byte sys_sync = 41u;
 
 public cdecl nothrow void exit(byte exitCode)
 {
@@ -58,9 +62,14 @@ public cdecl nothrow int fork()
     return cast<int>(trap(0u, sys_fork, 0u));
 }
 
-public cdecl nothrow int execu(int argc, const char** argv)
+public cdecl nothrow int exec(int argc, byte* argv, long count)
 {
-    return cast<int>(trap(0u, sys_exec, 0u, argc, argv));
+    return cast<int>(trap(0u, sys_exec, 0u, argc, argv, count));
+}
+
+public cdecl nothrow int kill(int pid, int sig)
+{
+    return cast<int>(trap(0u, sys_kill, 0u, pid, sig));
 }
 
 public cdecl nothrow int create(const char* path, int mode)
@@ -226,7 +235,22 @@ public cdecl nothrow int chmod(const char* path, int mode)
     return cast<int>(trap(0u, sys_chmod, 0u, path, mode));
 }
 
+public cdecl nothrow int chown(const char* path, int uid, int gid)
+{
+    return cast<int>(trap(0u, sys_chown, 0u, path, uid, gid));
+}
+
 public cdecl nothrow int utime(const char* path, byte* timeBuf)
 {
     return cast<int>(trap(0u, sys_utime, 0u, path, timeBuf));
+}
+
+public cdecl nothrow int getuid()
+{
+    return cast<int>(trap(0u, sys_getuid, 0u));
+}
+
+public cdecl nothrow int sync()
+{
+    return cast<int>(trap(0u, sys_sync, 0u));
 }

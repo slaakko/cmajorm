@@ -1,12 +1,17 @@
+// =================================
+// Copyright (c) 2019 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
 using System;
+using System.Collections;
 using System.IO;
-using System.Os;
 
 void PrintHelp()
 {
-    Console.Out() << "Usage: [options] mketc" << endl() <<
-        "Make /etc directory if it does not exist." << endl() <<
-        "Then make default /etc/passwd and /etc/group files, if they do not exist." << endl() << endl() <<
+    Console.Out() <<
+        "Usage: fc [options] SOURCEFILE TARGETFILE" << endl() << endl() <<
+        "Compare contents of files SOURCEFILE and TARGETFILE" << endl() << endl() <<
         "Options:" << endl() << endl() <<
         "--help | -h" << endl() <<
         "   Print help." << endl() << endl() <<
@@ -16,12 +21,50 @@ void PrintHelp()
         "   Show stack trace in case of error." << endl() << endl();
 }
 
+void CompareFiles(const string& sourceFilePath, const string& targetFilePath, bool verbose)
+{
+    if (verbose)
+    {
+        Console.Out() << "comparing contents of files '" + sourceFilePath + "' and '" + targetFilePath + "'..." << endl();
+    }
+    if (!File.Exists(sourceFilePath))
+    {
+        throw Exception("source file '" + sourceFilePath + "' does not exist");
+    }
+    if (!File.Exists(targetFilePath))
+    {
+        throw Exception("target file '" + targetFilePath + "' does not exist");
+    }
+    long ns = File.Size(sourceFilePath);
+    long nt = File.Size(targetFilePath);
+    if (ns != nt)
+    {
+        throw Exception("file sizes differ: size of '" + sourceFilePath + "' is " + ToString(ns) + " and size of '" + targetFilePath + "' is " + ToString(nt));
+    }
+    BinaryReader sourceReader = File.OpenBinary(sourceFilePath);
+    BinaryReader targetReader = File.OpenBinary(targetFilePath);
+    for (long i = 0; i < ns; ++i)
+    {
+        byte sb = sourceReader.ReadByte();
+        byte tb = targetReader.ReadByte();
+        if (sb != tb)
+        {
+            throw Exception("source file index " + ToString(i) + " byte " + ToString(sb) + " differs from target file byte " + ToString(tb));
+        }
+    }
+    if (verbose)
+    {
+        Console.Out() << "contents of files '" + sourceFilePath + "' and '" + targetFilePath + "' are identical" << endl();
+    }
+}
+
 int main(int argc, const char** argv)
 {
     bool diagnostics = false;
     try
     {
         bool verbose = false;
+        List<string> files;
         for (int i = 1; i < argc; ++i)
         {
             string arg = argv[i];
@@ -76,84 +119,32 @@ int main(int argc, const char** argv)
                     }
                 }
             }
+            else
+            {
+                files.Add(arg);
+            }
         }
-        if (!Directory.Exists("/etc"))
+        if (files.Count() != 2)
         {
-            if (verbose)
-            {
-                Console.Out() << "/etc does not exist, creating...";
-            }
-            Mkdir("/etc");
-            if (verbose)
-            {
-                Console.Out() << "\b\b\b, done." << endl();
-            }
+            PrintHelp();
+            throw Exception("number of files must be 2");
         }
         else
         {
-            if (verbose)
-            {
-                Console.Out() << "/etc already exists." << endl();
-            }
-        }
-        if (!File.Exists("/etc/passwd"))
-        {
-            if (verbose)
-            {
-                Console.Out() << "/etc/passwd does not exist, creating...";
-            }
-            StreamWriter writer(SharedPtr<Stream>(new FileStream("/etc/passwd", cast<OpenFlags>(OpenFlags.write | OpenFlags.create | OpenFlags.truncate), cast<int>(ParseOctal("644")))));
-            // username:hash:uid:gid:info:home:shell
-            writer << "root:142E4F84D6C5554052F32A6968E88EDCD56B118A:0:0:root:/:/bin/cmsh\n";
-            if (verbose)
-            {
-                Console.Out() << "\b\b\b, done." << endl();
-            }
-        }
-        else
-        {
-            if (verbose)
-            {
-                Console.Out() << "/etc/passwd already exists." << endl();
-            }
-        }
-        if (!File.Exists("/etc/group"))
-        {
-            if (verbose)
-            {
-                Console.Out() << "/etc/group does not exist, creating...";
-            }
-            StreamWriter writer(SharedPtr<Stream>(new FileStream("/etc/group", cast<OpenFlags>(OpenFlags.write | OpenFlags.create | OpenFlags.truncate), cast<int>(ParseOctal("644")))));
-            // groupname:gid:usercsv
-            writer << "root:0:root\n";
-            if (verbose)
-            {
-                Console.Out() << "\b\b\b, done." << endl();
-            }
-        }
-        else
-        {
-            if (verbose)
-            {
-                Console.Out() << "/etc/group already exists." << endl();
-            }
-        }
-        if (verbose)
-        {
-            Console.Out() << "Done." << endl();
+            CompareFiles(files[0], files[1], verbose);
         }
     }
     catch (const Exception& ex)
     {
         if (diagnostics)
         {
-            Console.Error() << endl() << ex.ToString() << endl();
+            Console.Error() << ex.ToString() << endl();
         }
         else
         {
-            Console.Error() << endl() << ex.Message() << endl();
+            Console.Error() << ex.Message() << endl();
         }
         return 1;
     }
     return 0;
-} 
+}

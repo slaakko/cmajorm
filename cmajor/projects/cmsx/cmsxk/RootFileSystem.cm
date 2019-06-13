@@ -123,6 +123,15 @@ namespace cmsx.kernel
             }
             inode->SetAccessMode(mode);
         }
+        public override void ChangeOwner(Process* process, const string& path, INode* inode, int uid, int gid)
+        {
+            if (process->uid != 0)
+            {
+                throw SystemError(EPERM, "error changing owner of '" + path + "': not authorized");
+            }
+            inode->SetUID(uid);
+            inode->SetGID(gid);
+        }
         public override void UpdateFileTimes(Process* process, const string& path, INode* inode, const DateTime& atime, const DateTime& mtime)
         {
             if (process->uid != inode->UID())

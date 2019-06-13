@@ -693,6 +693,21 @@ namespace cmsx.kernel
         {
             throw SystemError(EINVAL, "error changing mode of '" + path + "': file system '" + name + "' does not support chmod");
         }
+        public void ChangeOwner(Process* process, const string& path, int uid, int gid)
+        {
+            INode* inode = GetINodeManager()->PathToINode(process, path);
+            if (inode == null)
+            {
+                throw SystemError(ENOENT, "path '" + path + "' does not exist");
+            }
+            INodePutter putter(inode);
+            FileSystem* fs = GetMountTable().GetFileSystem(inode->Key().fsNumber);
+            fs->ChangeOwner(process, path, inode, uid, gid);
+        }
+        public virtual void ChangeOwner(Process* process, const string& path, INode* inode, int uid, int gid)
+        {
+            throw SystemError(EINVAL, "error changing owner of '" + path + "': file system '" + name + "' does not support chown");
+        }
         public void UpdateFileTimes(Process* process, const string& path, const DateTime& atime, const DateTime& mtime)
         {
             INode* inode = GetINodeManager()->PathToINode(process, path);

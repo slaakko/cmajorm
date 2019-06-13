@@ -68,6 +68,17 @@ namespace cmsx.util
             DateTime dt(date, secs);
             return dt;
         }
+        public string ReadString()
+        {
+            string result;
+            byte b = ReadByte();
+            while (b != 0u)
+            {
+                result.Append(cast<char>(b));
+                b = ReadByte();
+            }
+            return result;
+        }
         private byte* ptr;
         private byte* pos;
         private long count;

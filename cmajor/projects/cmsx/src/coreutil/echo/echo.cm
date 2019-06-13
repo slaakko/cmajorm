@@ -6,19 +6,18 @@
 using System;
 using System.Collections;
 
-void PrintUsage()
+void PrintHelp()
 {
-    Console.Out() << "umask [options] [<mask>]" << endl() <<
-        "Set or print file and directory creation mask where <mask> is three octal digits representing inverted owner, group and others permission mask." << endl() <<
-        "Default umask is 000, so that by default files are created with permissions 666 and directories with permissions 777." << endl() << endl() <<
+    Console.Out() << 
+        "Usage: echo [options] [ARG]..." << endl() << endl() <<
+        "Print arguments to standard output." << endl() << endl() <<
         "Options:" << endl() << endl() <<
         "--help | -h" << endl() <<
-        "   Print help." << endl() << endl() <<
-        "--verbose | -v" << endl() <<
-        "   Be verbose." << endl() << endl() <<
+        "   Print help and exit." << endl() << endl() <<
         "--diagnostics | -d" << endl() <<
-        "   Show stack trace in case of error." << endl() << endl() << 
-        endl();
+        "   Show stack trace in case of error." << endl() << endl() <<
+        "--no-trailing-newline | -n" << endl() <<
+        "   Do not print the trailing newline." << endl() << endl();
 }
 
 int main(int argc, const char** argv)
@@ -26,9 +25,8 @@ int main(int argc, const char** argv)
     bool diagnostics = false;
     try
     {
-        int mask = cast<int>(ParseOctal("777"));
         List<string> args;
-        bool verbose = false;
+        bool noNewLine = false;
         for (int i = 1; i < argc; ++i)
         {
             string arg = argv[i];
@@ -36,16 +34,16 @@ int main(int argc, const char** argv)
             {
                 if (arg == "--help")
                 {
-                    PrintUsage();
+                    PrintHelp();
                     return 1;
                 }
                 else if (arg == "--diagnostics")
                 {
                     diagnostics = true;
                 }
-                else if (arg == "--verbose")
+                else if (arg == "--no-trailing-newline")
                 {
-                    verbose = true;
+                    noNewLine = true;
                 }
                 else
                 {
@@ -57,63 +55,53 @@ int main(int argc, const char** argv)
                 string options = arg.Substring(1);
                 if (options.IsEmpty())
                 {
-                    throw Exception("unknown option '-'");
+                    throw Exception("unknown option '" + arg + "'");
                 }
-                else 
+                else
                 {
                     for (char o : options)
                     {
                         if (o == 'h')
                         {
-                            PrintUsage();
+                            PrintHelp();
                             return 1;
                         }
                         else if (o == 'd')
                         {
                             diagnostics = true;
                         }
-                        else if (o == 'v')
+                        else if (o == 'n')
                         {
-                            verbose = true;
+                            noNewLine = true;
                         }
-                        else
+                        else 
                         {
                             throw Exception("unknown option '-" + string(o) + "'");
                         }
                     }
                 }
             }
-            else 
+            else
             {
                 args.Add(arg);
             }
         }
-        if (args.Count() == 1)
+        bool first = true;
+        for (const string& arg : args)
         {
-            string m = args[0];
-            mask = cast<int>(ParseOctal(m));
-        }
-        else if (args.Count() > 1)
-        {
-            PrintUsage();
-            return 1;
-        }
-        int prevMask = umask(mask);
-        if (args.IsEmpty())
-        {
-            umask(prevMask);
-            Console.Out() << ToOctalString(cast<ulong>(prevMask), 3) << endl();
-        }
-        else
-        {
-            if (verbose)
+            if (first)
             {
-                Console.Out() << 
-                    "umask set to " << ToOctalString(cast<ulong>(mask), 3) << endl() <<
-                    "previous umask was " << ToOctalString(cast<ulong>(prevMask), 3) << endl() <<
-                    endl();
+                first = false;
             }
-
+            else
+            {
+                Console.Out() << " ";
+            }
+            Console.Out() << arg;
+        }
+        if (!noNewLine)
+        {
+            Console.Out() << endl();
         }
     }
     catch (const Exception& ex)

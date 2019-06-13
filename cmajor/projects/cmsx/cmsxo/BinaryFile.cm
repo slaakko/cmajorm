@@ -239,6 +239,10 @@ namespace cmsx.object
         {
             return null;
         }
+        public virtual nothrow Section* GetSymbolSection() const
+        {
+            return null;
+        }
         public Section* CreateSection(const string& sectionName)
         {
             if (sectionName == "CODE")
@@ -441,6 +445,10 @@ namespace cmsx.object
         {
             return dataSection;
         }
+        public override nothrow Section* GetSymbolSection() const
+        {
+            return symbolSection;
+        }
         public override void AddSymbolsToAddressMap()
         {
             symbolSection->AddSymbolsToAddressMap();
@@ -596,6 +604,10 @@ namespace cmsx.object
         public override nothrow Section* GetDataSection() const
         {
             return dataSection;
+        }
+        public override nothrow Section* GetSymbolSection() const
+        {
+            return symbolSection;
         }
         public override void AddSymbolsToAddressMap()
         {

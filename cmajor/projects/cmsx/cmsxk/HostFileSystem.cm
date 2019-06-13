@@ -119,18 +119,14 @@ namespace cmsx.kernel
                 byte[8] atimeBuf;
                 if (OsGetFileTimes(hostFile->GetHostFilePath().Chars(), &ctimeBuf[0], &mtimeBuf[0], &atimeBuf[0]))
                 {
-                    Console.Out() << hostFile->GetHostFilePath() << endl();
                     MemoryReader ctimeReader(&ctimeBuf[0], 8);
                     DateTime ctime = ctimeReader.ReadDateTime();
-                    Console.Out() << ctime.ToString() << endl();
                     inode->SetCTime(ctime);
                     MemoryReader mtimeReader(&mtimeBuf[0], 8);
                     DateTime mtime = mtimeReader.ReadDateTime();
-                    Console.Out() << mtime.ToString() << endl();
                     inode->SetMTime(mtime);
                     MemoryReader atimeReader(&atimeBuf[0], 8);
                     DateTime atime = atimeReader.ReadDateTime();
-                    Console.Out() << atime.ToString() << endl();
                     inode->SetATime(atime);
                 }
                 else

@@ -238,6 +238,29 @@ namespace System
         return s;
     }
     
+    public string ToCsv(const List<string>& strings)
+    {
+        string result;
+        bool first = true;
+        for (const string& s : strings)
+        {
+            if (s.Find(',') != -1)
+            {
+                ThrowConversionException("cannot convert string '" + s + "' to CSV: string contains comma");
+            }
+            if (first)
+            {   
+                first = false;
+            }
+            else
+            {
+                result.Append(',');
+            }
+            result.Append(s);
+        }
+        return result;
+    }
+    
     public nothrow bool ParseSigned<T>(const string& s, T& x) where T is SignedInteger
     {
         x = cast<T>(0);
