@@ -99,13 +99,13 @@ namespace cmsx.kernel
     {
         SharedPtr<ByteStream> memoryStream(new MemoryByteStream());
         FileSystem* fs = GetMountTable().GetFileSystem(inode->Key().fsNumber);
-        long bytesLeft = Min(blockSize, count);
         long offset = fileOffset;
-        while (bytesLeft > 0)
+        while (count > 0)
         {
             int blockNumber = 0;
             int blockOffset = 0;
             fs->GetBlockManager()->GetBlockNumber(inode, offset, blockNumber, blockOffset, false);
+            long bytesLeft = Min(blockSize, count);
             long bytesToRead = Min(bytesLeft, blockSize - blockOffset);
             if (bytesToRead == 0)
             {
@@ -132,8 +132,8 @@ namespace cmsx.kernel
                     memoryStream->Write(x);
                 }
             }
-            bytesLeft = bytesLeft - bytesToRead;
             offset = offset + bytesToRead;
+            count = count - bytesToRead;
         }
         return memoryStream;
     }
@@ -142,7 +142,7 @@ namespace cmsx.kernel
     {
         if (argc < 1)
         {
-            throw SystemError(EINVAL, "exec: argc must at least 1");
+            throw SystemError(EINVAL, "exec: argc must be at least 1");
         }
         if (argvAddress == 0u)
         {
@@ -205,24 +205,24 @@ namespace cmsx.kernel
             if (binaryFile.Get() is ExecutableFile*)
             {
                 executable = cast<ExecutableFile*>(binaryFile.Get());
+                FreeProcessMemory(machine.GetMemory(), process);
+                InitializeMemoryTable(machine, process->memoryTable, prevProcess->memoryTable, poolSegmentSize);
+                AllocateMemory(machine.GetMemory(), process->memoryTable, true);
+                Section* codeSection = executable->GetCodeSection();
+                codeSection->SetBaseAddress(4096u);
                 Section* dataSection = executable->GetDataSection();
-                if (dataSection->Length() > 0u)
-                {
-                    SharedPtr<ByteStream> dataSectionMemoryStream = ReadFilePortionIntoMemoryStream(inode, cast<long>(dataSection->fileOffset), cast<long>(dataSection->length));
-                    BinaryReader dataSectionReader(dataSectionMemoryStream);
-                    dataSection->Read(dataSectionReader);
-                    WriteProcessMemory(machine, process, dataSection->BaseAddress(), dataSection->data.Begin().Ptr(), cast<ulong>(dataSection->data.Count()), Protection.write);
-                }
+                SharedPtr<ByteStream> dataSectionMemoryStream = ReadFilePortionIntoMemoryStream(inode, cast<long>(dataSection->fileOffset), cast<long>(dataSection->length));
+                BinaryReader dataSectionReader(dataSectionMemoryStream);
+                dataSection->Read(dataSectionReader);
+                WriteProcessMemory(machine, process, dataSection->BaseAddress(), dataSection->data.Begin().Ptr(), cast<ulong>(dataSection->data.Count()), Protection.write);
                 Section* symbolSection = executable->GetSymbolSection();
-                if (symbolSection->Length() > 0u)
-                {
-                    SharedPtr<ByteStream> symbolSectionMemoryStream = ReadFilePortionIntoMemoryStream(inode, cast<long>(symbolSection->fileOffset), cast<long>(symbolSection->length));
-                    BinaryReader symbolSectionReader(symbolSectionMemoryStream);
-                    symbolSection->Read(symbolSectionReader);
-                }
+                SharedPtr<ByteStream> symbolSectionMemoryStream = ReadFilePortionIntoMemoryStream(inode, cast<long>(symbolSection->fileOffset), cast<long>(symbolSection->length));
+                BinaryReader symbolSectionReader(symbolSectionMemoryStream);
+                symbolSection->Read(symbolSectionReader);
                 executable->AddSymbolsToAddressMap();
                 Symbol* mainFunctionSymbol = executable->GetSymbolTable().GetSymbol("Main");
                 process->entryPoint = mainFunctionSymbol->start;
+                SaveContext(machine, process);
                 Symbol* functionTableSymbol = executable->GetSymbolTable().GetSymbol("@function_table");
                 process->functionTableAddress = functionTableSymbol->start;
                 process->functionTableLength = functionTableSymbol->length;
@@ -231,8 +231,6 @@ namespace cmsx.kernel
             {
                 throw SystemError(EINVAL, "file '" + executablePath + "' is not a CMSX executable");
             }
-            FreeProcessMemory(machine.GetMemory(), process);
-            InitializeMemoryTable(machine, process->memoryTable, prevProcess->memoryTable, poolSegmentSize);
         }
         else
         {
@@ -253,18 +251,18 @@ namespace cmsx.kernel
                 {
                     textSegmentStartAddress = textSegmentStartAddress + 4096u;
                 }
-                ulong textSegmentSize = codeSection->Length();
-                ulong dataSegmentSize = dataSection->Length();
+                ulong textSegmentSize = codeSection->DataLength();
+                ulong dataSegmentSize = dataSection->DataLength();
                 ulong minStackSegmentSize = cast<ulong>(executable->MinStackSize());
                 ulong maxStackSegmentSize = cast<ulong>(executable->MaxStackSize());
                 ulong stackSegmentIncrement = cast<ulong>(executable->StackSizeIncrement());
                 FreeProcessMemory(machine.GetMemory(), process);
                 InitializeProcessMemory(machine, process, textSegmentStartAddress, textSegmentSize, dataSegmentSize, poolSegmentSize, minStackSegmentSize, maxStackSegmentSize, stackSegmentIncrement);
-                if (codeSection->Length() > 0u)
+                if (codeSection->length > 0u)
                 {
                     WriteProcessMemory(machine, process, codeSection->BaseAddress(), codeSection->data.Begin().Ptr(), cast<ulong>(codeSection->data.Count()), Protection.execute);
                 }
-                if (dataSection->Length() > 0u)
+                if (dataSection->length > 0u)
                 {
                     WriteProcessMemory(machine, process, dataSection->BaseAddress(), dataSection->data.Begin().Ptr(), cast<ulong>(dataSection->data.Count()), Protection.write);
                 }
@@ -284,7 +282,6 @@ namespace cmsx.kernel
         process->poolStart = poolStart;
         process->poolEnd = poolEnd;
         process->name = Path.GetFileName(executablePath);
-        SetProcessReadyToRun(processTable, process);
         if (!poolSection.data.IsEmpty())
         {
             WriteProcessMemory(machine, process, poolSegmentBaseAddress, poolSection.data.Begin().Ptr(), cast<ulong>(poolSection.data.Count()), Protection.write);
@@ -293,6 +290,7 @@ namespace cmsx.kernel
             WriteProcessMemory(machine, process, process->regAXAddress, cast<ulong>(ax), 8u, Protection.write);
             WriteProcessMemory(machine, process, process->regBXAddress, bx, 8u, Protection.write);
         }
+        SetProcessReadyToRun(processTable, process);
         process->unsave = true;
         Schedule(machine, processTable);
     }

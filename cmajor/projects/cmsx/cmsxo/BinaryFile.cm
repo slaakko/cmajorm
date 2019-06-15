@@ -6,15 +6,18 @@ using cmsx.machine;
 namespace cmsx.object
 {
     public const char objectFileVersion_1 = '1';
-    public const char objectFileVersion_2 = '2'; 
+    public const char objectFileVersion_2 = '2';
+    public const char objectFileVersion_3 = '3'; 
     public const char libraryFileVersion_1 = '1';
     public const char libraryFileVersion_2 = '2';
+    public const char libraryFileVersion_3 = '3';
     public const char executableFileVersion_1 = '1';
     public const char executableFileVersion_2 = '2';
+    public const char executableFileVersion_3 = '3';
 
-    public const char currentObjectFileVersion = objectFileVersion_2;
-    public const char currentLibraryFileVersion = libraryFileVersion_2;
-    public const char currentExecutableFileVersion = executableFileVersion_2;
+    public const char currentObjectFileVersion = objectFileVersion_3;
+    public const char currentLibraryFileVersion = libraryFileVersion_3;
+    public const char currentExecutableFileVersion = executableFileVersion_3;
 
     public const ulong fileBlockSize = 4096u;
 
@@ -41,7 +44,7 @@ namespace cmsx.object
             int x = reader.ReadByteOrEnd();
             if (x == -1)
             {
-                throw Exception("unexpected end of file " + fileName);
+                throw Exception("unexpected end of file " + fileName + " while reading header name, length is " + ToString(length));
             }
             result.Append(cast<char>(x));
         }
@@ -636,10 +639,10 @@ namespace cmsx.object
 
     public class Section
     {
-        public nothrow Section() : file(null), name(), pos(0), baseAddress(0u), length(0u), copyStartPos(0u), removeOffset(0u), fileOffset(0u)
+        public nothrow Section() : file(null), name(), pos(0), baseAddress(0u), length(0u), dataLength(0u), copyStartPos(0u), removeOffset(0u), fileOffset(0u)
         {
         }
-        public nothrow Section(BinaryFile* file_, const string& name_) : file(file_), name(name_), pos(0), baseAddress(0u), length(0u), copyStartPos(0u), removeOffset(0u), fileOffset(0u)
+        public nothrow Section(BinaryFile* file_, const string& name_) : file(file_), name(name_), pos(0), baseAddress(0u), length(0u), dataLength(0u), copyStartPos(0u), removeOffset(0u), fileOffset(0u)
         {
         }
         public default virtual ~Section();
@@ -664,33 +667,42 @@ namespace cmsx.object
         {
             baseAddress = baseAddress_;
         }
-        public nothrow ulong Length() const
+        public nothrow ulong DataLength() const
         {
-            return length;
+            return cast<ulong>(data.Count());
         }
-        public virtual void Write(System.IO.BinaryWriter& writer)
+        public void Write(System.IO.BinaryWriter& writer)
         {
-            length = cast<ulong>(data.Count());
-            WriteULong(writer, length);
+            length = cast<ulong>(data.Count()) + 2u * 8u;
+            dataLength = cast<ulong>(data.Count());
+            WriteULong(writer, dataLength);
             WriteULong(writer, baseAddress);
             for (byte b : data)
             {
                 writer.Write(b);
             }
+            WriteExtended(writer);
         }
-        public virtual void Read(System.IO.BinaryReader& reader)
+        public virtual void WriteExtended(System.IO.BinaryWriter& writer)
         {
-            length = ReadULong(file->FileName(), reader);
+        }
+        public void Read(System.IO.BinaryReader& reader)
+        {
+            dataLength = reader.ReadULong();
             baseAddress = ReadULong(file->FileName(), reader);
-            for (ulong i = 0u; i < length; ++i)
+            for (ulong i = 0u; i < dataLength; ++i)
             {
                 int x = reader.ReadByteOrEnd();
                 if (x == -1)
                 {
-                    throw Exception("unexpected end of file " + file->FileName() + " " + name + " section");
+                    throw Exception("unexpected end of " + name + " section  of file '" + file->FileName() + "': dataLength=" + ToString(dataLength) + ", " + ToString(i) + " bytes read.");
                 }
                 data.Add(cast<byte>(x));
             }
+            ReadExtended(reader);
+        }
+        public virtual void ReadExtended(System.IO.BinaryReader& reader)
+        {
         }
         public virtual void Dump(StreamWriter& writer)
         {
@@ -699,7 +711,7 @@ namespace cmsx.object
             {
                 writer.WriteLine(Format("base address:", 17) + " #" + ToHexString(baseAddress));
             }
-            writer.WriteLine(Format("length:", 17) + " #" + ToHexString(length));
+            writer.WriteLine(Format("length:", 17) + " #" + ToHexString(dataLength));
         }
         public nothrow int GetByte()
         {
@@ -902,6 +914,7 @@ namespace cmsx.object
         public long pos;
         public ulong baseAddress;
         public ulong length;
+        public ulong dataLength;
         public ulong copyStartPos;
         public ulong removeOffset;
         public Section* copyTargetSection;
@@ -913,12 +926,6 @@ namespace cmsx.object
         public nothrow ObjectFileHeaderSection(BinaryFile* file_) : base(file_, "CMSXOBJ" + ObjectFileVersionStr())
         {
         }
-        public override void Write(System.IO.BinaryWriter& writer)
-        {
-        }
-        public override void Read(System.IO.BinaryReader& reader)
-        {
-        }
         public override void Dump(StreamWriter& writer)
         {
         }
@@ -927,12 +934,6 @@ namespace cmsx.object
     public class LibraryFileHeaderSection : Section
     {
         public nothrow LibraryFileHeaderSection(BinaryFile* file_) : base(file_, "CMSXLIB" + LibraryFileVersionStr())
-        {
-        }
-        public override void Write(System.IO.BinaryWriter& writer)
-        {
-        }
-        public override void Read(System.IO.BinaryReader& reader)
         {
         }
         public override void Dump(StreamWriter& writer)
@@ -946,17 +947,16 @@ namespace cmsx.object
             base(file_, "CMSXEXE" + ExecutableFileVersionStr()), minStackSize(minStackSize_), maxStackSize(maxStackSize_), stackSizeIncrement(stackSizeIncrement_), initialPoolSize(initialPoolSize_)
         {
         }
-        public override void Write(System.IO.BinaryWriter& writer)
+        public override void WriteExtended(System.IO.BinaryWriter& writer)
         {
-            base->Write(writer);
             WriteULong(writer, minStackSize);
             WriteULong(writer, maxStackSize);
             WriteULong(writer, stackSizeIncrement);
             WriteULong(writer, initialPoolSize);
+            length = length + 4u * 8u;
         }
-        public override void Read(System.IO.BinaryReader& reader)
+        public override void ReadExtended(System.IO.BinaryReader& reader)
         {
-            base->Read(reader);
             minStackSize = ReadULong(file->FileName(), reader);
             maxStackSize = ReadULong(file->FileName(), reader);
             stackSizeIncrement = ReadULong(file->FileName(), reader);
@@ -1026,9 +1026,8 @@ namespace cmsx.object
         {
             symbols.Add(symbol);
         }
-        public override void Write(System.IO.BinaryWriter& writer)
+        public override void WriteExtended(System.IO.BinaryWriter& writer)
         {
-            base->Write(writer);
             long n = symbols.Count();
             writer.Write(cast<ulong>(n));
             for (long i = 0; i < n; ++i)
@@ -1037,10 +1036,10 @@ namespace cmsx.object
                 ulong startOffset = symbol->start;
                 writer.Write(startOffset);
             }
+            length = length + (cast<ulong>(n) + 1u) * 8u;
         }
-        public override void Read(System.IO.BinaryReader& reader)
+        public override void ReadExtended(System.IO.BinaryReader& reader)
         {
-            base->Read(reader);
             ulong n = reader.ReadULong();
             for (ulong i = 0u; i < n; ++i)
             {
@@ -1368,9 +1367,8 @@ namespace cmsx.object
             Value value(flags, v, null);
             return value;
         }
-        public override void Read(System.IO.BinaryReader& reader)
+        public override void ReadExtended(System.IO.BinaryReader& reader)
         {
-            base->Read(reader);
             pos = 0;
             ulong numSymbols = GetULong();
             for (ulong i = 0u; i < numSymbols; ++i)

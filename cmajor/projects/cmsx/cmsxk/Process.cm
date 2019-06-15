@@ -768,11 +768,8 @@ namespace cmsx.kernel
         WriteProcessMemory(machine, process, bufferAddress + cast<ulong>(len), 0u, 1u, Protection.write);
     }
 
-    public nothrow void InitializeProcessMemory(Machine& machine, Process* process,
-        ulong textSegmentStartAddress, ulong textSegmentSize, ulong dataSegmentSize, ulong poolSegmentSize, ulong minStackSegmentSize, ulong maxStackSegmentSize, ulong stackSegmentIncrement)
+    public nothrow void SaveContext(Machine& machine, Process* process)
     {
-        InitializeMemoryTable(machine, process->memoryTable, textSegmentStartAddress, textSegmentSize, dataSegmentSize, poolSegmentSize, minStackSegmentSize, maxStackSegmentSize, stackSegmentIncrement);
-        AllocateMemory(machine.GetMemory(), process->memoryTable);
         ulong sp = process->memoryTable.segmentDescriptors[stackSegmentIndex]->baseAddress + process->memoryTable.segmentDescriptors[stackSegmentIndex]->startAddress;
         Registers& regs = machine.GetRegisters();
         ulong prevAX = regs.Get(regAX);
@@ -807,6 +804,14 @@ namespace cmsx.kernel
         regs.SetPC(prevPC);
         regs.SetSpecial(Registers.rL, prevRL);
         regs.SetSpecial(Registers.rG, prevRG);
+    }
+
+    public nothrow void InitializeProcessMemory(Machine& machine, Process* process,
+        ulong textSegmentStartAddress, ulong textSegmentSize, ulong dataSegmentSize, ulong poolSegmentSize, ulong minStackSegmentSize, ulong maxStackSegmentSize, ulong stackSegmentIncrement)
+    {
+        InitializeMemoryTable(machine, process->memoryTable, textSegmentStartAddress, textSegmentSize, dataSegmentSize, poolSegmentSize, minStackSegmentSize, maxStackSegmentSize, stackSegmentIncrement);
+        AllocateMemory(machine.GetMemory(), process->memoryTable, false);
+        SaveContext(machine, process);
     }
 
     public void CloneProcessMemory(Machine& machine, Process* child, Process* parent)
@@ -1078,6 +1083,7 @@ namespace cmsx.kernel
                     RemoveProcessFromList(&prevRunning);
                 }
             }
+            running->unsave = false;
             running->sp = processor.UnsaveContext(running->memoryTable.virtualTranslationRegisterValue, running->sp);
         }
         else if (running->unsave)

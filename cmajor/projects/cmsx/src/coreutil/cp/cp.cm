@@ -1,0 +1,315 @@
+// =================================
+// Copyright (c) 2019 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Collections;
+using System.IO;
+using System.Os;
+
+void PrintHelp()
+{
+    Console.Out() << "cp [options] <source> <dest>" << endl();
+    Console.Out() << "cp [options] <source>... <directory>" << endl();
+    Console.Out() << "Copy files and directories." << endl() << endl();
+    Console.Out() << "Options:" << endl() << endl();
+    Console.Out() << "--help | -h" << endl();
+    Console.Out() << "  Print help and exit." << endl() << endl();
+    Console.Out() << "--diagnostics | -d" << endl();
+    Console.Out() << "  Show stack trace in case of error." << endl() << endl();
+    Console.Out() << "--verbose | -v" << endl();
+    Console.Out() << "  Be verbose." << endl() << endl();
+    Console.Out() << "--recursive | -r" << endl();
+    Console.Out() << "  Copy directories recursively." << endl() << endl();
+    Console.Out() << "--update | -u" << endl();
+    Console.Out() << "  Copy only if source newer than target." << endl() << endl();
+    Console.Out() << "--preserve=mode" << endl();
+    Console.Out() << "  Preserve mode (default)." << endl() << endl();
+    Console.Out() << "--preserve=timestamps" << endl();
+    Console.Out() << "  Preserve timestamps." << endl() << endl();
+    Console.Out() << "--preserve=all" << endl();
+    Console.Out() << "  Preserve mode and timestamps." << endl() << endl();
+}
+
+void Copy(const List<string>& files, const string& target, bool verbose, bool recursive, FileCopyOptions copyOptions)
+{
+    byte[statBufSize] statBuf;
+    bool targetIsDirectory = false;
+    int result = stat(target.Chars(), &statBuf[0]);
+    if (result == 0)
+    {
+        StatInfo statInfo;
+        StatBufToStatInfo(&statBuf[0], statInfo);
+        targetIsDirectory = statInfo.Type() == FileType.directory;
+    }
+    if (!targetIsDirectory)
+    {
+        if (files.Count() == 1)
+        {
+            const string& file = files.Front();
+            StatInfo statInfo;
+            Stat(file.Chars(), statInfo);
+            if (statInfo.Type() == FileType.directory)
+            {
+                if (!recursive)
+                {
+                    throw Exception("'" + file + "' is directory and not --recursive specified");
+                }
+            }
+            else if (statInfo.Type() == FileType.regular)
+            {
+                bool copied = File.Copy(file, target, copyOptions);
+                if (copied)
+                {
+                    if (verbose)
+                    {
+                        Console.Out() << file << " -> " << target << endl();
+                    }
+                }
+                else
+                {
+                    if (verbose)
+                    {
+                        Console.Out() << file + " not copied" << endl();
+                    }
+                }
+                return;
+            }
+            else
+            {
+                throw Exception("'" + file + "' not regular or directory");
+            }
+        }
+        else if (files.Count() > 1)
+        {
+            throw Exception("'" + target + "' not directory");
+        }
+    }
+    List<StatInfo> statInfos;
+    for (const string& file : files)
+    {
+        StatInfo statInfo;
+        Stat(file.Chars(), statInfo);
+        statInfos.Add(statInfo);
+        if (statInfo.Type() == FileType.directory)
+        {
+            if (!recursive)
+            {
+                throw Exception("'" + file + "' is directory and not --recursive specified");
+            }
+        }
+        else if (statInfo.Type() != FileType.regular)
+        {
+            throw Exception("'" + file + "' not regular or directory");
+        }
+    }
+    bool targetDirExists = Directory.Exists(target);
+    if (!targetDirExists)
+    {
+        Mkdir(target.Chars());
+    }
+    long n = files.Count();
+    for (long i = 0; i < n; ++i)
+    {
+        const string& file = files[i];
+        const StatInfo& statInfo = statInfos[i];
+        if (statInfo.Type() == FileType.directory)
+        {
+            #assert(recursive);
+            DirectoryReader reader(file);
+            DirectoryEntry dirEntry;
+            List<string> sourceFilePaths;
+            while (reader.Read(dirEntry))
+            {
+                string entryName(&dirEntry.name[0]);
+                if (entryName != "." && entryName != "..")
+                {
+                    string sourceFilePath = Path.Combine(file, entryName);
+                    sourceFilePaths.Add(sourceFilePath);
+                }
+            }
+            string targetDir = target;
+            if (targetDirExists)
+            {
+                targetDir = Path.Combine(target, Path.GetFileName(file));
+                if (!Directory.Exists(targetDir))
+                {
+                    Mkdir(targetDir.Chars());
+                    if (verbose)
+                    {
+                        Console.Out() << file << " -> " << targetDir << endl();
+                    }
+                    if ((copyOptions & FileCopyOptions.preserveTimestamps) != FileCopyOptions.none)
+                    {
+                        DateTime accessTime;
+                        DateTime modificationTime;
+                        Directory.GetTimes(file, accessTime, modificationTime);
+                        Directory.SetTimes(targetDir, accessTime, modificationTime);
+                    }
+                }
+                else
+                {
+                    if (verbose)
+                    {
+                        Console.Out() << file << " -> " << targetDir << endl();
+                    }
+                }
+            }
+            Copy(sourceFilePaths, targetDir, verbose, recursive, copyOptions);
+        }
+        else if (statInfo.Type() == FileType.regular)
+        {
+            string targetFilePath = Path.Combine(target, Path.GetFileName(file));
+            bool copied = File.Copy(file, targetFilePath, copyOptions);
+            if (copied)
+            {
+                if (verbose)
+                {
+                    Console.Out() << file << " -> " << targetFilePath << endl();
+                }
+            }
+        }
+        else
+        {
+            throw Exception("'" + file + "' not regular or directory");
+        }
+    }
+}
+
+int main(int argc, const char** argv)
+{
+    bool diagnostics = false;
+    try
+    {
+        bool verbose = false;
+        bool recursive = false;
+        FileCopyOptions copyOptions = FileCopyOptions.preserveMode;
+        List<string> files;
+        string target;
+        for (int i = 1; i < argc; ++i)
+        {
+            string arg = argv[i];
+            if (arg.StartsWith("--"))
+            {
+                if (arg == "--help")
+                {
+                    PrintHelp();
+                    return 1;
+                }
+                else if (arg == "--diagnostics")
+                {
+                    diagnostics = true;
+                }
+                else if (arg == "--verbose")
+                {
+                    verbose = true;
+                }
+                else if (arg == "--recursive")
+                {
+                    recursive = true;
+                }
+                else if (arg == "--update")
+                {
+                    copyOptions = cast<FileCopyOptions>(copyOptions | FileCopyOptions.update);
+                }
+                else if (arg.StartsWith("--preserve="))
+                {
+                    string preserve = arg.Substring(11);
+                    if (preserve == "mode")
+                    {
+                        copyOptions = cast<FileCopyOptions>(copyOptions | FileCopyOptions.preserveMode);
+                    }
+                    else if (preserve == "timestamps")
+                    {
+                        copyOptions = cast<FileCopyOptions>(copyOptions | FileCopyOptions.preserveTimestamps);
+                    }
+                    else if (preserve == "all")
+                    {
+                        copyOptions = cast<FileCopyOptions>(copyOptions | FileCopyOptions.preserveAll);
+                    }
+                    else 
+                    {
+                        throw Exception("unknown options '" + arg + "'");
+                    }
+                }
+                else
+                {
+                    throw Exception("unknown options '" + arg + "'");
+                }
+            }
+            else if (arg.StartsWith("-"))
+            {
+                string options = arg.Substring(1);
+                if (options.IsEmpty())
+                {
+                    throw Exception("unknown options '" + arg + "'");
+                }
+                else 
+                {
+                    for (char o : options)
+                    {
+                        if (o == 'h')
+                        {
+                            PrintHelp();
+                            return 1;
+                        }
+                        else if (o == 'd')
+                        {
+                            diagnostics = true;
+                        }
+                        else if (o == 'v')
+                        {
+                            verbose = true;
+                        }
+                        else if (o == 'r')
+                        {
+                            recursive = true;
+                        }
+                        else if (o == 'u')
+                        {
+                            copyOptions = cast<FileCopyOptions>(copyOptions | FileCopyOptions.update);
+                        }
+                        else 
+                        {
+                            throw Exception("unknown options '-" + string(o) + "'");
+                        }
+                    }
+                }
+            }
+            else
+            {
+                files.Add(arg);
+            }
+        }
+        if (files.IsEmpty())
+        {
+            PrintHelp();
+            throw Exception("no files specified");
+        }
+        else if (files.Count() == 1)
+        {
+            PrintHelp();
+            throw Exception("target not specified");
+        }
+        else
+        {
+            target = files.Back();
+            files.RemoveLast();
+        }
+        Copy(files, target, verbose, recursive, copyOptions);
+    }
+    catch (const Exception& ex)
+    {
+        if (diagnostics)
+        {
+            Console.Error() << ex.ToString() << endl();
+        }
+        else
+        {
+            Console.Error() << ex.Message() << endl();
+        }
+        return 1;
+    }
+    return 0;
+}

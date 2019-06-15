@@ -379,12 +379,12 @@ namespace cmsx.object
         codeSection->copyStartPos = 0u;
         codeSection->copyTargetSection = executable.codeSection;
         codeSection->removeOffset = 0u;
-        ulong codeSectionLength = codeSection->length;
+        ulong codeSectionLength = codeSection->dataLength;
         Section* dataSection = objectFile->dataSection;
         dataSection->copyTargetSection = executable.dataSection;
         dataSection->copyStartPos = 0u;
         dataSection->removeOffset = 0u;
-        ulong dataSectionLength = dataSection->length;
+        ulong dataSectionLength = dataSection->dataLength;
         SymbolTable& executableSymbolTable = executable.GetSymbolTable();
         List<Symbol*> linkSymbols;
         for (const UniquePtr<Symbol>& symbol : objectFileSymbolTable.Symbols())
@@ -461,7 +461,7 @@ namespace cmsx.object
                                 symbol->linkage = Linkage.remove;
                                 symbol->section->copyStartPos = symbol->value.value + symbol->length;
                                 symbol->section->removeOffset = symbol->section->removeOffset + symbol->length;
-                                symbol->section->length = symbol->section->length - symbol->length;
+                                symbol->section->dataLength = symbol->section->dataLength - symbol->length;
                             }
                         }
                     }
@@ -521,7 +521,7 @@ namespace cmsx.object
                                 symbol->linkage = Linkage.remove;
                                 symbol->section->copyStartPos = symbol->value.value + symbol->length;
                                 symbol->section->removeOffset = symbol->section->removeOffset + symbol->length;
-                                symbol->section->length = symbol->section->length - symbol->length;
+                                symbol->section->dataLength = symbol->section->dataLength - symbol->length;
                             }
                         }
                         else
@@ -533,7 +533,7 @@ namespace cmsx.object
                             symbol->linkage = Linkage.remove;
                             symbol->section->copyStartPos = symbol->value.value + symbol->length;
                             symbol->section->removeOffset = symbol->section->removeOffset + symbol->length;
-                            symbol->section->length = symbol->section->length - symbol->length;
+                            symbol->section->dataLength = symbol->section->dataLength - symbol->length;
                         }
                     }
                 }
@@ -669,7 +669,7 @@ namespace cmsx.object
         }
         else
         {
-            codeSection->baseAddress = prevCodeSection->baseAddress + prevCodeSection->length;
+            codeSection->baseAddress = prevCodeSection->baseAddress + prevCodeSection->dataLength;
             if (debug)
             {
                 Console.Out() << "setting code section base address to " << ToHexString(codeSection->baseAddress) << endl();
@@ -688,7 +688,7 @@ namespace cmsx.object
         }
         else
         {
-            dataSection->baseAddress = prevDataSection->baseAddress + prevDataSection->length;
+            dataSection->baseAddress = prevDataSection->baseAddress + prevDataSection->dataLength;
             if (debug)
             {
                 Console.Out() << "setting data section base address to " << ToHexString(dataSection->baseAddress) << endl();

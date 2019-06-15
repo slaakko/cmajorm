@@ -46,7 +46,7 @@ void InstallBin(bool verbose)
         }
         string binFilePath = Path.Combine("/bin", binFileName);
         string hostBinFilePath = Path.Combine(hostBinDir, binFileName);
-        if (File.Copy(hostBinFilePath, binFilePath, cast<FileCopyOptions>(FileCopyOptions.update | FileCopyOptions.preserveTimes), verbose))
+        if (File.Copy(hostBinFilePath, binFilePath, cast<FileCopyOptions>(FileCopyOptions.update | FileCopyOptions.preserveTimestamps)))
         {
             Chmod(binFilePath.Chars(), cast<int>(ParseOctal("755")));
             if (verbose)
@@ -79,7 +79,7 @@ void InstallSystemBin(bool verbose)
         }
         string sbinFilePath = Path.Combine("/sbin", sbinFileName);
         string hostSBinFilePath = Path.Combine(hostSBinDir, sbinFileName);
-        if (File.Copy(hostSBinFilePath, sbinFilePath, cast<FileCopyOptions>(FileCopyOptions.update | FileCopyOptions.preserveTimes), verbose))
+        if (File.Copy(hostSBinFilePath, sbinFilePath, cast<FileCopyOptions>(FileCopyOptions.update | FileCopyOptions.preserveTimestamps)))
         {
             Chmod(sbinFilePath.Chars(), cast<int>(ParseOctal("755")));
             if (verbose)

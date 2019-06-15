@@ -44,6 +44,41 @@ namespace System.IO
                 }
             }
         }
+        public static DateTime AccessTime(const string& directoryPath)
+        {
+            StatInfo statInfo;
+            Stat(directoryPath.Chars(), statInfo);
+            if (statInfo.Type() != FileType.directory)
+            {
+                throw FileSystemException("path '" + directoryPath + "' is not a directory path");
+            }
+            return statInfo.ATime();
+        }
+        public static DateTime ModificationTime(const string& directoryPath)
+        {
+            StatInfo statInfo;
+            Stat(directoryPath.Chars(), statInfo);
+            if (statInfo.Type() != FileType.directory)
+            {
+                throw FileSystemException("path '" + directoryPath + "' is not a directory path");
+            }
+            return statInfo.MTime();
+        }
+        public static void GetTimes(const string& directoryPath, DateTime& accessTime, DateTime& modificationTime)
+        {
+            StatInfo statInfo;
+            Stat(directoryPath.Chars(), statInfo);
+            if (statInfo.Type() != FileType.directory)
+            {
+                throw FileSystemException("path '" + directoryPath + "' is not a directory path");
+            }
+            accessTime = statInfo.ATime();
+            modificationTime = statInfo.MTime();
+        }
+        public static void SetTimes(const string& directoryPath, const DateTime& accessTime, const DateTime& modificationTime)
+        {
+            UTime(directoryPath.Chars(), accessTime, modificationTime); 
+        }
         public static void Remove(const string& directoryPath)
         {
             if (Exists(directoryPath))

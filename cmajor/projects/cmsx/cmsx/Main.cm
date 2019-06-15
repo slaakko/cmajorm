@@ -24,7 +24,7 @@ void Init(Machine& machine)
     MemoryTable& kernelMemoryTable = kernel.GetMemoryTable();
     machine.SetKernelRootPageAddress(kernelMemoryTable.rootPageAddress);
     Memory& mem = machine.GetMemory();
-    AllocateMemory(mem, kernelMemoryTable);
+    AllocateMemory(mem, kernelMemoryTable, false);
     Registers& regs = machine.GetRegisters();
     SetProcessorToKernelMode(regs);
     regs.SetSpecial(Registers.rV, MakeVirtualTranslationRegisterValue(kernelMemoryTable.rootPageAddress, kernelMemoryTable.addressSpaceNumber));

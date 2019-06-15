@@ -51,13 +51,13 @@ namespace cmsx.kernel
             long poolDataLength = Max(cast<long>(executable->InitialPoolSize()), poolSection.data.Count());
             long poolSize = Align(poolDataLength, cast<long>(pageSize));
             Symbol* mainFunctionSymbol = executable->GetSymbolTable().GetSymbol("Main");
-            Process* process = CreateSingleProcess(machine, processTable, name, mainFunctionSymbol->start, codeSection->BaseAddress(), codeSection->Length(), dataSection->Length(), cast<ulong>(poolSize),
+            Process* process = CreateSingleProcess(machine, processTable, name, mainFunctionSymbol->start, codeSection->BaseAddress(), codeSection->DataLength(), dataSection->DataLength(), cast<ulong>(poolSize),
                 cast<ulong>(executable->MinStackSize()), cast<ulong>(executable->MaxStackSize()), cast<ulong>(executable->StackSizeIncrement()), sid);
-            if (codeSection->Length() > 0u)
+            if (codeSection->DataLength() > 0u)
             {
                 WriteProcessMemory(machine, process, codeSection->BaseAddress(), codeSection->data.Begin().Ptr(), cast<ulong>(codeSection->data.Count()), Protection.execute);
             }
-            if (dataSection->Length() > 0u)
+            if (dataSection->DataLength() > 0u)
             {
                 WriteProcessMemory(machine, process, dataSection->BaseAddress(), dataSection->data.Begin().Ptr(), cast<ulong>(dataSection->data.Count()), Protection.write);
             }

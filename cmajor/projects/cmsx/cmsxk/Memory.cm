@@ -1359,11 +1359,12 @@ namespace cmsx.kernel
         }
     }
 
-    public void AllocateMemory(Memory& mem, const MemoryTable& memoryTable)
+    public void AllocateMemory(Memory& mem, const MemoryTable& memoryTable, bool skipTextSegment)
     {
         mem.ClearTranslationCache(memoryTable.addressSpaceNumber);
         for (byte i = 0u; i < numSegments; ++i)
         {
+            if (skipTextSegment && i == textSegmentIndex) continue;
             SegmentDescriptor* sd = memoryTable.segmentDescriptors[i];
             if (sd != null)
             {

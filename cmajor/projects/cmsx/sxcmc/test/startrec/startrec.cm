@@ -1,0 +1,31 @@
+using System;
+using System.Collections;
+using System.Os;
+
+int main()
+{
+    try
+    {
+        int pid = Fork();
+        if (pid == 0)
+        {
+            Exec("/bin/rec", List<string>(1, string("0")));
+        }
+        ushort exitCode = 0u;
+        Wait(&exitCode);
+        if (exitCode != 0u)
+        {
+            throw Exception("startrec: /bin/rec returned " + ToString(exitCode));
+        }
+        else
+        {
+            Console.Out() << "startrec: /bin/rec exited normally" << endl();
+        }
+    }
+    catch (const Exception& ex)
+    {
+        Console.Error() << ex.Message() << endl();
+        return 1;
+    }
+    return 0;
+}

@@ -1577,7 +1577,7 @@ namespace cmsx.debug
             inputWindow.SetScreen(screen.Get());
             programEntryPoint = process->entryPoint;
             disassembly.SetEntryPointAddress(programEntryPoint);
-            disassembly.SetInstructionEndAddress(programEntryPoint + executable->GetCodeSection()->length);
+            disassembly.SetInstructionEndAddress(programEntryPoint + executable->GetCodeSection()->dataLength);
             uint entryPointInst = ReadInst(process, programEntryPoint);
             stepBreakpoints.Add(Breakpoint(Breakpoint.Kind.step, programEntryPoint, entryPointInst));
             WriteInst(process, programEntryPoint, debugBreakInst);
