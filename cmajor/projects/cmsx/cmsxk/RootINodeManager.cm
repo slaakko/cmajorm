@@ -257,8 +257,8 @@ namespace cmsx.kernel
                     }
                     fs->GetBlockManager()->FreeBlocks(inode);
                     inode->SetType(FileType.free);
-                    FileSystem* fs = GetMountTable().GetFileSystem(inode->Key().fsNumber);
-                    fs->SetFreeINodeNumber(inode->Key().inodeNumber);
+                    FileSystem* fsi = GetMountTable().GetFileSystem(inode->Key().fsNumber);
+                    fsi->SetFreeINodeNumber(inode->Key().inodeNumber);
                 }
                 if (inode->GetFlag(INode.Flags.dirty))
                 {
@@ -267,12 +267,12 @@ namespace cmsx.kernel
                     Block* block = null;
                     if (fileSystem->LastBlockNumber() < inodeBlockNumber)
                     {
-                        block = fs->GetBlockManager()->GetBlock(BlockKey(inodeBlockNumber, inode->Key().fsNumber, BlockKind.inodeBlock), null);
+                        block = fileSystem->GetBlockManager()->GetBlock(BlockKey(inodeBlockNumber, inode->Key().fsNumber, BlockKind.inodeBlock), null);
                         block->Clear();
                     }
                     else
                     {
-                        block = fs->GetBlockManager()->ReadBlock(BlockKey(inodeBlockNumber, inode->Key().fsNumber, BlockKind.inodeBlock), null);
+                        block = fileSystem->GetBlockManager()->ReadBlock(BlockKey(inodeBlockNumber, inode->Key().fsNumber, BlockKind.inodeBlock), null);
                     }
                     BlockPutter putter(block);
                     #assert(block is INodeBlock*);
@@ -284,7 +284,7 @@ namespace cmsx.kernel
                     MemoryReader reader(mem.Get(), inodeSize);
                     target->Read(reader);
                     block->SetFlag(Block.Flags.dirty);
-                    fs->GetBlockManager()->WriteBlock(block, null);
+                    fileSystem->GetBlockManager()->WriteBlock(block, null);
                     inode->ResetFlag(INode.Flags.dirty);
                 }
                 freeINodeList.Add(inode);

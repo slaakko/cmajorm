@@ -86,12 +86,12 @@ void Copy(const List<string>& files, const string& target, bool verbose, bool re
             throw Exception("'" + target + "' not directory");
         }
     }
-    List<StatInfo> statInfos;
+    List<FileType> fileTypes;
     for (const string& file : files)
     {
         StatInfo statInfo;
         Stat(file.Chars(), statInfo);
-        statInfos.Add(statInfo);
+        fileTypes.Add(statInfo.Type());
         if (statInfo.Type() == FileType.directory)
         {
             if (!recursive)
@@ -113,8 +113,8 @@ void Copy(const List<string>& files, const string& target, bool verbose, bool re
     for (long i = 0; i < n; ++i)
     {
         const string& file = files[i];
-        const StatInfo& statInfo = statInfos[i];
-        if (statInfo.Type() == FileType.directory)
+        FileType fileType = fileTypes[i];
+        if (fileType == FileType.directory)
         {
             #assert(recursive);
             DirectoryReader reader(file);
@@ -158,7 +158,7 @@ void Copy(const List<string>& files, const string& target, bool verbose, bool re
             }
             Copy(sourceFilePaths, targetDir, verbose, recursive, copyOptions);
         }
-        else if (statInfo.Type() == FileType.regular)
+        else if (fileType == FileType.regular)
         {
             string targetFilePath = Path.Combine(target, Path.GetFileName(file));
             bool copied = File.Copy(file, targetFilePath, copyOptions);

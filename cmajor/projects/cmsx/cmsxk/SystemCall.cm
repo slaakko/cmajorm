@@ -31,20 +31,21 @@ namespace cmsx.kernel
     public const byte sys_get_random_seed = 25u;
     public const byte sys_link = 26u;
     public const byte sys_unlink = 27u;
-    public const byte sys_mkdir = 28u;
-    public const byte sys_opendir = 29u;
-    public const byte sys_readdir = 30u;
-    public const byte sys_closedir = 31u;
-    public const byte sys_getcwd = 32u;
-    public const byte sys_chdir = 33u;
-    public const byte sys_stat = 34u;
-    public const byte sys_umask = 35u;
-    public const byte sys_ioctl = 36u;
-    public const byte sys_chmod = 37u;
-    public const byte sys_chown = 38u;
-    public const byte sys_utime = 39u;
-    public const byte sys_getuid = 40u;
-    public const byte sys_sync = 41u;
+    public const byte sys_rename = 28u;
+    public const byte sys_mkdir = 29u;
+    public const byte sys_opendir = 30u;
+    public const byte sys_readdir = 31u;
+    public const byte sys_closedir = 32u;
+    public const byte sys_getcwd = 33u;
+    public const byte sys_chdir = 34u;
+    public const byte sys_stat = 35u;
+    public const byte sys_umask = 36u;
+    public const byte sys_ioctl = 37u;
+    public const byte sys_chmod = 38u;
+    public const byte sys_chown = 39u;
+    public const byte sys_utime = 40u;
+    public const byte sys_getuid = 41u;
+    public const byte sys_sync = 42u;
     
     public const byte numSystemCalls = sys_sync + 1u;
 
@@ -80,6 +81,7 @@ namespace cmsx.kernel
             case sys_get_random_seed: return "sys_get_random_seed";
             case sys_link: return "sys_link";
             case sys_unlink: return "sys_unlink";
+            case sys_rename: return "sys_rename";
             case sys_mkdir: return "sys_mkdir";
             case sys_opendir: return "sys_opendir";
             case sys_readdir: return "sys_readdir";
@@ -541,6 +543,16 @@ namespace cmsx.kernel
             Panic("invalid unlink parameters: " + ToString(sc.x) + ", " + ToString(sc.y) + ", " + ToString(sc.z));
         }
         Unlink(*sc.machine, sc.process, sc.ax);
+        sc.result = 0;
+    }
+
+    public void Rename(SystemCall& sc)
+    {
+        if (sc.x != 0u || sc.y != sys_rename || sc.z != 0u)
+        {
+            Panic("invalid rename parameters: " + ToString(sc.x) + ", " + ToString(sc.y) + ", " + ToString(sc.z));
+        }
+        Rename(*sc.machine, sc.process, sc.ax, sc.bx);
         sc.result = 0;
     }
 

@@ -155,6 +155,32 @@ namespace cmsx.kernel
         fs->Unlink(process, path);
     }
 
+    public void Rename(Machine& machine, Process* process, ulong sourcePathAddress, ulong targetPathAddress)
+    {
+        if (sourcePathAddress == 0u)
+        {
+            throw SystemError(EINVAL, "source path address is null");
+        }
+        if (targetPathAddress == 0u)
+        {
+            throw SystemError(EINVAL, "target path address is null");
+        }
+        string sourcePath;
+        ReadStringFromProcessMemory(machine, process, sourcePathAddress, sourcePath);
+        if (sourcePath.IsEmpty())
+        {
+            throw SystemError(EINVAL, "source path is empty");
+        }
+        string targetPath;
+        ReadStringFromProcessMemory(machine, process, targetPathAddress, targetPath);
+        if (targetPath.IsEmpty())
+        {
+            throw SystemError(EINVAL, "target path is empty");
+        }
+        FileSystem* fs = GetMountTable().GetFileSystem(0);
+        fs->Rename(process, sourcePath, targetPath);
+    }
+
     public void Mkdir(Machine& machine, Process* process, ulong pathAddress, int mode)
     {
         if (pathAddress == 0u)

@@ -137,6 +137,9 @@ namespace cmsx.kernel
         SystemCallHandler unlinkSystemCallHandler = Unlink;
         ulong unlinkSystemCallAddress = cast<ulong>(cast<void*>(unlinkSystemCallHandler));
         mem.WriteULong(MakeSystemCallPtrAddress(sys_unlink), unlinkSystemCallAddress, Protection.write);
+        SystemCallHandler renameSystemCallHandler = Rename;
+        ulong renameSystemCallAddress = cast<ulong>(cast<void*>(renameSystemCallHandler));
+        mem.WriteULong(MakeSystemCallPtrAddress(sys_rename), renameSystemCallAddress, Protection.write);
         SystemCallHandler mkdirSystemCallHandler = Mkdir;
         ulong mkdirSystemCallAddress = cast<ulong>(cast<void*>(mkdirSystemCallHandler));
         mem.WriteULong(MakeSystemCallPtrAddress(sys_mkdir), mkdirSystemCallAddress, Protection.write);

@@ -223,6 +223,15 @@ namespace System.Os
         }
     }
     
+    public void Rename(const char* sourcePath, const char* targetPath)
+    {
+        int result = rename(sourcePath, targetPath);
+        if (result == -1)
+        {
+            ThrowSystemError();
+        }
+    }
+    
     public void Mkdir(const char* path)
     {
         Mkdir(path, 0);

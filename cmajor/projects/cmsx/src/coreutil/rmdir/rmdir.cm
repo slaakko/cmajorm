@@ -1,0 +1,131 @@
+// =================================
+// Copyright (c) 2019 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Collections;
+using System.IO;
+using System.Os;
+
+void PrintHelp()
+{
+    Console.Out() << "Usage: rmdir [options] <directory>..." << endl();
+    Console.Out() << "Remove directories if they are empty." << endl() << endl();
+    Console.Out() << "Options:" << endl() << endl();
+    Console.Out() << "--help | -h" << endl();
+    Console.Out() << "  Print help and exit." << endl() << endl();
+    Console.Out() << "--diagnostics | -d" << endl();
+    Console.Out() << "  Show stack trace in case of error." << endl() << endl();
+    Console.Out() << "--verbose | -v" << endl();
+    Console.Out() << "  Be verbose." << endl() << endl();
+}
+
+void RemoveDirectories(const List<string>& directories, bool verbose)
+{
+    for (const string& directory : directories)
+    {
+        if (!Directory.Exists(directory))
+        {
+            throw Exception("directory '" + directory + "' does not exist");
+        }
+        DirectoryReader reader(directory);
+        DirectoryEntry dirEntry;
+        while (reader.Read(dirEntry))
+        {
+            string entryName = &dirEntry.name[0];
+            if (entryName != "." && entryName != "..")
+            {
+                throw Exception("directory '" + directory + "' is not empty");
+            }
+        }
+        Directory.Remove(directory);
+        if (verbose)
+        {
+            Console.Out() << "directory " << directory << " removed" << endl();
+        }
+    }
+}
+
+int main(int argc, const char** argv)
+{
+    bool diagnostics = false;
+    try
+    {
+        bool verbose = false;
+        List<string> directories;
+        for (int i = 1; i < argc; ++i)
+        {
+            string arg = argv[i];
+            if (arg.StartsWith("--"))
+            {
+                if (arg == "--help")
+                {
+                    PrintHelp();
+                    return 1;
+                }
+                else if (arg == "--diagnostics")
+                {
+                    diagnostics = true;
+                }
+                else if (arg == "--verbose")
+                {
+                    verbose = true;
+                }
+                else
+                {
+                    throw Exception("unknown option '" + arg + "'");
+                }
+            }
+            else if (arg.StartsWith("-"))
+            {
+                string options = arg.Substring(1);
+                if (options.IsEmpty())
+                {
+                    throw Exception("unknown option '" + arg + "'");
+                }
+                else
+                {
+                    for (char o : options)
+                    {
+                        if (o == 'h')
+                        {
+                            PrintHelp();
+                            return 1;
+                        }
+                        else if (o == 'd')
+                        {
+                            diagnostics = true;
+                        }
+                        else if (o == 'v')
+                        {
+                            verbose = true;
+                        }
+                        else
+                        {
+                            throw Exception("unknown option '-" + string(o) + "'");
+                        }
+                    }
+                }
+            }
+            else
+            {
+                directories.Add(arg);
+            }
+        }
+        RemoveDirectories(directories, verbose);
+    }
+    catch (const Exception& ex)
+    {
+        if (diagnostics)
+        {
+            Console.Error() << ex.ToString() << endl();
+        }
+        else
+        {
+            Console.Error() << ex.Message() << endl();
+        }
+        return 1;
+    }
+    return 0;
+}

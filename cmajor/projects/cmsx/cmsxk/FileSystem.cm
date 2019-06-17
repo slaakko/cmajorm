@@ -282,6 +282,17 @@ namespace cmsx.kernel
                 LogMessage("fs.unlink", path);
             }
             string parentPath = Path.GetDirectoryName(path);
+            if (parentPath.IsEmpty())
+            {
+                if (path.StartsWith("/"))
+                {
+                    parentPath = "/";
+                }
+                else
+                {
+                    parentPath = ".";
+                }
+            }
             string entryName = Path.GetFileName(path);
             INode* parent = GetINodeManager()->PathToINode(process, parentPath);
             if (parent == null)
@@ -300,6 +311,14 @@ namespace cmsx.kernel
             if (fs->IsReadOnly())
             {
                 throw SystemError(EINVAL, "cannot unlink: file system '" + fs->Name() + "' is read-only");
+            }
+            try
+            {
+                parent->CheckPermissions(process->uid, process->gid, Access.write);
+            }
+            catch (const Exception& ex)
+            {
+                throw FileSystemException("cannot write to directory '" + parentPath + "' using uid " + ToString(process->uid) + ": " + ex.Message());
             }
             INodePutter inodePutter(inode);
             if (Log())
@@ -344,6 +363,227 @@ namespace cmsx.kernel
             if (Log())
             {
                 LogMessage("fs.unlink", "return.inode=" + inode->ToString());
+            }
+        }
+        public void Rename(Process* process, const string& sourcePath, const string& targetPath)
+        {
+            if (Log())
+            {
+                LogMessage("fs.rename", "source=" + sourcePath + ".target=" + targetPath);
+            }
+            string sourceParentPath = Path.GetDirectoryName(sourcePath);
+            if (sourceParentPath.IsEmpty())
+            {
+                if (sourcePath.StartsWith("/"))
+                {
+                    sourceParentPath = "/";
+                }
+                else
+                {
+                    sourceParentPath = ".";
+                }
+            }
+            string sourceEntryName = Path.GetFileName(sourcePath);
+            string targetParentPath = Path.GetDirectoryName(targetPath);
+            if (targetParentPath.IsEmpty())
+            {
+                if (targetPath.StartsWith("/"))
+                {
+                    targetParentPath = "/";
+                }
+                else
+                {
+                    targetParentPath = ".";
+                }
+            }
+            string targetEntryName = Path.GetFileName(targetPath);
+            bool sameDirectory = false;
+            if (GetFullPath(sourceParentPath) == GetFullPath(targetParentPath))
+            {
+                sameDirectory = true;
+            }
+            INode* sourceParent = GetINodeManager()->PathToINode(process, sourceParentPath);
+            if (sourceParent == null)
+            {
+                throw SystemError(ENOENT, "directory '" + sourceParentPath + "' does not exist");
+            }
+            INodePutter sourceParentPutter(sourceParent);
+            FileSystem* sourceFS = GetMountTable().GetFileSystem(sourceParent->Key().fsNumber);
+            if (sourceFS->IsReadOnly())
+            {
+                throw SystemError(EINVAL, "cannot rename: file system '" + sourceFS->Name() + "' is read-only");
+            }
+            try
+            {
+                sourceParent->CheckPermissions(process->uid, process->gid, Access.write);
+            }
+            catch (const Exception& ex)
+            {
+                throw FileSystemException("cannot write to directory '" + sourceParentPath + "' using uid " + ToString(process->uid) + ": " + ex.Message());
+            }
+            BlockPutter sourcePutter;
+            DirectoryBlock* sourceDirectoryBlock = null;
+            int sourceIndex = -1;
+            long sourceOffset = 0;
+            bool sourceEntryFound = false;
+            while (!sourceEntryFound && sourceOffset < sourceParent->GetFileSize())
+            {
+                int blockNumber = 0;
+                int blockOffset = 0;
+                GetBlockManager()->GetBlockNumber(sourceParent, sourceOffset, blockNumber, blockOffset, false);
+                if (blockNumber == 0)
+                {
+                    throw SystemError(EFAIL, "directory block number not found from inode of '" + sourceParentPath + "'");
+                }
+                Block* block = GetBlockManager()->ReadBlock(BlockKey(blockNumber, sourceParent->Key().fsNumber, BlockKind.directoryBlock), null);
+                BlockPutter putter(block);
+                #assert(block is DirectoryBlock*);
+                DirectoryBlock* directoryBlock = cast<DirectoryBlock*>(block);
+                for (int index = blockOffset / directoryEntrySize; index < numDirectoryEntriesInBlock && sourceOffset < sourceParent->GetFileSize(); ++index)
+                {
+                    DirectoryEntry& entry = directoryBlock->GetDirectoryEntry(index);
+                    string name = &entry.name[0];
+                    if (name == sourceEntryName)
+                    {
+                        if (sameDirectory)
+                        {
+                            StrCopy(&entry.name[0], targetEntryName.Chars(), nameMax);
+                            GetBlockManager()->WriteBlock(directoryBlock, null);
+                            sourceParent->SetMTime();
+                            return;
+                        }
+                        else
+                        {
+                            sourcePutter.Reset(putter.Release());
+                            sourceDirectoryBlock = directoryBlock;
+                            sourceIndex = index;
+                            sourceEntryFound = true;
+                            break;
+                        }
+                    }
+                    sourceOffset = sourceOffset + directoryEntrySize;
+                }
+            }
+            DirectorySlot freeDirectorySlot;
+            INode* targetParent = null;
+            string name;
+            INode* target = GetINodeManager()->PathToINode(process, targetPath, PathToINodeFlags.createEntry, targetParent, freeDirectorySlot, name);
+            INodePutter targetParentPutter(targetParent);
+            INodePutter targetPutter;
+            if (target != null)
+            {
+                targetPutter.ResetINode(target);
+            }
+            if (targetParent == null)
+            {
+                throw SystemError(EINVAL, "directory path '" + targetParentPath + "' not found ");
+            }
+            try
+            {
+                targetParent->CheckPermissions(process->uid, process->gid, Access.write);
+            }
+            catch (const Exception& ex)
+            {
+                throw FileSystemException("cannot write to directory '" + targetParentPath + "' using uid " + ToString(process->uid) + ": " + ex.Message());
+            }
+            FileSystem* targetFS = GetMountTable().GetFileSystem(targetParent->Key().fsNumber);
+            if (targetFS->IsReadOnly())
+            {
+                throw SystemError(EINVAL, "cannot rename: target file system '" + targetFS->Name() + "' is read-only");
+            }
+            if (sourceParent->Key().fsNumber != targetParent->Key().fsNumber)
+            {
+                throw SystemError(EINVAL, "cannot rename across file systems: source file system number: " + ToString(sourceParent->Key().fsNumber) + ", target file system number: " + ToString(targetParent->Key().fsNumber));
+            }
+            if (target == null)
+            {
+                Block* targetBlock = null;
+                if (freeDirectorySlot.blockNumber != invalidBlockNumber)
+                {
+                    targetBlock = GetBlockManager()->ReadBlock(BlockKey(freeDirectorySlot.blockNumber, targetParent->Key().fsNumber, BlockKind.directoryBlock), null);
+                }
+                else
+                {
+                    int blockNumber = 0;
+                    int blockOffset = 0;
+                    GetBlockManager()->GetBlockNumber(targetParent, freeDirectorySlot.offset, blockNumber, blockOffset, true);
+                    targetBlock= GetBlockManager()->GetBlock(BlockKey(blockNumber, targetParent->Key().fsNumber, BlockKind.directoryBlock), null);
+                    targetBlock->Clear();
+                }
+                BlockPutter targetBlockPutter(targetBlock);
+                DirectoryBlock* targetDirectoryBlock = cast<DirectoryBlock*>(targetBlock);
+                bool created = false;
+                for (int i = 0; i < numDirectoryEntriesInBlock; ++i)
+                {
+                    DirectoryEntry& targetEntry = targetDirectoryBlock->GetDirectoryEntry(i);
+                    if (targetEntry.inodeNumber == 0)
+                    {
+                        DirectoryEntry& sourceEntry = sourceDirectoryBlock->GetDirectoryEntry(sourceIndex);
+                        targetEntry.inodeNumber = sourceEntry.inodeNumber;
+                        StrCopy(&targetEntry.name[0], targetEntryName.Chars(), nameMax);
+                        if (freeDirectorySlot.blockNumber == invalidBlockNumber || freeDirectorySlot.offset >= targetParent->GetFileSize())
+                        {
+                            targetParent->SetFileSize(targetParent->GetFileSize() + directoryEntrySize);
+                        }
+                        created = true;
+                        break;
+                    }
+                }
+                if (created)
+                {
+                    GetBlockManager()->WriteBlock(sourceDirectoryBlock, null);
+                    GetBlockManager()->WriteBlock(targetDirectoryBlock, null);
+                    sourceParent->SetMTime();
+                    targetParent->SetMTime();
+                }
+                else
+                {
+                    throw SystemError(EFAIL, "no room for target directory entry");
+                }
+            }
+            else
+            {
+                long offset = 0;
+                bool entrySet = false;
+                DirectoryBlock* targetDirectoryBlock = null;
+                while (!entrySet && offset < targetParent->GetFileSize())
+                {
+                    int blockNumber = 0;
+                    int blockOffset = 0;
+                    GetBlockManager()->GetBlockNumber(targetParent, offset, blockNumber, blockOffset, false);
+                    if (blockNumber == 0)
+                    {
+                        throw SystemError(EFAIL, "directory block number not found from inode of '" + targetParentPath + "'");
+                    }
+                    Block* targetBlock = GetBlockManager()->ReadBlock(BlockKey(blockNumber, targetParent->Key().fsNumber, BlockKind.directoryBlock), null);
+                    BlockPutter putter(targetBlock);
+                    #assert(targetBlock is DirectoryBlock*);
+                    targetDirectoryBlock = cast<DirectoryBlock*>(targetBlock);
+                    for (int index = blockOffset / directoryEntrySize; index < numDirectoryEntriesInBlock && offset < targetParent->GetFileSize(); ++index)
+                    {
+                        DirectoryEntry& targetEntry = targetDirectoryBlock->GetDirectoryEntry(index);
+                        if (targetEntry.inodeNumber == target->Key().inodeNumber)
+                        {
+                            target->SetNumLinks(target->GetNumLinks() - 1);
+                            DirectoryEntry& sourceEntry = sourceDirectoryBlock->GetDirectoryEntry(sourceIndex);
+                            targetEntry.inodeNumber = sourceEntry.inodeNumber;
+                            entrySet = true;
+                            break;
+                        }
+                        offset = offset + directoryEntrySize;
+                    }
+                }
+                if (entrySet)
+                {
+                    GetBlockManager()->WriteBlock(sourceDirectoryBlock, null);
+                    GetBlockManager()->WriteBlock(targetDirectoryBlock, null);
+                    sourceParent->SetMTime();
+                    targetParent->SetMTime();
+                }
+                else
+                {
+                    throw SystemError(EFAIL, "directory entry for '" + targetPath + "' not found");
+                }
             }
         }
         public void MakeDirectory(Process* process, const string& path, int mode)

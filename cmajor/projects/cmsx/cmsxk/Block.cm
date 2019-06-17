@@ -585,12 +585,35 @@ namespace cmsx.kernel
 
     public class BlockPutter
     {
+        public nothrow BlockPutter() : block(null)
+        {
+        }
         public nothrow BlockPutter(Block* block_) : block(block_)
         {
         }
+        public nothrow void Reset(Block* block_)
+        {
+            if (block != block_)
+            {
+                if (block != null)
+                {
+                    block->Manager()->PutBlock(block);
+                }
+                block = block_;
+            }
+        }
+        public nothrow Block* Release()
+        {
+            Block* result = block;
+            block = null;
+            return result;
+        }
         public ~BlockPutter()
         {
-            block->Manager()->PutBlock(block);
+            if (block != null)
+            {
+                block->Manager()->PutBlock(block);
+            }
         }
         private Block* block;
     }

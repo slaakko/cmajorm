@@ -138,6 +138,12 @@ namespace cmsx.kernel
         public bool systemCallReady;
         public void* fiber;
         public bool unsave;
+        public Duration kernelTime;
+        public Duration userTime;
+        public Duration childKernelTime;
+        public Duration childUserTime;
+        public TimePoint kernelStart;
+        public TimePoint userStart;
     }
 
     public class ProcessTable
@@ -195,6 +201,12 @@ namespace cmsx.kernel
             process->workingDirINodeKey = process->rootDirINodeKey;
             process->umask = 0;
             AddProcessToProcessMap(process);
+            process->kernelTime = Duration(0);
+            process->userTime = Duration(0);
+            process->childKernelTime = Duration(0);
+            process->childUserTime = Duration(0);
+            process->kernelStart = TimePoint(0);
+            process->userStart = TimePoint(0);
             return process;
         }
         public nothrow Process* CloneProcess(Process* parent)
@@ -244,6 +256,12 @@ namespace cmsx.kernel
             child->functionTableLength = parent->functionTableLength;
             AddProcessToProcessMap(child);
             parent->AddChild(child);
+            child->kernelTime = Duration(0);
+            child->userTime = Duration(0);
+            child->childKernelTime = Duration(0);
+            child->childUserTime = Duration(0);
+            child->kernelStart = TimePoint(0);
+            child->userStart = TimePoint(0);
             return child;
         }
         public nothrow void FreeProcess(Process* process)
