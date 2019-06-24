@@ -266,6 +266,12 @@ namespace cmsx.kernel
             Registers& regs = machine.GetRegisters();
             regs.Set(regAX, returnValue);
         }
+/*
+        else if (process == processTable.GetIdle() && !processTable.ReadyQueueEmpty())
+        {
+            Schedule(machine, processTable);
+        }
+*/
         if (Log())
         {
             LogMessage("intr.return", "end");

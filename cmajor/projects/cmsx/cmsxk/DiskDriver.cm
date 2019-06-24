@@ -65,14 +65,15 @@ namespace cmsx.kernel
 
     public class IORequest
     {
-        public nothrow IORequest(int number_, ulong offset_, Process* process_, IOOperation op_, bool deliver_) :
-            number(number_), overlapped(offset_), process(process_), op(op_), deliver(deliver_)
+        public nothrow IORequest(int number_, Block* block_, ulong offset_, Process* process_, IOOperation op_, bool deliver_) :
+            number(number_), block(block_), overlapped(offset_), process(process_), op(op_), deliver(deliver_)
         {
         }
         public string ToString()
         {
             string s = "number=";
             s.Append(ToString(number));
+            s.Append(".block=").Append(block->ToString());
             s.Append(".overlapped=").Append(ToHexString(cast<ulong>(overlapped.Get())));
             s.Append(".process=").Append(ProcessName(process));
             s.Append(".op=").Append(IOOperationStr(op));
@@ -81,6 +82,7 @@ namespace cmsx.kernel
             return s;
         }
         public int number;
+        public Block* block;
         public Overlapped overlapped;
         public Buffer buffer;
         public Process* process;
@@ -141,7 +143,7 @@ namespace cmsx.kernel
             OsCloseIoCompletionPort(completionPort);
             OsCloseEvent(ddRequestProcessedEvent);
         }
-        public HostFile* GetOrInsertHostFile(const string& hostFilePath)
+        public HostFile* GetOrInsertHostFile(const string& hostFilePath, bool randomAccess)
         {
             if (Log())
             {
@@ -157,13 +159,13 @@ namespace cmsx.kernel
                 }
                 else
                 {
-                    hostFile = new HostFile(hostFilePath, nextHostFileKey++);
+                    hostFile = new HostFile(hostFilePath, nextHostFileKey++, randomAccess);
                     pathHostFileMap[hostFilePath] = hostFile;
                     keyHostFileMap[hostFile->Key()] = hostFile;
                     hostFiles.Add(UniquePtr<HostFile>(hostFile));
                     if (Log())
                     {
-                        LogMessage("fs.dd.GetOrInsertHostFile", "add:key=" + ToString(hostFile->Key()) + ".path=" + hostFile->GetHostFilePath());
+                        LogMessage("fs.dd.GetOrInsertHostFile", "add:key=" + ToString(hostFile->Key()) + ".path=" + hostFile->GetHostFilePath() + ".randomAccess=" + ToString(randomAccess));
                     }
                 }
             }
@@ -294,7 +296,7 @@ namespace cmsx.kernel
             UniquePtr<IORequest> request;
             {
                 LockGuard<Mutex> lock(mtx);
-                request.Reset(new IORequest(nextRequestNumber++, offset, process, IOOperation.read, true));
+                request.Reset(new IORequest(nextRequestNumber++, block, offset, process, IOOperation.read, true));
                 requestMap[request->overlapped.Get()] = request.Get();
             }
             if (Log())
@@ -307,6 +309,11 @@ namespace cmsx.kernel
                 if (Log())
                 {
                     LogMessage("fs.dd.read", "immediate=" + request->ToString());
+                }
+                if (block->GetFlag(Block.Flags.async))
+                {
+                    LogMessage("fs.dd.read", "async");
+                    return blockSize;
                 }
                 MemoryReader reader(cast<byte*>(request->buffer.Get()), blockSize);
                 block->Read(reader);
@@ -328,6 +335,11 @@ namespace cmsx.kernel
             }
             if (lastError == 0u)
             {
+                if (block->GetFlag(Block.Flags.async))
+                {
+                    LogMessage("fs.dd.read", "async");
+                    return blockSize;
+                }
                 if (Log())
                 {
                     LogMessage("fs.dd.read", "sleep");
@@ -387,7 +399,7 @@ namespace cmsx.kernel
             UniquePtr<IORequest> request;
             {
                 LockGuard<Mutex> lock(mtx);
-                request.Reset(new IORequest(nextRequestNumber++, offset, process, IOOperation.write, deliver));
+                request.Reset(new IORequest(nextRequestNumber++, block, offset, process, IOOperation.write, deliver));
                 requestMap[request->overlapped.Get()] = request.Get();
             }
             MemoryWriter writer(cast<byte*>(request->buffer.Get()), blockSize);
@@ -551,25 +563,35 @@ namespace cmsx.kernel
                             }
                             if (ioRequest->deliver)
                             {
+                                if (ioRequest->block->GetFlag(Block.Flags.async))
                                 {
-                                    LockGuard<Mutex> lock(mtx);
-                                    completionQueue.Put(IOCompletion(ioRequest.Release()));
-                                }
-                                if (GetKernel().Booting())
-                                {
-                                    if (Log())
-                                    {
-                                        LogMessage("fs.dd.run", "deliver.handleCompletions");
-                                    }
-                                    handleCompletions = true;
+                                    MemoryReader reader(cast<byte*>(ioRequest->buffer.Get()), blockSize);
+                                    ioRequest->block->Read(reader);
+                                    ioRequest->block->Manager()->PutBlock(ioRequest->block);
+                                    requestMap.Remove(overlapped);
                                 }
                                 else
                                 {
-                                    if (Log())
                                     {
-                                        LogMessage("fs.dd.run", "deliver.setInterrupt");
+                                        LockGuard<Mutex> lock(mtx);
+                                        completionQueue.Put(IOCompletion(ioRequest.Release()));
                                     }
-                                    GetMachine().GetRegisters().SetInterrupt(DISK_BIT);
+                                    if (GetKernel().Booting())
+                                    {
+                                        if (Log())
+                                        {
+                                            LogMessage("fs.dd.run", "deliver.handleCompletions");
+                                        }
+                                        handleCompletions = true;
+                                    }
+                                    else
+                                    {
+                                        if (Log())
+                                        {
+                                            LogMessage("fs.dd.run", "deliver.setInterrupt");
+                                        }
+                                        GetMachine().GetRegisters().SetInterrupt(DISK_BIT);
+                                    }
                                 }
                             }
                             else

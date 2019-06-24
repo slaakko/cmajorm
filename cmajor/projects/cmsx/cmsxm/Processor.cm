@@ -363,8 +363,8 @@ namespace cmsx.machine
                 if (irqBitSet)
                 {
                     ulong handlerPtrAddress = regs.GetSpecial(Registers.rTT) + 8u * cast<ulong>(irq);
-                    HandleInterrupt(cast<byte>(irq), handlerPtrAddress);
                     regs.ResetInterrupt(irqBit);
+                    HandleInterrupt(cast<byte>(irq), handlerPtrAddress);
                 }
             }
         }

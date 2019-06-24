@@ -538,7 +538,7 @@ namespace cmsx.kernel
                 {
                     return hostFilePair.second;
                 }
-                HostFile* hostFile = GetDiskDriver().GetOrInsertHostFile(hostFilePair.first);
+                HostFile* hostFile = GetDiskDriver().GetOrInsertHostFile(hostFilePair.first, false);
                 hostFilePair.second = hostFile;
                 if (Log())
                 {

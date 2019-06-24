@@ -38,7 +38,7 @@ namespace cmsx.kernel
                 create = true;
             }
             DiskDriver& diskDriver = GetDiskDriver();
-            hostFile = diskDriver.GetOrInsertHostFile(hostFilePath);
+            hostFile = diskDriver.GetOrInsertHostFile(hostFilePath, true);
             if (create)
             {
                 CreateRootFs(rootFSMaxFiles, rootFSMaxBlocks);

@@ -16,8 +16,8 @@ public extern cdecl nothrow bool OsSetConsoleCursorPosition(void* consoleOutputH
 public extern cdecl nothrow bool OsSetConsoleTextAttribute(ushort attrs);
 public extern cdecl nothrow void* OsCreateConsoleOutputHandle();
 public extern cdecl nothrow bool OsWriteConsole(void* consoleOutputHandle, const uchar* chars);
-public extern cdecl nothrow void* OsCreateHostFile(const char* filePath);
-public extern cdecl nothrow void* OsOpenHostFile(const char* filePath);
+public extern cdecl nothrow void* OsCreateHostFile(const char* filePath, bool randomAccess);
+public extern cdecl nothrow void* OsOpenHostFile(const char* filePath, bool randomAccess);
 public extern cdecl nothrow void OsCloseHostFile(void* fileHandle);
 public extern cdecl nothrow void* OsCreateIoCompletionPort();
 public extern cdecl nothrow void* OsAssociateFileWithCompletionPort(void* fileHandle, void* completionPort, ulong completionKey);

@@ -13,9 +13,10 @@ namespace cmsx.kernel
     public const int maxCachedBitmapBlocks = 16;
     public const int maxCachedINodeBlocks = 16;
     public const int maxCachedBlockNumberBlocks = 16;
-    public const int maxCachedFileBlocks = 128;
+    public const int maxCachedFileBlocks = 1024;
     public const int maxCachedDirectoryBlocks = 64;
     public const int nameMax = 252;
+    public const int maxReadAheadBlocks = 16;
 
     public enum BlockKind : byte
     {
@@ -73,7 +74,8 @@ namespace cmsx.kernel
             locked = 1u << 0u,
             valid = 1u << 1u,
             dirty = 1u << 2u,
-            old = 1u << 3u
+            old = 1u << 3u,
+            async = 1u << 4u
         }
         public nothrow string BlockFlagStr(Flags flags)
         {

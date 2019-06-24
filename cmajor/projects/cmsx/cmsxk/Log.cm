@@ -36,20 +36,29 @@ namespace cmsx.kernel
         public void Exit()
         {
             exit = true;
+            exiting.NotifyOne();
             flusherThread.Join();
         }
         private void Flush()
         {
-            while (!exit)
+            try
             {
-                RtFlushAll();
-                Sleep(Duration.FromSeconds(10));
+                while (!exit)
+                {
+                    RtFlushAll();
+                    exiting.WaitFor(mtx, Duration.FromSeconds(10));
+                }
+            }
+            catch (const Exception&)
+            {
             }
         }
         private static UniquePtr<LogFileWriter> instance;
         private System.IO.StreamWriter writer;
         private Thread flusherThread;
         private bool exit;
+        private RecursiveMutex mtx;
+        private ConditionVariable exiting;
     }
 
     public nothrow void SetLog(const string& logFile)

@@ -20,8 +20,8 @@ extern "C" RT_API bool OsGetConsoleScreenBufferInfo(void* consoleOutputHandle, i
 extern "C" RT_API bool OsSetConsoleCursorPosition(void* consoleOutputHandle, int cursorPosX, int cursorPosY);
 extern "C" RT_API bool OsWriteConsole(void* consoleOutputHandle, const char32_t* chars);
 extern "C" RT_API bool OsSetConsoleTextAttribute(uint16_t attrs);
-extern "C" RT_API void* OsCreateHostFile(const char* filePath);
-extern "C" RT_API void* OsOpenHostFile(const char* filePath);
+extern "C" RT_API void* OsCreateHostFile(const char* filePath, bool randomAccess);
+extern "C" RT_API void* OsOpenHostFile(const char* filePath, bool randomAccess);
 extern "C" RT_API void OsCloseHostFile(void* fileHandle);
 extern "C" RT_API void* OsCreateIoCompletionPort();
 extern "C" RT_API void* OsAssociateFileWithCompletionPort(void* fileHandle, void* completionPort, uint64_t completionKey);

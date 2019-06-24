@@ -225,9 +225,14 @@ extern "C" RT_API void* OsCreateConsoleOutputHandle()
     }
 }
 
-extern "C" RT_API void* OsCreateHostFile(const char* filePath)
+extern "C" RT_API void* OsCreateHostFile(const char* filePath, bool randomAccess)
 {
-    HANDLE handle = CreateFileA(filePath, GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ, NULL, CREATE_NEW, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_RANDOM_ACCESS | FILE_FLAG_OVERLAPPED, NULL);
+    DWORD accessFlag = FILE_FLAG_SEQUENTIAL_SCAN;
+    if (randomAccess)
+    {
+        accessFlag = FILE_FLAG_RANDOM_ACCESS;
+    }
+    HANDLE handle = CreateFileA(filePath, GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ, NULL, CREATE_NEW, FILE_ATTRIBUTE_NORMAL | accessFlag | FILE_FLAG_OVERLAPPED, NULL);
     if (handle == INVALID_HANDLE_VALUE)
     {
         return nullptr;
@@ -238,9 +243,14 @@ extern "C" RT_API void* OsCreateHostFile(const char* filePath)
     }
 }
 
-extern "C" RT_API void* OsOpenHostFile(const char* filePath)
+extern "C" RT_API void* OsOpenHostFile(const char* filePath, bool randomAccess)
 {
-    HANDLE handle = CreateFileA(filePath, GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_RANDOM_ACCESS | FILE_FLAG_OVERLAPPED, NULL);
+    DWORD accessFlag = FILE_FLAG_SEQUENTIAL_SCAN;
+    if (randomAccess)
+    {
+        accessFlag = FILE_FLAG_RANDOM_ACCESS;
+    }
+    HANDLE handle = CreateFileA(filePath, GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL | accessFlag | FILE_FLAG_OVERLAPPED, NULL);
     if (handle == INVALID_HANDLE_VALUE)
     {
         return nullptr;

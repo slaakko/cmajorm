@@ -6,7 +6,7 @@ namespace cmsx.kernel
 {
     public const int numProcessSlots = 1024;
     public const int noPID = -1;
-    public const int idlePID = 0x7FFFFFFF;
+    public const int idlePID = 0;
     public const ulong noEvent = 0u;
     public const ulong childExitEvent = 1u;
     public const ulong consoleInputEvent = 2u;
@@ -154,7 +154,7 @@ namespace cmsx.kernel
         {
             return *instance;
         }
-        private ProcessTable() : machine(GetMachine()), nextPID(0), free(null), init(null), running(null), readyQueue(), nextFreeProcessSlot(0)
+        private ProcessTable() : machine(GetMachine()), nextPID(1), free(null), init(null), running(null), readyQueue(), nextFreeProcessSlot(0)
         {
         }
         public Process* CreateProcess(const string& name, ulong entryPoint, ulong textSegmentBaseAddress, ulong textSegmentSize, ulong dataSegmentSize, ulong poolSegmentSize,
@@ -1054,7 +1054,7 @@ namespace cmsx.kernel
         {
             if (prevRunning != null)
             {
-                if (prevRunning->state != Process.State.zombie)
+                if (prevRunning->state != Process.State.zombie && !prevRunning->unsave)
                 {
                     ulong sp = machine.GetRegisters().Get(cmsx.machine.regSP);
                     prevRunning->sp = processor.SaveContext(prevRunning->memoryTable.virtualTranslationRegisterValue, sp,
@@ -1074,12 +1074,9 @@ namespace cmsx.kernel
             running->unsave = false;
             running->sp = processor.UnsaveContext(running->memoryTable.virtualTranslationRegisterValue, running->sp);
         }
-        else
-        {
-           // processor.GetRegisters().SetSpecial(Registers.rV, running->memoryTable.virtualTranslationRegisterValue);
-        }
         processTable.SetRunning(running);
         running->state = Process.State.running;
+        processor.GetRegisters().SetSpecial(Registers.rV, running->memoryTable.virtualTranslationRegisterValue);
         if (Log())
         {
             if (prevRunning != running)

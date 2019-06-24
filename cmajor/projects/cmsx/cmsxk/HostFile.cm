@@ -6,15 +6,15 @@ namespace cmsx.kernel
 
     public class HostFile
     {
-        public HostFile(const string& hostFilePath_, ulong key_) : hostFilePath(hostFilePath_), fileHandle(null), key(key_)
+        public HostFile(const string& hostFilePath_, ulong key_, bool randomAccess) : hostFilePath(hostFilePath_), fileHandle(null), key(key_)
         {
             if (System.IO.File.Exists(hostFilePath))
             {
-                fileHandle = OsOpenHostFile(hostFilePath.Chars());
+                fileHandle = OsOpenHostFile(hostFilePath.Chars(), randomAccess);
             }
             else
             {
-                fileHandle = OsCreateHostFile(hostFilePath.Chars());
+                fileHandle = OsCreateHostFile(hostFilePath.Chars(), randomAccess);
             }
             if (fileHandle == null)
             {
