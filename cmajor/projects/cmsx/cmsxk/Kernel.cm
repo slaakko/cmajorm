@@ -14,13 +14,16 @@ namespace cmsx.kernel
             return *instance;
         }
         private nothrow Kernel() : machine(GetMachine()), sessionTable(GetSessionTable()), processTable(GetProcessTable()), baseDebugger(), debugger(&baseDebugger), consoleDriver(null),
-            kernelEvent(OsCreateEvent())
+            kernelEvent(OsCreateEvent()), kernelIdleEvent(OsCreateEvent()), booting(false), waiting(false)
         {
+            SetIdle();
             SetKernelShutdownFunc(StopKernelThreads);
+            RetrieveHostName();
         }
         public ~Kernel()
         {
             OsCloseEvent(kernelEvent);
+            OsCloseEvent(kernelIdleEvent);
         }
         public nothrow void SetUser(const string& user_)
         {
@@ -29,6 +32,10 @@ namespace cmsx.kernel
         public nothrow inline const string& User() const
         {
             return user;
+        }
+        public nothrow inline const string& Host() const
+        {
+            return host;
         }
         public void Init()
         {
@@ -115,6 +122,26 @@ namespace cmsx.kernel
         {
             consoleDriver = consoleDriver_;
         }
+        public nothrow void SetBooting()
+        {
+            booting = true;
+        }
+        public nothrow void ResetBooting()
+        {
+            booting = false;
+        }
+        public nothrow inline bool Booting() const
+        {
+            return booting;
+        }
+        public void SetIdle()
+        {
+            OsSetEvent(kernelIdleEvent);
+        }
+        public void WaitIdle()
+        {
+            OsWaitEvent(kernelIdleEvent);
+        }
         public void SetKernelEvent()
         {
             OsSetEvent(kernelEvent);
@@ -123,17 +150,30 @@ namespace cmsx.kernel
         {
             OsWaitEvent(kernelEvent);
         }
-        public inline nothrow bool Waiting() const
+        public nothrow bool Waiting() const
         {
             return waiting;
         }
-        public nothrow inline void SetWaiting()
+        public nothrow void SetWaiting()
         {
             waiting = true;
         }
-        public nothrow inline void ResetWaiting()
+        public nothrow void ResetWaiting()
         {
             waiting = false;
+        }
+        private nothrow void RetrieveHostName()
+        {
+            int n = OsGetMaxComputerNameLength();
+            UniquePtr<char> computerNameBuf(cast<char*>(RtMemAlloc(n + 1)));
+            if (OsGetComputerName(computerNameBuf.Get(), n + 1))
+            {
+                host = computerNameBuf.Get();
+            }
+            else
+            {
+                host = "computer";
+            }
         }
         private static UniquePtr<Kernel> instance;
         private Machine& machine;
@@ -150,13 +190,17 @@ namespace cmsx.kernel
         private Session* currentSession;
         private ConsoleDriver* consoleDriver;
         private void* kernelEvent;
-        private bool waiting;
+        private void* kernelIdleEvent; 
         private string user;
+        private string host;
+        private bool booting;
+        private bool waiting;
     }
     
     public void StopKernelThreads()
     {
         GetDiskDriver().Stop();
         GetConsoleDriver().Stop();
+        GetKernel().SetKernelEvent();
     }
 }

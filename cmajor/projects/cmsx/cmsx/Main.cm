@@ -44,15 +44,14 @@ void Run(Machine& machine)
 
 void Terminate(Machine& machine)
 {
-    GetMountTable().Flush();
     GetDiskDriver().Stop();
     GetConsoleDriver().Stop();
-    Kernel& kernel = Kernel.Instance();
     if (Machine.GetFlag(Machine.Flags.debug))
     {
         Debugger* debugger = DebuggerProvider.GetDebugger();
         debugger->Done();
     }
+    Kernel& kernel = GetKernel();
     int pid = kernel.GetProgramPID();
     if (pid != -1)
     {
@@ -137,6 +136,12 @@ public void PrintHelp()
     Console.Out() << "  Log kernel operation to stdout." << endl();
     Console.Out() << "--logfile=FILE (-f=FILE)" << endl();
     Console.Out() << "  Log kernel operation to FILE." << endl();
+    Console.Out() << "--install (-i)" << endl();
+    Console.Out() << "  Install file system." << endl();
+    Console.Out() << "--followExec (-x)" << endl();
+    Console.Out() << "  Debugger follows exec chain." << endl();
+    Console.Out() << "--sleeping-write (-p)" << endl();
+    Console.Out() << "  Sleep during disk write operations." << endl();
 }
 
 bool CopyFs()
@@ -238,7 +243,7 @@ void SetUser(const string& user, bool fsCopied)
     }
     else
     {
-        Console.Out() << "CMSX default user account not set.\nEnter the name of a new CMSX user account to be created> ";
+        Console.Out() << "CMSX default user account not set.\nEnter name of a new CMSX user account to be created> ";
         defaultUserAccount = Console.ReadLine();
         while (true)
         {
@@ -250,7 +255,7 @@ void SetUser(const string& user, bool fsCopied)
             else
             {
                 Console.Out() << "String '" << defaultUserAccount << "' is not a valid CMSX user account name. It must not be empty and must consist of letters a-z, A-Z and digits 0-9." << endl();
-                Console.Out() << "Enter the name of a new CMSX user account to be created> ";
+                Console.Out() << "Enter name of a new CMSX user account to be created> ";
                 defaultUserAccount = Console.ReadLine();
             }
         }
@@ -314,6 +319,14 @@ int main(int argc, const char** argv)
                     {
                         Machine.SetFlag(Machine.Flags.install);
                     }
+                    else if (arg == "--followExec")
+                    {
+                        Machine.SetFlag(Machine.Flags.followExec);
+                    }
+                    else if (arg == "--sleeping-write")
+                    {
+                        Machine.SetFlag(Machine.Flags.sleepingWrite);
+                    }
                     else if (arg == "--dont-use-translation-cache")
                     {
                         SetUseTranslationCacheValue(false);
@@ -371,6 +384,14 @@ int main(int argc, const char** argv)
                                 {
                                     Machine.SetFlag(Machine.Flags.debug);
                                 }
+                                else if (o == 'x')
+                                {
+                                    Machine.SetFlag(Machine.Flags.followExec);
+                                }
+                                else if (o == 'p')
+                                {
+                                    Machine.SetFlag(Machine.Flags.sleepingWrite);
+                                }
                                 else if (o == 'l')
                                 {
                                     SetLog();
@@ -420,7 +441,9 @@ int main(int argc, const char** argv)
     catch (const Exception& ex)
     {
         Console.Error() << ex.ToString() << endl();
+        StopLog();
         return 1;
     }
+    StopLog();
     return 0;
 }

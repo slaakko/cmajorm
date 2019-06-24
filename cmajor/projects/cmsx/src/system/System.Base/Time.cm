@@ -162,6 +162,73 @@ namespace System
             ThrowSystemError();
         }
     }
+
+    public nothrow string HourStr(const Duration& duration)
+    {
+        string s;
+        long hours = duration.Hours();
+        long hh = hours % 24;
+        s.Append(cast<char>(cast<byte>('0') + cast<byte>(hh / 10 % 10)));
+        s.Append(cast<char>(cast<byte>('0') + cast<byte>(hh % 10)));
+        return s;
+    }
+    
+    public nothrow string MinuteStr(const Duration& duration)
+    {
+        string s;
+        long minutes = duration.Minutes();
+        long mm = minutes % 60;
+        s.Append(cast<char>(cast<byte>('0') + cast<byte>(mm / 10 % 10)));
+        s.Append(cast<char>(cast<byte>('0') + cast<byte>(mm % 10)));
+        return s;
+    }
+    
+    public nothrow string SecondStr(const Duration& duration)
+    {
+        string s;
+        long seconds = duration.Seconds();
+        long ss = seconds % 60;
+        s.Append(cast<char>(cast<byte>('0') + cast<byte>(ss / 10 % 10)));
+        s.Append(cast<char>(cast<byte>('0') + cast<byte>(ss % 10)));
+        return s;
+    }
+    
+    public nothrow string MillisecondStr(const Duration& duration)
+    {
+        string s;
+        long milliseconds = duration.Milliseconds();
+        long ms = milliseconds % 1000;
+        s.Append(cast<char>(cast<byte>('0') + cast<byte>(ms / 100 % 10)));
+        s.Append(cast<char>(cast<byte>('0') + cast<byte>(ms / 10 % 10)));
+        s.Append(cast<char>(cast<byte>('0') + cast<byte>(ms % 10)));
+        return s;
+    }
+    
+    public nothrow string MicrosecondStr(const Duration& duration)
+    {
+        string s;
+        long microseconds = duration.Microseconds();
+        long us = microseconds % 1000;
+        s.Append(cast<char>(cast<byte>('0') + cast<byte>(us / 100 % 10)));
+        s.Append(cast<char>(cast<byte>('0') + cast<byte>(us / 10 % 10)));
+        s.Append(cast<char>(cast<byte>('0') + cast<byte>(us % 10)));
+        return s;
+    }
+
+    public nothrow string DurationStr(const Duration& duration)
+    {
+        string s;
+        s.Append(HourStr(duration));
+        s.Append(':');
+        s.Append(MinuteStr(duration));
+        s.Append(':');
+        s.Append(SecondStr(duration));
+        s.Append('.');
+        s.Append(MillisecondStr(duration));
+        s.Append('.');
+        s.Append(MicrosecondStr(duration));
+        return s;
+    }
     
     public enum Month : sbyte
     {

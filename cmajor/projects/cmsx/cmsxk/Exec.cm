@@ -9,6 +9,10 @@ namespace cmsx.kernel
 {
     public SharedPtr<ByteStream> ReadFileIntoMemoryStream(INode* inode)
     {
+        if (Log())
+        {
+            LogMessage("proc.exec", "read.mem.begin");
+        }
         SharedPtr<ByteStream> memoryStream(new MemoryByteStream());
         long fileSize = inode->GetFileSize();
         FileSystem* fs = GetMountTable().GetFileSystem(inode->Key().fsNumber);
@@ -47,6 +51,10 @@ namespace cmsx.kernel
             }
             bytesLeft = bytesLeft - bytesToRead;
             offset = offset + bytesToRead;
+        }
+        if (Log())
+        {
+            LogMessage("proc.exec", "read.mem.end");
         }
         return memoryStream;
     }
@@ -138,29 +146,38 @@ namespace cmsx.kernel
         return memoryStream;
     }
 
-    public void Exec(Machine& machine, ProcessTable& processTable, Process* process, int argc, ulong argvAddress, long count)
+    public void Exec(Machine& machine, ProcessTable& processTable, Process* process, int argc, int envc, ulong bufferAddress, long count)
     {
+        if (Log())
+        {
+            LogMessage("proc.exec", "begin");
+        }
+        bool followExec = Machine.GetFlag(Machine.Flags.followExec);
         if (argc < 1)
         {
             throw SystemError(EINVAL, "exec: argc must be at least 1");
         }
-        if (argvAddress == 0u)
+        if (envc < 0)
         {
-            throw SystemError(EINVAL, "exec: argv is null");
+            throw SystemError(EINVAL, "exec: envc is negative");
+        }
+        if (bufferAddress == 0u)
+        {
+            throw SystemError(EINVAL, "exec: buffer address is null");
         }
         if (count < 0)
         {
             throw SystemError(EINVAL, "exec: count is negative");
         }
-        UniquePtr<byte> argv(cast<byte*>(RtMemAlloc(count)));
-        ReadProcessMemory(machine, process, argvAddress, argv.Get(), cast<ulong>(count));
-        MemoryReader reader(argv.Get(), count);
+        UniquePtr<byte> buffer(cast<byte*>(RtMemAlloc(count)));
+        ReadProcessMemory(machine, process, bufferAddress, buffer.Get(), cast<ulong>(count));
+        MemoryReader reader(buffer.Get(), count);
         List<string> args;
         for (int i = 0; i < argc; ++i)
         {
             long offset = reader.ReadLong();
             long length = reader.ReadLong();
-            byte* argPtr = argv.Get() + offset;
+            byte* argPtr = buffer.Get() + offset;
             MemoryReader argReader(argPtr, length);
             string arg = argReader.ReadString();
             if (arg.IsEmpty())
@@ -170,6 +187,20 @@ namespace cmsx.kernel
             args.Add(arg);
         }
         #assert(!args.IsEmpty());
+        List<string> environment;
+        for (int i = 0; i < envc; ++i)
+        {
+            long offset = reader.ReadLong();
+            long length = reader.ReadLong();
+            byte* envPtr = buffer.Get() + offset;
+            MemoryReader envReader(envPtr, length);
+            string env = envReader.ReadString();
+            if (env.IsEmpty())
+            {
+                throw SystemError(EINVAL, "exec: environment variable " + ToString(i) + " is empty");
+            }
+            environment.Add(env);
+        }
         const string& executablePath = args.Front();
         FileSystem* rootFS = GetMountTable().GetFileSystem(0);
         INode* inode = rootFS->GetINodeManager()->PathToINode(process, executablePath);
@@ -190,15 +221,20 @@ namespace cmsx.kernel
         {
             throw FileSystemException("cannot execute '" + executablePath + "' using uid " + ToString(process->uid) + ": " + ex.Message());
         }
-        Section poolSection = MakePoolSection(args);
+        ulong envDataAddress = 0u;
+        Section poolSection = MakePoolSection(args, environment, envDataAddress);
         long poolDataLength = poolSection.data.Count();
         long poolSize = Align(poolDataLength, cast<long>(pageSize));
         ulong poolSegmentSize = cast<ulong>(poolSize);
         INodeKey executableINodeKey = inode->Key();
         Process* prevProcess = processTable.GetProcessFromExecutableINodeProcessMap(executableINodeKey);
         ExecutableFile* executable = null;
-        if (prevProcess != null)
+        if (prevProcess != null && !followExec)
         {
+            if (Log())
+            {
+                LogMessage("proc.exec", "clone.begin");
+            }
             SharedPtr<ByteStream> memoryStream = ReadFirstBlockIntoMemoryStream(inode);
             BinaryReader reader(memoryStream);
             UniquePtr<BinaryFile> binaryFile = ReadBinaryFile(reader, executablePath, ReadOption.readHeadersOnly);
@@ -226,14 +262,26 @@ namespace cmsx.kernel
                 Symbol* functionTableSymbol = executable->GetSymbolTable().GetSymbol("@function_table");
                 process->functionTableAddress = functionTableSymbol->start;
                 process->functionTableLength = functionTableSymbol->length;
+                if (followExec)
+                {
+                    executable = cast<ExecutableFile*>(binaryFile.Release());
+                }
             }
             else
             {
                 throw SystemError(EINVAL, "file '" + executablePath + "' is not a CMSX executable");
             }
+            if (Log())
+            {
+                LogMessage("proc.exec", "clone.end");
+            }
         }
         else
         {
+            if (Log())
+            {
+                LogMessage("proc.exec", "read.begin");
+            }
             SharedPtr<ByteStream> memoryStream = ReadFileIntoMemoryStream(inode);
             BinaryReader reader(memoryStream);
             UniquePtr<BinaryFile> binaryFile = ReadBinaryFile(reader, executablePath);
@@ -269,10 +317,18 @@ namespace cmsx.kernel
                 Symbol* functionTableSymbol = executable->GetSymbolTable().GetSymbol("@function_table");
                 process->functionTableAddress = functionTableSymbol->start;
                 process->functionTableLength = functionTableSymbol->length;
+                if (followExec)
+                {
+                    executable = cast<ExecutableFile*>(binaryFile.Release());
+                }
             }
             else
             {
                 throw SystemError(EINVAL, "file '" + executablePath + "' is not a CMSX executable");
+            }
+            if (Log())
+            {
+                LogMessage("proc.exec", "read.end");
             }
         }
         process->executableINodeKey = executableINodeKey;
@@ -287,11 +343,32 @@ namespace cmsx.kernel
             WriteProcessMemory(machine, process, poolSegmentBaseAddress, poolSection.data.Begin().Ptr(), cast<ulong>(poolSection.data.Count()), Protection.write);
             int ax = cast<int>(args.Count());
             ulong bx = poolSegmentBaseAddress;
+            ulong cx = envDataAddress;
             WriteProcessMemory(machine, process, process->regAXAddress, cast<ulong>(ax), 8u, Protection.write);
             WriteProcessMemory(machine, process, process->regBXAddress, bx, 8u, Protection.write);
+            WriteProcessMemory(machine, process, process->regCXAddress, cx, 8u, Protection.write);
+        }
+        if (Log())
+        {
+            LogMessage("proc.exec", "ready");
         }
         SetProcessReadyToRun(processTable, process);
         process->unsave = true;
+        if (followExec)
+        {
+            Kernel& kernel = GetKernel();
+            kernel.SetExecutable(executable);
+            Debugger* debugger = kernel.GetDebugger();
+            debugger->Init(process);
+        }
+        if (Log())
+        {
+            LogMessage("proc.exec", "schedule");
+        }
         Schedule(machine, processTable);
+        if (Log())
+        {
+            LogMessage("proc.exec", "end");
+        }
     }
 }

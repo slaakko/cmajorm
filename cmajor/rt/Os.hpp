@@ -23,11 +23,12 @@ extern "C" RT_API bool OsSetConsoleTextAttribute(uint16_t attrs);
 extern "C" RT_API void* OsCreateHostFile(const char* filePath);
 extern "C" RT_API void* OsOpenHostFile(const char* filePath);
 extern "C" RT_API void OsCloseHostFile(void* fileHandle);
-extern "C" RT_API void* OsCreateIoCompletionPort(void* fileHandle, uint64_t completionKey);
+extern "C" RT_API void* OsCreateIoCompletionPort();
+extern "C" RT_API void* OsAssociateFileWithCompletionPort(void* fileHandle, void* completionPort, uint64_t completionKey);
 extern "C" RT_API void OsCloseIoCompletionPort(void* completionPortHandle);
 extern "C" RT_API bool OsGetQueuedCompletionStatus(void* completionPortHandle, uint64_t* numberOfBytes, uint64_t* completionKey, void** overlapped);
 extern "C" RT_API bool OsPostQueuedCompletionStatus(void* completionPortHandle, uint64_t numberOfBytes, uint64_t completionKey);
-extern "C" RT_API void* OsCreateOverlapped(uint64_t offset, void* evnt);
+extern "C" RT_API void* OsCreateOverlapped(uint64_t offset);
 extern "C" RT_API void OsDestroyOverlapped(void* overlapped);
 extern "C" RT_API bool OsReadFile(void* fileHandle, void* buffer, uint32_t numberOfBytesToRead, void* overlapped);
 extern "C" RT_API bool OsWriteFile(void* fileHandle, void* buffer, uint32_t numberOfBytesToWrite, void* overlapped);
@@ -52,5 +53,7 @@ extern "C" RT_API void* OsFindFirstFile(const char* pathMask, char* fileName);
 extern "C" RT_API bool OsFindNextFile(void* findHandle, char* fileName);
 extern "C" RT_API void OsFindClose(void* findHandle);
 extern "C" RT_API bool OsGetFileTimes(const char* filePath, uint8_t* ctime, uint8_t* mtime, uint8_t* atime);
+extern "C" RT_API int OsGetMaxComputerNameLength();
+extern "C" RT_API bool OsGetComputerName(char* buffer, int size);
 
 #endif // CMAJOR_RT_OS_INCLUDED

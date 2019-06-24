@@ -85,12 +85,11 @@ int main(int argc, const char** argv)
             throw Exception("passwd: input not coming from console");
         }
         prevEcho = Echo(0);
-        SetEcho(0, false);
         Users users = GetUsers();
         User* user = null;
         if (userArgs.IsEmpty())
         {
-            int uid = GetUid();
+            int uid = GetUID();
             user = users.GetUser(uid);
             if (user == null)
             {
@@ -99,7 +98,7 @@ int main(int argc, const char** argv)
         }
         else if (userArgs.Count() == 1)
         {
-            int uid = GetUid();
+            int uid = GetUID();
             user = users.GetUser(userArgs[0]);
             if (user == null)
             {
@@ -123,7 +122,7 @@ int main(int argc, const char** argv)
         {
             Console.Out() << "Changing password for " << user->Name() << "." << endl();
             Console.Out() << "Current CMSX password: ";
-            string password = Console.In().ReadLine();
+            string password = Console.ReadLine();
             if (password.IsEmpty())
             {
                 throw Exception("Unauthorized.");
@@ -138,15 +137,21 @@ int main(int argc, const char** argv)
             }
         }
         Console.Out() << "Enter new CMSX password: ";
-        string password = Console.In().ReadLine();
+        SetEcho(0, false);
+        string password = Console.ReadLine();
+        SetEcho(0, true);
         while (password.IsEmpty())
         {
             Console.Out() << "Password cannot be empty." << endl();
             Console.Out() << "Enter new CMSX password: ";
-            password = Console.In().ReadLine();
+            SetEcho(0, false);
+            password = Console.ReadLine();
+            SetEcho(0, true);
         }
         Console.Out() << "Retype new CMSX password: ";
-        string passwordRetyped = Console.In().ReadLine();
+        SetEcho(0, false);
+        string passwordRetyped = Console.ReadLine();
+        SetEcho(0, true);
         if (password != passwordRetyped)
         {
             Console.Out() << "Passwords do not match." << endl();

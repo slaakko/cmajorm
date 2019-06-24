@@ -6,7 +6,7 @@ using cmsx.object;
 
 namespace cmsx.kernel
 {
-    public Section MakePoolSection(const List<string>& argv)
+    public Section MakePoolSection(const List<string>& argv, const List<string>& environment, ulong& envDataAddress)
     {
         Section poolSection;
         long n = argv.Count() + 1;
@@ -14,16 +14,36 @@ namespace cmsx.kernel
         {
             poolSection.EmitULong(0u);
         }
+        long envBeginPos = poolSection.pos;
+        envDataAddress = poolSegmentBaseAddress + poolSection.Address();
+        long m = environment.Count() + 1;
+        for (long i = 0; i < m; ++i)
+        {
+            poolSection.EmitULong(0u);
+        }
+        poolSection.Align(8u);
         List<ulong> argAddresses;
         for (const string& arg : argv)
         {
             argAddresses.Add(poolSegmentBaseAddress + poolSection.Address());
             poolSection.EmitString(arg);
         }
-        poolSection.pos = 0u;
+        poolSection.Align(8u);
+        List<ulong> envAddresses;
+        for (const string& env : environment)
+        {
+            envAddresses.Add(poolSegmentBaseAddress + poolSection.Address());
+            poolSection.EmitString(env);
+        }
+        poolSection.pos = 0;
         for (ulong argAddr : argAddresses)
         {
             poolSection.EmitULong(argAddr);
+        }
+        poolSection.pos = envBeginPos;
+        for (ulong envAddr : envAddresses)
+        {
+            poolSection.EmitULong(envAddr);
         }
         return poolSection;
     }
@@ -47,7 +67,8 @@ namespace cmsx.kernel
             {
                 argv.Add(arg);
             }
-            Section poolSection = MakePoolSection(argv);
+            ulong envDataAddress = 0u;
+            Section poolSection = MakePoolSection(argv, List<string>(), envDataAddress);
             long poolDataLength = Max(cast<long>(executable->InitialPoolSize()), poolSection.data.Count());
             long poolSize = Align(poolDataLength, cast<long>(pageSize));
             Symbol* mainFunctionSymbol = executable->GetSymbolTable().GetSymbol("Main");
@@ -68,6 +89,7 @@ namespace cmsx.kernel
                 ulong bx = poolSegmentBaseAddress;
                 WriteProcessMemory(machine, process, process->regAXAddress, cast<ulong>(ax), 8u, Protection.write);
                 WriteProcessMemory(machine, process, process->regBXAddress, bx, 8u, Protection.write);
+                WriteProcessMemory(machine, process, process->regCXAddress, 0u, 8u, Protection.write);
             }
             ulong poolStart = poolSegmentBaseAddress + cast<ulong>(poolSize);
             ulong poolEnd = poolSegmentBaseAddress + cast<ulong>(poolSize);
@@ -80,7 +102,7 @@ namespace cmsx.kernel
             Kernel& kernel = Kernel.Instance();
             kernel.SetExecutable(executable);
             Session* session = kernel.CurrentSession();
-            session->fgpid = process->pid;
+            session->fgpgrp = process->pgid;
             return process->pid;
         }
         else

@@ -1,0 +1,171 @@
+// =================================
+// Copyright (c) 2019 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Collections;
+using System.IO;
+using System.Os;
+using System.Security;
+
+private string hostName;
+private int uid = 0;
+private string userName;
+private string home;
+private string shell;
+private string pwd;
+
+void SetEnvironment()
+{
+    if (HasEnv("HOSTNAME"))
+    {
+        hostName = GetEnv("HOSTNAME");
+    }
+    else
+    {
+        hostName = GetHostName();
+        SetEnv("HOSTNAME", hostName);
+    }
+    if (HasEnv("UID"))
+    {
+        uid = ParseInt(GetEnv("UID"));
+    }
+    else
+    {
+        uid = GetUID();
+        SetEnv("UID", ToString(uid));
+    }
+    Users users = GetUsers();
+    User* user = users.GetUser(uid);
+    if (HasEnv("USER"))
+    {
+        userName = GetEnv("USER");
+    }
+    else
+    {
+        if (user != null)
+        {
+            userName = user->Name();
+            SetEnv("USER", userName);
+        }
+    }
+    if (HasEnv("HOME"))
+    {
+        home = GetEnv("HOME");
+    }
+    else
+    {
+        if (user != null)
+        {
+            home = user->Home();
+            SetEnv("HOME", home);
+        }
+    }
+    if (HasEnv("SHELL"))
+    {
+        shell = GetEnv("SHELL");
+    }
+    else
+    {
+        if (user != null)
+        {
+            shell = user->Shell();
+            SetEnv("SHELL", shell);
+        }
+    }
+}
+
+void SetPWD()
+{
+    pwd = GetCurrentWorkingDirectory();
+    SetEnv("PWD", pwd);
+}
+
+void Setup()
+{
+    SetEnvironment();
+    BeginObeyColorStrings(1);
+    SetPWD();
+}
+
+void TearDown()
+{
+    EndObeyColorStrings(1);
+}
+
+void PrintEnvironment()
+{
+    const HashMap<string, string>& environmentVariables = Environment.Instance().Variables();
+    for (const Pair<string, string>& v : environmentVariables)
+    {
+        Console.Out() << v.first << "=" << v.second << endl();
+    }
+}
+
+void PrintPrompt()
+{
+    ustring loc;
+    loc.Append(BeginColors(ConsoleColor.green, ConsoleColor.black)).Append(ToUtf32(userName)).Append('@').Append(ToUtf32(hostName)).Append(EndColors());
+    ustring cwd;
+    if (pwd.StartsWith(home))
+    {
+        cwd.Append(BeginColors(ConsoleColor.cyan, ConsoleColor.black)).Append('~').Append(ToUtf32(pwd.Substring(home.Length()))).Append(EndColors());
+    }
+    else
+    {
+        cwd.Append(BeginColors(ConsoleColor.cyan, ConsoleColor.black)).Append(ToUtf32(pwd)).Append(EndColors());
+    }
+    ustring prompt = u"$ ";
+    if (uid == 0)
+    {
+        prompt = u"# ";
+    }
+    Console.Out() << loc << ":" << cwd << prompt;
+}
+
+nothrow string ReadLine()
+{
+    return Console.ReadLine();
+}
+
+int main(int argc, const char** argv)
+{
+    bool diagnostics = false;
+    int retval = 0;
+    try
+    {
+        Setup();
+        PrintPrompt();
+        string line = ReadLine();
+        while (line != "logout" && line != "exit")
+        {
+            PrintPrompt();
+            line = ReadLine();
+        }
+    }
+    catch (const Exception& ex)
+    {
+        if (diagnostics)
+        {
+            Console.Error() << ex.ToString() << endl();
+        }
+        else
+        {
+            Console.Error() << ex.Message() << endl();
+        }
+        retval = 1;
+    }
+    try
+    {
+        TearDown();
+    }
+    catch (const Exception& ex)
+    {
+        if (retval == 0)
+        {
+            retval = 1;
+        }
+    }
+    return retval;
+}

@@ -19,11 +19,12 @@ public extern cdecl nothrow bool OsWriteConsole(void* consoleOutputHandle, const
 public extern cdecl nothrow void* OsCreateHostFile(const char* filePath);
 public extern cdecl nothrow void* OsOpenHostFile(const char* filePath);
 public extern cdecl nothrow void OsCloseHostFile(void* fileHandle);
-public extern cdecl nothrow void* OsCreateIoCompletionPort(void* fileHandle, ulong completionKey);
+public extern cdecl nothrow void* OsCreateIoCompletionPort();
+public extern cdecl nothrow void* OsAssociateFileWithCompletionPort(void* fileHandle, void* completionPort, ulong completionKey);
 public extern cdecl nothrow void OsCloseIoCompletionPort(void* completionPortHandle);
 public extern cdecl nothrow bool OsGetQueuedCompletionStatus(void* completionPortHandle, ulong* numberOfBytes, ulong* completionKey, void** overlapped);
 public extern cdecl nothrow bool OsPostQueuedCompletionStatus(void* completionPortHandle, ulong numberOfBytes, ulong completionKey);
-public extern cdecl nothrow void* OsCreateOverlapped(ulong offset, void* evnt);
+public extern cdecl nothrow void* OsCreateOverlapped(ulong offset);
 public extern cdecl nothrow void OsDestroyOverlapped(void* overlapped);
 public extern cdecl nothrow bool OsReadFile(void* fileHandle, void* buffer, uint numberOfBytesToRead, void* overlapped);
 public extern cdecl nothrow bool OsWriteFile(void* fileHandle, void* buffer, uint numberOfBytesToWrite, void* overlapped);
@@ -48,3 +49,5 @@ public extern cdecl nothrow void* OsFindFirstFile(const char* pathMask, char* fi
 public extern cdecl nothrow bool OsFindNextFile(void* findHandle, char* fileName);
 public extern cdecl nothrow void OsFindClose(void* findHandle);
 public extern cdecl nothrow bool OsGetFileTimes(const char* filePath, byte* ctime, byte* mtime, byte* atime);
+public extern cdecl nothrow bool OsGetComputerName(char* buffer, int size);
+public extern cdecl nothrow int OsGetMaxComputerNameLength();

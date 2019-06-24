@@ -45,9 +45,18 @@ namespace cmsx.kernel
     public const byte sys_chown = 39u;
     public const byte sys_utime = 40u;
     public const byte sys_getuid = 41u;
-    public const byte sys_sync = 42u;
+    public const byte sys_setuid = 42u;
+    public const byte sys_getgid = 43u;
+    public const byte sys_setgid = 44u;
+    public const byte sys_getpgrp = 45u;
+    public const byte sys_setpgrp = 46u;
+    public const byte sys_tcgetpgrp = 47u;
+    public const byte sys_tcsetpgrp = 48u;
+    public const byte sys_sync = 49u;
+    public const byte sys_times = 50u;
+    public const byte sys_get_host_name = 51u;
     
-    public const byte numSystemCalls = sys_sync + 1u;
+    public const byte numSystemCalls = sys_get_host_name + 1u;
 
     public nothrow string SystemCallName(byte systemCall)
     {
@@ -95,7 +104,16 @@ namespace cmsx.kernel
             case sys_chown: return "sys_chown";
             case sys_utime: return "sys_utime";
             case sys_getuid: return "sys_getuid";
+            case sys_setuid: return "sys_setuid";
+            case sys_getgid: return "sys_getgid";
+            case sys_setgid: return "sys_setgid";
+            case sys_getpgrp: return "sys_getpgrp";
+            case sys_setpgrp: return "sys_setpgrp";
+            case sys_tcgetpgrp: return "sys_tcgetpgrp";
+            case sys_tcsetpgrp: return "sys_tcsetpgrp";
             case sys_sync: return "sys_sync";
+            case sys_times: return "sys_times";
+            case sys_get_host_name: return "sys_get_host_name";
         }
         return string();
     }
@@ -158,6 +176,7 @@ namespace cmsx.kernel
                     LogMessage("sc.begin", sc.ToString());
                 }
                 SystemCallHandler handler = sc.handler;
+                process->kernelStart = Now();
                 handler(sc);
             }
             catch (const SystemError& systemError)
@@ -186,6 +205,7 @@ namespace cmsx.kernel
             }
             process->systemCallReady = true;
             process->mode = Process.Mode.runningUser;
+            process->kernelTime = process->kernelTime + Now() - process->kernelStart;
             OsSwitchToFiber(mainFiber);
         }
     }
@@ -234,7 +254,7 @@ namespace cmsx.kernel
         {
             Panic("invalid exec parameters: " + ToString(sc.x) + ", " + ToString(sc.y) + ", " + ToString(sc.z));
         }
-        Exec(*sc.machine, *sc.processTable, sc.process, cast<int>(sc.ax), cast<ulong>(sc.bx), cast<long>(sc.cx));
+        Exec(*sc.machine, *sc.processTable, sc.process, cast<int>(sc.ax), cast<int>(sc.bx), sc.cx, cast<long>(sc.dx));
         sc.result = cast<int>(sc.ax);
     }
 
@@ -671,13 +691,84 @@ namespace cmsx.kernel
         UTime(*sc.machine, sc.process, sc.ax, sc.bx);
     }
 
-    public void GetUid(SystemCall& sc)
+    public void GetUID(SystemCall& sc)
     {
         if (sc.x != 0u || sc.y != sys_getuid || sc.z != 0u)
         {
             Panic("invalid getuid parameters: " + ToString(sc.x) + ", " + ToString(sc.y) + ", " + ToString(sc.z));
         }
         sc.result = sc.process->uid;
+    }
+
+    public void SetUID(SystemCall& sc)
+    {
+        if (sc.x != 0u || sc.y != sys_setuid || sc.z != 0u)
+        {
+            Panic("invalid setuid parameters: " + ToString(sc.x) + ", " + ToString(sc.y) + ", " + ToString(sc.z));
+        }
+        SetUIDProcess(sc.process, cast<int>(sc.ax));
+        sc.result = 0;
+    }
+
+    public void GetGID(SystemCall& sc)
+    {
+        if (sc.x != 0u || sc.y != sys_getgid || sc.z != 0u)
+        {
+            Panic("invalid getgid parameters: " + ToString(sc.x) + ", " + ToString(sc.y) + ", " + ToString(sc.z));
+        }
+        sc.result = sc.process->gid;
+    }
+
+    public void SetGID(SystemCall& sc)
+    {
+        if (sc.x != 0u || sc.y != sys_setgid || sc.z != 0u)
+        {
+            Panic("invalid setgid parameters: " + ToString(sc.x) + ", " + ToString(sc.y) + ", " + ToString(sc.z));
+        }
+        SetGIDProcess(sc.process, cast<int>(sc.ax));
+        sc.result = 0;
+    }
+
+    public void GetPGRP(SystemCall& sc)
+    {
+        if (sc.x != 0u || sc.y != sys_getpgrp || sc.z != 0u)
+        {
+            Panic("invalid getpgrp parameters: " + ToString(sc.x) + ", " + ToString(sc.y) + ", " + ToString(sc.z));
+        }
+        sc.result = sc.process->pgid;
+    }
+
+    public void SetPGRP(SystemCall& sc)
+    {
+        if (sc.x != 0u || sc.y != sys_setpgrp || sc.z != 0u)
+        {
+            Panic("invalid setpgrp parameters: " + ToString(sc.x) + ", " + ToString(sc.y) + ", " + ToString(sc.z));
+        }
+        Process* process = sc.process;
+        process->pgid = process->pid;
+        sc.result = process->pgid;
+    }
+
+    public void TCGetPGRP(SystemCall& sc)
+    {
+        if (sc.x != 0u || sc.y != sys_tcgetpgrp || sc.z != 0u)
+        {
+            Panic("invalid tcgetpgrp parameters: " + ToString(sc.x) + ", " + ToString(sc.y) + ", " + ToString(sc.z));
+        }
+        int fd = cast<int>(sc.ax);
+        sc.result = TCGetPGRP(sc.process, fd);
+    }
+
+    public void TCSetPGRP(SystemCall& sc)
+    {
+        if (sc.x != 0u || sc.y != sys_tcsetpgrp || sc.z != 0u)
+        {
+            Panic("invalid tcsetpgrp parameters: " + ToString(sc.x) + ", " + ToString(sc.y) + ", " + ToString(sc.z));
+        }
+        int fd = cast<int>(sc.ax);
+        int pgrp = cast<int>(sc.bx);
+        TCSetPGRP(sc.process, fd, pgrp);
+        sc.result = 0;
     }
 
     public void Sync(SystemCall& sc)
@@ -687,6 +778,33 @@ namespace cmsx.kernel
             Panic("invalid sync parameters: " + ToString(sc.x) + ", " + ToString(sc.y) + ", " + ToString(sc.z));
         }
         GetMountTable().Flush();
+        sc.result = 0;
+    }
+
+    public void Times(SystemCall& sc)
+    {
+        if (sc.x != 0u || sc.y != sys_times || sc.z != 0u)
+        {
+            Panic("invalid times parameters: " + ToString(sc.x) + ", " + ToString(sc.y) + ", " + ToString(sc.z));
+        }
+        Times(*sc.machine, sc.process, sc.ax, sc.bx, sc.cx, sc.dx);
+        sc.result = 0;
+    }
+
+    public void GetHostName(SystemCall& sc)
+    {
+        if (sc.x != 0u || sc.y != sys_get_host_name || sc.z != 0u)
+        {
+            Panic("invalid get_host_name parameters: " + ToString(sc.x) + ", " + ToString(sc.y) + ", " + ToString(sc.z));
+        }
+        ulong bufferAddress = sc.ax;
+        int size = cast<int>(sc.bx);
+        const string& host = sc.kernel->Host();
+        if (size <= host.Length())
+        {
+            throw SystemError(ERANGE, "get_host_name: buffer too small");
+        }
+        WriteProcessMemory(*sc.machine, sc.process, bufferAddress, cast<byte*>(cast<void*>(host.Chars())), cast<ulong>(host.Length() + 1), Protection.write);
         sc.result = 0;
     }
 }

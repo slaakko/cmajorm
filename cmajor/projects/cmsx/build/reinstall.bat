@@ -9,5 +9,7 @@ xcopy /Y coreutil\mv\bin\release ..\bin
 xcopy /Y coreutil\passwd\bin\release ..\bin
 xcopy /Y coreutil\rm\bin\release ..\bin
 xcopy /Y coreutil\rmdir\bin\release ..\bin
+xcopy /Y coreutil\time\bin\release ..\bin
 xcopy /Y coreutil\umask\bin\release ..\bin
 xcopy /Y proc\sync\bin\release ..\sbin
+xcopy /Y shell\cmsh\bin\release ..\bin

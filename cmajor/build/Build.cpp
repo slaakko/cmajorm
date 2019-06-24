@@ -938,11 +938,16 @@ void CreateMainUnitSystemX(std::vector<std::string>& objectFilePaths, Module& mo
     FunctionNode* mainFunction(new FunctionNode(Span(), Specifiers::public_, new IntNode(Span()), U"main", nullptr));
     mainFunction->AddParameter(new ParameterNode(Span(), new IntNode(Span()), new IdentifierNode(Span(), U"argc")));
     mainFunction->AddParameter(new ParameterNode(Span(), new PointerNode(Span(), new PointerNode(Span(), new CharNode(Span()))), new IdentifierNode(Span(), U"argv")));
+    mainFunction->AddParameter(new ParameterNode(Span(), new PointerNode(Span(), new PointerNode(Span(), new CharNode(Span()))), new IdentifierNode(Span(), U"envp")));
     mainFunction->SetProgramMain();
     CompoundStatementNode* mainFunctionBody = new CompoundStatementNode(Span());
     ConstructionStatementNode* constructExitCode = new ConstructionStatementNode(Span(), new IntNode(Span()), new IdentifierNode(Span(), U"exitCode"));
     mainFunctionBody->AddStatement(constructExitCode);
     CompoundStatementNode* tryBlock = new CompoundStatementNode(Span());
+    InvokeNode* invokeSetupEnvironment = new InvokeNode(Span(), new IdentifierNode(Span(), U"StartupSetupEnvironment"));
+    invokeSetupEnvironment->AddArgument(new IdentifierNode(Span(), U"envp"));
+    StatementNode* callSetEnvironmentStatement = new ExpressionStatementNode(Span(), invokeSetupEnvironment);
+    tryBlock->AddStatement(callSetEnvironmentStatement);
     FunctionSymbol* userMain = module.GetSymbolTable().MainFunctionSymbol();
     InvokeNode* invokeMain = new InvokeNode(Span(), new IdentifierNode(Span(), userMain->GroupName()));
     if (!userMain->Parameters().empty())

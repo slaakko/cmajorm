@@ -6,7 +6,7 @@ namespace cmsx.kernel
 
     public class HostFile
     {
-        public HostFile(const string& hostFilePath_, int index_) : hostFilePath(hostFilePath_), fileHandle(null), completionPort(null), evnt(null), index(index_)
+        public HostFile(const string& hostFilePath_, ulong key_) : hostFilePath(hostFilePath_), fileHandle(null), key(key_)
         {
             if (System.IO.File.Exists(hostFilePath))
             {
@@ -20,27 +20,9 @@ namespace cmsx.kernel
             {
                 throw Exception("error opening host file '" + hostFilePath + "': open failed");
             }
-            completionPort = OsCreateIoCompletionPort(fileHandle, hostFileCompletionKey);
-            if (completionPort == null)
-            {
-                throw Exception("error opening host file '" + hostFilePath + "': creating I/O completion port failed");
-            }
-            evnt = OsCreateEvent();
-            if (evnt == null)
-            {
-                throw Exception("error opening host file '" + hostFilePath + "': creating event failed");
-            }
         }
         public ~HostFile()
         {
-            if (evnt != null)
-            {
-                OsCloseEvent(evnt);
-            }
-            if (completionPort != null)
-            {
-                OsCloseIoCompletionPort(completionPort);
-            }
             if (fileHandle != null)
             {
                 OsCloseHostFile(fileHandle);
@@ -54,22 +36,12 @@ namespace cmsx.kernel
         {
             return fileHandle;
         }
-        public inline nothrow void* GetEventHandle() const
+        public nothrow inline ulong Key() const
         {
-            return evnt;
-        }
-        public inline nothrow void* GetCompletionPortHandle()
-        {
-            return completionPort;
-        }
-        public inline nothrow int Index() const
-        {
-            return index;
+            return key;
         }
         private string hostFilePath;
         private void* fileHandle;
-        private void* completionPort;
-        private void* evnt;
-        private int index;
+        private ulong key;
     }
 }

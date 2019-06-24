@@ -6,7 +6,7 @@
 // supplied 'main' function, and then the exit 
 // system call function to exit the program.
 //
-// On entry ax=argc, bx=argv.
+// On entry ax=argc, bx=argv, cx=envp
 // User supplied main function should return the 
 // exit code of the program in ax.
 // ===============================================

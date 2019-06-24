@@ -45,7 +45,16 @@ public const byte sys_chmod = 38u;
 public const byte sys_chown = 39u;
 public const byte sys_utime = 40u;
 public const byte sys_getuid = 41u;
-public const byte sys_sync = 42u;
+public const byte sys_setuid = 42u;
+public const byte sys_getgid = 43u;
+public const byte sys_setgid = 44u;
+public const byte sys_getpgrp = 45u;
+public const byte sys_setpgrp = 46u;
+public const byte sys_tcgetpgrp = 47u;
+public const byte sys_tcsetpgrp = 48u;
+public const byte sys_sync = 49u;
+public const byte sys_times = 50u;
+public const byte sys_get_host_name = 51u;
 
 public cdecl nothrow void exit(byte exitCode)
 {
@@ -63,9 +72,9 @@ public cdecl nothrow int fork()
     return cast<int>(trap(0u, sys_fork, 0u));
 }
 
-public cdecl nothrow int exec(int argc, byte* argv, long count)
+public cdecl nothrow int exec(int argc, int envc, byte* buffer, long bufSize)
 {
-    return cast<int>(trap(0u, sys_exec, 0u, argc, argv, count));
+    return cast<int>(trap(0u, sys_exec, 0u, argc, envc, buffer, bufSize));
 }
 
 public cdecl nothrow int kill(int pid, int sig)
@@ -256,7 +265,52 @@ public cdecl nothrow int getuid()
     return cast<int>(trap(0u, sys_getuid, 0u));
 }
 
+public cdecl nothrow int setuid(int uid)
+{
+    return cast<int>(trap(0u, sys_setuid, 0u, uid));
+}
+
+public cdecl nothrow int getgid()
+{
+    return cast<int>(trap(0u, sys_getgid, 0u));
+}
+
+public cdecl nothrow int setgid(int gid)
+{
+    return cast<int>(trap(0u, sys_setgid, 0u, gid));
+}
+
+public cdecl nothrow int getpgrp()
+{
+    return cast<int>(trap(0u, sys_getpgrp, 0u));
+}
+
+public cdecl nothrow int setpgrp()
+{
+    return cast<int>(trap(0u, sys_setpgrp, 0u));
+}
+
+public cdecl nothrow int tcgetpgrp(int fd)
+{
+    return cast<int>(trap(0u, sys_tcgetpgrp, 0u, fd));
+}
+
+public cdecl nothrow int tcsetpgrp(int fd, int pgrp)
+{
+    return cast<int>(trap(0u, sys_tcsetpgrp, 0u, fd, pgrp));
+}
+
 public cdecl nothrow int sync()
 {
     return cast<int>(trap(0u, sys_sync, 0u));
+}
+
+public cdecl nothrow int times(long* kernelTime, long* userTime, long* childKernelTime, long* childUserTime)
+{
+    return cast<int>(trap(0u, sys_times, 0u, kernelTime, userTime, childKernelTime, childUserTime));
+}
+
+public cdecl nothrow int get_host_name(char* buffer, int size)
+{
+    return cast<int>(trap(0u, sys_get_host_name, 0u, buffer, size));
 }

@@ -10,4 +10,6 @@ xcopy /Y /D coreutil\mv\bin\debug ..\bind
 xcopy /Y /D coreutil\passwd\bin\debug ..\bind
 xcopy /Y /D coreutil\rm\bin\debug ..\bind
 xcopy /Y /D coreutil\rmdir\bin\debug ..\bind
+xcopy /Y /D coreutil\time\bin\debug ..\bind
 xcopy /Y /D coreutil\umask\bin\debug ..\bind
+xcopy /Y /D shell\cmsh\bin\debug ..\bind

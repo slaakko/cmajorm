@@ -256,9 +256,22 @@ extern "C" RT_API void OsCloseHostFile(void* fileHandle)
     CloseHandle(fileHandle);
 }
 
-extern "C" RT_API void* OsCreateIoCompletionPort(void* fileHandle, uint64_t completionKey)
+extern "C" RT_API void* OsCreateIoCompletionPort()
 {
-    HANDLE handle = CreateIoCompletionPort(fileHandle, NULL, completionKey, 0);
+    HANDLE handle = CreateIoCompletionPort(INVALID_HANDLE_VALUE, NULL, NULL, 0);
+    if (handle == NULL)
+    {
+        return nullptr;
+    }
+    else
+    {
+        return handle;
+    }
+}
+
+extern "C" RT_API void* OsAssociateFileWithCompletionPort(void* fileHandle, void* completionPort, uint64_t completionKey)
+{
+    HANDLE handle = CreateIoCompletionPort(fileHandle, completionPort, completionKey, 0);
     if (handle == NULL)
     {
         return nullptr;
@@ -293,13 +306,13 @@ extern "C" RT_API bool OsPostQueuedCompletionStatus(void* completionPortHandle, 
     return retval;
 }
 
-extern "C" RT_API void* OsCreateOverlapped(uint64_t offset, void* evnt)
+extern "C" RT_API void* OsCreateOverlapped(uint64_t offset)
 {
     OVERLAPPED* overlapped = new OVERLAPPED();
     std::memset(overlapped, 0, sizeof(OVERLAPPED));
     overlapped->Offset = static_cast<uint32_t>(offset);
     overlapped->OffsetHigh = static_cast<uint32_t>(offset >> 32);
-    overlapped->hEvent = evnt;
+    overlapped->hEvent = 0;
     return overlapped;
 }
 
@@ -593,6 +606,32 @@ extern "C" RT_API bool OsGetFileTimes(const char* filePath, uint8_t* ctime, uint
     else
     {
         return false;
+    }
+}
+
+extern "C" RT_API bool OsGetComputerName(char* buffer, int size)
+{
+    DWORD n = size;
+    if (GetComputerNameExA(ComputerNameDnsHostname, buffer, &n))
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+extern "C" RT_API int OsGetMaxComputerNameLength()
+{
+    DWORD n = 0;
+    if (GetComputerNameExA(ComputerNameDnsHostname, NULL, &n))
+    {
+        return n;
+    }
+    else
+    {
+        return MAX_COMPUTERNAME_LENGTH;
     }
 }
 

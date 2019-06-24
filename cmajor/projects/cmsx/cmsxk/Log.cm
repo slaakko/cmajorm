@@ -27,13 +27,29 @@ namespace cmsx.kernel
         }
         private LogFileWriter() : writer(System.IO.File.CreateText(file))
         {
+            flusherThread = Thread.StartMethod(Flush);
         }
         public void Write(const string& msg)
         {
             writer << msg << endl();
         }
+        public void Exit()
+        {
+            exit = true;
+            flusherThread.Join();
+        }
+        private void Flush()
+        {
+            while (!exit)
+            {
+                RtFlushAll();
+                Sleep(Duration.FromSeconds(10));
+            }
+        }
         private static UniquePtr<LogFileWriter> instance;
         private System.IO.StreamWriter writer;
+        private Thread flusherThread;
+        private bool exit;
     }
 
     public nothrow void SetLog(const string& logFile)
@@ -47,6 +63,15 @@ namespace cmsx.kernel
     public nothrow void StartLog()
     {
         start = Now();
+    }
+
+    public nothrow void StopLog()
+    {
+        bool logStarted = log && !file.IsEmpty();
+        if (logStarted)
+        {
+            LogFileWriter.Instance().Exit();
+        }
     }
 
     public class LogLock

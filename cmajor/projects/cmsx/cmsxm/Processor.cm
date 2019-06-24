@@ -7,6 +7,22 @@ namespace cmsx.machine
 
     public delegate void InterruptReturnDelegate();
 
+    public delegate void StartUserTimeFunction();
+    public delegate void StopUserTimeFunction();
+
+    private StartUserTimeFunction startUserTimeFunction;
+    private StopUserTimeFunction stopUserTimeFunction;
+
+    public nothrow void SetStartUserTimeFunction(StartUserTimeFunction fun)
+    {
+        startUserTimeFunction = fun;
+    }
+
+    public nothrow void SetStopUserTimeFunction(StopUserTimeFunction fun)
+    {
+        stopUserTimeFunction = fun;
+    }
+
     public class Processor
     {
         public nothrow Processor(Machine& machine_) : machine(machine_), regs(), exiting(false)
@@ -37,7 +53,7 @@ namespace cmsx.machine
         {
             interruptReturn = interruptReturn_;
         }
-        public nothrow ulong SaveContext(ulong virtualTranslationRegisterValue, ulong sp, ulong* regAXAddress, ulong* regBXAddress)
+        public nothrow ulong SaveContext(ulong virtualTranslationRegisterValue, ulong sp, ulong* regAXAddress, ulong* regBXAddress, ulong* regCXAddress)
         {
             Memory& mem = machine.GetMemory();
             ulong prevRV = regs.GetSpecial(Registers.rV);
@@ -94,6 +110,11 @@ namespace cmsx.machine
                     case regBX:
                     {
                         if (regBXAddress != null) *regBXAddress = sp;
+                        break;
+                    }
+                    case regCX:
+                    {
+                        if (regCXAddress != null) *regCXAddress = sp;
                         break;
                     }
                 }
@@ -177,7 +198,6 @@ namespace cmsx.machine
                 SetPC(inst, pc, prevPC);
                 IncrementCycleCounter();
                 CheckInterrupts(inst, x, y, z);
-                DecrementIntervalCounter(inst, x, y, z);
                 pc = regs.GetPC();
             }
         }
@@ -206,7 +226,6 @@ namespace cmsx.machine
                     IncrementCycleCounter();
                     inst = null;
                     CheckInterrupts(inst, x, y, z);
-                    DecrementIntervalCounter(inst, x, y, z);
                     pc = regs.GetPC();
                 }
             }
@@ -277,20 +296,6 @@ namespace cmsx.machine
             ++cycleCounter;
             regs.SetSpecial(Registers.rC, cycleCounter);
         }
-        private nothrow void DecrementIntervalCounter(Instruction*& inst, byte& x, byte& y, byte& z)
-        {
-            ulong intervalCounter = regs.GetSpecial(Registers.rI);
-            if (intervalCounter != 0u)
-            {
-                --intervalCounter;
-                regs.SetSpecial(Registers.rI, intervalCounter);
-                if (intervalCounter == 0u)
-                {
-                    regs.SetInterrupt(INTERVAL_INTERRUPT_BIT);
-                    CheckInterrupts(inst, x, y, z);
-                }
-            }
-        }
         private nothrow void SetPC(Instruction* inst, ulong& newPC, ulong prevPC)
         {
             ulong pc = regs.GetPC();
@@ -320,6 +325,7 @@ namespace cmsx.machine
 */
         private nothrow void CheckInterrupts(Instruction*& inst, byte& x, byte& y, byte& z)
         {
+            interruptOccurred = false;
             regs.SetSpecial(Registers.rXX, 0u);
             ulong rq = regs.GetInterruptBits();
             ulong rk = regs.GetSpecial(Registers.rK);
@@ -342,6 +348,10 @@ namespace cmsx.machine
             if (rxx != 0u)
             {
                 MakeInstruction(cast<uint>(rxx), inst, x, y, z);
+            }
+            if (interruptOccurred)
+            {
+                startUserTimeFunction();
             }
         }
         private inline nothrow void CheckInterrupts(ulong bits, int first, int last)
@@ -372,6 +382,11 @@ namespace cmsx.machine
             regs.SetSpecial(Registers.rV, prevRV);
             if (handlerAddress != 0u)
             {
+                if (!interruptOccurred)
+                {
+                    stopUserTimeFunction();
+                }
+                interruptOccurred = true;
                 InterruptHandler handler = cast<InterruptHandler>(cast<void*>(handlerAddress));
                 handler(machine, irq);
                 if (interruptReturn != InterruptReturnDelegate())
@@ -412,5 +427,6 @@ namespace cmsx.machine
         private ulong breakAddr;
         private uint breakInst;
         private InterruptReturnDelegate interruptReturn;
+        private bool interruptOccurred;
     }
 }

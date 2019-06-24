@@ -45,7 +45,9 @@ namespace cmsx.machine
             quiet = 1u << 1u,
             debug = 1u << 2u,
             runProgram = 1u << 3u,
-            install = 1u << 4u
+            install = 1u << 4u,
+            followExec = 1u << 5u,
+            sleepingWrite = 1u << 6u
         }
         public static inline nothrow void SetFlag(Flags flag)
         {
@@ -54,6 +56,10 @@ namespace cmsx.machine
         public static inline nothrow bool GetFlag(Flags flag)
         {
             return (flags & flag) != Flags.none;
+        }
+        public static inline nothrow void ResetFlag(Flags flag)
+        {
+            flags = cast<Flags>(flags & ~flag);
         }
         static Machine() : instance(new Machine())
         {

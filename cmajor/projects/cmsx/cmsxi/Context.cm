@@ -148,7 +148,12 @@ namespace cmsx.intermediate
         {
             try
             {
-                return type->MakeValue(fromStr, *this);
+                ConstantValue* value = type->MakeValue(fromStr, *this);
+                if (value->type == null)
+                {
+                    value->type = type;
+                }
+                return value;
             }
             catch (const Exception& ex)
             {
@@ -338,6 +343,7 @@ namespace cmsx.intermediate
         public ConversionValue* MakeConversionValue(Type* targetType, ConstantValue* from, int lineNumber)
         {
             ConversionValue* val = new ConversionValue(targetType, from);
+            val->type = targetType;
             val->line = lineNumber;
             AddValue(val);
             return val;

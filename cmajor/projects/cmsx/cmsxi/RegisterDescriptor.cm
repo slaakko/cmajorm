@@ -188,6 +188,10 @@ namespace cmsx.intermediate
         {
             if (value is LiteralValue*) continue;
             Type* type = value->type;
+            if (type == null)
+            {
+                continue;
+            }
             #assert(type is ScalarType*);
             int storeOpCode = type->GetStoreOp(line);
             AddressDescriptor* addressDescriptor = addressDescriptors.GetAddressDescriptor(value);

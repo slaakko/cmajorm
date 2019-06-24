@@ -71,7 +71,6 @@ namespace cmsx.kernel
         List<Process*> processesToWakeUp = SleepingProcessQueue.Instance().GetProcessesToWakeUp(Now().Rep());
         for (Process* process : processesToWakeUp)
         {
-            Console.WriteLine("wake up process " + ProcessName(process));
             WakeUpProcess(processTable, process);
         }
         Schedule(machine, processTable);

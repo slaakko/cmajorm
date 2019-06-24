@@ -170,12 +170,45 @@ namespace cmsx.kernel
         SystemCallHandler chmodSystemCallHandler = Chmod;
         ulong chmodSystemCallAddress = cast<ulong>(cast<void*>(chmodSystemCallHandler)); 
         mem.WriteULong(MakeSystemCallPtrAddress(sys_chmod), chmodSystemCallAddress, Protection.write);
+        SystemCallHandler chownSystemCallHandler = Chown;
+        ulong chownSystemCallAddress = cast<ulong>(cast<void*>(chownSystemCallHandler)); 
+        mem.WriteULong(MakeSystemCallPtrAddress(sys_chown), chownSystemCallAddress, Protection.write);
         SystemCallHandler utimeSystemCallHandler = UTime;
         ulong utimeSystemCallAddress = cast<ulong>(cast<void*>(utimeSystemCallHandler)); 
         mem.WriteULong(MakeSystemCallPtrAddress(sys_utime), utimeSystemCallAddress, Protection.write);
-        SystemCallHandler getuidSystemCallHandler = GetUid;
+        SystemCallHandler getuidSystemCallHandler = GetUID;
         ulong getuidSystemCallAddress = cast<ulong>(cast<void*>(getuidSystemCallHandler)); 
         mem.WriteULong(MakeSystemCallPtrAddress(sys_getuid), getuidSystemCallAddress, Protection.write);
+        SystemCallHandler setuidSystemCallHandler = SetUID;
+        ulong setuidSystemCallAddress = cast<ulong>(cast<void*>(setuidSystemCallHandler)); 
+        mem.WriteULong(MakeSystemCallPtrAddress(sys_setuid), setuidSystemCallAddress, Protection.write);
+        SystemCallHandler getgidSystemCallHandler = GetGID;
+        ulong getgidSystemCallAddress = cast<ulong>(cast<void*>(getgidSystemCallHandler)); 
+        mem.WriteULong(MakeSystemCallPtrAddress(sys_getgid), getgidSystemCallAddress, Protection.write);
+        SystemCallHandler setgidSystemCallHandler = SetGID;
+        ulong setgidSystemCallAddress = cast<ulong>(cast<void*>(setgidSystemCallHandler)); 
+        mem.WriteULong(MakeSystemCallPtrAddress(sys_setgid), setgidSystemCallAddress, Protection.write);
+        SystemCallHandler getpgrpSystemCallHandler = GetPGRP;
+        ulong getpgrpSystemCallAddress = cast<ulong>(cast<void*>(getpgrpSystemCallHandler)); 
+        mem.WriteULong(MakeSystemCallPtrAddress(sys_getpgrp), getpgrpSystemCallAddress, Protection.write);
+        SystemCallHandler setpgrpSystemCallHandler = SetPGRP;
+        ulong setpgrpSystemCallAddress = cast<ulong>(cast<void*>(setpgrpSystemCallHandler)); 
+        mem.WriteULong(MakeSystemCallPtrAddress(sys_setpgrp), setpgrpSystemCallAddress, Protection.write);
+        SystemCallHandler tcgetpgrpSystemCallHandler = TCGetPGRP;
+        ulong tcgetpgrpSystemCallAddress = cast<ulong>(cast<void*>(tcgetpgrpSystemCallHandler)); 
+        mem.WriteULong(MakeSystemCallPtrAddress(sys_tcgetpgrp), tcgetpgrpSystemCallAddress, Protection.write);
+        SystemCallHandler tcsetpgrpSystemCallHandler = TCSetPGRP;
+        ulong tcsetpgrpSystemCallAddress = cast<ulong>(cast<void*>(tcsetpgrpSystemCallHandler)); 
+        mem.WriteULong(MakeSystemCallPtrAddress(sys_tcsetpgrp), tcsetpgrpSystemCallAddress, Protection.write);
+        SystemCallHandler syncSystemCallHandler = Sync;
+        ulong syncSystemCallAddress = cast<ulong>(cast<void*>(syncSystemCallHandler)); 
+        mem.WriteULong(MakeSystemCallPtrAddress(sys_sync), syncSystemCallAddress, Protection.write);
+        SystemCallHandler timesSystemCallHandler = Times;
+        ulong timesSystemCallAddress = cast<ulong>(cast<void*>(timesSystemCallHandler)); 
+        mem.WriteULong(MakeSystemCallPtrAddress(sys_times), timesSystemCallAddress, Protection.write);
+        SystemCallHandler getHostNameSystemCallHandler = GetHostName;
+        ulong getHostNameSystemCallAddress = cast<ulong>(cast<void*>(getHostNameSystemCallHandler)); 
+        mem.WriteULong(MakeSystemCallPtrAddress(sys_get_host_name), getHostNameSystemCallAddress, Protection.write);
     }
 
     public void Boot(Machine& machine)
@@ -190,16 +223,19 @@ namespace cmsx.kernel
         {
             Console.Out() << "Cmajor System X kernel version " << KernelVersion() << " booting...";
         }
+        Kernel& kernel = Kernel.Instance();
+        kernel.SetBooting();
         machine.GetProcessor().SetInterruptReturn(KernelInterruptReturn);
         SetKernelMaxStackSizeFunction(KernelGetMaxStackSize);
         SetKernelGrowStackFunction(KernelGrowStack);
+        SetStartUserTimeFunction(StartUserTime);
+        SetStopUserTimeFunction(StopUserTime);
         Registers& regs = machine.GetRegisters();
         DisableAllInterrupts(regs);
         InitializeInterruptVector(machine);
         InitializeSystemCalls(machine);
         GetDiskDriver().Start();
         GetMountTable().Init();
-        Kernel& kernel = Kernel.Instance();
         SessionTable& sessionTable = kernel.GetSessionTable();
         Session* currentSession = sessionTable.CreateSession();
         kernel.SetCurrentSession(currentSession);
@@ -262,6 +298,7 @@ namespace cmsx.kernel
         {
             consoleDriver->GetDimensions();
         }
+        kernel.ResetBooting();
         if (Log())
         {
             LogMessage("boot", "done");

@@ -42,10 +42,17 @@ namespace System.Os
             size = size + arg.Length() + 1 + 16;
             ++argc;
         }
+        Environment& environment = Environment.Instance();
+        int envc = cast<int>(environment.Variables().Count());
+        size = size + environment.Size();
         UniquePtr<byte> block(cast<byte*>(MemAlloc(size)));
         MemoryWriter writer(block.Get(), size);
         List<Pair<long, long>> offsetsAndLengths;
         for (int i = 0; i < argc; ++i)
+        {
+            offsetsAndLengths.Add(Pair<long, long>(0, 0));
+        }
+        for (int i = 0; i < envc; ++i)
         {
             offsetsAndLengths.Add(Pair<long, long>(0, 0));
         }
@@ -62,14 +69,21 @@ namespace System.Os
             offsetsAndLengths.Add(Pair<long, long>(writer.Offset(), arg.Length() + 1));
             writer.Write(arg);
         }
+        for (const Pair<string, string>& v : environment.Variables())
+        {
+            string env = v.first;
+            env.Append('=').Append(v.second);
+            offsetsAndLengths.Add(Pair<long, long>(writer.Offset(), env.Length() + 1));
+            writer.Write(env);
+        }
         MemoryWriter headerWriter(block.Get(), size);
         for (const Pair<long, long>& offsetLength : offsetsAndLengths)
         {
             headerWriter.Write(offsetLength.first);
             headerWriter.Write(offsetLength.second);
         }
-        byte* argv = cast<byte*>(block.Get());
-        int result = exec(argc, argv, size);
+        byte* buffer = block.Get();
+        int result = exec(argc, envc, buffer, size);
         if (result == -1)
         {
             ThrowSystemError();
@@ -472,7 +486,7 @@ namespace System.Os
         }
     }
     
-    public int GetUid()
+    public int GetUID()
     {
         int result = getuid();
         if (result == -1)
@@ -482,6 +496,73 @@ namespace System.Os
         return result;
     }
     
+    public void SetUID(int uid)
+    {
+        int result = setuid(uid);
+        if (result == -1)
+        {
+            ThrowSystemError();
+        }
+    }
+    
+    public int GetGID()
+    {
+        int result = getgid();
+        if (result == -1)
+        {
+            ThrowSystemError();
+        }
+        return result;
+    }
+    
+    public void SetGID(int gid)
+    {
+        int result = setgid(gid);
+        if (result == -1)
+        {
+            ThrowSystemError();
+        }
+    }
+    
+    public int GetPGRP()
+    {
+        int result = getpgrp();
+        if (result == -1)
+        {
+            ThrowSystemError();
+        }
+        return result;
+    }
+    
+    public int SetPGRP()
+    {
+        int result = setpgrp();
+        if (result == -1)
+        {
+            ThrowSystemError();
+        }
+        return result;
+    }
+    
+    public int TCGetPGRP(int fd)
+    {
+        int result = tcgetpgrp(fd);
+        if (result == -1)
+        {
+            ThrowSystemError();
+        }
+        return result;
+    }
+    
+    public void TCSetPGRP(int fd, int pgrp)
+    {
+        int result = tcsetpgrp(fd, pgrp);
+        if (result == -1)
+        {
+            ThrowSystemError();
+        }
+    }
+    
     public void Sync()
     {
         int result = sync();
@@ -489,5 +570,33 @@ namespace System.Os
         {
             ThrowSystemError();
         }
+    }
+    
+    public void Times(Duration& kernelTime, Duration& userTime, Duration& childKernelTime, Duration& childUserTime)
+    {
+        long kernel = 0;
+        long user = 0;
+        long childKernel = 0;
+        long childUser = 0;
+        int result = times(&kernel, &user, &childKernel, &childUser);
+        if (result == -1)
+        {
+            ThrowSystemError();
+        }
+        kernelTime = Duration(kernel);
+        userTime = Duration(user);
+        childKernelTime = Duration(childKernel);
+        childUserTime = Duration(childUser);
+    }
+    
+    public string GetHostName()
+    {
+        char[256] buffer;
+        int result = get_host_name(&buffer[0], 256);
+        if (result == -1)
+        {
+            ThrowSystemError();
+        }
+        return string(&buffer[0]);
     }
 }

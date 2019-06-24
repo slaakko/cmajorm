@@ -38,6 +38,7 @@ public:
     void SeekFile(int32_t fileHandle, int64_t pos, Origin origin);
     int64_t TellFile(int32_t fileHandle);
     void FlushStdoutAndStderr();
+    void FlushAll();
 private:
     static std::unique_ptr<FileTable> instance;
     const int32_t maxNoLockFileHandles = 256;
@@ -701,6 +702,20 @@ void FileTable::FlushStdoutAndStderr()
     std::fflush(stderr);
 }
 
+void FileTable::FlushAll()
+{
+    std::lock_guard<std::mutex> lock(mtx);
+    for (FILE* file : files)
+    {
+        std::fflush(file);
+    }
+    for (const auto& p : fileMap)
+    {
+        std::fflush(p.second);
+    }
+    FlushStdoutAndStderr();
+}
+
 FileSystemError::FileSystemError(const std::string& message_) : std::runtime_error(message_)
 {
 }
@@ -893,4 +908,9 @@ extern "C" RT_API int32_t RtCopyFile(const char* sourceFilePath, const char* tar
         return cmajor::rt::InstallError(ex.what());
     }
     return 0;
+}
+
+extern "C" RT_API void RtFlushAll()
+{
+    cmajor::rt::FileTable::Instance().FlushAll();
 }

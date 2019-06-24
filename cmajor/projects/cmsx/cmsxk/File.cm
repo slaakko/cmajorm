@@ -335,6 +335,18 @@ namespace cmsx.kernel
         file->IOCtl(machine, process, item, bufferAddress, count);
     }
 
+    public int TCGetPGRP(Process* process, int fd)
+    {
+        File* file = process->fileTable.GetFile(fd);
+        return file->TCGetPGRP();
+    }
+
+    public void TCSetPGRP(Process* process, int fd, int pgrp)
+    {
+        File* file = process->fileTable.GetFile(fd);
+        file->TCSetPGRP(pgrp);
+    }
+
     public void Chmod(Machine& machine, Process* process, ulong pathAddress, int mode)
     {
         if (pathAddress == 0u)
@@ -499,6 +511,14 @@ namespace cmsx.kernel
                 throw SystemError(EINVAL, "unknown ioctl item " + ToString(item) + " for " + name);
             }
         }
+        public virtual int TCGetPGRP()
+        {
+            throw SystemError(ENOTSUPPORTED, name + " does not support tcgetpgrp()");
+        }
+        public virtual void TCSetPGRP(int pgrp)
+        {
+            throw SystemError(ENOTSUPPORTED, name + " does not support tcsetpgrp()");
+        }
         public virtual File* Share()
         {
             return this;
@@ -547,7 +567,8 @@ namespace cmsx.kernel
             }
             byte[1] buffer;
             MemoryWriter writer(&buffer[0], buffer.Length());
-            writer.Write(cast<byte>(Echo()));
+            bool echo = Echo();
+            writer.Write(cast<byte>(echo));
             WriteProcessMemory(machine, process, bufferAddress, &buffer[0], cast<ulong>(buffer.Length()), Protection.write);
         }
         private void SetEcho(Machine& machine, Process* process, ulong bufferAddress, long count)
@@ -674,6 +695,25 @@ namespace cmsx.kernel
         {
             return true;
         }
+        public override bool Echo() const
+        {
+            return true;
+        }
+        public override void SetEcho(bool echo)
+        {
+        }
+        public override int TCGetPGRP()
+        {
+            Kernel& kernel = GetKernel();
+            Session* currentSession = kernel.CurrentSession();
+            return currentSession->fgpgrp;
+        }
+        public override void TCSetPGRP(int pgrp)
+        {
+            Kernel& kernel = GetKernel();
+            Session* currentSession = kernel.CurrentSession();
+            currentSession->fgpgrp = pgrp;
+        }
         private string bufferedInput;
     }
 
@@ -718,7 +758,7 @@ namespace cmsx.kernel
                 {
                     Kernel& kernel = Kernel.Instance();
                     Session* session = kernel.CurrentSession();
-                    if (session->fgpid == reader->pid)
+                    if (session->fgpgrp == reader->pgid)
                     {
                         if (bufferedInput.IsEmpty())
                         {
@@ -778,9 +818,22 @@ namespace cmsx.kernel
         {
             GetConsoleDriver().SetEcho(echo);
         }
+        public override int TCGetPGRP()
+        {
+            Kernel& kernel = GetKernel();
+            Session* currentSession = kernel.CurrentSession();
+            return currentSession->fgpgrp;
+        }
+        public override void TCSetPGRP(int pgrp)
+        {
+            Kernel& kernel = GetKernel();
+            Session* currentSession = kernel.CurrentSession();
+            currentSession->fgpgrp = pgrp;
+        }
         public override void Release()
         {
             GetConsoleDriver().SetEcho(true);
+            GetConsoleDriver().EndObeyColorStrings();
         }
         private string bufferedInput;
     }

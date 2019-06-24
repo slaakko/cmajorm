@@ -139,14 +139,17 @@ void SetUserPassword(const string& userName)
     int pid = Fork();
     if (pid == 0)
     {
+        int pgrp = SetPGRP();
+        TCSetPGRP(0, pgrp);
         Exec("/bin/passwd", List<string>(1, userName));
     }
     ushort exitCode = 0u;
     int childPID = Wait(&exitCode);
     if (exitCode != 0u)
     {
-        throw Exception("error: passwd exited with code = " + ToString(exitCode));
+        throw Exception("error: passwd exited with code " + ToString(exitCode));
     }
+    TCSetPGRP(0, GetPGRP());
 }
 
 void InstallUser(const string& userName, bool verbose)
@@ -232,7 +235,7 @@ int StartSync(bool verbose)
     {
         if (verbose)
         {
-            Console.Out() << "init: sync started" << endl();
+            Console.Out() << "init: sync started..." << endl();
         }
         return pid;
     }
@@ -244,17 +247,52 @@ int StartShell(const string& shell, bool verbose)
     int pid = Fork();
     if (pid == 0)
     {
+        int pgrp = SetPGRP();
+        TCSetPGRP(0, pgrp);
         Exec(shell.Chars(), List<string>());
     }
     else
     {
         if (verbose)
         {
-            Console.Out() << "init: " << shell << " started" << endl();
+            Console.Out() << "init: shell started..." << endl();
         }
         return pid;
     }
     return 0;
+}
+
+void Run(const string& shell, bool verbose)
+{
+    int syncPID = StartSync(verbose);
+    int shellPID = StartShell(shell, verbose);
+    while (true)
+    {
+        ushort exitCode = 0u;
+        int pid = Wait(&exitCode);
+        if (pid == syncPID)
+        {
+            throw Exception("sync died");
+        }
+        else if (pid == shellPID)
+        {
+            if (exitCode != 0u)
+            {
+                throw Exception("shell exited with code " + ToString(exitCode));
+            }
+            return;
+        }
+        else
+        {
+            if (exitCode != 0u)
+            {
+                if (verbose)
+                {
+                    Console.Error() << "init: child exited with code " << exitCode << endl();
+                }
+            }
+        }
+    }
 }
 
 int main(int argc, const char** argv)
@@ -346,6 +384,10 @@ int main(int argc, const char** argv)
         {
             throw Exception("error: user " + userName + " not found. Run cmsx with --install option.");
         }
+        SetUID(user->UID());
+        SetGID(user->GID());
+        ChDir(user->Home().Chars());
+        Run(user->Shell(), verbose);
     }
     catch (const Exception& ex)
     {

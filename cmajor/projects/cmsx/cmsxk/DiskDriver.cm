@@ -8,31 +8,32 @@ public const ulong ERROR_IO_PENDING = 997u;
 
 namespace cmsx.kernel
 {
-    public class IORequest
+    public const ulong ddExitCompletionKey = 0xFFFFFFFFFFFFFFFFu;
+    public const ulong ddRequestCompletionKey = 0xFFFFFFFFFFFFFFFEu;
+
+    public enum IOOperation
     {
-        public nothrow IORequest(Process* process_) : process(process_)
-        {
-        }
-        public Process* process;
-        public ulong numberOfBytesTransferred;
+        read, write
     }
 
-    public class IOCompletion
+    public nothrow string IOOperationStr(IOOperation op)
     {
-        public nothrow IOCompletion(HostFile* hostFile_, ulong numberOfBytesTransferred_, void* overlapped_) :
-            hostFile(hostFile_), numberOfBytesTransferred(numberOfBytesTransferred_), overlapped(overlapped_)
+        if (op == IOOperation.read)
         {
+            return "read";
         }
-        public HostFile* hostFile;
-        public ulong numberOfBytesTransferred;
-        public void* overlapped;
+        else if (op == IOOperation.write)
+        {
+            return "write";
+        }
+        return string();
     }
 
     public class Overlapped
     {
-        public nothrow Overlapped(ulong offset, void* evnt)
+        public nothrow Overlapped(ulong offset)
         {
-            overlapped = OsCreateOverlapped(offset, evnt);
+            overlapped = OsCreateOverlapped(offset);
         }
         public ~Overlapped()
         {
@@ -62,6 +63,57 @@ namespace cmsx.kernel
         private void* buffer;
     }
 
+    public class IORequest
+    {
+        public nothrow IORequest(int number_, ulong offset_, Process* process_, IOOperation op_, bool deliver_) :
+            number(number_), overlapped(offset_), process(process_), op(op_), deliver(deliver_)
+        {
+        }
+        public string ToString()
+        {
+            string s = "number=";
+            s.Append(ToString(number));
+            s.Append(".overlapped=").Append(ToHexString(cast<ulong>(overlapped.Get())));
+            s.Append(".process=").Append(ProcessName(process));
+            s.Append(".op=").Append(IOOperationStr(op));
+            s.Append(".count=").Append(ToString(numberOfBytesTransferred));
+            s.Append(".deliver=").Append(ToString(deliver));
+            return s;
+        }
+        public int number;
+        public Overlapped overlapped;
+        public Buffer buffer;
+        public Process* process;
+        public IOOperation op;
+        public ulong numberOfBytesTransferred;
+        public bool deliver;
+    }
+
+    public class IOCompletion
+    {
+        public nothrow IOCompletion(IORequest* request_) : request(request_)
+        {
+        }
+        public IORequest* request;
+    }
+
+    public abstract class DDRequest
+    {
+        public abstract void Execute(DiskDriver* dd);
+    }
+
+    public class AddFileDDRequest : DDRequest
+    {
+        public nothrow AddFileDDRequest(HostFile* hostFile_) : hostFile(hostFile_)
+        {
+        }
+        public override void Execute(DiskDriver* dd)
+        {
+            dd->AddFile(hostFile);
+        }
+        private HostFile* hostFile;
+    }
+
     public class DiskDriver
     {
         static DiskDriver() : instance(new DiskDriver())
@@ -71,61 +123,136 @@ namespace cmsx.kernel
         {
             return *instance;
         }
-        private DiskDriver() : exit(false), hostFilesChanged(false)
+        private DiskDriver() : exit(false), completionPort(OsCreateIoCompletionPort()), nextHostFileKey(0u), ddRequestProcessedEvent(OsCreateEvent())
         {
-            interruptEventHandle = OsCreateEvent();
-            if (interruptEventHandle == null)
+            if (completionPort == null)
             {
-                throw Exception("error initializing disk driver: create event failed");
+                ulong lastError = OsGetLastError();
+                Buffer messageBuf;
+                OsFormatMessage(lastError, cast<char*>(messageBuf.Get()));
+                const char* msg = cast<const char*>(messageBuf.Get());
+                string message = "error opening disk driver: creating I/O completion port failed: ";
+                message.Append(msg);
+                Panic(message);
             }
-            osFilesUpdatedEventHandle = OsCreateEvent();
-            if (osFilesUpdatedEventHandle == null)
-            {
-                throw Exception("error initializing disk driver: create event failed");
-            }
-            hostFiles.Add(UniquePtr<HostFile>());
         }
         public ~DiskDriver()
         {
-            OsCloseEvent(interruptEventHandle);
-            OsCloseEvent(osFilesUpdatedEventHandle);
+            OsCloseIoCompletionPort(completionPort);
+            OsCloseEvent(ddRequestProcessedEvent);
         }
         public HostFile* GetOrInsertHostFile(const string& hostFilePath)
         {
-            HashMap<string, HostFile*>.ConstIterator it = hostFileMap.CFind(hostFilePath);
-            if (it != hostFileMap.CEnd())
+            if (Log())
             {
-                return it->second;
+                LogMessage("fs.dd.GetOrInsertHostFile", "begin");
             }
-            else
+            HostFile* hostFile = null;
             {
-                HostFile* hostFile = new HostFile(hostFilePath, cast<int>(hostFiles.Count()));
-                hostFileMap[hostFilePath] = hostFile;
-                hostFiles.Add(UniquePtr<HostFile>(hostFile));
-                hostFilesChanged = true;
-                OsResetEvent(osFilesUpdatedEventHandle);
-                OsSetEvent(interruptEventHandle);
-                OsWaitEvent(osFilesUpdatedEventHandle);
-                return hostFile;
+                LockGuard<Mutex> lock(mtx);
+                HashMap<string, HostFile*>.ConstIterator it = pathHostFileMap.CFind(hostFilePath);
+                if (it != pathHostFileMap.CEnd())
+                {
+                    return it->second;
+                }
+                else
+                {
+                    hostFile = new HostFile(hostFilePath, nextHostFileKey++);
+                    pathHostFileMap[hostFilePath] = hostFile;
+                    keyHostFileMap[hostFile->Key()] = hostFile;
+                    hostFiles.Add(UniquePtr<HostFile>(hostFile));
+                    if (Log())
+                    {
+                        LogMessage("fs.dd.GetOrInsertHostFile", "add:key=" + ToString(hostFile->Key()) + ".path=" + hostFile->GetHostFilePath());
+                    }
+                }
+            }
+            if (Log())
+            {
+                LogMessage("fs.dd.GetOrInsertHostFile", "end");
+            }
+            SendAddFileRequest(hostFile);
+            return hostFile;
+        }
+        public void SendAddFileRequest(HostFile* hostFile)
+        {
+            {
+                LockGuard<Mutex> lock(mtx);
+                ddRequestQueue.Put(UniquePtr<DDRequest>(new AddFileDDRequest(hostFile)));
+                if (!OsPostQueuedCompletionStatus(completionPort, 0u, ddRequestCompletionKey))
+                {
+                    ulong lastError = OsGetLastError();
+                    Buffer messageBuf;
+                    OsFormatMessage(lastError, cast<char*>(messageBuf.Get()));
+                    const char* msg = cast<const char*>(messageBuf.Get());
+                    string message = "error operating disk driver: post queued completion status failed: ";
+                    message.Append(msg);
+                    Panic(message);
+                }
+            }
+            OsWaitEvent(ddRequestProcessedEvent);
+        }
+        public void AddFile(HostFile* hostFile)
+        {
+            if (Log())
+            {
+                LogMessage("fs.dd.AddFile", "begin.key=" + ToString(hostFile->Key()) + ".path=" + hostFile->GetHostFilePath());
+            }
+            if (OsAssociateFileWithCompletionPort(hostFile->GetFileHandle(), completionPort, hostFile->Key()) == null)
+            {
+                ulong lastError = OsGetLastError();
+                Buffer messageBuf;
+                OsFormatMessage(lastError, cast<char*>(messageBuf.Get()));
+                const char* msg = cast<const char*>(messageBuf.Get());
+                string message = "error operating disk driver: associating file with completion port failed: ";
+                message.Append(msg);
+                throw Exception(message);
+            }
+            if (Log())
+            {
+                LogMessage("fs.dd.AddFile", "end");
             }
         }
         public void RemoveHostFile(const string& hostFilePath)
         {
-            HashMap<string, HostFile*>.ConstIterator it = hostFileMap.CFind(hostFilePath);
-            if (it != hostFileMap.CEnd())
+            if (Log())
             {
-                HostFile* hostFile = it->second;
-                int index = hostFile->Index();
-                hostFiles.Remove(hostFiles.Begin() + index);
-                hostFileMap.Remove(hostFilePath);
-                hostFilesChanged = true;
-                OsResetEvent(osFilesUpdatedEventHandle);
-                OsSetEvent(interruptEventHandle);
-                OsWaitEvent(osFilesUpdatedEventHandle);
+                LogMessage("fs.dd.RemoveHostFile", "begin");
             }
-            else
             {
-                throw SystemError(EFAIL, "host file '" + hostFilePath + "' not found in disk driver");
+                LockGuard<Mutex> lock(mtx);
+                HashMap<string, HostFile*>.ConstIterator it = pathHostFileMap.CFind(hostFilePath);
+                if (it != pathHostFileMap.CEnd())
+                {
+                    HostFile* hostFile = it->second;
+                    long n = hostFiles.Count();
+                    for (long i = 0; i < n; ++i)
+                    {
+                        if (hostFile == hostFiles[i].Get())
+                        {
+                            if (Log())
+                            {
+                                LogMessage("fs.dd.RemoveHostFile", "remove:key=" + ToString(hostFile->Key()) + ".path=" + hostFile->GetHostFilePath());
+                            }
+                            keyHostFileMap.Remove(hostFile->Key());
+                            pathHostFileMap.Remove(hostFile->GetHostFilePath());
+                            hostFiles.Remove(hostFiles.Begin() + i);
+                            if (Log())
+                            {
+                                LogMessage("fs.dd.RemoveHostFile", "end");
+                            }
+                            return;
+                        }
+                    }
+                }
+                else
+                {
+                    throw SystemError(EFAIL, "host file '" + hostFilePath + "' not found in disk driver");
+                }
+            }
+            if (Log())
+            {
+                LogMessage("fs.dd.RemoveHostFile", "end");
             }
         }
         public void Start()
@@ -140,8 +267,209 @@ namespace cmsx.kernel
         }
         public void Exit()
         {
+            if (Log())
+            {
+                LogMessage("fs.dd", "exit");
+            }
             exit = true;
-            OsSetEvent(interruptEventHandle);
+            if (!OsPostQueuedCompletionStatus(completionPort, 0u, ddExitCompletionKey))
+            {
+                if (Log())
+                {
+                    LogMessage("fs.dd", "exit:postQueuedCompletionStatus.failed");
+                }
+            }
+        }
+        public long Read(Block* block)
+        {
+            if (Log())
+            {
+                LogMessage("fs.dd.read", "begin");
+            }
+            FileSystem* fs = GetMountTable().GetFileSystem(block->Key().fsNumber);
+            HostFile* hostFile = fs->GetHostFile(block->Key().fsNumber);
+            ulong offset = cast<ulong>(block->Key().blockNumber * blockSize);
+            void* fiberData = OsGetFiberData();
+            Process* process = cast<Process*>(fiberData);
+            UniquePtr<IORequest> request;
+            {
+                LockGuard<Mutex> lock(mtx);
+                request.Reset(new IORequest(nextRequestNumber++, offset, process, IOOperation.read, true));
+                requestMap[request->overlapped.Get()] = request.Get();
+            }
+            if (Log())
+            {
+                LogMessage("fs.dd.read", block->ToString() + ".request:" + request->ToString());
+            }
+            bool result = OsReadFile(hostFile->GetFileHandle(), request->buffer.Get(), cast<uint>(blockSize), request->overlapped.Get());
+            if (result)
+            {
+                if (Log())
+                {
+                    LogMessage("fs.dd.read", "immediate=" + request->ToString());
+                }
+                MemoryReader reader(cast<byte*>(request->buffer.Get()), blockSize);
+                block->Read(reader);
+                {
+                    LockGuard<Mutex> lock(mtx);
+                    requestMap.Remove(request->overlapped.Get());
+                }
+                long res = cast<long>(request->numberOfBytesTransferred);
+                if (Log())
+                {
+                    LogMessage("fs.dd.read", "end.immediate");
+                }
+                return res;
+            }
+            ulong lastError = OsGetLastError();
+            if (lastError == ERROR_IO_PENDING)
+            {
+                lastError = 0u;
+            }
+            if (lastError == 0u)
+            {
+                if (Log())
+                {
+                    LogMessage("fs.dd.read", "sleep");
+                }
+                SleepProcess(process, blockIOEvent, cast<ulong>(cast<void*>(block)), 0u);
+                if (Log())
+                {
+                    LogMessage("fs.dd.read", "wake up");
+                }
+                MemoryReader reader(cast<byte*>(request->buffer.Get()), blockSize);
+                block->Read(reader);
+                {
+                    LockGuard<Mutex> lock(mtx);
+                    requestMap.Remove(request->overlapped.Get());
+                }
+                if (Log())
+                {
+                    LogMessage("fs.dd.read", "end.deliver=true");
+                }
+                long res = cast<long>(request->numberOfBytesTransferred);
+                return res;
+            }
+            else
+            {
+                {
+                    LockGuard<Mutex> lock(mtx);
+                    requestMap.Remove(request->overlapped.Get());
+                }
+                Buffer messageBuf;
+                OsFormatMessage(lastError, cast<char*>(messageBuf.Get()));
+                const char* msg = cast<const char*>(messageBuf.Get());
+                string message = "Could not read from file '";
+                message.Append(hostFile->GetHostFilePath()).Append("': ").Append(msg);
+                if (Log())
+                {
+                    LogMessage("fs.dd.read", "end.error");
+                }
+                throw SystemError(EIO, message);
+            }
+        }
+        public long Write(Block* block)
+        {
+            if (Log())
+            {
+                LogMessage("fs.dd.write", "begin");
+            }
+            FileSystem* fs = GetMountTable().GetFileSystem(block->Key().fsNumber);
+            HostFile* hostFile = fs->GetHostFile(block->Key().fsNumber);
+            ulong offset = cast<ulong>(block->Key().blockNumber * blockSize);
+            void* fiberData = OsGetFiberData();
+            Process* process = cast<Process*>(fiberData);
+            bool deliver = false;
+            if (Machine.GetFlag(Machine.Flags.sleepingWrite) || process == null)
+            {
+                deliver = true;
+            }
+            UniquePtr<IORequest> request;
+            {
+                LockGuard<Mutex> lock(mtx);
+                request.Reset(new IORequest(nextRequestNumber++, offset, process, IOOperation.write, deliver));
+                requestMap[request->overlapped.Get()] = request.Get();
+            }
+            MemoryWriter writer(cast<byte*>(request->buffer.Get()), blockSize);
+            block->Write(writer);
+            if (Log())
+            {
+                LogMessage("fs.dd.write", block->ToString() + ".request:" + request->ToString());
+            }
+            bool result = OsWriteFile(hostFile->GetFileHandle(), request->buffer.Get(), cast<uint>(blockSize), request->overlapped.Get());
+            if (result)
+            {
+                if (Log())
+                {
+                    LogMessage("fs.dd.write", "immediate=" + request->ToString());
+                }
+                {
+                    LockGuard<Mutex> lock(mtx);
+                    requestMap.Remove(request->overlapped.Get());
+                }
+                long res = cast<long>(request->numberOfBytesTransferred);
+                if (Log())
+                {
+                    LogMessage("fs.dd.write", "end.immediate");
+                }
+                return res;
+            }
+            ulong lastError = OsGetLastError();
+            if (lastError == ERROR_IO_PENDING)
+            {
+                lastError = 0u;
+            }
+            if (lastError == 0u)
+            {
+                if (request->deliver)
+                {
+                    if (Log())
+                    {
+                        LogMessage("fs.dd.write", "sleep");
+                    }
+                    SleepProcess(process, blockIOEvent, cast<ulong>(cast<void*>(block)), 0u);
+                    if (Log())
+                    {
+                        LogMessage("fs.dd.write", "wake up");
+                    }
+                    {
+                        LockGuard<Mutex> lock(mtx);
+                        requestMap.Remove(request->overlapped.Get());
+                    }
+                    long res = cast<long>(request->numberOfBytesTransferred);
+                    if (Log())
+                    {
+                        LogMessage("fs.dd.write", "end.deliver=true");
+                    }
+                    return res;
+                }
+                else
+                {
+                    if (Log())
+                    {
+                        LogMessage("fs.dd.write", "end.deliver=false");
+                    }
+                    request.Release();
+                    return blockSize;
+                }
+            }
+            else
+            {
+                {
+                    LockGuard<Mutex> lock(mtx);
+                    requestMap.Remove(request->overlapped.Get());
+                }
+                Buffer messageBuf;
+                OsFormatMessage(lastError, cast<char*>(messageBuf.Get()));
+                const char* msg = cast<const char*>(messageBuf.Get());
+                string message = "Could not write to file '";
+                message.Append(hostFile->GetHostFilePath()).Append("': ").Append(msg);
+                if (Log())
+                {
+                    LogMessage("fs.dd.write", "end.error");
+                }
+                throw SystemError(EIO, message);
+            }
         }
         public void Run()
         {
@@ -150,63 +478,107 @@ namespace cmsx.kernel
                 OsConvertThreadToFiber(null);
                 while (!exit)
                 {
-                    MakeEventHandleList();
-                    hostFilesChanged = false;
-                    OsSetEvent(osFilesUpdatedEventHandle);
-                    int eventIndex = OsWaitForMultipleObjects(cast<uint>(eventHandles.Count()), eventHandles.Begin().Ptr());
-                    if (eventIndex < 0)
+                    if (Log())
                     {
-                        Panic("error from disk driver run: wait for multiple objects failed");
+                        LogMessage("fs.dd.run", "begin");
                     }
-                    else if (eventIndex == 0)
+                    ulong numberOfBytesTransferred = 0u;
+                    ulong completionKey = 0u;
+                    void* overlapped = null;
+                    if (Log())
                     {
-                        if (exit)
-                        {
-                            break;
-                        }
-                        else if (hostFilesChanged)
-                        {
-                            // cont
-                        }
+                        LogMessage("fs.dd.run", ">getQueuedCompletionStatus");
                     }
-                    else if (eventIndex < hostFiles.Count())
+                    bool retval = OsGetQueuedCompletionStatus(completionPort, &numberOfBytesTransferred, &completionKey, &overlapped);
+                    if (Log())
                     {
-                        HostFile* hostFile = hostFiles[eventIndex].Get();
-                        if (hostFile != null)
+                        LogMessage("fs.dd.run", "<getQueuedCompletionStatus:completionKey=" + ToHexString(completionKey));
+                    }
+                    if (retval)
+                    {
+                        HostFile* hostFile = null;
+                        if (completionKey == ddExitCompletionKey)
                         {
-                            ulong numberOfBytesTransferred = 0u;
-                            ulong completionKey = 0u;
-                            void* overlapped = null;
-                            bool retval = OsGetQueuedCompletionStatus(hostFile->GetCompletionPortHandle(), &numberOfBytesTransferred, &completionKey, &overlapped);
                             if (Log())
                             {
-                                string msg;
-                                msg.Append("ok=").Append(ToString(retval)).Append(".count=").Append(ToString(numberOfBytesTransferred)).Append(".overlapped=").Append(ToHexString(cast<ulong>(overlapped)));
-                                LogMessage("fs.dd.ioready",  msg);
+                                LogMessage("fs.dd.run", "exit.received");
+                                LogMessage("fs.dd.run", "end");
                             }
-                            if (!retval)
+                            return;
+                        }
+                        else if (completionKey == ddRequestCompletionKey)
+                        {
+                            if (Log())
                             {
-                                ulong lastError = OsGetLastError();
-                                Console.Error() << "dd.error: " << ToString(lastError) << endl();
-                                Panic("OsGetQueuedCompletionStatus failed: error=" + ToString(lastError));
+                                LogMessage("fs.dd.run", "request.received");
+                            }
+                            ProcessRequests();
+                            if (Log())
+                            {
+                                LogMessage("fs.dd.run", "end");
+                            }
+                            continue;
+                        }
+                        else
+                        {
+                            LockGuard<Mutex> lock(mtx);
+                            HashMap<ulong, HostFile*>.ConstIterator it = keyHostFileMap.CFind(completionKey);
+                            if (it != keyHostFileMap.CEnd())
+                            {
+                                hostFile = it->second;
+                            }
+                        }
+                        if (hostFile != null)
+                        {
+                            if (Log())
+                            {
+                                LogMessage("fs.dd.run", "completion.received:hostFile=" + ToString(completionKey));
                             }
                             bool handleCompletions = false;
-                            if (completionKey == hostFileCompletionKey)
+                            UniquePtr<IORequest> ioRequest;
                             {
-                                LockGuard<Mutex> lock(completionQueueMutex);
-                                completionQueue.Put(IOCompletion(hostFile, numberOfBytesTransferred, overlapped));
-                                if (GetKernel().Waiting())
+                                LockGuard<Mutex> lock(mtx);
+                                ioRequest.Reset(requestMap[overlapped]);
+                            }
+                            if (ioRequest.IsNull())
+                            {
+                                Panic("error from disk driver run: I/O request for overlapped " + ToHexString(cast<ulong>(overlapped)) + " not found");
+                            }
+                            ioRequest->numberOfBytesTransferred = numberOfBytesTransferred;
+                            if (Log())
+                            {
+                                LogMessage("fs.dd.run.ioready",  "request:" + ioRequest->ToString());
+                            }
+                            if (ioRequest->deliver)
+                            {
                                 {
+                                    LockGuard<Mutex> lock(mtx);
+                                    completionQueue.Put(IOCompletion(ioRequest.Release()));
+                                }
+                                if (GetKernel().Booting())
+                                {
+                                    if (Log())
+                                    {
+                                        LogMessage("fs.dd.run", "deliver.handleCompletions");
+                                    }
                                     handleCompletions = true;
                                 }
                                 else
                                 {
+                                    if (Log())
+                                    {
+                                        LogMessage("fs.dd.run", "deliver.setInterrupt");
+                                    }
                                     GetMachine().GetRegisters().SetInterrupt(DISK_BIT);
                                 }
                             }
                             else
                             {
-                                Panic("error from disk driver run: unknown completion key received");
+                                if (Log())
+                                {
+                                    LogMessage("fs.dd.run", "deliver.remove");
+                                }
+                                requestMap.Remove(overlapped);
                             }
                             if (handleCompletions)
                             {
@@ -215,12 +587,16 @@ namespace cmsx.kernel
                         }
                         else
                         {
-                            Panic("error from disk driver run: null host file");
+                            Panic("error from disk driver run: unknown completion key received");
                         }
                     }
                     else
                     {
-                        Panic("error from disk driver run: invalid event index from wait for multiple objects");
+                        Panic("error from disk driver run: get queued completion status failed");
+                    }
+                    if (Log())
+                    {
+                        LogMessage("fs.dd.run", "end");
                     }
                 }
             }
@@ -233,158 +609,60 @@ namespace cmsx.kernel
                 machine.Exit();
             }
         }
+        public void ProcessRequests()
+        {
+            if (Log())
+            {
+                LogMessage("fs.dd.ProcessRequests", "begin");
+            }
+            LockGuard<Mutex> lock(mtx);
+            while (!ddRequestQueue.IsEmpty())
+            {
+                UniquePtr<DDRequest> request = ddRequestQueue.Get();
+                request->Execute(this);
+                OsSetEvent(ddRequestProcessedEvent);
+            }
+            if (Log())
+            {
+                LogMessage("fs.dd.ProcessRequests", "end");
+            }
+        }
         public void HandleIOCompletions()
         {
+            if (Log())
+            {
+                LogMessage("fs.dd.HandleIOCompletions", "begin");
+            }
             Kernel& kernel = GetKernel();
             ProcessTable& processTable = kernel.GetProcessTable();
             {
-                LockGuard<Mutex> lock(completionQueueMutex);
+                LockGuard<Mutex> lock(mtx);
                 while (!completionQueue.IsEmpty())
                 {
                     IOCompletion ioCompletion = completionQueue.Get();
-                    IORequest& ioRequest = requestMap[ioCompletion.overlapped];
-                    ioRequest.numberOfBytesTransferred = ioCompletion.numberOfBytesTransferred;
-                    WakeUpProcess(processTable, ioRequest.process);
+                    WakeUpProcess(processTable, ioCompletion.request->process);
                 }
-            }
-        }
-        public long Read(Block* block)
-        {
-            FileSystem* fs = GetMountTable().GetFileSystem(block->Key().fsNumber);
-            HostFile* hostFile = fs->GetHostFile(block->Key().fsNumber);
-            void* evnt = hostFile->GetEventHandle();
-            ulong offset = cast<ulong>(block->Key().blockNumber * blockSize);
-            Overlapped overlapped(offset, evnt);
-            Buffer buffer;
-            void* fiberData = OsGetFiberData();
-            Process* process = cast<Process*>(fiberData);
-            requestMap[overlapped.Get()] = IORequest(process);
-            Kernel& kernel = GetKernel();
-            if (process == null)
-            {
-                kernel.SetWaiting();
-            }
-            else
-            {
-                kernel.ResetWaiting();
             }
             if (Log())
             {
-                LogMessage("fs.dd.read", block->ToString() + ".overlapped=" + ToHexString(cast<ulong>(overlapped.Get())));
-            }
-            bool result = OsReadFile(hostFile->GetFileHandle(), buffer.Get(), cast<uint>(blockSize), overlapped.Get());
-            ulong lastError = 0u;
-            if (!result)
-            {
-                lastError = OsGetLastError();
-                if (lastError == ERROR_IO_PENDING) lastError = 0u;
-            }
-            if (lastError == 0u)
-            {
-                SleepProcess(process, blockIOEvent, cast<ulong>(cast<void*>(block)), 0u);
-                MemoryReader reader(cast<byte*>(buffer.Get()), blockSize);
-                block->Read(reader);
-                IORequest& request = requestMap[overlapped.Get()];
-                long result = cast<long>(request.numberOfBytesTransferred);
-                requestMap.Remove(overlapped.Get());
-                return result;
-            }
-            else
-            {
-                requestMap.Remove(overlapped.Get());
-                Buffer messageBuf;
-                OsFormatMessage(lastError, cast<char*>(messageBuf.Get()));
-                const char* msg = cast<const char*>(messageBuf.Get());
-                string message = "Could not read from file '";
-                message.Append(hostFile->GetHostFilePath()).Append("': ").Append(msg);
-                throw SystemError(EIO, message);
-            }
-        }
-        public long Write(Block* block)
-        {
-            FileSystem* fs = GetMountTable().GetFileSystem(block->Key().fsNumber);
-            HostFile* hostFile = fs->GetHostFile(block->Key().fsNumber);
-            void* evnt = hostFile->GetEventHandle();
-            ulong offset = cast<ulong>(block->Key().blockNumber * blockSize);
-            Overlapped overlapped(offset, evnt);
-            Buffer buffer;
-            MemoryWriter writer(cast<byte*>(buffer.Get()), blockSize);
-            block->Write(writer);
-            void* fiberData = OsGetFiberData();
-            Process* process = cast<Process*>(fiberData);
-            requestMap[overlapped.Get()] = IORequest(process);
-            Kernel& kernel = GetKernel();
-            if (process == null)
-            {
-                kernel.SetWaiting();
-            }
-            else
-            {
-                kernel.ResetWaiting();
-            }
-            if (Log())
-            {
-                LogMessage("fs.dd.write", block->ToString() + ".overlapped=" + ToHexString(cast<ulong>(overlapped.Get())));
-            }
-            bool result = OsWriteFile(hostFile->GetFileHandle(), buffer.Get(), cast<uint>(blockSize), overlapped.Get());
-            ulong lastError = 0u;
-            if (!result)
-            {
-                lastError = OsGetLastError();
-                if (lastError == ERROR_IO_PENDING) lastError = 0u;
-            }
-            if (lastError == 0u)
-            {
-                SleepProcess(process, blockIOEvent, cast<ulong>(cast<void*>(block)), 0u);
-                IORequest& request = requestMap[overlapped.Get()];
-                long result = cast<long>(request.numberOfBytesTransferred);
-                requestMap.Remove(overlapped.Get());
-                return result;
-            }
-            else
-            {
-                requestMap.Remove(overlapped.Get());
-                Buffer messageBuf;
-                OsFormatMessage(lastError, cast<char*>(messageBuf.Get()));
-                const char* msg = cast<const char*>(messageBuf.Get());
-                string message = "Could not write to file '";
-                message.Append(hostFile->GetHostFilePath()).Append("': ").Append(msg);
-                throw SystemError(EIO, message);
-            }
-        }
-        private void MakeEventHandleList()
-        {
-            eventHandles.Clear();
-            bool first = true;
-            for (const UniquePtr<HostFile>& hostFile : hostFiles)
-            {
-                if (first)
-                {
-                    eventHandles.Add(interruptEventHandle);
-                    first = false;
-                }
-                else if (hostFile.IsNull())
-                {
-                    throw Exception("error: host file is null");
-                }
-                else
-                {
-                    eventHandles.Add(hostFile->GetEventHandle());
-                }
+                LogMessage("fs.dd.HandleIOCompletions", "end");
             }
         }
         private static UniquePtr<DiskDriver> instance;
         private bool exit;
-        private bool hostFilesChanged;
-        private void* interruptEventHandle;
-        private void* osFilesUpdatedEventHandle;
+        private void* completionPort;
+        private ulong nextHostFileKey;
         private List<UniquePtr<HostFile>> hostFiles;
-        private HashMap<string, HostFile*> hostFileMap;
+        private HashMap<string, HostFile*> pathHostFileMap;
+        private HashMap<ulong, HostFile*> keyHostFileMap;
         private List<void*> eventHandles;
-        private Mutex completionQueueMutex;
         private Queue<IOCompletion> completionQueue;
-        private HashMap<void*, IORequest> requestMap;
+        private Queue<UniquePtr<DDRequest>> ddRequestQueue;
+        private HashMap<void*, IORequest*> requestMap;
         private Thread thread;
+        private int nextRequestNumber;
+        private Mutex mtx;
+        private void* ddRequestProcessedEvent;
     }
 
     public DiskDriver& GetDiskDriver()

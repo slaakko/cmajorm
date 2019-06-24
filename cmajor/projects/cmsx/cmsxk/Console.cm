@@ -72,6 +72,8 @@ namespace cmsx.kernel
         backgroundColor = cast<ConsoleColor>(cast<byte>(x >> 8u));
     }
 
+    private bool consoleDriverExited = false;
+
     public class ConsoleDriver
     {
         static ConsoleDriver() : instance(new ConsoleDriver())
@@ -95,6 +97,7 @@ namespace cmsx.kernel
         }
         public void Stop()
         {
+            consoleDriverExited = true;
             consoleInputHandle = null;
         }
         public void GetDimensions(int& rows, int& cols)
@@ -277,10 +280,10 @@ namespace cmsx.kernel
             Machine& machine = GetMachine();
             Kernel& kernel = GetKernel();
             Session* session = kernel.CurrentSession();
-            if (session->fgpid != -1)
+            if (session->fgpgrp != -1)
             {
                 ProcessTable& processTable = kernel.GetProcessTable();
-                Process* reader = processTable.GetProcess(session->fgpid);
+                Process* reader = processTable.GetProcess(session->fgpgrp);
                 if (reader != null)
                 {
                     if (reader->state == Process.State.asleep && reader->event == consoleInputEvent)
@@ -482,14 +485,14 @@ namespace cmsx.kernel
 
     public void ConsoleInputWaitingCallback()
     {
-        if (ConsoleDriver.Instance().GetConsoleInputHandle() != null)
+        bool exited = consoleDriverExited;
+        if (exited) return;
+        ConsoleDriver& consoleDriver = GetConsoleDriver();
+        uchar c = '\0';
+        bool retVal = OsReadConsoleInput(consoleDriver.GetConsoleInputHandle(), &c);
+        if (retVal && c != '\0')
         {
-            uchar c = '\0';
-            bool retVal = OsReadConsoleInput(ConsoleDriver.Instance().GetConsoleInputHandle(), &c);
-            if (retVal && c != '\0')
-            {
-                ConsoleDriver.Instance().KeyPressed(c);
-            }
+            consoleDriver.KeyPressed(c);
         }
     }
 
