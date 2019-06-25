@@ -14,6 +14,7 @@ extern "C" RT_API int32_t RtStartThreadFunctionWithParam(void* function, void* p
 extern "C" RT_API int32_t RtStartThreadMethod(void* classDelegate);
 extern "C" RT_API int32_t RtStartThreadMethodWithParam(void* classDelegate, void* param);
 extern "C" RT_API bool RtJoinThread(int32_t threadId);
+extern "C" RT_API int32_t RtThisThreadId();
 
 namespace cmajor { namespace rt {
 

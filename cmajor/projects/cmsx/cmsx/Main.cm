@@ -142,6 +142,8 @@ public void PrintHelp()
     Console.Out() << "  Debugger follows exec chain." << endl();
     Console.Out() << "--sleeping-write (-p)" << endl();
     Console.Out() << "  Sleep during disk write operations." << endl();
+    Console.Out() << "--no-readahead (-n)" << endl();
+    Console.Out() << "  Disable readahead." << endl();
 }
 
 bool CopyFs()
@@ -327,6 +329,10 @@ int main(int argc, const char** argv)
                     {
                         Machine.SetFlag(Machine.Flags.sleepingWrite);
                     }
+                    else if (arg == "--no-readahead")
+                    {
+                        Machine.SetFlag(Machine.Flags.noReadahead);
+                    }
                     else if (arg == "--dont-use-translation-cache")
                     {
                         SetUseTranslationCacheValue(false);
@@ -391,6 +397,10 @@ int main(int argc, const char** argv)
                                 else if (o == 'p')
                                 {
                                     Machine.SetFlag(Machine.Flags.sleepingWrite);
+                                }
+                                else if (o == 'n')
+                                {
+                                    Machine.SetFlag(Machine.Flags.noReadahead);
                                 }
                                 else if (o == 'l')
                                 {

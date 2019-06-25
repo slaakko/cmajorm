@@ -197,7 +197,7 @@ namespace cmsx.kernel
             LogMessage("intr", "disk");
         }
         DiskDriver& diskDriver = GetDiskDriver();
-        diskDriver.HandleIOCompletions();
+        diskDriver.InterruptService();
     }
 
     public nothrow void KeyboardInterruptHandler(Machine& machine, byte irq)
@@ -210,7 +210,7 @@ namespace cmsx.kernel
         ConsoleDriver* consoleDriver = kernel.GetConsoleDriver();
         if (consoleDriver != null)
         {
-            consoleDriver->HandleBufferedInput();
+            consoleDriver->InterruptService();
         }
     }
 
@@ -266,12 +266,6 @@ namespace cmsx.kernel
             Registers& regs = machine.GetRegisters();
             regs.Set(regAX, returnValue);
         }
-/*
-        else if (process == processTable.GetIdle() && !processTable.ReadyQueueEmpty())
-        {
-            Schedule(machine, processTable);
-        }
-*/
         if (Log())
         {
             LogMessage("intr.return", "end");

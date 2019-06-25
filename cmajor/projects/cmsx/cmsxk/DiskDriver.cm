@@ -313,6 +313,7 @@ namespace cmsx.kernel
                 if (block->GetFlag(Block.Flags.async))
                 {
                     LogMessage("fs.dd.read", "async");
+                    request.Release();
                     return blockSize;
                 }
                 MemoryReader reader(cast<byte*>(request->buffer.Get()), blockSize);
@@ -338,6 +339,7 @@ namespace cmsx.kernel
                 if (block->GetFlag(Block.Flags.async))
                 {
                     LogMessage("fs.dd.read", "async");
+                    request.Release();
                     return blockSize;
                 }
                 if (Log())
@@ -567,7 +569,9 @@ namespace cmsx.kernel
                                 {
                                     MemoryReader reader(cast<byte*>(ioRequest->buffer.Get()), blockSize);
                                     ioRequest->block->Read(reader);
+                                    ioRequest->block->SetFlag(Block.Flags.valid);
                                     ioRequest->block->Manager()->PutBlock(ioRequest->block);
+                                    LockGuard<Mutex> lock(mtx);
                                     requestMap.Remove(overlapped);
                                 }
                                 else
@@ -600,11 +604,12 @@ namespace cmsx.kernel
                                 {
                                     LogMessage("fs.dd.run", "deliver.remove");
                                 }
+                                LockGuard<Mutex> lock(mtx);
                                 requestMap.Remove(overlapped);
                             }
                             if (handleCompletions)
                             {
-                                HandleIOCompletions();
+                                InterruptService();
                             }
                         }
                         else
@@ -649,11 +654,11 @@ namespace cmsx.kernel
                 LogMessage("fs.dd.ProcessRequests", "end");
             }
         }
-        public void HandleIOCompletions()
+        public void InterruptService()
         {
             if (Log())
             {
-                LogMessage("fs.dd.HandleIOCompletions", "begin");
+                LogMessage("fs.dd.interrupt", "begin");
             }
             Kernel& kernel = GetKernel();
             ProcessTable& processTable = kernel.GetProcessTable();
@@ -665,9 +670,17 @@ namespace cmsx.kernel
                     WakeUpProcess(processTable, ioCompletion.request->process);
                 }
             }
+            if (processTable.GetRunning() == processTable.GetIdle())
+            {
+                if (Log())
+                {
+                    LogMessage("fs.dd.interrupt", "schedule");
+                }
+                GetMachine().GetRegisters().SetInterrupt(CLOCK_BIT);
+            }
             if (Log())
             {
-                LogMessage("fs.dd.HandleIOCompletions", "end");
+                LogMessage("fs.dd.interrupt", "end");
             }
         }
         private static UniquePtr<DiskDriver> instance;

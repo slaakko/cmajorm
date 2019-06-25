@@ -13,6 +13,7 @@
 #include <mutex>
 #include <thread>
 #include <vector>
+#include <sstream>
 #include <unordered_map>
 
 namespace cmajor { namespace rt {
@@ -294,4 +295,23 @@ extern "C" RT_API int32_t RtStartThreadMethodWithParam(void* classDelegate, void
 extern "C" RT_API bool RtJoinThread(int32_t threadId)
 {
     return cmajor::rt::ThreadPool::Instance().JoinThread(threadId);
+}
+
+std::unordered_map<std::thread::id, int> threadIdMap;
+
+int nextThreadId = 0;
+std::mutex threadIdMapMutex;
+
+extern "C" RT_API int32_t RtThisThreadId()
+{
+    std::lock_guard<std::mutex> lock(threadIdMapMutex);
+    std::thread::id id = std::this_thread::get_id();
+    auto it = threadIdMap.find(id);
+    if (it != threadIdMap.cend())
+    {
+        return it->second;
+    }
+    int threadId = nextThreadId++;
+    threadIdMap[id] = threadId;
+    return threadId;
 }

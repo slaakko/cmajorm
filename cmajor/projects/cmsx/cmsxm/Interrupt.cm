@@ -53,31 +53,37 @@ namespace cmsx.machine
 
     public nothrow void SetProcessorToKernelMode(Registers& regs)
     {
+        LockGuard<Mutex> lock(regs.GetInterruptMutex());
         regs.SetSpecial(Registers.rK, regs.GetSpecial(Registers.rK) & ~N_BIT);
     }
 
     public nothrow void SetProcessorToUserMode(Registers& regs)
     {
+        LockGuard<Mutex> lock(regs.GetInterruptMutex());
         regs.SetSpecial(Registers.rK, regs.GetSpecial(Registers.rK) | MACHINE_INTERRUPT_BITS);
     }
 
     public nothrow bool IsProcessorInKernelMode(Registers& regs)
     {
+        LockGuard<Mutex> lock(regs.GetInterruptMutex());
         return (regs.GetSpecial(Registers.rK) & N_BIT) == 0u;
     }
 
     public nothrow void DisableAllInterrupts(Registers& regs)
     {
+        LockGuard<Mutex> lock(regs.GetInterruptMutex());
         regs.SetSpecial(Registers.rK, 0u);
     }
 
     public nothrow void EnableAllInterrupts(Registers& regs)
     {
+        LockGuard<Mutex> lock(regs.GetInterruptMutex());
         regs.SetSpecial(Registers.rK, ALL_INTERRUPT_BITS);
     }
 
     public nothrow void SetSecurityViolation(Registers& regs, ulong virtualAddress)
     {
+        LockGuard<Mutex> lock(regs.GetInterruptMutex());
         regs.SetSpecial(Registers.rZZ, virtualAddress);
         regs.SetSpecial(Registers.rK, regs.GetSpecial(Registers.rK) | S_BIT);
         regs.SetInterrupt(S_BIT);

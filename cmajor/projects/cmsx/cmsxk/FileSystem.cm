@@ -998,12 +998,17 @@ namespace cmsx.kernel
     public abstract class BlockManager
     {
         public default virtual ~BlockManager();
-        public abstract Block* GetBlock(const BlockKey& key, SuperBlock* sb);
+        public Block* GetBlock(const BlockKey& key, SuperBlock* sb)
+        {
+            return GetBlock(key, sb, true, true);
+        }
+        public abstract Block* GetBlock(const BlockKey& key, SuperBlock* sb, bool sleep, bool setOwner);
         public abstract nothrow void PutBlock(Block* block);
         public abstract nothrow Block* ReadBlock(const BlockKey& key, SuperBlock* sb);
         public abstract void WriteBlock(Block* block, SuperBlock* superBlock);
         public abstract void FreeBlocks(INode* inode);
         public abstract void GetBlockNumber(INode* inode, long offset, int& blockNumber, int& blockOffset, bool allocate);
+        public abstract int GetBlockNumber(INode* inode, int logicalBlockNumber) const;
         public abstract void Flush();
         public abstract nothrow string Name() const;
     }

@@ -254,8 +254,12 @@ namespace cmsx.kernel
             AddCharToInputBuffer(c);
             machine.GetRegisters().SetInterrupt(KEYBOARD_BIT);
         }
-        public void HandleBufferedInput()
+        public void InterruptService()
         {
+            if (Log())
+            {
+                LogMessage("con.interrupt", "begin");
+            }
             GetDimensions();
             outputEndCursorPosY = cursorPosY;
             ustring chars = GetCharsFromInputBuffer();
@@ -273,6 +277,10 @@ namespace cmsx.kernel
                     case cast<uchar>(keyBackspace): HandleBackspace(); break;
                     default: HandleChar(c); break;
                 }
+            }
+            if (Log())
+            {
+                LogMessage("con.interrupt", "end");
             }
         }
         private void DeliverInputLine()
@@ -298,6 +306,14 @@ namespace cmsx.kernel
                             }
                         }
                         WakeUpProcess(processTable, reader);
+                        if (processTable.GetRunning() == processTable.GetIdle())
+                        {
+                            if (Log())
+                            {
+                                LogMessage("con.interrupt", "schedule");
+                            }
+                            machine.GetRegisters().SetInterrupt(CLOCK_BIT);
+                        }
                     }
                 }
             }

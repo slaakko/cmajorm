@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Threading;
 using cmsx.machine;
 using cmsx.util;
 
@@ -232,7 +233,7 @@ namespace cmsx.kernel
         {
             return "fs.host.bmgr";
         }
-        public override Block* GetBlock(const BlockKey& key, SuperBlock* sb)
+        public override Block* GetBlock(const BlockKey& key, SuperBlock* sb, bool sleep, bool setOwner)
         {
             if (Log())
             {
@@ -248,29 +249,58 @@ namespace cmsx.kernel
                         Block* block = it->second;
                         if (block->GetFlag(Block.Flags.locked))
                         {
+                            if (!sleep)
+                            {
+                                return null;
+                            }
                             void* fiberData = OsGetFiberData();
                             Process* process = cast<Process*>(fiberData);
-                            block->AddWaitingProcess(process);
-                            SleepProcess(process, blockUnlockedEvent, cast<ulong>(cast<void*>(block)), 0u);
-                            continue;
+                            if (block->Owner() != process)
+                            {
+                                block->AddWaitingProcess(process);
+                                SleepProcess(process, blockUnlockedEvent, cast<ulong>(cast<void*>(block)), 0u);
+                                continue;
+                            }
+                            else
+                            {
+                                if (Log())
+                                {
+                                    LogMessage("fs.host.bmgr.getblock.end.found.sameOwner", block->ToString());
+                                }
+                                return block;
+                            }
                         }
                         else
                         {
                             block->SetFlag(Block.Flags.locked);
+                            if (setOwner)
+                            {
+                                void* fiberData = OsGetFiberData();
+                                Process* process = cast<Process*>(fiberData);
+                                block->SetOwner(process);
+                            }
+                            else
+                            {
+                                block->SetOwner(null);
+                            }
                             RemoveBlockFromFreeList(block);
                             if (Log())
                             {
-                                LogMessage("fs.host.bmgr.getblock.end.found", block->ToString());
+                                LogMessage("fs.host.bmgr.getblock.end.found.notLocked", block->ToString());
                             }
                             return block;
                         }
                     }
                     else
                     {
-                        LinkedList<Block*>* list = GetFreeBlockList();
+                        LinkedList<Block*>* list = cache.GetFreeBlockList();
                         #assert(list != null);
                         if (list->IsEmpty())
                         {
+                            if (!sleep)
+                            {
+                                return null;
+                            }
                             void* fiberData = OsGetFiberData();
                             Process* process = cast<Process*>(fiberData);
                             AddWaitingProcess(process);
@@ -279,14 +309,28 @@ namespace cmsx.kernel
                         }
                         else
                         {
-                            Block* block = list->Front();
-                            list->RemoveFirst();
-                            block->SetIterator(list->End());
+                            Block* block = null;
+                            {
+                                LockGuard<Mutex> lock(cache.GetMutex());
+                                block = list->Front();
+                                list->RemoveFirst();
+                                block->SetIterator(list->End());
+                            }
                             blockMap.Remove(block->Key());
                             block->SetKey(key);
                             blockMap[key] = block;
                             block->ResetFlags();
                             block->SetFlag(Block.Flags.locked);
+                            if (setOwner)
+                            {
+                                void* fiberData = OsGetFiberData();
+                                Process* process = cast<Process*>(fiberData);
+                                block->SetOwner(process);
+                            }
+                            else
+                            {
+                                block->SetOwner(null);
+                            }
                             if (Log())
                             {
                                 LogMessage("fs.host.bmgr.getblock.end.free", block->ToString());
@@ -363,6 +407,10 @@ namespace cmsx.kernel
         public override void FreeBlocks(INode* inode)
         {
             throw SystemError(EFAIL, "block manager for file system '" + fs->Name() + "' cannot free blocks");
+        }
+        public override int GetBlockNumber(INode* inode, int logicalBlockNumber) const
+        {
+            return logicalBlockNumber;
         }
         public override void GetBlockNumber(INode* inode, long offset, int& blockNumber, int& blockOffset, bool allocate)
         {

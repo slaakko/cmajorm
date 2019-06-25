@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 
 namespace cmsx.machine
 {
@@ -327,9 +328,7 @@ namespace cmsx.machine
         {
             interruptOccurred = false;
             regs.SetSpecial(Registers.rXX, 0u);
-            ulong rq = regs.GetInterruptBits();
-            ulong rk = regs.GetSpecial(Registers.rK);
-            ulong bits = rq & rk;
+            ulong bits = regs.GetInterruptBits();
             if (bits != 0u)
             {
                 uint low = cast<uint>(bits);
@@ -363,7 +362,6 @@ namespace cmsx.machine
                 if (irqBitSet)
                 {
                     ulong handlerPtrAddress = regs.GetSpecial(Registers.rTT) + 8u * cast<ulong>(irq);
-                    regs.ResetInterrupt(irqBit);
                     HandleInterrupt(cast<byte>(irq), handlerPtrAddress);
                 }
             }

@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Threading;
 
 namespace cmsx.kernel
@@ -106,6 +107,8 @@ namespace cmsx.kernel
         string m;
         Duration duration = Now() - start;
         m.Append(DurationStr(duration)).Append(' ');
+        m.Append(ToString(RtThisThreadId()));
+        m.Append(' ');
         void* fiberData = OsGetFiberData();
         Process* process = cast<Process*>(fiberData);
         if (process == null)

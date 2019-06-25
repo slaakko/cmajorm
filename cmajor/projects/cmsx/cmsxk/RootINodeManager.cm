@@ -164,6 +164,7 @@ namespace cmsx.kernel
                             {
                                 LogMessage("fs.root.imgr.getinode.end", inode->ToString());
                             }
+                            inode->ReadaheadData().Clear();
                             return inode;
                         }
                     }
@@ -179,6 +180,7 @@ namespace cmsx.kernel
                         {
                             LogMessage("fs.root.imgr.getinode.end", inode->ToString());
                         }
+                        inode->ReadaheadData().Clear();
                         return inode;
                     }
                 }
@@ -221,6 +223,7 @@ namespace cmsx.kernel
                     inode->ResetFlags();
                     inode->Read(reader);
                     inode->SetFlag(INode.Flags.locked);
+                    inode->ReadaheadData().Clear();
                     inode->SetUseCount(1);
                     if (inode->GetNumLinks() == 0)
                     {

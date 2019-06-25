@@ -165,7 +165,10 @@ namespace cmsx.machine
         public ulong GetInterruptBits()
         {
             LockGuard<Mutex> lock(interruptMutex);
-            return GetSpecial(Registers.rQ);
+            ulong rq = GetSpecial(Registers.rQ);
+            ulong rk = GetSpecial(Registers.rK);
+            SetSpecial(Registers.rQ, rq & ~rk);
+            return rq & rk;
         }
         public nothrow Mutex& GetInterruptMutex()
         {
