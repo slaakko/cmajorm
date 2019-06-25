@@ -536,10 +536,6 @@ namespace cmsx.kernel
         {
             return manager;
         }
-        public nothrow inline Readahead& ReadaheadData()
-        {
-            return readahead;
-        }
         private INodeKey key;
         private Flags flags;
         private int useCount;
@@ -563,7 +559,6 @@ namespace cmsx.kernel
         private Access otherAccess;
         private INodeManager* manager;
         private Process* owner;
-        private Readahead readahead;
     }
 
     public class INodeBlock : Block

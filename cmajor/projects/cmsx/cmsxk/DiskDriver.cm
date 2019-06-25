@@ -310,12 +310,6 @@ namespace cmsx.kernel
                 {
                     LogMessage("fs.dd.read", "immediate=" + request->ToString());
                 }
-                if (block->GetFlag(Block.Flags.async))
-                {
-                    LogMessage("fs.dd.read", "async");
-                    request.Release();
-                    return blockSize;
-                }
                 MemoryReader reader(cast<byte*>(request->buffer.Get()), blockSize);
                 block->Read(reader);
                 {
@@ -336,12 +330,6 @@ namespace cmsx.kernel
             }
             if (lastError == 0u)
             {
-                if (block->GetFlag(Block.Flags.async))
-                {
-                    LogMessage("fs.dd.read", "async");
-                    request.Release();
-                    return blockSize;
-                }
                 if (Log())
                 {
                     LogMessage("fs.dd.read", "sleep");
@@ -565,37 +553,25 @@ namespace cmsx.kernel
                             }
                             if (ioRequest->deliver)
                             {
-                                if (ioRequest->block->GetFlag(Block.Flags.async))
                                 {
-                                    MemoryReader reader(cast<byte*>(ioRequest->buffer.Get()), blockSize);
-                                    ioRequest->block->Read(reader);
-                                    ioRequest->block->SetFlag(Block.Flags.valid);
-                                    ioRequest->block->Manager()->PutBlock(ioRequest->block);
                                     LockGuard<Mutex> lock(mtx);
-                                    requestMap.Remove(overlapped);
+                                    completionQueue.Put(IOCompletion(ioRequest.Release()));
+                                }
+                                if (GetKernel().Booting())
+                                {
+                                    if (Log())
+                                    {
+                                        LogMessage("fs.dd.run", "deliver.handleCompletions");
+                                    }
+                                    handleCompletions = true;
                                 }
                                 else
                                 {
+                                    if (Log())
                                     {
-                                        LockGuard<Mutex> lock(mtx);
-                                        completionQueue.Put(IOCompletion(ioRequest.Release()));
+                                        LogMessage("fs.dd.run", "deliver.setInterrupt");
                                     }
-                                    if (GetKernel().Booting())
-                                    {
-                                        if (Log())
-                                        {
-                                            LogMessage("fs.dd.run", "deliver.handleCompletions");
-                                        }
-                                        handleCompletions = true;
-                                    }
-                                    else
-                                    {
-                                        if (Log())
-                                        {
-                                            LogMessage("fs.dd.run", "deliver.setInterrupt");
-                                        }
-                                        GetMachine().GetRegisters().SetInterrupt(DISK_BIT);
-                                    }
+                                    GetMachine().GetRegisters().SetInterrupt(DISK_BIT);
                                 }
                             }
                             else

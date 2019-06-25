@@ -120,6 +120,15 @@ void InstallEtc(bool verbose)
             Console.Out() << "init: /etc/group created" << endl();
         }
     }
+    if (!File.Exists("/etc/environment"))
+    {
+        StreamWriter writer(SharedPtr<Stream>(new FileStream("/etc/environment", cast<OpenFlags>(OpenFlags.write | OpenFlags.create | OpenFlags.truncate), cast<int>(ParseOctal("644")))));
+        writer << "PATH=/bin:/sbin" << endl();
+        if (verbose)
+        {
+            Console.Out() << "init: /etc/environment created" << endl();
+        }
+    }
 }
 
 void InstallHome(bool verbose)

@@ -1085,7 +1085,6 @@ namespace cmsx.kernel
                     int blockNumber = 0;
                     int blockOffset = 0;
                     fs->GetBlockManager()->GetBlockNumber(inode, pos, blockNumber, blockOffset, false);
-                    DoReadahead(fs->GetBlockManager(), inode, pos);
                     long bytesToRead = Min(count, blockSize - blockOffset);
                     long bytesLeft = Max(inode->GetFileSize() - pos, 0);
                     bytesToRead = Min(bytesToRead, bytesLeft);
