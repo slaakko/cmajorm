@@ -1,0 +1,913 @@
+// =================================
+// Copyright (c) 2019 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Collections;
+
+namespace cmsh
+{
+    public nothrow string GenNDigitInt(int x, int ndigits)
+    {
+        string s('0', ndigits);
+        int k = ndigits - 1;
+        while (x > 0)
+        {
+            int digit = x % 10;
+            s[k] = cast<char>(digit + cast<int>('0'));
+            --k;
+            x = x / 10;
+        }
+        return s;
+    }
+
+    public class BraceExpansionParser
+    {
+        private const int ERROR = -1;
+        private const int END = 0;
+        private const int LBRACE = 1;
+        private const int RBRACE = 2;
+        private const int COMMA = 3;
+        private const int SEQ = 4;
+        private const int CHARS = 5;
+
+        private nothrow string TokenStr(int token)
+        {
+            switch (token)
+            {
+                case ERROR: return "ERROR";
+                case END: return "END";
+                case LBRACE: return "LBRACE";
+                case RBRACE: return "RBRACE";
+                case COMMA: return "COMMA";
+                case SEQ: return "SEQ";
+                case CHARS: return "CHARS";
+            }
+            return string();
+        }
+        
+        public nothrow BraceExpansionParser(const ustring& word_) : word(word_), start(word.Chars()), end(word.Chars() + word.Length()), pos(start), expanded(false), debug(false)
+        {
+        }
+        public nothrow void SetDebug()
+        {
+            debug = true;
+        }
+        public nothrow ustring Parse()
+        {
+            ustring expandedText;
+            token = GetToken();
+            while (token != END && token != ERROR)
+            {
+                expandedText.Append(ParseBraceExpression(true, true));
+            }
+            if (token == ERROR)
+            {
+                expanded = false;
+            }
+            return expandedText;
+        }
+        public nothrow inline bool Expanded() const
+        {
+            return expanded;
+        }
+        private nothrow ustring ParseBraceExpression(bool accepRBraceInPrefix, bool acceptCommaInPrefix)
+        {
+            if (debug)
+            {
+                Console.Out() << ">braceExpr" << endl();
+            }
+            ustring expandedText;
+            ustring prefix;
+            ustring suffix;
+            while (token == CHARS || token == SEQ || (token == RBRACE && accepRBraceInPrefix) || (token == COMMA && acceptCommaInPrefix))
+            {
+                switch (token)
+                {
+                    case CHARS:
+                    {
+                        prefix.Append(chars);
+                        break;
+                    }
+                    case SEQ:
+                    {
+                        prefix.Append('.').Append('.');
+                        break;
+                    }
+                    case RBRACE:
+                    {
+                        prefix.Append('}');
+                        break;
+                    }
+                    case COMMA:
+                    {
+                        prefix.Append(',');
+                        break;
+                    }
+                }
+                if (debug)
+                {
+                    Console.Out() << "braceExpr:prefix" << endl();
+                }
+                token = GetToken();
+            }
+            if (token == LBRACE)
+            {
+                if (debug)
+                {
+                    Console.Out() << "braceExpr:LBRACE" << endl();
+                }
+                token = GetToken();
+                int savedToken = token;
+                uchar* savedPos = pos;
+                ustring savedChars = chars;
+                List<ustring> commaList;
+                if (TryParseCommaList(commaList))
+                {
+                    if (debug)
+                    {
+                        Console.Out() << "braceExpr:commaList:success" << endl();
+                    }
+                    if (token == RBRACE)
+                    {
+                        if (debug)
+                        {
+                            Console.Out() << "braceExpr:RBRACE" << endl();
+                        }
+                        token = GetToken();
+                        while (token == CHARS || token == SEQ)
+                        {
+                            switch (token)
+                            {
+                                case CHARS:
+                                {
+                                    suffix.Append(chars);
+                                    break;
+                                }
+                                case SEQ:
+                                {
+                                    suffix.Append('.').Append('.');
+                                    break;
+                                }
+                            }
+                            if (debug)
+                            {
+                                Console.Out() << "braceExpr:suffix" << endl();
+                            }
+                            token = GetToken();
+                        }
+                        bool first = true;
+                        for (const ustring& item : commaList)
+                        {
+                            if (first)
+                            {
+                                first = false;
+                            }
+                            else
+                            {
+                                expandedText.Append(' ');
+                            }
+                            expandedText.Append(prefix).Append(item).Append(suffix);
+                        }
+                        expanded = true;
+                        if (debug)
+                        {
+                            Console.Out() << "braceExpr:commanList.expanded" << endl();
+                        }
+                    }
+                    else
+                    {
+                        if (debug)
+                        {
+                            Console.Out() << "braceExpr:~RBRACE" << endl();
+                        }
+                        token = savedToken;
+                        pos = savedPos;
+                        chars = savedChars;
+                        expandedText.Append(prefix).Append('{');
+                    }
+                }
+                else 
+                {
+                    token = savedToken;
+                    pos = savedPos;
+                    chars = savedChars;
+                    int x = 0;
+                    int y = 0;
+                    int i = 1;
+                    int ndigits = 1;
+                    if (TryParseIntegerSequenceExpression(x, y, i, ndigits))
+                    {
+                        if (token == RBRACE)
+                        {
+                            if (debug)
+                            {
+                                Console.Out() << "braceExpr:RBRACE" << endl();
+                            }
+                            token = GetToken();
+                            while (token == CHARS || token == SEQ)
+                            {
+                                switch (token)
+                                {
+                                    case CHARS:
+                                    {
+                                        suffix.Append(chars);
+                                        break;
+                                    }
+                                    case SEQ:
+                                    {
+                                        suffix.Append('.').Append('.');
+                                        break;
+                                    }
+                                }
+                                if (debug)
+                                {
+                                    Console.Out() << "braceExpr:suffix" << endl();
+                                }
+                                token = GetToken();
+                            }
+                            if (i > 0)
+                            {
+                                bool first = true;
+                                for (int k = x; k <= y; k = k + i)
+                                {
+                                    if (first)
+                                    {
+                                        first = false;
+                                    }
+                                    else
+                                    {
+                                        expandedText.Append(' ');
+                                    }
+                                    string s = GenNDigitInt(k, ndigits);
+                                    expandedText.Append(prefix).Append(ToUtf32(s)).Append(suffix);
+                                }
+                            }
+                            else
+                            {
+                                bool first = true;
+                                for (int k = x; k >= y; k = k + i)
+                                {
+                                    if (first)
+                                    {
+                                        first = false;
+                                    }
+                                    else
+                                    {
+                                        expandedText.Append(' ');
+                                    }
+                                    string s = GenNDigitInt(k, ndigits);
+                                    expandedText.Append(prefix).Append(ToUtf32(s)).Append(suffix);
+                                }
+                            }
+                            expanded = true;
+                            if (debug)
+                            {
+                                Console.Out() << "braceExpr:intSequence.expanded" << endl();
+                            }
+                        }
+                        else
+                        {
+                            if (debug)
+                            {
+                                Console.Out() << "braceExpr:~RBRACE" << endl();
+                            }
+                            token = savedToken;
+                            pos = savedPos;
+                            chars = savedChars;
+                            expandedText.Append(prefix).Append('{');
+                        }
+                    }
+                    else
+                    {
+                        token = savedToken;
+                        pos = savedPos;
+                        chars = savedChars;
+                        uchar x = '\0';
+                        uchar y = '\0';
+                        int i = 1;
+                        if (TryParseCharacterSequenceExpression(x, y, i))
+                        {
+                            if (token == RBRACE)
+                            {
+                                if (debug)
+                                {
+                                    Console.Out() << "braceExpr:RBRACE" << endl();
+                                }
+                                token = GetToken();
+                                while (token == CHARS || token == SEQ)
+                                {
+                                    switch (token)
+                                    {
+                                        case CHARS:
+                                        {
+                                            suffix.Append(chars);
+                                            break;
+                                        }
+                                        case SEQ:
+                                        {
+                                            suffix.Append('.').Append('.');
+                                            break;
+                                        }
+                                    }
+                                    if (debug)
+                                    {
+                                        Console.Out() << "braceExpr:suffix" << endl();
+                                    }
+                                    token = GetToken();
+                                }
+                                if (i > 0)
+                                {
+                                    bool first = true;
+                                    for (uchar c = x; c <= y; c = cast<uchar>(cast<int>(c) + i))
+                                    {
+                                        if (first)
+                                        {
+                                            first = false;
+                                        }
+                                        else
+                                        {
+                                            expandedText.Append(' ');
+                                        }
+                                        expandedText.Append(prefix).Append(ustring(c)).Append(suffix);
+                                    }
+                                }
+                                else
+                                {
+                                    bool first = true;
+                                    for (uchar c = x; c >= y; c = cast<uchar>(cast<int>(c) + i))
+                                    {
+                                        if (first)
+                                        {
+                                            first = false;
+                                        }
+                                        else
+                                        {
+                                            expandedText.Append(' ');
+                                        }
+                                        expandedText.Append(prefix).Append(ustring(c)).Append(suffix);
+                                    }
+                                }
+                                expanded = true;
+                                if (debug)
+                                {
+                                    Console.Out() << "braceExpr:charSequence.expanded" << endl();
+                                }
+                            }
+                            else
+                            {
+                                if (debug)
+                                {
+                                    Console.Out() << "braceExpr:~RBRACE" << endl();
+                                }
+                                token = savedToken;
+                                pos = savedPos;
+                                chars = savedChars;
+                                expandedText.Append(prefix).Append('{');
+                            }
+                        }
+                        else
+                        {
+                            if (debug)
+                            {
+                                Console.Out() << "braceExpr:~commaList & ~seqExpr" << endl();
+                            }
+                            token = savedToken;
+                            pos = savedPos;
+                            chars = savedChars;
+                            expandedText.Append(prefix).Append('{');
+                        }
+                    }
+                }
+            }
+            else
+            {
+                if (debug)
+                {
+                    Console.Out() << "braceExpr:~LBRACE" << endl();
+                }
+                expandedText.Append(prefix);
+            }
+            if (debug)
+            {
+                Console.Out() << "<braceExpr" << endl();
+            }
+            return expandedText;
+        }
+        private nothrow bool TryParseCommaList(List<ustring>& commaList)
+        {
+            if (debug)
+            {
+                Console.Out() << ">commaList" << endl();
+            }
+            bool success = false;
+            ustring item;
+            while (token != END && token != ERROR && token != COMMA && token != RBRACE)
+            {
+                if (debug)
+                {
+                    Console.Out() << "commaList:firstItem" << endl();
+                }
+                item.Append(ParseBraceExpression(false, false));
+            }
+            while (token == COMMA)
+            {
+                if (debug)
+                {
+                    Console.Out() << "commaList:COMMA" << endl();
+                }
+                token = GetToken();
+                success = true;
+                commaList.Add(item);
+                item.Clear();
+                while (token != END && token != ERROR && token != COMMA && token != RBRACE)
+                {
+                    if (debug)
+                    {
+                        Console.Out() << "commaList:nextItem" << endl();
+                    }
+                    item.Append(ParseBraceExpression(false, false));
+                }
+            }
+            if (success)
+            {
+                if (debug)
+                {
+                    Console.Out() << "commaList:success" << endl();
+                }
+                commaList.Add(item);
+            }
+            if (debug)
+            {
+                Console.Out() << "<commaList" << endl();
+            }
+            return success;
+        }
+        private nothrow bool TryParseIntegerSequenceExpression(int& x, int& y, int& i, int& ndigits)
+        {
+            if (debug)
+            {
+                Console.Out() << ">intseq" << endl();
+            }
+            ustring digits;
+            while (token == CHARS)
+            {
+                digits.Append(chars);
+                token = GetToken();
+            }
+            uint ux = 0u;
+            if (ParseUInt(ToUtf8(digits), ux))
+            {
+                x = cast<int>(ux);
+                ndigits = cast<int>(Max(ndigits, cast<int>(digits.Length())));
+            }
+            else
+            {
+                if (debug)
+                {
+                    Console.Out() << "<intseq:fail:firstInt" << endl();
+                }
+                return false;
+            }
+            if (token == SEQ)
+            {
+                token = GetToken();
+                digits.Clear();
+                while (token == CHARS)
+                {
+                    digits.Append(chars);
+                    token = GetToken();
+                }
+                uint uy = 0u;
+                if (ParseUInt(ToUtf8(digits), uy))
+                {
+                    y = cast<int>(uy);
+                    ndigits = cast<int>(Max(ndigits, cast<int>(digits.Length())));
+                }
+                else
+                {
+                    if (debug)
+                    {
+                        Console.Out() << "<intseq:fail:secondInt" << endl();
+                    }
+                    return false;
+                }
+                if (token == SEQ)
+                {
+                    token = GetToken();
+                    digits.Clear();
+                    while (token == CHARS)
+                    {
+                        digits.Append(chars);
+                        token = GetToken();
+                    }
+                    if (ParseInt(ToUtf8(digits), i))
+                    {
+                        if (debug)
+                        {
+                            Console.Out() << "<intseq:success" << x << ":" << y << ":" << i << ":" << ndigits << endl();
+                        }
+                        return true;
+                    }
+                    else
+                    {
+                        if (debug)
+                        {
+                            Console.Out() << "<intseq:fail:incr" << endl();
+                        }
+                        return false;
+                    }
+                }
+                else
+                {
+                    if (x < y)
+                    {
+                        i = 1;
+                    }
+                    else
+                    {
+                        i = -1;
+                    }
+                    if (debug)
+                    {
+                        Console.Out() << "<intseq:success" << x << ":" << y << ":" << i << ":" << ndigits << endl();
+                    }
+                    return true;
+                }
+            }
+            if (debug)
+            {
+                Console.Out() << "<intseq:fail" << endl();
+            }
+            return false;
+        }
+        private bool TryParseCharacterSequenceExpression(uchar& x, uchar& y, int& i)
+        {
+            if (debug)
+            {
+                Console.Out() << ">charseq" << endl();
+            }
+            if (token == CHARS)
+            {
+                if (chars.Length() == 1)
+                {
+                    x = chars[0];
+                    token = GetToken();
+                }
+                else
+                {
+                    if (debug)
+                    {
+                        Console.Out() << "<charseq:fail:firstChar" << endl();
+                    }
+                    return false;
+                }
+                if (token == SEQ)
+                {
+                    token = GetToken();
+                    if (token == CHARS)
+                    {
+                        if (chars.Length() == 1)
+                        {
+                            y = chars[0];
+                            token = GetToken();
+                        }
+                        else
+                        {
+                            if (debug)
+                            {
+                                Console.Out() << "<charseq:fail:secondChar" << endl();
+                            }
+                            return false;
+                        }
+                        if (token == SEQ)
+                        {
+                            token = GetToken();
+                            ustring digits;
+                            while (token == CHARS)
+                            {
+                                digits.Append(chars);
+                                token = GetToken();
+                            }
+                            if (ParseInt(ToUtf8(digits), i))
+                            {
+                                if (debug)
+                                {
+                                    Console.Out() << "<charseq:success:" << ustring(x) << ":" << ustring(y) << ":" << i << endl();
+                                }
+                                return true;
+                            }
+                            else
+                            {
+                                if (debug)
+                                {
+                                    Console.Out() << "<charseq:fail:incr" << endl();
+                                }
+                                return false;
+                            }
+                        }
+                        else
+                        {
+                            if (x < y)
+                            {
+                                i = 1;
+                            }
+                            else
+                            {
+                                i = -1;
+                            }
+                            if (debug)
+                            {
+                                Console.Out() << "<charseq:success:" << ustring(x) << ":" << ustring(y) << ":" << i << endl();
+                            }
+                            return true;
+                        }
+                    }
+                    else
+                    {
+                        if (debug)
+                        {
+                            Console.Out() << "<charseq:fail:secondChar" << endl();
+                        }
+                        return false;
+                    }
+                }
+                else
+                {
+                    if (debug)
+                    {
+                        Console.Out() << "<charseq:fail:seq" << endl();
+                    }
+                    return false;
+                }
+            }
+            else
+            {
+                if (debug)
+                {
+                    Console.Out() << "<charseq:fail:firstChar" << endl();
+                }
+                return false;
+            }
+            if (debug)
+            {
+                Console.Out() << "<charseq:fail" << endl();
+            }
+            return false;
+        }
+        private nothrow int GetToken()
+        {
+            int token = DoGetToken();
+            if (debug)
+            {
+                Console.Out() << TokenStr(token) << endl();
+            }
+            return token;
+        }
+        private nothrow int DoGetToken()
+        {
+            int state = 0;
+            chars.Clear();
+            while (pos != end)
+            {
+                uchar c = *pos;
+                switch (state)
+                {
+                    case 0:
+                    {
+                        switch (c)
+                        {
+                            case QUOTE_SINGLE:
+                            {
+                                chars.Append(QUOTE_SINGLE);
+                                state = 1;
+                                break;
+                            }
+                            case QUOTE_DOUBLE:
+                            {
+                                chars.Append(QUOTE_DOUBLE);
+                                state = 2;
+                                break;
+                            }
+                            case QUOTE_BACKSLASH:
+                            {
+                                state = 4;
+                                break;
+                            }
+                            case '$':
+                            {
+                                state = 10;
+                                break;
+                            }
+                            case '.':
+                            {
+                                state = 30;
+                                break;
+                            }
+                            case '{':
+                            {
+                                ++pos;
+                                return LBRACE;
+                            }
+                            case '}':
+                            {
+                                ++pos;
+                                return RBRACE;
+                            }
+                            case ',':
+                            {
+                                ++pos;
+                                return COMMA;
+                            }
+                            default:
+                            {
+                                ++pos;
+                                chars.Append(c);
+                                return CHARS;
+                            }
+                        }
+                        break;
+                    }
+                    case 1:
+                    {
+                        if (c == QUOTE_SINGLE)
+                        {
+                            ++pos;
+                            chars.Append(QUOTE_SINGLE);
+                            return CHARS;
+                        }
+                        else
+                        {
+                            chars.Append(c);
+                        }
+                        break;
+                    }
+                    case 2:
+                    {
+                        switch (c)
+                        {
+                            case QUOTE_DOUBLE:
+                            {
+                                ++pos;
+                                chars.Append(QUOTE_DOUBLE);
+                                return CHARS;
+                            }
+                            case QUOTE_BACKSLASH:
+                            {
+                                state = 3;
+                                break;
+                            }   
+                            default:
+                            {
+                                chars.Append(c);
+                                break;
+                            }
+                        }
+                        break;
+                    }
+                    case 3:
+                    {
+                        chars.Append(QUOTE_BACKSLASH).Append(c);
+                        state = 2;
+                        break;
+                    }
+                    case 4:
+                    {
+                        chars.Append(QUOTE_BACKSLASH).Append(c);
+                        ++pos;
+                        return CHARS;
+                    }
+                    case 10:
+                    {
+                        switch (c)
+                        {
+                            case '{':
+                            {
+                                chars.Append('$').Append('{');
+                                state = 20;
+                                break;
+                            }
+                            case ',':
+                            {   
+                                chars.Append('$');
+                                return CHARS;
+                            }
+                            case '$':
+                            {
+                                chars.Append('$');
+                                break;
+                            }
+                            default:
+                            {
+                                chars.Append('$').Append(c);
+                                ++pos;
+                                return CHARS;
+                            }
+                        }
+                        break;
+                    }
+                    case 20:
+                    {
+                        if (c == '}')
+                        {
+                            chars.Append('}');
+                            ++pos;
+                            return CHARS;
+                        }
+                        else
+                        {
+                            chars.Append(c);
+                        }
+                        break;
+                    }
+                    case 30:
+                    {
+                        switch (c)
+                        {
+                            case '.':
+                            {
+                                ++pos;
+                                return SEQ;
+                            }
+                            case '{': 
+                            case '}': 
+                            case ',':
+                            {
+                                chars.Append('.');
+                                return CHARS;
+                            }
+                            case QUOTE_BACKSLASH:
+                            {
+                                chars.Append('.');
+                                state = 10;
+                                break;
+                            }
+                            default:
+                            {
+                                chars.Append('.').Append(c);
+                                ++pos;
+                                return CHARS;
+                            }
+                        }
+                        break;
+                    }
+                }
+                ++pos;
+            }
+            if (state == 0)
+            {
+                return END;
+            }
+            else
+            {
+                return ERROR;
+            }
+        }
+        private ustring word;
+        private ustring chars;
+        private uchar* start;
+        private uchar* end;
+        private uchar* pos;
+        private int token;
+        private bool expanded;
+        private bool debug;
+    }
+
+    nothrow List<Token> BraceExpand(const Token& word)
+    {
+        BraceExpansionParser parser(word.value);
+        ustring expandedText = parser.Parse();
+        if (parser.Expanded())
+        {
+            Tokenizer tokenizer(expandedText, word.line, word.col, false, false);
+            return tokenizer.Tokenize();
+        }
+        else
+        {
+            List<Token> tokens(1, word);
+            return tokens;
+        }
+    }
+    
+    nothrow List<Token> BraceExpand(const List<Token>& tokens)
+    {
+        List<Token> expandedTokens;
+        for (const Token& token : tokens)
+        {
+            if (token.id == WORD && token.value.Find('{') != -1)
+            {
+                List<Token> braceExpandedTokens = BraceExpand(token);
+                for (const Token& expandedToken : braceExpandedTokens)
+                {
+                    expandedTokens.Add(expandedToken);
+                }
+            }
+            else
+            {
+                expandedTokens.Add(token);
+            }
+        }
+        return expandedTokens;
+    }
+}

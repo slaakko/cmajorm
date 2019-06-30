@@ -1,0 +1,212 @@
+using System;
+using System.Collections;
+
+namespace rex
+{
+    public class State
+    {
+        public nothrow State(int id_): id(id_), accept(false)
+        {
+        }
+        public nothrow inline int Id() const
+        {
+            return id;
+        }
+        public nothrow inline bool Accept() const
+        {
+            return accept;
+        }
+        public nothrow inline void SetAccept()
+        {
+            accept = true;
+        }
+        public nothrow inline void ResetAccept()
+        {
+            accept = false;
+        }
+        public nothrow inline const List<Edge>& Edges() const
+        {
+            return edges;
+        }
+        public nothrow void SetEdges(const List<Edge>& edges_)
+        {
+            edges = edges_;
+        }
+        public nothrow void AddEdge(const Edge& edge)
+        {
+            edges.Add(edge);
+        }
+        public nothrow List<State*> Next(char c) const
+        {
+            List<State*> next;
+            for (const Edge& edge : edges)
+            {
+                Symbol* symbol = edge.GetSymbol();
+                if (symbol->Match(c))
+                {
+                    next.Add(edge.Next());
+                }
+            }
+            return next;
+        }
+        public nothrow string ToString() const
+        {
+            string s;
+            s.Append("state ").Append(ToString(id)).Append(':').Append('\n');
+            s.Append('{').Append('\n');
+            for (const Edge& edge : edges)
+            {
+                s.Append("  ").Append(edge.ToString()).Append('\n');
+            }
+            s.Append('}').Append('\n');
+            return s;
+        }
+        private int id;
+        private bool accept;
+        private List<Edge> edges;
+    }
+
+    public class Edge
+    {
+        public nothrow Edge(Symbol* symbol_, State* next_) : symbol(symbol_), next(next_)
+        {
+        }
+        public nothrow inline Symbol* GetSymbol() const
+        {
+            return symbol;
+        }
+        public nothrow inline State* Next() const
+        {
+            return next;
+        }
+        public nothrow string ToString() const
+        {
+            string s = symbol->ToString();
+            s.Append("->").Append(ToString(next->Id()));
+            return s;
+        }
+        private Symbol* symbol;
+        private State* next;
+    }
+
+    public class Nfa
+    {
+        public nothrow Nfa() : start(null), end(null)
+        {
+        }
+        public nothrow Nfa(State* start_, State* end_) : start(start_), end(end_)
+        {
+        }
+        public nothrow inline bool IsEmpty() const
+        {
+            return start == null && end == null;
+        }
+        public nothrow inline State* Start() const
+        {
+            return start;
+        }
+        public nothrow inline void SetStart(State* start_)
+        {
+            start = start_;
+        }
+        public nothrow inline State* End() const
+        {
+            return end;
+        }
+        public nothrow inline void SetEnd(State* end_)
+        {
+            end = end_;
+        }
+        private State* start;
+        private State* end;
+        private List<State*> states;
+    }
+
+    public nothrow Nfa MakeNfa(Context& context, Symbol* symbol)
+    {
+        State* start = context.MakeState();
+        State* end = context.MakeState();
+        end->SetAccept();
+        start->AddEdge(Edge(symbol, end));
+        return Nfa(start, end);
+    }
+
+    public nothrow Nfa MakeNfa(Context& context, char c)
+    {
+        return MakeNfa(context, context.MakeChar(c));
+    }
+
+    public nothrow Nfa Cat(const Nfa& left, const Nfa& right)
+    {
+        Nfa cat(left);
+        State* leftEnd = cat.End();
+        leftEnd->ResetAccept();
+        State* rightStart = right.Start();
+        leftEnd->SetEdges(rightStart->Edges());
+        cat.SetEnd(right.End());
+        return cat;
+    }
+
+    public nothrow Nfa Alt(Context& context, const Nfa& left, const Nfa& right)
+    {
+        State* leftStart = left.Start();
+        State* leftEnd = left.End();
+        State* rightStart = right.Start();
+        State* rightEnd = right.End();
+        State* start = context.MakeState();
+        State* end = context.MakeState();
+        end->SetAccept();
+        start->AddEdge(Edge(context.MakeEpsilon(), leftStart));
+        start->AddEdge(Edge(context.MakeEpsilon(), rightStart));
+        Nfa alt;
+        alt.SetStart(start);
+        leftEnd->ResetAccept();
+        leftEnd->AddEdge(Edge(context.MakeEpsilon(), end));
+        rightEnd->ResetAccept();
+        rightEnd->AddEdge(Edge(context.MakeEpsilon(), end));
+        alt.SetEnd(end);
+        return alt;
+    }
+
+    public nothrow Nfa Kleene(Context& context, const Nfa& nfa)
+    {
+        Nfa kleene;
+        State* start = context.MakeState();
+        State* end = context.MakeState();
+        end->SetAccept();
+        start->AddEdge(Edge(context.MakeEpsilon(), end));
+        kleene.SetStart(start);
+        State* nfaStart = nfa.Start();
+        start->AddEdge(Edge(context.MakeEpsilon(), nfaStart));
+        State* nfaEnd = nfa.End();
+        nfaEnd->ResetAccept();
+        nfaEnd->AddEdge(Edge(context.MakeEpsilon(), end));
+        nfaEnd->AddEdge(Edge(context.MakeEpsilon(), nfaStart));
+        kleene.SetEnd(end);
+        return kleene;
+    }
+
+    public nothrow Nfa Pos(Context& context, const Nfa& nfa)
+    {
+        Nfa positive;
+        State* start = context.MakeState();
+        State* end = context.MakeState();
+        end->SetAccept();
+        positive.SetStart(start);
+        State* nfaStart = nfa.Start();
+        start->AddEdge(Edge(context.MakeEpsilon(), nfaStart));
+        State* nfaEnd = nfa.End();
+        nfaEnd->ResetAccept();
+        nfaEnd->AddEdge(Edge(context.MakeEpsilon(), end));
+        nfaEnd->AddEdge(Edge(context.MakeEpsilon(), nfaStart));
+        positive.SetEnd(end);
+        return positive;
+    }
+
+    public nothrow Nfa Opt(Context& context, const Nfa& nfa)
+    {
+        Nfa opt(nfa);
+        opt.Start()->AddEdge(Edge(context.MakeEpsilon(), opt.End()));
+        return opt;
+    }
+}

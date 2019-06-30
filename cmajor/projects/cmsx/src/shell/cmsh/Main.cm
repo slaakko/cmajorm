@@ -8,125 +8,169 @@ using System.Collections;
 using System.IO;
 using System.Os;
 using System.Security;
+using cmsh;
 
-private string hostName;
-private int uid = 0;
-private string userName;
-private string home;
-private string shell;
-private string pwd;
-
-void SetEnvironment()
+namespace cmsh
 {
-    if (HasEnv("HOSTNAME"))
+    private string hostName;
+    private int uid = 0;
+    private string userName;
+    private string home;
+    private string shell;
+    private string pwd;
+
+    void SetLoginEnvironment()
     {
-        hostName = GetEnv("HOSTNAME");
-    }
-    else
-    {
-        hostName = GetHostName();
-        SetEnv("HOSTNAME", hostName);
-    }
-    if (HasEnv("UID"))
-    {
-        uid = ParseInt(GetEnv("UID"));
-    }
-    else
-    {
-        uid = GetUID();
-        SetEnv("UID", ToString(uid));
-    }
-    Users users = GetUsers();
-    User* user = users.GetUser(uid);
-    if (HasEnv("USER"))
-    {
-        userName = GetEnv("USER");
-    }
-    else
-    {
-        if (user != null)
+        if (HasEnv("HOSTNAME"))
         {
-            userName = user->Name();
-            SetEnv("USER", userName);
+            hostName = GetEnv("HOSTNAME");
+        }
+        else
+        {
+            hostName = GetHostName();
+            SetEnv("HOSTNAME", hostName);
+        }
+        if (HasEnv("UID"))
+        {
+            uid = ParseInt(GetEnv("UID"));
+        }
+        else
+        {
+            uid = GetUID();
+            SetEnv("UID", ToString(uid));
+        }
+        Users users = GetUsers();
+        User* user = users.GetUser(uid);
+        if (HasEnv("USER"))
+        {
+            userName = GetEnv("USER");
+        }
+        else
+        {
+            if (user != null)
+            {
+                userName = user->Name();
+                SetEnv("USER", userName);
+            }
+        }
+        if (HasEnv("HOME"))
+        {
+            home = GetEnv("HOME");
+        }
+        else
+        {
+            if (user != null)
+            {
+                home = user->Home();
+                SetEnv("HOME", home);
+            }
+        }
+        if (HasEnv("SHELL"))
+        {
+            shell = GetEnv("SHELL");
+        }
+        else
+        {
+            if (user != null)
+            {
+                shell = user->Shell();
+                SetEnv("SHELL", shell);
+            }
         }
     }
-    if (HasEnv("HOME"))
+
+    void SetPWD()
     {
-        home = GetEnv("HOME");
+        pwd = GetCurrentWorkingDirectory();
+        SetEnv("PWD", pwd);
     }
-    else
+
+    void ReadEnvironmentFile()
     {
-        if (user != null)
+        try
         {
-            home = user->Home();
-            SetEnv("HOME", home);
+            if (!File.Exists("/etc/environment"))
+            {
+                throw Exception("warning: /etc/environment does not exist");;
+            }
+            ustring environmentContent = ToUtf32(File.ReadAllText("/etc/environment"));
+            EnvironmentParser parser("/etc/environment", environmentContent);
+            parser.Parse();
+        }
+        catch (const Exception& ex)
+        {
+            Console.Error() << "cmsh: " << ex.Message() << endl();
         }
     }
-    if (HasEnv("SHELL"))
+
+    void Setup()
     {
-        shell = GetEnv("SHELL");
+        SetLoginEnvironment();
+        BeginObeyColorStrings(1);
+        SetPWD();
+        ReadEnvironmentFile();
     }
-    else
+
+    void TearDown()
     {
-        if (user != null)
+        EndObeyColorStrings(1);
+    }
+
+    void PrintEnvironment()
+    {
+        const HashMap<string, string>& environmentVariables = Environment.Instance().Variables();
+        for (const Pair<string, string>& v : environmentVariables)
         {
-            shell = user->Shell();
-            SetEnv("SHELL", shell);
+            Console.Out() << v.first << "=" << v.second << endl();
         }
     }
-}
 
-void SetPWD()
-{
-    pwd = GetCurrentWorkingDirectory();
-    SetEnv("PWD", pwd);
-}
-
-void Setup()
-{
-    SetEnvironment();
-    BeginObeyColorStrings(1);
-    SetPWD();
-}
-
-void TearDown()
-{
-    EndObeyColorStrings(1);
-}
-
-void PrintEnvironment()
-{
-    const HashMap<string, string>& environmentVariables = Environment.Instance().Variables();
-    for (const Pair<string, string>& v : environmentVariables)
+    void PrintPrompt()
     {
-        Console.Out() << v.first << "=" << v.second << endl();
+        ustring loc;
+        loc.Append(BeginColors(ConsoleColor.green, ConsoleColor.black)).Append(ToUtf32(userName)).Append('@').Append(ToUtf32(hostName)).Append(EndColors());
+        ustring cwd;
+        if (pwd.StartsWith(home))
+        {
+            cwd.Append(BeginColors(ConsoleColor.cyan, ConsoleColor.black)).Append('~').Append(ToUtf32(pwd.Substring(home.Length()))).Append(EndColors());
+        }
+        else
+        {
+            cwd.Append(BeginColors(ConsoleColor.cyan, ConsoleColor.black)).Append(ToUtf32(pwd)).Append(EndColors());
+        }
+        ustring prompt = u"$ ";
+        if (uid == 0)
+        {
+            prompt = u"# ";
+        }
+        Console.Out() << loc << ":" << cwd << prompt;
     }
-}
 
-void PrintPrompt()
-{
-    ustring loc;
-    loc.Append(BeginColors(ConsoleColor.green, ConsoleColor.black)).Append(ToUtf32(userName)).Append('@').Append(ToUtf32(hostName)).Append(EndColors());
-    ustring cwd;
-    if (pwd.StartsWith(home))
+    nothrow string ReadLine()
     {
-        cwd.Append(BeginColors(ConsoleColor.cyan, ConsoleColor.black)).Append('~').Append(ToUtf32(pwd.Substring(home.Length()))).Append(EndColors());
+        return Console.ReadLine();
     }
-    else
+    
+    void ProcessLine(const string& line)
     {
-        cwd.Append(BeginColors(ConsoleColor.cyan, ConsoleColor.black)).Append(ToUtf32(pwd)).Append(EndColors());
+        Tokenizer tokenizer(ToUtf32(line));
+        List<Token> tokens = tokenizer.Tokenize();
+        TokenizerFlags flags = tokenizer.GetFlags();
+        for (const Token& token : tokens)
+        {
+            Console.Out() << token.ToString() << endl();
+        }
+        Console.Out() << endl();
+        if ((flags & TokenizerFlags.containsLBrace) != TokenizerFlags.none)
+        {
+            tokens = BraceExpand(tokens);
+            for (const Token& token : tokens)
+            {
+                Console.Out() << token.ToString() << endl();
+            }
+            Console.Out() << endl();
+        }
     }
-    ustring prompt = u"$ ";
-    if (uid == 0)
-    {
-        prompt = u"# ";
-    }
-    Console.Out() << loc << ":" << cwd << prompt;
-}
-
-nothrow string ReadLine()
-{
-    return Console.ReadLine();
 }
 
 int main(int argc, const char** argv)
@@ -136,10 +180,12 @@ int main(int argc, const char** argv)
     try
     {
         Setup();
+        PrintEnvironment();
         PrintPrompt();
         string line = ReadLine();
         while (line != "logout" && line != "exit")
         {
+            ProcessLine(line);
             PrintPrompt();
             line = ReadLine();
         }

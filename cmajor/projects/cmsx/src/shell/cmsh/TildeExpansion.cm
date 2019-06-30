@@ -1,0 +1,146 @@
+// =================================
+// Copyright (c) 2019 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Collections;
+using System.Security;
+
+namespace cmsh
+{
+    public nothrow ustring TildeExpand(const ustring& value, const string& home, const Users& users)
+    {
+        int state = 0;
+        ustring loginName;
+        ustring rest;
+        uchar* start = value.Chars();
+        uchar* end = value.Chars() + value.Length();
+        uchar* pos = start;
+        while (pos != end)
+        {
+            uchar c = *pos;
+            switch (state)
+            {
+                case 0:
+                {
+                    switch (c)
+                    {
+                        case QUOTE_SINGLE:
+                        {
+                            state = 1;
+                            break;
+                        }
+                        case QUOTE_DOUBLE:
+                        {
+                            state = 2;
+                            break;
+                        }
+                        case QUOTE_BACKSLASH:
+                        {
+                            state = 4;
+                            break;
+                        }
+                        case '~':
+                        {
+                            state = 10;
+                            break;
+                        }
+                    }
+                    break;
+                }
+                case 1:
+                {
+                    if (c == QUOTE_SINGLE)
+                    {
+                        state = 0;
+                    }
+                    break;
+                }
+                case 2:
+                {
+                    switch (c)
+                    {
+                        case QUOTE_DOUBLE:
+                        {
+                            state = 0;
+                            break;
+                        }
+                        case QUOTE_BACKSLASH:
+                        {
+                            state = 3;
+                            break;
+                        }   
+                    }
+                    break;
+                }
+                case 3:
+                {
+                    state = 2;
+                    break;
+                }
+                case 4:
+                {
+                    state = 0;
+                    break;
+                }
+                case 10:
+                {
+                    if (c == '/')
+                    {
+                        rest.Append(c);
+                        state = 20;
+                    }
+                    else
+                    {
+                        loginName.Append(c);
+                    }
+                    break;
+                }
+                case 20:
+                {
+                    rest.Append(c);
+                    break;
+                }
+            }
+            ++pos;
+        }
+        if (state < 10)
+        {
+            return value;
+        }
+        else  
+        {
+            if (loginName.IsEmpty())
+            {
+                return ToUtf32(home) + rest;
+            }
+            else
+            {
+                User* user = users.GetUser(ToUtf8(loginName));
+                if (user != null)
+                {
+                    return ToUtf32(user->Home()) + rest;
+                }
+                else
+                {
+                    return value;
+                }
+            }
+        }
+    }
+
+    public nothrow void TildeExpand(List<Token>& tokens, const string& home, const Users& users)
+    {
+        for (Token& token : tokens)
+        {
+            if (token.id == WORD)
+            {
+                if (token.value.StartsWith(u"~"))
+                {
+                    token.value = TildeExpand(token.value, home, users);
+                }
+            }
+        }
+    }
+}

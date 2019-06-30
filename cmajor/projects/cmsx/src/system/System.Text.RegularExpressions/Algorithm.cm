@@ -1,0 +1,105 @@
+using System;
+using System.Collections;
+
+namespace System.Text.RegularExpressions
+{
+    public nothrow List<State*> EpsilonClosure(const List<State*>& states)
+    {
+        Stack<State*> stack;
+        for (State* state : states)
+        {
+            stack.Push(state);
+        }
+        List<State*> epsilonClosure = states;
+        while (!stack.IsEmpty())
+        {
+            State* s = stack.Pop();
+            List<State*> u = s->Next(eps);
+            for (State* v : u)
+            {
+                if (Find(epsilonClosure.CBegin(), epsilonClosure.CEnd(), v) == epsilonClosure.CEnd())
+                {
+                    epsilonClosure.Add(v);
+                    stack.Push(v);
+                }
+            }
+        }
+        return epsilonClosure;
+    }
+
+    public nothrow List<State*> EpsilonClosure(State* state)
+    {
+        List<State*> states(1, state);
+        return EpsilonClosure(states);
+    }
+
+    public nothrow List<State*> Move(const List<State*>& states, char c)
+    {
+        List<State*> next;
+        for (State* state : states)
+        {
+            List<State*> n = state->Next(c);
+            for (State* s : n)
+            {
+                if (Find(next.CBegin(), next.CEnd(), s) == next.CEnd())
+                {
+                    next.Add(s);
+                }
+            }
+        }
+        return next;
+    }
+
+    public nothrow bool Match(const string& s, const Nfa& nfa)
+    {
+        List<State*> states = EpsilonClosure(nfa.Start());
+        for (char c : s)
+        {
+            states = EpsilonClosure(Move(states, c));
+        }
+        for (State* state : states)
+        {
+            if (state->Accept())
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public bool MatchFileNamePattern(const string& s, const string& fileNamePattern)
+    {
+        return MatchFileNamePattern(s, fileNamePattern, false);
+    }
+
+    public bool MatchFileNamePattern(const string& s, const string& fileNamePattern, bool debug)
+    {
+        Context context;
+        FileNamePatternParser parser(context, fileNamePattern);
+        Nfa nfa = parser.Parse();
+        if (debug)
+        {
+            for (State* state : context.States())
+            {
+                Console.Out() << state->ToString() << endl();
+            }
+        }
+        return Match(s, nfa);
+    }
+
+    public List<string> GetMatchingFileNames(const List<string>& fileNames, const string& fileNamePattern)
+    {
+        List<string> matchingFileNames;
+        Context context;
+        FileNamePatternParser parser(context, fileNamePattern);
+        Nfa nfa = parser.Parse();
+        for (const string& fileName : fileNames)
+        {
+            if (Match(fileName, nfa))
+            {
+                matchingFileNames.Add(fileName);
+            }
+        }
+        return matchingFileNames;
+    }
+}

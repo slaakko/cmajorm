@@ -1,0 +1,436 @@
+// =================================
+// Copyright (c) 2019 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Collections;
+
+namespace cmsh
+{
+    public class ParameterExpansionParser
+    {
+        public nothrow ParameterExpansionParser(const ustring& value_, const HashMap<ustring, ustring>& variables_) : 
+            value(value_), start(value.Chars()), end(value.Chars() + value.Length()), pos(start), variables(variables_)
+        {
+        }
+        public nothrow List<Token> Parse()
+        {
+            List<Token> tokens;
+            int state = 0;
+            ustring expandedValue;
+            ustring parameterName;
+            while (pos != end)
+            {
+                uchar c = *pos;
+                switch (state)
+                {
+                    case 0:
+                    {
+                        switch (c)
+                        {
+                            case QUOTE_SINGLE:
+                            {
+                                expandedValue.Append(QUOTE_SINGLE);
+                                state = 1;
+                                break;
+                            }
+                            case QUOTE_DOUBLE:
+                            {
+                                expandedValue.Append(QUOTE_DOUBLE);
+                                state = 2;
+                                break;
+                            }
+                            case QUOTE_BACKSLASH:
+                            {
+                                state = 4;
+                                break;
+                            }
+                            case '$':
+                            {
+                                parameterName.Clear();
+                                state = 10;
+                                break;
+                            }
+                            default:
+                            {
+                                expandedValue.Append(c);
+                                break;
+                            }
+                        }
+                        break;
+                    }
+                    case 1:
+                    {
+                        if (c == QUOTE_SINGLE)
+                        {
+                            expandedValue.Append(QUOTE_SINGLE);
+                            state = 0;
+                        }
+                        else
+                        {
+                            expandedValue.Append(c);
+                        }
+                        break;
+                    }
+                    case 2:
+                    {
+                        switch (c)
+                        {
+                            case QUOTE_DOUBLE:
+                            {
+                                expandedValue.Append(QUOTE_DOUBLE);
+                                state = 0;
+                                break;
+                            }
+                            case QUOTE_BACKSLASH:
+                            {
+                                state = 3;
+                                break;
+                            }   
+                            case '$':
+                            {
+                                parameterName.Clear();
+                                state = 50;
+                                break;
+                            }
+                            default:
+                            {
+                                expandedValue.Append(c);
+                                break;
+                            }
+                        }
+                        break;
+                    }
+                    case 3:
+                    {
+                        expandedValue.Append(QUOTE_BACKSLASH).Append(c);
+                        state = 2;
+                        break;
+                    }
+                    case 4:
+                    {
+                        expandedValue.Append(QUOTE_BACKSLASH).Append(c);
+                        state = 0;
+                        break;
+                    }
+                    case 10:
+                    {
+                        if (c == '{')
+                        {
+                            state = 20;
+                        }
+                        else if (IsLetter(c) || c == '_')
+                        {
+                            parameterName.Append(c);
+                            state = 30;
+                        }
+                        else
+                        {
+                            if (Expand(parameterName, expandedValue, tokens, true))
+                            {
+                                expandedValue.Append(c);
+                                state = 0;
+                            }
+                            else
+                            {
+                                expandedValue.Append(c);
+                                state = 99;
+                            }
+                        }
+                        break;
+                    }
+                    case 20:
+                    {
+                        if (c == '}')
+                        {
+                            if (Expand(parameterName, expandedValue, tokens, true))
+                            {
+                                state = 0;
+                            }
+                            else
+                            {
+                                state = 99;
+                            }
+                        }
+                        else
+                        {
+                            parameterName.Append(c);
+                        }
+                        break;
+                    }
+                    case 30:
+                    {
+                        if (IsLetter(c) || IsAsciiDigit(c) || c == '_')
+                        {
+                            parameterName.Append(c);
+                        }
+                        else
+                        {
+                            if (Expand(parameterName, expandedValue, tokens, true))
+                            {
+                                expandedValue.Append(c);
+                                state = 0;
+                            }
+                            else
+                            {
+                                expandedValue.Append(c);
+                                state = 99;
+                            }
+                        }
+                        break;
+                    }
+                    case 50:
+                    {
+                        if (c == '{')
+                        {
+                            state = 60;
+                        }
+                        else if (IsLetter(c) || c == '_')
+                        {
+                            parameterName.Append(c);
+                            state = 70;
+                        }
+                        else
+                        {
+                            if (Expand(parameterName, expandedValue, tokens, false))
+                            {
+                                expandedValue.Append(c);
+                                state = 2;
+                            }
+                            else
+                            {
+                                expandedValue.Append(c);
+                                state = 99;
+                            }
+                        }
+                        break;
+                    }
+                    case 60:
+                    {
+                        if (c == '}')
+                        {
+                            if (Expand(parameterName, expandedValue, tokens, false))
+                            {
+                                state = 2;
+                            }
+                            else
+                            {
+                                state = 99;
+                            }
+                        }
+                        else
+                        {
+                            parameterName.Append(c);
+                        }
+                        break;
+                    }
+                    case 70:
+                    {
+                        if (IsLetter(c) || IsAsciiDigit(c) || c == '_')
+                        {
+                            parameterName.Append(c);
+                        }
+                        else
+                        {
+                            if (Expand(parameterName, expandedValue, tokens, false))
+                            {
+                                expandedValue.Append(c);
+                                state = 2;
+                            }
+                            else
+                            {
+                                expandedValue.Append(c);
+                                state = 99;
+                            }
+                        }
+                        break;
+                    }
+                    case 99:
+                    {
+                        expandedValue.Append(c);
+                        break;
+                    }
+                }
+                ++pos;
+            }
+            switch (state)
+            {
+                case 10:
+                {
+                    expandedValue.Append('$');
+                    tokens.Add(Token(WORD, expandedValue, 1, 1));
+                    break;
+                }
+                case 20:
+                {
+                    expandedValue.Append('$').Append('{').Append(parameterName);
+                    tokens.Add(Token(WORD, expandedValue, 1, 1));
+                    break;
+                }
+                case 30:
+                {
+                    Expand(parameterName, expandedValue, tokens, true);
+                    if (!expandedValue.IsEmpty())
+                    {
+                        tokens.Add(Token(WORD, expandedValue, 1, 1));
+                    }
+                    break;
+                }
+                case 50:
+                {
+                    expandedValue.Append('$');
+                    tokens.Add(Token(WORD, expandedValue, 1, 1));
+                    break;
+                }
+                case 60:
+                {
+                    expandedValue.Append('$').Append('{').Append(parameterName);
+                    tokens.Add(Token(WORD, expandedValue, 1, 1));
+                    break;
+                }
+                case 70:
+                {
+                    Expand(parameterName,  expandedValue, tokens, false);
+                    if (!expandedValue.IsEmpty())
+                    {
+                        tokens.Add(Token(WORD, expandedValue, 1, 1));
+                    }
+                    break;
+                }
+                default:
+                {
+                    if (!expandedValue.IsEmpty())
+                    {
+                        tokens.Add(Token(WORD, expandedValue, 1, 1));
+                    }
+                    break;
+                }
+            }
+            return tokens;
+        }
+        private nothrow bool Expand(const ustring& parameterName, ustring& expandedValue, List<Token>& tokens, bool split)
+        {
+            ustring expandedText;
+            bool expanded = false;
+            HashMap<ustring, ustring>.ConstIterator it = variables.CFind(parameterName);
+            if (it != variables.CEnd())
+            {
+                expandedText.Append(it->second);
+                expanded = true;
+            }
+            else
+            {
+                string envName = ToUtf8(parameterName);
+                if (HasEnv(envName))
+                {
+                    expandedText.Append(ToUtf32(GetEnv(envName)));
+                    expanded = true;
+                }
+                else
+                {
+                    expandedText.Append('$').Append(parameterName);
+                }
+            }
+            if (expanded && split)
+            {
+                List<ustring> words = SplitIntoWords(expandedText);
+                long n = words.Count();
+                if (n > 0)
+                {
+                    expandedValue.Append(words.Front());
+                    if (n > 1)
+                    {
+                        tokens.Add(Token(WORD, expandedValue, 1, 1));
+                        expandedValue.Clear();
+                    }
+                }
+                for (long i = 1; i < n - 1; ++i)
+                {
+                    tokens.Add(Token(WORD, words[i], 1, 1));
+                }
+                if (n > 1)
+                {
+                    expandedValue = words.Back();
+                }
+            }
+            else
+            {
+                expandedValue.Append(expandedText);
+            }
+            return expanded;
+        }
+        private nothrow List<ustring> SplitIntoWords(const ustring& text)
+        {
+            int state = 0;
+            List<ustring> words;
+            ustring word;
+            for (uchar c : text)
+            {
+                switch (state)
+                {
+                    case 0:
+                    {
+                        if (c != ' ' && c != '\t' && c != '\n')
+                        {
+                            word.Append(c);
+                            state = 1;
+                        }
+                        break;
+                    }
+                    case 1:
+                    {
+                        if (c == ' ' || c == '\t' || c == '\n')
+                        {
+                            words.Add(word);
+                            word.Clear();
+                            state = 0;
+                        }
+                        else
+                        {
+                            word.Append(c);
+                        }
+                        break;
+                    }
+                }
+            }
+            if (state == 1)
+            {
+                words.Add(word);
+            }
+            return words;
+        }
+        private ustring value;
+        private uchar* start;
+        private uchar* end;
+        private uchar* pos;
+        private const HashMap<ustring, ustring>& variables;
+    }
+    
+    nothrow List<Token> ExpandParameters(const Token& token, const HashMap<ustring, ustring>& variables)
+    {
+        ParameterExpansionParser parser(token.value, variables);
+        return parser.Parse();
+    }
+    
+    nothrow List<Token> ExpandParameters(const List<Token>& tokens, const HashMap<ustring, ustring>& variables)
+    {
+        List<Token> expandedTokens;
+        for (const Token& token : tokens)
+        {
+            if (token.id == WORD && token.value.Find('$') != -1)
+            {
+                List<Token> parameterExpandedTokens = ExpandParameters(token, variables);
+                for (const Token& expandedToken : parameterExpandedTokens)
+                {
+                    expandedTokens.Add(expandedToken);
+                }
+            }
+            else
+            {
+                expandedTokens.Add(token);
+            }
+        }
+        return expandedTokens;
+    }
+}

@@ -1,0 +1,207 @@
+// =================================
+// Copyright (c) 2019 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+
+namespace cmsh
+{
+    public class EnvironmentParser
+    {
+        private const int ERROR = -1;
+        private const int END = 0;
+        private const int NAME = 1;
+        private const int EQ = 2;
+        private const int STRING = 3;
+        private const int NL = 4;
+        
+        public nothrow EnvironmentParser(const string& fileName_, const ustring& content_) : 
+            fileName(fileName_), line(1), col(0), content(content_), start(content.Chars()), end(content.Chars() + content.Length()), pos(start), token(END)
+        {
+        }
+        public void Parse()
+        {
+            token = GetToken();
+            while (token != END)
+            {
+                ParseKleene(NL);
+                ParseEnvVar();
+                ParseSeparator(NL);
+            }
+        }
+        private void ParseEnvVar()
+        {
+            ustring name;
+            ustring value;
+            ParseToken(NAME, name, "environment variable name expected");
+            ParseToken(EQ);
+            ParseToken(STRING, value, "environment variable value enclosed in double quotes expected");
+            SetEnv(ToUtf8(name), ToUtf8(value));
+        }
+        private void ParseKleene(int t)
+        {
+            while (token == t)
+            {
+                token = GetToken();
+            }
+        }
+        private void ParseToken(int t)
+        {
+            if (token != t)
+            {
+                Error(TokenStr(t) + " expected");
+            }
+            token = GetToken();
+        }
+        private void ParseToken(int t, ustring& value, const string& errorMessage)
+        {
+            if (token == t)
+            {
+                value = tokenValue;
+                token = GetToken();
+            }
+            else
+            {
+                Error(errorMessage);
+            }
+        }
+        private void ParseSeparator(int t)
+        {
+            if (token != END)
+            {
+                ParseToken(t);
+            }
+        }
+        private void Error(const string& errorMessage)
+        {
+            throw Exception("error: " + errorMessage + " in " + fileName + " at line " + ToString(line) + " column " + ToString(col));
+        }
+        private nothrow int GetToken()
+        {
+            int state = 0;
+            tokenValue.Clear();
+            while (pos != end)
+            {
+                ++col;
+                uchar c = *pos;
+                switch (state)
+                {
+                    case 0:
+                    {
+                        if (IsLetter(c) || c == '_') 
+                        {
+                            tokenValue.Append(c);
+                            state = 1; 
+                        }
+                        else if (c == '=')
+                        {
+                            ++pos;
+                            return EQ;
+                        }
+                        else if (c == '"')
+                        {
+                            state = 2;
+                        }
+                        else if (c == '\n')
+                        {
+                            ++pos;
+                            ++line;
+                            col = 0;
+                            return NL;
+                        }
+                        else if (c == '#')
+                        {
+                            state = 4;
+                        }
+                        break;
+                    }
+                    case 1:
+                    {
+                        if (IsLetter(c) || IsAsciiDigit(c) || c == '_')
+                        {
+                            tokenValue.Append(c);
+                        }
+                        else
+                        {
+                            return NAME;
+                        }
+                        break;
+                    }
+                    case 2:
+                    {
+                        if (c == '"')
+                        {
+                            ++pos;
+                            return STRING;
+                        }
+                        else if (c == '\\')
+                        {
+                            state = 3;
+                        }
+                        else if (c == '\n')
+                        {
+                            return ERROR;
+                        }
+                        else
+                        {
+                            tokenValue.Append(c);
+                        }
+                        break;
+                    }
+                    case 3:
+                    {
+                        tokenValue.Append(c);
+                        state = 2;
+                        break;
+                    }
+                    case 4:
+                    {
+                        if (c == '\n')
+                        {
+                            ++line;
+                            col = 0;
+                            state = 0;
+                        }
+                        break;
+                    }
+                }
+                ++pos;
+            }
+            if (state == 0)
+            {
+                return END;
+            }
+            else if (state == 1)
+            {
+                return NAME;
+            }
+            else
+            {
+                return ERROR;
+            }
+        }
+        private nothrow string TokenStr(int t)
+        {
+            switch (t)
+            {
+                case ERROR: return "ERROR";
+                case END: return "END";
+                case NAME: return "NAME";
+                case EQ: return "=";
+                case STRING: return "STRING";
+                case NL: return "newline";
+            }
+            return string();
+        }
+        private string fileName;
+        private int line;
+        private int col;
+        private ustring content;
+        private int token;
+        private uchar* start;
+        private uchar* end;
+        private uchar* pos;
+        private ustring tokenValue;
+    }
+}

@@ -1,0 +1,290 @@
+// =================================
+// Copyright (c) 2019 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Collections;
+using System.IO;
+using System.Text.RegularExpressions;
+
+namespace cmsh
+{
+    nothrow bool ContainsPatternChar(const ustring& value)
+    {
+        for (uchar c : value)
+        {
+            if (c == '*' || c == '?' || c == '[') return true;
+        }
+        return false;
+    }
+
+    public class FileNameExpansionParser
+    {
+        private const int END = 0;
+        private const int COMPONENT = 1;
+        
+        public nothrow FileNameExpansionParser(const ustring& value_) : value(value_), start(value.Chars()), end(value.Chars() + value.Length()), pos(start)
+        {
+        }
+        public List<Token> Parse()
+        {
+            List<Token> tokens;
+            try
+            {
+                List<Pair<ustring, bool>> components;
+                int token = GetToken();
+                while (token == COMPONENT)
+                {
+                    components.Add(MakePair(component, patternCharInComponent));
+                    token = GetToken();
+                }
+                List<ustring> paths = Combine(u"", components);
+                for (const ustring& path : paths)
+                {
+                    tokens.Add(Token(WORD, path, 1, 1));
+                }
+            }
+            catch (const Exception& ex)
+            {
+                Console.Error() << "cmsh: warning: " << ex.Message() << endl();
+                return List<Token>();
+            }
+            return tokens;
+        }
+        private List<ustring> Combine(const ustring& prefix, const List<Pair<ustring, bool>>& components)
+        {
+            List<ustring> combinations;
+            ustring pre = prefix;
+            long n = components.Count();
+            bool expanded = false;
+            for (long i = 0; i < n; ++i)
+            {
+                const Pair<ustring, bool>& c = components[i];
+                if (prefix.IsEmpty() && i == 0 && c.first.IsEmpty())
+                {
+                    pre.Append('/');
+                }
+                else
+                {
+                    if (c.second)
+                    {
+                        List<ustring> prefixes = Expand(pre, c.first);
+                        List<Pair<ustring, bool>> suffix;
+                        for (long j = i + 1; j < n; ++j)
+                        {
+                            suffix.Add(components[j]);
+                        }
+                        for (const ustring& p : prefixes)
+                        {
+                            List<ustring> c = Combine(p, suffix);
+                            for (const ustring& u : c)
+                            {
+                                combinations.Add(u);
+                            }
+                        }
+                        expanded = true;
+                    }
+                    else if (pre.IsEmpty())
+                    {
+                        pre.Append(c.first);
+                    }
+                    else
+                    {
+                        pre.Append('/').Append(c.first);
+                    }
+                }
+            }
+            if (!expanded)
+            {
+                combinations.Add(pre);
+            }
+            return combinations;
+        }
+        private List<ustring> Expand(const ustring& prefix, const ustring& pattern)
+        {
+            string dirPath = ToUtf8(prefix);
+            if (dirPath.IsEmpty())
+            {
+                dirPath = ".";
+            }
+            List<string> fileNames;
+            DirectoryEntry dirEntry;
+            DirectoryReader reader(dirPath);
+            while (reader.Read(dirEntry))
+            {
+                string fileName = &dirEntry.name[0];
+                if (fileName != "." && fileName != "..")
+                {
+                    fileNames.Add(fileName);
+                }
+            }
+            List<string> matchingFileNames = GetMatchingFileNames(fileNames, ToUtf8(pattern));
+            Sort(matchingFileNames);
+            List<ustring> expanded;
+            string directory = ToUtf8(prefix);
+            for (const string& fileName : matchingFileNames)
+            {
+                if (directory.IsEmpty())
+                {
+                    expanded.Add(ToUtf32(fileName));
+                }
+                else
+                {
+                    expanded.Add(ToUtf32(Path.Combine(directory, fileName)));
+                }
+            }
+            return expanded;
+        }
+        private nothrow int GetToken()
+        {
+            patternCharInComponent = false;
+            component.Clear();
+            int state = 0;
+            while (pos != end)
+            {
+                uchar c = *pos;
+                switch (state)
+                {
+                    case 0:
+                    {
+                        switch (c)
+                        {
+                            case QUOTE_SINGLE:
+                            {
+                                component.Append('\'');
+                                state = 1;
+                                break;
+                            }
+                            case QUOTE_DOUBLE:
+                            {
+                                component.Append('"');
+                                state = 2;
+                                break;
+                            }
+                            case QUOTE_BACKSLASH:
+                            {
+                                state = 4;
+                                break;
+                            }
+                            case '/':
+                            {
+                                ++pos;
+                                return COMPONENT;
+                            }
+                            case '*':
+                            case '?':
+                            case '[':
+                            {
+                                patternCharInComponent = true;
+                                component.Append(c);
+                                break;
+                            }
+                            default:
+                            {
+                                component.Append(c);
+                                break;
+                            }
+                        }
+                        break;
+                    }
+                    case 1:
+                    {
+                        if (c == QUOTE_SINGLE)
+                        {
+                            component.Append('\'');
+                        }
+                        else
+                        {
+                            component.Append(c);
+                        }
+                        break;
+                    }
+                    case 2:
+                    {
+                        switch (c)
+                        {
+                            case QUOTE_DOUBLE:
+                            {
+                                component.Append('"');
+                                state = 0;
+                                break;
+                            }
+                            case QUOTE_BACKSLASH:
+                            {
+                                state = 3;
+                                break;
+                            }   
+                            default:
+                            {
+                                component.Append(c);
+                                break;
+                            }
+                        }
+                        break;
+                    }
+                    case 3:
+                    {
+                        component.Append(c);
+                        state = 2;
+                        break;
+                    }
+                    case 4:
+                    {
+                        component.Append(c);
+                        state = 0;
+                        break;
+                    }
+                }
+                ++pos;
+            }
+            if (!component.IsEmpty())
+            {
+                return COMPONENT;
+            }
+            return END;
+        }
+        private ustring value;
+        private uchar* start;
+        private uchar* end;
+        private uchar* pos;
+        private ustring component;
+        private bool patternCharInComponent;
+        private List<string> paths;
+    }
+    
+    nothrow List<Token> ExpandFileNamePatterns(const Token& token)
+    {
+        FileNameExpansionParser parser(token.value);
+        List<Token> pathTokens = parser.Parse();
+        if (pathTokens.IsEmpty())
+        {
+            return List<Token>(1, token);
+        }
+        else
+        {
+            return pathTokens;
+        }
+    }
+
+    nothrow List<Token> ExpandFileNamePatterns(const List<Token>& tokens)
+    {
+        List<Token> expandedTokens;
+        for (const Token& token : tokens)
+        {
+            if (token.id == WORD && ContainsPatternChar(token.value))
+            {
+                List<Token> patternExpandedTokens = ExpandFileNamePatterns(token);
+                for (const Token& expandedToken : patternExpandedTokens)
+                {
+                    expandedTokens.Add(expandedToken);
+                }
+            }
+            else
+            {
+                expandedTokens.Add(token);
+            }
+        }
+        return expandedTokens;
+    }
+}

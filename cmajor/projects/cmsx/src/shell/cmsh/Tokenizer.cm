@@ -1,0 +1,446 @@
+// =================================
+// Copyright (c) 2019 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Collections;
+
+namespace cmsh
+{
+    public const int ERROR = -1;
+    public const int END = 0;
+    public const int WORD = 1;
+    public const int NL = 2;
+    public const int PIPE = 3;
+    public const int AMPER = 4;
+    public const int SEMICOLON = 5;
+    public const int LPAREN = 6;
+    public const int RPAREN = 7;
+    public const int LANGLE = 8;
+    public const int RANGLE = 9;
+    
+    public const uchar QUOTE_BACKSLASH = cast<uchar>(0xE000u);
+    public const uchar QUOTE_SINGLE = cast<uchar>(0xE001u);
+    public const uchar QUOTE_DOUBLE = cast<uchar>(0xE002u);
+    
+    public nothrow string TokenIdStr(int tokenId)
+    {
+        switch (tokenId)
+        {
+            case ERROR: return "ERROR";
+            case END: return "END";
+            case WORD: return "WORD";
+            case PIPE: return "PIPE";
+            case AMPER: return "AMPER";
+            case SEMICOLON: return "SEMICOLON";
+            case LPAREN: return "LPAREN";
+            case RPAREN: return "RPAREN";
+            case LANGLE: return "LANGLE";
+            case RANGLE: return "RANGLE";
+        }
+        return string();
+    }
+
+    public class Token
+    {
+        public nothrow Token(int id_, const ustring& value_, int line_, int col_) : id(id_), value(value_), line(line_), col(col_)
+        {
+        }
+        public nothrow string ToString()
+        {
+            string s;
+            s.Append("token(").Append(TokenIdStr(id)).Append(':').Append(ToUtf8(value)).Append(':').Append(ToString(line)).Append(':').Append(ToString(col)).Append(')');
+            return s;
+        }
+        public int id;
+        public ustring value;
+        public int line;
+        public int col;
+    }
+    
+    public enum TokenizerFlags : int
+    {
+        none = 0, 
+        containsLBrace = 1 << 0,
+        containsTilde = 1 << 1,
+        containsDollar = 1 << 2,
+        containsPatternChar = 1 << 3
+    }
+    
+    public void PrintTokens(const List<Token>& tokens)
+    {
+        for (const Token& token : tokens)
+        {
+            Console.Out() << token.ToString() << endl();
+        }
+    }
+    
+    public class Tokenizer
+    {
+        public nothrow Tokenizer(const ustring& content_) : this(content_, 1, 1, true, true)
+        {
+        }
+        public nothrow Tokenizer(const ustring& content_, int line_, int col_, bool quote_, bool genEnd_) : 
+            content(content_), start(content.Chars()), end(content.Chars() + content.Length()), pos(start), line(line_), col(col_), quote(quote_), genEnd(genEnd_)
+        {
+        }
+        public nothrow inline TokenizerFlags GetFlags()const
+        {
+            return flags;
+        }
+        public nothrow List<Token> Tokenize()
+        {
+            flags = TokenizerFlags.none;
+            List<Token> tokens;
+            int state = 0;
+            int column = 1;
+            ustring tokenValue;
+            while (pos != end)
+            {
+                uchar c = *pos;
+                switch (state)
+                {
+                    case 0:
+                    {
+                        switch (c)
+                        {
+                            case '\'':
+                            {
+                                if (quote)
+                                {
+                                    tokenValue.Append(QUOTE_SINGLE);
+                                }
+                                else
+                                {
+                                    tokenValue.Append('\'');
+                                }
+                                state = 1;
+                                break;
+                            }
+                            case '"':
+                            {
+                                if (quote)
+                                {
+                                    tokenValue.Append(QUOTE_DOUBLE);
+                                }
+                                else
+                                {
+                                    tokenValue.Append('"');
+                                }
+                                state = 2;
+                                break;
+                            }
+                            case '\\':
+                            {
+                                state = 4;
+                                break;
+                            }
+                            case ' ': case '\t':  
+                            {
+                                if (!tokenValue.IsEmpty())
+                                {
+                                    tokens.Add(Token(WORD, tokenValue, line, column));
+                                }
+                                tokenValue.Clear();
+                                column = 0;
+                                break;
+                            }
+                            case '\n':
+                            {
+                                if (!tokenValue.IsEmpty())
+                                {
+                                    tokens.Add(Token(WORD, tokenValue, line, column));
+                                }
+                                tokenValue.Clear();
+                                tokens.Add(Token(NL, ustring(), line, col));
+                                ++line;
+                                col = 1;
+                                column = 0;
+                                break;
+                            }
+                            case '|':
+                            {
+                                if (!tokenValue.IsEmpty())
+                                {
+                                    tokens.Add(Token(WORD, tokenValue, line, column));
+                                }
+                                tokenValue.Clear();
+                                column = 0;
+                                tokens.Add(Token(PIPE, ustring(), line, col));
+                                break;
+                            }
+                            case '&':
+                            {
+                                if (!tokenValue.IsEmpty())
+                                {
+                                    tokens.Add(Token(WORD, tokenValue, line, column));
+                                }
+                                tokenValue.Clear();
+                                column = 0;
+                                tokens.Add(Token(AMPER, ustring(), line, col));
+                                break;
+                            }
+                            case ';':
+                            {
+                                if (!tokenValue.IsEmpty())
+                                {
+                                    tokens.Add(Token(WORD, tokenValue, line, column));
+                                }
+                                tokenValue.Clear();
+                                column = 0;
+                                tokens.Add(Token(SEMICOLON, ustring(), line, col));
+                                break;
+                            }
+                            case '(':
+                            {
+                                if (!tokenValue.IsEmpty())
+                                {
+                                    tokens.Add(Token(WORD, tokenValue, line, column));
+                                }
+                                tokenValue.Clear();
+                                column = 0;
+                                tokens.Add(Token(LPAREN, ustring(), line, col));
+                                break;
+                            }
+                            case ')':
+                            {
+                                if (!tokenValue.IsEmpty())
+                                {
+                                    tokens.Add(Token(WORD, tokenValue, line, column));
+                                }
+                                tokenValue.Clear();
+                                column = 0;
+                                tokens.Add(Token(RPAREN, ustring(), line, col));
+                                break;
+                            }
+                            case '<':
+                            {
+                                if (!tokenValue.IsEmpty())
+                                {
+                                    tokens.Add(Token(WORD, tokenValue, line, column));
+                                }
+                                tokenValue.Clear();
+                                column = 0;
+                                tokens.Add(Token(RANGLE, ustring(), line, col));
+                                break;
+                            }
+                            case '>':
+                            {
+                                if (!tokenValue.IsEmpty())
+                                {
+                                    tokens.Add(Token(WORD, tokenValue, line, column));
+                                }
+                                tokenValue.Clear();
+                                column = 0;
+                                tokens.Add(Token(RANGLE, ustring(), line, col));
+                                break;
+                            }
+                            default:
+                            {
+                                switch (c)
+                                {
+                                    case '{': 
+                                    {
+                                        flags = cast<TokenizerFlags>(flags | TokenizerFlags.containsLBrace);
+                                        break;
+                                    }
+                                    case '~':
+                                    {
+                                        flags = cast<TokenizerFlags>(flags | TokenizerFlags.containsTilde);
+                                        break;
+                                    }
+                                    case '$':
+                                    {
+                                        flags = cast<TokenizerFlags>(flags | TokenizerFlags.containsDollar);
+                                        break;
+                                    }
+                                    case '*':
+                                    case '?':
+                                    case '[':
+                                    {
+                                        flags = cast<TokenizerFlags>(flags | TokenizerFlags.containsPatternChar);
+                                        break;
+                                    }
+                                }
+                                tokenValue.Append(c);
+                                if (column == 0)
+                                {
+                                    column = col;
+                                }
+                                break;
+                            }
+                        }
+                        break;
+                    }
+                    case 1:
+                    {
+                        if (c == '\'')
+                        {
+                            if (quote)
+                            {
+                                tokenValue.Append(QUOTE_SINGLE);
+                            }
+                            else
+                            {
+                                tokenValue.Append('\'');
+                            }
+                            state = 0;
+                        }
+                        else if (c == '\n')
+                        {
+                            tokens.Add(Token(ERROR, tokenValue, line, column));
+                            tokenValue.Clear();
+                            column = 0;
+                            ++line;
+                            col = 1;
+                            state = 0;
+                        }
+                        else
+                        {
+                            tokenValue.Append(c);
+                        }
+                        break;
+                    }
+                    case 2:
+                    {
+                        switch (c)
+                        {
+                            case '"':
+                            {
+                                if (quote)
+                                {
+                                    tokenValue.Append(QUOTE_DOUBLE);
+                                }
+                                else
+                                {
+                                    tokenValue.Append('"');
+                                }
+                                state = 0;
+                                break;
+                            }
+                            case '\n':
+                            {
+                                tokens.Add(Token(ERROR, tokenValue, line, column));
+                                tokenValue.Clear();
+                                ++line;
+                                column = 0;
+                                col = 1;
+                                state = 0;
+                                break;
+                            }
+                            case '\\':
+                            {
+                                state = 3;
+                                break;
+                            }
+                            case '$':
+                            {
+                                flags = cast<TokenizerFlags>(flags | TokenizerFlags.containsDollar);
+                                tokenValue.Append('$');
+                                break;
+                            }
+                            default:
+                            {
+                                tokenValue.Append(c);
+                                break;
+                            }
+                        }
+                        break;
+                    }
+                    case 3:
+                    {
+                        switch (c)
+                        {
+                            case '\n':
+                            {
+                                tokens.Add(Token(NL, tokenValue, line, column));
+                                tokenValue.Clear();
+                                ++line;
+                                column = 0;
+                                col = 1;
+                                state = 2;
+                                break;
+                            }
+                            default:
+                            {
+                                if (quote)
+                                {
+                                    tokenValue.Append(QUOTE_BACKSLASH).Append(c);
+                                }
+                                else
+                                {
+                                    tokenValue.Append('\\').Append(c);
+                                }
+                                state = 2;
+                                break;
+                            }
+                        }
+                        break;
+                    }
+                    case 4:
+                    {
+                        if (c == '\n')
+                        {
+                            ++line;
+                            col = 1;
+                        }
+                        else
+                        {
+                            if (quote)
+                            {
+                                tokenValue.Append(QUOTE_BACKSLASH).Append(c);
+                            }
+                            else
+                            {
+                                tokenValue.Append('\\').Append(c);
+                            }
+                        }
+                        state = 0;
+                        break;
+                    }
+                }
+                ++pos;
+                ++col;
+            }
+            switch (state)
+            {
+                case 0:
+                {
+                    if (!tokenValue.IsEmpty())
+                    {
+                        tokens.Add(Token(WORD, tokenValue, line, column));
+                    }
+                    if (genEnd)
+                    {
+                        tokens.Add(Token(END, ustring(), line, col));
+                    }
+                    break;
+                }
+                default:
+                {
+                    tokens.Add(Token(ERROR, tokenValue, line, col));
+                    break;
+                }
+            }
+            return tokens;
+        }
+        private ustring content;
+        private uchar* start;
+        private uchar* end;
+        private uchar* pos;
+        private int line;
+        private int col;
+        private TokenizerFlags flags;
+        private bool quote;
+        private bool genEnd;
+    }
+    
+    public List<Token> Tokenize(const string& line, TokenizerFlags& flags)
+    {
+        Tokenizer tokenizer(ToUtf32(line));
+        List<Token> tokens = tokenizer.Tokenize();
+        flags = tokenizer.GetFlags();
+        return tokens;
+    }
+}

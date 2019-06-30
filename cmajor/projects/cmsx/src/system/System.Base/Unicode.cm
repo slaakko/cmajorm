@@ -2176,24 +2176,21 @@ namespace System.Unicode
             CharacterInfoPage* page = pages[pageIndex].Get();
             if (page == null)
             {
-                if (page == null)
+                string pathToUcdBinFile = PathToUcdBinFile();
+                if (!File.Exists(pathToUcdBinFile))
                 {
-                    string pathToUcdBinFile = PathToUcdBinFile();
-                    if (!File.Exists(pathToUcdBinFile))
-                    {
-                        throw UnicodeException("Error: Cmajor Unicode database file '" + pathToUcdBinFile + "' does not exist.");
-                    }
-                    BinaryReader reader = File.OpenBinary(pathToUcdBinFile);
-                    if (!headerRead)
-                    {
-                        ReadHeader(reader);
-                    }
-                    uint pageStart = headerSize + characterInfoPageSize * cast<uint>(pageIndex);
-                    reader.Seek(cast<long>(pageStart), Origin.seekSet);
-                    page = new CharacterInfoPage();
-                    page->Read(reader);
-                    pages[pageIndex].Reset(page);
+                    throw UnicodeException("Error: Cmajor Unicode database file '" + pathToUcdBinFile + "' does not exist.");
                 }
+                BinaryReader reader = File.OpenBinary(pathToUcdBinFile);
+                if (!headerRead)
+                {
+                    ReadHeader(reader);
+                }
+                uint pageStart = headerSize + characterInfoPageSize * cast<uint>(pageIndex);
+                reader.Seek(cast<long>(pageStart), Origin.seekSet);
+                page = new CharacterInfoPage();
+                page->Read(reader);
+                pages[pageIndex].Reset(page);
             }
             long infoIndex = cast<long>(codePoint) % numInfosInPage;
             return (*page)[infoIndex];

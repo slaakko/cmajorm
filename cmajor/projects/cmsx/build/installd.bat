@@ -8,8 +8,11 @@ xcopy /Y /D coreutil\ls\bin\debug ..\bind
 xcopy /Y /D coreutil\mkdir\bin\debug ..\bind
 xcopy /Y /D coreutil\mv\bin\debug ..\bind
 xcopy /Y /D coreutil\passwd\bin\debug ..\bind
+xcopy /Y /D coreutil\pwd\bin\debug ..\bin
 xcopy /Y /D coreutil\rm\bin\debug ..\bind
 xcopy /Y /D coreutil\rmdir\bin\debug ..\bind
 xcopy /Y /D coreutil\time\bin\debug ..\bind
 xcopy /Y /D coreutil\umask\bin\debug ..\bind
+xcopy /Y /D coreutil\wc\bin\debug ..\bin
+xcopy /Y /D coreutil\whoami\bin\debug ..\bin
 xcopy /Y /D shell\cmsh\bin\debug ..\bind
