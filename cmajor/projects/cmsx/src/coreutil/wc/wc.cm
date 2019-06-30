@@ -6,6 +6,7 @@
 using System;
 using System.Collections;
 using System.IO;
+using System.Text;
 
 public enum Counts
 {
@@ -14,6 +15,14 @@ public enum Counts
     words = 1 << 1,
     lines = 1 << 2,
     all = bytes | words | lines
+}
+
+public class CountData
+{
+    public string lines;
+    public string words;
+    public string bytes;
+    public string file;
 }
 
 void PrintHelp()
@@ -36,8 +45,63 @@ void PrintHelp()
     Console.Out() << "  Read standard input." << endl() << endl();
 }
 
-void Count(const string& file, Counts counts, int& totalBytes, int& totalWords, int& totalLines)
+void CalculateFieldWidths(const List<CountData>& counts, int& linesWidth, int& wordsWidth, int& bytesWidth)
 {
+    linesWidth = 0;
+    wordsWidth = 0;
+    bytesWidth = 0;
+    for (const CountData& fileCounts : counts)
+    {
+        long linesLength = fileCounts.lines.Length();
+        if (linesLength > linesWidth) linesWidth = cast<int>(linesLength);
+        long wordsLength = fileCounts.words.Length();
+        if (wordsLength > wordsWidth) wordsWidth = cast<int>(wordsLength);
+        long bytesLength = fileCounts.bytes.Length();
+        if (bytesLength > bytesWidth) bytesWidth = cast<int>(bytesLength);
+    }
+}
+
+void Print(Counts counts, const List<CountData>& fileCounts)
+{
+    int linesWidth = 0;
+    int wordsWidth = 0;
+    int bytesWidth = 0;
+    CalculateFieldWidths(fileCounts, linesWidth, wordsWidth, bytesWidth);
+    for (const CountData& fileData : fileCounts)
+    {
+        string line;
+        if ((counts & Counts.lines) != Counts.none)
+        {
+            line.Append(Format(fileData.lines, linesWidth, FormatJustify.right));
+        }
+        if ((counts & Counts.words) != Counts.none)
+        {
+            if (!line.IsEmpty())
+            {
+                line.Append(' ');
+            }
+            line.Append(Format(fileData.words, wordsWidth, FormatJustify.right));
+        }
+        if ((counts & Counts.bytes) != Counts.none)
+        {
+            if (!line.IsEmpty())
+            {
+                line.Append(' ');
+            }
+            line.Append(Format(fileData.bytes, bytesWidth, FormatJustify.right));
+        }
+        if (!line.IsEmpty())
+        {
+            line.Append(' ');
+        }
+        line.Append(fileData.file);
+        Console.Out() << line << endl();
+    }
+}
+
+CountData Count(const string& file, Counts counts, int& totalBytes, int& totalWords, int& totalLines)
+{
+    CountData fileCounts;
     int bytes = 0;
     int words = 0;
     int lines = 0;
@@ -146,39 +210,26 @@ void Count(const string& file, Counts counts, int& totalBytes, int& totalWords, 
     {
         ++words;
     }
-    string countLine;
     if ((counts & Counts.lines) != Counts.none)
     {
-        countLine.Append(ToString(lines));
+        fileCounts.lines = ToString(lines);
     }
     if ((counts & Counts.words) != Counts.none)
     {
-        if (!countLine.IsEmpty())
-        {
-            countLine.Append(' ');
-        }
-        countLine.Append(ToString(words));
+        fileCounts.words = ToString(words);
     }
     if ((counts & Counts.bytes) != Counts.none)
     {
-        if (!countLine.IsEmpty())
-        {
-            countLine.Append(' ');
-        }
-        countLine.Append(ToString(bytes));
+        fileCounts.bytes = ToString(bytes);
     }
     if (!file.IsEmpty())
     {
-        if (!countLine.IsEmpty())
-        {
-            countLine.Append(' ');
-        }
-        countLine.Append(file);
+        fileCounts.file = file;
     }
-    Console.Out() << countLine << endl();
     totalBytes = totalBytes + bytes;
     totalWords = totalWords + words;
     totalLines = totalLines + lines;
+    return fileCounts;
 }
 
 int main(int argc, const char** argv)
@@ -274,40 +325,30 @@ int main(int argc, const char** argv)
         int totalBytes = 0;
         int totalWords = 0;
         int totalLines = 0;
+        List<CountData> fileCounts;
         for (const string& file : files)
         {
-            Count(file, counts, totalBytes, totalWords, totalLines);
+            fileCounts.Add(Count(file, counts, totalBytes, totalWords, totalLines));
         }
         if (files.Count() > 1)
         {
-            string countLine;
+            CountData total;
             if ((counts & Counts.lines) != Counts.none)
             {
-                countLine.Append(ToString(totalLines));
+                total.lines = ToString(totalLines);
             }
             if ((counts & Counts.words) != Counts.none)
             {
-                if (!countLine.IsEmpty())
-                {
-                    countLine.Append(' ');
-                }
-                countLine.Append(ToString(totalWords));
+                total.words = ToString(totalWords);
             }
             if ((counts & Counts.bytes) != Counts.none)
             {
-                if (!countLine.IsEmpty())
-                {
-                    countLine.Append(' ');
-                }
-                countLine.Append(ToString(totalBytes));
+                total.bytes = ToString(totalBytes);
             }
-            if (!countLine.IsEmpty())
-            {
-                countLine.Append(' ');
-            }
-            countLine.Append("total");
-            Console.Out() << countLine << endl();
+            total.file = "total";
+            fileCounts.Add(total);
         }
+        Print(counts, fileCounts);
     }
     catch (const Exception& ex)
     {
