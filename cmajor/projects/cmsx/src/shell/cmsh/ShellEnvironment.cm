@@ -1,0 +1,38 @@
+// =================================
+// Copyright (c) 2019 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Collections;
+using System.IO;
+using System.Security;
+
+namespace cmsh
+{
+    public void SetPWD(ShellEnvironment& shellEnvironment)
+    {
+        shellEnvironment.pwd = GetCurrentWorkingDirectory();
+        SetEnv("PWD", shellEnvironment.pwd);
+    }
+    
+    public class ShellEnvironment
+    {
+        public ShellEnvironment() : users(GetUsers()), hostName(), uid(0), pgrp(0), exit(false), debug(false)
+        {
+        }
+        public Users users;
+        public string hostName;
+        public int uid;
+        public int pgrp;
+        public string userName;
+        public string home;
+        public string shell;
+        public string pwd;
+        public HashMap<ustring, ustring> variables;
+        public InternalCommandMap internalCommandMap;
+        public ExternalCommandMap externalCommandMap;
+        public bool exit;
+        public bool debug;
+    }
+}

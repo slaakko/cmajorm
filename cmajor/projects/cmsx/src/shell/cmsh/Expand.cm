@@ -9,7 +9,7 @@ using System.Security;
 
 namespace cmsh
 {
-    public void Expand(List<Token>& tokens, const string& home, const Users& users, const HashMap<ustring, ustring>& variables, TokenizerFlags flags)
+    public void Expand(List<Token>& tokens, ShellEnvironment& shellEnvironment, TokenizerFlags flags)
     {
         if ((flags & TokenizerFlags.containsLBrace) != TokenizerFlags.none)
         {
@@ -17,11 +17,11 @@ namespace cmsh
         }
         if ((flags & TokenizerFlags.containsTilde) != TokenizerFlags.none)
         {
-            TildeExpand(tokens, home, users);
+            TildeExpand(tokens, shellEnvironment.home, shellEnvironment.users);
         }
         if ((flags & TokenizerFlags.containsDollar) != TokenizerFlags.none)
         {
-            tokens = ExpandParameters(tokens, variables);
+            tokens = ExpandParameters(tokens, shellEnvironment.variables);
         }
         if ((flags & TokenizerFlags.containsPatternChar) != TokenizerFlags.none)
         {

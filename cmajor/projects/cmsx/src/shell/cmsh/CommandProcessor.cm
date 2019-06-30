@@ -1,0 +1,200 @@
+// =================================
+// Copyright (c) 2019 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Collections;
+using System.Os;
+using System.Security;
+
+namespace cmsh
+{
+    public class SimpleCommand
+    {
+        public HashMap<ustring, ustring> variableAssignments;
+        public string name;
+        public List<string> args;
+    }
+    
+    public nothrow byte MapExitCode(ushort exitCode)
+    {
+        if ((exitCode & 0xFF00u) != 0u)
+        {
+            return cast<byte>(128u + (exitCode >> 8u));
+        }
+        return cast<byte>(exitCode & 0xFFu);
+    }
+
+    public class CommandProcessor
+    {
+        public nothrow CommandProcessor(const List<Token>& tokens_, ShellEnvironment& shellEnvironment_) : 
+            tokens(tokens_), shellEnvironment(shellEnvironment_), tokenIndex(0), end(END, ustring(), 1, 1)
+        {
+        }
+        public void Run()
+        {
+            NextToken();
+            while (token->id == WORD)
+            {
+                SimpleCommand simpleCommand = ParseSimpleCommand();
+                if (!simpleCommand.name.IsEmpty())
+                {
+                    byte result = Execute(simpleCommand);
+                    if (shellEnvironment.exit)
+                    {
+                        return;
+                    }
+                }
+                NextToken();
+            }
+        }
+        private byte Execute(const SimpleCommand& simpleCommand)
+        {
+            bool tcPgrpChanged = false;
+            try
+            {
+                InternalCommand* internalCommand = shellEnvironment.internalCommandMap.GetCommand(simpleCommand.name);
+                if (internalCommand != null)
+                {
+                    return internalCommand->Execute(shellEnvironment, simpleCommand.args);
+                }
+                else
+                {
+                    if (!simpleCommand.name.StartsWith("/"))
+                    {
+                        if (!shellEnvironment.externalCommandMap.Populated())
+                        {
+                            shellEnvironment.externalCommandMap.Populate(shellEnvironment);
+                        }
+                        string pathName = shellEnvironment.externalCommandMap.Find(simpleCommand.name);
+                        if (!pathName.IsEmpty())
+                        {
+                            simpleCommand.name = pathName;
+                        }
+                    }
+                    int pid = Fork();
+                    if (pid == 0)
+                    {
+                        for (const Pair<ustring, ustring>& var : simpleCommand.variableAssignments)
+                        {
+                            SetEnv(ToUtf8(var.first), ToUtf8(var.second));
+                        }
+                        int pgrp = SetPGRP();
+                        TCSetPGRP(0, pgrp);
+                        tcPgrpChanged = true;
+                        Exec(simpleCommand.name, simpleCommand.args);
+                    }
+                    ushort exitCode = 0u;
+                    int childPID = Wait(&exitCode);
+                    TCSetPGRP(0, shellEnvironment.pgrp);
+                    byte retval = MapExitCode(exitCode);
+                    return retval;
+                }
+            }
+            catch (const Exception& ex)
+            {
+                Console.Error() << ex.Message() << endl();
+                if (tcPgrpChanged)
+                {
+                    try
+                    {
+                        TCSetPGRP(0, shellEnvironment.pgrp);
+                    }
+                    catch (const Exception& ex)
+                    {
+                    }
+                }
+                return 1u;
+            }
+            return 0u;
+        }
+        private SimpleCommand ParseSimpleCommand()
+        {
+            SimpleCommand simpleCommand;
+            if (token->id == WORD)
+            {
+                HashMap<ustring, ustring> commandVariables;
+                ustring variableName;
+                ustring variableValue;
+                while (TryParseVariableAssignment(variableName, variableValue))
+                {
+                    commandVariables[variableName] = variableValue;
+                    NextToken();
+                }
+                if (token->id == WORD)
+                {
+                    simpleCommand.variableAssignments = Rvalue(commandVariables);
+                    simpleCommand.name = ToUtf8(token->value);
+                    NextToken();
+                    while (token->id == WORD)
+                    {
+                        simpleCommand.args.Add(ToUtf8(token->value));
+                        NextToken();
+                    }
+                }
+                else
+                {
+                    for (const Pair<ustring, ustring>& var : commandVariables)
+                    {
+                        shellEnvironment.variables[var.first] = var.second;
+                    }
+                }
+            }
+            return simpleCommand;
+        }
+        private bool TryParseVariableAssignment(ustring& variableName, ustring& variableValue)
+        {
+            if (ParseVariableAssignment(token->value, shellEnvironment.home, shellEnvironment.users, variableName, variableValue))
+            {
+                ustring expandedValue;
+                Tokenizer tokenizer(variableValue, 1, 1, true, false);
+                List<Token> valueTokens = tokenizer.Tokenize();
+                valueTokens = ExpandParameters(valueTokens, shellEnvironment.variables);
+                RemoveQuotes(valueTokens);
+                bool first = true;
+                for (const Token& token : valueTokens)
+                {
+                    if (first)
+                    {
+                        first = false;
+                    }
+                    else
+                    {
+                        expandedValue.Append(' ');
+                    }
+                    expandedValue.Append(token.value);
+                }
+                variableValue = expandedValue;
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+        private void NextToken()
+        {
+            if (tokenIndex < tokens.Count())
+            {
+                const Token& t = tokens[tokenIndex++];
+                token = &t;
+            }
+            else
+            {
+                token = &end;
+            }
+        }
+        private const List<Token>& tokens;
+        private ShellEnvironment& shellEnvironment;
+        private int tokenIndex;
+        private Token end;
+        private Token* token;
+    }
+    
+    public void ProcessCommandLine(const List<Token>& tokens, ShellEnvironment& shellEnvironment)
+    {
+        CommandProcessor commandProcessor(tokens, shellEnvironment);
+        commandProcessor.Run();
+    }
+}

@@ -1,0 +1,205 @@
+// =================================
+// Copyright (c) 2019 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Collections;
+using System.IO;
+using System.Os;
+
+namespace cmsh
+{
+    public abstract class InternalCommand
+    {
+        public nothrow InternalCommand(const string& name_) : name(name_)
+        {
+        }
+        public default virtual ~InternalCommand();
+        public abstract byte Execute(ShellEnvironment& shellEnvironment, const List<string>& args);
+        public nothrow const string& Name() const
+        {
+            return name;
+        }
+        private string name;
+    }
+    
+    public class ExitCommand : InternalCommand
+    {
+        public nothrow ExitCommand() : base("exit")
+        {
+        }
+        public override byte Execute(ShellEnvironment& shellEnvironment, const List<string>& args)
+        {
+            shellEnvironment.exit = true;
+            return 0u;
+        }
+    }
+
+    public class LogoutCommand : InternalCommand
+    {
+        public nothrow LogoutCommand() : base("logout")
+        {
+        }
+        public override byte Execute(ShellEnvironment& shellEnvironment, const List<string>& args)
+        {
+            shellEnvironment.exit = true;
+            return 0u;
+        }
+    }
+
+    public class ChangeDirectoryCommand : InternalCommand
+    {
+        public nothrow ChangeDirectoryCommand() : base("cd")
+        {
+        }
+        public override byte Execute(ShellEnvironment& shellEnvironment, const List<string>& args)
+        {
+            if (args.IsEmpty())
+            {
+                ChDir(shellEnvironment.home.Chars());
+                SetPWD(shellEnvironment);
+            }
+            else if (args.Count() == 1)
+            {
+                const string& directory = args.Front();
+                ChDir(directory.Chars());
+                SetPWD(shellEnvironment);
+            }
+            else
+            {
+                throw Exception("cmsh: cd : unknown arguments");
+            }
+            return 0u;
+        }
+    }
+    
+    public class PrintEnvironmentCommand : InternalCommand
+    {
+        public nothrow PrintEnvironmentCommand() : base("printenv")
+        {
+        }
+        public override byte Execute(ShellEnvironment& shellEnvironment, const List<string>& args)
+        {
+            if (args.IsEmpty())
+            {
+                const HashMap<string, string>& environmentVariables = Environment.Instance().Variables();
+                for (const Pair<string, string>& v : environmentVariables)
+                {
+                    Console.Out() << v.first << "=" << v.second << endl();
+                }
+            }
+            else
+            {
+                throw Exception("cmsh: printenv : unknown arguments");
+            }
+            return 0u;
+        }
+    }
+    
+    public class InternalCommandMap
+    {
+        public InternalCommandMap()
+        {
+            AddCommand(new ExitCommand());
+            AddCommand(new LogoutCommand());
+            AddCommand(new ChangeDirectoryCommand());
+            AddCommand(new PrintEnvironmentCommand());
+        }
+        public void AddCommand(InternalCommand* command)
+        {
+            map[command->Name()] = command;
+            commands.Add(UniquePtr<InternalCommand>(command));
+        }
+        public nothrow InternalCommand* GetCommand(const string& commandName) const
+        {
+            HashMap<string, InternalCommand*>.ConstIterator it = map.CFind(commandName);
+            if (it != map.CEnd())
+            {
+                return it->second;
+            }
+            else
+            {
+                return null;
+            }
+        }
+        private HashMap<string, InternalCommand*> map;
+        private List<UniquePtr<InternalCommand>> commands;
+    }
+    
+    public class ExternalCommandMap
+    {
+        public nothrow ExternalCommandMap() : populated(false)
+        {
+        }
+        public nothrow bool Populated() const
+        {
+            return populated;
+        }
+        public string Find(const string& commandName) const
+        {
+            HashMap<string, string>.ConstIterator it = map.CFind(commandName);
+            if (it != map.CEnd())
+            {
+                return it->second;
+            }
+            else
+            {
+                return string();
+            }
+        }
+        public void Populate(ShellEnvironment& shellEnvironment)
+        {
+            try
+            {
+                populated = true;
+                map.Clear();
+                string path = GetEnv("PATH");
+                TokenizerFlags flags;
+                List<Token> tokens = Tokenize(ToUtf32(path), flags);
+                Expand(tokens, shellEnvironment, flags);
+                for (const Token& token : tokens)
+                {
+                    if (token.id == WORD)
+                    {
+                        string pathValue = ToUtf8(token.value);
+                        List<string> directories = pathValue.Split(':');
+                        for (const string& directory : directories)
+                        {
+                            DirectoryReader reader(directory);
+                            DirectoryEntry dirEntry;
+                            while (reader.Read(dirEntry))
+                            {
+                                string name = &dirEntry.name[0];
+                                if (name != "." && name != "..")
+                                {
+                                    string pathName = Path.Combine(directory, name);
+                                    byte[statBufSize] statBuf;
+                                    int result = stat(pathName.Chars(), &statBuf[0]);
+                                    if (result == 0)
+                                    {
+                                        StatInfo statInfo;
+                                        StatBufToStatInfo(&statBuf[0], statInfo);
+                                        if (statInfo.Type() == FileType.regular && (statInfo.OwnerAccess() & Access.execute) != Access.none)
+                                        {
+                                            if (map.CFind(name) == map.CEnd())
+                                            {
+                                                map[name] = pathName;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            catch (const Exception& ex)
+            {
+                Console.Error() << "cmsh: could not populate external command map: " << ex.Message() << endl();
+            }
+        }
+        private HashMap<string, string> map;
+        private bool populated;
+    }
+}

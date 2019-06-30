@@ -436,9 +436,9 @@ namespace cmsh
         private bool genEnd;
     }
     
-    public List<Token> Tokenize(const string& line, TokenizerFlags& flags)
+    public List<Token> Tokenize(const ustring& line, TokenizerFlags& flags)
     {
-        Tokenizer tokenizer(ToUtf32(line));
+        Tokenizer tokenizer(line);
         List<Token> tokens = tokenizer.Tokenize();
         flags = tokenizer.GetFlags();
         return tokens;

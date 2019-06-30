@@ -1,0 +1,156 @@
+// =================================
+// Copyright (c) 2019 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Security;
+
+namespace cmsh
+{
+    public class VariableAssignmentParser
+    {
+        public nothrow VariableAssignmentParser(const ustring& value_, const string& home_, Users& users_) : 
+            value(value_), start(value.Chars()), end(value.Chars() + value.Length()), pos(start), home(home_), users(users_)
+        {
+        }
+        public bool Parse(ustring& variableName, ustring& variableValue)
+        {
+            int state = 0;
+            variableName.Clear();
+            variableValue.Clear();
+            ustring loginName;
+            while (pos != end)
+            {
+                uchar c = *pos;
+                switch (state)
+                {
+                    case 0:
+                    {
+                        if (IsLetter(c) || c == '_')
+                        {
+                            variableName.Append(c);
+                            state = 1;
+                        }
+                        else
+                        {
+                            return false;
+                        }
+                        break;
+                    }
+                    case 1:
+                    {
+                        if (IsLetter(c) || IsAsciiDigit(c) || c == '_')
+                        {
+                            variableName.Append(c);
+                        }
+                        else if (c == '=')
+                        {
+                            state = 2;
+                        }
+                        else
+                        {
+                            return false;
+                        }
+                        break;
+                    }
+                    case 2:
+                    {
+                        if (c == '~')
+                        {
+                            loginName.Clear();
+                            state = 4;
+                        }
+                        else if (c == ':')
+                        {
+                            variableValue.Append(c);
+                        }
+                        else
+                        {
+                            variableValue.Append(c);
+                            state = 3;
+                        }
+                        break;
+                    }
+                    case 3:
+                    {
+                        if (c == ':')
+                        {
+                            variableValue.Append(c);
+                            state = 2;
+                        }
+                        else
+                        {
+                            variableValue.Append(c);
+                        }
+                        break;
+                    }
+                    case 4:
+                    {
+                        if (c == '/')
+                        {
+                            Expand(variableValue, loginName);
+                            variableValue.Append(c);
+                            state = 3;
+                        }
+                        else if (c == ':')
+                        {
+                            Expand(variableValue, loginName);
+                            variableValue.Append(c);
+                            state = 3;
+                        }
+                        else
+                        {
+                            loginName.Append(c);
+                        }
+                        break;
+                    }
+                }
+                ++pos;
+            }
+            switch (state)
+            {
+                case 2: case 3: case 4:
+                {
+                    if (state == 4)
+                    {
+                        Expand(variableValue, loginName);
+                    }
+                    return true;
+                }
+            }
+            return false;
+        }
+        private void Expand(ustring& variableValue, const ustring& loginName)
+        {
+            if (loginName.IsEmpty())
+            {
+                variableValue.Append(ToUtf32(home));
+            }
+            else
+            {
+                User* user = users.GetUser(ToUtf8(loginName));
+                if (user != null)
+                {
+                    variableValue.Append(ToUtf32(user->Home()));
+                }
+                else
+                {
+                    variableValue.Append('~').Append(loginName);
+                }
+            }
+        }
+        private ustring value;
+        private uchar* start;
+        private uchar* end;
+        private uchar* pos;
+        private string home;
+        private Users& users;
+    }
+    
+    public bool ParseVariableAssignment(const ustring& value, const string& home, Users& users, ustring& variableName, ustring& variableValue)
+    {
+        VariableAssignmentParser parser(value, home, users);
+        return parser.Parse(variableName, variableValue);
+    }
+}

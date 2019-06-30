@@ -12,77 +12,63 @@ using cmsh;
 
 namespace cmsh
 {
-    private string hostName;
-    private int uid = 0;
-    private string userName;
-    private string home;
-    private string shell;
-    private string pwd;
-
-    void SetLoginEnvironment()
+    void SetLoginEnvironment(ShellEnvironment& shellEnvironment)
     {
         if (HasEnv("HOSTNAME"))
         {
-            hostName = GetEnv("HOSTNAME");
+            shellEnvironment.hostName = GetEnv("HOSTNAME");
         }
         else
         {
-            hostName = GetHostName();
-            SetEnv("HOSTNAME", hostName);
+            shellEnvironment.hostName = GetHostName();
+            SetEnv("HOSTNAME", shellEnvironment.hostName);
         }
         if (HasEnv("UID"))
         {
-            uid = ParseInt(GetEnv("UID"));
+            shellEnvironment.uid = ParseInt(GetEnv("UID"));
         }
         else
         {
-            uid = GetUID();
-            SetEnv("UID", ToString(uid));
+            shellEnvironment.uid = GetUID();
+            SetEnv("UID", ToString(shellEnvironment.uid));
         }
-        Users users = GetUsers();
-        User* user = users.GetUser(uid);
+        User* user = shellEnvironment.users.GetUser(shellEnvironment.uid);
         if (HasEnv("USER"))
         {
-            userName = GetEnv("USER");
+            shellEnvironment.userName = GetEnv("USER");
         }
         else
         {
             if (user != null)
             {
-                userName = user->Name();
-                SetEnv("USER", userName);
+                shellEnvironment.userName = user->Name();
+                SetEnv("USER", shellEnvironment.userName);
             }
         }
         if (HasEnv("HOME"))
         {
-            home = GetEnv("HOME");
+            shellEnvironment.home = GetEnv("HOME");
         }
         else
         {
             if (user != null)
             {
-                home = user->Home();
-                SetEnv("HOME", home);
+                shellEnvironment.home = user->Home();
+                SetEnv("HOME", shellEnvironment.home);
             }
         }
         if (HasEnv("SHELL"))
         {
-            shell = GetEnv("SHELL");
+            shellEnvironment.shell = GetEnv("SHELL");
         }
         else
         {
             if (user != null)
             {
-                shell = user->Shell();
-                SetEnv("SHELL", shell);
+                shellEnvironment.shell = user->Shell();
+                SetEnv("SHELL", shellEnvironment.shell);
             }
         }
-    }
-
-    void SetPWD()
-    {
-        pwd = GetCurrentWorkingDirectory();
-        SetEnv("PWD", pwd);
     }
 
     void ReadEnvironmentFile()
@@ -103,73 +89,65 @@ namespace cmsh
         }
     }
 
-    void Setup()
+    void Setup(ShellEnvironment& shellEnvironment)
     {
-        SetLoginEnvironment();
+        SetLoginEnvironment(shellEnvironment);
         BeginObeyColorStrings(1);
-        SetPWD();
+        SetPWD(shellEnvironment);
         ReadEnvironmentFile();
+        shellEnvironment.pgrp = SetPGRP();
+        TCSetPGRP(0, shellEnvironment.pgrp);
     }
 
-    void TearDown()
+    void PrintPrompt(ShellEnvironment& shellEnvironment)
     {
-        EndObeyColorStrings(1);
-    }
-
-    void PrintEnvironment()
-    {
-        const HashMap<string, string>& environmentVariables = Environment.Instance().Variables();
-        for (const Pair<string, string>& v : environmentVariables)
-        {
-            Console.Out() << v.first << "=" << v.second << endl();
-        }
-    }
-
-    void PrintPrompt()
-    {
+        BeginObeyColorStrings(1);
         ustring loc;
-        loc.Append(BeginColors(ConsoleColor.green, ConsoleColor.black)).Append(ToUtf32(userName)).Append('@').Append(ToUtf32(hostName)).Append(EndColors());
+        loc.Append(BeginColors(ConsoleColor.green, ConsoleColor.black)).Append(ToUtf32(shellEnvironment.userName)).Append('@').Append(
+        ToUtf32(shellEnvironment.hostName)).Append(EndColors());
         ustring cwd;
-        if (pwd.StartsWith(home))
+        if (shellEnvironment.pwd.StartsWith(shellEnvironment.home))
         {
-            cwd.Append(BeginColors(ConsoleColor.cyan, ConsoleColor.black)).Append('~').Append(ToUtf32(pwd.Substring(home.Length()))).Append(EndColors());
+            cwd.Append(BeginColors(ConsoleColor.cyan, ConsoleColor.black)).Append('~').Append(
+            ToUtf32(shellEnvironment.pwd.Substring(shellEnvironment.home.Length()))).Append(EndColors());
         }
         else
         {
-            cwd.Append(BeginColors(ConsoleColor.cyan, ConsoleColor.black)).Append(ToUtf32(pwd)).Append(EndColors());
+            cwd.Append(BeginColors(ConsoleColor.cyan, ConsoleColor.black)).Append(ToUtf32(shellEnvironment.pwd)).Append(EndColors());
         }
         ustring prompt = u"$ ";
-        if (uid == 0)
+        if (shellEnvironment.uid == 0)
         {
             prompt = u"# ";
         }
         Console.Out() << loc << ":" << cwd << prompt;
+        EndObeyColorStrings(1);
     }
 
-    nothrow string ReadLine()
+    nothrow string ReadLine(ShellEnvironment& shellEnvironment)
     {
-        return Console.ReadLine();
+        string line = Console.ReadLine();
+        if (Console.In().Eof())
+        {
+            shellEnvironment.exit = true;
+        }
+        return line;
     }
     
-    void ProcessLine(const string& line)
+    void ProcessLine(const string& line, ShellEnvironment& shellEnvironment)
     {
-        Tokenizer tokenizer(ToUtf32(line));
-        List<Token> tokens = tokenizer.Tokenize();
-        TokenizerFlags flags = tokenizer.GetFlags();
-        for (const Token& token : tokens)
+        try
         {
-            Console.Out() << token.ToString() << endl();
+            TokenizerFlags flags = TokenizerFlags.none;
+            List<Token> tokens = Tokenize(ToUtf32(line), flags);
+            Expand(tokens, shellEnvironment, flags);
+            ProcessCommandLine(tokens, shellEnvironment);
+        }
+        catch (const Exception& ex)
+        {
+            Console.Error() << "cmsh: " << ex.Message() << endl();
         }
         Console.Out() << endl();
-        if ((flags & TokenizerFlags.containsLBrace) != TokenizerFlags.none)
-        {
-            tokens = BraceExpand(tokens);
-            for (const Token& token : tokens)
-            {
-                Console.Out() << token.ToString() << endl();
-            }
-            Console.Out() << endl();
-        }
     }
 }
 
@@ -179,15 +157,16 @@ int main(int argc, const char** argv)
     int retval = 0;
     try
     {
-        Setup();
-        PrintEnvironment();
-        PrintPrompt();
-        string line = ReadLine();
-        while (line != "logout" && line != "exit")
+        ShellEnvironment shellEnvironment;
+        Setup(shellEnvironment);
+        PrintPrompt(shellEnvironment);
+        string line = ReadLine(shellEnvironment);
+        while (!shellEnvironment.exit)
         {
-            ProcessLine(line);
-            PrintPrompt();
-            line = ReadLine();
+            ProcessLine(line, shellEnvironment);
+            if (shellEnvironment.exit) break;
+            PrintPrompt(shellEnvironment);
+            line = ReadLine(shellEnvironment);
         }
     }
     catch (const Exception& ex)
@@ -201,17 +180,6 @@ int main(int argc, const char** argv)
             Console.Error() << ex.Message() << endl();
         }
         retval = 1;
-    }
-    try
-    {
-        TearDown();
-    }
-    catch (const Exception& ex)
-    {
-        if (retval == 0)
-        {
-            retval = 1;
-        }
     }
     return retval;
 }
