@@ -12,9 +12,47 @@ namespace cmsh
 {
     public class SimpleCommand
     {
+        public nothrow string ToString() const
+        {
+            string s;
+            bool first = true;
+            for (const Pair<ustring, ustring>& var : variableAssignments)
+            {
+                if (first)
+                {
+                    first = false;
+                }
+                else
+                {
+                    s.Append(' ');
+                }
+                s.Append(ToUtf8(var.first)).Append('=').Append(ToUtf8(var.second));
+            }
+            if (first)
+            {
+                first = false;
+            }
+            else
+            {
+                s.Append(' ');
+            }
+            s.Append(name);
+            for (const string& arg : args)
+            {
+                s.Append(' ');
+                s.Append(arg);
+            }
+            for (const UniquePtr<Redirection>& redirection : redirections)
+            {
+                s.Append(' ');
+                s.Append(redirection->ToString());
+            }
+            return s;
+        }
         public HashMap<ustring, ustring> variableAssignments;
         public string name;
         public List<string> args;
+        public List<UniquePtr<Redirection>> redirections;
     }
     
     public nothrow byte MapExitCode(ushort exitCode)
@@ -38,19 +76,19 @@ namespace cmsh
             while (token->id == WORD)
             {
                 SimpleCommand simpleCommand = ParseSimpleCommand();
-                if (!simpleCommand.name.IsEmpty())
+                byte result = Execute(simpleCommand);
+                if (shellEnvironment.exit)
                 {
-                    byte result = Execute(simpleCommand);
-                    if (shellEnvironment.exit)
-                    {
-                        return;
-                    }
+                    return;
                 }
-                NextToken();
             }
         }
         private byte Execute(const SimpleCommand& simpleCommand)
         {
+            if (shellEnvironment.debug)
+            {
+                Console.Out() << "cmsh: executing '" << simpleCommand.ToString() << "'" << endl();
+            }
             bool tcPgrpChanged = false;
             try
             {
@@ -76,19 +114,35 @@ namespace cmsh
                     int pid = Fork();
                     if (pid == 0)
                     {
-                        for (const Pair<ustring, ustring>& var : simpleCommand.variableAssignments)
+                        try
                         {
-                            SetEnv(ToUtf8(var.first), ToUtf8(var.second));
+                            for (const Pair<ustring, ustring>& var : simpleCommand.variableAssignments)
+                            {
+                                SetEnv(ToUtf8(var.first), ToUtf8(var.second));
+                            }
+                            for (const UniquePtr<Redirection>& redirection : simpleCommand.redirections)
+                            {
+                                redirection->Execute();
+                            }
+                            int pgrp = SetPGRP();
+                            TCSetPGRP(0, pgrp);
+                            tcPgrpChanged = true;
+                            Exec(simpleCommand.name, simpleCommand.args);
                         }
-                        int pgrp = SetPGRP();
-                        TCSetPGRP(0, pgrp);
-                        tcPgrpChanged = true;
-                        Exec(simpleCommand.name, simpleCommand.args);
+                        catch (const Exception& ex)
+                        {
+                            Console.Error() << ex.Message() << endl();
+                            return 1u;
+                        }
                     }
                     ushort exitCode = 0u;
                     int childPID = Wait(&exitCode);
                     TCSetPGRP(0, shellEnvironment.pgrp);
                     byte retval = MapExitCode(exitCode);
+                    if (shellEnvironment.debug)
+                    {
+                        Console.Out() << "cmsh: result of command is " << retval << endl();
+                    }
                     return retval;
                 }
             }
@@ -122,19 +176,86 @@ namespace cmsh
                     commandVariables[variableName] = variableValue;
                     NextToken();
                 }
+                Token* word = token;
                 if (token->id == WORD)
                 {
                     simpleCommand.variableAssignments = Rvalue(commandVariables);
                     simpleCommand.name = ToUtf8(token->value);
                     NextToken();
-                    while (token->id == WORD)
+                    while (token->id == WORD || token->id == LANGLE || token->id == RANGLE)
                     {
-                        simpleCommand.args.Add(ToUtf8(token->value));
-                        NextToken();
+                        if (token->id == LANGLE)
+                        {
+                            int fd = 0;
+                            if (!token->value.IsEmpty())
+                            {
+                                fd = ParseInt(ToUtf8(token->value));
+                            }
+                            UniquePtr<Redirection> redirection(new InputRedirection(fd));
+                            NextToken();
+                            if (token->id == WORD)
+                            {
+                                redirection->filename = ToUtf8(token->value);
+                                simpleCommand.redirections.Add(Rvalue(redirection));
+                                NextToken();
+                            }
+                            else
+                            {
+                                throw Exception("filename for redirection expected (line " + 
+                                    ToString(token->line) + ", column " + ToString(token->col) + ")");
+                            }
+                        }
+                        else if (token->id == RANGLE)
+                        {
+                            int fd = 1;
+                            if (!token->value.IsEmpty())
+                            {
+                                fd = ParseInt(ToUtf8(token->value));
+                            }
+                            NextToken();
+                            if (token->id == WORD)
+                            {
+                                UniquePtr<Redirection> redirection(new OutputRedirection(fd));
+                                redirection->filename = ToUtf8(token->value);
+                                simpleCommand.redirections.Add(Rvalue(redirection));
+                                NextToken();
+                            }
+                            else if (token->id == RANGLE)
+                            {
+                                NextToken();
+                                if (token->id == WORD)
+                                {
+                                    UniquePtr<Redirection> redirection(new AppendRedirection(fd));
+                                    redirection->filename = ToUtf8(token->value);
+                                    simpleCommand.redirections.Add(Rvalue(redirection));
+                                    NextToken();
+                                }
+                                else
+                                {
+                                    throw Exception("filename for redirection expected (line " + 
+                                        ToString(token->line) + ", column " + ToString(token->col) + ")");
+                                }
+                            }
+                            else
+                            {
+                                throw Exception("filename for redirection expected (line " + 
+                                    ToString(token->line) + ", column " + ToString(token->col) + ")");
+                            }
+                        }
+                        else if (token->id == WORD)
+                        {
+                            simpleCommand.args.Add(ToUtf8(token->value));
+                            NextToken();
+                        }
                     }
                 }
                 else
                 {
+                    if (commandVariables.IsEmpty())
+                    {
+                        throw Exception("command or variable assignment expected (line " + 
+                            ToString(word->line) + ", column " + ToString(word->col) + ")");
+                    }
                     for (const Pair<ustring, ustring>& var : commandVariables)
                     {
                         shellEnvironment.variables[var.first] = var.second;

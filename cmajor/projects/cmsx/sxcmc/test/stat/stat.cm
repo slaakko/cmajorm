@@ -1,0 +1,16 @@
+using System;
+using System.IO;
+using System.Os;
+
+void main()
+{
+    try
+    {
+        StatInfo statInfo;
+        Stat("/home/slaakko/foo", statInfo);
+    }
+    catch (const Exception& ex)
+    {
+        Console.Error() << ex.Message() << endl();
+    }
+}

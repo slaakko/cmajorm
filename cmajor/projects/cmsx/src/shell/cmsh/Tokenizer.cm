@@ -216,24 +216,42 @@ namespace cmsh
                             }
                             case '<':
                             {
-                                if (!tokenValue.IsEmpty())
+                                if (tokenValue.Length() == 1 && tokenValue[0] >= u'0' && tokenValue[0] <= u'9')
                                 {
-                                    tokens.Add(Token(WORD, tokenValue, line, column));
+                                    tokens.Add(Token(LANGLE, tokenValue, line, col));
+                                    column = 0;
+                                    tokenValue.Clear();
                                 }
-                                tokenValue.Clear();
-                                column = 0;
-                                tokens.Add(Token(RANGLE, ustring(), line, col));
+                                else 
+                                {
+                                    if (!tokenValue.IsEmpty())
+                                    {
+                                        tokens.Add(Token(WORD, tokenValue, line, column));
+                                    }
+                                    tokenValue.Clear();
+                                    column = 0;
+                                    tokens.Add(Token(LANGLE, ustring(), line, col));
+                                }
                                 break;
                             }
                             case '>':
                             {
-                                if (!tokenValue.IsEmpty())
+                                if (tokenValue.Length() == 1 && tokenValue[0] >= u'0' && tokenValue[0] <= u'9')
                                 {
-                                    tokens.Add(Token(WORD, tokenValue, line, column));
+                                    tokens.Add(Token(RANGLE, tokenValue, line, col));
+                                    column = 0;
+                                    tokenValue.Clear();
                                 }
-                                tokenValue.Clear();
-                                column = 0;
-                                tokens.Add(Token(RANGLE, ustring(), line, col));
+                                else 
+                                {
+                                    if (!tokenValue.IsEmpty())
+                                    {
+                                        tokens.Add(Token(WORD, tokenValue, line, column));
+                                    }
+                                    tokenValue.Clear();
+                                    column = 0;
+                                    tokens.Add(Token(RANGLE, ustring(), line, col));
+                                }
                                 break;
                             }
                             default:

@@ -72,7 +72,7 @@ namespace cmsx.kernel
         File* file = process->fileTable.GetFile(fd);
         if (file != null)
         {
-            file->Release();
+            file->Release(fd);
             process->fileTable.SetFile(fd, null);
         }
         else
@@ -111,6 +111,15 @@ namespace cmsx.kernel
     {
         File* file = process->fileTable.GetFile(fd);
         return file->Tell();
+    }
+
+    public int Dup(Process* process, int fd)
+    {
+        File* file = process->fileTable.GetFile(fd);
+        File* shared = file->Share();
+        int duplicate = process->fileTable.GetEmptyFileSlot();
+        process->fileTable.SetFile(duplicate, shared);
+        return duplicate;
     }
 
     public void Link(Machine& machine, Process* process, ulong sourcePathAddress, ulong targetPathAddress)
@@ -249,7 +258,7 @@ namespace cmsx.kernel
         {
             if (file is DirectoryFile*)
             {
-                file->Release();
+                file->Release(fd);
                 process->fileTable.SetFile(fd, null);
             }
             else
@@ -523,8 +532,12 @@ namespace cmsx.kernel
         {
             return this;
         }
-        public virtual void Release()
+        public virtual void Release(int fd)
         {
+            if (Log())
+            {
+                LogMessage("fs.file", "release.fd=" + ToString(fd));
+            }
         }
         private void GetConsoleStatus(Machine& machine, Process* process, ulong bufferAddress, long count)
         {
@@ -830,11 +843,6 @@ namespace cmsx.kernel
             Session* currentSession = kernel.CurrentSession();
             currentSession->fgpgrp = pgrp;
         }
-        public override void Release()
-        {
-            GetConsoleDriver().SetEcho(true);
-            GetConsoleDriver().EndObeyColorStrings();
-        }
         private string bufferedInput;
     }
 
@@ -907,10 +915,18 @@ namespace cmsx.kernel
         {
             return new RegularFile(name, filePtr->Share());
         }
-        public override void Release()
+        public override void Release(int fd)
         {
+            if (Log())
+            {
+                LogMessage("fs.file", "regularFile.release.fd=" + ToString(fd));
+            }
             filePtr->Release();
             delete this;
+            if (Log())
+            {
+                LogMessage("fs.file", "~regularFile.release");
+            }
         }
         private FilePtr* filePtr;
     }
@@ -949,7 +965,7 @@ namespace cmsx.kernel
             }
             return new DirectoryFile(dirINode);
         }
-        public override void Release()
+        public override void Release(int fd)
         {
             if (dirINode != null)
             {
@@ -987,14 +1003,14 @@ namespace cmsx.kernel
             }
             return new HostDirectoryFile(DirINode());
         }
-        public override void Release()
+        public override void Release(int fd)
         {
             if (findHandle != null)
             {
                 OsFindClose(findHandle);
                 findHandle = null;
             }
-            base->Release();
+            base->Release(fd);
         }
         private void* findHandle;
     }
@@ -1158,14 +1174,26 @@ namespace cmsx.kernel
         }
         public void Release()
         {
+            if (Log())
+            {
+                LogMessage("fs.file", "filePtr.release.useCount=" + ToString(useCount));
+            }
             --useCount;
             if (useCount == 0)
             {
+                if (Log())
+                {
+                    LogMessage("fs.file", "filePtr.release.putinode");
+                }
                 if (inode != null)
                 {
                     inode->Manager()->PutINode(inode);
                 }
                 delete this;
+            }
+            if (Log())
+            {
+                LogMessage("fs.file", "~filePtr.release");
             }
         }
         public nothrow inline OpenFlags Flags() const
@@ -1223,6 +1251,10 @@ namespace cmsx.kernel
         }
         public void ShareFilesTo(ProcessFileTable& that)
         {
+            if (Log())
+            {
+                LogMessage("fs.file", "share");
+            }
             for (long i = 0; i < openFileMax; ++i)
             {
                 File* file = files[i];
@@ -1235,17 +1267,29 @@ namespace cmsx.kernel
                     that.files[i] = null;
                 }
             }
+            if (Log())
+            {
+                LogMessage("fs.file", "~share");
+            }
         }
         public void ReleaseFiles()
         {
+            if (Log())
+            {
+                LogMessage("fs.file", "releaseFiles");
+            }
             for (long i = 0; i < openFileMax; ++i)
             {
                 File* file = files[i];
                 if (file != null)
                 {
-                    file->Release();
+                    file->Release(cast<int>(i));
                     files[i] = null;
                 }
+            }
+            if (Log())
+            {
+                LogMessage("fs.file", "~releaseFiles");
             }
         }
         private File*[openFileMax] files;

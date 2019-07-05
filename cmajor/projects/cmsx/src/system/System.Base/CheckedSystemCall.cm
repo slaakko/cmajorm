@@ -89,7 +89,29 @@ namespace System.Os
             ThrowSystemError();
         }
     }
-    
+
+    public ushort ShellExecute(const string& command, const List<string>& args)
+    {
+        string shell = "/bin/cmsh";
+        if (HasEnv("SHELL"))
+        {
+            shell = GetEnv("SHELL");
+        }
+        List<string> arguments(1, command);
+        for (const string& arg : args)
+        {
+            arguments.Add(arg);
+        }
+        int pid = Fork();
+        if (pid == 0)
+        {
+            Exec(shell, arguments);
+        }
+        ushort exitCode = 0u;
+        Wait(&exitCode);
+        return exitCode;
+    }
+
     public void Kill(int pid, int sig)
     {
         int result = kill(pid, sig);
@@ -598,5 +620,15 @@ namespace System.Os
             ThrowSystemError();
         }
         return string(&buffer[0]);
+    }
+    
+    public int Dup(int fd)
+    {
+        int result = dup(fd);
+        if (result == -1)
+        {
+            ThrowSystemError();
+        }
+        return result;
     }
 }

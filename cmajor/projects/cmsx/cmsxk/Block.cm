@@ -16,7 +16,6 @@ namespace cmsx.kernel
     public const int maxCachedFileBlocks = 1024;
     public const int maxCachedDirectoryBlocks = 64;
     public const int nameMax = 252;
-    public const int maxReadAheadBlocks = 16;
 
     public enum BlockKind : byte
     {
@@ -62,7 +61,7 @@ namespace cmsx.kernel
     {
         public nothrow inline ulong operator()(const BlockKey& key) const
         {
-            return cast<ulong>(1099511628211 * key.fsNumber + 16777619 * cast<byte>(key.kind) + key.blockNumber);
+            return cast<ulong>(1099511628211 * key.fsNumber + 16777619 * cast<int>(cast<byte>(key.kind)) + key.blockNumber);
         }
     }
 

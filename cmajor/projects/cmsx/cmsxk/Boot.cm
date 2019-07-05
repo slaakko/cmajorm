@@ -209,6 +209,9 @@ namespace cmsx.kernel
         SystemCallHandler getHostNameSystemCallHandler = GetHostName;
         ulong getHostNameSystemCallAddress = cast<ulong>(cast<void*>(getHostNameSystemCallHandler)); 
         mem.WriteULong(MakeSystemCallPtrAddress(sys_get_host_name), getHostNameSystemCallAddress, Protection.write);
+        SystemCallHandler dupSystemCallHandler = Dup;
+        ulong dupSystemCallAddress = cast<ulong>(cast<void*>(dupSystemCallHandler));
+        mem.WriteULong(MakeSystemCallPtrAddress(sys_dup), dupSystemCallAddress, Protection.write);
     }
 
     public void Boot(Machine& machine)

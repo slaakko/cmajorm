@@ -443,6 +443,7 @@ namespace cmsx.kernel
                                     DirectorySlot slot(blockNumber, inode->Key().fsNumber, offset);
                                     freeDirectorySlot = slot;
                                 }
+                                offset = offset + directoryEntrySize;
                                 continue;
                             }
                             string entryName = &entry.name[0];

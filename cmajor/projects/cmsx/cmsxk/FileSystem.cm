@@ -39,6 +39,10 @@ namespace cmsx.kernel
             INode* parent = null;
             string name;
             INode* inode = GetINodeManager()->PathToINode(process, path, PathToINodeFlags.createEntry, parent, freeDirectorySlot, name);
+            if (inode != null && inode->Type() != FileType.regular)
+            {
+                throw SystemError(EINVAL, "cannot create: file type of '" + path + "' is " + FileTypeStr(inode->Type()));
+            }
             INodePutter parentPutter(parent);
             INodePutter inodePutter;
             if (inode != parent)
@@ -126,6 +130,7 @@ namespace cmsx.kernel
                 }
                 if (created)
                 {
+                    directoryBlock->SetFlag(Block.Flags.dirty);
                     GetBlockManager()->WriteBlock(directoryBlock, null);
                     parent->SetMTime();
                 }
@@ -158,9 +163,9 @@ namespace cmsx.kernel
                 throw SystemError(ENOENT, "path '" + path + "' does not exist");
             }
             INodePutter inodePutter(inode);
-            if (inode->Type() != FileType.regular)
+            if (inode->Type() != FileType.regular && (flags & OpenFlags.write) != OpenFlags.none)
             {
-                throw SystemError(EINVAL, "cannot open '" + path + "': file type is " + FileTypeStr(inode->Type()));
+                throw SystemError(EINVAL, "cannot open '" + path + "': for writing, file type is " + FileTypeStr(inode->Type()));
             }
             INodeLock lock(inode);
             FileSystem* fs = GetMountTable().GetFileSystem(inode->Key().fsNumber);
@@ -266,8 +271,10 @@ namespace cmsx.kernel
             }
             if (created)
             {
+                directoryBlock->SetFlag(Block.Flags.dirty);
                 GetBlockManager()->WriteBlock(directoryBlock, null);
                 parent->SetMTime();
+                parent->SetFlag(INode.Flags.dirty);
                 source->SetNumLinks(source->GetNumLinks() + 1);
             }
             else
@@ -348,7 +355,9 @@ namespace cmsx.kernel
                     if (name == entryName)
                     {
                         entry.inodeNumber = 0;
+                        block->SetFlag(Block.Flags.dirty);
                         GetBlockManager()->WriteBlock(block, null);
+                        parent->SetFlag(INode.Flags.dirty);
                         entryReset = true;
                         break;
                     }
@@ -448,8 +457,10 @@ namespace cmsx.kernel
                         if (sameDirectory)
                         {
                             StrCopy(&entry.name[0], targetEntryName.Chars(), nameMax);
+                            directoryBlock->SetFlag(Block.Flags.dirty);
                             GetBlockManager()->WriteBlock(directoryBlock, null);
                             sourceParent->SetMTime();
+                            sourceParent->SetFlag(INode.Flags.dirty);
                             return;
                         }
                         else
@@ -531,9 +542,13 @@ namespace cmsx.kernel
                 }
                 if (created)
                 {
+                    sourceDirectoryBlock->SetFlag(Block.Flags.dirty);
                     GetBlockManager()->WriteBlock(sourceDirectoryBlock, null);
+                    targetDirectoryBlock->SetFlag(Block.Flags.dirty);
                     GetBlockManager()->WriteBlock(targetDirectoryBlock, null);
+                    sourceParent->SetFlag(INode.Flags.dirty);
                     sourceParent->SetMTime();
+                    targetParent->SetFlag(INode.Flags.dirty);
                     targetParent->SetMTime();
                 }
                 else
@@ -575,7 +590,9 @@ namespace cmsx.kernel
                 }
                 if (entrySet)
                 {
+                    sourceDirectoryBlock->SetFlag(Block.Flags.dirty);
                     GetBlockManager()->WriteBlock(sourceDirectoryBlock, null);
+                    targetDirectoryBlock->SetFlag(Block.Flags.dirty);
                     GetBlockManager()->WriteBlock(targetDirectoryBlock, null);
                     sourceParent->SetMTime();
                     targetParent->SetMTime();
@@ -684,8 +701,10 @@ namespace cmsx.kernel
                 }
                 if (created)
                 {
+                    directoryBlock->SetFlag(Block.Flags.dirty);
                     GetBlockManager()->WriteBlock(directoryBlock, null);
                     parent->SetMTime();
+                    parent->SetFlag(INode.Flags.dirty);
                 }
                 else
                 {
@@ -752,6 +771,7 @@ namespace cmsx.kernel
             }
             if (crtd)
             {
+                dirBlock->SetFlag(Block.Flags.dirty);
                 GetBlockManager()->WriteBlock(dirBlock, null);
                 inode->SetFileSize(inode->GetFileSize() + n * directoryEntrySize);
                 inode->SetMTime();
@@ -789,13 +809,14 @@ namespace cmsx.kernel
                 LogMessage("fs.getcurrentworkingdirectory", "begin");
             }
             INode* rootINode = GetINodeManager()->GetINode(process->rootDirINodeKey);
-            INodeLock rootINodeLock(rootINode);
+            INodePutter rootPutter(rootINode);
             INode* dirINode = rootINode;
-            INodeLock dirINodeLock;
+            INodePutter wdNodePutter;
+            INodePutter parentPutter;
             if (process->workingDirINodeKey != process->rootDirINodeKey)
             {
                 dirINode = GetINodeManager()->GetINode(process->workingDirINodeKey);
-                dirINodeLock.Reset(dirINode);
+                wdNodePutter.ResetINode(dirINode);
             }
             INode* prevINode = null;
             bool first = true;
@@ -834,6 +855,7 @@ namespace cmsx.kernel
                                 if (key != rootINode->Key())
                                 {
                                     parentINode = GetINodeManager()->GetINode(key);
+                                    parentPutter.ResetINode(parentINode);
                                 }
                                 else
                                 {
@@ -856,19 +878,11 @@ namespace cmsx.kernel
                 {
                     prevINode = dirINode;
                     dirINode = parentINode;
-                    if (dirINode != rootINode)
-                    {
-                        dirINodeLock.Reset(dirINode);
-                    }
                 }
                 else if (first)
                 {
                     prevINode = dirINode;
                     dirINode = parentINode;
-                    if (dirINode != rootINode)
-                    {
-                        dirINodeLock.Reset(dirINode);
-                    }
                     first = false;
                 }
                 else

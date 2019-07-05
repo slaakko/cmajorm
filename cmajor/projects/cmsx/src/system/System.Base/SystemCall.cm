@@ -55,6 +55,7 @@ public const byte sys_tcsetpgrp = 48u;
 public const byte sys_sync = 49u;
 public const byte sys_times = 50u;
 public const byte sys_get_host_name = 51u;
+public const byte sys_dup = 52u;
 
 public cdecl nothrow void exit(byte exitCode)
 {
@@ -313,4 +314,9 @@ public cdecl nothrow int times(long* kernelTime, long* userTime, long* childKern
 public cdecl nothrow int get_host_name(char* buffer, int size)
 {
     return cast<int>(trap(0u, sys_get_host_name, 0u, buffer, size));
+}
+
+public cdecl nothrow int dup(int fd)
+{
+    return cast<int>(trap(0u, sys_dup, 0u, fd));
 }

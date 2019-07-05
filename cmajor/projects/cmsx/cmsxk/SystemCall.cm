@@ -55,8 +55,9 @@ namespace cmsx.kernel
     public const byte sys_sync = 49u;
     public const byte sys_times = 50u;
     public const byte sys_get_host_name = 51u;
+    public const byte sys_dup = 52u;
     
-    public const byte numSystemCalls = sys_get_host_name + 1u;
+    public const byte numSystemCalls = sys_dup + 1u;
 
     public nothrow string SystemCallName(byte systemCall)
     {
@@ -114,6 +115,7 @@ namespace cmsx.kernel
             case sys_sync: return "sys_sync";
             case sys_times: return "sys_times";
             case sys_get_host_name: return "sys_get_host_name";
+            case sys_dup: return "sys_dup";
         }
         return string();
     }
@@ -806,5 +808,14 @@ namespace cmsx.kernel
         }
         WriteProcessMemory(*sc.machine, sc.process, bufferAddress, cast<byte*>(cast<void*>(host.Chars())), cast<ulong>(host.Length() + 1), Protection.write);
         sc.result = 0;
+    }
+
+    public void Dup(SystemCall& sc)
+    {
+        if (sc.x != 0u || sc.y != sys_dup || sc.z != 0u)
+        {
+            Panic("invalid dup parameters: " + ToString(sc.x) + ", " + ToString(sc.y) + ", " + ToString(sc.z));
+        }
+        sc.result = Dup(sc.process, cast<int>(sc.ax));
     }
 }

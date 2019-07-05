@@ -24,31 +24,22 @@ void PrintHelp()
 void TimeCommand(const string& command, const List<string>& args, bool verbose)
 {
     TimePoint start = Now();
-    int pid = Fork();
-    if (pid == 0)
+    ushort exitCode = ShellExecute(command, args);
+    TimePoint stop = Now();
+    Duration realTime = stop - start;
+    Duration systemTime;
+    Duration userTime;
+    Duration childSystemTime;
+    Duration childUserTime;
+    Times(systemTime, userTime, childSystemTime, childUserTime);
+    Console.Out() << "real " << DurationStr(realTime) << endl();
+    Console.Out() << "system " << DurationStr(childSystemTime) << endl();
+    Console.Out() << "user " << DurationStr(childUserTime) << endl();
+    if (verbose)
     {
-        Exec(command, args);
-    }
-    else
-    {
-        ushort exitCode = 0u;
-        Wait(&exitCode);
-        TimePoint stop = Now();
-        Duration realTime = stop - start;
-        Duration systemTime;
-        Duration userTime;
-        Duration childSystemTime;
-        Duration childUserTime;
-        Times(systemTime, userTime, childSystemTime, childUserTime);
-        Console.Out() << "real " << DurationStr(realTime) << endl();
-        Console.Out() << "system " << DurationStr(childSystemTime) << endl();
-        Console.Out() << "user " << DurationStr(childUserTime) << endl();
-        if (verbose)
+        if (exitCode != 0u)
         {
-            if (exitCode != 0u)
-            {
-                Console.Out() << "command '" << command << "' returned exit code " << exitCode << endl();
-            }
+            Console.Out() << "command '" << command << "' returned exit code " << exitCode << endl();
         }
     }
 }

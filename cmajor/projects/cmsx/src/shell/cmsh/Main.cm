@@ -10,6 +10,21 @@ using System.Os;
 using System.Security;
 using cmsh;
 
+void PrintHelp()
+{
+    Console.Out() << "Usage: cmsh [options] [COMMAND [ARGS]...]" << endl();
+    Console.Out() << "If no COMMAND and ARGS are given run shell in interactive mode." << endl();
+    Console.Out() << "Otherwise expand COMMAND and ARGS and run command." << endl();
+    Console.Out() << "Then exit code of the shell is the exit code of the COMMAND." << endl() << endl();
+    Console.Out() << "Options:" << endl();
+    Console.Out() << "--help | -h" << endl();
+    Console.Out() << "  Print help and exit." << endl() << endl();
+    Console.Out() << "--diagnostics | -d" << endl();
+    Console.Out() << "  Show stack trace in case of error." << endl() << endl();
+    Console.Out() << "--debug | -b" << endl();
+    Console.Out() << "  Show tokens before and after each expansion performed." << endl() << endl();
+}
+
 namespace cmsh
 {
     void SetLoginEnvironment(ShellEnvironment& shellEnvironment)
@@ -136,18 +151,50 @@ namespace cmsh
     
     void ProcessLine(const string& line, ShellEnvironment& shellEnvironment)
     {
-        try
+        TokenizerFlags flags = TokenizerFlags.none;
+        List<Token> tokens = Tokenize(ToUtf32(line), flags);
+        Expand(tokens, shellEnvironment, flags);
+        ProcessCommandLine(tokens, shellEnvironment);
+    }
+    
+    void RunInteractive(ShellEnvironment& shellEnvironment)
+    {
+        PrintPrompt(shellEnvironment);
+        string line = ReadLine(shellEnvironment);
+        while (!shellEnvironment.exit)
         {
-            TokenizerFlags flags = TokenizerFlags.none;
-            List<Token> tokens = Tokenize(ToUtf32(line), flags);
-            Expand(tokens, shellEnvironment, flags);
-            ProcessCommandLine(tokens, shellEnvironment);
+            try
+            {
+                ProcessLine(line, shellEnvironment);
+            }
+            catch (const Exception& ex)
+            {
+                Console.Error() << "cmsh: " << ex.Message() << endl();
+            }
+            Console.Out() << endl();
+            if (shellEnvironment.exit) break;
+            PrintPrompt(shellEnvironment);
+            line = ReadLine(shellEnvironment);
         }
-        catch (const Exception& ex)
+    }
+    
+    void RunCommand(const List<string>& args, ShellEnvironment& shellEnvironment)
+    {
+        string line;
+        bool first = true;
+        for (string arg : args)
         {
-            Console.Error() << "cmsh: " << ex.Message() << endl();
+            if (first)
+            {
+                first = false;
+            }
+            else
+            {
+                line.Append(' ');
+            }
+            line.Append(arg);
         }
-        Console.Out() << endl();
+        ProcessLine(line, shellEnvironment);
     }
 }
 
@@ -157,16 +204,80 @@ int main(int argc, const char** argv)
     int retval = 0;
     try
     {
-        ShellEnvironment shellEnvironment;
-        Setup(shellEnvironment);
-        PrintPrompt(shellEnvironment);
-        string line = ReadLine(shellEnvironment);
-        while (!shellEnvironment.exit)
+        List<string> args;
+        bool debug = false;
+        for (int i = 1; i < argc; ++i)
         {
-            ProcessLine(line, shellEnvironment);
-            if (shellEnvironment.exit) break;
-            PrintPrompt(shellEnvironment);
-            line = ReadLine(shellEnvironment);
+            string arg = argv[i];
+            if (arg.StartsWith("--"))
+            {
+                if (arg == "--help")
+                {
+                    PrintHelp();
+                    return 1;
+                }
+                else if (arg == "--diagnostics")
+                {
+                    diagnostics = true;
+                }
+                else if (arg == "--debug")
+                {
+                    debug = true;
+                }
+                else
+                {
+                    throw Exception("unknown option '" + arg + "'");
+                }
+            }
+            else if (arg.StartsWith("-"))
+            {
+                string options = arg.Substring(1);
+                if (options.IsEmpty())
+                {
+                    throw Exception("unknonwn option '" + arg + "'");
+                }
+                else
+                {
+                    for (char o : options)
+                    {
+                        if (o == 'h')
+                        {
+                            PrintHelp();
+                            return 1;
+                        }
+                        else if (o == 'd')
+                        {
+                            diagnostics = true;
+                        }
+                        else if (o == 'b')
+                        {
+                            debug = true;
+                        }
+                        else 
+                        {
+                            throw Exception("unknown option '-" + string(o) + "'");
+                        }
+                    }
+                }
+            }
+            else
+            {
+                args.Add(arg);
+            }
+        }
+        ShellEnvironment shellEnvironment;
+        if (debug)
+        {
+            shellEnvironment.debug = true;
+        }
+        Setup(shellEnvironment);
+        if (args.IsEmpty())
+        {
+            RunInteractive(shellEnvironment);
+        }
+        else
+        {
+            RunCommand(args, shellEnvironment);
         }
     }
     catch (const Exception& ex)

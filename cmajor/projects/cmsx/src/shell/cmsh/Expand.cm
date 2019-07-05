@@ -11,22 +11,52 @@ namespace cmsh
 {
     public void Expand(List<Token>& tokens, ShellEnvironment& shellEnvironment, TokenizerFlags flags)
     {
+        if (shellEnvironment.debug)
+        {
+            Console.Out() << "tokens before expansions:" << endl();
+            PrintTokens(tokens);
+        }
         if ((flags & TokenizerFlags.containsLBrace) != TokenizerFlags.none)
         {
             tokens = BraceExpand(tokens);
+            if (shellEnvironment.debug)
+            {
+                Console.Out() << "tokens after brace expansion:" << endl();
+                PrintTokens(tokens);
+            }
         }
         if ((flags & TokenizerFlags.containsTilde) != TokenizerFlags.none)
         {
             TildeExpand(tokens, shellEnvironment.home, shellEnvironment.users);
+            if (shellEnvironment.debug)
+            {
+                Console.Out() << "tokens after tilde expansion:" << endl();
+                PrintTokens(tokens);
+            }
         }
         if ((flags & TokenizerFlags.containsDollar) != TokenizerFlags.none)
         {
             tokens = ExpandParameters(tokens, shellEnvironment.variables);
+            if (shellEnvironment.debug)
+            {
+                Console.Out() << "tokens after parameter expansion:" << endl();
+                PrintTokens(tokens);
+            }
         }
         if ((flags & TokenizerFlags.containsPatternChar) != TokenizerFlags.none)
         {
             tokens = ExpandFileNamePatterns(tokens);
+            if (shellEnvironment.debug)
+            {
+                Console.Out() << "tokens after file name expansion:" << endl();
+                PrintTokens(tokens);
+            }
         }
         RemoveQuotes(tokens);
+        if (shellEnvironment.debug)
+        {
+            Console.Out() << "tokens after expansions:" << endl();
+            PrintTokens(tokens);
+        }
     }
 }

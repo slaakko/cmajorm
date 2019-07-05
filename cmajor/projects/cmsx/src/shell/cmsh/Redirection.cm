@@ -1,0 +1,77 @@
+// =================================
+// Copyright (c) 2019 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.IO;
+using System.Os;
+
+namespace cmsh
+{
+    public abstract class Redirection
+    {
+        public nothrow Redirection(int fd_) : fd(fd_)
+        {
+        }
+        public abstract nothrow string ToString() const;
+        public default virtual ~Redirection();
+        public abstract void Execute();
+        public int fd;
+        public string filename;
+    }
+
+    public class InputRedirection : Redirection
+    {
+        public nothrow InputRedirection(int fd_) : base(fd_)
+        {
+        }
+        public override nothrow string ToString() const
+        {
+            return ToString(fd) + "<" + filename;
+        }
+        public override void Execute()
+        {
+            int newFD = Open(filename.Chars(), OpenFlags.read, 0);
+            Close(fd);
+            Dup(newFD);
+            Close(newFD);
+        }
+    }
+    
+    public class OutputRedirection : Redirection
+    {
+        public nothrow OutputRedirection(int fd_) : base(fd_)
+        {
+        }
+        public override nothrow string ToString() const
+        {
+            return ToString(fd) + ">" + filename;
+        }
+        public override void Execute()
+        {
+            int newFD = Create(filename.Chars(), 0);
+            Close(fd);
+            Dup(newFD);
+            Close(newFD);
+        }
+    }
+    
+    public class AppendRedirection : Redirection
+    {
+        public nothrow AppendRedirection(int fd_) : base(fd_)
+        {
+        }
+        public override nothrow string ToString() const
+        {
+            return ToString(fd) + ">>" + filename;
+        }
+        public override void Execute()
+        {
+            int newFD = Open(filename.Chars(), OpenFlags.write | OpenFlags.append, 0);
+            Close(fd);
+            Dup(newFD);
+            Close(newFD);
+        }
+    }
+}

@@ -4,6 +4,7 @@ xcopy /Y /D coreutil\chmod\bin\debug ..\bind
 xcopy /Y /D coreutil\cp\bin\debug ..\bind
 xcopy /Y /D coreutil\echo\bin\debug ..\bind
 xcopy /Y /D coreutil\fc\bin\debug ..\bind
+xcopy /Y /D coreutil\hexdump\bin\debug ..\bin
 xcopy /Y /D coreutil\ls\bin\debug ..\bind
 xcopy /Y /D coreutil\mkdir\bin\debug ..\bind
 xcopy /Y /D coreutil\mv\bin\debug ..\bind

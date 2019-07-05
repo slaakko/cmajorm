@@ -23,7 +23,6 @@ void PrintHelp()
 
 int main(int argc, const char** argv)
 {
-    bool prevEcho = false;
     bool diagnostics = false;
     bool printUnchangedMessage = false;
     try
@@ -84,7 +83,6 @@ int main(int argc, const char** argv)
         {
             throw Exception("passwd: input not coming from console");
         }
-        prevEcho = Echo(0);
         Users users = GetUsers();
         User* user = null;
         if (userArgs.IsEmpty())
@@ -122,7 +120,9 @@ int main(int argc, const char** argv)
         {
             Console.Out() << "Changing password for " << user->Name() << "." << endl();
             Console.Out() << "Current CMSX password: ";
+            SetEcho(0, false);
             string password = Console.ReadLine();
+            SetEcho(0, true);
             if (password.IsEmpty())
             {
                 throw Exception("Unauthorized.");
@@ -163,7 +163,6 @@ int main(int argc, const char** argv)
         user->SetHash(hash);
         WriteUsers(users);
         Console.Out() << "Password changed." << endl();
-        SetEcho(0, prevEcho);
     }
     catch (const Exception& ex)
     {
@@ -178,13 +177,6 @@ int main(int argc, const char** argv)
         else
         {
             Console.Error() << ex.Message() << endl();
-        }
-        try
-        {
-            SetEcho(0, prevEcho);
-        }
-        catch (const Exception&)
-        {
         }
         return 1;
     }
