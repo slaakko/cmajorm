@@ -10,8 +10,7 @@ namespace cmsx.kernel
         public INodeBitmap(int fsNumber_) : fsNumber(fsNumber_)
         {
             FileSystem* fs = GetMountTable().GetFileSystem(fsNumber);
-            Block* sb = fs->GetBlockManager()->ReadBlock(BlockKey(0, fsNumber, BlockKind.superBlock), null);
-            #assert(sb is SuperBlock*);
+            Block* sb = fs->GetBlockManager()->ReadBlock(BlockKey(0, fsNumber), null);
             BlockPutter superBlockPutter(sb);
             SuperBlock* superBlock = cast<SuperBlock*>(sb);
             int firstNumber = superBlock->GetFirstINodeBitmapBlockNumber();
@@ -23,14 +22,13 @@ namespace cmsx.kernel
             }
             if (superBlock->GetLastBlockNumber() < firstNumber + bitmapBlockIndex)
             {
-                block = fs->GetBlockManager()->GetBlock(BlockKey(firstNumber + bitmapBlockIndex, superBlock->Key().fsNumber, BlockKind.bitmapBlock), superBlock);
+                block = fs->GetBlockManager()->GetBlock(BlockKey(firstNumber + bitmapBlockIndex, superBlock->Key().fsNumber), superBlock);
                 block->Clear();
             }
             else
             {
-                block = fs->GetBlockManager()->ReadBlock(BlockKey(firstNumber + bitmapBlockIndex, superBlock->Key().fsNumber, BlockKind.bitmapBlock), superBlock);
+                block = fs->GetBlockManager()->ReadBlock(BlockKey(firstNumber + bitmapBlockIndex, superBlock->Key().fsNumber), superBlock);
             }
-            #assert(block is BitmapBlock*);
             BlockPutter putter(block);
             BitmapBlock* bitmapBlock = cast<BitmapBlock*>(block);
             bitmapBlock->SetBit(0);
@@ -43,8 +41,7 @@ namespace cmsx.kernel
                 LogMessage("fs.ibm.getfreeinodenumber", "begin");
             }
             FileSystem* fs = GetMountTable().GetFileSystem(fsNumber);
-            Block* sb = fs->GetBlockManager()->ReadBlock(BlockKey(0, fsNumber, BlockKind.superBlock), null);
-            #assert(sb is SuperBlock*);
+            Block* sb = fs->GetBlockManager()->ReadBlock(BlockKey(0, fsNumber), null);
             BlockPutter superBlockPutter(sb);
             SuperBlock* superBlock = cast<SuperBlock*>(sb);
             int firstNumber = superBlock->GetFirstINodeBitmapBlockNumber();
@@ -54,14 +51,13 @@ namespace cmsx.kernel
                 Block* block = null;
                 if (superBlock->GetLastBlockNumber() < firstNumber + i)
                 {
-                    block = fs->GetBlockManager()->GetBlock(BlockKey(firstNumber + i, superBlock->Key().fsNumber, BlockKind.bitmapBlock), superBlock);
+                    block = fs->GetBlockManager()->GetBlock(BlockKey(firstNumber + i, superBlock->Key().fsNumber), superBlock);
                     block->Clear();
                 }
                 else
                 {
-                    block = fs->GetBlockManager()->ReadBlock(BlockKey(firstNumber + i, superBlock->Key().fsNumber, BlockKind.bitmapBlock), superBlock);
+                    block = fs->GetBlockManager()->ReadBlock(BlockKey(firstNumber + i, superBlock->Key().fsNumber), superBlock);
                 }
-                #assert(block is BitmapBlock*);
                 BlockPutter putter(block);
                 BitmapBlock* bitmapBlock = cast<BitmapBlock*>(block);
                 int index = bitmapBlock->GetFirstZeroBitIndex();
@@ -86,8 +82,7 @@ namespace cmsx.kernel
                 LogMessage("fs.ibm.setfreeinodenumber", "begin.inode=" + ToString(inodeNumber));
             }
             FileSystem* fs = GetMountTable().GetFileSystem(fsNumber);
-            Block* sb = fs->GetBlockManager()->ReadBlock(BlockKey(0, fsNumber, BlockKind.superBlock), null);
-            #assert(sb is SuperBlock*);
+            Block* sb = fs->GetBlockManager()->ReadBlock(BlockKey(0, fsNumber), null);
             BlockPutter superBlockPutter(sb);
             SuperBlock* superBlock = cast<SuperBlock*>(sb);
             int blockNumber = inodeNumber / numBitsInBitmapBlock;
@@ -96,14 +91,13 @@ namespace cmsx.kernel
             Block* block = null;
             if (superBlock->GetLastBlockNumber() < firstNumber + blockNumber)
             {
-                block = fs->GetBlockManager()->GetBlock(BlockKey(firstNumber + blockNumber, superBlock->Key().fsNumber, BlockKind.bitmapBlock), superBlock);
+                block = fs->GetBlockManager()->GetBlock(BlockKey(firstNumber + blockNumber, superBlock->Key().fsNumber), superBlock);
                 block->Clear();
             }
             else
             {
-                block = fs->GetBlockManager()->ReadBlock(BlockKey(firstNumber + blockNumber, superBlock->Key().fsNumber, BlockKind.bitmapBlock), superBlock);
+                block = fs->GetBlockManager()->ReadBlock(BlockKey(firstNumber + blockNumber, superBlock->Key().fsNumber), superBlock);
             }
-            #assert(block is BitmapBlock*);
             {
                 BlockPutter putter(block);
                 BitmapBlock* bitmapBlock = cast<BitmapBlock*>(block);
@@ -203,20 +197,19 @@ namespace cmsx.kernel
                     Block* block = null;
                     if (fileSystem->LastBlockNumber() < inodeBlockNumber)
                     {
-                        block = fs->GetBlockManager()->GetBlock(BlockKey(inodeBlockNumber, key.fsNumber, BlockKind.inodeBlock), null);
+                        block = fs->GetBlockManager()->GetBlock(BlockKey(inodeBlockNumber, key.fsNumber), null);
                         block->Clear();
                     }
                     else
                     {
-                        block = fs->GetBlockManager()->ReadBlock(BlockKey(inodeBlockNumber, key.fsNumber, BlockKind.inodeBlock), null);
+                        block = fs->GetBlockManager()->ReadBlock(BlockKey(inodeBlockNumber, key.fsNumber), null);
                     }
-                    #assert(block is INodeBlock*);
                     BlockPutter putter(block);
                     INodeBlock* inodeBlock = cast<INodeBlock*>(block);
-                    INode* source = inodeBlock->GetINode(GetINodeIndex(key.inodeNumber));
+                    INode source = inodeBlock->GetINode(GetINodeIndex(key.inodeNumber));
                     UniquePtr<byte> mem(cast<byte*>(MemAlloc(inodeSize)));
                     MemoryWriter writer(mem.Get(), inodeSize);
-                    source->Write(writer);
+                    source.Write(writer);
                     MemoryReader reader(mem.Get(), inodeSize);
                     inode->ResetFlags();
                     inode->Read(reader);
@@ -257,6 +250,7 @@ namespace cmsx.kernel
                     }
                     fs->GetBlockManager()->FreeBlocks(inode);
                     inode->SetType(FileType.free);
+                    inodeMap.Remove(inode->Key());
                     FileSystem* fsi = GetMountTable().GetFileSystem(inode->Key().fsNumber);
                     fsi->SetFreeINodeNumber(inode->Key().inodeNumber);
                 }
@@ -267,22 +261,16 @@ namespace cmsx.kernel
                     Block* block = null;
                     if (fileSystem->LastBlockNumber() < inodeBlockNumber)
                     {
-                        block = fileSystem->GetBlockManager()->GetBlock(BlockKey(inodeBlockNumber, inode->Key().fsNumber, BlockKind.inodeBlock), null);
+                        block = fileSystem->GetBlockManager()->GetBlock(BlockKey(inodeBlockNumber, inode->Key().fsNumber), null);
                         block->Clear();
                     }
                     else
                     {
-                        block = fileSystem->GetBlockManager()->ReadBlock(BlockKey(inodeBlockNumber, inode->Key().fsNumber, BlockKind.inodeBlock), null);
+                        block = fileSystem->GetBlockManager()->ReadBlock(BlockKey(inodeBlockNumber, inode->Key().fsNumber), null);
                     }
                     BlockPutter putter(block);
-                    #assert(block is INodeBlock*);
                     INodeBlock* inodeBlock = cast<INodeBlock*>(block);
-                    INode* target = inodeBlock->GetINode(GetINodeIndex(inode->Key().inodeNumber));
-                    UniquePtr<byte> mem(cast<byte*>(MemAlloc(inodeSize)));
-                    MemoryWriter writer(mem.Get(), inodeSize);
-                    inode->Write(writer);
-                    MemoryReader reader(mem.Get(), inodeSize);
-                    target->Read(reader);
+                    inodeBlock->SetINode(GetINodeIndex(inode->Key().inodeNumber), *inode);
                     block->SetFlag(Block.Flags.dirty);
                     fileSystem->GetBlockManager()->WriteBlock(block, null);
                     inode->ResetFlag(INode.Flags.dirty);
@@ -407,7 +395,7 @@ namespace cmsx.kernel
                         }
                         catch (const Exception& ex)
                         {
-                            throw FileSystemException("cannot browse directory '" + pc + "' using uid " + ToString(process->uid) + ": " + ex.Message());
+                            throw SystemError(EPERM, "cannot browse directory '" + pc + "' using uid " + ToString(process->uid) + ": " + ex.Message());
                         }
                         if (inode->Key() == process->rootDirINodeKey && pathComponent == "..") continue;
                         if (pathComponent == ".") continue;
@@ -429,13 +417,12 @@ namespace cmsx.kernel
                         {
                             return null;
                         }
-                        Block* block = fs->GetBlockManager()->ReadBlock(BlockKey(blockNumber, inode->Key().fsNumber, BlockKind.directoryBlock), null);
-                        #assert(block is DirectoryBlock*);
+                        Block* block = fs->GetBlockManager()->ReadBlock(BlockKey(blockNumber, inode->Key().fsNumber), null);
                         BlockPutter blockPutter(block);
                         DirectoryBlock* directoryBlock = cast<DirectoryBlock*>(block);
                         for (int i = 0; i < numDirectoryEntriesInBlock; ++i)
                         {
-                            const DirectoryEntry& entry = directoryBlock->GetDirectoryEntry(i);
+                            DirectoryEntry entry = directoryBlock->GetDirectoryEntry(i);
                             if (entry.inodeNumber == 0)
                             {
                                 if (createEntry && pi == pn - 1 && freeDirectorySlot.offset == -1)
@@ -446,8 +433,7 @@ namespace cmsx.kernel
                                 offset = offset + directoryEntrySize;
                                 continue;
                             }
-                            string entryName = &entry.name[0];
-                            if (pathComponent == entryName)
+                            if (pathComponent == entry.name)
                             {
                                 inode = GetINode(INodeKey(entry.inodeNumber, inode->Key().fsNumber));
                                 if (!ignoreMountPoint && inode->GetFlag(INode.Flags.mountPoint))

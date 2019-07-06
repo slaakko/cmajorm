@@ -79,7 +79,7 @@ namespace cmsx.kernel
                 }
                 catch (const Exception& ex)
                 {
-                    throw FileSystemException("cannot write to directory '" + Path.GetDirectoryName(path) + "' using uid " + ToString(process->uid) + ": " + ex.Message());
+                    throw SystemError(EPERM, "cannot write to directory '" + Path.GetDirectoryName(path) + "' using uid " + ToString(process->uid) + ": " + ex.Message());
                 }
                 FileSystem* fs = GetMountTable().GetFileSystem(parent->Key().fsNumber);
                 int inodeNumber = fs->GetFreeINodeNumber();
@@ -100,14 +100,14 @@ namespace cmsx.kernel
                 Block* block = null;
                 if (freeDirectorySlot.blockNumber != invalidBlockNumber)
                 {
-                    block = GetBlockManager()->ReadBlock(BlockKey(freeDirectorySlot.blockNumber, parent->Key().fsNumber, BlockKind.directoryBlock), null);
+                    block = GetBlockManager()->ReadBlock(BlockKey(freeDirectorySlot.blockNumber, parent->Key().fsNumber), null);
                 }
                 else
                 {
                     int blockNumber = 0;
                     int blockOffset = 0;
                     GetBlockManager()->GetBlockNumber(parent, freeDirectorySlot.offset, blockNumber, blockOffset, true);
-                    block = GetBlockManager()->GetBlock(BlockKey(blockNumber, parent->Key().fsNumber, BlockKind.directoryBlock), null);
+                    block = GetBlockManager()->GetBlock(BlockKey(blockNumber, parent->Key().fsNumber), null);
                     block->Clear();
                 }
                 BlockPutter blockPutter(block);
@@ -115,11 +115,12 @@ namespace cmsx.kernel
                 bool created = false;
                 for (int i = 0; i < numDirectoryEntriesInBlock; ++i)
                 {
-                    DirectoryEntry& entry = directoryBlock->GetDirectoryEntry(i);
+                    DirectoryEntry entry = directoryBlock->GetDirectoryEntry(i);
                     if (entry.inodeNumber == 0)
                     {
                         entry.inodeNumber = inode->Key().inodeNumber;
-                        StrCopy(&entry.name[0], name.Chars(), nameMax);
+                        entry.name = name.Substring(0, nameMax -1);
+                        directoryBlock->SetDirectoryEntry(i, entry);
                         if (freeDirectorySlot.blockNumber == invalidBlockNumber || freeDirectorySlot.offset >= parent->GetFileSize())
                         {
                             parent->SetFileSize(parent->GetFileSize() + directoryEntrySize);
@@ -227,7 +228,7 @@ namespace cmsx.kernel
             }
             catch (const Exception& ex)
             {
-                throw FileSystemException("cannot write to directory '" + Path.GetDirectoryName(targetPath) + "' using uid " + ToString(process->uid) + ": " + ex.Message());
+                throw SystemError(EPERM, "cannot write to directory '" + Path.GetDirectoryName(targetPath) + "' using uid " + ToString(process->uid) + ": " + ex.Message());
             }
             FileSystem* fs = GetMountTable().GetFileSystem(parent->Key().fsNumber);
             if (fs->IsReadOnly())
@@ -241,14 +242,14 @@ namespace cmsx.kernel
             Block* block = null;
             if (freeDirectorySlot.blockNumber != invalidBlockNumber)
             {
-                block = GetBlockManager()->ReadBlock(BlockKey(freeDirectorySlot.blockNumber, parent->Key().fsNumber, BlockKind.directoryBlock), null);
+                block = GetBlockManager()->ReadBlock(BlockKey(freeDirectorySlot.blockNumber, parent->Key().fsNumber), null);
             }
             else
             {
                 int blockNumber = 0;
                 int blockOffset = 0;
                 GetBlockManager()->GetBlockNumber(parent, freeDirectorySlot.offset, blockNumber, blockOffset, true);
-                block = GetBlockManager()->GetBlock(BlockKey(blockNumber, parent->Key().fsNumber, BlockKind.directoryBlock), null);
+                block = GetBlockManager()->GetBlock(BlockKey(blockNumber, parent->Key().fsNumber), null);
                 block->Clear();
             }
             BlockPutter blockPutter(block);
@@ -256,11 +257,12 @@ namespace cmsx.kernel
             bool created = false;
             for (int i = 0; i < numDirectoryEntriesInBlock; ++i)
             {
-                DirectoryEntry& entry = directoryBlock->GetDirectoryEntry(i);
+                DirectoryEntry entry = directoryBlock->GetDirectoryEntry(i);
                 if (entry.inodeNumber == 0)
                 {
                     entry.inodeNumber = source->Key().inodeNumber;
-                    StrCopy(&entry.name[0], name.Chars(), nameMax);
+                    entry.name = name.Substring(0, nameMax - 1);
+                    directoryBlock->SetDirectoryEntry(i, entry);
                     if (freeDirectorySlot.blockNumber == invalidBlockNumber || freeDirectorySlot.offset >= parent->GetFileSize())
                     {
                         parent->SetFileSize(parent->GetFileSize() + directoryEntrySize);
@@ -325,7 +327,7 @@ namespace cmsx.kernel
             }
             catch (const Exception& ex)
             {
-                throw FileSystemException("cannot write to directory '" + parentPath + "' using uid " + ToString(process->uid) + ": " + ex.Message());
+                throw SystemError(EPERM, "cannot write to directory '" + parentPath + "' using uid " + ToString(process->uid) + ": " + ex.Message());
             }
             INodePutter inodePutter(inode);
             if (Log())
@@ -344,17 +346,16 @@ namespace cmsx.kernel
                 {
                     throw SystemError(EFAIL, "directory block number not found from inode of '" + parentPath + "'");
                 }
-                Block* block = GetBlockManager()->ReadBlock(BlockKey(blockNumber, parent->Key().fsNumber, BlockKind.directoryBlock), null);
+                Block* block = GetBlockManager()->ReadBlock(BlockKey(blockNumber, parent->Key().fsNumber), null);
                 BlockPutter putter(block);
-                #assert(block is DirectoryBlock*);
                 DirectoryBlock* directoryBlock = cast<DirectoryBlock*>(block);
                 for (int index = blockOffset / directoryEntrySize; index < numDirectoryEntriesInBlock && offset < parent->GetFileSize(); ++index)
                 {
-                    DirectoryEntry& entry = directoryBlock->GetDirectoryEntry(index);
-                    string name = &entry.name[0];
-                    if (name == entryName)
+                    DirectoryEntry entry = directoryBlock->GetDirectoryEntry(index);
+                    if (entry.name == entryName)
                     {
                         entry.inodeNumber = 0;
+                        directoryBlock->SetDirectoryEntry(index, entry);
                         block->SetFlag(Block.Flags.dirty);
                         GetBlockManager()->WriteBlock(block, null);
                         parent->SetFlag(INode.Flags.dirty);
@@ -428,7 +429,7 @@ namespace cmsx.kernel
             }
             catch (const Exception& ex)
             {
-                throw FileSystemException("cannot write to directory '" + sourceParentPath + "' using uid " + ToString(process->uid) + ": " + ex.Message());
+                throw SystemError(EPERM, "cannot write to directory '" + sourceParentPath + "' using uid " + ToString(process->uid) + ": " + ex.Message());
             }
             BlockPutter sourcePutter;
             DirectoryBlock* sourceDirectoryBlock = null;
@@ -444,19 +445,18 @@ namespace cmsx.kernel
                 {
                     throw SystemError(EFAIL, "directory block number not found from inode of '" + sourceParentPath + "'");
                 }
-                Block* block = GetBlockManager()->ReadBlock(BlockKey(blockNumber, sourceParent->Key().fsNumber, BlockKind.directoryBlock), null);
+                Block* block = GetBlockManager()->ReadBlock(BlockKey(blockNumber, sourceParent->Key().fsNumber), null);
                 BlockPutter putter(block);
-                #assert(block is DirectoryBlock*);
                 DirectoryBlock* directoryBlock = cast<DirectoryBlock*>(block);
                 for (int index = blockOffset / directoryEntrySize; index < numDirectoryEntriesInBlock && sourceOffset < sourceParent->GetFileSize(); ++index)
                 {
-                    DirectoryEntry& entry = directoryBlock->GetDirectoryEntry(index);
-                    string name = &entry.name[0];
-                    if (name == sourceEntryName)
+                    DirectoryEntry entry = directoryBlock->GetDirectoryEntry(index);
+                    if (entry.name == sourceEntryName)
                     {
                         if (sameDirectory)
                         {
-                            StrCopy(&entry.name[0], targetEntryName.Chars(), nameMax);
+                            entry.name = targetEntryName.Substring(0, nameMax - 1);
+                            directoryBlock->SetDirectoryEntry(index, entry);
                             directoryBlock->SetFlag(Block.Flags.dirty);
                             GetBlockManager()->WriteBlock(directoryBlock, null);
                             sourceParent->SetMTime();
@@ -495,7 +495,7 @@ namespace cmsx.kernel
             }
             catch (const Exception& ex)
             {
-                throw FileSystemException("cannot write to directory '" + targetParentPath + "' using uid " + ToString(process->uid) + ": " + ex.Message());
+                throw SystemError(EPERM, "cannot write to directory '" + targetParentPath + "' using uid " + ToString(process->uid) + ": " + ex.Message());
             }
             FileSystem* targetFS = GetMountTable().GetFileSystem(targetParent->Key().fsNumber);
             if (targetFS->IsReadOnly())
@@ -511,14 +511,14 @@ namespace cmsx.kernel
                 Block* targetBlock = null;
                 if (freeDirectorySlot.blockNumber != invalidBlockNumber)
                 {
-                    targetBlock = GetBlockManager()->ReadBlock(BlockKey(freeDirectorySlot.blockNumber, targetParent->Key().fsNumber, BlockKind.directoryBlock), null);
+                    targetBlock = GetBlockManager()->ReadBlock(BlockKey(freeDirectorySlot.blockNumber, targetParent->Key().fsNumber), null);
                 }
                 else
                 {
                     int blockNumber = 0;
                     int blockOffset = 0;
                     GetBlockManager()->GetBlockNumber(targetParent, freeDirectorySlot.offset, blockNumber, blockOffset, true);
-                    targetBlock= GetBlockManager()->GetBlock(BlockKey(blockNumber, targetParent->Key().fsNumber, BlockKind.directoryBlock), null);
+                    targetBlock= GetBlockManager()->GetBlock(BlockKey(blockNumber, targetParent->Key().fsNumber), null);
                     targetBlock->Clear();
                 }
                 BlockPutter targetBlockPutter(targetBlock);
@@ -526,12 +526,14 @@ namespace cmsx.kernel
                 bool created = false;
                 for (int i = 0; i < numDirectoryEntriesInBlock; ++i)
                 {
-                    DirectoryEntry& targetEntry = targetDirectoryBlock->GetDirectoryEntry(i);
+                    DirectoryEntry targetEntry = targetDirectoryBlock->GetDirectoryEntry(i);
                     if (targetEntry.inodeNumber == 0)
                     {
-                        DirectoryEntry& sourceEntry = sourceDirectoryBlock->GetDirectoryEntry(sourceIndex);
+                        DirectoryEntry sourceEntry = sourceDirectoryBlock->GetDirectoryEntry(sourceIndex);
                         targetEntry.inodeNumber = sourceEntry.inodeNumber;
-                        StrCopy(&targetEntry.name[0], targetEntryName.Chars(), nameMax);
+                        targetEntry.name = targetEntryName.Substring(0, nameMax - 1);
+                        targetDirectoryBlock->SetDirectoryEntry(i, targetEntry);
+                        targetDirectoryBlock->SetFlag(Block.Flags.dirty);
                         if (freeDirectorySlot.blockNumber == invalidBlockNumber || freeDirectorySlot.offset >= targetParent->GetFileSize())
                         {
                             targetParent->SetFileSize(targetParent->GetFileSize() + directoryEntrySize);
@@ -570,18 +572,19 @@ namespace cmsx.kernel
                     {
                         throw SystemError(EFAIL, "directory block number not found from inode of '" + targetParentPath + "'");
                     }
-                    Block* targetBlock = GetBlockManager()->ReadBlock(BlockKey(blockNumber, targetParent->Key().fsNumber, BlockKind.directoryBlock), null);
+                    Block* targetBlock = GetBlockManager()->ReadBlock(BlockKey(blockNumber, targetParent->Key().fsNumber), null);
                     BlockPutter putter(targetBlock);
                     #assert(targetBlock is DirectoryBlock*);
                     targetDirectoryBlock = cast<DirectoryBlock*>(targetBlock);
                     for (int index = blockOffset / directoryEntrySize; index < numDirectoryEntriesInBlock && offset < targetParent->GetFileSize(); ++index)
                     {
-                        DirectoryEntry& targetEntry = targetDirectoryBlock->GetDirectoryEntry(index);
+                        DirectoryEntry targetEntry = targetDirectoryBlock->GetDirectoryEntry(index);
                         if (targetEntry.inodeNumber == target->Key().inodeNumber)
                         {
                             target->SetNumLinks(target->GetNumLinks() - 1);
-                            DirectoryEntry& sourceEntry = sourceDirectoryBlock->GetDirectoryEntry(sourceIndex);
+                            DirectoryEntry sourceEntry = sourceDirectoryBlock->GetDirectoryEntry(sourceIndex);
                             targetEntry.inodeNumber = sourceEntry.inodeNumber;
+                            targetDirectoryBlock->SetDirectoryEntry(index, targetEntry);
                             entrySet = true;
                             break;
                         }
@@ -657,7 +660,7 @@ namespace cmsx.kernel
                 }
                 catch (const Exception& ex)
                 {
-                    throw FileSystemException("cannot write to directory '" + Path.GetDirectoryName(path) + "' using uid " + ToString(process->uid) + ": " + ex.Message());
+                    throw SystemError(EPERM, "cannot write to directory '" + Path.GetDirectoryName(path) + "' using uid " + ToString(process->uid) + ": " + ex.Message());
                 }
             }
             if (!name.IsEmpty())
@@ -670,27 +673,27 @@ namespace cmsx.kernel
                 Block* block = null;
                 if (freeDirectorySlot.blockNumber != invalidBlockNumber)
                 {
-                    block = GetBlockManager()->ReadBlock(BlockKey(freeDirectorySlot.blockNumber, parent->Key().fsNumber, BlockKind.directoryBlock), null);
+                    block = GetBlockManager()->ReadBlock(BlockKey(freeDirectorySlot.blockNumber, parent->Key().fsNumber), null);
                 }
                 else
                 {
                     int blockNumber = 0;
                     int blockOffset = 0;
                     GetBlockManager()->GetBlockNumber(parent, freeDirectorySlot.offset, blockNumber, blockOffset, true);
-                    block = GetBlockManager()->GetBlock(BlockKey(blockNumber, parent->Key().fsNumber, BlockKind.directoryBlock), null);
+                    block = GetBlockManager()->GetBlock(BlockKey(blockNumber, parent->Key().fsNumber), null);
                     block->Clear();
                 }
-                #assert(block is DirectoryBlock*);
                 BlockPutter blockPutter(block);
                 DirectoryBlock* directoryBlock = cast<DirectoryBlock*>(block);
                 bool created = false;
                 for (int i = 0; i < numDirectoryEntriesInBlock; ++i)
                 {
-                    DirectoryEntry& entry = directoryBlock->GetDirectoryEntry(i);
+                    DirectoryEntry entry = directoryBlock->GetDirectoryEntry(i);
                     if (entry.inodeNumber == 0)
                     {
                         entry.inodeNumber = inode->Key().inodeNumber;
-                        StrCopy(&entry.name[0], name.Chars(), nameMax);
+                        entry.name = name.Substring(0, nameMax - 1);
+                        directoryBlock->SetDirectoryEntry(i, entry);
                         if (freeDirectorySlot.blockNumber == invalidBlockNumber || freeDirectorySlot.offset >= parent->GetFileSize())
                         {
                             parent->SetFileSize(parent->GetFileSize() + directoryEntrySize);
@@ -745,7 +748,7 @@ namespace cmsx.kernel
             int blockNumber = 0;
             int blockOffset = 0;
             GetBlockManager()->GetBlockNumber(inode, 0, blockNumber, blockOffset, true);
-            Block* blck = GetBlockManager()->GetBlock(BlockKey(blockNumber, inode->Key().fsNumber, BlockKind.directoryBlock), null);
+            Block* blck = GetBlockManager()->GetBlock(BlockKey(blockNumber, inode->Key().fsNumber), null);
             blck->Clear();
             BlockPutter putter(blck);
             DirectoryBlock* dirBlock = cast<DirectoryBlock*>(blck);
@@ -753,17 +756,19 @@ namespace cmsx.kernel
             bool crtd = false;
             for (int i = 0; i < numDirectoryEntriesInBlock; ++i)
             {
-                DirectoryEntry& entry = dirBlock->GetDirectoryEntry(i);
+                DirectoryEntry entry = dirBlock->GetDirectoryEntry(i);
                 if (entry.inodeNumber == 0 && n == 0)
                 {
                     entry.inodeNumber = parent->Key().inodeNumber;
-                    StrCopy(&entry.name[0], "..", nameMax);
+                    entry.name = "..";
+                    dirBlock->SetDirectoryEntry(i, entry);
                     ++n;
                 }
                 else if (entry.inodeNumber == 0 && n == 1)
                 {
                     entry.inodeNumber = inode->Key().inodeNumber;
-                    StrCopy(&entry.name[0], ".", nameMax);
+                    entry.name = ".";
+                    dirBlock->SetDirectoryEntry(i, entry);
                     ++n;
                     crtd = true;
                     break;
@@ -834,20 +839,18 @@ namespace cmsx.kernel
                     {
                         throw SystemError(EFAIL, "could not get block number for directory inode");
                     }
-                    Block* block = GetBlockManager()->ReadBlock(BlockKey(blockNumber, dirINode->Key().fsNumber, BlockKind.directoryBlock), null);
+                    Block* block = GetBlockManager()->ReadBlock(BlockKey(blockNumber, dirINode->Key().fsNumber), null);
                     BlockPutter putter(block);
-                    #assert(block is DirectoryBlock*);
                     DirectoryBlock* directoryBlock = cast<DirectoryBlock*>(block);
                     for (int index = blockOffset / directoryEntrySize; index < numDirectoryEntriesInBlock && offset < dirINode->GetFileSize(); ++index)
                     {
-                        const DirectoryEntry& directoryEntry = directoryBlock->GetDirectoryEntry(index);
-                        string entryName = &directoryEntry.name[0];
+                        DirectoryEntry directoryEntry = directoryBlock->GetDirectoryEntry(index);
                         if (!first && directoryEntry.inodeNumber == prevINode->Key().inodeNumber)
                         {
-                            currentWorkindDirectoryPath = Path.Combine(entryName, currentWorkindDirectoryPath);
+                            currentWorkindDirectoryPath = Path.Combine(directoryEntry.name, currentWorkindDirectoryPath);
                             found = true;
                         }
-                        if (entryName == "..")
+                        if (directoryEntry.name == "..")
                         {
                             INodeKey key(directoryEntry.inodeNumber, dirINode->Key().fsNumber);
                             if (key != dirINode->Key())

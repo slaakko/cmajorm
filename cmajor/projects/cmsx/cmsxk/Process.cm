@@ -25,7 +25,7 @@ namespace cmsx.kernel
             case consoleInputEvent: eventStr.Append("console.input.").Append(ToHexString(eventData1)).Append('.').Append(ToString(eventData2)); break;
             case wakeupEvent: eventStr.Append("proc.wakeup.").Append(ToString(eventData1)); break;
             case blockUnlockedEvent: eventStr.Append("block.unlocked.").Append(cast<Block*>(cast<void*>(eventData1))->ToString()); break;
-            case anyBlockFreeEvent: eventStr.Append("anyblock.free.").Append(BlockKindStr(cast<BlockKind>(cast<byte>(eventData1))));; break;
+            case anyBlockFreeEvent: eventStr.Append("anyblock.free"); break;
             case blockIOEvent: eventStr.Append("blockio.ready.").Append(cast<Block*>(cast<void*>(eventData1))->ToString()); break;
             case inodeUnlockedEvent: eventStr.Append("inode.unlocked.").Append(cast<INode*>(cast<void*>(eventData1))->ToString()); break;
         }

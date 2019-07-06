@@ -310,8 +310,8 @@ namespace cmsx.kernel
                 {
                     LogMessage("fs.dd.read", "immediate=" + request->ToString());
                 }
-                MemoryReader reader(cast<byte*>(request->buffer.Get()), blockSize);
-                block->Read(reader);
+                MemoryWriter writer(cast<byte*>(request->buffer.Get()), blockSize);
+                block->Write(writer);
                 {
                     LockGuard<Mutex> lock(mtx);
                     requestMap.Remove(request->overlapped.Get());

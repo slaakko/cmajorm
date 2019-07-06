@@ -1051,14 +1051,13 @@ namespace cmsx.kernel
                     bool clearBlock = false;
                     if (inode->GetNumBlocks() > logicalBlockNumber && (blockOffset != 0 || bytesToWrite != blockSize))
                     {
-                        block = fs->GetBlockManager()->ReadBlock(BlockKey(blockNumber, inode->Key().fsNumber, BlockKind.fileBlock), null);
+                        block = fs->GetBlockManager()->ReadBlock(BlockKey(blockNumber, inode->Key().fsNumber), null);
                     }
                     else
                     {
-                        block = fs->GetBlockManager()->GetBlock(BlockKey(blockNumber, inode->Key().fsNumber, BlockKind.fileBlock), null);
+                        block = fs->GetBlockManager()->GetBlock(BlockKey(blockNumber, inode->Key().fsNumber), null);
                         block->Clear();
                     }
-                    #assert(block is FileBlock*);
                     BlockPutter blockPutter(block);
                     FileBlock* fileBlock = cast<FileBlock*>(block);
                     UniquePtr<byte> buffer(cast<byte*>(RtMemAlloc(bytesToWrite)));
@@ -1113,8 +1112,7 @@ namespace cmsx.kernel
                     MemoryWriter writer(buffer.Get(), bytesToRead);
                     if (!fs->IsRootFileSystem() || blockNumber != 0)
                     {
-                        block = fs->GetBlockManager()->ReadBlock(BlockKey(blockNumber, inode->Key().fsNumber, BlockKind.fileBlock), null);
-                        #assert(block is FileBlock*);
+                        block = fs->GetBlockManager()->ReadBlock(BlockKey(blockNumber, inode->Key().fsNumber), null);
                         BlockPutter blockPutter(block);
                         FileBlock* fileBlock = cast<FileBlock*>(block);
                         for (long i = 0; i < bytesToRead; ++i)

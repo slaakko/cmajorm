@@ -6,8 +6,6 @@ using cmsx.util;
 namespace cmsx.kernel
 {
     public const int invalidINodeNumber = 0;
-    public const int inodeSize = 128;
-    public const int numINodesInBlock = blockSize / inodeSize;
     public const int maxCachedINodes = 1024;
     public const int numDirectBlockNumbers = 17;
 
@@ -559,44 +557,6 @@ namespace cmsx.kernel
         private Access otherAccess;
         private INodeManager* manager;
         private Process* owner;
-    }
-
-    public class INodeBlock : Block
-    {
-        public nothrow INodeBlock(BlockManager* manager_, BlockCache* cache_) : base(BlockKey(0, 0, BlockKind.inodeBlock), manager_, cache_)
-        {
-        }
-        public override void Read(MemoryReader& reader)
-        {
-            base->Read(reader);
-            for (long i = 0; i < inodes.Length(); ++i)
-            {
-                inodes[i].Read(reader);
-            }
-        }
-        public override void Write(MemoryWriter& writer)
-        {
-            base->Write(writer);
-            for (long i = 0; i < inodes.Length(); ++i)
-            {
-                inodes[i].Write(writer);
-            }
-        }
-        public override nothrow void Clear()
-        {
-            long n = inodes.Length();
-            for (long i = 0; i < n; ++i)
-            {
-                inodes[i].Clear();
-            }
-            base->Clear();
-        }
-        public nothrow inline INode* GetINode(int index) const
-        {
-            #assert(index >= 0 && index < inodes.Length());
-            return &inodes[index];
-        }
-        private INode[numINodesInBlock] inodes;
     }
 
     public class INodePutter

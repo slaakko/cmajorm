@@ -92,13 +92,12 @@ namespace cmsx.kernel
                     {
                         return 0;
                     }
-                    Block* block = blockManager.ReadBlock(BlockKey(blockNumber, dirINode->Key().fsNumber, BlockKind.directoryBlock), null);
+                    Block* block = blockManager.ReadBlock(BlockKey(blockNumber, dirINode->Key().fsNumber), null);
                     BlockPutter putter(block);
-                    #assert(block is DirectoryBlock*);
                     DirectoryBlock* directoryBlock = cast<DirectoryBlock*>(block);
                     for (int index = blockOffset / directoryEntrySize; index < numDirectoryEntriesInBlock && dirFile->Offset() < dirINode->GetFileSize(); ++index)
                     {
-                        const DirectoryEntry& directoryEntry = directoryBlock->GetDirectoryEntry(index);
+                        DirectoryEntry directoryEntry = directoryBlock->GetDirectoryEntry(index);
                         if (directoryEntry.inodeNumber == 0)
                         {
                             dirFile->SetOffset(dirFile->Offset() + directoryEntrySize);
@@ -106,7 +105,7 @@ namespace cmsx.kernel
                         else
                         {
                             WriteProcessMemory(GetMachine(), process, inodeNumberAddress, cast<ulong>(directoryEntry.inodeNumber), 4u, Protection.write);
-                            WriteProcessMemory(GetMachine(), process, entryNameAddress, cast<byte*>(cast<void*>(&directoryEntry.name[0])), cast<ulong>(nameMax), Protection.write);
+                            WriteProcessMemory(GetMachine(), process, entryNameAddress, cast<byte*>(cast<void*>(directoryEntry.name.Chars())), cast<ulong>(directoryEntry.name.Length() + 1), Protection.write);
                             dirFile->SetOffset(dirFile->Offset() + directoryEntrySize);
                             return 1;
                         }
@@ -184,16 +183,14 @@ namespace cmsx.kernel
         }
         public override int GetFirstINodeBlockNumber() const
         {
-            Block* block = blockManager.ReadBlock(BlockKey(0, 0, BlockKind.superBlock), null);
-            #assert(block is SuperBlock*);
+            Block* block = blockManager.ReadBlock(BlockKey(0, 0), null);
             BlockPutter putter(block);
             SuperBlock* superBlock = cast<SuperBlock*>(block);
             return superBlock->GetFirstINodeBlockNumber();
         }
         public override INodeKey GetRootDirINodeKey() const
         {
-            Block* block = blockManager.ReadBlock(BlockKey(0, 0, BlockKind.superBlock), null);
-            #assert(block is SuperBlock*);
+            Block* block = blockManager.ReadBlock(BlockKey(0, 0), null);
             BlockPutter putter(block);
             SuperBlock* superBlock = cast<SuperBlock*>(block);
             return INodeKey(superBlock->GetRootDirINodeNumber(), 0);
@@ -209,8 +206,7 @@ namespace cmsx.kernel
         }
         public override int LastBlockNumber() const
         {
-            Block* block = blockManager.ReadBlock(BlockKey(0, 0, BlockKind.superBlock), null);
-            #assert(block is SuperBlock*);
+            Block* block = blockManager.ReadBlock(BlockKey(0, 0), null);
             BlockPutter putter(block);
             SuperBlock* superBlock = cast<SuperBlock*>(block);
             return superBlock->GetLastBlockNumber();
@@ -226,8 +222,7 @@ namespace cmsx.kernel
             }
             else
             {
-                Block* block = blockManager.ReadBlock(BlockKey(0, 0, BlockKind.superBlock), null);
-                #assert(block is SuperBlock*);
+                Block* block = blockManager.ReadBlock(BlockKey(0, 0), null);
                 BlockPutter putter(block);
                 SuperBlock* superBlock = cast<SuperBlock*>(block);
                 if (superBlock->GetLastBlockNumber() < blockNumber)
@@ -244,11 +239,11 @@ namespace cmsx.kernel
                 int numBlockBitmapBlocks = (maxBlocks - 1) / (8 * blockSize) + 1;
                 int numINodeBlocks = (maxFiles - 1) / numINodesInBlock + 1;
                 {
-                    Block* block = blockManager.GetBlock(BlockKey(0, 0, BlockKind.superBlock), null);
+                    Block* block = blockManager.GetBlock(BlockKey(0, 0), null);
                     block->Clear();
-                    #assert(block is SuperBlock*);
                     BlockPutter putter(block);
                     SuperBlock* superBlock = cast<SuperBlock*>(block);
+                    superBlock->SetLastBlockNumber(-1);
                     superBlock->SetFirstINodeBitmapBlockNumber(1);
                     superBlock->SetNumINodeBitmapBlocks(numINodeBitmapBlocks);
                     superBlock->SetFirstBlockBitmapBlockNumber(superBlock->GetFirstINodeBitmapBlockNumber() + superBlock->GetNumINodeBitmapBlocks());
@@ -257,13 +252,13 @@ namespace cmsx.kernel
                     superBlock->SetNumINodeBlocks(numINodeBlocks);
                     superBlock->SetFirstDataBlockNumber(superBlock->GetFirstINodeBlockNumber() + superBlock->GetNumINodeBlocks());
                     blockManager.WriteBlock(block, superBlock);
+                    superBlock->SetFlag(Block.Flags.valid);
                 }
                 blockBitmap.Reset(new BlockBitmap(0));
                 inodeBitmap.Reset(new INodeBitmap(0));
-                int rootDirINodeNumber = GetFreeINodeNumber();
+                int rootDirINodeNumber = GetFreeINodeNumber(); 
                 {
-                    Block* block = blockManager.GetBlock(BlockKey(0, 0, BlockKind.superBlock), null);
-                    #assert(block is SuperBlock*);
+                    Block* block = blockManager.ReadBlock(BlockKey(0, 0), null);
                     BlockPutter putter(block);
                     SuperBlock* superBlock = cast<SuperBlock*>(block);
                     superBlock->SetRootDirINodeNumber(rootDirINodeNumber);
