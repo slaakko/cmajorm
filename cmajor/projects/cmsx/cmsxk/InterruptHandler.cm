@@ -113,7 +113,7 @@ namespace cmsx.kernel
         string errorlf = error + "\n";
         debugger->WriteOutput(cast<byte*>(cast<void*>(errorlf.Chars())), errorlf.Length());
         debugger->Run(process);
-        Panic(error + " at virtual address " + ToHexString(virtualAddress) + " , page protection = " + GetProtectionStr(pageProtection) + ", " + GetProtectionStr(protection) + " needed (running process=" +
+        Panic(error + ", virtual address = " + ToHexString(virtualAddress) + ", page protection = " + GetProtectionStr(pageProtection) + ", " + GetProtectionStr(protection) + " needed (running process=" +
             runningProcessName + ")\n" + stackTrace + "\nRegisters:\n" + registers);
     }
 

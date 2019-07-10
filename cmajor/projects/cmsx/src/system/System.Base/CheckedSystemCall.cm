@@ -631,4 +631,13 @@ namespace System.Os
         }
         return result;
     }
+    
+    public void Pipe(int* readFD, int* writeFD)
+    {
+        int result = pipe(readFD, writeFD);
+        if (result == -1)
+        {
+            ThrowSystemError();
+        }
+    }
 }

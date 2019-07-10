@@ -21,9 +21,6 @@ namespace cmsx.kernel
         InterruptHandler softwareInterruptHandler = SoftwareInterruptHandler;
         ulong softwareInterruptHandlerAddress = cast<ulong>(cast<void*>(softwareInterruptHandler));
         mem.WriteULong(MakeInterruptHandlerPtrAddress(irqSoftware), softwareInterruptHandlerAddress, Protection.write);
-        InterruptHandler intervalInterruptHandler = IntervalInterruptHandler;
-        ulong intervalInterruptHandlerAddress = cast<ulong>(cast<void*>(intervalInterruptHandler));
-        mem.WriteULong(MakeInterruptHandlerPtrAddress(irqInterval), intervalInterruptHandlerAddress, Protection.write);
         InterruptHandler clockInterruptHandler = ClockInterruptHandler;
         ulong clockInterruptHandlerAddress = cast<ulong>(cast<void*>(clockInterruptHandler));
         mem.WriteULong(MakeInterruptHandlerPtrAddress(irqClock), clockInterruptHandlerAddress, Protection.write);
@@ -212,6 +209,9 @@ namespace cmsx.kernel
         SystemCallHandler dupSystemCallHandler = Dup;
         ulong dupSystemCallAddress = cast<ulong>(cast<void*>(dupSystemCallHandler));
         mem.WriteULong(MakeSystemCallPtrAddress(sys_dup), dupSystemCallAddress, Protection.write);
+        SystemCallHandler pipeSystemCallHandler = Pipe;
+        ulong pipeSystemCallAddress = cast<ulong>(cast<void*>(pipeSystemCallHandler));
+        mem.WriteULong(MakeSystemCallPtrAddress(sys_pipe), pipeSystemCallAddress, Protection.write);
     }
 
     public void Boot(Machine& machine)

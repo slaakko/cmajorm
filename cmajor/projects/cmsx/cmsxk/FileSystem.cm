@@ -77,9 +77,9 @@ namespace cmsx.kernel
                 {
                     parent->CheckPermissions(process->uid, process->gid, Access.write);
                 }
-                catch (const Exception& ex)
+                catch (const SystemError& ex)
                 {
-                    throw SystemError(EPERM, "cannot write to directory '" + Path.GetDirectoryName(path) + "' using uid " + ToString(process->uid) + ": " + ex.Message());
+                    throw SystemError(EPERM, "cannot write to directory '" + Path.GetDirectoryName(path) + "' using uid " + ToString(process->uid) + ": " + ex.message);
                 }
                 FileSystem* fs = GetMountTable().GetFileSystem(parent->Key().fsNumber);
                 int inodeNumber = fs->GetFreeINodeNumber();
@@ -226,9 +226,9 @@ namespace cmsx.kernel
             {
                 parent->CheckPermissions(process->uid, process->gid, Access.write);
             }
-            catch (const Exception& ex)
+            catch (const SystemError& ex)
             {
-                throw SystemError(EPERM, "cannot write to directory '" + Path.GetDirectoryName(targetPath) + "' using uid " + ToString(process->uid) + ": " + ex.Message());
+                throw SystemError(EPERM, "cannot write to directory '" + Path.GetDirectoryName(targetPath) + "' using uid " + ToString(process->uid) + ": " + ex.message);
             }
             FileSystem* fs = GetMountTable().GetFileSystem(parent->Key().fsNumber);
             if (fs->IsReadOnly())
@@ -325,9 +325,9 @@ namespace cmsx.kernel
             {
                 parent->CheckPermissions(process->uid, process->gid, Access.write);
             }
-            catch (const Exception& ex)
+            catch (const SystemError& ex)
             {
-                throw SystemError(EPERM, "cannot write to directory '" + parentPath + "' using uid " + ToString(process->uid) + ": " + ex.Message());
+                throw SystemError(EPERM, "cannot write to directory '" + parentPath + "' using uid " + ToString(process->uid) + ": " + ex.message);
             }
             INodePutter inodePutter(inode);
             if (Log())
@@ -427,9 +427,9 @@ namespace cmsx.kernel
             {
                 sourceParent->CheckPermissions(process->uid, process->gid, Access.write);
             }
-            catch (const Exception& ex)
+            catch (const SystemError& ex)
             {
-                throw SystemError(EPERM, "cannot write to directory '" + sourceParentPath + "' using uid " + ToString(process->uid) + ": " + ex.Message());
+                throw SystemError(EPERM, "cannot write to directory '" + sourceParentPath + "' using uid " + ToString(process->uid) + ": " + ex.message);
             }
             BlockPutter sourcePutter;
             DirectoryBlock* sourceDirectoryBlock = null;
@@ -658,9 +658,9 @@ namespace cmsx.kernel
                 {
                     parent->CheckPermissions(process->uid, process->gid, Access.write);
                 }
-                catch (const Exception& ex)
+                catch (const SystemError& ex)
                 {
-                    throw SystemError(EPERM, "cannot write to directory '" + Path.GetDirectoryName(path) + "' using uid " + ToString(process->uid) + ": " + ex.Message());
+                    throw SystemError(EPERM, "cannot write to directory '" + Path.GetDirectoryName(path) + "' using uid " + ToString(process->uid) + ": " + ex.message);
                 }
             }
             if (!name.IsEmpty())

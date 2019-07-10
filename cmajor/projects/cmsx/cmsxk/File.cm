@@ -122,6 +122,35 @@ namespace cmsx.kernel
         return duplicate;
     }
 
+    public void Pipe(Machine& machine, Process* process, ulong readFDAddress, ulong writeFDAddress)
+    {
+        if (readFDAddress == 0u)
+        {
+            throw SystemError(EINVAL, "read file descriptor address is null");
+        }
+        if (writeFDAddress == 0u)
+        {
+            throw SystemError(EINVAL, "write file descriptor address is null");
+        }
+        FileSystem* fs = GetMountTable().GetFileSystem(0);
+        int inodeNumber = fs->GetFreeINodeNumber();
+        INodeKey key(inodeNumber, 0);
+        INode* inode = fs->GetINodeManager()->GetINode(key);
+        INodePutter inodePutter(inode);
+        inode->SetType(FileType.fifo);
+        inode->SetFlag(INode.Flags.pipeEmpty);
+        Fifo* fifo = new Fifo(inode);
+        int readFD = process->fileTable.GetEmptyFileSlot();
+        PipeInputFile* pipeInput = new PipeInputFile(fifo);
+        process->fileTable.SetFile(readFD, pipeInput);
+        int writeFD = process->fileTable.GetEmptyFileSlot();
+        PipeOutputFile* pipeOutput = new PipeOutputFile(fifo);
+        process->fileTable.SetFile(writeFD, pipeOutput);
+        WriteProcessMemory(machine, process, readFDAddress, cast<ulong>(readFD), 4u, Protection.write);
+        WriteProcessMemory(machine, process, writeFDAddress, cast<ulong>(writeFD), 4u, Protection.write);
+        inodePutter.ResetINode();
+    }
+
     public void Link(Machine& machine, Process* process, ulong sourcePathAddress, ulong targetPathAddress)
     {
         if (sourcePathAddress == 0u)
@@ -919,13 +948,13 @@ namespace cmsx.kernel
         {
             if (Log())
             {
-                LogMessage("fs.file", "regularFile.release.fd=" + ToString(fd));
+                LogMessage("fs.file", "regular.release.begin.fd=" + ToString(fd));
             }
             filePtr->Release();
             delete this;
             if (Log())
             {
-                LogMessage("fs.file", "~regularFile.release");
+                LogMessage("fs.file", "regular.release.end");
             }
         }
         private FilePtr* filePtr;
@@ -1015,6 +1044,68 @@ namespace cmsx.kernel
         private void* findHandle;
     }
 
+    public class PipeInputFile : File
+    {
+        public nothrow PipeInputFile(Fifo* fifo_) : base("PIPE INPUT"), fifo(fifo_)
+        {
+            fifo->Share();
+        }
+        public override long Read(Machine& machine, Process* reader, ulong bufferAddress, long count)
+        {
+            return fifo->Read(machine, reader, bufferAddress, count);
+        }
+        public override File* Share()
+        {
+            return new PipeInputFile(fifo);
+        }
+        public override void Release(int fd)
+        {
+            if (Log())
+            {
+                LogMessage("fs.file", "pipe.input.release.begin.fd=" + ToString(fd));
+            }
+            fifo->Release();
+            delete this;
+            if (Log())
+            {
+                LogMessage("fs.file", "pipe.input.release.end");
+            }
+        }
+        private Fifo* fifo;
+    }
+
+    public class PipeOutputFile : File
+    {
+        public nothrow PipeOutputFile(Fifo* fifo_) : base("PIPE OUTPUT"), fifo(fifo_)
+        {
+            fifo->Share();
+            fifo->AddWriter();
+        }
+        public override long Write(Machine& machine, Process* writer, ulong bufferAddress, long count)
+        {
+            return fifo->Write(machine, writer, bufferAddress, count);
+        }
+        public override File* Share()
+        {
+            return new PipeOutputFile(fifo);
+        }
+        public override void Release(int fd)
+        {
+            if (Log())
+            {
+                LogMessage("fs.file", "pipe.output.release.begin.fd=" + ToString(fd));
+            }
+            fifo->RemoveWriter();
+            fifo->Release();
+            delete this;
+            if (Log())
+            {
+                LogMessage("fs.file", "pipe.output.release.end");
+            }
+        }
+        private Fifo* fifo;
+    }
+
     public class FilePtr
     {
         public nothrow FilePtr(INode* inode_, OpenFlags flags_) : inode(inode_), pos(0), flags(flags_), useCount(1)
@@ -1028,7 +1119,7 @@ namespace cmsx.kernel
         {
             if (Log())
             {
-                LogMessage("fileptr.write", "begin");
+                LogMessage("fs.file", "fileptr.write.begin");
             }
             while (inode->GetFlag(INode.Flags.locked))
             {
@@ -1081,6 +1172,10 @@ namespace cmsx.kernel
                 }
             }
             inode->SetMTime();
+            if (Log())
+            {
+                LogMessage("fs.file", "fileptr.write.end.written=" + ToString(bytesWritten));
+            }
             return bytesWritten;
         }
         public long Read(Machine& machine, Process* reader, ulong bufferAddress, long count)
@@ -1168,21 +1263,21 @@ namespace cmsx.kernel
         public FilePtr* Share()
         {
             ++useCount;
+            if (Log())
+            {
+                LogMessage("fs.file", "fileptr.share.useCount=" + ToString(useCount));
+            }
             return this;
         }
         public void Release()
         {
+            --useCount;
             if (Log())
             {
-                LogMessage("fs.file", "filePtr.release.useCount=" + ToString(useCount));
+                LogMessage("fs.file", "fileptr.release.begin.useCount=" + ToString(useCount));
             }
-            --useCount;
             if (useCount == 0)
             {
-                if (Log())
-                {
-                    LogMessage("fs.file", "filePtr.release.putinode");
-                }
                 if (inode != null)
                 {
                     inode->Manager()->PutINode(inode);
@@ -1191,7 +1286,7 @@ namespace cmsx.kernel
             }
             if (Log())
             {
-                LogMessage("fs.file", "~filePtr.release");
+                LogMessage("fs.file", "fileptr.release.end");
             }
         }
         public nothrow inline OpenFlags Flags() const
@@ -1202,6 +1297,296 @@ namespace cmsx.kernel
         private long pos;
         private OpenFlags flags;
         private int useCount;
+    }
+
+    public class Fifo
+    {
+        public nothrow Fifo(INode* inode_) : inode(inode_), useCount(0), writerCount(0)
+        {
+        }
+        public nothrow inline void AddWriter()
+        {
+            ++writerCount;
+            if (Log())
+            {
+                LogMessage("fs.file", "fifo.addwriter.writers=" + ToString(writerCount));
+            }
+        }
+        public nothrow inline void RemoveWriter()
+        {
+            --writerCount;
+            if (Log())
+            {
+                LogMessage("fs.file", "fifo.removewriter.writers=" + ToString(writerCount));
+            }
+        }
+        public long Write(Machine& machine, Process* writer, ulong bufferAddress, long count)
+        {
+            if (Log())
+            {
+                LogMessage("fs.file", "fifo.write.begin");
+            }
+            long bytesWritten = 0;
+            {
+                FileSystem* fs = GetMountTable().GetFileSystem(inode->Key().fsNumber);
+                long pipeBlockSize = maxPipeSize % blockSize;
+                if (pipeBlockSize == 0)
+                {
+                    pipeBlockSize = blockSize;
+                }
+                ulong offset = 0u;
+                long writePos = inode->WritePos();
+                long readPos = inode->ReadPos();
+                long room = 0;
+                if (writePos > readPos)
+                {
+                    room = maxPipeSize - (writePos - readPos);
+                }
+                else if (inode->GetFlag(INode.Flags.pipeFull))
+                {
+                    room = 0;
+                }
+                else if (inode->GetFlag(INode.Flags.pipeEmpty))
+                {
+                    room = maxPipeSize;
+                }
+                else
+                {
+                    room = readPos - writePos;
+                }
+                while (count > 0)
+                {
+                    while (room == 0)
+                    {
+                        if (Log())
+                        {
+                            LogMessage("fs.file", "fifo.write.sleep");
+                        }
+                        inode->AddWaitingPipeWriter(writer);
+                        SleepProcess(writer, pipeNotFullEvent, 0u, 0u);
+                        if (Log())
+                        {
+                            LogMessage("fs.file", "fifo.write.wakeup");
+                        }
+                        writePos = inode->WritePos();
+                        readPos = inode->ReadPos();
+                        if (writePos > readPos)
+                        {
+                            room = maxPipeSize - (writePos - readPos);
+                        }
+                        else if (inode->GetFlag(INode.Flags.pipeFull))
+                        {
+                            room = 0;
+                        }
+                        else if (inode->GetFlag(INode.Flags.pipeEmpty))
+                        {
+                            room = maxPipeSize;
+                        }
+                        else
+                        {
+                            room = readPos - writePos;
+                        }
+                    }
+                    int logicalBlockNumber = cast<int>(writePos / blockSize);
+                    int blockNumber = 0;
+                    int blockOffset = 0;
+                    fs->GetBlockManager()->GetBlockNumber(inode, writePos, blockNumber, blockOffset, true);
+                    long bytesToWrite = Min(room, Min(count, pipeBlockSize - blockOffset));
+                    Block* block = fs->GetBlockManager()->GetBlock(BlockKey(blockNumber, inode->Key().fsNumber), null);
+                    BlockPutter blockPutter(block);
+                    FileBlock* fileBlock = cast<FileBlock*>(block);
+                    UniquePtr<byte> buffer(cast<byte*>(RtMemAlloc(bytesToWrite)));
+                    ReadProcessMemory(machine, writer, bufferAddress + offset, buffer.Get(), cast<ulong>(bytesToWrite));
+                    MemoryReader reader(buffer.Get(), bytesToWrite);
+                    for (long i = 0; i < bytesToWrite; ++i)
+                    {
+                        byte x = reader.ReadByte();
+                        fileBlock->SetByte(blockOffset + i, x);
+                    }
+                    fileBlock->SetFlag(Block.Flags.dirty);
+                    fileBlock->SetFlag(Block.Flags.valid);
+                    fs->GetBlockManager()->WriteBlock(block, null);
+                    count = count - bytesToWrite;
+                    writePos = (writePos + bytesToWrite) % maxPipeSize;
+                    inode->SetWritePos(writePos);
+                    offset = offset + cast<ulong>(bytesToWrite);
+                    room = room - bytesToWrite;
+                    inode->ResetFlag(INode.Flags.pipeEmpty);
+                    if (room == 0)
+                    {
+                        inode->SetFlag(INode.Flags.pipeFull);
+                    }
+                    WakeUpPipeReaders();
+                    bytesWritten = bytesWritten + bytesToWrite;
+                }
+            }
+            inode->SetMTime();
+            if (Log())
+            {
+                LogMessage("fs.file", "fifo.write.end.written=" + ToString(bytesWritten));
+            }
+            return bytesWritten;
+        }
+        public long Read(Machine& machine, Process* reader, ulong bufferAddress, long count)
+        {
+            if (Log())
+            {
+                LogMessage("fs.file", "fifo.read.begin");
+            }
+            FileSystem* fs = GetMountTable().GetFileSystem(inode->Key().fsNumber);
+            long bytesRead = 0;
+            {
+                long pipeBlockSize = maxPipeSize % blockSize;
+                if (pipeBlockSize == 0)
+                {
+                    pipeBlockSize = blockSize;
+                }
+                ulong offset = 0u;
+                long writePos = inode->WritePos();
+                long readPos = inode->ReadPos();
+                long bytesAvailable = 0;
+                if (writePos > readPos)
+                {
+                    bytesAvailable = writePos - readPos;
+                }
+                else if (inode->GetFlag(INode.Flags.pipeFull))
+                {
+                    bytesAvailable = maxPipeSize;
+                }
+                else if (inode->GetFlag(INode.Flags.pipeEmpty))
+                {
+                    bytesAvailable = 0;
+                }
+                else
+                {
+                    bytesAvailable = maxPipeSize - (readPos - writePos);
+                }
+                while (count > 0)
+                {
+                    while (bytesAvailable == 0 && writerCount > 0)
+                    {
+                        if (Log())
+                        {
+                            LogMessage("fs.file", "fifo.read.sleep");
+                        }
+                        inode->AddWaitingPipeReader(reader);
+                        SleepProcess(reader, pipeNotEmptyEvent, 0u, 0u);
+                        if (Log())
+                        {
+                            LogMessage("fs.file", "fifo.read.wakeup");
+                        }
+                        writePos = inode->WritePos();
+                        readPos = inode->ReadPos();
+                        if (writePos > readPos)
+                        {
+                            bytesAvailable = writePos - readPos;
+                        }
+                        else if (inode->GetFlag(INode.Flags.pipeFull))
+                        {
+                            bytesAvailable = maxPipeSize;
+                        }
+                        else if (inode->GetFlag(INode.Flags.pipeEmpty))
+                        {
+                            bytesAvailable = 0;
+                        }
+                        else
+                        {
+                            bytesAvailable = maxPipeSize - (readPos - writePos);
+                        }
+                    }
+                    int blockNumber = 0;
+                    int blockOffset = 0;
+                    fs->GetBlockManager()->GetBlockNumber(inode, readPos, blockNumber, blockOffset, false);
+                    long bytesToRead = Min(bytesAvailable, Min(count, pipeBlockSize - blockOffset));
+                    if (bytesToRead == 0 && writerCount == 0)
+                    {
+                        break;
+                    }
+                    UniquePtr<byte> buffer(cast<byte*>(RtMemAlloc(bytesToRead)));
+                    MemoryWriter writer(buffer.Get(), bytesToRead);
+                    Block* block = fs->GetBlockManager()->ReadBlock(BlockKey(blockNumber, inode->Key().fsNumber), null);
+                    BlockPutter blockPutter(block);
+                    FileBlock* fileBlock = cast<FileBlock*>(block);
+                    for (long i = 0; i < bytesToRead; ++i)
+                    {
+                        byte x = fileBlock->GetByte(blockOffset + i);
+                        writer.Write(x);
+                    }
+                    WriteProcessMemory(machine, reader, bufferAddress + offset, buffer.Get(), cast<ulong>(bytesToRead), Protection.write);
+                    count = count - bytesToRead;
+                    readPos = (readPos + bytesToRead) % maxPipeSize;
+                    inode->SetReadPos(readPos);
+                    offset = offset + cast<ulong>(bytesToRead);
+                    bytesAvailable = bytesAvailable - bytesToRead;
+                    inode->ResetFlag(INode.Flags.pipeFull);
+                    if (bytesAvailable == 0)
+                    {
+                        inode->SetFlag(INode.Flags.pipeEmpty);
+                    }
+                    WakeUpPipeWriters();
+                    bytesRead = bytesRead + bytesToRead;
+                }
+            }
+            inode->SetATime();
+            if (Log())
+            {
+                LogMessage("fs.file", "fifo.read.end.read=" + ToString(bytesRead));
+            }
+            return bytesRead;
+        }
+        public Fifo* Share()
+        {
+            ++useCount;
+            if (Log())
+            {
+                LogMessage("fs.file", "fifo.share.useCount=" + ToString(useCount));
+            }
+            return this;
+        }
+        public void Release()
+        {
+            --useCount;
+            if (Log())
+            {
+                LogMessage("fs.file", "fifo.release.useCount=" + ToString(useCount));
+            }
+            if (useCount == 0)
+            {
+                if (inode != null)
+                {
+                    inode->SetNumLinks(inode->GetNumLinks() - 1);
+                    inode->Manager()->PutINode(inode);
+                }
+                delete this;
+            }
+            if (Log())
+            {
+                LogMessage("fs.file", "fifo.release.end");
+            }
+        }
+        private nothrow void WakeUpPipeWriters()
+        {
+            Kernel& kernel = GetKernel();
+            ProcessTable& processTable = kernel.GetProcessTable();
+            List<Process*> waitingPipeWriters = inode->GetWaitingPipeWriters();
+            for (Process* writer : waitingPipeWriters)
+            {
+                WakeUpProcess(processTable, writer);
+            }
+        }
+        private nothrow void WakeUpPipeReaders()
+        {
+            Kernel& kernel = GetKernel();
+            ProcessTable& processTable = kernel.GetProcessTable();
+            List<Process*> waitingPipeReaders = inode->GetWaitingPipeReaders();
+            for (Process* reader : waitingPipeReaders)
+            {
+                WakeUpProcess(processTable, reader);
+            }
+        }
+        private INode* inode;
+        private int useCount;
+        private int writerCount;
     }
 
     public class ProcessFileTable
@@ -1226,7 +1611,7 @@ namespace cmsx.kernel
             }
             else if (fd >= openFileMax)
             {
-                throw SystemError(EBADF, "descriptor value exceeds maximum number of open files");
+                throw SystemError(EBADF, "descriptor value (" + ToString(fd) + ") exceeds maximum number of open files");
             }
             File* file = files[fd];
             if (file == null)
@@ -1251,7 +1636,7 @@ namespace cmsx.kernel
         {
             if (Log())
             {
-                LogMessage("fs.file", "share");
+                LogMessage("fs.file", "share.files.begin");
             }
             for (long i = 0; i < openFileMax; ++i)
             {
@@ -1267,14 +1652,14 @@ namespace cmsx.kernel
             }
             if (Log())
             {
-                LogMessage("fs.file", "~share");
+                LogMessage("fs.file", "share.files.end");
             }
         }
         public void ReleaseFiles()
         {
             if (Log())
             {
-                LogMessage("fs.file", "releaseFiles");
+                LogMessage("fs.file", "release.files.begin");
             }
             for (long i = 0; i < openFileMax; ++i)
             {
@@ -1287,7 +1672,7 @@ namespace cmsx.kernel
             }
             if (Log())
             {
-                LogMessage("fs.file", "~releaseFiles");
+                LogMessage("fs.file", "release.files.end");
             }
         }
         private File*[openFileMax] files;

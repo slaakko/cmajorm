@@ -15,6 +15,8 @@ namespace cmsx.kernel
     public const ulong anyBlockFreeEvent = 5u;
     public const ulong blockIOEvent = 6u;
     public const ulong inodeUnlockedEvent = 7u;
+    public const ulong pipeNotFullEvent = 8u;
+    public const ulong pipeNotEmptyEvent = 9u;
 
     public nothrow string EventStr(ulong event, ulong eventData1, ulong eventData2)
     {
@@ -28,6 +30,8 @@ namespace cmsx.kernel
             case anyBlockFreeEvent: eventStr.Append("anyblock.free"); break;
             case blockIOEvent: eventStr.Append("blockio.ready.").Append(cast<Block*>(cast<void*>(eventData1))->ToString()); break;
             case inodeUnlockedEvent: eventStr.Append("inode.unlocked.").Append(cast<INode*>(cast<void*>(eventData1))->ToString()); break;
+            case pipeNotFullEvent: eventStr.Append("pipe.not.full"); break;
+            case pipeNotEmptyEvent: eventStr.Append("pipe.not.empty"); break;
         }
         return eventStr;
     }

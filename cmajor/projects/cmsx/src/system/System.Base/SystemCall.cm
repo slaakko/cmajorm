@@ -56,6 +56,7 @@ public const byte sys_sync = 49u;
 public const byte sys_times = 50u;
 public const byte sys_get_host_name = 51u;
 public const byte sys_dup = 52u;
+public const byte sys_pipe = 53u;
 
 public cdecl nothrow void exit(byte exitCode)
 {
@@ -319,4 +320,9 @@ public cdecl nothrow int get_host_name(char* buffer, int size)
 public cdecl nothrow int dup(int fd)
 {
     return cast<int>(trap(0u, sys_dup, 0u, fd));
+}
+
+public cdecl nothrow int pipe(int* readFD, int* writeFD)
+{
+    return cast<int>(trap(0u, sys_pipe, 0u, readFD, writeFD));
 }

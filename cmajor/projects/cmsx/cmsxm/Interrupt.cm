@@ -5,14 +5,14 @@ namespace cmsx.machine
 {
     public const byte irqMax = 64u;
 
-    public const byte irqClock = 0u;
+    public const byte irqSoftware = 0u;
+    public const ulong SOFTWARE_INTERRUPT_BIT = cast<ulong>(1u) << irqSoftware;
+    public const byte irqClock = 1u;
     public const ulong CLOCK_BIT = cast<ulong>(1u) << irqClock;
-    public const byte irqDisk = 1u;
+    public const byte irqDisk = 2u;
     public const ulong DISK_BIT = cast<ulong>(1u) << irqDisk;
-    public const byte irqKeyboard = 2u;
+    public const byte irqKeyboard = 3u;
     public const ulong KEYBOARD_BIT = cast<ulong>(1u) << irqKeyboard;
-    public const byte irqInterval = 3u;
-    public const ulong INTERVAL_INTERRUPT_BIT = cast<ulong>(1u) << irqInterval;
 
     public const int irqFirstSetBegin = 0;
     public const int irqFirstSetEnd = 4;
@@ -38,9 +38,6 @@ namespace cmsx.machine
 
     public const int irqSecondSetBegin = 32;
     public const int irqSecondSetEnd = 40;
-
-    public const byte irqSoftware = 63u;
-    public const ulong SOFTWARE_INTERRUPT_BIT = cast<ulong>(1u) << irqSoftware;
 
     public const ulong ALL_INTERRUPT_BITS = 0xFFFFFFFFFFFFFFFFu;
 
@@ -139,7 +136,6 @@ namespace cmsx.machine
         switch (irq)
         {
             case irqSoftware: return "software";
-            case irqInterval: return "interval";
             case irqClock: return "clock";
             case irqKeyboard: return "keyboard";
             case irqR: return "read page fault";

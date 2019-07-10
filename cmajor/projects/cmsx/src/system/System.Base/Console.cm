@@ -14,6 +14,18 @@ namespace System
             out(SharedPtr<Stream>(new FileStream(stdout))), 
             err(SharedPtr<Stream>(new FileStream(stderr)))
         {
+            if (!in.GetStream()->IsConsole())
+            {
+                in = StreamReader(SharedPtr<Stream>(new BufferedStream(SharedPtr<Stream>(new FileStream(stdin)))));
+            }
+            if (!out.GetStream()->IsConsole())
+            {
+                out = StreamWriter(SharedPtr<Stream>(new BufferedStream(SharedPtr<Stream>(new FileStream(stdout)))));
+            }
+            if (!err.GetStream()->IsConsole())
+            {
+                err = StreamWriter(SharedPtr<Stream>(new BufferedStream(SharedPtr<Stream>(new FileStream(stderr)))));
+            }
         }
         public static void Write(const char* s)
         {

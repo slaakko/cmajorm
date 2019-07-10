@@ -12,6 +12,7 @@ xcopy /Y /D coreutil\passwd\bin\debug ..\bind
 xcopy /Y /D coreutil\pwd\bin\debug ..\bin
 xcopy /Y /D coreutil\rm\bin\debug ..\bind
 xcopy /Y /D coreutil\rmdir\bin\debug ..\bind
+xcopy /Y /D coreutil\tee\bin\debug ..\bind
 xcopy /Y /D coreutil\time\bin\debug ..\bind
 xcopy /Y /D coreutil\umask\bin\debug ..\bind
 xcopy /Y /D coreutil\wc\bin\debug ..\bin

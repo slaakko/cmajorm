@@ -327,11 +327,16 @@ namespace System
 
     public nothrow string Format(const string& s, int width, FormatWidth fw, FormatJustify justify)
     {
+        return Format(s, width, fw, justify, ' ');
+    }
+
+    public nothrow string Format(const string& s, int width, FormatWidth fw, FormatJustify justify, char fillChar)
+    {
         if (fw == FormatWidth.min)
         {
             width = Max(width, cast<int>(s.Length()));
         }
-        string result(' ', width);
+        string result(fillChar, width);
         int n = Min(cast<int>(s.Length()), width);
         int offset = 0;
         if (justify == FormatJustify.right)
@@ -355,18 +360,18 @@ namespace System
         return Format(s, width, FormatWidth.exact, justify);
     }
 
-    public nothrow ustring Format(const ustring& s, int width, FormatWidth fw)
+    public nothrow ustring Format(const ustring& s, int width, FormatWidth fw, FormatJustify justify)
     {
-        return Format(s, width, fw, FormatJustify.left);
+        return Format(s, width, fw, justify, ' ');
     }
 
-    public nothrow ustring Format(const ustring& s, int width, FormatWidth fw, FormatJustify justify)
+    public nothrow ustring Format(const ustring& s, int width, FormatWidth fw, FormatJustify justify, uchar fillChar)
     {
         if (fw == FormatWidth.min)
         {
             width = Max(width, cast<int>(s.Length()));
         }
-        ustring result(' ', width);
+        ustring result(fillChar, width);
         int n = Min(cast<int>(s.Length()), width);
         int offset = 0;
         if (justify == FormatJustify.right)

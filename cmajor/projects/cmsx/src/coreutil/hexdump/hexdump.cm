@@ -83,9 +83,13 @@ void HexDump(const string& fileName)
     {
         reader = File.OpenBinary(fileName);
     }
-    else
+    else if (System.Os.IsConsole(0))
     {
         reader = BinaryReader(SharedPtr<Stream>(new FileStream(0)));
+    }
+    else
+    {
+        reader = BinaryReader(SharedPtr<Stream>(new BufferedStream(SharedPtr<Stream>(new FileStream(0)))));
     }
     byte[bytesInLine] bytes;
     int addr = 0u;

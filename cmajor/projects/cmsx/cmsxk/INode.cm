@@ -8,6 +8,8 @@ namespace cmsx.kernel
     public const int invalidINodeNumber = 0;
     public const int maxCachedINodes = 1024;
     public const int numDirectBlockNumbers = 17;
+    //public const int maxPipeSize = 256;
+    public const int maxPipeSize = numDirectBlockNumbers * blockSize;
 
     public enum FileType : int
     {
@@ -149,7 +151,9 @@ namespace cmsx.kernel
             none = 0u,
             locked = 1u << 0u,
             dirty = 1u << 1u,
-            mountPoint = 1u << 2u
+            mountPoint = 1u << 2u,
+            pipeFull = 1u << 3u,
+            pipeEmpty = 1u << 4u
         }
         public nothrow string FlagStr(Flags flags)
         {
@@ -396,7 +400,7 @@ namespace cmsx.kernel
             SetCTime();
             SetFlag(Flags.dirty);
         }
-        public void AddWaitingProcess(Process* process)
+        public nothrow void AddWaitingProcess(Process* process)
         {
             waitingProcesses.Add(process);
         }
@@ -404,6 +408,26 @@ namespace cmsx.kernel
         {
             List<Process*> processes;
             Swap(processes, waitingProcesses);
+            return processes;
+        }
+        public nothrow void AddWaitingPipeReader(Process* reader)
+        {
+            waitingPipeReaders.Add(reader);
+        }
+        public nothrow List<Process*> GetWaitingPipeReaders()
+        {
+            List<Process*> processes;
+            Swap(processes, waitingPipeReaders);
+            return processes;
+        }
+        public nothrow void AddWaitingPipeWriter(Process* writer)
+        {
+            waitingPipeWriters.Add(writer);
+        }
+        public nothrow List<Process*> GetWaitingPipeWriters()
+        {
+            List<Process*> processes;
+            Swap(processes, waitingPipeWriters);
             return processes;
         }
         public nothrow LinkedList<INode*>.Iterator GetIterator() const
@@ -534,10 +558,28 @@ namespace cmsx.kernel
         {
             return manager;
         }
+        public nothrow inline long ReadPos() const
+        {
+            return readPos;
+        }
+        public nothrow inline long WritePos() const
+        {
+            return writePos;
+        }
+        public nothrow inline void SetReadPos(long readPos_)
+        {
+            readPos = readPos_;
+        }
+        public nothrow inline void SetWritePos(long writePos_)
+        {
+            writePos = writePos_;
+        }
         private INodeKey key;
         private Flags flags;
         private int useCount;
         private List<Process*> waitingProcesses;
+        private List<Process*> waitingPipeReaders;
+        private List<Process*> waitingPipeWriters;
         private LinkedList<INode*>.Iterator iterator;
         private int mode;
         private int uid;
@@ -557,6 +599,8 @@ namespace cmsx.kernel
         private Access otherAccess;
         private INodeManager* manager;
         private Process* owner;
+        private long readPos;
+        private long writePos;
     }
 
     public class INodePutter

@@ -55,10 +55,11 @@ namespace cmsx.kernel
     public class SystemError : Exception
     {
         public nothrow SystemError(int errorCode_, const string& message_) :
-            base(ErrorCodeStr(errorCode_) + "(" + ToString(errorCode_) + "): " + ErrorMsg(errorCode_) + ": " + message_), errorCode(errorCode_)
+            base(ErrorCodeStr(errorCode_) + "(" + ToString(errorCode_) + "): " + ErrorMsg(errorCode_) + ": " + message_), errorCode(errorCode_), message(message_)
         {
         }
         public int errorCode;
+        public string message;
     }
 }
 
