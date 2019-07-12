@@ -27,9 +27,9 @@ namespace System.Text.RegularExpressions
             states.Add(state);
             return state;
         }
-        public nothrow Symbol* MakeChar(char c)
+        public nothrow Symbol* MakeChar(uchar c)
         {
-            HashMap<char, Symbol*>.ConstIterator it = charSymbols.CFind(c);
+            HashMap<uchar, Symbol*>.ConstIterator it = charSymbols.CFind(c);
             if (it != charSymbols.CEnd())
             {
                 return it->second;
@@ -47,7 +47,7 @@ namespace System.Text.RegularExpressions
         {
             return &any;
         }
-        public nothrow Symbol* MakeRange(char start, char end)
+        public nothrow Symbol* MakeRange(uchar start, uchar end)
         {
             Range range(start, end);
             HashMap<Range, Symbol*>.ConstIterator it = rangeSymbols.CFind(range);
@@ -73,7 +73,7 @@ namespace System.Text.RegularExpressions
         private int nextStateId;
         private List<State*> states;
         private List<Symbol*> symbols;
-        private HashMap<char, Symbol*> charSymbols;
+        private HashMap<uchar, Symbol*> charSymbols;
         private HashMap<Range, Symbol*> rangeSymbols;
         private Any any;
         private Char epsilon;

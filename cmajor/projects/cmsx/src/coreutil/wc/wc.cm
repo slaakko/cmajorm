@@ -108,7 +108,14 @@ CountData Count(const string& file, Counts counts, int& totalBytes, int& totalWo
     SharedPtr<Stream> stream;
     if (file.IsEmpty())
     {
-        stream.Reset(new FileStream(stdin));
+        if (System.Os.IsConsole(stdin))
+        {
+            stream.Reset(new FileStream(stdin));
+        }
+        else
+        {
+            stream.Reset(new BufferedStream(SharedPtr<Stream>(new FileStream(stdin))));
+        }
     }
     else
     {

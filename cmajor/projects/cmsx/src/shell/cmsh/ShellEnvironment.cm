@@ -18,21 +18,21 @@ namespace cmsh
     
     public class ShellEnvironment
     {
-        public ShellEnvironment() : users(GetUsers()), hostName(), uid(0), pgrp(0), exit(false), debug(false)
+        public ShellEnvironment() : users(GetUsers()), hostName(), uid(0), lastExitCode(0u), exit(false), log(false)
         {
         }
         public Users users;
         public string hostName;
         public int uid;
-        public int pgrp;
         public string userName;
         public string home;
         public string shell;
         public string pwd;
+        public byte lastExitCode;
         public HashMap<ustring, ustring> variables;
         public InternalCommandMap internalCommandMap;
         public ExternalCommandMap externalCommandMap;
         public bool exit;
-        public bool debug;
+        public bool log;
     }
 }

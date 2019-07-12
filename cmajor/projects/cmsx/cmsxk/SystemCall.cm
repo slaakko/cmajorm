@@ -48,17 +48,20 @@ namespace cmsx.kernel
     public const byte sys_setuid = 42u;
     public const byte sys_getgid = 43u;
     public const byte sys_setgid = 44u;
-    public const byte sys_getpgrp = 45u;
-    public const byte sys_setpgrp = 46u;
-    public const byte sys_tcgetpgrp = 47u;
-    public const byte sys_tcsetpgrp = 48u;
-    public const byte sys_sync = 49u;
-    public const byte sys_times = 50u;
-    public const byte sys_get_host_name = 51u;
-    public const byte sys_dup = 52u;
-    public const byte sys_pipe = 53u;
+    public const byte sys_getpid = 45u;
+    public const byte sys_getpgid = 46u;
+    public const byte sys_setpgid = 47u;
+    public const byte sys_getfgpid = 48u;
+    public const byte sys_setfgpid = 49u;
+    public const byte sys_sync = 50u;
+    public const byte sys_times = 51u;
+    public const byte sys_get_host_name = 52u;
+    public const byte sys_dup = 53u;
+    public const byte sys_pipe = 54u;
+    public const byte sys_log = 55u;
+    public const byte sys_log_message = 56u;
     
-    public const byte numSystemCalls = sys_dup + 1u;
+    public const byte numSystemCalls = sys_pipe + 1u;
 
     public nothrow string SystemCallName(byte systemCall)
     {
@@ -109,15 +112,18 @@ namespace cmsx.kernel
             case sys_setuid: return "sys_setuid";
             case sys_getgid: return "sys_getgid";
             case sys_setgid: return "sys_setgid";
-            case sys_getpgrp: return "sys_getpgrp";
-            case sys_setpgrp: return "sys_setpgrp";
-            case sys_tcgetpgrp: return "sys_tcgetpgrp";
-            case sys_tcsetpgrp: return "sys_tcsetpgrp";
+            case sys_getpid: return "sys_getpid";
+            case sys_getpgid: return "sys_getpgid";
+            case sys_setpgid: return "sys_setpgid";
+            case sys_getfgpid: return "sys_getfgpid";
+            case sys_setfgpid: return "sys_setfgpid";
             case sys_sync: return "sys_sync";
             case sys_times: return "sys_times";
             case sys_get_host_name: return "sys_get_host_name";
             case sys_dup: return "sys_dup";
             case sys_pipe: return "sys_pipe";
+            case sys_log: return "sys_log";
+            case sys_log_message: return "sys_log_message";
         }
         return string();
     }
@@ -733,45 +739,54 @@ namespace cmsx.kernel
         sc.result = 0;
     }
 
-    public void GetPGRP(SystemCall& sc)
+    public void GetPID(SystemCall& sc)
     {
-        if (sc.x != 0u || sc.y != sys_getpgrp || sc.z != 0u)
+        if (sc.x != 0u || sc.y != sys_getpid || sc.z != 0u)
         {
-            Panic("invalid getpgrp parameters: " + ToString(sc.x) + ", " + ToString(sc.y) + ", " + ToString(sc.z));
+            Panic("invalid getpid parameters: " + ToString(sc.x) + ", " + ToString(sc.y) + ", " + ToString(sc.z));
+        }
+        sc.result = sc.process->pid;
+    }
+
+    public void GetPGID(SystemCall& sc)
+    {
+        if (sc.x != 0u || sc.y != sys_getpgid || sc.z != 0u)
+        {
+            Panic("invalid getpgid parameters: " + ToString(sc.x) + ", " + ToString(sc.y) + ", " + ToString(sc.z));
         }
         sc.result = sc.process->pgid;
     }
 
-    public void SetPGRP(SystemCall& sc)
+    public void SetPGID(SystemCall& sc)
     {
-        if (sc.x != 0u || sc.y != sys_setpgrp || sc.z != 0u)
+        if (sc.x != 0u || sc.y != sys_setpgid || sc.z != 0u)
         {
-            Panic("invalid setpgrp parameters: " + ToString(sc.x) + ", " + ToString(sc.y) + ", " + ToString(sc.z));
+            Panic("invalid setpgid parameters: " + ToString(sc.x) + ", " + ToString(sc.y) + ", " + ToString(sc.z));
         }
         Process* process = sc.process;
-        process->pgid = process->pid;
-        sc.result = process->pgid;
+        process->pgid = cast<int>(sc.ax);
+        sc.result = 0;
     }
 
-    public void TCGetPGRP(SystemCall& sc)
+    public void GetFGPID(SystemCall& sc)
     {
-        if (sc.x != 0u || sc.y != sys_tcgetpgrp || sc.z != 0u)
+        if (sc.x != 0u || sc.y != sys_getfgpid || sc.z != 0u)
         {
-            Panic("invalid tcgetpgrp parameters: " + ToString(sc.x) + ", " + ToString(sc.y) + ", " + ToString(sc.z));
+            Panic("invalid getfgpid parameters: " + ToString(sc.x) + ", " + ToString(sc.y) + ", " + ToString(sc.z));
         }
         int fd = cast<int>(sc.ax);
-        sc.result = TCGetPGRP(sc.process, fd);
+        sc.result = GetFGPID(sc.process, fd);
     }
 
-    public void TCSetPGRP(SystemCall& sc)
+    public void SetFGPID(SystemCall& sc)
     {
-        if (sc.x != 0u || sc.y != sys_tcsetpgrp || sc.z != 0u)
+        if (sc.x != 0u || sc.y != sys_setfgpid || sc.z != 0u)
         {
-            Panic("invalid tcsetpgrp parameters: " + ToString(sc.x) + ", " + ToString(sc.y) + ", " + ToString(sc.z));
+            Panic("invalid setfgpid parameters: " + ToString(sc.x) + ", " + ToString(sc.y) + ", " + ToString(sc.z));
         }
         int fd = cast<int>(sc.ax);
-        int pgrp = cast<int>(sc.bx);
-        TCSetPGRP(sc.process, fd, pgrp);
+        int pid = cast<int>(sc.bx);
+        SetFGPID(sc.process, fd, pid);
         sc.result = 0;
     }
 
@@ -829,5 +844,44 @@ namespace cmsx.kernel
         }
         Pipe(*sc.machine, sc.process, sc.ax, sc.bx);
         sc.result = 0;
+    }
+
+    public void Log(SystemCall& sc)
+    {
+        if (sc.x != 0u || sc.y != sys_log || sc.z != 0u)
+        {
+            Panic("invalid log parameters: " + ToString(sc.x) + ", " + ToString(sc.y) + ", " + ToString(sc.z));
+        }
+        if (cmsx.kernel.Log())
+        {
+            sc.result = 1;
+        }
+        else
+        {
+            sc.result = 0;
+        }
+    }
+
+    public void LogMessage(SystemCall& sc)
+    {
+        if (sc.x != 0u || sc.y != sys_log_message || sc.z != 0u)
+        {
+            Panic("invalid log_message parameters: " + ToString(sc.x) + ", " + ToString(sc.y) + ", " + ToString(sc.z));
+        }
+        ulong methodAddress = sc.ax;
+        if (methodAddress == 0u)
+        {
+            throw SystemError(EINVAL, "method address is null");
+        }
+        ulong msgAddress = sc.bx;
+        if (msgAddress == 0u)
+        {
+            throw SystemError(EINVAL, "msg address is null");
+        }
+        string method;
+        ReadStringFromProcessMemory(*sc.machine, sc.process, methodAddress, method);
+        string msg;
+        ReadStringFromProcessMemory(*sc.machine, sc.process, msgAddress, msg);
+        LogMessage(method, msg);
     }
 }

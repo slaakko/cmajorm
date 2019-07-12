@@ -102,7 +102,7 @@ namespace cmsx.kernel
             Kernel& kernel = Kernel.Instance();
             kernel.SetExecutable(executable);
             Session* session = kernel.CurrentSession();
-            session->fgpgrp = process->pgid;
+            session->fgpid = process->pid;
             return process->pid;
         }
         else

@@ -3,21 +3,21 @@ using System.Collections;
 
 namespace System.Text.RegularExpressions
 {
-    public const char eps = '\0';
+    public const uchar eps = '\0';
 
     public abstract class Symbol
     {
         public default virtual ~Symbol();
-        public abstract nothrow bool Match(char c) const;
+        public abstract nothrow bool Match(uchar c) const;
         public abstract nothrow string ToString() const;
     }
 
     public class Char : Symbol
     {
-        public nothrow Char(char c_) : chr(c_)
+        public nothrow Char(uchar c_) : chr(c_)
         {
         }
-        public override nothrow bool Match(char c) const
+        public override nothrow bool Match(uchar c) const
         {
             return chr == c;
         }
@@ -29,15 +29,15 @@ namespace System.Text.RegularExpressions
             }
             else
             {
-                return string(chr);
+                return ToUtf8(ustring(chr));
             }
         }
-        private char chr;
+        private uchar chr;
     }
 
     public class Any : Symbol
     {
-        public override nothrow bool Match(char c) const
+        public override nothrow bool Match(uchar c) const
         {
             return true;
         }
@@ -49,29 +49,29 @@ namespace System.Text.RegularExpressions
 
     public class Range : Symbol
     {
-        public nothrow Range(char start_, char end_) : start(start_), end(end_)
+        public nothrow Range(uchar start_, uchar end_) : start(start_), end(end_)
         {
         }
-        public override nothrow bool Match(char c) const
+        public override nothrow bool Match(uchar c) const
         {
             return c >= start && c <= end;
         }
-        public nothrow inline char Start() const
+        public nothrow inline uchar Start() const
         {
             return start;
         }
-        public nothrow inline char End() const
+        public nothrow inline uchar End() const
         {
             return end;
         }
         public override nothrow string ToString() const
         {
             string s;
-            s.Append(start).Append('-').Append(end);
+            s.Append(ToUtf8(ustring(start))).Append('-').Append(ToUtf8(ustring(end)));
             return s;
         }
-        private char start;
-        private char end;
+        private uchar start;
+        private uchar end;
     }
 
     public nothrow inline bool operator==(const Range& left, const Range& right)
@@ -81,7 +81,7 @@ namespace System.Text.RegularExpressions
 
     public nothrow ulong GetHashCode(const Range& range)
     {
-        return (cast<ulong>(range.Start()) << 8u) | cast<ulong>(range.End());
+        return (cast<ulong>(range.Start()) << 32u) | cast<ulong>(range.End());
     }
 
     public class Class : Symbol
@@ -97,7 +97,7 @@ namespace System.Text.RegularExpressions
         {
             symbols.Add(symbol);
         }
-        public override nothrow bool Match(char c) const
+        public override nothrow bool Match(uchar c) const
         {
             bool match = false;
             for (Symbol* symbol : symbols)

@@ -7,14 +7,14 @@ namespace cmsx.kernel
 
     public class Session
     {
-        public nothrow Session() : sid(-1), nextFree(null), fgpgrp(-1)
+        public nothrow Session() : sid(-1), nextFree(null), fgpid(-1)
         {
         }
-        public nothrow Session(int sid_) : sid(sid_), nextFree(null), fgpgrp(-1)
+        public nothrow Session(int sid_) : sid(sid_), nextFree(null), fgpid(-1)
         {
         }
         public int sid;
-        public int fgpgrp;
+        public int fgpid;
         public Session* nextFree;
     }
 

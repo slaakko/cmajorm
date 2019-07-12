@@ -285,13 +285,21 @@ namespace cmsx.kernel
         }
         private void DeliverInputLine()
         {
+            if (Log())
+            {
+                LogMessage("con.deliver", "begin");
+            }
             Machine& machine = GetMachine();
             Kernel& kernel = GetKernel();
             Session* session = kernel.CurrentSession();
-            if (session->fgpgrp != -1)
+            if (session->fgpid != -1)
             {
                 ProcessTable& processTable = kernel.GetProcessTable();
-                Process* reader = processTable.GetProcess(session->fgpgrp);
+                if (Log())
+                {
+                    LogMessage("con.deliver", "fgpid=" + ToString(session->fgpid));
+                }
+                Process* reader = processTable.GetProcess(session->fgpid);
                 if (reader != null)
                 {
                     if (reader->state == Process.State.asleep && reader->event == consoleInputEvent)
@@ -305,6 +313,10 @@ namespace cmsx.kernel
                                 consoleInputFile->SetBufferedInput(GetLine());
                             }
                         }
+                        if (Log())
+                        {
+                            LogMessage("con.deliver", "wakeup");
+                        }
                         WakeUpProcess(processTable, reader);
                         if (processTable.GetRunning() == processTable.GetIdle())
                         {
@@ -316,6 +328,17 @@ namespace cmsx.kernel
                         }
                     }
                 }
+                else
+                {
+                    if (Log())
+                    {
+                        LogMessage("con.deliver", "not.delivered");
+                    }
+                }
+            }
+            if (Log())
+            {
+                LogMessage("con.deliver", "end");
             }
         }
         private void HandleEnter()

@@ -546,9 +546,9 @@ namespace System.Os
         }
     }
     
-    public int GetPGRP()
+    public int GetPID()
     {
-        int result = getpgrp();
+        int result = getpid();
         if (result == -1)
         {
             ThrowSystemError();
@@ -556,9 +556,9 @@ namespace System.Os
         return result;
     }
     
-    public int SetPGRP()
+    public int GetPGID()
     {
-        int result = setpgrp();
+        int result = getpgid();
         if (result == -1)
         {
             ThrowSystemError();
@@ -566,9 +566,18 @@ namespace System.Os
         return result;
     }
     
-    public int TCGetPGRP(int fd)
+    public void SetPGID(int pgid)
     {
-        int result = tcgetpgrp(fd);
+        int result = setpgid(pgid);
+        if (result == -1)
+        {
+            ThrowSystemError();
+        }
+    }
+    
+    public int GetFGPID(int fd)
+    {
+        int result = getfgpid(fd);
         if (result == -1)
         {
             ThrowSystemError();
@@ -576,9 +585,9 @@ namespace System.Os
         return result;
     }
     
-    public void TCSetPGRP(int fd, int pgrp)
+    public void SetFGPID(int fd, int pid)
     {
-        int result = tcsetpgrp(fd, pgrp);
+        int result = setfgpid(fd, pid);
         if (result == -1)
         {
             ThrowSystemError();
@@ -635,6 +644,25 @@ namespace System.Os
     public void Pipe(int* readFD, int* writeFD)
     {
         int result = pipe(readFD, writeFD);
+        if (result == -1)
+        {
+            ThrowSystemError();
+        }
+    }
+    
+    public bool Log()
+    {
+        int result = log();
+        if (result == -1)
+        {   
+            ThrowSystemError();
+        }
+        return result == 1;
+    }
+    
+    public void LogMessage(const string& method, const string& msg)
+    {
+        int result = log_message(method.Chars(), msg.Chars());
         if (result == -1)
         {
             ThrowSystemError();

@@ -48,15 +48,18 @@ public const byte sys_getuid = 41u;
 public const byte sys_setuid = 42u;
 public const byte sys_getgid = 43u;
 public const byte sys_setgid = 44u;
-public const byte sys_getpgrp = 45u;
-public const byte sys_setpgrp = 46u;
-public const byte sys_tcgetpgrp = 47u;
-public const byte sys_tcsetpgrp = 48u;
-public const byte sys_sync = 49u;
-public const byte sys_times = 50u;
-public const byte sys_get_host_name = 51u;
-public const byte sys_dup = 52u;
-public const byte sys_pipe = 53u;
+public const byte sys_getpid = 45u;
+public const byte sys_getpgid = 46u;
+public const byte sys_setpgid = 47u;
+public const byte sys_getfgpid = 48u;
+public const byte sys_setfgpid = 49u;
+public const byte sys_sync = 50u;
+public const byte sys_times = 51u;
+public const byte sys_get_host_name = 52u;
+public const byte sys_dup = 53u;
+public const byte sys_pipe = 54u;
+public const byte sys_log = 55u;
+public const byte sys_log_message = 56u;
 
 public cdecl nothrow void exit(byte exitCode)
 {
@@ -282,24 +285,29 @@ public cdecl nothrow int setgid(int gid)
     return cast<int>(trap(0u, sys_setgid, 0u, gid));
 }
 
-public cdecl nothrow int getpgrp()
+public cdecl nothrow int getpid()
 {
-    return cast<int>(trap(0u, sys_getpgrp, 0u));
+    return cast<int>(trap(0u, sys_getpid, 0u));
 }
 
-public cdecl nothrow int setpgrp()
+public cdecl nothrow int getpgid()
 {
-    return cast<int>(trap(0u, sys_setpgrp, 0u));
+    return cast<int>(trap(0u, sys_getpgid, 0u));
 }
 
-public cdecl nothrow int tcgetpgrp(int fd)
+public cdecl nothrow int setpgid(int pgid)
 {
-    return cast<int>(trap(0u, sys_tcgetpgrp, 0u, fd));
+    return cast<int>(trap(0u, sys_setpgid, 0u, pgid));
 }
 
-public cdecl nothrow int tcsetpgrp(int fd, int pgrp)
+public cdecl nothrow int getfgpid(int fd)
 {
-    return cast<int>(trap(0u, sys_tcsetpgrp, 0u, fd, pgrp));
+    return cast<int>(trap(0u, sys_getfgpid, 0u, fd));
+}
+
+public cdecl nothrow int setfgpid(int fd, int pid)
+{
+    return cast<int>(trap(0u, sys_setfgpid, 0u, fd, pid));
 }
 
 public cdecl nothrow int sync()
@@ -325,4 +333,14 @@ public cdecl nothrow int dup(int fd)
 public cdecl nothrow int pipe(int* readFD, int* writeFD)
 {
     return cast<int>(trap(0u, sys_pipe, 0u, readFD, writeFD));
+}
+
+public cdecl nothrow int log()
+{
+    return cast<int>(trap(0u, sys_log, 0u));
+}
+
+public cdecl nothrow int log_message(const char* method, const char* msg)
+{
+    return cast<int>(trap(0u, sys_log_message, 0u, method, msg));
 }

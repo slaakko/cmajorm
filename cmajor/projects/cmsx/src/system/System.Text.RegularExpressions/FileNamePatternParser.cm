@@ -7,7 +7,7 @@ namespace System.Text.RegularExpressions
         private const int END = 0;
         private const int CHR = 1;
 
-        public nothrow FileNamePatternParser(Context& context_, const string& pattern_) :
+        public nothrow FileNamePatternParser(Context& context_, const ustring& pattern_) :
             context(context_), pattern(pattern_), start(pattern.Chars()), end(pattern.Chars() + pattern.Length()), pos(start)
         {
         }
@@ -31,12 +31,12 @@ namespace System.Text.RegularExpressions
         }
         private int GetToken()
         {
-            char rangeStart;
+            uchar rangeStart;
             Class* cls = null;
             int state = 0;
             while (pos != end)
             {
-                char c = *pos;
+                uchar c = *pos;
                 switch (state)
                 {
                     case 0:
@@ -175,15 +175,15 @@ namespace System.Text.RegularExpressions
             }
             if (state != 0)
             {
-                throw Exception("invalid pattern '" + pattern + "'");
+                throw Exception("invalid pattern '" + ToUtf8(pattern) + "'");
             }
             return END;
         }
         private Context& context;
-        private string pattern;
-        private char* start;
-        private char* end;
-        private char* pos;
+        private ustring pattern;
+        private uchar* start;
+        private uchar* end;
+        private uchar* pos;
         private Nfa nfa;
     }
 }

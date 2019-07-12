@@ -5,57 +5,58 @@
 
 using System;
 using System.Collections;
+using System.Os;
 using System.Security;
 
 namespace cmsh
 {
     public void Expand(List<Token>& tokens, ShellEnvironment& shellEnvironment, TokenizerFlags flags)
     {
-        if (shellEnvironment.debug)
+        if (shellEnvironment.log)
         {
-            Console.Out() << "tokens before expansions:" << endl();
+            LogMessage("shell.expand", "tokens before expansions:");
             PrintTokens(tokens);
         }
         if ((flags & TokenizerFlags.containsLBrace) != TokenizerFlags.none)
         {
             tokens = BraceExpand(tokens);
-            if (shellEnvironment.debug)
+            if (shellEnvironment.log)
             {
-                Console.Out() << "tokens after brace expansion:" << endl();
+                LogMessage("shell.expand", "tokens after brace expansion:");
                 PrintTokens(tokens);
             }
         }
         if ((flags & TokenizerFlags.containsTilde) != TokenizerFlags.none)
         {
             TildeExpand(tokens, shellEnvironment.home, shellEnvironment.users);
-            if (shellEnvironment.debug)
+            if (shellEnvironment.log)
             {
-                Console.Out() << "tokens after tilde expansion:" << endl();
+                LogMessage("shell.expand", "tokens after tilde expansion:");
                 PrintTokens(tokens);
             }
         }
         if ((flags & TokenizerFlags.containsDollar) != TokenizerFlags.none)
         {
             tokens = ExpandParameters(tokens, shellEnvironment.variables);
-            if (shellEnvironment.debug)
+            if (shellEnvironment.log)
             {
-                Console.Out() << "tokens after parameter expansion:" << endl();
+                LogMessage("shell.expand", "tokens after parameter expansion:");
                 PrintTokens(tokens);
             }
         }
         if ((flags & TokenizerFlags.containsPatternChar) != TokenizerFlags.none)
         {
             tokens = ExpandFileNamePatterns(tokens);
-            if (shellEnvironment.debug)
+            if (shellEnvironment.log)
             {
-                Console.Out() << "tokens after file name expansion:" << endl();
+                LogMessage("shell.expand", "tokens after file name expansion:");
                 PrintTokens(tokens);
             }
         }
         RemoveQuotes(tokens);
-        if (shellEnvironment.debug)
+        if (shellEnvironment.log)
         {
-            Console.Out() << "tokens after expansions:" << endl();
+            LogMessage("shell.expand", "tokens after expansions:");
             PrintTokens(tokens);
         }
     }

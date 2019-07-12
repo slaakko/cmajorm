@@ -21,8 +21,6 @@ void PrintHelp()
     Console.Out() << "  Print help and exit." << endl() << endl();
     Console.Out() << "--diagnostics | -d" << endl();
     Console.Out() << "  Show stack trace in case of error." << endl() << endl();
-    Console.Out() << "--debug | -b" << endl();
-    Console.Out() << "  Show tokens before and after each expansion performed." << endl() << endl();
 }
 
 namespace cmsh
@@ -110,8 +108,8 @@ namespace cmsh
         BeginObeyColorStrings(1);
         SetPWD(shellEnvironment);
         ReadEnvironmentFile();
-        shellEnvironment.pgrp = SetPGRP();
-        TCSetPGRP(0, shellEnvironment.pgrp);
+        SetPGID(GetPID());
+        SetFGPID(0, GetPID());
     }
 
     void PrintPrompt(ShellEnvironment& shellEnvironment)
@@ -160,6 +158,7 @@ namespace cmsh
     void RunInteractive(ShellEnvironment& shellEnvironment)
     {
         PrintPrompt(shellEnvironment);
+        SetFGPID(0, GetPID());
         string line = ReadLine(shellEnvironment);
         while (!shellEnvironment.exit)
         {
@@ -174,6 +173,7 @@ namespace cmsh
             Console.Out() << endl();
             if (shellEnvironment.exit) break;
             PrintPrompt(shellEnvironment);
+            SetFGPID(0, GetPID());
             line = ReadLine(shellEnvironment);
         }
     }
@@ -220,10 +220,6 @@ int main(int argc, const char** argv)
                 {
                     diagnostics = true;
                 }
-                else if (arg == "--debug")
-                {
-                    debug = true;
-                }
                 else
                 {
                     throw Exception("unknown option '" + arg + "'");
@@ -249,10 +245,6 @@ int main(int argc, const char** argv)
                         {
                             diagnostics = true;
                         }
-                        else if (o == 'b')
-                        {
-                            debug = true;
-                        }
                         else 
                         {
                             throw Exception("unknown option '-" + string(o) + "'");
@@ -266,9 +258,9 @@ int main(int argc, const char** argv)
             }
         }
         ShellEnvironment shellEnvironment;
-        if (debug)
+        if (Log())
         {
-            shellEnvironment.debug = true;
+            shellEnvironment.log = true;
         }
         Setup(shellEnvironment);
         if (args.IsEmpty())

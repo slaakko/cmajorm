@@ -33,7 +33,7 @@ namespace System.Text.RegularExpressions
         return EpsilonClosure(states);
     }
 
-    public nothrow List<State*> Move(const List<State*>& states, char c)
+    public nothrow List<State*> Move(const List<State*>& states, uchar c)
     {
         List<State*> next;
         for (State* state : states)
@@ -50,10 +50,10 @@ namespace System.Text.RegularExpressions
         return next;
     }
 
-    public nothrow bool Match(const string& s, const Nfa& nfa)
+    public nothrow bool Match(const ustring& s, const Nfa& nfa)
     {
         List<State*> states = EpsilonClosure(nfa.Start());
-        for (char c : s)
+        for (uchar c : s)
         {
             states = EpsilonClosure(Move(states, c));
         }
@@ -67,12 +67,12 @@ namespace System.Text.RegularExpressions
         return false;
     }
 
-    public bool MatchFileNamePattern(const string& s, const string& fileNamePattern)
+    public bool MatchFileNamePattern(const ustring& s, const ustring& fileNamePattern)
     {
         return MatchFileNamePattern(s, fileNamePattern, false);
     }
 
-    public bool MatchFileNamePattern(const string& s, const string& fileNamePattern, bool debug)
+    public bool MatchFileNamePattern(const ustring& s, const ustring& fileNamePattern, bool debug)
     {
         Context context;
         FileNamePatternParser parser(context, fileNamePattern);
@@ -87,13 +87,13 @@ namespace System.Text.RegularExpressions
         return Match(s, nfa);
     }
 
-    public List<string> GetMatchingFileNames(const List<string>& fileNames, const string& fileNamePattern)
+    public List<ustring> GetMatchingFileNames(const List<ustring>& fileNames, const ustring& fileNamePattern)
     {
-        List<string> matchingFileNames;
+        List<ustring> matchingFileNames;
         Context context;
         FileNamePatternParser parser(context, fileNamePattern);
         Nfa nfa = parser.Parse();
-        for (const string& fileName : fileNames)
+        for (const ustring& fileName : fileNames)
         {
             if (Match(fileName, nfa))
             {

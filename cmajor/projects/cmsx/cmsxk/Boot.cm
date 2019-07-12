@@ -185,18 +185,21 @@ namespace cmsx.kernel
         SystemCallHandler setgidSystemCallHandler = SetGID;
         ulong setgidSystemCallAddress = cast<ulong>(cast<void*>(setgidSystemCallHandler)); 
         mem.WriteULong(MakeSystemCallPtrAddress(sys_setgid), setgidSystemCallAddress, Protection.write);
-        SystemCallHandler getpgrpSystemCallHandler = GetPGRP;
-        ulong getpgrpSystemCallAddress = cast<ulong>(cast<void*>(getpgrpSystemCallHandler)); 
-        mem.WriteULong(MakeSystemCallPtrAddress(sys_getpgrp), getpgrpSystemCallAddress, Protection.write);
-        SystemCallHandler setpgrpSystemCallHandler = SetPGRP;
-        ulong setpgrpSystemCallAddress = cast<ulong>(cast<void*>(setpgrpSystemCallHandler)); 
-        mem.WriteULong(MakeSystemCallPtrAddress(sys_setpgrp), setpgrpSystemCallAddress, Protection.write);
-        SystemCallHandler tcgetpgrpSystemCallHandler = TCGetPGRP;
-        ulong tcgetpgrpSystemCallAddress = cast<ulong>(cast<void*>(tcgetpgrpSystemCallHandler)); 
-        mem.WriteULong(MakeSystemCallPtrAddress(sys_tcgetpgrp), tcgetpgrpSystemCallAddress, Protection.write);
-        SystemCallHandler tcsetpgrpSystemCallHandler = TCSetPGRP;
-        ulong tcsetpgrpSystemCallAddress = cast<ulong>(cast<void*>(tcsetpgrpSystemCallHandler)); 
-        mem.WriteULong(MakeSystemCallPtrAddress(sys_tcsetpgrp), tcsetpgrpSystemCallAddress, Protection.write);
+        SystemCallHandler getpidSystemCallHandler = GetPID;
+        ulong getpidSystemCallAddress = cast<ulong>(cast<void*>(getpidSystemCallHandler)); 
+        mem.WriteULong(MakeSystemCallPtrAddress(sys_getpid), getpidSystemCallAddress, Protection.write);
+        SystemCallHandler getpgidSystemCallHandler = GetPGID;
+        ulong getpgidSystemCallAddress = cast<ulong>(cast<void*>(getpgidSystemCallHandler)); 
+        mem.WriteULong(MakeSystemCallPtrAddress(sys_getpgid), getpgidSystemCallAddress, Protection.write);
+        SystemCallHandler setpgidSystemCallHandler = SetPGID;
+        ulong setpgidSystemCallAddress = cast<ulong>(cast<void*>(setpgidSystemCallHandler)); 
+        mem.WriteULong(MakeSystemCallPtrAddress(sys_setpgid), setpgidSystemCallAddress, Protection.write);
+        SystemCallHandler getfgpidSystemCallHandler = GetFGPID;
+        ulong getfgpidSystemCallAddress = cast<ulong>(cast<void*>(getfgpidSystemCallHandler)); 
+        mem.WriteULong(MakeSystemCallPtrAddress(sys_getfgpid), getfgpidSystemCallAddress, Protection.write);
+        SystemCallHandler setfgpidSystemCallHandler = SetFGPID;
+        ulong setfgpidSystemCallAddress = cast<ulong>(cast<void*>(setfgpidSystemCallHandler)); 
+        mem.WriteULong(MakeSystemCallPtrAddress(sys_setfgpid), setfgpidSystemCallAddress, Protection.write);
         SystemCallHandler syncSystemCallHandler = Sync;
         ulong syncSystemCallAddress = cast<ulong>(cast<void*>(syncSystemCallHandler)); 
         mem.WriteULong(MakeSystemCallPtrAddress(sys_sync), syncSystemCallAddress, Protection.write);
@@ -212,6 +215,12 @@ namespace cmsx.kernel
         SystemCallHandler pipeSystemCallHandler = Pipe;
         ulong pipeSystemCallAddress = cast<ulong>(cast<void*>(pipeSystemCallHandler));
         mem.WriteULong(MakeSystemCallPtrAddress(sys_pipe), pipeSystemCallAddress, Protection.write);
+        SystemCallHandler logSystemCallHandler = cmsx.kernel.Log;
+        ulong logSystemCallAddress = cast<ulong>(cast<void*>(logSystemCallHandler));
+        mem.WriteULong(MakeSystemCallPtrAddress(sys_log), logSystemCallAddress, Protection.write);
+        SystemCallHandler logmessageSystemCallHandler = cmsx.kernel.LogMessage;
+        ulong logmessageSystemCallAddress = cast<ulong>(cast<void*>(logmessageSystemCallHandler));
+        mem.WriteULong(MakeSystemCallPtrAddress(sys_log_message), logmessageSystemCallAddress, Protection.write);
     }
 
     public void Boot(Machine& machine)

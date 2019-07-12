@@ -148,8 +148,8 @@ void SetUserPassword(const string& userName)
     int pid = Fork();
     if (pid == 0)
     {
-        int pgrp = SetPGRP();
-        TCSetPGRP(0, pgrp);
+        SetPGID(GetPID());
+        SetFGPID(0, GetPID());
         Exec("/bin/passwd", List<string>(1, userName));
     }
     ushort exitCode = 0u;
@@ -158,7 +158,7 @@ void SetUserPassword(const string& userName)
     {
         throw Exception("error: passwd exited with code " + ToString(exitCode));
     }
-    TCSetPGRP(0, GetPGRP());
+    SetFGPID(0, GetPID());
 }
 
 void InstallUser(const string& userName, bool verbose)
@@ -256,8 +256,8 @@ int StartShell(const string& shell, bool verbose)
     int pid = Fork();
     if (pid == 0)
     {
-        int pgrp = SetPGRP();
-        TCSetPGRP(0, pgrp);
+        SetPGID(GetPID());
+        SetFGPID(0, GetPID());
         Exec(shell.Chars(), List<string>());
     }
     else

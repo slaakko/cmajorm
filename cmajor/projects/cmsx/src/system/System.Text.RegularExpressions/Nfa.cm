@@ -36,7 +36,7 @@ namespace System.Text.RegularExpressions
         {
             edges.Add(edge);
         }
-        public nothrow List<State*> Next(char c) const
+        public nothrow List<State*> Next(uchar c) const
         {
             List<State*> next;
             for (const Edge& edge : edges)
@@ -130,7 +130,7 @@ namespace System.Text.RegularExpressions
         return Nfa(start, end);
     }
 
-    public nothrow Nfa MakeNfa(Context& context, char c)
+    public nothrow Nfa MakeNfa(Context& context, uchar c)
     {
         return MakeNfa(context, context.MakeChar(c));
     }

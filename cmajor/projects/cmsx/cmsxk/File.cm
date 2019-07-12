@@ -373,16 +373,16 @@ namespace cmsx.kernel
         file->IOCtl(machine, process, item, bufferAddress, count);
     }
 
-    public int TCGetPGRP(Process* process, int fd)
+    public int GetFGPID(Process* process, int fd)
     {
         File* file = process->fileTable.GetFile(fd);
-        return file->TCGetPGRP();
+        return file->GetFGPID();
     }
 
-    public void TCSetPGRP(Process* process, int fd, int pgrp)
+    public void SetFGPID(Process* process, int fd, int pid)
     {
         File* file = process->fileTable.GetFile(fd);
-        file->TCSetPGRP(pgrp);
+        file->SetFGPID(pid);
     }
 
     public void Chmod(Machine& machine, Process* process, ulong pathAddress, int mode)
@@ -549,13 +549,13 @@ namespace cmsx.kernel
                 throw SystemError(EINVAL, "unknown ioctl item " + ToString(item) + " for " + name);
             }
         }
-        public virtual int TCGetPGRP()
+        public virtual int GetFGPID()
         {
-            throw SystemError(ENOTSUPPORTED, name + " does not support tcgetpgrp()");
+            throw SystemError(ENOTSUPPORTED, name + " does not support getfgpid()");
         }
-        public virtual void TCSetPGRP(int pgrp)
+        public virtual void SetFGPID(int pid)
         {
-            throw SystemError(ENOTSUPPORTED, name + " does not support tcsetpgrp()");
+            throw SystemError(ENOTSUPPORTED, name + " does not support setfgpid()");
         }
         public virtual File* Share()
         {
@@ -744,17 +744,17 @@ namespace cmsx.kernel
         public override void SetEcho(bool echo)
         {
         }
-        public override int TCGetPGRP()
+        public override int GetFGPID()
         {
             Kernel& kernel = GetKernel();
             Session* currentSession = kernel.CurrentSession();
-            return currentSession->fgpgrp;
+            return currentSession->fgpid;
         }
-        public override void TCSetPGRP(int pgrp)
+        public override void SetFGPID(int pid)
         {
             Kernel& kernel = GetKernel();
             Session* currentSession = kernel.CurrentSession();
-            currentSession->fgpgrp = pgrp;
+            currentSession->fgpid = pid;
         }
         private string bufferedInput;
     }
@@ -798,36 +798,37 @@ namespace cmsx.kernel
             {
                 while (true)
                 {
+                    if (Log())
+                    {
+                        LogMessage("fs.file", "console.input.begin.read.count=" + ToString(count));
+                    }
                     Kernel& kernel = Kernel.Instance();
                     Session* session = kernel.CurrentSession();
-                    if (session->fgpgrp == reader->pgid)
+                    if (bufferedInput.IsEmpty())
                     {
-                        if (bufferedInput.IsEmpty())
+                        ConsoleDriver* consoleDriver = kernel.GetConsoleDriver();
+                        if (consoleDriver->HasLine())
                         {
-                            ConsoleDriver* consoleDriver = kernel.GetConsoleDriver();
-                            if (consoleDriver->HasLine())
-                            {
-                                bufferedInput = consoleDriver->GetLine();
-                            }
-                            else if (consoleDriver->Eof())
-                            {
-                                consoleDriver->ResetEof();
-                                return 0;
-                            }
-                            else
-                            {
-                                EnqueueReadRequest(reader, bufferAddress, count);
-                            }
+                            bufferedInput = consoleDriver->GetLine();
                         }
-                        long n = Min(count, bufferedInput.Length());
-                        WriteProcessMemory(machine, reader, bufferAddress, cast<byte*>(cast<void*>(bufferedInput.Chars())), cast<ulong>(n), Protection.write);
-                        bufferedInput = bufferedInput.Substring(n);
-                        return n;
+                        else if (consoleDriver->Eof())
+                        {
+                            consoleDriver->ResetEof();
+                            return 0;
+                        }
+                        else
+                        {
+                            EnqueueReadRequest(reader, bufferAddress, count);
+                        }
                     }
-                    else
+                    long n = Min(count, bufferedInput.Length());
+                    WriteProcessMemory(machine, reader, bufferAddress, cast<byte*>(cast<void*>(bufferedInput.Chars())), cast<ulong>(n), Protection.write);
+                    bufferedInput = bufferedInput.Substring(n);
+                    if (Log())
                     {
-                        EnqueueReadRequest(reader, bufferAddress, count);
+                        LogMessage("fs.file", "console.input.end.read.count=" + ToString(n));
                     }
+                    return n;
                 }
             }
             catch (const Exception& ex)
@@ -860,17 +861,21 @@ namespace cmsx.kernel
         {
             GetConsoleDriver().SetEcho(echo);
         }
-        public override int TCGetPGRP()
+        public override int GetFGPID()
         {
             Kernel& kernel = GetKernel();
             Session* currentSession = kernel.CurrentSession();
-            return currentSession->fgpgrp;
+            return currentSession->fgpid;
         }
-        public override void TCSetPGRP(int pgrp)
+        public override void SetFGPID(int pid)
         {
+            if (Log())
+            {
+                LogMessage("fs.file", "console.input.setfgpid=" + ToString(pid));
+            }
             Kernel& kernel = GetKernel();
             Session* currentSession = kernel.CurrentSession();
-            currentSession->fgpgrp = pgrp;
+            currentSession->fgpid = pid;
         }
         private string bufferedInput;
     }

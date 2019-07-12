@@ -103,35 +103,35 @@ namespace cmsh
         }
         private List<ustring> Expand(const ustring& prefix, const ustring& pattern)
         {
-            string dirPath = ToUtf8(prefix);
+            ustring dirPath = prefix;
             if (dirPath.IsEmpty())
             {
-                dirPath = ".";
+                dirPath = u".";
             }
-            List<string> fileNames;
+            List<ustring> fileNames;
             DirectoryEntry dirEntry;
-            DirectoryReader reader(dirPath);
+            DirectoryReader reader(ToUtf8(dirPath));
             while (reader.Read(dirEntry))
             {
-                string fileName = &dirEntry.name[0];
-                if (fileName != "." && fileName != "..")
+                ustring fileName = ToUtf32(&dirEntry.name[0]);
+                if (fileName != u"." && fileName != u"..")
                 {
                     fileNames.Add(fileName);
                 }
             }
-            List<string> matchingFileNames = GetMatchingFileNames(fileNames, ToUtf8(pattern));
+            List<ustring> matchingFileNames = GetMatchingFileNames(fileNames, pattern);
             Sort(matchingFileNames);
             List<ustring> expanded;
-            string directory = ToUtf8(prefix);
-            for (const string& fileName : matchingFileNames)
+            ustring directory = prefix;
+            for (const ustring& fileName : matchingFileNames)
             {
                 if (directory.IsEmpty())
                 {
-                    expanded.Add(ToUtf32(fileName));
+                    expanded.Add(fileName);
                 }
                 else
                 {
-                    expanded.Add(ToUtf32(Path.Combine(directory, fileName)));
+                    expanded.Add(ToUtf32(Path.Combine(ToUtf8(directory), ToUtf8(fileName))));
                 }
             }
             return expanded;
@@ -250,7 +250,7 @@ namespace cmsh
         private uchar* pos;
         private ustring component;
         private bool patternCharInComponent;
-        private List<string> paths;
+        private List<ustring> paths;
     }
     
     nothrow List<Token> ExpandFileNamePatterns(const Token& token)
