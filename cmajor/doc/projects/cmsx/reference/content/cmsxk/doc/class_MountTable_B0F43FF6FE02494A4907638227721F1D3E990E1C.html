@@ -7,7 +7,7 @@
  <body>
   <h1>MountTable Class</h1>
   <h2>Definition</h2>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/MountTable.cm.html#6">6</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/MountTable.cm.html">cmsxk/MountTable.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/MountTable.cm.html#15">15</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/MountTable.cm.html">cmsxk/MountTable.cm</a></span>
   <h2>Constructors &amp; Destructor</h2>
   <table>
    <tr>
@@ -22,12 +22,24 @@
   <h2>Member Functions</h2>
   <table>
    <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">void</span></td>
+    <td xml:space="preserve"><a href="../../cmsxk/doc/class_MountTable_B0F43FF6FE02494A4907638227721F1D3E990E1C.html#member_function_Flush_MountTable_3D71A472AD57E4E30ED2489F0F15E14F5C820B83">Flush</a>()</td>
+   </tr>
+   <tr>
     <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<a href="../../cmsxk/doc/class_FileSystem_823A441640DD79314B289975B77549B0702224FD.html">FileSystem</a>*</td>
     <td xml:space="preserve"><a href="../../cmsxk/doc/class_MountTable_B0F43FF6FE02494A4907638227721F1D3E990E1C.html#member_function_GetFileSystem_MountTable_EFDCC681D31A63F0D11E23F723136F2AC5E32A43">GetFileSystem</a>(<span class="kw">int</span>&nbsp;fsNumber)&nbsp;<span class="kw">const</span></td>
    </tr>
    <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<a href="../../cmsxk/doc/class_FileSystem_823A441640DD79314B289975B77549B0702224FD.html">FileSystem</a>*</td>
+    <td xml:space="preserve"><a href="../../cmsxk/doc/class_MountTable_B0F43FF6FE02494A4907638227721F1D3E990E1C.html#member_function_GetMountedFileSystem_MountTable_F3C7B7862DBE35FF9003AE8558CB24AC79059F7F">GetMountedFileSystem</a>(<span class="kw">const</span>&nbsp;<a href="../../../../../../system/content/System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html">String</a>&lt;<span class="kw">char</span>>&amp;&nbsp;dirPath, <span class="kw">const</span>&nbsp;<a href="../../cmsxk/doc/class_INodeKey_D7A9808D7A5112D72E843460CC4BC9CA7116C35D.html">INodeKey</a>&amp;&nbsp;mountDirKey)&nbsp;<span class="kw">const</span></td>
+   </tr>
+   <tr>
     <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">void</span></td>
-    <td xml:space="preserve"><a href="../../cmsxk/doc/class_MountTable_B0F43FF6FE02494A4907638227721F1D3E990E1C.html#member_function_InitializeFileSystems_MountTable_332AA6B36D16274C71182FB6C6647EBBEC648AA7">InitializeFileSystems</a>()</td>
+    <td xml:space="preserve"><a href="../../cmsxk/doc/class_MountTable_B0F43FF6FE02494A4907638227721F1D3E990E1C.html#member_function_Init_MountTable_6A8C28511F5BD7080090A3005FA4A9D9A6CEFC50">Init</a>()</td>
+   </tr>
+   <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">private</span>&nbsp;<span class="kw">void</span></td>
+    <td xml:space="preserve"><a href="../../cmsxk/doc/class_MountTable_B0F43FF6FE02494A4907638227721F1D3E990E1C.html#member_function_InitializeFileSystems_MountTable_3C616061A9D611BB75D7272F78F10F362188CE72">InitializeFileSystems</a>()</td>
    </tr>
    <tr>
     <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">static</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<a href="../../cmsxk/doc/class_MountTable_B0F43FF6FE02494A4907638227721F1D3E990E1C.html">MountTable</a>&amp;</td>
@@ -49,36 +61,57 @@
   <h3 id="static_constructor_MountTable_5D6605715D6D7D6148A2093E4ACC6DA89F0116E2" xml:space="preserve">MountTable&nbsp;Static Constructor</h3>
   <h4 xml:space="preserve"><span class="kw">static</span>&nbsp;MountTable()</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/MountTable.cm.html#8">8</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/MountTable.cm.html">cmsxk/MountTable.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/MountTable.cm.html#17">17</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/MountTable.cm.html">cmsxk/MountTable.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="default_constructor_MountTable_70BB0D355770E3A5BB7FDEA27CDC869E2DDF85E1" xml:space="preserve">MountTable&nbsp;Constructor</h3>
   <h4 xml:space="preserve"><span class="kw">private</span>&nbsp;MountTable()</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/MountTable.cm.html#30">30</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/MountTable.cm.html">cmsxk/MountTable.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/MountTable.cm.html#48">48</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/MountTable.cm.html">cmsxk/MountTable.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h2>Member Function Details</h2>
-  <h3 id="member_function_GetFileSystem_MountTable_EFDCC681D31A63F0D11E23F723136F2AC5E32A43" xml:space="preserve">GetFileSystem&nbsp;Member Function</h3>
-  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<a href="../../cmsxk/doc/class_FileSystem_823A441640DD79314B289975B77549B0702224FD.html">FileSystem</a>*&nbsp;GetFileSystem(<span class="kw">int</span>&nbsp;fsNumber)</h4>
+  <h3 id="member_function_Flush_MountTable_3D71A472AD57E4E30ED2489F0F15E14F5C820B83" xml:space="preserve">Flush&nbsp;Member Function</h3>
+  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">void</span>&nbsp;Flush()</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/MountTable.cm.html#22">22</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/MountTable.cm.html">cmsxk/MountTable.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/MountTable.cm.html#94">94</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/MountTable.cm.html">cmsxk/MountTable.cm</a></span>
   <br/>
   <br/>
   <hr/>
-  <h3 id="member_function_InitializeFileSystems_MountTable_332AA6B36D16274C71182FB6C6647EBBEC648AA7" xml:space="preserve">InitializeFileSystems&nbsp;Member Function</h3>
-  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">void</span>&nbsp;InitializeFileSystems()</h4>
+  <h3 id="member_function_GetFileSystem_MountTable_EFDCC681D31A63F0D11E23F723136F2AC5E32A43" xml:space="preserve">GetFileSystem&nbsp;Member Function</h3>
+  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<a href="../../cmsxk/doc/class_FileSystem_823A441640DD79314B289975B77549B0702224FD.html">FileSystem</a>*&nbsp;GetFileSystem(<span class="kw">int</span>&nbsp;fsNumber)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/MountTable.cm.html#15">15</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/MountTable.cm.html">cmsxk/MountTable.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/MountTable.cm.html#24">24</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/MountTable.cm.html">cmsxk/MountTable.cm</a></span>
+  <br/>
+  <br/>
+  <hr/>
+  <h3 id="member_function_GetMountedFileSystem_MountTable_F3C7B7862DBE35FF9003AE8558CB24AC79059F7F" xml:space="preserve">GetMountedFileSystem&nbsp;Member Function</h3>
+  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<a href="../../cmsxk/doc/class_FileSystem_823A441640DD79314B289975B77549B0702224FD.html">FileSystem</a>*&nbsp;GetMountedFileSystem(<span class="kw">const</span>&nbsp;<a href="../../../../../../system/content/System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html">String</a>&lt;<span class="kw">char</span>>&amp;&nbsp;dirPath, <span class="kw">const</span>&nbsp;<a href="../../cmsxk/doc/class_INodeKey_D7A9808D7A5112D72E843460CC4BC9CA7116C35D.html">INodeKey</a>&amp;&nbsp;mountDirKey)</h4>
+  <h5>Definition</h5>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/MountTable.cm.html#33">33</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/MountTable.cm.html">cmsxk/MountTable.cm</a></span>
+  <br/>
+  <br/>
+  <hr/>
+  <h3 id="member_function_Init_MountTable_6A8C28511F5BD7080090A3005FA4A9D9A6CEFC50" xml:space="preserve">Init&nbsp;Member Function</h3>
+  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">void</span>&nbsp;Init()</h4>
+  <h5>Definition</h5>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/MountTable.cm.html#51">51</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/MountTable.cm.html">cmsxk/MountTable.cm</a></span>
+  <br/>
+  <br/>
+  <hr/>
+  <h3 id="member_function_InitializeFileSystems_MountTable_3C616061A9D611BB75D7272F78F10F362188CE72" xml:space="preserve">InitializeFileSystems&nbsp;Member Function</h3>
+  <h4 xml:space="preserve"><span class="kw">private</span>&nbsp;<span class="kw">void</span>&nbsp;InitializeFileSystems()</h4>
+  <h5>Definition</h5>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/MountTable.cm.html#101">101</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/MountTable.cm.html">cmsxk/MountTable.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="member_function_Instance_MountTable_8C91C8B849A5422418A4809192C20458EF2D479C" xml:space="preserve">Instance&nbsp;Static Member Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">static</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<a href="../../cmsxk/doc/class_MountTable_B0F43FF6FE02494A4907638227721F1D3E990E1C.html">MountTable</a>&amp;&nbsp;Instance()</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/MountTable.cm.html#11">11</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/MountTable.cm.html">cmsxk/MountTable.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/MountTable.cm.html#20">20</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/MountTable.cm.html">cmsxk/MountTable.cm</a></span>
   <br/>
   <br/>
   <hr/>

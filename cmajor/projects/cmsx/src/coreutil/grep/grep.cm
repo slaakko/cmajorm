@@ -1,0 +1,230 @@
+// =================================
+// Copyright (c) 2019 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Collections;
+using System.IO;
+using System.Text.RegularExpressions;
+
+void PrintHelp()
+{
+    Console.Out() << "Usage: grep [options] PATTERN [FILE]..." << endl();
+    Console.Out() << "Search regular expression PATTERN from FILEs." << endl();
+    Console.Out() << "If no FILE given search standard input." << endl() << endl();
+    Console.Out() << "Options:" << endl() << endl();
+    Console.Out() << "--help | -h" << endl();
+    Console.Out() << "  Print help and exit." << endl() << endl();
+    Console.Out() << "--diagnostics | -d" << endl();
+    Console.Out() << "  Show stack trace in case of error." << endl() << endl();
+    Console.Out() << "-" << endl();
+    Console.Out() << "  Search standard input." << endl() << endl();
+    Console.Out() << "--use-nfa | -n" << endl();
+    Console.Out() << "  Simulate NFA directly without compiling to DFA." << endl() << endl();
+}
+
+bool Grep(const ustring& pattern, const List<string>& files, bool useNfa)
+{
+    bool outputToConsole = System.Os.IsConsole(stdout);
+    if (outputToConsole)
+    {
+        System.Os.BeginObeyColorStrings(stdout);
+    }
+    Context context;
+    RegularExpressionPatternParser parser(context, pattern);
+    Nfa nfa = parser.Parse();
+    Dfa dfa;
+    if (!useNfa)
+    {
+        context.MakeRanges();
+        dfa = Compile(context, nfa);
+    }
+    bool found = false;
+    for (const string& file : files)
+    {
+        StreamReader reader;
+        if (file.IsEmpty())
+        {
+            reader = Console.In();
+        }
+        else
+        {
+            reader = File.OpenRead(file);
+        }
+        int lineNumber = 1;
+        while (!reader.Eof())
+        {
+            ustring line = ToUtf32(reader.ReadLine());
+            bool match = false;
+            if (useNfa)
+            {
+                match = Match(line, nfa);
+            }
+            else
+            {
+                match = Match(context, line, dfa);
+            }
+            if (match)
+            {
+                found = true;
+                if (file.IsEmpty())
+                {
+                    if (outputToConsole)
+                    {
+                        Console.Out() << ustring(System.Os.BeginColors(System.Os.ConsoleColor.green, System.Os.ConsoleColor.black));
+                    }
+                    Console.Out() << lineNumber << ": ";
+                    if (outputToConsole)
+                    {
+                        Console.Out() << ustring(System.Os.EndColors());
+                    }
+                    if (outputToConsole)
+                    {
+                        Console.Out() << ustring(System.Os.BeginColors(System.Os.ConsoleColor.gray, System.Os.ConsoleColor.black));
+                    }
+                    Console.Out() << line;
+                    if (outputToConsole)
+                    {
+                        Console.Out() << ustring(System.Os.EndColors());
+                    }
+                    Console.Out() << endl();
+                }
+                else
+                {
+                    if (outputToConsole)
+                    {
+                        Console.Out() << ustring(System.Os.BeginColors(System.Os.ConsoleColor.green, System.Os.ConsoleColor.black));
+                    }
+                    Console.Out() << file << ":" << lineNumber << ": ";
+                    if (outputToConsole)
+                    {
+                        Console.Out() << ustring(System.Os.EndColors());
+                    }
+                    if (outputToConsole)
+                    {
+                        Console.Out() << ustring(System.Os.BeginColors(System.Os.ConsoleColor.gray, System.Os.ConsoleColor.black));
+                    }
+                    Console.Out() << line;
+                    if (outputToConsole)
+                    {
+                        Console.Out() << ustring(System.Os.EndColors());
+                    }
+                    Console.Out() << endl();
+                }
+            }
+            ++lineNumber;
+        }
+    }
+    if (outputToConsole)
+    {
+        System.Os.EndObeyColorStrings(stdout);
+    }
+    return found;
+}
+
+int main(int argc, const char** argv)
+{
+    bool diagnostics = false;
+    try
+    {
+        string pattern;
+        List<string> files;
+        bool useNfa = false;
+        for (int i = 1; i < argc; ++i)
+        {
+            string arg = argv[i];
+            if (arg.StartsWith("--"))
+            {
+                if (arg == "--help")
+                {
+                    PrintHelp();
+                    return 1;
+                }
+                else if (arg == "--diagnostics")
+                {
+                    diagnostics = true;
+                }
+                else if (arg == "--use-nfa")
+                {
+                    useNfa = true;
+                }
+                else
+                {
+                    throw Exception("unknown option '" + arg + "'");
+                }
+            }
+            else if (arg.StartsWith("-"))
+            {
+                string options = arg.Substring(1);
+                if (options.IsEmpty())
+                {
+                    files.Add(string());
+                }
+                else
+                {
+                    for (char o : options)
+                    {
+                        if (o == 'h')
+                        {
+                            PrintHelp();
+                            return 1;
+                        }
+                        else if (o == 'd')
+                        {
+                            diagnostics = true;
+                        }
+                        else if (o == 'n')
+                        {
+                            useNfa = true;
+                        }
+                        else
+                        {
+                            throw Exception("unknown option '-" + string(o) + "'");
+                        }
+                    }
+                }
+            }
+            else if (pattern.IsEmpty())
+            {
+                pattern = arg;
+            }
+            else
+            {
+                files.Add(arg);
+            }
+        }
+        if (pattern.IsEmpty())
+        {
+            throw Exception("no pattern given");
+        }
+        else
+        {
+            if (files.IsEmpty())
+            {
+                files.Add(string());
+            }
+            if (Grep(ToUtf32(pattern), files, useNfa))
+            {
+                return 0;
+            }
+            else
+            {
+                return 1;
+            }
+        }
+    }
+    catch (const Exception& ex)
+    {
+        if (diagnostics)
+        {
+            Console.Error() << ex.ToString() << endl();
+        }
+        else
+        {
+            Console.Error() << ex.Message() << endl();
+        }
+        return 2;
+    }
+    return 0;
+}

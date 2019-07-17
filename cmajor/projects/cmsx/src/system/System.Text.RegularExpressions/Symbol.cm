@@ -1,3 +1,8 @@
+// =================================
+// Copyright (c) 2019 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
 using System;
 using System.Collections;
 
@@ -10,6 +15,7 @@ namespace System.Text.RegularExpressions
         public default virtual ~Symbol();
         public abstract nothrow bool Match(uchar c) const;
         public abstract nothrow string ToString() const;
+        public abstract void Accept(Visitor& visitor);
     }
 
     public class Char : Symbol
@@ -32,6 +38,14 @@ namespace System.Text.RegularExpressions
                 return ToUtf8(ustring(chr));
             }
         }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public inline nothrow uchar Chr() const
+        {
+            return chr;
+        }
         private uchar chr;
     }
 
@@ -44,6 +58,10 @@ namespace System.Text.RegularExpressions
         public override nothrow string ToString() const
         {
             return "<any>";
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
         }
     }
 
@@ -64,11 +82,26 @@ namespace System.Text.RegularExpressions
         {
             return end;
         }
+        public nothrow inline bool IsEmpty() const
+        {
+            return start > end;
+        }
         public override nothrow string ToString() const
         {
             string s;
-            s.Append(ToUtf8(ustring(start))).Append('-').Append(ToUtf8(ustring(end)));
+            if (start >= cast<uchar>(32) && start <= cast<uchar>(127) && end >= cast<uchar>(32) && end <= cast<uchar>(127))
+            {
+                s.Append(ToUtf8(ustring(start))).Append('-').Append(ToUtf8(ustring(end)));
+            }
+            else
+            {
+                s.Append('#').Append(ToHexString(cast<uint>(start))).Append('-').Append('#').Append(ToHexString(cast<uint>(end)));
+            }
             return s;
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
         }
         private uchar start;
         private uchar end;
@@ -77,6 +110,54 @@ namespace System.Text.RegularExpressions
     public nothrow inline bool operator==(const Range& left, const Range& right)
     {
         return left.Start() == right.Start() && left.End() == right.End();
+    }
+    
+    public nothrow bool Intersect(const Range& left, const Range& right)
+    {
+        if (left.IsEmpty() || right.IsEmpty())
+        {
+            return false;
+        }
+        if (left.Start() <= right.Start())
+        {
+            return right.Start() >= left.Start() && right.Start() <= left.End();
+        }
+        else
+        {
+            return left.Start() >= right.Start() && left.Start() <= right.End();
+        }
+    }
+    
+    public nothrow Range operator&(const Range& left, const Range& right)
+    {
+        if (Intersect(left, right))
+        {
+            Range intersection(Max(left.Start(), right.Start()), Min(left.End(), right.End()));
+            return intersection;
+        }
+        else
+        {
+            return Range(cast<uchar>(1), cast<uchar>(0));
+        }
+    }
+    
+    public nothrow List<Range> operator~(const Range& r)
+    {
+        List<Range> result;
+        if (cast<uint>(r.Start()) > 1)
+        {
+            result.Add(Range(cast<uchar>(1), cast<uchar>(cast<uint>(r.Start()) - 1u)));
+        }
+        if (cast<uint>(r.End()) < 0xFFFFFFFFu)
+        {
+            result.Add(Range(cast<uchar>(cast<uint>(r.End()) + 1u), cast<uchar>(0xFFFFFFFFu)));
+        }
+        return result;
+    }
+    
+    public nothrow inline bool operator<(const Range& left, const Range& right)
+    {
+        return left.Start() < right.Start();
     }
 
     public nothrow ulong GetHashCode(const Range& range)
@@ -88,6 +169,10 @@ namespace System.Text.RegularExpressions
     {
         public nothrow Class() : inverse(false)
         {
+        }
+        public inline nothrow bool Inverse() const
+        {
+            return inverse;
         }
         public nothrow void SetInverse()
         {
@@ -123,6 +208,14 @@ namespace System.Text.RegularExpressions
             }
             s.Append(']');
             return s;
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public inline nothrow const List<Symbol*>& Symbols() const
+        {
+            return symbols;
         }
         private bool inverse;
         private List<Symbol*> symbols;

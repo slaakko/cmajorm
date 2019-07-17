@@ -1,14 +1,14 @@
 <html>
  <head>
   <meta charset="utf-8"/>
-  <title>Block Abstract Class</title>
+  <title>Block Class</title>
   <link href="../../../style/style.css" rel="stylesheet" type="text/css"/>
   <script src="class_Block_ECE4C34A3726C7F1BD7D0523C735EB978205BCFE_inheritance.js" type="text/javascript"> </script>
  </head>
  <body onload="drawInheritanceDiagram()">
-  <h1>Block Abstract Class</h1>
+  <h1>Block Class</h1>
   <h2>Definition</h2>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/Block.cm.html#68">68</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/Block.cm.html">cmsxk/Block.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/Block.cm.html#46">46</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/Block.cm.html">cmsxk/Block.cm</a></span>
   <h2>Inheritance</h2>
   <div class="diagram">
    <svg height="0" id="inheritance_svg_diagram" version="2.0" width="0" xmlns="http://www.w3.org/2000/svg"/>
@@ -17,7 +17,7 @@
   <table>
    <tr>
     <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span></td>
-    <td xml:space="preserve"><a href="../../cmsxk/doc/class_Block_ECE4C34A3726C7F1BD7D0523C735EB978205BCFE.html#constructor_Block_0B729B66B69196A3DA49090E9DD99D43ED0DA3EE">Block</a>(<span class="kw">const</span>&nbsp;<a href="../../cmsxk/doc/class_BlockKey_41D48C3C4A15BB1BB1CBD82083CD8485022FB45D.html">BlockKey</a>&amp;&nbsp;key_, <a href="../../cmsxk/doc/class_BlockCache_8291E5791244657664DCAC8BA1DD22C7E034444D.html">BlockCache</a>*&nbsp;cache_)</td>
+    <td xml:space="preserve"><a href="../../cmsxk/doc/class_Block_ECE4C34A3726C7F1BD7D0523C735EB978205BCFE.html#constructor_Block_F4F5FC79626DC90456227D2AD846F31AFDF80DB2">Block</a>(<span class="kw">const</span>&nbsp;<a href="../../cmsxk/doc/class_BlockKey_41D48C3C4A15BB1BB1CBD82083CD8485022FB45D.html">BlockKey</a>&amp;&nbsp;key_, <a href="../../cmsxk/doc/class_BlockManager_BA4FF2BF11C402B6A14B0C9EA29F9D0C0B578930.html">BlockManager</a>*&nbsp;manager_, <a href="../../cmsxk/doc/class_BlockCache_8291E5791244657664DCAC8BA1DD22C7E034444D.html">BlockCache</a>*&nbsp;cache_)</td>
    </tr>
    <tr>
     <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">virtual</span>&nbsp;<span class="kw">default</span></td>
@@ -33,6 +33,10 @@
    <tr>
     <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<a href="../../../../../../system/content/System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html">String</a>&lt;<span class="kw">char</span>></td>
     <td xml:space="preserve"><a href="../../cmsxk/doc/class_Block_ECE4C34A3726C7F1BD7D0523C735EB978205BCFE.html#member_function_BlockFlagStr_Block_7E463979B6BE2DBBDB25051BC9775704D56F1D7F">BlockFlagStr</a>(<a href="../../cmsxk/doc/enumerated_type_Flags_119E3982207AEA301DED90586F6AB6CDF6D62669.html">Flags</a>&nbsp;flags)</td>
+   </tr>
+   <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span></td>
+    <td xml:space="preserve"><a href="../../cmsxk/doc/class_Block_ECE4C34A3726C7F1BD7D0523C735EB978205BCFE.html#member_function_Clear_Block_4A5541BCEC10F77A773505A06918EBE4CCE1B55E">Clear</a>()</td>
    </tr>
    <tr>
     <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">inline</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">bool</span></td>
@@ -51,8 +55,16 @@
     <td xml:space="preserve"><a href="../../cmsxk/doc/class_Block_ECE4C34A3726C7F1BD7D0523C735EB978205BCFE.html#member_function_Key_Block_D1C519E4C4FA18EB7F946DA22634426A3DFA2539">Key</a>()&nbsp;<span class="kw">const</span></td>
    </tr>
    <tr>
-    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">virtual</span>&nbsp;<span class="kw">void</span></td>
-    <td xml:space="preserve"><a href="../../cmsxk/doc/class_Block_ECE4C34A3726C7F1BD7D0523C735EB978205BCFE.html#member_function_Read_Block_178355198FA4B25F31138211706918280C6ADC98">Read</a>(<a href="../../cmsxu/doc/class_MemoryReader_6A5D4F18EC5CB81C1E250DC6476FC0556BC3C91E.html">MemoryReader</a>&amp;&nbsp;reader)</td>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">inline</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<a href="../../cmsxk/doc/class_BlockManager_BA4FF2BF11C402B6A14B0C9EA29F9D0C0B578930.html">BlockManager</a>*</td>
+    <td xml:space="preserve"><a href="../../cmsxk/doc/class_Block_ECE4C34A3726C7F1BD7D0523C735EB978205BCFE.html#member_function_Manager_Block_8912EFE1613FAD863010A36889044EEBACFDA4FE">Manager</a>()</td>
+   </tr>
+   <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">inline</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<a href="../../cmsxk/doc/class_Process_96BF1BFE7F4BA73B2BD2D2BA6C0FA69CD799B3B3.html">Process</a>*</td>
+    <td xml:space="preserve"><a href="../../cmsxk/doc/class_Block_ECE4C34A3726C7F1BD7D0523C735EB978205BCFE.html#member_function_Owner_Block_BD971083575679B72AAA2D41E2F67FA9DC3F1981">Owner</a>()&nbsp;<span class="kw">const</span></td>
+   </tr>
+   <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span></td>
+    <td xml:space="preserve"><a href="../../cmsxk/doc/class_Block_ECE4C34A3726C7F1BD7D0523C735EB978205BCFE.html#member_function_Read_Block_E250C71A948816A878A055F0D163DF775A6B09C9">Read</a>(<a href="../../cmsxu/doc/class_MemoryReader_6A5D4F18EC5CB81C1E250DC6476FC0556BC3C91E.html">MemoryReader</a>&amp;&nbsp;reader)</td>
    </tr>
    <tr>
     <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">inline</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span></td>
@@ -61,6 +73,10 @@
    <tr>
     <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">inline</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span></td>
     <td xml:space="preserve"><a href="../../cmsxk/doc/class_Block_ECE4C34A3726C7F1BD7D0523C735EB978205BCFE.html#member_function_ResetFlags_Block_E295E07647185174A7D50691B76D4509325089AE">ResetFlags</a>()</td>
+   </tr>
+   <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">inline</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span></td>
+    <td xml:space="preserve"><a href="../../cmsxk/doc/class_Block_ECE4C34A3726C7F1BD7D0523C735EB978205BCFE.html#member_function_ResetOwner_Block_4F4AF271C90151FC683CC725FE311F5A4EF1B0B0">ResetOwner</a>()</td>
    </tr>
    <tr>
     <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">inline</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span></td>
@@ -75,12 +91,16 @@
     <td xml:space="preserve"><a href="../../cmsxk/doc/class_Block_ECE4C34A3726C7F1BD7D0523C735EB978205BCFE.html#member_function_SetKey_Block_0BEC7DAED10EC7FAA5977AC9CDF99D40FDE1FF93">SetKey</a>(<span class="kw">const</span>&nbsp;<a href="../../cmsxk/doc/class_BlockKey_41D48C3C4A15BB1BB1CBD82083CD8485022FB45D.html">BlockKey</a>&amp;&nbsp;key_)</td>
    </tr>
    <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">inline</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span></td>
+    <td xml:space="preserve"><a href="../../cmsxk/doc/class_Block_ECE4C34A3726C7F1BD7D0523C735EB978205BCFE.html#member_function_SetOwner_Block_88398CE27F50FB8883528CCDD03C861F0E2CE77E">SetOwner</a>(<a href="../../cmsxk/doc/class_Process_96BF1BFE7F4BA73B2BD2D2BA6C0FA69CD799B3B3.html">Process</a>*&nbsp;owner_)</td>
+   </tr>
+   <tr>
     <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<a href="../../../../../../system/content/System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html">String</a>&lt;<span class="kw">char</span>></td>
     <td xml:space="preserve"><a href="../../cmsxk/doc/class_Block_ECE4C34A3726C7F1BD7D0523C735EB978205BCFE.html#member_function_ToString_Block_1C37E556122941AE3B0361A230CC7CBE315F0D0F">ToString</a>()&nbsp;<span class="kw">const</span></td>
    </tr>
    <tr>
-    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">virtual</span>&nbsp;<span class="kw">void</span></td>
-    <td xml:space="preserve"><a href="../../cmsxk/doc/class_Block_ECE4C34A3726C7F1BD7D0523C735EB978205BCFE.html#member_function_Write_Block_696A943A9CBEBDF40BC89BE4837A1449D170F232">Write</a>(<a href="../../cmsxu/doc/class_MemoryWriter_7EC7A6F43659409400AC83DD949BC26830026C92.html">MemoryWriter</a>&amp;&nbsp;writer)</td>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span></td>
+    <td xml:space="preserve"><a href="../../cmsxk/doc/class_Block_ECE4C34A3726C7F1BD7D0523C735EB978205BCFE.html#member_function_Write_Block_2D8AAE46E71559FB203E61736FB43BBCBBE7476B">Write</a>(<a href="../../cmsxu/doc/class_MemoryWriter_7EC7A6F43659409400AC83DD949BC26830026C92.html">MemoryWriter</a>&amp;&nbsp;writer)</td>
    </tr>
   </table>
   <h2>Enumerated Types</h2>
@@ -97,6 +117,10 @@
     <td xml:space="preserve">cache</td>
    </tr>
    <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">byte</span>[4096]</td>
+    <td xml:space="preserve">data</td>
+   </tr>
+   <tr>
     <td class="rightAlignedCol" xml:space="preserve"><span class="kw">private</span>&nbsp;<a href="../../cmsxk/doc/enumerated_type_Flags_119E3982207AEA301DED90586F6AB6CDF6D62669.html">Flags</a></td>
     <td xml:space="preserve">flags</td>
    </tr>
@@ -109,22 +133,30 @@
     <td xml:space="preserve">key</td>
    </tr>
    <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">private</span>&nbsp;<a href="../../cmsxk/doc/class_BlockManager_BA4FF2BF11C402B6A14B0C9EA29F9D0C0B578930.html">BlockManager</a>*</td>
+    <td xml:space="preserve">manager</td>
+   </tr>
+   <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">private</span>&nbsp;<a href="../../cmsxk/doc/class_Process_96BF1BFE7F4BA73B2BD2D2BA6C0FA69CD799B3B3.html">Process</a>*</td>
+    <td xml:space="preserve">owner</td>
+   </tr>
+   <tr>
     <td class="rightAlignedCol" xml:space="preserve"><span class="kw">private</span>&nbsp;<a href="../../../../../../system/content/System.Base/doc/class_List_T_4E42CF5913BEB21F5260DEFEC239180C94460B11.html">List</a>&lt;<a href="../../cmsxk/doc/class_Process_96BF1BFE7F4BA73B2BD2D2BA6C0FA69CD799B3B3.html">Process</a>*></td>
     <td xml:space="preserve">waitingProcesses</td>
    </tr>
   </table>
   <h2>Constructor&amp; Destructor Details</h2>
-  <h3 id="constructor_Block_0B729B66B69196A3DA49090E9DD99D43ED0DA3EE" xml:space="preserve">Block&nbsp;Constructor</h3>
-  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;Block(<span class="kw">const</span>&nbsp;<a href="../../cmsxk/doc/class_BlockKey_41D48C3C4A15BB1BB1CBD82083CD8485022FB45D.html">BlockKey</a>&amp;&nbsp;key_, <a href="../../cmsxk/doc/class_BlockCache_8291E5791244657664DCAC8BA1DD22C7E034444D.html">BlockCache</a>*&nbsp;cache_)</h4>
+  <h3 id="constructor_Block_F4F5FC79626DC90456227D2AD846F31AFDF80DB2" xml:space="preserve">Block&nbsp;Constructor</h3>
+  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;Block(<span class="kw">const</span>&nbsp;<a href="../../cmsxk/doc/class_BlockKey_41D48C3C4A15BB1BB1CBD82083CD8485022FB45D.html">BlockKey</a>&amp;&nbsp;key_, <a href="../../cmsxk/doc/class_BlockManager_BA4FF2BF11C402B6A14B0C9EA29F9D0C0B578930.html">BlockManager</a>*&nbsp;manager_, <a href="../../cmsxk/doc/class_BlockCache_8291E5791244657664DCAC8BA1DD22C7E034444D.html">BlockCache</a>*&nbsp;cache_)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/Block.cm.html#99">99</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/Block.cm.html">cmsxk/Block.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/Block.cm.html#77">77</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/Block.cm.html">cmsxk/Block.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="destructor_Block_44641CF4F515657818882E02DBAAE3726CA7DB69" xml:space="preserve">~Block&nbsp;Destructor</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">virtual</span>&nbsp;<span class="kw">default</span>&nbsp;~Block()</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/Block.cm.html#102">102</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/Block.cm.html">cmsxk/Block.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/Block.cm.html#92">92</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/Block.cm.html">cmsxk/Block.cm</a></span>
   <br/>
   <br/>
   <hr/>
@@ -132,98 +164,133 @@
   <h3 id="member_function_AddWaitingProcess_Block_F229365541D4322C83E422EE441F601B719D6FD6" xml:space="preserve">AddWaitingProcess&nbsp;Member Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">void</span>&nbsp;AddWaitingProcess(<a href="../../cmsxk/doc/class_Process_96BF1BFE7F4BA73B2BD2D2BA6C0FA69CD799B3B3.html">Process</a>*&nbsp;process)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/Block.cm.html#145">145</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/Block.cm.html">cmsxk/Block.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/Block.cm.html#151">151</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/Block.cm.html">cmsxk/Block.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="member_function_BlockFlagStr_Block_7E463979B6BE2DBBDB25051BC9775704D56F1D7F" xml:space="preserve">BlockFlagStr&nbsp;Member Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<a href="../../../../../../system/content/System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html">String</a>&lt;<span class="kw">char</span>>&nbsp;BlockFlagStr(<a href="../../cmsxk/doc/enumerated_type_Flags_119E3982207AEA301DED90586F6AB6CDF6D62669.html">Flags</a>&nbsp;flags)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/Block.cm.html#78">78</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/Block.cm.html">cmsxk/Block.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/Block.cm.html#56">56</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/Block.cm.html">cmsxk/Block.cm</a></span>
+  <br/>
+  <br/>
+  <hr/>
+  <h3 id="member_function_Clear_Block_4A5541BCEC10F77A773505A06918EBE4CCE1B55E" xml:space="preserve">Clear&nbsp;Member Function</h3>
+  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span>&nbsp;Clear()</h4>
+  <h5>Definition</h5>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/Block.cm.html#115">115</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/Block.cm.html">cmsxk/Block.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="member_function_GetFlag_Block_B783EC6D7575B963C8D92759A64F1E68532A3328" xml:space="preserve">GetFlag&nbsp;Member Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">inline</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">bool</span>&nbsp;GetFlag(<a href="../../cmsxk/doc/enumerated_type_Flags_119E3982207AEA301DED90586F6AB6CDF6D62669.html">Flags</a>&nbsp;flag)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/Block.cm.html#117">117</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/Block.cm.html">cmsxk/Block.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/Block.cm.html#123">123</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/Block.cm.html">cmsxk/Block.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="member_function_GetIterator_Block_364FA4743F84E94448DD341220414C60F4BB2718" xml:space="preserve">GetIterator&nbsp;Member Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<a href="../../../../../../system/content/System.Base/doc/class_LinkedListNodeIterator_T_R_P_1B6A4ECB2747EF21647DCDFB3EA5E3CFB23B08EF.html">LinkedListNodeIterator</a>&lt;<a href="../../cmsxk/doc/class_Block_ECE4C34A3726C7F1BD7D0523C735EB978205BCFE.html">Block</a>*, <a href="../../cmsxk/doc/class_Block_ECE4C34A3726C7F1BD7D0523C735EB978205BCFE.html">Block</a>*&amp;, <a href="../../cmsxk/doc/class_Block_ECE4C34A3726C7F1BD7D0523C735EB978205BCFE.html">Block</a>**>&nbsp;GetIterator()</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/Block.cm.html#155">155</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/Block.cm.html">cmsxk/Block.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/Block.cm.html#161">161</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/Block.cm.html">cmsxk/Block.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="member_function_GetWaitingProcesses_Block_88274ADDBD9CC74921494845030EF3D3FFBF4D24" xml:space="preserve">GetWaitingProcesses&nbsp;Member Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<a href="../../../../../../system/content/System.Base/doc/class_List_T_4E42CF5913BEB21F5260DEFEC239180C94460B11.html">List</a>&lt;<a href="../../cmsxk/doc/class_Process_96BF1BFE7F4BA73B2BD2D2BA6C0FA69CD799B3B3.html">Process</a>*>&nbsp;GetWaitingProcesses()</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/Block.cm.html#149">149</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/Block.cm.html">cmsxk/Block.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/Block.cm.html#155">155</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/Block.cm.html">cmsxk/Block.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="member_function_Key_Block_D1C519E4C4FA18EB7F946DA22634426A3DFA2539" xml:space="preserve">Key&nbsp;Member Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">inline</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<a href="../../cmsxk/doc/class_BlockKey_41D48C3C4A15BB1BB1CBD82083CD8485022FB45D.html">BlockKey</a>&amp;&nbsp;Key()</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/Block.cm.html#137">137</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/Block.cm.html">cmsxk/Block.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/Block.cm.html#143">143</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/Block.cm.html">cmsxk/Block.cm</a></span>
   <br/>
   <br/>
   <hr/>
-  <h3 id="member_function_Read_Block_178355198FA4B25F31138211706918280C6ADC98" xml:space="preserve">Read&nbsp;Member Function</h3>
-  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">virtual</span>&nbsp;<span class="kw">void</span>&nbsp;Read(<a href="../../cmsxu/doc/class_MemoryReader_6A5D4F18EC5CB81C1E250DC6476FC0556BC3C91E.html">MemoryReader</a>&amp;&nbsp;reader)</h4>
+  <h3 id="member_function_Manager_Block_8912EFE1613FAD863010A36889044EEBACFDA4FE" xml:space="preserve">Manager&nbsp;Member Function</h3>
+  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">inline</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<a href="../../cmsxk/doc/class_BlockManager_BA4FF2BF11C402B6A14B0C9EA29F9D0C0B578930.html">BlockManager</a>*&nbsp;Manager()</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/Block.cm.html#110">110</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/Block.cm.html">cmsxk/Block.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/Block.cm.html#169">169</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/Block.cm.html">cmsxk/Block.cm</a></span>
+  <br/>
+  <br/>
+  <hr/>
+  <h3 id="member_function_Owner_Block_BD971083575679B72AAA2D41E2F67FA9DC3F1981" xml:space="preserve">Owner&nbsp;Member Function</h3>
+  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">inline</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<a href="../../cmsxk/doc/class_Process_96BF1BFE7F4BA73B2BD2D2BA6C0FA69CD799B3B3.html">Process</a>*&nbsp;Owner()</h4>
+  <h5>Definition</h5>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/Block.cm.html#80">80</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/Block.cm.html">cmsxk/Block.cm</a></span>
+  <br/>
+  <br/>
+  <hr/>
+  <h3 id="member_function_Read_Block_E250C71A948816A878A055F0D163DF775A6B09C9" xml:space="preserve">Read&nbsp;Member Function</h3>
+  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span>&nbsp;Read(<a href="../../cmsxu/doc/class_MemoryReader_6A5D4F18EC5CB81C1E250DC6476FC0556BC3C91E.html">MemoryReader</a>&amp;&nbsp;reader)</h4>
+  <h5>Definition</h5>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/Block.cm.html#100">100</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/Block.cm.html">cmsxk/Block.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="member_function_ResetFlag_Block_AE1CC7E1A8E1E4051C237D61C6954766FF7385CC" xml:space="preserve">ResetFlag&nbsp;Member Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">inline</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span>&nbsp;ResetFlag(<a href="../../cmsxk/doc/enumerated_type_Flags_119E3982207AEA301DED90586F6AB6CDF6D62669.html">Flags</a>&nbsp;flag)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/Block.cm.html#129">129</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/Block.cm.html">cmsxk/Block.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/Block.cm.html#135">135</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/Block.cm.html">cmsxk/Block.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="member_function_ResetFlags_Block_E295E07647185174A7D50691B76D4509325089AE" xml:space="preserve">ResetFlags&nbsp;Member Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">inline</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span>&nbsp;ResetFlags()</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/Block.cm.html#133">133</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/Block.cm.html">cmsxk/Block.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/Block.cm.html#139">139</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/Block.cm.html">cmsxk/Block.cm</a></span>
+  <br/>
+  <br/>
+  <hr/>
+  <h3 id="member_function_ResetOwner_Block_4F4AF271C90151FC683CC725FE311F5A4EF1B0B0" xml:space="preserve">ResetOwner&nbsp;Member Function</h3>
+  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">inline</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span>&nbsp;ResetOwner()</h4>
+  <h5>Definition</h5>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/Block.cm.html#88">88</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/Block.cm.html">cmsxk/Block.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="member_function_SetFlag_Block_48F218C0DF558B2CA137E336E44066B1BDC445EF" xml:space="preserve">SetFlag&nbsp;Member Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">inline</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span>&nbsp;SetFlag(<a href="../../cmsxk/doc/enumerated_type_Flags_119E3982207AEA301DED90586F6AB6CDF6D62669.html">Flags</a>&nbsp;flag)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/Block.cm.html#121">121</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/Block.cm.html">cmsxk/Block.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/Block.cm.html#127">127</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/Block.cm.html">cmsxk/Block.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="member_function_SetIterator_Block_4BACE4E6CDF317A42380C3106FB4D7C7DA00475C" xml:space="preserve">SetIterator&nbsp;Member Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span>&nbsp;SetIterator(<a href="../../../../../../system/content/System.Base/doc/class_LinkedListNodeIterator_T_R_P_1B6A4ECB2747EF21647DCDFB3EA5E3CFB23B08EF.html">LinkedListNodeIterator</a>&lt;<a href="../../cmsxk/doc/class_Block_ECE4C34A3726C7F1BD7D0523C735EB978205BCFE.html">Block</a>*, <a href="../../cmsxk/doc/class_Block_ECE4C34A3726C7F1BD7D0523C735EB978205BCFE.html">Block</a>*&amp;, <a href="../../cmsxk/doc/class_Block_ECE4C34A3726C7F1BD7D0523C735EB978205BCFE.html">Block</a>**>&nbsp;iterator_)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/Block.cm.html#159">159</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/Block.cm.html">cmsxk/Block.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/Block.cm.html#165">165</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/Block.cm.html">cmsxk/Block.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="member_function_SetKey_Block_0BEC7DAED10EC7FAA5977AC9CDF99D40FDE1FF93" xml:space="preserve">SetKey&nbsp;Member Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span>&nbsp;SetKey(<span class="kw">const</span>&nbsp;<a href="../../cmsxk/doc/class_BlockKey_41D48C3C4A15BB1BB1CBD82083CD8485022FB45D.html">BlockKey</a>&amp;&nbsp;key_)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/Block.cm.html#141">141</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/Block.cm.html">cmsxk/Block.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/Block.cm.html#147">147</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/Block.cm.html">cmsxk/Block.cm</a></span>
+  <br/>
+  <br/>
+  <hr/>
+  <h3 id="member_function_SetOwner_Block_88398CE27F50FB8883528CCDD03C861F0E2CE77E" xml:space="preserve">SetOwner&nbsp;Member Function</h3>
+  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">inline</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span>&nbsp;SetOwner(<a href="../../cmsxk/doc/class_Process_96BF1BFE7F4BA73B2BD2D2BA6C0FA69CD799B3B3.html">Process</a>*&nbsp;owner_)</h4>
+  <h5>Definition</h5>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/Block.cm.html#84">84</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/Block.cm.html">cmsxk/Block.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="member_function_ToString_Block_1C37E556122941AE3B0361A230CC7CBE315F0D0F" xml:space="preserve">ToString&nbsp;Member Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<a href="../../../../../../system/content/System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html">String</a>&lt;<span class="kw">char</span>>&nbsp;ToString()</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/Block.cm.html#103">103</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/Block.cm.html">cmsxk/Block.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/Block.cm.html#93">93</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/Block.cm.html">cmsxk/Block.cm</a></span>
   <br/>
   <br/>
   <hr/>
-  <h3 id="member_function_Write_Block_696A943A9CBEBDF40BC89BE4837A1449D170F232" xml:space="preserve">Write&nbsp;Member Function</h3>
-  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">virtual</span>&nbsp;<span class="kw">void</span>&nbsp;Write(<a href="../../cmsxu/doc/class_MemoryWriter_7EC7A6F43659409400AC83DD949BC26830026C92.html">MemoryWriter</a>&amp;&nbsp;writer)</h4>
+  <h3 id="member_function_Write_Block_2D8AAE46E71559FB203E61736FB43BBCBBE7476B" xml:space="preserve">Write&nbsp;Member Function</h3>
+  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span>&nbsp;Write(<a href="../../cmsxu/doc/class_MemoryWriter_7EC7A6F43659409400AC83DD949BC26830026C92.html">MemoryWriter</a>&amp;&nbsp;writer)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/Block.cm.html#113">113</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/Block.cm.html">cmsxk/Block.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/Block.cm.html#107">107</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/Block.cm.html">cmsxk/Block.cm</a></span>
   <br/>
   <br/>
   <hr/>

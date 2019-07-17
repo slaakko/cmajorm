@@ -46,7 +46,7 @@ namespace cmsh
         }
         if ((flags & TokenizerFlags.containsPatternChar) != TokenizerFlags.none)
         {
-            tokens = ExpandFileNamePatterns(tokens);
+            tokens = ExpandFileNamePatterns(tokens, shellEnvironment);
             if (shellEnvironment.log)
             {
                 LogMessage("shell.expand", "tokens after file name expansion:");

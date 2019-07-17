@@ -1,11 +1,16 @@
+// =================================
+// Copyright (c) 2019 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
 using System;
 using System.Collections;
 
 namespace System.Text.RegularExpressions
 {
-    public class State
+    public class NfaState
     {
-        public nothrow State(int id_): id(id_), accept(false)
+        public nothrow NfaState(int id_): id(id_), accept(false)
         {
         }
         public nothrow inline int Id() const
@@ -24,22 +29,22 @@ namespace System.Text.RegularExpressions
         {
             accept = false;
         }
-        public nothrow inline const List<Edge>& Edges() const
+        public nothrow inline const List<NfaEdge>& Edges() const
         {
             return edges;
         }
-        public nothrow void SetEdges(const List<Edge>& edges_)
+        public nothrow void SetEdges(const List<NfaEdge>& edges_)
         {
             edges = edges_;
         }
-        public nothrow void AddEdge(const Edge& edge)
+        public nothrow void AddEdge(const NfaEdge& edge)
         {
             edges.Add(edge);
         }
-        public nothrow List<State*> Next(uchar c) const
+        public nothrow List<NfaState*> Next(uchar c) const
         {
-            List<State*> next;
-            for (const Edge& edge : edges)
+            List<NfaState*> next;
+            for (const NfaEdge& edge : edges)
             {
                 Symbol* symbol = edge.GetSymbol();
                 if (symbol->Match(c))
@@ -54,7 +59,7 @@ namespace System.Text.RegularExpressions
             string s;
             s.Append("state ").Append(ToString(id)).Append(':').Append('\n');
             s.Append('{').Append('\n');
-            for (const Edge& edge : edges)
+            for (const NfaEdge& edge : edges)
             {
                 s.Append("  ").Append(edge.ToString()).Append('\n');
             }
@@ -63,19 +68,19 @@ namespace System.Text.RegularExpressions
         }
         private int id;
         private bool accept;
-        private List<Edge> edges;
+        private List<NfaEdge> edges;
     }
 
-    public class Edge
+    public class NfaEdge
     {
-        public nothrow Edge(Symbol* symbol_, State* next_) : symbol(symbol_), next(next_)
+        public nothrow NfaEdge(Symbol* symbol_, NfaState* next_) : symbol(symbol_), next(next_)
         {
         }
         public nothrow inline Symbol* GetSymbol() const
         {
             return symbol;
         }
-        public nothrow inline State* Next() const
+        public nothrow inline NfaState* Next() const
         {
             return next;
         }
@@ -86,7 +91,7 @@ namespace System.Text.RegularExpressions
             return s;
         }
         private Symbol* symbol;
-        private State* next;
+        private NfaState* next;
     }
 
     public class Nfa
@@ -94,39 +99,39 @@ namespace System.Text.RegularExpressions
         public nothrow Nfa() : start(null), end(null)
         {
         }
-        public nothrow Nfa(State* start_, State* end_) : start(start_), end(end_)
+        public nothrow Nfa(NfaState* start_, NfaState* end_) : start(start_), end(end_)
         {
         }
         public nothrow inline bool IsEmpty() const
         {
             return start == null && end == null;
         }
-        public nothrow inline State* Start() const
+        public nothrow inline NfaState* Start() const
         {
             return start;
         }
-        public nothrow inline void SetStart(State* start_)
+        public nothrow inline void SetStart(NfaState* start_)
         {
             start = start_;
         }
-        public nothrow inline State* End() const
+        public nothrow inline NfaState* End() const
         {
             return end;
         }
-        public nothrow inline void SetEnd(State* end_)
+        public nothrow inline void SetEnd(NfaState* end_)
         {
             end = end_;
         }
-        private State* start;
-        private State* end;
+        private NfaState* start;
+        private NfaState* end;
     }
 
     public nothrow Nfa MakeNfa(Context& context, Symbol* symbol)
     {
-        State* start = context.MakeState();
-        State* end = context.MakeState();
+        NfaState* start = context.MakeNfaState();
+        NfaState* end = context.MakeNfaState();
         end->SetAccept();
-        start->AddEdge(Edge(symbol, end));
+        start->AddEdge(NfaEdge(symbol, end));
         return Nfa(start, end);
     }
 
@@ -138,31 +143,31 @@ namespace System.Text.RegularExpressions
     public nothrow Nfa Cat(const Nfa& left, const Nfa& right)
     {
         Nfa cat(left);
-        State* leftEnd = cat.End();
+        NfaState* leftEnd = cat.End();
         leftEnd->ResetAccept();
-        State* rightStart = right.Start();
+        NfaState* rightStart = right.Start();
         leftEnd->SetEdges(rightStart->Edges());
         cat.SetEnd(right.End());
         return cat;
     }
-
+    
     public nothrow Nfa Alt(Context& context, const Nfa& left, const Nfa& right)
     {
-        State* leftStart = left.Start();
-        State* leftEnd = left.End();
-        State* rightStart = right.Start();
-        State* rightEnd = right.End();
-        State* start = context.MakeState();
-        State* end = context.MakeState();
+        NfaState* leftStart = left.Start();
+        NfaState* leftEnd = left.End();
+        NfaState* rightStart = right.Start();
+        NfaState* rightEnd = right.End();
+        NfaState* start = context.MakeNfaState();
+        NfaState* end = context.MakeNfaState();
         end->SetAccept();
-        start->AddEdge(Edge(context.MakeEpsilon(), leftStart));
-        start->AddEdge(Edge(context.MakeEpsilon(), rightStart));
+        start->AddEdge(NfaEdge(context.MakeEpsilon(), leftStart));
+        start->AddEdge(NfaEdge(context.MakeEpsilon(), rightStart));
         Nfa alt;
         alt.SetStart(start);
         leftEnd->ResetAccept();
-        leftEnd->AddEdge(Edge(context.MakeEpsilon(), end));
+        leftEnd->AddEdge(NfaEdge(context.MakeEpsilon(), end));
         rightEnd->ResetAccept();
-        rightEnd->AddEdge(Edge(context.MakeEpsilon(), end));
+        rightEnd->AddEdge(NfaEdge(context.MakeEpsilon(), end));
         alt.SetEnd(end);
         return alt;
     }
@@ -170,17 +175,17 @@ namespace System.Text.RegularExpressions
     public nothrow Nfa Kleene(Context& context, const Nfa& nfa)
     {
         Nfa kleene;
-        State* start = context.MakeState();
-        State* end = context.MakeState();
+        NfaState* start = context.MakeNfaState();
+        NfaState* end = context.MakeNfaState();
         end->SetAccept();
-        start->AddEdge(Edge(context.MakeEpsilon(), end));
+        start->AddEdge(NfaEdge(context.MakeEpsilon(), end));
         kleene.SetStart(start);
-        State* nfaStart = nfa.Start();
-        start->AddEdge(Edge(context.MakeEpsilon(), nfaStart));
-        State* nfaEnd = nfa.End();
+        NfaState* nfaStart = nfa.Start();
+        start->AddEdge(NfaEdge(context.MakeEpsilon(), nfaStart));
+        NfaState* nfaEnd = nfa.End();
         nfaEnd->ResetAccept();
-        nfaEnd->AddEdge(Edge(context.MakeEpsilon(), end));
-        nfaEnd->AddEdge(Edge(context.MakeEpsilon(), nfaStart));
+        nfaEnd->AddEdge(NfaEdge(context.MakeEpsilon(), end));
+        nfaEnd->AddEdge(NfaEdge(context.MakeEpsilon(), nfaStart));
         kleene.SetEnd(end);
         return kleene;
     }
@@ -188,16 +193,16 @@ namespace System.Text.RegularExpressions
     public nothrow Nfa Pos(Context& context, const Nfa& nfa)
     {
         Nfa positive;
-        State* start = context.MakeState();
-        State* end = context.MakeState();
+        NfaState* start = context.MakeNfaState();
+        NfaState* end = context.MakeNfaState();
         end->SetAccept();
         positive.SetStart(start);
-        State* nfaStart = nfa.Start();
-        start->AddEdge(Edge(context.MakeEpsilon(), nfaStart));
-        State* nfaEnd = nfa.End();
+        NfaState* nfaStart = nfa.Start();
+        start->AddEdge(NfaEdge(context.MakeEpsilon(), nfaStart));
+        NfaState* nfaEnd = nfa.End();
         nfaEnd->ResetAccept();
-        nfaEnd->AddEdge(Edge(context.MakeEpsilon(), end));
-        nfaEnd->AddEdge(Edge(context.MakeEpsilon(), nfaStart));
+        nfaEnd->AddEdge(NfaEdge(context.MakeEpsilon(), end));
+        nfaEnd->AddEdge(NfaEdge(context.MakeEpsilon(), nfaStart));
         positive.SetEnd(end);
         return positive;
     }
@@ -205,7 +210,7 @@ namespace System.Text.RegularExpressions
     public nothrow Nfa Opt(Context& context, const Nfa& nfa)
     {
         Nfa opt(nfa);
-        opt.Start()->AddEdge(Edge(context.MakeEpsilon(), opt.End()));
+        opt.Start()->AddEdge(NfaEdge(context.MakeEpsilon(), opt.End()));
         return opt;
     }
 }

@@ -127,6 +127,7 @@ int main(int argc, const char** argv)
                 cmdocXmlFilePaths.push_back(arg);
             }
         }
+        SetGlobalFlag(GlobalFlags::rebuild);
 #ifndef _WIN32
         SetNumBuildThreads(1);
         SetGlobalFlag(GlobalFlags::singleThreadedCompile);

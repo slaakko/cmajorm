@@ -7,7 +7,7 @@
  <body>
   <h1>LogFileWriter Class</h1>
   <h2>Definition</h2>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/Log.cm.html#19">19</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/Log.cm.html">cmsxk/Log.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/Log.cm.html#20">20</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/Log.cm.html">cmsxk/Log.cm</a></span>
   <h2>Constructors &amp; Destructor</h2>
   <table>
    <tr>
@@ -22,6 +22,14 @@
   <h2>Member Functions</h2>
   <table>
    <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">void</span></td>
+    <td xml:space="preserve"><a href="../../cmsxk/doc/class_LogFileWriter_CFF6CCCB360A86DEFED3E1292A9E84D84E3A99DF.html#member_function_Exit_LogFileWriter_501E6686F231CF59C1D3442990C8857CBC5171E2">Exit</a>()</td>
+   </tr>
+   <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">private</span>&nbsp;<span class="kw">void</span></td>
+    <td xml:space="preserve"><a href="../../cmsxk/doc/class_LogFileWriter_CFF6CCCB360A86DEFED3E1292A9E84D84E3A99DF.html#member_function_Flush_LogFileWriter_790EC2D7C425E11C7C8BF71A2E1D6EE618ACB0BD">Flush</a>()</td>
+   </tr>
+   <tr>
     <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">static</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<a href="../../cmsxk/doc/class_LogFileWriter_CFF6CCCB360A86DEFED3E1292A9E84D84E3A99DF.html">LogFileWriter</a>&amp;</td>
     <td xml:space="preserve"><a href="../../cmsxk/doc/class_LogFileWriter_CFF6CCCB360A86DEFED3E1292A9E84D84E3A99DF.html#member_function_Instance_LogFileWriter_9C36B34676F8648251748D9D0681E9AD80E5E64C">Instance</a>()</td>
    </tr>
@@ -33,8 +41,24 @@
   <h2>Member Variables</h2>
   <table>
    <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">private</span>&nbsp;<span class="kw">bool</span></td>
+    <td xml:space="preserve">exit</td>
+   </tr>
+   <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">private</span>&nbsp;<a href="../../../../../../system/content/System.Base/doc/class_ConditionVariable_019A80625043CF98EC88D8F55238C84CFD4A9C26.html">ConditionVariable</a></td>
+    <td xml:space="preserve">exiting</td>
+   </tr>
+   <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">private</span>&nbsp;<a href="../../../../../../system/content/System.Base/doc/class_Thread_805238682CDC09B4D1BB5C11ACA935F47C73BA4F.html">Thread</a></td>
+    <td xml:space="preserve">flusherThread</td>
+   </tr>
+   <tr>
     <td class="rightAlignedCol" xml:space="preserve"><span class="kw">private</span>&nbsp;<span class="kw">static</span>&nbsp;<a href="../../../../../../system/content/System.Base/doc/class_UniquePtr_T_793F841C13E9DD3A6869243C74F1D948C0E04009.html">UniquePtr</a>&lt;<a href="../../cmsxk/doc/class_LogFileWriter_CFF6CCCB360A86DEFED3E1292A9E84D84E3A99DF.html">LogFileWriter</a>></td>
     <td xml:space="preserve">instance</td>
+   </tr>
+   <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">private</span>&nbsp;<a href="../../../../../../system/content/System.Base/doc/class_RecursiveMutex_B9ED5479754BBDDED6A4491348BBD2F20F701D82.html">RecursiveMutex</a></td>
+    <td xml:space="preserve">mtx</td>
    </tr>
    <tr>
     <td class="rightAlignedCol" xml:space="preserve"><span class="kw">private</span>&nbsp;<a href="../../../../../../system/content/System.Base/doc/class_StreamWriter_40A39F418049D49DB679452BB514CDFE47500311.html">StreamWriter</a></td>
@@ -45,29 +69,43 @@
   <h3 id="static_constructor_LogFileWriter_2DF38741406BA49F466761EF460AA9AF279936F1" xml:space="preserve">LogFileWriter&nbsp;Static Constructor</h3>
   <h4 xml:space="preserve"><span class="kw">static</span>&nbsp;LogFileWriter()</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/Log.cm.html#21">21</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/Log.cm.html">cmsxk/Log.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/Log.cm.html#22">22</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/Log.cm.html">cmsxk/Log.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="default_constructor_LogFileWriter_ED6F34A23C1294EFEC54207F4A36678296EE9BFE" xml:space="preserve">LogFileWriter&nbsp;Constructor</h3>
   <h4 xml:space="preserve"><span class="kw">private</span>&nbsp;LogFileWriter()</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/Log.cm.html#28">28</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/Log.cm.html">cmsxk/Log.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/Log.cm.html#29">29</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/Log.cm.html">cmsxk/Log.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h2>Member Function Details</h2>
+  <h3 id="member_function_Exit_LogFileWriter_501E6686F231CF59C1D3442990C8857CBC5171E2" xml:space="preserve">Exit&nbsp;Member Function</h3>
+  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">void</span>&nbsp;Exit()</h4>
+  <h5>Definition</h5>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/Log.cm.html#37">37</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/Log.cm.html">cmsxk/Log.cm</a></span>
+  <br/>
+  <br/>
+  <hr/>
+  <h3 id="member_function_Flush_LogFileWriter_790EC2D7C425E11C7C8BF71A2E1D6EE618ACB0BD" xml:space="preserve">Flush&nbsp;Member Function</h3>
+  <h4 xml:space="preserve"><span class="kw">private</span>&nbsp;<span class="kw">void</span>&nbsp;Flush()</h4>
+  <h5>Definition</h5>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/Log.cm.html#43">43</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/Log.cm.html">cmsxk/Log.cm</a></span>
+  <br/>
+  <br/>
+  <hr/>
   <h3 id="member_function_Instance_LogFileWriter_9C36B34676F8648251748D9D0681E9AD80E5E64C" xml:space="preserve">Instance&nbsp;Static Member Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">static</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<a href="../../cmsxk/doc/class_LogFileWriter_CFF6CCCB360A86DEFED3E1292A9E84D84E3A99DF.html">LogFileWriter</a>&amp;&nbsp;Instance()</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/Log.cm.html#24">24</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/Log.cm.html">cmsxk/Log.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/Log.cm.html#25">25</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/Log.cm.html">cmsxk/Log.cm</a></span>
   <br/>
   <br/>
   <hr/>
   <h3 id="member_function_Write_LogFileWriter_F62A610F61CB2116462CEA6C0A28E7ABAACD1BEC" xml:space="preserve">Write&nbsp;Member Function</h3>
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">void</span>&nbsp;Write(<span class="kw">const</span>&nbsp;<a href="../../../../../../system/content/System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html">String</a>&lt;<span class="kw">char</span>>&amp;&nbsp;msg)</h4>
   <h5>Definition</h5>
-  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/Log.cm.html#31">31</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/Log.cm.html">cmsxk/Log.cm</a></span>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="../../cmsxk/file/Log.cm.html#33">33</a>&nbsp;of&nbsp;<a href="../../cmsxk/file/Log.cm.html">cmsxk/Log.cm</a></span>
   <br/>
   <br/>
   <hr/>

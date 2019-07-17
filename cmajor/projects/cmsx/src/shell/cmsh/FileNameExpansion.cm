@@ -6,6 +6,7 @@
 using System;
 using System.Collections;
 using System.IO;
+using System.Os;
 using System.Text.RegularExpressions;
 
 namespace cmsh
@@ -27,7 +28,7 @@ namespace cmsh
         public nothrow FileNameExpansionParser(const ustring& value_) : value(value_), start(value.Chars()), end(value.Chars() + value.Length()), pos(start)
         {
         }
-        public List<Token> Parse()
+        public List<Token> Parse(ShellEnvironment& shellEnvironment)
         {
             List<Token> tokens;
             try
@@ -39,7 +40,15 @@ namespace cmsh
                     components.Add(MakePair(component, patternCharInComponent));
                     token = GetToken();
                 }
-                List<ustring> paths = Combine(u"", components);
+                if (shellEnvironment.log)
+                {
+                    LogMessage("shell.expand", "file name components:");
+                    for (const Pair<ustring, bool>& c : components)
+                    {
+                        LogMessage("shell.expand", ToUtf8(c.first) + ":" + ToString(c.second));
+                    }
+                }
+                List<ustring> paths = Combine(u"", components, shellEnvironment);
                 for (const ustring& path : paths)
                 {
                     tokens.Add(Token(WORD, path, 1, 1));
@@ -47,12 +56,16 @@ namespace cmsh
             }
             catch (const Exception& ex)
             {
+                if (shellEnvironment.log)
+                {
+                    LogMessage("shell.expand", "error: " + ex.ToString());
+                }
                 Console.Error() << "cmsh: warning: " << ex.Message() << endl();
                 return List<Token>();
             }
             return tokens;
         }
-        private List<ustring> Combine(const ustring& prefix, const List<Pair<ustring, bool>>& components)
+        private List<ustring> Combine(const ustring& prefix, const List<Pair<ustring, bool>>& components, ShellEnvironment& shellEnvironment)
         {
             List<ustring> combinations;
             ustring pre = prefix;
@@ -69,7 +82,7 @@ namespace cmsh
                 {
                     if (c.second)
                     {
-                        List<ustring> prefixes = Expand(pre, c.first);
+                        List<ustring> prefixes = Expand(pre, c.first, shellEnvironment);
                         List<Pair<ustring, bool>> suffix;
                         for (long j = i + 1; j < n; ++j)
                         {
@@ -77,7 +90,7 @@ namespace cmsh
                         }
                         for (const ustring& p : prefixes)
                         {
-                            List<ustring> c = Combine(p, suffix);
+                            List<ustring> c = Combine(p, suffix, shellEnvironment);
                             for (const ustring& u : c)
                             {
                                 combinations.Add(u);
@@ -85,7 +98,7 @@ namespace cmsh
                         }
                         expanded = true;
                     }
-                    else if (pre.IsEmpty())
+                    else if (pre.IsEmpty() || pre[pre.Length() - 1] == '/')
                     {
                         pre.Append(c.first);
                     }
@@ -101,16 +114,21 @@ namespace cmsh
             }
             return combinations;
         }
-        private List<ustring> Expand(const ustring& prefix, const ustring& pattern)
+        private List<ustring> Expand(const ustring& prefix, const ustring& pattern, ShellEnvironment& shellEnvironment)
         {
             ustring dirPath = prefix;
             if (dirPath.IsEmpty())
             {
                 dirPath = u".";
             }
+            if (shellEnvironment.log)
+            {
+                LogMessage("shell.expand", "prefix=" + ToUtf8(prefix) + ", pattern=" + ToUtf8(pattern));
+            }
             List<ustring> fileNames;
             DirectoryEntry dirEntry;
-            DirectoryReader reader(ToUtf8(dirPath));
+            string dp = ToUtf8(dirPath);
+            DirectoryReader reader(dp);
             while (reader.Read(dirEntry))
             {
                 ustring fileName = ToUtf32(&dirEntry.name[0]);
@@ -253,10 +271,10 @@ namespace cmsh
         private List<ustring> paths;
     }
     
-    nothrow List<Token> ExpandFileNamePatterns(const Token& token)
+    nothrow List<Token> ExpandFileNamePatterns(const Token& token, ShellEnvironment& shellEnvironment)
     {
         FileNameExpansionParser parser(token.value);
-        List<Token> pathTokens = parser.Parse();
+        List<Token> pathTokens = parser.Parse(shellEnvironment);
         if (pathTokens.IsEmpty())
         {
             return List<Token>(1, token);
@@ -267,14 +285,14 @@ namespace cmsh
         }
     }
 
-    nothrow List<Token> ExpandFileNamePatterns(const List<Token>& tokens)
+    nothrow List<Token> ExpandFileNamePatterns(const List<Token>& tokens, ShellEnvironment& shellEnvironment)
     {
         List<Token> expandedTokens;
         for (const Token& token : tokens)
         {
             if (token.id == WORD && ContainsPatternChar(token.value))
             {
-                List<Token> patternExpandedTokens = ExpandFileNamePatterns(token);
+                List<Token> patternExpandedTokens = ExpandFileNamePatterns(token, shellEnvironment);
                 for (const Token& expandedToken : patternExpandedTokens)
                 {
                     expandedTokens.Add(expandedToken);

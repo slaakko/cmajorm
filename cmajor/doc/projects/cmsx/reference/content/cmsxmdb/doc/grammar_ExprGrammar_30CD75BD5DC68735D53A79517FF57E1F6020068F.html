@@ -1,0 +1,117 @@
+<html>
+ <head>
+  <meta charset="utf-8"/>
+  <title>ExprGrammar Grammar</title>
+  <link href="../../../style/style.css" rel="stylesheet" type="text/css"/>
+ </head>
+ <body>
+  <h1>ExprGrammar Grammar</h1>
+  <table class="grammar">
+   <tr id="rule_Expression_C4AFA10A5796D08ECEBD48801833195FC18FC8CD">
+    <td class="grammarFirstCol">
+     <span class="rule">Expression</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#rule_FormatExpression_3F2D9BA45F58DB17486259B9150D5D6E7F546D63">FormatExpression</a></span></td>
+   </tr>
+   <tr id="rule_WeakOperator_30E1615CBEE205404372B0C2505966459ECC9E1F">
+    <td class="grammarFirstCol">
+     <span class="rule">WeakOperator</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleChar">'+'</span><span class="ruleOp"> | </span><span class="ruleChar">'-'</span><span class="ruleOp"> | </span><span class="ruleChar">'|'</span><span class="ruleOp"> | </span><span class="ruleChar">'^'</span></td>
+   </tr>
+   <tr id="rule_StrongOperator_AC796A0707424AA0DB5A81DB1FD54588525D4E99">
+    <td class="grammarFirstCol">
+     <span class="rule">StrongOperator</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleChar">'*'</span><span class="ruleOp"> | </span><span class="ruleChar">'/'</span><span class="ruleOp"> | </span><span class="ruleChar">'%'</span><span class="ruleOp"> | </span><span class="ruleString">"&lt;&lt;"</span><span class="ruleOp"> | </span><span class="ruleString">">>"</span><span class="ruleOp"> | </span><span class="ruleChar">'&amp;'</span></td>
+   </tr>
+   <tr id="rule_UnaryOperator_8C72D0C039CD1E686EDA980D487FFC6C10C0316B">
+    <td class="grammarFirstCol">
+     <span class="rule">UnaryOperator</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleChar">'+'</span><span class="ruleOp"> | </span><span class="ruleChar">'-'</span><span class="ruleOp"> | </span><span class="ruleChar">'~'</span><span class="ruleOp"> | </span><span class="ruleChar">'*'</span></td>
+   </tr>
+   <tr id="rule_Format_37B61FC7644A55172570946BA46AC9607AAF31C2">
+    <td class="grammarFirstCol">
+     <span class="rule">Format</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleOp">(</span><span class="ruleOp">(</span><span class="ruleChar">'b'</span><span class="ruleOp"> | </span><span class="ruleChar">'1'</span><span class="ruleOp">)</span><span class="ruleOp"> | </span><span class="ruleOp">(</span><span class="ruleChar">'w'</span><span class="ruleOp"> | </span><span class="ruleChar">'2'</span><span class="ruleOp">)</span><span class="ruleOp"> | </span><span class="ruleOp">(</span><span class="ruleChar">'t'</span><span class="ruleOp"> | </span><span class="ruleChar">'4'</span><span class="ruleOp">)</span><span class="ruleOp"> | </span><span class="ruleOp">(</span><span class="ruleChar">'o'</span><span class="ruleOp"> | </span><span class="ruleChar">'8'</span><span class="ruleOp">)</span><span class="ruleOp"> | </span><span class="ruleChar">'c'</span><span class="ruleOp"> | </span><span class="ruleChar">'s'</span><span class="ruleOp">)</span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleChar">'s'</span><span class="ruleOp"> | </span><span class="ruleChar">'x'</span><span class="ruleOp">)</span><span class="ruleOp">?</span></td>
+   </tr>
+   <tr id="rule_FormatExpression_3F2D9BA45F58DB17486259B9150D5D6E7F546D63">
+    <td class="grammarFirstCol">
+     <span class="rule">FormatExpression</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#rule_BinaryExpression_8B8EB0F2A3EA2DBEA4710E80B60DEBEC65262F6B">BinaryExpression</a></span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleChar">'.'</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_Format_37B61FC7644A55172570946BA46AC9607AAF31C2">Format</a></span><span class="ruleOp">)</span><span class="ruleOp">?</span></td>
+   </tr>
+   <tr id="rule_BinaryExpression_8B8EB0F2A3EA2DBEA4710E80B60DEBEC65262F6B">
+    <td class="grammarFirstCol">
+     <span class="rule">BinaryExpression</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#rule_Term_F8618BBF54C696BA63BC0AC9351E08D18EAD7BFA">Term</a></span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#rule_WeakOperator_30E1615CBEE205404372B0C2505966459ECC9E1F">WeakOperator</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_Term_F8618BBF54C696BA63BC0AC9351E08D18EAD7BFA">Term</a></span><span class="ruleOp">)</span><span class="ruleOp">*</span></td>
+   </tr>
+   <tr id="rule_Term_F8618BBF54C696BA63BC0AC9351E08D18EAD7BFA">
+    <td class="grammarFirstCol">
+     <span class="rule">Term</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#rule_UnaryExpression_84BAED64CD3031B3ECA33789ACF3433C8A7EF670">UnaryExpression</a></span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#rule_StrongOperator_AC796A0707424AA0DB5A81DB1FD54588525D4E99">StrongOperator</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_UnaryExpression_84BAED64CD3031B3ECA33789ACF3433C8A7EF670">UnaryExpression</a></span><span class="ruleOp">)</span><span class="ruleOp">*</span></td>
+   </tr>
+   <tr id="rule_UnaryExpression_84BAED64CD3031B3ECA33789ACF3433C8A7EF670">
+    <td class="grammarFirstCol">
+     <span class="rule">UnaryExpression</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleOp">(</span><span class="ruleChar">'('</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_Expression_C4AFA10A5796D08ECEBD48801833195FC18FC8CD">Expression</a></span><span class="ruleOp"> </span><span class="ruleChar">')'</span><span class="ruleOp">)</span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#rule_UnaryOperator_8C72D0C039CD1E686EDA980D487FFC6C10C0316B">UnaryOperator</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_UnaryExpression_84BAED64CD3031B3ECA33789ACF3433C8A7EF670">UnaryExpression</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#rule_PrimaryExpression_BE29DA591C0B9630B1C959A8252888835A6C2E9B">PrimaryExpression</a></span></td>
+   </tr>
+   <tr id="rule_PrimaryExpression_BE29DA591C0B9630B1C959A8252888835A6C2E9B">
+    <td class="grammarFirstCol">
+     <span class="rule">PrimaryExpression</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#rule_Segment_105386878502394990DAF0B3BE95A821F1445394">Segment</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#rule_RegNumber_927B916A40C598105B832AFA011C90854D1DF145">RegNumber</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#rule_DecNumber_A4CD4C2BA8A2548E0FB176F34C4D950321A581EA">DecNumber</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#rule_HexNumber_2ED2C35774FB6016F6D424FE22600C7E67F53A33">HexNumber</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#rule_Symbol_686FC1857B63970CDFFEEE96479E8BB9AB3BB527">Symbol</a></span></td>
+   </tr>
+   <tr id="rule_Segment_105386878502394990DAF0B3BE95A821F1445394">
+    <td class="grammarFirstCol">
+     <span class="rule">Segment</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleString">"$t"</span><span class="ruleOp"> | </span><span class="ruleString">"$d"</span><span class="ruleOp"> | </span><span class="ruleString">"$p"</span><span class="ruleOp"> | </span><span class="ruleString">"$s"</span><span class="ruleOp"> | </span><span class="ruleString">"$k"</span></td>
+   </tr>
+   <tr id="rule_RegNumber_927B916A40C598105B832AFA011C90854D1DF145">
+    <td class="grammarFirstCol">
+     <span class="rule">RegNumber</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleOp">(</span><span class="ruleChar">'$'</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="../../../../../../system/content/System.Text.Parsing/grammars.xml#rule_byte_C2DDD39B6AD5B1F40B5539D993B89D2FF7975460">byte</a></span><span class="ruleOp">)</span></td>
+   </tr>
+   <tr id="rule_DecNumber_A4CD4C2BA8A2548E0FB176F34C4D950321A581EA">
+    <td class="grammarFirstCol">
+     <span class="rule">DecNumber</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="../../../../../../system/content/System.Text.Parsing/grammars.xml#rule_ulong_1DA767A515D4C25CB5AD0097F1DA3CDE60E14F70">ulong</a></span></td>
+   </tr>
+   <tr id="rule_HexNumber_2ED2C35774FB6016F6D424FE22600C7E67F53A33">
+    <td class="grammarFirstCol">
+     <span class="rule">HexNumber</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleOp">(</span><span class="ruleChar">'#'</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="../../../../../../system/content/System.Text.Parsing/grammars.xml#rule_hex_10EA9C5F025764FA507545832CFF81A98D128D11">hex</a></span><span class="ruleOp">)</span></td>
+   </tr>
+   <tr id="rule_Symbol_686FC1857B63970CDFFEEE96479E8BB9AB3BB527">
+    <td class="grammarFirstCol">
+     <span class="rule">Symbol</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="../../../../../../system/content/System.Text.Parsing/grammars.xml#rule_identifier_EC79E9557ADCB4230187E4EB2CFA518A0D75FDF1">identifier</a></span></td>
+   </tr>
+  </table>
+ </body>
+</html>

@@ -960,4 +960,18 @@ namespace System
             Swap(*i, *j);
         }
     }
+    
+    public nothrow F UniqueCopy<I, F>(I first, I last, F result) where I is InputIterator and F is ForwardIterator and I.ValueType is F.ValueType
+    {
+        if (first == last) return result;
+        *result = *first;
+        while (++first != last)
+        {
+            if (*result != *first)
+            {
+                *++result = *first;
+            }
+        }
+        return ++result;
+    }
 }

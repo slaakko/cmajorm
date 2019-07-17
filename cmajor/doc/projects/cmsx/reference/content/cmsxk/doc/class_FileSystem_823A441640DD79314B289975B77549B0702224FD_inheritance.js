@@ -269,6 +269,7 @@ function drawDiagram(diagramNodes) {
 function drawInheritanceDiagram() {
     var diagramNodes = [
         { name: "cmsx.kernel.FileSystem", id: "diagram_node_0", level: 0, subject: true, hasDerivedNodes: true, link: "../../cmsxk/doc/class_FileSystem_823A441640DD79314B289975B77549B0702224FD.html" },
+        { name: "cmsx.kernel.HostFileSystem", id: "diagram_node_2", level: 1, subject: false, hasDerivedNodes: false, link: "../../cmsxk/doc/class_HostFileSystem_71C61EF2DF3C43D99C62E6B79A14CBA9519386C8.html" },
         { name: "cmsx.kernel.RootFileSystem", id: "diagram_node_1", level: 1, subject: false, hasDerivedNodes: false, link: "../../cmsxk/doc/class_RootFileSystem_8A2FF8FE98DDCE00A9FC4AF6FCF1DD2913D537B9.html" }];
     drawDiagram(diagramNodes);
 }
