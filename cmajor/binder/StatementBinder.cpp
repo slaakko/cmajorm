@@ -212,18 +212,38 @@ StatementBinder::StatementBinder(BoundCompileUnit& boundCompileUnit_) :
     currentClass(nullptr), currentFunction(nullptr), currentStaticConstructorSymbol(nullptr), currentStaticConstructorNode(nullptr), currentConstructorSymbol(nullptr),
     currentConstructorNode(nullptr), currentDestructorSymbol(nullptr), currentDestructorNode(nullptr), currentMemberFunctionSymbol(nullptr), currentMemberFunctionNode(nullptr), 
     switchConditionType(nullptr), currentCaseValueMap(nullptr), currentGotoCaseStatements(nullptr), currentGotoDefaultStatements(nullptr), postfix(false), compilingThrow(false), 
-    compilingReleaseExceptionStatement(false)
+    compilingReleaseExceptionStatement(false), dontCheckDuplicateFunctionSymbols(false)
 {
 }
 
 void StatementBinder::Visit(CompileUnitNode& compileUnitNode)
 {
+    if (compileUnitNode.IsSynthesizedUnit())
+    {
+        dontCheckDuplicateFunctionSymbols = true;
+    }
     compileUnitNode.GlobalNs()->Accept(*this);
+    dontCheckDuplicateFunctionSymbols = false;
 }
+
+struct NamespaceVisitor
+{
+    NamespaceVisitor(BoundCompileUnit* cu_, BoundNamespace* ns_) : cu(cu_), ns(ns_)
+    {
+        cu->PushNamespace(ns);
+    }
+    ~NamespaceVisitor()
+    {
+        cu->PopNamespace();
+    }
+    BoundCompileUnit* cu;
+    BoundNamespace* ns;
+};
 
 void StatementBinder::Visit(NamespaceNode& namespaceNode)
 {
     std::unique_ptr<BoundNamespace> ns(new BoundNamespace(module, namespaceNode));
+    //NamespaceVisitor visitor(&boundCompileUnit, ns.get());
     boundCompileUnit.PushNamespace(ns.get());
     ContainerScope* prevContainerScope = containerScope;
     Symbol* symbol = boundCompileUnit.GetSymbolTable().GetSymbol(&namespaceNode);
@@ -285,6 +305,10 @@ void StatementBinder::Visit(FunctionNode& functionNode)
     Symbol* symbol = boundCompileUnit.GetSymbolTable().GetSymbol(&functionNode);
     Assert(symbol->GetSymbolType() == SymbolType::functionSymbol, "function symbol expected");
     FunctionSymbol* functionSymbol = static_cast<FunctionSymbol*>(symbol);
+    if (!dontCheckDuplicateFunctionSymbols)
+    {
+        functionSymbol->FunctionGroup()->CheckDuplicateFunctionSymbols();
+    }
     if (functionSymbol->IsFunctionTemplate())
     {
         return;
@@ -315,6 +339,10 @@ void StatementBinder::Visit(StaticConstructorNode& staticConstructorNode)
     Symbol* symbol = boundCompileUnit.GetSymbolTable().GetSymbol(&staticConstructorNode);
     Assert(symbol->GetSymbolType() == SymbolType::staticConstructorSymbol , "static constructor symbol expected");
     StaticConstructorSymbol* staticConstructorSymbol = static_cast<StaticConstructorSymbol*>(symbol);
+    if (!dontCheckDuplicateFunctionSymbols)
+    {
+        staticConstructorSymbol->FunctionGroup()->CheckDuplicateFunctionSymbols();
+    }
     StaticConstructorSymbol* prevStaticConstructorSymbol = currentStaticConstructorSymbol;
     currentStaticConstructorSymbol = staticConstructorSymbol;
     containerScope = symbol->GetContainerScope();
@@ -347,6 +375,10 @@ void StatementBinder::Visit(ConstructorNode& constructorNode)
     Symbol* symbol = boundCompileUnit.GetSymbolTable().GetSymbol(&constructorNode);
     Assert(symbol->GetSymbolType() == SymbolType::constructorSymbol, "constructor symbol expected");
     ConstructorSymbol* constructorSymbol = static_cast<ConstructorSymbol*>(symbol);
+    if (!dontCheckDuplicateFunctionSymbols)
+    {
+        constructorSymbol->FunctionGroup()->CheckDuplicateFunctionSymbols();
+    }
     ConstructorSymbol* prevConstructorSymbol = currentConstructorSymbol;
     currentConstructorSymbol = constructorSymbol;
     containerScope = symbol->GetContainerScope();
@@ -391,6 +423,10 @@ void StatementBinder::Visit(DestructorNode& destructorNode)
     Symbol* symbol = boundCompileUnit.GetSymbolTable().GetSymbol(&destructorNode);
     Assert(symbol->GetSymbolType() == SymbolType::destructorSymbol, "destructor symbol expected");
     DestructorSymbol* destructorSymbol = static_cast<DestructorSymbol*>(symbol);
+    if (!dontCheckDuplicateFunctionSymbols)
+    {
+        destructorSymbol->FunctionGroup()->CheckDuplicateFunctionSymbols();
+    }
     DestructorSymbol* prevDestructorSymbol = currentDestructorSymbol;
     currentDestructorSymbol = destructorSymbol;
     containerScope = symbol->GetContainerScope();
@@ -435,6 +471,10 @@ void StatementBinder::Visit(MemberFunctionNode& memberFunctionNode)
     Symbol* symbol = boundCompileUnit.GetSymbolTable().GetSymbol(&memberFunctionNode);
     Assert(symbol->GetSymbolType() == SymbolType::memberFunctionSymbol, "member function symbol expected");
     MemberFunctionSymbol* memberFunctionSymbol = static_cast<MemberFunctionSymbol*>(symbol);
+    if (!dontCheckDuplicateFunctionSymbols)
+    {
+        memberFunctionSymbol->FunctionGroup()->CheckDuplicateFunctionSymbols();
+    }
     MemberFunctionSymbol* prevMemberFunctionSymbol = currentMemberFunctionSymbol;
     currentMemberFunctionSymbol = memberFunctionSymbol;
     containerScope = symbol->GetContainerScope();
@@ -480,6 +520,10 @@ void StatementBinder::Visit(ConversionFunctionNode& conversionFunctionNode)
     Symbol* symbol = boundCompileUnit.GetSymbolTable().GetSymbol(&conversionFunctionNode);
     Assert(symbol->GetSymbolType() == SymbolType::conversionFunctionSymbol, "conversion function symbol expected");
     ConversionFunctionSymbol* conversionFunctionSymbol = static_cast<ConversionFunctionSymbol*>(symbol);
+    if (!dontCheckDuplicateFunctionSymbols)
+    {
+        conversionFunctionSymbol->FunctionGroup()->CheckDuplicateFunctionSymbols();
+    }
     containerScope = symbol->GetContainerScope();
     std::unique_ptr<BoundFunction> boundFunction(new BoundFunction(module, conversionFunctionSymbol));
     BoundFunction* prevFunction = currentFunction;

@@ -52,6 +52,7 @@ public:
     std::u32string Info() const override { return Name(); }
     const char* ClassName() const override { return "FunctionGroupSymbol"; }
     void Check() override;
+    void CheckDuplicateFunctionSymbols();
 private:
     std::unordered_map<int, std::vector<FunctionSymbol*>> arityFunctionListMap;
     std::vector<FunctionSymbol*> varArgFunctions;

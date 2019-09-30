@@ -373,7 +373,7 @@ std::string GetFullPath(const std::string& path)
     {
         p = GetCurrentWorkingDirectory();
         p.append(1, '/');
-        p.append(path);
+        p.append(Path::MakeCanonical(path));
     }
     std::vector<std::string> components = Split(p, '/');
     int w = 0;

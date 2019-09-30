@@ -278,6 +278,25 @@ void FunctionGroupSymbol::Check()
     }
 }
 
+void FunctionGroupSymbol::CheckDuplicateFunctionSymbols()
+{
+    for (const auto& p : arityFunctionListMap)
+    {
+        std::set<std::u32string> names;
+        for (const auto& functionSymbol : p.second)
+        {
+            if (!functionSymbol->IsFunctionTemplate() && !functionSymbol->IsTemplateSpecialization())
+            {
+                if (names.find(functionSymbol->FullName()) != names.cend())
+                {
+                    throw Exception(GetRootModuleForCurrentThread(), "function with identical name '" + ToUtf8(functionSymbol->FullName()) + "' already defined.", GetSpan());
+                }
+                names.insert(functionSymbol->FullName());
+            }
+        }
+    }
+}
+
 std::string FunctionSymbolFlagStr(FunctionSymbolFlags flags)
 {
     std::string s;

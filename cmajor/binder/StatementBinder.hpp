@@ -106,6 +106,7 @@ private:
     bool postfix;
     bool compilingThrow;
     bool compilingReleaseExceptionStatement;
+    bool dontCheckDuplicateFunctionSymbols;
     std::stack<bool> conditionalCompilationStack;
     void AddStatement(BoundStatement* boundStatement);
     void AddReleaseExceptionStatement(const Span& span);
