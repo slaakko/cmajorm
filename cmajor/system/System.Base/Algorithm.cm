@@ -960,4 +960,54 @@ namespace System
             Swap(*i, *j);
         }
     }
+
+    public nothrow I AdjacentFind<I, R>(I begin, I end, R r) where I is ForwardIterator and R is Relation and R.Domain is I.ValueType
+    {
+        if (begin != end)
+        {
+            I i = begin;
+            ++i;
+            while (i != end)
+            {
+                if (r(*begin, *i))
+                {
+                    return begin;
+                }
+                begin = i;
+                ++i;
+            }
+        }
+        return end;
+    }
+
+    public nothrow I AdjacentFind<I>(I begin, I end) where I is ForwardIterator
+    {
+        return AdjacentFind(begin, end, EqualTo<I.ValueType>());
+    }
+
+    public nothrow I Unique<I, R>(I begin, I end, R r) where I is ForwardIterator and R is Relation and R.Domain is I.ValueType
+    {
+        begin = AdjacentFind(begin, end, r);
+        if (begin != end)
+        {
+            I i = begin;
+            ++i;
+            ++i;
+            while (i != end)
+            {
+                if (!r(*begin, *i))
+                {
+                    *++begin = Rvalue(*i);
+                }
+                ++i;
+            }
+            ++begin;
+        }
+        return begin;
+    }
+
+    public nothrow I Unique<I>(I begin, I end) where I is ForwardIterator
+    {
+        return Unique(begin, end, EqualTo<I.ValueType>());
+    }
 }

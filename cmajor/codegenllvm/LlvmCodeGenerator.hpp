@@ -97,6 +97,9 @@ public:
     void ExitBlocks(BoundCompoundStatement* targetBlock);
     void GenJumpingBoolCode();
     void ClearFlags();
+    int Install(const std::string& str) override;
+    int Install(const std::u16string& str) override;
+    int Install(const std::u32string& str) override;
 protected:
     cmajor::symbols::SymbolTable* symbolTable;
     cmajor::symbols::Module* symbolsModule;

@@ -1737,4 +1737,19 @@ void Emitter::FinalizeFunction(void* function)
     static_cast<cmsxi::Function*>(function)->Finalize();
 }
 
+int Emitter::Install(const std::string& str)
+{
+    return emittingDelegate->Install(str);
+}
+
+int Emitter::Install(const std::u16string& str)
+{
+    return emittingDelegate->Install(str);
+}
+
+int Emitter::Install(const std::u32string& str)
+{
+    return emittingDelegate->Install(str);
+}
+
 } // namespace cmsxbe

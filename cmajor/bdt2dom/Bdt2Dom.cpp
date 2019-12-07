@@ -299,7 +299,10 @@ void Bdt2DomVisitor::Visit(BoundCaseStatement& boundCaseStatement)
     std::unique_ptr<dom::Element> caseElement(new dom::Element(U"BoundCaseStatement"));
     dom::Element* prevElement = currentElement;
     currentElement = caseElement.get();
-    boundCaseStatement.CompoundStatement()->Accept(*this);
+    if (boundCaseStatement.CompoundStatement())
+    {
+        boundCaseStatement.CompoundStatement()->Accept(*this);
+    }
     prevElement->AppendChild(std::unique_ptr<dom::Node>(caseElement.release()));
     currentElement = prevElement;
 }
@@ -310,7 +313,10 @@ void Bdt2DomVisitor::Visit(BoundDefaultStatement& boundDefaultStatement)
     std::unique_ptr<dom::Element> defaultElement(new dom::Element(U"BoundDefaultStatement"));
     dom::Element* prevElement = currentElement;
     currentElement = defaultElement.get();
-    boundDefaultStatement.CompoundStatement()->Accept(*this);
+    if (boundDefaultStatement.CompoundStatement())
+    {
+        boundDefaultStatement.CompoundStatement()->Accept(*this);
+    }
     prevElement->AppendChild(std::unique_ptr<dom::Node>(defaultElement.release()));
     currentElement = prevElement;
 }

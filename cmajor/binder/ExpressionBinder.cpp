@@ -691,19 +691,19 @@ void ExpressionBinder::Visit(UCharLiteralNode& ucharLiteralNode)
 
 void ExpressionBinder::Visit(StringLiteralNode& stringLiteralNode)
 {
-    expression.reset(new BoundLiteral(module, std::unique_ptr<Value>(new StringValue(stringLiteralNode.GetSpan(), boundCompileUnit.Install(stringLiteralNode.Value()))),
+    expression.reset(new BoundLiteral(module, std::unique_ptr<Value>(new StringValue(stringLiteralNode.GetSpan(), boundCompileUnit.Install(stringLiteralNode.Value()), stringLiteralNode.Value())),
         symbolTable.GetTypeByName(U"char")->AddConst(stringLiteralNode.GetSpan())->AddPointer(stringLiteralNode.GetSpan())));
 }
 
 void ExpressionBinder::Visit(WStringLiteralNode& wstringLiteralNode)
 {
-    expression.reset(new BoundLiteral(module, std::unique_ptr<Value>(new WStringValue(wstringLiteralNode.GetSpan(), boundCompileUnit.Install(wstringLiteralNode.Value()))),
+    expression.reset(new BoundLiteral(module, std::unique_ptr<Value>(new WStringValue(wstringLiteralNode.GetSpan(), boundCompileUnit.Install(wstringLiteralNode.Value()), wstringLiteralNode.Value())),
         symbolTable.GetTypeByName(U"wchar")->AddConst(wstringLiteralNode.GetSpan())->AddPointer(wstringLiteralNode.GetSpan())));
 }
 
 void ExpressionBinder::Visit(UStringLiteralNode& ustringLiteralNode)
 {
-    expression.reset(new BoundLiteral(module, std::unique_ptr<Value>(new UStringValue(ustringLiteralNode.GetSpan(), boundCompileUnit.Install(ustringLiteralNode.Value()))),
+    expression.reset(new BoundLiteral(module, std::unique_ptr<Value>(new UStringValue(ustringLiteralNode.GetSpan(), boundCompileUnit.Install(ustringLiteralNode.Value()), ustringLiteralNode.Value())),
         symbolTable.GetTypeByName(U"uchar")->AddConst(ustringLiteralNode.GetSpan())->AddPointer(ustringLiteralNode.GetSpan())));
 }
 
@@ -2268,14 +2268,14 @@ void ExpressionBinder::Visit(TypeNameNode& typeNameNode)
         }
         else
         {
-            expression.reset(new BoundLiteral(module, std::unique_ptr<Value>(new StringValue(typeNameNode.GetSpan(), boundCompileUnit.Install(ToUtf8(classType->FullName())))),
-                symbolTable.GetTypeByName(U"char")->AddConst(typeNameNode.GetSpan())->AddPointer(typeNameNode.GetSpan())));
+            expression.reset(new BoundLiteral(module, std::unique_ptr<Value>(new StringValue(typeNameNode.GetSpan(), boundCompileUnit.Install(ToUtf8(classType->FullName())),
+                ToUtf8(classType->FullName()))), symbolTable.GetTypeByName(U"char")->AddConst(typeNameNode.GetSpan())->AddPointer(typeNameNode.GetSpan())));
         }
     }
     else
     {
-        expression.reset(new BoundLiteral(module, std::unique_ptr<Value>(new StringValue(typeNameNode.GetSpan(), boundCompileUnit.Install(ToUtf8(expr->GetType()->FullName())))),
-            symbolTable.GetTypeByName(U"char")->AddConst(typeNameNode.GetSpan())->AddPointer(typeNameNode.GetSpan())));
+        expression.reset(new BoundLiteral(module, std::unique_ptr<Value>(new StringValue(typeNameNode.GetSpan(), boundCompileUnit.Install(ToUtf8(expr->GetType()->FullName())),
+            ToUtf8(expr->GetType()->FullName()))), symbolTable.GetTypeByName(U"char")->AddConst(typeNameNode.GetSpan())->AddPointer(typeNameNode.GetSpan())));
     }
 }
 

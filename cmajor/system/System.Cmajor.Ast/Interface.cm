@@ -1,0 +1,128 @@
+using System;
+using System.Collections;
+
+// this file has been semiautomatically generated from 'D:/work/soulng-project/sngcm/ast/Interface.hpp' using cpp2cm version 1.0.0
+
+// this file has been semiautomatically generated from 'D:/work/soulng-project/sngcm/ast/Interface.cpp' using cpp2cm version 1.0.0
+
+namespace System.Cmajor.Ast
+{
+    public class InterfaceNode : Node
+    {
+        public InterfaceNode(const System.Lex.Span& span_) :
+            base(NodeType.interfaceNode, span_), specifiers(), id(), members()
+        {
+        }
+        public InterfaceNode(const System.Lex.Span& span_, Specifiers specifiers_, IdentifierNode* id_, Attributes* attributes_) :
+            base(NodeType.interfaceNode, span_), specifiers(specifiers_), id(id_), members(), attributes(attributes_)
+        {
+            id->SetParent(this);
+        }
+        public IdentifierNode* Id() const
+        {
+            return id.Get();
+        }
+        public const NodeList<Node>& Members() const
+        {
+            return members;
+        }
+        public Attributes* GetAttributes() const
+        {
+            return attributes.Get();
+        }
+        public void SetSpecifierSpan(const System.Lex.Span& specifierSpan_)
+        {
+            specifierSpan = specifierSpan_;
+        }
+        public const System.Lex.Span& SpecifierSpan() const
+        {
+            return specifierSpan;
+        }
+        public void SetBeginBraceSpan(const System.Lex.Span& beginBraceSpan_)
+        {
+            beginBraceSpan = beginBraceSpan_;
+        }
+        public const System.Lex.Span& BeginBraceSpan() const
+        {
+            return beginBraceSpan;
+        }
+        public void SetEndBraceSpan(const System.Lex.Span& endBraceSpan_)
+        {
+            endBraceSpan = endBraceSpan_;
+        }
+        public const System.Lex.Span& EndBraceSpan() const
+        {
+            return endBraceSpan;
+        }
+        public void AddMember(Node* member)
+        {
+            member->SetParent(this);
+            members.Add(member);
+        }
+        public override Specifiers GetSpecifiers() const
+        {
+            return specifiers;
+        }
+        public override Node* Clone(CloneContext& cloneContext) const
+        {
+            Attributes* clonedAttributes = null;
+            if (!attributes.IsNull())
+            {
+                clonedAttributes = attributes->Clone();
+            }
+            InterfaceNode* clone = new InterfaceNode(GetSpan(), specifiers, cast<IdentifierNode*>(id->Clone(cloneContext)), clonedAttributes);
+            int n = members.Count();
+            for (int i = 0; i < n; ++i)
+            {
+                clone->AddMember(members[i]->Clone(cloneContext));
+            }
+            clone->SetSpecifierSpan(specifierSpan);
+            clone->SetBeginBraceSpan(beginBraceSpan);
+            clone->SetEndBraceSpan(endBraceSpan);
+            return clone;
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public override void Write(AstWriter& writer)
+        {
+            base->Write(writer);
+            bool hasAttributes = attributes != null;
+            writer.GetBinaryWriter().Write(hasAttributes);
+            if (hasAttributes)
+            {
+                attributes->Write(writer);
+            }
+            writer.Write(id.Get());
+            members.Write(writer);
+            writer.Write(specifierSpan);
+            writer.Write(beginBraceSpan);
+            writer.Write(endBraceSpan);
+        }
+        public override void Read(AstReader& reader)
+        {
+            base->Read(reader);
+            bool hasAttributes = reader.GetBinaryReader().ReadBool();
+            if (hasAttributes)
+            {
+                attributes.Reset(new Attributes());
+                attributes->Read(reader);
+            }
+            id.Reset(reader.ReadIdentifierNode());
+            id->SetParent(this);
+            members.Read(reader);
+            members.SetParent(this);
+            specifierSpan = reader.ReadSpan();
+            beginBraceSpan = reader.ReadSpan();
+            endBraceSpan = reader.ReadSpan();
+        }
+        private Specifiers specifiers;
+        private System.Lex.Span specifierSpan;
+        private System.Lex.Span beginBraceSpan;
+        private System.Lex.Span endBraceSpan;
+        private UniquePtr<IdentifierNode> id;
+        private NodeList<Node> members;
+        private UniquePtr<Attributes> attributes;
+    }
+} // namespace System.Cmajor.Ast

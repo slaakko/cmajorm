@@ -314,8 +314,8 @@ private:
 class SYMBOLS_API StringValue : public Value
 {
 public:
-    StringValue(const Span& span_, int stringId_);
-    Value* Clone() const override  { return new StringValue(GetSpan(), stringId); }
+    StringValue(const Span& span_, int stringId_, const std::string& str_);
+    Value* Clone() const override  { return new StringValue(GetSpan(), stringId, str); }
     void* IrValue(Emitter& emitter) override;
     void Write(BinaryWriter& writer) override;
     void Read(BinaryReader& reader) override;
@@ -325,13 +325,14 @@ public:
     const char* ClassName() const override { return "StringValue"; }
 private:
     int stringId;
+    std::string str;
 };
 
 class SYMBOLS_API WStringValue : public Value
 {
 public:
-    WStringValue(const Span& span_, int stringId_);
-    Value* Clone() const override  { return new WStringValue(GetSpan(), stringId); }
+    WStringValue(const Span& span_, int stringId_, const std::u16string& str_);
+    Value* Clone() const override  { return new WStringValue(GetSpan(), stringId, str); }
     void* IrValue(Emitter& emitter) override;
     void Write(BinaryWriter& writer) override;
     void Read(BinaryReader& reader) override;
@@ -341,13 +342,14 @@ public:
     const char* ClassName() const override { return "WStringValue"; }
 private:
     int stringId;
+    std::u16string str;
 };
 
 class SYMBOLS_API UStringValue : public Value
 {
 public:
-    UStringValue(const Span& span_, int stringId_);
-    Value* Clone() const override  { return new UStringValue(GetSpan(), stringId); }
+    UStringValue(const Span& span_, int stringId_, const std::u32string& str_);
+    Value* Clone() const override  { return new UStringValue(GetSpan(), stringId, str); }
     void* IrValue(Emitter& emitter) override;
     void Write(BinaryWriter& writer) override;
     void Read(BinaryReader& reader) override;
@@ -357,6 +359,7 @@ public:
     const char* ClassName() const override { return "UStringValue"; }
 private:
     int stringId;
+    std::u32string str;
 };
 
 class SYMBOLS_API NullValue : public Value

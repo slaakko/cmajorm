@@ -48,7 +48,9 @@ inline TypeResolverFlags operator|(TypeResolverFlags left, TypeResolverFlags rig
 }
 
 TypeSymbol* ResolveType(Node* typeExprNode, BoundCompileUnit& boundCompileUnit, ContainerScope* containerScope);
+TypeSymbol* ResolveType(Node* typeExprNode, BoundCompileUnit& boundCompileUnit, ContainerScope* containerScope, ClassTypeSymbol* currentClass);
 TypeSymbol* ResolveType(Node* typeExprNode, BoundCompileUnit& boundCompileUnit, ContainerScope* containerScope, TypeResolverFlags flags);
+TypeSymbol* ResolveType(Node* typeExprNode, BoundCompileUnit& boundCompileUnit, ContainerScope* containerScope, TypeResolverFlags flags, ClassTypeSymbol* currentClass);
 
 } } // namespace cmajor::binder
 

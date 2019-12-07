@@ -856,7 +856,10 @@ void LlvmCodeGenerator::Visit(BoundCaseStatement& boundCaseStatement)
         {
             void* caseDest = it->second;
             emitter->SetCurrentBasicBlock(caseDest);
-            boundCaseStatement.CompoundStatement()->Accept(*this);
+            if (boundCaseStatement.CompoundStatement())
+            {
+                boundCaseStatement.CompoundStatement()->Accept(*this);
+            }
         }
         else
         {
@@ -878,7 +881,10 @@ void LlvmCodeGenerator::Visit(BoundDefaultStatement& boundDefaultStatement)
     if (defaultDest)
     {
         emitter->SetCurrentBasicBlock(defaultDest);
-        boundDefaultStatement.CompoundStatement()->Accept(*this);
+        if (boundDefaultStatement.CompoundStatement())
+        {
+            boundDefaultStatement.CompoundStatement()->Accept(*this);
+        }
     }
     else
     {
@@ -1456,6 +1462,21 @@ void LlvmCodeGenerator::ClearFlags()
     destructorCallGenerated = false;
     lastInstructionWasRet = false;
     basicBlockOpen = false;
+}
+
+int LlvmCodeGenerator::Install(const std::string& str)
+{
+    return compileUnit->Install(str);
+}
+
+int LlvmCodeGenerator::Install(const std::u16string& str)
+{
+    return compileUnit->Install(str);
+}
+
+int LlvmCodeGenerator::Install(const std::u32string& str)
+{
+    return compileUnit->Install(str);
 }
 
 } } // namespace cmajor::codegen

@@ -182,11 +182,11 @@ public:
     void AddCaseValue(std::unique_ptr<Value>&& caseValue_);
     const std::vector<std::unique_ptr<Value>>& CaseValues() const { return caseValues; }
     void AddStatement(std::unique_ptr<BoundStatement>&& statement);
-    BoundCompoundStatement* CompoundStatement() { return &compoundStatement; }
+    BoundCompoundStatement* CompoundStatement() { return compoundStatement.get(); }
     void Accept(BoundNodeVisitor& visitor) override;
 private:
     std::vector<std::unique_ptr<Value>> caseValues;
-    BoundCompoundStatement compoundStatement;
+    std::unique_ptr<BoundCompoundStatement> compoundStatement;
 };
 
 class BINDER_API BoundDefaultStatement : public BoundStatement
@@ -194,10 +194,10 @@ class BINDER_API BoundDefaultStatement : public BoundStatement
 public:
     BoundDefaultStatement(Module* module_, const Span& span_);
     void AddStatement(std::unique_ptr<BoundStatement>&& statement);
-    BoundCompoundStatement* CompoundStatement() { return &compoundStatement; }
+    BoundCompoundStatement* CompoundStatement() { return compoundStatement.get(); }
     void Accept(BoundNodeVisitor& visitor) override;
 private:
-    BoundCompoundStatement compoundStatement;
+    std::unique_ptr<BoundCompoundStatement> compoundStatement;
 };
 
 class BINDER_API BoundGotoCaseStatement : public BoundStatement

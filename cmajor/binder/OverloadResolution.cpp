@@ -301,7 +301,8 @@ bool FindTemplateParameterMatch(TypeSymbol* sourceType, TypeSymbol* targetType, 
                 {
                     ++functionMatch.numConversions;
                     argumentMatch.conversionFun = conversionFun;
-                    if (argumentMatch.postReferenceConversionFlags == OperationFlags::none)
+                    //if (argumentMatch.postReferenceConversionFlags == OperationFlags::none) bug???
+                    if (argumentMatch.preReferenceConversionFlags == OperationFlags::none)
                     {
                         if (FindQualificationConversion(sourceType, targetType, argument, conversionType, span, functionMatch, argumentMatch))
                         {

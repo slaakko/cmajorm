@@ -1,0 +1,36 @@
+using System;
+using System.Collections;
+
+// this file has been semiautomatically generated from 'D:/work/soulng-project/soulng/lexer/TrivialLexer.hpp' using cpp2cm version 1.0.0
+
+// this file has been semiautomatically generated from 'D:/work/soulng-project/soulng/lexer/TrivialLexer.cpp' using cpp2cm version 1.0.0
+
+public class TrivialLexer : System.Lex.Lexer
+{
+    public TrivialLexer(const ustring& content_, const string& fileName_, int fileIndex_) :
+        base(content_, fileName_, fileIndex_)
+    {
+    }
+    public TrivialLexer(const uchar* start_, const uchar* end_, const string& fileName_, int fileIndex_) :
+        base(start_, end_, fileName_, fileIndex_)
+    {
+    }
+    public override int NextState(int state, uchar c)
+    {
+        token.id = cast<int>(c);
+        token.match = lexeme;
+        if (c == '\n')
+        {
+            ++line;
+        }
+        return -1;
+    }
+}
+public string GetTrivialTokenInfo(int tokenId)
+{
+    if (tokenId == System.Lex.END_TOKEN)
+    {
+        return "end of file";
+    }
+    return ToString(tokenId);
+}

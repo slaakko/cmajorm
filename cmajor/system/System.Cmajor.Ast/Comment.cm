@@ -1,0 +1,44 @@
+using System;
+using System.Collections;
+
+// this file has been semiautomatically generated from 'D:/work/soulng-project/sngcm/ast/Comment.hpp' using cpp2cm version 1.0.0
+
+// this file has been semiautomatically generated from 'D:/work/soulng-project/sngcm/ast/Comment.cpp' using cpp2cm version 1.0.0
+
+namespace System.Cmajor.Ast
+{
+    public class CommentNode : Node
+    {
+        public CommentNode(const System.Lex.Span& span_) :
+            base(NodeType.commentNode, span_)
+        {
+        }
+        public CommentNode(const System.Lex.Span& span_, const ustring& comment_) :
+            base(NodeType.commentNode, span_), comment(comment_)
+        {
+        }
+        public const ustring& Comment() const
+        {
+            return comment;
+        }
+        public override Node* Clone(CloneContext& cloneContext) const
+        {
+            return new CommentNode(GetSpan(), comment);
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public override void Write(AstWriter& writer)
+        {
+            base->Write(writer);
+            writer.GetBinaryWriter().Write(comment);
+        }
+        public override void Read(AstReader& reader)
+        {
+            base->Read(reader);
+            comment = reader.GetBinaryReader().ReadUString();
+        }
+        private ustring comment;
+    }
+} // namespace System.Cmajor.Ast

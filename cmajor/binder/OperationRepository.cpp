@@ -540,6 +540,7 @@ void PointerPlusOffsetOperation::CollectViableFunctions(ContainerScope* containe
 {
     TypeSymbol* leftType = arguments[0]->GetType();
     if (!leftType->IsPointerType()) return;
+    leftType = leftType->PlainType(span);
     TypeSymbol* rightType = arguments[1]->GetType();
     if (!rightType->PlainType(span)->IsIntegralType())
     {
@@ -629,6 +630,7 @@ void OffsetPlusPointerOperation::CollectViableFunctions(ContainerScope* containe
     }
     TypeSymbol* rightType = arguments[1]->GetType();
     if (!rightType->IsPointerType()) return;
+    rightType = rightType->PlainType(span);
     TypeSymbol* longType = GetSymbolTable()->GetTypeByName(U"long");
     if (rightType->BaseType()->GetSymbolType() == SymbolType::classTemplateSpecializationSymbol)
     {
@@ -702,6 +704,7 @@ void PointerMinusOffsetOperation::CollectViableFunctions(ContainerScope* contain
 {
     TypeSymbol* leftType = arguments[0]->GetType();
     if (!leftType->IsPointerType()) return;
+    leftType = leftType->PlainType(span);
     TypeSymbol* rightType = arguments[1]->GetType();
     if (!rightType->PlainType(span)->IsIntegralType())
     {
@@ -782,8 +785,10 @@ void PointerMinusPointerOperation::CollectViableFunctions(ContainerScope* contai
 {
     TypeSymbol* leftType = arguments[0]->GetType();
     if (!leftType->IsPointerType()) return;
+    leftType = leftType->PlainType(span);
     TypeSymbol* rightType = arguments[1]->GetType();
     if (!rightType->IsPointerType()) return;
+    rightType = rightType->PlainType(span);
     if (leftType->BaseType()->GetSymbolType() == SymbolType::classTemplateSpecializationSymbol)
     {
         ClassTemplateSpecializationSymbol* specialization = static_cast<ClassTemplateSpecializationSymbol*>(leftType->BaseType());
@@ -855,12 +860,10 @@ void PointerEqualOperation::CollectViableFunctions(ContainerScope* containerScop
 {
     TypeSymbol* leftType = arguments[0]->GetType();
     if (!leftType->IsPointerType()) return;
+    leftType = leftType->PlainType(span);
     TypeSymbol* rightType = arguments[1]->GetType();
+    rightType = rightType->PlainType(span);
     if (!rightType->IsPointerType()) return;
-    if (leftType->IsReferenceType())
-    {
-        leftType = leftType->PlainType(span);
-    }
     if (leftType->BaseType()->GetSymbolType() == SymbolType::classTemplateSpecializationSymbol)
     {
         ClassTemplateSpecializationSymbol* specialization = static_cast<ClassTemplateSpecializationSymbol*>(leftType->BaseType());
@@ -932,8 +935,10 @@ void PointerLessOperation::CollectViableFunctions(ContainerScope* containerScope
 {
     TypeSymbol* leftType = arguments[0]->GetType();
     if (!leftType->IsPointerType()) return;
+    leftType = leftType->PlainType(span);
     TypeSymbol* rightType = arguments[1]->GetType();
     if (!rightType->IsPointerType()) return;
+    rightType = rightType->PlainType(span);
     if (leftType->BaseType()->GetSymbolType() == SymbolType::classTemplateSpecializationSymbol)
     {
         ClassTemplateSpecializationSymbol* specialization = static_cast<ClassTemplateSpecializationSymbol*>(leftType->BaseType());

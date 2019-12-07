@@ -18,6 +18,14 @@ enum class BackEnd
     llvm, cmsx
 };
 
+class AST_API ModuleVersionTagVerifier
+{
+public:
+    virtual void VerifyModuleVersionTag(const std::string& moduleFilePath) = 0;
+};
+
+AST_API void SetModuleVersionTagVerifier(ModuleVersionTagVerifier* verifier);
+
 AST_API std::string CmajorRootDir();
 AST_API std::string CmajorSystemLibDir(const std::string& config, BackEnd backend);
 AST_API std::string CmajorSystemModuleFilePath(const std::string& config, BackEnd backend);

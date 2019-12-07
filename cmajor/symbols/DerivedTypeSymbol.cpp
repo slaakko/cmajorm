@@ -629,9 +629,60 @@ ValueType DerivedTypeSymbol::GetValueType() const
 {
     if (HasPointerDerivation(derivationRec.derivations))
     {
-        return ValueType::pointerValue;
+        if (PointerCount() == 1)
+        {
+            switch (baseType->GetSymbolType())
+            {
+                case SymbolType::charTypeSymbol:
+                {
+                    return ValueType::stringValue;
+                }
+                case SymbolType::wcharTypeSymbol:
+                {
+                    return ValueType::wstringValue;
+                }
+                case SymbolType::ucharTypeSymbol:
+                {
+                    return ValueType::ustringValue;
+                }
+                default:
+                {
+                    return ValueType::pointerValue;
+                }
+            }
+        }
+        else
+        {
+            return ValueType::pointerValue;
+        }
     }
     return ValueType::none;
+}
+
+Value* DerivedTypeSymbol::MakeValue() const
+{
+    if (HasPointerDerivation(derivationRec.derivations))
+    {
+        if (PointerCount() == 1)
+        {
+            switch (baseType->GetSymbolType())
+            {
+                case SymbolType::charTypeSymbol:
+                {
+                    return new StringValue(Span(), -1, "");
+                }
+                case SymbolType::wcharTypeSymbol:
+                {
+                    return new WStringValue(Span(), -1, u"");
+                }
+                case SymbolType::ucharTypeSymbol:
+                {
+                    return new UStringValue(Span(), -1, U""); 
+                }
+            }
+        }
+    }
+    return TypeSymbol::MakeValue();
 }
 
 void DerivedTypeSymbol::Check()

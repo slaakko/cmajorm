@@ -4,6 +4,7 @@
 // =================================
 
 #include <cmajor/util/MemoryWriter.hpp>
+#include <stdexcept>
 
 namespace cmajor { namespace util {
 

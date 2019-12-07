@@ -334,6 +334,9 @@ public:
     void* GetMDStructRefForSourceFile(const std::string& sourceFileName) override;
     void SetMetadataRef(void* inst, void* mdStructRef) override;
     void FinalizeFunction(void* function) override;
+    int Install(const std::string& str) override;
+    int Install(const std::u16string& str) override;
+    int Install(const std::u32string& str) override;
 private:
     cmajor::ir::EmittingContext& emittingContext;
     cmajor::ir::EmittingDelegate* emittingDelegate;

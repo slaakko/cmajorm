@@ -249,7 +249,10 @@ void ControlFlowAnalyzer::Visit(BoundCaseStatement& boundCaseStatement)
     {
         CollectLabel(boundCaseStatement);
     }
-    boundCaseStatement.CompoundStatement()->Accept(*this);
+    if (boundCaseStatement.CompoundStatement())
+    {
+        boundCaseStatement.CompoundStatement()->Accept(*this);
+    }
 }
 
 void ControlFlowAnalyzer::Visit(BoundDefaultStatement& boundDefaultStatement)
@@ -258,7 +261,10 @@ void ControlFlowAnalyzer::Visit(BoundDefaultStatement& boundDefaultStatement)
     {
         CollectLabel(boundDefaultStatement);
     }
-    boundDefaultStatement.CompoundStatement()->Accept(*this);
+    if (boundDefaultStatement.CompoundStatement())
+    {
+        boundDefaultStatement.CompoundStatement()->Accept(*this);
+    }
 }
 
 void ControlFlowAnalyzer::Visit(BoundGotoCaseStatement& boundGotoCaseStatement)

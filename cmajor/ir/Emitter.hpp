@@ -40,6 +40,9 @@ public:
     virtual std::string GetSourceFilePath(int32_t fileIndex) { return std::string(); }
     virtual cmajor::ir::Pad* CurrentPad() { return nullptr; }
     virtual void* CreateClassDIType(void* classPtr) { return nullptr; }
+    virtual int Install(const std::string& str) = 0;
+    virtual int Install(const std::u16string& str) = 0;
+    virtual int Install(const std::u32string& str) = 0;
 };
 
 class IR_API Emitter
@@ -343,6 +346,9 @@ public:
     virtual void SetCurrentLineNumber(int currentLineNumber) = 0;
     virtual void SetMetadataRef(void* inst, void* mdStructRef) = 0;
     virtual void FinalizeFunction(void* function) = 0;
+    virtual int Install(const std::string& str) = 0;
+    virtual int Install(const std::u16string& str) = 0;
+    virtual int Install(const std::u32string& str) = 0;
 private:
     ValueStack* stack;
 };

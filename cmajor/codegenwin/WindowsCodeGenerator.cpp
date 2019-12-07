@@ -161,12 +161,17 @@ void WindowsCodeGenerator::Visit(BoundBreakStatement& boundBreakStatement)
     }
     ExitBlocks(breakTargetBlock);
     emitter->CreateBr(breakTarget);
+/*
     if (!currentCaseMap) // not in switch
     {
         void* nextBlock = emitter->CreateBasicBlock("next");
         emitter->SetCurrentBasicBlock(nextBlock);
         basicBlockOpen = true;
     }
+*/
+    void* nextBlock = emitter->CreateBasicBlock("next");
+    emitter->SetCurrentBasicBlock(nextBlock);
+    basicBlockOpen = true;
     currentPad = prevCurrentPad;
 }
 

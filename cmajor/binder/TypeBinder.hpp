@@ -96,6 +96,7 @@ private:
     std::vector<Node*> usingNodes;
     EnumTypeSymbol* enumType;
     FunctionSymbol* currentFunctionSymbol;
+    ClassTypeSymbol* currentClassTypeSymbol;
     std::stack<bool> conditionalCompilationStack;
     TypeResolverFlags typeResolverFlags;
     BoundGlobalVariable* boundGlobalVariable;

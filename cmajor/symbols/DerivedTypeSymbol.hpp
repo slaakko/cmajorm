@@ -90,6 +90,7 @@ public:
     TypeSymbol* Unify(TypeSymbol* sourceType, const Span& span) override;
     bool IsRecursive(TypeSymbol* type, std::unordered_set<boost::uuids::uuid, boost::hash<boost::uuids::uuid>>& tested) override;
     ValueType GetValueType() const override;
+    Value* MakeValue() const override;
     std::u32string Info() const override { return Name(); }
     const char* ClassName() const override { return "DerivedTypeSymbol"; }
     void Check() override;

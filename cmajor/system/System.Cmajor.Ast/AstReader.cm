@@ -1,0 +1,205 @@
+using System;
+using System.Collections;
+using System.IO;
+
+// this file has been semiautomatically generated from 'D:/work/soulng-project/sngcm/ast/AstReader.hpp' using cpp2cm version 1.0.0
+
+// this file has been semiautomatically generated from 'D:/work/soulng-project/sngcm/ast/AstReader.cpp' using cpp2cm version 1.0.0
+
+namespace System.Cmajor.Ast
+{
+    public inline int MakeFileIndex(short moduleId, short fileId)
+    {
+        return (cast<int>(moduleId) << 16) | fileId;
+    }
+    public inline short GetModuleId(int fileIndex)
+    {
+        return cast<short>((fileIndex >> 16) & 65535);
+    }
+    public inline short GetFileId(int fileIndex)
+    {
+        return cast<short>(fileIndex & 65535);
+    }
+    public class AstReader
+    {
+        public AstReader(const string& fileName_) :
+            binaryReader(File.OpenBinary(fileName_)), moduleId(-1)
+        {
+        }
+        public BinaryReader& GetBinaryReader()
+        {
+            return binaryReader;
+        }
+        public void SetModuleId(short moduleId_)
+        {
+            moduleId = moduleId_;
+        }
+        public Node* ReadNode()
+        {
+            NodeType nodeType = cast<NodeType>(binaryReader.ReadByte());
+            System.Lex.Span span = ReadSpan();
+            Node* node = NodeFactory.Instance().CreateNode(nodeType, span);
+            node->Read(*this);
+            return node;
+        }
+        public IdentifierNode* ReadIdentifierNode()
+        {
+            Node* node = ReadNode();
+            if (node->GetNodeType() == NodeType.identifierNode)
+            {
+                return cast<IdentifierNode*>(node);
+            }
+            else
+            {
+                throw Exception("identifier node expected");
+            }
+        }
+        public LabelNode* ReadLabelNode()
+        {
+            Node* node = ReadNode();
+            if (node->GetNodeType() == NodeType.labelNode)
+            {
+                return cast<LabelNode*>(node);
+            }
+            else
+            {
+                throw Exception("label node expected");
+            }
+        }
+        public StatementNode* ReadStatementNode()
+        {
+            Node* node = ReadNode();
+            if (node->IsStatementNode())
+            {
+                return cast<StatementNode*>(node);
+            }
+            else
+            {
+                throw Exception("statement node expected");
+            }
+        }
+        public DefaultStatementNode* ReadDefaultStatementNode()
+        {
+            Node* node = ReadNode();
+            if (node->GetNodeType() == NodeType.defaultStatementNode)
+            {
+                return cast<DefaultStatementNode*>(node);
+            }
+            else
+            {
+                throw Exception("default statement node expected");
+            }
+        }
+        public CompoundStatementNode* ReadCompoundStatementNode()
+        {
+            Node* node = ReadNode();
+            if (node->GetNodeType() == NodeType.compoundStatementNode)
+            {
+                return cast<CompoundStatementNode*>(node);
+            }
+            else
+            {
+                throw Exception("compound statement node expected");
+            }
+        }
+        public ConstraintNode* ReadConstraintNode()
+        {
+            Node* node = ReadNode();
+            if (node->NodeIsConstraintNode())
+            {
+                return cast<ConstraintNode*>(node);
+            }
+            else
+            {
+                throw Exception("constraint node expected");
+            }
+        }
+        public WhereConstraintNode* ReadWhereConstraintNode()
+        {
+            Node* node = ReadNode();
+            if (node->GetNodeType() == NodeType.whereConstraintNode)
+            {
+                return cast<WhereConstraintNode*>(node);
+            }
+            else
+            {
+                throw Exception("where constraint node expected");
+            }
+        }
+        public ConceptIdNode* ReadConceptIdNode()
+        {
+            Node* node = ReadNode();
+            if (node->GetNodeType() == NodeType.conceptIdNode)
+            {
+                return cast<ConceptIdNode*>(node);
+            }
+            else
+            {
+                throw Exception("concept id node expected");
+            }
+        }
+        public ConceptNode* ReadConceptNode()
+        {
+            Node* node = ReadNode();
+            if (node->IsConceptNode())
+            {
+                return cast<ConceptNode*>(node);
+            }
+            else
+            {
+                throw Exception("concept node expected");
+            }
+        }
+        public ConditionalCompilationExpressionNode* ReadConditionalCompilationExpressionNode()
+        {
+            Node* node = ReadNode();
+            if (node->IsConditionalCompilationExpressionNode())
+            {
+                return cast<ConditionalCompilationExpressionNode*>(node);
+            }
+            else
+            {
+                throw Exception("conditional compilation expression node expected");
+            }
+        }
+        public ConditionalCompilationPartNode* ReadConditionalCompilationPartNode()
+        {
+            Node* node = ReadNode();
+            if (node->GetNodeType() == NodeType.conditionalCompilationPartNode)
+            {
+                return cast<ConditionalCompilationPartNode*>(node);
+            }
+            else
+            {
+                throw Exception("conditional compilation part node expected");
+            }
+        }
+        public Specifiers ReadSpecifiers()
+        {
+            return cast<Specifiers>(binaryReader.ReadInt());
+        }
+        public System.Lex.Span ReadSpan()
+        {
+            bool valid = binaryReader.ReadBool();
+            if (!valid)
+            {
+                return System.Lex.Span();
+            }
+            else
+            {
+                uint fileIndex = binaryReader.ReadULEB128UInt();
+                if (moduleId != -1)
+                {
+                    short fileId = GetFileId(cast<int>(fileIndex));
+                    fileIndex = cast<uint>(MakeFileIndex(moduleId, fileId));
+                }
+                uint line = binaryReader.ReadULEB128UInt();
+                uint start = binaryReader.ReadULEB128UInt();
+                uint end = binaryReader.ReadULEB128UInt();
+                return System.Lex.Span(cast<int>(fileIndex), cast<int>(line), cast<int>(start), cast<int>(end));
+            }
+        }
+        private BinaryReader binaryReader;
+        private short moduleId;
+    }
+} // namespace System.Cmajor.Ast

@@ -2703,17 +2703,17 @@ void Evaluator::Visit(UCharLiteralNode& ucharLiteralNode)
 
 void Evaluator::Visit(StringLiteralNode& stringLiteralNode)
 {
-    value.reset(new StringValue(stringLiteralNode.GetSpan(), boundCompileUnit.Install(stringLiteralNode.Value())));
+    value.reset(new StringValue(stringLiteralNode.GetSpan(), boundCompileUnit.Install(stringLiteralNode.Value()), stringLiteralNode.Value()));
 }
 
 void Evaluator::Visit(WStringLiteralNode& wstringLiteralNode)
 {
-    value.reset(new WStringValue(wstringLiteralNode.GetSpan(), boundCompileUnit.Install(wstringLiteralNode.Value())));
+    value.reset(new WStringValue(wstringLiteralNode.GetSpan(), boundCompileUnit.Install(wstringLiteralNode.Value()), wstringLiteralNode.Value()));
 }
 
 void Evaluator::Visit(UStringLiteralNode& ustringLiteralNode)
 {
-    value.reset(new UStringValue(ustringLiteralNode.GetSpan(), boundCompileUnit.Install(ustringLiteralNode.Value())));
+    value.reset(new UStringValue(ustringLiteralNode.GetSpan(), boundCompileUnit.Install(ustringLiteralNode.Value()), ustringLiteralNode.Value()));
 }
 
 void Evaluator::Visit(NullLiteralNode& nullLiteralNode)

@@ -14,6 +14,13 @@ namespace cmajor { namespace ast {
 using namespace cmajor::util;
 using namespace cmajor::unicode;
 
+ModuleVersionTagVerifier* moduleVersionTagVerifier = nullptr;
+
+void SetModuleVersionTagVerifier(ModuleVersionTagVerifier* verifier)
+{
+    moduleVersionTagVerifier = verifier;
+}
+
 std::string CmajorRootDir()
 {
     char* e = getenv("CMAJOR_ROOT");
@@ -316,6 +323,10 @@ bool Project::IsUpToDate(const std::string& systemModuleFilePath) const
         {
             return false;
         }
+    }
+    if (moduleVersionTagVerifier != nullptr && !systemModuleFilePath.empty())
+    {
+        moduleVersionTagVerifier->VerifyModuleVersionTag(systemModuleFilePath);
     }
     return true;
 }

@@ -264,12 +264,13 @@ namespace System.Collections
             delete n;
             --count;
         }
-        public nothrow void Remove(Iterator pos)
+        public nothrow Iterator Remove(Iterator pos)
         {
             LinkedListNode<ValueType>* n = pos.Node();
             #assert(n != null);
             LinkedListNode<ValueType>* prev = n->Prev();
             LinkedListNode<ValueType>* next = n->Next();
+            Iterator nxt(this, next);
             if (prev != null)
             {
                 prev->SetNext(next);
@@ -288,6 +289,7 @@ namespace System.Collections
             }
             delete n;
             --count;
+            return nxt;
         }
         public nothrow void Remove(const ValueType& value)
         {

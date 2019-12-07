@@ -632,7 +632,13 @@ void* Emitter::GetOrInsertFunction(const std::string& name, void* type)
 
 void* Emitter::CreateGlobalStringPtr(const std::string& name)
 {
-    return builder.CreateGlobalStringPtr(name);
+    llvm::Constant* strConstant = llvm::ConstantDataArray::getString(context, name);
+    llvm::GlobalVariable* gv = new llvm::GlobalVariable(*module, strConstant->getType(), true, llvm::GlobalValue::PrivateLinkage, strConstant, "", nullptr, llvm::GlobalVariable::NotThreadLocal, 0);
+    gv->setUnnamedAddr(llvm::GlobalValue::UnnamedAddr::Global);
+    gv->setAlignment(1);
+    llvm::Constant* zero = llvm::ConstantInt::get(llvm::Type::getInt32Ty(context), 0);
+    llvm::Constant* indices[] = { zero, zero };
+    return llvm::ConstantExpr::getInBoundsGetElementPtr(gv->getValueType(), gv, indices);
 }
 
 void* Emitter::CreateCall(void* callee, const std::vector<void*>& args)
@@ -1854,6 +1860,21 @@ void Emitter::SetMetadataRef(void* inst, void* mdStructRef)
 
 void Emitter::FinalizeFunction(void* function)
 {
+}
+
+int Emitter::Install(const std::string& str)
+{
+    return emittingDelegate->Install(str);
+}
+
+int Emitter::Install(const std::u16string& str)
+{
+    return emittingDelegate->Install(str);
+}
+
+int Emitter::Install(const std::u32string& str)
+{
+    return emittingDelegate->Install(str);
 }
 
 } // namespace cmllvm

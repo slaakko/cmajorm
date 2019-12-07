@@ -1,0 +1,267 @@
+using System;
+using System.Collections;
+
+// this file has been semiautomatically generated from 'D:/work/soulng-project/sngcm/ast/TypeExpr.hpp' using cpp2cm version 1.0.0
+
+// this file has been semiautomatically generated from 'D:/work/soulng-project/sngcm/ast/TypeExpr.cpp' using cpp2cm version 1.0.0
+
+namespace System.Cmajor.Ast
+{
+    public class ConstNode : Node
+    {
+        public ConstNode(const System.Lex.Span& span_) :
+            base(NodeType.constNode, span_)
+        {
+        }
+        public ConstNode(const System.Lex.Span& span_, Node* subject_) :
+            base(NodeType.constNode, span_), subject(subject_)
+        {
+            subject->SetParent(this);
+        }
+        public const Node* Subject() const
+        {
+            return subject.Get();
+        }
+        public Node* Subject()
+        {
+            return subject.Get();
+        }
+        public override Node* Clone(CloneContext& cloneContext) const
+        {
+            return new ConstNode(GetSpan(), subject->Clone(cloneContext));
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public override void Write(AstWriter& writer)
+        {
+            base->Write(writer);
+            writer.Write(subject.Get());
+        }
+        public override void Read(AstReader& reader)
+        {
+            base->Read(reader);
+            subject.Reset(reader.ReadNode());
+            subject->SetParent(this);
+        }
+        public override string ToString() const
+        {
+            return "const " + subject->ToString();
+        }
+        private UniquePtr<Node> subject;
+    }
+    public class LValueRefNode : Node
+    {
+        public LValueRefNode(const System.Lex.Span& span_) :
+            base(NodeType.lvalueRefNode, span_)
+        {
+        }
+        public LValueRefNode(const System.Lex.Span& span_, Node* subject_) :
+            base(NodeType.lvalueRefNode, span_), subject(subject_)
+        {
+            subject->SetParent(this);
+        }
+        public const Node* Subject() const
+        {
+            return subject.Get();
+        }
+        public Node* Subject()
+        {
+            return subject.Get();
+        }
+        public override Node* Clone(CloneContext& cloneContext) const
+        {
+            return new LValueRefNode(GetSpan(), subject->Clone(cloneContext));
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public override void Write(AstWriter& writer)
+        {
+            base->Write(writer);
+            writer.Write(subject.Get());
+        }
+        public override void Read(AstReader& reader)
+        {
+            base->Read(reader);
+            subject.Reset(reader.ReadNode());
+            subject->SetParent(this);
+        }
+        public override string ToString() const
+        {
+            return subject->ToString() + "&";
+        }
+        private UniquePtr<Node> subject;
+    }
+    public class RValueRefNode : Node
+    {
+        public RValueRefNode(const System.Lex.Span& span_) :
+            base(NodeType.rvalueRefNode, span_)
+        {
+        }
+        public RValueRefNode(const System.Lex.Span& span_, Node* subject_) :
+            base(NodeType.rvalueRefNode, span_), subject(subject_)
+        {
+            subject->SetParent(this);
+        }
+        public const Node* Subject() const
+        {
+            return subject.Get();
+        }
+        public Node* Subject()
+        {
+            return subject.Get();
+        }
+        public override Node* Clone(CloneContext& cloneContext) const
+        {
+            return new RValueRefNode(GetSpan(), subject->Clone(cloneContext));
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public override void Write(AstWriter& writer)
+        {
+            base->Write(writer);
+            writer.Write(subject.Get());
+        }
+        public override void Read(AstReader& reader)
+        {
+            base->Read(reader);
+            subject.Reset(reader.ReadNode());
+            subject->SetParent(this);
+        }
+        public override string ToString() const
+        {
+            return subject->ToString() + "&&";
+        }
+        private UniquePtr<Node> subject;
+    }
+    public class PointerNode : Node
+    {
+        public PointerNode(const System.Lex.Span& span_) :
+            base(NodeType.pointerNode, span_)
+        {
+        }
+        public PointerNode(const System.Lex.Span& span_, Node* subject_) :
+            base(NodeType.pointerNode, span_), subject(subject_)
+        {
+            subject->SetParent(this);
+        }
+        public const Node* Subject() const
+        {
+            return subject.Get();
+        }
+        public Node* Subject()
+        {
+            return subject.Get();
+        }
+        public override Node* Clone(CloneContext& cloneContext) const
+        {
+            return new PointerNode(GetSpan(), subject->Clone(cloneContext));
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public override void Write(AstWriter& writer)
+        {
+            base->Write(writer);
+            writer.Write(subject.Get());
+        }
+        public override void Read(AstReader& reader)
+        {
+            base->Read(reader);
+            subject.Reset(reader.ReadNode());
+            subject->SetParent(this);
+        }
+        public override string ToString() const
+        {
+            return subject->ToString() + "*";
+        }
+        private UniquePtr<Node> subject;
+    }
+    public class ArrayNode : Node
+    {
+        public ArrayNode(const System.Lex.Span& span_) :
+            base(NodeType.arrayNode, span_), subject(), size()
+        {
+        }
+        public ArrayNode(const System.Lex.Span& span_, Node* subject_, Node* size_) :
+            base(NodeType.arrayNode, span_), subject(subject_), size(size_)
+        {
+            subject->SetParent(this);
+            if (!size.IsNull())
+            {
+                size->SetParent(this);
+            }
+        }
+        public const Node* Subject() const
+        {
+            return subject.Get();
+        }
+        public Node* Subject()
+        {
+            return subject.Get();
+        }
+        public const Node* Size() const
+        {
+            return size.Get();
+        }
+        public Node* Size()
+        {
+            return size.Get();
+        }
+        public override Node* Clone(CloneContext& cloneContext) const
+        {
+            Node* clonedSize = null;
+            if (!size.IsNull())
+            {
+                clonedSize = size->Clone(cloneContext);
+            }
+            return new ArrayNode(GetSpan(), subject->Clone(cloneContext), clonedSize);
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public override void Write(AstWriter& writer)
+        {
+            base->Write(writer);
+            writer.Write(subject.Get());
+            bool hasSize = size != null;
+            writer.GetBinaryWriter().Write(hasSize);
+            if (hasSize)
+            {
+                writer.Write(size.Get());
+            }
+        }
+        public override void Read(AstReader& reader)
+        {
+            base->Read(reader);
+            subject.Reset(reader.ReadNode());
+            subject->SetParent(this);
+            bool hasSize = reader.GetBinaryReader().ReadBool();
+            if (hasSize)
+            {
+                size.Reset(reader.ReadNode());
+                size->SetParent(this);
+            }
+        }
+        public override string ToString() const
+        {
+            string s = subject->ToString();
+            s.Append("[");
+            if (!size.IsNull())
+            {
+                s.Append(size->ToString());
+            }
+            s.Append("]");
+            return s;
+        }
+        private UniquePtr<Node> subject;
+        private UniquePtr<Node> size;
+    }
+} // namespace System.Cmajor.Ast

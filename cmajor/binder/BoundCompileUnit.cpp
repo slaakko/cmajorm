@@ -402,7 +402,8 @@ FunctionSymbol* BoundCompileUnit::GetConversion(TypeSymbol* sourceType, TypeSymb
                     uint8_t conversionDistance = 0;
                     if (sourceClassType->HasBaseClass(targetClassType, conversionDistance))
                     {
-                        if (targetType->IsLvalueReferenceType() && !sourceType->IsReferenceType())
+                        //if (targetType->IsLvalueReferenceType() && !sourceType->IsReferenceType()) // bug???
+                        if (targetType->IsReferenceType() && !sourceType->IsReferenceType())
                         {
                             argumentMatch.preReferenceConversionFlags = OperationFlags::addr;
                             sourceType = sourceType->AddLvalueReference(span);
@@ -423,7 +424,8 @@ FunctionSymbol* BoundCompileUnit::GetConversion(TypeSymbol* sourceType, TypeSymb
                         uint8_t conversionDistance = 0;
                         if (targetClassType->HasBaseClass(sourceClassType, conversionDistance))
                         {
-                            if (targetType->IsLvalueReferenceType() && !sourceType->IsReferenceType())
+                            //if (targetType->IsLvalueReferenceType() && !sourceType->IsReferenceType()) // bug???
+                            if (targetType->IsReferenceType() && !sourceType->IsReferenceType())
                             {
                                 argumentMatch.preReferenceConversionFlags = OperationFlags::addr;
                                 sourceType = sourceType->AddLvalueReference(span);

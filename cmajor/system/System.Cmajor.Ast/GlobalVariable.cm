@@ -1,0 +1,105 @@
+using System;
+using System.Collections;
+
+// this file has been semiautomatically generated from 'D:/work/soulng-project/sngcm/ast/GlobalVariable.hpp' using cpp2cm version 1.0.0
+
+// this file has been semiautomatically generated from 'D:/work/soulng-project/sngcm/ast/GlobalVariable.cpp' using cpp2cm version 1.0.0
+
+namespace System.Cmajor.Ast
+{
+    public class GlobalVariableNode : Node
+    {
+        public GlobalVariableNode(const System.Lex.Span& span_) :
+            base(NodeType.globalVariableNode, span_), specifiers(Specifiers.none), cu(null)
+        {
+        }
+        public GlobalVariableNode(const System.Lex.Span& span_, Specifiers specifiers_, Node* typeExpr_, IdentifierNode* id_, CompileUnitNode* cu_) :
+            base(NodeType.globalVariableNode, span_), specifiers(specifiers_), typeExpr(typeExpr_), id(id_), cu(cu_)
+        {
+            typeExpr->SetParent(this);
+            id->SetParent(this);
+        }
+        public const Node* TypeExpr() const
+        {
+            return typeExpr.Get();
+        }
+        public Node* TypeExpr()
+        {
+            return typeExpr.Get();
+        }
+        public const IdentifierNode* Id() const
+        {
+            return id.Get();
+        }
+        public IdentifierNode* Id()
+        {
+            return id.Get();
+        }
+        public Node* Initializer()
+        {
+            return initializer.Get();
+        }
+        public CompileUnitNode* CompileUnit() const
+        {
+            return cu;
+        }
+        public void SetInitializer(Node* initializer_)
+        {
+            initializer.Reset(initializer_);
+            if (!initializer.IsNull())
+            {
+                initializer->SetParent(this);
+            }
+        }
+        public override Specifiers GetSpecifiers() const
+        {
+            return specifiers;
+        }
+        public override Node* Clone(CloneContext& cloneContext) const
+        {
+            GlobalVariableNode* clone = new GlobalVariableNode(GetSpan(), specifiers, typeExpr->Clone(cloneContext), cast<IdentifierNode*>(id->Clone(cloneContext)), cu);
+            if (!initializer.IsNull())
+            {
+                clone->SetInitializer(initializer->Clone(cloneContext));
+            }
+            return clone;
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public override void Write(AstWriter& writer)
+        {
+            base->Write(writer);
+            writer.Write(specifiers);
+            writer.Write(typeExpr.Get());
+            writer.Write(id.Get());
+            bool hasInitializer = initializer != null;
+            writer.GetBinaryWriter().Write(hasInitializer);
+            if (hasInitializer)
+            {
+                writer.Write(initializer.Get());
+            }
+        }
+        public override void Read(AstReader& reader)
+        {
+            base->Read(reader);
+            specifiers = reader.ReadSpecifiers();
+            typeExpr.Reset(reader.ReadNode());
+            typeExpr->SetParent(this);
+            id.Reset(reader.ReadIdentifierNode());
+            id->SetParent(this);
+            bool hasInitializer = reader.GetBinaryReader().ReadBool();
+            if (hasInitializer)
+            {
+                initializer.Reset(reader.ReadNode());
+                initializer->SetParent(this);
+            }
+        }
+        private Specifiers specifiers;
+        private UniquePtr<Node> typeExpr;
+        private UniquePtr<IdentifierNode> id;
+        private UniquePtr<Node> initializer;
+        private CompileUnitNode* cu;
+    }
+} // namespace System.Cmajor.Ast

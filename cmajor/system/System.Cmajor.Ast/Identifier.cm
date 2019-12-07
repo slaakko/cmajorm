@@ -1,0 +1,101 @@
+using System;
+using System.Collections;
+
+// this file has been semiautomatically generated from 'D:/work/soulng-project/sngcm/ast/Identifier.hpp' using cpp2cm version 1.0.0
+
+// this file has been semiautomatically generated from 'D:/work/soulng-project/sngcm/ast/Identifier.cpp' using cpp2cm version 1.0.0
+
+namespace System.Cmajor.Ast
+{
+    public class IdentifierNode : Node
+    {
+        public IdentifierNode(const System.Lex.Span& span_) :
+            base(NodeType.identifierNode, span_), identifier()
+        {
+        }
+        public IdentifierNode(const System.Lex.Span& span_, NodeType nodeType_) :
+            base(nodeType_, span_), identifier()
+        {
+        }
+        public IdentifierNode(const System.Lex.Span& span_, const ustring& identifier_) :
+            base(NodeType.identifierNode, span_), identifier(identifier_)
+        {
+        }
+        public IdentifierNode(const System.Lex.Span& span_, NodeType nodeType_, const ustring& identifier_) :
+            base(nodeType_, span_), identifier(identifier_)
+        {
+            ustring result;
+            for (uchar c : identifier)
+            {
+                if (c != '`')
+                {
+                    result.Append(c, 1);
+                }
+            }
+            Swap(result, identifier);
+        }
+        public IdentifierNode(const System.Lex.Span& span_, const System.Lex.Token& token) :
+            base(NodeType.identifierNode, span_)
+        {
+            identifier = ustring(token.match.end, token.match.begin);
+        }
+        public const ustring& Str() const
+        {
+            return identifier;
+        }
+        public void SetStr(const ustring& str)
+        {
+            identifier = str;
+        }
+        public override Node* Clone(CloneContext& cloneContext) const
+        {
+            return new IdentifierNode(GetSpan(), identifier);
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public override void Write(AstWriter& writer)
+        {
+            base->Write(writer);
+            writer.GetBinaryWriter().Write(identifier);
+        }
+        public override void Read(AstReader& reader)
+        {
+            base->Read(reader);
+            identifier = reader.GetBinaryReader().ReadUString();
+        }
+        public override string ToString() const
+        {
+            return ToUtf8(identifier);
+        }
+        private ustring identifier;
+    }
+    public class CursorIdNode : IdentifierNode
+    {
+        public CursorIdNode(const System.Lex.Span& span_) :
+            base(span_, NodeType.cursorIdNode)
+        {
+        }
+        public CursorIdNode(const System.Lex.Span& span_, const ustring& identifier_) :
+            base(span_, NodeType.cursorIdNode, identifier_)
+        {
+        }
+        public override Node* Clone(CloneContext& cloneContext) const
+        {
+            return new CursorIdNode(GetSpan(), Str());
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public override void Write(AstWriter& writer)
+        {
+            base->Write(writer);
+        }
+        public override void Read(AstReader& reader)
+        {
+            base->Read(reader);
+        }
+    }
+} // namespace System.Cmajor.Ast

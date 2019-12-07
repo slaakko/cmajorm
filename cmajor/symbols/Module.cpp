@@ -57,6 +57,9 @@ SystemModuleSet::SystemModuleSet()
     systemModuleNames.insert(U"System.Core");
     systemModuleNames.insert(U"System.Runtime");
     systemModuleNames.insert(U"System.Base");
+    systemModuleNames.insert(U"System.Lex");
+    systemModuleNames.insert(U"System.Parsing");
+    systemModuleNames.insert(U"System.Cmajor.Ast");
     systemModuleNames.insert(U"System.Text.Parsing.CodeDom");
     systemModuleNames.insert(U"System.Text.Parsing");
     systemModuleNames.insert(U"System.Net.Sockets");
@@ -1211,8 +1214,37 @@ void SetRootModuleForCurrentThread(Module* rootModule_)
     rootModule = rootModule_;
 }
 
+class SYMBOLS_API SystemModuleVersionTagVerifier : public cmajor::ast::ModuleVersionTagVerifier
+{
+public:
+    void VerifyModuleVersionTag(const std::string& moduleFilePath) override;
+};
+
+void SystemModuleVersionTagVerifier::VerifyModuleVersionTag(const std::string& moduleFilePath)
+{
+    SymbolReader reader(moduleFilePath);
+    ModuleTag expectedTag;
+    ModuleTag tag;
+    tag.Read(reader);
+    for (int i = 0; i < 3; ++i)
+    {
+        if (tag.bytes[i] != expectedTag.bytes[i])
+        {
+            throw std::runtime_error("Invalid Cmajor module tag read from file '" + reader.GetBinaryReader().FileName() + "', please rebuild module from sources");
+        }
+    }
+    if (tag.bytes[3] != expectedTag.bytes[3])
+    {
+        throw std::runtime_error("Cmajor module format version mismatch reading from file '" + reader.GetBinaryReader().FileName() +
+            "': format " + std::string(1, expectedTag.bytes[3]) + " expected, format " + std::string(1, tag.bytes[3]) + " read, please rebuild module from sources");
+    }
+}
+
+SystemModuleVersionTagVerifier verifier;
+
 void InitModule()
 {
+    cmajor::ast::SetModuleVersionTagVerifier(&verifier);
     SystemModuleSet::Init();
 }
 

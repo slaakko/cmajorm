@@ -1,0 +1,22 @@
+﻿using System;
+using System.Json;
+
+namespace Trade
+{
+    [json="true"]
+    public abstract class Base
+    {
+        public abstract string& Save()
+        {
+            string str;
+            return str;
+        }
+
+        public ulong id;
+        public int version; // defines which version of the object is this instance (needed when loading from .json files)
+        public DateTime created;
+        public DateTime modified; 
+        public DateTime archived;
+
+    }
+}

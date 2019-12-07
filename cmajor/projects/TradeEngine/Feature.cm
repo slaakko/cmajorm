@@ -1,0 +1,54 @@
+﻿using System;
+using System.Json;
+using System.Concepts;
+using System.Collections;
+
+namespace Trade
+{
+    [json="true"]
+    public class Feature
+    {
+        private List<Feature> subFeature;
+        private ulong id;
+        private string name;
+        private string description;
+        
+        public bool Match(const List<string>& param, List<Object>& result)
+        {
+            // Fix this to check circular graphs
+            for (const string& x : param)
+            {
+                if (name.Find(x)!=-1) return true;
+                if (description.Find(x)!=-1) return true;
+
+                for (const Feature& f : this->subFeature)
+                {
+                    if(f.Match(param,result)) return true;
+                }                
+            }    
+            return false;        
+        }
+        public bool MatchOr(const List<string>& param, List<Object>& result)
+        {
+            return Match(param,result);
+        }
+        public bool MatchAnd(const List<string>& param, List<Object>& result)
+        {
+            // Fix this to check circular graphs
+            //TODO!
+            for (const string& x : param)
+            {
+                if (name.Find(x)!=-1) return true;
+                if (description.Find(x)!=-1) return true;
+
+                for (const Feature& f : this->subFeature)
+                {
+                    if(f.Match(param,result)) return true;
+                }                
+            }    
+            return false;        
+        }
+
+    }       
+}
+

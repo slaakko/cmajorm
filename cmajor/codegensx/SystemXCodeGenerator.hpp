@@ -108,6 +108,9 @@ public:
     void GenerateCodeForCleanups();
     bool InTryBlock() const override;
     int CurrentTryBlockId() const override;
+    int Install(const std::string& str) override;
+    int Install(const std::u16string& str) override;
+    int Install(const std::u32string& str) override;
 private:
     cmajor::ir::Emitter* emitter;
     cmajor::ir::EmittingContext* emittingContext;

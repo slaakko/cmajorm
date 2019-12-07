@@ -159,8 +159,7 @@ void BoundSwitchStatement::Accept(BoundNodeVisitor& visitor)
     visitor.Visit(*this);
 }
 
-BoundCaseStatement::BoundCaseStatement(Module* module_, const Span& span_) : 
-    BoundStatement(module_, span_, BoundNodeType::boundCaseStatement), compoundStatement(module_, span_)
+BoundCaseStatement::BoundCaseStatement(Module* module_, const Span& span_) : BoundStatement(module_, span_, BoundNodeType::boundCaseStatement)
 {
 }
 
@@ -171,7 +170,21 @@ void BoundCaseStatement::AddCaseValue(std::unique_ptr<Value>&& caseValue)
 
 void BoundCaseStatement::AddStatement(std::unique_ptr<BoundStatement>&& statement)
 {
-    compoundStatement.AddStatement(std::move(statement));
+    if (compoundStatement)
+    {
+        compoundStatement->AddStatement(std::move(statement));
+    }
+    else if (statement->GetBoundNodeType() == BoundNodeType::boundCompoundStatement)
+    {
+        compoundStatement.reset(static_cast<BoundCompoundStatement*>(statement.release()));
+        compoundStatement->SetParent(this);
+    }
+    else
+    {
+        compoundStatement.reset(new BoundCompoundStatement(GetModule(), GetSpan()));
+        compoundStatement->SetParent(this);
+        compoundStatement->AddStatement(std::move(statement));
+    }
 }
 
 void BoundCaseStatement::Accept(BoundNodeVisitor& visitor)
@@ -180,13 +193,27 @@ void BoundCaseStatement::Accept(BoundNodeVisitor& visitor)
 }
 
 BoundDefaultStatement::BoundDefaultStatement(Module* module_, const Span& span_) : 
-    BoundStatement(module_, span_, BoundNodeType::boundDefaultStatement), compoundStatement(module_, span_)
+    BoundStatement(module_, span_, BoundNodeType::boundDefaultStatement)
 {
 }
 
 void BoundDefaultStatement::AddStatement(std::unique_ptr<BoundStatement>&& statement)
 {
-    compoundStatement.AddStatement(std::move(statement));
+    if (compoundStatement)
+    {
+        compoundStatement->AddStatement(std::move(statement));
+    }
+    else if (statement->GetBoundNodeType() == BoundNodeType::boundCompoundStatement)
+    {
+        compoundStatement.reset(static_cast<BoundCompoundStatement*>(statement.release()));
+        compoundStatement->SetParent(this);
+    }
+    else
+    {
+        compoundStatement.reset(new BoundCompoundStatement(GetModule(), GetSpan()));
+        compoundStatement->SetParent(this);
+        compoundStatement->AddStatement(std::move(statement));
+    }
 }
 
 void BoundDefaultStatement::Accept(BoundNodeVisitor& visitor)

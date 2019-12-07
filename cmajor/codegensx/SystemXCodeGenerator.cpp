@@ -144,10 +144,6 @@ void SystemXCodeGenerator::Visit(BoundFunction& boundFunction)
     if (!boundFunction.Body()) return;
     currentFunction = &boundFunction;
     FunctionSymbol* functionSymbol = boundFunction.GetFunctionSymbol();
-    if (functionSymbol->MangledName() == U"member_function_op_index_Map_String_uchar_int_Less_String_uchar_64DC84AFB6F4D4B426E8C5586707122612E3419C")
-    {
-        int x = 0;
-    }
     void* functionType = functionSymbol->IrType(*emitter);
     destructorCallGenerated = false;
     lastInstructionWasRet = false;
@@ -798,7 +794,10 @@ void SystemXCodeGenerator::Visit(BoundCaseStatement& boundCaseStatement)
         {
             void* caseDest = it->second;
             emitter->SetCurrentBasicBlock(caseDest);
-            boundCaseStatement.CompoundStatement()->Accept(*this);
+            if (boundCaseStatement.CompoundStatement())
+            {
+                boundCaseStatement.CompoundStatement()->Accept(*this);
+            }
         }
         else
         {
@@ -825,7 +824,10 @@ void SystemXCodeGenerator::Visit(BoundDefaultStatement& boundDefaultStatement)
     if (defaultDest)
     {
         emitter->SetCurrentBasicBlock(defaultDest);
-        boundDefaultStatement.CompoundStatement()->Accept(*this);
+        if (boundDefaultStatement.CompoundStatement())
+        {
+            boundDefaultStatement.CompoundStatement()->Accept(*this);
+        }
     }
     else
     {
@@ -1419,6 +1421,21 @@ bool SystemXCodeGenerator::InTryBlock() const
 int SystemXCodeGenerator::CurrentTryBlockId() const
 {
     return currentTryBlockId;
+}
+
+int SystemXCodeGenerator::Install(const std::string& str)
+{
+    return compileUnit->Install(str);
+}
+
+int SystemXCodeGenerator::Install(const std::u16string& str)
+{
+    return compileUnit->Install(str);
+}
+
+int SystemXCodeGenerator::Install(const std::u32string& str)
+{
+    return compileUnit->Install(str);
 }
 
 void SystemXCodeGenerator::CreateCleanup()

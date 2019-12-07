@@ -32,7 +32,7 @@ NamespaceTypeSymbol::NamespaceTypeSymbol(NamespaceSymbol* ns_) : TypeSymbol(Symb
 class TypeResolver : public Visitor
 {
 public:
-    TypeResolver(BoundCompileUnit& boundCompileUnit_, ContainerScope* containerScope_, TypeResolverFlags flags_);
+    TypeResolver(BoundCompileUnit& boundCompileUnit_, ContainerScope* containerScope_, TypeResolverFlags flags_, ClassTypeSymbol* currentClass_);
     TypeSymbol* GetType() { return type; }
     const TypeDerivationRec& DerivationRec() const { return derivationRec; }
     void Visit(BoolNode& boolNode) override;
@@ -68,12 +68,14 @@ private:
     TypeDerivationRec derivationRec;
     std::unique_ptr<NamespaceTypeSymbol> nsTypeSymbol;
     TypeResolverFlags flags;
+    ClassTypeSymbol* currentClass;
     void ResolveSymbol(Node& node, IdentifierNode* idNode, Symbol* symbol);
 };
 
-TypeResolver::TypeResolver(BoundCompileUnit& boundCompileUnit_, ContainerScope* containerScope_, TypeResolverFlags flags_) :
-    boundCompileUnit(boundCompileUnit_), symbolTable(boundCompileUnit.GetSymbolTable()), module(&boundCompileUnit.GetModule()), classTemplateRepository(boundCompileUnit.GetClassTemplateRepository()), containerScope(containerScope_),
-    type(nullptr), derivationRec(), nsTypeSymbol(), flags(flags_)
+TypeResolver::TypeResolver(BoundCompileUnit& boundCompileUnit_, ContainerScope* containerScope_, TypeResolverFlags flags_, ClassTypeSymbol* currentClass_) :
+    boundCompileUnit(boundCompileUnit_), symbolTable(boundCompileUnit.GetSymbolTable()), module(&boundCompileUnit.GetModule()),
+    classTemplateRepository(boundCompileUnit.GetClassTemplateRepository()), containerScope(containerScope_),
+    type(nullptr), derivationRec(), nsTypeSymbol(), flags(flags_), currentClass(currentClass_)
 {
 }
 
@@ -190,7 +192,7 @@ void TypeResolver::Visit(PointerNode& pointerNode)
 
 void TypeResolver::Visit(ArrayNode& arrayNode)
 {
-    type = ResolveType(arrayNode.Subject(), boundCompileUnit, containerScope);
+    type = ResolveType(arrayNode.Subject(), boundCompileUnit, containerScope, currentClass);
     if (type->IsReferenceType())
     {
         throw Exception(module, "cannot have array of reference type", arrayNode.GetSpan());
@@ -303,7 +305,7 @@ void TypeResolver::Visit(TemplateIdNode& templateIdNode)
 {
     IdentifierNode* prevId = symbolTable.GetLatestIdentifier();
     int arity = templateIdNode.TemplateArguments().Count();
-    TypeSymbol* primaryTemplateType = ResolveType(templateIdNode.Primary(), boundCompileUnit, containerScope, TypeResolverFlags::resolveClassGroup);
+    TypeSymbol* primaryTemplateType = ResolveType(templateIdNode.Primary(), boundCompileUnit, containerScope, TypeResolverFlags::resolveClassGroup, currentClass);
     if (primaryTemplateType->GetSymbolType() == SymbolType::classGroupTypeSymbol)
     {
         ClassGroupTypeSymbol* classGroup = static_cast<ClassGroupTypeSymbol*>(primaryTemplateType);
@@ -337,7 +339,7 @@ void TypeResolver::Visit(TemplateIdNode& templateIdNode)
     for (int i = 0; i < n; ++i)
     {
         IdentifierNode* prevId = symbolTable.GetLatestIdentifier();
-        TypeSymbol* templateArgumentType = ResolveType(templateIdNode.TemplateArguments()[i], boundCompileUnit, containerScope);
+        TypeSymbol* templateArgumentType = ResolveType(templateIdNode.TemplateArguments()[i], boundCompileUnit, containerScope, currentClass);
         templateArgumentTypes.push_back(templateArgumentType);
         IdentifierNode* idNode = symbolTable.GetLatestIdentifier();
         if (idNode && GetGlobalFlag(GlobalFlags::cmdoc))
@@ -366,7 +368,14 @@ void TypeResolver::Visit(DotNode& dotNode)
     if (type->GetSymbolType() == SymbolType::classGroupTypeSymbol)
     {
         ClassGroupTypeSymbol* classGroup = static_cast<ClassGroupTypeSymbol*>(type);
-        type = classGroup->GetClass(0);
+        if (currentClass && classGroup->Name() == currentClass->Name())
+        {
+            type = currentClass;
+        }
+        else
+        {
+            type = classGroup->GetClass(0);
+        }
         if (!type)
         {
             throw Exception(module, "symbol '" + ToUtf8(type->FullName()) + "' does not denote a class type, an array type or a namespace", dotNode.GetSpan(), type->GetSpan());
@@ -413,14 +422,24 @@ void TypeResolver::Visit(DotNode& dotNode)
 
 TypeSymbol* ResolveType(Node* typeExprNode, BoundCompileUnit& boundCompileUnit, ContainerScope* containerScope)
 {
-    return ResolveType(typeExprNode, boundCompileUnit, containerScope, TypeResolverFlags::none);
+    return ResolveType(typeExprNode, boundCompileUnit, containerScope, TypeResolverFlags::none, nullptr);
+}
+
+TypeSymbol* ResolveType(Node* typeExprNode, BoundCompileUnit& boundCompileUnit, ContainerScope* containerScope, ClassTypeSymbol* currentClass)
+{
+    return ResolveType(typeExprNode, boundCompileUnit, containerScope, TypeResolverFlags::none, currentClass);
 }
 
 TypeSymbol* ResolveType(Node* typeExprNode, BoundCompileUnit& boundCompileUnit, ContainerScope* containerScope, TypeResolverFlags flags)
 {
+    return ResolveType(typeExprNode, boundCompileUnit, containerScope, flags, nullptr);
+}
+
+TypeSymbol* ResolveType(Node* typeExprNode, BoundCompileUnit& boundCompileUnit, ContainerScope* containerScope, TypeResolverFlags flags, ClassTypeSymbol* currentClass)
+{
     Module* module = &boundCompileUnit.GetModule();
     bool resolveClassGroup = (flags & TypeResolverFlags::resolveClassGroup) != TypeResolverFlags::none;
-    TypeResolver typeResolver(boundCompileUnit, containerScope, flags);
+    TypeResolver typeResolver(boundCompileUnit, containerScope, flags, currentClass);
     typeExprNode->Accept(typeResolver);
     TypeSymbol* type = typeResolver.GetType();
     if (resolveClassGroup && type && type->GetSymbolType() == SymbolType::classGroupTypeSymbol)
@@ -430,7 +449,14 @@ TypeSymbol* ResolveType(Node* typeExprNode, BoundCompileUnit& boundCompileUnit, 
     if (type && type->GetSymbolType() == SymbolType::classGroupTypeSymbol)
     {
         ClassGroupTypeSymbol* classGroup = static_cast<ClassGroupTypeSymbol*>(type);
-        type = classGroup->GetClass(0);
+        if (currentClass && classGroup->Name() == currentClass->GroupName())
+        {
+            type = currentClass;
+        }
+        else
+        {
+            type = classGroup->GetClass(0);
+        }
     }
     if (!type || type->IsInComplete())
     {

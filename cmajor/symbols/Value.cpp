@@ -3643,23 +3643,27 @@ TypeSymbol* UCharValue::GetType(SymbolTable* symbolTable)
     return symbolTable->GetTypeByName(U"uchar");
 }
 
-StringValue::StringValue(const Span& span_, int stringId_) : Value(span_, ValueType::stringValue), stringId(stringId_)
+StringValue::StringValue(const Span& span_, int stringId_, const std::string& str_) : Value(span_, ValueType::stringValue), stringId(stringId_), str(str_)
 {
 }
 
 void* StringValue::IrValue(Emitter& emitter)
 {
+    if (stringId == -1)
+    {
+        stringId = emitter.Install(str);
+    }
     return emitter.GetGlobalStringPtr(stringId);
 }
 
 void StringValue::Write(BinaryWriter& writer)
 {
-    Assert(false, "write for string value not supported");
+    writer.Write(str);
 }
 
 void StringValue::Read(BinaryReader& reader)
 {
-    Assert(false, "read for string value not supported");
+    str = reader.ReadUtf8String();
 }
 
 Value* StringValue::As(TypeSymbol* targetType, bool cast, const Span& span, bool dontThrow) const
@@ -3668,7 +3672,7 @@ Value* StringValue::As(TypeSymbol* targetType, bool cast, const Span& span, bool
     {
         case ValueType::stringValue:
         {
-            return new StringValue(span, stringId);
+            return new StringValue(span, stringId, str);
         }
         default:
         {
@@ -3689,24 +3693,26 @@ TypeSymbol* StringValue::GetType(SymbolTable* symbolTable)
     return symbolTable->GetTypeByName(U"char")->AddConst(GetSpan())->AddPointer(GetSpan());
 }
 
-WStringValue::WStringValue(const Span& span_, int stringId_) : Value(span_, ValueType::wstringValue), stringId(stringId_)
+WStringValue::WStringValue(const Span& span_, int stringId_, const std::u16string& str_) : Value(span_, ValueType::wstringValue), stringId(stringId_), str(str_)
 {
 }
 
 void* WStringValue::IrValue(Emitter& emitter)
 { 
+    if (stringId == -1)
+    {
+        stringId = emitter.Install(str);
+    }
     void* wstringConstant = emitter.GetGlobalWStringConstant(stringId);
     return emitter.CreateIrValueForWString(wstringConstant);
 }
 
 void WStringValue::Write(BinaryWriter& writer)
 {
-    Assert(false, "write for wstring value not supported");
 }
 
 void WStringValue::Read(BinaryReader& reader)
 {
-    Assert(false, "read for wstring value not supported");
 }
 
 Value* WStringValue::As(TypeSymbol* targetType, bool cast, const Span& span, bool dontThrow) const
@@ -3715,7 +3721,7 @@ Value* WStringValue::As(TypeSymbol* targetType, bool cast, const Span& span, boo
     {
         case ValueType::wstringValue:
         {
-            return new WStringValue(span, stringId);
+            return new WStringValue(span, stringId, str);
         }
         default:
         {
@@ -3736,24 +3742,26 @@ TypeSymbol* WStringValue::GetType(SymbolTable* symbolTable)
     return symbolTable->GetTypeByName(U"wchar")->AddConst(GetSpan())->AddPointer(GetSpan());
 }
 
-UStringValue::UStringValue(const Span& span_, int stringId_) : Value(span_, ValueType::ustringValue), stringId(stringId_)
+UStringValue::UStringValue(const Span& span_, int stringId_, const std::u32string& str_) : Value(span_, ValueType::ustringValue), stringId(stringId_), str(str_)
 {
 }
 
 void* UStringValue::IrValue(Emitter& emitter)
 {
+    if (stringId == -1)
+    {
+        stringId = emitter.Install(str);
+    }
     void* ustringConstant = emitter.GetGlobalUStringConstant(stringId);
     return emitter.CreateIrValueForUString(ustringConstant);
 }
 
 void UStringValue::Write(BinaryWriter& writer)
 {
-    Assert(false, "write for ustring value not supported");
 }
 
 void UStringValue::Read(BinaryReader& reader)
 {
-    Assert(false, "read for ustring value not supported");
 }
 
 Value* UStringValue::As(TypeSymbol* targetType, bool cast, const Span& span, bool dontThrow) const
@@ -3762,7 +3770,7 @@ Value* UStringValue::As(TypeSymbol* targetType, bool cast, const Span& span, boo
     {
         case ValueType::ustringValue:
         {
-            return new UStringValue(span, stringId);
+            return new UStringValue(span, stringId, str);
         }
         default:
         {
@@ -4272,6 +4280,9 @@ std::unique_ptr<Value> ReadValue(BinaryReader& reader, const Span& span)
         case ValueType::wcharValue: value.reset(new WCharValue(Span(), '\0')); break;
         case ValueType::ucharValue: value.reset(new UCharValue(Span(), '\0')); break;
         case ValueType::pointerValue: value.reset(new PointerValue(Span(), nullptr, nullptr)); break;
+        case ValueType::stringValue: value.reset(new StringValue(Span(), -1, ""));
+        case ValueType::wstringValue: value.reset(new WStringValue(Span(), -1, u""));
+        case ValueType::ustringValue: value.reset(new UStringValue(Span(), -1, U""));
     }
     if (value)
     {

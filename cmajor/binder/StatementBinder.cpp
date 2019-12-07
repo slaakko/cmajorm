@@ -1244,6 +1244,13 @@ void StatementBinder::Visit(AssignmentStatementNode& assignmentStatementNode)
         TypeSymbol* type = target->GetType()->RemoveReference(assignmentStatementNode.GetSpan())->AddPointer(assignmentStatementNode.GetSpan());
         target.reset(new BoundReferenceToPointerExpression(module, std::unique_ptr<BoundExpression>(target.release()), type));
     }
+    else if (targetPlainType->IsPointerType() && target->GetType()->IsReferenceType())
+    {
+        TypeSymbol* derefType = target->GetType()->RemoveReference(assignmentStatementNode.GetSpan());
+        TypeSymbol* addrOfType = derefType->AddPointer(assignmentStatementNode.GetSpan());
+        target.reset(new BoundAddressOfExpression(module, std::unique_ptr<BoundExpression>(
+            new BoundDereferenceExpression(module, std::unique_ptr<BoundExpression>(target.release()), derefType)), addrOfType));
+    }
     else
     {
         target.reset(new BoundAddressOfExpression(module, std::move(target), target->GetType()->AddPointer(assignmentStatementNode.GetSpan())));
@@ -1795,11 +1802,11 @@ void StatementBinder::Visit(AssertStatementNode& assertStatementNode)
             std::vector<std::unique_ptr<BoundExpression>> arguments;
             TypeSymbol* constCharPtrType = symbolTable.GetTypeByName(U"char")->AddConst(assertStatementNode.GetSpan())->AddPointer(assertStatementNode.GetSpan());
             arguments.push_back(std::unique_ptr<BoundExpression>(new BoundLiteral(module, std::unique_ptr<Value>(new StringValue(assertStatementNode.GetSpan(),
-                boundCompileUnit.Install(assertStatementNode.AssertExpr()->ToString()))), constCharPtrType)));
+                boundCompileUnit.Install(assertStatementNode.AssertExpr()->ToString()), assertStatementNode.AssertExpr()->ToString())), constCharPtrType)));
             arguments.push_back(std::unique_ptr<BoundExpression>(new BoundLiteral(module, std::unique_ptr<Value>(new StringValue(assertStatementNode.GetSpan(),
-                boundCompileUnit.Install(ToUtf8(currentFunction->GetFunctionSymbol()->FullName())))), constCharPtrType)));
+                boundCompileUnit.Install(ToUtf8(currentFunction->GetFunctionSymbol()->FullName())), ToUtf8(currentFunction->GetFunctionSymbol()->FullName()))), constCharPtrType)));
             arguments.push_back(std::unique_ptr<BoundExpression>(new BoundLiteral(module, std::unique_ptr<Value>(new StringValue(assertStatementNode.GetSpan(),
-                boundCompileUnit.Install(module->GetFilePath(assertStatementNode.GetSpan().FileIndex())))), constCharPtrType)));
+                boundCompileUnit.Install(module->GetFilePath(assertStatementNode.GetSpan().FileIndex())), module->GetFilePath(assertStatementNode.GetSpan().FileIndex()))), constCharPtrType)));
             arguments.push_back(std::unique_ptr<BoundExpression>(new BoundLiteral(module, std::unique_ptr<Value>(new IntValue(assertStatementNode.GetSpan(),
                 assertStatementNode.GetSpan().LineNumber())), symbolTable.GetTypeByName(U"int"))));
             std::unique_ptr<BoundExpression> assertExpression = BindExpression(assertStatementNode.AssertExpr(), boundCompileUnit, currentFunction, containerScope, this);

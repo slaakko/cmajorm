@@ -1,0 +1,86 @@
+﻿using System;
+using System.Json;
+using System.Concepts;
+using System.Collections;
+
+namespace Trade
+{
+    [json="true"]
+    public class Object : Base
+    {
+
+        public ~Object()
+        {
+            try
+            {
+                next.Clear();
+                try
+                {
+                    features.Clear(); 
+                }
+                catch(Exception& ex)
+                {
+                }
+            }
+            catch(Exception& ex)
+            {
+            }
+        }        
+
+        public override string& Save()
+        {
+            string str;
+            return str;
+        }
+        
+        public List<Object> next;
+        public string name;
+        public string description;
+        public List<Feature> features;        
+        
+        public bool Match(const List<string>& param, List<Object>& result)
+        {
+            // Fix this to check circular graphs
+            for (const string& x : param)
+            {
+                if (name.Find(x)!=-1)
+                {    
+                    result.Add(*this);
+                    return true;
+                }            
+                if (description.Find(x)!=-1)
+                {    
+                    result.Add(*this);
+                    return true;
+                }
+                for (const Object& o : this->next)
+                {
+                    if(o.Match(param,result))
+                    {
+                        result.Add(*this);
+                        return true;   
+                    }                     
+                }
+                for (const Feature& f : this->features)
+                {
+                    if(f.Match(param,result))
+                    {
+                        result.Add(*this);
+                        return true;   
+                    }                     
+                }
+                
+            }  
+                
+            return false;
+        }        
+        public bool MatchOr(const List<string>& param, List<Object>& result)
+        {
+            return Match(param,result);
+        }
+        public bool MatchAnd(const List<string>& param, List<Object>& result)
+        {
+            return true;
+        }
+    }
+}

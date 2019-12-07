@@ -1,0 +1,50 @@
+﻿using System;
+using System.Json;
+using System.Concepts;
+
+namespace Trade
+{
+    public enum TransactionState
+    {
+        initial,
+        pending,
+        rejected, //final
+        complete //final
+    }
+    
+    [json="true"]
+    public class Transaction : Base
+    {
+        public override string& Save()
+        {
+
+            UniquePtr<JsonValue> baseJsonValue = ToJson(base);
+            string transactionJsonStr = baseJsonValue->ToString();
+
+            UniquePtr<JsonValue> notesJsonValue = ToJson(notes);
+            transactionJsonStr.Append(notesJsonValue->ToString());
+            
+            UniquePtr<JsonValue> buyerJsonValue = ToJson(buyer);
+            transactionJsonStr.Append(buyerJsonValue->ToString());
+            
+            UniquePtr<JsonValue> sellerJsonValue = ToJson(seller);
+            transactionJsonStr.Append(sellerJsonValue->ToString());
+
+            UniquePtr<JsonValue> objectJsonValue = ToJson(object);
+            transactionJsonStr.Append(objectJsonValue->ToString());
+
+            UniquePtr<JsonValue> stateJsonValue = ToJson(state);
+            transactionJsonStr.Append(stateJsonValue->ToString());
+            
+            return transactionJsonStr;
+            //Console.WriteLine(transactionJsonStr);
+
+        }
+        public string notes;
+        public Buyer buyer;
+        public Seller seller;
+        public Object object;
+        public TransactionState state;        
+    }       
+}
+
