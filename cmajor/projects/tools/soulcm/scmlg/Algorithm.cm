@@ -1,0 +1,94 @@
+using System;
+using System.Collections;
+
+// this file has been semiautomatically generated from 'D:/work/soulngcm/soulngcm/sngcmlg/Algorithm.hpp' using cpp2cm version 1.0.0
+
+// this file has been semiautomatically generated from 'D:/work/soulngcm/soulngcm/sngcmlg/Algorithm.cpp' using cpp2cm version 1.0.0
+
+namespace soulcm.scmlg
+{
+    public List<NfaState*> EpsilonClosure(const List<NfaState*>& states)
+    {
+        List<NfaState*> stack;
+        for (NfaState* state : states)
+        {
+            stack.Add(state);
+        }
+        List<NfaState*> epsilonClosure = states;
+        while (!stack.IsEmpty())
+        {
+            NfaState* s = stack.Back();
+            stack.RemoveLast();
+            List<NfaState*> u = s->Next(eps);
+            for (NfaState* v : u)
+            {
+                if (Find(epsilonClosure.CBegin(), epsilonClosure.CEnd(), v) == epsilonClosure.CEnd())
+                {
+                    epsilonClosure.Add(v);
+                    stack.Add(v);
+                }
+            }
+        }
+        return epsilonClosure;
+    }
+    public List<NfaState*> EpsilonClosure(NfaState* state)
+    {
+        List<NfaState*> states(1, state);
+        return EpsilonClosure(states);
+    }
+    public List<NfaState*> Move(const List<NfaState*>& states, uchar c)
+    {
+        List<NfaState*> next;
+        for (NfaState* state : states)
+        {
+            List<NfaState*> n = state->Next(c);
+            for (NfaState* s : n)
+            {
+                if (Find(next.CBegin(), next.CEnd(), s) == next.CEnd())
+                {
+                    next.Add(s);
+                }
+            }
+        }
+        return next;
+    }
+    public Dfa Compile(LexerContext& lexerContext, Nfa& nfa)
+    {
+        Dfa dfa;
+        List<NfaState*> start = EpsilonClosure(nfa.Start());
+        DfaState* s = lexerContext.MakeDfaState(start);
+        s->Mark();
+        List<DfaState*> stack;
+        stack.Add(s);
+        while (!stack.IsEmpty())
+        {
+            DfaState* state = stack.Back();
+            stack.RemoveLast();
+            dfa.AddState(state);
+            for (Class* cls : lexerContext.Partition())
+            {
+                if (!cls->Chars().IsEmpty())
+                {
+                    uchar c = cls->Chars().Front();
+                    List<NfaState*> next = EpsilonClosure(Move(state->NfaStates(), c));
+                    if (next.IsEmpty())
+                    {
+                        state->AddNext(null);
+                    }
+                    else
+                    {
+                        DfaState* n = lexerContext.MakeDfaState(next);
+                        state->AddNext(n);
+                        if (!n->IsMarked())
+                        {
+                            n->Mark();
+                            stack.Add(n);
+                        }
+                    }
+                }
+            }
+        }
+        dfa.Finalize();
+        return dfa;
+    }
+} // namespace soulcm.scmlg

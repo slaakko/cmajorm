@@ -1,0 +1,867 @@
+using System;
+using System.Collections;
+using System.IO;
+using System.Text;
+using System.Cmajor.Ast;
+
+// this file has been semiautomatically generated from 'D:/work/soulngcm/soulngcm/sngcmlg/Model.hpp' using cpp2cm version 1.0.0
+
+// this file has been semiautomatically generated from 'D:/work/soulngcm/soulngcm/sngcmlg/Model.cpp' using cpp2cm version 1.0.0
+
+namespace soulcm.scmlg
+{
+    public abstract class Parser
+    {
+        public virtual ~Parser()
+        {
+        }
+        public abstract Nfa Parse(const ustring& expression, LexerContext* lexerContext, int line);
+    }
+    public abstract class Declaration
+    {
+        public Declaration(const ustring& name_) :
+            name(name_)
+        {
+        }
+        public virtual ~Declaration()
+        {
+        }
+        public const ustring& Name() const
+        {
+            return name;
+        }
+        public abstract void FillContext(LexerContext& lexerContext);
+        public abstract void Process(const string& root, bool verbose, LexerContext& lexerContext);
+        private ustring name;
+    }
+    public class ClassMap : Declaration
+    {
+        public ClassMap(const ustring& name_) :
+            base(name_)
+        {
+        }
+        public override void FillContext(LexerContext& lexerContext)
+        {
+            lexerContext.SetClassMap(this);
+        }
+        public override void Process(const string& root, bool verbose, LexerContext& lexerContext)
+        {
+        }
+    }
+    public class Usings : Declaration
+    {
+        public Usings() :
+            base(u"usings")
+        {
+        }
+        public const List<UniquePtr<System.Cmajor.Ast.Node>>& UsingNodes() const
+        {
+            return usingNodes;
+        }
+        public void AddMember(System.Cmajor.Ast.Node* usingNode)
+        {
+            usingNodes.Add(UniquePtr<System.Cmajor.Ast.Node>(usingNode));
+        }
+        public override void FillContext(LexerContext& lexerContext)
+        {
+            for (const UniquePtr<System.Cmajor.Ast.Node>& usingNode : usingNodes)
+            {
+                lexerContext.AddUsingNode(usingNode.Get());
+            }
+        }
+        public override void Process(const string& root, bool verbose, LexerContext& lexerContext)
+        {
+        }
+        private List<UniquePtr<System.Cmajor.Ast.Node>> usingNodes;
+    }
+    public class Token
+    {
+        public Token() :
+            name(), info()
+        {
+        }
+        public Token(const ustring& name_, const string& info_) :
+            name(name_), info(info_)
+        {
+        }
+        public ustring name;
+        public string info;
+    }
+    public class Tokens : Declaration
+    {
+        public Tokens(const ustring& name_) :
+            base(name_)
+        {
+        }
+        public void Add(const Token& token)
+        {
+            tokens.Add(token);
+        }
+        public override void FillContext(LexerContext& lexerContext)
+        {
+            lexerContext.SetTokens(this);
+        }
+        public override void Process(const string& root, bool verbose, LexerContext& lexerContext)
+        {
+            string tokenFileName = ToUtf8(Name()) + ".cm";
+            string tokenFilePath = GetFullPath(Path.Combine(root, tokenFileName));
+            System.Cmajor.Ast.CompileUnitNode compileUnit(System.Lex.Span(), tokenFilePath);
+            compileUnit.GlobalNs()->AddMember(new System.Cmajor.Ast.NamespaceImportNode(System.Lex.Span(), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"System")));
+            compileUnit.GlobalNs()->AddMember(new System.Cmajor.Ast.CommentNode(System.Lex.Span(), u"this file has been automatically generated from \'" + ToUtf32(lexerContext.FileName()) + u"\' using soulcm lexer generator scmlg version " + ToUtf32(LexerGeneratorVersionStr())));
+            UniquePtr<System.Cmajor.Ast.NamespaceNode> ns(new System.Cmajor.Ast.NamespaceNode(System.Lex.Span(), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), Name())));
+            UniquePtr<System.Cmajor.Ast.ConstantNode> end(new System.Cmajor.Ast.ConstantNode(System.Lex.Span(), Specifiers.public_, new System.Cmajor.Ast.IntNode(System.Lex.Span()), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"END"), new System.Cmajor.Ast.IntLiteralNode(System.Lex.Span(), 0)));
+            ns->AddMember(end.Release());
+            Map<ustring, int> tokenIdMap;
+            int i = 1;
+            for (const Token& t : tokens)
+            {
+                tokenIdMap[t.name] = i;
+                UniquePtr<System.Cmajor.Ast.ConstantNode> token(new System.Cmajor.Ast.ConstantNode(System.Lex.Span(), Specifiers.public_, new System.Cmajor.Ast.IntNode(System.Lex.Span()), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), t.name), new System.Cmajor.Ast.IntLiteralNode(System.Lex.Span(), i++)));
+                ns->AddMember(token.Release());
+            }
+            UniquePtr<System.Cmajor.Ast.ClassNode> tokenMapClass(new System.Cmajor.Ast.ClassNode(System.Lex.Span(), Specifiers.internal_, new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"TokenMap"), null));
+            UniquePtr<System.Cmajor.Ast.StaticConstructorNode> staticConstructor(new System.Cmajor.Ast.StaticConstructorNode(System.Lex.Span(), Specifiers.static_, null));
+            staticConstructor->SetClassId(new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"TokenMap"));
+            staticConstructor->SetBody(new System.Cmajor.Ast.CompoundStatementNode(System.Lex.Span()));
+            UniquePtr<System.Cmajor.Ast.MemberInitializerNode> init(new System.Cmajor.Ast.MemberInitializerNode(System.Lex.Span(), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"instance")));
+            System.Cmajor.Ast.TemplateIdNode instanceType(System.Lex.Span(), new System.Cmajor.Ast.DotNode(System.Lex.Span(), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"System"), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"UniquePtr")));
+            instanceType.AddTemplateArgument(new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"TokenMap"));
+            System.Cmajor.Ast.CloneContext cloneContext;
+            System.Cmajor.Ast.NewNode* newNode = new System.Cmajor.Ast.NewNode(System.Lex.Span(), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"TokenMap"));
+            init->AddArgument(newNode);
+            staticConstructor->AddInitializer(init.Release());
+            tokenMapClass->AddMember(staticConstructor.Release());
+            UniquePtr<System.Cmajor.Ast.MemberFunctionNode> instanceMemFun(new System.Cmajor.Ast.MemberFunctionNode(System.Lex.Span(), Specifiers.public_ | Specifiers.static_, new System.Cmajor.Ast.LValueRefNode(System.Lex.Span(), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"TokenMap")), u"Instance", null));
+            UniquePtr<System.Cmajor.Ast.CompoundStatementNode> instanceBody(new System.Cmajor.Ast.CompoundStatementNode(System.Lex.Span()));
+            instanceBody->AddStatement(new System.Cmajor.Ast.ReturnStatementNode(System.Lex.Span(), new System.Cmajor.Ast.DerefNode(System.Lex.Span(), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"instance"))));
+            instanceMemFun->SetBody(instanceBody.Release());
+            tokenMapClass->AddMember(instanceMemFun.Release());
+            UniquePtr<System.Cmajor.Ast.TemplateIdNode> mapType(new System.Cmajor.Ast.TemplateIdNode(System.Lex.Span(), new System.Cmajor.Ast.DotNode(System.Lex.Span(), new System.Cmajor.Ast.DotNode(System.Lex.Span(), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"System"), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"Collections")), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"Map"))));
+            mapType->AddTemplateArgument(new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"ustring"));
+            mapType->AddTemplateArgument(new System.Cmajor.Ast.IntNode(System.Lex.Span()));
+            UniquePtr<System.Cmajor.Ast.TemplateIdNode> listType(new System.Cmajor.Ast.TemplateIdNode(System.Lex.Span(), new System.Cmajor.Ast.DotNode(System.Lex.Span(), new System.Cmajor.Ast.DotNode(System.Lex.Span(), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"System"), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"Collections")), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"List"))));
+            listType->AddTemplateArgument(new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"ustring"));
+            UniquePtr<System.Cmajor.Ast.MemberFunctionNode> getTokenIdMemFun(new System.Cmajor.Ast.MemberFunctionNode(System.Lex.Span(), Specifiers.public_, new System.Cmajor.Ast.IntNode(System.Lex.Span()), u"GetTokenId", null));
+            getTokenIdMemFun->AddParameter(new System.Cmajor.Ast.ParameterNode(System.Lex.Span(), new System.Cmajor.Ast.ConstNode(System.Lex.Span(), new System.Cmajor.Ast.LValueRefNode(System.Lex.Span(), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"ustring"))), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"tokenName")));
+            UniquePtr<System.Cmajor.Ast.CompoundStatementNode> getTokenIdBody(new System.Cmajor.Ast.CompoundStatementNode(System.Lex.Span()));
+            UniquePtr<System.Cmajor.Ast.DotNode> iteratorType(new System.Cmajor.Ast.DotNode(System.Lex.Span(), mapType->Clone(cloneContext), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"ConstIterator")));
+            UniquePtr<System.Cmajor.Ast.ConstructionStatementNode> constructIt(new System.Cmajor.Ast.ConstructionStatementNode(System.Lex.Span(), iteratorType.Release(), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"it")));
+            UniquePtr<System.Cmajor.Ast.InvokeNode> invokeCFind(new System.Cmajor.Ast.InvokeNode(System.Lex.Span(), new System.Cmajor.Ast.DotNode(System.Lex.Span(), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"tokenIdMap"), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"CFind"))));
+            invokeCFind->AddArgument(new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"tokenName"));
+            constructIt->AddArgument(invokeCFind.Release());
+            constructIt->SetAssignment();
+            getTokenIdBody->AddStatement(constructIt.Release());
+            UniquePtr<System.Cmajor.Ast.CompoundStatementNode> thenS(new System.Cmajor.Ast.CompoundStatementNode(System.Lex.Span()));
+            UniquePtr<System.Cmajor.Ast.ReturnStatementNode> returnIt(new System.Cmajor.Ast.ReturnStatementNode(System.Lex.Span(), new System.Cmajor.Ast.ArrowNode(System.Lex.Span(), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"it"), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"second"))));
+            thenS->AddStatement(returnIt.Release());
+            UniquePtr<System.Cmajor.Ast.CompoundStatementNode> elseS(new System.Cmajor.Ast.CompoundStatementNode(System.Lex.Span()));
+            UniquePtr<System.Cmajor.Ast.ReturnStatementNode> returnMinusOne(new System.Cmajor.Ast.ReturnStatementNode(System.Lex.Span(), new System.Cmajor.Ast.IntLiteralNode(System.Lex.Span(), -1)));
+            elseS->AddStatement(returnMinusOne.Release());
+            UniquePtr<System.Cmajor.Ast.IfStatementNode> stmt(new System.Cmajor.Ast.IfStatementNode(System.Lex.Span(), new System.Cmajor.Ast.NotEqualNode(System.Lex.Span(), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"it"), new System.Cmajor.Ast.InvokeNode(System.Lex.Span(), new System.Cmajor.Ast.DotNode(System.Lex.Span(), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"tokenIdMap"), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"CEnd")))), thenS.Release(), elseS.Release()));
+            getTokenIdBody->AddStatement(stmt.Release());
+            getTokenIdMemFun->SetBody(getTokenIdBody.Release());
+            tokenMapClass->AddMember(getTokenIdMemFun.Release());
+            UniquePtr<System.Cmajor.Ast.MemberFunctionNode> getTokenNameMemFun(new System.Cmajor.Ast.MemberFunctionNode(System.Lex.Span(), Specifiers.public_, new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"ustring"), u"GetTokenName", null));
+            getTokenNameMemFun->AddParameter(new System.Cmajor.Ast.ParameterNode(System.Lex.Span(), new System.Cmajor.Ast.IntNode(System.Lex.Span()), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"tokenId")));
+            UniquePtr<System.Cmajor.Ast.CompoundStatementNode> getTokenNameMemFunBody(new System.Cmajor.Ast.CompoundStatementNode(System.Lex.Span()));
+            System.Cmajor.Ast.ReturnStatementNode* getTokenNameStmt = new System.Cmajor.Ast.ReturnStatementNode(System.Lex.Span(), new System.Cmajor.Ast.IndexingNode(System.Lex.Span(), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"tokenNameList"), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"tokenId")));
+            getTokenNameMemFunBody->AddStatement(getTokenNameStmt);
+            getTokenNameMemFun->SetBody(getTokenNameMemFunBody.Release());
+            tokenMapClass->AddMember(getTokenNameMemFun.Release());
+            UniquePtr<System.Cmajor.Ast.MemberFunctionNode> getTokenInfoMemFun(new System.Cmajor.Ast.MemberFunctionNode(System.Lex.Span(), Specifiers.public_, new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"ustring"), u"GetTokenInfo", null));
+            getTokenInfoMemFun->AddParameter(new System.Cmajor.Ast.ParameterNode(System.Lex.Span(), new System.Cmajor.Ast.IntNode(System.Lex.Span()), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"tokenId")));
+            UniquePtr<System.Cmajor.Ast.CompoundStatementNode> getTokenInfoMemFunBody(new System.Cmajor.Ast.CompoundStatementNode(System.Lex.Span()));
+            System.Cmajor.Ast.ReturnStatementNode* getTokenInfoStmt = new System.Cmajor.Ast.ReturnStatementNode(System.Lex.Span(), new System.Cmajor.Ast.IndexingNode(System.Lex.Span(), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"tokenInfoList"), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"tokenId")));
+            getTokenInfoMemFunBody->AddStatement(getTokenInfoStmt);
+            getTokenInfoMemFun->SetBody(getTokenInfoMemFunBody.Release());
+            tokenMapClass->AddMember(getTokenInfoMemFun.Release());
+            UniquePtr<System.Cmajor.Ast.ConstructorNode> ctor(new System.Cmajor.Ast.ConstructorNode(System.Lex.Span(), Specifiers.private_, null));
+            ctor->SetClassId(new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"TokenMap"));
+            UniquePtr<System.Cmajor.Ast.CompoundStatementNode> ctorBody(new System.Cmajor.Ast.CompoundStatementNode(System.Lex.Span()));
+            for (const Pair<ustring, int>& p : tokenIdMap)
+            {
+                UniquePtr<System.Cmajor.Ast.AssignmentStatementNode> stmt(new System.Cmajor.Ast.AssignmentStatementNode(System.Lex.Span(), new System.Cmajor.Ast.IndexingNode(System.Lex.Span(), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"tokenIdMap"), new System.Cmajor.Ast.UStringLiteralNode(System.Lex.Span(), p.first)), new System.Cmajor.Ast.IntLiteralNode(System.Lex.Span(), p.second)));
+                ctorBody->AddStatement(stmt.Release());
+            }
+            System.Cmajor.Ast.DotNode* addToTokenNameList = new System.Cmajor.Ast.DotNode(System.Lex.Span(), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"tokenNameList"), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"Add"));
+            System.Cmajor.Ast.InvokeNode* invokeAdd = new System.Cmajor.Ast.InvokeNode(System.Lex.Span(), addToTokenNameList);
+            invokeAdd->AddArgument(new System.Cmajor.Ast.UStringLiteralNode(System.Lex.Span(), u"END"));
+            System.Cmajor.Ast.ExpressionStatementNode* addExpr = new System.Cmajor.Ast.ExpressionStatementNode(System.Lex.Span(), invokeAdd);
+            ctorBody->AddStatement(addExpr);
+            System.Cmajor.Ast.DotNode* addToTokenInfoList = new System.Cmajor.Ast.DotNode(System.Lex.Span(), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"tokenInfoList"), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"Add"));
+            System.Cmajor.Ast.InvokeNode* invokeAddTokenInfo = new System.Cmajor.Ast.InvokeNode(System.Lex.Span(), addToTokenInfoList);
+            invokeAddTokenInfo->AddArgument(new System.Cmajor.Ast.UStringLiteralNode(System.Lex.Span(), u"end of file"));
+            System.Cmajor.Ast.ExpressionStatementNode* addTokenInfoExpr = new System.Cmajor.Ast.ExpressionStatementNode(System.Lex.Span(), invokeAddTokenInfo);
+            ctorBody->AddStatement(addTokenInfoExpr);
+            for (const Token& t : tokens)
+            {
+                System.Cmajor.Ast.DotNode* addToTokenNameList = new System.Cmajor.Ast.DotNode(System.Lex.Span(), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"tokenNameList"), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"Add"));
+                System.Cmajor.Ast.InvokeNode* invokeAdd = new System.Cmajor.Ast.InvokeNode(System.Lex.Span(), addToTokenNameList);
+                invokeAdd->AddArgument(new System.Cmajor.Ast.UStringLiteralNode(System.Lex.Span(), t.name));
+                System.Cmajor.Ast.ExpressionStatementNode* addExpr = new System.Cmajor.Ast.ExpressionStatementNode(System.Lex.Span(), invokeAdd);
+                ctorBody->AddStatement(addExpr);
+                System.Cmajor.Ast.DotNode* addToTokenInfoList = new System.Cmajor.Ast.DotNode(System.Lex.Span(), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"tokenInfoList"), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"Add"));
+                System.Cmajor.Ast.InvokeNode* invokeAddTokenInfo = new System.Cmajor.Ast.InvokeNode(System.Lex.Span(), addToTokenInfoList);
+                invokeAddTokenInfo->AddArgument(new System.Cmajor.Ast.UStringLiteralNode(System.Lex.Span(), ToUtf32(t.info)));
+                System.Cmajor.Ast.ExpressionStatementNode* addTokenInfoExpr = new System.Cmajor.Ast.ExpressionStatementNode(System.Lex.Span(), invokeAddTokenInfo);
+                ctorBody->AddStatement(addTokenInfoExpr);
+            }
+            ctor->SetBody(ctorBody.Release());
+            tokenMapClass->AddMember(ctor.Release());
+            UniquePtr<System.Cmajor.Ast.MemberVariableNode> instanceMemVar(new System.Cmajor.Ast.MemberVariableNode(System.Lex.Span(), Specifiers.private_ | Specifiers.static_, instanceType.Clone(cloneContext), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"instance"), null));
+            tokenMapClass->AddMember(instanceMemVar.Release());
+            UniquePtr<System.Cmajor.Ast.MemberVariableNode> tokenIdMapMemVar(new System.Cmajor.Ast.MemberVariableNode(System.Lex.Span(), Specifiers.private_, mapType->Clone(cloneContext), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"tokenIdMap"), null));
+            tokenMapClass->AddMember(tokenIdMapMemVar.Release());
+            UniquePtr<System.Cmajor.Ast.MemberVariableNode> tokenNameListMemVar(new System.Cmajor.Ast.MemberVariableNode(System.Lex.Span(), Specifiers.private_, listType->Clone(cloneContext), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"tokenNameList"), null));
+            tokenMapClass->AddMember(tokenNameListMemVar.Release());
+            UniquePtr<System.Cmajor.Ast.MemberVariableNode> tokenInfoListMemVar(new System.Cmajor.Ast.MemberVariableNode(System.Lex.Span(), Specifiers.private_, listType->Clone(cloneContext), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"tokenInfoList"), null));
+            tokenMapClass->AddMember(tokenInfoListMemVar.Release());
+            ns->AddMember(tokenMapClass.Release());
+            UniquePtr<System.Cmajor.Ast.FunctionNode> getTokenIdFun(new System.Cmajor.Ast.MemberFunctionNode(System.Lex.Span(), Specifiers.public_, new System.Cmajor.Ast.IntNode(System.Lex.Span()), u"GetTokenId", null));
+            getTokenIdFun->AddParameter(new System.Cmajor.Ast.ParameterNode(System.Lex.Span(), new System.Cmajor.Ast.ConstNode(System.Lex.Span(), new System.Cmajor.Ast.LValueRefNode(System.Lex.Span(), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"ustring"))), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"tokenName")));
+            UniquePtr<System.Cmajor.Ast.CompoundStatementNode> getTokenIdFunBody(new System.Cmajor.Ast.CompoundStatementNode(System.Lex.Span()));
+            UniquePtr<System.Cmajor.Ast.InvokeNode> invokeGetTokenIdMemFun(new System.Cmajor.Ast.InvokeNode(System.Lex.Span(), new System.Cmajor.Ast.DotNode(System.Lex.Span(), new System.Cmajor.Ast.InvokeNode(System.Lex.Span(), new System.Cmajor.Ast.DotNode(System.Lex.Span(), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"TokenMap"), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"Instance"))), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"GetTokenId"))));
+            invokeGetTokenIdMemFun->AddArgument(new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"tokenName"));
+            UniquePtr<System.Cmajor.Ast.ReturnStatementNode> returnTokenId(new System.Cmajor.Ast.ReturnStatementNode(System.Lex.Span(), invokeGetTokenIdMemFun.Release()));
+            getTokenIdFunBody->AddStatement(returnTokenId.Release());
+            getTokenIdFun->SetBody(getTokenIdFunBody.Release());
+            ns->AddMember(getTokenIdFun.Release());
+            UniquePtr<System.Cmajor.Ast.FunctionNode> getTokenNameFun(new System.Cmajor.Ast.FunctionNode(System.Lex.Span(), Specifiers.public_, new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"ustring"), u"GetTokenName", null));
+            getTokenNameFun->AddParameter(new System.Cmajor.Ast.ParameterNode(System.Lex.Span(), new System.Cmajor.Ast.IntNode(System.Lex.Span()), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"tokenId")));
+            UniquePtr<System.Cmajor.Ast.CompoundStatementNode> getTokenNameFunBody(new System.Cmajor.Ast.CompoundStatementNode(System.Lex.Span()));
+            UniquePtr<System.Cmajor.Ast.InvokeNode> invokeGetTokenNameMemFun(new System.Cmajor.Ast.InvokeNode(System.Lex.Span(), new System.Cmajor.Ast.DotNode(System.Lex.Span(), new System.Cmajor.Ast.InvokeNode(System.Lex.Span(), new System.Cmajor.Ast.DotNode(System.Lex.Span(), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"TokenMap"), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"Instance"))), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"GetTokenName"))));
+            invokeGetTokenNameMemFun->AddArgument(new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"tokenId"));
+            UniquePtr<System.Cmajor.Ast.ReturnStatementNode> returnTokenName(new System.Cmajor.Ast.ReturnStatementNode(System.Lex.Span(), invokeGetTokenNameMemFun.Release()));
+            getTokenNameFunBody->AddStatement(returnTokenName.Release());
+            getTokenNameFun->SetBody(getTokenNameFunBody.Release());
+            ns->AddMember(getTokenNameFun.Release());
+            UniquePtr<System.Cmajor.Ast.FunctionNode> getTokenInfoFun(new System.Cmajor.Ast.FunctionNode(System.Lex.Span(), Specifiers.public_, new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"ustring"), u"GetTokenInfo", null));
+            getTokenInfoFun->AddParameter(new System.Cmajor.Ast.ParameterNode(System.Lex.Span(), new System.Cmajor.Ast.IntNode(System.Lex.Span()), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"tokenId")));
+            UniquePtr<System.Cmajor.Ast.CompoundStatementNode> getTokenInfoFunBody(new System.Cmajor.Ast.CompoundStatementNode(System.Lex.Span()));
+            UniquePtr<System.Cmajor.Ast.InvokeNode> invokeGetTokenInfoMemFun(new System.Cmajor.Ast.InvokeNode(System.Lex.Span(), new System.Cmajor.Ast.DotNode(System.Lex.Span(), new System.Cmajor.Ast.InvokeNode(System.Lex.Span(), new System.Cmajor.Ast.DotNode(System.Lex.Span(), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"TokenMap"), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"Instance"))), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"GetTokenInfo"))));
+            invokeGetTokenInfoMemFun->AddArgument(new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"tokenId"));
+            UniquePtr<System.Cmajor.Ast.ReturnStatementNode> returnTokenInfo(new System.Cmajor.Ast.ReturnStatementNode(System.Lex.Span(), invokeGetTokenInfoMemFun.Release()));
+            getTokenInfoFunBody->AddStatement(returnTokenInfo.Release());
+            getTokenInfoFun->SetBody(getTokenInfoFunBody.Release());
+            ns->AddMember(getTokenInfoFun.Release());
+            compileUnit.GlobalNs()->AddMember(ns.Release());
+            System.IO.StreamWriter tokenFile(System.IO.File.CreateText(tokenFilePath));
+            CodeFormatter formatter(tokenFile);
+            System.Cmajor.Ast.SourceWriter writer(formatter);
+            compileUnit.Accept(writer);
+            if (verbose)
+            {
+                Console.Out() << "==> " << tokenFilePath << endl();
+            }
+        }
+        private List<Token> tokens;
+    }
+    public class Keyword
+    {
+        public Keyword(const ustring& kw_, const ustring& token_) :
+            kw(kw_), token(token_)
+        {
+        }
+        public ustring kw;
+        public ustring token;
+    }
+    public class Keywords : Declaration
+    {
+        public Keywords(const ustring& name_) :
+            base(name_)
+        {
+        }
+        public void Add(Keyword* keyword)
+        {
+            keywords.Add(UniquePtr<Keyword>(keyword));
+        }
+        public override void FillContext(LexerContext& lexerContext)
+        {
+            lexerContext.SetKeywords(this);
+        }
+        public override void Process(const string& root, bool verbose, LexerContext& lexerContext)
+        {
+            string keywordFileName = ToUtf8(Name()) + ".cm";
+            string keywordFilePath = GetFullPath(Path.Combine(root, keywordFileName));
+            System.Cmajor.Ast.CompileUnitNode compileUnit(System.Lex.Span(), keywordFilePath);
+            compileUnit.GlobalNs()->AddMember(new System.Cmajor.Ast.NamespaceImportNode(System.Lex.Span(), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"System")));
+            compileUnit.GlobalNs()->AddMember(new System.Cmajor.Ast.CommentNode(System.Lex.Span(), u"this file has been automatically generated from \'" + ToUtf32(lexerContext.FileName()) + u"\' using soulcm lexer generator scmlg version " + ToUtf32(LexerGeneratorVersionStr())));
+            UniquePtr<System.Cmajor.Ast.NamespaceNode> ns(new System.Cmajor.Ast.NamespaceNode(System.Lex.Span(), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), Name())));
+            UniquePtr<System.Cmajor.Ast.ClassNode> keywordsClass(new System.Cmajor.Ast.ClassNode(System.Lex.Span(), Specifiers.internal_, new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"Keywords"), null));
+            UniquePtr<System.Cmajor.Ast.StaticConstructorNode> staticConstructor(new System.Cmajor.Ast.StaticConstructorNode(System.Lex.Span(), Specifiers.static_, null));
+            staticConstructor->SetClassId(new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"Keywords"));
+            staticConstructor->SetBody(new System.Cmajor.Ast.CompoundStatementNode(System.Lex.Span()));
+            UniquePtr<System.Cmajor.Ast.MemberInitializerNode> init(new System.Cmajor.Ast.MemberInitializerNode(System.Lex.Span(), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"instance")));
+            System.Cmajor.Ast.TemplateIdNode instanceType(System.Lex.Span(), new System.Cmajor.Ast.DotNode(System.Lex.Span(), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"System"), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"UniquePtr")));
+            instanceType.AddTemplateArgument(new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"Keywords"));
+            System.Cmajor.Ast.CloneContext cloneContext;
+            System.Cmajor.Ast.NewNode* newNode = new System.Cmajor.Ast.NewNode(System.Lex.Span(), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"Keywords"));
+            init->AddArgument(newNode);
+            staticConstructor->AddInitializer(init.Release());
+            keywordsClass->AddMember(staticConstructor.Release());
+            UniquePtr<System.Cmajor.Ast.MemberFunctionNode> instanceMemFun(new System.Cmajor.Ast.MemberFunctionNode(System.Lex.Span(), Specifiers.public_ | Specifiers.static_, new System.Cmajor.Ast.LValueRefNode(System.Lex.Span(), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"Keywords")), u"Instance", null));
+            UniquePtr<System.Cmajor.Ast.CompoundStatementNode> instanceBody(new System.Cmajor.Ast.CompoundStatementNode(System.Lex.Span()));
+            instanceBody->AddStatement(new System.Cmajor.Ast.ReturnStatementNode(System.Lex.Span(), new System.Cmajor.Ast.DerefNode(System.Lex.Span(), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"instance"))));
+            instanceMemFun->SetBody(instanceBody.Release());
+            keywordsClass->AddMember(instanceMemFun.Release());
+            System.Cmajor.Ast.DotNode keywordType(System.Lex.Span(), new System.Cmajor.Ast.DotNode(System.Lex.Span(), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"System"), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"Lex")), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"Keyword"));
+            System.Cmajor.Ast.TemplateIdNode uniquePtrKeywordMapType(System.Lex.Span(), new System.Cmajor.Ast.DotNode(System.Lex.Span(), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"System"), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"UniquePtr")));
+            System.Cmajor.Ast.DotNode keywordMapType(System.Lex.Span(), new System.Cmajor.Ast.DotNode(System.Lex.Span(), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"System"), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"Lex")), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"KeywordMap"));
+            uniquePtrKeywordMapType.AddTemplateArgument(keywordMapType.Clone(cloneContext));
+            UniquePtr<System.Cmajor.Ast.MemberFunctionNode> getkeywordMapMemFun(new System.Cmajor.Ast.MemberFunctionNode(System.Lex.Span(), Specifiers.public_, new System.Cmajor.Ast.PointerNode(System.Lex.Span(), keywordMapType.Clone(cloneContext)), u"GetKeywordMap", null));
+            UniquePtr<System.Cmajor.Ast.CompoundStatementNode> getkeywordMapMemFunBody(new System.Cmajor.Ast.CompoundStatementNode(System.Lex.Span()));
+            UniquePtr<System.Cmajor.Ast.InvokeNode> invokeGetKeywordMap(new System.Cmajor.Ast.InvokeNode(System.Lex.Span(), new System.Cmajor.Ast.DotNode(System.Lex.Span(), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"keywordMap"), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"Get"))));
+            UniquePtr<System.Cmajor.Ast.ReturnStatementNode> getKeywordMapStmt(new System.Cmajor.Ast.ReturnStatementNode(System.Lex.Span(), invokeGetKeywordMap.Release()));
+            getkeywordMapMemFunBody->AddStatement(getKeywordMapStmt.Release());
+            getkeywordMapMemFun->SetBody(getkeywordMapMemFunBody.Release());
+            keywordsClass->AddMember(getkeywordMapMemFun.Release());
+            UniquePtr<System.Cmajor.Ast.ConstructorNode> ctor(new System.Cmajor.Ast.ConstructorNode(System.Lex.Span(), Specifiers.private_, null));
+            ctor->SetClassId(new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"Keywords"));
+            UniquePtr<System.Cmajor.Ast.CompoundStatementNode> ctorBody(new System.Cmajor.Ast.CompoundStatementNode(System.Lex.Span()));
+            int index = 0;
+            for (const UniquePtr<Keyword>& k : keywords)
+            {
+                UniquePtr<System.Cmajor.Ast.ConstructionStatementNode> constructKeyword(new System.Cmajor.Ast.ConstructionStatementNode(System.Lex.Span(), keywordType.Clone(cloneContext), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"keyword" + ToUtf32(ToString(index)))));
+                constructKeyword->AddArgument(new System.Cmajor.Ast.UStringLiteralNode(System.Lex.Span(), k->kw));
+                constructKeyword->AddArgument(new System.Cmajor.Ast.DotNode(System.Lex.Span(), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), lexerContext.GetTokens()->Name()), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), k->token)));
+                ctorBody->AddStatement(constructKeyword.Release());
+                UniquePtr<System.Cmajor.Ast.InvokeNode> invokeAdd(new System.Cmajor.Ast.InvokeNode(System.Lex.Span(), new System.Cmajor.Ast.DotNode(System.Lex.Span(), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"keywordList"), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"Add"))));
+                invokeAdd->AddArgument(new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"keyword" + ToUtf32(ToString(index))));
+                UniquePtr<System.Cmajor.Ast.ExpressionStatementNode> addToKeywordList(new System.Cmajor.Ast.ExpressionStatementNode(System.Lex.Span(), invokeAdd.Release()));
+                ctorBody->AddStatement(addToKeywordList.Release());
+                ++index;
+            }
+            UniquePtr<System.Cmajor.Ast.ConstructionStatementNode> constructNullKeyword(new System.Cmajor.Ast.ConstructionStatementNode(System.Lex.Span(), keywordType.Clone(cloneContext), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"nullKeyword")));
+            constructNullKeyword->AddArgument(new System.Cmajor.Ast.NullLiteralNode(System.Lex.Span()));
+            constructNullKeyword->AddArgument(new System.Cmajor.Ast.IntLiteralNode(System.Lex.Span(), -1));
+            ctorBody->AddStatement(constructNullKeyword.Release());
+            UniquePtr<System.Cmajor.Ast.InvokeNode> invokeAdd(new System.Cmajor.Ast.InvokeNode(System.Lex.Span(), new System.Cmajor.Ast.DotNode(System.Lex.Span(), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"keywordList"), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"Add"))));
+            invokeAdd->AddArgument(new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"nullKeyword"));
+            UniquePtr<System.Cmajor.Ast.ExpressionStatementNode> addToKeywordList(new System.Cmajor.Ast.ExpressionStatementNode(System.Lex.Span(), invokeAdd.Release()));
+            ctorBody->AddStatement(addToKeywordList.Release());
+            UniquePtr<System.Cmajor.Ast.InvokeNode> invokeReset(new System.Cmajor.Ast.InvokeNode(System.Lex.Span(), new System.Cmajor.Ast.DotNode(System.Lex.Span(), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"keywordMap"), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"Reset"))));
+            UniquePtr<System.Cmajor.Ast.NewNode> newKeywordMap(new System.Cmajor.Ast.NewNode(System.Lex.Span(), keywordMapType.Clone(cloneContext)));
+            UniquePtr<System.Cmajor.Ast.InvokeNode> invokeCBegin(new System.Cmajor.Ast.InvokeNode(System.Lex.Span(), new System.Cmajor.Ast.DotNode(System.Lex.Span(), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"keywordList"), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"CBegin"))));
+            UniquePtr<System.Cmajor.Ast.InvokeNode> invokePtr(new System.Cmajor.Ast.InvokeNode(System.Lex.Span(), new System.Cmajor.Ast.DotNode(System.Lex.Span(), invokeCBegin.Release(), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"Ptr"))));
+            newKeywordMap->AddArgument(invokePtr.Release());
+            invokeReset->AddArgument(newKeywordMap.Release());
+            UniquePtr<System.Cmajor.Ast.ExpressionStatementNode> resetKeywordMap(new System.Cmajor.Ast.ExpressionStatementNode(System.Lex.Span(), invokeReset.Release()));
+            ctorBody->AddStatement(resetKeywordMap.Release());
+            ctor->SetBody(ctorBody.Release());
+            keywordsClass->AddMember(ctor.Release());
+            UniquePtr<System.Cmajor.Ast.MemberVariableNode> instanceMemVar(new System.Cmajor.Ast.MemberVariableNode(System.Lex.Span(), Specifiers.private_ | Specifiers.static_, instanceType.Clone(cloneContext), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"instance"), null));
+            keywordsClass->AddMember(instanceMemVar.Release());
+            System.Cmajor.Ast.TemplateIdNode keywordListType(System.Lex.Span(), new System.Cmajor.Ast.DotNode(System.Lex.Span(), new System.Cmajor.Ast.DotNode(System.Lex.Span(), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"System"), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"Collections")), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"List")));
+            keywordListType.AddTemplateArgument(keywordType.Clone(cloneContext));
+            UniquePtr<System.Cmajor.Ast.MemberVariableNode> keywordListMemVar(new System.Cmajor.Ast.MemberVariableNode(System.Lex.Span(), Specifiers.private_, keywordListType.Clone(cloneContext), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"keywordList"), null));
+            keywordsClass->AddMember(keywordListMemVar.Release());
+            UniquePtr<System.Cmajor.Ast.MemberVariableNode> keywordMapMemVar(new System.Cmajor.Ast.MemberVariableNode(System.Lex.Span(), Specifiers.private_, uniquePtrKeywordMapType.Clone(cloneContext), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"keywordMap"), null));
+            keywordsClass->AddMember(keywordMapMemVar.Release());
+            ns->AddMember(keywordsClass.Release());
+            UniquePtr<System.Cmajor.Ast.FunctionNode> getKeywordMapFun(new System.Cmajor.Ast.FunctionNode(System.Lex.Span(), Specifiers.public_, new System.Cmajor.Ast.PointerNode(System.Lex.Span(), keywordMapType.Clone(cloneContext)), u"GetKeywordMap", null));
+            UniquePtr<System.Cmajor.Ast.CompoundStatementNode> getKeywordMapFunBody(new System.Cmajor.Ast.CompoundStatementNode(System.Lex.Span()));
+            UniquePtr<System.Cmajor.Ast.InvokeNode> invokeGetKeywordMapMemFun(new System.Cmajor.Ast.InvokeNode(System.Lex.Span(), new System.Cmajor.Ast.DotNode(System.Lex.Span(), new System.Cmajor.Ast.InvokeNode(System.Lex.Span(), new System.Cmajor.Ast.DotNode(System.Lex.Span(), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"Keywords"), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"Instance"))), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"GetKeywordMap"))));
+            UniquePtr<System.Cmajor.Ast.ReturnStatementNode> returnKeywordMap(new System.Cmajor.Ast.ReturnStatementNode(System.Lex.Span(), invokeGetKeywordMapMemFun.Release()));
+            getKeywordMapFunBody->AddStatement(returnKeywordMap.Release());
+            getKeywordMapFun->SetBody(getKeywordMapFunBody.Release());
+            ns->AddMember(getKeywordMapFun.Release());
+            compileUnit.GlobalNs()->AddMember(ns.Release());
+            System.IO.StreamWriter keywordFile(System.IO.File.CreateText(keywordFilePath));
+            CodeFormatter formatter(keywordFile);
+            System.Cmajor.Ast.SourceWriter writer(formatter);
+            compileUnit.Accept(writer);
+            if (verbose)
+            {
+                Console.Out() << "==> " << keywordFilePath << endl();
+            }
+        }
+        private List<UniquePtr<Keyword>> keywords;
+    }
+    public class Expression
+    {
+        public Expression(int index_, const ustring& id_, const ustring& value_, int line_) :
+            index(index_), id(id_), value(value_), line(line_)
+        {
+        }
+        public int Index() const
+        {
+            return index;
+        }
+        public const ustring& Id() const
+        {
+            return id;
+        }
+        public const ustring& Value() const
+        {
+            return value;
+        }
+        public int Line() const
+        {
+            return line;
+        }
+        private int index;
+        private ustring id;
+        private ustring value;
+        private int line;
+    }
+    public class Expressions : Declaration
+    {
+        public Expressions() :
+            base(u"expressions")
+        {
+        }
+        public void Add(Expression* expression)
+        {
+            expressions.Add(UniquePtr<Expression>(expression));
+            exprMap[expression->Id()] = expression->Index();
+        }
+        public Expression* Get(const ustring& id) const
+        {
+            Map<ustring, int>.ConstIterator it = exprMap.CFind(id);
+            if (it != exprMap.CEnd())
+            {
+                int index = it->second;
+                return expressions[index].Get();
+            }
+            else
+            {
+                throw Exception("expression \'" + ToUtf8(id) + "\' not found");
+            }
+        }
+        public override void FillContext(LexerContext& lexerContext)
+        {
+            lexerContext.SetExpressions(this);
+        }
+        public override void Process(const string& root, bool verbose, LexerContext& lexerContext)
+        {
+        }
+        private List<UniquePtr<Expression>> expressions;
+        private Map<ustring, int> exprMap;
+    }
+    public class Variable
+    {
+        public Variable(System.Cmajor.Ast.Node* type_, const ustring& name_) :
+            type(type_), name(name_)
+        {
+        }
+        public System.Cmajor.Ast.Node* GetType() const
+        {
+            return type.Get();
+        }
+        public const ustring& Name() const
+        {
+            return name;
+        }
+        private UniquePtr<System.Cmajor.Ast.Node> type;
+        private ustring name;
+    }
+    public class LexerStatement
+    {
+        public LexerStatement(const ustring& expr_, System.Cmajor.Ast.CompoundStatementNode* stmt_, int action_, int line_) :
+            index(-1), expr(expr_), stmt(stmt_), retract(true), action(action_), line(line_)
+        {
+        }
+        public void SetIndex(int index_)
+        {
+            index = index_;
+        }
+        public int Index() const
+        {
+            return index;
+        }
+        public const Nfa& GetNfa() const
+        {
+            return nfa;
+        }
+        public System.Cmajor.Ast.CompoundStatementNode* Code() const
+        {
+            return stmt.Get();
+        }
+        public bool Retract() const
+        {
+            return retract;
+        }
+        public int Action() const
+        {
+            return action;
+        }
+        public int Line() const
+        {
+            return line;
+        }
+        public void Process(LexerContext& lexerContext)
+        {
+            nfa = lexerContext.GetParser()->Parse(expr, &lexerContext, line);
+            nfa.End()->SetStatementIndex(index);
+        }
+        private int index;
+        private ustring expr;
+        private Nfa nfa;
+        private UniquePtr<System.Cmajor.Ast.CompoundStatementNode> stmt;
+        private bool retract;
+        private int action;
+        private int line;
+    }
+    public class Action
+    {
+        public Action(int id_, System.Cmajor.Ast.CompoundStatementNode* stmt_) :
+            id(id_), stmt(stmt_)
+        {
+        }
+        public int Id() const
+        {
+            return id;
+        }
+        public System.Cmajor.Ast.CompoundStatementNode* Code() const
+        {
+            return stmt.Get();
+        }
+        private int id;
+        private UniquePtr<System.Cmajor.Ast.CompoundStatementNode> stmt;
+    }
+    public class Actions : Declaration
+    {
+        public Actions() :
+            base(u"actions")
+        {
+        }
+        public void Add(Action* action)
+        {
+            actions.Add(UniquePtr<Action>(action));
+            actionMap[action->Id()] = action;
+        }
+        public Action* Get(int id) const
+        {
+            Map<int, Action*>.ConstIterator it = actionMap.CFind(id);
+            if (it != actionMap.CEnd())
+            {
+                return it->second;
+            }
+            else
+            {
+                return null;
+            }
+        }
+        public override void FillContext(LexerContext& lexerContext)
+        {
+        }
+        public override void Process(const string& root, bool verbose, LexerContext& lexerContext)
+        {
+        }
+        private List<UniquePtr<Action>> actions;
+        private Map<int, Action*> actionMap;
+    }
+    public class Lexer : Declaration
+    {
+        public Lexer(const ustring& api_, const ustring& name_) :
+            base(name_), api(api_)
+        {
+        }
+        public void AddStatement(LexerStatement* stmt)
+        {
+            stmt->SetIndex(cast<int>(statements.Count()));
+            statements.Add(UniquePtr<LexerStatement>(stmt));
+        }
+        public void AddVariable(Variable* variable)
+        {
+            variables.Add(UniquePtr<Variable>(variable));
+        }
+        public void AddAction(Action* action)
+        {
+            actions.Add(action);
+        }
+        public void MakeMasterNfa(LexerContext& lexerContext)
+        {
+            NfaState* start = lexerContext.MakeNfaState();
+            masterNfa.SetStart(start);
+            for (const UniquePtr<LexerStatement>& statement : statements)
+            {
+                start->AddEdge(NfaEdge(lexerContext.MakeEpsilon(), statement->GetNfa().Start()));
+            }
+        }
+        public void MakeDfa(LexerContext& lexerContext)
+        {
+            dfa = Compile(lexerContext, masterNfa);
+        }
+        public void WriteAutomaton(const string& root, bool verbose, LexerContext& lexerContext)
+        {
+            System.Cmajor.Ast.CloneContext cloneContext;
+            string lexerFileName = ToUtf8(Name()) + ".cm";
+            string lexerFilePath = GetFullPath(Path.Combine(root, lexerFileName));
+            System.Cmajor.Ast.CompileUnitNode compileUnit(System.Lex.Span(), lexerFilePath);
+            compileUnit.GlobalNs()->AddMember(new System.Cmajor.Ast.NamespaceImportNode(System.Lex.Span(), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"System")));
+            compileUnit.GlobalNs()->AddMember(new System.Cmajor.Ast.NamespaceImportNode(System.Lex.Span(), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"System.Lex")));
+            compileUnit.GlobalNs()->AddMember(new System.Cmajor.Ast.NamespaceImportNode(System.Lex.Span(), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), lexerContext.GetTokens()->Name())));
+            for (System.Cmajor.Ast.Node* usingNode : lexerContext.GetUsingNodes())
+            {
+                compileUnit.GlobalNs()->AddMember(usingNode->Clone(cloneContext));
+            }
+            compileUnit.GlobalNs()->AddMember(new System.Cmajor.Ast.CommentNode(System.Lex.Span(), u"this file has been automatically generated from \'" + ToUtf32(lexerContext.FileName()) + u"\' using soulcm lexer generator scmlg version " + ToUtf32(LexerGeneratorVersionStr())));
+            UniquePtr<System.Cmajor.Ast.ClassNode> classNode(new System.Cmajor.Ast.ClassNode(System.Lex.Span(), Specifiers.public_, new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), Name()), null));
+            classNode->AddBaseClassOrInterface(new System.Cmajor.Ast.DotNode(System.Lex.Span(), new System.Cmajor.Ast.DotNode(System.Lex.Span(), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"System"), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"Lex")), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"Lexer")));
+            UniquePtr<System.Cmajor.Ast.ConstructorNode> contentCtor(new System.Cmajor.Ast.ConstructorNode(System.Lex.Span(), Specifiers.public_, null));
+            contentCtor->SetClassId(new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), Name()));
+            contentCtor->AddParameter(new System.Cmajor.Ast.ParameterNode(System.Lex.Span(), new System.Cmajor.Ast.ConstNode(System.Lex.Span(), new System.Cmajor.Ast.LValueRefNode(System.Lex.Span(), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"ustring"))), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"content_")));
+            contentCtor->AddParameter(new System.Cmajor.Ast.ParameterNode(System.Lex.Span(), new System.Cmajor.Ast.ConstNode(System.Lex.Span(), new System.Cmajor.Ast.LValueRefNode(System.Lex.Span(), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"string"))), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"fileName_")));
+            contentCtor->AddParameter(new System.Cmajor.Ast.ParameterNode(System.Lex.Span(), new System.Cmajor.Ast.IntNode(System.Lex.Span()), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"fileIndex_")));
+            System.Cmajor.Ast.BaseInitializerNode* baseInitializer = new System.Cmajor.Ast.BaseInitializerNode(System.Lex.Span());
+            baseInitializer->AddArgument(new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"content_"));
+            baseInitializer->AddArgument(new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"fileName_"));
+            baseInitializer->AddArgument(new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"fileIndex_"));
+            contentCtor->AddInitializer(baseInitializer);
+            for (const UniquePtr<Variable>& variable : variables)
+            {
+                System.Cmajor.Ast.MemberInitializerNode* memInit = new System.Cmajor.Ast.MemberInitializerNode(System.Lex.Span(), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), variable->Name()));
+                contentCtor->AddInitializer(memInit);
+            }
+            UniquePtr<System.Cmajor.Ast.CompoundStatementNode> contentCtorBody(new System.Cmajor.Ast.CompoundStatementNode(System.Lex.Span()));
+            if ((lexerContext.GetKeywords() != null))
+            {
+                UniquePtr<System.Cmajor.Ast.InvokeNode> invokeSetKeywordMap(new System.Cmajor.Ast.InvokeNode(System.Lex.Span(), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"SetKeywordMap")));
+                invokeSetKeywordMap->AddArgument(new System.Cmajor.Ast.InvokeNode(System.Lex.Span(), new System.Cmajor.Ast.DotNode(System.Lex.Span(), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), lexerContext.GetKeywords()->Name()), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"GetKeywordMap"))));
+                UniquePtr<System.Cmajor.Ast.ExpressionStatementNode> setKeywordMapStmt(new System.Cmajor.Ast.ExpressionStatementNode(System.Lex.Span(), invokeSetKeywordMap.Release()));
+                contentCtorBody->AddStatement(setKeywordMapStmt.Release());
+            }
+            contentCtor->SetBody(contentCtorBody.Release());
+            classNode->AddMember(contentCtor.Release());
+            UniquePtr<System.Cmajor.Ast.ConstructorNode> startCtor(new System.Cmajor.Ast.ConstructorNode(System.Lex.Span(), Specifiers.public_, null));
+            startCtor->SetClassId(new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), Name()));
+            startCtor->AddParameter(new System.Cmajor.Ast.ParameterNode(System.Lex.Span(), new System.Cmajor.Ast.ConstNode(System.Lex.Span(), new System.Cmajor.Ast.PointerNode(System.Lex.Span(), new System.Cmajor.Ast.UCharNode(System.Lex.Span()))), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"start_")));
+            startCtor->AddParameter(new System.Cmajor.Ast.ParameterNode(System.Lex.Span(), new System.Cmajor.Ast.ConstNode(System.Lex.Span(), new System.Cmajor.Ast.PointerNode(System.Lex.Span(), new System.Cmajor.Ast.UCharNode(System.Lex.Span()))), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"end_")));
+            startCtor->AddParameter(new System.Cmajor.Ast.ParameterNode(System.Lex.Span(), new System.Cmajor.Ast.ConstNode(System.Lex.Span(), new System.Cmajor.Ast.LValueRefNode(System.Lex.Span(), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"string"))), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"fileName_")));
+            startCtor->AddParameter(new System.Cmajor.Ast.ParameterNode(System.Lex.Span(), new System.Cmajor.Ast.IntNode(System.Lex.Span()), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"fileIndex_")));
+            System.Cmajor.Ast.BaseInitializerNode* baseInit = new System.Cmajor.Ast.BaseInitializerNode(System.Lex.Span());
+            baseInit->AddArgument(new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"start_"));
+            baseInit->AddArgument(new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"end_"));
+            baseInit->AddArgument(new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"fileName_"));
+            baseInit->AddArgument(new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"fileIndex_"));
+            startCtor->AddInitializer(baseInit);
+            for (const UniquePtr<Variable>& variable : variables)
+            {
+                System.Cmajor.Ast.MemberInitializerNode* memInit = new System.Cmajor.Ast.MemberInitializerNode(System.Lex.Span(), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), variable->Name()));
+                startCtor->AddInitializer(memInit);
+            }
+            UniquePtr<System.Cmajor.Ast.CompoundStatementNode> startCtorBody(new System.Cmajor.Ast.CompoundStatementNode(System.Lex.Span()));
+            if ((lexerContext.GetKeywords() != null))
+            {
+                UniquePtr<System.Cmajor.Ast.InvokeNode> invokeSetKeywordMap2(new System.Cmajor.Ast.InvokeNode(System.Lex.Span(), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"SetKeywordMap")));
+                invokeSetKeywordMap2->AddArgument(new System.Cmajor.Ast.InvokeNode(System.Lex.Span(), new System.Cmajor.Ast.DotNode(System.Lex.Span(), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), lexerContext.GetKeywords()->Name()), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"GetKeywordMap"))));
+                UniquePtr<System.Cmajor.Ast.ExpressionStatementNode> setKeywordMapStmt2(new System.Cmajor.Ast.ExpressionStatementNode(System.Lex.Span(), invokeSetKeywordMap2.Release()));
+                startCtorBody->AddStatement(setKeywordMapStmt2.Release());
+            }
+            startCtor->SetBody(startCtorBody.Release());
+            classNode->AddMember(startCtor.Release());
+            UniquePtr<System.Cmajor.Ast.MemberFunctionNode> nextStateMemFun(new System.Cmajor.Ast.MemberFunctionNode(System.Lex.Span(), Specifiers.public_ | Specifiers.override_, new System.Cmajor.Ast.IntNode(System.Lex.Span()), u"NextState", null));
+            nextStateMemFun->AddParameter(new System.Cmajor.Ast.ParameterNode(System.Lex.Span(), new System.Cmajor.Ast.IntNode(System.Lex.Span()), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"state")));
+            nextStateMemFun->AddParameter(new System.Cmajor.Ast.ParameterNode(System.Lex.Span(), new System.Cmajor.Ast.UCharNode(System.Lex.Span()), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"c")));
+            UniquePtr<System.Cmajor.Ast.CompoundStatementNode> nextStateMemFunBody(new System.Cmajor.Ast.CompoundStatementNode(System.Lex.Span()));
+            string classMapName = "ClassMap";
+            if ((lexerContext.GetClassMap() != null))
+            {
+                classMapName = ToUtf8(lexerContext.GetClassMap()->Name());
+            }
+            UniquePtr<System.Cmajor.Ast.ConstructionStatementNode> constructI(new System.Cmajor.Ast.ConstructionStatementNode(System.Lex.Span(), new System.Cmajor.Ast.IntNode(System.Lex.Span()), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"i")));
+            UniquePtr<System.Cmajor.Ast.InvokeNode> invokeGetClass(new System.Cmajor.Ast.InvokeNode(System.Lex.Span(), new System.Cmajor.Ast.DotNode(System.Lex.Span(), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), ToUtf32(classMapName)), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"GetClass"))));
+            invokeGetClass->AddArgument(new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"c"));
+            constructI->SetAssignment();
+            constructI->AddArgument(invokeGetClass.Release());
+            nextStateMemFunBody->AddStatement(constructI.Release());
+            UniquePtr<System.Cmajor.Ast.SwitchStatementNode> switchStmt(new System.Cmajor.Ast.SwitchStatementNode(System.Lex.Span(), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"state")));
+            for (DfaState* state : dfa.States())
+            {
+                UniquePtr<System.Cmajor.Ast.CaseStatementNode> caseStmt(new System.Cmajor.Ast.CaseStatementNode(System.Lex.Span()));
+                caseStmt->AddCaseExpr(new System.Cmajor.Ast.IntLiteralNode(System.Lex.Span(), state->Id()));
+                UniquePtr<System.Cmajor.Ast.CompoundStatementNode> caseBody(new System.Cmajor.Ast.CompoundStatementNode(System.Lex.Span()));
+                if (state->Accept())
+                {
+                    UniquePtr<System.Cmajor.Ast.ConstructionStatementNode> constructPrevMatch(new System.Cmajor.Ast.ConstructionStatementNode(System.Lex.Span(), new System.Cmajor.Ast.DotNode(System.Lex.Span(), new System.Cmajor.Ast.DotNode(System.Lex.Span(), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"System"), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"Lex")), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"Lexeme")), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"prevMatch")));
+                    constructPrevMatch->SetAssignment();
+                    constructPrevMatch->AddArgument(new System.Cmajor.Ast.DotNode(System.Lex.Span(), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"token"), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"match")));
+                    UniquePtr<System.Cmajor.Ast.AssignmentStatementNode> assignmentStmt(new System.Cmajor.Ast.AssignmentStatementNode(System.Lex.Span(), new System.Cmajor.Ast.DotNode(System.Lex.Span(), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"token"), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"match")), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"lexeme")));
+                    caseBody->AddStatement(constructPrevMatch.Release());
+                    caseBody->AddStatement(assignmentStmt.Release());
+                    UniquePtr<System.Cmajor.Ast.ConstructionStatementNode> constructTokenId(new System.Cmajor.Ast.ConstructionStatementNode(System.Lex.Span(), new System.Cmajor.Ast.IntNode(System.Lex.Span()), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"tokenId")));
+                    constructTokenId->SetAssignment();
+                    UniquePtr<System.Cmajor.Ast.InvokeNode> invokeGetTokenId(new System.Cmajor.Ast.InvokeNode(System.Lex.Span(), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"GetTokenId")));
+                    invokeGetTokenId->AddArgument(new System.Cmajor.Ast.IntLiteralNode(System.Lex.Span(), state->StatementIndex()));
+                    constructTokenId->AddArgument(invokeGetTokenId.Release());
+                    caseBody->AddStatement(constructTokenId.Release());
+                    UniquePtr<System.Cmajor.Ast.CompoundStatementNode> thenS(new System.Cmajor.Ast.CompoundStatementNode(System.Lex.Span()));
+                    UniquePtr<System.Cmajor.Ast.AssignmentStatementNode> assignTokenIdStmt(new System.Cmajor.Ast.AssignmentStatementNode(System.Lex.Span(), new System.Cmajor.Ast.DotNode(System.Lex.Span(), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"token"), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"id")), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"CONTINUE_TOKEN")));
+                    thenS->AddStatement(assignTokenIdStmt.Release());
+                    thenS->AddStatement(new System.Cmajor.Ast.ReturnStatementNode(System.Lex.Span(), new System.Cmajor.Ast.IntLiteralNode(System.Lex.Span(), -1)));
+                    UniquePtr<System.Cmajor.Ast.CompoundStatementNode> elseS(new System.Cmajor.Ast.CompoundStatementNode(System.Lex.Span()));
+                    UniquePtr<System.Cmajor.Ast.CompoundStatementNode> thenS2(new System.Cmajor.Ast.CompoundStatementNode(System.Lex.Span()));
+                    UniquePtr<System.Cmajor.Ast.AssignmentStatementNode> assignStmt2(new System.Cmajor.Ast.AssignmentStatementNode(System.Lex.Span(), new System.Cmajor.Ast.DotNode(System.Lex.Span(), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"token"), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"id")), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"tokenId")));
+                    thenS2->AddStatement(assignStmt2.Release());
+                    UniquePtr<System.Cmajor.Ast.CompoundStatementNode> elseS2(new System.Cmajor.Ast.CompoundStatementNode(System.Lex.Span()));
+                    elseS2->AddStatement(new System.Cmajor.Ast.AssignmentStatementNode(System.Lex.Span(), new System.Cmajor.Ast.DotNode(System.Lex.Span(), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"token"), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"match")), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"prevMatch")));
+                    UniquePtr<System.Cmajor.Ast.IfStatementNode> ifStmt2(new System.Cmajor.Ast.IfStatementNode(System.Lex.Span(), new System.Cmajor.Ast.NotEqualNode(System.Lex.Span(), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"tokenId"), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"INVALID_TOKEN")), thenS2.Release(), elseS2.Release()));
+                    elseS->AddStatement(ifStmt2.Release());
+                    UniquePtr<System.Cmajor.Ast.IfStatementNode> ifStmt(new System.Cmajor.Ast.IfStatementNode(System.Lex.Span(), new System.Cmajor.Ast.EqualNode(System.Lex.Span(), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"tokenId"), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"CONTINUE_TOKEN")), thenS.Release(), elseS.Release()));
+                    caseBody->AddStatement(ifStmt.Release());
+                }
+                Map<int, Set<int>> m;
+                for (Class* cls : lexerContext.Partition())
+                {
+                    DfaState* next = state->Next(cls->Index());
+                    if (next != null)
+                    {
+                        m[next->Id()].Insert(cls->Index());
+                    }
+                }
+                if (m.IsEmpty())
+                {
+                    caseBody->AddStatement(new System.Cmajor.Ast.ReturnStatementNode(System.Lex.Span(), new System.Cmajor.Ast.IntLiteralNode(System.Lex.Span(), -1)));
+                }
+                else
+                {
+                    UniquePtr<System.Cmajor.Ast.SwitchStatementNode> switchStmt(new System.Cmajor.Ast.SwitchStatementNode(System.Lex.Span(), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"i")));
+                    for (const Pair<int, Set<int>>& p : m)
+                    {
+                        int n = p.first;
+                        const Set<int>& s = p.second;
+                        UniquePtr<System.Cmajor.Ast.CaseStatementNode> caseS(new System.Cmajor.Ast.CaseStatementNode(System.Lex.Span()));
+                        for (int k : s)
+                        {
+                            caseS->AddCaseExpr(new System.Cmajor.Ast.IntLiteralNode(System.Lex.Span(), k));
+                        }
+                        UniquePtr<System.Cmajor.Ast.CompoundStatementNode> caseBlock(new System.Cmajor.Ast.CompoundStatementNode(System.Lex.Span()));
+                        caseBlock->AddStatement(new System.Cmajor.Ast.ReturnStatementNode(System.Lex.Span(), new System.Cmajor.Ast.IntLiteralNode(System.Lex.Span(), n)));
+                        caseS->AddStatement(caseBlock.Release());
+                        switchStmt->AddCase(caseS.Release());
+                        UniquePtr<System.Cmajor.Ast.DefaultStatementNode> defaultS(new System.Cmajor.Ast.DefaultStatementNode(System.Lex.Span()));
+                        UniquePtr<System.Cmajor.Ast.CompoundStatementNode> defaultBlock(new System.Cmajor.Ast.CompoundStatementNode(System.Lex.Span()));
+                        defaultBlock->AddStatement(new System.Cmajor.Ast.ReturnStatementNode(System.Lex.Span(), new System.Cmajor.Ast.IntLiteralNode(System.Lex.Span(), -1)));
+                        defaultS->AddStatement(defaultBlock.Release());
+                        switchStmt->SetDefault(defaultS.Release());
+                    }
+                    caseBody->AddStatement(switchStmt.Release());
+                    caseBody->AddStatement(new System.Cmajor.Ast.ReturnStatementNode(System.Lex.Span(), new System.Cmajor.Ast.IntLiteralNode(System.Lex.Span(), -1)));
+                }
+                caseStmt->AddStatement(caseBody.Release());
+                switchStmt->AddCase(caseStmt.Release());
+            }
+            nextStateMemFunBody->AddStatement(switchStmt.Release());
+            nextStateMemFunBody->AddStatement(new System.Cmajor.Ast.ReturnStatementNode(System.Lex.Span(), new System.Cmajor.Ast.IntLiteralNode(System.Lex.Span(), -1)));
+            nextStateMemFun->SetBody(nextStateMemFunBody.Release());
+            classNode->AddMember(nextStateMemFun.Release());
+            UniquePtr<System.Cmajor.Ast.MemberFunctionNode> getTokenIdMemFun(new System.Cmajor.Ast.MemberFunctionNode(System.Lex.Span(), Specifiers.private_, new System.Cmajor.Ast.IntNode(System.Lex.Span()), u"GetTokenId", null));
+            getTokenIdMemFun->AddParameter(new System.Cmajor.Ast.ParameterNode(System.Lex.Span(), new System.Cmajor.Ast.IntNode(System.Lex.Span()), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"statementIndex")));
+            UniquePtr<System.Cmajor.Ast.CompoundStatementNode> getTokenIdMemFunBody(new System.Cmajor.Ast.CompoundStatementNode(System.Lex.Span()));
+            UniquePtr<System.Cmajor.Ast.SwitchStatementNode> switchStmt2(new System.Cmajor.Ast.SwitchStatementNode(System.Lex.Span(), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"statementIndex")));
+            for (const UniquePtr<LexerStatement>& statement : statements)
+            {
+                UniquePtr<System.Cmajor.Ast.CaseStatementNode> caseS(new System.Cmajor.Ast.CaseStatementNode(System.Lex.Span()));
+                caseS->AddCaseExpr(new System.Cmajor.Ast.IntLiteralNode(System.Lex.Span(), statement->Index()));
+                UniquePtr<System.Cmajor.Ast.CompoundStatementNode> caseBlock(new System.Cmajor.Ast.CompoundStatementNode(System.Lex.Span()));
+                if (statement->Retract())
+                {
+                    UniquePtr<System.Cmajor.Ast.InvokeNode> invokeRetract(new System.Cmajor.Ast.InvokeNode(System.Lex.Span(), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"Retract")));
+                    UniquePtr<System.Cmajor.Ast.ExpressionStatementNode> retractStmt(new System.Cmajor.Ast.ExpressionStatementNode(System.Lex.Span(), invokeRetract.Release()));
+                    caseBlock->AddStatement(retractStmt.Release());
+                }
+                if (statement->Action() != -1)
+                {
+                    Action* action = actions.Get(statement->Action());
+                    if (action != null)
+                    {
+                        int n = action->Code()->Statements().Count();
+                        for (int i = 0; i < n; ++i)
+                        {
+                            System.Cmajor.Ast.StatementNode* stmt = action->Code()->Statements()[i];
+                            caseBlock->AddStatement(cast<System.Cmajor.Ast.StatementNode*>(stmt->Clone(cloneContext)));
+                        }
+                    }
+                    else
+                    {
+                        throw Exception("action " + ToString(statement->Action()) + " not found");
+                    }
+                }
+                int n = statement->Code()->Statements().Count();
+                for (int i = 0; i < n; ++i)
+                {
+                    caseBlock->AddStatement(cast<System.Cmajor.Ast.StatementNode*>(statement->Code()->Statements()[i]->Clone(cloneContext)));
+                }
+                caseBlock->AddStatement(new System.Cmajor.Ast.BreakStatementNode(System.Lex.Span()));
+                caseS->AddStatement(caseBlock.Release());
+                switchStmt2->AddCase(caseS.Release());
+            }
+            getTokenIdMemFunBody->AddStatement(switchStmt2.Release());
+            getTokenIdMemFunBody->AddStatement(new System.Cmajor.Ast.ReturnStatementNode(System.Lex.Span(), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"CONTINUE_TOKEN")));
+            getTokenIdMemFun->SetBody(getTokenIdMemFunBody.Release());
+            classNode->AddMember(getTokenIdMemFun.Release());
+            for (const UniquePtr<Variable>& variable : variables)
+            {
+                System.Cmajor.Ast.MemberVariableNode* var = new System.Cmajor.Ast.MemberVariableNode(System.Lex.Span(), Specifiers.public_, variable->GetType()->Clone(cloneContext), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), variable->Name()), null);
+                classNode->AddMember(var);
+            }
+            compileUnit.GlobalNs()->AddMember(classNode.Release());
+            System.IO.StreamWriter lexerFile(System.IO.File.CreateText(lexerFilePath));
+            CodeFormatter formatter(lexerFile);
+            System.Cmajor.Ast.SourceWriter writer(formatter);
+            compileUnit.Accept(writer);
+            if (verbose)
+            {
+                Console.Out() << "==> " << lexerFilePath << endl();
+            }
+        }
+        public override void FillContext(LexerContext& lexerContext)
+        {
+            lexerContext.SetApi(api);
+            lexerContext.SetLexer(this);
+        }
+        public override void Process(const string& root, bool verbose, LexerContext& lexerContext)
+        {
+            for (const UniquePtr<LexerStatement>& statement : statements)
+            {
+                statement->Process(lexerContext);
+            }
+        }
+        private ustring api;
+        private List<UniquePtr<LexerStatement>> statements;
+        private List<UniquePtr<Variable>> variables;
+        private Actions actions;
+        private Nfa masterNfa;
+        private Dfa dfa;
+    }
+    public class LexerFile
+    {
+        public void Add(Declaration* declaration)
+        {
+            declarations.Add(UniquePtr<Declaration>(declaration));
+            declarationMap[declaration->Name()] = declaration;
+        }
+        public void Process(const string& root, bool verbose, bool debug, LexerContext& lexerContext)
+        {
+            for (UniquePtr<Declaration>& d : declarations)
+            {
+                d->FillContext(lexerContext);
+            }
+            if (!(lexerContext.GetTokens() != null))
+            {
+                throw Exception("error: no tokens defined");
+            }
+            if (!(lexerContext.GetLexer() != null))
+            {
+                throw Exception("error: no lexer defined");
+            }
+            for (UniquePtr<Declaration>& d : declarations)
+            {
+                d->Process(root, verbose, lexerContext);
+            }
+            lexerContext.MakeCanonicalClasses();
+            lexerContext.MakeClassPartition(debug);
+            lexerContext.MakeClassMap(root, verbose);
+            lexerContext.GetLexer()->MakeMasterNfa(lexerContext);
+            lexerContext.GetLexer()->MakeDfa(lexerContext);
+            lexerContext.GetLexer()->WriteAutomaton(root, verbose, lexerContext);
+        }
+        private List<UniquePtr<Declaration>> declarations;
+        private Map<ustring, Declaration*> declarationMap;
+    }
+    public const char* LexerGeneratorVersionStr()
+    {
+        return "3.0.0";
+    }
+} // namespace soulcm.scmlg

@@ -1,0 +1,99 @@
+using System;
+using System.Collections;
+
+// this file has been semiautomatically generated from 'D:/work/soulngcm/soulngcm/sngcmlg/Dfa.hpp' using cpp2cm version 1.0.0
+
+// this file has been semiautomatically generated from 'D:/work/soulngcm/soulngcm/sngcmlg/Dfa.cpp' using cpp2cm version 1.0.0
+
+namespace soulcm.scmlg
+{
+    public class DfaState
+    {
+        public DfaState(int id_, const List<NfaState*>& nfaStates_) :
+            id(id_), nfaStates(nfaStates_), next(), marked(false), accept(false), statementIndex(-1)
+        {
+        }
+        public int Id() const
+        {
+            return id;
+        }
+        public bool IsMarked() const
+        {
+            return marked;
+        }
+        public void Mark()
+        {
+            marked = true;
+        }
+        public bool Accept() const
+        {
+            return accept;
+        }
+        public void SetAccept(bool accept_)
+        {
+            accept = accept_;
+        }
+        public int StatementIndex() const
+        {
+            return statementIndex;
+        }
+        public void SetStatementIndex(int index)
+        {
+            statementIndex = index;
+        }
+        public const List<NfaState*>& NfaStates() const
+        {
+            return nfaStates;
+        }
+        public void AddNext(DfaState* n)
+        {
+            next.Add(n);
+        }
+        public DfaState* Next(int i) const
+        {
+            if (i >= 0 && i < next.Count())
+            {
+                return next[i];
+            }
+            else
+            {
+                return null;
+            }
+        }
+        private int id;
+        private List<NfaState*> nfaStates;
+        private List<DfaState*> next;
+        private bool marked;
+        private bool accept;
+        private int statementIndex;
+    }
+    public class Dfa
+    {
+        public const List<DfaState*>& States() const
+        {
+            return states;
+        }
+        public void AddState(DfaState* state)
+        {
+            states.Add(state);
+        }
+        public void Finalize()
+        {
+            for (DfaState* state : states)
+            {
+                for (NfaState* nfaState : state->NfaStates())
+                {
+                    if (nfaState->Accept())
+                    {
+                        state->SetAccept(true);
+                        if (state->StatementIndex() == -1 || (nfaState->StatementIndex() != -1 && nfaState->StatementIndex() < state->StatementIndex()))
+                        {
+                            state->SetStatementIndex(nfaState->StatementIndex());
+                        }
+                    }
+                }
+            }
+        }
+        private List<DfaState*> states;
+    }
+} // namespace soulcm.scmlg

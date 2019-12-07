@@ -1,0 +1,535 @@
+using System;
+using System.Collections;
+using System.IO;
+using System.Text;
+
+// this file has been semiautomatically generated from 'D:/work/soulngcm/soulngcm/sngcmlg/LexerContext.hpp' using cpp2cm version 1.0.0
+
+// this file has been semiautomatically generated from 'D:/work/soulngcm/soulngcm/sngcmlg/LexerContext.cpp' using cpp2cm version 1.0.0
+
+namespace soulcm.scmlg
+{
+    public enum IdentifierClassKind
+    {
+        none, unicode, ascii
+    }
+    public class LexerContext
+    {
+        public LexerContext(IdentifierClassKind identifierClassKind) :
+            nextNfaStateId(0), nextDfaStateId(0), lexerStatementIndex(-1), classIndex(0), any(), epsilon(eps), idStart(new Class(classIndex++)), idCont(new Class(classIndex++)), classMap(null), tokens(null), keywords(null), expressions(null), lexer(null), parser(null), currentExpression(null)
+        {
+            if (identifierClassKind == IdentifierClassKind.unicode)
+            {
+                MakeUnicodeIdentifierClasses(*this);
+                symbols.Add(idStart);
+                symbols.Add(idCont);
+            }
+            else if (identifierClassKind == IdentifierClassKind.ascii)
+            {
+                MakeAsciiIdentifierClasses(*this);
+                symbols.Add(idStart);
+                symbols.Add(idCont);
+            }
+        }
+        public ~LexerContext()
+        {
+            for (NfaState* state : nfaStates)
+            {
+                delete state;
+            }
+            for (DfaState* state : dfaStates)
+            {
+                delete state;
+            }
+            for (Symbol* symbol : symbols)
+            {
+                delete symbol;
+            }
+            for (Class* cls : canonicalClasses)
+            {
+                delete cls;
+            }
+        }
+        public const List<NfaState*>& NfaStates() const
+        {
+            return nfaStates;
+        }
+        public Symbol* MakeAny()
+        {
+            return &any;
+        }
+        public Symbol* MakeEpsilon()
+        {
+            return &epsilon;
+        }
+        public Class* MakeIdStart()
+        {
+            return idStart;
+        }
+        public Class* MakeIdCont()
+        {
+            return idCont;
+        }
+        public const List<Symbol*>& Symbols() const
+        {
+            return symbols;
+        }
+        public const string& FileName() const
+        {
+            return fileName;
+        }
+        public ClassMap* GetClassMap() const
+        {
+            return classMap;
+        }
+        public const List<System.Cmajor.Ast.Node*>& GetUsingNodes() const
+        {
+            return usingNodes;
+        }
+        public Tokens* GetTokens() const
+        {
+            return tokens;
+        }
+        public Keywords* GetKeywords() const
+        {
+            return keywords;
+        }
+        public void SetLexer(Lexer* lexer_)
+        {
+            lexer = lexer_;
+        }
+        public Lexer* GetLexer() const
+        {
+            return lexer;
+        }
+        public void SetParser(Parser* parser_)
+        {
+            parser = parser_;
+        }
+        public Parser* GetParser() const
+        {
+            return parser;
+        }
+        public void SetCurrentExpression(Expression* currentExpression_)
+        {
+            currentExpression = currentExpression_;
+        }
+        public const List<Class*>& Partition() const
+        {
+            return partition;
+        }
+        public void SetApi(const ustring& api_)
+        {
+            api = api_;
+        }
+        public const ustring& Api() const
+        {
+            return api;
+        }
+        public NfaState* MakeNfaState()
+        {
+            NfaState* state = new NfaState(nextNfaStateId++, lexerStatementIndex);
+            nfaStates.Add(state);
+            return state;
+        }
+        public DfaState* MakeDfaState(const List<NfaState*>& nfaStates)
+        {
+            List<NfaState*> s(nfaStates);
+            Sort(s.Begin(), s.End());
+            for (DfaState* state : dfaStates)
+            {
+                if (state->NfaStates() == s)
+                {
+                    return state;
+                }
+            }
+            DfaState* state = new DfaState(nextDfaStateId++, s);
+            dfaStates.Add(state);
+            return state;
+        }
+        public Symbol* MakeChar(uchar c)
+        {
+            Map<uchar, Symbol*>.ConstIterator it = charSymbols.CFind(c);
+            if (it != charSymbols.CEnd())
+            {
+                return it->second;
+            }
+            Symbol* symbol = new Char(c);
+            symbol->DontSetContained();
+            symbols.Add(symbol);
+            charSymbols[c] = symbol;
+            return symbol;
+        }
+        public Symbol* MakeRange(uchar start, uchar end)
+        {
+            Range range(start, end);
+            Map<Range, Symbol*>.ConstIterator it = rangeSymbols.CFind(range);
+            if (it != rangeSymbols.CEnd())
+            {
+                return it->second;
+            }
+            Symbol* symbol = new Range(start, end);
+            symbols.Add(symbol);
+            rangeSymbols[range] = symbol;
+            return symbol;
+        }
+        public Class* MakeClass()
+        {
+            Class* cls = new Class(classIndex++);
+            symbols.Add(cls);
+            return cls;
+        }
+        public void SetClassMap(ClassMap* classMap_)
+        {
+            if ((classMap != null))
+            {
+                throw Exception("error in " + fileName + ": cannot have more than one class map declaration per .lexer file");
+            }
+            classMap = classMap_;
+        }
+        public void AddUsingNode(System.Cmajor.Ast.Node* usingNode)
+        {
+            usingNodes.Add(usingNode);
+        }
+        public void SetTokens(Tokens* tokens_)
+        {
+            if ((tokens != null))
+            {
+                throw Exception("error in " + fileName + ": cannot have more than one set of token definitions per .lexer file");
+            }
+            tokens = tokens_;
+        }
+        public void SetKeywords(Keywords* keywords_)
+        {
+            if ((keywords != null))
+            {
+                throw Exception("error in " + fileName + ": cannot have more than one set of keyword definitions per .lexer file");
+            }
+            keywords = keywords_;
+        }
+        public void SetExpressions(Expressions* expressions_)
+        {
+            if ((expressions != null))
+            {
+                throw Exception("error in " + fileName + ": cannot have more than one set of expressions per .lexer file");
+            }
+            expressions = expressions_;
+        }
+        public void SetFileName(const string& fileName_)
+        {
+            fileName = fileName_;
+        }
+        public Nfa MakeExpr(const ustring& id)
+        {
+            if (id == u"idstart")
+            {
+                return MakeNfa(*this, MakeIdStart());
+            }
+            else if (id == u"idcont")
+            {
+                return MakeNfa(*this, MakeIdCont());
+            }
+            if ((expressions != null))
+            {
+                Expression* expr = expressions->Get(id);
+                if ((currentExpression != null))
+                {
+                    if (expr->Index() >= currentExpression->Index())
+                    {
+                        throw Exception("error: forward reference \'" + ToUtf8(expr->Id()) + "\' from expression \'" + ToUtf8(currentExpression->Id()) + "\'");
+                    }
+                }
+                if ((parser != null))
+                {
+                    Expression* prevExpression = currentExpression;
+                    currentExpression = expr;
+                    Nfa nfa = parser->Parse(expr->Value(), this, expr->Line());
+                    currentExpression = prevExpression;
+                    return nfa;
+                }
+                else
+                {
+                    throw Exception("parser not set");
+                }
+            }
+            else
+            {
+                throw Exception("expressions not set");
+            }
+        }
+        public void MakeCanonicalClasses()
+        {
+            List<Symbol*> s = symbols;
+            for (Symbol* symbol : s)
+            {
+                if (symbol->Contained()) continue;
+                if (symbol->IsClass())
+                {
+                    Class* cls = cast<Class*>(symbol);
+                    Class* canonicalClass = cls->MakeCanonical(*this);
+                    canonicalClasses.Add(canonicalClass);
+                }
+                else if (symbol->IsChar())
+                {
+                    Char* chr = cast<Char*>(symbol);
+                    Class* canonicalClass = new Class(-1);
+                    canonicalClass->Ranges().Add(Range(chr->Chr(), chr->Chr()));
+                    canonicalClasses.Add(canonicalClass);
+                }
+                else if (symbol->IsAny())
+                {
+                    Symbol* range = MakeRange(cast<uchar>(1), cast<uchar>(1114111));
+                    Class* canonicalClass = new Class(-1);
+                    canonicalClass->Ranges().Add(Range(cast<uchar>(1), cast<uchar>(1114111)));
+                    canonicalClasses.Add(canonicalClass);
+                }
+                else if (symbol->IsRange())
+                {
+                    Range* range = cast<Range*>(symbol);
+                    Class* canonicalClass = new Class(-1);
+                    canonicalClass->Ranges().Add(*range);
+                    canonicalClasses.Add(canonicalClass);
+                }
+            }
+            for (Class* canonicalClass : canonicalClasses)
+            {
+                for (const Range& range : canonicalClass->Ranges())
+                {
+                    if (canonicalClass->Chars().IsEmpty())
+                    {
+                        canonicalClass->AddChar(range.Start());
+                    }
+                    break;
+                }
+            }
+        }
+        public void MakeClassPartition(bool debug)
+        {
+            LinkedList<Class*> classes;
+            for (Class* cls : canonicalClasses)
+            {
+                classes.Add(cls);
+            }
+            LinkedList<Class*>.Iterator classIt = classes.Begin();
+            while (classIt != classes.End())
+            {
+                bool classChanged = false;
+                Class* cls = *classIt;
+                LinkedList<Class*>.Iterator sourceIt = classes.Begin();
+                while (!cls->Ranges().IsEmpty() && sourceIt != classes.End())
+                {
+                    if (sourceIt == classIt)
+                    {
+                        ++sourceIt;
+                        continue;
+                    }
+                    bool sourceChanged = false;
+                    Class* source = *sourceIt;
+                    UniquePtr<Class> splitClass(new Class(-1));
+                    LinkedList<Range>.Iterator leftIt = cls->Ranges().Begin();
+                    while (leftIt != cls->Ranges().End())
+                    {
+                        bool leftChanged = false;
+                        LinkedList<Range>.Iterator rightIt = source->Ranges().Begin();
+                        while (leftIt != cls->Ranges().End() && rightIt != source->Ranges().End())
+                        {
+                            bool rightChanged = false;
+                            if (Intersect(*leftIt, *rightIt))
+                            {
+                                List<Range> leftRanges = *leftIt - *rightIt;
+                                List<Range> rightRanges = *rightIt - *leftIt;
+                                Range intersection = *leftIt & *rightIt;
+                                for (const Range& leftRange : leftRanges)
+                                {
+                                    if (leftRange.IsEmpty()) continue;
+                                    LinkedList<Range>.Iterator it = leftIt;
+                                    ++it;
+                                    cls->Ranges().Insert(it, leftRange);
+                                }
+                                leftIt = cls->Ranges().Remove(leftIt);
+                                leftChanged = true;
+                                if (!intersection.IsEmpty())
+                                {
+                                    splitClass->Ranges().Add(intersection);
+                                }
+                                for (const Range& rightRange : rightRanges)
+                                {
+                                    if (rightRange.IsEmpty()) continue;
+                                    LinkedList<Range>.Iterator it = rightIt;
+                                    ++it;
+                                    source->Ranges().Insert(it, rightRange);
+                                }
+                                rightIt = source->Ranges().Remove(rightIt);
+                                rightChanged = true;
+                            }
+                            if (!rightChanged)
+                            {
+                                ++rightIt;
+                            }
+                        }
+                        if (!leftChanged)
+                        {
+                            ++leftIt;
+                        }
+                    }
+                    if (source->Ranges().IsEmpty())
+                    {
+                        sourceIt = classes.Remove(sourceIt);
+                        sourceChanged = true;
+                    }
+                    if (!splitClass->Ranges().IsEmpty())
+                    {
+                        classes.Insert(sourceIt, splitClass.Get());
+                        symbols.Add(splitClass.Release());
+                        sourceChanged = true;
+                    }
+                    if (!sourceChanged)
+                    {
+                        ++sourceIt;
+                    }
+                }
+                if (cls->Ranges().IsEmpty())
+                {
+                    classIt = classes.Remove(classIt);
+                    classChanged = true;
+                }
+                if (!classChanged)
+                {
+                    ++classIt;
+                }
+            }
+            for (Class* cls : classes)
+            {
+                cls->MakeMinimal(*this);
+                partition.Add(cls);
+            }
+            for (int i = 0; i < partition.Count(); ++i)
+            {
+                Class* cls = partition[i];
+                cls->SetIndex(i);
+            }
+            if (debug)
+            {
+                CodeFormatter formatter(Console.Out());
+                formatter.WriteLine("partition:");
+                for (int i = 0; i < partition.Count(); ++i)
+                {
+                    Class* cls = partition[i];
+                    formatter.Write(ToString(cls->Index()));
+                    formatter.Write(" : ");
+                    cls->Print(formatter);
+                    formatter.WriteLine();
+                }
+            }
+        }
+        public void MakeClassMap(const string& root, bool verbose)
+        {
+            List<int> classMapVec(1114112, -1);
+            for (Class* cls : partition)
+            {
+                for (const Range& range : cls->Ranges())
+                {
+                    for (uchar i = range.Start(); i <= range.End(); i = cast<uchar>(cast<int>(i) + 1))
+                    {
+                        if (classMapVec[cast<int>(i)] == -1)
+                        {
+                            classMapVec[cast<int>(i)] = cls->Index();
+                        }
+                    }
+                }
+            }
+            string classMapName = "ClassMap";
+            if ((classMap != null))
+            {
+                classMapName = ToUtf8(classMap->Name());
+            }
+            string classMapSourceFileName = GetFullPath(Path.Combine(root, classMapName + ".cm"));
+            System.Cmajor.Ast.CompileUnitNode classMapUnit(System.Lex.Span(), classMapSourceFileName);
+            classMapUnit.GlobalNs()->AddMember(new System.Cmajor.Ast.NamespaceImportNode(System.Lex.Span(), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"System")));
+            classMapUnit.GlobalNs()->AddMember(new System.Cmajor.Ast.CommentNode(System.Lex.Span(), u"this file has been automatically generated from \'" + ToUtf32(FileName()) + u"\' using soulcm lexer generator scmlg version " + ToUtf32(LexerGeneratorVersionStr())));
+            UniquePtr<System.Cmajor.Ast.GlobalVariableNode> classMapVariable(new System.Cmajor.Ast.GlobalVariableNode(System.Lex.Span(), System.Cmajor.Ast.Specifiers.private_, new System.Cmajor.Ast.ArrayNode(System.Lex.Span(), new System.Cmajor.Ast.IntNode(System.Lex.Span()), null), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"classMap"), &classMapUnit));
+            UniquePtr<System.Cmajor.Ast.ArrayLiteralNode> arrayLiteral(new System.Cmajor.Ast.ArrayLiteralNode(System.Lex.Span()));
+            for (int i : classMapVec)
+            {
+                arrayLiteral->AddValue(new System.Cmajor.Ast.IntLiteralNode(System.Lex.Span(), i));
+            }
+            classMapVariable->SetInitializer(arrayLiteral.Release());
+            classMapUnit.GlobalNs()->AddMember(classMapVariable.Release());
+            UniquePtr<System.Cmajor.Ast.ClassNode> cls(new System.Cmajor.Ast.ClassNode(System.Lex.Span(), System.Cmajor.Ast.Specifiers.public_ | System.Cmajor.Ast.Specifiers.static_, new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), ToUtf32(classMapName)), null));
+            UniquePtr<System.Cmajor.Ast.MemberFunctionNode> getClassMemFun(new System.Cmajor.Ast.MemberFunctionNode(System.Lex.Span(), System.Cmajor.Ast.Specifiers.public_ | System.Cmajor.Ast.Specifiers.static_, new System.Cmajor.Ast.IntNode(System.Lex.Span()), u"GetClass", null));
+            getClassMemFun->AddParameter(new System.Cmajor.Ast.ParameterNode(System.Lex.Span(), new System.Cmajor.Ast.UCharNode(System.Lex.Span()), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"c")));
+            UniquePtr<System.Cmajor.Ast.CompoundStatementNode> body(new System.Cmajor.Ast.CompoundStatementNode(System.Lex.Span()));
+            UniquePtr<System.Cmajor.Ast.ConstructionStatementNode> constructStmt(new System.Cmajor.Ast.ConstructionStatementNode(System.Lex.Span(), new System.Cmajor.Ast.IntNode(System.Lex.Span()), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"i")));
+            constructStmt->SetAssignment();
+            constructStmt->AddArgument(new System.Cmajor.Ast.CastNode(System.Lex.Span(), new System.Cmajor.Ast.IntNode(System.Lex.Span()), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"c")));
+            body->AddStatement(constructStmt.Release());
+            UniquePtr<System.Cmajor.Ast.CompoundStatementNode> thenS(new System.Cmajor.Ast.CompoundStatementNode(System.Lex.Span()));
+            UniquePtr<System.Cmajor.Ast.ReturnStatementNode> returnClassMapI(new System.Cmajor.Ast.ReturnStatementNode(System.Lex.Span(), new System.Cmajor.Ast.IndexingNode(System.Lex.Span(), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"classMap"), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"i"))));
+            thenS->AddStatement(returnClassMapI.Release());
+            UniquePtr<System.Cmajor.Ast.CompoundStatementNode> elseS(new System.Cmajor.Ast.CompoundStatementNode(System.Lex.Span()));
+            UniquePtr<System.Cmajor.Ast.ReturnStatementNode> returnMinusOne(new System.Cmajor.Ast.ReturnStatementNode(System.Lex.Span(), new System.Cmajor.Ast.IntLiteralNode(System.Lex.Span(), -1)));
+            elseS->AddStatement(returnMinusOne.Release());
+            UniquePtr<System.Cmajor.Ast.IfStatementNode> ifStmt(new System.Cmajor.Ast.IfStatementNode(System.Lex.Span(), new System.Cmajor.Ast.LessNode(System.Lex.Span(), new System.Cmajor.Ast.IdentifierNode(System.Lex.Span(), u"i"), new System.Cmajor.Ast.IntLiteralNode(System.Lex.Span(), 1114112)), thenS.Release(), elseS.Release()));
+            body->AddStatement(ifStmt.Release());
+            getClassMemFun->SetBody(body.Release());
+            cls->AddMember(getClassMemFun.Release());
+            classMapUnit.GlobalNs()->AddMember(cls.Release());
+            System.IO.StreamWriter classMapFile(System.IO.File.CreateText(classMapSourceFileName));
+            CodeFormatter formatter(classMapFile);
+            System.Cmajor.Ast.SourceWriter writer(formatter);
+            classMapUnit.Accept(writer);
+            if (verbose)
+            {
+                Console.Out() << "==> " << classMapSourceFileName << endl();
+            }
+        }
+        private int nextNfaStateId;
+        private int nextDfaStateId;
+        private int lexerStatementIndex;
+        private int classIndex;
+        private string fileName;
+        private List<NfaState*> nfaStates;
+        private List<DfaState*> dfaStates;
+        private List<Symbol*> symbols;
+        private List<Class*> canonicalClasses;
+        private List<Class*> partition;
+        private List<System.Cmajor.Ast.Node*> usingNodes;
+        private Map<uchar, Symbol*> charSymbols;
+        private Map<Range, Symbol*> rangeSymbols;
+        private Any any;
+        private Char epsilon;
+        private Class* idStart;
+        private Class* idCont;
+        private ClassMap* classMap;
+        private Usings* usings;
+        private Tokens* tokens;
+        private Keywords* keywords;
+        private Expressions* expressions;
+        private Lexer* lexer;
+        private Parser* parser;
+        private Expression* currentExpression;
+        private ustring api;
+    }
+    public class ClassLess
+    {
+        public bool operator()(const Class* left, const Class* right) const
+        {
+            if (left->Ranges().Count() < right->Ranges().Count()) return false;
+            if (left->Ranges().Count() > right->Ranges().Count()) return false;
+            if (!left->Ranges().IsEmpty())
+            {
+                Range leftRange = left->Ranges().Front();
+                Range rightRange = right->Ranges().Front();
+                return leftRange < rightRange;
+            }
+            return false;
+        }
+    }
+    public class ClassesEqual
+    {
+        public bool operator()(const Class* left, const Class* right) const
+        {
+            return left->Ranges() == right->Ranges();
+        }
+    }
+} // namespace soulcm.scmlg

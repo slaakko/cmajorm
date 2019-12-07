@@ -1,0 +1,26 @@
+using System;
+using System.Collections;
+
+// this file has been semiautomatically generated from 'D:/work/soulngcm/soulngcm/sngcmlg/RegularExpressionParser.hpp' using cpp2cm version 1.0.0
+
+// this file has been semiautomatically generated from 'D:/work/soulngcm/soulngcm/sngcmlg/RegularExpressionParser.cpp' using cpp2cm version 1.0.0
+
+namespace soulcm.scmlg
+{
+    public class RegularExpressionParser : Parser
+    {
+        public override Nfa Parse(const ustring& expression, LexerContext* lexerContext, int line)
+        {
+            try
+            {
+                RegExLexer lexer(expression, lexerContext->FileName(), 0);
+                return RegExParser.Parse(lexer, lexerContext);
+            }
+            catch (const Exception& ex)
+            {
+                throw Exception("error parsing regular expression at " + lexerContext->FileName() + ":" + ToString(line) + ": " + ex.Message());
+            }
+            return Nfa();
+        }
+    }
+} // namespace soulcm.scmlg
