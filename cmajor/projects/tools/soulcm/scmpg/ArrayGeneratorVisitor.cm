@@ -1,0 +1,119 @@
+using System;
+using System.Collections;
+using Cm.Ast;
+
+// this file has been semiautomatically generated from 'D:/work/soulngcm/soulngcm/sngcmpg/ArrayGeneratorVisitor.hpp' using cpp2cm version 1.0.0
+
+// this file has been semiautomatically generated from 'D:/work/soulngcm/soulngcm/sngcmpg/ArrayGeneratorVisitor.cpp' using cpp2cm version 1.0.0
+
+namespace soulcm.scmpg
+{
+    public class ArrayGeneratorVisitor : Visitor
+    {
+        public ArrayGeneratorVisitor(Cm.Ast.NamespaceNode* ns_, int& sn_) :
+            ns(ns_), sn(sn_)
+        {
+        }
+        public override void Visit(StringParser& parser)
+        {
+            UniquePtr<Cm.Ast.ArrayLiteralNode> arrayLiteral(new Cm.Ast.ArrayLiteralNode(System.Lex.Span()));
+            string s = "s" + ToString(sn++);
+            parser.SetArrayName(s);
+            for (uchar c : parser.Str())
+            {
+                arrayLiteral->AddValue(new Cm.Ast.IntLiteralNode(System.Lex.Span(), cast<int>(c)));
+            }
+            UniquePtr<Cm.Ast.ConstantNode> arrayConstant(new Cm.Ast.ConstantNode(System.Lex.Span(), Specifiers.public_, new Cm.Ast.ArrayNode(System.Lex.Span(), new Cm.Ast.IntNode(System.Lex.Span()), new Cm.Ast.LongLiteralNode(System.Lex.Span(), parser.Str().Length())), new Cm.Ast.IdentifierNode(System.Lex.Span(), ToUtf32(s)), arrayLiteral.Release()));
+            int index = 0;
+            for (int i = 0; i < ns->Members().Count(); ++i)
+            {
+                if (ns->Members()[i]->GetNodeType() == NodeType.namespaceImportNode) ++index;
+            }
+            ns->Members().Insert(index, arrayConstant.Release());
+        }
+        public override void Visit(CharSetParser& parser)
+        {
+            UniquePtr<Cm.Ast.ArrayLiteralNode> arrayLiteral(new Cm.Ast.ArrayLiteralNode(System.Lex.Span()));
+            string s = "s" + ToString(sn++);
+            parser.SetArrayName(s);
+            bool first = true;
+            for (const System.Parsing.Range& range : parser.Set().Ranges())
+            {
+                Cm.Ast.StructuredLiteralNode* value = new Cm.Ast.StructuredLiteralNode(System.Lex.Span());
+                value->AddMember(new Cm.Ast.IntLiteralNode(System.Lex.Span(), range.first));
+                value->AddMember(new Cm.Ast.IntLiteralNode(System.Lex.Span(), range.last));
+                arrayLiteral->AddValue(value);
+            }
+            UniquePtr<Cm.Ast.ConstantNode> arrayConstant(new Cm.Ast.ConstantNode(System.Lex.Span(), Specifiers.public_, new Cm.Ast.ArrayNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"Range"), new Cm.Ast.LongLiteralNode(System.Lex.Span(), parser.Set().Ranges().Count())), new Cm.Ast.IdentifierNode(System.Lex.Span(), ToUtf32(s)), arrayLiteral.Release()));
+            int index = 0;
+            for (int i = 0; i < ns->Members().Count(); ++i)
+            {
+                if (ns->Members()[i]->GetNodeType() == NodeType.namespaceImportNode || ns->Members()[i]->GetNodeType() == NodeType.constantNode) ++index;
+            }
+            ns->Members().Insert(index, arrayConstant.Release());
+        }
+        public override void Visit(OptionalParser& parser)
+        {
+            parser.Child()->Accept(*this);
+        }
+        public override void Visit(KleeneParser& parser)
+        {
+            parser.Child()->Accept(*this);
+        }
+        public override void Visit(PositiveParser& parser)
+        {
+            parser.Child()->Accept(*this);
+        }
+        public override void Visit(ExpectationParser& parser)
+        {
+            parser.Child()->Accept(*this);
+        }
+        public override void Visit(GroupingParser& parser)
+        {
+            parser.Child()->Accept(*this);
+        }
+        public override void Visit(SequenceParser& parser)
+        {
+            parser.Left()->Accept(*this);
+            parser.Right()->Accept(*this);
+        }
+        public override void Visit(AlternativeParser& parser)
+        {
+            parser.Left()->Accept(*this);
+            parser.Right()->Accept(*this);
+        }
+        public override void Visit(DifferenceParser& parser)
+        {
+            parser.Left()->Accept(*this);
+            parser.Right()->Accept(*this);
+        }
+        public override void Visit(ListParser& parser)
+        {
+            parser.Child()->Accept(*this);
+        }
+        public override void Visit(ActionParser& parser)
+        {
+            parser.Child()->Accept(*this);
+        }
+        public override void Visit(RuleParser& parser)
+        {
+            parser.Definition()->Accept(*this);
+        }
+        public override void Visit(GrammarParser& parser)
+        {
+            for (const UniquePtr<RuleParser>& rule : parser.Rules())
+            {
+                rule->Accept(*this);
+            }
+        }
+        public override void Visit(ParserFile& parserFile)
+        {
+            for (const UniquePtr<GrammarParser>& parser : parserFile.Parsers())
+            {
+                parser->Accept(*this);
+            }
+        }
+        private Cm.Ast.NamespaceNode* ns;
+        private int& sn;
+    }
+} // namespace soulcm.scmpg

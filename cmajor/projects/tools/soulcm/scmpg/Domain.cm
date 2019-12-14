@@ -1,0 +1,48 @@
+using System;
+using System.Collections;
+
+// this file has been semiautomatically generated from 'D:/work/soulngcm/soulngcm/sngcmpg/Domain.hpp' using cpp2cm version 1.0.0
+
+// this file has been semiautomatically generated from 'D:/work/soulngcm/soulngcm/sngcmpg/Domain.cpp' using cpp2cm version 1.0.0
+
+namespace soulcm.scmpg
+{
+    public class Domain
+    {
+        public const List<ParserFile*>& ParserFiles() const
+        {
+            return parserFiles;
+        }
+        public void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public void AddParserFile(ParserFile* parserFile)
+        {
+            parserFiles.Add(parserFile);
+        }
+        public void AddParser(GrammarParser* parser)
+        {
+            Map<ustring, GrammarParser*>.ConstIterator it = parserMap.CFind(parser->Name());
+            if (it != parserMap.CEnd())
+            {
+                throw Exception("parser \'" + ToUtf8(parser->Name()) + "\' already exists");
+            }
+            parserMap[parser->Name()] = parser;
+        }
+        public GrammarParser* GetParser(const ustring& parserName) const
+        {
+            Map<ustring, GrammarParser*>.ConstIterator it = parserMap.CFind(parserName);
+            if (it != parserMap.CEnd())
+            {
+                return it->second;
+            }
+            else
+            {
+                throw Exception("parser \'" + ToUtf8(parserName) + "\' not found");
+            }
+        }
+        private List<ParserFile*> parserFiles;
+        private Map<ustring, GrammarParser*> parserMap;
+    }
+} // namespace soulcm.scmpg

@@ -8,11 +8,11 @@
 #include <cmajor/binder/BoundCompileUnit.hpp>
 #include <cmajor/binder/StatementBinder.hpp>
 #include <cmajor/symbols/Exception.hpp>
-#include <cmajor/util/Unicode.hpp>
+#include <soulng/util/Unicode.hpp>
 
 namespace cmajor {namespace binder {
 
-using namespace cmajor::unicode;
+using namespace soulng::unicode;
 using namespace cmajor::symbols;
 
 AttributeProcessor::AttributeProcessor(const std::u32string& attributeName_) : attributeName(attributeName_)

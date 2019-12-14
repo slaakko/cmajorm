@@ -12,6 +12,13 @@
 #define SYMBOLS_API __declspec(dllexport)
 #else
 #define SYMBOLS_API __declspec(dllimport)
+
+#ifdef NDEBUG
+#pragma comment(lib, "symbols.lib")
+#else
+#pragma comment(lib, "symbolsd.lib")
+#endif
+
 #endif
 
 #else

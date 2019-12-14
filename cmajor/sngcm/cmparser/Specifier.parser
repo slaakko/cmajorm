@@ -1,0 +1,47 @@
+// =================================
+// Copyright (c) 2019 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+[hpp]#include <sngcm/cmparser/ParserApi.hpp>
+[hpp]#include <sngcm/ast/Specifier.hpp>
+[cpp]#include <sngcm/cmlexer/CmajorLexer.hpp>
+[cpp]#include <sngcm/cmlexer/CmajorTokens.hpp>
+
+using namespace CmajorTokens;
+
+parser api(SNGCM_PARSER_API) SpecifierParser
+{
+    uselexer CmajorLexer;
+
+    Specifiers(var sngcm::ast::Specifiers specifiers) : sngcm::ast::Specifiers
+        ::= ((Specifier:specifier{ specifiers = specifiers | specifier; })*){ return specifiers; }
+        ;
+
+    Specifier : sngcm::ast::Specifiers
+        ::= PUBLIC{ return sngcm::ast::Specifiers::public_; }
+        |   PROTECTED{ return sngcm::ast::Specifiers::protected_; }
+        |   PRIVATE{ return sngcm::ast::Specifiers::private_; }
+        |   INTERNAL{ return sngcm::ast::Specifiers::internal_; }
+        |   STATIC{ return sngcm::ast::Specifiers::static_; }
+        |   VIRTUAL{ return sngcm::ast::Specifiers::virtual_; }
+        |   OVERRIDE{ return sngcm::ast::Specifiers::override_; }
+        |   ABSTRACT{ return sngcm::ast::Specifiers::abstract_; }
+        |   INLINE{ return sngcm::ast::Specifiers::inline_; }
+        |   EXPLICIT{ return sngcm::ast::Specifiers::explicit_; }
+        |   EXTERN{ return sngcm::ast::Specifiers::external_; }
+        |   SUPPRESS{ return sngcm::ast::Specifiers::suppress_; }
+        |   DEFAULT{ return sngcm::ast::Specifiers::default_; }
+        |   CONSTEXPR{ return sngcm::ast::Specifiers::constexpr_; }
+        |   CDECL{ return sngcm::ast::Specifiers::cdecl_; }
+        |   NOTHROW{ return sngcm::ast::Specifiers::nothrow_; }
+        |   THROW{ return sngcm::ast::Specifiers::throw_; }
+        |   NEW{ return sngcm::ast::Specifiers::new_; }
+        |   UNIT_TEST{ return sngcm::ast::Specifiers::unit_test_; }
+        ;
+
+    ruleinfo
+    {
+        (Specifiers, "specifiers"), (Specifier, "specifier")
+    }
+}

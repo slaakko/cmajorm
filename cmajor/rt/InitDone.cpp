@@ -5,8 +5,7 @@
 
 #include <cmajor/rt/InitDone.hpp>
 #include <cmajor/rt/Error.hpp>
-#include <cmajor/parsing/InitDone.hpp>
-#include <cmajor/util/InitDone.hpp>
+#include <soulng/util/InitDone.hpp>
 #include <cmajor/rt/Io.hpp>
 #include <cmajor/rt/Directory.hpp>
 #include <cmajor/rt/CallStack.hpp>
@@ -52,8 +51,7 @@ namespace cmajor { namespace rt {
 void Init(int64_t numberOfPolymorphicClassIds, const uint64_t* polymorphicClassIdArray, int64_t numberOfStaticClassIds, const uint64_t* staticClassIdArray)
 {
     InitMutex();
-    cmajor::parsing::Init();
-    cmajor::util::Init();
+    soulng::util::Init();
     InitIo();
     InitScreen();
     InitDirectory();
@@ -88,8 +86,7 @@ void Done()
     DoneDirectory();
     DoneScreen();
     DoneIo();
-    cmajor::util::Done();
-    cmajor::parsing::Done();
+    soulng::util::Done();
     DoneMutex();
 }
 

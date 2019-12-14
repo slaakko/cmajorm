@@ -15,21 +15,21 @@
 #include <cmajor/symbols/Module.hpp>
 #include <cmajor/symbols/SymbolCollector.hpp>
 #include <cmajor/symbols/GlobalFlags.hpp>
-#include <cmajor/ast/Literal.hpp>
-#include <cmajor/ast/TypeExpr.hpp>
-#include <cmajor/ast/BasicType.hpp>
-#include <cmajor/util/Unicode.hpp>
-#include <cmajor/util/Sha1.hpp>
-#include <cmajor/util/Uuid.hpp>
-#include <cmajor/util/Prime.hpp>
-#include <cmajor/util/TextUtils.hpp>
+#include <sngcm/ast/Literal.hpp>
+#include <sngcm/ast/TypeExpr.hpp>
+#include <sngcm/ast/BasicType.hpp>
+#include <soulng/util/Unicode.hpp>
+#include <soulng/util/Sha1.hpp>
+#include <soulng/util/Uuid.hpp>
+#include <soulng/util/Prime.hpp>
+#include <soulng/util/TextUtils.hpp>
 #include <boost/uuid/uuid_generators.hpp>
 #include <boost/uuid/uuid_io.hpp>
 #include <iostream>
 
 namespace cmajor { namespace symbols {
 
-using namespace cmajor::unicode;
+using namespace soulng::unicode;
 
 int32_t GetClassIdVmtIndexOffset()
 {
@@ -141,15 +141,15 @@ bool ClassGroupTypeSymbol::HasProjectMembers() const
     return false;
 }
 
-void ClassGroupTypeSymbol::AppendChildElements(dom::Element* element, TypeMap& typeMap) const
+void ClassGroupTypeSymbol::AppendChildElements(sngxml::dom::Element* element, TypeMap& typeMap) const
 {
     for (const auto& p : arityClassMap)
     {
         ClassTypeSymbol* cls = p.second;
-        std::unique_ptr<dom::Element> classElement = cls->ToDomElement(typeMap);
+        std::unique_ptr<sngxml::dom::Element> classElement = cls->ToDomElement(typeMap);
         if (cls->IsProject())
         {
-            element->AppendChild(std::unique_ptr<dom::Node>(classElement.release()));
+            element->AppendChild(std::unique_ptr<sngxml::dom::Node>(classElement.release()));
         }
     }
 }
@@ -1511,7 +1511,7 @@ void* ClassTypeSymbol::VmtObject(Emitter& emitter, bool create)
             std::string typeId;
             for (uint8_t x : TypeId())
             {
-                typeId.append(cmajor::util::ToHexString(x));
+                typeId.append(soulng::util::ToHexString(x));
             }
             vmtArray.push_back(emitter.GetClsIdValue(typeId)); // 64-bit class id
             vmtArray.push_back(emitter.GetConversionValue(emitter.GetIrTypeForVoidPtrType(), className)); // class name pointer
@@ -1800,7 +1800,7 @@ ConstantNode* MakeStaticClassArray(const std::unordered_set<ClassTypeSymbol*>& c
 
 void MakeClassIdFile(const std::unordered_set<ClassTypeSymbol*>& polymorphicClasses, const std::string& classIdFileName)
 {
-    cmajor::util::BinaryWriter binaryWriter(classIdFileName);
+    soulng::util::BinaryWriter binaryWriter(classIdFileName);
     std::unordered_map<boost::uuids::uuid, ClassInfo, boost::hash<boost::uuids::uuid>> classIdMap;
     for (ClassTypeSymbol* cls : polymorphicClasses)
     {

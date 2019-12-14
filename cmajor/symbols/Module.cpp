@@ -11,21 +11,21 @@
 #include <cmajor/symbols/SymbolCollector.hpp>
 #include <cmajor/symbols/Warning.hpp>
 #include <cmajor/symbols/DebugFlags.hpp>
-#include <cmajor/ast/Project.hpp>
-#include <cmajor/ast/AstReader.hpp>
-#include <cmajor/util/CodeFormatter.hpp>
-#include <cmajor/util/Path.hpp>
-#include <cmajor/util/Unicode.hpp>
-#include <cmajor/util/TextUtils.hpp>
-#include <cmajor/util/Log.hpp>
-#include <cmajor/util/Time.hpp>
+#include <sngcm/ast/Project.hpp>
+#include <sngcm/ast/AstReader.hpp>
+#include <soulng/util/CodeFormatter.hpp>
+#include <soulng/util/Path.hpp>
+#include <soulng/util/Unicode.hpp>
+#include <soulng/util/TextUtils.hpp>
+#include <soulng/util/Log.hpp>
+#include <soulng/util/Time.hpp>
 #include <boost/filesystem.hpp>
 #include <iostream>
 
 namespace cmajor { namespace symbols {
 
-using namespace cmajor::unicode;
-using namespace cmajor::util;
+using namespace soulng::unicode;
+using namespace soulng::util;
 
 class SystemModuleSet
 {
@@ -59,7 +59,6 @@ SystemModuleSet::SystemModuleSet()
     systemModuleNames.insert(U"System.Base");
     systemModuleNames.insert(U"System.Lex");
     systemModuleNames.insert(U"System.Parsing");
-    systemModuleNames.insert(U"System.Cmajor.Ast");
     systemModuleNames.insert(U"System.Text.Parsing.CodeDom");
     systemModuleNames.insert(U"System.Text.Parsing");
     systemModuleNames.insert(U"System.Net.Sockets");
@@ -200,7 +199,6 @@ void FileTable::Write(BinaryWriter& writer, bool systemModule)
             if (filePath.find(cmajorRoot, 0) == 0)
             {
                 filePath = filePath.substr(cmajorRoot.size());
-                Assert(Path::IsRelative(filePath), "relative file path expected");
             }
         }
         writer.Write(filePath);
@@ -225,7 +223,6 @@ void FileTable::Read(BinaryReader& reader, bool systemModule)
         if (systemModule)
         {
             std::string filePath = reader.ReadUtf8String();
-            Assert(Path::IsRelative(filePath), "relative file path expected");
             filePath = Path::Combine(cmajorRoot, filePath);
             filePaths.push_back(std::move(filePath));
         }
@@ -382,10 +379,10 @@ void Import(Module* rootModule, Module* module, const std::vector<std::string>& 
             std::string searchedDirectories;
             if (!rootModule->IsSystemModule())
             {
-                cmajor::ast::BackEnd backend = cmajor::ast::BackEnd::llvm;
+                sngcm::ast::BackEnd backend = sngcm::ast::BackEnd::llvm;
                 if (GetBackEnd() == cmajor::symbols::BackEnd::cmsx)
                 {
-                    backend = cmajor::ast::BackEnd::cmsx;
+                    backend = sngcm::ast::BackEnd::cmsx;
                 }
                 mfp = CmajorSystemLibDir(config, backend);
                 searchedDirectories.append("\n").append(mfp.generic_string());
@@ -431,10 +428,10 @@ void Import(Module* rootModule, Module* module, const std::vector<std::string>& 
             std::string searchedDirectories;
             if (!rootModule->IsSystemModule())
             {
-                cmajor::ast::BackEnd backend = cmajor::ast::BackEnd::llvm;
+                sngcm::ast::BackEnd backend = sngcm::ast::BackEnd::llvm;
                 if (GetBackEnd() == cmajor::symbols::BackEnd::cmsx)
                 {
-                    backend = cmajor::ast::BackEnd::cmsx;
+                    backend = sngcm::ast::BackEnd::cmsx;
                 }
                 mfp = CmajorSystemLibDir(config, backend);
                 mfp /= mfn;
@@ -496,10 +493,10 @@ void ImportModulesWithReferences(Module* rootModule, Module* module, const std::
     std::vector<std::string> allReferences = references;
     if (!rootModule->IsSystemModule() && !GetGlobalFlag(GlobalFlags::profile))
     {
-        cmajor::ast::BackEnd backend = cmajor::ast::BackEnd::llvm;
+        sngcm::ast::BackEnd backend = sngcm::ast::BackEnd::llvm;
         if (GetBackEnd() == cmajor::symbols::BackEnd::cmsx)
         {
-            backend = cmajor::ast::BackEnd::cmsx;
+            backend = sngcm::ast::BackEnd::cmsx;
         }
         allReferences.push_back(CmajorSystemModuleFilePath(GetConfig(), backend));
     }
@@ -671,14 +668,28 @@ void Module::RegisterFileTable(FileTable* fileTable, Module* module)
     moduleIdMap[module] = moduleId;
 }
 
+void Module::SetLexers(std::vector<std::unique_ptr<CmajorLexer>>&& lexers_)
+{
+    lexers = std::move(lexers_);
+    for (const auto& lexer : lexers)
+    {
+        lexerVec.push_back(lexer.get());
+    }
+}
+
+std::vector<soulng::lexer::Lexer*>* Module::GetLexers() 
+{
+    return &lexerVec;
+}
+
 std::string Module::GetFilePath(int32_t fileIndex) const
 {
     if (fileIndex == -1)
     {
         return std::string();
     }
-    int16_t moduleId = cmajor::ast::GetModuleId(fileIndex);
-    int16_t fileId = cmajor::ast::GetFileId(fileIndex);
+    int16_t moduleId = sngcm::ast::GetModuleId(fileIndex);
+    int16_t fileId = sngcm::ast::GetFileId(fileIndex);
     if (moduleId >= 0 && moduleId < fileTables.size())
     {
         FileTable* fileTable = fileTables[moduleId];
@@ -687,11 +698,64 @@ std::string Module::GetFilePath(int32_t fileIndex) const
     return std::string();
 }
 
+std::u32string Module::GetErrorLines(const Span& span) const
+{
+    if (span.fileIndex >= 0)
+    {
+        int16_t moduleId = sngcm::ast::GetModuleId(span.fileIndex);
+        if (moduleId == 0 && GetFlag(ModuleFlags::compiling))
+        {
+            int16_t fileId = sngcm::ast::GetFileId(span.fileIndex);
+            if (fileId < lexers.size())
+            {
+                return lexers[fileId]->ErrorLines(span);
+            }
+        }
+        else
+        {
+            std::string filePath = GetFilePath(span.fileIndex);
+            if (filePath.empty())
+            {
+                return std::u32string();
+            }
+            std::u32string content = ToUtf32(soulng::util::ReadFile(filePath));
+            return soulng::lexer::GetErrorLines(content.c_str(), content.c_str() + content.length(), span);
+        }
+    }
+    return std::u32string();
+}
+
+void Module::GetColumns(const Span& span, int32_t& startCol, int32_t& endCol) const
+{
+    if (span.fileIndex >= 0)
+    {
+        int16_t moduleId = sngcm::ast::GetModuleId(span.fileIndex);
+        if (moduleId == 0 && GetFlag(ModuleFlags::compiling))
+        {
+            int16_t fileId = sngcm::ast::GetFileId(span.fileIndex);
+            if (fileId < lexers.size())
+            {
+                return lexers[fileId]->GetColumns(span, startCol, endCol);
+            }
+        }
+        else
+        {
+            std::string filePath = GetFilePath(span.fileIndex);
+            if (filePath.empty())
+            {
+                return;
+            }
+            std::u32string content = ToUtf32(soulng::util::ReadFile(filePath));
+            return soulng::lexer::GetColumns(content.c_str(), content.c_str() + content.length(), span, startCol, endCol);
+        }
+    }
+}
+
 void Module::Write(SymbolWriter& writer)
 {
     ModuleTag tag;
     tag.Write(writer);
-    writer.GetBinaryWriter().Write(static_cast<uint8_t>(flags & ~(ModuleFlags::root | ModuleFlags::immutable)));
+    writer.GetBinaryWriter().Write(static_cast<uint8_t>(flags & ~(ModuleFlags::root | ModuleFlags::immutable | ModuleFlags::compiling)));
     writer.GetBinaryWriter().Write(name);
     writer.GetBinaryWriter().Write(originalFilePath);
     uint32_t nr = referencedModules.size();
@@ -1214,7 +1278,7 @@ void SetRootModuleForCurrentThread(Module* rootModule_)
     rootModule = rootModule_;
 }
 
-class SYMBOLS_API SystemModuleVersionTagVerifier : public cmajor::ast::ModuleVersionTagVerifier
+class SYMBOLS_API SystemModuleVersionTagVerifier : public sngcm::ast::ModuleVersionTagVerifier
 {
 public:
     void VerifyModuleVersionTag(const std::string& moduleFilePath) override;
@@ -1244,7 +1308,7 @@ SystemModuleVersionTagVerifier verifier;
 
 void InitModule()
 {
-    cmajor::ast::SetModuleVersionTagVerifier(&verifier);
+    sngcm::ast::SetModuleVersionTagVerifier(&verifier);
     SystemModuleSet::Init();
 }
 

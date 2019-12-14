@@ -8,7 +8,7 @@
 
 namespace cmajor { namespace symbols {
 
-SymbolWriter::SymbolWriter(const std::string& fileName_) : astWriter(fileName_)
+SymbolWriter::SymbolWriter(const std::string& fileName_) : astWriter(fileName_), lexers(nullptr)
 {
 }
 
@@ -18,6 +18,12 @@ void SymbolWriter::Write(Symbol* symbol)
     astWriter.Write(symbol->GetSpan());
     astWriter.GetBinaryWriter().Write(symbol->Name());
     symbol->Write(*this);
+}
+
+void SymbolWriter::SetLexers(std::vector<soulng::lexer::Lexer*>* lexers_)
+{
+    lexers = lexers_;
+    astWriter.SetLexers(lexers);
 }
 
 } } // namespace cmajor::symbols

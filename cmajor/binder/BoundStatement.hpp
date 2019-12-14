@@ -8,12 +8,12 @@
 #include <cmajor/binder/BoundExpression.hpp>
 #include <cmajor/symbols/VariableSymbol.hpp>
 #include <cmajor/symbols/Value.hpp>
-#include <cmajor/ast/Statement.hpp>
+#include <sngcm/ast/Statement.hpp>
 
 namespace cmajor { namespace binder {
 
 using namespace cmajor::symbols;
-using namespace cmajor::ast;
+using namespace sngcm::ast;
 
 class BoundFunctionCall;
 class BoundExpression;

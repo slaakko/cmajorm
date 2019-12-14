@@ -4,7 +4,7 @@
 // =================================
 
 #include <cmajor/rt/Mutex.hpp>
-#include <cmajor/util/Error.hpp>
+#include <soulng/util/Error.hpp>
 #include <atomic>
 #include <vector>
 #include <unordered_map>

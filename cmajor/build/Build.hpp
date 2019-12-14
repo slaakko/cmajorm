@@ -7,11 +7,11 @@
 #define CMAJOR_BUILD_BUILD_INCLUDED
 #include <cmajor/build/BuildApi.hpp>
 #include <cmajor/symbols/Module.hpp>
-#include <cmajor/ast/Project.hpp>
+#include <sngcm/ast/Project.hpp>
 
 namespace cmajor { namespace build {
 
-using namespace cmajor::ast;
+using namespace sngcm::ast;
 using namespace cmajor::symbols;
 
 BUILD_API void BuildProject(const std::string& projectFilePath, std::unique_ptr<Module>& rootModule);

@@ -12,6 +12,13 @@
 #define CODEGENWIN_API __declspec(dllexport)
 #else
 #define CODEGENWIN_API __declspec(dllimport)
+
+#ifdef NDEBUG
+#pragma comment(lib, "codegenwin.lib")
+#else
+#pragma comment(lib, "codegenwind.lib")
+#endif
+
 #endif
 
 #else

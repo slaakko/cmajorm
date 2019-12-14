@@ -5,11 +5,12 @@
 
 #include <cmajor/rt/CommandLine.hpp>
 #include <cmajor/rt/Memory.hpp>
-#include <cmajor/parser/CommandLine.hpp>
-#include <cmajor/util/Unicode.hpp>
-#include <cmajor/util/Error.hpp>
-#include <cmajor/util/Path.hpp>
-#include <cmajor/util/TextUtils.hpp>
+#include <sngcm/cmparser/CommandLine.hpp>
+#include <soulng/lexer/TrivialLexer.hpp>
+#include <soulng/util/Unicode.hpp>
+#include <soulng/util/Error.hpp>
+#include <soulng/util/Path.hpp>
+#include <soulng/util/TextUtils.hpp>
 #include <boost/lexical_cast.hpp>
 #include <memory>
 #include <string>
@@ -19,8 +20,8 @@
 
 namespace cmajor { namespace rt {
 
-using namespace cmajor::util;
-using namespace cmajor::unicode;
+using namespace soulng::util;
+using namespace soulng::unicode;
 
 class CommandLineProcessor
 {
@@ -32,7 +33,6 @@ public:
     const char** Argv() const { return argv.get();  }
 private:
     static std::unique_ptr<CommandLineProcessor> instance;
-    cmajor::parser::CommandLine* grammar;
     std::u32string commandLine;
     std::vector<std::string> args;
     int32_t argc;
@@ -59,9 +59,11 @@ bool ContainsWildCard(const std::string& filePath)
     return filePath.find('*') != std::string::npos || filePath.find('?') != std::string::npos;
 }
 
-CommandLineProcessor::CommandLineProcessor() : grammar(cmajor::parser::CommandLine::Create()), commandLine(ToUtf32(GetCommandLine())), argc(0), argv(nullptr)
+CommandLineProcessor::CommandLineProcessor() : commandLine(ToUtf32(GetCommandLine())), argc(0), argv(nullptr) 
 {
-    args = grammar->Parse(&commandLine[0], &commandLine[0] + commandLine.length(), 0, ""); 
+    commandLine.append(1, '\n');
+    TrivialLexer lexer(commandLine, "", 0);
+    args = CommandLineParser::Parse(lexer);
     std::vector<std::string> newArgs;
     int n = args.size();
     for (int i = 0; i < n; ++i)

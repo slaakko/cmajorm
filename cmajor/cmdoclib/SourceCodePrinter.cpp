@@ -5,29 +5,29 @@
 
 #include <cmajor/cmdoclib/SourceCodePrinter.hpp>
 #include <cmajor/cmdoclib/Input.hpp>
-#include <cmajor/dom/CharacterData.hpp>
-#include <cmajor/parser/SourceToken.hpp>
+#include <sngxml/dom/CharacterData.hpp>
+#include <sngcm/cmparser/SourceTokenParser.hpp>
 #include <cmajor/symbols/SymbolTable.hpp>
 #include <cmajor/symbols/GlobalFlags.hpp>
-#include <cmajor/ast/TypeExpr.hpp>
-#include <cmajor/ast/Visitor.hpp>
-#include <cmajor/ast/BasicType.hpp>
-#include <cmajor/ast/Literal.hpp>
-#include <cmajor/ast/Expression.hpp>
-#include <cmajor/ast/SourceToken.hpp>
-#include <cmajor/util/Path.hpp>
-#include <cmajor/util/Unicode.hpp>
-#include <cmajor/util/CodeFormatter.hpp>
-#include <cmajor/util/TextUtils.hpp>
+#include <sngcm/ast/TypeExpr.hpp>
+#include <sngcm/ast/Visitor.hpp>
+#include <sngcm/ast/BasicType.hpp>
+#include <sngcm/ast/Literal.hpp>
+#include <sngcm/ast/Expression.hpp>
+#include <sngcm/ast/SourceToken.hpp>
+#include <soulng/util/Path.hpp>
+#include <soulng/util/Unicode.hpp>
+#include <soulng/util/CodeFormatter.hpp>
+#include <soulng/util/TextUtils.hpp>
 #include <boost/filesystem.hpp>
 #include <fstream>
 
 namespace cmajor { namespace cmdoclib {
 
 using namespace cmajor::symbols;
-using namespace cmajor::ast;
-using namespace cmajor::util;
-using namespace cmajor::unicode;
+using namespace sngcm::ast;
+using namespace soulng::util;
+using namespace soulng::unicode;
 
 class OperatorMap
 {
@@ -102,11 +102,11 @@ std::u32string GetOperatorId(const std::u32string& groupId)
     return OperatorMap::Instance().GetOperatorId(groupId);
 }
 
-class SourceCodePrinter : public cmajor::ast::Visitor, public cmajor::ast::SourceTokenFormatter
+class SourceCodePrinter : public sngcm::ast::Visitor, public sngcm::ast::SourceTokenFormatter
 {
 public:
     SourceCodePrinter(const std::string& htmlFilePath_, const std::u32string& title_, const std::string& styleFilePath_, const std::vector<std::u32string>& lines_, 
-        SymbolTable& symbolTable_);
+        SymbolTable& symbolTable_, Module& module_, int sourceFileIndex_);
 
     void WriteDocument();
     void MoveTo(const Span& span);
@@ -116,7 +116,7 @@ public:
     void WriteRestOfInput();
     std::u32string MakeSymbolRef(Symbol* symbol);
     std::u32string MakeSymbolRef(Symbol* symbol, Module* module);
-    void WriteToElement(dom::Element* element, const std::u32string& text);
+    void WriteToElement(sngxml::dom::Element* element, const std::u32string& text);
     void WriteSpace(int n);
     void WriteLineNumber(const std::u32string& lineNumberText);
     void WriteLink(const std::u32string& linkText, const std::u32string& href, bool type);
@@ -218,6 +218,7 @@ public:
     void Visit(NonreferenceTypeConstraintNode& nonreferenceTypeConstraintNode) override;
 
     void Visit(LabelNode& labelNode) override;
+    void Visit(LabeledStatementNode& labeledStatementNode) override;
     void Visit(CompoundStatementNode& compoundStatementNode) override;
     void Visit(ReturnStatementNode& returnStatementNode) override;
     void Visit(IfStatementNode& ifStatementNode) override;
@@ -248,6 +249,7 @@ public:
     void Visit(ConditionalCompilationNotNode& conditionalCompilationNotNode) override;
     void Visit(ConditionalCompilationPrimaryNode& conditionalCompilationPrimaryNode) override;
     void Visit(ConditionalCompilationStatementNode& conditionalCompilationStatementNode) override;
+    void Visit(ParenthesizedConditionalCompilationExpressionNode& parenthesizedConditionalCompilationExpressionNode) override;
 
     void Visit(TypedefNode& typedefNode) override;
     void Visit(ConstantNode& constantNode) override;
@@ -311,39 +313,42 @@ private:
     std::string htmlFilePath;
     std::u32string title;
     std::string styleFilePath;
-    std::unique_ptr<dom::Document> htmlDoc;
-    std::unique_ptr<dom::Element> htmlElement;
-    std::unique_ptr<dom::Element> bodyElement;
-    std::unique_ptr<dom::Element> lineElement;
+    std::unique_ptr<sngxml::dom::Document> htmlDoc;
+    std::unique_ptr<sngxml::dom::Element> htmlElement;
+    std::unique_ptr<sngxml::dom::Element> bodyElement;
+    std::unique_ptr<sngxml::dom::Element> lineElement;
     std::vector<std::u32string> lines;
     const std::vector<int>* lineStarts;
     int numDigits;
     int currentSourceLineNumber;
     int currentPos;
     SymbolTable& symbolTable;
+    Module& module;
+    int sourceFileIndex;
     FunctionSymbol* invokeFunctionSymbol;
+    bool inBlockComment;
 };
 
 SourceCodePrinter::SourceCodePrinter(const std::string& htmlFilePath_, const std::u32string& title_, const std::string& styleFilePath_, const std::vector<std::u32string>& lines_, 
-    SymbolTable& symbolTable_) :
+    SymbolTable& symbolTable_, Module& module_, int sourceFileIndex_) :
     input(GetInputPtr()), htmlFilePath(htmlFilePath_), title(title_), styleFilePath(styleFilePath_),
-    htmlDoc(new dom::Document()), htmlElement(new dom::Element(U"html")), bodyElement(new dom::Element(U"body")), lines(lines_), lineStarts(nullptr), numDigits(Log10(lines.size())), 
-    currentSourceLineNumber(1), currentPos(0), symbolTable(symbolTable_), invokeFunctionSymbol(nullptr)
+    htmlDoc(new sngxml::dom::Document()), htmlElement(new sngxml::dom::Element(U"html")), bodyElement(new sngxml::dom::Element(U"body")), lines(lines_), lineStarts(nullptr), numDigits(Log10(lines.size())), 
+    currentSourceLineNumber(1), currentPos(0), symbolTable(symbolTable_), module(module_), sourceFileIndex(sourceFileIndex_), invokeFunctionSymbol(nullptr), inBlockComment(false)
 {
-    std::unique_ptr<dom::Element> headElement(new dom::Element(U"head"));
-    std::unique_ptr<dom::Element> metaElement(new dom::Element(U"meta"));
+    std::unique_ptr<sngxml::dom::Element> headElement(new sngxml::dom::Element(U"head"));
+    std::unique_ptr<sngxml::dom::Element> metaElement(new sngxml::dom::Element(U"meta"));
     metaElement->SetAttribute(U"charset", U"utf-8");
-    headElement->AppendChild(std::unique_ptr<dom::Node>(metaElement.release()));
-    std::unique_ptr<dom::Element> titleElement(new dom::Element(U"title"));
-    titleElement->AppendChild(std::unique_ptr<dom::Node>(new dom::Text(title)));
-    headElement->AppendChild(std::unique_ptr<dom::Node>(titleElement.release()));
-    std::unique_ptr<dom::Element> linkElement(new dom::Element(U"link"));
+    headElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(metaElement.release()));
+    std::unique_ptr<sngxml::dom::Element> titleElement(new sngxml::dom::Element(U"title"));
+    titleElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::Text(title)));
+    headElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(titleElement.release()));
+    std::unique_ptr<sngxml::dom::Element> linkElement(new sngxml::dom::Element(U"link"));
     linkElement->SetAttribute(U"rel", U"stylesheet");
     linkElement->SetAttribute(U"type", U"text/css");
     std::u32string relativeStyleFilePath = ToUtf32(styleFilePath);
     linkElement->SetAttribute(U"href", relativeStyleFilePath);
-    headElement->AppendChild(std::unique_ptr<dom::Node>(linkElement.release()));
-    htmlElement->AppendChild(std::unique_ptr<dom::Node>(headElement.release()));
+    headElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(linkElement.release()));
+    htmlElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(headElement.release()));
 }
 
 void SourceCodePrinter::WriteDocument()
@@ -351,14 +356,14 @@ void SourceCodePrinter::WriteDocument()
     std::ofstream htmlFile(htmlFilePath);
     CodeFormatter formatter(htmlFile);
     formatter.SetIndentSize(1);
-    htmlElement->AppendChild(std::unique_ptr<dom::Node>(bodyElement.release()));
-    htmlDoc->AppendChild(std::unique_ptr<dom::Node>(htmlElement.release()));
+    htmlElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(bodyElement.release()));
+    htmlDoc->AppendChild(std::unique_ptr<sngxml::dom::Node>(htmlElement.release()));
     htmlDoc->Write(formatter);
 }
 
 void SourceCodePrinter::MoveTo(const Span& span)
 {
-    int lineNumber = span.LineNumber();
+    int lineNumber = span.line;
     while (lineNumber > currentSourceLineNumber)
     {
         if (!lineElement)
@@ -374,16 +379,19 @@ void SourceCodePrinter::MoveTo(const Span& span)
     {
         OpenLine();
     }
-    if (currentPos < span.Start())
+    soulng::lexer::Lexer* lexer = (*module.GetLexers())[sourceFileIndex];
+    Span s = span;
+    lexer->ConvertExternal(s);
+    if (currentPos < s.start)
     {
-        int length = span.Start() - currentPos;
+        int length = s.start - currentPos;
         WriteSpace(length);
     }
 }
 
 void SourceCodePrinter::OpenLine()
 {
-    lineElement.reset(new dom::Element(U"span"));
+    lineElement.reset(new sngxml::dom::Element(U"span"));
     lineElement->SetAttribute(U"class", U"code");
     lineElement->SetAttribute(U"xml:space", U"preserve");
     lineElement->SetAttribute(U"id", ToUtf32(std::to_string(currentSourceLineNumber)));
@@ -400,22 +408,16 @@ void SourceCodePrinter::OpenLine()
 
 void SourceCodePrinter::CloseLine()
 {
-    bodyElement->AppendChild(std::unique_ptr<dom::Node>(lineElement.release()));
-    bodyElement->AppendChild(std::unique_ptr<dom::Node>(new dom::Element(U"br")));
+    bodyElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(lineElement.release()));
+    bodyElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::Element(U"br")));
     ++currentSourceLineNumber;
 }
 
-cmajor::parser::SourceToken* sourceTokenParser = nullptr; 
-
 void SourceCodePrinter::UseInputLine()
 {
-    if (!sourceTokenParser)
-    {
-        sourceTokenParser = cmajor::parser::SourceToken::Create();
-    }
     const std::u32string& line = lines[currentSourceLineNumber - 1];
     OpenLine();
-    sourceTokenParser->Parse(line.c_str(), line.c_str() + line.length(), 0, "", this);
+    sngcm::parser::ParseSourceLine(line, this, inBlockComment);
     CloseLine();
 }
 
@@ -494,17 +496,17 @@ std::u32string SourceCodePrinter::MakeSymbolRef(Symbol* symbol, Module* module)
     }
 }
 
-void SourceCodePrinter::WriteToElement(dom::Element* element, const std::u32string& text)
+void SourceCodePrinter::WriteToElement(sngxml::dom::Element* element, const std::u32string& text)
 {
     for (char32_t c : text)
     {
         if (c == ' ')
         {
-            element->AppendChild(std::unique_ptr<dom::Node>(new dom::EntityReference(U"nbsp")));
+            element->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::EntityReference(U"nbsp")));
         }
         else
         {
-            element->AppendChild(std::unique_ptr<dom::Node>(new dom::Text(std::u32string(1, c))));
+            element->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::Text(std::u32string(1, c))));
         }
     }
 }
@@ -513,17 +515,17 @@ void SourceCodePrinter::WriteSpace(int n)
 {
     for (int i = 0; i < n; ++i)
     {
-        lineElement->AppendChild(std::unique_ptr<dom::Node>(new dom::EntityReference(U"nbsp")));
+        lineElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::EntityReference(U"nbsp")));
     }
     currentPos += n;
 }
 
 void SourceCodePrinter::WriteLineNumber(const std::u32string& lineNumberText)
 {
-    std::unique_ptr<dom::Element> lineNumberElement(new dom::Element(U"span"));
+    std::unique_ptr<sngxml::dom::Element> lineNumberElement(new sngxml::dom::Element(U"span"));
     lineNumberElement->SetAttribute(U"class", U"lineNumber");
     WriteToElement(lineNumberElement.get(), lineNumberText);
-    lineElement->AppendChild(std::unique_ptr<dom::Node>(lineNumberElement.release()));
+    lineElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(lineNumberElement.release()));
     currentPos += lineNumberText.length();
 }
 
@@ -531,7 +533,7 @@ void SourceCodePrinter::WriteLink(const std::u32string& linkText, const std::u32
 {
     if (href.empty())
     {
-        std::unique_ptr<dom::Element> identifierElement(new dom::Element(U"span"));
+        std::unique_ptr<sngxml::dom::Element> identifierElement(new sngxml::dom::Element(U"span"));
         if (type)
         {
             identifierElement->SetAttribute(U"class", U"type");
@@ -541,15 +543,15 @@ void SourceCodePrinter::WriteLink(const std::u32string& linkText, const std::u32
             identifierElement->SetAttribute(U"class", U"identifier");
         }
         WriteToElement(identifierElement.get(), linkText);
-        lineElement->AppendChild(std::unique_ptr<dom::Node>(identifierElement.release()));
+        lineElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(identifierElement.release()));
         currentPos += linkText.length();
     }
     else
     {
-        std::unique_ptr<dom::Element> linkElement(new dom::Element(U"a"));
+        std::unique_ptr<sngxml::dom::Element> linkElement(new sngxml::dom::Element(U"a"));
         linkElement->SetAttribute(U"href", href);
         WriteToElement(linkElement.get(), linkText);
-        lineElement->AppendChild(std::unique_ptr<dom::Node>(linkElement.release()));
+        lineElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(linkElement.release()));
         currentPos += linkText.length();
     }
 }
@@ -634,46 +636,46 @@ void SourceCodePrinter::WriteType(TypeSymbol* type)
 
 void SourceCodePrinter::Keyword(const std::u32string& token)
 {
-    std::unique_ptr<dom::Element> keywordElement(new dom::Element(U"span"));
+    std::unique_ptr<sngxml::dom::Element> keywordElement(new sngxml::dom::Element(U"span"));
     keywordElement->SetAttribute(U"class", U"kw");
     WriteToElement(keywordElement.get(), token);
-    lineElement->AppendChild(std::unique_ptr<dom::Node>(keywordElement.release()));
+    lineElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(keywordElement.release()));
     currentPos += token.length();
 }
 
 void SourceCodePrinter::Identifier(const std::u32string& token)
 {
-    std::unique_ptr<dom::Element> identifierElement(new dom::Element(U"span"));
+    std::unique_ptr<sngxml::dom::Element> identifierElement(new sngxml::dom::Element(U"span"));
     identifierElement->SetAttribute(U"class", U"identifier");
     WriteToElement(identifierElement.get(), token);
-    lineElement->AppendChild(std::unique_ptr<dom::Node>(identifierElement.release()));
+    lineElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(identifierElement.release()));
     currentPos += token.length();
 }
 
 void SourceCodePrinter::Number(const std::u32string& token)
 {
-    std::unique_ptr<dom::Element> numberElement(new dom::Element(U"span"));
+    std::unique_ptr<sngxml::dom::Element> numberElement(new sngxml::dom::Element(U"span"));
     numberElement->SetAttribute(U"class", U"number");
     WriteToElement(numberElement.get(), token);
-    lineElement->AppendChild(std::unique_ptr<dom::Node>(numberElement.release()));
+    lineElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(numberElement.release()));
     currentPos += token.length();
 }
 
 void SourceCodePrinter::Char(const std::u32string& token)
 {
-    std::unique_ptr<dom::Element> charElement(new dom::Element(U"span"));
+    std::unique_ptr<sngxml::dom::Element> charElement(new sngxml::dom::Element(U"span"));
     charElement->SetAttribute(U"class", U"char");
     WriteToElement(charElement.get(), token);
-    lineElement->AppendChild(std::unique_ptr<dom::Node>(charElement.release()));
+    lineElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(charElement.release()));
     currentPos += token.length();
 }
 
 void SourceCodePrinter::String(const std::u32string& token)
 {
-    std::unique_ptr<dom::Element> stringElement(new dom::Element(U"span"));
+    std::unique_ptr<sngxml::dom::Element> stringElement(new sngxml::dom::Element(U"span"));
     stringElement->SetAttribute(U"class", U"string");
     WriteToElement(stringElement.get(), token);
-    lineElement->AppendChild(std::unique_ptr<dom::Node>(stringElement.release()));
+    lineElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(stringElement.release()));
     currentPos += token.length();
 }
 
@@ -684,19 +686,19 @@ void SourceCodePrinter::Spaces(const std::u32string& token)
 
 void SourceCodePrinter::Comment(const std::u32string& token)
 {
-    std::unique_ptr<dom::Element> commentElement(new dom::Element(U"span"));
+    std::unique_ptr<sngxml::dom::Element> commentElement(new sngxml::dom::Element(U"span"));
     commentElement->SetAttribute(U"class", U"comment");
     WriteToElement(commentElement.get(), token);
-    lineElement->AppendChild(std::unique_ptr<dom::Node>(commentElement.release()));
+    lineElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(commentElement.release()));
     currentPos += token.length();
 }
 
 void SourceCodePrinter::Other(const std::u32string& token)
 {
-    std::unique_ptr<dom::Element> otherElement(new dom::Element(U"span"));
+    std::unique_ptr<sngxml::dom::Element> otherElement(new sngxml::dom::Element(U"span"));
     otherElement->SetAttribute(U"class", U"other");
     WriteToElement(otherElement.get(), token);
-    lineElement->AppendChild(std::unique_ptr<dom::Node>(otherElement.release()));
+    lineElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(otherElement.release()));
     currentPos += token.length();
 }
 
@@ -1929,12 +1931,14 @@ void SourceCodePrinter::Visit(LabelNode& labelNode)
     Other(U": ");
 }
 
+void SourceCodePrinter::Visit(LabeledStatementNode& labeledStatementNode)
+{
+    labeledStatementNode.Label()->Accept(*this);
+    labeledStatementNode.Stmt()->Accept(*this);
+}
+
 void SourceCodePrinter::Visit(CompoundStatementNode& compoundStatementNode)
 {
-    if (compoundStatementNode.Label())
-    {
-        compoundStatementNode.Label()->Accept(*this);
-    }
     MoveTo(compoundStatementNode.GetSpan());
     MoveTo(compoundStatementNode.BeginBraceSpan());
     Other(U"{");
@@ -1950,10 +1954,6 @@ void SourceCodePrinter::Visit(CompoundStatementNode& compoundStatementNode)
 
 void SourceCodePrinter::Visit(ReturnStatementNode& returnStatementNode)
 {
-    if (returnStatementNode.Label())
-    {
-        returnStatementNode.Label()->Accept(*this);
-    }
     MoveTo(returnStatementNode.GetSpan());
     Keyword(U"return");
     if (returnStatementNode.Expression())
@@ -1965,13 +1965,10 @@ void SourceCodePrinter::Visit(ReturnStatementNode& returnStatementNode)
 
 void SourceCodePrinter::Visit(IfStatementNode& ifStatementNode)
 {
-    if (ifStatementNode.Label())
-    {
-        ifStatementNode.Label()->Accept(*this);
-    }
     MoveTo(ifStatementNode.GetSpan());
     Keyword(U"if");
     MoveTo(ifStatementNode.LeftParenSpan());
+
     Other(U"(");
     ifStatementNode.Condition()->Accept(*this);
     MoveTo(ifStatementNode.RightParenSpan());
@@ -1987,10 +1984,6 @@ void SourceCodePrinter::Visit(IfStatementNode& ifStatementNode)
 
 void SourceCodePrinter::Visit(WhileStatementNode& whileStatementNode)
 {
-    if (whileStatementNode.Label())
-    {
-        whileStatementNode.Label()->Accept(*this);
-    }
     MoveTo(whileStatementNode.GetSpan());
     Keyword(U"while");
     MoveTo(whileStatementNode.LeftParenSpan());
@@ -2003,10 +1996,6 @@ void SourceCodePrinter::Visit(WhileStatementNode& whileStatementNode)
 
 void SourceCodePrinter::Visit(DoStatementNode& doStatementNode)
 {
-    if (doStatementNode.Label())
-    {
-        doStatementNode.Label()->Accept(*this);
-    }
     MoveTo(doStatementNode.GetSpan());
     Keyword(U"do");
     doStatementNode.Statement()->Accept(*this);
@@ -2021,10 +2010,6 @@ void SourceCodePrinter::Visit(DoStatementNode& doStatementNode)
 
 void SourceCodePrinter::Visit(ForStatementNode& forStatementNode)
 {
-    if (forStatementNode.Label())
-    {
-        forStatementNode.Label()->Accept(*this);
-    }
     MoveTo(forStatementNode.GetSpan());
     Keyword(U"for");
     MoveTo(forStatementNode.LeftParenSpan());
@@ -2043,10 +2028,6 @@ void SourceCodePrinter::Visit(ForStatementNode& forStatementNode)
 
 void SourceCodePrinter::Visit(BreakStatementNode& breakStatementNode)
 {
-    if (breakStatementNode.Label())
-    {
-        breakStatementNode.Label()->Accept(*this);
-    }
     MoveTo(breakStatementNode.GetSpan());
     Keyword(U"break");
     Other(U";");
@@ -2054,10 +2035,6 @@ void SourceCodePrinter::Visit(BreakStatementNode& breakStatementNode)
 
 void SourceCodePrinter::Visit(ContinueStatementNode& continueStatementNode)
 {
-    if (continueStatementNode.Label())
-    {
-        continueStatementNode.Label()->Accept(*this);
-    }
     MoveTo(continueStatementNode.GetSpan());
     Keyword(U"continue");
     Other(U";");
@@ -2065,10 +2042,6 @@ void SourceCodePrinter::Visit(ContinueStatementNode& continueStatementNode)
 
 void SourceCodePrinter::Visit(GotoStatementNode& gotoStatementNode)
 {
-    if (gotoStatementNode.Label())
-    {
-        gotoStatementNode.Label()->Accept(*this);
-    }
     MoveTo(gotoStatementNode.GetSpan());
     Keyword(U"goto");
     WriteSpace(1);
@@ -2078,10 +2051,6 @@ void SourceCodePrinter::Visit(GotoStatementNode& gotoStatementNode)
 
 void SourceCodePrinter::Visit(ConstructionStatementNode& constructionStatementNode)
 {
-    if (constructionStatementNode.Label())
-    {
-        constructionStatementNode.Label()->Accept(*this);
-    }
     MoveTo(constructionStatementNode.GetSpan());
     constructionStatementNode.TypeExpr()->Accept(*this);
     constructionStatementNode.Id()->Accept(*this);
@@ -2109,10 +2078,6 @@ void SourceCodePrinter::Visit(ConstructionStatementNode& constructionStatementNo
 
 void SourceCodePrinter::Visit(DeleteStatementNode& deleteStatementNode)
 {
-    if (deleteStatementNode.Label())
-    {
-        deleteStatementNode.Label()->Accept(*this);
-    }
     MoveTo(deleteStatementNode.GetSpan());
     Keyword(U"delete");
     deleteStatementNode.Expression()->Accept(*this);
@@ -2121,10 +2086,6 @@ void SourceCodePrinter::Visit(DeleteStatementNode& deleteStatementNode)
 
 void SourceCodePrinter::Visit(DestroyStatementNode& destroyStatementNode)
 {
-    if (destroyStatementNode.Label())
-    {
-        destroyStatementNode.Label()->Accept(*this);
-    }
     MoveTo(destroyStatementNode.GetSpan());
     Keyword(U"destroy");
     destroyStatementNode.Expression()->Accept(*this);
@@ -2133,10 +2094,6 @@ void SourceCodePrinter::Visit(DestroyStatementNode& destroyStatementNode)
 
 void SourceCodePrinter::Visit(AssignmentStatementNode& assignmentStatementNode)
 {
-    if (assignmentStatementNode.Label())
-    {
-        assignmentStatementNode.Label()->Accept(*this);
-    }
     MoveTo(assignmentStatementNode.GetSpan());
     assignmentStatementNode.TargetExpr()->Accept(*this);
     Other(U" = ");
@@ -2146,10 +2103,6 @@ void SourceCodePrinter::Visit(AssignmentStatementNode& assignmentStatementNode)
 
 void SourceCodePrinter::Visit(ExpressionStatementNode& expressionStatementNode)
 {
-    if (expressionStatementNode.Label())
-    {
-        expressionStatementNode.Label()->Accept(*this);
-    }
     MoveTo(expressionStatementNode.GetSpan());
     expressionStatementNode.Expression()->Accept(*this);
     Other(U";");
@@ -2157,20 +2110,12 @@ void SourceCodePrinter::Visit(ExpressionStatementNode& expressionStatementNode)
 
 void SourceCodePrinter::Visit(EmptyStatementNode& emptyStatementNode)
 {
-    if (emptyStatementNode.Label())
-    {
-        emptyStatementNode.Label()->Accept(*this);
-    }
     MoveTo(emptyStatementNode.GetSpan());
     Other(U";");
 }
 
 void SourceCodePrinter::Visit(RangeForStatementNode& rangeForStatementNode)
 {
-    if (rangeForStatementNode.Label())
-    {
-        rangeForStatementNode.Label()->Accept(*this);
-    }
     MoveTo(rangeForStatementNode.GetSpan());
     Keyword(U"for");
     MoveTo(rangeForStatementNode.LeftParenSpan());
@@ -2187,10 +2132,6 @@ void SourceCodePrinter::Visit(RangeForStatementNode& rangeForStatementNode)
 
 void SourceCodePrinter::Visit(SwitchStatementNode& switchStatementNode)
 {
-    if (switchStatementNode.Label())
-    {
-        switchStatementNode.Label()->Accept(*this);
-    }
     MoveTo(switchStatementNode.GetSpan());
     Keyword(U"switch");
     MoveTo(switchStatementNode.LeftParenSpan());
@@ -2216,10 +2157,6 @@ void SourceCodePrinter::Visit(SwitchStatementNode& switchStatementNode)
 
 void SourceCodePrinter::Visit(CaseStatementNode& caseStatementNode)
 {
-    if (caseStatementNode.Label())
-    {
-        caseStatementNode.Label()->Accept(*this);
-    }
     MoveTo(caseStatementNode.GetSpan());
     int n = caseStatementNode.CaseExprs().Count();
     for (int i = 0; i < n; ++i)
@@ -2238,10 +2175,6 @@ void SourceCodePrinter::Visit(CaseStatementNode& caseStatementNode)
 
 void SourceCodePrinter::Visit(DefaultStatementNode& defaultStatementNode)
 {
-    if (defaultStatementNode.Label())
-    {
-        defaultStatementNode.Label()->Accept(*this);
-    }
     MoveTo(defaultStatementNode.GetSpan());
     Keyword(U"default");
     Other(U":");
@@ -2254,10 +2187,6 @@ void SourceCodePrinter::Visit(DefaultStatementNode& defaultStatementNode)
 
 void SourceCodePrinter::Visit(GotoCaseStatementNode& gotoCaseStatementNode)
 {
-    if (gotoCaseStatementNode.Label())
-    {
-        gotoCaseStatementNode.Label()->Accept(*this);
-    }
     MoveTo(gotoCaseStatementNode.GetSpan());
     Keyword(U"goto");
     WriteSpace(1);
@@ -2268,10 +2197,6 @@ void SourceCodePrinter::Visit(GotoCaseStatementNode& gotoCaseStatementNode)
 
 void SourceCodePrinter::Visit(GotoDefaultStatementNode& gotoDefaultStatementNode)
 {
-    if (gotoDefaultStatementNode.Label())
-    {
-        gotoDefaultStatementNode.Label()->Accept(*this);
-    }
     MoveTo(gotoDefaultStatementNode.GetSpan());
     Keyword(U"goto");
     WriteSpace(1);
@@ -2281,10 +2206,6 @@ void SourceCodePrinter::Visit(GotoDefaultStatementNode& gotoDefaultStatementNode
 
 void SourceCodePrinter::Visit(ThrowStatementNode& throwStatementNode)
 {
-    if (throwStatementNode.Label())
-    {
-        throwStatementNode.Label()->Accept(*this);
-    }
     MoveTo(throwStatementNode.GetSpan());
     Keyword(U"throw");
     if (throwStatementNode.Expression())
@@ -2296,10 +2217,6 @@ void SourceCodePrinter::Visit(ThrowStatementNode& throwStatementNode)
 
 void SourceCodePrinter::Visit(TryStatementNode& tryStatementNode)
 {
-    if (tryStatementNode.Label())
-    {
-        tryStatementNode.Label()->Accept(*this);
-    }
     MoveTo(tryStatementNode.GetSpan());
     Keyword(U"try");
     tryStatementNode.TryBlock()->Accept(*this);
@@ -2328,10 +2245,6 @@ void SourceCodePrinter::Visit(CatchNode& catchNode)
 
 void SourceCodePrinter::Visit(AssertStatementNode& assertStatementNode)
 {
-    if (assertStatementNode.Label())
-    {
-        assertStatementNode.Label()->Accept(*this);
-    }
     MoveTo(assertStatementNode.GetSpan());
     Keyword(U"#assert");
     assertStatementNode.AssertExpr()->Accept(*this);
@@ -2367,12 +2280,16 @@ void SourceCodePrinter::Visit(ConditionalCompilationPrimaryNode& conditionalComp
     Identifier(conditionalCompilationPrimaryNode.Symbol());
 }
 
+void SourceCodePrinter::Visit(ParenthesizedConditionalCompilationExpressionNode& parenthesizedConditionalCompilationExpressionNode)
+{
+    MoveTo(parenthesizedConditionalCompilationExpressionNode.GetSpan());
+    Other(U"(");
+    parenthesizedConditionalCompilationExpressionNode.Expr()->Accept(*this);
+    Other(U")");
+}
+
 void SourceCodePrinter::Visit(ConditionalCompilationStatementNode& conditionalCompilationStatementNode)
 {
-    if (conditionalCompilationStatementNode.Label())
-    {
-        conditionalCompilationStatementNode.Label()->Accept(*this);
-    }
     MoveTo(conditionalCompilationStatementNode.IfPart()->KeywordSpan());
     Keyword(U"#if");
     MoveTo(conditionalCompilationStatementNode.IfPart()->LeftParenSpan());
@@ -2931,7 +2848,7 @@ void SourceCodePrinter::Visit(ParenthesizedExpressionNode& parenthesizedExpressi
     Other(U")");
 }
 
-bool HtmlSourceFilePathsUpToDate(cmajor::ast::Project* project)
+bool HtmlSourceFilePathsUpToDate(sngcm::ast::Project* project)
 {
     Input* input = GetInputPtr();
     std::string targetDir = input->targetDirPath;
@@ -2951,7 +2868,7 @@ bool HtmlSourceFilePathsUpToDate(cmajor::ast::Project* project)
     return true;
 }
 
-void GenerateSourceCode(cmajor::ast::Project* project, cmajor::binder::BoundCompileUnit* boundCompileUnit, std::unordered_map<int, File>& fileMap)
+void GenerateSourceCode(sngcm::ast::Project* project, cmajor::binder::BoundCompileUnit* boundCompileUnit, std::unordered_map<int, File>& fileMap)
 {
     std::string fileName = Path::GetFileName(boundCompileUnit->GetCompileUnitNode()->FilePath());
     Input* input = GetInputPtr();
@@ -2970,7 +2887,7 @@ void GenerateSourceCode(cmajor::ast::Project* project, cmajor::binder::BoundComp
     File file;
     file.name = title;
     file.htmlFilePath = Path::Combine(Path::Combine(Path::Combine("../..", ToUtf8(project->Name())), "file"), htmlFileName);
-    fileMap[boundCompileUnit->GetCompileUnitNode()->GetSpan().FileIndex()] = file;
+    fileMap[boundCompileUnit->GetCompileUnitNode()->GetSpan().fileIndex] = file;
     std::vector<std::u32string> lines;
     std::ifstream inputFile(boundCompileUnit->GetCompileUnitNode()->FilePath());
     std::string line;
@@ -2979,7 +2896,8 @@ void GenerateSourceCode(cmajor::ast::Project* project, cmajor::binder::BoundComp
         lines.push_back(ToUtf32(line));
     }
     std::string styleFilePath = "../../../style/style.css";
-    SourceCodePrinter printer(htmlFilePath, title, styleFilePath, lines, boundCompileUnit->GetSymbolTable());
+    SourceCodePrinter printer(htmlFilePath, title, styleFilePath, lines, boundCompileUnit->GetSymbolTable(), boundCompileUnit->GetModule(),
+        boundCompileUnit->GetCompileUnitNode()->GetSpan().fileIndex);
     boundCompileUnit->GetCompileUnitNode()->Accept(printer);
     printer.WriteDocument();
 }

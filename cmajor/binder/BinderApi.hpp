@@ -12,6 +12,13 @@
 #define BINDER_API __declspec(dllexport)
 #else
 #define BINDER_API __declspec(dllimport)
+
+#ifdef NDEBUG
+#pragma comment(lib, "binder.lib")
+#else
+#pragma comment(lib, "binderd.lib")
+#endif
+
 #endif
 
 #else

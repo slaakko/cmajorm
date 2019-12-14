@@ -18,16 +18,16 @@
 #include <cmajor/symbols/InterfaceTypeSymbol.hpp>
 #include <cmajor/symbols/Module.hpp>
 #include <cmajor/symbols/DebugFlags.hpp>
-#include <cmajor/util/Path.hpp>
-#include <cmajor/util/Unicode.hpp>
-#include <cmajor/util/Log.hpp>
-#include <cmajor/util/Time.hpp>
+#include <soulng/util/Path.hpp>
+#include <soulng/util/Unicode.hpp>
+#include <soulng/util/Log.hpp>
+#include <soulng/util/Time.hpp>
 #include <boost/filesystem.hpp>
 
 namespace cmajor { namespace binder {
 
-using namespace cmajor::util;
-using namespace cmajor::unicode;
+using namespace soulng::util;
+using namespace soulng::unicode;
 
 class ClassTypeConversion : public FunctionSymbol
 {
@@ -231,6 +231,42 @@ void ULongToVoidPtrConversion::GenerateCall(Emitter& emitter, std::vector<GenObj
     emitter.Stack().Push(emitter.CreateIntToPtr(value, voidPtrType->IrType(emitter)));
 }
 
+class CharacterPointerLiteralToStringFunctionContainerConversion : public FunctionSymbol
+{
+public:
+    CharacterPointerLiteralToStringFunctionContainerConversion(TypeSymbol* characterPtrType_, TypeSymbol* stringFunctionContainerType_);
+    ConversionType GetConversionType() const override { return ConversionType::implicit_; }
+    uint8_t ConversionDistance() const override { return 1; }
+    TypeSymbol* ConversionSourceType() const { return characterPtrType; }
+    TypeSymbol* ConversionTargetType() const { return stringFunctionContainerType; }
+    bool IsBasicTypeOperation() const override { return true; }
+    void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span) override;
+    std::unique_ptr<Value> ConvertValue(const std::unique_ptr<Value>& value) const override;
+    const char* ClassName() const override { return "CharacterPointerLiteralToStringFunctionContainerConversion"; }
+private:
+    TypeSymbol* characterPtrType;
+    TypeSymbol* stringFunctionContainerType;
+};
+
+CharacterPointerLiteralToStringFunctionContainerConversion::CharacterPointerLiteralToStringFunctionContainerConversion(TypeSymbol* characterPtrType_, TypeSymbol* stringFunctionContainerType_) :
+    FunctionSymbol(Span(), U"charlit2stringFun"), characterPtrType(characterPtrType_), stringFunctionContainerType(stringFunctionContainerType_)
+{
+    SetConversion();
+    SetGroupName(U"@conversion");
+    SetAccess(SymbolAccess::public_);
+}
+
+void CharacterPointerLiteralToStringFunctionContainerConversion::GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span)
+{
+    throw std::runtime_error(ToUtf8(Name()) + " function provides compile time calls only");
+}
+
+std::unique_ptr<Value> CharacterPointerLiteralToStringFunctionContainerConversion::ConvertValue(const std::unique_ptr<Value>& value) const
+{
+    int x = 0;
+    return std::unique_ptr<Value>();
+}
+
 BoundCompileUnit::BoundCompileUnit(Module& module_, CompileUnitNode* compileUnitNode_, AttributeBinder* attributeBinder_) :
     BoundNode(&module_, Span(), BoundNodeType::boundCompileUnit), module(module_), symbolTable(module.GetSymbolTable()), compileUnitNode(compileUnitNode_), attributeBinder(attributeBinder_), currentNamespace(nullptr), 
     hasGotos(false), operationRepository(*this), functionTemplateRepository(*this), classTemplateRepository(*this), inlineFunctionRepository(*this), 
@@ -390,6 +426,16 @@ FunctionSymbol* BoundCompileUnit::GetConversion(TypeSymbol* sourceType, TypeSymb
                 conversion = ptrToVoidPtrConversion.get();
                 conversionTable.AddConversion(conversion);
                 conversionTable.AddGeneratedConversion(std::move(ptrToVoidPtrConversion));
+                return conversion;
+            }
+            else if (sourceType->PlainType(span)->IsCharacterPointerType() && targetType->IsStringFunctionContainer())
+            {
+                std::unique_ptr<FunctionSymbol> charPtr2StringFunctionsConversion(
+                    new CharacterPointerLiteralToStringFunctionContainerConversion(sourceType->PlainType(span), symbolTable.GetTypeByName(U"@string_functions")));
+                charPtr2StringFunctionsConversion->SetParent(&symbolTable.GlobalNs());
+                conversion = charPtr2StringFunctionsConversion.get();
+                conversionTable.AddConversion(conversion);
+                conversionTable.AddGeneratedConversion(std::move(charPtr2StringFunctionsConversion));
                 return conversion;
             }
             else if (sourceType->BaseType()->IsClassTypeSymbol() && targetType->BaseType()->IsClassTypeSymbol())

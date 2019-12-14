@@ -3,9 +3,8 @@
 // Distributed under the MIT license
 // =================================
 
-#include <cmajor/ast/InitDone.hpp>
-#include <cmajor/parsing/InitDone.hpp>
-#include <cmajor/util/InitDone.hpp>
+#include <sngcm/ast/InitDone.hpp>
+#include <soulng/util/InitDone.hpp>
 #include <cmajor/build/Build.hpp>
 #include <cmajor/cmmid/InitDone.hpp>
 #include <cmajor/symbols/Exception.hpp>
@@ -13,14 +12,14 @@
 #include <cmajor/symbols/GlobalFlags.hpp>
 #include <cmajor/symbols/ModuleCache.hpp>
 #include <cmajor/symbols/Warning.hpp>
-#include <cmajor/parsing/Exception.hpp>
-#include <cmajor/dom/Document.hpp>
-#include <cmajor/dom/Element.hpp>
-#include <cmajor/dom/CharacterData.hpp>
-#include <cmajor/util/Util.hpp>
-#include <cmajor/util/Path.hpp>
-#include <cmajor/util/Json.hpp>
-#include <cmajor/util/Unicode.hpp>
+#include <soulng/lexer/ParsingException.hpp>
+#include <sngxml/dom/Document.hpp>
+#include <sngxml/dom/Element.hpp>
+#include <sngxml/dom/CharacterData.hpp>
+#include <soulng/util/Util.hpp>
+#include <soulng/util/Path.hpp>
+#include <soulng/util/Json.hpp>
+#include <soulng/util/Unicode.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/lexical_cast.hpp>
 #include <iostream>
@@ -32,17 +31,15 @@ struct InitDone
 {
     InitDone()
     {
-        cmajor::ast::Init();
+        soulng::util::Init();
+        sngcm::ast::Init();
         cmajor::symbols::Init();
-        cmajor::parsing::Init();
-        cmajor::util::Init();
     }
     ~InitDone()
     {
-        cmajor::util::Done();
-        cmajor::parsing::Done();
         cmajor::symbols::Done();
-        cmajor::ast::Done();
+        sngcm::ast::Done();
+        soulng::util::Done();
     }
 };
 
@@ -144,51 +141,50 @@ void PrintHelp()
         std::endl;
 }
 
-using namespace cmajor::util;
-using namespace cmajor::unicode;
+using namespace soulng::util;
+using namespace soulng::unicode;
 using namespace cmajor::symbols;
-using namespace cmajor::parsing;
 using namespace cmajor::build;
 
 #if(0)
-void AddWarningsTo(cmajor::dom::Element* diagnosticsElement, Module* module)
+void AddWarningsTo(sngxml::dom::Element* diagnosticsElement, Module* module)
 {
     if (!module->WarningCollection().Warnings().empty())
     {
         for (const Warning& warning : module->WarningCollection().Warnings())
         {
-            std::unique_ptr<cmajor::dom::Element> diagnosticElement(new cmajor::dom::Element(U"diagnostic"));
-            std::unique_ptr<cmajor::dom::Element> categoryElement(new cmajor::dom::Element(U"category"));
-            std::unique_ptr<cmajor::dom::Text> categoryText(new cmajor::dom::Text(U"warning"));
-            categoryElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(categoryText.release()));
-            std::unique_ptr<cmajor::dom::Element> messageElement(new cmajor::dom::Element(U"message"));
-            std::unique_ptr<cmajor::dom::Text> messageText(new cmajor::dom::Text(ToUtf32(warning.Message())));
-            messageElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(messageText.release()));
-            diagnosticElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(categoryElement.release()));
-            diagnosticElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(messageElement.release()));
-            std::unique_ptr<cmajor::dom::Element> spanElement = SpanToDomElement(module, warning.Defined());
+            std::unique_ptr<sngxml::dom::Element> diagnosticElement(new sngxml::dom::Element(U"diagnostic"));
+            std::unique_ptr<sngxml::dom::Element> categoryElement(new sngxml::dom::Element(U"category"));
+            std::unique_ptr<sngxml::dom::Text> categoryText(new sngxml::dom::Text(U"warning"));
+            categoryElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(categoryText.release()));
+            std::unique_ptr<sngxml::dom::Element> messageElement(new sngxml::dom::Element(U"message"));
+            std::unique_ptr<sngxml::dom::Text> messageText(new sngxml::dom::Text(ToUtf32(warning.Message())));
+            messageElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(messageText.release()));
+            diagnosticElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(categoryElement.release()));
+            diagnosticElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(messageElement.release()));
+            std::unique_ptr<sngxml::dom::Element> spanElement = SpanToDomElement(module, warning.Defined());
             if (spanElement)
             {
-                diagnosticElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(spanElement.release()));
+                diagnosticElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(spanElement.release()));
             }
-            diagnosticsElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(diagnosticElement.release()));
+            diagnosticsElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(diagnosticElement.release()));
             for (const Span& span : warning.References())
             {
                 if (!span.Valid()) continue;
-                std::unique_ptr<cmajor::dom::Element> diagnosticElement(new cmajor::dom::Element(U"diagnostic"));
-                std::unique_ptr<cmajor::dom::Element> categoryElement(new cmajor::dom::Element(U"category"));
-                std::unique_ptr<cmajor::dom::Text> categoryText(new cmajor::dom::Text(U"info"));
-                categoryElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(categoryText.release()));
-                std::unique_ptr<cmajor::dom::Element> messageElement(new cmajor::dom::Element(U"message"));
-                std::unique_ptr<cmajor::dom::Text> messageText(new cmajor::dom::Text(ToUtf32("see reference to")));
-                messageElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(messageText.release()));
-                diagnosticElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(categoryElement.release()));
-                diagnosticElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(messageElement.release()));
-                std::unique_ptr<cmajor::dom::Element> spanElement = SpanToDomElement(module, span);
+                std::unique_ptr<sngxml::dom::Element> diagnosticElement(new sngxml::dom::Element(U"diagnostic"));
+                std::unique_ptr<sngxml::dom::Element> categoryElement(new sngxml::dom::Element(U"category"));
+                std::unique_ptr<sngxml::dom::Text> categoryText(new sngxml::dom::Text(U"info"));
+                categoryElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(categoryText.release()));
+                std::unique_ptr<sngxml::dom::Element> messageElement(new sngxml::dom::Element(U"message"));
+                std::unique_ptr<sngxml::dom::Text> messageText(new sngxml::dom::Text(ToUtf32("see reference to")));
+                messageElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(messageText.release()));
+                diagnosticElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(categoryElement.release()));
+                diagnosticElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(messageElement.release()));
+                std::unique_ptr<sngxml::dom::Element> spanElement = SpanToDomElement(module, span);
                 if (spanElement)
                 {
-                    diagnosticElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(spanElement.release()));
-                    diagnosticsElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(diagnosticElement.release()));
+                    diagnosticElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(spanElement.release()));
+                    diagnosticsElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(diagnosticElement.release()));
                 }
             }
         }
@@ -560,13 +556,13 @@ int main(int argc, const char** argv)
                 }
                 else if (GetGlobalFlag(GlobalFlags::msbuild))
                 {
-                    cmajor::dom::Document compileResultDoc;
-                    std::unique_ptr<cmajor::dom::Element> compileResultElement(new cmajor::dom::Element(U"compileResult"));
-                    std::unique_ptr<cmajor::dom::Element> successElement(new cmajor::dom::Element(U"success"));
-                    std::unique_ptr<cmajor::dom::Text> trueValue(new cmajor::dom::Text(U"true"));
-                    successElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(trueValue.release()));
-                    compileResultElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(successElement.release()));
-                    compileResultDoc.AppendChild(std::unique_ptr<cmajor::dom::Node>(compileResultElement.release()));
+                    sngxml::dom::Document compileResultDoc;
+                    std::unique_ptr<sngxml::dom::Element> compileResultElement(new sngxml::dom::Element(U"compileResult"));
+                    std::unique_ptr<sngxml::dom::Element> successElement(new sngxml::dom::Element(U"success"));
+                    std::unique_ptr<sngxml::dom::Text> trueValue(new sngxml::dom::Text(U"true"));
+                    successElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(trueValue.release()));
+                    compileResultElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(successElement.release()));
+                    compileResultDoc.AppendChild(std::unique_ptr<sngxml::dom::Node>(compileResultElement.release()));
                     CodeFormatter formatter(std::cerr);
                     formatter.SetIndentSize(1);
                     compileResultDoc.Write(formatter);
@@ -580,13 +576,13 @@ int main(int argc, const char** argv)
             }
             else if (GetGlobalFlag(GlobalFlags::msbuild))
             {
-                cmajor::dom::Document compileResultDoc;
-                std::unique_ptr<cmajor::dom::Element> compileResultElement(new cmajor::dom::Element(U"compileResult"));
-                std::unique_ptr<cmajor::dom::Element> successElement(new cmajor::dom::Element(U"success"));
-                std::unique_ptr<cmajor::dom::Text> trueValue(new cmajor::dom::Text(U"true"));
-                successElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(trueValue.release()));
-                compileResultElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(successElement.release()));
-                compileResultDoc.AppendChild(std::unique_ptr<cmajor::dom::Node>(compileResultElement.release()));
+                sngxml::dom::Document compileResultDoc;
+                std::unique_ptr<sngxml::dom::Element> compileResultElement(new sngxml::dom::Element(U"compileResult"));
+                std::unique_ptr<sngxml::dom::Element> successElement(new sngxml::dom::Element(U"success"));
+                std::unique_ptr<sngxml::dom::Text> trueValue(new sngxml::dom::Text(U"true"));
+                successElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(trueValue.release()));
+                compileResultElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(successElement.release()));
+                compileResultDoc.AppendChild(std::unique_ptr<sngxml::dom::Node>(compileResultElement.release()));
                 CodeFormatter formatter(std::cerr);
                 formatter.SetIndentSize(1);
                 compileResultDoc.Write(formatter);
@@ -606,7 +602,7 @@ int main(int argc, const char** argv)
             }
         }
     }
-    catch (const ParsingException& ex)
+    catch (const soulng::lexer::ParsingException& ex)
     {
         if (!GetGlobalFlag(GlobalFlags::quiet) && !GetGlobalFlag(GlobalFlags::ide) && !GetGlobalFlag(GlobalFlags::msbuild))
         {
@@ -643,7 +639,7 @@ int main(int argc, const char** argv)
             json->AddField(U"project", std::unique_ptr<JsonValue>(new JsonString(ToUtf32(ex.Project()))));
             json->AddField(U"message", std::unique_ptr<JsonValue>(new JsonString(ToUtf32(ex.Message()))));
             std::unique_ptr<JsonArray> refs(new JsonArray());
-            std::unique_ptr<JsonObject> ref = SpanToJson(rootModule.get(), ex.GetSpan());
+            std::unique_ptr<JsonObject> ref = SpanToJson(rootModule.get(), ex.GetSpan()); 
             if (ref)
             {
                 refs->AddItem(std::move(ref));
@@ -676,37 +672,37 @@ int main(int argc, const char** argv)
                 }
 #endif
             }
-            cmajor::dom::Document compileResultDoc;
-            std::unique_ptr<cmajor::dom::Element> compileResultElement(new cmajor::dom::Element(U"compileResult"));
-            std::unique_ptr<cmajor::dom::Element> successElement(new cmajor::dom::Element(U"success"));
-            std::unique_ptr<cmajor::dom::Text> falseValue(new cmajor::dom::Text(U"false"));
-            successElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(falseValue.release()));
-            compileResultElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(successElement.release()));
-            std::unique_ptr<cmajor::dom::Element> diagnosticsElement(new cmajor::dom::Element(U"diagnostics"));
-            std::unique_ptr<cmajor::dom::Element> diagnosticElement(new cmajor::dom::Element(U"diagnostic"));
-            std::unique_ptr<cmajor::dom::Element> categoryElement(new cmajor::dom::Element(U"category"));
-            std::unique_ptr<cmajor::dom::Text> categoryText(new cmajor::dom::Text(U"error"));
-            categoryElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(categoryText.release()));
-            std::unique_ptr<cmajor::dom::Element> subcategoryElement(new cmajor::dom::Element(U"subcategory"));
-            std::unique_ptr<cmajor::dom::Text> subcategoryText(new cmajor::dom::Text(U"error"));
-            subcategoryElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(subcategoryText.release()));
-            std::unique_ptr<cmajor::dom::Element> messageElement(new cmajor::dom::Element(U"message"));
-            std::unique_ptr<cmajor::dom::Text> messageText(new cmajor::dom::Text(ToUtf32(ex.Message())));
-            messageElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(messageText.release()));
-            diagnosticElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(categoryElement.release()));
-            diagnosticElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(subcategoryElement.release()));
-            diagnosticElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(messageElement.release()));
-            std::unique_ptr<cmajor::dom::Element> spanElement = SpanToDomElement(rootModule.get(), ex.GetSpan());
+            sngxml::dom::Document compileResultDoc;
+            std::unique_ptr<sngxml::dom::Element> compileResultElement(new sngxml::dom::Element(U"compileResult"));
+            std::unique_ptr<sngxml::dom::Element> successElement(new sngxml::dom::Element(U"success"));
+            std::unique_ptr<sngxml::dom::Text> falseValue(new sngxml::dom::Text(U"false"));
+            successElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(falseValue.release()));
+            compileResultElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(successElement.release()));
+            std::unique_ptr<sngxml::dom::Element> diagnosticsElement(new sngxml::dom::Element(U"diagnostics"));
+            std::unique_ptr<sngxml::dom::Element> diagnosticElement(new sngxml::dom::Element(U"diagnostic"));
+            std::unique_ptr<sngxml::dom::Element> categoryElement(new sngxml::dom::Element(U"category"));
+            std::unique_ptr<sngxml::dom::Text> categoryText(new sngxml::dom::Text(U"error"));
+            categoryElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(categoryText.release()));
+            std::unique_ptr<sngxml::dom::Element> subcategoryElement(new sngxml::dom::Element(U"subcategory"));
+            std::unique_ptr<sngxml::dom::Text> subcategoryText(new sngxml::dom::Text(U"error"));
+            subcategoryElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(subcategoryText.release()));
+            std::unique_ptr<sngxml::dom::Element> messageElement(new sngxml::dom::Element(U"message"));
+            std::unique_ptr<sngxml::dom::Text> messageText(new sngxml::dom::Text(ToUtf32(ex.Message())));
+            messageElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(messageText.release()));
+            diagnosticElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(categoryElement.release()));
+            diagnosticElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(subcategoryElement.release()));
+            diagnosticElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(messageElement.release()));
+            std::unique_ptr<sngxml::dom::Element> spanElement = SpanToDomElement(rootModule.get(), ex.GetSpan());
             if (spanElement)
             {
-                diagnosticElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(spanElement.release()));
+                diagnosticElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(spanElement.release()));
             }
-            diagnosticsElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(diagnosticElement.release()));
+            diagnosticsElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(diagnosticElement.release()));
 #if(0)
             AddWarningsTo(diagnosticsElement.get(), rootModule.get());
 #endif
-            compileResultElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(diagnosticsElement.release()));
-            compileResultDoc.AppendChild(std::unique_ptr<cmajor::dom::Node>(compileResultElement.release()));
+            compileResultElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(diagnosticsElement.release()));
+            compileResultDoc.AppendChild(std::unique_ptr<sngxml::dom::Node>(compileResultElement.release()));
             CodeFormatter formatter(std::cerr);
             formatter.SetIndentSize(1);
             compileResultDoc.Write(formatter);
@@ -762,19 +758,19 @@ int main(int argc, const char** argv)
                 std::cout << what << std::endl;
             }
 #endif
-            cmajor::dom::Document compileResultDoc;
-            std::unique_ptr<cmajor::dom::Element> compileResultElement(new cmajor::dom::Element(U"compileResult"));
-            std::unique_ptr<cmajor::dom::Element> successElement(new cmajor::dom::Element(U"success"));
-            std::unique_ptr<cmajor::dom::Text> falseValue(new cmajor::dom::Text(U"false"));
-            successElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(falseValue.release()));
-            compileResultElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(successElement.release()));
-            std::unique_ptr<cmajor::dom::Element> diagnosticsElement(new cmajor::dom::Element(U"diagnostics"));
+            sngxml::dom::Document compileResultDoc;
+            std::unique_ptr<sngxml::dom::Element> compileResultElement(new sngxml::dom::Element(U"compileResult"));
+            std::unique_ptr<sngxml::dom::Element> successElement(new sngxml::dom::Element(U"success"));
+            std::unique_ptr<sngxml::dom::Text> falseValue(new sngxml::dom::Text(U"false"));
+            successElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(falseValue.release()));
+            compileResultElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(successElement.release()));
+            std::unique_ptr<sngxml::dom::Element> diagnosticsElement(new sngxml::dom::Element(U"diagnostics"));
             ex.AddToDiagnosticsElement(diagnosticsElement.get());
 #if(0)
             AddWarningsTo(diagnosticsElement.get(), ex.GetModule());
 #endif
-            compileResultElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(diagnosticsElement.release()));
-            compileResultDoc.AppendChild(std::unique_ptr<cmajor::dom::Node>(compileResultElement.release()));
+            compileResultElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(diagnosticsElement.release()));
+            compileResultDoc.AppendChild(std::unique_ptr<sngxml::dom::Node>(compileResultElement.release()));
             CodeFormatter formatter(std::cerr);
             formatter.SetIndentSize(1);
             compileResultDoc.Write(formatter);
@@ -844,32 +840,32 @@ int main(int argc, const char** argv)
                 }
 #endif
             }
-            cmajor::dom::Document compileResultDoc;
-            std::unique_ptr<cmajor::dom::Element> compileResultElement(new cmajor::dom::Element(U"compileResult"));
-            std::unique_ptr<cmajor::dom::Element> successElement(new cmajor::dom::Element(U"success"));
-            std::unique_ptr<cmajor::dom::Text> falseValue(new cmajor::dom::Text(U"false"));
-            successElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(falseValue.release()));
-            compileResultElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(successElement.release()));
-            std::unique_ptr<cmajor::dom::Element> diagnosticsElement(new cmajor::dom::Element(U"diagnostics"));
-            std::unique_ptr<cmajor::dom::Element> diagnosticElement(new cmajor::dom::Element(U"diagnostic"));
-            std::unique_ptr<cmajor::dom::Element> categoryElement(new cmajor::dom::Element(U"category"));
-            std::unique_ptr<cmajor::dom::Text> categoryText(new cmajor::dom::Text(U"error"));
-            std::unique_ptr<cmajor::dom::Element> subcategoryElement(new cmajor::dom::Element(U"subcategory"));
-            std::unique_ptr<cmajor::dom::Text> subcategoryText(new cmajor::dom::Text(U"general"));
-            subcategoryElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(subcategoryText.release()));
-            categoryElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(categoryText.release()));
-            std::unique_ptr<cmajor::dom::Element> messageElement(new cmajor::dom::Element(U"message"));
-            std::unique_ptr<cmajor::dom::Text> messageText(new cmajor::dom::Text(ToUtf32(ex.what())));
-            messageElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(messageText.release()));
-            diagnosticElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(categoryElement.release()));
-            diagnosticElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(subcategoryElement.release()));
-            diagnosticElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(messageElement.release()));
-            diagnosticsElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(diagnosticElement.release()));
+            sngxml::dom::Document compileResultDoc;
+            std::unique_ptr<sngxml::dom::Element> compileResultElement(new sngxml::dom::Element(U"compileResult"));
+            std::unique_ptr<sngxml::dom::Element> successElement(new sngxml::dom::Element(U"success"));
+            std::unique_ptr<sngxml::dom::Text> falseValue(new sngxml::dom::Text(U"false"));
+            successElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(falseValue.release()));
+            compileResultElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(successElement.release()));
+            std::unique_ptr<sngxml::dom::Element> diagnosticsElement(new sngxml::dom::Element(U"diagnostics"));
+            std::unique_ptr<sngxml::dom::Element> diagnosticElement(new sngxml::dom::Element(U"diagnostic"));
+            std::unique_ptr<sngxml::dom::Element> categoryElement(new sngxml::dom::Element(U"category"));
+            std::unique_ptr<sngxml::dom::Text> categoryText(new sngxml::dom::Text(U"error"));
+            std::unique_ptr<sngxml::dom::Element> subcategoryElement(new sngxml::dom::Element(U"subcategory"));
+            std::unique_ptr<sngxml::dom::Text> subcategoryText(new sngxml::dom::Text(U"general"));
+            subcategoryElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(subcategoryText.release()));
+            categoryElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(categoryText.release()));
+            std::unique_ptr<sngxml::dom::Element> messageElement(new sngxml::dom::Element(U"message"));
+            std::unique_ptr<sngxml::dom::Text> messageText(new sngxml::dom::Text(ToUtf32(ex.what())));
+            messageElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(messageText.release()));
+            diagnosticElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(categoryElement.release()));
+            diagnosticElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(subcategoryElement.release()));
+            diagnosticElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(messageElement.release()));
+            diagnosticsElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(diagnosticElement.release()));
 #if(0)
             AddWarningsTo(diagnosticsElement.get(), rootModule.get());
 #endif
-            compileResultElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(diagnosticsElement.release()));
-            compileResultDoc.AppendChild(std::unique_ptr<cmajor::dom::Node>(compileResultElement.release()));
+            compileResultElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(diagnosticsElement.release()));
+            compileResultDoc.AppendChild(std::unique_ptr<sngxml::dom::Node>(compileResultElement.release()));
             CodeFormatter formatter(std::cerr);
             formatter.SetIndentSize(1);
             compileResultDoc.Write(formatter);

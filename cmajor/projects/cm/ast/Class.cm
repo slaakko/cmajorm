@@ -1,0 +1,708 @@
+using System;
+using System.Collections;
+
+// this file has been semiautomatically generated from 'D:/work/soulng-project/sngcm/ast/Class.hpp' using cpp2cm version 1.0.0
+
+// this file has been semiautomatically generated from 'D:/work/soulng-project/sngcm/ast/Class.cpp' using cpp2cm version 1.0.0
+
+namespace Cm.Ast
+{
+    public class ClassNode : Node
+    {
+        public nothrow ClassNode(const System.Lex.Span& span_) :
+            base(NodeType.classNode, span_), specifiers(Specifiers.none), id(), templateParameters(), baseClassOrInterfaces(), members()
+        {
+        }
+        public nothrow ClassNode(const System.Lex.Span& span_, Specifiers specifiers_, IdentifierNode* id_, Attributes* attributes_) :
+            base(NodeType.classNode, span_), specifiers(specifiers_), id(id_), templateParameters(), baseClassOrInterfaces(), members(), attributes(attributes_)
+        {
+        }
+        public nothrow void SetSpecifiers(Specifiers specifiers_)
+        {
+            specifiers = specifiers_;
+        }
+        public nothrow IdentifierNode* Id() const
+        {
+            return id.Get();
+        }
+        public nothrow const WhereConstraintNode* WhereConstraint() const
+        {
+            return constraint.Get();
+        }
+        public nothrow WhereConstraintNode* WhereConstraint()
+        {
+            return constraint.Get();
+        }
+        public nothrow const NodeList<TemplateParameterNode>& TemplateParameters() const
+        {
+            return templateParameters;
+        }
+        public nothrow const NodeList<Node>& BaseClassOrInterfaces() const
+        {
+            return baseClassOrInterfaces;
+        }
+        public nothrow const NodeList<Node>& Members() const
+        {
+            return members;
+        }
+        public nothrow Attributes* GetAttributes() const
+        {
+            return attributes.Get();
+        }
+        public nothrow void SetSpecifierSpan(const System.Lex.Span& specifierSpan_)
+        {
+            specifierSpan = specifierSpan_;
+        }
+        public nothrow const System.Lex.Span& SpecifierSpan() const
+        {
+            return specifierSpan;
+        }
+        public nothrow void SetClassSpan(const System.Lex.Span& classSpan_)
+        {
+            classSpan = classSpan_;
+        }
+        public nothrow const System.Lex.Span& ClassSpan() const
+        {
+            return classSpan;
+        }
+        public nothrow void SetBeginBraceSpan(const System.Lex.Span& beginBraceSpan_)
+        {
+            beginBraceSpan = beginBraceSpan_;
+        }
+        public nothrow const System.Lex.Span& BeginBraceSpan() const
+        {
+            return beginBraceSpan;
+        }
+        public nothrow void SetEndBraceSpan(const System.Lex.Span& endBraceSpan_)
+        {
+            endBraceSpan = endBraceSpan_;
+        }
+        public nothrow const System.Lex.Span& EndBraceSpan() const
+        {
+            return endBraceSpan;
+        }
+        public nothrow void AddBaseClassOrInterface(Node* baseClassOrInterface)
+        {
+            baseClassOrInterface->SetParent(this);
+            baseClassOrInterfaces.Add(baseClassOrInterface);
+        }
+        public nothrow void SetConstraint(WhereConstraintNode* whereConstraint)
+        {
+            constraint.Reset(whereConstraint);
+            constraint->SetParent(this);
+        }
+        public nothrow void AddMember(Node* member)
+        {
+            member->SetParent(this);
+            members.Add(member);
+        }
+        public nothrow void ArrangeMembers()
+        {
+            UniquePtr<Node> staticConstructor;
+            NodeList<Node> constructors;
+            UniquePtr<Node> destructor;
+            NodeList<Node> virtualMembers;
+            NodeList<Node> protectedMembers;
+            NodeList<Node> privateMembers;
+            int n = members.Count();
+            for (int i = 0; i < n; ++i)
+            {
+                Node* member = members[i];
+                if (member->GetNodeType() == NodeType.staticConstructorNode)
+                {
+                    staticConstructor.Reset(members.Release(i));
+                }
+                else if (member->GetNodeType() == NodeType.constructorNode)
+                {
+                    constructors.Add(members.Release(i));
+                }
+                else if (member->GetNodeType() == NodeType.destructorNode)
+                {
+                    destructor.Reset(members.Release(i));
+                }
+                else
+                {
+                    Specifiers specifiers = member->GetSpecifiers();
+                    if ((specifiers & (Specifiers.abstract_ | Specifiers.override_ | Specifiers.virtual_)) != Specifiers.none)
+                    {
+                        virtualMembers.Add(members.Release(i));
+                    }
+                    else if ((specifiers & Specifiers.protected_) != Specifiers.none)
+                    {
+                        protectedMembers.Add(members.Release(i));
+                    }
+                    else if ((specifiers & Specifiers.private_) != Specifiers.none)
+                    {
+                        privateMembers.Add(members.Release(i));
+                    }
+                }
+            }
+            members.RemoveEmpty();
+            int index = 0;
+            if (!staticConstructor.IsNull())
+            {
+                members.Insert(index, staticConstructor.Release());
+                ++index;
+            }
+            int nc = constructors.Count();
+            if (nc > 0)
+            {
+                for (int i = 0; i < nc; ++i)
+                {
+                    members.Insert(index, constructors.Release(i));
+                    ++index;
+                }
+            }
+            if (!destructor.IsNull())
+            {
+                members.Insert(index, destructor.Release());
+                ++index;
+            }
+            if (virtualMembers.Count() > 0 || protectedMembers.Count() > 0 || privateMembers.Count() > 0)
+            {
+                for (int i = 0; i < virtualMembers.Count(); ++i)
+                {
+                    members.Add(virtualMembers.Release(i));
+                }
+                for (int i = 0; i < protectedMembers.Count(); ++i)
+                {
+                    members.Add(protectedMembers.Release(i));
+                }
+                for (int i = 0; i < privateMembers.Count(); ++i)
+                {
+                    members.Add(privateMembers.Release(i));
+                }
+            }
+        }
+        public override nothrow Specifiers GetSpecifiers() const
+        {
+            return specifiers;
+        }
+        public override Node* Clone(CloneContext& cloneContext) const
+        {
+            Attributes* clonedAttributes = null;
+            if (!attributes.IsNull())
+            {
+                clonedAttributes = attributes->Clone();
+            }
+            ClassNode* clone = new ClassNode(GetSpan(), specifiers, cast<IdentifierNode*>(id->Clone(cloneContext)), clonedAttributes);
+            if (!cloneContext.InstantiateClassNode())
+            {
+                int tn = templateParameters.Count();
+                for (int i = 0; i < tn; ++i)
+                {
+                    clone->AddTemplateParameter(cast<TemplateParameterNode*>(templateParameters[i]->Clone(cloneContext)));
+                }
+            }
+            int bn = baseClassOrInterfaces.Count();
+            for (int i = 0; i < bn; ++i)
+            {
+                clone->AddBaseClassOrInterface(baseClassOrInterfaces[i]->Clone(cloneContext));
+            }
+            if (!constraint.IsNull())
+            {
+                clone->SetConstraint(cast<WhereConstraintNode*>(constraint->Clone(cloneContext)));
+            }
+            int mn = members.Count();
+            for (int i = 0; i < mn; ++i)
+            {
+                clone->AddMember(members[i]->Clone(cloneContext));
+            }
+            clone->SetSpecifierSpan(specifierSpan);
+            clone->SetClassSpan(classSpan);
+            clone->SetBeginBraceSpan(beginBraceSpan);
+            clone->SetEndBraceSpan(endBraceSpan);
+            return clone;
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public override nothrow void Write(AstWriter& writer)
+        {
+            base->Write(writer);
+            bool hasAttributes = attributes != null;
+            writer.GetBinaryWriter().Write(hasAttributes);
+            if (hasAttributes)
+            {
+                attributes->Write(writer);
+            }
+            writer.Write(specifiers);
+            writer.Write(id.Get());
+            templateParameters.Write(writer);
+            baseClassOrInterfaces.Write(writer);
+            members.Write(writer);
+            writer.Write(specifierSpan);
+            writer.Write(classSpan);
+            writer.Write(beginBraceSpan);
+            writer.Write(endBraceSpan);
+        }
+        public override void Read(AstReader& reader)
+        {
+            base->Read(reader);
+            bool hasAttributes = reader.GetBinaryReader().ReadBool();
+            if (hasAttributes)
+            {
+                attributes.Reset(new Attributes());
+                attributes->Read(reader);
+            }
+            specifiers = reader.ReadSpecifiers();
+            id.Reset(reader.ReadIdentifierNode());
+            id->SetParent(this);
+            templateParameters.Read(reader);
+            templateParameters.SetParent(this);
+            baseClassOrInterfaces.Read(reader);
+            baseClassOrInterfaces.SetParent(this);
+            members.Read(reader);
+            members.SetParent(this);
+            specifierSpan = reader.ReadSpan();
+            classSpan = reader.ReadSpan();
+            beginBraceSpan = reader.ReadSpan();
+            endBraceSpan = reader.ReadSpan();
+        }
+        public override void AddTemplateParameter(TemplateParameterNode* templateParameter)
+        {
+            templateParameter->SetParent(this);
+            templateParameters.Add(templateParameter);
+        }
+        private Specifiers specifiers;
+        private System.Lex.Span specifierSpan;
+        private System.Lex.Span classSpan;
+        private System.Lex.Span beginBraceSpan;
+        private System.Lex.Span endBraceSpan;
+        private UniquePtr<IdentifierNode> id;
+        private NodeList<TemplateParameterNode> templateParameters;
+        private NodeList<Node> baseClassOrInterfaces;
+        private UniquePtr<WhereConstraintNode> constraint;
+        private NodeList<Node> members;
+        private UniquePtr<Attributes> attributes;
+    }
+    public abstract class InitializerNode : Node
+    {
+        public nothrow InitializerNode(NodeType nodeType_, const System.Lex.Span& span_) :
+            base(nodeType_, span_)
+        {
+        }
+        public nothrow const NodeList<Node>& Arguments() const
+        {
+            return arguments;
+        }
+        public override nothrow void Write(AstWriter& writer)
+        {
+            base->Write(writer);
+            arguments.Write(writer);
+        }
+        public override void Read(AstReader& reader)
+        {
+            base->Read(reader);
+            arguments.Read(reader);
+            arguments.SetParent(this);
+        }
+        public override void AddArgument(Node* argument)
+        {
+            argument->SetParent(this);
+            arguments.Add(argument);
+        }
+        private NodeList<Node> arguments;
+    }
+    public class ThisInitializerNode : InitializerNode
+    {
+        public nothrow ThisInitializerNode(const System.Lex.Span& span_) :
+            base(NodeType.thisInitializerNode, span_)
+        {
+        }
+        public override Node* Clone(CloneContext& cloneContext) const
+        {
+            ThisInitializerNode* clone = new ThisInitializerNode(GetSpan());
+            int n = Arguments().Count();
+            for (int i = 0; i < n; ++i)
+            {
+                clone->AddArgument(Arguments()[i]->Clone(cloneContext));
+            }
+            return clone;
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+    }
+    public class BaseInitializerNode : InitializerNode
+    {
+        public nothrow BaseInitializerNode(const System.Lex.Span& span_) :
+            base(NodeType.baseInitializerNode, span_)
+        {
+        }
+        public override Node* Clone(CloneContext& cloneContext) const
+        {
+            BaseInitializerNode* clone = new BaseInitializerNode(GetSpan());
+            int n = Arguments().Count();
+            for (int i = 0; i < n; ++i)
+            {
+                clone->AddArgument(Arguments()[i]->Clone(cloneContext));
+            }
+            return clone;
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+    }
+    public class MemberInitializerNode : InitializerNode
+    {
+        public nothrow MemberInitializerNode(const System.Lex.Span& span_) :
+            base(NodeType.memberInitializerNode, span_), memberId()
+        {
+        }
+        public nothrow MemberInitializerNode(const System.Lex.Span& span_, IdentifierNode* memberId_) :
+            base(NodeType.memberInitializerNode, span_), memberId(memberId_)
+        {
+            memberId->SetParent(this);
+        }
+        public nothrow const IdentifierNode* MemberId() const
+        {
+            return memberId.Get();
+        }
+        public nothrow IdentifierNode* MemberId()
+        {
+            return memberId.Get();
+        }
+        public override Node* Clone(CloneContext& cloneContext) const
+        {
+            MemberInitializerNode* clone = new MemberInitializerNode(GetSpan(), cast<IdentifierNode*>(memberId->Clone(cloneContext)));
+            int n = Arguments().Count();
+            for (int i = 0; i < n; ++i)
+            {
+                clone->AddArgument(Arguments()[i]->Clone(cloneContext));
+            }
+            return clone;
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public override nothrow void Write(AstWriter& writer)
+        {
+            base->Write(writer);
+            writer.Write(memberId.Get());
+        }
+        public override void Read(AstReader& reader)
+        {
+            base->Read(reader);
+            memberId.Reset(reader.ReadIdentifierNode());
+            memberId->SetParent(this);
+        }
+        private UniquePtr<IdentifierNode> memberId;
+    }
+    public class StaticConstructorNode : FunctionNode
+    {
+        public nothrow StaticConstructorNode(const System.Lex.Span& span_) :
+            base(NodeType.staticConstructorNode, span_, Specifiers.none, null, u"@static_constructor", null), initializers()
+        {
+        }
+        public nothrow StaticConstructorNode(const System.Lex.Span& span_, Specifiers specifiers_, Attributes* attributes_) :
+            base(NodeType.staticConstructorNode, span_, specifiers_, null, u"@static_constructor", attributes_), initializers()
+        {
+        }
+        public nothrow const NodeList<InitializerNode>& Initializers() const
+        {
+            return initializers;
+        }
+        public nothrow void SetClassId(IdentifierNode* classId_)
+        {
+            classId.Reset(classId_);
+        }
+        public nothrow IdentifierNode* ClassId()
+        {
+            return classId.Get();
+        }
+        public nothrow void AddInitializer(InitializerNode* initializer)
+        {
+            initializer->SetParent(this);
+            initializers.Add(initializer);
+        }
+        public override Node* Clone(CloneContext& cloneContext) const
+        {
+            StaticConstructorNode* clone = new StaticConstructorNode(GetSpan(), GetSpecifiers(), null);
+            int n = initializers.Count();
+            for (int i = 0; i < n; ++i)
+            {
+                clone->AddInitializer(cast<InitializerNode*>(initializers[i]->Clone(cloneContext)));
+            }
+            clone->classId.Reset(cast<IdentifierNode*>(classId->Clone(cloneContext)));
+            CloneContent(clone, cloneContext);
+            return clone;
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public override nothrow void Write(AstWriter& writer)
+        {
+            base->Write(writer);
+            initializers.Write(writer);
+            classId->Write(writer);
+        }
+        public override void Read(AstReader& reader)
+        {
+            base->Read(reader);
+            initializers.Read(reader);
+            initializers.SetParent(this);
+            classId.Reset(reader.ReadIdentifierNode());
+        }
+        private NodeList<InitializerNode> initializers;
+        private UniquePtr<IdentifierNode> classId;
+    }
+    public class ConstructorNode : FunctionNode
+    {
+        public nothrow ConstructorNode(const System.Lex.Span& span_) :
+            base(NodeType.constructorNode, span_, Specifiers.none, null, u"@constructor", null), initializers()
+        {
+        }
+        public nothrow ConstructorNode(const System.Lex.Span& span_, Specifiers specifiers_, Attributes* attributes_) :
+            base(NodeType.constructorNode, span_, specifiers_, null, u"@constructor", attributes_), initializers()
+        {
+        }
+        public nothrow const NodeList<InitializerNode>& Initializers() const
+        {
+            return initializers;
+        }
+        public nothrow void SetClassId(IdentifierNode* classId_)
+        {
+            classId.Reset(classId_);
+        }
+        public nothrow IdentifierNode* ClassId()
+        {
+            return classId.Get();
+        }
+        public nothrow void AddInitializer(InitializerNode* initializer)
+        {
+            initializer->SetParent(this);
+            initializers.Add(initializer);
+        }
+        public override Node* Clone(CloneContext& cloneContext) const
+        {
+            ConstructorNode* clone = new ConstructorNode(GetSpan(), GetSpecifiers(), null);
+            int n = initializers.Count();
+            for (int i = 0; i < n; ++i)
+            {
+                clone->AddInitializer(cast<InitializerNode*>(initializers[i]->Clone(cloneContext)));
+            }
+            clone->classId.Reset(cast<IdentifierNode*>(classId->Clone(cloneContext)));
+            CloneContent(clone, cloneContext);
+            return clone;
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public override nothrow void Write(AstWriter& writer)
+        {
+            base->Write(writer);
+            initializers.Write(writer);
+            classId->Write(writer);
+        }
+        public override void Read(AstReader& reader)
+        {
+            base->Read(reader);
+            initializers.Read(reader);
+            initializers.SetParent(this);
+            classId.Reset(reader.ReadIdentifierNode());
+        }
+        private NodeList<InitializerNode> initializers;
+        private UniquePtr<IdentifierNode> classId;
+    }
+    public class DestructorNode : FunctionNode
+    {
+        public nothrow DestructorNode(const System.Lex.Span& span_) :
+            base(NodeType.destructorNode, span_)
+        {
+        }
+        public nothrow DestructorNode(const System.Lex.Span& span_, Specifiers specifiers_, Attributes* attributes_) :
+            base(NodeType.destructorNode, span_, specifiers_, null, u"@destructor", attributes_)
+        {
+        }
+        public nothrow void SetClassId(IdentifierNode* classId_)
+        {
+            classId.Reset(classId_);
+        }
+        public nothrow IdentifierNode* ClassId()
+        {
+            return classId.Get();
+        }
+        public override Node* Clone(CloneContext& cloneContext) const
+        {
+            DestructorNode* clone = new DestructorNode(GetSpan(), GetSpecifiers(), null);
+            clone->classId.Reset(cast<IdentifierNode*>(classId->Clone(cloneContext)));
+            CloneContent(clone, cloneContext);
+            return clone;
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public override nothrow void Write(AstWriter& writer)
+        {
+            base->Write(writer);
+            classId->Write(writer);
+        }
+        public override void Read(AstReader& reader)
+        {
+            base->Read(reader);
+            classId.Reset(reader.ReadIdentifierNode());
+        }
+        private UniquePtr<IdentifierNode> classId;
+    }
+    public class MemberFunctionNode : FunctionNode
+    {
+        public nothrow MemberFunctionNode(const System.Lex.Span& span_) :
+            base(NodeType.memberFunctionNode, span_)
+        {
+        }
+        public nothrow MemberFunctionNode(const System.Lex.Span& span_, Specifiers specifiers_, Node* returnTypeExpr_, const ustring& groupId_, Attributes* attributes_) :
+            base(NodeType.memberFunctionNode, span_, specifiers_, returnTypeExpr_, groupId_, attributes_)
+        {
+        }
+        public nothrow bool IsConst() const
+        {
+            return (GetSpecifiers() & Specifiers.const_) != Specifiers.none;
+        }
+        public nothrow void SetConst()
+        {
+            SetSpecifiers(GetSpecifiers() | Specifiers.const_);
+        }
+        public override Node* Clone(CloneContext& cloneContext) const
+        {
+            MemberFunctionNode* clone = new MemberFunctionNode(GetSpan());
+            CloneContent(clone, cloneContext);
+            if (IsConst())
+            {
+                clone->SetConst();
+            }
+            return clone;
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+    }
+    public class ConversionFunctionNode : FunctionNode
+    {
+        public nothrow ConversionFunctionNode(const System.Lex.Span& span_) :
+            base(NodeType.conversionFunctionNode, span_)
+        {
+        }
+        public nothrow ConversionFunctionNode(const System.Lex.Span& span_, Specifiers specifiers_, Node* returnTypeExpr_, Attributes* attributes_) :
+            base(NodeType.conversionFunctionNode, span_, specifiers_, returnTypeExpr_, u"@operator_conv", attributes_)
+        {
+        }
+        public nothrow bool IsConst() const
+        {
+            return (GetSpecifiers() & Specifiers.const_) != Specifiers.none;
+        }
+        public nothrow void SetConst()
+        {
+            SetSpecifiers(GetSpecifiers() | Specifiers.const_);
+        }
+        public override Node* Clone(CloneContext& cloneContext) const
+        {
+            ConversionFunctionNode* clone = new ConversionFunctionNode(GetSpan());
+            CloneContent(clone, cloneContext);
+            if (IsConst())
+            {
+                clone->SetConst();
+            }
+            return clone;
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+    }
+    public class MemberVariableNode : Node
+    {
+        public nothrow MemberVariableNode(const System.Lex.Span& span_) :
+            base(NodeType.memberVariableNode, span_)
+        {
+        }
+        public nothrow MemberVariableNode(const System.Lex.Span& span_, Specifiers specifiers_, Node* typeExpr_, IdentifierNode* id_, Attributes* attributes_) :
+            base(NodeType.memberVariableNode, span_), specifiers(specifiers_), typeExpr(typeExpr_), id(id_), attributes(attributes_)
+        {
+            typeExpr->SetParent(this);
+            id->SetParent(this);
+        }
+        public nothrow Node* TypeExpr() const
+        {
+            return typeExpr.Get();
+        }
+        public nothrow IdentifierNode* Id() const
+        {
+            return id.Get();
+        }
+        public nothrow Attributes* GetAttributes() const
+        {
+            return attributes.Get();
+        }
+        public nothrow void SetSpecifierSpan(const System.Lex.Span& specifierSpan_)
+        {
+            specifierSpan = specifierSpan_;
+        }
+        public nothrow const System.Lex.Span& SpecifierSpan() const
+        {
+            return specifierSpan;
+        }
+        public override nothrow Specifiers GetSpecifiers() const
+        {
+            return specifiers;
+        }
+        public override Node* Clone(CloneContext& cloneContext) const
+        {
+            Attributes* clonedAttributes = null;
+            if (!attributes.IsNull())
+            {
+                clonedAttributes = attributes->Clone();
+            }
+            MemberVariableNode* clone = new MemberVariableNode(GetSpan(), specifiers, typeExpr->Clone(cloneContext), cast<IdentifierNode*>(id->Clone(cloneContext)), clonedAttributes);
+            clone->SetSpecifierSpan(specifierSpan);
+            return clone;
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public override nothrow void Write(AstWriter& writer)
+        {
+            base->Write(writer);
+            bool hasAttributes = attributes != null;
+            writer.GetBinaryWriter().Write(hasAttributes);
+            if (hasAttributes)
+            {
+                attributes->Write(writer);
+            }
+            writer.Write(specifiers);
+            writer.Write(typeExpr.Get());
+            writer.Write(id.Get());
+            writer.Write(specifierSpan);
+        }
+        public override void Read(AstReader& reader)
+        {
+            base->Read(reader);
+            bool hasAttributes = reader.GetBinaryReader().ReadBool();
+            if (hasAttributes)
+            {
+                attributes.Reset(new Attributes());
+                attributes->Read(reader);
+            }
+            specifiers = reader.ReadSpecifiers();
+            typeExpr.Reset(reader.ReadNode());
+            typeExpr->SetParent(this);
+            id.Reset(reader.ReadIdentifierNode());
+            id->SetParent(this);
+            specifierSpan = reader.ReadSpan();
+        }
+        private Specifiers specifiers;
+        private System.Lex.Span specifierSpan;
+        private UniquePtr<Node> typeExpr;
+        private UniquePtr<IdentifierNode> id;
+        private UniquePtr<Attributes> attributes;
+    }
+} // namespace Cm.Ast

@@ -231,12 +231,40 @@
     <td class="grammarSecondCol">&rarr;</td>
     <td class="grammarThirdCol" xml:space="preserve"><span class="ruleKeyword">token</span><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#rule_identifier_EC79E9557ADCB4230187E4EB2CFA518A0D75FDF1">identifier</a></span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleChar">'.'</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_identifier_EC79E9557ADCB4230187E4EB2CFA518A0D75FDF1">identifier</a></span><span class="ruleOp">)</span><span class="ruleOp">*</span><span class="ruleOp">)</span></td>
    </tr>
+   <tr id="rule_hex_escape_55CBB5713C70D597A7CDD62141B0EF7B61BC95F8">
+    <td class="grammarFirstCol">
+     <span class="rule">hex_escape</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleCharSet">[xX]</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_hexdword_F453C401D35C3BD497CC9F203EB83ACF1CCC07DF">hexdword</a></span></td>
+   </tr>
+   <tr id="rule_octal_escape_52835F61186C0111E6514E494BD54A330DEB4801">
+    <td class="grammarFirstCol">
+     <span class="rule">octal_escape</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#rule_octal_digit_4DD133F8EBE3B81F95F76F846EF87AF239D50D4B">octal_digit</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_octal_digit_4DD133F8EBE3B81F95F76F846EF87AF239D50D4B">octal_digit</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_octal_digit_4DD133F8EBE3B81F95F76F846EF87AF239D50D4B">octal_digit</a></span><span class="ruleOp">)</span></td>
+   </tr>
+   <tr id="rule_decimal_escape_3B982B84DF6B5623FF20B0B91E23419A6E11A077">
+    <td class="grammarFirstCol">
+     <span class="rule">decimal_escape</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleCharSet">[dD]</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_uint_B576C7C3A3FEC095F54489E9D57621A6F9A486C9">uint</a></span></td>
+   </tr>
+   <tr id="rule_c_escape_A7D9EC1AA56865294594BA63F5B311663E474B59">
+    <td class="grammarFirstCol">
+     <span class="rule">c_escape</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleCharSet">[^dDxX]</span></td>
+   </tr>
    <tr id="rule_escape_35B1304EE89CA8A4CFB632BA91CA3BC542B43B13">
     <td class="grammarFirstCol">
      <span class="rule">escape</span>
     </td>
     <td class="grammarSecondCol">&rarr;</td>
-    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleKeyword">token</span><span class="ruleOp">(</span><span class="ruleChar">'\\'</span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleCharSet">[xX]</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_hexdword_F453C401D35C3BD497CC9F203EB83ACF1CCC07DF">hexdword</a></span><span class="ruleOp"> | </span><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#rule_octal_digit_4DD133F8EBE3B81F95F76F846EF87AF239D50D4B">octal_digit</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_octal_digit_4DD133F8EBE3B81F95F76F846EF87AF239D50D4B">octal_digit</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_octal_digit_4DD133F8EBE3B81F95F76F846EF87AF239D50D4B">octal_digit</a></span><span class="ruleOp">)</span><span class="ruleOp"> | </span><span class="ruleCharSet">[dD]</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#rule_uint_B576C7C3A3FEC095F54489E9D57621A6F9A486C9">uint</a></span><span class="ruleOp"> | </span><span class="ruleCharSet">[^dDxX]</span><span class="ruleOp">)</span><span class="ruleOp">)</span></td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleKeyword">token</span><span class="ruleOp">(</span><span class="ruleChar">'\\'</span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#rule_hex_escape_55CBB5713C70D597A7CDD62141B0EF7B61BC95F8">hex_escape</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#rule_octal_escape_52835F61186C0111E6514E494BD54A330DEB4801">octal_escape</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#rule_decimal_escape_3B982B84DF6B5623FF20B0B91E23419A6E11A077">decimal_escape</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#rule_c_escape_A7D9EC1AA56865294594BA63F5B311663E474B59">c_escape</a></span><span class="ruleOp">)</span><span class="ruleOp">)</span></td>
    </tr>
    <tr id="rule_char_B356A507EF497187D65D4FC9DEE1FA39355AECD2">
     <td class="grammarFirstCol">

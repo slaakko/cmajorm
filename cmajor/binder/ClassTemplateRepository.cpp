@@ -14,14 +14,14 @@
 #include <cmajor/binder/Concept.hpp>
 #include <cmajor/symbols/TemplateSymbol.hpp>
 #include <cmajor/symbols/SymbolCreatorVisitor.hpp>
-#include <cmajor/ast/Identifier.hpp>
-#include <cmajor/util/Util.hpp>
-#include <cmajor/util/Unicode.hpp>
+#include <sngcm/ast/Identifier.hpp>
+#include <soulng/util/Util.hpp>
+#include <soulng/util/Unicode.hpp>
 
 namespace cmajor { namespace binder {
 
-using namespace cmajor::util;
-using namespace cmajor::unicode;
+using namespace soulng::util;
+using namespace soulng::unicode;
 
 size_t ClassIdMemberFunctionIndexHash::operator()(const std::pair<boost::uuids::uuid, int>& p) const
 {

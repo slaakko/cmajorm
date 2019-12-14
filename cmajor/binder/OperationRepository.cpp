@@ -18,13 +18,13 @@
 #include <cmajor/symbols/InterfaceTypeSymbol.hpp>
 #include <cmajor/symbols/GlobalFlags.hpp>
 #include <cmajor/symbols/SymbolCreatorVisitor.hpp>
-#include <cmajor/ast/Identifier.hpp>
-#include <cmajor/ast/Expression.hpp>
-#include <cmajor/util/Unicode.hpp>
+#include <sngcm/ast/Identifier.hpp>
+#include <sngcm/ast/Expression.hpp>
+#include <soulng/util/Unicode.hpp>
 
 namespace cmajor { namespace binder {
 
-using namespace cmajor::unicode;
+using namespace soulng::unicode;
 
 class PointerDefaultCtor : public FunctionSymbol
 {

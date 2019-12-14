@@ -1,0 +1,908 @@
+using System;
+using System.Collections;
+
+// this file has been semiautomatically generated from 'D:/work/soulng-project/sngcm/ast/Literal.hpp' using cpp2cm version 1.0.0
+
+// this file has been semiautomatically generated from 'D:/work/soulng-project/sngcm/ast/Literal.cpp' using cpp2cm version 1.0.0
+
+namespace Cm.Ast
+{
+    public abstract class LiteralNode : Node
+    {
+        public nothrow LiteralNode(NodeType nodeType_, const System.Lex.Span& span_) :
+            base(nodeType_, span_)
+        {
+        }
+        public nothrow const ustring& Text() const
+        {
+            return text;
+        }
+        public nothrow void SetText(const ustring& text_)
+        {
+            text = text_;
+        }
+        public override nothrow void Write(AstWriter& writer)
+        {
+            base->Write(writer);
+            writer.GetBinaryWriter().Write(text);
+        }
+        public override void Read(AstReader& reader)
+        {
+            base->Read(reader);
+            text = reader.GetBinaryReader().ReadUString();
+        }
+        private ustring text;
+    }
+    public class BooleanLiteralNode : LiteralNode
+    {
+        public nothrow BooleanLiteralNode(const System.Lex.Span& span_) :
+            base(NodeType.booleanLiteralNode, span_), value(false)
+        {
+        }
+        public nothrow BooleanLiteralNode(const System.Lex.Span& span_, bool value_) :
+            base(NodeType.booleanLiteralNode, span_), value(value_)
+        {
+        }
+        public nothrow bool Value() const
+        {
+            return value;
+        }
+        public override Node* Clone(CloneContext& cloneContext) const
+        {
+            return new BooleanLiteralNode(GetSpan(), value);
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public override nothrow void Write(AstWriter& writer)
+        {
+            base->Write(writer);
+            writer.GetBinaryWriter().Write(value);
+        }
+        public override void Read(AstReader& reader)
+        {
+            base->Read(reader);
+            value = reader.GetBinaryReader().ReadBool();
+        }
+        public override nothrow string ToString() const
+        {
+            if (value) return "true";
+            else return "false";
+        }
+        private bool value;
+    }
+    public class SByteLiteralNode : LiteralNode
+    {
+        public nothrow SByteLiteralNode(const System.Lex.Span& span_) :
+            base(NodeType.sbyteLiteralNode, span_), value(0)
+        {
+        }
+        public nothrow SByteLiteralNode(const System.Lex.Span& span_, sbyte value_) :
+            base(NodeType.sbyteLiteralNode, span_), value(value_)
+        {
+        }
+        public nothrow sbyte Value() const
+        {
+            return value;
+        }
+        public override Node* Clone(CloneContext& cloneContext) const
+        {
+            return new SByteLiteralNode(GetSpan(), value);
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public override nothrow void Write(AstWriter& writer)
+        {
+            base->Write(writer);
+            writer.GetBinaryWriter().Write(value);
+        }
+        public override void Read(AstReader& reader)
+        {
+            base->Read(reader);
+            value = reader.GetBinaryReader().ReadSByte();
+        }
+        public override nothrow string ToString() const
+        {
+            return ToString(value);
+        }
+        private sbyte value;
+    }
+    public class ByteLiteralNode : LiteralNode
+    {
+        public nothrow ByteLiteralNode(const System.Lex.Span& span_) :
+            base(NodeType.byteLiteralNode, span_), value(0u)
+        {
+        }
+        public nothrow ByteLiteralNode(const System.Lex.Span& span_, byte value_) :
+            base(NodeType.byteLiteralNode, span_), value(value_)
+        {
+        }
+        public nothrow byte Value() const
+        {
+            return value;
+        }
+        public override Node* Clone(CloneContext& cloneContext) const
+        {
+            return new ByteLiteralNode(GetSpan(), value);
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public override nothrow void Write(AstWriter& writer)
+        {
+            base->Write(writer);
+            writer.GetBinaryWriter().Write(value);
+        }
+        public override void Read(AstReader& reader)
+        {
+            base->Read(reader);
+            value = reader.GetBinaryReader().ReadByte();
+        }
+        public override nothrow string ToString() const
+        {
+            return ToString(value) + "u";
+        }
+        private byte value;
+    }
+    public class ShortLiteralNode : LiteralNode
+    {
+        public nothrow ShortLiteralNode(const System.Lex.Span& span_) :
+            base(NodeType.shortLiteralNode, span_), value(0)
+        {
+        }
+        public nothrow ShortLiteralNode(const System.Lex.Span& span_, short value_) :
+            base(NodeType.shortLiteralNode, span_), value(value_)
+        {
+        }
+        public nothrow short Value() const
+        {
+            return value;
+        }
+        public override Node* Clone(CloneContext& cloneContext) const
+        {
+            return new ShortLiteralNode(GetSpan(), value);
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public override nothrow void Write(AstWriter& writer)
+        {
+            base->Write(writer);
+            writer.GetBinaryWriter().Write(value);
+        }
+        public override void Read(AstReader& reader)
+        {
+            base->Read(reader);
+            value = reader.GetBinaryReader().ReadShort();
+        }
+        public override nothrow string ToString() const
+        {
+            return ToString(value);
+        }
+        private short value;
+    }
+    public class UShortLiteralNode : LiteralNode
+    {
+        public nothrow UShortLiteralNode(const System.Lex.Span& span_) :
+            base(NodeType.ushortLiteralNode, span_), value(0u)
+        {
+        }
+        public nothrow UShortLiteralNode(const System.Lex.Span& span_, ushort value_) :
+            base(NodeType.ushortLiteralNode, span_), value(value_)
+        {
+        }
+        public nothrow ushort Value() const
+        {
+            return value;
+        }
+        public override Node* Clone(CloneContext& cloneContext) const
+        {
+            return new UShortLiteralNode(GetSpan(), value);
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public override nothrow void Write(AstWriter& writer)
+        {
+            base->Write(writer);
+            writer.GetBinaryWriter().Write(value);
+        }
+        public override void Read(AstReader& reader)
+        {
+            base->Read(reader);
+            value = reader.GetBinaryReader().ReadUShort();
+        }
+        public override nothrow string ToString() const
+        {
+            return ToString(value) + "u";
+        }
+        private ushort value;
+    }
+    public class IntLiteralNode : LiteralNode
+    {
+        public nothrow IntLiteralNode(const System.Lex.Span& span_) :
+            base(NodeType.intLiteralNode, span_), value(0)
+        {
+        }
+        public nothrow IntLiteralNode(const System.Lex.Span& span_, int value_) :
+            base(NodeType.intLiteralNode, span_), value(value_)
+        {
+        }
+        public nothrow int Value() const
+        {
+            return value;
+        }
+        public override Node* Clone(CloneContext& cloneContext) const
+        {
+            return new IntLiteralNode(GetSpan(), value);
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public override nothrow void Write(AstWriter& writer)
+        {
+            base->Write(writer);
+            writer.GetBinaryWriter().Write(value);
+        }
+        public override void Read(AstReader& reader)
+        {
+            base->Read(reader);
+            value = reader.GetBinaryReader().ReadInt();
+        }
+        public override nothrow string ToString() const
+        {
+            return ToString(value);
+        }
+        private int value;
+    }
+    public class UIntLiteralNode : LiteralNode
+    {
+        public nothrow UIntLiteralNode(const System.Lex.Span& span_) :
+            base(NodeType.uintLiteralNode, span_), value(0u)
+        {
+        }
+        public nothrow UIntLiteralNode(const System.Lex.Span& span_, uint value_) :
+            base(NodeType.uintLiteralNode, span_), value(value_)
+        {
+        }
+        public nothrow uint Value() const
+        {
+            return value;
+        }
+        public override Node* Clone(CloneContext& cloneContext) const
+        {
+            return new UIntLiteralNode(GetSpan(), value);
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public override nothrow void Write(AstWriter& writer)
+        {
+            base->Write(writer);
+            writer.GetBinaryWriter().Write(value);
+        }
+        public override void Read(AstReader& reader)
+        {
+            base->Read(reader);
+            value = reader.GetBinaryReader().ReadUInt();
+        }
+        public override nothrow string ToString() const
+        {
+            return ToString(value) + "u";
+        }
+        private uint value;
+    }
+    public class LongLiteralNode : LiteralNode
+    {
+        public nothrow LongLiteralNode(const System.Lex.Span& span_) :
+            base(NodeType.longLiteralNode, span_), value(0)
+        {
+        }
+        public nothrow LongLiteralNode(const System.Lex.Span& span_, long value_) :
+            base(NodeType.longLiteralNode, span_), value(value_)
+        {
+        }
+        public nothrow long Value() const
+        {
+            return value;
+        }
+        public override Node* Clone(CloneContext& cloneContext) const
+        {
+            return new LongLiteralNode(GetSpan(), value);
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public override nothrow void Write(AstWriter& writer)
+        {
+            base->Write(writer);
+            writer.GetBinaryWriter().Write(value);
+        }
+        public override void Read(AstReader& reader)
+        {
+            base->Read(reader);
+            value = reader.GetBinaryReader().ReadLong();
+        }
+        public override nothrow string ToString() const
+        {
+            return ToString(value);
+        }
+        private long value;
+    }
+    public class ULongLiteralNode : LiteralNode
+    {
+        public nothrow ULongLiteralNode(const System.Lex.Span& span_) :
+            base(NodeType.ulongLiteralNode, span_), value(0u)
+        {
+        }
+        public nothrow ULongLiteralNode(const System.Lex.Span& span_, ulong value_) :
+            base(NodeType.ulongLiteralNode, span_), value(value_)
+        {
+        }
+        public nothrow ulong Value() const
+        {
+            return value;
+        }
+        public override Node* Clone(CloneContext& cloneContext) const
+        {
+            return new ULongLiteralNode(GetSpan(), value);
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public override nothrow void Write(AstWriter& writer)
+        {
+            base->Write(writer);
+            writer.GetBinaryWriter().Write(value);
+        }
+        public override void Read(AstReader& reader)
+        {
+            base->Read(reader);
+            value = reader.GetBinaryReader().ReadULong();
+        }
+        public override nothrow string ToString() const
+        {
+            return ToString(value) + "u";
+        }
+        private ulong value;
+    }
+    public class FloatLiteralNode : LiteralNode
+    {
+        public nothrow FloatLiteralNode(const System.Lex.Span& span_) :
+            base(NodeType.floatLiteralNode, span_), value(0)
+        {
+        }
+        public nothrow FloatLiteralNode(const System.Lex.Span& span_, float value_) :
+            base(NodeType.floatLiteralNode, span_), value(value_)
+        {
+        }
+        public nothrow float Value() const
+        {
+            return value;
+        }
+        public override Node* Clone(CloneContext& cloneContext) const
+        {
+            return new FloatLiteralNode(GetSpan(), value);
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public override nothrow void Write(AstWriter& writer)
+        {
+            base->Write(writer);
+            writer.GetBinaryWriter().Write(value);
+        }
+        public override void Read(AstReader& reader)
+        {
+            base->Read(reader);
+            value = reader.GetBinaryReader().ReadFloat();
+        }
+        public override nothrow string ToString() const
+        {
+            return ToString(value) + "f";
+        }
+        private float value;
+    }
+    public class DoubleLiteralNode : LiteralNode
+    {
+        public nothrow DoubleLiteralNode(const System.Lex.Span& span_) :
+            base(NodeType.doubleLiteralNode, span_), value(0)
+        {
+        }
+        public nothrow DoubleLiteralNode(const System.Lex.Span& span_, double value_) :
+            base(NodeType.doubleLiteralNode, span_), value(value_)
+        {
+        }
+        public nothrow double Value() const
+        {
+            return value;
+        }
+        public override Node* Clone(CloneContext& cloneContext) const
+        {
+            return new DoubleLiteralNode(GetSpan(), value);
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public override nothrow void Write(AstWriter& writer)
+        {
+            base->Write(writer);
+            writer.GetBinaryWriter().Write(value);
+        }
+        public override void Read(AstReader& reader)
+        {
+            base->Read(reader);
+            value = reader.GetBinaryReader().ReadDouble();
+        }
+        public override nothrow string ToString() const
+        {
+            return ToString(value);
+        }
+        private double value;
+    }
+    public class CharLiteralNode : LiteralNode
+    {
+        public nothrow CharLiteralNode(const System.Lex.Span& span_) :
+            base(NodeType.charLiteralNode, span_), value('\0')
+        {
+        }
+        public nothrow CharLiteralNode(const System.Lex.Span& span_, char value_) :
+            base(NodeType.charLiteralNode, span_), value(value_)
+        {
+        }
+        public nothrow char Value() const
+        {
+            return value;
+        }
+        public override Node* Clone(CloneContext& cloneContext) const
+        {
+            return new CharLiteralNode(GetSpan(), value);
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public override nothrow void Write(AstWriter& writer)
+        {
+            base->Write(writer);
+            writer.GetBinaryWriter().Write(value);
+        }
+        public override void Read(AstReader& reader)
+        {
+            base->Read(reader);
+            value = reader.GetBinaryReader().ReadChar();
+        }
+        public override nothrow string ToString() const
+        {
+            return "\'" + CharStr(value) + "\'";
+        }
+        private char value;
+    }
+    public class WCharLiteralNode : LiteralNode
+    {
+        public nothrow WCharLiteralNode(const System.Lex.Span& span_) :
+            base(NodeType.wcharLiteralNode, span_), value('\0')
+        {
+        }
+        public nothrow WCharLiteralNode(const System.Lex.Span& span_, wchar value_) :
+            base(NodeType.wcharLiteralNode, span_), value(value_)
+        {
+        }
+        public nothrow wchar Value() const
+        {
+            return value;
+        }
+        public override Node* Clone(CloneContext& cloneContext) const
+        {
+            return new WCharLiteralNode(GetSpan(), value);
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public override nothrow void Write(AstWriter& writer)
+        {
+            base->Write(writer);
+            writer.GetBinaryWriter().Write(value);
+        }
+        public override void Read(AstReader& reader)
+        {
+            base->Read(reader);
+            value = reader.GetBinaryReader().ReadWChar();
+        }
+        public override nothrow string ToString() const
+        {
+            return "w\'" + ToUtf8(CharStr(uchar(value))) + "\'";
+        }
+        private wchar value;
+    }
+    public class UCharLiteralNode : LiteralNode
+    {
+        public nothrow UCharLiteralNode(const System.Lex.Span& span_) :
+            base(NodeType.ucharLiteralNode, span_), value('\0')
+        {
+        }
+        public nothrow UCharLiteralNode(const System.Lex.Span& span_, uchar value_) :
+            base(NodeType.ucharLiteralNode, span_), value(value_)
+        {
+        }
+        public nothrow uchar Value() const
+        {
+            return value;
+        }
+        public override Node* Clone(CloneContext& cloneContext) const
+        {
+            return new UCharLiteralNode(GetSpan(), value);
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public override nothrow void Write(AstWriter& writer)
+        {
+            base->Write(writer);
+            writer.GetBinaryWriter().Write(value);
+        }
+        public override void Read(AstReader& reader)
+        {
+            base->Read(reader);
+            value = reader.GetBinaryReader().ReadUChar();
+        }
+        public override nothrow string ToString() const
+        {
+            return "u\'" + ToUtf8(CharStr(value)) + "\'";
+        }
+        private uchar value;
+    }
+    public class StringLiteralNode : LiteralNode
+    {
+        public nothrow StringLiteralNode(const System.Lex.Span& span_) :
+            base(NodeType.stringLiteralNode, span_), value()
+        {
+        }
+        public nothrow StringLiteralNode(const System.Lex.Span& span_, const string& value_) :
+            base(NodeType.stringLiteralNode, span_), value(value_)
+        {
+        }
+        public nothrow const string& Value() const
+        {
+            return value;
+        }
+        public override Node* Clone(CloneContext& cloneContext) const
+        {
+            return new StringLiteralNode(GetSpan(), value);
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public override nothrow void Write(AstWriter& writer)
+        {
+            base->Write(writer);
+            writer.GetBinaryWriter().Write(value);
+        }
+        public override void Read(AstReader& reader)
+        {
+            base->Read(reader);
+            value = reader.GetBinaryReader().ReadString();
+        }
+        public override nothrow string ToString() const
+        {
+            return "\"" + StringStr(value) + "\"";
+        }
+        private string value;
+    }
+    public class WStringLiteralNode : LiteralNode
+    {
+        public nothrow WStringLiteralNode(const System.Lex.Span& span_) :
+            base(NodeType.wstringLiteralNode, span_), value()
+        {
+        }
+        public nothrow WStringLiteralNode(const System.Lex.Span& span_, const wstring& value_) :
+            base(NodeType.wstringLiteralNode, span_), value(value_)
+        {
+        }
+        public nothrow const wstring& Value() const
+        {
+            return value;
+        }
+        public override Node* Clone(CloneContext& cloneContext) const
+        {
+            return new WStringLiteralNode(GetSpan(), value);
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public override nothrow void Write(AstWriter& writer)
+        {
+            base->Write(writer);
+            writer.GetBinaryWriter().Write(value);
+        }
+        public override void Read(AstReader& reader)
+        {
+            base->Read(reader);
+            value = reader.GetBinaryReader().ReadWString();
+        }
+        public override nothrow string ToString() const
+        {
+            return "\"" + StringStr(ToUtf8(value)) + "\"";
+        }
+        private wstring value;
+    }
+    public class UStringLiteralNode : LiteralNode
+    {
+        public nothrow UStringLiteralNode(const System.Lex.Span& span_) :
+            base(NodeType.ustringLiteralNode, span_), value()
+        {
+        }
+        public nothrow UStringLiteralNode(const System.Lex.Span& span_, const ustring& value_) :
+            base(NodeType.ustringLiteralNode, span_), value(value_)
+        {
+        }
+        public nothrow const ustring& Value() const
+        {
+            return value;
+        }
+        public override Node* Clone(CloneContext& cloneContext) const
+        {
+            return new UStringLiteralNode(GetSpan(), value);
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public override nothrow void Write(AstWriter& writer)
+        {
+            base->Write(writer);
+            writer.GetBinaryWriter().Write(value);
+        }
+        public override void Read(AstReader& reader)
+        {
+            base->Read(reader);
+            value = reader.GetBinaryReader().ReadUString();
+        }
+        public override nothrow string ToString() const
+        {
+            return "\"" + StringStr(ToUtf8(value)) + "\"";
+        }
+        private ustring value;
+    }
+    public class NullLiteralNode : LiteralNode
+    {
+        public nothrow NullLiteralNode(const System.Lex.Span& span_) :
+            base(NodeType.nullLiteralNode, span_)
+        {
+        }
+        public override nothrow string ToString() const
+        {
+            return "null";
+        }
+        public override Node* Clone(CloneContext& cloneContext) const
+        {
+            return new NullLiteralNode(GetSpan());
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+    }
+    public class ArrayLiteralNode : LiteralNode
+    {
+        public nothrow ArrayLiteralNode(const System.Lex.Span& span_) :
+            base(NodeType.arrayLiteralNode, span_)
+        {
+        }
+        public nothrow const NodeList<Node>& Values() const
+        {
+            return values;
+        }
+        public nothrow NodeList<Node>& Values()
+        {
+            return values;
+        }
+        public nothrow void AddValue(Node* value)
+        {
+            value->SetParent(this);
+            values.Add(value);
+        }
+        public override nothrow string ToString() const
+        {
+            return "array";
+        }
+        public override Node* Clone(CloneContext& cloneContext) const
+        {
+            ArrayLiteralNode* clone = new ArrayLiteralNode(GetSpan());
+            int n = values.Count();
+            for (int i = 0; i < n; ++i)
+            {
+                clone->AddValue(values[i]->Clone(cloneContext));
+            }
+            return clone;
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public override nothrow void Write(AstWriter& writer)
+        {
+            base->Write(writer);
+            values.Write(writer);
+        }
+        public override void Read(AstReader& reader)
+        {
+            base->Read(reader);
+            values.Read(reader);
+        }
+        private NodeList<Node> values;
+    }
+    public class StructuredLiteralNode : LiteralNode
+    {
+        public nothrow StructuredLiteralNode(const System.Lex.Span& span_) :
+            base(NodeType.structuredLiteralNode, span_)
+        {
+        }
+        public nothrow const NodeList<Node>& Members() const
+        {
+            return members;
+        }
+        public nothrow NodeList<Node>& Members()
+        {
+            return members;
+        }
+        public nothrow void AddMember(Node* member)
+        {
+            member->SetParent(this);
+            members.Add(member);
+        }
+        public override nothrow string ToString() const
+        {
+            return "structure";
+        }
+        public override Node* Clone(CloneContext& cloneContext) const
+        {
+            StructuredLiteralNode* clone = new StructuredLiteralNode(GetSpan());
+            int n = members.Count();
+            for (int i = 0; i < n; ++i)
+            {
+                clone->AddMember(members[i]->Clone(cloneContext));
+            }
+            return clone;
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public override nothrow void Write(AstWriter& writer)
+        {
+            base->Write(writer);
+            members.Write(writer);
+        }
+        public override void Read(AstReader& reader)
+        {
+            base->Read(reader);
+            members.Read(reader);
+        }
+        private NodeList<Node> members;
+    }
+    public class UuidLiteralNode : LiteralNode
+    {
+        public nothrow UuidLiteralNode(const System.Lex.Span& span_) :
+            base(NodeType.uuidLiteralNode, span_), uuid()
+        {
+        }
+        public nothrow UuidLiteralNode(const System.Lex.Span& span_, const Uuid& uuid_) :
+            base(NodeType.uuidLiteralNode, span_), uuid(uuid_)
+        {
+        }
+        public nothrow const Uuid& GetUuid() const
+        {
+            return uuid;
+        }
+        public override nothrow string ToString() const
+        {
+            return "uuid";
+        }
+        public override Node* Clone(CloneContext& cloneContext) const
+        {
+            return new UuidLiteralNode(GetSpan(), uuid);
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public override nothrow void Write(AstWriter& writer)
+        {
+            base->Write(writer);
+            writer.GetBinaryWriter().Write(uuid);
+        }
+        public override void Read(AstReader& reader)
+        {
+            base->Read(reader);
+            uuid = reader.GetBinaryReader().ReadUuid();
+        }
+        private Uuid uuid;
+    }
+    public nothrow LiteralNode* CreateIntegerLiteralNode(const System.Lex.Span& span, ulong value, bool unsignedSuffix)
+    {
+        if (unsignedSuffix)
+        {
+            if (value <= MaxValue<byte>()) return new ByteLiteralNode(span, cast<byte>(value));
+            if (value <= MaxValue<ushort>()) return new UShortLiteralNode(span, cast<ushort>(value));
+            if (value <= MaxValue<uint>()) return new UIntLiteralNode(span, cast<uint>(value));
+            return new ULongLiteralNode(span, value);
+        }
+        else
+        {
+            if (value <= MaxValue<sbyte>()) return new SByteLiteralNode(span, cast<sbyte>(value));
+            if (value <= MaxValue<byte>()) return new ByteLiteralNode(span, cast<byte>(value));
+            if (value <= MaxValue<short>()) return new ShortLiteralNode(span, cast<short>(value));
+            if (value <= MaxValue<ushort>()) return new UShortLiteralNode(span, cast<ushort>(value));
+            if (value <= MaxValue<int>()) return new IntLiteralNode(span, cast<int>(value));
+            if (value <= MaxValue<uint>()) return new UIntLiteralNode(span, cast<uint>(value));
+            if (value <= MaxValue<long>()) return new LongLiteralNode(span, cast<long>(value));
+            return new ULongLiteralNode(span, value);
+        }
+    }
+    public nothrow LiteralNode* CreateFloatingLiteralNode(const System.Lex.Span& span, double value, bool float_)
+    {
+        if (float_)
+        {
+            return new FloatLiteralNode(span, cast<float>(value));
+        }
+        else
+        {
+            return new DoubleLiteralNode(span, value);
+        }
+    }
+    public nothrow LiteralNode* CreateCharacterLiteralNode(const System.Lex.Span& span, uchar value, int chrLitPrefix)
+    {
+        switch (chrLitPrefix)
+        {
+            case 0: 
+            {
+                return new CharLiteralNode(span, cast<char>(value));
+            }
+            case 1: 
+            {
+                return new WCharLiteralNode(span, cast<wchar>(value));
+            }
+            case 2: 
+            {
+                return new UCharLiteralNode(span, value);
+            }
+        }
+        return null;
+    }
+    public nothrow LiteralNode* CreateStringLiteralNode(const System.Lex.Span& span, const ustring& value, int strLitPrefix)
+    {
+        switch (strLitPrefix)
+        {
+            case 0: 
+            {
+                return new StringLiteralNode(span, ToUtf8(value));
+            }
+            case 1: 
+            {
+                return new WStringLiteralNode(span, ToUtf16(value));
+            }
+            case 2: 
+            {
+                return new UStringLiteralNode(span, value);
+            }
+        }
+        return null;
+    }
+} // namespace Cm.Ast

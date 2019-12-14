@@ -5,8 +5,8 @@
 
 #include <cmajor/rt/Io.hpp>
 #include <cmajor/rt/Error.hpp>
-#include <cmajor/util/Error.hpp>
-#include <cmajor/util/Unicode.hpp>
+#include <soulng/util/Error.hpp>
+#include <soulng/util/Unicode.hpp>
 #include <boost/filesystem.hpp>
 #include <atomic>
 #include <mutex>
@@ -20,7 +20,7 @@
 
 namespace cmajor { namespace rt {
 
-using namespace cmajor::unicode;
+using namespace soulng::unicode;
 
 class FileTable
 {
@@ -768,7 +768,7 @@ extern "C" RT_API int32_t RtWrite(int32_t fileHandle, const uint8_t* buffer, int
     {
         return cmajor::rt::InstallError(ex.what());
     }
-    catch (const cmajor::unicode::UnicodeException& ex)
+    catch (const soulng::unicode::UnicodeException& ex)
     {
         return cmajor::rt::InstallError(ex.what());
     }
@@ -785,7 +785,7 @@ extern "C" RT_API int32_t RtWriteByte(int32_t fileHandle, uint8_t x)
     {
         return cmajor::rt::InstallError(ex.what());
     }
-    catch (const cmajor::unicode::UnicodeException& ex)
+    catch (const soulng::unicode::UnicodeException& ex)
     {
         return cmajor::rt::InstallError(ex.what());
     }

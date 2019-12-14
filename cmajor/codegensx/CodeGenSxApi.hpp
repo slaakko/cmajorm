@@ -12,6 +12,13 @@
 #define CODEGENSX_API __declspec(dllexport)
 #else
 #define CODEGENSX_API __declspec(dllimport)
+
+#ifdef NDEBUG
+#pragma comment(lib, "codegensx.lib")
+#else
+#pragma comment(lib, "codegensxd.lib")
+#endif
+
 #endif
 
 #else

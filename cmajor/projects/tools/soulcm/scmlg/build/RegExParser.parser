@@ -1,0 +1,101 @@
+// =================================
+// Copyright (c) 2019 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using RegExTokens;
+
+parser RegExParser
+{
+    uselexer RegExLexer;
+
+    main;
+
+    RegularExpression(soulcm.scmlg.LexerContext* lexerContext) : soulcm.scmlg.Nfa
+        ::= Alternative(lexerContext):alternative{ return alternative; }
+        ;
+
+    Alternative(soulcm.scmlg.LexerContext* lexerContext, var soulcm.scmlg.Nfa value) : soulcm.scmlg.Nfa
+        ::= (Catenation(lexerContext):left{ value = left; } (ALT Catenation(lexerContext):right!{ value = soulcm.scmlg.Alt(*lexerContext, value, right); })*)
+        {
+            return value;
+        }
+        ;
+
+    Catenation(soulcm.scmlg.LexerContext* lexerContext, var soulcm.scmlg.Nfa value) : soulcm.scmlg.Nfa
+        ::= (Repetition(lexerContext):left{ value = left; } (Repetition(lexerContext):right{ value = soulcm.scmlg.Cat(value, right); })*)
+        {
+            return value;
+        }
+        ;
+
+    Repetition(soulcm.scmlg.LexerContext* lexerContext, var soulcm.scmlg.Nfa value) : soulcm.scmlg.Nfa
+        ::=
+        (   Primary(lexerContext):left{ value = left; }
+            (   STAR{ value = soulcm.scmlg.Kleene(*lexerContext, value); }
+            |   PLUS{ value = soulcm.scmlg.Pos(*lexerContext, value); }
+            |   QUEST{ value = soulcm.scmlg.Opt(*lexerContext, value); }
+            )?
+        )
+        {
+            return value;
+        }
+        ;
+
+    Primary(soulcm.scmlg.LexerContext* lexerContext, var soulcm.scmlg.Nfa value) : soulcm.scmlg.Nfa
+        ::=
+        (   LPAREN Alternative(lexerContext):alt!{ value = alt; } RPAREN!
+        |   ESCAPE{ value = soulcm.scmlg.MakeNfa(*lexerContext, lexerContext->MakeChar(soulcm.scmlg.MakeEscapeValue(lexer.FileName(), lexer.GetToken(pos)))); }
+        |   INVERSE{ value = soulcm.scmlg.MakeNfa(*lexerContext, lexerContext->MakeChar('^')); }
+        |   MINUS{ value = soulcm.scmlg.MakeNfa(*lexerContext, lexerContext->MakeChar('-')); }
+        |   CHAR{ ustring match = lexer.GetMatch(span); value = soulcm.scmlg.MakeNfa(*lexerContext, lexerContext->MakeChar(match[0])); }
+        |   DOT{ value = soulcm.scmlg.MakeNfa(*lexerContext, lexerContext->MakeAny()); }
+        |   Class(lexerContext):cls{ value = soulcm.scmlg.MakeNfa(*lexerContext, cls); }
+        |   ExpressionReference:ref{ value = lexerContext->MakeExpr(ref); }
+        )
+        {
+            return value;
+        }
+        ;
+
+    Class(soulcm.scmlg.LexerContext* lexerContext, var soulcm.scmlg.Class* cls) : soulcm.scmlg.Class*
+        ::= (LBRACKET{ cls = lexerContext->MakeClass(); } ((INVERSE{ cls->SetInverse(); })? (Range(lexerContext):r{ cls->AddSymbol(r); })*) RBRACKET!)
+        {
+            return cls;
+        }
+        ;
+
+    Range(soulcm.scmlg.LexerContext* lexerContext, var soulcm.scmlg.Symbol* symbol) : soulcm.scmlg.Symbol*
+        ::= (Char:s (MINUS Char:e{ symbol = lexerContext->MakeRange(s, e); } | empty{ symbol = lexerContext->MakeChar(s); }))
+        {
+            return symbol;
+        }
+        ;
+
+    Char : uchar
+        ::= LPAREN{ return '('; }
+        |   RPAREN{ return ')'; }
+        |   LBRACKET{ return '['; }
+        |   LBRACE{ return '{'; }
+        |   RBRACE{ return '}'; }
+        |   ALT{ return '|'; }
+        |   STAR{ return '*'; }
+        |   PLUS{ return '+'; }
+        |   QUEST{ return '?'; }
+        |   DOT{ return '.'; }
+        |   ESCAPE{ return soulcm.scmlg.MakeEscapeValue(lexer.FileName(), lexer.GetToken(pos)); }
+        |   INVERSE{ return '^'; }
+        |   MINUS{ return '-'; }
+        |   CHAR{ ustring match = lexer.GetMatch(span); return match[0]; }
+        ;
+
+    ExpressionReference(var Span s) : ustring
+        ::= LBRACE{ s = span; } CHAR+ RBRACE{ s.end = span.end; return soulcm.scmlg.MakeExprRefId(lexer.FileName(), lexer.GetMatch(s), lexer.GetToken(pos).line); }
+        ;
+
+    ruleinfo
+    {
+        (RegularExpression, "regular expression"), (Alternative, "alternative"), (Catenation, "catenation"), (Repetition, "repetition"), (Primary, "primary expression"),
+        (Class, "regular class definition"), (Range, "range"), (Char, "character"), (ExpressionReference, "regular expression reference")
+    }
+}

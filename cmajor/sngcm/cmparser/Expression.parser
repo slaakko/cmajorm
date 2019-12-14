@@ -1,0 +1,371 @@
+// =================================
+// Copyright (c) 2019 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+[hpp]#include <sngcm/cmparser/ParserApi.hpp>
+[hpp]#include <sngcm/ast/Expression.hpp>
+[hpp]#include <sngcm/cmparser/ParsingContext.hpp>
+[cpp]#include <sngcm/cmparser/BasicType.hpp>
+[cpp]#include <sngcm/cmparser/Literal.hpp>
+[cpp]#include <sngcm/cmparser/Template.hpp>
+[cpp]#include <sngcm/cmparser/Operator.hpp>
+[cpp]#include <sngcm/cmparser/TypeExpr.hpp>
+[cpp]#include <sngcm/cmparser/Identifier.hpp>
+[cpp]#include <sngcm/cmlexer/CmajorLexer.hpp>
+[cpp]#include <sngcm/cmlexer/CmajorTokens.hpp>
+
+using namespace sngcm::ast;
+using namespace CmajorTokens;
+
+parser api(SNGCM_PARSER_API) ExpressionParser
+{
+    uselexer CmajorLexer;
+
+    using LiteralParser.Literal;
+    using BasicTypeParser.BasicType;
+    using TemplateParser.TemplateId;
+    using TypeExprParser.TypeExpr;
+    using IdentifierParser.Identifier;
+
+    Expression(ParsingContext* ctx) : Node*
+        ::= Equivalence(ctx):equivalence{ return equivalence; }
+        ;
+
+    Equivalence(ParsingContext* ctx, var std::unique_ptr<Node> expr, var Span s) : Node*
+        ::=
+        (   Implication(ctx):left{ s = span; expr.reset(left); }
+            (   EQUIVALENCE{ if (!ctx->parsingConcept || ctx->parsingTemplateId) pass = false; }
+                Implication(ctx):right!{ s.end = span.end; expr.reset(new EquivalenceNode(s, expr.release(), right)); }
+            )*
+        )
+        {
+            return expr.release();
+        }
+        ;
+
+    Implication(ParsingContext* ctx, var std::unique_ptr<Node> expr, var Span s) : Node*
+        ::=
+        (   Disjunction(ctx):left{ s = span; expr.reset(left); }
+            (   IMPLICATION{ if (!ctx->parsingConcept || ctx->parsingTemplateId) pass = false; }
+                Implication(ctx):right!{ s.end = span.end; expr.reset(new ImplicationNode(s, expr.release(), right)); }
+            )?
+        )
+        {
+            return expr.release();
+        }
+        ;
+
+    Disjunction(ParsingContext* ctx, var std::unique_ptr<Node> expr, var Span s) : Node*
+        ::=
+        (   Conjunction(ctx):left{ s = span; expr.reset(left); }
+            (   DISJUNCTION{ if (ctx->parsingLvalue || ctx->parsingExpressionStatement && !ctx->parsingArguments) pass = false; }
+                Conjunction(ctx):right!{ s.end = span.end; expr.reset(new DisjunctionNode(s, expr.release(), right)); }
+            )*
+        )
+        {
+            return expr.release();
+        }
+        ;
+
+    Conjunction(ParsingContext* ctx, var std::unique_ptr<Node> expr, var Span s) : Node*
+        ::=
+        (   BitOr(ctx):left{ s = span; expr.reset(left); }
+            (   AMPAMP{ if (ctx->parsingLvalue || ctx->parsingExpressionStatement && !ctx->parsingArguments) pass = false; }
+                BitOr(ctx):right!{ s.end = span.end; expr.reset(new ConjunctionNode(s, expr.release(), right)); }
+            )*
+        )
+        {
+            return expr.release();
+        }
+        ;
+
+    BitOr(ParsingContext* ctx, var std::unique_ptr<Node> expr, var Span s) : Node*
+        ::=
+        (   BitXor(ctx):left{ s = span; expr.reset(left); }
+            (   BITOR{ if (ctx->parsingLvalue || ctx->parsingExpressionStatement && !ctx->parsingArguments) pass = false; }
+                BitXor(ctx):right!{ s.end = span.end; expr.reset(new BitOrNode(s, expr.release(), right)); }
+            )*
+        )
+        {
+            return expr.release();
+        }
+        ;
+
+    BitXor(ParsingContext* ctx, var std::unique_ptr<Node> expr, var Span s) : Node*
+        ::=
+        (   BitAnd(ctx):left{ s = span; expr.reset(left); }
+            (   BITXOR{ if (ctx->parsingLvalue || ctx->parsingExpressionStatement && !ctx->parsingArguments) pass = false; }
+                BitAnd(ctx):right!{ s.end = span.end; expr.reset(new BitXorNode(s, expr.release(), right)); }
+            )*
+        )
+        {
+            return expr.release();
+        }
+        ;
+
+    BitAnd(ParsingContext* ctx, var std::unique_ptr<Node> expr, var Span s) : Node*
+        ::=
+        (   Equality(ctx):left{ s = span; expr.reset(left); }
+            (   AMP{ if (ctx->parsingLvalue || ctx->parsingExpressionStatement && !ctx->parsingArguments) pass = false; }
+                Equality(ctx):right!{ s.end = span.end; expr.reset(new BitAndNode(s, expr.release(), right)); }
+            )*
+        )
+        {
+            return expr.release();
+        }
+        ;
+
+    Equality(ParsingContext* ctx, var std::unique_ptr<Node> expr, var Span s, var Operator op) : Node*
+        ::=
+        (   Relational(ctx):left{ s = span; expr.reset(left); }
+            (
+                (   EQ{ if (ctx->parsingLvalue || ctx->parsingExpressionStatement && !ctx->parsingArguments) pass = false; else op = Operator::eq; }
+                |   NEQ{ if (ctx->parsingLvalue || ctx->parsingExpressionStatement && !ctx->parsingArguments) pass = false; else op = Operator::neq; }
+                )
+                Relational(ctx):right!
+                {
+                    switch (op)
+                    {
+                        case Operator::eq: s.end = span.end; expr.reset(new EqualNode(s, expr.release(), right)); break;
+                        case Operator::neq: s.end = span.end; expr.reset(new NotEqualNode(s, expr.release(), right)); break; 
+                    }
+                }
+            )*
+        )
+        {
+            return expr.release();
+        }
+        ;
+
+    Relational(ParsingContext* ctx, var std::unique_ptr<Node> expr, var Span s, var Operator op) : Node*
+        ::=
+        (   Shift(ctx):left{ s = span; expr.reset(left); }
+            (
+                (   LEQ{ if (ctx->parsingLvalue || ctx->parsingExpressionStatement && !ctx->parsingArguments) pass = false; else { op = Operator::lessOrEq; ctx->PushParsingIsOrAs(false); } }
+                |   GEQ{ if (ctx->parsingLvalue || ctx->parsingExpressionStatement && !ctx->parsingArguments) pass = false; else { op = Operator::greaterOrEq; ctx->PushParsingIsOrAs(false); } }
+                |   LANGLE{ if (ctx->parsingLvalue || ctx->parsingExpressionStatement && !ctx->parsingArguments) pass = false; else { op = Operator::less; ctx->PushParsingIsOrAs(false); } }
+                |   RANGLE{ if (ctx->parsingLvalue || ctx->parsingExpressionStatement && !ctx->parsingArguments) pass = false; else { op = Operator::greater; ctx->PushParsingIsOrAs(false); } }
+                |   IS{ if (ctx->parsingLvalue || ctx->parsingExpressionStatement && !ctx->parsingArguments) pass = false; else { op = Operator::is; ctx->PushParsingIsOrAs(true); } }
+                    TypeExpr(ctx):isType
+                |   AS{ if (ctx->parsingLvalue || ctx->parsingExpressionStatement && !ctx->parsingArguments) pass = false; else { op = Operator::as; ctx->PushParsingIsOrAs(true); } }
+                    TypeExpr(ctx):asType
+                )
+                (Shift(ctx):right | empty{ if (!ctx->parsingIsOrAs) pass = false; })
+                {
+                    ctx->PopParsingIsOrAs();
+                    switch (op)
+                    {
+                        case Operator::lessOrEq: s.end = span.end; expr.reset(new LessOrEqualNode(s, expr.release(), right)); break;
+                        case Operator::greaterOrEq: s.end = span.end; expr.reset(new GreaterOrEqualNode(s, expr.release(), right)); break;
+                        case Operator::less: s.end = span.end; expr.reset(new LessNode(s, expr.release(), right)); break;
+                        case Operator::greater: s.end = span.end; expr.reset(new GreaterNode(s, expr.release(), right)); break;
+                        case Operator::is: s.end = span.end; expr.reset(new IsNode(s, expr.release(), isType)); break;
+                        case Operator::as: s.end = span.end; expr.reset(new AsNode(s, expr.release(), asType)); break;
+                    }
+                }
+            )*
+        )
+        {
+            return expr.release();
+        }
+        ;
+
+    Shift(ParsingContext* ctx, var std::unique_ptr<Node> expr, var Span s, var Operator op) : Node*
+        ::=
+        (   Additive(ctx):left{ s = span; expr.reset(left); }
+            (
+                (   SHIFTLEFT{ if (ctx->parsingLvalue) pass = false; else op = Operator::shiftLeft; }
+                |   SHIFTRIGHT{ if (ctx->parsingLvalue) pass = false; else op = Operator::shiftRight; }
+                )
+                empty{ ctx->BeginParsingArguments(); } Additive(ctx):right!
+                {
+                    switch (op)
+                    {
+                        case Operator::shiftLeft: s.end = span.end; expr.reset(new ShiftLeftNode(s, expr.release(), right)); break;
+                        case Operator::shiftRight: s.end = span.end; expr.reset(new ShiftRightNode(s, expr.release(), right)); break;
+                    }
+                    ctx->EndParsingArguments();
+                }
+                /
+                {
+                    ctx->EndParsingArguments();
+                }
+            )*
+        )
+        {
+            return expr.release();
+        }
+        ;
+
+    Additive(ParsingContext* ctx, var std::unique_ptr<Node> expr, var Span s, var Operator op) : Node*
+        ::=
+        (   Multiplicative(ctx):left{ s = span; expr.reset(left); }
+            (
+                (   PLUS{ if (ctx->parsingLvalue || ctx->parsingExpressionStatement && !ctx->parsingArguments) pass = false; else op = Operator::plus; }
+                |   MINUS{ if (ctx->parsingLvalue || ctx->parsingExpressionStatement && !ctx->parsingArguments) pass = false; else op = Operator::minus; }
+                )
+                Multiplicative(ctx):right!
+                {
+                    switch (op)
+                    {
+                        case Operator::plus: s.end = span.end; expr.reset(new AddNode(s, expr.release(), right)); break;
+                        case Operator::minus: s.end = span.end; expr.reset(new SubNode(s, expr.release(), right)); break;
+                    }
+                }
+            )*
+        )
+        {
+            return expr.release();
+        }
+        ;
+
+    Multiplicative(ParsingContext* ctx, var std::unique_ptr<Node> expr, var Span s, var Operator op) : Node*
+        ::=
+        (   Prefix(ctx):left{ s = span; expr.reset(left); }
+            (
+                (   STAR{ if (ctx->parsingLvalue || ctx->parsingExpressionStatement && !ctx->parsingArguments) pass = false; else op = Operator::mul; }
+                |   DIV{ if (ctx->parsingLvalue || ctx->parsingExpressionStatement && !ctx->parsingArguments) pass = false; else op = Operator::div; }
+                |   REM{ if (ctx->parsingLvalue || ctx->parsingExpressionStatement && !ctx->parsingArguments) pass = false; else op = Operator::rem; }
+                )
+                Prefix(ctx):right!
+                {
+                    switch (op)
+                    {
+                        case Operator::mul: s.end = span.end; expr.reset(new MulNode(s, expr.release(), right)); break;
+                        case Operator::div: s.end = span.end;  expr.reset(new DivNode(s, expr.release(), right)); break;
+                        case Operator::rem: s.end = span.end; expr.reset(new RemNode(s, expr.release(), right)); break;
+                    }
+                }
+            )*
+        )
+        {
+            return expr.release();
+        }
+        ;
+
+    Prefix(ParsingContext* ctx, var std::unique_ptr<Node> prefix, var Span s, var Operator op) : Node*
+        ::=
+        (   (   PLUSPLUS{ s = span; op = Operator::plusplus; }
+            |   MINUSMINUS{ s = span; op = Operator::minusminus; }
+            |   PLUS{ if (ctx->parsingExpressionStatement && !ctx->parsingArguments) pass = false; else { s = span; op = Operator::plus; } }
+            |   MINUS{ if (ctx->parsingExpressionStatement && !ctx->parsingArguments) pass = false; else { s = span; op = Operator::minus; } }
+            |   EXCLAMATION{ if (ctx->parsingExpressionStatement && !ctx->parsingArguments) pass = false; else { s = span; op = Operator::not_; } }
+            |   CPL{ if (ctx->parsingExpressionStatement && !ctx->parsingArguments) pass = false; else { s = span; op = Operator::complement; } }
+            |   STAR{ if (ctx->parsingExpressionStatement && !ctx->parsingArguments) pass = false; else { s = span; op = Operator::deref; } }
+            |   AMP{ if (ctx->parsingExpressionStatement && !ctx->parsingArguments) pass = false; else { s = span; op = Operator::addrOf; } }
+            )
+            Prefix(ctx):p
+            {
+                prefix.reset(p);
+                s.end = span.end;
+                switch (op)
+                {
+                    case Operator::plusplus: return new PrefixIncrementNode(s, prefix.release());
+                    case Operator::minusminus: return new PrefixDecrementNode(s, prefix.release());
+                    case Operator::plus: return new UnaryPlusNode(s, prefix.release());
+                    case Operator::minus: return new UnaryMinusNode(s, prefix.release());
+                    case Operator::not_: return new NotNode(s, prefix.release());
+                    case Operator::complement: return new ComplementNode(s, prefix.release());
+                    case Operator::deref: return new DerefNode(s, prefix.release());
+                    case Operator::addrOf: return new AddrOfNode(s, prefix.release());
+                }
+            }
+        |   Postfix(ctx):postfix{ return postfix; }
+        )
+        ;
+
+    Postfix(ParsingContext* ctx, var std::unique_ptr<Node> expr, var Span s) : Node*
+        ::=
+        (   Primary(ctx):primary{ s = span; expr.reset(primary); }
+            (   PLUSPLUS{ s.end = span.end; expr.reset(new PostfixIncrementNode(s, expr.release())); }
+            |   MINUSMINUS{ s.end = span.end; expr.reset(new PostfixDecrementNode(s, expr.release())); }
+            |   DOT Identifier:dotMember{ s.end = span.end; expr.reset(new DotNode(s, expr.release(), dotMember)); }
+            |   ARROW Identifier:arrowMember{ s.end = span.end; expr.reset(new ArrowNode(s, expr.release(), arrowMember)); }
+            |   LBRACKET{ ctx->PushParsingLvalue(false); ctx->PushParsingExpressionStatement(false); }
+                Expression(ctx):index{ ctx->PopParsingExpressionStatement(); ctx->PopParsingLvalue(); }
+                RBRACKET!{ s.end = span.end; expr.reset(new IndexingNode(s, expr.release(), index)); }
+            |   LPAREN{ expr.reset(new InvokeNode(s, expr.release())); } ArgumentList(ctx, expr.get()):args RPAREN!{ expr->SetSpanEnd(span.end); }
+            )*
+        )
+        {
+            return expr.release();
+        }
+        ;
+
+    Primary(ParsingContext* ctx, var Span s) : Node*
+        ::= (LPAREN{ s = span; } Expression(ctx):expr RPAREN{ s.end = span.end; }){ return new ParenthesizedExpressionNode(s, expr); }
+        |   Literal(ctx):literal{ return literal; }
+        |   BasicType:basicType{ return basicType; }
+        |   TemplateId(ctx):templateId{ return templateId; }
+        |   Identifier:id{ return id; }
+        |   THIS{ return new ThisNode(span); }
+        |   BASE{ return new BaseNode(span); }
+        |   SizeOfExpr(ctx):sizeOf{ return sizeOf; }
+        |   TypeNameExpr(ctx):typeName{ return typeName; }
+        |   TypeIdExpr(ctx):typeId{ return typeId; }
+        |   CastExpr(ctx):cast{ return cast; }
+        |   ConstructExpr(ctx):construct{ return construct; }
+        |   NewExpr(ctx):newExpr{ return newExpr; }
+        ;
+
+    SizeOfExpr(ParsingContext* ctx, var Span s) : Node*
+        ::= (SIZEOF{ s = span; } LPAREN! Expression(ctx):expr! RPAREN!){ s.end = span.end; return new SizeOfNode(s, expr); }
+        ;
+
+    TypeNameExpr(ParsingContext* ctx, var Span s) : Node*
+        ::= (TYPENAME{ s = span; } LPAREN! Expression(ctx):expr! RPAREN!){ s.end = span.end; return new TypeNameNode(s, expr); }
+        ;
+
+    TypeIdExpr(ParsingContext* ctx, var Span s) : Node*
+        ::= (TYPEID{ s = span; } LPAREN! Expression(ctx):expr! RPAREN!){ s.end = span.end; return new TypeIdNode(s, expr); }
+        ;
+
+    CastExpr(ParsingContext* ctx, var Span s) : Node*
+        ::= (CAST{ s = span; } LANGLE! TypeExpr(ctx):typeExpr! RANGLE! LPAREN! Expression(ctx):expr! RPAREN!){ s.end = span.end; return new CastNode(s, typeExpr, expr); }
+        ;
+
+    ConstructExpr(ParsingContext* ctx, var std::unique_ptr<Node> expr, var Span s) : Node*
+        ::= (CONSTRUCT{ s = span; } LANGLE! TypeExpr(ctx):typeExpr! RANGLE!){ expr.reset(new ConstructNode(s, typeExpr)); } LPAREN! ExpressionList(ctx, expr.get()):exprList! RPAREN!
+        {
+            expr->SetSpanEnd(span.end);
+            return expr.release();
+        }
+        ;
+
+    NewExpr(ParsingContext* ctx, var std::unique_ptr<Node> expr, var Span s) : Node*
+        ::= (NEW{ s = span; } TypeExpr(ctx):typeExpr!{ s.end = span.end; expr.reset(new NewNode(s, typeExpr)); } (LPAREN ArgumentList(ctx, expr.get()):argList RPAREN{ expr->SetSpanEnd(span.end); })?)
+        {
+            return expr.release();
+        }
+        ;
+
+    ArgumentList(ParsingContext* ctx, sngcm::ast::Node* node)
+        ::= (ExpressionList(ctx, node):exprList?)
+        ;
+
+    ExpressionList(ParsingContext* ctx, sngcm::ast::Node* node)
+        ::= empty{ ctx->BeginParsingArguments(); }
+        (   (Expression(ctx):arg{ node->AddArgument(arg); }) % COMMA){ ctx->EndParsingArguments(); } / { ctx->EndParsingArguments(); }
+        ;
+
+    InvokeExpr(ParsingContext* ctx, var std::unique_ptr<Node> expr, var Span s) : Node*
+        ::= ((TemplateId(ctx):templateId{ s = span; expr.reset(templateId); } | Identifier:id{ s = span; expr.reset(id); })
+        (   DOT Identifier:dotMemberId!{ s.end = span.end; expr.reset(new DotNode(s, expr.release(), dotMemberId)); }   )*
+        LPAREN{ expr.reset(new InvokeNode(s, expr.release())); } ArgumentList(ctx, expr.get()):argList RPAREN!{ expr->SetSpanEnd(span.end); })
+        { 
+            return expr.release();
+        }
+        ;
+
+    ruleinfo
+    {
+        (Expression, "expression"), (Equivalence, "equivalence expression"), (Implication, "implication expression"), (Disjunction, "disjunctive expression"),
+        (Conjunction, "conjunctive expression"), (BitOr, "bitwise or expression "),
+        (BitXor, "bitwise exclusive or expression"), (BitAnd, "bitwise and expression"), (Equality, "equality expression"), (Relational, "relational expression"),
+        (Shift, "shift expression"), (Additive, "additive expression"), (Multiplicative, "multiplicative expression"),
+        (Prefix, "prefix expression"), (Postfix, "postfix expression"), (Primary, "primary expression"), (SizeOfExpr, "sizeof expression"), (TypeNameExpr, "typename expression"),
+        (TypeIdExpr, "typeid expression"), (CastExpr, "cast expression"), (ConstructExpr, "construct expression"), (NewExpr, "new expression"),
+        (ArgumentList, "argument list"), (ExpressionList, "expression list"), (InvokeExpr, "invoke expression")
+    }
+}

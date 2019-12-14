@@ -5,7 +5,7 @@
 
 #include <cmajor/cmsxi/Value.hpp>
 #include <cmajor/cmsxi/Context.hpp>
-#include <cmajor/util/TextUtils.hpp>
+#include <soulng/util/TextUtils.hpp>
 
 namespace cmsxi {
 
@@ -317,11 +317,11 @@ std::string StringValue::Name(Context& context)
     {
         if (c == '"')
         {
-            name.append("\\").append(cmajor::util::ToHexString(static_cast<uint8_t>(c)));
+            name.append("\\").append(soulng::util::ToHexString(static_cast<uint8_t>(c)));
         }
         else if (c == '\\')
         {
-            name.append("\\").append(cmajor::util::ToHexString(static_cast<uint8_t>(c)));
+            name.append("\\").append(soulng::util::ToHexString(static_cast<uint8_t>(c)));
         }
         else if (c >= 32 && c < 127)
         {
@@ -329,10 +329,10 @@ std::string StringValue::Name(Context& context)
         }
         else
         {
-            name.append("\\").append(cmajor::util::ToHexString(static_cast<uint8_t>(c)));
+            name.append("\\").append(soulng::util::ToHexString(static_cast<uint8_t>(c)));
         }
     }
-    name.append("\\").append(cmajor::util::ToHexString(static_cast<uint8_t>(0)));
+    name.append("\\").append(soulng::util::ToHexString(static_cast<uint8_t>(0)));
     name.append("\"");
     return name;
 }

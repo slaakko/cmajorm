@@ -1,0 +1,155 @@
+// =================================
+// Copyright (c) 2019 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+[hpp]#include <sngcm/cmparser/ParserApi.hpp>
+[hpp]#include <sngcm/ast/CompileUnit.hpp>
+[hpp]#include <sngcm/cmparser/ParsingContext.hpp>
+[hpp]#include <memory>
+[cpp]#include <sngcm/cmparser/Typedef.hpp>
+[cpp]#include <sngcm/cmparser/Identifier.hpp>
+[cpp]#include <sngcm/cmparser/Concept.hpp>
+[cpp]#include <sngcm/cmparser/Function.hpp>
+[cpp]#include <sngcm/cmparser/Class.hpp>
+[cpp]#include <sngcm/cmparser/Interface.hpp>
+[cpp]#include <sngcm/cmparser/Enumeration.hpp>
+[cpp]#include <sngcm/cmparser/Constant.hpp>
+[cpp]#include <sngcm/cmparser/Delegate.hpp>
+[cpp]#include <sngcm/cmparser/GlobalVariable.hpp>
+[cpp]#include <sngcm/cmlexer/CmajorLexer.hpp>
+[cpp]#include <sngcm/cmlexer/CmajorTokens.hpp>
+
+using namespace sngcm::ast;
+using namespace CmajorTokens;
+
+parser api(SNGCM_PARSER_API) CompileUnitParser
+{
+    main;
+    uselexer CmajorLexer;
+
+    using IdentifierParser.Identifier;
+    using IdentifierParser.QualifiedId;
+    using ConceptParser.Concept;
+    using FunctionParser.Function;
+    using ClassParser.Class;
+    using InterfaceParser.Interface;
+    using TypedefParser.Typedef;
+    using EnumerationParser.EnumType;
+    using ConstantParser.Constant;
+    using DelegateParser.Delegate;
+    using DelegateParser.ClassDelegate;
+    using GlobalVariableParser.GlobalVariable;
+
+    CompileUnit(ParsingContext* ctx, var std::unique_ptr<CompileUnitNode> compileUnit) : sngcm::ast::CompileUnitNode*
+        ::= empty{ compileUnit.reset(new CompileUnitNode(span, lexer.FileName())); }
+            NamespaceContent(ctx, compileUnit.get(), compileUnit->GlobalNs()):content{ return compileUnit.release(); }
+        ;
+
+    NamespaceContent(ParsingContext* ctx, sngcm::ast::CompileUnitNode* cu, sngcm::ast::NamespaceNode* ns)
+        ::= UsingDirectives(ctx, ns):usingDirectives
+            Definitions(ctx, cu, ns):definitions
+        ;
+
+    UsingDirectives(ParsingContext* ctx, sngcm::ast::NamespaceNode* ns)
+        ::= UsingDirective(ctx, ns):usingDirective*
+        ;
+
+    UsingDirective(ParsingContext* ctx, sngcm::ast::NamespaceNode* ns)
+        ::= UsingAliasDirective:usingAlias{ ns->AddMember(usingAlias); }
+        |   UsingNamespaceDirective(ctx):usingNs{ ns->AddMember(usingNs); }
+        ;
+
+    UsingAliasDirective(var Span s) : Node*
+        ::= USING{ s = span; } Identifier:id ASSIGN QualifiedId:qid! SEMICOLON!
+        {
+            s.end = span.end;
+            return new AliasNode(s, id, qid);
+        }
+        ;
+
+    UsingNamespaceDirective(ParsingContext* ctx, var Span s) : Node*
+        ::= USING{ s = span; } QualifiedId:ns! SEMICOLON!
+        {
+            s.end = span.end;
+            return new NamespaceImportNode(s, ns);
+        }
+        ;
+
+    Definitions(ParsingContext* ctx, sngcm::ast::CompileUnitNode* cu, sngcm::ast::NamespaceNode* ns)
+        ::= (Definition(ctx, cu, ns):definition{ ns->AddMember(definition); })*
+        ;
+
+    Definition(ParsingContext* ctx, sngcm::ast::CompileUnitNode* cu, sngcm::ast::NamespaceNode* ns) : Node*
+        ::= NamespaceDefinition(ctx, cu, ns):nsDefinition{ return nsDefinition; }
+        |   TypedefDeclaration(ctx):typedefDeclaration{ return typedefDeclaration; }
+        |   ConceptDefinition(ctx):conceptDefinition{ return conceptDefinition; }
+        |   FunctionDefinition(ctx):functionDefinition{ return functionDefinition; }
+        |   ClassDefinition(ctx):classDefinition{ return classDefinition; }
+        |   InterfaceDefinition(ctx):interfaceDefinition{ return interfaceDefinition; }
+        |   EnumTypeDefinition(ctx):enumTypeDefinition{ return enumTypeDefinition; }
+        |   ConstantDefinition(ctx):constantDefinition{ return constantDefinition; }
+        |   DelegateDefinition(ctx):delegateDefinition{ return delegateDefinition; }
+        |   ClassDelegateDefinition(ctx):classDelegateDefinition{ return classDelegateDefinition; }
+        |   GlobalVariableDefinition(ctx, cu):globalVariableDefinition{ return globalVariableDefinition; }
+        ;
+
+    NamespaceDefinition(ParsingContext* ctx, sngcm::ast::CompileUnitNode* cu, sngcm::ast::NamespaceNode* ns, var std::unique_ptr<NamespaceNode> nsNode, var Span s) : NamespaceNode*
+        ::= NAMESPACE{ s = span; } QualifiedId:nsName{ s.end = span.end; nsNode.reset(new NamespaceNode(s, nsName)); } LBRACE! NamespaceContent(ctx, cu, nsNode.get()):content! RBRACE!
+        {
+            return nsNode.release();
+        }
+        ;
+
+    TypedefDeclaration(ParsingContext* ctx) : TypedefNode*
+        ::= Typedef(ctx):typedefDeclaration{ return typedefDeclaration; }
+        ;
+
+    ConceptDefinition(ParsingContext* ctx) : ConceptNode*
+        ::= Concept(ctx):conceptDefinition{ return conceptDefinition; }
+        ;
+
+    FunctionDefinition(ParsingContext* ctx) : FunctionNode*
+        ::= Function(ctx):functionDefinition{ return functionDefinition; }
+        ;
+
+    ClassDefinition(ParsingContext* ctx) : ClassNode*
+        ::= Class(ctx):classDefinition{ return classDefinition; }
+        ;
+
+    InterfaceDefinition(ParsingContext* ctx) : InterfaceNode*
+        ::= Interface(ctx):interfaceDefinition{ return interfaceDefinition; }
+        ;
+
+    EnumTypeDefinition(ParsingContext* ctx) : EnumTypeNode*
+        ::= EnumType(ctx):enumTypeDefinition{ return enumTypeDefinition; }
+        ;
+
+    ConstantDefinition(ParsingContext* ctx) : ConstantNode*
+        ::= Constant(ctx):constantDefinition{ return constantDefinition; }
+        ;
+
+    DelegateDefinition(ParsingContext* ctx) : DelegateNode*
+        ::= Delegate(ctx):delegateDefinition{ return delegateDefinition; }
+        ;
+
+    ClassDelegateDefinition(ParsingContext* ctx) : ClassDelegateNode*
+        ::= ClassDelegate(ctx):classDelegateDefinition{ return classDelegateDefinition; }
+        ;
+
+    GlobalVariableDefinition(ParsingContext* ctx, sngcm::ast::CompileUnitNode* cu) : GlobalVariableNode*
+        ::= GlobalVariable(ctx, cu):globalVariableDefinition{ return globalVariableDefinition; }
+        ;
+
+    ruleinfo
+    {
+        (CompileUnit, "compile unit"), (NamespaceContent, "namespace content"), (UsingDirectives, "using directives"), (UsingDirective, "using directive"),
+        (UsingAliasDirective, "using alias directive"), (UsingNamespaceDirective, "using namespace directive"), (Definitions, "definitions"),
+        (Definition, "definition"), (NamespaceDefinition, "namespace definition"), (TypedefDeclaration , "typedef declaration"), (ConceptDefinition, "concept definition"),
+        (FunctionDefinition, "function definition"), (ClassDefinition, "class definition"), (InterfaceDefinition, "interface definition"), (EnumTypeDefinition, "enumerated type definition"),
+        (ConstantDefinition, "constant definition"), (DelegateDefinition, "delegate definition"), (ClassDelegateDefinition, "class delegate definition"),
+        (GlobalVariableDefinition, "global variable definition")
+    }
+}
+
+

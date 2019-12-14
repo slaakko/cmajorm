@@ -5,17 +5,17 @@
 
 #include <cmajor/cmdoclib/Input.hpp>
 #include <cmajor/symbols/GlobalFlags.hpp>
-#include <cmajor/dom/Parser.hpp>
-#include <cmajor/dom/Element.hpp>
-#include <cmajor/xpath/XPathEvaluate.hpp>
-#include <cmajor/util/Unicode.hpp>
-#include <cmajor/util/Path.hpp>
+#include <sngxml/dom/Parser.hpp>
+#include <sngxml/dom/Element.hpp>
+#include <sngxml/xpath/XPathEvaluate.hpp>
+#include <soulng/util/Unicode.hpp>
+#include <soulng/util/Path.hpp>
 #include <iostream>
 
 namespace cmajor { namespace cmdoclib {
 
-using namespace cmajor::util;
-using namespace cmajor::unicode;
+using namespace soulng::util;
+using namespace soulng::unicode;
 using namespace cmajor::symbols;
 
 std::mutex mtx;
@@ -34,17 +34,17 @@ Input ReadInputXml(const std::string& cmDocFilePath)
     {
         std::cout << "> " << cmDocFilePath << std::endl;
     }
-    std::unique_ptr<dom::Document> inputDoc = dom::ReadDocument(cmDocFilePath);
-    std::unique_ptr<xpath::XPathObject> solutionObject = xpath::Evaluate(U"/cmdoc/solution", inputDoc.get());
-    if (solutionObject->Type() == xpath::XPathObjectType::nodeSet)
+    std::unique_ptr<sngxml::dom::Document> inputDoc = sngxml::dom::ReadDocument(cmDocFilePath);
+    std::unique_ptr<sngxml::xpath::XPathObject> solutionObject = sngxml::xpath::Evaluate(U"/cmdoc/solution", inputDoc.get());
+    if (solutionObject->Type() == sngxml::xpath::XPathObjectType::nodeSet)
     {
-        xpath::XPathNodeSet* solutionNodeSet = static_cast<xpath::XPathNodeSet*>(solutionObject.get());
+        sngxml::xpath::XPathNodeSet* solutionNodeSet = static_cast<sngxml::xpath::XPathNodeSet*>(solutionObject.get());
         if (solutionNodeSet->Length() == 1)
         {
-            dom::Node* solutionNode = (*solutionNodeSet)[0];
-            if (solutionNode->GetNodeType() == dom::NodeType::elementNode)
+            sngxml::dom::Node* solutionNode = (*solutionNodeSet)[0];
+            if (solutionNode->GetNodeType() == sngxml::dom::NodeType::elementNode)
             {
-                dom::Element* solutionElement = static_cast<dom::Element*>(solutionNode);
+                sngxml::dom::Element* solutionElement = static_cast<sngxml::dom::Element*>(solutionNode);
                 std::string relativeSolutionFilePath = ToUtf8(solutionElement->GetAttribute(U"filePath"));
                 input.relativeSolutionFilePath = Path::MakeCanonical(relativeSolutionFilePath);
                 std::string solutionFilePath = GetFullPath(Path::Combine(input.baseDir, relativeSolutionFilePath));
@@ -52,66 +52,66 @@ Input ReadInputXml(const std::string& cmDocFilePath)
             }
         }
     }
-    std::unique_ptr<xpath::XPathObject> docObject = xpath::Evaluate(U"/cmdoc/doc", inputDoc.get());
-    if (docObject->Type() == xpath::XPathObjectType::nodeSet)
+    std::unique_ptr<sngxml::xpath::XPathObject> docObject = sngxml::xpath::Evaluate(U"/cmdoc/doc", inputDoc.get());
+    if (docObject->Type() == sngxml::xpath::XPathObjectType::nodeSet)
     {
-        xpath::XPathNodeSet* docNodeSet = static_cast<xpath::XPathNodeSet*>(docObject.get());
+        sngxml::xpath::XPathNodeSet* docNodeSet = static_cast<sngxml::xpath::XPathNodeSet*>(docObject.get());
         if (docNodeSet->Length() == 1)
         {
-            dom::Node* docNode = (*docNodeSet)[0];
-            if (docNode->GetNodeType() == dom::NodeType::elementNode)
+            sngxml::dom::Node* docNode = (*docNodeSet)[0];
+            if (docNode->GetNodeType() == sngxml::dom::NodeType::elementNode)
             {
-                dom::Element* docElement = static_cast<dom::Element*>(docNode);
+                sngxml::dom::Element* docElement = static_cast<sngxml::dom::Element*>(docNode);
                 std::string docFilePath = GetFullPath(Path::Combine(input.baseDir, ToUtf8(docElement->GetAttribute(U"filePath"))));
-                input.docs = dom::ReadDocument(docFilePath);
+                input.docs = sngxml::dom::ReadDocument(docFilePath);
             }
         }
     }
-    std::unique_ptr<xpath::XPathObject> targetObject = xpath::Evaluate(U"/cmdoc/target", inputDoc.get());
-    if (targetObject->Type() == xpath::XPathObjectType::nodeSet)
+    std::unique_ptr<sngxml::xpath::XPathObject> targetObject = sngxml::xpath::Evaluate(U"/cmdoc/target", inputDoc.get());
+    if (targetObject->Type() == sngxml::xpath::XPathObjectType::nodeSet)
     {
-        xpath::XPathNodeSet* targetNodeSet = static_cast<xpath::XPathNodeSet*>(targetObject.get());
+        sngxml::xpath::XPathNodeSet* targetNodeSet = static_cast<sngxml::xpath::XPathNodeSet*>(targetObject.get());
         if (targetNodeSet->Length() == 1)
         {
-            dom::Node* targetNode = (*targetNodeSet)[0];
-            if (targetNode->GetNodeType() == dom::NodeType::elementNode)
+            sngxml::dom::Node* targetNode = (*targetNodeSet)[0];
+            if (targetNode->GetNodeType() == sngxml::dom::NodeType::elementNode)
             {
-                dom::Element* targetElement = static_cast<dom::Element*>(targetNode);
+                sngxml::dom::Element* targetElement = static_cast<sngxml::dom::Element*>(targetNode);
                 std::string relativeTargetDirPath = ToUtf8(targetElement->GetAttribute(U"dir"));
                 std::string targetDirPath = GetFullPath(Path::Combine(input.baseDir, relativeTargetDirPath));
                 input.targetDirPath = targetDirPath;
             }
         }
     }
-    std::unique_ptr<xpath::XPathObject> libraryObjects = xpath::Evaluate(U"/cmdoc/libraries/library", inputDoc.get());
-    if (libraryObjects->Type() == xpath::XPathObjectType::nodeSet)
+    std::unique_ptr<sngxml::xpath::XPathObject> libraryObjects = sngxml::xpath::Evaluate(U"/cmdoc/libraries/library", inputDoc.get());
+    if (libraryObjects->Type() == sngxml::xpath::XPathObjectType::nodeSet)
     {
-        xpath::XPathNodeSet* libraryNodeSet = static_cast<xpath::XPathNodeSet*>(libraryObjects.get());
+        sngxml::xpath::XPathNodeSet* libraryNodeSet = static_cast<sngxml::xpath::XPathNodeSet*>(libraryObjects.get());
         int  n = libraryNodeSet->Length();
         for (int i = 0; i < n; ++i)
         {
-            dom::Node* libraryNode = (*libraryNodeSet)[i];
-            if (libraryNode->GetNodeType() == dom::NodeType::elementNode)
+            sngxml::dom::Node* libraryNode = (*libraryNodeSet)[i];
+            if (libraryNode->GetNodeType() == sngxml::dom::NodeType::elementNode)
             {
-                dom::Element* libraryElement = static_cast<dom::Element*>(libraryNode);
+                sngxml::dom::Element* libraryElement = static_cast<sngxml::dom::Element*>(libraryNode);
                 std::string libraryDir = ToUtf8(libraryElement->GetAttribute(U"dir"));
                 if (!libraryDir.empty())
                 {
                     input.libraryDirs.push_back(libraryDir);
                     std::string libraryPrefix = Path::Combine(libraryDir, "content");
                     std::string libDir = Path::Combine(input.baseDir, libraryDir);
-                    std::unique_ptr<dom::Document> modulesDoc = dom::ReadDocument(Path::Combine(libDir, "modules.xml"));
-                    std::unique_ptr<xpath::XPathObject> moduleObjects = xpath::Evaluate(U"/modules/module", modulesDoc.get());
-                    if (moduleObjects->Type() == xpath::XPathObjectType::nodeSet)
+                    std::unique_ptr<sngxml::dom::Document> modulesDoc = sngxml::dom::ReadDocument(Path::Combine(libDir, "modules.xml"));
+                    std::unique_ptr<sngxml::xpath::XPathObject> moduleObjects = sngxml::xpath::Evaluate(U"/modules/module", modulesDoc.get());
+                    if (moduleObjects->Type() == sngxml::xpath::XPathObjectType::nodeSet)
                     {
-                        xpath::XPathNodeSet* moduleNodeSet = static_cast<xpath::XPathNodeSet*>(moduleObjects.get());
+                        sngxml::xpath::XPathNodeSet* moduleNodeSet = static_cast<sngxml::xpath::XPathNodeSet*>(moduleObjects.get());
                         int nm = moduleNodeSet->Length();
                         for (int i = 0; i < nm; ++i)
                         {
-                            dom::Node* moduleNode = (*moduleNodeSet)[i];
-                            if (moduleNode->GetNodeType() == dom::NodeType::elementNode)
+                            sngxml::dom::Node* moduleNode = (*moduleNodeSet)[i];
+                            if (moduleNode->GetNodeType() == sngxml::dom::NodeType::elementNode)
                             {
-                                dom::Element* moduleElement = static_cast<dom::Element*>(moduleNode);
+                                sngxml::dom::Element* moduleElement = static_cast<sngxml::dom::Element*>(moduleNode);
                                 std::u32string moduleName = moduleElement->GetAttribute(U"name");
                                 input.libraryPrefixMap[moduleName] = libraryPrefix;
                             }

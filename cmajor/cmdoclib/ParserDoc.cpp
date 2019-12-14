@@ -5,22 +5,22 @@
 
 #include <cmajor/cmdoclib/ParserDoc.hpp>
 #include <cmajor/cmdoclib/Input.hpp>
-#include <cmajor/xpath/XPathEvaluate.hpp>
-#include <cmajor/dom/Document.hpp>
-#include <cmajor/dom/Element.hpp>
-#include <cmajor/dom/Parser.hpp>
+#include <sngxml/xpath/XPathEvaluate.hpp>
+#include <sngxml/dom/Document.hpp>
+#include <sngxml/dom/Element.hpp>
+#include <sngxml/dom/Parser.hpp>
 #include <cmajor/symbols/GlobalFlags.hpp>
-#include <cmajor/util/System.hpp>
-#include <cmajor/util/Path.hpp>
-#include <cmajor/util/Unicode.hpp>
+#include <soulng/util/System.hpp>
+#include <soulng/util/Path.hpp>
+#include <soulng/util/Unicode.hpp>
 
 namespace cmajor { namespace cmdoclib {
 
 using namespace cmajor::symbols;
-using namespace cmajor::util;
-using namespace cmajor::unicode;
+using namespace soulng::util;
+using namespace soulng::unicode;
 
-void GeneratePPXml(cmajor::ast::Project* project)
+void GeneratePPXml(sngcm::ast::Project* project)
 {
     std::string styleFilePath = "../../../style/style.css";
     Input* input = GetInputPtr();
@@ -34,21 +34,21 @@ void GeneratePPXml(cmajor::ast::Project* project)
     std::ofstream ppXmlFile(ppXmlFilePath);
     CodeFormatter formatter(ppXmlFile);
     formatter.SetIndentSize(1);
-    dom::Document ppDoc;
-    std::unique_ptr<dom::Element> parserProjectsElement(new dom::Element(U"parserProjects"));
+    sngxml::dom::Document ppDoc;
+    std::unique_ptr<sngxml::dom::Element> parserProjectsElement(new sngxml::dom::Element(U"parserProjects"));
     for (const std::string& textFilePath : project->RelativeTextFilePaths())
     {
         if (Path::GetExtension(textFilePath) == ".pp")
         {
-            std::unique_ptr<dom::Element> parserProjectElement(new dom::Element(U"parserProject"));
+            std::unique_ptr<sngxml::dom::Element> parserProjectElement(new sngxml::dom::Element(U"parserProject"));
             std::string ppFilePath = Path::Combine(Path::Combine(
                 Path::Combine("../..", Path::GetDirectoryName(input->relativeSolutionFilePath)), Path::GetDirectoryName(project->RelativeFilePath())), textFilePath);
             parserProjectElement->SetAttribute(U"filePath", ToUtf32(ppFilePath));
             parserProjectElement->SetAttribute(U"styleFilePath", ToUtf32(styleFilePath));
-            parserProjectsElement->AppendChild(std::unique_ptr<dom::Node>(parserProjectElement.release()));
+            parserProjectsElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(parserProjectElement.release()));
         }
     }
-    ppDoc.AppendChild(std::unique_ptr<dom::Node>(parserProjectsElement.release()));
+    ppDoc.AppendChild(std::unique_ptr<sngxml::dom::Node>(parserProjectsElement.release()));
     ppDoc.Write(formatter);
 }
 
@@ -58,27 +58,27 @@ void GenerateGmXml(Input* input, const std::string& moduleDir)
     std::ofstream gmXmlFile(gmXmlFilePath);
     CodeFormatter formatter(gmXmlFile);
     formatter.SetIndentSize(1);
-    dom::Document gmDoc;
-    std::unique_ptr<dom::Element> grammarsElement(new dom::Element(U"grammars"));
+    sngxml::dom::Document gmDoc;
+    std::unique_ptr<sngxml::dom::Element> grammarsElement(new sngxml::dom::Element(U"grammars"));
     for (const auto& p : input->grammarMap)
     {
-        std::unique_ptr<dom::Element> grammarElement(new dom::Element(U"grammar"));
+        std::unique_ptr<sngxml::dom::Element> grammarElement(new sngxml::dom::Element(U"grammar"));
         grammarElement->SetAttribute(U"id", p.first);
         grammarElement->SetAttribute(U"docPath", ToUtf32(p.second));
-        grammarsElement->AppendChild(std::unique_ptr<dom::Node>(grammarElement.release()));
+        grammarsElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(grammarElement.release()));
     }
-    gmDoc.AppendChild(std::unique_ptr<dom::Node>(grammarsElement.release()));
+    gmDoc.AppendChild(std::unique_ptr<sngxml::dom::Node>(grammarsElement.release()));
     gmDoc.Write(formatter);
 }
 
 void BuildParserDocs(Input* input, const std::string& moduleDir, const std::string& grammarXmlFilePath, const std::string& relativeModuleDir, 
     std::vector<std::string>& grammarFilePaths, const std::u32string& moduleName, std::vector<GrammarInfo>& grammars)
 {
-    std::unique_ptr<dom::Document> parserProjectsDoc = dom::ReadDocument(Path::Combine(moduleDir, "pp.xml"));
-    std::unique_ptr<xpath::XPathObject> parserProjectObject = xpath::Evaluate(U"/parserProjects/parserProject", parserProjectsDoc.get());
-    if (parserProjectObject->Type() == xpath::XPathObjectType::nodeSet)
+    std::unique_ptr<sngxml::dom::Document> parserProjectsDoc = sngxml::dom::ReadDocument(Path::Combine(moduleDir, "pp.xml"));
+    std::unique_ptr<sngxml::xpath::XPathObject> parserProjectObject = sngxml::xpath::Evaluate(U"/parserProjects/parserProject", parserProjectsDoc.get());
+    if (parserProjectObject->Type() == sngxml::xpath::XPathObjectType::nodeSet)
     {
-        xpath::XPathNodeSet* parserProjectNodeSet = static_cast<xpath::XPathNodeSet*>(parserProjectObject.get());
+        sngxml::xpath::XPathNodeSet* parserProjectNodeSet = static_cast<sngxml::xpath::XPathNodeSet*>(parserProjectObject.get());
         int n = parserProjectNodeSet->Length();
         if (n > 0)
         {
@@ -91,21 +91,21 @@ void BuildParserDocs(Input* input, const std::string& moduleDir, const std::stri
             }
             command.append("\"" + moduleDir + "\"");
             GenerateGmXml(input, moduleDir);
-            cmajor::util::System(command);
+            soulng::util::System(command);
             std::string grammarFilePath = Path::Combine(relativeModuleDir, Path::GetFileName(grammarXmlFilePath));
             grammarFilePaths.push_back(grammarFilePath);
-            std::unique_ptr<dom::Document> grammarDoc = dom::ReadDocument(grammarXmlFilePath);
-            std::unique_ptr<xpath::XPathObject> grammarsObject = xpath::Evaluate(U"/grammars/grammar", grammarDoc.get());
-            if (grammarsObject->Type() == xpath::XPathObjectType::nodeSet)
+            std::unique_ptr<sngxml::dom::Document> grammarDoc = sngxml::dom::ReadDocument(grammarXmlFilePath);
+            std::unique_ptr<sngxml::xpath::XPathObject> grammarsObject = sngxml::xpath::Evaluate(U"/grammars/grammar", grammarDoc.get());
+            if (grammarsObject->Type() == sngxml::xpath::XPathObjectType::nodeSet)
             {
-                xpath::XPathNodeSet* grammarsNodeSet = static_cast<xpath::XPathNodeSet*>(grammarsObject.get());
+                sngxml::xpath::XPathNodeSet* grammarsNodeSet = static_cast<sngxml::xpath::XPathNodeSet*>(grammarsObject.get());
                 int ng = grammarsNodeSet->Length();
                 for (int i = 0; i < ng; ++i)
                 {
-                    dom::Node* grammarNode = (*grammarsNodeSet)[i];
-                    if (grammarNode->GetNodeType() == dom::NodeType::elementNode)
+                    sngxml::dom::Node* grammarNode = (*grammarsNodeSet)[i];
+                    if (grammarNode->GetNodeType() == sngxml::dom::NodeType::elementNode)
                     {
-                        dom::Element* grammarElement = static_cast<dom::Element*>(grammarNode);
+                        sngxml::dom::Element* grammarElement = static_cast<sngxml::dom::Element*>(grammarNode);
                         std::u32string grammarName = grammarElement->GetAttribute(U"name");
                         std::u32string grammarId = grammarElement->GetAttribute(U"id");
                         std::string grammarDocPath = ToUtf8(grammarElement->GetAttribute(U"docPath"));

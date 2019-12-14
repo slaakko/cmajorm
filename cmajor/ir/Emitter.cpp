@@ -4,7 +4,6 @@
 // =================================
 
 #include <cmajor/ir/Emitter.hpp>
-#include <cmajor/cmmid/Interface.hpp>
 
 namespace cmajor { namespace ir {
 

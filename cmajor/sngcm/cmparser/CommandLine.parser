@@ -1,0 +1,72 @@
+// =================================
+// Copyright (c) 2019 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+[hpp]#include <sngcm/cmparser/ParserApi.hpp>
+[hpp]#include <vector>
+[hpp]#include <string>
+[cpp]#include <soulng/lexer/TrivialLexer.hpp>
+[cpp]#include <soulng/parser/Range.hpp>
+
+using namespace soulng::lexer;
+
+parser api(SNGCM_PARSER_API) CommandLineParser
+{
+    uselexer TrivialLexer;
+    main;
+
+    CommandLine(var std::vector<std::string> value) : std::vector<std::string>
+        ::= (Spaces:spc1? Argument:first{ value.push_back(first); } (Spaces:spc2 Argument:next{ value.push_back(next); })* Spaces:spc3? '\n'){ return value; }
+        ;
+
+    Spaces
+        ::= "[\t ]"+
+        ;
+
+    Argument(var std::string value) : std::string
+        ::= ((ArgElement:element{ value.append(element); })+){ return value; }
+        ;
+
+    ArgElement(var std::string value) : std::string
+        ::= OddBackslashesAndLiteralQuotationMark:o{ return o; }
+        |   EvenBackslashesAndQuotationMark:s{ value.append(s); } (StringChar:sc{ value.append(sc); })* EvenBackslashesAndQuotationMark:e{ value.append(e); return value; }
+        |   "[^\t\n\r ]"{ value.append(ToUtf8(lexer.GetMatch(span))); return value; }
+        ;
+
+    OddBackslashesAndLiteralQuotationMark(var Span s, var std::string value) : std::string
+        ::= "[\\]"{ s = span; } "[\\]"* '"'
+        {
+            s.end = span.end;
+            std::u32string bs = lexer.GetMatch(s);
+            int n = bs.length() - 1; 
+            pass = n % 2 == 1;
+            if (pass)
+            {
+                value = std::string(n / 2, '\\');
+                value.append(1, '"');
+                return value;
+            }
+        }
+        ;
+
+    EvenBackslashesAndQuotationMark(var Span s, var std::string value) : std::string
+        ::= empty{ s = span; } "[\\]"* '"'
+        { 
+            s.end = span.end; 
+            std::u32string bs = lexer.GetMatch(s); 
+            int n = bs.length() - 1; 
+            pass = n % 2 == 0; 
+            if (pass) 
+            {
+                value = std::string(n / 2, '\\');
+                return value;
+            }
+        }
+        ;
+
+    StringChar(var Span s) : std::string
+        ::= OddBackslashesAndLiteralQuotationMark:o{ return o; }
+        |   (("[^\n\r]"{ s = span; }) - EvenBackslashesAndQuotationMark:m){ return ToUtf8(lexer.GetMatch(s)); }
+        ;
+}

@@ -1,0 +1,61 @@
+using System;
+using System.Collections;
+
+// this file has been semiautomatically generated from 'D:/work/soulngcm/soulngcm/sngcmpg/ParserFile.hpp' using cpp2cm version 1.0.0
+
+// this file has been semiautomatically generated from 'D:/work/soulngcm/soulngcm/sngcmpg/ParserFile.cpp' using cpp2cm version 1.0.0
+
+namespace soulcm.scmpg
+{
+    public class Include
+    {
+        public Include(bool hppPrefix_, const ustring& str_) :
+            hppPrefix(hppPrefix_), str(str_)
+        {
+        }
+        public bool HppPrefix() const
+        {
+            return hppPrefix;
+        }
+        public const ustring& Str() const
+        {
+            return str;
+        }
+        private bool hppPrefix;
+        private ustring str;
+    }
+    public class ParserFile
+    {
+        public ParserFile(const string& fileName_) :
+            fileName(fileName_)
+        {
+        }
+        public const string& FileName() const
+        {
+            return fileName;
+        }
+        public const List<UniquePtr<Cm.Ast.Node>>& UsingDirectives() const
+        {
+            return usingDirectives;
+        }
+        public const List<UniquePtr<GrammarParser>>& Parsers() const
+        {
+            return parsers;
+        }
+        public void AddUsingDirective(Cm.Ast.Node* usingDirective)
+        {
+            usingDirectives.Add(UniquePtr<Cm.Ast.Node>(usingDirective));
+        }
+        public void AddParser(GrammarParser* parser)
+        {
+            parsers.Add(UniquePtr<GrammarParser>(parser));
+        }
+        public void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        private string fileName;
+        private List<UniquePtr<Cm.Ast.Node>> usingDirectives;
+        private List<UniquePtr<GrammarParser>> parsers;
+    }
+} // namespace soulcm.scmpg

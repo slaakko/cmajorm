@@ -20,21 +20,21 @@
 #include <cmajor/symbols/TemplateSymbol.hpp>
 #include <cmajor/symbols/GlobalFlags.hpp>
 #include <cmajor/symbols/DebugFlags.hpp>
-#include <cmajor/ast/BasicType.hpp>
-#include <cmajor/ast/Literal.hpp>
-#include <cmajor/ast/Expression.hpp>
-#include <cmajor/ast/Identifier.hpp>
-#include <cmajor/ast/Visitor.hpp>
-#include <cmajor/util/Unicode.hpp>
-#include <cmajor/util/Log.hpp>
-#include <cmajor/util/Time.hpp>
+#include <sngcm/ast/BasicType.hpp>
+#include <sngcm/ast/Literal.hpp>
+#include <sngcm/ast/Expression.hpp>
+#include <sngcm/ast/Identifier.hpp>
+#include <sngcm/ast/Visitor.hpp>
+#include <soulng/util/Unicode.hpp>
+#include <soulng/util/Log.hpp>
+#include <soulng/util/Time.hpp>
 
 namespace cmajor { namespace binder {
 
-using cmajor::parsing::Span;
-using namespace cmajor::unicode;
+using soulng::lexer::Span;
+using namespace soulng::unicode;
 
-class ExpressionBinder : public cmajor::ast::Visitor
+class ExpressionBinder : public sngcm::ast::Visitor
 {
 public:
     ExpressionBinder(const Span& span_, BoundCompileUnit& boundCompileUnit_, BoundFunction* boundFunction_, ContainerScope* containerScope_, StatementBinder* statementBinder_, bool lvalue_);
@@ -715,7 +715,7 @@ void ExpressionBinder::Visit(NullLiteralNode& nullLiteralNode)
 
 void ExpressionBinder::Visit(UuidLiteralNode& uuidLiteralNode)
 {
-    expression.reset(new BoundLiteral(module, std::unique_ptr<Value>(new UuidValue(uuidLiteralNode.GetSpan(), boundCompileUnit.Install(uuidLiteralNode.Uuid()))),
+    expression.reset(new BoundLiteral(module, std::unique_ptr<Value>(new UuidValue(uuidLiteralNode.GetSpan(), boundCompileUnit.Install(uuidLiteralNode.GetUuid()))),
         symbolTable.GetTypeByName(U"void")->AddPointer(uuidLiteralNode.GetSpan())));
 }
 
@@ -1080,6 +1080,29 @@ void ExpressionBinder::Visit(DotNode& dotNode)
             else
             {
                 throw Exception(module, "symbol '" + ToUtf8(name) + "' not found from array type '" + ToUtf8(arrayType->FullName()) + "'", dotNode.MemberId()->GetSpan());
+            }
+        }
+        else if (type->IsCharacterPointerType() && expression->GetBoundNodeType() == BoundNodeType::boundLiteral)
+        {
+            TypeSymbol* stringFunctionContainer = symbolTable.GetTypeByName(U"@string_functions");
+            ContainerScope* scope = stringFunctionContainer->GetContainerScope();
+            std::u32string name = dotNode.MemberId()->Str();
+            Symbol* symbol = scope->Lookup(name);
+            if (symbol)
+            {
+                std::unique_ptr<BoundExpression> receiverPtr = std::move(expression);
+                BindSymbol(symbol, dotNode.MemberId());
+                if (expression->GetBoundNodeType() == BoundNodeType::boundFunctionGroupExpression)
+                {
+                    BoundFunctionGroupExpression* bfe = static_cast<BoundFunctionGroupExpression*>(expression.get());
+                    bfe->SetScopeQualified();
+                    bfe->SetQualifiedScope(scope);
+                    bfe->SetClassPtr(std::move(receiverPtr));
+                }
+            }
+            else
+            {
+                throw Exception(module, "symbol '" + ToUtf8(name) + "' not found from string functions", dotNode.MemberId()->GetSpan());
             }
         }
         else
@@ -2103,6 +2126,20 @@ void ExpressionBinder::Visit(InvokeNode& invokeNode)
         expression->SetFlag(BoundExpressionFlags::bindToRvalueReference);
     }
     if (functionSymbol->IsConstExpr())
+    {
+        TypeSymbol* returnType = functionSymbol->ReturnType();
+        if (returnType && !returnType->IsVoidType())
+        {
+            std::unique_ptr<Value> value = Evaluate(&invokeNode, returnType, containerScope, boundCompileUnit, true, boundFunction, span);
+            if (value)
+            {
+                TypeSymbol* type = value->GetType(&symbolTable);
+                BoundLiteral* literal = new BoundLiteral(module, std::move(value), type);
+                expression.reset(literal);
+            }
+        }
+    }
+    else if (functionSymbol->IsCompileTimePrimitiveFunction())
     {
         TypeSymbol* returnType = functionSymbol->ReturnType();
         if (returnType && !returnType->IsVoidType())

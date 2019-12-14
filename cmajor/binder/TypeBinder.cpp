@@ -10,9 +10,9 @@
 #include <cmajor/binder/Evaluator.hpp>
 #include <cmajor/binder/AttributeBinder.hpp>
 #include <cmajor/binder/BoundExpression.hpp>
-#include <cmajor/ast/CompileUnit.hpp>
-#include <cmajor/ast/Identifier.hpp>
-#include <cmajor/ast/GlobalVariable.hpp>
+#include <sngcm/ast/CompileUnit.hpp>
+#include <sngcm/ast/Identifier.hpp>
+#include <sngcm/ast/GlobalVariable.hpp>
 #include <cmajor/symbols/FunctionSymbol.hpp>
 #include <cmajor/symbols/VariableSymbol.hpp>
 #include <cmajor/symbols/DelegateSymbol.hpp>
@@ -22,11 +22,11 @@
 #include <cmajor/symbols/TemplateSymbol.hpp>
 #include <cmajor/symbols/ConceptSymbol.hpp>
 #include <cmajor/symbols/GlobalFlags.hpp>
-#include <cmajor/util/Unicode.hpp>
+#include <soulng/util/Unicode.hpp>
 
 namespace cmajor { namespace binder {
 
-using namespace cmajor::unicode;
+using namespace soulng::unicode;
 
 ConstraintSymbolBinder* constraintSymbolBinder = nullptr;
 

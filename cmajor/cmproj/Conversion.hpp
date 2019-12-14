@@ -5,9 +5,10 @@
 
 #ifndef CMAJOR_CMPROJ_CONVERSION_INCLUDED
 #define CMAJOR_CMPROJ_CONVERSION_INCLUDED
-#include <cmajor/ast/Project.hpp>
+#include <cmproj/CmprojApi.hpp>
+#include <sngcm/ast/Project.hpp>
 
-using namespace cmajor::ast;
+using namespace sngcm::ast;
 
 namespace cmajor { namespace cmproj {
 

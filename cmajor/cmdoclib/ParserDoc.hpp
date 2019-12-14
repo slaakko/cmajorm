@@ -6,7 +6,7 @@
 #ifndef CMAJOR_CMDOCLIB_PARSER_DOC_INCLUDED
 #define CMAJOR_CMDOCLIB_PARSER_DOC_INCLUDED
 #include <cmajor/cmdoclib/Input.hpp>
-#include <cmajor/ast/Project.hpp>
+#include <sngcm/ast/Project.hpp>
 #include <string>
 #include <unordered_map>
 
@@ -31,7 +31,7 @@ struct CMDOCLIB_API ByGrammarName
     }
 };
 
-CMDOCLIB_API void GeneratePPXml(cmajor::ast::Project* project);
+CMDOCLIB_API void GeneratePPXml(sngcm::ast::Project* project);
 CMDOCLIB_API void BuildParserDocs(Input* input, const std::string& ppXmlFilePath, const std::string& grammarXmlFilePath, const std::string& relativeModuleDir,
     std::vector<std::string>& grammarFilePaths, const std::u32string& moduleName, std::vector<GrammarInfo>& grammars);
 

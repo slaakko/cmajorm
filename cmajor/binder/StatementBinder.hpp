@@ -7,11 +7,11 @@
 #define CMAJOR_BINDER_STATEMENT_BINDER_INCLUDED
 #include <cmajor/binder/BoundCompileUnit.hpp>
 #include <cmajor/binder/BoundStatement.hpp>
-#include <cmajor/ast/Visitor.hpp>
+#include <sngcm/ast/Visitor.hpp>
 
 namespace cmajor { namespace binder {
 
-using namespace cmajor::ast;
+using namespace sngcm::ast;
 
 class BoundGotoCaseStatement;
 class BoundGotoDefaultStatement;

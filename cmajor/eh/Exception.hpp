@@ -5,6 +5,7 @@
 
 #ifndef CMAJOR_EH_EXCEPTION_INCLUDED
 #define CMAJOR_EH_EXCEPTION_INCLUDED
+#include <cmajor/eh/EhApi.hpp>
 
 namespace cmajor { namespace eh {
 

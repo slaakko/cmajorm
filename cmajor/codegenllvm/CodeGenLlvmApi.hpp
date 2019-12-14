@@ -12,6 +12,13 @@
 #define CODEGENLLVM_API __declspec(dllexport)
 #else
 #define CODEGENLLVM_API __declspec(dllimport)
+
+#ifdef NDEBUG
+#pragma comment(lib, "codegenllvm.lib")
+#else
+#pragma comment(lib, "codegenllvmd.lib")
+#endif
+
 #endif
 
 #else

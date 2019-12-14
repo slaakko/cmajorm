@@ -6,7 +6,7 @@
 #ifndef CMAJOR_SYMBOLS_TYPE_MAP_INCLUDED
 #define CMAJOR_SYMBOLS_TYPE_MAP_INCLUDED
 #include <cmajor/symbols/SymbolsApi.hpp>
-#include <cmajor/dom/Element.hpp>
+#include <sngxml/dom/Element.hpp>
 #include <unordered_map>
 
 namespace cmajor { namespace symbols {
@@ -20,12 +20,12 @@ public:
     TypeMap(const TypeMap&) = delete;
     TypeMap& operator=(const TypeMap&) = delete;
     int GetOrInsertType(TypeSymbol* type);
-    std::vector<std::unique_ptr<dom::Element>> TypeElements();
+    std::vector<std::unique_ptr<sngxml::dom::Element>> TypeElements();
 private:
     int nextClassTemplateSpecializationId;
     int nextOtherTypeId;
     std::unordered_map<TypeSymbol*, int> typeMap;
-    std::map<int, std::unique_ptr<dom::Element>> typeIdTypeElementMap;
+    std::map<int, std::unique_ptr<sngxml::dom::Element>> typeIdTypeElementMap;
 };
 
 } } // namespace cmajor::symbols

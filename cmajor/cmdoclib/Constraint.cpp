@@ -4,8 +4,8 @@
 // =================================
 
 #include <cmajor/cmdoclib/Constraint.hpp>
-#include <cmajor/ast/Visitor.hpp>
-#include <cmajor/ast/Expression.hpp>
+#include <sngcm/ast/Visitor.hpp>
+#include <sngcm/ast/Expression.hpp>
 
 namespace cmajor { namespace cmdoclib {
 

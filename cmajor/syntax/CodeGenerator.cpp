@@ -9,9 +9,9 @@
 #include <cmajor/parsing/Namespace.hpp>
 #include <cmajor/parsing/Visitor.hpp>
 #include <cmajor/parsing/Scope.hpp>
-#include <cmajor/util/TextUtils.hpp>
-#include <cmajor/util/Util.hpp>
-#include <cmajor/util/Unicode.hpp>
+#include <soulng/util/TextUtils.hpp>
+#include <soulng/util/Util.hpp>
+#include <soulng/util/Unicode.hpp>
 #include <boost/filesystem.hpp>
 #include <unordered_map>
 #include <fstream>
@@ -21,7 +21,7 @@
 namespace cmajor { namespace syntax {
 
 using namespace cmajor::parsing;
-using namespace cmajor::util;
+using namespace soulng::util;
 using namespace cmajor::unicode;
 using boost::filesystem::path;
 
@@ -134,7 +134,7 @@ void GenerateCode(ParserFileContent* parserFile)
     cppFormatter.WriteLine("#include <cmajor/parsing/Exception.hpp>");
     cppFormatter.WriteLine("#include <cmajor/parsing/StdLib.hpp>");
     cppFormatter.WriteLine("#include <cmajor/parsing/XmlLog.hpp>");
-    cppFormatter.WriteLine("#include <cmajor/util/Unicode.hpp>");
+    cppFormatter.WriteLine("#include <soulng/util/Unicode.hpp>");
 
     int n = int(parserFile->IncludeDirectives().size());
     for (int i = 0; i < n; ++i)
@@ -201,7 +201,7 @@ void GenerateCode(ParserFileContent* parserFile)
             }
         }
         cppFormatter.WriteLine("using namespace cmajor::parsing;");
-        cppFormatter.WriteLine("using namespace cmajor::util;");
+        cppFormatter.WriteLine("using namespace soulng::util;");
         cppFormatter.WriteLine("using namespace cmajor::unicode;");
         cppFormatter.WriteLine();
         if (!content.Grammars().empty())

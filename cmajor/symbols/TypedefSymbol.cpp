@@ -11,11 +11,11 @@
 #include <cmajor/symbols/Exception.hpp>
 #include <cmajor/symbols/Module.hpp>
 #include <cmajor/symbols/SymbolCollector.hpp>
-#include <cmajor/util/Unicode.hpp>
+#include <soulng/util/Unicode.hpp>
 
 namespace cmajor { namespace symbols {
 
-using namespace cmajor::unicode;
+using namespace soulng::unicode;
 
 TypedefSymbol::TypedefSymbol(const Span& span_, const std::u32string& name_) : Symbol(SymbolType::typedefSymbol, span_, name_), type()
 {
@@ -147,15 +147,15 @@ void TypedefSymbol::SetSpecifiers(Specifiers specifiers)
     }
 }
 
-std::unique_ptr<dom::Element> TypedefSymbol::CreateDomElement(TypeMap& typeMap)
+std::unique_ptr<sngxml::dom::Element> TypedefSymbol::CreateDomElement(TypeMap& typeMap)
 {
-    std::unique_ptr<dom::Element> element(new dom::Element(U"TypedefSymbol"));
+    std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(U"TypedefSymbol"));
     if (type)
     {
-        std::unique_ptr<dom::Element> typeElement(new dom::Element(U"type"));
+        std::unique_ptr<sngxml::dom::Element> typeElement(new sngxml::dom::Element(U"type"));
         int typeId = typeMap.GetOrInsertType(type);
         typeElement->SetAttribute(U"ref", U"type_" + ToUtf32(std::to_string(typeId)));
-        element->AppendChild(std::unique_ptr<dom::Node>(typeElement.release()));
+        element->AppendChild(std::unique_ptr<sngxml::dom::Node>(typeElement.release()));
     }
     return element;
 }

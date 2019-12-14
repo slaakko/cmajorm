@@ -1,0 +1,411 @@
+// =================================
+// Copyright (c) 2019 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+[hpp]#include <sngxml/xpath/XPathExpr.hpp>
+#include <sngxml/xpath/XPathLexer.hpp>
+#include <sngxml/xpath/XPathTokens.hpp>
+#include <sngxml/xpath/XPathTokenValueParsers.hpp>
+
+using namespace XPathTokens;
+
+parser XPathParser
+{
+    uselexer XPathLexer;
+    main;
+
+    Expr : sngxml::xpath::XPathExpr*
+        ::= OrExpr:orExpr{ return orExpr; }
+        ;
+
+    OrExpr(var std::unique_ptr<sngxml::xpath::XPathExpr> expr) : sngxml::xpath::XPathExpr*
+        ::= (AndExpr:left{ expr.reset(left); } (NAME{ soulng::lexer::Token token = lexer.GetToken(pos); pass = lexer.GetKeywordToken(token.match) == OR; } AndExpr:right{ expr.reset(new sngxml::xpath::XPathOrExpr(expr.release(), right)); })*)
+        {
+            return expr.release();
+        }
+        ;
+
+    AndExpr(var std::unique_ptr<sngxml::xpath::XPathExpr> expr) : sngxml::xpath::XPathExpr*
+        ::= (EqualityExpr:left{ expr.reset(left); } (NAME{ soulng::lexer::Token token = lexer.GetToken(pos); pass = lexer.GetKeywordToken(token.match) == AND; } EqualityExpr:right{ expr.reset(new sngxml::xpath::XPathAndExpr(expr.release(), right)); })*)
+        {
+            return expr.release();
+        }
+        ;
+
+    EqualityExpr(var std::unique_ptr<sngxml::xpath::XPathExpr> expr, var sngxml::xpath::Operator op) : sngxml::xpath::XPathExpr*
+        ::=
+        (   RelationalExpr:left{ expr.reset(left); }
+            (   (EQ{ op = sngxml::xpath::Operator::equal; } | NEQ{ op = sngxml::xpath::Operator::notEqual; })
+                RelationalExpr:right!
+                {
+                    switch (op)
+                    {
+                        case sngxml::xpath::Operator::equal: expr.reset(new sngxml::xpath::XPathEqualExpr(expr.release(), right)); break;
+                        case sngxml::xpath::Operator::notEqual: expr.reset(new sngxml::xpath::XPathNotEqualExpr(expr.release(), right)); break;
+                    }
+                }
+            )*
+        )
+        {
+            return expr.release();
+        }
+        ;
+
+    RelationalExpr(var std::unique_ptr<sngxml::xpath::XPathExpr> expr, var sngxml::xpath::Operator op) : sngxml::xpath::XPathExpr*
+        ::=
+        (   AdditiveExpr:left{ expr.reset(left); }
+            (   (LEQ{ op = sngxml::xpath::Operator::lessOrEqual; } | GEQ{ op = sngxml::xpath::Operator::greaterOrEqual; } | LESS{ op = sngxml::xpath::Operator::less; } | GREATER{ op = sngxml::xpath::Operator::greater; })
+                AdditiveExpr:right!
+                {
+                    switch (op)
+                    {
+                        case sngxml::xpath::Operator::lessOrEqual: expr.reset(new sngxml::xpath::XPathLessOrEqualExpr(expr.release(), right)); break;
+                        case sngxml::xpath::Operator::greaterOrEqual: expr.reset(new sngxml::xpath::XPathGreaterOrEqualExpr(expr.release(), right)); break;
+                        case sngxml::xpath::Operator::less: expr.reset(new sngxml::xpath::XPathLessExpr(expr.release(), right)); break;
+                        case sngxml::xpath::Operator::greater: expr.reset(new sngxml::xpath::XPathGreaterExpr(expr.release(), right)); break;
+                    }
+                }
+            )*
+        )
+        {
+            return expr.release();
+        }
+        ;
+
+    AdditiveExpr(var std::unique_ptr<sngxml::xpath::XPathExpr> expr, var sngxml::xpath::Operator op) : sngxml::xpath::XPathExpr*
+        ::=
+        (   MultiplicativeExpr:left{ expr.reset(left); }
+            (   (PLUS{ op = sngxml::xpath::Operator::plus; } | MINUS{ op = sngxml::xpath::Operator::minus; })
+                MultiplicativeExpr:right!
+                {
+                    switch (op)
+                    {
+                        case sngxml::xpath::Operator::plus: expr.reset(new sngxml::xpath::XPathAddExpr(expr.release(), right)); break;
+                        case sngxml::xpath::Operator::minus: expr.reset(new sngxml::xpath::XPathSubExpr(expr.release(), right)); break;
+                    }
+                }
+            )*
+        )
+        {
+            return expr.release();
+        }
+        ;
+
+    MultiplicativeExpr(var std::unique_ptr<sngxml::xpath::XPathExpr> expr, var sngxml::xpath::Operator op) : sngxml::xpath::XPathExpr*
+        ::=
+        (   UnaryExpr:left{ expr.reset(left); }
+            (   (STAR{ op = sngxml::xpath::Operator::mul; }
+                |   NAME
+                {
+                    soulng::lexer::Token token = lexer.GetToken(pos);
+                    switch (lexer.GetKeywordToken(token.match))
+                    {
+                        case DIV: op = sngxml::xpath::Operator::div; break;
+                        case MOD: op = sngxml::xpath::Operator::mod; break;
+                        default: pass = false; break;
+                    }
+                }
+            )
+                UnaryExpr:right!
+                {
+                    switch (op)
+                    {
+                        case sngxml::xpath::Operator::mul: expr.reset(new sngxml::xpath::XPathMulExpr(expr.release(), right)); break;
+                        case sngxml::xpath::Operator::div: expr.reset(new sngxml::xpath::XPathDivExpr(expr.release(), right)); break;
+                        case sngxml::xpath::Operator::mod: expr.reset(new sngxml::xpath::XPathModExpr(expr.release(), right)); break;
+                    }
+                }
+            )*
+        )
+        {
+            return expr.release();
+        }
+        ;
+
+    UnaryExpr : sngxml::xpath::XPathExpr*
+        ::= MINUS UnaryExpr:subject{ return new sngxml::xpath::XPathUnaryMinusExpr(subject); }
+        |   UnionExpr:unionExpr{ return unionExpr; }
+        ;
+
+    UnionExpr(var std::unique_ptr<sngxml::xpath::XPathExpr> expr) : sngxml::xpath::XPathExpr*
+        ::= (PathExpr:left{ expr.reset(left); } (UNION PathExpr:right{ expr.reset(new sngxml::xpath::XPathUnionExpr(expr.release(), right)); })*)
+        {
+            return expr.release();
+        }
+        ;
+
+    PathExpr(var std::unique_ptr<sngxml::xpath::XPathExpr> expr, var sngxml::xpath::Operator op) : sngxml::xpath::XPathExpr*
+        ::= (LocationPath:locationPath - FunctionCall:functionCall){ return locationPath; }
+        |   (FilterExpr:filterExpr{ expr.reset(filterExpr); } ((SLASHSLASH{ op = sngxml::xpath::Operator::slashSlash; } | SLASH{ op = sngxml::xpath::Operator::slash; }) RelativeLocationPath:right
+            {
+                switch (op)
+                {
+                    case sngxml::xpath::Operator::slashSlash:
+                    {
+                        return new sngxml::xpath::XPathCombineStepExpr(expr.release(),
+                            new sngxml::xpath::XPathCombineStepExpr(new sngxml::xpath::XPathLocationStepExpr(sngxml::xpath::Axis::descendantOrSelf, new sngxml::xpath::XPathAnyNodeTest()), right));
+                    }
+                    case sngxml::xpath::Operator::slash:
+                    {
+                        return new sngxml::xpath::XPathCombineStepExpr(expr.release(), right);
+                    }
+                }
+            }
+            )?
+        )
+        {
+            return expr.release();
+        }
+        ;
+
+    FilterExpr(var std::unique_ptr<sngxml::xpath::XPathExpr> expr) : sngxml::xpath::XPathExpr*
+        ::= (PrimaryExpr:primaryExpr{ expr.reset(primaryExpr); } (Predicate:predicate{ expr.reset(new sngxml::xpath::XPathFilterExpr(expr.release(), predicate)); })*)
+        {
+            return expr.release();
+        }
+        ;
+
+    LocationPath : sngxml::xpath::XPathExpr*
+        ::= AbsoluteLocationPath:absoluteLocationPath{ return absoluteLocationPath; }
+        |   RelativeLocationPath:relativeLocationPath{ return relativeLocationPath; }
+        ;
+
+    AbsoluteLocationPath(var std::unique_ptr<sngxml::xpath::XPathExpr> expr) : sngxml::xpath::XPathExpr*
+        ::=
+        (   AbbreviatedAbsoluteLocationPath:abbreviatedAbsoluteLocationPath{ expr.reset(abbreviatedAbsoluteLocationPath); }
+        |   SLASH{ expr.reset(new sngxml::xpath::XPathRootNodeExpr()); } (RelativeLocationPath:right{ expr.reset(new sngxml::xpath::XPathCombineStepExpr(expr.release(), right)); })?
+        )
+        {
+            return expr.release();
+        }
+        ;
+
+    AbbreviatedAbsoluteLocationPath : sngxml::xpath::XPathExpr*
+        ::= SLASHSLASH RelativeLocationPath:right
+        {
+            return new sngxml::xpath::XPathCombineStepExpr(new sngxml::xpath::XPathRootNodeExpr(), new sngxml::xpath::XPathCombineStepExpr(
+                new sngxml::xpath::XPathLocationStepExpr(sngxml::xpath::Axis::descendantOrSelf, new sngxml::xpath::XPathAnyNodeTest()), right));
+        }
+        ;
+
+    RelativeLocationPath(var std::unique_ptr<sngxml::xpath::XPathExpr> expr, var sngxml::xpath::Operator op) : sngxml::xpath::XPathExpr*
+        ::=
+        (
+            Step:left{ expr.reset(left); } ((SLASHSLASH{ op = sngxml::xpath::Operator::slashSlash; } | SLASH{ op = sngxml::xpath::Operator::slash; }) Step:right
+            {
+                switch (op)
+                {
+                    case sngxml::xpath::Operator::slashSlash:
+                    {
+                        expr.reset(new sngxml::xpath::XPathCombineStepExpr(expr.release(), new sngxml::xpath::XPathCombineStepExpr(
+                            new sngxml::xpath::XPathLocationStepExpr(sngxml::xpath::Axis::descendantOrSelf, new sngxml::xpath::XPathAnyNodeTest()), right)));
+                        break;
+                    }
+                    case sngxml::xpath::Operator::slash:
+                    {
+                        expr.reset(new sngxml::xpath::XPathCombineStepExpr(expr.release(), right));
+                        break;
+                    }
+                }
+            }
+            )*
+        )
+        {
+            return expr.release();
+        }
+        ;
+
+    Step(var std::unique_ptr<sngxml::xpath::XPathLocationStepExpr> expr) : sngxml::xpath::XPathLocationStepExpr*
+        ::=
+        (   AxisSpecifier:axis NodeTest:nodeTest{ expr.reset(new sngxml::xpath::XPathLocationStepExpr(axis, nodeTest)); } (Predicate:predicate{ expr->AddPredicate(predicate); })*
+        |   AbbreviatedStep:abbreviatedStep{ expr.reset(abbreviatedStep); }
+        )
+        {
+            return expr.release();
+        }
+        ;
+
+    AxisSpecifier : sngxml::xpath::Axis
+        ::= AxisName:axis COLONCOLON{ return axis;}
+        |   AbbreviatedAxisSpecifier:abbreviatedAxisSpecifier{ return abbreviatedAxisSpecifier; }
+        ;
+
+    AxisName : sngxml::xpath::Axis
+        ::= NAME
+        {
+            soulng::lexer::Token token = lexer.GetToken(pos);
+            switch (lexer.GetKeywordToken(token.match))
+            {
+                case ANCESTOR:
+                {
+                    return sngxml::xpath::Axis::ancestor;
+                }
+                case ANCESTOR_OR_SELF:
+                {
+                    return sngxml::xpath::Axis::ancestorOrSelf;
+                }
+                case ATTRIBUTE:
+                {
+                    return sngxml::xpath::Axis::attribute;
+                }
+                case CHILD :
+                {
+                    return sngxml::xpath::Axis::child;
+                }
+                case DESCENDANT:
+                {
+                    return sngxml::xpath::Axis::descendant;
+                }
+                case DESCENDANT_OR_SELF:
+                {
+                    return sngxml::xpath::Axis::descendantOrSelf;
+                }
+                case FOLLOWING:
+                {
+                    return sngxml::xpath::Axis::following;
+                }
+                case FOLLOWING_SIBLING:
+                {
+                    return sngxml::xpath::Axis::followingSibling;
+                }
+                case NAMESPACE:
+                {
+                    return sngxml::xpath::Axis::ns;
+                }
+                case PARENT:
+                {
+                    return sngxml::xpath::Axis::parent;
+                }
+                case PRECEDING:
+                {
+                    return sngxml::xpath::Axis::preceding;
+                }
+                case PRECEDING_SIBLING:
+                {
+                    return sngxml::xpath::Axis::precedingSibling;
+                }
+                case SELF:
+                {
+                    return sngxml::xpath::Axis::self;
+                }
+                default:
+                {
+                    pass = false;
+                    break;
+                }
+            }
+        }
+        ;
+
+    AbbreviatedAxisSpecifier : sngxml::xpath::Axis
+        ::= AT{ return sngxml::xpath::Axis::attribute; }
+        |   empty{ return sngxml::xpath::Axis::child; }
+        ;
+
+    NodeTest : sngxml::xpath::XPathNodeTestExpr*
+        ::= NAME{ soulng::lexer::Token token = lexer.GetToken(pos); pass = lexer.GetKeywordToken(token.match) == PROCESSING_INSTRUCTION; } LPAREN Literal:pi RPAREN{ return new sngxml::xpath::XPathPILiteralTest(pi); }
+        |   NodeType:nodeType LPAREN RPAREN{ return nodeType; }
+        |   NameTest:nameTest{ return nameTest; }
+        ;
+
+    NodeType : sngxml::xpath::XPathNodeTestExpr*
+        ::= NAME
+        {
+            soulng::lexer::Token token = lexer.GetToken(pos);
+            switch (lexer.GetKeywordToken(token.match))
+            {
+                case COMMENT: return new sngxml::xpath::XPathCommentNodeTest();
+                case TEXT: return new sngxml::xpath::XPathTextNodeTest();
+                case PROCESSING_INSTRUCTION: return new sngxml::xpath::XPathPINodeTest();
+                case NODE: return new sngxml::xpath::XPathAnyNodeTest();
+                default:
+                {
+                    pass = false;
+                    break;
+                }
+            }
+        }
+        ;
+
+    NameTest : sngxml::xpath::XPathNodeTestExpr*
+        ::= STAR{ return new sngxml::xpath::XPathPrincipalNodeTest(); }
+        |   NCName:ncname COLON STAR{ return new sngxml::xpath::XPathPrefixTest(ncname); }
+        |   QName:qname{ return new sngxml::xpath::XPathNameTest(qname); }
+        ;
+
+    AbbreviatedStep : sngxml::xpath::XPathLocationStepExpr*
+        ::= DOTDOT{ return new sngxml::xpath::XPathLocationStepExpr(sngxml::xpath::Axis::parent, new sngxml::xpath::XPathAnyNodeTest()); }
+        |   DOT{ return new sngxml::xpath::XPathLocationStepExpr(sngxml::xpath::Axis::self, new sngxml::xpath::XPathAnyNodeTest()); }
+        ;
+
+    Literal : sngxml::xpath::XPathExpr*
+        ::= DQSTRING{ soulng::lexer::Token token = lexer.GetToken(pos); return new sngxml::xpath::XPathLiteral(sngxml::xpath::ParseDQString(lexer.FileName(), token)); }
+        |   SQSTRING{ soulng::lexer::Token token = lexer.GetToken(pos); return new sngxml::xpath::XPathLiteral(sngxml::xpath::ParseSQString(lexer.FileName(), token)); }
+        ;
+
+    Number : sngxml::xpath::XPathExpr*
+        ::= NUMBER{ soulng::lexer::Token token = lexer.GetToken(pos); return new sngxml::xpath::XPathNumberExpr(token.match.ToString()); }
+        ;
+
+    Predicate : sngxml::xpath::XPathExpr*
+        ::= (LBRACKET PredicateExpr:expr RBRACKET){ return expr; }
+        ;
+
+    PredicateExpr : sngxml::xpath::XPathExpr*
+        ::= Expr:expr{ return expr; }
+        ;
+
+    PrimaryExpr : sngxml::xpath::XPathExpr*
+        ::= FunctionCall:functionCall{ return functionCall; }
+        |   VariableReference:variableReference{ return variableReference; }
+        |   (LPAREN Expr:expr RPAREN){ return expr; }
+        |   Literal:literal{ return literal; }
+        |   Number:number{ return number; }
+        ;
+
+    VariableReference : sngxml::xpath::XPathExpr*
+        ::= (DOLLAR QName:qname){ return new sngxml::xpath::XPathVariableReference(qname); }
+        ;
+
+    FunctionCall(var std::unique_ptr<sngxml::xpath::XPathFunctionCall> functionCall) : sngxml::xpath::XPathExpr*
+        ::= (FunctionName:functionName LPAREN{ functionCall.reset(new sngxml::xpath::XPathFunctionCall(functionName)); } (Argument:arg{ functionCall->AddArgument(arg); } % COMMA)? RPAREN)
+        {
+            return functionCall.release();
+        }
+        ;
+
+    FunctionName : std::u32string
+        ::= (QName:qname - NodeType:nodeType){ return qname; }
+        ;
+
+    Argument : sngxml::xpath::XPathExpr*
+        ::= Expr:expr{ return expr; }
+        ;
+
+    QName : std::u32string
+        ::= PrefixedName:prefixedName{ return prefixedName; }
+        |   UnprefixedName:unprefixedName{ return unprefixedName; }
+        ;
+
+    PrefixedName : std::u32string
+        ::= (Prefix:prefix COLON LocalPart:localPart){ return prefix + U":" + localPart; }
+        ;
+
+    Prefix : std::u32string
+        ::= NCName:ncname{ return ncname; }
+        ;
+
+    UnprefixedName : std::u32string
+        ::= LocalPart:localPart{ return localPart; }
+        ;
+
+    LocalPart : std::u32string
+        ::= NCName:ncname{ return ncname; }
+        ;
+
+    NCName : std::u32string
+        ::= NAME{ soulng::lexer::Token token = lexer.GetToken(pos); return token.match.ToString(); }
+        ;
+
+}

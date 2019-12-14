@@ -6,7 +6,7 @@
 #include <cmajor/rt/ConditionVariable.hpp>
 #include <cmajor/rt/Mutex.hpp>
 #include <cmajor/rt/Error.hpp>
-#include <cmajor/util/Error.hpp>
+#include <soulng/util/Error.hpp>
 #include <memory>
 #include <mutex>
 #include <condition_variable>

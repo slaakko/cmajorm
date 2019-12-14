@@ -8,7 +8,7 @@
 #include <cmajor/symbols/TypeSymbol.hpp>
 #include <cmajor/symbols/VariableSymbol.hpp>
 #include <cmajor/symbols/Meta.hpp>
-#include <cmajor/ast/Function.hpp>
+#include <sngcm/ast/Function.hpp>
 #include <cmajor/ir/GenObject.hpp>
 #include <unordered_set>
 
@@ -48,7 +48,7 @@ public:
     void RemoveFunction(FunctionSymbol* function);
     void CollectViableFunctions(int arity, ViableFunctionSet& viableFunctions, Module* module);
     bool HasProjectMembers() const override;
-    void AppendChildElements(dom::Element* element, TypeMap& typeMap) const override;
+    void AppendChildElements(sngxml::dom::Element* element, TypeMap& typeMap) const override;
     std::u32string Info() const override { return Name(); }
     const char* ClassName() const override { return "FunctionGroupSymbol"; }
     void Check() override;
@@ -147,7 +147,7 @@ public:
     virtual bool IsMemberFunctionToClassDelegateConversion() const { return false; }
     virtual void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span);
     void GenerateVirtualCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span);
-    virtual std::unique_ptr<Value> ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span) const;
+    virtual std::unique_ptr<Value> ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span, Value* receiver) const;
     virtual std::unique_ptr<Value> ConvertValue(const std::unique_ptr<Value>& value) const;
     virtual ParameterSymbol* GetThisParam() const { return nullptr; }
     virtual bool IsConstructorDestructorOrNonstaticMemberFunction() const { return false; }
@@ -228,7 +228,7 @@ public:
     void SetIntrinsic(IntrinsicFunction* intrinsic_) { intrinsic.reset(intrinsic_); }
     bool IsProgramMain() const { return isProgramMain; }
     void SetProgramMain() { isProgramMain = true; }
-    std::unique_ptr<dom::Element> CreateDomElement(TypeMap& typeMap) override;
+    std::unique_ptr<sngxml::dom::Element> CreateDomElement(TypeMap& typeMap) override;
     std::u32string Info() const override { return groupName; }
     const char* ClassName() const override { return "FunctionSymbol"; }
     virtual int ClassArity() const { return 0; }
@@ -343,7 +343,7 @@ public:
     TypeSymbol* ConversionSourceType() const override;
     TypeSymbol* ConversionTargetType() const override;
     void SetSpecifiers(Specifiers specifiers);
-    std::unique_ptr<dom::Element> CreateDomElement(TypeMap& typeMap) override;
+    std::unique_ptr<sngxml::dom::Element> CreateDomElement(TypeMap& typeMap) override;
     std::u32string Info() const override { return std::u32string(); }
     const char* ClassName() const override { return "ConversionFunctionSymbol"; }
 };

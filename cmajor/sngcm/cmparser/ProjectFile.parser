@@ -1,0 +1,76 @@
+// =================================
+// Copyright (c) 2019 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+[hpp]#include <sngcm/cmparser/ParserApi.hpp>
+[hpp]#include <sngcm/ast/Project.hpp>
+[cpp]#include <sngcm/cmlexer/ContainerFileLexer.hpp>
+[cpp]#include <sngcm/cmlexer/ContainerFileTokens.hpp>
+
+using namespace sngcm::ast;
+using namespace ContainerFileTokens;
+
+parser api(SNGCM_PARSER_API) ProjectFileParser
+{
+    uselexer ContainerFileLexer;
+    main;
+
+    ProjectFile(std::string config, sngcm::ast::BackEnd backend, var std::unique_ptr<Project> project) : sngcm::ast::Project*
+        ::=
+        (
+            PROJECT QualifiedId:name! SEMICOLON!{ project.reset(new Project(name, lexer.FileName(), config, backend)); }
+            (Declaration:declaration{ project->AddDeclaration(declaration); })*
+        )
+        {
+            return project.release();
+        }
+        ;
+
+    QualifiedId(var Span s) : std::u32string
+        ::=
+        (
+            ID{ s = span; } (DOT ID{ s.end = span.end; })*
+        )
+        {
+            return lexer.GetMatch(s);
+        }
+        ;
+
+    Declaration : ProjectDeclaration*
+        ::= ReferenceDeclaration:referenceDeclaration{ return referenceDeclaration; }
+        |   SourceFileDeclaration:sourceFileDeclaration{ return sourceFileDeclaration; }
+        |   TextFileDeclaration:textFileDeclaration{ return textFileDeclaration; }
+        |   TargetDeclaration:targetDeclaration{ return targetDeclaration; }
+        ;
+
+    ReferenceDeclaration(var std::string filePath) : ProjectDeclaration*
+        ::= REFERENCE FILEPATH!{ filePath = lexer.filePath; } SEMICOLON!{ return new sngcm::ast::ReferenceDeclaration(filePath); }
+        ;
+
+    SourceFileDeclaration(var std::string filePath) : ProjectDeclaration*
+        ::= SOURCE FILEPATH!{ filePath = lexer.filePath; } SEMICOLON!{ return new sngcm::ast::SourceFileDeclaration(filePath); }
+        ;
+
+    TextFileDeclaration(var std::string filePath) : ProjectDeclaration*
+        ::= TEXT FILEPATH!{ filePath = lexer.filePath; } SEMICOLON!{ return new sngcm::ast::TextFileDeclaration(filePath); }
+        ;
+
+    TargetDeclaration : ProjectDeclaration*
+        ::= TARGET ASSIGN! Target:target! SEMICOLON!{ return new sngcm::ast::TargetDeclaration(target); }
+        ;
+
+    Target : sngcm::ast::Target
+        ::= PROGRAM{ return sngcm::ast::Target::program; }
+        |   LIBRARY{ return sngcm::ast::Target::library; }
+        |   UNITTEST{ return sngcm::ast::Target::unitTest; }
+        ;
+
+    ruleinfo
+    {
+        (ProjectFile, "project file"), (QualifiedId, "identifier"), (Declaration, "project file declaration"),
+        (ReferenceDeclaration, "reference declaration"), (SourceFileDeclaration, "source file declaration"),
+        (TextFileDeclaration, "text file declaration"), (TargetDeclaration, "target declaration"),
+        (Target, "target")
+    }
+}

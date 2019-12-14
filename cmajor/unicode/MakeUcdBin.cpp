@@ -1,10 +1,7 @@
-#include <cmajor/xml/XmlParser.hpp>
-#include <cmajor/parsing/InitDone.hpp>
-#include <cmajor/parsing/Utility.hpp>
-#include <cmajor/codedom/InitDone.hpp>
-#include <cmajor/util/InitDone.hpp>
-#include <cmajor/util/Unicode.hpp>
-#include <cmajor/util/TextUtils.hpp>
+#include <sngxml/xml/XmlParserInterface.hpp>
+#include <soulng/util/InitDone.hpp>
+#include <soulng/util/Unicode.hpp>
+#include <soulng/util/TextUtils.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/lexical_cast.hpp>
 #include <iostream>
@@ -15,15 +12,13 @@
 #include <set>
 #include <map>
 
-using namespace cmajor::xml;
-using namespace cmajor::unicode;
-using namespace cmajor::parsing;
+using namespace soulng::unicode;
 
-class UnicodeCharacterDatabaseContentHandler : public XmlContentHandler
+class UnicodeCharacterDatabaseContentHandler : public sngxml::xml::XmlContentHandler
 {
 public:
     UnicodeCharacterDatabaseContentHandler();
-    void StartElement(const std::u32string& namespaceUri, const std::u32string& localName, const std::u32string& qualifiedName, const Attributes& attributes) override;
+    void StartElement(const std::u32string& namespaceUri, const std::u32string& localName, const std::u32string& qualifiedName, const sngxml::xml::Attributes& attributes) override;
     void EndElement(const std::u32string& namespaceUri, const std::u32string& localName, const std::u32string& qualifiedName) override;
 private:
     char32_t codePoint;
@@ -51,7 +46,7 @@ uint32_t FromHex(const std::string& hex)
     return c;
 }
 
-void UnicodeCharacterDatabaseContentHandler::StartElement(const std::u32string& namespaceUri, const std::u32string& localName, const std::u32string& qualifiedName, const Attributes& attributes)
+void UnicodeCharacterDatabaseContentHandler::StartElement(const std::u32string& namespaceUri, const std::u32string& localName, const std::u32string& qualifiedName, const sngxml::xml::Attributes& attributes)
 {
     auto it = elementNames.find(qualifiedName);
     if (it == elementNames.cend())
@@ -72,7 +67,7 @@ void UnicodeCharacterDatabaseContentHandler::StartElement(const std::u32string& 
             characterInfo = &CreateCharacterInfo(c);
             extendedCharacterInfo = &CreateExtendedCharacterInfo(c);
         }
-        for (const Attribute& attribute : attributes)
+        for (const sngxml::xml::Attribute& attribute : attributes)
         {
             auto it = attributeNames.find(attribute.QualifiedName());
             if (it == attributeNames.cend())
@@ -288,7 +283,7 @@ void UnicodeCharacterDatabaseContentHandler::StartElement(const std::u32string& 
     {
         std::string alias;
         std::string type;
-        for (const Attribute& attribute : attributes)
+        for (const sngxml::xml::Attribute& attribute : attributes)
         {
             std::string attributeName = ToUtf8(attribute.QualifiedName());
             if (attributeName == "alias")
@@ -318,15 +313,11 @@ struct InitDone
 {
     InitDone()
     {
-        cmajor::util::Init();
-        cmajor::parsing::Init();
-        cmajor::codedom::Init();
+        soulng::util::Init();
     }
     ~InitDone()
     {
-        cmajor::codedom::Done();
-        cmajor::parsing::Done();
-        cmajor::util::Done();
+        soulng::util::Done();
     }
 };
 
@@ -349,7 +340,7 @@ int main(int argc, const char** argv)
         std::string xmlFileName = (boost::filesystem::path(cmajor_root) / boost::filesystem::path("unicode") / boost::filesystem::path("ucd.all.flat.xml")).generic_string();
         std::cout << "processing " << xmlFileName << "...";
         UnicodeCharacterDatabaseContentHandler contentHandler;
-        ParseXmlFile(xmlFileName, &contentHandler);
+        sngxml::xml::ParseXmlFile(xmlFileName, &contentHandler);
         CharacterTable::Instance().Write();
         std::cout << "\b\b\b, done." << std::endl;
     }

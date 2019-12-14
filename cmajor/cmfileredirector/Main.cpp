@@ -3,9 +3,9 @@
 // Distributed under the MIT license
 // =================================
 
-#include <cmajor/util/System.hpp>
-#include <cmajor/util/TextUtils.hpp>
-#include <cmajor/util/InitDone.hpp>
+#include <soulng/util/System.hpp>
+#include <soulng/util/TextUtils.hpp>
+#include <soulng/util/InitDone.hpp>
 #include <iostream>
 #include <stdexcept>
 
@@ -13,11 +13,11 @@ struct InitDone
 {
     InitDone()
     {
-        cmajor::util::Init();
+        soulng::util::Init();
     }
     ~InitDone()
     {
-        cmajor::util::Done();
+        soulng::util::Done();
     }
 };
 
@@ -54,16 +54,16 @@ int main(int argc, const char** argv)
                 }
                 else if (first)
                 {
-                    command.append(cmajor::util::QuotedPath(arg));
+                    command.append(soulng::util::QuotedPath(arg));
                     first = false;
                     args = true;
                 }
                 else
                 {
-                    command.append(" ").append(cmajor::util::QuotedPath(arg));
+                    command.append(" ").append(soulng::util::QuotedPath(arg));
                 }
             }
-            cmajor::util::System(command, redirections);
+            soulng::util::System(command, redirections);
         }
     }
     catch (...)

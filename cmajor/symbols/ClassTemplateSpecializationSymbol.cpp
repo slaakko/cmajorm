@@ -9,13 +9,13 @@
 #include <cmajor/symbols/SymbolWriter.hpp>
 #include <cmajor/symbols/SymbolReader.hpp>
 #include <cmajor/symbols/SymbolTable.hpp>
-#include <cmajor/util/Unicode.hpp>
-#include <cmajor/util/Sha1.hpp>
+#include <soulng/util/Unicode.hpp>
+#include <soulng/util/Sha1.hpp>
 #include <boost/uuid/uuid_io.hpp>
 
 namespace cmajor { namespace symbols {
 
-using namespace cmajor::unicode;
+using namespace soulng::unicode;
 
 std::u32string MakeClassTemplateSpecializationName(ClassTypeSymbol* classTemplate, const std::vector<TypeSymbol*>& templateArgumentTypes)
 {

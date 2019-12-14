@@ -6,11 +6,12 @@
 #ifndef CMAJOR_SYMBOLS_SYMBOL_READER_INCLUDED
 #define CMAJOR_SYMBOLS_SYMBOL_READER_INCLUDED
 #include <cmajor/symbols/SymbolsApi.hpp>
-#include <cmajor/ast/AstReader.hpp>
+#include <sngcm/ast/AstReader.hpp>
+#include <vector>
 
 namespace cmajor { namespace symbols {
 
-using namespace cmajor::ast;
+using namespace sngcm::ast;
 
 class Symbol;
 class ArrayTypeSymbol;

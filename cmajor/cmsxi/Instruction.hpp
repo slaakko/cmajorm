@@ -6,13 +6,13 @@
 #ifndef CMAJOR_CMSXI_INSTRUCTION_INCLUDED
 #define CMAJOR_CMSXI_INSTRUCTION_INCLUDED
 #include <cmajor/cmsxi/Value.hpp>
-#include <cmajor/util/CodeFormatter.hpp>
+#include <soulng/util/CodeFormatter.hpp>
 #include <vector>
 #include <utility>
 
 namespace cmsxi {
 
-using namespace cmajor::util;
+using namespace soulng::util;
 
 class Type;
 class BasicBlock;

@@ -11,12 +11,12 @@
 #include <cmajor/binder/BoundFunction.hpp>
 #include <cmajor/binder/BoundStatement.hpp>
 #include <cmajor/symbols/SymbolCreatorVisitor.hpp>
-#include <cmajor/ast/Identifier.hpp>
-#include <cmajor/util/Util.hpp>
+#include <sngcm/ast/Identifier.hpp>
+#include <soulng/util/Util.hpp>
 
 namespace cmajor { namespace binder {
 
-using namespace cmajor::util;
+using namespace soulng::util;
 
 InlineFunctionRepository::InlineFunctionRepository(BoundCompileUnit& boundCompileUnit_) : boundCompileUnit(boundCompileUnit_)
 {

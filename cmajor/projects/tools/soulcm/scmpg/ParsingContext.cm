@@ -1,0 +1,98 @@
+using System;
+using System.Collections;
+
+// this file has been semiautomatically generated from 'D:/work/soulngcm/soulngcm/sngcmpg/ParsingContext.hpp' using cpp2cm version 1.0.0
+
+// this file has been semiautomatically generated from 'D:/work/soulngcm/soulngcm/sngcmpg/ParsingContext.cpp' using cpp2cm version 1.0.0
+
+public class ParsingContext
+{
+    public ParsingContext() :
+        parsingExpressionStatement(false), parsingLvalue(false), parsingArguments(false), parsingIsOrAs(false), parsingTypeExpr(false), parsingConcept(false), parsingTemplateId(false)
+    {
+    }
+    public bool parsingExpressionStatement;
+    public bool parsingLvalue;
+    public bool parsingArguments;
+    public bool parsingIsOrAs;
+    public bool parsingTypeExpr;
+    public bool parsingConcept;
+    public bool parsingTemplateId;
+    public void PushParsingExpressionStatement(bool enable)
+    {
+        parsingExpressionStatementStack.Push(parsingExpressionStatement);
+        parsingExpressionStatement = enable;
+    }
+    public void PopParsingExpressionStatement()
+    {
+        parsingExpressionStatement = parsingExpressionStatementStack.Top();
+        parsingExpressionStatementStack.Pop();
+    }
+    public void PushParsingLvalue(bool enable)
+    {
+        parsingLvalueStack.Push(parsingLvalue);
+        parsingLvalue = enable;
+    }
+    public void PopParsingLvalue()
+    {
+        parsingLvalue = parsingLvalueStack.Top();
+        parsingLvalueStack.Pop();
+    }
+    public void BeginParsingArguments()
+    {
+        parsingArgumentsStack.Push(parsingArguments);
+        parsingArguments = true;
+    }
+    public void EndParsingArguments()
+    {
+        parsingArguments = parsingArgumentsStack.Top();
+        parsingArgumentsStack.Pop();
+    }
+    public void PushParsingIsOrAs(bool enable)
+    {
+        parsingIsOrAsStack.Push(parsingIsOrAs);
+        parsingIsOrAs = enable;
+    }
+    public void PopParsingIsOrAs()
+    {
+        parsingIsOrAs = parsingIsOrAsStack.Top();
+        parsingIsOrAsStack.Pop();
+    }
+    public void BeginParsingTypeExpr()
+    {
+        parsingTypeExprStack.Push(parsingTypeExpr);
+        parsingTypeExpr = true;
+    }
+    public void EndParsingTypeExpr()
+    {
+        parsingTypeExpr = parsingTypeExprStack.Top();
+        parsingTypeExprStack.Pop();
+    }
+    public void BeginParsingConcept()
+    {
+        parsingConceptStack.Push(parsingConcept);
+        parsingConcept = true;
+    }
+    public void EndParsingConcept()
+    {
+        parsingConcept = parsingConceptStack.Top();
+        parsingConceptStack.Pop();
+    }
+    public void BeginParsingTemplateId()
+    {
+        parsingTemplateIdStack.Push(parsingTemplateId);
+        parsingTemplateId = true;
+    }
+    public void EndParsingTemplateId()
+    {
+        parsingTemplateId = parsingTemplateIdStack.Top();
+        parsingTemplateIdStack.Pop();
+    }
+    private Stack<bool> parsingExpressionStatementStack;
+    private Stack<bool> parsingLvalueStack;
+    private Stack<bool> parsingArgumentsStack;
+    private Stack<bool> parsingIsOrAsStack;
+    private Stack<bool> parsingTypeExprStack;
+    private Stack<bool> parsingConceptStack;
+    private Stack<bool> parsingTemplateIdStack;
+}

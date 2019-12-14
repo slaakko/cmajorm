@@ -18,7 +18,7 @@
 
 namespace cmllvm {
 
-using cmajor::parsing::Span;
+using soulng::lexer::Span;
 
 typedef llvm::SmallVector<llvm::Value*, 4> ArgVector;
 

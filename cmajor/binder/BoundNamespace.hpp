@@ -6,11 +6,11 @@
 #ifndef CMAJOR_BINDER_BOUND_NAMESPACE_INCLUDED
 #define CMAJOR_BINDER_BOUND_NAMESPACE_INCLUDED
 #include <cmajor/binder/BoundNode.hpp>
-#include <cmajor/ast/Namespace.hpp>
+#include <sngcm/ast/Namespace.hpp>
 
 namespace cmajor { namespace binder {
 
-using namespace cmajor::ast;
+using namespace sngcm::ast;
 
 class BINDER_API BoundNamespace : public BoundNode
 {

@@ -11,12 +11,12 @@
 #include <cmajor/symbols/SymbolReader.hpp>
 #include <cmajor/symbols/Module.hpp>
 #include <cmajor/symbols/GlobalFlags.hpp>
-#include <cmajor/util/Unicode.hpp>
+#include <soulng/util/Unicode.hpp>
 #include <boost/uuid/uuid_generators.hpp>
 
 namespace cmajor { namespace symbols {
 
-using namespace cmajor::unicode;
+using namespace soulng::unicode;
 
 std::u32string DerivationStr(Derivation derivation)
 {
@@ -432,6 +432,11 @@ bool DerivedTypeSymbol::IsPointerType() const
 bool DerivedTypeSymbol::IsVoidPtrType() const 
 {
     return baseType->IsVoidType() && derivationRec.derivations.size() == 1 && derivationRec.derivations.front() == Derivation::pointerDerivation;
+}
+
+bool DerivedTypeSymbol::IsCharacterPointerType() const
+{
+    return baseType->IsCharacterType() && derivationRec.derivations.size() == 1 && derivationRec.derivations.front() == Derivation::pointerDerivation;
 }
 
 int DerivedTypeSymbol::PointerCount() const

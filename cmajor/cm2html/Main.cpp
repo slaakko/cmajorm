@@ -1,35 +1,31 @@
-#include <cmajor/ast/InitDone.hpp>
-#include <cmajor/ast/SourceToken.hpp>
-#include <cmajor/parser/SourceToken.hpp>
-#include <cmajor/parsing/InitDone.hpp>
-#include <cmajor/util/InitDone.hpp>
-#include <cmajor/util/CodeFormatter.hpp>
-#include <cmajor/util/Unicode.hpp>
-#include <cmajor/util/TextUtils.hpp>
+#include <sngcm/ast/InitDone.hpp>
+#include <sngcm/ast/SourceToken.hpp>
+#include <sngcm/cmparser/SourceTokenParser.hpp>
+#include <soulng/util/InitDone.hpp>
+#include <soulng/util/CodeFormatter.hpp>
+#include <soulng/util/Unicode.hpp>
+#include <soulng/util/TextUtils.hpp>
 #include <boost/filesystem.hpp>
 #include <iostream>
 #include <fstream>
 #include <string>
 #include <stdexcept>
 
-using namespace cmajor::ast;
-using namespace cmajor::util;
-using namespace cmajor::unicode;
-using namespace cmajor::parser;
+using namespace sngcm::ast;
+using namespace soulng::util;
+using namespace soulng::unicode;
 
 struct InitDone
 {
     InitDone()
     {
-        cmajor::ast::Init();
-        cmajor::parsing::Init();
-        cmajor::util::Init();
+        sngcm::ast::Init();
+        soulng::util::Init();
     }
     ~InitDone()
     {
-        cmajor::util::Done();
-        cmajor::parsing::Done();
-        cmajor::ast::Done();
+        soulng::util::Done();
+        sngcm::ast::Done();
     }
 };
 
@@ -170,6 +166,52 @@ void PrintHelp()
     std::cout << "-h | --help             : print this help message" << std::endl;
 }
 
+std::vector<std::u32string> GetLines(const std::u32string& text)
+{
+    std::vector<std::u32string> lines;
+    std::u32string line;
+    int state = 0;
+    for (char32_t c : text)
+    {
+        switch (state)
+        {
+        case 0:
+        {
+            if (c == '\n')
+            {
+                lines.push_back(std::move(line));
+                line.clear();
+                state = 1;
+            }
+            else if (c != '\r')
+            {
+                line.append(1, c);
+            }
+            break;
+        }
+        case 1:
+        {
+            if (c == '\n')
+            {
+                lines.push_back(std::move(line));
+                line.clear();
+            }
+            else if (c != '\r')
+            {
+                line.append(1, c);
+                state = 0;
+            }
+            break;
+        }
+        }
+    }
+    if (state == 0)
+    {
+        lines.push_back(std::move(line));
+    }
+    return lines;
+}
+
 int main(int argc, const char** argv)
 {
     try
@@ -180,7 +222,6 @@ int main(int argc, const char** argv)
             PrintHelp();
             return 0;
         }
-        SourceToken* grammar = SourceToken::Create();
         std::vector<std::string> sourceFiles;
         std::string styleSheetPath = "code.css";
         bool prevWasStyle = false;
@@ -215,10 +256,15 @@ int main(int argc, const char** argv)
         }
         for (const std::string& sourceFile : sourceFiles)
         {
+            bool inBlockComment = false;
             MappedInputFile file(sourceFile);
             std::u32string s(ToUtf32(std::string(file.Begin(), file.End())));
             HtmlSourceTokenFormatter formatter(sourceFile, styleSheetPath);
-            grammar->Parse(&s[0], &s[0] + s.length(), 0, sourceFile, &formatter);
+            std::vector<std::u32string> lines = GetLines(s);
+            for (const auto& line : lines)
+            {
+                sngcm::parser::ParseSourceLine(line, &formatter, inBlockComment);
+            }
         }
     }
     catch (const std::exception& ex)

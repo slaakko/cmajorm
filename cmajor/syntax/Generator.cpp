@@ -9,9 +9,9 @@
 #include <cmajor/syntax/ParserFile.hpp>
 #include <cmajor/syntax/Library.hpp>
 #include <cmajor/syntax/CodeGenerator.hpp>
-#include <cmajor/util/TextUtils.hpp>
-#include <cmajor/util/MappedInputFile.hpp>
-#include <cmajor/util/Unicode.hpp>
+#include <soulng/util/TextUtils.hpp>
+#include <soulng/util/MappedInputFile.hpp>
+#include <soulng/util/Unicode.hpp>
 #include <cmajor/parsing/Linking.hpp>
 #include <cmajor/parsing/ParsingDomain.hpp>
 #include <cmajor/parsing/Exception.hpp>
@@ -20,7 +20,7 @@
 
 namespace cmajor { namespace syntax {
 
-using namespace cmajor::util;
+using namespace soulng::util;
 using namespace cmajor::unicode;
 using namespace boost::filesystem;
 

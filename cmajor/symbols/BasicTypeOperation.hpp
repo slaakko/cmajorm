@@ -14,12 +14,12 @@
 #include <cmajor/symbols/Exception.hpp>
 #include <cmajor/symbols/Module.hpp>
 #include <cmajor/symbols/Value.hpp>
-#include <cmajor/util/Unicode.hpp>
+#include <soulng/util/Unicode.hpp>
 #include <cmajor/ir/Emitter.hpp>
 
 namespace cmajor { namespace symbols {
 
-using namespace cmajor::unicode;
+using namespace soulng::unicode;
 
 struct BasicTypeNot
 {
@@ -156,85 +156,85 @@ struct BasicTypeLShr
 struct DefaultInt1
 {
     static void* Generate(Emitter& emitter) { return emitter.CreateDefaultIrValueForBool(); }
-    static std::unique_ptr<Value> ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span) { return std::unique_ptr<Value>(new BoolValue(span, false)); }
+    static std::unique_ptr<Value> ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span, Value* receiver) { return std::unique_ptr<Value>(new BoolValue(span, false)); }
 };
 
 struct DefaultSInt8
 {
     static void* Generate(Emitter& emitter) { return emitter.CreateDefaultIrValueForSByte(); }
-    static std::unique_ptr<Value> ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span) { return std::unique_ptr<Value>(new SByteValue(span, 0)); }
+    static std::unique_ptr<Value> ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span, Value* receiver) { return std::unique_ptr<Value>(new SByteValue(span, 0)); }
 };
 
 struct DefaultUInt8
 {
     static void* Generate(Emitter& emitter) { return emitter.CreateDefaultIrValueForByte(); }
-    static std::unique_ptr<Value> ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span) { return std::unique_ptr<Value>(new ByteValue(span, 0)); }
+    static std::unique_ptr<Value> ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span, Value* receiver) { return std::unique_ptr<Value>(new ByteValue(span, 0)); }
 };
 
 struct DefaultSInt16
 {
     static void* Generate(Emitter& emitter) { return emitter.CreateDefaultIrValueForShort(); }
-    static std::unique_ptr<Value> ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span) { return std::unique_ptr<Value>(new ShortValue(span, 0)); }
+    static std::unique_ptr<Value> ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span, Value* receiver) { return std::unique_ptr<Value>(new ShortValue(span, 0)); }
 };
 
 struct DefaultUInt16
 {
     static void* Generate(Emitter& emitter) { return emitter.CreateDefaultIrValueForUShort(); }
-    static std::unique_ptr<Value> ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span) { return std::unique_ptr<Value>(new UShortValue(span, 0)); }
+    static std::unique_ptr<Value> ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span, Value* receiver) { return std::unique_ptr<Value>(new UShortValue(span, 0)); }
 };
 
 struct DefaultSInt32
 {
     static void* Generate(Emitter& emitter) { return emitter.CreateDefaultIrValueForInt(); }
-    static std::unique_ptr<Value> ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span) { return std::unique_ptr<Value>(new IntValue(span, 0)); }
+    static std::unique_ptr<Value> ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span, Value* receiver) { return std::unique_ptr<Value>(new IntValue(span, 0)); }
 };
 
 struct DefaultUInt32
 {
     static void* Generate(Emitter& emitter) { return emitter.CreateDefaultIrValueForUInt(); }
-    static std::unique_ptr<Value> ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span) { return std::unique_ptr<Value>(new UIntValue(span, 0)); }
+    static std::unique_ptr<Value> ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span, Value* receiver) { return std::unique_ptr<Value>(new UIntValue(span, 0)); }
 };
 
 struct DefaultSInt64
 {
     static void* Generate(Emitter& emitter) { return emitter.CreateDefaultIrValueForLong(); }
-    static std::unique_ptr<Value> ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span) { return std::unique_ptr<Value>(new LongValue(span, 0)); }
+    static std::unique_ptr<Value> ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span, Value* receiver) { return std::unique_ptr<Value>(new LongValue(span, 0)); }
 };
 
 struct DefaultUInt64
 {
     static void* Generate(Emitter& emitter) { return emitter.CreateDefaultIrValueForULong(); }
-    static std::unique_ptr<Value> ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span) { return std::unique_ptr<Value>(new ULongValue(span, 0)); }
+    static std::unique_ptr<Value> ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span, Value* receiver) { return std::unique_ptr<Value>(new ULongValue(span, 0)); }
 };
 
 struct DefaultFloat
 {
     static void* Generate(Emitter& emitter) { return emitter.CreateDefaultIrValueForFloat(); }
-    static std::unique_ptr<Value> ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span) { return std::unique_ptr<Value>(new FloatValue(span, 0.0)); }
+    static std::unique_ptr<Value> ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span, Value* receiver) { return std::unique_ptr<Value>(new FloatValue(span, 0.0)); }
 };
 
 struct DefaultDouble
 {
     static void* Generate(Emitter& emitter) { return emitter.CreateDefaultIrValueForDouble(); }
-    static std::unique_ptr<Value> ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span) { return std::unique_ptr<Value>(new DoubleValue(span, 0.0)); }
+    static std::unique_ptr<Value> ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span, Value* receiver) { return std::unique_ptr<Value>(new DoubleValue(span, 0.0)); }
 };
 
 struct DefaultChar
 {
     static void* Generate(Emitter& emitter) { return emitter.CreateDefaultIrValueForChar(); }
-    static std::unique_ptr<Value> ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span) { return std::unique_ptr<Value>(new CharValue(span, '\0')); }
+    static std::unique_ptr<Value> ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span, Value* receiver) { return std::unique_ptr<Value>(new CharValue(span, '\0')); }
 };
 
 struct DefaultWChar
 {
     static void* Generate(Emitter& emitter) { return emitter.CreateDefaultIrValueForWChar(); }
-    static std::unique_ptr<Value> ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span) { return std::unique_ptr<Value>(new WCharValue(span, '\0')); }
+    static std::unique_ptr<Value> ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span, Value* receiver) { return std::unique_ptr<Value>(new WCharValue(span, '\0')); }
 };
 
 struct DefaultUChar
 {
     static void* Generate(Emitter& emitter) { return emitter.CreateDefaultIrValueForUChar(); }
-    static std::unique_ptr<Value> ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span) { return std::unique_ptr<Value>(new UCharValue(span, '\0')); }
+    static std::unique_ptr<Value> ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span, Value* receiver) { return std::unique_ptr<Value>(new UCharValue(span, '\0')); }
 };
 
 struct BasicTypeIntegerEquality
@@ -553,7 +553,7 @@ public:
     SymbolAccess DeclaredAccess() const override { return SymbolAccess::public_; }
     void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span) override;
     bool IsBasicTypeOperation() const override { return true; }
-    std::unique_ptr<Value> ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span) const override;
+    std::unique_ptr<Value> ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span, Value* receiver) const override;
     bool IsCompileTimePrimitiveFunction() const override { return true; }
     const char* ClassName() const override { return "BasicTypeDefaultCtor"; }
     int ClassArity() const override { return 1; }
@@ -589,9 +589,9 @@ void BasicTypeDefaultCtor<DefaultOp>::GenerateCall(Emitter& emitter, std::vector
 }
 
 template<typename DefaultOp>
-std::unique_ptr<Value> BasicTypeDefaultCtor<DefaultOp>::ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span) const
+std::unique_ptr<Value> BasicTypeDefaultCtor<DefaultOp>::ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span, Value* receiver) const
 {
-    return DefaultOp::ConstructValue(argumentValues, span);
+    return DefaultOp::ConstructValue(argumentValues, span, receiver);
 }
 
 class BasicTypeDefaultInt1Operation : public BasicTypeDefaultCtor<DefaultInt1>
@@ -685,7 +685,7 @@ public:
     BasicTypeCopyCtor(const Span& span_, const std::u32string& name_);
     SymbolAccess DeclaredAccess() const override { return SymbolAccess::public_; }
     void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span) override;
-    std::unique_ptr<Value> ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span) const override;
+    std::unique_ptr<Value> ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span, Value* receiver) const override;
     bool IsBasicTypeOperation() const override { return true; }
     bool IsCompileTimePrimitiveFunction() const override { return true; }
     const char* ClassName() const override { return "BasicTypeCopyCtor"; }
@@ -699,7 +699,7 @@ public:
     BasicTypeMoveCtor(const Span& span_, const std::u32string& name_);
     SymbolAccess DeclaredAccess() const override { return SymbolAccess::public_; }
     void GenerateCall(Emitter& emitter, std::vector<GenObject*>& genObjects, OperationFlags flags, const Span& span) override;
-    std::unique_ptr<Value> ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span) const override;
+    std::unique_ptr<Value> ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span, Value* receiver) const override;
     bool IsBasicTypeOperation() const override { return true; }
     bool IsCompileTimePrimitiveFunction() const override { return true; }
     const char* ClassName() const override { return "BasicTypeMoveCtor"; }

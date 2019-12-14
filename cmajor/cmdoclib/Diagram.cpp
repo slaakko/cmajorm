@@ -4,15 +4,15 @@
 // =================================
 
 #include <cmajor/cmdoclib/Diagram.hpp>
-#include <cmajor/parsing/Utility.hpp>
-#include <cmajor/util/CodeFormatter.hpp>
-#include <cmajor/util/Unicode.hpp>
+#include <soulng/lexer/XmlParsingLog.hpp>
+#include <soulng/util/CodeFormatter.hpp>
+#include <soulng/util/Unicode.hpp>
 #include <fstream>
 
 namespace cmajor { namespace cmdoclib {
 
-using namespace cmajor::util;
-using namespace cmajor::unicode;
+using namespace soulng::util;
+using namespace soulng::unicode;
 
 void GenerateDiagramDrawingCode(CodeFormatter& formatter, const std::string& svgId)
 {
@@ -364,7 +364,7 @@ void DiagramNode::Write(CodeFormatter& formatter)
 {
     formatter.Write("{ ");
     formatter.Write("name: \"");
-    formatter.Write(cmajor::parsing::XmlEscape(ToUtf8(name)));
+    formatter.Write(ToUtf8(soulng::lexer::XmlEscape(name)));
     formatter.Write("\", ");
     formatter.Write("id: \"");
     formatter.Write("diagram_node_" + std::to_string(index));

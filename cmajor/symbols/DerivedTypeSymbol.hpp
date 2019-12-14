@@ -83,6 +83,7 @@ public:
     bool IsRvalueReferenceType() const override;
     bool IsPointerType() const override;
     bool IsVoidPtrType() const override;
+    bool IsCharacterPointerType() const override;
     int PointerCount() const override;
     bool ContainsTemplateParameter() const override { return baseType->ContainsTemplateParameter(); }
     const TypeDerivationRec& DerivationRec() const override { return derivationRec; }

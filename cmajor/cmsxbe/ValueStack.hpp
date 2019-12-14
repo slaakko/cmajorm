@@ -6,7 +6,7 @@
 #ifndef CMAJOR_CMSXBE_VALUE_STACK_INCLUDED
 #define CMAJOR_CMSXBE_VALUE_STACK_INCLUDED
 #include <cmajor/ir/ValueStack.hpp>
-#include <cmajor/util/Error.hpp>
+#include <soulng/util/Error.hpp>
 #include <cmajor/cmsxi/Value.hpp>
 #include <vector>
 

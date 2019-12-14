@@ -4,7 +4,7 @@
 // =================================
 
 #include <cmajor/rt/Directory.hpp>
-#include <cmajor/util/Path.hpp>
+#include <soulng/util/Path.hpp>
 #include <memory>
 #include <mutex>
 #include <unordered_map>
@@ -12,7 +12,7 @@
 
 namespace cmajor { namespace rt {
 
-using namespace cmajor::util;
+using namespace soulng::util;
 
 struct Iteration
 {

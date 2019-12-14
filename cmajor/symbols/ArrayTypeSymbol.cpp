@@ -9,11 +9,11 @@
 #include <cmajor/symbols/SymbolTable.hpp>
 #include <cmajor/symbols/Exception.hpp>
 #include <cmajor/symbols/Module.hpp>
-#include <cmajor/util/Unicode.hpp>
+#include <soulng/util/Unicode.hpp>
 
 namespace cmajor { namespace symbols {
 
-using namespace cmajor::unicode;
+using namespace soulng::unicode;
 
 ArrayTypeSymbol::ArrayTypeSymbol(const Span& span_, const std::u32string& name_) : TypeSymbol(SymbolType::arrayTypeSymbol, span_, name_), elementType(nullptr), size(-1)
 {
@@ -161,7 +161,7 @@ void ArrayLengthFunction::GenerateCall(Emitter& emitter, std::vector<GenObject*>
     emitter.Stack().Push(size);
 }
 
-std::unique_ptr<Value> ArrayLengthFunction::ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span) const
+std::unique_ptr<Value> ArrayLengthFunction::ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span, Value* receiver) const
 {
     return std::unique_ptr<Value>(new LongValue(span, arrayType->Size()));
 }

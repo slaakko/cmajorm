@@ -1,0 +1,51 @@
+// =================================
+// Copyright (c) 2019 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+#include <sngcm/cmlexer/CmajorLexerApi.hpp>
+#include <sngcm/cmlexer/TokenValueParsers.hpp>
+
+classmap ContainerFileClassMap;
+
+prefix "sngcm/cmlexer";
+
+tokens ContainerFileTokens
+{
+    (PROJECT, "'project'"), (SOLUTION, "'solution'"), (REFERENCE, "'reference'"), (SOURCE, "'source'"), (TEXT, "'text'"), (TARGET, "'target'"),
+    (PROGRAM, "'program'"), (LIBRARY, "'library'"), (UNITTEST, "'unittest'"), (ACTIVEPROJECT, "'activeProject'"),
+    (ID, "identifier"), (FILEPATH, "file path"), (ASSIGN, "'='"), (SEMICOLON, "';'"), (DOT, "'.'")
+}
+
+keywords ContainerFileKeywords
+{
+    ("project", PROJECT), ("solution", SOLUTION), ("reference", REFERENCE), ("source", SOURCE), ("text", TEXT), ("target", TARGET), ("program", PROGRAM), ("library", LIBRARY), ("unittest", UNITTEST),
+    ("activeProject", ACTIVEPROJECT)
+}
+
+expressions
+{
+    ws = "[\n\r\t ]";
+    newline = "\r\n|\n|\r";
+    linecomment = "//[^\n\r]*{newline}";
+    blockcomment = "/\*([^*]|\*[^/])*\*/";
+    comment = "{linecomment}|{blockcomment}";
+    separators = "({ws}|{comment})+";
+    id = "{idstart}{idcont}*";
+    filepath = "<[^>]*>";
+}
+
+lexer api(SNGCM_LEXER_API) ContainerFileLexer
+{
+    "{separators}" {}
+    "{id}" { int kw = GetKeywordToken(token.match); if (kw == INVALID_TOKEN) return ID; else return kw; }
+    "{filepath}" { filePath = MakeFilePath(token.match); return FILEPATH; }
+    "=" { return ASSIGN; }
+    ";" { return SEMICOLON; }
+    "\." { return DOT; }
+
+    variables
+    {
+        std::string filePath;
+    }
+}

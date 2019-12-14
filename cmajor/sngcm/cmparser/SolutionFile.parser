@@ -1,0 +1,52 @@
+// =================================
+// Copyright (c) 2019 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+[hpp]#include <sngcm/cmparser/ParserApi.hpp>
+[hpp]#include <sngcm/ast/Solution.hpp>
+[cpp]#include <sngcm/cmlexer/ContainerFileLexer.hpp>
+[cpp]#include <sngcm/cmlexer/ContainerFileTokens.hpp>
+
+using namespace sngcm::ast;
+using namespace ContainerFileTokens;
+
+parser api(SNGCM_PARSER_API) SolutionFileParser
+{
+    uselexer ContainerFileLexer;
+    main;
+    
+    SolutionFile(var std::unique_ptr<sngcm::ast::Solution> solution) : sngcm::ast::Solution*
+        ::= 
+        (
+            SOLUTION QualifiedId:name! SEMICOLON!{ solution.reset(new sngcm::ast::Solution(name, lexer.FileName())); }
+            (Declaration:declaration{ solution->AddDeclaration(declaration); })*
+        )
+        {
+            return solution.release();
+        }
+        ;
+
+    QualifiedId(var Span s) : std::u32string
+        ::=
+        (
+            ID{ s = span; } (DOT ID{ s.end = span.end; })*
+        )
+        {
+            return lexer.GetMatch(s);
+        }
+        ;
+        
+    Declaration : sngcm::ast::SolutionDeclaration*
+        ::= SolutionProjectDeclaration:solutionProjectDeclaration{ return solutionProjectDeclaration; }
+        |   ActiveProjectDeclaration:activeProjectDeclaration{ return activeProjectDeclaration; }
+        ;
+
+    SolutionProjectDeclaration(var std::string filePath) : sngcm::ast::SolutionDeclaration*
+        ::= (PROJECT FILEPATH{ filePath = lexer.filePath; } SEMICOLON){ return new sngcm::ast::SolutionProjectDeclaration(filePath); }
+        ;
+
+    ActiveProjectDeclaration : sngcm::ast::SolutionDeclaration*
+        ::= (ACTIVEPROJECT QualifiedId:activeProjectName SEMICOLON){ return new sngcm::ast::SolutionActiveProjectDeclaration(activeProjectName); }
+        ;
+}

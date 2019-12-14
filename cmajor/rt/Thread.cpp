@@ -8,7 +8,7 @@
 #include <cmajor/rt/CallStack.hpp>
 #include <cmajor/rt/Error.hpp>
 #include <cmajor/rt/InitDone.hpp>
-#include <cmajor/util/Error.hpp>
+#include <soulng/util/Error.hpp>
 #include <atomic>
 #include <mutex>
 #include <thread>

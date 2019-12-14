@@ -8,7 +8,7 @@
 #include <cmajor/parsing/Exception.hpp>
 #include <cmajor/parsing/StdLib.hpp>
 #include <cmajor/parsing/XmlLog.hpp>
-#include <cmajor/util/Unicode.hpp>
+#include <soulng/util/Unicode.hpp>
 #include <cmajor/code/Expression.hpp>
 #include <cmajor/code/Statement.hpp>
 #include <cmajor/syntax/Primitive.hpp>
@@ -21,7 +21,7 @@ namespace cmajor { namespace syntax {
 
 using namespace cmajor::code;
 using namespace cmajor::parsing;
-using namespace cmajor::util;
+using namespace soulng::util;
 using namespace cmajor::unicode;
 
 Primary* Primary::Create()

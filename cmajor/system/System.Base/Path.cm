@@ -31,14 +31,12 @@ namespace System.IO
     
     public string GetFullPath(const string& path)
     {
-        string cp = Path.MakeCanonical(path);
-        string p = cp;
-        if (Path.IsRelative(cp))
+        string p = Path.MakeCanonical(path);
+        if (Path.IsRelative(p))
         {
-            p.Clear();
-            p.Append(GetCurrentWorkingDirectory());
+            p = GetCurrentWorkingDirectory();
             p.Append('/');
-            p.Append(cp);
+            p.Append(Path.MakeCanonical(path));
         }
         List<string> components = p.Split('/');
         long w = 0;
@@ -101,10 +99,26 @@ namespace System.IO
     {
         public static nothrow string MakeCanonical(const string& path)
         {
+            bool startsWithDriveLetter = false;
+            #if (WINDOWS)
+                if (path.Length() >= 2 && IsAlpha(path[0]) && path[1] == ':')
+                {
+                    startsWithDriveLetter = true;
+                }
+            #endif
             string result;
             char prev = ' ';
+            bool first = true;
             for (char c : path)
             {
+                if (first)
+                {
+                    first = false;
+                    if (startsWithDriveLetter)
+                    {
+                        c = AsciiToUpper(c);
+                    }
+                }
                 if (c == '\\')
                 {
                     c = '/';

@@ -10,13 +10,13 @@
 #include <cmajor/symbols/SymbolReader.hpp>
 #include <cmajor/symbols/SymbolTable.hpp>
 #include <cmajor/symbols/SymbolCollector.hpp>
-#include <cmajor/util/Unicode.hpp>
+#include <soulng/util/Unicode.hpp>
 #include <boost/uuid/uuid_generators.hpp>
 #include <boost/uuid/uuid_io.hpp>
 
 namespace cmajor { namespace symbols {
 
-using namespace cmajor::unicode;
+using namespace soulng::unicode;
 
 BasicTypeSymbol::BasicTypeSymbol(SymbolType symbolType_, const Span& span_, const std::u32string& name_) : 
     TypeSymbol(symbolType_, span_, name_), 

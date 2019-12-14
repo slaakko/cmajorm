@@ -36,6 +36,8 @@ public:
     virtual bool IsDelegateType() const { return false; }
     virtual bool IsClassDelegateType() const { return false; }
     virtual bool IsEnumeratedType() const { return false; }
+    virtual bool IsCharacterType() const { return false; }
+    virtual bool IsCharacterPointerType() const { return false; }
     virtual const TypeSymbol* BaseType() const { return this; }
     virtual TypeSymbol* BaseType() { return this; }
     virtual TypeSymbol* PlainType(const Span& span) { return this; }
@@ -55,6 +57,7 @@ public:
     virtual bool IsLvalueReferenceType() const { return false; }
     virtual bool IsRvalueReferenceType() const { return false; }
     virtual bool IsArrayType() const { return false; }
+    virtual bool IsStringFunctionContainer() const { return false; }
     virtual bool IsPointerType() const { return false; }
     virtual bool IsNullPtrType() const { return false; }
     virtual bool IsVoidPtrType() const { return false; }

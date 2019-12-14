@@ -222,6 +222,7 @@ public:
     void* CreateDIType(Emitter& emitter) override;
     bool IsSwitchConditionType() const override { return true; }
     bool IsUnsignedType() const override { return true; }
+    bool IsCharacterType() const override { return true; }
     ValueType GetValueType() const override;
     Value* MakeValue() const override;
     const char* ClassName() const override { return "CharTypeSymbol"; }
@@ -237,6 +238,7 @@ public:
     void* CreateDIType(Emitter& emitter) override;
     bool IsSwitchConditionType() const override { return true; }
     bool IsUnsignedType() const override { return true; }
+    bool IsCharacterType() const override { return true; }
     ValueType GetValueType() const override;
     Value* MakeValue() const override;
     const char* ClassName() const override { return "WCharTypeSymbol"; }
@@ -252,6 +254,7 @@ public:
     void* CreateDIType(Emitter& emitter) override;
     bool IsSwitchConditionType() const override { return true; }
     bool IsUnsignedType() const override { return true; }
+    bool IsCharacterType() const override { return true; }
     ValueType GetValueType() const override;
     Value* MakeValue() const override;
     const char* ClassName() const override { return "UCharTypeSymbol"; }

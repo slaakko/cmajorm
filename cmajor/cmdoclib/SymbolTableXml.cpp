@@ -12,20 +12,20 @@
 #include <cmajor/symbols/TypedefSymbol.hpp>
 #include <cmajor/symbols/DelegateSymbol.hpp>
 #include <cmajor/symbols/GlobalFlags.hpp>
-#include <cmajor/ast/Visitor.hpp>
-#include <cmajor/ast/Expression.hpp>
-#include <cmajor/dom/Parser.hpp>
-#include <cmajor/dom/CharacterData.hpp>
-#include <cmajor/util/Unicode.hpp>
-#include <cmajor/util/Path.hpp>
-#include <cmajor/util/Log.hpp>
+#include <sngcm/ast/Visitor.hpp>
+#include <sngcm/ast/Expression.hpp>
+#include <sngxml/dom/Parser.hpp>
+#include <sngxml/dom/CharacterData.hpp>
+#include <soulng/util/Unicode.hpp>
+#include <soulng/util/Path.hpp>
+#include <soulng/util/Log.hpp>
 #include <boost/filesystem.hpp>
 #include <algorithm>
 #include <fstream>
 
 namespace cmajor { namespace cmdoclib {
 
-using namespace cmajor::unicode;
+using namespace soulng::unicode;
 
 struct ByCodeName
 {
@@ -123,8 +123,8 @@ public:
     SymbolTableXmlBuilder(const std::u32string& moduleName_, SymbolTable& symbolTable_, std::unordered_map<int, File>& fileMap_, const std::string& modulePrefix_,
         const std::string& extModulePrefix_);
     void WriteDocument(const std::string& symbolTableXmlFilePath);
-    void AddModuleXmlDocument(dom::Document* moduleXmlDocument);
-    std::unique_ptr<dom::Element> CreateSymbolElement(const std::u32string& elementName, Symbol& symbol) const;
+    void AddModuleXmlDocument(sngxml::dom::Document* moduleXmlDocument);
+    std::unique_ptr<sngxml::dom::Element> CreateSymbolElement(const std::u32string& elementName, Symbol& symbol) const;
     bool AddNamespace(NamespaceSymbol& ns);
     void AddConcept(ConceptSymbol& concept);
     void AddClass(ClassTypeSymbol& cls);
@@ -150,7 +150,7 @@ public:
     std::vector<EnumConstantSymbol*> GetEnumConstants(ContainerSymbol& container);
     std::vector<ConstantSymbol*> GetConstants(ContainerSymbol& container);
     std::vector<VariableSymbol*> GetVariables(ContainerSymbol& container, bool sort, bool skipFirst);
-    bool IsNonemptyNamespace(dom::Element* nsElement) const;
+    bool IsNonemptyNamespace(sngxml::dom::Element* nsElement) const;
     std::u32string GetOrInsertType(TypeSymbol* type);
     void GenerateTypes();
     void Visit(ParenthesizedConstraintNode& parenthesizedConstraintNode) override;
@@ -192,18 +192,18 @@ private:
     std::unordered_map<int, File>& fileMap;
     std::string modulePrefix;
     std::string extModulePrefix;
-    std::vector<dom::Document*> moduleXmlDocuments;
-    std::unique_ptr<dom::Document> symbolTableXmlDocument;
-    std::unique_ptr<dom::Element> symbolTableElement;
-    dom::Element* currentElement;
+    std::vector<sngxml::dom::Document*> moduleXmlDocuments;
+    std::unique_ptr<sngxml::dom::Document> symbolTableXmlDocument;
+    std::unique_ptr<sngxml::dom::Element> symbolTableElement;
+    sngxml::dom::Element* currentElement;
     std::unordered_set<std::u32string> typeIdSet;
     std::vector<TypeSymbol*> types;
 };
 
 SymbolTableXmlBuilder::SymbolTableXmlBuilder(const std::u32string& moduleName_, SymbolTable& symbolTable_, std::unordered_map<int, File>& fileMap_, 
     const std::string& modulePrefix_, const std::string& extModulePrefix_) :
-    moduleName(moduleName_), symbolTableXmlDocument(new dom::Document()), 
-    symbolTableElement(new dom::Element(U"symbolTable")), currentElement(symbolTableElement.get()), symbolTable(symbolTable_),
+    moduleName(moduleName_), symbolTableXmlDocument(new sngxml::dom::Document()),
+    symbolTableElement(new sngxml::dom::Element(U"symbolTable")), currentElement(symbolTableElement.get()), symbolTable(symbolTable_),
     fileMap(fileMap_), modulePrefix(modulePrefix_), extModulePrefix(extModulePrefix_)
 {
     symbolTableElement->SetAttribute(U"module", moduleName);
@@ -214,40 +214,40 @@ SymbolTableXmlBuilder::SymbolTableXmlBuilder(const std::u32string& moduleName_, 
         files.push_back(&p.second);
     }
     std::sort(files.begin(), files.end(), FileByName());
-    std::unique_ptr<dom::Element> filesElement(new dom::Element(U"files"));
+    std::unique_ptr<sngxml::dom::Element> filesElement(new sngxml::dom::Element(U"files"));
     for (File* file : files)
     {
-        std::unique_ptr<dom::Element> fileElement(new dom::Element(U"file"));
+        std::unique_ptr<sngxml::dom::Element> fileElement(new sngxml::dom::Element(U"file"));
         fileElement->SetAttribute(U"name", file->name);
         fileElement->SetAttribute(U"path", ToUtf32(Path::Combine("file", Path::GetFileName(file->htmlFilePath))));
-        filesElement->AppendChild(std::unique_ptr<dom::Node>(fileElement.release()));
+        filesElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(fileElement.release()));
     }
-    symbolTableElement->AppendChild(std::unique_ptr<dom::Node>(filesElement.release()));
+    symbolTableElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(filesElement.release()));
 }
 
 void SymbolTableXmlBuilder::WriteDocument(const std::string& symbolTableXmlFilePath)
 {
     GenerateTypes();
-    symbolTableXmlDocument->AppendChild(std::unique_ptr<dom::Node>(symbolTableElement.release()));
+    symbolTableXmlDocument->AppendChild(std::unique_ptr<sngxml::dom::Node>(symbolTableElement.release()));
     std::ofstream symbolTableXmlFile(symbolTableXmlFilePath);
     CodeFormatter formatter(symbolTableXmlFile);
     formatter.SetIndentSize(1);
     symbolTableXmlDocument->Write(formatter);
 }
 
-void SymbolTableXmlBuilder::AddModuleXmlDocument(dom::Document* moduleXmlDocument)
+void SymbolTableXmlBuilder::AddModuleXmlDocument(sngxml::dom::Document* moduleXmlDocument)
 {
     moduleXmlDocuments.push_back(moduleXmlDocument);
 }
 
-bool SymbolTableXmlBuilder::IsNonemptyNamespace(dom::Element* nsElement) const
+bool SymbolTableXmlBuilder::IsNonemptyNamespace(sngxml::dom::Element* nsElement) const
 {
-    dom::Node* child = nsElement->FirstChild();
+    sngxml::dom::Node* child = nsElement->FirstChild();
     while (child)
     {
-        if (child->GetNodeType() == dom::NodeType::elementNode)
+        if (child->GetNodeType() == sngxml::dom::NodeType::elementNode)
         {
-            dom::Element* element = static_cast<dom::Element*>(child);
+            sngxml::dom::Element* element = static_cast<sngxml::dom::Element*>(child);
             if (element->Name()  == U"namespaces" || element->Name() == U"namespace")
             {
                 if (IsNonemptyNamespace(element))
@@ -271,9 +271,9 @@ std::u32string SymbolTableXmlBuilder::GetOrInsertType(TypeSymbol* type)
     int n = moduleXmlDocuments.size();
     for (int i = 0; i < n; ++i)
     {
-        dom::Document* moduleDoc = moduleXmlDocuments[i];
+        sngxml::dom::Document* moduleDoc = moduleXmlDocuments[i];
         std::lock_guard<std::mutex> lock(GetInputMutex());
-        dom::Element* element = moduleDoc->GetElementById(typeId);
+        sngxml::dom::Element* element = moduleDoc->GetElementById(typeId);
         if (element)
         {
             return typeId;
@@ -349,84 +349,84 @@ std::u32string SymbolTableXmlBuilder::GetOrInsertType(TypeSymbol* type)
 
 void SymbolTableXmlBuilder::GenerateTypes()
 {
-    std::unique_ptr<dom::Element> typesElement(new dom::Element(U"types"));
+    std::unique_ptr<sngxml::dom::Element> typesElement(new sngxml::dom::Element(U"types"));
     for (TypeSymbol* type : types)
     {
         if (type->IsBasicTypeSymbol())
         {
-            std::unique_ptr<dom::Element> typeElement = CreateSymbolElement(U"basicType", *type);
-            typesElement->AppendChild(std::unique_ptr<dom::Node>(typeElement.release()));
+            std::unique_ptr<sngxml::dom::Element> typeElement = CreateSymbolElement(U"basicType", *type);
+            typesElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(typeElement.release()));
         }
         else if (type->GetSymbolType() == SymbolType::derivedTypeSymbol)
         {
             DerivedTypeSymbol* derivedTypeSymbol = static_cast<DerivedTypeSymbol*>(type);
-            std::unique_ptr<dom::Element> typeElement = CreateSymbolElement(U"derivedType", *derivedTypeSymbol);
+            std::unique_ptr<sngxml::dom::Element> typeElement = CreateSymbolElement(U"derivedType", *derivedTypeSymbol);
             if (HasFrontConstDerivation(derivedTypeSymbol->DerivationRec().derivations))
             {
-                std::unique_ptr<dom::Element> constDerivationElement(new dom::Element(U"derivation"));
+                std::unique_ptr<sngxml::dom::Element> constDerivationElement(new sngxml::dom::Element(U"derivation"));
                 constDerivationElement->SetAttribute(U"name", U"const");
-                typeElement->AppendChild(std::unique_ptr<dom::Node>(constDerivationElement.release()));
+                typeElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(constDerivationElement.release()));
             }
-            std::unique_ptr<dom::Element> baseDerivationElement(new dom::Element(U"derivation"));
+            std::unique_ptr<sngxml::dom::Element> baseDerivationElement(new sngxml::dom::Element(U"derivation"));
             baseDerivationElement->SetAttribute(U"baseType", type->BaseType()->Id());
-            typeElement->AppendChild(std::unique_ptr<dom::Node>(baseDerivationElement.release()));
+            typeElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(baseDerivationElement.release()));
             for (Derivation derivation : derivedTypeSymbol->DerivationRec().derivations)
             {
                 switch (derivation)
                 {
                     case Derivation::lvalueRefDerivation:
                     {
-                        std::unique_ptr<dom::Element> lvalueRefDerivationElement(new dom::Element(U"derivation"));
+                        std::unique_ptr<sngxml::dom::Element> lvalueRefDerivationElement(new sngxml::dom::Element(U"derivation"));
                         lvalueRefDerivationElement->SetAttribute(U"name", U"&");
-                        typeElement->AppendChild(std::unique_ptr<dom::Node>(lvalueRefDerivationElement.release()));
+                        typeElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(lvalueRefDerivationElement.release()));
                         break;
                     }
                     case Derivation::rvalueRefDerivation:
                     {
-                        std::unique_ptr<dom::Element> rvalueRefDerivationElement(new dom::Element(U"derivation"));
+                        std::unique_ptr<sngxml::dom::Element> rvalueRefDerivationElement(new sngxml::dom::Element(U"derivation"));
                         rvalueRefDerivationElement->SetAttribute(U"name", U"&&");
-                        typeElement->AppendChild(std::unique_ptr<dom::Node>(rvalueRefDerivationElement.release()));
+                        typeElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(rvalueRefDerivationElement.release()));
                         break;
                     }
                     case Derivation::pointerDerivation:
                     {
-                        std::unique_ptr<dom::Element> pointerDerivationElement(new dom::Element(U"derivation"));
+                        std::unique_ptr<sngxml::dom::Element> pointerDerivationElement(new sngxml::dom::Element(U"derivation"));
                         pointerDerivationElement->SetAttribute(U"name", U"*");
-                        typeElement->AppendChild(std::unique_ptr<dom::Node>(pointerDerivationElement.release()));
+                        typeElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(pointerDerivationElement.release()));
                         break;
                     }
                 }
             }
-            typesElement->AppendChild(std::unique_ptr<dom::Node>(typeElement.release()));
+            typesElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(typeElement.release()));
         }
         else if (type->GetSymbolType() == SymbolType::arrayTypeSymbol)
         {
             ArrayTypeSymbol* arrayTypeSymbol = static_cast<ArrayTypeSymbol*>(type);
-            std::unique_ptr<dom::Element> typeElement = CreateSymbolElement(U"arrayType", *arrayTypeSymbol);
+            std::unique_ptr<sngxml::dom::Element> typeElement = CreateSymbolElement(U"arrayType", *arrayTypeSymbol);
             typeElement->SetAttribute(U"elementType", arrayTypeSymbol->ElementType()->Id());
             if (arrayTypeSymbol->Size() != -1)
             {
                 typeElement->SetAttribute(U"size", ToUtf32(std::to_string(arrayTypeSymbol->Size())));
             }
-            typesElement->AppendChild(std::unique_ptr<dom::Node>(typeElement.release()));
+            typesElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(typeElement.release()));
         }
         else if (type->GetSymbolType() == SymbolType::classTemplateSpecializationSymbol)
         {
             ClassTemplateSpecializationSymbol* specialization = static_cast<ClassTemplateSpecializationSymbol*>(type);
             if (!specialization->IsPrototype())
             {
-                std::unique_ptr<dom::Element> typeElement = CreateSymbolElement(U"specialization", *specialization);
+                std::unique_ptr<sngxml::dom::Element> typeElement = CreateSymbolElement(U"specialization", *specialization);
                 ClassTypeSymbol* classTemplate = specialization->GetClassTemplate();
                 typeElement->SetAttribute(U"primaryType", classTemplate->Id());
-                std::unique_ptr<dom::Element> argumentTypesElement(new dom::Element(U"templateArgumentTypes"));
+                std::unique_ptr<sngxml::dom::Element> argumentTypesElement(new sngxml::dom::Element(U"templateArgumentTypes"));
                 for (TypeSymbol* templateArgumentType : specialization->TemplateArgumentTypes())
                 {
-                    std::unique_ptr<dom::Element> argumentTypeElement(new dom::Element(U"templateArgumentType"));
+                    std::unique_ptr<sngxml::dom::Element> argumentTypeElement(new sngxml::dom::Element(U"templateArgumentType"));
                     argumentTypeElement->SetAttribute(U"ref", templateArgumentType->Id());
-                    argumentTypesElement->AppendChild(std::unique_ptr<dom::Node>(argumentTypeElement.release()));
+                    argumentTypesElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(argumentTypeElement.release()));
                 }
-                typeElement->AppendChild(std::unique_ptr<dom::Node>(argumentTypesElement.release()));
-                typesElement->AppendChild(std::unique_ptr<dom::Node>(typeElement.release()));
+                typeElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(argumentTypesElement.release()));
+                typesElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(typeElement.release()));
             }
         }
         else
@@ -434,156 +434,156 @@ void SymbolTableXmlBuilder::GenerateTypes()
             throw std::runtime_error("unexpected type symbol");
         }
     }
-    symbolTableElement->AppendChild(std::unique_ptr<dom::Node>(typesElement.release()));
+    symbolTableElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(typesElement.release()));
 }
 
 void SymbolTableXmlBuilder::Visit(ParenthesizedConstraintNode& parenthesizedConstraintNode)
 {
-    std::unique_ptr<dom::Element> parensElement(new dom::Element(U"parens"));
-    dom::Element* prevElement = currentElement;
+    std::unique_ptr<sngxml::dom::Element> parensElement(new sngxml::dom::Element(U"parens"));
+    sngxml::dom::Element* prevElement = currentElement;
     currentElement = parensElement.get();
     parenthesizedConstraintNode.Constraint()->Accept(*this);
-    prevElement->AppendChild(std::unique_ptr<dom::Node>(parensElement.release()));
+    prevElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(parensElement.release()));
     currentElement = prevElement;
 }
 
 void SymbolTableXmlBuilder::Visit(DisjunctiveConstraintNode& disjunctiveConstraintNode)
 {
-    std::unique_ptr<dom::Element> orElement(new dom::Element(U"or"));
-    dom::Element* prevElement = currentElement;
+    std::unique_ptr<sngxml::dom::Element> orElement(new sngxml::dom::Element(U"or"));
+    sngxml::dom::Element* prevElement = currentElement;
     currentElement = orElement.get();
     disjunctiveConstraintNode.Left()->Accept(*this);
     disjunctiveConstraintNode.Right()->Accept(*this);
-    prevElement->AppendChild(std::unique_ptr<dom::Node>(orElement.release()));
+    prevElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(orElement.release()));
     currentElement = prevElement;
 }
 
 void SymbolTableXmlBuilder::Visit(ConjunctiveConstraintNode& conjunctiveConstraintNode)
 {
-    std::unique_ptr<dom::Element> andElement(new dom::Element(U"and"));
-    dom::Element* prevElement = currentElement;
+    std::unique_ptr<sngxml::dom::Element> andElement(new sngxml::dom::Element(U"and"));
+    sngxml::dom::Element* prevElement = currentElement;
     currentElement = andElement.get();
     conjunctiveConstraintNode.Left()->Accept(*this);
     conjunctiveConstraintNode.Right()->Accept(*this);
-    prevElement->AppendChild(std::unique_ptr<dom::Node>(andElement.release()));
+    prevElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(andElement.release()));
     currentElement = prevElement;
 }
 
 void SymbolTableXmlBuilder::Visit(WhereConstraintNode& whereConstraintNode)
 {
-    std::unique_ptr<dom::Element> whereElement(new dom::Element(U"where"));
-    dom::Element* prevElement = currentElement;
+    std::unique_ptr<sngxml::dom::Element> whereElement(new sngxml::dom::Element(U"where"));
+    sngxml::dom::Element* prevElement = currentElement;
     currentElement = whereElement.get();
     whereConstraintNode.Constraint()->Accept(*this);
-    prevElement->AppendChild(std::unique_ptr<dom::Node>(whereElement.release()));
+    prevElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(whereElement.release()));
     currentElement = prevElement;
 }
 
 void SymbolTableXmlBuilder::Visit(PredicateConstraintNode& predicateConstraintNode)
 {
-    std::unique_ptr<dom::Element> predicateElement(new dom::Element(U"predicate"));
-    dom::Element* prevElement = currentElement;
+    std::unique_ptr<sngxml::dom::Element> predicateElement(new sngxml::dom::Element(U"predicate"));
+    sngxml::dom::Element* prevElement = currentElement;
     currentElement = predicateElement.get();
     currentElement ->SetAttribute(U"value", ToUtf32(predicateConstraintNode.InvokeExpr()->ToString()));
-    prevElement->AppendChild(std::unique_ptr<dom::Node>(predicateElement.release()));
+    prevElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(predicateElement.release()));
     currentElement = prevElement;
 }
 
 void SymbolTableXmlBuilder::Visit(IsConstraintNode& isConstraintNode)
 {
-    std::unique_ptr<dom::Element> isElement(new dom::Element(U"is"));
-    dom::Element* prevElement = currentElement;
+    std::unique_ptr<sngxml::dom::Element> isElement(new sngxml::dom::Element(U"is"));
+    sngxml::dom::Element* prevElement = currentElement;
     currentElement = isElement.get();
     isConstraintNode.TypeExpr()->Accept(*this);
     isConstraintNode.ConceptOrTypeName()->Accept(*this);
-    prevElement->AppendChild(std::unique_ptr<dom::Node>(isElement.release()));
+    prevElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(isElement.release()));
     currentElement = prevElement;
 }
 
 void SymbolTableXmlBuilder::Visit(MultiParamConstraintNode& multiParamConstraintNode)
 {
-    std::unique_ptr<dom::Element> multiElement(new dom::Element(U"multi"));
-    dom::Element* prevElement = currentElement;
+    std::unique_ptr<sngxml::dom::Element> multiElement(new sngxml::dom::Element(U"multi"));
+    sngxml::dom::Element* prevElement = currentElement;
     currentElement = multiElement.get();
     multiParamConstraintNode.ConceptId()->Accept(*this);
-    std::unique_ptr<dom::Element> typesElement(new dom::Element(U"types"));
-    dom::Element* prevTypesElement = currentElement;
+    std::unique_ptr<sngxml::dom::Element> typesElement(new sngxml::dom::Element(U"types"));
+    sngxml::dom::Element* prevTypesElement = currentElement;
     currentElement = typesElement.get();
     int n = multiParamConstraintNode.TypeExprs().Count();
     for (int i = 0; i < n; ++i)
     {
         multiParamConstraintNode.TypeExprs()[i]->Accept(*this);
     }
-    prevTypesElement->AppendChild(std::unique_ptr<dom::Node>(typesElement.release()));
+    prevTypesElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(typesElement.release()));
     currentElement = prevTypesElement;
-    prevElement->AppendChild(std::unique_ptr<dom::Node>(multiElement.release()));
+    prevElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(multiElement.release()));
     currentElement = prevElement;
 }
 
 void SymbolTableXmlBuilder::Visit(TypeNameConstraintNode& typeNameConstraintNode)
 {
-    std::unique_ptr<dom::Element> typenameElement(new dom::Element(U"typename"));
-    dom::Element* prevElement = currentElement;
+    std::unique_ptr<sngxml::dom::Element> typenameElement(new sngxml::dom::Element(U"typename"));
+    sngxml::dom::Element* prevElement = currentElement;
     currentElement = typenameElement.get();
     typeNameConstraintNode.TypeId()->Accept(*this);
-    prevElement->AppendChild(std::unique_ptr<dom::Node>(typenameElement.release()));
+    prevElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(typenameElement.release()));
     currentElement = prevElement;
 }
 
 void SymbolTableXmlBuilder::Visit(ConstructorConstraintNode& constructorConstraintNode)
 {
-    std::unique_ptr<dom::Element> signatureConstraintElement(new dom::Element(U"signature"));
-    dom::Element* prevElement = currentElement;
+    std::unique_ptr<sngxml::dom::Element> signatureConstraintElement(new sngxml::dom::Element(U"signature"));
+    sngxml::dom::Element* prevElement = currentElement;
     currentElement = signatureConstraintElement.get();
     signatureConstraintElement->SetAttribute(U"value", ToUtf32(constructorConstraintNode.ToString()));
-    prevElement->AppendChild(std::unique_ptr<dom::Node>(signatureConstraintElement.release()));
+    prevElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(signatureConstraintElement.release()));
     currentElement = prevElement;
 }
 
 void SymbolTableXmlBuilder::Visit(DestructorConstraintNode& destructorConstraintNode)
 {
-    std::unique_ptr<dom::Element> signatureConstraintElement(new dom::Element(U"signature"));
-    dom::Element* prevElement = currentElement;
+    std::unique_ptr<sngxml::dom::Element> signatureConstraintElement(new sngxml::dom::Element(U"signature"));
+    sngxml::dom::Element* prevElement = currentElement;
     currentElement = signatureConstraintElement.get();
     signatureConstraintElement->SetAttribute(U"value", ToUtf32(destructorConstraintNode.ToString()));
-    prevElement->AppendChild(std::unique_ptr<dom::Node>(signatureConstraintElement.release()));
+    prevElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(signatureConstraintElement.release()));
     currentElement = prevElement;
 }
 
 void SymbolTableXmlBuilder::Visit(MemberFunctionConstraintNode& memberFunctionConstraintNode)
 {
-    std::unique_ptr<dom::Element> signatureConstraintElement(new dom::Element(U"signature"));
-    dom::Element* prevElement = currentElement;
+    std::unique_ptr<sngxml::dom::Element> signatureConstraintElement(new sngxml::dom::Element(U"signature"));
+    sngxml::dom::Element* prevElement = currentElement;
     currentElement = signatureConstraintElement.get();
     signatureConstraintElement->SetAttribute(U"value", ToUtf32(memberFunctionConstraintNode.ToString()));
-    prevElement->AppendChild(std::unique_ptr<dom::Node>(signatureConstraintElement.release()));
+    prevElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(signatureConstraintElement.release()));
     currentElement = prevElement;
 }
 
 void SymbolTableXmlBuilder::Visit(FunctionConstraintNode& functionConstraintNode)
 {
-    std::unique_ptr<dom::Element> signatureConstraintElement(new dom::Element(U"signature"));
-    dom::Element* prevElement = currentElement;
+    std::unique_ptr<sngxml::dom::Element> signatureConstraintElement(new sngxml::dom::Element(U"signature"));
+    sngxml::dom::Element* prevElement = currentElement;
     currentElement = signatureConstraintElement.get();
     signatureConstraintElement->SetAttribute(U"value", ToUtf32(functionConstraintNode.ToString()));
-    prevElement->AppendChild(std::unique_ptr<dom::Node>(signatureConstraintElement.release()));
+    prevElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(signatureConstraintElement.release()));
     currentElement = prevElement;
 }
 
 void SymbolTableXmlBuilder::Visit(AxiomStatementNode& axiomStatementNode)
 {
-    std::unique_ptr<dom::Element> axiomStatementElement(new dom::Element(U"axiomStatement"));
-    dom::Element* prevElement = currentElement;
+    std::unique_ptr<sngxml::dom::Element> axiomStatementElement(new sngxml::dom::Element(U"axiomStatement"));
+    sngxml::dom::Element* prevElement = currentElement;
     currentElement = axiomStatementElement.get();
     axiomStatementElement->SetAttribute(U"value", axiomStatementNode.Text());
-    prevElement->AppendChild(std::unique_ptr<dom::Node>(axiomStatementElement.release()));
+    prevElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(axiomStatementElement.release()));
     currentElement = prevElement;
 }
 
 void SymbolTableXmlBuilder::Visit(AxiomNode& axiomNode)
 {
-    std::unique_ptr<dom::Element> axiomElement(new dom::Element(U"axiom"));
-    dom::Element* prevElement = currentElement;
+    std::unique_ptr<sngxml::dom::Element> axiomElement(new sngxml::dom::Element(U"axiom"));
+    sngxml::dom::Element* prevElement = currentElement;
     currentElement = axiomElement.get();
     if (axiomNode.Id())
     {
@@ -592,238 +592,238 @@ void SymbolTableXmlBuilder::Visit(AxiomNode& axiomNode)
     int np = axiomNode.Parameters().Count();
     if (np > 0)
     {
-        std::unique_ptr<dom::Element> parametersElement(new dom::Element(U"parameters"));
-        dom::Element* prevElement = currentElement;
+        std::unique_ptr<sngxml::dom::Element> parametersElement(new sngxml::dom::Element(U"parameters"));
+        sngxml::dom::Element* prevElement = currentElement;
         currentElement = parametersElement.get();
         for (int i = 0; i < np; ++i)
         {
             axiomNode.Parameters()[i]->Accept(*this);
         }
-        prevElement->AppendChild(std::unique_ptr<dom::Node>(parametersElement.release()));
+        prevElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(parametersElement.release()));
         currentElement = prevElement;
     }
     int n = axiomNode.Statements().Count();
     if (n > 0)
     {
-        std::unique_ptr<dom::Element> statementsElement(new dom::Element(U"axiomStatements"));
-        dom::Element* prevElement = currentElement;
+        std::unique_ptr<sngxml::dom::Element> statementsElement(new sngxml::dom::Element(U"axiomStatements"));
+        sngxml::dom::Element* prevElement = currentElement;
         currentElement = statementsElement.get();
         for (int i = 0; i < n; ++i)
         {
             axiomNode.Statements()[i]->Accept(*this);
         }
-        prevElement->AppendChild(std::unique_ptr<dom::Node>(statementsElement.release()));
+        prevElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(statementsElement.release()));
         currentElement = prevElement;
     }
-    prevElement->AppendChild(std::unique_ptr<dom::Node>(axiomElement.release()));
+    prevElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(axiomElement.release()));
     currentElement = prevElement;
 }
 
 void SymbolTableXmlBuilder::Visit(ConceptIdNode& conceptIdNode)
 {
     conceptIdNode.Id()->Accept(*this);
-    std::unique_ptr<dom::Element> typeParamsElement(new dom::Element(U"typeParams"));
-    dom::Element* prevElement = currentElement;
+    std::unique_ptr<sngxml::dom::Element> typeParamsElement(new sngxml::dom::Element(U"typeParams"));
+    sngxml::dom::Element* prevElement = currentElement;
     currentElement = typeParamsElement.get();
     int n = conceptIdNode.TypeParameters().Count();
     for (int i = 0; i < n; ++i)
     {
         conceptIdNode.TypeParameters()[i]->Accept(*this);
     }
-    prevElement->AppendChild(std::unique_ptr<dom::Node>(typeParamsElement.release()));
+    prevElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(typeParamsElement.release()));
     currentElement = prevElement;
 }
 
 void SymbolTableXmlBuilder::Visit(IdentifierNode& identifierNode)
 {
-    std::unique_ptr<dom::Element> symbolElement(new dom::Element(U"symbol"));
+    std::unique_ptr<sngxml::dom::Element> symbolElement(new sngxml::dom::Element(U"symbol"));
     Symbol* symbol = symbolTable.GetMappedSymbol(&identifierNode);
     if (symbol)
     {
         symbolElement->SetAttribute(U"ref", symbol->Id());
     }
     symbolElement->SetAttribute(U"name", identifierNode.Str());
-    currentElement->AppendChild(std::unique_ptr<dom::Node>(symbolElement.release()));
+    currentElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(symbolElement.release()));
 }
 
 void SymbolTableXmlBuilder::Visit(DotNode& dotNode)
 {
-    std::unique_ptr<dom::Element> dotElement(new dom::Element(U"dot"));
-    dom::Element* prevElement = currentElement;
+    std::unique_ptr<sngxml::dom::Element> dotElement(new sngxml::dom::Element(U"dot"));
+    sngxml::dom::Element* prevElement = currentElement;
     currentElement = dotElement.get();
     dotNode.Subject()->Accept(*this); 
     dotNode.MemberId()->Accept(*this);
-    prevElement->AppendChild(std::unique_ptr<dom::Node>(dotElement.release()));
+    prevElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(dotElement.release()));
     currentElement = prevElement;
 }
 
 void SymbolTableXmlBuilder::Visit(ParameterNode& parameterNode)
 {
-    std::unique_ptr<dom::Element> parameterElement(new dom::Element(U"parameter"));
-    dom::Element* prevElement = currentElement;
+    std::unique_ptr<sngxml::dom::Element> parameterElement(new sngxml::dom::Element(U"parameter"));
+    sngxml::dom::Element* prevElement = currentElement;
     currentElement = parameterElement.get();
     parameterNode.TypeExpr()->Accept(*this);
     if (parameterNode.Id() && !parameterNode.ArtificialId())
     {
         parameterNode.Id()->Accept(*this);
     }
-    prevElement->AppendChild(std::unique_ptr<dom::Node>(parameterElement.release()));
+    prevElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(parameterElement.release()));
     currentElement = prevElement;
 }
 
 void SymbolTableXmlBuilder::Visit(BoolNode& boolNode)
 {
-    std::unique_ptr<dom::Element> keywordElement(new dom::Element(U"keyword"));
+    std::unique_ptr<sngxml::dom::Element> keywordElement(new sngxml::dom::Element(U"keyword"));
     keywordElement->SetAttribute(U"value", U"bool");
-    dom::Element* prevElement = currentElement;
+    sngxml::dom::Element* prevElement = currentElement;
     currentElement = keywordElement.get();
-    prevElement->AppendChild(std::unique_ptr<dom::Node>(keywordElement.release()));
+    prevElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(keywordElement.release()));
     currentElement = prevElement;
 }
 
 void SymbolTableXmlBuilder::Visit(SByteNode& sbyteNode) 
 {
-    std::unique_ptr<dom::Element> keywordElement(new dom::Element(U"keyword"));
+    std::unique_ptr<sngxml::dom::Element> keywordElement(new sngxml::dom::Element(U"keyword"));
     keywordElement->SetAttribute(U"value", U"sbyte");
-    dom::Element* prevElement = currentElement;
+    sngxml::dom::Element* prevElement = currentElement;
     currentElement = keywordElement.get();
-    prevElement->AppendChild(std::unique_ptr<dom::Node>(keywordElement.release()));
+    prevElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(keywordElement.release()));
     currentElement = prevElement;
 }
 
 void SymbolTableXmlBuilder::Visit(ByteNode& byteNode)
 {
-    std::unique_ptr<dom::Element> keywordElement(new dom::Element(U"keyword"));
+    std::unique_ptr<sngxml::dom::Element> keywordElement(new sngxml::dom::Element(U"keyword"));
     keywordElement->SetAttribute(U"value", U"byte");
-    dom::Element* prevElement = currentElement;
+    sngxml::dom::Element* prevElement = currentElement;
     currentElement = keywordElement.get();
-    prevElement->AppendChild(std::unique_ptr<dom::Node>(keywordElement.release()));
+    prevElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(keywordElement.release()));
     currentElement = prevElement;
 }
 
 void SymbolTableXmlBuilder::Visit(ShortNode& shortNode)
 {
-    std::unique_ptr<dom::Element> keywordElement(new dom::Element(U"keyword"));
+    std::unique_ptr<sngxml::dom::Element> keywordElement(new sngxml::dom::Element(U"keyword"));
     keywordElement->SetAttribute(U"value", U"short");
-    dom::Element* prevElement = currentElement;
+    sngxml::dom::Element* prevElement = currentElement;
     currentElement = keywordElement.get();
-    prevElement->AppendChild(std::unique_ptr<dom::Node>(keywordElement.release()));
+    prevElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(keywordElement.release()));
     currentElement = prevElement;
 }
 
 void SymbolTableXmlBuilder::Visit(UShortNode& ushortNode)
 {
-    std::unique_ptr<dom::Element> keywordElement(new dom::Element(U"keyword"));
+    std::unique_ptr<sngxml::dom::Element> keywordElement(new sngxml::dom::Element(U"keyword"));
     keywordElement->SetAttribute(U"value", U"ushort");
-    dom::Element* prevElement = currentElement;
+    sngxml::dom::Element* prevElement = currentElement;
     currentElement = keywordElement.get();
-    prevElement->AppendChild(std::unique_ptr<dom::Node>(keywordElement.release()));
+    prevElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(keywordElement.release()));
     currentElement = prevElement;
 }
 
 void SymbolTableXmlBuilder::Visit(IntNode& intNode)
 {
-    std::unique_ptr<dom::Element> keywordElement(new dom::Element(U"keyword"));
+    std::unique_ptr<sngxml::dom::Element> keywordElement(new sngxml::dom::Element(U"keyword"));
     keywordElement->SetAttribute(U"value", U"int");
-    dom::Element* prevElement = currentElement;
+    sngxml::dom::Element* prevElement = currentElement;
     currentElement = keywordElement.get();
-    prevElement->AppendChild(std::unique_ptr<dom::Node>(keywordElement.release()));
+    prevElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(keywordElement.release()));
     currentElement = prevElement;
 }
 
 void SymbolTableXmlBuilder::Visit(UIntNode& uintNode)
 {
-    std::unique_ptr<dom::Element> keywordElement(new dom::Element(U"keyword"));
+    std::unique_ptr<sngxml::dom::Element> keywordElement(new sngxml::dom::Element(U"keyword"));
     keywordElement->SetAttribute(U"value", U"uint");
-    dom::Element* prevElement = currentElement;
+    sngxml::dom::Element* prevElement = currentElement;
     currentElement = keywordElement.get();
-    prevElement->AppendChild(std::unique_ptr<dom::Node>(keywordElement.release()));
+    prevElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(keywordElement.release()));
     currentElement = prevElement;
 }
 
 void SymbolTableXmlBuilder::Visit(LongNode& longNode)
 {
-    std::unique_ptr<dom::Element> keywordElement(new dom::Element(U"keyword"));
+    std::unique_ptr<sngxml::dom::Element> keywordElement(new sngxml::dom::Element(U"keyword"));
     keywordElement->SetAttribute(U"value", U"long");
-    dom::Element* prevElement = currentElement;
+    sngxml::dom::Element* prevElement = currentElement;
     currentElement = keywordElement.get();
-    prevElement->AppendChild(std::unique_ptr<dom::Node>(keywordElement.release()));
+    prevElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(keywordElement.release()));
     currentElement = prevElement;
 }
 
 void SymbolTableXmlBuilder::Visit(ULongNode& ulongNode)
 {
-    std::unique_ptr<dom::Element> keywordElement(new dom::Element(U"keyword"));
+    std::unique_ptr<sngxml::dom::Element> keywordElement(new sngxml::dom::Element(U"keyword"));
     keywordElement->SetAttribute(U"value", U"ulong");
-    dom::Element* prevElement = currentElement;
+    sngxml::dom::Element* prevElement = currentElement;
     currentElement = keywordElement.get();
-    prevElement->AppendChild(std::unique_ptr<dom::Node>(keywordElement.release()));
+    prevElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(keywordElement.release()));
     currentElement = prevElement;
 }
 
 void SymbolTableXmlBuilder::Visit(FloatNode& floatNode)
 {
-    std::unique_ptr<dom::Element> keywordElement(new dom::Element(U"keyword"));
+    std::unique_ptr<sngxml::dom::Element> keywordElement(new sngxml::dom::Element(U"keyword"));
     keywordElement->SetAttribute(U"value", U"float");
-    dom::Element* prevElement = currentElement;
+    sngxml::dom::Element* prevElement = currentElement;
     currentElement = keywordElement.get();
-    prevElement->AppendChild(std::unique_ptr<dom::Node>(keywordElement.release()));
+    prevElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(keywordElement.release()));
     currentElement = prevElement;
 }
 
 void SymbolTableXmlBuilder::Visit(DoubleNode& doubleNode)
 {
-    std::unique_ptr<dom::Element> keywordElement(new dom::Element(U"keyword"));
+    std::unique_ptr<sngxml::dom::Element> keywordElement(new sngxml::dom::Element(U"keyword"));
     keywordElement->SetAttribute(U"value", U"double");
-    dom::Element* prevElement = currentElement;
+    sngxml::dom::Element* prevElement = currentElement;
     currentElement = keywordElement.get();
-    prevElement->AppendChild(std::unique_ptr<dom::Node>(keywordElement.release()));
+    prevElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(keywordElement.release()));
     currentElement = prevElement;
 }
 
 void SymbolTableXmlBuilder::Visit(CharNode& charNode)
 {
-    std::unique_ptr<dom::Element> keywordElement(new dom::Element(U"keyword"));
+    std::unique_ptr<sngxml::dom::Element> keywordElement(new sngxml::dom::Element(U"keyword"));
     keywordElement->SetAttribute(U"value", U"char");
-    dom::Element* prevElement = currentElement;
+    sngxml::dom::Element* prevElement = currentElement;
     currentElement = keywordElement.get();
-    prevElement->AppendChild(std::unique_ptr<dom::Node>(keywordElement.release()));
+    prevElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(keywordElement.release()));
     currentElement = prevElement;
 }
 
 void SymbolTableXmlBuilder::Visit(WCharNode& wcharNode)
 {
-    std::unique_ptr<dom::Element> keywordElement(new dom::Element(U"keyword"));
+    std::unique_ptr<sngxml::dom::Element> keywordElement(new sngxml::dom::Element(U"keyword"));
     keywordElement->SetAttribute(U"value", U"wchar");
-    dom::Element* prevElement = currentElement;
+    sngxml::dom::Element* prevElement = currentElement;
     currentElement = keywordElement.get();
-    prevElement->AppendChild(std::unique_ptr<dom::Node>(keywordElement.release()));
+    prevElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(keywordElement.release()));
     currentElement = prevElement;
 }
 
 void SymbolTableXmlBuilder::Visit(UCharNode& ucharNode)
 {
-    std::unique_ptr<dom::Element> keywordElement(new dom::Element(U"keyword"));
+    std::unique_ptr<sngxml::dom::Element> keywordElement(new sngxml::dom::Element(U"keyword"));
     keywordElement->SetAttribute(U"value", U"uchar");
-    dom::Element* prevElement = currentElement;
+    sngxml::dom::Element* prevElement = currentElement;
     currentElement = keywordElement.get();
-    prevElement->AppendChild(std::unique_ptr<dom::Node>(keywordElement.release()));
+    prevElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(keywordElement.release()));
     currentElement = prevElement;
 }
 
 void SymbolTableXmlBuilder::Visit(VoidNode& voidNode)
 {
-    std::unique_ptr<dom::Element> keywordElement(new dom::Element(U"keyword"));
+    std::unique_ptr<sngxml::dom::Element> keywordElement(new sngxml::dom::Element(U"keyword"));
     keywordElement->SetAttribute(U"value", U"void");
-    dom::Element* prevElement = currentElement;
+    sngxml::dom::Element* prevElement = currentElement;
     currentElement = keywordElement.get();
-    prevElement->AppendChild(std::unique_ptr<dom::Node>(keywordElement.release()));
+    prevElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(keywordElement.release()));
     currentElement = prevElement;
 }
 
-std::unique_ptr<dom::Element> SymbolTableXmlBuilder::CreateSymbolElement(const std::u32string& elementName, Symbol& symbol) const
+std::unique_ptr<sngxml::dom::Element> SymbolTableXmlBuilder::CreateSymbolElement(const std::u32string& elementName, Symbol& symbol) const
 {
-    std::unique_ptr<dom::Element> symbolElement(new dom::Element(elementName));
+    std::unique_ptr<sngxml::dom::Element> symbolElement(new sngxml::dom::Element(elementName));
     symbolElement->SetAttribute(U"name", symbol.CodeName());
     symbolElement->SetAttribute(U"id", symbol.Id());
     return symbolElement;
@@ -832,17 +832,17 @@ std::unique_ptr<dom::Element> SymbolTableXmlBuilder::CreateSymbolElement(const s
 bool SymbolTableXmlBuilder::AddNamespace(NamespaceSymbol& ns)
 {
     bool added = false;
-    std::unique_ptr<dom::Element> nsElement = CreateSymbolElement(U"namespace", ns);
+    std::unique_ptr<sngxml::dom::Element> nsElement = CreateSymbolElement(U"namespace", ns);
     std::u32string docPath = ToUtf32(Path::Combine(modulePrefix, ToUtf8(ns.Id()) + ".html"));
     nsElement->SetAttribute(U"docPath", docPath);
     std::u32string extPath = ToUtf32(Path::Combine(extModulePrefix, ToUtf8(ns.Id()) + ".html"));
     nsElement->SetAttribute(U"extPath", extPath);
-    dom::Element* prevElement = currentElement;
+    sngxml::dom::Element* prevElement = currentElement;
     currentElement = nsElement.get();
     AddChildren(ns);
     if (IsNonemptyNamespace(nsElement.get()))
     {
-        prevElement->AppendChild(std::unique_ptr<dom::Node>(nsElement.release()));
+        prevElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(nsElement.release()));
         added = true;
     }
     currentElement = prevElement;
@@ -851,7 +851,7 @@ bool SymbolTableXmlBuilder::AddNamespace(NamespaceSymbol& ns)
 
 void SymbolTableXmlBuilder::AddConcept(ConceptSymbol& concept)
 {
-    std::unique_ptr<dom::Element> conceptElement = CreateSymbolElement(U"concept", concept);
+    std::unique_ptr<sngxml::dom::Element> conceptElement = CreateSymbolElement(U"concept", concept);
     if (concept.RefinedConcept())
     {
         conceptElement->SetAttribute(U"refines", concept.RefinedConcept()->Id());
@@ -864,22 +864,22 @@ void SymbolTableXmlBuilder::AddConcept(ConceptSymbol& concept)
     int n = concept.TemplateParameters().size();
     if (n > 0)
     {
-        std::unique_ptr<dom::Element> typeParametersElement(new dom::Element(U"typeParameters"));
+        std::unique_ptr<sngxml::dom::Element> typeParametersElement(new sngxml::dom::Element(U"typeParameters"));
         for (int i = 0; i < n; ++i)
         {
-            std::unique_ptr<dom::Element> typeParameterElement = CreateSymbolElement(U"typeParameter", *concept.TemplateParameters()[i]);
+            std::unique_ptr<sngxml::dom::Element> typeParameterElement = CreateSymbolElement(U"typeParameter", *concept.TemplateParameters()[i]);
             std::u32string docPath = conceptElement->GetAttribute(U"docPath") + U"#" + typeParameterElement->GetAttribute(U"id");
             typeParameterElement->SetAttribute(U"docPath", docPath);
-            typeParametersElement->AppendChild(std::unique_ptr<dom::Node>(typeParameterElement.release()));
+            typeParametersElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(typeParameterElement.release()));
         }
-        conceptElement->AppendChild(std::unique_ptr<dom::Node>(typeParametersElement.release()));
+        conceptElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(typeParametersElement.release()));
     }
     if (concept.HasSource())
     {
-        File& file = fileMap[concept.GetSpan().FileIndex()];
+        File& file = fileMap[concept.GetSpan().fileIndex];
         conceptElement->SetAttribute(U"fileName", file.name);
         conceptElement->SetAttribute(U"filePath", ToUtf32(file.htmlFilePath));
-        conceptElement->SetAttribute(U"line", ToUtf32(std::to_string(concept.GetSpan().LineNumber())));
+        conceptElement->SetAttribute(U"line", ToUtf32(std::to_string(concept.GetSpan().line)));
     }
     Node* node = symbolTable.GetNodeNoThrow(&concept);
     ConceptNode* conceptNode = nullptr;
@@ -888,55 +888,55 @@ void SymbolTableXmlBuilder::AddConcept(ConceptSymbol& concept)
         conceptNode = static_cast<ConceptNode*>(node);
         conceptElement->SetAttribute(U"specifiers", ToUtf32(SpecifierStr(conceptNode->GetSpecifiers())));
     }
-    dom::Element* prevElement = currentElement;
+    sngxml::dom::Element* prevElement = currentElement;
     currentElement = conceptElement.get();
     if (conceptNode)
     {
         int nc = conceptNode->Constraints().Count();
         if (nc > 0)
         {
-            std::unique_ptr<dom::Element> constraintsElement(new dom::Element(U"constraints"));
-            dom::Element* prevElement = currentElement;
+            std::unique_ptr<sngxml::dom::Element> constraintsElement(new sngxml::dom::Element(U"constraints"));
+            sngxml::dom::Element* prevElement = currentElement;
             currentElement = constraintsElement.get();
             for (int i = 0; i < nc; ++i)
             {
                 ConstraintNode* constraint = conceptNode->Constraints()[i];
                 constraint->Accept(*this);
             }
-            prevElement->AppendChild(std::unique_ptr<dom::Node>(constraintsElement.release()));
+            prevElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(constraintsElement.release()));
             currentElement = prevElement;
         }
         int na = conceptNode->Axioms().Count();
         if (na > 0)
         {
-            std::unique_ptr<dom::Element> axiomsElement(new dom::Element(U"axioms"));
-            dom::Element* prevElement = currentElement;
+            std::unique_ptr<sngxml::dom::Element> axiomsElement(new sngxml::dom::Element(U"axioms"));
+            sngxml::dom::Element* prevElement = currentElement;
             currentElement = axiomsElement.get();
             for (int i = 0; i < na; ++i)
             {
                 AxiomNode* axiom = conceptNode->Axioms()[i];
                 axiom->Accept(*this);
             }
-            prevElement->AppendChild(std::unique_ptr<dom::Node>(axiomsElement.release()));
+            prevElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(axiomsElement.release()));
             currentElement = prevElement;
         }
     }
     AddChildren(concept);
-    prevElement->AppendChild(std::unique_ptr<dom::Node>(conceptElement.release()));
+    prevElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(conceptElement.release()));
     currentElement = prevElement;
 }
 
 void SymbolTableXmlBuilder::AddClass(ClassTypeSymbol& cls)
 {
-    std::unique_ptr<dom::Element> classElement = CreateSymbolElement(U"class", cls);
+    std::unique_ptr<sngxml::dom::Element> classElement = CreateSymbolElement(U"class", cls);
     std::u32string docPath = ToUtf32(Path::Combine(modulePrefix, ToUtf8(cls.Id()) + ".html"));
     classElement->SetAttribute(U"docPath", docPath);
     std::u32string extPath = ToUtf32(Path::Combine(extModulePrefix, ToUtf8(cls.Id()) + ".html"));
     classElement->SetAttribute(U"extPath", extPath);
-    File& file = fileMap[cls.GetSpan().FileIndex()];
+    File& file = fileMap[cls.GetSpan().fileIndex];
     classElement->SetAttribute(U"fileName", file.name);
     classElement->SetAttribute(U"filePath", ToUtf32(file.htmlFilePath));
-    classElement->SetAttribute(U"line", ToUtf32(std::to_string(cls.GetSpan().LineNumber())));
+    classElement->SetAttribute(U"line", ToUtf32(std::to_string(cls.GetSpan().line)));
     Node* node = symbolTable.GetNodeNoThrow(&cls);
     if (node && node->GetNodeType() == NodeType::classNode)
     {
@@ -952,7 +952,7 @@ void SymbolTableXmlBuilder::AddClass(ClassTypeSymbol& cls)
         ClassTemplateSpecializationSymbol* specialization = static_cast<ClassTemplateSpecializationSymbol*>(&cls);
         if (specialization->IsPrototype())
         {
-            std::unique_ptr<dom::Element> templateParametersElement(new dom::Element(U"templateParameters"));
+            std::unique_ptr<sngxml::dom::Element> templateParametersElement(new sngxml::dom::Element(U"templateParameters"));
             int n = specialization->TemplateArgumentTypes().size();
             for (int i = 0; i < n; ++i)
             {
@@ -960,7 +960,7 @@ void SymbolTableXmlBuilder::AddClass(ClassTypeSymbol& cls)
                 if (templateArgumentType->GetSymbolType() == SymbolType::templateParameterSymbol)
                 {
                     TemplateParameterSymbol* templateParameter = static_cast<TemplateParameterSymbol*>(templateArgumentType);
-                    std::unique_ptr<dom::Element> templateParameterElement = CreateSymbolElement(U"templateParameter", *templateParameter);
+                    std::unique_ptr<sngxml::dom::Element> templateParameterElement = CreateSymbolElement(U"templateParameter", *templateParameter);
                     std::u32string docPath = classElement->GetAttribute(U"docPath") + U"#" + templateParameter->Id();
                     templateParameterElement->SetAttribute(U"docPath", docPath);
                     if (templateParameter->HasDefault())
@@ -968,14 +968,14 @@ void SymbolTableXmlBuilder::AddClass(ClassTypeSymbol& cls)
                         GetOrInsertType(templateParameter->DefaultType());
                         templateParameterElement->SetAttribute(U"default", templateParameter->DefaultType()->Id());
                     }
-                    templateParametersElement->AppendChild(std::unique_ptr<dom::Node>(templateParameterElement.release()));
+                    templateParametersElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(templateParameterElement.release()));
                 }
                 else
                 {
                     throw std::runtime_error("template parameter expected");
                 }
             }
-            classElement->AppendChild(std::unique_ptr<dom::Node>(templateParametersElement.release()));
+            classElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(templateParametersElement.release()));
         }
         else
         {
@@ -1005,28 +1005,28 @@ void SymbolTableXmlBuilder::AddClass(ClassTypeSymbol& cls)
         }
         AddDerivedClass(baseClass, &cls);
     }
-    dom::Element* prevElement = currentElement;
+    sngxml::dom::Element* prevElement = currentElement;
     currentElement = classElement.get();
     AddChildren(cls);
     if (cls.Constraint())
     {
         cls.Constraint()->Accept(*this);
     }
-    prevElement->AppendChild(std::unique_ptr<dom::Node>(classElement.release()));
+    prevElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(classElement.release()));
     currentElement = prevElement;
 }
 
 void SymbolTableXmlBuilder::AddCtorOrDtor(FunctionSymbol& function)
 {
-    std::unique_ptr<dom::Element> ctorDtorElement = CreateSymbolElement(U"ctorDtor", function);
+    std::unique_ptr<sngxml::dom::Element> ctorDtorElement = CreateSymbolElement(U"ctorDtor", function);
     std::u32string docPath = ToUtf32(Path::Combine(modulePrefix, ToUtf8(function.Parent()->Id()) + ".html#" + ToUtf8(function.Id())));
     ctorDtorElement->SetAttribute(U"docPath", docPath);
     std::u32string extPath = ToUtf32(Path::Combine(extModulePrefix, ToUtf8(function.Parent()->Id()) + ".html#" + ToUtf8(function.Id())));
     ctorDtorElement->SetAttribute(U"extPath", extPath);
-    File& file = fileMap[function.GetSpan().FileIndex()];
+    File& file = fileMap[function.GetSpan().fileIndex];
     ctorDtorElement->SetAttribute(U"fileName", file.name);
     ctorDtorElement->SetAttribute(U"filePath", ToUtf32(file.htmlFilePath));
-    ctorDtorElement->SetAttribute(U"line", ToUtf32(std::to_string(function.GetSpan().LineNumber())));
+    ctorDtorElement->SetAttribute(U"line", ToUtf32(std::to_string(function.GetSpan().line)));
     if (function.GetSymbolType() == SymbolType::staticConstructorSymbol)
     {
         ctorDtorElement->SetAttribute(U"kind", U"Static Constructor");
@@ -1049,16 +1049,16 @@ void SymbolTableXmlBuilder::AddCtorOrDtor(FunctionSymbol& function)
     {
         throw std::runtime_error("function node expected");
     }
-    dom::Element* prevElement = currentElement;
+    sngxml::dom::Element* prevElement = currentElement;
     currentElement = ctorDtorElement.get();
     AddChildren(function);
-    prevElement->AppendChild(std::unique_ptr<dom::Node>(ctorDtorElement.release()));
+    prevElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(ctorDtorElement.release()));
     currentElement = prevElement;
 }
 
 void SymbolTableXmlBuilder::AddFunction(FunctionSymbol& function)
 {
-    std::unique_ptr<dom::Element> functionElement = CreateSymbolElement(U"function", function);
+    std::unique_ptr<sngxml::dom::Element> functionElement = CreateSymbolElement(U"function", function);
     std::u32string docPath = ToUtf32(Path::Combine(modulePrefix, ToUtf8(function.Parent()->Id()) + ".html#" + ToUtf8(function.Id())));
     if (function.Parent()->Id().empty() || function.Parent()->Id() == U"ns_")
     {
@@ -1073,10 +1073,10 @@ void SymbolTableXmlBuilder::AddFunction(FunctionSymbol& function)
     functionElement->SetAttribute(U"extPath", extPath);
     if (function.HasSource())
     {
-        File& file = fileMap[function.GetSpan().FileIndex()];
+        File& file = fileMap[function.GetSpan().fileIndex];
         functionElement->SetAttribute(U"fileName", file.name);
         functionElement->SetAttribute(U"filePath", ToUtf32(file.htmlFilePath));
-        functionElement->SetAttribute(U"line", ToUtf32(std::to_string(function.GetSpan().LineNumber())));
+        functionElement->SetAttribute(U"line", ToUtf32(std::to_string(function.GetSpan().line)));
     }
     if (function.GetSymbolType() == SymbolType::functionSymbol)
     {
@@ -1121,44 +1121,44 @@ void SymbolTableXmlBuilder::AddFunction(FunctionSymbol& function)
     int n = function.TemplateParameters().size();
     if (n > 0)
     {
-        std::unique_ptr<dom::Element> templateParametersElement(new dom::Element(U"templateParameters"));
+        std::unique_ptr<sngxml::dom::Element> templateParametersElement(new sngxml::dom::Element(U"templateParameters"));
         for (int i = 0; i < n; ++i)
         {
-            std::unique_ptr<dom::Element> templateParameterElement = CreateSymbolElement(U"templateParameter", *function.TemplateParameters()[i]);
+            std::unique_ptr<sngxml::dom::Element> templateParameterElement = CreateSymbolElement(U"templateParameter", *function.TemplateParameters()[i]);
             std::u32string docPath = ToUtf32(Path::Combine(modulePrefix, ToUtf8(function.Parent()->Id()) + ".html#" + ToUtf8(function.TemplateParameters()[i]->Id())));
             templateParameterElement->SetAttribute(U"docPath", docPath);
             std::u32string extPath = ToUtf32(Path::Combine(extModulePrefix, ToUtf8(function.Parent()->Id()) + ".html#" + ToUtf8(function.TemplateParameters()[i]->Id())));
             templateParameterElement->SetAttribute(U"extPath", extPath);
-            templateParametersElement->AppendChild(std::unique_ptr<dom::Node>(templateParameterElement.release()));
+            templateParametersElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(templateParameterElement.release()));
         }
-        functionElement->AppendChild(std::unique_ptr<dom::Node>(templateParametersElement.release()));
+        functionElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(templateParametersElement.release()));
     }
     TypeSymbol* returnType = function.ReturnType();
     Assert(returnType, "nonnull return type expected");
     std::u32string returnTypeId = GetOrInsertType(returnType);
     functionElement->SetAttribute(U"returnType", returnTypeId);
-    dom::Element* prevElement = currentElement;
+    sngxml::dom::Element* prevElement = currentElement;
     currentElement = functionElement.get();
     AddChildren(function);
     if (function.Constraint())
     {
         function.Constraint()->Accept(*this);
     }
-    prevElement->AppendChild(std::unique_ptr<dom::Node>(functionElement.release()));
+    prevElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(functionElement.release()));
     currentElement = prevElement;
 }
 
 void SymbolTableXmlBuilder::AddDelegate(DelegateTypeSymbol& delegate)
 {
-    std::unique_ptr<dom::Element> delegateElement = CreateSymbolElement(U"delegate", delegate);
+    std::unique_ptr<sngxml::dom::Element> delegateElement = CreateSymbolElement(U"delegate", delegate);
     std::u32string docPath = ToUtf32(Path::Combine(modulePrefix, ToUtf8(delegate.Parent()->Id()) + ".html#" + ToUtf8(delegate.Id())));
     delegateElement->SetAttribute(U"docPath", docPath);
     std::u32string extPath = ToUtf32(Path::Combine(extModulePrefix, ToUtf8(delegate.Parent()->Id()) + ".html#" + ToUtf8(delegate.Id())));
     delegateElement->SetAttribute(U"extPath", extPath);
-    File& file = fileMap[delegate.GetSpan().FileIndex()];
+    File& file = fileMap[delegate.GetSpan().fileIndex];
     delegateElement->SetAttribute(U"fileName", file.name);
     delegateElement->SetAttribute(U"filePath", ToUtf32(file.htmlFilePath));
-    delegateElement->SetAttribute(U"line", ToUtf32(std::to_string(delegate.GetSpan().LineNumber())));
+    delegateElement->SetAttribute(U"line", ToUtf32(std::to_string(delegate.GetSpan().line)));
     TypeSymbol* returnType = delegate.ReturnType();
     Assert(returnType, "nonnull return type expected");
     std::u32string returnTypeId = GetOrInsertType(returnType);
@@ -1173,24 +1173,24 @@ void SymbolTableXmlBuilder::AddDelegate(DelegateTypeSymbol& delegate)
     {
         throw std::runtime_error("delegate node expected");
     }
-    dom::Element* prevElement = currentElement;
+    sngxml::dom::Element* prevElement = currentElement;
     currentElement = delegateElement.get();
     AddChildren(delegate);
-    prevElement->AppendChild(std::unique_ptr<dom::Node>(delegateElement.release()));
+    prevElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(delegateElement.release()));
     currentElement = prevElement;
 }
 
 void SymbolTableXmlBuilder::AddClassDelegate(ClassDelegateTypeSymbol& classDelegate)
 {
-    std::unique_ptr<dom::Element> classDelegateElement = CreateSymbolElement(U"classDelegate", classDelegate);
+    std::unique_ptr<sngxml::dom::Element> classDelegateElement = CreateSymbolElement(U"classDelegate", classDelegate);
     std::u32string docPath = ToUtf32(Path::Combine(modulePrefix, ToUtf8(classDelegate.Parent()->Id()) + ".html#" + ToUtf8(classDelegate.Id())));
     classDelegateElement->SetAttribute(U"docPath", docPath);
     std::u32string extPath = ToUtf32(Path::Combine(extModulePrefix, ToUtf8(classDelegate.Parent()->Id()) + ".html#" + ToUtf8(classDelegate.Id())));
     classDelegateElement->SetAttribute(U"extPath", extPath);
-    File& file = fileMap[classDelegate.GetSpan().FileIndex()];
+    File& file = fileMap[classDelegate.GetSpan().fileIndex];
     classDelegateElement->SetAttribute(U"fileName", file.name);
     classDelegateElement->SetAttribute(U"filePath", ToUtf32(file.htmlFilePath));
-    classDelegateElement->SetAttribute(U"line", ToUtf32(std::to_string(classDelegate.GetSpan().LineNumber())));
+    classDelegateElement->SetAttribute(U"line", ToUtf32(std::to_string(classDelegate.GetSpan().line)));
     TypeSymbol* returnType = classDelegate.ReturnType();
     Assert(returnType, "nonnull return type expected");
     std::u32string returnTypeId = GetOrInsertType(returnType);
@@ -1205,16 +1205,16 @@ void SymbolTableXmlBuilder::AddClassDelegate(ClassDelegateTypeSymbol& classDeleg
     {
         throw std::runtime_error("class delegate node expected");
     }
-    dom::Element* prevElement = currentElement;
+    sngxml::dom::Element* prevElement = currentElement;
     currentElement = classDelegateElement.get();
     AddChildren(classDelegate);
-    prevElement->AppendChild(std::unique_ptr<dom::Node>(classDelegateElement.release()));
+    prevElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(classDelegateElement.release()));
     currentElement = prevElement;
 }
 
 void SymbolTableXmlBuilder::AddTypedef(TypedefSymbol& typedef_)
 {
-    std::unique_ptr<dom::Element> typedefElement = CreateSymbolElement(U"typedef", typedef_);
+    std::unique_ptr<sngxml::dom::Element> typedefElement = CreateSymbolElement(U"typedef", typedef_);
     std::u32string docPath = ToUtf32(Path::Combine(modulePrefix, ToUtf8(typedef_.Parent()->Id()) + ".html#" + ToUtf8(typedef_.Id())));
     typedefElement->SetAttribute(U"docPath", docPath);
     std::u32string extPath = ToUtf32(Path::Combine(extModulePrefix, ToUtf8(typedef_.Parent()->Id()) + ".html#" + ToUtf8(typedef_.Id())));
@@ -1233,23 +1233,23 @@ void SymbolTableXmlBuilder::AddTypedef(TypedefSymbol& typedef_)
     {
         throw std::runtime_error("typedef node expected");
     }
-    dom::Element* prevElement = currentElement;
+    sngxml::dom::Element* prevElement = currentElement;
     currentElement = typedefElement.get();
-    prevElement->AppendChild(std::unique_ptr<dom::Node>(typedefElement.release()));
+    prevElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(typedefElement.release()));
     currentElement = prevElement;
 }
 
 void SymbolTableXmlBuilder::AddEnumType(EnumTypeSymbol& enumType)
 {
-    std::unique_ptr<dom::Element> enumTypeElement = CreateSymbolElement(U"enumType", enumType);
+    std::unique_ptr<sngxml::dom::Element> enumTypeElement = CreateSymbolElement(U"enumType", enumType);
     std::u32string docPath = ToUtf32(Path::Combine(modulePrefix, ToUtf8(enumType.Id()) + ".html"));
     enumTypeElement->SetAttribute(U"docPath", docPath);
     std::u32string extPath = ToUtf32(Path::Combine(extModulePrefix, ToUtf8(enumType.Id()) + ".html"));
     enumTypeElement->SetAttribute(U"extPath", extPath);
-    File& file = fileMap[enumType.GetSpan().FileIndex()];
+    File& file = fileMap[enumType.GetSpan().fileIndex];
     enumTypeElement->SetAttribute(U"fileName", file.name);
     enumTypeElement->SetAttribute(U"filePath", ToUtf32(file.htmlFilePath));
-    enumTypeElement->SetAttribute(U"line", ToUtf32(std::to_string(enumType.GetSpan().LineNumber())));
+    enumTypeElement->SetAttribute(U"line", ToUtf32(std::to_string(enumType.GetSpan().line)));
     TypeSymbol* underlyingType = enumType.UnderlyingType();
     Assert(underlyingType, "nonnull type expected");
     std::u32string underlyingTypeId = GetOrInsertType(underlyingType);
@@ -1264,16 +1264,16 @@ void SymbolTableXmlBuilder::AddEnumType(EnumTypeSymbol& enumType)
     {
         throw std::runtime_error("enum type node expected");
     }
-    dom::Element* prevElement = currentElement;
+    sngxml::dom::Element* prevElement = currentElement;
     currentElement = enumTypeElement.get();
     AddChildren(enumType);
-    prevElement->AppendChild(std::unique_ptr<dom::Node>(enumTypeElement.release()));
+    prevElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(enumTypeElement.release()));
     currentElement = prevElement;
 }
 
 void SymbolTableXmlBuilder::AddEnumConstant(EnumConstantSymbol& enumConstant)
 {
-    std::unique_ptr<dom::Element> enumConstantElement = CreateSymbolElement(U"enumConstant", enumConstant);
+    std::unique_ptr<sngxml::dom::Element> enumConstantElement = CreateSymbolElement(U"enumConstant", enumConstant);
     std::u32string docPath = ToUtf32(Path::Combine(modulePrefix, ToUtf8(enumConstant.Parent()->Id()) + ".html#" + ToUtf8(enumConstant.Id())));
     enumConstantElement->SetAttribute(U"docPath", docPath);
     std::u32string extPath = ToUtf32(Path::Combine(extModulePrefix, ToUtf8(enumConstant.Parent()->Id()) + ".html#" + ToUtf8(enumConstant.Id())));
@@ -1282,15 +1282,15 @@ void SymbolTableXmlBuilder::AddEnumConstant(EnumConstantSymbol& enumConstant)
     {
         enumConstantElement->SetAttribute(U"value", enumConstant.StrValue());
     }
-    dom::Element* prevElement = currentElement;
+    sngxml::dom::Element* prevElement = currentElement;
     currentElement = enumConstantElement.get();
-    prevElement->AppendChild(std::unique_ptr<dom::Node>(enumConstantElement.release()));
+    prevElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(enumConstantElement.release()));
     currentElement = prevElement;
 }
 
 void SymbolTableXmlBuilder::AddConstant(ConstantSymbol& constant)
 {
-    std::unique_ptr<dom::Element> constantElement = CreateSymbolElement(U"constant", constant);
+    std::unique_ptr<sngxml::dom::Element> constantElement = CreateSymbolElement(U"constant", constant);
     std::u32string docPath = ToUtf32(Path::Combine(modulePrefix, ToUtf8(constant.Parent()->Id()) + ".html#" + ToUtf8(constant.Id())));
     constantElement->SetAttribute(U"docPath", docPath);
     std::u32string extPath = ToUtf32(Path::Combine(extModulePrefix, ToUtf8(constant.Parent()->Id()) + ".html#" + ToUtf8(constant.Id())));
@@ -1313,9 +1313,9 @@ void SymbolTableXmlBuilder::AddConstant(ConstantSymbol& constant)
     {
         throw std::runtime_error("constant node expected");
     }
-    dom::Element* prevElement = currentElement;
+    sngxml::dom::Element* prevElement = currentElement;
     currentElement = constantElement.get();
-    prevElement->AppendChild(std::unique_ptr<dom::Node>(constantElement.release()));
+    prevElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(constantElement.release()));
     currentElement = prevElement;
 }
 
@@ -1327,7 +1327,7 @@ void SymbolTableXmlBuilder::AddVariable(VariableSymbol& variable)
     {
         elementName = U"parameter";
     }
-    std::unique_ptr<dom::Element> variableElement = CreateSymbolElement(elementName, variable);
+    std::unique_ptr<sngxml::dom::Element> variableElement = CreateSymbolElement(elementName, variable);
     if (variable.GetSymbolType() == SymbolType::memberVariableSymbol)
     {
         std::u32string docPath = ToUtf32(Path::Combine(modulePrefix, ToUtf8(variable.Parent()->Id()) + ".html#" + ToUtf8(variable.Id())));
@@ -1352,9 +1352,9 @@ void SymbolTableXmlBuilder::AddVariable(VariableSymbol& variable)
     {
         throw std::runtime_error("variable node expected");
     }
-    dom::Element* prevElement = currentElement;
+    sngxml::dom::Element* prevElement = currentElement;
     currentElement = variableElement.get();
-    prevElement->AppendChild(std::unique_ptr<dom::Node>(variableElement.release()));
+    prevElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(variableElement.release()));
     currentElement = prevElement;
 }
 
@@ -1366,8 +1366,8 @@ void SymbolTableXmlBuilder::AddChildren(ContainerSymbol& container)
         std::vector<NamespaceSymbol*> namespaces = GetNamespaces(container);
         if (!namespaces.empty())
         {
-            std::unique_ptr<dom::Element> namespacesElement(new dom::Element(U"namespaces"));
-            dom::Element* prevElement = currentElement;
+            std::unique_ptr<sngxml::dom::Element> namespacesElement(new sngxml::dom::Element(U"namespaces"));
+            sngxml::dom::Element* prevElement = currentElement;
             currentElement = namespacesElement.get();
             for (NamespaceSymbol* namespaceSymbol : namespaces)
             {
@@ -1378,138 +1378,138 @@ void SymbolTableXmlBuilder::AddChildren(ContainerSymbol& container)
             }
             if (added)
             {
-                prevElement->AppendChild(std::unique_ptr<dom::Node>(namespacesElement.release()));
+                prevElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(namespacesElement.release()));
             }
             currentElement = prevElement;
         }
         std::vector<ConceptSymbol*> concepts = GetConcepts(container);
         if (!concepts.empty())
         {
-            std::unique_ptr<dom::Element> conceptsElement(new dom::Element(U"concepts"));
-            dom::Element* prevElement = currentElement;
+            std::unique_ptr<sngxml::dom::Element> conceptsElement(new sngxml::dom::Element(U"concepts"));
+            sngxml::dom::Element* prevElement = currentElement;
             currentElement = conceptsElement.get();
             for (ConceptSymbol* concept : concepts)
             {
                 AddConcept(*concept);
             }
-            prevElement->AppendChild(std::unique_ptr<dom::Node>(conceptsElement.release()));
+            prevElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(conceptsElement.release()));
             currentElement = prevElement;
         }
         std::vector<ClassTypeSymbol*> classes = GetClasses(container);
         if (!classes.empty())
         {
-            std::unique_ptr<dom::Element> classesElement(new dom::Element(U"classes"));
-            dom::Element* prevElement = currentElement;
+            std::unique_ptr<sngxml::dom::Element> classesElement(new sngxml::dom::Element(U"classes"));
+            sngxml::dom::Element* prevElement = currentElement;
             currentElement = classesElement.get();
             for (ClassTypeSymbol* cls : classes)
             {
                 AddClass(*cls);
             }
-            prevElement->AppendChild(std::unique_ptr<dom::Node>(classesElement.release()));
+            prevElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(classesElement.release()));
             currentElement = prevElement;
         }
         std::vector<FunctionSymbol*> ctorsDtors = GetConstructorsAndDestructors(container);
         if (!ctorsDtors.empty())
         {
-            std::unique_ptr<dom::Element> ctorsDtorsElement(new dom::Element(U"ctorsDtors"));
-            dom::Element* prevElement = currentElement;
+            std::unique_ptr<sngxml::dom::Element> ctorsDtorsElement(new sngxml::dom::Element(U"ctorsDtors"));
+            sngxml::dom::Element* prevElement = currentElement;
             currentElement = ctorsDtorsElement.get();
             for (FunctionSymbol* function : ctorsDtors)
             {
                 AddCtorOrDtor(*function);
             }
-            prevElement->AppendChild(std::unique_ptr<dom::Node>(ctorsDtorsElement.release()));
+            prevElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(ctorsDtorsElement.release()));
             currentElement = prevElement;
         }
         std::vector<FunctionSymbol*> functions = GetFunctions(container);
         if (!functions.empty())
         {
-            std::unique_ptr<dom::Element> functionsElement(new dom::Element(U"functions"));
-            dom::Element* prevElement = currentElement;
+            std::unique_ptr<sngxml::dom::Element> functionsElement(new sngxml::dom::Element(U"functions"));
+            sngxml::dom::Element* prevElement = currentElement;
             currentElement = functionsElement.get();
             for (FunctionSymbol* function : functions)
             {
                 AddFunction(*function);
             }
-            prevElement->AppendChild(std::unique_ptr<dom::Node>(functionsElement.release()));
+            prevElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(functionsElement.release()));
             currentElement = prevElement;
         }
         std::vector<DelegateTypeSymbol*> delegates = GetDelegates(container);
         if (!delegates.empty())
         {
-            std::unique_ptr<dom::Element> delegatesElement(new dom::Element(U"delegates"));
-            dom::Element* prevElement = currentElement;
+            std::unique_ptr<sngxml::dom::Element> delegatesElement(new sngxml::dom::Element(U"delegates"));
+            sngxml::dom::Element* prevElement = currentElement;
             currentElement = delegatesElement.get();
             for (DelegateTypeSymbol* delegate : delegates)
             {
                 AddDelegate(*delegate);
             }
-            prevElement->AppendChild(std::unique_ptr<dom::Node>(delegatesElement.release()));
+            prevElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(delegatesElement.release()));
             currentElement = prevElement;
         }
         std::vector<ClassDelegateTypeSymbol*> classDelegates = GetClassDelegates(container);
         if (!classDelegates.empty())
         {
-            std::unique_ptr<dom::Element> classDelegatesElement(new dom::Element(U"classDelegates"));
-            dom::Element* prevElement = currentElement;
+            std::unique_ptr<sngxml::dom::Element> classDelegatesElement(new sngxml::dom::Element(U"classDelegates"));
+            sngxml::dom::Element* prevElement = currentElement;
             currentElement = classDelegatesElement.get();
             for (ClassDelegateTypeSymbol* classDelegate : classDelegates)
             {
                 AddClassDelegate(*classDelegate);
             }
-            prevElement->AppendChild(std::unique_ptr<dom::Node>(classDelegatesElement.release()));
+            prevElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(classDelegatesElement.release()));
             currentElement = prevElement;
         }
         std::vector<TypedefSymbol*> typedefs = GetTypedefs(container);
         if (!typedefs.empty())
         {
-            std::unique_ptr<dom::Element> typedefsElement(new dom::Element(U"typedefs"));
-            dom::Element* prevElement = currentElement;
+            std::unique_ptr<sngxml::dom::Element> typedefsElement(new sngxml::dom::Element(U"typedefs"));
+            sngxml::dom::Element* prevElement = currentElement;
             currentElement = typedefsElement.get();
             for (TypedefSymbol* typedef_ : typedefs)
             {
                 AddTypedef(*typedef_);
             }
-            prevElement->AppendChild(std::unique_ptr<dom::Node>(typedefsElement.release()));
+            prevElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(typedefsElement.release()));
             currentElement = prevElement;
         }
         std::vector<EnumTypeSymbol*> enumTypes = GetEnumTypes(container);
         if (!enumTypes.empty())
         {
-            std::unique_ptr<dom::Element> enumTypesElement(new dom::Element(U"enumTypes"));
-            dom::Element* prevElement = currentElement;
+            std::unique_ptr<sngxml::dom::Element> enumTypesElement(new sngxml::dom::Element(U"enumTypes"));
+            sngxml::dom::Element* prevElement = currentElement;
             currentElement = enumTypesElement.get();
             for (EnumTypeSymbol* enumType : enumTypes)
             {
                 AddEnumType(*enumType);
             }
-            prevElement->AppendChild(std::unique_ptr<dom::Node>(enumTypesElement.release()));
+            prevElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(enumTypesElement.release()));
             currentElement = prevElement;
         }
         std::vector<EnumConstantSymbol*> enumConstants = GetEnumConstants(container);
         if (!enumConstants.empty())
         {
-            std::unique_ptr<dom::Element> enumConstantsElement(new dom::Element(U"enumConstants"));
-            dom::Element* prevElement = currentElement;
+            std::unique_ptr<sngxml::dom::Element> enumConstantsElement(new sngxml::dom::Element(U"enumConstants"));
+            sngxml::dom::Element* prevElement = currentElement;
             currentElement = enumConstantsElement.get();
             for (EnumConstantSymbol* enumConstant : enumConstants)
             {
                 AddEnumConstant(*enumConstant);
             }
-            prevElement->AppendChild(std::unique_ptr<dom::Node>(enumConstantsElement.release()));
+            prevElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(enumConstantsElement.release()));
             currentElement = prevElement;
         }
         std::vector<ConstantSymbol*> constants = GetConstants(container);
         if (!constants.empty())
         {
-            std::unique_ptr<dom::Element> constantsElement(new dom::Element(U"constants"));
-            dom::Element* prevElement = currentElement;
+            std::unique_ptr<sngxml::dom::Element> constantsElement(new sngxml::dom::Element(U"constants"));
+            sngxml::dom::Element* prevElement = currentElement;
             currentElement = constantsElement.get();
             for (ConstantSymbol* constant : constants)
             {
                 AddConstant(*constant);
             }
-            prevElement->AppendChild(std::unique_ptr<dom::Node>(constantsElement.release()));
+            prevElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(constantsElement.release()));
             currentElement = prevElement;
         }
     }
@@ -1533,14 +1533,14 @@ void SymbolTableXmlBuilder::AddChildren(ContainerSymbol& container)
         {
             varContainerName = U"parameters";
         }
-        std::unique_ptr<dom::Element> variablesElement(new dom::Element(varContainerName));
-        dom::Element* prevElement = currentElement;
+        std::unique_ptr<sngxml::dom::Element> variablesElement(new sngxml::dom::Element(varContainerName));
+        sngxml::dom::Element* prevElement = currentElement;
         currentElement = variablesElement.get();
         for (VariableSymbol* variable : variables)
         {
             AddVariable(*variable);
         }
-        prevElement->AppendChild(std::unique_ptr<dom::Node>(variablesElement.release()));
+        prevElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(variablesElement.release()));
         currentElement = prevElement;
     }
 }
@@ -1778,11 +1778,11 @@ bool SymbolTableXmlFilesUpToDate(Project* project)
     return true;
 }
 
-dom::Document* GetModuleDocument(Input* input, const std::u32string& moduleName)
+sngxml::dom::Document* GetModuleDocument(Input* input, const std::u32string& moduleName)
 {
     for (const auto& p : input->externalModuleDocs)
     {
-        dom::Document* doc = p.get();
+        sngxml::dom::Document* doc = p.get();
         if (doc->DocumentElement()->GetAttribute(U"module") == moduleName)
         {
             return doc;
@@ -1804,13 +1804,13 @@ void GenerateSymbolTableXml(Module* rootModule, std::unordered_map<int, File>& f
     boost::filesystem::create_directories(contentDir);
     std::string moduleDir = GetFullPath(Path::Combine(contentDir, ToUtf8(rootModule->Name())));
     boost::filesystem::create_directories(moduleDir);
-    std::vector<std::unique_ptr<dom::Document>> refModuleXmlDocs;
+    std::vector<std::unique_ptr<sngxml::dom::Document>> refModuleXmlDocs;
     int n = rootModule->AllReferencedModules().size();
     for (int i = 0; i < n; ++i)
     {
         Module* referencedModule = rootModule->AllReferencedModules()[i];
         std::pair<std::string, bool> refModuleXmlDocFilePathExternal = ResolveModuleXmlDocFilePath(input, referencedModule->Name());
-        dom::Document* moduleDoc = nullptr;
+        sngxml::dom::Document* moduleDoc = nullptr;
         std::lock_guard<std::mutex> lock(GetInputMutex());
         if (refModuleXmlDocFilePathExternal.second)
         {
@@ -1822,8 +1822,8 @@ void GenerateSymbolTableXml(Module* rootModule, std::unordered_map<int, File>& f
         }
         if (!moduleDoc)
         {
-            std::unique_ptr<dom::Document> refModuleXmlDoc = dom::ReadDocument(refModuleXmlDocFilePathExternal.first);
-            dom::Document* moduleXmlDoc = refModuleXmlDoc.get();
+            std::unique_ptr<sngxml::dom::Document> refModuleXmlDoc = sngxml::dom::ReadDocument(refModuleXmlDocFilePathExternal.first);
+            sngxml::dom::Document* moduleXmlDoc = refModuleXmlDoc.get();
             if (refModuleXmlDocFilePathExternal.second)
             {
                 input->externalModuleDocs.push_back(std::move(refModuleXmlDoc));
@@ -1852,11 +1852,11 @@ void ReadExternalModuleDocuments(Input* input)
         {
             const std::u32string& moduleName = p.first;
             std::lock_guard<std::mutex> lock(GetInputMutex());
-            dom::Document* moduleDoc = GetModuleDocument(input, moduleName);
+            sngxml::dom::Document* moduleDoc = GetModuleDocument(input, moduleName);
             if (!moduleDoc)
             {
                 std::pair<std::string, bool> refModuleXmlDocFilePathExternal = ResolveModuleXmlDocFilePath(input, moduleName);
-                std::unique_ptr<dom::Document> refModuleXmlDoc = dom::ReadDocument(refModuleXmlDocFilePathExternal.first);
+                std::unique_ptr<sngxml::dom::Document> refModuleXmlDoc = sngxml::dom::ReadDocument(refModuleXmlDocFilePathExternal.first);
                 input->externalModuleDocs.push_back(std::move(refModuleXmlDoc));
             }
         }

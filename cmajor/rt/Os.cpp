@@ -9,10 +9,10 @@
 #ifdef _WIN32
 #include <Windows.h>
 #endif
-#include <cmajor/util/Unicode.hpp>
-#include <cmajor/util/Path.hpp>
-#include <cmajor/util/Time.hpp>
-#include <cmajor/util/MemoryWriter.hpp>
+#include <soulng/util/Unicode.hpp>
+#include <soulng/util/Path.hpp>
+#include <soulng/util/Time.hpp>
+#include <soulng/util/MemoryWriter.hpp>
 
 #ifdef _WIN32
 
@@ -203,7 +203,7 @@ extern "C" RT_API bool OsWriteConsole(void* consoleOutputHandle, const char32_t*
 {
     DWORD numCharsWritten = 0;
     std::u32string s(chars);
-    std::u16string w(cmajor::unicode::ToUtf16(s));
+    std::u16string w(soulng::unicode::ToUtf16(s));
     return WriteConsoleW(consoleOutputHandle, w.c_str(), w.length(), &numCharsWritten, nullptr);
 }
 
@@ -522,7 +522,7 @@ extern "C" RT_API void* OsFindFirstFile(const char* pathMask, char* fileName)
     else
     {
         std::string pathName = &findData.cFileName[0];
-        std::string fname = cmajor::util::Path::GetFileName(pathName);
+        std::string fname = soulng::util::Path::GetFileName(pathName);
         strcpy(fileName, fname.c_str());
         return handle;
     }
@@ -535,7 +535,7 @@ extern "C" RT_API bool OsFindNextFile(void* findHandle, char* fileName)
     if (result)
     {
         std::string pathName = &findData.cFileName[0];
-        std::string fname = cmajor::util::Path::GetFileName(pathName);
+        std::string fname = soulng::util::Path::GetFileName(pathName);
         strcpy(fileName, fname.c_str());
         return true;
     }
@@ -561,9 +561,9 @@ extern "C" RT_API bool OsGetFileTimes(const char* filePath, uint8_t* ctime, uint
         {
             if (SystemTimeToTzSpecificLocalTime(NULL, &systemTime, &localTime))
             {
-                cmajor::util::DateTime dtCreationTime(cmajor::util::Date(localTime.wYear, static_cast<cmajor::util::Month>(localTime.wMonth), localTime.wDay),
+                soulng::util::DateTime dtCreationTime(soulng::util::Date(localTime.wYear, static_cast<soulng::util::Month>(localTime.wMonth), localTime.wDay),
                     60 * 60 * localTime.wHour + 60 * localTime.wMinute + localTime.wSecond);
-                cmajor::util::MemoryWriter ctimeWriter(ctime, 8);
+                soulng::util::MemoryWriter ctimeWriter(ctime, 8);
                 ctimeWriter.Write(dtCreationTime);
             }
             else
@@ -579,9 +579,9 @@ extern "C" RT_API bool OsGetFileTimes(const char* filePath, uint8_t* ctime, uint
         {
             if (SystemTimeToTzSpecificLocalTime(NULL, &systemTime, &localTime))
             {
-                cmajor::util::DateTime dtWriteTime(cmajor::util::Date(localTime.wYear, static_cast<cmajor::util::Month>(localTime.wMonth), localTime.wDay),
+                soulng::util::DateTime dtWriteTime(soulng::util::Date(localTime.wYear, static_cast<soulng::util::Month>(localTime.wMonth), localTime.wDay),
                     60 * 60 * localTime.wHour + 60 * localTime.wMinute + localTime.wSecond);
-                cmajor::util::MemoryWriter mtimeWriter(mtime, 8);
+                soulng::util::MemoryWriter mtimeWriter(mtime, 8);
                 mtimeWriter.Write(dtWriteTime);
             }
             else
@@ -597,9 +597,9 @@ extern "C" RT_API bool OsGetFileTimes(const char* filePath, uint8_t* ctime, uint
         {
             if (SystemTimeToTzSpecificLocalTime(NULL, &systemTime, &localTime))
             {
-                cmajor::util::DateTime dtAccessTime(cmajor::util::Date(localTime.wYear, static_cast<cmajor::util::Month>(localTime.wMonth), localTime.wDay),
+                soulng::util::DateTime dtAccessTime(soulng::util::Date(localTime.wYear, static_cast<soulng::util::Month>(localTime.wMonth), localTime.wDay),
                     60 * 60 * localTime.wHour + 60 * localTime.wMinute + localTime.wSecond);
-                cmajor::util::MemoryWriter atimeWriter(atime, 8);
+                soulng::util::MemoryWriter atimeWriter(atime, 8);
                 atimeWriter.Write(dtAccessTime);
             }
             else

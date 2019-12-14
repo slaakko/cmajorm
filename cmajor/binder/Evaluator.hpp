@@ -7,7 +7,7 @@
 #define CMAJOR_BINDER_EVALUATOR_INCLUDED
 #include <cmajor/symbols/Value.hpp>
 #include <cmajor/symbols/Scope.hpp>
-#include <cmajor/ast/Node.hpp>
+#include <sngcm/ast/Node.hpp>
 
 namespace cmajor { namespace binder {
 
@@ -15,7 +15,7 @@ class BoundCompileUnit;
 class BoundFunction;
 
 using namespace cmajor::symbols;
-using namespace cmajor::ast;
+using namespace sngcm::ast;
 
 std::unique_ptr<Value> Evaluate(Node* node, TypeSymbol* targetType, ContainerScope* containerScope, BoundCompileUnit& boundCompileUnit, bool dontThrow, BoundFunction* currentFunction, const Span& span);
 

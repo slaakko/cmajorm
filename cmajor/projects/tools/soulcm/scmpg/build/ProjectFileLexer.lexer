@@ -1,0 +1,42 @@
+// =================================
+// Copyright (c) 2019 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+classmap ProjectFileClassMap;
+
+tokens ProjectFileTokens
+{
+    (PROJECT, "'project'"), (SOURCE, "'source'"), (ID, "identifier"), (FILEPATH, "file path"), (DOT, "'.'"), (SEMICOLON, "';'")
+}
+
+keywords ProjectFileKeywords
+{
+    ("project", PROJECT), ("source", SOURCE)
+}
+
+expressions
+{
+    ws = "[\n\r\t ]";
+    newline = "\r\n|\n|\r";
+    linecomment = "//[^\n\r]*{newline}";
+    blockcomment = "/\*([^*]|\*[^/])*\*/";
+    comment = "{linecomment}|{blockcomment}";
+    separators = "({ws}|{comment})+";
+    id = "{idstart}{idcont}*";
+    filepath = "<[^\n>]*>";
+}
+
+lexer ProjectFileLexer
+{
+    "{separators}" {}
+    "{id}" { int kw = GetKeywordToken(token.match); if (kw == INVALID_TOKEN) return ID; else return kw; }
+    "{filepath}" { filePath = soulcm.scmpg.MakeFilePath(FileName(), token); return FILEPATH; }
+    "\." { return DOT; }
+    ";" { return SEMICOLON; }
+
+    variables
+    {
+        string filePath;
+    }
+}

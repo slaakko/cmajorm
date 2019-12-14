@@ -1,0 +1,103 @@
+using System;
+
+// this file has been automatically generated from 'D:/work/cmajorm/cmajor/projects/tools/soulcm/scmlg/build/RegExLexer.lexer' using soulcm lexer generator scmlg version 3.0.0
+
+public const int END = 0;
+public const int  = 1;
+public const int  = 2;
+public const int  = 3;
+public const int  = 4;
+public const int  = 5;
+public const int  = 6;
+public const int  = 7;
+public const int  = 8;
+public const int  = 9;
+public const int  = 10;
+public const int  = 11;
+public const int  = 12;
+public const int  = 13;
+public const int  = 14;
+public const int  = 15;
+internal class TokenMap
+{
+    static TokenMap() :
+        instance(new TokenMap())
+    {
+    }
+    public static TokenMap& Instance()
+    {
+        return *instance;
+    }
+    public int GetTokenId(const ustring& tokenName)
+    {
+        System.Collections.Map<ustring, int>.ConstIterator it = tokenIdMap.CFind(tokenName);
+        if (it != tokenIdMap.CEnd())
+        {
+            return it->second;
+        }
+        else
+        {
+            return -1;
+        }
+    }
+    public ustring GetTokenName(int tokenId)
+    {
+        return tokenNameList[tokenId];
+    }
+    public ustring GetTokenInfo(int tokenId)
+    {
+        return tokenInfoList[tokenId];
+    }
+    private TokenMap()
+    {
+        tokenIdMap[u""] = 15;
+        tokenNameList.Add(u"END");
+        tokenInfoList.Add(u"end of file");
+        tokenNameList.Add(u"");
+        tokenInfoList.Add(u"'('");
+        tokenNameList.Add(u"");
+        tokenInfoList.Add(u"')'");
+        tokenNameList.Add(u"");
+        tokenInfoList.Add(u"'['");
+        tokenNameList.Add(u"");
+        tokenInfoList.Add(u"']'");
+        tokenNameList.Add(u"");
+        tokenInfoList.Add(u"'{'");
+        tokenNameList.Add(u"");
+        tokenInfoList.Add(u"'}");
+        tokenNameList.Add(u"");
+        tokenInfoList.Add(u"'|'");
+        tokenNameList.Add(u"");
+        tokenInfoList.Add(u"'*'");
+        tokenNameList.Add(u"");
+        tokenInfoList.Add(u"'+'");
+        tokenNameList.Add(u"");
+        tokenInfoList.Add(u"'?'");
+        tokenNameList.Add(u"");
+        tokenInfoList.Add(u"'.'");
+        tokenNameList.Add(u"");
+        tokenInfoList.Add(u"escape");
+        tokenNameList.Add(u"");
+        tokenInfoList.Add(u"'^'");
+        tokenNameList.Add(u"");
+        tokenInfoList.Add(u"'-'");
+        tokenNameList.Add(u"");
+        tokenInfoList.Add(u"character");
+    }
+    private static System.UniquePtr<TokenMap> instance;
+    private System.Collections.Map<ustring, int> tokenIdMap;
+    private System.Collections.List<ustring> tokenNameList;
+    private System.Collections.List<ustring> tokenInfoList;
+}
+public int GetTokenId(const ustring& tokenName)
+{
+    return TokenMap.Instance().GetTokenId(tokenName);
+}
+public ustring GetTokenName(int tokenId)
+{
+    return TokenMap.Instance().GetTokenName(tokenId);
+}
+public ustring GetTokenInfo(int tokenId)
+{
+    return TokenMap.Instance().GetTokenInfo(tokenId);
+}

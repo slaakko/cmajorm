@@ -8,13 +8,13 @@
 #include <cmajor/parsing/Exception.hpp>
 #include <cmajor/parsing/StdLib.hpp>
 #include <cmajor/parsing/XmlLog.hpp>
-#include <cmajor/util/Unicode.hpp>
+#include <soulng/util/Unicode.hpp>
 #include <cmajor/syntax/Element.hpp>
 
 namespace cmajor { namespace syntax {
 
 using namespace cmajor::parsing;
-using namespace cmajor::util;
+using namespace soulng::util;
 using namespace cmajor::unicode;
 
 Primitive* Primitive::Create()

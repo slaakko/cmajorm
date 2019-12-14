@@ -290,7 +290,7 @@ namespace soulcm.scmlg
         }
         if (p != e)
         {
-            throw Exception("invalid floating literal at " + fileName + ":" + ToString(token.line) + ": " + ToUtf8(ustring(token.match.end, token.match.begin)));
+            throw Exception("invalid floating literal at " + fileName + ":" + ToString(token.line) + ": " + ToUtf8(ustring(token.match.begin, token.match.end)));
         }
         if (floatingLitFloat) floatingLit = ParseFloat(str); else floatingLit = ParseDouble(str);
     }
@@ -348,7 +348,7 @@ namespace soulcm.scmlg
         }
         else
         {
-            throw Exception("invalid integer literal at " + fileName + ":" + ToString(token.line) + ": " + ToUtf8(ustring(token.match.end, token.match.begin)));
+            throw Exception("invalid integer literal at " + fileName + ":" + ToString(token.line) + ": " + ToUtf8(ustring(token.match.begin, token.match.end)));
         }
         if (p != e && (*p == 'u' || *p == 'U'))
         {
@@ -357,7 +357,7 @@ namespace soulcm.scmlg
         }
         if (p != e)
         {
-            throw Exception("invalid integer literal at " + fileName + ":" + ToString(token.line) + ": " + ToUtf8(ustring(token.match.end, token.match.begin)));
+            throw Exception("invalid integer literal at " + fileName + ":" + ToString(token.line) + ": " + ToUtf8(ustring(token.match.begin, token.match.end)));
         }
     }
     public void ParseCharacterLiteral(const string& fileName, const System.Lex.Token& token, uchar& charLit, int& charLitPrefix)
@@ -395,7 +395,7 @@ namespace soulcm.scmlg
                 ustring u = ToUtf32(s);
                 if (u.Length() != 1)
                 {
-                    throw Exception("invalid character literal at " + fileName + ":" + ToString(token.line) + ": " + ToUtf8(ustring(token.match.end, token.match.begin)));
+                    throw Exception("invalid character literal at " + fileName + ":" + ToString(token.line) + ": " + ToUtf8(ustring(token.match.begin, token.match.end)));
                 }
                 charLit = u[0];
             }
@@ -405,12 +405,12 @@ namespace soulcm.scmlg
             }
             if (p != e)
             {
-                throw Exception("invalid character literal at " + fileName + ":" + ToString(token.line) + ": " + ToUtf8(ustring(token.match.end, token.match.begin)));
+                throw Exception("invalid character literal at " + fileName + ":" + ToString(token.line) + ": " + ToUtf8(ustring(token.match.begin, token.match.end)));
             }
         }
         else
         {
-            throw Exception("invalid character literal at " + fileName + ":" + ToString(token.line) + ": " + ToUtf8(ustring(token.match.end, token.match.begin)));
+            throw Exception("invalid character literal at " + fileName + ":" + ToString(token.line) + ": " + ToUtf8(ustring(token.match.begin, token.match.end)));
         }
     }
     public void ParseStringLiteral(const string& fileName, const System.Lex.Token& token, ustring& stringLit, int& stringLitPrefix)
@@ -446,7 +446,7 @@ namespace soulcm.scmlg
                 }
                 if (p != e)
                 {
-                    throw Exception("invalid string literal at " + fileName + ":" + ToString(token.line) + ": " + ToUtf8(ustring(token.match.end, token.match.begin)));
+                    throw Exception("invalid string literal at " + fileName + ":" + ToString(token.line) + ": " + ToUtf8(ustring(token.match.begin, token.match.end)));
                 }
             }
         }
@@ -474,12 +474,12 @@ namespace soulcm.scmlg
                 }
                 if (p != e)
                 {
-                    throw Exception("invalid string literal at " + fileName + ":" + ToString(token.line) + ": " + ToUtf8(ustring(token.match.end, token.match.begin)));
+                    throw Exception("invalid string literal at " + fileName + ":" + ToString(token.line) + ": " + ToUtf8(ustring(token.match.begin, token.match.end)));
                 }
             }
             else
             {
-                throw Exception("invalid string literal at " + fileName + ":" + ToString(token.line) + ": " + ToUtf8(ustring(token.match.end, token.match.begin)));
+                throw Exception("invalid string literal at " + fileName + ":" + ToString(token.line) + ": " + ToUtf8(ustring(token.match.begin, token.match.end)));
             }
         }
     }
@@ -503,7 +503,7 @@ namespace soulcm.scmlg
         }
         if (p != e)
         {
-            throw Exception("invalid file path \'" + ToUtf8(ustring(lexeme.end, lexeme.begin)));
+            throw Exception("invalid file path \'" + ToUtf8(ustring(lexeme.begin, lexeme.end)));
         }
         return ToUtf8(s);
     }

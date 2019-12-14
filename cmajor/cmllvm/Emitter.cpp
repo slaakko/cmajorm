@@ -4,9 +4,9 @@
 // =================================
 
 #include <cmajor/cmllvm/Emitter.hpp>
-#include <cmajor/util/Path.hpp>
-#include <cmajor/util/System.hpp>
-#include <cmajor/util/TextUtils.hpp>
+#include <soulng/util/Path.hpp>
+#include <soulng/util/System.hpp>
+#include <soulng/util/TextUtils.hpp>
 #include <llvm/Support/raw_os_ostream.h>
 #include <llvm/IR/Verifier.h>
 #include <llvm/IR/LegacyPassManager.h>
@@ -16,7 +16,7 @@
 
 namespace cmllvm {
 
-using namespace cmajor::util;
+using namespace soulng::util;
 
 const unsigned cmajorLanguageTag = llvm::dwarf::DW_LANG_C_plus_plus_11; // closest approximation
 
@@ -188,7 +188,7 @@ void* Emitter::CreateDITypeForEnumType(const std::string& name, const std::strin
     {
         elements.push_back(static_cast<llvm::Metadata*>(element));
     }
-    return diBuilder->createEnumerationType(nullptr, name, static_cast<llvm::DIFile*>(GetDebugInfoForFile(span.FileIndex())), span.LineNumber(), sizeInBits, alignInBits,
+    return diBuilder->createEnumerationType(nullptr, name, static_cast<llvm::DIFile*>(GetDebugInfoForFile(span.fileIndex)), span.line, sizeInBits, alignInBits,
         diBuilder->getOrCreateArray(elements), static_cast<llvm::DIType*>(underlyingDIType), mangledName);
 }
 
@@ -315,7 +315,7 @@ llvm::DebugLoc Emitter::GetDebugLocation(const Span& span)
 {
     if (!diCompileUnit || !span.Valid() || !currentDIBuilder) return llvm::DebugLoc();
     int column = GetColumn(span);
-    return llvm::DebugLoc::get(span.LineNumber(), column, static_cast<llvm::DIScope*>(CurrentScope()));
+    return llvm::DebugLoc::get(span.line, column, static_cast<llvm::DIScope*>(CurrentScope()));
 }
 
 void Emitter::ResetCurrentDebugLocation()
@@ -961,7 +961,7 @@ void Emitter::SetDIMemberType(const std::pair<boost::uuids::uuid, int32_t>& memb
 void* Emitter::CreateDIMemberType(void* scope, const std::string& name, const Span& span, uint64_t sizeInBits, uint64_t alignInBits, uint64_t offsetInBits, void* diType)
 {
     llvm::DINode::DIFlags flags = llvm::DINode::DIFlags::FlagZero;
-    return diBuilder->createMemberType(static_cast<llvm::DIType*>(scope), name, static_cast<llvm::DIFile*>(GetDebugInfoForFile(span.FileIndex())), span.LineNumber(), sizeInBits, alignInBits, offsetInBits, flags,
+    return diBuilder->createMemberType(static_cast<llvm::DIType*>(scope), name, static_cast<llvm::DIFile*>(GetDebugInfoForFile(span.fileIndex)), span.line, sizeInBits, alignInBits, offsetInBits, flags,
         static_cast<llvm::DIType*>(diType));
 }
 
@@ -1398,7 +1398,7 @@ void* Emitter::CreateIrDIForwardDeclaration(void* irType, const std::string& nam
     uint64_t sizeInBits = dataLayout->getStructLayout(llvm::cast<llvm::StructType>(static_cast<llvm::Type*>(irType)))->getSizeInBits();
     uint32_t alignInBits = 8 * dataLayout->getStructLayout(llvm::cast<llvm::StructType>(static_cast<llvm::Type*>(irType)))->getAlignment();
     uint64_t offsetInBits = 0; // todo?
-    return diBuilder->createReplaceableCompositeType(llvm::dwarf::DW_TAG_class_type, name, nullptr, static_cast<llvm::DIFile*>(GetDebugInfoForFile(span.FileIndex())), span.LineNumber(),
+    return diBuilder->createReplaceableCompositeType(llvm::dwarf::DW_TAG_class_type, name, nullptr, static_cast<llvm::DIFile*>(GetDebugInfoForFile(span.fileIndex)), span.line,
         0, sizeInBits, alignInBits, llvm::DINode::DIFlags::FlagZero, mangledName);
 }
 
@@ -1423,7 +1423,7 @@ void* Emitter::CreateDITypeForClassType(void* irType, const std::vector<void*>& 
     uint32_t alignInBits = 8 * structLayout->getAlignment();
     uint64_t offsetInBits = 0; // todo?
     llvm::DINode::DIFlags flags = llvm::DINode::DIFlags::FlagZero;
-    return diBuilder->createClassType(static_cast<llvm::DIScope*>(CurrentScope()), name, static_cast<llvm::DIFile*>(GetDebugInfoForFile(classSpan.FileIndex())), classSpan.LineNumber(), sizeInBits, alignInBits, offsetInBits,
+    return diBuilder->createClassType(static_cast<llvm::DIScope*>(CurrentScope()), name, static_cast<llvm::DIFile*>(GetDebugInfoForFile(classSpan.fileIndex)), classSpan.line, sizeInBits, alignInBits, offsetInBits,
         flags, static_cast<llvm::DIType*>(baseClassDIType), diBuilder->getOrCreateArray(elements), static_cast<llvm::DIType*>(vtableHolderClass), templateParams, mangledName);
 }
 
@@ -1617,8 +1617,8 @@ unsigned Emitter::GetFunctionFlags(bool isStatic, unsigned accessFlags, bool isE
 void* Emitter::CreateDIMethod(const std::string& name, const std::string& mangledName, const Span& span, void* subroutineType, unsigned virtuality, unsigned vtableIndex, void* vtableHolder,
     unsigned flags)
 {
-    void* subprogram = diBuilder->createMethod(static_cast<llvm::DIScope*>(CurrentScope()), name, mangledName, static_cast<llvm::DIFile*>(GetDebugInfoForFile(span.FileIndex())),
-        span.LineNumber(), static_cast<llvm::DISubroutineType*>(subroutineType), false, true, virtuality, vtableIndex, 0, static_cast<llvm::DIType*>(vtableHolder),
+    void* subprogram = diBuilder->createMethod(static_cast<llvm::DIScope*>(CurrentScope()), name, mangledName, static_cast<llvm::DIFile*>(GetDebugInfoForFile(span.fileIndex)),
+        span.line, static_cast<llvm::DISubroutineType*>(subroutineType), false, true, virtuality, vtableIndex, 0, static_cast<llvm::DIType*>(vtableHolder),
         static_cast<llvm::DINode::DIFlags>(flags));
     return subprogram;
 }
@@ -1627,8 +1627,8 @@ void* Emitter::CreateDIMethod(const std::string& name, const std::string& mangle
 void* Emitter::CreateDIMethod(const std::string& name, const std::string& mangledName, const Span& span, void* subroutineType, unsigned virtuality, unsigned vtableIndex, void* vtableHolder,
     unsigned flags)
 {
-    void* subprogram = diBuilder->createMethod(static_cast<llvm::DIScope*>(CurrentScope()), name, mangledName, static_cast<llvm::DIFile*>(GetDebugInfoForFile(span.FileIndex())),
-        span.LineNumber(), static_cast<llvm::DISubroutineType*>(subroutineType), vtableIndex, 0, static_cast<llvm::DIType*>(vtableHolder),
+    void* subprogram = diBuilder->createMethod(static_cast<llvm::DIScope*>(CurrentScope()), name, mangledName, static_cast<llvm::DIFile*>(GetDebugInfoForFile(span.fileIndex)),
+        span.line, static_cast<llvm::DISubroutineType*>(subroutineType), vtableIndex, 0, static_cast<llvm::DIType*>(vtableHolder),
         static_cast<llvm::DINode::DIFlags>(flags), llvm::DISubprogram::SPFlagDefinition);
     return subprogram;
 }
@@ -1636,16 +1636,16 @@ void* Emitter::CreateDIMethod(const std::string& name, const std::string& mangle
 /*
 void* Emitter::CreateDIFunction(const std::string& name, const std::string& mangledName, const Span& span, void* subroutineType, unsigned flags)
 {
-    void* subprogram = diBuilder->createFunction(static_cast<llvm::DIScope*>(CurrentScope()), name, mangledName, static_cast<llvm::DIFile*>(GetDebugInfoForFile(span.FileIndex())),
-        span.LineNumber(), static_cast<llvm::DISubroutineType*>(subroutineType), false, true, span.LineNumber(), static_cast<llvm::DINode::DIFlags>(flags));
+    void* subprogram = diBuilder->createFunction(static_cast<llvm::DIScope*>(CurrentScope()), name, mangledName, static_cast<llvm::DIFile*>(GetDebugInfoForFile(span.fileIndex)),
+        span.line, static_cast<llvm::DISubroutineType*>(subroutineType), false, true, span.line, static_cast<llvm::DINode::DIFlags>(flags));
     return subprogram;
 }
 */
 
 void* Emitter::CreateDIFunction(const std::string& name, const std::string& mangledName, const Span& span, void* subroutineType, unsigned flags)
 {
-    void* subprogram = diBuilder->createFunction(static_cast<llvm::DIScope*>(CurrentScope()), name, mangledName, static_cast<llvm::DIFile*>(GetDebugInfoForFile(span.FileIndex())),
-        span.LineNumber(), static_cast<llvm::DISubroutineType*>(subroutineType), span.LineNumber(), static_cast<llvm::DINode::DIFlags>(flags),
+    void* subprogram = diBuilder->createFunction(static_cast<llvm::DIScope*>(CurrentScope()), name, mangledName, static_cast<llvm::DIFile*>(GetDebugInfoForFile(span.fileIndex)),
+        span.line, static_cast<llvm::DISubroutineType*>(subroutineType), span.line, static_cast<llvm::DINode::DIFlags>(flags),
         llvm::DISubprogram::SPFlagDefinition);
     return subprogram;
 }
@@ -1662,8 +1662,8 @@ void* Emitter::CreateAlloca(void* irType)
 
 void* Emitter::CreateDIParameterVariable(const std::string& name, int index, const Span& span, void* irType, void* allocaInst)
 {
-    llvm::DILocalVariable* paramVar = diBuilder->createParameterVariable(static_cast<llvm::DIScope*>(CurrentScope()), name, index, static_cast<llvm::DIFile*>(GetDebugInfoForFile(span.FileIndex())),
-        span.LineNumber(), static_cast<llvm::DIType*>(irType));
+    llvm::DILocalVariable* paramVar = diBuilder->createParameterVariable(static_cast<llvm::DIScope*>(CurrentScope()), name, index, static_cast<llvm::DIFile*>(GetDebugInfoForFile(span.fileIndex)),
+        span.line, static_cast<llvm::DIType*>(irType));
     llvm::SmallVector<int64_t, 13> expr; // todo
     diBuilder->insertDeclare(static_cast<llvm::Value*>(allocaInst), paramVar, diBuilder->createExpression(expr), GetDebugLocation(span), builder.GetInsertBlock());
     return paramVar;
@@ -1671,8 +1671,8 @@ void* Emitter::CreateDIParameterVariable(const std::string& name, int index, con
 
 void* Emitter::CreateDIAutoVariable(const std::string& name, const Span& span, void* irType, void* allocaInst)
 {
-    llvm::DILocalVariable* localVar = diBuilder->createAutoVariable(static_cast<llvm::DIScope*>(CurrentScope()), name, static_cast<llvm::DIFile*>(GetDebugInfoForFile(span.FileIndex())),
-        span.LineNumber(), static_cast<llvm::DIType*>(irType));
+    llvm::DILocalVariable* localVar = diBuilder->createAutoVariable(static_cast<llvm::DIScope*>(CurrentScope()), name, static_cast<llvm::DIFile*>(GetDebugInfoForFile(span.fileIndex)),
+        span.line, static_cast<llvm::DIType*>(irType));
     llvm::SmallVector<int64_t, 13> expr; // todo
     diBuilder->insertDeclare(static_cast<llvm::Value*>(allocaInst), localVar, diBuilder->createExpression(expr), GetDebugLocation(span), builder.GetInsertBlock());
     return localVar;
@@ -1716,8 +1716,8 @@ void Emitter::AddUWTableAttribute(void* function)
 
 void* Emitter::CreateLexicalBlock(const Span& span)
 {
-    llvm::DILexicalBlock* block = diBuilder->createLexicalBlock(static_cast<llvm::DIScope*>(CurrentScope()), static_cast<llvm::DIFile*>(GetDebugInfoForFile(span.FileIndex())),
-        span.LineNumber(), GetColumn(span));
+    llvm::DILexicalBlock* block = diBuilder->createLexicalBlock(static_cast<llvm::DIScope*>(CurrentScope()), static_cast<llvm::DIFile*>(GetDebugInfoForFile(span.fileIndex)),
+        span.line, GetColumn(span));
     PushScope(block);
     return block;
 }

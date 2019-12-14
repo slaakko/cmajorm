@@ -5,7 +5,7 @@
 
 #include <cmajor/cmsxi/Metadata.hpp>
 #include <cmajor/cmsxi/BasicBlock.hpp>
-#include <cmajor/util/TextUtils.hpp>
+#include <soulng/util/TextUtils.hpp>
 
 namespace cmsxi {
 

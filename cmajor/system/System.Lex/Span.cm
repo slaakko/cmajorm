@@ -30,4 +30,8 @@ namespace System.Lex
         public int start;
         public int end;
     }
+    public bool operator==(const Span& left, const Span& right)
+    {
+        return left.fileIndex == right.fileIndex && left.line == right.line && left.start == right.start && left.end == right.end;
+    }
 } // namespace System.Lex

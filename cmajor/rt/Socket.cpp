@@ -7,8 +7,8 @@
 #include <cmajor/rt/Io.hpp>
 #include <cmajor/rt/Error.hpp>
 #include <cmajor/rt/InitDone.hpp>
-#include <cmajor/util/Error.hpp>
-#include <cmajor/util/TextUtils.hpp>
+#include <soulng/util/Error.hpp>
+#include <soulng/util/TextUtils.hpp>
 #include <memory>
 #include <vector>
 #include <atomic>
@@ -36,7 +36,7 @@
 
 namespace cmajor { namespace rt {
 
-using namespace cmajor::util;
+using namespace soulng::util;
 
 struct SocketData
 {

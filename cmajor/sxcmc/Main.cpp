@@ -3,9 +3,8 @@
 // Distributed under the MIT license
 // =================================
 
-#include <cmajor/ast/InitDone.hpp>
-#include <cmajor/parsing/InitDone.hpp>
-#include <cmajor/util/InitDone.hpp>
+#include <sngcm/ast/InitDone.hpp>
+#include <soulng/util/InitDone.hpp>
 #include <cmajor/build/Build.hpp>
 #include <cmajor/cmmid/InitDone.hpp>
 #include <cmajor/symbols/Exception.hpp>
@@ -13,14 +12,14 @@
 #include <cmajor/symbols/GlobalFlags.hpp>
 #include <cmajor/symbols/ModuleCache.hpp>
 #include <cmajor/symbols/Warning.hpp>
-#include <cmajor/parsing/Exception.hpp>
-#include <cmajor/dom/Document.hpp>
-#include <cmajor/dom/Element.hpp>
-#include <cmajor/dom/CharacterData.hpp>
-#include <cmajor/util/Util.hpp>
-#include <cmajor/util/Path.hpp>
-#include <cmajor/util/Json.hpp>
-#include <cmajor/util/Unicode.hpp>
+#include <sngxml/dom/Document.hpp>
+#include <sngxml/dom/Element.hpp>
+#include <sngxml/dom/CharacterData.hpp>
+#include <soulng/lexer/ParsingException.hpp>
+#include <soulng/util/Util.hpp>
+#include <soulng/util/Path.hpp>
+#include <soulng/util/Json.hpp>
+#include <soulng/util/Unicode.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/lexical_cast.hpp>
 #include <iostream>
@@ -32,17 +31,15 @@ struct InitDone
 {
     InitDone()
     {
-        cmajor::ast::Init();
+        soulng::util::Init();
+        sngcm::ast::Init();
         cmajor::symbols::Init();
-        cmajor::parsing::Init();
-        cmajor::util::Init();
     }
     ~InitDone()
     {
-        cmajor::util::Done();
-        cmajor::parsing::Done();
         cmajor::symbols::Done();
-        cmajor::ast::Done();
+        sngcm::ast::Done();
+        soulng::util::Done();
     }
 };
 
@@ -111,10 +108,9 @@ void PrintHelp()
         std::endl;
 }
 
-using namespace cmajor::util;
-using namespace cmajor::unicode;
+using namespace soulng::util;
+using namespace soulng::unicode;
 using namespace cmajor::symbols;
-using namespace cmajor::parsing;
 using namespace cmajor::build;
 
 int main(int argc, const char** argv)
@@ -419,7 +415,7 @@ int main(int argc, const char** argv)
             }
         }
     }
-    catch (const ParsingException& ex)
+    catch (const soulng::lexer::ParsingException& ex)
     {
         if (!GetGlobalFlag(GlobalFlags::quiet))
         {

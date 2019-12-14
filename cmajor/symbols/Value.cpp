@@ -8,11 +8,11 @@
 #include <cmajor/symbols/Exception.hpp>
 #include <cmajor/symbols/SymbolTable.hpp>
 #include <cmajor/symbols/Module.hpp>
-#include <cmajor/util/Unicode.hpp>
+#include <soulng/util/Unicode.hpp>
 
 namespace cmajor { namespace symbols {
 
-using namespace cmajor::unicode;
+using namespace soulng::unicode;
 
 const char* valueTypeStr[]
 {
@@ -247,10 +247,10 @@ Value::~Value()
 {
 }
 
-std::unique_ptr<dom::Element> Value::ToDomElement()
+std::unique_ptr<sngxml::dom::Element> Value::ToDomElement()
 {
     std::u32string className = ToUtf32(ClassName());
-    std::unique_ptr<dom::Element> element(new dom::Element(className));
+    std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(className));
     element->SetAttribute(U"info", ToUtf32(ToString()));
     return element;
 }

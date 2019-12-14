@@ -1,0 +1,955 @@
+using System;
+using System.Collections;
+
+// this file has been semiautomatically generated from 'D:/work/soulngcm/soulngcm/sngcmpg/CodeEmittingVisitor.hpp' using cpp2cm version 1.0.0
+
+// this file has been semiautomatically generated from 'D:/work/soulngcm/soulngcm/sngcmpg/CodeEmittingVisitor.cpp' using cpp2cm version 1.0.0
+
+namespace soulcm.scmpg
+{
+    public class CodeEmittingVisitor : Cm.Ast.Visitor
+    {
+        public CodeEmittingVisitor(bool valueOfPtrType_, const ustring& nonterminalName_, const List<NonterminalInfo>& nonterminalInfos_, Cm.Ast.Node* returnType_, bool noParserDebugSupport_, const ustring& parserName_) :
+            valueOfPtrType(valueOfPtrType_), nonterminalName(nonterminalName_), nonterminalInfos(nonterminalInfos_), returnType(returnType_), noParserDebugSupport(noParserDebugSupport_), parserName(parserName_)
+        {
+        }
+        public Cm.Ast.CompoundStatementNode* GetCode()
+        {
+            if (!node.IsNull() && node->GetNodeType() == NodeType.compoundStatementNode)
+            {
+                return cast<Cm.Ast.CompoundStatementNode*>(node.Release());
+            }
+            else
+            {
+                throw Exception("no code");
+            }
+        }
+        public override void Visit(Cm.Ast.IdentifierNode& identifierNode)
+        {
+            Cm.Ast.CloneContext cloneContext;
+            bool set = false;
+            for (NonterminalInfo& info : nonterminalInfos)
+            {
+                if (identifierNode.Str() == info.name)
+                {
+                    if (info.ptrType)
+                    {
+                        node.Reset(new Cm.Ast.InvokeNode(System.Lex.Span(), new Cm.Ast.DotNode(System.Lex.Span(), cast<Cm.Ast.IdentifierNode*>(identifierNode.Clone(cloneContext)), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"Release"))));
+                        set = true;
+                        break;
+                    }
+                    else
+                    {
+                        node.Reset(new Cm.Ast.ArrowNode(System.Lex.Span(), identifierNode.Clone(cloneContext), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"value")));
+                        set = true;
+                        break;
+                    }
+                }
+            }
+            if (!set)
+            {
+                node.Reset(new Cm.Ast.IdentifierNode(System.Lex.Span(), identifierNode.Str()));
+            }
+        }
+        public override void Visit(Cm.Ast.BoolNode& boolNode)
+        {
+            node.Reset(new Cm.Ast.BoolNode(System.Lex.Span()));
+        }
+        public override void Visit(Cm.Ast.SByteNode& sbyteNode)
+        {
+            node.Reset(new Cm.Ast.SByteNode(System.Lex.Span()));
+        }
+        public override void Visit(Cm.Ast.ByteNode& byteNode)
+        {
+            node.Reset(new Cm.Ast.ByteNode(System.Lex.Span()));
+        }
+        public override void Visit(Cm.Ast.ShortNode& shortNode)
+        {
+            node.Reset(new Cm.Ast.ShortNode(System.Lex.Span()));
+        }
+        public override void Visit(Cm.Ast.UShortNode& ushortNode)
+        {
+            node.Reset(new Cm.Ast.UShortNode(System.Lex.Span()));
+        }
+        public override void Visit(Cm.Ast.IntNode& intNode)
+        {
+            node.Reset(new Cm.Ast.IntNode(System.Lex.Span()));
+        }
+        public override void Visit(Cm.Ast.UIntNode& uintNode)
+        {
+            node.Reset(new Cm.Ast.UIntNode(System.Lex.Span()));
+        }
+        public override void Visit(Cm.Ast.LongNode& longNode)
+        {
+            node.Reset(new Cm.Ast.LongNode(System.Lex.Span()));
+        }
+        public override void Visit(Cm.Ast.ULongNode& ulongNode)
+        {
+            node.Reset(new Cm.Ast.ULongNode(System.Lex.Span()));
+        }
+        public override void Visit(Cm.Ast.FloatNode& floatNode)
+        {
+            node.Reset(new Cm.Ast.FloatNode(System.Lex.Span()));
+        }
+        public override void Visit(Cm.Ast.DoubleNode& doubleNode)
+        {
+            node.Reset(new Cm.Ast.DoubleNode(System.Lex.Span()));
+        }
+        public override void Visit(Cm.Ast.CharNode& charNode)
+        {
+            node.Reset(new Cm.Ast.CharNode(System.Lex.Span()));
+        }
+        public override void Visit(Cm.Ast.WCharNode& wcharNode)
+        {
+            node.Reset(new Cm.Ast.WCharNode(System.Lex.Span()));
+        }
+        public override void Visit(Cm.Ast.UCharNode& ucharNode)
+        {
+            node.Reset(new Cm.Ast.UCharNode(System.Lex.Span()));
+        }
+        public override void Visit(Cm.Ast.VoidNode& voidNode)
+        {
+            node.Reset(new Cm.Ast.VoidNode(System.Lex.Span()));
+        }
+        public override void Visit(Cm.Ast.BooleanLiteralNode& booleanLiteralNode)
+        {
+            Cm.Ast.CloneContext cloneContext;
+            node.Reset(booleanLiteralNode.Clone(cloneContext));
+        }
+        public override void Visit(Cm.Ast.SByteLiteralNode& sbyteLiteralNode)
+        {
+            Cm.Ast.CloneContext cloneContext;
+            node.Reset(sbyteLiteralNode.Clone(cloneContext));
+        }
+        public override void Visit(Cm.Ast.ByteLiteralNode& byteLiteralNode)
+        {
+            Cm.Ast.CloneContext cloneContext;
+            node.Reset(byteLiteralNode.Clone(cloneContext));
+        }
+        public override void Visit(Cm.Ast.ShortLiteralNode& shortLiteralNode)
+        {
+            Cm.Ast.CloneContext cloneContext;
+            node.Reset(shortLiteralNode.Clone(cloneContext));
+        }
+        public override void Visit(Cm.Ast.UShortLiteralNode& ushortLiteralNode)
+        {
+            Cm.Ast.CloneContext cloneContext;
+            node.Reset(ushortLiteralNode.Clone(cloneContext));
+        }
+        public override void Visit(Cm.Ast.IntLiteralNode& intLiteralNode)
+        {
+            Cm.Ast.CloneContext cloneContext;
+            node.Reset(intLiteralNode.Clone(cloneContext));
+        }
+        public override void Visit(Cm.Ast.UIntLiteralNode& uintLiteralNode)
+        {
+            Cm.Ast.CloneContext cloneContext;
+            node.Reset(uintLiteralNode.Clone(cloneContext));
+        }
+        public override void Visit(Cm.Ast.LongLiteralNode& longLiteralNode)
+        {
+            Cm.Ast.CloneContext cloneContext;
+            node.Reset(longLiteralNode.Clone(cloneContext));
+        }
+        public override void Visit(Cm.Ast.ULongLiteralNode& ulongLiteralNode)
+        {
+            Cm.Ast.CloneContext cloneContext;
+            node.Reset(ulongLiteralNode.Clone(cloneContext));
+        }
+        public override void Visit(Cm.Ast.FloatLiteralNode& floatLiteralNode)
+        {
+            Cm.Ast.CloneContext cloneContext;
+            node.Reset(floatLiteralNode.Clone(cloneContext));
+        }
+        public override void Visit(Cm.Ast.DoubleLiteralNode& doubleLiteralNode)
+        {
+            Cm.Ast.CloneContext cloneContext;
+            node.Reset(doubleLiteralNode.Clone(cloneContext));
+        }
+        public override void Visit(Cm.Ast.CharLiteralNode& charLiteralNode)
+        {
+            Cm.Ast.CloneContext cloneContext;
+            node.Reset(charLiteralNode.Clone(cloneContext));
+        }
+        public override void Visit(Cm.Ast.WCharLiteralNode& wcharLiteralNode)
+        {
+            Cm.Ast.CloneContext cloneContext;
+            node.Reset(wcharLiteralNode.Clone(cloneContext));
+        }
+        public override void Visit(Cm.Ast.UCharLiteralNode& ucharLiteralNode)
+        {
+            Cm.Ast.CloneContext cloneContext;
+            node.Reset(ucharLiteralNode.Clone(cloneContext));
+        }
+        public override void Visit(Cm.Ast.StringLiteralNode& stringLiteralNode)
+        {
+            Cm.Ast.CloneContext cloneContext;
+            node.Reset(stringLiteralNode.Clone(cloneContext));
+        }
+        public override void Visit(Cm.Ast.WStringLiteralNode& wstringLiteralNode)
+        {
+            Cm.Ast.CloneContext cloneContext;
+            node.Reset(wstringLiteralNode.Clone(cloneContext));
+        }
+        public override void Visit(Cm.Ast.UStringLiteralNode& ustringLiteralNode)
+        {
+            Cm.Ast.CloneContext cloneContext;
+            node.Reset(ustringLiteralNode.Clone(cloneContext));
+        }
+        public override void Visit(Cm.Ast.NullLiteralNode& nullLiteralNode)
+        {
+            Cm.Ast.CloneContext cloneContext;
+            node.Reset(nullLiteralNode.Clone(cloneContext));
+        }
+        public override void Visit(Cm.Ast.ArrayLiteralNode& arrayLiteralNode)
+        {
+            Cm.Ast.ArrayLiteralNode* clone = new Cm.Ast.ArrayLiteralNode(System.Lex.Span());
+            int n = arrayLiteralNode.Values().Count();
+            for (int i = 0; i < n; ++i)
+            {
+                arrayLiteralNode.Values()[i]->Accept(*this);
+                clone->AddValue(node.Release());
+            }
+            node.Reset(clone);
+        }
+        public override void Visit(Cm.Ast.StructuredLiteralNode& structuredLiteralNode)
+        {
+            Cm.Ast.StructuredLiteralNode* clone = new Cm.Ast.StructuredLiteralNode(System.Lex.Span());
+            int n = structuredLiteralNode.Members().Count();
+            for (int i = 0; i < n; ++i)
+            {
+                structuredLiteralNode.Members()[i]->Accept(*this);
+                clone->AddMember(node.Release());
+            }
+            node.Reset(clone);
+        }
+        public override void Visit(Cm.Ast.UuidLiteralNode& uuidLiteralNode)
+        {
+            Cm.Ast.CloneContext cloneContext;
+            node.Reset(uuidLiteralNode.Clone(cloneContext));
+        }
+        public override void Visit(Cm.Ast.LabeledStatementNode& labeledStatementNode)
+        {
+            labeledStatementNode.Stmt()->Accept(*this);
+            Cm.Ast.LabeledStatementNode* clone = new Cm.Ast.LabeledStatementNode(System.Lex.Span(), cast<Cm.Ast.StatementNode*>(node.Release()));
+            Cm.Ast.CloneContext cloneContext;
+            clone->SetLabelNode(cast<Cm.Ast.LabelNode*>(labeledStatementNode.Label()->Clone(cloneContext)));
+            node.Reset(clone);
+        }
+        public override void Visit(Cm.Ast.CompoundStatementNode& compoundStatementNode)
+        {
+            Cm.Ast.CompoundStatementNode* clone = new Cm.Ast.CompoundStatementNode(System.Lex.Span());
+            int n = compoundStatementNode.Statements().Count();
+            for (int i = 0; i < n; ++i)
+            {
+                compoundStatementNode.Statements()[i]->Accept(*this);
+                clone->AddStatement(cast<Cm.Ast.StatementNode*>(node.Release()));
+            }
+            node.Reset(clone);
+        }
+        public override void Visit(Cm.Ast.ReturnStatementNode& returnStatementNode)
+        {
+            Cm.Ast.CloneContext cloneContext;
+            Cm.Ast.Node* retVal = null;
+            if ((returnStatementNode.Expression() != null))
+            {
+                Cm.Ast.InvokeNode* returnValue = new Cm.Ast.InvokeNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"Match"));
+                retVal = returnValue;
+                returnValue->AddArgument(new Cm.Ast.BooleanLiteralNode(System.Lex.Span(), true));
+                returnStatementNode.Expression()->Accept(*this);
+                if (valueOfPtrType)
+                {
+                    returnValue->AddArgument(node.Release());
+                }
+                else
+                {
+                    Cm.Ast.TemplateIdNode* valueType = new Cm.Ast.TemplateIdNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"Value"));
+                    valueType->AddTemplateArgument(returnType->Clone(cloneContext));
+                    Cm.Ast.NewNode* newNode = new Cm.Ast.NewNode(System.Lex.Span(), valueType);
+                    newNode->AddArgument(node.Release());
+                    returnValue->AddArgument(newNode);
+                }
+            }
+            node.Reset(new Cm.Ast.ReturnStatementNode(System.Lex.Span(), retVal));
+            if (!noParserDebugSupport)
+            {
+                Cm.Ast.CompoundStatementNode* debugBlock = new Cm.Ast.CompoundStatementNode(System.Lex.Span());
+                Cm.Ast.ConditionalCompilationStatementNode* ccstmt = new Cm.Ast.ConditionalCompilationStatementNode(System.Lex.Span(), new Cm.Ast.ConditionalCompilationPrimaryNode(System.Lex.Span(), u"DEBUG"));
+                Cm.Ast.InvokeNode* writeSuccessToLog = new Cm.Ast.InvokeNode(System.Lex.Span(), new Cm.Ast.DotNode(System.Lex.Span(), new Cm.Ast.DotNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"System"), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"Lex")), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"WriteSuccessToLog")));
+                writeSuccessToLog->AddArgument(new Cm.Ast.IdentifierNode(System.Lex.Span(), u"lexer"));
+                writeSuccessToLog->AddArgument(new Cm.Ast.IdentifierNode(System.Lex.Span(), u"debugSpan"));
+                writeSuccessToLog->AddArgument(new Cm.Ast.UStringLiteralNode(System.Lex.Span(), parserName));
+                Cm.Ast.ExpressionStatementNode* expressionStmt = new Cm.Ast.ExpressionStatementNode(System.Lex.Span(), writeSuccessToLog);
+                Cm.Ast.IfStatementNode* ifS = new Cm.Ast.IfStatementNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"writeToLog"), expressionStmt, null);
+                ccstmt->AddIfStatement(ifS);
+                debugBlock->AddStatement(ccstmt);
+                debugBlock->AddStatement(cast<Cm.Ast.StatementNode*>(node.Release()));
+                node.Reset(debugBlock);
+            }
+        }
+        public override void Visit(Cm.Ast.IfStatementNode& ifStatementNode)
+        {
+            ifStatementNode.Condition()->Accept(*this);
+            Cm.Ast.Node* cond = node.Release();
+            ifStatementNode.ThenS()->Accept(*this);
+            Cm.Ast.StatementNode* thenS = cast<Cm.Ast.StatementNode*>(node.Release());
+            Cm.Ast.StatementNode* elseS = null;
+            if ((ifStatementNode.ElseS() != null))
+            {
+                ifStatementNode.ElseS()->Accept(*this);
+                elseS = cast<Cm.Ast.StatementNode*>(node.Release());
+            }
+            Cm.Ast.IfStatementNode* clone = new Cm.Ast.IfStatementNode(System.Lex.Span(), cond, thenS, elseS);
+            node.Reset(clone);
+        }
+        public override void Visit(Cm.Ast.WhileStatementNode& whileStatementNode)
+        {
+            whileStatementNode.Condition()->Accept(*this);
+            Cm.Ast.Node* cond = node.Release();
+            whileStatementNode.Statement()->Accept(*this);
+            Cm.Ast.StatementNode* stmt = cast<Cm.Ast.StatementNode*>(node.Release());
+            Cm.Ast.WhileStatementNode* clone = new Cm.Ast.WhileStatementNode(System.Lex.Span(), cond, stmt);
+            node.Reset(clone);
+        }
+        public override void Visit(Cm.Ast.DoStatementNode& doStatementNode)
+        {
+            doStatementNode.Statement()->Accept(*this);
+            Cm.Ast.StatementNode* stmt = cast<Cm.Ast.StatementNode*>(node.Release());
+            doStatementNode.Condition()->Accept(*this);
+            Cm.Ast.Node* cond = node.Release();
+            Cm.Ast.DoStatementNode* clone = new Cm.Ast.DoStatementNode(System.Lex.Span(), stmt, cond);
+            node.Reset(clone);
+        }
+        public override void Visit(Cm.Ast.ForStatementNode& forStatementNode)
+        {
+            forStatementNode.InitS()->Accept(*this);
+            Cm.Ast.StatementNode* initS = cast<Cm.Ast.StatementNode*>(node.Release());
+            Cm.Ast.Node* cond = null;
+            if ((forStatementNode.Condition() != null))
+            {
+                forStatementNode.Condition()->Accept(*this);
+                cond = node.Release();
+            }
+            forStatementNode.LoopS()->Accept(*this);
+            Cm.Ast.StatementNode* loopS = cast<Cm.Ast.StatementNode*>(node.Release());
+            forStatementNode.ActionS()->Accept(*this);
+            Cm.Ast.StatementNode* actionS = cast<Cm.Ast.StatementNode*>(node.Release());
+            Cm.Ast.ForStatementNode* clone = new Cm.Ast.ForStatementNode(System.Lex.Span(), initS, cond, loopS, actionS);
+            node.Reset(clone);
+        }
+        public override void Visit(Cm.Ast.BreakStatementNode& breakStatementNode)
+        {
+            node.Reset(new Cm.Ast.BreakStatementNode(System.Lex.Span()));
+        }
+        public override void Visit(Cm.Ast.ContinueStatementNode& continueStatementNode)
+        {
+            node.Reset(new Cm.Ast.ContinueStatementNode(System.Lex.Span()));
+        }
+        public override void Visit(Cm.Ast.GotoStatementNode& gotoStatementNode)
+        {
+            Cm.Ast.GotoStatementNode* clone = new Cm.Ast.GotoStatementNode(System.Lex.Span(), gotoStatementNode.Target());
+            node.Reset(clone);
+        }
+        public override void Visit(Cm.Ast.ConstructionStatementNode& constructionStatementNode)
+        {
+            constructionStatementNode.TypeExpr()->Accept(*this);
+            Cm.Ast.Node* typeExpr = node.Release();
+            constructionStatementNode.Id()->Accept(*this);
+            Cm.Ast.IdentifierNode* id = cast<Cm.Ast.IdentifierNode*>(node.Release());
+            Cm.Ast.ConstructionStatementNode* clone = new Cm.Ast.ConstructionStatementNode(System.Lex.Span(), typeExpr, id);
+            if (constructionStatementNode.Empty())
+            {
+                clone->SetEmpty();
+            }
+            else
+            {
+                if (constructionStatementNode.Assignment())
+                {
+                    clone->SetAssignment();
+                }
+                int n = constructionStatementNode.Arguments().Count();
+                for (int i = 0; i < n; ++i)
+                {
+                    constructionStatementNode.Arguments()[i]->Accept(*this);
+                    clone->AddArgument(node.Release());
+                }
+            }
+            node.Reset(clone);
+        }
+        public override void Visit(Cm.Ast.DeleteStatementNode& deleteStatementNode)
+        {
+            deleteStatementNode.Expression()->Accept(*this);
+            Cm.Ast.DeleteStatementNode* clone = new Cm.Ast.DeleteStatementNode(System.Lex.Span(), node.Release());
+            node.Reset(clone);
+        }
+        public override void Visit(Cm.Ast.DestroyStatementNode& destroyStatementNode)
+        {
+            destroyStatementNode.Expression()->Accept(*this);
+            Cm.Ast.DestroyStatementNode* clone = new Cm.Ast.DestroyStatementNode(System.Lex.Span(), node.Release());
+            node.Reset(clone);
+        }
+        public override void Visit(Cm.Ast.AssignmentStatementNode& assignmentStatementNode)
+        {
+            assignmentStatementNode.TargetExpr()->Accept(*this);
+            Cm.Ast.Node* targetExpr = node.Release();
+            assignmentStatementNode.SourceExpr()->Accept(*this);
+            Cm.Ast.Node* sourceExpr = node.Release();
+            node.Reset(new Cm.Ast.AssignmentStatementNode(System.Lex.Span(), targetExpr, sourceExpr));
+        }
+        public override void Visit(Cm.Ast.ExpressionStatementNode& expressionStatementNode)
+        {
+            expressionStatementNode.Expression()->Accept(*this);
+            node.Reset(new Cm.Ast.ExpressionStatementNode(System.Lex.Span(), node.Release()));
+        }
+        public override void Visit(Cm.Ast.EmptyStatementNode& emptyStatementNode)
+        {
+            node.Reset(new Cm.Ast.EmptyStatementNode(System.Lex.Span()));
+        }
+        public override void Visit(Cm.Ast.RangeForStatementNode& rangeForStatementNode)
+        {
+            rangeForStatementNode.TypeExpr()->Accept(*this);
+            Cm.Ast.Node* typeExpr = node.Release();
+            rangeForStatementNode.Id()->Accept(*this);
+            Cm.Ast.IdentifierNode* id = cast<Cm.Ast.IdentifierNode*>(node.Release());
+            rangeForStatementNode.Container()->Accept(*this);
+            Cm.Ast.Node* container = node.Release();
+            rangeForStatementNode.Action()->Accept(*this);
+            Cm.Ast.StatementNode* action = cast<Cm.Ast.StatementNode*>(node.Release());
+            node.Reset(new Cm.Ast.RangeForStatementNode(System.Lex.Span(), typeExpr, id, container, action));
+        }
+        public override void Visit(Cm.Ast.SwitchStatementNode& switchStatementNode)
+        {
+            switchStatementNode.Condition()->Accept(*this);
+            Cm.Ast.Node* cond = node.Release();
+            Cm.Ast.SwitchStatementNode* clone = new Cm.Ast.SwitchStatementNode(System.Lex.Span(), cond);
+            int nc = switchStatementNode.Cases().Count();
+            for (int i = 0; i < nc; ++i)
+            {
+                switchStatementNode.Cases()[i]->Accept(*this);
+                clone->AddCase(cast<Cm.Ast.CaseStatementNode*>(node.Release()));
+            }
+            if ((switchStatementNode.Default() != null))
+            {
+                switchStatementNode.Default()->Accept(*this);
+                clone->SetDefault(cast<Cm.Ast.DefaultStatementNode*>(node.Release()));
+            }
+            node.Reset(clone);
+        }
+        public override void Visit(Cm.Ast.CaseStatementNode& caseStatementNode)
+        {
+            Cm.Ast.CaseStatementNode* clone = new Cm.Ast.CaseStatementNode(System.Lex.Span());
+            int ne = caseStatementNode.CaseExprs().Count();
+            for (int i = 0; i < ne; ++i)
+            {
+                caseStatementNode.CaseExprs()[i]->Accept(*this);
+                clone->AddCaseExpr(node.Release());
+            }
+            int ns = caseStatementNode.Statements().Count();
+            for (int i = 0; i < ns; ++i)
+            {
+                caseStatementNode.Statements()[i]->Accept(*this);
+                clone->AddStatement(cast<Cm.Ast.StatementNode*>(node.Release()));
+            }
+            node.Reset(clone);
+        }
+        public override void Visit(Cm.Ast.DefaultStatementNode& defaultStatementNode)
+        {
+            Cm.Ast.DefaultStatementNode* clone = new Cm.Ast.DefaultStatementNode(System.Lex.Span());
+            int n = defaultStatementNode.Statements().Count();
+            for (int i = 0; i < n; ++i)
+            {
+                defaultStatementNode.Statements()[i]->Accept(*this);
+                clone->AddStatement(cast<Cm.Ast.StatementNode*>(node.Release()));
+            }
+            node.Reset(clone);
+        }
+        public override void Visit(Cm.Ast.GotoCaseStatementNode& gotoCaseStatementNode)
+        {
+            gotoCaseStatementNode.CaseExpr()->Accept(*this);
+            Cm.Ast.GotoCaseStatementNode* clone = new Cm.Ast.GotoCaseStatementNode(System.Lex.Span(), node.Release());
+            node.Reset(clone);
+        }
+        public override void Visit(Cm.Ast.GotoDefaultStatementNode& gotoDefaultStatementNode)
+        {
+            node.Reset(new Cm.Ast.GotoDefaultStatementNode(System.Lex.Span()));
+        }
+        public override void Visit(Cm.Ast.ThrowStatementNode& throwStatementNode)
+        {
+            Cm.Ast.Node* expr = null;
+            if ((throwStatementNode.Expression() != null))
+            {
+                throwStatementNode.Expression()->Accept(*this);
+                expr = node.Release();
+            }
+            Cm.Ast.ThrowStatementNode* clone = new Cm.Ast.ThrowStatementNode(System.Lex.Span(), expr);
+            node.Reset(clone);
+        }
+        public override void Visit(Cm.Ast.TryStatementNode& tryStatementNode)
+        {
+            tryStatementNode.TryBlock()->Accept(*this);
+            Cm.Ast.CompoundStatementNode* tryBlock = cast<Cm.Ast.CompoundStatementNode*>(node.Release());
+            Cm.Ast.TryStatementNode* clone = new Cm.Ast.TryStatementNode(System.Lex.Span(), tryBlock);
+            int n = tryStatementNode.Catches().Count();
+            for (int i = 0; i < n; ++i)
+            {
+                tryStatementNode.Catches()[i]->Accept(*this);
+                Cm.Ast.CatchNode* catchNode = cast<Cm.Ast.CatchNode*>(node.Release());
+                clone->AddCatch(catchNode);
+            }
+            node.Reset(clone);
+        }
+        public override void Visit(Cm.Ast.CatchNode& catchNode)
+        {
+            catchNode.TypeExpr()->Accept(*this);
+            Cm.Ast.Node* typeExpr = node.Release();
+            Cm.Ast.IdentifierNode* id = null;
+            if ((catchNode.Id() != null))
+            {
+                catchNode.Id()->Accept(*this);
+                id = cast<Cm.Ast.IdentifierNode*>(node.Release());
+            }
+            catchNode.CatchBlock()->Accept(*this);
+            Cm.Ast.CompoundStatementNode* catchBlock = cast<Cm.Ast.CompoundStatementNode*>(node.Release());
+            Cm.Ast.CatchNode* clone = new Cm.Ast.CatchNode(System.Lex.Span(), typeExpr, id, catchBlock);
+            node.Reset(clone);
+        }
+        public override void Visit(Cm.Ast.AssertStatementNode& assertStatementNode)
+        {
+            assertStatementNode.AssertExpr()->Accept(*this);
+            Cm.Ast.Node* assertExpr = node.Release();
+            node.Reset(new Cm.Ast.AssertStatementNode(System.Lex.Span(), assertExpr));
+        }
+        public override void Visit(Cm.Ast.ConditionalCompilationPartNode& conditionalCompilationPartNode)
+        {
+            conditionalCompilationPartNode.Expr()->Accept(*this);
+            Cm.Ast.ConditionalCompilationExpressionNode* expr = cast<Cm.Ast.ConditionalCompilationExpressionNode*>(node.Release());
+            Cm.Ast.ConditionalCompilationPartNode* clone = new Cm.Ast.ConditionalCompilationPartNode(System.Lex.Span(), expr);
+            int n = conditionalCompilationPartNode.Statements().Count();
+            for (int i = 0; i < n; ++i)
+            {
+                conditionalCompilationPartNode.Statements()[i]->Accept(*this);
+                clone->AddStatement(cast<Cm.Ast.StatementNode*>(node.Release()));
+            }
+            node.Reset(clone);
+        }
+        public override void Visit(Cm.Ast.ConditionalCompilationDisjunctionNode& conditionalCompilationDisjunctionNode)
+        {
+            conditionalCompilationDisjunctionNode.Left()->Accept(*this);
+            Cm.Ast.ConditionalCompilationExpressionNode* left = cast<Cm.Ast.ConditionalCompilationExpressionNode*>(node.Release());
+            conditionalCompilationDisjunctionNode.Right()->Accept(*this);
+            Cm.Ast.ConditionalCompilationExpressionNode* right = cast<Cm.Ast.ConditionalCompilationExpressionNode*>(node.Release());
+            Cm.Ast.ConditionalCompilationDisjunctionNode* clone = new Cm.Ast.ConditionalCompilationDisjunctionNode(System.Lex.Span(), left, right);
+            node.Reset(clone);
+        }
+        public override void Visit(Cm.Ast.ConditionalCompilationConjunctionNode& conditionalCompilationConjunctionNode)
+        {
+            conditionalCompilationConjunctionNode.Left()->Accept(*this);
+            Cm.Ast.ConditionalCompilationExpressionNode* left = cast<Cm.Ast.ConditionalCompilationExpressionNode*>(node.Release());
+            conditionalCompilationConjunctionNode.Right()->Accept(*this);
+            Cm.Ast.ConditionalCompilationExpressionNode* right = cast<Cm.Ast.ConditionalCompilationExpressionNode*>(node.Release());
+            Cm.Ast.ConditionalCompilationConjunctionNode* clone = new Cm.Ast.ConditionalCompilationConjunctionNode(System.Lex.Span(), left, right);
+            node.Reset(clone);
+        }
+        public override void Visit(Cm.Ast.ConditionalCompilationNotNode& conditionalCompilationNotNode)
+        {
+            conditionalCompilationNotNode.Expr()->Accept(*this);
+            Cm.Ast.ConditionalCompilationExpressionNode* expr = cast<Cm.Ast.ConditionalCompilationExpressionNode*>(node.Release());
+            Cm.Ast.ConditionalCompilationNotNode* clone = new Cm.Ast.ConditionalCompilationNotNode(System.Lex.Span(), expr);
+            node.Reset(clone);
+        }
+        public override void Visit(Cm.Ast.ConditionalCompilationPrimaryNode& conditionalCompilationPrimaryNode)
+        {
+            node.Reset(new Cm.Ast.ConditionalCompilationPrimaryNode(System.Lex.Span(), conditionalCompilationPrimaryNode.Symbol()));
+        }
+        public override void Visit(Cm.Ast.ParenthesizedConditionalCompilationExpressionNode& parenthesizeCondCompExprNode)
+        {
+            parenthesizeCondCompExprNode.Expr()->Accept(*this);
+            Cm.Ast.ConditionalCompilationExpressionNode* expr = cast<Cm.Ast.ConditionalCompilationExpressionNode*>(node.Release());
+            Cm.Ast.ParenthesizedConditionalCompilationExpressionNode* clone = new Cm.Ast.ParenthesizedConditionalCompilationExpressionNode(System.Lex.Span(), expr);
+            node.Reset(clone);
+        }
+        public override void Visit(Cm.Ast.ConditionalCompilationStatementNode& conditionalCompilationStatementNode)
+        {
+            conditionalCompilationStatementNode.IfPart()->Accept(*this);
+            Cm.Ast.ConditionalCompilationPartNode* ifPart = cast<Cm.Ast.ConditionalCompilationPartNode*>(node.Release());
+            Cm.Ast.ConditionalCompilationStatementNode* clone = new Cm.Ast.ConditionalCompilationStatementNode(System.Lex.Span());
+            clone->SetIfPart(ifPart);
+            int n = conditionalCompilationStatementNode.ElifParts().Count();
+            for (int i = 0; i < n; ++i)
+            {
+                conditionalCompilationStatementNode.ElifParts()[i]->Accept(*this);
+                clone->AddElifPart(cast<Cm.Ast.ConditionalCompilationPartNode*>(node.Release()));
+            }
+            if ((conditionalCompilationStatementNode.ElsePart() != null))
+            {
+                conditionalCompilationStatementNode.ElsePart()->Accept(*this);
+                clone->SetElsePart(cast<Cm.Ast.ConditionalCompilationPartNode*>(node.Release()));
+            }
+            node.Reset(clone);
+        }
+        public override void Visit(Cm.Ast.ConstNode& constNode)
+        {
+            constNode.Subject()->Accept(*this);
+            node.Reset(new Cm.Ast.ConstNode(System.Lex.Span(), node.Release()));
+        }
+        public override void Visit(Cm.Ast.LValueRefNode& lvalueRefNode)
+        {
+            lvalueRefNode.Subject()->Accept(*this);
+            node.Reset(new Cm.Ast.LValueRefNode(System.Lex.Span(), node.Release()));
+        }
+        public override void Visit(Cm.Ast.RValueRefNode& rvalueRefNode)
+        {
+            rvalueRefNode.Subject()->Accept(*this);
+            node.Reset(new Cm.Ast.RValueRefNode(System.Lex.Span(), node.Release()));
+        }
+        public override void Visit(Cm.Ast.PointerNode& pointerNode)
+        {
+            pointerNode.Subject()->Accept(*this);
+            node.Reset(new Cm.Ast.PointerNode(System.Lex.Span(), node.Release()));
+        }
+        public override void Visit(Cm.Ast.ArrayNode& arrayNode)
+        {
+            arrayNode.Subject()->Accept(*this);
+            Cm.Ast.Node* subject = node.Release();
+            Cm.Ast.Node* size = null;
+            if ((arrayNode.Size() != null))
+            {
+                arrayNode.Size()->Accept(*this);
+                size = node.Release();
+            }
+            node.Reset(new Cm.Ast.ArrayNode(System.Lex.Span(), subject, size));
+        }
+        public override void Visit(Cm.Ast.DotNode& dotNode)
+        {
+            dotNode.Subject()->Accept(*this);
+            Cm.Ast.Node* subject = node.Release();
+            dotNode.MemberId()->Accept(*this);
+            Cm.Ast.IdentifierNode* memberId = cast<Cm.Ast.IdentifierNode*>(node.Release());
+            Cm.Ast.DotNode* clone = new Cm.Ast.DotNode(System.Lex.Span(), subject, memberId);
+            node.Reset(clone);
+        }
+        public override void Visit(Cm.Ast.ArrowNode& arrowNode)
+        {
+            arrowNode.Subject()->Accept(*this);
+            Cm.Ast.Node* subject = node.Release();
+            arrowNode.MemberId()->Accept(*this);
+            Cm.Ast.IdentifierNode* memberId = cast<Cm.Ast.IdentifierNode*>(node.Release());
+            Cm.Ast.ArrowNode* clone = new Cm.Ast.ArrowNode(System.Lex.Span(), subject, memberId);
+            node.Reset(clone);
+        }
+        public override void Visit(Cm.Ast.EquivalenceNode& equivalenceNode)
+        {
+            equivalenceNode.Left()->Accept(*this);
+            Cm.Ast.Node* left = node.Release();
+            equivalenceNode.Right()->Accept(*this);
+            Cm.Ast.Node* right = node.Release();
+            node.Reset(new Cm.Ast.EquivalenceNode(System.Lex.Span(), left, right));
+        }
+        public override void Visit(Cm.Ast.ImplicationNode& implicationNode)
+        {
+            implicationNode.Left()->Accept(*this);
+            Cm.Ast.Node* left = node.Release();
+            implicationNode.Right()->Accept(*this);
+            Cm.Ast.Node* right = node.Release();
+            node.Reset(new Cm.Ast.ImplicationNode(System.Lex.Span(), left, right));
+        }
+        public override void Visit(Cm.Ast.DisjunctionNode& disjunctionNode)
+        {
+            disjunctionNode.Left()->Accept(*this);
+            Cm.Ast.Node* left = node.Release();
+            disjunctionNode.Right()->Accept(*this);
+            Cm.Ast.Node* right = node.Release();
+            node.Reset(new Cm.Ast.DisjunctionNode(System.Lex.Span(), left, right));
+        }
+        public override void Visit(Cm.Ast.ConjunctionNode& conjunctionNode)
+        {
+            conjunctionNode.Left()->Accept(*this);
+            Cm.Ast.Node* left = node.Release();
+            conjunctionNode.Right()->Accept(*this);
+            Cm.Ast.Node* right = node.Release();
+            node.Reset(new Cm.Ast.ConjunctionNode(System.Lex.Span(), left, right));
+        }
+        public override void Visit(Cm.Ast.BitOrNode& bitOrNode)
+        {
+            bitOrNode.Left()->Accept(*this);
+            Cm.Ast.Node* left = node.Release();
+            bitOrNode.Right()->Accept(*this);
+            Cm.Ast.Node* right = node.Release();
+            node.Reset(new Cm.Ast.BitOrNode(System.Lex.Span(), left, right));
+        }
+        public override void Visit(Cm.Ast.BitXorNode& bitXorNode)
+        {
+            bitXorNode.Left()->Accept(*this);
+            Cm.Ast.Node* left = node.Release();
+            bitXorNode.Right()->Accept(*this);
+            Cm.Ast.Node* right = node.Release();
+            node.Reset(new Cm.Ast.BitXorNode(System.Lex.Span(), left, right));
+        }
+        public override void Visit(Cm.Ast.BitAndNode& bitAndNode)
+        {
+            bitAndNode.Left()->Accept(*this);
+            Cm.Ast.Node* left = node.Release();
+            bitAndNode.Right()->Accept(*this);
+            Cm.Ast.Node* right = node.Release();
+            node.Reset(new Cm.Ast.BitAndNode(System.Lex.Span(), left, right));
+        }
+        public override void Visit(Cm.Ast.EqualNode& equalNode)
+        {
+            equalNode.Left()->Accept(*this);
+            Cm.Ast.Node* left = node.Release();
+            equalNode.Right()->Accept(*this);
+            Cm.Ast.Node* right = node.Release();
+            node.Reset(new Cm.Ast.EqualNode(System.Lex.Span(), left, right));
+        }
+        public override void Visit(Cm.Ast.NotEqualNode& notEqualNode)
+        {
+            notEqualNode.Left()->Accept(*this);
+            Cm.Ast.Node* left = node.Release();
+            notEqualNode.Right()->Accept(*this);
+            Cm.Ast.Node* right = node.Release();
+            node.Reset(new Cm.Ast.NotEqualNode(System.Lex.Span(), left, right));
+        }
+        public override void Visit(Cm.Ast.LessNode& lessNode)
+        {
+            lessNode.Left()->Accept(*this);
+            Cm.Ast.Node* left = node.Release();
+            lessNode.Right()->Accept(*this);
+            Cm.Ast.Node* right = node.Release();
+            node.Reset(new Cm.Ast.LessNode(System.Lex.Span(), left, right));
+        }
+        public override void Visit(Cm.Ast.GreaterNode& greaterNode)
+        {
+            greaterNode.Left()->Accept(*this);
+            Cm.Ast.Node* left = node.Release();
+            greaterNode.Right()->Accept(*this);
+            Cm.Ast.Node* right = node.Release();
+            node.Reset(new Cm.Ast.GreaterNode(System.Lex.Span(), left, right));
+        }
+        public override void Visit(Cm.Ast.LessOrEqualNode& lessOrEqualNode)
+        {
+            lessOrEqualNode.Left()->Accept(*this);
+            Cm.Ast.Node* left = node.Release();
+            lessOrEqualNode.Right()->Accept(*this);
+            Cm.Ast.Node* right = node.Release();
+            node.Reset(new Cm.Ast.LessOrEqualNode(System.Lex.Span(), left, right));
+        }
+        public override void Visit(Cm.Ast.GreaterOrEqualNode& greaterOrEqualNode)
+        {
+            greaterOrEqualNode.Left()->Accept(*this);
+            Cm.Ast.Node* left = node.Release();
+            greaterOrEqualNode.Right()->Accept(*this);
+            Cm.Ast.Node* right = node.Release();
+            node.Reset(new Cm.Ast.GreaterOrEqualNode(System.Lex.Span(), left, right));
+        }
+        public override void Visit(Cm.Ast.ShiftLeftNode& shiftLeftNode)
+        {
+            shiftLeftNode.Left()->Accept(*this);
+            Cm.Ast.Node* left = node.Release();
+            shiftLeftNode.Right()->Accept(*this);
+            Cm.Ast.Node* right = node.Release();
+            node.Reset(new Cm.Ast.ShiftLeftNode(System.Lex.Span(), left, right));
+        }
+        public override void Visit(Cm.Ast.ShiftRightNode& shiftRightNode)
+        {
+            shiftRightNode.Left()->Accept(*this);
+            Cm.Ast.Node* left = node.Release();
+            shiftRightNode.Right()->Accept(*this);
+            Cm.Ast.Node* right = node.Release();
+            node.Reset(new Cm.Ast.ShiftRightNode(System.Lex.Span(), left, right));
+        }
+        public override void Visit(Cm.Ast.AddNode& addNode)
+        {
+            addNode.Left()->Accept(*this);
+            Cm.Ast.Node* left = node.Release();
+            addNode.Right()->Accept(*this);
+            Cm.Ast.Node* right = node.Release();
+            node.Reset(new Cm.Ast.AddNode(System.Lex.Span(), left, right));
+        }
+        public override void Visit(Cm.Ast.SubNode& subNode)
+        {
+            subNode.Left()->Accept(*this);
+            Cm.Ast.Node* left = node.Release();
+            subNode.Right()->Accept(*this);
+            Cm.Ast.Node* right = node.Release();
+            node.Reset(new Cm.Ast.SubNode(System.Lex.Span(), left, right));
+        }
+        public override void Visit(Cm.Ast.MulNode& mulNode)
+        {
+            mulNode.Left()->Accept(*this);
+            Cm.Ast.Node* left = node.Release();
+            mulNode.Right()->Accept(*this);
+            Cm.Ast.Node* right = node.Release();
+            node.Reset(new Cm.Ast.MulNode(System.Lex.Span(), left, right));
+        }
+        public override void Visit(Cm.Ast.DivNode& divNode)
+        {
+            divNode.Left()->Accept(*this);
+            Cm.Ast.Node* left = node.Release();
+            divNode.Right()->Accept(*this);
+            Cm.Ast.Node* right = node.Release();
+            node.Reset(new Cm.Ast.DivNode(System.Lex.Span(), left, right));
+        }
+        public override void Visit(Cm.Ast.RemNode& remNode)
+        {
+            remNode.Left()->Accept(*this);
+            Cm.Ast.Node* left = node.Release();
+            remNode.Right()->Accept(*this);
+            Cm.Ast.Node* right = node.Release();
+            node.Reset(new Cm.Ast.RemNode(System.Lex.Span(), left, right));
+        }
+        public override void Visit(Cm.Ast.NotNode& notNode)
+        {
+            notNode.Subject()->Accept(*this);
+            node.Reset(new Cm.Ast.NotNode(System.Lex.Span(), node.Release()));
+        }
+        public override void Visit(Cm.Ast.UnaryPlusNode& unaryPlusNode)
+        {
+            unaryPlusNode.Subject()->Accept(*this);
+            node.Reset(new Cm.Ast.UnaryPlusNode(System.Lex.Span(), node.Release()));
+        }
+        public override void Visit(Cm.Ast.UnaryMinusNode& unaryMinusNode)
+        {
+            unaryMinusNode.Subject()->Accept(*this);
+            node.Reset(new Cm.Ast.UnaryMinusNode(System.Lex.Span(), node.Release()));
+        }
+        public override void Visit(Cm.Ast.PrefixIncrementNode& prefixIncrementNode)
+        {
+            prefixIncrementNode.Subject()->Accept(*this);
+            node.Reset(new Cm.Ast.PrefixIncrementNode(System.Lex.Span(), node.Release()));
+        }
+        public override void Visit(Cm.Ast.PrefixDecrementNode& prefixDecrementNode)
+        {
+            prefixDecrementNode.Subject()->Accept(*this);
+            node.Reset(new Cm.Ast.PrefixDecrementNode(System.Lex.Span(), node.Release()));
+        }
+        public override void Visit(Cm.Ast.DerefNode& derefNode)
+        {
+            derefNode.Subject()->Accept(*this);
+            node.Reset(new Cm.Ast.DerefNode(System.Lex.Span(), node.Release()));
+        }
+        public override void Visit(Cm.Ast.AddrOfNode& addrOfNode)
+        {
+            addrOfNode.Subject()->Accept(*this);
+            node.Reset(new Cm.Ast.AddrOfNode(System.Lex.Span(), node.Release()));
+        }
+        public override void Visit(Cm.Ast.ComplementNode& complementNode)
+        {
+            complementNode.Subject()->Accept(*this);
+            node.Reset(new Cm.Ast.ComplementNode(System.Lex.Span(), node.Release()));
+        }
+        public override void Visit(Cm.Ast.IsNode& isNode)
+        {
+            isNode.TargetTypeExpr()->Accept(*this);
+            Cm.Ast.Node* targetTypeExpr = node.Release();
+            isNode.Expr()->Accept(*this);
+            node.Reset(new Cm.Ast.IsNode(System.Lex.Span(), node.Release(), targetTypeExpr));
+        }
+        public override void Visit(Cm.Ast.AsNode& asNode)
+        {
+            asNode.TargetTypeExpr()->Accept(*this);
+            Cm.Ast.Node* targetTypeExpr = node.Release();
+            asNode.Expr()->Accept(*this);
+            node.Reset(new Cm.Ast.AsNode(System.Lex.Span(), node.Release(), targetTypeExpr));
+        }
+        public override void Visit(Cm.Ast.IndexingNode& indexingNode)
+        {
+            indexingNode.Subject()->Accept(*this);
+            Cm.Ast.Node* subject = node.Release();
+            indexingNode.Index()->Accept(*this);
+            Cm.Ast.Node* index = node.Release();
+            node.Reset(new Cm.Ast.IndexingNode(System.Lex.Span(), subject, index));
+        }
+        public override void Visit(Cm.Ast.InvokeNode& invokeNode)
+        {
+            invokeNode.Subject()->Accept(*this);
+            Cm.Ast.Node* subject = node.Release();
+            Cm.Ast.InvokeNode* clone = new Cm.Ast.InvokeNode(System.Lex.Span(), subject);
+            int n = invokeNode.Arguments().Count();
+            for (int i = 0; i < n; ++i)
+            {
+                invokeNode.Arguments()[i]->Accept(*this);
+                clone->AddArgument(node.Release());
+            }
+            node.Reset(clone);
+        }
+        public override void Visit(Cm.Ast.PostfixIncrementNode& postfixIncrementNode)
+        {
+            postfixIncrementNode.Subject()->Accept(*this);
+            Cm.Ast.Node* subject = node.Release();
+            node.Reset(new Cm.Ast.PostfixIncrementNode(System.Lex.Span(), subject));
+        }
+        public override void Visit(Cm.Ast.PostfixDecrementNode& postfixDecrementNode)
+        {
+            postfixDecrementNode.Subject()->Accept(*this);
+            Cm.Ast.Node* subject = node.Release();
+            node.Reset(new Cm.Ast.PostfixDecrementNode(System.Lex.Span(), subject));
+        }
+        public override void Visit(Cm.Ast.SizeOfNode& sizeOfNode)
+        {
+            sizeOfNode.Expression()->Accept(*this);
+            node.Reset(new Cm.Ast.SizeOfNode(System.Lex.Span(), node.Release()));
+        }
+        public override void Visit(Cm.Ast.TypeNameNode& typeNameNode)
+        {
+            typeNameNode.Expression()->Accept(*this);
+            Cm.Ast.TypeNameNode* clone = new Cm.Ast.TypeNameNode(System.Lex.Span(), node.Release());
+            if (typeNameNode.Static())
+            {
+                clone->SetStatic();
+            }
+            node.Reset(clone);
+        }
+        public override void Visit(Cm.Ast.TypeIdNode& typeIdNode)
+        {
+            typeIdNode.Expression()->Accept(*this);
+            node.Reset(new Cm.Ast.TypeIdNode(System.Lex.Span(), node.Release()));
+        }
+        public override void Visit(Cm.Ast.CastNode& castNode)
+        {
+            castNode.TargetTypeExpr()->Accept(*this);
+            Cm.Ast.Node* targetTypeExpr = node.Release();
+            castNode.SourceExpr()->Accept(*this);
+            node.Reset(new Cm.Ast.CastNode(System.Lex.Span(), targetTypeExpr, node.Release()));
+        }
+        public override void Visit(Cm.Ast.ConstructNode& constructNode)
+        {
+            constructNode.TypeExpr()->Accept(*this);
+            Cm.Ast.Node* typeExpr = node.Release();
+            Cm.Ast.ConstructNode* clone = new Cm.Ast.ConstructNode(System.Lex.Span(), typeExpr);
+            int n = constructNode.Arguments().Count();
+            for (int i = 0; i < n; ++i)
+            {
+                constructNode.Arguments()[i]->Accept(*this);
+                clone->AddArgument(node.Release());
+            }
+            node.Reset(clone);
+        }
+        public override void Visit(Cm.Ast.NewNode& newNode)
+        {
+            newNode.TypeExpr()->Accept(*this);
+            Cm.Ast.Node* typeExpr = node.Release();
+            Cm.Ast.NewNode* clone = new Cm.Ast.NewNode(System.Lex.Span(), typeExpr);
+            int n = newNode.Arguments().Count();
+            for (int i = 0; i < n; ++i)
+            {
+                newNode.Arguments()[i]->Accept(*this);
+                clone->AddArgument(node.Release());
+            }
+            node.Reset(clone);
+        }
+        public override void Visit(Cm.Ast.ParenthesizedExpressionNode& parenthesizedExpressionNode)
+        {
+            parenthesizedExpressionNode.Subject()->Accept(*this);
+            node.Reset(new Cm.Ast.ParenthesizedExpressionNode(System.Lex.Span(), node.Release()));
+        }
+        private UniquePtr<Cm.Ast.Node> node;
+        private bool valueOfPtrType;
+        private ustring nonterminalName;
+        private List<NonterminalInfo> nonterminalInfos;
+        private List<int> nonterminalCounts;
+        private Cm.Ast.Node* returnType;
+        private bool noParserDebugSupport;
+        private ustring parserName;
+        private Cm.Ast.CompoundStatementNode* currentBlock;
+    }
+} // namespace soulcm.scmpg

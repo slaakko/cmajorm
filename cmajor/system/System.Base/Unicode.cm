@@ -1995,7 +1995,7 @@ namespace System.Unicode
             long pageIndex = cast<long>(codePoint) / numInfosInPage;
             if (pages.Count() <= pageIndex)
             {
-                LockGuard<Mutex> lock(characterTableLock);
+                LockGuard<RecursiveMutex> lock(characterTableLock);
                 while (pages.Count() <= pageIndex)
                 {
                     pages.Add(UniquePtr<CharacterInfoPage>());
@@ -2004,7 +2004,7 @@ namespace System.Unicode
             CharacterInfoPage* page = pages[pageIndex].Get();
             if (page == null)
             {
-                LockGuard<Mutex> lock(characterTableLock);
+                LockGuard<RecursiveMutex> lock(characterTableLock);
                 if (page == null)
                 {
                     string pathToUcdBinFile = PathToUcdBinFile();
@@ -2036,7 +2036,7 @@ namespace System.Unicode
             long pageIndex = cast<long>(codePoint) / numInfosInPage;
             if (extendedPages.Count() <= pageIndex)
             {
-                LockGuard<Mutex> lock(characterTableLock);
+                LockGuard<RecursiveMutex> lock(characterTableLock);
                 while (extendedPages.Count() <= pageIndex)
                 {
                     extendedPages.Add(UniquePtr<ExtendedCharacterInfoPage>());
@@ -2045,7 +2045,7 @@ namespace System.Unicode
             ExtendedCharacterInfoPage* extendedPage = extendedPages[pageIndex].Get();
             if (extendedPage == null)
             {
-                LockGuard<Mutex> lock(characterTableLock);
+                LockGuard<RecursiveMutex> lock(characterTableLock);
                 if (extendedPage == null)
                 {
                     string pathToUcdBinFile = PathToUcdBinFile();
@@ -2130,7 +2130,7 @@ namespace System.Unicode
         private uint extendedHeaderEnd;
         private UniquePtr<ExtendedCharacterInfoHeader> extendedHeader;
         private List<UniquePtr<ExtendedCharacterInfoPage>> extendedPages;
-        private Mutex characterTableLock;
+        private RecursiveMutex characterTableLock;
     }
 
     public const CharacterInfo& GetCharacterInfo(uchar codePoint)

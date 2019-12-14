@@ -13,11 +13,11 @@
 #include <cmajor/symbols/Exception.hpp>
 #include <cmajor/symbols/ConceptSymbol.hpp>
 #include <cmajor/symbols/DebugFlags.hpp>
-#include <cmajor/util/Unicode.hpp>
+#include <soulng/util/Unicode.hpp>
 
 namespace cmajor { namespace symbols {
 
-using namespace cmajor::unicode;
+using namespace soulng::unicode;
 
 ContainerSymbol::ContainerSymbol(SymbolType symbolType_, const Span& span_, const std::u32string& name_) : Symbol(symbolType_, span_, name_)
 {
@@ -226,7 +226,7 @@ GlobalVariableGroupSymbol* ContainerSymbol::MakeGlobalVariableGroupSymbol(const 
     }
 }
 
-void ContainerSymbol::AppendChildElements(dom::Element* element, TypeMap& typeMap) const
+void ContainerSymbol::AppendChildElements(sngxml::dom::Element* element, TypeMap& typeMap) const
 {
     for (const std::unique_ptr<Symbol>& member : members)
     {
@@ -243,10 +243,10 @@ void ContainerSymbol::AppendChildElements(dom::Element* element, TypeMap& typeMa
         {
             if (!member->HasProjectMembers()) continue;
         }
-        std::unique_ptr<dom::Element> memberElement = member->ToDomElement(typeMap);
+        std::unique_ptr<sngxml::dom::Element> memberElement = member->ToDomElement(typeMap);
         if (memberElement)
         {
-            element->AppendChild(std::unique_ptr<dom::Node>(memberElement.release()));
+            element->AppendChild(std::unique_ptr<sngxml::dom::Node>(memberElement.release()));
         }
     }
 }

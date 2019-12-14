@@ -11,12 +11,12 @@
 #include <cmajor/symbols/Exception.hpp>
 #include <cmajor/symbols/SymbolCollector.hpp>
 #include <cmajor/symbols/Module.hpp>
-#include <cmajor/util/Unicode.hpp>
-#include <cmajor/util/Sha1.hpp>
+#include <soulng/util/Unicode.hpp>
+#include <soulng/util/Sha1.hpp>
 
 namespace cmajor { namespace symbols {
 
-using namespace cmajor::unicode;
+using namespace soulng::unicode;
 
 VariableSymbol::VariableSymbol(SymbolType symbolType_, const Span& span_, const std::u32string& name_) : Symbol(symbolType_, span_, name_), type()
 {
@@ -76,15 +76,15 @@ std::u32string ParameterSymbol::CodeName() const
     return VariableSymbol::CodeName();
 }
 
-std::unique_ptr<dom::Element> ParameterSymbol::CreateDomElement(TypeMap& typeMap) 
+std::unique_ptr<sngxml::dom::Element> ParameterSymbol::CreateDomElement(TypeMap& typeMap) 
 {
-    std::unique_ptr<dom::Element> element(new dom::Element(U"ParameterSymbol"));
+    std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(U"ParameterSymbol"));
     if (GetType())
     {
-        std::unique_ptr<dom::Element> typeElement(new dom::Element(U"type"));
+        std::unique_ptr<sngxml::dom::Element> typeElement(new sngxml::dom::Element(U"type"));
         int typeId = typeMap.GetOrInsertType(GetType());
         typeElement->SetAttribute(U"ref", U"type_" + ToUtf32(std::to_string(typeId)));
-        element->AppendChild(std::unique_ptr<dom::Node>(typeElement.release()));
+        element->AppendChild(std::unique_ptr<sngxml::dom::Node>(typeElement.release()));
     }
     return element;
 }
@@ -93,15 +93,15 @@ LocalVariableSymbol::LocalVariableSymbol(const Span& span_, const std::u32string
 {
 }
 
-std::unique_ptr<dom::Element> LocalVariableSymbol::CreateDomElement(TypeMap& typeMap)
+std::unique_ptr<sngxml::dom::Element> LocalVariableSymbol::CreateDomElement(TypeMap& typeMap)
 {
-    std::unique_ptr<dom::Element> element(new dom::Element(U"LocalVariableSymbol"));
+    std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(U"LocalVariableSymbol"));
     if (GetType())
     {
-        std::unique_ptr<dom::Element> typeElement(new dom::Element(U"type"));
+        std::unique_ptr<sngxml::dom::Element> typeElement(new sngxml::dom::Element(U"type"));
         int typeId = typeMap.GetOrInsertType(GetType());
         typeElement->SetAttribute(U"ref", U"type_" + ToUtf32(std::to_string(typeId)));
-        element->AppendChild(std::unique_ptr<dom::Node>(typeElement.release()));
+        element->AppendChild(std::unique_ptr<sngxml::dom::Node>(typeElement.release()));
     }
     return element;
 }
@@ -246,15 +246,15 @@ void* MemberVariableSymbol::GetDIMemberType(Emitter& emitter, uint64_t offsetInB
     return localDIType;
 }
 
-std::unique_ptr<dom::Element> MemberVariableSymbol::CreateDomElement(TypeMap& typeMap)
+std::unique_ptr<sngxml::dom::Element> MemberVariableSymbol::CreateDomElement(TypeMap& typeMap)
 {
-    std::unique_ptr<dom::Element> element(new dom::Element(U"MemberVariableSymbol"));
+    std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(U"MemberVariableSymbol"));
     if (GetType())
     {
-        std::unique_ptr<dom::Element> typeElement(new dom::Element(U"type"));
+        std::unique_ptr<sngxml::dom::Element> typeElement(new sngxml::dom::Element(U"type"));
         int typeId = typeMap.GetOrInsertType(GetType());
         typeElement->SetAttribute(U"ref", U"type_" + ToUtf32(std::to_string(typeId)));
-        element->AppendChild(std::unique_ptr<dom::Node>(typeElement.release()));
+        element->AppendChild(std::unique_ptr<sngxml::dom::Node>(typeElement.release()));
     }
     return element;
 }

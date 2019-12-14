@@ -10,13 +10,13 @@
 #include <cmajor/symbols/SymbolTable.hpp>
 #include <cmajor/symbols/SymbolCollector.hpp>
 #include <cmajor/symbols/Module.hpp>
-#include <cmajor/util/Unicode.hpp>
+#include <soulng/util/Unicode.hpp>
 #include <boost/uuid/uuid_generators.hpp>
 #include <boost/uuid/uuid_io.hpp>
 
 namespace cmajor { namespace symbols {
 
-using namespace cmajor::unicode;
+using namespace soulng::unicode;
 
 ConceptGroupSymbol::ConceptGroupSymbol(const Span& span_, const std::u32string& name_) : Symbol(SymbolType::conceptGroupSymbol, span_, name_)
 {
@@ -60,15 +60,15 @@ bool ConceptGroupSymbol::HasProjectMembers() const
     return false;
 }
 
-void ConceptGroupSymbol::AppendChildElements(dom::Element* element, TypeMap& typeMap) const
+void ConceptGroupSymbol::AppendChildElements(sngxml::dom::Element* element, TypeMap& typeMap) const
 {
     for (const auto& p : arityConceptMap)
     {
         ConceptSymbol* concept = p.second;
         if (concept->IsProject())
         {
-            std::unique_ptr<dom::Element> conceptElement = concept->ToDomElement(typeMap);
-            element->AppendChild(std::unique_ptr<dom::Node>(conceptElement.release()));
+            std::unique_ptr<sngxml::dom::Element> conceptElement = concept->ToDomElement(typeMap);
+            element->AppendChild(std::unique_ptr<sngxml::dom::Node>(conceptElement.release()));
         }
     }
 }

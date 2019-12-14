@@ -7,8 +7,8 @@
 #include <cmajor/cmsxi/Type.hpp>
 #include <cmajor/cmsxi/Context.hpp>
 #include <cmajor/cmsxi/Function.hpp>
-#include <cmajor/util/Error.hpp>
-#include <cmajor/util/TextUtils.hpp>
+#include <soulng/util/Error.hpp>
+#include <soulng/util/TextUtils.hpp>
 
 namespace cmsxi {
 

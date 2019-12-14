@@ -6,7 +6,7 @@
 #include <cmajor/rt/Statics.hpp>
 #include <cmajor/rt/Error.hpp>
 #include <cmajor/rt/Io.hpp>
-#include <cmajor/util/Error.hpp>
+#include <soulng/util/Error.hpp>
 #include <boost/functional/hash.hpp>
 #include <memory>
 #include <mutex>

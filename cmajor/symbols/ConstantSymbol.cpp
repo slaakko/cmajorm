@@ -12,11 +12,11 @@
 #include <cmajor/symbols/SymbolCollector.hpp>
 #include <cmajor/symbols/Module.hpp>
 #include <cmajor/ir/Emitter.hpp>
-#include <cmajor/util/Unicode.hpp>
+#include <soulng/util/Unicode.hpp>
 
 namespace cmajor { namespace symbols {
 
-using namespace cmajor::unicode;
+using namespace soulng::unicode;
 
 ConstantSymbol::ConstantSymbol(const Span& span_, const std::u32string& name_) : Symbol(SymbolType::constantSymbol, span_, name_), type(), evaluating(false), sizeOfValue(0), valuePos(0)
 {

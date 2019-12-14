@@ -1,0 +1,111 @@
+using System;
+using System.Collections;
+
+// this file has been semiautomatically generated from 'D:/work/soulng-project/sngcm/ast/Constant.hpp' using cpp2cm version 1.0.0
+
+// this file has been semiautomatically generated from 'D:/work/soulng-project/sngcm/ast/Constant.cpp' using cpp2cm version 1.0.0
+
+namespace Cm.Ast
+{
+    public class ConstantNode : Node
+    {
+        public nothrow ConstantNode(const System.Lex.Span& span_) :
+            base(NodeType.constantNode, span_), specifiers(Specifiers.none)
+        {
+        }
+        public nothrow ConstantNode(const System.Lex.Span& span_, Specifiers specifiers_, Node* typeExpr_, IdentifierNode* id_, Node* value_) :
+            base(NodeType.constantNode, span_), specifiers(specifiers_), typeExpr(typeExpr_), id(id_), value(value_)
+        {
+            typeExpr->SetParent(this);
+            id->SetParent(this);
+            if (!value.IsNull())
+            {
+                value->SetParent(this);
+            }
+        }
+        public nothrow const Node* TypeExpr() const
+        {
+            return typeExpr.Get();
+        }
+        public nothrow Node* TypeExpr()
+        {
+            return typeExpr.Get();
+        }
+        public nothrow const IdentifierNode* Id() const
+        {
+            return id.Get();
+        }
+        public nothrow IdentifierNode* Id()
+        {
+            return id.Get();
+        }
+        public nothrow const Node* Value() const
+        {
+            return value.Get();
+        }
+        public nothrow Node* Value()
+        {
+            return value.Get();
+        }
+        public nothrow void SetStrValue(const ustring& strValue_)
+        {
+            strValue = strValue_;
+        }
+        public nothrow const ustring& StrValue() const
+        {
+            return strValue;
+        }
+        public override nothrow Specifiers GetSpecifiers() const
+        {
+            return specifiers;
+        }
+        public override Node* Clone(CloneContext& cloneContext) const
+        {
+            Node* clonedValue = null;
+            if (!value.IsNull())
+            {
+                clonedValue = value->Clone(cloneContext);
+            }
+            return new ConstantNode(GetSpan(), specifiers, typeExpr->Clone(cloneContext), cast<IdentifierNode*>(id->Clone(cloneContext)), clonedValue);
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public override nothrow void Write(AstWriter& writer)
+        {
+            base->Write(writer);
+            writer.Write(specifiers);
+            writer.Write(typeExpr.Get());
+            writer.Write(id.Get());
+            bool hasValue = value != null;
+            writer.GetBinaryWriter().Write(hasValue);
+            if (hasValue)
+            {
+                writer.Write(value.Get());
+            }
+            writer.GetBinaryWriter().Write(strValue);
+        }
+        public override void Read(AstReader& reader)
+        {
+            base->Read(reader);
+            specifiers = reader.ReadSpecifiers();
+            typeExpr.Reset(reader.ReadNode());
+            typeExpr->SetParent(this);
+            id.Reset(reader.ReadIdentifierNode());
+            id->SetParent(this);
+            bool hasValue = reader.GetBinaryReader().ReadBool();
+            if (hasValue)
+            {
+                value.Reset(reader.ReadNode());
+                value->SetParent(this);
+            }
+            strValue = reader.GetBinaryReader().ReadUString();
+        }
+        private Specifiers specifiers;
+        private UniquePtr<Node> typeExpr;
+        private UniquePtr<IdentifierNode> id;
+        private UniquePtr<Node> value;
+        private ustring strValue;
+    }
+} // namespace Cm.Ast

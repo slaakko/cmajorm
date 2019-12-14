@@ -6,13 +6,13 @@
 #ifndef CMAJOR_SYMBOLS_SYMBOL_CREATOR_VISITOR_INCLUDED
 #define CMAJOR_SYMBOLS_SYMBOL_CREATOR_VISITOR_INCLUDED
 #include <cmajor/symbols/SymbolsApi.hpp>
-#include <cmajor/ast/Visitor.hpp>
+#include <sngcm/ast/Visitor.hpp>
 #include <stack>
 #include <stdint.h>
 
 namespace cmajor { namespace symbols {
 
-using namespace cmajor::ast;
+using namespace sngcm::ast;
 
 class SymbolTable;
 class ClassTemplateSpecializationSymbol;

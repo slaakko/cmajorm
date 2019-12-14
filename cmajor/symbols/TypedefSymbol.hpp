@@ -25,7 +25,7 @@ public:
     const TypeSymbol* GetType() const { return type; }
     TypeSymbol* GetType() { return type; }
     void SetType(TypeSymbol* typeSymbol) { type = typeSymbol; }
-    std::unique_ptr<dom::Element> CreateDomElement(TypeMap& typeMap) override;
+    std::unique_ptr<sngxml::dom::Element> CreateDomElement(TypeMap& typeMap) override;
     std::u32string Info() const override { return Name(); }
     const char* ClassName() const override { return "TypedefSymbol"; }
     void Check() override;

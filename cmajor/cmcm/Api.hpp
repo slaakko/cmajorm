@@ -12,6 +12,13 @@
 #define CMCM_API __declspec(dllexport)
 #else
 #define CMCM_API __declspec(dllimport)
+
+#ifdef NDEBUG
+#pragma comment(lib, "cmcm.lib")
+#else
+#pragma comment(lib, "cmcmd.lib")
+#endif
+
 #endif
 
 #else

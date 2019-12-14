@@ -180,7 +180,7 @@ void BasicTypeCopyCtor::GenerateCall(Emitter& emitter, std::vector<GenObject*>& 
     genObjects[0]->Store(emitter, flags & OperationFlags::functionCallFlags);
 }
 
-std::unique_ptr<Value> BasicTypeCopyCtor::ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span) const
+std::unique_ptr<Value> BasicTypeCopyCtor::ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span, Value* receiver) const
 {
     Assert(argumentValues.size() == 1, "one source value expected");
     return std::unique_ptr<Value>(argumentValues[0]->Clone());
@@ -217,7 +217,7 @@ void BasicTypeMoveCtor::GenerateCall(Emitter& emitter, std::vector<GenObject*>& 
     genObjects[0]->Store(emitter, flags & OperationFlags::functionCallFlags);
 }
 
-std::unique_ptr<Value> BasicTypeMoveCtor::ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span) const
+std::unique_ptr<Value> BasicTypeMoveCtor::ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span, Value* receiver) const
 {
     Assert(argumentValues.size() == 1, "one source value expected");
     return std::unique_ptr<Value>(argumentValues[0]->Clone());

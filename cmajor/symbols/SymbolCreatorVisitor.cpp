@@ -7,9 +7,9 @@
 #include <cmajor/symbols/SymbolTable.hpp>
 #include <cmajor/symbols/GlobalFlags.hpp>
 #include <cmajor/symbols/Module.hpp>
-#include <cmajor/ast/CompileUnit.hpp>
-#include <cmajor/ast/Class.hpp>
-#include <cmajor/ast/Interface.hpp>
+#include <sngcm/ast/CompileUnit.hpp>
+#include <sngcm/ast/Class.hpp>
+#include <sngcm/ast/Interface.hpp>
 
 namespace cmajor { namespace symbols {
 

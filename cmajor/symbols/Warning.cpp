@@ -5,12 +5,12 @@
 
 #include <cmajor/symbols/Warning.hpp>
 #include <cmajor/symbols/Exception.hpp>
-#include <cmajor/util/Unicode.hpp>
+#include <soulng/util/Unicode.hpp>
 
 namespace cmajor { namespace symbols {
 
-using namespace cmajor::util;
-using namespace cmajor::unicode;
+using namespace soulng::util;
+using namespace soulng::unicode;
 
 Warning::Warning(const std::u32string& project_, const std::string& message_) : project(project_), message(message_), module(nullptr)
 {

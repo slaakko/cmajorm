@@ -23,14 +23,15 @@
 #include <cmajor/symbols/TemplateSymbol.hpp>
 #include <cmajor/symbols/ConceptSymbol.hpp>
 #include <cmajor/symbols/FunctionSymbol.hpp>
+#include <cmajor/symbols/StringFunctions.hpp>
 #include <cmajor/symbols/Module.hpp>
 #include <cmajor/symbols/Trap.hpp>
-#include <cmajor/util/Unicode.hpp>
-#include <cmajor/util/Sha1.hpp>
+#include <soulng/util/Unicode.hpp>
+#include <soulng/util/Sha1.hpp>
 
 namespace cmajor { namespace symbols {
 
-using namespace cmajor::unicode;
+using namespace soulng::unicode;
 
 const char* symbolTypeStr[uint8_t(SymbolType::maxSymbol)] =
 {
@@ -56,7 +57,8 @@ const char* symbolTypeStr[uint8_t(SymbolType::maxSymbol)] =
     "classDelegateTypeDefaultConstructor", "classDelegateTypeCopyConstructor", "classDelegateTypeMoveConstructor", "classDelegateTypeCopyAssignment", "classDelegateTypeMoveAssignment",
     "classDelegateTypeEquality", "memberFunctionToClassDelegateSymbol", 
     "arrayLengthFunctionSymbol", "arrayBeginFunctionSymbol", "arrayEndFunctionSymbol", "arrayCBeginFunctionSymbol", "arrayCEndFunctionSymbol",
-    "namespaceTypeSymbol", "functionGroupTypeSymbol", "memberExpressionTypeSymbol", "variableValueSymbol", "globalVariableSymbol", "globalVariableGroupSymbol"
+    "namespaceTypeSymbol", "functionGroupTypeSymbol", "memberExpressionTypeSymbol", "variableValueSymbol", "globalVariableSymbol", "globalVariableGroupSymbol",
+    "stringFunctionContainerSymbol", "stringLengthFunctionSymbol"
 };
 
 std::string SymbolTypeStr(SymbolType symbolType)
@@ -945,9 +947,9 @@ void Symbol::SetAttributes(std::unique_ptr<Attributes>&& attributes_)
     attributes = std::move(attributes_);
 }
 
-std::unique_ptr<dom::Element> Symbol::ToDomElement(TypeMap& typeMap) 
+std::unique_ptr<sngxml::dom::Element> Symbol::ToDomElement(TypeMap& typeMap) 
 {
-    std::unique_ptr<dom::Element> element = CreateDomElement(typeMap);
+    std::unique_ptr<sngxml::dom::Element> element = CreateDomElement(typeMap);
     if (element)
     {
         std::u32string info = Info();
@@ -960,9 +962,9 @@ std::unique_ptr<dom::Element> Symbol::ToDomElement(TypeMap& typeMap)
     return element;
 }
 
-std::unique_ptr<dom::Element> Symbol::CreateDomElement(TypeMap& typeMap)
+std::unique_ptr<sngxml::dom::Element> Symbol::CreateDomElement(TypeMap& typeMap)
 {
-    return std::unique_ptr<dom::Element>(new dom::Element(ToUtf32(ClassName())));
+    return std::unique_ptr<sngxml::dom::Element>(new sngxml::dom::Element(ToUtf32(ClassName())));
 }
 
 SymbolCreator::~SymbolCreator()
@@ -1129,6 +1131,8 @@ SymbolFactory::SymbolFactory()
     Register(SymbolType::arrayCBeginFunctionSymbol, new ConcreteSymbolCreator<ArrayCBeginFunction>());
     Register(SymbolType::arrayCEndFunctionSymbol, new ConcreteSymbolCreator<ArrayCEndFunction>());
     Register(SymbolType::globalVariableSymbol, new ConcreteSymbolCreator<GlobalVariableSymbol>());
+    Register(SymbolType::stringFunctionContainerSymbol, new ConcreteSymbolCreator<StringFunctionContainerSymbol>());
+    Register(SymbolType::stringLengthFunctionSymbol, new ConcreteSymbolCreator<StringLengthFunction>());
 }
 
 Symbol* SymbolFactory::CreateSymbol(SymbolType symbolType, const Span& span, const std::u32string& name)

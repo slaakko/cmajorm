@@ -4,7 +4,7 @@
 // =================================
 
 #include <cmajor/cmsxi/Type.hpp>
-#include <cmajor/util/Error.hpp>
+#include <soulng/util/Error.hpp>
 #include <string>
 
 namespace cmsxi {

@@ -18,7 +18,7 @@
 #include <cmajor/binder/ConceptRepository.hpp>
 #include <cmajor/symbols/Module.hpp>
 #include <cmajor/symbols/ConversionTable.hpp>
-#include <cmajor/ast/CompileUnit.hpp>
+#include <sngcm/ast/CompileUnit.hpp>
 
 namespace cmajor { namespace binder {
 

@@ -7,7 +7,7 @@
 #include <cmajor/rt/CallStack.hpp>
 #include <cmajor/rt/Io.hpp>
 #include <cmajor/rt/Classes.hpp>
-#include <cmajor/util/Error.hpp>
+#include <soulng/util/Error.hpp>
 #include <mutex>
 #include <sstream>
 #include <unordered_map>

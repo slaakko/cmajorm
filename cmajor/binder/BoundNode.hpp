@@ -6,13 +6,12 @@
 #ifndef CMAJOR_BINDER_BOUND_NODE_INCLUDED
 #define CMAJOR_BINDER_BOUND_NODE_INCLUDED
 #include <cmajor/binder/BinderApi.hpp>
-#include <cmajor/parsing/Scanner.hpp>
 #include <cmajor/ir/GenObject.hpp>
 #include <cmajor/symbols/Module.hpp>
 
 namespace cmajor { namespace binder {
 
-using cmajor::parsing::Span;
+using soulng::lexer::Span;
 using namespace cmajor::ir;
 using namespace cmajor::symbols;
 

@@ -3,9 +3,8 @@
 // Distributed under the MIT license
 // =================================
 
-#include <cmajor/ast/InitDone.hpp>
-#include <cmajor/parsing/InitDone.hpp>
-#include <cmajor/util/InitDone.hpp>
+#include <sngcm/ast/InitDone.hpp>
+#include <soulng/util/InitDone.hpp>
 #include <cmajor/binder/AttributeBinder.hpp>
 #include <cmajor/symbols/InitDone.hpp>
 #include <cmajor/symbols/Exception.hpp>
@@ -19,17 +18,15 @@ struct InitDone
 {
     InitDone()
     {
-        cmajor::ast::Init();
+        soulng::util::Init();
+        sngcm::ast::Init();
         cmajor::symbols::Init();
-        cmajor::parsing::Init();
-        cmajor::util::Init();
     }
     ~InitDone()
     {
-        cmajor::util::Done();
-        cmajor::parsing::Done();
         cmajor::symbols::Done();
-        cmajor::ast::Done();
+        sngcm::ast::Done();
+        soulng::util::Done();
     }
 };
 

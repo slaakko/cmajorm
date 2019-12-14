@@ -10,16 +10,16 @@
 #include <cmajor/binder/OverloadResolution.hpp>
 #include <cmajor/binder/StatementBinder.hpp>
 #include <cmajor/symbols/Exception.hpp>
-#include <cmajor/ast/Visitor.hpp>
-#include <cmajor/ast/BasicType.hpp>
-#include <cmajor/ast/Literal.hpp>
-#include <cmajor/ast/Expression.hpp>
-#include <cmajor/ast/Identifier.hpp>
-#include <cmajor/util/Unicode.hpp>
+#include <sngcm/ast/Visitor.hpp>
+#include <sngcm/ast/BasicType.hpp>
+#include <sngcm/ast/Literal.hpp>
+#include <sngcm/ast/Expression.hpp>
+#include <sngcm/ast/Identifier.hpp>
+#include <soulng/util/Unicode.hpp>
 
 namespace cmajor { namespace binder {
 
-using namespace cmajor::unicode;
+using namespace soulng::unicode;
 
 void ThrowCannotEvaluateStatically(Module* module, const Span& defined)
 {
@@ -49,7 +49,7 @@ public:
     void* IrValue(Emitter& emitter) override { Assert(false, "scoped value does not have ir value"); return nullptr; }
     TypeSymbol* GetType(SymbolTable* symbolTable) override { return type; }
     void SetType(TypeSymbol* type_) { type = type_; }
-    Value* Subject() { return subject.get(); }
+    Value* GetSubject() override { return subject.get(); }
     void SetSubject(Value* subject_) { subject.reset(subject_); }
 private:
     ContainerSymbol* containerSymbol;
@@ -127,6 +127,26 @@ private:
 };
 
 StructuredReferenceValue::StructuredReferenceValue(StructuredValue* structuredValue_) : Value(structuredValue_->GetSpan(), ValueType::none), structuredValue(structuredValue_)
+{
+}
+
+class StringReferenceValue : public Value
+{
+public:
+    StringReferenceValue(Value* stringValue_);
+    bool IsStringReferenceValue() const override { return true; }
+    Value* Clone() const override { return new StringReferenceValue(stringValue); }
+    void Write(BinaryWriter& writer) override {}
+    void Read(BinaryReader& reader) override {}
+    Value* As(TypeSymbol* targetType, bool cast, const Span& span, bool dontThrow) const override { Assert(false, "string reference value cannot be converted"); return nullptr; }
+    void* IrValue(Emitter& emitter) override { return stringValue->IrValue(emitter); }
+    TypeSymbol* GetType(SymbolTable * symbolTable) override { return stringValue->GetType(symbolTable); }
+    Value* GetSubject() override { return stringValue; }
+private:
+    Value* stringValue;
+};
+
+StringReferenceValue::StringReferenceValue(Value* stringValue_) : Value(stringValue_->GetSpan(), ValueType::none), stringValue(stringValue_)
 {
 }
 
@@ -1340,7 +1360,7 @@ void Evaluator::Visit(ConstructorNode& constructorNode)
         FunctionSymbol* constructorSymbol = constructorCall->GetFunctionSymbol();
         if (constructorSymbol->IsCompileTimePrimitiveFunction())
         {
-            value = constructorSymbol->ConstructValue(argumentValues, span);
+            value = constructorSymbol->ConstructValue(argumentValues, span, nullptr);
             if (!value)
             {
                 if (dontThrow)
@@ -2060,7 +2080,7 @@ void Evaluator::Visit(ConstructionStatementNode& constructionStatementNode)
     FunctionSymbol* constructorSymbol = constructorCall->GetFunctionSymbol();
     if (constructorSymbol->IsCompileTimePrimitiveFunction())
     {
-        value = constructorSymbol->ConstructValue(argumentValues, span);
+        value = constructorSymbol->ConstructValue(argumentValues, span, nullptr);
         if (!value)
         {
             if (dontThrow)
@@ -3072,17 +3092,28 @@ void Evaluator::EvaluateConstantSymbol(ConstantSymbol* constantSymbol, const Spa
     Value* constantValue = constantSymbol->GetValue();
     if (constantValue)
     {
-        if (constantValue->GetValueType() == ValueType::arrayValue)
+        switch (constantValue->GetValueType())
         {
-            value.reset(new ArrayReferenceValue(static_cast<ArrayValue*>(constantValue)));
-        }
-        else if (constantValue->GetValueType() == ValueType::structuredValue)
-        {
-            value.reset(new StructuredReferenceValue(static_cast<StructuredValue*>(constantValue)));
-        }
-        else
-        {
-            value.reset(constantValue->Clone());
+            case ValueType::arrayValue:
+            {
+                value.reset(new ArrayReferenceValue(static_cast<ArrayValue*>(constantValue)));
+                break;
+            }
+            case ValueType::structuredValue:
+            {
+                value.reset(new StructuredReferenceValue(static_cast<StructuredValue*>(constantValue)));
+                break;
+            }
+            case ValueType::stringValue: case ValueType::wstringValue: case ValueType::ustringValue:
+            {
+                value.reset(new StringReferenceValue(constantValue));
+                break;
+            }
+            default:
+            {
+                value.reset(constantValue->Clone());
+                break;
+            }
         }
     }
     else
@@ -3168,6 +3199,14 @@ void Evaluator::Visit(DotNode& dotNode)
             scopedValue->SetSubject(value.release());
             value.reset(scopedValue);
         }
+        else if (value->IsStringReferenceValue())
+        {
+            TypeSymbol* type = symbolTable->GetTypeByName(U"@string_functions");
+            ScopedValue* scopedValue = new ScopedValue(span, type);
+            scopedValue->SetType(type);
+            scopedValue->SetSubject(value.release());
+            value.reset(scopedValue);
+        }
         else if (value->GetValueType() == ValueType::structuredValue)
         {
             TypeSymbol* type = static_cast<StructuredValue*>(value.get())->GetType(symbolTable);
@@ -3192,7 +3231,8 @@ void Evaluator::Visit(DotNode& dotNode)
         if (symbol)
         {
             std::unique_ptr<Value> receiver;
-            if (scopedValue->GetType(symbolTable) && (scopedValue->GetType(symbolTable)->IsArrayType() || scopedValue->GetType(symbolTable)->BaseType()->IsClassTypeSymbol()))
+            TypeSymbol* type = scopedValue->GetType(symbolTable);
+            if (type && (type->IsArrayType() || type->BaseType()->IsClassTypeSymbol() || type->IsStringFunctionContainer()))
             {
                 receiver = std::move(value);
             }
@@ -3579,13 +3619,23 @@ void Evaluator::Visit(IndexingNode& indexingNode)
             }
         }
         Value* elementValue = arrayValue->Elements()[index].get();
-        if (elementValue->GetValueType() == ValueType::arrayValue)
+        switch (elementValue->GetValueType())
         {
-            value.reset(new ArrayReferenceValue(static_cast<ArrayValue*>(elementValue)));
-        }
-        else
-        {
-            value = std::unique_ptr<Value>(elementValue->Clone());
+            case ValueType::arrayValue:
+            {
+                value.reset(new ArrayReferenceValue(static_cast<ArrayValue*>(elementValue)));
+                break;
+            }
+            case ValueType::stringValue: case ValueType::wstringValue: case ValueType::ustringValue:
+            {
+                value.reset(new StringReferenceValue(elementValue));
+                break;
+            }
+            default:
+            {
+                value = std::unique_ptr<Value>(elementValue->Clone());
+                break;
+            }
         }
     }
     else
@@ -3703,7 +3753,8 @@ void Evaluator::Visit(InvokeNode& invokeNode)
         FunctionSymbol* functionSymbol = functionCall->GetFunctionSymbol();
         if (functionSymbol->IsCompileTimePrimitiveFunction())
         {
-            bool skipFirst = functionGroupValue->Receiver();
+            Value* receiver = functionGroupValue->Receiver();
+            bool skipFirst = receiver != nullptr;;
             argumentValues = ArgumentsToValues(functionCall->Arguments(), error, skipFirst, boundCompileUnit);
             if (error)
             {
@@ -3716,7 +3767,7 @@ void Evaluator::Visit(InvokeNode& invokeNode)
                     ThrowCannotEvaluateStatically(module, span, invokeNode.GetSpan());
                 }
             }
-            value = functionSymbol->ConstructValue(argumentValues, invokeNode.GetSpan());
+            value = functionSymbol->ConstructValue(argumentValues, invokeNode.GetSpan(), receiver);
             if (!value)
             {
                 if (dontThrow)
@@ -3751,10 +3802,10 @@ void Evaluator::Visit(InvokeNode& invokeNode)
             if (functionGroupValue->Receiver() && functionGroupValue->Receiver()->IsScopedValue())
             {
                 ScopedValue* receiver = static_cast<ScopedValue*>(functionGroupValue->Receiver());
-                if (receiver->Subject() && receiver->Subject()->GetType(symbolTable)->IsClassTypeSymbol())
+                if (receiver->GetSubject() && receiver->GetSubject()->GetType(symbolTable)->IsClassTypeSymbol())
                 {
-                    currentClassType = static_cast<ClassTypeSymbol*>(receiver->Subject()->GetType(symbolTable));
-                    structureReferenceValue = std::unique_ptr<Value>(receiver->Subject()->Clone());
+                    currentClassType = static_cast<ClassTypeSymbol*>(receiver->GetSubject()->GetType(symbolTable));
+                    structureReferenceValue = std::unique_ptr<Value>(receiver->GetSubject()->Clone());
                 }
             }
             functionNode->Accept(*this);
@@ -4015,6 +4066,10 @@ std::unique_ptr<Value> Evaluate(Node* node, TypeSymbol* targetType, ContainerSco
             if (!TypesEqual(targetType->PlainType(span), value->GetType(&boundCompileUnit.GetSymbolTable())))
             {
                 if (targetType->IsArrayType() && static_cast<ArrayTypeSymbol*>(targetType)->Size() == -1)
+                {
+                    return std::move(value);
+                }
+                if (value->IsStringReferenceValue())
                 {
                     return std::move(value);
                 }

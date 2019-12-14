@@ -7,9 +7,9 @@
 #include <cmajor/binder/TypeBinder.hpp>
 #include <cmajor/binder/BoundCompileUnit.hpp>
 #include <cmajor/binder/Evaluator.hpp>
-#include <cmajor/ast/Visitor.hpp>
-#include <cmajor/ast/Identifier.hpp>
-#include <cmajor/ast/Expression.hpp>
+#include <sngcm/ast/Visitor.hpp>
+#include <sngcm/ast/Identifier.hpp>
+#include <sngcm/ast/Expression.hpp>
 #include <cmajor/symbols/ClassTypeSymbol.hpp>
 #include <cmajor/symbols/DerivedTypeSymbol.hpp>
 #include <cmajor/symbols/Exception.hpp>
@@ -17,13 +17,13 @@
 #include <cmajor/symbols/TypedefSymbol.hpp>
 #include <cmajor/symbols/GlobalFlags.hpp>
 #include <cmajor/symbols/DebugFlags.hpp>
-#include <cmajor/util/Unicode.hpp>
-#include <cmajor/util/Log.hpp>
-#include <cmajor/util/Time.hpp>
+#include <soulng/util/Unicode.hpp>
+#include <soulng/util/Log.hpp>
+#include <soulng/util/Time.hpp>
 
 namespace cmajor { namespace binder {
 
-using namespace cmajor::unicode;
+using namespace soulng::unicode;
 
 NamespaceTypeSymbol::NamespaceTypeSymbol(NamespaceSymbol* ns_) : TypeSymbol(SymbolType::namespaceTypeSymbol, ns_->GetSpan(), ns_->Name()), ns(ns_)
 {

@@ -12,6 +12,13 @@
 #define CMDOCLIB_API __declspec(dllexport)
 #else
 #define CMDOCLIB_API __declspec(dllimport)
+
+#ifdef NDEBUG
+#pragma comment(lib, "cmdoclib.lib")
+#else
+#pragma comment(lib, "cmdoclibd.lib")
+#endif
+
 #endif
 
 #else

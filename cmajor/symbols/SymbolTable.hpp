@@ -10,21 +10,22 @@
 #include <cmajor/symbols/ClassTemplateSpecializationSymbol.hpp>
 #include <cmajor/symbols/ArrayTypeSymbol.hpp>
 #include <cmajor/symbols/ConversionTable.hpp>
-#include <cmajor/dom/Document.hpp>
-#include <cmajor/ast/Namespace.hpp>
-#include <cmajor/ast/Function.hpp>
-#include <cmajor/ast/Class.hpp>
-#include <cmajor/ast/Interface.hpp>
-#include <cmajor/ast/Delegate.hpp>
-#include <cmajor/ast/Typedef.hpp>
-#include <cmajor/ast/Constant.hpp>
-#include <cmajor/ast/GlobalVariable.hpp>
-#include <cmajor/ast/Enumeration.hpp>
+#include <sngxml/dom/Document.hpp>
+#include <sngcm/ast/Namespace.hpp>
+#include <sngcm/ast/Function.hpp>
+#include <sngcm/ast/Class.hpp>
+#include <sngcm/ast/Interface.hpp>
+#include <sngcm/ast/Delegate.hpp>
+#include <sngcm/ast/Typedef.hpp>
+#include <sngcm/ast/Constant.hpp>
+#include <sngcm/ast/GlobalVariable.hpp>
+#include <sngcm/ast/Enumeration.hpp>
 #include <boost/functional/hash.hpp>
+#include <stack>
 
 namespace cmajor { namespace symbols {
 
-using namespace cmajor::ast;
+using namespace sngcm::ast;
 
 class Module;
 class FunctionSymbol;
@@ -201,7 +202,7 @@ public:
     void MapProfiledFunction(const boost::uuids::uuid& functionId, const std::u32string& profiledFunctionName);
     std::u32string GetProfiledFunctionName(const boost::uuids::uuid& functionId) const;
     Module* GetModule() { return module; }
-    std::unique_ptr<dom::Document> ToDomDocument();
+    std::unique_ptr<sngxml::dom::Document> ToDomDocument();
     void MapInvoke(IdentifierNode* invokeId, FunctionSymbol* functionSymbol);
     FunctionSymbol* GetInvoke(IdentifierNode* invokeId) const;
     void SetLatestIdentifier(IdentifierNode* latestIdentifierNode_) { latestIdentifierNode = latestIdentifierNode_; }

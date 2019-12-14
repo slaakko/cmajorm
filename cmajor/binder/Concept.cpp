@@ -12,14 +12,14 @@
 #include <cmajor/binder/Evaluator.hpp>
 #include <cmajor/symbols/TypedefSymbol.hpp>
 #include <cmajor/symbols/ConceptSymbol.hpp>
-#include <cmajor/ast/Visitor.hpp>
-#include <cmajor/ast/Identifier.hpp>
-#include <cmajor/ast/Expression.hpp>
-#include <cmajor/util/Unicode.hpp>
+#include <sngcm/ast/Visitor.hpp>
+#include <sngcm/ast/Identifier.hpp>
+#include <sngcm/ast/Expression.hpp>
+#include <soulng/util/Unicode.hpp>
 
 namespace cmajor { namespace binder {
 
-using namespace cmajor::unicode;
+using namespace soulng::unicode;
 
 class ConceptIdResolver : public Visitor
 {

@@ -31,7 +31,7 @@ public:
     ContainerScope* GetContainerScope() override { return &containerScope; }
     const std::vector<std::unique_ptr<Symbol>>& Members() const { return members; }
     std::vector<std::unique_ptr<Symbol>>& Members() { return members; }
-    void AppendChildElements(dom::Element* element, TypeMap& typeMap) const override;
+    void AppendChildElements(sngxml::dom::Element* element, TypeMap& typeMap) const override;
     bool HasProjectMembers() const override;
     const char* ClassName() const override { return "ContainerSymbol"; }
     void Check() override;

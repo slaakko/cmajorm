@@ -1,0 +1,34 @@
+using System;
+using System.Collections;
+using System.IO;
+
+// this file has been semiautomatically generated from 'D:/work/soulngcm/soulngcm/sngcmpg/ProjectFile.hpp' using cpp2cm version 1.0.0
+
+// this file has been semiautomatically generated from 'D:/work/soulngcm/soulngcm/sngcmpg/ProjectFile.cpp' using cpp2cm version 1.0.0
+
+namespace soulcm.scmpg
+{
+    public class ProjectFile
+    {
+        public ProjectFile(const string& fileName_, const ustring& projectName_) :
+            fileName(fileName_), projectName(projectName_), basePath(Path.GetDirectoryName(GetFullPath(fileName)))
+        {
+        }
+        public const string& BasePath() const
+        {
+            return basePath;
+        }
+        public const List<string>& SourceFiles() const
+        {
+            return sourceFiles;
+        }
+        public void AddSourceFile(const string& sourceFile)
+        {
+            sourceFiles.Add(sourceFile);
+        }
+        private string fileName;
+        private string basePath;
+        private ustring projectName;
+        private List<string> sourceFiles;
+    }
+} // namespace soulcm.scmpg

@@ -11,14 +11,14 @@
 #include <cmajor/symbols/Exception.hpp>
 #include <cmajor/symbols/GlobalFlags.hpp>
 #include <cmajor/symbols/Module.hpp>
-#include <cmajor/ast/Identifier.hpp>
-#include <cmajor/util/Unicode.hpp>
-#include <cmajor/util/Util.hpp>
+#include <sngcm/ast/Identifier.hpp>
+#include <soulng/util/Unicode.hpp>
+#include <soulng/util/Util.hpp>
 
 namespace cmajor { namespace symbols {
 
-using namespace cmajor::unicode;
-using namespace cmajor::util;
+using namespace soulng::unicode;
+using namespace soulng::util;
 
 Scope::~Scope()
 {

@@ -5,12 +5,12 @@
 
 #ifndef CMAJOR_BINDER_EXPRESSION_BINDER_INCLUDED
 #define CMAJOR_BINDER_EXPRESSION_BINDER_INCLUDED
-#include <cmajor/ast/Node.hpp>
+#include <sngcm/ast/Node.hpp>
 #include <cmajor/symbols/Scope.hpp>
 
 namespace cmajor { namespace binder {
 
-using cmajor::ast::Node;
+using sngcm::ast::Node;
 using cmajor::symbols::ContainerScope;
 
 class BoundCompileUnit;

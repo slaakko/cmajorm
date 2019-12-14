@@ -8,11 +8,11 @@
 #include <cmajor/symbols/FunctionSymbol.hpp>
 #include <cmajor/symbols/TemplateSymbol.hpp>
 #include <cmajor/symbols/SymbolTable.hpp>
-#include <cmajor/util/Unicode.hpp>
+#include <soulng/util/Unicode.hpp>
 
 namespace cmajor { namespace symbols {
 
-using namespace cmajor::unicode;
+using namespace soulng::unicode;
 
 IntrinsicFunction::IntrinsicFunction(Module* module_) : module(module_)
 {

@@ -14,13 +14,13 @@
 #include <cmajor/symbols/GlobalFlags.hpp>
 #include <cmajor/symbols/Warning.hpp>
 #include <cmajor/symbols/DebugFlags.hpp>
-#include <cmajor/util/Unicode.hpp>
-#include <cmajor/util/Log.hpp>
-#include <cmajor/util/Time.hpp>
+#include <soulng/util/Unicode.hpp>
+#include <soulng/util/Log.hpp>
+#include <soulng/util/Time.hpp>
 
 namespace cmajor { namespace binder {
 
-using namespace cmajor::unicode;
+using namespace soulng::unicode;
 
 bool BetterFunctionMatch::operator()(const FunctionMatch& left, const FunctionMatch& right) const
 {

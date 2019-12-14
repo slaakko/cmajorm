@@ -8,13 +8,13 @@
 #include <cmajor/symbols/DebugFlags.hpp>
 #include <cmajor/symbols/GlobalFlags.hpp>
 #include <cmajor/symbols/Trap.hpp>
-#include <cmajor/util/Unicode.hpp>
-#include <cmajor/util/Log.hpp>
+#include <soulng/util/Unicode.hpp>
+#include <soulng/util/Log.hpp>
 
 namespace cmajor { namespace symbols {
 
-using namespace cmajor::unicode;
-using namespace cmajor::util;
+using namespace soulng::unicode;
+using namespace soulng::util;
 
 bool useModuleCache = false;
 

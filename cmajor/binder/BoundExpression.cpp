@@ -15,11 +15,11 @@
 #include <cmajor/symbols/InterfaceTypeSymbol.hpp>
 #include <cmajor/symbols/GlobalFlags.hpp>
 #include <cmajor/ir/Emitter.hpp>
-#include <cmajor/util/Unicode.hpp>
+#include <soulng/util/Unicode.hpp>
 
 namespace cmajor { namespace binder {
 
-using namespace cmajor::unicode;
+using namespace soulng::unicode;
  
 BoundExpression::BoundExpression(Module* module_, const Span& span_, BoundNodeType boundNodeType_, TypeSymbol* type_) : 
     BoundNode(module_, span_, boundNodeType_), type(type_), flags(BoundExpressionFlags::none)
@@ -426,29 +426,7 @@ void BoundLiteral::Accept(BoundNodeVisitor& visitor)
 
 std::unique_ptr<Value> BoundLiteral::ToValue(BoundCompileUnit& boundCompileUnit) const
 { 
-    switch (value->GetValueType())
-    {
-        case ValueType::stringValue: 
-        {
-            StringValue* stringValue = static_cast<StringValue*>(value.get());
-            return std::unique_ptr<Value>(new PointerValue(GetSpan(), boundCompileUnit.GetSymbolTable().GetTypeByName(U"char")->AddPointer(Span()), boundCompileUnit.GetUtf8CharPtr(stringValue->StringId()))); 
-        }
-        case ValueType::wstringValue:
-        {
-            WStringValue* wstringValue = static_cast<WStringValue*>(value.get());
-            return std::unique_ptr<Value>(new PointerValue(GetSpan(), boundCompileUnit.GetSymbolTable().GetTypeByName(U"wchar")->AddPointer(Span()), boundCompileUnit.GetUtf16CharPtr(wstringValue->StringId())));
-        }
-        case ValueType::ustringValue:
-        {
-            UStringValue* ustringValue = static_cast<UStringValue*>(value.get());
-            return std::unique_ptr<Value>(new PointerValue(GetSpan(), boundCompileUnit.GetSymbolTable().GetTypeByName(U"uchar")->AddPointer(Span()), boundCompileUnit.GetUtf32CharPtr(ustringValue->StringId())));
-        }
-        default: 
-        {
-            return std::unique_ptr<Value>(value->Clone());
-        }
-    }
-    return std::unique_ptr<Value>();
+    return std::unique_ptr<Value>(value->Clone());
 }
 
 BoundGlobalVariable::BoundGlobalVariable(Module* module_, const Span& span_, GlobalVariableSymbol* globalVariableSymbol_) :
@@ -895,7 +873,7 @@ void BoundFunctionCall::Load(Emitter& emitter, OperationFlags flags)
         }
         if (!functionSymbol->DontThrow())
         {
-            emitter.SetLineNumber(GetSpan().LineNumber());
+            emitter.SetLineNumber(GetSpan().line);
         }
         if (functionSymbol->Parent()->GetSymbolType() == SymbolType::interfaceTypeSymbol)
         {
@@ -943,7 +921,7 @@ void BoundFunctionCall::Store(Emitter& emitter, OperationFlags flags)
         }
         if (!functionSymbol->DontThrow())
         {
-            emitter.SetLineNumber(GetSpan().LineNumber());
+            emitter.SetLineNumber(GetSpan().line);
         }
         if (functionSymbol->IsArrayElementAccess())
         {
@@ -1025,7 +1003,7 @@ void BoundDelegateCall::Load(Emitter& emitter, OperationFlags flags)
         OperationFlags callFlags = flags & OperationFlags::functionCallFlags;
         if (!delegateTypeSymbol->IsNothrow())
         {
-            emitter.SetLineNumber(GetSpan().LineNumber());
+            emitter.SetLineNumber(GetSpan().line);
         }
         delegateTypeSymbol->GenerateCall(emitter, genObjects, callFlags, GetSpan());
         if ((flags & OperationFlags::deref) != OperationFlags::none)
@@ -1064,7 +1042,7 @@ void BoundDelegateCall::Store(Emitter& emitter, OperationFlags flags)
         }
         if (!delegateTypeSymbol->IsNothrow())
         {
-            emitter.SetLineNumber(GetSpan().LineNumber());
+            emitter.SetLineNumber(GetSpan().line);
         }
         delegateTypeSymbol->GenerateCall(emitter, genObjects, callFlags, GetSpan());
         void* ptr = emitter.Stack().Pop();
@@ -1157,7 +1135,7 @@ void BoundClassDelegateCall::Load(Emitter& emitter, OperationFlags flags)
         OperationFlags callFlags = flags & OperationFlags::functionCallFlags;
         if (!classDelegateTypeSymbol->IsNothrow())
         {
-            emitter.SetLineNumber(GetSpan().LineNumber());
+            emitter.SetLineNumber(GetSpan().line);
         }
         classDelegateTypeSymbol->GenerateCall(emitter, genObjects, callFlags, GetSpan());
         if ((flags & OperationFlags::deref) != OperationFlags::none)
@@ -1196,7 +1174,7 @@ void BoundClassDelegateCall::Store(Emitter& emitter, OperationFlags flags)
         }
         if (!classDelegateTypeSymbol->IsNothrow())
         {
-            emitter.SetLineNumber(GetSpan().LineNumber());
+            emitter.SetLineNumber(GetSpan().line);
         }
         classDelegateTypeSymbol->GenerateCall(emitter, genObjects, callFlags, GetSpan());
         void* ptr = emitter.Stack().Pop();

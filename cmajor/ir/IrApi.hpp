@@ -12,6 +12,13 @@
 #define IR_API __declspec(dllexport)
 #else
 #define IR_API __declspec(dllimport)
+
+#ifdef NDEBUG
+#pragma comment(lib, "ir.lib")
+#else
+#pragma comment(lib, "ird.lib")
+#endif
+
 #endif
 
 #else

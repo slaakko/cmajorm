@@ -1,0 +1,60 @@
+using System;
+using System.Collections;
+
+// this file has been semiautomatically generated from 'D:/work/soulng-project/sngcm/ast/Clone.hpp' using cpp2cm version 1.0.0
+
+// this file has been semiautomatically generated from 'D:/work/soulng-project/sngcm/ast/Clone.cpp' using cpp2cm version 1.0.0
+
+namespace Cm.Ast
+{
+    public class CloneContext
+    {
+        public nothrow CloneContext() :
+            instantiateFunctionNode(false), instantiateClassNode(false), makeTestUnits(false)
+        {
+        }
+        public ~CloneContext()
+        {
+            for (FunctionNode* unitTestFunction : unitTestFunctions)
+            {
+                delete unitTestFunction;
+            }
+        }
+        public nothrow void SetInstantiateFunctionNode()
+        {
+            instantiateFunctionNode = true;
+        }
+        public nothrow bool InstantiateFunctionNode() const
+        {
+            return instantiateFunctionNode;
+        }
+        public nothrow void SetInstantiateClassNode()
+        {
+            instantiateClassNode = true;
+        }
+        public nothrow bool InstantiateClassNode() const
+        {
+            return instantiateClassNode;
+        }
+        public nothrow void SetMakeTestUnits()
+        {
+            makeTestUnits = true;
+        }
+        public nothrow bool MakeTestUnits() const
+        {
+            return makeTestUnits;
+        }
+        public nothrow void AddUnitTestFunction(FunctionNode* unitTestFunction)
+        {
+            unitTestFunctions.Add(unitTestFunction);
+        }
+        public nothrow List<FunctionNode*>& UnitTestFunctions()
+        {
+            return unitTestFunctions;
+        }
+        private bool instantiateFunctionNode;
+        private bool instantiateClassNode;
+        private bool makeTestUnits;
+        private List<FunctionNode*> unitTestFunctions;
+    }
+} // namespace Cm.Ast

@@ -11,7 +11,7 @@
 
 namespace cmajor { namespace cmdoclib {
 
-using namespace cmajor::ast;
+using namespace sngcm::ast;
 using namespace cmajor::symbols;
 using namespace cmajor::binder;
 

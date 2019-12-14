@@ -1,0 +1,1812 @@
+using System;
+using System.Collections;
+using System.Text;
+
+// this file has been semiautomatically generated from 'D:/work/soulng-project/sngcm/ast/SourceWriter.hpp' using cpp2cm version 1.0.0
+
+// this file has been semiautomatically generated from 'D:/work/soulng-project/sngcm/ast/SourceWriter.cpp' using cpp2cm version 1.0.0
+
+namespace Cm.Ast
+{
+    public class SourceWriter : Visitor
+    {
+        public nothrow SourceWriter(CodeFormatter& formatter_) :
+            formatter(formatter_), omitNewLine(false), omitSemicolon(false)
+        {
+        }
+        public nothrow void WriteWarning(const string& message)
+        {
+            Console.Error() << message << endl();
+        }
+        public override void Visit(BoolNode& boolNode)
+        {
+            formatter.Write("bool");
+        }
+        public override void Visit(SByteNode& sbyteNode)
+        {
+            formatter.Write("sbyte");
+        }
+        public override void Visit(ByteNode& byteNode)
+        {
+            formatter.Write("byte");
+        }
+        public override void Visit(ShortNode& shortNode)
+        {
+            formatter.Write("short");
+        }
+        public override void Visit(UShortNode& ushortNode)
+        {
+            formatter.Write("ushort");
+        }
+        public override void Visit(IntNode& intNode)
+        {
+            formatter.Write("int");
+        }
+        public override void Visit(UIntNode& uintNode)
+        {
+            formatter.Write("uint");
+        }
+        public override void Visit(LongNode& longNode)
+        {
+            formatter.Write("long");
+        }
+        public override void Visit(ULongNode& ulongNode)
+        {
+            formatter.Write("ulong");
+        }
+        public override void Visit(FloatNode& floatNode)
+        {
+            formatter.Write("float");
+        }
+        public override void Visit(DoubleNode& doubleNode)
+        {
+            formatter.Write("double");
+        }
+        public override void Visit(CharNode& charNode)
+        {
+            formatter.Write("char");
+        }
+        public override void Visit(WCharNode& wcharNode)
+        {
+            formatter.Write("wchar");
+        }
+        public override void Visit(UCharNode& ucharNode)
+        {
+            formatter.Write("uchar");
+        }
+        public override void Visit(VoidNode& voidNode)
+        {
+            formatter.Write("void");
+        }
+        public override void Visit(BooleanLiteralNode& booleanLiteralNode)
+        {
+            if (booleanLiteralNode.Value())
+            {
+                formatter.Write("true");
+            }
+            else
+            {
+                formatter.Write("false");
+            }
+        }
+        public override void Visit(SByteLiteralNode& sbyteLiteralNode)
+        {
+            formatter.Write(ToString(sbyteLiteralNode.Value()));
+        }
+        public override void Visit(ByteLiteralNode& byteLiteralNode)
+        {
+            formatter.Write(ToString(byteLiteralNode.Value()) + "u");
+        }
+        public override void Visit(ShortLiteralNode& shortLiteralNode)
+        {
+            formatter.Write(ToString(shortLiteralNode.Value()));
+        }
+        public override void Visit(UShortLiteralNode& ushortLiteralNode)
+        {
+            formatter.Write(ToString(ushortLiteralNode.Value()) + "u");
+        }
+        public override void Visit(IntLiteralNode& intLiteralNode)
+        {
+            formatter.Write(ToString(intLiteralNode.Value()));
+        }
+        public override void Visit(UIntLiteralNode& uintLiteralNode)
+        {
+            formatter.Write(ToString(uintLiteralNode.Value()) + "u");
+        }
+        public override void Visit(LongLiteralNode& longLiteralNode)
+        {
+            formatter.Write(ToString(longLiteralNode.Value()));
+        }
+        public override void Visit(ULongLiteralNode& ulongLiteralNode)
+        {
+            formatter.Write(ToString(ulongLiteralNode.Value()) + "u");
+        }
+        public override void Visit(FloatLiteralNode& floatLiteralNode)
+        {
+            formatter.Write(ToString(floatLiteralNode.Value()) + "f");
+        }
+        public override void Visit(DoubleLiteralNode& doubleLiteralNode)
+        {
+            formatter.Write(ToString(doubleLiteralNode.Value()));
+        }
+        public override void Visit(CharLiteralNode& charLiteralNode)
+        {
+            formatter.Write("\'");
+            formatter.Write(CharStr(charLiteralNode.Value()));
+            formatter.Write("\'");
+        }
+        public override void Visit(WCharLiteralNode& wcharLiteralNode)
+        {
+            formatter.Write("w\'");
+            formatter.Write(ToUtf8(CharStr(uchar(wcharLiteralNode.Value()))));
+            formatter.Write("\'");
+        }
+        public override void Visit(UCharLiteralNode& ucharLiteralNode)
+        {
+            formatter.Write("u\'");
+            formatter.Write(ToUtf8(CharStr(ucharLiteralNode.Value())));
+            formatter.Write("\'");
+        }
+        public override void Visit(StringLiteralNode& stringLiteralNode)
+        {
+            formatter.Write("\"");
+            formatter.Write(StringStr(stringLiteralNode.Value()));
+            formatter.Write("\"");
+        }
+        public override void Visit(WStringLiteralNode& wstringLiteralNode)
+        {
+            formatter.Write("w\"");
+            formatter.Write(StringStr(ToUtf8(wstringLiteralNode.Value())));
+            formatter.Write("\"");
+        }
+        public override void Visit(UStringLiteralNode& ustringLiteralNode)
+        {
+            formatter.Write("u\"");
+            formatter.Write(StringStr(ToUtf8(ustringLiteralNode.Value())));
+            formatter.Write("\"");
+        }
+        public override void Visit(NullLiteralNode& nullLiteralNode)
+        {
+            formatter.Write("null");
+        }
+        public override void Visit(ArrayLiteralNode& arrayLiteralNode)
+        {
+            formatter.Write("[");
+            int n = arrayLiteralNode.Values().Count();
+            for (int i = 0; i < n; ++i)
+            {
+                if (i > 0)
+                {
+                    formatter.Write(", ");
+                }
+                arrayLiteralNode.Values()[i]->Accept(*this);
+            }
+            formatter.Write("]");
+        }
+        public override void Visit(StructuredLiteralNode& structuredLiteralNode)
+        {
+            formatter.Write("{");
+            int n = structuredLiteralNode.Members().Count();
+            for (int i = 0; i < n; ++i)
+            {
+                if (i > 0)
+                {
+                    formatter.Write(", ");
+                }
+                structuredLiteralNode.Members()[i]->Accept(*this);
+            }
+            formatter.Write("}");
+        }
+        public override void Visit(UuidLiteralNode& uuidLiteralNode)
+        {
+            WriteWarning("sngcm::writer::SourceWriter: uuid literals not supported");
+        }
+        public override void Visit(CompileUnitNode& compileUnitNode)
+        {
+            compileUnitNode.GlobalNs()->Accept(*this);
+        }
+        public override void Visit(NamespaceNode& namespaceNode)
+        {
+            if (!namespaceNode.Id()->Str().IsEmpty())
+            {
+                formatter.Write("namespace ");
+                namespaceNode.Id()->Accept(*this);
+                formatter.WriteLine();
+                formatter.WriteLine("{");
+                formatter.IncIndent();
+            }
+            int n = namespaceNode.Members().Count();
+            for (int i = 0; i < n; ++i)
+            {
+                namespaceNode.Members()[i]->Accept(*this);
+                if (i < n - 1)
+                {
+                    NodeType nodeType = namespaceNode.Members()[i]->GetNodeType();
+                    if (nodeType == NodeType.aliasNode || nodeType == NodeType.namespaceImportNode)
+                    {
+                        NodeType nextNodeType = namespaceNode.Members()[i + 1]->GetNodeType();
+                        if (nextNodeType != NodeType.aliasNode && nextNodeType != NodeType.namespaceImportNode)
+                        {
+                            formatter.WriteLine();
+                        }
+                    }
+                }
+            }
+            if (!namespaceNode.Id()->Str().IsEmpty())
+            {
+                formatter.DecIndent();
+                formatter.WriteLine("} // namespace " + ToUtf8(namespaceNode.Id()->Str()));
+            }
+        }
+        public override void Visit(AliasNode& aliasNode)
+        {
+            formatter.Write("using ");
+            aliasNode.Id()->Accept(*this);
+            formatter.Write(" = ");
+            aliasNode.Qid()->Accept(*this);
+            formatter.WriteLine(";");
+        }
+        public override void Visit(NamespaceImportNode& namespaceImportNode)
+        {
+            formatter.Write("using ");
+            namespaceImportNode.Ns()->Accept(*this);
+            formatter.WriteLine(";");
+        }
+        public override void Visit(IdentifierNode& identifierNode)
+        {
+            formatter.Write(ToUtf8(identifierNode.Str()));
+        }
+        public override void Visit(CursorIdNode& cursorIdNode)
+        {
+            WriteWarning("sngcm::writer::SourceWriter: cursor id nodes not supported");
+        }
+        public override void Visit(TemplateIdNode& templateIdNode)
+        {
+            templateIdNode.Primary()->Accept(*this);
+            formatter.Write("<");
+            int n = templateIdNode.TemplateArguments().Count();
+            for (int i = 0; i < n; ++i)
+            {
+                if (i > 0)
+                {
+                    formatter.Write(", ");
+                }
+                templateIdNode.TemplateArguments()[i]->Accept(*this);
+            }
+            formatter.Write(">");
+        }
+        public override void Visit(FunctionNode& functionNode)
+        {
+            Attributes* attributes = functionNode.GetAttributes();
+            if ((attributes != null))
+            {
+                attributes->Accept(*this);
+                formatter.WriteLine();
+            }
+            if (functionNode.GetSpecifiers() != Specifiers.none)
+            {
+                formatter.Write(SpecifierStr(functionNode.GetSpecifiers()));
+                formatter.Write(" ");
+            }
+            functionNode.ReturnTypeExpr()->Accept(*this);
+            formatter.Write(" ");
+            formatter.Write(ToUtf8(functionNode.GroupId()));
+            int nt = functionNode.TemplateParameters().Count();
+            if (nt > 0)
+            {
+                formatter.Write("<");
+                for (int i = 0; i < nt; ++i)
+                {
+                    if (i > 0)
+                    {
+                        formatter.Write(", ");
+                    }
+                    functionNode.TemplateParameters()[i]->Accept(*this);
+                }
+                formatter.Write(">");
+            }
+            formatter.Write("(");
+            int np = functionNode.Parameters().Count();
+            for (int i = 0; i < np; ++i)
+            {
+                if (i > 0)
+                {
+                    formatter.Write(", ");
+                }
+                functionNode.Parameters()[i]->Accept(*this);
+            }
+            formatter.Write(")");
+            if ((functionNode.WhereConstraint() != null))
+            {
+                formatter.Write(" ");
+                functionNode.WhereConstraint()->Accept(*this);
+            }
+            if ((functionNode.Body() != null))
+            {
+                formatter.WriteLine();
+                functionNode.Body()->Accept(*this);
+            }
+            else
+            {
+                formatter.WriteLine(";");
+            }
+        }
+        public override void Visit(ClassNode& classNode)
+        {
+            Attributes* attributes = classNode.GetAttributes();
+            if ((attributes != null))
+            {
+                attributes->Accept(*this);
+                formatter.WriteLine();
+            }
+            if (classNode.GetSpecifiers() != Specifiers.none)
+            {
+                formatter.Write(SpecifierStr(classNode.GetSpecifiers()));
+                formatter.Write(" ");
+            }
+            formatter.Write("class ");
+            classNode.Id()->Accept(*this);
+            int nt = classNode.TemplateParameters().Count();
+            if (nt > 0)
+            {
+                formatter.Write("<");
+                for (int i = 0; i < nt; ++i)
+                {
+                    if (i > 0)
+                    {
+                        formatter.Write(", ");
+                    }
+                    classNode.TemplateParameters()[i]->Accept(*this);
+                }
+                formatter.Write(">");
+            }
+            int nb = classNode.BaseClassOrInterfaces().Count();
+            if (nb > 0)
+            {
+                formatter.Write(" : ");
+                for (int i = 0; i < nb; ++i)
+                {
+                    if (i > 0)
+                    {
+                        formatter.Write(", ");
+                    }
+                    classNode.BaseClassOrInterfaces()[i]->Accept(*this);
+                }
+            }
+            if ((classNode.WhereConstraint() != null))
+            {
+                formatter.Write(" ");
+                classNode.WhereConstraint()->Accept(*this);
+            }
+            formatter.WriteLine();
+            formatter.WriteLine("{");
+            formatter.IncIndent();
+            int n = classNode.Members().Count();
+            for (int i = 0; i < n; ++i)
+            {
+                classNode.Members()[i]->Accept(*this);
+            }
+            formatter.DecIndent();
+            formatter.WriteLine("}");
+        }
+        public override void Visit(ThisInitializerNode& thisInitializerNode)
+        {
+            formatter.Write("this(");
+            int n = thisInitializerNode.Arguments().Count();
+            for (int i = 0; i < n; ++i)
+            {
+                if (i > 0)
+                {
+                    formatter.Write(", ");
+                }
+                thisInitializerNode.Arguments()[i]->Accept(*this);
+            }
+            formatter.Write(")");
+        }
+        public override void Visit(BaseInitializerNode& baseInitializerNode)
+        {
+            formatter.Write("base(");
+            int n = baseInitializerNode.Arguments().Count();
+            for (int i = 0; i < n; ++i)
+            {
+                if (i > 0)
+                {
+                    formatter.Write(", ");
+                }
+                baseInitializerNode.Arguments()[i]->Accept(*this);
+            }
+            formatter.Write(")");
+        }
+        public override void Visit(MemberInitializerNode& memberInitializerNode)
+        {
+            memberInitializerNode.MemberId()->Accept(*this);
+            formatter.Write("(");
+            int n = memberInitializerNode.Arguments().Count();
+            for (int i = 0; i < n; ++i)
+            {
+                if (i > 0)
+                {
+                    formatter.Write(", ");
+                }
+                memberInitializerNode.Arguments()[i]->Accept(*this);
+            }
+            formatter.Write(")");
+        }
+        public override void Visit(StaticConstructorNode& staticConstructorNode)
+        {
+            Attributes* attributes = staticConstructorNode.GetAttributes();
+            if ((attributes != null))
+            {
+                attributes->Accept(*this);
+                formatter.WriteLine();
+            }
+            if (staticConstructorNode.GetSpecifiers() != Specifiers.none)
+            {
+                formatter.Write(SpecifierStr(staticConstructorNode.GetSpecifiers()));
+                formatter.Write(" ");
+            }
+            staticConstructorNode.ClassId()->Accept(*this);
+            formatter.Write("()");
+            int ni = staticConstructorNode.Initializers().Count();
+            if (ni > 0)
+            {
+                formatter.WriteLine(" :");
+                formatter.IncIndent();
+                for (int i = 0; i < ni; ++i)
+                {
+                    if (i > 0)
+                    {
+                        formatter.Write(", ");
+                    }
+                    staticConstructorNode.Initializers()[i]->Accept(*this);
+                }
+                formatter.DecIndent();
+            }
+            if ((staticConstructorNode.WhereConstraint() != null))
+            {
+                formatter.WriteLine();
+                formatter.IncIndent();
+                staticConstructorNode.WhereConstraint()->Accept(*this);
+                formatter.DecIndent();
+            }
+            if ((staticConstructorNode.Body() != null))
+            {
+                formatter.WriteLine();
+                staticConstructorNode.Body()->Accept(*this);
+            }
+            else
+            {
+                formatter.WriteLine(";");
+            }
+        }
+        public override void Visit(ConstructorNode& constructorNode)
+        {
+            Attributes* attributes = constructorNode.GetAttributes();
+            if ((attributes != null))
+            {
+                attributes->Accept(*this);
+                formatter.WriteLine();
+            }
+            if (constructorNode.GetSpecifiers() != Specifiers.none)
+            {
+                formatter.Write(SpecifierStr(constructorNode.GetSpecifiers()));
+                formatter.Write(" ");
+            }
+            constructorNode.ClassId()->Accept(*this);
+            formatter.Write("(");
+            int np = constructorNode.Parameters().Count();
+            for (int i = 0; i < np; ++i)
+            {
+                if (i > 0)
+                {
+                    formatter.Write(", ");
+                }
+                constructorNode.Parameters()[i]->Accept(*this);
+            }
+            formatter.Write(")");
+            int ni = constructorNode.Initializers().Count();
+            if (ni > 0)
+            {
+                formatter.WriteLine(" :");
+                formatter.IncIndent();
+                for (int i = 0; i < ni; ++i)
+                {
+                    if (i > 0)
+                    {
+                        formatter.Write(", ");
+                    }
+                    constructorNode.Initializers()[i]->Accept(*this);
+                }
+                formatter.DecIndent();
+            }
+            if ((constructorNode.WhereConstraint() != null))
+            {
+                formatter.WriteLine();
+                formatter.IncIndent();
+                constructorNode.WhereConstraint()->Accept(*this);
+                formatter.DecIndent();
+            }
+            if ((constructorNode.Body() != null))
+            {
+                formatter.WriteLine();
+                constructorNode.Body()->Accept(*this);
+            }
+            else
+            {
+                formatter.WriteLine(";");
+            }
+        }
+        public override void Visit(DestructorNode& destructorNode)
+        {
+            Attributes* attributes = destructorNode.GetAttributes();
+            if ((attributes != null))
+            {
+                attributes->Accept(*this);
+                formatter.WriteLine();
+            }
+            if (destructorNode.GetSpecifiers() != Specifiers.none)
+            {
+                formatter.Write(SpecifierStr(destructorNode.GetSpecifiers()));
+                formatter.Write(" ");
+            }
+            formatter.Write("~");
+            destructorNode.ClassId()->Accept(*this);
+            formatter.Write("()");
+            if ((destructorNode.WhereConstraint() != null))
+            {
+                formatter.WriteLine();
+                formatter.IncIndent();
+                destructorNode.WhereConstraint()->Accept(*this);
+                formatter.DecIndent();
+            }
+            if ((destructorNode.Body() != null))
+            {
+                formatter.WriteLine();
+                destructorNode.Body()->Accept(*this);
+            }
+            else
+            {
+                formatter.WriteLine(";");
+            }
+        }
+        public override void Visit(MemberFunctionNode& memberFunctionNode)
+        {
+            Attributes* attributes = memberFunctionNode.GetAttributes();
+            if ((attributes != null))
+            {
+                attributes->Accept(*this);
+                formatter.WriteLine();
+            }
+            if (memberFunctionNode.GetSpecifiers() != Specifiers.none)
+            {
+                formatter.Write(SpecifierStr(memberFunctionNode.GetSpecifiers()));
+                formatter.Write(" ");
+            }
+            memberFunctionNode.ReturnTypeExpr()->Accept(*this);
+            formatter.Write(" ");
+            formatter.Write(ToUtf8(memberFunctionNode.GroupId()));
+            formatter.Write("(");
+            int np = memberFunctionNode.Parameters().Count();
+            for (int i = 0; i < np; ++i)
+            {
+                if (i > 0)
+                {
+                    formatter.Write(", ");
+                }
+                memberFunctionNode.Parameters()[i]->Accept(*this);
+            }
+            formatter.Write(")");
+            if (memberFunctionNode.IsConst())
+            {
+                formatter.Write(" const");
+            }
+            if ((memberFunctionNode.WhereConstraint() != null))
+            {
+                formatter.WriteLine();
+                formatter.IncIndent();
+                memberFunctionNode.WhereConstraint()->Accept(*this);
+                formatter.DecIndent();
+            }
+            if ((memberFunctionNode.Body() != null))
+            {
+                formatter.WriteLine();
+                memberFunctionNode.Body()->Accept(*this);
+            }
+            else
+            {
+                formatter.WriteLine(";");
+            }
+        }
+        public override void Visit(ConversionFunctionNode& conversionFunctionNode)
+        {
+            Attributes* attributes = conversionFunctionNode.GetAttributes();
+            if ((attributes != null))
+            {
+                attributes->Accept(*this);
+                formatter.WriteLine();
+            }
+            if (conversionFunctionNode.GetSpecifiers() != Specifiers.none)
+            {
+                formatter.Write(SpecifierStr(conversionFunctionNode.GetSpecifiers()));
+                formatter.Write(" ");
+            }
+            formatter.Write("operator ");
+            conversionFunctionNode.ReturnTypeExpr()->Accept(*this);
+            formatter.Write("()");
+            if (conversionFunctionNode.IsConst())
+            {
+                formatter.Write(" const");
+            }
+            if ((conversionFunctionNode.WhereConstraint() != null))
+            {
+                formatter.WriteLine();
+                formatter.IncIndent();
+                conversionFunctionNode.WhereConstraint()->Accept(*this);
+                formatter.DecIndent();
+            }
+            if ((conversionFunctionNode.Body() != null))
+            {
+                formatter.WriteLine();
+                conversionFunctionNode.Body()->Accept(*this);
+            }
+            else
+            {
+                formatter.WriteLine(";");
+            }
+        }
+        public override void Visit(MemberVariableNode& memberVariableNode)
+        {
+            Attributes* attributes = memberVariableNode.GetAttributes();
+            if ((attributes != null))
+            {
+                attributes->Accept(*this);
+                formatter.WriteLine();
+            }
+            if (memberVariableNode.GetSpecifiers() != Specifiers.none)
+            {
+                formatter.Write(SpecifierStr(memberVariableNode.GetSpecifiers()));
+                formatter.Write(" ");
+            }
+            memberVariableNode.TypeExpr()->Accept(*this);
+            formatter.Write(" ");
+            memberVariableNode.Id()->Accept(*this);
+            formatter.WriteLine(";");
+        }
+        public override void Visit(InterfaceNode& interfaceNode)
+        {
+            Attributes* attributes = interfaceNode.GetAttributes();
+            if ((attributes != null))
+            {
+                attributes->Accept(*this);
+                formatter.WriteLine();
+            }
+            if (interfaceNode.GetSpecifiers() != Specifiers.none)
+            {
+                formatter.Write(SpecifierStr(interfaceNode.GetSpecifiers()));
+                formatter.Write(" ");
+            }
+            formatter.Write("interface ");
+            interfaceNode.Id()->Accept(*this);
+            formatter.WriteLine();
+            formatter.WriteLine("{");
+            formatter.IncIndent();
+            int n = interfaceNode.Members().Count();
+            for (int i = 0; i < n; ++i)
+            {
+                interfaceNode.Members()[i]->Accept(*this);
+            }
+            formatter.DecIndent();
+            formatter.WriteLine("}");
+        }
+        public override void Visit(DelegateNode& delegateNode)
+        {
+            if (delegateNode.GetSpecifiers() != Specifiers.none)
+            {
+                formatter.Write(SpecifierStr(delegateNode.GetSpecifiers()));
+                formatter.Write(" ");
+            }
+            formatter.Write("delegate ");
+            delegateNode.ReturnTypeExpr()->Accept(*this);
+            formatter.Write(" ");
+            delegateNode.Id()->Accept(*this);
+            formatter.Write("(");
+            int np = delegateNode.Parameters().Count();
+            for (int i = 0; i < np; ++i)
+            {
+                if (i > 0)
+                {
+                    formatter.Write(", ");
+                }
+                delegateNode.Parameters()[i]->Accept(*this);
+            }
+            formatter.WriteLine(");");
+        }
+        public override void Visit(ClassDelegateNode& classDelegateNode)
+        {
+            if (classDelegateNode.GetSpecifiers() != Specifiers.none)
+            {
+                formatter.Write(SpecifierStr(classDelegateNode.GetSpecifiers()));
+                formatter.Write(" ");
+            }
+            formatter.Write("class delegate ");
+            classDelegateNode.ReturnTypeExpr()->Accept(*this);
+            formatter.Write(" ");
+            classDelegateNode.Id()->Accept(*this);
+            formatter.Write("(");
+            int np = classDelegateNode.Parameters().Count();
+            for (int i = 0; i < np; ++i)
+            {
+                if (i > 0)
+                {
+                    formatter.Write(", ");
+                }
+                classDelegateNode.Parameters()[i]->Accept(*this);
+            }
+            formatter.WriteLine(");");
+        }
+        public override void Visit(ParenthesizedConstraintNode& parenthesizedConstraintNode)
+        {
+            formatter.Write("(");
+            parenthesizedConstraintNode.Constraint()->Accept(*this);
+            formatter.Write(")");
+        }
+        public override void Visit(DisjunctiveConstraintNode& disjunctiveConstraintNode)
+        {
+            disjunctiveConstraintNode.Left()->Accept(*this);
+            formatter.Write(" or ");
+            disjunctiveConstraintNode.Right()->Accept(*this);
+        }
+        public override void Visit(ConjunctiveConstraintNode& conjunctiveConstraintNode)
+        {
+            conjunctiveConstraintNode.Left()->Accept(*this);
+            formatter.Write(" and ");
+            conjunctiveConstraintNode.Right()->Accept(*this);
+        }
+        public override void Visit(WhereConstraintNode& whereConstraintNode)
+        {
+            formatter.Write("where ");
+            whereConstraintNode.Constraint()->Accept(*this);
+            if (whereConstraintNode.Semicolon())
+            {
+                formatter.WriteLine(";");
+            }
+        }
+        public override void Visit(PredicateConstraintNode& predicateConstraintNode)
+        {
+            predicateConstraintNode.InvokeExpr()->Accept(*this);
+        }
+        public override void Visit(IsConstraintNode& isConstraintNode)
+        {
+            isConstraintNode.TypeExpr()->Accept(*this);
+            formatter.Write(" is ");
+            isConstraintNode.ConceptOrTypeName()->Accept(*this);
+        }
+        public override void Visit(MultiParamConstraintNode& multiParamConstraintNode)
+        {
+            multiParamConstraintNode.ConceptId()->Accept(*this);
+            formatter.Write("<");
+            int n = multiParamConstraintNode.TypeExprs().Count();
+            for (int i = 0; i < n; ++i)
+            {
+                if (i > 0)
+                {
+                    formatter.Write(", ");
+                }
+                multiParamConstraintNode.TypeExprs()[i]->Accept(*this);
+            }
+            formatter.Write(">");
+        }
+        public override void Visit(TypeNameConstraintNode& typeNameConstraintNode)
+        {
+            formatter.Write("typename ");
+            typeNameConstraintNode.TypeId()->Accept(*this);
+            formatter.WriteLine(";");
+        }
+        public override void Visit(ConstructorConstraintNode& constructorConstraintNode)
+        {
+            constructorConstraintNode.TypeParamId()->Accept(*this);
+            formatter.Write("(");
+            int np = constructorConstraintNode.Parameters().Count();
+            for (int i = 0; i < np; ++i)
+            {
+                if (i > 0)
+                {
+                    formatter.Write(", ");
+                }
+                constructorConstraintNode.Parameters()[i]->Accept(*this);
+            }
+            formatter.WriteLine(");");
+        }
+        public override void Visit(DestructorConstraintNode& destructorConstraintNode)
+        {
+            formatter.Write("~");
+            destructorConstraintNode.TypeParamId()->Accept(*this);
+            formatter.WriteLine("();");
+        }
+        public override void Visit(MemberFunctionConstraintNode& memberFunctionConstraintNode)
+        {
+            memberFunctionConstraintNode.ReturnTypeExpr()->Accept(*this);
+            formatter.Write(" ");
+            memberFunctionConstraintNode.TypeParamId()->Accept(*this);
+            formatter.Write(".");
+            formatter.Write(ToUtf8(memberFunctionConstraintNode.GroupId()));
+            formatter.Write("(");
+            int np = memberFunctionConstraintNode.Parameters().Count();
+            for (int i = 0; i < np; ++i)
+            {
+                if (i > 0)
+                {
+                    formatter.Write(", ");
+                }
+                memberFunctionConstraintNode.Parameters()[i]->Accept(*this);
+            }
+            formatter.WriteLine(");");
+        }
+        public override void Visit(FunctionConstraintNode& functionConstraintNode)
+        {
+            functionConstraintNode.ReturnTypeExpr()->Accept(*this);
+            formatter.Write(" ");
+            formatter.Write(ToUtf8(functionConstraintNode.GroupId()));
+            formatter.Write("(");
+            int np = functionConstraintNode.Parameters().Count();
+            for (int i = 0; i < np; ++i)
+            {
+                if (i > 0)
+                {
+                    formatter.Write(", ");
+                }
+                functionConstraintNode.Parameters()[i]->Accept(*this);
+            }
+            formatter.WriteLine(");");
+        }
+        public override void Visit(AxiomStatementNode& axiomStatementNode)
+        {
+            axiomStatementNode.Expression()->Accept(*this);
+            formatter.WriteLine(";");
+        }
+        public override void Visit(AxiomNode& axiomNode)
+        {
+            formatter.Write("axiom ");
+            axiomNode.Id()->Accept(*this);
+            int np = axiomNode.Parameters().Count();
+            if (np > 0)
+            {
+                formatter.Write("(");
+                for (int i = 0; i < np; ++i)
+                {
+                    if (i > 0)
+                    {
+                        formatter.Write(", ");
+                    }
+                    axiomNode.Parameters()[i]->Accept(*this);
+                }
+                formatter.Write(")");
+            }
+            formatter.WriteLine();
+            formatter.WriteLine("{");
+            formatter.IncIndent();
+            int n = axiomNode.Statements().Count();
+            for (int i = 0; i < n; ++i)
+            {
+                axiomNode.Statements()[i]->Accept(*this);
+            }
+            formatter.DecIndent();
+            formatter.WriteLine("}");
+        }
+        public override void Visit(ConceptIdNode& conceptIdNode)
+        {
+            formatter.Write(" : ");
+            conceptIdNode.Id()->Accept(*this);
+            formatter.Write("<");
+            int n = conceptIdNode.TypeParameters().Count();
+            for (int i = 0; i < n; ++i)
+            {
+                if (i > 0)
+                {
+                    formatter.Write(", ");
+                }
+                conceptIdNode.TypeParameters()[i]->Accept(*this);
+            }
+            formatter.Write(">");
+        }
+        public override void Visit(ConceptNode& conceptNode)
+        {
+            if (conceptNode.GetSpecifiers() != Specifiers.none)
+            {
+                formatter.Write(SpecifierStr(conceptNode.GetSpecifiers()));
+                formatter.Write(" ");
+            }
+            formatter.Write("concept ");
+            conceptNode.Id()->Accept(*this);
+            formatter.Write("<");
+            int n = conceptNode.TypeParameters().Count();
+            for (int i = 0; i < n; ++i)
+            {
+                if (i > 0)
+                {
+                    formatter.Write(", ");
+                }
+                conceptNode.TypeParameters()[i]->Accept(*this);
+            }
+            formatter.Write(">");
+            if ((conceptNode.Refinement() != null))
+            {
+                conceptNode.Refinement()->Accept(*this);
+            }
+            formatter.WriteLine();
+            int nc = conceptNode.Constraints().Count();
+            for (int i = 0; i < nc; ++i)
+            {
+                ConstraintNode* constraintNode = conceptNode.Constraints()[i];
+                if (constraintNode->IsHeaderConstraint())
+                {
+                    formatter.IncIndent();
+                    constraintNode->Accept(*this);
+                    formatter.DecIndent();
+                    formatter.WriteLine();
+                }
+            }
+            formatter.WriteLine("{");
+            formatter.IncIndent();
+            for (int i = 0; i < nc; ++i)
+            {
+                ConstraintNode* constraintNode = conceptNode.Constraints()[i];
+                if (constraintNode->IsHeaderConstraint()) continue;
+                constraintNode->Accept(*this);
+            }
+            int na = conceptNode.Axioms().Count();
+            for (int i = 0; i < na; ++i)
+            {
+                conceptNode.Axioms()[i]->Accept(*this);
+            }
+            formatter.DecIndent();
+            formatter.WriteLine("}");
+        }
+        public override void Visit(LabelNode& labelNode)
+        {
+            formatter.Write(ToUtf8(labelNode.Label()));
+            formatter.Write(": ");
+        }
+        public override void Visit(LabeledStatementNode& labeledStatementNode)
+        {
+            labeledStatementNode.Label()->Accept(*this);
+            labeledStatementNode.Stmt()->Accept(*this);
+        }
+        public override void Visit(CompoundStatementNode& compoundStatementNode)
+        {
+            formatter.WriteLine("{");
+            formatter.IncIndent();
+            int n = compoundStatementNode.Statements().Count();
+            for (int i = 0; i < n; ++i)
+            {
+                compoundStatementNode.Statements()[i]->Accept(*this);
+            }
+            formatter.DecIndent();
+            formatter.WriteLine("}");
+        }
+        public override void Visit(ReturnStatementNode& returnStatementNode)
+        {
+            formatter.Write("return");
+            if ((returnStatementNode.Expression() != null))
+            {
+                formatter.Write(" ");
+                returnStatementNode.Expression()->Accept(*this);
+            }
+            formatter.WriteLine(";");
+        }
+        public override void Visit(IfStatementNode& ifStatementNode)
+        {
+            formatter.Write("if (");
+            ifStatementNode.Condition()->Accept(*this);
+            if (ifStatementNode.ThenS()->GetNodeType() == NodeType.compoundStatementNode)
+            {
+                formatter.WriteLine(")");
+            }
+            else
+            {
+                formatter.Write(") ");
+            }
+            ifStatementNode.ThenS()->Accept(*this);
+            if ((ifStatementNode.ElseS() != null))
+            {
+                if (ifStatementNode.ElseS()->GetNodeType() == NodeType.compoundStatementNode)
+                {
+                    formatter.WriteLine("else");
+                }
+                else
+                {
+                    formatter.Write("else ");
+                }
+                ifStatementNode.ElseS()->Accept(*this);
+            }
+        }
+        public override void Visit(WhileStatementNode& whileStatementNode)
+        {
+            formatter.Write("while (");
+            whileStatementNode.Condition()->Accept(*this);
+            if (whileStatementNode.Statement()->GetNodeType() == NodeType.compoundStatementNode)
+            {
+                formatter.WriteLine(")");
+            }
+            else
+            {
+                formatter.Write(") ");
+            }
+            whileStatementNode.Statement()->Accept(*this);
+        }
+        public override void Visit(DoStatementNode& doStatementNode)
+        {
+            formatter.Write("do");
+            if (doStatementNode.Statement()->GetNodeType() == NodeType.compoundStatementNode)
+            {
+                formatter.WriteLine();
+            }
+            else
+            {
+                formatter.Write(" ");
+            }
+            doStatementNode.Statement()->Accept(*this);
+            formatter.Write("while (");
+            doStatementNode.Condition()->Accept(*this);
+            formatter.WriteLine(");");
+        }
+        public override void Visit(ForStatementNode& forStatementNode)
+        {
+            formatter.Write("for (");
+            omitNewLine = true;
+            forStatementNode.InitS()->Accept(*this);
+            formatter.Write(" ");
+            omitNewLine = false;
+            if ((forStatementNode.Condition() != null))
+            {
+                forStatementNode.Condition()->Accept(*this);
+                formatter.Write("; ");
+            }
+            else
+            {
+                formatter.Write("; ");
+            }
+            omitSemicolon = true;
+            omitNewLine = true;
+            forStatementNode.LoopS()->Accept(*this);
+            omitSemicolon = false;
+            omitNewLine = false;
+            if (forStatementNode.ActionS()->GetNodeType() == NodeType.compoundStatementNode)
+            {
+                formatter.WriteLine(")");
+            }
+            else
+            {
+                formatter.Write(") ");
+            }
+            forStatementNode.ActionS()->Accept(*this);
+        }
+        public override void Visit(BreakStatementNode& breakStatementNode)
+        {
+            formatter.WriteLine("break;");
+        }
+        public override void Visit(ContinueStatementNode& continueStatementNode)
+        {
+            formatter.WriteLine("continue;");
+        }
+        public override void Visit(GotoStatementNode& gotoStatementNode)
+        {
+            formatter.Write("goto ");
+            formatter.Write(ToUtf8(gotoStatementNode.Target()));
+            formatter.WriteLine(";");
+        }
+        public override void Visit(ConstructionStatementNode& constructionStatementNode)
+        {
+            constructionStatementNode.TypeExpr()->Accept(*this);
+            formatter.Write(" ");
+            constructionStatementNode.Id()->Accept(*this);
+            if (constructionStatementNode.Empty())
+            {
+                formatter.Write(";");
+            }
+            else if (constructionStatementNode.Assignment())
+            {
+                formatter.Write(" = ");
+                constructionStatementNode.Arguments()[0]->Accept(*this);
+                formatter.Write(";");
+            }
+            else
+            {
+                formatter.Write("(");
+                int n = constructionStatementNode.Arguments().Count();
+                for (int i = 0; i < n; ++i)
+                {
+                    if (i > 0)
+                    {
+                        formatter.Write(", ");
+                    }
+                    constructionStatementNode.Arguments()[i]->Accept(*this);
+                }
+                formatter.Write(");");
+            }
+            if (!omitNewLine)
+            {
+                formatter.WriteLine();
+            }
+        }
+        public override void Visit(DeleteStatementNode& deleteStatementNode)
+        {
+            formatter.Write("delete ");
+            deleteStatementNode.Expression()->Accept(*this);
+            formatter.WriteLine(";");
+        }
+        public override void Visit(DestroyStatementNode& destroyStatementNode)
+        {
+            formatter.Write("destroy ");
+            destroyStatementNode.Expression()->Accept(*this);
+            formatter.WriteLine(";");
+        }
+        public override void Visit(AssignmentStatementNode& assignmentStatementNode)
+        {
+            assignmentStatementNode.TargetExpr()->Accept(*this);
+            formatter.Write(" = ");
+            assignmentStatementNode.SourceExpr()->Accept(*this);
+            if (!omitSemicolon)
+            {
+                formatter.Write(";");
+            }
+            if (!omitNewLine)
+            {
+                formatter.WriteLine();
+            }
+        }
+        public override void Visit(ExpressionStatementNode& expressionStatementNode)
+        {
+            expressionStatementNode.Expression()->Accept(*this);
+            if (!omitSemicolon)
+            {
+                formatter.Write(";");
+            }
+            if (!omitNewLine)
+            {
+                formatter.WriteLine();
+            }
+        }
+        public override void Visit(EmptyStatementNode& emptyStatementNode)
+        {
+            formatter.Write(";");
+            if (!omitNewLine)
+            {
+                formatter.WriteLine();
+            }
+        }
+        public override void Visit(RangeForStatementNode& rangeForStatementNode)
+        {
+            formatter.Write("for (");
+            rangeForStatementNode.TypeExpr()->Accept(*this);
+            formatter.Write(" ");
+            rangeForStatementNode.Id()->Accept(*this);
+            formatter.Write(" : ");
+            rangeForStatementNode.Container()->Accept(*this);
+            if (rangeForStatementNode.Action()->GetNodeType() == NodeType.compoundStatementNode)
+            {
+                formatter.WriteLine(")");
+            }
+            else
+            {
+                formatter.Write(") ");
+            }
+            rangeForStatementNode.Action()->Accept(*this);
+        }
+        public override void Visit(SwitchStatementNode& switchStatementNode)
+        {
+            formatter.Write("switch (");
+            switchStatementNode.Condition()->Accept(*this);
+            formatter.WriteLine(")");
+            formatter.WriteLine("{");
+            formatter.IncIndent();
+            int n = switchStatementNode.Cases().Count();
+            for (int i = 0; i < n; ++i)
+            {
+                switchStatementNode.Cases()[i]->Accept(*this);
+            }
+            if ((switchStatementNode.Default() != null))
+            {
+                switchStatementNode.Default()->Accept(*this);
+            }
+            formatter.DecIndent();
+            formatter.WriteLine("}");
+        }
+        public override void Visit(CaseStatementNode& caseStatementNode)
+        {
+            int n = caseStatementNode.CaseExprs().Count();
+            for (int i = 0; i < n; ++i)
+            {
+                formatter.Write("case ");
+                caseStatementNode.CaseExprs()[i]->Accept(*this);
+                formatter.Write(": ");
+            }
+            int ns = caseStatementNode.Statements().Count();
+            for (int i = 0; i < ns; ++i)
+            {
+                if (i == 0 && caseStatementNode.Statements()[i]->GetNodeType() == NodeType.compoundStatementNode)
+                {
+                    formatter.WriteLine();
+                }
+                caseStatementNode.Statements()[i]->Accept(*this);
+            }
+        }
+        public override void Visit(DefaultStatementNode& defaultStatementNode)
+        {
+            formatter.Write("default: ");
+            int ns = defaultStatementNode.Statements().Count();
+            for (int i = 0; i < ns; ++i)
+            {
+                if (i == 0 && defaultStatementNode.Statements()[i]->GetNodeType() == NodeType.compoundStatementNode)
+                {
+                    formatter.WriteLine();
+                }
+                defaultStatementNode.Statements()[i]->Accept(*this);
+            }
+        }
+        public override void Visit(GotoCaseStatementNode& gotoCaseStatementNode)
+        {
+            formatter.Write("goto case ");
+            gotoCaseStatementNode.CaseExpr()->Accept(*this);
+            formatter.WriteLine(";");
+        }
+        public override void Visit(GotoDefaultStatementNode& gotoDefaultStatementNode)
+        {
+            formatter.WriteLine("goto default;");
+        }
+        public override void Visit(ThrowStatementNode& throwStatementNode)
+        {
+            formatter.Write("throw");
+            if ((throwStatementNode.Expression() != null))
+            {
+                formatter.Write(" ");
+                throwStatementNode.Expression()->Accept(*this);
+            }
+            formatter.WriteLine(";");
+        }
+        public override void Visit(TryStatementNode& tryStatementNode)
+        {
+            formatter.WriteLine("try");
+            tryStatementNode.TryBlock()->Accept(*this);
+            int n = tryStatementNode.Catches().Count();
+            for (int i = 0; i < n; ++i)
+            {
+                tryStatementNode.Catches()[i]->Accept(*this);
+            }
+        }
+        public override void Visit(CatchNode& catchNode)
+        {
+            formatter.Write("catch (");
+            catchNode.TypeExpr()->Accept(*this);
+            if ((catchNode.Id() != null))
+            {
+                formatter.Write(" ");
+                catchNode.Id()->Accept(*this);
+            }
+            formatter.WriteLine(")");
+            catchNode.CatchBlock()->Accept(*this);
+        }
+        public override void Visit(AssertStatementNode& assertStatementNode)
+        {
+            formatter.Write("#assert ");
+            assertStatementNode.AssertExpr()->Accept(*this);
+            formatter.WriteLine(";");
+        }
+        public override void Visit(ConditionalCompilationPartNode& conditionalCompilationPartNode)
+        {
+            int n = conditionalCompilationPartNode.Statements().Count();
+            for (int i = 0; i < n; ++i)
+            {
+                conditionalCompilationPartNode.Statements()[i]->Accept(*this);
+            }
+        }
+        public override void Visit(ConditionalCompilationDisjunctionNode& conditionalCompilationDisjunctionNode)
+        {
+            conditionalCompilationDisjunctionNode.Left()->Accept(*this);
+            formatter.Write(" || ");
+            conditionalCompilationDisjunctionNode.Right()->Accept(*this);
+        }
+        public override void Visit(ConditionalCompilationConjunctionNode& conditionalCompilationConjunctionNode)
+        {
+            conditionalCompilationConjunctionNode.Left()->Accept(*this);
+            formatter.Write(" && ");
+            conditionalCompilationConjunctionNode.Right()->Accept(*this);
+        }
+        public override void Visit(ConditionalCompilationNotNode& conditionalCompilationNotNode)
+        {
+            formatter.Write("!");
+            conditionalCompilationNotNode.Expr()->Accept(*this);
+        }
+        public override void Visit(ConditionalCompilationPrimaryNode& conditionalCompilationPrimaryNode)
+        {
+            formatter.Write(ToUtf8(conditionalCompilationPrimaryNode.Symbol()));
+        }
+        public override void Visit(ParenthesizedConditionalCompilationExpressionNode& parenthesizeCondCompExprNode)
+        {
+            formatter.Write("(");
+            parenthesizeCondCompExprNode.Expr()->Accept(*this);
+            formatter.Write(")");
+        }
+        public override void Visit(ConditionalCompilationStatementNode& conditionalCompilationStatementNode)
+        {
+            formatter.Write("#");
+            formatter.Write("if (");
+            conditionalCompilationStatementNode.IfPart()->Expr()->Accept(*this);
+            formatter.WriteLine(")");
+            formatter.IncIndent();
+            conditionalCompilationStatementNode.IfPart()->Accept(*this);
+            formatter.DecIndent();
+            int ne = conditionalCompilationStatementNode.ElifParts().Count();
+            for (int i = 0; i < ne; ++i)
+            {
+                formatter.Write("#");
+                formatter.Write("elif (");
+                conditionalCompilationStatementNode.ElifParts()[i]->Expr()->Accept(*this);
+                formatter.WriteLine(")");
+                formatter.IncIndent();
+                conditionalCompilationStatementNode.ElifParts()[i]->Accept(*this);
+                formatter.DecIndent();
+            }
+            if ((conditionalCompilationStatementNode.ElsePart() != null))
+            {
+                formatter.Write("#");
+                formatter.WriteLine("else");
+                formatter.IncIndent();
+                conditionalCompilationStatementNode.ElsePart()->Accept(*this);
+                formatter.DecIndent();
+            }
+            formatter.WriteLine("#endif");
+        }
+        public override void Visit(TypedefNode& typedefNode)
+        {
+            if (typedefNode.GetSpecifiers() != Specifiers.none)
+            {
+                formatter.Write(SpecifierStr(typedefNode.GetSpecifiers()));
+                formatter.Write(" ");
+            }
+            formatter.Write("typedef ");
+            typedefNode.TypeExpr()->Accept(*this);
+            formatter.Write(" ");
+            typedefNode.Id()->Accept(*this);
+            formatter.WriteLine(";");
+        }
+        public override void Visit(ConstantNode& constantNode)
+        {
+            if (constantNode.GetSpecifiers() != Specifiers.none)
+            {
+                formatter.Write(SpecifierStr(constantNode.GetSpecifiers()));
+                formatter.Write(" ");
+            }
+            formatter.Write("const ");
+            constantNode.TypeExpr()->Accept(*this);
+            formatter.Write(" ");
+            constantNode.Id()->Accept(*this);
+            formatter.Write(" = ");
+            constantNode.Value()->Accept(*this);
+            formatter.WriteLine(";");
+        }
+        public override void Visit(EnumTypeNode& enumTypeNode)
+        {
+            if (enumTypeNode.GetSpecifiers() != Specifiers.none)
+            {
+                formatter.Write(SpecifierStr(enumTypeNode.GetSpecifiers()));
+                formatter.Write(" ");
+            }
+            formatter.Write("enum ");
+            enumTypeNode.Id()->Accept(*this);
+            if ((enumTypeNode.GetUnderlyingType() != null))
+            {
+                formatter.Write(" : ");
+                enumTypeNode.GetUnderlyingType()->Accept(*this);
+            }
+            formatter.WriteLine();
+            formatter.WriteLine("{");
+            formatter.IncIndent();
+            int n = enumTypeNode.Constants().Count();
+            for (int i = 0; i < n; ++i)
+            {
+                if (i > 0)
+                {
+                    formatter.Write(", ");
+                }
+                enumTypeNode.Constants()[i]->Accept(*this);
+            }
+            formatter.WriteLine();
+            formatter.DecIndent();
+            formatter.WriteLine("}");
+        }
+        public override void Visit(EnumConstantNode& enumConstantNode)
+        {
+            enumConstantNode.Id()->Accept(*this);
+            if (enumConstantNode.HasValue())
+            {
+                formatter.Write(" = ");
+                enumConstantNode.GetValue()->Accept(*this);
+            }
+        }
+        public override void Visit(ParameterNode& parameterNode)
+        {
+            parameterNode.TypeExpr()->Accept(*this);
+            if ((parameterNode.Id() != null))
+            {
+                formatter.Write(" ");
+                parameterNode.Id()->Accept(*this);
+            }
+        }
+        public override void Visit(TemplateParameterNode& templateParameterNode)
+        {
+            templateParameterNode.Id()->Accept(*this);
+            if ((templateParameterNode.DefaultTemplateArgument() != null))
+            {
+                formatter.Write(" = ");
+                templateParameterNode.DefaultTemplateArgument()->Accept(*this);
+            }
+        }
+        public override void Visit(ConstNode& constNode)
+        {
+            formatter.Write("const ");
+            constNode.Subject()->Accept(*this);
+        }
+        public override void Visit(LValueRefNode& lvalueRefNode)
+        {
+            lvalueRefNode.Subject()->Accept(*this);
+            formatter.Write("&");
+        }
+        public override void Visit(RValueRefNode& rvalueRefNode)
+        {
+            rvalueRefNode.Subject()->Accept(*this);
+            formatter.Write("&&");
+        }
+        public override void Visit(PointerNode& pointerNode)
+        {
+            pointerNode.Subject()->Accept(*this);
+            formatter.Write("*");
+        }
+        public override void Visit(ArrayNode& arrayNode)
+        {
+            arrayNode.Subject()->Accept(*this);
+            formatter.Write("[");
+            if ((arrayNode.Size() != null))
+            {
+                arrayNode.Size()->Accept(*this);
+            }
+            formatter.Write("]");
+        }
+        public override void Visit(DotNode& dotNode)
+        {
+            dotNode.Subject()->Accept(*this);
+            formatter.Write(".");
+            dotNode.MemberId()->Accept(*this);
+        }
+        public override void Visit(ArrowNode& arrowNode)
+        {
+            arrowNode.Subject()->Accept(*this);
+            formatter.Write("->");
+            arrowNode.MemberId()->Accept(*this);
+        }
+        public override void Visit(EquivalenceNode& equivalenceNode)
+        {
+            equivalenceNode.Left()->Accept(*this);
+            formatter.Write(" <=> ");
+            equivalenceNode.Right()->Accept(*this);
+        }
+        public override void Visit(ImplicationNode& implicationNode)
+        {
+            implicationNode.Left()->Accept(*this);
+            formatter.Write(" => ");
+            implicationNode.Right()->Accept(*this);
+        }
+        public override void Visit(DisjunctionNode& disjunctionNode)
+        {
+            disjunctionNode.Left()->Accept(*this);
+            formatter.Write(" || ");
+            disjunctionNode.Right()->Accept(*this);
+        }
+        public override void Visit(ConjunctionNode& conjunctionNode)
+        {
+            conjunctionNode.Left()->Accept(*this);
+            formatter.Write(" && ");
+            conjunctionNode.Right()->Accept(*this);
+        }
+        public override void Visit(BitOrNode& bitOrNode)
+        {
+            bitOrNode.Left()->Accept(*this);
+            formatter.Write(" | ");
+            bitOrNode.Right()->Accept(*this);
+        }
+        public override void Visit(BitXorNode& bitXorNode)
+        {
+            bitXorNode.Left()->Accept(*this);
+            formatter.Write(" ^ ");
+            bitXorNode.Right()->Accept(*this);
+        }
+        public override void Visit(BitAndNode& bitAndNode)
+        {
+            bitAndNode.Left()->Accept(*this);
+            formatter.Write(" & ");
+            bitAndNode.Right()->Accept(*this);
+        }
+        public override void Visit(EqualNode& equalNode)
+        {
+            equalNode.Left()->Accept(*this);
+            formatter.Write(" == ");
+            equalNode.Right()->Accept(*this);
+        }
+        public override void Visit(NotEqualNode& notEqualNode)
+        {
+            notEqualNode.Left()->Accept(*this);
+            formatter.Write(" != ");
+            notEqualNode.Right()->Accept(*this);
+        }
+        public override void Visit(LessNode& lessNode)
+        {
+            lessNode.Left()->Accept(*this);
+            formatter.Write(" < ");
+            lessNode.Right()->Accept(*this);
+        }
+        public override void Visit(GreaterNode& greaterNode)
+        {
+            greaterNode.Left()->Accept(*this);
+            formatter.Write(" > ");
+            greaterNode.Right()->Accept(*this);
+        }
+        public override void Visit(LessOrEqualNode& lessOrEqualNode)
+        {
+            lessOrEqualNode.Left()->Accept(*this);
+            formatter.Write(" <= ");
+            lessOrEqualNode.Right()->Accept(*this);
+        }
+        public override void Visit(GreaterOrEqualNode& greaterOrEqualNode)
+        {
+            greaterOrEqualNode.Left()->Accept(*this);
+            formatter.Write(" >= ");
+            greaterOrEqualNode.Right()->Accept(*this);
+        }
+        public override void Visit(ShiftLeftNode& shiftLeftNode)
+        {
+            shiftLeftNode.Left()->Accept(*this);
+            formatter.Write(" << ");
+            shiftLeftNode.Right()->Accept(*this);
+        }
+        public override void Visit(ShiftRightNode& shiftRightNode)
+        {
+            shiftRightNode.Left()->Accept(*this);
+            formatter.Write(" >> ");
+            shiftRightNode.Right()->Accept(*this);
+        }
+        public override void Visit(AddNode& addNode)
+        {
+            addNode.Left()->Accept(*this);
+            formatter.Write(" + ");
+            addNode.Right()->Accept(*this);
+        }
+        public override void Visit(SubNode& subNode)
+        {
+            subNode.Left()->Accept(*this);
+            formatter.Write(" - ");
+            subNode.Right()->Accept(*this);
+        }
+        public override void Visit(MulNode& mulNode)
+        {
+            mulNode.Left()->Accept(*this);
+            formatter.Write(" * ");
+            mulNode.Right()->Accept(*this);
+        }
+        public override void Visit(DivNode& divNode)
+        {
+            divNode.Left()->Accept(*this);
+            formatter.Write(" / ");
+            divNode.Right()->Accept(*this);
+        }
+        public override void Visit(RemNode& remNode)
+        {
+            remNode.Left()->Accept(*this);
+            formatter.Write(" % ");
+            remNode.Right()->Accept(*this);
+        }
+        public override void Visit(NotNode& notNode)
+        {
+            formatter.Write("!");
+            notNode.Subject()->Accept(*this);
+        }
+        public override void Visit(UnaryPlusNode& unaryPlusNode)
+        {
+            formatter.Write("+");
+            unaryPlusNode.Subject()->Accept(*this);
+        }
+        public override void Visit(UnaryMinusNode& unaryMinusNode)
+        {
+            formatter.Write("-");
+            unaryMinusNode.Subject()->Accept(*this);
+        }
+        public override void Visit(PrefixIncrementNode& prefixIncrementNode)
+        {
+            formatter.Write("++");
+            prefixIncrementNode.Subject()->Accept(*this);
+        }
+        public override void Visit(PrefixDecrementNode& prefixDecrementNode)
+        {
+            formatter.Write("--");
+            prefixDecrementNode.Subject()->Accept(*this);
+        }
+        public override void Visit(DerefNode& derefNode)
+        {
+            formatter.Write("*");
+            derefNode.Subject()->Accept(*this);
+        }
+        public override void Visit(AddrOfNode& addrOfNode)
+        {
+            formatter.Write("&");
+            addrOfNode.Subject()->Accept(*this);
+        }
+        public override void Visit(ComplementNode& complementNode)
+        {
+            formatter.Write("~");
+            complementNode.Subject()->Accept(*this);
+        }
+        public override void Visit(IsNode& isNode)
+        {
+            isNode.Expr()->Accept(*this);
+            formatter.Write(" is ");
+            isNode.TargetTypeExpr()->Accept(*this);
+        }
+        public override void Visit(AsNode& asNode)
+        {
+            asNode.Expr()->Accept(*this);
+            formatter.Write(" as ");
+            asNode.TargetTypeExpr()->Accept(*this);
+        }
+        public override void Visit(IndexingNode& indexingNode)
+        {
+            indexingNode.Subject()->Accept(*this);
+            formatter.Write("[");
+            indexingNode.Index()->Accept(*this);
+            formatter.Write("]");
+        }
+        public override void Visit(InvokeNode& invokeNode)
+        {
+            invokeNode.Subject()->Accept(*this);
+            formatter.Write("(");
+            int n = invokeNode.Arguments().Count();
+            for (int i = 0; i < n; ++i)
+            {
+                if (i > 0)
+                {
+                    formatter.Write(", ");
+                }
+                invokeNode.Arguments()[i]->Accept(*this);
+            }
+            formatter.Write(")");
+        }
+        public override void Visit(PostfixIncrementNode& postfixIncrementNode)
+        {
+            postfixIncrementNode.Subject()->Accept(*this);
+            formatter.Write("++");
+        }
+        public override void Visit(PostfixDecrementNode& postfixDecrementNode)
+        {
+            postfixDecrementNode.Subject()->Accept(*this);
+            formatter.Write("--");
+        }
+        public override void Visit(SizeOfNode& sizeOfNode)
+        {
+            formatter.Write("sizeof(");
+            sizeOfNode.Expression()->Accept(*this);
+            formatter.Write(")");
+        }
+        public override void Visit(TypeNameNode& typeNameNode)
+        {
+            formatter.Write("typename(");
+            typeNameNode.Expression()->Accept(*this);
+            formatter.Write(")");
+        }
+        public override void Visit(TypeIdNode& typeIdNode)
+        {
+            formatter.Write("typeid(");
+            typeIdNode.Expression()->Accept(*this);
+            formatter.Write(")");
+        }
+        public override void Visit(CastNode& castNode)
+        {
+            formatter.Write("cast<");
+            castNode.TargetTypeExpr()->Accept(*this);
+            formatter.Write(">(");
+            castNode.SourceExpr()->Accept(*this);
+            formatter.Write(")");
+        }
+        public override void Visit(ConstructNode& constructNode)
+        {
+            formatter.Write("construct<");
+            constructNode.TypeExpr()->Accept(*this);
+            formatter.Write(">(");
+            int n = constructNode.Arguments().Count();
+            for (int i = 0; i < n; ++i)
+            {
+                if (i > 0)
+                {
+                    formatter.Write(", ");
+                }
+                constructNode.Arguments()[i]->Accept(*this);
+            }
+            formatter.Write(")");
+        }
+        public override void Visit(NewNode& newNode)
+        {
+            formatter.Write("new ");
+            newNode.TypeExpr()->Accept(*this);
+            formatter.Write("(");
+            int n = newNode.Arguments().Count();
+            for (int i = 0; i < n; ++i)
+            {
+                if (i > 0)
+                {
+                    formatter.Write(", ");
+                }
+                newNode.Arguments()[i]->Accept(*this);
+            }
+            formatter.Write(")");
+        }
+        public override void Visit(ThisNode& thisNode)
+        {
+            formatter.Write("this");
+        }
+        public override void Visit(BaseNode& baseNode)
+        {
+            formatter.Write("base");
+        }
+        public override void Visit(ParenthesizedExpressionNode& parenthesizedExpressionNode)
+        {
+            formatter.Write("(");
+            parenthesizedExpressionNode.Subject()->Accept(*this);
+            formatter.Write(")");
+        }
+        public override void Visit(GlobalVariableNode& globalVariableNode)
+        {
+            if (globalVariableNode.GetSpecifiers() != Specifiers.none)
+            {
+                formatter.Write(SpecifierStr(globalVariableNode.GetSpecifiers()));
+                formatter.Write(" ");
+            }
+            globalVariableNode.TypeExpr()->Accept(*this);
+            formatter.Write(" ");
+            globalVariableNode.Id()->Accept(*this);
+            if ((globalVariableNode.Initializer() != null))
+            {
+                formatter.Write(" = ");
+                globalVariableNode.Initializer()->Accept(*this);
+            }
+            formatter.WriteLine(";");
+        }
+        public override void Visit(Attribute& attribute)
+        {
+            formatter.Write(ToUtf8(attribute.Name()));
+            if (!attribute.Value().IsEmpty())
+            {
+                formatter.Write("=");
+                formatter.Write("\"" + StringStr(ToUtf8(attribute.Value())) + "\"");
+            }
+        }
+        public override void Visit(Attributes& attributes)
+        {
+            formatter.Write("[");
+            int n = cast<int>(attributes.GetAttributes().Count());
+            for (int i = 0; i < n; ++i)
+            {
+                if (i > 0)
+                {
+                    formatter.Write(", ");
+                }
+                attributes.GetAttributes()[i]->Accept(*this);
+            }
+            formatter.Write("]");
+        }
+        public override void Visit(CommentNode& comment)
+        {
+            formatter.WriteLine("// " + ToUtf8(comment.Comment()));
+            formatter.WriteLine();
+        }
+        private CodeFormatter& formatter;
+        private bool omitNewLine;
+        private bool omitSemicolon;
+    }
+} // namespace Cm.Ast

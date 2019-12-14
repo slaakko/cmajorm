@@ -5,10 +5,10 @@
 
 #include <cmajor/rt/UnitTest.hpp>
 #include <cmajor/rt/InitDone.hpp>
-#include <cmajor/dom/Document.hpp>
-#include <cmajor/dom/Element.hpp>
-#include <cmajor/util/CodeFormatter.hpp>
-#include <cmajor/util/Unicode.hpp>
+#include <sngxml/dom/Document.hpp>
+#include <sngxml/dom/Element.hpp>
+#include <soulng/util/CodeFormatter.hpp>
+#include <soulng/util/Unicode.hpp>
 #include <fstream>
 #include <memory>
 #include <string>
@@ -16,7 +16,7 @@
 
 namespace cmajor { namespace rt {
 
-using namespace cmajor::unicode;
+using namespace soulng::unicode;
 
 const int assertionResultEmpty = 0;
 const int assertionResultPassed = 1;
@@ -72,12 +72,12 @@ void UnitTestEngine::StartUnitTest(int32_t numAssertions_, const char* unitTestF
 void UnitTestEngine::EndUnitTest(const char* testName, int32_t exitCode)
 {
     std::ofstream testXmlFile(unitTestFilePath);
-    cmajor::dom::Document document;
-    std::unique_ptr<cmajor::dom::Element> testElement(new cmajor::dom::Element(U"test"));
+    sngxml::dom::Document document;
+    std::unique_ptr<sngxml::dom::Element> testElement(new sngxml::dom::Element(U"test"));
     testElement->SetAttribute(U"name", ToUtf32(testName));
     for (int32_t i = 0; i < numAssertions; ++i)
     {
-        std::unique_ptr<cmajor::dom::Element> assertionElement(new cmajor::dom::Element(U"assertion"));
+        std::unique_ptr<sngxml::dom::Element> assertionElement(new sngxml::dom::Element(U"assertion"));
         assertionElement->SetAttribute(U"index", ToUtf32(std::to_string(i)));
         const AssertionResult& assertionResult = assertionResults[i];
         std::u32string assertionResultStr = U"empty";
@@ -91,7 +91,7 @@ void UnitTestEngine::EndUnitTest(const char* testName, int32_t exitCode)
         }
         assertionElement->SetAttribute(U"result", assertionResultStr);
         assertionElement->SetAttribute(U"line", ToUtf32(std::to_string(assertionResult.line)));
-        testElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(assertionElement.release()));
+        testElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(assertionElement.release()));
     }
     testElement->SetAttribute(U"exitCode", ToUtf32(std::to_string(exitCode)));
     testElement->SetAttribute(U"count", ToUtf32(std::to_string(numAssertions)));
@@ -99,8 +99,8 @@ void UnitTestEngine::EndUnitTest(const char* testName, int32_t exitCode)
     {
         testElement->SetAttribute(U"exception", ToUtf32(exceptionStr));
     }
-    document.AppendChild(std::unique_ptr<cmajor::dom::Node>(testElement.release()));
-    cmajor::util::CodeFormatter formatter(testXmlFile);
+    document.AppendChild(std::unique_ptr<sngxml::dom::Node>(testElement.release()));
+    soulng::util::CodeFormatter formatter(testXmlFile);
     formatter.SetIndentSize(2);
     document.Write(formatter);
 }

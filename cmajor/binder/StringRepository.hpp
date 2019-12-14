@@ -5,7 +5,7 @@
 
 #ifndef CMAJOR_BINDER_STRING_REPOSITORY_INCLUDED
 #define CMAJOR_BINDER_STRING_REPOSITORY_INCLUDED
-#include <cmajor/util/Error.hpp>
+#include <soulng/util/Error.hpp>
 #include <unordered_map>
 #include <vector>
 

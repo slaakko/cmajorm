@@ -10,7 +10,7 @@
 #include <cmajor/parsing/Composite.hpp>
 #include <cmajor/parsing/Keyword.hpp>
 #include <cmajor/parsing/Visitor.hpp>
-#include <cmajor/util/CodeFormatter.hpp>
+#include <soulng/util/CodeFormatter.hpp>
 
 namespace cmajor { namespace syntax {
 

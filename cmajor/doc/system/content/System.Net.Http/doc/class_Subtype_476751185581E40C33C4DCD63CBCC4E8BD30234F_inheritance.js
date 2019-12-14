@@ -271,13 +271,13 @@ function drawInheritanceDiagram() {
         { name: "System.Net.Http.Subtype", id: "diagram_node_0", level: 0, subject: true, hasDerivedNodes: true, link: "../../System.Net.Http/doc/class_Subtype_476751185581E40C33C4DCD63CBCC4E8BD30234F.html" },
         { name: "System.Net.Http.AnySubtype", id: "diagram_node_1", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Net.Http/doc/class_AnySubtype_2E4F7CF9A8C197FBBD5696A094067103502E5891.html" },
         { name: "System.Net.Http.BasicSubtype", id: "diagram_node_4", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Net.Http/doc/class_BasicSubtype_F00EEECE2247D89E6A77A23DF84B0246BA1E201F.html" },
-        { name: "System.Net.Http.ExternalBodySubtype", id: "diagram_node_6", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Net.Http/doc/class_ExternalBodySubtype_DE34B3EBADA544F8FEAF585C869F373A95A8210C.html" },
+        { name: "System.Net.Http.ExternalBodySubtype", id: "diagram_node_5", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Net.Http/doc/class_ExternalBodySubtype_DE34B3EBADA544F8FEAF585C869F373A95A8210C.html" },
         { name: "System.Net.Http.JpegSubtype", id: "diagram_node_3", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Net.Http/doc/class_JpegSubtype_D13AC5779951ED5B19463DFEFED3737B14A3F3B5.html" },
-        { name: "System.Net.Http.MpegSubtype", id: "diagram_node_7", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Net.Http/doc/class_MpegSubtype_2D78E14D08CE2C2EFC901C1621FE2F5D9821EF80.html" },
+        { name: "System.Net.Http.MpegSubtype", id: "diagram_node_6", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Net.Http/doc/class_MpegSubtype_2D78E14D08CE2C2EFC901C1621FE2F5D9821EF80.html" },
         { name: "System.Net.Http.OctetStreamSubtype", id: "diagram_node_2", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Net.Http/doc/class_OctetStreamSubtype_C758A617CEC7A2318C14F0DEAE218921B337B5D9.html" },
-        { name: "System.Net.Http.PartialSubtype", id: "diagram_node_8", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Net.Http/doc/class_PartialSubtype_B017988E17CA24D6612F691AFE3DB0CFB49EB9F2.html" },
-        { name: "System.Net.Http.PlainSubtype", id: "diagram_node_9", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Net.Http/doc/class_PlainSubtype_DE85845E4A7BF753261EBC12850D75839A5245ED.html" },
-        { name: "System.Net.Http.PostScriptSubtype", id: "diagram_node_5", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Net.Http/doc/class_PostScriptSubtype_F384A0F6E137195067DFFCB9842E15EC0DB74631.html" },
+        { name: "System.Net.Http.PartialSubtype", id: "diagram_node_7", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Net.Http/doc/class_PartialSubtype_B017988E17CA24D6612F691AFE3DB0CFB49EB9F2.html" },
+        { name: "System.Net.Http.PlainSubtype", id: "diagram_node_8", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Net.Http/doc/class_PlainSubtype_DE85845E4A7BF753261EBC12850D75839A5245ED.html" },
+        { name: "System.Net.Http.PostScriptSubtype", id: "diagram_node_9", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Net.Http/doc/class_PostScriptSubtype_F384A0F6E137195067DFFCB9842E15EC0DB74631.html" },
         { name: "System.Net.Http.Rfc822Subtype", id: "diagram_node_10", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Net.Http/doc/class_Rfc822Subtype_F90CDE0DB0845415DD05E9C0D8331B919F49EC35.html" }];
     drawDiagram(diagramNodes);
 }

@@ -8,11 +8,11 @@
 #include <stdint.h>
 #include <string>
 #include <vector>
-#include <cmajor/util/CodeFormatter.hpp>
+#include <soulng/util/CodeFormatter.hpp>
 
 namespace cmsxi {
 
-using namespace cmajor::util;
+using namespace soulng::util;
 
 enum class MDItemKind : uint8_t
 {

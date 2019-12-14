@@ -1,0 +1,34 @@
+// =================================
+// Copyright (c) 2019 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+[hpp]#include <sngcm/cmparser/ParserApi.hpp>
+[hpp]#include <sngcm/ast/Typedef.hpp>
+[hpp]#include <sngcm/cmparser/ParsingContext.hpp>
+[cpp]#include <sngcm/cmparser/Specifier.hpp>
+[cpp]#include <sngcm/cmparser/TypeExpr.hpp>
+[cpp]#include <sngcm/cmparser/Identifier.hpp>
+[cpp]#include <sngcm/cmlexer/CmajorLexer.hpp>
+[cpp]#include <sngcm/cmlexer/CmajorTokens.hpp>
+
+using namespace sngcm::ast;
+using namespace CmajorTokens;
+
+parser api(SNGCM_PARSER_API) TypedefParser
+{
+    uselexer CmajorLexer;
+
+    using SpecifierParser.Specifiers;
+    using TypeExprParser.TypeExpr;
+    using IdentifierParser.Identifier;
+
+    Typedef(ParsingContext* ctx, var Span s) : TypedefNode*
+        ::= Specifiers:specifiers{ s = span; } TYPEDEF TypeExpr(ctx):type! Identifier:id! SEMICOLON!{ s.end = span.end; return new TypedefNode(s, specifiers, type, id); }
+        ;
+
+    ruleinfo
+    {
+        (Typedef, "typedef")
+    }
+}

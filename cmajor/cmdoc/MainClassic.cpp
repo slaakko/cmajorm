@@ -1,22 +1,22 @@
 /*
 #include <cmajor/binder/AttributeBinder.hpp>
-#include <cmajor/ast/InitDone.hpp>
-#include <cmajor/ast/Visitor.hpp>
-#include <cmajor/ast/TypeExpr.hpp>
-#include <cmajor/ast/Identifier.hpp>
-#include <cmajor/ast/Expression.hpp>
+#include <sngcm/ast/InitDone.hpp>
+#include <sngcm/ast/Visitor.hpp>
+#include <sngcm/ast/TypeExpr.hpp>
+#include <sngcm/ast/Identifier.hpp>
+#include <sngcm/ast/Expression.hpp>
 #include <cmajor/symbols/InitDone.hpp>
 #include <cmajor/symbols/GlobalFlags.hpp>
 #include <cmajor/symbols/SymbolCollector.hpp>
-#include <cmajor/dom/Parser.hpp>
-#include <cmajor/dom/Element.hpp>
-#include <cmajor/dom/CharacterData.hpp>
+#include <sngxml/dom/Parser.hpp>
+#include <sngxml/dom/Element.hpp>
+#include <sngxml/dom/CharacterData.hpp>
 #include <cmajor/xpath/InitDone.hpp>
 #include <cmajor/xpath/XPathEvaluate.hpp>
-#include <cmajor/util/InitDone.hpp>
-#include <cmajor/util/Unicode.hpp>
-#include <cmajor/util/Path.hpp>
-#include <cmajor/util/Sha1.hpp>
+#include <soulng/util/InitDone.hpp>
+#include <soulng/util/Unicode.hpp>
+#include <soulng/util/Path.hpp>
+#include <soulng/util/Sha1.hpp>
 #include <cmajor/parsing/InitDone.hpp>
 #include <boost/filesystem.hpp>
 #include <iostream>
@@ -24,11 +24,11 @@
 #include <stdexcept>
 #include <vector>
 
-using namespace cmajor::dom;
-using namespace cmajor::unicode;
+using namespace sngxml::dom;
+using namespace soulng::unicode;
 using namespace cmajor::symbols;
 using namespace cmajor::binder;
-using namespace cmajor::util;
+using namespace soulng::util;
 
 bool verbose = false;
 bool force = false;
@@ -44,8 +44,8 @@ void GenerateXmlForConstants(Element* parentElement, const std::vector<ConstantS
 void GenerateXmlForEnumeratedTypes(Element* parentElement, const std::vector<EnumTypeSymbol*>& enumTypes);
 void GenerateXmlForMemberVariables(Element* parentElement, const std::vector<MemberVariableSymbol*>& memberVariables);
 void GenerateXmlForTypes(Element* parentElement, std::vector<TypeSymbol*>& types, const std::vector<std::u32string>& referenceXmlFilePaths, const std::vector<std::unique_ptr<Document>>& referenceXmlDocs);
-std::u32string GetName(cmajor::dom::Element* element, bool optional);
-std::u32string GetName(cmajor::dom::Element* element)
+std::u32string GetName(sngxml::dom::Element* element, bool optional);
+std::u32string GetName(sngxml::dom::Element* element)
 {
     return GetName(element, false);
 }
@@ -80,7 +80,7 @@ std::u32string FullClassName(Element* element)
     else
     {
         ParentNode* parent = element->Parent();
-        if (parent && parent->GetNodeType() == cmajor::dom::NodeType::elementNode)
+        if (parent && parent->GetNodeType() == sngxml::dom::NodeType::elementNode)
         {
             fullClassName = FullClassName(static_cast<Element*>(parent));
             std::u32string name = GetName(element, true);
@@ -97,7 +97,7 @@ std::u32string FullClassName(Element* element)
     return fullClassName;
 }
 
-class ConstraintHyperTextGenerator : public cmajor::ast::Visitor
+class ConstraintHyperTextGenerator : public sngcm::ast::Visitor
 {
 public:
     ConstraintHyperTextGenerator(Element* constraintElement_, const std::vector<ContainerScope*>& containerScopes_, SymbolTable* symbolTable_);
@@ -314,7 +314,7 @@ void ConstraintHyperTextGenerator::Visit(VoidNode& voidNode)
 void ConstraintHyperTextGenerator::Visit(ConstNode& constNode)
 {
     std::unique_ptr<Element> qualifierElement(new Element(U"qualifier"));
-    qualifierElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(U"const")));
+    qualifierElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(U"const")));
     parentElement->AppendChild(std::move(qualifierElement));
     constNode.Subject()->Accept(*this);
 }
@@ -323,7 +323,7 @@ void ConstraintHyperTextGenerator::Visit(LValueRefNode& lvalueRefNode)
 {
     lvalueRefNode.Subject()->Accept(*this);
     std::unique_ptr<Element> qualifierElement(new Element(U"qualifier"));
-    qualifierElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(U"&")));
+    qualifierElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(U"&")));
     parentElement->AppendChild(std::move(qualifierElement));
 }
 
@@ -331,7 +331,7 @@ void ConstraintHyperTextGenerator::Visit(RValueRefNode& rvalueRefNode)
 {
     rvalueRefNode.Subject()->Accept(*this);
     std::unique_ptr<Element> qualifierElement(new Element(U"qualifier"));
-    qualifierElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(U"&&")));
+    qualifierElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(U"&&")));
     parentElement->AppendChild(std::move(qualifierElement));
 }
 
@@ -339,7 +339,7 @@ void ConstraintHyperTextGenerator::Visit(PointerNode& pointerNode)
 {
     pointerNode.Subject()->Accept(*this);
     std::unique_ptr<Element> qualifierElement(new Element(U"qualifier"));
-    qualifierElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(U"*")));
+    qualifierElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(U"*")));
     parentElement->AppendChild(std::move(qualifierElement));
 }
 
@@ -347,7 +347,7 @@ void ConstraintHyperTextGenerator::Visit(ArrayNode& arrayNode)
 {
     arrayNode.Subject()->Accept(*this);
     std::unique_ptr<Element> qualifierElement(new Element(U"qualifier"));
-    qualifierElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(U"[]")));
+    qualifierElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(U"[]")));
     parentElement->AppendChild(std::move(qualifierElement));
 }
 
@@ -367,7 +367,7 @@ void ConstraintHyperTextGenerator::Visit(IdentifierNode& identifierNode)
     }
     if (!resolved)
     {
-        parentElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(name)));
+        parentElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(name)));
     }
 }
 
@@ -437,7 +437,7 @@ void ConstraintHyperTextGenerator::Visit(DotNode& dotNode)
     else
     {
         std::unique_ptr<Element> dot(new Element(U"dot"));
-        dot->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(name)));
+        dot->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(name)));
         parentElement->AppendChild(std::move(dot));
     }
 }
@@ -451,7 +451,7 @@ void ConstraintHyperTextGenerator::Visit(DisjunctiveConstraintNode& disjunctiveC
     }
     disjunctiveConstraintNode.Left()->Accept(*this);
     std::unique_ptr<Element> connector(new Element(U"connector"));
-    connector->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(U"or")));
+    connector->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(U"or")));
     parentElement->AppendChild(std::move(connector));
     disjunctiveConstraintNode.Right()->Accept(*this);
     if (parens)
@@ -463,7 +463,7 @@ void ConstraintHyperTextGenerator::Visit(DisjunctiveConstraintNode& disjunctiveC
 
 void ConstraintHyperTextGenerator::Visit(ConjunctiveConstraintNode& conjunctiveConstraintNode)
 {
-    if (conjunctiveConstraintNode.Left()->GetNodeType() == cmajor::ast::NodeType::disjunctiveConstraintNode)
+    if (conjunctiveConstraintNode.Left()->GetNodeType() == sngcm::ast::NodeType::disjunctiveConstraintNode)
     {
         PushParens(true);
         conjunctiveConstraintNode.Left()->Accept(*this);
@@ -474,9 +474,9 @@ void ConstraintHyperTextGenerator::Visit(ConjunctiveConstraintNode& conjunctiveC
         conjunctiveConstraintNode.Left()->Accept(*this);
     }
     std::unique_ptr<Element> connector(new Element(U"connector"));
-    connector->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(U"and")));
+    connector->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(U"and")));
     parentElement->AppendChild(std::move(connector));
-    if (conjunctiveConstraintNode.Right()->GetNodeType() == cmajor::ast::NodeType::disjunctiveConstraintNode)
+    if (conjunctiveConstraintNode.Right()->GetNodeType() == sngcm::ast::NodeType::disjunctiveConstraintNode)
     {
         PushParens(true);
         conjunctiveConstraintNode.Right()->Accept(*this);
@@ -497,7 +497,7 @@ void ConstraintHyperTextGenerator::Visit(IsConstraintNode& isConstraintNode)
 {
     isConstraintNode.TypeExpr()->Accept(*this);
     std::unique_ptr<Element> connector(new Element(U"connector"));
-    connector->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(U"is")));
+    connector->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(U"is")));
     parentElement->AppendChild(std::move(connector));
     typeAdded = false;
     isConstraintNode.ConceptOrTypeName()->Accept(*this);
@@ -526,7 +526,7 @@ void ConstraintHyperTextGenerator::Visit(MultiParamConstraintNode& multiParamCon
     int n = multiParamConstraintNode.TypeExprs().Count();
     for (int i = 0; i < n; ++i)
     {
-        cmajor::ast::Node* node = multiParamConstraintNode.TypeExprs()[i];
+        sngcm::ast::Node* node = multiParamConstraintNode.TypeExprs()[i];
         node->Accept(*this);
     }
     parentElement = prevParent;
@@ -551,34 +551,34 @@ void ConstraintHyperTextGenerator::Visit(TypeNameConstraintNode& typeNameConstra
 {
     std::unique_ptr<Element> span(new Element(U"span"));
     span->SetAttribute(U"class", U"kw");
-    span->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(U"typename")));
+    span->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(U"typename")));
     parentElement->AppendChild(std::move(span));
-    parentElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(U" " + ToUtf32(typeNameConstraintNode.TypeId()->ToString()))));
+    parentElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(U" " + ToUtf32(typeNameConstraintNode.TypeId()->ToString()))));
 }
 
 void ConstraintHyperTextGenerator::Visit(PredicateConstraintNode& predicateConstratintNode)
 {
-    parentElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(ToUtf32(predicateConstratintNode.ToString()))));
+    parentElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(ToUtf32(predicateConstratintNode.ToString()))));
 }
 
 void ConstraintHyperTextGenerator::Visit(ConstructorConstraintNode& constructorConstraintNode)
 {
-    parentElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(ToUtf32(constructorConstraintNode.ToString()))));
+    parentElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(ToUtf32(constructorConstraintNode.ToString()))));
 }
 
 void ConstraintHyperTextGenerator::Visit(DestructorConstraintNode& destructorConstraintNode)
 {
-    parentElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(ToUtf32(destructorConstraintNode.ToString()))));
+    parentElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(ToUtf32(destructorConstraintNode.ToString()))));
 }
 
 void ConstraintHyperTextGenerator::Visit(MemberFunctionConstraintNode& memberFunctionConstraintNode)
 {
-    parentElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(ToUtf32(memberFunctionConstraintNode.ToString()))));
+    parentElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(ToUtf32(memberFunctionConstraintNode.ToString()))));
 }
 
 void ConstraintHyperTextGenerator::Visit(FunctionConstraintNode& functionConstraintNode)
 {
-    parentElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(ToUtf32(functionConstraintNode.ToString()))));
+    parentElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(ToUtf32(functionConstraintNode.ToString()))));
 }
 
 std::unique_ptr<Element> ConstraintToXml(ConstraintNode* constraintNode, Symbol* parent)
@@ -587,7 +587,7 @@ std::unique_ptr<Element> ConstraintToXml(ConstraintNode* constraintNode, Symbol*
     ContainerScope* containerScope = parent->GetContainerScope();
     std::vector<ContainerScope*> containerScopes;
     containerScopes.push_back(containerScope);
-    const cmajor::ast::NodeList<cmajor::ast::Node>* usingNodes = nullptr;
+    const sngcm::ast::NodeList<sngcm::ast::Node>* usingNodes = nullptr;
     if (parent->IsFunctionSymbol())
     {
         FunctionSymbol* fun = static_cast<FunctionSymbol*>(parent);
@@ -625,10 +625,10 @@ std::unique_ptr<Element> ConstraintToXml(ConstraintNode* constraintNode, Symbol*
         int n = usingNodes->Count();
         for (int i = 0; i < n; ++i)
         {
-            cmajor::ast::Node* usingNode = (*usingNodes)[i];
-            if (usingNode->GetNodeType() == cmajor::ast::NodeType::namespaceImportNode)
+            sngcm::ast::Node* usingNode = (*usingNodes)[i];
+            if (usingNode->GetNodeType() == sngcm::ast::NodeType::namespaceImportNode)
             {
-                cmajor::ast::NamespaceImportNode* nsImport = static_cast<cmajor::ast::NamespaceImportNode*>(usingNode);
+                sngcm::ast::NamespaceImportNode* nsImport = static_cast<sngcm::ast::NamespaceImportNode*>(usingNode);
                 std::u32string importedNamespaceName = nsImport->Ns()->Str();
                 Symbol* symbol = containerScope->Lookup(importedNamespaceName, ScopeLookup::this_and_parent);
                 containerScopes.push_back(symbol->GetContainerScope());
@@ -658,13 +658,13 @@ void GenerateClassXml(Element* parentElement, ClassTypeSymbol* cls)
     std::unique_ptr<Element> classElement(new Element(U"class"));
     classElement->SetAttribute(U"id", cls->Id());
     std::unique_ptr<Element> classNameElement(new Element(U"name"));
-    classNameElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(cls->DocName())));
+    classNameElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(cls->DocName())));
     classElement->AppendChild(std::move(classNameElement));
     std::unique_ptr<Element> classGroupNameElement(new Element(U"groupName"));
-    classGroupNameElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(cls->GroupName())));
+    classGroupNameElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(cls->GroupName())));
     classElement->AppendChild(std::move(classGroupNameElement));
     std::unique_ptr<Element> syntaxElement(new Element(U"syntax"));
-    syntaxElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(ToUtf32(cls->Syntax()))));
+    syntaxElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(ToUtf32(cls->Syntax()))));
     classElement->AppendChild(std::move(syntaxElement));
     if (cls->GetSymbolType() == SymbolType::classTemplateSpecializationSymbol)
     {
@@ -677,7 +677,7 @@ void GenerateClassXml(Element* parentElement, ClassTypeSymbol* cls)
                 std::unique_ptr<Element> templateParameterElement(new Element(U"templateParameter"));
                 templateParameterElement->SetAttribute(U"id", templateParameter->Id());
                 std::unique_ptr<Element> templateParameterNameElement(new Element(U"name"));
-                templateParameterNameElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(templateParameter->DocName())));
+                templateParameterNameElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(templateParameter->DocName())));
                 templateParameterElement->AppendChild(std::move(templateParameterNameElement));
                 if (templateParameter->GetSymbolType() == SymbolType::templateParameterSymbol)
                 {
@@ -685,7 +685,7 @@ void GenerateClassXml(Element* parentElement, ClassTypeSymbol* cls)
                     if (symbol->HasDefault())
                     {
                         std::unique_ptr<Element> defaultElement(new Element(U"default"));
-                        defaultElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(ToUtf32(symbol->DefaultStr()))));
+                        defaultElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(ToUtf32(symbol->DefaultStr()))));
                         templateParameterElement->AppendChild(std::move(defaultElement));
                     }
                 }
@@ -741,10 +741,10 @@ void GenerateXmlForTypedefs(Element* parentElement, const std::vector<TypedefSym
         std::unique_ptr<Element> typedefElement(new Element(U"typedef"));
         typedefElement->SetAttribute(U"id", typedef_->Id());
         std::unique_ptr<Element> typedefNameElement(new Element(U"name"));
-        typedefNameElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(typedef_->DocName())));
+        typedefNameElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(typedef_->DocName())));
         typedefElement->AppendChild(std::move(typedefNameElement));
         std::unique_ptr<Element> syntaxElement(new Element(U"syntax"));
-        syntaxElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(ToUtf32(typedef_->Syntax()))));
+        syntaxElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(ToUtf32(typedef_->Syntax()))));
         typedefElement->AppendChild(std::move(syntaxElement));
         std::unique_ptr<Element> typeElement(new Element(U"type"));
         typeElement->SetAttribute(U"ref", GetTypeId(typedef_->GetType()));
@@ -776,13 +776,13 @@ void GenerateXmlForConcepts(Element* parentElement, const std::vector<ConceptSym
         std::unique_ptr<Element> conceptElement(new Element(U"concept"));
         conceptElement->SetAttribute(U"id", concept->Id());
         std::unique_ptr<Element> conceptNameElement(new Element(U"name"));
-        conceptNameElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(concept->DocName())));
+        conceptNameElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(concept->DocName())));
         conceptElement->AppendChild(std::move(conceptNameElement));
         std::unique_ptr<Element> conceptGroupNameElement(new Element(U"groupName"));
-        conceptGroupNameElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(concept->GroupName())));
+        conceptGroupNameElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(concept->GroupName())));
         conceptElement->AppendChild(std::move(conceptGroupNameElement));
         std::unique_ptr<Element> syntaxElement(new Element(U"syntax"));
-        syntaxElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(ToUtf32(concept->Syntax()))));
+        syntaxElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(ToUtf32(concept->Syntax()))));
         conceptElement->AppendChild(std::move(syntaxElement));
         std::unique_ptr<Element> templateParametersElement(new Element(U"templateParameters"));
         for (TemplateParameterSymbol* templateParameter : concept->TemplateParameters())
@@ -790,12 +790,12 @@ void GenerateXmlForConcepts(Element* parentElement, const std::vector<ConceptSym
             std::unique_ptr<Element> templateParameterElement(new Element(U"templateParameter"));
             templateParameterElement->SetAttribute(U"id", templateParameter->Id());
             std::unique_ptr<Element> templateParameterNameElement(new Element(U"name"));
-            templateParameterNameElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(templateParameter->DocName())));
+            templateParameterNameElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(templateParameter->DocName())));
             templateParameterElement->AppendChild(std::move(templateParameterNameElement));
             if (templateParameter->HasDefault())
             {
                 std::unique_ptr<Element> defaultElement(new Element(U"default"));
-                defaultElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(ToUtf32(templateParameter->DefaultStr()))));
+                defaultElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(ToUtf32(templateParameter->DefaultStr()))));
                 templateParameterElement->AppendChild(std::move(defaultElement));
             }
             templateParametersElement->AppendChild(std::move(templateParameterElement));
@@ -839,14 +839,14 @@ void GenerateXmlForConcepts(Element* parentElement, const std::vector<ConceptSym
                 }
                 axiomName.append(U")");
             }
-            axiomNameElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(axiomName)));
+            axiomNameElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(axiomName)));
             axiomElement->AppendChild(std::move(axiomNameElement));
             std::unique_ptr<Element> axiomStatementsElement(new Element(U"axiomStatements"));
             int s = axiom->Statements().Count();
             for (int i = 0; i < s; ++i)
             {
                 std::unique_ptr<Element> axiomStatementElement(new Element(U"axiomStatement"));
-                axiomStatementElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(ToUtf32(axiom->Statements()[i]->ToString()))));
+                axiomStatementElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(ToUtf32(axiom->Statements()[i]->ToString()))));
                 axiomStatementsElement->AppendChild(std::move(axiomStatementElement));
             }
             axiomElement->AppendChild(std::move(axiomStatementsElement));
@@ -867,10 +867,10 @@ void GenerateXmlForDelegates(Element* parentElement, const std::vector<DelegateT
         std::unique_ptr<Element> delegateElement(new Element(U"delegate"));
         delegateElement->SetAttribute(U"id", delegate->Id());
         std::unique_ptr<Element> delegateNameElement(new Element(U"name"));
-        delegateNameElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(delegate->DocName())));
+        delegateNameElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(delegate->DocName())));
         delegateElement->AppendChild(std::move(delegateNameElement));
         std::unique_ptr<Element> syntaxElement(new Element(U"syntax"));
-        syntaxElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(ToUtf32(delegate->Syntax()))));
+        syntaxElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(ToUtf32(delegate->Syntax()))));
         delegateElement->AppendChild(std::move(syntaxElement));
         int n = delegate->Parameters().size();
         if (n > 0)
@@ -904,10 +904,10 @@ void GenerateXmlForClassDelegates(Element* parentElement, const std::vector<Clas
         std::unique_ptr<Element> classDelegateElement(new Element(U"classDelegate"));
         classDelegateElement->SetAttribute(U"id", classDelegate->Id());
         std::unique_ptr<Element> classDelegateNameElement(new Element(U"name"));
-        classDelegateNameElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(classDelegate->DocName())));
+        classDelegateNameElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(classDelegate->DocName())));
         classDelegateElement->AppendChild(std::move(classDelegateNameElement));
         std::unique_ptr<Element> syntaxElement(new Element(U"syntax"));
-        syntaxElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(ToUtf32(classDelegate->Syntax()))));
+        syntaxElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(ToUtf32(classDelegate->Syntax()))));
         classDelegateElement->AppendChild(std::move(syntaxElement));
         int n = classDelegate->Parameters().size();
         if (n > 0)
@@ -941,10 +941,10 @@ void GenerateXmlForConstants(Element* parentElement, const std::vector<ConstantS
         std::unique_ptr<Element> constantElement(new Element(U"constant"));
         constantElement->SetAttribute(U"id", constant->Id());
         std::unique_ptr<Element> constantNameElement(new Element(U"name"));
-        constantNameElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(constant->DocName())));
+        constantNameElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(constant->DocName())));
         constantElement->AppendChild(std::move(constantNameElement));
         std::unique_ptr<Element> syntaxElement(new Element(U"syntax"));
-        syntaxElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(ToUtf32(constant->Syntax()))));
+        syntaxElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(ToUtf32(constant->Syntax()))));
         constantElement->AppendChild(std::move(syntaxElement));
         std::unique_ptr<Element> constantTypeElement(new Element(U"type"));
         constantTypeElement->SetAttribute(U"ref", GetTypeId(constant->GetType()));
@@ -956,7 +956,7 @@ void GenerateXmlForConstants(Element* parentElement, const std::vector<ConstantS
         {
             constantValue.append(1, 'u');
         }
-        constantValueElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(ToUtf32(constantValue))));
+        constantValueElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(ToUtf32(constantValue))));
         constantElement->AppendChild(std::move(constantValueElement));
         constantsElement->AppendChild(std::move(constantElement));
     }
@@ -972,10 +972,10 @@ void GenerateXmlForEnumeratedTypes(Element* parentElement, const std::vector<Enu
         std::unique_ptr<Element> enumerationElement(new Element(U"enumeration"));
         enumerationElement->SetAttribute(U"id", enumType->Id());
         std::unique_ptr<Element> enumerationNameElement(new Element(U"name"));
-        enumerationNameElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(enumType->DocName())));
+        enumerationNameElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(enumType->DocName())));
         enumerationElement->AppendChild(std::move(enumerationNameElement));
         std::unique_ptr<Element> syntaxElement(new Element(U"syntax"));
-        syntaxElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(ToUtf32(enumType->Syntax()))));
+        syntaxElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(ToUtf32(enumType->Syntax()))));
         enumerationElement->AppendChild(std::move(syntaxElement));
         std::unique_ptr<Element> underlyingTypeElement(new Element(U"underlyingType"));
         TypeSymbol* underlyingType = enumType->UnderlyingType();
@@ -989,7 +989,7 @@ void GenerateXmlForEnumeratedTypes(Element* parentElement, const std::vector<Enu
         {
             std::unique_ptr<Element> enumConstantElement(new Element(U"enumConstant"));
             std::unique_ptr<Element> enumConstantNameElement(new Element(U"name"));
-            enumConstantNameElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(enumConstant->DocName())));
+            enumConstantNameElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(enumConstant->DocName())));
             enumConstantElement->AppendChild(std::move(enumConstantNameElement));
             std::unique_ptr<Element> enumConstantValueElement(new Element(U"value"));
             std::string enumConstantValue = enumConstant->GetValue()->ToString();
@@ -997,7 +997,7 @@ void GenerateXmlForEnumeratedTypes(Element* parentElement, const std::vector<Enu
             {
                 enumConstantValue.append(1, 'u');
             }
-            enumConstantValueElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(ToUtf32(enumConstantValue))));
+            enumConstantValueElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(ToUtf32(enumConstantValue))));
             enumConstantElement->AppendChild(std::move(enumConstantValueElement));
             enumerationElement->AppendChild(std::move(enumConstantElement));
         }
@@ -1015,10 +1015,10 @@ void GenerateXmlForMemberVariables(Element* parentElement, const std::vector<Mem
         std::unique_ptr<Element> memberVariableElement(new Element(U"memberVariable"));
         memberVariableElement->SetAttribute(U"id", memberVariable->Id());
         std::unique_ptr<Element> memberVariableNameElement(new Element(U"name"));
-        memberVariableNameElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(memberVariable->DocName())));
+        memberVariableNameElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(memberVariable->DocName())));
         memberVariableElement->AppendChild(std::move(memberVariableNameElement));
         std::unique_ptr<Element> syntaxElement(new Element(U"syntax"));
-        syntaxElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(ToUtf32(memberVariable->Syntax()))));
+        syntaxElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(ToUtf32(memberVariable->Syntax()))));
         memberVariableElement->AppendChild(std::move(syntaxElement));
         std::unique_ptr<Element> typeElement(new Element(U"type"));
         typeElement->SetAttribute(U"ref", GetTypeId(memberVariable->GetType()));
@@ -1140,7 +1140,7 @@ void GenerateXmlForTypes(Element* parentElement, std::vector<TypeSymbol*>& types
             typeElement->SetAttribute(U"id", type->Id());
         }
         std::unique_ptr<Element> typeNameElement(new Element(U"name"));
-        typeNameElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(type->DocName())));
+        typeNameElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(type->DocName())));
         typeElement->AppendChild(std::move(typeNameElement));
         if (type->GetSymbolType() == SymbolType::derivedTypeSymbol)
         {
@@ -1149,7 +1149,7 @@ void GenerateXmlForTypes(Element* parentElement, std::vector<TypeSymbol*>& types
             if (derivedType->IsConstType())
             {
                 std::unique_ptr<Element> qualifierElement(new Element(U"qualifier"));
-                qualifierElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(U"const")));
+                qualifierElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(U"const")));
                 contentElement->AppendChild(std::move(qualifierElement));
             }
             std::unique_ptr<Element> baseTypeElement(new Element(U"baseType"));
@@ -1167,7 +1167,7 @@ void GenerateXmlForTypes(Element* parentElement, std::vector<TypeSymbol*>& types
                     default: continue;
                 }
                 std::unique_ptr<Element> qualifierElement(new Element(U"qualifier"));
-                qualifierElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(qualifier)));
+                qualifierElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(qualifier)));
                 contentElement->AppendChild(std::move(qualifierElement));
             }
             typeElement->AppendChild(std::move(contentElement));
@@ -1197,7 +1197,7 @@ void GenerateXmlForParameter(ParameterSymbol* parameter, Element* parametersElem
     std::unique_ptr<Element> parameterElement(new Element(U"parameter"));
     std::unique_ptr<Element> parameterNameElement(new Element(U"name"));
     std::u32string docName = parameter->DocName();
-    parameterNameElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(docName)));
+    parameterNameElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(docName)));
     parameterElement->AppendChild(std::move(parameterNameElement));
     std::unique_ptr<Element> parameterTypeElement(new Element(U"type"));
     if (parameter->GetType()->GetSymbolType() == SymbolType::derivedTypeSymbol)
@@ -1245,10 +1245,10 @@ void GenerateXmlForFunctions(Element* parentElement, const std::vector<FunctionS
             constructorElement->SetAttribute(U"id", constructor->Id());
             std::unique_ptr<Element> constructorNameElement(new Element(U"name"));
             std::u32string docName = constructor->DocName();
-            constructorNameElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(docName)));
+            constructorNameElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(docName)));
             constructorElement->AppendChild(std::move(constructorNameElement));
             std::unique_ptr<Element> syntaxElement(new Element(U"syntax"));
-            syntaxElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(ToUtf32(constructor->Syntax()))));
+            syntaxElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(ToUtf32(constructor->Syntax()))));
             constructorElement->AppendChild(std::move(syntaxElement));
             int n = constructor->Parameters().size();
             if (n > 1)
@@ -1302,7 +1302,7 @@ void GenerateXmlForFunctions(Element* parentElement, const std::vector<FunctionS
             std::unique_ptr<Element> functionNameElement(new Element(U"name"));
             if (overloads.size() > 1)
             {
-                functionNameElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(groupName)));
+                functionNameElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(groupName)));
                 functionElement->AppendChild(std::move(functionNameElement));
                 if (overloads.front()->FunctionGroup()->Id().empty())
                 {
@@ -1336,10 +1336,10 @@ void GenerateXmlForFunctions(Element* parentElement, const std::vector<FunctionS
                     {
                         docName.append(1, ' ').append(ToUtf32(overload->Constraint()->ToString()));
                     }
-                    overloadNameElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(docName)));
+                    overloadNameElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(docName)));
                     overloadElement->AppendChild(std::move(overloadNameElement));
                     std::unique_ptr<Element> syntaxElement(new Element(U"syntax"));
-                    syntaxElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(ToUtf32(overload->Syntax()))));
+                    syntaxElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(ToUtf32(overload->Syntax()))));
                     overloadElement->AppendChild(std::move(syntaxElement));
                     if (!overload->TemplateParameters().empty())
                     {
@@ -1349,12 +1349,12 @@ void GenerateXmlForFunctions(Element* parentElement, const std::vector<FunctionS
                             std::unique_ptr<Element> templateParameterElement(new Element(U"templateParameter"));
                             templateParameterElement->SetAttribute(U"id", templateParameter->Id());
                             std::unique_ptr<Element> templateParameterNameElement(new Element(U"name"));
-                            templateParameterNameElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(templateParameter->DocName())));
+                            templateParameterNameElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(templateParameter->DocName())));
                             templateParameterElement->AppendChild(std::move(templateParameterNameElement));
                             if (templateParameter->HasDefault())
                             {
                                 std::unique_ptr<Element> defaultElement(new Element(U"default"));
-                                defaultElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(ToUtf32(templateParameter->DefaultStr()))));
+                                defaultElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(ToUtf32(templateParameter->DefaultStr()))));
                                 templateParameterElement->AppendChild(std::move(defaultElement));
                             }
                             templateParametersElement->AppendChild(std::move(templateParameterElement));
@@ -1396,10 +1396,10 @@ void GenerateXmlForFunctions(Element* parentElement, const std::vector<FunctionS
                     function->ComputeMangledName();
                 }
                 functionElement->SetAttribute(U"id", function->Id());
-                functionNameElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(function->DocName())));
+                functionNameElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(function->DocName())));
                 functionElement->AppendChild(std::move(functionNameElement));
                 std::unique_ptr<Element> syntaxElement(new Element(U"syntax"));
-                syntaxElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(ToUtf32(function->Syntax()))));
+                syntaxElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(ToUtf32(function->Syntax()))));
                 functionElement->AppendChild(std::move(syntaxElement));
                 if (!function->TemplateParameters().empty())
                 {
@@ -1409,12 +1409,12 @@ void GenerateXmlForFunctions(Element* parentElement, const std::vector<FunctionS
                         std::unique_ptr<Element> templateParameterElement(new Element(U"templateParameter"));
                         templateParameterElement->SetAttribute(U"id", templateParameter->Id());
                         std::unique_ptr<Element> templateParameterNameElement(new Element(U"name"));
-                        templateParameterNameElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(templateParameter->DocName())));
+                        templateParameterNameElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(templateParameter->DocName())));
                         templateParameterElement->AppendChild(std::move(templateParameterNameElement));
                         if (templateParameter->HasDefault())
                         {
                             std::unique_ptr<Element> defaultElement(new Element(U"default"));
-                            defaultElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(ToUtf32(templateParameter->DefaultStr()))));
+                            defaultElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(ToUtf32(templateParameter->DefaultStr()))));
                             templateParameterElement->AppendChild(std::move(defaultElement));
                         }
                         templateParametersElement->AppendChild(std::move(templateParameterElement));
@@ -1460,7 +1460,7 @@ void GenerateXmlForFunctions(Element* parentElement, const std::vector<FunctionS
             std::unique_ptr<Element> functionNameElement(new Element(U"name"));
             if (overloads.size() > 1)
             {
-                functionNameElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(groupName)));
+                functionNameElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(groupName)));
                 functionElement->AppendChild(std::move(functionNameElement));
                 if (overloads.front()->FunctionGroup()->Id().empty())
                 {
@@ -1494,10 +1494,10 @@ void GenerateXmlForFunctions(Element* parentElement, const std::vector<FunctionS
                     {
                         docName.append(1, ' ').append(ToUtf32(overload->Constraint()->ToString()));
                     }
-                    overloadNameElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(docName)));
+                    overloadNameElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(docName)));
                     overloadElement->AppendChild(std::move(overloadNameElement));
                     std::unique_ptr<Element> syntaxElement(new Element(U"syntax"));
-                    syntaxElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(ToUtf32(overload->Syntax()))));
+                    syntaxElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(ToUtf32(overload->Syntax()))));
                     overloadElement->AppendChild(std::move(syntaxElement));
                     if (!overload->TemplateParameters().empty())
                     {
@@ -1507,12 +1507,12 @@ void GenerateXmlForFunctions(Element* parentElement, const std::vector<FunctionS
                             std::unique_ptr<Element> templateParameterElement(new Element(U"templateParameter"));
                             templateParameterElement->SetAttribute(U"id", templateParameter->Id());
                             std::unique_ptr<Element> templateParameterNameElement(new Element(U"name"));
-                            templateParameterNameElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(templateParameter->DocName())));
+                            templateParameterNameElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(templateParameter->DocName())));
                             templateParameterElement->AppendChild(std::move(templateParameterNameElement));
                             if (templateParameter->HasDefault())
                             {
                                 std::unique_ptr<Element> defaultElement(new Element(U"default"));
-                                defaultElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(ToUtf32(templateParameter->DefaultStr()))));
+                                defaultElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(ToUtf32(templateParameter->DefaultStr()))));
                                 templateParameterElement->AppendChild(std::move(defaultElement));
                             }
                             templateParametersElement->AppendChild(std::move(templateParameterElement));
@@ -1554,10 +1554,10 @@ void GenerateXmlForFunctions(Element* parentElement, const std::vector<FunctionS
                     function->ComputeMangledName();
                 }
                 functionElement->SetAttribute(U"id", function->Id());
-                functionNameElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(function->DocName())));
+                functionNameElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(function->DocName())));
                 functionElement->AppendChild(std::move(functionNameElement));
                 std::unique_ptr<Element> syntaxElement(new Element(U"syntax"));
-                syntaxElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(ToUtf32(function->Syntax()))));
+                syntaxElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(ToUtf32(function->Syntax()))));
                 functionElement->AppendChild(std::move(syntaxElement));
                 if (!function->TemplateParameters().empty())
                 {
@@ -1567,13 +1567,13 @@ void GenerateXmlForFunctions(Element* parentElement, const std::vector<FunctionS
                         std::unique_ptr<Element> templateParameterElement(new Element(U"templateParameter"));
                         templateParameterElement->SetAttribute(U"id", templateParameter->Id());
                         std::unique_ptr<Element> templateParameterNameElement(new Element(U"name"));
-                        templateParameterNameElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(templateParameter->DocName())));
+                        templateParameterNameElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(templateParameter->DocName())));
                         templateParameterElement->AppendChild(std::move(templateParameterNameElement));
                         templateParametersElement->AppendChild(std::move(templateParameterElement));
                         if (templateParameter->HasDefault())
                         {
                             std::unique_ptr<Element> defaultElement(new Element(U"default"));
-                            defaultElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(ToUtf32(templateParameter->DefaultStr()))));
+                            defaultElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(ToUtf32(templateParameter->DefaultStr()))));
                             templateParameterElement->AppendChild(std::move(defaultElement));
                         }
                     }
@@ -1639,7 +1639,7 @@ void GenerateLibraryXml(SymbolTable& symbolTable, std::map<std::u32string, Symbo
             namespaceElement->SetAttribute(U"id", namespaceId);
         }
         std::unique_ptr<Element> namespaceNameElement(new Element(U"name"));
-        namespaceNameElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(nsName)));
+        namespaceNameElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(nsName)));
         namespaceElement->AppendChild(std::move(namespaceNameElement));
         GenerateXmlForClasses(namespaceElement.get(), collector.Classes());
         GenerateXmlForFunctions(namespaceElement.get(), collector.Functions(), 0);
@@ -1713,9 +1713,9 @@ void DistributeToNamespaces(std::map<std::u32string, SymbolCollector>& byNs, std
     }
 }
 
-struct CheckRefsVisitor : cmajor::dom::Visitor
+struct CheckRefsVisitor : sngxml::dom::Visitor
 {
-    CheckRefsVisitor(cmajor::dom::Document* document_, const std::vector<std::unique_ptr<cmajor::dom::Document>>& referenceXmlDocs_) : document(document_), referenceXmlDocs(referenceXmlDocs_)
+    CheckRefsVisitor(sngxml::dom::Document* document_, const std::vector<std::unique_ptr<sngxml::dom::Document>>& referenceXmlDocs_) : document(document_), referenceXmlDocs(referenceXmlDocs_)
     {
     }
     void BeginVisit(Element* element) override
@@ -1729,7 +1729,7 @@ struct CheckRefsVisitor : cmajor::dom::Visitor
                 int n = referenceXmlDocs.size();
                 for (int i = 0; i < n; ++i) 
                 {
-                    cmajor::dom::Document* referenceDocuments = referenceXmlDocs[i].get();
+                    sngxml::dom::Document* referenceDocuments = referenceXmlDocs[i].get();
                     refencedElement = referenceDocuments->GetElementById(ref);
                     if (refencedElement)
                     {
@@ -1743,8 +1743,8 @@ struct CheckRefsVisitor : cmajor::dom::Visitor
             }
         }
     }
-    cmajor::dom::Document* document;
-    const std::vector<std::unique_ptr<cmajor::dom::Document>>& referenceXmlDocs;
+    sngxml::dom::Document* document;
+    const std::vector<std::unique_ptr<sngxml::dom::Document>>& referenceXmlDocs;
 };
 
 std::unique_ptr<Document> GenerateLibraryXmlFile(const std::string& moduleFilePath, const std::string& libraryXmlFilePath, 
@@ -1794,12 +1794,12 @@ std::unique_ptr<Document> GenerateLibraryXmlFile(const std::string& moduleFilePa
     std::unique_ptr<Document> libraryXmlDoc(new Document());
     std::unique_ptr<Element> libraryElement(new Element(U"library"));
     std::unique_ptr<Element> libraryNameElement(new Element(U"name"));
-    libraryNameElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(module.Name())));
+    libraryNameElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(module.Name())));
     libraryElement->AppendChild(std::move(libraryNameElement));
     if (!stylePath.empty())
     {
         std::unique_ptr<Element> styleElement(new Element(U"style"));
-        styleElement->AppendChild((std::unique_ptr<cmajor::dom::Node>(new Text(stylePath))));
+        styleElement->AppendChild((std::unique_ptr<sngxml::dom::Node>(new Text(stylePath))));
         libraryElement->AppendChild(std::move(styleElement));
     }
     libraryXmlDoc->AppendChild(std::move(libraryElement));
@@ -1828,18 +1828,18 @@ std::u32string GetLibraryName(Document* libraryXmlDoc)
     {
         throw std::runtime_error("one node expected");
     }
-    cmajor::dom::Node* libraryNameNode = (*libraryNameNodeSet)[0];
-    if (libraryNameNode->GetNodeType() != cmajor::dom::NodeType::textNode)
+    sngxml::dom::Node* libraryNameNode = (*libraryNameNodeSet)[0];
+    if (libraryNameNode->GetNodeType() != sngxml::dom::NodeType::textNode)
     {
         throw std::runtime_error("text node expected");
     }
-    cmajor::dom::Text* libraryName = static_cast<cmajor::dom::Text*>(libraryNameNode);
+    sngxml::dom::Text* libraryName = static_cast<sngxml::dom::Text*>(libraryNameNode);
     return libraryName->Data();
 }
 
-std::vector<cmajor::dom::Element*> GetNamespaceElements(Document* libraryXmlDoc)
+std::vector<sngxml::dom::Element*> GetNamespaceElements(Document* libraryXmlDoc)
 {
-    std::vector<cmajor::dom::Element*> namespaceElements;
+    std::vector<sngxml::dom::Element*> namespaceElements;
     std::unique_ptr<cmajor::xpath::XPathObject> namespaceObject = cmajor::xpath::Evaluate(U"/library/namespaces/namespace", libraryXmlDoc);
     if (namespaceObject->Type() != cmajor::xpath::XPathObjectType::nodeSet)
     {
@@ -1849,10 +1849,10 @@ std::vector<cmajor::dom::Element*> GetNamespaceElements(Document* libraryXmlDoc)
     int n = nodeSet->Length();
     for (int i = 0; i < n; ++i)
     {
-        cmajor::dom::Node* node = (*nodeSet)[i];
-        if (node->GetNodeType() == cmajor::dom::NodeType::elementNode)
+        sngxml::dom::Node* node = (*nodeSet)[i];
+        if (node->GetNodeType() == sngxml::dom::NodeType::elementNode)
         {
-            namespaceElements.push_back(static_cast<cmajor::dom::Element*>(node));
+            namespaceElements.push_back(static_cast<sngxml::dom::Element*>(node));
         }
         else
         {
@@ -1862,9 +1862,9 @@ std::vector<cmajor::dom::Element*> GetNamespaceElements(Document* libraryXmlDoc)
     return namespaceElements;
 }
 
-std::vector<cmajor::dom::Element*> GetOverloadElements(Element* parentElement)
+std::vector<sngxml::dom::Element*> GetOverloadElements(Element* parentElement)
 {
-    std::vector<cmajor::dom::Element*> overloadElements;
+    std::vector<sngxml::dom::Element*> overloadElements;
     std::unique_ptr<cmajor::xpath::XPathObject> overloadsObject = cmajor::xpath::Evaluate(U"overloads/overload", parentElement);
     if (overloadsObject->Type() != cmajor::xpath::XPathObjectType::nodeSet)
     {
@@ -1874,10 +1874,10 @@ std::vector<cmajor::dom::Element*> GetOverloadElements(Element* parentElement)
     int n = nodeSet->Length();
     for (int i = 0; i < n; ++i)
     {
-        cmajor::dom::Node* node = (*nodeSet)[i];
-        if (node->GetNodeType() == cmajor::dom::NodeType::elementNode)
+        sngxml::dom::Node* node = (*nodeSet)[i];
+        if (node->GetNodeType() == sngxml::dom::NodeType::elementNode)
         {
-            overloadElements.push_back(static_cast<cmajor::dom::Element*>(node));
+            overloadElements.push_back(static_cast<sngxml::dom::Element*>(node));
         }
         else
         {
@@ -1903,10 +1903,10 @@ std::u32string GetStylePath(Document* libraryXmlDoc)
     {
         throw std::runtime_error("one node expected");
     }
-    cmajor::dom::Node* node = (*nodeSet)[0];
-    if (node->GetNodeType() == cmajor::dom::NodeType::textNode)
+    sngxml::dom::Node* node = (*nodeSet)[0];
+    if (node->GetNodeType() == sngxml::dom::NodeType::textNode)
     {
-        cmajor::dom::Text* text = static_cast<cmajor::dom::Text*>(node);
+        sngxml::dom::Text* text = static_cast<sngxml::dom::Text*>(node);
         return text->Data();
     }
     else
@@ -1915,7 +1915,7 @@ std::u32string GetStylePath(Document* libraryXmlDoc)
     }
 }
 
-std::u32string GetName(cmajor::dom::Element* element, bool optional)
+std::u32string GetName(sngxml::dom::Element* element, bool optional)
 {
     std::unique_ptr<cmajor::xpath::XPathObject> nameObject = cmajor::xpath::Evaluate(U"name/text()", element);
     if (nameObject->Type() != cmajor::xpath::XPathObjectType::nodeSet)
@@ -1931,16 +1931,16 @@ std::u32string GetName(cmajor::dom::Element* element, bool optional)
         }
         throw std::runtime_error("one node expected");
     }
-    cmajor::dom::Node* nameNode = (*nodeSet)[0];
-    if (nameNode->GetNodeType() != cmajor::dom::NodeType::textNode)
+    sngxml::dom::Node* nameNode = (*nodeSet)[0];
+    if (nameNode->GetNodeType() != sngxml::dom::NodeType::textNode)
     {
         throw std::runtime_error("text node expected");
     }
-    cmajor::dom::Text* name = static_cast<cmajor::dom::Text*>(nameNode);
+    sngxml::dom::Text* name = static_cast<sngxml::dom::Text*>(nameNode);
     return name->Data();
 }
 
-std::u32string GetDefault(cmajor::dom::Element* element)
+std::u32string GetDefault(sngxml::dom::Element* element)
 {
     std::unique_ptr<cmajor::xpath::XPathObject> nameObject = cmajor::xpath::Evaluate(U"default/text()", element);
     if (nameObject->Type() != cmajor::xpath::XPathObjectType::nodeSet)
@@ -1952,16 +1952,16 @@ std::u32string GetDefault(cmajor::dom::Element* element)
     {
         return std::u32string();
     }
-    cmajor::dom::Node* defaultNode = (*nodeSet)[0];
-    if (defaultNode->GetNodeType() != cmajor::dom::NodeType::textNode)
+    sngxml::dom::Node* defaultNode = (*nodeSet)[0];
+    if (defaultNode->GetNodeType() != sngxml::dom::NodeType::textNode)
     {
         throw std::runtime_error("text node expected");
     }
-    cmajor::dom::Text* default_ = static_cast<cmajor::dom::Text*>(defaultNode);
+    sngxml::dom::Text* default_ = static_cast<sngxml::dom::Text*>(defaultNode);
     return default_->Data();
 }
 
-std::u32string GetValue(cmajor::dom::Element* element)
+std::u32string GetValue(sngxml::dom::Element* element)
 {
     std::unique_ptr<cmajor::xpath::XPathObject> valueObject = cmajor::xpath::Evaluate(U"value/text()", element);
     if (valueObject->Type() != cmajor::xpath::XPathObjectType::nodeSet)
@@ -1973,16 +1973,16 @@ std::u32string GetValue(cmajor::dom::Element* element)
     {
         throw std::runtime_error("one node expected");
     }
-    cmajor::dom::Node* valueNode = (*nodeSet)[0];
-    if (valueNode->GetNodeType() != cmajor::dom::NodeType::textNode)
+    sngxml::dom::Node* valueNode = (*nodeSet)[0];
+    if (valueNode->GetNodeType() != sngxml::dom::NodeType::textNode)
     {
         throw std::runtime_error("text node expected");
     }
-    cmajor::dom::Text* value = static_cast<cmajor::dom::Text*>(valueNode);
+    sngxml::dom::Text* value = static_cast<sngxml::dom::Text*>(valueNode);
     return value->Data();
 }
 
-std::u32string GetGroupName(cmajor::dom::Element* element)
+std::u32string GetGroupName(sngxml::dom::Element* element)
 {
     std::unique_ptr<cmajor::xpath::XPathObject> groupNameObject = cmajor::xpath::Evaluate(U"groupName/text()", element);
     if (groupNameObject->Type() != cmajor::xpath::XPathObjectType::nodeSet)
@@ -1994,18 +1994,18 @@ std::u32string GetGroupName(cmajor::dom::Element* element)
     {
         throw std::runtime_error("one node expected");
     }
-    cmajor::dom::Node* groupNameNode = (*nodeSet)[0];
-    if (groupNameNode->GetNodeType() != cmajor::dom::NodeType::textNode)
+    sngxml::dom::Node* groupNameNode = (*nodeSet)[0];
+    if (groupNameNode->GetNodeType() != sngxml::dom::NodeType::textNode)
     {
         throw std::runtime_error("text node expected");
     }
-    cmajor::dom::Text* groupName = static_cast<cmajor::dom::Text*>(groupNameNode);
+    sngxml::dom::Text* groupName = static_cast<sngxml::dom::Text*>(groupNameNode);
     return groupName->Data();
 }
 
-std::vector<cmajor::dom::Element*> GetClassElements(cmajor::dom::Element* parentElement)
+std::vector<sngxml::dom::Element*> GetClassElements(sngxml::dom::Element* parentElement)
 {
-    std::vector<cmajor::dom::Element*> classes;
+    std::vector<sngxml::dom::Element*> classes;
     std::unique_ptr<cmajor::xpath::XPathObject> classObject = cmajor::xpath::Evaluate(U"classes/class", parentElement);
     if (classObject->Type() != cmajor::xpath::XPathObjectType::nodeSet)
     {
@@ -2015,10 +2015,10 @@ std::vector<cmajor::dom::Element*> GetClassElements(cmajor::dom::Element* parent
     int n = nodeSet->Length();
     for (int i = 0; i < n; ++i)
     {
-        cmajor::dom::Node* node = (*nodeSet)[i];
-        if (node->GetNodeType() == cmajor::dom::NodeType::elementNode)
+        sngxml::dom::Node* node = (*nodeSet)[i];
+        if (node->GetNodeType() == sngxml::dom::NodeType::elementNode)
         {
-            classes.push_back(static_cast<cmajor::dom::Element*>(node));
+            classes.push_back(static_cast<sngxml::dom::Element*>(node));
         }
         else
         {
@@ -2028,9 +2028,9 @@ std::vector<cmajor::dom::Element*> GetClassElements(cmajor::dom::Element* parent
     return classes;
 }
 
-std::vector<cmajor::dom::Element*> GetConstructorElements(cmajor::dom::Element* parentElement)
+std::vector<sngxml::dom::Element*> GetConstructorElements(sngxml::dom::Element* parentElement)
 {
-    std::vector<cmajor::dom::Element*> constructors;
+    std::vector<sngxml::dom::Element*> constructors;
     std::unique_ptr<cmajor::xpath::XPathObject> constructorObject = cmajor::xpath::Evaluate(U"constructors/constructor", parentElement);
     if (constructorObject->Type() != cmajor::xpath::XPathObjectType::nodeSet)
     {
@@ -2040,10 +2040,10 @@ std::vector<cmajor::dom::Element*> GetConstructorElements(cmajor::dom::Element* 
     int n = nodeSet->Length();
     for (int i = 0; i < n; ++i)
     {
-        cmajor::dom::Node* node = (*nodeSet)[i];
-        if (node->GetNodeType() == cmajor::dom::NodeType::elementNode)
+        sngxml::dom::Node* node = (*nodeSet)[i];
+        if (node->GetNodeType() == sngxml::dom::NodeType::elementNode)
         {
-            constructors.push_back(static_cast<cmajor::dom::Element*>(node));
+            constructors.push_back(static_cast<sngxml::dom::Element*>(node));
         }
         else
         {
@@ -2053,9 +2053,9 @@ std::vector<cmajor::dom::Element*> GetConstructorElements(cmajor::dom::Element* 
     return constructors;
 }
 
-std::vector<cmajor::dom::Element*> GetFunctionElements(cmajor::dom::Element* parentElement)
+std::vector<sngxml::dom::Element*> GetFunctionElements(sngxml::dom::Element* parentElement)
 {
-    std::vector<cmajor::dom::Element*> functions;
+    std::vector<sngxml::dom::Element*> functions;
     std::unique_ptr<cmajor::xpath::XPathObject> functionObject = cmajor::xpath::Evaluate(U"functions/function", parentElement);
     if (functionObject->Type() != cmajor::xpath::XPathObjectType::nodeSet)
     {
@@ -2065,10 +2065,10 @@ std::vector<cmajor::dom::Element*> GetFunctionElements(cmajor::dom::Element* par
     int n = nodeSet->Length();
     for (int i = 0; i < n; ++i)
     {
-        cmajor::dom::Node* node = (*nodeSet)[i];
-        if (node->GetNodeType() == cmajor::dom::NodeType::elementNode)
+        sngxml::dom::Node* node = (*nodeSet)[i];
+        if (node->GetNodeType() == sngxml::dom::NodeType::elementNode)
         {
-            functions.push_back(static_cast<cmajor::dom::Element*>(node));
+            functions.push_back(static_cast<sngxml::dom::Element*>(node));
         }
         else
         {
@@ -2078,9 +2078,9 @@ std::vector<cmajor::dom::Element*> GetFunctionElements(cmajor::dom::Element* par
     return functions;
 }
 
-std::vector<cmajor::dom::Element*> GetStaticMemberFunctionElements(cmajor::dom::Element* parentElement)
+std::vector<sngxml::dom::Element*> GetStaticMemberFunctionElements(sngxml::dom::Element* parentElement)
 {
-    std::vector<cmajor::dom::Element*> functions;
+    std::vector<sngxml::dom::Element*> functions;
     std::unique_ptr<cmajor::xpath::XPathObject> functionObject = cmajor::xpath::Evaluate(U"staticMemberFunctions/function", parentElement);
     if (functionObject->Type() != cmajor::xpath::XPathObjectType::nodeSet)
     {
@@ -2090,10 +2090,10 @@ std::vector<cmajor::dom::Element*> GetStaticMemberFunctionElements(cmajor::dom::
     int n = nodeSet->Length();
     for (int i = 0; i < n; ++i)
     {
-        cmajor::dom::Node* node = (*nodeSet)[i];
-        if (node->GetNodeType() == cmajor::dom::NodeType::elementNode)
+        sngxml::dom::Node* node = (*nodeSet)[i];
+        if (node->GetNodeType() == sngxml::dom::NodeType::elementNode)
         {
-            functions.push_back(static_cast<cmajor::dom::Element*>(node));
+            functions.push_back(static_cast<sngxml::dom::Element*>(node));
         }
         else
         {
@@ -2103,9 +2103,9 @@ std::vector<cmajor::dom::Element*> GetStaticMemberFunctionElements(cmajor::dom::
     return functions;
 }
 
-std::vector<cmajor::dom::Element*> GetTypedefElements(cmajor::dom::Element* parentElement)
+std::vector<sngxml::dom::Element*> GetTypedefElements(sngxml::dom::Element* parentElement)
 {
-    std::vector<cmajor::dom::Element*> typedefs;
+    std::vector<sngxml::dom::Element*> typedefs;
     std::unique_ptr<cmajor::xpath::XPathObject> typedefObject = cmajor::xpath::Evaluate(U"typedefs/typedef", parentElement);
     if (typedefObject->Type() != cmajor::xpath::XPathObjectType::nodeSet)
     {
@@ -2115,10 +2115,10 @@ std::vector<cmajor::dom::Element*> GetTypedefElements(cmajor::dom::Element* pare
     int n = nodeSet->Length();
     for (int i = 0; i < n; ++i)
     {
-        cmajor::dom::Node* node = (*nodeSet)[i];
-        if (node->GetNodeType() == cmajor::dom::NodeType::elementNode)
+        sngxml::dom::Node* node = (*nodeSet)[i];
+        if (node->GetNodeType() == sngxml::dom::NodeType::elementNode)
         {
-            typedefs.push_back(static_cast<cmajor::dom::Element*>(node));
+            typedefs.push_back(static_cast<sngxml::dom::Element*>(node));
         }
         else
         {
@@ -2128,9 +2128,9 @@ std::vector<cmajor::dom::Element*> GetTypedefElements(cmajor::dom::Element* pare
     return typedefs;
 }
 
-std::vector<cmajor::dom::Element*> GetConceptElements(cmajor::dom::Element* parentElement)
+std::vector<sngxml::dom::Element*> GetConceptElements(sngxml::dom::Element* parentElement)
 {
-    std::vector<cmajor::dom::Element*> concepts;
+    std::vector<sngxml::dom::Element*> concepts;
     std::unique_ptr<cmajor::xpath::XPathObject> conceptObject = cmajor::xpath::Evaluate(U"concepts/concept", parentElement);
     if (conceptObject->Type() != cmajor::xpath::XPathObjectType::nodeSet)
     {
@@ -2140,10 +2140,10 @@ std::vector<cmajor::dom::Element*> GetConceptElements(cmajor::dom::Element* pare
     int n = nodeSet->Length();
     for (int i = 0; i < n; ++i)
     {
-        cmajor::dom::Node* node = (*nodeSet)[i];
-        if (node->GetNodeType() == cmajor::dom::NodeType::elementNode)
+        sngxml::dom::Node* node = (*nodeSet)[i];
+        if (node->GetNodeType() == sngxml::dom::NodeType::elementNode)
         {
-            concepts.push_back(static_cast<cmajor::dom::Element*>(node));
+            concepts.push_back(static_cast<sngxml::dom::Element*>(node));
         }
         else
         {
@@ -2153,9 +2153,9 @@ std::vector<cmajor::dom::Element*> GetConceptElements(cmajor::dom::Element* pare
     return concepts;
 }
 
-std::vector<cmajor::dom::Element*> GetDelegateElements(cmajor::dom::Element* parentElement)
+std::vector<sngxml::dom::Element*> GetDelegateElements(sngxml::dom::Element* parentElement)
 {
-    std::vector<cmajor::dom::Element*> delegates;
+    std::vector<sngxml::dom::Element*> delegates;
     std::unique_ptr<cmajor::xpath::XPathObject> delegateObject = cmajor::xpath::Evaluate(U"delegates/delegate", parentElement);
     if (delegateObject->Type() != cmajor::xpath::XPathObjectType::nodeSet)
     {
@@ -2165,10 +2165,10 @@ std::vector<cmajor::dom::Element*> GetDelegateElements(cmajor::dom::Element* par
     int n = nodeSet->Length();
     for (int i = 0; i < n; ++i)
     {
-        cmajor::dom::Node* node = (*nodeSet)[i];
-        if (node->GetNodeType() == cmajor::dom::NodeType::elementNode)
+        sngxml::dom::Node* node = (*nodeSet)[i];
+        if (node->GetNodeType() == sngxml::dom::NodeType::elementNode)
         {
-            delegates.push_back(static_cast<cmajor::dom::Element*>(node));
+            delegates.push_back(static_cast<sngxml::dom::Element*>(node));
         }
         else
         {
@@ -2178,9 +2178,9 @@ std::vector<cmajor::dom::Element*> GetDelegateElements(cmajor::dom::Element* par
     return delegates;
 }
 
-std::vector<cmajor::dom::Element*> GetClassDelegateElements(cmajor::dom::Element* parentElement)
+std::vector<sngxml::dom::Element*> GetClassDelegateElements(sngxml::dom::Element* parentElement)
 {
-    std::vector<cmajor::dom::Element*> classDelegates;
+    std::vector<sngxml::dom::Element*> classDelegates;
     std::unique_ptr<cmajor::xpath::XPathObject> classDelegateObject = cmajor::xpath::Evaluate(U"classDelegates/classDelegate", parentElement);
     if (classDelegateObject->Type() != cmajor::xpath::XPathObjectType::nodeSet)
     {
@@ -2190,10 +2190,10 @@ std::vector<cmajor::dom::Element*> GetClassDelegateElements(cmajor::dom::Element
     int n = nodeSet->Length();
     for (int i = 0; i < n; ++i)
     {
-        cmajor::dom::Node* node = (*nodeSet)[i];
-        if (node->GetNodeType() == cmajor::dom::NodeType::elementNode)
+        sngxml::dom::Node* node = (*nodeSet)[i];
+        if (node->GetNodeType() == sngxml::dom::NodeType::elementNode)
         {
-            classDelegates.push_back(static_cast<cmajor::dom::Element*>(node));
+            classDelegates.push_back(static_cast<sngxml::dom::Element*>(node));
         }
         else
         {
@@ -2203,9 +2203,9 @@ std::vector<cmajor::dom::Element*> GetClassDelegateElements(cmajor::dom::Element
     return classDelegates;
 }
 
-std::vector<cmajor::dom::Element*> GetConstantElements(cmajor::dom::Element* parentElement)
+std::vector<sngxml::dom::Element*> GetConstantElements(sngxml::dom::Element* parentElement)
 {
-    std::vector<cmajor::dom::Element*> constants;
+    std::vector<sngxml::dom::Element*> constants;
     std::unique_ptr<cmajor::xpath::XPathObject> constantObject = cmajor::xpath::Evaluate(U"constants/constant", parentElement);
     if (constantObject->Type() != cmajor::xpath::XPathObjectType::nodeSet)
     {
@@ -2215,10 +2215,10 @@ std::vector<cmajor::dom::Element*> GetConstantElements(cmajor::dom::Element* par
     int n = nodeSet->Length();
     for (int i = 0; i < n; ++i)
     {
-        cmajor::dom::Node* node = (*nodeSet)[i];
-        if (node->GetNodeType() == cmajor::dom::NodeType::elementNode)
+        sngxml::dom::Node* node = (*nodeSet)[i];
+        if (node->GetNodeType() == sngxml::dom::NodeType::elementNode)
         {
-            constants.push_back(static_cast<cmajor::dom::Element*>(node));
+            constants.push_back(static_cast<sngxml::dom::Element*>(node));
         }
         else
         {
@@ -2228,9 +2228,9 @@ std::vector<cmajor::dom::Element*> GetConstantElements(cmajor::dom::Element* par
     return constants;
 }
 
-std::vector<cmajor::dom::Element*> GetEnumerationElements(cmajor::dom::Element* parentElement)
+std::vector<sngxml::dom::Element*> GetEnumerationElements(sngxml::dom::Element* parentElement)
 {
-    std::vector<cmajor::dom::Element*> enumerations;
+    std::vector<sngxml::dom::Element*> enumerations;
     std::unique_ptr<cmajor::xpath::XPathObject> enumObject = cmajor::xpath::Evaluate(U"enumerations/enumeration", parentElement);
     if (enumObject->Type() != cmajor::xpath::XPathObjectType::nodeSet)
     {
@@ -2240,10 +2240,10 @@ std::vector<cmajor::dom::Element*> GetEnumerationElements(cmajor::dom::Element* 
     int n = nodeSet->Length();
     for (int i = 0; i < n; ++i)
     {
-        cmajor::dom::Node* node = (*nodeSet)[i];
-        if (node->GetNodeType() == cmajor::dom::NodeType::elementNode)
+        sngxml::dom::Node* node = (*nodeSet)[i];
+        if (node->GetNodeType() == sngxml::dom::NodeType::elementNode)
         {
-            enumerations.push_back(static_cast<cmajor::dom::Element*>(node));
+            enumerations.push_back(static_cast<sngxml::dom::Element*>(node));
         }
         else
         {
@@ -2253,9 +2253,9 @@ std::vector<cmajor::dom::Element*> GetEnumerationElements(cmajor::dom::Element* 
     return enumerations;
 }
 
-std::vector<cmajor::dom::Element*> GetMemberVariableElements(cmajor::dom::Element* parentElement)
+std::vector<sngxml::dom::Element*> GetMemberVariableElements(sngxml::dom::Element* parentElement)
 {
-    std::vector<cmajor::dom::Element*> memberVariables;
+    std::vector<sngxml::dom::Element*> memberVariables;
     std::unique_ptr<cmajor::xpath::XPathObject> meberVariableObject = cmajor::xpath::Evaluate(U"memberVariables/memberVariable", parentElement);
     if (meberVariableObject->Type() != cmajor::xpath::XPathObjectType::nodeSet)
     {
@@ -2265,10 +2265,10 @@ std::vector<cmajor::dom::Element*> GetMemberVariableElements(cmajor::dom::Elemen
     int n = nodeSet->Length();
     for (int i = 0; i < n; ++i)
     {
-        cmajor::dom::Node* node = (*nodeSet)[i];
-        if (node->GetNodeType() == cmajor::dom::NodeType::elementNode)
+        sngxml::dom::Node* node = (*nodeSet)[i];
+        if (node->GetNodeType() == sngxml::dom::NodeType::elementNode)
         {
-            memberVariables.push_back(static_cast<cmajor::dom::Element*>(node));
+            memberVariables.push_back(static_cast<sngxml::dom::Element*>(node));
         }
         else
         {
@@ -2278,9 +2278,9 @@ std::vector<cmajor::dom::Element*> GetMemberVariableElements(cmajor::dom::Elemen
     return memberVariables;
 }
 
-std::vector<cmajor::dom::Element*> GetTemplateParameterElements(cmajor::dom::Element* parentElement)
+std::vector<sngxml::dom::Element*> GetTemplateParameterElements(sngxml::dom::Element* parentElement)
 {
-    std::vector<cmajor::dom::Element*> templateParameters;
+    std::vector<sngxml::dom::Element*> templateParameters;
     std::unique_ptr<cmajor::xpath::XPathObject> templateParameterObject = cmajor::xpath::Evaluate(U"templateParameters/templateParameter", parentElement);
     if (templateParameterObject->Type() != cmajor::xpath::XPathObjectType::nodeSet)
     {
@@ -2290,10 +2290,10 @@ std::vector<cmajor::dom::Element*> GetTemplateParameterElements(cmajor::dom::Ele
     int n = nodeSet->Length();
     for (int i = 0; i < n; ++i)
     {
-        cmajor::dom::Node* node = (*nodeSet)[i];
-        if (node->GetNodeType() == cmajor::dom::NodeType::elementNode)
+        sngxml::dom::Node* node = (*nodeSet)[i];
+        if (node->GetNodeType() == sngxml::dom::NodeType::elementNode)
         {
-            templateParameters.push_back(static_cast<cmajor::dom::Element*>(node));
+            templateParameters.push_back(static_cast<sngxml::dom::Element*>(node));
         }
         else
         {
@@ -2303,9 +2303,9 @@ std::vector<cmajor::dom::Element*> GetTemplateParameterElements(cmajor::dom::Ele
     return templateParameters;
 }
 
-std::vector<cmajor::dom::Element*> GetParameterElements(cmajor::dom::Element* parentElement)
+std::vector<sngxml::dom::Element*> GetParameterElements(sngxml::dom::Element* parentElement)
 {
-    std::vector<cmajor::dom::Element*> parameters;
+    std::vector<sngxml::dom::Element*> parameters;
     std::unique_ptr<cmajor::xpath::XPathObject> parameterObject = cmajor::xpath::Evaluate(U"parameters/parameter", parentElement);
     if (parameterObject->Type() != cmajor::xpath::XPathObjectType::nodeSet)
     {
@@ -2315,10 +2315,10 @@ std::vector<cmajor::dom::Element*> GetParameterElements(cmajor::dom::Element* pa
     int n = nodeSet->Length();
     for (int i = 0; i < n; ++i)
     {
-        cmajor::dom::Node* node = (*nodeSet)[i];
-        if (node->GetNodeType() == cmajor::dom::NodeType::elementNode)
+        sngxml::dom::Node* node = (*nodeSet)[i];
+        if (node->GetNodeType() == sngxml::dom::NodeType::elementNode)
         {
-            parameters.push_back(static_cast<cmajor::dom::Element*>(node));
+            parameters.push_back(static_cast<sngxml::dom::Element*>(node));
         }
         else
         {
@@ -2336,10 +2336,10 @@ void AppendRule(Element* parent)
     parent->AppendChild(std::move(hr));
 }
 
-cmajor::dom::Element* GetTypeById(const std::u32string& typeId, Document* libraryXmlDoc, const std::vector<std::u32string>& referenceXmlFilePaths, const std::vector<std::unique_ptr<Document>>& referenceXmlDocs,
+sngxml::dom::Element* GetTypeById(const std::u32string& typeId, Document* libraryXmlDoc, const std::vector<std::u32string>& referenceXmlFilePaths, const std::vector<std::unique_ptr<Document>>& referenceXmlDocs,
     int& index)
 {
-    cmajor::dom::Element* element = libraryXmlDoc->GetElementById(typeId);
+    sngxml::dom::Element* element = libraryXmlDoc->GetElementById(typeId);
     if (element)
     {
         index = -1;
@@ -2372,10 +2372,10 @@ Element* GetContentElement(Element* typeElement)
         {
             throw std::runtime_error("one node expected");
         }
-        cmajor::dom::Node* node = (*nodeSet)[0];
-        if (node->GetNodeType() == cmajor::dom::NodeType::elementNode)
+        sngxml::dom::Node* node = (*nodeSet)[0];
+        if (node->GetNodeType() == sngxml::dom::NodeType::elementNode)
         {
-            cmajor::dom::Element* element = static_cast<cmajor::dom::Element*>(node);
+            sngxml::dom::Element* element = static_cast<sngxml::dom::Element*>(node);
             return element;
         }
         else
@@ -2399,10 +2399,10 @@ Element* GetPrimaryTypeElement(Element* contentElement)
         {
             throw std::runtime_error("one node expected");
         }
-        cmajor::dom::Node* node = (*nodeSet)[0];
-        if (node->GetNodeType() == cmajor::dom::NodeType::elementNode)
+        sngxml::dom::Node* node = (*nodeSet)[0];
+        if (node->GetNodeType() == sngxml::dom::NodeType::elementNode)
         {
-            cmajor::dom::Element* element = static_cast<cmajor::dom::Element*>(node);
+            sngxml::dom::Element* element = static_cast<sngxml::dom::Element*>(node);
             return element;
         }
         else
@@ -2445,8 +2445,8 @@ std::u32string GetClassGroupName(const std::u32string& classId, Document* librar
             }
             else
             {
-                cmajor::dom::Node* node = (*nodeSet)[0];
-                if (node->GetNodeType() == cmajor::dom::NodeType::textNode)
+                sngxml::dom::Node* node = (*nodeSet)[0];
+                if (node->GetNodeType() == sngxml::dom::NodeType::textNode)
                 {
                     Text* text = static_cast<Text*>(node);
                     return text->Data();
@@ -2478,8 +2478,8 @@ std::vector<std::u32string> GetArgumentTypeIds(Element* contentElement)
         int n = nodeSet->Length();
         for (int i = 0; i < n; ++i)
         {
-            cmajor::dom::Node* node = (*nodeSet)[i];
-            if (node->GetNodeType() == cmajor::dom::NodeType::elementNode)
+            sngxml::dom::Node* node = (*nodeSet)[i];
+            if (node->GetNodeType() == sngxml::dom::NodeType::elementNode)
             {
                 Element* element = static_cast<Element*>(node);
                 std::u32string ref = element->GetAttribute(U"ref");
@@ -2508,8 +2508,8 @@ std::vector<Element*> GetEnumConstantElements(Element* enumerationElement)
         int n = nodeSet->Length();
         for (int i = 0; i < n; ++i)
         {
-            cmajor::dom::Node* node = (*nodeSet)[i];
-            if (node->GetNodeType() == cmajor::dom::NodeType::elementNode)
+            sngxml::dom::Node* node = (*nodeSet)[i];
+            if (node->GetNodeType() == sngxml::dom::NodeType::elementNode)
             {
                 Element* element = static_cast<Element*>(node);
                 enumConstantElements.push_back(element);
@@ -2531,30 +2531,30 @@ void AppendTypeHtml(const std::u32string& typeId, Document* libraryXmlDoc, const
     Element* parentElement)
 {
     int index = -1;
-    cmajor::dom::Element* type = GetTypeById(typeId, libraryXmlDoc, referenceXmlFilePaths, referenceXmlDocs, index);
+    sngxml::dom::Element* type = GetTypeById(typeId, libraryXmlDoc, referenceXmlFilePaths, referenceXmlDocs, index);
     if (!type)
     {
-        parentElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(U"typeId " + typeId + U" not found")));
+        parentElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(U"typeId " + typeId + U" not found")));
         return;
     }
     if (type->GetAttribute(U"basic") == U"true")
     {
-        std::unique_ptr<cmajor::dom::Element> spanElement(new Element(U"span"));
+        std::unique_ptr<sngxml::dom::Element> spanElement(new Element(U"span"));
         spanElement->SetAttribute(U"class", U"kw");
-        spanElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(GetName(type))));
+        spanElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(GetName(type))));
         parentElement->AppendChild(std::move(spanElement));
     }
     else if (type->GetAttribute(U"derived") == U"true")
     {
         Element* contentElement = GetContentElement(type);
-        cmajor::dom::NodeList children = contentElement->ChildNodes();
+        sngxml::dom::NodeList children = contentElement->ChildNodes();
         int n = children.Length();
         for (int i = 0; i < n; ++i)
         {
-            cmajor::dom::Node* node = children[i];
+            sngxml::dom::Node* node = children[i];
             if (node->Name() == U"baseType")
             {
-                if (node->GetNodeType() == cmajor::dom::NodeType::elementNode)
+                if (node->GetNodeType() == sngxml::dom::NodeType::elementNode)
                 {
                     Element* baseType = static_cast<Element*>(node);
                     std::u32string ref = baseType->GetAttribute(U"ref");
@@ -2567,29 +2567,29 @@ void AppendTypeHtml(const std::u32string& typeId, Document* libraryXmlDoc, const
             }
             else if (node->Name() == U"qualifier")
             {
-                if (node->GetNodeType() == cmajor::dom::NodeType::elementNode)
+                if (node->GetNodeType() == sngxml::dom::NodeType::elementNode)
                 {
                     Element* qualifier = static_cast<Element*>(node);
-                    cmajor::dom::NodeList children = qualifier->ChildNodes();
+                    sngxml::dom::NodeList children = qualifier->ChildNodes();
                     if (children.Length() != 1)
                     {
                         throw std::runtime_error("one node expected");
                     }
-                    cmajor::dom::Node* child = children[0];
-                    if (child->GetNodeType() == cmajor::dom::NodeType::textNode)
+                    sngxml::dom::Node* child = children[0];
+                    if (child->GetNodeType() == sngxml::dom::NodeType::textNode)
                     {
-                        cmajor::dom::Text* text = static_cast<Text*>(child);
+                        sngxml::dom::Text* text = static_cast<Text*>(child);
                         std::u32string qualifierText = text->Data();
                         if (qualifierText == U"const")
                         {
                             std::unique_ptr<Element> span(new Element(U"span"));
                             span->SetAttribute(U"class", U"kw");
-                            span->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(U"const ")));
+                            span->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(U"const ")));
                             parentElement->AppendChild(std::move(span));
                         }
                         else
                         {
-                            parentElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(qualifierText)));
+                            parentElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(qualifierText)));
                         }
                     }
                     else
@@ -2621,20 +2621,20 @@ void AppendTypeHtml(const std::u32string& typeId, Document* libraryXmlDoc, const
             filePath = ToUtf32(Path::ChangeExtension(ToUtf8(referenceXmlFilePaths[index]), ".html"));
         }
         link->SetAttribute(U"href", filePath + U"#" + ref);
-        link->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(groupName)));
+        link->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(groupName)));
         parentElement->AppendChild(std::move(link));
-        parentElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(U"<")));
+        parentElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(U"<")));
         std::vector<std::u32string> argumentTypeIds = GetArgumentTypeIds(contentElement);
         int n = argumentTypeIds.size();
         for (int i = 0; i < n; ++i)
         {
             if (i > 0)
             {
-                parentElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(U", ")));
+                parentElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(U", ")));
             }
             AppendTypeHtml(argumentTypeIds[i], libraryXmlDoc, referenceXmlFilePaths, referenceXmlDocs, parentElement);
         }
-        parentElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(U">")));
+        parentElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(U">")));
     }
     else
     {
@@ -2646,7 +2646,7 @@ void AppendTypeHtml(const std::u32string& typeId, Document* libraryXmlDoc, const
         }
         link->SetAttribute(U"href", filePath + U"#" + type->GetAttribute(U"id"));
         std::u32string typeName = GetName(type);
-        link->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(typeName)));
+        link->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(typeName)));
         parentElement->AppendChild(std::move(link));
     }
 }
@@ -2666,36 +2666,36 @@ void AppendConceptHtml(const std::u32string& conceptId, Document* libraryXmlDoc,
     {
         conceptName = GetName(conceptElement);
     }
-    link->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(conceptName)));
+    link->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(conceptName)));
     parentElement->AppendChild(std::move(link));
 }
 
 void AppendConstraintHtml(Element* constraintElement, Document* libraryXmlDoc, const std::vector<std::u32string>& referenceXmlFilePaths, const std::vector<std::unique_ptr<Document>>& referenceXmlDocs, 
     Element* parentElement)
 {
-    cmajor::dom::NodeList children = constraintElement->ChildNodes();
+    sngxml::dom::NodeList children = constraintElement->ChildNodes();
     int n = children.Length();
     for (int i = 0; i < n; ++i)
     {
-        cmajor::dom::Node* node = children[i];
-        if (node->GetNodeType() == cmajor::dom::NodeType::textNode)
+        sngxml::dom::Node* node = children[i];
+        if (node->GetNodeType() == sngxml::dom::NodeType::textNode)
         {
             Text* text = static_cast<Text*>(node);
-            parentElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(text->Data())));
+            parentElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(text->Data())));
         }
-        else if (node->GetNodeType() == cmajor::dom::NodeType::elementNode)
+        else if (node->GetNodeType() == sngxml::dom::NodeType::elementNode)
         {
             Element* element = static_cast<Element*>(node);
             if (element->Name() == U"connector")
             {
-                cmajor::dom::Node* firstChild = element->FirstChild();
-                if (firstChild && firstChild->GetNodeType() == cmajor::dom::NodeType::textNode)
+                sngxml::dom::Node* firstChild = element->FirstChild();
+                if (firstChild && firstChild->GetNodeType() == sngxml::dom::NodeType::textNode)
                 {
                     Text* text = static_cast<Text*>(firstChild);
                     std::u32string connector = text->Data();
                     std::unique_ptr<Element> span(new Element(U"span"));
                     span->SetAttribute(U"class", U"kw");
-                    span->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(U" " + connector + U" ")));
+                    span->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(U" " + connector + U" ")));
                     parentElement->AppendChild(std::move(span));
                 }
                 else
@@ -2705,35 +2705,35 @@ void AppendConstraintHtml(Element* constraintElement, Document* libraryXmlDoc, c
             }
             else if (element->Name() == U"openParen")
             {
-                parentElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(U"( ")));
+                parentElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(U"( ")));
             }
             else if (element->Name() == U"closeParen")
             {
-                parentElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(U")")));
+                parentElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(U")")));
             }
             else if (element->Name() == U"qualifier")
             {
                 Element* qualifier = element;
-                cmajor::dom::NodeList children = qualifier->ChildNodes();
+                sngxml::dom::NodeList children = qualifier->ChildNodes();
                 if (children.Length() != 1)
                 {
                     throw std::runtime_error("one node expected");
                 }
-                cmajor::dom::Node* child = children[0];
-                if (child->GetNodeType() == cmajor::dom::NodeType::textNode)
+                sngxml::dom::Node* child = children[0];
+                if (child->GetNodeType() == sngxml::dom::NodeType::textNode)
                 {
-                    cmajor::dom::Text* text = static_cast<Text*>(child);
+                    sngxml::dom::Text* text = static_cast<Text*>(child);
                     std::u32string qualifierText = text->Data();
                     if (qualifierText == U"const")
                     {
                         std::unique_ptr<Element> span(new Element(U"span"));
                         span->SetAttribute(U"class", U"kw");
-                        span->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(U"const ")));
+                        span->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(U"const ")));
                         parentElement->AppendChild(std::move(span));
                     }
                     else
                     {
-                        parentElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(qualifierText)));
+                        parentElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(qualifierText)));
                     }
                 }
                 else
@@ -2757,35 +2757,35 @@ void AppendConstraintHtml(Element* constraintElement, Document* libraryXmlDoc, c
                 {
                     AppendConceptHtml(ref, libraryXmlDoc, parentElement, true);
                 }
-                cmajor::dom::Node* firstChild = element->FirstChild();
-                if (firstChild && firstChild->GetNodeType() == cmajor::dom::NodeType::elementNode)
+                sngxml::dom::Node* firstChild = element->FirstChild();
+                if (firstChild && firstChild->GetNodeType() == sngxml::dom::NodeType::elementNode)
                 {
                     Element* childElement = static_cast<Element*>(firstChild);
                     if (childElement->Name() == U"params")
                     {
-                        cmajor::dom::NodeList children = childElement->ChildNodes();
-                        parentElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(U"<")));
+                        sngxml::dom::NodeList children = childElement->ChildNodes();
+                        parentElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(U"<")));
                         int n = children.Length();
                         for (int i = 0; i < n; ++i)
                         {
-                            cmajor::dom::Node* childNode = children[i];
-                            if (childNode->GetNodeType() == cmajor::dom::NodeType::elementNode)
+                            sngxml::dom::Node* childNode = children[i];
+                            if (childNode->GetNodeType() == sngxml::dom::NodeType::elementNode)
                             {
                                 Element* childElement = static_cast<Element*>(childNode);
                                 if (childElement->Name() == U"type")
                                 {
                                     if (i > 0)
                                     {
-                                        parentElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(U", ")));
+                                        parentElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(U", ")));
                                     }
                                     std::u32string ref = childElement->GetAttribute(U"ref");
                                     AppendTypeHtml(ref, libraryXmlDoc, referenceXmlFilePaths, referenceXmlDocs, parentElement);
                                 }
                                 else if (childElement->Name() == U"dot")
                                 {
-                                    cmajor::dom::Node* firstChild = childElement->FirstChild();
+                                    sngxml::dom::Node* firstChild = childElement->FirstChild();
                                     std::u32string content;
-                                    if (firstChild && firstChild->GetNodeType() == cmajor::dom::NodeType::textNode)
+                                    if (firstChild && firstChild->GetNodeType() == sngxml::dom::NodeType::textNode)
                                     {
                                         Text* text = static_cast<Text*>(firstChild);
                                         content = text->Data();
@@ -2794,7 +2794,7 @@ void AppendConstraintHtml(Element* constraintElement, Document* libraryXmlDoc, c
                                     {
                                         throw std::runtime_error("text node expected");
                                     }
-                                    parentElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(U"." + content)));
+                                    parentElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(U"." + content)));
                                 }
                                 else
                                 {
@@ -2806,7 +2806,7 @@ void AppendConstraintHtml(Element* constraintElement, Document* libraryXmlDoc, c
                                 throw std::runtime_error("element expected");
                             }
                         }
-                        parentElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(U">")));
+                        parentElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(U">")));
                     }
                     else
                     {
@@ -2816,9 +2816,9 @@ void AppendConstraintHtml(Element* constraintElement, Document* libraryXmlDoc, c
             }
             else if (element->Name() == U"dot")
             {
-                cmajor::dom::Node* firstChild = element->FirstChild();
+                sngxml::dom::Node* firstChild = element->FirstChild();
                 std::u32string content;
-                if (firstChild && firstChild->GetNodeType() == cmajor::dom::NodeType::textNode)
+                if (firstChild && firstChild->GetNodeType() == sngxml::dom::NodeType::textNode)
                 {
                     Text* text = static_cast<Text*>(firstChild);
                     content = text->Data();
@@ -2827,7 +2827,7 @@ void AppendConstraintHtml(Element* constraintElement, Document* libraryXmlDoc, c
                 {
                     throw std::runtime_error("text node expected");
                 }
-                parentElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(U"." + content)));
+                parentElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(U"." + content)));
             }
             else
             {
@@ -2849,8 +2849,8 @@ Element* GetBaseClassElement(Element* classElement)
         cmajor::xpath::XPathNodeSet* nodeSet = static_cast<cmajor::xpath::XPathNodeSet*>(baseClassObject.get());
         if (nodeSet->Length() == 1)
         {
-            cmajor::dom::Node* node = (*nodeSet)[0];
-            if (node->GetNodeType() == cmajor::dom::NodeType::elementNode)
+            sngxml::dom::Node* node = (*nodeSet)[0];
+            if (node->GetNodeType() == sngxml::dom::NodeType::elementNode)
             {
                 return static_cast<Element*>(node);
             }
@@ -2878,8 +2878,8 @@ Element* GetRefinesElement(Element* conceptElement)
         cmajor::xpath::XPathNodeSet* nodeSet = static_cast<cmajor::xpath::XPathNodeSet*>(refinedObject.get());
         if (nodeSet->Length() == 1)
         {
-            cmajor::dom::Node* node = (*nodeSet)[0];
-            if (node->GetNodeType() == cmajor::dom::NodeType::elementNode)
+            sngxml::dom::Node* node = (*nodeSet)[0];
+            if (node->GetNodeType() == sngxml::dom::NodeType::elementNode)
             {
                 return static_cast<Element*>(node);
             }
@@ -2907,8 +2907,8 @@ Element* GetReturnTypeElement(Element* parentElement)
         cmajor::xpath::XPathNodeSet* nodeSet = static_cast<cmajor::xpath::XPathNodeSet*>(returnTypeObject.get());
         if (nodeSet->Length() == 1)
         {
-            cmajor::dom::Node* node = (*nodeSet)[0];
-            if (node->GetNodeType() == cmajor::dom::NodeType::elementNode)
+            sngxml::dom::Node* node = (*nodeSet)[0];
+            if (node->GetNodeType() == sngxml::dom::NodeType::elementNode)
             {
                 return static_cast<Element*>(node);
             }
@@ -2936,8 +2936,8 @@ Element* GetTypeElement(Element* parentElement)
         cmajor::xpath::XPathNodeSet* nodeSet = static_cast<cmajor::xpath::XPathNodeSet*>(typeObject.get());
         if (nodeSet->Length() == 1)
         {
-            cmajor::dom::Node* node = (*nodeSet)[0];
-            if (node->GetNodeType() == cmajor::dom::NodeType::elementNode)
+            sngxml::dom::Node* node = (*nodeSet)[0];
+            if (node->GetNodeType() == sngxml::dom::NodeType::elementNode)
             {
                 return static_cast<Element*>(node);
             }
@@ -2965,8 +2965,8 @@ Element* GetUnderlyingTypeElement(Element* parentElement)
         cmajor::xpath::XPathNodeSet* nodeSet = static_cast<cmajor::xpath::XPathNodeSet*>(typeObject.get());
         if (nodeSet->Length() == 1)
         {
-            cmajor::dom::Node* node = (*nodeSet)[0];
-            if (node->GetNodeType() == cmajor::dom::NodeType::elementNode)
+            sngxml::dom::Node* node = (*nodeSet)[0];
+            if (node->GetNodeType() == sngxml::dom::NodeType::elementNode)
             {
                 return static_cast<Element*>(node);
             }
@@ -2994,8 +2994,8 @@ Element* GetConstraintElement(Element* parentElement)
         cmajor::xpath::XPathNodeSet* nodeSet = static_cast<cmajor::xpath::XPathNodeSet*>(constraintObject.get());
         if (nodeSet->Length() == 1)
         {
-            cmajor::dom::Node* node = (*nodeSet)[0];
-            if (node->GetNodeType() == cmajor::dom::NodeType::elementNode)
+            sngxml::dom::Node* node = (*nodeSet)[0];
+            if (node->GetNodeType() == sngxml::dom::NodeType::elementNode)
             {
                 return static_cast<Element*>(node);
             }
@@ -3025,8 +3025,8 @@ std::vector<Element*> GetConstraintElements(Element* parentElement)
         int n = nodeSet->Length();
         for (int i = 0; i < n; ++i)
         {
-            cmajor::dom::Node* node = (*nodeSet)[i];
-            if (node->GetNodeType() == cmajor::dom::NodeType::elementNode)
+            sngxml::dom::Node* node = (*nodeSet)[i];
+            if (node->GetNodeType() == sngxml::dom::NodeType::elementNode)
             {
                 constraintElements.push_back(static_cast<Element*>(node));
             }
@@ -3053,8 +3053,8 @@ std::vector<Element*> GetAxiomElements(Element* parentElement)
         int n = nodeSet->Length();
         for (int i = 0; i < n; ++i)
         {
-            cmajor::dom::Node* node = (*nodeSet)[i];
-            if (node->GetNodeType() == cmajor::dom::NodeType::elementNode)
+            sngxml::dom::Node* node = (*nodeSet)[i];
+            if (node->GetNodeType() == sngxml::dom::NodeType::elementNode)
             {
                 axiomElements.push_back(static_cast<Element*>(node));
             }
@@ -3081,8 +3081,8 @@ std::vector<Element*> GetAxiomStatementElements(Element* parentElement)
         int n = nodeSet->Length();
         for (int i = 0; i < n; ++i)
         {
-            cmajor::dom::Node* node = (*nodeSet)[i];
-            if (node->GetNodeType() == cmajor::dom::NodeType::elementNode)
+            sngxml::dom::Node* node = (*nodeSet)[i];
+            if (node->GetNodeType() == sngxml::dom::NodeType::elementNode)
             {
                 axiomStatementElements.push_back(static_cast<Element*>(node));
             }
@@ -3107,8 +3107,8 @@ std::u32string GetSyntaxText(Element* parentElement)
         cmajor::xpath::XPathNodeSet* nodeSet = static_cast<cmajor::xpath::XPathNodeSet*>(syntaxObject.get());
         if (nodeSet->Length() == 1)
         {
-            cmajor::dom::Node* node = (*nodeSet)[0];
-            if (node->GetNodeType() == cmajor::dom::NodeType::textNode)
+            sngxml::dom::Node* node = (*nodeSet)[0];
+            if (node->GetNodeType() == sngxml::dom::NodeType::textNode)
             {
                 Text* syntaxText = static_cast<Text*>(node);
                 return syntaxText->Data();
@@ -3130,22 +3130,22 @@ std::u32string GetSyntaxText(Element* parentElement)
 }
 
 void GenerateMembersHtml(Document* libraryXmlDoc, const std::vector<std::u32string>& referenceXmlFilePaths, const std::vector<std::unique_ptr<Document>>& referenceXmlDocs, 
-    cmajor::dom::Element* bodyElement, cmajor::dom::Element* parentElement, int level, const std::u32string& functionsText, const std::u32string& functionText, Document* docXml);
+    sngxml::dom::Element* bodyElement, sngxml::dom::Element* parentElement, int level, const std::u32string& functionsText, const std::u32string& functionText, Document* docXml);
 
-void GenerateTemplateParameterHtml(cmajor::dom::Element* parentElement, cmajor::dom::Element* bodyElement, int level, Document* docXml, const std::u32string& parentId, const std::u32string& title)
+void GenerateTemplateParameterHtml(sngxml::dom::Element* parentElement, sngxml::dom::Element* bodyElement, int level, Document* docXml, const std::u32string& parentId, const std::u32string& title)
 {
-    std::vector<cmajor::dom::Element*> templateParameterElements = GetTemplateParameterElements(parentElement);
+    std::vector<sngxml::dom::Element*> templateParameterElements = GetTemplateParameterElements(parentElement);
     if (!templateParameterElements.empty())
     {
         std::unique_ptr<Element> templateParametersHeadingElement(new Element(U"h" + ToUtf32(std::to_string(level))));
-        templateParametersHeadingElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(title)));
+        templateParametersHeadingElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(title)));
         bodyElement->AppendChild(std::move(templateParametersHeadingElement));
         std::unique_ptr<Element> templateParameterTableElement(new Element(U"table"));
         templateParameterTableElement->SetAttribute(U"class", U"params");
         int m = templateParameterElements.size();
         for (int i = 0; i < m; ++i)
         {
-            cmajor::dom::Element* templateParameterElement = templateParameterElements[i];
+            sngxml::dom::Element* templateParameterElement = templateParameterElements[i];
             std::u32string templateParameterName = GetName(templateParameterElement);
             std::u32string templateParameterDefault = GetDefault(templateParameterElement);
             std::unique_ptr<Element> tableRowElement(new Element(U"tr"));
@@ -3160,7 +3160,7 @@ void GenerateTemplateParameterHtml(cmajor::dom::Element* parentElement, cmajor::
             {
                 defaultStr = U" = " + templateParameterDefault;
             }
-            span->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(templateParameterName + defaultStr)));
+            span->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(templateParameterName + defaultStr)));
             tableColElement->AppendChild(std::move(span));
             tableRowElement->AppendChild(std::move(tableColElement));
             if (docXml)
@@ -3182,22 +3182,22 @@ void GenerateTemplateParameterHtml(cmajor::dom::Element* parentElement, cmajor::
 }
 
 void GenerateParameterHtml(Document* libraryXmlDoc, const std::vector<std::u32string>& referenceXmlFilePaths, const std::vector<std::unique_ptr<Document>>& referenceXmlDocs,
-    cmajor::dom::Element* parentElement, cmajor::dom::Element* bodyElement, int level, Document* docXml, const std::u32string& parentId)
+    sngxml::dom::Element* parentElement, sngxml::dom::Element* bodyElement, int level, Document* docXml, const std::u32string& parentId)
 {
-    std::vector<cmajor::dom::Element*> parameterElements = GetParameterElements(parentElement);
+    std::vector<sngxml::dom::Element*> parameterElements = GetParameterElements(parentElement);
     if (!parameterElements.empty())
     {
         std::unique_ptr<Element> parametersHeadingElement(new Element(U"h" + ToUtf32(std::to_string(level))));
-        parametersHeadingElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(U"Parameters")));
+        parametersHeadingElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(U"Parameters")));
         bodyElement->AppendChild(std::move(parametersHeadingElement));
         std::unique_ptr<Element> parameterTableElement(new Element(U"table"));
         parameterTableElement->SetAttribute(U"class", U"params");
         int n = parameterElements.size();
         for (int i = 0; i < n; ++i)
         {
-            cmajor::dom::Element* parameterElement = parameterElements[i];
+            sngxml::dom::Element* parameterElement = parameterElements[i];
             std::u32string parameterName = GetName(parameterElement);
-            cmajor::dom::Element* parameterTypeElement = GetTypeElement(parameterElement);
+            sngxml::dom::Element* parameterTypeElement = GetTypeElement(parameterElement);
             std::unique_ptr<Element> tableRowElement(new Element(U"tr"));
             tableRowElement->SetAttribute(U"class", U"params");
             std::unique_ptr<Element> tableDataElement(new Element(U"td"));
@@ -3205,7 +3205,7 @@ void GenerateParameterHtml(Document* libraryXmlDoc, const std::vector<std::u32st
             std::unique_ptr<Element> span(new Element(U"span"));
             span->SetAttribute(U"id", parameterElement->GetAttribute(U"id"));
             span->SetAttribute(U"class", U"param");
-            span->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(parameterName)));
+            span->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(parameterName)));
             tableDataElement->AppendChild(std::move(span));
             tableRowElement->AppendChild(std::move(tableDataElement));
             std::unique_ptr<Element> tableDataTypeElement(new Element(U"td"));
@@ -3230,20 +3230,20 @@ void GenerateParameterHtml(Document* libraryXmlDoc, const std::vector<std::u32st
     }
 }
 
-void AppendSyntax(cmajor::dom::Element* parentElement, cmajor::dom::Element* bodyElement, int level)
+void AppendSyntax(sngxml::dom::Element* parentElement, sngxml::dom::Element* bodyElement, int level)
 {
     std::u32string syntax = GetSyntaxText(parentElement);
     if (!syntax.empty())
     {
         std::unique_ptr<Element> syntaxHeadingElement(new Element(U"h" + ToUtf32(std::to_string(level))));
-        syntaxHeadingElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(U"Syntax")));
+        syntaxHeadingElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(U"Syntax")));
         bodyElement->AppendChild(std::move(syntaxHeadingElement));
         std::unique_ptr<Element> tableElement(new Element(U"table"));
         std::unique_ptr<Element> tableRowElement(new Element(U"tr"));
         std::unique_ptr<Element> tableDataElement(new Element(U"td"));
         std::unique_ptr<Element> span(new Element(U"span"));
         span->SetAttribute(U"class", U"mono");
-        span->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(syntax)));
+        span->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(syntax)));
         tableDataElement->AppendChild(std::move(span));
         tableRowElement->AppendChild(std::move(tableDataElement));
         tableElement->AppendChild(std::move(tableRowElement));
@@ -3251,14 +3251,14 @@ void AppendSyntax(cmajor::dom::Element* parentElement, cmajor::dom::Element* bod
     }
 }
 
-void GenerateClassHtml(cmajor::dom::Element* classElement, Document* libraryXmlDoc, const std::vector<std::u32string>& referenceXmlFilePaths, const std::vector<std::unique_ptr<Document>>& referenceXmlDocs,
-    cmajor::dom::Element* bodyElement, int level, Document* docXml)
+void GenerateClassHtml(sngxml::dom::Element* classElement, Document* libraryXmlDoc, const std::vector<std::u32string>& referenceXmlFilePaths, const std::vector<std::unique_ptr<Document>>& referenceXmlDocs,
+    sngxml::dom::Element* bodyElement, int level, Document* docXml)
 {
     AppendRule(bodyElement);
     std::u32string className = GetName(classElement);
     std::unique_ptr<Element> classHeadingElement(new Element(U"h" + ToUtf32(std::to_string(level))));
     classHeadingElement->SetAttribute(U"id", classElement->GetAttribute(U"id"));
-    classHeadingElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(className + U" Class")));
+    classHeadingElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(className + U" Class")));
     bodyElement->AppendChild(std::move(classHeadingElement));
     if (docXml)
     {
@@ -3272,19 +3272,19 @@ void GenerateClassHtml(cmajor::dom::Element* classElement, Document* libraryXmlD
     }
     AppendSyntax(classElement, bodyElement, level + 1);
     GenerateTemplateParameterHtml(classElement, bodyElement, level + 1, docXml, classElement->GetAttribute(U"id"), U"Template Parameters");
-    cmajor::dom::Element* baseClassElement = GetBaseClassElement(classElement);
+    sngxml::dom::Element* baseClassElement = GetBaseClassElement(classElement);
     if (baseClassElement)
     {
         std::unique_ptr<Element> baseClassHeadingElement(new Element(U"h" + ToUtf32(std::to_string(level + 1))));
-        baseClassHeadingElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(U"Base Class")));
+        baseClassHeadingElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(U"Base Class")));
         bodyElement->AppendChild(std::move(baseClassHeadingElement));
         AppendTypeHtml(baseClassElement->GetAttribute(U"ref"), libraryXmlDoc, referenceXmlFilePaths, referenceXmlDocs, bodyElement);
     }
-    cmajor::dom::Element* constraintElement = GetConstraintElement(classElement);
+    sngxml::dom::Element* constraintElement = GetConstraintElement(classElement);
     if (constraintElement)
     {
         std::unique_ptr<Element> constraintHeadingElement(new Element(U"h" + ToUtf32(std::to_string(level + 1))));
-        constraintHeadingElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(U"Constraint")));
+        constraintHeadingElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(U"Constraint")));
         bodyElement->AppendChild(std::move(constraintHeadingElement));
         std::unique_ptr<Element> tableElement(new Element(U"table"));
         std::unique_ptr<Element> tableRowElement(new Element(U"tr"));
@@ -3297,15 +3297,15 @@ void GenerateClassHtml(cmajor::dom::Element* classElement, Document* libraryXmlD
     GenerateMembersHtml(libraryXmlDoc, referenceXmlFilePaths, referenceXmlDocs, bodyElement, classElement, level + 1, U"Member Functions", U"Member Function", docXml);
 }
 
-void GenerateTypedefHtml(cmajor::dom::Element* typedefElement, Document* libraryXmlDoc, const std::vector<std::u32string>& referenceXmlFilePaths, const std::vector<std::unique_ptr<Document>>& referenceXmlDocs, 
-    cmajor::dom::Element* bodyElement, int level, Document* docXml)
+void GenerateTypedefHtml(sngxml::dom::Element* typedefElement, Document* libraryXmlDoc, const std::vector<std::u32string>& referenceXmlFilePaths, const std::vector<std::unique_ptr<Document>>& referenceXmlDocs, 
+    sngxml::dom::Element* bodyElement, int level, Document* docXml)
 {
     AppendRule(bodyElement);
     std::u32string typedefName = GetName(typedefElement);
     std::unique_ptr<Element> typedefHeadingElement(new Element(U"h" + ToUtf32(std::to_string(level))));
     std::u32string typedefId = typedefElement->GetAttribute(U"id");
     typedefHeadingElement->SetAttribute(U"id", typedefId);
-    typedefHeadingElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(typedefName + U" Typedef")));
+    typedefHeadingElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(typedefName + U" Typedef")));
     bodyElement->AppendChild(std::move(std::move(typedefHeadingElement)));
     if (docXml)
     {
@@ -3320,7 +3320,7 @@ void GenerateTypedefHtml(cmajor::dom::Element* typedefElement, Document* library
     AppendSyntax(typedefElement, bodyElement, level + 1);
     Element* typeElement = GetTypeElement(typedefElement);
     std::unique_ptr<Element> typeHeadingElement(new Element(U"h" + ToUtf32(std::to_string(level + 1))));
-    typeHeadingElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(U"Type")));
+    typeHeadingElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(U"Type")));
     bodyElement->AppendChild(std::move(typeHeadingElement));
     std::u32string ref = typeElement->GetAttribute(U"ref");
     std::unique_ptr<Element> tableElement(new Element(U"table"));
@@ -3332,15 +3332,15 @@ void GenerateTypedefHtml(cmajor::dom::Element* typedefElement, Document* library
     bodyElement->AppendChild(std::move(tableElement));
 }
 
-void GenerateConceptHtml(cmajor::dom::Element* conceptElement, Document* libraryXmlDoc, const std::vector<std::u32string>& referenceXmlFilePaths, const std::vector<std::unique_ptr<Document>>& referenceXmlDocs,
-    cmajor::dom::Element* bodyElement, int level, Document* docXml)
+void GenerateConceptHtml(sngxml::dom::Element* conceptElement, Document* libraryXmlDoc, const std::vector<std::u32string>& referenceXmlFilePaths, const std::vector<std::unique_ptr<Document>>& referenceXmlDocs,
+    sngxml::dom::Element* bodyElement, int level, Document* docXml)
 {
     AppendRule(bodyElement);
     std::u32string conceptName = GetName(conceptElement);
     std::unique_ptr<Element> conceptHeadingElement(new Element(U"h" + ToUtf32(std::to_string(level))));
     std::u32string conceptId = conceptElement->GetAttribute(U"id");
     conceptHeadingElement->SetAttribute(U"id", conceptId);
-    conceptHeadingElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(conceptName + U" Concept")));
+    conceptHeadingElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(conceptName + U" Concept")));
     bodyElement->AppendChild(std::move(conceptHeadingElement));
     if (docXml)
     {
@@ -3354,11 +3354,11 @@ void GenerateConceptHtml(cmajor::dom::Element* conceptElement, Document* library
     }
     AppendSyntax(conceptElement, bodyElement, level + 1);
     GenerateTemplateParameterHtml(conceptElement, bodyElement, level + 1, docXml, conceptId, U"Type Parameters");
-    cmajor::dom::Element* refinesElement = GetRefinesElement(conceptElement);
+    sngxml::dom::Element* refinesElement = GetRefinesElement(conceptElement);
     if (refinesElement)
     {
         std::unique_ptr<Element> refinesHeadingElement(new Element(U"h" + ToUtf32(std::to_string(level + 1))));
-        refinesHeadingElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(U"Refines")));
+        refinesHeadingElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(U"Refines")));
         bodyElement->AppendChild(std::move(refinesHeadingElement));
         std::unique_ptr<Element> tableElement(new Element(U"table"));
         std::unique_ptr<Element> tableRowElement(new Element(U"tr"));
@@ -3372,7 +3372,7 @@ void GenerateConceptHtml(cmajor::dom::Element* conceptElement, Document* library
     if (!constraintElements.empty())
     {
         std::unique_ptr<Element> constraintsHeadingElement(new Element(U"h" + ToUtf32(std::to_string(level + 1))));
-        constraintsHeadingElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(U"Constraints")));
+        constraintsHeadingElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(U"Constraints")));
         bodyElement->AppendChild(std::move(constraintsHeadingElement));
         std::unique_ptr<Element> tableElement(new Element(U"table"));
         int n = constraintElements.size();
@@ -3391,7 +3391,7 @@ void GenerateConceptHtml(cmajor::dom::Element* conceptElement, Document* library
     if (!axiomElements.empty())
     {
         std::unique_ptr<Element> axiomsHeadingElement(new Element(U"h" + ToUtf32(std::to_string(level + 1))));
-        axiomsHeadingElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(U"Axioms")));
+        axiomsHeadingElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(U"Axioms")));
         bodyElement->AppendChild(std::move(axiomsHeadingElement));
         int n = axiomElements.size();
         for (int i = 0; i < n; ++i)
@@ -3399,7 +3399,7 @@ void GenerateConceptHtml(cmajor::dom::Element* conceptElement, Document* library
             Element* axiomElement = axiomElements[i];
             std::u32string axiomName = GetName(axiomElement);
             std::unique_ptr<Element> axiomHeadingElement(new Element(U"h" + ToUtf32(std::to_string(level + 2))));
-            axiomHeadingElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(axiomName + U" Axiom")));
+            axiomHeadingElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(axiomName + U" Axiom")));
             bodyElement->AppendChild(std::move(axiomHeadingElement));
             std::unique_ptr<Element> tableElement(new Element(U"table"));
             std::vector<Element*> axiomStatementElements = GetAxiomStatementElements(axiomElement);
@@ -3417,15 +3417,15 @@ void GenerateConceptHtml(cmajor::dom::Element* conceptElement, Document* library
     }
 }
 
-void GenerateDelegateHtml(cmajor::dom::Element* delegateElement, Document* libraryXmlDoc, const std::vector<std::u32string>& referenceXmlFilePaths, const std::vector<std::unique_ptr<Document>>& referenceXmlDocs, 
-    cmajor::dom::Element* bodyElement, int level, Document* docXml)
+void GenerateDelegateHtml(sngxml::dom::Element* delegateElement, Document* libraryXmlDoc, const std::vector<std::u32string>& referenceXmlFilePaths, const std::vector<std::unique_ptr<Document>>& referenceXmlDocs, 
+    sngxml::dom::Element* bodyElement, int level, Document* docXml)
 {
     AppendRule(bodyElement);
     std::u32string delegateName = GetName(delegateElement);
     std::unique_ptr<Element> delegateHeadingElement(new Element(U"h" + ToUtf32(std::to_string(level))));
     std::u32string delegateId = delegateElement->GetAttribute(U"id");
     delegateHeadingElement->SetAttribute(U"id", delegateId);
-    delegateHeadingElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(delegateName + U" Delegate")));
+    delegateHeadingElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(delegateName + U" Delegate")));
     bodyElement->AppendChild(std::move(delegateHeadingElement));
     if (docXml)
     {
@@ -3439,11 +3439,11 @@ void GenerateDelegateHtml(cmajor::dom::Element* delegateElement, Document* libra
     }
     AppendSyntax(delegateElement, bodyElement, level + 1);
     GenerateParameterHtml(libraryXmlDoc, referenceXmlFilePaths, referenceXmlDocs, delegateElement, bodyElement, level + 1, docXml, delegateId);
-    cmajor::dom::Element* returnTypeElement = GetReturnTypeElement(delegateElement);
+    sngxml::dom::Element* returnTypeElement = GetReturnTypeElement(delegateElement);
     if (returnTypeElement)
     {
         std::unique_ptr<Element> returnTypeHeadingElement(new Element(U"h" + ToUtf32(std::to_string(level + 1))));
-        returnTypeHeadingElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(U"Return Type")));
+        returnTypeHeadingElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(U"Return Type")));
         bodyElement->AppendChild(std::move(returnTypeHeadingElement));
         std::unique_ptr<Element> tableElement(new Element(U"table"));
         std::unique_ptr<Element> tableRowElement(new Element(U"tr"));
@@ -3459,7 +3459,7 @@ void GenerateDelegateHtml(cmajor::dom::Element* delegateElement, Document* libra
             if (returnDescriptionElement)
             {
                 std::unique_ptr<Element> returnValueHeadingElement(new Element(U"h" + ToUtf32(std::to_string(level + 1))));
-                returnValueHeadingElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(U"Return Value")));
+                returnValueHeadingElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(U"Return Value")));
                 bodyElement->AppendChild(std::move(returnValueHeadingElement));
                 std::unique_ptr<Element> tableElement(new Element(U"table"));
                 std::unique_ptr<Element> tableRowElement(new Element(U"tr"));
@@ -3473,15 +3473,15 @@ void GenerateDelegateHtml(cmajor::dom::Element* delegateElement, Document* libra
     }
 }
 
-void GenerateClassDelegateHtml(cmajor::dom::Element* classDelegateElement, Document* libraryXmlDoc, const std::vector<std::u32string>& referenceXmlFilePaths, 
-    const std::vector<std::unique_ptr<Document>>& referenceXmlDocs, cmajor::dom::Element* bodyElement, int level, Document* docXml)
+void GenerateClassDelegateHtml(sngxml::dom::Element* classDelegateElement, Document* libraryXmlDoc, const std::vector<std::u32string>& referenceXmlFilePaths, 
+    const std::vector<std::unique_ptr<Document>>& referenceXmlDocs, sngxml::dom::Element* bodyElement, int level, Document* docXml)
 {
     AppendRule(bodyElement);
     std::u32string classDelegateName = GetName(classDelegateElement);
     std::unique_ptr<Element> classDelegateHeadingElement(new Element(U"h" + ToUtf32(std::to_string(level))));
     std::u32string classDelegateId = classDelegateElement->GetAttribute(U"id");
     classDelegateHeadingElement->SetAttribute(U"id", classDelegateId);
-    classDelegateHeadingElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(classDelegateName + U" Class Delegate")));
+    classDelegateHeadingElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(classDelegateName + U" Class Delegate")));
     bodyElement->AppendChild(std::move(classDelegateHeadingElement));
     if (docXml)
     {
@@ -3495,11 +3495,11 @@ void GenerateClassDelegateHtml(cmajor::dom::Element* classDelegateElement, Docum
     }
     AppendSyntax(classDelegateElement, bodyElement, level + 1);
     GenerateParameterHtml(libraryXmlDoc, referenceXmlFilePaths, referenceXmlDocs, classDelegateElement, bodyElement, level + 1, docXml, classDelegateId);
-    cmajor::dom::Element* returnTypeElement = GetReturnTypeElement(classDelegateElement);
+    sngxml::dom::Element* returnTypeElement = GetReturnTypeElement(classDelegateElement);
     if (returnTypeElement)
     {
         std::unique_ptr<Element> returnTypeHeadingElement(new Element(U"h" + ToUtf32(std::to_string(level + 1))));
-        returnTypeHeadingElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(U"Return Type")));
+        returnTypeHeadingElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(U"Return Type")));
         bodyElement->AppendChild(std::move(returnTypeHeadingElement));
         std::unique_ptr<Element> tableElement(new Element(U"table"));
         std::unique_ptr<Element> tableRowElement(new Element(U"tr"));
@@ -3515,7 +3515,7 @@ void GenerateClassDelegateHtml(cmajor::dom::Element* classDelegateElement, Docum
             if (returnDescriptionElement)
             {
                 std::unique_ptr<Element> returnValueHeadingElement(new Element(U"h" + ToUtf32(std::to_string(level + 1))));
-                returnValueHeadingElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(U"Return Value")));
+                returnValueHeadingElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(U"Return Value")));
                 bodyElement->AppendChild(std::move(returnValueHeadingElement));
                 std::unique_ptr<Element> tableElement(new Element(U"table"));
                 std::unique_ptr<Element> tableRowElement(new Element(U"tr"));
@@ -3529,15 +3529,15 @@ void GenerateClassDelegateHtml(cmajor::dom::Element* classDelegateElement, Docum
     }
 }
 
-void GenerateConstantHtml(cmajor::dom::Element* constantElement, Document* libraryXmlDoc, const std::vector<std::u32string>& referenceXmlFilePaths,
-    const std::vector<std::unique_ptr<Document>>& referenceXmlDocs, cmajor::dom::Element* bodyElement, int level, Document* docXml)
+void GenerateConstantHtml(sngxml::dom::Element* constantElement, Document* libraryXmlDoc, const std::vector<std::u32string>& referenceXmlFilePaths,
+    const std::vector<std::unique_ptr<Document>>& referenceXmlDocs, sngxml::dom::Element* bodyElement, int level, Document* docXml)
 {
     AppendRule(bodyElement);
     std::u32string constantName = GetName(constantElement);
     std::unique_ptr<Element> constantHeadingElement(new Element(U"h" + ToUtf32(std::to_string(level))));
     std::u32string constantId = constantElement->GetAttribute(U"id");
     constantHeadingElement->SetAttribute(U"id", constantId);
-    constantHeadingElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(constantName + U" Constant")));
+    constantHeadingElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(constantName + U" Constant")));
     bodyElement->AppendChild(std::move(constantHeadingElement));
     if (docXml)
     {
@@ -3550,36 +3550,36 @@ void GenerateConstantHtml(cmajor::dom::Element* constantElement, Document* libra
         }
     }
     AppendSyntax(constantElement, bodyElement, level + 1);
-    cmajor::dom::Element* typeElement = GetTypeElement(constantElement);
+    sngxml::dom::Element* typeElement = GetTypeElement(constantElement);
     std::unique_ptr<Element> typeHeadingElement(new Element(U"h" + ToUtf32(std::to_string(level + 1))));
-    typeHeadingElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(U"Type")));
+    typeHeadingElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(U"Type")));
     bodyElement->AppendChild(std::move(typeHeadingElement));
     AppendTypeHtml(typeElement->GetAttribute(U"ref"), libraryXmlDoc, referenceXmlFilePaths, referenceXmlDocs, bodyElement);
     std::u32string constantValue = GetValue(constantElement);
     std::unique_ptr<Element> valueHeadingElement(new Element(U"h" + ToUtf32(std::to_string(level + 1))));
-    valueHeadingElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(U"Value")));
+    valueHeadingElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(U"Value")));
     bodyElement->AppendChild(std::move(valueHeadingElement));
     std::unique_ptr<Element> tableElement(new Element(U"table"));
     std::unique_ptr<Element> tableRowElement(new Element(U"tr"));
     std::unique_ptr<Element> tableDataElement(new Element(U"td"));
     std::unique_ptr<Element> spanValueElement(new Element(U"span"));
     spanValueElement->SetAttribute(U"class", U"var");
-    spanValueElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(constantValue)));
+    spanValueElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(constantValue)));
     tableDataElement->AppendChild(std::move(spanValueElement));
     tableRowElement->AppendChild(std::move(tableDataElement));
     tableElement->AppendChild(std::move(tableRowElement));
     bodyElement->AppendChild(std::move(tableElement));
 }
 
-void GenerateEnumerationHtml(cmajor::dom::Element* enumerationElement, Document* libraryXmlDoc, const std::vector<std::u32string>& referenceXmlFilePaths,
-    const std::vector<std::unique_ptr<Document>>& referenceXmlDocs, cmajor::dom::Element* bodyElement, int level, Document* docXml)
+void GenerateEnumerationHtml(sngxml::dom::Element* enumerationElement, Document* libraryXmlDoc, const std::vector<std::u32string>& referenceXmlFilePaths,
+    const std::vector<std::unique_ptr<Document>>& referenceXmlDocs, sngxml::dom::Element* bodyElement, int level, Document* docXml)
 {
     AppendRule(bodyElement);
     std::u32string enumerationName = GetName(enumerationElement);
     std::unique_ptr<Element> enumerationHeadingElement(new Element(U"h" + ToUtf32(std::to_string(level))));
     std::u32string enumId = enumerationElement->GetAttribute(U"id");
     enumerationHeadingElement->SetAttribute(U"id", enumId);
-    enumerationHeadingElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(enumerationName + U" Enumeration")));
+    enumerationHeadingElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(enumerationName + U" Enumeration")));
     bodyElement->AppendChild(std::move(enumerationHeadingElement));
     if (docXml)
     {
@@ -3592,33 +3592,33 @@ void GenerateEnumerationHtml(cmajor::dom::Element* enumerationElement, Document*
         }
     }
     AppendSyntax(enumerationElement, bodyElement, level + 1);
-    cmajor::dom::Element* underlyingTypeElement = GetUnderlyingTypeElement(enumerationElement);
+    sngxml::dom::Element* underlyingTypeElement = GetUnderlyingTypeElement(enumerationElement);
     std::unique_ptr<Element> typeHeadingElement(new Element(U"h" + ToUtf32(std::to_string(level + 1))));
-    typeHeadingElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(U"Underlying Type")));
+    typeHeadingElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(U"Underlying Type")));
     bodyElement->AppendChild(std::move(typeHeadingElement));
     AppendTypeHtml(underlyingTypeElement->GetAttribute(U"ref"), libraryXmlDoc, referenceXmlFilePaths, referenceXmlDocs, bodyElement);
     std::unique_ptr<Element> enumConstantsHeadingElement(new Element(U"h" + ToUtf32(std::to_string(level + 1))));
-    enumConstantsHeadingElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(U"Enumeration Constants")));
+    enumConstantsHeadingElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(U"Enumeration Constants")));
     bodyElement->AppendChild(std::move(enumConstantsHeadingElement));
     std::unique_ptr<Element> enumConstantTableElement(new Element(U"table"));
     std::vector<Element*> enumConstantElements = GetEnumConstantElements(enumerationElement);
     int n = enumConstantElements.size();
     for (int i = 0; i < n; ++i)
     {
-        cmajor::dom::Element* enumConstantElement = enumConstantElements[i];
+        sngxml::dom::Element* enumConstantElement = enumConstantElements[i];
         std::u32string enumConstantName = GetName(enumConstantElement);
         std::u32string enumConstantValue = GetValue(enumConstantElement);
         std::unique_ptr<Element> tableRowElement(new Element(U"tr"));
         std::unique_ptr<Element> tableColElement(new Element(U"td"));
         std::unique_ptr<Element> spanVarElement(new Element(U"span"));
         spanVarElement->SetAttribute(U"class", U"var");
-        spanVarElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(enumConstantName)));
+        spanVarElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(enumConstantName)));
         tableColElement->AppendChild(std::move(spanVarElement));
         tableRowElement->AppendChild(std::move(tableColElement));
         std::unique_ptr<Element> tableCol2Element(new Element(U"td"));
         std::unique_ptr<Element> spanValueElement(new Element(U"span"));
         spanValueElement->SetAttribute(U"class", U"var");
-        spanValueElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(enumConstantValue)));
+        spanValueElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(enumConstantValue)));
         tableCol2Element->AppendChild(std::move(spanValueElement));
         tableRowElement->AppendChild(std::move(tableCol2Element));
         enumConstantTableElement->AppendChild(std::move(tableRowElement));
@@ -3626,15 +3626,15 @@ void GenerateEnumerationHtml(cmajor::dom::Element* enumerationElement, Document*
     bodyElement->AppendChild(std::move(enumConstantTableElement));
 }
 
-void GenerateMemberVariableHtml(cmajor::dom::Element* memberVariableElement, Document* libraryXmlDoc, const std::vector<std::u32string>& referenceXmlFilePaths,
-    const std::vector<std::unique_ptr<Document>>& referenceXmlDocs, cmajor::dom::Element* bodyElement, int level, Document* docXml)
+void GenerateMemberVariableHtml(sngxml::dom::Element* memberVariableElement, Document* libraryXmlDoc, const std::vector<std::u32string>& referenceXmlFilePaths,
+    const std::vector<std::unique_ptr<Document>>& referenceXmlDocs, sngxml::dom::Element* bodyElement, int level, Document* docXml)
 {
     AppendRule(bodyElement);
     std::u32string memberVariableName = GetName(memberVariableElement);
     std::unique_ptr<Element> memberVariableHeadingElement(new Element(U"h" + ToUtf32(std::to_string(level))));
     std::u32string memberVarId = memberVariableElement->GetAttribute(U"id");
     memberVariableHeadingElement->SetAttribute(U"id", memberVarId);
-    memberVariableHeadingElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(memberVariableName + U" Member Variable")));
+    memberVariableHeadingElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(memberVariableName + U" Member Variable")));
     bodyElement->AppendChild(std::move(memberVariableHeadingElement));
     if (docXml)
     {
@@ -3647,9 +3647,9 @@ void GenerateMemberVariableHtml(cmajor::dom::Element* memberVariableElement, Doc
         }
     }
     AppendSyntax(memberVariableElement, bodyElement, level + 1);
-    cmajor::dom::Element* typeElement = GetTypeElement(memberVariableElement);
+    sngxml::dom::Element* typeElement = GetTypeElement(memberVariableElement);
     std::unique_ptr<Element> typeHeadingElement(new Element(U"h" + ToUtf32(std::to_string(level + 1))));
-    typeHeadingElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(U"Type")));
+    typeHeadingElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(U"Type")));
     bodyElement->AppendChild(std::move(typeHeadingElement));
     std::unique_ptr<Element> tableElement(new Element(U"table"));
     std::unique_ptr<Element> tableRowElement(new Element(U"tr"));
@@ -3660,15 +3660,15 @@ void GenerateMemberVariableHtml(cmajor::dom::Element* memberVariableElement, Doc
     bodyElement->AppendChild(std::move(tableElement));
 }
 
-void GenerateFunctionHtml(cmajor::dom::Element* functionElement, Document* libraryXmlDoc, const std::vector<std::u32string>& referenceXmlFilePaths, const std::vector<std::unique_ptr<Document>>& referenceXmlDocs, 
-    cmajor::dom::Element* bodyElement, int level, const std::u32string& functionKind, Document* docXml)
+void GenerateFunctionHtml(sngxml::dom::Element* functionElement, Document* libraryXmlDoc, const std::vector<std::u32string>& referenceXmlFilePaths, const std::vector<std::unique_ptr<Document>>& referenceXmlDocs, 
+    sngxml::dom::Element* bodyElement, int level, const std::u32string& functionKind, Document* docXml)
 {
     AppendRule(bodyElement);
     std::u32string functionName = GetName(functionElement);
     std::unique_ptr<Element> functionHeadingElement(new Element(U"h" + ToUtf32(std::to_string(level))));
     std::u32string functionId = functionElement->GetAttribute(U"id");
     functionHeadingElement->SetAttribute(U"id", functionId);
-    functionHeadingElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(functionName + U" " + functionKind)));
+    functionHeadingElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(functionName + U" " + functionKind)));
     bodyElement->AppendChild(std::move(std::move(functionHeadingElement)));
     if (docXml)
     {
@@ -3682,11 +3682,11 @@ void GenerateFunctionHtml(cmajor::dom::Element* functionElement, Document* libra
     }
     AppendSyntax(functionElement, bodyElement, level + 1);
     GenerateTemplateParameterHtml(functionElement, bodyElement, level + 1, docXml, functionId, U"Template Parameters");
-    cmajor::dom::Element* constraintElement = GetConstraintElement(functionElement);
+    sngxml::dom::Element* constraintElement = GetConstraintElement(functionElement);
     if (constraintElement)
     {
         std::unique_ptr<Element> constraintHeadingElement(new Element(U"h" + ToUtf32(std::to_string(level + 1))));
-        constraintHeadingElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(U"Constraint")));
+        constraintHeadingElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(U"Constraint")));
         bodyElement->AppendChild(std::move(constraintHeadingElement));
         std::unique_ptr<Element> tableElement(new Element(U"table"));
         std::unique_ptr<Element> tableRowElement(new Element(U"tr"));
@@ -3697,11 +3697,11 @@ void GenerateFunctionHtml(cmajor::dom::Element* functionElement, Document* libra
         bodyElement->AppendChild(std::move(tableElement));
     }
     GenerateParameterHtml(libraryXmlDoc, referenceXmlFilePaths, referenceXmlDocs, functionElement, bodyElement, level + 1, docXml, functionId);
-    cmajor::dom::Element* returnTypeElement = GetReturnTypeElement(functionElement);
+    sngxml::dom::Element* returnTypeElement = GetReturnTypeElement(functionElement);
     if (returnTypeElement)
     {
         std::unique_ptr<Element> returnTypeHeadingElement(new Element(U"h" + ToUtf32(std::to_string(level + 1))));
-        returnTypeHeadingElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(U"Return Type")));
+        returnTypeHeadingElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(U"Return Type")));
         bodyElement->AppendChild(std::move(returnTypeHeadingElement));
         std::unique_ptr<Element> tableElement(new Element(U"table"));
         std::unique_ptr<Element> tableRowElement(new Element(U"tr"));
@@ -3717,7 +3717,7 @@ void GenerateFunctionHtml(cmajor::dom::Element* functionElement, Document* libra
             if (returnDescriptionElement)
             {
                 std::unique_ptr<Element> returnValueHeadingElement(new Element(U"h" + ToUtf32(std::to_string(level + 1))));
-                returnValueHeadingElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(U"Return Value")));
+                returnValueHeadingElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(U"Return Value")));
                 bodyElement->AppendChild(std::move(returnValueHeadingElement));
                 std::unique_ptr<Element> tableElement(new Element(U"table"));
                 std::unique_ptr<Element> tableRowElement(new Element(U"tr"));
@@ -3733,19 +3733,19 @@ void GenerateFunctionHtml(cmajor::dom::Element* functionElement, Document* libra
     if (!overloadElements.empty())
     {
         std::unique_ptr<Element> overloadsHeadingElement(new Element(U"h" + ToUtf32(std::to_string(level + 1))));
-        overloadsHeadingElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(U"Overloads")));
+        overloadsHeadingElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(U"Overloads")));
         bodyElement->AppendChild(std::move(overloadsHeadingElement));
         std::unique_ptr<Element> overloadTableElement(new Element(U"table"));
         int m = overloadElements.size();
         for (int i = 0; i < m; ++i)
         {
-            cmajor::dom::Element* overloadElement = overloadElements[i];
+            sngxml::dom::Element* overloadElement = overloadElements[i];
             std::u32string overloadName = GetName(overloadElement);
             std::unique_ptr<Element> tableRowElement(new Element(U"tr"));
             std::unique_ptr<Element> tableColElement(new Element(U"td"));
             std::unique_ptr<Element> linkElement(new Element(U"a"));
             linkElement->SetAttribute(U"href", U"#" + overloadElement->GetAttribute(U"id"));
-            linkElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(overloadName)));
+            linkElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(overloadName)));
             tableColElement->AppendChild(std::move(linkElement));
             tableRowElement->AppendChild(std::move(tableColElement));
             overloadTableElement->AppendChild(std::move(tableRowElement));
@@ -3759,302 +3759,302 @@ void GenerateFunctionHtml(cmajor::dom::Element* functionElement, Document* libra
 }
 
 void GenerateMembersHtml(Document* libraryXmlDoc, const std::vector<std::u32string>& referenceXmlFilePaths, const std::vector<std::unique_ptr<Document>>& referenceXmlDocs, 
-    cmajor::dom::Element* bodyElement, cmajor::dom::Element* parentElement, int level, const std::u32string& functionsText, const std::u32string& functionText, Document* docXml)
+    sngxml::dom::Element* bodyElement, sngxml::dom::Element* parentElement, int level, const std::u32string& functionsText, const std::u32string& functionText, Document* docXml)
 {
-    std::vector<cmajor::dom::Element*> classElements = GetClassElements(parentElement);
+    std::vector<sngxml::dom::Element*> classElements = GetClassElements(parentElement);
     if (!classElements.empty())
     {
         std::unique_ptr<Element> classesHeadingElement(new Element(U"h" + ToUtf32(std::to_string(level))));
-        classesHeadingElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(U"Classes")));
+        classesHeadingElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(U"Classes")));
         bodyElement->AppendChild(std::move(classesHeadingElement));
         std::unique_ptr<Element> classTableElement(new Element(U"table"));
         int m = classElements.size();
         for (int i = 0; i < m; ++i)
         {
-            cmajor::dom::Element* classElement = classElements[i];
+            sngxml::dom::Element* classElement = classElements[i];
             std::u32string className = GetName(classElement);
             std::unique_ptr<Element> tableRowElement(new Element(U"tr"));
             std::unique_ptr<Element> tableColElement(new Element(U"td"));
             std::unique_ptr<Element> linkElement(new Element(U"a"));
             linkElement->SetAttribute(U"href", U"#" + classElement->GetAttribute(U"id"));
-            linkElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(className)));
+            linkElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(className)));
             tableColElement->AppendChild(std::move(linkElement));
             tableRowElement->AppendChild(std::move(tableColElement));
             classTableElement->AppendChild(std::move(tableRowElement));
         }
         bodyElement->AppendChild(std::move(classTableElement));
     }
-    std::vector<cmajor::dom::Element*> constructorElements = GetConstructorElements(parentElement);
+    std::vector<sngxml::dom::Element*> constructorElements = GetConstructorElements(parentElement);
     if (!constructorElements.empty())
     {
         std::unique_ptr<Element> constructorsHeadingElement(new Element(U"h" + ToUtf32(std::to_string(level))));
-        constructorsHeadingElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(U"Constructors")));
+        constructorsHeadingElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(U"Constructors")));
         bodyElement->AppendChild(std::move(constructorsHeadingElement));
         std::unique_ptr<Element> constructorTableElement(new Element(U"table"));
         int m = constructorElements.size();
         for (int i = 0; i < m; ++i)
         {
-            cmajor::dom::Element* constructorElement = constructorElements[i];
+            sngxml::dom::Element* constructorElement = constructorElements[i];
             std::u32string constructorName = GetName(constructorElement);
             std::unique_ptr<Element> tableRowElement(new Element(U"tr"));
             std::unique_ptr<Element> tableColElement(new Element(U"td"));
             std::unique_ptr<Element> linkElement(new Element(U"a"));
             linkElement->SetAttribute(U"href", U"#" + constructorElement->GetAttribute(U"id"));
-            linkElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(constructorName)));
+            linkElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(constructorName)));
             tableColElement->AppendChild(std::move(linkElement));
             tableRowElement->AppendChild(std::move(tableColElement));
             constructorTableElement->AppendChild(std::move(tableRowElement));
         }
         bodyElement->AppendChild(std::move(constructorTableElement));
     }
-    std::vector<cmajor::dom::Element*> functionElements = GetFunctionElements(parentElement);
+    std::vector<sngxml::dom::Element*> functionElements = GetFunctionElements(parentElement);
     if (!functionElements.empty())
     {
         std::unique_ptr<Element> functionsHeadingElement(new Element(U"h" + ToUtf32(std::to_string(level))));
-        functionsHeadingElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(functionsText)));
+        functionsHeadingElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(functionsText)));
         bodyElement->AppendChild(std::move(functionsHeadingElement));
         std::unique_ptr<Element> functionTableElement(new Element(U"table"));
         int m = functionElements.size();
         for (int i = 0; i < m; ++i)
         {
-            cmajor::dom::Element* functionElement = functionElements[i];
+            sngxml::dom::Element* functionElement = functionElements[i];
             std::u32string functionName = GetName(functionElement);
             std::unique_ptr<Element> tableRowElement(new Element(U"tr"));
             std::unique_ptr<Element> tableColElement(new Element(U"td"));
             std::unique_ptr<Element> linkElement(new Element(U"a"));
             linkElement->SetAttribute(U"href", U"#" + functionElement->GetAttribute(U"id"));
-            linkElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(functionName)));
+            linkElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(functionName)));
             tableColElement->AppendChild(std::move(linkElement));
             tableRowElement->AppendChild(std::move(tableColElement));
             functionTableElement->AppendChild(std::move(tableRowElement));
         }
         bodyElement->AppendChild(std::move(functionTableElement));
     }
-    std::vector<cmajor::dom::Element*> staticMemberFunctionElements = GetStaticMemberFunctionElements(parentElement);
+    std::vector<sngxml::dom::Element*> staticMemberFunctionElements = GetStaticMemberFunctionElements(parentElement);
     if (!staticMemberFunctionElements.empty())
     {
         std::unique_ptr<Element> functionsHeadingElement(new Element(U"h" + ToUtf32(std::to_string(level))));
-        functionsHeadingElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(U"Static Member Functions")));
+        functionsHeadingElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(U"Static Member Functions")));
         bodyElement->AppendChild(std::move(functionsHeadingElement));
         std::unique_ptr<Element> functionTableElement(new Element(U"table"));
         int m = staticMemberFunctionElements.size();
         for (int i = 0; i < m; ++i)
         {
-            cmajor::dom::Element* functionElement = staticMemberFunctionElements[i];
+            sngxml::dom::Element* functionElement = staticMemberFunctionElements[i];
             std::u32string functionName = GetName(functionElement);
             std::unique_ptr<Element> tableRowElement(new Element(U"tr"));
             std::unique_ptr<Element> tableColElement(new Element(U"td"));
             std::unique_ptr<Element> linkElement(new Element(U"a"));
             linkElement->SetAttribute(U"href", U"#" + functionElement->GetAttribute(U"id"));
-            linkElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(functionName)));
+            linkElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(functionName)));
             tableColElement->AppendChild(std::move(linkElement));
             tableRowElement->AppendChild(std::move(tableColElement));
             functionTableElement->AppendChild(std::move(tableRowElement));
         }
         bodyElement->AppendChild(std::move(functionTableElement));
     }
-    std::vector<cmajor::dom::Element*> typedefElements = GetTypedefElements(parentElement);
+    std::vector<sngxml::dom::Element*> typedefElements = GetTypedefElements(parentElement);
     if (!typedefElements.empty())
     {
         std::unique_ptr<Element> typedefsHeadingElement(new Element(U"h" + ToUtf32(std::to_string(level))));
-        typedefsHeadingElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(U"Typedefs")));
+        typedefsHeadingElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(U"Typedefs")));
         bodyElement->AppendChild(std::move(typedefsHeadingElement));
         std::unique_ptr<Element> typedefTableElement(new Element(U"table"));
         int m = typedefElements.size();
         for (int i = 0; i < m; ++i)
         {
-            cmajor::dom::Element* typedefElement = typedefElements[i];
+            sngxml::dom::Element* typedefElement = typedefElements[i];
             std::u32string typedefName = GetName(typedefElement);
             std::unique_ptr<Element> tableRowElement(new Element(U"tr"));
             std::unique_ptr<Element> tableColElement(new Element(U"td"));
             std::unique_ptr<Element> linkElement(new Element(U"a"));
             linkElement->SetAttribute(U"href", U"#" + typedefElement->GetAttribute(U"id"));
-            linkElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(typedefName)));
+            linkElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(typedefName)));
             tableColElement->AppendChild(std::move(linkElement));
             tableRowElement->AppendChild(std::move(tableColElement));
             typedefTableElement->AppendChild(std::move(tableRowElement));
         }
         bodyElement->AppendChild(std::move(typedefTableElement));
     }
-    std::vector<cmajor::dom::Element*> conceptElements = GetConceptElements(parentElement);
+    std::vector<sngxml::dom::Element*> conceptElements = GetConceptElements(parentElement);
     if (!conceptElements.empty())
     {
         std::unique_ptr<Element> conceptsHeadingElement(new Element(U"h" + ToUtf32(std::to_string(level))));
-        conceptsHeadingElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(U"Concepts")));
+        conceptsHeadingElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(U"Concepts")));
         bodyElement->AppendChild(std::move(conceptsHeadingElement));
         std::unique_ptr<Element> conceptTableElement(new Element(U"table"));
         int m = conceptElements.size();
         for (int i = 0; i < m; ++i)
         {
-            cmajor::dom::Element* conceptElement = conceptElements[i];
+            sngxml::dom::Element* conceptElement = conceptElements[i];
             std::u32string conceptName = GetName(conceptElement);
             std::unique_ptr<Element> tableRowElement(new Element(U"tr"));
             std::unique_ptr<Element> tableColElement(new Element(U"td"));
             std::unique_ptr<Element> linkElement(new Element(U"a"));
             linkElement->SetAttribute(U"href", U"#" + conceptElement->GetAttribute(U"id"));
-            linkElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(conceptName)));
+            linkElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(conceptName)));
             tableColElement->AppendChild(std::move(linkElement));
             tableRowElement->AppendChild(std::move(tableColElement));
             conceptTableElement->AppendChild(std::move(tableRowElement));
         }
         bodyElement->AppendChild(std::move(conceptTableElement));
     }
-    std::vector<cmajor::dom::Element*> delegateElements = GetDelegateElements(parentElement);
+    std::vector<sngxml::dom::Element*> delegateElements = GetDelegateElements(parentElement);
     if (!delegateElements.empty())
     {
         std::unique_ptr<Element> delegatesHeadingElement(new Element(U"h" + ToUtf32(std::to_string(level))));
-        delegatesHeadingElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(U"Delegates")));
+        delegatesHeadingElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(U"Delegates")));
         bodyElement->AppendChild(std::move(delegatesHeadingElement));
         std::unique_ptr<Element> delegateTableElement(new Element(U"table"));
         int m = delegateElements.size();
         for (int i = 0; i < m; ++i)
         {
-            cmajor::dom::Element* delegateElement = delegateElements[i];
+            sngxml::dom::Element* delegateElement = delegateElements[i];
             std::u32string delegateName = GetName(delegateElement);
             std::unique_ptr<Element> tableRowElement(new Element(U"tr"));
             std::unique_ptr<Element> tableColElement(new Element(U"td"));
             std::unique_ptr<Element> linkElement(new Element(U"a"));
             linkElement->SetAttribute(U"href", U"#" + delegateElement->GetAttribute(U"id"));
-            linkElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(delegateName)));
+            linkElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(delegateName)));
             tableColElement->AppendChild(std::move(linkElement));
             tableRowElement->AppendChild(std::move(tableColElement));
             delegateTableElement->AppendChild(std::move(tableRowElement));
         }
         bodyElement->AppendChild(std::move(delegateTableElement));
     }
-    std::vector<cmajor::dom::Element*> classDelegateElements = GetClassDelegateElements(parentElement);
+    std::vector<sngxml::dom::Element*> classDelegateElements = GetClassDelegateElements(parentElement);
     if (!classDelegateElements.empty())
     {
         std::unique_ptr<Element> classDelegatesHeadingElement(new Element(U"h" + ToUtf32(std::to_string(level))));
-        classDelegatesHeadingElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(U"Class Delegates")));
+        classDelegatesHeadingElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(U"Class Delegates")));
         bodyElement->AppendChild(std::move(classDelegatesHeadingElement));
         std::unique_ptr<Element> classDelegateTableElement(new Element(U"table"));
         int m = classDelegateElements.size();
         for (int i = 0; i < m; ++i)
         {
-            cmajor::dom::Element* classDelegateElement = classDelegateElements[i];
+            sngxml::dom::Element* classDelegateElement = classDelegateElements[i];
             std::u32string classDelegateName = GetName(classDelegateElement);
             std::unique_ptr<Element> tableRowElement(new Element(U"tr"));
             std::unique_ptr<Element> tableColElement(new Element(U"td"));
             std::unique_ptr<Element> linkElement(new Element(U"a"));
             linkElement->SetAttribute(U"href", U"#" + classDelegateElement->GetAttribute(U"id"));
-            linkElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(classDelegateName)));
+            linkElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(classDelegateName)));
             tableColElement->AppendChild(std::move(linkElement));
             tableRowElement->AppendChild(std::move(tableColElement));
             classDelegateTableElement->AppendChild(std::move(tableRowElement));
         }
         bodyElement->AppendChild(std::move(classDelegateTableElement));
     }
-    std::vector<cmajor::dom::Element*> constantElements = GetConstantElements(parentElement);
+    std::vector<sngxml::dom::Element*> constantElements = GetConstantElements(parentElement);
     if (!constantElements.empty())
     {
         std::unique_ptr<Element> constantHeadingElement(new Element(U"h" + ToUtf32(std::to_string(level))));
-        constantHeadingElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(U"Constants")));
+        constantHeadingElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(U"Constants")));
         bodyElement->AppendChild(std::move(constantHeadingElement));
         std::unique_ptr<Element> constantTableElement(new Element(U"table"));
         int m = constantElements.size();
         for (int i = 0; i < m; ++i)
         {
-            cmajor::dom::Element* constantElement = constantElements[i];
+            sngxml::dom::Element* constantElement = constantElements[i];
             std::u32string constantName = GetName(constantElement);
             std::unique_ptr<Element> tableRowElement(new Element(U"tr"));
             std::unique_ptr<Element> tableColElement(new Element(U"td"));
             std::unique_ptr<Element> linkElement(new Element(U"a"));
             linkElement->SetAttribute(U"href", U"#" + constantElement->GetAttribute(U"id"));
-            linkElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(constantName)));
+            linkElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(constantName)));
             tableColElement->AppendChild(std::move(linkElement));
             tableRowElement->AppendChild(std::move(tableColElement));
             constantTableElement->AppendChild(std::move(tableRowElement));
         }
         bodyElement->AppendChild(std::move(constantTableElement));
     }
-    std::vector<cmajor::dom::Element*> enumerationElements = GetEnumerationElements(parentElement);
+    std::vector<sngxml::dom::Element*> enumerationElements = GetEnumerationElements(parentElement);
     if (!enumerationElements.empty())
     {
         std::unique_ptr<Element> enumerationHeadingElement(new Element(U"h" + ToUtf32(std::to_string(level))));
-        enumerationHeadingElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(U"Enumerations")));
+        enumerationHeadingElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(U"Enumerations")));
         bodyElement->AppendChild(std::move(enumerationHeadingElement));
         std::unique_ptr<Element> enumTableElement(new Element(U"table"));
         int m = enumerationElements.size();
         for (int i = 0; i < m; ++i)
         {
-            cmajor::dom::Element* enumElement = enumerationElements[i];
+            sngxml::dom::Element* enumElement = enumerationElements[i];
             std::u32string enumName = GetName(enumElement);
             std::unique_ptr<Element> tableRowElement(new Element(U"tr"));
             std::unique_ptr<Element> tableColElement(new Element(U"td"));
             std::unique_ptr<Element> linkElement(new Element(U"a"));
             linkElement->SetAttribute(U"href", U"#" + enumElement->GetAttribute(U"id"));
-            linkElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(enumName)));
+            linkElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(enumName)));
             tableColElement->AppendChild(std::move(linkElement));
             tableRowElement->AppendChild(std::move(tableColElement));
             enumTableElement->AppendChild(std::move(tableRowElement));
         }
         bodyElement->AppendChild(std::move(enumTableElement));
     }
-    std::vector<cmajor::dom::Element*> memberVariableElements = GetMemberVariableElements(parentElement);
+    std::vector<sngxml::dom::Element*> memberVariableElements = GetMemberVariableElements(parentElement);
     if (!memberVariableElements.empty())
     {
         std::unique_ptr<Element> memberVariablesHeadingElement(new Element(U"h" + ToUtf32(std::to_string(level))));
-        memberVariablesHeadingElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(U"Member Variables")));
+        memberVariablesHeadingElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(U"Member Variables")));
         bodyElement->AppendChild(std::move(memberVariablesHeadingElement));
         std::unique_ptr<Element> memberVariableTableElement(new Element(U"table"));
         int m = memberVariableElements.size();
         for (int i = 0; i < m; ++i)
         {
-            cmajor::dom::Element* memberVariableElement = memberVariableElements[i];
+            sngxml::dom::Element* memberVariableElement = memberVariableElements[i];
             std::u32string memberVariableName = GetName(memberVariableElement);
             std::unique_ptr<Element> tableRowElement(new Element(U"tr"));
             std::unique_ptr<Element> tableColElement(new Element(U"td"));
             std::unique_ptr<Element> linkElement(new Element(U"a"));
             linkElement->SetAttribute(U"href", U"#" + memberVariableElement->GetAttribute(U"id"));
-            linkElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(memberVariableName)));
+            linkElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(memberVariableName)));
             tableColElement->AppendChild(std::move(linkElement));
             tableRowElement->AppendChild(std::move(tableColElement));
             memberVariableTableElement->AppendChild(std::move(tableRowElement));
         }
         bodyElement->AppendChild(std::move(memberVariableTableElement));
     }
-    for (cmajor::dom::Element* classElement : classElements)
+    for (sngxml::dom::Element* classElement : classElements)
     {
         GenerateClassHtml(classElement, libraryXmlDoc, referenceXmlFilePaths, referenceXmlDocs, bodyElement, level, docXml);
     }
-    for (cmajor::dom::Element* constructorElement : constructorElements)
+    for (sngxml::dom::Element* constructorElement : constructorElements)
     {
         GenerateFunctionHtml(constructorElement, libraryXmlDoc, referenceXmlFilePaths, referenceXmlDocs, bodyElement, level, U"Constructor", docXml);
     }
-    for (cmajor::dom::Element* functionElement : functionElements)
+    for (sngxml::dom::Element* functionElement : functionElements)
     {
         GenerateFunctionHtml(functionElement, libraryXmlDoc, referenceXmlFilePaths, referenceXmlDocs, bodyElement, level, functionText, docXml);
     }
-    for (cmajor::dom::Element* staticMemberFunctionElement : staticMemberFunctionElements)
+    for (sngxml::dom::Element* staticMemberFunctionElement : staticMemberFunctionElements)
     {
         GenerateFunctionHtml(staticMemberFunctionElement, libraryXmlDoc, referenceXmlFilePaths, referenceXmlDocs, bodyElement, level, U"Static Member Function", docXml);
     }
-    for (cmajor::dom::Element* typedefElement : typedefElements)
+    for (sngxml::dom::Element* typedefElement : typedefElements)
     {
         GenerateTypedefHtml(typedefElement, libraryXmlDoc, referenceXmlFilePaths, referenceXmlDocs, bodyElement, level, docXml);
     }
-    for (cmajor::dom::Element* conceptElement : conceptElements)
+    for (sngxml::dom::Element* conceptElement : conceptElements)
     {
         GenerateConceptHtml(conceptElement, libraryXmlDoc, referenceXmlFilePaths, referenceXmlDocs, bodyElement, level, docXml);
     }
-    for (cmajor::dom::Element* delegateElement : delegateElements)
+    for (sngxml::dom::Element* delegateElement : delegateElements)
     {
         GenerateDelegateHtml(delegateElement, libraryXmlDoc, referenceXmlFilePaths, referenceXmlDocs, bodyElement, level, docXml);
     }
-    for (cmajor::dom::Element* classDelegateElement : classDelegateElements)
+    for (sngxml::dom::Element* classDelegateElement : classDelegateElements)
     {
         GenerateClassDelegateHtml(classDelegateElement, libraryXmlDoc, referenceXmlFilePaths, referenceXmlDocs, bodyElement, level, docXml);
     }
-    for (cmajor::dom::Element* constantElement : constantElements)
+    for (sngxml::dom::Element* constantElement : constantElements)
     {
         GenerateConstantHtml(constantElement, libraryXmlDoc, referenceXmlFilePaths, referenceXmlDocs, bodyElement, level, docXml);
     }
-    for (cmajor::dom::Element* enumerationElement : enumerationElements)
+    for (sngxml::dom::Element* enumerationElement : enumerationElements)
     {
         GenerateEnumerationHtml(enumerationElement, libraryXmlDoc, referenceXmlFilePaths, referenceXmlDocs, bodyElement, level, docXml);
     }
-    for (cmajor::dom::Element* memberVariableElement : memberVariableElements)
+    for (sngxml::dom::Element* memberVariableElement : memberVariableElements)
     {
         GenerateMemberVariableHtml(memberVariableElement, libraryXmlDoc, referenceXmlFilePaths, referenceXmlDocs, bodyElement, level, docXml);
     }
@@ -4072,7 +4072,7 @@ void GenerateHtml(Document* libraryXmlDoc, const std::vector<std::u32string>& re
     headElement->AppendChild(std::move(metaElement));
     std::unique_ptr<Element> titleElement(new Element(U"title"));
     std::u32string libraryName = GetLibraryName(libraryXmlDoc);
-    titleElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(libraryName + U" Library Reference")));
+    titleElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(libraryName + U" Library Reference")));
     headElement->AppendChild(std::move(titleElement));
     std::u32string stylePath = GetStylePath(libraryXmlDoc);
     if (!stylePath.empty())
@@ -4086,23 +4086,23 @@ void GenerateHtml(Document* libraryXmlDoc, const std::vector<std::u32string>& re
     htmlElement->AppendChild(std::move(headElement));
     std::unique_ptr<Element> bodyElement(new Element(U"body"));
     std::unique_ptr<Element> libraryHeadingElement(new Element(U"h1"));
-    libraryHeadingElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(libraryName + U" Library Reference")));
+    libraryHeadingElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(libraryName + U" Library Reference")));
     bodyElement->AppendChild(std::move(libraryHeadingElement));
     std::unique_ptr<Element> namespacesHeadingElement(new Element(U"h2"));
-    namespacesHeadingElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(U"Namespaces")));
+    namespacesHeadingElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(U"Namespaces")));
     bodyElement->AppendChild(std::move(namespacesHeadingElement));
-    std::vector<cmajor::dom::Element*> namespaceElements = GetNamespaceElements(libraryXmlDoc);
+    std::vector<sngxml::dom::Element*> namespaceElements = GetNamespaceElements(libraryXmlDoc);
     std::unique_ptr<Element> namespaceTableElement(new Element(U"table"));
     int n = namespaceElements.size();
     for (int i = 0; i < n; ++i)
     {
-        cmajor::dom::Element* namespaceElement = namespaceElements[i];
+        sngxml::dom::Element* namespaceElement = namespaceElements[i];
         std::u32string namespaceName = GetName(namespaceElement);
         std::unique_ptr<Element> tableRowElement(new Element(U"tr"));
         std::unique_ptr<Element> tableColElement(new Element(U"td"));
         std::unique_ptr<Element> linkElement(new Element(U"a"));
         linkElement->SetAttribute(U"href", U"#" + namespaceElement->GetAttribute(U"id"));
-        linkElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(namespaceName)));
+        linkElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(namespaceName)));
         tableColElement->AppendChild(std::move(linkElement));
         tableRowElement->AppendChild(std::move(tableColElement));
         namespaceTableElement->AppendChild(std::move(tableRowElement));
@@ -4111,11 +4111,11 @@ void GenerateHtml(Document* libraryXmlDoc, const std::vector<std::u32string>& re
     for (int i = 0; i < n; ++i)
     {
         AppendRule(bodyElement.get());
-        cmajor::dom::Element* namespaceElement = namespaceElements[i];
+        sngxml::dom::Element* namespaceElement = namespaceElements[i];
         std::u32string namespaceName = GetName(namespaceElement);
         std::unique_ptr<Element> namespaceHeadingElement(new Element(U"h2"));
         namespaceHeadingElement->SetAttribute(U"id", namespaceElement->GetAttribute(U"id"));
-        namespaceHeadingElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new Text(namespaceName + U" Namespace")));
+        namespaceHeadingElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new Text(namespaceName + U" Namespace")));
         bodyElement->AppendChild(std::move(std::move(namespaceHeadingElement)));
         GenerateMembersHtml(libraryXmlDoc, referenceXmlFilePaths, referenceXmlDocs, bodyElement.get(), namespaceElement, 3, U"Functions", U"Function", docXml);
     }
@@ -4130,9 +4130,9 @@ void GenerateHtml(Document* libraryXmlDoc, const std::vector<std::u32string>& re
     htmlDoc.Write(formatter);
 }
 
-std::vector<cmajor::dom::Element*> GetLibraryElements(Document* document)
+std::vector<sngxml::dom::Element*> GetLibraryElements(Document* document)
 {
-    std::vector<cmajor::dom::Element*> libraryElements;
+    std::vector<sngxml::dom::Element*> libraryElements;
     std::unique_ptr<cmajor::xpath::XPathObject> libraryNodeSetObject = cmajor::xpath::Evaluate(U"/cmdoc/libraries/library", document);
     if (libraryNodeSetObject->Type() != cmajor::xpath::XPathObjectType::nodeSet)
     {
@@ -4142,10 +4142,10 @@ std::vector<cmajor::dom::Element*> GetLibraryElements(Document* document)
     int n = nodeSet->Length();
     for (int i = 0; i < n; ++i)
     {
-        cmajor::dom::Node* node = (*nodeSet)[i];
-        if (node->GetNodeType() == cmajor::dom::NodeType::elementNode)
+        sngxml::dom::Node* node = (*nodeSet)[i];
+        if (node->GetNodeType() == sngxml::dom::NodeType::elementNode)
         {
-            libraryElements.push_back(static_cast<cmajor::dom::Element*>(node));
+            libraryElements.push_back(static_cast<sngxml::dom::Element*>(node));
         }
         else
         {
@@ -4155,9 +4155,9 @@ std::vector<cmajor::dom::Element*> GetLibraryElements(Document* document)
     return libraryElements;
 }
 
-std::vector<cmajor::dom::Element*> GetReferenceElements(Element* libraryElement)
+std::vector<sngxml::dom::Element*> GetReferenceElements(Element* libraryElement)
 {
-    std::vector<cmajor::dom::Element*> referenceElements;
+    std::vector<sngxml::dom::Element*> referenceElements;
     std::unique_ptr<cmajor::xpath::XPathObject> referenceNodeSetObject = cmajor::xpath::Evaluate(U"references/reference", libraryElement);
     if (referenceNodeSetObject->Type() != cmajor::xpath::XPathObjectType::nodeSet)
     {
@@ -4167,10 +4167,10 @@ std::vector<cmajor::dom::Element*> GetReferenceElements(Element* libraryElement)
     int n = nodeSet->Length();
     for (int i = 0; i < n; ++i)
     {
-        cmajor::dom::Node* node = (*nodeSet)[i];
-        if (node->GetNodeType() == cmajor::dom::NodeType::elementNode)
+        sngxml::dom::Node* node = (*nodeSet)[i];
+        if (node->GetNodeType() == sngxml::dom::NodeType::elementNode)
         {
-            referenceElements.push_back(static_cast<cmajor::dom::Element*>(node));
+            referenceElements.push_back(static_cast<sngxml::dom::Element*>(node));
         }
         else
         {
@@ -4196,12 +4196,12 @@ std::u32string GetTextNode(const std::u32string& textNodeName, Element* element,
     {
         throw std::runtime_error("node set length 1 expected");
     }
-    cmajor::dom::Node* node = (*nodeSet)[0];
-    if (node->GetNodeType() != cmajor::dom::NodeType::textNode)
+    sngxml::dom::Node* node = (*nodeSet)[0];
+    if (node->GetNodeType() != sngxml::dom::NodeType::textNode)
     {
         throw std::runtime_error("text node expected");
     }
-    cmajor::dom::Text* text = static_cast<cmajor::dom::Text*>(node);
+    sngxml::dom::Text* text = static_cast<sngxml::dom::Text*>(node);
     return text->Data();
 }
 
@@ -4213,7 +4213,7 @@ void Generate(const std::string& projectXmlFile)
     }
     std::string basePath = Path::GetDirectoryName(GetFullPath(projectXmlFile));
     std::unique_ptr<Document> projectXmlDoc = ReadDocument(projectXmlFile);
-    std::vector<cmajor::dom::Element*> libraryElements = GetLibraryElements(projectXmlDoc.get());
+    std::vector<sngxml::dom::Element*> libraryElements = GetLibraryElements(projectXmlDoc.get());
     int n = libraryElements.size();
     for (int i = 0; i < n; ++i)
     {
@@ -4229,13 +4229,13 @@ void Generate(const std::string& projectXmlFile)
         boost::filesystem::path lfp = Path::Combine(basePath, ToUtf8(libraryXmlFilePath));
         boost::filesystem::path dfp = Path::Combine(basePath, ToUtf8(docXmlFilePath));
         boost::filesystem::create_directories(lfp.parent_path());
-        std::vector<cmajor::dom::Element*> referenceElements = GetReferenceElements(libraryElement);
+        std::vector<sngxml::dom::Element*> referenceElements = GetReferenceElements(libraryElement);
         std::vector<std::u32string> referenceXmlFilePaths;
-        for (cmajor::dom::Element* referenceElement : referenceElements)
+        for (sngxml::dom::Element* referenceElement : referenceElements)
         {
             if (referenceElement->FirstChild() != nullptr)
             {
-                if (referenceElement->FirstChild()->GetNodeType() == cmajor::dom::NodeType::textNode)
+                if (referenceElement->FirstChild()->GetNodeType() == sngxml::dom::NodeType::textNode)
                 {
                     Text* text = static_cast<Text*>(referenceElement->FirstChild());
                     referenceXmlFilePaths.push_back(text->Data());
@@ -4301,9 +4301,9 @@ struct InitDone
 {
     InitDone()
     {
-        cmajor::ast::Init();
+        soulng::util::Init();
+        sngcm::ast::Init();
         cmajor::symbols::Init();
-        cmajor::util::Init();
         cmajor::parsing::Init();
         cmajor::xpath::Init();
     }
@@ -4311,9 +4311,9 @@ struct InitDone
     {
         cmajor::xpath::Done();
         cmajor::symbols::Done();
-        cmajor::ast::Done();
+        sngcm::ast::Done();
         cmajor::parsing::Done();
-        cmajor::util::Done();
+        soulng::util::Done();
     }
 };
 

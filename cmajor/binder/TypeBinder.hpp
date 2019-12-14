@@ -7,17 +7,18 @@
 #define CMAJOR_BINDER_TYPE_BINDER_INCLUDED
 #include <cmajor/binder/BinderApi.hpp>
 #include <cmajor/binder/TypeResolver.hpp>
-#include <cmajor/ast/Visitor.hpp>
+#include <sngcm/ast/Visitor.hpp>
 #include <cmajor/symbols/Scope.hpp>
 #include <cmajor/symbols/ClassTypeSymbol.hpp>
 #include <cmajor/symbols/InterfaceTypeSymbol.hpp>
 #include <cmajor/symbols/TypedefSymbol.hpp>
 #include <cmajor/symbols/EnumSymbol.hpp>
 #include <cmajor/symbols/ConceptSymbol.hpp>
+#include <stack>
 
 namespace cmajor { namespace binder {
 
-using namespace cmajor::ast;
+using namespace sngcm::ast;
 using namespace cmajor::symbols;
 
 class BoundCompileUnit;

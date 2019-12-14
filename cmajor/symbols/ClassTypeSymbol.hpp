@@ -7,8 +7,8 @@
 #define CMAJOR_SYMBOLS_CLASS_TYPE_SYMBOL_INCLUDED
 #include <cmajor/symbols/TypeSymbol.hpp>
 #include <cmajor/symbols/VariableSymbol.hpp>
-#include <cmajor/ast/Class.hpp>
-#include <cmajor/ast/Constant.hpp>
+#include <sngcm/ast/Class.hpp>
+#include <sngcm/ast/Constant.hpp>
 
 namespace cmajor { namespace symbols {
 
@@ -33,7 +33,7 @@ public:
     void AddClass(ClassTypeSymbol* classTypeSymbol);
     ClassTypeSymbol* GetClass(int arity) const;
     bool HasProjectMembers() const override;
-    void AppendChildElements(dom::Element* element, TypeMap& typeMap) const override;
+    void AppendChildElements(sngxml::dom::Element* element, TypeMap& typeMap) const override;
     std::u32string Info() const override { return Name(); }
     const char* ClassName() const override { return "ClassGroupTypeSymbol"; }
     void Check() override;

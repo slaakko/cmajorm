@@ -61,4 +61,14 @@ namespace System
     {
         return (CharClassTable.Instance().GetCharacterClass(c) & CharClass.space) != 0;
     }
+
+    public nothrow char AsciiToUpper(char c)
+    {
+        return RtAsciiToUpper(c);
+    }
+
+    public nothrow char AsciiToLower(char c)
+    {
+        return RtAsciiToLower(c);
+    }
 }

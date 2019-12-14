@@ -6,16 +6,15 @@
 #include <cmajor/symbols/Exception.hpp>
 #include <cmajor/symbols/GlobalFlags.hpp>
 #include <cmajor/symbols/Module.hpp>
-#include <cmajor/parsing/Exception.hpp>
-#include <cmajor/dom/CharacterData.hpp>
-#include <cmajor/util/MappedInputFile.hpp>
-#include <cmajor/util/Unicode.hpp>
+#include <sngxml/dom/CharacterData.hpp>
+#include <soulng/util/MappedInputFile.hpp>
+#include <soulng/util/Unicode.hpp>
 #include <algorithm>
 
 namespace cmajor { namespace symbols {
 
-using namespace cmajor::util;
-using namespace cmajor::unicode;
+using namespace soulng::util;
+using namespace soulng::unicode;
 
 std::string Expand(Module* module, const std::string& errorMessage, const Span& span)
 {
@@ -51,14 +50,11 @@ std::string Expand(Module* module, const std::string& errorMessage, const Span& 
         {
             throw std::runtime_error("module not set");
         }
-        std::string fileName = module->GetFilePath(span.FileIndex());
+        std::string fileName = module->GetFilePath(span.fileIndex);
         if (!fileName.empty())
         {
-            expandedMessage.append(" (file '" + fileName + "', line " + std::to_string(span.LineNumber()) + ")");
-            MappedInputFile file(fileName);
-            std::string s(file.Begin(), file.End());
-            std::u32string t(ToUtf32(s));
-            expandedMessage.append(":\n").append(ToUtf8(cmajor::parsing::GetErrorLines(&t[0], &t[0] + t.length(), span)));
+            expandedMessage.append(" (file '" + fileName + "', line " + std::to_string(span.line) + ")");
+            expandedMessage.append(":\n").append(ToUtf8(module->GetErrorLines(span)));
         }
     }
     for (const Span& referenceSpan : referenceSpans)
@@ -69,14 +65,11 @@ std::string Expand(Module* module, const std::string& errorMessage, const Span& 
         {
             throw std::runtime_error("module not set");
         }
-        std::string fileName = module->GetFilePath(referenceSpan.FileIndex());
+        std::string fileName = module->GetFilePath(referenceSpan.fileIndex);
         if (!fileName.empty())
         {
-            expandedMessage.append("\nsee reference to file '" + fileName + "', line " + std::to_string(referenceSpan.LineNumber()));
-            MappedInputFile file(fileName);
-            std::string s(file.Begin(), file.End());
-            std::u32string t(ToUtf32(s));
-            expandedMessage.append(":\n").append(ToUtf8(cmajor::parsing::GetErrorLines(&t[0], &t[0] + t.length(), referenceSpan)));
+            expandedMessage.append("\nsee reference to file '" + fileName + "', line " + std::to_string(referenceSpan.line));
+            expandedMessage.append(":\n").append(ToUtf8(module->GetErrorLines(referenceSpan)));
         }
     }
     return expandedMessage;
@@ -89,61 +82,55 @@ std::unique_ptr<JsonObject> SpanToJson(Module* module, const Span& span)
     {
         throw std::runtime_error("module not set");
     }
-    const std::string& fileName = module->GetFilePath(span.FileIndex());
+    const std::string& fileName = module->GetFilePath(span.fileIndex);
     if (fileName.empty()) return std::unique_ptr<JsonObject>();
     std::unique_ptr<JsonObject> json(new JsonObject());
     json->AddField(U"file", std::unique_ptr<JsonValue>(new JsonString(ToUtf32(fileName))));
-    json->AddField(U"line", std::unique_ptr<JsonValue>(new JsonString(ToUtf32(std::to_string(span.LineNumber())))));
-    MappedInputFile file(fileName);
-    std::string s(file.Begin(), file.End());
-    std::u32string t(ToUtf32(s));
-    std::u32string text = cmajor::parsing::GetErrorLines(&t[0], &t[0] + t.length(), span);
+    json->AddField(U"line", std::unique_ptr<JsonValue>(new JsonString(ToUtf32(std::to_string(span.line)))));
+    std::u32string text = module->GetErrorLines(span);
     int32_t startCol = 0;
     int32_t endCol = 0;
-    GetColumns(&t[0], &t[0] + t.length(), span, startCol, endCol);
+    module->GetColumns(span, startCol, endCol); 
     json->AddField(U"startCol", std::unique_ptr<JsonValue>(new JsonString(ToUtf32(std::to_string(startCol)))));
     json->AddField(U"endCol", std::unique_ptr<JsonValue>(new JsonString(ToUtf32(std::to_string(endCol)))));
-    json->AddField(U"text", std::unique_ptr<JsonValue>(new JsonString(text)));
+    json->AddField(U"text", std::unique_ptr<JsonValue>(new JsonString(text))); 
     return json;
 }
 
-std::unique_ptr<cmajor::dom::Element> SpanToDomElement(Module* module, const Span& span)
+std::unique_ptr<sngxml::dom::Element> SpanToDomElement(Module* module, const Span& span)
 {
-    if (!span.Valid()) return std::unique_ptr<cmajor::dom::Element>();
+    if (!span.Valid()) return std::unique_ptr<sngxml::dom::Element>();
     if (!module)
     {
         throw std::runtime_error("module not set");
     }
-    const std::string& fileName = module->GetFilePath(span.FileIndex());
-    if (fileName.empty()) return std::unique_ptr<cmajor::dom::Element>();
-    std::unique_ptr<cmajor::dom::Element> spanElement(new cmajor::dom::Element(U"span"));
-    std::unique_ptr<cmajor::dom::Element> fileElement(new cmajor::dom::Element(U"file"));
-    std::unique_ptr<cmajor::dom::Text> fileText(new cmajor::dom::Text(ToUtf32(fileName)));
-    fileElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(fileText.release()));
-    std::unique_ptr<cmajor::dom::Element> lineElement(new cmajor::dom::Element(U"line"));
-    std::unique_ptr<cmajor::dom::Text> lineText(new cmajor::dom::Text(ToUtf32(std::to_string(span.LineNumber()))));
-    lineElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(lineText.release()));
-    MappedInputFile file(fileName);
-    std::string s(file.Begin(), file.End());
-    std::u32string t(ToUtf32(s));
-    std::u32string text = cmajor::parsing::GetErrorLines(&t[0], &t[0] + t.length(), span);
+    const std::string& fileName = module->GetFilePath(span.fileIndex);
+    if (fileName.empty()) return std::unique_ptr<sngxml::dom::Element>();
+    std::unique_ptr<sngxml::dom::Element> spanElement(new sngxml::dom::Element(U"span"));
+    std::unique_ptr<sngxml::dom::Element> fileElement(new sngxml::dom::Element(U"file"));
+    std::unique_ptr<sngxml::dom::Text> fileText(new sngxml::dom::Text(ToUtf32(fileName)));
+    fileElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(fileText.release()));
+    std::unique_ptr<sngxml::dom::Element> lineElement(new sngxml::dom::Element(U"line"));
+    std::unique_ptr<sngxml::dom::Text> lineText(new sngxml::dom::Text(ToUtf32(std::to_string(span.line))));
+    lineElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(lineText.release()));
+    std::u32string text = module->GetErrorLines(span); 
     int32_t startCol = 0;
     int32_t endCol = 0;
-    GetColumns(&t[0], &t[0] + t.length(), span, startCol, endCol);
-    spanElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(fileElement.release()));
-    spanElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(lineElement.release()));
-    std::unique_ptr<cmajor::dom::Element> startColElement(new cmajor::dom::Element(U"startCol"));
-    std::unique_ptr<cmajor::dom::Text> startColText(new cmajor::dom::Text(ToUtf32(std::to_string(startCol))));
-    startColElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(startColText.release()));
-    spanElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(startColElement.release()));
-    std::unique_ptr<cmajor::dom::Element> endColElement(new cmajor::dom::Element(U"endCol"));
-    std::unique_ptr<cmajor::dom::Text> endColText(new cmajor::dom::Text(ToUtf32(std::to_string(endCol))));
-    endColElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(endColText.release()));
-    spanElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(endColElement.release()));
-    std::unique_ptr<cmajor::dom::Element> textElement(new cmajor::dom::Element(U"text"));
-    std::unique_ptr<cmajor::dom::Text> textText(new cmajor::dom::Text(text));
-    textElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(textText.release()));
-    spanElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(textElement.release()));
+    module->GetColumns(span, startCol, endCol);
+    spanElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(fileElement.release()));
+    spanElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(lineElement.release()));
+    std::unique_ptr<sngxml::dom::Element> startColElement(new sngxml::dom::Element(U"startCol"));
+    std::unique_ptr<sngxml::dom::Text> startColText(new sngxml::dom::Text(ToUtf32(std::to_string(startCol))));
+    startColElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(startColText.release()));
+    spanElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(startColElement.release()));
+    std::unique_ptr<sngxml::dom::Element> endColElement(new sngxml::dom::Element(U"endCol"));
+    std::unique_ptr<sngxml::dom::Text> endColText(new sngxml::dom::Text(ToUtf32(std::to_string(endCol))));
+    endColElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(endColText.release()));
+    spanElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(endColElement.release()));
+    std::unique_ptr<sngxml::dom::Element> textElement(new sngxml::dom::Element(U"text"));
+    std::unique_ptr<sngxml::dom::Text> textText(new sngxml::dom::Text(text)); 
+    textElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(textText.release())); 
+    spanElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(textElement.release()));
     return spanElement;
 }
 
@@ -194,44 +181,44 @@ std::unique_ptr<JsonValue> Exception::ToJson() const
     return std::unique_ptr<JsonValue>(json.release());
 }
 
-void Exception::AddToDiagnosticsElement(cmajor::dom::Element* diagnosticsElement) const
+void Exception::AddToDiagnosticsElement(sngxml::dom::Element* diagnosticsElement) const
 {
-    std::unique_ptr<cmajor::dom::Element> diagnosticElement(new cmajor::dom::Element(U"diagnostic"));
-    std::unique_ptr<cmajor::dom::Element> categoryElement(new cmajor::dom::Element(U"category"));
-    std::unique_ptr<cmajor::dom::Text> categoryText(new cmajor::dom::Text(U"error"));
-    categoryElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(categoryText.release()));
-    std::unique_ptr<cmajor::dom::Element> subcategoryElement(new cmajor::dom::Element(U"subcategory"));
-    std::unique_ptr<cmajor::dom::Text> subcategoryText(new cmajor::dom::Text(U"error"));
-    subcategoryElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(subcategoryText.release()));
-    std::unique_ptr<cmajor::dom::Element> messageElement(new cmajor::dom::Element(U"message"));
-    std::unique_ptr<cmajor::dom::Text> messageText(new cmajor::dom::Text(ToUtf32(message)));
-    messageElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(messageText.release()));
-    diagnosticElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(categoryElement.release()));
-    diagnosticElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(subcategoryElement.release()));
-    diagnosticElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(messageElement.release()));
-    std::unique_ptr<cmajor::dom::Element> spanElement = SpanToDomElement(module, defined);
+    std::unique_ptr<sngxml::dom::Element> diagnosticElement(new sngxml::dom::Element(U"diagnostic"));
+    std::unique_ptr<sngxml::dom::Element> categoryElement(new sngxml::dom::Element(U"category"));
+    std::unique_ptr<sngxml::dom::Text> categoryText(new sngxml::dom::Text(U"error"));
+    categoryElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(categoryText.release()));
+    std::unique_ptr<sngxml::dom::Element> subcategoryElement(new sngxml::dom::Element(U"subcategory"));
+    std::unique_ptr<sngxml::dom::Text> subcategoryText(new sngxml::dom::Text(U"error"));
+    subcategoryElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(subcategoryText.release()));
+    std::unique_ptr<sngxml::dom::Element> messageElement(new sngxml::dom::Element(U"message"));
+    std::unique_ptr<sngxml::dom::Text> messageText(new sngxml::dom::Text(ToUtf32(message)));
+    messageElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(messageText.release()));
+    diagnosticElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(categoryElement.release()));
+    diagnosticElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(subcategoryElement.release()));
+    diagnosticElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(messageElement.release()));
+    std::unique_ptr<sngxml::dom::Element> spanElement = SpanToDomElement(module, defined);
     if (spanElement)
     {
-        diagnosticElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(spanElement.release()));
+        diagnosticElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(spanElement.release()));
     }
-    diagnosticsElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(diagnosticElement.release()));
+    diagnosticsElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(diagnosticElement.release()));
     for (const Span& span : references)
     {
         if (!span.Valid()) continue;
-        std::unique_ptr<cmajor::dom::Element> diagnosticElement(new cmajor::dom::Element(U"diagnostic"));
-        std::unique_ptr<cmajor::dom::Element> categoryElement(new cmajor::dom::Element(U"category"));
-        std::unique_ptr<cmajor::dom::Text> categoryText(new cmajor::dom::Text(U"info"));
-        categoryElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(categoryText.release()));
-        std::unique_ptr<cmajor::dom::Element> messageElement(new cmajor::dom::Element(U"message"));
-        std::unique_ptr<cmajor::dom::Text> messageText(new cmajor::dom::Text(ToUtf32("see reference to")));
-        messageElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(messageText.release()));
-        diagnosticElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(categoryElement.release()));
-        diagnosticElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(messageElement.release()));
-        std::unique_ptr<cmajor::dom::Element> spanElement = SpanToDomElement(module, span);
+        std::unique_ptr<sngxml::dom::Element> diagnosticElement(new sngxml::dom::Element(U"diagnostic"));
+        std::unique_ptr<sngxml::dom::Element> categoryElement(new sngxml::dom::Element(U"category"));
+        std::unique_ptr<sngxml::dom::Text> categoryText(new sngxml::dom::Text(U"info"));
+        categoryElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(categoryText.release()));
+        std::unique_ptr<sngxml::dom::Element> messageElement(new sngxml::dom::Element(U"message"));
+        std::unique_ptr<sngxml::dom::Text> messageText(new sngxml::dom::Text(ToUtf32("see reference to")));
+        messageElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(messageText.release()));
+        diagnosticElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(categoryElement.release()));
+        diagnosticElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(messageElement.release()));
+        std::unique_ptr<sngxml::dom::Element> spanElement = SpanToDomElement(module, span);
         if (spanElement)
         {
-            diagnosticElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(spanElement.release()));
-            diagnosticsElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(diagnosticElement.release()));
+            diagnosticElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(spanElement.release()));
+            diagnosticsElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(diagnosticElement.release()));
         }
     }
 

@@ -10,14 +10,14 @@
 #include <cmajor/binder/BoundFunction.hpp>
 #include <cmajor/symbols/GlobalFlags.hpp>
 #include <cmajor/symbols/InterfaceTypeSymbol.hpp>
-#include <cmajor/util/Util.hpp>
-#include <cmajor/util/Unicode.hpp>
+#include <soulng/util/Util.hpp>
+#include <soulng/util/Unicode.hpp>
 
 namespace cmajor { namespace codegenllvm {
 
 using namespace cmajor::symbols;
-using namespace cmajor::util;
-using namespace cmajor::unicode;
+using namespace soulng::util;
+using namespace soulng::unicode;
 
 struct NativeModule
 {
@@ -120,7 +120,7 @@ void LlvmCodeGenerator::Visit(BoundNamespace& boundNamespace)
         }
         else
         {
-            emitter->PushScope(emitter->GetDebugInfoForFile(boundNamespace.GetSpan().FileIndex()));
+            emitter->PushScope(emitter->GetDebugInfoForFile(boundNamespace.GetSpan().fileIndex));
         }
     }
     int n = boundNamespace.Members().size();
@@ -601,7 +601,7 @@ void LlvmCodeGenerator::Visit(BoundCompoundStatement& boundCompoundStatement)
     currentBlock = &boundCompoundStatement;
     blockDestructionMap[currentBlock] = std::vector<std::unique_ptr<BoundFunctionCall>>();
     blocks.push_back(currentBlock);
-    SetLineNumber(boundCompoundStatement.GetSpan().LineNumber());
+    SetLineNumber(boundCompoundStatement.GetSpan().line);
     int n = boundCompoundStatement.Statements().size();
     for (int i = 0; i < n; ++i)
     {

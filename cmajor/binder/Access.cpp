@@ -7,11 +7,11 @@
 #include <cmajor/symbols/ClassTypeSymbol.hpp>
 #include <cmajor/symbols/ClassTemplateSpecializationSymbol.hpp>
 #include <cmajor/symbols/Exception.hpp>
-#include <cmajor/util/Unicode.hpp>
+#include <soulng/util/Unicode.hpp>
 
 namespace cmajor { namespace binder {
 
-using namespace cmajor::unicode;
+using namespace soulng::unicode;
 
 void CheckAccess(FunctionSymbol* fromFunction, Symbol* toSymbol) 
 {

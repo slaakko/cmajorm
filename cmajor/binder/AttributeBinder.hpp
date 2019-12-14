@@ -6,13 +6,13 @@
 #ifndef CMAJOR_BINDER_ATTRIBUTE_BINDER_INCLUDED
 #define CMAJOR_BINDER_ATTRIBUTE_BINDER_INCLUDED
 #include <cmajor/binder/BinderApi.hpp>
-#include <cmajor/ast/Attribute.hpp>
+#include <sngcm/ast/Attribute.hpp>
 #include <cmajor/symbols/Symbol.hpp>
 #include <unordered_map>
 
 namespace cmajor { namespace binder {
 
-using namespace cmajor::ast;
+using namespace sngcm::ast;
 using namespace cmajor::symbols;
 class BoundCompileUnit;
 

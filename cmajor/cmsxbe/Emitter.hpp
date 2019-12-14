@@ -14,7 +14,7 @@
 
 namespace cmsxbe {
 
-using cmajor::parsing::Span;
+using soulng::lexer::Span;
 
 class Emitter : public cmajor::ir::Emitter
 {

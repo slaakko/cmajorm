@@ -12,6 +12,13 @@
 #define CMSXI_API __declspec(dllexport)
 #else
 #define CMSXI_API __declspec(dllimport)
+
+#ifdef NDEBUG
+#pragma comment(lib, "cmsxi.lib")
+#else
+#pragma comment(lib, "cmsxid.lib")
+#endif
+
 #endif
 
 #else

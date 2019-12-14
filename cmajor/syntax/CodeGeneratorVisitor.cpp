@@ -4,8 +4,8 @@
 // =================================
 
 #include <cmajor/syntax/CodeGeneratorVisitor.hpp>
-#include <cmajor/util/TextUtils.hpp>
-#include <cmajor/util/Unicode.hpp>
+#include <soulng/util/TextUtils.hpp>
+#include <soulng/util/Unicode.hpp>
 #include <cmajor/parsing/Keyword.hpp>
 #include <cmajor/parsing/Grammar.hpp>
 #include <cmajor/parsing/Rule.hpp>

@@ -1,0 +1,401 @@
+// =================================
+// Copyright (c) 2019 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+[hpp]#include <sngxml/xml/XmlProcessor.hpp>
+[cpp]#include <soulng/lexer/TrivialLexer.hpp>
+[cpp]#include <soulng/parser/Range.hpp>
+
+using namespace soulng::lexer;
+
+parser api(SNGXML_XML_API) XmlParser
+{
+    uselexer TrivialLexer;
+    main;
+
+    Document(sngxml::xml::XmlProcessor* processor)
+        ::= empty{ processor->StartDocument(); }
+            (Prolog(processor):prolog Element(processor):element (Misc(processor):misc)*){ processor->EndDocument(); }
+        ;
+
+    Char : char32_t
+        ::= ("[\x9\xA\xD\x20-\xD7FF\xE000-\xFFFD\x10000-\x10FFFF]"){ Token token = lexer.GetToken(pos); return static_cast<char32_t>(token.id); }
+        ;
+
+    S
+        ::= "[\x20\x9\xD\xA]"+
+        ;
+
+    NameStartChar
+        ::= "[:A-Z_a-z\xC0-\xD6\xD8-\xF6\xF8-\x2FF\x370-\x37D\x37F-\x1FFF\x200C-\x200D\x2070-\x218F\x2C00-\x2FEF\x3001-\xD7FF\xF900-\xFDCF\xFDF0-\xFFFD\x10000-\xEFFFF]"
+        ;
+
+    NameChar
+        ::= NameStartChar:nameStartChar | "[-.0-9\xB7\x300-\x36F\x203F-\x2040]"
+        ;
+
+    Name(var Span s) : std::u32string
+        ::= (NameStartChar:nameStartChar{ s = span; } (NameChar:nameChar{ s.end = span.end; })*)
+        {
+            return lexer.GetMatch(s);
+        }
+        ;
+
+    Names
+        ::= Name:name1 ('\x20' Name:name2)*
+        ;
+
+    Nmtoken
+        ::= NameChar:nameChar+
+        ;
+
+    Nmtokens
+        ::= Nmtoken:nmToken1 ('\x20' Nmtoken:nmToken2)*
+        ;
+
+    Prolog(sngxml::xml::XmlProcessor* processor)
+        ::= XMLDecl(processor):xmlDecl? Misc(processor):m1* (DocTypeDecl(processor):docTypeDecl Misc(processor):m2*)?
+        ;
+
+    XMLDecl(sngxml::xml::XmlProcessor* processor)
+        ::= "<?xml" VersionInfo(processor):versionInfo EncodingDecl(processor):encodingDecl? SDDecl(processor):sdDecl? S:s? "?>"
+        ;
+
+    VersionInfo(sngxml::xml::XmlProcessor* processor)
+        ::= S:s "version" Eq:eq VersionNumber(processor):versionNumber
+        ;
+
+    VersionNum(sngxml::xml::XmlProcessor* processor, var Span s) 
+        ::= ('1'{ s = span; } '.' ("[0-9]"{ s.end = span.end; })+)
+        {
+            processor->Version(lexer.GetMatch(s));
+        }
+        ;
+
+    VersionNumDQ(sngxml::xml::XmlProcessor* processor)
+        ::= '"' VersionNum(processor):versionNum '"'
+        ;
+
+    VersionNumSQ(sngxml::xml::XmlProcessor* processor)
+        ::= '\'' VersionNum(processor):versionNum '\''
+        ;
+
+    VersionNumber(sngxml::xml::XmlProcessor* processor)
+        ::= VersionNumDQ(processor):versionNumDQ
+        |   VersionNumSQ(processor):versionNumSQ
+        ;
+
+    EncodingDecl(sngxml::xml::XmlProcessor* processor)
+        ::= S:s "encoding" Eq:eq EncName(processor):encName
+        ;
+
+    EncodingName(sngxml::xml::XmlProcessor* processor, var Span s)
+        ::= ("[A-Za-z]"{ s = span; } ("[A-Za-z0-9._-]"{ s.end = span.end; })*)
+        {
+            processor->Encoding(lexer.GetMatch(s));
+        }
+        ;
+
+    EncNameDQ(sngxml::xml::XmlProcessor* processor)
+        ::= '"' EncodingName(processor):encodingName '"'
+        ;
+
+    EncNameSQ(sngxml::xml::XmlProcessor* processor)
+        ::= '\'' EncodingName(processor):encodingName '\''
+        ;
+
+    EncName(sngxml::xml::XmlProcessor* processor)
+        ::= EncNameDQ(processor):encNameDQ
+        |   EncNameSQ(processor):encNameSQ
+        ;
+
+    SDDecl(sngxml::xml::XmlProcessor* processor)
+        ::= S:s "standalone" Eq:eq YesNo:yn{ processor->Standalone(yn); }
+        ;
+
+    DocTypeDecl(sngxml::xml::XmlProcessor* processor)
+        ::= "<!DOCTYPE" S:s1 Name:rootElementName (S:s2 ExternalID:extID)? S:s3? ('[' IntSubset(processor):intSubset ']' S:s4?)? '>'
+        ;
+
+    ExternalID
+        ::= ("SYSTEM" S:s1 SystemLiteral:s2)
+        |   ("PUBLIC" S:s3 PubidLiteral:p2 S:s4 SystemLiteral:s5)
+        ;
+
+    SystemLiteral 
+        ::= ('"' ("[^\"]"*) '"') | ('\'' ("[^']"*) '\'')
+        ;
+
+    PubidLiteral
+        ::= '"' (PubidChar:p1*) '"' | '\'' ((PubidChar:p2 - '\'')*) '\''
+        ;
+
+    PubidChar
+        ::= "[\x20\xD\xA]" | "[a-zA-Z0-9]" | "[-'()+,./:=?;!*#@$_%]"
+        ;
+
+    IntSubset(sngxml::xml::XmlProcessor* processor)
+        ::= (MarkupDecl(processor):mdecl | DeclSep(processor):declsep)*
+        ;
+
+    MarkupDecl(sngxml::xml::XmlProcessor* processor)
+        ::= ElementDecl(processor):elementDecl | AttlistDecl(processor):attlistDecl | EntityDecl(processor):entityDecl | NotationDecl(processor):notationDecl | PI(processor):pi | Comment(processor):comment
+        ;
+
+    DeclSep(sngxml::xml::XmlProcessor* processor)
+        ::= PEReference(processor):peref | S:s
+        ;
+
+    ElementDecl(sngxml::xml::XmlProcessor* processor)
+        ::= "<!ELEMENT" S:s1 Name:elementName S:s2 ContentSpec:contentSpec S:s3? '>'
+        ;
+
+    ContentSpec
+        ::= "EMPTY" | "ANY" | Mixed:mixed | Children:children
+        ;
+
+    Children
+        ::= (Choice:choice | Seq:seq) ('?' | '*' | '+')?
+        ;
+
+    CP
+        ::= (Name:name | Choice:choice | Seq:seq) ('?' | '*' | '+')?
+        ;
+
+    Choice
+        ::= '(' S:s1? CP:cp1 (S:s2? '|' S:s3? CP:cp2)+ S:s4? ')'
+        ;
+
+    Seq
+        ::= '(' S:s1? CP:cp1 (S:s2? ',' S:s3? CP:cp2)* S:s4? ')'
+        ;
+
+    Mixed
+        ::= '(' S:s1? "#PCDATA" (S:s2? '|' S:s3? Name:name)* S:s4? ")*"
+        |   '(' S:s5? "#PCDATA" S:s6? ')'
+        ;
+
+    AttlistDecl(sngxml::xml::XmlProcessor* processor)
+        ::= "<!ATTLIST" S:s1 Name:name AttDef(processor):attdef* S:s2? '>'
+        ;
+
+    AttDef(sngxml::xml::XmlProcessor* processor)
+        ::= S:s Name:name S:s2 AttType:attType S:s3 DefaultDecl(processor):defaultDecl
+        ;
+
+    AttType
+        ::= StringType:stringType | TokenizedType:tokenizedType | EnumeratedType:enumeratedType
+        ;
+
+    StringType
+        ::= "CDATA"
+        ;
+
+    TokenizedType
+        ::= "ID"
+        |   "IDREF"
+        |   "IDREFS"
+        |   "ENTITY"
+        |   "ENTITIES"
+        |   "NMTOKEN"
+        |   "NMTOKENS"
+        ;
+
+    EnumeratedType
+        ::= NotationType:notationType | Enumeration:enumeration
+        ;
+
+    NotationType
+        ::= "NOTATION" S:s1 '(' S:s2? Name:f (S:s3? '|' S:s4? Name:n)* S:s5? ')'
+        ;
+
+    Enumeration
+        ::= '(' S:s1? Nmtoken:nmtoken (S:s2? '|' S:s3? Nmtoken:nmtoken2)* S:s4? ')'
+        ;
+
+    DefaultDecl(sngxml::xml::XmlProcessor* processor)
+        ::= "#REQUIRED" | "#IMPLIED" | (("#FIXED" S:s)? AttValue(processor):attVAlue)
+        ;
+
+    EntityDecl(sngxml::xml::XmlProcessor* processor)
+        ::= GEDecl(processor):gedecl | PEDecl(processor):pedecl
+        ;
+
+    GEDecl(sngxml::xml::XmlProcessor* processor)
+        ::= "<!ENTITY" S:s0 Name:entityName S:s1 EntityDef(processor):entityValue S:s2? '>'
+        ;
+
+    PEDecl(sngxml::xml::XmlProcessor* processor)
+        ::= "<!ENTITY" S:s0 '%' S:s1 Name:peName S:s2 PEDef(processor):peValue S:s3? '>'
+        ;
+
+    EntityDef(sngxml::xml::XmlProcessor* processor)
+        ::= EntityValue(processor):entityValue | (ExternalID:extID NDataDecl:notation?)
+        ;
+
+    PEDef(sngxml::xml::XmlProcessor* processor)
+        ::= EntityValue(processor):entityValue | ExternalID:extID
+        ;
+
+    EntityValue(sngxml::xml::XmlProcessor* processor)
+        ::= '"'
+            (   "[^%&\"]"
+            |   PEReference(processor):pr1
+            |   Reference(processor):ref1
+            )* '"'
+        |   '\''
+            (   "[^%&']"
+            |   PEReference(processor):pr2
+            |   Reference(processor):ref2
+            )* '\''
+        ;
+
+    NDataDecl 
+        ::= S:s1 "NDATA" S:s2 Name:name
+        ;
+
+    PEReference(sngxml::xml::XmlProcessor* processor)
+        ::= '%' Name:name ';'
+        ;
+
+    NotationDecl(sngxml::xml::XmlProcessor* processor)
+        ::= "<!NOTATION" S:s Name:name S:s2 (ExternalID:extID | PublicID:pubID) S:s3? '>'
+        ;
+
+    PublicID
+        ::= "PUBLIC" S:s PubidLiteral:pl
+        ;
+
+    Element(sngxml::xml::XmlProcessor* processor, var std::u32string tagName)
+        ::= '<' Name:name{ tagName = name; processor->BeginStartTag(tagName); } (S:s Attribute(processor):attribute)* S:s?
+            (   "/>"{ processor->EndStartTag(span, lexer.FileName()); processor->EndTag(tagName, span, lexer.FileName()); }
+            |   '>'{ processor->EndStartTag(span, lexer.FileName()); } Content(processor):content ETag(processor):etag
+            )
+        ;
+
+    ETag(sngxml::xml::XmlProcessor* processor)
+        ::= "</" Name:name{ processor->EndTag(name, span, lexer.FileName()); } S:s? '>'
+        ;
+
+    Content(sngxml::xml::XmlProcessor* processor)
+        ::= CharData(processor):cd1? ((Element(processor):element | Reference(processor):reference | CDSect(processor):cdsect | PI(processor):pi | Comment(processor):comment) CharData(processor):cd2?)*
+        ;
+
+    CharDataChar : char32_t
+        ::= "[^<&]"{ Token token = lexer.GetToken(pos); return static_cast<char32_t>(token.id); }
+        ;
+
+    CharData(sngxml::xml::XmlProcessor* processor, var std::u32string s)
+        ::= ((CharDataChar:chr{ s.append(1, chr); })* - ("[^<&]"* "]]>" "[^<&]"*)){ processor->Text(s); }
+        ;
+
+    CDSect(sngxml::xml::XmlProcessor* processor, var std::u32string s)
+        ::= ("<![CDATA[" ((Char:chr - "]]>"){ s.append(1, chr); })* "]]>")
+        {
+            processor->CDataSection(s);
+        }
+        ;
+
+    Attribute(sngxml::xml::XmlProcessor* processor)
+        ::= Name:attName Eq:eq AttValue(processor):attValue{ processor->AddAttribute(attName, attValue, span, lexer.FileName()); }
+        ;
+
+    AttValueDQ(sngxml::xml::XmlProcessor* processor) : std::u32string
+        ::= '"'{ processor->BeginAttributeValue(); }
+            (   "[^<&\"]"{ processor->AttValue().append(lexer.GetMatch(span)); }
+            |   Reference(processor):reference)* '"'
+            {
+                std::u32string value = processor->AttValue();
+                processor->EndAttributeValue();
+                return value;
+            }
+        ;
+
+    AttValueSQ(sngxml::xml::XmlProcessor* processor) : std::u32string
+        ::= '\''{ processor->BeginAttributeValue(); }
+            (   "[^<&\']"{ processor->AttValue().append(lexer.GetMatch(span)); }
+            |   Reference(processor):reference)* '\''
+            {
+                std::u32string value = processor->AttValue();
+                processor->EndAttributeValue();
+                return value;
+            }
+        ;
+
+    AttValue(sngxml::xml::XmlProcessor* processor) : std::u32string
+        ::= AttValueDQ(processor):attValueDQ{ return attValueDQ; }
+        |   AttValueSQ(processor):attValueSQ{ return attValueSQ; }
+        ;
+
+    EntityRef(sngxml::xml::XmlProcessor* processor)
+        ::= ('&' Name:name ';'){ processor->EntityRef(name, span, lexer.FileName()); }
+        ;
+
+    DecCodePoint(var uint32_t val) : uint32_t
+        ::= (("[0-9]"{ Token token = lexer.GetToken(pos); val = 10 * val + token.id - '0'; })+)
+        {
+            return val;
+        }
+        ;
+
+    HexCodePoint(var uint32_t val) : uint32_t
+        ::=
+        (   ("[0-9a-fA-F]"
+                {
+                    Token token = lexer.GetToken(pos);
+                    if (token.id >= '0' && token.id <= '9') val = 16 * val + token.id - '0';
+                    else if (token.id >= 'a' && token.id <= 'f') val = 16 * val + 10 + token.id - 'a';
+                    else if (token.id >= 'A' && token.id <= 'F') val = 16 * val + 10 + token.id - 'A';
+                }
+            )+
+        )
+        {
+            return val;
+        }
+        ;
+
+    CharRef(sngxml::xml::XmlProcessor* processor)
+        ::= ("&#" DecCodePoint:decCodePoint ';'){ processor->Text(std::u32string(1, static_cast<char32_t>(decCodePoint))); }
+        |   ("&#x" HexCodePoint:hexCodePoint ';'){ processor->Text(std::u32string(1, static_cast<char32_t>(hexCodePoint))); }
+        ;
+
+    Reference(sngxml::xml::XmlProcessor* processor)
+        ::= EntityRef(processor):entityRef
+        |   CharRef(processor):charRef
+        ;
+
+    Misc(sngxml::xml::XmlProcessor* processor)
+        ::= Comment(processor):comment | PI(processor):pi | S:s
+        ;
+
+    Comment(sngxml::xml::XmlProcessor* processor, var std::u32string s)
+        ::=
+        (   "<!--" ((Char:chr - '-'){ s.append(1, chr); } | '-' (Char:chr - '-'){ s.append(1, '-').append(1, chr); })* "-->"
+        )
+        {
+            processor->Comment(s);
+        }
+        ;
+
+    PI(sngxml::xml::XmlProcessor* processor, var std::u32string data)
+        ::= ("<?" PITarget:target S:s ((Char:chr - "?>"){ data.append(1, chr); })* "?>"){ processor->PI(target, data); }
+        ;
+
+    PITarget : std::u32string
+        ::= (Name:name - Xml:xml){ return name; }
+        ;
+
+    Xml
+        ::= "[xX]" "[mM]" "[lL]"
+        ;
+
+    Eq
+        ::= S:s? '=' S:s?
+        ;
+
+    YesNo : bool
+        ::= "\"yes\""{ return true; }
+        |   "\"no\""{ return false; }
+        ;
+}

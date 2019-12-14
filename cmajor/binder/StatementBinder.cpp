@@ -22,17 +22,17 @@
 #include <cmajor/symbols/Exception.hpp>
 #include <cmajor/symbols/GlobalFlags.hpp>
 #include <cmajor/symbols/SymbolCreatorVisitor.hpp>
-#include <cmajor/parser/TypeExpr.hpp>
-#include <cmajor/ast/Literal.hpp>
-#include <cmajor/ast/Identifier.hpp>
-#include <cmajor/ast/Expression.hpp>
-#include <cmajor/ast/BasicType.hpp>
-#include <cmajor/util/Unicode.hpp>
+#include <sngcm/cmparser/TypeExpr.hpp>
+#include <sngcm/cmlexer/CmajorLexer.hpp>
+#include <sngcm/ast/Literal.hpp>
+#include <sngcm/ast/Identifier.hpp>
+#include <sngcm/ast/Expression.hpp>
+#include <sngcm/ast/BasicType.hpp>
+#include <soulng/util/Unicode.hpp>
 
 namespace cmajor { namespace binder {
 
-using namespace cmajor::unicode;
-using namespace cmajor::parser;
+using namespace soulng::unicode;
 
 bool IsAlwaysTrue(Node* node, BoundCompileUnit& boundCompileUnit, ContainerScope* containerScope)
 {
@@ -243,7 +243,6 @@ struct NamespaceVisitor
 void StatementBinder::Visit(NamespaceNode& namespaceNode)
 {
     std::unique_ptr<BoundNamespace> ns(new BoundNamespace(module, namespaceNode));
-    //NamespaceVisitor visitor(&boundCompileUnit, ns.get());
     boundCompileUnit.PushNamespace(ns.get());
     ContainerScope* prevContainerScope = containerScope;
     Symbol* symbol = boundCompileUnit.GetSymbolTable().GetSymbol(&namespaceNode);
@@ -471,6 +470,10 @@ void StatementBinder::Visit(MemberFunctionNode& memberFunctionNode)
     Symbol* symbol = boundCompileUnit.GetSymbolTable().GetSymbol(&memberFunctionNode);
     Assert(symbol->GetSymbolType() == SymbolType::memberFunctionSymbol, "member function symbol expected");
     MemberFunctionSymbol* memberFunctionSymbol = static_cast<MemberFunctionSymbol*>(symbol);
+    if (memberFunctionSymbol->GroupName() == U"ReadString")
+    {
+        int x = 0;
+    }
     if (!dontCheckDuplicateFunctionSymbols)
     {
         memberFunctionSymbol->FunctionGroup()->CheckDuplicateFunctionSymbols();
@@ -623,10 +626,6 @@ void StatementBinder::Visit(CompoundStatementNode& compoundStatementNode)
         GenerateClassTermination(currentDestructorSymbol, currentDestructorNode, boundCompoundStatement.get(), currentFunction, boundCompileUnit, containerScope, this, boundCompoundStatement->EndSpan());
     }
     AddStatement(boundCompoundStatement.release());
-    if (compoundStatementNode.Label())
-    {
-        statement->SetLabel(compoundStatementNode.Label()->Label());
-    }
     containerScope = prevContainerScope;
 }
 
@@ -808,10 +807,6 @@ void StatementBinder::Visit(ReturnStatementNode& returnStatementNode)
             throw Exception(module, "nonvoid function must return a value", returnStatementNode.GetSpan(), currentFunction->GetFunctionSymbol()->GetSpan());
         }
     }
-    if (returnStatementNode.Label())
-    {
-        statement->SetLabel(returnStatementNode.Label()->Label());
-    }
 }
 
 void StatementBinder::Visit(IfStatementNode& ifStatementNode)
@@ -853,10 +848,6 @@ void StatementBinder::Visit(IfStatementNode& ifStatementNode)
         AddReleaseExceptionStatement(ifStatementNode.GetSpan());
     }
     AddStatement(new BoundIfStatement(module, ifStatementNode.GetSpan(), std::move(condition), std::unique_ptr<BoundStatement>(thenS), std::unique_ptr<BoundStatement>(elseS)));
-    if (ifStatementNode.Label())
-    {
-        statement->SetLabel(ifStatementNode.Label()->Label());
-    }
 }
 
 void StatementBinder::Visit(WhileStatementNode& whileStatementNode)
@@ -892,10 +883,6 @@ void StatementBinder::Visit(WhileStatementNode& whileStatementNode)
         AddReleaseExceptionStatement(whileStatementNode.GetSpan());
     }
     AddStatement(new BoundWhileStatement(module, whileStatementNode.GetSpan(), std::move(condition), std::unique_ptr<BoundStatement>(stmt)));
-    if (whileStatementNode.Label())
-    {
-        statement->SetLabel(whileStatementNode.Label()->Label());
-    }
 }
 
 void StatementBinder::Visit(DoStatementNode& doStatementNode)
@@ -931,10 +918,6 @@ void StatementBinder::Visit(DoStatementNode& doStatementNode)
         AddReleaseExceptionStatement(doStatementNode.GetSpan());
     }
     AddStatement(new BoundDoStatement(module, doStatementNode.GetSpan(), std::unique_ptr<BoundStatement>(stmt), std::move(condition)));
-    if (doStatementNode.Label())
-    {
-        statement->SetLabel(doStatementNode.Label()->Label());
-    }
 }
 
 void StatementBinder::Visit(ForStatementNode& forStatementNode)
@@ -989,10 +972,6 @@ void StatementBinder::Visit(ForStatementNode& forStatementNode)
     }
     AddStatement(new BoundForStatement(module, forStatementNode.GetSpan(), std::unique_ptr<BoundStatement>(initS), std::move(condition), std::unique_ptr<BoundStatement>(loopS),
         std::unique_ptr<BoundStatement>(actionS)));
-    if (forStatementNode.Label())
-    {
-        statement->SetLabel(forStatementNode.Label()->Label());
-    }
     containerScope = prevContainerScope;
 }
 
@@ -1021,10 +1000,6 @@ void StatementBinder::Visit(BreakStatementNode& breakStatementNode)
         throw Exception(module, "break statement must be enclosed in a while, do, for or switch statement", breakStatementNode.GetSpan());
     }
     AddStatement(new BoundBreakStatement(module, breakStatementNode.GetSpan()));
-    if (breakStatementNode.Label())
-    {
-        statement->SetLabel(breakStatementNode.Label()->Label());
-    }
 }
 
 void StatementBinder::Visit(ContinueStatementNode& continueStatementNode)
@@ -1052,10 +1027,6 @@ void StatementBinder::Visit(ContinueStatementNode& continueStatementNode)
         throw Exception(module, "continue statement must be enclosed in a while, do or for statement", continueStatementNode.GetSpan());
     }
     AddStatement(new BoundContinueStatement(module, continueStatementNode.GetSpan()));
-    if (continueStatementNode.Label())
-    {
-        statement->SetLabel(continueStatementNode.Label()->Label());
-    }
 }
 
 void StatementBinder::Visit(GotoStatementNode& gotoStatementNode)
@@ -1063,10 +1034,6 @@ void StatementBinder::Visit(GotoStatementNode& gotoStatementNode)
     currentFunction->SetHasGotos();
     boundCompileUnit.SetHasGotos();
     AddStatement(new BoundGotoStatement(module, gotoStatementNode.GetSpan(), gotoStatementNode.Target()));
-    if (gotoStatementNode.Label())
-    {
-        statement->SetLabel(gotoStatementNode.Label()->Label());
-    }
 }
 
 void StatementBinder::Visit(ConstructionStatementNode& constructionStatementNode)
@@ -1105,10 +1072,6 @@ void StatementBinder::Visit(ConstructionStatementNode& constructionStatementNode
         AddReleaseExceptionStatement(constructionStatementNode.GetSpan());
     }
     AddStatement(new BoundConstructionStatement(module, std::move(constructorCall)));
-    if (constructionStatementNode.Label())
-    {
-        statement->SetLabel(constructionStatementNode.Label()->Label());
-    }
 }
 
 void StatementBinder::Visit(DeleteStatementNode& deleteStatementNode)
@@ -1183,10 +1146,6 @@ void StatementBinder::Visit(DeleteStatementNode& deleteStatementNode)
         AddReleaseExceptionStatement(deleteStatementNode.GetSpan());
     }
     AddStatement(new BoundExpressionStatement(module, std::move(memFreeCall)));
-    if (deleteStatementNode.Label())
-    {
-        statement->SetLabel(deleteStatementNode.Label()->Label());
-    }
 }
 
 void StatementBinder::Visit(DestroyStatementNode& destroyStatementNode)
@@ -1278,10 +1237,6 @@ void StatementBinder::Visit(AssignmentStatementNode& assignmentStatementNode)
         AddReleaseExceptionStatement(assignmentStatementNode.GetSpan());
     }
     AddStatement(new BoundAssignmentStatement(module, std::move(assignmentCall)));
-    if (assignmentStatementNode.Label())
-    {
-        statement->SetLabel(assignmentStatementNode.Label()->Label());
-    }
 }
 
 void StatementBinder::Visit(ExpressionStatementNode& expressionStatementNode)
@@ -1297,22 +1252,12 @@ void StatementBinder::Visit(ExpressionStatementNode& expressionStatementNode)
         AddReleaseExceptionStatement(expressionStatementNode.GetSpan());
     }
     AddStatement(new BoundExpressionStatement(module, std::move(expression)));
-    if (expressionStatementNode.Label())
-    {
-        statement->SetLabel(expressionStatementNode.Label()->Label());
-    }
 }
 
 void StatementBinder::Visit(EmptyStatementNode& emptyStatementNode)
 {
     AddStatement(new BoundEmptyStatement(module, emptyStatementNode.GetSpan()));
-    if (emptyStatementNode.Label())
-    {
-        statement->SetLabel(emptyStatementNode.Label()->Label());
-    }
 }
-
-TypeExpr* typeExprGrammar = nullptr;
 
 void StatementBinder::Visit(RangeForStatementNode& rangeForStatementNode)
 {
@@ -1320,12 +1265,10 @@ void StatementBinder::Visit(RangeForStatementNode& rangeForStatementNode)
     std::unique_ptr<BoundExpression> container = BindExpression(rangeForStatementNode.Container(), boundCompileUnit, currentFunction, containerScope, this);
     TypeSymbol* plainContainerType = container->GetType()->PlainType(span);
     std::u32string plainContainerTypeFullName = plainContainerType->FullName();
-    if (!typeExprGrammar)
-    {
-        typeExprGrammar = TypeExpr::Create();
-    }
     ParsingContext parsingContext;
-    std::unique_ptr<Node> containerTypeNode(typeExprGrammar->Parse(&plainContainerTypeFullName[0], &plainContainerTypeFullName[plainContainerTypeFullName.length()], 0, "", &parsingContext));
+    CmajorLexer cmajorLexer(plainContainerTypeFullName + U"\n", "", 0);
+    cmajorLexer.SetSeparatorChar('\n');
+    std::unique_ptr<Node> containerTypeNode(TypeExprParser::Parse(cmajorLexer, &parsingContext));
     std::unique_ptr<IdentifierNode> iteratorTypeNode = nullptr;
     if (container->GetType()->IsConstType())
     {
@@ -1463,10 +1406,6 @@ void StatementBinder::Visit(SwitchStatementNode& switchStatementNode)
             AddReleaseExceptionStatement(switchStatementNode.GetSpan());
         }
         AddStatement(boundSwitchStatement.release());
-        if (switchStatementNode.Label())
-        {
-            statement->SetLabel(switchStatementNode.Label()->Label());
-        }
         switchConditionType = prevSwitchConditionType;
     }
     else
@@ -1510,10 +1449,6 @@ void StatementBinder::Visit(CaseStatementNode& caseStatementNode)
         boundCaseStatement->AddCaseValue(std::move(caseValue));
     }
     AddStatement(boundCaseStatement.release());
-    if (caseStatementNode.Label())
-    {
-        statement->SetLabel(caseStatementNode.Label()->Label());
-    }
 }
 
 void StatementBinder::Visit(DefaultStatementNode& defaultStatementNode)
@@ -1536,10 +1471,6 @@ void StatementBinder::Visit(DefaultStatementNode& defaultStatementNode)
         throw Exception(module, "default must end in break, continue, return, throw, goto, or goto case statement", defaultStatementNode.GetSpan());
     }
     AddStatement(boundDefaultStatement.release());
-    if (defaultStatementNode.Label())
-    {
-        statement->SetLabel(defaultStatementNode.Label()->Label());
-    }
 }
 
 void StatementBinder::Visit(GotoCaseStatementNode& gotoCaseStatementNode)
@@ -1560,10 +1491,6 @@ void StatementBinder::Visit(GotoCaseStatementNode& gotoCaseStatementNode)
     Assert(currentGotoCaseStatements, "current goto case statement vector not set");
     currentGotoCaseStatements->push_back(std::make_pair(boundGotoCaseStatement, IntegralValue(caseValuePtr)));
     AddStatement(boundGotoCaseStatement);
-    if (gotoCaseStatementNode.Label())
-    {
-        statement->SetLabel(gotoCaseStatementNode.Label()->Label());
-    }
 }
 
 void StatementBinder::Visit(GotoDefaultStatementNode& gotoDefaultStatementNode)
@@ -1581,10 +1508,6 @@ void StatementBinder::Visit(GotoDefaultStatementNode& gotoDefaultStatementNode)
     Assert(currentGotoDefaultStatements, "current goto default statement vector not set");
     currentGotoDefaultStatements->push_back(boundGotoDefaultStatement);
     AddStatement(boundGotoDefaultStatement);
-    if (gotoDefaultStatementNode.Label())
-    {
-        statement->SetLabel(gotoDefaultStatementNode.Label()->Label());
-    }
 }
 
 void StatementBinder::Visit(ThrowStatementNode& throwStatementNode)
@@ -1651,10 +1574,6 @@ void StatementBinder::Visit(ThrowStatementNode& throwStatementNode)
             throw Exception(module, "rethrow must occur inside a catch clause", throwStatementNode.GetSpan());
         }
     }
-    if (throwStatementNode.Label())
-    {
-        statement->SetLabel(throwStatementNode.Label()->Label());
-    }
     compilingThrow = prevCompilingThrow;
 }
 
@@ -1674,10 +1593,6 @@ void StatementBinder::Visit(TryStatementNode& tryStatementNode)
         boundTryStatement->AddCatch(std::unique_ptr<BoundCatchStatement>(catchStatement));
     }
     AddStatement(boundTryStatement);
-    if (tryStatementNode.Label())
-    {
-        statement->SetLabel(tryStatementNode.Label()->Label());
-    }
 }
 
 void StatementBinder::Visit(CatchNode& catchNode)
@@ -1770,7 +1685,7 @@ void StatementBinder::Visit(AssertStatementNode& assertStatementNode)
     }
     if (unitTestAssertion)
     {
-        int32_t assertionLineNumber = assertStatementNode.GetSpan().LineNumber();
+        int32_t assertionLineNumber = assertStatementNode.GetSpan().line;
         int32_t assertionIndex = GetNextUnitTestAssertionNumber();
         AddAssertionLineNumber(assertionLineNumber);
         InvokeNode* invokeSetUnitTestAssertionResult = new InvokeNode(assertStatementNode.GetSpan(), new IdentifierNode(assertStatementNode.GetSpan(), U"RtSetUnitTestAssertionResult"));
@@ -1806,9 +1721,9 @@ void StatementBinder::Visit(AssertStatementNode& assertStatementNode)
             arguments.push_back(std::unique_ptr<BoundExpression>(new BoundLiteral(module, std::unique_ptr<Value>(new StringValue(assertStatementNode.GetSpan(),
                 boundCompileUnit.Install(ToUtf8(currentFunction->GetFunctionSymbol()->FullName())), ToUtf8(currentFunction->GetFunctionSymbol()->FullName()))), constCharPtrType)));
             arguments.push_back(std::unique_ptr<BoundExpression>(new BoundLiteral(module, std::unique_ptr<Value>(new StringValue(assertStatementNode.GetSpan(),
-                boundCompileUnit.Install(module->GetFilePath(assertStatementNode.GetSpan().FileIndex())), module->GetFilePath(assertStatementNode.GetSpan().FileIndex()))), constCharPtrType)));
+                boundCompileUnit.Install(module->GetFilePath(assertStatementNode.GetSpan().fileIndex)), module->GetFilePath(assertStatementNode.GetSpan().fileIndex))), constCharPtrType)));
             arguments.push_back(std::unique_ptr<BoundExpression>(new BoundLiteral(module, std::unique_ptr<Value>(new IntValue(assertStatementNode.GetSpan(),
-                assertStatementNode.GetSpan().LineNumber())), symbolTable.GetTypeByName(U"int"))));
+                assertStatementNode.GetSpan().line)), symbolTable.GetTypeByName(U"int"))));
             std::unique_ptr<BoundExpression> assertExpression = BindExpression(assertStatementNode.AssertExpr(), boundCompileUnit, currentFunction, containerScope, this);
             const char32_t* failAssertionFunctionName = U"";
             if (GetBackEnd() == BackEnd::llvm)

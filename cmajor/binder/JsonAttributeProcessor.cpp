@@ -17,14 +17,14 @@
 #include <cmajor/symbols/Warning.hpp>
 #include <cmajor/symbols/SymbolCreatorVisitor.hpp>
 #include <cmajor/symbols/Module.hpp>
-#include <cmajor/ast/Expression.hpp>
-#include <cmajor/ast/Identifier.hpp>
-#include <cmajor/ast/Literal.hpp>
-#include <cmajor/util/Unicode.hpp>
+#include <sngcm/ast/Expression.hpp>
+#include <sngcm/ast/Identifier.hpp>
+#include <sngcm/ast/Literal.hpp>
+#include <soulng/util/Unicode.hpp>
 
 namespace cmajor { namespace binder {
 
-using namespace cmajor::unicode;
+using namespace soulng::unicode;
 using namespace cmajor::symbols;
 
 JsonAttributeProcessor::JsonAttributeProcessor(Module* module_) : AttributeProcessor(U"json"), module(module_)

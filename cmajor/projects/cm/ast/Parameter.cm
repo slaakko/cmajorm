@@ -1,0 +1,90 @@
+using System;
+using System.Collections;
+
+// this file has been semiautomatically generated from 'D:/work/soulng-project/sngcm/ast/Parameter.hpp' using cpp2cm version 1.0.0
+
+// this file has been semiautomatically generated from 'D:/work/soulng-project/sngcm/ast/Parameter.cpp' using cpp2cm version 1.0.0
+
+namespace Cm.Ast
+{
+    public class ParameterNode : Node
+    {
+        public nothrow ParameterNode(const System.Lex.Span& span_) :
+            base(NodeType.parameterNode, span_), typeExpr(), id(), artificialId(false)
+        {
+        }
+        public nothrow ParameterNode(const System.Lex.Span& span_, Node* typeExpr_, IdentifierNode* id_) :
+            base(NodeType.parameterNode, span_), typeExpr(typeExpr_), id(id_), artificialId(false)
+        {
+            typeExpr->SetParent(this);
+            if (!id.IsNull())
+            {
+                id->SetParent(this);
+            }
+        }
+        public nothrow Node* TypeExpr() const
+        {
+            return typeExpr.Get();
+        }
+        public nothrow IdentifierNode* Id() const
+        {
+            return id.Get();
+        }
+        public nothrow bool ArtificialId() const
+        {
+            return artificialId;
+        }
+        public nothrow void SetId(IdentifierNode* id_)
+        {
+            id.Reset(id_);
+            id->SetParent(this);
+            artificialId = true;
+        }
+        public override Node* Clone(CloneContext& cloneContext) const
+        {
+            IdentifierNode* clonedId = null;
+            if (!id.IsNull())
+            {
+                clonedId = cast<IdentifierNode*>(id->Clone(cloneContext));
+            }
+            ParameterNode* clone = new ParameterNode(GetSpan(), typeExpr->Clone(cloneContext), clonedId);
+            if (artificialId)
+            {
+                clone->artificialId = true;
+            }
+            return clone;
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public override nothrow void Write(AstWriter& writer)
+        {
+            base->Write(writer);
+            writer.Write(typeExpr.Get());
+            bool hasId = id != null;
+            writer.GetBinaryWriter().Write(hasId);
+            if (hasId)
+            {
+                writer.Write(id.Get());
+            }
+            writer.GetBinaryWriter().Write(artificialId);
+        }
+        public override void Read(AstReader& reader)
+        {
+            base->Read(reader);
+            typeExpr.Reset(reader.ReadNode());
+            typeExpr->SetParent(this);
+            bool hasId = reader.GetBinaryReader().ReadBool();
+            if (hasId)
+            {
+                id.Reset(reader.ReadIdentifierNode());
+                id->SetParent(this);
+            }
+            artificialId = reader.GetBinaryReader().ReadBool();
+        }
+        private UniquePtr<Node> typeExpr;
+        private UniquePtr<IdentifierNode> id;
+        private bool artificialId;
+    }
+} // namespace Cm.Ast

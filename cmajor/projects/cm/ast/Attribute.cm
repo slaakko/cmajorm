@@ -1,0 +1,144 @@
+using System;
+using System.Collections;
+
+// this file has been semiautomatically generated from 'D:/work/soulng-project/sngcm/ast/Attribute.hpp' using cpp2cm version 1.0.0
+
+// this file has been semiautomatically generated from 'D:/work/soulng-project/sngcm/ast/Attribute.cpp' using cpp2cm version 1.0.0
+
+namespace Cm.Ast
+{
+    public class Attribute
+    {
+        public suppress nothrow Attribute(const Attribute& );
+        public nothrow Attribute() :
+            span(), name(), value()
+        {
+        }
+        public nothrow Attribute(const System.Lex.Span& span_, const ustring& name_, const ustring& value_) :
+            span(span_), name(name_), value(value_)
+        {
+        }
+        public suppress nothrow Attribute& operator=(const Attribute& );
+        public nothrow const System.Lex.Span& GetSpan() const
+        {
+            return span;
+        }
+        public nothrow const ustring& Name() const
+        {
+            return name;
+        }
+        public nothrow const ustring& Value() const
+        {
+            return value;
+        }
+        public void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public nothrow void Write(AstWriter& writer)
+        {
+            writer.Write(span);
+            writer.GetBinaryWriter().Write(name);
+            writer.GetBinaryWriter().Write(value);
+        }
+        public void Read(AstReader& reader)
+        {
+            span = reader.ReadSpan();
+            name = reader.GetBinaryReader().ReadUString();
+            value = reader.GetBinaryReader().ReadUString();
+        }
+        private System.Lex.Span span;
+        private ustring name;
+        private ustring value;
+    }
+    public class Attributes
+    {
+        public suppress nothrow Attributes(const Attributes& );
+        public nothrow Attributes()
+        {
+        }
+        public suppress nothrow Attributes& operator=(const Attributes& );
+        public nothrow const List<UniquePtr<Attribute>>& GetAttributes() const
+        {
+            return attributes;
+        }
+        public nothrow Attribute* GetAttribute(const ustring& name) const
+        {
+            Map<ustring, Attribute*>.ConstIterator it = attributeMap.CFind(name);
+            if (it != attributeMap.CEnd())
+            {
+                return it->second;
+            }
+            return null;
+        }
+        public void AddAttribute(const System.Lex.Span& span, const ustring& name)
+        {
+            AddAttribute(span, name, u"true");
+        }
+        public void AddAttribute(const System.Lex.Span& span, const ustring& name, const ustring& value)
+        {
+            Attribute* prev = GetAttribute(name);
+            if (prev != null)
+            {
+                throw AttributeNotUniqueException("attribute \'" + ToUtf8(name) + "\' not unique", span, prev->GetSpan());
+            }
+            Attribute* attribute = new Attribute(span, name, value);
+            AddAttribute(attribute);
+        }
+        public void AddAttribute(Attribute* attribute)
+        {
+            attributes.Add(UniquePtr<Attribute>(attribute));
+            attributeMap[attribute->Name()] = attribute;
+        }
+        public Attributes* Clone() const
+        {
+            UniquePtr<Attributes> clone(new Attributes());
+            for (const UniquePtr<Attribute>& attribute : attributes)
+            {
+                clone->AddAttribute(attribute->GetSpan(), attribute->Name(), attribute->Value());
+            }
+            return clone.Release();
+        }
+        public void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public nothrow void Write(AstWriter& writer)
+        {
+            writer.GetBinaryWriter().WriteULEB128UInt(cast<uint>(attributes.Count()));
+            for (const UniquePtr<Attribute>& attribute : attributes)
+            {
+                attribute->Write(writer);
+            }
+        }
+        public void Read(AstReader& reader)
+        {
+            uint n = reader.GetBinaryReader().ReadULEB128UInt();
+            for (uint i = 0u; i < n; ++i)
+            {
+                Attribute* attribute = new Attribute();
+                attribute->Read(reader);
+                AddAttribute(attribute);
+            }
+        }
+        private List<UniquePtr<Attribute>> attributes;
+        private Map<ustring, Attribute*> attributeMap;
+    }
+    public class AttributeNotUniqueException : Exception
+    {
+        public nothrow AttributeNotUniqueException(const string& message_, const System.Lex.Span& span_, const System.Lex.Span& prevSpan_) :
+            base(message_), span(span_), prevSpan(prevSpan_)
+        {
+        }
+        public nothrow const System.Lex.Span& GetSpan() const
+        {
+            return span;
+        }
+        public nothrow const System.Lex.Span& PrevSpan() const
+        {
+            return prevSpan;
+        }
+        private System.Lex.Span span;
+        private System.Lex.Span prevSpan;
+    }
+} // namespace Cm.Ast

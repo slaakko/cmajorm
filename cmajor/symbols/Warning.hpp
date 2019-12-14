@@ -6,13 +6,13 @@
 #ifndef CMAJOR_SYMBOLS_WARNING_INCLUDED
 #define CMAJOR_SYMBOLS_WARNING_INCLUDED
 #include <cmajor/symbols/SymbolsApi.hpp>
-#include <cmajor/parsing/Scanner.hpp>
-#include <cmajor/util/Json.hpp>
+#include <soulng/util/Json.hpp>
+#include <soulng/lexer/Span.hpp>
 
 namespace cmajor { namespace symbols {
 
-using cmajor::parsing::Span;
-using cmajor::util::JsonValue;
+using soulng::lexer::Span;
+using soulng::util::JsonValue;
 class Module;
 
 class SYMBOLS_API Warning

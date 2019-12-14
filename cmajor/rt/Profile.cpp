@@ -5,10 +5,10 @@
 
 #include <cmajor/rt/Profile.hpp>
 #include <cmajor/rt/InitDone.hpp>
-#include <cmajor/util/System.hpp>
-#include <cmajor/util/Path.hpp>
-#include <cmajor/util/Unicode.hpp>
-#include <cmajor/util/BinaryWriter.hpp>
+#include <soulng/util/System.hpp>
+#include <soulng/util/Path.hpp>
+#include <soulng/util/Unicode.hpp>
+#include <soulng/util/BinaryWriter.hpp>
 #include <memory>
 #include <vector>
 #include <chrono>
@@ -17,8 +17,8 @@
 
 namespace cmajor {namespace rt {
 
-using namespace cmajor::util;
-using namespace cmajor::unicode;
+using namespace soulng::util;
+using namespace soulng::unicode;
 
 enum class TimePointKind : uint8_t
 {

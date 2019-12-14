@@ -5,7 +5,7 @@
 
 #ifndef CMAJOR_BINDER_UUID_REPOSITORY_INCLUDED
 #define CMAJOR_BINDER_UUID_REPOSITORY_INCLUDED
-#include <cmajor/util/Error.hpp>
+#include <soulng/util/Error.hpp>
 #include <boost/uuid/uuid.hpp>
 #include <boost/functional/hash.hpp>
 #include <unordered_map>

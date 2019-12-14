@@ -1,0 +1,36 @@
+// =================================
+// Copyright (c) 2019 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+[hpp]#include <sngcm/cmparser/ParserApi.hpp>
+[hpp]#include <sngcm/ast/Parameter.hpp>
+[hpp]#include <sngcm/cmparser/ParsingContext.hpp>
+[cpp]#include <sngcm/cmparser/TypeExpr.hpp>
+[cpp]#include <sngcm/cmparser/Identifier.hpp>
+[cpp]#include <sngcm/cmlexer/CmajorLexer.hpp>
+[cpp]#include <sngcm/cmlexer/CmajorTokens.hpp>
+
+using namespace sngcm::ast;
+using namespace CmajorTokens;
+
+parser api(SNGCM_PARSER_API) ParameterParser
+{
+    uselexer CmajorLexer;
+
+    using TypeExprParser.TypeExpr;
+    using IdentifierParser.Identifier;
+
+    ParameterList(ParsingContext* ctx, sngcm::ast::Node* owner) 
+        ::= LPAREN (Parameter(ctx):param{ owner->AddParameter(param); } % COMMA)? RPAREN!
+        ;
+
+    Parameter(ParsingContext* ctx, var Span s) : ParameterNode*
+        ::= (TypeExpr(ctx):type{ s = span; } (Identifier:id{ s.end = span.end; })?){ return new ParameterNode(s, type, id); }
+        ;
+
+    ruleinfo
+    {
+        (ParameterList, "parameter list"), (Parameter, "parameter")
+    }
+}

@@ -5,7 +5,7 @@
 
 #ifndef CMAJOR_RT_STRING_INCLUDED
 #define CMAJOR_RT_STRING_INCLUDED
-#include <cmajor/util/Error.hpp>
+#include <soulng/util/Error.hpp>
 #include <memory>
 #include <unordered_map>
 #include <string>

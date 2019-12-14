@@ -1,0 +1,30 @@
+using System;
+using System.Collections;
+using Cm.Ast;
+
+// this file has been semiautomatically generated from 'D:/work/soulngcm/soulngcm/sngcmpg/CodeUtils.hpp' using cpp2cm version 1.0.0
+
+// this file has been semiautomatically generated from 'D:/work/soulngcm/soulngcm/sngcmpg/CodeUtils.cpp' using cpp2cm version 1.0.0
+
+namespace soulcm.scmpg
+{
+    public bool IsPtrType(Cm.Ast.Node* node)
+    {
+        if (!(node != null)) return false;
+        if (node->GetNodeType() == NodeType.constNode)
+        {
+            Cm.Ast.ConstNode* constNode = cast<Cm.Ast.ConstNode*>(node);
+            node = constNode->Subject();
+        }
+        return node->GetNodeType() == NodeType.pointerNode;
+    }
+    public Cm.Ast.Node* RemovePointer(Cm.Ast.Node* node)
+    {
+        if (node->GetNodeType() == NodeType.pointerNode)
+        {
+            Cm.Ast.PointerNode* ptrNode = cast<Cm.Ast.PointerNode*>(node);
+            return ptrNode->Subject();
+        }
+        return node;
+    }
+} // namespace soulcm.scmpg

@@ -16,8 +16,8 @@
 #include <cmajor/symbols/TemplateSymbol.hpp>
 #include <cmajor/symbols/GlobalFlags.hpp>
 #include <cmajor/symbols/SymbolCollector.hpp>
-#include <cmajor/util/Unicode.hpp>
-#include <cmajor/util/Sha1.hpp>
+#include <soulng/util/Unicode.hpp>
+#include <soulng/util/Sha1.hpp>
 #include <boost/uuid/uuid_generators.hpp>
 
 namespace cmajor { namespace symbols {
@@ -103,7 +103,7 @@ void ViableFunctionSet::Insert(FunctionSymbol* fun)
     set.insert(fun);
 }
 
-using namespace cmajor::unicode;
+using namespace soulng::unicode;
 
 class OperatorMangleMap
 {
@@ -247,7 +247,7 @@ bool FunctionGroupSymbol::HasProjectMembers() const
     return false;
 }
 
-void FunctionGroupSymbol::AppendChildElements(dom::Element* element, TypeMap& typeMap) const
+void FunctionGroupSymbol::AppendChildElements(sngxml::dom::Element* element, TypeMap& typeMap) const
 {
     for (const auto& p : arityFunctionListMap)
     {
@@ -256,8 +256,8 @@ void FunctionGroupSymbol::AppendChildElements(dom::Element* element, TypeMap& ty
             if (fun->IsTemplateSpecialization()) continue;
             if (fun->IsProject())
             {
-                std::unique_ptr<dom::Element> functionElement = fun->ToDomElement(typeMap);
-                element->AppendChild(std::unique_ptr<dom::Node>(functionElement.release()));
+                std::unique_ptr<sngxml::dom::Element> functionElement = fun->ToDomElement(typeMap);
+                element->AppendChild(std::unique_ptr<sngxml::dom::Node>(functionElement.release()));
             }
         }
     }
@@ -1027,7 +1027,7 @@ void FunctionSymbol::GenerateVirtualCall(Emitter& emitter, std::vector<GenObject
     }
 }
 
-std::unique_ptr<Value> FunctionSymbol::ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span) const
+std::unique_ptr<Value> FunctionSymbol::ConstructValue(const std::vector<std::unique_ptr<Value>>& argumentValues, const Span& span, Value* receiver) const
 {
     return std::unique_ptr<Value>();
 }
@@ -1267,16 +1267,16 @@ void* FunctionSymbol::IrType(Emitter& emitter)
     return localIrType;
 }
 
-std::unique_ptr<dom::Element> FunctionSymbol::CreateDomElement(TypeMap& typeMap)
+std::unique_ptr<sngxml::dom::Element> FunctionSymbol::CreateDomElement(TypeMap& typeMap)
 {
-    if (IsTemplateSpecialization()) return std::unique_ptr<dom::Element>();
-    std::unique_ptr<dom::Element> element(new dom::Element(U"FunctionSymbol"));
+    if (IsTemplateSpecialization()) return std::unique_ptr<sngxml::dom::Element>();
+    std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(U"FunctionSymbol"));
     if (returnType)
     {
-        std::unique_ptr<dom::Element> returnTypeElement(new dom::Element(U"returnType"));
+        std::unique_ptr<sngxml::dom::Element> returnTypeElement(new sngxml::dom::Element(U"returnType"));
         int typeId = typeMap.GetOrInsertType(returnType);
         returnTypeElement->SetAttribute(U"ref", U"type_" + ToUtf32(std::to_string(typeId)));
-        element->AppendChild(std::unique_ptr<dom::Node>(returnTypeElement.release()));
+        element->AppendChild(std::unique_ptr<sngxml::dom::Node>(returnTypeElement.release()));
     }
     return element;
 }
@@ -2014,15 +2014,15 @@ void ConversionFunctionSymbol::SetSpecifiers(Specifiers specifiers)
     }
 }
 
-std::unique_ptr<dom::Element> ConversionFunctionSymbol::CreateDomElement(TypeMap& typeMap)
+std::unique_ptr<sngxml::dom::Element> ConversionFunctionSymbol::CreateDomElement(TypeMap& typeMap)
 {
-    std::unique_ptr<dom::Element> element(new dom::Element(U"ConversionFunctionSymbol"));
+    std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(U"ConversionFunctionSymbol"));
     if (ReturnType())
     {
-        std::unique_ptr<dom::Element> returnTypeElement(new dom::Element(U"returnType"));
+        std::unique_ptr<sngxml::dom::Element> returnTypeElement(new sngxml::dom::Element(U"returnType"));
         int typeId = typeMap.GetOrInsertType(ReturnType());
         returnTypeElement->SetAttribute(U"ref", U"type_" + ToUtf32(std::to_string(typeId)));
-        element->AppendChild(std::unique_ptr<dom::Node>(returnTypeElement.release()));
+        element->AppendChild(std::unique_ptr<sngxml::dom::Node>(returnTypeElement.release()));
     }
     return element;
 }

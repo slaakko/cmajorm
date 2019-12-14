@@ -42,7 +42,7 @@ public:
     void Read(SymbolReader& reader) override;
     TypeSymbol* GetType() const { return type; }
     void SetType(TypeSymbol* type_) { type = type_; }
-    std::unique_ptr<dom::Element> CreateDomElement(TypeMap& typeMap) override;
+    std::unique_ptr<sngxml::dom::Element> CreateDomElement(TypeMap& typeMap) override;
     std::u32string Info() const override { return Name(); }
     const char* ClassName() const override { return "BoundTemplateParameterSymbol"; }
     void Check() override;

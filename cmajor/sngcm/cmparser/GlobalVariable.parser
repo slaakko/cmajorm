@@ -1,0 +1,42 @@
+// =================================
+// Copyright (c) 2019 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+[hpp]#include <sngcm/cmparser/ParserApi.hpp>
+[hpp]#include <sngcm/ast/GlobalVariable.hpp>
+[hpp]#include <sngcm/cmparser/ParsingContext.hpp>
+[cpp]#include <sngcm/cmparser/Specifier.hpp>
+[cpp]#include <sngcm/cmparser/Identifier.hpp>
+[cpp]#include <sngcm/cmparser/TypeExpr.hpp>
+[cpp]#include <sngcm/cmparser/Expression.hpp>
+[cpp]#include <sngcm/cmlexer/CmajorLexer.hpp>
+[cpp]#include <sngcm/cmlexer/CmajorTokens.hpp>
+
+using namespace sngcm::ast;
+using namespace CmajorTokens;
+
+parser api(SNGCM_PARSER_API) GlobalVariableParser
+{
+    uselexer CmajorLexer;
+
+    using SpecifierParser.Specifiers;
+    using TypeExprParser.TypeExpr;
+    using IdentifierParser.Identifier;
+    using ExpressionParser.Expression;
+
+    GlobalVariable(ParsingContext* ctx, sngcm::ast::CompileUnitNode* cu, var Span s) : GlobalVariableNode*
+        ::= Specifiers:specifiers{ s = span; } TypeExpr(ctx):type Identifier:id (ASSIGN Expression(ctx):initializer)? SEMICOLON
+        {
+            s.end = span.end;
+            GlobalVariableNode* value = new GlobalVariableNode(s, specifiers, type, id, cu);
+            value->SetInitializer(initializer);
+            return value;
+        }
+        ;
+
+    ruleinfo
+    {
+        (GlobalVariable, "global variable")
+    }
+}

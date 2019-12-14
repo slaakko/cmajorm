@@ -1,0 +1,101 @@
+// =================================
+// Copyright (c) 2019 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+[hpp]#include <sngcm/cmparser/ParserApi.hpp>
+[hpp]#include <sngcm/ast/Literal.hpp>
+[hpp]#include <sngcm/cmparser/ParsingContext.hpp>
+[cpp]#include <sngcm/cmparser/Expression.hpp>
+[cpp]#include <sngcm/cmlexer/CmajorLexer.hpp>
+[cpp]#include <sngcm/cmlexer/CmajorTokens.hpp>
+
+using namespace sngcm::ast;
+using namespace CmajorTokens;
+
+parser api(SNGCM_PARSER_API) LiteralParser
+{
+    uselexer CmajorLexer;
+
+    using ExpressionParser.Expression;
+
+    Literal(ParsingContext* ctx) : LiteralNode*
+        ::= SimpleLiteral:simpleLiteral{ return simpleLiteral; }
+        |   ComplexLiteral(ctx):complexLiteral{ return complexLiteral; }
+        ;
+
+    SimpleLiteral : LiteralNode*
+        ::= TRUE
+        {
+            LiteralNode* value = new BooleanLiteralNode(span, true);
+            value->SetText(lexer.GetMatch(span));
+            return value;
+        }
+        |   FALSE
+        {
+            LiteralNode* value = new BooleanLiteralNode(span, false);
+            value->SetText(lexer.GetMatch(span));
+            return value;
+        }
+        |   FLOATINGLIT
+        {
+            ParseFloatingLiteral(lexer.FileName(), lexer.GetToken(pos), lexer.floatingLit, lexer.floatingLitFloat);
+            LiteralNode* value = CreateFloatingLiteralNode(span, lexer.floatingLit, lexer.floatingLitFloat);
+            value->SetText(lexer.GetMatch(span));
+            return value;
+        }
+        |   INTLIT
+        {
+            ParseIntegerLiteral(lexer.FileName(), lexer.GetToken(pos), lexer.intLit, lexer.intLitUnsigned);
+            LiteralNode* value = CreateIntegerLiteralNode(span, lexer.intLit, lexer.intLitUnsigned);
+            value->SetText(lexer.GetMatch(span));
+            return value;
+        }
+        |   CHARLIT
+        {
+            ParseCharacterLiteral(lexer.FileName(), lexer.GetToken(pos), lexer.chrLit, lexer.chrLitPrefix);
+            LiteralNode* value = CreateCharacterLiteralNode(span, lexer.chrLit, lexer.chrLitPrefix);
+            value->SetText(lexer.GetMatch(span));
+            return value;
+        }
+        |   STRINGLIT
+        {
+            ParseStringLiteral(lexer.FileName(), lexer.GetToken(pos), lexer.strLit, lexer.strLitPrefix);
+            LiteralNode* value = CreateStringLiteralNode(span, lexer.strLit, lexer.strLitPrefix);
+            value->SetText(lexer.GetMatch(span));
+            return value;
+        }
+        |   NULLLIT
+        {
+            LiteralNode* value = new NullLiteralNode(span);
+            value->SetText(lexer.GetMatch(span));
+            return value;
+        }
+        ;
+
+    ComplexLiteral(ParsingContext* ctx) : LiteralNode*
+        ::= ArrayLiteral(ctx):arrayLiteral{ return arrayLiteral; }
+        |   StructuredLiteral(ctx):structuredLiteral{ return structuredLiteral; }
+        ;
+
+    ArrayLiteral(ParsingContext* ctx, var std::unique_ptr<ArrayLiteralNode> arrayLiteral) : ArrayLiteralNode*
+        ::= LBRACKET{ arrayLiteral.reset(new ArrayLiteralNode(span)); } (Expression(ctx):expr{ arrayLiteral->AddValue(expr); } % COMMA)? RBRACKET!
+        {
+            arrayLiteral->SetSpanEnd(span.end);
+            return arrayLiteral.release();
+        }
+        ;
+
+    StructuredLiteral(ParsingContext* ctx, var std::unique_ptr<StructuredLiteralNode> structuredLiteral) : StructuredLiteralNode*
+        ::= LBRACE{ structuredLiteral.reset(new StructuredLiteralNode(span)); } (Expression(ctx):expr{ structuredLiteral->AddMember(expr); } % COMMA)? RBRACE!
+        {
+            structuredLiteral->SetSpanEnd(span.end);
+            return structuredLiteral.release();
+        }
+        ;
+
+    ruleinfo
+    {
+        (Literal, "literal"), (SimpleLiteral, "simple literal"), (ComplexLiteral, "complex literal"), (ArrayLiteral, "array literal"), (StructuredLiteral, "structured literal")
+    }
+}

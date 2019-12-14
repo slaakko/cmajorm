@@ -7,11 +7,11 @@
 #include <cmajor/rt/Statics.hpp>
 #include <cmajor/rt/Error.hpp>
 #include <cmajor/rt/Io.hpp>
-#include <cmajor/util/System.hpp>
-#include <cmajor/util/BinaryReader.hpp>
-#include <cmajor/util/Path.hpp>
-#include <cmajor/util/Prime.hpp>
-#include <cmajor/util/Uuid.hpp>
+#include <soulng/util/System.hpp>
+#include <soulng/util/BinaryReader.hpp>
+#include <soulng/util/Path.hpp>
+#include <soulng/util/Prime.hpp>
+#include <soulng/util/Uuid.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/uuid/uuid_io.hpp>
 #include <boost/functional/hash.hpp>
@@ -21,7 +21,7 @@
 
 namespace cmajor { namespace rt {
 
-using namespace cmajor::util;
+using namespace soulng::util;
 
 class ClassIdMap
 {

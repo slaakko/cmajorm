@@ -12,6 +12,13 @@
 #define BUILD_API __declspec(dllexport)
 #else
 #define BUILD_API __declspec(dllimport)
+
+#ifdef NDEBUG
+#pragma comment(lib, "build.lib")
+#else
+#pragma comment(lib, "buildd.lib")
+#endif
+
 #endif
 
 #else

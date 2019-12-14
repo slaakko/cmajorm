@@ -6,7 +6,7 @@
 #ifndef CMAJOR_CMSXI_TYPE_INCLUDED
 #define CMAJOR_CMSXI_TYPE_INCLUDED
 #include <cmajor/cmsxi/Value.hpp>
-#include <cmajor/util/CodeFormatter.hpp>
+#include <soulng/util/CodeFormatter.hpp>
 #include <vector>
 #include <memory>
 #include <unordered_map>
@@ -14,7 +14,7 @@
 
 namespace cmsxi {
 
-using namespace cmajor::util;
+using namespace soulng::util;
 
 const int voidTypeId = -1;
 const int boolTypeId = -2;

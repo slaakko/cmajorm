@@ -10,17 +10,16 @@
 #include <cmajor/cmdoclib/Doc.hpp>
 #include <cmajor/cmdoclib/ParserDoc.hpp>
 #include <cmajor/cmdoclib/SymbolTableXml.hpp>
-#include <cmajor/ast/InitDone.hpp>
-#include <cmajor/parsing/InitDone.hpp>
-#include <cmajor/util/InitDone.hpp>
+#include <sngcm/ast/InitDone.hpp>
+#include <soulng/lexer/ParsingException.hpp>
+#include <soulng/util/InitDone.hpp>
 #include <cmajor/symbols/InitDone.hpp>
-#include <cmajor/xpath/InitDone.hpp>
-#include <cmajor/parsing/Exception.hpp>
+#include <sngxml/xpath/InitDone.hpp>
 #include <cmajor/build/Build.hpp>
 #include <cmajor/symbols/GlobalFlags.hpp>
 #include <cmajor/symbols/Exception.hpp>
-#include <cmajor/util/Unicode.hpp>
-#include <cmajor/util/Util.hpp>
+#include <soulng/util/Unicode.hpp>
+#include <soulng/util/Util.hpp>
 #include <boost/lexical_cast.hpp>
 #include <stdexcept>
 #include <iostream>
@@ -29,21 +28,19 @@ struct InitDone
 {
     InitDone()
     {
+        soulng::util::Init();
         cmajor::cmdoclib::Init();
-        cmajor::xpath::Init();
-        cmajor::ast::Init();
+        sngxml::xpath::Init();
+        sngcm::ast::Init();
         cmajor::symbols::Init();
-        cmajor::parsing::Init();
-        cmajor::util::Init();
     }
     ~InitDone()
     {
-        cmajor::util::Done();
-        cmajor::parsing::Done();
         cmajor::symbols::Done();
-        cmajor::ast::Done();
-        cmajor::xpath::Done();
+        sngcm::ast::Done();
+        sngxml::xpath::Done();
         cmajor::cmdoclib::Done();
+        soulng::util::Done();
     }
 };
 
@@ -65,10 +62,9 @@ void PrintHelp()
 }
 
 using namespace cmajor::cmdoclib;
-using namespace cmajor::util;
-using namespace cmajor::unicode;
+using namespace soulng::util;
+using namespace soulng::unicode;
 using namespace cmajor::symbols;
-using namespace cmajor::parsing;
 using namespace cmajor::build;
 
 int main(int argc, const char** argv)
@@ -152,7 +148,7 @@ int main(int argc, const char** argv)
             SetInputPtr(nullptr);
         }
     }
-    catch (const ParsingException& ex)
+    catch (const soulng::lexer::ParsingException& ex)
     {
         std::cerr << ex.what() << std::endl;
         return 1;

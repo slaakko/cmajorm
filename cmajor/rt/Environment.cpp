@@ -6,7 +6,7 @@
 #include <cmajor/rt/Environment.hpp>
 #include <cmajor/rt/Error.hpp>
 #include <cmajor/rt/String.hpp>
-#include <cmajor/util/System.hpp>
+#include <soulng/util/System.hpp>
 #include <memory>
 #include <vector>
 #include <string>
@@ -271,7 +271,7 @@ extern "C" RT_API int32_t RtEndExec(int32_t execHandle)
 
 extern "C" RT_API int32_t RtBeginGetPathToExecutable()
 {
-    std::string pathToExecutable = cmajor::util::GetPathToExecutable();
+    std::string pathToExecutable = soulng::util::GetPathToExecutable();
     return cmajor::rt::InstallString(pathToExecutable);
 }
 

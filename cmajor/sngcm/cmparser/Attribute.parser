@@ -1,0 +1,35 @@
+// =================================
+// Copyright (c) 2019 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+[hpp]#include <sngcm/cmparser/ParserApi.hpp>
+[hpp]#include <sngcm/ast/Attribute.hpp>
+[cpp]#include <sngcm/cmlexer/CmajorLexer.hpp>
+[cpp]#include <sngcm/cmlexer/CmajorTokens.hpp>
+
+using namespace CmajorTokens;
+
+parser api(SNGCM_PARSER_API) AttributeParser
+{
+    uselexer CmajorLexer;
+
+    Attributes(var std::unique_ptr<sngcm::ast::Attributes> attributes) : sngcm::ast::Attributes*
+        ::= LBRACKET{ attributes.reset(new sngcm::ast::Attributes()); } (Attribute(attributes.get()):attribute % COMMA)? RBRACKET!
+        {
+            return attributes.release();
+        }
+        ;
+
+    Attribute(sngcm::ast::Attributes* attributes, var Span s, var std::u32string name, var std::u32string value)
+        ::= (ID{ s = span; name = lexer.GetMatch(span); } (ASSIGN STRINGLIT{ s.end = span.end; value = lexer.GetMatch(span); })?)
+        {
+            attributes->AddAttribute(s, name, value);
+        }
+        ;
+
+    ruleinfo
+    {
+        (Attributes, "attributes"), (Attribute, "attribute")
+    }
+}

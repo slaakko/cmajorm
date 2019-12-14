@@ -7,15 +7,15 @@
 #include <cmajor/cmdoclib/Input.hpp>
 #include <cmajor/symbols/GlobalFlags.hpp>
 #include <boost/filesystem.hpp>
-#include <cmajor/util/Path.hpp>
-#include <cmajor/util/CodeFormatter.hpp>
+#include <soulng/util/Path.hpp>
+#include <soulng/util/CodeFormatter.hpp>
 #include <boost/filesystem.hpp>
 #include <fstream>
 
 namespace cmajor { namespace cmdoclib {
 
 using namespace cmajor::symbols;
-using namespace cmajor::util;
+using namespace soulng::util;
 
 void GenerateStyleFile()
 {

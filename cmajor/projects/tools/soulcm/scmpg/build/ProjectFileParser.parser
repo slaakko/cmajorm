@@ -1,0 +1,32 @@
+// =================================
+// Copyright (c) 2019 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System.Lex;
+using ProjectFileTokens;
+
+parser ProjectFileParser
+{
+    uselexer ProjectFileLexer;
+    main;
+
+    ProjectFile(var UniquePtr<soulcm.scmpg.ProjectFile> projectFile) : soulcm.scmpg.ProjectFile*
+        ::= PROJECT QualifiedId:projectName! SEMICOLON!{ projectFile.Reset(new soulcm.scmpg.ProjectFile(lexer.FileName(), projectName)); } ProjectFileContent(projectFile.Get()):content
+        {
+            return projectFile.Release();
+        }
+        ;
+
+    ProjectFileContent(soulcm.scmpg.ProjectFile* projectFile)
+        ::= SourceFile(projectFile):sourceFile*
+        ;
+
+    QualifiedId(var Span s) : ustring
+        ::= (ID{ s = span; } (DOT ID{ s.end = span.end; })*){ return lexer.GetMatch(s); }
+        ;
+
+    SourceFile(soulcm.scmpg.ProjectFile* projectFile)
+        ::= SOURCE FILEPATH!{ projectFile->AddSourceFile(lexer.filePath); } SEMICOLON!
+        ;
+}

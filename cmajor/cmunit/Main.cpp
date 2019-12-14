@@ -1,11 +1,10 @@
-#include <cmajor/ast/InitDone.hpp>
-#include <cmajor/ast/Identifier.hpp>
-#include <cmajor/ast/BasicType.hpp>
-#include <cmajor/ast/Expression.hpp>
-#include <cmajor/ast/TypeExpr.hpp>
-#include <cmajor/ast/Literal.hpp>
-#include <cmajor/parsing/InitDone.hpp>
-#include <cmajor/util/InitDone.hpp>
+#include <sngcm/ast/InitDone.hpp>
+#include <sngcm/ast/Identifier.hpp>
+#include <sngcm/ast/BasicType.hpp>
+#include <sngcm/ast/Expression.hpp>
+#include <sngcm/ast/TypeExpr.hpp>
+#include <sngcm/ast/Literal.hpp>
+#include <soulng/util/InitDone.hpp>
 #include <cmajor/symbols/InitDone.hpp>
 #include <cmajor/symbols/Exception.hpp>
 #include <cmajor/symbols/GlobalFlags.hpp>
@@ -20,21 +19,23 @@
 #include <cmajor/build/Build.hpp>
 #include <cmajor/codegen/EmittingContext.hpp>
 #include <cmajor/codegen/Interface.hpp>
-#include <cmajor/parser/Project.hpp>
-#include <cmajor/parser/Solution.hpp>
-#include <cmajor/parser/CompileUnit.hpp>
-#include <cmajor/parsing/Exception.hpp>
-#include <cmajor/dom/Document.hpp>
-#include <cmajor/dom/Element.hpp>
-#include <cmajor/dom/CharacterData.hpp>
-#include <cmajor/dom/Parser.hpp>
-#include <cmajor/xpath/InitDone.hpp>
-#include <cmajor/xpath/XPathEvaluate.hpp>
-#include <cmajor/util/Util.hpp>
-#include <cmajor/util/Path.hpp>
-#include <cmajor/util/Json.hpp>
-#include <cmajor/util/Unicode.hpp>
-#include <cmajor/util/Time.hpp>
+#include <sngcm/cmlexer/CmajorLexer.hpp>
+#include <sngcm/cmlexer/ContainerFileLexer.hpp>
+#include <sngcm/cmparser/ProjectFile.hpp>
+#include <sngcm/cmparser/SolutionFile.hpp>
+#include <sngcm/cmparser/CompileUnit.hpp>
+#include <sngxml/dom/Document.hpp>
+#include <sngxml/dom/Element.hpp>
+#include <sngxml/dom/CharacterData.hpp>
+#include <sngxml/dom/Parser.hpp>
+#include <sngxml/xpath/InitDone.hpp>
+#include <sngxml/xpath/XPathEvaluate.hpp>
+#include <soulng/lexer/ParsingException.hpp>
+#include <soulng/util/Util.hpp>
+#include <soulng/util/Path.hpp>
+#include <soulng/util/Json.hpp>
+#include <soulng/util/Unicode.hpp>
+#include <soulng/util/Time.hpp>
 #include <boost/filesystem.hpp>
 #include <iostream>
 #include <chrono>
@@ -43,32 +44,27 @@ struct InitDone
 {
     InitDone()
     {
-        cmajor::ast::Init();
+        soulng::util::Init();
+        sngcm::ast::Init();
         cmajor::symbols::Init();
-        cmajor::parsing::Init();
-        cmajor::util::Init();
-        cmajor::xpath::Init();
+        sngxml::xpath::Init();
     }
     ~InitDone()
     {
-        cmajor::xpath::Done();
-        cmajor::util::Done();
-        cmajor::parsing::Done();
+        sngxml::xpath::Done();
         cmajor::symbols::Done();
-        cmajor::ast::Done();
+        sngcm::ast::Done();
+        soulng::util::Done();
     }
 };
 
-using namespace cmajor::ast;
-using namespace cmajor::util;
-using namespace cmajor::unicode;
+using namespace sngcm::ast;
+using namespace soulng::util;
+using namespace soulng::unicode;
 using namespace cmajor::symbols;
-using namespace cmajor::parser;
-using namespace cmajor::parsing;
 using namespace cmajor::build;
 using namespace cmajor::binder;
-using namespace cmajor::dom;
-using namespace cmajor::xpath;
+using namespace sngxml::dom;
 
 const char* version = "3.3.0";
 
@@ -93,8 +89,6 @@ void PrintHelp()
         "   don't generate debug info even for debug build\n" <<
         std::endl;
 }
-
-CompileUnit* compileUnitGrammar = nullptr;
 
 bool unitTestsFound = false;
 
@@ -219,14 +213,14 @@ struct UnitTest
     bool prevUnitTest;
 };
 
-int RunUnitTest(cmajor::ast::Project* project)
+int RunUnitTest(sngcm::ast::Project* project)
 {
     unitTestsFound = true;
     int exitCode = system(project->ExecutableFilePath().c_str());
     return exitCode;
 }
 
-void TestUnit(FileTable* fileTable, cmajor::ast::Project* project, CompileUnitNode* testUnit, const std::string& testName, Element* sourceFileElement, std::unique_ptr<Module>& rootModule)
+void TestUnit(FileTable* fileTable, sngcm::ast::Project* project, CompileUnitNode* testUnit, const std::string& testName, Element* sourceFileElement, std::unique_ptr<Module>& rootModule)
 {
     bool compileError = false;
     std::string compileErrorMessage;
@@ -281,12 +275,12 @@ void TestUnit(FileTable* fileTable, cmajor::ast::Project* project, CompileUnitNo
         }
         else
         {
-            std::unique_ptr<cmajor::dom::Element> testElement(new cmajor::dom::Element(U"test"));
+            std::unique_ptr<sngxml::dom::Element> testElement(new sngxml::dom::Element(U"test"));
             testElement->SetAttribute(U"name", ToUtf32(testName));
             testElement->SetAttribute(U"exitCode", ToUtf32(std::to_string(exitCode)));
             for (int32_t i = 0; i < numUnitTestAssertions; ++i)
             {
-                std::unique_ptr<cmajor::dom::Element> assertionElement(new cmajor::dom::Element(U"assertion"));
+                std::unique_ptr<sngxml::dom::Element> assertionElement(new sngxml::dom::Element(U"assertion"));
                 assertionElement->SetAttribute(U"index", ToUtf32(std::to_string(i)));
                 std::u32string assertionResultStr = U"empty";
                 assertionElement->SetAttribute(U"result", assertionResultStr);
@@ -294,12 +288,12 @@ void TestUnit(FileTable* fileTable, cmajor::ast::Project* project, CompileUnitNo
                 {
                     assertionElement->SetAttribute(U"line", ToUtf32(std::to_string(assertionLineNumbers[i])));
                 }
-                testElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(assertionElement.release()));
+                testElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(assertionElement.release()));
             }
-            sourceFileElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(testElement.release()));
+            sourceFileElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(testElement.release()));
         }
     }
-    catch (const ParsingException& ex)
+    catch (const soulng::lexer::ParsingException& ex)
     {
         compileError = true;
         compileErrorMessage = ex.what();
@@ -316,10 +310,10 @@ void TestUnit(FileTable* fileTable, cmajor::ast::Project* project, CompileUnitNo
     }
     if (compileError)
     {
-        std::unique_ptr<cmajor::dom::Element> testElement(new cmajor::dom::Element(U"test"));
+        std::unique_ptr<sngxml::dom::Element> testElement(new sngxml::dom::Element(U"test"));
         testElement->SetAttribute(U"name", ToUtf32(testName));
         testElement->SetAttribute(U"compileError", ToUtf32(compileErrorMessage));
-        sourceFileElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(testElement.release()));
+        sourceFileElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(testElement.release()));
     }
 }
 
@@ -358,21 +352,18 @@ std::vector<std::pair<std::unique_ptr<CompileUnitNode>, std::string>> SplitIntoT
     return testUnits;
 }
 
-void TestSourceFile(bool& first, cmajor::ast::Project* project, const std::string& sourceFilePath, const std::string& onlyTest, cmajor::dom::Element* projectElement, 
+void TestSourceFile(bool& first, sngcm::ast::Project* project, const std::string& sourceFilePath, const std::string& onlyTest, sngxml::dom::Element* projectElement, 
     std::unique_ptr<Module>& rootModule)
 {
-    std::unique_ptr<cmajor::dom::Element> sourceFileElement(new cmajor::dom::Element(U"sourceFile"));
+    std::unique_ptr<sngxml::dom::Element> sourceFileElement(new sngxml::dom::Element(U"sourceFile"));
     sourceFileElement->SetAttribute(U"name", ToUtf32(Path::GetFileNameWithoutExtension(sourceFilePath)));
-    if (!compileUnitGrammar)
-    {
-        compileUnitGrammar = CompileUnit::Create();
-    }
     MappedInputFile sourceFile(sourceFilePath);
     FileTable fileTable;
     uint32_t fileIndex = fileTable.RegisterFilePath(sourceFilePath);
     ParsingContext parsingContext;
     std::u32string s(ToUtf32(std::string(sourceFile.Begin(), sourceFile.End())));
-    std::unique_ptr<CompileUnitNode> compileUnit(compileUnitGrammar->Parse(&s[0], &s[0] + s.length(), fileIndex, sourceFilePath, &parsingContext));
+    CmajorLexer lexer(s, sourceFilePath, fileIndex);
+    std::unique_ptr<CompileUnitNode> compileUnit = CompileUnitParser::Parse(lexer, &parsingContext);
     std::vector<std::pair<std::unique_ptr<CompileUnitNode>, std::string>> testUnits = SplitIntoTestUnits(compileUnit.get());
     if (!testUnits.empty())
     {
@@ -397,7 +388,7 @@ void TestSourceFile(bool& first, cmajor::ast::Project* project, const std::strin
         }
         TestUnit(&fileTable, project, p.first.get(), p.second, sourceFileElement.get(), rootModule);
     }
-    projectElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(sourceFileElement.release()));
+    projectElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(sourceFileElement.release()));
 }
 
 bool SourceFileNameEquals(const std::string& fileName, const std::string& sourceFilePath)
@@ -415,14 +406,14 @@ bool SourceFileNameEquals(const std::string& fileName, const std::string& source
     return true;
 }
 
-void TestProject(cmajor::ast::Project* project, const std::string& onlySourceFile, const std::string& onlyTest, cmajor::dom::Element* parentElement, std::unique_ptr<Module>& rootModule)
+void TestProject(sngcm::ast::Project* project, const std::string& onlySourceFile, const std::string& onlyTest, sngxml::dom::Element* parentElement, std::unique_ptr<Module>& rootModule)
 {
     if (project->GetTarget() != Target::unitTest)
     {
         throw std::runtime_error("project '" + ToUtf8(project->Name()) + "' is not a unit testing project");
     }
     bool first = true;
-    std::unique_ptr<cmajor::dom::Element> projectElement(new cmajor::dom::Element(U"project"));
+    std::unique_ptr<sngxml::dom::Element> projectElement(new sngxml::dom::Element(U"project"));
     projectElement->SetAttribute(U"name", project->Name());
     std::string config = GetConfig();
     for (const std::string& sourceFilePath : project->SourceFilePaths())
@@ -436,23 +427,17 @@ void TestProject(cmajor::ast::Project* project, const std::string& onlySourceFil
         }
         TestSourceFile(first, project, sourceFilePath, onlyTest, projectElement.get(), rootModule);
     }
-    parentElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(projectElement.release()));
+    parentElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(projectElement.release()));
 }
 
-cmajor::parser::Solution* solutionGrammar = nullptr;
-cmajor::parser::Project* projectGrammar = nullptr;
-
-bool TestProject(const std::string& projectFileName, const std::string& onlySourceFile, const std::string& onlyTest, cmajor::dom::Element* parentElement, 
+bool TestProject(const std::string& projectFileName, const std::string& onlySourceFile, const std::string& onlyTest, sngxml::dom::Element* parentElement, 
     std::unique_ptr<Module>& rootModule)
 {
     std::string config = GetConfig();
-    if (!projectGrammar)
-    {
-        projectGrammar = cmajor::parser::Project::Create();
-    }
     MappedInputFile projectFile(projectFileName);
     std::u32string p(ToUtf32(std::string(projectFile.Begin(), projectFile.End())));
-    std::unique_ptr<cmajor::ast::Project> project(projectGrammar->Parse(&p[0], &p[0] + p.length(), 0, projectFileName, config, cmajor::ast::BackEnd::llvm));
+    ContainerFileLexer containerFileLexer(p, projectFileName, 0);
+    std::unique_ptr<sngcm::ast::Project> project = ProjectFileParser::Parse(containerFileLexer, config, sngcm::ast::BackEnd::llvm);
     project->ResolveDeclarations();
     if (project->GetTarget() != Target::unitTest)
     {
@@ -462,21 +447,14 @@ bool TestProject(const std::string& projectFileName, const std::string& onlySour
     return true;
 }
 
-bool TestSolution(const std::string& solutionFileName, const std::string& onlySourceFile, const std::string& onlyTest, cmajor::dom::Element* cmunitElement,
+bool TestSolution(const std::string& solutionFileName, const std::string& onlySourceFile, const std::string& onlyTest, sngxml::dom::Element* cmunitElement,
     std::unique_ptr<Module>& rootModule)
 {
-    std::unique_ptr<cmajor::dom::Element> solutionElement(new cmajor::dom::Element(U"solution"));
-    if (!solutionGrammar)
-    {
-        solutionGrammar = cmajor::parser::Solution::Create();
-    }
-    if (!projectGrammar)
-    {
-        projectGrammar = cmajor::parser::Project::Create();
-    }
+    std::unique_ptr<sngxml::dom::Element> solutionElement(new sngxml::dom::Element(U"solution"));
     MappedInputFile solutionFile(solutionFileName);
     std::u32string s(ToUtf32(std::string(solutionFile.Begin(), solutionFile.End())));
-    std::unique_ptr<cmajor::ast::Solution> solution(solutionGrammar->Parse(&s[0], &s[0] + s.length(), 0, solutionFileName));
+    ContainerFileLexer containerFileLexer(s, solutionFileName, 0);
+    std::unique_ptr<sngcm::ast::Solution> solution = SolutionFileParser::Parse(containerFileLexer);
     solutionElement->SetAttribute(U"name", solution->Name());
     solution->ResolveDeclarations();
     std::string config = GetConfig();
@@ -491,224 +469,224 @@ bool TestSolution(const std::string& solutionFileName, const std::string& onlySo
     }
     if (containsUnitTestProject)
     {
-        cmunitElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(solutionElement.release()));
+        cmunitElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(solutionElement.release()));
     }
     return containsUnitTestProject;
 }
 
-std::unique_ptr<cmajor::dom::Document> GenerateHtmlReport(cmajor::dom::Document* testDoc)
+std::unique_ptr<sngxml::dom::Document> GenerateHtmlReport(sngxml::dom::Document* testDoc)
 {
-    std::unique_ptr<cmajor::dom::Document> reportDoc(new cmajor::dom::Document());
-    std::unique_ptr<cmajor::dom::Element> htmlElement(new cmajor::dom::Element(U"html"));
-    std::unique_ptr<cmajor::dom::Element> headElement(new cmajor::dom::Element(U"head"));
-    std::unique_ptr<cmajor::dom::Element> titleElement(new cmajor::dom::Element(U"title"));
-    titleElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new cmajor::dom::Text(U"Unit Test Report")));
-    std::unique_ptr<cmajor::dom::Element> styleElement(new cmajor::dom::Element(U"style"));
+    std::unique_ptr<sngxml::dom::Document> reportDoc(new sngxml::dom::Document());
+    std::unique_ptr<sngxml::dom::Element> htmlElement(new sngxml::dom::Element(U"html"));
+    std::unique_ptr<sngxml::dom::Element> headElement(new sngxml::dom::Element(U"head"));
+    std::unique_ptr<sngxml::dom::Element> titleElement(new sngxml::dom::Element(U"title"));
+    titleElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::Text(U"Unit Test Report")));
+    std::unique_ptr<sngxml::dom::Element> styleElement(new sngxml::dom::Element(U"style"));
     std::u32string style = 
         U"body { max-width: 800px; } h1, h2, h3, h4, h5, h6 { color: #005ab4; font-family: sans-serif; } table { boder-collapse: collapse; } table, th, td { text-align: left; border: 1px solid #dddddd; padding: 8px; }";
-    styleElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new cmajor::dom::Text(style)));
-    std::unique_ptr<cmajor::dom::Element> bodyElement(new cmajor::dom::Element(U"body"));
-    std::unique_ptr<cmajor::dom::Element> h1Element(new cmajor::dom::Element(U"h1"));
-    h1Element->AppendChild(std::unique_ptr<cmajor::dom::Node>(new cmajor::dom::Text(U"Unit Test Report")));
-    bodyElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(h1Element.release()));
-    cmajor::dom::Element* cmunitElement = testDoc->DocumentElement();
+    styleElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::Text(style)));
+    std::unique_ptr<sngxml::dom::Element> bodyElement(new sngxml::dom::Element(U"body"));
+    std::unique_ptr<sngxml::dom::Element> h1Element(new sngxml::dom::Element(U"h1"));
+    h1Element->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::Text(U"Unit Test Report")));
+    bodyElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(h1Element.release()));
+    sngxml::dom::Element* cmunitElement = testDoc->DocumentElement();
 
-    std::unique_ptr<cmajor::dom::Element> paramTableElement(new cmajor::dom::Element(U"table"));
+    std::unique_ptr<sngxml::dom::Element> paramTableElement(new sngxml::dom::Element(U"table"));
 
     std::u32string configuration = cmunitElement->GetAttribute(U"config");
-    std::unique_ptr<cmajor::dom::Element> trConfigElement(new cmajor::dom::Element(U"tr"));
-    std::unique_ptr<cmajor::dom::Element> thConfigElement(new cmajor::dom::Element(U"th"));
-    thConfigElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new cmajor::dom::Text(U"configuration")));
-    trConfigElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(thConfigElement.release()));
-    std::unique_ptr<cmajor::dom::Element> tdConfigElement(new cmajor::dom::Element(U"td"));
-    tdConfigElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new cmajor::dom::Text(configuration)));
-    trConfigElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(tdConfigElement.release()));
-    paramTableElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(trConfigElement.release()));
+    std::unique_ptr<sngxml::dom::Element> trConfigElement(new sngxml::dom::Element(U"tr"));
+    std::unique_ptr<sngxml::dom::Element> thConfigElement(new sngxml::dom::Element(U"th"));
+    thConfigElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::Text(U"configuration")));
+    trConfigElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(thConfigElement.release()));
+    std::unique_ptr<sngxml::dom::Element> tdConfigElement(new sngxml::dom::Element(U"td"));
+    tdConfigElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::Text(configuration)));
+    trConfigElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(tdConfigElement.release()));
+    paramTableElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(trConfigElement.release()));
 
     std::u32string start = cmunitElement->GetAttribute(U"start");
-    std::unique_ptr<cmajor::dom::Element> trStartElement(new cmajor::dom::Element(U"tr"));
-    std::unique_ptr<cmajor::dom::Element> thStartElement(new cmajor::dom::Element(U"th"));
-    thStartElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new cmajor::dom::Text(U"start")));
-    trStartElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(thStartElement.release()));
-    std::unique_ptr<cmajor::dom::Element> tdStartElement(new cmajor::dom::Element(U"td"));
-    tdStartElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new cmajor::dom::Text(start)));
-    trStartElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(tdStartElement.release()));
-    paramTableElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(trStartElement.release()));
+    std::unique_ptr<sngxml::dom::Element> trStartElement(new sngxml::dom::Element(U"tr"));
+    std::unique_ptr<sngxml::dom::Element> thStartElement(new sngxml::dom::Element(U"th"));
+    thStartElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::Text(U"start")));
+    trStartElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(thStartElement.release()));
+    std::unique_ptr<sngxml::dom::Element> tdStartElement(new sngxml::dom::Element(U"td"));
+    tdStartElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::Text(start)));
+    trStartElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(tdStartElement.release()));
+    paramTableElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(trStartElement.release()));
 
     std::u32string end = cmunitElement->GetAttribute(U"end");
-    std::unique_ptr<cmajor::dom::Element> trEndElement(new cmajor::dom::Element(U"tr"));
-    std::unique_ptr<cmajor::dom::Element> thEndElement(new cmajor::dom::Element(U"th"));
-    thEndElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new cmajor::dom::Text(U"end")));
-    trEndElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(thEndElement.release()));
-    std::unique_ptr<cmajor::dom::Element> tdEndElement(new cmajor::dom::Element(U"td"));
-    tdEndElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new cmajor::dom::Text(end)));
-    trEndElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(tdEndElement.release()));
-    paramTableElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(trEndElement.release()));
+    std::unique_ptr<sngxml::dom::Element> trEndElement(new sngxml::dom::Element(U"tr"));
+    std::unique_ptr<sngxml::dom::Element> thEndElement(new sngxml::dom::Element(U"th"));
+    thEndElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::Text(U"end")));
+    trEndElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(thEndElement.release()));
+    std::unique_ptr<sngxml::dom::Element> tdEndElement(new sngxml::dom::Element(U"td"));
+    tdEndElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::Text(end)));
+    trEndElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(tdEndElement.release()));
+    paramTableElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(trEndElement.release()));
 
     std::u32string duration = cmunitElement->GetAttribute(U"duration");
-    std::unique_ptr<cmajor::dom::Element> trDurationElement(new cmajor::dom::Element(U"tr"));
-    std::unique_ptr<cmajor::dom::Element> thDurationElement(new cmajor::dom::Element(U"th"));
-    thDurationElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new cmajor::dom::Text(U"duration")));
-    trDurationElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(thDurationElement.release()));
-    std::unique_ptr<cmajor::dom::Element> tdDurationElement(new cmajor::dom::Element(U"td"));
-    tdDurationElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new cmajor::dom::Text(duration)));
-    trDurationElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(tdDurationElement.release()));
-    paramTableElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(trDurationElement.release()));
+    std::unique_ptr<sngxml::dom::Element> trDurationElement(new sngxml::dom::Element(U"tr"));
+    std::unique_ptr<sngxml::dom::Element> thDurationElement(new sngxml::dom::Element(U"th"));
+    thDurationElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::Text(U"duration")));
+    trDurationElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(thDurationElement.release()));
+    std::unique_ptr<sngxml::dom::Element> tdDurationElement(new sngxml::dom::Element(U"td"));
+    tdDurationElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::Text(duration)));
+    trDurationElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(tdDurationElement.release()));
+    paramTableElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(trDurationElement.release()));
 
     std::u32string file = cmunitElement->GetAttribute(U"file");
-    std::unique_ptr<cmajor::dom::Element> trFileElement(new cmajor::dom::Element(U"tr"));
-    std::unique_ptr<cmajor::dom::Element> thFileElement(new cmajor::dom::Element(U"th"));
-    thFileElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new cmajor::dom::Text(U"file")));
-    trFileElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(thFileElement.release()));
-    std::unique_ptr<cmajor::dom::Element> tdFileElement(new cmajor::dom::Element(U"td"));
-    tdFileElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new cmajor::dom::Text(file)));
-    trFileElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(tdFileElement.release()));
-    paramTableElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(trFileElement.release()));
+    std::unique_ptr<sngxml::dom::Element> trFileElement(new sngxml::dom::Element(U"tr"));
+    std::unique_ptr<sngxml::dom::Element> thFileElement(new sngxml::dom::Element(U"th"));
+    thFileElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::Text(U"file")));
+    trFileElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(thFileElement.release()));
+    std::unique_ptr<sngxml::dom::Element> tdFileElement(new sngxml::dom::Element(U"td"));
+    tdFileElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::Text(file)));
+    trFileElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(tdFileElement.release()));
+    paramTableElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(trFileElement.release()));
 
     std::u32string test = cmunitElement->GetAttribute(U"test");
-    std::unique_ptr<cmajor::dom::Element> trTestElement(new cmajor::dom::Element(U"tr"));
-    std::unique_ptr<cmajor::dom::Element> thTestElement(new cmajor::dom::Element(U"th"));
-    thTestElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new cmajor::dom::Text(U"test")));
-    trTestElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(thTestElement.release()));
-    std::unique_ptr<cmajor::dom::Element> tdTestElement(new cmajor::dom::Element(U"td"));
-    tdTestElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new cmajor::dom::Text(test)));
-    trTestElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(tdTestElement.release()));
-    paramTableElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(trTestElement.release()));
+    std::unique_ptr<sngxml::dom::Element> trTestElement(new sngxml::dom::Element(U"tr"));
+    std::unique_ptr<sngxml::dom::Element> thTestElement(new sngxml::dom::Element(U"th"));
+    thTestElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::Text(U"test")));
+    trTestElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(thTestElement.release()));
+    std::unique_ptr<sngxml::dom::Element> tdTestElement(new sngxml::dom::Element(U"td"));
+    tdTestElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::Text(test)));
+    trTestElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(tdTestElement.release()));
+    paramTableElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(trTestElement.release()));
 
-    bodyElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(paramTableElement.release()));
+    bodyElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(paramTableElement.release()));
 
-    std::unique_ptr<cmajor::dom::Element> h2ComponentsElement(new cmajor::dom::Element(U"h2"));
-    h2ComponentsElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new cmajor::dom::Text(U"Components")));
-    bodyElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(h2ComponentsElement.release()));
+    std::unique_ptr<sngxml::dom::Element> h2ComponentsElement(new sngxml::dom::Element(U"h2"));
+    h2ComponentsElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::Text(U"Components")));
+    bodyElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(h2ComponentsElement.release()));
 
-    std::unique_ptr<cmajor::dom::Element> ulElement(new cmajor::dom::Element(U"ul"));
-    std::unique_ptr<XPathObject> components = Evaluate(U"cmunit/components/component/text()", testDoc);
-    if (components && components->Type() == cmajor::xpath::XPathObjectType::nodeSet)
+    std::unique_ptr<sngxml::dom::Element> ulElement(new sngxml::dom::Element(U"ul"));
+    std::unique_ptr<sngxml::xpath::XPathObject> components = sngxml::xpath::Evaluate(U"cmunit/components/component/text()", testDoc);
+    if (components && components->Type() == sngxml::xpath::XPathObjectType::nodeSet)
     {
-        XPathNodeSet* componentsSet = static_cast<XPathNodeSet*>(components.get());
+        sngxml::xpath::XPathNodeSet* componentsSet = static_cast<sngxml::xpath::XPathNodeSet*>(components.get());
         int n = componentsSet->Length();
         for (int i = 0; i < n; ++i)
         {
-            cmajor::dom::Node* componentNode = (*componentsSet)[i];
-            if (componentNode->GetNodeType() == cmajor::dom::NodeType::textNode)
+            sngxml::dom::Node* componentNode = (*componentsSet)[i];
+            if (componentNode->GetNodeType() == sngxml::dom::NodeType::textNode)
             {
-                cmajor::dom::Text* component = static_cast<cmajor::dom::Text*>(componentNode);
-                std::unique_ptr<cmajor::dom::Element> liElement(new cmajor::dom::Element(U"li"));
-                liElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new cmajor::dom::Text(component->Data())));
-                ulElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(liElement.release()));
+                sngxml::dom::Text* component = static_cast<sngxml::dom::Text*>(componentNode);
+                std::unique_ptr<sngxml::dom::Element> liElement(new sngxml::dom::Element(U"li"));
+                liElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::Text(component->Data())));
+                ulElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(liElement.release()));
             }
         }
     }
-    bodyElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(ulElement.release()));
+    bodyElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(ulElement.release()));
 
-    std::unique_ptr<cmajor::dom::Element> h2Element(new cmajor::dom::Element(U"h2"));
-    h2Element->AppendChild(std::unique_ptr<cmajor::dom::Node>(new cmajor::dom::Text(U"Results")));
-    bodyElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(h2Element.release()));
+    std::unique_ptr<sngxml::dom::Element> h2Element(new sngxml::dom::Element(U"h2"));
+    h2Element->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::Text(U"Results")));
+    bodyElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(h2Element.release()));
 
-    std::unique_ptr<cmajor::dom::Element> tableElement(new cmajor::dom::Element(U"table"));
+    std::unique_ptr<sngxml::dom::Element> tableElement(new sngxml::dom::Element(U"table"));
 
-    std::unique_ptr<cmajor::dom::Element> trHeaderElement(new cmajor::dom::Element(U"tr"));
-    std::unique_ptr<cmajor::dom::Element> thNameElement(new cmajor::dom::Element(U"th"));
-    thNameElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new cmajor::dom::Text(U"name")));
-    trHeaderElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(thNameElement.release()));
+    std::unique_ptr<sngxml::dom::Element> trHeaderElement(new sngxml::dom::Element(U"tr"));
+    std::unique_ptr<sngxml::dom::Element> thNameElement(new sngxml::dom::Element(U"th"));
+    thNameElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::Text(U"name")));
+    trHeaderElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(thNameElement.release()));
 
-    std::unique_ptr<cmajor::dom::Element> thCountElement(new cmajor::dom::Element(U"th"));
-    thCountElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new cmajor::dom::Text(U"count")));
-    trHeaderElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(thCountElement.release()));
+    std::unique_ptr<sngxml::dom::Element> thCountElement(new sngxml::dom::Element(U"th"));
+    thCountElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::Text(U"count")));
+    trHeaderElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(thCountElement.release()));
 
-    std::unique_ptr<cmajor::dom::Element> thPassedElement(new cmajor::dom::Element(U"th"));
-    thPassedElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new cmajor::dom::Text(U"passed")));
-    trHeaderElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(thPassedElement.release()));
+    std::unique_ptr<sngxml::dom::Element> thPassedElement(new sngxml::dom::Element(U"th"));
+    thPassedElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::Text(U"passed")));
+    trHeaderElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(thPassedElement.release()));
 
-    std::unique_ptr<cmajor::dom::Element> thFailedElement(new cmajor::dom::Element(U"th"));
-    thFailedElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new cmajor::dom::Text(U"failed")));
-    trHeaderElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(thFailedElement.release()));
+    std::unique_ptr<sngxml::dom::Element> thFailedElement(new sngxml::dom::Element(U"th"));
+    thFailedElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::Text(U"failed")));
+    trHeaderElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(thFailedElement.release()));
 
-    std::unique_ptr<cmajor::dom::Element> thEmptyElement(new cmajor::dom::Element(U"th"));
-    thEmptyElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new cmajor::dom::Text(U"empty")));
-    trHeaderElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(thEmptyElement.release()));
+    std::unique_ptr<sngxml::dom::Element> thEmptyElement(new sngxml::dom::Element(U"th"));
+    thEmptyElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::Text(U"empty")));
+    trHeaderElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(thEmptyElement.release()));
 
-    std::unique_ptr<cmajor::dom::Element> thExitCodeElement(new cmajor::dom::Element(U"th"));
-    thExitCodeElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new cmajor::dom::Text(U"exit code")));
-    trHeaderElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(thExitCodeElement.release()));
+    std::unique_ptr<sngxml::dom::Element> thExitCodeElement(new sngxml::dom::Element(U"th"));
+    thExitCodeElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::Text(U"exit code")));
+    trHeaderElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(thExitCodeElement.release()));
 
-    std::unique_ptr<cmajor::dom::Element> thCompileErrorElement(new cmajor::dom::Element(U"th"));
-    thCompileErrorElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new cmajor::dom::Text(U"compile error")));
-    trHeaderElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(thCompileErrorElement.release()));
+    std::unique_ptr<sngxml::dom::Element> thCompileErrorElement(new sngxml::dom::Element(U"th"));
+    thCompileErrorElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::Text(U"compile error")));
+    trHeaderElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(thCompileErrorElement.release()));
 
-    std::unique_ptr<cmajor::dom::Element> thExceptionElement(new cmajor::dom::Element(U"th"));
-    thExceptionElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new cmajor::dom::Text(U"exception")));
-    trHeaderElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(thExceptionElement.release()));
+    std::unique_ptr<sngxml::dom::Element> thExceptionElement(new sngxml::dom::Element(U"th"));
+    thExceptionElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::Text(U"exception")));
+    trHeaderElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(thExceptionElement.release()));
 
-    std::vector<std::pair<std::u32string, cmajor::dom::Element*>> failedAssertions;
+    std::vector<std::pair<std::u32string, sngxml::dom::Element*>> failedAssertions;
 
-    tableElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(trHeaderElement.release()));
+    tableElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(trHeaderElement.release()));
 
-    std::unique_ptr<XPathObject> tests = Evaluate(U"//test", testDoc);
-    if (tests && tests->Type() == XPathObjectType::nodeSet)
+    std::unique_ptr<sngxml::xpath::XPathObject> tests = sngxml::xpath::Evaluate(U"//test", testDoc);
+    if (tests && tests->Type() == sngxml::xpath::XPathObjectType::nodeSet)
     {
-        XPathNodeSet* testElements = static_cast<XPathNodeSet*>(tests.get());
+        sngxml::xpath::XPathNodeSet* testElements = static_cast<sngxml::xpath::XPathNodeSet*>(tests.get());
         int n = testElements->Length();
         for (int i = 0; i < n; ++i)
         {
-            cmajor::dom::Node* testNode = (*testElements)[i];
-            if (testNode->GetNodeType() == cmajor::dom::NodeType::elementNode)
+            sngxml::dom::Node* testNode = (*testElements)[i];
+            if (testNode->GetNodeType() == sngxml::dom::NodeType::elementNode)
             {
-                cmajor::dom::Element* testElement = static_cast<cmajor::dom::Element*>(testNode);
+                sngxml::dom::Element* testElement = static_cast<sngxml::dom::Element*>(testNode);
                 std::u32string name = testElement->GetAttribute(U"name");
                 std::u32string fullTestName = name;
-                cmajor::dom::ParentNode* sourceFileNode = testElement->Parent();
+                sngxml::dom::ParentNode* sourceFileNode = testElement->Parent();
                 if (sourceFileNode)
                 {
-                    if (sourceFileNode->GetNodeType() == cmajor::dom::NodeType::elementNode)
+                    if (sourceFileNode->GetNodeType() == sngxml::dom::NodeType::elementNode)
                     {
-                        cmajor::dom::Element* sourceFileElement = static_cast<cmajor::dom::Element*>(sourceFileNode);
+                        sngxml::dom::Element* sourceFileElement = static_cast<sngxml::dom::Element*>(sourceFileNode);
                         name = sourceFileElement->GetAttribute(U"name");
                         fullTestName = name + U"." + fullTestName;
-                        cmajor::dom::ParentNode* projectNode = sourceFileElement->Parent();
+                        sngxml::dom::ParentNode* projectNode = sourceFileElement->Parent();
                         if (projectNode)
                         {
-                            if (projectNode->GetNodeType() == cmajor::dom::NodeType::elementNode)
+                            if (projectNode->GetNodeType() == sngxml::dom::NodeType::elementNode)
                             {
-                                cmajor::dom::Element* projectElement = static_cast<cmajor::dom::Element*>(projectNode);
+                                sngxml::dom::Element* projectElement = static_cast<sngxml::dom::Element*>(projectNode);
                                 name = projectElement->GetAttribute(U"name");
                                 fullTestName = name + U"." + fullTestName;
-                                cmajor::dom::ParentNode* parentNode = projectElement->Parent();
+                                sngxml::dom::ParentNode* parentNode = projectElement->Parent();
                                 if (parentNode)
                                 {
-                                    if (parentNode->GetNodeType() == cmajor::dom::NodeType::elementNode)
+                                    if (parentNode->GetNodeType() == sngxml::dom::NodeType::elementNode)
                                     {
-                                        cmajor::dom::Element* parentElement = static_cast<cmajor::dom::Element*>(parentNode);
+                                        sngxml::dom::Element* parentElement = static_cast<sngxml::dom::Element*>(parentNode);
                                         if (parentElement->Name() == U"solution")
                                         {
-                                            cmajor::dom::Element* solutionElement = parentElement;
+                                            sngxml::dom::Element* solutionElement = parentElement;
                                             name = solutionElement->GetAttribute(U"name");
                                             fullTestName = name + U"." + fullTestName;
                                         }
 
-                                        std::unique_ptr<cmajor::dom::Element> trElement(new cmajor::dom::Element(U"tr"));
-                                        std::unique_ptr<cmajor::dom::Element> tdNameElement(new cmajor::dom::Element(U"td"));
-                                        cmajor::dom::Element* nameElement = tdNameElement.get();
-                                        tdNameElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new cmajor::dom::Text(fullTestName)));
-                                        trElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(tdNameElement.release()));
-                                        std::unique_ptr<cmajor::dom::Element> tdCountElement(new cmajor::dom::Element(U"td"));
-                                        tdCountElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new cmajor::dom::Text(testElement->GetAttribute(U"count"))));
-                                        trElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(tdCountElement.release()));
-                                        std::unique_ptr<XPathObject> assertions = Evaluate(U"assertion", testElement);
+                                        std::unique_ptr<sngxml::dom::Element> trElement(new sngxml::dom::Element(U"tr"));
+                                        std::unique_ptr<sngxml::dom::Element> tdNameElement(new sngxml::dom::Element(U"td"));
+                                        sngxml::dom::Element* nameElement = tdNameElement.get();
+                                        tdNameElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::Text(fullTestName)));
+                                        trElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(tdNameElement.release()));
+                                        std::unique_ptr<sngxml::dom::Element> tdCountElement(new sngxml::dom::Element(U"td"));
+                                        tdCountElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::Text(testElement->GetAttribute(U"count"))));
+                                        trElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(tdCountElement.release()));
+                                        std::unique_ptr<sngxml::xpath::XPathObject> assertions = sngxml::xpath::Evaluate(U"assertion", testElement);
                                         int passed = 0;
                                         int failed = 0;
                                         int empty = 0;
                                         int count = 0;
-                                        if (assertions && assertions->Type() == cmajor::xpath::XPathObjectType::nodeSet)
+                                        if (assertions && assertions->Type() == sngxml::xpath::XPathObjectType::nodeSet)
                                         {
-                                            XPathNodeSet* assertionElements = static_cast<XPathNodeSet*>(assertions.get());
+                                            sngxml::xpath::XPathNodeSet* assertionElements = static_cast<sngxml::xpath::XPathNodeSet*>(assertions.get());
                                             count = assertionElements->Length();
                                             for (int i = 0; i < count; ++i)
                                             {
-                                                cmajor::dom::Node* assertionNode = (*assertionElements)[i];
-                                                if (assertionNode->GetNodeType() == cmajor::dom::NodeType::elementNode)
+                                                sngxml::dom::Node* assertionNode = (*assertionElements)[i];
+                                                if (assertionNode->GetNodeType() == sngxml::dom::NodeType::elementNode)
                                                 {
-                                                    cmajor::dom::Element* assertionElement = static_cast<cmajor::dom::Element*>(assertionNode);
+                                                    sngxml::dom::Element* assertionElement = static_cast<sngxml::dom::Element*>(assertionNode);
                                                     std::u32string result = assertionElement->GetAttribute(U"result");
                                                     if (result == U"passed")
                                                     {
@@ -746,37 +724,37 @@ std::unique_ptr<cmajor::dom::Document> GenerateHtmlReport(cmajor::dom::Document*
                                         {
                                             nameElement->SetAttribute(U"style", U"background-color: #ffff00; " + fontAttr);
                                         }
-                                        std::unique_ptr<cmajor::dom::Element> tdPassedElement(new cmajor::dom::Element(U"td"));
-                                        tdPassedElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new cmajor::dom::Text(ToUtf32(std::to_string(passed)))));
-                                        trElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(tdPassedElement.release()));
+                                        std::unique_ptr<sngxml::dom::Element> tdPassedElement(new sngxml::dom::Element(U"td"));
+                                        tdPassedElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::Text(ToUtf32(std::to_string(passed)))));
+                                        trElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(tdPassedElement.release()));
 
-                                        std::unique_ptr<cmajor::dom::Element> tdFailedElement(new cmajor::dom::Element(U"td"));
-                                        tdFailedElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new cmajor::dom::Text(ToUtf32(std::to_string(failed)))));
-                                        trElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(tdFailedElement.release()));
+                                        std::unique_ptr<sngxml::dom::Element> tdFailedElement(new sngxml::dom::Element(U"td"));
+                                        tdFailedElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::Text(ToUtf32(std::to_string(failed)))));
+                                        trElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(tdFailedElement.release()));
 
                                         if (count == 0)
                                         {
-                                            std::unique_ptr<cmajor::dom::Element> tdEmptyElement(new cmajor::dom::Element(U"td"));
-                                            tdEmptyElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new cmajor::dom::Text(testElement->GetAttribute(U"count"))));
-                                            trElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(tdEmptyElement.release()));
+                                            std::unique_ptr<sngxml::dom::Element> tdEmptyElement(new sngxml::dom::Element(U"td"));
+                                            tdEmptyElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::Text(testElement->GetAttribute(U"count"))));
+                                            trElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(tdEmptyElement.release()));
                                         }
                                         else
                                         {
-                                            std::unique_ptr<cmajor::dom::Element> tdEmptyElement(new cmajor::dom::Element(U"td"));
-                                            tdEmptyElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new cmajor::dom::Text(ToUtf32(std::to_string(empty)))));
-                                            trElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(tdEmptyElement.release()));
+                                            std::unique_ptr<sngxml::dom::Element> tdEmptyElement(new sngxml::dom::Element(U"td"));
+                                            tdEmptyElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::Text(ToUtf32(std::to_string(empty)))));
+                                            trElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(tdEmptyElement.release()));
                                         }
 
-                                        std::unique_ptr<cmajor::dom::Element> tdExitCodeElement(new cmajor::dom::Element(U"td"));
-                                        tdExitCodeElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new cmajor::dom::Text(testElement->GetAttribute(U"exitCode"))));
-                                        trElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(tdExitCodeElement.release()));
-                                        std::unique_ptr<cmajor::dom::Element> tdCompileErrorElement(new cmajor::dom::Element(U"td")); 
-                                        tdCompileErrorElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new cmajor::dom::Text(testElement->GetAttribute(U"compileError"))));
-                                        trElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(tdCompileErrorElement.release()));
-                                        std::unique_ptr<cmajor::dom::Element> tdExceptionElement(new cmajor::dom::Element(U"td")); 
-                                        tdExceptionElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new cmajor::dom::Text(testElement->GetAttribute(U"exception"))));
-                                        trElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(tdExceptionElement.release()));
-                                        tableElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(trElement.release()));
+                                        std::unique_ptr<sngxml::dom::Element> tdExitCodeElement(new sngxml::dom::Element(U"td"));
+                                        tdExitCodeElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::Text(testElement->GetAttribute(U"exitCode"))));
+                                        trElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(tdExitCodeElement.release()));
+                                        std::unique_ptr<sngxml::dom::Element> tdCompileErrorElement(new sngxml::dom::Element(U"td")); 
+                                        tdCompileErrorElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::Text(testElement->GetAttribute(U"compileError"))));
+                                        trElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(tdCompileErrorElement.release()));
+                                        std::unique_ptr<sngxml::dom::Element> tdExceptionElement(new sngxml::dom::Element(U"td")); 
+                                        tdExceptionElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::Text(testElement->GetAttribute(U"exception"))));
+                                        trElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(tdExceptionElement.release()));
+                                        tableElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(trElement.release()));
                                     }
                                 }
                             }
@@ -786,64 +764,64 @@ std::unique_ptr<cmajor::dom::Document> GenerateHtmlReport(cmajor::dom::Document*
             }
         }
     }
-    bodyElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(tableElement.release()));
+    bodyElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(tableElement.release()));
 
     if (!failedAssertions.empty())
     {
-        std::unique_ptr<cmajor::dom::Element> h2Element(new cmajor::dom::Element(U"h2"));
-        h2Element->AppendChild(std::unique_ptr<cmajor::dom::Node>(new cmajor::dom::Text(U"Failed Assertions")));
-        bodyElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(h2Element.release()));
+        std::unique_ptr<sngxml::dom::Element> h2Element(new sngxml::dom::Element(U"h2"));
+        h2Element->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::Text(U"Failed Assertions")));
+        bodyElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(h2Element.release()));
 
-        std::unique_ptr<cmajor::dom::Element> failedAssertionsTable(new cmajor::dom::Element(U"table"));
+        std::unique_ptr<sngxml::dom::Element> failedAssertionsTable(new sngxml::dom::Element(U"table"));
 
-        std::unique_ptr<cmajor::dom::Element> trHeaderElement(new cmajor::dom::Element(U"tr"));
+        std::unique_ptr<sngxml::dom::Element> trHeaderElement(new sngxml::dom::Element(U"tr"));
 
-        std::unique_ptr<cmajor::dom::Element> thNameElement(new cmajor::dom::Element(U"th"));
-        thNameElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new cmajor::dom::Text(U"name")));
-        trHeaderElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(thNameElement.release()));
+        std::unique_ptr<sngxml::dom::Element> thNameElement(new sngxml::dom::Element(U"th"));
+        thNameElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::Text(U"name")));
+        trHeaderElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(thNameElement.release()));
 
-        std::unique_ptr<cmajor::dom::Element> thIndexElement(new cmajor::dom::Element(U"th"));
-        thIndexElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new cmajor::dom::Text(U"index")));
-        trHeaderElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(thIndexElement.release()));
+        std::unique_ptr<sngxml::dom::Element> thIndexElement(new sngxml::dom::Element(U"th"));
+        thIndexElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::Text(U"index")));
+        trHeaderElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(thIndexElement.release()));
 
-        std::unique_ptr<cmajor::dom::Element> thLineElement(new cmajor::dom::Element(U"th"));
-        thLineElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new cmajor::dom::Text(U"line")));
-        trHeaderElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(thLineElement.release()));
+        std::unique_ptr<sngxml::dom::Element> thLineElement(new sngxml::dom::Element(U"th"));
+        thLineElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::Text(U"line")));
+        trHeaderElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(thLineElement.release()));
 
-        failedAssertionsTable->AppendChild(std::unique_ptr<cmajor::dom::Node>(trHeaderElement.release()));
+        failedAssertionsTable->AppendChild(std::unique_ptr<sngxml::dom::Node>(trHeaderElement.release()));
 
         int n = failedAssertions.size();
         for (int i = 0; i < n; ++i)
         {
-            const std::pair<std::u32string, cmajor::dom::Element*>& p = failedAssertions[i];
-            std::unique_ptr<cmajor::dom::Element> trAssertionElement(new cmajor::dom::Element(U"tr"));
-            cmajor::dom::Element* assertionElement = p.second;
+            const std::pair<std::u32string, sngxml::dom::Element*>& p = failedAssertions[i];
+            std::unique_ptr<sngxml::dom::Element> trAssertionElement(new sngxml::dom::Element(U"tr"));
+            sngxml::dom::Element* assertionElement = p.second;
 
-            std::unique_ptr<cmajor::dom::Element> tdNameElement(new cmajor::dom::Element(U"td"));
+            std::unique_ptr<sngxml::dom::Element> tdNameElement(new sngxml::dom::Element(U"td"));
             std::u32string attr = U"background-color: #ff3300; font-family: sans-serif; font-size: 13px; font-weight: bold;";
             tdNameElement->SetAttribute(U"style", attr);
-            tdNameElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new cmajor::dom::Text(p.first)));
-            trAssertionElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(tdNameElement.release()));
+            tdNameElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::Text(p.first)));
+            trAssertionElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(tdNameElement.release()));
 
-            std::unique_ptr<cmajor::dom::Element> tdIndexElement(new cmajor::dom::Element(U"td"));
-            tdIndexElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new cmajor::dom::Text(assertionElement->GetAttribute(U"index"))));
-            trAssertionElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(tdIndexElement.release()));
+            std::unique_ptr<sngxml::dom::Element> tdIndexElement(new sngxml::dom::Element(U"td"));
+            tdIndexElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::Text(assertionElement->GetAttribute(U"index"))));
+            trAssertionElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(tdIndexElement.release()));
 
-            std::unique_ptr<cmajor::dom::Element> tdLineElement(new cmajor::dom::Element(U"td"));
-            tdLineElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new cmajor::dom::Text(assertionElement->GetAttribute(U"line"))));
-            trAssertionElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(tdLineElement.release()));
+            std::unique_ptr<sngxml::dom::Element> tdLineElement(new sngxml::dom::Element(U"td"));
+            tdLineElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::Text(assertionElement->GetAttribute(U"line"))));
+            trAssertionElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(tdLineElement.release()));
 
-            failedAssertionsTable->AppendChild(std::unique_ptr<cmajor::dom::Node>(trAssertionElement.release()));
+            failedAssertionsTable->AppendChild(std::unique_ptr<sngxml::dom::Node>(trAssertionElement.release()));
         }
 
-        bodyElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(failedAssertionsTable.release()));
+        bodyElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(failedAssertionsTable.release()));
     }
 
-    headElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(titleElement.release()));
-    headElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(styleElement.release()));
-    htmlElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(headElement.release()));
-    htmlElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(bodyElement.release()));
-    reportDoc->AppendChild(std::unique_ptr<cmajor::dom::Node>(htmlElement.release()));
+    headElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(titleElement.release()));
+    headElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(styleElement.release()));
+    htmlElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(headElement.release()));
+    htmlElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(bodyElement.release()));
+    reportDoc->AppendChild(std::unique_ptr<sngxml::dom::Node>(htmlElement.release()));
     return reportDoc;
 }
 
@@ -854,9 +832,9 @@ int main(int argc, const char** argv)
     {
         InitDone initDone;
         SetCompilerVersion(version);
-        std::unique_ptr<cmajor::dom::Element> cmunitElement(new cmajor::dom::Element(U"cmunit"));
+        std::unique_ptr<sngxml::dom::Element> cmunitElement(new sngxml::dom::Element(U"cmunit"));
         cmunitElement->SetAttribute(U"start", ToUtf32(GetCurrentDateTime().ToString()));
-        std::unique_ptr<cmajor::dom::Element> componentsElement(new cmajor::dom::Element(U"components"));
+        std::unique_ptr<sngxml::dom::Element> componentsElement(new sngxml::dom::Element(U"components"));
         std::chrono::time_point<std::chrono::steady_clock> start = std::chrono::steady_clock::now();
         SetGlobalFlag(GlobalFlags::unitTest);
         std::vector<std::string> projectsAndSolutions;
@@ -1008,9 +986,9 @@ int main(int argc, const char** argv)
                     else
                     {
                         std::string solutionFileName = GetFullPath(fp.generic_string());
-                        std::unique_ptr<cmajor::dom::Element> componentElement(new cmajor::dom::Element(U"component"));
-                        componentElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new cmajor::dom::Text(ToUtf32(Path::GetFileName(solutionFileName)))));
-                        componentsElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(componentElement.release()));
+                        std::unique_ptr<sngxml::dom::Element> componentElement(new sngxml::dom::Element(U"component"));
+                        componentElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::Text(ToUtf32(Path::GetFileName(solutionFileName)))));
+                        componentsElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(componentElement.release()));
                         bool solutionContainsUnitTestProject = TestSolution(solutionFileName, onlySourceFile, onlyTest, cmunitElement.get(), rootModule);
                         if (solutionContainsUnitTestProject)
                         {
@@ -1027,9 +1005,9 @@ int main(int argc, const char** argv)
                     else
                     {
                         std::string projectFileName = GetFullPath(fp.generic_string());
-                        std::unique_ptr<cmajor::dom::Element> componentElement(new cmajor::dom::Element(U"component"));
-                        componentElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(new cmajor::dom::Text(ToUtf32(Path::GetFileName(projectFileName)))));
-                        componentsElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(componentElement.release()));
+                        std::unique_ptr<sngxml::dom::Element> componentElement(new sngxml::dom::Element(U"component"));
+                        componentElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::Text(ToUtf32(Path::GetFileName(projectFileName)))));
+                        componentsElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(componentElement.release()));
                         bool projectIsUnitTestProject = TestProject(projectFileName, onlySourceFile, onlyTest, cmunitElement.get(), rootModule);
                         if (projectIsUnitTestProject)
                         {
@@ -1052,7 +1030,7 @@ int main(int argc, const char** argv)
             }
         }
         cmunitElement->SetAttribute(U"end", ToUtf32(GetCurrentDateTime().ToString()));
-        cmunitElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(componentsElement.release()));
+        cmunitElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(componentsElement.release()));
         std::chrono::time_point<std::chrono::steady_clock> end = std::chrono::steady_clock::now();
         int durationSecs = std::chrono::duration_cast<std::chrono::seconds>(end - start).count();
         int hours = durationSecs / 3600;
@@ -1068,8 +1046,8 @@ int main(int argc, const char** argv)
         durationStr.append(1, '0' + (secs / 10));
         durationStr.append(1, '0' + (secs % 10));
         cmunitElement->SetAttribute(U"duration", ToUtf32(durationStr));
-        cmajor::dom::Document testDoc;
-        testDoc.AppendChild(std::unique_ptr<cmajor::dom::Node>(cmunitElement.release()));
+        sngxml::dom::Document testDoc;
+        testDoc.AppendChild(std::unique_ptr<sngxml::dom::Node>(cmunitElement.release()));
         if (outFile.empty())
         {
             outFile = "cmunit";
@@ -1077,17 +1055,17 @@ int main(int argc, const char** argv)
         }
         std::string cmunitFileName = GetFullPath(boost::filesystem::path(outFile).replace_extension(".xml").generic_string());
         std::ofstream cmunitXmlFile(cmunitFileName);
-        cmajor::util::CodeFormatter formatter(cmunitXmlFile);
+        soulng::util::CodeFormatter formatter(cmunitXmlFile);
         formatter.SetIndentSize(2);
         testDoc.Write(formatter);
         if (GetGlobalFlag(GlobalFlags::verbose))
         {
             std::cout << "==> " << cmunitFileName << std::endl;
         }
-        std::unique_ptr<cmajor::dom::Document> reportDoc = GenerateHtmlReport(&testDoc);
+        std::unique_ptr<sngxml::dom::Document> reportDoc = GenerateHtmlReport(&testDoc);
         std::string cmunitReportFileName = Path::ChangeExtension(cmunitFileName, ".html");
         std::ofstream cmunitHtmlFile(cmunitReportFileName);
-        cmajor::util::CodeFormatter htmlFormatter(cmunitHtmlFile);
+        soulng::util::CodeFormatter htmlFormatter(cmunitHtmlFile);
         htmlFormatter.SetIndentSize(2);
         reportDoc->Write(htmlFormatter);
         if (GetGlobalFlag(GlobalFlags::verbose))

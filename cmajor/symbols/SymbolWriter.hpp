@@ -6,11 +6,11 @@
 #ifndef CMAJOR_SYMBOLS_SYMBOL_WRITER_INCLUDED
 #define CMAJOR_SYMBOLS_SYMBOL_WRITER_INCLUDED
 #include <cmajor/symbols/SymbolsApi.hpp>
-#include <cmajor/ast/AstWriter.hpp>
+#include <sngcm/ast/AstWriter.hpp>
 
 namespace cmajor { namespace symbols {
 
-using namespace cmajor::ast;
+using namespace sngcm::ast;
 
 class Symbol;
 
@@ -21,8 +21,10 @@ public:
     AstWriter& GetAstWriter() { return astWriter; }
     BinaryWriter& GetBinaryWriter() { return astWriter.GetBinaryWriter(); }
     void Write(Symbol* symbol);
+    void SetLexers(std::vector<soulng::lexer::Lexer*>* lexers_);
 private:
     AstWriter astWriter;
+    std::vector<soulng::lexer::Lexer*>* lexers;
 };
 
 } } // namespace cmajor::symbols

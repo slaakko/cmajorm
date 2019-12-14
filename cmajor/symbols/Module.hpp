@@ -7,7 +7,8 @@
 #define CMAJOR_SYMBOLS_MODULE_INCLUDED
 #include <cmajor/symbols/SymbolTable.hpp>
 #include <cmajor/symbols/Warning.hpp>
-#include <cmajor/util/CodeFormatter.hpp>
+#include <sngcm/cmlexer/CmajorLexer.hpp>
+#include <soulng/util/CodeFormatter.hpp>
 #include <mutex>
 #include <set>
 
@@ -36,7 +37,7 @@ const uint8_t currentModuleFormat = moduleFormat_7;
 
 enum class ModuleFlags : uint8_t
 {
-    none = 0, system = 1 << 0, core = 1 << 1, root = 1 << 2, immutable = 1 << 3
+    none = 0, system = 1 << 0, core = 1 << 1, root = 1 << 2, immutable = 1 << 3, compiling = 1 << 4
 };
 
 inline ModuleFlags operator|(ModuleFlags left, ModuleFlags right)
@@ -105,7 +106,11 @@ public:
     uint32_t SymbolTablePos() const { return symbolTablePos; }
     FileTable& GetFileTable() { return fileTable; }
     void RegisterFileTable(FileTable* fileTable, Module* module);
+    void SetLexers(std::vector<std::unique_ptr<CmajorLexer>>&& lexers_);
+    std::vector<soulng::lexer::Lexer*>* GetLexers();
     std::string GetFilePath(int32_t fileIndex) const;
+    std::u32string GetErrorLines(const Span& span) const;
+    void GetColumns(const Span& span, int32_t& startCol, int32_t& endCol) const;
     void Write(SymbolWriter& writer);
     void SetDirectoryPath(const std::string& directoryPath_);
     const std::string& DirectoryPath() const { return directoryPath; }
@@ -170,6 +175,8 @@ private:
     std::vector<std::string> referenceFilePaths;
     FileTable fileTable;
     std::vector<FileTable*> fileTables;
+    std::vector<std::unique_ptr<CmajorLexer>> lexers;
+    std::vector<soulng::lexer::Lexer*> lexerVec;
     std::unordered_map<Module*, int16_t> moduleIdMap;
     std::vector<std::string> exportedFunctions;
     std::vector<std::string> exportedData;

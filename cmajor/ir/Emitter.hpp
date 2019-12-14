@@ -8,13 +8,14 @@
 #include <cmajor/ir/IrApi.hpp>
 #include <cmajor/ir/ValueStack.hpp>
 #include <cmajor/common/Common.hpp>
-#include <cmajor/parsing/Scanner.hpp>
+#include <soulng/lexer/Span.hpp>
 #include <boost/uuid/uuid.hpp>
 #include <vector>
+#include <string>
 
 namespace cmajor { namespace ir {
 
-using cmajor::parsing::Span;
+using soulng::lexer::Span;
 
 struct Pad
 {

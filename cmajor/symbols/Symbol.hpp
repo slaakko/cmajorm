@@ -7,21 +7,20 @@
 #define CMAJOR_SYMBOLS_SYMBOL_INCLUDED
 #include <cmajor/symbols/SymbolsApi.hpp>
 #include <cmajor/symbols/TypeMap.hpp>
-#include <cmajor/ast/Attribute.hpp>
-#include <cmajor/ast/Specifier.hpp>
-#include <cmajor/ast/CompileUnit.hpp>
-#include <cmajor/dom/Element.hpp>
-#include <cmajor/parsing/Scanner.hpp>
-#include <cmajor/util/CodeFormatter.hpp>
+#include <sngcm/ast/Attribute.hpp>
+#include <sngcm/ast/Specifier.hpp>
+#include <sngcm/ast/CompileUnit.hpp>
+#include <sngxml/dom/Element.hpp>
+#include <soulng/util/CodeFormatter.hpp>
 #include <cmajor/ir/Emitter.hpp>
 #include <unordered_set>
 #include <stdint.h>
 
 namespace cmajor { namespace symbols {
 
-using cmajor::parsing::Span;
-using namespace cmajor::ast;
-using namespace cmajor::util;
+using soulng::lexer::Span;
+using namespace sngcm::ast;
+using namespace soulng::util;
 using namespace cmajor::ir;
 
 class SymbolWriter;
@@ -64,6 +63,7 @@ enum class SymbolType : uint8_t
     classDelegateTypeEquality, memberFunctionToClassDelegateSymbol, 
     arrayLengthFunctionSymbol, arrayBeginFunctionSymbol, arrayEndFunctionSymbol, arrayCBeginFunctionSymbol, arrayCEndFunctionSymbol,
     namespaceTypeSymbol, functionGroupTypeSymbol, memberExpressionTypeSymbol, variableValueSymbol, globalVariableSymbol, globalVariableGroupSymbol,
+    stringFunctionContainerSymbol, stringLengthFunctionSymbol,
     maxSymbol
 };
 
@@ -206,10 +206,10 @@ public:
     const std::u32string& MangledName() const { return mangledName; }
     void SetAttributes(std::unique_ptr<Attributes>&& attributes_);
     Attributes* GetAttributes() const { return attributes.get(); }
-    std::unique_ptr<dom::Element> ToDomElement(TypeMap& typeMap);
-    virtual std::unique_ptr<dom::Element> CreateDomElement(TypeMap& typeMap);
+    std::unique_ptr<sngxml::dom::Element> ToDomElement(TypeMap& typeMap);
+    virtual std::unique_ptr<sngxml::dom::Element> CreateDomElement(TypeMap& typeMap);
     virtual std::u32string Info() const { return std::u32string(); }
-    virtual void AppendChildElements(dom::Element* element, TypeMap& typeMap) const {}
+    virtual void AppendChildElements(sngxml::dom::Element* element, TypeMap& typeMap) const {}
     virtual bool HasProjectMembers() const { return false; }
     virtual const char* ClassName() const { return "Symbol"; }
 private:

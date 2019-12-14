@@ -9,11 +9,11 @@
 #include <cmajor/symbols/Exception.hpp>
 #include <cmajor/symbols/TemplateSymbol.hpp>
 #include <cmajor/symbols/ConceptSymbol.hpp>
-#include <cmajor/ast/Concept.hpp>
+#include <sngcm/ast/Concept.hpp>
 
 namespace cmajor { namespace binder {
 
-using namespace cmajor::ast;
+using namespace sngcm::ast;
 using namespace cmajor::symbols;
 
 class BoundCompileUnit;

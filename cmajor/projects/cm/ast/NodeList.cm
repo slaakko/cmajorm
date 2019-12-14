@@ -1,0 +1,92 @@
+using System;
+using System.Collections;
+
+// this file has been semiautomatically generated from 'D:/work/soulng-project/sngcm/ast/NodeList.hpp' using cpp2cm version 1.0.0
+
+namespace Cm.Ast
+{
+    public class NodeList<T>
+    {
+        public nothrow int Count() const
+        {
+            return cast<int>(nodes.Count());
+        }
+        public nothrow T* operator[](int index) const
+        {
+            return nodes[index].Get();
+        }
+        public nothrow void Add(T* node)
+        {
+            nodes.Add(UniquePtr<T>(node));
+        }
+        public nothrow T* Release(int index)
+        {
+            return nodes[index].Release();
+        }
+        public nothrow void Insert(int index, T* node)
+        {
+            nodes.Insert(nodes.Begin() + index, UniquePtr<T>(node));
+        }
+        public nothrow void Clear()
+        {
+            nodes.Clear();
+        }
+        public nothrow void RemoveEmpty()
+        {
+            int p = 0;
+            int n = cast<int>(nodes.Count());
+            for (int i = 0; i < n; ++i)
+            {
+                if (!nodes[i].IsNull())
+                {
+                    if (p != i)
+                    {
+                        nodes[p].Reset(nodes[i].Release());
+                    }
+                    ++p;
+                }
+            }
+            if (p != n)
+            {
+                while (nodes.Begin() + p != nodes.End()) nodes.Remove(nodes.Begin() + p);
+            }
+        }
+        public nothrow void SetParent(Node* parent)
+        {
+            for (const UniquePtr<T>& node : nodes)
+            {
+                node->SetParent(parent);
+            }
+        }
+        public nothrow void Write(AstWriter& writer)
+        {
+            uint n = cast<uint>(nodes.Count());
+            writer.GetBinaryWriter().WriteULEB128UInt(n);
+            for (uint i = 0u; i < n; ++i)
+            {
+                writer.Write(nodes[i].Get());
+            }
+        }
+        public void Read(AstReader& reader)
+        {
+            uint n = reader.GetBinaryReader().ReadULEB128UInt();
+            for (uint i = 0u; i < n; ++i)
+            {
+                nodes.Add(UniquePtr<T>(cast<T*>(reader.ReadNode())));
+            }
+        }
+        public nothrow List<UniquePtr<T>>& Nodes()
+        {
+            return nodes;
+        }
+        public nothrow List<UniquePtr<T>> Content()
+        {
+            return Rvalue(nodes);
+        }
+        public nothrow void SetContent(List<UniquePtr<T>>&& content)
+        {
+            nodes = Rvalue(content);
+        }
+        private List<UniquePtr<T>> nodes;
+    }
+} // namespace Cm.Ast

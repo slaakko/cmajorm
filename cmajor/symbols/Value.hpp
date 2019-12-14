@@ -6,12 +6,11 @@
 #ifndef CMAJOR_SYMBOLS_VALUE_INCLUDED
 #define CMAJOR_SYMBOLS_VALUE_INCLUDED
 #include <cmajor/symbols/Symbol.hpp>
-#include <cmajor/parsing/Scanner.hpp>
 #include <cmajor/ir/Emitter.hpp>
 
 namespace cmajor { namespace symbols {
 
-using cmajor::parsing::Span;
+using soulng::lexer::Span;
 using namespace cmajor::ir;
 
 class TypeSymbol;
@@ -46,13 +45,15 @@ public:
     virtual bool IsFunctionGroupValue() const { return false; }
     virtual bool IsArrayReferenceValue() const { return false; }
     virtual bool IsStructuredReferenceValue() const { return false; }
+    virtual bool IsStringReferenceValue() const { return false; }
     virtual bool IsComplexValue() const { return false; }
+    virtual Value* GetSubject() { return this; }
     virtual std::string ToString() const { return std::string(); }
     virtual TypeSymbol* GetType(SymbolTable* symbolTable) = 0;
     virtual void SetType(TypeSymbol* type_) {}
     const Span& GetSpan() const { return span; }
     ValueType GetValueType() const { return valueType; }
-    std::unique_ptr<dom::Element> ToDomElement();
+    std::unique_ptr<sngxml::dom::Element> ToDomElement();
     virtual const char* ClassName() const { return "Value";  }
 private:
     Span span;
@@ -322,6 +323,7 @@ public:
     Value* As(TypeSymbol* targetType, bool cast, const Span& span, bool dontThrow) const override;
     TypeSymbol* GetType(SymbolTable* symbolTable) override;
     int StringId() const { return stringId; }
+    const std::string& Str() const { return str; }
     const char* ClassName() const override { return "StringValue"; }
 private:
     int stringId;
@@ -339,6 +341,7 @@ public:
     Value* As(TypeSymbol* targetType, bool cast, const Span& span, bool dontThrow) const override;
     TypeSymbol* GetType(SymbolTable* symbolTable) override;
     int StringId() const { return stringId; }
+    const std::u16string& Str() const { return str; }
     const char* ClassName() const override { return "WStringValue"; }
 private:
     int stringId;
@@ -356,6 +359,7 @@ public:
     Value* As(TypeSymbol* targetType, bool cast, const Span& span, bool dontThrow) const override;
     TypeSymbol* GetType(SymbolTable* symbolTable) override;
     int StringId() const { return stringId; }
+    const std::u32string& Str() const { return str; }
     const char* ClassName() const override { return "UStringValue"; }
 private:
     int stringId;

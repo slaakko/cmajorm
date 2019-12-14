@@ -5,11 +5,11 @@
 
 #ifndef CMAJOR_COMMON_INCLUDED
 #define CMAJOR_COMMON_INCLUDED
-#include <cmajor/parsing/Scanner.hpp>
+#include <soulng/lexer/Span.hpp>
 
 namespace cmajor { namespace common {
 
-using cmajor::parsing::Span;
+using soulng::lexer::Span;
 
 class ColumnSpanProvider
 {

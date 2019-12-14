@@ -5,17 +5,16 @@
 
 #include <cmajor/cmcm/Compiler.hpp>
 #include <cmajor/Build/Build.hpp>
-#include <cmajor/ast/InitDone.hpp>
-#include <cmajor/parsing/InitDone.hpp>
-#include <cmajor/parsing/Exception.hpp>
-#include <cmajor/util/InitDone.hpp>
-#include <cmajor/util/Path.hpp>
-#include <cmajor/util/Unicode.hpp>
-#include <cmajor/util/Log.hpp>
-#include <cmajor/util/System.hpp>
+#include <sngcm/ast/InitDone.hpp>
+#include <soulng/lexer/ParsingException.hpp>
+#include <soulng/util/InitDone.hpp>
+#include <soulng/util/Path.hpp>
+#include <soulng/util/Unicode.hpp>
+#include <soulng/util/Log.hpp>
+#include <soulng/util/System.hpp>
 #include <cmajor/symbols/GlobalFlags.hpp>
-#include <cmajor/dom/Parser.hpp>
-#include <cmajor/dom/CharacterData.hpp>
+#include <sngxml/dom/Parser.hpp>
+#include <sngxml/dom/CharacterData.hpp>
 #include <cmajor/symbols/InitDone.hpp>
 #include <cmajor/symbols/Exception.hpp>
 #include <cmajor/symbols/ModuleCache.hpp>
@@ -30,7 +29,7 @@
 
 bool initialized = false;
 
-using namespace cmajor::unicode;
+using namespace soulng::unicode;
 
 class CompileData
 {
@@ -98,13 +97,12 @@ int CompileData::GetCompileResult(int compileResultHandle, char16_t* buf, int si
 
 extern "C" void Init()
 {
-    cmajor::ast::Init();
+    soulng::util::Init();
+    sngcm::ast::Init();
     cmajor::symbols::Init();
-    cmajor::parsing::Init();
-    cmajor::util::Init();
     CompileData::Init();
-    cmajor::util::SetLogMode(cmajor::util::LogMode::queue); 
-    cmajor::util::DisableConsoleWindow();
+    soulng::util::SetLogMode(soulng::util::LogMode::queue); 
+    soulng::util::DisableConsoleWindow();
     initialized = true;
 }
 
@@ -112,28 +110,24 @@ extern "C" void Done()
 {
     initialized = false;
     CompileData::Done();
-    cmajor::util::Done();
-    cmajor::parsing::Done();
     cmajor::symbols::Done();
-    cmajor::ast::Done();
+    sngcm::ast::Done();
+    soulng::util::Done();
 }
 
-std::unique_ptr<cmajor::dom::Element> SpanElement(cmajor::symbols::Module* module, const cmajor::parsing::Span& span)
+std::unique_ptr<sngxml::dom::Element> SpanElement(cmajor::symbols::Module* module, const soulng::lexer::Span& span)
 {
-    std::unique_ptr<cmajor::dom::Element> spanElement(new cmajor::dom::Element(U"span"));
+    std::unique_ptr<sngxml::dom::Element> spanElement(new sngxml::dom::Element(U"span"));
     if (span.Valid() && module)
     {
-        std::string fileName = module->GetFilePath(span.FileIndex());
-        if (fileName.empty()) return std::unique_ptr<cmajor::dom::Element>();
+        std::string fileName = module->GetFilePath(span.fileIndex);
+        if (fileName.empty()) return std::unique_ptr<sngxml::dom::Element>();
         spanElement->SetAttribute(U"file", ToUtf32(fileName));
-        spanElement->SetAttribute(U"line", ToUtf32(std::to_string(span.LineNumber())));
-        MappedInputFile file(fileName);
-        std::string s(file.Begin(), file.End());
-        std::u32string t(ToUtf32(s));
-        std::u32string text = cmajor::parsing::GetErrorLines(&t[0], &t[0] + t.length(), span);
+        spanElement->SetAttribute(U"line", ToUtf32(std::to_string(span.line)));
+        std::u32string text = module->GetErrorLines(span);
         int32_t startCol = 0;
         int32_t endCol = 0;
-        GetColumns(&t[0], &t[0] + t.length(), span, startCol, endCol);
+        module->GetColumns(span, startCol, endCol);
         spanElement->SetAttribute(U"startCol", ToUtf32(std::to_string(startCol)));
         spanElement->SetAttribute(U"endCol", ToUtf32(std::to_string(endCol)));
         spanElement->SetAttribute(U"text", text);
@@ -145,34 +139,34 @@ std::unique_ptr<cmajor::dom::Element> SpanElement(cmajor::symbols::Module* modul
     return spanElement;
 }
 
-void AddWarningsTo(cmajor::dom::Element* diagnosticsElement, cmajor::symbols::Module* module)
+void AddWarningsTo(sngxml::dom::Element* diagnosticsElement, cmajor::symbols::Module* module)
 {
     if (!module) return;
     if (!module->WarningCollection().Warnings().empty())
     {
         for (const cmajor::symbols::Warning& warning : module->WarningCollection().Warnings())
         {
-            std::unique_ptr<cmajor::dom::Element> diagnosticElement(new cmajor::dom::Element(U"diagnostic"));
+            std::unique_ptr<sngxml::dom::Element> diagnosticElement(new sngxml::dom::Element(U"diagnostic"));
             diagnosticElement->SetAttribute(U"category", U"warning");
             diagnosticElement->SetAttribute(U"message", ToUtf32(warning.Message()));
             diagnosticElement->SetAttribute(U"project", warning.Project());
-            std::unique_ptr<cmajor::dom::Element> spanElement = SpanElement(module, warning.Defined());
+            std::unique_ptr<sngxml::dom::Element> spanElement = SpanElement(module, warning.Defined());
             if (spanElement)
             {
-                diagnosticElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(spanElement.release()));
+                diagnosticElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(spanElement.release()));
             }
-            diagnosticsElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(diagnosticElement.release()));
-            for (const cmajor::parsing::Span& span : warning.References())
+            diagnosticsElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(diagnosticElement.release()));
+            for (const soulng::lexer::Span& span : warning.References())
             {
                 if (!span.Valid()) continue;
-                std::unique_ptr<cmajor::dom::Element> diagnosticElement(new cmajor::dom::Element(U"diagnostic"));
+                std::unique_ptr<sngxml::dom::Element> diagnosticElement(new sngxml::dom::Element(U"diagnostic"));
                 diagnosticElement->SetAttribute(U"category", U"info");
                 diagnosticElement->SetAttribute(U"message", ToUtf32("see reference to"));
-                std::unique_ptr<cmajor::dom::Element> spanElement = SpanElement(module, span);
+                std::unique_ptr<sngxml::dom::Element> spanElement = SpanElement(module, span);
                 if (spanElement)
                 {
-                    diagnosticElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(spanElement.release()));
-                    diagnosticsElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(diagnosticElement.release()));
+                    diagnosticElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(spanElement.release()));
+                    diagnosticsElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(diagnosticElement.release()));
                 }
             }
         }
@@ -191,14 +185,14 @@ extern "C" int Compile(const char16_t* compileXmlRequest)
     bool noDebugInfo = false;
     std::unique_ptr<cmajor::symbols::Module> rootModule;
     std::vector<std::unique_ptr<cmajor::symbols::Module>> rootModules;
-    cmajor::dom::Document compileResultDoc;
-    std::unique_ptr<cmajor::dom::Element> compileResultElement(new cmajor::dom::Element(U"compileResult"));
-    std::unique_ptr<cmajor::dom::Element> diagnosticsElement(new cmajor::dom::Element(U"diagnostics"));
+    sngxml::dom::Document compileResultDoc;
+    std::unique_ptr<sngxml::dom::Element> compileResultElement(new sngxml::dom::Element(U"compileResult"));
+    std::unique_ptr<sngxml::dom::Element> diagnosticsElement(new sngxml::dom::Element(U"diagnostics"));
     try
     {
         std::u32string compileRequest = ToUtf32(compileXmlRequest);
-        std::unique_ptr<cmajor::dom::Document> compileRequestDoc = cmajor::dom::ParseDocument(compileRequest, "compileRequest");
-        cmajor::dom::Element* compileRequestElement = compileRequestDoc->DocumentElement();
+        std::unique_ptr<sngxml::dom::Document> compileRequestDoc = sngxml::dom::ParseDocument(compileRequest, "compileRequest");
+        sngxml::dom::Element* compileRequestElement = compileRequestDoc->DocumentElement();
         std::string filePath = ToUtf8(compileRequestElement->GetAttribute(U"filePath"));
         std::string config = ToUtf8(compileRequestElement->GetAttribute(U"config"));
         if (config == "release")
@@ -301,50 +295,50 @@ extern "C" int Compile(const char16_t* compileXmlRequest)
             LogMessage(-1, timeStream.str());
         }
     }
-    catch (const cmajor::parsing::ParsingException& ex)
+    catch (const soulng::lexer::ParsingException& ex)
     {
         LogMessage(-1, ex.what());
         module = static_cast<cmajor::symbols::Module*>(ex.Module());
         compileResultElement->SetAttribute(U"success", U"false");
-        std::unique_ptr<cmajor::dom::Element> diagnosticElement(new cmajor::dom::Element(U"diagnostic"));
+        std::unique_ptr<sngxml::dom::Element> diagnosticElement(new sngxml::dom::Element(U"diagnostic"));
         diagnosticElement->SetAttribute(U"category", U"error");
         diagnosticElement->SetAttribute(U"message", ToUtf32(ex.Message()));
         diagnosticElement->SetAttribute(U"tool", U"cmc");
         diagnosticElement->SetAttribute(U"project", ToUtf32(ex.Project()));
-        std::unique_ptr<cmajor::dom::Element> spanElement = SpanElement(module, ex.GetSpan());
+        std::unique_ptr<sngxml::dom::Element> spanElement = SpanElement(module, ex.GetSpan()); 
         if (spanElement)
         {
-            diagnosticElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(spanElement.release()));
+            diagnosticElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(spanElement.release()));
         }
-        diagnosticsElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(diagnosticElement.release()));
+        diagnosticsElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(diagnosticElement.release()));
     }
     catch (const cmajor::symbols::Exception& ex)
     {
         LogMessage(-1, ex.What());
         module = ex.GetModule();
         compileResultElement->SetAttribute(U"success", U"false");
-        std::unique_ptr<cmajor::dom::Element> diagnosticElement(new cmajor::dom::Element(U"diagnostic"));
+        std::unique_ptr<sngxml::dom::Element> diagnosticElement(new sngxml::dom::Element(U"diagnostic"));
         diagnosticElement->SetAttribute(U"category", U"error");
         diagnosticElement->SetAttribute(U"message", ToUtf32(ex.Message()));
         diagnosticElement->SetAttribute(U"tool", ex.GetModule()->GetCurrentToolName());
         diagnosticElement->SetAttribute(U"project", ex.GetModule()->GetCurrentProjectName());
-        std::unique_ptr<cmajor::dom::Element> spanElement = SpanElement(ex.GetModule(), ex.Defined());
+        std::unique_ptr<sngxml::dom::Element> spanElement = SpanElement(ex.GetModule(), ex.Defined());
         if (spanElement)
         {
-            diagnosticElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(spanElement.release()));
+            diagnosticElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(spanElement.release()));
         }
-        diagnosticsElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(diagnosticElement.release()));
-        for (const cmajor::parsing::Span& span : ex.References())
+        diagnosticsElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(diagnosticElement.release()));
+        for (const soulng::lexer::Span& span : ex.References())
         {
             if (!span.Valid()) continue;
-            std::unique_ptr<cmajor::dom::Element> diagnosticElement(new cmajor::dom::Element(U"diagnostic"));
+            std::unique_ptr<sngxml::dom::Element> diagnosticElement(new sngxml::dom::Element(U"diagnostic"));
             diagnosticElement->SetAttribute(U"category", U"info");
             diagnosticElement->SetAttribute(U"message", ToUtf32("see reference to"));
-            std::unique_ptr<cmajor::dom::Element> spanElement = SpanElement(ex.GetModule(), span);
+            std::unique_ptr<sngxml::dom::Element> spanElement = SpanElement(ex.GetModule(), span);
             if (spanElement)
             {
-                diagnosticElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(spanElement.release()));
-                diagnosticsElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(diagnosticElement.release()));
+                diagnosticElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(spanElement.release()));
+                diagnosticsElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(diagnosticElement.release()));
             }
         }
     }
@@ -352,10 +346,10 @@ extern "C" int Compile(const char16_t* compileXmlRequest)
     {
         LogMessage(-1, ex.what());
         compileResultElement->SetAttribute(U"success", U"false");
-        std::unique_ptr<cmajor::dom::Element> diagnosticElement(new cmajor::dom::Element(U"diagnostic"));
+        std::unique_ptr<sngxml::dom::Element> diagnosticElement(new sngxml::dom::Element(U"diagnostic"));
         diagnosticElement->SetAttribute(U"category", U"error");
         diagnosticElement->SetAttribute(U"message", ToUtf32(ex.what()));
-        diagnosticsElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(diagnosticElement.release()));
+        diagnosticsElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(diagnosticElement.release()));
     }
     if (!module)
     {
@@ -375,8 +369,8 @@ extern "C" int Compile(const char16_t* compileXmlRequest)
         }
     }
     AddWarningsTo(diagnosticsElement.get(), module);
-    compileResultElement->AppendChild(std::unique_ptr<cmajor::dom::Node>(diagnosticsElement.release()));
-    compileResultDoc.AppendChild(std::unique_ptr<cmajor::dom::Node>(compileResultElement.release()));
+    compileResultElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(diagnosticsElement.release()));
+    compileResultDoc.AppendChild(std::unique_ptr<sngxml::dom::Node>(compileResultElement.release()));
     std::ostringstream strStream;
     CodeFormatter formatter(strStream);
     formatter.SetIndentSize(1);
@@ -404,23 +398,23 @@ extern "C" void StopBuild()
 extern "C" int WaitForLogMessage()
 {
     if (!initialized) return -1;
-    return cmajor::util::WaitForLogMessage();
+    return soulng::util::WaitForLogMessage();
 }
 
 extern "C" int FetchLogMessage(char16_t* buf, int size)
 {
     if (!initialized) return -1;
-    return cmajor::util::FetchLogMessage(buf, size);
+    return soulng::util::FetchLogMessage(buf, size);
 }
 
 extern "C" void StartLog()
 {
-    cmajor::util::StartLog();
+    soulng::util::StartLog();
 }
 
 extern "C" void EndLog()
 {
-    cmajor::util::EndLog();
+    soulng::util::EndLog();
 }
 
 extern "C" void ResetModuleCache()

@@ -6,14 +6,14 @@
 #ifndef CMAJOR_SYMBOLS_EXCEPTION_INCLUDED
 #define CMAJOR_SYMBOLS_EXCEPTION_INCLUDED
 #include <cmajor/symbols/SymbolsApi.hpp>
-#include <cmajor/parsing/Scanner.hpp>
-#include <cmajor/dom/Element.hpp>
-#include <cmajor/util/Json.hpp>
+#include <sngxml/dom/Element.hpp>
+#include <soulng/util/Json.hpp>
+#include <soulng/lexer/Span.hpp>
 
 namespace cmajor { namespace symbols {
 
-using namespace cmajor::util;
-using cmajor::parsing::Span;
+using namespace soulng::util;
+using soulng::lexer::Span;
 
 class Module;
 
@@ -24,7 +24,7 @@ std::string Expand(Module* module, const std::string& errorMessage, const Span& 
 std::string Expand(Module* module, const std::string& errorMessage, const Span& span, const std::vector<Span>& references, const std::string& title);
 
 SYMBOLS_API std::unique_ptr<JsonObject> SpanToJson(Module* module, const Span& span);
-SYMBOLS_API std::unique_ptr<cmajor::dom::Element> SpanToDomElement(Module* module, const Span& span);
+SYMBOLS_API std::unique_ptr<sngxml::dom::Element> SpanToDomElement(Module* module, const Span& span);
 
 class SYMBOLS_API Exception
 {
@@ -39,7 +39,7 @@ public:
     const Span& Defined() const { return defined; }
     const std::vector<Span>& References() const { return references; }
     std::unique_ptr<JsonValue> ToJson() const;
-    void AddToDiagnosticsElement(cmajor::dom::Element* diagnosticsElement) const;
+    void AddToDiagnosticsElement(sngxml::dom::Element* diagnosticsElement) const;
 private:
     Module* module;
     std::string what;

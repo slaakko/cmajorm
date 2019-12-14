@@ -1,16 +1,16 @@
-#include <cmajor/ast/InitDone.hpp>
-#include <cmajor/parsing/InitDone.hpp>
-#include <cmajor/util/InitDone.hpp>
-#include <cmajor/parser/Project.hpp>
-#include <cmajor/parser/Solution.hpp>
+#include <sngcm/ast/InitDone.hpp>
+#include <soulng/util/InitDone.hpp>
+#include <sngcm/cmlexer/ContainerFileLexer.hpp>
+#include <sngcm/cmparser/ProjectFile.hpp>
+#include <sngcm/cmparser/SolutionFile.hpp>
 #include <cmajor/cmproj/Conversion.hpp>
-#include <cmajor/dom/Document.hpp>
-#include <cmajor/dom/Element.hpp>
-#include <cmajor/dom/CharacterData.hpp>
-#include <cmajor/util/TextUtils.hpp>
-#include <cmajor/util/MappedInputFile.hpp>
-#include <cmajor/util/Path.hpp>
-#include <cmajor/util/Unicode.hpp>
+#include <sngxml/dom/Document.hpp>
+#include <sngxml/dom/Element.hpp>
+#include <sngxml/dom/CharacterData.hpp>
+#include <soulng/util/TextUtils.hpp>
+#include <soulng/util/MappedInputFile.hpp>
+#include <soulng/util/Path.hpp>
+#include <soulng/util/Unicode.hpp>
 #include <boost/uuid/uuid.hpp>
 #include <boost/uuid/uuid_generators.hpp>
 #include <boost/uuid/uuid_io.hpp>
@@ -21,27 +21,21 @@ struct InitDone
 {
     InitDone()
     {
-        cmajor::ast::Init();
-        cmajor::parsing::Init();
-        cmajor::util::Init();
+        sngcm::ast::Init();
+        soulng::util::Init();
     }
     ~InitDone()
     {
-        cmajor::util::Done();
-        cmajor::parsing::Done();
-        cmajor::ast::Done();
+        soulng::util::Done();
+        sngcm::ast::Done();
     }
 };
 
-using namespace cmajor::parser;
-using namespace cmajor::parsing;
-using namespace cmajor::util;
-using namespace cmajor::unicode;
+using namespace soulng::util;
+using namespace soulng::unicode;
 using namespace cmajor::cmproj;
 
-cmajor::parser::Project* projectGrammar = nullptr;
-
-void ConvertSolution(cmajor::ast::Solution* solution, const std::string& slnFilePath, const std::string& guidStr, bool verbose)
+void ConvertSolution(sngcm::ast::Solution* solution, const std::string& slnFilePath, const std::string& guidStr, bool verbose)
 {
     std::ofstream slnFile(slnFilePath);
     CodeFormatter formatter(slnFile);
@@ -57,7 +51,8 @@ void ConvertSolution(cmajor::ast::Solution* solution, const std::string& slnFile
         std::string projectFilePath = solution->ProjectFilePaths()[i];
         MappedInputFile projectFile(projectFilePath);
         std::u32string p(ToUtf32(std::string(projectFile.Begin(), projectFile.End())));
-        std::unique_ptr<cmajor::ast::Project> project(projectGrammar->Parse(&p[0], &p[0] + p.length(), 0, projectFilePath, "debug", cmajor::ast::BackEnd::llvm));
+        ContainerFileLexer containerFileLexer(p, projectFilePath, 0);
+        std::unique_ptr<sngcm::ast::Project> project = ProjectFileParser::Parse(containerFileLexer, "debug", sngcm::ast::BackEnd::llvm);
         project->ResolveDeclarations();
         std::string cmprojFilePath = Path::ChangeExtension(projectFilePath, ".cmproj");
         boost::uuids::uuid guid = boost::uuids::random_generator()();
@@ -125,21 +120,11 @@ void PrintHelp()
         std::endl;
 }
 
-cmajor::parser::Solution* solutionGrammar = nullptr;
-
 int main(int argc, const char** argv)
 {
     try
     {
         InitDone initDone;
-        if (!projectGrammar)
-        {
-            projectGrammar = cmajor::parser::Project::Create();
-        }
-        if (!solutionGrammar)
-        {
-            solutionGrammar = cmajor::parser::Solution::Create();
-        }
         bool verbose = false;
         std::vector<std::string> solutionFilePaths;
         for (int i = 1; i < argc; ++i)
@@ -178,7 +163,8 @@ int main(int argc, const char** argv)
         {
             MappedInputFile solutionFile(solutionFilePath);
             std::u32string s(ToUtf32(std::string(solutionFile.Begin(), solutionFile.End())));
-            std::unique_ptr<cmajor::ast::Solution> solution(solutionGrammar->Parse(&s[0], &s[0] + s.length(), 0, solutionFilePath));
+            ContainerFileLexer containerFileLexer(s, solutionFilePath, 0);
+            std::unique_ptr<sngcm::ast::Solution> solution = SolutionFileParser::Parse(containerFileLexer);
             solution->ResolveDeclarations();
             std::string slnFilePath = GetFullPath(Path::ChangeExtension(solutionFilePath, ".sln"));
             boost::uuids::uuid guid = boost::uuids::random_generator()();

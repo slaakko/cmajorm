@@ -1,0 +1,156 @@
+using System;
+using System.Collections;
+
+namespace Cm.Ast
+{
+    public class NamespaceNode : Node
+    {
+        public nothrow NamespaceNode(const System.Lex.Span& span_) :
+            base(NodeType.namespaceNode, span_), id()
+        {
+        }
+        public nothrow NamespaceNode(const System.Lex.Span& span_, IdentifierNode* id_) :
+            base(NodeType.namespaceNode, span_), id(id_)
+        {
+            id->SetParent(this);
+        }
+        public nothrow NodeList<Node>& Members()
+        {
+            return members;
+        }
+        public nothrow const NodeList<Node>& Members() const
+        {
+            return members;
+        }
+        public nothrow IdentifierNode* Id() const
+        {
+            return id.Get();
+        }
+        public nothrow void AddMember(Node* member)
+        {
+            member->SetParent(this);
+            members.Add(member);
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public override nothrow void Write(AstWriter& writer)
+        {
+            base->Write(writer);
+            writer.Write(id.Get());
+            members.Write(writer);
+        }
+        public override void Read(AstReader& reader)
+        {
+            base->Read(reader);
+            id.Reset(reader.ReadIdentifierNode());
+            id->SetParent(this);
+            members.Read(reader);
+            members.SetParent(this);
+        }
+        public override Node* Clone(CloneContext& cloneContext) const
+        {
+            NamespaceNode* clone = new NamespaceNode(GetSpan(), cast<IdentifierNode*>(id->Clone(cloneContext)));
+            int n = members.Count();
+            for (int i = 0; i < n; ++i)
+            {
+                Node* member = members[i];
+                if (cloneContext.MakeTestUnits() && member->GetNodeType() == NodeType.functionNode && (cast<FunctionNode*>(member)->GetSpecifiers() & Specifiers.unit_test_) != Specifiers.none)
+                {
+                    FunctionNode* unitTestFunction = cast<FunctionNode*>(member->Clone(cloneContext));
+                    unitTestFunction->SetParent(this);
+                    cloneContext.AddUnitTestFunction(unitTestFunction);
+                }
+                else
+                {
+                    clone->AddMember(member->Clone(cloneContext));
+                }
+            }
+            return clone;
+        }
+        private UniquePtr<IdentifierNode> id;
+        private NodeList<Node> members;
+    }
+    public class AliasNode : Node
+    {
+        public nothrow AliasNode(const System.Lex.Span& span_) :
+            base(NodeType.aliasNode, span_), id(), qid()
+        {
+        }
+        public nothrow AliasNode(const System.Lex.Span& span_, IdentifierNode* id_, IdentifierNode* qid_) :
+            base(NodeType.aliasNode, span_), id(id_), qid(qid_)
+        {
+            id->SetParent(this);
+            qid->SetParent(this);
+        }
+        public nothrow IdentifierNode* Id() const
+        {
+            return id.Get();
+        }
+        public nothrow IdentifierNode* Qid() const
+        {
+            return qid.Get();
+        }
+        public override Node* Clone(CloneContext& cloneContext) const
+        {
+            return new AliasNode(GetSpan(), cast<IdentifierNode*>(id->Clone(cloneContext)), cast<IdentifierNode*>(qid->Clone(cloneContext)));
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public override nothrow void Write(AstWriter& writer)
+        {
+            base->Write(writer);
+            writer.Write(id.Get());
+            writer.Write(qid.Get());
+        }
+        public override void Read(AstReader& reader)
+        {
+            base->Read(reader);
+            id.Reset(reader.ReadIdentifierNode());
+            id->SetParent(this);
+            qid.Reset(reader.ReadIdentifierNode());
+            qid->SetParent(this);
+        }
+        private UniquePtr<IdentifierNode> id;
+        private UniquePtr<IdentifierNode> qid;
+    }
+    public class NamespaceImportNode : Node
+    {
+        public nothrow NamespaceImportNode(const System.Lex.Span& span_) :
+            base(NodeType.namespaceImportNode, span_), ns()
+        {
+        }
+        public nothrow NamespaceImportNode(const System.Lex.Span& span_, IdentifierNode* ns_) :
+            base(NodeType.namespaceImportNode, span_), ns(ns_)
+        {
+            ns->SetParent(this);
+        }
+        public nothrow IdentifierNode* Ns() const
+        {
+            return ns.Get();
+        }
+        public override Node* Clone(CloneContext& cloneContext) const
+        {
+            return new NamespaceImportNode(GetSpan(), cast<IdentifierNode*>(ns->Clone(cloneContext)));
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        public override nothrow void Write(AstWriter& writer)
+        {
+            base->Write(writer);
+            writer.Write(ns.Get());
+        }
+        public override void Read(AstReader& reader)
+        {
+            base->Read(reader);
+            ns.Reset(reader.ReadIdentifierNode());
+            ns->SetParent(this);
+        }
+        private UniquePtr<IdentifierNode> ns;
+    }
+} // namespace Cm.Ast

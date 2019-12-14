@@ -258,9 +258,9 @@ namespace System.Lex
             ustring lines;
             const uchar* lineStart = LineStart(start, token.match.begin);
             const uchar* lineEnd = LineEnd(end, token.match.end);
-            lines.Append(ustring(token.match.begin, lineStart));
+            lines.Append(ustring(lineStart, token.match.begin));
             lines.Append(token.match.ToString());
-            lines.Append(ustring(lineEnd, token.match.end));
+            lines.Append(ustring(token.match.end, lineEnd));
             lines.Append('\n', 1);
             lines.Append(' ', token.match.begin - lineStart);
             lines.Append('^', Max(cast<long>(1), token.match.end - token.match.begin));
@@ -279,7 +279,7 @@ namespace System.Lex
                 endToken = GetToken(span.end);
             }
             const uchar* lineEnd = LineEnd(end, endToken.match.end);
-            lines.Append(ustring(startToken.match.begin, lineStart));
+            lines.Append(ustring(lineStart, startToken.match.begin));
             lines.Append(startToken.match.ToString());
             const uchar* s = startToken.match.begin;
             const uchar* e = startToken.match.end;
@@ -290,7 +290,7 @@ namespace System.Lex
                 lines.Append(token.match.ToString());
                 e = token.match.end;
             }
-            lines.Append(ustring(lineEnd, e));
+            lines.Append(ustring(e, lineEnd));
             lines.Append('\n', 1);
             lines.Append(' ', s - lineStart);
             lines.Append('^', Max(cast<long>(1), e - s));
@@ -298,14 +298,38 @@ namespace System.Lex
             lines.Append('\n', 1);
             return lines;
         }
-        public void ThrowExpectationFailure(long pos, const ustring& name)
+        public void GetColumns(const Span& span, int& startCol, int& endCol) const
         {
-            Token token = GetToken(pos);
-            throw Exception("parsing error in \'" + fileName + ":" + ToString(token.line) + "\': " + ToUtf8(name) + " expected:\n" + ToUtf8(ErrorLines(token)));
+            Token startToken = GetToken(span.start);
+            Token endToken = startToken;
+            const uchar* lineStart = LineStart(start, startToken.match.begin);
+            if (span.end != span.start)
+            {
+                endToken = GetToken(span.end);
+            }
+            int cols = cast<int>(startToken.match.begin - lineStart);
+            if (cols < 0)
+            {
+                cols = 0;
+            }
+            startCol = cols + 1;
+            const uchar* lineEnd = LineEnd(end, endToken.match.end);
+            if (lineEnd < lineStart)
+            {
+                lineEnd = lineStart;
+            }
+            int lineLength = cast<int>(lineEnd - lineStart);
+            int spanCols = Max(cast<int>(1), Min(span.end - span.start, lineLength - cols));
+            endCol = startCol + spanCols;
+        }
+        public void ThrowExpectationFailure(const Span& span, const ustring& name)
+        {
+            Token token = GetToken(span.start);
+            throw ParsingException("parsing error in \'" + fileName + ":" + ToString(token.line) + "\': " + ToUtf8(name) + " expected:\n" + ToUtf8(ErrorLines(span)), fileName, span);
         }
         public ustring RestOfLine(int maxLineLength)
         {
-            ustring restOfLine(current->match.ToString() + ustring(pos, current->match.end) + ustring(LineEnd(end, pos), pos));
+            ustring restOfLine(current->match.ToString() + ustring(current->match.end, pos) + ustring(pos, LineEnd(end, pos)));
             if (maxLineLength != 0)
             {
                 restOfLine = restOfLine.Substring(0, maxLineLength);
@@ -350,6 +374,55 @@ namespace System.Lex
             ++p;
         }
         return p;
+    }
+    public ustring GetErrorLines(const uchar* start, const uchar* end, const Span& externalSpan)
+    {
+        const uchar* startPos = start + externalSpan.start;
+        if (startPos < start || startPos >= end)
+        {
+            return ustring();
+        }
+        const uchar* lineStart = LineStart(start, startPos);
+        int cols = cast<int>(startPos - lineStart);
+        if (cols < 0)
+        {
+            cols = 0;
+        }
+        const uchar* lineEnd = LineEnd(end, startPos);
+        if (lineEnd < lineStart)
+        {
+            lineEnd = lineStart;
+        }
+        int lineLength = cast<int>(lineEnd - lineStart);
+        ustring lines(lineStart, lineEnd);
+        int spanCols = Max(cast<int>(1), Min(externalSpan.end - externalSpan.start, lineLength - cols));
+        lines.Append('\n', 1).Append(ustring(' ', cols)).Append('^', spanCols);
+        return lines;
+    }
+    public void GetColumns(const uchar* start, const uchar* end, const Span& externalSpan, int& startCol, int& endCol)
+    {
+        startCol = 0;
+        endCol = 0;
+        const uchar* startPos = start + externalSpan.start;
+        if (startPos < start || startPos >= end)
+        {
+            return;
+        }
+        const uchar* lineStart = LineStart(start, startPos);
+        int cols = cast<int>(startPos - lineStart);
+        if (cols < 0)
+        {
+            cols = 0;
+        }
+        startCol = cols + 1;
+        const uchar* lineEnd = LineEnd(end, startPos);
+        if (lineEnd < lineStart)
+        {
+            lineEnd = lineStart;
+        }
+        int lineLength = cast<int>(lineEnd - lineStart);
+        int spanCols = Max(cast<int>(1), Min(externalSpan.end - externalSpan.start, lineLength - cols));
+        endCol = startCol + spanCols;
     }
     public void WriteBeginRuleToLog(Lexer& lexer, const ustring& ruleName)
     {

@@ -11,12 +11,12 @@
 #include <cmajor/symbols/SymbolCreatorVisitor.hpp>
 #include <cmajor/symbols/TemplateSymbol.hpp>
 #include <cmajor/symbols/GlobalFlags.hpp>
-#include <cmajor/ast/Identifier.hpp>
-#include <cmajor/util/Util.hpp>
+#include <sngcm/ast/Identifier.hpp>
+#include <soulng/util/Util.hpp>
 
 namespace cmajor { namespace binder {
 
-using namespace cmajor::util;
+using namespace soulng::util;
 using namespace cmajor::symbols;
 
 bool operator==(const FunctionTemplateKey& left, const FunctionTemplateKey& right)

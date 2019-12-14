@@ -47,15 +47,15 @@ void NamespaceSymbol::Import(NamespaceSymbol* that, SymbolTable& symbolTable)
     symbolTable.EndNamespace();
 }
 
-std::unique_ptr<dom::Element> NamespaceSymbol::CreateDomElement(TypeMap& typeMap)
+std::unique_ptr<sngxml::dom::Element> NamespaceSymbol::CreateDomElement(TypeMap& typeMap)
 {
     if (HasProjectMembers())
     {
-        return std::unique_ptr<dom::Element>(new dom::Element(U"NamespaceSymbol"));
+        return std::unique_ptr<sngxml::dom::Element>(new sngxml::dom::Element(U"NamespaceSymbol"));
     }
     else
     {
-        return std::unique_ptr<dom::Element>();
+        return std::unique_ptr<sngxml::dom::Element>();
     }
 }
 

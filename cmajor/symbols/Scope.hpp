@@ -6,15 +6,14 @@
 #ifndef CMAJOR_SYMBOLS_SCOPE_INCLUDED
 #define CMAJOR_SYMBOLS_SCOPE_INCLUDED
 #include <cmajor/symbols/SymbolsApi.hpp>
-#include <cmajor/ast/Namespace.hpp>
-#include <cmajor/parsing/Scanner.hpp>
+#include <sngcm/ast/Namespace.hpp>
 #include <unordered_map>
 #include <unordered_set>
 
 namespace cmajor { namespace symbols {
 
-using cmajor::parsing::Span;
-using namespace cmajor::ast;
+using soulng::lexer::Span;
+using namespace sngcm::ast;
 
 class Symbol;
 class ContainerSymbol;

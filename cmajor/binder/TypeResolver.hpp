@@ -5,13 +5,13 @@
 
 #ifndef CMAJOR_BINDER_TYPE_RESOLVER_INCLUDED
 #define CMAJOR_BINDER_TYPE_RESOLVER_INCLUDED
-#include <cmajor/ast/TypeExpr.hpp>
+#include <sngcm/ast/TypeExpr.hpp>
 #include <cmajor/symbols/TypeSymbol.hpp>
 
 
 namespace cmajor {  namespace binder {
 
-using namespace cmajor::ast;
+using namespace sngcm::ast;
 using namespace cmajor::symbols;
 
 class BoundCompileUnit;

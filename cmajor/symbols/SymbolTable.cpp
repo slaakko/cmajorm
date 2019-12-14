@@ -19,19 +19,20 @@
 #include <cmajor/symbols/Exception.hpp>
 #include <cmajor/symbols/TemplateSymbol.hpp>
 #include <cmajor/symbols/ConceptSymbol.hpp>
+#include <cmajor/symbols/StringFunctions.hpp>
 #include <cmajor/symbols/GlobalFlags.hpp>
 #include <cmajor/symbols/Module.hpp>
 #include <cmajor/symbols/DebugFlags.hpp>
-#include <cmajor/ast/Identifier.hpp>
-#include <cmajor/util/Unicode.hpp>
-#include <cmajor/util/Log.hpp>
-#include <cmajor/util/Time.hpp>
+#include <sngcm/ast/Identifier.hpp>
+#include <soulng/util/Unicode.hpp>
+#include <soulng/util/Log.hpp>
+#include <soulng/util/Time.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/uuid/uuid_generators.hpp>
 
 namespace cmajor { namespace symbols {
 
-using namespace cmajor::unicode;
+using namespace soulng::unicode;
 
 bool operator==(const ClassTemplateSpecializationKey& left, const ClassTemplateSpecializationKey& right)
 {
@@ -1569,25 +1570,25 @@ std::u32string SymbolTable::GetProfiledFunctionName(const boost::uuids::uuid& fu
     return std::u32string();
 }
 
-std::unique_ptr<dom::Document> SymbolTable::ToDomDocument() 
+std::unique_ptr<sngxml::dom::Document> SymbolTable::ToDomDocument() 
 {
     TypeMap typeMap;
-    std::unique_ptr<dom::Document> doc(new dom::Document());
-    std::unique_ptr<dom::Element> st(new dom::Element(U"symbolTable"));
-    std::unique_ptr<dom::Element> globalNsElement = globalNs.ToDomElement(typeMap);
-    std::unique_ptr<dom::Element> symbols(new dom::Element(U"symbols"));
-    symbols->AppendChild(std::unique_ptr<dom::Node>(globalNsElement.release()));
-    st->AppendChild(std::unique_ptr<dom::Node>(symbols.release()));
-    std::unique_ptr<dom::Element> types(new dom::Element(U"types"));
-    std::vector<std::unique_ptr<dom::Element>> typeElements = typeMap.TypeElements();
+    std::unique_ptr<sngxml::dom::Document> doc(new sngxml::dom::Document());
+    std::unique_ptr<sngxml::dom::Element> st(new sngxml::dom::Element(U"symbolTable"));
+    std::unique_ptr<sngxml::dom::Element> globalNsElement = globalNs.ToDomElement(typeMap);
+    std::unique_ptr<sngxml::dom::Element> symbols(new sngxml::dom::Element(U"symbols"));
+    symbols->AppendChild(std::unique_ptr<sngxml::dom::Node>(globalNsElement.release()));
+    st->AppendChild(std::unique_ptr<sngxml::dom::Node>(symbols.release()));
+    std::unique_ptr<sngxml::dom::Element> types(new sngxml::dom::Element(U"types"));
+    std::vector<std::unique_ptr<sngxml::dom::Element>> typeElements = typeMap.TypeElements();
     int n = typeElements.size();
     for (int i = 0; i < n; ++i)
     {
-        std::unique_ptr<dom::Element> typeElement(std::move(typeElements[i]));
-        types->AppendChild(std::unique_ptr<dom::Node>(typeElement.release()));
+        std::unique_ptr<sngxml::dom::Element> typeElement(std::move(typeElements[i]));
+        types->AppendChild(std::unique_ptr<sngxml::dom::Node>(typeElement.release()));
     }
-    st->AppendChild(std::unique_ptr<dom::Node>(types.release()));
-    doc->AppendChild(std::unique_ptr<dom::Node>(st.release()));
+    st->AppendChild(std::unique_ptr<sngxml::dom::Node>(types.release()));
+    doc->AppendChild(std::unique_ptr<sngxml::dom::Node>(st.release()));
     return doc;
 }
 
@@ -1862,6 +1863,7 @@ void InitCoreSymbolTable(SymbolTable& symbolTable)
         symbolTable.EndConcept();
         conceptSymbol->ComputeName();
     }
+    symbolTable.AddTypeSymbolToGlobalScope(new StringFunctionContainerSymbol());
 }
 
 /*

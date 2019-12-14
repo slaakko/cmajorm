@@ -9,13 +9,13 @@
 #include <cmajor/symbols/Module.hpp>
 #include <cmajor/symbols/SymbolWriter.hpp>
 #include <cmajor/symbols/SymbolReader.hpp>
-#include <cmajor/util/Unicode.hpp>
-#include <cmajor/util/Sha1.hpp>
+#include <soulng/util/Unicode.hpp>
+#include <soulng/util/Sha1.hpp>
 #include <boost/uuid/uuid_generators.hpp>
 
 namespace cmajor { namespace symbols {
 
-using namespace cmajor::unicode;
+using namespace soulng::unicode;
 
 TemplateParameterSymbol::TemplateParameterSymbol(const Span& span_, const std::u32string& name_) : 
     TypeSymbol(SymbolType::templateParameterSymbol, span_, name_), hasDefault(false), defaultType(nullptr)
@@ -94,15 +94,15 @@ void BoundTemplateParameterSymbol::Read(SymbolReader& reader)
     reader.GetSymbolTable()->EmplaceTypeRequest(reader, this, typeId, 0);
 }
 
-std::unique_ptr<dom::Element> BoundTemplateParameterSymbol::CreateDomElement(TypeMap& typeMap)
+std::unique_ptr<sngxml::dom::Element> BoundTemplateParameterSymbol::CreateDomElement(TypeMap& typeMap)
 {
-    std::unique_ptr<dom::Element> element(new dom::Element(U"BoundTemplateParameterSymbol"));
+    std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(U"BoundTemplateParameterSymbol"));
     if (type)
     {
-        std::unique_ptr<dom::Element> typeElement(new dom::Element(U"type"));
+        std::unique_ptr<sngxml::dom::Element> typeElement(new sngxml::dom::Element(U"type"));
         int typeId = typeMap.GetOrInsertType(type);
         typeElement->SetAttribute(U"ref", U"type_" + ToUtf32(std::to_string(typeId)));
-        element->AppendChild(std::unique_ptr<dom::Node>(typeElement.release()));
+        element->AppendChild(std::unique_ptr<sngxml::dom::Node>(typeElement.release()));
     }
     return element;
 }

@@ -23,7 +23,7 @@ public:
     void AddConcept(ConceptSymbol* concept);
     ConceptSymbol* GetConcept(int arity);
     bool HasProjectMembers() const override;
-    void AppendChildElements(dom::Element* element, TypeMap& typeMap) const override;
+    void AppendChildElements(sngxml::dom::Element* element, TypeMap& typeMap) const override;
     std::u32string Info() const override { return Name(); }
     const char* ClassName() const override { return "ConceptGroupSymbol"; }
     void Check() override;

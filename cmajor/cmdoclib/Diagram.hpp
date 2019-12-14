@@ -6,7 +6,7 @@
 #ifndef CMAJOR_CMDOCLIB_DIAGRAM_INCLUDED
 #define CMAJOR_CMDOCLIB_DIAGRAM_INCLUDED
 #include <cmajor/cmdoclib/CmDocLibApi.hpp>
-#include <cmajor/util/CodeFormatter.hpp>
+#include <soulng/util/CodeFormatter.hpp>
 #include <vector>
 
 namespace cmajor { namespace cmdoclib {
@@ -14,7 +14,7 @@ namespace cmajor { namespace cmdoclib {
 struct CMDOCLIB_API DiagramNode
 {
     DiagramNode(int index_, int level_, const std::u32string& name_, bool subject_, bool hasDerivedNodes_, const std::u32string& link_);
-    void Write(cmajor::util::CodeFormatter& formatter);
+    void Write(soulng::util::CodeFormatter& formatter);
     int index;
     int level;
     std::u32string name;

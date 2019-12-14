@@ -1,0 +1,43 @@
+// =================================
+// Copyright (c) 2019 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+[hpp]#include <sngcm/cmparser/ParserApi.hpp>
+[hpp]#include <sngcm/ast/Constant.hpp>
+[hpp]#include <sngcm/cmparser/ParsingContext.hpp>
+[cpp]#include <sngcm/cmparser/Specifier.hpp>
+[cpp]#include <sngcm/cmparser/TypeExpr.hpp>
+[cpp]#include <sngcm/cmparser/Identifier.hpp>
+[cpp]#include <sngcm/cmparser/Expression.hpp>
+[cpp]#include <sngcm/cmlexer/CmajorLexer.hpp>
+[cpp]#include <sngcm/cmlexer/CmajorTokens.hpp>
+
+using namespace sngcm::ast;
+using namespace CmajorTokens;
+
+parser api(SNGCM_PARSER_API) ConstantParser
+{
+    uselexer CmajorLexer;
+
+    using SpecifierParser.Specifiers;
+    using TypeExprParser.TypeExpr;
+    using ExpressionParser.Expression;
+    using IdentifierParser.Identifier;
+
+    Constant(ParsingContext* ctx, var Span s, var std::unique_ptr<Node> e) : ConstantNode*
+        ::= Specifiers:specifiers{ s = span; } CONST TypeExpr(ctx):type! Identifier:id! ASSIGN Expression(ctx):expr{ e.reset(expr); } SEMICOLON
+        {
+            e->SetFullSpan();
+            s.end = e->GetSpan().end;
+            ConstantNode* value = new ConstantNode(s, specifiers, type, id, e.release());
+            value->SetStrValue(lexer.GetMatch(s));
+            return value;
+        }
+        ;
+
+    ruleinfo
+    {
+        (Constant, "constant")
+    }
+}

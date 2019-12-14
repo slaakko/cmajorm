@@ -10,11 +10,11 @@
 #include <cmajor/binder/BoundStatement.hpp>
 #include <cmajor/binder/BoundNodeVisitor.hpp>
 #include <cmajor/symbols/Module.hpp>
-#include <cmajor/util/Unicode.hpp>
+#include <soulng/util/Unicode.hpp>
 
 namespace cmajor { namespace binder {
 
-using namespace cmajor::unicode;
+using namespace soulng::unicode;
 
 class ControlFlowAnalyzer : public BoundNodeVisitor
 {

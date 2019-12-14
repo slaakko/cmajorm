@@ -43,6 +43,7 @@
     <ClInclude Include="NamespaceSymbol.hpp" />
     <ClInclude Include="Operation.hpp" />
     <ClInclude Include="Scope.hpp" />
+    <ClInclude Include="StringFunctions.hpp" />
     <ClInclude Include="Symbol.hpp" />
     <ClInclude Include="SymbolCollector.hpp" />
     <ClInclude Include="SymbolCreatorVisitor.hpp" />
@@ -84,6 +85,7 @@
     <ClCompile Include="NamespaceSymbol.cpp" />
     <ClCompile Include="Operation.cpp" />
     <ClCompile Include="Scope.cpp" />
+    <ClCompile Include="StringFunctions.cpp" />
     <ClCompile Include="Symbol.cpp" />
     <ClCompile Include="SymbolCollector.cpp" />
     <ClCompile Include="SymbolCreatorVisitor.cpp" />
@@ -177,14 +179,15 @@
       <PreprocessorDefinitions>_DEBUG;SYMBOLS_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <AdditionalIncludeDirectories>../..;C:\Program Files\boost\include\boost-1_68</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..;../..;C:\Boost\include\boost-1_71</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4141;4146;4244;4267;4291;4624;4996;4251;4275</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
-      <AdditionalLibraryDirectories>$(OutDir);C:\Program Files\boost\lib;D:\work\cmajorm\cmajor\lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>codedomd.lib;parsingd.lib;dom.lib;astd.lib;ird.lib;utild.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OutDir);C:\Boost\lib;..\..\lib</AdditionalLibraryDirectories>
+      <AdditionalDependencies>
+      </AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -223,7 +226,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>NDEBUG;SYMBOLS_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>../..;C:\Program Files\boost\include\boost-1_68</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..;../..;C:\Boost\include\boost-1_71</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4141;4146;4244;4267;4291;4624;4996;4251;4275</DisableSpecificWarnings>
     </ClCompile>
     <Link>
@@ -231,8 +234,9 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
-      <AdditionalLibraryDirectories>$(OutDir);C:\Program Files\boost\lib;D:\work\cmajorm\cmajor\lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>codedom.lib;parsing.lib;dom.lib;ast.lib;ir.lib;util.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OutDir);C:\Boost\lib;..\..\lib</AdditionalLibraryDirectories>
+      <AdditionalDependencies>
+      </AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

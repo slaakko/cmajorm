@@ -1,0 +1,53 @@
+// =================================
+// Copyright (c) 2019 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+[hpp]#include <sngcm/cmparser/ParserApi.hpp>
+[hpp]#include <sngcm/ast/Template.hpp>
+[hpp]#include <sngcm/cmparser/Identifier.hpp>
+[hpp]#include <sngcm/cmparser/TypeExpr.hpp>
+[hpp]#include <sngcm/cmparser/ParsingContext.hpp>
+[cpp]#include <sngcm/cmlexer/CmajorLexer.hpp>
+[cpp]#include <sngcm/cmlexer/CmajorTokens.hpp>
+
+using namespace sngcm::ast;
+using namespace CmajorTokens;
+
+parser api(SNGCM_PARSER_API) TemplateParser
+{
+    uselexer CmajorLexer;
+
+    using IdentifierParser.Identifier;
+    using IdentifierParser.QualifiedId;
+    using TypeExprParser.TypeExpr;
+
+    TemplateId(ParsingContext* ctx, var std::unique_ptr<TemplateIdNode> templateId, var Span e) : Node*
+        ::= empty{ ctx->BeginParsingTemplateId(); }
+            (QualifiedId:primary{ templateId.reset(new TemplateIdNode(span, primary)); }
+            LANGLE{ ++lexer.leftAngleCount; }
+            ((TypeExpr(ctx):templateArg{ templateId->AddTemplateArgument(templateArg); } % COMMA) RANGLE{ e = span; }){ --lexer.leftAngleCount; } / { --lexer.leftAngleCount; })
+        {
+            templateId->SetSpanEnd(e.end);
+            ctx->EndParsingTemplateId();
+            return templateId.release();
+        }
+        /
+        {
+            ctx->EndParsingTemplateId();
+        }
+        ;
+
+    TemplateParameter(ParsingContext* ctx) : TemplateParameterNode*
+        ::= (Identifier:id (ASSIGN TypeExpr(ctx):type)?){ return new TemplateParameterNode(span, id, type); }
+        ;
+
+    TemplateParameterList(ParsingContext* ctx, sngcm::ast::Node* owner)
+        ::= LANGLE (TemplateParameter(ctx):tp{ owner->AddTemplateParameter(tp); } % COMMA) RANGLE!
+        ;
+
+    ruleinfo
+    {
+        (TemplateId, "template identifier"), (TemplateParameter, "template parameter"), (TemplateParameterList, "template parameter list")
+    }
+}
