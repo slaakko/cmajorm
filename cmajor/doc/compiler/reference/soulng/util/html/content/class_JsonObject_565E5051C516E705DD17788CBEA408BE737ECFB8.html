@@ -1,0 +1,165 @@
+<html>
+    <head>
+        <meta charset="utf-8"/>
+        <title>JsonObject Class</title>
+        <link href="../style/style.css" rel="stylesheet" type="text/css"/>
+        <script src="class_JsonObject_565E5051C516E705DD17788CBEA408BE737ECFB8_inheritance.js" type="text/javascript"> </script>
+    </head>
+    <body onload="drawClassInheritanceDiagram()">
+        <a href="../../../../compiler-projects.html">top</a>
+         | <a href="namespace_util_E23A9512F2AAFD7C9E0BD9C05F0E325D24E4033B.html">up</a>
+         | <a href="class_JsonNumber_D145900EA9746387DFC1118AFF96C196D500CC2B.html">prev</a>
+         | <a href="class_JsonString_2259B74A69D96D51CABFFF3337929CCD1D05D5D8.html">next</a>
+        <hr/>
+        <h1>JsonObject Class</h1>
+        <div class="diagram">
+            <svg height="0" id="classInheritanceDiagram" version="2.0" width="0" xmlns="http://www.w3.org/2000/svg"/>
+        </div>
+        <span>
+            Definition at line <a href="file/Json.hpp_4251708192C7F4FE68AFC011C12F7AAC15DABC7D.html#69">69</a>
+             of <a href="file/Json.hpp_4251708192C7F4FE68AFC011C12F7AAC15DABC7D.html">Json.hpp</a>
+        </span>
+        <br/>
+        <h2>Constructors</h2>
+        <table class="constructorTable">
+            <tr>
+                <td class="constructorTableFirstCol" xml:space="preserve"><a href="class_JsonObject_565E5051C516E705DD17788CBEA408BE737ECFB8.html#constructor_JsonObject_52589489C0453061432084EAF738F04B3F36331F">JsonObject</a>()</td>
+            </tr>
+        </table>
+        <h2>Member Functions</h2>
+        <table class="functionTable">
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_JsonObject_565E5051C516E705DD17788CBEA408BE737ECFB8.html#function_AddField_8EE1F56C2BAD227F1A7CAAC419A5A922A0EA305F">AddField</a>(<span class="kw">const </span>std::u32string&amp; fieldName, std::unique_ptr&lt;<a href="./class_JsonValue_86C47A0347F1EFBF30D99D6A8B06C7D9311CBAA2.html">JsonValue</a>>&amp;&amp; fieldValue)</td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><a href="./class_JsonValue_86C47A0347F1EFBF30D99D6A8B06C7D9311CBAA2.html">JsonValue</a>*</td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_JsonObject_565E5051C516E705DD17788CBEA408BE737ECFB8.html#function_GetField_449B57BCE482A3FBF89ECD72648BEAB9E58C4F6A">GetField</a>(<span class="kw">const </span>std::u32string&amp; fieldName)</td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve">std::string</td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_JsonObject_565E5051C516E705DD17788CBEA408BE737ECFB8.html#function_ToString_A232AB4FDA889046E8B4159B4D7DE661089BA18E">ToString</a>() <span class="kw">const override</span></td>
+            </tr>
+        </table>
+        <h2>Member Variables</h2>
+        <table>
+            <tr id="variable_fieldMap_43C7DD9A6BDA67741E8A784C734AD3D40D906DAC">
+                <td class="functionTableFirstCol" xml:space="preserve">std::map&lt;std::u32string, <a href="./class_JsonValue_86C47A0347F1EFBF30D99D6A8B06C7D9311CBAA2.html">JsonValue</a>*></td>
+                <td class="functionTableSecondCol" xml:space="preserve">fieldMap</td>
+            </tr>
+            <tr id="variable_fieldValues_2BB6DA8A05719A39D3CB97233B8D4A810FD3F5D3">
+                <td class="functionTableFirstCol" xml:space="preserve">std::vector&lt;std::unique_ptr&lt;<a href="./class_JsonValue_86C47A0347F1EFBF30D99D6A8B06C7D9311CBAA2.html">JsonValue</a>>></td>
+                <td class="functionTableSecondCol" xml:space="preserve">fieldValues</td>
+            </tr>
+        </table>
+        <hr/>
+        <h2>Constructor Details</h2>
+        <h3 id="constructor_JsonObject_52589489C0453061432084EAF738F04B3F36331F">JsonObject Constructor</h3>
+        <h4>
+            soulng::util::JsonObject::JsonObject()</h4>
+        <span>
+            Definition at line <a href="file/Json.cpp_C28877B46F143F20D56CA816B42B6CEB348811FB.html#104">104</a>
+             of <a href="file/Json.cpp_C28877B46F143F20D56CA816B42B6CEB348811FB.html">Json.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">104</span>&nbsp;<span class="other">:</span>&nbsp;<a href="./class_JsonValue_86C47A0347F1EFBF30D99D6A8B06C7D9311CBAA2.html">JsonValue</a><span class="other">(</span><a href="./enum_JsonValueType_462BAC4C194F63E8A241F5F4920CE986CAA207A0.html">JsonValueType</a><span class="other">::</span><a href="./enum_JsonValueType_462BAC4C194F63E8A241F5F4920CE986CAA207A0.html#enumerator_object_6204AB6B4E50270E7747C8BE7260A8D1B773D119">object</a><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_JsonObject_565E5051C516E705DD17788CBEA408BE737ECFB8.html#variable_fieldValues_2BB6DA8A05719A39D3CB97233B8D4A810FD3F5D3">fieldValues</a><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_JsonObject_565E5051C516E705DD17788CBEA408BE737ECFB8.html#variable_fieldMap_43C7DD9A6BDA67741E8A784C734AD3D40D906DAC">fieldMap</a><span class="other">(</span><span class="other">)</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">105</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">106</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/Json.hpp_4251708192C7F4FE68AFC011C12F7AAC15DABC7D.html#72">72</a>
+             of <a href="file/Json.hpp_4251708192C7F4FE68AFC011C12F7AAC15DABC7D.html">Json.hpp</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h2>Member Function Details</h2>
+        <h3 id="function_AddField_8EE1F56C2BAD227F1A7CAAC419A5A922A0EA305F">AddField Member Function</h3>
+        <h4>
+            <span class="kw">void</span>
+             soulng::util::JsonObject::AddField(<span class="kw">const </span>
+            std::u32string&amp; fieldName, std::unique_ptr&lt;<a href="./class_JsonValue_86C47A0347F1EFBF30D99D6A8B06C7D9311CBAA2.html">JsonValue</a>
+            >&amp;&amp; fieldValue)</h4>
+        <span>
+            Definition at line <a href="file/Json.cpp_C28877B46F143F20D56CA816B42B6CEB348811FB.html#108">108</a>
+             of <a href="file/Json.cpp_C28877B46F143F20D56CA816B42B6CEB348811FB.html">Json.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">109</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">110</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_JsonObject_565E5051C516E705DD17788CBEA408BE737ECFB8.html#variable_fieldMap_43C7DD9A6BDA67741E8A784C734AD3D40D906DAC">fieldMap</a><span class="other">[</span><span class="identifier">fieldName</span><span class="other">]</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">fieldValue</span><span class="other">.</span><span class="identifier">get</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">111</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_JsonObject_565E5051C516E705DD17788CBEA408BE737ECFB8.html#variable_fieldValues_2BB6DA8A05719A39D3CB97233B8D4A810FD3F5D3">fieldValues</a><span class="other">.</span><span class="identifier">push_back</span><span class="other">(</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">move</span><span class="other">(</span><span class="identifier">fieldValue</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">112</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/Json.hpp_4251708192C7F4FE68AFC011C12F7AAC15DABC7D.html#73">73</a>
+             of <a href="file/Json.hpp_4251708192C7F4FE68AFC011C12F7AAC15DABC7D.html">Json.hpp</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_GetField_449B57BCE482A3FBF89ECD72648BEAB9E58C4F6A">GetField Member Function</h3>
+        <h4>
+            <a href="./class_JsonValue_86C47A0347F1EFBF30D99D6A8B06C7D9311CBAA2.html">JsonValue</a>
+            * soulng::util::JsonObject::GetField(<span class="kw">const </span>
+            std::u32string&amp; fieldName)</h4>
+        <span>
+            Definition at line <a href="file/Json.cpp_C28877B46F143F20D56CA816B42B6CEB348811FB.html#114">114</a>
+             of <a href="file/Json.cpp_C28877B46F143F20D56CA816B42B6CEB348811FB.html">Json.cpp</a>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/Json.hpp_4251708192C7F4FE68AFC011C12F7AAC15DABC7D.html#74">74</a>
+             of <a href="file/Json.hpp_4251708192C7F4FE68AFC011C12F7AAC15DABC7D.html">Json.hpp</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_ToString_A232AB4FDA889046E8B4159B4D7DE661089BA18E">ToString Member Function</h3>
+        <h4>
+            std::string soulng::util::JsonObject::ToString() <span class="kw">const override</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/Json.cpp_C28877B46F143F20D56CA816B42B6CEB348811FB.html#127">127</a>
+             of <a href="file/Json.cpp_C28877B46F143F20D56CA816B42B6CEB348811FB.html">Json.cpp</a>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/Json.hpp_4251708192C7F4FE68AFC011C12F7AAC15DABC7D.html#75">75</a>
+             of <a href="file/Json.hpp_4251708192C7F4FE68AFC011C12F7AAC15DABC7D.html">Json.hpp</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Base class overridden functions: <a href="./class_JsonValue_86C47A0347F1EFBF30D99D6A8B06C7D9311CBAA2.html#function_ToString_58FC5A07AF60C46FA6ECA35683E60E631A4F74DC">soulng::util::JsonValue::ToString</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Calls: <a href="./class_JsonObject_565E5051C516E705DD17788CBEA408BE737ECFB8.html#function_ToString_A232AB4FDA889046E8B4159B4D7DE661089BA18E">soulng::util::JsonObject::ToString</a>
+            , <a href="./class_JsonString_2259B74A69D96D51CABFFF3337929CCD1D05D5D8.html#function_ToString_DC614D4A4C44D3745BFDE3932BABE7DEB99FCD60">soulng::util::JsonString::ToString</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Called by: <a href="./class_JsonObject_565E5051C516E705DD17788CBEA408BE737ECFB8.html#function_ToString_A232AB4FDA889046E8B4159B4D7DE661089BA18E">soulng::util::JsonObject::ToString</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <a href="../../../../compiler-projects.html">top</a>
+         | <a href="namespace_util_E23A9512F2AAFD7C9E0BD9C05F0E325D24E4033B.html">up</a>
+         | <a href="class_JsonNumber_D145900EA9746387DFC1118AFF96C196D500CC2B.html">prev</a>
+         | <a href="class_JsonString_2259B74A69D96D51CABFFF3337929CCD1D05D5D8.html">next</a>
+    </body>
+</html>

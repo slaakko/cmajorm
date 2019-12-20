@@ -1,0 +1,368 @@
+<html>
+    <head>
+        <meta charset="utf-8"/>
+        <title>UnaryNode Abstract Class</title>
+        <link href="../style/style.css" rel="stylesheet" type="text/css"/>
+        <script src="class_UnaryNode_165135A5C7753F52B4F177BA0F0E4222CB08456A_inheritance.js" type="text/javascript"> </script>
+    </head>
+    <body onload="drawClassInheritanceDiagram()">
+        <a href="../../../../compiler-projects.html">top</a>
+         | <a href="namespace_ast_92B316F3086369C69BB33331B69D260F42EB9214.html">up</a>
+         | <a href="class_UnaryMinusNode_FE5C9C78B9E8BD832B00578BBD225B17D3F00CD8.html">prev</a>
+         | <a href="class_UnaryPlusNode_32CF619985622AD1511854185F327AC47ECCCBE9.html">next</a>
+        <hr/>
+        <h1>UnaryNode Abstract Class</h1>
+        <div class="diagram">
+            <svg height="0" id="classInheritanceDiagram" version="2.0" width="0" xmlns="http://www.w3.org/2000/svg"/>
+        </div>
+        <span>
+            Definition at line <a href="file/Node.hpp_836F61A8A19212BC7185877B0C4FC76BBDBE7023.html#95">95</a>
+             of <a href="file/Node.hpp_836F61A8A19212BC7185877B0C4FC76BBDBE7023.html">Node.hpp</a>
+        </span>
+        <br/>
+        <h2>Constructors</h2>
+        <table class="constructorTable">
+            <tr>
+                <td class="constructorTableFirstCol" xml:space="preserve"><a href="class_UnaryNode_165135A5C7753F52B4F177BA0F0E4222CB08456A.html#constructor_UnaryNode_B08A3B0476669923654E1B2058E84571A6B8BF00">UnaryNode</a>(<a href="./enum_NodeType_7A9078208A9559F99B3E7BE36B25F5CB0CFCDCD2.html">NodeType</a> nodeType_, <span class="kw">const </span><a href="./../../../../soulng/lexer/html/content/struct_Span_30EE73A264B60937695144F1BD60852CA010DF7E.html">Span</a>&amp; span_)</td>
+            </tr>
+            <tr>
+                <td class="constructorTableFirstCol" xml:space="preserve"><a href="class_UnaryNode_165135A5C7753F52B4F177BA0F0E4222CB08456A.html#constructor_UnaryNode_1A69AFD5AB76689CFE41FB90AF1056C8EFAABBB7">UnaryNode</a>(<a href="./enum_NodeType_7A9078208A9559F99B3E7BE36B25F5CB0CFCDCD2.html">NodeType</a> nodeType_, <span class="kw">const </span><a href="./../../../../soulng/lexer/html/content/struct_Span_30EE73A264B60937695144F1BD60852CA010DF7E.html">Span</a>&amp; span_, <a href="./class_Node_7FDC87EBEBE372FAA4360E17F122F6028A1505D6.html">Node</a>* subject_)</td>
+            </tr>
+        </table>
+        <h2>Member Functions</h2>
+        <table class="functionTable">
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_UnaryNode_165135A5C7753F52B4F177BA0F0E4222CB08456A.html#function_Read_5887246292BB7E04D258B11A20514D2625449952">Read</a>(<a href="./class_AstReader_83AF922492FCB69E71E24FE05933E85CDDA3A1C1.html">AstReader</a>&amp; reader) <span class="kw">override</span></td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_UnaryNode_165135A5C7753F52B4F177BA0F0E4222CB08456A.html#function_SetFullSpan_5309FFBD3DC2056F761BBABB52672368BCFDEEA5">SetFullSpan</a>() <span class="kw">override</span></td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">const </span><a href="./class_Node_7FDC87EBEBE372FAA4360E17F122F6028A1505D6.html">Node</a>*</td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_UnaryNode_165135A5C7753F52B4F177BA0F0E4222CB08456A.html#function_Subject_35FF5EF20F588BDAF84CC0A036E050084A9506A3">Subject</a>() <span class="kw">const</span></td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><a href="./class_Node_7FDC87EBEBE372FAA4360E17F122F6028A1505D6.html">Node</a>*</td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_UnaryNode_165135A5C7753F52B4F177BA0F0E4222CB08456A.html#function_Subject_C19F6B20317BB67C2BC651600456830AAD86B23C">Subject</a>()</td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_UnaryNode_165135A5C7753F52B4F177BA0F0E4222CB08456A.html#function_Write_AAEB43B67BAB6C3BE912B30FBBAA113A13C8D85A">Write</a>(<a href="./class_AstWriter_55521D978F954F056D58DA00DE17A7FF56217E9E.html">AstWriter</a>&amp; writer) <span class="kw">override</span></td>
+            </tr>
+        </table>
+        <h2>Member Variables</h2>
+        <table>
+            <tr id="variable_subject_144E074FF1BF5DA3E68ADF4189F9C1370B5E8548">
+                <td class="functionTableFirstCol" xml:space="preserve">std::unique_ptr&lt;<a href="./class_Node_7FDC87EBEBE372FAA4360E17F122F6028A1505D6.html">Node</a>></td>
+                <td class="functionTableSecondCol" xml:space="preserve">subject</td>
+            </tr>
+        </table>
+        <hr/>
+        <h2>Constructor Details</h2>
+        <h3 id="constructor_UnaryNode_B08A3B0476669923654E1B2058E84571A6B8BF00">UnaryNode Constructor</h3>
+        <h4>
+            sngcm::ast::UnaryNode::UnaryNode(<a href="./enum_NodeType_7A9078208A9559F99B3E7BE36B25F5CB0CFCDCD2.html">NodeType</a>
+             nodeType_, <span class="kw">const </span>
+            <a href="./../../../../soulng/lexer/html/content/struct_Span_30EE73A264B60937695144F1BD60852CA010DF7E.html">Span</a>
+            &amp; span_)</h4>
+        <span>
+            Definition at line <a href="file/Node.cpp_817EA1879E393FD3DA606E48EEAD6BBE3AC81641.html#93">93</a>
+             of <a href="file/Node.cpp_817EA1879E393FD3DA606E48EEAD6BBE3AC81641.html">Node.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;93</span>&nbsp;<span class="other">:</span>&nbsp;<a href="./class_Node_7FDC87EBEBE372FAA4360E17F122F6028A1505D6.html">Node</a><span class="other">(</span><span class="identifier">nodeType_</span><span class="other">,&nbsp;</span><span class="identifier">span_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_UnaryNode_165135A5C7753F52B4F177BA0F0E4222CB08456A.html#variable_subject_144E074FF1BF5DA3E68ADF4189F9C1370B5E8548">subject</a><span class="other">(</span><span class="other">)</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;94</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;95</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/Node.hpp_836F61A8A19212BC7185877B0C4FC76BBDBE7023.html#98">98</a>
+             of <a href="file/Node.hpp_836F61A8A19212BC7185877B0C4FC76BBDBE7023.html">Node.hpp</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="constructor_UnaryNode_1A69AFD5AB76689CFE41FB90AF1056C8EFAABBB7">UnaryNode Constructor</h3>
+        <h4>
+            sngcm::ast::UnaryNode::UnaryNode(<a href="./enum_NodeType_7A9078208A9559F99B3E7BE36B25F5CB0CFCDCD2.html">NodeType</a>
+             nodeType_, <span class="kw">const </span>
+            <a href="./../../../../soulng/lexer/html/content/struct_Span_30EE73A264B60937695144F1BD60852CA010DF7E.html">Span</a>
+            &amp; span_, <a href="./class_Node_7FDC87EBEBE372FAA4360E17F122F6028A1505D6.html">Node</a>
+            * subject_)</h4>
+        <span>
+            Definition at line <a href="file/Node.cpp_817EA1879E393FD3DA606E48EEAD6BBE3AC81641.html#97">97</a>
+             of <a href="file/Node.cpp_817EA1879E393FD3DA606E48EEAD6BBE3AC81641.html">Node.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;97</span>&nbsp;<span class="other">:</span>&nbsp;<a href="./class_Node_7FDC87EBEBE372FAA4360E17F122F6028A1505D6.html">Node</a><span class="other">(</span><span class="identifier">nodeType_</span><span class="other">,&nbsp;</span><span class="identifier">span_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_UnaryNode_165135A5C7753F52B4F177BA0F0E4222CB08456A.html#variable_subject_144E074FF1BF5DA3E68ADF4189F9C1370B5E8548">subject</a><span class="other">(</span><span class="identifier">subject_</span><span class="other">)</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;98</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;99</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/Node.hpp_836F61A8A19212BC7185877B0C4FC76BBDBE7023.html#99">99</a>
+             of <a href="file/Node.hpp_836F61A8A19212BC7185877B0C4FC76BBDBE7023.html">Node.hpp</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h2>Member Function Details</h2>
+        <h3 id="function_Read_5887246292BB7E04D258B11A20514D2625449952">Read Member Function</h3>
+        <h4>
+            <span class="kw">void</span>
+             sngcm::ast::UnaryNode::Read(<a href="./class_AstReader_83AF922492FCB69E71E24FE05933E85CDDA3A1C1.html">AstReader</a>
+            &amp; reader) <span class="kw">override</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/Node.cpp_817EA1879E393FD3DA606E48EEAD6BBE3AC81641.html#107">107</a>
+             of <a href="file/Node.cpp_817EA1879E393FD3DA606E48EEAD6BBE3AC81641.html">Node.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">108</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">109</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_Node_7FDC87EBEBE372FAA4360E17F122F6028A1505D6.html">Node</a><span class="other">::</span><span class="identifier">Read</span><span class="other">(</span><span class="identifier">reader</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">110</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_UnaryNode_165135A5C7753F52B4F177BA0F0E4222CB08456A.html#variable_subject_144E074FF1BF5DA3E68ADF4189F9C1370B5E8548">subject</a><span class="other">.</span><span class="identifier">reset</span><span class="other">(</span><span class="identifier">reader</span><span class="other">.</span><span class="identifier">ReadNode</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">111</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_UnaryNode_165135A5C7753F52B4F177BA0F0E4222CB08456A.html#variable_subject_144E074FF1BF5DA3E68ADF4189F9C1370B5E8548">subject</a><span class="other">-></span><span class="identifier">SetParent</span><span class="other">(</span><span class="kw">this</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">112</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/Node.hpp_836F61A8A19212BC7185877B0C4FC76BBDBE7023.html#101">101</a>
+             of <a href="file/Node.hpp_836F61A8A19212BC7185877B0C4FC76BBDBE7023.html">Node.hpp</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Base class overridden functions: <a href="./class_Node_7FDC87EBEBE372FAA4360E17F122F6028A1505D6.html#function_Read_752482F1CB1306EFB283CCDCEDEE428813AFB309">sngcm::ast::Node::Read</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Derived class overrides: <a href="./class_ArrowNode_18E24A8B3EE68A393B6C03328C46593F32291582.html#function_Read_7ABBF5BAE7D65F0F127A0F3BFAF3FD97A7E5BDA6">sngcm::ast::ArrowNode::Read</a>
+            , <a href="./class_DotNode_00CE98206AFDB0D9D33F072754FA67CCD9FCC726.html#function_Read_D11994AD81DCDA6950638953156493F3FE1F6EAB">sngcm::ast::DotNode::Read</a>
+            , <a href="./class_ParenthesizedExpressionNode_0B617EDA6C23D6F056B59DF1C9306C6AF42BF619.html#function_Read_4AD3B0AB587A50D504149B96FF5A66C26FAB837B">sngcm::ast::ParenthesizedExpressionNode::Read</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Calls: <a href="./class_AstReader_83AF922492FCB69E71E24FE05933E85CDDA3A1C1.html#function_ReadNode_EDD56073762F6C46EE306D4C29645A61843CB523">sngcm::ast::AstReader::ReadNode</a>
+            , <a href="./class_Node_7FDC87EBEBE372FAA4360E17F122F6028A1505D6.html#function_Read_752482F1CB1306EFB283CCDCEDEE428813AFB309">sngcm::ast::Node::Read</a>
+            , <a href="./class_Node_7FDC87EBEBE372FAA4360E17F122F6028A1505D6.html#function_SetParent_C9CC10A97DD1BD027D4AA8CC9726919C2E037A27">sngcm::ast::Node::SetParent</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Called by: <a href="./class_ArrowNode_18E24A8B3EE68A393B6C03328C46593F32291582.html#function_Read_7ABBF5BAE7D65F0F127A0F3BFAF3FD97A7E5BDA6">sngcm::ast::ArrowNode::Read</a>
+            , <a href="./class_DotNode_00CE98206AFDB0D9D33F072754FA67CCD9FCC726.html#function_Read_D11994AD81DCDA6950638953156493F3FE1F6EAB">sngcm::ast::DotNode::Read</a>
+            , <a href="./class_ParenthesizedExpressionNode_0B617EDA6C23D6F056B59DF1C9306C6AF42BF619.html#function_Read_4AD3B0AB587A50D504149B96FF5A66C26FAB837B">sngcm::ast::ParenthesizedExpressionNode::Read</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_SetFullSpan_5309FFBD3DC2056F761BBABB52672368BCFDEEA5">SetFullSpan Member Function</h3>
+        <h4>
+            <span class="kw">void</span>
+             sngcm::ast::UnaryNode::SetFullSpan() <span class="kw">override</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/Node.cpp_817EA1879E393FD3DA606E48EEAD6BBE3AC81641.html#114">114</a>
+             of <a href="file/Node.cpp_817EA1879E393FD3DA606E48EEAD6BBE3AC81641.html">Node.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">115</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">116</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><a href="./class_UnaryNode_165135A5C7753F52B4F177BA0F0E4222CB08456A.html#variable_subject_144E074FF1BF5DA3E68ADF4189F9C1370B5E8548">subject</a><span class="other">)</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">117</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">118</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">const</span>&nbsp;<a href="./../../../../soulng/lexer/html/content/struct_Span_30EE73A264B60937695144F1BD60852CA010DF7E.html">Span</a><span class="other">&amp;</span>&nbsp;<span class="identifier">thisSpan</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">GetSpan</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">119</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_UnaryNode_165135A5C7753F52B4F177BA0F0E4222CB08456A.html#variable_subject_144E074FF1BF5DA3E68ADF4189F9C1370B5E8548">subject</a><span class="other">-></span><span class="identifier">SetFullSpan</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">120</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">const</span>&nbsp;<a href="./../../../../soulng/lexer/html/content/struct_Span_30EE73A264B60937695144F1BD60852CA010DF7E.html">Span</a><span class="other">&amp;</span>&nbsp;<span class="identifier">childSpan</span>&nbsp;<span class="other">=</span>&nbsp;<a href="./class_UnaryNode_165135A5C7753F52B4F177BA0F0E4222CB08456A.html#variable_subject_144E074FF1BF5DA3E68ADF4189F9C1370B5E8548">subject</a><span class="other">-></span><span class="identifier">GetSpan</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">121</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">SetSpanStart</span><span class="other">(</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">min</span><span class="other">(</span><span class="identifier">thisSpan</span><span class="other">.</span><a href="./../../../../soulng/lexer/html/content/struct_Span_30EE73A264B60937695144F1BD60852CA010DF7E.html#variable_start_0EB4D148F31AB3C42C3BD2666BBBBF06D0B91630">start</a><span class="other">,&nbsp;</span><span class="identifier">childSpan</span><span class="other">.</span><a href="./../../../../soulng/lexer/html/content/struct_Span_30EE73A264B60937695144F1BD60852CA010DF7E.html#variable_start_0EB4D148F31AB3C42C3BD2666BBBBF06D0B91630">start</a><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">122</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">SetSpanEnd</span><span class="other">(</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">max</span><span class="other">(</span><span class="identifier">thisSpan</span><span class="other">.</span><a href="./../../../../soulng/lexer/html/content/struct_Span_30EE73A264B60937695144F1BD60852CA010DF7E.html#variable_end_92AD5CE1C47CBE1951D90D4007C9DA5230BB097E">end</a><span class="other">,&nbsp;</span><span class="identifier">childSpan</span><span class="other">.</span><a href="./../../../../soulng/lexer/html/content/struct_Span_30EE73A264B60937695144F1BD60852CA010DF7E.html#variable_end_92AD5CE1C47CBE1951D90D4007C9DA5230BB097E">end</a><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">123</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">124</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/Node.hpp_836F61A8A19212BC7185877B0C4FC76BBDBE7023.html#102">102</a>
+             of <a href="file/Node.hpp_836F61A8A19212BC7185877B0C4FC76BBDBE7023.html">Node.hpp</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Base class overridden functions: <a href="./class_Node_7FDC87EBEBE372FAA4360E17F122F6028A1505D6.html#function_SetFullSpan_140684BC5640B628A36EBDB7F0E9FD05400C8CAE">sngcm::ast::Node::SetFullSpan</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Calls: <a href="./class_Node_7FDC87EBEBE372FAA4360E17F122F6028A1505D6.html#function_GetSpan_2C0C8352C84DB2C90B655B64DC94DE1F897E5979">sngcm::ast::Node::GetSpan</a>
+            , <a href="./class_Node_7FDC87EBEBE372FAA4360E17F122F6028A1505D6.html#function_SetSpanEnd_9FF7CC1FC60287DCA0D7AC8B72BC18CF68165BB4">sngcm::ast::Node::SetSpanEnd</a>
+            , <a href="./class_Node_7FDC87EBEBE372FAA4360E17F122F6028A1505D6.html#function_SetSpanStart_A7ACFDE2558B797F6E333A3659A922FA67B85C62">sngcm::ast::Node::SetSpanStart</a>
+            , <a href="./class_UnaryNode_165135A5C7753F52B4F177BA0F0E4222CB08456A.html#function_SetFullSpan_5309FFBD3DC2056F761BBABB52672368BCFDEEA5">sngcm::ast::UnaryNode::SetFullSpan</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Called by: <a href="./class_UnaryNode_165135A5C7753F52B4F177BA0F0E4222CB08456A.html#function_SetFullSpan_5309FFBD3DC2056F761BBABB52672368BCFDEEA5">sngcm::ast::UnaryNode::SetFullSpan</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_Subject_35FF5EF20F588BDAF84CC0A036E050084A9506A3">Subject Member Function</h3>
+        <h4>
+            <span class="kw">const </span>
+            <a href="./class_Node_7FDC87EBEBE372FAA4360E17F122F6028A1505D6.html">Node</a>
+            * sngcm::ast::UnaryNode::Subject() <span class="kw">const</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/Node.hpp_836F61A8A19212BC7185877B0C4FC76BBDBE7023.html#103">103</a>
+             of <a href="file/Node.hpp_836F61A8A19212BC7185877B0C4FC76BBDBE7023.html">Node.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">103</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_UnaryNode_165135A5C7753F52B4F177BA0F0E4222CB08456A.html#variable_subject_144E074FF1BF5DA3E68ADF4189F9C1370B5E8548">subject</a><span class="other">.</span><span class="identifier">get</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <hr/>
+        <h3 id="function_Subject_C19F6B20317BB67C2BC651600456830AAD86B23C">Subject Member Function</h3>
+        <h4>
+            <a href="./class_Node_7FDC87EBEBE372FAA4360E17F122F6028A1505D6.html">Node</a>
+            * sngcm::ast::UnaryNode::Subject()</h4>
+        <span>
+            Definition at line <a href="file/Node.hpp_836F61A8A19212BC7185877B0C4FC76BBDBE7023.html#104">104</a>
+             of <a href="file/Node.hpp_836F61A8A19212BC7185877B0C4FC76BBDBE7023.html">Node.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">104</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_UnaryNode_165135A5C7753F52B4F177BA0F0E4222CB08456A.html#variable_subject_144E074FF1BF5DA3E68ADF4189F9C1370B5E8548">subject</a><span class="other">.</span><span class="identifier">get</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Called by: <a href="./class_AddrOfNode_DE458EEE7F70C166D3982DBACC76BAAF2BE37831.html#function_Clone_3DFCD615569C5367F35E03C95A3C59E54486C7C4">sngcm::ast::AddrOfNode::Clone</a>
+            , <a href="./class_AddrOfNode_DE458EEE7F70C166D3982DBACC76BAAF2BE37831.html#function_ToString_D0B2C898D8B67BF06BDBACA8D212836EC01FC8BC">sngcm::ast::AddrOfNode::ToString</a>
+            , <a href="./class_ArrowNode_18E24A8B3EE68A393B6C03328C46593F32291582.html#function_Clone_859353CEFC1597184348BA14DF5444212E8D0F11">sngcm::ast::ArrowNode::Clone</a>
+            , <a href="./class_ArrowNode_18E24A8B3EE68A393B6C03328C46593F32291582.html#function_ToString_9C23D084550C4E2F6A162F37D774BD8183E1AA0B">sngcm::ast::ArrowNode::ToString</a>
+            , <a href="./class_ComplementNode_BB3F25E75A6C31BC5748D5AA50EAE3FE0F6FF298.html#function_Clone_D3D21C3BF7BE842C2E5741629CB278A1D7431DEA">sngcm::ast::ComplementNode::Clone</a>
+            , <a href="./class_ComplementNode_BB3F25E75A6C31BC5748D5AA50EAE3FE0F6FF298.html#function_ToString_47C12089A7E7EB828EEAA0275B7104A982398AA5">sngcm::ast::ComplementNode::ToString</a>
+            , <a href="./class_DerefNode_EEABC37F324A7821B8FA85DE0CA92BB469C60398.html#function_Clone_CDF8FCF62C3CEE409425C1874B2D09565A2CCC9B">sngcm::ast::DerefNode::Clone</a>
+            , <a href="./class_DerefNode_EEABC37F324A7821B8FA85DE0CA92BB469C60398.html#function_ToString_4AC8DA9F2F7589184C99702EB3D2191F11E4E495">sngcm::ast::DerefNode::ToString</a>
+            , <a href="./class_DotNode_00CE98206AFDB0D9D33F072754FA67CCD9FCC726.html#function_Clone_CE42AACAA1CE42EFD700B406D1197E6DA2B20226">sngcm::ast::DotNode::Clone</a>
+            , <a href="./class_DotNode_00CE98206AFDB0D9D33F072754FA67CCD9FCC726.html#function_ToString_C33A867AD821D6F1CC129B58F7F63F14A15AE5B5">sngcm::ast::DotNode::ToString</a>
+            , <a href="./class_NotNode_71CDBDE68FCC26CBC59F3DD118C932172CAF421D.html#function_Clone_5C0B177319DBED548486150C764C882AA385D0A4">sngcm::ast::NotNode::Clone</a>
+            , <a href="./class_NotNode_71CDBDE68FCC26CBC59F3DD118C932172CAF421D.html#function_ToString_DB4A66992BF1DA5DD80F4A082B88C2E937408EC4">sngcm::ast::NotNode::ToString</a>
+            , <a href="./class_ParenthesizedExpressionNode_0B617EDA6C23D6F056B59DF1C9306C6AF42BF619.html#function_Clone_573E2AA318EF69F7D55D00F9BB87F4D5775BBD67">sngcm::ast::ParenthesizedExpressionNode::Clone</a>
+            , <a href="./class_ParenthesizedExpressionNode_0B617EDA6C23D6F056B59DF1C9306C6AF42BF619.html#function_ToString_72AA0446355F3DD1423C48E1FCC640E7AD015E48">sngcm::ast::ParenthesizedExpressionNode::ToString</a>
+            , <a href="./class_PostfixDecrementNode_E2A5E030EE5C86D7098BBD97C1027E57BF5A9426.html#function_Clone_8BA4D0BFD3B1D70538AA1B338F79DA69994F43CC">sngcm::ast::PostfixDecrementNode::Clone</a>
+            , <a href="./class_PostfixDecrementNode_E2A5E030EE5C86D7098BBD97C1027E57BF5A9426.html#function_ToString_1ACEEC72E4600A07E6F536DB16676C33087B89F2">sngcm::ast::PostfixDecrementNode::ToString</a>
+            , <a href="./class_PostfixIncrementNode_3A0510723200D1FEF9044869EDE0D672DC410F5B.html#function_Clone_3F5F3F452F9208D4877CED676707D8ADF0F9B8F9">sngcm::ast::PostfixIncrementNode::Clone</a>
+            , <a href="./class_PostfixIncrementNode_3A0510723200D1FEF9044869EDE0D672DC410F5B.html#function_ToString_37AF17ACC997BEFA5CEE151BEC6AF8FCDE9BF453">sngcm::ast::PostfixIncrementNode::ToString</a>
+            , <a href="./class_PrefixDecrementNode_5C823FDF9C45F58CF9464A9CF2E4FCAD64D99F25.html#function_Clone_6D833FB902051B5F6C20F341D1174B65479EB876">sngcm::ast::PrefixDecrementNode::Clone</a>
+            , <a href="./class_PrefixDecrementNode_5C823FDF9C45F58CF9464A9CF2E4FCAD64D99F25.html#function_ToString_010947B7053A8974CBB62318E6A3C846E110F005">sngcm::ast::PrefixDecrementNode::ToString</a>
+            , <a href="./class_PrefixIncrementNode_93FF951231F8187CC017A56981316028F06F08E8.html#function_Clone_705ED3DF640EB3D307C92E3621A6BFD11051DE6C">sngcm::ast::PrefixIncrementNode::Clone</a>
+            , <a href="./class_PrefixIncrementNode_93FF951231F8187CC017A56981316028F06F08E8.html#function_ToString_747CD34B3F4DE61451620338E24A052AE3A038B2">sngcm::ast::PrefixIncrementNode::ToString</a>
+            , <a href="./class_SourceWriter_F8B0D3A0501E14A1198B89A881D033416892ED7B.html#function_Visit_558DD5D884F78881F5D03960FF6700DAF9791E27">sngcm::ast::SourceWriter::Visit</a>
+            , <a href="./class_SourceWriter_F8B0D3A0501E14A1198B89A881D033416892ED7B.html#function_Visit_9DF112E0999B85170F971B91F7FBF0B0435D22C6">sngcm::ast::SourceWriter::Visit</a>
+            , <a href="./class_SourceWriter_F8B0D3A0501E14A1198B89A881D033416892ED7B.html#function_Visit_B6D1C95962587084BC481C86107A015EAA729E01">sngcm::ast::SourceWriter::Visit</a>
+            , <a href="./class_SourceWriter_F8B0D3A0501E14A1198B89A881D033416892ED7B.html#function_Visit_CB9F16926EA53EEA968A48AE9FE70FF960E0CC51">sngcm::ast::SourceWriter::Visit</a>
+            , <a href="./class_SourceWriter_F8B0D3A0501E14A1198B89A881D033416892ED7B.html#function_Visit_DAC3CC8CF55FAA221EB310F88DC3A4C8D875D3DF">sngcm::ast::SourceWriter::Visit</a>
+            , <a href="./class_SourceWriter_F8B0D3A0501E14A1198B89A881D033416892ED7B.html#function_Visit_EFE60517EB040BF5E6D812F14D99FF79DAFE8B07">sngcm::ast::SourceWriter::Visit</a>
+            , <a href="./class_SourceWriter_F8B0D3A0501E14A1198B89A881D033416892ED7B.html#function_Visit_DD00DD04506C0DB2E01390087403A6D79F3DD456">sngcm::ast::SourceWriter::Visit</a>
+            , <a href="./class_SourceWriter_F8B0D3A0501E14A1198B89A881D033416892ED7B.html#function_Visit_7A763FCE27EC23FFF69367CFD6F8118BD71CBF96">sngcm::ast::SourceWriter::Visit</a>
+            , <a href="./class_SourceWriter_F8B0D3A0501E14A1198B89A881D033416892ED7B.html#function_Visit_3C4553ABC47F902E666E6EA3F43A5791C33D2D78">sngcm::ast::SourceWriter::Visit</a>
+            , <a href="./class_SourceWriter_F8B0D3A0501E14A1198B89A881D033416892ED7B.html#function_Visit_84A6C107098C67137C083B5C119DF0F35B6362A3">sngcm::ast::SourceWriter::Visit</a>
+            , <a href="./class_SourceWriter_F8B0D3A0501E14A1198B89A881D033416892ED7B.html#function_Visit_032FFC6918B1DB3004EBD1398E5DA99CDF2C4830">sngcm::ast::SourceWriter::Visit</a>
+            , <a href="./class_SourceWriter_F8B0D3A0501E14A1198B89A881D033416892ED7B.html#function_Visit_758E759374FC62755A7ED0A22DCD70B6762944CE">sngcm::ast::SourceWriter::Visit</a>
+            , <a href="./class_SourceWriter_F8B0D3A0501E14A1198B89A881D033416892ED7B.html#function_Visit_413F1BCC8D8763A4870E794481FBD0AA0058A18A">sngcm::ast::SourceWriter::Visit</a>
+            , <a href="./class_UnaryMinusNode_FE5C9C78B9E8BD832B00578BBD225B17D3F00CD8.html#function_Clone_2D3616E3B9F6981E2277E42B47CE51883A26E477">sngcm::ast::UnaryMinusNode::Clone</a>
+            , <a href="./class_UnaryMinusNode_FE5C9C78B9E8BD832B00578BBD225B17D3F00CD8.html#function_ToString_206462F057D607FEA54D49D2BDE1CB83C842E1A1">sngcm::ast::UnaryMinusNode::ToString</a>
+            , <a href="./class_UnaryPlusNode_32CF619985622AD1511854185F327AC47ECCCBE9.html#function_Clone_E292C6FEE1117ACB2F198349330EFAD16F927AA6">sngcm::ast::UnaryPlusNode::Clone</a>
+            , <a href="./class_UnaryPlusNode_32CF619985622AD1511854185F327AC47ECCCBE9.html#function_ToString_A39E62CE4712A37DC3CF1B776AD04B6DED6C7D15">sngcm::ast::UnaryPlusNode::ToString</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_Write_AAEB43B67BAB6C3BE912B30FBBAA113A13C8D85A">Write Member Function</h3>
+        <h4>
+            <span class="kw">void</span>
+             sngcm::ast::UnaryNode::Write(<a href="./class_AstWriter_55521D978F954F056D58DA00DE17A7FF56217E9E.html">AstWriter</a>
+            &amp; writer) <span class="kw">override</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/Node.cpp_817EA1879E393FD3DA606E48EEAD6BBE3AC81641.html#101">101</a>
+             of <a href="file/Node.cpp_817EA1879E393FD3DA606E48EEAD6BBE3AC81641.html">Node.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">102</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">103</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_Node_7FDC87EBEBE372FAA4360E17F122F6028A1505D6.html">Node</a><span class="other">::</span><span class="identifier">Write</span><span class="other">(</span><span class="identifier">writer</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">104</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">writer</span><span class="other">.</span><span class="identifier">Write</span><span class="other">(</span><a href="./class_UnaryNode_165135A5C7753F52B4F177BA0F0E4222CB08456A.html#variable_subject_144E074FF1BF5DA3E68ADF4189F9C1370B5E8548">subject</a><span class="other">.</span><span class="identifier">get</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">105</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/Node.hpp_836F61A8A19212BC7185877B0C4FC76BBDBE7023.html#100">100</a>
+             of <a href="file/Node.hpp_836F61A8A19212BC7185877B0C4FC76BBDBE7023.html">Node.hpp</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Base class overridden functions: <a href="./class_Node_7FDC87EBEBE372FAA4360E17F122F6028A1505D6.html#function_Write_67F59ACDC95A0AD11AD691611F8AB8512CF407C5">sngcm::ast::Node::Write</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Derived class overrides: <a href="./class_ArrowNode_18E24A8B3EE68A393B6C03328C46593F32291582.html#function_Write_A460A4F0076C16C8236A0EBECE7B6C69DDDF0DC6">sngcm::ast::ArrowNode::Write</a>
+            , <a href="./class_DotNode_00CE98206AFDB0D9D33F072754FA67CCD9FCC726.html#function_Write_409B8C113AE3DB0E8DD1657CAF08E7E47B0947F1">sngcm::ast::DotNode::Write</a>
+            , <a href="./class_ParenthesizedExpressionNode_0B617EDA6C23D6F056B59DF1C9306C6AF42BF619.html#function_Write_2422174BBC0179FD3156E8E9A912544A8711113D">sngcm::ast::ParenthesizedExpressionNode::Write</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Calls: <a href="./class_Node_7FDC87EBEBE372FAA4360E17F122F6028A1505D6.html#function_Write_67F59ACDC95A0AD11AD691611F8AB8512CF407C5">sngcm::ast::Node::Write</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Called by: <a href="./class_ArrowNode_18E24A8B3EE68A393B6C03328C46593F32291582.html#function_Write_A460A4F0076C16C8236A0EBECE7B6C69DDDF0DC6">sngcm::ast::ArrowNode::Write</a>
+            , <a href="./class_DotNode_00CE98206AFDB0D9D33F072754FA67CCD9FCC726.html#function_Write_409B8C113AE3DB0E8DD1657CAF08E7E47B0947F1">sngcm::ast::DotNode::Write</a>
+            , <a href="./class_ParenthesizedExpressionNode_0B617EDA6C23D6F056B59DF1C9306C6AF42BF619.html#function_Write_2422174BBC0179FD3156E8E9A912544A8711113D">sngcm::ast::ParenthesizedExpressionNode::Write</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <a href="../../../../compiler-projects.html">top</a>
+         | <a href="namespace_ast_92B316F3086369C69BB33331B69D260F42EB9214.html">up</a>
+         | <a href="class_UnaryMinusNode_FE5C9C78B9E8BD832B00578BBD225B17D3F00CD8.html">prev</a>
+         | <a href="class_UnaryPlusNode_32CF619985622AD1511854185F327AC47ECCCBE9.html">next</a>
+    </body>
+</html>

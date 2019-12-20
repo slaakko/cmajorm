@@ -23,7 +23,8 @@ void BoundConstraint::Store(Emitter& emitter, OperationFlags flags)
     throw Exception(GetModule(), "cannot store constraint", GetSpan());
 }
 
-BoundAtomicConstraint::BoundAtomicConstraint(Module* module_, const Span& span_, bool satisfied_) : BoundConstraint(module_, span_, BoundNodeType::boundAtomicConstraint), satisfied(satisfied_), concept(nullptr)
+BoundAtomicConstraint::BoundAtomicConstraint(Module* module_, const Span& span_, bool satisfied_) : BoundConstraint(module_, span_, BoundNodeType::boundAtomicConstraint), satisfied(satisfied_),
+    conceptSymbol(nullptr)
 {
 }
 
@@ -68,28 +69,28 @@ bool BoundAtomicConstraint::Subsume(BoundConstraint* that) const
         }
         else
         {
-            if (concept && !thatAtomic->concept)
+            if (conceptSymbol && !thatAtomic->conceptSymbol)
             {
                 return true;
             }
-            else if (!concept && thatAtomic->concept)
+            else if (!conceptSymbol && thatAtomic->conceptSymbol)
             {
                 return false;
             }
-            else if (!concept && !thatAtomic->concept)
+            else if (!conceptSymbol && !thatAtomic->conceptSymbol)
             {
                 return true;
             }
             else
             {
-                if (concept == thatAtomic->concept)
+                if (conceptSymbol == thatAtomic->conceptSymbol)
                 {
                     return true;
                 }
-                ConceptSymbol* refinedConcept = concept->RefinedConcept();
+                ConceptSymbol* refinedConcept = conceptSymbol->RefinedConcept();
                 while (refinedConcept)
                 {
-                    if (refinedConcept == thatAtomic->concept)
+                    if (refinedConcept == thatAtomic->conceptSymbol)
                     {
                         return true;
                     }

@@ -1,0 +1,208 @@
+<html>
+    <head>
+        <meta charset="utf-8"/>
+        <title>Profiler Class</title>
+        <link href="../style/style.css" rel="stylesheet" type="text/css"/>
+    </head>
+    <body>
+        <a href="../../../compiler-projects.html">top</a>
+         | <a href="namespace_rt_EF8D5C7D9502D19049E33A11686364EE54A983DA.html">up</a>
+         | <a href="class_MutexTable_F21C18E0AD83B5B52F3DB36BC99D4EA20E0CD6B7.html">prev</a>
+         | <a href="class_RecursiveMutexTable_ABDDA69E9BBCE5DC805566577AFEC9AB9E2AB693.html">next</a>
+        <hr/>
+        <h1>Profiler Class</h1>
+        <span>
+            Definition at line <a href="file/Profile.cpp_B94A783BE7083F85DC4E02F581B6E6D10086C779.html#37">37</a>
+             of <a href="file/Profile.cpp_B94A783BE7083F85DC4E02F581B6E6D10086C779.html">Profile.cpp</a>
+        </span>
+        <br/>
+        <h2>Member Functions</h2>
+        <table class="functionTable">
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve">std::vector&lt;<a href="./struct_FunctionProfileData_AA22C6CFC6D99F9B8AAF33A728699A34883E3361.html">FunctionProfileData</a>>*</td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_Profiler_565DD4BD3D3F27E291497A50D9412EF5843BEFFE.html#function_CreateFunctionProfileData_040A55B4AAAB18008B9F8CACE4B8F4598B833E79">CreateFunctionProfileData</a>()</td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_Profiler_565DD4BD3D3F27E291497A50D9412EF5843BEFFE.html#function_Done_6C85869CD8AC6E2AD9D7B182B04BE3C91ED85896">Done</a>() <span class="kw">static</span></td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_Profiler_565DD4BD3D3F27E291497A50D9412EF5843BEFFE.html#function_EndFunction_453B970DB677DFC3087E9B60FEFCD709622040D8">EndFunction</a>(<span class="kw">const </span>boost::uuids::uuid&amp; functionId)</td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_Profiler_565DD4BD3D3F27E291497A50D9412EF5843BEFFE.html#function_Init_C4FD496B15973E9787D7DBFE7A4E9517AA9D141A">Init</a>() <span class="kw">static</span></td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><a href="./class_Profiler_565DD4BD3D3F27E291497A50D9412EF5843BEFFE.html">Profiler</a>&amp;</td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_Profiler_565DD4BD3D3F27E291497A50D9412EF5843BEFFE.html#function_Instance_86477E1DEDEEB5A8BAA25A0FAA2D17D9841982A1">Instance</a>() <span class="kw">static</span></td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_Profiler_565DD4BD3D3F27E291497A50D9412EF5843BEFFE.html#function_StartFunction_93B42F519C23D1CA3FE49822DB9574AB080D68E6">StartFunction</a>(<span class="kw">const </span>boost::uuids::uuid&amp; functionId)</td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_Profiler_565DD4BD3D3F27E291497A50D9412EF5843BEFFE.html#function_WriteData_36F27F3701D7E2AD48A0A47C6429A30E4C60F74D">WriteData</a>()</td>
+            </tr>
+        </table>
+        <h2>Member Variables</h2>
+        <table>
+            <tr id="variable_instance_A5DEB2D604C584D345F3ADA41C0D255DBD207352">
+                <td class="functionTableFirstCol" xml:space="preserve">std::unique_ptr&lt;<a href="./class_Profiler_565DD4BD3D3F27E291497A50D9412EF5843BEFFE.html">Profiler</a>></td>
+                <td class="functionTableSecondCol" xml:space="preserve">instance <span class="kw">static</span></td>
+            </tr>
+            <tr id="variable_mtx_F3E0C60CBBCCE7113505C5C0E39E774041CD4D21">
+                <td class="functionTableFirstCol" xml:space="preserve">std::mutex</td>
+                <td class="functionTableSecondCol" xml:space="preserve">mtx</td>
+            </tr>
+            <tr id="variable_profileData_6BBB4B46B14DC7E492FBE83E58D8DC25F7005B74">
+                <td class="functionTableFirstCol" xml:space="preserve">std::vector&lt;std::unique_ptr&lt;std::vector&lt;<a href="./struct_FunctionProfileData_AA22C6CFC6D99F9B8AAF33A728699A34883E3361.html">FunctionProfileData</a>>>></td>
+                <td class="functionTableSecondCol" xml:space="preserve">profileData</td>
+            </tr>
+        </table>
+        <hr/>
+        <h2>Member Function Details</h2>
+        <h3 id="function_CreateFunctionProfileData_040A55B4AAAB18008B9F8CACE4B8F4598B833E79">CreateFunctionProfileData Member Function</h3>
+        <h4>
+            std::vector&lt;<a href="./struct_FunctionProfileData_AA22C6CFC6D99F9B8AAF33A728699A34883E3361.html">FunctionProfileData</a>
+            >* cmajor::rt::Profiler::CreateFunctionProfileData()</h4>
+        <span>
+            Definition at line <a href="file/Profile.cpp_B94A783BE7083F85DC4E02F581B6E6D10086C779.html#65">65</a>
+             of <a href="file/Profile.cpp_B94A783BE7083F85DC4E02F581B6E6D10086C779.html">Profile.cpp</a>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/Profile.cpp_B94A783BE7083F85DC4E02F581B6E6D10086C779.html#45">45</a>
+             of <a href="file/Profile.cpp_B94A783BE7083F85DC4E02F581B6E6D10086C779.html">Profile.cpp</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Called by: <a href="./class_Profiler_565DD4BD3D3F27E291497A50D9412EF5843BEFFE.html#function_EndFunction_453B970DB677DFC3087E9B60FEFCD709622040D8">cmajor::rt::Profiler::EndFunction</a>
+            , <a href="./class_Profiler_565DD4BD3D3F27E291497A50D9412EF5843BEFFE.html#function_StartFunction_93B42F519C23D1CA3FE49822DB9574AB080D68E6">cmajor::rt::Profiler::StartFunction</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_Done_6C85869CD8AC6E2AD9D7B182B04BE3C91ED85896">Done Member Function</h3>
+        <h4>
+            <span class="kw">void</span>
+             cmajor::rt::Profiler::Done() <span class="kw">static</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/Profile.cpp_B94A783BE7083F85DC4E02F581B6E6D10086C779.html#60">60</a>
+             of <a href="file/Profile.cpp_B94A783BE7083F85DC4E02F581B6E6D10086C779.html">Profile.cpp</a>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/Profile.cpp_B94A783BE7083F85DC4E02F581B6E6D10086C779.html#41">41</a>
+             of <a href="file/Profile.cpp_B94A783BE7083F85DC4E02F581B6E6D10086C779.html">Profile.cpp</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_EndFunction_453B970DB677DFC3087E9B60FEFCD709622040D8">EndFunction Member Function</h3>
+        <h4>
+            <span class="kw">void</span>
+             cmajor::rt::Profiler::EndFunction(<span class="kw">const </span>
+            boost::uuids::uuid&amp; functionId)</h4>
+        <span>
+            Definition at line <a href="file/Profile.cpp_B94A783BE7083F85DC4E02F581B6E6D10086C779.html#109">109</a>
+             of <a href="file/Profile.cpp_B94A783BE7083F85DC4E02F581B6E6D10086C779.html">Profile.cpp</a>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/Profile.cpp_B94A783BE7083F85DC4E02F581B6E6D10086C779.html#44">44</a>
+             of <a href="file/Profile.cpp_B94A783BE7083F85DC4E02F581B6E6D10086C779.html">Profile.cpp</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Calls: <a href="./class_Profiler_565DD4BD3D3F27E291497A50D9412EF5843BEFFE.html#function_CreateFunctionProfileData_040A55B4AAAB18008B9F8CACE4B8F4598B833E79">cmajor::rt::Profiler::CreateFunctionProfileData</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_Init_C4FD496B15973E9787D7DBFE7A4E9517AA9D141A">Init Member Function</h3>
+        <h4>
+            <span class="kw">void</span>
+             cmajor::rt::Profiler::Init() <span class="kw">static</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/Profile.cpp_B94A783BE7083F85DC4E02F581B6E6D10086C779.html#55">55</a>
+             of <a href="file/Profile.cpp_B94A783BE7083F85DC4E02F581B6E6D10086C779.html">Profile.cpp</a>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/Profile.cpp_B94A783BE7083F85DC4E02F581B6E6D10086C779.html#40">40</a>
+             of <a href="file/Profile.cpp_B94A783BE7083F85DC4E02F581B6E6D10086C779.html">Profile.cpp</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_Instance_86477E1DEDEEB5A8BAA25A0FAA2D17D9841982A1">Instance Member Function</h3>
+        <h4>
+            <a href="./class_Profiler_565DD4BD3D3F27E291497A50D9412EF5843BEFFE.html">Profiler</a>
+            &amp; cmajor::rt::Profiler::Instance() <span class="kw">static</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/Profile.cpp_B94A783BE7083F85DC4E02F581B6E6D10086C779.html#42">42</a>
+             of <a href="file/Profile.cpp_B94A783BE7083F85DC4E02F581B6E6D10086C779.html">Profile.cpp</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_StartFunction_93B42F519C23D1CA3FE49822DB9574AB080D68E6">StartFunction Member Function</h3>
+        <h4>
+            <span class="kw">void</span>
+             cmajor::rt::Profiler::StartFunction(<span class="kw">const </span>
+            boost::uuids::uuid&amp; functionId)</h4>
+        <span>
+            Definition at line <a href="file/Profile.cpp_B94A783BE7083F85DC4E02F581B6E6D10086C779.html#100">100</a>
+             of <a href="file/Profile.cpp_B94A783BE7083F85DC4E02F581B6E6D10086C779.html">Profile.cpp</a>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/Profile.cpp_B94A783BE7083F85DC4E02F581B6E6D10086C779.html#43">43</a>
+             of <a href="file/Profile.cpp_B94A783BE7083F85DC4E02F581B6E6D10086C779.html">Profile.cpp</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Calls: <a href="./class_Profiler_565DD4BD3D3F27E291497A50D9412EF5843BEFFE.html#function_CreateFunctionProfileData_040A55B4AAAB18008B9F8CACE4B8F4598B833E79">cmajor::rt::Profiler::CreateFunctionProfileData</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_WriteData_36F27F3701D7E2AD48A0A47C6429A30E4C60F74D">WriteData Member Function</h3>
+        <h4>
+            <span class="kw">void</span>
+             cmajor::rt::Profiler::WriteData()</h4>
+        <span>
+            Definition at line <a href="file/Profile.cpp_B94A783BE7083F85DC4E02F581B6E6D10086C779.html#72">72</a>
+             of <a href="file/Profile.cpp_B94A783BE7083F85DC4E02F581B6E6D10086C779.html">Profile.cpp</a>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/Profile.cpp_B94A783BE7083F85DC4E02F581B6E6D10086C779.html#46">46</a>
+             of <a href="file/Profile.cpp_B94A783BE7083F85DC4E02F581B6E6D10086C779.html">Profile.cpp</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Calls: <a href="./../../../soulng/util/html/content/class_BinaryWriter_0D40DDC5D57867D529F25148B10988402235B9CF.html#function_Write_46B20BD660CE2FB20A00D98F57775C1A33B1D3F0">soulng::util::BinaryWriter::Write</a>
+            , <a href="./../../../soulng/util/html/content/class_BinaryWriter_0D40DDC5D57867D529F25148B10988402235B9CF.html#function_Write_3E297EF11047E0C69B1F2573EE01C2915FB992C2">soulng::util::BinaryWriter::Write</a>
+            , <a href="./../../../soulng/util/html/content/class_Path_4B3DE54C4207046D89CC15C18C3336BA3FDCEA6F.html#function_Combine_366AB69E7B19657179918C0792B9E79E0FC1F1ED">soulng::util::Path::Combine</a>
+            , <a href="./../../../soulng/util/html/content/class_Path_4B3DE54C4207046D89CC15C18C3336BA3FDCEA6F.html#function_GetDirectoryName_851015B1DE2A4159F6DAC0A7A2E2F1ACAC9FE5D6">soulng::util::Path::GetDirectoryName</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <a href="../../../compiler-projects.html">top</a>
+         | <a href="namespace_rt_EF8D5C7D9502D19049E33A11686364EE54A983DA.html">up</a>
+         | <a href="class_MutexTable_F21C18E0AD83B5B52F3DB36BC99D4EA20E0CD6B7.html">prev</a>
+         | <a href="class_RecursiveMutexTable_ABDDA69E9BBCE5DC805566577AFEC9AB9E2AB693.html">next</a>
+    </body>
+</html>

@@ -235,8 +235,8 @@ void SymbolTable::Import(const SymbolTable& symbolTable)
         }
         else if (typeOrConcept->GetSymbolType() == SymbolType::conceptSymbol)
         {
-            ConceptSymbol* concept = static_cast<ConceptSymbol*>(typeOrConcept);
-            typeIdMap[concept->TypeId()] = concept;
+            ConceptSymbol* conceptSymbol = static_cast<ConceptSymbol*>(typeOrConcept);
+            typeIdMap[conceptSymbol->TypeId()] = conceptSymbol;
         }
         else
         {

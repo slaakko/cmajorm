@@ -1,0 +1,164 @@
+<html>
+ <head>
+  <meta charset="utf-8"/>
+  <title>Compile Unit Grammar</title>
+  <link href="../style/style.css" rel="stylesheet" type="text/css"/>
+ </head>
+ <body>
+  <h1>Compile Unit Grammar</h1>
+  <table class="grammar">
+   <tr id="compile-unit">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      compile&#8209;unit</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#namespace-content">namespace&#8209;content</a></span></td>
+   </tr>
+   <tr id="namespace-content">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      namespace&#8209;content</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#using-directives">using&#8209;directives</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#definitions">definitions</a></span></td>
+   </tr>
+   <tr id="using-directives">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      using&#8209;directives</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#using-directive">using&#8209;directive</a></span><span class="ruleOp">*</span></td>
+   </tr>
+   <tr id="using-directive">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      using&#8209;directive</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#using-alias-directive">using&#8209;alias&#8209;directive</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#using-namespace-directive">using&#8209;namespace&#8209;directive</a></span></td>
+   </tr>
+   <tr id="using-alias-directive">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      using&#8209;alias&#8209;directive</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleKeyword">using</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="identifier-grammar.html#identifier">identifier</a></span><span class="ruleOp"> </span><span class="ruleChar">=</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="identifier-grammar.html#qualified-id">qualified&#8209;id</a></span><span class="ruleOp"> </span><span class="ruleChar">;</span></td>
+   </tr>
+   <tr id="using-namespace-directive">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      using&#8209;namespace&#8209;directive</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleKeyword">using</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="identifier-grammar.html#qualified-id">qualified&#8209;id</a></span><span class="ruleOp"> </span><span class="ruleChar">;</span></td>
+   </tr>
+   <tr id="definitions">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      definitions</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#definition">definition</a></span><span class="ruleOp">*</span></td>
+   </tr>
+   <tr id="definition">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      definition</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#namespace-definition">namespace&#8209;definition</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#typedef-declaration">typedef&#8209;declaration</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#concept-definition">concept&#8209;definition</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#function-definition">function&#8209;definition</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#class-definition">class&#8209;definition</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#interface-definition">interface&#8209;definition</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#enum-type-definition">enum&#8209;type&#8209;definition</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#constant-definition">constant&#8209;definition</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#delegate-definition">delegate&#8209;definition</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#class-delegate-definition">class&#8209;delegate&#8209;definition</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#global-variable-definition">global&#8209;variable&#8209;definition</a></span></td>
+   </tr>
+   <tr id="namespace-definition">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      namespace&#8209;definition</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleKeyword">namespace</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="identifier-grammar.html#qualified-id">qualified&#8209;id</a></span><span class="ruleOp"> </span><span class="ruleChar">{</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#namespace-content">namespace&#8209;content</a></span><span class="ruleOp"> </span><span class="ruleChar">}</span></td>
+   </tr>
+   <tr id="typedef-declaration">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      typedef&#8209;declaration</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="typedef-grammar.html#typedef">typedef</a></span></td>
+   </tr>
+   <tr id="concept-definition">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      concept&#8209;definition</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="concept-grammar.html#concept">concept</a></span></td>
+   </tr>
+   <tr id="function-definition">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      function&#8209;definition</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="function-grammar.html#function">function</a></span></td>
+   </tr>
+   <tr id="class-definition">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      class&#8209;definition</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="class-grammar.html#class">class</a></span></td>
+   </tr>
+   <tr id="interface-definition">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      interface&#8209;definition</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="interface-grammar.html#interface">interface</a></span></td>
+   </tr>
+   <tr id="enum-type-definition">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      enum&#8209;type&#8209;definition</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="enumeration-grammar.html#enum-type">enum&#8209;type</a></span></td>
+   </tr>
+   <tr id="constant-definition">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      constant&#8209;definition</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="constant-grammar.html#constant">constant</a></span></td>
+   </tr>
+   <tr id="delegate-definition">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      delegate&#8209;definition</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="delegate-grammar.html#delegate">delegate</a></span></td>
+   </tr>
+   <tr id="class-delegate-definition">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      class&#8209;delegate&#8209;definition</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="delegate-grammar.html#class-delegate">class&#8209;delegate</a></span></td>
+   </tr>
+   <tr id="global-variable-definition">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      global&#8209;variable&#8209;definition</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="global-variable-grammar.html#global-variable">global&#8209;variable</a></span></td>
+   </tr>
+  </table>
+ </body>
+</html>

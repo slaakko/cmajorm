@@ -1,0 +1,52 @@
+<html>
+ <head>
+  <meta charset="utf-8"/>
+  <title>Literal Grammar</title>
+  <link href="../style/style.css" rel="stylesheet" type="text/css"/>
+ </head>
+ <body>
+  <h1>Literal Grammar</h1>
+  <table class="grammar">
+   <tr id="literal">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      literal</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#simple-literal">simple&#8209;literal</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#complex-literal">complex&#8209;literal</a></span></td>
+   </tr>
+   <tr id="simple-literal">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      simple&#8209;literal</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleKeyword">true</span><span class="ruleOp"> | </span><span class="ruleKeyword">false</span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="cmajor-lexical-grammar.html#floating-lit">floating&#8209;lit</a></span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="cmajor-lexical-grammar.html#int-lit">int&#8209;lit</a></span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="cmajor-lexical-grammar.html#char-lit">char&#8209;lit</a></span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="cmajor-lexical-grammar.html#string-lit">string&#8209;lit</a></span><span class="ruleOp"> | </span><span class="ruleKeyword">null</span></td>
+   </tr>
+   <tr id="complex-literal">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      complex&#8209;literal</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#array-literal">array&#8209;literal</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#structured-literal">structured&#8209;literal</a></span></td>
+   </tr>
+   <tr id="array-literal">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      array&#8209;literal</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleChar">[</span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="expression-grammar.html#expression">expression</a></span><span class="ruleOp"> % </span><span class="ruleChar">,</span><span class="ruleOp">)</span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleChar">]</span></td>
+   </tr>
+   <tr id="structured-literal">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      structured&#8209;literal</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleChar">{</span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="expression-grammar.html#expression">expression</a></span><span class="ruleOp"> % </span><span class="ruleChar">,</span><span class="ruleOp">)</span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleChar">}</span></td>
+   </tr>
+  </table>
+ </body>
+</html>

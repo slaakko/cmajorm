@@ -1,0 +1,185 @@
+<html>
+    <head>
+        <meta charset="utf-8"/>
+        <title>StringTable Class</title>
+        <link href="../style/style.css" rel="stylesheet" type="text/css"/>
+    </head>
+    <body>
+        <a href="../../../compiler-projects.html">top</a>
+         | <a href="namespace_rt_EF8D5C7D9502D19049E33A11686364EE54A983DA.html">up</a>
+         | <a href="class_StaticInitTable_2752E83FFD975574425290335B2CF802DDCC6E2E.html">prev</a>
+         | <a href="class_ThreadPool_D7124ADB03F69A0E12AE412D0CDD440D15EBA5FE.html">next</a>
+        <hr/>
+        <h1>StringTable Class</h1>
+        <span>
+            Definition at line <a href="file/String.hpp_6E0E65AAB2F1DE1AE865D7A7C7404DDBE90C1E7E.html#16">16</a>
+             of <a href="file/String.hpp_6E0E65AAB2F1DE1AE865D7A7C7404DDBE90C1E7E.html">String.hpp</a>
+        </span>
+        <br/>
+        <h2>Constructors</h2>
+        <table class="constructorTable">
+            <tr>
+                <td class="constructorTableFirstCol" xml:space="preserve"><a href="class_StringTable_F6866506147F9F2DF2FD2B5C6414DEB2B7BD990A.html#constructor_StringTable_A463645D65369E04C0032032D2B82FE8E1CCB8AF">StringTable</a>()</td>
+            </tr>
+        </table>
+        <h2>Member Functions</h2>
+        <table class="functionTable">
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_StringTable_F6866506147F9F2DF2FD2B5C6414DEB2B7BD990A.html#function_DisposeString_0022A0B9B81AA215C2F3C6345CF31B06C6856D20">DisposeString</a>(int32_t stringHandle)</td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_StringTable_F6866506147F9F2DF2FD2B5C6414DEB2B7BD990A.html#function_Done_1B81A78974AAE6359A7FB07A356EB06B5F24B4F4">Done</a>() <span class="kw">static</span></td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">const </span><span class="kw">char</span>*</td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_StringTable_F6866506147F9F2DF2FD2B5C6414DEB2B7BD990A.html#function_GetString_4841085E175F3111A14AE229DF9CE38936D28EB1">GetString</a>(int32_t stringHandle)</td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_StringTable_F6866506147F9F2DF2FD2B5C6414DEB2B7BD990A.html#function_Init_C3BD8470D7216E3093496465137D48A0361DF7E2">Init</a>() <span class="kw">static</span></td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve">int32_t</td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_StringTable_F6866506147F9F2DF2FD2B5C6414DEB2B7BD990A.html#function_InstallString_0BB2F4905F9D11F4CFF52FC48C00E84E2E595145">InstallString</a>(<span class="kw">const </span>std::string&amp; str)</td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><a href="./class_StringTable_F6866506147F9F2DF2FD2B5C6414DEB2B7BD990A.html">StringTable</a>&amp;</td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_StringTable_F6866506147F9F2DF2FD2B5C6414DEB2B7BD990A.html#function_Instance_84090B9C1D1686C65C0C6FD71B8A2608F6DCB4EA">Instance</a>() <span class="kw">static</span></td>
+            </tr>
+        </table>
+        <h2>Member Variables</h2>
+        <table>
+            <tr id="variable_instance_62C39BA10BBBBBD29801921FD8526ACF2265F939">
+                <td class="functionTableFirstCol" xml:space="preserve">std::unique_ptr&lt;<a href="./class_StringTable_F6866506147F9F2DF2FD2B5C6414DEB2B7BD990A.html">StringTable</a>></td>
+                <td class="functionTableSecondCol" xml:space="preserve">instance <span class="kw">static</span></td>
+            </tr>
+            <tr id="variable_nextStringHandle_09DFDCA8BE7643D1E9A7DFDD61CD81738AF0F729">
+                <td class="functionTableFirstCol" xml:space="preserve">int32_t</td>
+                <td class="functionTableSecondCol" xml:space="preserve">nextStringHandle</td>
+            </tr>
+            <tr id="variable_stringMap_A10DA9DC4D74723015BB656FB7003AAEFBC7D8D2">
+                <td class="functionTableFirstCol" xml:space="preserve">std::unordered_map&lt;int32_t, std::string></td>
+                <td class="functionTableSecondCol" xml:space="preserve">stringMap</td>
+            </tr>
+        </table>
+        <hr/>
+        <h2>Constructor Details</h2>
+        <h3 id="constructor_StringTable_A463645D65369E04C0032032D2B82FE8E1CCB8AF">StringTable Constructor</h3>
+        <h4>
+            cmajor::rt::StringTable::StringTable()</h4>
+        <span>
+            Definition at line <a href="file/String.cpp_6CF25690EA79ABF57F5DCC1CF34800263B45E6DF.html#23">23</a>
+             of <a href="file/String.cpp_6CF25690EA79ABF57F5DCC1CF34800263B45E6DF.html">String.cpp</a>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/String.hpp_6E0E65AAB2F1DE1AE865D7A7C7404DDBE90C1E7E.html#27">27</a>
+             of <a href="file/String.hpp_6E0E65AAB2F1DE1AE865D7A7C7404DDBE90C1E7E.html">String.hpp</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h2>Member Function Details</h2>
+        <h3 id="function_DisposeString_0022A0B9B81AA215C2F3C6345CF31B06C6856D20">DisposeString Member Function</h3>
+        <h4>
+            <span class="kw">void</span>
+             cmajor::rt::StringTable::DisposeString(int32_t stringHandle)</h4>
+        <span>
+            Definition at line <a href="file/String.cpp_6CF25690EA79ABF57F5DCC1CF34800263B45E6DF.html#48">48</a>
+             of <a href="file/String.cpp_6CF25690EA79ABF57F5DCC1CF34800263B45E6DF.html">String.cpp</a>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/String.hpp_6E0E65AAB2F1DE1AE865D7A7C7404DDBE90C1E7E.html#24">24</a>
+             of <a href="file/String.hpp_6E0E65AAB2F1DE1AE865D7A7C7404DDBE90C1E7E.html">String.hpp</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_Done_1B81A78974AAE6359A7FB07A356EB06B5F24B4F4">Done Member Function</h3>
+        <h4>
+            <span class="kw">void</span>
+             cmajor::rt::StringTable::Done() <span class="kw">static</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/String.cpp_6CF25690EA79ABF57F5DCC1CF34800263B45E6DF.html#18">18</a>
+             of <a href="file/String.cpp_6CF25690EA79ABF57F5DCC1CF34800263B45E6DF.html">String.cpp</a>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/String.hpp_6E0E65AAB2F1DE1AE865D7A7C7404DDBE90C1E7E.html#20">20</a>
+             of <a href="file/String.hpp_6E0E65AAB2F1DE1AE865D7A7C7404DDBE90C1E7E.html">String.hpp</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_GetString_4841085E175F3111A14AE229DF9CE38936D28EB1">GetString Member Function</h3>
+        <h4>
+            <span class="kw">const </span>
+            <span class="kw">char</span>
+            * cmajor::rt::StringTable::GetString(int32_t stringHandle)</h4>
+        <span>
+            Definition at line <a href="file/String.cpp_6CF25690EA79ABF57F5DCC1CF34800263B45E6DF.html#37">37</a>
+             of <a href="file/String.cpp_6CF25690EA79ABF57F5DCC1CF34800263B45E6DF.html">String.cpp</a>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/String.hpp_6E0E65AAB2F1DE1AE865D7A7C7404DDBE90C1E7E.html#23">23</a>
+             of <a href="file/String.hpp_6E0E65AAB2F1DE1AE865D7A7C7404DDBE90C1E7E.html">String.hpp</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_Init_C3BD8470D7216E3093496465137D48A0361DF7E2">Init Member Function</h3>
+        <h4>
+            <span class="kw">void</span>
+             cmajor::rt::StringTable::Init() <span class="kw">static</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/String.cpp_6CF25690EA79ABF57F5DCC1CF34800263B45E6DF.html#13">13</a>
+             of <a href="file/String.cpp_6CF25690EA79ABF57F5DCC1CF34800263B45E6DF.html">String.cpp</a>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/String.hpp_6E0E65AAB2F1DE1AE865D7A7C7404DDBE90C1E7E.html#19">19</a>
+             of <a href="file/String.hpp_6E0E65AAB2F1DE1AE865D7A7C7404DDBE90C1E7E.html">String.hpp</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_InstallString_0BB2F4905F9D11F4CFF52FC48C00E84E2E595145">InstallString Member Function</h3>
+        <h4>
+            int32_t cmajor::rt::StringTable::InstallString(<span class="kw">const </span>
+            std::string&amp; str)</h4>
+        <span>
+            Definition at line <a href="file/String.cpp_6CF25690EA79ABF57F5DCC1CF34800263B45E6DF.html#29">29</a>
+             of <a href="file/String.cpp_6CF25690EA79ABF57F5DCC1CF34800263B45E6DF.html">String.cpp</a>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/String.hpp_6E0E65AAB2F1DE1AE865D7A7C7404DDBE90C1E7E.html#22">22</a>
+             of <a href="file/String.hpp_6E0E65AAB2F1DE1AE865D7A7C7404DDBE90C1E7E.html">String.hpp</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_Instance_84090B9C1D1686C65C0C6FD71B8A2608F6DCB4EA">Instance Member Function</h3>
+        <h4>
+            <a href="./class_StringTable_F6866506147F9F2DF2FD2B5C6414DEB2B7BD990A.html">StringTable</a>
+            &amp; cmajor::rt::StringTable::Instance() <span class="kw">static</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/String.hpp_6E0E65AAB2F1DE1AE865D7A7C7404DDBE90C1E7E.html#21">21</a>
+             of <a href="file/String.hpp_6E0E65AAB2F1DE1AE865D7A7C7404DDBE90C1E7E.html">String.hpp</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <a href="../../../compiler-projects.html">top</a>
+         | <a href="namespace_rt_EF8D5C7D9502D19049E33A11686364EE54A983DA.html">up</a>
+         | <a href="class_StaticInitTable_2752E83FFD975574425290335B2CF802DDCC6E2E.html">prev</a>
+         | <a href="class_ThreadPool_D7124ADB03F69A0E12AE412D0CDD440D15EBA5FE.html">next</a>
+    </body>
+</html>

@@ -1,0 +1,175 @@
+<html>
+    <head>
+        <meta charset="utf-8"/>
+        <title>XPathNumberExpr Class</title>
+        <link href="../style/style.css" rel="stylesheet" type="text/css"/>
+        <script src="class_XPathNumberExpr_60DA56E701CDB51FDEB2D506E8A0323C99D55B7E_inheritance.js" type="text/javascript"> </script>
+    </head>
+    <body onload="drawClassInheritanceDiagram()">
+        <a href="../../../../compiler-projects.html">top</a>
+         | <a href="namespace_xpath_59E06762EA9754C81AA501A4568C3F2FAC168577.html">up</a>
+         | <a href="class_XPathNumber_D99BEBB5FEBC4056A70E2B3C31ED48D11FD84AE3.html">prev</a>
+         | <a href="class_XPathNumberFunction_CE6CD90641D01FDE2F153231C0CBBF4A604055CF.html">next</a>
+        <hr/>
+        <h1>XPathNumberExpr Class</h1>
+        <div class="diagram">
+            <svg height="0" id="classInheritanceDiagram" version="2.0" width="0" xmlns="http://www.w3.org/2000/svg"/>
+        </div>
+        <span>
+            Definition at line <a href="file/XPathExpr.hpp_A1A62D4E7251F282B27861333FD7F483E3D249DC.html#313">313</a>
+             of <a href="file/XPathExpr.hpp_A1A62D4E7251F282B27861333FD7F483E3D249DC.html">XPathExpr.hpp</a>
+        </span>
+        <br/>
+        <h2>Constructors</h2>
+        <table class="constructorTable">
+            <tr>
+                <td class="constructorTableFirstCol" xml:space="preserve"><a href="class_XPathNumberExpr_60DA56E701CDB51FDEB2D506E8A0323C99D55B7E.html#constructor_XPathNumberExpr_6DDEB1D37996A5794202F3747832A8D86BBE9891">XPathNumberExpr</a>(<span class="kw">const </span>std::u32string&amp; value_)</td>
+            </tr>
+            <tr>
+                <td class="constructorTableFirstCol" xml:space="preserve"><a href="class_XPathNumberExpr_60DA56E701CDB51FDEB2D506E8A0323C99D55B7E.html#constructor_XPathNumberExpr_05C571CC42DAFCD85A43F8DD13B8D0D1A99FF95B">XPathNumberExpr</a>(<span class="kw">double</span> value_)</td>
+            </tr>
+        </table>
+        <h2>Member Functions</h2>
+        <table class="functionTable">
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve">std::unique_ptr&lt;<a href="./class_XPathObject_E5E0D9A54B0114EDADA4422120F5489270F4E203.html">XPathObject</a>></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_XPathNumberExpr_60DA56E701CDB51FDEB2D506E8A0323C99D55B7E.html#function_Evaluate_B3B61236206920AE6ED86F4983556CB91A67145F">Evaluate</a>(<a href="./class_XPathContext_F8537A88F33D0B9925318608AEE016B328437F22.html">XPathContext</a>&amp; context)</td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve">std::unique_ptr&lt;<a href="./../../../dom/html/content/class_Node_2DB98192932AD5A81AEA60A4462A0D6400707720.html">Node</a>></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_XPathNumberExpr_60DA56E701CDB51FDEB2D506E8A0323C99D55B7E.html#function_ToDom_E469B9C17F8F92A2EBD5A076B81A3F7F084EA285">ToDom</a>() <span class="kw">const override</span></td>
+            </tr>
+        </table>
+        <h2>Member Variables</h2>
+        <table>
+            <tr id="variable_value_27EF663EF6B7EFBEF7B7A7A5064E4A26BF239767">
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">double</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve">value</td>
+            </tr>
+        </table>
+        <hr/>
+        <h2>Constructor Details</h2>
+        <h3 id="constructor_XPathNumberExpr_6DDEB1D37996A5794202F3747832A8D86BBE9891">XPathNumberExpr Constructor</h3>
+        <h4>
+            sngxml::xpath::XPathNumberExpr::XPathNumberExpr(<span class="kw">const </span>
+            std::u32string&amp; value_)</h4>
+        <span>
+            Definition at line <a href="file/XPathExpr.cpp_9DDC7814CF54B98BBBABD7415A845E57CF0B14B0.html#1609">1609</a>
+             of <a href="file/XPathExpr.cpp_9DDC7814CF54B98BBBABD7415A845E57CF0B14B0.html">XPathExpr.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">1610</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">1611</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">string</span>&nbsp;<span class="identifier">s</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">ToUtf8</span><span class="other">(</span><span class="identifier">value_</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">1612</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">stringstream</span>&nbsp;<span class="identifier">strm</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">1613</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">strm</span><span class="other">.</span><span class="identifier">str</span><span class="other">(</span><span class="identifier">s</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">1614</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">strm</span><span class="other">&nbsp;>>&nbsp;</span><a href="./class_XPathNumberExpr_60DA56E701CDB51FDEB2D506E8A0323C99D55B7E.html#variable_value_27EF663EF6B7EFBEF7B7A7A5064E4A26BF239767">value</a><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">1615</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/XPathExpr.hpp_A1A62D4E7251F282B27861333FD7F483E3D249DC.html#316">316</a>
+             of <a href="file/XPathExpr.hpp_A1A62D4E7251F282B27861333FD7F483E3D249DC.html">XPathExpr.hpp</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="constructor_XPathNumberExpr_05C571CC42DAFCD85A43F8DD13B8D0D1A99FF95B">XPathNumberExpr Constructor</h3>
+        <h4>
+            sngxml::xpath::XPathNumberExpr::XPathNumberExpr(<span class="kw">double</span>
+             value_)</h4>
+        <span>
+            Definition at line <a href="file/XPathExpr.cpp_9DDC7814CF54B98BBBABD7415A845E57CF0B14B0.html#1617">1617</a>
+             of <a href="file/XPathExpr.cpp_9DDC7814CF54B98BBBABD7415A845E57CF0B14B0.html">XPathExpr.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">1617</span>&nbsp;<span class="other">:</span>&nbsp;<a href="./class_XPathNumberExpr_60DA56E701CDB51FDEB2D506E8A0323C99D55B7E.html#variable_value_27EF663EF6B7EFBEF7B7A7A5064E4A26BF239767">value</a><span class="other">(</span><span class="identifier">value_</span><span class="other">)</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">1618</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">1619</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/XPathExpr.hpp_A1A62D4E7251F282B27861333FD7F483E3D249DC.html#317">317</a>
+             of <a href="file/XPathExpr.hpp_A1A62D4E7251F282B27861333FD7F483E3D249DC.html">XPathExpr.hpp</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h2>Member Function Details</h2>
+        <h3 id="function_Evaluate_B3B61236206920AE6ED86F4983556CB91A67145F">Evaluate Member Function</h3>
+        <h4>
+            std::unique_ptr&lt;<a href="./class_XPathObject_E5E0D9A54B0114EDADA4422120F5489270F4E203.html">XPathObject</a>
+            > sngxml::xpath::XPathNumberExpr::Evaluate(<a href="./class_XPathContext_F8537A88F33D0B9925318608AEE016B328437F22.html">XPathContext</a>
+            &amp; context)</h4>
+        <span>
+            Definition at line <a href="file/XPathExpr.cpp_9DDC7814CF54B98BBBABD7415A845E57CF0B14B0.html#1621">1621</a>
+             of <a href="file/XPathExpr.cpp_9DDC7814CF54B98BBBABD7415A845E57CF0B14B0.html">XPathExpr.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">1622</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">1623</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><a href="./class_XPathObject_E5E0D9A54B0114EDADA4422120F5489270F4E203.html">XPathObject</a><span class="other">></span><span class="other">(</span><span class="kw">new&nbsp;</span><a href="./class_XPathNumber_D99BEBB5FEBC4056A70E2B3C31ED48D11FD84AE3.html">XPathNumber</a><span class="other">(</span><a href="./class_XPathNumberExpr_60DA56E701CDB51FDEB2D506E8A0323C99D55B7E.html#variable_value_27EF663EF6B7EFBEF7B7A7A5064E4A26BF239767">value</a><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">1624</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/XPathExpr.hpp_A1A62D4E7251F282B27861333FD7F483E3D249DC.html#318">318</a>
+             of <a href="file/XPathExpr.hpp_A1A62D4E7251F282B27861333FD7F483E3D249DC.html">XPathExpr.hpp</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_ToDom_E469B9C17F8F92A2EBD5A076B81A3F7F084EA285">ToDom Member Function</h3>
+        <h4>
+            std::unique_ptr&lt;<a href="./../../../dom/html/content/class_Node_2DB98192932AD5A81AEA60A4462A0D6400707720.html">Node</a>
+            > sngxml::xpath::XPathNumberExpr::ToDom() <span class="kw">const override</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/XPathExpr.cpp_9DDC7814CF54B98BBBABD7415A845E57CF0B14B0.html#1626">1626</a>
+             of <a href="file/XPathExpr.cpp_9DDC7814CF54B98BBBABD7415A845E57CF0B14B0.html">XPathExpr.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">1627</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">1628</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><a href="./namespace_sngxml_9C27F272E637BDDF82ACFC08D65B1C1F350F3395.html">sngxml</a><span class="other">::</span><a href="./../../../dom/html/content/namespace_dom_FFCEC4591AB8ED58385D1D84BEBB703A58D0FFC8.html">dom</a><span class="other">::</span><a href="./../../../dom/html/content/class_Element_53DAECAECE4CFF5A605FAE83BABF0BA9CB3ED2C0.html">Element</a><span class="other">></span>&nbsp;<span class="identifier">element</span><span class="other">(</span><span class="kw">new&nbsp;</span><a href="./namespace_sngxml_9C27F272E637BDDF82ACFC08D65B1C1F350F3395.html">sngxml</a><span class="other">::</span><a href="./../../../dom/html/content/namespace_dom_FFCEC4591AB8ED58385D1D84BEBB703A58D0FFC8.html">dom</a><span class="other">::</span><a href="./../../../dom/html/content/class_Element_53DAECAECE4CFF5A605FAE83BABF0BA9CB3ED2C0.html">Element</a><span class="other">(</span><span class="string">U"number"</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">1629</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">element</span><span class="other">-></span><span class="identifier">SetAttribute</span><span class="other">(</span><span class="string">U"value"</span><span class="other">,&nbsp;</span><span class="identifier">ToUtf32</span><span class="other">(</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">to_string</span><span class="other">(</span><a href="./class_XPathNumberExpr_60DA56E701CDB51FDEB2D506E8A0323C99D55B7E.html#variable_value_27EF663EF6B7EFBEF7B7A7A5064E4A26BF239767">value</a><span class="other">)</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">1630</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">unique_ptr</span><span class="other">&lt;</span><a href="./namespace_sngxml_9C27F272E637BDDF82ACFC08D65B1C1F350F3395.html">sngxml</a><span class="other">::</span><a href="./../../../dom/html/content/namespace_dom_FFCEC4591AB8ED58385D1D84BEBB703A58D0FFC8.html">dom</a><span class="other">::</span><a href="./../../../dom/html/content/class_Node_2DB98192932AD5A81AEA60A4462A0D6400707720.html">Node</a><span class="other">></span><span class="other">(</span><span class="identifier">element</span><span class="other">.</span><span class="identifier">release</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">1631</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/XPathExpr.hpp_A1A62D4E7251F282B27861333FD7F483E3D249DC.html#319">319</a>
+             of <a href="file/XPathExpr.hpp_A1A62D4E7251F282B27861333FD7F483E3D249DC.html">XPathExpr.hpp</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Base class overridden functions: <a href="./class_XPathExpr_ED77DE00ECE6F2DBBE584F6190A65F57E99E207E.html#function_ToDom_8492540BB9AFE9B48E1CAA1FF9C850F48F530F7C">sngxml::xpath::XPathExpr::ToDom</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <a href="../../../../compiler-projects.html">top</a>
+         | <a href="namespace_xpath_59E06762EA9754C81AA501A4568C3F2FAC168577.html">up</a>
+         | <a href="class_XPathNumber_D99BEBB5FEBC4056A70E2B3C31ED48D11FD84AE3.html">prev</a>
+         | <a href="class_XPathNumberFunction_CE6CD90641D01FDE2F153231C0CBBF4A604055CF.html">next</a>
+    </body>
+</html>

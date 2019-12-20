@@ -1,0 +1,194 @@
+<html>
+    <head>
+        <meta charset="utf-8"/>
+        <title>ConditionVariableTable Class</title>
+        <link href="../style/style.css" rel="stylesheet" type="text/css"/>
+    </head>
+    <body>
+        <a href="../../../compiler-projects.html">top</a>
+         | <a href="namespace_rt_EF8D5C7D9502D19049E33A11686364EE54A983DA.html">up</a>
+         | <a href="class_ClassIdMap_FF5A3B0F6616B6701499BBA03FE9328C5F787ED3.html">prev</a>
+         | <a href="class_DebugHeap_B712266C3DCB2CF5641B6A2E2008E5A5DA16D512.html">next</a>
+        <hr/>
+        <h1>ConditionVariableTable Class</h1>
+        <span>
+            Definition at line <a href="file/ConditionVariable.cpp_EAE81F444D92085B0892E42D2B0386E52E416ACE.html#21">21</a>
+             of <a href="file/ConditionVariable.cpp_EAE81F444D92085B0892E42D2B0386E52E416ACE.html">ConditionVariable.cpp</a>
+        </span>
+        <br/>
+        <h2>Constructors</h2>
+        <table class="constructorTable">
+            <tr>
+                <td class="constructorTableFirstCol" xml:space="preserve"><a href="class_ConditionVariableTable_682A9C08983D19C8350B1EEA3D9725017BA39F49.html#constructor_ConditionVariableTable_9ED7C3BCC8CC9CED630AA67CFB49747B87D35182">ConditionVariableTable</a>()</td>
+            </tr>
+        </table>
+        <h2>Member Functions</h2>
+        <table class="functionTable">
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve">int32_t</td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_ConditionVariableTable_682A9C08983D19C8350B1EEA3D9725017BA39F49.html#function_AllocateConditionVariable_D34FEFE236E4B1FBFE0321D74CD3EDC56552A6E2">AllocateConditionVariable</a>()</td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_ConditionVariableTable_682A9C08983D19C8350B1EEA3D9725017BA39F49.html#function_Done_D071538E7BC8F67661280DD5B61D5E47985D1F29">Done</a>() <span class="kw">static</span></td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_ConditionVariableTable_682A9C08983D19C8350B1EEA3D9725017BA39F49.html#function_FreeConditionVariable_1CBD979A69B70FB9A8248BD4618DE483BAE70B47">FreeConditionVariable</a>(int32_t conditionVariableId)</td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve">std::condition_variable_any&amp;</td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_ConditionVariableTable_682A9C08983D19C8350B1EEA3D9725017BA39F49.html#function_GetConditionVariable_7977CA479D4847881D25F187A0F59ED1372AB864">GetConditionVariable</a>(int32_t conditionVariableId)</td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_ConditionVariableTable_682A9C08983D19C8350B1EEA3D9725017BA39F49.html#function_Init_35E95D5C69AAF552E4430AB2D9D4FD6E5F32CB04">Init</a>() <span class="kw">static</span></td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><a href="./class_ConditionVariableTable_682A9C08983D19C8350B1EEA3D9725017BA39F49.html">ConditionVariableTable</a>&amp;</td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_ConditionVariableTable_682A9C08983D19C8350B1EEA3D9725017BA39F49.html#function_Instance_8A8DC9518AFFB997B8A4857253F57B79345E7F64">Instance</a>() <span class="kw">static</span></td>
+            </tr>
+        </table>
+        <h2>Member Variables</h2>
+        <table>
+            <tr id="variable_conditionVariableMap_BC6E761500779706D5D842F7AD4574620FFE9EB0">
+                <td class="functionTableFirstCol" xml:space="preserve">std::unordered_map&lt;int32_t, std::unique_ptr&lt;std::condition_variable_any>></td>
+                <td class="functionTableSecondCol" xml:space="preserve">conditionVariableMap</td>
+            </tr>
+            <tr id="variable_conditionVariables_6BC42A9F859924F51BD2B1D031886A92933870AA">
+                <td class="functionTableFirstCol" xml:space="preserve">std::vector&lt;std::unique_ptr&lt;std::condition_variable_any>></td>
+                <td class="functionTableSecondCol" xml:space="preserve">conditionVariables</td>
+            </tr>
+            <tr id="variable_instance_7321F0CF6E362C05520DACC16C893AF85A721142">
+                <td class="functionTableFirstCol" xml:space="preserve">std::unique_ptr&lt;<a href="./class_ConditionVariableTable_682A9C08983D19C8350B1EEA3D9725017BA39F49.html">ConditionVariableTable</a>></td>
+                <td class="functionTableSecondCol" xml:space="preserve">instance <span class="kw">static</span></td>
+            </tr>
+            <tr id="variable_maxNoLockConditionVariables_FE590CC683B692DFFF190539F6EFE51461F7812B">
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">const </span>int32_t</td>
+                <td class="functionTableSecondCol" xml:space="preserve">maxNoLockConditionVariables</td>
+            </tr>
+            <tr id="variable_mtx_18B5ABE6C0C38E05D71BCF8EB999A770749ABA68">
+                <td class="functionTableFirstCol" xml:space="preserve">std::mutex</td>
+                <td class="functionTableSecondCol" xml:space="preserve">mtx</td>
+            </tr>
+            <tr id="variable_nextConditionVariableId_3B712EB34D122D75BA94ACB9A4CD97B53CBBCF10">
+                <td class="functionTableFirstCol" xml:space="preserve">std::atomic&lt;int32_t></td>
+                <td class="functionTableSecondCol" xml:space="preserve">nextConditionVariableId</td>
+            </tr>
+        </table>
+        <hr/>
+        <h2>Constructor Details</h2>
+        <h3 id="constructor_ConditionVariableTable_9ED7C3BCC8CC9CED630AA67CFB49747B87D35182">ConditionVariableTable Constructor</h3>
+        <h4>
+            cmajor::rt::ConditionVariableTable::ConditionVariableTable()</h4>
+        <span>
+            Definition at line <a href="file/ConditionVariable.cpp_EAE81F444D92085B0892E42D2B0386E52E416ACE.html#52">52</a>
+             of <a href="file/ConditionVariable.cpp_EAE81F444D92085B0892E42D2B0386E52E416ACE.html">ConditionVariable.cpp</a>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/ConditionVariable.cpp_EAE81F444D92085B0892E42D2B0386E52E416ACE.html#37">37</a>
+             of <a href="file/ConditionVariable.cpp_EAE81F444D92085B0892E42D2B0386E52E416ACE.html">ConditionVariable.cpp</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h2>Member Function Details</h2>
+        <h3 id="function_AllocateConditionVariable_D34FEFE236E4B1FBFE0321D74CD3EDC56552A6E2">AllocateConditionVariable Member Function</h3>
+        <h4>
+            int32_t cmajor::rt::ConditionVariableTable::AllocateConditionVariable()</h4>
+        <span>
+            Definition at line <a href="file/ConditionVariable.cpp_EAE81F444D92085B0892E42D2B0386E52E416ACE.html#57">57</a>
+             of <a href="file/ConditionVariable.cpp_EAE81F444D92085B0892E42D2B0386E52E416ACE.html">ConditionVariable.cpp</a>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/ConditionVariable.cpp_EAE81F444D92085B0892E42D2B0386E52E416ACE.html#27">27</a>
+             of <a href="file/ConditionVariable.cpp_EAE81F444D92085B0892E42D2B0386E52E416ACE.html">ConditionVariable.cpp</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_Done_D071538E7BC8F67661280DD5B61D5E47985D1F29">Done Member Function</h3>
+        <h4>
+            <span class="kw">void</span>
+             cmajor::rt::ConditionVariableTable::Done() <span class="kw">static</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/ConditionVariable.cpp_EAE81F444D92085B0892E42D2B0386E52E416ACE.html#47">47</a>
+             of <a href="file/ConditionVariable.cpp_EAE81F444D92085B0892E42D2B0386E52E416ACE.html">ConditionVariable.cpp</a>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/ConditionVariable.cpp_EAE81F444D92085B0892E42D2B0386E52E416ACE.html#25">25</a>
+             of <a href="file/ConditionVariable.cpp_EAE81F444D92085B0892E42D2B0386E52E416ACE.html">ConditionVariable.cpp</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_FreeConditionVariable_1CBD979A69B70FB9A8248BD4618DE483BAE70B47">FreeConditionVariable Member Function</h3>
+        <h4>
+            <span class="kw">void</span>
+             cmajor::rt::ConditionVariableTable::FreeConditionVariable(int32_t conditionVariableId)</h4>
+        <span>
+            Definition at line <a href="file/ConditionVariable.cpp_EAE81F444D92085B0892E42D2B0386E52E416ACE.html#73">73</a>
+             of <a href="file/ConditionVariable.cpp_EAE81F444D92085B0892E42D2B0386E52E416ACE.html">ConditionVariable.cpp</a>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/ConditionVariable.cpp_EAE81F444D92085B0892E42D2B0386E52E416ACE.html#28">28</a>
+             of <a href="file/ConditionVariable.cpp_EAE81F444D92085B0892E42D2B0386E52E416ACE.html">ConditionVariable.cpp</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_GetConditionVariable_7977CA479D4847881D25F187A0F59ED1372AB864">GetConditionVariable Member Function</h3>
+        <h4>
+            std::condition_variable_any&amp; cmajor::rt::ConditionVariableTable::GetConditionVariable(int32_t conditionVariableId)</h4>
+        <span>
+            Definition at line <a href="file/ConditionVariable.cpp_EAE81F444D92085B0892E42D2B0386E52E416ACE.html#90">90</a>
+             of <a href="file/ConditionVariable.cpp_EAE81F444D92085B0892E42D2B0386E52E416ACE.html">ConditionVariable.cpp</a>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/ConditionVariable.cpp_EAE81F444D92085B0892E42D2B0386E52E416ACE.html#29">29</a>
+             of <a href="file/ConditionVariable.cpp_EAE81F444D92085B0892E42D2B0386E52E416ACE.html">ConditionVariable.cpp</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_Init_35E95D5C69AAF552E4430AB2D9D4FD6E5F32CB04">Init Member Function</h3>
+        <h4>
+            <span class="kw">void</span>
+             cmajor::rt::ConditionVariableTable::Init() <span class="kw">static</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/ConditionVariable.cpp_EAE81F444D92085B0892E42D2B0386E52E416ACE.html#42">42</a>
+             of <a href="file/ConditionVariable.cpp_EAE81F444D92085B0892E42D2B0386E52E416ACE.html">ConditionVariable.cpp</a>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/ConditionVariable.cpp_EAE81F444D92085B0892E42D2B0386E52E416ACE.html#24">24</a>
+             of <a href="file/ConditionVariable.cpp_EAE81F444D92085B0892E42D2B0386E52E416ACE.html">ConditionVariable.cpp</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_Instance_8A8DC9518AFFB997B8A4857253F57B79345E7F64">Instance Member Function</h3>
+        <h4>
+            <a href="./class_ConditionVariableTable_682A9C08983D19C8350B1EEA3D9725017BA39F49.html">ConditionVariableTable</a>
+            &amp; cmajor::rt::ConditionVariableTable::Instance() <span class="kw">static</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/ConditionVariable.cpp_EAE81F444D92085B0892E42D2B0386E52E416ACE.html#26">26</a>
+             of <a href="file/ConditionVariable.cpp_EAE81F444D92085B0892E42D2B0386E52E416ACE.html">ConditionVariable.cpp</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <a href="../../../compiler-projects.html">top</a>
+         | <a href="namespace_rt_EF8D5C7D9502D19049E33A11686364EE54A983DA.html">up</a>
+         | <a href="class_ClassIdMap_FF5A3B0F6616B6701499BBA03FE9328C5F787ED3.html">prev</a>
+         | <a href="class_DebugHeap_B712266C3DCB2CF5641B6A2E2008E5A5DA16D512.html">next</a>
+    </body>
+</html>

@@ -1,0 +1,200 @@
+<html>
+    <head>
+        <meta charset="utf-8"/>
+        <title>DirectoryIterationTable Class</title>
+        <link href="../style/style.css" rel="stylesheet" type="text/css"/>
+    </head>
+    <body>
+        <a href="../../../compiler-projects.html">top</a>
+         | <a href="namespace_rt_EF8D5C7D9502D19049E33A11686364EE54A983DA.html">up</a>
+         | <a href="struct_Destruction_BA985C71A15C04021A652CA76BC7DB74D1298EC1.html">prev</a>
+         | <a href="class_ErrorTable_C6728ED226A2873F4D1BDDE313B29A4B3C21A186.html">next</a>
+        <hr/>
+        <h1>DirectoryIterationTable Class</h1>
+        <span>
+            Definition at line <a href="file/Directory.cpp_EC49A3B51C7876D3A8B4DFBC2EB17EEE920F2B26.html#24">24</a>
+             of <a href="file/Directory.cpp_EC49A3B51C7876D3A8B4DFBC2EB17EEE920F2B26.html">Directory.cpp</a>
+        </span>
+        <br/>
+        <h2>Constructors</h2>
+        <table class="constructorTable">
+            <tr>
+                <td class="constructorTableFirstCol" xml:space="preserve"><a href="class_DirectoryIterationTable_F40AF3786F734C7C9DD56D10EA8FDF062B78DB40.html#constructor_DirectoryIterationTable_FE040C242E630F971FB443DD0F59AD8FC0D1086C">DirectoryIterationTable</a>()</td>
+            </tr>
+        </table>
+        <h2>Member Functions</h2>
+        <table class="functionTable">
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve">int32_t</td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_DirectoryIterationTable_F40AF3786F734C7C9DD56D10EA8FDF062B78DB40.html#function_BeginIterate_D4F0BDCCFC0F7C843AED45E3EFD67CD315C928D9">BeginIterate</a>(<span class="kw">const </span><span class="kw">char</span>* directoryPath)</td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_DirectoryIterationTable_F40AF3786F734C7C9DD56D10EA8FDF062B78DB40.html#function_Done_E1DCFC646A763C090AAF87409FF02E15F4F6728E">Done</a>() <span class="kw">static</span></td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_DirectoryIterationTable_F40AF3786F734C7C9DD56D10EA8FDF062B78DB40.html#function_EndIterate_B2BAA9062924EEC9A7148228F4D0B86938402FEE">EndIterate</a>(int32_t handle)</td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_DirectoryIterationTable_F40AF3786F734C7C9DD56D10EA8FDF062B78DB40.html#function_Init_1A9E49C3FD38DAF5B4BDFC1826562EE3A78D3E57">Init</a>() <span class="kw">static</span></td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><a href="./class_DirectoryIterationTable_F40AF3786F734C7C9DD56D10EA8FDF062B78DB40.html">DirectoryIterationTable</a>&amp;</td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_DirectoryIterationTable_F40AF3786F734C7C9DD56D10EA8FDF062B78DB40.html#function_Instance_800F0CA17CCBE35659E842E09819682299A5B9ED">Instance</a>() <span class="kw">static</span></td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">const </span><span class="kw">char</span>*</td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_DirectoryIterationTable_F40AF3786F734C7C9DD56D10EA8FDF062B78DB40.html#function_Iterate_DC6A49425E5C43EB01037D0F179262D0548FC314">Iterate</a>(int32_t handle)</td>
+            </tr>
+        </table>
+        <h2>Member Variables</h2>
+        <table>
+            <tr id="variable_instance_86CDE81F0745A6181B8509B47D35375509D9E73F">
+                <td class="functionTableFirstCol" xml:space="preserve">std::unique_ptr&lt;<a href="./class_DirectoryIterationTable_F40AF3786F734C7C9DD56D10EA8FDF062B78DB40.html">DirectoryIterationTable</a>></td>
+                <td class="functionTableSecondCol" xml:space="preserve">instance <span class="kw">static</span></td>
+            </tr>
+            <tr id="variable_iterationMap_C469ED14ED405B33C985BF925DFEB6D7979DA645">
+                <td class="functionTableFirstCol" xml:space="preserve">std::unordered_map&lt;int32_t, <a href="./struct_Iteration_21D44BA63C74DD6DB70596A66DA02B67C07DC85A.html">Iteration</a>></td>
+                <td class="functionTableSecondCol" xml:space="preserve">iterationMap</td>
+            </tr>
+            <tr id="variable_mtx_869705DDE60288DA56F4D672FB036A4F37058A76">
+                <td class="functionTableFirstCol" xml:space="preserve">std::mutex</td>
+                <td class="functionTableSecondCol" xml:space="preserve">mtx</td>
+            </tr>
+            <tr id="variable_nextIterationHandle_3AA2F96B677F17CE77C31058C94D3F37C1A71F11">
+                <td class="functionTableFirstCol" xml:space="preserve">int32_t</td>
+                <td class="functionTableSecondCol" xml:space="preserve">nextIterationHandle</td>
+            </tr>
+        </table>
+        <hr/>
+        <h2>Constructor Details</h2>
+        <h3 id="constructor_DirectoryIterationTable_FE040C242E630F971FB443DD0F59AD8FC0D1086C">DirectoryIterationTable Constructor</h3>
+        <h4>
+            cmajor::rt::DirectoryIterationTable::DirectoryIterationTable()</h4>
+        <span>
+            Definition at line <a href="file/Directory.cpp_EC49A3B51C7876D3A8B4DFBC2EB17EEE920F2B26.html#53">53</a>
+             of <a href="file/Directory.cpp_EC49A3B51C7876D3A8B4DFBC2EB17EEE920F2B26.html">Directory.cpp</a>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/Directory.cpp_EC49A3B51C7876D3A8B4DFBC2EB17EEE920F2B26.html#35">35</a>
+             of <a href="file/Directory.cpp_EC49A3B51C7876D3A8B4DFBC2EB17EEE920F2B26.html">Directory.cpp</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h2>Member Function Details</h2>
+        <h3 id="function_BeginIterate_D4F0BDCCFC0F7C843AED45E3EFD67CD315C928D9">BeginIterate Member Function</h3>
+        <h4>
+            int32_t cmajor::rt::DirectoryIterationTable::BeginIterate(<span class="kw">const </span>
+            <span class="kw">char</span>
+            * directoryPath)</h4>
+        <span>
+            Definition at line <a href="file/Directory.cpp_EC49A3B51C7876D3A8B4DFBC2EB17EEE920F2B26.html#57">57</a>
+             of <a href="file/Directory.cpp_EC49A3B51C7876D3A8B4DFBC2EB17EEE920F2B26.html">Directory.cpp</a>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/Directory.cpp_EC49A3B51C7876D3A8B4DFBC2EB17EEE920F2B26.html#30">30</a>
+             of <a href="file/Directory.cpp_EC49A3B51C7876D3A8B4DFBC2EB17EEE920F2B26.html">Directory.cpp</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Calls: <a href="./../../../soulng/util/html/content/class_Path_4B3DE54C4207046D89CC15C18C3336BA3FDCEA6F.html#function_MakeCanonical_AD82E43D97663653AAF6093A830F65D31E72441A">soulng::util::Path::MakeCanonical</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_Done_E1DCFC646A763C090AAF87409FF02E15F4F6728E">Done Member Function</h3>
+        <h4>
+            <span class="kw">void</span>
+             cmajor::rt::DirectoryIterationTable::Done() <span class="kw">static</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/Directory.cpp_EC49A3B51C7876D3A8B4DFBC2EB17EEE920F2B26.html#48">48</a>
+             of <a href="file/Directory.cpp_EC49A3B51C7876D3A8B4DFBC2EB17EEE920F2B26.html">Directory.cpp</a>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/Directory.cpp_EC49A3B51C7876D3A8B4DFBC2EB17EEE920F2B26.html#28">28</a>
+             of <a href="file/Directory.cpp_EC49A3B51C7876D3A8B4DFBC2EB17EEE920F2B26.html">Directory.cpp</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_EndIterate_B2BAA9062924EEC9A7148228F4D0B86938402FEE">EndIterate Member Function</h3>
+        <h4>
+            <span class="kw">void</span>
+             cmajor::rt::DirectoryIterationTable::EndIterate(int32_t handle)</h4>
+        <span>
+            Definition at line <a href="file/Directory.cpp_EC49A3B51C7876D3A8B4DFBC2EB17EEE920F2B26.html#68">68</a>
+             of <a href="file/Directory.cpp_EC49A3B51C7876D3A8B4DFBC2EB17EEE920F2B26.html">Directory.cpp</a>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/Directory.cpp_EC49A3B51C7876D3A8B4DFBC2EB17EEE920F2B26.html#32">32</a>
+             of <a href="file/Directory.cpp_EC49A3B51C7876D3A8B4DFBC2EB17EEE920F2B26.html">Directory.cpp</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_Init_1A9E49C3FD38DAF5B4BDFC1826562EE3A78D3E57">Init Member Function</h3>
+        <h4>
+            <span class="kw">void</span>
+             cmajor::rt::DirectoryIterationTable::Init() <span class="kw">static</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/Directory.cpp_EC49A3B51C7876D3A8B4DFBC2EB17EEE920F2B26.html#43">43</a>
+             of <a href="file/Directory.cpp_EC49A3B51C7876D3A8B4DFBC2EB17EEE920F2B26.html">Directory.cpp</a>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/Directory.cpp_EC49A3B51C7876D3A8B4DFBC2EB17EEE920F2B26.html#27">27</a>
+             of <a href="file/Directory.cpp_EC49A3B51C7876D3A8B4DFBC2EB17EEE920F2B26.html">Directory.cpp</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_Instance_800F0CA17CCBE35659E842E09819682299A5B9ED">Instance Member Function</h3>
+        <h4>
+            <a href="./class_DirectoryIterationTable_F40AF3786F734C7C9DD56D10EA8FDF062B78DB40.html">DirectoryIterationTable</a>
+            &amp; cmajor::rt::DirectoryIterationTable::Instance() <span class="kw">static</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/Directory.cpp_EC49A3B51C7876D3A8B4DFBC2EB17EEE920F2B26.html#29">29</a>
+             of <a href="file/Directory.cpp_EC49A3B51C7876D3A8B4DFBC2EB17EEE920F2B26.html">Directory.cpp</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_Iterate_DC6A49425E5C43EB01037D0F179262D0548FC314">Iterate Member Function</h3>
+        <h4>
+            <span class="kw">const </span>
+            <span class="kw">char</span>
+            * cmajor::rt::DirectoryIterationTable::Iterate(int32_t handle)</h4>
+        <span>
+            Definition at line <a href="file/Directory.cpp_EC49A3B51C7876D3A8B4DFBC2EB17EEE920F2B26.html#74">74</a>
+             of <a href="file/Directory.cpp_EC49A3B51C7876D3A8B4DFBC2EB17EEE920F2B26.html">Directory.cpp</a>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/Directory.cpp_EC49A3B51C7876D3A8B4DFBC2EB17EEE920F2B26.html#31">31</a>
+             of <a href="file/Directory.cpp_EC49A3B51C7876D3A8B4DFBC2EB17EEE920F2B26.html">Directory.cpp</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Calls: <a href="./../../../soulng/util/html/content/class_Path_4B3DE54C4207046D89CC15C18C3336BA3FDCEA6F.html#function_Combine_366AB69E7B19657179918C0792B9E79E0FC1F1ED">soulng::util::Path::Combine</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <a href="../../../compiler-projects.html">top</a>
+         | <a href="namespace_rt_EF8D5C7D9502D19049E33A11686364EE54A983DA.html">up</a>
+         | <a href="struct_Destruction_BA985C71A15C04021A652CA76BC7DB74D1298EC1.html">prev</a>
+         | <a href="class_ErrorTable_C6728ED226A2873F4D1BDDE313B29A4B3C21A186.html">next</a>
+    </body>
+</html>

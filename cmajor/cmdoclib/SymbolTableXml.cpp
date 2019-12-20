@@ -126,7 +126,7 @@ public:
     void AddModuleXmlDocument(sngxml::dom::Document* moduleXmlDocument);
     std::unique_ptr<sngxml::dom::Element> CreateSymbolElement(const std::u32string& elementName, Symbol& symbol) const;
     bool AddNamespace(NamespaceSymbol& ns);
-    void AddConcept(ConceptSymbol& concept);
+    void AddConcept(ConceptSymbol& conceptSymbol);
     void AddClass(ClassTypeSymbol& cls);
     void AddCtorOrDtor(FunctionSymbol& function);
     void AddFunction(FunctionSymbol& function);
@@ -849,39 +849,39 @@ bool SymbolTableXmlBuilder::AddNamespace(NamespaceSymbol& ns)
     return added;
 }
 
-void SymbolTableXmlBuilder::AddConcept(ConceptSymbol& concept)
+void SymbolTableXmlBuilder::AddConcept(ConceptSymbol& conceptSymbol)
 {
-    std::unique_ptr<sngxml::dom::Element> conceptElement = CreateSymbolElement(U"concept", concept);
-    if (concept.RefinedConcept())
+    std::unique_ptr<sngxml::dom::Element> conceptElement = CreateSymbolElement(U"concept", conceptSymbol);
+    if (conceptSymbol.RefinedConcept())
     {
-        conceptElement->SetAttribute(U"refines", concept.RefinedConcept()->Id());
-        AddConceptRefinement(concept.RefinedConcept(), &concept);
+        conceptElement->SetAttribute(U"refines", conceptSymbol.RefinedConcept()->Id());
+        AddConceptRefinement(conceptSymbol.RefinedConcept(), &conceptSymbol);
     }
-    std::u32string docPath = ToUtf32(Path::Combine(modulePrefix, ToUtf8(concept.Id()) + ".html"));
+    std::u32string docPath = ToUtf32(Path::Combine(modulePrefix, ToUtf8(conceptSymbol.Id()) + ".html"));
     conceptElement->SetAttribute(U"docPath", docPath);
-    std::u32string extPath = ToUtf32(Path::Combine(extModulePrefix, ToUtf8(concept.Id()) + ".html"));
+    std::u32string extPath = ToUtf32(Path::Combine(extModulePrefix, ToUtf8(conceptSymbol.Id()) + ".html"));
     conceptElement->SetAttribute(U"extPath", extPath);
-    int n = concept.TemplateParameters().size();
+    int n = conceptSymbol.TemplateParameters().size();
     if (n > 0)
     {
         std::unique_ptr<sngxml::dom::Element> typeParametersElement(new sngxml::dom::Element(U"typeParameters"));
         for (int i = 0; i < n; ++i)
         {
-            std::unique_ptr<sngxml::dom::Element> typeParameterElement = CreateSymbolElement(U"typeParameter", *concept.TemplateParameters()[i]);
+            std::unique_ptr<sngxml::dom::Element> typeParameterElement = CreateSymbolElement(U"typeParameter", *conceptSymbol.TemplateParameters()[i]);
             std::u32string docPath = conceptElement->GetAttribute(U"docPath") + U"#" + typeParameterElement->GetAttribute(U"id");
             typeParameterElement->SetAttribute(U"docPath", docPath);
             typeParametersElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(typeParameterElement.release()));
         }
         conceptElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(typeParametersElement.release()));
     }
-    if (concept.HasSource())
+    if (conceptSymbol.HasSource())
     {
-        File& file = fileMap[concept.GetSpan().fileIndex];
+        File& file = fileMap[conceptSymbol.GetSpan().fileIndex];
         conceptElement->SetAttribute(U"fileName", file.name);
         conceptElement->SetAttribute(U"filePath", ToUtf32(file.htmlFilePath));
-        conceptElement->SetAttribute(U"line", ToUtf32(std::to_string(concept.GetSpan().line)));
+        conceptElement->SetAttribute(U"line", ToUtf32(std::to_string(conceptSymbol.GetSpan().line)));
     }
-    Node* node = symbolTable.GetNodeNoThrow(&concept);
+    Node* node = symbolTable.GetNodeNoThrow(&conceptSymbol);
     ConceptNode* conceptNode = nullptr;
     if (node && node->GetNodeType() == NodeType::conceptNode)
     {
@@ -921,7 +921,7 @@ void SymbolTableXmlBuilder::AddConcept(ConceptSymbol& concept)
             currentElement = prevElement;
         }
     }
-    AddChildren(concept);
+    AddChildren(conceptSymbol);
     prevElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(conceptElement.release()));
     currentElement = prevElement;
 }
@@ -1388,9 +1388,9 @@ void SymbolTableXmlBuilder::AddChildren(ContainerSymbol& container)
             std::unique_ptr<sngxml::dom::Element> conceptsElement(new sngxml::dom::Element(U"concepts"));
             sngxml::dom::Element* prevElement = currentElement;
             currentElement = conceptsElement.get();
-            for (ConceptSymbol* concept : concepts)
+            for (ConceptSymbol* conceptSymbol : concepts)
             {
-                AddConcept(*concept);
+                AddConcept(*conceptSymbol);
             }
             prevElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(conceptsElement.release()));
             currentElement = prevElement;

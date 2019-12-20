@@ -83,19 +83,19 @@ const std::string& CompileUnitNode::Id()
     return id;
 }
 
-class NamespaceCombinder : public Visitor
+class NamespaceCombiner : public Visitor
 {
 public:
     void Visit(CompileUnitNode& compileUnitNode) override;
     void Visit(NamespaceNode& namespaceNode) override;
 };
 
-void NamespaceCombinder::Visit(CompileUnitNode& compileUnitNode)
+void NamespaceCombiner::Visit(CompileUnitNode& compileUnitNode)
 {
     compileUnitNode.GlobalNs()->Accept(*this);
 }
 
-void NamespaceCombinder::Visit(NamespaceNode& namespaceNode)
+void NamespaceCombiner::Visit(NamespaceNode& namespaceNode)
 {
     int n = namespaceNode.Members().Count();
     for (int i = 0; i < n; ++i)

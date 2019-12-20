@@ -1,0 +1,178 @@
+<html>
+    <head>
+        <meta charset="utf-8"/>
+        <title>TokenLexer Class</title>
+        <link href="../style/style.css" rel="stylesheet" type="text/css"/>
+        <script src="class_TokenLexer_0B4019E3B9B726F8F833350DD7C6067FE164BD6B_inheritance.js" type="text/javascript"> </script>
+    </head>
+    <body onload="drawClassInheritanceDiagram()">
+        <a href="../../../../compiler-projects.html">top</a>
+         | <a href="namespace__DA39A3EE5E6B4B0D3255BFEF95601890AFD80709.html">up</a>
+         | <a href="class_ContainerFileLexer_4B4376F377F76EB18871FCA1924F103F548B5A93.html">prev</a>
+         | next<hr/>
+        <h1>TokenLexer Class</h1>
+        <div class="diagram">
+            <svg height="0" id="classInheritanceDiagram" version="2.0" width="0" xmlns="http://www.w3.org/2000/svg"/>
+        </div>
+        <span>
+            Definition at line <a href="file/TokenLexer.hpp_D3B56B9546AA919C8B6CE36A837CB4B2CEBB8A9E.html#9">9</a>
+             of <a href="file/TokenLexer.hpp_D3B56B9546AA919C8B6CE36A837CB4B2CEBB8A9E.html">TokenLexer.hpp</a>
+        </span>
+        <br/>
+        <h2>Constructors</h2>
+        <table class="constructorTable">
+            <tr>
+                <td class="constructorTableFirstCol" xml:space="preserve"><a href="class_TokenLexer_0B4019E3B9B726F8F833350DD7C6067FE164BD6B.html#constructor_TokenLexer_4638752202FF4B74CE9E4AA3B708094C4FF17692">TokenLexer</a>(<span class="kw">const </span><span class="kw">char32_t</span>* start_, <span class="kw">const </span><span class="kw">char32_t</span>* end_, <span class="kw">const </span>std::string&amp; fileName_, <span class="kw">int</span> fileIndex_)</td>
+            </tr>
+            <tr>
+                <td class="constructorTableFirstCol" xml:space="preserve"><a href="class_TokenLexer_0B4019E3B9B726F8F833350DD7C6067FE164BD6B.html#constructor_TokenLexer_5A6F165771603B36E4F7D83A5E206A279965CF61">TokenLexer</a>(<span class="kw">const </span>std::u32string&amp; content_, <span class="kw">const </span>std::string&amp; fileName_, <span class="kw">int</span> fileIndex_)</td>
+            </tr>
+        </table>
+        <h2>Member Functions</h2>
+        <table class="functionTable">
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">int</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_TokenLexer_0B4019E3B9B726F8F833350DD7C6067FE164BD6B.html#function_GetTokenId_409389CAD2353D5997319E53D80B071DC68E1758">GetTokenId</a>(<span class="kw">int</span> statementIndex)</td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">int</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_TokenLexer_0B4019E3B9B726F8F833350DD7C6067FE164BD6B.html#function_NextState_9783A4F7579A1287523EFA9AEE0D336E2539C093">NextState</a>(<span class="kw">int</span> state, <span class="kw">char32_t</span> c) <span class="kw">override</span></td>
+            </tr>
+        </table>
+        <h2>Member Variables</h2>
+        <table>
+            <tr id="variable_inBlockComment_9107F605A38CE3B8070B87340BB0DC140A550550">
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">bool</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve">inBlockComment</td>
+            </tr>
+        </table>
+        <hr/>
+        <h2>Constructor Details</h2>
+        <h3 id="constructor_TokenLexer_4638752202FF4B74CE9E4AA3B708094C4FF17692">TokenLexer Constructor</h3>
+        <h4>
+            TokenLexer::TokenLexer(<span class="kw">const </span>
+            <span class="kw">char32_t</span>
+            * start_, <span class="kw">const </span>
+            <span class="kw">char32_t</span>
+            * end_, <span class="kw">const </span>
+            std::string&amp; fileName_, <span class="kw">int</span>
+             fileIndex_)</h4>
+        <span>
+            Definition at line <a href="file/TokenLexer.cpp_DBF1BA25E043F919CC793EF49C41E9122C9C5E16.html#19">19</a>
+             of <a href="file/TokenLexer.cpp_DBF1BA25E043F919CC793EF49C41E9122C9C5E16.html">TokenLexer.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;&nbsp;19</span>&nbsp;<span class="other">:</span>&nbsp;<span class="identifier">soulng</span><span class="other">::</span><span class="identifier">lexer</span><span class="other">::</span><a href="./../../../../soulng/lexer/html/content/class_Lexer_75B3A28C791BF2C7E5C3BC60E0421BDF87014048.html">Lexer</a><span class="other">(</span><span class="identifier">start_</span><span class="other">,&nbsp;</span><span class="identifier">end_</span><span class="other">,&nbsp;</span><span class="identifier">fileName_</span><span class="other">,&nbsp;</span><span class="identifier">fileIndex_</span><span class="other">)</span><span class="other">,&nbsp;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;&nbsp;20</span>&nbsp;<a href="./class_TokenLexer_0B4019E3B9B726F8F833350DD7C6067FE164BD6B.html#variable_inBlockComment_9107F605A38CE3B8070B87340BB0DC140A550550">inBlockComment</a><span class="other">(</span><span class="other">)</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;&nbsp;21</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;&nbsp;22</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">SetKeywordMap</span><span class="other">(</span><a href="./namespace_TokenLexerKeywords_0E9B017441121B9A510C25E185DDAD5FE097A324.html">TokenLexerKeywords</a><span class="other">::</span><span class="identifier">GetKeywordMap</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;&nbsp;23</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/TokenLexer.hpp_D3B56B9546AA919C8B6CE36A837CB4B2CEBB8A9E.html#13">13</a>
+             of <a href="file/TokenLexer.hpp_D3B56B9546AA919C8B6CE36A837CB4B2CEBB8A9E.html">TokenLexer.hpp</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="constructor_TokenLexer_5A6F165771603B36E4F7D83A5E206A279965CF61">TokenLexer Constructor</h3>
+        <h4>
+            TokenLexer::TokenLexer(<span class="kw">const </span>
+            std::u32string&amp; content_, <span class="kw">const </span>
+            std::string&amp; fileName_, <span class="kw">int</span>
+             fileIndex_)</h4>
+        <span>
+            Definition at line <a href="file/TokenLexer.cpp_DBF1BA25E043F919CC793EF49C41E9122C9C5E16.html#13">13</a>
+             of <a href="file/TokenLexer.cpp_DBF1BA25E043F919CC793EF49C41E9122C9C5E16.html">TokenLexer.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;&nbsp;13</span>&nbsp;<span class="other">:</span>&nbsp;<span class="identifier">soulng</span><span class="other">::</span><span class="identifier">lexer</span><span class="other">::</span><a href="./../../../../soulng/lexer/html/content/class_Lexer_75B3A28C791BF2C7E5C3BC60E0421BDF87014048.html">Lexer</a><span class="other">(</span><span class="identifier">content_</span><span class="other">,&nbsp;</span><span class="identifier">fileName_</span><span class="other">,&nbsp;</span><span class="identifier">fileIndex_</span><span class="other">)</span><span class="other">,&nbsp;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;&nbsp;14</span>&nbsp;<a href="./class_TokenLexer_0B4019E3B9B726F8F833350DD7C6067FE164BD6B.html#variable_inBlockComment_9107F605A38CE3B8070B87340BB0DC140A550550">inBlockComment</a><span class="other">(</span><span class="other">)</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;&nbsp;15</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;&nbsp;16</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">SetKeywordMap</span><span class="other">(</span><a href="./namespace_TokenLexerKeywords_0E9B017441121B9A510C25E185DDAD5FE097A324.html">TokenLexerKeywords</a><span class="other">::</span><span class="identifier">GetKeywordMap</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;&nbsp;17</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/TokenLexer.hpp_D3B56B9546AA919C8B6CE36A837CB4B2CEBB8A9E.html#12">12</a>
+             of <a href="file/TokenLexer.hpp_D3B56B9546AA919C8B6CE36A837CB4B2CEBB8A9E.html">TokenLexer.hpp</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h2>Member Function Details</h2>
+        <h3 id="function_GetTokenId_409389CAD2353D5997319E53D80B071DC68E1758">GetTokenId Member Function</h3>
+        <h4>
+            <span class="kw">int</span>
+             TokenLexer::GetTokenId(<span class="kw">int</span>
+             statementIndex)</h4>
+        <span>
+            Definition at line <a href="file/TokenLexer.cpp_DBF1BA25E043F919CC793EF49C41E9122C9C5E16.html#19032">19032</a>
+             of <a href="file/TokenLexer.cpp_DBF1BA25E043F919CC793EF49C41E9122C9C5E16.html">TokenLexer.cpp</a>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/TokenLexer.hpp_D3B56B9546AA919C8B6CE36A837CB4B2CEBB8A9E.html#17">17</a>
+             of <a href="file/TokenLexer.hpp_D3B56B9546AA919C8B6CE36A837CB4B2CEBB8A9E.html">TokenLexer.hpp</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Calls: <a href="./../../../../soulng/lexer/html/content/class_Lexer_75B3A28C791BF2C7E5C3BC60E0421BDF87014048.html#function_GetKeywordToken_9803AB3AB12177597A7ADB33E7159FC29236CB66">soulng::lexer::Lexer::GetKeywordToken</a>
+            , <a href="./../../../../soulng/lexer/html/content/class_Lexer_75B3A28C791BF2C7E5C3BC60E0421BDF87014048.html#function_Retract_DEBB6C8BFF47ABA76B0034408E5FD4B1421A5F98">soulng::lexer::Lexer::Retract</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Called by: <a href="./class_TokenLexer_0B4019E3B9B726F8F833350DD7C6067FE164BD6B.html#function_NextState_9783A4F7579A1287523EFA9AEE0D336E2539C093">TokenLexer::NextState</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_NextState_9783A4F7579A1287523EFA9AEE0D336E2539C093">NextState Member Function</h3>
+        <h4>
+            <span class="kw">int</span>
+             TokenLexer::NextState(<span class="kw">int</span>
+             state, <span class="kw">char32_t</span>
+             c) <span class="kw">override</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/TokenLexer.cpp_DBF1BA25E043F919CC793EF49C41E9122C9C5E16.html#25">25</a>
+             of <a href="file/TokenLexer.cpp_DBF1BA25E043F919CC793EF49C41E9122C9C5E16.html">TokenLexer.cpp</a>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/TokenLexer.hpp_D3B56B9546AA919C8B6CE36A837CB4B2CEBB8A9E.html#14">14</a>
+             of <a href="file/TokenLexer.hpp_D3B56B9546AA919C8B6CE36A837CB4B2CEBB8A9E.html">TokenLexer.hpp</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Base class overridden functions: <a href="./../../../../soulng/lexer/html/content/class_Lexer_75B3A28C791BF2C7E5C3BC60E0421BDF87014048.html#function_NextState_770F33FD64D82342B2028F01CB63DB92E6E8D009">soulng::lexer::Lexer::NextState</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Calls: <a href="./class_TokenLexer_0B4019E3B9B726F8F833350DD7C6067FE164BD6B.html#function_GetTokenId_409389CAD2353D5997319E53D80B071DC68E1758">TokenLexer::GetTokenId</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <a href="../../../../compiler-projects.html">top</a>
+         | <a href="namespace__DA39A3EE5E6B4B0D3255BFEF95601890AFD80709.html">up</a>
+         | <a href="class_ContainerFileLexer_4B4376F377F76EB18871FCA1924F103F548B5A93.html">prev</a>
+         | next</body>
+</html>

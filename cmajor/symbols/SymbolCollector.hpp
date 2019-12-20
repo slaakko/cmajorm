@@ -35,7 +35,7 @@ public:
     SymbolCollector();
     void AddBasicType(BasicTypeSymbol* basicType);
     void AddClass(ClassTypeSymbol* class_);
-    void AddConcept(ConceptSymbol* concept);
+    void AddConcept(ConceptSymbol* conceptSymbol);
     void AddConstant(ConstantSymbol* constant);
     void AddDelegate(DelegateTypeSymbol* delegate);
     void AddClassDelegate(ClassDelegateTypeSymbol* classDelegate);

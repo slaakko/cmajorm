@@ -1,0 +1,44 @@
+<html>
+ <head>
+  <meta charset="utf-8"/>
+  <title>Enumeration Grammar</title>
+  <link href="../style/style.css" rel="stylesheet" type="text/css"/>
+ </head>
+ <body>
+  <h1>Enumeration Grammar</h1>
+  <table class="grammar">
+   <tr id="enum-type">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      enum&#8209;type</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="specifier-grammar.html#specifiers">specifiers</a></span><span class="ruleOp"> </span><span class="ruleKeyword">enum</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="identifier-grammar.html#identifier">identifier</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#underlying-type">underlying&#8209;type</a></span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleChar">{</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#enum-constants">enum&#8209;constants</a></span><span class="ruleOp"> </span><span class="ruleChar">}</span></td>
+   </tr>
+   <tr id="underlying-type">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      underlying&#8209;type</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleChar">:</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="type-expr-grammar.html#type-expr">type&#8209;expr</a></span></td>
+   </tr>
+   <tr id="enum-constants">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      enum&#8209;constants</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#enum-constant">enum&#8209;constant</a></span><span class="ruleOp"> % </span><span class="ruleChar">,</span></td>
+   </tr>
+   <tr id="enum-constant">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      enum&#8209;constant</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="identifier-grammar.html#identifier">identifier</a></span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleChar">=</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="expression-grammar.html#expression">expression</a></span><span class="ruleOp"> | </span><span class="ruleOp">&lt;empty></span><span class="ruleOp">)</span></td>
+   </tr>
+  </table>
+ </body>
+</html>

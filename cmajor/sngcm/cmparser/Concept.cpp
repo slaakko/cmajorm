@@ -26,7 +26,7 @@ soulng::parser::Match ConceptParser::Concept(CmajorLexer& lexer, ParsingContext*
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("Concept"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
-    std::unique_ptr<ConceptNode> concept = std::unique_ptr<ConceptNode>();
+    std::unique_ptr<ConceptNode> conceptNode = std::unique_ptr<ConceptNode>();
     std::unique_ptr<WhereConstraintNode> constraint = std::unique_ptr<WhereConstraintNode>();
     Span s = Span();
     Span beginBraceSpan = Span();
@@ -159,7 +159,7 @@ soulng::parser::Match ConceptParser::Concept(CmajorLexer& lexer, ParsingContext*
                                                     }
                                                     if (match.hit)
                                                     {
-                                                        concept.reset(new ConceptNode(span, specifiers->value, conceptName.release()));
+                                                        conceptNode.reset(new ConceptNode(span, specifiers->value, conceptName.release()));
                                                     }
                                                     *parentMatch12 = match;
                                                 }
@@ -214,7 +214,7 @@ soulng::parser::Match ConceptParser::Concept(CmajorLexer& lexer, ParsingContext*
                                                             typeParam.reset(static_cast<IdentifierNode*>(match.value));
                                                             if (match.hit)
                                                             {
-                                                                concept->AddTypeParameter(typeParam.release());
+                                                                conceptNode->AddTypeParameter(typeParam.release());
                                                             }
                                                             *parentMatch25 = match;
                                                         }
@@ -256,7 +256,7 @@ soulng::parser::Match ConceptParser::Concept(CmajorLexer& lexer, ParsingContext*
                                                                                     typeParam.reset(static_cast<IdentifierNode*>(match.value));
                                                                                     if (match.hit)
                                                                                     {
-                                                                                        concept->AddTypeParameter(typeParam.release());
+                                                                                        conceptNode->AddTypeParameter(typeParam.release());
                                                                                     }
                                                                                     *parentMatch30 = match;
                                                                                 }
@@ -348,7 +348,7 @@ soulng::parser::Match ConceptParser::Concept(CmajorLexer& lexer, ParsingContext*
                                                                 refinement.reset(static_cast<ConceptIdNode*>(match.value));
                                                                 if (match.hit)
                                                                 {
-                                                                    concept->SetRefinement(refinement.release());
+                                                                    conceptNode->SetRefinement(refinement.release());
                                                                 }
                                                                 *parentMatch39 = match;
                                                             }
@@ -389,7 +389,7 @@ soulng::parser::Match ConceptParser::Concept(CmajorLexer& lexer, ParsingContext*
                                                                         s.end = span.end;
                                                                         constraint.reset(c.release());
                                                                         constraint->SetHeaderConstraint();
-                                                                        concept->AddConstraint(constraint.release());
+                                                                        conceptNode->AddConstraint(constraint.release());
                                                                     }
                                                                     *parentMatch43 = match;
                                                                 }
@@ -412,7 +412,7 @@ soulng::parser::Match ConceptParser::Concept(CmajorLexer& lexer, ParsingContext*
                                             }
                                             if (match.hit)
                                             {
-                                                concept->SetSpan(s);
+                                                conceptNode->SetSpan(s);
                                             }
                                             *parentMatch34 = match;
                                         }
@@ -472,7 +472,7 @@ soulng::parser::Match ConceptParser::Concept(CmajorLexer& lexer, ParsingContext*
                                 soulng::parser::Match* parentMatch48 = &match;
                                 {
                                     soulng::lexer::Span span = lexer.GetSpan();
-                                    soulng::parser::Match match = ConceptParser::ConceptBody(lexer, ctx, concept.get());
+                                    soulng::parser::Match match = ConceptParser::ConceptBody(lexer, ctx, conceptNode.get());
                                     if (match.hit)
                                     {
                                         *parentMatch48 = match;
@@ -532,13 +532,13 @@ soulng::parser::Match ConceptParser::Concept(CmajorLexer& lexer, ParsingContext*
                 if (match.hit)
                 {
                     ctx->EndParsingConcept();
-                    concept->SetBeginBraceSpan(beginBraceSpan);
-                    concept->SetEndBraceSpan(endBraceSpan);
+                    conceptNode->SetBeginBraceSpan(beginBraceSpan);
+                    conceptNode->SetEndBraceSpan(endBraceSpan);
                     {
                         #ifdef SOULNG_PARSER_DEBUG_SUPPORT
                         if (parser_debug_write_to_log) soulng::lexer::WriteSuccessToLog(lexer, parser_debug_match_span, soulng::unicode::ToUtf32("Concept"));
                         #endif // SOULNG_PARSER_DEBUG_SUPPORT
-                        return soulng::parser::Match(true, concept.release());
+                        return soulng::parser::Match(true, conceptNode.release());
                     }
                 }
                 else
@@ -808,7 +808,7 @@ soulng::parser::Match ConceptParser::Refinement(CmajorLexer& lexer)
     return match;
 }
 
-soulng::parser::Match ConceptParser::ConceptBody(CmajorLexer& lexer, ParsingContext* ctx, sngcm::ast::ConceptNode* concept)
+soulng::parser::Match ConceptParser::ConceptBody(CmajorLexer& lexer, ParsingContext* ctx, sngcm::ast::ConceptNode* conceptNode)
 {
     #ifdef SOULNG_PARSER_DEBUG_SUPPORT
     soulng::lexer::Span parser_debug_match_span;
@@ -833,7 +833,7 @@ soulng::parser::Match ConceptParser::ConceptBody(CmajorLexer& lexer, ParsingCont
                     soulng::parser::Match* parentMatch2 = &match;
                     {
                         int64_t save = lexer.GetPos();
-                        soulng::parser::Match match = ConceptParser::ConceptBodyConstraint(lexer, ctx, concept);
+                        soulng::parser::Match match = ConceptParser::ConceptBodyConstraint(lexer, ctx, conceptNode);
                         *parentMatch2 = match;
                         if (!match.hit)
                         {
@@ -841,7 +841,7 @@ soulng::parser::Match ConceptParser::ConceptBody(CmajorLexer& lexer, ParsingCont
                             soulng::parser::Match* parentMatch3 = &match;
                             lexer.SetPos(save);
                             {
-                                soulng::parser::Match match = ConceptParser::Axiom(lexer, ctx, concept);
+                                soulng::parser::Match match = ConceptParser::Axiom(lexer, ctx, conceptNode);
                                 *parentMatch3 = match;
                             }
                             *parentMatch2 = match;
@@ -875,7 +875,7 @@ soulng::parser::Match ConceptParser::ConceptBody(CmajorLexer& lexer, ParsingCont
     return match;
 }
 
-soulng::parser::Match ConceptParser::ConceptBodyConstraint(CmajorLexer& lexer, ParsingContext* ctx, sngcm::ast::ConceptNode* concept)
+soulng::parser::Match ConceptParser::ConceptBodyConstraint(CmajorLexer& lexer, ParsingContext* ctx, sngcm::ast::ConceptNode* conceptNode)
 {
     #ifdef SOULNG_PARSER_DEBUG_SUPPORT
     soulng::lexer::Span parser_debug_match_span;
@@ -905,7 +905,7 @@ soulng::parser::Match ConceptParser::ConceptBodyConstraint(CmajorLexer& lexer, P
                 typeNameConstraint.reset(static_cast<ConstraintNode*>(match.value));
                 if (match.hit)
                 {
-                    concept->AddConstraint(typeNameConstraint.release());
+                    conceptNode->AddConstraint(typeNameConstraint.release());
                 }
                 *parentMatch2 = match;
             }
@@ -920,11 +920,11 @@ soulng::parser::Match ConceptParser::ConceptBodyConstraint(CmajorLexer& lexer, P
                     soulng::parser::Match* parentMatch4 = &match;
                     {
                         int64_t pos = lexer.GetPos();
-                        soulng::parser::Match match = ConceptParser::SignatureConstraint(lexer, ctx, concept->TypeParameters()[0]);
+                        soulng::parser::Match match = ConceptParser::SignatureConstraint(lexer, ctx, conceptNode->TypeParameters()[0]);
                         signatureConstraint.reset(static_cast<ConstraintNode*>(match.value));
                         if (match.hit)
                         {
-                            concept->AddConstraint(signatureConstraint.release());
+                            conceptNode->AddConstraint(signatureConstraint.release());
                         }
                         *parentMatch4 = match;
                     }
@@ -948,7 +948,7 @@ soulng::parser::Match ConceptParser::ConceptBodyConstraint(CmajorLexer& lexer, P
                     embeddedConstraint.reset(static_cast<WhereConstraintNode*>(match.value));
                     if (match.hit)
                     {
-                        concept->AddConstraint(embeddedConstraint.release());
+                        conceptNode->AddConstraint(embeddedConstraint.release());
                     }
                     *parentMatch6 = match;
                 }
@@ -3093,7 +3093,7 @@ soulng::parser::Match ConceptParser::MultiParamConstraint(CmajorLexer& lexer, Pa
     return match;
 }
 
-soulng::parser::Match ConceptParser::Axiom(CmajorLexer& lexer, ParsingContext* ctx, sngcm::ast::ConceptNode* concept)
+soulng::parser::Match ConceptParser::Axiom(CmajorLexer& lexer, ParsingContext* ctx, sngcm::ast::ConceptNode* conceptNode)
 {
     #ifdef SOULNG_PARSER_DEBUG_SUPPORT
     soulng::lexer::Span parser_debug_match_span;
@@ -3337,7 +3337,7 @@ soulng::parser::Match ConceptParser::Axiom(CmajorLexer& lexer, ParsingContext* c
         {
             axiomNode->SetBeginBraceSpan(beginBraceSpan);
             axiomNode->SetEndBraceSpan(endBraceSpan);
-            concept->AddAxiom(axiomNode.release());
+            conceptNode->AddAxiom(axiomNode.release());
         }
         *parentMatch0 = match;
     }

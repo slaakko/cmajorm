@@ -1,0 +1,163 @@
+<html>
+    <head>
+        <meta charset="utf-8"/>
+        <title>LockGuard Class</title>
+        <link href="../style/style.css" rel="stylesheet" type="text/css"/>
+    </head>
+    <body>
+        <a href="../../../../compiler-projects.html">top</a>
+         | <a href="namespace_util_E23A9512F2AAFD7C9E0BD9C05F0E325D24E4033B.html">up</a>
+         | <a href="class_JsonValue_86C47A0347F1EFBF30D99D6A8B06C7D9311CBAA2.html">prev</a>
+         | <a href="class_MT_5CCD3FFBFC4F73CEEEE14F68F311FC46611B6974.html">next</a>
+        <hr/>
+        <h1>LockGuard Class</h1>
+        <span>
+            Definition at line <a href="file/Mutex.hpp_8C8D52CF8C7097C815982CB3CE623208D5BE2197.html#36">36</a>
+             of <a href="file/Mutex.hpp_8C8D52CF8C7097C815982CB3CE623208D5BE2197.html">Mutex.hpp</a>
+        </span>
+        <br/>
+        <h2>Constructors</h2>
+        <table class="constructorTable">
+            <tr>
+                <td class="constructorTableFirstCol" xml:space="preserve"><a href="class_LockGuard_F128A4BAF416AE2070FC347BCAAE16EFA55CB17C.html#constructor_LockGuard_E5DAF965704FB2EB8721116C2F5984622B1C7558">LockGuard</a>(<a href="./class_Mutex_7C760F1D4760846B5984CC75B779E7C63EE1FC04.html">Mutex</a>&amp; mtx_, <a href="./class_MutexOwner_F6E1EBE51136037061417224E1AEAEB0004DB28F.html">MutexOwner</a>&amp; owner_)</td>
+            </tr>
+        </table>
+        <h2>Member Functions</h2>
+        <table class="functionTable">
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_LockGuard_F128A4BAF416AE2070FC347BCAAE16EFA55CB17C.html#function_Lock_274EF1722CA4E2EC367F502AC0B943E74CCD633F">Lock</a>()</td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_LockGuard_F128A4BAF416AE2070FC347BCAAE16EFA55CB17C.html#function_Unlock_82F674E91A320F74072E2176ACD390A4943EE60C">Unlock</a>()</td>
+            </tr>
+        </table>
+        <h2>Member Variables</h2>
+        <table>
+            <tr id="variable_locked_2AD98DB612DA9EACC2B1278AE29EBAF490224167">
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">bool</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve">locked</td>
+            </tr>
+            <tr id="variable_mtx_F74BB4BF2004D3E9324B593A3489FE4EC639B7C2">
+                <td class="functionTableFirstCol" xml:space="preserve"><a href="./class_Mutex_7C760F1D4760846B5984CC75B779E7C63EE1FC04.html">Mutex</a>&amp;</td>
+                <td class="functionTableSecondCol" xml:space="preserve">mtx</td>
+            </tr>
+            <tr id="variable_owner_98886AD92E6DEEECF18AEA1A1A1D8593021B5A62">
+                <td class="functionTableFirstCol" xml:space="preserve"><a href="./class_MutexOwner_F6E1EBE51136037061417224E1AEAEB0004DB28F.html">MutexOwner</a>&amp;</td>
+                <td class="functionTableSecondCol" xml:space="preserve">owner</td>
+            </tr>
+        </table>
+        <hr/>
+        <h2>Constructor Details</h2>
+        <h3 id="constructor_LockGuard_E5DAF965704FB2EB8721116C2F5984622B1C7558">LockGuard Constructor</h3>
+        <h4>
+            soulng::util::LockGuard::LockGuard(<a href="./class_Mutex_7C760F1D4760846B5984CC75B779E7C63EE1FC04.html">Mutex</a>
+            &amp; mtx_, <a href="./class_MutexOwner_F6E1EBE51136037061417224E1AEAEB0004DB28F.html">MutexOwner</a>
+            &amp; owner_)</h4>
+        <span>
+            Definition at line <a href="file/Mutex.cpp_EB5D558332B50F620B0DA33624E5E26AB304446F.html#34">34</a>
+             of <a href="file/Mutex.cpp_EB5D558332B50F620B0DA33624E5E26AB304446F.html">Mutex.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">34</span>&nbsp;<span class="other">:</span>&nbsp;<a href="./class_LockGuard_F128A4BAF416AE2070FC347BCAAE16EFA55CB17C.html#variable_mtx_F74BB4BF2004D3E9324B593A3489FE4EC639B7C2">mtx</a><span class="other">(</span><span class="identifier">mtx_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_LockGuard_F128A4BAF416AE2070FC347BCAAE16EFA55CB17C.html#variable_owner_98886AD92E6DEEECF18AEA1A1A1D8593021B5A62">owner</a><span class="other">(</span><span class="identifier">owner_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_LockGuard_F128A4BAF416AE2070FC347BCAAE16EFA55CB17C.html#variable_locked_2AD98DB612DA9EACC2B1278AE29EBAF490224167">locked</a><span class="other">(</span><span class="kw">false</span><span class="other">)</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">35</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">36</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">Lock</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">37</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/Mutex.hpp_8C8D52CF8C7097C815982CB3CE623208D5BE2197.html#39">39</a>
+             of <a href="file/Mutex.hpp_8C8D52CF8C7097C815982CB3CE623208D5BE2197.html">Mutex.hpp</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h2>Member Function Details</h2>
+        <h3 id="function_Lock_274EF1722CA4E2EC367F502AC0B943E74CCD633F">Lock Member Function</h3>
+        <h4>
+            <span class="kw">void</span>
+             soulng::util::LockGuard::Lock()</h4>
+        <span>
+            Definition at line <a href="file/Mutex.cpp_EB5D558332B50F620B0DA33624E5E26AB304446F.html#47">47</a>
+             of <a href="file/Mutex.cpp_EB5D558332B50F620B0DA33624E5E26AB304446F.html">Mutex.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">48</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">49</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_LockGuard_F128A4BAF416AE2070FC347BCAAE16EFA55CB17C.html#variable_owner_98886AD92E6DEEECF18AEA1A1A1D8593021B5A62">owner</a><span class="other">.</span><span class="identifier">Push</span><span class="other">(</span><a href="./class_LockGuard_F128A4BAF416AE2070FC347BCAAE16EFA55CB17C.html#variable_mtx_F74BB4BF2004D3E9324B593A3489FE4EC639B7C2">mtx</a><span class="other">.</span><span class="identifier">Id</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">50</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_LockGuard_F128A4BAF416AE2070FC347BCAAE16EFA55CB17C.html#variable_mtx_F74BB4BF2004D3E9324B593A3489FE4EC639B7C2">mtx</a><span class="other">.</span><span class="identifier">Lock</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">51</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_LockGuard_F128A4BAF416AE2070FC347BCAAE16EFA55CB17C.html#variable_locked_2AD98DB612DA9EACC2B1278AE29EBAF490224167">locked</a><span class="other">&nbsp;=&nbsp;</span><span class="kw">true</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">52</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/Mutex.hpp_8C8D52CF8C7097C815982CB3CE623208D5BE2197.html#41">41</a>
+             of <a href="file/Mutex.hpp_8C8D52CF8C7097C815982CB3CE623208D5BE2197.html">Mutex.hpp</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Calls: <a href="./class_Mutex_7C760F1D4760846B5984CC75B779E7C63EE1FC04.html#function_Id_0FFCC4A73CEBB077BB895F9078B6B455FF3C2E77">soulng::util::Mutex::Id</a>
+            , <a href="./class_Mutex_7C760F1D4760846B5984CC75B779E7C63EE1FC04.html#function_Lock_17AB9838F20FA4F2565028C22C405EB69592F567">soulng::util::Mutex::Lock</a>
+            , <a href="./class_MutexOwner_F6E1EBE51136037061417224E1AEAEB0004DB28F.html#function_Push_8C314BCB766630E03496EAEFACF430EBD6218332">soulng::util::MutexOwner::Push</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_Unlock_82F674E91A320F74072E2176ACD390A4943EE60C">Unlock Member Function</h3>
+        <h4>
+            <span class="kw">void</span>
+             soulng::util::LockGuard::Unlock()</h4>
+        <span>
+            Definition at line <a href="file/Mutex.cpp_EB5D558332B50F620B0DA33624E5E26AB304446F.html#54">54</a>
+             of <a href="file/Mutex.cpp_EB5D558332B50F620B0DA33624E5E26AB304446F.html">Mutex.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">55</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">56</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_LockGuard_F128A4BAF416AE2070FC347BCAAE16EFA55CB17C.html#variable_mtx_F74BB4BF2004D3E9324B593A3489FE4EC639B7C2">mtx</a><span class="other">.</span><span class="identifier">Unlock</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">57</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_LockGuard_F128A4BAF416AE2070FC347BCAAE16EFA55CB17C.html#variable_owner_98886AD92E6DEEECF18AEA1A1A1D8593021B5A62">owner</a><span class="other">.</span><span class="identifier">Pop</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">58</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_LockGuard_F128A4BAF416AE2070FC347BCAAE16EFA55CB17C.html#variable_locked_2AD98DB612DA9EACC2B1278AE29EBAF490224167">locked</a><span class="other">&nbsp;=&nbsp;</span><span class="kw">false</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">59</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/Mutex.hpp_8C8D52CF8C7097C815982CB3CE623208D5BE2197.html#42">42</a>
+             of <a href="file/Mutex.hpp_8C8D52CF8C7097C815982CB3CE623208D5BE2197.html">Mutex.hpp</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Calls: <a href="./class_Mutex_7C760F1D4760846B5984CC75B779E7C63EE1FC04.html#function_Unlock_07A83ADF646E6CC70DF686628D3C14BAD55C18C4">soulng::util::Mutex::Unlock</a>
+            , <a href="./class_MutexOwner_F6E1EBE51136037061417224E1AEAEB0004DB28F.html#function_Pop_5E47B06376D11B65F3E31779E794210B39198BF3">soulng::util::MutexOwner::Pop</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Called by: <a href="./class_LockGuard_F128A4BAF416AE2070FC347BCAAE16EFA55CB17C.html#destructor_destructor_2B6D3F083F53EEB96D46906E1B2BEDC65124BCA1">soulng::util::LockGuard::destructor</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <a href="../../../../compiler-projects.html">top</a>
+         | <a href="namespace_util_E23A9512F2AAFD7C9E0BD9C05F0E325D24E4033B.html">up</a>
+         | <a href="class_JsonValue_86C47A0347F1EFBF30D99D6A8B06C7D9311CBAA2.html">prev</a>
+         | <a href="class_MT_5CCD3FFBFC4F73CEEEE14F68F311FC46611B6974.html">next</a>
+    </body>
+</html>

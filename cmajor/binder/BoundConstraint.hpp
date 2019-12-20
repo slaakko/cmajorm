@@ -31,10 +31,10 @@ public:
     bool Subsume(BoundConstraint* that) const override;
     BoundConstraint* Clone() const override;
     bool Satisfied() const { return satisfied; }
-    void SetConcept(ConceptSymbol* concept_) { concept = concept_; }
+    void SetConcept(ConceptSymbol* conceptSymbol_) { conceptSymbol = conceptSymbol_; }
 private:
     bool satisfied;
-    ConceptSymbol* concept;
+    ConceptSymbol* conceptSymbol;
 };
 
 class BINDER_API BoundBinaryConstraint : public BoundConstraint

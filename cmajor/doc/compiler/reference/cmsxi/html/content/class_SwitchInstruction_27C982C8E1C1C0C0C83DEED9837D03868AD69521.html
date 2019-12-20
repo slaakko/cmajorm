@@ -1,0 +1,151 @@
+<html>
+    <head>
+        <meta charset="utf-8"/>
+        <title>SwitchInstruction Class</title>
+        <link href="../style/style.css" rel="stylesheet" type="text/css"/>
+        <script src="class_SwitchInstruction_27C982C8E1C1C0C0C83DEED9837D03868AD69521_inheritance.js" type="text/javascript"> </script>
+    </head>
+    <body onload="drawClassInheritanceDiagram()">
+        <a href="../../../compiler-projects.html">top</a>
+         | <a href="namespace_cmsxi_9FF0912E7694F9E263911E9FA89E89C681FEBDFA.html">up</a>
+         | <a href="class_SubInstruction_80215F458791800ACC8DB084A5425D9D25BA9C95.html">prev</a>
+         | <a href="class_TrapInstruction_3A0E48743A9F441758862E3B3946E735F4C55E96.html">next</a>
+        <hr/>
+        <h1>SwitchInstruction Class</h1>
+        <div class="diagram">
+            <svg height="0" id="classInheritanceDiagram" version="2.0" width="0" xmlns="http://www.w3.org/2000/svg"/>
+        </div>
+        <span>
+            Definition at line <a href="file/Instruction.hpp_BA846EEB8860ED551A66A071659234ED6157406C.html#346">346</a>
+             of <a href="file/Instruction.hpp_BA846EEB8860ED551A66A071659234ED6157406C.html">Instruction.hpp</a>
+        </span>
+        <br/>
+        <h2>Constructors</h2>
+        <table class="constructorTable">
+            <tr>
+                <td class="constructorTableFirstCol" xml:space="preserve"><a href="class_SwitchInstruction_27C982C8E1C1C0C0C83DEED9837D03868AD69521.html#constructor_SwitchInstruction_F5F4AFA95928FB2D656A06D2658160DA06BCE357">SwitchInstruction</a>(<a href="./class_Value_BEC1DDC8DAD42471218B0D65934FC1D3506EAD06.html">Value</a>* cond_, <a href="./class_BasicBlock_91E140482E351F1F15A001EF55BE0F2B4F5BBDDC.html">BasicBlock</a>* defaultDest_)</td>
+            </tr>
+        </table>
+        <h2>Member Functions</h2>
+        <table class="functionTable">
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_SwitchInstruction_27C982C8E1C1C0C0C83DEED9837D03868AD69521.html#function_AddCase_29CECBEB4EE0B5F3B93297E98C0E7531CD62D2DC">AddCase</a>(<a href="./class_Value_BEC1DDC8DAD42471218B0D65934FC1D3506EAD06.html">Value</a>* caseValue, <a href="./class_BasicBlock_91E140482E351F1F15A001EF55BE0F2B4F5BBDDC.html">BasicBlock</a>* dest)</td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_SwitchInstruction_27C982C8E1C1C0C0C83DEED9837D03868AD69521.html#function_Write_393329FE02C81D4FA3CC29D273AB380BDA37AE20">Write</a>(<a href="./../../../soulng/util/html/content/class_CodeFormatter_C58CAFDB50587A7AC80B6435A31CAA3A81DB6CC9.html">CodeFormatter</a>&amp; formatter, <a href="./class_Function_98A91CF98A94177A3A63B253F29B179264F9D8CE.html">Function</a>&amp; function, <a href="./class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html">Context</a>&amp; context) <span class="kw">override</span></td>
+            </tr>
+        </table>
+        <h2>Member Variables</h2>
+        <table>
+            <tr id="variable_cond_0A5F2EA67ABCCC3E6E22F7B054620731A8B0C662">
+                <td class="functionTableFirstCol" xml:space="preserve"><a href="./class_Value_BEC1DDC8DAD42471218B0D65934FC1D3506EAD06.html">Value</a>*</td>
+                <td class="functionTableSecondCol" xml:space="preserve">cond</td>
+            </tr>
+            <tr id="variable_defaultDest_1B3EA45BECF7F3996E5ECA8A3D128C1B53DDDBBC">
+                <td class="functionTableFirstCol" xml:space="preserve"><a href="./class_BasicBlock_91E140482E351F1F15A001EF55BE0F2B4F5BBDDC.html">BasicBlock</a>*</td>
+                <td class="functionTableSecondCol" xml:space="preserve">defaultDest</td>
+            </tr>
+            <tr id="variable_destinations_E7AD424E6353A2742DA0DB0943F975C0147C9915">
+                <td class="functionTableFirstCol" xml:space="preserve">std::vector&lt;std::pair&lt;<a href="./class_Value_BEC1DDC8DAD42471218B0D65934FC1D3506EAD06.html">Value</a>*, <a href="./class_BasicBlock_91E140482E351F1F15A001EF55BE0F2B4F5BBDDC.html">BasicBlock</a>*>></td>
+                <td class="functionTableSecondCol" xml:space="preserve">destinations</td>
+            </tr>
+        </table>
+        <hr/>
+        <h2>Constructor Details</h2>
+        <h3 id="constructor_SwitchInstruction_F5F4AFA95928FB2D656A06D2658160DA06BCE357">SwitchInstruction Constructor</h3>
+        <h4>
+            cmsxi::SwitchInstruction::SwitchInstruction(<a href="./class_Value_BEC1DDC8DAD42471218B0D65934FC1D3506EAD06.html">Value</a>
+            * cond_, <a href="./class_BasicBlock_91E140482E351F1F15A001EF55BE0F2B4F5BBDDC.html">BasicBlock</a>
+            * defaultDest_)</h4>
+        <span>
+            Definition at line <a href="file/Instruction.cpp_2DFB8264AD9B9299EE506ADB2F3CD8AF791EA788.html#614">614</a>
+             of <a href="file/Instruction.cpp_2DFB8264AD9B9299EE506ADB2F3CD8AF791EA788.html">Instruction.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">614</span>&nbsp;<span class="other">:</span>&nbsp;<a href="./class_Instruction_31E399AEA14ADF6E2D4DF9E2AC2EB3771E5E58AD.html">Instruction</a><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_SwitchInstruction_27C982C8E1C1C0C0C83DEED9837D03868AD69521.html#variable_cond_0A5F2EA67ABCCC3E6E22F7B054620731A8B0C662">cond</a><span class="other">(</span><span class="identifier">cond_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_SwitchInstruction_27C982C8E1C1C0C0C83DEED9837D03868AD69521.html#variable_defaultDest_1B3EA45BECF7F3996E5ECA8A3D128C1B53DDDBBC">defaultDest</a><span class="other">(</span><span class="identifier">defaultDest_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_SwitchInstruction_27C982C8E1C1C0C0C83DEED9837D03868AD69521.html#variable_destinations_E7AD424E6353A2742DA0DB0943F975C0147C9915">destinations</a><span class="other">(</span><span class="other">)</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">615</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">616</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/Instruction.hpp_BA846EEB8860ED551A66A071659234ED6157406C.html#349">349</a>
+             of <a href="file/Instruction.hpp_BA846EEB8860ED551A66A071659234ED6157406C.html">Instruction.hpp</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h2>Member Function Details</h2>
+        <h3 id="function_AddCase_29CECBEB4EE0B5F3B93297E98C0E7531CD62D2DC">AddCase Member Function</h3>
+        <h4>
+            <span class="kw">void</span>
+             cmsxi::SwitchInstruction::AddCase(<a href="./class_Value_BEC1DDC8DAD42471218B0D65934FC1D3506EAD06.html">Value</a>
+            * caseValue, <a href="./class_BasicBlock_91E140482E351F1F15A001EF55BE0F2B4F5BBDDC.html">BasicBlock</a>
+            * dest)</h4>
+        <span>
+            Definition at line <a href="file/Instruction.cpp_2DFB8264AD9B9299EE506ADB2F3CD8AF791EA788.html#618">618</a>
+             of <a href="file/Instruction.cpp_2DFB8264AD9B9299EE506ADB2F3CD8AF791EA788.html">Instruction.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">619</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">620</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_SwitchInstruction_27C982C8E1C1C0C0C83DEED9837D03868AD69521.html#variable_destinations_E7AD424E6353A2742DA0DB0943F975C0147C9915">destinations</a><span class="other">.</span><span class="identifier">push_back</span><span class="other">(</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">make_pair</span><span class="other">(</span><span class="identifier">caseValue</span><span class="other">,&nbsp;</span><span class="identifier">dest</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">621</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/Instruction.hpp_BA846EEB8860ED551A66A071659234ED6157406C.html#350">350</a>
+             of <a href="file/Instruction.hpp_BA846EEB8860ED551A66A071659234ED6157406C.html">Instruction.hpp</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_Write_393329FE02C81D4FA3CC29D273AB380BDA37AE20">Write Member Function</h3>
+        <h4>
+            <span class="kw">void</span>
+             cmsxi::SwitchInstruction::Write(<a href="./../../../soulng/util/html/content/class_CodeFormatter_C58CAFDB50587A7AC80B6435A31CAA3A81DB6CC9.html">CodeFormatter</a>
+            &amp; formatter, <a href="./class_Function_98A91CF98A94177A3A63B253F29B179264F9D8CE.html">Function</a>
+            &amp; function, <a href="./class_Context_8CE20B1020EC10C898CE6A95CB1905F1C6A4479C.html">Context</a>
+            &amp; context) <span class="kw">override</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/Instruction.cpp_2DFB8264AD9B9299EE506ADB2F3CD8AF791EA788.html#623">623</a>
+             of <a href="file/Instruction.cpp_2DFB8264AD9B9299EE506ADB2F3CD8AF791EA788.html">Instruction.cpp</a>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/Instruction.hpp_BA846EEB8860ED551A66A071659234ED6157406C.html#351">351</a>
+             of <a href="file/Instruction.hpp_BA846EEB8860ED551A66A071659234ED6157406C.html">Instruction.hpp</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Base class overridden functions: <a href="./class_Instruction_31E399AEA14ADF6E2D4DF9E2AC2EB3771E5E58AD.html#function_Write_63F32ED51F41816DD9A8264A42CA1D66669556CA">cmsxi::Instruction::Write</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Calls: <a href="./class_BasicBlock_91E140482E351F1F15A001EF55BE0F2B4F5BBDDC.html#function_Id_A25329305112BD0F1AE48BEAEC3DFB83EB85BF93">cmsxi::BasicBlock::Id</a>
+            , <a href="./class_Instruction_31E399AEA14ADF6E2D4DF9E2AC2EB3771E5E58AD.html#function_WriteMetadataRef_AE8E45EED286F5B86760FBB7DC91625EC43A50C9">cmsxi::Instruction::WriteMetadataRef</a>
+            , <a href="./class_Type_0135BAB9139BA4DFDB4D5D250F240280DFF4403A.html#function_Name_9F2D924EA9FD589377F088C165175D6DBAF32D91">cmsxi::Type::Name</a>
+            , <a href="./class_Value_BEC1DDC8DAD42471218B0D65934FC1D3506EAD06.html#function_GetType_EB9DABA41B8CAB28760683B4E28A26C415414FEA">cmsxi::Value::GetType</a>
+            , <a href="./class_Value_BEC1DDC8DAD42471218B0D65934FC1D3506EAD06.html#function_Name_30CB8EE7B42C4DE8442F7A678366C56D08B598AC">cmsxi::Value::Name</a>
+            , <a href="./../../../soulng/util/html/content/class_CodeFormatter_C58CAFDB50587A7AC80B6435A31CAA3A81DB6CC9.html#function_Write_CD7775F73D2C0A69FD368A415F86EBB6960314A5">soulng::util::CodeFormatter::Write</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <a href="../../../compiler-projects.html">top</a>
+         | <a href="namespace_cmsxi_9FF0912E7694F9E263911E9FA89E89C681FEBDFA.html">up</a>
+         | <a href="class_SubInstruction_80215F458791800ACC8DB084A5425D9D25BA9C95.html">prev</a>
+         | <a href="class_TrapInstruction_3A0E48743A9F441758862E3B3946E735F4C55E96.html">next</a>
+    </body>
+</html>

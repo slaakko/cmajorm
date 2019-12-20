@@ -1,0 +1,310 @@
+<html>
+    <head>
+        <meta charset="utf-8"/>
+        <title>LiteralNode Abstract Class</title>
+        <link href="../style/style.css" rel="stylesheet" type="text/css"/>
+        <script src="class_LiteralNode_1A76F3823B6151408E0B854080BE8685B0ABF949_inheritance.js" type="text/javascript"> </script>
+    </head>
+    <body onload="drawClassInheritanceDiagram()">
+        <a href="../../../../compiler-projects.html">top</a>
+         | <a href="namespace_ast_92B316F3086369C69BB33331B69D260F42EB9214.html">up</a>
+         | <a href="class_LessOrEqualNode_DAAF2E7A80A91276BD27D9174083269CE11B4A4E.html">prev</a>
+         | <a href="class_LongLiteralNode_3631CA81B20EC1F466F904BA69C0152A5E8D72CA.html">next</a>
+        <hr/>
+        <h1>LiteralNode Abstract Class</h1>
+        <div class="diagram">
+            <svg height="0" id="classInheritanceDiagram" version="2.0" width="0" xmlns="http://www.w3.org/2000/svg"/>
+        </div>
+        <span>
+            Definition at line <a href="file/Literal.hpp_1A4D5DC9C9F85380722648C3B99A4BF209089BE6.html#13">13</a>
+             of <a href="file/Literal.hpp_1A4D5DC9C9F85380722648C3B99A4BF209089BE6.html">Literal.hpp</a>
+        </span>
+        <br/>
+        <h2>Constructors</h2>
+        <table class="constructorTable">
+            <tr>
+                <td class="constructorTableFirstCol" xml:space="preserve"><a href="class_LiteralNode_1A76F3823B6151408E0B854080BE8685B0ABF949.html#constructor_LiteralNode_DAF688FA94E3D18BF2BEF10CF3D39F572E4F5F29">LiteralNode</a>(<a href="./enum_NodeType_7A9078208A9559F99B3E7BE36B25F5CB0CFCDCD2.html">NodeType</a> nodeType_, <span class="kw">const </span><a href="./../../../../soulng/lexer/html/content/struct_Span_30EE73A264B60937695144F1BD60852CA010DF7E.html">Span</a>&amp; span_)</td>
+            </tr>
+        </table>
+        <h2>Member Functions</h2>
+        <table class="functionTable">
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_LiteralNode_1A76F3823B6151408E0B854080BE8685B0ABF949.html#function_Read_D961C0F62CB093952AFC987A71E266FE4F79BC7D">Read</a>(<a href="./class_AstReader_83AF922492FCB69E71E24FE05933E85CDDA3A1C1.html">AstReader</a>&amp; reader) <span class="kw">override</span></td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_LiteralNode_1A76F3823B6151408E0B854080BE8685B0ABF949.html#function_SetText_B115E74F6F7C26B6C27CAADD80D3F9C188A25F6D">SetText</a>(<span class="kw">const </span>std::u32string&amp; text_)</td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">const </span>std::u32string&amp;</td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_LiteralNode_1A76F3823B6151408E0B854080BE8685B0ABF949.html#function_Text_FD57C399DA5F80CF9B62FD27DA5C92CE0B5FFE24">Text</a>() <span class="kw">const</span></td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_LiteralNode_1A76F3823B6151408E0B854080BE8685B0ABF949.html#function_Write_2C7B38B1ECD69D700AE64F1C1C13F6EFAA8BFA7B">Write</a>(<a href="./class_AstWriter_55521D978F954F056D58DA00DE17A7FF56217E9E.html">AstWriter</a>&amp; writer) <span class="kw">override</span></td>
+            </tr>
+        </table>
+        <h2>Member Variables</h2>
+        <table>
+            <tr id="variable_text_A12563F3C4B2ADD7B977DE4F2DDB54317169D291">
+                <td class="functionTableFirstCol" xml:space="preserve">std::u32string</td>
+                <td class="functionTableSecondCol" xml:space="preserve">text</td>
+            </tr>
+        </table>
+        <hr/>
+        <h2>Constructor Details</h2>
+        <h3 id="constructor_LiteralNode_DAF688FA94E3D18BF2BEF10CF3D39F572E4F5F29">LiteralNode Constructor</h3>
+        <h4>
+            sngcm::ast::LiteralNode::LiteralNode(<a href="./enum_NodeType_7A9078208A9559F99B3E7BE36B25F5CB0CFCDCD2.html">NodeType</a>
+             nodeType_, <span class="kw">const </span>
+            <a href="./../../../../soulng/lexer/html/content/struct_Span_30EE73A264B60937695144F1BD60852CA010DF7E.html">Span</a>
+            &amp; span_)</h4>
+        <span>
+            Definition at line <a href="file/Literal.cpp_3CAA8866D2E585FD531A984A835682CE97BAAABB.html#19">19</a>
+             of <a href="file/Literal.cpp_3CAA8866D2E585FD531A984A835682CE97BAAABB.html">Literal.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;19</span>&nbsp;<span class="other">:</span>&nbsp;<a href="./class_Node_7FDC87EBEBE372FAA4360E17F122F6028A1505D6.html">Node</a><span class="other">(</span><span class="identifier">nodeType_</span><span class="other">,&nbsp;</span><span class="identifier">span_</span><span class="other">)</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;20</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;21</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/Literal.hpp_1A4D5DC9C9F85380722648C3B99A4BF209089BE6.html#16">16</a>
+             of <a href="file/Literal.hpp_1A4D5DC9C9F85380722648C3B99A4BF209089BE6.html">Literal.hpp</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h2>Member Function Details</h2>
+        <h3 id="function_Read_D961C0F62CB093952AFC987A71E266FE4F79BC7D">Read Member Function</h3>
+        <h4>
+            <span class="kw">void</span>
+             sngcm::ast::LiteralNode::Read(<a href="./class_AstReader_83AF922492FCB69E71E24FE05933E85CDDA3A1C1.html">AstReader</a>
+            &amp; reader) <span class="kw">override</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/Literal.cpp_3CAA8866D2E585FD531A984A835682CE97BAAABB.html#29">29</a>
+             of <a href="file/Literal.cpp_3CAA8866D2E585FD531A984A835682CE97BAAABB.html">Literal.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;30</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;31</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_Node_7FDC87EBEBE372FAA4360E17F122F6028A1505D6.html">Node</a><span class="other">::</span><span class="identifier">Read</span><span class="other">(</span><span class="identifier">reader</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;32</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_LiteralNode_1A76F3823B6151408E0B854080BE8685B0ABF949.html#variable_text_A12563F3C4B2ADD7B977DE4F2DDB54317169D291">text</a><span class="other">&nbsp;=&nbsp;</span><span class="identifier">reader</span><span class="other">.</span><span class="identifier">GetBinaryReader</span><span class="other">(</span><span class="other">)</span><span class="other">.</span><span class="identifier">ReadUtf32String</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;33</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/Literal.hpp_1A4D5DC9C9F85380722648C3B99A4BF209089BE6.html#18">18</a>
+             of <a href="file/Literal.hpp_1A4D5DC9C9F85380722648C3B99A4BF209089BE6.html">Literal.hpp</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Base class overridden functions: <a href="./class_Node_7FDC87EBEBE372FAA4360E17F122F6028A1505D6.html#function_Read_752482F1CB1306EFB283CCDCEDEE428813AFB309">sngcm::ast::Node::Read</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Derived class overrides: <a href="./class_ArrayLiteralNode_988557EE6037BCFDDA4392AE4C66A2D92D66D766.html#function_Read_344ACADA573A038EA688D5916FD633E82BBA9A7C">sngcm::ast::ArrayLiteralNode::Read</a>
+            , <a href="./class_BooleanLiteralNode_BA061A8FA86B8477955DDB406C513FDEBAF71B8D.html#function_Read_847505BE5568E38CBE6280496BC937C0EE452503">sngcm::ast::BooleanLiteralNode::Read</a>
+            , <a href="./class_ByteLiteralNode_B68F4970B8830DF04BE378616376125C60867498.html#function_Read_EA394966A08E5474F8CFECD7FC9D0B654FA291C0">sngcm::ast::ByteLiteralNode::Read</a>
+            , <a href="./class_CharLiteralNode_79B44AD52D16F8D05FD9B71E97FD23B00AE977DD.html#function_Read_576B79AB659930A764A664A4C89E0BF91879BDD7">sngcm::ast::CharLiteralNode::Read</a>
+            , <a href="./class_DoubleLiteralNode_D5CFE87D7CDB5EFED50331560B07FAC89521AC76.html#function_Read_891682C88F66F6F6E2BB439BA7872BE8E14D4556">sngcm::ast::DoubleLiteralNode::Read</a>
+            , <a href="./class_FloatLiteralNode_A99C6780902CF5D89BDC533130920183DAC76E50.html#function_Read_19B1A4D556725041FE535BF7958CEC49D65A0374">sngcm::ast::FloatLiteralNode::Read</a>
+            , <a href="./class_IntLiteralNode_3635610F208BAFA0526F4FF2BE23BE73D1D83FA2.html#function_Read_0E565675E1D884664A59E1C07B9C57BFA0520F91">sngcm::ast::IntLiteralNode::Read</a>
+            , <a href="./class_LongLiteralNode_3631CA81B20EC1F466F904BA69C0152A5E8D72CA.html#function_Read_310D5EF3A9919DD00FBD1CB13459517D392B5A9B">sngcm::ast::LongLiteralNode::Read</a>
+            , <a href="./class_SByteLiteralNode_B9A5B0BDC2CECE80F25781D817A1F9ABFE6B1EF8.html#function_Read_A23FC0A3E14098396889787CA2FC8DFF1FC2FF20">sngcm::ast::SByteLiteralNode::Read</a>
+            , <a href="./class_ShortLiteralNode_FDD4EC0716C295E29B28EAF1817D43C70B584E45.html#function_Read_CDD0AC10732F0015E554C238F862846F7678C178">sngcm::ast::ShortLiteralNode::Read</a>
+            , <a href="./class_StringLiteralNode_5F198EC06D6C70B076C7C0ADA756C11B8829FE31.html#function_Read_F53DA8BE9B1762DF0295A8F55370F28E5807064E">sngcm::ast::StringLiteralNode::Read</a>
+            , <a href="./class_StructuredLiteralNode_21B802C8332CD70644D47102943C2D80F541E08E.html#function_Read_F710546440358726A51E9287694BF29598CD6D83">sngcm::ast::StructuredLiteralNode::Read</a>
+            , <a href="./class_UCharLiteralNode_E151461595DEB25D751F273215D1AC16537CA9B7.html#function_Read_CB8C6709BB3786766781FC46A7B562C43E9A6DB2">sngcm::ast::UCharLiteralNode::Read</a>
+            , <a href="./class_UIntLiteralNode_88EDCED33D52CC13D1BB4A572BDF21A9F50EB84A.html#function_Read_8ABA9ABCBDC01127526304864DEBE8ED5B084CED">sngcm::ast::UIntLiteralNode::Read</a>
+            , <a href="./class_ULongLiteralNode_C91A45D13051DE8A3A4F305C3101B2EB146F3083.html#function_Read_74FC86272DFFD8152D304E411172422BF68E3505">sngcm::ast::ULongLiteralNode::Read</a>
+            , <a href="./class_UShortLiteralNode_A487D4B53D677B73E960D9C1B0663C6F57F80AC5.html#function_Read_DCA05C90829E17B9FF59A372B5F5510D2BDC7269">sngcm::ast::UShortLiteralNode::Read</a>
+            , <a href="./class_UStringLiteralNode_F80FD7C129A86274FD094A4207E6EAD98AC199A2.html#function_Read_A3326708481DA5CFF6CCFABCF25F818FBD4C3D1E">sngcm::ast::UStringLiteralNode::Read</a>
+            , <a href="./class_UuidLiteralNode_8A54D3E9EAC6499E12B4414060F3905DA1361C31.html#function_Read_6EA024681DE8F6186A37C9A37D0159FCA479BA23">sngcm::ast::UuidLiteralNode::Read</a>
+            , <a href="./class_WCharLiteralNode_22E4B9AB53BA2799E64C26A437967AE0A8B19FC1.html#function_Read_AFEB01F420E3469899D6C6116D9D7FACC4D55393">sngcm::ast::WCharLiteralNode::Read</a>
+            , <a href="./class_WStringLiteralNode_FE9E70285EDCCBD2AD2B3655AC611319558F65FB.html#function_Read_D91A41A4875B56B10BE7475909621C3117126F71">sngcm::ast::WStringLiteralNode::Read</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Calls: <a href="./class_AstReader_83AF922492FCB69E71E24FE05933E85CDDA3A1C1.html#function_GetBinaryReader_C4EBE237AB790F3291BA338C15C29EAC4D2B44E3">sngcm::ast::AstReader::GetBinaryReader</a>
+            , <a href="./class_Node_7FDC87EBEBE372FAA4360E17F122F6028A1505D6.html#function_Read_752482F1CB1306EFB283CCDCEDEE428813AFB309">sngcm::ast::Node::Read</a>
+            , <a href="./../../../../soulng/util/html/content/class_BinaryReader_A09089526873F7BFDE3CAFC3BAE5A3A652113045.html#function_ReadUtf32String_3B2A7EDE0B437661B7861B881062A2BB5ADD8193">soulng::util::BinaryReader::ReadUtf32String</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Called by: <a href="./class_ArrayLiteralNode_988557EE6037BCFDDA4392AE4C66A2D92D66D766.html#function_Read_344ACADA573A038EA688D5916FD633E82BBA9A7C">sngcm::ast::ArrayLiteralNode::Read</a>
+            , <a href="./class_BooleanLiteralNode_BA061A8FA86B8477955DDB406C513FDEBAF71B8D.html#function_Read_847505BE5568E38CBE6280496BC937C0EE452503">sngcm::ast::BooleanLiteralNode::Read</a>
+            , <a href="./class_ByteLiteralNode_B68F4970B8830DF04BE378616376125C60867498.html#function_Read_EA394966A08E5474F8CFECD7FC9D0B654FA291C0">sngcm::ast::ByteLiteralNode::Read</a>
+            , <a href="./class_CharLiteralNode_79B44AD52D16F8D05FD9B71E97FD23B00AE977DD.html#function_Read_576B79AB659930A764A664A4C89E0BF91879BDD7">sngcm::ast::CharLiteralNode::Read</a>
+            , <a href="./class_DoubleLiteralNode_D5CFE87D7CDB5EFED50331560B07FAC89521AC76.html#function_Read_891682C88F66F6F6E2BB439BA7872BE8E14D4556">sngcm::ast::DoubleLiteralNode::Read</a>
+            , <a href="./class_FloatLiteralNode_A99C6780902CF5D89BDC533130920183DAC76E50.html#function_Read_19B1A4D556725041FE535BF7958CEC49D65A0374">sngcm::ast::FloatLiteralNode::Read</a>
+            , <a href="./class_IntLiteralNode_3635610F208BAFA0526F4FF2BE23BE73D1D83FA2.html#function_Read_0E565675E1D884664A59E1C07B9C57BFA0520F91">sngcm::ast::IntLiteralNode::Read</a>
+            , <a href="./class_LongLiteralNode_3631CA81B20EC1F466F904BA69C0152A5E8D72CA.html#function_Read_310D5EF3A9919DD00FBD1CB13459517D392B5A9B">sngcm::ast::LongLiteralNode::Read</a>
+            , <a href="./class_SByteLiteralNode_B9A5B0BDC2CECE80F25781D817A1F9ABFE6B1EF8.html#function_Read_A23FC0A3E14098396889787CA2FC8DFF1FC2FF20">sngcm::ast::SByteLiteralNode::Read</a>
+            , <a href="./class_ShortLiteralNode_FDD4EC0716C295E29B28EAF1817D43C70B584E45.html#function_Read_CDD0AC10732F0015E554C238F862846F7678C178">sngcm::ast::ShortLiteralNode::Read</a>
+            , <a href="./class_StringLiteralNode_5F198EC06D6C70B076C7C0ADA756C11B8829FE31.html#function_Read_F53DA8BE9B1762DF0295A8F55370F28E5807064E">sngcm::ast::StringLiteralNode::Read</a>
+            , <a href="./class_StructuredLiteralNode_21B802C8332CD70644D47102943C2D80F541E08E.html#function_Read_F710546440358726A51E9287694BF29598CD6D83">sngcm::ast::StructuredLiteralNode::Read</a>
+            , <a href="./class_UCharLiteralNode_E151461595DEB25D751F273215D1AC16537CA9B7.html#function_Read_CB8C6709BB3786766781FC46A7B562C43E9A6DB2">sngcm::ast::UCharLiteralNode::Read</a>
+            , <a href="./class_UIntLiteralNode_88EDCED33D52CC13D1BB4A572BDF21A9F50EB84A.html#function_Read_8ABA9ABCBDC01127526304864DEBE8ED5B084CED">sngcm::ast::UIntLiteralNode::Read</a>
+            , <a href="./class_ULongLiteralNode_C91A45D13051DE8A3A4F305C3101B2EB146F3083.html#function_Read_74FC86272DFFD8152D304E411172422BF68E3505">sngcm::ast::ULongLiteralNode::Read</a>
+            , <a href="./class_UShortLiteralNode_A487D4B53D677B73E960D9C1B0663C6F57F80AC5.html#function_Read_DCA05C90829E17B9FF59A372B5F5510D2BDC7269">sngcm::ast::UShortLiteralNode::Read</a>
+            , <a href="./class_UStringLiteralNode_F80FD7C129A86274FD094A4207E6EAD98AC199A2.html#function_Read_A3326708481DA5CFF6CCFABCF25F818FBD4C3D1E">sngcm::ast::UStringLiteralNode::Read</a>
+            , <a href="./class_UuidLiteralNode_8A54D3E9EAC6499E12B4414060F3905DA1361C31.html#function_Read_6EA024681DE8F6186A37C9A37D0159FCA479BA23">sngcm::ast::UuidLiteralNode::Read</a>
+            , <a href="./class_WCharLiteralNode_22E4B9AB53BA2799E64C26A437967AE0A8B19FC1.html#function_Read_AFEB01F420E3469899D6C6116D9D7FACC4D55393">sngcm::ast::WCharLiteralNode::Read</a>
+            , <a href="./class_WStringLiteralNode_FE9E70285EDCCBD2AD2B3655AC611319558F65FB.html#function_Read_D91A41A4875B56B10BE7475909621C3117126F71">sngcm::ast::WStringLiteralNode::Read</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_SetText_B115E74F6F7C26B6C27CAADD80D3F9C188A25F6D">SetText Member Function</h3>
+        <h4>
+            <span class="kw">void</span>
+             sngcm::ast::LiteralNode::SetText(<span class="kw">const </span>
+            std::u32string&amp; text_)</h4>
+        <span>
+            Definition at line <a href="file/Literal.cpp_3CAA8866D2E585FD531A984A835682CE97BAAABB.html#35">35</a>
+             of <a href="file/Literal.cpp_3CAA8866D2E585FD531A984A835682CE97BAAABB.html">Literal.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;36</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;37</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_LiteralNode_1A76F3823B6151408E0B854080BE8685B0ABF949.html#variable_text_A12563F3C4B2ADD7B977DE4F2DDB54317169D291">text</a><span class="other">&nbsp;=&nbsp;</span><span class="identifier">text_</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;38</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/Literal.hpp_1A4D5DC9C9F85380722648C3B99A4BF209089BE6.html#19">19</a>
+             of <a href="file/Literal.hpp_1A4D5DC9C9F85380722648C3B99A4BF209089BE6.html">Literal.hpp</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_Text_FD57C399DA5F80CF9B62FD27DA5C92CE0B5FFE24">Text Member Function</h3>
+        <h4>
+            <span class="kw">const </span>
+            std::u32string&amp; sngcm::ast::LiteralNode::Text() <span class="kw">const</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/Literal.hpp_1A4D5DC9C9F85380722648C3B99A4BF209089BE6.html#20">20</a>
+             of <a href="file/Literal.hpp_1A4D5DC9C9F85380722648C3B99A4BF209089BE6.html">Literal.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;20</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_LiteralNode_1A76F3823B6151408E0B854080BE8685B0ABF949.html#variable_text_A12563F3C4B2ADD7B977DE4F2DDB54317169D291">text</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <hr/>
+        <h3 id="function_Write_2C7B38B1ECD69D700AE64F1C1C13F6EFAA8BFA7B">Write Member Function</h3>
+        <h4>
+            <span class="kw">void</span>
+             sngcm::ast::LiteralNode::Write(<a href="./class_AstWriter_55521D978F954F056D58DA00DE17A7FF56217E9E.html">AstWriter</a>
+            &amp; writer) <span class="kw">override</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/Literal.cpp_3CAA8866D2E585FD531A984A835682CE97BAAABB.html#23">23</a>
+             of <a href="file/Literal.cpp_3CAA8866D2E585FD531A984A835682CE97BAAABB.html">Literal.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;24</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;25</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_Node_7FDC87EBEBE372FAA4360E17F122F6028A1505D6.html">Node</a><span class="other">::</span><span class="identifier">Write</span><span class="other">(</span><span class="identifier">writer</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;26</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">writer</span><span class="other">.</span><span class="identifier">GetBinaryWriter</span><span class="other">(</span><span class="other">)</span><span class="other">.</span><span class="identifier">Write</span><span class="other">(</span><a href="./class_LiteralNode_1A76F3823B6151408E0B854080BE8685B0ABF949.html#variable_text_A12563F3C4B2ADD7B977DE4F2DDB54317169D291">text</a><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;27</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/Literal.hpp_1A4D5DC9C9F85380722648C3B99A4BF209089BE6.html#17">17</a>
+             of <a href="file/Literal.hpp_1A4D5DC9C9F85380722648C3B99A4BF209089BE6.html">Literal.hpp</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Base class overridden functions: <a href="./class_Node_7FDC87EBEBE372FAA4360E17F122F6028A1505D6.html#function_Write_67F59ACDC95A0AD11AD691611F8AB8512CF407C5">sngcm::ast::Node::Write</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Derived class overrides: <a href="./class_ArrayLiteralNode_988557EE6037BCFDDA4392AE4C66A2D92D66D766.html#function_Write_ECC79451CE51DA43ED5DCC84410232B1F6F87955">sngcm::ast::ArrayLiteralNode::Write</a>
+            , <a href="./class_BooleanLiteralNode_BA061A8FA86B8477955DDB406C513FDEBAF71B8D.html#function_Write_56DCC3B85F5DA4C5E53FFDFA382EF33C74F40E5C">sngcm::ast::BooleanLiteralNode::Write</a>
+            , <a href="./class_ByteLiteralNode_B68F4970B8830DF04BE378616376125C60867498.html#function_Write_9581786BF920F95CBA74A4A8DB2EE9DF7CE41064">sngcm::ast::ByteLiteralNode::Write</a>
+            , <a href="./class_CharLiteralNode_79B44AD52D16F8D05FD9B71E97FD23B00AE977DD.html#function_Write_F68C3414D03E8EA7EDE6747C3DDE0362C44C66DE">sngcm::ast::CharLiteralNode::Write</a>
+            , <a href="./class_DoubleLiteralNode_D5CFE87D7CDB5EFED50331560B07FAC89521AC76.html#function_Write_D078A793E30369019A7E0891B9D887C7E491470A">sngcm::ast::DoubleLiteralNode::Write</a>
+            , <a href="./class_FloatLiteralNode_A99C6780902CF5D89BDC533130920183DAC76E50.html#function_Write_7F0243CF1C53B4BABA02D7D0385DE1C13A28D431">sngcm::ast::FloatLiteralNode::Write</a>
+            , <a href="./class_IntLiteralNode_3635610F208BAFA0526F4FF2BE23BE73D1D83FA2.html#function_Write_C4CACC223B100C899201B9FE91B79413A6B152D3">sngcm::ast::IntLiteralNode::Write</a>
+            , <a href="./class_LongLiteralNode_3631CA81B20EC1F466F904BA69C0152A5E8D72CA.html#function_Write_78A00E95B8B4A74CC725393D84896C2AC9E316C0">sngcm::ast::LongLiteralNode::Write</a>
+            , <a href="./class_SByteLiteralNode_B9A5B0BDC2CECE80F25781D817A1F9ABFE6B1EF8.html#function_Write_8122C0CF7D2513BDAD359F701660EC9922431B13">sngcm::ast::SByteLiteralNode::Write</a>
+            , <a href="./class_ShortLiteralNode_FDD4EC0716C295E29B28EAF1817D43C70B584E45.html#function_Write_658C0B7496C41A98BC7667822927DBD7F74AF546">sngcm::ast::ShortLiteralNode::Write</a>
+            , <a href="./class_StringLiteralNode_5F198EC06D6C70B076C7C0ADA756C11B8829FE31.html#function_Write_6F69F84ECAD73883B3ED25B116D86379998BE987">sngcm::ast::StringLiteralNode::Write</a>
+            , <a href="./class_StructuredLiteralNode_21B802C8332CD70644D47102943C2D80F541E08E.html#function_Write_2263704BF5E45CE1675E6D40CFC8226FD7603042">sngcm::ast::StructuredLiteralNode::Write</a>
+            , <a href="./class_UCharLiteralNode_E151461595DEB25D751F273215D1AC16537CA9B7.html#function_Write_68CCF4557009C4600D932A22EEE47C76DE60C193">sngcm::ast::UCharLiteralNode::Write</a>
+            , <a href="./class_UIntLiteralNode_88EDCED33D52CC13D1BB4A572BDF21A9F50EB84A.html#function_Write_FAF3EA406FDC9C4E9B8B3B3C0157CF6632234C68">sngcm::ast::UIntLiteralNode::Write</a>
+            , <a href="./class_ULongLiteralNode_C91A45D13051DE8A3A4F305C3101B2EB146F3083.html#function_Write_3E4E29A9709CAD3CED1A9A51EC4C9C99CC775058">sngcm::ast::ULongLiteralNode::Write</a>
+            , <a href="./class_UShortLiteralNode_A487D4B53D677B73E960D9C1B0663C6F57F80AC5.html#function_Write_BA9503089DBC5A714E1E9EEC51B296A5EDF17648">sngcm::ast::UShortLiteralNode::Write</a>
+            , <a href="./class_UStringLiteralNode_F80FD7C129A86274FD094A4207E6EAD98AC199A2.html#function_Write_483C942162CA4F3844CDC3AB41E689E176466512">sngcm::ast::UStringLiteralNode::Write</a>
+            , <a href="./class_UuidLiteralNode_8A54D3E9EAC6499E12B4414060F3905DA1361C31.html#function_Write_DA85F2E3E79019A41F78CA2F48A9F3F3736B9755">sngcm::ast::UuidLiteralNode::Write</a>
+            , <a href="./class_WCharLiteralNode_22E4B9AB53BA2799E64C26A437967AE0A8B19FC1.html#function_Write_60699E4D8AE6BF4CE3E684ECD6EBBBA8927E0291">sngcm::ast::WCharLiteralNode::Write</a>
+            , <a href="./class_WStringLiteralNode_FE9E70285EDCCBD2AD2B3655AC611319558F65FB.html#function_Write_6C56EAF13E8B9F665CD46646A66DD0620DF6E781">sngcm::ast::WStringLiteralNode::Write</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Calls: <a href="./class_AstWriter_55521D978F954F056D58DA00DE17A7FF56217E9E.html#function_GetBinaryWriter_C0553F3868525738920D79B8A4B828CECA64AE9D">sngcm::ast::AstWriter::GetBinaryWriter</a>
+            , <a href="./class_Node_7FDC87EBEBE372FAA4360E17F122F6028A1505D6.html#function_Write_67F59ACDC95A0AD11AD691611F8AB8512CF407C5">sngcm::ast::Node::Write</a>
+            , <a href="./../../../../soulng/util/html/content/class_BinaryWriter_0D40DDC5D57867D529F25148B10988402235B9CF.html#function_Write_A7316B717FAE4D7238B2AE6D8EC125765712CDC8">soulng::util::BinaryWriter::Write</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Called by: <a href="./class_ArrayLiteralNode_988557EE6037BCFDDA4392AE4C66A2D92D66D766.html#function_Write_ECC79451CE51DA43ED5DCC84410232B1F6F87955">sngcm::ast::ArrayLiteralNode::Write</a>
+            , <a href="./class_BooleanLiteralNode_BA061A8FA86B8477955DDB406C513FDEBAF71B8D.html#function_Write_56DCC3B85F5DA4C5E53FFDFA382EF33C74F40E5C">sngcm::ast::BooleanLiteralNode::Write</a>
+            , <a href="./class_ByteLiteralNode_B68F4970B8830DF04BE378616376125C60867498.html#function_Write_9581786BF920F95CBA74A4A8DB2EE9DF7CE41064">sngcm::ast::ByteLiteralNode::Write</a>
+            , <a href="./class_CharLiteralNode_79B44AD52D16F8D05FD9B71E97FD23B00AE977DD.html#function_Write_F68C3414D03E8EA7EDE6747C3DDE0362C44C66DE">sngcm::ast::CharLiteralNode::Write</a>
+            , <a href="./class_DoubleLiteralNode_D5CFE87D7CDB5EFED50331560B07FAC89521AC76.html#function_Write_D078A793E30369019A7E0891B9D887C7E491470A">sngcm::ast::DoubleLiteralNode::Write</a>
+            , <a href="./class_FloatLiteralNode_A99C6780902CF5D89BDC533130920183DAC76E50.html#function_Write_7F0243CF1C53B4BABA02D7D0385DE1C13A28D431">sngcm::ast::FloatLiteralNode::Write</a>
+            , <a href="./class_IntLiteralNode_3635610F208BAFA0526F4FF2BE23BE73D1D83FA2.html#function_Write_C4CACC223B100C899201B9FE91B79413A6B152D3">sngcm::ast::IntLiteralNode::Write</a>
+            , <a href="./class_LongLiteralNode_3631CA81B20EC1F466F904BA69C0152A5E8D72CA.html#function_Write_78A00E95B8B4A74CC725393D84896C2AC9E316C0">sngcm::ast::LongLiteralNode::Write</a>
+            , <a href="./class_SByteLiteralNode_B9A5B0BDC2CECE80F25781D817A1F9ABFE6B1EF8.html#function_Write_8122C0CF7D2513BDAD359F701660EC9922431B13">sngcm::ast::SByteLiteralNode::Write</a>
+            , <a href="./class_ShortLiteralNode_FDD4EC0716C295E29B28EAF1817D43C70B584E45.html#function_Write_658C0B7496C41A98BC7667822927DBD7F74AF546">sngcm::ast::ShortLiteralNode::Write</a>
+            , <a href="./class_StringLiteralNode_5F198EC06D6C70B076C7C0ADA756C11B8829FE31.html#function_Write_6F69F84ECAD73883B3ED25B116D86379998BE987">sngcm::ast::StringLiteralNode::Write</a>
+            , <a href="./class_StructuredLiteralNode_21B802C8332CD70644D47102943C2D80F541E08E.html#function_Write_2263704BF5E45CE1675E6D40CFC8226FD7603042">sngcm::ast::StructuredLiteralNode::Write</a>
+            , <a href="./class_UCharLiteralNode_E151461595DEB25D751F273215D1AC16537CA9B7.html#function_Write_68CCF4557009C4600D932A22EEE47C76DE60C193">sngcm::ast::UCharLiteralNode::Write</a>
+            , <a href="./class_UIntLiteralNode_88EDCED33D52CC13D1BB4A572BDF21A9F50EB84A.html#function_Write_FAF3EA406FDC9C4E9B8B3B3C0157CF6632234C68">sngcm::ast::UIntLiteralNode::Write</a>
+            , <a href="./class_ULongLiteralNode_C91A45D13051DE8A3A4F305C3101B2EB146F3083.html#function_Write_3E4E29A9709CAD3CED1A9A51EC4C9C99CC775058">sngcm::ast::ULongLiteralNode::Write</a>
+            , <a href="./class_UShortLiteralNode_A487D4B53D677B73E960D9C1B0663C6F57F80AC5.html#function_Write_BA9503089DBC5A714E1E9EEC51B296A5EDF17648">sngcm::ast::UShortLiteralNode::Write</a>
+            , <a href="./class_UStringLiteralNode_F80FD7C129A86274FD094A4207E6EAD98AC199A2.html#function_Write_483C942162CA4F3844CDC3AB41E689E176466512">sngcm::ast::UStringLiteralNode::Write</a>
+            , <a href="./class_UuidLiteralNode_8A54D3E9EAC6499E12B4414060F3905DA1361C31.html#function_Write_DA85F2E3E79019A41F78CA2F48A9F3F3736B9755">sngcm::ast::UuidLiteralNode::Write</a>
+            , <a href="./class_WCharLiteralNode_22E4B9AB53BA2799E64C26A437967AE0A8B19FC1.html#function_Write_60699E4D8AE6BF4CE3E684ECD6EBBBA8927E0291">sngcm::ast::WCharLiteralNode::Write</a>
+            , <a href="./class_WStringLiteralNode_FE9E70285EDCCBD2AD2B3655AC611319558F65FB.html#function_Write_6C56EAF13E8B9F665CD46646A66DD0620DF6E781">sngcm::ast::WStringLiteralNode::Write</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <a href="../../../../compiler-projects.html">top</a>
+         | <a href="namespace_ast_92B316F3086369C69BB33331B69D260F42EB9214.html">up</a>
+         | <a href="class_LessOrEqualNode_DAAF2E7A80A91276BD27D9174083269CE11B4A4E.html">prev</a>
+         | <a href="class_LongLiteralNode_3631CA81B20EC1F466F904BA69C0152A5E8D72CA.html">next</a>
+    </body>
+</html>

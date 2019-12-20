@@ -1,0 +1,134 @@
+<html>
+    <head>
+        <meta charset="utf-8"/>
+        <title>FunctionTemplateRepository Class</title>
+        <link href="../style/style.css" rel="stylesheet" type="text/css"/>
+    </head>
+    <body>
+        <a href="../../../compiler-projects.html">top</a>
+         | <a href="namespace_binder_C711B7605339DC3A9E128C1E622E7D9A4629C97D.html">up</a>
+         | <a href="struct_FunctionTemplateKeyHash_181A391442DDC84DED041D47E510104CE0BDBCA4.html">prev</a>
+         | <a href="struct_Identity_7DDDC937D57E7B8F70DC9D08D7611F31C2B94BC4.html">next</a>
+        <hr/>
+        <h1>FunctionTemplateRepository Class</h1>
+        <span>
+            Definition at line <a href="file/FunctionTemplateRepository.hpp_5A3FE9BC8F41528CA0A525DC55E4A38243917350.html#42">42</a>
+             of <a href="file/FunctionTemplateRepository.hpp_5A3FE9BC8F41528CA0A525DC55E4A38243917350.html">FunctionTemplateRepository.hpp</a>
+        </span>
+        <br/>
+        <h2>Constructors</h2>
+        <table class="constructorTable">
+            <tr>
+                <td class="constructorTableFirstCol" xml:space="preserve"><a href="class_FunctionTemplateRepository_10783C76E1CD0A9F074EEAC00AE057491C72AE50.html#constructor_FunctionTemplateRepository_C5D4B915A61A3C45721539864FDD71F0466862CF">FunctionTemplateRepository</a>(<a href="./class_BoundCompileUnit_E99BC7539B5239DF3A33DC3D613FE1D188A0A9E1.html">BoundCompileUnit</a>&amp; boundCompileUnit_)</td>
+            </tr>
+        </table>
+        <h2>Member Functions</h2>
+        <table class="functionTable">
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><a href="./../../../symbols/html/content/class_FunctionSymbol_5AC1C26A9572181B3E31247997BF40453B22EDEF.html">FunctionSymbol</a>*</td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_FunctionTemplateRepository_10783C76E1CD0A9F074EEAC00AE057491C72AE50.html#function_Instantiate_C010D56065E55CB6A53F6D2077866BFD66B5E1CA">Instantiate</a>(<a href="./../../../symbols/html/content/class_FunctionSymbol_5AC1C26A9572181B3E31247997BF40453B22EDEF.html">FunctionSymbol</a>* functionTemplate, <span class="kw">const </span>std::unordered_map&lt;<a href="./../../../symbols/html/content/class_TemplateParameterSymbol_E40C8C6A1A16CD38F979FFEC21EFECE32E4417BC.html">TemplateParameterSymbol</a>*, <a href="./../../../symbols/html/content/class_TypeSymbol_E4B881CC0D40D6232A69F240FA90045A54D93258.html">TypeSymbol</a>*>&amp; templateParameterMapping, <span class="kw">const </span><a href="./../../../soulng/lexer/html/content/struct_Span_30EE73A264B60937695144F1BD60852CA010DF7E.html">Span</a>&amp; span)</td>
+            </tr>
+        </table>
+        <h2>Member Variables</h2>
+        <table>
+            <tr id="variable_boundCompileUnit_0DBFEE7B5474B989725DAB2A2AE7F0A3DED13A2C">
+                <td class="functionTableFirstCol" xml:space="preserve"><a href="./class_BoundCompileUnit_E99BC7539B5239DF3A33DC3D613FE1D188A0A9E1.html">BoundCompileUnit</a>&amp;</td>
+                <td class="functionTableSecondCol" xml:space="preserve">boundCompileUnit</td>
+            </tr>
+            <tr id="variable_functionTemplateMap_B4275C23B8455DE5D76D68C55D32BBDFD66EA0E2">
+                <td class="functionTableFirstCol" xml:space="preserve">std::unordered_map&lt;<a href="./struct_FunctionTemplateKey_A977172C35867B4966246A8D34A6FAB60AE8EE2A.html">FunctionTemplateKey</a>, <a href="./../../../symbols/html/content/class_FunctionSymbol_5AC1C26A9572181B3E31247997BF40453B22EDEF.html">FunctionSymbol</a>*, <a href="./struct_FunctionTemplateKeyHash_181A391442DDC84DED041D47E510104CE0BDBCA4.html">FunctionTemplateKeyHash</a>></td>
+                <td class="functionTableSecondCol" xml:space="preserve">functionTemplateMap</td>
+            </tr>
+        </table>
+        <hr/>
+        <h2>Constructor Details</h2>
+        <h3 id="constructor_FunctionTemplateRepository_C5D4B915A61A3C45721539864FDD71F0466862CF">FunctionTemplateRepository Constructor</h3>
+        <h4>
+            cmajor::binder::FunctionTemplateRepository::FunctionTemplateRepository(<a href="./class_BoundCompileUnit_E99BC7539B5239DF3A33DC3D613FE1D188A0A9E1.html">BoundCompileUnit</a>
+            &amp; boundCompileUnit_)</h4>
+        <span>
+            Definition at line <a href="file/FunctionTemplateRepository.cpp_03E1A9FA386F45EA5A7910137322B36EE4CB7969.html#39">39</a>
+             of <a href="file/FunctionTemplateRepository.cpp_03E1A9FA386F45EA5A7910137322B36EE4CB7969.html">FunctionTemplateRepository.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;39</span>&nbsp;<span class="other">:</span>&nbsp;<a href="./class_FunctionTemplateRepository_10783C76E1CD0A9F074EEAC00AE057491C72AE50.html#variable_boundCompileUnit_0DBFEE7B5474B989725DAB2A2AE7F0A3DED13A2C">boundCompileUnit</a><span class="other">(</span><span class="identifier">boundCompileUnit_</span><span class="other">)</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;40</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;41</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/FunctionTemplateRepository.hpp_5A3FE9BC8F41528CA0A525DC55E4A38243917350.html#45">45</a>
+             of <a href="file/FunctionTemplateRepository.hpp_5A3FE9BC8F41528CA0A525DC55E4A38243917350.html">FunctionTemplateRepository.hpp</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h2>Member Function Details</h2>
+        <h3 id="function_Instantiate_C010D56065E55CB6A53F6D2077866BFD66B5E1CA">Instantiate Member Function</h3>
+        <h4>
+            <a href="./../../../symbols/html/content/class_FunctionSymbol_5AC1C26A9572181B3E31247997BF40453B22EDEF.html">FunctionSymbol</a>
+            * cmajor::binder::FunctionTemplateRepository::Instantiate(<a href="./../../../symbols/html/content/class_FunctionSymbol_5AC1C26A9572181B3E31247997BF40453B22EDEF.html">FunctionSymbol</a>
+            * functionTemplate, <span class="kw">const </span>
+            std::unordered_map&lt;<a href="./../../../symbols/html/content/class_TemplateParameterSymbol_E40C8C6A1A16CD38F979FFEC21EFECE32E4417BC.html">TemplateParameterSymbol</a>
+            *, <a href="./../../../symbols/html/content/class_TypeSymbol_E4B881CC0D40D6232A69F240FA90045A54D93258.html">TypeSymbol</a>
+            *>&amp; templateParameterMapping, <span class="kw">const </span>
+            <a href="./../../../soulng/lexer/html/content/struct_Span_30EE73A264B60937695144F1BD60852CA010DF7E.html">Span</a>
+            &amp; span)</h4>
+        <span>
+            Definition at line <a href="file/FunctionTemplateRepository.cpp_03E1A9FA386F45EA5A7910137322B36EE4CB7969.html#43">43</a>
+             of <a href="file/FunctionTemplateRepository.cpp_03E1A9FA386F45EA5A7910137322B36EE4CB7969.html">FunctionTemplateRepository.cpp</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Calls: <a href="./class_BoundCompileUnit_E99BC7539B5239DF3A33DC3D613FE1D188A0A9E1.html#function_AddFileScope_9B87B87D49BDFF55A836797EE55440D3053A1091">cmajor::binder::BoundCompileUnit::AddFileScope</a>
+            , <a href="./class_BoundCompileUnit_E99BC7539B5239DF3A33DC3D613FE1D188A0A9E1.html#function_AddGlobalNs_4D8AD034FFCEC11DD40F0F220C7F8A58A59FE64D">cmajor::binder::BoundCompileUnit::AddGlobalNs</a>
+            , <a href="./class_BoundCompileUnit_E99BC7539B5239DF3A33DC3D613FE1D188A0A9E1.html#function_GetCompileUnitNode_278F90635D6192A44C7A2A27DEBD61EEEF1D6C8C">cmajor::binder::BoundCompileUnit::GetCompileUnitNode</a>
+            , <a href="./class_BoundCompileUnit_E99BC7539B5239DF3A33DC3D613FE1D188A0A9E1.html#function_GetModule_3D1A2B5CC98F2A7EDDF7C0F95FEC80A03A352BDE">cmajor::binder::BoundCompileUnit::GetModule</a>
+            , <a href="./class_BoundCompileUnit_E99BC7539B5239DF3A33DC3D613FE1D188A0A9E1.html#function_GetSymbolTable_67A2A0A2C598F97CD8078339C59387139B141ECC">cmajor::binder::BoundCompileUnit::GetSymbolTable</a>
+            , <a href="./class_BoundCompileUnit_E99BC7539B5239DF3A33DC3D613FE1D188A0A9E1.html#function_RemoveLastFileScope_5171E434C34E7DABB6605399D42B27AA4A65D966">cmajor::binder::BoundCompileUnit::RemoveLastFileScope</a>
+            , <a href="./../../../symbols/html/content/class_BoundTemplateParameterSymbol_ED8EDBA40D073E19B579005F31550CE5344F4841.html#function_SetType_75DA74D00296108AC4E203B6D61BCC30DC2376E1">cmajor::symbols::BoundTemplateParameterSymbol::SetType</a>
+            , <a href="./../../../symbols/html/content/class_ContainerSymbol_4B08BF3CBF422A1BDE2F14FAEAF47E262AA566CC.html#function_GetContainerScope_A7A959C541BE4FFBF5757464BE9DD9B4E2CB59DA">cmajor::symbols::ContainerSymbol::GetContainerScope</a>
+            , <a href="./../../../symbols/html/content/class_FileScope_4759AFD971D57DACECD7F77635E53248B4E0AA50.html#function_AddContainerScope_E30A759D3FA4BC0A4134610F5085243F1E51170D">cmajor::symbols::FileScope::AddContainerScope</a>
+            , <a href="./../../../symbols/html/content/class_FunctionSymbol_5AC1C26A9572181B3E31247997BF40453B22EDEF.html#function_AddMember_E251FEC2348DE7FC663686D5D4250A5BCCA24F6E">cmajor::symbols::FunctionSymbol::AddMember</a>
+            , <a href="./../../../symbols/html/content/class_FunctionSymbol_5AC1C26A9572181B3E31247997BF40453B22EDEF.html#function_GetFunctionNode_A131EDA209461E2F8E2E6F9270FBD39F199EB193">cmajor::symbols::FunctionSymbol::GetFunctionNode</a>
+            , <a href="./../../../symbols/html/content/class_FunctionSymbol_5AC1C26A9572181B3E31247997BF40453B22EDEF.html#function_SetFunctionTemplate_E70BD8FD6F89D77EA84D9437CC2EBF6D5C1B148E">cmajor::symbols::FunctionSymbol::SetFunctionTemplate</a>
+            , <a href="./../../../symbols/html/content/class_FunctionSymbol_5AC1C26A9572181B3E31247997BF40453B22EDEF.html#function_SetLinkOnceOdrLinkage_FA0282C070E7EB955DFA79EDBA33214116CA580F">cmajor::symbols::FunctionSymbol::SetLinkOnceOdrLinkage</a>
+            , <a href="./../../../symbols/html/content/class_FunctionSymbol_5AC1C26A9572181B3E31247997BF40453B22EDEF.html#function_SetTemplateArgumentTypes_44A432D9A8CEFF9817412C145CDAB741BCDB05D3">cmajor::symbols::FunctionSymbol::SetTemplateArgumentTypes</a>
+            , <a href="./../../../symbols/html/content/class_FunctionSymbol_5AC1C26A9572181B3E31247997BF40453B22EDEF.html#function_SetTemplateSpecialization_D3502C48C3727659BD5EDC4B8094D335B889081F">cmajor::symbols::FunctionSymbol::SetTemplateSpecialization</a>
+            , <a href="./../../../symbols/html/content/class_FunctionSymbol_5AC1C26A9572181B3E31247997BF40453B22EDEF.html#function_TemplateParameters_9F94B8C8281A571876FDE1678790795D60005AEE">cmajor::symbols::FunctionSymbol::TemplateParameters</a>
+            , <a href="./../../../symbols/html/content/class_FunctionSymbol_5AC1C26A9572181B3E31247997BF40453B22EDEF.html#function_UsingNodes_EAD7AF227CE6E2AB1D047EF8B78DAEB0AA567415">cmajor::symbols::FunctionSymbol::UsingNodes</a>
+            , <a href="./../../../symbols/html/content/class_NamespaceSymbol_BCCF6423401B565F4ACE6EB96887A998E2535933.html#function_IsGlobalNamespace_1A550CA22BB62073A29E45CF1446D6BF257C5E70">cmajor::symbols::NamespaceSymbol::IsGlobalNamespace</a>
+            , <a href="./../../../symbols/html/content/class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_FullName_60D71721B3DBA5E19256E562D0BB6EEFCD2DCF1C">cmajor::symbols::Symbol::FullName</a>
+            , <a href="./../../../symbols/html/content/class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_GetSpan_17D3765039B6ABC988EB1C280F29AF78F5638F6B">cmajor::symbols::Symbol::GetSpan</a>
+            , <a href="./../../../symbols/html/content/class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_GetSymbolType_DC14618DCD6070C58A1E8334ED8F05B32F71404F">cmajor::symbols::Symbol::GetSymbolType</a>
+            , <a href="./../../../symbols/html/content/class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_Name_B1480E10752EECD29D1579EE62AEED3A43C9D1D8">cmajor::symbols::Symbol::Name</a>
+            , <a href="./../../../symbols/html/content/class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_Ns_C10DD9006E88AB3E396D0B7B72C72A911CB16E87">cmajor::symbols::Symbol::Ns</a>
+            , <a href="./../../../symbols/html/content/class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_GetNodeNoThrow_F4CF20FD3753EE53BF6F6FAA6F32FD1CFFA8DA2B">cmajor::symbols::SymbolTable::GetNodeNoThrow</a>
+            , <a href="./../../../symbols/html/content/class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_GetSymbol_C4274AA9B87F03FF0D26A3FFA4D505C2512799CE">cmajor::symbols::SymbolTable::GetSymbol</a>
+            , <a href="./../../../symbols/html/content/class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_MapNode_565A1A0BA75362AF695A6EA923889183E990875C">cmajor::symbols::SymbolTable::MapNode</a>
+            , <a href="./../../../symbols/html/content/class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html#function_SetCurrentCompileUnit_5C5532EDEB29748792F7682B6AF46313B6D12FF1">cmajor::symbols::SymbolTable::SetCurrentCompileUnit</a>
+            , <a href="./../../../sngcm/ast/html/content/class_CloneContext_96C8319CA34684474E820BEB2D3498BD18A13E50.html#function_SetInstantiateFunctionNode_264CA30BFAC0C53DBD6684A727B7FE2A8AC3BA18">sngcm::ast::CloneContext::SetInstantiateFunctionNode</a>
+            , <a href="./../../../sngcm/ast/html/content/class_FunctionNode_95C464D9620C4D6FD74DA45BE5340174A5E1BC0D.html#function_Clone_DC93E4905BDC1C699049613DE3F95AF67D4D70A4">sngcm::ast::FunctionNode::Clone</a>
+            , <a href="./../../../sngcm/ast/html/content/class_NamespaceNode_FCE3319C12CB53B9DE678E1E74EA6C7698B7CD4C.html#function_AddMember_A79C398A7A63186581B1E74A0B523FCD5CB87D72">sngcm::ast::NamespaceNode::AddMember</a>
+            , <a href="./../../../sngcm/ast/html/content/class_Node_7FDC87EBEBE372FAA4360E17F122F6028A1505D6.html#function_Clone_6B776AC36C1336FD74AC56AA22663751FB58250F">sngcm::ast::Node::Clone</a>
+            , <a href="./../../../sngcm/ast/html/content/class_Node_7FDC87EBEBE372FAA4360E17F122F6028A1505D6.html#function_GetNodeType_F0791FB5502109359FB46F4C8415EC01F395AD14">sngcm::ast::Node::GetNodeType</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Called by: <a href="./class_BoundCompileUnit_E99BC7539B5239DF3A33DC3D613FE1D188A0A9E1.html#function_InstantiateFunctionTemplate_9D94ABC6F8D11FB55310CF3CC45C99A85FDCEB09">cmajor::binder::BoundCompileUnit::InstantiateFunctionTemplate</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <a href="../../../compiler-projects.html">top</a>
+         | <a href="namespace_binder_C711B7605339DC3A9E128C1E622E7D9A4629C97D.html">up</a>
+         | <a href="struct_FunctionTemplateKeyHash_181A391442DDC84DED041D47E510104CE0BDBCA4.html">prev</a>
+         | <a href="struct_Identity_7DDDC937D57E7B8F70DC9D08D7611F31C2B94BC4.html">next</a>
+    </body>
+</html>

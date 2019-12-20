@@ -1,0 +1,177 @@
+<html>
+    <head>
+        <meta charset="utf-8"/>
+        <title>EmittingContext Class</title>
+        <link href="../style/style.css" rel="stylesheet" type="text/css"/>
+        <script src="class_EmittingContext_4EB94232B61D5EF0B064A316E5880C4918DA0A62_inheritance.js" type="text/javascript"> </script>
+    </head>
+    <body onload="drawClassInheritanceDiagram()">
+        <a href="../../../compiler-projects.html">top</a>
+         | <a href="namespace_cmllvm_9F109794C67722BF0384621650FD9BF738353AFB.html">up</a>
+         | <a href="class_Emitter_EFF99B195E35C6E87D7677FFB24ECB1F971CE9A0.html">prev</a>
+         | <a href="class_ValueStack_307A5C9CC9BA831B144B7BBB1BFEA89E1E0872AD.html">next</a>
+        <hr/>
+        <h1>EmittingContext Class</h1>
+        <div class="diagram">
+            <svg height="0" id="classInheritanceDiagram" version="2.0" width="0" xmlns="http://www.w3.org/2000/svg"/>
+        </div>
+        <span>
+            Definition at line <a href="file/EmittingContext.hpp_67308B44F2F0DCBB3F3F8A261496DB66237F3F40.html#30">30</a>
+             of <a href="file/EmittingContext.hpp_67308B44F2F0DCBB3F3F8A261496DB66237F3F40.html">EmittingContext.hpp</a>
+        </span>
+        <br/>
+        <h2>Constructors</h2>
+        <table class="constructorTable">
+            <tr>
+                <td class="constructorTableFirstCol" xml:space="preserve"><a href="class_EmittingContext_4EB94232B61D5EF0B064A316E5880C4918DA0A62.html#constructor_EmittingContext_1996C72D6098784EFB6E949845DB103704E8452A">EmittingContext</a>(<span class="kw">int</span> optimizationLevel)</td>
+            </tr>
+        </table>
+        <h2>Member Functions</h2>
+        <table class="functionTable">
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve">llvm::LLVMContext&amp;</td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_EmittingContext_4EB94232B61D5EF0B064A316E5880C4918DA0A62.html#function_Context_075EA81117BC5942987B3C4737864407A4AB3F64">Context</a>()</td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span>*</td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_EmittingContext_4EB94232B61D5EF0B064A316E5880C4918DA0A62.html#function_DataLayout_847F19A2B409956232352CACE862E3FF2C819AA2">DataLayout</a>() <span class="kw">override</span></td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">int</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_EmittingContext_4EB94232B61D5EF0B064A316E5880C4918DA0A62.html#function_OptimizationLevel_BB1A07CD4FEF1F55B5380EDDA8106A2B44A6ACFB">OptimizationLevel</a>() <span class="kw">const override</span></td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span>*</td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_EmittingContext_4EB94232B61D5EF0B064A316E5880C4918DA0A62.html#function_TargetMachine_0D064D6A064B70351F0495D608581CA09B9A5AD9">TargetMachine</a>() <span class="kw">override</span></td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">const </span>std::string&amp;</td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_EmittingContext_4EB94232B61D5EF0B064A316E5880C4918DA0A62.html#function_TargetTriple_CB53D086DBC7D7AD79EC3F0978D3125A9D560AFD">TargetTriple</a>() <span class="kw">const override</span></td>
+            </tr>
+        </table>
+        <h2>Member Variables</h2>
+        <table>
+            <tr id="variable_context_CC1C05F0B48ADA90DC3403D855BE9C8EFD2B851B">
+                <td class="functionTableFirstCol" xml:space="preserve">llvm::LLVMContext</td>
+                <td class="functionTableSecondCol" xml:space="preserve">context</td>
+            </tr>
+            <tr id="variable_dataLayout_9A0D5FD550E9DBAFFA9A633A5A8D8B39B66F664D">
+                <td class="functionTableFirstCol" xml:space="preserve">std::unique_ptr&lt;llvm::DataLayout></td>
+                <td class="functionTableSecondCol" xml:space="preserve">dataLayout</td>
+            </tr>
+            <tr id="variable_optimizationLevel_B559C3B57879085C3A0F667BBA3FA1594DB548EF">
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">int</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve">optimizationLevel</td>
+            </tr>
+            <tr id="variable_targetMachine_398572D53119C9A71B9329BF1C127A9B4D66EAEE">
+                <td class="functionTableFirstCol" xml:space="preserve">std::unique_ptr&lt;llvm::TargetMachine></td>
+                <td class="functionTableSecondCol" xml:space="preserve">targetMachine</td>
+            </tr>
+            <tr id="variable_targetTriple_8DA794D0E3608C24ED5685B1C1B3287A677498AF">
+                <td class="functionTableFirstCol" xml:space="preserve">std::string</td>
+                <td class="functionTableSecondCol" xml:space="preserve">targetTriple</td>
+            </tr>
+        </table>
+        <hr/>
+        <h2>Constructor Details</h2>
+        <h3 id="constructor_EmittingContext_1996C72D6098784EFB6E949845DB103704E8452A">EmittingContext Constructor</h3>
+        <h4>
+            cmllvm::EmittingContext::EmittingContext(<span class="kw">int</span>
+             optimizationLevel)</h4>
+        <span>
+            Definition at line <a href="file/EmittingContext.cpp_B75AE93C66FF7DC85B36FA2D38A77AFCD4DB39E7.html#10">10</a>
+             of <a href="file/EmittingContext.cpp_B75AE93C66FF7DC85B36FA2D38A77AFCD4DB39E7.html">EmittingContext.cpp</a>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/EmittingContext.hpp_67308B44F2F0DCBB3F3F8A261496DB66237F3F40.html#33">33</a>
+             of <a href="file/EmittingContext.hpp_67308B44F2F0DCBB3F3F8A261496DB66237F3F40.html">EmittingContext.hpp</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h2>Member Function Details</h2>
+        <h3 id="function_Context_075EA81117BC5942987B3C4737864407A4AB3F64">Context Member Function</h3>
+        <h4>
+            llvm::LLVMContext&amp; cmllvm::EmittingContext::Context()</h4>
+        <span>
+            Definition at line <a href="file/EmittingContext.hpp_67308B44F2F0DCBB3F3F8A261496DB66237F3F40.html#34">34</a>
+             of <a href="file/EmittingContext.hpp_67308B44F2F0DCBB3F3F8A261496DB66237F3F40.html">EmittingContext.hpp</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_DataLayout_847F19A2B409956232352CACE862E3FF2C819AA2">DataLayout Member Function</h3>
+        <h4>
+            <span class="kw">void</span>
+            * cmllvm::EmittingContext::DataLayout() <span class="kw">override</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/EmittingContext.hpp_67308B44F2F0DCBB3F3F8A261496DB66237F3F40.html#36">36</a>
+             of <a href="file/EmittingContext.hpp_67308B44F2F0DCBB3F3F8A261496DB66237F3F40.html">EmittingContext.hpp</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Base class overridden functions: <a href="./../../../ir/html/content/class_EmittingContext_42D38BA76B81697C1A82775FA1B5E641DC51D0DD.html#function_DataLayout_C56C54510300049D879980D48EEE1DA5E5A3BA6B">cmajor::ir::EmittingContext::DataLayout</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_OptimizationLevel_BB1A07CD4FEF1F55B5380EDDA8106A2B44A6ACFB">OptimizationLevel Member Function</h3>
+        <h4>
+            <span class="kw">int</span>
+             cmllvm::EmittingContext::OptimizationLevel() <span class="kw">const override</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/EmittingContext.hpp_67308B44F2F0DCBB3F3F8A261496DB66237F3F40.html#38">38</a>
+             of <a href="file/EmittingContext.hpp_67308B44F2F0DCBB3F3F8A261496DB66237F3F40.html">EmittingContext.hpp</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Base class overridden functions: <a href="./../../../ir/html/content/class_EmittingContext_42D38BA76B81697C1A82775FA1B5E641DC51D0DD.html#function_OptimizationLevel_9373DA1AF5EFC03C23B8AFEFBBA666DAD8E62EDB">cmajor::ir::EmittingContext::OptimizationLevel</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_TargetMachine_0D064D6A064B70351F0495D608581CA09B9A5AD9">TargetMachine Member Function</h3>
+        <h4>
+            <span class="kw">void</span>
+            * cmllvm::EmittingContext::TargetMachine() <span class="kw">override</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/EmittingContext.hpp_67308B44F2F0DCBB3F3F8A261496DB66237F3F40.html#37">37</a>
+             of <a href="file/EmittingContext.hpp_67308B44F2F0DCBB3F3F8A261496DB66237F3F40.html">EmittingContext.hpp</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Base class overridden functions: <a href="./../../../ir/html/content/class_EmittingContext_42D38BA76B81697C1A82775FA1B5E641DC51D0DD.html#function_TargetMachine_CB2886A0CFDF0D53BDEEC47EAF1CB15F72189F65">cmajor::ir::EmittingContext::TargetMachine</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_TargetTriple_CB53D086DBC7D7AD79EC3F0978D3125A9D560AFD">TargetTriple Member Function</h3>
+        <h4>
+            <span class="kw">const </span>
+            std::string&amp; cmllvm::EmittingContext::TargetTriple() <span class="kw">const override</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/EmittingContext.hpp_67308B44F2F0DCBB3F3F8A261496DB66237F3F40.html#35">35</a>
+             of <a href="file/EmittingContext.hpp_67308B44F2F0DCBB3F3F8A261496DB66237F3F40.html">EmittingContext.hpp</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Base class overridden functions: <a href="./../../../ir/html/content/class_EmittingContext_42D38BA76B81697C1A82775FA1B5E641DC51D0DD.html#function_TargetTriple_087E748006250FBFFD35E6E2E838A79B7EEBC960">cmajor::ir::EmittingContext::TargetTriple</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <a href="../../../compiler-projects.html">top</a>
+         | <a href="namespace_cmllvm_9F109794C67722BF0384621650FD9BF738353AFB.html">up</a>
+         | <a href="class_Emitter_EFF99B195E35C6E87D7677FFB24ECB1F971CE9A0.html">prev</a>
+         | <a href="class_ValueStack_307A5C9CC9BA831B144B7BBB1BFEA89E1E0872AD.html">next</a>
+    </body>
+</html>

@@ -22,9 +22,9 @@ void SymbolCollector::AddClass(ClassTypeSymbol* class_)
     classes.push_back(class_);
 }
 
-void SymbolCollector::AddConcept(ConceptSymbol* concept)
+void SymbolCollector::AddConcept(ConceptSymbol* conceptSymbol)
 {
-    concepts.push_back(concept);
+    concepts.push_back(conceptSymbol);
 }
 
 void SymbolCollector::AddConstant(ConstantSymbol* constant)

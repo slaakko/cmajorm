@@ -1,0 +1,257 @@
+<html>
+    <head>
+        <meta charset="utf-8"/>
+        <title>ModuleCache Class</title>
+        <link href="../style/style.css" rel="stylesheet" type="text/css"/>
+    </head>
+    <body>
+        <a href="../../../compiler-projects.html">top</a>
+         | <a href="namespace_symbols_CED2EBA893BFBF04AA45D2AF9418A2BC23E64ADF.html">up</a>
+         | <a href="class_Module_A2BC96D600A4B3135D7F5444EC360BBF9EA9DDF4.html">prev</a>
+         | <a href="class_ModuleDependency_4B83104823F6EE9088348B38C9C6C8F1E0B982C0.html">next</a>
+        <hr/>
+        <h1>ModuleCache Class</h1>
+        <span>
+            Definition at line <a href="file/ModuleCache.cpp_194616D6F8782A3BCDF53B4A6EF7D44145F370B1.html#26">26</a>
+             of <a href="file/ModuleCache.cpp_194616D6F8782A3BCDF53B4A6EF7D44145F370B1.html">ModuleCache.cpp</a>
+        </span>
+        <br/>
+        <h2>Member Functions</h2>
+        <table class="functionTable">
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_ModuleCache_4B35093B571A2E0B1887D5BC86BC5EAE2F0C5984.html#function_CollectModuleIndices_77214518ADFC6AC63BC600CEE288ECC6BD0684DA">CollectModuleIndices</a>(<a href="./class_Module_A2BC96D600A4B3135D7F5444EC360BBF9EA9DDF4.html">Module</a>* module, std::unordered_set&lt;<span class="kw">int</span>>&amp; moduleIndices)</td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_ModuleCache_4B35093B571A2E0B1887D5BC86BC5EAE2F0C5984.html#function_Done_DD2BBFF4353259523490F7FE9E745B61E4D9E3DB">Done</a>() <span class="kw">static</span></td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><a href="./class_Module_A2BC96D600A4B3135D7F5444EC360BBF9EA9DDF4.html">Module</a>*</td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_ModuleCache_4B35093B571A2E0B1887D5BC86BC5EAE2F0C5984.html#function_GetModule_666FFCD1C7EFAB10B4397B63F9619C4406E0D8E1">GetModule</a>(<span class="kw">const </span>std::string&amp; moduleFilePath)</td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_ModuleCache_4B35093B571A2E0B1887D5BC86BC5EAE2F0C5984.html#function_Init_F153CF3CFD8471A8BA35F269DA5A909DB197FAA5">Init</a>() <span class="kw">static</span></td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><a href="./class_ModuleCache_4B35093B571A2E0B1887D5BC86BC5EAE2F0C5984.html">ModuleCache</a>&amp;</td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_ModuleCache_4B35093B571A2E0B1887D5BC86BC5EAE2F0C5984.html#function_Instance_74475CFBB3CE005C4F0BC936D4A5D59206A6076B">Instance</a>() <span class="kw">static</span></td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_ModuleCache_4B35093B571A2E0B1887D5BC86BC5EAE2F0C5984.html#function_PutModule_BA8A8C66E9094C1F719BF6AAD48ED4E61569E414">PutModule</a>(std::unique_ptr&lt;<a href="./class_Module_A2BC96D600A4B3135D7F5444EC360BBF9EA9DDF4.html">Module</a>>&amp;&amp; module)</td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_ModuleCache_4B35093B571A2E0B1887D5BC86BC5EAE2F0C5984.html#function_ResetCacheEntries_60009E95E329118A7ED258515404026FE128FB7C">ResetCacheEntries</a>(<a href="./class_Module_A2BC96D600A4B3135D7F5444EC360BBF9EA9DDF4.html">Module</a>* module)</td>
+            </tr>
+        </table>
+        <h2>Member Variables</h2>
+        <table>
+            <tr id="variable_instance_A8D1D323BAD58DC58C35ABC66C16D8001C1F9269">
+                <td class="functionTableFirstCol" xml:space="preserve">std::unique_ptr&lt;<a href="./class_ModuleCache_4B35093B571A2E0B1887D5BC86BC5EAE2F0C5984.html">ModuleCache</a>></td>
+                <td class="functionTableSecondCol" xml:space="preserve">instance <span class="kw">static</span></td>
+            </tr>
+            <tr id="variable_moduleMap_F414DC26AA59DEC07B2FC3680D81465A9B2E7F1C">
+                <td class="functionTableFirstCol" xml:space="preserve">std::unordered_map&lt;std::string, <span class="kw">int</span>></td>
+                <td class="functionTableSecondCol" xml:space="preserve">moduleMap</td>
+            </tr>
+            <tr id="variable_modules_8D35130FE97A4CAD5762387826F61196DCB27B38">
+                <td class="functionTableFirstCol" xml:space="preserve">std::vector&lt;std::unique_ptr&lt;<a href="./class_Module_A2BC96D600A4B3135D7F5444EC360BBF9EA9DDF4.html">Module</a>>></td>
+                <td class="functionTableSecondCol" xml:space="preserve">modules</td>
+            </tr>
+        </table>
+        <hr/>
+        <h2>Member Function Details</h2>
+        <h3 id="function_CollectModuleIndices_77214518ADFC6AC63BC600CEE288ECC6BD0684DA">CollectModuleIndices Member Function</h3>
+        <h4>
+            <span class="kw">void</span>
+             cmajor::symbols::ModuleCache::CollectModuleIndices(<a href="./class_Module_A2BC96D600A4B3135D7F5444EC360BBF9EA9DDF4.html">Module</a>
+            * module, std::unordered_set&lt;<span class="kw">int</span>
+            >&amp; moduleIndices)</h4>
+        <span>
+            Definition at line <a href="file/ModuleCache.cpp_194616D6F8782A3BCDF53B4A6EF7D44145F370B1.html#54">54</a>
+             of <a href="file/ModuleCache.cpp_194616D6F8782A3BCDF53B4A6EF7D44145F370B1.html">ModuleCache.cpp</a>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/ModuleCache.cpp_194616D6F8782A3BCDF53B4A6EF7D44145F370B1.html#38">38</a>
+             of <a href="file/ModuleCache.cpp_194616D6F8782A3BCDF53B4A6EF7D44145F370B1.html">ModuleCache.cpp</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Calls: <a href="./class_Module_A2BC96D600A4B3135D7F5444EC360BBF9EA9DDF4.html#function_Index_A2CC599FB3C970165BF6D22B6400FF8E7D941EC6">cmajor::symbols::Module::Index</a>
+            , <a href="./class_Module_A2BC96D600A4B3135D7F5444EC360BBF9EA9DDF4.html#function_IsRootModule_D2E84A86F18691635C063B53859B35A13EC82E81">cmajor::symbols::Module::IsRootModule</a>
+            , <a href="./class_Module_A2BC96D600A4B3135D7F5444EC360BBF9EA9DDF4.html#function_ReferencedModules_8881CF03E6149EE9DD84EA9B4B49C23F5BC63853">cmajor::symbols::Module::ReferencedModules</a>
+            , <a href="./class_ModuleCache_4B35093B571A2E0B1887D5BC86BC5EAE2F0C5984.html#function_CollectModuleIndices_77214518ADFC6AC63BC600CEE288ECC6BD0684DA">cmajor::symbols::ModuleCache::CollectModuleIndices</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Called by: <a href="./class_ModuleCache_4B35093B571A2E0B1887D5BC86BC5EAE2F0C5984.html#function_CollectModuleIndices_77214518ADFC6AC63BC600CEE288ECC6BD0684DA">cmajor::symbols::ModuleCache::CollectModuleIndices</a>
+            , <a href="./class_ModuleCache_4B35093B571A2E0B1887D5BC86BC5EAE2F0C5984.html#function_ResetCacheEntries_60009E95E329118A7ED258515404026FE128FB7C">cmajor::symbols::ModuleCache::ResetCacheEntries</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_Done_DD2BBFF4353259523490F7FE9E745B61E4D9E3DB">Done Member Function</h3>
+        <h4>
+            <span class="kw">void</span>
+             cmajor::symbols::ModuleCache::Done() <span class="kw">static</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/ModuleCache.cpp_194616D6F8782A3BCDF53B4A6EF7D44145F370B1.html#49">49</a>
+             of <a href="file/ModuleCache.cpp_194616D6F8782A3BCDF53B4A6EF7D44145F370B1.html">ModuleCache.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;50</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;51</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_ModuleCache_4B35093B571A2E0B1887D5BC86BC5EAE2F0C5984.html#variable_instance_A8D1D323BAD58DC58C35ABC66C16D8001C1F9269">instance</a><span class="other">.</span><span class="identifier">reset</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;52</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/ModuleCache.cpp_194616D6F8782A3BCDF53B4A6EF7D44145F370B1.html#30">30</a>
+             of <a href="file/ModuleCache.cpp_194616D6F8782A3BCDF53B4A6EF7D44145F370B1.html">ModuleCache.cpp</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_GetModule_666FFCD1C7EFAB10B4397B63F9619C4406E0D8E1">GetModule Member Function</h3>
+        <h4>
+            <a href="./class_Module_A2BC96D600A4B3135D7F5444EC360BBF9EA9DDF4.html">Module</a>
+            * cmajor::symbols::ModuleCache::GetModule(<span class="kw">const </span>
+            std::string&amp; moduleFilePath)</h4>
+        <span>
+            Definition at line <a href="file/ModuleCache.cpp_194616D6F8782A3BCDF53B4A6EF7D44145F370B1.html#81">81</a>
+             of <a href="file/ModuleCache.cpp_194616D6F8782A3BCDF53B4A6EF7D44145F370B1.html">ModuleCache.cpp</a>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/ModuleCache.cpp_194616D6F8782A3BCDF53B4A6EF7D44145F370B1.html#32">32</a>
+             of <a href="file/ModuleCache.cpp_194616D6F8782A3BCDF53B4A6EF7D44145F370B1.html">ModuleCache.cpp</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_Init_F153CF3CFD8471A8BA35F269DA5A909DB197FAA5">Init Member Function</h3>
+        <h4>
+            <span class="kw">void</span>
+             cmajor::symbols::ModuleCache::Init() <span class="kw">static</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/ModuleCache.cpp_194616D6F8782A3BCDF53B4A6EF7D44145F370B1.html#44">44</a>
+             of <a href="file/ModuleCache.cpp_194616D6F8782A3BCDF53B4A6EF7D44145F370B1.html">ModuleCache.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;45</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;46</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_ModuleCache_4B35093B571A2E0B1887D5BC86BC5EAE2F0C5984.html#variable_instance_A8D1D323BAD58DC58C35ABC66C16D8001C1F9269">instance</a><span class="other">.</span><span class="identifier">reset</span><span class="other">(</span><span class="kw">new&nbsp;</span><a href="./class_ModuleCache_4B35093B571A2E0B1887D5BC86BC5EAE2F0C5984.html">ModuleCache</a><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;47</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/ModuleCache.cpp_194616D6F8782A3BCDF53B4A6EF7D44145F370B1.html#29">29</a>
+             of <a href="file/ModuleCache.cpp_194616D6F8782A3BCDF53B4A6EF7D44145F370B1.html">ModuleCache.cpp</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_Instance_74475CFBB3CE005C4F0BC936D4A5D59206A6076B">Instance Member Function</h3>
+        <h4>
+            <a href="./class_ModuleCache_4B35093B571A2E0B1887D5BC86BC5EAE2F0C5984.html">ModuleCache</a>
+            &amp; cmajor::symbols::ModuleCache::Instance() <span class="kw">static</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/ModuleCache.cpp_194616D6F8782A3BCDF53B4A6EF7D44145F370B1.html#31">31</a>
+             of <a href="file/ModuleCache.cpp_194616D6F8782A3BCDF53B4A6EF7D44145F370B1.html">ModuleCache.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;31</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="other">*</span><a href="./class_ModuleCache_4B35093B571A2E0B1887D5BC86BC5EAE2F0C5984.html#variable_instance_A8D1D323BAD58DC58C35ABC66C16D8001C1F9269">instance</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <hr/>
+        <h3 id="function_PutModule_BA8A8C66E9094C1F719BF6AAD48ED4E61569E414">PutModule Member Function</h3>
+        <h4>
+            <span class="kw">void</span>
+             cmajor::symbols::ModuleCache::PutModule(std::unique_ptr&lt;<a href="./class_Module_A2BC96D600A4B3135D7F5444EC360BBF9EA9DDF4.html">Module</a>
+            >&amp;&amp; module)</h4>
+        <span>
+            Definition at line <a href="file/ModuleCache.cpp_194616D6F8782A3BCDF53B4A6EF7D44145F370B1.html#105">105</a>
+             of <a href="file/ModuleCache.cpp_194616D6F8782A3BCDF53B4A6EF7D44145F370B1.html">ModuleCache.cpp</a>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/ModuleCache.cpp_194616D6F8782A3BCDF53B4A6EF7D44145F370B1.html#33">33</a>
+             of <a href="file/ModuleCache.cpp_194616D6F8782A3BCDF53B4A6EF7D44145F370B1.html">ModuleCache.cpp</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Calls: <a href="./class_ModuleCache_4B35093B571A2E0B1887D5BC86BC5EAE2F0C5984.html#function_ResetCacheEntries_60009E95E329118A7ED258515404026FE128FB7C">cmajor::symbols::ModuleCache::ResetCacheEntries</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_ResetCacheEntries_60009E95E329118A7ED258515404026FE128FB7C">ResetCacheEntries Member Function</h3>
+        <h4>
+            <span class="kw">void</span>
+             cmajor::symbols::ModuleCache::ResetCacheEntries(<a href="./class_Module_A2BC96D600A4B3135D7F5444EC360BBF9EA9DDF4.html">Module</a>
+            * module)</h4>
+        <span>
+            Definition at line <a href="file/ModuleCache.cpp_194616D6F8782A3BCDF53B4A6EF7D44145F370B1.html#71">71</a>
+             of <a href="file/ModuleCache.cpp_194616D6F8782A3BCDF53B4A6EF7D44145F370B1.html">ModuleCache.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;72</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;73</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="type">unordered_set</span><span class="other">&lt;</span><span class="kw">int</span><span class="other">></span>&nbsp;<span class="identifier">moduleIndices</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;74</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">CollectModuleIndices</span><span class="other">(</span><span class="identifier">module</span><span class="other">,&nbsp;</span><span class="identifier">moduleIndices</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;75</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">for&nbsp;</span><span class="other">(</span><span class="kw">int</span>&nbsp;<span class="identifier">moduleIndex</span><span class="other">&nbsp;:&nbsp;</span><span class="identifier">moduleIndices</span><span class="other">)</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;76</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;77</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_ModuleCache_4B35093B571A2E0B1887D5BC86BC5EAE2F0C5984.html#variable_modules_8D35130FE97A4CAD5762387826F61196DCB27B38">modules</a><span class="other">[</span><span class="identifier">moduleIndex</span><span class="other">]</span><span class="other">.</span><span class="identifier">reset</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;78</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;79</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/ModuleCache.cpp_194616D6F8782A3BCDF53B4A6EF7D44145F370B1.html#39">39</a>
+             of <a href="file/ModuleCache.cpp_194616D6F8782A3BCDF53B4A6EF7D44145F370B1.html">ModuleCache.cpp</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Calls: <a href="./class_ModuleCache_4B35093B571A2E0B1887D5BC86BC5EAE2F0C5984.html#function_CollectModuleIndices_77214518ADFC6AC63BC600CEE288ECC6BD0684DA">cmajor::symbols::ModuleCache::CollectModuleIndices</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Called by: <a href="./class_ModuleCache_4B35093B571A2E0B1887D5BC86BC5EAE2F0C5984.html#function_PutModule_BA8A8C66E9094C1F719BF6AAD48ED4E61569E414">cmajor::symbols::ModuleCache::PutModule</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <a href="../../../compiler-projects.html">top</a>
+         | <a href="namespace_symbols_CED2EBA893BFBF04AA45D2AF9418A2BC23E64ADF.html">up</a>
+         | <a href="class_Module_A2BC96D600A4B3135D7F5444EC360BBF9EA9DDF4.html">prev</a>
+         | <a href="class_ModuleDependency_4B83104823F6EE9088348B38C9C6C8F1E0B982C0.html">next</a>
+    </body>
+</html>

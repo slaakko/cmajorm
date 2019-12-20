@@ -15,8 +15,8 @@ struct SNGCM_PARSER_API ConceptParser
 {
     static soulng::parser::Match Concept(CmajorLexer& lexer, ParsingContext* ctx);
     static soulng::parser::Match Refinement(CmajorLexer& lexer);
-    static soulng::parser::Match ConceptBody(CmajorLexer& lexer, ParsingContext* ctx, sngcm::ast::ConceptNode* concept);
-    static soulng::parser::Match ConceptBodyConstraint(CmajorLexer& lexer, ParsingContext* ctx, sngcm::ast::ConceptNode* concept);
+    static soulng::parser::Match ConceptBody(CmajorLexer& lexer, ParsingContext* ctx, sngcm::ast::ConceptNode* conceptNode);
+    static soulng::parser::Match ConceptBodyConstraint(CmajorLexer& lexer, ParsingContext* ctx, sngcm::ast::ConceptNode* conceptNode);
     static soulng::parser::Match TypeNameConstraint(CmajorLexer& lexer, ParsingContext* ctx);
     static soulng::parser::Match SignatureConstraint(CmajorLexer& lexer, ParsingContext* ctx, sngcm::ast::IdentifierNode* firstTypeParameter);
     static soulng::parser::Match ConstructorConstraint(CmajorLexer& lexer, ParsingContext* ctx, sngcm::ast::IdentifierNode* firstTypeParameter);
@@ -34,7 +34,7 @@ struct SNGCM_PARSER_API ConceptParser
     static soulng::parser::Match IsConstraint(CmajorLexer& lexer, ParsingContext* ctx);
     static soulng::parser::Match ConceptOrTypeName(CmajorLexer& lexer, ParsingContext* ctx);
     static soulng::parser::Match MultiParamConstraint(CmajorLexer& lexer, ParsingContext* ctx);
-    static soulng::parser::Match Axiom(CmajorLexer& lexer, ParsingContext* ctx, sngcm::ast::ConceptNode* concept);
+    static soulng::parser::Match Axiom(CmajorLexer& lexer, ParsingContext* ctx, sngcm::ast::ConceptNode* conceptNode);
     static soulng::parser::Match AxiomBody(CmajorLexer& lexer, ParsingContext* ctx, sngcm::ast::AxiomNode* axiom);
     static soulng::parser::Match AxiomStatement(CmajorLexer& lexer, ParsingContext* ctx);
 };

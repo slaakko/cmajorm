@@ -198,12 +198,12 @@ void AddDerivedClass(ClassTypeSymbol* baseClass, ClassTypeSymbol* derivedClass)
     Global::Instance().GetDerivedClassMap(moduleName)->AddDerivedClass(baseClass->Id(), derivedClass->Id());
 }
 
-void AddConceptRefinement(ConceptSymbol* refinedConcept, ConceptSymbol* concept)
+void AddConceptRefinement(ConceptSymbol* refinedConcept, ConceptSymbol* conceptSymbol)
 {
     std::lock_guard<std::mutex> lock(globalMutex);
     Module* originalModule = refinedConcept->GetModule();
     std::u32string moduleName = originalModule->Name();
-    Global::Instance().GetDerivedClassMap(moduleName)->AddDerivedClass(refinedConcept->Id(), concept->Id());
+    Global::Instance().GetDerivedClassMap(moduleName)->AddDerivedClass(refinedConcept->Id(), conceptSymbol->Id());
 }
 
 std::vector<std::u32string> GetDerivedClassIds(const std::u32string& moduleName, const std::u32string& baseClassId)

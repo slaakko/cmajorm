@@ -1,0 +1,215 @@
+<html>
+    <head>
+        <meta charset="utf-8"/>
+        <title>MutexTable Class</title>
+        <link href="../style/style.css" rel="stylesheet" type="text/css"/>
+    </head>
+    <body>
+        <a href="../../../compiler-projects.html">top</a>
+         | <a href="namespace_rt_EF8D5C7D9502D19049E33A11686364EE54A983DA.html">up</a>
+         | <a href="class_MT_C253D14F8679805698F6CB174FA6D91D638F0DCE.html">prev</a>
+         | <a href="class_Profiler_565DD4BD3D3F27E291497A50D9412EF5843BEFFE.html">next</a>
+        <hr/>
+        <h1>MutexTable Class</h1>
+        <span>
+            Definition at line <a href="file/Mutex.cpp_785D0644FBEECFFD309AB70D14A0229FD4045F9A.html#16">16</a>
+             of <a href="file/Mutex.cpp_785D0644FBEECFFD309AB70D14A0229FD4045F9A.html">Mutex.cpp</a>
+        </span>
+        <br/>
+        <h2>Constructors</h2>
+        <table class="constructorTable">
+            <tr>
+                <td class="constructorTableFirstCol" xml:space="preserve"><a href="class_MutexTable_F21C18E0AD83B5B52F3DB36BC99D4EA20E0CD6B7.html#constructor_MutexTable_E357ACE9C40DDE36BA64D7BA4A292C884D28B3CF">MutexTable</a>()</td>
+            </tr>
+        </table>
+        <h2>Member Functions</h2>
+        <table class="functionTable">
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve">int32_t</td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_MutexTable_F21C18E0AD83B5B52F3DB36BC99D4EA20E0CD6B7.html#function_AllocateMutex_00189BC3375F94C85F3AD5532C5CB0C6979D782D">AllocateMutex</a>()</td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_MutexTable_F21C18E0AD83B5B52F3DB36BC99D4EA20E0CD6B7.html#function_Done_09628391B586299E4045F00C5EB2A4A2A9695084">Done</a>() <span class="kw">static</span></td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_MutexTable_F21C18E0AD83B5B52F3DB36BC99D4EA20E0CD6B7.html#function_FreeMutex_F0FF60C3E6BF89F81172F20278A81551EB79E903">FreeMutex</a>(int32_t mutexId)</td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_MutexTable_F21C18E0AD83B5B52F3DB36BC99D4EA20E0CD6B7.html#function_Init_D4E9E9C2DCD6912C770A55A7139AEF219B3018F1">Init</a>() <span class="kw">static</span></td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><a href="./class_MutexTable_F21C18E0AD83B5B52F3DB36BC99D4EA20E0CD6B7.html">MutexTable</a>&amp;</td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_MutexTable_F21C18E0AD83B5B52F3DB36BC99D4EA20E0CD6B7.html#function_Instance_3FF6A5CE43CB216182A8BF12DFAB584A5562F36E">Instance</a>() <span class="kw">static</span></td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_MutexTable_F21C18E0AD83B5B52F3DB36BC99D4EA20E0CD6B7.html#function_LockMutex_EEF4F3477DF9652E8B4A8F6338E11C8E7B49F941">LockMutex</a>(int32_t mutexId)</td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_MutexTable_F21C18E0AD83B5B52F3DB36BC99D4EA20E0CD6B7.html#function_UnlockMutex_E15BD528157EA6F3AB7951A2D8DA424516965F08">UnlockMutex</a>(int32_t mutexId)</td>
+            </tr>
+        </table>
+        <h2>Member Variables</h2>
+        <table>
+            <tr id="variable_instance_223806F5F0AD2ADA2CE8AE7B1E0FF9C9CD3146ED">
+                <td class="functionTableFirstCol" xml:space="preserve">std::unique_ptr&lt;<a href="./class_MutexTable_F21C18E0AD83B5B52F3DB36BC99D4EA20E0CD6B7.html">MutexTable</a>></td>
+                <td class="functionTableSecondCol" xml:space="preserve">instance <span class="kw">static</span></td>
+            </tr>
+            <tr id="variable_mtx_95D4E9DEFA3F7DBF2157DC326DF51B65E4148A24">
+                <td class="functionTableFirstCol" xml:space="preserve">std::mutex</td>
+                <td class="functionTableSecondCol" xml:space="preserve">mtx</td>
+            </tr>
+            <tr id="variable_mutexMap_A4296962A10F481CE185EFCD2E1654DDB5210738">
+                <td class="functionTableFirstCol" xml:space="preserve">std::unordered_map&lt;int32_t, std::unique_ptr&lt;std::mutex>></td>
+                <td class="functionTableSecondCol" xml:space="preserve">mutexMap</td>
+            </tr>
+            <tr id="variable_nextMutexId_0CBD93EA78266DE7A06FC2C0D48363718D2436B7">
+                <td class="functionTableFirstCol" xml:space="preserve">std::atomic&lt;int32_t></td>
+                <td class="functionTableSecondCol" xml:space="preserve">nextMutexId</td>
+            </tr>
+            <tr id="variable_noLockMutexes_3346B31FA81ACDF3D04D68D1F4753F4603E269CD">
+                <td class="functionTableFirstCol" xml:space="preserve">std::vector&lt;std::unique_ptr&lt;std::mutex>></td>
+                <td class="functionTableSecondCol" xml:space="preserve">noLockMutexes</td>
+            </tr>
+            <tr id="variable_numNoLockMutexes_8A93FEEBC543F5F6660D6654B8AEB1F77097D0CE">
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">const </span>int32_t</td>
+                <td class="functionTableSecondCol" xml:space="preserve">numNoLockMutexes</td>
+            </tr>
+        </table>
+        <hr/>
+        <h2>Constructor Details</h2>
+        <h3 id="constructor_MutexTable_E357ACE9C40DDE36BA64D7BA4A292C884D28B3CF">MutexTable Constructor</h3>
+        <h4>
+            cmajor::rt::MutexTable::MutexTable()</h4>
+        <span>
+            Definition at line <a href="file/Mutex.cpp_785D0644FBEECFFD309AB70D14A0229FD4045F9A.html#48">48</a>
+             of <a href="file/Mutex.cpp_785D0644FBEECFFD309AB70D14A0229FD4045F9A.html">Mutex.cpp</a>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/Mutex.cpp_785D0644FBEECFFD309AB70D14A0229FD4045F9A.html#27">27</a>
+             of <a href="file/Mutex.cpp_785D0644FBEECFFD309AB70D14A0229FD4045F9A.html">Mutex.cpp</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h2>Member Function Details</h2>
+        <h3 id="function_AllocateMutex_00189BC3375F94C85F3AD5532C5CB0C6979D782D">AllocateMutex Member Function</h3>
+        <h4>
+            int32_t cmajor::rt::MutexTable::AllocateMutex()</h4>
+        <span>
+            Definition at line <a href="file/Mutex.cpp_785D0644FBEECFFD309AB70D14A0229FD4045F9A.html#53">53</a>
+             of <a href="file/Mutex.cpp_785D0644FBEECFFD309AB70D14A0229FD4045F9A.html">Mutex.cpp</a>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/Mutex.cpp_785D0644FBEECFFD309AB70D14A0229FD4045F9A.html#22">22</a>
+             of <a href="file/Mutex.cpp_785D0644FBEECFFD309AB70D14A0229FD4045F9A.html">Mutex.cpp</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_Done_09628391B586299E4045F00C5EB2A4A2A9695084">Done Member Function</h3>
+        <h4>
+            <span class="kw">void</span>
+             cmajor::rt::MutexTable::Done() <span class="kw">static</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/Mutex.cpp_785D0644FBEECFFD309AB70D14A0229FD4045F9A.html#43">43</a>
+             of <a href="file/Mutex.cpp_785D0644FBEECFFD309AB70D14A0229FD4045F9A.html">Mutex.cpp</a>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/Mutex.cpp_785D0644FBEECFFD309AB70D14A0229FD4045F9A.html#20">20</a>
+             of <a href="file/Mutex.cpp_785D0644FBEECFFD309AB70D14A0229FD4045F9A.html">Mutex.cpp</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_FreeMutex_F0FF60C3E6BF89F81172F20278A81551EB79E903">FreeMutex Member Function</h3>
+        <h4>
+            <span class="kw">void</span>
+             cmajor::rt::MutexTable::FreeMutex(int32_t mutexId)</h4>
+        <span>
+            Definition at line <a href="file/Mutex.cpp_785D0644FBEECFFD309AB70D14A0229FD4045F9A.html#69">69</a>
+             of <a href="file/Mutex.cpp_785D0644FBEECFFD309AB70D14A0229FD4045F9A.html">Mutex.cpp</a>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/Mutex.cpp_785D0644FBEECFFD309AB70D14A0229FD4045F9A.html#23">23</a>
+             of <a href="file/Mutex.cpp_785D0644FBEECFFD309AB70D14A0229FD4045F9A.html">Mutex.cpp</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_Init_D4E9E9C2DCD6912C770A55A7139AEF219B3018F1">Init Member Function</h3>
+        <h4>
+            <span class="kw">void</span>
+             cmajor::rt::MutexTable::Init() <span class="kw">static</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/Mutex.cpp_785D0644FBEECFFD309AB70D14A0229FD4045F9A.html#38">38</a>
+             of <a href="file/Mutex.cpp_785D0644FBEECFFD309AB70D14A0229FD4045F9A.html">Mutex.cpp</a>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/Mutex.cpp_785D0644FBEECFFD309AB70D14A0229FD4045F9A.html#19">19</a>
+             of <a href="file/Mutex.cpp_785D0644FBEECFFD309AB70D14A0229FD4045F9A.html">Mutex.cpp</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_Instance_3FF6A5CE43CB216182A8BF12DFAB584A5562F36E">Instance Member Function</h3>
+        <h4>
+            <a href="./class_MutexTable_F21C18E0AD83B5B52F3DB36BC99D4EA20E0CD6B7.html">MutexTable</a>
+            &amp; cmajor::rt::MutexTable::Instance() <span class="kw">static</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/Mutex.cpp_785D0644FBEECFFD309AB70D14A0229FD4045F9A.html#21">21</a>
+             of <a href="file/Mutex.cpp_785D0644FBEECFFD309AB70D14A0229FD4045F9A.html">Mutex.cpp</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_LockMutex_EEF4F3477DF9652E8B4A8F6338E11C8E7B49F941">LockMutex Member Function</h3>
+        <h4>
+            <span class="kw">void</span>
+             cmajor::rt::MutexTable::LockMutex(int32_t mutexId)</h4>
+        <span>
+            Definition at line <a href="file/Mutex.cpp_785D0644FBEECFFD309AB70D14A0229FD4045F9A.html#82">82</a>
+             of <a href="file/Mutex.cpp_785D0644FBEECFFD309AB70D14A0229FD4045F9A.html">Mutex.cpp</a>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/Mutex.cpp_785D0644FBEECFFD309AB70D14A0229FD4045F9A.html#24">24</a>
+             of <a href="file/Mutex.cpp_785D0644FBEECFFD309AB70D14A0229FD4045F9A.html">Mutex.cpp</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_UnlockMutex_E15BD528157EA6F3AB7951A2D8DA424516965F08">UnlockMutex Member Function</h3>
+        <h4>
+            <span class="kw">void</span>
+             cmajor::rt::MutexTable::UnlockMutex(int32_t mutexId)</h4>
+        <span>
+            Definition at line <a href="file/Mutex.cpp_785D0644FBEECFFD309AB70D14A0229FD4045F9A.html#95">95</a>
+             of <a href="file/Mutex.cpp_785D0644FBEECFFD309AB70D14A0229FD4045F9A.html">Mutex.cpp</a>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/Mutex.cpp_785D0644FBEECFFD309AB70D14A0229FD4045F9A.html#25">25</a>
+             of <a href="file/Mutex.cpp_785D0644FBEECFFD309AB70D14A0229FD4045F9A.html">Mutex.cpp</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <a href="../../../compiler-projects.html">top</a>
+         | <a href="namespace_rt_EF8D5C7D9502D19049E33A11686364EE54A983DA.html">up</a>
+         | <a href="class_MT_C253D14F8679805698F6CB174FA6D91D638F0DCE.html">prev</a>
+         | <a href="class_Profiler_565DD4BD3D3F27E291497A50D9412EF5843BEFFE.html">next</a>
+    </body>
+</html>

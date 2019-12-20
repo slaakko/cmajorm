@@ -1,0 +1,92 @@
+<html>
+    <head>
+        <meta charset="utf-8"/>
+        <title>ParserData Struct</title>
+        <link href="../style/style.css" rel="stylesheet" type="text/css"/>
+    </head>
+    <body>
+        <a href="../../../compiler-projects.html">top</a>
+         | <a href="namespace_build_8579CAB238C54EBCD5D162A3B94D6D12FA6E71A5.html">up</a>
+         | <a href="class_CompileQueue_72C934EB3F58AB5623AEA2429AE838D4C377D84D.html">prev</a>
+         | <a href="class_ProjectQueue_6FAB8514DAD48B4FB048B96B5C9BD96F2143C677.html">next</a>
+        <hr/>
+        <h1>ParserData Struct</h1>
+        <span>
+            Definition at line <a href="file/Build.cpp_C44CB9AE7A213A3E4EF4559980B43232ECEC7EA6.html#146">146</a>
+             of <a href="file/Build.cpp_C44CB9AE7A213A3E4EF4559980B43232ECEC7EA6.html">Build.cpp</a>
+        </span>
+        <br/>
+        <h2>Constructors</h2>
+        <table class="constructorTable">
+            <tr>
+                <td class="constructorTableFirstCol" xml:space="preserve"><a href="struct_ParserData_5F5DA810893A59F31A161A8BF95C2B1F7E7074FB.html#constructor_ParserData_8145EC826BCBEB0908F1EB4C6B2DD4321309F81B">ParserData</a>(<span class="kw">const </span>std::vector&lt;std::string>&amp; sourceFilePaths_, std::vector&lt;std::unique_ptr&lt;<a href="./../../../sngcm/ast/html/content/class_CompileUnitNode_CDA7B3852BEEDA056D8D4BEE4A1675A1E15F5527.html">CompileUnitNode</a>>>&amp; compileUnits_, std::vector&lt;std::unique_ptr&lt;<a href="./../../../sngcm/cmlexer/html/content/class_CmajorLexer_4C787A34AA515119265B9958A67DFB3A3E465AA6.html">CmajorLexer</a>>>&amp; lexers_, <span class="kw">const </span>std::vector&lt;uint32_t>&amp; fileIndeces_, std::vector&lt;std::exception_ptr>&amp; exceptions_, <span class="kw">bool</span>&amp; stop_)</td>
+            </tr>
+        </table>
+        <h2>Member Variables</h2>
+        <table>
+            <tr id="variable_compileUnits_1B1351F4808975415C7748D114F5973E135914D6">
+                <td class="functionTableFirstCol" xml:space="preserve">std::vector&lt;std::unique_ptr&lt;<a href="./../../../sngcm/ast/html/content/class_CompileUnitNode_CDA7B3852BEEDA056D8D4BEE4A1675A1E15F5527.html">CompileUnitNode</a>>>&amp;</td>
+                <td class="functionTableSecondCol" xml:space="preserve">compileUnits</td>
+            </tr>
+            <tr id="variable_exceptions_9B52B47F2EA45D4E9FC8FDADC4FD9ADC7544E654">
+                <td class="functionTableFirstCol" xml:space="preserve">std::vector&lt;std::exception_ptr>&amp;</td>
+                <td class="functionTableSecondCol" xml:space="preserve">exceptions</td>
+            </tr>
+            <tr id="variable_fileIndeces_AB4C64E4870F73FBB40165ECB58A85F682BFD6B8">
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">const </span>std::vector&lt;uint32_t>&amp;</td>
+                <td class="functionTableSecondCol" xml:space="preserve">fileIndeces</td>
+            </tr>
+            <tr id="variable_indexQueue_FB062C20F9F3E1B5FC7CFF5A75239DE8DF12003A">
+                <td class="functionTableFirstCol" xml:space="preserve">std::list&lt;<span class="kw">int</span>></td>
+                <td class="functionTableSecondCol" xml:space="preserve">indexQueue</td>
+            </tr>
+            <tr id="variable_indexQueueMutex_BD2684806AAA1113EA5C200890ED9FFBB1E74DAE">
+                <td class="functionTableFirstCol" xml:space="preserve">std::mutex</td>
+                <td class="functionTableSecondCol" xml:space="preserve">indexQueueMutex</td>
+            </tr>
+            <tr id="variable_lexers_BB8CADF95F85D3E8E0D1CDCD0F58BF83EB6039D7">
+                <td class="functionTableFirstCol" xml:space="preserve">std::vector&lt;std::unique_ptr&lt;<a href="./../../../sngcm/cmlexer/html/content/class_CmajorLexer_4C787A34AA515119265B9958A67DFB3A3E465AA6.html">CmajorLexer</a>>>&amp;</td>
+                <td class="functionTableSecondCol" xml:space="preserve">lexers</td>
+            </tr>
+            <tr id="variable_sourceFilePaths_51D7CC296AA3B4A678726F76BE1CCDBB14AC4CC4">
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">const </span>std::vector&lt;std::string>&amp;</td>
+                <td class="functionTableSecondCol" xml:space="preserve">sourceFilePaths</td>
+            </tr>
+            <tr id="variable_stop_ECCB184CE6DC631636A11A13D382EAABD770AA3E">
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">bool</span>&amp;</td>
+                <td class="functionTableSecondCol" xml:space="preserve">stop</td>
+            </tr>
+        </table>
+        <hr/>
+        <h2>Constructor Details</h2>
+        <h3 id="constructor_ParserData_8145EC826BCBEB0908F1EB4C6B2DD4321309F81B">ParserData Constructor</h3>
+        <h4>
+            cmajor::build::ParserData::ParserData(<span class="kw">const </span>
+            std::vector&lt;std::string>&amp; sourceFilePaths_, std::vector&lt;std::unique_ptr&lt;<a href="./../../../sngcm/ast/html/content/class_CompileUnitNode_CDA7B3852BEEDA056D8D4BEE4A1675A1E15F5527.html">CompileUnitNode</a>
+            >>&amp; compileUnits_, std::vector&lt;std::unique_ptr&lt;<a href="./../../../sngcm/cmlexer/html/content/class_CmajorLexer_4C787A34AA515119265B9958A67DFB3A3E465AA6.html">CmajorLexer</a>
+            >>&amp; lexers_, <span class="kw">const </span>
+            std::vector&lt;uint32_t>&amp; fileIndeces_, std::vector&lt;std::exception_ptr>&amp; exceptions_, <span class="kw">bool</span>
+            &amp; stop_)</h4>
+        <span>
+            Definition at line <a href="file/Build.cpp_C44CB9AE7A213A3E4EF4559980B43232ECEC7EA6.html#148">148</a>
+             of <a href="file/Build.cpp_C44CB9AE7A213A3E4EF4559980B43232ECEC7EA6.html">Build.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;149</span>&nbsp;<span class="other">:</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;150</span>&nbsp;<a href="./struct_ParserData_5F5DA810893A59F31A161A8BF95C2B1F7E7074FB.html#variable_sourceFilePaths_51D7CC296AA3B4A678726F76BE1CCDBB14AC4CC4">sourceFilePaths</a><span class="other">(</span><span class="identifier">sourceFilePaths_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./struct_ParserData_5F5DA810893A59F31A161A8BF95C2B1F7E7074FB.html#variable_compileUnits_1B1351F4808975415C7748D114F5973E135914D6">compileUnits</a><span class="other">(</span><span class="identifier">compileUnits_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./struct_ParserData_5F5DA810893A59F31A161A8BF95C2B1F7E7074FB.html#variable_lexers_BB8CADF95F85D3E8E0D1CDCD0F58BF83EB6039D7">lexers</a><span class="other">(</span><span class="identifier">lexers_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./struct_ParserData_5F5DA810893A59F31A161A8BF95C2B1F7E7074FB.html#variable_fileIndeces_AB4C64E4870F73FBB40165ECB58A85F682BFD6B8">fileIndeces</a><span class="other">(</span><span class="identifier">fileIndeces_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./struct_ParserData_5F5DA810893A59F31A161A8BF95C2B1F7E7074FB.html#variable_stop_ECCB184CE6DC631636A11A13D382EAABD770AA3E">stop</a><span class="other">(</span><span class="identifier">stop_</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./struct_ParserData_5F5DA810893A59F31A161A8BF95C2B1F7E7074FB.html#variable_exceptions_9B52B47F2EA45D4E9FC8FDADC4FD9ADC7544E654">exceptions</a><span class="other">(</span><span class="identifier">exceptions_</span><span class="other">)</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;151</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;152</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <hr/>
+        <a href="../../../compiler-projects.html">top</a>
+         | <a href="namespace_build_8579CAB238C54EBCD5D162A3B94D6D12FA6E71A5.html">up</a>
+         | <a href="class_CompileQueue_72C934EB3F58AB5623AEA2429AE838D4C377D84D.html">prev</a>
+         | <a href="class_ProjectQueue_6FAB8514DAD48B4FB048B96B5C9BD96F2143C677.html">next</a>
+    </body>
+</html>

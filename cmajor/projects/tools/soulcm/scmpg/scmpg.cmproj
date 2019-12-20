@@ -2,7 +2,7 @@
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
  <PropertyGroup Label="Globals">
   <CustomProjectExtensionsPath>$(LocalAppData)\CustomProjectSystems\Cmajor\</CustomProjectExtensionsPath>
-  <ProjectGuid>b1266486-f177-4fef-bdf2-24208a7216de</ProjectGuid>
+  <ProjectGuid>dc9580b5-6188-47b2-bddd-64ac5ca6a6de</ProjectGuid>
  </PropertyGroup>
  <PropertyGroup>
   <TargetType>program</TargetType>
@@ -43,7 +43,20 @@
   <CmCompile Include="TypeExpr.cm"/>
   <CmCompile Include="Visitor.cm"/>
  </ItemGroup>
- <ItemGroup/>
+ <ItemGroup>
+  <None Include="BasicType.parser"/>
+  <None Include="Expression.parser"/>
+  <None Include="Identifier.parser"/>
+  <None Include="Literal.parser"/>
+  <None Include="ParserFileLexer.lexer"/>
+  <None Include="ParserFileParser.parser"/>
+  <None Include="Parsers.spg"/>
+  <None Include="ProjectFileLexer.lexer"/>
+  <None Include="ProjectFileParser.parser"/>
+  <None Include="Statement.parser"/>
+  <None Include="Template.parser"/>
+  <None Include="TypeExpr.parser"/>
+ </ItemGroup>
  <ItemGroup>
   <ProjectReference Include="../../../cm/ast/Cm.Ast.cmproj"/>
  </ItemGroup>

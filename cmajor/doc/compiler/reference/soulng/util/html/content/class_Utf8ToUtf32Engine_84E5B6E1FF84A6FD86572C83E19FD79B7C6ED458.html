@@ -1,0 +1,135 @@
+<html>
+    <head>
+        <meta charset="utf-8"/>
+        <title>Utf8ToUtf32Engine Class</title>
+        <link href="../style/style.css" rel="stylesheet" type="text/css"/>
+    </head>
+    <body>
+        <a href="../../../../compiler-projects.html">top</a>
+         | <a href="namespace_unicode_1CB99A2FA0E6E72BEB3B4AA1DF683913D2B58DFE.html">up</a>
+         | <a href="class_UnicodeException_6F16E443A4127D796EF48B68B67D688437EDDAE5.html">prev</a>
+         | next<hr/>
+        <h1>Utf8ToUtf32Engine Class</h1>
+        <span>
+            Definition at line <a href="file/Unicode.hpp_1F72A7C641FC4331BFBA3DE8753978652405FEAC.html#28">28</a>
+             of <a href="file/Unicode.hpp_1F72A7C641FC4331BFBA3DE8753978652405FEAC.html">Unicode.hpp</a>
+        </span>
+        <br/>
+        <h2>Constructors</h2>
+        <table class="constructorTable">
+            <tr>
+                <td class="constructorTableFirstCol" xml:space="preserve"><a href="class_Utf8ToUtf32Engine_84E5B6E1FF84A6FD86572C83E19FD79B7C6ED458.html#constructor_Utf8ToUtf32Engine_02095825A793292ACA514F0BAC508A9C68B5478A">Utf8ToUtf32Engine</a>()</td>
+            </tr>
+        </table>
+        <h2>Member Functions</h2>
+        <table class="functionTable">
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_Utf8ToUtf32Engine_84E5B6E1FF84A6FD86572C83E19FD79B7C6ED458.html#function_Put_AF5E6F1DEB865A7A1B2F2593DFD31B7772DEB2C5">Put</a>(uint8_t x)</td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">bool</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_Utf8ToUtf32Engine_84E5B6E1FF84A6FD86572C83E19FD79B7C6ED458.html#function_ResulReady_C14B135380E3E38118275E962F172D11211C84A4">ResulReady</a>() <span class="kw">const</span></td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">char32_t</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_Utf8ToUtf32Engine_84E5B6E1FF84A6FD86572C83E19FD79B7C6ED458.html#function_Result_49810BCC849DC649DCC033362B74242B0C7FE6CB">Result</a>() <span class="kw">const</span></td>
+            </tr>
+        </table>
+        <h2>Member Variables</h2>
+        <table>
+            <tr id="variable_result_68E9E0DA16AF7E002C5E4B9D1690B697851A4878">
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">char32_t</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve">result</td>
+            </tr>
+            <tr id="variable_resultReady_D2007C83AC87030AF46C89170612AEA6D7BC90D6">
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">bool</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve">resultReady</td>
+            </tr>
+            <tr id="variable_state_039C41670E90BEBFE836CB6F23330FC567B71990">
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">int</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve">state</td>
+            </tr>
+        </table>
+        <hr/>
+        <h2>Constructor Details</h2>
+        <h3 id="constructor_Utf8ToUtf32Engine_02095825A793292ACA514F0BAC508A9C68B5478A">Utf8ToUtf32Engine Constructor</h3>
+        <h4>
+            soulng::unicode::Utf8ToUtf32Engine::Utf8ToUtf32Engine()</h4>
+        <span>
+            Definition at line <a href="file/Unicode.cpp_BB5C901C70FAB4D3F98F2EEC3C05AA19CCB9B545.html#23">23</a>
+             of <a href="file/Unicode.cpp_BB5C901C70FAB4D3F98F2EEC3C05AA19CCB9B545.html">Unicode.cpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;23</span>&nbsp;<span class="other">:</span>&nbsp;<a href="./class_Utf8ToUtf32Engine_84E5B6E1FF84A6FD86572C83E19FD79B7C6ED458.html#variable_state_039C41670E90BEBFE836CB6F23330FC567B71990">state</a><span class="other">(</span><span class="other">0</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_Utf8ToUtf32Engine_84E5B6E1FF84A6FD86572C83E19FD79B7C6ED458.html#variable_resultReady_D2007C83AC87030AF46C89170612AEA6D7BC90D6">resultReady</a><span class="other">(</span><span class="kw">false</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_Utf8ToUtf32Engine_84E5B6E1FF84A6FD86572C83E19FD79B7C6ED458.html#variable_result_68E9E0DA16AF7E002C5E4B9D1690B697851A4878">result</a><span class="other">(</span><span class="string">U'\0'</span><span class="other">)</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;24</span>&nbsp;<span class="other">{</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;25</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">memset</span><span class="other">(</span><span class="identifier">bytes</span><span class="other">,&nbsp;</span><span class="other">0</span><span class="other">,&nbsp;</span><span class="other">sizeof</span><span class="other">(</span><span class="identifier">bytes</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+                <br/>
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;26</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/Unicode.hpp_1F72A7C641FC4331BFBA3DE8753978652405FEAC.html#31">31</a>
+             of <a href="file/Unicode.hpp_1F72A7C641FC4331BFBA3DE8753978652405FEAC.html">Unicode.hpp</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h2>Member Function Details</h2>
+        <h3 id="function_Put_AF5E6F1DEB865A7A1B2F2593DFD31B7772DEB2C5">Put Member Function</h3>
+        <h4>
+            <span class="kw">void</span>
+             soulng::unicode::Utf8ToUtf32Engine::Put(uint8_t x)</h4>
+        <span>
+            Definition at line <a href="file/Unicode.cpp_BB5C901C70FAB4D3F98F2EEC3C05AA19CCB9B545.html#28">28</a>
+             of <a href="file/Unicode.cpp_BB5C901C70FAB4D3F98F2EEC3C05AA19CCB9B545.html">Unicode.cpp</a>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/Unicode.hpp_1F72A7C641FC4331BFBA3DE8753978652405FEAC.html#32">32</a>
+             of <a href="file/Unicode.hpp_1F72A7C641FC4331BFBA3DE8753978652405FEAC.html">Unicode.hpp</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_ResulReady_C14B135380E3E38118275E962F172D11211C84A4">ResulReady Member Function</h3>
+        <h4>
+            <span class="kw">bool</span>
+             soulng::unicode::Utf8ToUtf32Engine::ResulReady() <span class="kw">const</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/Unicode.hpp_1F72A7C641FC4331BFBA3DE8753978652405FEAC.html#33">33</a>
+             of <a href="file/Unicode.hpp_1F72A7C641FC4331BFBA3DE8753978652405FEAC.html">Unicode.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;33</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_Utf8ToUtf32Engine_84E5B6E1FF84A6FD86572C83E19FD79B7C6ED458.html#variable_resultReady_D2007C83AC87030AF46C89170612AEA6D7BC90D6">resultReady</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <hr/>
+        <h3 id="function_Result_49810BCC849DC649DCC033362B74242B0C7FE6CB">Result Member Function</h3>
+        <h4>
+            <span class="kw">char32_t</span>
+             soulng::unicode::Utf8ToUtf32Engine::Result() <span class="kw">const</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/Unicode.hpp_1F72A7C641FC4331BFBA3DE8753978652405FEAC.html#34">34</a>
+             of <a href="file/Unicode.hpp_1F72A7C641FC4331BFBA3DE8753978652405FEAC.html">Unicode.hpp</a>
+            :<br/>
+            <span class="code">
+                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;34</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_Utf8ToUtf32Engine_84E5B6E1FF84A6FD86572C83E19FD79B7C6ED458.html#variable_result_68E9E0DA16AF7E002C5E4B9D1690B697851A4878">result</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+            </span>
+            <br/>
+        </span>
+        <br/>
+        <hr/>
+        <a href="../../../../compiler-projects.html">top</a>
+         | <a href="namespace_unicode_1CB99A2FA0E6E72BEB3B4AA1DF683913D2B58DFE.html">up</a>
+         | <a href="class_UnicodeException_6F16E443A4127D796EF48B68B67D688437EDDAE5.html">prev</a>
+         | next</body>
+</html>

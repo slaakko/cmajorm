@@ -261,7 +261,7 @@ std::u32string GetErrorLines(const char32_t* start, const char32_t* end, const S
     }
     int lineLength = static_cast<int>(lineEnd - lineStart);
     std::u32string lines(lineStart, lineEnd);
-    int spanCols = std::max(1, std::min(externalSpan.end - externalSpan.start, lineLength - cols));
+    int spanCols = std::max(static_cast<int>(1), std::min(externalSpan.end - externalSpan.start, lineLength - cols));
     lines.append(1, '\n').append(std::u32string(cols, ' ')).append(spanCols, '^');
     return lines;
 }
@@ -288,7 +288,7 @@ void GetColumns(const char32_t* start, const char32_t* end, const Span& external
         lineEnd = lineStart;
     }
     int lineLength = static_cast<int>(lineEnd - lineStart);
-    int spanCols = std::max(1, std::min(externalSpan.end - externalSpan.start, lineLength - cols));
+    int spanCols = std::max(static_cast<int>(1), std::min(externalSpan.end - externalSpan.start, lineLength - cols));
     endCol = startCol + spanCols;
 }
 
@@ -360,7 +360,7 @@ void Lexer::GetColumns(const Span& span, int32_t& startCol, int32_t& endCol) con
         lineEnd = lineStart;
     }
     int lineLength = static_cast<int>(lineEnd - lineStart);
-    int spanCols = std::max(1, std::min(span.end - span.start, lineLength - cols));
+    int spanCols = std::max(static_cast<int>(1), std::min(span.end - span.start, lineLength - cols));
     endCol = startCol + spanCols;
 }
 

@@ -22,16 +22,16 @@ ConceptGroupSymbol::ConceptGroupSymbol(const Span& span_, const std::u32string& 
 {
 }
 
-void ConceptGroupSymbol::AddConcept(ConceptSymbol* concept)
+void ConceptGroupSymbol::AddConcept(ConceptSymbol* conceptSymbol)
 {
-    Assert(concept->GroupName() == Name(), "wrong concept group");
-    int arity = concept->Arity();
+    Assert(conceptSymbol->GroupName() == Name(), "wrong concept group");
+    int arity = conceptSymbol->Arity();
     auto it = arityConceptMap.find(arity);
     if (it != arityConceptMap.cend())
     {
         throw Exception(GetRootModuleForCurrentThread(), "concept group '" + ToUtf8(FullName()) + "' already has concept with arity " + std::to_string(arity), GetSpan());
     }
-    arityConceptMap[arity] = concept;
+    arityConceptMap[arity] = conceptSymbol;
 }
 
 ConceptSymbol* ConceptGroupSymbol::GetConcept(int arity)
@@ -51,8 +51,8 @@ bool ConceptGroupSymbol::HasProjectMembers() const
 {
     for (const auto& p : arityConceptMap)
     {
-        ConceptSymbol* concept = p.second;
-        if (concept->IsProject())
+        ConceptSymbol* conceptSymbol = p.second;
+        if (conceptSymbol->IsProject())
         {
             return true;
         }
@@ -64,10 +64,10 @@ void ConceptGroupSymbol::AppendChildElements(sngxml::dom::Element* element, Type
 {
     for (const auto& p : arityConceptMap)
     {
-        ConceptSymbol* concept = p.second;
-        if (concept->IsProject())
+        ConceptSymbol* conceptSymbol = p.second;
+        if (conceptSymbol->IsProject())
         {
-            std::unique_ptr<sngxml::dom::Element> conceptElement = concept->ToDomElement(typeMap);
+            std::unique_ptr<sngxml::dom::Element> conceptElement = conceptSymbol->ToDomElement(typeMap);
             element->AppendChild(std::unique_ptr<sngxml::dom::Node>(conceptElement.release()));
         }
     }
@@ -140,9 +140,9 @@ void ConceptSymbol::Read(SymbolReader& reader)
     hasSource = reader.GetBinaryReader().ReadBool();
 }
 
-void ConceptSymbol::EmplaceConcept(ConceptSymbol* concept)
+void ConceptSymbol::EmplaceConcept(ConceptSymbol* conceptSymbol)
 {
-    refinedConcept = concept;
+    refinedConcept = conceptSymbol;
 }
 
 void ConceptSymbol::EmplaceType(TypeSymbol* typeSymbol, int index)

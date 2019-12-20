@@ -1,0 +1,165 @@
+<html>
+    <head>
+        <meta charset="utf-8"/>
+        <title>StaticInitTable Class</title>
+        <link href="../style/style.css" rel="stylesheet" type="text/css"/>
+    </head>
+    <body>
+        <a href="../../../compiler-projects.html">top</a>
+         | <a href="namespace_rt_EF8D5C7D9502D19049E33A11686364EE54A983DA.html">up</a>
+         | <a href="struct_SourceLocation_D479766EEA351AB24F346DEDDFBF6F67F280C3D8.html">prev</a>
+         | <a href="class_StringTable_F6866506147F9F2DF2FD2B5C6414DEB2B7BD990A.html">next</a>
+        <hr/>
+        <h1>StaticInitTable Class</h1>
+        <span>
+            Definition at line <a href="file/Statics.cpp_3CC3CC306BE8F5E45FEBA99C627ADA816DAA9A9D.html#19">19</a>
+             of <a href="file/Statics.cpp_3CC3CC306BE8F5E45FEBA99C627ADA816DAA9A9D.html">Statics.cpp</a>
+        </span>
+        <br/>
+        <h2>Member Functions</h2>
+        <table class="functionTable">
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_StaticInitTable_2752E83FFD975574425290335B2CF802DDCC6E2E.html#function_AllocateMutexes_263D69DF85E9721637002D603970F25A4CB50FE8">AllocateMutexes</a>(<span class="kw">const </span>std::vector&lt;boost::uuids::uuid>&amp; staticClassIds)</td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_StaticInitTable_2752E83FFD975574425290335B2CF802DDCC6E2E.html#function_BeginCriticalSection_64C919445135D5FD753C674C656B429C480C5216">BeginCriticalSection</a>(<span class="kw">const </span>boost::uuids::uuid&amp; classId)</td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_StaticInitTable_2752E83FFD975574425290335B2CF802DDCC6E2E.html#function_Done_D70EEF539CF8FBD81FF87DD1BE57C16CBCAD7ED5">Done</a>() <span class="kw">static</span></td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_StaticInitTable_2752E83FFD975574425290335B2CF802DDCC6E2E.html#function_EndCriticalSection_D16320D238732A76C277CED7DBB7C6815F3AD085">EndCriticalSection</a>(<span class="kw">const </span>boost::uuids::uuid&amp; classId)</td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_StaticInitTable_2752E83FFD975574425290335B2CF802DDCC6E2E.html#function_Init_BDE6CC26A7E324FF8BEDD4B3A72E8689EA576BD7">Init</a>() <span class="kw">static</span></td>
+            </tr>
+            <tr>
+                <td class="functionTableFirstCol" xml:space="preserve"><a href="./class_StaticInitTable_2752E83FFD975574425290335B2CF802DDCC6E2E.html">StaticInitTable</a>&amp;</td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_StaticInitTable_2752E83FFD975574425290335B2CF802DDCC6E2E.html#function_Instance_8AF5DC772A95A9AC80C400F6092DA6983AF9A020">Instance</a>() <span class="kw">static</span></td>
+            </tr>
+        </table>
+        <h2>Member Variables</h2>
+        <table>
+            <tr id="variable_instance_D71213C8FDD1CB68AB54F52CC367FD8FF1D9F82A">
+                <td class="functionTableFirstCol" xml:space="preserve">std::unique_ptr&lt;<a href="./class_StaticInitTable_2752E83FFD975574425290335B2CF802DDCC6E2E.html">StaticInitTable</a>></td>
+                <td class="functionTableSecondCol" xml:space="preserve">instance <span class="kw">static</span></td>
+            </tr>
+            <tr id="variable_mutexMap_51AA83ECAE219A5E4397246BC0142DBD38ED305E">
+                <td class="functionTableFirstCol" xml:space="preserve">std::unordered_map&lt;boost::uuids::uuid, <span class="kw">int</span>, boost::hash&lt;boost::uuids::uuid>></td>
+                <td class="functionTableSecondCol" xml:space="preserve">mutexMap</td>
+            </tr>
+            <tr id="variable_mutexes_DF1229FCCFBBA6775B763F6A633DF9FC3BE40B33">
+                <td class="functionTableFirstCol" xml:space="preserve">std::vector&lt;std::unique_ptr&lt;std::recursive_mutex>></td>
+                <td class="functionTableSecondCol" xml:space="preserve">mutexes</td>
+            </tr>
+        </table>
+        <hr/>
+        <h2>Member Function Details</h2>
+        <h3 id="function_AllocateMutexes_263D69DF85E9721637002D603970F25A4CB50FE8">AllocateMutexes Member Function</h3>
+        <h4>
+            <span class="kw">void</span>
+             cmajor::rt::StaticInitTable::AllocateMutexes(<span class="kw">const </span>
+            std::vector&lt;boost::uuids::uuid>&amp; staticClassIds)</h4>
+        <span>
+            Definition at line <a href="file/Statics.cpp_3CC3CC306BE8F5E45FEBA99C627ADA816DAA9A9D.html#46">46</a>
+             of <a href="file/Statics.cpp_3CC3CC306BE8F5E45FEBA99C627ADA816DAA9A9D.html">Statics.cpp</a>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/Statics.cpp_3CC3CC306BE8F5E45FEBA99C627ADA816DAA9A9D.html#25">25</a>
+             of <a href="file/Statics.cpp_3CC3CC306BE8F5E45FEBA99C627ADA816DAA9A9D.html">Statics.cpp</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_BeginCriticalSection_64C919445135D5FD753C674C656B429C480C5216">BeginCriticalSection Member Function</h3>
+        <h4>
+            <span class="kw">void</span>
+             cmajor::rt::StaticInitTable::BeginCriticalSection(<span class="kw">const </span>
+            boost::uuids::uuid&amp; classId)</h4>
+        <span>
+            Definition at line <a href="file/Statics.cpp_3CC3CC306BE8F5E45FEBA99C627ADA816DAA9A9D.html#57">57</a>
+             of <a href="file/Statics.cpp_3CC3CC306BE8F5E45FEBA99C627ADA816DAA9A9D.html">Statics.cpp</a>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/Statics.cpp_3CC3CC306BE8F5E45FEBA99C627ADA816DAA9A9D.html#26">26</a>
+             of <a href="file/Statics.cpp_3CC3CC306BE8F5E45FEBA99C627ADA816DAA9A9D.html">Statics.cpp</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_Done_D70EEF539CF8FBD81FF87DD1BE57C16CBCAD7ED5">Done Member Function</h3>
+        <h4>
+            <span class="kw">void</span>
+             cmajor::rt::StaticInitTable::Done() <span class="kw">static</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/Statics.cpp_3CC3CC306BE8F5E45FEBA99C627ADA816DAA9A9D.html#41">41</a>
+             of <a href="file/Statics.cpp_3CC3CC306BE8F5E45FEBA99C627ADA816DAA9A9D.html">Statics.cpp</a>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/Statics.cpp_3CC3CC306BE8F5E45FEBA99C627ADA816DAA9A9D.html#23">23</a>
+             of <a href="file/Statics.cpp_3CC3CC306BE8F5E45FEBA99C627ADA816DAA9A9D.html">Statics.cpp</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_EndCriticalSection_D16320D238732A76C277CED7DBB7C6815F3AD085">EndCriticalSection Member Function</h3>
+        <h4>
+            <span class="kw">void</span>
+             cmajor::rt::StaticInitTable::EndCriticalSection(<span class="kw">const </span>
+            boost::uuids::uuid&amp; classId)</h4>
+        <span>
+            Definition at line <a href="file/Statics.cpp_3CC3CC306BE8F5E45FEBA99C627ADA816DAA9A9D.html#73">73</a>
+             of <a href="file/Statics.cpp_3CC3CC306BE8F5E45FEBA99C627ADA816DAA9A9D.html">Statics.cpp</a>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/Statics.cpp_3CC3CC306BE8F5E45FEBA99C627ADA816DAA9A9D.html#27">27</a>
+             of <a href="file/Statics.cpp_3CC3CC306BE8F5E45FEBA99C627ADA816DAA9A9D.html">Statics.cpp</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_Init_BDE6CC26A7E324FF8BEDD4B3A72E8689EA576BD7">Init Member Function</h3>
+        <h4>
+            <span class="kw">void</span>
+             cmajor::rt::StaticInitTable::Init() <span class="kw">static</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/Statics.cpp_3CC3CC306BE8F5E45FEBA99C627ADA816DAA9A9D.html#36">36</a>
+             of <a href="file/Statics.cpp_3CC3CC306BE8F5E45FEBA99C627ADA816DAA9A9D.html">Statics.cpp</a>
+        </span>
+        <br/>
+        <span>
+            Declaration at line <a href="file/Statics.cpp_3CC3CC306BE8F5E45FEBA99C627ADA816DAA9A9D.html#22">22</a>
+             of <a href="file/Statics.cpp_3CC3CC306BE8F5E45FEBA99C627ADA816DAA9A9D.html">Statics.cpp</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <h3 id="function_Instance_8AF5DC772A95A9AC80C400F6092DA6983AF9A020">Instance Member Function</h3>
+        <h4>
+            <a href="./class_StaticInitTable_2752E83FFD975574425290335B2CF802DDCC6E2E.html">StaticInitTable</a>
+            &amp; cmajor::rt::StaticInitTable::Instance() <span class="kw">static</span>
+        </h4>
+        <span>
+            Definition at line <a href="file/Statics.cpp_3CC3CC306BE8F5E45FEBA99C627ADA816DAA9A9D.html#24">24</a>
+             of <a href="file/Statics.cpp_3CC3CC306BE8F5E45FEBA99C627ADA816DAA9A9D.html">Statics.cpp</a>
+        </span>
+        <br/>
+        <br/>
+        <hr/>
+        <a href="../../../compiler-projects.html">top</a>
+         | <a href="namespace_rt_EF8D5C7D9502D19049E33A11686364EE54A983DA.html">up</a>
+         | <a href="struct_SourceLocation_D479766EEA351AB24F346DEDDFBF6F67F280C3D8.html">prev</a>
+         | <a href="class_StringTable_F6866506147F9F2DF2FD2B5C6414DEB2B7BD990A.html">next</a>
+    </body>
+</html>

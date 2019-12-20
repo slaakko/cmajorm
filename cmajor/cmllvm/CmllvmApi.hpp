@@ -23,7 +23,7 @@
 
 #else
 
-#define CMLLVM
+#define CMLLVM_API
 
 #endif
 

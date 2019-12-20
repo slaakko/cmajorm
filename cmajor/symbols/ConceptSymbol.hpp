@@ -20,7 +20,7 @@ public:
     std::string TypeString() const override { return "concept_group"; }
     bool IsExportSymbol() const override { return false; }
     SymbolAccess DeclaredAccess() const override { return SymbolAccess::public_; }
-    void AddConcept(ConceptSymbol* concept);
+    void AddConcept(ConceptSymbol* conceptSymbol);
     ConceptSymbol* GetConcept(int arity);
     bool HasProjectMembers() const override;
     void AppendChildElements(sngxml::dom::Element* element, TypeMap& typeMap) const override;
@@ -38,7 +38,7 @@ public:
     bool IsParentSymbol() const override { return true; }
     void Write(SymbolWriter& writer) override;
     void Read(SymbolReader& reader) override;
-    void EmplaceConcept(ConceptSymbol* concept) override;
+    void EmplaceConcept(ConceptSymbol* conceptSymbol) override;
     void EmplaceType(TypeSymbol* typeSymbol, int index) override;
     void Accept(SymbolCollector* collector) override;
     void Dump(CodeFormatter& formatter) override;
