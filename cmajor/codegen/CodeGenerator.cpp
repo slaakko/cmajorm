@@ -19,7 +19,11 @@ cmajor::codegenbase::CodeGenerator* CreateCodeGenerator(cmajor::ir::EmittingCont
     {
         case cmajor::mid::BackEndKind::llvmBackEnd:
         {
+#ifdef _WIN32
             return new cmajor::codegenwin::WindowsCodeGenerator(emittingContext);
+#else
+            return new cmajor::codegenlinux::LinuxCodeGenerator(emittingContext);
+#endif
         }
         case cmajor::mid::BackEndKind::cmsxBackEnd:
         {

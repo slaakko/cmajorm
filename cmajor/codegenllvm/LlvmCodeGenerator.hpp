@@ -100,6 +100,7 @@ public:
     int Install(const std::string& str) override;
     int Install(const std::u16string& str) override;
     int Install(const std::u32string& str) override;
+    void InsertAllocaIntoEntryBlock(void* allocaInst);
 protected:
     cmajor::symbols::SymbolTable* symbolTable;
     cmajor::symbols::Module* symbolsModule;

@@ -1479,4 +1479,10 @@ int LlvmCodeGenerator::Install(const std::u32string& str)
     return compileUnit->Install(str);
 }
 
+void LlvmCodeGenerator::InsertAllocaIntoEntryBlock(void* allocaInst)
+{
+    emitter->InsertAllocaIntoBasicBlock(allocaInst, lastAlloca, entryBasicBlock);
+    lastAlloca = allocaInst;
+}
+
 } } // namespace cmajor::codegen

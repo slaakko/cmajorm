@@ -350,6 +350,14 @@ public:
     virtual int Install(const std::string& str) = 0;
     virtual int Install(const std::u16string& str) = 0;
     virtual int Install(const std::u32string& str) = 0;
+    virtual void* CreateLandingPad(void* lpType) = 0;
+    virtual void SetLandindPadAsCleanup(void* landingPad) = 0;
+    virtual void InsertAllocaIntoBasicBlock(void* allocaInst, void* lastAlloca, void* basicBlock) = 0;
+    virtual void AddClauseToLangdingPad(void* landingPad, void* exceptionTypeId) = 0;
+    virtual void* CreateExtractValue(void* aggregate, const std::vector<unsigned int>& indeces) = 0;
+    virtual void* CreateInsertValue(void* aggregate, void* value, const std::vector<unsigned int>& indeces) = 0;
+    virtual void* CreateUndefValue(void* type) = 0;
+    virtual void CreateResume(void* exception) = 0;
 private:
     ValueStack* stack;
 };

@@ -4,17 +4,17 @@
 // =================================
 
 #include <cmajor/codegenllvm/LlvmCodeGenerator.hpp>
-#include <cmajor/codegenwin/CodeGenWinApi.hpp>
+#include <cmajor/codegenlinux/CodeGenLinuxApi.hpp>
 #include <cmajor/binder/BoundStatement.hpp>
 
-namespace cmajor { namespace codegenwin {
+namespace cmajor { namespace codegenlinux {
 
 using namespace cmajor::binder;
 
-class CODEGENWIN_API WindowsCodeGenerator : public cmajor::codegenllvm::LlvmCodeGenerator
+class CODEGENLINUX_API LinuxCodeGenerator : public cmajor::codegenllvm::LlvmCodeGenerator
 {
 public:
-    WindowsCodeGenerator(cmajor::ir::EmittingContext& emittingContext_);
+    LinuxCodeGenerator(cmajor::ir::EmittingContext& emittingContext_);
     void Visit(BoundReturnStatement& boundReturnStatement) override;
     void Visit(BoundGotoCaseStatement& boundGotoCaseStatement) override;
     void Visit(BoundGotoDefaultStatement& boundGotoDefaultStatement) override;
@@ -28,4 +28,4 @@ public:
     void GenerateCodeForCleanups() override;
 };
 
-} } // namespace cmajor::codegenwin
+} } // namespace cmajor::codegenlinux

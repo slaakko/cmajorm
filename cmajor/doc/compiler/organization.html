@@ -1,0 +1,288 @@
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title>Cmajor Compiler Organization</title>
+        <link href="reference/html/style/style.css" rel="stylesheet" type="text/css" />
+    </head>
+    <body>
+        <h1>
+            Cmajor Compiler Organization
+        </h1>
+
+        <p>
+            The Cmajor compiler follows traditional compiler organization having a front-end and a back-end.
+            The front-end drives the compilation process and generates intermediate code.
+            The back-end optimizes the intermediate code and generates machine code from it.
+            In addition the front-end utilizes an archiver that bundles object code files into libraries
+            and a linker that produces executable programs from the object code and library files.
+        </p>
+
+        <p>
+            At present there's one front-end written in C++ and another one planned to be written in Cmajor.
+            There's two back-ends, <a href="https://llvm.org/">LLVM</a> back-end that is the real one,
+            and another, System X, that is an experimental one written in Cmajor.
+            LLVM can produce code for many platforms and computer architectures,
+            but currently the Cmajor outputs only x86_64 code for Windows and Linux.
+            The System X back-end produces MMIX-based assembly code for a virtual machine.
+        </p>
+
+        <p>
+            The front-end has four main components:
+            <ul>
+                <li>parser,</li>
+                <li>symbol table,</li>
+                <li>binder and</li> 
+                <li>code generator</li>
+            </ul>
+        </p>
+
+        <h2>
+            Parser
+        </h2>
+
+        <p>
+            The <a href="reference/sngcm/cmparser/cmparser.html">parser</a> component is made using <a href="https://slaakko.github.io/soulng/contents.html">SoulNG</a> parser generator tool.
+            It produces a <a href="reference/sngcm/ast/ast.html">tree</a> of objects for each syntax element in a Cmajor source file.
+            Each kind of syntax element, be it an identifier, literal, variable, function or type, is represented by a class that 
+            is derived from the <a href="reference/sngcm/ast/html/content/class_Node_7FDC87EBEBE372FAA4360E17F122F6028A1505D6.html">Node</a> class.
+            Syntax tree nodes can be written to and read from a binary stream, cloned and they accept a
+            <a href="reference/sngcm/ast/html/content/class_Visitor_EE4D58A199693C26BFFAD637A3ADC818BC5994FC.html">visitor</a>.
+            The phases of compilation following the parsing phase walk the syntax tree node object hierarchy using a concrete visitor derived from the base visitor class.
+        </p>
+
+        <p>
+            There are many kinds of syntax tree nodes.
+            Primitive ones such as <a href="reference/sngcm/ast/html/content/class_IdentifierNode_4CE99E9F7A7A909CE85CE1E7ED4A63A5060B83E3.html">identifier</a> are derived directly from the
+            node class. They just contain the data for the element. There are also composite syntax tree nodes that have child nodes.
+            The <a href="reference/sngcm/ast/html/content/class_UnaryNode_165135A5C7753F52B4F177BA0F0E4222CB08456A.html">unary</a> nodes have one child node.
+            Concrete examples of unary nodes are nodes for expressions taking one operand. Each kind of unary operator is represented by such a class derived from the unary node class.
+            Similarly each binary operator is represented by a class derived from the <a href="reference/sngcm/ast/html/content/class_BinaryNode_3126E45E075D8E51330FC7DF648DA56ED7E10D9D.html">binary</a> node class.
+            Nodes having arbitrary many child nodes, such as <a href="reference/sngcm/ast/html/content/class_NamespaceNode_FCE3319C12CB53B9DE678E1E74EA6C7698B7CD4C.html">namespace</a> nodes,
+            have a <a href="reference/sngcm/ast/html/content/class_NodeList_92D32F9C7F3DBA6ECEC0B05A7D7CF10C01D6FCEB.html">node list</a>.
+        </p>
+
+        <h2>
+            Symbol table
+        </h2>
+
+        <p">
+            The <a href="reference/symbols/symbols.html">symbol table</a> component collects information about program entities.
+            In syntax tree each identifier has its own node despite of its value.
+            In contrast in the symbol table each symbol except class template specialization symbol is unique.
+
+            The key classes in this component are
+            <ul>
+                <li>
+                    the <a href="reference/symbols/html/content/class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html">symbol</a>
+                    class of which all symbol classes are derived from,
+                </li>
+                <li>
+                    the <a href="reference/symbols/html/content/class_ContainerSymbol_4B08BF3CBF422A1BDE2F14FAEAF47E262AA566CC.html">container</a>
+                    symbol class that is the base class for symbols containing other symbols,
+                </li>
+                <li>
+                    the <a href="reference/symbols/html/content/class_Scope_1908FF7600691E8D5236AD504D2317CFD68E125A.html">scope</a> class that is contained
+                    by each container symbol and enables looking up symbols by name,
+                </li>
+                <li>
+                    the <a href="reference/symbols/html/content/class_SymbolTable_ED1EDE715C5A9505E6FD6DBB1CB6B668AB12B460.html">symbol table</a> class that contains the symbols
+                    of a library or program,
+                </li>
+                <li>
+                    the <a href="reference/symbols/html/content/class_Module_A2BC96D600A4B3135D7F5444EC360BBF9EA9DDF4.html">module</a> class that contains the symbol table
+                    of a library or program and references to other modules it uses, and
+                </li>
+                <li>
+                    the <a href="reference/symbols/html/content/class_SymbolCreatorVisitor_5ED8400607A86B5052CD520D65326DCEDCDF2CF7.html">symbol creator visitor</a>
+                    class that creates symbols from syntax tree nodes and insert them into symbol table.
+                    There is a symbol for each class, function, compound statement, parameter, variable, typedef, delegate, enumerated type, enumeration constant
+                    and constant node.
+                </li>
+            </ul>
+            </p>
+
+            <p>
+                The information kept in the symbol table depends on the program entity:
+
+                <ul>
+                    <li>
+                        All symbols have name and mangled name.
+                        The name of a symbol is the value of the identifier used in declaration of the program entity.
+                        The mangled name of a symbol identifies the program entity in intermediate code files.
+                        It consists of only Latin letters, digits and underscores and ends with hexadecimal SHA-1 hash of the full name of the entity.
+                        All symbols have also
+                        <a href="reference/symbols/html/content/enum_SymbolFlags_008C1051F1FC28E5BA1D0762EA9AD5BF40BA0B17.html">flags</a>,
+                        owner module, pointer to a parent symbol and a
+                        <a href="reference/soulng/lexer/html/content/struct_Span_30EE73A264B60937695144F1BD60852CA010DF7E.html">span</a>
+                        that tells the source location of the symbol.
+                    </li>
+                    <li>
+                        The <a href="reference/symbols/html/content/class_TypeSymbol_E4B881CC0D40D6232A69F240FA90045A54D93258.html">type</a> symbols
+                        have in addition a unique type id that is an UUID.
+                    </li>
+                    <li>
+                        A <a href="reference/symbols/html/content/class_ClassTypeSymbol_706F15CDE917688D403DB002B3816EE91C6F66CB.html">class</a> type symbol has
+                        in addition symbols for contained member functions, variables, typedefs, constants and delegates.
+                    </li>
+                    <li>
+                        A parameter and variable symbol have a type that is represented internally as a pointer to a type symbol. Each type is represented externally by its id, that is an UUID.
+                    </li>
+                    <li>
+                        A <a href="reference/symbols/html/content/class_FunctionSymbol_5AC1C26A9572181B3E31247997BF40453B22EDEF.html">function</a> symbol contains
+                        symbols for parameters and a pointer to a return type. They have also a unique id that is an UUID. Function templates and inline functions contain also the actual
+                        <a href="reference/sngcm/ast/html/content/class_FunctionNode_95C464D9620C4D6FD74DA45BE5340174A5E1BC0D.html">syntax tree nodes</a> for the function.
+                    </li>
+                </ul>
+            </p>
+
+            <p>
+                Mapping from syntax tree nodes to symbols and vice versa is kept in the symbol table, so when the following phases of compilation
+                visit the syntax tree node object hierarchy, they have access to the corresponding symbols as well.
+            </p>
+
+            <p>
+                At the end of compilation of a program or library module, the contents of the module, meaning exportable symbols and their the externally visible attributes,
+                is written to a module file that has a <em>.cmm</em> extension.
+                At the start of a compilation of a program or library module the contents of the modules it references to are read from their module files.
+            </p>
+
+            <h2>
+                Binder
+            </h2>
+
+            <p>
+                The task of the <a href="reference/binder/binder.html">binder</a> component is to combine syntax with symbols and to create bound node trees
+                from which intermediate code can be generated.
+                After creating syntax trees from the source files and creating symbols from the syntax trees, the front-end completes the symbols with type information.
+                The <a href="reference/binder/html/content/class_TypeBinder_197D6C7822958FE5DD6F6B43DDE787A9FA490EEA.html">type binder</a> visits syntax trees and
+                uses the <a href="reference/binder/html/content/class_TypeResolver_2CB187B7C01DC112ECF07B8D0C87E4AF50BCFF1A.html">type resolver</a> to
+                look up identifiers that should represent types from the symbol table. The type resolver also creates
+                <a href="reference/symbols/html/content/class_ClassTemplateSpecializationSymbol_F0BC1A28739F39F0DA3BC5C1405A607BF1DFC8EA.html">class template specialization</a>
+                symbols from <a href="reference/sngcm/ast/html/content/class_TemplateIdNode_511FF4648199D13B43B12A897052E66766561252.html">template id</a> nodes when needed.
+                The type binder resolves:
+                <ul>
+                    <li>the return type of a function or delegate</li>
+                    <li>the type of the base class of a class type</li>
+                    <li>the declared type of a typedef</li>
+                    <li>the type of a parameter, variable or constant</li>
+                    <li>the underlying type of an enumerated type</li>
+                </ul>
+                The second task of the type binder is to evaluate constant expressions. For this it uses a static
+                <a href="reference/binder/html/content/class_Evaluator_4B7670893CEE707FB594A365EDC98F228E04C2F5.html">evaluator</a>.
+                The result of evaluation is a value derived from the <a href="reference/symbols/html/content/class_Value_D656BD8E5EC910AF6747A38C3979A4A9B1E41ED4.html">value</a> class.
+            </p>
+
+            <p>
+                After binding types the control branches to multiple threads and the compilation of each compile unit is done in parallel from now on.
+            </p>
+
+            <p>
+                The next phase is binding statements and expressions.
+                The <a href="reference/binder/html/content/class_StatementBinder_9ABCC30A844E1A4C1BE61777BAAE98FBBA33A6BD.html">statement binder</a> visits the
+                body of each function and creates <a href="reference/binder/html/content/class_BoundStatement_FA468BD98D7521F6E353AC55182B34AD7D55D8A7.html">bound statements</a>
+                from the corresponding syntax statements.
+                It also binds each expression using the <a href="reference/binder/html/content/class_ExpressionBinder_C0C9CF3C7A3FAD1C9CAD7E66177E8932F8FC37BD.html">expression binder</a>.
+                The expression binder creates <a href="reference/binder/html/content/class_BoundExpression_6C13A7CD518141FC69CADA397796946086EEA452.html">bound expressions</a>
+                from syntax expressions. Each bound expression has a type that is represented as a pointer to a type symbol.
+                Most bound expressions contain also a pointer to the symbol that corresponds the syntax tree node from which the bound node is created from:
+                <a href="reference/binder/html/content/class_BoundLocalVariable_A57A3CCE331BFEC9A961AA545EA665CA0BE43FD1.html">bound local variable</a> has
+                a <a href="reference/symbols/html/content/class_LocalVariableSymbol_F5A9F74EEFC0001129616C5EEBCFE3B2DFC74FCF.html">local variable symbol</a>,
+                and <a href="reference/binder/html/content/class_BoundConstant_4F99952EEB608967A62DFA4EB371782CD2C2C305.html">bound constant</a> has a
+                <a href="reference/symbols/html/content/class_ConstantSymbol_C24F6B6BF615227AB82DFBE1F620EA7AC3355A15.html">constant symbol</a>, for example.
+            </p>
+
+            <p>
+                Major part of expression binding is devoted to overload resolution.
+                To resolve a function call, the
+                <a href="reference/binder/html/content/namespace_binder_C711B7605339DC3A9E128C1E622E7D9A4629C97D.html#function_ResolveOverload_274F866B0477129B5B456EC74D2549E01F146D85">ResolveOverload</a>
+                function is called with the group name of the function to call and bound expression arguments.
+                It returns a <a href="reference/binder/html/content/class_BoundFunctionCall_3B6FF42595EC5C47E14802245CBCB5F47F5F3EAC.html">bound function call</a>
+                that contains a pointer to the symbol of the called function.
+                Naturally all function call expressions are represented as bound function calls but also construction, copying and moving values,
+                expressions containing unary and binary operators, and array element access are represented as such as well.
+                For such operations the symbol contained in the bound function call is of type derived from the generic
+                <a href="reference/symbols/html/content/class_FunctionSymbol_5AC1C26A9572181B3E31247997BF40453B22EDEF.html">function symbol</a> class.
+            </p>
+
+            <p>
+                After resolving a function call expression to a function symbol to call, the compiler checks if the function symbol is a <strong>constexpr</strong>
+                function or a compile time primitive function such as length of an array or string literal.
+                When this is the case, the compiler tries to evaluate the value of the function at compile time using static
+                <a href="reference/binder/html/content/class_Evaluator_4B7670893CEE707FB594A365EDC98F228E04C2F5.html">evaluator</a>.
+                If it succeeds the function call is replaced by a
+                <a href="reference/binder/html/content/class_BoundLiteral_DF1E22194FB48EAFA2C4993DC33E08DF24AF2F68.html">bound literal</a> that
+                contains the evaluated <a href="reference/symbols/html/content/class_Value_D656BD8E5EC910AF6747A38C3979A4A9B1E41ED4.html">value</a>.
+                If the static evaluation fails, the value of the function is computed at run-time as usual.
+            </p>
+
+            <p>
+                The binder component creates a <a href="reference/binder/html/content/class_BoundCompileUnit_E99BC7539B5239DF3A33DC3D613FE1D188A0A9E1.html">bound compile unit</a>
+                in the beginning of compilation of a source file and it is also the result of this compilation.
+                To support the compilation process, mainly overload resolution, a bound compile unit contains various repositories:
+                <ul>
+                    <li>
+                        The <a href="reference/binder/html/content/class_ClassTemplateRepository_8091371C094F17B8769F636AA4554A153D57D624.html">class template repository</a>
+                        is used for instantiating member functions of a class template.
+                        When the type resolver creates a class template specialization symbol, it initially uses the class template repository
+                        to bind <em>signatures</em> of the member functions of the class template.
+                        The member functions are not <em>instantiated</em> until they are needed, that is: called. The instantiation processs is triggered by overload resolution.
+                        The class template repository coordinates the instantiation process and contains the symbols of the instantiated member functions.
+                        The instantiations themselves go to the bound compile unit.
+                        When instantiating a member function of a class template, the class template repository uses the symbol creator, the type binder and the statement binder to
+                        compile the body of the function.
+                    </li>
+                    <li>
+                        The <a href="reference/binder/html/content/class_ConceptRepository_E82BEECFA202891E8476C8F8B86E66DC9886D90F.html">concept repository</a>
+                        holds <a href="reference/binder/html/content/class_BoundConcept_CB1C95090CB1E451FB6C9D3507A957889FED6295.html">bound concept</a>
+                        instantiations and provides them to the
+                        <a href="reference/binder/html/content/class_ConstraintChecker_8FE36C1E71A68A6FE42B5D8757398247B1B2B476.html">constraint checker</a>
+                        that is used in overload resolution.
+                    </li>
+                    <li>
+                        The <a href="reference/binder/html/content/class_ConstExprFunctionRepository_48EF82B22D2165A2986DE193E6FB5CC47A545BC8.html">constexpr function repository</a>
+                        provides constexpr function nodes to the static evaluator.
+                    </li>
+                    <li>
+                        The <a href="reference/binder/html/content/class_FunctionTemplateRepository_10783C76E1CD0A9F074EEAC00AE057491C72AE50.html">function template repository</a>
+                        coordinates instantiation of function templates. The instantiation process is triggered by overload resolution.
+                        When instantiating a function template, the repository uses the symbol creator, the type binder and the statement binder to compile the body of the function.
+                    </li>
+                    <li>
+                        The <a href="reference/binder/html/content/class_InlineFunctionRepository_5087FA71559FE89FBD4D112BF75AFF6F24536D23.html">inline function repository</a>
+                        is in effect only when compiling release mode code. It coordinates instantiation of inline functions.
+                        The instantiation process is similar to instantiation of function templates and member functions of class templates.
+                    </li>
+                    <li>
+                        The <a href="reference/binder/html/content/class_OperationRepository_C6E4DEF6A11C767444C05F73D5BEB8BA4459F24B.html">operation repository</a>
+                        contains <a href="reference/binder/html/content/class_Operation_8F65927D68CA006D4A1FCF730CC955646E5C0F2E.html">operation</a>s organized in
+                        <a href="reference/binder/html/content/class_OperationGroup_1EF1FAB0C8ADEBD26EE189509D491CF81A62A50C.html">operation group</a>s by group name of the operation.
+                        The operations create and hold temporary symbols derived from the <a href="reference/symbols/html/content/class_FunctionSymbol_5AC1C26A9572181B3E31247997BF40453B22EDEF.html">function symbol</a>
+                        on demand. Examples of such a symbols are <a href="reference/binder/html/content/class_PointerDefaultCtor_D473B2A7F4757D582FC83E0CB5D9D42809C65601.html">pointer default constructor</a> and
+                        <a href="reference/binder/html/content/class_PointerCopyCtor_0078845CB37880EA9A208EED0C190084141E6447.html">pointer copy constructor</a>.
+                        Some of them are however defined in the <a href="reference/binder/html/content/namespace_binder_C711B7605339DC3A9E128C1E622E7D9A4629C97D.html">binder</a>
+                        namespace so they are not shown as classes derived from the function symbol in the documentation.
+                        Operations on primitive types such as
+                        <a href="reference/symbols/html/content/class_BasicTypeBinaryOperation_0264B4B65138C1098E6EAD5F75B0395C088C752F.html">basic type binary operation</a>s
+                        operating on <strong>int</strong> are not in this repository, but are inserted in the global scope of the <em>System.Core</em> module and
+                        found from there by overload resolution directly.
+                    </li>
+                </ul>
+            </p>
+
+            <h2>
+                Code generator
+            </h2>
+
+            <p>
+
+            </p>
+
+            <h2>
+                Reference
+            </h2>
+
+            <p>
+                The front-end consists of these <a href="reference/compiler-projects.html">modules</a>.
+            </p>
+</body>
+</html>

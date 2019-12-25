@@ -1877,4 +1877,63 @@ int Emitter::Install(const std::u32string& str)
     return emittingDelegate->Install(str);
 }
 
+void* Emitter::CreateLandingPad(void* lpType)
+{
+    llvm::LandingPadInst* lp = builder.CreateLandingPad(static_cast<llvm::Type*>(lpType), 1);
+    return lp;
+}
+
+void Emitter::SetLandindPadAsCleanup(void* landingPad)
+{
+    llvm::LandingPadInst* lp = static_cast<llvm::LandingPadInst*>(landingPad);
+    lp->setCleanup(true);
+}
+
+void Emitter::InsertAllocaIntoBasicBlock(void* allocaInst, void* lastAlloca, void* basicBlock)
+{
+    if (lastAlloca)
+    {
+        static_cast<llvm::AllocaInst*>(allocaInst)->insertAfter(static_cast<llvm::AllocaInst*>(lastAlloca));
+    }
+    else
+    {
+        llvm::BasicBlock* block = static_cast<llvm::BasicBlock*>(basicBlock);
+        if (block->empty())
+        {
+            block->getInstList().push_back(static_cast<llvm::AllocaInst*>(allocaInst));
+        }
+        else
+        {
+            block->getInstList().insert(block->getInstList().begin(), static_cast<llvm::AllocaInst*>(allocaInst));
+        }
+    }
+}
+
+void Emitter::AddClauseToLangdingPad(void* landingPad, void* exceptionTypeId)
+{
+    llvm::LandingPadInst* lp = static_cast<llvm::LandingPadInst*>(landingPad);
+    llvm::Constant* typeId = static_cast<llvm::Constant*>(exceptionTypeId);
+    lp->addClause(llvm::cast<llvm::Constant>(builder.CreateBitCast(typeId, builder.getInt8PtrTy())));
+}
+
+void* Emitter::CreateExtractValue(void* aggregate, const std::vector<unsigned int>& indeces)
+{
+    return builder.CreateExtractValue(static_cast<llvm::Value*>(aggregate), indeces);
+}
+
+void* Emitter::CreateInsertValue(void* aggregate, void* value, const std::vector<unsigned int>& indeces)
+{
+    return builder.CreateInsertValue(static_cast<llvm::Value*>(aggregate), static_cast<llvm::Value*>(value), indeces);
+}
+
+void* Emitter::CreateUndefValue(void* type)
+{
+    return llvm::UndefValue::get(static_cast<llvm::Type*>(type));
+}
+
+void Emitter::CreateResume(void* exception)
+{
+    builder.CreateResume(static_cast<llvm::Value*>(exception));
+}
+
 } // namespace cmllvm

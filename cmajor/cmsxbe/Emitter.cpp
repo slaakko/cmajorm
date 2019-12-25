@@ -1752,4 +1752,40 @@ int Emitter::Install(const std::u32string& str)
     return emittingDelegate->Install(str);
 }
 
+void* Emitter::CreateLandingPad(void* lpType)
+{
+    return nullptr;
+}
+
+void Emitter::SetLandindPadAsCleanup(void* landingPad)
+{
+}
+
+void Emitter::InsertAllocaIntoBasicBlock(void* allocaInst, void* lastAlloca, void* basicBlock)
+{
+}
+
+void Emitter::AddClauseToLangdingPad(void* landingPad, void* exceptionTypeId)
+{
+}
+
+void* Emitter::CreateExtractValue(void* aggregate, const std::vector<unsigned int>& indeces)
+{
+    return nullptr;
+}
+
+void* Emitter::CreateInsertValue(void* aggregate, void* value, const std::vector<unsigned int>& indeces)
+{
+    return nullptr;
+}
+
+void* Emitter::CreateUndefValue(void* type)
+{
+    return nullptr;
+}
+
+void Emitter::CreateResume(void* exception)
+{
+}
+
 } // namespace cmsxbe

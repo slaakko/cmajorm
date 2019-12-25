@@ -319,6 +319,14 @@ public:
     int Install(const std::string& str) override;
     int Install(const std::u16string& str) override;
     int Install(const std::u32string& str) override;
+    void* CreateLandingPad(void* lpType) override;
+    void SetLandindPadAsCleanup(void* landingPad) override;
+    void InsertAllocaIntoBasicBlock(void* allocaInst, void* lastAlloca, void* basicBlock) override;
+    void AddClauseToLangdingPad(void* landingPad, void* exceptionTypeId) override;
+    void* CreateExtractValue(void* aggregate, const std::vector<unsigned int>& indeces) override;
+    void* CreateInsertValue(void* aggregate, void* value, const std::vector<unsigned int>& indeces) override;
+    void* CreateUndefValue(void* type) override;
+    void CreateResume(void* exception) override;
 private:
     cmsxbe::EmittingContext* emittingContext;
     cmajor::ir::EmittingDelegate* emittingDelegate;
