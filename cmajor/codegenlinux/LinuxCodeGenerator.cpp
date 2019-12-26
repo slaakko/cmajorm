@@ -188,7 +188,6 @@ void LinuxCodeGenerator::Visit(BoundTryStatement& boundTryStatement)
     void* exIdAlloca = emitter->NewAllocaInst(emitter->GetIrTypeForInt());
     emitter->CreateStore(exId, exIdAlloca);
     InsertAllocaIntoEntryBlock(exIdAlloca);
-/*
     void* testBlock = emitter->CreateBasicBlock("test");
     emitter->CreateBr(testBlock);
     emitter->SetCurrentBasicBlock(testBlock);
@@ -256,7 +255,6 @@ void LinuxCodeGenerator::Visit(BoundTryStatement& boundTryStatement)
     void* resume1 = emitter->CreateInsertValue(emitter->CreateUndefValue(lpType), loadedExPtrForResume, exPtrIndex);
     void* resume2 = emitter->CreateInsertValue(resume1, loadedExIdForResume, exIdIndex);
     emitter->CreateResume(resume2);
-*/
     emitter->SetCurrentBasicBlock(nextTarget);
     basicBlockOpen = true;
 }
