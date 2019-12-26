@@ -1,13 +1,13 @@
 include ../Makefile.common
 
-OBJECTS = Exception.o
+OBJECTS = LinuxCodeGenerator.o
 
 %o: %.cpp
 	$(CXX) -c $(CXXFLAGS) -o $@ $<
 
-../lib/libcmeh.a: $(OBJECTS)
+../lib/libcmcodegenlinux.a: $(OBJECTS)
 	$(AR) $(ARFLAGS) $@ $(OBJECTS)
 
 clean:
 	rm -f *.o
-	rm -f ../lib/libcmeh.a
+	rm -f ../lib/libcmcodegenlinux.a

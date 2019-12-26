@@ -5,9 +5,9 @@ OBJECTS = XmlApi.o XmlContentHandler.o XmlParser.o XmlParserInterface.o XmlProce
 %o: %.cpp
 	$(CXX) -c $(CXXFLAGS) -o $@ $<
 	
-../../lib/libsngxmlxml.a: $(OBJECTS)
+../../lib/libcmsngxmlxml.a: $(OBJECTS)
 	$(AR) $(ARFLAGS) $@ $(OBJECTS)
 
 clean:
 	rm -f *.o
-	rm -f ../../lib/libsngxmlxml.a
+	rm -f ../../lib/libcmsngxmlxml.a

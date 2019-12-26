@@ -6,9 +6,9 @@ XPathParser.o XPathTokenValueParsers.o XPathTokens.o
 %o: %.cpp
 	$(CXX) -c $(CXXFLAGS) -o $@ $<
 	
-../../lib/libsngxmlxpath.a: $(OBJECTS)
+../../lib/libcmsngxmlxpath.a: $(OBJECTS)
 	$(AR) $(ARFLAGS) $@ $(OBJECTS)
 
 clean:
 	rm -f *.o
-	rm -f ../../lib/libsngxmlxpath.a
+	rm -f ../../lib/libcmsngxmlxpath.a

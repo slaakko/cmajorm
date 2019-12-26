@@ -2,27 +2,30 @@ include ../Makefile.common
 
 OBJECTS = Main.o
 
-LIBRARIES = ../lib/libutil.a ../lib/libcodedom.a ../lib/libparsing.a ../lib/libxpath.a ../lib/libdom.a ../lib/libxml.a \
-../lib/libast.a ../lib/libsymbols.a ../lib/libparser.a ../lib/libbuild.a ../lib/libbinder.a ../lib/libemitter.a \
-../lib/libir.a ../lib/libast2dom.a ../lib/libbdt2dom.a ../lib/libcmdoclib.a
+LIBRARIES = ../lib/libcmsngutil.a ../lib/libcmsnglexer.a ../lib/libcmsngparser.a ../lib/libcmsngxmlxml.a ../lib/libcmsngxmldom.a ../lib/libcmsngxmlxpath.a \
+../lib/libcmsngcmast.a ../lib/libcmsngcmcmlexer.a ../lib/libcmsngcmcmparser.a ../lib/libcmcommon.a ../lib/libcmir.a ../lib/libcmllvm.a ../lib/libcmsymbols.a \
+../lib/libcmmid.a ../lib/libcmbinder.a ../lib/libcmcodegenbase.a ../lib/libcmcodegenllvm.a ../lib/libcmcodegenwin.a ../lib/libcmcodegenlinux.a ../lib/libcmcodegen.a \
+../lib/libcmdoclib.a ../lib/libcmast2dom.a ../lib/libcmbdt2dom.a ../lib/libcmbuild.a
 
 LLVMLIBS = $(shell llvm-config --libs)
+
+CXXFLAGS += -L$(shell llvm-config --libdir)
 
 %o: %.cpp
 	$(CXX) -c $(CXXFLAGS) -o $@ $<
 
 ifeq ($(config),debug)
-    exename=cmdocd
+exename=cmdocd
 else
-    exename=cmdoc
+exename=cmdoc
 endif
 
 ../bin/$(exename): $(OBJECTS) $(LIBRARIES)
-	$(CXX) $(CXXFLAGS) -o ../bin/$(exename) $(OBJECTS) -lbuild -lbinder -lcmdoclib -lemitter -lir -lsymbols -lparser -last -last2dom -lbdt2dom \
--lxpath -ldom -lxml -lparsing -lcodedom -lutil \
+	$(CXX) $(CXXFLAGS) -o ../bin/$(exename) $(OBJECTS) -lcmbuild -lcmast2dom -lcmbdt2dom -lcmdoclib -lcmcodegen -lcmcodegenlinux -lcmcodegenwin -lcmcodegenllvm -lcmcodegenbase -lcmbinder -lcmmid -lcmsymbols \
+-lcmllvm -lcmir -lcmcommon -lcmsngcmcmparser -lcmsngcmcmlexer -lcmsngcmast \
+-lcmsngxmlxpath -lcmsngxmldom -lcmsngxmlxml -lcmsngparser -lcmsnglexer -lcmsngutil \
 $(LLVMLIBS) -lboost_filesystem -lboost_iostreams -lboost_system -ldl -ltinfo -lz
 
 clean:
 	rm -f *.o
 	rm -f ../bin/$(exename)
-

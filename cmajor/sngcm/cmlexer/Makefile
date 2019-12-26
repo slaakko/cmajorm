@@ -1,14 +1,14 @@
-include ../../Makefile.common
+include ../Makefile.common
 
 OBJECTS = CmajorClassMap.o CmajorKeywords.o CmajorLexer.o CmajorTokens.o ContainerFileClassMap.o ContainerFileKeywords.o ContainerFileLexer.o ContainerFileTokens.o \
-TokenValueParsers.o
+TokenLexer.o TokenLexerClassMap.o TokenLexerKeywords.o TokenLexerTokens.o TokenValueParsers.o
 
 %o: %.cpp
 	$(CXX) -c $(CXXFLAGS) -o $@ $<
 	
-../../../lib/libcmajorlexer.a: $(OBJECTS)
+../../lib/libcmsngcmcmlexer.a: $(OBJECTS)
 	$(AR) $(ARFLAGS) $@ $(OBJECTS)
 
 clean:
 	rm -f *.o
-	rm -f ../../../lib/libcmajorlexer.a
+	rm -f ../../lib/libcmsngcmcmlexer.a

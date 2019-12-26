@@ -2,24 +2,23 @@ include ../Makefile.common
 
 OBJECTS = Main.o
 
-LIBRARIES = ../lib/libutil.a ../lib/libcodedom.a ../lib/libparsing.a ../lib/libxpath.a ../lib/libdom.a ../lib/libxml.a \
-../lib/libast.a ../lib/libsymbols.a ../lib/libparser.a ../lib/libbuild.a ../lib/libbinder.a ../lib/libemitter.a \
-../lib/libir.a ../lib/libcmdoclib.a
-
-LLVMLIBS = $(shell llvm-config --libs)
+LIBRARIES = ../lib/libcmsngutil.a ../lib/libcmsnglexer.a ../lib/libcmsngparser.a ../lib/libcmsngxmlxml.a ../lib/libcmsngxmldom.a ../lib/libcmsngxmlxpath.a \
+../lib/libcmsngcmast.a ../lib/libcmsngcmcmlexer.a ../lib/libcmsngcmcmparser.a ../lib/libcmcommon.a ../lib/libcmir.a ../lib/libcmllvm.a ../lib/libcmsymbols.a \
+../lib/libcmmid.a ../lib/libcmbinder.a
 
 %o: %.cpp
 	$(CXX) -c $(CXXFLAGS) -o $@ $<
 
 ifeq ($(config),debug)
-    exename=cmmdumpd
+exename=cmmdumpd
 else
-    exename=cmmdump
+exename=cmmdump
 endif
 
 ../bin/$(exename): $(OBJECTS) $(LIBRARIES)
-	$(CXX) $(CXXFLAGS) -o ../bin/$(exename) $(OBJECTS) -lbuild -lbinder -lcmdoclib -lemitter -lir -lsymbols -lparser -last \
--lxpath -ldom -lxml -lparsing -lcodedom -lutil \
+	$(CXX) $(CXXFLAGS) -o ../bin/$(exename) $(OBJECTS) -lcmbinder -lcmmid \
+-lcmsymbols -lcmllvm -lcmir -lcmcommon -lcmsngcmcmparser -lcmsngcmcmlexer -lcmsngcmast \
+-lcmsngxmlxpath -lcmsngxmldom -lcmsngxmlxml -lcmsngparser -lcmsnglexer -lcmsngutil \
 $(LLVMLIBS) -lboost_filesystem -lboost_iostreams -lboost_system -ldl -ltinfo -lz
 
 clean:
