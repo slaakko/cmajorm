@@ -12,6 +12,7 @@
 #include <llvm/IR/LegacyPassManager.h>
 #include <llvm/Support/FileSystem.h>
 #include <llvm/Target/TargetMachine.h>
+#include <llvm/Config/llvm-config.h>
 #include <fstream>
 
 namespace cmllvm {
@@ -627,7 +628,11 @@ void Emitter::SetPrivateLinkage(void* global)
 
 void* Emitter::GetOrInsertFunction(const std::string& name, void* type)
 {
+#if (LLVM_VERSION_MAJOR >= 9)
+    return module->getOrInsertFunction(name, static_cast<llvm::FunctionType*>(type)).getCallee();
+#else
     return module->getOrInsertFunction(name, static_cast<llvm::FunctionType*>(type));
+#endif
 }
 
 void* Emitter::CreateGlobalStringPtr(const std::string& name)
@@ -1658,6 +1663,11 @@ void Emitter::SetDISubprogram(void* function, void* subprogram)
 void* Emitter::CreateAlloca(void* irType)
 {
     return builder.CreateAlloca(static_cast<llvm::Type*>(irType));
+}
+
+void* Emitter::NewAllocaInst(void* irType)
+{
+    return new llvm::AllocaInst(static_cast<llvm::Type*>(irType), 0);
 }
 
 void* Emitter::CreateDIParameterVariable(const std::string& name, int index, const Span& span, void* irType, void* allocaInst)

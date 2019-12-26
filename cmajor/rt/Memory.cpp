@@ -14,6 +14,7 @@
 #include <malloc.h>
 #include <fstream>
 #include <vector>
+#include <cstring>
 
 namespace cmajor { namespace rt {
 

@@ -25,9 +25,11 @@
 #include <cmajor/symbols/FunctionSymbol.hpp>
 #include <cmajor/symbols/StringFunctions.hpp>
 #include <cmajor/symbols/Module.hpp>
-#include <cmajor/symbols/Trap.hpp>
 #include <soulng/util/Unicode.hpp>
 #include <soulng/util/Sha1.hpp>
+#ifdef _WIN32
+#include <cmajor/symbols/Trap.hpp>
+#endif
 
 namespace cmajor { namespace symbols {
 
@@ -1100,7 +1102,6 @@ SymbolFactory::SymbolFactory()
     Register(SymbolType::basicTypeFloatingToSignedInt, new ConcreteSymbolCreator<BasicTypeFloatingToSignedIntOperation>());
     Register(SymbolType::basicTypeFloatingExtension, new ConcreteSymbolCreator<BasicTypeFloatingExtensionOperation>());
     Register(SymbolType::basicTypeFloatingTruncation, new ConcreteSymbolCreator<BasicTypeFloatingTruncationOperation>());
-    Register(SymbolType::trap, new ConcreteSymbolCreator<TrapFunction>());
     Register(SymbolType::enumTypeDefaultConstructor, new ConcreteSymbolCreator<EnumTypeDefaultConstructor>());
     Register(SymbolType::enumTypeCopyConstructor, new ConcreteSymbolCreator<EnumTypeCopyConstructor>());
     Register(SymbolType::enumTypeMoveConstructor, new ConcreteSymbolCreator<EnumTypeMoveConstructor>());
@@ -1133,6 +1134,9 @@ SymbolFactory::SymbolFactory()
     Register(SymbolType::globalVariableSymbol, new ConcreteSymbolCreator<GlobalVariableSymbol>());
     Register(SymbolType::stringFunctionContainerSymbol, new ConcreteSymbolCreator<StringFunctionContainerSymbol>());
     Register(SymbolType::stringLengthFunctionSymbol, new ConcreteSymbolCreator<StringLengthFunction>());
+#ifdef _WIN32
+    Register(SymbolType::trap, new ConcreteSymbolCreator<TrapFunction>());
+#endif
 }
 
 Symbol* SymbolFactory::CreateSymbol(SymbolType symbolType, const Span& span, const std::u32string& name)

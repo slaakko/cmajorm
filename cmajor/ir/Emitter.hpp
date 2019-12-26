@@ -319,6 +319,7 @@ public:
     virtual void* CreateDIFunction(const std::string& name, const std::string& mangledName, const Span& span, void* subroutineType, unsigned flags) = 0;
     virtual void SetDISubprogram(void* function, void* subprogram) = 0;
     virtual void* CreateAlloca(void* irType) = 0;
+    virtual void* NewAllocaInst(void* irType) = 0;
     virtual void* CreateDIParameterVariable(const std::string& name, int index, const Span& span, void* irType, void* allocaInst) = 0;
     virtual void* CreateDIAutoVariable(const std::string& name, const Span& span, void* irType, void* allocaInst) = 0;
     virtual void* GetFunctionArgument(void* function, int argumentIndex) = 0;

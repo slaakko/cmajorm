@@ -13,6 +13,7 @@
 #include <cmajor/symbols/Module.hpp>
 #include <soulng/util/Unicode.hpp>
 #include <soulng/util/Sha1.hpp>
+#include <algorithm>
 
 namespace cmajor { namespace symbols {
 

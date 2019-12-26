@@ -165,68 +165,30 @@ void LinuxCodeGenerator::Visit(BoundTryStatement& boundTryStatement)
     emitter->CreateBr(nextTarget);
     emitter->SetCurrentBasicBlock(handlerBlock);
     handlerBlock = prevHandlerBlock;
-
     std::vector<void*> lpElemTypes;
     lpElemTypes.push_back(emitter->GetIrTypeForVoidPtrType());
     lpElemTypes.push_back(emitter->GetIrTypeForInt());
     void* lpType = emitter->GetIrTypeForClassType(lpElemTypes);
     void* lp = emitter->CreateLandingPad(lpType);
-    /*
-    std::vector<llvm::Type*> lpElemTypes;
-    lpElemTypes.push_back(builder.getInt8PtrTy());
-    lpElemTypes.push_back(builder.getInt32Ty());
-    llvm::StructType* lpType = llvm::StructType::get(context, lpElemTypes);
-    llvm::LandingPadInst* lp = builder.CreateLandingPad(lpType, 1);
-    */
-
     std::vector<void*> exTypeInfoElemTypes;
     exTypeInfoElemTypes.push_back(emitter->GetIrTypeForVoidPtrType());
     exTypeInfoElemTypes.push_back(emitter->GetIrTypeForVoidPtrType());
     void* exTypeInfoType = emitter->GetIrTypeForClassType(exTypeInfoElemTypes);
     void* exceptionTypeId = emitter->GetOrInsertGlobal("_ZTIN6cmajor2eh9ExceptionE", exTypeInfoType);
     emitter->AddClauseToLangdingPad(lp, exceptionTypeId);
-
-    /*
-    std::vector<llvm::Type*> exTypeInfoElemTypes;
-    exTypeInfoElemTypes.push_back(builder.getInt8PtrTy());
-    exTypeInfoElemTypes.push_back(builder.getInt8PtrTy());
-    llvm::StructType* exTypeInfoType = llvm::StructType::get(context, exTypeInfoElemTypes);
-    llvm::Constant* exceptionTypeId = compileUnitModule->getOrInsertGlobal("_ZTIN6cmajor2eh9ExceptionE", exTypeInfoType);
-    lp->addClause(llvm::cast<llvm::Constant>(builder.CreateBitCast(exceptionTypeId, builder.getInt8PtrTy())));
-    */
-
     std::vector<unsigned int> exPtrIndex;
     exPtrIndex.push_back(0);
-    void* exPtrAlloca = emitter->CreateAlloca(emitter->GetIrTypeForVoidPtrType());
+    void* exPtrAlloca = emitter->NewAllocaInst(emitter->GetIrTypeForVoidPtrType());
     InsertAllocaIntoEntryBlock(exPtrAlloca);
     void* exPtr = emitter->CreateExtractValue(lp, exPtrIndex);
     emitter->CreateStore(exPtr, exPtrAlloca);
-
-/*
-    std::vector<unsigned int> exPtrIndex;
-    exPtrIndex.push_back(0);
-    llvm::AllocaInst* exPtrAlloca = new llvm::AllocaInst(builder.getInt8PtrTy(), 0);
-    InsertAllocaIntoEntryBlock(exPtrAlloca);
-    llvm::Value* exPtr = builder.CreateExtractValue(lp, exPtrIndex);
-    builder.CreateStore(exPtr, exPtrAlloca);
-*/
-
     std::vector<unsigned int> exIdIndex;
     exIdIndex.push_back(1);
     void* exId = emitter->CreateExtractValue(lp, exIdIndex);
-    void* exIdAlloca = emitter->CreateAlloca(emitter->GetIrTypeForVoidPtrType());
+    void* exIdAlloca = emitter->NewAllocaInst(emitter->GetIrTypeForInt());
     emitter->CreateStore(exId, exIdAlloca);
     InsertAllocaIntoEntryBlock(exIdAlloca);
-
 /*
-    std::vector<unsigned int> exIdIndex;
-    exIdIndex.push_back(1);
-    llvm::Value* exId = builder.CreateExtractValue(lp, exIdIndex);
-    llvm::AllocaInst* exIdAlloca = new llvm::AllocaInst(builder.getInt32Ty(), 0);
-    builder.CreateStore(exId, exIdAlloca);
-    InsertAllocaIntoEntryBlock(exIdAlloca);
-*/
-
     void* testBlock = emitter->CreateBasicBlock("test");
     emitter->CreateBr(testBlock);
     emitter->SetCurrentBasicBlock(testBlock);
@@ -253,34 +215,6 @@ void LinuxCodeGenerator::Visit(BoundTryStatement& boundTryStatement)
     void* cxaBeginCatchValue = emitter->CreateCall(cxaBeginCatch, cxaBeginCatchArgs);
     void* catchTarget = emitter->CreateBasicBlock("catch");
     emitter->CreateBr(catchTarget);
-/*
-    llvm::BasicBlock* testBlock = llvm::BasicBlock::Create(context, "test", function);
-    builder.CreateBr(testBlock);
-    SetCurrentBasicBlock(testBlock);
-    llvm::Value* loadedExId = builder.CreateLoad(exIdAlloca);
-    std::vector<llvm::Type*> llvmEhParamTypes;
-    llvmEhParamTypes.push_back(builder.getInt8PtrTy());
-    llvm::FunctionType* llvmEHTypeIdForType = llvm::FunctionType::get(builder.getInt32Ty(), llvmEhParamTypes, false);
-    llvm::Function* llvmEHTypeIdFor = llvm::cast<llvm::Function>(compileUnitModule->getOrInsertFunction("llvm.eh.typeid.for", llvmEHTypeIdForType));
-    ArgVector llvmEHTypeIdForArgs;
-    llvmEHTypeIdForArgs.push_back(llvm::cast<llvm::Constant>(builder.CreateBitCast(exceptionTypeId, builder.getInt8PtrTy())));
-    llvm::Value* ehSelector = builder.CreateCall(llvmEHTypeIdFor, llvmEHTypeIdForArgs);
-    llvm::Value* match = builder.CreateICmpEQ(loadedExId, ehSelector);
-    llvm::BasicBlock* beginCatchBlock = llvm::BasicBlock::Create(context, "handlers", function);
-    llvm::BasicBlock* resumeBlock = llvm::BasicBlock::Create(context, "resume", function);
-    builder.CreateCondBr(match, beginCatchBlock, resumeBlock);
-    SetCurrentBasicBlock(beginCatchBlock);
-    std::vector<llvm::Type*> cxaBeginCatchParamTypes;
-    cxaBeginCatchParamTypes.push_back(builder.getInt8PtrTy());
-    llvm::FunctionType* cxaBeginCatchType = llvm::FunctionType::get(builder.getInt8PtrTy(), cxaBeginCatchParamTypes, false);
-    llvm::Function* cxaBeginCatch = llvm::cast<llvm::Function>(compileUnitModule->getOrInsertFunction("__cxa_begin_catch", cxaBeginCatchType));
-    ArgVector cxaBeginCatchArgs;
-    llvm::Value* loadedExPtr = builder.CreateLoad(exPtrAlloca);
-    cxaBeginCatchArgs.push_back(loadedExPtr);
-    llvm::Value* cxaBeginCatchValue = builder.CreateCall(cxaBeginCatch, cxaBeginCatchArgs);
-    llvm::BasicBlock* catchTarget = llvm::BasicBlock::Create(context, "catch", function);
-    builder.CreateBr(catchTarget);
-*/
     int n = boundTryStatement.Catches().size();
     for (int i = 0; i < n; ++i)
     {
@@ -307,36 +241,6 @@ void LinuxCodeGenerator::Visit(BoundTryStatement& boundTryStatement)
         }
         void* thisHandlerTarget = emitter->CreateBasicBlock("handler");
         emitter->CreateCondBr(handleThisEx, thisHandlerTarget, nextHandlerTarget);
-
-        /*
-            int n = boundTryStatement.Catches().size();
-            for (int i = 0; i < n; ++i)
-            {
-                const std::unique_ptr<BoundCatchStatement>& boundCatchStatement = boundTryStatement.Catches()[i];
-                SetCurrentBasicBlock(catchTarget);
-                std::vector<llvm::Type*> handleExceptionParamTypes;
-                handleExceptionParamTypes.push_back(builder.getInt8PtrTy());
-                llvm::FunctionType* handleExceptionFunctionType = llvm::FunctionType::get(builder.getInt1Ty(), handleExceptionParamTypes, false);
-                ArgVector handleExceptionArgs;
-                UuidValue uuidValue(boundCatchStatement->GetSpan(), boundCatchStatement->CatchedTypeUuidId());
-                llvm::Value* catchTypeIdValue = uuidValue.IrValue(*this);
-                handleExceptionArgs.push_back(catchTypeIdValue);
-                llvm::Function* handleException = llvm::cast<llvm::Function>(compileUnitModule->getOrInsertFunction("RtHandleException", handleExceptionFunctionType));
-                llvm::Value* handleThisEx = builder.CreateCall(handleException, handleExceptionArgs);
-                llvm::BasicBlock* nextHandlerTarget = nullptr;
-                if (i < n - 1)
-                {
-                    catchTarget = llvm::BasicBlock::Create(context, "catch", function);
-                    nextHandlerTarget = catchTarget;
-                }
-                else
-                {
-                    nextHandlerTarget = resumeBlock;
-                }
-                llvm::BasicBlock* thisHandlerTarget = llvm::BasicBlock::Create(context, "handler", function);
-                builder.CreateCondBr(handleThisEx, thisHandlerTarget, nextHandlerTarget);
-        */
-
         emitter->SetCurrentBasicBlock(thisHandlerTarget);
         boundCatchStatement->CatchBlock()->Accept(*this);
         std::vector<void*> cxaEndCatchParamTypes;
@@ -345,17 +249,6 @@ void LinuxCodeGenerator::Visit(BoundTryStatement& boundTryStatement)
         std::vector<void*> cxaEndCatchArgs;
         void* cxaEndCatchValue = emitter->CreateCall(cxaEndCatch, cxaEndCatchArgs);
         emitter->CreateBr(nextTarget);
-/*
-        SetCurrentBasicBlock(thisHandlerTarget);
-        boundCatchStatement->CatchBlock()->Accept(*this);
-        std::vector<llvm::Type*> cxaEndCatchParamTypes;
-        llvm::FunctionType* cxaEndCatchType = llvm::FunctionType::get(builder.getVoidTy(), cxaEndCatchParamTypes, false);
-        llvm::Function* cxaEndCatch = llvm::cast<llvm::Function>(compileUnitModule->getOrInsertFunction("__cxa_end_catch", cxaEndCatchType));
-        ArgVector cxaEndCatchArgs;
-        llvm::Value* cxaEndCatchValue = builder.CreateCall(cxaEndCatch, cxaEndCatchArgs);
-        builder.CreateBr(nextTarget);
-    }
-*/
     }
     emitter->SetCurrentBasicBlock(resumeBlock);
     void* loadedExPtrForResume = emitter->CreateLoad(exPtrAlloca);
@@ -363,19 +256,9 @@ void LinuxCodeGenerator::Visit(BoundTryStatement& boundTryStatement)
     void* resume1 = emitter->CreateInsertValue(emitter->CreateUndefValue(lpType), loadedExPtrForResume, exPtrIndex);
     void* resume2 = emitter->CreateInsertValue(resume1, loadedExIdForResume, exIdIndex);
     emitter->CreateResume(resume2);
+*/
     emitter->SetCurrentBasicBlock(nextTarget);
     basicBlockOpen = true;
-
-/*
-    SetCurrentBasicBlock(resumeBlock);
-    llvm::Value* loadedExPtrForResume = builder.CreateLoad(exPtrAlloca);
-    llvm::Value* loadedExIdForResume = builder.CreateLoad(exIdAlloca);
-    llvm::Value* resume1 = builder.CreateInsertValue(llvm::UndefValue::get(lpType), loadedExPtrForResume, exPtrIndex);
-    llvm::Value* resume2 = builder.CreateInsertValue(resume1, loadedExIdForResume, exIdIndex);
-    builder.CreateResume(resume2);
-    SetCurrentBasicBlock(nextTarget);
-    basicBlockOpen = true;
-*/
 }
 
 void LinuxCodeGenerator::Visit(BoundRethrowStatement& boundRethrowStatement)
@@ -390,12 +273,6 @@ void LinuxCodeGenerator::Visit(BoundRethrowStatement& boundRethrowStatement)
     void* cxaRethrowFunction = emitter->GetOrInsertFunction("__cxa_rethrow", rethrowFunctionType);
     std::vector<void*> rethrowArgs;
     emitter->CreateCall(cxaRethrowFunction, rethrowArgs);
-/*
-    llvm::FunctionType* rethrowFunctionType = llvm::FunctionType::get(builder.getVoidTy(), false);
-    llvm::Function* cxaRethrowFunction = llvm::cast<llvm::Function>(compileUnitModule->getOrInsertFunction("__cxa_rethrow", rethrowFunctionType, nullptr));
-    ArgVector rethrowArgs;
-    builder.CreateCall(cxaRethrowFunction, rethrowArgs);
-*/
 }
 
 void LinuxCodeGenerator::CreateCleanup()
@@ -437,45 +314,6 @@ void LinuxCodeGenerator::CreateCleanup()
     }
     cleanups.push_back(std::unique_ptr<cmajor::codegenllvm::Cleanup>(cleanup));
     newCleanupNeeded = false;
-    /*
-    cleanupBlock = llvm::BasicBlock::Create(context, "cleanup", function);
-    BoundCompoundStatement* targetBlock = nullptr;
-    BoundStatement* parent = currentBlock->Parent();
-    while (parent && parent->GetBoundNodeType() != BoundNodeType::boundTryStatement)
-    {
-        parent = parent->Parent();
-    }
-    if (parent)
-    {
-        targetBlock = parent->Block();
-    }
-    Cleanup* cleanup = new Cleanup(cleanupBlock, handlerBlock, currentPad);
-    int n = blocks.size();
-    for (int i = n - 1; i >= 0; --i)
-    {
-        BoundCompoundStatement* block = blocks[i];
-        if (block == targetBlock)
-        {
-            break;
-        }
-        auto it = blockDestructionMap.find(block);
-        if (it != blockDestructionMap.cend())
-        {
-            std::vector<std::unique_ptr<BoundFunctionCall>>& destructorCallVec = it->second;
-            int nd = destructorCallVec.size();
-            for (int i = nd - 1; i >= 0; --i)
-            {
-                std::unique_ptr<BoundFunctionCall>& destructorCall = destructorCallVec[i];
-                if (destructorCall)
-                {
-                    cleanup->destructors.push_back(std::unique_ptr<BoundFunctionCall>(static_cast<BoundFunctionCall*>(destructorCall->Clone())));
-                }
-            }
-        }
-    }
-    cleanups.push_back(std::unique_ptr<Cleanup>(cleanup));
-    newCleanupNeeded = false;
-*/
 }
 
 void* LinuxCodeGenerator::GetPersonalityFunction() const
@@ -483,11 +321,6 @@ void* LinuxCodeGenerator::GetPersonalityFunction() const
     void* personalityFunctionType = emitter->GetIrTypeForVariableParamFunction(emitter->GetIrTypeForInt());
     void* personalityFunction = emitter->GetOrInsertFunction("__gxx_personality_v0", personalityFunctionType);
     return personalityFunction;
-/*
-    llvm::FunctionType* personalityFunctionType = llvm::FunctionType::get(builder.getInt32Ty(), true);
-    llvm::Function* personalityFunction = llvm::cast<llvm::Function>(compileUnitModule->getOrInsertFunction("__gxx_personality_v0", personalityFunctionType));
-    return personalityFunction;
-*/
 }
 
 void LinuxCodeGenerator::GenerateCodeForCleanups()
@@ -507,23 +340,6 @@ void LinuxCodeGenerator::GenerateCodeForCleanups()
         }
         emitter->CreateResume(lp);
     }
-/*
-    for (const std::unique_ptr<Cleanup>& cleanup : cleanups)
-    {
-        SetCurrentBasicBlock(cleanup->cleanupBlock);
-        std::vector<llvm::Type*> lpElemTypes;
-        lpElemTypes.push_back(builder.getInt8PtrTy());
-        lpElemTypes.push_back(builder.getInt32Ty());
-        llvm::StructType* lpType = llvm::StructType::get(context, lpElemTypes);
-        llvm::LandingPadInst* lp = builder.CreateLandingPad(lpType, 0);
-        lp->setCleanup(true);
-        for (const std::unique_ptr<BoundFunctionCall>& destructorCall : cleanup->destructors)
-        {
-            destructorCall->Accept(*this);
-        }
-        builder.CreateResume(lp);
-    }
-*/
 }
 
 } } // namespace cmajor::codegenlinux

@@ -14,6 +14,7 @@
 #include <sngcm/ast/Identifier.hpp>
 #include <soulng/util/Unicode.hpp>
 #include <soulng/util/Util.hpp>
+#include <algorithm>
 
 namespace cmajor { namespace symbols {
 
@@ -354,7 +355,7 @@ void ContainerScope::CollectViableFunctions(int arity, const std::u32string& gro
 {
     if ((scopeLookup & ScopeLookup::this_) != ScopeLookup::none)
     {
-        if (scopesLookedUp.find(this) == scopesLookedUp.cend())
+        if (scopesLookedUp.find(this) == scopesLookedUp.end())
         {
             scopesLookedUp.insert(this);
             Symbol* symbol = Lookup(groupName);
@@ -408,7 +409,7 @@ void FileScope::InstallAlias(ContainerScope* containerScope, AliasNode* aliasNod
 
 void FileScope::AddContainerScope(ContainerScope* containerScope)
 {
-    if (std::find(containerScopes.cbegin(), containerScopes.cend(), containerScope) == containerScopes.cend())
+    if (std::find(containerScopes.begin(), containerScopes.end(), containerScope) == containerScopes.end())
     {
         containerScopes.push_back(containerScope);
     }
@@ -426,7 +427,7 @@ void FileScope::InstallNamespaceImport(ContainerScope* containerScope, Namespace
             if (symbol->GetSymbolType() == SymbolType::namespaceSymbol)
             {
                 ContainerScope* symbolContainerScope = symbol->GetContainerScope();
-                if (std::find(containerScopes.cbegin(), containerScopes.cend(), symbolContainerScope) == containerScopes.cend())
+                if (std::find(containerScopes.begin(), containerScopes.end(), symbolContainerScope) == containerScopes.end())
                 {
                     containerScopes.push_back(symbolContainerScope);
                 }
@@ -511,7 +512,7 @@ void FileScope::CollectViableFunctions(int arity, const std::u32string&  groupNa
 {
     for (ContainerScope* containerScope : containerScopes)
     {
-        if (scopesLookedUp.find(containerScope) == scopesLookedUp.cend())
+        if (scopesLookedUp.find(containerScope) == scopesLookedUp.end())
         {
             containerScope->CollectViableFunctions(arity, groupName, scopesLookedUp, ScopeLookup::this_, viableFunctions, module);
             scopesLookedUp.insert(containerScope);

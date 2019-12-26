@@ -471,10 +471,12 @@ void GenerateLibrary(Module* module, const std::vector<std::string>& objectFileP
     {
         GenerateLibraryLlvm(module, objectFilePaths, libraryFilePath);
     }
+#ifdef _WIN32
     else if (GetBackEnd() == cmajor::symbols::BackEnd::cmsx)
     {
         GenerateLibrarySystemX(module, objectFilePaths, libraryFilePath);
     }
+#endif
 }
 
 #ifdef _WIN32
@@ -712,10 +714,12 @@ void Link(const std::string& executableFilePath, const std::string& libraryFileP
     {
         LinkLlvm(executableFilePath, libraryFilePath, libraryFilePaths, module);
     }
+#ifdef _WIN32
     else if (GetBackEnd() == cmajor::symbols::BackEnd::cmsx)
     {
         LinkSystemX(executableFilePath, libraryFilePath, libraryFilePaths, module);
     }
+#endif
 }
 
 void CleanProject(Project* project)

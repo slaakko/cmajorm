@@ -17,6 +17,7 @@
 #include <soulng/util/Unicode.hpp>
 #include <soulng/util/Log.hpp>
 #include <soulng/util/Time.hpp>
+#include <algorithm>
 
 namespace cmajor { namespace binder {
 

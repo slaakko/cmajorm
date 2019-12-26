@@ -1587,6 +1587,10 @@ void* Emitter::CreateAlloca(void* irType)
 {
     return context->CreateLocal(static_cast<cmsxi::Type*>(irType));
 }
+void* Emitter::NewAllocaInst(void* irType)
+{
+    return nullptr;
+}
 
 void* Emitter::CreateDIParameterVariable(const std::string& name, int index, const Span& span, void* irType, void* allocaInst)
 {
