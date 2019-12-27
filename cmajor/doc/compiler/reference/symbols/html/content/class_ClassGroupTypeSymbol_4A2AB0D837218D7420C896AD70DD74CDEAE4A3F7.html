@@ -1,7 +1,7 @@
 <html>
     <head>
         <meta charset="utf-8"/>
-        <title>ClassGroupTypeSymbol Class</title>
+        <title>ClassGroupTypeSymbol Abstract Class</title>
         <link href="../style/style.css" rel="stylesheet" type="text/css"/>
         <script src="class_ClassGroupTypeSymbol_4A2AB0D837218D7420C896AD70DD74CDEAE4A3F7_inheritance.js" type="text/javascript"> </script>
     </head>
@@ -11,7 +11,7 @@
          | <a href="class_ClassDelegateTypeSymbol_128306583C73553FFFA4F5C051CE181C3EC4D435.html">prev</a>
          | <a href="struct_ClassInfo_E3392BE13CFEE6FDC3DF7C5D536D1FA4F8D3F3E2.html">next</a>
         <hr/>
-        <h1>ClassGroupTypeSymbol Class</h1>
+        <h1>ClassGroupTypeSymbol Abstract Class</h1>
         <div class="diagram">
             <svg height="0" id="classInheritanceDiagram" version="2.0" width="0" xmlns="http://www.w3.org/2000/svg"/>
         </div>
@@ -23,7 +23,7 @@
         <h2>Constructors</h2>
         <table class="constructorTable">
             <tr>
-                <td class="constructorTableFirstCol" xml:space="preserve"><a href="class_ClassGroupTypeSymbol_4A2AB0D837218D7420C896AD70DD74CDEAE4A3F7.html#constructor_ClassGroupTypeSymbol_92562E1468C9FE05BAA7928420EA74168823DEE3">ClassGroupTypeSymbol</a>(<span class="kw">const </span><a href="./../../../soulng/lexer/html/content/struct_Span_30EE73A264B60937695144F1BD60852CA010DF7E.html">Span</a>&amp; span_, <span class="kw">const </span>std::u32string&amp; name_)</td>
+                <td class="constructorTableFirstCol" xml:space="preserve"><a href="class_ClassGroupTypeSymbol_4A2AB0D837218D7420C896AD70DD74CDEAE4A3F7.html#constructor_ClassGroupTypeSymbol_B6D3074C2B7C290BDBD25AFB47BECF530CB11885">ClassGroupTypeSymbol</a>(<span class="kw">const </span>Span&amp; span_, <span class="kw">const </span>std::u32string&amp; name_)</td>
             </tr>
         </table>
         <h2>Member Functions</h2>
@@ -46,7 +46,7 @@
             </tr>
             <tr>
                 <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span>*</td>
-                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_ClassGroupTypeSymbol_4A2AB0D837218D7420C896AD70DD74CDEAE4A3F7.html#function_CreateDefaultIrValue_C68324F34BE5AA0999AB858C04F06E975359EEFD">CreateDefaultIrValue</a>(<a href="./../../../ir/html/content/class_Emitter_154396B281E1F2C3ECA7612F1A3AD2E408E7D595.html">Emitter</a>&amp; emitter) <span class="kw">override</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_ClassGroupTypeSymbol_4A2AB0D837218D7420C896AD70DD74CDEAE4A3F7.html#function_CreateDefaultIrValue_3CBA1633E6AF56612F57183DA489172591D2D3D2">CreateDefaultIrValue</a>(Emitter&amp; emitter) <span class="kw">override</span></td>
             </tr>
             <tr>
                 <td class="functionTableFirstCol" xml:space="preserve"><a href="./class_ClassTypeSymbol_706F15CDE917688D403DB002B3816EE91C6F66CB.html">ClassTypeSymbol</a>*</td>
@@ -62,7 +62,7 @@
             </tr>
             <tr>
                 <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span>*</td>
-                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_ClassGroupTypeSymbol_4A2AB0D837218D7420C896AD70DD74CDEAE4A3F7.html#function_IrType_CBF894906030E05C9E948276936FB17C057977F3">IrType</a>(<a href="./../../../ir/html/content/class_Emitter_154396B281E1F2C3ECA7612F1A3AD2E408E7D595.html">Emitter</a>&amp; emitter) <span class="kw">override</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_ClassGroupTypeSymbol_4A2AB0D837218D7420C896AD70DD74CDEAE4A3F7.html#function_IrType_36C34DE8606FA297F19F10FA27547E69B02FF43D">IrType</a>(Emitter&amp; emitter) <span class="kw">override</span></td>
             </tr>
             <tr>
                 <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">bool</span></td>
@@ -86,24 +86,14 @@
         </table>
         <hr/>
         <h2>Constructor Details</h2>
-        <h3 id="constructor_ClassGroupTypeSymbol_92562E1468C9FE05BAA7928420EA74168823DEE3">ClassGroupTypeSymbol Constructor</h3>
+        <h3 id="constructor_ClassGroupTypeSymbol_B6D3074C2B7C290BDBD25AFB47BECF530CB11885">ClassGroupTypeSymbol Constructor</h3>
         <h4>
             cmajor::symbols::ClassGroupTypeSymbol::ClassGroupTypeSymbol(<span class="kw">const </span>
-            <a href="./../../../soulng/lexer/html/content/struct_Span_30EE73A264B60937695144F1BD60852CA010DF7E.html">Span</a>
-            &amp; span_, <span class="kw">const </span>
+            Span&amp; span_, <span class="kw">const </span>
             std::u32string&amp; name_)</h4>
         <span>
             Definition at line <a href="file/ClassTypeSymbol.cpp_5F7DBA8F4C8719ADA0A886EEDC1D953D7C104148.html#92">92</a>
              of <a href="file/ClassTypeSymbol.cpp_5F7DBA8F4C8719ADA0A886EEDC1D953D7C104148.html">ClassTypeSymbol.cpp</a>
-            :<br/>
-            <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;92</span>&nbsp;<span class="other">:</span>&nbsp;<a href="./class_TypeSymbol_E4B881CC0D40D6232A69F240FA90045A54D93258.html">TypeSymbol</a><span class="other">(</span><a href="./enum_SymbolType_0C0BF9091F0459D7D1F67F3504BFA03942CCA1EB.html">SymbolType</a><span class="other">::</span><a href="./enum_SymbolType_0C0BF9091F0459D7D1F67F3504BFA03942CCA1EB.html#enumerator_classGroupTypeSymbol_5A9B6C980800B20182024056975E72AF70B561B6">classGroupTypeSymbol</a><span class="other">,&nbsp;</span><span class="identifier">span_</span><span class="other">,&nbsp;</span><span class="identifier">name_</span><span class="other">)</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;93</span>&nbsp;<span class="other">{</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;94</span>&nbsp;<span class="other">}</span></span>
-            </span>
-            <br/>
         </span>
         <br/>
         <span>
@@ -122,29 +112,6 @@
         <span>
             Definition at line <a href="file/ClassTypeSymbol.cpp_5F7DBA8F4C8719ADA0A886EEDC1D953D7C104148.html#108">108</a>
              of <a href="file/ClassTypeSymbol.cpp_5F7DBA8F4C8719ADA0A886EEDC1D953D7C104148.html">ClassTypeSymbol.cpp</a>
-            :<br/>
-            <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;109</span>&nbsp;<span class="other">{</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;110</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">for&nbsp;</span><span class="other">(</span><span class="kw">int</span>&nbsp;<span class="identifier">arity</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">classTypeSymbol</span><span class="other">-></span><span class="identifier">MinArity</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>&nbsp;<span class="identifier">arity</span><span class="other">&nbsp;&lt;=&nbsp;</span><span class="identifier">classTypeSymbol</span><span class="other">-></span><span class="identifier">MaxArity</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>&nbsp;<span class="other">++</span><span class="identifier">arity</span><span class="other">)</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;111</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;112</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><a href="./class_ClassGroupTypeSymbol_4A2AB0D837218D7420C896AD70DD74CDEAE4A3F7.html#variable_arityClassMap_AB6B6116A16AF73C477E2C751B5A2C8E72245CD7">arityClassMap</a><span class="other">.</span><span class="identifier">find</span><span class="other">(</span><span class="identifier">arity</span><span class="other">)</span><span class="other">&nbsp;!=&nbsp;</span><a href="./class_ClassGroupTypeSymbol_4A2AB0D837218D7420C896AD70DD74CDEAE4A3F7.html#variable_arityClassMap_AB6B6116A16AF73C477E2C751B5A2C8E72245CD7">arityClassMap</a><span class="other">.</span><span class="identifier">cend</span><span class="other">(</span><span class="other">)</span><span class="other">)</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;113</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;114</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">throw&nbsp;</span><a href="./class_Exception_E0D6B53922FCDD67B6AEBE6ECEF34C5DCE53785E.html">Exception</a><span class="other">(</span><span class="identifier">GetRootModuleForCurrentThread</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="string">"already&nbsp;has&nbsp;class&nbsp;with&nbsp;arity&nbsp;"</span><span class="other">&nbsp;+&nbsp;</span><span class="identifier">std</span><span class="other">::</span><span class="identifier">to_string</span><span class="other">(</span><span class="identifier">arity</span><span class="other">)</span><span class="other">&nbsp;+&nbsp;</span><span class="string">"&nbsp;in&nbsp;class&nbsp;group&nbsp;'"</span><span class="other">&nbsp;+&nbsp;</span><span class="identifier">ToUtf8</span><span class="other">(</span><span class="identifier">Name</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">&nbsp;+&nbsp;</span><span class="string">"'"</span><span class="other">,&nbsp;</span><span class="identifier">GetSpan</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">classTypeSymbol</span><span class="other">-></span><span class="identifier">GetSpan</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;115</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;116</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_ClassGroupTypeSymbol_4A2AB0D837218D7420C896AD70DD74CDEAE4A3F7.html#variable_arityClassMap_AB6B6116A16AF73C477E2C751B5A2C8E72245CD7">arityClassMap</a><span class="other">[</span><span class="identifier">arity</span><span class="other">]</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">classTypeSymbol</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;117</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;118</span>&nbsp;<span class="other">}</span></span>
-            </span>
-            <br/>
         </span>
         <br/>
         <span>
@@ -208,29 +175,6 @@
         <span>
             Definition at line <a href="file/ClassTypeSymbol.cpp_5F7DBA8F4C8719ADA0A886EEDC1D953D7C104148.html#157">157</a>
              of <a href="file/ClassTypeSymbol.cpp_5F7DBA8F4C8719ADA0A886EEDC1D953D7C104148.html">ClassTypeSymbol.cpp</a>
-            :<br/>
-            <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;158</span>&nbsp;<span class="other">{</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;159</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_TypeSymbol_E4B881CC0D40D6232A69F240FA90045A54D93258.html">TypeSymbol</a><span class="other">::</span><span class="identifier">Check</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;160</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">for&nbsp;</span><span class="other">(</span><span class="kw">const</span>&nbsp;<span class="kw">auto</span><span class="other">&amp;</span>&nbsp;<span class="identifier">p</span><span class="other">&nbsp;:&nbsp;</span><a href="./class_ClassGroupTypeSymbol_4A2AB0D837218D7420C896AD70DD74CDEAE4A3F7.html#variable_arityClassMap_AB6B6116A16AF73C477E2C751B5A2C8E72245CD7">arityClassMap</a><span class="other">)</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;161</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;162</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="other">!</span><span class="identifier">p</span><span class="other">.</span><span class="identifier">second</span><span class="other">)</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;163</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;164</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">throw&nbsp;</span><a href="./class_SymbolCheckException_C3BF15A63B1A1CB6CB6BAA8D2BA78519D93D92C4.html">SymbolCheckException</a><span class="other">(</span><span class="identifier">GetRootModuleForCurrentThread</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="string">"class&nbsp;group&nbsp;type&nbsp;symbol&nbsp;has&nbsp;no&nbsp;class&nbsp;type&nbsp;symbol"</span><span class="other">,&nbsp;</span><span class="identifier">GetSpan</span><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;165</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;166</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;167</span>&nbsp;<span class="other">}</span></span>
-            </span>
-            <br/>
         </span>
         <br/>
         <span>
@@ -262,12 +206,8 @@
         <span>
             Definition at line <a href="file/ClassTypeSymbol.hpp_599C00B4618BAF68696CCA87AD78C5B577520A99.html#38">38</a>
              of <a href="file/ClassTypeSymbol.hpp_599C00B4618BAF68696CCA87AD78C5B577520A99.html">ClassTypeSymbol.hpp</a>
-            :<br/>
-            <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;38</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="string">"ClassGroupTypeSymbol"</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
-            </span>
-            <br/>
         </span>
+        <br/>
         <br/>
         <span>
             Base class overridden functions: <a href="./class_ContainerSymbol_4B08BF3CBF422A1BDE2F14FAEAF47E262AA566CC.html#function_ClassName_89669E070A33919DA464776855DF5F48ACC1C9AF">cmajor::symbols::ContainerSymbol::ClassName</a>
@@ -277,36 +217,19 @@
         <br/>
         <br/>
         <hr/>
-        <h3 id="function_CreateDefaultIrValue_C68324F34BE5AA0999AB858C04F06E975359EEFD">CreateDefaultIrValue Member Function</h3>
+        <h3 id="function_CreateDefaultIrValue_3CBA1633E6AF56612F57183DA489172591D2D3D2">CreateDefaultIrValue Member Function</h3>
         <h4>
             <span class="kw">void</span>
-            * cmajor::symbols::ClassGroupTypeSymbol::CreateDefaultIrValue(<a href="./../../../ir/html/content/class_Emitter_154396B281E1F2C3ECA7612F1A3AD2E408E7D595.html">Emitter</a>
-            &amp; emitter) <span class="kw">override</span>
+            * cmajor::symbols::ClassGroupTypeSymbol::CreateDefaultIrValue(Emitter&amp; emitter) <span class="kw">override</span>
         </h4>
         <span>
             Definition at line <a href="file/ClassTypeSymbol.cpp_5F7DBA8F4C8719ADA0A886EEDC1D953D7C104148.html#102">102</a>
              of <a href="file/ClassTypeSymbol.cpp_5F7DBA8F4C8719ADA0A886EEDC1D953D7C104148.html">ClassTypeSymbol.cpp</a>
-            :<br/>
-            <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;103</span>&nbsp;<span class="other">{</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;104</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">Assert</span><span class="other">(</span><span class="kw">false</span><span class="other">,&nbsp;</span><span class="string">"tried&nbsp;to&nbsp;create&nbsp;default&nbsp;ir&nbsp;value&nbsp;of&nbsp;class&nbsp;group"</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;105</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">nullptr</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;106</span>&nbsp;<span class="other">}</span></span>
-            </span>
-            <br/>
         </span>
         <br/>
         <span>
             Declaration at line <a href="file/ClassTypeSymbol.hpp_599C00B4618BAF68696CCA87AD78C5B577520A99.html#32">32</a>
              of <a href="file/ClassTypeSymbol.hpp_599C00B4618BAF68696CCA87AD78C5B577520A99.html">ClassTypeSymbol.hpp</a>
-        </span>
-        <br/>
-        <br/>
-        <span>
-            Base class overridden functions: <a href="./class_TypeSymbol_E4B881CC0D40D6232A69F240FA90045A54D93258.html#function_CreateDefaultIrValue_06FCAEC93D661C5D73CA1961BACA37E1156F3838">cmajor::symbols::TypeSymbol::CreateDefaultIrValue</a>
         </span>
         <br/>
         <br/>
@@ -320,27 +243,6 @@
         <span>
             Definition at line <a href="file/ClassTypeSymbol.cpp_5F7DBA8F4C8719ADA0A886EEDC1D953D7C104148.html#120">120</a>
              of <a href="file/ClassTypeSymbol.cpp_5F7DBA8F4C8719ADA0A886EEDC1D953D7C104148.html">ClassTypeSymbol.cpp</a>
-            :<br/>
-            <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;121</span>&nbsp;<span class="other">{</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;122</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">auto</span>&nbsp;<span class="identifier">it</span>&nbsp;<span class="other">=</span>&nbsp;<a href="./class_ClassGroupTypeSymbol_4A2AB0D837218D7420C896AD70DD74CDEAE4A3F7.html#variable_arityClassMap_AB6B6116A16AF73C477E2C751B5A2C8E72245CD7">arityClassMap</a><span class="other">.</span><span class="identifier">find</span><span class="other">(</span><span class="identifier">arity</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;123</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if&nbsp;</span><span class="other">(</span><span class="identifier">it</span><span class="other">&nbsp;!=&nbsp;</span><a href="./class_ClassGroupTypeSymbol_4A2AB0D837218D7420C896AD70DD74CDEAE4A3F7.html#variable_arityClassMap_AB6B6116A16AF73C477E2C751B5A2C8E72245CD7">arityClassMap</a><span class="other">.</span><span class="identifier">cend</span><span class="other">(</span><span class="other">)</span><span class="other">)</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;124</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;125</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_ClassTypeSymbol_706F15CDE917688D403DB002B3816EE91C6F66CB.html">ClassTypeSymbol</a><span class="other">*</span>&nbsp;<span class="identifier">classTypeSymbol</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">it</span><span class="other">-></span><span class="identifier">second</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;126</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">classTypeSymbol</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;127</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;128</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">nullptr</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;129</span>&nbsp;<span class="other">}</span></span>
-            </span>
-            <br/>
         </span>
         <br/>
         <span>
@@ -385,12 +287,8 @@
         <span>
             Definition at line <a href="file/ClassTypeSymbol.hpp_599C00B4618BAF68696CCA87AD78C5B577520A99.html#37">37</a>
              of <a href="file/ClassTypeSymbol.hpp_599C00B4618BAF68696CCA87AD78C5B577520A99.html">ClassTypeSymbol.hpp</a>
-            :<br/>
-            <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;37</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">Name</span><span class="other">(</span><span class="other">)</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
-            </span>
-            <br/>
         </span>
+        <br/>
         <br/>
         <span>
             Base class overridden functions: <a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_Info_4C298F9C10CD52551E26E8A155C24685D4DB6BC1">cmajor::symbols::Symbol::Info</a>
@@ -403,36 +301,19 @@
         <br/>
         <br/>
         <hr/>
-        <h3 id="function_IrType_CBF894906030E05C9E948276936FB17C057977F3">IrType Member Function</h3>
+        <h3 id="function_IrType_36C34DE8606FA297F19F10FA27547E69B02FF43D">IrType Member Function</h3>
         <h4>
             <span class="kw">void</span>
-            * cmajor::symbols::ClassGroupTypeSymbol::IrType(<a href="./../../../ir/html/content/class_Emitter_154396B281E1F2C3ECA7612F1A3AD2E408E7D595.html">Emitter</a>
-            &amp; emitter) <span class="kw">override</span>
+            * cmajor::symbols::ClassGroupTypeSymbol::IrType(Emitter&amp; emitter) <span class="kw">override</span>
         </h4>
         <span>
             Definition at line <a href="file/ClassTypeSymbol.cpp_5F7DBA8F4C8719ADA0A886EEDC1D953D7C104148.html#96">96</a>
              of <a href="file/ClassTypeSymbol.cpp_5F7DBA8F4C8719ADA0A886EEDC1D953D7C104148.html">ClassTypeSymbol.cpp</a>
-            :<br/>
-            <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;97</span>&nbsp;<span class="other">{</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;98</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">Assert</span><span class="other">(</span><span class="kw">false</span><span class="other">,&nbsp;</span><span class="string">"tried&nbsp;to&nbsp;get&nbsp;ir&nbsp;type&nbsp;of&nbsp;class&nbsp;group"</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;99</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">nullptr</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;100</span>&nbsp;<span class="other">}</span></span>
-            </span>
-            <br/>
         </span>
         <br/>
         <span>
             Declaration at line <a href="file/ClassTypeSymbol.hpp_599C00B4618BAF68696CCA87AD78C5B577520A99.html#31">31</a>
              of <a href="file/ClassTypeSymbol.hpp_599C00B4618BAF68696CCA87AD78C5B577520A99.html">ClassTypeSymbol.hpp</a>
-        </span>
-        <br/>
-        <br/>
-        <span>
-            Base class overridden functions: <a href="./class_TypeSymbol_E4B881CC0D40D6232A69F240FA90045A54D93258.html#function_IrType_CF492E4F6EE5C2476955057615923BBB6B3B1F13">cmajor::symbols::TypeSymbol::IrType</a>
         </span>
         <br/>
         <br/>
@@ -445,12 +326,8 @@
         <span>
             Definition at line <a href="file/ClassTypeSymbol.hpp_599C00B4618BAF68696CCA87AD78C5B577520A99.html#28">28</a>
              of <a href="file/ClassTypeSymbol.hpp_599C00B4618BAF68696CCA87AD78C5B577520A99.html">ClassTypeSymbol.hpp</a>
-            :<br/>
-            <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;28</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">false</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
-            </span>
-            <br/>
         </span>
+        <br/>
         <br/>
         <span>
             Base class overridden functions: <a href="./class_Symbol_7AEBC014717F74E379D617070579BCDAE3CACAA3.html#function_IsExportSymbol_5EE363EF759C8DCC5B65A8068A8449A49E653F8B">cmajor::symbols::Symbol::IsExportSymbol</a>
@@ -466,12 +343,8 @@
         <span>
             Definition at line <a href="file/ClassTypeSymbol.hpp_599C00B4618BAF68696CCA87AD78C5B577520A99.html#30">30</a>
              of <a href="file/ClassTypeSymbol.hpp_599C00B4618BAF68696CCA87AD78C5B577520A99.html">ClassTypeSymbol.hpp</a>
-            :<br/>
-            <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;30</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">true</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
-            </span>
-            <br/>
         </span>
+        <br/>
         <br/>
         <span>
             Base class overridden functions: <a href="./class_TypeSymbol_E4B881CC0D40D6232A69F240FA90045A54D93258.html#function_IsInComplete_8B6CA5E772D0944D0B3584BA061F9DF0D14F91AB">cmajor::symbols::TypeSymbol::IsInComplete</a>
@@ -486,12 +359,8 @@
         <span>
             Definition at line <a href="file/ClassTypeSymbol.hpp_599C00B4618BAF68696CCA87AD78C5B577520A99.html#29">29</a>
              of <a href="file/ClassTypeSymbol.hpp_599C00B4618BAF68696CCA87AD78C5B577520A99.html">ClassTypeSymbol.hpp</a>
-            :<br/>
-            <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;29</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="string">"class_group"</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
-            </span>
-            <br/>
         </span>
+        <br/>
         <br/>
         <span>
             Base class overridden functions: <a href="./class_ContainerSymbol_4B08BF3CBF422A1BDE2F14FAEAF47E262AA566CC.html#function_TypeString_1E515530A6BC6C6CF524EA70FAD935C67F70BDB9">cmajor::symbols::ContainerSymbol::TypeString</a>

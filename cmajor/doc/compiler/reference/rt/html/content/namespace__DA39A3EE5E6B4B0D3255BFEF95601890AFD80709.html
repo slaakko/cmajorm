@@ -2422,7 +2422,7 @@
              RtDispose(<span class="kw">void</span>
             * ptr)</h4>
         <span>
-            Definition at line <a href="file/Memory.cpp_6A02691CDDF974E227CA4F856608BDF86FE50AA2.html#238">238</a>
+            Definition at line <a href="file/Memory.cpp_6A02691CDDF974E227CA4F856608BDF86FE50AA2.html#239">239</a>
              of <a href="file/Memory.cpp_6A02691CDDF974E227CA4F856608BDF86FE50AA2.html">Memory.cpp</a>
         </span>
         <br/>
@@ -3650,7 +3650,7 @@
             <span class="kw">void</span>
             * RtMemAlloc(int64_t size)</h4>
         <span>
-            Definition at line <a href="file/Memory.cpp_6A02691CDDF974E227CA4F856608BDF86FE50AA2.html#233">233</a>
+            Definition at line <a href="file/Memory.cpp_6A02691CDDF974E227CA4F856608BDF86FE50AA2.html#234">234</a>
              of <a href="file/Memory.cpp_6A02691CDDF974E227CA4F856608BDF86FE50AA2.html">Memory.cpp</a>
         </span>
         <br/>
@@ -3668,7 +3668,7 @@
             <span class="kw">char</span>
             * info)</h4>
         <span>
-            Definition at line <a href="file/Memory.cpp_6A02691CDDF974E227CA4F856608BDF86FE50AA2.html#213">213</a>
+            Definition at line <a href="file/Memory.cpp_6A02691CDDF974E227CA4F856608BDF86FE50AA2.html#214">214</a>
              of <a href="file/Memory.cpp_6A02691CDDF974E227CA4F856608BDF86FE50AA2.html">Memory.cpp</a>
         </span>
         <br/>
@@ -3694,7 +3694,7 @@
              RtMemFree(<span class="kw">void</span>
             * ptr)</h4>
         <span>
-            Definition at line <a href="file/Memory.cpp_6A02691CDDF974E227CA4F856608BDF86FE50AA2.html#246">246</a>
+            Definition at line <a href="file/Memory.cpp_6A02691CDDF974E227CA4F856608BDF86FE50AA2.html#247">247</a>
              of <a href="file/Memory.cpp_6A02691CDDF974E227CA4F856608BDF86FE50AA2.html">Memory.cpp</a>
         </span>
         <br/>
@@ -3711,7 +3711,7 @@
              RtMemZero(<span class="kw">void</span>
             * ptr, int64_t size)</h4>
         <span>
-            Definition at line <a href="file/Memory.cpp_6A02691CDDF974E227CA4F856608BDF86FE50AA2.html#251">251</a>
+            Definition at line <a href="file/Memory.cpp_6A02691CDDF974E227CA4F856608BDF86FE50AA2.html#252">252</a>
              of <a href="file/Memory.cpp_6A02691CDDF974E227CA4F856608BDF86FE50AA2.html">Memory.cpp</a>
         </span>
         <br/>
@@ -5045,27 +5045,6 @@
         <span>
             Definition at line <a href="file/BZ2Interface.c_0BAC96CF1B7E8278698339846A481EED4549D7EB.html#83">83</a>
              of <a href="file/BZ2Interface.c_0BAC96CF1B7E8278698339846A481EED4549D7EB.html">BZ2Interface.c</a>
-            :<br/>
-            <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;84</span>&nbsp;<span class="other">{</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;85</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">bz_stream</span><span class="other">*</span>&nbsp;<span class="identifier">strm</span>&nbsp;<span class="other">=</span>&nbsp;<span class="other">(</span><span class="identifier">bz_stream</span><span class="other">*</span><span class="other">)</span><span class="identifier">handle</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;86</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">strm</span><span class="other">-></span><span class="identifier">next_out</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">outChunk</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;87</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">strm</span><span class="other">-></span><span class="identifier">avail_out</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">outChunkSize</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;88</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">int</span>&nbsp;<span class="identifier">ret</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">BZ2_bzCompress</span><span class="other">(</span><span class="identifier">strm</span><span class="other">,&nbsp;</span><span class="identifier">action</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;89</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">*</span><span class="identifier">have</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">outChunkSize</span><span class="other">&nbsp;-&nbsp;</span><span class="identifier">strm</span><span class="other">-></span><span class="identifier">avail_out</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;90</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">*</span><span class="identifier">outAvail</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">strm</span><span class="other">-></span><span class="identifier">avail_out</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;91</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">ret</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;92</span>&nbsp;<span class="other">}</span></span>
-            </span>
-            <br/>
         </span>
         <br/>
         <span>
@@ -5083,29 +5062,6 @@
         <span>
             Definition at line <a href="file/BZ2Interface.c_0BAC96CF1B7E8278698339846A481EED4549D7EB.html#94">94</a>
              of <a href="file/BZ2Interface.c_0BAC96CF1B7E8278698339846A481EED4549D7EB.html">BZ2Interface.c</a>
-            :<br/>
-            <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;95</span>&nbsp;<span class="other">{</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;96</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">bz_stream</span><span class="other">*</span>&nbsp;<span class="identifier">strm</span>&nbsp;<span class="other">=</span>&nbsp;<span class="other">(</span><span class="identifier">bz_stream</span><span class="other">*</span><span class="other">)</span><span class="identifier">handle</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;97</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">strm</span><span class="other">-></span><span class="identifier">next_out</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">outChunk</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;98</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">strm</span><span class="other">-></span><span class="identifier">avail_out</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">outChunkSize</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;99</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">int32_t</span>&nbsp;<span class="identifier">ret</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">BZ2_bzDecompress</span><span class="other">(</span><span class="identifier">strm</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">100</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">*</span><span class="identifier">have</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">outChunkSize</span><span class="other">&nbsp;-&nbsp;</span><span class="identifier">strm</span><span class="other">-></span><span class="identifier">avail_out</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">101</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">*</span><span class="identifier">outAvail</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">strm</span><span class="other">-></span><span class="identifier">avail_out</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">102</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">*</span><span class="identifier">inAvail</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">strm</span><span class="other">-></span><span class="identifier">avail_in</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">103</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">ret</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">104</span>&nbsp;<span class="other">}</span></span>
-            </span>
-            <br/>
         </span>
         <br/>
         <span>
@@ -5174,19 +5130,6 @@
         <span>
             Definition at line <a href="file/BZ2Interface.c_0BAC96CF1B7E8278698339846A481EED4549D7EB.html#76">76</a>
              of <a href="file/BZ2Interface.c_0BAC96CF1B7E8278698339846A481EED4549D7EB.html">BZ2Interface.c</a>
-            :<br/>
-            <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;77</span>&nbsp;<span class="other">{</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;78</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">bz_stream</span><span class="other">*</span>&nbsp;<span class="identifier">strm</span>&nbsp;<span class="other">=</span>&nbsp;<span class="other">(</span><span class="identifier">bz_stream</span><span class="other">*</span><span class="other">)</span><span class="identifier">handle</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;79</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">strm</span><span class="other">-></span><span class="identifier">next_in</span><span class="other">&nbsp;=&nbsp;</span><span class="other">(</span><span class="kw">char</span><span class="other">*</span><span class="other">)</span><span class="identifier">inChunk</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;80</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">strm</span><span class="other">-></span><span class="identifier">avail_in</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">inAvail</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;81</span>&nbsp;<span class="other">}</span></span>
-            </span>
-            <br/>
         </span>
         <br/>
         <span>
@@ -5206,16 +5149,8 @@
         <span>
             Definition at line <a href="file/Socket.hpp_8D31BFD6327B4C37D8C4787C6D95011163F5F7E8.html#21">21</a>
              of <a href="file/Socket.hpp_8D31BFD6327B4C37D8C4787C6D95011163F5F7E8.html">Socket.hpp</a>
-            :<br/>
-            <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">22</span>&nbsp;<span class="other">{</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">23</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<a href="./enum_ConnectOptions_915E12F2426BCA283ADB493783DA114D926817CA.html">ConnectOptions</a><span class="other">(</span><span class="identifier">int32_t</span><span class="other">(</span><span class="identifier">left</span><span class="other">)</span><span class="other">&nbsp;&amp;&nbsp;</span><span class="identifier">int32_t</span><span class="other">(</span><span class="identifier">right</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">24</span>&nbsp;<span class="other">}</span></span>
-            </span>
-            <br/>
         </span>
+        <br/>
         <br/>
         <hr/>
         <h3 id="function_operator_and_B20337425411DBE35D069C777EF9BC0BC5F6374E">operator&amp; Function</h3>
@@ -5228,16 +5163,8 @@
         <span>
             Definition at line <a href="file/Io.hpp_6018649EA1BEA1DEEF0EBB3852E98FE16384D4D1.html#29">29</a>
              of <a href="file/Io.hpp_6018649EA1BEA1DEEF0EBB3852E98FE16384D4D1.html">Io.hpp</a>
-            :<br/>
-            <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">30</span>&nbsp;<span class="other">{</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">31</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<a href="./enum_OpenMode_F3DD14171959950898B3FB604B356AE109B6E608.html">OpenMode</a><span class="other">(</span><span class="identifier">uint8_t</span><span class="other">(</span><span class="identifier">left</span><span class="other">)</span><span class="other">&nbsp;&amp;&nbsp;</span><span class="identifier">uint8_t</span><span class="other">(</span><span class="identifier">right</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">32</span>&nbsp;<span class="other">}</span></span>
-            </span>
-            <br/>
         </span>
+        <br/>
         <br/>
         <hr/>
         <h3 id="function_operator_or_40879757B01B3E6B91862EB0D47236B2689FFA9A">operator| Function</h3>
@@ -5250,16 +5177,8 @@
         <span>
             Definition at line <a href="file/Socket.hpp_8D31BFD6327B4C37D8C4787C6D95011163F5F7E8.html#26">26</a>
              of <a href="file/Socket.hpp_8D31BFD6327B4C37D8C4787C6D95011163F5F7E8.html">Socket.hpp</a>
-            :<br/>
-            <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">27</span>&nbsp;<span class="other">{</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">28</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<a href="./enum_ConnectOptions_915E12F2426BCA283ADB493783DA114D926817CA.html">ConnectOptions</a><span class="other">(</span><span class="identifier">int32_t</span><span class="other">(</span><span class="identifier">left</span><span class="other">)</span><span class="other">&nbsp;|&nbsp;</span><span class="identifier">int32_t</span><span class="other">(</span><span class="identifier">right</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">29</span>&nbsp;<span class="other">}</span></span>
-            </span>
-            <br/>
         </span>
+        <br/>
         <br/>
         <hr/>
         <h3 id="function_operator_or_E1A634DAD6A4596E464ACE8DB4790196E85B8EF5">operator| Function</h3>
@@ -5272,16 +5191,8 @@
         <span>
             Definition at line <a href="file/Io.hpp_6018649EA1BEA1DEEF0EBB3852E98FE16384D4D1.html#34">34</a>
              of <a href="file/Io.hpp_6018649EA1BEA1DEEF0EBB3852E98FE16384D4D1.html">Io.hpp</a>
-            :<br/>
-            <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">35</span>&nbsp;<span class="other">{</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">36</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<a href="./enum_OpenMode_F3DD14171959950898B3FB604B356AE109B6E608.html">OpenMode</a><span class="other">(</span><span class="identifier">uint8_t</span><span class="other">(</span><span class="identifier">left</span><span class="other">)</span><span class="other">&nbsp;|&nbsp;</span><span class="identifier">uint8_t</span><span class="other">(</span><span class="identifier">right</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">37</span>&nbsp;<span class="other">}</span></span>
-            </span>
-            <br/>
         </span>
+        <br/>
         <br/>
         <hr/>
         <h3 id="function_zlib_deflate_88B86C12D64EA07EECD97684AAF50FD7368F0EF3">zlib_deflate Function</h3>
@@ -5292,27 +5203,6 @@
         <span>
             Definition at line <a href="file/ZlibInterface.c_AC81C29F9396FC9CC1028B2808B33BC729E10CDA.html#80">80</a>
              of <a href="file/ZlibInterface.c_AC81C29F9396FC9CC1028B2808B33BC729E10CDA.html">ZlibInterface.c</a>
-            :<br/>
-            <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;81</span>&nbsp;<span class="other">{</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;82</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">z_stream</span><span class="other">*</span>&nbsp;<span class="identifier">strm</span>&nbsp;<span class="other">=</span>&nbsp;<span class="other">(</span><span class="identifier">z_stream</span><span class="other">*</span><span class="other">)</span><span class="identifier">handle</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;83</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">strm</span><span class="other">-></span><span class="identifier">next_out</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">outChunk</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;84</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">strm</span><span class="other">-></span><span class="identifier">avail_out</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">outChunkSize</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;85</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">int</span>&nbsp;<span class="identifier">ret</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">deflate</span><span class="other">(</span><span class="identifier">strm</span><span class="other">,&nbsp;</span><span class="identifier">flush</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;86</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">*</span><span class="identifier">have</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">outChunkSize</span><span class="other">&nbsp;-&nbsp;</span><span class="identifier">strm</span><span class="other">-></span><span class="identifier">avail_out</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;87</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">*</span><span class="identifier">outAvail</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">strm</span><span class="other">-></span><span class="identifier">avail_out</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;88</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">ret</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;89</span>&nbsp;<span class="other">}</span></span>
-            </span>
-            <br/>
         </span>
         <br/>
         <span>
@@ -5347,29 +5237,6 @@
         <span>
             Definition at line <a href="file/ZlibInterface.c_AC81C29F9396FC9CC1028B2808B33BC729E10CDA.html#91">91</a>
              of <a href="file/ZlibInterface.c_AC81C29F9396FC9CC1028B2808B33BC729E10CDA.html">ZlibInterface.c</a>
-            :<br/>
-            <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;92</span>&nbsp;<span class="other">{</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;93</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">z_stream</span><span class="other">*</span>&nbsp;<span class="identifier">strm</span>&nbsp;<span class="other">=</span>&nbsp;<span class="other">(</span><span class="identifier">z_stream</span><span class="other">*</span><span class="other">)</span><span class="identifier">handle</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;94</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">strm</span><span class="other">-></span><span class="identifier">next_out</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">outChunk</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;95</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">strm</span><span class="other">-></span><span class="identifier">avail_out</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">outChunkSize</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;96</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">int</span>&nbsp;<span class="identifier">ret</span>&nbsp;<span class="other">=</span>&nbsp;<span class="identifier">inflate</span><span class="other">(</span><span class="identifier">strm</span><span class="other">,&nbsp;</span><span class="identifier">Z_NO_FLUSH</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;97</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">*</span><span class="identifier">have</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">outChunkSize</span><span class="other">&nbsp;-&nbsp;</span><span class="identifier">strm</span><span class="other">-></span><span class="identifier">avail_out</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;98</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">*</span><span class="identifier">outAvail</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">strm</span><span class="other">-></span><span class="identifier">avail_out</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;99</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">*</span><span class="identifier">inAvail</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">strm</span><span class="other">-></span><span class="identifier">avail_in</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">100</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">ret</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">101</span>&nbsp;<span class="other">}</span></span>
-            </span>
-            <br/>
         </span>
         <br/>
         <span>
@@ -5421,19 +5288,6 @@
         <span>
             Definition at line <a href="file/ZlibInterface.c_AC81C29F9396FC9CC1028B2808B33BC729E10CDA.html#73">73</a>
              of <a href="file/ZlibInterface.c_AC81C29F9396FC9CC1028B2808B33BC729E10CDA.html">ZlibInterface.c</a>
-            :<br/>
-            <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;74</span>&nbsp;<span class="other">{</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;75</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">z_stream</span><span class="other">*</span>&nbsp;<span class="identifier">strm</span>&nbsp;<span class="other">=</span>&nbsp;<span class="other">(</span><span class="identifier">z_stream</span><span class="other">*</span><span class="other">)</span><span class="identifier">handle</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;76</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">strm</span><span class="other">-></span><span class="identifier">next_in</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">inChunk</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;77</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">strm</span><span class="other">-></span><span class="identifier">avail_in</span><span class="other">&nbsp;=&nbsp;</span><span class="identifier">inAvail</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">&nbsp;78</span>&nbsp;<span class="other">}</span></span>
-            </span>
-            <br/>
         </span>
         <br/>
         <span>

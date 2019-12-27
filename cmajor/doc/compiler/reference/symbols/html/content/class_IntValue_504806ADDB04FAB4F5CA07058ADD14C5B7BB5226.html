@@ -1,7 +1,7 @@
 <html>
     <head>
         <meta charset="utf-8"/>
-        <title>IntValue Class</title>
+        <title>IntValue Abstract Class</title>
         <link href="../style/style.css" rel="stylesheet" type="text/css"/>
         <script src="class_IntValue_504806ADDB04FAB4F5CA07058ADD14C5B7BB5226_inheritance.js" type="text/javascript"> </script>
     </head>
@@ -11,7 +11,7 @@
          | <a href="class_IntTypeSymbol_71EF6529A3FFCAD7809021FD313C31474BC3FF0B.html">prev</a>
          | <a href="struct_IntegralValue_97B864A8B25A7E1B93A00A2165B209665CD8CD79.html">next</a>
         <hr/>
-        <h1>IntValue Class</h1>
+        <h1>IntValue Abstract Class</h1>
         <div class="diagram">
             <svg height="0" id="classInheritanceDiagram" version="2.0" width="0" xmlns="http://www.w3.org/2000/svg"/>
         </div>
@@ -23,14 +23,14 @@
         <h2>Constructors</h2>
         <table class="constructorTable">
             <tr>
-                <td class="constructorTableFirstCol" xml:space="preserve"><a href="class_IntValue_504806ADDB04FAB4F5CA07058ADD14C5B7BB5226.html#constructor_IntValue_E8C22BD70E4714DDE81C3F2F34CCAE9A3E75ACA7">IntValue</a>(<span class="kw">const </span><a href="./../../../soulng/lexer/html/content/struct_Span_30EE73A264B60937695144F1BD60852CA010DF7E.html">Span</a>&amp; span_, int32_t value_)</td>
+                <td class="constructorTableFirstCol" xml:space="preserve"><a href="class_IntValue_504806ADDB04FAB4F5CA07058ADD14C5B7BB5226.html#constructor_IntValue_B72A1E409CEB6C7F235EFCE850569DB490C63F4F">IntValue</a>(<span class="kw">const </span>Span&amp; span_, int32_t value_)</td>
             </tr>
         </table>
         <h2>Member Functions</h2>
         <table class="functionTable">
             <tr>
                 <td class="functionTableFirstCol" xml:space="preserve"><a href="./class_Value_D656BD8E5EC910AF6747A38C3979A4A9B1E41ED4.html">Value</a>*</td>
-                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_IntValue_504806ADDB04FAB4F5CA07058ADD14C5B7BB5226.html#function_As_6793BF26312A2173710D786D4874FB69540AEFA8">As</a>(<a href="./class_TypeSymbol_E4B881CC0D40D6232A69F240FA90045A54D93258.html">TypeSymbol</a>* targetType, <span class="kw">bool</span> cast, <span class="kw">const </span><a href="./../../../soulng/lexer/html/content/struct_Span_30EE73A264B60937695144F1BD60852CA010DF7E.html">Span</a>&amp; span, <span class="kw">bool</span> dontThrow) <span class="kw">const override</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_IntValue_504806ADDB04FAB4F5CA07058ADD14C5B7BB5226.html#function_As_811960B81CA90D57414600E30BCEA9039DC799A7">As</a>(<a href="./class_TypeSymbol_E4B881CC0D40D6232A69F240FA90045A54D93258.html">TypeSymbol</a>* targetType, <span class="kw">bool</span> cast, <span class="kw">const </span>Span&amp; span, <span class="kw">bool</span> dontThrow) <span class="kw">const</span></td>
             </tr>
             <tr>
                 <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">const </span><span class="kw">char</span>*</td>
@@ -50,11 +50,11 @@
             </tr>
             <tr>
                 <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span>*</td>
-                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_IntValue_504806ADDB04FAB4F5CA07058ADD14C5B7BB5226.html#function_IrValue_00EC74D0ABE81A6B095DDD511FE3807AE3F25B87">IrValue</a>(<a href="./../../../ir/html/content/class_Emitter_154396B281E1F2C3ECA7612F1A3AD2E408E7D595.html">Emitter</a>&amp; emitter) <span class="kw">override</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_IntValue_504806ADDB04FAB4F5CA07058ADD14C5B7BB5226.html#function_IrValue_93414737950036239E9C6DDABECD12518FF9AD3B">IrValue</a>(Emitter&amp; emitter)</td>
             </tr>
             <tr>
                 <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
-                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_IntValue_504806ADDB04FAB4F5CA07058ADD14C5B7BB5226.html#function_Read_CE29E25381CE3FC8D00C406C230C8C5F52F38B54">Read</a>(<a href="./../../../soulng/util/html/content/class_BinaryReader_A09089526873F7BFDE3CAFC3BAE5A3A652113045.html">BinaryReader</a>&amp; reader) <span class="kw">override</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_IntValue_504806ADDB04FAB4F5CA07058ADD14C5B7BB5226.html#function_Read_D5C144A3F8159179EC6CBD3770E28BA34B502C25">Read</a>(BinaryReader&amp; reader) <span class="kw">override</span></td>
             </tr>
             <tr>
                 <td class="functionTableFirstCol" xml:space="preserve">std::string</td>
@@ -62,7 +62,7 @@
             </tr>
             <tr>
                 <td class="functionTableFirstCol" xml:space="preserve"><span class="kw">void</span></td>
-                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_IntValue_504806ADDB04FAB4F5CA07058ADD14C5B7BB5226.html#function_Write_617DF002B24DDBFE40D7A76DB59F6BFDE57DD12B">Write</a>(<a href="./../../../soulng/util/html/content/class_BinaryWriter_0D40DDC5D57867D529F25148B10988402235B9CF.html">BinaryWriter</a>&amp; writer) <span class="kw">override</span></td>
+                <td class="functionTableSecondCol" xml:space="preserve"><a href="class_IntValue_504806ADDB04FAB4F5CA07058ADD14C5B7BB5226.html#function_Write_E15B90402B89D79525AA19D73D180B3926B51531">Write</a>(BinaryWriter&amp; writer) <span class="kw">override</span></td>
             </tr>
         </table>
         <h2>Typedefs</h2>
@@ -81,56 +81,30 @@
         </table>
         <hr/>
         <h2>Constructor Details</h2>
-        <h3 id="constructor_IntValue_E8C22BD70E4714DDE81C3F2F34CCAE9A3E75ACA7">IntValue Constructor</h3>
+        <h3 id="constructor_IntValue_B72A1E409CEB6C7F235EFCE850569DB490C63F4F">IntValue Constructor</h3>
         <h4>
             cmajor::symbols::IntValue::IntValue(<span class="kw">const </span>
-            <a href="./../../../soulng/lexer/html/content/struct_Span_30EE73A264B60937695144F1BD60852CA010DF7E.html">Span</a>
-            &amp; span_, int32_t value_)</h4>
+            Span&amp; span_, int32_t value_)</h4>
         <span>
             Definition at line <a href="file/Value.cpp_ED09D65179F021B285B24E062BC9E332CD23723B.html#1336">1336</a>
              of <a href="file/Value.cpp_ED09D65179F021B285B24E062BC9E332CD23723B.html">Value.cpp</a>
-            :<br/>
-            <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">1336</span>&nbsp;<span class="other">:</span>&nbsp;<a href="./class_Value_D656BD8E5EC910AF6747A38C3979A4A9B1E41ED4.html">Value</a><span class="other">(</span><span class="identifier">span_</span><span class="other">,&nbsp;</span><a href="./enum_ValueType_53EFA2370B12A6CDF7C96369C9FA53A351665CB2.html">ValueType</a><span class="other">::</span><a href="./enum_ValueType_53EFA2370B12A6CDF7C96369C9FA53A351665CB2.html#enumerator_intValue_72ECC0538883F4F3B6F7BD7A9F7E62DEF2ADB62A">intValue</a><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_IntValue_504806ADDB04FAB4F5CA07058ADD14C5B7BB5226.html#variable_value_37C9A411EB65C93D2BF407262A99E8C5B9FABA5C">value</a><span class="other">(</span><span class="identifier">value_</span><span class="other">)</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1337</span>&nbsp;<span class="other">{</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1338</span>&nbsp;<span class="other">}</span></span>
-            </span>
-            <br/>
-        </span>
-        <br/>
-        <span>
-            Declaration at line <a href="file/Value.hpp_45E7078418BA8D3A0BA8B999AFD3E02EADAD2B5B.html#157">157</a>
-             of <a href="file/Value.hpp_45E7078418BA8D3A0BA8B999AFD3E02EADAD2B5B.html">Value.hpp</a>
         </span>
         <br/>
         <br/>
         <hr/>
         <h2>Member Function Details</h2>
-        <h3 id="function_As_6793BF26312A2173710D786D4874FB69540AEFA8">As Member Function</h3>
+        <h3 id="function_As_811960B81CA90D57414600E30BCEA9039DC799A7">As Member Function</h3>
         <h4>
             <a href="./class_Value_D656BD8E5EC910AF6747A38C3979A4A9B1E41ED4.html">Value</a>
             * cmajor::symbols::IntValue::As(<a href="./class_TypeSymbol_E4B881CC0D40D6232A69F240FA90045A54D93258.html">TypeSymbol</a>
             * targetType, <span class="kw">bool</span>
              cast, <span class="kw">const </span>
-            <a href="./../../../soulng/lexer/html/content/struct_Span_30EE73A264B60937695144F1BD60852CA010DF7E.html">Span</a>
-            &amp; span, <span class="kw">bool</span>
-             dontThrow) <span class="kw">const override</span>
+            Span&amp; span, <span class="kw">bool</span>
+             dontThrow) <span class="kw">const</span>
         </h4>
         <span>
             Definition at line <a href="file/Value.cpp_ED09D65179F021B285B24E062BC9E332CD23723B.html#1355">1355</a>
              of <a href="file/Value.cpp_ED09D65179F021B285B24E062BC9E332CD23723B.html">Value.cpp</a>
-        </span>
-        <br/>
-        <span>
-            Declaration at line <a href="file/Value.hpp_45E7078418BA8D3A0BA8B999AFD3E02EADAD2B5B.html#162">162</a>
-             of <a href="file/Value.hpp_45E7078418BA8D3A0BA8B999AFD3E02EADAD2B5B.html">Value.hpp</a>
-        </span>
-        <br/>
-        <br/>
-        <span>
-            Base class overridden functions: <a href="./class_Value_D656BD8E5EC910AF6747A38C3979A4A9B1E41ED4.html#function_As_1C54933A4C34963D07764F14356395A49372051C">cmajor::symbols::Value::As</a>
         </span>
         <br/>
         <br/>
@@ -150,12 +124,8 @@
         <span>
             Definition at line <a href="file/Value.hpp_45E7078418BA8D3A0BA8B999AFD3E02EADAD2B5B.html#166">166</a>
              of <a href="file/Value.hpp_45E7078418BA8D3A0BA8B999AFD3E02EADAD2B5B.html">Value.hpp</a>
-            :<br/>
-            <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">166</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="string">"IntValue"</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
-            </span>
-            <br/>
         </span>
+        <br/>
         <br/>
         <span>
             Base class overridden functions: <a href="./class_Value_D656BD8E5EC910AF6747A38C3979A4A9B1E41ED4.html#function_ClassName_CFF16D1ED1838560F82258BF6D6F0EF46777BCB6">cmajor::symbols::Value::ClassName</a>
@@ -171,12 +141,8 @@
         <span>
             Definition at line <a href="file/Value.hpp_45E7078418BA8D3A0BA8B999AFD3E02EADAD2B5B.html#158">158</a>
              of <a href="file/Value.hpp_45E7078418BA8D3A0BA8B999AFD3E02EADAD2B5B.html">Value.hpp</a>
-            :<br/>
-            <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">158</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="kw">new&nbsp;</span><a href="./class_IntValue_504806ADDB04FAB4F5CA07058ADD14C5B7BB5226.html">IntValue</a><span class="other">(</span><span class="identifier">GetSpan</span><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><a href="./class_IntValue_504806ADDB04FAB4F5CA07058ADD14C5B7BB5226.html#variable_value_37C9A411EB65C93D2BF407262A99E8C5B9FABA5C">value</a><span class="other">)</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
-            </span>
-            <br/>
         </span>
+        <br/>
         <br/>
         <span>
             Base class overridden functions: <a href="./class_Value_D656BD8E5EC910AF6747A38C3979A4A9B1E41ED4.html#function_Clone_62B968BDB2F1127A90D4EADA95E8E660C18710F3">cmajor::symbols::Value::Clone</a>
@@ -198,15 +164,6 @@
         <span>
             Definition at line <a href="file/Value.cpp_ED09D65179F021B285B24E062BC9E332CD23723B.html#1569">1569</a>
              of <a href="file/Value.cpp_ED09D65179F021B285B24E062BC9E332CD23723B.html">Value.cpp</a>
-            :<br/>
-            <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">1570</span>&nbsp;<span class="other">{</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1571</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">symbolTable</span><span class="other">-></span><span class="identifier">GetTypeByName</span><span class="other">(</span><span class="string">U"int"</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1572</span>&nbsp;<span class="other">}</span></span>
-            </span>
-            <br/>
         </span>
         <br/>
         <span>
@@ -233,69 +190,29 @@
         <span>
             Definition at line <a href="file/Value.hpp_45E7078418BA8D3A0BA8B999AFD3E02EADAD2B5B.html#165">165</a>
              of <a href="file/Value.hpp_45E7078418BA8D3A0BA8B999AFD3E02EADAD2B5B.html">Value.hpp</a>
-            :<br/>
-            <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">165</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<a href="./class_IntValue_504806ADDB04FAB4F5CA07058ADD14C5B7BB5226.html#variable_value_37C9A411EB65C93D2BF407262A99E8C5B9FABA5C">value</a><span class="other">;</span>&nbsp;<span class="other">}</span></span>
-            </span>
-            <br/>
         </span>
         <br/>
+        <br/>
         <hr/>
-        <h3 id="function_IrValue_00EC74D0ABE81A6B095DDD511FE3807AE3F25B87">IrValue Member Function</h3>
+        <h3 id="function_IrValue_93414737950036239E9C6DDABECD12518FF9AD3B">IrValue Member Function</h3>
         <h4>
             <span class="kw">void</span>
-            * cmajor::symbols::IntValue::IrValue(<a href="./../../../ir/html/content/class_Emitter_154396B281E1F2C3ECA7612F1A3AD2E408E7D595.html">Emitter</a>
-            &amp; emitter) <span class="kw">override</span>
-        </h4>
+            * cmajor::symbols::IntValue::IrValue(Emitter&amp; emitter)</h4>
         <span>
             Definition at line <a href="file/Value.cpp_ED09D65179F021B285B24E062BC9E332CD23723B.html#1340">1340</a>
              of <a href="file/Value.cpp_ED09D65179F021B285B24E062BC9E332CD23723B.html">Value.cpp</a>
-            :<br/>
-            <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">1341</span>&nbsp;<span class="other">{</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1342</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">emitter</span><span class="other">.</span><span class="identifier">CreateIrValueForInt</span><span class="other">(</span><a href="./class_IntValue_504806ADDB04FAB4F5CA07058ADD14C5B7BB5226.html#variable_value_37C9A411EB65C93D2BF407262A99E8C5B9FABA5C">value</a><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1343</span>&nbsp;<span class="other">}</span></span>
-            </span>
-            <br/>
-        </span>
-        <br/>
-        <span>
-            Declaration at line <a href="file/Value.hpp_45E7078418BA8D3A0BA8B999AFD3E02EADAD2B5B.html#159">159</a>
-             of <a href="file/Value.hpp_45E7078418BA8D3A0BA8B999AFD3E02EADAD2B5B.html">Value.hpp</a>
-        </span>
-        <br/>
-        <br/>
-        <span>
-            Base class overridden functions: <a href="./class_Value_D656BD8E5EC910AF6747A38C3979A4A9B1E41ED4.html#function_IrValue_AFB463C478AA879E8D63059DF8C551FB7BE96153">cmajor::symbols::Value::IrValue</a>
-        </span>
-        <br/>
-        <br/>
-        <span>
-            Calls: <a href="./../../../ir/html/content/class_Emitter_154396B281E1F2C3ECA7612F1A3AD2E408E7D595.html#function_CreateIrValueForInt_E9095C11F67D57B69570407CD6746E649A11CEFC">cmajor::ir::Emitter::CreateIrValueForInt</a>
         </span>
         <br/>
         <br/>
         <hr/>
-        <h3 id="function_Read_CE29E25381CE3FC8D00C406C230C8C5F52F38B54">Read Member Function</h3>
+        <h3 id="function_Read_D5C144A3F8159179EC6CBD3770E28BA34B502C25">Read Member Function</h3>
         <h4>
             <span class="kw">void</span>
-             cmajor::symbols::IntValue::Read(<a href="./../../../soulng/util/html/content/class_BinaryReader_A09089526873F7BFDE3CAFC3BAE5A3A652113045.html">BinaryReader</a>
-            &amp; reader) <span class="kw">override</span>
+             cmajor::symbols::IntValue::Read(BinaryReader&amp; reader) <span class="kw">override</span>
         </h4>
         <span>
             Definition at line <a href="file/Value.cpp_ED09D65179F021B285B24E062BC9E332CD23723B.html#1350">1350</a>
              of <a href="file/Value.cpp_ED09D65179F021B285B24E062BC9E332CD23723B.html">Value.cpp</a>
-            :<br/>
-            <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">1351</span>&nbsp;<span class="other">{</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1352</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="./class_IntValue_504806ADDB04FAB4F5CA07058ADD14C5B7BB5226.html#variable_value_37C9A411EB65C93D2BF407262A99E8C5B9FABA5C">value</a><span class="other">&nbsp;=&nbsp;</span><span class="identifier">reader</span><span class="other">.</span><span class="identifier">ReadInt</span><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1353</span>&nbsp;<span class="other">}</span></span>
-            </span>
-            <br/>
         </span>
         <br/>
         <span>
@@ -305,12 +222,7 @@
         <br/>
         <br/>
         <span>
-            Base class overridden functions: <a href="./class_Value_D656BD8E5EC910AF6747A38C3979A4A9B1E41ED4.html#function_Read_8A81AF9A5F5807C9DB9DD46FEBD06EB43B61D61C">cmajor::symbols::Value::Read</a>
-        </span>
-        <br/>
-        <br/>
-        <span>
-            Calls: <a href="./../../../soulng/util/html/content/class_BinaryReader_A09089526873F7BFDE3CAFC3BAE5A3A652113045.html#function_ReadInt_23EA54457C8067B9307866124A1D5DE6A4D1AE13">soulng::util::BinaryReader::ReadInt</a>
+            Base class overridden functions: <a href="./class_Value_D656BD8E5EC910AF6747A38C3979A4A9B1E41ED4.html#function_Read_A44DC4EA4922863478675D4887A431A53102193C">cmajor::symbols::Value::Read</a>
         </span>
         <br/>
         <br/>
@@ -322,12 +234,8 @@
         <span>
             Definition at line <a href="file/Value.hpp_45E7078418BA8D3A0BA8B999AFD3E02EADAD2B5B.html#163">163</a>
              of <a href="file/Value.hpp_45E7078418BA8D3A0BA8B999AFD3E02EADAD2B5B.html">Value.hpp</a>
-            :<br/>
-            <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">163</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">std</span><span class="other">::</span><span class="identifier">to_string</span><span class="other">(</span><a href="./class_IntValue_504806ADDB04FAB4F5CA07058ADD14C5B7BB5226.html#variable_value_37C9A411EB65C93D2BF407262A99E8C5B9FABA5C">value</a><span class="other">)</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
-            </span>
-            <br/>
         </span>
+        <br/>
         <br/>
         <span>
             Base class overridden functions: <a href="./class_Value_D656BD8E5EC910AF6747A38C3979A4A9B1E41ED4.html#function_ToString_048E414E143C3C85B8F9B37CBB43BBBDAD077110">cmajor::symbols::Value::ToString</a>
@@ -335,24 +243,14 @@
         <br/>
         <br/>
         <hr/>
-        <h3 id="function_Write_617DF002B24DDBFE40D7A76DB59F6BFDE57DD12B">Write Member Function</h3>
+        <h3 id="function_Write_E15B90402B89D79525AA19D73D180B3926B51531">Write Member Function</h3>
         <h4>
             <span class="kw">void</span>
-             cmajor::symbols::IntValue::Write(<a href="./../../../soulng/util/html/content/class_BinaryWriter_0D40DDC5D57867D529F25148B10988402235B9CF.html">BinaryWriter</a>
-            &amp; writer) <span class="kw">override</span>
+             cmajor::symbols::IntValue::Write(BinaryWriter&amp; writer) <span class="kw">override</span>
         </h4>
         <span>
             Definition at line <a href="file/Value.cpp_ED09D65179F021B285B24E062BC9E332CD23723B.html#1345">1345</a>
              of <a href="file/Value.cpp_ED09D65179F021B285B24E062BC9E332CD23723B.html">Value.cpp</a>
-            :<br/>
-            <span class="code">
-                <span class="code" xml:space="preserve"><span class="lineNumber">1346</span>&nbsp;<span class="other">{</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1347</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">writer</span><span class="other">.</span><span class="identifier">Write</span><span class="other">(</span><a href="./class_IntValue_504806ADDB04FAB4F5CA07058ADD14C5B7BB5226.html#variable_value_37C9A411EB65C93D2BF407262A99E8C5B9FABA5C">value</a><span class="other">)</span><span class="other">;</span></span>
-                <br/>
-                <span class="code" xml:space="preserve"><span class="lineNumber">1348</span>&nbsp;<span class="other">}</span></span>
-            </span>
-            <br/>
         </span>
         <br/>
         <span>
@@ -362,12 +260,17 @@
         <br/>
         <br/>
         <span>
-            Base class overridden functions: <a href="./class_Value_D656BD8E5EC910AF6747A38C3979A4A9B1E41ED4.html#function_Write_355E85D64F4E08AC8C9397FC8D4E9D3AA4AAFDA3">cmajor::symbols::Value::Write</a>
+            Base class overridden functions: <a href="./class_Value_D656BD8E5EC910AF6747A38C3979A4A9B1E41ED4.html#function_Write_56B82DC1EED375CF92592459C25E859671F72E55">cmajor::symbols::Value::Write</a>
         </span>
         <br/>
         <br/>
         <span>
-            Calls: <a href="./../../../soulng/util/html/content/class_BinaryWriter_0D40DDC5D57867D529F25148B10988402235B9CF.html#function_Write_49E900F8FCBEE026FB051B768287EF8640B06FED">soulng::util::BinaryWriter::Write</a>
+            Calls: <a href="./class_IntValue_504806ADDB04FAB4F5CA07058ADD14C5B7BB5226.html#function_Write_E15B90402B89D79525AA19D73D180B3926B51531">cmajor::symbols::IntValue::Write</a>
+        </span>
+        <br/>
+        <br/>
+        <span>
+            Called by: <a href="./class_IntValue_504806ADDB04FAB4F5CA07058ADD14C5B7BB5226.html#function_Write_E15B90402B89D79525AA19D73D180B3926B51531">cmajor::symbols::IntValue::Write</a>
         </span>
         <br/>
         <br/>
