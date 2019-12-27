@@ -8,6 +8,7 @@
 #include <soulng/util/System.hpp>
 #include <soulng/util/TextUtils.hpp>
 #include <llvm/Support/raw_os_ostream.h>
+#include <llvm/IR/Module.h>
 #include <llvm/IR/Verifier.h>
 #include <llvm/IR/LegacyPassManager.h>
 #include <llvm/Support/FileSystem.h>
