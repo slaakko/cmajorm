@@ -1,0 +1,121 @@
+// =================================
+// Copyright (c) 2019 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Collections;
+
+namespace System.Windows.API
+{
+    public string GetWindowsAPIErrorMessage(ulong errorCode)
+    {
+        char[4096] buffer;
+        OsFormatMessage(errorCode, &buffer[0]);
+        return string(&buffer[0]);
+    }
+    
+    public class WindowsAPIException : Exception
+    {
+        public WindowsAPIException(ulong errorCode_) : base(GetWindowsAPIErrorMessage(errorCode_)), errorCode(errorCode_)
+        {
+        }
+        public ulong ErrorCode() const
+        {
+            return errorCode;
+        }
+        private ulong errorCode;
+    }
+    
+    public void* FindFirstChangeNotification(const string& directoryPath)
+    {
+        void* notificationHandle = WinFindFirstChangeNotification(directoryPath.Chars());
+        if (notificationHandle == null)
+        {
+            throw WindowsAPIException(WinGetLastError());
+        }
+        return notificationHandle;
+    }
+    
+    public void FindNextChangeNotification(void* notificationHandle)
+    {
+        bool result = WinFindNextChangeNotification(notificationHandle);
+        if (!result)
+        {
+            throw WindowsAPIException(WinGetLastError());
+        }
+    }
+    
+    public void FindCloseChangeNotification(void* notificationHandle)
+    {
+        bool result = WinFindCloseChangeNotification(notificationHandle);
+        if (!result)
+        {
+            throw WindowsAPIException(WinGetLastError());
+        }
+    }
+    
+    public void* CreateEvent()
+    {
+        void* eventHandle = WinCreateEvent();
+        if (eventHandle == null)
+        {
+            throw WindowsAPIException(WinGetLastError());
+        }
+        return eventHandle;
+    }
+    
+    public void SetEvent(void* eventHandle)
+    {
+        bool result = WinSetEvent(eventHandle);
+        if (!result)
+        {
+            throw WindowsAPIException(WinGetLastError());
+        }
+    }
+    
+    public void ResetEvent(void* eventHandle)
+    {
+        bool result = WinResetEvent(eventHandle);
+        if (!result)
+        {
+            throw WindowsAPIException(WinGetLastError());
+        }
+    }
+    
+    public void WaitEvent(void* eventHandle)
+    {
+        bool result = WinWaitEvent(eventHandle);
+        if (!result)
+        {
+            throw WindowsAPIException(WinGetLastError());
+        }
+    }
+    
+    public void CloseHandle(void* handle)
+    {
+        bool result = WinCloseHandle(handle);
+        if (!result)
+        {
+            throw WindowsAPIException(WinGetLastError());
+        }
+    }
+    
+    public void CloseEvent(void* eventHandle)
+    {
+        CloseHandle(eventHandle);
+    }
+    
+    public int WaitForMultipleObjects(const List<void*>& handles)
+    {
+        int result = WinWaitForMultipleObjects(cast<uint>(handles.Count()), handles.Begin().Ptr());
+        if (result >= 0 && result <= handles.Count())
+        {
+            return result;
+        }
+        else
+        {
+            throw WindowsAPIException(WinGetLastError());
+        }
+    }
+}

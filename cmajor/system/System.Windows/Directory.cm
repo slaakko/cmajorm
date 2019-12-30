@@ -1,0 +1,121 @@
+// =================================
+// Copyright (c) 2019 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Collections;
+using System.Windows.API;
+
+namespace System.Windows.IO
+{
+    public delegate void DirectoryChangedFunction(const string& directoryPath);
+    
+    public class delegate void DirectoryChangedMethod(const string& directoryPath);
+    
+    public class DirectoryChangeNotifier
+    {
+        public nothrow DirectoryChangeNotifier() : 
+            notificationHandle(null), waitCanceledEventHandle(null), directoryPath(), firstTime(true), waiting(false)
+        {
+        }
+        public nothrow DirectoryChangeNotifier(void* notificationHandle_, const string& directoryPath_) : 
+            notificationHandle(notificationHandle_), waitCanceledEventHandle(CreateEvent()), directoryPath(directoryPath_), firstTime(true), waiting(false)
+        {       
+        }
+        public ~DirectoryChangeNotifier()
+        {
+            try
+            {
+                if (waiting)
+                {
+                    CancelWait();
+                }
+                if (notificationHandle != null)
+                {
+                    FindCloseChangeNotification(notificationHandle);
+                }
+                if (waitCanceledEventHandle != null)
+                {
+                    CloseEvent(waitCanceledEventHandle);
+                }
+            }            
+            catch (const Exception&)
+            {
+            }
+        }
+        public suppress DirectoryChangeNotifier(const DirectoryChangeNotifier&);
+        public suppress void operator=(const DirectoryChangeNotifier&);
+        public DirectoryChangeNotifier(DirectoryChangeNotifier&& that) : 
+            notificationHandle(that.notificationHandle), waitCanceledEventHandle(that.waitCanceledEventHandle), directoryPath(that.directoryPath), firstTime(that.firstTime), waiting(that.waiting)
+        {
+            that.notificationHandle = null;
+            that.waitCanceledEventHandle = null;
+            that.directoryPath.Clear();
+            that.firstTime = false;
+            that.waiting = false;
+        }
+        public default nothrow void operator=(DirectoryChangeNotifier&& that);
+        public void WaitAndCallWhenDirectoryChanged(DirectoryChangedFunction callback)
+        {
+            if (WaitUntilDirectoryChangedOrWaitCanceled())
+            {
+                callback(directoryPath);
+            }
+        }
+        public void WaitAndCallWhenDirectoryChanged(DirectoryChangedMethod callback)
+        {
+            if (WaitUntilDirectoryChangedOrWaitCanceled())
+            {
+                callback(directoryPath);
+            }
+        }
+        public bool WaitUntilDirectoryChangedOrWaitCanceled()
+        {
+            if (firstTime)
+            {
+                firstTime = false;
+            }        
+            else
+            {
+                FindNextChangeNotification(notificationHandle);
+            }
+            List<void*> handles;
+            handles.Add(notificationHandle);
+            handles.Add(waitCanceledEventHandle);
+            waiting = true;
+            int index = WaitForMultipleObjects(handles);
+            waiting = false;
+            return index == 0;
+        }
+        public void CancelWait()
+        {
+            if (waiting)
+            {
+                waiting = false;
+                SetEvent(waitCanceledEventHandle);
+            }            
+        }
+        void* notificationHandle;
+        void* waitCanceledEventHandle;
+        string directoryPath;
+        bool firstTime;
+        bool waiting;
+    }
+    
+    public static class Directory
+    {
+        public static DirectoryChangeNotifier NotifyChanged(const string& directoryPath)
+        {
+            if (System.IO.Directory.Exists(directoryPath))
+            {
+                void* handle = FindFirstChangeNotification(directoryPath);
+                return DirectoryChangeNotifier(handle, directoryPath);
+            }
+            else
+            {
+                throw System.IO.FileSystemException("directory '" + directoryPath + "' does not exist");
+            }
+        }
+    }    
+}

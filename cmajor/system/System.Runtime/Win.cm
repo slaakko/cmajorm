@@ -1,0 +1,16 @@
+// =================================
+// Copyright (c) 2019 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+public extern cdecl nothrow ulong WinGetLastError();
+public extern cdecl nothrow void WinFormatMessage(ulong errorCode, char* buffer);
+public extern cdecl nothrow void* WinCreateEvent();
+public extern cdecl nothrow bool WinSetEvent(void* eventHandle);
+public extern cdecl nothrow bool WinResetEvent(void* eventHandle);
+public extern cdecl nothrow bool WinWaitEvent(void* eventHandle);
+public extern cdecl nothrow bool WinCloseHandle(void* handle);
+public extern cdecl nothrow int WinWaitForMultipleObjects(uint count, void** handles);
+public extern cdecl nothrow void* WinFindFirstChangeNotification(const char* directoryPath);
+public extern cdecl nothrow bool WinFindNextChangeNotification(void* handle);
+public extern cdecl nothrow bool WinFindCloseChangeNotification(void* handle);

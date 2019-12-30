@@ -1,0 +1,61 @@
+using System;
+using System.Threading;
+
+class DirectoryWatcher
+{
+    public DirectoryWatcher(const string& directoryPath_) : exiting(false), directoryPath(directoryPath_)
+    {
+    }
+    public void Start()
+    {
+        thread = Thread.StartMethod(Execute);
+    }
+    public void Stop()
+    {
+        exiting = true;
+        notifier.CancelWait();
+        thread.Join();
+    }
+    private void Execute()
+    {
+        try
+        {
+            notifier = System.Windows.IO.Directory.NotifyChanged(directoryPath);
+            while (!exiting)
+            {
+                notifier.WaitAndCallWhenDirectoryChanged(DirectoryChanged);
+            }
+        }
+        catch (const Exception& ex)
+        {
+            Console.Error() << ex.ToString() << endl();
+        }
+    }
+    private void DirectoryChanged(const string& directoryPath)
+    {
+        Console.WriteLine("directory '" + directoryPath + "' changed");
+    }
+    private string directoryPath;
+    private System.Windows.IO.DirectoryChangeNotifier notifier;
+    private Thread thread;
+    private bool exiting;
+}
+
+int main()
+{
+    try
+    {
+        Console.WriteLine("begin watching... (press enter to exit)");
+        DirectoryWatcher watcher("D:/temp/watchThisDir");
+        watcher.Start();
+        Console.ReadLine();
+        watcher.Stop();
+        Console.WriteLine("exiting.");
+    }
+    catch (const Exception& ex)
+    {
+        Console.Error() << ex.ToString() << endl();
+        return 1;
+    }
+    return 0;
+}
