@@ -1,22 +1,58 @@
-// =================================
-// Copyright (c) 2019 Seppo Laakko
-// Distributed under the MIT license
-// =================================
-
 using System;
 using System.Collections;
-using System.IO;
+
+// this file has been semiautomatically generated from 'D:/work/soulng-project/sngxml/dom/Parser.hpp' using cpp2cm version 1.0.0
+
+// this file has been semiautomatically generated from 'D:/work/soulng-project/sngxml/dom/Parser.cpp' using cpp2cm version 1.0.0
 
 namespace System.Dom
 {
-    public class DomDocumentBuilder : System.Xml.XmlContentHandler
+    public enum Flags : int
     {
-        public DomDocumentBuilder() : document(new DomDocument())
+        none = 0, debug = 1 << 0
+    }
+    public inline Flags operator&(Flags flags, Flags flag)
+    {
+        return cast<Flags>(cast<int>(flags) & cast<int>(flag));
+    }
+    public inline Flags operator|(Flags flags, Flags flag)
+    {
+        return cast<Flags>(cast<int>(flags) | cast<int>(flag));
+    }
+    public inline Flags operator~(Flags flags)
+    {
+        return cast<Flags>(~cast<int>(flags));
+    }
+    public class DomDocumentHandler : System.Xml.XmlContentHandler
+    {
+        public DomDocumentHandler() :
+            document(new Document())
         {
         }
-        public UniquePtr<DomDocument> GetDocument()
+        public UniquePtr<Document> GetDocument()
         {
             return Rvalue(document);
+        }
+        public void AddTextContent()
+        {
+            AddTextContent(false);
+        }
+        public void AddTextContent(bool addSpace)
+        {
+            if (!currentElement.IsNull())
+            {
+                ustring text = TrimAll(textContent);
+                if (!text.IsEmpty())
+                {
+                    if (addSpace)
+                    {
+                        text.Append(' ', 1);
+                    }
+                    UniquePtr<Node> textNode(new System.Dom.Text(text));
+                    currentElement->AppendChild(Rvalue(textNode));
+                }
+            }
+            textContent.Clear();
         }
         public override void StartDocument()
         {
@@ -24,9 +60,9 @@ namespace System.Dom
         public override void EndDocument()
         {
         }
-        public override void Version(const ustring& version)
+        public override void Version(const ustring& xmlVersion)
         {
-            document->SetXmlVersion(version);
+            document->SetXmlVersion(xmlVersion);
         }
         public override void Standalone(bool standalone)
         {
@@ -36,14 +72,14 @@ namespace System.Dom
         {
             document->SetXmlEncoding(encoding);
         }
-        public override void Text(const ustring& text)
+        public override void HandleText(const ustring& text)
         {
             textContent.Append(text);
         }
-        public override void Comment(const ustring& comment)
+        public override void HandleComment(const ustring& comment)
         {
             AddTextContent();
-            UniquePtr<DomNode> commentNode(new DomComment(comment));
+            UniquePtr<Node> commentNode(new Comment(comment));
             if (!currentElement.IsNull())
             {
                 currentElement->AppendChild(Rvalue(commentNode));
@@ -53,22 +89,23 @@ namespace System.Dom
                 document->AppendChild(Rvalue(commentNode));
             }
         }
-        public override void PI(const ustring& target, const ustring& data)
+        public override void HandlePI(const ustring& target, const ustring& data)
         {
             AddTextContent();
-            UniquePtr<DomNode> processingInstruction(new DomProcessingInstruction(target, data));
+            UniquePtr<Node> processingInstructionNode(new ProcessingInstruction(target, data));
             if (!currentElement.IsNull())
             {
-                currentElement->AppendChild(Rvalue(processingInstruction));
+                currentElement->AppendChild(Rvalue(processingInstructionNode));
             }
             else
             {
-                document->AppendChild(Rvalue(processingInstruction));
+                document->AppendChild(Rvalue(processingInstructionNode));
             }
         }
-        public override void CDataSection(const ustring& cdata)
+        public override void HandleCDataSection(const ustring& data)
         {
-            UniquePtr<DomNode> cdataSection(new DomCDataSection(cdata));
+            AddTextContent();
+            UniquePtr<Node> cdataSection(new CDataSection(data));
             if (!currentElement.IsNull())
             {
                 currentElement->AppendChild(Rvalue(cdataSection));
@@ -80,17 +117,15 @@ namespace System.Dom
         }
         public override void StartElement(const ustring& namespaceUri, const ustring& localName, const ustring& qualifiedName, const System.Xml.Attributes& attributes)
         {
-            AddTextContent();
+            AddTextContent(true);
             elementStack.Push(Rvalue(currentElement));
-            List<UniquePtr<DomAttr>> attrs;
-            Map<ustring, DomAttr*> attrMap;
-            for (const System.Xml.Attribute& attribute : attributes)
+            Map<ustring, Attr*> attrs;
+            for (const System.Xml.Attribute& attr : attributes)
             {
-                DomAttr* attr = new DomAttr(attribute.QualifiedName(), attribute.Value());
-                attrs.Add(UniquePtr<DomAttr>(attr));
-                attrMap[attribute.QualifiedName()] = attr;
+                attrs[attr.QualifiedName()] = new Attr(attr.QualifiedName(), attr.Value());
             }
-            currentElement.Reset(new DomElement(qualifiedName, Rvalue(attrs), Rvalue(attrMap)));
+            currentElement.Reset(new Element(qualifiedName, Rvalue(attrs)));
+            currentElement->InternalSetOwnerDocument(document.Get());
             if (!namespaceUri.IsEmpty())
             {
                 currentElement->InternalSetNamespaceUri(namespaceUri);
@@ -99,59 +134,48 @@ namespace System.Dom
         public override void EndElement(const ustring& namespaceUri, const ustring& localName, const ustring& qualifiedName)
         {
             AddTextContent();
-            UniquePtr<DomElement> parentElement = elementStack.Pop();
+            UniquePtr<Element> parentElement = Rvalue(elementStack.Top());
+            elementStack.Pop();
             if (!parentElement.IsNull())
             {
-                parentElement->AppendChild(UniquePtr<DomNode>(currentElement.Release()));
+                parentElement->AppendChild(UniquePtr<Node>(currentElement.Release()));
                 currentElement = Rvalue(parentElement);
             }
             else
             {
-                document->AppendChild(UniquePtr<DomNode>(currentElement.Release()));
-            }        
+                document->AppendChild(UniquePtr<Node>(currentElement.Release()));
+            }
         }
         public override void SkippedEntity(const ustring& entityName)
         {
         }
-        private void AddTextContent()
-        {
-            if (!currentElement.IsNull())
-            {
-                ustring text = TrimAll(textContent);
-                if (!text.IsEmpty())
-                {
-                    UniquePtr<DomNode> textNode(new DomText(u"text", text));
-                    currentElement->AppendChild(Rvalue(textNode));
-                }                
-            }
-            textContent.Clear();
-        }        
-        private UniquePtr<DomDocument> document;
-        private UniquePtr<DomElement> currentElement;
-        private Stack<UniquePtr<DomElement>> elementStack;
+        private UniquePtr<Document> document;
+        private UniquePtr<Element> currentElement;
+        private Stack<UniquePtr<Element>> elementStack;
         private ustring textContent;
     }
-    
-    public UniquePtr<DomDocument> ParseXmlFileToDomDocument(const string& xmlFileName)
+    public UniquePtr<Document> ParseDocument(const ustring& content, const string& systemId)
     {
-        string xmlContent = File.ReadAllText(xmlFileName);
-        return ParseXmlContentToDomDocument(xmlContent, xmlFileName);
+        return ParseDocument(content, systemId, Flags.none);
     }
-
-    public UniquePtr<DomDocument> ParseXmlContentToDomDocument(const string& xmlContent, const string& systemId)
+    public UniquePtr<Document> ParseDocument(const ustring& content, const string& systemId, Flags flags)
     {
-        return ParseXmlContentToDomDocument(ToUtf32(xmlContent), systemId);
+        DomDocumentHandler domDocumentHandler;
+        System.Xml.Flags xmlFlags = System.Xml.Flags.none;
+        if ((flags & Flags.debug) != Flags.none)
+        {
+            xmlFlags = xmlFlags | System.Xml.Flags.debug;
+        }
+        System.Xml.ParseXmlContent(content, systemId, &domDocumentHandler, xmlFlags);
+        return domDocumentHandler.GetDocument();
     }
-        
-    public UniquePtr<DomDocument> ParseXmlContentToDomDocument(const wstring& xmlContent, const string& systemId)
+    public UniquePtr<Document> ReadDocument(const string& fileName)
     {
-        return ParseXmlContentToDomDocument(ToUtf32(xmlContent), systemId);
+        return ReadDocument(fileName, Flags.none);
     }
-    
-    public UniquePtr<DomDocument> ParseXmlContentToDomDocument(const ustring& xmlContent, const string& systemId)
+    public UniquePtr<Document> ReadDocument(const string& fileName, Flags flags)
     {
-        DomDocumentBuilder domDocumentBuilder;
-        System.Xml.ParseXmlContent(xmlContent, systemId, &domDocumentBuilder);
-        return domDocumentBuilder.GetDocument();
+        ustring content = ToUtf32(System.IO.File.ReadAllText(fileName));
+        return ParseDocument(content, fileName, flags);
     }
-}
+} // namespace System.Dom

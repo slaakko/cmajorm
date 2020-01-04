@@ -7,6 +7,7 @@
 #define CMAJOR_SYMBOLS_MODULE_INCLUDED
 #include <cmajor/symbols/SymbolTable.hpp>
 #include <cmajor/symbols/Warning.hpp>
+#include <sngcm/ast/Project.hpp>
 #include <sngcm/cmlexer/CmajorLexer.hpp>
 #include <soulng/util/CodeFormatter.hpp>
 #include <mutex>
@@ -91,7 +92,7 @@ class SYMBOLS_API Module
 public:
     Module();
     Module(const std::string& filePath);
-    Module(const std::u32string& name_, const std::string& filePath_);
+    Module(const std::u32string& name_, const std::string& filePath_, sngcm::ast::Target target);
     uint8_t Format() const { return format; }
     ModuleFlags Flags() const { return flags; }
     const std::u32string& Name() const { return name; }
@@ -99,7 +100,7 @@ public:
     const std::string& FilePathReadFrom() const { return filePathReadFrom; }
     const std::string& LibraryFilePath() const { return libraryFilePath; }
     const std::vector<Module*> AllReferencedModules() const { return allRefModules; }
-    void PrepareForCompilation(const std::vector<std::string>& references);
+    void PrepareForCompilation(const std::vector<std::string>& references, sngcm::ast::Target target);
     SymbolTable& GetSymbolTable() { return *symbolTable; }
     bool HasSymbolTable() const { return symbolTable != nullptr; }
     void CreateSymbolTable();
@@ -151,7 +152,7 @@ public:
     std::vector<Module*>& ReferencedModules() { return referencedModules; }
     void AddReferencedModule(Module* referencedModule);
     const std::vector<std::string>& ReferenceFilePaths() const { return referenceFilePaths; }
-    void ReadHeader(SymbolReader& reader, Module* rootModule, std::unordered_set<std::string>& importSet, std::vector<Module*>& modules,
+    void ReadHeader(sngcm::ast::Target target, SymbolReader& reader, Module* rootModule, std::unordered_set<std::string>& importSet, std::vector<Module*>& modules,
         std::unordered_map<std::string, ModuleDependency*>& moduleDependencyMap, std::unordered_map<std::string, Module*>& readMap);
     int DebugLogIndent() const { return debugLogIndent; }
     void IncDebugLogIndent() { ++debugLogIndent; }

@@ -62,7 +62,9 @@ parser api(SNGCM_PARSER_API) ProjectFileParser
 
     Target : sngcm::ast::Target
         ::= PROGRAM{ return sngcm::ast::Target::program; }
+        |   WINAPP{ return sngcm::ast::Target::winapp; }
         |   LIBRARY{ return sngcm::ast::Target::library; }
+        |   WINLIB{ return sngcm::ast::Target::winlib; }
         |   UNITTEST{ return sngcm::ast::Target::unitTest; }
         ;
 

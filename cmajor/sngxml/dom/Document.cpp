@@ -13,7 +13,7 @@ namespace sngxml { namespace dom {
 
 using namespace soulng::unicode;
 
-Document::Document() : ParentNode(NodeType::documentNode, U"document"), documentElement(nullptr), docType(nullptr), indexValid(false), xmlStandalone(false)
+Document::Document() : ParentNode(NodeType::documentNode, U"document"), documentElement(nullptr), indexValid(false), xmlStandalone(false)
 {
 }
 
@@ -85,10 +85,6 @@ std::unique_ptr<Node> Document::RemoveChild(Node* oldChild)
     {
         documentElement = nullptr;
     }
-    else if (oldChild->GetNodeType() == NodeType::documentTypeNode)
-    {
-        docType = nullptr;
-    }
     return ParentNode::RemoveChild(oldChild);
 }
 
@@ -146,7 +142,7 @@ Element* Document::GetElementById(const std::u32string& elementId)
         Accept(visitor);
         indexValid = true;
     }
-    auto it = elementsByIdMap.find(elementId);
+    std::unordered_map<std::u32string, Element*>::const_iterator it = elementsByIdMap.find(elementId);
     if (it != elementsByIdMap.cend())
     {
         Element* element = it->second;
@@ -162,13 +158,6 @@ void Document::CheckValidInsert(Node* node, Node* refNode)
         if (refNode != nullptr || documentElement != nullptr)
         {
             throw DomException("attempt to insert a second element to a document");
-        }
-    }
-    else if (node->GetNodeType() == NodeType::documentTypeNode)
-    {
-        if (refNode != nullptr || docType != nullptr)
-        {
-            throw DomException("attempt to insert a second document type node to a document");
         }
     }
 }

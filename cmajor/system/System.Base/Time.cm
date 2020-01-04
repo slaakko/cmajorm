@@ -366,4 +366,83 @@ namespace System
         if (left.GetDate() > right.GetDate()) return false;
         return left.Seconds() < right.Seconds();
     }
+    
+    public class Timestamp
+    {
+        public nothrow Timestamp() : dateTime(), nanosecs()
+        {
+        }
+        public nothrow Timestamp(const DateTime& dateTime_, int nanosecs_) : dateTime(dateTime_), nanosecs(nanosecs_)
+        {
+        }
+        public nothrow const DateTime& GetDateTime() const
+        {
+            return dateTime;
+        }
+        public nothrow int GetNanoseconds() const
+        {
+            return nanosecs;
+        }
+        public nothrow string ToString() const
+        {
+            string s(dateTime.ToString());
+            s.Append('.').Append(Format(ToString(nanosecs), 9, FormatWidth.exact, FormatJustify.right, '0'));
+            return s;
+        }
+        private DateTime dateTime;
+        private int nanosecs;
+    }
+    
+    public nothrow bool operator==(const Timestamp& left, const Timestamp& right)
+    {
+        return left.GetDateTime() == right.GetDateTime() && left.GetNanoseconds() == right.GetNanoseconds();
+    }
+    
+    public nothrow bool operator<(const Timestamp& left, const Timestamp& right)
+    {
+        if (left.GetDateTime() < right.GetDateTime()) return true;
+        if (left.GetDateTime() > right.GetDateTime()) return false;
+        return left.GetNanoseconds() < right.GetNanoseconds();
+    }
+    
+    public class TimestampProvider
+    {
+        static nothrow TimestampProvider() : instance(new TimestampProvider())
+        {
+        }
+        public static nothrow TimestampProvider& Instance()
+        {
+            return *instance;
+        }
+        private nothrow TimestampProvider()
+        {
+            Reset();
+        }
+        public nothrow Timestamp GetCurrentTimestamp()
+        {
+            if (GetCurrentDate() != startDateTime.GetDate())
+            {
+                Reset();
+            }
+            Duration elapsed = Now() - startTimePoint;
+            long elapsedNanosecs = elapsed.Nanoseconds();
+            int secs = cast<int>(elapsedNanosecs / cast<long>(1000000000));
+            int nanosecs = cast<int>(elapsedNanosecs % cast<long>(1000000000));
+            Timestamp timestamp(DateTime(startDateTime.GetDate(), startDateTime.Seconds() + secs), nanosecs);
+            return timestamp;
+        }
+        private nothrow void Reset()
+        {
+            startDateTime = GetCurrentDateTime();
+            startTimePoint = Now();
+        }
+        private static UniquePtr<TimestampProvider> instance;
+        private DateTime startDateTime;
+        private TimePoint startTimePoint;
+    }
+    
+    public nothrow Timestamp GetCurrentTimestamp()
+    {
+        return TimestampProvider.Instance().GetCurrentTimestamp();
+    }
 }

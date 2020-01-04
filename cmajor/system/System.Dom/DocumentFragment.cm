@@ -1,30 +1,31 @@
-// =================================
-// Copyright (c) 2019 Seppo Laakko
-// Distributed under the MIT license
-// =================================
-
 using System;
+using System.Collections;
+
+// this file has been semiautomatically generated from 'D:/work/soulng-project/sngxml/dom/DocumentFragment.hpp' using cpp2cm version 1.0.0
+
+// this file has been semiautomatically generated from 'D:/work/soulng-project/sngxml/dom/DocumentFragment.cpp' using cpp2cm version 1.0.0
 
 namespace System.Dom
 {
-    public class DomDocumentFragment : DomParentNode
+    public class DocumentFragment : ParentNode
     {
-        public nothrow DomDocumentFragment() : base(u"document_fragment")
+        public suppress DocumentFragment(const DocumentFragment& );
+        public suppress DocumentFragment(DocumentFragment&& );
+        public DocumentFragment() :
+            base(NodeType.documentFragmentNode, u"document_fragment")
         {
         }
-        suppress DomDocumentFragment(const DomDocumentFragment&);
-        suppress void operator=(const DomDocumentFragment&);
-        suppress DomDocumentFragment(DomDocumentFragment&&);
-        suppress void operator=(DomDocumentFragment&&);
-        public override UniquePtr<DomNode> CloneNode(bool deep) const
+        public suppress DocumentFragment& operator=(const DocumentFragment& );
+        public suppress DocumentFragment& operator=(DocumentFragment&& );
+        public override UniquePtr<Node> CloneNode(bool deep)
         {
-            UniquePtr<DomNode> clonedDocumentFragment(new DomDocumentFragment());
+            UniquePtr<Node> clonedDocumentFragment(new DocumentFragment());
             if (deep)
             {
-                DomParentNode* parentNode = cast<DomParentNode*>(clonedDocumentFragment.Get());
+                ParentNode* parentNode = cast<ParentNode*>(clonedDocumentFragment.Get());
                 CloneChildrenTo(parentNode);
             }
             return clonedDocumentFragment;
         }
     }
-}
+} // namespace System.Dom

@@ -1538,7 +1538,12 @@ std::unique_ptr<BoundFunctionCall> ResolveOverload(const std::u32string& groupNa
     ViableFunctionSet viableFunctions;
     if (currentFunction)
     {
-        boundCompileUnit.CollectViableFunctions(groupName, containerScope, arguments, currentFunction, viableFunctions, exception, span);
+        CollectFlags collectFlags = CollectFlags::none;
+        if ((flags & OverloadResolutionFlags::noRvalueRef) != OverloadResolutionFlags::none)
+        {
+            collectFlags = collectFlags | CollectFlags::noRvalueRef;
+        }
+        boundCompileUnit.CollectViableFunctions(groupName, containerScope, arguments, currentFunction, viableFunctions, exception, span, collectFlags);
     }
     if (viableFunctions.Get().empty())
     {

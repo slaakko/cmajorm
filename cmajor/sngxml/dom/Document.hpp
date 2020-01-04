@@ -11,7 +11,6 @@
 namespace sngxml { namespace dom {
 
 class Element;
-class DocumentType;
 
 class SNGXML_DOM_API Document : public ParentNode
 {
@@ -39,7 +38,6 @@ public:
     void InternalInvalidateIndex();
 private:
     Element* documentElement;
-    DocumentType* docType;
     void CheckValidInsert(Node* node, Node* refNode);
     std::unordered_map<std::u32string, Element*> elementsByIdMap;
     bool indexValid;

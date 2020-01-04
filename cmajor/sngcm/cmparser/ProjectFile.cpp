@@ -1047,6 +1047,19 @@ soulng::parser::Match ProjectFileParser::Target(ContainerFileLexer& lexer)
             }
             break;
         }
+        case WINAPP:
+        {
+            ++lexer;
+            {
+                {
+                    #ifdef SOULNG_PARSER_DEBUG_SUPPORT
+                    if (parser_debug_write_to_log) soulng::lexer::WriteSuccessToLog(lexer, parser_debug_match_span, soulng::unicode::ToUtf32("Target"));
+                    #endif // SOULNG_PARSER_DEBUG_SUPPORT
+                    return soulng::parser::Match(true, new soulng::parser::Value<sngcm::ast::Target>(sngcm::ast::Target::winapp));
+                }
+            }
+            break;
+        }
         case LIBRARY:
         {
             ++lexer;
@@ -1056,6 +1069,19 @@ soulng::parser::Match ProjectFileParser::Target(ContainerFileLexer& lexer)
                     if (parser_debug_write_to_log) soulng::lexer::WriteSuccessToLog(lexer, parser_debug_match_span, soulng::unicode::ToUtf32("Target"));
                     #endif // SOULNG_PARSER_DEBUG_SUPPORT
                     return soulng::parser::Match(true, new soulng::parser::Value<sngcm::ast::Target>(sngcm::ast::Target::library));
+                }
+            }
+            break;
+        }
+        case WINLIB:
+        {
+            ++lexer;
+            {
+                {
+                    #ifdef SOULNG_PARSER_DEBUG_SUPPORT
+                    if (parser_debug_write_to_log) soulng::lexer::WriteSuccessToLog(lexer, parser_debug_match_span, soulng::unicode::ToUtf32("Target"));
+                    #endif // SOULNG_PARSER_DEBUG_SUPPORT
+                    return soulng::parser::Match(true, new soulng::parser::Value<sngcm::ast::Target>(sngcm::ast::Target::winlib));
                 }
             }
             break;

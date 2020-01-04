@@ -1,0 +1,211 @@
+using System;
+using System.Collections;
+using System.Text;
+
+// this file has been semiautomatically generated from 'D:/work/soulng-project/sngxml/dom/CharacterData.hpp' using cpp2cm version 1.0.0
+
+// this file has been semiautomatically generated from 'D:/work/soulng-project/sngxml/dom/CharacterData.cpp' using cpp2cm version 1.0.0
+
+namespace System.Dom
+{
+    public abstract class CharacterData : Node
+    {
+        public suppress CharacterData(const CharacterData& );
+        public suppress CharacterData(CharacterData&& );
+        public CharacterData(NodeType nodeType_, const ustring& name_) :
+            base(nodeType_, name_)
+        {
+        }
+        public CharacterData(NodeType nodeType_, const ustring& name_, const ustring& data_) :
+            base(nodeType_, name_), data(data_)
+        {
+        }
+        public suppress CharacterData& operator=(const CharacterData& );
+        public suppress CharacterData& operator=(CharacterData&& );
+        public const ustring& Data() const
+        {
+            return data;
+        }
+        public ustring& Data()
+        {
+            return data;
+        }
+        public override void Write(CodeFormatter& formatter)
+        {
+            formatter.Write(ToUtf8(XmlCharDataEscape(data)));
+        }
+        public override bool ValueContainsNewLine() const
+        {
+            return data.Find('\n') != -1;
+        }
+        private ustring data;
+    }
+    public class Text : CharacterData
+    {
+        public suppress Text(const Text& );
+        public suppress Text(Text&& );
+        public Text() :
+            base(NodeType.textNode, u"text")
+        {
+        }
+        public Text(const ustring& data_) :
+            base(NodeType.textNode, u"text", data_)
+        {
+        }
+        public Text(NodeType nodeType_, const ustring& name_) :
+            base(nodeType_, name_)
+        {
+        }
+        public Text(NodeType nodeType_, const ustring& name_, const ustring& data_) :
+            base(nodeType_, name_, data_)
+        {
+        }
+        public suppress Text& operator=(const Text& );
+        public suppress Text& operator=(Text&& );
+        public override UniquePtr<Node> CloneNode(bool deep)
+        {
+            return UniquePtr<Node>(new Text(Data()));
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(this);
+        }
+    }
+    public class EntityReference : CharacterData
+    {
+        public suppress EntityReference(const EntityReference& );
+        public suppress EntityReference(EntityReference&& );
+        public EntityReference() :
+            base(NodeType.entityReferenceNode, u"entity_refefrence")
+        {
+        }
+        public EntityReference(const ustring& entityRef_) :
+            base(NodeType.entityReferenceNode, u"entity_refefrence", entityRef_)
+        {
+        }
+        public suppress EntityReference& operator=(const EntityReference& );
+        public suppress EntityReference& operator=(EntityReference&& );
+        public override void Write(CodeFormatter& formatter)
+        {
+            formatter.Write("&");
+            formatter.Write(ToUtf8(Data()));
+            formatter.Write(";");
+        }
+        public override UniquePtr<Node> CloneNode(bool deep)
+        {
+            return UniquePtr<Node>(new EntityReference(Data()));
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(this);
+        }
+    }
+    public class CDataSection : Text
+    {
+        public suppress CDataSection(const CDataSection& );
+        public suppress CDataSection(CDataSection&& );
+        public CDataSection() :
+            base(NodeType.cdataSectionNode, u"cdata_section")
+        {
+        }
+        public CDataSection(const ustring& data_) :
+            base(NodeType.cdataSectionNode, u"cdata_section", data_)
+        {
+        }
+        public suppress CDataSection& operator=(const CDataSection& );
+        public suppress CDataSection& operator=(CDataSection&& );
+        public override void Write(CodeFormatter& formatter)
+        {
+            formatter.Write("<![CDATA[");
+            formatter.Write(ToUtf8(Data()));
+            formatter.Write("]]>");
+        }
+        public override UniquePtr<Node> CloneNode(bool deep)
+        {
+            return UniquePtr<Node>(new CDataSection(Data()));
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(this);
+        }
+    }
+    public class Comment : CharacterData
+    {
+        public suppress Comment(const Comment& );
+        public suppress Comment(Comment&& );
+        public Comment() :
+            base(NodeType.commentNode, u"comment")
+        {
+        }
+        public Comment(const ustring& data_) :
+            base(NodeType.commentNode, u"comment", data_)
+        {
+        }
+        public suppress Comment& operator=(const Comment& );
+        public suppress Comment& operator=(Comment&& );
+        public override void Write(CodeFormatter& formatter)
+        {
+            formatter.Write("<!-- ");
+            formatter.Write(ToUtf8(Data()));
+            formatter.Write(" -->");
+        }
+        public override UniquePtr<Node> CloneNode(bool deep)
+        {
+            return UniquePtr<Node>(new Comment(Data()));
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(this);
+        }
+    }
+    public class ProcessingInstruction : Node
+    {
+        public suppress ProcessingInstruction(const ProcessingInstruction& );
+        public suppress ProcessingInstruction(ProcessingInstruction&& );
+        public ProcessingInstruction(const ustring& target_, const ustring& data_) :
+            base(NodeType.processingInstructionNode, u"processing_instruction"), target(target_), data(data_)
+        {
+        }
+        public suppress ProcessingInstruction& operator=(const ProcessingInstruction& );
+        public suppress ProcessingInstruction& operator=(ProcessingInstruction&& );
+        public const ustring& Target() const
+        {
+            return target;
+        }
+        public const ustring& Data() const
+        {
+            return data;
+        }
+        public override void Write(CodeFormatter& formatter)
+        {
+            formatter.WriteLine("<?" + ToUtf8(target) + " " + ToUtf8(data) + "?>");
+        }
+        public override UniquePtr<Node> CloneNode(bool deep)
+        {
+            return UniquePtr<Node>(new ProcessingInstruction(target, data));
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(this);
+        }
+        private ustring target;
+        private ustring data;
+    }
+    public ustring XmlCharDataEscape(const ustring& charData)
+    {
+        ustring result;
+        for (uchar c : charData)
+        {
+            switch (c)
+            {
+                case '<': result.Append(u"&lt;");
+                break;
+                case '&': result.Append(u"&amp;");
+                break;
+                default: result.Append(c, 1);
+                break;
+            }
+        }
+        return result;
+    }
+} // namespace System.Dom

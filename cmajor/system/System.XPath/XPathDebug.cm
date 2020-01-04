@@ -1,95 +1,110 @@
-// =================================
-// Copyright (c) 2019 Seppo Laakko
-// Distributed under the MIT license
-// =================================
-
 using System;
-using System.Dom;
+using System.Collections;
+
+// this file has been semiautomatically generated from 'D:/work/soulng-project/sngxml/xpath/XPathDebug.hpp' using cpp2cm version 1.0.0
+
+// this file has been semiautomatically generated from 'D:/work/soulng-project/sngxml/xpath/XPathDebug.cpp' using cpp2cm version 1.0.0
 
 namespace System.XPath
 {
-    public class XPathDebug
+    public class XPathDebugInfo
     {
-        static nothrow XPathDebug() : instance(new XPathDebug())
+        static XPathDebugInfo() : instance(new XPathDebugInfo())
         {
         }
-        public nothrow static XPathDebug& Instance() 
+        private XPathDebugInfo() :
+            debugParsing(false), debugQuery(false), queryDuration(0), executeDuration(0)
         {
-            return *instance;
         }
-        public nothrow inline bool DebugParsing() const
+        public bool DebugParsing() const
         {
             return debugParsing;
         }
-        public nothrow inline void SetDebugParsing()
+        public void SetDebugParsing()
         {
             debugParsing = true;
         }
-        public nothrow inline bool DebugQuery() const
+        public bool DebugQuery() const
         {
             return debugQuery;
         }
-        public nothrow inline void SetDebugQuery() 
+        public void SetDebugQuery()
         {
             debugQuery = true;
         }
-        public nothrow void SetQueryDom(UniquePtr<DomNode>&& queryDom_)
+        public void SetQueryDom(UniquePtr<System.Dom.Node>&& queryDom_)
         {
-            queryDom = queryDom_;
+            queryDom = Rvalue(queryDom_);
         }
-        public nothrow UniquePtr<DomNode> GetQueryDom()
+        public UniquePtr<System.Dom.Node> GetQueryDom()
         {
             return Rvalue(queryDom);
         }
-        public nothrow void SetQueryDuration(Duration queryDuration_)
+        public void SetQueryDuration(Duration duration)
         {
-            queryDuration = queryDuration_;
+            queryDuration = duration;
         }
-        public nothrow Duration GetQueryDuration() 
+        public Duration GetQueryDuration() const
         {
             return queryDuration;
         }
-        public nothrow void SetExecutionDuration(Duration executionDuration_)
+        public void SetExecuteDuration(Duration duration)
         {
-            executionDuration = executionDuration_;
+            executeDuration = duration;
         }
-        public nothrow Duration GetExecutionDuration()
+        public Duration GetExecuteDuration() const
         {
-            return executionDuration;
+            return executeDuration;
         }
-        private nothrow XPathDebug() : debugParsing(false), debugQuery(false)
+        public static UniquePtr<XPathDebugInfo> instance;
+        public static XPathDebugInfo& Instance()
         {
+            return *instance;
         }
-        private static UniquePtr<XPathDebug> instance;
         private bool debugParsing;
         private bool debugQuery;
-        private UniquePtr<DomNode> queryDom;
+        private UniquePtr<System.Dom.Node> queryDom;
         private Duration queryDuration;
-        private Duration executionDuration;
+        private Duration executeDuration;
     }
-
-    public nothrow bool DebugParsing()
+    public bool XPathDebugParsing()
     {
-        return XPathDebug.Instance().DebugParsing();
+        return XPathDebugInfo.Instance().DebugParsing();
     }
-    
-    public nothrow bool DebugQuery()
+    public void SetXPathDebugParsing()
     {
-        return XPathDebug.Instance().DebugQuery();
+        XPathDebugInfo.Instance().SetDebugParsing();
     }
-    
-    public nothrow void SetQueryDom(UniquePtr<DomNode>&& queryDom)
+    public bool XPathDebugQuery()
     {
-        XPathDebug.Instance().SetQueryDom(queryDom);
+        return XPathDebugInfo.Instance().DebugQuery();
     }
-    
-    public nothrow void SetQueryDuration(Duration queryDuration)
+    public void SetXPathDebugQuery()
     {
-        XPathDebug.Instance().SetQueryDuration(queryDuration);
+        XPathDebugInfo.Instance().SetDebugQuery();
     }
-    
-    public nothrow void SetExecutionDuration(Duration executionDuration)
+    public void SetXPathQueryDom(UniquePtr<System.Dom.Node>&& queryDom)
     {
-        XPathDebug.Instance().SetExecutionDuration(executionDuration);
+        XPathDebugInfo.Instance().SetQueryDom(Rvalue(queryDom));
     }
-}
+    public UniquePtr<System.Dom.Node> GetXPathQueryDom()
+    {
+        return XPathDebugInfo.Instance().GetQueryDom();
+    }
+    public void SetXPathQueryDuration(Duration duration)
+    {
+        XPathDebugInfo.Instance().SetQueryDuration(duration);
+    }
+    public Duration XPathQueryDuration()
+    {
+        return XPathDebugInfo.Instance().GetQueryDuration();
+    }
+    public void SetXPathExecuteDuration(Duration duration)
+    {
+        XPathDebugInfo.Instance().SetExecuteDuration(duration);
+    }
+    public Duration XPathExecuteDuration()
+    {
+        return XPathDebugInfo.Instance().GetExecuteDuration();
+    }
+} // namespace System.XPath

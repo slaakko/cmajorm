@@ -62,12 +62,12 @@ std::unique_ptr<XPathObject> XPathOrExpr::Evaluate(XPathContext& context)
     return rightAsBoolean;
 }
 
-std::unique_ptr<sngxml::dom::Node> XPathOrExpr::ToDom() const
+std::unique_ptr<dom::Node> XPathOrExpr::ToDom() const
 {
-    std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(U"or"));
+    std::unique_ptr<dom::Element> element(new dom::Element(U"or"));
     element->AppendChild(Left()->ToDom());
     element->AppendChild(Right()->ToDom());
-    return std::unique_ptr<sngxml::dom::Node>(element.release());
+    return std::unique_ptr<dom::Node>(element.release());
 }
 
 XPathAndExpr::XPathAndExpr(XPathExpr* left_, XPathExpr* right_) : XPathBinaryExpr(left_, right_)
@@ -100,12 +100,12 @@ std::unique_ptr<XPathObject> XPathAndExpr::Evaluate(XPathContext& context)
     return rightAsBoolean;
 }
 
-std::unique_ptr<sngxml::dom::Node> XPathAndExpr::ToDom() const
+std::unique_ptr<dom::Node> XPathAndExpr::ToDom() const
 {
-    std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(U"and"));
+    std::unique_ptr<dom::Element> element(new dom::Element(U"and"));
     element->AppendChild(Left()->ToDom());
     element->AppendChild(Right()->ToDom());
-    return std::unique_ptr<sngxml::dom::Node>(element.release());
+    return std::unique_ptr<dom::Node>(element.release());
 }
 
 std::unique_ptr<XPathObject> CompareNodeSets(XPathContext& context, XPathObject* left, XPathObject* right, Operator comparisonOp)
@@ -709,12 +709,12 @@ std::unique_ptr<XPathObject> XPathEqualExpr::Evaluate(XPathContext& context)
     return CompareEquality(context, left.get(), right.get());
 }
 
-std::unique_ptr<sngxml::dom::Node> XPathEqualExpr::ToDom() const
+std::unique_ptr<dom::Node> XPathEqualExpr::ToDom() const
 {
-    std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(U"equal"));
+    std::unique_ptr<dom::Element> element(new dom::Element(U"equal"));
     element->AppendChild(Left()->ToDom());
     element->AppendChild(Right()->ToDom());
-    return std::unique_ptr<sngxml::dom::Node>(element.release());
+    return std::unique_ptr<dom::Node>(element.release());
 }
 
 XPathNotEqualExpr::XPathNotEqualExpr(XPathExpr* left_, XPathExpr* right_) : XPathBinaryExpr(left_, right_)
@@ -733,12 +733,12 @@ std::unique_ptr<XPathObject> XPathNotEqualExpr::Evaluate(XPathContext& context)
     return std::unique_ptr<XPathObject>(new XPathBoolean(!static_cast<XPathBoolean*>(equal.get())->Value()));
 }
 
-std::unique_ptr<sngxml::dom::Node> XPathNotEqualExpr::ToDom() const
+std::unique_ptr<dom::Node> XPathNotEqualExpr::ToDom() const
 {
-    std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(U"notEqual"));
+    std::unique_ptr<dom::Element> element(new dom::Element(U"notEqual"));
     element->AppendChild(Left()->ToDom());
     element->AppendChild(Right()->ToDom());
-    return std::unique_ptr<sngxml::dom::Node>(element.release());
+    return std::unique_ptr<dom::Node>(element.release());
 }
 
 std::unique_ptr<XPathObject> Compare(XPathContext& context, XPathObject* left, XPathObject* right, Operator comparisonOp)
@@ -841,12 +841,12 @@ std::unique_ptr<XPathObject> XPathLessExpr::Evaluate(XPathContext& context)
     return Compare(context, left.get(), right.get(), Operator::less);
 }
 
-std::unique_ptr<sngxml::dom::Node> XPathLessExpr::ToDom() const
+std::unique_ptr<dom::Node> XPathLessExpr::ToDom() const
 {
-    std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(U"less"));
+    std::unique_ptr<dom::Element> element(new dom::Element(U"less"));
     element->AppendChild(Left()->ToDom());
     element->AppendChild(Right()->ToDom());
-    return std::unique_ptr<sngxml::dom::Node>(element.release());
+    return std::unique_ptr<dom::Node>(element.release());
 }
 
 XPathGreaterExpr::XPathGreaterExpr(XPathExpr* left_, XPathExpr* right_) : XPathBinaryExpr(left_, right_)
@@ -860,12 +860,12 @@ std::unique_ptr<XPathObject> XPathGreaterExpr::Evaluate(XPathContext& context)
     return Compare(context, left.get(), right.get(), Operator::greater);
 }
 
-std::unique_ptr<sngxml::dom::Node> XPathGreaterExpr::ToDom() const
+std::unique_ptr<dom::Node> XPathGreaterExpr::ToDom() const
 {
-    std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(U"greater"));
+    std::unique_ptr<dom::Element> element(new dom::Element(U"greater"));
     element->AppendChild(Left()->ToDom());
     element->AppendChild(Right()->ToDom());
-    return std::unique_ptr<sngxml::dom::Node>(element.release());
+    return std::unique_ptr<dom::Node>(element.release());
 }
 
 XPathLessOrEqualExpr::XPathLessOrEqualExpr(XPathExpr* left_, XPathExpr* right_) : XPathBinaryExpr(left_, right_)
@@ -879,12 +879,12 @@ std::unique_ptr<XPathObject> XPathLessOrEqualExpr::Evaluate(XPathContext& contex
     return Compare(context, left.get(), right.get(), Operator::lessOrEqual);
 }
 
-std::unique_ptr<sngxml::dom::Node> XPathLessOrEqualExpr::ToDom() const
+std::unique_ptr<dom::Node> XPathLessOrEqualExpr::ToDom() const
 {
-    std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(U"lessOrEqual"));
+    std::unique_ptr<dom::Element> element(new dom::Element(U"lessOrEqual"));
     element->AppendChild(Left()->ToDom());
     element->AppendChild(Right()->ToDom());
-    return std::unique_ptr<sngxml::dom::Node>(element.release());
+    return std::unique_ptr<dom::Node>(element.release());
 }
 
 XPathGreaterOrEqualExpr::XPathGreaterOrEqualExpr(XPathExpr* left_, XPathExpr* right_) : XPathBinaryExpr(left_, right_)
@@ -898,12 +898,12 @@ std::unique_ptr<XPathObject> XPathGreaterOrEqualExpr::Evaluate(XPathContext& con
     return Compare(context, left.get(), right.get(), Operator::greaterOrEqual);
 }
 
-std::unique_ptr<sngxml::dom::Node> XPathGreaterOrEqualExpr::ToDom() const
+std::unique_ptr<dom::Node> XPathGreaterOrEqualExpr::ToDom() const
 {
-    std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(U"greaterOrEqual"));
+    std::unique_ptr<dom::Element> element(new dom::Element(U"greaterOrEqual"));
     element->AppendChild(Left()->ToDom());
     element->AppendChild(Right()->ToDom());
-    return std::unique_ptr<sngxml::dom::Node>(element.release());
+    return std::unique_ptr<dom::Node>(element.release());
 }
 
 XPathAddExpr::XPathAddExpr(XPathExpr* left_, XPathExpr* right_) : XPathBinaryExpr(left_, right_)
@@ -934,12 +934,12 @@ std::unique_ptr<XPathObject> XPathAddExpr::Evaluate(XPathContext& context)
     return std::unique_ptr<XPathObject>(new XPathNumber(leftNumber + rightNumber));
 }
 
-std::unique_ptr<sngxml::dom::Node> XPathAddExpr::ToDom() const
+std::unique_ptr<dom::Node> XPathAddExpr::ToDom() const
 {
-    std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(U"add"));
+    std::unique_ptr<dom::Element> element(new dom::Element(U"add"));
     element->AppendChild(Left()->ToDom());
     element->AppendChild(Right()->ToDom());
-    return std::unique_ptr<sngxml::dom::Node>(element.release());
+    return std::unique_ptr<dom::Node>(element.release());
 }
 
 XPathSubExpr::XPathSubExpr(XPathExpr* left_, XPathExpr* right_) : XPathBinaryExpr(left_, right_)
@@ -970,12 +970,12 @@ std::unique_ptr<XPathObject> XPathSubExpr::Evaluate(XPathContext& context)
     return std::unique_ptr<XPathObject>(new XPathNumber(leftNumber - rightNumber));
 }
 
-std::unique_ptr<sngxml::dom::Node> XPathSubExpr::ToDom() const
+std::unique_ptr<dom::Node> XPathSubExpr::ToDom() const
 {
-    std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(U"sub"));
+    std::unique_ptr<dom::Element> element(new dom::Element(U"sub"));
     element->AppendChild(Left()->ToDom());
     element->AppendChild(Right()->ToDom());
-    return std::unique_ptr<sngxml::dom::Node>(element.release());
+    return std::unique_ptr<dom::Node>(element.release());
 }
 
 XPathMulExpr::XPathMulExpr(XPathExpr* left_, XPathExpr* right_) : XPathBinaryExpr(left_, right_)
@@ -1006,12 +1006,12 @@ std::unique_ptr<XPathObject> XPathMulExpr::Evaluate(XPathContext& context)
     return std::unique_ptr<XPathObject>(new XPathNumber(leftNumber * rightNumber));
 }
 
-std::unique_ptr<sngxml::dom::Node> XPathMulExpr::ToDom() const
+std::unique_ptr<dom::Node> XPathMulExpr::ToDom() const
 {
-    std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(U"mul"));
+    std::unique_ptr<dom::Element> element(new dom::Element(U"mul"));
     element->AppendChild(Left()->ToDom());
     element->AppendChild(Right()->ToDom());
-    return std::unique_ptr<sngxml::dom::Node>(element.release());
+    return std::unique_ptr<dom::Node>(element.release());
 }
 
 XPathDivExpr::XPathDivExpr(XPathExpr* left_, XPathExpr* right_) : XPathBinaryExpr(left_, right_)
@@ -1042,12 +1042,12 @@ std::unique_ptr<XPathObject> XPathDivExpr::Evaluate(XPathContext& context)
     return std::unique_ptr<XPathObject>(new XPathNumber(leftNumber / rightNumber));
 }
 
-std::unique_ptr<sngxml::dom::Node> XPathDivExpr::ToDom() const
+std::unique_ptr<dom::Node> XPathDivExpr::ToDom() const
 {
-    std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(U"div"));
+    std::unique_ptr<dom::Element> element(new dom::Element(U"div"));
     element->AppendChild(Left()->ToDom());
     element->AppendChild(Right()->ToDom());
-    return std::unique_ptr<sngxml::dom::Node>(element.release());
+    return std::unique_ptr<dom::Node>(element.release());
 }
 
 XPathModExpr::XPathModExpr(XPathExpr* left_, XPathExpr* right_) : XPathBinaryExpr(left_, right_)
@@ -1078,12 +1078,12 @@ std::unique_ptr<XPathObject> XPathModExpr::Evaluate(XPathContext& context)
     return std::unique_ptr<XPathObject>(new XPathNumber(double(leftNumber % rightNumber)));
 }
 
-std::unique_ptr<sngxml::dom::Node> XPathModExpr::ToDom() const
+std::unique_ptr<dom::Node> XPathModExpr::ToDom() const
 {
-    std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(U"mod"));
+    std::unique_ptr<dom::Element> element(new dom::Element(U"mod"));
     element->AppendChild(Left()->ToDom());
     element->AppendChild(Right()->ToDom());
-    return std::unique_ptr<sngxml::dom::Node>(element.release());
+    return std::unique_ptr<dom::Node>(element.release());
 }
 
 XPathUnaryMinusExpr::XPathUnaryMinusExpr(XPathExpr* operand_) : XPathUnaryExpr(operand_)
@@ -1105,11 +1105,11 @@ std::unique_ptr<XPathObject> XPathUnaryMinusExpr::Evaluate(XPathContext& context
     return std::unique_ptr<XPathObject>(new XPathNumber(-operandNumber));
 }
 
-std::unique_ptr<sngxml::dom::Node> XPathUnaryMinusExpr::ToDom() const
+std::unique_ptr<dom::Node> XPathUnaryMinusExpr::ToDom() const
 {
-    std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(U"unaryMinus"));
+    std::unique_ptr<dom::Element> element(new dom::Element(U"unaryMinus"));
     element->AppendChild(Operand()->ToDom());
-    return std::unique_ptr<sngxml::dom::Node>(element.release());
+    return std::unique_ptr<dom::Node>(element.release());
 }
 
 XPathUnionExpr::XPathUnionExpr(XPathExpr* left_, XPathExpr* right_) : XPathBinaryExpr(left_, right_)
@@ -1144,12 +1144,12 @@ std::unique_ptr<XPathObject> XPathUnionExpr::Evaluate(XPathContext& context)
     return std::unique_ptr<XPathObject>(result.release());
 }
 
-std::unique_ptr<sngxml::dom::Node> XPathUnionExpr::ToDom() const
+std::unique_ptr<dom::Node> XPathUnionExpr::ToDom() const
 {
-    std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(U"union"));
+    std::unique_ptr<dom::Element> element(new dom::Element(U"union"));
     element->AppendChild(Left()->ToDom());
     element->AppendChild(Right()->ToDom());
-    return std::unique_ptr<sngxml::dom::Node>(element.release());
+    return std::unique_ptr<dom::Node>(element.release());
 }
 
 XPathCombineStepExpr::XPathCombineStepExpr(XPathExpr* left_, XPathExpr* right_) : XPathBinaryExpr(left_, right_)
@@ -1186,12 +1186,12 @@ std::unique_ptr<XPathObject> XPathCombineStepExpr::Evaluate(XPathContext& contex
     return std::unique_ptr<XPathObject>(result.release());
 }
 
-std::unique_ptr<sngxml::dom::Node> XPathCombineStepExpr::ToDom() const
+std::unique_ptr<dom::Node> XPathCombineStepExpr::ToDom() const
 {
-    std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(U"combineStep"));
+    std::unique_ptr<dom::Element> element(new dom::Element(U"combineStep"));
     element->AppendChild(Left()->ToDom());
     element->AppendChild(Right()->ToDom());
-    return std::unique_ptr<sngxml::dom::Node>(element.release());
+    return std::unique_ptr<dom::Node>(element.release());
 }
 
 XPathRootNodeExpr::XPathRootNodeExpr()
@@ -1212,10 +1212,10 @@ std::unique_ptr<XPathObject> XPathRootNodeExpr::Evaluate(XPathContext& context)
     return std::unique_ptr<XPathObject>(nodeSet.release());
 }
 
-std::unique_ptr<sngxml::dom::Node> XPathRootNodeExpr::ToDom() const
+std::unique_ptr<dom::Node> XPathRootNodeExpr::ToDom() const
 {
-    std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(U"root"));
-    return std::unique_ptr<sngxml::dom::Node>(element.release());
+    std::unique_ptr<dom::Element> element(new dom::Element(U"root"));
+    return std::unique_ptr<dom::Node>(element.release());
 }
 
 XPathFilterExpr::XPathFilterExpr(XPathExpr* expr_, XPathExpr* predicate_) : XPathUnaryExpr(expr_), predicate(predicate_)
@@ -1263,28 +1263,28 @@ std::unique_ptr<XPathObject> XPathFilterExpr::Evaluate(XPathContext& context)
     return std::unique_ptr<XPathObject>(nodeSet.release());
 }
 
-std::unique_ptr<sngxml::dom::Node> XPathFilterExpr::ToDom() const
+std::unique_ptr<dom::Node> XPathFilterExpr::ToDom() const
 {
-    std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(U"filter"));
+    std::unique_ptr<dom::Element> element(new dom::Element(U"filter"));
     element->AppendChild(Operand()->ToDom());
-    std::unique_ptr<sngxml::dom::Element> predicateElement(new sngxml::dom::Element(U"predicate"));
+    std::unique_ptr<dom::Element> predicateElement(new dom::Element(U"predicate"));
     predicateElement->AppendChild(predicate->ToDom());
-    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(predicateElement.release()));
-    return std::unique_ptr<sngxml::dom::Node>(element.release());
+    element->AppendChild(std::unique_ptr<dom::Node>(predicateElement.release()));
+    return std::unique_ptr<dom::Node>(element.release());
 }
 
 class NodeSelectionOp : public sngxml::dom::NodeOp
 {
 public:
-    NodeSelectionOp(XPathNodeTestExpr* nodeTest_, XPathNodeSet& nodeSet_, Axis axis_);
+    NodeSelectionOp(XPathNodeTestExpr* nodeTest_, XPathNodeSet& nodeSet_, sngxml::dom::Axis axis_);
     void Apply(sngxml::dom::Node* node) override;
 private:
     XPathNodeTestExpr* nodeTest;
     XPathNodeSet& nodeSet;
-    Axis axis;
+    sngxml::dom::Axis axis;
 };
 
-NodeSelectionOp::NodeSelectionOp(XPathNodeTestExpr* nodeTest_, XPathNodeSet& nodeSet_, Axis axis_) : nodeTest(nodeTest_), nodeSet(nodeSet_), axis(axis_)
+NodeSelectionOp::NodeSelectionOp(XPathNodeTestExpr* nodeTest_, XPathNodeSet& nodeSet_, sngxml::dom::Axis axis_) : nodeTest(nodeTest_), nodeSet(nodeSet_), axis(axis_)
 {
 }
 
@@ -1296,7 +1296,7 @@ void NodeSelectionOp::Apply(sngxml::dom::Node* node)
     }
 }
 
-XPathLocationStepExpr::XPathLocationStepExpr(Axis axis_, XPathNodeTestExpr* nodeTest_) : axis(axis_), nodeTest(nodeTest_)
+XPathLocationStepExpr::XPathLocationStepExpr(sngxml::dom::Axis axis_, XPathNodeTestExpr* nodeTest_) : axis(axis_), nodeTest(nodeTest_)
 {
 }
 
@@ -1346,54 +1346,54 @@ std::unique_ptr<XPathObject> XPathLocationStepExpr::Evaluate(XPathContext& conte
     return std::unique_ptr<XPathObject>(nodeSet.release());
 }
 
-std::unique_ptr<sngxml::dom::Node> XPathLocationStepExpr::ToDom() const
+std::unique_ptr<dom::Node> XPathLocationStepExpr::ToDom() const
 {
-    std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(U"locationStep"));
-    sngxml::dom::Element* axisElement = new sngxml::dom::Element(U"axis");
+    std::unique_ptr<dom::Element> element(new dom::Element(U"locationStep"));
+    dom::Element* axisElement = new dom::Element(U"axis");
     std::u32string axisName = AxisName(axis);
     axisElement->SetAttribute(U"name", axisName);
-    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(axisElement));
-    sngxml::dom::Element* nodeTestElement = new sngxml::dom::Element(U"nodeTest");
+    element->AppendChild(std::unique_ptr<dom::Node>(axisElement));
+    dom::Element* nodeTestElement = new dom::Element(U"nodeTest");
     nodeTestElement->AppendChild(nodeTest->ToDom());
-    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(nodeTestElement));
-    std::unique_ptr<sngxml::dom::Element> predicatesElement(new sngxml::dom::Element(U"predicates"));
+    element->AppendChild(std::unique_ptr<dom::Node>(nodeTestElement));
+    std::unique_ptr<dom::Element> predicatesElement(new dom::Element(U"predicates"));
     for (const std::unique_ptr<XPathExpr>& predicate : predicates)
     {
         predicatesElement->AppendChild(predicate->ToDom());
     }
-    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(predicatesElement.release()));
-    return std::unique_ptr<sngxml::dom::Node>(element.release());
+    element->AppendChild(std::unique_ptr<dom::Node>(predicatesElement.release()));
+    return std::unique_ptr<dom::Node>(element.release());
 }
 
 class AxisMap
 {
 public:
     AxisMap();
-    Axis GetAxis(const std::u32string& axis) const;
+    sngxml::dom::Axis GetAxis(const std::u32string& axis) const;
 private:
-    std::map<std::u32string, Axis> axisMap;
+    std::map<std::u32string, sngxml::dom::Axis> axisMap;
 };
 
 AxisMap::AxisMap()
 {
-    axisMap[U"ancestor"] = Axis::ancestor;
-    axisMap[U"ancestor-or-self"] = Axis::ancestorOrSelf;
-    axisMap[U"attribute"] = Axis::attribute;
-    axisMap[U"child"] = Axis::child;
-    axisMap[U"descendant"] = Axis::descendant;
-    axisMap[U"descendant-or-self"] = Axis::descendantOrSelf;
-    axisMap[U"following"] = Axis::following;
-    axisMap[U"following-sibling"] = Axis::followingSibling;
-    axisMap[U"namespace"] = Axis::ns;
-    axisMap[U"parent"] = Axis::parent;
-    axisMap[U"preceding"] = Axis::preceding;
-    axisMap[U"preceding-sibling"] = Axis::precedingSibling;
-    axisMap[U"self"] = Axis::self;
+    axisMap[U"ancestor"] = sngxml::dom::Axis::ancestor;
+    axisMap[U"ancestor-or-self"] = sngxml::dom::Axis::ancestorOrSelf;
+    axisMap[U"attribute"] = sngxml::dom::Axis::attribute;
+    axisMap[U"child"] = sngxml::dom::Axis::child;
+    axisMap[U"descendant"] = sngxml::dom::Axis::descendant;
+    axisMap[U"descendant-or-self"] = sngxml::dom::Axis::descendantOrSelf;
+    axisMap[U"following"] = sngxml::dom::Axis::following;
+    axisMap[U"following-sibling"] = sngxml::dom::Axis::followingSibling;
+    axisMap[U"namespace"] = sngxml::dom::Axis::ns;
+    axisMap[U"parent"] = sngxml::dom::Axis::parent;
+    axisMap[U"preceding"] = sngxml::dom::Axis::preceding;
+    axisMap[U"preceding-sibling"] = sngxml::dom::Axis::precedingSibling;
+    axisMap[U"self"] = sngxml::dom::Axis::self;
 }
 
-Axis AxisMap::GetAxis(const std::u32string& axis) const
+sngxml::dom::Axis AxisMap::GetAxis(const std::u32string& axis) const
 {
-    auto it = axisMap.find(axis);
+    std::map<std::u32string, sngxml::dom::Axis>::const_iterator it = axisMap.find(axis);
     if (it != axisMap.cend())
     {
         return it->second;
@@ -1406,7 +1406,7 @@ Axis AxisMap::GetAxis(const std::u32string& axis) const
 
 AxisMap axisMap;
 
-Axis GetAxis(const std::u32string& axisName)
+sngxml::dom::Axis GetAxis(const std::u32string& axisName)
 {
     return axisMap.GetAxis(axisName);
 }
@@ -1415,7 +1415,7 @@ XPathPILiteralTest::XPathPILiteralTest(XPathExpr* literal_) : literal(literal_)
 {
 }
 
-bool XPathPILiteralTest::Select(sngxml::dom::Node* node, Axis axis) const
+bool XPathPILiteralTest::Select(sngxml::dom::Node* node, sngxml::dom::Axis axis) const
 {
     if (node->GetNodeType() == sngxml::dom::NodeType::processingInstructionNode)
     {
@@ -1428,53 +1428,53 @@ bool XPathPILiteralTest::Select(sngxml::dom::Node* node, Axis axis) const
     return false;
 }
 
-std::unique_ptr<sngxml::dom::Node> XPathPILiteralTest::ToDom() const
+std::unique_ptr<dom::Node> XPathPILiteralTest::ToDom() const
 {
-    std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(U"piLiteralTest"));
+    std::unique_ptr<dom::Element> element(new dom::Element(U"piLiteralTest"));
     element->AppendChild(literal->ToDom());
-    return std::unique_ptr<sngxml::dom::Node>(element.release());
+    return std::unique_ptr<dom::Node>(element.release());
 }
 
-bool XPathCommentNodeTest::Select(sngxml::dom::Node* node, Axis axis) const
+bool XPathCommentNodeTest::Select(sngxml::dom::Node* node, sngxml::dom::Axis axis) const
 {
     return node->GetNodeType() == sngxml::dom::NodeType::commentNode;
 }
 
-std::unique_ptr<sngxml::dom::Node> XPathCommentNodeTest::ToDom() const
+std::unique_ptr<dom::Node> XPathCommentNodeTest::ToDom() const
 {
-    std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(U"commentNodeTest"));
-    return std::unique_ptr<sngxml::dom::Node>(element.release());
+    std::unique_ptr<dom::Element> element(new dom::Element(U"commentNodeTest"));
+    return std::unique_ptr<dom::Node>(element.release());
 }
 
-bool XPathTextNodeTest::Select(sngxml::dom::Node* node, Axis axis) const
+bool XPathTextNodeTest::Select(sngxml::dom::Node* node, sngxml::dom::Axis axis) const
 {
     return node->GetNodeType() == sngxml::dom::NodeType::textNode;
 }
 
-std::unique_ptr<sngxml::dom::Node> XPathTextNodeTest::ToDom() const
+std::unique_ptr<dom::Node> XPathTextNodeTest::ToDom() const
 {
-    std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(U"textNodeTest"));
-    return std::unique_ptr<sngxml::dom::Node>(element.release());
+    std::unique_ptr<dom::Element> element(new dom::Element(U"textNodeTest"));
+    return std::unique_ptr<dom::Node>(element.release());
 }
 
-bool XPathPINodeTest::Select(sngxml::dom::Node* node, Axis axis) const
+bool XPathPINodeTest::Select(sngxml::dom::Node* node, sngxml::dom::Axis axis) const
 {
     return node->GetNodeType() == sngxml::dom::NodeType::processingInstructionNode;
 }
 
-std::unique_ptr<sngxml::dom::Node> XPathPINodeTest::ToDom() const
+std::unique_ptr<dom::Node> XPathPINodeTest::ToDom() const
 {
-    std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(U"piNodeTest"));
-    return std::unique_ptr<sngxml::dom::Node>(element.release());
+    std::unique_ptr<dom::Element> element(new dom::Element(U"piNodeTest"));
+    return std::unique_ptr<dom::Node>(element.release());
 }
 
-bool XPathPrincipalNodeTest::Select(sngxml::dom::Node* node, Axis axis) const
+bool XPathPrincipalNodeTest::Select(sngxml::dom::Node* node, sngxml::dom::Axis axis) const
 {
-    if (axis == Axis::attribute)
+    if (axis == sngxml::dom::Axis::attribute)
     {
         return node->GetNodeType() == sngxml::dom::NodeType::attributeNode;
     }
-    else if (axis == Axis::ns)
+    else if (axis == sngxml::dom::Axis::ns)
     {
         return false; // todo
     }
@@ -1484,30 +1484,30 @@ bool XPathPrincipalNodeTest::Select(sngxml::dom::Node* node, Axis axis) const
     }
 }
 
-std::unique_ptr<sngxml::dom::Node> XPathPrincipalNodeTest::ToDom() const
+std::unique_ptr<dom::Node> XPathPrincipalNodeTest::ToDom() const
 {
-    std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(U"principalNodeTest"));
-    return std::unique_ptr<sngxml::dom::Node>(element.release());
+    std::unique_ptr<dom::Element> element(new dom::Element(U"principalNodeTest"));
+    return std::unique_ptr<dom::Node>(element.release());
 }
 
-bool XPathAnyNodeTest::Select(sngxml::dom::Node* node, Axis axis) const
+bool XPathAnyNodeTest::Select(sngxml::dom::Node* node, sngxml::dom::Axis axis) const
 {
     return true;
 }
 
-std::unique_ptr<sngxml::dom::Node> XPathAnyNodeTest::ToDom() const
+std::unique_ptr<dom::Node> XPathAnyNodeTest::ToDom() const
 {
-    std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(U"anyNodeTest"));
-    return std::unique_ptr<sngxml::dom::Node>(element.release());
+    std::unique_ptr<dom::Element> element(new dom::Element(U"anyNodeTest"));
+    return std::unique_ptr<dom::Node>(element.release());
 }
 
 XPathPrefixTest::XPathPrefixTest(const std::u32string& name_) : name(name_)
 {
 }
 
-bool XPathPrefixTest::Select(sngxml::dom::Node* node, Axis axis) const
+bool XPathPrefixTest::Select(sngxml::dom::Node* node, sngxml::dom::Axis axis) const
 {
-    if (axis == Axis::attribute)
+    if (axis == sngxml::dom::Axis::attribute)
     {
         if (node->GetNodeType() == sngxml::dom::NodeType::attributeNode)
         {
@@ -1518,7 +1518,7 @@ bool XPathPrefixTest::Select(sngxml::dom::Node* node, Axis axis) const
             }
         }
     }
-    else if (axis == Axis::ns)
+    else if (axis == sngxml::dom::Axis::ns)
     {
         // todo
         return false;
@@ -1534,20 +1534,20 @@ bool XPathPrefixTest::Select(sngxml::dom::Node* node, Axis axis) const
     return false;
 }
 
-std::unique_ptr<sngxml::dom::Node> XPathPrefixTest::ToDom() const
+std::unique_ptr<dom::Node> XPathPrefixTest::ToDom() const
 {
-    std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(U"prefixTest"));
+    std::unique_ptr<dom::Element> element(new dom::Element(U"prefixTest"));
     element->SetAttribute(U"prefix", name);
-    return std::unique_ptr<sngxml::dom::Node>(element.release());
+    return std::unique_ptr<dom::Node>(element.release());
 }
 
 XPathNameTest::XPathNameTest(const std::u32string& name_) : name(name_)
 {
 }
 
-bool XPathNameTest::Select(sngxml::dom::Node* node, Axis axis) const
+bool XPathNameTest::Select(sngxml::dom::Node* node, sngxml::dom::Axis axis) const
 {
-    if (axis == Axis::attribute)
+    if (axis == sngxml::dom::Axis::attribute)
     {
         if (node->GetNodeType() == sngxml::dom::NodeType::attributeNode)
         {
@@ -1558,7 +1558,7 @@ bool XPathNameTest::Select(sngxml::dom::Node* node, Axis axis) const
             }
         }
     }
-    else if (axis != Axis::ns)
+    else if (axis != sngxml::dom::Axis::ns)
     {
         if (node->GetNodeType() == sngxml::dom::NodeType::elementNode)
         {
@@ -1572,22 +1572,22 @@ bool XPathNameTest::Select(sngxml::dom::Node* node, Axis axis) const
     return false;
 }
 
-std::unique_ptr<sngxml::dom::Node> XPathNameTest::ToDom() const
+std::unique_ptr<dom::Node> XPathNameTest::ToDom() const
 {
-    std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(U"nameTest"));
+    std::unique_ptr<dom::Element> element(new dom::Element(U"nameTest"));
     element->SetAttribute(U"name", name);
-    return std::unique_ptr<sngxml::dom::Node>(element.release());
+    return std::unique_ptr<dom::Node>(element.release());
 }
 
 XPathVariableReference::XPathVariableReference(const std::u32string& name_) : name(name_)
 {
 }
 
-std::unique_ptr<sngxml::dom::Node> XPathVariableReference::ToDom() const
+std::unique_ptr<dom::Node> XPathVariableReference::ToDom() const
 {
-    std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(U"variableReference"));
+    std::unique_ptr<dom::Element> element(new dom::Element(U"variableReference"));
     element->SetAttribute(U"name", name);
-    return std::unique_ptr<sngxml::dom::Node>(element.release());
+    return std::unique_ptr<dom::Node>(element.release());
 }
 
 XPathLiteral::XPathLiteral(const std::u32string& value_) : value(value_)
@@ -1599,11 +1599,11 @@ std::unique_ptr<XPathObject> XPathLiteral::Evaluate(XPathContext& context)
     return std::unique_ptr<XPathObject>(new XPathString(value));
 }
 
-std::unique_ptr<sngxml::dom::Node> XPathLiteral::ToDom() const
+std::unique_ptr<dom::Node> XPathLiteral::ToDom() const
 {
-    std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(U"literal"));
+    std::unique_ptr<dom::Element> element(new dom::Element(U"literal"));
     element->SetAttribute(U"value", value);
-    return std::unique_ptr<sngxml::dom::Node>(element.release());
+    return std::unique_ptr<dom::Node>(element.release());
 }
 
 XPathNumberExpr::XPathNumberExpr(const std::u32string& value_)
@@ -1623,11 +1623,11 @@ std::unique_ptr<XPathObject> XPathNumberExpr::Evaluate(XPathContext& context)
     return std::unique_ptr<XPathObject>(new XPathNumber(value));
 }
 
-std::unique_ptr<sngxml::dom::Node> XPathNumberExpr::ToDom() const
+std::unique_ptr<dom::Node> XPathNumberExpr::ToDom() const
 {
-    std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(U"number"));
+    std::unique_ptr<dom::Element> element(new dom::Element(U"number"));
     element->SetAttribute(U"value", ToUtf32(std::to_string(value)));
-    return std::unique_ptr<sngxml::dom::Node>(element.release());
+    return std::unique_ptr<dom::Node>(element.release());
 }
 
 XPathFunctionCall::XPathFunctionCall(const std::u32string& functionName_) : functionName(functionName_)
@@ -1659,17 +1659,17 @@ std::unique_ptr<XPathObject> XPathFunctionCall::Evaluate(XPathContext& context)
     return result;
 }
 
-std::unique_ptr<sngxml::dom::Node> XPathFunctionCall::ToDom() const
+std::unique_ptr<dom::Node> XPathFunctionCall::ToDom() const
 {
-    std::unique_ptr<sngxml::dom::Element> element(new sngxml::dom::Element(U"functionCall"));
-    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::Element(functionName)));
-    std::unique_ptr<sngxml::dom::Element> argumentsElement(new sngxml::dom::Element(U"arguments"));
+    std::unique_ptr<dom::Element> element(new dom::Element(U"functionCall"));
+    element->AppendChild(std::unique_ptr<dom::Node>(new dom::Element(functionName)));
+    std::unique_ptr<dom::Element> argumentsElement(new dom::Element(U"arguments"));
     for (const std::unique_ptr<XPathExpr>& argument : arguments)
     {
         argumentsElement->AppendChild(argument->ToDom());
     }
-    element->AppendChild(std::unique_ptr<sngxml::dom::Node>(argumentsElement.release()));
-    return std::unique_ptr<sngxml::dom::Node>(element.release());
+    element->AppendChild(std::unique_ptr<dom::Node>(argumentsElement.release()));
+    return std::unique_ptr<dom::Node>(element.release());
 }
 
 } } // namespace sngxml::xpath

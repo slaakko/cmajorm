@@ -1,0 +1,250 @@
+using System;
+
+namespace XPathTokens
+{
+    public const int END = 0;
+    public const int OR = 1;
+    public const int AND = 2;
+    public const int EQ = 3;
+    public const int NEQ = 4;
+    public const int LEQ = 5;
+    public const int GEQ = 6;
+    public const int LESS = 7;
+    public const int GREATER = 8;
+    public const int PLUS = 9;
+    public const int MINUS = 10;
+    public const int STAR = 11;
+    public const int DIV = 12;
+    public const int MOD = 13;
+    public const int UNION = 14;
+    public const int SLASHSLASH = 15;
+    public const int SLASH = 16;
+    public const int DOTDOT = 17;
+    public const int DOT = 18;
+    public const int COLONCOLON = 19;
+    public const int COLON = 20;
+    public const int DOLLAR = 21;
+    public const int COMMA = 22;
+    public const int ANCESTOR = 23;
+    public const int ANCESTOR_OR_SELF = 24;
+    public const int ATTRIBUTE = 25;
+    public const int CHILD = 26;
+    public const int DESCENDANT = 27;
+    public const int DESCENDANT_OR_SELF = 28;
+    public const int FOLLOWING = 29;
+    public const int FOLLOWING_SIBLING = 30;
+    public const int NAMESPACE = 31;
+    public const int PARENT = 32;
+    public const int PRECEDING = 33;
+    public const int PRECEDING_SIBLING = 34;
+    public const int SELF = 35;
+    public const int AT = 36;
+    public const int LBRACKET = 37;
+    public const int RBRACKET = 38;
+    public const int PROCESSING_INSTRUCTION = 39;
+    public const int LPAREN = 40;
+    public const int RPAREN = 41;
+    public const int COMMENT = 42;
+    public const int TEXT = 43;
+    public const int NODE = 44;
+    public const int DQSTRING = 45;
+    public const int SQSTRING = 46;
+    public const int NUMBER = 47;
+    public const int NAME = 48;
+    internal class TokenMap
+    {
+        static TokenMap() :
+            instance(new TokenMap())
+        {
+        }
+        public static TokenMap& Instance()
+        {
+            return *instance;
+        }
+        public int GetTokenId(const ustring& tokenName)
+        {
+            System.Collections.Map<ustring, int>.ConstIterator it = tokenIdMap.CFind(tokenName);
+            if (it != tokenIdMap.CEnd())
+            {
+                return it->second;
+            }
+            else
+            {
+                return -1;
+            }
+        }
+        public ustring GetTokenName(int tokenId)
+        {
+            return tokenNameList[tokenId];
+        }
+        public ustring GetTokenInfo(int tokenId)
+        {
+            return tokenInfoList[tokenId];
+        }
+        private TokenMap()
+        {
+            tokenIdMap[u"ANCESTOR"] = 23;
+            tokenIdMap[u"ANCESTOR_OR_SELF"] = 24;
+            tokenIdMap[u"AND"] = 2;
+            tokenIdMap[u"AT"] = 36;
+            tokenIdMap[u"ATTRIBUTE"] = 25;
+            tokenIdMap[u"CHILD"] = 26;
+            tokenIdMap[u"COLON"] = 20;
+            tokenIdMap[u"COLONCOLON"] = 19;
+            tokenIdMap[u"COMMA"] = 22;
+            tokenIdMap[u"COMMENT"] = 42;
+            tokenIdMap[u"DESCENDANT"] = 27;
+            tokenIdMap[u"DESCENDANT_OR_SELF"] = 28;
+            tokenIdMap[u"DIV"] = 12;
+            tokenIdMap[u"DOLLAR"] = 21;
+            tokenIdMap[u"DOT"] = 18;
+            tokenIdMap[u"DOTDOT"] = 17;
+            tokenIdMap[u"DQSTRING"] = 45;
+            tokenIdMap[u"EQ"] = 3;
+            tokenIdMap[u"FOLLOWING"] = 29;
+            tokenIdMap[u"FOLLOWING_SIBLING"] = 30;
+            tokenIdMap[u"GEQ"] = 6;
+            tokenIdMap[u"GREATER"] = 8;
+            tokenIdMap[u"LBRACKET"] = 37;
+            tokenIdMap[u"LEQ"] = 5;
+            tokenIdMap[u"LESS"] = 7;
+            tokenIdMap[u"LPAREN"] = 40;
+            tokenIdMap[u"MINUS"] = 10;
+            tokenIdMap[u"MOD"] = 13;
+            tokenIdMap[u"NAME"] = 48;
+            tokenIdMap[u"NAMESPACE"] = 31;
+            tokenIdMap[u"NEQ"] = 4;
+            tokenIdMap[u"NODE"] = 44;
+            tokenIdMap[u"NUMBER"] = 47;
+            tokenIdMap[u"OR"] = 1;
+            tokenIdMap[u"PARENT"] = 32;
+            tokenIdMap[u"PLUS"] = 9;
+            tokenIdMap[u"PRECEDING"] = 33;
+            tokenIdMap[u"PRECEDING_SIBLING"] = 34;
+            tokenIdMap[u"PROCESSING_INSTRUCTION"] = 39;
+            tokenIdMap[u"RBRACKET"] = 38;
+            tokenIdMap[u"RPAREN"] = 41;
+            tokenIdMap[u"SELF"] = 35;
+            tokenIdMap[u"SLASH"] = 16;
+            tokenIdMap[u"SLASHSLASH"] = 15;
+            tokenIdMap[u"SQSTRING"] = 46;
+            tokenIdMap[u"STAR"] = 11;
+            tokenIdMap[u"TEXT"] = 43;
+            tokenIdMap[u"UNION"] = 14;
+            tokenNameList.Add(u"END");
+            tokenInfoList.Add(u"end of file");
+            tokenNameList.Add(u"OR");
+            tokenInfoList.Add(u"\'or\'");
+            tokenNameList.Add(u"AND");
+            tokenInfoList.Add(u"\'and\'");
+            tokenNameList.Add(u"EQ");
+            tokenInfoList.Add(u"\'=\'");
+            tokenNameList.Add(u"NEQ");
+            tokenInfoList.Add(u"\'!=\'");
+            tokenNameList.Add(u"LEQ");
+            tokenInfoList.Add(u"\'<=\'");
+            tokenNameList.Add(u"GEQ");
+            tokenInfoList.Add(u"\'>=\'");
+            tokenNameList.Add(u"LESS");
+            tokenInfoList.Add(u"\'<\'");
+            tokenNameList.Add(u"GREATER");
+            tokenInfoList.Add(u"\'>\'");
+            tokenNameList.Add(u"PLUS");
+            tokenInfoList.Add(u"\'+\'");
+            tokenNameList.Add(u"MINUS");
+            tokenInfoList.Add(u"\'-\'");
+            tokenNameList.Add(u"STAR");
+            tokenInfoList.Add(u"\'*");
+            tokenNameList.Add(u"DIV");
+            tokenInfoList.Add(u"\'div\'");
+            tokenNameList.Add(u"MOD");
+            tokenInfoList.Add(u"\'mod\'");
+            tokenNameList.Add(u"UNION");
+            tokenInfoList.Add(u"\'|\'");
+            tokenNameList.Add(u"SLASHSLASH");
+            tokenInfoList.Add(u"\'//\'");
+            tokenNameList.Add(u"SLASH");
+            tokenInfoList.Add(u"\'/\'");
+            tokenNameList.Add(u"DOTDOT");
+            tokenInfoList.Add(u"\'..\'");
+            tokenNameList.Add(u"DOT");
+            tokenInfoList.Add(u"\'.\'");
+            tokenNameList.Add(u"COLONCOLON");
+            tokenInfoList.Add(u"\'::\'");
+            tokenNameList.Add(u"COLON");
+            tokenInfoList.Add(u"\':\'");
+            tokenNameList.Add(u"DOLLAR");
+            tokenInfoList.Add(u"\'$\'");
+            tokenNameList.Add(u"COMMA");
+            tokenInfoList.Add(u"\',\'");
+            tokenNameList.Add(u"ANCESTOR");
+            tokenInfoList.Add(u"\'ancestor\'");
+            tokenNameList.Add(u"ANCESTOR_OR_SELF");
+            tokenInfoList.Add(u"\'ancestor-or-self\'");
+            tokenNameList.Add(u"ATTRIBUTE");
+            tokenInfoList.Add(u"\'attribute\'");
+            tokenNameList.Add(u"CHILD");
+            tokenInfoList.Add(u"\'child\'");
+            tokenNameList.Add(u"DESCENDANT");
+            tokenInfoList.Add(u"\'descendant\'");
+            tokenNameList.Add(u"DESCENDANT_OR_SELF");
+            tokenInfoList.Add(u"\'descendant-or-self\'");
+            tokenNameList.Add(u"FOLLOWING");
+            tokenInfoList.Add(u"\'following\'");
+            tokenNameList.Add(u"FOLLOWING_SIBLING");
+            tokenInfoList.Add(u"\'following-sibling\'");
+            tokenNameList.Add(u"NAMESPACE");
+            tokenInfoList.Add(u"\'namespace\'");
+            tokenNameList.Add(u"PARENT");
+            tokenInfoList.Add(u"\'parent\'");
+            tokenNameList.Add(u"PRECEDING");
+            tokenInfoList.Add(u"\'preceding\'");
+            tokenNameList.Add(u"PRECEDING_SIBLING");
+            tokenInfoList.Add(u"\'preceding-sibling\'");
+            tokenNameList.Add(u"SELF");
+            tokenInfoList.Add(u"\'self\'");
+            tokenNameList.Add(u"AT");
+            tokenInfoList.Add(u"\'@\'");
+            tokenNameList.Add(u"LBRACKET");
+            tokenInfoList.Add(u"\'[\'");
+            tokenNameList.Add(u"RBRACKET");
+            tokenInfoList.Add(u"\']\'");
+            tokenNameList.Add(u"PROCESSING_INSTRUCTION");
+            tokenInfoList.Add(u"\'processing-instruction\'");
+            tokenNameList.Add(u"LPAREN");
+            tokenInfoList.Add(u"\'(\'");
+            tokenNameList.Add(u"RPAREN");
+            tokenInfoList.Add(u"\')\'");
+            tokenNameList.Add(u"COMMENT");
+            tokenInfoList.Add(u"\'comment\'");
+            tokenNameList.Add(u"TEXT");
+            tokenInfoList.Add(u"\'text\'");
+            tokenNameList.Add(u"NODE");
+            tokenInfoList.Add(u"\'node\'");
+            tokenNameList.Add(u"DQSTRING");
+            tokenInfoList.Add(u"string");
+            tokenNameList.Add(u"SQSTRING");
+            tokenInfoList.Add(u"string");
+            tokenNameList.Add(u"NUMBER");
+            tokenInfoList.Add(u"number");
+            tokenNameList.Add(u"NAME");
+            tokenInfoList.Add(u"name");
+        }
+        private static System.UniquePtr<TokenMap> instance;
+        private System.Collections.Map<ustring, int> tokenIdMap;
+        private System.Collections.List<ustring> tokenNameList;
+        private System.Collections.List<ustring> tokenInfoList;
+    }
+    public int GetTokenId(const ustring& tokenName)
+    {
+        return TokenMap.Instance().GetTokenId(tokenName);
+    }
+    public ustring GetTokenName(int tokenId)
+    {
+        return TokenMap.Instance().GetTokenName(tokenId);
+    }
+    public ustring GetTokenInfo(int tokenId)
+    {
+        return TokenMap.Instance().GetTokenInfo(tokenId);
+    }
+} // namespace XPathTokens

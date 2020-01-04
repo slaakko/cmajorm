@@ -17,7 +17,7 @@ using namespace soulng::util;
 
 enum class NodeType
 {
-    attributeNode, documentFragmentNode, documentNode, documentTypeNode, elementNode, entityNode, entityReferenceNode, notationNode, processingInstructionNode, textNode, cdataSectionNode, commentNode
+    attributeNode, documentFragmentNode, documentNode, elementNode, entityNode, entityReferenceNode, notationNode, processingInstructionNode, textNode, cdataSectionNode, commentNode
 };
 
 class Node;

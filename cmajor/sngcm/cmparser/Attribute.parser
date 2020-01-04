@@ -7,6 +7,7 @@
 [hpp]#include <sngcm/ast/Attribute.hpp>
 [cpp]#include <sngcm/cmlexer/CmajorLexer.hpp>
 [cpp]#include <sngcm/cmlexer/CmajorTokens.hpp>
+[cpp]#include <sngcm/cmlexer/TokenValueParsers.hpp>
 
 using namespace CmajorTokens;
 
@@ -22,7 +23,18 @@ parser api(SNGCM_PARSER_API) AttributeParser
         ;
 
     Attribute(sngcm::ast::Attributes* attributes, var Span s, var std::u32string name, var std::u32string value)
-        ::= (ID{ s = span; name = lexer.GetMatch(span); } (ASSIGN STRINGLIT{ s.end = span.end; value = lexer.GetMatch(span); })?)
+        ::= 
+        (
+            ID{ s = span; name = lexer.GetMatch(span); } 
+            (
+                ASSIGN STRINGLIT
+                { 
+                    s.end = span.end; 
+                    ParseStringLiteral(lexer.FileName(), lexer.GetToken(pos), lexer.strLit, lexer.strLitPrefix);
+                    value = lexer.strLit;
+                }
+            )?
+        )
         {
             attributes->AddAttribute(s, name, value);
         }

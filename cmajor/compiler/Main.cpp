@@ -374,9 +374,9 @@ int main(int argc, const char** argv)
                             else if (components[0] == "--target" || components[0] == "-a")
                             {
                                 target = components[1];
-                                if (target != "program" && target != "library" && target != "unitTest")
+                                if (target != "program" && target != "winapp" && target != "library" && target != "winlib" && target != "unitTest")
                                 {
-                                    throw std::runtime_error("unknown target '" + target + "': not 'program', 'library', or 'unitTest'");
+                                    throw std::runtime_error("unknown target '" + target + "': not 'program', 'winapp', 'library', 'winlib' or 'unitTest'");
                                 }
                             }
                             else if (components[0] == "--name" || components[0] == "-N")

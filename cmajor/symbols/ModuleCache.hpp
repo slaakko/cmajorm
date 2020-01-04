@@ -7,10 +7,11 @@
 #define CMAJOR_SYMBOLS_MODULE_CACHE_INCLUDED
 #include <cmajor/symbols/SymbolsApi.hpp>
 #include <cmajor/symbols/Module.hpp>
+#include <sngcm/ast/Project.hpp>
 
 namespace cmajor { namespace symbols {
 
-SYMBOLS_API void PrepareModuleForCompilation(Module* rootModule, const std::vector<std::string>& references);
+SYMBOLS_API void PrepareModuleForCompilation(Module* rootModule, const std::vector<std::string>& references, sngcm::ast::Target target);
 SYMBOLS_API Module* GetModuleFromModuleCache(const std::string& moduleFilePath);
 SYMBOLS_API void PutModuleToModuleCache(std::unique_ptr<Module>&& module);
 SYMBOLS_API void InitModuleCache();

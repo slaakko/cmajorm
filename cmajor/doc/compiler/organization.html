@@ -274,7 +274,37 @@
             </h2>
 
             <p>
+                The task of a code generator is to go through a bound compile unit and generate intermediate code from it.
+                There are three code generators in the Cmajor front-end:
+                one for <a href="reference/codegenwin/html/content/class_WindowsCodeGenerator_5CB85FB67BB4C01F571B8A928810DBE31840C4F5.html">Windows</a>,
+                one for <a href="reference/codegenlinux/html/content/class_LinuxCodeGenerator_96D307C65FA858021AA104296621E87B504D8540.html">Linux</a> and
+                one for <a href="reference/codegensx/html/content/class_SystemXCodeGenerator_DE287C9679CDC0753891962F51921862AF0B4632.html">System X</a>.
+                The Windows and Linux code generators generate <a href="http://llvm.org/docs/LangRef.html">LLVM instructions</a> and the
+                System X code generator generate <a href="reference/cmsxi/html/content/class_Instruction_31E399AEA14ADF6E2D4DF9E2AC2EB3771E5E58AD.html">System X instructions</a>.
+                The difference between the Windows and the Linux code generator is in implementation of exception handling.
+                The Windows code generator implements the Visual C++ exception handling ABI and the the Linux code generator implements the Itanium exception handling ABI.
+                The Windows and Linux code generators use the <a href="reference/cmllvm/html/content/class_Emitter_EFF99B195E35C6E87D7677FFB24ECB1F971CE9A0.html">cmllvm emitter</a>
+                for creating intermediate instructions and the System X code generator use the
+                <a href="reference/cmsxbe/html/content/class_Emitter_0B6D71D122C9C4AEF63343CD3FD27FEAA0BDF75B.html">cmsxbe emitter </a> for this task.
+                Both emitters derive from the abstract <a href="reference/ir/html/content/class_Emitter_154396B281E1F2C3ECA7612F1A3AD2E408E7D595.html">ir emitter</a> class,
+                whose interface is a superset of the functionality implemented by both concrete emitters.
+            </p>
 
+            <p>
+                When visiting each kind of <a href="reference/binder/html/content/class_BoundStatement_FA468BD98D7521F6E353AC55182B34AD7D55D8A7.html">bound statement</a>,
+                the code generators create <a href="https://en.wikipedia.org/wiki/Basic_block">basic blocks</a> that contain code for bound expressions and jumps between the basic blocks that correspond the control flow.
+                The <a href="reference/binder/html/content/class_BoundExpression_6C13A7CD518141FC69CADA397796946086EEA452.html">bound expressions</a>
+                implement two basic operations defined in the <a href="reference/ir/html/content/class_GenObject_58B5CE43FA7DE3F0DCCA4882DA8ADB648134410A.html">GenObject</a> interface:
+                the <em>load</em> operation that produce side effects, generates a value and pushes it to the
+                <a href="reference/ir/html/content/class_ValueStack_0032454A09E37AB037BC01A9EA549EFC362C7CDA.html">value stack</a>
+                of an emitter, and the <em>store</em> operation that pops a value from the value stack and stores it to a location of the bound expression.
+                The store operation of those bound expressions that are not lvalues generate an error by throwing an exception.
+            </p>
+
+            <p>
+                Function calls and operations on primitive, derived and class types are all implemented as
+                <a href="reference/binder/html/content/class_BoundFunctionCall_3B6FF42595EC5C47E14802245CBCB5F47F5F3EAC.html">bound function calls</a> that
+                call the the virtual <em>generate call</em> member function of a contained function symbol that represents the operation.
             </p>
 
             <h2>
@@ -283,6 +313,36 @@
 
             <p>
                 The front-end consists of these <a href="reference/compiler-projects.html">modules</a>.
+            </p>
+
+            <h2 id="specific-features">Implementation of Specific Features</h2>
+
+            <h3 id="is-and-as-expressions">Is and As Expressions</h3>
+
+            <p>
+                The implementation of <b>is</b> and <b>as</b> expressions is based on a scheme invented by Michael Gibbs and Bjarne Stroustrup
+                and described in their article <a href="http://www.stroustrup.com/fast_dynamic_casting.pdf">Fast dynamic casting</a>.
+            </p>
+
+            <p>
+                Each polymorphic class in Cmajor has a unique 64-bit identifier that is a product of prime number keys.
+                The prime number key of the class is based on the level of the class in the class hierarchy.
+                Ultimate base classes are assigned keys 2, 3, 5, etc., and the leaf classes of the class hierarchy have the largest keys.
+                The identifier of a class is the product of the key of itself, the key of its base class, the key of its ancestor class, and so on.
+            </p>
+
+            <p>
+                When we have these class identifiers, the test whether a polymorphic class A is the same class or derived from the class B
+                becomes a simple modulo operation: <em>classIdOf(A) % classIdOf(B) == 0</em> <=> A is same or derived from B.
+            </p>
+
+            <p>
+                The 64-bit identifier of a class is stored to the virtual method table of the class at index 0.
+                The class identifier is initially zero and dynamically initialized by calling the runtime library.
+                The runtime library looks up the class identifier from a hash table by using a 16-byte type identifier (UUID) of the class as a key
+                and stores the nonzero 64-bit class identifier to the virtual method table index 0.
+                The 16-byte type identifier (UUID) is initialized by the compiler and stored to the virtual method table at index 1 in 64-bit units.
+                The hash table lookup is needed only first time. In the future the class id is found in the VMT at index 0.
             </p>
 </body>
 </html>

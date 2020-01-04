@@ -9,6 +9,7 @@
 #include <soulng/util/Error.hpp>
 #include <vector>
 #include <sstream>
+#include <iostream>
 
 namespace cmajor { namespace rt {
 
@@ -58,6 +59,8 @@ __thread std::string* stackTrace = nullptr;
 #endif
 
 } }  // namespace cmajor::rt
+
+int indent = 0;
 
 extern "C" RT_API void RtEnterFunction(const char* functionName, const char* sourceFilePath)
 {

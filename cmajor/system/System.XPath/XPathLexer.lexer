@@ -1,0 +1,63 @@
+classmap XPathClassMap;
+
+tokens XPathTokens
+{
+    (OR, "'or'"), (AND, "'and'"), (EQ, "'='"), (NEQ, "'!='"), (LEQ, "'<='"), (GEQ, "'>='"), (LESS, "'<'"), (GREATER, "'>'"), (PLUS, "'+'"), (MINUS, "'-'"), (STAR, "'*"), (DIV, "'div'"), (MOD, "'mod'"),
+    (UNION, "'|'"), (SLASHSLASH, "'//'"), (SLASH, "'/'"), (DOTDOT, "'..'"), (DOT, "'.'"), (COLONCOLON, "'::'"), (COLON, "':'"), (DOLLAR, "'$'"), (COMMA, "','"),
+    (ANCESTOR, "'ancestor'"), (ANCESTOR_OR_SELF, "'ancestor-or-self'"), (ATTRIBUTE, "'attribute'"), (CHILD, "'child'"), (DESCENDANT, "'descendant'"), (DESCENDANT_OR_SELF, "'descendant-or-self'"),
+    (FOLLOWING, "'following'"), (FOLLOWING_SIBLING, "'following-sibling'"), (NAMESPACE, "'namespace'"), (PARENT, "'parent'"), (PRECEDING, "'preceding'"), (PRECEDING_SIBLING, "'preceding-sibling'"),
+    (SELF, "'self'"), (AT, "'@'"), (LBRACKET, "'['"), (RBRACKET, "']'"), (PROCESSING_INSTRUCTION, "'processing-instruction'"), (LPAREN, "'('"), (RPAREN, "')'"), (COMMENT, "'comment'"), (TEXT, "'text'"),
+    (NODE, "'node'"), (DQSTRING, "string"), (SQSTRING, "string"), (NUMBER, "number"), (NAME, "name")
+}
+
+keywords XPathKeywords
+{
+    ("or", OR), ("and", AND), ("div", DIV), ("mod", MOD), ("ancestor", ANCESTOR), ("ancestor-or-self", ANCESTOR_OR_SELF), ("attribute", ATTRIBUTE), ("child", CHILD), ("descendant", DESCENDANT),
+    ("descendant-or-self", DESCENDANT_OR_SELF), ("following", FOLLOWING), ("following-sibling", FOLLOWING_SIBLING), ("namespace", NAMESPACE), ("parent", PARENT), ("preceding", PRECEDING),
+    ("preceding-sibling", PRECEDING_SIBLING), ("self", SELF), ("processing-instruction", PROCESSING_INSTRUCTION), ("comment", COMMENT), ("text", TEXT), ("node", NODE)
+}
+
+expressions
+{
+    ws = "[\n\r\t ]";
+    separators = "{ws}+";
+    dqstring = "\"[^\"]*\"";
+    sqstring = "'[^']*'";
+    digits = "[0-9]+";
+    number = "{digits}(\.{digits}?)?|\.{digits}";
+    namestartchar = "[A-Z_a-z\xC0-\xD6\xD8-\xF6\xF8-\x2FF\x370-\x37D\x37F-\x1FFF\x200C-\x200D\x2070-\x218F\x2C00-\x2FEF\x3001-\xD7FF\xF900-\xFDCF\xFDF0-\xFFFD\x10000-\xEFFFF]";
+    namechar = "{namestartchar}|[-\.0-9\xB7\x300-\x36F\x203F-\x2040]";
+    name = "{namestartchar}{namechar}*";
+}
+
+lexer XPathLexer
+{
+    "{separators}" {}
+    "{name}" { return NAME; }
+    "{number}" { return NUMBER; }
+    "{dqstring}" { return DQSTRING; }
+    "{sqstring}" { return SQSTRING; }
+    "=" { return EQ; }
+    "!=" { return NEQ; }
+    "<=" { return LEQ; }
+    ">=" { return GEQ; }
+    "<" { return LESS; }
+    ">" { return GREATER; }
+    "\+" { return PLUS; }
+    "-" { return MINUS; }
+    "\*" { return STAR; }
+    "\|" { return UNION; }
+    "//" { return SLASHSLASH; }
+    "/" { return SLASH; }
+    "\.\." { return DOTDOT; }
+    "\." { return DOT; }
+    "::" { return COLONCOLON; }
+    ":" { return COLON; }
+    "$" { return DOLLAR; }
+    "," { return COMMA; }
+    "@" { return AT; }
+    "\[" { return LBRACKET; }
+    "\]" { return RBRACKET; }
+    "\(" { return LPAREN; }
+    "\)" { return RPAREN; }
+}

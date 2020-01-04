@@ -76,6 +76,13 @@ std::string CmajorSystemModuleFilePath(const std::string& config, BackEnd backen
     return GetFullPath(smfp.generic_string());
 }
 
+std::string CmajorSystemWindowsModuleFilePath(const std::string& config)
+{
+    boost::filesystem::path smfp(CmajorSystemLibDir(config, BackEnd::llvm));
+    smfp /= "System.Windows.cmm";
+    return GetFullPath(smfp.generic_string());
+}
+
 ProjectDeclaration::ProjectDeclaration(ProjectDeclarationType declarationType_) : declarationType(declarationType_)
 {
 }
@@ -239,7 +246,7 @@ void Project::ResolveDeclarations()
                 relativeSourceFilePaths.push_back(sfp.generic_string());
                 if (sfp.is_relative())
                 {
-                    sfp = sourceBasePath / sfp;
+                    sfp = (sourceBasePath / sfp).generic_path();
                 }
                 if (sfp.extension() != ".cm")
                 {

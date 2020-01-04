@@ -100,7 +100,10 @@ namespace soulcm.scmpg
                 Cm.Ast.IfStatementNode* ifStmt = new Cm.Ast.IfStatementNode(System.Lex.Span(), new Cm.Ast.ConjunctionNode(System.Lex.Span(), new Cm.Ast.GreaterOrEqualNode(System.Lex.Span(), new Cm.Ast.DerefNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"lexer")), new Cm.Ast.DotNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"range"), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"first"))), new Cm.Ast.LessOrEqualNode(System.Lex.Span(), new Cm.Ast.DerefNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"lexer")), new Cm.Ast.DotNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"range"), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"last")))), thenS, null);
                 Cm.Ast.CompoundStatementNode* actionS = new Cm.Ast.CompoundStatementNode(System.Lex.Span());
                 actionS->AddStatement(ifStmt);
-                Cm.Ast.RangeForStatementNode* rangeFor = new Cm.Ast.RangeForStatementNode(System.Lex.Span(), new Cm.Ast.ConstNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"Range")), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"range"), new Cm.Ast.IdentifierNode(System.Lex.Span(), ToUtf32(parser.ArrayName())), actionS);
+                Cm.Ast.RangeForStatementNode* rangeFor = new Cm.Ast.RangeForStatementNode(System.Lex.Span(),
+                    new Cm.Ast.ConstNode(System.Lex.Span(), 
+                    new Cm.Ast.LValueRefNode(System.Lex.Span(), 
+                    new Cm.Ast.IdentifierNode(System.Lex.Span(), u"Range"))), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"range"), new Cm.Ast.IdentifierNode(System.Lex.Span(), ToUtf32(parser.ArrayName())), actionS);
                 currentBlock->AddStatement(rangeFor);
                 Cm.Ast.CompoundStatementNode* then2S = new Cm.Ast.CompoundStatementNode(System.Lex.Span());
                 then2S->AddStatement(new Cm.Ast.ExpressionStatementNode(System.Lex.Span(), new Cm.Ast.PrefixIncrementNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"lexer"))));
@@ -119,7 +122,9 @@ namespace soulcm.scmpg
                 Cm.Ast.IfStatementNode* ifStmt = new Cm.Ast.IfStatementNode(System.Lex.Span(), new Cm.Ast.ConjunctionNode(System.Lex.Span(), new Cm.Ast.GreaterOrEqualNode(System.Lex.Span(), new Cm.Ast.DerefNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"lexer")), new Cm.Ast.DotNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"range"), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"first"))), new Cm.Ast.LessOrEqualNode(System.Lex.Span(), new Cm.Ast.DerefNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"lexer")), new Cm.Ast.DotNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"range"), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"last")))), thenS, null);
                 Cm.Ast.CompoundStatementNode* actionS = new Cm.Ast.CompoundStatementNode(System.Lex.Span());
                 actionS->AddStatement(ifStmt);
-                Cm.Ast.RangeForStatementNode* rangeFor = new Cm.Ast.RangeForStatementNode(System.Lex.Span(), new Cm.Ast.ConstNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"Range")), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"range"), new Cm.Ast.IdentifierNode(System.Lex.Span(), ToUtf32(parser.ArrayName())), actionS);
+                Cm.Ast.RangeForStatementNode* rangeFor = new Cm.Ast.RangeForStatementNode(System.Lex.Span(), new Cm.Ast.ConstNode(System.Lex.Span(),
+                    new Cm.Ast.LValueRefNode(System.Lex.Span(), 
+                    new Cm.Ast.IdentifierNode(System.Lex.Span(), u"Range"))), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"range"), new Cm.Ast.IdentifierNode(System.Lex.Span(), ToUtf32(parser.ArrayName())), actionS);
                 currentBlock->AddStatement(rangeFor);
             }
         }

@@ -231,7 +231,7 @@ void TestUnit(FileTable* fileTable, sngcm::ast::Project* project, CompileUnitNod
     try
     {
         std::string config = GetConfig();
-        rootModule.reset(new Module(project->Name(), project->ModuleFilePath()));
+        rootModule.reset(new Module(project->Name(), project->ModuleFilePath(), project->GetTarget()));
         rootModule->SetRootModule();
         SetRootModuleForCurrentThread(rootModule.get());
         rootModule->SetCurrentToolName(U"cmc");
@@ -242,7 +242,7 @@ void TestUnit(FileTable* fileTable, sngcm::ast::Project* project, CompileUnitNod
             rootModule->GetFileTable().RegisterFilePath(fileTable->GetFilePath(i));
         }
         AttributeBinder attributeBinder(rootModule.get());
-        rootModule->PrepareForCompilation(project->References());
+        rootModule->PrepareForCompilation(project->References(), project->GetTarget());
         cmajor::symbols::MetaInit(rootModule->GetSymbolTable());
         CreateSymbols(rootModule->GetSymbolTable(), testUnit);
         std::vector<std::string> objectFilePaths;

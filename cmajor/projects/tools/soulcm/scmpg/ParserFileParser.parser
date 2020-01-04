@@ -184,7 +184,7 @@ parser ParserFileParser
         ;
 
     RuleCall(ParsingContext* parsingContext, var ustring ruleName, var UniquePtr<InvokeNode> invoke, var long nonterminalPos) : soulcm.scmpg.Parser*
-        ::= Nonterminal:nt{ ruleName = nt; nonterminalPos = pos; invoke.Reset(new InvokeNode(Span())); }
+        ::= Nonterminal:nt{ ruleName = nt; nonterminalPos = pos; invoke.Reset(new InvokeNode(Span())); } 
             (LPAREN{ pass = NoWhiteSpaceBetweenTokens(lexer.GetToken(nonterminalPos), lexer.GetToken(pos)); }
             ExpressionList(parsingContext, invoke.Get()):args RPAREN)? COLON ID!
         {
@@ -200,15 +200,27 @@ parser ParserFileParser
         ;
 
     Primitive : soulcm.scmpg.Parser*
-        ::= EMPTY{ return new soulcm.scmpg.EmptyParser(); }
-        |   ID{ return new soulcm.scmpg.TokenParser(lexer.GetMatch(span)); }
-        |   CHARLIT{ return new soulcm.scmpg.CharParser(soulcm.scmpg.ParseCharLiteral(lexer.FileName(), lexer.GetToken(pos))); }
+        ::= EMPTY
+        {
+            return new soulcm.scmpg.EmptyParser();
+        }
+        |   ID
+        {
+            ustring tokenName = lexer.GetMatch(span);
+            return new soulcm.scmpg.TokenParser(tokenName);
+        }
+        |   CHARLIT
+        {
+            uchar charLit = soulcm.scmpg.ParseCharLiteral(lexer.FileName(), lexer.GetToken(pos));
+            return new soulcm.scmpg.CharParser(charLit);
+        }
         |   STRINGLIT
         {
             ustring strLit = soulcm.scmpg.ParseStringLiteral(lexer.FileName(), lexer.GetToken(pos));
             if (strLit.Length() > 0 && strLit[0] == '[' && strLit[strLit.Length() - 1] == ']')
             {
-                return new soulcm.scmpg.CharSetParser(soulcm.scmpg.ParseCharSet(lexer.FileName(), lexer.GetToken(pos), strLit));
+                soulcm.scmpg.CharSet charSet = soulcm.scmpg.ParseCharSet(lexer.FileName(), lexer.GetToken(pos), strLit);
+                return new soulcm.scmpg.CharSetParser(charSet);
             }
             else
             {

@@ -65,7 +65,7 @@ class PointerDefaultConstructorOperation : public Operation
 public:
     PointerDefaultConstructorOperation(BoundCompileUnit& boundCompileUnit_);
     void CollectViableFunctions(ContainerScope* containerScope, const std::vector<std::unique_ptr<BoundExpression>>& arguments, BoundFunction* currentFunction, 
-        ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span) override;
+        ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span, CollectFlags flags) override;
 private:
     std::unordered_map<TypeSymbol*, FunctionSymbol*> functionMap;
     std::vector<std::unique_ptr<FunctionSymbol>> functions;
@@ -76,7 +76,7 @@ PointerDefaultConstructorOperation::PointerDefaultConstructorOperation(BoundComp
 }
 
 void PointerDefaultConstructorOperation::CollectViableFunctions(ContainerScope* containerScope, const std::vector<std::unique_ptr<BoundExpression>>& arguments, BoundFunction* currentFunction,
-    ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span)
+    ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span, CollectFlags flags)
 {
     TypeSymbol* type = arguments[0]->GetType();
     if (type->PointerCount() <= 1) return;
@@ -142,7 +142,7 @@ class PointerCopyConstructorOperation : public Operation
 public:
     PointerCopyConstructorOperation(BoundCompileUnit& boundCompileUnit_);
     void CollectViableFunctions(ContainerScope* containerScope, const std::vector<std::unique_ptr<BoundExpression>>& arguments, BoundFunction* currentFunction, 
-        ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span) override;
+        ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span, CollectFlags flags) override;
 private:
     std::unordered_map<TypeSymbol*, FunctionSymbol*> functionMap;
     std::vector<std::unique_ptr<FunctionSymbol>> functions;
@@ -153,7 +153,7 @@ PointerCopyConstructorOperation::PointerCopyConstructorOperation(BoundCompileUni
 }
 
 void PointerCopyConstructorOperation::CollectViableFunctions(ContainerScope* containerScope, const std::vector<std::unique_ptr<BoundExpression>>& arguments, BoundFunction* currentFunction,
-    ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span)
+    ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span, CollectFlags flags)
 {
     TypeSymbol* type = arguments[0]->GetType();
     if (type->PointerCount() <= 1) return;
@@ -164,7 +164,8 @@ void PointerCopyConstructorOperation::CollectViableFunctions(ContainerScope* con
         GetBoundCompileUnit().FinalizeBinding(specialization);
     }
     TypeSymbol* pointerType = type->RemovePointer(span);
-    if (!TypesEqual(arguments[1]->GetType(), pointerType->AddRvalueReference(span)) && !arguments[1]->GetFlag(BoundExpressionFlags::bindToRvalueReference))
+    if ((flags & CollectFlags::noRvalueRef) != CollectFlags::none ||
+        !TypesEqual(arguments[1]->GetType(), pointerType->AddRvalueReference(span)) && !arguments[1]->GetFlag(BoundExpressionFlags::bindToRvalueReference))
     {
         FunctionSymbol* function = functionMap[pointerType];
         if (!function)
@@ -224,7 +225,7 @@ class PointerMoveConstructorOperation : public Operation
 public:
     PointerMoveConstructorOperation(BoundCompileUnit& boundCompileUnit_);
     void CollectViableFunctions(ContainerScope* containerScope, const std::vector<std::unique_ptr<BoundExpression>>& arguments, BoundFunction* currentFunction, 
-        ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span) override;
+        ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span, CollectFlags flags) override;
 private:
     std::unordered_map<TypeSymbol*, FunctionSymbol*> functionMap;
     std::vector<std::unique_ptr<FunctionSymbol>> functions;
@@ -235,8 +236,9 @@ PointerMoveConstructorOperation::PointerMoveConstructorOperation(BoundCompileUni
 }
 
 void PointerMoveConstructorOperation::CollectViableFunctions(ContainerScope* containerScope, const std::vector<std::unique_ptr<BoundExpression>>& arguments, BoundFunction* currentFunction,
-    ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span)
+    ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span, CollectFlags flags)
 {
+    if ((flags & CollectFlags::noRvalueRef) != CollectFlags::none) return;
     TypeSymbol* type = arguments[0]->GetType();
     if (type->PointerCount() <= 1) return;
     if (type->IsReferenceType()) return;
@@ -299,7 +301,7 @@ class PointerCopyAssignmentOperation : public Operation
 public:
     PointerCopyAssignmentOperation(BoundCompileUnit& boundCompileUnit_);
     void CollectViableFunctions(ContainerScope* containerScope, const std::vector<std::unique_ptr<BoundExpression>>& arguments, BoundFunction* currentFunction, 
-        ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span) override;
+        ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span, CollectFlags flags) override;
 private:
     std::unordered_map<TypeSymbol*, FunctionSymbol*> functionMap;
     std::vector<std::unique_ptr<FunctionSymbol>> functions;
@@ -310,7 +312,7 @@ PointerCopyAssignmentOperation::PointerCopyAssignmentOperation(BoundCompileUnit&
 }
 
 void PointerCopyAssignmentOperation::CollectViableFunctions(ContainerScope* containerScope, const std::vector<std::unique_ptr<BoundExpression>>& arguments, BoundFunction* currentFunction,
-    ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span)
+    ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span, CollectFlags flags)
 {
     TypeSymbol* type = arguments[0]->GetType();
     if (type->PointerCount() <= 1) return;
@@ -321,7 +323,8 @@ void PointerCopyAssignmentOperation::CollectViableFunctions(ContainerScope* cont
         GetBoundCompileUnit().FinalizeBinding(specialization);
     }
     TypeSymbol* pointerType = type->RemovePointer(span);
-    if (!TypesEqual(arguments[1]->GetType(), pointerType->AddRvalueReference(span)) && !arguments[1]->GetFlag(BoundExpressionFlags::bindToRvalueReference))
+    if ((flags & CollectFlags::noRvalueRef) != CollectFlags::none ||
+        !TypesEqual(arguments[1]->GetType(), pointerType->AddRvalueReference(span)) && !arguments[1]->GetFlag(BoundExpressionFlags::bindToRvalueReference))
     {
         FunctionSymbol* function = functionMap[pointerType];
         if (!function)
@@ -376,7 +379,7 @@ class PointerMoveAssignmentOperation : public Operation
 public:
     PointerMoveAssignmentOperation(BoundCompileUnit& boundCompileUnit_);
     void CollectViableFunctions(ContainerScope* containerScope, const std::vector<std::unique_ptr<BoundExpression>>& arguments, BoundFunction* currentFunction, 
-        ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span) override;
+        ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span, CollectFlags flags) override;
 private:
     std::unordered_map<TypeSymbol*, FunctionSymbol*> functionMap;
     std::vector<std::unique_ptr<FunctionSymbol>> functions;
@@ -387,8 +390,9 @@ PointerMoveAssignmentOperation::PointerMoveAssignmentOperation(BoundCompileUnit&
 }
 
 void PointerMoveAssignmentOperation::CollectViableFunctions(ContainerScope* containerScope, const std::vector<std::unique_ptr<BoundExpression>>& arguments, BoundFunction* currentFunction,
-    ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span)
+    ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span, CollectFlags flags)
 {
+    if ((flags & CollectFlags::noRvalueRef) != CollectFlags::none) return;
     TypeSymbol* type = arguments[0]->GetType();
     if (type->PointerCount() <= 1) return;
     if (type->IsReferenceType()) return;
@@ -453,7 +457,7 @@ class PointerReturnOperation : public Operation
 public:
     PointerReturnOperation(BoundCompileUnit& boundCompileUnit_);
     void CollectViableFunctions(ContainerScope* containerScope, const std::vector<std::unique_ptr<BoundExpression>>& arguments, BoundFunction* currentFunction, 
-        ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span) override;
+        ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span, CollectFlags flags) override;
 private:
     std::unordered_map<TypeSymbol*, FunctionSymbol*> functionMap;
     std::vector<std::unique_ptr<FunctionSymbol>> functions;
@@ -464,7 +468,7 @@ PointerReturnOperation::PointerReturnOperation(BoundCompileUnit& boundCompileUni
 }
 
 void PointerReturnOperation::CollectViableFunctions(ContainerScope* containerScope, const std::vector<std::unique_ptr<BoundExpression>>& arguments, BoundFunction* currentFunction,
-    ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span)
+    ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span, CollectFlags flags)
 {
     TypeSymbol* type = arguments[0]->GetType();
     if (!type->IsPointerType()) return;
@@ -525,7 +529,7 @@ class PointerPlusOffsetOperation : public Operation
 public:
     PointerPlusOffsetOperation(BoundCompileUnit& boundCompileUnit_);
     void CollectViableFunctions(ContainerScope* containerScope, const std::vector<std::unique_ptr<BoundExpression>>& arguments, BoundFunction* currentFunction, 
-        ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span) override;
+        ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span, CollectFlags flags) override;
 private:
     std::unordered_map<TypeSymbol*, FunctionSymbol*> functionMap;
     std::vector<std::unique_ptr<FunctionSymbol>> functions;
@@ -536,7 +540,7 @@ PointerPlusOffsetOperation::PointerPlusOffsetOperation(BoundCompileUnit& boundCo
 }
 
 void PointerPlusOffsetOperation::CollectViableFunctions(ContainerScope* containerScope, const std::vector<std::unique_ptr<BoundExpression>>& arguments, BoundFunction* currentFunction,
-    ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span)
+    ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span, CollectFlags flags)
 {
     TypeSymbol* leftType = arguments[0]->GetType();
     if (!leftType->IsPointerType()) return;
@@ -606,7 +610,7 @@ class OffsetPlusPointerOperation : public Operation
 public:
     OffsetPlusPointerOperation(BoundCompileUnit& boundCompileUnit_);
     void CollectViableFunctions(ContainerScope* containerScope, const std::vector<std::unique_ptr<BoundExpression>>& arguments, BoundFunction* currentFunction, 
-        ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span) override;
+        ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span, CollectFlags flags) override;
 private:
     std::unordered_map<TypeSymbol*, FunctionSymbol*> functionMap;
     std::vector<std::unique_ptr<FunctionSymbol>> functions;
@@ -617,7 +621,7 @@ OffsetPlusPointerOperation::OffsetPlusPointerOperation(BoundCompileUnit& boundCo
 }
 
 void OffsetPlusPointerOperation::CollectViableFunctions(ContainerScope* containerScope, const std::vector<std::unique_ptr<BoundExpression>>& arguments, BoundFunction* currentFunction,
-    ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span)
+    ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span, CollectFlags flags)
 {
     TypeSymbol* leftType = arguments[0]->GetType();
     if (!leftType->PlainType(span)->IsIntegralType())
@@ -689,7 +693,7 @@ class PointerMinusOffsetOperation : public Operation
 public:
     PointerMinusOffsetOperation(BoundCompileUnit& boundCompileUnit_);
     void CollectViableFunctions(ContainerScope* containerScope, const std::vector<std::unique_ptr<BoundExpression>>& arguments, BoundFunction* currentFunction, 
-        ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span) override;
+        ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span, CollectFlags flags) override;
 private:
     std::unordered_map<TypeSymbol*, FunctionSymbol*> functionMap;
     std::vector<std::unique_ptr<FunctionSymbol>> functions;
@@ -700,7 +704,7 @@ PointerMinusOffsetOperation::PointerMinusOffsetOperation(BoundCompileUnit& bound
 }
 
 void PointerMinusOffsetOperation::CollectViableFunctions(ContainerScope* containerScope, const std::vector<std::unique_ptr<BoundExpression>>& arguments, BoundFunction* currentFunction,
-    ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span)
+    ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span, CollectFlags flags)
 {
     TypeSymbol* leftType = arguments[0]->GetType();
     if (!leftType->IsPointerType()) return;
@@ -770,7 +774,7 @@ class PointerMinusPointerOperation : public Operation
 public:
     PointerMinusPointerOperation(BoundCompileUnit& boundCompileUnit_);
     void CollectViableFunctions(ContainerScope* containerScope, const std::vector<std::unique_ptr<BoundExpression>>& arguments, BoundFunction* currentFunction, 
-        ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span) override;
+        ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span, CollectFlags flags) override;
 private:
     std::unordered_map<TypeSymbol*, FunctionSymbol*> functionMap;
     std::vector<std::unique_ptr<FunctionSymbol>> functions;
@@ -781,7 +785,7 @@ PointerMinusPointerOperation::PointerMinusPointerOperation(BoundCompileUnit& bou
 }
 
 void PointerMinusPointerOperation::CollectViableFunctions(ContainerScope* containerScope, const std::vector<std::unique_ptr<BoundExpression>>& arguments, BoundFunction* currentFunction,
-    ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span)
+    ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span, CollectFlags flags)
 {
     TypeSymbol* leftType = arguments[0]->GetType();
     if (!leftType->IsPointerType()) return;
@@ -845,7 +849,7 @@ class PointerEqualOperation : public Operation
 public:
     PointerEqualOperation(BoundCompileUnit& boundCompileUnit_);
     void CollectViableFunctions(ContainerScope* containerScope, const std::vector<std::unique_ptr<BoundExpression>>& arguments, BoundFunction* currentFunction, 
-        ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span) override;
+        ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span, CollectFlags flags) override;
 private:
     std::unordered_map<TypeSymbol*, FunctionSymbol*> functionMap;
     std::vector<std::unique_ptr<FunctionSymbol>> functions;
@@ -856,7 +860,7 @@ PointerEqualOperation::PointerEqualOperation(BoundCompileUnit& boundCompileUnit_
 }
 
 void PointerEqualOperation::CollectViableFunctions(ContainerScope* containerScope, const std::vector<std::unique_ptr<BoundExpression>>& arguments, BoundFunction* currentFunction,
-    ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span)
+    ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span, CollectFlags flags)
 {
     TypeSymbol* leftType = arguments[0]->GetType();
     if (!leftType->IsPointerType()) return;
@@ -920,7 +924,7 @@ class PointerLessOperation : public Operation
 public:
     PointerLessOperation(BoundCompileUnit& boundCompileUnit_);
     void CollectViableFunctions(ContainerScope* containerScope, const std::vector<std::unique_ptr<BoundExpression>>& arguments, BoundFunction* currentFunction, 
-        ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span) override;
+        ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span, CollectFlags flags) override;
 private:
     std::unordered_map<TypeSymbol*, FunctionSymbol*> functionMap;
     std::vector<std::unique_ptr<FunctionSymbol>> functions;
@@ -931,7 +935,7 @@ PointerLessOperation::PointerLessOperation(BoundCompileUnit& boundCompileUnit_) 
 }
 
 void PointerLessOperation::CollectViableFunctions(ContainerScope* containerScope, const std::vector<std::unique_ptr<BoundExpression>>& arguments, BoundFunction* currentFunction,
-    ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span)
+    ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span, CollectFlags flags)
 {
     TypeSymbol* leftType = arguments[0]->GetType();
     if (!leftType->IsPointerType()) return;
@@ -990,7 +994,7 @@ class PointerArrowOperation : public Operation
 public:
     PointerArrowOperation(BoundCompileUnit& boundCompileUnit_);
     void CollectViableFunctions(ContainerScope* containerScope, const std::vector<std::unique_ptr<BoundExpression>>& arguments, BoundFunction* currentFunction, 
-        ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span) override;
+        ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span, CollectFlags flags) override;
 private:
     std::unordered_map<TypeSymbol*, FunctionSymbol*> functionMap;
     std::vector<std::unique_ptr<FunctionSymbol>> functions;
@@ -1001,7 +1005,7 @@ PointerArrowOperation::PointerArrowOperation(BoundCompileUnit& boundCompileUnit_
 }
 
 void PointerArrowOperation::CollectViableFunctions(ContainerScope* containerScope, const std::vector<std::unique_ptr<BoundExpression>>& arguments, BoundFunction* currentFunction,
-    ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span)
+    ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span, CollectFlags flags)
 {
     TypeSymbol* type = arguments[0]->GetType();
     if (type->PointerCount() <= 1) return;
@@ -1060,7 +1064,7 @@ class LvalueReferenceCopyConstructorOperation : public Operation
 public:
     LvalueReferenceCopyConstructorOperation(BoundCompileUnit& boundCompileUnit_);
     void CollectViableFunctions(ContainerScope* containerScope, const std::vector<std::unique_ptr<BoundExpression>>& arguments, BoundFunction* currentFunction, 
-        ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span) override;
+        ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span, CollectFlags flags) override;
 private:
     std::unordered_map<TypeSymbol*, FunctionSymbol*> functionMap;
     std::vector<std::unique_ptr<FunctionSymbol>> functions;
@@ -1071,7 +1075,7 @@ LvalueReferenceCopyConstructorOperation::LvalueReferenceCopyConstructorOperation
 }
 
 void LvalueReferenceCopyConstructorOperation::CollectViableFunctions(ContainerScope* containerScope, const std::vector<std::unique_ptr<BoundExpression>>& arguments, BoundFunction* currentFunction,
-    ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span)
+    ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span, CollectFlags flags)
 {
     TypeSymbol* type = arguments[0]->GetType();
     if (type->PointerCount() < 1 || !type->IsLvalueReferenceType()) return;
@@ -1132,7 +1136,7 @@ class LvalueReferenceCopyAssignmentOperation : public Operation
 public:
     LvalueReferenceCopyAssignmentOperation(BoundCompileUnit& boundCompileUnit_);
     void CollectViableFunctions(ContainerScope* containerScope, const std::vector<std::unique_ptr<BoundExpression>>& arguments, BoundFunction* currentFunction, 
-        ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span) override;
+        ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span, CollectFlags flags) override;
 private:
     std::unordered_map<TypeSymbol*, FunctionSymbol*> functionMap;
     std::vector<std::unique_ptr<FunctionSymbol>> functions;
@@ -1143,7 +1147,7 @@ LvalueReferenceCopyAssignmentOperation::LvalueReferenceCopyAssignmentOperation(B
 }
 
 void LvalueReferenceCopyAssignmentOperation::CollectViableFunctions(ContainerScope* containerScope, const std::vector<std::unique_ptr<BoundExpression>>& arguments, BoundFunction* currentFunction,
-    ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span)
+    ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span, CollectFlags flags)
 {
     TypeSymbol* type = arguments[0]->GetType();
     if (type->PointerCount() < 1 || !type->IsLvalueReferenceType()) return;
@@ -1154,7 +1158,8 @@ void LvalueReferenceCopyAssignmentOperation::CollectViableFunctions(ContainerSco
     }
     TypeSymbol* lvalueRefType = type->RemovePointer(span);
     if (lvalueRefType->PlainType(span)->IsClassTypeSymbol()) return;
-    if (!TypesEqual(arguments[1]->GetType()->RemoveConst(span), lvalueRefType->PlainType(span)->AddRvalueReference(span)) && !arguments[1]->GetFlag(BoundExpressionFlags::bindToRvalueReference))
+    if ((flags & CollectFlags::noRvalueRef) != CollectFlags::none ||
+        !TypesEqual(arguments[1]->GetType()->RemoveConst(span), lvalueRefType->PlainType(span)->AddRvalueReference(span)) && !arguments[1]->GetFlag(BoundExpressionFlags::bindToRvalueReference))
     {
         FunctionSymbol* function = functionMap[lvalueRefType];
         if (!function)
@@ -1209,7 +1214,7 @@ class LvalueReferenceMoveAssignmentOperation : public Operation
 public:
     LvalueReferenceMoveAssignmentOperation(BoundCompileUnit& boundCompileUnit_);
     void CollectViableFunctions(ContainerScope* containerScope, const std::vector<std::unique_ptr<BoundExpression>>& arguments, BoundFunction* currentFunction, 
-        ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span) override;
+        ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span, CollectFlags flags) override;
 private:
     std::unordered_map<TypeSymbol*, FunctionSymbol*> functionMap;
     std::vector<std::unique_ptr<FunctionSymbol>> functions;
@@ -1220,8 +1225,9 @@ LvalueReferenceMoveAssignmentOperation::LvalueReferenceMoveAssignmentOperation(B
 }
 
 void LvalueReferenceMoveAssignmentOperation::CollectViableFunctions(ContainerScope* containerScope, const std::vector<std::unique_ptr<BoundExpression>>& arguments, BoundFunction* currentFunction,
-    ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span)
+    ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span, CollectFlags flags)
 {
+    if ((flags & CollectFlags::noRvalueRef) != CollectFlags::none) return;
     TypeSymbol* type = arguments[0]->GetType();
     if (type->PointerCount() < 1 || !type->IsLvalueReferenceType()) return;
     if (type->BaseType()->GetSymbolType() == SymbolType::classTemplateSpecializationSymbol)
@@ -1280,7 +1286,7 @@ class LvalueReferenceReturnOperation : public Operation
 public:
     LvalueReferenceReturnOperation(BoundCompileUnit& boundCompileUnit_);
     void CollectViableFunctions(ContainerScope* containerScope, const std::vector<std::unique_ptr<BoundExpression>>& arguments, BoundFunction* currentFunction, 
-        ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span) override;
+        ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span, CollectFlags flags) override;
 private:
     std::unordered_map<TypeSymbol*, FunctionSymbol*> functionMap;
     std::vector<std::unique_ptr<FunctionSymbol>> functions;
@@ -1291,7 +1297,7 @@ LvalueReferenceReturnOperation::LvalueReferenceReturnOperation(BoundCompileUnit&
 }
 
 void LvalueReferenceReturnOperation::CollectViableFunctions(ContainerScope* containerScope, const std::vector<std::unique_ptr<BoundExpression>>& arguments, BoundFunction* currentFunction,
-    ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span)
+    ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span, CollectFlags flags)
 {
     TypeSymbol* type = arguments[0]->GetType();
     if (!type->IsLvalueReferenceType()) return;
@@ -1349,7 +1355,7 @@ class RvalueReferenceCopyConstructorOperation : public Operation
 public:
     RvalueReferenceCopyConstructorOperation(BoundCompileUnit& boundCompileUnit_);
     void CollectViableFunctions(ContainerScope* containerScope, const std::vector<std::unique_ptr<BoundExpression>>& arguments, BoundFunction* currentFunction, 
-        ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span) override;
+        ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span, CollectFlags flags) override;
 private:
     std::unordered_map<TypeSymbol*, FunctionSymbol*> functionMap;
     std::vector<std::unique_ptr<FunctionSymbol>> functions;
@@ -1360,7 +1366,7 @@ RvalueReferenceCopyConstructorOperation::RvalueReferenceCopyConstructorOperation
 }
 
 void RvalueReferenceCopyConstructorOperation::CollectViableFunctions(ContainerScope* containerScope, const std::vector<std::unique_ptr<BoundExpression>>& arguments, BoundFunction* currentFunction,
-    ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span)
+    ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span, CollectFlags flags)
 {
     TypeSymbol* type = arguments[0]->GetType();
     if (type->PointerCount() < 1 || !type->IsRvalueReferenceType()) return;
@@ -1423,7 +1429,7 @@ class RvalueReferenceCopyAssignmentOperation : public Operation
 public:
     RvalueReferenceCopyAssignmentOperation(BoundCompileUnit& boundCompileUnit_);
     void CollectViableFunctions(ContainerScope* containerScope, const std::vector<std::unique_ptr<BoundExpression>>& arguments, BoundFunction* currentFunction, 
-        ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span) override;
+        ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span, CollectFlags flags) override;
 private:
     std::unordered_map<TypeSymbol*, FunctionSymbol*> functionMap;
     std::vector<std::unique_ptr<FunctionSymbol>> functions;
@@ -1434,7 +1440,7 @@ RvalueReferenceCopyAssignmentOperation::RvalueReferenceCopyAssignmentOperation(B
 }
 
 void RvalueReferenceCopyAssignmentOperation::CollectViableFunctions(ContainerScope* containerScope, const std::vector<std::unique_ptr<BoundExpression>>& arguments, BoundFunction* currentFunction,
-    ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span)
+    ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span, CollectFlags flags)
 {
     TypeSymbol* type = arguments[0]->GetType();
     if (type->PointerCount() < 1 || !type->IsRvalueReferenceType()) return;
@@ -1491,7 +1497,7 @@ class RvalueReferenceReturnOperation : public Operation
 public:
     RvalueReferenceReturnOperation(BoundCompileUnit& boundCompileUnit_);
     void CollectViableFunctions(ContainerScope* containerScope, const std::vector<std::unique_ptr<BoundExpression>>& arguments, BoundFunction* currentFunction, 
-        ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span) override;
+        ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span, CollectFlags flags) override;
 private:
     std::unordered_map<TypeSymbol*, FunctionSymbol*> functionMap;
     std::vector<std::unique_ptr<FunctionSymbol>> functions;
@@ -1502,7 +1508,7 @@ RvalueReferenceReturnOperation::RvalueReferenceReturnOperation(BoundCompileUnit&
 }
 
 void RvalueReferenceReturnOperation::CollectViableFunctions(ContainerScope* containerScope, const std::vector<std::unique_ptr<BoundExpression>>& arguments, BoundFunction* currentFunction,
-    ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span)
+    ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span, CollectFlags flags)
 {
     TypeSymbol* type = arguments[0]->GetType();
     if (!type->IsRvalueReferenceType()) return;
@@ -1528,7 +1534,7 @@ class ArrayDefaultConstructorOperation : public Operation
 public:
     ArrayDefaultConstructorOperation(BoundCompileUnit& boundCompileUnit_);
     void CollectViableFunctions(ContainerScope* containerScope_, const std::vector<std::unique_ptr<BoundExpression>>& arguments, BoundFunction* currentFunction,
-        ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span) override;
+        ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span, CollectFlags flags) override;
 private:
     std::unordered_map<boost::uuids::uuid, FunctionSymbol*, boost::hash<boost::uuids::uuid>> functionMap;
     std::vector<std::unique_ptr<FunctionSymbol>> functions;
@@ -1539,7 +1545,7 @@ ArrayDefaultConstructorOperation::ArrayDefaultConstructorOperation(BoundCompileU
 }
 
 void ArrayDefaultConstructorOperation::CollectViableFunctions(ContainerScope* containerScope, const std::vector<std::unique_ptr<BoundExpression>>& arguments, BoundFunction* currentFunction,
-    ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span)
+    ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span, CollectFlags flags)
 {
     TypeSymbol* type = arguments[0]->GetType();
     if (type->PointerCount() != 1 || !type->RemovePointer(span)->IsArrayType()) return;
@@ -1574,7 +1580,7 @@ class ArrayCopyConstructorOperation : public Operation
 public:
     ArrayCopyConstructorOperation(BoundCompileUnit& boundCompileUnit_);
     void CollectViableFunctions(ContainerScope* containerScope_, const std::vector<std::unique_ptr<BoundExpression>>& arguments, BoundFunction* currentFunction,
-        ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span) override;
+        ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span, CollectFlags flags) override;
 private:
     std::unordered_map<boost::uuids::uuid, FunctionSymbol*, boost::hash<boost::uuids::uuid>> functionMap;
     std::vector<std::unique_ptr<FunctionSymbol>> functions;
@@ -1585,7 +1591,7 @@ ArrayCopyConstructorOperation::ArrayCopyConstructorOperation(BoundCompileUnit& b
 }
 
 void ArrayCopyConstructorOperation::CollectViableFunctions(ContainerScope* containerScope, const std::vector<std::unique_ptr<BoundExpression>>& arguments, BoundFunction* currentFunction,
-    ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span)
+    ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span, CollectFlags flags)
 {
     TypeSymbol* type = arguments[0]->GetType();
     if (type->PointerCount() != 1 || !type->RemovePointer(span)->IsArrayType()) return;
@@ -1595,7 +1601,8 @@ void ArrayCopyConstructorOperation::CollectViableFunctions(ContainerScope* conta
         GetBoundCompileUnit().FinalizeBinding(specialization);
     }
     ArrayTypeSymbol* arrayType = static_cast<ArrayTypeSymbol*>(type->RemovePointer(span));
-    if (!TypesEqual(arguments[1]->GetType(), arrayType->AddRvalueReference(span)) && !arguments[1]->GetFlag(BoundExpressionFlags::bindToRvalueReference) &&
+    if (((flags & CollectFlags::noRvalueRef) != CollectFlags::none ||
+        !TypesEqual(arguments[1]->GetType(), arrayType->AddRvalueReference(span)) && !arguments[1]->GetFlag(BoundExpressionFlags::bindToRvalueReference)) &&
         TypesEqual(arguments[1]->GetType()->PlainType(span), arrayType))
     {
         FunctionSymbol* function = functionMap[arrayType->TypeId()];
@@ -1625,7 +1632,7 @@ class ArrayMoveConstructorOperation : public Operation
 public:
     ArrayMoveConstructorOperation(BoundCompileUnit& boundCompileUnit_);
     void CollectViableFunctions(ContainerScope* containerScope_, const std::vector<std::unique_ptr<BoundExpression>>& arguments, BoundFunction* currentFunction,
-        ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span) override;
+        ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span, CollectFlags flags) override;
 private:
     std::unordered_map<boost::uuids::uuid, FunctionSymbol*, boost::hash<boost::uuids::uuid>> functionMap;
     std::vector<std::unique_ptr<FunctionSymbol>> functions;
@@ -1636,8 +1643,9 @@ ArrayMoveConstructorOperation::ArrayMoveConstructorOperation(BoundCompileUnit& b
 }
 
 void ArrayMoveConstructorOperation::CollectViableFunctions(ContainerScope* containerScope, const std::vector<std::unique_ptr<BoundExpression>>& arguments, BoundFunction* currentFunction,
-    ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span)
+    ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span, CollectFlags flags)
 {
+    if ((flags & CollectFlags::noRvalueRef) != CollectFlags::none) return;
     TypeSymbol* type = arguments[0]->GetType();
     if (type->PointerCount() != 1 || !type->RemovePointer(span)->IsArrayType()) return;
     if (type->BaseType()->GetSymbolType() == SymbolType::classTemplateSpecializationSymbol)
@@ -1676,7 +1684,7 @@ class ArrayCopyAssignmentOperation : public Operation
 public:
     ArrayCopyAssignmentOperation(BoundCompileUnit& boundCompileUnit_);
     void CollectViableFunctions(ContainerScope* containerScope_, const std::vector<std::unique_ptr<BoundExpression>>& arguments, BoundFunction* currentFunction,
-        ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span) override;
+        ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span, CollectFlags flags) override;
 private:
     std::unordered_map<boost::uuids::uuid, FunctionSymbol*, boost::hash<boost::uuids::uuid>> functionMap;
     std::vector<std::unique_ptr<FunctionSymbol>> functions;
@@ -1687,7 +1695,7 @@ ArrayCopyAssignmentOperation::ArrayCopyAssignmentOperation(BoundCompileUnit& bou
 }
 
 void ArrayCopyAssignmentOperation::CollectViableFunctions(ContainerScope* containerScope, const std::vector<std::unique_ptr<BoundExpression>>& arguments, BoundFunction* currentFunction,
-    ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span)
+    ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span, CollectFlags flags)
 {
     TypeSymbol* type = arguments[0]->GetType();
     if (type->PointerCount() != 1 || !type->RemovePointer(span)->IsArrayType()) return;
@@ -1697,7 +1705,8 @@ void ArrayCopyAssignmentOperation::CollectViableFunctions(ContainerScope* contai
         GetBoundCompileUnit().FinalizeBinding(specialization);
     }
     ArrayTypeSymbol* arrayType = static_cast<ArrayTypeSymbol*>(type->RemovePointer(span));
-    if (!TypesEqual(arguments[1]->GetType(), arrayType->AddRvalueReference(span)) && !arguments[1]->GetFlag(BoundExpressionFlags::bindToRvalueReference) &&
+    if (((flags & CollectFlags::noRvalueRef) != CollectFlags::none && TypesEqual(arguments[1]->GetType()->PlainType(span), arrayType) ||
+        !TypesEqual(arguments[1]->GetType(), arrayType->AddRvalueReference(span)) && !arguments[1]->GetFlag(BoundExpressionFlags::bindToRvalueReference)) &&
         TypesEqual(arguments[1]->GetType()->PlainType(span), arrayType))
     {
         FunctionSymbol* function = functionMap[arrayType->TypeId()];
@@ -1727,7 +1736,7 @@ class ArrayMoveAssignmentOperation : public Operation
 public:
     ArrayMoveAssignmentOperation(BoundCompileUnit& boundCompileUnit_);
     void CollectViableFunctions(ContainerScope* containerScope_, const std::vector<std::unique_ptr<BoundExpression>>& arguments, BoundFunction* currentFunction,
-        ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span) override;
+        ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span, CollectFlags flags) override;
 private:
     std::unordered_map<boost::uuids::uuid, FunctionSymbol*, boost::hash<boost::uuids::uuid>> functionMap;
     std::vector<std::unique_ptr<FunctionSymbol>> functions;
@@ -1738,8 +1747,9 @@ ArrayMoveAssignmentOperation::ArrayMoveAssignmentOperation(BoundCompileUnit& bou
 }
 
 void ArrayMoveAssignmentOperation::CollectViableFunctions(ContainerScope* containerScope, const std::vector<std::unique_ptr<BoundExpression>>& arguments, BoundFunction* currentFunction,
-    ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span)
+    ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span, CollectFlags flags)
 {
+    if ((flags & CollectFlags::noRvalueRef) != CollectFlags::none) return;
     TypeSymbol* type = arguments[0]->GetType();
     if (type->PointerCount() != 1 || !type->RemovePointer(span)->IsArrayType()) return;
     if (type->BaseType()->GetSymbolType() == SymbolType::classTemplateSpecializationSymbol)
@@ -1778,7 +1788,7 @@ class ArrayElementAccessOperation : public Operation
 public:
     ArrayElementAccessOperation(BoundCompileUnit& boundCompileUnit_);
     void CollectViableFunctions(ContainerScope* containerScope_, const std::vector<std::unique_ptr<BoundExpression>>& arguments, BoundFunction* currentFunction,
-        ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span) override;
+        ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span, CollectFlags flags) override;
 private:
     std::unordered_map<boost::uuids::uuid, FunctionSymbol*, boost::hash<boost::uuids::uuid>> functionMap;
     std::vector<std::unique_ptr<FunctionSymbol>> functions;
@@ -1789,7 +1799,7 @@ ArrayElementAccessOperation::ArrayElementAccessOperation(BoundCompileUnit& bound
 }
 
 void ArrayElementAccessOperation::CollectViableFunctions(ContainerScope* containerScope, const std::vector<std::unique_ptr<BoundExpression>>& arguments, BoundFunction* currentFunction,
-    ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span)
+    ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span, CollectFlags flags)
 {
     TypeSymbol* leftType = arguments[0]->GetType();
     if (!leftType->PlainType(span)->IsArrayType()) return;
@@ -1825,7 +1835,7 @@ class InterfaceDefaultConstructorOperation : public Operation
 public:
     InterfaceDefaultConstructorOperation(BoundCompileUnit& boundCompileUnit_);
     void CollectViableFunctions(ContainerScope* containerScope_, const std::vector<std::unique_ptr<BoundExpression>>& arguments, BoundFunction* currentFunction,
-        ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span) override;
+        ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span, CollectFlags flags) override;
 private:
     std::unordered_map<boost::uuids::uuid, FunctionSymbol*, boost::hash<boost::uuids::uuid>> functionMap;
     std::vector<std::unique_ptr<FunctionSymbol>> functions;
@@ -1836,7 +1846,7 @@ InterfaceDefaultConstructorOperation::InterfaceDefaultConstructorOperation(Bound
 }
 
 void InterfaceDefaultConstructorOperation::CollectViableFunctions(ContainerScope* containerScope, const std::vector<std::unique_ptr<BoundExpression>>& arguments, BoundFunction* currentFunction,
-    ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span)
+    ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span, CollectFlags flags)
 {
     TypeSymbol* type = arguments[0]->GetType();
     if (type->PointerCount() != 1 || type->RemovePointer(span)->GetSymbolType() != SymbolType::interfaceTypeSymbol) return;
@@ -1863,7 +1873,7 @@ class InterfaceCopyConstructorOperation : public Operation
 public:
     InterfaceCopyConstructorOperation(BoundCompileUnit& boundCompileUnit_);
     void CollectViableFunctions(ContainerScope* containerScope_, const std::vector<std::unique_ptr<BoundExpression>>& arguments, BoundFunction* currentFunction,
-        ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span) override;
+        ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span, CollectFlags flags) override;
 private:
     std::unordered_map<boost::uuids::uuid, FunctionSymbol*, boost::hash<boost::uuids::uuid>> functionMap;
     std::vector<std::unique_ptr<FunctionSymbol>> functions;
@@ -1874,7 +1884,7 @@ InterfaceCopyConstructorOperation::InterfaceCopyConstructorOperation(BoundCompil
 }
 
 void InterfaceCopyConstructorOperation::CollectViableFunctions(ContainerScope* containerScope, const std::vector<std::unique_ptr<BoundExpression>>& arguments, BoundFunction* currentFunction,
-    ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span)
+    ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span, CollectFlags flags)
 {
     TypeSymbol* type = arguments[0]->GetType();
     if (type->PointerCount() != 1 || type->RemovePointer(span)->GetSymbolType() != SymbolType::interfaceTypeSymbol) return;
@@ -1884,7 +1894,9 @@ void InterfaceCopyConstructorOperation::CollectViableFunctions(ContainerScope* c
         GetBoundCompileUnit().FinalizeBinding(specialization);
     }
     InterfaceTypeSymbol* interfaceType = static_cast<InterfaceTypeSymbol*>(type->RemovePointer(span));
-    if (!TypesEqual(arguments[1]->GetType(), interfaceType->AddRvalueReference(span)) && !arguments[1]->GetFlag(BoundExpressionFlags::bindToRvalueReference) &&
+    
+    if (((flags & CollectFlags::noRvalueRef) != CollectFlags::none ||
+        !TypesEqual(arguments[1]->GetType(), interfaceType->AddRvalueReference(span)) && !arguments[1]->GetFlag(BoundExpressionFlags::bindToRvalueReference)) &&
         (TypesEqual(arguments[1]->GetType()->PlainType(span), interfaceType) || arguments[1]->GetType()->PlainType(span)->IsClassTypeSymbol()))
     {
         if (GetBoundCompileUnit().HasCopyConstructorFor(interfaceType->TypeId()))
@@ -1911,7 +1923,7 @@ class InterfaceMoveConstructorOperation : public Operation
 public:
     InterfaceMoveConstructorOperation(BoundCompileUnit& boundCompileUnit_);
     void CollectViableFunctions(ContainerScope* containerScope_, const std::vector<std::unique_ptr<BoundExpression>>& arguments, BoundFunction* currentFunction,
-        ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span) override;
+        ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span, CollectFlags flags) override;
 private:
     std::unordered_map<boost::uuids::uuid, FunctionSymbol*, boost::hash<boost::uuids::uuid>> functionMap;
     std::vector<std::unique_ptr<FunctionSymbol>> functions;
@@ -1922,8 +1934,9 @@ InterfaceMoveConstructorOperation::InterfaceMoveConstructorOperation(BoundCompil
 }
 
 void InterfaceMoveConstructorOperation::CollectViableFunctions(ContainerScope* containerScope, const std::vector<std::unique_ptr<BoundExpression>>& arguments, BoundFunction* currentFunction,
-    ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span)
+    ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span, CollectFlags flags)
 {
+    if ((flags & CollectFlags::noRvalueRef) != CollectFlags::none) return;
     TypeSymbol* type = arguments[0]->GetType();
     if (type->PointerCount() != 1 || type->RemovePointer(span)->GetSymbolType() != SymbolType::interfaceTypeSymbol) return;
     if (type->BaseType()->GetSymbolType() == SymbolType::classTemplateSpecializationSymbol)
@@ -1952,7 +1965,7 @@ class InterfaceCopyAssignmentOperation : public Operation
 public:
     InterfaceCopyAssignmentOperation(BoundCompileUnit& boundCompileUnit_);
     void CollectViableFunctions(ContainerScope* containerScope_, const std::vector<std::unique_ptr<BoundExpression>>& arguments, BoundFunction* currentFunction,
-        ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span) override;
+        ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span, CollectFlags flags) override;
 private:
     std::unordered_map<boost::uuids::uuid, FunctionSymbol*, boost::hash<boost::uuids::uuid>> functionMap;
     std::vector<std::unique_ptr<FunctionSymbol>> functions;
@@ -1963,7 +1976,7 @@ InterfaceCopyAssignmentOperation::InterfaceCopyAssignmentOperation(BoundCompileU
 }
 
 void InterfaceCopyAssignmentOperation::CollectViableFunctions(ContainerScope* containerScope, const std::vector<std::unique_ptr<BoundExpression>>& arguments, BoundFunction* currentFunction,
-    ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span)
+    ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span, CollectFlags flags)
 {
     TypeSymbol* type = arguments[0]->GetType();
     if (type->PointerCount() != 1 || type->RemovePointer(span)->GetSymbolType() != SymbolType::interfaceTypeSymbol) return;
@@ -1973,7 +1986,8 @@ void InterfaceCopyAssignmentOperation::CollectViableFunctions(ContainerScope* co
         GetBoundCompileUnit().FinalizeBinding(specialization);
     }
     InterfaceTypeSymbol* interfaceType = static_cast<InterfaceTypeSymbol*>(type->RemovePointer(span));
-    if (!TypesEqual(arguments[1]->GetType(), interfaceType->AddRvalueReference(span)) && !arguments[1]->GetFlag(BoundExpressionFlags::bindToRvalueReference) &&
+    if (((flags & CollectFlags::noRvalueRef) != CollectFlags::none || 
+        !TypesEqual(arguments[1]->GetType(), interfaceType->AddRvalueReference(span)) && !arguments[1]->GetFlag(BoundExpressionFlags::bindToRvalueReference)) &&
         TypesEqual(arguments[1]->GetType()->PlainType(span), interfaceType))
     {
         FunctionSymbol* function = functionMap[interfaceType->TypeId()];
@@ -1994,7 +2008,7 @@ class InterfaceMoveAssignmentOperation : public Operation
 public:
     InterfaceMoveAssignmentOperation(BoundCompileUnit& boundCompileUnit_);
     void CollectViableFunctions(ContainerScope* containerScope_, const std::vector<std::unique_ptr<BoundExpression>>& arguments, BoundFunction* currentFunction,
-        ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span) override;
+        ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span, CollectFlags flags) override;
 private:
     std::unordered_map<boost::uuids::uuid, FunctionSymbol*, boost::hash<boost::uuids::uuid>> functionMap;
     std::vector<std::unique_ptr<FunctionSymbol>> functions;
@@ -2005,8 +2019,9 @@ InterfaceMoveAssignmentOperation::InterfaceMoveAssignmentOperation(BoundCompileU
 }
 
 void InterfaceMoveAssignmentOperation::CollectViableFunctions(ContainerScope* containerScope, const std::vector<std::unique_ptr<BoundExpression>>& arguments, BoundFunction* currentFunction,
-    ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span)
+    ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span, CollectFlags flags)
 {
+    if ((flags & CollectFlags::noRvalueRef) != CollectFlags::none) return;
     TypeSymbol* type = arguments[0]->GetType();
     if (type->PointerCount() != 1 || type->RemovePointer(span)->GetSymbolType() != SymbolType::interfaceTypeSymbol) return;
     if (type->BaseType()->GetSymbolType() == SymbolType::classTemplateSpecializationSymbol)
@@ -2058,7 +2073,7 @@ class ClassDefaultConstructorOperation : public Operation
 public:
     ClassDefaultConstructorOperation(BoundCompileUnit& boundCompileUnit_);
     void CollectViableFunctions(ContainerScope* containerScope, const std::vector<std::unique_ptr<BoundExpression>>& arguments, BoundFunction* currentFunction, 
-        ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span) override;
+        ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span, CollectFlags flags) override;
     bool GenerateImplementation(ClassDefaultConstructor* defaultConstructor, ContainerScope* containerScope, BoundFunction* currentFunction, std::unique_ptr<Exception>& exception, const Span& span);
 private:
     std::unordered_map<boost::uuids::uuid, FunctionSymbol*, boost::hash<boost::uuids::uuid>> functionMap;
@@ -2070,7 +2085,7 @@ ClassDefaultConstructorOperation::ClassDefaultConstructorOperation(BoundCompileU
 }
 
 void ClassDefaultConstructorOperation::CollectViableFunctions(ContainerScope* containerScope, const std::vector<std::unique_ptr<BoundExpression>>& arguments, BoundFunction* currentFunction,
-    ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span)
+    ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span, CollectFlags flags)
 {
     TypeSymbol* type = arguments[0]->GetType();
     if (type->PointerCount() != 1 || !type->RemovePointer(span)->PlainType(span)->IsClassTypeSymbol()) return;
@@ -2238,7 +2253,7 @@ class ClassCopyConstructorOperation : public Operation
 public:
     ClassCopyConstructorOperation(BoundCompileUnit& boundCompileUnit_);
     void CollectViableFunctions(ContainerScope* containerScope, const std::vector<std::unique_ptr<BoundExpression>>& arguments, BoundFunction* currentFunction, 
-        ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span) override;
+        ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span, CollectFlags flags) override;
     bool GenerateImplementation(ClassCopyConstructor* copyConstructor, ContainerScope* containerScope, BoundFunction* currentFunction, std::unique_ptr<Exception>& exception, const Span& span);
     void AddFunction(std::unique_ptr<FunctionSymbol>&& function) { functions.push_back(std::move(function)); }
 private:
@@ -2251,7 +2266,7 @@ ClassCopyConstructorOperation::ClassCopyConstructorOperation(BoundCompileUnit& b
 }
 
 void ClassCopyConstructorOperation::CollectViableFunctions(ContainerScope* containerScope, const std::vector<std::unique_ptr<BoundExpression>>& arguments, BoundFunction* currentFunction,
-    ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span)
+    ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span, CollectFlags flags)
 {
     TypeSymbol* type = arguments[0]->GetType();
     if (type->PointerCount() != 1 || !type->RemovePointer(span)->PlainType(span)->IsClassTypeSymbol()) return;
@@ -2278,7 +2293,8 @@ void ClassCopyConstructorOperation::CollectViableFunctions(ContainerScope* conta
             }
         }
     }
-    if (!TypesEqual(arguments[1]->GetType(), classType->AddRvalueReference(span)) && !bindToRvalueRef && (typesEqual || conversionFunctionExists))
+    if (((flags & CollectFlags::noRvalueRef) != CollectFlags::none ||
+        !TypesEqual(arguments[1]->GetType(), classType->AddRvalueReference(span)) && !bindToRvalueRef) && (typesEqual || conversionFunctionExists))
     {
         if (classType->CopyConstructor())
         {
@@ -2459,7 +2475,7 @@ class ClassMoveConstructorOperation : public Operation
 public:
     ClassMoveConstructorOperation(BoundCompileUnit& boundCompileUnit_);
     void CollectViableFunctions(ContainerScope* containerScope, const std::vector<std::unique_ptr<BoundExpression>>& arguments, BoundFunction* currentFunction, 
-        ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span) override;
+        ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span, CollectFlags flags) override;
     bool GenerateImplementation(ClassMoveConstructor* moveConstructor, ContainerScope* containerScope, BoundFunction* currentFunction, std::unique_ptr<Exception>& exception, const Span& span);
 private:
     std::unordered_map<boost::uuids::uuid, FunctionSymbol*, boost::hash<boost::uuids::uuid>> functionMap;
@@ -2471,8 +2487,9 @@ ClassMoveConstructorOperation::ClassMoveConstructorOperation(BoundCompileUnit& b
 }
 
 void ClassMoveConstructorOperation::CollectViableFunctions(ContainerScope* containerScope, const std::vector<std::unique_ptr<BoundExpression>>& arguments, BoundFunction* currentFunction,
-    ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span)
+    ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span, CollectFlags flags)
 {
+    if ((flags & CollectFlags::noRvalueRef) != CollectFlags::none) return;
     TypeSymbol* type = arguments[0]->GetType();
     if (type->PointerCount() != 1 || !type->RemovePointer(span)->PlainType(span)->IsClassTypeSymbol()) return;
     ClassTypeSymbol* classType = static_cast<ClassTypeSymbol*>(type->BaseType());
@@ -2678,7 +2695,7 @@ class ClassCopyAssignmentOperation : public Operation
 public:
     ClassCopyAssignmentOperation(BoundCompileUnit& boundCompileUnit_);
     void CollectViableFunctions(ContainerScope* containerScope, const std::vector<std::unique_ptr<BoundExpression>>& arguments, BoundFunction* currentFunction, 
-        ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span) override;
+        ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span, CollectFlags flags) override;
     bool GenerateImplementation(ClassCopyAssignment* copyAssignment, ContainerScope* containerScope, BoundFunction* currentFunction, std::unique_ptr<Exception>& exception, const Span& span);
 private:
     std::unordered_map<boost::uuids::uuid, FunctionSymbol*, boost::hash<boost::uuids::uuid>> functionMap;
@@ -2690,7 +2707,7 @@ ClassCopyAssignmentOperation::ClassCopyAssignmentOperation(BoundCompileUnit& bou
 }
 
 void ClassCopyAssignmentOperation::CollectViableFunctions(ContainerScope* containerScope, const std::vector<std::unique_ptr<BoundExpression>>& arguments, BoundFunction* currentFunction,
-    ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span)
+    ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span, CollectFlags flags)
 {
     TypeSymbol* type = arguments[0]->GetType();
     if (type->PointerCount() != 1 || !type->RemovePointer(span)->PlainType(span)->IsClassTypeSymbol()) return;
@@ -2717,7 +2734,8 @@ void ClassCopyAssignmentOperation::CollectViableFunctions(ContainerScope* contai
             }
         }
     }
-    if (!TypesEqual(arguments[1]->GetType(), classType->AddRvalueReference(span)) && !bindToRvalueRef && (TypesEqual(rightType, classType) || conversionFunctionExists))
+    if (((flags & CollectFlags::noRvalueRef) != CollectFlags::none || 
+        !TypesEqual(arguments[1]->GetType(), classType->AddRvalueReference(span)) && !bindToRvalueRef) && (TypesEqual(rightType, classType) || conversionFunctionExists))
     {
         if (classType->CopyAssignment())
         {
@@ -2867,7 +2885,7 @@ class ClassMoveAssignmentOperation : public Operation
 public:
     ClassMoveAssignmentOperation(BoundCompileUnit& boundCompileUnit_);
     void CollectViableFunctions(ContainerScope* containerScope, const std::vector<std::unique_ptr<BoundExpression>>& arguments, BoundFunction* currentFunction, 
-        ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span) override;
+        ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span, CollectFlags flags) override;
     bool GenerateImplementation(ClassMoveAssignment* moveAssignment, ContainerScope* containerScope, BoundFunction* currentFunction, std::unique_ptr<Exception>& exception, const Span& span);
 private:
     std::unordered_map<boost::uuids::uuid, FunctionSymbol*, boost::hash<boost::uuids::uuid>> functionMap;
@@ -2879,8 +2897,9 @@ ClassMoveAssignmentOperation::ClassMoveAssignmentOperation(BoundCompileUnit& bou
 }
 
 void ClassMoveAssignmentOperation::CollectViableFunctions(ContainerScope* containerScope, const std::vector<std::unique_ptr<BoundExpression>>& arguments, BoundFunction* currentFunction,
-    ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span)
+    ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span, CollectFlags flags)
 {
+    if ((flags & CollectFlags::noRvalueRef) != CollectFlags::none) return;
     TypeSymbol* type = arguments[0]->GetType();
     if (type->PointerCount() != 1 || !type->RemovePointer(span)->PlainType(span)->IsClassTypeSymbol()) return;
     ClassTypeSymbol* classType = static_cast<ClassTypeSymbol*>(type->BaseType());
@@ -3434,7 +3453,15 @@ void GenerateClassInitialization(ConstructorSymbol* constructorSymbol, Construct
                 std::unique_ptr<BoundExpression> argument = BindExpression(argumentNode, boundCompileUnit, boundFunction, containerScope, statementBinder);
                 arguments.push_back(std::move(argument));
             }
-            std::unique_ptr<BoundFunctionCall> constructorCall = ResolveOverload(U"@constructor", containerScope, lookups, arguments, boundCompileUnit, boundFunction, span);
+            OverloadResolutionFlags flags = OverloadResolutionFlags::none;
+            if (!constructorSymbol->IsMoveConstructor())
+            {
+                flags = flags | OverloadResolutionFlags::noRvalueRef;
+            }
+            std::unique_ptr<Exception> exception;
+            std::vector<TypeSymbol*> templateArgumentTypes;
+            std::unique_ptr<BoundFunctionCall> constructorCall = ResolveOverload(U"@constructor", containerScope, lookups, arguments, boundCompileUnit, boundFunction, span,
+                flags, templateArgumentTypes, exception);
             boundFunction->MoveTemporaryDestructorCallsTo(*constructorCall);
             boundCompoundStatement->AddStatement(std::unique_ptr<BoundStatement>(new BoundExpressionStatement(module, std::move(constructorCall))));
         }
@@ -3465,7 +3492,15 @@ void GenerateClassInitialization(ConstructorSymbol* constructorSymbol, Construct
                 std::unique_ptr<BoundExpression> argument = BindExpression(argumentNode, boundCompileUnit, boundFunction, containerScope, statementBinder);
                 arguments.push_back(std::move(argument));
             }
-            std::unique_ptr<BoundFunctionCall> constructorCall = ResolveOverload(U"@constructor", containerScope, lookups, arguments, boundCompileUnit, boundFunction, span);
+            OverloadResolutionFlags flags = OverloadResolutionFlags::none;
+            if (!constructorSymbol->IsMoveConstructor())
+            {
+                flags = flags | OverloadResolutionFlags::noRvalueRef;
+            }
+            std::unique_ptr<Exception> exception;
+            std::vector<TypeSymbol*> templateArgumentTypes;
+            std::unique_ptr<BoundFunctionCall> constructorCall = ResolveOverload(U"@constructor", containerScope, lookups, arguments, boundCompileUnit, boundFunction, span,
+                flags, templateArgumentTypes, exception);
             boundFunction->MoveTemporaryDestructorCallsTo(*constructorCall);
             boundCompoundStatement->AddStatement(std::unique_ptr<BoundStatement>(new BoundExpressionStatement(module, std::move(constructorCall))));
         }
@@ -3499,8 +3534,15 @@ void GenerateClassInitialization(ConstructorSymbol* constructorSymbol, Construct
                 BoundExpression* baseClassReferenceConversion = new BoundConversion(module, std::unique_ptr<BoundExpression>(new BoundParameter(module, span, thatParam)), thatToBaseConversion);
                 arguments.push_back(std::unique_ptr<BoundExpression>(baseClassReferenceConversion));
             }
-            std::unique_ptr<BoundFunctionCall> constructorCall = ResolveOverload(U"@constructor", containerScope, lookups, arguments, boundCompileUnit, boundFunction,
-                span);
+            OverloadResolutionFlags flags = OverloadResolutionFlags::none;
+            if (!constructorSymbol->IsMoveConstructor())
+            {
+                flags = flags | OverloadResolutionFlags::noRvalueRef;
+            }
+            std::unique_ptr<Exception> exception;
+            std::vector<TypeSymbol*> templateArgumentTypes;
+            std::unique_ptr<BoundFunctionCall> constructorCall = ResolveOverload(U"@constructor", containerScope, lookups, arguments, boundCompileUnit, boundFunction, span,
+                flags, templateArgumentTypes, exception);
             boundFunction->MoveTemporaryDestructorCallsTo(*constructorCall);
             boundCompoundStatement->AddStatement(std::unique_ptr<BoundStatement>(new BoundExpressionStatement(module, std::move(constructorCall))));
         }
@@ -3550,7 +3592,11 @@ void GenerateClassInitialization(ConstructorSymbol* constructorSymbol, Construct
                     std::unique_ptr<BoundExpression> argument = BindExpression(argumentNode, boundCompileUnit, boundFunction, containerScope, statementBinder);
                     arguments.push_back(std::move(argument));
                 }
-                std::unique_ptr<BoundFunctionCall> constructorCall = ResolveOverload(U"@constructor", containerScope, lookups, arguments, boundCompileUnit, boundFunction, span);
+                OverloadResolutionFlags flags = OverloadResolutionFlags::none;
+                std::unique_ptr<Exception> exception;
+                std::vector<TypeSymbol*> templateArgumentTypes;
+                std::unique_ptr<BoundFunctionCall> constructorCall = ResolveOverload(U"@constructor", containerScope, lookups, arguments, boundCompileUnit, boundFunction, span,
+                    flags, templateArgumentTypes, exception);
                 boundFunction->MoveTemporaryDestructorCallsTo(*constructorCall);
                 boundCompoundStatement->AddStatement(std::unique_ptr<BoundStatement>(new BoundExpressionStatement(module, std::move(constructorCall))));
             }
@@ -3617,8 +3663,15 @@ void GenerateClassInitialization(ConstructorSymbol* constructorSymbol, Construct
                     boundMemberVariable->SetClassPtr(std::unique_ptr<BoundExpression>(new BoundParameter(module, span, thisParam)));
                     arguments.push_back(std::unique_ptr<BoundExpression>(
                         new BoundAddressOfExpression(module, std::unique_ptr<BoundExpression>(boundMemberVariable), boundMemberVariable->GetType()->AddPointer(span))));
-                    std::unique_ptr<BoundFunctionCall> constructorCall = ResolveOverload(U"@constructor", containerScope, lookups, arguments, boundCompileUnit, boundFunction, 
-                        span);
+                    OverloadResolutionFlags flags = OverloadResolutionFlags::none;
+                    if (!constructorSymbol->IsMoveConstructor())
+                    {
+                        flags = flags | OverloadResolutionFlags::noRvalueRef;
+                    }
+                    std::unique_ptr<Exception> exception;
+                    std::vector<TypeSymbol*> templateArgumentTypes;
+                    std::unique_ptr<BoundFunctionCall> constructorCall = ResolveOverload(U"@constructor", containerScope, lookups, arguments, boundCompileUnit, boundFunction, span,
+                        flags, templateArgumentTypes, exception);
                     boundFunction->MoveTemporaryDestructorCallsTo(*constructorCall);
                     boundCompoundStatement->AddStatement(std::unique_ptr<BoundStatement>(new BoundExpressionStatement(module, std::move(constructorCall))));
                 }
@@ -3891,11 +3944,11 @@ void ArityOperation::Add(Operation* operation)
 }
 
 void ArityOperation::CollectViableFunctions(ContainerScope* containerScope, const std::vector<std::unique_ptr<BoundExpression>>& arguments, BoundFunction* currentFunction, 
-    ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span)
+    ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span, CollectFlags flags)
 {
     for (Operation* operation : operations)
     {
-        operation->CollectViableFunctions(containerScope, arguments, currentFunction, viableFunctions, exception, span);
+        operation->CollectViableFunctions(containerScope, arguments, currentFunction, viableFunctions, exception, span, flags);
     }
 }
 
@@ -3916,7 +3969,7 @@ void OperationGroup::Add(Operation* operation)
 }
 
 void OperationGroup::CollectViableFunctions(ContainerScope* containerScope, const std::vector<std::unique_ptr<BoundExpression>>& arguments, BoundFunction* currentFunction, 
-    ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span)
+    ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span, CollectFlags flags)
 {
     int arity = arguments.size();
     if (arity < arityOperations.size())
@@ -3924,7 +3977,7 @@ void OperationGroup::CollectViableFunctions(ContainerScope* containerScope, cons
         ArityOperation* arityOperation = arityOperations[arity].get();
         if (arityOperation)
         {
-            arityOperation->CollectViableFunctions(containerScope, arguments, currentFunction, viableFunctions, exception, span);
+            arityOperation->CollectViableFunctions(containerScope, arguments, currentFunction, viableFunctions, exception, span, flags);
         }
     }
 }
@@ -3989,13 +4042,13 @@ void OperationRepository::Add(Operation* operation)
 }
 
 void OperationRepository::CollectViableFunctions(const std::u32string& groupName, ContainerScope* containerScope, const std::vector<std::unique_ptr<BoundExpression>>& arguments, 
-    BoundFunction* currentFunction, ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span)
+    BoundFunction* currentFunction, ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span, CollectFlags flags)
 {
     auto it = operationGroupMap.find(groupName);
     if (it != operationGroupMap.cend())
     {
         OperationGroup* operationGroup = it->second;
-        operationGroup->CollectViableFunctions(containerScope, arguments, currentFunction, viableFunctions, exception, span);
+        operationGroup->CollectViableFunctions(containerScope, arguments, currentFunction, viableFunctions, exception, span, flags);
     }
 }
 

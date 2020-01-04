@@ -1,32 +1,31 @@
-// =================================
-// Copyright (c) 2019 Seppo Laakko
-// Distributed under the MIT license
-// =================================
-
 using System;
 using System.Collections;
+
+// this file has been semiautomatically generated from 'D:/work/soulng-project/sngxml/xml/XmlContentHandler.hpp' using cpp2cm version 1.0.0
+
+// this file has been semiautomatically generated from 'D:/work/soulng-project/sngxml/xml/XmlContentHandler.cpp' using cpp2cm version 1.0.0
 
 namespace System.Xml
 {
     public class Attribute
     {
-        public nothrow Attribute(const ustring& namespaceUri_, const ustring& localName_, const ustring& qualifiedName_, const ustring& value_) :
+        public Attribute(const ustring& namespaceUri_, const ustring& localName_, const ustring& qualifiedName_, const ustring& value_) :
             namespaceUri(namespaceUri_), localName(localName_), qualifiedName(qualifiedName_), value(value_)
         {
         }
-        public nothrow inline const ustring& NamespaceUri() const
+        public const ustring& NamespaceUri() const
         {
             return namespaceUri;
         }
-        public nothrow inline const ustring& LocalName() const
+        public const ustring& LocalName() const
         {
             return localName;
         }
-        public nothrow inline const ustring& QualifiedName() const
+        public const ustring& QualifiedName() const
         {
             return qualifiedName;
         }
-        public nothrow inline const ustring& Value() const
+        public const ustring& Value() const
         {
             return value;
         }
@@ -35,34 +34,33 @@ namespace System.Xml
         private ustring qualifiedName;
         private ustring value;
     }
-    
     public class Attributes
     {
-        public typedef List<Attribute>.ConstIterator ConstIterator;
         public typedef List<Attribute>.Iterator Iterator;
-        public nothrow inline ConstIterator CBegin() const
-        {
-            return attributes.CBegin();
-        }
-        public nothrow inline ConstIterator Begin() const
-        {
-            return attributes.CBegin();
-        }
-        public nothrow inline Iterator Begin() 
+        public typedef List<Attribute>.ConstIterator ConstIterator;
+        public List<Attribute>.Iterator Begin()
         {
             return attributes.Begin();
         }
-        public nothrow inline ConstIterator CEnd() const
-        {
-            return attributes.CEnd();
-        }
-        public nothrow inline ConstIterator End() const
-        {
-            return attributes.CEnd();
-        }
-        public nothrow inline Iterator End()
+        public List<Attribute>.Iterator End()
         {
             return attributes.End();
+        }
+        public List<Attribute>.ConstIterator Begin() const
+        {
+            return attributes.CBegin();
+        }
+        public List<Attribute>.ConstIterator End() const
+        {
+            return attributes.CEnd();
+        }
+        public List<Attribute>.ConstIterator CBegin() const
+        {
+            return attributes.CBegin();
+        }
+        public List<Attribute>.ConstIterator CEnd() const
+        {
+            return attributes.CEnd();
         }
         public void Add(const Attribute& attribute)
         {
@@ -72,26 +70,14 @@ namespace System.Xml
         {
             attributes.Clear();
         }
-        public nothrow inline bool IsEmpty() const
-        {
-            return attributes.IsEmpty();
-        }
-        public nothrow inline long Count() const
-        {
-            return attributes.Count();
-        }
-        public nothrow const Attribute& operator[](long index) const
-        {
-            return attributes[index];
-        }
         public const ustring* GetAttributeValue(const ustring& namespaceUri, const ustring& localName) const
         {
             for (const Attribute& attribute : attributes)
             {
                 if (attribute.NamespaceUri() == namespaceUri && attribute.LocalName() == localName)
                 {
-                    const ustring& attValue = attribute.Value();
-                    return &attValue;
+                    const ustring& value = attribute.Value();
+                    return &value;
                 }
             }
             return null;
@@ -102,25 +88,26 @@ namespace System.Xml
             {
                 if (attribute.QualifiedName() == qualifiedName)
                 {
-                    const ustring& attValue = attribute.Value();
-                    return &attValue;
+                    const ustring& value = attribute.Value();
+                    return &value;
                 }
             }
             return null;
         }
         private List<Attribute> attributes;
     }
-    
     public class XmlContentHandler
     {
-        public default virtual ~XmlContentHandler();
+        public virtual ~XmlContentHandler()
+        {
+        }
         public virtual void StartDocument()
         {
         }
         public virtual void EndDocument()
         {
         }
-        public virtual void Version(const ustring& version)
+        public virtual void Version(const ustring& xmlVersion)
         {
         }
         public virtual void Standalone(bool standalone)
@@ -129,16 +116,16 @@ namespace System.Xml
         public virtual void Encoding(const ustring& encoding)
         {
         }
-        public virtual void Text(const ustring& text)
+        public virtual void HandleText(const ustring& text)
         {
         }
-        public virtual void CDataSection(const ustring& cdata)
+        public virtual void HandleComment(const ustring& comment)
         {
         }
-        public virtual void Comment(const ustring& comment)
+        public virtual void HandlePI(const ustring& target, const ustring& data)
         {
         }
-        public virtual void PI(const ustring& target, const ustring& data)
+        public virtual void HandleCDataSection(const ustring& cdata)
         {
         }
         public virtual void StartElement(const ustring& namespaceUri, const ustring& localName, const ustring& qualifiedName, const Attributes& attributes)
@@ -151,4 +138,4 @@ namespace System.Xml
         {
         }
     }
-}
+} // namespace System.Xml

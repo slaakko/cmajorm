@@ -21,17 +21,17 @@ enum class Flags : int
 
 inline Flags operator&(Flags flags, Flags flag)
 {
-    return Flags(int(flags) & int(flag));
+    return static_cast<Flags>(static_cast<int>(flags) & static_cast<int>(flag));
 }
 
 inline Flags operator|(Flags flags, Flags flag)
 {
-    return Flags(int(flags) | int(flag));
+    return static_cast<Flags>(static_cast<int>(flags) | static_cast<int>(flag));
 }
 
 inline Flags operator~(Flags flags)
 {
-    return Flags(~int(flags));
+    return static_cast<Flags>(~static_cast<int>(flags));
 }
 
 //  ==================================================================================

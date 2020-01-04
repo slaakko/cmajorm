@@ -30,8 +30,11 @@ class SNGXML_XML_API Attributes
 {
 public:
     typedef std::vector<Attribute>::const_iterator const_iterator;
-    const_iterator begin() const { return attributes.begin(); }
-    const_iterator end() const { return attributes.end(); }
+    typedef std::vector<Attribute>::iterator iterator;
+    iterator begin() { return attributes.begin(); }
+    iterator end() { return attributes.end(); }
+    const_iterator begin() const { return attributes.cbegin(); }
+    const_iterator end() const { return attributes.cend(); }
     const_iterator cbegin() const { return attributes.cbegin(); }
     const_iterator cend() const { return attributes.cend(); }
     void Add(const Attribute& attribute);

@@ -286,12 +286,19 @@ namespace cmdevenv
             saveAllToolStripMenuItem.Enabled = editing && solutionOpen;
             buildSolutionToolStripMenuItem.Enabled = editing && solutionHasProjects;
             buildToolStripMenuItem1.Enabled = editing && solutionHasProjects;
-            buildActiveProjectToolStripMenuItem.Enabled = editing && activeProjectSet && (solution.ActiveProject.Target == Target.program || solution.ActiveProject.Target == Target.library);
+            buildActiveProjectToolStripMenuItem.Enabled = editing && activeProjectSet &&
+                (solution.ActiveProject.Target == Target.program || solution.ActiveProject.Target == Target.winapp ||
+                solution.ActiveProject.Target == Target.library || solution.ActiveProject.Target == Target.winlib);
             rebuildToolStripMenuItem.Enabled = editing && solutionHasProjects;
-            rebuildActiveProjcectToolStripMenuItem.Enabled = editing && activeProjectSet && (solution.ActiveProject.Target == Target.program || solution.ActiveProject.Target == Target.library);
-            rebuildToolStripMenuItem1.Enabled = editing && activeProjectSet && (solution.ActiveProject.Target == Target.program || solution.ActiveProject.Target == Target.library);
+            rebuildActiveProjcectToolStripMenuItem.Enabled = editing && activeProjectSet &&
+                (solution.ActiveProject.Target == Target.program || solution.ActiveProject.Target == Target.winapp || 
+                solution.ActiveProject.Target == Target.library || solution.ActiveProject.Target == Target.winlib);
+            rebuildToolStripMenuItem1.Enabled = editing && activeProjectSet &&
+                (solution.ActiveProject.Target == Target.program || solution.ActiveProject.Target == Target.winapp ||
+                solution.ActiveProject.Target == Target.library || solution.ActiveProject.Target == Target.winlib);
             runUnitTestsInCurrentSolutionToolStripMenuItem.Enabled = editing && solutionHasProjects;
-            profileActiveProjectToolStripMenuItem1.Enabled = editing && activeProjectSet && solution.ActiveProject.Target == Target.program;
+            profileActiveProjectToolStripMenuItem1.Enabled = editing && activeProjectSet &&
+                (solution.ActiveProject.Target == Target.program || solution.ActiveProject.Target == Target.winapp);
             runUnitTestsInActiveProjectToolStripMenuItem.Enabled = editing && activeProjectSet && solution.ActiveProject.Target == Target.unitTest;
             buildSolutionToolStripMenuItem.Enabled = editing && solutionHasProjects;
             rebuildSolutionToolStripMenuItem.Enabled = editing && solutionHasProjects;
@@ -880,9 +887,17 @@ namespace cmdevenv
                         {
                             project.Target = Target.program;
                         }
+                        else if (dialog.SelectedProjectType == ProjectType.winapp)
+                        {
+                            project.Target = Target.winapp;
+                        }
                         else if (dialog.SelectedProjectType == ProjectType.library)
                         {
                             project.Target = Target.library;
+                        }
+                        else if (dialog.SelectedProjectType == ProjectType.winlib)
+                        {
+                            project.Target = Target.winlib;
                         }
                         else if (dialog.SelectedProjectType == ProjectType.unitTestProject)
                         {
@@ -1793,9 +1808,17 @@ namespace cmdevenv
                     {
                         project.Target = Target.program;
                     }
+                    else if (dialog.SelectedProjectType == ProjectType.winapp)
+                    {
+                        project.Target = Target.winapp;
+                    }
                     else if (dialog.SelectedProjectType == ProjectType.library)
                     {
                         project.Target = Target.library;
+                    }
+                    else if (dialog.SelectedProjectType == ProjectType.winlib)
+                    {
+                        project.Target = Target.winlib;
                     }
                     else if (dialog.SelectedProjectType == ProjectType.unitTestProject)
                     {
@@ -1944,7 +1967,7 @@ namespace cmdevenv
             try
             {
                 string cmajorRootDir = Environment.GetEnvironmentVariable("CMAJOR_ROOT");
-                await OpenProjectOrSolution(Path.Combine(Path.Combine(cmajorRootDir, "system"), "System.cms"));
+                await OpenProjectOrSolution(Path.Combine(Path.Combine(Path.Combine(Path.Combine(cmajorRootDir, "system"), "platform"), "windows"), "System.cms"));
             }
             catch (Exception ex)
             {
@@ -1985,7 +2008,7 @@ namespace cmdevenv
                     Project activeProject = solution.ActiveProject;
                     if (activeProject != null)
                     {
-                        if (activeProject.Target != Target.program)
+                        if (activeProject.Target != Target.program && activeProject.Target != Target.winapp)
                         {
                             throw new Exception("cannot execute: active project is not a program");
                         }

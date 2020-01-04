@@ -28,7 +28,8 @@ const std::u32string* Attributes::GetAttributeValue(const std::u32string& namesp
     {
         if (attribute.NamespaceUri() == namespaceUri && attribute.LocalName() == localName)
         {
-            return &attribute.Value();
+            const std::u32string& value = attribute.Value();
+            return &value;
         }
     }
     return nullptr;
@@ -40,7 +41,8 @@ const std::u32string* Attributes::GetAttributeValue(const std::u32string& qualif
     {
         if (attribute.QualifiedName() == qualifiedName)
         {
-            return &attribute.Value();
+            const std::u32string& value = attribute.Value();
+            return &value;
         }
     }
     return nullptr;

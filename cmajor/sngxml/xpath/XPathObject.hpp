@@ -21,7 +21,7 @@ public:
     XPathObject(XPathObjectType type_);
     XPathObjectType Type() const { return type; }
     virtual ~XPathObject();
-    virtual std::unique_ptr<sngxml::dom::Node> ToDom() const = 0;
+    virtual std::unique_ptr<dom::Node> ToDom() const = 0;
 private:
     XPathObjectType type;
 };
@@ -33,7 +33,7 @@ public:
     sngxml::dom::Node* operator[](int index) const { return nodes[index]; }
     int Length() const { return nodes.Length(); }
     void Add(sngxml::dom::Node* node);
-    std::unique_ptr<sngxml::dom::Node> ToDom() const override;
+    std::unique_ptr<dom::Node> ToDom() const override;
 private:
     sngxml::dom::NodeList nodes;
 };
@@ -43,7 +43,7 @@ class SNGXML_XPATH_API XPathBoolean : public XPathObject
 public:
     XPathBoolean(bool value_);
     bool Value() const { return value; }
-    std::unique_ptr<sngxml::dom::Node> ToDom() const override;
+    std::unique_ptr<dom::Node> ToDom() const override;
 private:
     bool value;
 };
@@ -53,7 +53,7 @@ class SNGXML_XPATH_API XPathNumber : public XPathObject
 public:
     XPathNumber(double value_);
     double Value() const { return value; }
-    std::unique_ptr<sngxml::dom::Node> ToDom() const override;
+    std::unique_ptr<dom::Node> ToDom() const override;
 private:
     double value;
 };
@@ -63,7 +63,7 @@ class SNGXML_XPATH_API XPathString : public XPathObject
 public:
     XPathString(const std::u32string& value_);
     const std::u32string& Value() const { return value; }
-    std::unique_ptr<sngxml::dom::Node> ToDom() const override;
+    std::unique_ptr<dom::Node> ToDom() const override;
 private:
     std::u32string value;
 };

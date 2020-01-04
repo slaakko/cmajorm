@@ -1,0 +1,421 @@
+// =================================
+// Copyright (c) 2019 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using XPathTokens;
+
+parser XPathParser
+{
+    uselexer XPathLexer;
+    main;
+
+    Expr : System.XPath.XPathExpr*
+        ::= OrExpr:orExpr{ return orExpr; }
+        ;
+
+    OrExpr(var UniquePtr<System.XPath.XPathExpr> expr) : System.XPath.XPathExpr*
+        ::= (AndExpr:left{ expr.Reset(left); } (NAME{ Token token = lexer.GetToken(pos); pass = lexer.GetKeywordToken(token.match) == OR; } AndExpr:right{ expr.Reset(new System.XPath.XPathOrExpr(expr.Release(), right)); })*)
+        {
+            return expr.Release();
+        }
+        ;
+
+    AndExpr(var UniquePtr<System.XPath.XPathExpr> expr) : System.XPath.XPathExpr*
+        ::= (EqualityExpr:left{ expr.Reset(left); } (NAME{ Token token = lexer.GetToken(pos); pass = lexer.GetKeywordToken(token.match) == AND; } EqualityExpr:right{ expr.Reset(new System.XPath.XPathAndExpr(expr.Release(), right)); })*)
+        {
+            return expr.Release();
+        }
+        ;
+
+    EqualityExpr(var UniquePtr<System.XPath.XPathExpr> expr, var System.XPath.Operator op) : System.XPath.XPathExpr*
+        ::=
+        (   RelationalExpr:left{ expr.Reset(left); }
+            (   (EQ{ op = System.XPath.Operator.equal; } | NEQ{ op = System.XPath.Operator.notEqual; })
+                RelationalExpr:right!
+                {
+                    switch (op)
+                    {
+                        case System.XPath.Operator.equal: expr.Reset(new System.XPath.XPathEqualExpr(expr.Release(), right)); break;
+                        case System.XPath.Operator.notEqual: expr.Reset(new System.XPath.XPathNotEqualExpr(expr.Release(), right)); break;
+                    }
+                }
+            )*
+        )
+        {
+            return expr.Release();
+        }
+        ;
+
+    RelationalExpr(var UniquePtr<System.XPath.XPathExpr> expr, var System.XPath.Operator op) : System.XPath.XPathExpr*
+        ::=
+        (   AdditiveExpr:left{ expr.Reset(left); }
+            (   (LEQ{ op = System.XPath.Operator.lessOrEqual; } | GEQ{ op = System.XPath.Operator.greaterOrEqual; } | LESS{ op = System.XPath.Operator.less; } | GREATER{ op = System.XPath.Operator.greater; })
+                AdditiveExpr:right!
+                {
+                    switch (op)
+                    {
+                        case System.XPath.Operator.lessOrEqual: expr.Reset(new System.XPath.XPathLessOrEqualExpr(expr.Release(), right)); break;
+                        case System.XPath.Operator.greaterOrEqual: expr.Reset(new System.XPath.XPathGreaterOrEqualExpr(expr.Release(), right)); break;
+                        case System.XPath.Operator.less: expr.Reset(new System.XPath.XPathLessExpr(expr.Release(), right)); break;
+                        case System.XPath.Operator.greater: expr.Reset(new System.XPath.XPathGreaterExpr(expr.Release(), right)); break;
+                    }
+                }
+            )*
+        )
+        {
+            return expr.Release();
+        }
+        ;
+
+    AdditiveExpr(var UniquePtr<System.XPath.XPathExpr> expr, var System.XPath.Operator op) : System.XPath.XPathExpr*
+        ::=
+        (   MultiplicativeExpr:left{ expr.Reset(left); }
+            (   (PLUS{ op = System.XPath.Operator.plus; } | MINUS{ op = System.XPath.Operator.minus; })
+                MultiplicativeExpr:right!
+                {
+                    switch (op)
+                    {
+                        case System.XPath.Operator.plus: expr.Reset(new System.XPath.XPathAddExpr(expr.Release(), right)); break;
+                        case System.XPath.Operator.minus: expr.Reset(new System.XPath.XPathSubExpr(expr.Release(), right)); break;
+                    }
+                }
+            )*
+        )
+        {
+            return expr.Release();
+        }
+        ;
+
+    MultiplicativeExpr(var UniquePtr<System.XPath.XPathExpr> expr, var System.XPath.Operator op) : System.XPath.XPathExpr*
+        ::=
+        (   UnaryExpr:left{ expr.Reset(left); }
+            (   (STAR{ op = System.XPath.Operator.mul; }
+                |   NAME
+                {
+                    Token token = lexer.GetToken(pos);
+                    switch (lexer.GetKeywordToken(token.match))
+                    {
+                        case DIV: op = System.XPath.Operator.div; break;
+                        case MOD: op = System.XPath.Operator.mod; break;
+                        default: pass = false; break;
+                    }
+                }
+            )
+                UnaryExpr:right!
+                {
+                    switch (op)
+                    {
+                        case System.XPath.Operator.mul: expr.Reset(new System.XPath.XPathMulExpr(expr.Release(), right)); break;
+                        case System.XPath.Operator.div: expr.Reset(new System.XPath.XPathDivExpr(expr.Release(), right)); break;
+                        case System.XPath.Operator.mod: expr.Reset(new System.XPath.XPathModExpr(expr.Release(), right)); break;
+                    }
+                }
+            )*
+        )
+        {
+            return expr.Release();
+        }
+        ;
+
+    UnaryExpr : System.XPath.XPathExpr*
+        ::= MINUS UnaryExpr:subject{ return new System.XPath.XPathUnaryMinusExpr(subject); }
+        |   UnionExpr:unionExpr{ return unionExpr; }
+        ;
+
+    UnionExpr(var UniquePtr<System.XPath.XPathExpr> expr) : System.XPath.XPathExpr*
+        ::= (PathExpr:left{ expr.Reset(left); } (UNION PathExpr:right{ expr.Reset(new System.XPath.XPathUnionExpr(expr.Release(), right)); })*)
+        {
+            return expr.Release();
+        }
+        ;
+
+    PathExpr(var UniquePtr<System.XPath.XPathExpr> expr, var System.XPath.Operator op) : System.XPath.XPathExpr*
+        ::= (LocationPath:locationPath - FunctionCall:functionCall){ return locationPath; }
+        |   (FilterExpr:filterExpr{ expr.Reset(filterExpr); } ((SLASHSLASH{ op = System.XPath.Operator.slashSlash; } | SLASH{ op = System.XPath.Operator.slash; }) RelativeLocationPath:right
+            {
+                switch (op)
+                {
+                    case System.XPath.Operator.slashSlash:
+                    {
+                        return new System.XPath.XPathCombineStepExpr(expr.Release(),
+                            new System.XPath.XPathCombineStepExpr(new System.XPath.XPathLocationStepExpr(System.Dom.Axis.descendantOrSelf, new System.XPath.XPathAnyNodeTest()), right));
+                    }
+                    case System.XPath.Operator.slash:
+                    {
+                        return new System.XPath.XPathCombineStepExpr(expr.Release(), right);
+                    }
+                }
+            }
+            )?
+        )
+        {
+            return expr.Release();
+        }
+        ;
+
+    FilterExpr(var UniquePtr<System.XPath.XPathExpr> expr) : System.XPath.XPathExpr*
+        ::= (PrimaryExpr:primaryExpr{ expr.Reset(primaryExpr); } (Predicate:predicate{ expr.Reset(new System.XPath.XPathFilterExpr(expr.Release(), predicate)); })*)
+        {
+            return expr.Release();
+        }
+        ;
+
+    LocationPath : System.XPath.XPathExpr*
+        ::= AbsoluteLocationPath:absoluteLocationPath{ return absoluteLocationPath; }
+        |   RelativeLocationPath:relativeLocationPath{ return relativeLocationPath; }
+        ;
+
+    AbsoluteLocationPath(var UniquePtr<System.XPath.XPathExpr> expr) : System.XPath.XPathExpr*
+        ::=
+        (   AbbreviatedAbsoluteLocationPath:abbreviatedAbsoluteLocationPath{ expr.Reset(abbreviatedAbsoluteLocationPath); }
+        |   SLASH{ expr.Reset(new System.XPath.XPathRootNodeExpr()); } (RelativeLocationPath:right{ expr.Reset(new System.XPath.XPathCombineStepExpr(expr.Release(), right)); })?
+        )
+        {
+            return expr.Release();
+        }
+        ;
+
+    AbbreviatedAbsoluteLocationPath : System.XPath.XPathExpr*
+        ::= SLASHSLASH RelativeLocationPath:right
+        {
+            return new System.XPath.XPathCombineStepExpr(new System.XPath.XPathRootNodeExpr(), new System.XPath.XPathCombineStepExpr(
+                new System.XPath.XPathLocationStepExpr(System.Dom.Axis.descendantOrSelf, new System.XPath.XPathAnyNodeTest()), right));
+        }
+        ;
+
+    RelativeLocationPath(var UniquePtr<System.XPath.XPathExpr> expr, var System.XPath.Operator op) : System.XPath.XPathExpr*
+        ::=
+        (
+            Step:left{ expr.Reset(left); } ((SLASHSLASH{ op = System.XPath.Operator.slashSlash; } | SLASH{ op = System.XPath.Operator.slash; }) Step:right
+            {
+                switch (op)
+                {
+                    case System.XPath.Operator.slashSlash:
+                    {
+                        expr.Reset(new System.XPath.XPathCombineStepExpr(expr.Release(), new System.XPath.XPathCombineStepExpr(
+                            new System.XPath.XPathLocationStepExpr(System.Dom.Axis.descendantOrSelf, new System.XPath.XPathAnyNodeTest()), right)));
+                        break;
+                    }
+                    case System.XPath.Operator.slash:
+                    {
+                        expr.Reset(new System.XPath.XPathCombineStepExpr(expr.Release(), right));
+                        break;
+                    }
+                }
+            }
+            )*
+        )
+        {
+            return expr.Release();
+        }
+        ;
+
+    Step(var UniquePtr<System.XPath.XPathLocationStepExpr> expr) : System.XPath.XPathLocationStepExpr*
+        ::=
+        (   AxisSpecifier:axis NodeTest:nodeTest{ expr.Reset(new System.XPath.XPathLocationStepExpr(axis, nodeTest)); } (Predicate:predicate{ expr->AddPredicate(predicate); })*
+        |   AbbreviatedStep:abbreviatedStep{ expr.Reset(abbreviatedStep); }
+        )
+        {
+            return expr.Release();
+        }
+        ;
+
+    AxisSpecifier : System.Dom.Axis
+        ::= AxisName:axis COLONCOLON{ return axis;}
+        |   AbbreviatedAxisSpecifier:abbreviatedAxisSpecifier{ return abbreviatedAxisSpecifier; }
+        ;
+
+    AxisName : System.Dom.Axis
+        ::= NAME
+        {
+            Token token = lexer.GetToken(pos);
+            switch (lexer.GetKeywordToken(token.match))
+            {
+                case ANCESTOR:
+                {
+                    return System.Dom.Axis.ancestor;
+                }
+                case ANCESTOR_OR_SELF:
+                {
+                    return System.Dom.Axis.ancestorOrSelf;
+                }
+                case ATTRIBUTE:
+                {
+                    return System.Dom.Axis.attribute;
+                }
+                case CHILD :
+                {
+                    return System.Dom.Axis.child;
+                }
+                case DESCENDANT:
+                {
+                    return System.Dom.Axis.descendant;
+                }
+                case DESCENDANT_OR_SELF:
+                {
+                    return System.Dom.Axis.descendantOrSelf;
+                }
+                case FOLLOWING:
+                {
+                    return System.Dom.Axis.following;
+                }
+                case FOLLOWING_SIBLING:
+                {
+                    return System.Dom.Axis.followingSibling;
+                }
+                case NAMESPACE:
+                {
+                    return System.Dom.Axis.ns;
+                }
+                case PARENT:
+                {
+                    return System.Dom.Axis.parent;
+                }
+                case PRECEDING:
+                {
+                    return System.Dom.Axis.preceding;
+                }
+                case PRECEDING_SIBLING:
+                {
+                    return System.Dom.Axis.precedingSibling;
+                }
+                case SELF:
+                {
+                    return System.Dom.Axis.self;
+                }
+                default:
+                {
+                    pass = false;
+                    break;
+                }
+            }
+        }
+        ;
+
+    AbbreviatedAxisSpecifier : System.Dom.Axis
+        ::= AT{ return System.Dom.Axis.attribute; }
+        |   empty{ return System.Dom.Axis.child; }
+        ;
+
+    NodeTest : System.XPath.XPathNodeTestExpr*
+        ::= NAME{ Token token = lexer.GetToken(pos); pass = lexer.GetKeywordToken(token.match) == PROCESSING_INSTRUCTION; } LPAREN Literal:pi RPAREN{ return new System.XPath.XPathPILiteralTest(pi); }
+        |   NodeType:nodeType LPAREN RPAREN{ return nodeType; }
+        |   NameTest:nameTest{ return nameTest; }
+        ;
+
+    NodeType : System.XPath.XPathNodeTestExpr*
+        ::= NAME
+        {
+            Token token = lexer.GetToken(pos);
+            switch (lexer.GetKeywordToken(token.match))
+            {
+                case COMMENT: return new System.XPath.XPathCommentNodeTest();
+                case TEXT: return new System.XPath.XPathTextNodeTest();
+                case PROCESSING_INSTRUCTION: return new System.XPath.XPathPINodeTest();
+                case NODE: return new System.XPath.XPathAnyNodeTest();
+                default:
+                {
+                    pass = false;
+                    break;
+                }
+            }
+        }
+        ;
+
+    NameTest : System.XPath.XPathNodeTestExpr*
+        ::= STAR{ return new System.XPath.XPathPrincipalNodeTest(); }
+        |   NCName:ncname COLON STAR{ return new System.XPath.XPathPrefixTest(ncname); }
+        |   QName:qname{ return new System.XPath.XPathNameTest(qname); }
+        ;
+
+    AbbreviatedStep : System.XPath.XPathLocationStepExpr*
+        ::= DOTDOT{ return new System.XPath.XPathLocationStepExpr(System.Dom.Axis.parent, new System.XPath.XPathAnyNodeTest()); }
+        |   DOT{ return new System.XPath.XPathLocationStepExpr(System.Dom.Axis.self, new System.XPath.XPathAnyNodeTest()); }
+        ;
+
+    Literal : System.XPath.XPathExpr*
+        ::= DQSTRING
+        { 
+            Token token = lexer.GetToken(pos); 
+            ustring str = System.XPath.ParseDQString(lexer.FileName(), token);
+            return new System.XPath.XPathLiteral(str); 
+        }
+        |   SQSTRING
+        { 
+            Token token = lexer.GetToken(pos); 
+            ustring str = System.XPath.ParseSQString(lexer.FileName(), token);
+            return new System.XPath.XPathLiteral(str); 
+        }
+        ;
+
+    Number : System.XPath.XPathExpr*
+        ::= NUMBER
+        { 
+            Token token = lexer.GetToken(pos); 
+            ustring str = token.match.ToString();
+            return new System.XPath.XPathNumberExpr(str); 
+        }
+        ;
+
+    Predicate : System.XPath.XPathExpr*
+        ::= (LBRACKET PredicateExpr:expr RBRACKET){ return expr; }
+        ;
+
+    PredicateExpr : System.XPath.XPathExpr*
+        ::= Expr:expr{ return expr; }
+        ;
+
+    PrimaryExpr : System.XPath.XPathExpr*
+        ::= FunctionCall:functionCall{ return functionCall; }
+        |   VariableReference:variableReference{ return variableReference; }
+        |   (LPAREN Expr:expr RPAREN){ return expr; }
+        |   Literal:literal{ return literal; }
+        |   Number:number{ return number; }
+        ;
+
+    VariableReference : System.XPath.XPathExpr*
+        ::= (DOLLAR QName:qname){ return new System.XPath.XPathVariableReference(qname); }
+        ;
+
+    FunctionCall(var UniquePtr<System.XPath.XPathFunctionCall> functionCall) : System.XPath.XPathExpr*
+        ::= (FunctionName:functionName LPAREN{ functionCall.Reset(new System.XPath.XPathFunctionCall(functionName)); } (Argument:arg{ functionCall->AddArgument(arg); } % COMMA)? RPAREN)
+        {
+            return functionCall.Release();
+        }
+        ;
+
+    FunctionName : ustring
+        ::= (QName:qname - NodeType:nodeType){ return qname; }
+        ;
+
+    Argument : System.XPath.XPathExpr*
+        ::= Expr:expr{ return expr; }
+        ;
+
+    QName : ustring
+        ::= PrefixedName:prefixedName{ return prefixedName; }
+        |   UnprefixedName:unprefixedName{ return unprefixedName; }
+        ;
+
+    PrefixedName : ustring
+        ::= (Prefix:prefix COLON LocalPart:localPart){ return prefix + u":" + localPart; }
+        ;
+
+    Prefix : ustring
+        ::= NCName:ncname{ return ncname; }
+        ;
+
+    UnprefixedName : ustring
+        ::= LocalPart:localPart{ return localPart; }
+        ;
+
+    LocalPart : ustring
+        ::= NCName:ncname{ return ncname; }
+        ;
+
+    NCName : ustring
+        ::= NAME{ Token token = lexer.GetToken(pos); return token.match.ToString(); }
+        ;
+
+}

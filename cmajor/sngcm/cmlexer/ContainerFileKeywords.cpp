@@ -17,7 +17,9 @@ namespace ContainerFileKeywords
         {U"text", TEXT}, 
         {U"target", TARGET}, 
         {U"program", PROGRAM}, 
+        {U"winapp", WINAPP}, 
         {U"library", LIBRARY}, 
+        {U"winlib", WINLIB}, 
         {U"unittest", UNITTEST}, 
         {U"activeProject", ACTIVEPROJECT},
         {nullptr, -1}

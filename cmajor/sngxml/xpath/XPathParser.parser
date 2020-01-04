@@ -144,7 +144,7 @@ parser XPathParser
                     case sngxml::xpath::Operator::slashSlash:
                     {
                         return new sngxml::xpath::XPathCombineStepExpr(expr.release(),
-                            new sngxml::xpath::XPathCombineStepExpr(new sngxml::xpath::XPathLocationStepExpr(sngxml::xpath::Axis::descendantOrSelf, new sngxml::xpath::XPathAnyNodeTest()), right));
+                            new sngxml::xpath::XPathCombineStepExpr(new sngxml::xpath::XPathLocationStepExpr(sngxml::dom::Axis::descendantOrSelf, new sngxml::xpath::XPathAnyNodeTest()), right));
                     }
                     case sngxml::xpath::Operator::slash:
                     {
@@ -185,7 +185,7 @@ parser XPathParser
         ::= SLASHSLASH RelativeLocationPath:right
         {
             return new sngxml::xpath::XPathCombineStepExpr(new sngxml::xpath::XPathRootNodeExpr(), new sngxml::xpath::XPathCombineStepExpr(
-                new sngxml::xpath::XPathLocationStepExpr(sngxml::xpath::Axis::descendantOrSelf, new sngxml::xpath::XPathAnyNodeTest()), right));
+                new sngxml::xpath::XPathLocationStepExpr(sngxml::dom::Axis::descendantOrSelf, new sngxml::xpath::XPathAnyNodeTest()), right));
         }
         ;
 
@@ -199,7 +199,7 @@ parser XPathParser
                     case sngxml::xpath::Operator::slashSlash:
                     {
                         expr.reset(new sngxml::xpath::XPathCombineStepExpr(expr.release(), new sngxml::xpath::XPathCombineStepExpr(
-                            new sngxml::xpath::XPathLocationStepExpr(sngxml::xpath::Axis::descendantOrSelf, new sngxml::xpath::XPathAnyNodeTest()), right)));
+                            new sngxml::xpath::XPathLocationStepExpr(sngxml::dom::Axis::descendantOrSelf, new sngxml::xpath::XPathAnyNodeTest()), right)));
                         break;
                     }
                     case sngxml::xpath::Operator::slash:
@@ -226,12 +226,12 @@ parser XPathParser
         }
         ;
 
-    AxisSpecifier : sngxml::xpath::Axis
+    AxisSpecifier : sngxml::dom::Axis
         ::= AxisName:axis COLONCOLON{ return axis;}
         |   AbbreviatedAxisSpecifier:abbreviatedAxisSpecifier{ return abbreviatedAxisSpecifier; }
         ;
 
-    AxisName : sngxml::xpath::Axis
+    AxisName : sngxml::dom::Axis
         ::= NAME
         {
             soulng::lexer::Token token = lexer.GetToken(pos);
@@ -239,55 +239,55 @@ parser XPathParser
             {
                 case ANCESTOR:
                 {
-                    return sngxml::xpath::Axis::ancestor;
+                    return sngxml::dom::Axis::ancestor;
                 }
                 case ANCESTOR_OR_SELF:
                 {
-                    return sngxml::xpath::Axis::ancestorOrSelf;
+                    return sngxml::dom::Axis::ancestorOrSelf;
                 }
                 case ATTRIBUTE:
                 {
-                    return sngxml::xpath::Axis::attribute;
+                    return sngxml::dom::Axis::attribute;
                 }
                 case CHILD :
                 {
-                    return sngxml::xpath::Axis::child;
+                    return sngxml::dom::Axis::child;
                 }
                 case DESCENDANT:
                 {
-                    return sngxml::xpath::Axis::descendant;
+                    return sngxml::dom::Axis::descendant;
                 }
                 case DESCENDANT_OR_SELF:
                 {
-                    return sngxml::xpath::Axis::descendantOrSelf;
+                    return sngxml::dom::Axis::descendantOrSelf;
                 }
                 case FOLLOWING:
                 {
-                    return sngxml::xpath::Axis::following;
+                    return sngxml::dom::Axis::following;
                 }
                 case FOLLOWING_SIBLING:
                 {
-                    return sngxml::xpath::Axis::followingSibling;
+                    return sngxml::dom::Axis::followingSibling;
                 }
                 case NAMESPACE:
                 {
-                    return sngxml::xpath::Axis::ns;
+                    return sngxml::dom::Axis::ns;
                 }
                 case PARENT:
                 {
-                    return sngxml::xpath::Axis::parent;
+                    return sngxml::dom::Axis::parent;
                 }
                 case PRECEDING:
                 {
-                    return sngxml::xpath::Axis::preceding;
+                    return sngxml::dom::Axis::preceding;
                 }
                 case PRECEDING_SIBLING:
                 {
-                    return sngxml::xpath::Axis::precedingSibling;
+                    return sngxml::dom::Axis::precedingSibling;
                 }
                 case SELF:
                 {
-                    return sngxml::xpath::Axis::self;
+                    return sngxml::dom::Axis::self;
                 }
                 default:
                 {
@@ -298,9 +298,9 @@ parser XPathParser
         }
         ;
 
-    AbbreviatedAxisSpecifier : sngxml::xpath::Axis
-        ::= AT{ return sngxml::xpath::Axis::attribute; }
-        |   empty{ return sngxml::xpath::Axis::child; }
+    AbbreviatedAxisSpecifier : sngxml::dom::Axis
+        ::= AT{ return sngxml::dom::Axis::attribute; }
+        |   empty{ return sngxml::dom::Axis::child; }
         ;
 
     NodeTest : sngxml::xpath::XPathNodeTestExpr*
@@ -335,8 +335,8 @@ parser XPathParser
         ;
 
     AbbreviatedStep : sngxml::xpath::XPathLocationStepExpr*
-        ::= DOTDOT{ return new sngxml::xpath::XPathLocationStepExpr(sngxml::xpath::Axis::parent, new sngxml::xpath::XPathAnyNodeTest()); }
-        |   DOT{ return new sngxml::xpath::XPathLocationStepExpr(sngxml::xpath::Axis::self, new sngxml::xpath::XPathAnyNodeTest()); }
+        ::= DOTDOT{ return new sngxml::xpath::XPathLocationStepExpr(sngxml::dom::Axis::parent, new sngxml::xpath::XPathAnyNodeTest()); }
+        |   DOT{ return new sngxml::xpath::XPathLocationStepExpr(sngxml::dom::Axis::self, new sngxml::xpath::XPathAnyNodeTest()); }
         ;
 
     Literal : sngxml::xpath::XPathExpr*

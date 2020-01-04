@@ -1,4 +1,4 @@
-﻿/*========================================================================
+/*========================================================================
     Copyright (c) 2012-2016 Seppo Laakko
     http://sourceforge.net/projects/cmajor/
  
@@ -43,7 +43,11 @@ namespace parser
                     ;
 
         TargetDeclaration: Target
-                    ::= keyword("target") '='! (keyword("program"){ value = Target.program; } | keyword("library"){ value = Target.library; } | keyword("unitTest"){ value = Target.unitTest; }) ';'!
+                    ::= keyword("target") '='!
+                    (   keyword("program"){ value = Target.program; } | keyword("winapp"){ value = Target.winapp; } |
+                        keyword("library"){ value = Target.library; } | keyword("winlib"){ value = Target.winlib; } |
+                        keyword("unitTest"){ value = Target.unitTest; }
+                    ) ';'!
                     ;
                 
         ProjectReference: string

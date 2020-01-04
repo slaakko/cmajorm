@@ -21,13 +21,28 @@ class BoundFunction;
 class BoundCompoundStatement;
 class StatementBinder;
 
+enum class CollectFlags : int
+{
+    none = 0, noRvalueRef = 1 << 0
+};
+
+inline CollectFlags operator|(CollectFlags left, CollectFlags right)
+{
+    return static_cast<CollectFlags>(static_cast<int>(left) | static_cast<int>(right));
+}
+
+inline CollectFlags operator&(CollectFlags left, CollectFlags right)
+{
+    return static_cast<CollectFlags>(static_cast<int>(left) & static_cast<int>(right));
+}
+
 class Operation
 {
 public:
     Operation(const std::u32string& groupName_, int arity_, BoundCompileUnit& boundCompileUnit_);
     virtual ~Operation();
     virtual void CollectViableFunctions(ContainerScope* containerScope_, const std::vector<std::unique_ptr<BoundExpression>>& arguments, BoundFunction* currentFunction, 
-        ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span) = 0;
+        ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span, CollectFlags flags) = 0;
     const std::u32string& GroupName() const { return groupName; }
     int Arity() const { return arity; }
     SymbolTable* GetSymbolTable();
@@ -45,7 +60,7 @@ class ArityOperation
 public:
     void Add(Operation* operation);
     void CollectViableFunctions(ContainerScope* containerScope, const std::vector<std::unique_ptr<BoundExpression>>& arguments, BoundFunction* currentFunction, 
-        ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span);
+        ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span, CollectFlags flags);
 private:
     std::vector<Operation*> operations;
 };
@@ -55,7 +70,7 @@ class OperationGroup
 public:
     void Add(Operation* operation);
     void CollectViableFunctions(ContainerScope* containerScope, const std::vector<std::unique_ptr<BoundExpression>>& arguments, BoundFunction* currentFunction, 
-        ViableFunctionSet& viableFunctions,  std::unique_ptr<Exception>& exception, const Span& span);
+        ViableFunctionSet& viableFunctions,  std::unique_ptr<Exception>& exception, const Span& span, CollectFlags flags);
 private:
     std::vector<std::unique_ptr<ArityOperation>> arityOperations;
 };
@@ -66,7 +81,7 @@ public:
     OperationRepository(BoundCompileUnit& boundCompileUnit_);
     void Add(Operation* operation);
     void CollectViableFunctions(const std::u32string& groupName, ContainerScope* containerScope, const std::vector<std::unique_ptr<BoundExpression>>& arguments, 
-        BoundFunction* currentFunction, ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span);
+        BoundFunction* currentFunction, ViableFunctionSet& viableFunctions, std::unique_ptr<Exception>& exception, const Span& span, CollectFlags flags);
     void GenerateCopyConstructorFor(ClassTypeSymbol* classTypeSymbol, ContainerScope* containerScope, BoundFunction* currentFunction, const Span& span);
     void GenerateCopyConstructorFor(InterfaceTypeSymbol* interfaceTypeSymbol, ContainerScope* containerScope, BoundFunction* currentFunction, const Span& span);
 private:

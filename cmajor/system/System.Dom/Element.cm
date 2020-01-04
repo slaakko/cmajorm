@@ -1,228 +1,153 @@
-// =================================
-// Copyright (c) 2019 Seppo Laakko
-// Distributed under the MIT license
-// =================================
-
 using System;
 using System.Collections;
 using System.Text;
 
+// this file has been semiautomatically generated from 'D:/work/soulng-project/sngxml/dom/Element.hpp' using cpp2cm version 1.0.0
+
+// this file has been semiautomatically generated from 'D:/work/soulng-project/sngxml/dom/Element.cpp' using cpp2cm version 1.0.0
+
 namespace System.Dom
 {
-    public nothrow ustring AttrValueEscape(const ustring& attributeValue, uchar delimiter)
+    public class Attr : Node
     {
-        ustring result;
-        for (uchar c : attributeValue)
-        {
-            switch (c)
-            {
-                case u'<': result.Append(u"&lt;"); break;
-                case u'&': result.Append(u"&amp;"); break;
-                case u'"': 
-                {
-                    if (delimiter == u'"')
-                    {
-                        result.Append(u"&quot;"); 
-                    }
-                    else
-                    {
-                        result.Append(u'"'); 
-                    }
-                    break;
-                }
-                case u'\'':
-                {
-                    if (delimiter == u'\'')
-                    {
-                        result.Append(u"&apos;"); 
-                    }
-                    else
-                    {
-                        result.Append(u'\''); 
-                    }
-                    break;
-                }
-                default:
-                {
-                    result.Append(c);
-                    break;
-                }
-            }
-        }
-        return result;
-    }
-    
-    public nothrow ustring MakeXmlAttrValue(const ustring& attrValue)
-    {
-        ustring result;
-        if (attrValue.Find(u'"') == -1)
-        {
-            result.Append(u'"');
-            result.Append(AttrValueEscape(attrValue, u'"'));
-            result.Append(u'"');
-        }
-        else if (attrValue.Find(u'\'') == -1)
-        {
-            result.Append(u'\'');
-            result.Append(AttrValueEscape(attrValue, u'\''));
-            result.Append(u'\'');
-        }
-        else
-        {
-            result.Append(u'"');
-            result.Append(AttrValueEscape(attrValue, u'"'));
-            result.Append(u'"');
-        }
-        return result;
-    }
-    
-    public class DomAttr : DomNode
-    {
-        public nothrow DomAttr() : base(u""), value(u"")
+        public suppress Attr(const Attr& );
+        public suppress Attr(Attr&& );
+        public Attr() :
+            base(NodeType.attributeNode, u""), value(u"")
         {
         }
-        public nothrow DomAttr(const ustring& name_, const ustring& value_) : base(name_), value(value_)
+        public Attr(const ustring& name_, const ustring& value_) :
+            base(NodeType.attributeNode, name_), value(value_)
         {
         }
-        suppress DomAttr(const DomAttr&);
-        suppress void operator=(const DomAttr&);
-        suppress DomAttr(DomAttr&&);
-        suppress void operator=(DomAttr&&);
-        public override UniquePtr<DomNode> CloneNode(bool deep) const
+        public suppress Attr& operator=(const Attr& );
+        public suppress Attr& operator=(Attr&& );
+        public const ustring& Value() const
         {
-            return UniquePtr<DomNode>(new DomAttr(Name(), value));
+            return value;
+        }
+        public ustring& Value()
+        {
+            return value;
+        }
+        public override UniquePtr<Node> CloneNode(bool deep)
+        {
+            return UniquePtr<Node>(new Attr(Name(), value));
         }
         public override void Write(CodeFormatter& formatter)
         {
             formatter.Write(" " + ToUtf8(Name()) + "=");
             formatter.Write(ToUtf8(MakeXmlAttrValue(value)));
         }
-        public nothrow override ustring Prefix() const
+        private ustring value;
+    }
+    public class Element : ParentNode
+    {
+        public suppress Element(const Element& );
+        public suppress Element(Element&& );
+        public Element(const ustring& name_) :
+            base(NodeType.elementNode, name_)
         {
-            const ustring& name = Name();
-            long colonPos = name.Find(u':');
-            if (colonPos != -1)
+        }
+        public Element(const ustring& name_, Map<ustring, Attr*>&& attributeMap_) :
+            base(NodeType.elementNode, name_), attributeMap(Rvalue(attributeMap_))
+        {
+        }
+        public ~Element()
+        {
+            for (Pair<ustring, Attr*>& p : attributeMap)
             {
-                return name.Substring(0, colonPos);
+                delete p.second;
+            }
+        }
+        public suppress Element& operator=(const Element& );
+        public suppress Element& operator=(Element&& );
+        public const ustring& TagName() const
+        {
+            return Name();
+        }
+        public void WriteAttributes(CodeFormatter& formatter)
+        {
+            for (Pair<ustring, Attr*>& p : attributeMap)
+            {
+                Attr* attr = p.second;
+                attr->Write(formatter);
+            }
+        }
+        public bool HasMultilineContent()
+        {
+            if (FirstChild() != LastChild()) return true;
+            Node* child = FirstChild();
+            if ((child != null))
+            {
+                if (child->GetNodeType() == NodeType.elementNode || child->GetNodeType() == NodeType.documentNode) return true;
+                if (child->ValueContainsNewLine()) return true;
+            }
+            return false;
+        }
+        public ustring GetAttribute(const ustring& attrName) const
+        {
+            Map<ustring, Attr*>.ConstIterator it = attributeMap.CFind(attrName);
+            if (it != attributeMap.CEnd())
+            {
+                return it->second->Value();
             }
             return ustring();
         }
-        public override void SetPrefix(const ustring& prefix)
+        public void AddAttribute(UniquePtr<Attr>&& attr)
         {
-            const ustring& name = Name();
-            long colonPos = name.Find(u':');
-            if (prefix.IsEmpty())
+            RemoveAttribute(attr->Name());
+            attributeMap[attr->Name()] = attr.Release();
+        }
+        public void SetAttribute(const ustring& attrName, const ustring& attrValue)
+        {
+            RemoveAttribute(attrName);
+            attributeMap[attrName] = new Attr(attrName, attrValue);
+        }
+        public void RemoveAttribute(const ustring& attrName)
+        {
+            Map<ustring, Attr*>.Iterator it = attributeMap.Find(attrName);
+            if (it != attributeMap.End())
             {
-                if (colonPos != -1)
-                {
-                    SetName(name.Substring(colonPos + 1));
-                }
+               delete it->second;
             }
-            else
+            attributeMap.Remove(attrName);
+        }
+        public NodeList GetElementsByTagName(const ustring& tagName)
+        {
+            NodeList result;
+            ElementsByTagNameVisitor visitor(result, tagName);
+            Accept(visitor);
+            return result;
+        }
+        public override UniquePtr<Node> CloneNode(bool deep)
+        {
+            UniquePtr<Node> clone(new Element(Name()));
+            ParentNode* cloneAsParent = cast<ParentNode*>(clone.Get());
+            Map<ustring, Attr*> clonedAttributeMap;
+            for (const Pair<ustring, Attr*>& p : attributeMap)
             {
-                if (colonPos != -1)
-                {
-                    SetName(prefix + u":" + name.Substring(colonPos + 1));
-                }
-                else
-                {
-                    SetName(prefix + u":" + name);
-                }
+                UniquePtr<Node> clonedAttrNode = p.second->CloneNode(false);
+                clonedAttrNode->InternalSetParent(cloneAsParent);
+                clonedAttributeMap[p.first] = cast<Attr*>(clonedAttrNode.Release());
             }
-        }
-        public nothrow inline const ustring& Value() const
-        {
-            return value;
-        }
-        public nothrow inline ustring& Value()
-        {
-            return value;
-        }
-        private ustring value;
-    }
-    
-    public class DomElement : DomParentNode
-    {
-        public explicit DomElement(const ustring& name_) : base(name_)
-        {
-        }
-        public DomElement(const ustring& name_, List<UniquePtr<DomAttr>>&& attrs_, Map<ustring, DomAttr*>&& attrMap_) :
-            base(name_), attrs(attrs_), attrMap(attrMap_)
-        {
-        }
-        suppress DomElement(const DomElement&);
-        suppress void operator=(const DomElement&);
-        suppress DomElement(DomElement&&);
-        suppress void operator=(DomElement&&);
-        public override UniquePtr<DomNode> CloneNode(bool deep) const
-        {
-            UniquePtr<DomNode> clone(new DomElement(Name()));
-            DomParentNode* cloneAsParent = cast<DomParentNode*>(clone.Get());
-            List<UniquePtr<DomAttr>> clonedAttrs;
-            Map<ustring, DomAttr*> clonedAttrMap;
-            for (const Pair<ustring, DomAttr*>& p : attrMap)
-            {
-                DomAttr* attr = p.second;
-                UniquePtr<DomNode> clonedAttr = attr->CloneNode(deep);
-                clonedAttr->InternalSetParent(cloneAsParent);
-                clonedAttrMap[attr->Name()] = cast<DomAttr*>(clonedAttr.Get());
-                clonedAttrs.Add(UniquePtr<DomAttr>(cast<DomAttr*>(clonedAttr.Release())));
-            }
-            DomElement* cloneAsElement = cast<DomElement*>(clone.Get());
-            cloneAsElement->attrs = Rvalue(clonedAttrs);
-            cloneAsElement->attrMap = Rvalue(clonedAttrMap);
+            Element* cloneAsElement = cast<Element*>(clone.Get());
+            cloneAsElement->attributeMap = Rvalue(clonedAttributeMap);
             if (deep)
             {
                 CloneChildrenTo(cloneAsParent);
             }
             return clone;
         }
-        public nothrow inline const ustring& TagName() const 
-        { 
-            return Name(); 
-        }
-        public nothrow override ustring Prefix() const
+        public override bool HasAttributes() const
         {
-            const ustring& name = Name();
-            long colonPos = name.Find(u':');
-            if (colonPos != -1)
-            {
-                return name.Substring(0, colonPos);
-            }
-            return ustring();
-        }
-        public override void SetPrefix(const ustring& prefix)
-        {
-            const ustring& name = Name();
-            long colonPos = name.Find(u':');
-            if (prefix.IsEmpty())
-            {
-                if (colonPos != -1)
-                {
-                    SetName(name.Substring(colonPos + 1));
-                }
-            }
-            else
-            {
-                if (colonPos != -1)
-                {
-                    SetName(prefix + u":" + name.Substring(colonPos + 1));
-                }
-                else
-                {
-                    SetName(prefix + u":" + name);
-                }
-            }
-        }
-        public nothrow override bool HasAttributes() const
-        {
-            return !attrMap.IsEmpty();
+            return !attributeMap.IsEmpty();
         }
         public override void Write(CodeFormatter& formatter)
         {
             if (HasChildNodes())
             {
-                if (attrMap.IsEmpty())
+                if (attributeMap.IsEmpty())
                 {
                     formatter.Write("<" + ToUtf8(Name()) + ">");
                 }
@@ -261,7 +186,7 @@ namespace System.Dom
             }
             else
             {
-                if (attrMap.IsEmpty())
+                if (attributeMap.IsEmpty())
                 {
                     formatter.WriteLine("<" + ToUtf8(Name()) + "/>");
                 }
@@ -273,93 +198,75 @@ namespace System.Dom
                 }
             }
         }
-        public ustring GetAttribute(const ustring& attrName) const
-        {
-            Map<ustring, DomAttr*>.ConstIterator it = attrMap.CFind(attrName);
-            if (it != attrMap.CEnd())
-            {
-                return it->second->Value();
-            }
-            return ustring();
-        }
-        public void AddAttribute(UniquePtr<DomAttr>&& attr)
-        {
-            DomAttr* attrPtr = attr.Get();
-            attrMap[attr->Name()] = attrPtr;
-            attrs.Add(attr);
-        }
-        public void SetAttribute(const ustring& attrName, const ustring& attrValue) 
-        {
-            RemoveAttribute(attrName);
-            DomAttr* attr = new DomAttr(attrName, attrValue);
-            attrMap[attrName] = attr;
-            attrs.Add(UniquePtr<DomAttr>(attr));
-        }
-        public void RemoveAttribute(const ustring& attrName)
-        {
-            Map<ustring, DomAttr*>.Iterator it = attrMap.Find(attrName);
-            if (it != attrMap.End())
-            {
-                DomAttr* toRemove = it->second;
-                List<UniquePtr<DomAttr>>.Iterator e = attrs.End();
-                for (List<UniquePtr<DomAttr>>.Iterator i = attrs.Begin(); i != e; ++i)
-                {
-                    DomAttr* attr = (*i).Get();
-                    if (attr == toRemove)
-                    {
-                        attrs.Remove(i);
-                        break;
-                    }
-                }            
-                attrMap.Remove(it);
-            }
-        }
         public override void WalkAttribute(NodeOp& nodeOp)
         {
-            for (const Pair<ustring, DomAttr*>& p : attrMap)
+            for (const Pair<ustring, Attr*>& p : attributeMap)
             {
-                DomAttr* attr = p.second;
+                Attr* attr = p.second;
                 nodeOp.Apply(attr);
             }
         }
-        public NodeList GetElementsByTagName(const ustring& tagName)
+        public override void Accept(Visitor& visitor)
         {
-            NodeList result;
-            ElementsByTagNameVisitor visitor(result, tagName);
-            Accept(visitor);
-            return result;
+            visitor.BeginVisit(this);
+            base->Accept(visitor);
+            visitor.EndVisit(this);
         }
-        private void WriteAttributes(CodeFormatter& formatter)
-        {
-            for (const Pair<ustring, DomAttr*>& p : attrMap)
-            {
-                p.second->Write(formatter);
-            }
-        }
-        private nothrow bool HasMultilineContent() const
-        {
-            if (FirstChild() != LastChild()) return true;
-            DomNode* child = FirstChild();
-            if (child != null)
-            {
-                if ((child is DomElement*) || (child is DomDocument*))
-                {
-                    return true;
-                }
-                if (child->ValueContainsNewLine()) return true;
-            }
-            return false;
-        }
-        private List<UniquePtr<DomAttr>> attrs;
-        private Map<ustring, DomAttr*> attrMap;
+        private Map<ustring, Attr*> attributeMap;
     }
-    
+    public ustring AttrValueEscape(const ustring& attributeValue, uchar delimiter)
+    {
+        ustring result;
+        for (uchar c : attributeValue)
+        {
+            switch (c)
+            {
+                case '<': result.Append(u"&lt;");
+                break;
+                case '&': result.Append(u"&amp;");
+                break;
+                case '\"': if (delimiter == '\"') result.Append(u"&quot;");
+                else result.Append('\"', 1);
+                break;
+                case '\'': if (delimiter == '\'') result.Append(u"&apos;");
+                else result.Append('\'', 1);
+                break;
+                default: result.Append(c, 1);
+                break;
+            }
+        }
+        return result;
+    }
+    public ustring MakeXmlAttrValue(const ustring& attributeValue)
+    {
+        ustring result;
+        if (attributeValue.Find('\"') == -1)
+        {
+            result.Append('\"', 1);
+            result.Append(AttrValueEscape(attributeValue, '\"'));
+            result.Append('\"', 1);
+        }
+        else if (attributeValue.Find('\'') == -1)
+        {
+            result.Append('\'', 1);
+            result.Append(AttrValueEscape(attributeValue, '\''));
+            result.Append('\'', 1);
+        }
+        else
+        {
+            result.Append('\"', 1);
+            result.Append(AttrValueEscape(attributeValue, '\"'));
+            result.Append('\"', 1);
+        }
+        return result;
+    }
     public class ElementsByTagNameVisitor : Visitor
     {
-        public nothrow ElementsByTagNameVisitor(NodeList& elements_, const ustring& tagName_) : elements(elements_), tagName(tagName_)
+        public ElementsByTagNameVisitor(NodeList& elements_, const ustring& tagName_) :
+            elements(elements_), tagName(tagName_)
         {
         }
-        public override void BeginVisit(DomElement* element)
+        public override void BeginVisit(Element* element)
         {
             if (element->Name() == tagName)
             {
@@ -369,4 +276,4 @@ namespace System.Dom
         private NodeList& elements;
         private ustring tagName;
     }
-}
+} // namespace System.Dom

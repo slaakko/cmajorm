@@ -38,9 +38,17 @@ void ConvertProject(Project* project, const std::string& cmprojFilePath, const s
     std::unique_ptr<sngxml::dom::Element> targetPropertyGroupElement(new sngxml::dom::Element(U"PropertyGroup"));
     std::unique_ptr<sngxml::dom::Element> targetTypeElement(new sngxml::dom::Element(U"TargetType"));
     std::u32string targetTypeStr = U"program";
-    if (project->GetTarget() == Target::library)
+    if (project->GetTarget() == Target::winapp)
+    {
+        targetTypeStr = U"winapp";
+    }
+    else if (project->GetTarget() == Target::library)
     {
         targetTypeStr = U"library";
+    }
+    else if (project->GetTarget() == Target::winlib)
+    {
+        targetTypeStr = U"winlib";
     }
     else if (project->GetTarget() == Target::unitTest)
     {

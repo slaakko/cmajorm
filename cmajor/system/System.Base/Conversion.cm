@@ -963,4 +963,14 @@ namespace System
         return dateTime;
     }
     
+    public Timestamp ParseTimestamp(const string& s)
+    {
+        if (s.Length() != 20 + 9)
+        {
+            ThrowConversionException("cannot parse timestamp from string '" + s + "': not in format YYYY-MM-DDTHH:MM:SS.nnnnnnnnn");
+        }
+        DateTime dateTime = ParseDateTime(s.Substring(0, 19));
+        int nanosecs = ParseInt(s.Substring(20));
+        return Timestamp(dateTime, nanosecs);
+    }
 }

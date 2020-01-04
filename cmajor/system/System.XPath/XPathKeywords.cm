@@ -1,0 +1,75 @@
+using System;
+
+namespace XPathKeywords
+{
+    internal class Keywords
+    {
+        static Keywords() :
+            instance(new Keywords())
+        {
+        }
+        public static Keywords& Instance()
+        {
+            return *instance;
+        }
+        public System.Lex.KeywordMap* GetKeywordMap()
+        {
+            return keywordMap.Get();
+        }
+        private Keywords()
+        {
+            System.Lex.Keyword keyword0(u"or", XPathTokens.OR);
+            keywordList.Add(keyword0);
+            System.Lex.Keyword keyword1(u"and", XPathTokens.AND);
+            keywordList.Add(keyword1);
+            System.Lex.Keyword keyword2(u"div", XPathTokens.DIV);
+            keywordList.Add(keyword2);
+            System.Lex.Keyword keyword3(u"mod", XPathTokens.MOD);
+            keywordList.Add(keyword3);
+            System.Lex.Keyword keyword4(u"ancestor", XPathTokens.ANCESTOR);
+            keywordList.Add(keyword4);
+            System.Lex.Keyword keyword5(u"ancestor-or-self", XPathTokens.ANCESTOR_OR_SELF);
+            keywordList.Add(keyword5);
+            System.Lex.Keyword keyword6(u"attribute", XPathTokens.ATTRIBUTE);
+            keywordList.Add(keyword6);
+            System.Lex.Keyword keyword7(u"child", XPathTokens.CHILD);
+            keywordList.Add(keyword7);
+            System.Lex.Keyword keyword8(u"descendant", XPathTokens.DESCENDANT);
+            keywordList.Add(keyword8);
+            System.Lex.Keyword keyword9(u"descendant-or-self", XPathTokens.DESCENDANT_OR_SELF);
+            keywordList.Add(keyword9);
+            System.Lex.Keyword keyword10(u"following", XPathTokens.FOLLOWING);
+            keywordList.Add(keyword10);
+            System.Lex.Keyword keyword11(u"following-sibling", XPathTokens.FOLLOWING_SIBLING);
+            keywordList.Add(keyword11);
+            System.Lex.Keyword keyword12(u"namespace", XPathTokens.NAMESPACE);
+            keywordList.Add(keyword12);
+            System.Lex.Keyword keyword13(u"parent", XPathTokens.PARENT);
+            keywordList.Add(keyword13);
+            System.Lex.Keyword keyword14(u"preceding", XPathTokens.PRECEDING);
+            keywordList.Add(keyword14);
+            System.Lex.Keyword keyword15(u"preceding-sibling", XPathTokens.PRECEDING_SIBLING);
+            keywordList.Add(keyword15);
+            System.Lex.Keyword keyword16(u"self", XPathTokens.SELF);
+            keywordList.Add(keyword16);
+            System.Lex.Keyword keyword17(u"processing-instruction", XPathTokens.PROCESSING_INSTRUCTION);
+            keywordList.Add(keyword17);
+            System.Lex.Keyword keyword18(u"comment", XPathTokens.COMMENT);
+            keywordList.Add(keyword18);
+            System.Lex.Keyword keyword19(u"text", XPathTokens.TEXT);
+            keywordList.Add(keyword19);
+            System.Lex.Keyword keyword20(u"node", XPathTokens.NODE);
+            keywordList.Add(keyword20);
+            System.Lex.Keyword nullKeyword(null, -1);
+            keywordList.Add(nullKeyword);
+            keywordMap.Reset(new System.Lex.KeywordMap(keywordList.CBegin().Ptr()));
+        }
+        private static System.UniquePtr<Keywords> instance;
+        private System.Collections.List<System.Lex.Keyword> keywordList;
+        private System.UniquePtr<System.Lex.KeywordMap> keywordMap;
+    }
+    public System.Lex.KeywordMap* GetKeywordMap()
+    {
+        return Keywords.Instance().GetKeywordMap();
+    }
+} // namespace XPathKeywords

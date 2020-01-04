@@ -1,62 +1,41 @@
-// =================================
-// Copyright (c) 2019 Seppo Laakko
-// Distributed under the MIT license
-// =================================
-
 using System;
-using System.Dom;
-using System.Text;
+using System.Collections;
+
+// this file has been semiautomatically generated from 'D:/work/soulng-project/sngxml/xpath/XPathEvaluate.hpp' using cpp2cm version 1.0.0
+
+// this file has been semiautomatically generated from 'D:/work/soulng-project/sngxml/xpath/XPathEvaluate.cpp' using cpp2cm version 1.0.0
 
 namespace System.XPath
 {
-    public class XPathExpressionParser
+    public UniquePtr<XPathObject> Evaluate(const ustring& xpathExpression, System.Dom.Node* node)
     {
-        static XPathExpressionParser() : instance(new XPathExpressionParser())
+        System.Lex.XmlParsingLog debugLog(Console.Out());
+        TimePoint startQuery = Now();
+        XPathLexer xpathLexer(xpathExpression, "", 0);
+        if (XPathDebugParsing())
         {
+            xpathLexer.SetLog(&debugLog);
         }
-        public static XPathExpressionParser& Instance()
+        UniquePtr<XPathExpr> xpathExpr(XPathParser.Parse(xpathLexer));
+        TimePoint endQuery = Now();
+        if (XPathDebugQuery())
         {
-            return *instance;
+            UniquePtr<System.Dom.Node> queryDom = xpathExpr->ToDom();
+            SetXPathQueryDom(Rvalue(queryDom));
+            SetXPathQueryDuration(endQuery - startQuery);
         }
-        public UniquePtr<XPathExpr> Parse(const ustring& xpathExpression)
-        {
-            if (DebugParsing())
-            {
-                xpathExpressionGrammar->SetLog(&Console.Out());
-            }
-            TimePoint start = Now();
-            UniquePtr<XPathExpr> expr = xpathExpressionGrammar->Parse(xpathExpression.Chars(), xpathExpression.Chars() + xpathExpression.Length(), 0, "");
-            TimePoint end = Now();
-            if (DebugQuery())
-            {
-                UniquePtr<DomNode> queryDom = expr->ToDom();
-                SetQueryDom(Rvalue(queryDom));
-                SetQueryDuration(end - start);
-            }
-            return expr;
-        }
-        private XPathExpressionParser() : xpathExpressionGrammar(new XPathExpressionGrammar())
-        {
-        }
-        private static UniquePtr<XPathExpressionParser> instance;
-        private XPathExpressionGrammar* xpathExpressionGrammar;
-    }
-    
-    public UniquePtr<XPathObject> Evaluate(const ustring& xpathExpression, DomNode* node)
-    {
-        UniquePtr<XPathExpr> xpathExpr = XPathExpressionParser.Instance().Parse(xpathExpression);
-        TimePoint start = Now();
+        TimePoint startEvaluate = Now();
         XPathContext context(node, 1, 1);
         UniquePtr<XPathObject> result = xpathExpr->Evaluate(context);
-        TimePoint end = Now();
-        if (DebugQuery())
+        TimePoint endEvaluate = Now();
+        if (XPathDebugQuery())
         {
-            SetExecutionDuration(end - start);
+            SetXPathExecuteDuration(endEvaluate - startEvaluate);
         }
         return result;
     }
-    public UniquePtr<XPathObject> Evaluate(const ustring& xpathExpression, DomDocument* document)
+    public UniquePtr<XPathObject> Evaluate(const ustring& xpathExpression, System.Dom.Document* document)
     {
-        return Evaluate(xpathExpression, cast<DomNode*>(document));
+        return Evaluate(xpathExpression, cast<System.Dom.Node*>(document));
     }
-}
+} // namespace System.XPath

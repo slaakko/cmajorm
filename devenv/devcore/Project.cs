@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,7 +11,7 @@ namespace devcore
 {
     public enum Target
     {
-        program, library, unitTest
+        program, winapp, library, winlib, unitTest
     }
 
     public class Project : IComparable<Project>
@@ -37,9 +37,17 @@ namespace devcore
             {
                 writer.WriteLine("project " + name + ";");
                 string targetStr = "program";
-                if (target == Target.library)
+                if (target == Target.winapp)
+                {
+                    targetStr = "winapp";
+                }
+                else if (target == Target.library)
                 {
                     targetStr = "library";
+                }
+                else if (target == Target.winlib)
+                {
+                    targetStr = "winlib";
                 }
                 else if (target == Target.unitTest)
                 {

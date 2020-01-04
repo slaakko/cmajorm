@@ -159,7 +159,7 @@ void XmlProcessor::AddAttribute(const std::u32string& attName, const std::u32str
 
 void XmlProcessor::EntityRef(const std::u32string& entityName, const soulng::lexer::Span& span, const std::string& systemId)
 {
-    auto it = entityMap.find(entityName);
+    std::unordered_map<std::u32string, std::unique_ptr<Entity>>::const_iterator it = entityMap.find(entityName);
     if (it != entityMap.cend())
     {
         const std::unique_ptr<Entity>& entity = it->second;
@@ -209,7 +209,7 @@ std::u32string XmlProcessor::GetNamespaceUri(const std::u32string& namespacePref
     {
         return currentNamespaceUri;
     }
-    auto it = namespacePrefixMap.find(namespacePrefix);
+    std::unordered_map<std::u32string, std::u32string>::const_iterator it = namespacePrefixMap.find(namespacePrefix);
     if (it != namespacePrefixMap.cend())
     {
         return it->second;

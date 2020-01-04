@@ -13,6 +13,10 @@ namespace soulcm.scmpg
             name(name_), parent(null)
         {
         }
+        suppress Parser(const Parser&);
+        suppress Parser(Parser&&);
+        suppress void operator=(const Parser&);
+        suppress void operator=(Parser&&);
         public virtual ~Parser()
         {
         }
@@ -130,7 +134,7 @@ namespace soulcm.scmpg
     public class CharParser : Parser
     {
         public CharParser(uchar chr_) :
-            base(ustring(chr_, 1)), chr(chr_)
+            base(u"char"), chr(chr_)
         {
         }
         public uchar Chr() const

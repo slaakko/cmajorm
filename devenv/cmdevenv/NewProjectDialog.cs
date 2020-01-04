@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -12,7 +12,7 @@ namespace cmdevenv
 {
     public enum ProjectType
     {
-        consoleApp, library, unitTestProject, blankSolution
+        consoleApp, winapp, library, winlib, unitTestProject, blankSolution
     }
 
     public partial class NewProjectDialog : Form

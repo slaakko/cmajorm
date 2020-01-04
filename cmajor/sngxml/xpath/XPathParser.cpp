@@ -1670,7 +1670,7 @@ soulng::parser::Match XPathParser::PathExpr(XPathLexer& lexer)
                                                                     #ifdef SOULNG_PARSER_DEBUG_SUPPORT
                                                                     if (parser_debug_write_to_log) soulng::lexer::WriteSuccessToLog(lexer, parser_debug_match_span, soulng::unicode::ToUtf32("PathExpr"));
                                                                     #endif // SOULNG_PARSER_DEBUG_SUPPORT
-                                                                    return soulng::parser::Match(true, new sngxml::xpath::XPathCombineStepExpr(expr.release(), new sngxml::xpath::XPathCombineStepExpr(new sngxml::xpath::XPathLocationStepExpr(sngxml::xpath::Axis::descendantOrSelf, new sngxml::xpath::XPathAnyNodeTest), right.release())));
+                                                                    return soulng::parser::Match(true, new sngxml::xpath::XPathCombineStepExpr(expr.release(), new sngxml::xpath::XPathCombineStepExpr(new sngxml::xpath::XPathLocationStepExpr(sngxml::dom::Axis::descendantOrSelf, new sngxml::xpath::XPathAnyNodeTest), right.release())));
                                                                 }
                                                             }
                                                             case sngxml::xpath::Operator::slash: {
@@ -2099,7 +2099,7 @@ soulng::parser::Match XPathParser::AbbreviatedAbsoluteLocationPath(XPathLexer& l
                         #ifdef SOULNG_PARSER_DEBUG_SUPPORT
                         if (parser_debug_write_to_log) soulng::lexer::WriteSuccessToLog(lexer, parser_debug_match_span, soulng::unicode::ToUtf32("AbbreviatedAbsoluteLocationPath"));
                         #endif // SOULNG_PARSER_DEBUG_SUPPORT
-                        return soulng::parser::Match(true, new sngxml::xpath::XPathCombineStepExpr(new sngxml::xpath::XPathRootNodeExpr, new sngxml::xpath::XPathCombineStepExpr(new sngxml::xpath::XPathLocationStepExpr(sngxml::xpath::Axis::descendantOrSelf, new sngxml::xpath::XPathAnyNodeTest), right.release())));
+                        return soulng::parser::Match(true, new sngxml::xpath::XPathCombineStepExpr(new sngxml::xpath::XPathRootNodeExpr, new sngxml::xpath::XPathCombineStepExpr(new sngxml::xpath::XPathLocationStepExpr(sngxml::dom::Axis::descendantOrSelf, new sngxml::xpath::XPathAnyNodeTest), right.release())));
                     }
                 }
                 *parentMatch2 = match;
@@ -2250,7 +2250,7 @@ soulng::parser::Match XPathParser::RelativeLocationPath(XPathLexer& lexer)
                                                     switch (op)
                                                     {
                                                         case sngxml::xpath::Operator::slashSlash: {
-                                                            expr.reset(new sngxml::xpath::XPathCombineStepExpr(expr.release(), new sngxml::xpath::XPathCombineStepExpr(new sngxml::xpath::XPathLocationStepExpr(sngxml::xpath::Axis::descendantOrSelf, new sngxml::xpath::XPathAnyNodeTest), right.release())));
+                                                            expr.reset(new sngxml::xpath::XPathCombineStepExpr(expr.release(), new sngxml::xpath::XPathCombineStepExpr(new sngxml::xpath::XPathLocationStepExpr(sngxml::dom::Axis::descendantOrSelf, new sngxml::xpath::XPathAnyNodeTest), right.release())));
                                                             break;
                                                         }
                                                         case sngxml::xpath::Operator::slash: {
@@ -2322,7 +2322,7 @@ soulng::parser::Match XPathParser::Step(XPathLexer& lexer)
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
     std::unique_ptr<sngxml::xpath::XPathLocationStepExpr> expr = std::unique_ptr<sngxml::xpath::XPathLocationStepExpr>();
-    std::unique_ptr<soulng::parser::Value<sngxml::xpath::Axis>> axis;
+    std::unique_ptr<soulng::parser::Value<sngxml::dom::Axis>> axis;
     std::unique_ptr<sngxml::xpath::XPathNodeTestExpr> nodeTest;
     std::unique_ptr<sngxml::xpath::XPathExpr> predicate;
     std::unique_ptr<sngxml::xpath::XPathLocationStepExpr> abbreviatedStep;
@@ -2344,7 +2344,7 @@ soulng::parser::Match XPathParser::Step(XPathLexer& lexer)
                     soulng::parser::Match* parentMatch4 = &match;
                     {
                         soulng::parser::Match match = XPathParser::AxisSpecifier(lexer);
-                        axis.reset(static_cast<soulng::parser::Value<sngxml::xpath::Axis>*>(match.value));
+                        axis.reset(static_cast<soulng::parser::Value<sngxml::dom::Axis>*>(match.value));
                         *parentMatch4 = match;
                     }
                     if (match.hit)
@@ -2477,8 +2477,8 @@ soulng::parser::Match XPathParser::AxisSpecifier(XPathLexer& lexer)
         soulng::lexer::WriteBeginRuleToLog(lexer, soulng::unicode::ToUtf32("AxisSpecifier"));
     }
     #endif // SOULNG_PARSER_DEBUG_SUPPORT
-    std::unique_ptr<soulng::parser::Value<sngxml::xpath::Axis>> axis;
-    std::unique_ptr<soulng::parser::Value<sngxml::xpath::Axis>> abbreviatedAxisSpecifier;
+    std::unique_ptr<soulng::parser::Value<sngxml::dom::Axis>> axis;
+    std::unique_ptr<soulng::parser::Value<sngxml::dom::Axis>> abbreviatedAxisSpecifier;
     soulng::parser::Match match(false);
     soulng::parser::Match* parentMatch0 = &match;
     {
@@ -2487,7 +2487,7 @@ soulng::parser::Match XPathParser::AxisSpecifier(XPathLexer& lexer)
         soulng::parser::Match* parentMatch1 = &match;
         {
             soulng::parser::Match match = XPathParser::AxisName(lexer);
-            axis.reset(static_cast<soulng::parser::Value<sngxml::xpath::Axis>*>(match.value));
+            axis.reset(static_cast<soulng::parser::Value<sngxml::dom::Axis>*>(match.value));
             *parentMatch1 = match;
         }
         if (match.hit)
@@ -2511,7 +2511,7 @@ soulng::parser::Match XPathParser::AxisSpecifier(XPathLexer& lexer)
                             #ifdef SOULNG_PARSER_DEBUG_SUPPORT
                             if (parser_debug_write_to_log) soulng::lexer::WriteSuccessToLog(lexer, parser_debug_match_span, soulng::unicode::ToUtf32("AxisSpecifier"));
                             #endif // SOULNG_PARSER_DEBUG_SUPPORT
-                            return soulng::parser::Match(true, new soulng::parser::Value<sngxml::xpath::Axis>(axis->value));
+                            return soulng::parser::Match(true, new soulng::parser::Value<sngxml::dom::Axis>(axis->value));
                         }
                     }
                     *parentMatch3 = match;
@@ -2532,14 +2532,14 @@ soulng::parser::Match XPathParser::AxisSpecifier(XPathLexer& lexer)
                 {
                     int64_t pos = lexer.GetPos();
                     soulng::parser::Match match = XPathParser::AbbreviatedAxisSpecifier(lexer);
-                    abbreviatedAxisSpecifier.reset(static_cast<soulng::parser::Value<sngxml::xpath::Axis>*>(match.value));
+                    abbreviatedAxisSpecifier.reset(static_cast<soulng::parser::Value<sngxml::dom::Axis>*>(match.value));
                     if (match.hit)
                     {
                         {
                             #ifdef SOULNG_PARSER_DEBUG_SUPPORT
                             if (parser_debug_write_to_log) soulng::lexer::WriteSuccessToLog(lexer, parser_debug_match_span, soulng::unicode::ToUtf32("AxisSpecifier"));
                             #endif // SOULNG_PARSER_DEBUG_SUPPORT
-                            return soulng::parser::Match(true, new soulng::parser::Value<sngxml::xpath::Axis>(abbreviatedAxisSpecifier->value));
+                            return soulng::parser::Match(true, new soulng::parser::Value<sngxml::dom::Axis>(abbreviatedAxisSpecifier->value));
                         }
                     }
                     *parentMatch5 = match;
@@ -2595,7 +2595,7 @@ soulng::parser::Match XPathParser::AxisName(XPathLexer& lexer)
                         #ifdef SOULNG_PARSER_DEBUG_SUPPORT
                         if (parser_debug_write_to_log) soulng::lexer::WriteSuccessToLog(lexer, parser_debug_match_span, soulng::unicode::ToUtf32("AxisName"));
                         #endif // SOULNG_PARSER_DEBUG_SUPPORT
-                        return soulng::parser::Match(true, new soulng::parser::Value<sngxml::xpath::Axis>(sngxml::xpath::Axis::ancestor));
+                        return soulng::parser::Match(true, new soulng::parser::Value<sngxml::dom::Axis>(sngxml::dom::Axis::ancestor));
                     }
                 }
                 case ANCESTOR_OR_SELF: {
@@ -2603,7 +2603,7 @@ soulng::parser::Match XPathParser::AxisName(XPathLexer& lexer)
                         #ifdef SOULNG_PARSER_DEBUG_SUPPORT
                         if (parser_debug_write_to_log) soulng::lexer::WriteSuccessToLog(lexer, parser_debug_match_span, soulng::unicode::ToUtf32("AxisName"));
                         #endif // SOULNG_PARSER_DEBUG_SUPPORT
-                        return soulng::parser::Match(true, new soulng::parser::Value<sngxml::xpath::Axis>(sngxml::xpath::Axis::ancestorOrSelf));
+                        return soulng::parser::Match(true, new soulng::parser::Value<sngxml::dom::Axis>(sngxml::dom::Axis::ancestorOrSelf));
                     }
                 }
                 case ATTRIBUTE: {
@@ -2611,7 +2611,7 @@ soulng::parser::Match XPathParser::AxisName(XPathLexer& lexer)
                         #ifdef SOULNG_PARSER_DEBUG_SUPPORT
                         if (parser_debug_write_to_log) soulng::lexer::WriteSuccessToLog(lexer, parser_debug_match_span, soulng::unicode::ToUtf32("AxisName"));
                         #endif // SOULNG_PARSER_DEBUG_SUPPORT
-                        return soulng::parser::Match(true, new soulng::parser::Value<sngxml::xpath::Axis>(sngxml::xpath::Axis::attribute));
+                        return soulng::parser::Match(true, new soulng::parser::Value<sngxml::dom::Axis>(sngxml::dom::Axis::attribute));
                     }
                 }
                 case CHILD: {
@@ -2619,7 +2619,7 @@ soulng::parser::Match XPathParser::AxisName(XPathLexer& lexer)
                         #ifdef SOULNG_PARSER_DEBUG_SUPPORT
                         if (parser_debug_write_to_log) soulng::lexer::WriteSuccessToLog(lexer, parser_debug_match_span, soulng::unicode::ToUtf32("AxisName"));
                         #endif // SOULNG_PARSER_DEBUG_SUPPORT
-                        return soulng::parser::Match(true, new soulng::parser::Value<sngxml::xpath::Axis>(sngxml::xpath::Axis::child));
+                        return soulng::parser::Match(true, new soulng::parser::Value<sngxml::dom::Axis>(sngxml::dom::Axis::child));
                     }
                 }
                 case DESCENDANT: {
@@ -2627,7 +2627,7 @@ soulng::parser::Match XPathParser::AxisName(XPathLexer& lexer)
                         #ifdef SOULNG_PARSER_DEBUG_SUPPORT
                         if (parser_debug_write_to_log) soulng::lexer::WriteSuccessToLog(lexer, parser_debug_match_span, soulng::unicode::ToUtf32("AxisName"));
                         #endif // SOULNG_PARSER_DEBUG_SUPPORT
-                        return soulng::parser::Match(true, new soulng::parser::Value<sngxml::xpath::Axis>(sngxml::xpath::Axis::descendant));
+                        return soulng::parser::Match(true, new soulng::parser::Value<sngxml::dom::Axis>(sngxml::dom::Axis::descendant));
                     }
                 }
                 case DESCENDANT_OR_SELF: {
@@ -2635,7 +2635,7 @@ soulng::parser::Match XPathParser::AxisName(XPathLexer& lexer)
                         #ifdef SOULNG_PARSER_DEBUG_SUPPORT
                         if (parser_debug_write_to_log) soulng::lexer::WriteSuccessToLog(lexer, parser_debug_match_span, soulng::unicode::ToUtf32("AxisName"));
                         #endif // SOULNG_PARSER_DEBUG_SUPPORT
-                        return soulng::parser::Match(true, new soulng::parser::Value<sngxml::xpath::Axis>(sngxml::xpath::Axis::descendantOrSelf));
+                        return soulng::parser::Match(true, new soulng::parser::Value<sngxml::dom::Axis>(sngxml::dom::Axis::descendantOrSelf));
                     }
                 }
                 case FOLLOWING: {
@@ -2643,7 +2643,7 @@ soulng::parser::Match XPathParser::AxisName(XPathLexer& lexer)
                         #ifdef SOULNG_PARSER_DEBUG_SUPPORT
                         if (parser_debug_write_to_log) soulng::lexer::WriteSuccessToLog(lexer, parser_debug_match_span, soulng::unicode::ToUtf32("AxisName"));
                         #endif // SOULNG_PARSER_DEBUG_SUPPORT
-                        return soulng::parser::Match(true, new soulng::parser::Value<sngxml::xpath::Axis>(sngxml::xpath::Axis::following));
+                        return soulng::parser::Match(true, new soulng::parser::Value<sngxml::dom::Axis>(sngxml::dom::Axis::following));
                     }
                 }
                 case FOLLOWING_SIBLING: {
@@ -2651,7 +2651,7 @@ soulng::parser::Match XPathParser::AxisName(XPathLexer& lexer)
                         #ifdef SOULNG_PARSER_DEBUG_SUPPORT
                         if (parser_debug_write_to_log) soulng::lexer::WriteSuccessToLog(lexer, parser_debug_match_span, soulng::unicode::ToUtf32("AxisName"));
                         #endif // SOULNG_PARSER_DEBUG_SUPPORT
-                        return soulng::parser::Match(true, new soulng::parser::Value<sngxml::xpath::Axis>(sngxml::xpath::Axis::followingSibling));
+                        return soulng::parser::Match(true, new soulng::parser::Value<sngxml::dom::Axis>(sngxml::dom::Axis::followingSibling));
                     }
                 }
                 case NAMESPACE: {
@@ -2659,7 +2659,7 @@ soulng::parser::Match XPathParser::AxisName(XPathLexer& lexer)
                         #ifdef SOULNG_PARSER_DEBUG_SUPPORT
                         if (parser_debug_write_to_log) soulng::lexer::WriteSuccessToLog(lexer, parser_debug_match_span, soulng::unicode::ToUtf32("AxisName"));
                         #endif // SOULNG_PARSER_DEBUG_SUPPORT
-                        return soulng::parser::Match(true, new soulng::parser::Value<sngxml::xpath::Axis>(sngxml::xpath::Axis::ns));
+                        return soulng::parser::Match(true, new soulng::parser::Value<sngxml::dom::Axis>(sngxml::dom::Axis::ns));
                     }
                 }
                 case PARENT: {
@@ -2667,7 +2667,7 @@ soulng::parser::Match XPathParser::AxisName(XPathLexer& lexer)
                         #ifdef SOULNG_PARSER_DEBUG_SUPPORT
                         if (parser_debug_write_to_log) soulng::lexer::WriteSuccessToLog(lexer, parser_debug_match_span, soulng::unicode::ToUtf32("AxisName"));
                         #endif // SOULNG_PARSER_DEBUG_SUPPORT
-                        return soulng::parser::Match(true, new soulng::parser::Value<sngxml::xpath::Axis>(sngxml::xpath::Axis::parent));
+                        return soulng::parser::Match(true, new soulng::parser::Value<sngxml::dom::Axis>(sngxml::dom::Axis::parent));
                     }
                 }
                 case PRECEDING: {
@@ -2675,7 +2675,7 @@ soulng::parser::Match XPathParser::AxisName(XPathLexer& lexer)
                         #ifdef SOULNG_PARSER_DEBUG_SUPPORT
                         if (parser_debug_write_to_log) soulng::lexer::WriteSuccessToLog(lexer, parser_debug_match_span, soulng::unicode::ToUtf32("AxisName"));
                         #endif // SOULNG_PARSER_DEBUG_SUPPORT
-                        return soulng::parser::Match(true, new soulng::parser::Value<sngxml::xpath::Axis>(sngxml::xpath::Axis::preceding));
+                        return soulng::parser::Match(true, new soulng::parser::Value<sngxml::dom::Axis>(sngxml::dom::Axis::preceding));
                     }
                 }
                 case PRECEDING_SIBLING: {
@@ -2683,7 +2683,7 @@ soulng::parser::Match XPathParser::AxisName(XPathLexer& lexer)
                         #ifdef SOULNG_PARSER_DEBUG_SUPPORT
                         if (parser_debug_write_to_log) soulng::lexer::WriteSuccessToLog(lexer, parser_debug_match_span, soulng::unicode::ToUtf32("AxisName"));
                         #endif // SOULNG_PARSER_DEBUG_SUPPORT
-                        return soulng::parser::Match(true, new soulng::parser::Value<sngxml::xpath::Axis>(sngxml::xpath::Axis::precedingSibling));
+                        return soulng::parser::Match(true, new soulng::parser::Value<sngxml::dom::Axis>(sngxml::dom::Axis::precedingSibling));
                     }
                 }
                 case SELF: {
@@ -2691,7 +2691,7 @@ soulng::parser::Match XPathParser::AxisName(XPathLexer& lexer)
                         #ifdef SOULNG_PARSER_DEBUG_SUPPORT
                         if (parser_debug_write_to_log) soulng::lexer::WriteSuccessToLog(lexer, parser_debug_match_span, soulng::unicode::ToUtf32("AxisName"));
                         #endif // SOULNG_PARSER_DEBUG_SUPPORT
-                        return soulng::parser::Match(true, new soulng::parser::Value<sngxml::xpath::Axis>(sngxml::xpath::Axis::self));
+                        return soulng::parser::Match(true, new soulng::parser::Value<sngxml::dom::Axis>(sngxml::dom::Axis::self));
                     }
                 }
                 default: {
@@ -2751,7 +2751,7 @@ soulng::parser::Match XPathParser::AbbreviatedAxisSpecifier(XPathLexer& lexer)
                     #ifdef SOULNG_PARSER_DEBUG_SUPPORT
                     if (parser_debug_write_to_log) soulng::lexer::WriteSuccessToLog(lexer, parser_debug_match_span, soulng::unicode::ToUtf32("AbbreviatedAxisSpecifier"));
                     #endif // SOULNG_PARSER_DEBUG_SUPPORT
-                    return soulng::parser::Match(true, new soulng::parser::Value<sngxml::xpath::Axis>(sngxml::xpath::Axis::attribute));
+                    return soulng::parser::Match(true, new soulng::parser::Value<sngxml::dom::Axis>(sngxml::dom::Axis::attribute));
                 }
             }
             *parentMatch1 = match;
@@ -2774,7 +2774,7 @@ soulng::parser::Match XPathParser::AbbreviatedAxisSpecifier(XPathLexer& lexer)
                             #ifdef SOULNG_PARSER_DEBUG_SUPPORT
                             if (parser_debug_write_to_log) soulng::lexer::WriteSuccessToLog(lexer, parser_debug_match_span, soulng::unicode::ToUtf32("AbbreviatedAxisSpecifier"));
                             #endif // SOULNG_PARSER_DEBUG_SUPPORT
-                            return soulng::parser::Match(true, new soulng::parser::Value<sngxml::xpath::Axis>(sngxml::xpath::Axis::child));
+                            return soulng::parser::Match(true, new soulng::parser::Value<sngxml::dom::Axis>(sngxml::dom::Axis::child));
                         }
                     }
                     *parentMatch3 = match;
@@ -3280,7 +3280,7 @@ soulng::parser::Match XPathParser::AbbreviatedStep(XPathLexer& lexer)
                     #ifdef SOULNG_PARSER_DEBUG_SUPPORT
                     if (parser_debug_write_to_log) soulng::lexer::WriteSuccessToLog(lexer, parser_debug_match_span, soulng::unicode::ToUtf32("AbbreviatedStep"));
                     #endif // SOULNG_PARSER_DEBUG_SUPPORT
-                    return soulng::parser::Match(true, new sngxml::xpath::XPathLocationStepExpr(sngxml::xpath::Axis::parent, new sngxml::xpath::XPathAnyNodeTest));
+                    return soulng::parser::Match(true, new sngxml::xpath::XPathLocationStepExpr(sngxml::dom::Axis::parent, new sngxml::xpath::XPathAnyNodeTest));
                 }
             }
             break;
@@ -3293,7 +3293,7 @@ soulng::parser::Match XPathParser::AbbreviatedStep(XPathLexer& lexer)
                     #ifdef SOULNG_PARSER_DEBUG_SUPPORT
                     if (parser_debug_write_to_log) soulng::lexer::WriteSuccessToLog(lexer, parser_debug_match_span, soulng::unicode::ToUtf32("AbbreviatedStep"));
                     #endif // SOULNG_PARSER_DEBUG_SUPPORT
-                    return soulng::parser::Match(true, new sngxml::xpath::XPathLocationStepExpr(sngxml::xpath::Axis::self, new sngxml::xpath::XPathAnyNodeTest));
+                    return soulng::parser::Match(true, new sngxml::xpath::XPathLocationStepExpr(sngxml::dom::Axis::self, new sngxml::xpath::XPathAnyNodeTest));
                 }
             }
             break;

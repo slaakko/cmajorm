@@ -98,11 +98,17 @@ namespace parser
                                 new CharParser('='))),
                         new AlternativeParser(
                             new AlternativeParser(
-                                new ActionParser("A0",
-                                    new KeywordParser("program")),
-                                new ActionParser("A1",
-                                    new KeywordParser("library"))),
-                            new ActionParser("A2",
+                                new AlternativeParser(
+                                    new AlternativeParser(
+                                        new ActionParser("A0",
+                                            new KeywordParser("program")),
+                                        new ActionParser("A1",
+                                            new KeywordParser("winapp"))),
+                                    new ActionParser("A2",
+                                        new KeywordParser("library"))),
+                                new ActionParser("A3",
+                                    new KeywordParser("winlib"))),
+                            new ActionParser("A4",
                                 new KeywordParser("unitTest")))),
                     new ExpectationParser(
                         new CharParser(';')))));
@@ -388,6 +394,10 @@ namespace parser
                 a1ActionParser.Action = A1Action;
                 ActionParser a2ActionParser = GetAction("A2");
                 a2ActionParser.Action = A2Action;
+                ActionParser a3ActionParser = GetAction("A3");
+                a3ActionParser.Action = A3Action;
+                ActionParser a4ActionParser = GetAction("A4");
+                a4ActionParser.Action = A4Action;
             }
             public override void Enter(Stack<object> stack)
             {
@@ -408,9 +418,17 @@ namespace parser
             }
             private void A1Action(string match, string content, Position position, string fileName, ref bool pass)
             {
-                context.value = Target.library;
+                context.value = Target.winapp;
             }
             private void A2Action(string match, string content, Position position, string fileName, ref bool pass)
+            {
+                context.value = Target.library;
+            }
+            private void A3Action(string match, string content, Position position, string fileName, ref bool pass)
+            {
+                context.value = Target.winlib;
+            }
+            private void A4Action(string match, string content, Position position, string fileName, ref bool pass)
             {
                 context.value = Target.unitTest;
             }

@@ -184,7 +184,7 @@ parser ParserFileParser
         ;
 
     RuleCall(ParsingContext* parsingContext, var ustring ruleName, var UniquePtr<InvokeNode> invoke, var long nonterminalPos) : soulcm.scmpg.Parser*
-        ::= Nonterminal:nt{ ruleName = nt; nonterminalPos = pos; invoke.Reset(new InvokeNode(Span())); }
+        ::= Nonterminal:nt{ ruleName = nt; nonterminalPos = pos; invoke.Reset(new InvokeNode(Span())); } 
             (LPAREN{ pass = NoWhiteSpaceBetweenTokens(lexer.GetToken(nonterminalPos), lexer.GetToken(pos)); }
             ExpressionList(parsingContext, invoke.Get()):args RPAREN)? COLON ID!
         {

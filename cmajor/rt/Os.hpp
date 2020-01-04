@@ -55,5 +55,8 @@ extern "C" RT_API void OsFindClose(void* findHandle);
 extern "C" RT_API bool OsGetFileTimes(const char* filePath, uint8_t* ctime, uint8_t* mtime, uint8_t* atime);
 extern "C" RT_API int OsGetMaxComputerNameLength();
 extern "C" RT_API bool OsGetComputerName(char* buffer, int size);
+extern "C" RT_API void* OsFindFirstChangeNotification(const char* directoryPath);
+extern "C" RT_API bool OsFindNextChangeNotification(void* handle);
+extern "C" RT_API void OsFindCloseChangeNotification(void* handle);
 
 #endif // CMAJOR_RT_OS_INCLUDED

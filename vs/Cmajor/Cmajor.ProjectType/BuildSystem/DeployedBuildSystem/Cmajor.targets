@@ -65,7 +65,7 @@
   <UsingTask TaskName="CmajorTasks.ResolveModuleFilePath" AssemblyFile="$(CMAJOR_ROOT)\bin\CmajorTasks.dll"/>
 
   <Target Name="Clean">
-    <RemoveDir Condition="'$(TargetType)' == 'program'" Directories="$(MSBuildProjectDirectory)\$(BinDir)"/>
+    <RemoveDir Condition="'$(TargetType)' == 'program' || '$(TargetType)' == 'winapp'" Directories="$(MSBuildProjectDirectory)\$(BinDir)"/>
     <RemoveDir Directories="$(MSBuildProjectDirectory)\$(LibDir)"/>
   </Target>
 

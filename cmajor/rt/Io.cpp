@@ -18,6 +18,8 @@
 #include <unistd.h>
 #endif
 
+bool fileTableInitialized = false;
+
 namespace cmajor { namespace rt {
 
 using namespace soulng::unicode;
@@ -63,10 +65,12 @@ std::unique_ptr<FileTable> FileTable::instance;
 void FileTable::Init()
 {
     instance.reset(new FileTable());
+    fileTableInitialized = true;
 }
 
 void FileTable::Done()
 {
+    fileTableInitialized = false;
     instance.reset();
 }
 

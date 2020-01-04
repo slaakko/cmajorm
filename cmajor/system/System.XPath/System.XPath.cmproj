@@ -2,24 +2,30 @@
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
  <PropertyGroup Label="Globals">
   <CustomProjectExtensionsPath>$(LocalAppData)\CustomProjectSystems\Cmajor\</CustomProjectExtensionsPath>
-  <ProjectGuid>1bd5215b-c9b7-4a8c-b650-6ae5f509c791</ProjectGuid>
+  <ProjectGuid>2fb13cb4-cd45-44fe-b042-b3a7f80de557</ProjectGuid>
  </PropertyGroup>
  <PropertyGroup>
   <TargetType>library</TargetType>
  </PropertyGroup>
  <ItemGroup>
+  <CmCompile Include="XPathApi.cm"/>
+  <CmCompile Include="XPathClassMap.cm"/>
   <CmCompile Include="XPathContext.cm"/>
   <CmCompile Include="XPathDebug.cm"/>
   <CmCompile Include="XPathEvaluate.cm"/>
   <CmCompile Include="XPathExpr.cm"/>
-  <CmCompile Include="XPathExpressionGrammar.cm"/>
   <CmCompile Include="XPathFunction.cm"/>
+  <CmCompile Include="XPathKeywords.cm"/>
+  <CmCompile Include="XPathLexer.cm"/>
   <CmCompile Include="XPathObject.cm"/>
+  <CmCompile Include="XPathParser.cm"/>
+  <CmCompile Include="XPathTokenValueParsers.cm"/>
+  <CmCompile Include="XPathTokens.cm"/>
  </ItemGroup>
  <ItemGroup>
-  <None Include="XPathExpressionGrammar.parser"/>
-  <None Include="XPathExpressionGrammar.pl"/>
-  <None Include="XPathExpressionGrammar.pp"/>
+  <None Include="XPathLexer.lexer"/>
+  <None Include="XPathParser.parser"/>
+  <None Include="XPathParser.spg"/>
  </ItemGroup>
  <ItemGroup>
   <ProjectReference Include="../System.Dom/System.Dom.cmproj"/>

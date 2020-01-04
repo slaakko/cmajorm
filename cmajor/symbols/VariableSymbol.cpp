@@ -367,8 +367,9 @@ void GlobalVariableSymbol::Write(SymbolWriter& writer)
     writer.GetBinaryWriter().Write(groupName);
     writer.GetBinaryWriter().Write(compileUnitFilePath);
     bool hasInitializer = initializer != nullptr;
+    bool privateAccess = Access() == SymbolAccess::private_;
     writer.GetBinaryWriter().Write(hasInitializer);
-    if (hasInitializer)
+    if (hasInitializer && !privateAccess)
     {
         WriteValue(initializer.get(), writer.GetBinaryWriter());
     }
@@ -380,7 +381,8 @@ void GlobalVariableSymbol::Read(SymbolReader& reader)
     groupName = reader.GetBinaryReader().ReadUtf32String();
     compileUnitFilePath = reader.GetBinaryReader().ReadUtf8String();
     bool hasInitializer = reader.GetBinaryReader().ReadBool();
-    if (hasInitializer)
+    bool privateAccess = Access() == SymbolAccess::private_;
+    if (hasInitializer && !privateAccess)
     {
         initializer = ReadValue(reader.GetBinaryReader(), GetSpan());
         initializer->SetType(GetType());

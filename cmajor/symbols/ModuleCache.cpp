@@ -136,10 +136,10 @@ void ModuleCache::PutModule(std::unique_ptr<Module>&& module)
 
 std::recursive_mutex mtx;
 
-void PrepareModuleForCompilation(Module* rootModule, const std::vector<std::string>& references)
+void PrepareModuleForCompilation(Module* rootModule, const std::vector<std::string>& references, sngcm::ast::Target target)
 {
     std::lock_guard<std::recursive_mutex> lock(mtx);
-    rootModule->PrepareForCompilation(references);
+    rootModule->PrepareForCompilation(references, target);
     cmajor::symbols::MetaInit(rootModule->GetSymbolTable());
 #ifdef _WIN32
     if (GetBackEnd() == BackEnd::cmsx && rootModule->Name() == U"System.Core")

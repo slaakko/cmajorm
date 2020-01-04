@@ -1,30 +1,32 @@
-// =================================
-// Copyright (c) 2019 Seppo Laakko
-// Distributed under the MIT license
-// =================================
-
 using System;
 using System.Collections;
-using System.Dom;
+using System.IO;
+
+// this file has been semiautomatically generated from 'D:/work/soulng-project/sngxml/xpath/XPathExpr.hpp' using cpp2cm version 1.0.0
+
+// this file has been semiautomatically generated from 'D:/work/soulng-project/sngxml/xpath/XPathExpr.cpp' using cpp2cm version 1.0.0
 
 namespace System.XPath
 {
-    public class XPathException : Exception
-    {
-        public nothrow XPathException(const string& message_) : base(message_)
-        {
-        }
-    }
-    
-    public enum Operator : int
+    using Axis = System.Dom.Axis;
+    using NodeType = System.Dom.NodeType;
+    public enum Operator
     {
         equal, notEqual, less, greater, lessOrEqual, greaterOrEqual, plus, minus, mul, div, mod, slash, slashSlash
     }
-    
     public abstract class XPathExpr
     {
-        public default virtual ~XPathExpr();
-        public virtual UniquePtr<XPathObject> Evaluate(XPathContext& context) 
+        public suppress XPathExpr(const XPathExpr& );
+        public suppress XPathExpr(XPathExpr&& );
+        public XPathExpr()
+        {
+        }
+        public virtual ~XPathExpr()
+        {
+        }
+        public suppress XPathExpr& operator=(const XPathExpr& );
+        public suppress XPathExpr&& operator=(XPathExpr&& );
+        public virtual UniquePtr<XPathObject> Evaluate(XPathContext& context)
         {
             return UniquePtr<XPathObject>();
         }
@@ -32,41 +34,41 @@ namespace System.XPath
         {
             return ustring();
         }
-        public abstract UniquePtr<DomNode> ToDom() const;
+        public abstract UniquePtr<System.Dom.Node> ToDom() const;
     }
-    
     public abstract class XPathUnaryExpr : XPathExpr
     {
-        public nothrow XPathUnaryExpr(XPathExpr* operand_) : operand(operand_)
+        public XPathUnaryExpr(XPathExpr* operand_) :
+            operand(operand_)
         {
         }
-        public nothrow inline XPathExpr* Operand() const
+        public XPathExpr* Operand() const
         {
             return operand.Get();
         }
         private UniquePtr<XPathExpr> operand;
     }
-    
     public abstract class XPathBinaryExpr : XPathExpr
     {
-        public nothrow XPathBinaryExpr(XPathExpr* left_, XPathExpr* right_) : left(left_), right(right_)
+        public XPathBinaryExpr(XPathExpr* left_, XPathExpr* right_) :
+            left(left_), right(right_)
         {
         }
-        public nothrow inline XPathExpr* Left() const
+        public XPathExpr* Left() const
         {
             return left.Get();
         }
-        public nothrow inline XPathExpr* Right() const
+        public XPathExpr* Right() const
         {
             return right.Get();
         }
         private UniquePtr<XPathExpr> left;
         private UniquePtr<XPathExpr> right;
     }
-    
     public class XPathOrExpr : XPathBinaryExpr
     {
-        public nothrow XPathOrExpr(XPathExpr* left_, XPathExpr* right_) : base(left_, right_)
+        public XPathOrExpr(XPathExpr* left_, XPathExpr* right_) :
+            base(left_, right_)
         {
         }
         public override UniquePtr<XPathObject> Evaluate(XPathContext& context)
@@ -75,38 +77,37 @@ namespace System.XPath
             UniquePtr<XPathObject> left = Left()->Evaluate(context);
             List<XPathObject*> leftArgs;
             leftArgs.Add(left.Get());
-            UniquePtr<XPathObject> leftBooleanObject = boolean->Evaluate(context, leftArgs);
-            if (!(leftBooleanObject.Get() is XPathBoolean*))
+            UniquePtr<XPathObject> leftAsBoolean = boolean->Evaluate(context, leftArgs);
+            if (leftAsBoolean->Type() != XPathObjectType.boolean)
             {
-                throw XPathException("boolean result expected");
+                throw Exception("boolean result expected");
             }
-            XPathBoolean* leftAsBoolean = cast<XPathBoolean*>(leftBooleanObject.Get());
-            if (leftAsBoolean->Value())
+            if (cast<XPathBoolean*>(leftAsBoolean.Get())->Value())
             {
-                return leftBooleanObject;
+                return leftAsBoolean;
             }
             UniquePtr<XPathObject> right = Right()->Evaluate(context);
             List<XPathObject*> rightArgs;
             rightArgs.Add(right.Get());
-            UniquePtr<XPathObject> rightBooleanObject = boolean->Evaluate(context, rightArgs);
-            if (!(rightBooleanObject.Get() is XPathBoolean*))
+            UniquePtr<XPathObject> rightAsBoolean = boolean->Evaluate(context, rightArgs);
+            if (rightAsBoolean->Type() != XPathObjectType.boolean)
             {
-                throw XPathException("boolean result expected");
+                throw Exception("boolean result expected");
             }
-            return rightBooleanObject;
+            return rightAsBoolean;
         }
-        public override UniquePtr<DomNode> ToDom() const
+        public override UniquePtr<System.Dom.Node> ToDom() const
         {
-            UniquePtr<DomElement> element = new DomElement(u"or");
+            UniquePtr<System.Dom.Element> element(new System.Dom.Element(u"or"));
             element->AppendChild(Left()->ToDom());
             element->AppendChild(Right()->ToDom());
-            return UniquePtr<DomNode>(element.Release());
+            return UniquePtr<System.Dom.Node>(element.Release());
         }
     }
-    
     public class XPathAndExpr : XPathBinaryExpr
     {
-        public nothrow XPathAndExpr(XPathExpr* left_, XPathExpr* right_) : base(left_, right_)
+        public XPathAndExpr(XPathExpr* left_, XPathExpr* right_) :
+            base(left_, right_)
         {
         }
         public override UniquePtr<XPathObject> Evaluate(XPathContext& context)
@@ -115,50 +116,913 @@ namespace System.XPath
             UniquePtr<XPathObject> left = Left()->Evaluate(context);
             List<XPathObject*> leftArgs;
             leftArgs.Add(left.Get());
-            UniquePtr<XPathObject> leftBooleanObject = boolean->Evaluate(context, leftArgs);
-            if (!(leftBooleanObject.Get() is XPathBoolean*))
+            UniquePtr<XPathObject> leftAsBoolean = boolean->Evaluate(context, leftArgs);
+            if (leftAsBoolean->Type() != XPathObjectType.boolean)
             {
-                throw XPathException("boolean result expected");
+                throw Exception("boolean result expected");
             }
-            XPathBoolean* leftAsBoolean = cast<XPathBoolean*>(leftBooleanObject.Get());
-            if (!leftAsBoolean->Value())
+            if (!cast<XPathBoolean*>(leftAsBoolean.Get())->Value())
             {
-                return leftBooleanObject;
+                return leftAsBoolean;
             }
             UniquePtr<XPathObject> right = Right()->Evaluate(context);
             List<XPathObject*> rightArgs;
             rightArgs.Add(right.Get());
-            UniquePtr<XPathObject> rightBooleanObject = boolean->Evaluate(context, rightArgs);
-            if (!(rightBooleanObject.Get() is XPathBoolean*))
+            UniquePtr<XPathObject> rightAsBoolean = boolean->Evaluate(context, rightArgs);
+            if (rightAsBoolean->Type() != XPathObjectType.boolean)
             {
-                throw XPathException("boolean result expected");
+                throw Exception("boolean result expected");
             }
-            return rightBooleanObject;
+            return rightAsBoolean;
         }
-        public override UniquePtr<DomNode> ToDom() const
+        public override UniquePtr<System.Dom.Node> ToDom() const
         {
-            UniquePtr<DomElement> element = new DomElement(u"and");
+            UniquePtr<System.Dom.Element> element(new System.Dom.Element(u"and"));
             element->AppendChild(Left()->ToDom());
             element->AppendChild(Right()->ToDom());
-            return UniquePtr<DomNode>(element.Release());
+            return UniquePtr<System.Dom.Node>(element.Release());
         }
     }
-    
+    public class XPathEqualExpr : XPathBinaryExpr
+    {
+        public XPathEqualExpr(XPathExpr* left_, XPathExpr* right_) :
+            base(left_, right_)
+        {
+        }
+        public override UniquePtr<XPathObject> Evaluate(XPathContext& context)
+        {
+            UniquePtr<XPathObject> left = Left()->Evaluate(context);
+            UniquePtr<XPathObject> right = Right()->Evaluate(context);
+            return CompareEquality(context, left.Get(), right.Get());
+        }
+        public override UniquePtr<System.Dom.Node> ToDom() const
+        {
+            UniquePtr<System.Dom.Element> element(new System.Dom.Element(u"equal"));
+            element->AppendChild(Left()->ToDom());
+            element->AppendChild(Right()->ToDom());
+            return UniquePtr<System.Dom.Node>(element.Release());
+        }
+    }
+    public class XPathNotEqualExpr : XPathBinaryExpr
+    {
+        public XPathNotEqualExpr(XPathExpr* left_, XPathExpr* right_) :
+            base(left_, right_)
+        {
+        }
+        public override UniquePtr<XPathObject> Evaluate(XPathContext& context)
+        {
+            UniquePtr<XPathObject> left = Left()->Evaluate(context);
+            UniquePtr<XPathObject> right = Right()->Evaluate(context);
+            UniquePtr<XPathObject> equal = CompareEquality(context, left.Get(), right.Get());
+            if (equal->Type() != XPathObjectType.boolean)
+            {
+                throw Exception("boolean result expected");
+            }
+            return UniquePtr<XPathObject>(new XPathBoolean(!cast<XPathBoolean*>(equal.Get())->Value()));
+        }
+        public override UniquePtr<System.Dom.Node> ToDom() const
+        {
+            UniquePtr<System.Dom.Element> element(new System.Dom.Element(u"notEqual"));
+            element->AppendChild(Left()->ToDom());
+            element->AppendChild(Right()->ToDom());
+            return UniquePtr<System.Dom.Node>(element.Release());
+        }
+    }
+    public class XPathLessExpr : XPathBinaryExpr
+    {
+        public XPathLessExpr(XPathExpr* left_, XPathExpr* right_) :
+            base(left_, right_)
+        {
+        }
+        public override UniquePtr<XPathObject> Evaluate(XPathContext& context)
+        {
+            UniquePtr<XPathObject> left = Left()->Evaluate(context);
+            UniquePtr<XPathObject> right = Right()->Evaluate(context);
+            return Compare(context, left.Get(), right.Get(), Operator.less);
+        }
+        public override UniquePtr<System.Dom.Node> ToDom() const
+        {
+            UniquePtr<System.Dom.Element> element(new System.Dom.Element(u"less"));
+            element->AppendChild(Left()->ToDom());
+            element->AppendChild(Right()->ToDom());
+            return UniquePtr<System.Dom.Node>(element.Release());
+        }
+    }
+    public class XPathGreaterExpr : XPathBinaryExpr
+    {
+        public XPathGreaterExpr(XPathExpr* left_, XPathExpr* right_) :
+            base(left_, right_)
+        {
+        }
+        public override UniquePtr<XPathObject> Evaluate(XPathContext& context)
+        {
+            UniquePtr<XPathObject> left = Left()->Evaluate(context);
+            UniquePtr<XPathObject> right = Right()->Evaluate(context);
+            return Compare(context, left.Get(), right.Get(), Operator.greater);
+        }
+        public override UniquePtr<System.Dom.Node> ToDom() const
+        {
+            UniquePtr<System.Dom.Element> element(new System.Dom.Element(u"greater"));
+            element->AppendChild(Left()->ToDom());
+            element->AppendChild(Right()->ToDom());
+            return UniquePtr<System.Dom.Node>(element.Release());
+        }
+    }
+    public class XPathLessOrEqualExpr : XPathBinaryExpr
+    {
+        public XPathLessOrEqualExpr(XPathExpr* left_, XPathExpr* right_) :
+            base(left_, right_)
+        {
+        }
+        public override UniquePtr<XPathObject> Evaluate(XPathContext& context)
+        {
+            UniquePtr<XPathObject> left = Left()->Evaluate(context);
+            UniquePtr<XPathObject> right = Right()->Evaluate(context);
+            return Compare(context, left.Get(), right.Get(), Operator.lessOrEqual);
+        }
+        public override UniquePtr<System.Dom.Node> ToDom() const
+        {
+            UniquePtr<System.Dom.Element> element(new System.Dom.Element(u"lessOrEqual"));
+            element->AppendChild(Left()->ToDom());
+            element->AppendChild(Right()->ToDom());
+            return UniquePtr<System.Dom.Node>(element.Release());
+        }
+    }
+    public class XPathGreaterOrEqualExpr : XPathBinaryExpr
+    {
+        public XPathGreaterOrEqualExpr(XPathExpr* left_, XPathExpr* right_) :
+            base(left_, right_)
+        {
+        }
+        public override UniquePtr<XPathObject> Evaluate(XPathContext& context)
+        {
+            UniquePtr<XPathObject> left = Left()->Evaluate(context);
+            UniquePtr<XPathObject> right = Right()->Evaluate(context);
+            return Compare(context, left.Get(), right.Get(), Operator.greaterOrEqual);
+        }
+        public override UniquePtr<System.Dom.Node> ToDom() const
+        {
+            UniquePtr<System.Dom.Element> element(new System.Dom.Element(u"greaterOrEqual"));
+            element->AppendChild(Left()->ToDom());
+            element->AppendChild(Right()->ToDom());
+            return UniquePtr<System.Dom.Node>(element.Release());
+        }
+    }
+    public class XPathAddExpr : XPathBinaryExpr
+    {
+        public XPathAddExpr(XPathExpr* left_, XPathExpr* right_) :
+            base(left_, right_)
+        {
+        }
+        public override UniquePtr<XPathObject> Evaluate(XPathContext& context)
+        {
+            UniquePtr<XPathObject> left = Left()->Evaluate(context);
+            UniquePtr<XPathObject> right = Right()->Evaluate(context);
+            XPathFunction* numberFunction = GetXPathLibraryFunction(u"number");
+            List<XPathObject*> leftArgs;
+            leftArgs.Add(left.Get());
+            UniquePtr<XPathObject> leftAsNumber = numberFunction->Evaluate(context, leftArgs);
+            if (leftAsNumber->Type() != XPathObjectType.number)
+            {
+                throw Exception("number result expected");
+            }
+            double leftNumber = cast<XPathNumber*>(leftAsNumber.Get())->Value();
+            List<XPathObject*> rightArgs;
+            rightArgs.Add(right.Get());
+            UniquePtr<XPathObject> rightAsNumber = numberFunction->Evaluate(context, rightArgs);
+            if (rightAsNumber->Type() != XPathObjectType.number)
+            {
+                throw Exception("number result expected");
+            }
+            double rightNumber = cast<XPathNumber*>(rightAsNumber.Get())->Value();
+            return UniquePtr<XPathObject>(new XPathNumber(leftNumber + rightNumber));
+        }
+        public override UniquePtr<System.Dom.Node> ToDom() const
+        {
+            UniquePtr<System.Dom.Element> element(new System.Dom.Element(u"add"));
+            element->AppendChild(Left()->ToDom());
+            element->AppendChild(Right()->ToDom());
+            return UniquePtr<System.Dom.Node>(element.Release());
+        }
+    }
+    public class XPathSubExpr : XPathBinaryExpr
+    {
+        public XPathSubExpr(XPathExpr* left_, XPathExpr* right_) :
+            base(left_, right_)
+        {
+        }
+        public override UniquePtr<XPathObject> Evaluate(XPathContext& context)
+        {
+            UniquePtr<XPathObject> left = Left()->Evaluate(context);
+            UniquePtr<XPathObject> right = Right()->Evaluate(context);
+            XPathFunction* numberFunction = GetXPathLibraryFunction(u"number");
+            List<XPathObject*> leftArgs;
+            leftArgs.Add(left.Get());
+            UniquePtr<XPathObject> leftAsNumber = numberFunction->Evaluate(context, leftArgs);
+            if (leftAsNumber->Type() != XPathObjectType.number)
+            {
+                throw Exception("number result expected");
+            }
+            double leftNumber = cast<XPathNumber*>(leftAsNumber.Get())->Value();
+            List<XPathObject*> rightArgs;
+            rightArgs.Add(right.Get());
+            UniquePtr<XPathObject> rightAsNumber = numberFunction->Evaluate(context, rightArgs);
+            if (rightAsNumber->Type() != XPathObjectType.number)
+            {
+                throw Exception("number result expected");
+            }
+            double rightNumber = cast<XPathNumber*>(rightAsNumber.Get())->Value();
+            return UniquePtr<XPathObject>(new XPathNumber(leftNumber - rightNumber));
+        }
+        public override UniquePtr<System.Dom.Node> ToDom() const
+        {
+            UniquePtr<System.Dom.Element> element(new System.Dom.Element(u"sub"));
+            element->AppendChild(Left()->ToDom());
+            element->AppendChild(Right()->ToDom());
+            return UniquePtr<System.Dom.Node>(element.Release());
+        }
+    }
+    public class XPathMulExpr : XPathBinaryExpr
+    {
+        public XPathMulExpr(XPathExpr* left_, XPathExpr* right_) :
+            base(left_, right_)
+        {
+        }
+        public override UniquePtr<XPathObject> Evaluate(XPathContext& context)
+        {
+            UniquePtr<XPathObject> left = Left()->Evaluate(context);
+            UniquePtr<XPathObject> right = Right()->Evaluate(context);
+            XPathFunction* numberFunction = GetXPathLibraryFunction(u"number");
+            List<XPathObject*> leftArgs;
+            leftArgs.Add(left.Get());
+            UniquePtr<XPathObject> leftAsNumber = numberFunction->Evaluate(context, leftArgs);
+            if (leftAsNumber->Type() != XPathObjectType.number)
+            {
+                throw Exception("number result expected");
+            }
+            double leftNumber = cast<XPathNumber*>(leftAsNumber.Get())->Value();
+            List<XPathObject*> rightArgs;
+            rightArgs.Add(right.Get());
+            UniquePtr<XPathObject> rightAsNumber = numberFunction->Evaluate(context, rightArgs);
+            if (rightAsNumber->Type() != XPathObjectType.number)
+            {
+                throw Exception("number result expected");
+            }
+            double rightNumber = cast<XPathNumber*>(rightAsNumber.Get())->Value();
+            return UniquePtr<XPathObject>(new XPathNumber(leftNumber * rightNumber));
+        }
+        public override UniquePtr<System.Dom.Node> ToDom() const
+        {
+            UniquePtr<System.Dom.Element> element(new System.Dom.Element(u"mul"));
+            element->AppendChild(Left()->ToDom());
+            element->AppendChild(Right()->ToDom());
+            return UniquePtr<System.Dom.Node>(element.Release());
+        }
+    }
+    public class XPathDivExpr : XPathBinaryExpr
+    {
+        public XPathDivExpr(XPathExpr* left_, XPathExpr* right_) :
+            base(left_, right_)
+        {
+        }
+        public override UniquePtr<XPathObject> Evaluate(XPathContext& context)
+        {
+            UniquePtr<XPathObject> left = Left()->Evaluate(context);
+            UniquePtr<XPathObject> right = Right()->Evaluate(context);
+            XPathFunction* numberFunction = GetXPathLibraryFunction(u"number");
+            List<XPathObject*> leftArgs;
+            leftArgs.Add(left.Get());
+            UniquePtr<XPathObject> leftAsNumber = numberFunction->Evaluate(context, leftArgs);
+            if (leftAsNumber->Type() != XPathObjectType.number)
+            {
+                throw Exception("number result expected");
+            }
+            double leftNumber = cast<XPathNumber*>(leftAsNumber.Get())->Value();
+            List<XPathObject*> rightArgs;
+            rightArgs.Add(right.Get());
+            UniquePtr<XPathObject> rightAsNumber = numberFunction->Evaluate(context, rightArgs);
+            if (rightAsNumber->Type() != XPathObjectType.number)
+            {
+                throw Exception("number result expected");
+            }
+            double rightNumber = cast<XPathNumber*>(rightAsNumber.Get())->Value();
+            return UniquePtr<XPathObject>(new XPathNumber(leftNumber / rightNumber));
+        }
+        public override UniquePtr<System.Dom.Node> ToDom() const
+        {
+            UniquePtr<System.Dom.Element> element(new System.Dom.Element(u"div"));
+            element->AppendChild(Left()->ToDom());
+            element->AppendChild(Right()->ToDom());
+            return UniquePtr<System.Dom.Node>(element.Release());
+        }
+    }
+    public class XPathModExpr : XPathBinaryExpr
+    {
+        public XPathModExpr(XPathExpr* left_, XPathExpr* right_) :
+            base(left_, right_)
+        {
+        }
+        public override UniquePtr<XPathObject> Evaluate(XPathContext& context)
+        {
+            UniquePtr<XPathObject> left = Left()->Evaluate(context);
+            UniquePtr<XPathObject> right = Right()->Evaluate(context);
+            XPathFunction* numberFunction = GetXPathLibraryFunction(u"number");
+            List<XPathObject*> leftArgs;
+            leftArgs.Add(left.Get());
+            UniquePtr<XPathObject> leftAsNumber = numberFunction->Evaluate(context, leftArgs);
+            if (leftAsNumber->Type() != XPathObjectType.number)
+            {
+                throw Exception("number result expected");
+            }
+            long leftNumber = cast<long>(cast<XPathNumber*>(leftAsNumber.Get())->Value());
+            List<XPathObject*> rightArgs;
+            rightArgs.Add(right.Get());
+            UniquePtr<XPathObject> rightAsNumber = numberFunction->Evaluate(context, rightArgs);
+            if (rightAsNumber->Type() != XPathObjectType.number)
+            {
+                throw Exception("number result expected");
+            }
+            long rightNumber = cast<long>(cast<XPathNumber*>(rightAsNumber.Get())->Value());
+            return UniquePtr<XPathObject>(new XPathNumber(double(leftNumber % rightNumber)));
+        }
+        public override UniquePtr<System.Dom.Node> ToDom() const
+        {
+            UniquePtr<System.Dom.Element> element(new System.Dom.Element(u"mod"));
+            element->AppendChild(Left()->ToDom());
+            element->AppendChild(Right()->ToDom());
+            return UniquePtr<System.Dom.Node>(element.Release());
+        }
+    }
+    public class XPathUnaryMinusExpr : XPathUnaryExpr
+    {
+        public XPathUnaryMinusExpr(XPathExpr* operand_) :
+            base(operand_)
+        {
+        }
+        public override UniquePtr<XPathObject> Evaluate(XPathContext& context)
+        {
+            UniquePtr<XPathObject> operand = Operand()->Evaluate(context);
+            XPathFunction* numberFunction = GetXPathLibraryFunction(u"number");
+            List<XPathObject*> operandArgs;
+            operandArgs.Add(operand.Get());
+            UniquePtr<XPathObject> operandAsNumber = numberFunction->Evaluate(context, operandArgs);
+            if (operandAsNumber->Type() != XPathObjectType.number)
+            {
+                throw Exception("number result expected");
+            }
+            double operandNumber = cast<XPathNumber*>(operandAsNumber.Get())->Value();
+            return UniquePtr<XPathObject>(new XPathNumber(-operandNumber));
+        }
+        public override UniquePtr<System.Dom.Node> ToDom() const
+        {
+            UniquePtr<System.Dom.Element> element(new System.Dom.Element(u"unaryMinus"));
+            element->AppendChild(Operand()->ToDom());
+            return UniquePtr<System.Dom.Node>(element.Release());
+        }
+    }
+    public class XPathUnionExpr : XPathBinaryExpr
+    {
+        public XPathUnionExpr(XPathExpr* left_, XPathExpr* right_) :
+            base(left_, right_)
+        {
+        }
+        public override UniquePtr<XPathObject> Evaluate(XPathContext& context)
+        {
+            UniquePtr<XPathNodeSet> result(new XPathNodeSet());
+            UniquePtr<XPathObject> leftResult = Left()->Evaluate(context);
+            if (leftResult->Type() != XPathObjectType.nodeSet)
+            {
+                throw Exception("node set expected");
+            }
+            XPathNodeSet* leftNodeSet = cast<XPathNodeSet*>(leftResult.Get());
+            int n = leftNodeSet->Length();
+            for (int i = 0; i < n; ++i)
+            {
+                result->Add((*leftNodeSet)[i]);
+            }
+            UniquePtr<XPathObject> rightResult = Right()->Evaluate(context);
+            if (rightResult->Type() != XPathObjectType.nodeSet)
+            {
+                throw Exception("node set expected");
+            }
+            XPathNodeSet* rightNodeSet = cast<XPathNodeSet*>(rightResult.Get());
+            int m = rightNodeSet->Length();
+            for (int i = 0; i < m; ++i)
+            {
+                result->Add((*rightNodeSet)[i]);
+            }
+            return UniquePtr<XPathObject>(result.Release());
+        }
+        public override UniquePtr<System.Dom.Node> ToDom() const
+        {
+            UniquePtr<System.Dom.Element> element(new System.Dom.Element(u"union"));
+            element->AppendChild(Left()->ToDom());
+            element->AppendChild(Right()->ToDom());
+            return UniquePtr<System.Dom.Node>(element.Release());
+        }
+    }
+    public class XPathCombineStepExpr : XPathBinaryExpr
+    {
+        public XPathCombineStepExpr(XPathExpr* left_, XPathExpr* right_) :
+            base(left_, right_)
+        {
+        }
+        public override UniquePtr<XPathObject> Evaluate(XPathContext& context)
+        {
+            UniquePtr<XPathNodeSet> result(new XPathNodeSet());
+            UniquePtr<XPathObject> leftResult = Left()->Evaluate(context);
+            if (leftResult->Type() != XPathObjectType.nodeSet)
+            {
+                throw Exception("node set expected");
+            }
+            XPathNodeSet* leftNodeSet = cast<XPathNodeSet*>(leftResult.Get());
+            int n = leftNodeSet->Length();
+            for (int i = 0; i < n; ++i)
+            {
+                System.Dom.Node* node = (*leftNodeSet)[i];
+                XPathContext rightContext(node, i + 1, n);
+                UniquePtr<XPathObject> rightResult = Right()->Evaluate(rightContext);
+                if (rightResult->Type() != XPathObjectType.nodeSet)
+                {
+                    throw Exception("node set expected");
+                }
+                XPathNodeSet* rightNodeSet = cast<XPathNodeSet*>(rightResult.Get());
+                int m = rightNodeSet->Length();
+                for (int i = 0; i < m; ++i)
+                {
+                    System.Dom.Node* node = (*rightNodeSet)[i];
+                    result->Add(node);
+                }
+            }
+            return UniquePtr<XPathObject>(result.Release());
+        }
+        public override UniquePtr<System.Dom.Node> ToDom() const
+        {
+            UniquePtr<System.Dom.Element> element(new System.Dom.Element(u"combineStep"));
+            element->AppendChild(Left()->ToDom());
+            element->AppendChild(Right()->ToDom());
+            return UniquePtr<System.Dom.Node>(element.Release());
+        }
+    }
+    public class XPathRootNodeExpr : XPathExpr
+    {
+        public XPathRootNodeExpr()
+        {
+        }
+        public override UniquePtr<XPathObject> Evaluate(XPathContext& context)
+        {
+            UniquePtr<XPathNodeSet> nodeSet(new XPathNodeSet());
+            if (context.Node()->GetNodeType() == NodeType.documentNode)
+            {
+                nodeSet->Add(context.Node());
+            }
+            else
+            {
+                nodeSet->Add(context.Node()->OwnerDocument());
+            }
+            return UniquePtr<XPathObject>(nodeSet.Release());
+        }
+        public override UniquePtr<System.Dom.Node> ToDom() const
+        {
+            UniquePtr<System.Dom.Element> element(new System.Dom.Element(u"root"));
+            return UniquePtr<System.Dom.Node>(element.Release());
+        }
+    }
+    public class XPathFilterExpr : XPathUnaryExpr
+    {
+        public XPathFilterExpr(XPathExpr* expr_, XPathExpr* predicate_) :
+            base(expr_), predicate(predicate_)
+        {
+        }
+        public override UniquePtr<XPathObject> Evaluate(XPathContext& context)
+        {
+            UniquePtr<XPathObject> result = Operand()->Evaluate(context);
+            if (result->Type() != XPathObjectType.nodeSet)
+            {
+                throw Exception("node-set expected");
+            }
+            UniquePtr<XPathNodeSet> nodeSet(cast<XPathNodeSet*>(result.Release()));
+            UniquePtr<XPathNodeSet> filteredNodeSet(new XPathNodeSet());
+            int n = nodeSet->Length();
+            for (int i = 0; i < n; ++i)
+            {
+                System.Dom.Node* node = (*nodeSet)[i];
+                XPathContext context(node, i + 1, n);
+                UniquePtr<XPathObject> result = predicate->Evaluate(context);
+                bool booleanResult = false;
+                if (result->Type() == XPathObjectType.number)
+                {
+                    XPathNumber* number = cast<XPathNumber*>(result.Get());
+                    if (number->Value() == context.Position())
+                    {
+                        booleanResult = true;
+                    }
+                }
+                else
+                {
+                    XPathFunction* boolean = GetXPathLibraryFunction(u"boolean");
+                    List<XPathObject*> args;
+                    args.Add(result.Get());
+                    UniquePtr<XPathObject> resultAsBoolean = boolean->Evaluate(context, args);
+                    booleanResult = cast<XPathBoolean*>(resultAsBoolean.Get())->Value();
+                }
+                if (booleanResult)
+                {
+                    filteredNodeSet->Add(node);
+                }
+            }
+            Swap(nodeSet, filteredNodeSet);
+            return UniquePtr<XPathObject>(nodeSet.Release());
+        }
+        public override UniquePtr<System.Dom.Node> ToDom() const
+        {
+            UniquePtr<System.Dom.Element> element(new System.Dom.Element(u"filter"));
+            element->AppendChild(Operand()->ToDom());
+            UniquePtr<System.Dom.Element> predicateElement(new System.Dom.Element(u"predicate"));
+            predicateElement->AppendChild(predicate->ToDom());
+            element->AppendChild(UniquePtr<System.Dom.Node>(predicateElement.Release()));
+            return UniquePtr<System.Dom.Node>(element.Release());
+        }
+        private UniquePtr<XPathExpr> predicate;
+    }
+    public abstract class XPathNodeTestExpr : XPathExpr
+    {
+        public virtual bool Select(System.Dom.Node* node, System.Dom.Axis axis) const
+        {
+            return true;
+        }
+    }
+    public class XPathLocationStepExpr : XPathExpr
+    {
+        public suppress XPathLocationStepExpr(const XPathLocationStepExpr& );
+        public suppress XPathLocationStepExpr(XPathLocationStepExpr&& );
+        public XPathLocationStepExpr(System.Dom.Axis axis_, XPathNodeTestExpr* nodeTest_) :
+            axis(axis_), nodeTest(nodeTest_)
+        {
+        }
+        public suppress XPathLocationStepExpr& operator=(const XPathLocationStepExpr& );
+        public suppress XPathLocationStepExpr&& operator=(XPathLocationStepExpr&& );
+        public void AddPredicate(XPathExpr* predicate)
+        {
+            predicates.Add(UniquePtr<XPathExpr>(predicate));
+        }
+        public override UniquePtr<XPathObject> Evaluate(XPathContext& context)
+        {
+            UniquePtr<XPathNodeSet> nodeSet(new XPathNodeSet());
+            NodeSelectionOp selectNodes(nodeTest.Get(), *nodeSet, axis);
+            context.Node()->Walk(selectNodes, axis);
+            for (const UniquePtr<XPathExpr>& predicate : predicates)
+            {
+                UniquePtr<XPathNodeSet> filteredNodeSet(new XPathNodeSet());
+                int n = nodeSet->Length();
+                for (int i = 0; i < n; ++i)
+                {
+                    System.Dom.Node* node = (*nodeSet)[i];
+                    XPathContext context(node, i + 1, n);
+                    UniquePtr<XPathObject> result = predicate->Evaluate(context);
+                    bool booleanResult = false;
+                    if (result->Type() == XPathObjectType.number)
+                    {
+                        XPathNumber* number = cast<XPathNumber*>(result.Get());
+                        if (number->Value() == context.Position())
+                        {
+                            booleanResult = true;
+                        }
+                    }
+                    else
+                    {
+                        XPathFunction* boolean = GetXPathLibraryFunction(u"boolean");
+                        List<XPathObject*> args;
+                        args.Add(result.Get());
+                        UniquePtr<XPathObject> resultAsBoolean = boolean->Evaluate(context, args);
+                        booleanResult = cast<XPathBoolean*>(resultAsBoolean.Get())->Value();
+                    }
+                    if (booleanResult)
+                    {
+                        filteredNodeSet->Add(node);
+                    }
+                }
+                Swap(nodeSet, filteredNodeSet);
+            }
+            return UniquePtr<XPathObject>(nodeSet.Release());
+        }
+        public override UniquePtr<System.Dom.Node> ToDom() const
+        {
+            UniquePtr<System.Dom.Element> element(new System.Dom.Element(u"locationStep"));
+            System.Dom.Element* axisElement = new System.Dom.Element(u"axis");
+            ustring axisName =  System.Dom.AxisName(axis);
+            axisElement->SetAttribute(u"name", axisName);
+            element->AppendChild(UniquePtr<System.Dom.Node>(axisElement));
+            System.Dom.Element* nodeTestElement = new System.Dom.Element(u"nodeTest");
+            nodeTestElement->AppendChild(nodeTest->ToDom());
+            element->AppendChild(UniquePtr<System.Dom.Node>(nodeTestElement));
+            UniquePtr<System.Dom.Element> predicatesElement(new System.Dom.Element(u"predicates"));
+            for (const UniquePtr<XPathExpr>& predicate : predicates)
+            {
+                predicatesElement->AppendChild(predicate->ToDom());
+            }
+            element->AppendChild(UniquePtr<System.Dom.Node>(predicatesElement.Release()));
+            return UniquePtr<System.Dom.Node>(element.Release());
+        }
+        private System.Dom.Axis axis;
+        private UniquePtr<XPathNodeTestExpr> nodeTest;
+        private List<UniquePtr<XPathExpr>> predicates;
+    }
+    public class XPathPILiteralTest : XPathNodeTestExpr
+    {
+        public XPathPILiteralTest(XPathExpr* literal_) :
+            literal(literal_)
+        {
+        }
+        public override bool Select(System.Dom.Node* node, System.Dom.Axis axis) const
+        {
+            if (node->GetNodeType() == NodeType.processingInstructionNode)
+            {
+                System.Dom.ProcessingInstruction* pi = cast<System.Dom.ProcessingInstruction*>(node);
+                if (pi->Target() == literal->TextValue())
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+        public override UniquePtr<System.Dom.Node> ToDom() const
+        {
+            UniquePtr<System.Dom.Element> element(new System.Dom.Element(u"piLiteralTest"));
+            element->AppendChild(literal->ToDom());
+            return UniquePtr<System.Dom.Node>(element.Release());
+        }
+        private UniquePtr<XPathExpr> literal;
+    }
+    public class XPathCommentNodeTest : XPathNodeTestExpr
+    {
+        public override bool Select(System.Dom.Node* node, System.Dom.Axis axis) const
+        {
+            return node->GetNodeType() == NodeType.commentNode;
+        }
+        public override UniquePtr<System.Dom.Node> ToDom() const
+        {
+            UniquePtr<System.Dom.Element> element(new System.Dom.Element(u"commentNodeTest"));
+            return UniquePtr<System.Dom.Node>(element.Release());
+        }
+    }
+    public class XPathTextNodeTest : XPathNodeTestExpr
+    {
+        public override bool Select(System.Dom.Node* node, System.Dom.Axis axis) const
+        {
+            return node->GetNodeType() == NodeType.textNode;
+        }
+        public override UniquePtr<System.Dom.Node> ToDom() const
+        {
+            UniquePtr<System.Dom.Element> element(new System.Dom.Element(u"textNodeTest"));
+            return UniquePtr<System.Dom.Node>(element.Release());
+        }
+    }
+    public class XPathPINodeTest : XPathNodeTestExpr
+    {
+        public override bool Select(System.Dom.Node* node, System.Dom.Axis axis) const
+        {
+            return node->GetNodeType() == NodeType.processingInstructionNode;
+        }
+        public override UniquePtr<System.Dom.Node> ToDom() const
+        {
+            UniquePtr<System.Dom.Element> element(new System.Dom.Element(u"piNodeTest"));
+            return UniquePtr<System.Dom.Node>(element.Release());
+        }
+    }
+    public class XPathAnyNodeTest : XPathNodeTestExpr
+    {
+        public override bool Select(System.Dom.Node* node, System.Dom.Axis axis) const
+        {
+            return true;
+        }
+        public override UniquePtr<System.Dom.Node> ToDom() const
+        {
+            UniquePtr<System.Dom.Element> element(new System.Dom.Element(u"anyNodeTest"));
+            return UniquePtr<System.Dom.Node>(element.Release());
+        }
+    }
+    public class XPathPrincipalNodeTest : XPathNodeTestExpr
+    {
+        public override bool Select(System.Dom.Node* node, System.Dom.Axis axis) const
+        {
+            if (axis == Axis.attribute)
+            {
+                return node->GetNodeType() == NodeType.attributeNode;
+            }
+            else if (axis == Axis.ns)
+            {
+                return false;
+            }
+            else
+            {
+                return node->GetNodeType() == NodeType.elementNode;
+            }
+        }
+        public override UniquePtr<System.Dom.Node> ToDom() const
+        {
+            UniquePtr<System.Dom.Element> element(new System.Dom.Element(u"principalNodeTest"));
+            return UniquePtr<System.Dom.Node>(element.Release());
+        }
+    }
+    public class XPathPrefixTest : XPathNodeTestExpr
+    {
+        public XPathPrefixTest(const ustring& name_) :
+            name(name_)
+        {
+        }
+        public override bool Select(System.Dom.Node* node, System.Dom.Axis axis) const
+        {
+            if (axis == Axis.attribute)
+            {
+                if (node->GetNodeType() == NodeType.attributeNode)
+                {
+                    System.Dom.Attr* attr = cast<System.Dom.Attr*>(node);
+                    if (attr->Prefix() == name)
+                    {
+                        return true;
+                    }
+                }
+            }
+            else if (axis == Axis.ns)
+            {
+                return false;
+            }
+            else if (node->GetNodeType() == NodeType.elementNode)
+            {
+                System.Dom.Element* element = cast<System.Dom.Element*>(node);
+                if (element->Prefix() == name)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+        public override UniquePtr<System.Dom.Node> ToDom() const
+        {
+            UniquePtr<System.Dom.Element> element(new System.Dom.Element(u"prefixTest"));
+            element->SetAttribute(u"prefix", name);
+            return UniquePtr<System.Dom.Node>(element.Release());
+        }
+        private ustring name;
+    }
+    public class XPathNameTest : XPathNodeTestExpr
+    {
+        public XPathNameTest(const ustring& name_) :
+            name(name_)
+        {
+        }
+        public override bool Select(System.Dom.Node* node, System.Dom.Axis axis) const
+        {
+            if (axis == Axis.attribute)
+            {
+                if (node->GetNodeType() == NodeType.attributeNode)
+                {
+                    System.Dom.Attr* attr = cast<System.Dom.Attr*>(node);
+                    if (attr->Name() == name)
+                    {
+                        return true;
+                    }
+                }
+            }
+            else if (axis != Axis.ns)
+            {
+                if (node->GetNodeType() == NodeType.elementNode)
+                {
+                    System.Dom.Element* element = cast<System.Dom.Element*>(node);
+                    if (element->Name() == name)
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+        public override UniquePtr<System.Dom.Node> ToDom() const
+        {
+            UniquePtr<System.Dom.Element> element(new System.Dom.Element(u"nameTest"));
+            element->SetAttribute(u"name", name);
+            return UniquePtr<System.Dom.Node>(element.Release());
+        }
+        private ustring name;
+    }
+    public class XPathVariableReference : XPathExpr
+    {
+        public XPathVariableReference(const ustring& name_) :
+            name(name_)
+        {
+        }
+        public override UniquePtr<System.Dom.Node> ToDom() const
+        {
+            UniquePtr<System.Dom.Element> element(new System.Dom.Element(u"variableReference"));
+            element->SetAttribute(u"name", name);
+            return UniquePtr<System.Dom.Node>(element.Release());
+        }
+        private ustring name;
+    }
+    public class XPathLiteral : XPathExpr
+    {
+        public XPathLiteral(const ustring& value_) :
+            value(value_)
+        {
+        }
+        public override ustring TextValue() const
+        {
+            return value;
+        }
+        public override UniquePtr<XPathObject> Evaluate(XPathContext& context)
+        {
+            return UniquePtr<XPathObject>(new XPathString(value));
+        }
+        public override UniquePtr<System.Dom.Node> ToDom() const
+        {
+            UniquePtr<System.Dom.Element> element(new System.Dom.Element(u"literal"));
+            element->SetAttribute(u"value", value);
+            return UniquePtr<System.Dom.Node>(element.Release());
+        }
+        private ustring value;
+    }
+    public class XPathNumberExpr : XPathExpr
+    {
+        public XPathNumberExpr(const ustring& value_)
+        {
+            string s = ToUtf8(value_);
+            value = ParseDouble(ToUtf8(value_));
+        }
+        public XPathNumberExpr(double value_) :
+            value(value_)
+        {
+        }
+        public override UniquePtr<XPathObject> Evaluate(XPathContext& context)
+        {
+            return UniquePtr<XPathObject>(new XPathNumber(value));
+        }
+        public override UniquePtr<System.Dom.Node> ToDom() const
+        {
+            UniquePtr<System.Dom.Element> element(new System.Dom.Element(u"number"));
+            element->SetAttribute(u"value", ToUtf32(ToString(value)));
+            return UniquePtr<System.Dom.Node>(element.Release());
+        }
+        private double value;
+    }
+    public class XPathFunctionCall : XPathExpr
+    {
+        public XPathFunctionCall(const ustring& functionName_) :
+            functionName(functionName_)
+        {
+        }
+        public void AddArgument(XPathExpr* argument)
+        {
+            arguments.Add(UniquePtr<XPathExpr>(argument));
+        }
+        public override UniquePtr<XPathObject> Evaluate(XPathContext& context)
+        {
+            XPathFunction* function = GetXPathLibraryFunction(functionName);
+            if (arguments.Count() < function->MinArity() || arguments.Count() > function->MaxArity())
+            {
+                throw Exception("function \'" + ToUtf8(functionName) + "\' takes " + ToString(function->MinArity()) + "..." + ToString(function->MaxArity()) + " arguments (" + ToString(arguments.Count()) + " arguments provided)");
+            }
+            List<UniquePtr<XPathObject>> ownedArgs;
+            List<XPathObject*> args;
+            for (const UniquePtr<XPathExpr>& argument : arguments)
+            {
+                UniquePtr<XPathObject> arg = argument->Evaluate(context);
+                args.Add(arg.Get());
+                ownedArgs.Add(Rvalue(arg));
+            }
+            UniquePtr<XPathObject> result = function->Evaluate(context, args);
+            return result;
+        }
+        public override UniquePtr<System.Dom.Node> ToDom() const
+        {
+            UniquePtr<System.Dom.Element> element(new System.Dom.Element(u"functionCall"));
+            element->AppendChild(UniquePtr<System.Dom.Node>(new System.Dom.Element(functionName)));
+            UniquePtr<System.Dom.Element> argumentsElement(new System.Dom.Element(u"arguments"));
+            for (const UniquePtr<XPathExpr>& argument : arguments)
+            {
+                argumentsElement->AppendChild(argument->ToDom());
+            }
+            element->AppendChild(UniquePtr<System.Dom.Node>(argumentsElement.Release()));
+            return UniquePtr<System.Dom.Node>(element.Release());
+        }
+        private ustring functionName;
+        private List<UniquePtr<XPathExpr>> arguments;
+    }
     public UniquePtr<XPathObject> CompareNodeSets(XPathContext& context, XPathObject* left, XPathObject* right, Operator comparisonOp)
     {
-        if ((left is XPathNodeSet*) && (right is XPathNodeSet*))
+        if (left->Type() == XPathObjectType.nodeSet && right->Type() == XPathObjectType.nodeSet)
         {
             XPathNodeSet* leftNodeSet = cast<XPathNodeSet*>(left);
             XPathNodeSet* rightNodeSet = cast<XPathNodeSet*>(right);
-            long n = leftNodeSet->Length();
-            for (long i = 0; i < n; ++i)
+            int n = leftNodeSet->Length();
+            for (int i = 0; i < n; ++i)
             {
-                DomNode* leftNode = (*leftNodeSet)[i];
+                System.Dom.Node* leftNode = (*leftNodeSet)[i];
                 ustring leftStr = StringValue(leftNode);
-                long m = rightNodeSet->Length();
-                for (long j = 0; j < m; ++j)
+                int m = rightNodeSet->Length();
+                for (int j = 0; j < m; ++j)
                 {
-                    DomNode* rightNode = (*rightNodeSet)[j];
+                    System.Dom.Node* rightNode = (*rightNodeSet)[j];
                     ustring rightStr = StringValue(rightNode);
                     switch (comparisonOp)
                     {
@@ -171,7 +1035,7 @@ namespace System.XPath
                             }
                             break;
                         }
-                        case Operator.notEqual:
+                        case Operator.notEqual: 
                         {
                             if (leftStr != rightStr)
                             {
@@ -180,7 +1044,7 @@ namespace System.XPath
                             }
                             break;
                         }
-                        case Operator.less:
+                        case Operator.less: 
                         {
                             if (leftStr < rightStr)
                             {
@@ -189,7 +1053,7 @@ namespace System.XPath
                             }
                             break;
                         }
-                        case Operator.greater:
+                        case Operator.greater: 
                         {
                             if (leftStr > rightStr)
                             {
@@ -198,7 +1062,7 @@ namespace System.XPath
                             }
                             break;
                         }
-                        case Operator.lessOrEqual:
+                        case Operator.lessOrEqual: 
                         {
                             if (leftStr <= rightStr)
                             {
@@ -207,7 +1071,7 @@ namespace System.XPath
                             }
                             break;
                         }
-                        case Operator.greaterOrEqual:
+                        case Operator.greaterOrEqual: 
                         {
                             if (leftStr >= rightStr)
                             {
@@ -220,218 +1084,30 @@ namespace System.XPath
                 }
             }
         }
-        else if (left is XPathNodeSet*)
+        else if (left->Type() == XPathObjectType.nodeSet)
         {
             XPathFunction* numberFunction = GetXPathLibraryFunction(u"number");
             XPathFunction* booleanFunction = GetXPathLibraryFunction(u"boolean");
-            if (right is XPathNumber*)
+            if (right->Type() == XPathObjectType.number)
             {
-                XPathNumber* rightAsNumber = cast<XPathNumber*>(right);
-                double rightNumber = rightAsNumber->Value();
+                double rightNumber = cast<XPathNumber*>(right)->Value();
                 XPathNodeSet* leftNodeSet = cast<XPathNodeSet*>(left);
-                long n = leftNodeSet->Length();
-                for (long i = 0; i < n; ++i)
+                int n = leftNodeSet->Length();
+                for (int i = 0; i < n; ++i)
                 {
-                    DomNode* leftNode = (*leftNodeSet)[i];
-                    XPathString leftAsString = StringValue(leftNode);
+                    System.Dom.Node* leftNode = (*leftNodeSet)[i];
+                    XPathString leftAsString(StringValue(leftNode));
                     List<XPathObject*> leftArgs;
                     leftArgs.Add(&leftAsString);
-                    UniquePtr<XPathObject> leftAsNumberObject = numberFunction->Evaluate(context, leftArgs);
-                    if (leftAsNumberObject.Get() is XPathNumber*)
+                    UniquePtr<XPathObject> leftAsNumber = numberFunction->Evaluate(context, leftArgs);
+                    if (leftAsNumber->Type() != XPathObjectType.number)
                     {
-                        XPathNumber* leftAsNumber = cast<XPathNumber*>(leftAsNumberObject.Get());
-                        double leftNumber = leftAsNumber->Value();
-                        switch (comparisonOp)
-                        {
-                            case Operator.equal:
-                            {
-                                if (leftNumber == rightNumber)
-                                {
-                                    UniquePtr<XPathObject> result(new XPathBoolean(true));
-                                    return result;
-                                }
-                                break;
-                            }
-                            case Operator.notEqual:
-                            {
-                                if (leftNumber != rightNumber)
-                                {
-                                    UniquePtr<XPathObject> result(new XPathBoolean(true));
-                                    return result;
-                                }
-                                break;
-                            }
-                            case Operator.less:
-                            {
-                                if (leftNumber < rightNumber)
-                                {
-                                    UniquePtr<XPathObject> result(new XPathBoolean(true));
-                                    return result;
-                                }
-                                break;
-                            }
-                            case Operator.greater:
-                            {
-                                if (leftNumber > rightNumber)
-                                {
-                                    UniquePtr<XPathObject> result(new XPathBoolean(true));
-                                    return result;
-                                }
-                                break;
-                            }
-                            case Operator.lessOrEqual:
-                            {
-                                if (leftNumber <= rightNumber)
-                                {
-                                    UniquePtr<XPathObject> result(new XPathBoolean(true));
-                                    return result;
-                                }
-                                break;
-                            }
-                            case Operator.greaterOrEqual:
-                            {
-                                if (leftNumber >= rightNumber)
-                                {
-                                    UniquePtr<XPathObject> result(new XPathBoolean(true));
-                                    return result;
-                                }
-                                break;
-                            }
-                        }
+                        throw Exception("number result expected");
                     }
-                }
-            }
-            else if (right is XPathString*)
-            {
-                XPathString* rightAsString = cast<XPathString*>(right);
-                ustring rightStr = rightAsString->Value();
-                XPathNodeSet* leftNodeSet = cast<XPathNodeSet*>(left);
-                long n = leftNodeSet->Length();
-                for (long i = 0; i < n; ++i)
-                {
-                    DomNode* leftNode = (*leftNodeSet)[i];
-                    ustring leftStr = StringValue(leftNode);
+                    double leftNumber = cast<XPathNumber*>(leftAsNumber.Get())->Value();
                     switch (comparisonOp)
                     {
                         case Operator.equal: 
-                        {
-                            if (leftStr == rightStr)
-                            {
-                                UniquePtr<XPathObject> result(new XPathBoolean(true));
-                                return result;
-                            }
-                            break;
-                        }
-                        case Operator.notEqual:
-                        {
-                            if (leftStr != rightStr)
-                            {
-                                UniquePtr<XPathObject> result(new XPathBoolean(true));
-                                return result;
-                            }
-                            break;
-                        }
-                        case Operator.less:
-                        {
-                            if (leftStr < rightStr)
-                            {
-                                UniquePtr<XPathObject> result(new XPathBoolean(true));
-                                return result;
-                            }
-                            break;
-                        }
-                        case Operator.greater:
-                        {
-                            if (leftStr > rightStr)
-                            {
-                                UniquePtr<XPathObject> result(new XPathBoolean(true));
-                                return result;
-                            }
-                            break;
-                        }
-                        case Operator.lessOrEqual:
-                        {
-                            if (leftStr <= rightStr)
-                            {
-                                UniquePtr<XPathObject> result(new XPathBoolean(true));
-                                return result;
-                            }
-                            break;
-                        }
-                        case Operator.greaterOrEqual:
-                        {
-                            if (leftStr >= rightStr)
-                            {
-                                UniquePtr<XPathObject> result(new XPathBoolean(true));
-                                return result;
-                            }
-                            break;
-                        }
-                    }
-                }
-            }
-            else if (right is XPathBoolean*)
-            {
-                XPathBoolean* rightAsBoolean = cast<XPathBoolean*>(right);
-                bool rightBool = rightAsBoolean->Value();
-                List<XPathObject*> leftArgs;
-                leftArgs.Add(left);
-                UniquePtr<XPathObject> leftAsBooleanObject = booleanFunction->Evaluate(context, leftArgs);
-                if (!(leftAsBooleanObject.Get() is XPathBoolean*))
-                {
-                    throw XPathException("boolean result expected");
-                }
-                XPathBoolean* leftAsBoolean = cast<XPathBoolean*>(leftAsBooleanObject.Get());
-                bool leftBool = leftAsBoolean->Value();
-                switch (comparisonOp)
-                {
-                    case Operator.equal:
-                    {
-                        if (leftBool == rightBool)
-                        {
-                            UniquePtr<XPathObject> result(new XPathBoolean(true));
-                            return result;
-                        }
-                        break;
-                    }
-                    case Operator.notEqual:
-                    {
-                        if (leftBool != rightBool)
-                        {
-                            UniquePtr<XPathObject> result(new XPathBoolean(true));
-                            return result;
-                        }
-                        break;
-                    }
-                }
-            }
-        }
-        else if (right is XPathNodeSet*)
-        {
-            XPathFunction* numberFunction = GetXPathLibraryFunction(u"number");
-            XPathFunction* booleanFunction = GetXPathLibraryFunction(u"boolean");
-            if (left is XPathNumber*)
-            {
-                XPathNumber* leftAsNumber = cast<XPathNumber*>(left);
-                double leftNumber = leftAsNumber->Value();
-                XPathNodeSet* rightNodeSet = cast<XPathNodeSet*>(right);
-                long n = rightNodeSet->Length();
-                for (long i = 0; i < n; ++i)
-                {
-                    DomNode* rightNode = (*rightNodeSet)[i];
-                    XPathString rightAsString(StringValue(rightNode));
-                    List<XPathObject*> rightArgs;
-                    rightArgs.Add(&rightAsString);
-                    UniquePtr<XPathObject> rightAsNumberObject = numberFunction->Evaluate(context, rightArgs);
-                    if (!(rightAsNumberObject.Get() is XPathNumber*))
-                    {
-                        throw XPathException("number result expected");
-                    }
-                    XPathNumber* rightAsNumber = cast<XPathNumber*>(rightAsNumberObject.Get());
-                    double rightNumber = rightAsNumber->Value();
-                    switch (comparisonOp)
-                    {
-                        case Operator.equal:
                         {
                             if (leftNumber == rightNumber)
                             {
@@ -440,7 +1116,7 @@ namespace System.XPath
                             }
                             break;
                         }
-                        case Operator.notEqual:
+                        case Operator.notEqual: 
                         {
                             if (leftNumber != rightNumber)
                             {
@@ -449,7 +1125,7 @@ namespace System.XPath
                             }
                             break;
                         }
-                        case Operator.less:
+                        case Operator.less: 
                         {
                             if (leftNumber < rightNumber)
                             {
@@ -458,7 +1134,7 @@ namespace System.XPath
                             }
                             break;
                         }
-                        case Operator.greater:
+                        case Operator.greater: 
                         {
                             if (leftNumber > rightNumber)
                             {
@@ -467,7 +1143,7 @@ namespace System.XPath
                             }
                             break;
                         }
-                        case Operator.lessOrEqual:
+                        case Operator.lessOrEqual: 
                         {
                             if (leftNumber <= rightNumber)
                             {
@@ -476,7 +1152,7 @@ namespace System.XPath
                             }
                             break;
                         }
-                        case Operator.greaterOrEqual:
+                        case Operator.greaterOrEqual: 
                         {
                             if (leftNumber >= rightNumber)
                             {
@@ -488,19 +1164,18 @@ namespace System.XPath
                     }
                 }
             }
-            else if (left is XPathString*)
+            else if (right->Type() == XPathObjectType.string)
             {
-                XPathString* leftAsString = cast<XPathString*>(left);
-                ustring leftString = leftAsString->Value();
-                XPathNodeSet* rightNodeSet = cast<XPathNodeSet*>(right);
-                long n = rightNodeSet->Length();
-                for (long i = 0; i < n; ++i)
+                ustring rightString = cast<XPathString*>(right)->Value();
+                XPathNodeSet* leftNodeSet = cast<XPathNodeSet*>(left);
+                int n = leftNodeSet->Length();
+                for (int i = 0; i < n; ++i)
                 {
-                    DomNode* rightNode = (*rightNodeSet)[i];
-                    ustring rightString = StringValue(rightNode);
+                    System.Dom.Node* leftNode = (*leftNodeSet)[i];
+                    ustring leftString = StringValue(leftNode);
                     switch (comparisonOp)
                     {
-                        case Operator.equal:
+                        case Operator.equal: 
                         {
                             if (leftString == rightString)
                             {
@@ -509,7 +1184,7 @@ namespace System.XPath
                             }
                             break;
                         }
-                        case Operator.notEqual:
+                        case Operator.notEqual: 
                         {
                             if (leftString != rightString)
                             {
@@ -518,7 +1193,7 @@ namespace System.XPath
                             }
                             break;
                         }
-                        case Operator.less:
+                        case Operator.less: 
                         {
                             if (leftString < rightString)
                             {
@@ -527,7 +1202,7 @@ namespace System.XPath
                             }
                             break;
                         }
-                        case Operator.greater:
+                        case Operator.greater: 
                         {
                             if (leftString > rightString)
                             {
@@ -536,7 +1211,7 @@ namespace System.XPath
                             }
                             break;
                         }
-                        case Operator.lessOrEqual:
+                        case Operator.lessOrEqual: 
                         {
                             if (leftString <= rightString)
                             {
@@ -545,7 +1220,7 @@ namespace System.XPath
                             }
                             break;
                         }
-                        case Operator.greaterOrEqual:
+                        case Operator.greaterOrEqual: 
                         {
                             if (leftString >= rightString)
                             {
@@ -557,22 +1232,20 @@ namespace System.XPath
                     }
                 }
             }
-            else if (left is XPathBoolean*)
+            else if (right->Type() == XPathObjectType.boolean)
             {
-                XPathBoolean* leftAsBoolean = cast<XPathBoolean*>(left);
-                bool leftBool = leftAsBoolean->Value();
-                List<XPathObject*> rightArgs;
-                rightArgs.Add(right);
-                UniquePtr<XPathObject> rightAsBooleanObject = booleanFunction->Evaluate(context, rightArgs);
-                if (!(rightAsBooleanObject.Get() is XPathBoolean*))
+                bool rightBool = cast<XPathBoolean*>(right)->Value();
+                List<XPathObject*> leftArgs;
+                leftArgs.Add(left);
+                UniquePtr<XPathObject> leftAsBool = booleanFunction->Evaluate(context, leftArgs);
+                if (leftAsBool->Type() != XPathObjectType.boolean)
                 {
-                    throw XPathException("boolean result expected");
+                    throw Exception("boolean result expected");
                 }
-                XPathBoolean* rightAsBoolean = cast<XPathBoolean*>(rightAsBooleanObject.Get());
-                bool rightBool = rightAsBoolean->Value();
+                bool leftBool = cast<XPathBoolean*>(leftAsBool.Get())->Value();
                 switch (comparisonOp)
                 {
-                    case Operator.equal:
+                    case Operator.equal: 
                     {
                         if (leftBool == rightBool)
                         {
@@ -581,9 +1254,263 @@ namespace System.XPath
                         }
                         break;
                     }
-                    case Operator.notEqual:
+                    case Operator.notEqual: 
                     {
                         if (leftBool != rightBool)
+                        {
+                            UniquePtr<XPathObject> result(new XPathBoolean(true));
+                            return result;
+                        }
+                        break;
+                    }
+                    case Operator.less: 
+                    {
+                        if (cast<int>(leftBool) < cast<int>(rightBool))
+                        {
+                            UniquePtr<XPathObject> result(new XPathBoolean(true));
+                            return result;
+                        }
+                        break;
+                    }
+                    case Operator.greater: 
+                    {
+                        if (cast<int>(leftBool) > cast<int>(rightBool))
+                        {
+                            UniquePtr<XPathObject> result(new XPathBoolean(true));
+                            return result;
+                        }
+                        break;
+                    }
+                    case Operator.lessOrEqual: 
+                    {
+                        if (cast<int>(leftBool) <= cast<int>(rightBool))
+                        {
+                            UniquePtr<XPathObject> result(new XPathBoolean(true));
+                            return result;
+                        }
+                        break;
+                    }
+                    case Operator.greaterOrEqual: 
+                    {
+                        if (cast<int>(leftBool) >= cast<int>(rightBool))
+                        {
+                            UniquePtr<XPathObject> result(new XPathBoolean(true));
+                            return result;
+                        }
+                        break;
+                    }
+                }
+            }
+        }
+        else if (right->Type() == XPathObjectType.nodeSet)
+        {
+            XPathFunction* numberFunction = GetXPathLibraryFunction(u"number");
+            XPathFunction* booleanFunction = GetXPathLibraryFunction(u"boolean");
+            if (left->Type() == XPathObjectType.number)
+            {
+                double leftNumber = cast<XPathNumber*>(left)->Value();
+                XPathNodeSet* rightNodeSet = cast<XPathNodeSet*>(right);
+                int n = rightNodeSet->Length();
+                for (int i = 0; i < n; ++i)
+                {
+                    System.Dom.Node* rightNode = (*rightNodeSet)[i];
+                    XPathString rightAsString(StringValue(rightNode));
+                    List<XPathObject*> rightArgs;
+                    rightArgs.Add(&rightAsString);
+                    UniquePtr<XPathObject> rightAsNumber = numberFunction->Evaluate(context, rightArgs);
+                    if (rightAsNumber->Type() != XPathObjectType.number)
+                    {
+                        throw Exception("number result expected");
+                    }
+                    double rightNumber = cast<XPathNumber*>(rightAsNumber.Get())->Value();
+                    switch (comparisonOp)
+                    {
+                        case Operator.equal: 
+                        {
+                            if (leftNumber == rightNumber)
+                            {
+                                UniquePtr<XPathObject> result(new XPathBoolean(true));
+                                return result;
+                            }
+                            break;
+                        }
+                        case Operator.notEqual: 
+                        {
+                            if (leftNumber != rightNumber)
+                            {
+                                UniquePtr<XPathObject> result(new XPathBoolean(true));
+                                return result;
+                            }
+                            break;
+                        }
+                        case Operator.less: 
+                        {
+                            if (leftNumber < rightNumber)
+                            {
+                                UniquePtr<XPathObject> result(new XPathBoolean(true));
+                                return result;
+                            }
+                            break;
+                        }
+                        case Operator.greater: 
+                        {
+                            if (leftNumber > rightNumber)
+                            {
+                                UniquePtr<XPathObject> result(new XPathBoolean(true));
+                                return result;
+                            }
+                            break;
+                        }
+                        case Operator.lessOrEqual: 
+                        {
+                            if (leftNumber <= rightNumber)
+                            {
+                                UniquePtr<XPathObject> result(new XPathBoolean(true));
+                                return result;
+                            }
+                            break;
+                        }
+                        case Operator.greaterOrEqual: 
+                        {
+                            if (leftNumber >= rightNumber)
+                            {
+                                UniquePtr<XPathObject> result(new XPathBoolean(true));
+                                return result;
+                            }
+                            break;
+                        }
+                    }
+                }
+            }
+            else if (left->Type() == XPathObjectType.string)
+            {
+                ustring leftString = cast<XPathString*>(left)->Value();
+                XPathNodeSet* rightNodeSet = cast<XPathNodeSet*>(right);
+                int n = rightNodeSet->Length();
+                for (int i = 0; i < n; ++i)
+                {
+                    System.Dom.Node* rightNode = (*rightNodeSet)[i];
+                    ustring rightString = StringValue(rightNode);
+                    switch (comparisonOp)
+                    {
+                        case Operator.equal: 
+                        {
+                            if (leftString == rightString)
+                            {
+                                UniquePtr<XPathObject> result(new XPathBoolean(true));
+                                return result;
+                            }
+                            break;
+                        }
+                        case Operator.notEqual: 
+                        {
+                            if (leftString != rightString)
+                            {
+                                UniquePtr<XPathObject> result(new XPathBoolean(true));
+                                return result;
+                            }
+                            break;
+                        }
+                        case Operator.less: 
+                        {
+                            if (leftString < rightString)
+                            {
+                                UniquePtr<XPathObject> result(new XPathBoolean(true));
+                                return result;
+                            }
+                            break;
+                        }
+                        case Operator.greater: 
+                        {
+                            if (leftString > rightString)
+                            {
+                                UniquePtr<XPathObject> result(new XPathBoolean(true));
+                                return result;
+                            }
+                            break;
+                        }
+                        case Operator.lessOrEqual: 
+                        {
+                            if (leftString <= rightString)
+                            {
+                                UniquePtr<XPathObject> result(new XPathBoolean(true));
+                                return result;
+                            }
+                            break;
+                        }
+                        case Operator.greaterOrEqual: 
+                        {
+                            if (leftString >= rightString)
+                            {
+                                UniquePtr<XPathObject> result(new XPathBoolean(true));
+                                return result;
+                            }
+                            break;
+                        }
+                    }
+                }
+            }
+            else if (left->Type() == XPathObjectType.boolean)
+            {
+                bool leftBool = cast<XPathBoolean*>(left)->Value();
+                List<XPathObject*> rightArgs;
+                rightArgs.Add(right);
+                UniquePtr<XPathObject> rightAsBool = booleanFunction->Evaluate(context, rightArgs);
+                if (rightAsBool->Type() != XPathObjectType.boolean)
+                {
+                    throw Exception("boolean result expected");
+                }
+                bool rightBool = cast<XPathBoolean*>(rightAsBool.Get())->Value();
+                switch (comparisonOp)
+                {
+                    case Operator.equal: 
+                    {
+                        if (leftBool == rightBool)
+                        {
+                            UniquePtr<XPathObject> result(new XPathBoolean(true));
+                            return result;
+                        }
+                        break;
+                    }
+                    case Operator.notEqual: 
+                    {
+                        if (leftBool != rightBool)
+                        {
+                            UniquePtr<XPathObject> result(new XPathBoolean(true));
+                            return result;
+                        }
+                        break;
+                    }
+                    case Operator.less: 
+                    {
+                        if (cast<int>(leftBool) < cast<int>(rightBool))
+                        {
+                            UniquePtr<XPathObject> result(new XPathBoolean(true));
+                            return result;
+                        }
+                        break;
+                    }
+                    case Operator.greater: 
+                    {
+                        if (cast<int>(leftBool) > cast<int>(rightBool))
+                        {
+                            UniquePtr<XPathObject> result(new XPathBoolean(true));
+                            return result;
+                        }
+                        break;
+                    }
+                    case Operator.lessOrEqual: 
+                    {
+                        if (cast<int>(leftBool) <= cast<int>(rightBool))
+                        {
+                            UniquePtr<XPathObject> result(new XPathBoolean(true));
+                            return result;
+                        }
+                        break;
+                    }
+                    case Operator.greaterOrEqual: 
+                    {
+                        if (cast<int>(leftBool) >= cast<int>(rightBool))
                         {
                             UniquePtr<XPathObject> result(new XPathBoolean(true));
                             return result;
@@ -596,10 +1523,9 @@ namespace System.XPath
         UniquePtr<XPathObject> result(new XPathBoolean(false));
         return result;
     }
-    
-    UniquePtr<XPathObject> CompareEquality(XPathContext& context, XPathObject* left, XPathObject* right)
+    public UniquePtr<XPathObject> CompareEquality(XPathContext& context, XPathObject* left, XPathObject* right)
     {
-        if ((left is XPathNodeSet*) || (right is XPathNodeSet*))
+        if (left->Type() == XPathObjectType.nodeSet || right->Type() == XPathObjectType.nodeSet)
         {
             return CompareNodeSets(context, left, right, Operator.equal);
         }
@@ -608,26 +1534,24 @@ namespace System.XPath
             XPathFunction* numberFunction = GetXPathLibraryFunction(u"number");
             XPathFunction* booleanFunction = GetXPathLibraryFunction(u"boolean");
             XPathFunction* stringFunction = GetXPathLibraryFunction(u"string");
-            if ((left is XPathNumber*) || (right is XPathNumber*))
+            if (left->Type() == XPathObjectType.number || right->Type() == XPathObjectType.number)
             {
                 List<XPathObject*> leftArgs;
                 leftArgs.Add(left);
-                UniquePtr<XPathObject> leftAsNumberObject = numberFunction->Evaluate(context, leftArgs);
-                if (!(leftAsNumberObject.Get() is XPathNumber*))
+                UniquePtr<XPathObject> leftAsNumber = numberFunction->Evaluate(context, leftArgs);
+                if (leftAsNumber->Type() != XPathObjectType.number)
                 {
-                    throw XPathException("number result expected");
+                    throw Exception("number result expected");
                 }
-                XPathNumber* leftAsNumber = cast<XPathNumber*>(leftAsNumberObject.Get());
-                double leftNumber = leftAsNumber->Value();
+                double leftNumber = cast<XPathNumber*>(leftAsNumber.Get())->Value();
                 List<XPathObject*> rightArgs;
                 rightArgs.Add(right);
-                UniquePtr<XPathObject> rightAsNumberObject = numberFunction->Evaluate(context, rightArgs);
-                if (!(rightAsNumberObject.Get() is XPathNumber*))
+                UniquePtr<XPathObject> rightAsNumber = numberFunction->Evaluate(context, rightArgs);
+                if (rightAsNumber->Type() != XPathObjectType.number)
                 {
-                    throw XPathException("number result expected");
+                    throw Exception("number result expected");
                 }
-                XPathNumber* rightAsNumber = cast<XPathNumber*>(rightAsNumberObject.Get());
-                double rightNumber = rightAsNumber->Value();
+                double rightNumber = cast<XPathNumber*>(rightAsNumber.Get())->Value();
                 if (leftNumber == rightNumber)
                 {
                     UniquePtr<XPathObject> result(new XPathBoolean(true));
@@ -643,22 +1567,20 @@ namespace System.XPath
             {
                 List<XPathObject*> leftArgs;
                 leftArgs.Add(left);
-                UniquePtr<XPathObject> leftAsStringObject = stringFunction->Evaluate(context, leftArgs);
-                if (!(leftAsStringObject.Get() is XPathString*))
+                UniquePtr<XPathObject> leftAsString = stringFunction->Evaluate(context, leftArgs);
+                if (leftAsString->Type() != XPathObjectType.string)
                 {
-                    throw XPathException("string result expected");
+                    throw Exception("string result expected");
                 }
-                XPathString* leftAsString = cast<XPathString*>(leftAsStringObject.Get());
-                ustring leftString = leftAsString->Value();
+                ustring leftString = cast<XPathString*>(leftAsString.Get())->Value();
                 List<XPathObject*> rightArgs;
                 rightArgs.Add(right);
-                UniquePtr<XPathObject> rightAsStringObject = stringFunction->Evaluate(context, rightArgs);
-                if (!(rightAsStringObject.Get() is XPathString*))
+                UniquePtr<XPathObject> rightAsString = stringFunction->Evaluate(context, rightArgs);
+                if (rightAsString->Type() != XPathObjectType.string)
                 {
-                    throw XPathException("string result expected");
+                    throw Exception("string result expected");
                 }
-                XPathString* rightAsString = cast<XPathString*>(rightAsStringObject.Get());
-                ustring rightString = rightAsString->Value();
+                ustring rightString = cast<XPathString*>(rightAsString.Get())->Value();
                 if (leftString == rightString)
                 {
                     UniquePtr<XPathObject> result(new XPathBoolean(true));
@@ -673,58 +1595,10 @@ namespace System.XPath
         }
         UniquePtr<XPathObject> result(new XPathBoolean(false));
         return result;
-    }    
-    
-    public class XPathEqualExpr : XPathBinaryExpr
-    {
-        public nothrow XPathEqualExpr(XPathExpr* left_, XPathExpr* right_) : base(left_, right_)
-        {
-        }
-        public override UniquePtr<XPathObject> Evaluate(XPathContext& context)
-        {
-            UniquePtr<XPathObject> left = Left()->Evaluate(context);
-            UniquePtr<XPathObject> right = Right()->Evaluate(context);
-            return CompareEquality(context, left.Get(), right.Get());
-        }
-        public override UniquePtr<DomNode> ToDom() const
-        {
-            UniquePtr<DomElement> element = new DomElement(u"equal");
-            element->AppendChild(Left()->ToDom());
-            element->AppendChild(Right()->ToDom());
-            return UniquePtr<DomNode>(element.Release());
-        }
     }
-
-    public class XPathNotEqualExpr : XPathBinaryExpr
-    {
-        public nothrow XPathNotEqualExpr(XPathExpr* left_, XPathExpr* right_) : base(left_, right_)
-        {
-        }
-        public override UniquePtr<XPathObject> Evaluate(XPathContext& context)
-        {
-            UniquePtr<XPathObject> left = Left()->Evaluate(context);
-            UniquePtr<XPathObject> right = Right()->Evaluate(context);
-            UniquePtr<XPathObject> equalResultObject = CompareEquality(context, left.Get(), right.Get());
-            if (!(equalResultObject.Get() is XPathBoolean*))
-            {
-                throw XPathException("boolean result expected");
-            }
-            XPathBoolean* equalResult = cast<XPathBoolean*>(equalResultObject.Get());
-            bool equal = equalResult->Value();
-            return UniquePtr<XPathObject>(new XPathBoolean(!equal));
-        }
-        public override UniquePtr<DomNode> ToDom() const
-        {
-            UniquePtr<DomElement> element = new DomElement(u"notEqual");
-            element->AppendChild(Left()->ToDom());
-            element->AppendChild(Right()->ToDom());
-            return UniquePtr<DomNode>(element.Release());
-        }
-    }
-
     public UniquePtr<XPathObject> Compare(XPathContext& context, XPathObject* left, XPathObject* right, Operator comparisonOp)
     {
-        if ((left is XPathNodeSet*) || (right is XPathNodeSet*))
+        if (left->Type() == XPathObjectType.nodeSet || right->Type() == XPathObjectType.nodeSet)
         {
             return CompareNodeSets(context, left, right, comparisonOp);
         }
@@ -733,25 +1607,23 @@ namespace System.XPath
             XPathFunction* numberFunction = GetXPathLibraryFunction(u"number");
             List<XPathObject*> leftArgs;
             leftArgs.Add(left);
-            UniquePtr<XPathObject> leftAsNumberObject = numberFunction->Evaluate(context, leftArgs);
-            if (!(leftAsNumberObject.Get() is XPathNumber*))
+            UniquePtr<XPathObject> leftAsNumber = numberFunction->Evaluate(context, leftArgs);
+            if (leftAsNumber->Type() != XPathObjectType.number)
             {
-                throw XPathException("number result expected");
+                throw Exception("number result expected");
             }
-            XPathNumber* leftAsNumber = cast<XPathNumber*>(leftAsNumberObject.Get());
-            double leftNumber = leftAsNumber->Value();
+            double leftNumber = cast<XPathNumber*>(leftAsNumber.Get())->Value();
             List<XPathObject*> rightArgs;
             rightArgs.Add(right);
-            UniquePtr<XPathObject> rightAsNumberObject = numberFunction->Evaluate(context, rightArgs);
-            if (!(rightAsNumberObject.Get() is XPathNumber*))
+            UniquePtr<XPathObject> rightAsNumber = numberFunction->Evaluate(context, rightArgs);
+            if (rightAsNumber->Type() != XPathObjectType.number)
             {
-                throw XPathException("number result expected");
+                throw Exception("number result expected");
             }
-            XPathNumber* rightAsNumber = cast<XPathNumber*>(rightAsNumberObject.Get());
-            double rightNumber = rightAsNumber->Value();
+            double rightNumber = cast<XPathNumber*>(rightAsNumber.Get())->Value();
             switch (comparisonOp)
             {
-                case Operator.less:
+                case Operator.less: 
                 {
                     if (leftNumber < rightNumber)
                     {
@@ -765,7 +1637,7 @@ namespace System.XPath
                     }
                     break;
                 }
-                case Operator.greater:
+                case Operator.greater: 
                 {
                     if (leftNumber > rightNumber)
                     {
@@ -779,7 +1651,7 @@ namespace System.XPath
                     }
                     break;
                 }
-                case Operator.lessOrEqual:
+                case Operator.lessOrEqual: 
                 {
                     if (leftNumber <= rightNumber)
                     {
@@ -793,7 +1665,7 @@ namespace System.XPath
                     }
                     break;
                 }
-                case Operator.greaterOrEqual:
+                case Operator.greaterOrEqual: 
                 {
                     if (leftNumber >= rightNumber)
                     {
@@ -812,494 +1684,13 @@ namespace System.XPath
         UniquePtr<XPathObject> result(new XPathBoolean(false));
         return result;
     }
-
-    public class XPathLessExpr : XPathBinaryExpr
+    public class NodeSelectionOp : System.Dom.NodeOp
     {
-        public nothrow XPathLessExpr(XPathExpr* left_, XPathExpr* right_) : base(left_, right_)
+        public NodeSelectionOp(XPathNodeTestExpr* nodeTest_, XPathNodeSet& nodeSet_, System.Dom.Axis axis_) :
+            nodeTest(nodeTest_), nodeSet(nodeSet_), axis(axis_)
         {
         }
-        public override UniquePtr<XPathObject> Evaluate(XPathContext& context)
-        {
-            UniquePtr<XPathObject> left = Left()->Evaluate(context);
-            UniquePtr<XPathObject> right = Right()->Evaluate(context);
-            return Compare(context, left.Get(), right.Get(), Operator.less);
-        }
-        public override UniquePtr<DomNode> ToDom() const
-        {
-            UniquePtr<DomElement> element = new DomElement(u"less");
-            element->AppendChild(Left()->ToDom());
-            element->AppendChild(Right()->ToDom());
-            return UniquePtr<DomNode>(element.Release());
-        }
-    }
-
-    public class XPathGreaterExpr : XPathBinaryExpr
-    {
-        public nothrow XPathGreaterExpr(XPathExpr* left_, XPathExpr* right_) : base(left_, right_)
-        {
-        }
-        public override UniquePtr<XPathObject> Evaluate(XPathContext& context)
-        {
-            UniquePtr<XPathObject> left = Left()->Evaluate(context);
-            UniquePtr<XPathObject> right = Right()->Evaluate(context);
-            return Compare(context, left.Get(), right.Get(), Operator.greater);
-        }
-        public override UniquePtr<DomNode> ToDom() const
-        {
-            UniquePtr<DomElement> element = new DomElement(u"greater");
-            element->AppendChild(Left()->ToDom());
-            element->AppendChild(Right()->ToDom());
-            return UniquePtr<DomNode>(element.Release());
-        }
-    }
-
-    public class XPathLessOrEqualExpr : XPathBinaryExpr
-    {
-        public nothrow XPathLessOrEqualExpr(XPathExpr* left_, XPathExpr* right_) : base(left_, right_)
-        {
-        }
-        public override UniquePtr<XPathObject> Evaluate(XPathContext& context)
-        {
-            UniquePtr<XPathObject> left = Left()->Evaluate(context);
-            UniquePtr<XPathObject> right = Right()->Evaluate(context);
-            return Compare(context, left.Get(), right.Get(), Operator.lessOrEqual);
-        }
-        public override UniquePtr<DomNode> ToDom() const
-        {
-            UniquePtr<DomElement> element = new DomElement(u"lessOrEqual");
-            element->AppendChild(Left()->ToDom());
-            element->AppendChild(Right()->ToDom());
-            return UniquePtr<DomNode>(element.Release());
-        }
-    }
-
-    public class XPathGreaterOrEqualExpr : XPathBinaryExpr
-    {
-        public nothrow XPathGreaterOrEqualExpr(XPathExpr* left_, XPathExpr* right_) : base(left_, right_)
-        {
-        }
-        public override UniquePtr<XPathObject> Evaluate(XPathContext& context)
-        {
-            UniquePtr<XPathObject> left = Left()->Evaluate(context);
-            UniquePtr<XPathObject> right = Right()->Evaluate(context);
-            return Compare(context, left.Get(), right.Get(), Operator.greaterOrEqual);
-        }
-        public override UniquePtr<DomNode> ToDom() const
-        {
-            UniquePtr<DomElement> element = new DomElement(u"greaterOrEqual");
-            element->AppendChild(Left()->ToDom());
-            element->AppendChild(Right()->ToDom());
-            return UniquePtr<DomNode>(element.Release());
-        }
-    }
-    
-    public class XPathAddExpr : XPathBinaryExpr
-    {
-        public nothrow XPathAddExpr(XPathExpr* left_, XPathExpr* right_) : base(left_, right_)
-        {
-        }
-        public override UniquePtr<XPathObject> Evaluate(XPathContext& context)
-        {
-            UniquePtr<XPathObject> left = Left()->Evaluate(context);
-            UniquePtr<XPathObject> right = Right()->Evaluate(context);
-            XPathFunction* numberFunction = GetXPathLibraryFunction(u"number");
-            List<XPathObject*> leftArgs;
-            leftArgs.Add(left.Get());
-            UniquePtr<XPathObject> leftAsNumberObject = numberFunction->Evaluate(context, leftArgs);
-            if (!(leftAsNumberObject.Get() is XPathNumber*))
-            {
-                throw XPathException("number result expected");
-            }
-            XPathNumber* leftAsNumber = cast<XPathNumber*>(leftAsNumberObject.Get());
-            double leftNumber = leftAsNumber->Value();
-            List<XPathObject*> rightArgs;
-            rightArgs.Add(right.Get());
-            UniquePtr<XPathObject> rightAsNumberObject = numberFunction->Evaluate(context, rightArgs);
-            if (!(rightAsNumberObject.Get() is XPathNumber*))
-            {
-                throw XPathException("number result expected");
-            }
-            XPathNumber* rightAsNumber = cast<XPathNumber*>(rightAsNumberObject.Get());
-            double rightNumber = rightAsNumber->Value();
-            return UniquePtr<XPathObject>(new XPathNumber(leftNumber + rightNumber));
-        }
-        public override UniquePtr<DomNode> ToDom() const
-        {
-            UniquePtr<DomElement> element = new DomElement(u"add");
-            element->AppendChild(Left()->ToDom());
-            element->AppendChild(Right()->ToDom());
-            return UniquePtr<DomNode>(element.Release());
-        }
-    }
-
-    public class XPathSubExpr : XPathBinaryExpr
-    {
-        public nothrow XPathSubExpr(XPathExpr* left_, XPathExpr* right_) : base(left_, right_)
-        {
-        }
-        public override UniquePtr<XPathObject> Evaluate(XPathContext& context)
-        {
-            UniquePtr<XPathObject> left = Left()->Evaluate(context);
-            UniquePtr<XPathObject> right = Right()->Evaluate(context);
-            XPathFunction* numberFunction = GetXPathLibraryFunction(u"number");
-            List<XPathObject*> leftArgs;
-            leftArgs.Add(left.Get());
-            UniquePtr<XPathObject> leftAsNumberObject = numberFunction->Evaluate(context, leftArgs);
-            if (!(leftAsNumberObject.Get() is XPathNumber*))
-            {
-                throw XPathException("number result expected");
-            }
-            XPathNumber* leftAsNumber = cast<XPathNumber*>(leftAsNumberObject.Get());
-            double leftNumber = leftAsNumber->Value();
-            List<XPathObject*> rightArgs;
-            rightArgs.Add(right.Get());
-            UniquePtr<XPathObject> rightAsNumberObject = numberFunction->Evaluate(context, rightArgs);
-            if (!(rightAsNumberObject.Get() is XPathNumber*))
-            {
-                throw XPathException("number result expected");
-            }
-            XPathNumber* rightAsNumber = cast<XPathNumber*>(rightAsNumberObject.Get());
-            double rightNumber = rightAsNumber->Value();
-            return UniquePtr<XPathObject>(new XPathNumber(leftNumber - rightNumber));
-        }
-        public override UniquePtr<DomNode> ToDom() const
-        {
-            UniquePtr<DomElement> element = new DomElement(u"sub");
-            element->AppendChild(Left()->ToDom());
-            element->AppendChild(Right()->ToDom());
-            return UniquePtr<DomNode>(element.Release());
-        }
-    }
-
-    public class XPathMulExpr : XPathBinaryExpr
-    {
-        public nothrow XPathMulExpr(XPathExpr* left_, XPathExpr* right_) : base(left_, right_)
-        {
-        }
-        public override UniquePtr<XPathObject> Evaluate(XPathContext& context)
-        {
-            UniquePtr<XPathObject> left = Left()->Evaluate(context);
-            UniquePtr<XPathObject> right = Right()->Evaluate(context);
-            XPathFunction* numberFunction = GetXPathLibraryFunction(u"number");
-            List<XPathObject*> leftArgs;
-            leftArgs.Add(left.Get());
-            UniquePtr<XPathObject> leftAsNumberObject = numberFunction->Evaluate(context, leftArgs);
-            if (!(leftAsNumberObject.Get() is XPathNumber*))
-            {
-                throw XPathException("number result expected");
-            }
-            XPathNumber* leftAsNumber = cast<XPathNumber*>(leftAsNumberObject.Get());
-            double leftNumber = leftAsNumber->Value();
-            List<XPathObject*> rightArgs;
-            rightArgs.Add(right.Get());
-            UniquePtr<XPathObject> rightAsNumberObject = numberFunction->Evaluate(context, rightArgs);
-            if (!(rightAsNumberObject.Get() is XPathNumber*))
-            {
-                throw XPathException("number result expected");
-            }
-            XPathNumber* rightAsNumber = cast<XPathNumber*>(rightAsNumberObject.Get());
-            double rightNumber = rightAsNumber->Value();
-            return UniquePtr<XPathObject>(new XPathNumber(leftNumber * rightNumber));
-        }
-        public override UniquePtr<DomNode> ToDom() const
-        {
-            UniquePtr<DomElement> element = new DomElement(u"mul");
-            element->AppendChild(Left()->ToDom());
-            element->AppendChild(Right()->ToDom());
-            return UniquePtr<DomNode>(element.Release());
-        }
-    }
-
-    public class XPathDivExpr : XPathBinaryExpr
-    {
-        public nothrow XPathDivExpr(XPathExpr* left_, XPathExpr* right_) : base(left_, right_)
-        {
-        }
-        public override UniquePtr<XPathObject> Evaluate(XPathContext& context)
-        {
-            UniquePtr<XPathObject> left = Left()->Evaluate(context);
-            UniquePtr<XPathObject> right = Right()->Evaluate(context);
-            XPathFunction* numberFunction = GetXPathLibraryFunction(u"number");
-            List<XPathObject*> leftArgs;
-            leftArgs.Add(left.Get());
-            UniquePtr<XPathObject> leftAsNumberObject = numberFunction->Evaluate(context, leftArgs);
-            if (!(leftAsNumberObject.Get() is XPathNumber*))
-            {
-                throw XPathException("number result expected");
-            }
-            XPathNumber* leftAsNumber = cast<XPathNumber*>(leftAsNumberObject.Get());
-            double leftNumber = leftAsNumber->Value();
-            List<XPathObject*> rightArgs;
-            rightArgs.Add(right.Get());
-            UniquePtr<XPathObject> rightAsNumberObject = numberFunction->Evaluate(context, rightArgs);
-            if (!(rightAsNumberObject.Get() is XPathNumber*))
-            {
-                throw XPathException("number result expected");
-            }
-            XPathNumber* rightAsNumber = cast<XPathNumber*>(rightAsNumberObject.Get());
-            double rightNumber = rightAsNumber->Value();
-            return UniquePtr<XPathObject>(new XPathNumber(leftNumber / rightNumber));
-        }
-        public override UniquePtr<DomNode> ToDom() const
-        {
-            UniquePtr<DomElement> element = new DomElement(u"div");
-            element->AppendChild(Left()->ToDom());
-            element->AppendChild(Right()->ToDom());
-            return UniquePtr<DomNode>(element.Release());
-        }
-    }
-
-    public class XPathModExpr : XPathBinaryExpr
-    {
-        public nothrow XPathModExpr(XPathExpr* left_, XPathExpr* right_) : base(left_, right_)
-        {
-        }
-        public override UniquePtr<XPathObject> Evaluate(XPathContext& context)
-        {
-            UniquePtr<XPathObject> left = Left()->Evaluate(context);
-            UniquePtr<XPathObject> right = Right()->Evaluate(context);
-            XPathFunction* numberFunction = GetXPathLibraryFunction(u"number");
-            List<XPathObject*> leftArgs;
-            leftArgs.Add(left.Get());
-            UniquePtr<XPathObject> leftAsNumberObject = numberFunction->Evaluate(context, leftArgs);
-            if (!(leftAsNumberObject.Get() is XPathNumber*))
-            {
-                throw XPathException("number result expected");
-            }
-            XPathNumber* leftAsNumber = cast<XPathNumber*>(leftAsNumberObject.Get());
-            double leftNumber = leftAsNumber->Value();
-            long leftLong = cast<long>(leftNumber);
-            List<XPathObject*> rightArgs;
-            rightArgs.Add(right.Get());
-            UniquePtr<XPathObject> rightAsNumberObject = numberFunction->Evaluate(context, rightArgs);
-            if (!(rightAsNumberObject.Get() is XPathNumber*))
-            {
-                throw XPathException("number result expected");
-            }
-            XPathNumber* rightAsNumber = cast<XPathNumber*>(rightAsNumberObject.Get());
-            double rightNumber = rightAsNumber->Value();
-            long rightLong = cast<long>(rightNumber);
-            return UniquePtr<XPathObject>(new XPathNumber(leftLong % rightLong));
-        }
-        public override UniquePtr<DomNode> ToDom() const
-        {
-            UniquePtr<DomElement> element = new DomElement(u"mod");
-            element->AppendChild(Left()->ToDom());
-            element->AppendChild(Right()->ToDom());
-            return UniquePtr<DomNode>(element.Release());
-        }
-    }
-
-    public class XPathUnaryMinusExpr : XPathUnaryExpr
-    {
-        public nothrow XPathUnaryMinusExpr(XPathExpr* operand_) : base(operand_)
-        {
-        }
-        public override UniquePtr<XPathObject> Evaluate(XPathContext& context)
-        {
-            UniquePtr<XPathObject> operand = Operand()->Evaluate(context);
-            XPathFunction* numberFunction = GetXPathLibraryFunction(u"number");
-            List<XPathObject*> operandArgs;
-            operandArgs.Add(operand.Get());
-            UniquePtr<XPathObject> operandAsNumberObject = numberFunction->Evaluate(context, operandArgs);
-            if (!(operandAsNumberObject.Get() is XPathNumber*))
-            {
-                throw XPathException("number result expected");
-            }
-            XPathNumber* operandAsNumber = cast<XPathNumber*>(operandAsNumberObject.Get());
-            double operandNumber = operandAsNumber->Value();
-            return UniquePtr<XPathObject>(new XPathNumber(-operandNumber));
-        }
-        public override UniquePtr<DomNode> ToDom() const
-        {
-            UniquePtr<DomElement> element = new DomElement(u"unaryMinus");
-            element->AppendChild(Operand()->ToDom());
-            return UniquePtr<DomNode>(element.Release());
-        }
-    }
-
-    public class XPathUnionExpr : XPathBinaryExpr
-    {
-        public nothrow XPathUnionExpr(XPathExpr* left_, XPathExpr* right_) : base(left_, right_)
-        {
-        }
-        public override UniquePtr<XPathObject> Evaluate(XPathContext& context)
-        {
-            UniquePtr<XPathNodeSet> result(new XPathNodeSet());
-            UniquePtr<XPathObject> left = Left()->Evaluate(context);
-            if (!(left.Get() is XPathNodeSet*))
-            {
-                throw XPathException("node set expected");
-            }
-            XPathNodeSet* leftNodeSet = cast<XPathNodeSet*>(left.Get());
-            long n = leftNodeSet->Length();
-            for (long i = 0; i < n; ++i)
-            {
-                result->Add((*leftNodeSet)[i]);
-            }
-            UniquePtr<XPathObject> right = Right()->Evaluate(context);
-            if (!(right.Get() is XPathNodeSet*))
-            {
-                throw XPathException("node set expected");
-            }
-            XPathNodeSet* rightNodeSet = cast<XPathNodeSet*>(right.Get());
-            long m = rightNodeSet->Length();
-            for (long i = 0; i < m; ++i)
-            {
-                result->Add((*rightNodeSet)[i]);
-            }
-            return UniquePtr<XPathObject>(result.Release());
-        }
-        public override UniquePtr<DomNode> ToDom() const
-        {
-            UniquePtr<DomElement> element = new DomElement(u"union");
-            element->AppendChild(Left()->ToDom());
-            element->AppendChild(Right()->ToDom());
-            return UniquePtr<DomNode>(element.Release());
-        }
-    }
-
-    public class XPathCombineStepExpr : XPathBinaryExpr
-    {
-        public nothrow XPathCombineStepExpr(XPathExpr* left_, XPathExpr* right_) : base(left_, right_)
-        {
-        }
-        public override UniquePtr<XPathObject> Evaluate(XPathContext& context)
-        {
-            UniquePtr<XPathNodeSet> result(new XPathNodeSet());
-            UniquePtr<XPathObject> left = Left()->Evaluate(context);
-            if (!(left.Get() is XPathNodeSet*))
-            {
-                throw XPathException("node set expected");
-            }
-            XPathNodeSet* leftNodeSet = cast<XPathNodeSet*>(left.Get());
-            long n = leftNodeSet->Length();
-            for (long i = 0; i < n; ++i)
-            {
-                DomNode* node = (*leftNodeSet)[i];
-                XPathContext rightContext(node, i + 1, n);
-                UniquePtr<XPathObject> right = Right()->Evaluate(rightContext);
-                if (!(right.Get() is XPathNodeSet*))
-                {
-                    throw XPathException("node set expected");
-                }
-                XPathNodeSet* rightNodeSet = cast<XPathNodeSet*>(right.Get());
-                long m = rightNodeSet->Length();
-                for (long i = 0; i < m; ++i)
-                {
-                    DomNode* node = (*rightNodeSet)[i];
-                    result->Add(node);
-                }
-            }
-            return UniquePtr<XPathObject>(result.Release());
-        }
-        public override UniquePtr<DomNode> ToDom() const
-        {
-            UniquePtr<DomElement> element = new DomElement(u"combineStep");
-            element->AppendChild(Left()->ToDom());
-            element->AppendChild(Right()->ToDom());
-            return UniquePtr<DomNode>(element.Release());
-        }
-    }
-
-    public class XPathRootNodeExpr : XPathExpr
-    {
-        public override UniquePtr<XPathObject> Evaluate(XPathContext& context) 
-        {
-            UniquePtr<XPathNodeSet> result(new XPathNodeSet());
-            if (context.Node() is DomDocument*)
-            {
-                result->Add(context.Node());
-            }
-            else
-            {
-                result->Add(context.Node()->OwnerDocument());
-            }           
-            return UniquePtr<XPathObject>(result.Release());
-        }
-        public override UniquePtr<DomNode> ToDom() const
-        {
-            UniquePtr<DomElement> element = new DomElement(u"root");
-            return UniquePtr<DomNode>(element.Release());
-        }
-    }
-
-    public class XPathFilterExpr : XPathUnaryExpr
-    {
-        public nothrow XPathFilterExpr(XPathExpr* operand_, XPathExpr* predicate_) : base(operand_), predicate(predicate_)
-        {
-        }
-        public override UniquePtr<XPathObject> Evaluate(XPathContext& context)
-        {
-            XPathFunction* boolean = GetXPathLibraryFunction(u"boolean");
-            UniquePtr<XPathObject> operandResult = Operand()->Evaluate(context);
-            if (!(operandResult.Get() is XPathNodeSet*))
-            {
-                throw XPathException("node set expected");
-            }
-            UniquePtr<XPathNodeSet> result = cast<XPathNodeSet*>(operandResult.Release());
-            UniquePtr<XPathNodeSet> filteredResult(new XPathNodeSet());
-            long n = result->Length();
-            for (long i = 0; i < n; ++i)
-            {
-                DomNode* node = (*result)[i];
-                XPathContext predicateContext(node, i + 1, n);
-                UniquePtr<XPathObject> predicateResult = predicate->Evaluate(predicateContext);
-                bool booleanResult = false;
-                if (predicateResult.Get() is XPathNumber*)
-                {
-                    XPathNumber* number = cast<XPathNumber*>(predicateResult.Get());
-                    if (number->Value() == predicateContext.Position())
-                    {
-                        booleanResult = true;
-                    }
-                }
-                else
-                {
-                    List<XPathObject*> predicateArgs;
-                    predicateArgs.Add(predicateResult.Get());
-                    UniquePtr<XPathObject> predicateResultAsBooleanObject = boolean->Evaluate(predicateContext, predicateArgs);
-                    if (!(predicateResultAsBooleanObject.Get() is XPathBoolean*))
-                    {
-                        throw XPathException("boolean result expected");
-                    }
-                    XPathBoolean* predicateResultAsBoolean = cast<XPathBoolean*>(predicateResultAsBooleanObject.Get());
-                    booleanResult = predicateResultAsBoolean->Value();
-                }
-                if (booleanResult)
-                {
-                    filteredResult->Add(node);
-                }
-            }
-            Swap(filteredResult, result);
-            return UniquePtr<XPathObject>(result.Release());
-        }
-        public override UniquePtr<DomNode> ToDom() const
-        {
-            UniquePtr<DomElement> element = new DomElement(u"filter");
-            element->AppendChild(Operand()->ToDom());
-            UniquePtr<DomElement> predicateElement = new DomElement(u"predicate");
-            predicateElement->AppendChild(predicate->ToDom());
-            element->AppendChild(UniquePtr<DomNode>(predicateElement.Release()));
-            return UniquePtr<DomNode>(element.Release());
-        }
-        private UniquePtr<XPathExpr> predicate;
-    }
-
-    public abstract class XPathNodeTestExpr : XPathExpr
-    {
-        public virtual bool Select(DomNode* node, Axis axis) const
-        {
-            return true;
-        }
-    }
-    
-    public class NodeSelectionOp : NodeOp
-    {
-        public nothrow NodeSelectionOp(XPathNodeTestExpr* nodeTest_, XPathNodeSet& nodeSet_, Axis axis_) : nodeTest(nodeTest_), nodeSet(nodeSet_), axis(axis_)
-        {
-        }
-        public override void Apply(DomNode* node)
+        public override void Apply(System.Dom.Node* node)
         {
             if (nodeTest->Select(node, axis))
             {
@@ -1308,86 +1699,8 @@ namespace System.XPath
         }
         private XPathNodeTestExpr* nodeTest;
         private XPathNodeSet& nodeSet;
-        private Axis axis;
+        private System.Dom.Axis axis;
     }
-    
-    public class XPathLocationStepExpr : XPathExpr
-    {
-        public nothrow XPathLocationStepExpr(Axis axis_, XPathNodeTestExpr* nodeTest_) : axis(axis_), nodeTest(nodeTest_)
-        {
-        }
-        public void AddPredicate(XPathExpr* predicate)
-        {
-            predicates.Add(UniquePtr<XPathExpr>(predicate));
-        }
-        public override UniquePtr<XPathObject> Evaluate(XPathContext& context)
-        {
-            XPathFunction* boolean = GetXPathLibraryFunction(u"boolean");
-            UniquePtr<XPathNodeSet> result(new XPathNodeSet());
-            NodeSelectionOp selectNodes(nodeTest.Get(), *result, axis);
-            context.Node()->Walk(selectNodes, axis);
-            for (const UniquePtr<XPathExpr>& predicate : predicates)
-            {
-                UniquePtr<XPathNodeSet> filteredResult(new XPathNodeSet());
-                long n = result->Length();
-                for (long i = 0; i < n; ++i)
-                {
-                    DomNode* node = (*result)[i];
-                    XPathContext predicateContext(node, i + 1, n);
-                    UniquePtr<XPathObject> predicateResult = predicate->Evaluate(predicateContext);
-                    bool booleanResult = false;
-                    if (predicateResult.Get() is XPathNumber*)
-                    {
-                        XPathNumber* number = cast<XPathNumber*>(predicateResult.Get());
-                        if (number->Value() == predicateContext.Position())
-                        {
-                            booleanResult = true;
-                        }
-                    }
-                    else
-                    {
-                        List<XPathObject*> predicateArgs;
-                        predicateArgs.Add(predicateResult.Get());
-                        UniquePtr<XPathObject> predicateResultAsBooleanObject = boolean->Evaluate(predicateContext, predicateArgs);
-                        if (!(predicateResultAsBooleanObject.Get() is XPathBoolean*))
-                        {
-                            throw XPathException("boolean result expected");
-                        }
-                        XPathBoolean* predicateResultAsBoolean = cast<XPathBoolean*>(predicateResultAsBooleanObject.Get());
-                        booleanResult = predicateResultAsBoolean->Value();
-                    }
-                    if (booleanResult)
-                    {
-                        filteredResult->Add(node);
-                    }
-                }
-                Swap(filteredResult, result);
-            }
-            return UniquePtr<XPathObject>(result.Release());
-        }
-        public override UniquePtr<DomNode> ToDom() const
-        {
-            UniquePtr<DomElement> element = new DomElement(u"locationStep");
-            DomElement* axisElement = new DomElement(u"axis");
-            ustring axisName = AxisName(axis);
-            axisElement->SetAttribute(u"name", axisName);
-            element->AppendChild(UniquePtr<DomNode>(axisElement));
-            DomElement* nodeTestElement = new DomElement(u"nodeTest");
-            nodeTestElement->AppendChild(nodeTest->ToDom());
-            element->AppendChild(UniquePtr<DomNode>(nodeTestElement));
-            UniquePtr<DomElement> predicatesElement = new DomElement(u"predicates");
-            for (const UniquePtr<XPathExpr>& predicate : predicates)
-            {
-                predicatesElement->AppendChild(predicate->ToDom());
-            }
-            element->AppendChild(UniquePtr<DomNode>(predicatesElement.Release()));
-            return UniquePtr<DomNode>(element.Release());
-        }
-        private Axis axis;
-        private UniquePtr<XPathNodeTestExpr> nodeTest;
-        private List<UniquePtr<XPathExpr>> predicates;
-    }
-    
     public class AxisMap
     {
         static AxisMap() : instance(new AxisMap())
@@ -1397,349 +1710,39 @@ namespace System.XPath
         {
             return *instance;
         }
-        public Axis GetAxis(const ustring& axis) const
+        public AxisMap()
         {
-            Map<ustring, Axis>.ConstIterator i = map.CFind(axis);
-            if (i != map.CEnd())
+            axisMap[u"ancestor"] = Axis.ancestor;
+            axisMap[u"ancestor-or-self"] = Axis.ancestorOrSelf;
+            axisMap[u"attribute"] = Axis.attribute;
+            axisMap[u"child"] = Axis.child;
+            axisMap[u"descendant"] = Axis.descendant;
+            axisMap[u"descendant-or-self"] = Axis.descendantOrSelf;
+            axisMap[u"following"] = Axis.following;
+            axisMap[u"following-sibling"] = Axis.followingSibling;
+            axisMap[u"namespace"] = Axis.ns;
+            axisMap[u"parent"] = Axis.parent;
+            axisMap[u"preceding"] = Axis.preceding;
+            axisMap[u"preceding-sibling"] = Axis.precedingSibling;
+            axisMap[u"self"] = Axis.self;
+        }
+        public System.Dom.Axis GetAxis(const ustring& axis) const
+        {
+            Map<ustring, System.Dom.Axis>.ConstIterator it = axisMap.CFind(axis);
+            if (it != axisMap.CEnd())
             {
-                return i->second;
+                return it->second;
             }
             else
             {
-                throw Exception("axis '" + ToUtf8(axis) + "' not found");
+                throw Exception("axis \'" + ToUtf8(axis) + "\' not found");
             }
         }
-        private AxisMap()
-        {
-            map[u"ancestor"] = Axis.ancestor;
-            map[u"ancestor-or-self"] = Axis.ancestorOrSelf;
-            map[u"attribute"] = Axis.attribute;
-            map[u"child"] = Axis.child;
-            map[u"descendant"] = Axis.descendant;
-            map[u"descendant-or-self"] = Axis.descendantOrSelf;
-            map[u"following"] = Axis.following;
-            map[u"following-sibling"] = Axis.followingSibling;
-            map[u"namespace"] = Axis.ns;
-            map[u"parent"] = Axis.parent;
-            map[u"preceding"] = Axis.preceding;
-            map[u"preceding-sibling"] = Axis.precedingSibling;
-            map[u"self"] = Axis.self;
-        }
         private static UniquePtr<AxisMap> instance;
-        private Map<ustring, Axis> map;
+        private Map<ustring, System.Dom.Axis> axisMap;
     }
-    
-    public Axis GetAxis(const ustring& axisName)
+    public System.Dom.Axis GetAxis(const ustring& axisName)
     {
         return AxisMap.Instance().GetAxis(axisName);
     }
-    
-    public class XPathPILiteralTest : XPathNodeTestExpr
-    {
-        public nothrow XPathPILiteralTest(XPathExpr* literal_) : literal(literal_)
-        {
-        }
-        public override bool Select(DomNode* node, Axis axis) const
-        {
-            if (node is DomProcessingInstruction*)
-            {
-                DomProcessingInstruction* pi = cast<DomProcessingInstruction*>(node);
-                if (pi->Target() == literal->TextValue())
-                {
-                    return true;
-                }
-            }
-            return false;
-        }
-        public override UniquePtr<DomNode> ToDom() const
-        {
-            UniquePtr<DomElement> element = new DomElement(u"piLiteralTest");
-            element->AppendChild(literal->ToDom());
-            return UniquePtr<DomNode>(element.Release());
-        }
-        private UniquePtr<XPathExpr> literal;
-    }
-    
-    public class XPathCommentNodeTest : XPathNodeTestExpr
-    {
-        public override bool Select(DomNode* node, Axis axis) const
-        {
-            if (node is DomComment*)
-            {
-                return true;
-            }
-            return false;
-        }
-        public override UniquePtr<DomNode> ToDom() const
-        {
-            UniquePtr<DomElement> element = new DomElement(u"commentNodeTest");
-            return UniquePtr<DomNode>(element.Release());
-        }
-    }
-    
-    public class XPathTextNodeTest : XPathNodeTestExpr
-    {
-        public override bool Select(DomNode* node, Axis axis) const
-        {
-            if (node is DomText*)
-            {
-                return true;
-            }
-            return false;
-        }
-        public override UniquePtr<DomNode> ToDom() const
-        {
-            UniquePtr<DomElement> element = new DomElement(u"textNodeTest");
-            return UniquePtr<DomNode>(element.Release());
-        }
-    }
-    
-    public class XPathPINodeTest : XPathNodeTestExpr
-    {
-        public override bool Select(DomNode* node, Axis axis) const
-        {
-            if (node is DomProcessingInstruction*)
-            {
-                return true;
-            }
-            return false;
-        }
-        public override UniquePtr<DomNode> ToDom() const
-        {
-            UniquePtr<DomElement> element = new DomElement(u"piNodeTest");
-            return UniquePtr<DomNode>(element.Release());
-        }
-    }
-    
-    public class XPathAnyNodeTest : XPathNodeTestExpr
-    {
-        public override bool Select(DomNode* node, Axis axis) const
-        {
-            return true;
-        }
-        public override UniquePtr<DomNode> ToDom() const
-        {
-            UniquePtr<DomElement> element = new DomElement(u"anyNodeTest");
-            return UniquePtr<DomNode>(element.Release());
-        }
-    }
-    
-    public class XPathPrincipalNodeTest : XPathNodeTestExpr
-    {
-        public override bool Select(DomNode* node, Axis axis) const
-        {
-            if (axis == Axis.attribute)
-            {
-                if (node is DomAttr*)
-                {
-                    return true;
-                }
-            }
-            else if (axis == Axis.ns)
-            {                
-                return false; // todo
-            }
-            else
-            {
-                if (node is DomElement*)
-                {
-                    return true;
-                }
-            }
-            return false;
-        }
-        public override UniquePtr<DomNode> ToDom() const
-        {
-            UniquePtr<DomElement> element = new DomElement(u"principalNodeTest");
-            return UniquePtr<DomNode>(element.Release());
-        }
-    }
-    
-    public class XPathPrefixTest : XPathNodeTestExpr
-    {
-        public nothrow XPathPrefixTest(const ustring& name_) : name(name_)
-        {
-        }
-        public override bool Select(DomNode* node, Axis axis) const
-        {
-            if (axis == Axis.attribute)
-            {
-                if (node is DomAttr*)
-                {
-                    DomAttr* attr = cast<DomAttr*>(node);
-                    if (attr->Prefix() == name)
-                    {
-                        return true;
-                    }
-                }
-            }
-            else if (axis == Axis.ns)
-            {
-                return false; // todo
-            }
-            else if (node is DomElement*)
-            {
-                DomElement* element = cast<DomElement*>(node);
-                if (element->Prefix() == name)
-                {
-                    return true;
-                }
-            }
-            return false;
-        }
-        public override UniquePtr<DomNode> ToDom() const
-        {
-            UniquePtr<DomElement> element = new DomElement(u"prefixTest");
-            element->SetAttribute(u"prefix", name);
-            return UniquePtr<DomNode>(element.Release());
-        }
-        private ustring name;
-    }
-    
-    public class XPathNameTest : XPathNodeTestExpr
-    {
-        public nothrow XPathNameTest(const ustring& name_) : name(name_)
-        {
-        }
-        public override bool Select(DomNode* node, Axis axis) const
-        {
-            if (axis == Axis.attribute)
-            {
-                if (node is DomAttr*)
-                {
-                    DomAttr* attr = cast<DomAttr*>(node);
-                    if (attr->Name() == name)
-                    {
-                        return true;
-                    }
-                }
-            }
-            else if (axis != Axis.ns)
-            {
-                if (node is DomElement*)
-                {
-                    DomElement* element = cast<DomElement*>(node);
-                    if (element->Name() == name)
-                    {
-                        return true;
-                    }
-                }
-            }        
-            return false;
-        }
-        public override UniquePtr<DomNode> ToDom() const
-        {
-            UniquePtr<DomElement> element = new DomElement(u"nameTest");
-            element->SetAttribute(u"name", name);
-            return UniquePtr<DomNode>(element.Release());
-        }
-        private ustring name;
-    }
-    
-    public class XPathVariableReference : XPathExpr
-    {
-        public nothrow XPathVariableReference(const ustring& name_) : name(name_)
-        {
-        }
-        // todo
-        public override UniquePtr<DomNode> ToDom() const
-        {
-            UniquePtr<DomElement> element = new DomElement(u"variableReference");
-            element->AppendChild(UniquePtr<DomNode>(new DomElement(name)));
-            return UniquePtr<DomNode>(element.Release());
-        }
-        private ustring name;
-    }
-    
-    public class XPathLiteral : XPathExpr
-    {
-        public nothrow XPathLiteral(const ustring& value_) : value(value_)
-        {
-        }
-        public override UniquePtr<XPathObject> Evaluate(XPathContext& context)
-        {
-            return UniquePtr<XPathObject>(new XPathString(value));
-        }
-        public override ustring TextValue() const
-        {
-            return value;
-        }
-        public override UniquePtr<DomNode> ToDom() const
-        {
-            UniquePtr<DomElement> element = new DomElement(u"literal");
-            element->SetAttribute(u"value", value);
-            return UniquePtr<DomNode>(element.Release());
-        }
-        private ustring value;
-    }
-    
-    public class XPathNumberExpr : XPathExpr
-    {
-        public XPathNumberExpr(const ustring& value_) : value(ParseDouble(ToUtf8(value_)))
-        {
-        }
-        public nothrow XPathNumberExpr(double value_) : value(value_)
-        {
-        }
-        public override UniquePtr<XPathObject> Evaluate(XPathContext& context)
-        {
-            return UniquePtr<XPathObject>(new XPathNumber(value));
-        }
-        public override ustring TextValue() const
-        {
-            return ToUtf32(ToString(value));
-        }
-        public override UniquePtr<DomNode> ToDom() const
-        {
-            UniquePtr<DomElement> element = new DomElement(u"number");
-            ustring valueStr = ToUtf32(ToString(value));
-            element->SetAttribute(u"value", valueStr);
-            return UniquePtr<DomNode>(element.Release());
-        }
-        private double value;
-    }
-    
-    public class XPathFunctionCall : XPathExpr
-    {
-        public nothrow XPathFunctionCall(const ustring& functionName_) : functionName(functionName_)
-        {
-        }
-        public void AddArgument(XPathExpr* argument)
-        {
-            arguments.Add(UniquePtr<XPathExpr>(argument));
-        }
-        public override UniquePtr<XPathObject> Evaluate(XPathContext& context)
-        {
-            XPathFunction* function = GetXPathLibraryFunction(functionName);
-            if (arguments.Count() < function->MinArity() || arguments.Count() > function->MaxArity())
-            {
-                throw XPathException("function '" + ToUtf8(function->Name()) + "' takes " + ToString(function->MinArity()) + "..." + ToString(function->MaxArity()) + 
-                    " arguments (" + ToString(arguments.Count()) + " arguments provided)");
-            }
-            List<UniquePtr<XPathObject>> ownedArgs;
-            List<XPathObject*> args;
-            for (const UniquePtr<XPathExpr>& argument : arguments)
-            {
-                UniquePtr<XPathObject> arg = argument->Evaluate(context);
-                args.Add(arg.Get());
-                ownedArgs.Add(Rvalue(arg));
-            }
-            UniquePtr<XPathObject> result = function->Evaluate(context, args);
-            return result;
-        }
-        public override UniquePtr<DomNode> ToDom() const
-        {
-            UniquePtr<DomElement> element = new DomElement(u"functionCall");
-            element->AppendChild(UniquePtr<DomNode>(new DomElement(functionName)));
-            UniquePtr<DomElement> argumentsElement(new DomElement(u"arguments"));
-            for (const UniquePtr<XPathExpr>& argument : arguments)
-            {
-                argumentsElement->AppendChild(argument->ToDom());
-            }
-            element->AppendChild(UniquePtr<DomNode>(argumentsElement.Release()));
-            return UniquePtr<DomNode>(element.Release());
-        }
-        private ustring functionName;
-        private List<UniquePtr<XPathExpr>> arguments;
-    }
-}
+} // namespace System.XPath

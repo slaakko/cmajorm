@@ -1,0 +1,58 @@
+using System;
+using System.Collections;
+
+// this file has been semiautomatically generated from 'D:/work/soulng-project/sngxml/xml/XmlParserInterface.hpp' using cpp2cm version 1.0.0
+
+// this file has been semiautomatically generated from 'D:/work/soulng-project/sngxml/xml/XmlParserInterface.cpp' using cpp2cm version 1.0.0
+
+namespace System.Xml
+{
+    public enum Flags : int
+    {
+        none = 0, debug = 1 << 0
+    }
+    public inline Flags operator&(Flags flags, Flags flag)
+    {
+        return cast<Flags>(cast<int>(flags) & cast<int>(flag));
+    }
+    public inline Flags operator|(Flags flags, Flags flag)
+    {
+        return cast<Flags>(cast<int>(flags) | cast<int>(flag));
+    }
+    public inline Flags operator~(Flags flags)
+    {
+        return cast<Flags>(~cast<int>(flags));
+    }
+    public void ParseXmlFile(const string& xmlFileName, XmlContentHandler* contentHandler)
+    {
+        ParseXmlFile(xmlFileName, contentHandler, Flags.none);
+    }
+    public void ParseXmlFile(const string& xmlFileName, XmlContentHandler* contentHandler, Flags flags)
+    {
+        string xmlContent = System.IO.File.ReadAllText(xmlFileName);
+        ParseXmlContent(xmlContent, xmlFileName, contentHandler, flags);
+    }
+    public void ParseXmlContent(const string& xmlContent, const string& systemId, XmlContentHandler* contentHandler)
+    {
+        ParseXmlContent(ToUtf32(xmlContent), systemId, contentHandler, Flags.none);
+    }
+    public void ParseXmlContent(const string& xmlContent, const string& systemId, XmlContentHandler* contentHandler, Flags flags)
+    {
+        ParseXmlContent(ToUtf32(xmlContent), systemId, contentHandler, flags);
+    }
+    public void ParseXmlContent(const ustring& xmlContent, const string& systemId, XmlContentHandler* contentHandler)
+    {
+        ParseXmlContent(xmlContent, systemId, contentHandler, Flags.none);
+    }
+    public void ParseXmlContent(const ustring& xmlContent, const string& systemId, XmlContentHandler* contentHandler, Flags flags)
+    {
+        System.Lex.XmlParsingLog debugLog(Console.Error());
+        TrivialLexer xmlLexer(xmlContent, systemId, 0);
+        if ((flags & Flags.debug) != Flags.none)
+        {
+            xmlLexer.SetLog(&debugLog);
+        }
+        XmlProcessor xmlProcessor(xmlLexer, contentHandler);
+        XmlParser.Parse(xmlLexer, &xmlProcessor);
+    }
+} // namespace System.Xml

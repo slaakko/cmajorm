@@ -1,0 +1,58 @@
+using System;
+using System.Collections;
+
+// this file has been semiautomatically generated from 'D:/work/soulng-project/sngxml/xpath/XPathTokenValueParsers.hpp' using cpp2cm version 1.0.0
+
+// this file has been semiautomatically generated from 'D:/work/soulng-project/sngxml/xpath/XPathTokenValueParsers.cpp' using cpp2cm version 1.0.0
+
+namespace System.XPath
+{
+    public ustring ParseDQString(const string& fileName, const System.Lex.Token& token)
+    {
+        ustring s;
+        const uchar* p = token.match.begin;
+        const uchar* e = token.match.end;
+        if (p != e && *p == '\"')
+        {
+            ++p;
+        }
+        while (p != e && *p != '\"')
+        {
+            s.Append(*p, 1);
+            ++p;
+        }
+        if (p != e && *p == '\"')
+        {
+            ++p;
+        }
+        if (p != e)
+        {
+            throw Exception("invalid string literal at " + fileName + ":" + ToString(token.line) + ": " + ToUtf8(token.match.ToString()));
+        }
+        return s;
+    }
+    public ustring ParseSQString(const string& fileName, const System.Lex.Token& token)
+    {
+        ustring s;
+        const uchar* p = token.match.begin;
+        const uchar* e = token.match.end;
+        if (p != e && *p == '\'')
+        {
+            ++p;
+        }
+        while (p != e && *p != '\'')
+        {
+            s.Append(*p, 1);
+            ++p;
+        }
+        if (p != e && *p == '\'')
+        {
+            ++p;
+        }
+        if (p != e)
+        {
+            throw Exception("invalid string literal at " + fileName + ":" + ToString(token.line) + ": " + ToUtf8(token.match.ToString()));
+        }
+        return s;
+    }
+} // namespace System.XPath

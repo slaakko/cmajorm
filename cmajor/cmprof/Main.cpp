@@ -638,7 +638,7 @@ void ReadProject(const std::string& projectFilePath, sngcm::ast::Solution& solut
     project->ResolveDeclarations();
     if (requireProgram)
     {
-        if (project->GetTarget() != Target::program)
+        if (project->GetTarget() != Target::program && project->GetTarget() != Target::winapp)
         {
             throw std::runtime_error("project '" + ToUtf8(project->Name()) + "' is not a program project");
         }

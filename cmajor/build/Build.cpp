@@ -732,7 +732,7 @@ void CleanProject(Project* project)
     boost::filesystem::path mfp = project->ModuleFilePath();
     mfp.remove_filename();
     boost::filesystem::remove_all(mfp);
-    if (project->GetTarget() == Target::program)
+    if (project->GetTarget() == Target::program || project->GetTarget() == Target::winapp)
     {
         boost::filesystem::path efp = project->ExecutableFilePath();
         efp.remove_filename();
@@ -1085,6 +1085,53 @@ void InstallSystemLibraries(Module* systemInstallModule)
     }
 }
 
+void InstallSystemWindowsLibraries(Module* systemInstallWindowsModule)
+{
+    if (GetGlobalFlag(GlobalFlags::verbose))
+    {
+        LogMessage(systemInstallWindowsModule->LogStreamId(), "Installing system libraries (Windows)...");
+    }
+    sngcm::ast::BackEnd backend = sngcm::ast::BackEnd::llvm;
+    if (GetBackEnd() == cmajor::symbols::BackEnd::cmsx)
+    {
+        backend = sngcm::ast::BackEnd::cmsx;
+    }
+    boost::filesystem::path systemLibDir = CmajorSystemLibDir(GetConfig(), backend);
+    boost::filesystem::create_directories(systemLibDir);
+    for (Module* systemModule : systemInstallWindowsModule->AllReferencedModules())
+    {
+        boost::filesystem::path from = systemModule->OriginalFilePath();
+        boost::filesystem::path to = systemLibDir / from.filename();
+        if (boost::filesystem::exists(to))
+        {
+            boost::filesystem::remove(to);
+        }
+        boost::filesystem::copy(from, to);
+        if (GetGlobalFlag(GlobalFlags::verbose))
+        {
+            LogMessage(systemInstallWindowsModule->LogStreamId(), from.generic_string() + " -> " + to.generic_string());
+        }
+        if (!systemModule->LibraryFilePath().empty())
+        {
+            from = systemModule->LibraryFilePath();
+            to = systemLibDir / from.filename();
+            if (boost::filesystem::exists(to))
+            {
+                boost::filesystem::remove(to);
+            }
+            boost::filesystem::copy(from, to);
+            if (GetGlobalFlag(GlobalFlags::verbose))
+            {
+                LogMessage(systemInstallWindowsModule->LogStreamId(), from.generic_string() + " -> " + to.generic_string());
+            }
+        }
+    }
+    if (GetGlobalFlag(GlobalFlags::verbose))
+    {
+        LogMessage(systemInstallWindowsModule->LogStreamId(), "System libraries installed.");
+    }
+}
+
 void CompileSingleThreaded(Project* project, Module* rootModule, std::vector<std::unique_ptr<BoundCompileUnit>>& boundCompileUnits, cmajor::codegen::EmittingContext& emittingContext,
     std::vector<std::string>& objectFilePaths, std::unordered_map<int, cmdoclib::File>& docFileMap, bool& stop) 
 {
@@ -1403,7 +1450,7 @@ void BuildProject(Project* project, std::unique_ptr<Module>& rootModule, bool& s
             }
         }
     }
-    rootModule.reset(new Module(project->Name(), project->ModuleFilePath()));
+    rootModule.reset(new Module(project->Name(), project->ModuleFilePath(), project->GetTarget()));
     rootModule->SetRootModule();
     SetRootModuleForCurrentThread(rootModule.get());
     {
@@ -1421,7 +1468,7 @@ void BuildProject(Project* project, std::unique_ptr<Module>& rootModule, bool& s
         std::vector<ClassTemplateSpecializationSymbol*> classTemplateSpecializations;
         bool prevPreparing = rootModule->Preparing();
         rootModule->SetPreparing(true);
-        PrepareModuleForCompilation(rootModule.get(), project->References()); 
+        PrepareModuleForCompilation(rootModule.get(), project->References(), project->GetTarget()); 
         CreateSymbols(rootModule->GetSymbolTable(), compileUnits, stop);
         if (GetGlobalFlag(GlobalFlags::sym2xml))
         {
@@ -1483,7 +1530,7 @@ void BuildProject(Project* project, std::unique_ptr<Module>& rootModule, bool& s
                 formatter.SetIndentSize(1);
                 symbolTableDoc->Write(formatter);
             }
-            if (project->GetTarget() == Target::program)
+            if (project->GetTarget() == Target::program || project->GetTarget() == Target::winapp)
             {
                 CheckMainFunctionSymbol(*rootModule);
                 if (!rootModule->GetSymbolTable().JsonClasses().empty())
@@ -1503,7 +1550,7 @@ void BuildProject(Project* project, std::unique_ptr<Module>& rootModule, bool& s
             {
                 GenerateLibrary(rootModule.get(), objectFilePaths, project->LibraryFilePath());
             }
-            if (project->GetTarget() == Target::program)
+            if (project->GetTarget() == Target::program || project->GetTarget() == Target::winapp)
             {
                 Link(project->ExecutableFilePath(), project->LibraryFilePath(), rootModule->LibraryFilePaths(), *rootModule);
             }
@@ -1535,6 +1582,11 @@ void BuildProject(Project* project, std::unique_ptr<Module>& rootModule, bool& s
             if (rootModule->Name() == U"System.Install")
             {
                 InstallSystemLibraries(rootModule.get());
+                systemLibraryInstalled = true;
+            }
+            else if (rootModule->Name() == U"System.Windows.Install")
+            {
+                InstallSystemWindowsLibraries(rootModule.get());
                 systemLibraryInstalled = true;
             }
         }
@@ -1898,9 +1950,17 @@ void BuildMsBuildProject(const std::string& projectName, const std::string& proj
     {
         project->AddDeclaration(new TargetDeclaration(Target::program));
     }
+    else if (target == "winapp")
+    {
+        project->AddDeclaration(new TargetDeclaration(Target::winapp));
+    }
     else if (target == "library")
     {
         project->AddDeclaration(new TargetDeclaration(Target::library));
+    }
+    else if (target == "winlib")
+    {
+        project->AddDeclaration(new TargetDeclaration(Target::winlib));
     }
     else if (target == "unitTest")
     {

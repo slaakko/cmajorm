@@ -77,7 +77,7 @@ class XPathBooleanFunction : public XPathFunction
 {
 public:
     XPathBooleanFunction();
-    std::unique_ptr<XPathObject> Evaluate(XPathContext& context, std::vector<XPathObject*>& arguments);
+    std::unique_ptr<XPathObject> Evaluate(XPathContext& context, std::vector<XPathObject*>& arguments) override;
 };
 
 XPathBooleanFunction::XPathBooleanFunction() : XPathFunction(U"boolean", 1, 1)
@@ -121,7 +121,7 @@ class XPathNumberFunction : public XPathFunction
 {
 public:
     XPathNumberFunction();
-    std::unique_ptr<XPathObject> Evaluate(XPathContext& context, std::vector<XPathObject*>& arguments);
+    std::unique_ptr<XPathObject> Evaluate(XPathContext& context, std::vector<XPathObject*>& arguments) override;
 };
 
 XPathNumberFunction::XPathNumberFunction() : XPathFunction(U"number", 0, 1)
@@ -161,7 +161,11 @@ std::unique_ptr<XPathObject> XPathNumberFunction::Evaluate(XPathContext& context
     case XPathObjectType::boolean:
     {
         XPathBoolean* boolean = static_cast<XPathBoolean*>(argument);
-        double result = boolean->Value() ? 1 : 0;
+        double result = 0;
+        if (boolean->Value())
+        {
+            result = 1;
+        }
         return std::unique_ptr<XPathObject>(new XPathNumber(result));
     }
     case XPathObjectType::nodeSet:
@@ -187,7 +191,7 @@ class XPathStringFunction : public XPathFunction
 {
 public:
     XPathStringFunction();
-    std::unique_ptr<XPathObject> Evaluate(XPathContext& context, std::vector<XPathObject*>& arguments);
+    std::unique_ptr<XPathObject> Evaluate(XPathContext& context, std::vector<XPathObject*>& arguments) override;
 };
 
 XPathStringFunction::XPathStringFunction() : XPathFunction(U"string", 0, 1)
@@ -234,7 +238,12 @@ std::unique_ptr<XPathObject> XPathStringFunction::Evaluate(XPathContext& context
     case XPathObjectType::boolean:
     {
         XPathBoolean* boolean = static_cast<XPathBoolean*>(argument);
-        return std::unique_ptr<XPathObject>(new XPathString(boolean->Value() ? U"true" : U"false"));
+        std::u32string val = U"true";
+        if (!boolean->Value())
+        {
+            val = U"false";
+        }
+        return std::unique_ptr<XPathObject>(new XPathString(val));
     }
     case XPathObjectType::string:
     {
@@ -250,7 +259,7 @@ class XPathLastFunction : public XPathFunction
 {
 public:
     XPathLastFunction();
-    std::unique_ptr<XPathObject> Evaluate(XPathContext& context, std::vector<XPathObject*>& arguments);
+    std::unique_ptr<XPathObject> Evaluate(XPathContext& context, std::vector<XPathObject*>& arguments) override;
 };
 
 XPathLastFunction::XPathLastFunction() : XPathFunction(U"last", 0, 0)
@@ -270,7 +279,7 @@ class XPathPositionFunction : public XPathFunction
 {
 public:
     XPathPositionFunction();
-    std::unique_ptr<XPathObject> Evaluate(XPathContext& context, std::vector<XPathObject*>& arguments);
+    std::unique_ptr<XPathObject> Evaluate(XPathContext& context, std::vector<XPathObject*>& arguments) override;
 };
 
 XPathPositionFunction::XPathPositionFunction() : XPathFunction(U"position", 0, 0)
@@ -290,7 +299,7 @@ class XPathCountFunction : public XPathFunction
 {
 public:
     XPathCountFunction();
-    std::unique_ptr<XPathObject> Evaluate(XPathContext& context, std::vector<XPathObject*>& arguments);
+    std::unique_ptr<XPathObject> Evaluate(XPathContext& context, std::vector<XPathObject*>& arguments) override;
 };
 
 XPathCountFunction::XPathCountFunction() : XPathFunction(U"count", 1, 1)
@@ -299,9 +308,17 @@ XPathCountFunction::XPathCountFunction() : XPathFunction(U"count", 1, 1)
 
 std::unique_ptr<XPathObject> XPathCountFunction::Evaluate(XPathContext& context, std::vector<XPathObject*>& arguments)
 {
-    if (arguments.size() != 1 || arguments[0]->Type() != XPathObjectType::nodeSet)
+    if (arguments.size() != 1)
     {
         throw std::runtime_error("sngxml::xpath::count() function requires one node-set argument");
+    }
+    else if (arguments.size() == 1)
+    {
+        XPathObject* arg = arguments[0];
+        if (arg->Type() != XPathObjectType::nodeSet)
+        {
+            throw std::runtime_error("sngxml::xpath::count() function requires one node-set argument");
+        }
     }
     XPathNodeSet* nodeSet = static_cast<XPathNodeSet*>(arguments[0]);
     return std::unique_ptr<XPathObject>(new XPathNumber(nodeSet->Length()));
@@ -349,7 +366,7 @@ XPathFunctionLibrary::XPathFunctionLibrary()
 
 XPathFunction* XPathFunctionLibrary::GetFunction(const std::u32string& functionName)
 {
-    auto it = functionMap.find(functionName);
+    std::unordered_map<std::u32string, XPathFunction*>::const_iterator it = functionMap.find(functionName);
     if (it != functionMap.cend())
     {
         return it->second;

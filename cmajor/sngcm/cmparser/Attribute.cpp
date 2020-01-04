@@ -2,6 +2,7 @@
 #include <soulng/util/Unicode.hpp>
 #include <sngcm/cmlexer/CmajorLexer.hpp>
 #include <sngcm/cmlexer/CmajorTokens.hpp>
+#include <sngcm/cmlexer/TokenValueParsers.hpp>
 
 // this file has been automatically generated from 'D:/work/soulng-project/sngcm/cmparser/Attribute.parser' using soulng parser generator spg version 3.0.0
 
@@ -271,7 +272,8 @@ soulng::parser::Match AttributeParser::Attribute(CmajorLexer& lexer, sngcm::ast:
                                         if (match.hit)
                                         {
                                             s.end = span.end;
-                                            value = lexer.GetMatch(span);
+                                            ParseStringLiteral(lexer.FileName(), lexer.GetToken(pos), lexer.strLit, lexer.strLitPrefix);
+                                            value = lexer.strLit;
                                         }
                                         *parentMatch9 = match;
                                     }

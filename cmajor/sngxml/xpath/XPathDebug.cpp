@@ -17,8 +17,8 @@ public:
     void SetDebugParsing() { debugParsing = true; }
     bool DebugQuery() const { return debugQuery; }
     void SetDebugQuery() { debugQuery = true; }
-    void SetQueryDom(std::unique_ptr<sngxml::dom::Node>&& queryDom_) { queryDom = std::move(queryDom_); }
-    std::unique_ptr<sngxml::dom::Node> GetQueryDom() { return std::move(queryDom); }
+    void SetQueryDom(std::unique_ptr<dom::Node>&& queryDom_) { queryDom = std::move(queryDom_); }
+    std::unique_ptr<dom::Node> GetQueryDom() { return std::move(queryDom); }
     void SetQueryDuration(std::chrono::nanoseconds duration) { queryDuration = duration; }
     std::chrono::nanoseconds GetQueryDuration() const { return queryDuration; }
     void SetExecuteDuration(std::chrono::nanoseconds duration) { executeDuration = duration; }
@@ -28,14 +28,14 @@ private:
     XPathDebugInfo();
     bool debugParsing;
     bool debugQuery;
-    std::unique_ptr<sngxml::dom::Node> queryDom;
+    std::unique_ptr<dom::Node> queryDom;
     std::chrono::nanoseconds queryDuration;
     std::chrono::nanoseconds executeDuration;
 };
 
 std::unique_ptr<XPathDebugInfo> XPathDebugInfo::instance;
 
-XPathDebugInfo::XPathDebugInfo() : debugParsing(false), debugQuery(false)
+XPathDebugInfo::XPathDebugInfo() : debugParsing(false), debugQuery(false), queryDuration(0), executeDuration(0)
 {
 }
 
