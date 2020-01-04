@@ -1,0 +1,68 @@
+using System;
+using System.Collections;
+
+// this file has been semiautomatically generated from 'D:/work/soulng-project/soulng/rex/Algorithm.hpp' using cpp2cm version 1.0.0
+
+// this file has been semiautomatically generated from 'D:/work/soulng-project/soulng/rex/Algorithm.cpp' using cpp2cm version 1.0.0
+
+namespace System.RegularExpressions
+{
+    public List<NfaState*> EpsilonClosure(const List<NfaState*>& states)
+    {
+        List<NfaState*> stack;
+        for (NfaState* state : states)
+        {
+            stack.Add(state);
+        }
+        List<NfaState*> epsilonClosure = states;
+        while (!stack.IsEmpty())
+        {
+            NfaState* s = stack.Back();
+            stack.RemoveLast();
+            List<NfaState*> u = s->Next(eps);
+            for (NfaState* v : u)
+            {
+                if (Find(epsilonClosure.CBegin(), epsilonClosure.CEnd(), v) == epsilonClosure.CEnd())
+                {
+                    epsilonClosure.Add(v);
+                    stack.Add(v);
+                }
+            }
+        }
+        return epsilonClosure;
+    }
+    public List<NfaState*> EpsilonClosure(NfaState* state)
+    {
+        List<NfaState*> states(1, state);
+        return EpsilonClosure(states);
+    }
+    public List<NfaState*> Move(const List<NfaState*>& states, uchar c)
+    {
+        List<NfaState*> next;
+        for (NfaState* state : states)
+        {
+            List<NfaState*> n = state->Next(c);
+            for (NfaState* s : n)
+            {
+                if (Find(next.CBegin(), next.CEnd(), s) == next.CEnd())
+                {
+                    next.Add(s);
+                }
+            }
+        }
+        return next;
+    }
+    public bool Match(Nfa& nfa, const ustring& s)
+    {
+        List<NfaState*> states = EpsilonClosure(nfa.Start());
+        for (uchar c : s)
+        {
+            states = EpsilonClosure(Move(states, c));
+        }
+        for (NfaState* state : states)
+        {
+            if (state->Accept()) return true;
+        }
+        return false;
+    }
+} // namespace System.RegularExpressions

@@ -1,0 +1,85 @@
+using System;
+using System.Collections;
+
+// this file has been semiautomatically generated from 'D:/work/soulng-project/soulng/rex/Context.hpp' using cpp2cm version 1.0.0
+
+// this file has been semiautomatically generated from 'D:/work/soulng-project/soulng/rex/Context.cpp' using cpp2cm version 1.0.0
+
+namespace System.RegularExpressions
+{
+    public class Context
+    {
+        public Context() :
+            any(), epsilon(eps)
+        {
+        }
+        public ~Context()
+        {
+            for (NfaState* state : nfaStates)
+            {
+                delete state;
+            }
+            for (Symbol* symbol : symbols)
+            {
+                delete symbol;
+            }
+        }
+        public Symbol* MakeAny()
+        {
+            return &any;
+        }
+        public Symbol* MakeEpsilon()
+        {
+            return &epsilon;
+        }
+        public NfaState* MakeNfaState()
+        {
+            NfaState* state = new NfaState();
+            nfaStates.Add(state);
+            return state;
+        }
+        public Symbol* MakeChar(uchar c)
+        {
+            Map<uchar, Symbol*>.ConstIterator it = charSymbols.CFind(c);
+            if (it != charSymbols.CEnd())
+            {
+                return it->second;
+            }
+            else
+            {
+                Symbol* symbol = new Char(c);
+                symbols.Add(symbol);
+                charSymbols[c] = symbol;
+                return symbol;
+            }
+        }
+        public Symbol* MakeRange(uchar start, uchar end)
+        {
+            Range range(start, end);
+            Map<Range, Symbol*>.ConstIterator it = rangeSymbols.CFind(range);
+            if (it != rangeSymbols.CEnd())
+            {
+                return it->second;
+            }
+            else
+            {
+                Symbol* symbol = new Range(start, end);
+                symbols.Add(symbol);
+                rangeSymbols[range] = symbol;
+                return symbol;
+            }
+        }
+        public Class* MakeClass()
+        {
+            Class* cls = new Class();
+            symbols.Add(cls);
+            return cls;
+        }
+        private List<NfaState*> nfaStates;
+        private List<Symbol*> symbols;
+        private Any any;
+        private Char epsilon;
+        private Map<uchar, Symbol*> charSymbols;
+        private Map<Range, Symbol*> rangeSymbols;
+    }
+} // namespace System.RegularExpressions

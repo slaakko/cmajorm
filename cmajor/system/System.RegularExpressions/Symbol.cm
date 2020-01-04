@@ -1,0 +1,102 @@
+using System;
+using System.Collections;
+
+// this file has been semiautomatically generated from 'D:/work/soulng-project/soulng/rex/Symbol.hpp' using cpp2cm version 1.0.0
+
+// this file has been semiautomatically generated from 'D:/work/soulng-project/soulng/rex/Symbol.cpp' using cpp2cm version 1.0.0
+
+namespace System.RegularExpressions
+{
+    public const uchar eps = '\0';
+    public abstract class Symbol
+    {
+        public virtual ~Symbol()
+        {
+        }
+        public abstract bool Match(uchar c);
+    }
+    public class Char : Symbol
+    {
+        public Char(uchar chr_) :
+            chr(chr_)
+        {
+        }
+        public uchar Chr() const
+        {
+            return chr;
+        }
+        public override bool Match(uchar c)
+        {
+            return c == chr;
+        }
+        private uchar chr;
+    }
+    public class Any : Symbol
+    {
+        public override bool Match(uchar c)
+        {
+            return true;
+        }
+    }
+    public class Range : Symbol
+    {
+        public Range(uchar start_, uchar end_) :
+            start(start_), end(end_)
+        {
+        }
+        public uchar Start() const
+        {
+            return start;
+        }
+        public uchar End() const
+        {
+            return end;
+        }
+        public override bool Match(uchar c)
+        {
+            return c >= start && c <= end;
+        }
+        private uchar start;
+        private uchar end;
+    }
+    public inline bool operator==(const Range& left, const Range& right)
+    {
+        return left.Start() == right.Start() && left.End() == right.End();
+    }
+    public inline bool operator<(const Range& left, const Range& right)
+    {
+        if (left.Start() < right.Start()) return true;
+        if (left.Start() > right.Start()) return false;
+        return left.End() < right.End();
+    }
+    public class Class : Symbol
+    {
+        public Class() :
+            inverse(false)
+        {
+        }
+        public void SetInverse()
+        {
+            inverse = true;
+        }
+        public void AddSymbol(Symbol* symbol)
+        {
+            symbols.Add(symbol);
+        }
+        public override bool Match(uchar c)
+        {
+            bool match = false;
+            for (Symbol* symbol : symbols)
+            {
+                if (symbol->Match(c))
+                {
+                    match = true;
+                    break;
+                }
+            }
+            return match != inverse;
+        }
+        private bool inverse;
+        private List<Symbol*> symbols;
+    }
+} // namespace System.RegularExpressions

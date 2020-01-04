@@ -1,0 +1,1361 @@
+using System;
+using System.Collections;
+using System.Lex;
+using System.Parsing;
+using RexTokens;
+
+public static class RexParser
+{
+    public static System.RegularExpressions.Nfa Parse(RexLexer& lexer, System.RegularExpressions.Context* context)
+    {
+        UniquePtr<Value<System.RegularExpressions.Nfa>> value;
+        #if (DEBUG)
+            if (lexer.Log() != null)
+            {
+                lexer.Log()->WriteBeginRule(u"parse");
+                lexer.Log()->IncIndent();
+            }
+        #endif
+        ++lexer;
+        System.Lex.Span span = lexer.GetSpan();
+        Match match = RegularExpression(lexer, context);
+        value.Reset(cast<Value<System.RegularExpressions.Nfa>*>(match.value));
+        #if (DEBUG)
+            if (lexer.Log() != null)
+            {
+                lexer.Log()->DecIndent();
+                lexer.Log()->WriteEndRule(u"parse");
+            }
+        #endif
+        if (match.hit)
+        {
+            if (*lexer == System.Lex.END_TOKEN)
+            {
+                return value->value;
+            }
+            else
+            {
+                lexer.ThrowExpectationFailure(lexer.GetSpan(), GetEndTokenInfo());
+            }
+        }
+        else
+        {
+            lexer.ThrowExpectationFailure(span, u"RegularExpression");
+        }
+        return value->value;
+    }
+    public static Match RegularExpression(RexLexer& lexer, System.RegularExpressions.Context* context)
+    {
+        #if (DEBUG)
+            Span debugSpan;
+            bool writeToLog = lexer.Log() != null;
+            if (writeToLog)
+            {
+                debugSpan = lexer.GetSpan();
+                System.Lex.WriteBeginRuleToLog(lexer, u"RegularExpression");
+            }
+        #endif
+        UniquePtr<Value<System.RegularExpressions.Nfa>> alternative;
+        Match match(false);
+        Match* parentMatch0 = &match;
+        {
+            long pos = lexer.GetPos();
+            Match match = RexParser.Alternative(lexer, context);
+            alternative.Reset(cast<Value<System.RegularExpressions.Nfa>*>(match.value));
+            if (match.hit)
+            {
+                {
+                    #if (DEBUG)
+                        if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"RegularExpression");
+                    #endif
+                    return Match(true, new Value<System.RegularExpressions.Nfa>(alternative->value));
+                }
+            }
+            *parentMatch0 = match;
+        }
+        #if (DEBUG)
+            if (writeToLog)
+            {
+                if (match.hit)
+                {
+                    System.Lex.WriteSuccessToLog(lexer, debugSpan, u"RegularExpression");
+                }
+                else
+                {
+                    System.Lex.WriteFailureToLog(lexer, u"RegularExpression");
+                }
+            }
+        #endif
+        if (!match.hit)
+        {
+            match.value = null;
+        }
+        return match;
+    }
+    public static Match Alternative(RexLexer& lexer, System.RegularExpressions.Context* context)
+    {
+        #if (DEBUG)
+            Span debugSpan;
+            bool writeToLog = lexer.Log() != null;
+            if (writeToLog)
+            {
+                debugSpan = lexer.GetSpan();
+                System.Lex.WriteBeginRuleToLog(lexer, u"Alternative");
+            }
+        #endif
+        System.RegularExpressions.Nfa value;
+        UniquePtr<Value<System.RegularExpressions.Nfa>> left;
+        UniquePtr<Value<System.RegularExpressions.Nfa>> right;
+        Match match(false);
+        Match* parentMatch0 = &match;
+        {
+            long pos = lexer.GetPos();
+            Match match(false);
+            Match* parentMatch1 = &match;
+            {
+                Match match(false);
+                Match* parentMatch2 = &match;
+                {
+                    Match match(false);
+                    Match* parentMatch3 = &match;
+                    {
+                        long pos = lexer.GetPos();
+                        Match match = RexParser.Catenation(lexer, context);
+                        left.Reset(cast<Value<System.RegularExpressions.Nfa>*>(match.value));
+                        if (match.hit)
+                        {
+                            value = left->value;
+                        }
+                        *parentMatch3 = match;
+                    }
+                    *parentMatch2 = match;
+                }
+                if (match.hit)
+                {
+                    Match match(false);
+                    Match* parentMatch4 = &match;
+                    {
+                        Match match(true);
+                        Match* parentMatch5 = &match;
+                        {
+                            while (true)
+                            {
+                                long save = lexer.GetPos();
+                                {
+                                    Match match(false);
+                                    Match* parentMatch6 = &match;
+                                    {
+                                        Match match(false);
+                                        Match* parentMatch7 = &match;
+                                        {
+                                            Match match(false);
+                                            if (*lexer == ALT)
+                                            {
+                                                ++lexer;
+                                                match.hit = true;
+                                            }
+                                            *parentMatch7 = match;
+                                        }
+                                        if (match.hit)
+                                        {
+                                            Match match(false);
+                                            Match* parentMatch8 = &match;
+                                            {
+                                                Match match(false);
+                                                Match* parentMatch9 = &match;
+                                                {
+                                                    long pos = lexer.GetPos();
+                                                    Match match(true);
+                                                    Match* parentMatch10 = &match;
+                                                    {
+                                                        System.Lex.Span span = lexer.GetSpan();
+                                                        Match match = RexParser.Catenation(lexer, context);
+                                                        right.Reset(cast<Value<System.RegularExpressions.Nfa>*>(match.value));
+                                                        if (match.hit)
+                                                        {
+                                                            *parentMatch10 = match;
+                                                        }
+                                                        else
+                                                        {
+                                                            lexer.ThrowExpectationFailure(span, u"Catenation");
+                                                        }
+                                                    }
+                                                    if (match.hit)
+                                                    {
+                                                        value = System.RegularExpressions.Alt(*context, value, right->value);
+                                                    }
+                                                    *parentMatch9 = match;
+                                                }
+                                                *parentMatch8 = match;
+                                            }
+                                            *parentMatch7 = match;
+                                        }
+                                        *parentMatch6 = match;
+                                    }
+                                    if (match.hit)
+                                    {
+                                        *parentMatch5 = match;
+                                    }
+                                    else
+                                    {
+                                        lexer.SetPos(save);
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                        *parentMatch4 = match;
+                    }
+                    *parentMatch2 = match;
+                }
+                *parentMatch1 = match;
+            }
+            if (match.hit)
+            {
+                {
+                    #if (DEBUG)
+                        if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Alternative");
+                    #endif
+                    return Match(true, new Value<System.RegularExpressions.Nfa>(value));
+                }
+            }
+            *parentMatch0 = match;
+        }
+        #if (DEBUG)
+            if (writeToLog)
+            {
+                if (match.hit)
+                {
+                    System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Alternative");
+                }
+                else
+                {
+                    System.Lex.WriteFailureToLog(lexer, u"Alternative");
+                }
+            }
+        #endif
+        if (!match.hit)
+        {
+            match.value = null;
+        }
+        return match;
+    }
+    public static Match Catenation(RexLexer& lexer, System.RegularExpressions.Context* context)
+    {
+        #if (DEBUG)
+            Span debugSpan;
+            bool writeToLog = lexer.Log() != null;
+            if (writeToLog)
+            {
+                debugSpan = lexer.GetSpan();
+                System.Lex.WriteBeginRuleToLog(lexer, u"Catenation");
+            }
+        #endif
+        System.RegularExpressions.Nfa value;
+        UniquePtr<Value<System.RegularExpressions.Nfa>> left;
+        UniquePtr<Value<System.RegularExpressions.Nfa>> right;
+        Match match(false);
+        Match* parentMatch0 = &match;
+        {
+            long pos = lexer.GetPos();
+            Match match(false);
+            Match* parentMatch1 = &match;
+            {
+                Match match(false);
+                Match* parentMatch2 = &match;
+                {
+                    Match match(false);
+                    Match* parentMatch3 = &match;
+                    {
+                        long pos = lexer.GetPos();
+                        Match match = RexParser.Repetition(lexer, context);
+                        left.Reset(cast<Value<System.RegularExpressions.Nfa>*>(match.value));
+                        if (match.hit)
+                        {
+                            value = left->value;
+                        }
+                        *parentMatch3 = match;
+                    }
+                    *parentMatch2 = match;
+                }
+                if (match.hit)
+                {
+                    Match match(false);
+                    Match* parentMatch4 = &match;
+                    {
+                        Match match(true);
+                        Match* parentMatch5 = &match;
+                        {
+                            while (true)
+                            {
+                                long save = lexer.GetPos();
+                                {
+                                    Match match(false);
+                                    Match* parentMatch6 = &match;
+                                    {
+                                        Match match(false);
+                                        Match* parentMatch7 = &match;
+                                        {
+                                            long pos = lexer.GetPos();
+                                            Match match = RexParser.Repetition(lexer, context);
+                                            right.Reset(cast<Value<System.RegularExpressions.Nfa>*>(match.value));
+                                            if (match.hit)
+                                            {
+                                                value = System.RegularExpressions.Cat(value, right->value);
+                                            }
+                                            *parentMatch7 = match;
+                                        }
+                                        *parentMatch6 = match;
+                                    }
+                                    if (match.hit)
+                                    {
+                                        *parentMatch5 = match;
+                                    }
+                                    else
+                                    {
+                                        lexer.SetPos(save);
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                        *parentMatch4 = match;
+                    }
+                    *parentMatch2 = match;
+                }
+                *parentMatch1 = match;
+            }
+            if (match.hit)
+            {
+                {
+                    #if (DEBUG)
+                        if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Catenation");
+                    #endif
+                    return Match(true, new Value<System.RegularExpressions.Nfa>(value));
+                }
+            }
+            *parentMatch0 = match;
+        }
+        #if (DEBUG)
+            if (writeToLog)
+            {
+                if (match.hit)
+                {
+                    System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Catenation");
+                }
+                else
+                {
+                    System.Lex.WriteFailureToLog(lexer, u"Catenation");
+                }
+            }
+        #endif
+        if (!match.hit)
+        {
+            match.value = null;
+        }
+        return match;
+    }
+    public static Match Repetition(RexLexer& lexer, System.RegularExpressions.Context* context)
+    {
+        #if (DEBUG)
+            Span debugSpan;
+            bool writeToLog = lexer.Log() != null;
+            if (writeToLog)
+            {
+                debugSpan = lexer.GetSpan();
+                System.Lex.WriteBeginRuleToLog(lexer, u"Repetition");
+            }
+        #endif
+        System.RegularExpressions.Nfa value;
+        UniquePtr<Value<System.RegularExpressions.Nfa>> left;
+        Match match(false);
+        Match* parentMatch0 = &match;
+        {
+            long pos = lexer.GetPos();
+            Match match(false);
+            Match* parentMatch1 = &match;
+            {
+                Match match(false);
+                Match* parentMatch2 = &match;
+                {
+                    Match match(false);
+                    Match* parentMatch3 = &match;
+                    {
+                        long pos = lexer.GetPos();
+                        Match match = RexParser.Primary(lexer, context);
+                        left.Reset(cast<Value<System.RegularExpressions.Nfa>*>(match.value));
+                        if (match.hit)
+                        {
+                            value = left->value;
+                        }
+                        *parentMatch3 = match;
+                    }
+                    *parentMatch2 = match;
+                }
+                if (match.hit)
+                {
+                    Match match(false);
+                    Match* parentMatch4 = &match;
+                    {
+                        Match match(true);
+                        long save = lexer.GetPos();
+                        Match* parentMatch5 = &match;
+                        {
+                            Match match(false);
+                            Match* parentMatch6 = &match;
+                            {
+                                Match match(false);
+                                Match* parentMatch7 = &match;
+                                {
+                                    long save = lexer.GetPos();
+                                    Match match(false);
+                                    Match* parentMatch8 = &match;
+                                    {
+                                        long save = lexer.GetPos();
+                                        Match match(false);
+                                        Match* parentMatch9 = &match;
+                                        {
+                                            long pos = lexer.GetPos();
+                                            Match match(false);
+                                            if (*lexer == STAR)
+                                            {
+                                                ++lexer;
+                                                match.hit = true;
+                                            }
+                                            if (match.hit)
+                                            {
+                                                value = System.RegularExpressions.Kleene(*context, value);
+                                            }
+                                            *parentMatch9 = match;
+                                        }
+                                        *parentMatch8 = match;
+                                        if (!match.hit)
+                                        {
+                                            Match match(false);
+                                            Match* parentMatch10 = &match;
+                                            lexer.SetPos(save);
+                                            {
+                                                Match match(false);
+                                                Match* parentMatch11 = &match;
+                                                {
+                                                    long pos = lexer.GetPos();
+                                                    Match match(false);
+                                                    if (*lexer == PLUS)
+                                                    {
+                                                        ++lexer;
+                                                        match.hit = true;
+                                                    }
+                                                    if (match.hit)
+                                                    {
+                                                        value = System.RegularExpressions.Pos(*context, value);
+                                                    }
+                                                    *parentMatch11 = match;
+                                                }
+                                                *parentMatch10 = match;
+                                            }
+                                            *parentMatch8 = match;
+                                        }
+                                    }
+                                    *parentMatch7 = match;
+                                    if (!match.hit)
+                                    {
+                                        Match match(false);
+                                        Match* parentMatch12 = &match;
+                                        lexer.SetPos(save);
+                                        {
+                                            Match match(false);
+                                            Match* parentMatch13 = &match;
+                                            {
+                                                long pos = lexer.GetPos();
+                                                Match match(false);
+                                                if (*lexer == QUEST)
+                                                {
+                                                    ++lexer;
+                                                    match.hit = true;
+                                                }
+                                                if (match.hit)
+                                                {
+                                                    value = System.RegularExpressions.Opt(*context, value);
+                                                }
+                                                *parentMatch13 = match;
+                                            }
+                                            *parentMatch12 = match;
+                                        }
+                                        *parentMatch7 = match;
+                                    }
+                                }
+                                *parentMatch6 = match;
+                            }
+                            if (match.hit)
+                            {
+                                *parentMatch5 = match;
+                            }
+                            else
+                            {
+                                lexer.SetPos(save);
+                            }
+                        }
+                        *parentMatch4 = match;
+                    }
+                    *parentMatch2 = match;
+                }
+                *parentMatch1 = match;
+            }
+            if (match.hit)
+            {
+                {
+                    #if (DEBUG)
+                        if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Repetition");
+                    #endif
+                    return Match(true, new Value<System.RegularExpressions.Nfa>(value));
+                }
+            }
+            *parentMatch0 = match;
+        }
+        #if (DEBUG)
+            if (writeToLog)
+            {
+                if (match.hit)
+                {
+                    System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Repetition");
+                }
+                else
+                {
+                    System.Lex.WriteFailureToLog(lexer, u"Repetition");
+                }
+            }
+        #endif
+        if (!match.hit)
+        {
+            match.value = null;
+        }
+        return match;
+    }
+    public static Match Primary(RexLexer& lexer, System.RegularExpressions.Context* context)
+    {
+        #if (DEBUG)
+            Span debugSpan;
+            bool writeToLog = lexer.Log() != null;
+            if (writeToLog)
+            {
+                debugSpan = lexer.GetSpan();
+                System.Lex.WriteBeginRuleToLog(lexer, u"Primary");
+            }
+        #endif
+        System.RegularExpressions.Nfa value;
+        UniquePtr<Value<System.RegularExpressions.Nfa>> alt;
+        UniquePtr<System.RegularExpressions.Class> cls;
+        Match match(false);
+        Match* parentMatch0 = &match;
+        {
+            long pos = lexer.GetPos();
+            Match match(false);
+            Match* parentMatch1 = &match;
+            {
+                Match match(false);
+                Match* parentMatch2 = &match;
+                {
+                    long save = lexer.GetPos();
+                    Match match(false);
+                    Match* parentMatch3 = &match;
+                    {
+                        long save = lexer.GetPos();
+                        Match match(false);
+                        Match* parentMatch4 = &match;
+                        {
+                            long save = lexer.GetPos();
+                            Match match(false);
+                            Match* parentMatch5 = &match;
+                            {
+                                long save = lexer.GetPos();
+                                Match match(false);
+                                Match* parentMatch6 = &match;
+                                {
+                                    long save = lexer.GetPos();
+                                    Match match(false);
+                                    Match* parentMatch7 = &match;
+                                    {
+                                        long save = lexer.GetPos();
+                                        Match match(false);
+                                        Match* parentMatch8 = &match;
+                                        {
+                                            Match match(false);
+                                            Match* parentMatch9 = &match;
+                                            {
+                                                Match match(false);
+                                                if (*lexer == LPAREN)
+                                                {
+                                                    ++lexer;
+                                                    match.hit = true;
+                                                }
+                                                *parentMatch9 = match;
+                                            }
+                                            if (match.hit)
+                                            {
+                                                Match match(false);
+                                                Match* parentMatch10 = &match;
+                                                {
+                                                    Match match(false);
+                                                    Match* parentMatch11 = &match;
+                                                    {
+                                                        long pos = lexer.GetPos();
+                                                        Match match(true);
+                                                        Match* parentMatch12 = &match;
+                                                        {
+                                                            System.Lex.Span span = lexer.GetSpan();
+                                                            Match match = RexParser.Alternative(lexer, context);
+                                                            alt.Reset(cast<Value<System.RegularExpressions.Nfa>*>(match.value));
+                                                            if (match.hit)
+                                                            {
+                                                                *parentMatch12 = match;
+                                                            }
+                                                            else
+                                                            {
+                                                                lexer.ThrowExpectationFailure(span, u"Alternative");
+                                                            }
+                                                        }
+                                                        if (match.hit)
+                                                        {
+                                                            value = alt->value;
+                                                        }
+                                                        *parentMatch11 = match;
+                                                    }
+                                                    *parentMatch10 = match;
+                                                }
+                                                *parentMatch9 = match;
+                                            }
+                                            *parentMatch8 = match;
+                                        }
+                                        if (match.hit)
+                                        {
+                                            Match match(false);
+                                            Match* parentMatch13 = &match;
+                                            {
+                                                Match match(true);
+                                                Match* parentMatch14 = &match;
+                                                {
+                                                    System.Lex.Span span = lexer.GetSpan();
+                                                    Match match(false);
+                                                    if (*lexer == RPAREN)
+                                                    {
+                                                        ++lexer;
+                                                        match.hit = true;
+                                                    }
+                                                    if (match.hit)
+                                                    {
+                                                        *parentMatch14 = match;
+                                                    }
+                                                    else
+                                                    {
+                                                        lexer.ThrowExpectationFailure(span, GetTokenName(RPAREN));
+                                                    }
+                                                }
+                                                *parentMatch13 = match;
+                                            }
+                                            *parentMatch8 = match;
+                                        }
+                                        *parentMatch7 = match;
+                                        if (!match.hit)
+                                        {
+                                            Match match(false);
+                                            Match* parentMatch15 = &match;
+                                            lexer.SetPos(save);
+                                            {
+                                                Match match(false);
+                                                Match* parentMatch16 = &match;
+                                                {
+                                                    long pos = lexer.GetPos();
+                                                    Match match(false);
+                                                    if (*lexer == ESCAPE)
+                                                    {
+                                                        ++lexer;
+                                                        match.hit = true;
+                                                    }
+                                                    if (match.hit)
+                                                    {
+                                                        value = System.RegularExpressions.MakeNfa(*context, context->MakeChar(System.RegularExpressions.MakeEscapeValue(lexer.FileName(), lexer.GetToken(pos))));
+                                                    }
+                                                    *parentMatch16 = match;
+                                                }
+                                                *parentMatch15 = match;
+                                            }
+                                            *parentMatch7 = match;
+                                        }
+                                    }
+                                    *parentMatch6 = match;
+                                    if (!match.hit)
+                                    {
+                                        Match match(false);
+                                        Match* parentMatch17 = &match;
+                                        lexer.SetPos(save);
+                                        {
+                                            Match match(false);
+                                            Match* parentMatch18 = &match;
+                                            {
+                                                long pos = lexer.GetPos();
+                                                Match match(false);
+                                                if (*lexer == INVERSE)
+                                                {
+                                                    ++lexer;
+                                                    match.hit = true;
+                                                }
+                                                if (match.hit)
+                                                {
+                                                    value = System.RegularExpressions.MakeNfa(*context, context->MakeChar('^'));
+                                                }
+                                                *parentMatch18 = match;
+                                            }
+                                            *parentMatch17 = match;
+                                        }
+                                        *parentMatch6 = match;
+                                    }
+                                }
+                                *parentMatch5 = match;
+                                if (!match.hit)
+                                {
+                                    Match match(false);
+                                    Match* parentMatch19 = &match;
+                                    lexer.SetPos(save);
+                                    {
+                                        Match match(false);
+                                        Match* parentMatch20 = &match;
+                                        {
+                                            long pos = lexer.GetPos();
+                                            Match match(false);
+                                            if (*lexer == MINUS)
+                                            {
+                                                ++lexer;
+                                                match.hit = true;
+                                            }
+                                            if (match.hit)
+                                            {
+                                                value = System.RegularExpressions.MakeNfa(*context, context->MakeChar('-'));
+                                            }
+                                            *parentMatch20 = match;
+                                        }
+                                        *parentMatch19 = match;
+                                    }
+                                    *parentMatch5 = match;
+                                }
+                            }
+                            *parentMatch4 = match;
+                            if (!match.hit)
+                            {
+                                Match match(false);
+                                Match* parentMatch21 = &match;
+                                lexer.SetPos(save);
+                                {
+                                    Match match(false);
+                                    Match* parentMatch22 = &match;
+                                    {
+                                        long pos = lexer.GetPos();
+                                        Span span = lexer.GetSpan();
+                                        Match match(false);
+                                        if (*lexer == CHAR)
+                                        {
+                                            ++lexer;
+                                            match.hit = true;
+                                        }
+                                        if (match.hit)
+                                        {
+                                            ustring match = lexer.GetMatch(span);
+                                            value = System.RegularExpressions.MakeNfa(*context, context->MakeChar(match[0]));
+                                        }
+                                        *parentMatch22 = match;
+                                    }
+                                    *parentMatch21 = match;
+                                }
+                                *parentMatch4 = match;
+                            }
+                        }
+                        *parentMatch3 = match;
+                        if (!match.hit)
+                        {
+                            Match match(false);
+                            Match* parentMatch23 = &match;
+                            lexer.SetPos(save);
+                            {
+                                Match match(false);
+                                Match* parentMatch24 = &match;
+                                {
+                                    long pos = lexer.GetPos();
+                                    Match match(false);
+                                    if (*lexer == DOT)
+                                    {
+                                        ++lexer;
+                                        match.hit = true;
+                                    }
+                                    if (match.hit)
+                                    {
+                                        value = System.RegularExpressions.MakeNfa(*context, context->MakeAny());
+                                    }
+                                    *parentMatch24 = match;
+                                }
+                                *parentMatch23 = match;
+                            }
+                            *parentMatch3 = match;
+                        }
+                    }
+                    *parentMatch2 = match;
+                    if (!match.hit)
+                    {
+                        Match match(false);
+                        Match* parentMatch25 = &match;
+                        lexer.SetPos(save);
+                        {
+                            Match match(false);
+                            Match* parentMatch26 = &match;
+                            {
+                                long pos = lexer.GetPos();
+                                Match match = RexParser.Class(lexer, context);
+                                cls.Reset(cast<System.RegularExpressions.Class*>(match.value));
+                                if (match.hit)
+                                {
+                                    value = System.RegularExpressions.MakeNfa(*context, cls.Release());
+                                }
+                                *parentMatch26 = match;
+                            }
+                            *parentMatch25 = match;
+                        }
+                        *parentMatch2 = match;
+                    }
+                }
+                *parentMatch1 = match;
+            }
+            if (match.hit)
+            {
+                {
+                    #if (DEBUG)
+                        if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Primary");
+                    #endif
+                    return Match(true, new Value<System.RegularExpressions.Nfa>(value));
+                }
+            }
+            *parentMatch0 = match;
+        }
+        #if (DEBUG)
+            if (writeToLog)
+            {
+                if (match.hit)
+                {
+                    System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Primary");
+                }
+                else
+                {
+                    System.Lex.WriteFailureToLog(lexer, u"Primary");
+                }
+            }
+        #endif
+        if (!match.hit)
+        {
+            match.value = null;
+        }
+        return match;
+    }
+    public static Match Class(RexLexer& lexer, System.RegularExpressions.Context* context)
+    {
+        #if (DEBUG)
+            Span debugSpan;
+            bool writeToLog = lexer.Log() != null;
+            if (writeToLog)
+            {
+                debugSpan = lexer.GetSpan();
+                System.Lex.WriteBeginRuleToLog(lexer, u"Class");
+            }
+        #endif
+        System.RegularExpressions.Class* cls;
+        UniquePtr<System.RegularExpressions.Symbol> r;
+        Match match(false);
+        Match* parentMatch0 = &match;
+        {
+            long pos = lexer.GetPos();
+            Match match(false);
+            Match* parentMatch1 = &match;
+            {
+                Match match(false);
+                Match* parentMatch2 = &match;
+                {
+                    Match match(false);
+                    Match* parentMatch3 = &match;
+                    {
+                        Match match(false);
+                        Match* parentMatch4 = &match;
+                        {
+                            long pos = lexer.GetPos();
+                            Match match(false);
+                            if (*lexer == LBRACKET)
+                            {
+                                ++lexer;
+                                match.hit = true;
+                            }
+                            if (match.hit)
+                            {
+                                cls = context->MakeClass();
+                            }
+                            *parentMatch4 = match;
+                        }
+                        *parentMatch3 = match;
+                    }
+                    if (match.hit)
+                    {
+                        Match match(false);
+                        Match* parentMatch5 = &match;
+                        {
+                            Match match(false);
+                            Match* parentMatch6 = &match;
+                            {
+                                Match match(false);
+                                Match* parentMatch7 = &match;
+                                {
+                                    Match match(true);
+                                    long save = lexer.GetPos();
+                                    Match* parentMatch8 = &match;
+                                    {
+                                        Match match(false);
+                                        Match* parentMatch9 = &match;
+                                        {
+                                            Match match(false);
+                                            Match* parentMatch10 = &match;
+                                            {
+                                                long pos = lexer.GetPos();
+                                                Match match(false);
+                                                if (*lexer == INVERSE)
+                                                {
+                                                    ++lexer;
+                                                    match.hit = true;
+                                                }
+                                                if (match.hit)
+                                                {
+                                                    cls->SetInverse();
+                                                }
+                                                *parentMatch10 = match;
+                                            }
+                                            *parentMatch9 = match;
+                                        }
+                                        if (match.hit)
+                                        {
+                                            *parentMatch8 = match;
+                                        }
+                                        else
+                                        {
+                                            lexer.SetPos(save);
+                                        }
+                                    }
+                                    *parentMatch7 = match;
+                                }
+                                if (match.hit)
+                                {
+                                    Match match(false);
+                                    Match* parentMatch11 = &match;
+                                    {
+                                        Match match(true);
+                                        Match* parentMatch12 = &match;
+                                        {
+                                            while (true)
+                                            {
+                                                long save = lexer.GetPos();
+                                                {
+                                                    Match match(false);
+                                                    Match* parentMatch13 = &match;
+                                                    {
+                                                        Match match(false);
+                                                        Match* parentMatch14 = &match;
+                                                        {
+                                                            long pos = lexer.GetPos();
+                                                            Match match = RexParser.Range(lexer, context);
+                                                            r.Reset(cast<System.RegularExpressions.Symbol*>(match.value));
+                                                            if (match.hit)
+                                                            {
+                                                                cls->AddSymbol(r.Release());
+                                                            }
+                                                            *parentMatch14 = match;
+                                                        }
+                                                        *parentMatch13 = match;
+                                                    }
+                                                    if (match.hit)
+                                                    {
+                                                        *parentMatch12 = match;
+                                                    }
+                                                    else
+                                                    {
+                                                        lexer.SetPos(save);
+                                                        break;
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        *parentMatch11 = match;
+                                    }
+                                    *parentMatch7 = match;
+                                }
+                                *parentMatch6 = match;
+                            }
+                            *parentMatch5 = match;
+                        }
+                        *parentMatch3 = match;
+                    }
+                    *parentMatch2 = match;
+                }
+                if (match.hit)
+                {
+                    Match match(false);
+                    Match* parentMatch15 = &match;
+                    {
+                        Match match(true);
+                        Match* parentMatch16 = &match;
+                        {
+                            System.Lex.Span span = lexer.GetSpan();
+                            Match match(false);
+                            if (*lexer == RBRACKET)
+                            {
+                                ++lexer;
+                                match.hit = true;
+                            }
+                            if (match.hit)
+                            {
+                                *parentMatch16 = match;
+                            }
+                            else
+                            {
+                                lexer.ThrowExpectationFailure(span, GetTokenName(RBRACKET));
+                            }
+                        }
+                        *parentMatch15 = match;
+                    }
+                    *parentMatch2 = match;
+                }
+                *parentMatch1 = match;
+            }
+            if (match.hit)
+            {
+                {
+                    #if (DEBUG)
+                        if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Class");
+                    #endif
+                    return Match(true, cls);
+                }
+            }
+            *parentMatch0 = match;
+        }
+        #if (DEBUG)
+            if (writeToLog)
+            {
+                if (match.hit)
+                {
+                    System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Class");
+                }
+                else
+                {
+                    System.Lex.WriteFailureToLog(lexer, u"Class");
+                }
+            }
+        #endif
+        if (!match.hit)
+        {
+            match.value = null;
+        }
+        return match;
+    }
+    public static Match Range(RexLexer& lexer, System.RegularExpressions.Context* context)
+    {
+        #if (DEBUG)
+            Span debugSpan;
+            bool writeToLog = lexer.Log() != null;
+            if (writeToLog)
+            {
+                debugSpan = lexer.GetSpan();
+                System.Lex.WriteBeginRuleToLog(lexer, u"Range");
+            }
+        #endif
+        System.RegularExpressions.Symbol* symbol;
+        UniquePtr<Value<uchar>> s;
+        UniquePtr<Value<uchar>> e;
+        Match match(false);
+        Match* parentMatch0 = &match;
+        {
+            long pos = lexer.GetPos();
+            Match match(false);
+            Match* parentMatch1 = &match;
+            {
+                Match match(false);
+                Match* parentMatch2 = &match;
+                {
+                    Match match = RexParser.Char(lexer);
+                    s.Reset(cast<Value<uchar>*>(match.value));
+                    *parentMatch2 = match;
+                }
+                if (match.hit)
+                {
+                    Match match(false);
+                    Match* parentMatch3 = &match;
+                    {
+                        Match match(false);
+                        Match* parentMatch4 = &match;
+                        {
+                            Match match(false);
+                            Match* parentMatch5 = &match;
+                            {
+                                long save = lexer.GetPos();
+                                Match match(false);
+                                Match* parentMatch6 = &match;
+                                {
+                                    Match match(false);
+                                    if (*lexer == MINUS)
+                                    {
+                                        ++lexer;
+                                        match.hit = true;
+                                    }
+                                    *parentMatch6 = match;
+                                }
+                                if (match.hit)
+                                {
+                                    Match match(false);
+                                    Match* parentMatch7 = &match;
+                                    {
+                                        Match match(false);
+                                        Match* parentMatch8 = &match;
+                                        {
+                                            long pos = lexer.GetPos();
+                                            Match match = RexParser.Char(lexer);
+                                            e.Reset(cast<Value<uchar>*>(match.value));
+                                            if (match.hit)
+                                            {
+                                                symbol = context->MakeRange(s->value, e->value);
+                                            }
+                                            *parentMatch8 = match;
+                                        }
+                                        *parentMatch7 = match;
+                                    }
+                                    *parentMatch6 = match;
+                                }
+                                *parentMatch5 = match;
+                                if (!match.hit)
+                                {
+                                    Match match(false);
+                                    Match* parentMatch9 = &match;
+                                    lexer.SetPos(save);
+                                    {
+                                        Match match(false);
+                                        Match* parentMatch10 = &match;
+                                        {
+                                            long pos = lexer.GetPos();
+                                            Match match(true);
+                                            if (match.hit)
+                                            {
+                                                symbol = context->MakeChar(s->value);
+                                            }
+                                            *parentMatch10 = match;
+                                        }
+                                        *parentMatch9 = match;
+                                    }
+                                    *parentMatch5 = match;
+                                }
+                            }
+                            *parentMatch4 = match;
+                        }
+                        *parentMatch3 = match;
+                    }
+                    *parentMatch2 = match;
+                }
+                *parentMatch1 = match;
+            }
+            if (match.hit)
+            {
+                {
+                    #if (DEBUG)
+                        if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Range");
+                    #endif
+                    return Match(true, symbol);
+                }
+            }
+            *parentMatch0 = match;
+        }
+        #if (DEBUG)
+            if (writeToLog)
+            {
+                if (match.hit)
+                {
+                    System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Range");
+                }
+                else
+                {
+                    System.Lex.WriteFailureToLog(lexer, u"Range");
+                }
+            }
+        #endif
+        if (!match.hit)
+        {
+            match.value = null;
+        }
+        return match;
+    }
+    public static Match Char(RexLexer& lexer)
+    {
+        #if (DEBUG)
+            Span debugSpan;
+            bool writeToLog = lexer.Log() != null;
+            if (writeToLog)
+            {
+                debugSpan = lexer.GetSpan();
+                System.Lex.WriteBeginRuleToLog(lexer, u"Char");
+            }
+        #endif
+        Match match(false);
+        long pos = lexer.GetPos();
+        Span span = lexer.GetSpan();
+        switch (*lexer)
+        {
+            case LPAREN: 
+            {
+                ++lexer;
+                {
+                    #if (DEBUG)
+                        if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Char");
+                    #endif
+                    return Match(true, new Value<uchar>('('));
+                }
+                break;
+            }
+            case RPAREN: 
+            {
+                ++lexer;
+                {
+                    #if (DEBUG)
+                        if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Char");
+                    #endif
+                    return Match(true, new Value<uchar>(')'));
+                }
+                break;
+            }
+            case LBRACKET: 
+            {
+                ++lexer;
+                {
+                    #if (DEBUG)
+                        if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Char");
+                    #endif
+                    return Match(true, new Value<uchar>('['));
+                }
+                break;
+            }
+            case ALT: 
+            {
+                ++lexer;
+                {
+                    #if (DEBUG)
+                        if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Char");
+                    #endif
+                    return Match(true, new Value<uchar>('|'));
+                }
+                break;
+            }
+            case STAR: 
+            {
+                ++lexer;
+                {
+                    #if (DEBUG)
+                        if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Char");
+                    #endif
+                    return Match(true, new Value<uchar>('*'));
+                }
+                break;
+            }
+            case PLUS: 
+            {
+                ++lexer;
+                {
+                    #if (DEBUG)
+                        if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Char");
+                    #endif
+                    return Match(true, new Value<uchar>('+'));
+                }
+                break;
+            }
+            case QUEST: 
+            {
+                ++lexer;
+                {
+                    #if (DEBUG)
+                        if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Char");
+                    #endif
+                    return Match(true, new Value<uchar>('?'));
+                }
+                break;
+            }
+            case DOT: 
+            {
+                ++lexer;
+                {
+                    #if (DEBUG)
+                        if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Char");
+                    #endif
+                    return Match(true, new Value<uchar>('.'));
+                }
+                break;
+            }
+            case ESCAPE: 
+            {
+                ++lexer;
+                {
+                    #if (DEBUG)
+                        if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Char");
+                    #endif
+                    return Match(true, new Value<uchar>(System.RegularExpressions.MakeEscapeValue(lexer.FileName(), lexer.GetToken(pos))));
+                }
+                break;
+            }
+            case INVERSE: 
+            {
+                ++lexer;
+                {
+                    #if (DEBUG)
+                        if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Char");
+                    #endif
+                    return Match(true, new Value<uchar>('^'));
+                }
+                break;
+            }
+            case MINUS: 
+            {
+                ++lexer;
+                {
+                    #if (DEBUG)
+                        if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Char");
+                    #endif
+                    return Match(true, new Value<uchar>('-'));
+                }
+                break;
+            }
+            case CHAR: 
+            {
+                ++lexer;
+                ustring match = lexer.GetMatch(span);
+                {
+                    #if (DEBUG)
+                        if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Char");
+                    #endif
+                    return Match(true, new Value<uchar>(match[0]));
+                }
+                break;
+            }
+        }
+        #if (DEBUG)
+            if (writeToLog)
+            {
+                if (match.hit)
+                {
+                    System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Char");
+                }
+                else
+                {
+                    System.Lex.WriteFailureToLog(lexer, u"Char");
+                }
+            }
+        #endif
+        if (!match.hit)
+        {
+            match.value = null;
+        }
+        return match;
+    }
+}
