@@ -1,0 +1,148 @@
+// =================================
+// Copyright (c) 2019 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System.Lex;
+
+namespace System.Json
+{
+    public void ParseHexChar(uchar& value, const uchar*& p, const uchar* e, const System.Lex.Token& token)
+    {
+        if (p != e)
+        {
+            switch (cast<uchar>(*p))
+            {
+                case '0': case '1': case '2': case '3': case '4': case '5': case '6': case '7': case '8': case '9': 
+                {
+                    value = cast<uchar>(16 * cast<int>(value) + cast<int>(*p) - cast<int>('0'));
+                    break;
+                }
+                case 'A': case 'B': case 'C': case 'D': case 'E': case 'F': 
+                {
+                    value = cast<uchar>(16 * cast<int>(value) + 10 + cast<int>(*p) - cast<int>('A'));
+                    break;
+                }
+                case 'a': case 'b': case 'c': case 'd': case 'e': case 'f': 
+                {
+                    value = cast<uchar>(16 * cast<int>(value) + 10 + cast<int>(*p) - cast<int>('a'));
+                    break;
+                }
+            }
+            ++p;
+        }
+        else
+        {
+            throw Exception("hex character expected at line " + ToString(token.line) + ": " + ToUtf8(token.match.ToString()));
+        }
+    }
+    public uchar ParseEscape(const uchar*& p, const uchar* e, const System.Lex.Token& token)
+    {
+        uchar value = '\0';
+        if (p != e && (*p == 'x' || *p == 'X'))
+        {
+            ++p;
+            while (p != e && ((*p >= '0' && *p <= '9') || (*p >= 'a' && *p <= 'f') || (*p >= 'A' && *p <= 'F')))
+            {
+                ParseHexChar(value, p, e, token);
+            }
+        }
+        else if (p != e && (*p == 'd' || *p == 'D'))
+        {
+            ++p;
+            while (p != e && *p >= '0' && *p <= '9')
+            {
+                value = cast<uchar>(10 * cast<int>(value) + cast<int>(*p) - cast<int>('0'));
+                ++p;
+            }
+        }
+        else if (p != e && (*p >= '0' && *p <= '7'))
+        {
+            while (p != e && *p >= '0' && *p <= '7')
+            {
+                value = cast<uchar>(8 * cast<int>(value) + cast<int>(*p) - cast<int>('0'));
+                ++p;
+            }
+        }
+        else if (p != e && *p == 'u')
+        {
+            ++p;
+            ParseHexChar(value, p, e, token);
+            ParseHexChar(value, p, e, token);
+            ParseHexChar(value, p, e, token);
+            ParseHexChar(value, p, e, token);
+        }
+        else if (p != e && *p == 'U')
+        {
+            ++p;
+            ParseHexChar(value, p, e, token);
+            ParseHexChar(value, p, e, token);
+            ParseHexChar(value, p, e, token);
+            ParseHexChar(value, p, e, token);
+            ParseHexChar(value, p, e, token);
+            ParseHexChar(value, p, e, token);
+            ParseHexChar(value, p, e, token);
+            ParseHexChar(value, p, e, token);
+        }
+        else if (p != e)
+        {
+            switch (cast<uchar>(*p))
+            {
+                case 'a': value = '\a';
+                break;
+                case 'b': value = '\b';
+                break;
+                case 'f': value = '\f';
+                break;
+                case 'n': value = '\n';
+                break;
+                case 'r': value = '\r';
+                break;
+                case 't': value = '\t';
+                break;
+                case 'v': value = '\v';
+                break;
+                default: value = *p;
+                break;
+            }
+            ++p;
+        }
+        return value;
+    }
+    public ustring ParseStringLiteral(const Token& token)
+    {
+        ustring value;
+        uchar* p = token.match.begin;
+        uchar* e = token.match.end;
+        if (p != e && *p == '"')
+        {
+            ++p;
+        }
+        while (p != e && *p != '"')
+        {
+            if (*p == '\\')
+            {
+                ++p;
+                value.Append(ParseEscape(p, e, token));
+            }
+            else
+            {
+                value.Append(*p);
+            }
+        }
+        if (p != e && *p == '"')
+        {
+            ++p;
+        }
+        if (p != e)
+        {
+            throw Exception("invalid string literal at line " + ToString(token.line) + ": " + ToUtf8(token.match.ToString()));
+        }
+        return value;
+    }
+    
+    public double ParseNumber(const Token& token)
+    {
+        return ParseDouble(ToUtf8(token.match.ToString()));
+    }
+}

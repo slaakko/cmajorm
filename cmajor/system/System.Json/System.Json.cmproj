@@ -2,7 +2,7 @@
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
  <PropertyGroup Label="Globals">
   <CustomProjectExtensionsPath>$(LocalAppData)\CustomProjectSystems\Cmajor\</CustomProjectExtensionsPath>
-  <ProjectGuid>4f8a2dfb-6680-4c56-aaaa-bf46a9bad98f</ProjectGuid>
+  <ProjectGuid>a82a8093-1d24-4cb5-b542-6dae04b14e83</ProjectGuid>
  </PropertyGroup>
  <PropertyGroup>
   <TargetType>library</TargetType>
@@ -10,17 +10,22 @@
  <ItemGroup>
   <CmCompile Include="Json.cm"/>
   <CmCompile Include="JsonClassFactory.cm"/>
+  <CmCompile Include="JsonClassMap.cm"/>
   <CmCompile Include="JsonExport.cm"/>
-  <CmCompile Include="JsonGrammar.cm"/>
   <CmCompile Include="JsonImport.cm"/>
+  <CmCompile Include="JsonLexer.cm"/>
+  <CmCompile Include="JsonParser.cm"/>
+  <CmCompile Include="JsonTokens.cm"/>
+  <CmCompile Include="TokenValueParsers.cm"/>
  </ItemGroup>
  <ItemGroup>
-  <None Include="JsonGrammar.parser"/>
-  <None Include="JsonGrammar.pl"/>
-  <None Include="JsonGrammar.pp"/>
+  <None Include="JsonLexer.lexer"/>
+  <None Include="JsonParser.parser"/>
+  <None Include="JsonParser.spg"/>
  </ItemGroup>
  <ItemGroup>
-  <ProjectReference Include="../System.Text.Parsing/System.Text.Parsing.cmproj"/>
+  <ProjectReference Include="../System.Lex/System.Lex.cmproj"/>
+  <ProjectReference Include="../System.Parsing/System.Parsing.cmproj"/>
  </ItemGroup>
  <Import Project="$(CustomProjectExtensionsPath)Cmajor.props"/>
  <Import Project="$(CustomProjectExtensionsPath)Cmajor.targets"/>

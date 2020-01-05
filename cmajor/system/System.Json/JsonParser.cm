@@ -1,0 +1,717 @@
+using System;
+using System.Collections;
+using System.Lex;
+using System.Parsing;
+using JsonTokens;
+
+// this file has been automatically generated from 'D:/work/cmajorm/cmajor/system/System.Json/JsonParser.parser' using soulcm parser generator scmpg version 3.0.0
+
+public static class JsonParser
+{
+    public static UniquePtr<System.Json.JsonValue> Parse(JsonLexer& lexer)
+    {
+        UniquePtr<System.Json.JsonValue> value;
+        #if (DEBUG)
+            if (lexer.Log() != null)
+            {
+                lexer.Log()->WriteBeginRule(u"parse");
+                lexer.Log()->IncIndent();
+            }
+        #endif
+        ++lexer;
+        System.Lex.Span span = lexer.GetSpan();
+        Match match = Value(lexer);
+        value.Reset(cast<System.Json.JsonValue*>(match.value));
+        #if (DEBUG)
+            if (lexer.Log() != null)
+            {
+                lexer.Log()->DecIndent();
+                lexer.Log()->WriteEndRule(u"parse");
+            }
+        #endif
+        if (match.hit)
+        {
+            if (*lexer == System.Lex.END_TOKEN)
+            {
+                return value;
+            }
+            else
+            {
+                lexer.ThrowExpectationFailure(lexer.GetSpan(), GetEndTokenInfo());
+            }
+        }
+        else
+        {
+            lexer.ThrowExpectationFailure(span, u"Value");
+        }
+        return value;
+    }
+    public static Match Value(JsonLexer& lexer)
+    {
+        #if (DEBUG)
+            Span debugSpan;
+            bool writeToLog = lexer.Log() != null;
+            if (writeToLog)
+            {
+                debugSpan = lexer.GetSpan();
+                System.Lex.WriteBeginRuleToLog(lexer, u"Value");
+            }
+        #endif
+        UniquePtr<System.Json.JsonObject> o;
+        UniquePtr<System.Json.JsonArray> a;
+        Match match(false);
+        Match* parentMatch0 = &match;
+        {
+            long save = lexer.GetPos();
+            Match match(false);
+            Match* parentMatch1 = &match;
+            {
+                long save = lexer.GetPos();
+                Match match(false);
+                Match* parentMatch2 = &match;
+                {
+                    long save = lexer.GetPos();
+                    Match match(false);
+                    Match* parentMatch3 = &match;
+                    {
+                        long save = lexer.GetPos();
+                        Match match(false);
+                        Match* parentMatch4 = &match;
+                        {
+                            long save = lexer.GetPos();
+                            long pos = lexer.GetPos();
+                            Span span = lexer.GetSpan();
+                            switch (*lexer)
+                            {
+                                case STRING: 
+                                {
+                                    ++lexer;
+                                    Token token = lexer.GetToken(pos);
+                                    {
+                                        #if (DEBUG)
+                                            if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Value");
+                                        #endif
+                                        return Match(true, new System.Json.JsonString(System.Json.ParseStringLiteral(token)));
+                                    }
+                                    break;
+                                }
+                                case NUMBER: 
+                                {
+                                    ++lexer;
+                                    Token token = lexer.GetToken(pos);
+                                    {
+                                        #if (DEBUG)
+                                            if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Value");
+                                        #endif
+                                        return Match(true, new System.Json.JsonNumber(System.Json.ParseNumber(token)));
+                                    }
+                                    break;
+                                }
+                            }
+                            *parentMatch4 = match;
+                            if (!match.hit)
+                            {
+                                Match match(false);
+                                Match* parentMatch5 = &match;
+                                lexer.SetPos(save);
+                                {
+                                    Match match(false);
+                                    Match* parentMatch6 = &match;
+                                    {
+                                        long pos = lexer.GetPos();
+                                        Match match = JsonParser.Object(lexer);
+                                        o.Reset(cast<System.Json.JsonObject*>(match.value));
+                                        if (match.hit)
+                                        {
+                                            {
+                                                #if (DEBUG)
+                                                    if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Value");
+                                                #endif
+                                                return Match(true, o.Release());
+                                            }
+                                        }
+                                        *parentMatch6 = match;
+                                    }
+                                    *parentMatch5 = match;
+                                }
+                                *parentMatch4 = match;
+                            }
+                        }
+                        *parentMatch3 = match;
+                        if (!match.hit)
+                        {
+                            Match match(false);
+                            Match* parentMatch7 = &match;
+                            lexer.SetPos(save);
+                            {
+                                Match match(false);
+                                Match* parentMatch8 = &match;
+                                {
+                                    long pos = lexer.GetPos();
+                                    Match match = JsonParser.Array(lexer);
+                                    a.Reset(cast<System.Json.JsonArray*>(match.value));
+                                    if (match.hit)
+                                    {
+                                        {
+                                            #if (DEBUG)
+                                                if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Value");
+                                            #endif
+                                            return Match(true, a.Release());
+                                        }
+                                    }
+                                    *parentMatch8 = match;
+                                }
+                                *parentMatch7 = match;
+                            }
+                            *parentMatch3 = match;
+                        }
+                    }
+                    *parentMatch2 = match;
+                    if (!match.hit)
+                    {
+                        Match match(false);
+                        Match* parentMatch9 = &match;
+                        lexer.SetPos(save);
+                        {
+                            Match match(false);
+                            Match* parentMatch10 = &match;
+                            {
+                                long pos = lexer.GetPos();
+                                Match match(false);
+                                if (*lexer == TRUE)
+                                {
+                                    ++lexer;
+                                    match.hit = true;
+                                }
+                                if (match.hit)
+                                {
+                                    {
+                                        #if (DEBUG)
+                                            if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Value");
+                                        #endif
+                                        return Match(true, new System.Json.JsonBool(true));
+                                    }
+                                }
+                                *parentMatch10 = match;
+                            }
+                            *parentMatch9 = match;
+                        }
+                        *parentMatch2 = match;
+                    }
+                }
+                *parentMatch1 = match;
+                if (!match.hit)
+                {
+                    Match match(false);
+                    Match* parentMatch11 = &match;
+                    lexer.SetPos(save);
+                    {
+                        Match match(false);
+                        Match* parentMatch12 = &match;
+                        {
+                            long pos = lexer.GetPos();
+                            Match match(false);
+                            if (*lexer == FALSE)
+                            {
+                                ++lexer;
+                                match.hit = true;
+                            }
+                            if (match.hit)
+                            {
+                                {
+                                    #if (DEBUG)
+                                        if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Value");
+                                    #endif
+                                    return Match(true, new System.Json.JsonBool(false));
+                                }
+                            }
+                            *parentMatch12 = match;
+                        }
+                        *parentMatch11 = match;
+                    }
+                    *parentMatch1 = match;
+                }
+            }
+            *parentMatch0 = match;
+            if (!match.hit)
+            {
+                Match match(false);
+                Match* parentMatch13 = &match;
+                lexer.SetPos(save);
+                {
+                    Match match(false);
+                    Match* parentMatch14 = &match;
+                    {
+                        long pos = lexer.GetPos();
+                        Match match(false);
+                        if (*lexer == NULL)
+                        {
+                            ++lexer;
+                            match.hit = true;
+                        }
+                        if (match.hit)
+                        {
+                            {
+                                #if (DEBUG)
+                                    if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Value");
+                                #endif
+                                return Match(true, new System.Json.JsonNull());
+                            }
+                        }
+                        *parentMatch14 = match;
+                    }
+                    *parentMatch13 = match;
+                }
+                *parentMatch0 = match;
+            }
+        }
+        #if (DEBUG)
+            if (writeToLog)
+            {
+                if (match.hit)
+                {
+                    System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Value");
+                }
+                else
+                {
+                    System.Lex.WriteFailureToLog(lexer, u"Value");
+                }
+            }
+        #endif
+        if (!match.hit)
+        {
+            match.value = null;
+        }
+        return match;
+    }
+    public static Match Object(JsonLexer& lexer)
+    {
+        #if (DEBUG)
+            Span debugSpan;
+            bool writeToLog = lexer.Log() != null;
+            if (writeToLog)
+            {
+                debugSpan = lexer.GetSpan();
+                System.Lex.WriteBeginRuleToLog(lexer, u"Object");
+            }
+        #endif
+        UniquePtr<System.Json.JsonObject> o;
+        Match match(false);
+        Match* parentMatch0 = &match;
+        {
+            Match match(false);
+            Match* parentMatch1 = &match;
+            {
+                Match match(false);
+                Match* parentMatch2 = &match;
+                {
+                    long pos = lexer.GetPos();
+                    Match match(false);
+                    if (*lexer == LBRACE)
+                    {
+                        ++lexer;
+                        match.hit = true;
+                    }
+                    if (match.hit)
+                    {
+                        o.Reset(new System.Json.JsonObject());
+                    }
+                    *parentMatch2 = match;
+                }
+                *parentMatch1 = match;
+            }
+            if (match.hit)
+            {
+                Match match(false);
+                Match* parentMatch3 = &match;
+                {
+                    Match match(false);
+                    Match* parentMatch4 = &match;
+                    {
+                        Match match(false);
+                        Match* parentMatch5 = &match;
+                        {
+                            Match match = JsonParser.Field(lexer, o.Get());
+                            *parentMatch5 = match;
+                        }
+                        if (match.hit)
+                        {
+                            Match match(false);
+                            Match* parentMatch6 = &match;
+                            {
+                                Match match(true);
+                                Match* parentMatch7 = &match;
+                                {
+                                    while (true)
+                                    {
+                                        long save = lexer.GetPos();
+                                        {
+                                            Match match(false);
+                                            Match* parentMatch8 = &match;
+                                            {
+                                                Match match(false);
+                                                if (*lexer == COMMA)
+                                                {
+                                                    ++lexer;
+                                                    match.hit = true;
+                                                }
+                                                *parentMatch8 = match;
+                                            }
+                                            if (match.hit)
+                                            {
+                                                Match match(false);
+                                                Match* parentMatch9 = &match;
+                                                {
+                                                    Match match = JsonParser.Field(lexer, o.Get());
+                                                    *parentMatch9 = match;
+                                                }
+                                                *parentMatch8 = match;
+                                            }
+                                            if (match.hit)
+                                            {
+                                                *parentMatch7 = match;
+                                            }
+                                            else
+                                            {
+                                                lexer.SetPos(save);
+                                                break;
+                                            }
+                                        }
+                                    }
+                                }
+                                *parentMatch6 = match;
+                            }
+                            *parentMatch5 = match;
+                        }
+                        *parentMatch4 = match;
+                    }
+                    *parentMatch3 = match;
+                }
+                *parentMatch1 = match;
+            }
+            *parentMatch0 = match;
+        }
+        if (match.hit)
+        {
+            Match match(false);
+            Match* parentMatch10 = &match;
+            {
+                Match match(false);
+                Match* parentMatch11 = &match;
+                {
+                    long pos = lexer.GetPos();
+                    Match match(false);
+                    if (*lexer == RBRACE)
+                    {
+                        ++lexer;
+                        match.hit = true;
+                    }
+                    if (match.hit)
+                    {
+                        {
+                            #if (DEBUG)
+                                if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Object");
+                            #endif
+                            return Match(true, o.Release());
+                        }
+                    }
+                    *parentMatch11 = match;
+                }
+                *parentMatch10 = match;
+            }
+            *parentMatch0 = match;
+        }
+        #if (DEBUG)
+            if (writeToLog)
+            {
+                if (match.hit)
+                {
+                    System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Object");
+                }
+                else
+                {
+                    System.Lex.WriteFailureToLog(lexer, u"Object");
+                }
+            }
+        #endif
+        if (!match.hit)
+        {
+            match.value = null;
+        }
+        return match;
+    }
+    public static Match Field(JsonLexer& lexer, System.Json.JsonObject* o)
+    {
+        #if (DEBUG)
+            Span debugSpan;
+            bool writeToLog = lexer.Log() != null;
+            if (writeToLog)
+            {
+                debugSpan = lexer.GetSpan();
+                System.Lex.WriteBeginRuleToLog(lexer, u"Field");
+            }
+        #endif
+        ustring n;
+        UniquePtr<System.Json.JsonValue> v;
+        Match match(false);
+        Match* parentMatch0 = &match;
+        {
+            Match match(false);
+            Match* parentMatch1 = &match;
+            {
+                Match match(false);
+                Match* parentMatch2 = &match;
+                {
+                    long pos = lexer.GetPos();
+                    Match match(false);
+                    if (*lexer == STRING)
+                    {
+                        ++lexer;
+                        match.hit = true;
+                    }
+                    if (match.hit)
+                    {
+                        Token token = lexer.GetToken(pos);
+                        n = System.Json.ParseStringLiteral(token);
+                    }
+                    *parentMatch2 = match;
+                }
+                *parentMatch1 = match;
+            }
+            if (match.hit)
+            {
+                Match match(false);
+                Match* parentMatch3 = &match;
+                {
+                    Match match(false);
+                    if (*lexer == COLON)
+                    {
+                        ++lexer;
+                        match.hit = true;
+                    }
+                    *parentMatch3 = match;
+                }
+                *parentMatch1 = match;
+            }
+            *parentMatch0 = match;
+        }
+        if (match.hit)
+        {
+            Match match(false);
+            Match* parentMatch4 = &match;
+            {
+                Match match(false);
+                Match* parentMatch5 = &match;
+                {
+                    long pos = lexer.GetPos();
+                    Match match = JsonParser.Value(lexer);
+                    v.Reset(cast<System.Json.JsonValue*>(match.value));
+                    if (match.hit)
+                    {
+                        o->AddField(n, v.Release());
+                    }
+                    *parentMatch5 = match;
+                }
+                *parentMatch4 = match;
+            }
+            *parentMatch0 = match;
+        }
+        #if (DEBUG)
+            if (writeToLog)
+            {
+                if (match.hit)
+                {
+                    System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Field");
+                }
+                else
+                {
+                    System.Lex.WriteFailureToLog(lexer, u"Field");
+                }
+            }
+        #endif
+        if (!match.hit)
+        {
+            match.value = null;
+        }
+        return match;
+    }
+    public static Match Array(JsonLexer& lexer)
+    {
+        #if (DEBUG)
+            Span debugSpan;
+            bool writeToLog = lexer.Log() != null;
+            if (writeToLog)
+            {
+                debugSpan = lexer.GetSpan();
+                System.Lex.WriteBeginRuleToLog(lexer, u"Array");
+            }
+        #endif
+        UniquePtr<System.Json.JsonArray> a;
+        UniquePtr<System.Json.JsonValue> v;
+        Match match(false);
+        Match* parentMatch0 = &match;
+        {
+            Match match(false);
+            Match* parentMatch1 = &match;
+            {
+                Match match(false);
+                Match* parentMatch2 = &match;
+                {
+                    long pos = lexer.GetPos();
+                    Match match(false);
+                    if (*lexer == LBRACKET)
+                    {
+                        ++lexer;
+                        match.hit = true;
+                    }
+                    if (match.hit)
+                    {
+                        a.Reset(new System.Json.JsonArray());
+                    }
+                    *parentMatch2 = match;
+                }
+                *parentMatch1 = match;
+            }
+            if (match.hit)
+            {
+                Match match(false);
+                Match* parentMatch3 = &match;
+                {
+                    Match match(false);
+                    Match* parentMatch4 = &match;
+                    {
+                        Match match(false);
+                        Match* parentMatch5 = &match;
+                        {
+                            Match match(false);
+                            Match* parentMatch6 = &match;
+                            {
+                                long pos = lexer.GetPos();
+                                Match match = JsonParser.Value(lexer);
+                                v.Reset(cast<System.Json.JsonValue*>(match.value));
+                                if (match.hit)
+                                {
+                                    a->AddItem(v.Release());
+                                }
+                                *parentMatch6 = match;
+                            }
+                            *parentMatch5 = match;
+                        }
+                        if (match.hit)
+                        {
+                            Match match(false);
+                            Match* parentMatch7 = &match;
+                            {
+                                Match match(true);
+                                Match* parentMatch8 = &match;
+                                {
+                                    while (true)
+                                    {
+                                        long save = lexer.GetPos();
+                                        {
+                                            Match match(false);
+                                            Match* parentMatch9 = &match;
+                                            {
+                                                Match match(false);
+                                                if (*lexer == COMMA)
+                                                {
+                                                    ++lexer;
+                                                    match.hit = true;
+                                                }
+                                                *parentMatch9 = match;
+                                            }
+                                            if (match.hit)
+                                            {
+                                                Match match(false);
+                                                Match* parentMatch10 = &match;
+                                                {
+                                                    Match match(false);
+                                                    Match* parentMatch11 = &match;
+                                                    {
+                                                        long pos = lexer.GetPos();
+                                                        Match match = JsonParser.Value(lexer);
+                                                        v.Reset(cast<System.Json.JsonValue*>(match.value));
+                                                        if (match.hit)
+                                                        {
+                                                            a->AddItem(v.Release());
+                                                        }
+                                                        *parentMatch11 = match;
+                                                    }
+                                                    *parentMatch10 = match;
+                                                }
+                                                *parentMatch9 = match;
+                                            }
+                                            if (match.hit)
+                                            {
+                                                *parentMatch8 = match;
+                                            }
+                                            else
+                                            {
+                                                lexer.SetPos(save);
+                                                break;
+                                            }
+                                        }
+                                    }
+                                }
+                                *parentMatch7 = match;
+                            }
+                            *parentMatch5 = match;
+                        }
+                        *parentMatch4 = match;
+                    }
+                    *parentMatch3 = match;
+                }
+                *parentMatch1 = match;
+            }
+            *parentMatch0 = match;
+        }
+        if (match.hit)
+        {
+            Match match(false);
+            Match* parentMatch12 = &match;
+            {
+                Match match(false);
+                Match* parentMatch13 = &match;
+                {
+                    long pos = lexer.GetPos();
+                    Match match(false);
+                    if (*lexer == RBRACKET)
+                    {
+                        ++lexer;
+                        match.hit = true;
+                    }
+                    if (match.hit)
+                    {
+                        {
+                            #if (DEBUG)
+                                if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Array");
+                            #endif
+                            return Match(true, a.Release());
+                        }
+                    }
+                    *parentMatch13 = match;
+                }
+                *parentMatch12 = match;
+            }
+            *parentMatch0 = match;
+        }
+        #if (DEBUG)
+            if (writeToLog)
+            {
+                if (match.hit)
+                {
+                    System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Array");
+                }
+                else
+                {
+                    System.Lex.WriteFailureToLog(lexer, u"Array");
+                }
+            }
+        #endif
+        if (!match.hit)
+        {
+            match.value = null;
+        }
+        return match;
+    }
+}

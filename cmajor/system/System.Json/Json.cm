@@ -150,18 +150,18 @@ namespace System.Json
         public JsonObject() : fieldValues(), fieldMap()
         {
         }
-        public void AddField(const string& fieldName, UniquePtr<JsonValue>&& fieldValue)
+        public void AddField(const string& fieldName, JsonValue* fieldValue)
         {
             AddField(ToUtf32(fieldName), fieldValue);
         }
-        public void AddField(const wstring& fieldName, UniquePtr<JsonValue>&& fieldValue)
+        public void AddField(const wstring& fieldName, JsonValue* fieldValue)
         {
             AddField(ToUtf32(fieldName), fieldValue);
         }
-        public void AddField(const ustring& fieldName, UniquePtr<JsonValue>&& fieldValue)
+        public void AddField(const ustring& fieldName, JsonValue* fieldValue)
         {
-            fieldMap[fieldName] = fieldValue.Get();
-            fieldValues.Add(fieldValue);
+            fieldMap[fieldName] = fieldValue;
+            fieldValues.Add(UniquePtr<JsonValue>(fieldValue));
         }
         public JsonValue* GetField(const string& fieldName) const
         {
@@ -218,9 +218,9 @@ namespace System.Json
         public nothrow JsonArray() : items()
         {
         }
-        public void AddItem(UniquePtr<JsonValue>&& item)
+        public void AddItem(JsonValue* item)
         {
-            items.Add(item);
+            items.Add(UniquePtr<JsonValue>(item));
         }
         public JsonValue* operator[](long index) const 
         {
@@ -252,26 +252,6 @@ namespace System.Json
         private List<UniquePtr<JsonValue>> items;
     }
     
-    public class JsonParser
-    {
-        static JsonParser() : instance(new JsonParser())
-        {
-        }
-        public static nothrow JsonParser& Instance()
-        {
-            return *instance;
-        }
-        private JsonParser() : jsonGrammar(new JsonGrammar())
-        {
-        }
-        public nothrow JsonGrammar* GetJsonGrammar() const
-        {
-            return jsonGrammar;
-        }
-        private static UniquePtr<JsonParser> instance;
-        private JsonGrammar* jsonGrammar;
-    }
-    
     public UniquePtr<JsonValue> ParseJson(const string& jsonText)
     {
         return ParseJson(ToUtf32(jsonText));
@@ -284,7 +264,8 @@ namespace System.Json
     
     public UniquePtr<JsonValue> ParseJson(const ustring& jsonText)
     {
-        UniquePtr<JsonValue> jsonValue = JsonParser.Instance().GetJsonGrammar()->Parse(jsonText.Chars(), jsonText.Chars() + jsonText.Length(), 0, "");
+        JsonLexer jsonLexer(jsonText, "", 0);
+        UniquePtr<JsonValue> jsonValue = JsonParser.Parse(jsonLexer);
         return jsonValue;
     }
 }

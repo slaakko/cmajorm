@@ -1,0 +1,29 @@
+using JsonTokens;
+
+parser JsonParser
+{
+    uselexer JsonLexer;
+    main;
+    
+    Value : System.Json.JsonValue*
+        ::= STRING{ Token token = lexer.GetToken(pos); return new System.Json.JsonString(System.Json.ParseStringLiteral(token)); }
+        |   NUMBER{ Token token = lexer.GetToken(pos); return new System.Json.JsonNumber(System.Json.ParseNumber(token)); }
+        |   Object:o{ return o; }
+        |   Array:a{ return a; }
+        |   TRUE{ return new System.Json.JsonBool(true); }
+        |   FALSE{ return new System.Json.JsonBool(false); }
+        |   NULL{ return new System.Json.JsonNull(); }
+        ;
+        
+    Object(var UniquePtr<System.Json.JsonObject> o) : System.Json.JsonObject*
+        ::= LBRACE{ o.Reset(new System.Json.JsonObject()); } (Field(o.Get()):field % COMMA) RBRACE{ return o.Release(); }
+        ;
+        
+    Field(System.Json.JsonObject* o, var ustring n)
+        ::= STRING{ Token token = lexer.GetToken(pos); n = System.Json.ParseStringLiteral(token); } COLON Value:v{ o->AddField(n, v); }
+        ;
+        
+    Array(var UniquePtr<System.Json.JsonArray> a) : System.Json.JsonArray*
+        ::= LBRACKET{ a.Reset(new System.Json.JsonArray()); } (Value:v{ a->AddItem(v); } % COMMA) RBRACKET{ return a.Release(); }
+        ;
+}
