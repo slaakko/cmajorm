@@ -33,13 +33,10 @@ void AstWriter::Write(const Span& span)
     else
     {
         Span s = span;
-        if (lexers)
+        if (span.fileIndex >= 0 && span.fileIndex < lexers->size())
         {
-            if (span.fileIndex >= 0 && span.fileIndex < lexers->size())
-            {
-                soulng::lexer::Lexer* lexer = (*lexers)[span.fileIndex];
-                lexer->ConvertExternal(s);
-            }
+            soulng::lexer::Lexer* lexer = (*lexers)[span.fileIndex];
+            lexer->ConvertExternal(s);
         }
         binaryWriter.Write(true);
         binaryWriter.WriteULEB128UInt(static_cast<uint32_t>(s.fileIndex));

@@ -2136,7 +2136,7 @@ void CharacterTable::ReadExtendedHeader(BinaryReader& reader)
     extendedHeader.Read(reader);
 }
 
-std::recursive_mutex mtx;
+std::mutex mtx;
 
 const CharacterInfo& CharacterTable::GetCharacterInfo(char32_t codePoint)
 {
@@ -2147,7 +2147,7 @@ const CharacterInfo& CharacterTable::GetCharacterInfo(char32_t codePoint)
     int pageIndex = codePoint / numInfosInPage;
     if (pages.size() <= pageIndex)
     {
-        std::lock_guard<std::recursive_mutex> lock(mtx);
+        std::lock_guard<std::mutex> lock(mtx);
         while (pages.size() <= pageIndex)
         {
             pages.push_back(std::unique_ptr<CharacterInfoPage>());
@@ -2156,7 +2156,7 @@ const CharacterInfo& CharacterTable::GetCharacterInfo(char32_t codePoint)
     CharacterInfoPage* page = pages[pageIndex].get();
     if (!page)
     {
-        std::lock_guard<std::recursive_mutex> lock(mtx);
+        std::lock_guard<std::mutex> lock(mtx);
         if (!page)
         {
             std::string ucdFilePath = SoulNGUcdFilePath();
@@ -2206,7 +2206,7 @@ const ExtendedCharacterInfo& CharacterTable::GetExtendedCharacterInfo(char32_t c
     int pageIndex = codePoint / numInfosInPage;
     if (extendedPages.size() <= pageIndex)
     {
-        std::lock_guard<std::recursive_mutex> lock(mtx);
+        std::lock_guard<std::mutex> lock(mtx);
         while (extendedPages.size() <= pageIndex)
         {
             extendedPages.push_back(std::unique_ptr<ExtendedCharacterInfoPage>());
@@ -2215,7 +2215,7 @@ const ExtendedCharacterInfo& CharacterTable::GetExtendedCharacterInfo(char32_t c
     ExtendedCharacterInfoPage* extendedPage = extendedPages[pageIndex].get();
     if (!extendedPage)
     {
-        std::lock_guard<std::recursive_mutex> lock(mtx);
+        std::lock_guard<std::mutex> lock(mtx);
         if (!extendedPage)
         {
             std::string ucdFilePath = SoulNGUcdFilePath();

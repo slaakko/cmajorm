@@ -150,6 +150,19 @@ namespace System.Json
         public JsonObject() : fieldValues(), fieldMap()
         {
         }
+        public void AddField(const string& fieldName, UniquePtr<JsonValue>&& fieldValue)
+        {
+            AddField(ToUtf32(fieldName), fieldValue);
+        }
+        public void AddField(const wstring& fieldName, UniquePtr<JsonValue>&& fieldValue)
+        {
+            AddField(ToUtf32(fieldName), fieldValue);
+        }
+        public void AddField(const ustring& fieldName, UniquePtr<JsonValue>&& fieldValue)
+        {
+            fieldMap[fieldName] = fieldValue.Get();
+            fieldValues.Add(Rvalue(fieldValue));
+        }
         public void AddField(const string& fieldName, JsonValue* fieldValue)
         {
             AddField(ToUtf32(fieldName), fieldValue);
@@ -217,6 +230,10 @@ namespace System.Json
     {
         public nothrow JsonArray() : items()
         {
+        }
+        public void AddItem(UniquePtr<JsonValue>&& item)
+        {
+            items.Add(Rvalue(item));
         }
         public void AddItem(JsonValue* item)
         {

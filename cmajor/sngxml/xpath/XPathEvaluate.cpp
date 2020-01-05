@@ -28,7 +28,7 @@ std::unique_ptr<XPathObject> Evaluate(const std::u32string& xpathExpression, sng
     std::chrono::time_point<std::chrono::steady_clock> endQuery = std::chrono::steady_clock::now();
     if (XPathDebugQuery())
     {
-        std::unique_ptr<sngxml::dom::Node> queryDom = xpathExpr->ToDom();
+        std::unique_ptr<dom::Node> queryDom = xpathExpr->ToDom();
         SetXPathQueryDom(std::move(queryDom));
         SetXPathQueryDuration(std::chrono::nanoseconds(endQuery - startQuery));
     }

@@ -486,7 +486,7 @@ void ConversionFunctionNode::Accept(Visitor& visitor)
     visitor.Visit(*this);
 }
 
-MemberVariableNode::MemberVariableNode(const Span& span_) : Node(NodeType::memberVariableNode, span_)
+MemberVariableNode::MemberVariableNode(const Span& span_) : Node(NodeType::memberVariableNode, span_), specifiers()
 {
 }
 

@@ -25,6 +25,7 @@ parser api(SNGCM_PARSER_API) AttributeParser
     Attribute(sngcm::ast::Attributes* attributes, var Span s, var std::u32string name, var std::u32string value)
         ::= 
         (
+            empty{ value = U"true"; }
             ID{ s = span; name = lexer.GetMatch(span); } 
             (
                 ASSIGN STRINGLIT

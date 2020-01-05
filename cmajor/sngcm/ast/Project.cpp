@@ -246,7 +246,7 @@ void Project::ResolveDeclarations()
                 relativeSourceFilePaths.push_back(sfp.generic_string());
                 if (sfp.is_relative())
                 {
-                    sfp = (sourceBasePath / sfp).generic_path();
+                    sfp = sourceBasePath / sfp;
                 }
                 if (sfp.extension() != ".cm")
                 {

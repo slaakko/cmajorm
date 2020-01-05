@@ -20,7 +20,6 @@ FunctionNode* ConstExprFunctionRepository::GetFunctionNodeFor(FunctionSymbol* co
     {
         node = constExprFunctionSymbol->GetFunctionNode();
     }
-    Assert(node->GetNodeType() == NodeType::functionNode, "function node expected");
     FunctionNode* functionNode = static_cast<FunctionNode*>(node);
     boundCompileUnit.GetSymbolTable().MapNode(node, constExprFunctionSymbol);
     if (constExprFunctionSymbol->IsProject() && !constExprFunctionSymbol->IsBound())
