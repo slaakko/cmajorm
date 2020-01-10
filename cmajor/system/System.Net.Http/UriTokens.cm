@@ -1,0 +1,164 @@
+using System;
+
+// this file has been automatically generated from 'D:/work/cmajorm/cmajor/system/System.Net.Http/UriLexer.lexer' using soulcm lexer generator scmlg version 3.0.0
+
+namespace UriTokens
+{
+    public const int END = 0;
+    public const int DIGIT = 1;
+    public const int HEX = 2;
+    public const int ALPHA = 3;
+    public const int COLON = 4;
+    public const int SEMICOLON = 5;
+    public const int SLASH = 6;
+    public const int DOT = 7;
+    public const int DASH = 8;
+    public const int QUEST = 9;
+    public const int AT = 10;
+    public const int LBRACKET = 11;
+    public const int RBRACKET = 12;
+    public const int UNDERSCORE = 13;
+    public const int TILDE = 14;
+    public const int EXCLAMATION = 15;
+    public const int DOLLAR = 16;
+    public const int AMP = 17;
+    public const int SQ = 18;
+    public const int LPAREN = 19;
+    public const int RPAREN = 20;
+    public const int ASTERISK = 21;
+    public const int PLUS = 22;
+    public const int COMMA = 23;
+    public const int EQ = 24;
+    public const int PERCENT = 25;
+    public const int HASH = 26;
+    internal class TokenMap
+    {
+        static TokenMap() :
+            instance(new TokenMap())
+        {
+        }
+        public static TokenMap& Instance()
+        {
+            return *instance;
+        }
+        public int GetTokenId(const ustring& tokenName)
+        {
+            System.Collections.Map<ustring, int>.ConstIterator it = tokenIdMap.CFind(tokenName);
+            if (it != tokenIdMap.CEnd())
+            {
+                return it->second;
+            }
+            else
+            {
+                return -1;
+            }
+        }
+        public ustring GetTokenName(int tokenId)
+        {
+            return tokenNameList[tokenId];
+        }
+        public ustring GetTokenInfo(int tokenId)
+        {
+            return tokenInfoList[tokenId];
+        }
+        private TokenMap()
+        {
+            tokenIdMap[u"ALPHA"] = 3;
+            tokenIdMap[u"AMP"] = 17;
+            tokenIdMap[u"ASTERISK"] = 21;
+            tokenIdMap[u"AT"] = 10;
+            tokenIdMap[u"COLON"] = 4;
+            tokenIdMap[u"COMMA"] = 23;
+            tokenIdMap[u"DASH"] = 8;
+            tokenIdMap[u"DIGIT"] = 1;
+            tokenIdMap[u"DOLLAR"] = 16;
+            tokenIdMap[u"DOT"] = 7;
+            tokenIdMap[u"EQ"] = 24;
+            tokenIdMap[u"EXCLAMATION"] = 15;
+            tokenIdMap[u"HASH"] = 26;
+            tokenIdMap[u"HEX"] = 2;
+            tokenIdMap[u"LBRACKET"] = 11;
+            tokenIdMap[u"LPAREN"] = 19;
+            tokenIdMap[u"PERCENT"] = 25;
+            tokenIdMap[u"PLUS"] = 22;
+            tokenIdMap[u"QUEST"] = 9;
+            tokenIdMap[u"RBRACKET"] = 12;
+            tokenIdMap[u"RPAREN"] = 20;
+            tokenIdMap[u"SEMICOLON"] = 5;
+            tokenIdMap[u"SLASH"] = 6;
+            tokenIdMap[u"SQ"] = 18;
+            tokenIdMap[u"TILDE"] = 14;
+            tokenIdMap[u"UNDERSCORE"] = 13;
+            tokenNameList.Add(u"END");
+            tokenInfoList.Add(u"end of file");
+            tokenNameList.Add(u"DIGIT");
+            tokenInfoList.Add(u"'digit'");
+            tokenNameList.Add(u"HEX");
+            tokenInfoList.Add(u"'hex'");
+            tokenNameList.Add(u"ALPHA");
+            tokenInfoList.Add(u"'alpha'");
+            tokenNameList.Add(u"COLON");
+            tokenInfoList.Add(u"':'");
+            tokenNameList.Add(u"SEMICOLON");
+            tokenInfoList.Add(u"';'");
+            tokenNameList.Add(u"SLASH");
+            tokenInfoList.Add(u"'/'");
+            tokenNameList.Add(u"DOT");
+            tokenInfoList.Add(u"'.'");
+            tokenNameList.Add(u"DASH");
+            tokenInfoList.Add(u"'-'");
+            tokenNameList.Add(u"QUEST");
+            tokenInfoList.Add(u"'?'");
+            tokenNameList.Add(u"AT");
+            tokenInfoList.Add(u"'@'");
+            tokenNameList.Add(u"LBRACKET");
+            tokenInfoList.Add(u"'['");
+            tokenNameList.Add(u"RBRACKET");
+            tokenInfoList.Add(u"']'");
+            tokenNameList.Add(u"UNDERSCORE");
+            tokenInfoList.Add(u"'_'");
+            tokenNameList.Add(u"TILDE");
+            tokenInfoList.Add(u"'~'");
+            tokenNameList.Add(u"EXCLAMATION");
+            tokenInfoList.Add(u"'!'");
+            tokenNameList.Add(u"DOLLAR");
+            tokenInfoList.Add(u"'$'");
+            tokenNameList.Add(u"AMP");
+            tokenInfoList.Add(u"'&'");
+            tokenNameList.Add(u"SQ");
+            tokenInfoList.Add(u"'");
+            tokenNameList.Add(u"LPAREN");
+            tokenInfoList.Add(u"'('");
+            tokenNameList.Add(u"RPAREN");
+            tokenInfoList.Add(u"')'");
+            tokenNameList.Add(u"ASTERISK");
+            tokenInfoList.Add(u"'*'");
+            tokenNameList.Add(u"PLUS");
+            tokenInfoList.Add(u"'+'");
+            tokenNameList.Add(u"COMMA");
+            tokenInfoList.Add(u"','");
+            tokenNameList.Add(u"EQ");
+            tokenInfoList.Add(u"'='");
+            tokenNameList.Add(u"PERCENT");
+            tokenInfoList.Add(u"'%'");
+            tokenNameList.Add(u"HASH");
+            tokenInfoList.Add(u"'#'");
+        }
+        private static System.UniquePtr<TokenMap> instance;
+        private System.Collections.Map<ustring, int> tokenIdMap;
+        private System.Collections.List<ustring> tokenNameList;
+        private System.Collections.List<ustring> tokenInfoList;
+    }
+    public int GetTokenId(const ustring& tokenName)
+    {
+        return TokenMap.Instance().GetTokenId(tokenName);
+    }
+    public ustring GetTokenName(int tokenId)
+    {
+        return TokenMap.Instance().GetTokenName(tokenId);
+    }
+    public ustring GetTokenInfo(int tokenId)
+    {
+        return TokenMap.Instance().GetTokenInfo(tokenId);
+    }
+} // namespace UriTokens

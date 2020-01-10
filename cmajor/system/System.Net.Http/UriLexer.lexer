@@ -1,0 +1,72 @@
+classmap UriClassMap;
+
+tokens UriTokens
+{
+    (DIGIT, "'digit'"), (HEX, "'hex'"), (ALPHA, "'alpha'"), (COLON, "':'"), (SEMICOLON, "';'"), (SLASH, "'/'"), (DOT, "'.'"), (DASH, "'-'"), (QUEST, "'?'"), (AT, "'@'"), (LBRACKET, "'['"), (RBRACKET, "']'"),
+    (UNDERSCORE, "'_'"), (TILDE, "'~'"), (EXCLAMATION, "'!'"), (DOLLAR, "'$'"), (AMP, "'&'"), (SQ, "'"), (LPAREN, "'('"), (RPAREN, "')'"), (ASTERISK, "'*'"), (PLUS, "'+'"), (COMMA, "','"), (EQ, "'='"), (PERCENT, "'%'"), (HASH, "'#'")
+}
+
+expressions
+{
+    digit = "[0-9]";
+    hex = "{digit}|[a-fA-F]";
+    alpha = "[a-zA-Z]";
+    colon = ":";
+    semicolon = ";";
+    ctl = "[\x0-\x1f]";
+    sp = " ";
+    dq = "\"";
+    hash = "#";
+    langle = "<";
+    rangle = ">";
+    slash = "/";
+    quest = "\?";
+    at = "@";
+    lbracket = "\[";
+    rbracket = "\]";
+    dot = "\.";
+    dash = "-";
+    underscore = "_";
+    tilde = "~";
+    exclamation = "!";
+    dollar = "$";
+    amp = "&";
+    sq = "'";
+    lparen = "\(";
+    rparen = "\)";
+    asterisk = "\*";
+    plus = "\+";
+    comma = ",";
+    eq = "=";
+    percent = "%";
+}
+
+lexer UriLexer
+{
+    "{digit}"{ return DIGIT; }
+    "{hex}"{ return HEX; }
+    "{alpha}"{ return ALPHA; }
+    "{colon}"{ return COLON; }
+    "{semicolon}"{ return SEMICOLON; }
+    "{slash}"{ return SLASH; }
+    "{quest}"{ return QUEST; }
+    "{dot}"{ return DOT; }
+    "{dash}"{ return DASH; }
+    "{underscore}"{ return UNDERSCORE; }
+    "{tilde}"{ return TILDE; }
+    "{at}"{ return AT; }
+    "{exclamation}"{ return EXCLAMATION; }
+    "{lbracket}"{ return LBRACKET; }
+    "{rbracket}"{ return RBRACKET; }
+    "{dollar}"{ return DOLLAR; }
+    "{amp}"{ return AMP; }
+    "{sq}"{ return SQ; }
+    "{lparen}"{ return LPAREN; }
+    "{rparen}"{ return RPAREN; }
+    "{asterisk}"{ return ASTERISK; }
+    "{plus}"{ return PLUS; }
+    "{comma}"{ return COMMA; }
+    "{eq}"{ return EQ; }
+    "{percent}"{ return PERCENT; }
+    "{hash}"{ return HASH; }
+}

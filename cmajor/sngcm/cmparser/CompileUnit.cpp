@@ -1060,14 +1060,46 @@ soulng::parser::Match CompileUnitParser::NamespaceDefinition(CmajorLexer& lexer,
                         soulng::parser::Match match(false);
                         soulng::parser::Match* parentMatch6 = &match;
                         {
-                            int64_t pos = lexer.GetPos();
-                            soulng::lexer::Span span = lexer.GetSpan();
-                            soulng::parser::Match match = IdentifierParser::QualifiedId(lexer);
-                            nsName.reset(static_cast<IdentifierNode*>(match.value));
-                            if (match.hit)
+                            soulng::parser::Match match(false);
+                            soulng::parser::Match* parentMatch7 = &match;
                             {
-                                s.end = span.end;
-                                nsNode.reset(new NamespaceNode(s, nsName.release()));
+                                int64_t save = lexer.GetPos();
+                                soulng::parser::Match match(false);
+                                soulng::parser::Match* parentMatch8 = &match;
+                                {
+                                    int64_t pos = lexer.GetPos();
+                                    soulng::lexer::Span span = lexer.GetSpan();
+                                    soulng::parser::Match match = IdentifierParser::QualifiedId(lexer);
+                                    nsName.reset(static_cast<IdentifierNode*>(match.value));
+                                    if (match.hit)
+                                    {
+                                        s.end = span.end;
+                                        nsNode.reset(new NamespaceNode(s, nsName.release()));
+                                    }
+                                    *parentMatch8 = match;
+                                }
+                                *parentMatch7 = match;
+                                if (!match.hit)
+                                {
+                                    soulng::parser::Match match(false);
+                                    soulng::parser::Match* parentMatch9 = &match;
+                                    lexer.SetPos(save);
+                                    {
+                                        soulng::parser::Match match(false);
+                                        soulng::parser::Match* parentMatch10 = &match;
+                                        {
+                                            int64_t pos = lexer.GetPos();
+                                            soulng::parser::Match match(true);
+                                            if (match.hit)
+                                            {
+                                                nsNode.reset(new NamespaceNode(s, nullptr));
+                                            }
+                                            *parentMatch10 = match;
+                                        }
+                                        *parentMatch9 = match;
+                                    }
+                                    *parentMatch7 = match;
+                                }
                             }
                             *parentMatch6 = match;
                         }
@@ -1080,10 +1112,10 @@ soulng::parser::Match CompileUnitParser::NamespaceDefinition(CmajorLexer& lexer,
             if (match.hit)
             {
                 soulng::parser::Match match(false);
-                soulng::parser::Match* parentMatch7 = &match;
+                soulng::parser::Match* parentMatch11 = &match;
                 {
                     soulng::parser::Match match(true);
-                    soulng::parser::Match* parentMatch8 = &match;
+                    soulng::parser::Match* parentMatch12 = &match;
                     {
                         soulng::lexer::Span span = lexer.GetSpan();
                         soulng::parser::Match match(false);
@@ -1094,14 +1126,14 @@ soulng::parser::Match CompileUnitParser::NamespaceDefinition(CmajorLexer& lexer,
                         }
                         if (match.hit)
                         {
-                            *parentMatch8 = match;
+                            *parentMatch12 = match;
                         }
                         else
                         {
                             lexer.ThrowExpectationFailure(span, ToUtf32(GetTokenInfo(LBRACE)));
                         }
                     }
-                    *parentMatch7 = match;
+                    *parentMatch11 = match;
                 }
                 *parentMatch2 = match;
             }
@@ -1110,23 +1142,23 @@ soulng::parser::Match CompileUnitParser::NamespaceDefinition(CmajorLexer& lexer,
         if (match.hit)
         {
             soulng::parser::Match match(false);
-            soulng::parser::Match* parentMatch9 = &match;
+            soulng::parser::Match* parentMatch13 = &match;
             {
                 soulng::parser::Match match(true);
-                soulng::parser::Match* parentMatch10 = &match;
+                soulng::parser::Match* parentMatch14 = &match;
                 {
                     soulng::lexer::Span span = lexer.GetSpan();
                     soulng::parser::Match match = CompileUnitParser::NamespaceContent(lexer, ctx, cu, nsNode.get());
                     if (match.hit)
                     {
-                        *parentMatch10 = match;
+                        *parentMatch14 = match;
                     }
                     else
                     {
                         lexer.ThrowExpectationFailure(span, U"namespace content");
                     }
                 }
-                *parentMatch9 = match;
+                *parentMatch13 = match;
             }
             *parentMatch1 = match;
         }
@@ -1135,14 +1167,14 @@ soulng::parser::Match CompileUnitParser::NamespaceDefinition(CmajorLexer& lexer,
     if (match.hit)
     {
         soulng::parser::Match match(false);
-        soulng::parser::Match* parentMatch11 = &match;
+        soulng::parser::Match* parentMatch15 = &match;
         {
             soulng::parser::Match match(false);
-            soulng::parser::Match* parentMatch12 = &match;
+            soulng::parser::Match* parentMatch16 = &match;
             {
                 int64_t pos = lexer.GetPos();
                 soulng::parser::Match match(true);
-                soulng::parser::Match* parentMatch13 = &match;
+                soulng::parser::Match* parentMatch17 = &match;
                 {
                     soulng::lexer::Span span = lexer.GetSpan();
                     soulng::parser::Match match(false);
@@ -1153,7 +1185,7 @@ soulng::parser::Match CompileUnitParser::NamespaceDefinition(CmajorLexer& lexer,
                     }
                     if (match.hit)
                     {
-                        *parentMatch13 = match;
+                        *parentMatch17 = match;
                     }
                     else
                     {
@@ -1169,9 +1201,9 @@ soulng::parser::Match CompileUnitParser::NamespaceDefinition(CmajorLexer& lexer,
                         return soulng::parser::Match(true, nsNode.release());
                     }
                 }
-                *parentMatch12 = match;
+                *parentMatch16 = match;
             }
-            *parentMatch11 = match;
+            *parentMatch15 = match;
         }
         *parentMatch0 = match;
     }

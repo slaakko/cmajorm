@@ -1,0 +1,31 @@
+using System.Net.Http;
+using HttpTokens;
+
+parser HttpHeaderParser
+{
+    uselexer HttpLexer;
+    main;
+    
+    using Http.text;
+    using Http.chr;
+    using Http.ctl;
+    using Http.tspecial;
+    using Http.ctext;
+    using Http.token;
+    
+    message_header : HttpHeader
+        ::= (field_name:fn COLON field_value:fv?){ return HttpHeader(fn, fv); }
+        ;
+        
+    field_name : string
+        ::= token:tk{ return tk; }
+        ;
+        
+    field_value(var string s) : string
+        ::= ((LWS{ s.Append(' '); } | field_content:fc{ s.Append(fc); })+){ return s; }
+        ;
+    
+    field_content(var string s) : string
+        ::= ((text:t{ s.Append(t); })+){ return s; }
+        ;
+}

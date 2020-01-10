@@ -1765,7 +1765,8 @@ public static class ParserFileParser
                                 }
                                 if (match.hit)
                                 {
-                                    rule.Reset(new soulcm.scmpg.RuleParser(lexer.GetMatch(span)));
+                                    ustring id = lexer.GetMatch(span);
+                                    rule.Reset(new soulcm.scmpg.RuleParser(id));
                                 }
                                 *parentMatch5 = match;
                             }
@@ -3659,22 +3660,24 @@ public static class ParserFileParser
             case ID: 
             {
                 ++lexer;
+                ustring tokenName = lexer.GetMatch(span);
                 {
                     #if (DEBUG)
                         if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Primitive");
                     #endif
-                    return Match(true, new soulcm.scmpg.TokenParser(lexer.GetMatch(span)));
+                    return Match(true, new soulcm.scmpg.TokenParser(tokenName));
                 }
                 break;
             }
             case CHARLIT: 
             {
                 ++lexer;
+                uchar charLit = soulcm.scmpg.ParseCharLiteral(lexer.FileName(), lexer.GetToken(pos));
                 {
                     #if (DEBUG)
                         if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Primitive");
                     #endif
-                    return Match(true, new soulcm.scmpg.CharParser(soulcm.scmpg.ParseCharLiteral(lexer.FileName(), lexer.GetToken(pos))));
+                    return Match(true, new soulcm.scmpg.CharParser(charLit));
                 }
                 break;
             }
@@ -3684,11 +3687,12 @@ public static class ParserFileParser
                 ustring strLit = soulcm.scmpg.ParseStringLiteral(lexer.FileName(), lexer.GetToken(pos));
                 if (strLit.Length() > 0 && strLit[0] == '[' && strLit[strLit.Length() - 1] == ']')
                 {
+                    soulcm.scmpg.CharSet charSet = soulcm.scmpg.ParseCharSet(lexer.FileName(), lexer.GetToken(pos), strLit);
                     {
                         #if (DEBUG)
                             if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Primitive");
                         #endif
-                        return Match(true, new soulcm.scmpg.CharSetParser(soulcm.scmpg.ParseCharSet(lexer.FileName(), lexer.GetToken(pos), strLit)));
+                        return Match(true, new soulcm.scmpg.CharSetParser(charSet));
                     }
                 }
                 else

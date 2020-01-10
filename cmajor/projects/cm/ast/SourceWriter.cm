@@ -209,8 +209,15 @@ namespace Cm.Ast
         {
             if (!namespaceNode.Id()->Str().IsEmpty())
             {
-                formatter.Write("namespace ");
-                namespaceNode.Id()->Accept(*this);
+                if (namespaceNode.IsUnnamedNs())
+                {
+                    formatter.Write("namespace");
+                }
+                else
+                {
+                    formatter.Write("namespace ");
+                    namespaceNode.Id()->Accept(*this);
+                }
                 formatter.WriteLine();
                 formatter.WriteLine("{");
                 formatter.IncIndent();
@@ -235,7 +242,14 @@ namespace Cm.Ast
             if (!namespaceNode.Id()->Str().IsEmpty())
             {
                 formatter.DecIndent();
-                formatter.WriteLine("} // namespace " + ToUtf8(namespaceNode.Id()->Str()));
+                if (namespaceNode.IsUnnamedNs())
+                {
+                    formatter.WriteLine("} // namespace");
+                }
+                else
+                {
+                    formatter.WriteLine("} // namespace " + ToUtf8(namespaceNode.Id()->Str()));
+                }
             }
         }
         public override void Visit(AliasNode& aliasNode)

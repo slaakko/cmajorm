@@ -440,7 +440,7 @@ namespace Cm.Ast
         {
             base->Write(writer);
             initializers.Write(writer);
-            classId->Write(writer);
+            writer.Write(classId.Get());
         }
         public override void Read(AstReader& reader)
         {
@@ -499,7 +499,7 @@ namespace Cm.Ast
         {
             base->Write(writer);
             initializers.Write(writer);
-            classId->Write(writer);
+            writer.Write(classId.Get());
         }
         public override void Read(AstReader& reader)
         {
@@ -543,7 +543,7 @@ namespace Cm.Ast
         public override nothrow void Write(AstWriter& writer)
         {
             base->Write(writer);
-            classId->Write(writer);
+            writer.Write(classId.Get());
         }
         public override void Read(AstReader& reader)
         {
@@ -621,7 +621,7 @@ namespace Cm.Ast
     public class MemberVariableNode : Node
     {
         public nothrow MemberVariableNode(const System.Lex.Span& span_) :
-            base(NodeType.memberVariableNode, span_)
+            base(NodeType.memberVariableNode, span_), specifiers()
         {
         }
         public nothrow MemberVariableNode(const System.Lex.Span& span_, Specifiers specifiers_, Node* typeExpr_, IdentifierNode* id_, Attributes* attributes_) :

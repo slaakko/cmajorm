@@ -11,21 +11,21 @@ namespace System.Net.Http
 {
     public HttpStatus ReadStartOfMessage(ByteStream& stream, HttpHeaderCollection& headers, StreamWriter* log)
     {
-        ustring statusLine = ReadStartOfMessageWithStatus(stream, headers, log);
-        return HttpParser.Instance().ParseStatus(statusLine);
+        string statusLine = ReadStartOfMessageWithStatus(stream, headers, log);
+        return HttpParser.ParseStatus(statusLine);
     }
     
-    public ustring ReadStartOfMessageWithStatus(ByteStream& stream, HttpHeaderCollection& headers, StreamWriter* log)
+    public string ReadStartOfMessageWithStatus(ByteStream& stream, HttpHeaderCollection& headers, StreamWriter* log)
     {
         if (log != null)
         {
             log->WriteLine("RESPONSE:");
         }
         bool firstLine = true;
-        ustring startLine;
+        string startLine;
         int state = 0;
         int x = stream.ReadByte();
-        ustring line;
+        string line;
         while (x != -1)
         {
             byte c = cast<byte>(x);
@@ -39,7 +39,7 @@ namespace System.Net.Http
                     }
                     else
                     {
-                        line.Append(cast<uchar>(c));
+                        line.Append(cast<char>(c));
                         state = 2;
                     }
                     break;
@@ -52,7 +52,7 @@ namespace System.Net.Http
                     }
                     else if (c != 13u)
                     {
-                        line.Append(cast<uchar>(c));
+                        line.Append(cast<char>(c));
                         state = 2;
                     }
                     break;
@@ -65,7 +65,7 @@ namespace System.Net.Http
                     }
                     else
                     {
-                        line.Append(cast<uchar>(c));
+                        line.Append(cast<char>(c));
                     }
                     break;
                 }
@@ -84,7 +84,7 @@ namespace System.Net.Http
                         }
                         else
                         {
-                            HttpHeader hdr = HttpParser.Instance().ParseHeader(line);
+                            HttpHeader hdr = HttpParser.ParseHeader(line);
                             headers.Add(UniquePtr<HttpHeader>(new HttpHeader(hdr)));
                         }
                         line.Clear();
@@ -92,15 +92,15 @@ namespace System.Net.Http
                     }
                     else if (c == 13u)
                     {
-                        line.Append(cast<uchar>(13));
-                        line.Append(cast<uchar>(13));
+                        line.Append(cast<char>(13));
+                        line.Append(cast<char>(13));
                         state = 5;
                     }
                     else
                     {
                         state = 2;
-                        line.Append(cast<uchar>(13));
-                        line.Append(cast<uchar>(c));
+                        line.Append(cast<char>(13));
+                        line.Append(cast<char>(c));
                     }
                     break;
                 }
@@ -112,7 +112,7 @@ namespace System.Net.Http
                     }
                     else
                     {
-                        line.Append(cast<uchar>(c));
+                        line.Append(cast<char>(c));
                         state = 2;
                     }
                     break;
@@ -121,7 +121,7 @@ namespace System.Net.Http
                 {
                     if (c == 13u)
                     {
-                        line.Append(cast<uchar>(13));
+                        line.Append(cast<char>(13));
                     }
                     else if (c == 10u)
                     {
@@ -136,7 +136,7 @@ namespace System.Net.Http
                         }
                         else
                         {
-                            HttpHeader hdr = HttpParser.Instance().ParseHeader(line);
+                            HttpHeader hdr = HttpParser.ParseHeader(line);
                             headers.Add(UniquePtr<HttpHeader>(new HttpHeader(hdr)));
                         }
                         line.Clear();
@@ -144,7 +144,7 @@ namespace System.Net.Http
                     }
                     else
                     {
-                        line.Append(cast<uchar>(c));
+                        line.Append(cast<char>(c));
                         state = 2;
                     }
                     break;
@@ -157,8 +157,8 @@ namespace System.Net.Http
                     }
                     else
                     {
-                        line.Append(cast<uchar>(13));
-                        line.Append(cast<uchar>(c));
+                        line.Append(cast<char>(13));
+                        line.Append(cast<char>(c));
                         state = 2;
                     }
                     break;
@@ -166,6 +166,6 @@ namespace System.Net.Http
             }
             x = stream.ReadByte();
         }
-        throw HttpException(HttpStatus(u"HTTP/1.1", statusClientErrorBadRequest, u"invalid HTTP message"));
+        throw HttpException(HttpStatus("HTTP/1.1", statusClientErrorBadRequest, "invalid HTTP message"));
     }
 }

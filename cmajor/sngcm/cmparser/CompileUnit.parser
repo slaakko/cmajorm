@@ -95,7 +95,8 @@ parser api(SNGCM_PARSER_API) CompileUnitParser
         ;
 
     NamespaceDefinition(ParsingContext* ctx, sngcm::ast::CompileUnitNode* cu, sngcm::ast::NamespaceNode* ns, var std::unique_ptr<NamespaceNode> nsNode, var Span s) : NamespaceNode*
-        ::= NAMESPACE{ s = span; } QualifiedId:nsName{ s.end = span.end; nsNode.reset(new NamespaceNode(s, nsName)); } LBRACE! NamespaceContent(ctx, cu, nsNode.get()):content! RBRACE!
+        ::= NAMESPACE{ s = span; } (QualifiedId:nsName{ s.end = span.end; nsNode.reset(new NamespaceNode(s, nsName)); } | empty{ nsNode.reset(new NamespaceNode(s, nullptr)); })
+            LBRACE! NamespaceContent(ctx, cu, nsNode.get()):content! RBRACE!
         {
             return nsNode.release();
         }

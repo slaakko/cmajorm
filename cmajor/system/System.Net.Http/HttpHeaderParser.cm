@@ -1,0 +1,487 @@
+using System;
+using System.Collections;
+using System.Lex;
+using System.Parsing;
+using System.Net.Http;
+using HttpTokens;
+
+// this file has been automatically generated from 'D:/work/cmajorm/cmajor/system/System.Net.Http/HttpHeaderParser.parser' using soulcm parser generator scmpg version 3.0.0
+
+public static class HttpHeaderParser
+{
+    public static HttpHeader Parse(HttpLexer& lexer)
+    {
+        UniquePtr<Value<HttpHeader>> value;
+        #if (DEBUG)
+            if (lexer.Log() != null)
+            {
+                lexer.Log()->WriteBeginRule(u"parse");
+                lexer.Log()->IncIndent();
+            }
+        #endif
+        ++lexer;
+        System.Lex.Span span = lexer.GetSpan();
+        Match match = message_header(lexer);
+        value.Reset(cast<Value<HttpHeader>*>(match.value));
+        #if (DEBUG)
+            if (lexer.Log() != null)
+            {
+                lexer.Log()->DecIndent();
+                lexer.Log()->WriteEndRule(u"parse");
+            }
+        #endif
+        if (match.hit)
+        {
+            if (*lexer == System.Lex.END_TOKEN)
+            {
+                return value->value;
+            }
+            else
+            {
+                lexer.ThrowExpectationFailure(lexer.GetSpan(), GetEndTokenInfo());
+            }
+        }
+        else
+        {
+            lexer.ThrowExpectationFailure(span, u"message_header");
+        }
+        return value->value;
+    }
+    public static Match message_header(HttpLexer& lexer)
+    {
+        #if (DEBUG)
+            Span debugSpan;
+            bool writeToLog = lexer.Log() != null;
+            if (writeToLog)
+            {
+                debugSpan = lexer.GetSpan();
+                System.Lex.WriteBeginRuleToLog(lexer, u"message_header");
+            }
+        #endif
+        UniquePtr<Value<string>> fn;
+        UniquePtr<Value<string>> fv;
+        Match match(false);
+        Match* parentMatch0 = &match;
+        {
+            long pos = lexer.GetPos();
+            Match match(false);
+            Match* parentMatch1 = &match;
+            {
+                Match match(false);
+                Match* parentMatch2 = &match;
+                {
+                    Match match(false);
+                    Match* parentMatch3 = &match;
+                    {
+                        Match match = HttpHeaderParser.field_name(lexer);
+                        fn.Reset(cast<Value<string>*>(match.value));
+                        *parentMatch3 = match;
+                    }
+                    if (match.hit)
+                    {
+                        Match match(false);
+                        Match* parentMatch4 = &match;
+                        {
+                            Match match(false);
+                            if (*lexer == COLON)
+                            {
+                                ++lexer;
+                                match.hit = true;
+                            }
+                            *parentMatch4 = match;
+                        }
+                        *parentMatch3 = match;
+                    }
+                    *parentMatch2 = match;
+                }
+                if (match.hit)
+                {
+                    Match match(false);
+                    Match* parentMatch5 = &match;
+                    {
+                        Match match(true);
+                        long save = lexer.GetPos();
+                        Match* parentMatch6 = &match;
+                        {
+                            Match match = HttpHeaderParser.field_value(lexer);
+                            fv.Reset(cast<Value<string>*>(match.value));
+                            if (match.hit)
+                            {
+                                *parentMatch6 = match;
+                            }
+                            else
+                            {
+                                lexer.SetPos(save);
+                            }
+                        }
+                        *parentMatch5 = match;
+                    }
+                    *parentMatch2 = match;
+                }
+                *parentMatch1 = match;
+            }
+            if (match.hit)
+            {
+                {
+                    #if (DEBUG)
+                        if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"message_header");
+                    #endif
+                    return Match(true, new Value<HttpHeader>(HttpHeader(fn->value, fv->value)));
+                }
+            }
+            *parentMatch0 = match;
+        }
+        #if (DEBUG)
+            if (writeToLog)
+            {
+                if (match.hit)
+                {
+                    System.Lex.WriteSuccessToLog(lexer, debugSpan, u"message_header");
+                }
+                else
+                {
+                    System.Lex.WriteFailureToLog(lexer, u"message_header");
+                }
+            }
+        #endif
+        if (!match.hit)
+        {
+            match.value = null;
+        }
+        return match;
+    }
+    public static Match field_name(HttpLexer& lexer)
+    {
+        #if (DEBUG)
+            Span debugSpan;
+            bool writeToLog = lexer.Log() != null;
+            if (writeToLog)
+            {
+                debugSpan = lexer.GetSpan();
+                System.Lex.WriteBeginRuleToLog(lexer, u"field_name");
+            }
+        #endif
+        UniquePtr<Value<string>> tk;
+        Match match(false);
+        Match* parentMatch0 = &match;
+        {
+            long pos = lexer.GetPos();
+            Match match = Http.token(lexer);
+            tk.Reset(cast<Value<string>*>(match.value));
+            if (match.hit)
+            {
+                {
+                    #if (DEBUG)
+                        if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"field_name");
+                    #endif
+                    return Match(true, new Value<string>(tk->value));
+                }
+            }
+            *parentMatch0 = match;
+        }
+        #if (DEBUG)
+            if (writeToLog)
+            {
+                if (match.hit)
+                {
+                    System.Lex.WriteSuccessToLog(lexer, debugSpan, u"field_name");
+                }
+                else
+                {
+                    System.Lex.WriteFailureToLog(lexer, u"field_name");
+                }
+            }
+        #endif
+        if (!match.hit)
+        {
+            match.value = null;
+        }
+        return match;
+    }
+    public static Match field_value(HttpLexer& lexer)
+    {
+        #if (DEBUG)
+            Span debugSpan;
+            bool writeToLog = lexer.Log() != null;
+            if (writeToLog)
+            {
+                debugSpan = lexer.GetSpan();
+                System.Lex.WriteBeginRuleToLog(lexer, u"field_value");
+            }
+        #endif
+        string s;
+        UniquePtr<Value<string>> fc;
+        Match match(false);
+        Match* parentMatch0 = &match;
+        {
+            long pos = lexer.GetPos();
+            Match match(false);
+            Match* parentMatch1 = &match;
+            {
+                Match match(false);
+                Match* parentMatch2 = &match;
+                {
+                    Match match(false);
+                    Match* parentMatch3 = &match;
+                    {
+                        Match match(false);
+                        Match* parentMatch4 = &match;
+                        {
+                            long save = lexer.GetPos();
+                            Match match(false);
+                            Match* parentMatch5 = &match;
+                            {
+                                long pos = lexer.GetPos();
+                                Match match(false);
+                                if (*lexer == LWS)
+                                {
+                                    ++lexer;
+                                    match.hit = true;
+                                }
+                                if (match.hit)
+                                {
+                                    s.Append(' ');
+                                }
+                                *parentMatch5 = match;
+                            }
+                            *parentMatch4 = match;
+                            if (!match.hit)
+                            {
+                                Match match(false);
+                                Match* parentMatch6 = &match;
+                                lexer.SetPos(save);
+                                {
+                                    Match match(false);
+                                    Match* parentMatch7 = &match;
+                                    {
+                                        long pos = lexer.GetPos();
+                                        Match match = HttpHeaderParser.field_content(lexer);
+                                        fc.Reset(cast<Value<string>*>(match.value));
+                                        if (match.hit)
+                                        {
+                                            s.Append(fc->value);
+                                        }
+                                        *parentMatch7 = match;
+                                    }
+                                    *parentMatch6 = match;
+                                }
+                                *parentMatch4 = match;
+                            }
+                        }
+                        *parentMatch3 = match;
+                    }
+                    *parentMatch2 = match;
+                }
+                if (match.hit)
+                {
+                    Match match(true);
+                    Match* parentMatch8 = &match;
+                    while (true)
+                    {
+                        long save = lexer.GetPos();
+                        {
+                            Match match(false);
+                            Match* parentMatch9 = &match;
+                            {
+                                Match match(false);
+                                Match* parentMatch10 = &match;
+                                {
+                                    long save = lexer.GetPos();
+                                    Match match(false);
+                                    Match* parentMatch11 = &match;
+                                    {
+                                        long pos = lexer.GetPos();
+                                        Match match(false);
+                                        if (*lexer == LWS)
+                                        {
+                                            ++lexer;
+                                            match.hit = true;
+                                        }
+                                        if (match.hit)
+                                        {
+                                            s.Append(' ');
+                                        }
+                                        *parentMatch11 = match;
+                                    }
+                                    *parentMatch10 = match;
+                                    if (!match.hit)
+                                    {
+                                        Match match(false);
+                                        Match* parentMatch12 = &match;
+                                        lexer.SetPos(save);
+                                        {
+                                            Match match(false);
+                                            Match* parentMatch13 = &match;
+                                            {
+                                                long pos = lexer.GetPos();
+                                                Match match = HttpHeaderParser.field_content(lexer);
+                                                fc.Reset(cast<Value<string>*>(match.value));
+                                                if (match.hit)
+                                                {
+                                                    s.Append(fc->value);
+                                                }
+                                                *parentMatch13 = match;
+                                            }
+                                            *parentMatch12 = match;
+                                        }
+                                        *parentMatch10 = match;
+                                    }
+                                }
+                                *parentMatch9 = match;
+                            }
+                            if (match.hit)
+                            {
+                                *parentMatch8 = match;
+                            }
+                            else
+                            {
+                                lexer.SetPos(save);
+                                break;
+                            }
+                        }
+                    }
+                }
+                *parentMatch1 = match;
+            }
+            if (match.hit)
+            {
+                {
+                    #if (DEBUG)
+                        if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"field_value");
+                    #endif
+                    return Match(true, new Value<string>(s));
+                }
+            }
+            *parentMatch0 = match;
+        }
+        #if (DEBUG)
+            if (writeToLog)
+            {
+                if (match.hit)
+                {
+                    System.Lex.WriteSuccessToLog(lexer, debugSpan, u"field_value");
+                }
+                else
+                {
+                    System.Lex.WriteFailureToLog(lexer, u"field_value");
+                }
+            }
+        #endif
+        if (!match.hit)
+        {
+            match.value = null;
+        }
+        return match;
+    }
+    public static Match field_content(HttpLexer& lexer)
+    {
+        #if (DEBUG)
+            Span debugSpan;
+            bool writeToLog = lexer.Log() != null;
+            if (writeToLog)
+            {
+                debugSpan = lexer.GetSpan();
+                System.Lex.WriteBeginRuleToLog(lexer, u"field_content");
+            }
+        #endif
+        string s;
+        UniquePtr<Value<char>> t;
+        Match match(false);
+        Match* parentMatch0 = &match;
+        {
+            long pos = lexer.GetPos();
+            Match match(false);
+            Match* parentMatch1 = &match;
+            {
+                Match match(false);
+                Match* parentMatch2 = &match;
+                {
+                    Match match(false);
+                    Match* parentMatch3 = &match;
+                    {
+                        Match match(false);
+                        Match* parentMatch4 = &match;
+                        {
+                            long pos = lexer.GetPos();
+                            Match match = Http.text(lexer);
+                            t.Reset(cast<Value<char>*>(match.value));
+                            if (match.hit)
+                            {
+                                s.Append(t->value);
+                            }
+                            *parentMatch4 = match;
+                        }
+                        *parentMatch3 = match;
+                    }
+                    *parentMatch2 = match;
+                }
+                if (match.hit)
+                {
+                    Match match(true);
+                    Match* parentMatch5 = &match;
+                    while (true)
+                    {
+                        long save = lexer.GetPos();
+                        {
+                            Match match(false);
+                            Match* parentMatch6 = &match;
+                            {
+                                Match match(false);
+                                Match* parentMatch7 = &match;
+                                {
+                                    long pos = lexer.GetPos();
+                                    Match match = Http.text(lexer);
+                                    t.Reset(cast<Value<char>*>(match.value));
+                                    if (match.hit)
+                                    {
+                                        s.Append(t->value);
+                                    }
+                                    *parentMatch7 = match;
+                                }
+                                *parentMatch6 = match;
+                            }
+                            if (match.hit)
+                            {
+                                *parentMatch5 = match;
+                            }
+                            else
+                            {
+                                lexer.SetPos(save);
+                                break;
+                            }
+                        }
+                    }
+                }
+                *parentMatch1 = match;
+            }
+            if (match.hit)
+            {
+                {
+                    #if (DEBUG)
+                        if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"field_content");
+                    #endif
+                    return Match(true, new Value<string>(s));
+                }
+            }
+            *parentMatch0 = match;
+        }
+        #if (DEBUG)
+            if (writeToLog)
+            {
+                if (match.hit)
+                {
+                    System.Lex.WriteSuccessToLog(lexer, debugSpan, u"field_content");
+                }
+                else
+                {
+                    System.Lex.WriteFailureToLog(lexer, u"field_content");
+                }
+            }
+        #endif
+        if (!match.hit)
+        {
+            match.value = null;
+        }
+        return match;
+    }
+}

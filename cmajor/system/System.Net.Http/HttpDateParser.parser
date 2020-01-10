@@ -1,0 +1,102 @@
+using System.Net.Http;
+
+parser HttpDateParser
+{
+    uselexer TrivialLexer;
+    main;
+    
+    HttpDate : DateTime
+        ::= RFC1123Date:d1{ return d1; } | RFC850Date:d2{ return d2; } | AscTimeDate:d3{ return d3; }
+        ;
+
+    RFC1123Date : DateTime
+        ::= (wkday:wd ',' SP:sp1 date1:d1 SP:sp2 time:t SP:sp3 "GMT"){ return DateTime(d1, t); }
+        ;
+
+    RFC850Date : DateTime
+        ::= (weekday:wd "," SP:sp1 date2:d2 SP:sp2 time:t SP:sp3 "GMT"){ return DateTime(d2, t); }
+        ;
+
+    AscTimeDate(var Date monthday) : DateTime
+        ::= (wkday:wd SP:sp1 date3:md{ monthday = md; } SP:sp2 time:t SP:sp3 Year:y){ return DateTime(Date(y, monthday.GetMonth(), monthday.Day()), t); }
+        ;
+
+    date1 : Date
+        ::= (Day:day SP:sp1 month:m SP:sp2 Year:y){ return Date(y, m, day); }
+        ;
+
+    date2 : Date
+        ::= (Day:day '-' month:m '-' Year2:y){ return Date(y, m, day); }
+        ;
+
+    date3(var sbyte d) : Date
+        ::= (month:m SP:sp (Day:day{ d = day; } | Day1:day1{ d = day1; })){ return Date(0, m, d); }
+        ;
+
+    Year(var ustring s) : short
+        ::= (DIGIT:d1{ s.Append(d1); } DIGIT:d2{ s.Append(d2); } DIGIT:d3{ s.Append(d3); } DIGIT:d4{ s.Append(d4); }){ return ParseShort(ToUtf8(s)); }
+        ;
+
+    Year2(var ustring s) : short
+        ::= (DIGIT:d1{ s.Append(d1); } DIGIT:d2{ s.Append(d2); }){ return 2000 + ParseShort(ToUtf8(s)); }
+        ;
+
+    Day(var ustring s) : sbyte
+        ::= (DIGIT:d1{ s.Append(d1); } DIGIT:d2{ s.Append(d2); }){ return ParseSByte(ToUtf8(s)); }
+        ;
+
+    Day1(var ustring s) : sbyte
+        ::= SP:sp DIGIT:digit{ s.Append(digit); return ParseSByte(ToUtf8(s)); }
+        ;
+
+    wkday
+        ::= "Mon" | "Tue" | "Wed" | "Thu" | "Fri" | "Sat" | "Sun"
+        ;
+
+    weekday
+        ::= "Monday" | "Tuesday" | "Wednesday" | "Thursday" | "Friday" | "Saturday" | "Sunday"
+        ;
+
+    month : Month
+        ::= "Jan"{ return Month.january; }
+        |   "Feb"{ return Month.february; }
+        |   "Mar"{ return Month.march; }
+        |   "Apr"{ return Month.april; }
+        |   "May"{ return Month.may; }
+        |   "Jun"{ return Month.june; }
+        |   "Jul"{ return Month.july; }
+        |   "Aug"{ return Month.august; }
+        |   "Sep"{ return Month.september; }
+        |   "Oct"{ return Month.october; }
+        |   "Nov"{ return Month.november; }
+        |   "Dec"{ return Month.december; }
+        ;
+
+    time : int
+        ::= (Hour:hour ':' Min:min ':' Sec:sec){ return 3600 * hour + 60 * min + sec; }
+        ;
+
+    Hour(var ustring s) : int
+        ::= (DIGIT:d1{ s.Append(d1); } DIGIT:d2{ s.Append(d2); }){ return ParseInt(ToUtf8(s)); }
+        ;
+
+    Min(var ustring s) : int
+        ::= (DIGIT:d1{ s.Append(d1); } DIGIT:d2{ s.Append(d2); }){ return ParseInt(ToUtf8(s)); }
+        ;
+
+    Sec(var ustring s) : int
+        ::= (DIGIT:d1{ s.Append(d1); } DIGIT:d2{ s.Append(d2); }){ return ParseInt(ToUtf8(s)); }
+        ;
+
+    deltaSeconds(var ustring s) : int
+        ::= ((DIGIT:digit{ s.Append(digit); })+){ return ParseInt(ToUtf8(s)); }
+        ;
+        
+    SP : uchar
+        ::= ' '{ return ' '; }
+        ;
+        
+    DIGIT : uchar
+        ::= "[0-9]"{ return lexer.GetUChar(pos); }
+        ;
+}

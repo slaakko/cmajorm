@@ -94,7 +94,7 @@ parser ParserFileParser
         ;
 
     RuleStatement(soulcm.scmpg.GrammarParser* grammarParser, ParsingContext* parsingContext, var UniquePtr<soulcm.scmpg.RuleParser> rule)
-        ::= ID{ rule.Reset(new soulcm.scmpg.RuleParser(lexer.GetMatch(span))); } ParametersAndVariables(rule.Get(), parsingContext):paramsAndVars?
+        ::= ID{ ustring id = lexer.GetMatch(span); rule.Reset(new soulcm.scmpg.RuleParser(id)); } ParametersAndVariables(rule.Get(), parsingContext):paramsAndVars?
             ReturnType(parsingContext):returnType? PRODUCES RuleBody(parsingContext):definition! SEMICOLON!
         {
             rule->SetDefinition(definition);

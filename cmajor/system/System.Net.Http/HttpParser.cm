@@ -8,62 +8,85 @@ using System.Collections;
 
 namespace System.Net.Http
 {
-    public class HttpParser
+    public static class HttpParser
     {
-        static HttpParser() : instance(new HttpParser())
+        public static HttpHeader ParseHeader(const string& header)
         {
+            try
+            {
+                HttpLexer lexer(ToUtf32(header), "", 0);
+                return HttpHeaderParser.Parse(lexer);
+            }
+            catch (const Exception& ex)
+            {
+                throw Exception("error: could not parse header '" + header + "': " + ex.Message());
+            }
+            return HttpHeader();
         }
-        public static HttpParser& Instance()
+        public static HttpStatus ParseStatus(const string& statusLine)
         {
-            return *instance;
+            try
+            {
+                HttpLexer lexer(ToUtf32(statusLine), "", 0);
+                return HttpStatusLineParser.Parse(lexer);
+            } 
+            catch (const Exception& ex)
+            {
+                throw Exception("error: could not parse status '" + statusLine + "': " + ex.Message());
+            }
+            return HttpStatus();
         }
-        public HttpHeader ParseHeader(const ustring& header)
+        public static void ParseChunkHeader(const string& chunkHeader, ulong* chunkSize, ChunkExtensionAdder* adder)
         {
-            return headerGrammar->Parse(header.Chars(), header.Chars() + header.Length(), 0, "");
+            try
+            {
+                HttpLexer lexer(ToUtf32(chunkHeader), "", 0);
+                HttpChunkHeaderParser.Parse(lexer, chunkSize, adder);
+            }
+            catch (const Exception& ex)
+            {
+                throw Exception("error: could not parse chunk header '" + chunkHeader + "': " + ex.Message());
+            }
         }
-        public HttpStatus ParseStatus(const ustring& statusLine)
+        public static void ParseFieldValue(const string& fieldValue, List<HttpFieldValue>* values)
         {
-            HttpStatus httpStatus;
-            statusLineGrammar->Parse(statusLine.Chars(), statusLine.Chars() + statusLine.Length(), 0, "", &httpStatus);
-            return httpStatus;
+            try
+            {
+                HttpLexer lexer(ToUtf32(fieldValue), "", 0);
+                HttpFieldValueParser.Parse(lexer, values);
+            }
+            catch (const Exception& ex)
+            {
+                throw Exception("error: coulnd not parse field value '" + fieldValue + "': " + ex.Message());
+            }
         }
-        public void ParseChunkHeader(const ustring& chunkHeader, ulong* chunkSize, ChunkExtensionAdder* adder)
+        public static MimeType ParseMediaType(const string& fieldValue)
         {
-            chunkHeaderGrammar->Parse(chunkHeader.Chars(), chunkHeader.Chars() + chunkHeader.Length(), 0, "", chunkSize, adder);
+            try
+            {
+                HttpLexer lexer(ToUtf32(fieldValue), "", 0);
+                MimeType mimeType;
+                HttpMediaTypeParser.Parse(lexer, &mimeType);
+                return mimeType;
+            }
+            catch (const Exception& ex)
+            {
+                throw Exception("could not parse media type '" + fieldValue + "': " + ex.Message());
+            }
+            return MimeType();
         }
-        public void ParseFieldValue(const ustring& fieldValue, List<HttpFieldValue>* values)
+        public static DateTime ParseDate(const string& fieldValue)
         {
-            fieldValueGrammar->Parse(fieldValue.Chars(), fieldValue.Chars() + fieldValue.Length(), 0, "", values);
+            try
+            {
+                TrivialLexer lexer(ToUtf32(fieldValue), "", 0);
+                return HttpDateParser.Parse(lexer);
+            }
+            catch (const Exception& ex)
+            {
+                throw Exception("could not parse date '" + fieldValue + "':" + ex.Message());
+            }
+            return DateTime();
         }
-        public MimeType ParseMediaType(const ustring& fieldValue)
-        {
-            MimeType mediaType;
-            mediaTypeGrammar->Parse(fieldValue.Chars(), fieldValue.Chars() + fieldValue.Length(), 0, "", &mediaType);
-            return mediaType;
-        }
-        public DateTime ParseDate(const ustring& fieldValue)
-        {
-            DateTime date;
-            dateGrammar->Parse(fieldValue.Chars(), fieldValue.Chars() + fieldValue.Length(), 0, "", &date);
-            return date;
-        }
-        private HttpParser() : 
-            httpGrammar(new HttpGrammar()), 
-            headerGrammar(new HttpHeaderGrammar(httpGrammar->Domain())), 
-            statusLineGrammar(new HttpStatusLineGrammar(httpGrammar->Domain())),
-            chunkHeaderGrammar(new HttpChunkHeaderGrammar(httpGrammar->Domain())),
-            fieldValueGrammar(new HttpFieldValueGrammar(httpGrammar->Domain())),
-            mediaTypeGrammar(new HttpMediaTypeGrammar(httpGrammar->Domain())),
-            dateGrammar(new HttpDateGrammar(httpGrammar->Domain()))
-        {
-        }
-        private static UniquePtr<HttpParser> instance;
-        private HttpGrammar* httpGrammar;
-        private HttpHeaderGrammar* headerGrammar;
-        private HttpStatusLineGrammar* statusLineGrammar;
-        private HttpChunkHeaderGrammar* chunkHeaderGrammar;
-        private HttpFieldValueGrammar* fieldValueGrammar;
-        private HttpMediaTypeGrammar* mediaTypeGrammar;
-        private HttpDateGrammar* dateGrammar;
     }
 }

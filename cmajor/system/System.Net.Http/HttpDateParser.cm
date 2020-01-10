@@ -1,0 +1,3102 @@
+using System;
+using System.Collections;
+using System.Lex;
+using System.Parsing;
+using System.Net.Http;
+
+// this file has been automatically generated from 'D:/work/cmajorm/cmajor/system/System.Net.Http/HttpDateParser.parser' using soulcm parser generator scmpg version 3.0.0
+
+namespace
+{
+    public const int[3] s28 = [68, 101, 99];
+    public const int[3] s27 = [78, 111, 118];
+    public const int[3] s26 = [79, 99, 116];
+    public const int[3] s25 = [83, 101, 112];
+    public const int[3] s24 = [65, 117, 103];
+    public const int[3] s23 = [74, 117, 108];
+    public const int[3] s22 = [74, 117, 110];
+    public const int[3] s21 = [77, 97, 121];
+    public const int[3] s20 = [65, 112, 114];
+    public const int[3] s19 = [77, 97, 114];
+    public const int[3] s18 = [70, 101, 98];
+    public const int[3] s17 = [74, 97, 110];
+    public const int[6] s16 = [83, 117, 110, 100, 97, 121];
+    public const int[8] s15 = [83, 97, 116, 117, 114, 100, 97, 121];
+    public const int[6] s14 = [70, 114, 105, 100, 97, 121];
+    public const int[8] s13 = [84, 104, 117, 114, 115, 100, 97, 121];
+    public const int[9] s12 = [87, 101, 100, 110, 101, 115, 100, 97, 121];
+    public const int[7] s11 = [84, 117, 101, 115, 100, 97, 121];
+    public const int[6] s10 = [77, 111, 110, 100, 97, 121];
+    public const int[3] s9 = [83, 117, 110];
+    public const int[3] s8 = [83, 97, 116];
+    public const int[3] s7 = [70, 114, 105];
+    public const int[3] s6 = [84, 104, 117];
+    public const int[3] s5 = [87, 101, 100];
+    public const int[3] s4 = [84, 117, 101];
+    public const int[3] s3 = [77, 111, 110];
+    public const int[3] s2 = [71, 77, 84];
+    public const int[1] s1 = [44];
+    public const int[3] s0 = [71, 77, 84];
+    public const Range[1] s29 = [{48, 57}];
+} // namespace
+public static class HttpDateParser
+{
+    public static DateTime Parse(TrivialLexer& lexer)
+    {
+        UniquePtr<Value<DateTime>> value;
+        #if (DEBUG)
+            if (lexer.Log() != null)
+            {
+                lexer.Log()->WriteBeginRule(u"parse");
+                lexer.Log()->IncIndent();
+            }
+        #endif
+        ++lexer;
+        System.Lex.Span span = lexer.GetSpan();
+        Match match = HttpDate(lexer);
+        value.Reset(cast<Value<DateTime>*>(match.value));
+        #if (DEBUG)
+            if (lexer.Log() != null)
+            {
+                lexer.Log()->DecIndent();
+                lexer.Log()->WriteEndRule(u"parse");
+            }
+        #endif
+        if (match.hit)
+        {
+            if (*lexer == System.Lex.END_TOKEN)
+            {
+                return value->value;
+            }
+            else
+            {
+                lexer.ThrowExpectationFailure(lexer.GetSpan(), GetEndTokenInfo());
+            }
+        }
+        else
+        {
+            lexer.ThrowExpectationFailure(span, u"HttpDate");
+        }
+        return value->value;
+    }
+    public static Match HttpDate(TrivialLexer& lexer)
+    {
+        #if (DEBUG)
+            Span debugSpan;
+            bool writeToLog = lexer.Log() != null;
+            if (writeToLog)
+            {
+                debugSpan = lexer.GetSpan();
+                System.Lex.WriteBeginRuleToLog(lexer, u"HttpDate");
+            }
+        #endif
+        UniquePtr<Value<DateTime>> d1;
+        UniquePtr<Value<DateTime>> d2;
+        UniquePtr<Value<DateTime>> d3;
+        Match match(false);
+        Match* parentMatch0 = &match;
+        {
+            long save = lexer.GetPos();
+            Match match(false);
+            Match* parentMatch1 = &match;
+            {
+                long save = lexer.GetPos();
+                Match match(false);
+                Match* parentMatch2 = &match;
+                {
+                    long pos = lexer.GetPos();
+                    Match match = HttpDateParser.RFC1123Date(lexer);
+                    d1.Reset(cast<Value<DateTime>*>(match.value));
+                    if (match.hit)
+                    {
+                        {
+                            #if (DEBUG)
+                                if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"HttpDate");
+                            #endif
+                            return Match(true, new Value<DateTime>(d1->value));
+                        }
+                    }
+                    *parentMatch2 = match;
+                }
+                *parentMatch1 = match;
+                if (!match.hit)
+                {
+                    Match match(false);
+                    Match* parentMatch3 = &match;
+                    lexer.SetPos(save);
+                    {
+                        Match match(false);
+                        Match* parentMatch4 = &match;
+                        {
+                            long pos = lexer.GetPos();
+                            Match match = HttpDateParser.RFC850Date(lexer);
+                            d2.Reset(cast<Value<DateTime>*>(match.value));
+                            if (match.hit)
+                            {
+                                {
+                                    #if (DEBUG)
+                                        if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"HttpDate");
+                                    #endif
+                                    return Match(true, new Value<DateTime>(d2->value));
+                                }
+                            }
+                            *parentMatch4 = match;
+                        }
+                        *parentMatch3 = match;
+                    }
+                    *parentMatch1 = match;
+                }
+            }
+            *parentMatch0 = match;
+            if (!match.hit)
+            {
+                Match match(false);
+                Match* parentMatch5 = &match;
+                lexer.SetPos(save);
+                {
+                    Match match(false);
+                    Match* parentMatch6 = &match;
+                    {
+                        long pos = lexer.GetPos();
+                        Match match = HttpDateParser.AscTimeDate(lexer);
+                        d3.Reset(cast<Value<DateTime>*>(match.value));
+                        if (match.hit)
+                        {
+                            {
+                                #if (DEBUG)
+                                    if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"HttpDate");
+                                #endif
+                                return Match(true, new Value<DateTime>(d3->value));
+                            }
+                        }
+                        *parentMatch6 = match;
+                    }
+                    *parentMatch5 = match;
+                }
+                *parentMatch0 = match;
+            }
+        }
+        #if (DEBUG)
+            if (writeToLog)
+            {
+                if (match.hit)
+                {
+                    System.Lex.WriteSuccessToLog(lexer, debugSpan, u"HttpDate");
+                }
+                else
+                {
+                    System.Lex.WriteFailureToLog(lexer, u"HttpDate");
+                }
+            }
+        #endif
+        if (!match.hit)
+        {
+            match.value = null;
+        }
+        return match;
+    }
+    public static Match RFC1123Date(TrivialLexer& lexer)
+    {
+        #if (DEBUG)
+            Span debugSpan;
+            bool writeToLog = lexer.Log() != null;
+            if (writeToLog)
+            {
+                debugSpan = lexer.GetSpan();
+                System.Lex.WriteBeginRuleToLog(lexer, u"RFC1123Date");
+            }
+        #endif
+        UniquePtr<Value<uchar>> sp1;
+        UniquePtr<Value<Date>> d1;
+        UniquePtr<Value<uchar>> sp2;
+        UniquePtr<Value<int>> t;
+        UniquePtr<Value<uchar>> sp3;
+        Match match(false);
+        Match* parentMatch0 = &match;
+        {
+            long pos = lexer.GetPos();
+            Match match(false);
+            Match* parentMatch1 = &match;
+            {
+                Match match(false);
+                Match* parentMatch2 = &match;
+                {
+                    Match match(false);
+                    Match* parentMatch3 = &match;
+                    {
+                        Match match(false);
+                        Match* parentMatch4 = &match;
+                        {
+                            Match match(false);
+                            Match* parentMatch5 = &match;
+                            {
+                                Match match(false);
+                                Match* parentMatch6 = &match;
+                                {
+                                    Match match(false);
+                                    Match* parentMatch7 = &match;
+                                    {
+                                        Match match(false);
+                                        Match* parentMatch8 = &match;
+                                        {
+                                            Match match = HttpDateParser.wkday(lexer);
+                                            *parentMatch8 = match;
+                                        }
+                                        if (match.hit)
+                                        {
+                                            Match match(false);
+                                            Match* parentMatch9 = &match;
+                                            {
+                                                Match match(false);
+                                                if (*lexer == 44)
+                                                {
+                                                    ++lexer;
+                                                    match.hit = true;
+                                                }
+                                                *parentMatch9 = match;
+                                            }
+                                            *parentMatch8 = match;
+                                        }
+                                        *parentMatch7 = match;
+                                    }
+                                    if (match.hit)
+                                    {
+                                        Match match(false);
+                                        Match* parentMatch10 = &match;
+                                        {
+                                            Match match = HttpDateParser.SP(lexer);
+                                            sp1.Reset(cast<Value<uchar>*>(match.value));
+                                            *parentMatch10 = match;
+                                        }
+                                        *parentMatch7 = match;
+                                    }
+                                    *parentMatch6 = match;
+                                }
+                                if (match.hit)
+                                {
+                                    Match match(false);
+                                    Match* parentMatch11 = &match;
+                                    {
+                                        Match match = HttpDateParser.date1(lexer);
+                                        d1.Reset(cast<Value<Date>*>(match.value));
+                                        *parentMatch11 = match;
+                                    }
+                                    *parentMatch6 = match;
+                                }
+                                *parentMatch5 = match;
+                            }
+                            if (match.hit)
+                            {
+                                Match match(false);
+                                Match* parentMatch12 = &match;
+                                {
+                                    Match match = HttpDateParser.SP(lexer);
+                                    sp2.Reset(cast<Value<uchar>*>(match.value));
+                                    *parentMatch12 = match;
+                                }
+                                *parentMatch5 = match;
+                            }
+                            *parentMatch4 = match;
+                        }
+                        if (match.hit)
+                        {
+                            Match match(false);
+                            Match* parentMatch13 = &match;
+                            {
+                                Match match = HttpDateParser.time(lexer);
+                                t.Reset(cast<Value<int>*>(match.value));
+                                *parentMatch13 = match;
+                            }
+                            *parentMatch4 = match;
+                        }
+                        *parentMatch3 = match;
+                    }
+                    if (match.hit)
+                    {
+                        Match match(false);
+                        Match* parentMatch14 = &match;
+                        {
+                            Match match = HttpDateParser.SP(lexer);
+                            sp3.Reset(cast<Value<uchar>*>(match.value));
+                            *parentMatch14 = match;
+                        }
+                        *parentMatch3 = match;
+                    }
+                    *parentMatch2 = match;
+                }
+                if (match.hit)
+                {
+                    Match match(false);
+                    Match* parentMatch15 = &match;
+                    {
+                        Match match(true);
+                        for (int i : s0)
+                        {
+                            if (*lexer == i)
+                            {
+                                ++lexer;
+                            }
+                            else
+                            {
+                                match.hit = false;
+                                break;
+                            }
+                        }
+                        *parentMatch15 = match;
+                    }
+                    *parentMatch2 = match;
+                }
+                *parentMatch1 = match;
+            }
+            if (match.hit)
+            {
+                {
+                    #if (DEBUG)
+                        if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"RFC1123Date");
+                    #endif
+                    return Match(true, new Value<DateTime>(DateTime(d1->value, t->value)));
+                }
+            }
+            *parentMatch0 = match;
+        }
+        #if (DEBUG)
+            if (writeToLog)
+            {
+                if (match.hit)
+                {
+                    System.Lex.WriteSuccessToLog(lexer, debugSpan, u"RFC1123Date");
+                }
+                else
+                {
+                    System.Lex.WriteFailureToLog(lexer, u"RFC1123Date");
+                }
+            }
+        #endif
+        if (!match.hit)
+        {
+            match.value = null;
+        }
+        return match;
+    }
+    public static Match RFC850Date(TrivialLexer& lexer)
+    {
+        #if (DEBUG)
+            Span debugSpan;
+            bool writeToLog = lexer.Log() != null;
+            if (writeToLog)
+            {
+                debugSpan = lexer.GetSpan();
+                System.Lex.WriteBeginRuleToLog(lexer, u"RFC850Date");
+            }
+        #endif
+        UniquePtr<Value<uchar>> sp1;
+        UniquePtr<Value<Date>> d2;
+        UniquePtr<Value<uchar>> sp2;
+        UniquePtr<Value<int>> t;
+        UniquePtr<Value<uchar>> sp3;
+        Match match(false);
+        Match* parentMatch0 = &match;
+        {
+            long pos = lexer.GetPos();
+            Match match(false);
+            Match* parentMatch1 = &match;
+            {
+                Match match(false);
+                Match* parentMatch2 = &match;
+                {
+                    Match match(false);
+                    Match* parentMatch3 = &match;
+                    {
+                        Match match(false);
+                        Match* parentMatch4 = &match;
+                        {
+                            Match match(false);
+                            Match* parentMatch5 = &match;
+                            {
+                                Match match(false);
+                                Match* parentMatch6 = &match;
+                                {
+                                    Match match(false);
+                                    Match* parentMatch7 = &match;
+                                    {
+                                        Match match(false);
+                                        Match* parentMatch8 = &match;
+                                        {
+                                            Match match = HttpDateParser.weekday(lexer);
+                                            *parentMatch8 = match;
+                                        }
+                                        if (match.hit)
+                                        {
+                                            Match match(false);
+                                            Match* parentMatch9 = &match;
+                                            {
+                                                Match match(true);
+                                                for (int i : s1)
+                                                {
+                                                    if (*lexer == i)
+                                                    {
+                                                        ++lexer;
+                                                    }
+                                                    else
+                                                    {
+                                                        match.hit = false;
+                                                        break;
+                                                    }
+                                                }
+                                                *parentMatch9 = match;
+                                            }
+                                            *parentMatch8 = match;
+                                        }
+                                        *parentMatch7 = match;
+                                    }
+                                    if (match.hit)
+                                    {
+                                        Match match(false);
+                                        Match* parentMatch10 = &match;
+                                        {
+                                            Match match = HttpDateParser.SP(lexer);
+                                            sp1.Reset(cast<Value<uchar>*>(match.value));
+                                            *parentMatch10 = match;
+                                        }
+                                        *parentMatch7 = match;
+                                    }
+                                    *parentMatch6 = match;
+                                }
+                                if (match.hit)
+                                {
+                                    Match match(false);
+                                    Match* parentMatch11 = &match;
+                                    {
+                                        Match match = HttpDateParser.date2(lexer);
+                                        d2.Reset(cast<Value<Date>*>(match.value));
+                                        *parentMatch11 = match;
+                                    }
+                                    *parentMatch6 = match;
+                                }
+                                *parentMatch5 = match;
+                            }
+                            if (match.hit)
+                            {
+                                Match match(false);
+                                Match* parentMatch12 = &match;
+                                {
+                                    Match match = HttpDateParser.SP(lexer);
+                                    sp2.Reset(cast<Value<uchar>*>(match.value));
+                                    *parentMatch12 = match;
+                                }
+                                *parentMatch5 = match;
+                            }
+                            *parentMatch4 = match;
+                        }
+                        if (match.hit)
+                        {
+                            Match match(false);
+                            Match* parentMatch13 = &match;
+                            {
+                                Match match = HttpDateParser.time(lexer);
+                                t.Reset(cast<Value<int>*>(match.value));
+                                *parentMatch13 = match;
+                            }
+                            *parentMatch4 = match;
+                        }
+                        *parentMatch3 = match;
+                    }
+                    if (match.hit)
+                    {
+                        Match match(false);
+                        Match* parentMatch14 = &match;
+                        {
+                            Match match = HttpDateParser.SP(lexer);
+                            sp3.Reset(cast<Value<uchar>*>(match.value));
+                            *parentMatch14 = match;
+                        }
+                        *parentMatch3 = match;
+                    }
+                    *parentMatch2 = match;
+                }
+                if (match.hit)
+                {
+                    Match match(false);
+                    Match* parentMatch15 = &match;
+                    {
+                        Match match(true);
+                        for (int i : s2)
+                        {
+                            if (*lexer == i)
+                            {
+                                ++lexer;
+                            }
+                            else
+                            {
+                                match.hit = false;
+                                break;
+                            }
+                        }
+                        *parentMatch15 = match;
+                    }
+                    *parentMatch2 = match;
+                }
+                *parentMatch1 = match;
+            }
+            if (match.hit)
+            {
+                {
+                    #if (DEBUG)
+                        if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"RFC850Date");
+                    #endif
+                    return Match(true, new Value<DateTime>(DateTime(d2->value, t->value)));
+                }
+            }
+            *parentMatch0 = match;
+        }
+        #if (DEBUG)
+            if (writeToLog)
+            {
+                if (match.hit)
+                {
+                    System.Lex.WriteSuccessToLog(lexer, debugSpan, u"RFC850Date");
+                }
+                else
+                {
+                    System.Lex.WriteFailureToLog(lexer, u"RFC850Date");
+                }
+            }
+        #endif
+        if (!match.hit)
+        {
+            match.value = null;
+        }
+        return match;
+    }
+    public static Match AscTimeDate(TrivialLexer& lexer)
+    {
+        #if (DEBUG)
+            Span debugSpan;
+            bool writeToLog = lexer.Log() != null;
+            if (writeToLog)
+            {
+                debugSpan = lexer.GetSpan();
+                System.Lex.WriteBeginRuleToLog(lexer, u"AscTimeDate");
+            }
+        #endif
+        Date monthday;
+        UniquePtr<Value<uchar>> sp1;
+        UniquePtr<Value<Date>> md;
+        UniquePtr<Value<uchar>> sp2;
+        UniquePtr<Value<int>> t;
+        UniquePtr<Value<uchar>> sp3;
+        UniquePtr<Value<short>> y;
+        Match match(false);
+        Match* parentMatch0 = &match;
+        {
+            long pos = lexer.GetPos();
+            Match match(false);
+            Match* parentMatch1 = &match;
+            {
+                Match match(false);
+                Match* parentMatch2 = &match;
+                {
+                    Match match(false);
+                    Match* parentMatch3 = &match;
+                    {
+                        Match match(false);
+                        Match* parentMatch4 = &match;
+                        {
+                            Match match(false);
+                            Match* parentMatch5 = &match;
+                            {
+                                Match match(false);
+                                Match* parentMatch6 = &match;
+                                {
+                                    Match match(false);
+                                    Match* parentMatch7 = &match;
+                                    {
+                                        Match match = HttpDateParser.wkday(lexer);
+                                        *parentMatch7 = match;
+                                    }
+                                    if (match.hit)
+                                    {
+                                        Match match(false);
+                                        Match* parentMatch8 = &match;
+                                        {
+                                            Match match = HttpDateParser.SP(lexer);
+                                            sp1.Reset(cast<Value<uchar>*>(match.value));
+                                            *parentMatch8 = match;
+                                        }
+                                        *parentMatch7 = match;
+                                    }
+                                    *parentMatch6 = match;
+                                }
+                                if (match.hit)
+                                {
+                                    Match match(false);
+                                    Match* parentMatch9 = &match;
+                                    {
+                                        Match match(false);
+                                        Match* parentMatch10 = &match;
+                                        {
+                                            long pos = lexer.GetPos();
+                                            Match match = HttpDateParser.date3(lexer);
+                                            md.Reset(cast<Value<Date>*>(match.value));
+                                            if (match.hit)
+                                            {
+                                                monthday = md->value;
+                                            }
+                                            *parentMatch10 = match;
+                                        }
+                                        *parentMatch9 = match;
+                                    }
+                                    *parentMatch6 = match;
+                                }
+                                *parentMatch5 = match;
+                            }
+                            if (match.hit)
+                            {
+                                Match match(false);
+                                Match* parentMatch11 = &match;
+                                {
+                                    Match match = HttpDateParser.SP(lexer);
+                                    sp2.Reset(cast<Value<uchar>*>(match.value));
+                                    *parentMatch11 = match;
+                                }
+                                *parentMatch5 = match;
+                            }
+                            *parentMatch4 = match;
+                        }
+                        if (match.hit)
+                        {
+                            Match match(false);
+                            Match* parentMatch12 = &match;
+                            {
+                                Match match = HttpDateParser.time(lexer);
+                                t.Reset(cast<Value<int>*>(match.value));
+                                *parentMatch12 = match;
+                            }
+                            *parentMatch4 = match;
+                        }
+                        *parentMatch3 = match;
+                    }
+                    if (match.hit)
+                    {
+                        Match match(false);
+                        Match* parentMatch13 = &match;
+                        {
+                            Match match = HttpDateParser.SP(lexer);
+                            sp3.Reset(cast<Value<uchar>*>(match.value));
+                            *parentMatch13 = match;
+                        }
+                        *parentMatch3 = match;
+                    }
+                    *parentMatch2 = match;
+                }
+                if (match.hit)
+                {
+                    Match match(false);
+                    Match* parentMatch14 = &match;
+                    {
+                        Match match = HttpDateParser.Year(lexer);
+                        y.Reset(cast<Value<short>*>(match.value));
+                        *parentMatch14 = match;
+                    }
+                    *parentMatch2 = match;
+                }
+                *parentMatch1 = match;
+            }
+            if (match.hit)
+            {
+                {
+                    #if (DEBUG)
+                        if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"AscTimeDate");
+                    #endif
+                    return Match(true, new Value<DateTime>(DateTime(Date(y->value, monthday.GetMonth(), monthday.Day()), t->value)));
+                }
+            }
+            *parentMatch0 = match;
+        }
+        #if (DEBUG)
+            if (writeToLog)
+            {
+                if (match.hit)
+                {
+                    System.Lex.WriteSuccessToLog(lexer, debugSpan, u"AscTimeDate");
+                }
+                else
+                {
+                    System.Lex.WriteFailureToLog(lexer, u"AscTimeDate");
+                }
+            }
+        #endif
+        if (!match.hit)
+        {
+            match.value = null;
+        }
+        return match;
+    }
+    public static Match date1(TrivialLexer& lexer)
+    {
+        #if (DEBUG)
+            Span debugSpan;
+            bool writeToLog = lexer.Log() != null;
+            if (writeToLog)
+            {
+                debugSpan = lexer.GetSpan();
+                System.Lex.WriteBeginRuleToLog(lexer, u"date1");
+            }
+        #endif
+        UniquePtr<Value<sbyte>> day;
+        UniquePtr<Value<uchar>> sp1;
+        UniquePtr<Value<Month>> m;
+        UniquePtr<Value<uchar>> sp2;
+        UniquePtr<Value<short>> y;
+        Match match(false);
+        Match* parentMatch0 = &match;
+        {
+            long pos = lexer.GetPos();
+            Match match(false);
+            Match* parentMatch1 = &match;
+            {
+                Match match(false);
+                Match* parentMatch2 = &match;
+                {
+                    Match match(false);
+                    Match* parentMatch3 = &match;
+                    {
+                        Match match(false);
+                        Match* parentMatch4 = &match;
+                        {
+                            Match match(false);
+                            Match* parentMatch5 = &match;
+                            {
+                                Match match = HttpDateParser.Day(lexer);
+                                day.Reset(cast<Value<sbyte>*>(match.value));
+                                *parentMatch5 = match;
+                            }
+                            if (match.hit)
+                            {
+                                Match match(false);
+                                Match* parentMatch6 = &match;
+                                {
+                                    Match match = HttpDateParser.SP(lexer);
+                                    sp1.Reset(cast<Value<uchar>*>(match.value));
+                                    *parentMatch6 = match;
+                                }
+                                *parentMatch5 = match;
+                            }
+                            *parentMatch4 = match;
+                        }
+                        if (match.hit)
+                        {
+                            Match match(false);
+                            Match* parentMatch7 = &match;
+                            {
+                                Match match = HttpDateParser.month(lexer);
+                                m.Reset(cast<Value<Month>*>(match.value));
+                                *parentMatch7 = match;
+                            }
+                            *parentMatch4 = match;
+                        }
+                        *parentMatch3 = match;
+                    }
+                    if (match.hit)
+                    {
+                        Match match(false);
+                        Match* parentMatch8 = &match;
+                        {
+                            Match match = HttpDateParser.SP(lexer);
+                            sp2.Reset(cast<Value<uchar>*>(match.value));
+                            *parentMatch8 = match;
+                        }
+                        *parentMatch3 = match;
+                    }
+                    *parentMatch2 = match;
+                }
+                if (match.hit)
+                {
+                    Match match(false);
+                    Match* parentMatch9 = &match;
+                    {
+                        Match match = HttpDateParser.Year(lexer);
+                        y.Reset(cast<Value<short>*>(match.value));
+                        *parentMatch9 = match;
+                    }
+                    *parentMatch2 = match;
+                }
+                *parentMatch1 = match;
+            }
+            if (match.hit)
+            {
+                {
+                    #if (DEBUG)
+                        if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"date1");
+                    #endif
+                    return Match(true, new Value<Date>(Date(y->value, m->value, day->value)));
+                }
+            }
+            *parentMatch0 = match;
+        }
+        #if (DEBUG)
+            if (writeToLog)
+            {
+                if (match.hit)
+                {
+                    System.Lex.WriteSuccessToLog(lexer, debugSpan, u"date1");
+                }
+                else
+                {
+                    System.Lex.WriteFailureToLog(lexer, u"date1");
+                }
+            }
+        #endif
+        if (!match.hit)
+        {
+            match.value = null;
+        }
+        return match;
+    }
+    public static Match date2(TrivialLexer& lexer)
+    {
+        #if (DEBUG)
+            Span debugSpan;
+            bool writeToLog = lexer.Log() != null;
+            if (writeToLog)
+            {
+                debugSpan = lexer.GetSpan();
+                System.Lex.WriteBeginRuleToLog(lexer, u"date2");
+            }
+        #endif
+        UniquePtr<Value<sbyte>> day;
+        UniquePtr<Value<Month>> m;
+        UniquePtr<Value<short>> y;
+        Match match(false);
+        Match* parentMatch0 = &match;
+        {
+            long pos = lexer.GetPos();
+            Match match(false);
+            Match* parentMatch1 = &match;
+            {
+                Match match(false);
+                Match* parentMatch2 = &match;
+                {
+                    Match match(false);
+                    Match* parentMatch3 = &match;
+                    {
+                        Match match(false);
+                        Match* parentMatch4 = &match;
+                        {
+                            Match match(false);
+                            Match* parentMatch5 = &match;
+                            {
+                                Match match = HttpDateParser.Day(lexer);
+                                day.Reset(cast<Value<sbyte>*>(match.value));
+                                *parentMatch5 = match;
+                            }
+                            if (match.hit)
+                            {
+                                Match match(false);
+                                Match* parentMatch6 = &match;
+                                {
+                                    Match match(false);
+                                    if (*lexer == 45)
+                                    {
+                                        ++lexer;
+                                        match.hit = true;
+                                    }
+                                    *parentMatch6 = match;
+                                }
+                                *parentMatch5 = match;
+                            }
+                            *parentMatch4 = match;
+                        }
+                        if (match.hit)
+                        {
+                            Match match(false);
+                            Match* parentMatch7 = &match;
+                            {
+                                Match match = HttpDateParser.month(lexer);
+                                m.Reset(cast<Value<Month>*>(match.value));
+                                *parentMatch7 = match;
+                            }
+                            *parentMatch4 = match;
+                        }
+                        *parentMatch3 = match;
+                    }
+                    if (match.hit)
+                    {
+                        Match match(false);
+                        Match* parentMatch8 = &match;
+                        {
+                            Match match(false);
+                            if (*lexer == 45)
+                            {
+                                ++lexer;
+                                match.hit = true;
+                            }
+                            *parentMatch8 = match;
+                        }
+                        *parentMatch3 = match;
+                    }
+                    *parentMatch2 = match;
+                }
+                if (match.hit)
+                {
+                    Match match(false);
+                    Match* parentMatch9 = &match;
+                    {
+                        Match match = HttpDateParser.Year2(lexer);
+                        y.Reset(cast<Value<short>*>(match.value));
+                        *parentMatch9 = match;
+                    }
+                    *parentMatch2 = match;
+                }
+                *parentMatch1 = match;
+            }
+            if (match.hit)
+            {
+                {
+                    #if (DEBUG)
+                        if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"date2");
+                    #endif
+                    return Match(true, new Value<Date>(Date(y->value, m->value, day->value)));
+                }
+            }
+            *parentMatch0 = match;
+        }
+        #if (DEBUG)
+            if (writeToLog)
+            {
+                if (match.hit)
+                {
+                    System.Lex.WriteSuccessToLog(lexer, debugSpan, u"date2");
+                }
+                else
+                {
+                    System.Lex.WriteFailureToLog(lexer, u"date2");
+                }
+            }
+        #endif
+        if (!match.hit)
+        {
+            match.value = null;
+        }
+        return match;
+    }
+    public static Match date3(TrivialLexer& lexer)
+    {
+        #if (DEBUG)
+            Span debugSpan;
+            bool writeToLog = lexer.Log() != null;
+            if (writeToLog)
+            {
+                debugSpan = lexer.GetSpan();
+                System.Lex.WriteBeginRuleToLog(lexer, u"date3");
+            }
+        #endif
+        sbyte d;
+        UniquePtr<Value<Month>> m;
+        UniquePtr<Value<uchar>> sp;
+        UniquePtr<Value<sbyte>> day;
+        UniquePtr<Value<sbyte>> day1;
+        Match match(false);
+        Match* parentMatch0 = &match;
+        {
+            long pos = lexer.GetPos();
+            Match match(false);
+            Match* parentMatch1 = &match;
+            {
+                Match match(false);
+                Match* parentMatch2 = &match;
+                {
+                    Match match(false);
+                    Match* parentMatch3 = &match;
+                    {
+                        Match match = HttpDateParser.month(lexer);
+                        m.Reset(cast<Value<Month>*>(match.value));
+                        *parentMatch3 = match;
+                    }
+                    if (match.hit)
+                    {
+                        Match match(false);
+                        Match* parentMatch4 = &match;
+                        {
+                            Match match = HttpDateParser.SP(lexer);
+                            sp.Reset(cast<Value<uchar>*>(match.value));
+                            *parentMatch4 = match;
+                        }
+                        *parentMatch3 = match;
+                    }
+                    *parentMatch2 = match;
+                }
+                if (match.hit)
+                {
+                    Match match(false);
+                    Match* parentMatch5 = &match;
+                    {
+                        Match match(false);
+                        Match* parentMatch6 = &match;
+                        {
+                            Match match(false);
+                            Match* parentMatch7 = &match;
+                            {
+                                long save = lexer.GetPos();
+                                Match match(false);
+                                Match* parentMatch8 = &match;
+                                {
+                                    long pos = lexer.GetPos();
+                                    Match match = HttpDateParser.Day(lexer);
+                                    day.Reset(cast<Value<sbyte>*>(match.value));
+                                    if (match.hit)
+                                    {
+                                        d = day->value;
+                                    }
+                                    *parentMatch8 = match;
+                                }
+                                *parentMatch7 = match;
+                                if (!match.hit)
+                                {
+                                    Match match(false);
+                                    Match* parentMatch9 = &match;
+                                    lexer.SetPos(save);
+                                    {
+                                        Match match(false);
+                                        Match* parentMatch10 = &match;
+                                        {
+                                            long pos = lexer.GetPos();
+                                            Match match = HttpDateParser.Day1(lexer);
+                                            day1.Reset(cast<Value<sbyte>*>(match.value));
+                                            if (match.hit)
+                                            {
+                                                d = day1->value;
+                                            }
+                                            *parentMatch10 = match;
+                                        }
+                                        *parentMatch9 = match;
+                                    }
+                                    *parentMatch7 = match;
+                                }
+                            }
+                            *parentMatch6 = match;
+                        }
+                        *parentMatch5 = match;
+                    }
+                    *parentMatch2 = match;
+                }
+                *parentMatch1 = match;
+            }
+            if (match.hit)
+            {
+                {
+                    #if (DEBUG)
+                        if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"date3");
+                    #endif
+                    return Match(true, new Value<Date>(Date(0, m->value, d)));
+                }
+            }
+            *parentMatch0 = match;
+        }
+        #if (DEBUG)
+            if (writeToLog)
+            {
+                if (match.hit)
+                {
+                    System.Lex.WriteSuccessToLog(lexer, debugSpan, u"date3");
+                }
+                else
+                {
+                    System.Lex.WriteFailureToLog(lexer, u"date3");
+                }
+            }
+        #endif
+        if (!match.hit)
+        {
+            match.value = null;
+        }
+        return match;
+    }
+    public static Match Year(TrivialLexer& lexer)
+    {
+        #if (DEBUG)
+            Span debugSpan;
+            bool writeToLog = lexer.Log() != null;
+            if (writeToLog)
+            {
+                debugSpan = lexer.GetSpan();
+                System.Lex.WriteBeginRuleToLog(lexer, u"Year");
+            }
+        #endif
+        ustring s;
+        UniquePtr<Value<uchar>> d1;
+        UniquePtr<Value<uchar>> d2;
+        UniquePtr<Value<uchar>> d3;
+        UniquePtr<Value<uchar>> d4;
+        Match match(false);
+        Match* parentMatch0 = &match;
+        {
+            long pos = lexer.GetPos();
+            Match match(false);
+            Match* parentMatch1 = &match;
+            {
+                Match match(false);
+                Match* parentMatch2 = &match;
+                {
+                    Match match(false);
+                    Match* parentMatch3 = &match;
+                    {
+                        Match match(false);
+                        Match* parentMatch4 = &match;
+                        {
+                            Match match(false);
+                            Match* parentMatch5 = &match;
+                            {
+                                long pos = lexer.GetPos();
+                                Match match = HttpDateParser.DIGIT(lexer);
+                                d1.Reset(cast<Value<uchar>*>(match.value));
+                                if (match.hit)
+                                {
+                                    s.Append(d1->value);
+                                }
+                                *parentMatch5 = match;
+                            }
+                            *parentMatch4 = match;
+                        }
+                        if (match.hit)
+                        {
+                            Match match(false);
+                            Match* parentMatch6 = &match;
+                            {
+                                Match match(false);
+                                Match* parentMatch7 = &match;
+                                {
+                                    long pos = lexer.GetPos();
+                                    Match match = HttpDateParser.DIGIT(lexer);
+                                    d2.Reset(cast<Value<uchar>*>(match.value));
+                                    if (match.hit)
+                                    {
+                                        s.Append(d2->value);
+                                    }
+                                    *parentMatch7 = match;
+                                }
+                                *parentMatch6 = match;
+                            }
+                            *parentMatch4 = match;
+                        }
+                        *parentMatch3 = match;
+                    }
+                    if (match.hit)
+                    {
+                        Match match(false);
+                        Match* parentMatch8 = &match;
+                        {
+                            Match match(false);
+                            Match* parentMatch9 = &match;
+                            {
+                                long pos = lexer.GetPos();
+                                Match match = HttpDateParser.DIGIT(lexer);
+                                d3.Reset(cast<Value<uchar>*>(match.value));
+                                if (match.hit)
+                                {
+                                    s.Append(d3->value);
+                                }
+                                *parentMatch9 = match;
+                            }
+                            *parentMatch8 = match;
+                        }
+                        *parentMatch3 = match;
+                    }
+                    *parentMatch2 = match;
+                }
+                if (match.hit)
+                {
+                    Match match(false);
+                    Match* parentMatch10 = &match;
+                    {
+                        Match match(false);
+                        Match* parentMatch11 = &match;
+                        {
+                            long pos = lexer.GetPos();
+                            Match match = HttpDateParser.DIGIT(lexer);
+                            d4.Reset(cast<Value<uchar>*>(match.value));
+                            if (match.hit)
+                            {
+                                s.Append(d4->value);
+                            }
+                            *parentMatch11 = match;
+                        }
+                        *parentMatch10 = match;
+                    }
+                    *parentMatch2 = match;
+                }
+                *parentMatch1 = match;
+            }
+            if (match.hit)
+            {
+                {
+                    #if (DEBUG)
+                        if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Year");
+                    #endif
+                    return Match(true, new Value<short>(ParseShort(ToUtf8(s))));
+                }
+            }
+            *parentMatch0 = match;
+        }
+        #if (DEBUG)
+            if (writeToLog)
+            {
+                if (match.hit)
+                {
+                    System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Year");
+                }
+                else
+                {
+                    System.Lex.WriteFailureToLog(lexer, u"Year");
+                }
+            }
+        #endif
+        if (!match.hit)
+        {
+            match.value = null;
+        }
+        return match;
+    }
+    public static Match Year2(TrivialLexer& lexer)
+    {
+        #if (DEBUG)
+            Span debugSpan;
+            bool writeToLog = lexer.Log() != null;
+            if (writeToLog)
+            {
+                debugSpan = lexer.GetSpan();
+                System.Lex.WriteBeginRuleToLog(lexer, u"Year2");
+            }
+        #endif
+        ustring s;
+        UniquePtr<Value<uchar>> d1;
+        UniquePtr<Value<uchar>> d2;
+        Match match(false);
+        Match* parentMatch0 = &match;
+        {
+            long pos = lexer.GetPos();
+            Match match(false);
+            Match* parentMatch1 = &match;
+            {
+                Match match(false);
+                Match* parentMatch2 = &match;
+                {
+                    Match match(false);
+                    Match* parentMatch3 = &match;
+                    {
+                        long pos = lexer.GetPos();
+                        Match match = HttpDateParser.DIGIT(lexer);
+                        d1.Reset(cast<Value<uchar>*>(match.value));
+                        if (match.hit)
+                        {
+                            s.Append(d1->value);
+                        }
+                        *parentMatch3 = match;
+                    }
+                    *parentMatch2 = match;
+                }
+                if (match.hit)
+                {
+                    Match match(false);
+                    Match* parentMatch4 = &match;
+                    {
+                        Match match(false);
+                        Match* parentMatch5 = &match;
+                        {
+                            long pos = lexer.GetPos();
+                            Match match = HttpDateParser.DIGIT(lexer);
+                            d2.Reset(cast<Value<uchar>*>(match.value));
+                            if (match.hit)
+                            {
+                                s.Append(d2->value);
+                            }
+                            *parentMatch5 = match;
+                        }
+                        *parentMatch4 = match;
+                    }
+                    *parentMatch2 = match;
+                }
+                *parentMatch1 = match;
+            }
+            if (match.hit)
+            {
+                {
+                    #if (DEBUG)
+                        if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Year2");
+                    #endif
+                    return Match(true, new Value<short>(2000 + ParseShort(ToUtf8(s))));
+                }
+            }
+            *parentMatch0 = match;
+        }
+        #if (DEBUG)
+            if (writeToLog)
+            {
+                if (match.hit)
+                {
+                    System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Year2");
+                }
+                else
+                {
+                    System.Lex.WriteFailureToLog(lexer, u"Year2");
+                }
+            }
+        #endif
+        if (!match.hit)
+        {
+            match.value = null;
+        }
+        return match;
+    }
+    public static Match Day(TrivialLexer& lexer)
+    {
+        #if (DEBUG)
+            Span debugSpan;
+            bool writeToLog = lexer.Log() != null;
+            if (writeToLog)
+            {
+                debugSpan = lexer.GetSpan();
+                System.Lex.WriteBeginRuleToLog(lexer, u"Day");
+            }
+        #endif
+        ustring s;
+        UniquePtr<Value<uchar>> d1;
+        UniquePtr<Value<uchar>> d2;
+        Match match(false);
+        Match* parentMatch0 = &match;
+        {
+            long pos = lexer.GetPos();
+            Match match(false);
+            Match* parentMatch1 = &match;
+            {
+                Match match(false);
+                Match* parentMatch2 = &match;
+                {
+                    Match match(false);
+                    Match* parentMatch3 = &match;
+                    {
+                        long pos = lexer.GetPos();
+                        Match match = HttpDateParser.DIGIT(lexer);
+                        d1.Reset(cast<Value<uchar>*>(match.value));
+                        if (match.hit)
+                        {
+                            s.Append(d1->value);
+                        }
+                        *parentMatch3 = match;
+                    }
+                    *parentMatch2 = match;
+                }
+                if (match.hit)
+                {
+                    Match match(false);
+                    Match* parentMatch4 = &match;
+                    {
+                        Match match(false);
+                        Match* parentMatch5 = &match;
+                        {
+                            long pos = lexer.GetPos();
+                            Match match = HttpDateParser.DIGIT(lexer);
+                            d2.Reset(cast<Value<uchar>*>(match.value));
+                            if (match.hit)
+                            {
+                                s.Append(d2->value);
+                            }
+                            *parentMatch5 = match;
+                        }
+                        *parentMatch4 = match;
+                    }
+                    *parentMatch2 = match;
+                }
+                *parentMatch1 = match;
+            }
+            if (match.hit)
+            {
+                {
+                    #if (DEBUG)
+                        if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Day");
+                    #endif
+                    return Match(true, new Value<sbyte>(ParseSByte(ToUtf8(s))));
+                }
+            }
+            *parentMatch0 = match;
+        }
+        #if (DEBUG)
+            if (writeToLog)
+            {
+                if (match.hit)
+                {
+                    System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Day");
+                }
+                else
+                {
+                    System.Lex.WriteFailureToLog(lexer, u"Day");
+                }
+            }
+        #endif
+        if (!match.hit)
+        {
+            match.value = null;
+        }
+        return match;
+    }
+    public static Match Day1(TrivialLexer& lexer)
+    {
+        #if (DEBUG)
+            Span debugSpan;
+            bool writeToLog = lexer.Log() != null;
+            if (writeToLog)
+            {
+                debugSpan = lexer.GetSpan();
+                System.Lex.WriteBeginRuleToLog(lexer, u"Day1");
+            }
+        #endif
+        ustring s;
+        UniquePtr<Value<uchar>> sp;
+        UniquePtr<Value<uchar>> digit;
+        Match match(false);
+        Match* parentMatch0 = &match;
+        {
+            Match match = HttpDateParser.SP(lexer);
+            sp.Reset(cast<Value<uchar>*>(match.value));
+            *parentMatch0 = match;
+        }
+        if (match.hit)
+        {
+            Match match(false);
+            Match* parentMatch1 = &match;
+            {
+                Match match(false);
+                Match* parentMatch2 = &match;
+                {
+                    long pos = lexer.GetPos();
+                    Match match = HttpDateParser.DIGIT(lexer);
+                    digit.Reset(cast<Value<uchar>*>(match.value));
+                    if (match.hit)
+                    {
+                        s.Append(digit->value);
+                        {
+                            #if (DEBUG)
+                                if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Day1");
+                            #endif
+                            return Match(true, new Value<sbyte>(ParseSByte(ToUtf8(s))));
+                        }
+                    }
+                    *parentMatch2 = match;
+                }
+                *parentMatch1 = match;
+            }
+            *parentMatch0 = match;
+        }
+        #if (DEBUG)
+            if (writeToLog)
+            {
+                if (match.hit)
+                {
+                    System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Day1");
+                }
+                else
+                {
+                    System.Lex.WriteFailureToLog(lexer, u"Day1");
+                }
+            }
+        #endif
+        if (!match.hit)
+        {
+            match.value = null;
+        }
+        return match;
+    }
+    public static Match wkday(TrivialLexer& lexer)
+    {
+        #if (DEBUG)
+            Span debugSpan;
+            bool writeToLog = lexer.Log() != null;
+            if (writeToLog)
+            {
+                debugSpan = lexer.GetSpan();
+                System.Lex.WriteBeginRuleToLog(lexer, u"wkday");
+            }
+        #endif
+        Match match(false);
+        Match* parentMatch0 = &match;
+        {
+            long save = lexer.GetPos();
+            Match match(false);
+            Match* parentMatch1 = &match;
+            {
+                long save = lexer.GetPos();
+                Match match(false);
+                Match* parentMatch2 = &match;
+                {
+                    long save = lexer.GetPos();
+                    Match match(false);
+                    Match* parentMatch3 = &match;
+                    {
+                        long save = lexer.GetPos();
+                        Match match(false);
+                        Match* parentMatch4 = &match;
+                        {
+                            long save = lexer.GetPos();
+                            Match match(false);
+                            Match* parentMatch5 = &match;
+                            {
+                                long save = lexer.GetPos();
+                                Match match(true);
+                                for (int i : s3)
+                                {
+                                    if (*lexer == i)
+                                    {
+                                        ++lexer;
+                                    }
+                                    else
+                                    {
+                                        match.hit = false;
+                                        break;
+                                    }
+                                }
+                                *parentMatch5 = match;
+                                if (!match.hit)
+                                {
+                                    Match match(false);
+                                    Match* parentMatch6 = &match;
+                                    lexer.SetPos(save);
+                                    {
+                                        Match match(true);
+                                        for (int i : s4)
+                                        {
+                                            if (*lexer == i)
+                                            {
+                                                ++lexer;
+                                            }
+                                            else
+                                            {
+                                                match.hit = false;
+                                                break;
+                                            }
+                                        }
+                                        *parentMatch6 = match;
+                                    }
+                                    *parentMatch5 = match;
+                                }
+                            }
+                            *parentMatch4 = match;
+                            if (!match.hit)
+                            {
+                                Match match(false);
+                                Match* parentMatch7 = &match;
+                                lexer.SetPos(save);
+                                {
+                                    Match match(true);
+                                    for (int i : s5)
+                                    {
+                                        if (*lexer == i)
+                                        {
+                                            ++lexer;
+                                        }
+                                        else
+                                        {
+                                            match.hit = false;
+                                            break;
+                                        }
+                                    }
+                                    *parentMatch7 = match;
+                                }
+                                *parentMatch4 = match;
+                            }
+                        }
+                        *parentMatch3 = match;
+                        if (!match.hit)
+                        {
+                            Match match(false);
+                            Match* parentMatch8 = &match;
+                            lexer.SetPos(save);
+                            {
+                                Match match(true);
+                                for (int i : s6)
+                                {
+                                    if (*lexer == i)
+                                    {
+                                        ++lexer;
+                                    }
+                                    else
+                                    {
+                                        match.hit = false;
+                                        break;
+                                    }
+                                }
+                                *parentMatch8 = match;
+                            }
+                            *parentMatch3 = match;
+                        }
+                    }
+                    *parentMatch2 = match;
+                    if (!match.hit)
+                    {
+                        Match match(false);
+                        Match* parentMatch9 = &match;
+                        lexer.SetPos(save);
+                        {
+                            Match match(true);
+                            for (int i : s7)
+                            {
+                                if (*lexer == i)
+                                {
+                                    ++lexer;
+                                }
+                                else
+                                {
+                                    match.hit = false;
+                                    break;
+                                }
+                            }
+                            *parentMatch9 = match;
+                        }
+                        *parentMatch2 = match;
+                    }
+                }
+                *parentMatch1 = match;
+                if (!match.hit)
+                {
+                    Match match(false);
+                    Match* parentMatch10 = &match;
+                    lexer.SetPos(save);
+                    {
+                        Match match(true);
+                        for (int i : s8)
+                        {
+                            if (*lexer == i)
+                            {
+                                ++lexer;
+                            }
+                            else
+                            {
+                                match.hit = false;
+                                break;
+                            }
+                        }
+                        *parentMatch10 = match;
+                    }
+                    *parentMatch1 = match;
+                }
+            }
+            *parentMatch0 = match;
+            if (!match.hit)
+            {
+                Match match(false);
+                Match* parentMatch11 = &match;
+                lexer.SetPos(save);
+                {
+                    Match match(true);
+                    for (int i : s9)
+                    {
+                        if (*lexer == i)
+                        {
+                            ++lexer;
+                        }
+                        else
+                        {
+                            match.hit = false;
+                            break;
+                        }
+                    }
+                    *parentMatch11 = match;
+                }
+                *parentMatch0 = match;
+            }
+        }
+        #if (DEBUG)
+            if (writeToLog)
+            {
+                if (match.hit)
+                {
+                    System.Lex.WriteSuccessToLog(lexer, debugSpan, u"wkday");
+                }
+                else
+                {
+                    System.Lex.WriteFailureToLog(lexer, u"wkday");
+                }
+            }
+        #endif
+        if (!match.hit)
+        {
+            match.value = null;
+        }
+        return match;
+    }
+    public static Match weekday(TrivialLexer& lexer)
+    {
+        #if (DEBUG)
+            Span debugSpan;
+            bool writeToLog = lexer.Log() != null;
+            if (writeToLog)
+            {
+                debugSpan = lexer.GetSpan();
+                System.Lex.WriteBeginRuleToLog(lexer, u"weekday");
+            }
+        #endif
+        Match match(false);
+        Match* parentMatch0 = &match;
+        {
+            long save = lexer.GetPos();
+            Match match(false);
+            Match* parentMatch1 = &match;
+            {
+                long save = lexer.GetPos();
+                Match match(false);
+                Match* parentMatch2 = &match;
+                {
+                    long save = lexer.GetPos();
+                    Match match(false);
+                    Match* parentMatch3 = &match;
+                    {
+                        long save = lexer.GetPos();
+                        Match match(false);
+                        Match* parentMatch4 = &match;
+                        {
+                            long save = lexer.GetPos();
+                            Match match(false);
+                            Match* parentMatch5 = &match;
+                            {
+                                long save = lexer.GetPos();
+                                Match match(true);
+                                for (int i : s10)
+                                {
+                                    if (*lexer == i)
+                                    {
+                                        ++lexer;
+                                    }
+                                    else
+                                    {
+                                        match.hit = false;
+                                        break;
+                                    }
+                                }
+                                *parentMatch5 = match;
+                                if (!match.hit)
+                                {
+                                    Match match(false);
+                                    Match* parentMatch6 = &match;
+                                    lexer.SetPos(save);
+                                    {
+                                        Match match(true);
+                                        for (int i : s11)
+                                        {
+                                            if (*lexer == i)
+                                            {
+                                                ++lexer;
+                                            }
+                                            else
+                                            {
+                                                match.hit = false;
+                                                break;
+                                            }
+                                        }
+                                        *parentMatch6 = match;
+                                    }
+                                    *parentMatch5 = match;
+                                }
+                            }
+                            *parentMatch4 = match;
+                            if (!match.hit)
+                            {
+                                Match match(false);
+                                Match* parentMatch7 = &match;
+                                lexer.SetPos(save);
+                                {
+                                    Match match(true);
+                                    for (int i : s12)
+                                    {
+                                        if (*lexer == i)
+                                        {
+                                            ++lexer;
+                                        }
+                                        else
+                                        {
+                                            match.hit = false;
+                                            break;
+                                        }
+                                    }
+                                    *parentMatch7 = match;
+                                }
+                                *parentMatch4 = match;
+                            }
+                        }
+                        *parentMatch3 = match;
+                        if (!match.hit)
+                        {
+                            Match match(false);
+                            Match* parentMatch8 = &match;
+                            lexer.SetPos(save);
+                            {
+                                Match match(true);
+                                for (int i : s13)
+                                {
+                                    if (*lexer == i)
+                                    {
+                                        ++lexer;
+                                    }
+                                    else
+                                    {
+                                        match.hit = false;
+                                        break;
+                                    }
+                                }
+                                *parentMatch8 = match;
+                            }
+                            *parentMatch3 = match;
+                        }
+                    }
+                    *parentMatch2 = match;
+                    if (!match.hit)
+                    {
+                        Match match(false);
+                        Match* parentMatch9 = &match;
+                        lexer.SetPos(save);
+                        {
+                            Match match(true);
+                            for (int i : s14)
+                            {
+                                if (*lexer == i)
+                                {
+                                    ++lexer;
+                                }
+                                else
+                                {
+                                    match.hit = false;
+                                    break;
+                                }
+                            }
+                            *parentMatch9 = match;
+                        }
+                        *parentMatch2 = match;
+                    }
+                }
+                *parentMatch1 = match;
+                if (!match.hit)
+                {
+                    Match match(false);
+                    Match* parentMatch10 = &match;
+                    lexer.SetPos(save);
+                    {
+                        Match match(true);
+                        for (int i : s15)
+                        {
+                            if (*lexer == i)
+                            {
+                                ++lexer;
+                            }
+                            else
+                            {
+                                match.hit = false;
+                                break;
+                            }
+                        }
+                        *parentMatch10 = match;
+                    }
+                    *parentMatch1 = match;
+                }
+            }
+            *parentMatch0 = match;
+            if (!match.hit)
+            {
+                Match match(false);
+                Match* parentMatch11 = &match;
+                lexer.SetPos(save);
+                {
+                    Match match(true);
+                    for (int i : s16)
+                    {
+                        if (*lexer == i)
+                        {
+                            ++lexer;
+                        }
+                        else
+                        {
+                            match.hit = false;
+                            break;
+                        }
+                    }
+                    *parentMatch11 = match;
+                }
+                *parentMatch0 = match;
+            }
+        }
+        #if (DEBUG)
+            if (writeToLog)
+            {
+                if (match.hit)
+                {
+                    System.Lex.WriteSuccessToLog(lexer, debugSpan, u"weekday");
+                }
+                else
+                {
+                    System.Lex.WriteFailureToLog(lexer, u"weekday");
+                }
+            }
+        #endif
+        if (!match.hit)
+        {
+            match.value = null;
+        }
+        return match;
+    }
+    public static Match month(TrivialLexer& lexer)
+    {
+        #if (DEBUG)
+            Span debugSpan;
+            bool writeToLog = lexer.Log() != null;
+            if (writeToLog)
+            {
+                debugSpan = lexer.GetSpan();
+                System.Lex.WriteBeginRuleToLog(lexer, u"month");
+            }
+        #endif
+        Match match(false);
+        Match* parentMatch0 = &match;
+        {
+            long save = lexer.GetPos();
+            Match match(false);
+            Match* parentMatch1 = &match;
+            {
+                long save = lexer.GetPos();
+                Match match(false);
+                Match* parentMatch2 = &match;
+                {
+                    long save = lexer.GetPos();
+                    Match match(false);
+                    Match* parentMatch3 = &match;
+                    {
+                        long save = lexer.GetPos();
+                        Match match(false);
+                        Match* parentMatch4 = &match;
+                        {
+                            long save = lexer.GetPos();
+                            Match match(false);
+                            Match* parentMatch5 = &match;
+                            {
+                                long save = lexer.GetPos();
+                                Match match(false);
+                                Match* parentMatch6 = &match;
+                                {
+                                    long save = lexer.GetPos();
+                                    Match match(false);
+                                    Match* parentMatch7 = &match;
+                                    {
+                                        long save = lexer.GetPos();
+                                        Match match(false);
+                                        Match* parentMatch8 = &match;
+                                        {
+                                            long save = lexer.GetPos();
+                                            Match match(false);
+                                            Match* parentMatch9 = &match;
+                                            {
+                                                long save = lexer.GetPos();
+                                                Match match(false);
+                                                Match* parentMatch10 = &match;
+                                                {
+                                                    long save = lexer.GetPos();
+                                                    Match match(false);
+                                                    Match* parentMatch11 = &match;
+                                                    {
+                                                        long pos = lexer.GetPos();
+                                                        Match match(true);
+                                                        for (int i : s17)
+                                                        {
+                                                            if (*lexer == i)
+                                                            {
+                                                                ++lexer;
+                                                            }
+                                                            else
+                                                            {
+                                                                match.hit = false;
+                                                                break;
+                                                            }
+                                                        }
+                                                        if (match.hit)
+                                                        {
+                                                            {
+                                                                #if (DEBUG)
+                                                                    if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"month");
+                                                                #endif
+                                                                return Match(true, new Value<Month>(Month.january));
+                                                            }
+                                                        }
+                                                        *parentMatch11 = match;
+                                                    }
+                                                    *parentMatch10 = match;
+                                                    if (!match.hit)
+                                                    {
+                                                        Match match(false);
+                                                        Match* parentMatch12 = &match;
+                                                        lexer.SetPos(save);
+                                                        {
+                                                            Match match(false);
+                                                            Match* parentMatch13 = &match;
+                                                            {
+                                                                long pos = lexer.GetPos();
+                                                                Match match(true);
+                                                                for (int i : s18)
+                                                                {
+                                                                    if (*lexer == i)
+                                                                    {
+                                                                        ++lexer;
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        match.hit = false;
+                                                                        break;
+                                                                    }
+                                                                }
+                                                                if (match.hit)
+                                                                {
+                                                                    {
+                                                                        #if (DEBUG)
+                                                                            if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"month");
+                                                                        #endif
+                                                                        return Match(true, new Value<Month>(Month.february));
+                                                                    }
+                                                                }
+                                                                *parentMatch13 = match;
+                                                            }
+                                                            *parentMatch12 = match;
+                                                        }
+                                                        *parentMatch10 = match;
+                                                    }
+                                                }
+                                                *parentMatch9 = match;
+                                                if (!match.hit)
+                                                {
+                                                    Match match(false);
+                                                    Match* parentMatch14 = &match;
+                                                    lexer.SetPos(save);
+                                                    {
+                                                        Match match(false);
+                                                        Match* parentMatch15 = &match;
+                                                        {
+                                                            long pos = lexer.GetPos();
+                                                            Match match(true);
+                                                            for (int i : s19)
+                                                            {
+                                                                if (*lexer == i)
+                                                                {
+                                                                    ++lexer;
+                                                                }
+                                                                else
+                                                                {
+                                                                    match.hit = false;
+                                                                    break;
+                                                                }
+                                                            }
+                                                            if (match.hit)
+                                                            {
+                                                                {
+                                                                    #if (DEBUG)
+                                                                        if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"month");
+                                                                    #endif
+                                                                    return Match(true, new Value<Month>(Month.march));
+                                                                }
+                                                            }
+                                                            *parentMatch15 = match;
+                                                        }
+                                                        *parentMatch14 = match;
+                                                    }
+                                                    *parentMatch9 = match;
+                                                }
+                                            }
+                                            *parentMatch8 = match;
+                                            if (!match.hit)
+                                            {
+                                                Match match(false);
+                                                Match* parentMatch16 = &match;
+                                                lexer.SetPos(save);
+                                                {
+                                                    Match match(false);
+                                                    Match* parentMatch17 = &match;
+                                                    {
+                                                        long pos = lexer.GetPos();
+                                                        Match match(true);
+                                                        for (int i : s20)
+                                                        {
+                                                            if (*lexer == i)
+                                                            {
+                                                                ++lexer;
+                                                            }
+                                                            else
+                                                            {
+                                                                match.hit = false;
+                                                                break;
+                                                            }
+                                                        }
+                                                        if (match.hit)
+                                                        {
+                                                            {
+                                                                #if (DEBUG)
+                                                                    if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"month");
+                                                                #endif
+                                                                return Match(true, new Value<Month>(Month.april));
+                                                            }
+                                                        }
+                                                        *parentMatch17 = match;
+                                                    }
+                                                    *parentMatch16 = match;
+                                                }
+                                                *parentMatch8 = match;
+                                            }
+                                        }
+                                        *parentMatch7 = match;
+                                        if (!match.hit)
+                                        {
+                                            Match match(false);
+                                            Match* parentMatch18 = &match;
+                                            lexer.SetPos(save);
+                                            {
+                                                Match match(false);
+                                                Match* parentMatch19 = &match;
+                                                {
+                                                    long pos = lexer.GetPos();
+                                                    Match match(true);
+                                                    for (int i : s21)
+                                                    {
+                                                        if (*lexer == i)
+                                                        {
+                                                            ++lexer;
+                                                        }
+                                                        else
+                                                        {
+                                                            match.hit = false;
+                                                            break;
+                                                        }
+                                                    }
+                                                    if (match.hit)
+                                                    {
+                                                        {
+                                                            #if (DEBUG)
+                                                                if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"month");
+                                                            #endif
+                                                            return Match(true, new Value<Month>(Month.may));
+                                                        }
+                                                    }
+                                                    *parentMatch19 = match;
+                                                }
+                                                *parentMatch18 = match;
+                                            }
+                                            *parentMatch7 = match;
+                                        }
+                                    }
+                                    *parentMatch6 = match;
+                                    if (!match.hit)
+                                    {
+                                        Match match(false);
+                                        Match* parentMatch20 = &match;
+                                        lexer.SetPos(save);
+                                        {
+                                            Match match(false);
+                                            Match* parentMatch21 = &match;
+                                            {
+                                                long pos = lexer.GetPos();
+                                                Match match(true);
+                                                for (int i : s22)
+                                                {
+                                                    if (*lexer == i)
+                                                    {
+                                                        ++lexer;
+                                                    }
+                                                    else
+                                                    {
+                                                        match.hit = false;
+                                                        break;
+                                                    }
+                                                }
+                                                if (match.hit)
+                                                {
+                                                    {
+                                                        #if (DEBUG)
+                                                            if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"month");
+                                                        #endif
+                                                        return Match(true, new Value<Month>(Month.june));
+                                                    }
+                                                }
+                                                *parentMatch21 = match;
+                                            }
+                                            *parentMatch20 = match;
+                                        }
+                                        *parentMatch6 = match;
+                                    }
+                                }
+                                *parentMatch5 = match;
+                                if (!match.hit)
+                                {
+                                    Match match(false);
+                                    Match* parentMatch22 = &match;
+                                    lexer.SetPos(save);
+                                    {
+                                        Match match(false);
+                                        Match* parentMatch23 = &match;
+                                        {
+                                            long pos = lexer.GetPos();
+                                            Match match(true);
+                                            for (int i : s23)
+                                            {
+                                                if (*lexer == i)
+                                                {
+                                                    ++lexer;
+                                                }
+                                                else
+                                                {
+                                                    match.hit = false;
+                                                    break;
+                                                }
+                                            }
+                                            if (match.hit)
+                                            {
+                                                {
+                                                    #if (DEBUG)
+                                                        if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"month");
+                                                    #endif
+                                                    return Match(true, new Value<Month>(Month.july));
+                                                }
+                                            }
+                                            *parentMatch23 = match;
+                                        }
+                                        *parentMatch22 = match;
+                                    }
+                                    *parentMatch5 = match;
+                                }
+                            }
+                            *parentMatch4 = match;
+                            if (!match.hit)
+                            {
+                                Match match(false);
+                                Match* parentMatch24 = &match;
+                                lexer.SetPos(save);
+                                {
+                                    Match match(false);
+                                    Match* parentMatch25 = &match;
+                                    {
+                                        long pos = lexer.GetPos();
+                                        Match match(true);
+                                        for (int i : s24)
+                                        {
+                                            if (*lexer == i)
+                                            {
+                                                ++lexer;
+                                            }
+                                            else
+                                            {
+                                                match.hit = false;
+                                                break;
+                                            }
+                                        }
+                                        if (match.hit)
+                                        {
+                                            {
+                                                #if (DEBUG)
+                                                    if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"month");
+                                                #endif
+                                                return Match(true, new Value<Month>(Month.august));
+                                            }
+                                        }
+                                        *parentMatch25 = match;
+                                    }
+                                    *parentMatch24 = match;
+                                }
+                                *parentMatch4 = match;
+                            }
+                        }
+                        *parentMatch3 = match;
+                        if (!match.hit)
+                        {
+                            Match match(false);
+                            Match* parentMatch26 = &match;
+                            lexer.SetPos(save);
+                            {
+                                Match match(false);
+                                Match* parentMatch27 = &match;
+                                {
+                                    long pos = lexer.GetPos();
+                                    Match match(true);
+                                    for (int i : s25)
+                                    {
+                                        if (*lexer == i)
+                                        {
+                                            ++lexer;
+                                        }
+                                        else
+                                        {
+                                            match.hit = false;
+                                            break;
+                                        }
+                                    }
+                                    if (match.hit)
+                                    {
+                                        {
+                                            #if (DEBUG)
+                                                if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"month");
+                                            #endif
+                                            return Match(true, new Value<Month>(Month.september));
+                                        }
+                                    }
+                                    *parentMatch27 = match;
+                                }
+                                *parentMatch26 = match;
+                            }
+                            *parentMatch3 = match;
+                        }
+                    }
+                    *parentMatch2 = match;
+                    if (!match.hit)
+                    {
+                        Match match(false);
+                        Match* parentMatch28 = &match;
+                        lexer.SetPos(save);
+                        {
+                            Match match(false);
+                            Match* parentMatch29 = &match;
+                            {
+                                long pos = lexer.GetPos();
+                                Match match(true);
+                                for (int i : s26)
+                                {
+                                    if (*lexer == i)
+                                    {
+                                        ++lexer;
+                                    }
+                                    else
+                                    {
+                                        match.hit = false;
+                                        break;
+                                    }
+                                }
+                                if (match.hit)
+                                {
+                                    {
+                                        #if (DEBUG)
+                                            if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"month");
+                                        #endif
+                                        return Match(true, new Value<Month>(Month.october));
+                                    }
+                                }
+                                *parentMatch29 = match;
+                            }
+                            *parentMatch28 = match;
+                        }
+                        *parentMatch2 = match;
+                    }
+                }
+                *parentMatch1 = match;
+                if (!match.hit)
+                {
+                    Match match(false);
+                    Match* parentMatch30 = &match;
+                    lexer.SetPos(save);
+                    {
+                        Match match(false);
+                        Match* parentMatch31 = &match;
+                        {
+                            long pos = lexer.GetPos();
+                            Match match(true);
+                            for (int i : s27)
+                            {
+                                if (*lexer == i)
+                                {
+                                    ++lexer;
+                                }
+                                else
+                                {
+                                    match.hit = false;
+                                    break;
+                                }
+                            }
+                            if (match.hit)
+                            {
+                                {
+                                    #if (DEBUG)
+                                        if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"month");
+                                    #endif
+                                    return Match(true, new Value<Month>(Month.november));
+                                }
+                            }
+                            *parentMatch31 = match;
+                        }
+                        *parentMatch30 = match;
+                    }
+                    *parentMatch1 = match;
+                }
+            }
+            *parentMatch0 = match;
+            if (!match.hit)
+            {
+                Match match(false);
+                Match* parentMatch32 = &match;
+                lexer.SetPos(save);
+                {
+                    Match match(false);
+                    Match* parentMatch33 = &match;
+                    {
+                        long pos = lexer.GetPos();
+                        Match match(true);
+                        for (int i : s28)
+                        {
+                            if (*lexer == i)
+                            {
+                                ++lexer;
+                            }
+                            else
+                            {
+                                match.hit = false;
+                                break;
+                            }
+                        }
+                        if (match.hit)
+                        {
+                            {
+                                #if (DEBUG)
+                                    if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"month");
+                                #endif
+                                return Match(true, new Value<Month>(Month.december));
+                            }
+                        }
+                        *parentMatch33 = match;
+                    }
+                    *parentMatch32 = match;
+                }
+                *parentMatch0 = match;
+            }
+        }
+        #if (DEBUG)
+            if (writeToLog)
+            {
+                if (match.hit)
+                {
+                    System.Lex.WriteSuccessToLog(lexer, debugSpan, u"month");
+                }
+                else
+                {
+                    System.Lex.WriteFailureToLog(lexer, u"month");
+                }
+            }
+        #endif
+        if (!match.hit)
+        {
+            match.value = null;
+        }
+        return match;
+    }
+    public static Match time(TrivialLexer& lexer)
+    {
+        #if (DEBUG)
+            Span debugSpan;
+            bool writeToLog = lexer.Log() != null;
+            if (writeToLog)
+            {
+                debugSpan = lexer.GetSpan();
+                System.Lex.WriteBeginRuleToLog(lexer, u"time");
+            }
+        #endif
+        UniquePtr<Value<int>> hour;
+        UniquePtr<Value<int>> min;
+        UniquePtr<Value<int>> sec;
+        Match match(false);
+        Match* parentMatch0 = &match;
+        {
+            long pos = lexer.GetPos();
+            Match match(false);
+            Match* parentMatch1 = &match;
+            {
+                Match match(false);
+                Match* parentMatch2 = &match;
+                {
+                    Match match(false);
+                    Match* parentMatch3 = &match;
+                    {
+                        Match match(false);
+                        Match* parentMatch4 = &match;
+                        {
+                            Match match(false);
+                            Match* parentMatch5 = &match;
+                            {
+                                Match match = HttpDateParser.Hour(lexer);
+                                hour.Reset(cast<Value<int>*>(match.value));
+                                *parentMatch5 = match;
+                            }
+                            if (match.hit)
+                            {
+                                Match match(false);
+                                Match* parentMatch6 = &match;
+                                {
+                                    Match match(false);
+                                    if (*lexer == 58)
+                                    {
+                                        ++lexer;
+                                        match.hit = true;
+                                    }
+                                    *parentMatch6 = match;
+                                }
+                                *parentMatch5 = match;
+                            }
+                            *parentMatch4 = match;
+                        }
+                        if (match.hit)
+                        {
+                            Match match(false);
+                            Match* parentMatch7 = &match;
+                            {
+                                Match match = HttpDateParser.Min(lexer);
+                                min.Reset(cast<Value<int>*>(match.value));
+                                *parentMatch7 = match;
+                            }
+                            *parentMatch4 = match;
+                        }
+                        *parentMatch3 = match;
+                    }
+                    if (match.hit)
+                    {
+                        Match match(false);
+                        Match* parentMatch8 = &match;
+                        {
+                            Match match(false);
+                            if (*lexer == 58)
+                            {
+                                ++lexer;
+                                match.hit = true;
+                            }
+                            *parentMatch8 = match;
+                        }
+                        *parentMatch3 = match;
+                    }
+                    *parentMatch2 = match;
+                }
+                if (match.hit)
+                {
+                    Match match(false);
+                    Match* parentMatch9 = &match;
+                    {
+                        Match match = HttpDateParser.Sec(lexer);
+                        sec.Reset(cast<Value<int>*>(match.value));
+                        *parentMatch9 = match;
+                    }
+                    *parentMatch2 = match;
+                }
+                *parentMatch1 = match;
+            }
+            if (match.hit)
+            {
+                {
+                    #if (DEBUG)
+                        if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"time");
+                    #endif
+                    return Match(true, new Value<int>(3600 * hour->value + 60 * min->value + sec->value));
+                }
+            }
+            *parentMatch0 = match;
+        }
+        #if (DEBUG)
+            if (writeToLog)
+            {
+                if (match.hit)
+                {
+                    System.Lex.WriteSuccessToLog(lexer, debugSpan, u"time");
+                }
+                else
+                {
+                    System.Lex.WriteFailureToLog(lexer, u"time");
+                }
+            }
+        #endif
+        if (!match.hit)
+        {
+            match.value = null;
+        }
+        return match;
+    }
+    public static Match Hour(TrivialLexer& lexer)
+    {
+        #if (DEBUG)
+            Span debugSpan;
+            bool writeToLog = lexer.Log() != null;
+            if (writeToLog)
+            {
+                debugSpan = lexer.GetSpan();
+                System.Lex.WriteBeginRuleToLog(lexer, u"Hour");
+            }
+        #endif
+        ustring s;
+        UniquePtr<Value<uchar>> d1;
+        UniquePtr<Value<uchar>> d2;
+        Match match(false);
+        Match* parentMatch0 = &match;
+        {
+            long pos = lexer.GetPos();
+            Match match(false);
+            Match* parentMatch1 = &match;
+            {
+                Match match(false);
+                Match* parentMatch2 = &match;
+                {
+                    Match match(false);
+                    Match* parentMatch3 = &match;
+                    {
+                        long pos = lexer.GetPos();
+                        Match match = HttpDateParser.DIGIT(lexer);
+                        d1.Reset(cast<Value<uchar>*>(match.value));
+                        if (match.hit)
+                        {
+                            s.Append(d1->value);
+                        }
+                        *parentMatch3 = match;
+                    }
+                    *parentMatch2 = match;
+                }
+                if (match.hit)
+                {
+                    Match match(false);
+                    Match* parentMatch4 = &match;
+                    {
+                        Match match(false);
+                        Match* parentMatch5 = &match;
+                        {
+                            long pos = lexer.GetPos();
+                            Match match = HttpDateParser.DIGIT(lexer);
+                            d2.Reset(cast<Value<uchar>*>(match.value));
+                            if (match.hit)
+                            {
+                                s.Append(d2->value);
+                            }
+                            *parentMatch5 = match;
+                        }
+                        *parentMatch4 = match;
+                    }
+                    *parentMatch2 = match;
+                }
+                *parentMatch1 = match;
+            }
+            if (match.hit)
+            {
+                {
+                    #if (DEBUG)
+                        if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Hour");
+                    #endif
+                    return Match(true, new Value<int>(ParseInt(ToUtf8(s))));
+                }
+            }
+            *parentMatch0 = match;
+        }
+        #if (DEBUG)
+            if (writeToLog)
+            {
+                if (match.hit)
+                {
+                    System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Hour");
+                }
+                else
+                {
+                    System.Lex.WriteFailureToLog(lexer, u"Hour");
+                }
+            }
+        #endif
+        if (!match.hit)
+        {
+            match.value = null;
+        }
+        return match;
+    }
+    public static Match Min(TrivialLexer& lexer)
+    {
+        #if (DEBUG)
+            Span debugSpan;
+            bool writeToLog = lexer.Log() != null;
+            if (writeToLog)
+            {
+                debugSpan = lexer.GetSpan();
+                System.Lex.WriteBeginRuleToLog(lexer, u"Min");
+            }
+        #endif
+        ustring s;
+        UniquePtr<Value<uchar>> d1;
+        UniquePtr<Value<uchar>> d2;
+        Match match(false);
+        Match* parentMatch0 = &match;
+        {
+            long pos = lexer.GetPos();
+            Match match(false);
+            Match* parentMatch1 = &match;
+            {
+                Match match(false);
+                Match* parentMatch2 = &match;
+                {
+                    Match match(false);
+                    Match* parentMatch3 = &match;
+                    {
+                        long pos = lexer.GetPos();
+                        Match match = HttpDateParser.DIGIT(lexer);
+                        d1.Reset(cast<Value<uchar>*>(match.value));
+                        if (match.hit)
+                        {
+                            s.Append(d1->value);
+                        }
+                        *parentMatch3 = match;
+                    }
+                    *parentMatch2 = match;
+                }
+                if (match.hit)
+                {
+                    Match match(false);
+                    Match* parentMatch4 = &match;
+                    {
+                        Match match(false);
+                        Match* parentMatch5 = &match;
+                        {
+                            long pos = lexer.GetPos();
+                            Match match = HttpDateParser.DIGIT(lexer);
+                            d2.Reset(cast<Value<uchar>*>(match.value));
+                            if (match.hit)
+                            {
+                                s.Append(d2->value);
+                            }
+                            *parentMatch5 = match;
+                        }
+                        *parentMatch4 = match;
+                    }
+                    *parentMatch2 = match;
+                }
+                *parentMatch1 = match;
+            }
+            if (match.hit)
+            {
+                {
+                    #if (DEBUG)
+                        if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Min");
+                    #endif
+                    return Match(true, new Value<int>(ParseInt(ToUtf8(s))));
+                }
+            }
+            *parentMatch0 = match;
+        }
+        #if (DEBUG)
+            if (writeToLog)
+            {
+                if (match.hit)
+                {
+                    System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Min");
+                }
+                else
+                {
+                    System.Lex.WriteFailureToLog(lexer, u"Min");
+                }
+            }
+        #endif
+        if (!match.hit)
+        {
+            match.value = null;
+        }
+        return match;
+    }
+    public static Match Sec(TrivialLexer& lexer)
+    {
+        #if (DEBUG)
+            Span debugSpan;
+            bool writeToLog = lexer.Log() != null;
+            if (writeToLog)
+            {
+                debugSpan = lexer.GetSpan();
+                System.Lex.WriteBeginRuleToLog(lexer, u"Sec");
+            }
+        #endif
+        ustring s;
+        UniquePtr<Value<uchar>> d1;
+        UniquePtr<Value<uchar>> d2;
+        Match match(false);
+        Match* parentMatch0 = &match;
+        {
+            long pos = lexer.GetPos();
+            Match match(false);
+            Match* parentMatch1 = &match;
+            {
+                Match match(false);
+                Match* parentMatch2 = &match;
+                {
+                    Match match(false);
+                    Match* parentMatch3 = &match;
+                    {
+                        long pos = lexer.GetPos();
+                        Match match = HttpDateParser.DIGIT(lexer);
+                        d1.Reset(cast<Value<uchar>*>(match.value));
+                        if (match.hit)
+                        {
+                            s.Append(d1->value);
+                        }
+                        *parentMatch3 = match;
+                    }
+                    *parentMatch2 = match;
+                }
+                if (match.hit)
+                {
+                    Match match(false);
+                    Match* parentMatch4 = &match;
+                    {
+                        Match match(false);
+                        Match* parentMatch5 = &match;
+                        {
+                            long pos = lexer.GetPos();
+                            Match match = HttpDateParser.DIGIT(lexer);
+                            d2.Reset(cast<Value<uchar>*>(match.value));
+                            if (match.hit)
+                            {
+                                s.Append(d2->value);
+                            }
+                            *parentMatch5 = match;
+                        }
+                        *parentMatch4 = match;
+                    }
+                    *parentMatch2 = match;
+                }
+                *parentMatch1 = match;
+            }
+            if (match.hit)
+            {
+                {
+                    #if (DEBUG)
+                        if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Sec");
+                    #endif
+                    return Match(true, new Value<int>(ParseInt(ToUtf8(s))));
+                }
+            }
+            *parentMatch0 = match;
+        }
+        #if (DEBUG)
+            if (writeToLog)
+            {
+                if (match.hit)
+                {
+                    System.Lex.WriteSuccessToLog(lexer, debugSpan, u"Sec");
+                }
+                else
+                {
+                    System.Lex.WriteFailureToLog(lexer, u"Sec");
+                }
+            }
+        #endif
+        if (!match.hit)
+        {
+            match.value = null;
+        }
+        return match;
+    }
+    public static Match deltaSeconds(TrivialLexer& lexer)
+    {
+        #if (DEBUG)
+            Span debugSpan;
+            bool writeToLog = lexer.Log() != null;
+            if (writeToLog)
+            {
+                debugSpan = lexer.GetSpan();
+                System.Lex.WriteBeginRuleToLog(lexer, u"deltaSeconds");
+            }
+        #endif
+        ustring s;
+        UniquePtr<Value<uchar>> digit;
+        Match match(false);
+        Match* parentMatch0 = &match;
+        {
+            long pos = lexer.GetPos();
+            Match match(false);
+            Match* parentMatch1 = &match;
+            {
+                Match match(false);
+                Match* parentMatch2 = &match;
+                {
+                    Match match(false);
+                    Match* parentMatch3 = &match;
+                    {
+                        Match match(false);
+                        Match* parentMatch4 = &match;
+                        {
+                            long pos = lexer.GetPos();
+                            Match match = HttpDateParser.DIGIT(lexer);
+                            digit.Reset(cast<Value<uchar>*>(match.value));
+                            if (match.hit)
+                            {
+                                s.Append(digit->value);
+                            }
+                            *parentMatch4 = match;
+                        }
+                        *parentMatch3 = match;
+                    }
+                    *parentMatch2 = match;
+                }
+                if (match.hit)
+                {
+                    Match match(true);
+                    Match* parentMatch5 = &match;
+                    while (true)
+                    {
+                        long save = lexer.GetPos();
+                        {
+                            Match match(false);
+                            Match* parentMatch6 = &match;
+                            {
+                                Match match(false);
+                                Match* parentMatch7 = &match;
+                                {
+                                    long pos = lexer.GetPos();
+                                    Match match = HttpDateParser.DIGIT(lexer);
+                                    digit.Reset(cast<Value<uchar>*>(match.value));
+                                    if (match.hit)
+                                    {
+                                        s.Append(digit->value);
+                                    }
+                                    *parentMatch7 = match;
+                                }
+                                *parentMatch6 = match;
+                            }
+                            if (match.hit)
+                            {
+                                *parentMatch5 = match;
+                            }
+                            else
+                            {
+                                lexer.SetPos(save);
+                                break;
+                            }
+                        }
+                    }
+                }
+                *parentMatch1 = match;
+            }
+            if (match.hit)
+            {
+                {
+                    #if (DEBUG)
+                        if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"deltaSeconds");
+                    #endif
+                    return Match(true, new Value<int>(ParseInt(ToUtf8(s))));
+                }
+            }
+            *parentMatch0 = match;
+        }
+        #if (DEBUG)
+            if (writeToLog)
+            {
+                if (match.hit)
+                {
+                    System.Lex.WriteSuccessToLog(lexer, debugSpan, u"deltaSeconds");
+                }
+                else
+                {
+                    System.Lex.WriteFailureToLog(lexer, u"deltaSeconds");
+                }
+            }
+        #endif
+        if (!match.hit)
+        {
+            match.value = null;
+        }
+        return match;
+    }
+    public static Match SP(TrivialLexer& lexer)
+    {
+        #if (DEBUG)
+            Span debugSpan;
+            bool writeToLog = lexer.Log() != null;
+            if (writeToLog)
+            {
+                debugSpan = lexer.GetSpan();
+                System.Lex.WriteBeginRuleToLog(lexer, u"SP");
+            }
+        #endif
+        Match match(false);
+        Match* parentMatch0 = &match;
+        {
+            long pos = lexer.GetPos();
+            Match match(false);
+            if (*lexer == 32)
+            {
+                ++lexer;
+                match.hit = true;
+            }
+            if (match.hit)
+            {
+                {
+                    #if (DEBUG)
+                        if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"SP");
+                    #endif
+                    return Match(true, new Value<uchar>(' '));
+                }
+            }
+            *parentMatch0 = match;
+        }
+        #if (DEBUG)
+            if (writeToLog)
+            {
+                if (match.hit)
+                {
+                    System.Lex.WriteSuccessToLog(lexer, debugSpan, u"SP");
+                }
+                else
+                {
+                    System.Lex.WriteFailureToLog(lexer, u"SP");
+                }
+            }
+        #endif
+        if (!match.hit)
+        {
+            match.value = null;
+        }
+        return match;
+    }
+    public static Match DIGIT(TrivialLexer& lexer)
+    {
+        #if (DEBUG)
+            Span debugSpan;
+            bool writeToLog = lexer.Log() != null;
+            if (writeToLog)
+            {
+                debugSpan = lexer.GetSpan();
+                System.Lex.WriteBeginRuleToLog(lexer, u"DIGIT");
+            }
+        #endif
+        Match match(false);
+        Match* parentMatch0 = &match;
+        {
+            long pos = lexer.GetPos();
+            Match match(false);
+            for (const Range& range : s29)
+            {
+                if (*lexer >= range.first && *lexer <= range.last)
+                {
+                    match.hit = true;
+                    ++lexer;
+                    break;
+                }
+            }
+            if (match.hit)
+            {
+                {
+                    #if (DEBUG)
+                        if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"DIGIT");
+                    #endif
+                    return Match(true, new Value<uchar>(lexer.GetUChar(pos)));
+                }
+            }
+            *parentMatch0 = match;
+        }
+        #if (DEBUG)
+            if (writeToLog)
+            {
+                if (match.hit)
+                {
+                    System.Lex.WriteSuccessToLog(lexer, debugSpan, u"DIGIT");
+                }
+                else
+                {
+                    System.Lex.WriteFailureToLog(lexer, u"DIGIT");
+                }
+            }
+        #endif
+        if (!match.hit)
+        {
+            match.value = null;
+        }
+        return match;
+    }
+}

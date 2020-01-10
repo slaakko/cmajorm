@@ -12,6 +12,21 @@ namespace sngcm { namespace ast {
 
 class IdentifierNode;
 
+enum class NsFlags : int8_t
+{
+    none = 0, isUnnamedNs = 1 << 0, hasUnnamedNs = 1 << 1
+};
+
+inline constexpr NsFlags operator|(NsFlags left, NsFlags right)
+{
+    return static_cast<NsFlags>(static_cast<int8_t>(left) | static_cast<int8_t>(right));
+}
+
+inline constexpr NsFlags operator&(NsFlags left, NsFlags right)
+{
+    return static_cast<NsFlags>(static_cast<int8_t>(left) & static_cast<int8_t>(right));
+}
+
 class SNGCM_AST_API NamespaceNode : public Node
 {
 public:
@@ -25,9 +40,14 @@ public:
     IdentifierNode* Id() const;
     NodeList<Node>& Members() { return members; }
     const NodeList<Node>& Members() const { return members; }
+    bool IsUnnamedNs() const { return (flags & NsFlags::isUnnamedNs) != NsFlags::none; }
+    void SetUnnamedNs() { flags = flags | NsFlags::isUnnamedNs; }
+    bool HasUnnamedNs() const { return (flags & NsFlags::hasUnnamedNs) != NsFlags::none; }
+    void SetHasUnnamedNs() { flags = flags | NsFlags::hasUnnamedNs; }
 private:
     std::unique_ptr<IdentifierNode> id;
     NodeList<Node> members;
+    NsFlags flags;
 };
 
 class SNGCM_AST_API AliasNode : public Node

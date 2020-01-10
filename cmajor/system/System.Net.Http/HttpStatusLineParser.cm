@@ -1,0 +1,800 @@
+using System;
+using System.Collections;
+using System.Lex;
+using System.Parsing;
+using System.Net.Http;
+using HttpTokens;
+
+// this file has been automatically generated from 'D:/work/cmajorm/cmajor/system/System.Net.Http/HttpStatusLineParser.parser' using soulcm parser generator scmpg version 3.0.0
+
+public static class HttpStatusLineParser
+{
+    public static HttpStatus Parse(HttpLexer& lexer)
+    {
+        UniquePtr<Value<HttpStatus>> value;
+        #if (DEBUG)
+            if (lexer.Log() != null)
+            {
+                lexer.Log()->WriteBeginRule(u"parse");
+                lexer.Log()->IncIndent();
+            }
+        #endif
+        ++lexer;
+        System.Lex.Span span = lexer.GetSpan();
+        Match match = StatusLine(lexer);
+        value.Reset(cast<Value<HttpStatus>*>(match.value));
+        #if (DEBUG)
+            if (lexer.Log() != null)
+            {
+                lexer.Log()->DecIndent();
+                lexer.Log()->WriteEndRule(u"parse");
+            }
+        #endif
+        if (match.hit)
+        {
+            if (*lexer == System.Lex.END_TOKEN)
+            {
+                return value->value;
+            }
+            else
+            {
+                lexer.ThrowExpectationFailure(lexer.GetSpan(), GetEndTokenInfo());
+            }
+        }
+        else
+        {
+            lexer.ThrowExpectationFailure(span, u"StatusLine");
+        }
+        return value->value;
+    }
+    public static Match StatusLine(HttpLexer& lexer)
+    {
+        #if (DEBUG)
+            Span debugSpan;
+            bool writeToLog = lexer.Log() != null;
+            if (writeToLog)
+            {
+                debugSpan = lexer.GetSpan();
+                System.Lex.WriteBeginRuleToLog(lexer, u"StatusLine");
+            }
+        #endif
+        UniquePtr<Value<string>> v;
+        UniquePtr<Value<ushort>> sc;
+        UniquePtr<Value<string>> rp;
+        Match match(false);
+        Match* parentMatch0 = &match;
+        {
+            long pos = lexer.GetPos();
+            Match match(false);
+            Match* parentMatch1 = &match;
+            {
+                Match match(false);
+                Match* parentMatch2 = &match;
+                {
+                    Match match(false);
+                    Match* parentMatch3 = &match;
+                    {
+                        Match match(false);
+                        Match* parentMatch4 = &match;
+                        {
+                            Match match(false);
+                            Match* parentMatch5 = &match;
+                            {
+                                Match match = HttpStatusLineParser.HttpVersion(lexer);
+                                v.Reset(cast<Value<string>*>(match.value));
+                                *parentMatch5 = match;
+                            }
+                            if (match.hit)
+                            {
+                                Match match(false);
+                                Match* parentMatch6 = &match;
+                                {
+                                    Match match(false);
+                                    if (*lexer == SP)
+                                    {
+                                        ++lexer;
+                                        match.hit = true;
+                                    }
+                                    *parentMatch6 = match;
+                                }
+                                *parentMatch5 = match;
+                            }
+                            *parentMatch4 = match;
+                        }
+                        if (match.hit)
+                        {
+                            Match match(false);
+                            Match* parentMatch7 = &match;
+                            {
+                                Match match = HttpStatusLineParser.StatusCode(lexer);
+                                sc.Reset(cast<Value<ushort>*>(match.value));
+                                *parentMatch7 = match;
+                            }
+                            *parentMatch4 = match;
+                        }
+                        *parentMatch3 = match;
+                    }
+                    if (match.hit)
+                    {
+                        Match match(false);
+                        Match* parentMatch8 = &match;
+                        {
+                            Match match(false);
+                            if (*lexer == SP)
+                            {
+                                ++lexer;
+                                match.hit = true;
+                            }
+                            *parentMatch8 = match;
+                        }
+                        *parentMatch3 = match;
+                    }
+                    *parentMatch2 = match;
+                }
+                if (match.hit)
+                {
+                    Match match(false);
+                    Match* parentMatch9 = &match;
+                    {
+                        Match match = HttpStatusLineParser.ReasonPhrase(lexer);
+                        rp.Reset(cast<Value<string>*>(match.value));
+                        *parentMatch9 = match;
+                    }
+                    *parentMatch2 = match;
+                }
+                *parentMatch1 = match;
+            }
+            if (match.hit)
+            {
+                {
+                    #if (DEBUG)
+                        if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"StatusLine");
+                    #endif
+                    return Match(true, new Value<HttpStatus>(HttpStatus(v->value, sc->value, rp->value)));
+                }
+            }
+            *parentMatch0 = match;
+        }
+        #if (DEBUG)
+            if (writeToLog)
+            {
+                if (match.hit)
+                {
+                    System.Lex.WriteSuccessToLog(lexer, debugSpan, u"StatusLine");
+                }
+                else
+                {
+                    System.Lex.WriteFailureToLog(lexer, u"StatusLine");
+                }
+            }
+        #endif
+        if (!match.hit)
+        {
+            match.value = null;
+        }
+        return match;
+    }
+    public static Match HttpVersion(HttpLexer& lexer)
+    {
+        #if (DEBUG)
+            Span debugSpan;
+            bool writeToLog = lexer.Log() != null;
+            if (writeToLog)
+            {
+                debugSpan = lexer.GetSpan();
+                System.Lex.WriteBeginRuleToLog(lexer, u"HttpVersion");
+            }
+        #endif
+        string s;
+        Match match(false);
+        Match* parentMatch0 = &match;
+        {
+            long pos = lexer.GetPos();
+            Match match(false);
+            Match* parentMatch1 = &match;
+            {
+                Match match(false);
+                Match* parentMatch2 = &match;
+                {
+                    Match match(false);
+                    Match* parentMatch3 = &match;
+                    {
+                        Match match(false);
+                        Match* parentMatch4 = &match;
+                        {
+                            Match match(false);
+                            Match* parentMatch5 = &match;
+                            {
+                                Match match(false);
+                                Match* parentMatch6 = &match;
+                                {
+                                    Match match(false);
+                                    Match* parentMatch7 = &match;
+                                    {
+                                        Match match(false);
+                                        Match* parentMatch8 = &match;
+                                        {
+                                            Match match(false);
+                                            Match* parentMatch9 = &match;
+                                            {
+                                                long pos = lexer.GetPos();
+                                                Match match(false);
+                                                if (*lexer == ALPHA)
+                                                {
+                                                    ++lexer;
+                                                    match.hit = true;
+                                                }
+                                                if (match.hit)
+                                                {
+                                                    s.Append(lexer.GetChar(pos));
+                                                }
+                                                *parentMatch9 = match;
+                                            }
+                                            *parentMatch8 = match;
+                                        }
+                                        if (match.hit)
+                                        {
+                                            Match match(false);
+                                            Match* parentMatch10 = &match;
+                                            {
+                                                Match match(false);
+                                                Match* parentMatch11 = &match;
+                                                {
+                                                    long pos = lexer.GetPos();
+                                                    Match match(false);
+                                                    if (*lexer == ALPHA)
+                                                    {
+                                                        ++lexer;
+                                                        match.hit = true;
+                                                    }
+                                                    if (match.hit)
+                                                    {
+                                                        s.Append(lexer.GetChar(pos));
+                                                    }
+                                                    *parentMatch11 = match;
+                                                }
+                                                *parentMatch10 = match;
+                                            }
+                                            *parentMatch8 = match;
+                                        }
+                                        *parentMatch7 = match;
+                                    }
+                                    if (match.hit)
+                                    {
+                                        Match match(false);
+                                        Match* parentMatch12 = &match;
+                                        {
+                                            Match match(false);
+                                            Match* parentMatch13 = &match;
+                                            {
+                                                long pos = lexer.GetPos();
+                                                Match match(false);
+                                                if (*lexer == ALPHA)
+                                                {
+                                                    ++lexer;
+                                                    match.hit = true;
+                                                }
+                                                if (match.hit)
+                                                {
+                                                    s.Append(lexer.GetChar(pos));
+                                                }
+                                                *parentMatch13 = match;
+                                            }
+                                            *parentMatch12 = match;
+                                        }
+                                        *parentMatch7 = match;
+                                    }
+                                    *parentMatch6 = match;
+                                }
+                                if (match.hit)
+                                {
+                                    Match match(false);
+                                    Match* parentMatch14 = &match;
+                                    {
+                                        Match match(false);
+                                        Match* parentMatch15 = &match;
+                                        {
+                                            long pos = lexer.GetPos();
+                                            bool pass = true;
+                                            Match match(false);
+                                            if (*lexer == ALPHA)
+                                            {
+                                                ++lexer;
+                                                match.hit = true;
+                                            }
+                                            if (match.hit)
+                                            {
+                                                s.Append(lexer.GetChar(pos));
+                                                pass = s == "HTTP";
+                                            }
+                                            if (match.hit && !pass)
+                                            {
+                                                match = Match(false);
+                                            }
+                                            *parentMatch15 = match;
+                                        }
+                                        *parentMatch14 = match;
+                                    }
+                                    *parentMatch6 = match;
+                                }
+                                *parentMatch5 = match;
+                            }
+                            if (match.hit)
+                            {
+                                Match match(false);
+                                Match* parentMatch16 = &match;
+                                {
+                                    Match match(false);
+                                    Match* parentMatch17 = &match;
+                                    {
+                                        long pos = lexer.GetPos();
+                                        Match match(false);
+                                        if (*lexer == SLASH)
+                                        {
+                                            ++lexer;
+                                            match.hit = true;
+                                        }
+                                        if (match.hit)
+                                        {
+                                            s.Append('/');
+                                        }
+                                        *parentMatch17 = match;
+                                    }
+                                    *parentMatch16 = match;
+                                }
+                                *parentMatch5 = match;
+                            }
+                            *parentMatch4 = match;
+                        }
+                        if (match.hit)
+                        {
+                            Match match(false);
+                            Match* parentMatch18 = &match;
+                            {
+                                Match match(false);
+                                Match* parentMatch19 = &match;
+                                {
+                                    Match match(false);
+                                    Match* parentMatch20 = &match;
+                                    {
+                                        Match match(false);
+                                        Match* parentMatch21 = &match;
+                                        {
+                                            long pos = lexer.GetPos();
+                                            Match match(false);
+                                            if (*lexer == DIGIT)
+                                            {
+                                                ++lexer;
+                                                match.hit = true;
+                                            }
+                                            if (match.hit)
+                                            {
+                                                s.Append(lexer.GetChar(pos));
+                                            }
+                                            *parentMatch21 = match;
+                                        }
+                                        *parentMatch20 = match;
+                                    }
+                                    *parentMatch19 = match;
+                                }
+                                if (match.hit)
+                                {
+                                    Match match(true);
+                                    Match* parentMatch22 = &match;
+                                    while (true)
+                                    {
+                                        long save = lexer.GetPos();
+                                        {
+                                            Match match(false);
+                                            Match* parentMatch23 = &match;
+                                            {
+                                                Match match(false);
+                                                Match* parentMatch24 = &match;
+                                                {
+                                                    long pos = lexer.GetPos();
+                                                    Match match(false);
+                                                    if (*lexer == DIGIT)
+                                                    {
+                                                        ++lexer;
+                                                        match.hit = true;
+                                                    }
+                                                    if (match.hit)
+                                                    {
+                                                        s.Append(lexer.GetChar(pos));
+                                                    }
+                                                    *parentMatch24 = match;
+                                                }
+                                                *parentMatch23 = match;
+                                            }
+                                            if (match.hit)
+                                            {
+                                                *parentMatch22 = match;
+                                            }
+                                            else
+                                            {
+                                                lexer.SetPos(save);
+                                                break;
+                                            }
+                                        }
+                                    }
+                                }
+                                *parentMatch18 = match;
+                            }
+                            *parentMatch4 = match;
+                        }
+                        *parentMatch3 = match;
+                    }
+                    if (match.hit)
+                    {
+                        Match match(false);
+                        Match* parentMatch25 = &match;
+                        {
+                            Match match(false);
+                            Match* parentMatch26 = &match;
+                            {
+                                long pos = lexer.GetPos();
+                                Match match(false);
+                                if (*lexer == DOT)
+                                {
+                                    ++lexer;
+                                    match.hit = true;
+                                }
+                                if (match.hit)
+                                {
+                                    s.Append('.');
+                                }
+                                *parentMatch26 = match;
+                            }
+                            *parentMatch25 = match;
+                        }
+                        *parentMatch3 = match;
+                    }
+                    *parentMatch2 = match;
+                }
+                if (match.hit)
+                {
+                    Match match(false);
+                    Match* parentMatch27 = &match;
+                    {
+                        Match match(false);
+                        Match* parentMatch28 = &match;
+                        {
+                            Match match(false);
+                            Match* parentMatch29 = &match;
+                            {
+                                Match match(false);
+                                Match* parentMatch30 = &match;
+                                {
+                                    long pos = lexer.GetPos();
+                                    Match match(false);
+                                    if (*lexer == DIGIT)
+                                    {
+                                        ++lexer;
+                                        match.hit = true;
+                                    }
+                                    if (match.hit)
+                                    {
+                                        s.Append(lexer.GetChar(pos));
+                                    }
+                                    *parentMatch30 = match;
+                                }
+                                *parentMatch29 = match;
+                            }
+                            *parentMatch28 = match;
+                        }
+                        if (match.hit)
+                        {
+                            Match match(true);
+                            Match* parentMatch31 = &match;
+                            while (true)
+                            {
+                                long save = lexer.GetPos();
+                                {
+                                    Match match(false);
+                                    Match* parentMatch32 = &match;
+                                    {
+                                        Match match(false);
+                                        Match* parentMatch33 = &match;
+                                        {
+                                            long pos = lexer.GetPos();
+                                            Match match(false);
+                                            if (*lexer == DIGIT)
+                                            {
+                                                ++lexer;
+                                                match.hit = true;
+                                            }
+                                            if (match.hit)
+                                            {
+                                                s.Append(lexer.GetChar(pos));
+                                            }
+                                            *parentMatch33 = match;
+                                        }
+                                        *parentMatch32 = match;
+                                    }
+                                    if (match.hit)
+                                    {
+                                        *parentMatch31 = match;
+                                    }
+                                    else
+                                    {
+                                        lexer.SetPos(save);
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                        *parentMatch27 = match;
+                    }
+                    *parentMatch2 = match;
+                }
+                *parentMatch1 = match;
+            }
+            if (match.hit)
+            {
+                {
+                    #if (DEBUG)
+                        if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"HttpVersion");
+                    #endif
+                    return Match(true, new Value<string>(s));
+                }
+            }
+            *parentMatch0 = match;
+        }
+        #if (DEBUG)
+            if (writeToLog)
+            {
+                if (match.hit)
+                {
+                    System.Lex.WriteSuccessToLog(lexer, debugSpan, u"HttpVersion");
+                }
+                else
+                {
+                    System.Lex.WriteFailureToLog(lexer, u"HttpVersion");
+                }
+            }
+        #endif
+        if (!match.hit)
+        {
+            match.value = null;
+        }
+        return match;
+    }
+    public static Match StatusCode(HttpLexer& lexer)
+    {
+        #if (DEBUG)
+            Span debugSpan;
+            bool writeToLog = lexer.Log() != null;
+            if (writeToLog)
+            {
+                debugSpan = lexer.GetSpan();
+                System.Lex.WriteBeginRuleToLog(lexer, u"StatusCode");
+            }
+        #endif
+        string s;
+        Match match(false);
+        Match* parentMatch0 = &match;
+        {
+            long pos = lexer.GetPos();
+            Match match(false);
+            Match* parentMatch1 = &match;
+            {
+                Match match(false);
+                Match* parentMatch2 = &match;
+                {
+                    Match match(false);
+                    Match* parentMatch3 = &match;
+                    {
+                        Match match(false);
+                        Match* parentMatch4 = &match;
+                        {
+                            long pos = lexer.GetPos();
+                            Match match(false);
+                            if (*lexer == DIGIT)
+                            {
+                                ++lexer;
+                                match.hit = true;
+                            }
+                            if (match.hit)
+                            {
+                                s.Append(lexer.GetChar(pos));
+                            }
+                            *parentMatch4 = match;
+                        }
+                        *parentMatch3 = match;
+                    }
+                    if (match.hit)
+                    {
+                        Match match(false);
+                        Match* parentMatch5 = &match;
+                        {
+                            Match match(false);
+                            Match* parentMatch6 = &match;
+                            {
+                                long pos = lexer.GetPos();
+                                Match match(false);
+                                if (*lexer == DIGIT)
+                                {
+                                    ++lexer;
+                                    match.hit = true;
+                                }
+                                if (match.hit)
+                                {
+                                    s.Append(lexer.GetChar(pos));
+                                }
+                                *parentMatch6 = match;
+                            }
+                            *parentMatch5 = match;
+                        }
+                        *parentMatch3 = match;
+                    }
+                    *parentMatch2 = match;
+                }
+                if (match.hit)
+                {
+                    Match match(false);
+                    Match* parentMatch7 = &match;
+                    {
+                        Match match(false);
+                        Match* parentMatch8 = &match;
+                        {
+                            long pos = lexer.GetPos();
+                            Match match(false);
+                            if (*lexer == DIGIT)
+                            {
+                                ++lexer;
+                                match.hit = true;
+                            }
+                            if (match.hit)
+                            {
+                                s.Append(lexer.GetChar(pos));
+                            }
+                            *parentMatch8 = match;
+                        }
+                        *parentMatch7 = match;
+                    }
+                    *parentMatch2 = match;
+                }
+                *parentMatch1 = match;
+            }
+            if (match.hit)
+            {
+                {
+                    #if (DEBUG)
+                        if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"StatusCode");
+                    #endif
+                    return Match(true, new Value<ushort>(ParseUShort(s)));
+                }
+            }
+            *parentMatch0 = match;
+        }
+        #if (DEBUG)
+            if (writeToLog)
+            {
+                if (match.hit)
+                {
+                    System.Lex.WriteSuccessToLog(lexer, debugSpan, u"StatusCode");
+                }
+                else
+                {
+                    System.Lex.WriteFailureToLog(lexer, u"StatusCode");
+                }
+            }
+        #endif
+        if (!match.hit)
+        {
+            match.value = null;
+        }
+        return match;
+    }
+    public static Match ReasonPhrase(HttpLexer& lexer)
+    {
+        #if (DEBUG)
+            Span debugSpan;
+            bool writeToLog = lexer.Log() != null;
+            if (writeToLog)
+            {
+                debugSpan = lexer.GetSpan();
+                System.Lex.WriteBeginRuleToLog(lexer, u"ReasonPhrase");
+            }
+        #endif
+        string s;
+        UniquePtr<Value<char>> t;
+        Match match(false);
+        Match* parentMatch0 = &match;
+        {
+            long pos = lexer.GetPos();
+            Match match(false);
+            Match* parentMatch1 = &match;
+            {
+                Match match(false);
+                Match* parentMatch2 = &match;
+                {
+                    Match match(false);
+                    Match* parentMatch3 = &match;
+                    {
+                        Match match(false);
+                        Match* parentMatch4 = &match;
+                        {
+                            long pos = lexer.GetPos();
+                            Match match = Http.text(lexer);
+                            t.Reset(cast<Value<char>*>(match.value));
+                            if (match.hit)
+                            {
+                                s.Append(t->value);
+                            }
+                            *parentMatch4 = match;
+                        }
+                        *parentMatch3 = match;
+                    }
+                    *parentMatch2 = match;
+                }
+                if (match.hit)
+                {
+                    Match match(true);
+                    Match* parentMatch5 = &match;
+                    while (true)
+                    {
+                        long save = lexer.GetPos();
+                        {
+                            Match match(false);
+                            Match* parentMatch6 = &match;
+                            {
+                                Match match(false);
+                                Match* parentMatch7 = &match;
+                                {
+                                    long pos = lexer.GetPos();
+                                    Match match = Http.text(lexer);
+                                    t.Reset(cast<Value<char>*>(match.value));
+                                    if (match.hit)
+                                    {
+                                        s.Append(t->value);
+                                    }
+                                    *parentMatch7 = match;
+                                }
+                                *parentMatch6 = match;
+                            }
+                            if (match.hit)
+                            {
+                                *parentMatch5 = match;
+                            }
+                            else
+                            {
+                                lexer.SetPos(save);
+                                break;
+                            }
+                        }
+                    }
+                }
+                *parentMatch1 = match;
+            }
+            if (match.hit)
+            {
+                {
+                    #if (DEBUG)
+                        if (writeToLog) System.Lex.WriteSuccessToLog(lexer, debugSpan, u"ReasonPhrase");
+                    #endif
+                    return Match(true, new Value<string>(s));
+                }
+            }
+            *parentMatch0 = match;
+        }
+        #if (DEBUG)
+            if (writeToLog)
+            {
+                if (match.hit)
+                {
+                    System.Lex.WriteSuccessToLog(lexer, debugSpan, u"ReasonPhrase");
+                }
+                else
+                {
+                    System.Lex.WriteFailureToLog(lexer, u"ReasonPhrase");
+                }
+            }
+        #endif
+        if (!match.hit)
+        {
+            match.value = null;
+        }
+        return match;
+    }
+}

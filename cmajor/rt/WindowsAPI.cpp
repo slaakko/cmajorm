@@ -5,6 +5,80 @@
 
 #include <cmajor/rt/WindowsAPI.hpp>
 #include <Windows.h>
+#include <map>
+
+struct CodeMapping
+{
+    CodeMapping(long extCode_, long winCode_) : extCode(extCode_), winCode(winCode_)
+    {
+    }
+    long extCode;
+    long winCode;
+};
+
+long ERROR_OUT_OF_RESOURCES = 0;
+
+CodeMapping code_mapping[] =
+{
+    CodeMapping(0, ERROR_OUT_OF_RESOURCES),
+    CodeMapping(1, ERROR_FILE_NOT_FOUND),
+    CodeMapping(2, ERROR_PATH_NOT_FOUND),
+    CodeMapping(3, ERROR_BAD_FORMAT),
+    CodeMapping(4, SE_ERR_ACCESSDENIED),
+    CodeMapping(5, SE_ERR_ASSOCINCOMPLETE),
+    CodeMapping(6, SE_ERR_DDEBUSY),
+    CodeMapping(7, SE_ERR_DDEFAIL),
+    CodeMapping(8, SE_ERR_DDETIMEOUT),
+    CodeMapping(9, SE_ERR_DLLNOTFOUND),
+    CodeMapping(10, SE_ERR_FNF),
+    CodeMapping(11, SE_ERR_NOASSOC),
+    CodeMapping(12, SE_ERR_OOM),
+    CodeMapping(13, SE_ERR_PNF),
+    CodeMapping(14, SE_ERR_SHARE)
+};
+
+bool codeMappingInitialized = false;
+
+std::map<long, long> winToExtCodeMap;
+std::map<long, long> extToWinCodeMap;
+
+void InitCodeMapping()
+{
+    for (const CodeMapping& mapping : code_mapping)
+    {
+        winToExtCodeMap[mapping.winCode] = mapping.extCode;
+        extToWinCodeMap[mapping.extCode] = mapping.winCode;
+    }
+    codeMappingInitialized = true;
+}
+
+long MapWinCodeToExtCode(long winCode)
+{
+    if (!codeMappingInitialized)
+    {
+        InitCodeMapping();
+    }
+    auto it = winToExtCodeMap.find(winCode);
+    if (it != winToExtCodeMap.cend())
+    {
+        return it->second;
+    }
+    return -1;
+}
+
+long MapExtCodeToWinCode(long extCode)
+{
+    if (!codeMappingInitialized)
+    {
+        InitCodeMapping();
+    }
+    auto it = extToWinCodeMap.find(extCode);
+    if (it != extToWinCodeMap.cend())
+    {
+        return it->second;
+    }
+    return -1;
+}
 
 uint64_t WinGetLastError()
 {
@@ -91,4 +165,16 @@ bool WinFindCloseChangeNotification(void* handle)
 {
     bool retval = FindCloseChangeNotification(handle);
     return retval;
+}
+
+bool WinShellExecute(const char* filePath, int64_t& errorCode)
+{
+    int code = (int)ShellExecuteA(NULL, "open", filePath, NULL, NULL, SW_SHOWNORMAL);
+    if (code > 32)
+    {
+        errorCode = 0;
+        return true;
+    }
+    errorCode = MapWinCodeToExtCode(code);
+    return false;
 }

@@ -26,7 +26,7 @@ namespace System.Net.Http
         }
         public void Connect()
         {
-            Connect(ToUtf8(baseAddress.Host()), ToUtf8(baseAddress.Scheme()));
+            Connect(baseAddress.GetAuthority().Host(), baseAddress.Scheme());
         }
         public void Connect(const string& node, const string& service)
         {
@@ -50,9 +50,9 @@ namespace System.Net.Http
         {
             responseHeaders.Clear();
             UriReference absoluteUri = UriReference.Combine(baseAddress, uri);
-            if (absoluteUri.Host() != baseAddress.Host() || absoluteUri.Scheme() != baseAddress.Scheme())
+            if (absoluteUri.GetAuthority().Host() != baseAddress.GetAuthority().Host() || absoluteUri.Scheme() != baseAddress.Scheme())
             {
-                Connect(ToUtf8(absoluteUri.Host()), ToUtf8(absoluteUri.Scheme()));
+                Connect(absoluteUri.GetAuthority().Host(), absoluteUri.Scheme());
             }
             HttpRequest request(absoluteUri, requestHeaders);
             StreamWriter writer(stream);
@@ -60,23 +60,23 @@ namespace System.Net.Http
             HttpStatus status = ReadStartOfMessage(*stream, responseHeaders, log);
             if (status.StatusCode() == statusRedirectionMovedPermanently)
             {
-                HttpHeader* locationHeader = responseHeaders.GetHeader(u"location");
-                ustring location = locationHeader->SingleFieldValue().FieldValue();
+                HttpHeader* locationHeader = responseHeaders.GetHeader("location");
+                string location = locationHeader->SingleFieldValue().FieldValue();
                 UriReference locationUri(location);
                 return Get(locationUri, requestHeaders, responseHeaders, body);
             }
             else if (status.StatusCode() == statusSuccessOK)
             {
                 bool chunked = false;
-                HttpHeader* transferEncodingHeader = responseHeaders.GetHeader(u"transfer-encoding");
+                HttpHeader* transferEncodingHeader = responseHeaders.GetHeader("transfer-encoding");
                 if (transferEncodingHeader != null)
                 {
-                    ustring transferCodingsValue = transferEncodingHeader->CombinedFieldValue();
+                    string transferCodingsValue = transferEncodingHeader->CombinedFieldValue();
                     List<HttpFieldValue> transferCodings;
-                    HttpParser.Instance().ParseFieldValue(transferCodingsValue, &transferCodings);
+                    HttpParser.ParseFieldValue(transferCodingsValue, &transferCodings);
                     for (const HttpFieldValue& transferCoding : transferCodings)
                     {
-                        if (ToLower(transferCoding.FieldValue()) == u"chunked")
+                        if (ToLower(transferCoding.FieldValue()) == "chunked")
                         {
                             chunked = true;
                         }

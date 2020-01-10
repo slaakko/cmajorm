@@ -13,24 +13,24 @@ namespace System.Net.Http
         public nothrow MediaType() : name()
         {
         }
-        public nothrow MediaType(const ustring& name_) : name(name_)
+        public nothrow MediaType(const string& name_) : name(name_)
         {
         }
         public default virtual ~MediaType();
-        public nothrow inline const ustring& Name() const
+        public nothrow inline const string& Name() const
         {
             return name;
         }
-        public nothrow void SetName(const ustring& name_) 
+        public nothrow void SetName(const string& name_) 
         {
             name = name_;
         }
-        private ustring name;
+        private string name;
     }
     
     public class AnyMediaType : MediaType
     {
-        public nothrow AnyMediaType() : base(u"*")
+        public nothrow AnyMediaType() : base("*")
         {
         }
     }
@@ -40,136 +40,136 @@ namespace System.Net.Http
         public nothrow Subtype() : name()
         {
         }
-        public nothrow Subtype(const ustring& name_) : name(name_)
+        public nothrow Subtype(const string& name_) : name(name_)
         {
         }
         public default virtual ~Subtype();
-        public nothrow inline const ustring& Name() const
+        public nothrow inline const string& Name() const
         {
             return name;
         }
-        public nothrow void SetName(const ustring& name_) 
+        public nothrow void SetName(const string& name_) 
         {
             name = name_;
         }
-        private ustring name;
+        private string name;
     }
     
     public class AnySubtype : Subtype
     {
-        public nothrow AnySubtype() : base(u"*")
+        public nothrow AnySubtype() : base("*")
         {
         }
     }
     
     public class TextMediaType : MediaType
     {
-        public nothrow TextMediaType() : base(u"text")
+        public nothrow TextMediaType() : base("text")
         {
         }
     }
     
     public class PlainSubtype : Subtype
     {
-        public nothrow PlainSubtype() : base(u"plain")
+        public nothrow PlainSubtype() : base("plain")
         {
         }
     }
     
     public class ImageMediaType : MediaType
     {
-        public nothrow ImageMediaType() : base(u"image")
+        public nothrow ImageMediaType() : base("image")
         {
         }
     }
     
     public class JpegSubtype : Subtype
     {
-        public nothrow JpegSubtype() : base(u"jpeg")
+        public nothrow JpegSubtype() : base("jpeg")
         {
         }
     }
     
     public class AudioMediaType : MediaType
     {
-        public nothrow AudioMediaType() : base(u"audio")
+        public nothrow AudioMediaType() : base("audio")
         {
         }
     }
     
     public class BasicSubtype : Subtype
     {
-        public BasicSubtype() : base(u"basic")
+        public BasicSubtype() : base("basic")
         {
         }
     }
     
     public class VideoMediaType : MediaType
     {
-        public nothrow VideoMediaType() : base(u"video")
+        public nothrow VideoMediaType() : base("video")
         {
         }
     }
     
     public class MpegSubtype : Subtype
     {
-        public nothrow MpegSubtype() : base(u"mpeg")
+        public nothrow MpegSubtype() : base("mpeg")
         {
         }
     }
     
     public class ApplicationMediaType : MediaType
     {
-        public nothrow ApplicationMediaType() : base(u"application")
+        public nothrow ApplicationMediaType() : base("application")
         {
         }
     }
     
     public class OctetStreamSubtype : Subtype
     {
-        public nothrow OctetStreamSubtype() : base(u"octet-stream")
+        public nothrow OctetStreamSubtype() : base("octet-stream")
         {
         }
     }
     
     public class PostScriptSubtype : Subtype
     {
-        public nothrow PostScriptSubtype() : base(u"postscript")
+        public nothrow PostScriptSubtype() : base("postscript")
         {
         }
     }
     
     public class MultipartMediaType : MediaType
     {
-        public nothrow MultipartMediaType() : base(u"multipart")
+        public nothrow MultipartMediaType() : base("multipart")
         {
         }
     }
     
     public class MessageMediaType : MediaType
     {
-        public nothrow MessageMediaType() : base(u"message")
+        public nothrow MessageMediaType() : base("message")
         {
         }
     }
     
     public class Rfc822Subtype : Subtype
     {
-        public nothrow Rfc822Subtype() : base(u"rfc822")
+        public nothrow Rfc822Subtype() : base("rfc822")
         {
         }
     }
     
     public class PartialSubtype : Subtype
     {
-        public nothrow PartialSubtype() : base(u"partial")
+        public nothrow PartialSubtype() : base("partial")
         {
         }
     }
     
     public class ExternalBodySubtype : Subtype
     {
-        public nothrow ExternalBodySubtype() : base(u"external-body")
+        public nothrow ExternalBodySubtype() : base("external-body")
         {
         }
     }
@@ -193,52 +193,52 @@ namespace System.Net.Http
         {
             return subtype.Get();
         }
-        public void SetValue(const ustring& mediaType_, const ustring& subtype_)
+        public void SetValue(const string& mediaType_, const string& subtype_)
         {
             mediaType.Reset(new MediaType(mediaType_));
             subtype.Reset(new Subtype(subtype_));
         }
-        public nothrow inline const Map<ustring, ustring>& Parameters() const
+        public nothrow inline const Map<string, string>& Parameters() const
         {
             return parameters;
         }
-        public ustring GetParameter(const ustring& paramName) const
+        public string GetParameter(const string& paramName) const
         {
-            Map<ustring, ustring>.ConstIterator it = parameters.CFind(paramName);
+            Map<string, string>.ConstIterator it = parameters.CFind(paramName);
             if (it != parameters.CEnd())
             {
                 return it->second;
             }
-            return ustring();
+            return string();
         }
-        public void SetParameter(const ustring& paramName, const ustring& paramValue)
+        public void SetParameter(const string& paramName, const string& paramValue)
         {
             parameters[paramName] = paramValue;
         }    
-        public ustring ToString() const
+        public string ToString() const
         {
             if (parameters.IsEmpty())
             {
-                return mediaType->Name() + u"/" + subtype->Name();
+                return mediaType->Name() + "/" + subtype->Name();
             }
             else
             {
-                ustring s = mediaType->Name() + u"/" + subtype->Name();
-                for (const Pair<ustring, ustring>& p : parameters)
+                string s = mediaType->Name() + "/" + subtype->Name();
+                for (const Pair<string, string>& p : parameters)
                 {
-                    ustring paramValue = p.second;
-                    if (paramValue.Find(u'"') != -1)
+                    string paramValue = p.second;
+                    if (paramValue.Find('"') != -1)
                     {
-                        paramValue = ToUtf32(MakeStringLiteral(ToUtf8(paramValue)));
+                        paramValue = MakeStringLiteral(paramValue);
                     }
-                    s.Append(u';').Append(p.first).Append(u'=').Append(paramValue);
+                    s.Append(';').Append(p.first).Append('=').Append(paramValue);
                 }
                 return s;
             }
         }
         private UniquePtr<MediaType> mediaType;
         private UniquePtr<Subtype> subtype;
-        private Map<ustring, ustring> parameters;
+        private Map<string, string> parameters;
     }
     
     public class MediaRange 
@@ -249,7 +249,7 @@ namespace System.Net.Http
         public MediaRange(MimeType&& mimeType_) : mimeType(mimeType_), quality(1)
         {
         }
-        public Map<ustring, ustring>& Params() 
+        public Map<string, string>& Params() 
         {
             return params;
         }
@@ -264,9 +264,9 @@ namespace System.Net.Http
                 HttpFieldValue fieldValue(mimeType.ToString());
                 if (quality != 1)
                 {
-                    fieldValue.SetParameter(u"q", ToUtf32(ToString(quality, 3)));
+                    fieldValue.SetParameter("q", ToString(quality, 3));
                 }
-                for (const Pair<ustring, ustring>& p : params)
+                for (const Pair<string, string>& p : params)
                 {
                     fieldValue.SetParameter(p.first, p.second);
                 }
@@ -275,7 +275,7 @@ namespace System.Net.Http
         }
         private MimeType mimeType;
         private double quality;
-        private Map<ustring, ustring> params;
+        private Map<string, string> params;
     }
 }
 

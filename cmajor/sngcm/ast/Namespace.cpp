@@ -7,15 +7,32 @@
 #include <sngcm/ast/Identifier.hpp>
 #include <sngcm/ast/Visitor.hpp>
 #include <sngcm/ast/Function.hpp>
+#include <soulng/util/Unicode.hpp>
+#include <soulng/util/Sha1.hpp>
+#include <boost/uuid/random_generator.hpp>
 
 namespace sngcm { namespace ast {
 
-NamespaceNode::NamespaceNode(const Span& span_) : Node(NodeType::namespaceNode, span_), id()
+using namespace soulng::unicode;
+using namespace soulng::util;
+
+NamespaceNode::NamespaceNode(const Span& span_) : Node(NodeType::namespaceNode, span_), id(), flags()
 {
 }
 
-NamespaceNode::NamespaceNode(const Span& span_, IdentifierNode* id_) : Node(NodeType::namespaceNode, span_), id(id_)
+NamespaceNode::NamespaceNode(const Span& span_, IdentifierNode* id_) : Node(NodeType::namespaceNode, span_), id(id_), flags()
 {
+    if (id == nullptr)
+    {
+        SetUnnamedNs();
+        Sha1 sha1;
+        boost::uuids::uuid randomUuid = boost::uuids::random_generator()();
+        for (uint8_t x : randomUuid)
+        {
+            sha1.Process(x);
+        }
+        id.reset(new IdentifierNode(span_, U"unnamed_ns_" + ToUtf32(sha1.GetDigest())));
+    }
     id->SetParent(this);
 }
 
@@ -26,7 +43,16 @@ IdentifierNode* NamespaceNode::Id() const
 
 Node* NamespaceNode::Clone(CloneContext& cloneContext) const
 {
-    NamespaceNode* clone = new NamespaceNode(GetSpan(), static_cast<IdentifierNode*>(id->Clone(cloneContext)));
+    NamespaceNode* clone = nullptr;
+    if (IsUnnamedNs())
+    {
+        clone = new NamespaceNode(GetSpan(), nullptr);
+    }
+    else
+    {
+        clone = new NamespaceNode(GetSpan(), static_cast<IdentifierNode*>(id->Clone(cloneContext)));
+    }
+    clone->flags = flags;
     int n = members.Count();
     for (int i = 0; i < n; ++i)
     {
@@ -54,6 +80,7 @@ void NamespaceNode::Write(AstWriter& writer)
 {
     Node::Write(writer);
     writer.Write(id.get());
+    writer.GetBinaryWriter().Write(static_cast<int8_t>(flags));
     members.Write(writer);
 }
 
@@ -62,6 +89,7 @@ void NamespaceNode::Read(AstReader& reader)
     Node::Read(reader);
     id.reset(reader.ReadIdentifierNode());
     id->SetParent(this);
+    flags = static_cast<NsFlags>(reader.GetBinaryReader().ReadSByte());
     members.Read(reader);
     members.SetParent(this);
 }
@@ -70,6 +98,14 @@ void NamespaceNode::AddMember(Node* member)
 {
     member->SetParent(this);
     members.Add(member);
+    if (member->GetNodeType() == NodeType::namespaceNode)
+    {
+        NamespaceNode* ns = static_cast<NamespaceNode*>(member);
+        if (ns->IsUnnamedNs() || ns->HasUnnamedNs())
+        {
+            SetHasUnnamedNs();
+        }
+    }
 }
 
 AliasNode::AliasNode(const Span& span_) : Node(NodeType::aliasNode, span_), id(), qid()

@@ -160,4 +160,51 @@ void ArrangeClassMembers(CompileUnitNode& cu)
     cu.Accept(arranger);
 }
 
+class UnnamedNamespaceProcessor : public Visitor
+{
+public:
+    UnnamedNamespaceProcessor();
+    void Visit(CompileUnitNode& compileUnitNode) override;
+    void Visit(NamespaceNode& namespaceNode) override;
+private:
+    std::vector<NamespaceNode*> unnamedNamespaces;
+};
+
+UnnamedNamespaceProcessor::UnnamedNamespaceProcessor()
+{
+}
+
+void UnnamedNamespaceProcessor::Visit(CompileUnitNode& compileUnitNode)
+{
+    compileUnitNode.GlobalNs()->Accept(*this);
+    int index = 0;
+    for (NamespaceNode* unnamedNs : unnamedNamespaces)
+    {
+        CloneContext cloneContext;
+        IdentifierNode* unnamedNsId = static_cast<IdentifierNode*>(unnamedNs->Id()->Clone(cloneContext));
+        NamespaceImportNode* import = new NamespaceImportNode(compileUnitNode.GetSpan(), unnamedNsId);
+        compileUnitNode.GlobalNs()->Members().Insert(index, import);
+        ++index;
+    }
+}
+
+void UnnamedNamespaceProcessor::Visit(NamespaceNode& namespaceNode)
+{
+    if (namespaceNode.IsUnnamedNs())
+    {
+        unnamedNamespaces.push_back(&namespaceNode);
+    }
+    int n = namespaceNode.Members().Count();
+    for (int i = 0; i < n; ++i)
+    {
+        namespaceNode.Members()[i]->Accept(*this);
+    }
+}
+
+void AddNamespaceImportsForUnnamedNamespaces(CompileUnitNode& cu)
+{
+    UnnamedNamespaceProcessor processor;
+    cu.Accept(processor);
+}
+
 } } // namespace sngcm::ast

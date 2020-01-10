@@ -1,0 +1,27 @@
+using System.Net.Http;
+using HttpTokens;
+
+parser HttpChunkHeaderParser
+{
+    uselexer HttpLexer;
+    main;
+    
+    using Http.token;
+    using Http.quoted_string;
+    
+    ChunkHeader(var string s, ulong* chunkSize, ChunkExtensionAdder* adder)
+        ::= ((DIGIT{ s.Append(lexer.GetChar(pos)); } | HEX{ s.Append(lexer.GetChar(pos)); })+){ *chunkSize = ParseHexULong(s); } ChunkExtensions(adder):cexts?
+        ;
+        
+    ChunkExtensions(ChunkExtensionAdder* adder)
+        ::= (SEMICOLON (ChunkExtName:cn ('=' ChunkExtVal:cv)?){ adder->AddChunkExtension(cn, cv); })*
+        ;
+
+    ChunkExtName : string
+        ::= token:t{ return t; }
+        ;
+
+    ChunkExtVal : string
+        ::= token:t{ return t; } | quoted_string:qs{ return qs; }
+        ;
+}

@@ -8,6 +8,23 @@ using System.Collections;
 
 namespace System.Windows.API
 {
+    public const long ERROR_CODE_NOT_FOUND = -1;
+    public const long ERROR_OUT_OF_RESOURCES = 0;
+    public const long ERROR_FILE_NOT_FOUND = 1;
+    public const long ERROR_PATH_NOT_FOUND = 2;
+    public const long ERROR_BAD_FORMAT = 3;
+    public const long SE_ERR_ACCESSDENIED  = 4;
+    public const long SE_ERR_ASSOCINCOMPLETE = 5;
+    public const long SE_ERR_DDEBUSY = 6;
+    public const long SE_ERR_DDEFAIL = 7;
+    public const long SE_ERR_DDETIMEOUT = 8;
+    public const long SE_ERR_DLLNOTFOUND = 9;
+    public const long SE_ERR_FNF = 10;
+    public const long SE_ERR_NOASSOC = 11;
+    public const long SE_ERR_OOM = 12;
+    public const long SE_ERR_PNF = 13;
+    public const long SE_ERR_SHARE = 14;
+    
     public string GetWindowsAPIErrorMessage(ulong errorCode)
     {
         char[4096] buffer;
@@ -116,6 +133,86 @@ namespace System.Windows.API
         else
         {
             throw WindowsAPIException(WinGetLastError());
+        }
+    }
+    
+    public void ShellExecute(const string& filePath)
+    {
+        long errorCode = 0;
+        bool succeeded = WinShellExecute(filePath.Chars(), errorCode);
+        if (!succeeded)
+        {
+            string errorMessage = "shell execution error for file '" + filePath + "': ";
+            string error = "out of resources";
+            switch (errorCode)
+            {
+                case ERROR_CODE_NOT_FOUND:
+                {
+                    error = "code not found"; break;
+                }
+                case ERROR_OUT_OF_RESOURCES:
+                {
+                    error = "out of resources"; break;
+                }
+                case ERROR_FILE_NOT_FOUND:
+                {
+                    error = "file not found"; break;
+                }
+                case ERROR_PATH_NOT_FOUND:
+                {
+                    error = "path not found"; break;
+                }
+                case ERROR_BAD_FORMAT:
+                {
+                    error = "invalid executable"; break;
+                }
+                case SE_ERR_ACCESSDENIED:
+                {
+                    error = "access denied"; break;
+                }
+                case SE_ERR_ASSOCINCOMPLETE:
+                {
+                    error = "invalid file association"; break;
+                }
+                case SE_ERR_DDEBUSY:
+                {
+                    error = "DDE busy"; break;
+                }
+                case SE_ERR_DDEFAIL:
+                {
+                    error = "DDE failed"; break;
+                }
+                case SE_ERR_DDETIMEOUT:
+                {
+                    error = "DDE timeout"; break;
+                }
+                case SE_ERR_DLLNOTFOUND:
+                {
+                    error = "DLL not found"; break;
+                }
+                case SE_ERR_FNF:
+                {
+                    error = "file not found"; break;
+                }
+                case SE_ERR_NOASSOC:
+                {
+                    error = "no association for this type of file"; break;
+                }
+                case SE_ERR_OOM:
+                {
+                    error = "not enough memory"; break;
+                }
+                case SE_ERR_PNF:
+                {
+                    error = "path not found"; break;
+                }
+                case SE_ERR_SHARE:
+                {
+                    error = "sharing violation"; break;
+                }
+            }
+            errorMessage.Append(error);
+            throw Exception(errorMessage);
         }
     }
 }

@@ -1,0 +1,38 @@
+// =================================
+// Copyright (c) 2019 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Collections;
+
+namespace System.Init
+{
+    internal class Initializer
+    {
+        static Initializer() : instance(new Initializer())
+        {
+        }
+        public static Initializer& Instance()
+        {
+            return *instance;
+        }
+        public void Initialize()
+        {
+        }    
+        private Initializer()
+        {
+            Console.WriteLine("initializer running...");
+        }
+        public ~Initializer()
+        {
+            Console.WriteLine("initializer terminating...");
+        }
+        private static UniquePtr<Initializer> instance;
+    }
+}
+
+public cdecl void Initialize()
+{
+    System.Init.Initializer.Instance().Initialize();
+}

@@ -1,0 +1,23 @@
+using System.Net.Http;
+using HttpTokens;
+
+parser HttpMediaTypeParser
+{
+    uselexer HttpLexer;
+    main;
+    
+    using Http.token;
+    using Http.parameter;
+ 
+    MediaType(MimeType* mimeType, var Pair<string, string> param)
+        ::= LWS? (Type:t SLASH Subtype:st){ mimeType->SetValue(t, st); } (LWS? SEMICOLON LWS? parameter:p{ param = p; mimeType->SetParameter(param.first, param.second); })* LWS?
+        ;
+        
+    Type : string
+        ::= token:t{ return t; }
+        ;
+
+    Subtype : string
+        ::= token:t{ return t; }
+        ;
+}

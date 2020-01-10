@@ -12,14 +12,14 @@ namespace System.Net.Http
 {
     public class ChunkExtensionAdder
     {
-        public ChunkExtensionAdder(Map<ustring, ustring>& chunkExtensions_) : chunkExtensions(chunkExtensions_)
+        public ChunkExtensionAdder(Map<string, string>& chunkExtensions_) : chunkExtensions(chunkExtensions_)
         {
         }
-        public void AddChunkExtension(const ustring& chunkExtName, const ustring& chunkExtVal)
+        public void AddChunkExtension(const string& chunkExtName, const string& chunkExtVal)
         {
             chunkExtensions[chunkExtName] = chunkExtVal;
         }
-        private Map<ustring, ustring>& chunkExtensions;
+        private Map<string, string>& chunkExtensions;
     }
     
     public void ReadCRLF(ByteStream& stream)
@@ -36,7 +36,7 @@ namespace System.Net.Http
         }        
     }
     
-    public ulong ReadChunkHeader(ByteStream& stream, Map<ustring, ustring>& chunkExtensions)
+    public ulong ReadChunkHeader(ByteStream& stream, Map<string, string>& chunkExtensions)
     {
         string s;
         int x = stream.ReadByte();
@@ -64,7 +64,7 @@ namespace System.Net.Http
                     {
                         ulong chunkSize = 0u;
                         ChunkExtensionAdder adder(chunkExtensions);
-                        HttpParser.Instance().ParseChunkHeader(ToUtf32(s), &chunkSize, &adder);
+                        HttpParser.ParseChunkHeader(s, &chunkSize, &adder);
                         return chunkSize;
                     }
                     else if (b != 13u)
@@ -76,7 +76,7 @@ namespace System.Net.Http
             }
             x = stream.ReadByte();
         }
-        throw HttpException(HttpStatus(u"HTTP/1.1", statusClientErrorBadRequest, u"invalid HTTP message"));
+        throw HttpException(HttpStatus("HTTP/1.1", statusClientErrorBadRequest, "invalid HTTP message"));
     }
     
     public void ReadTrailer(ByteStream& stream, List<HttpHeader>& trailer)
@@ -134,7 +134,7 @@ namespace System.Net.Http
                     {
                         if (!line.IsEmpty())
                         {
-                            HttpHeader header = HttpParser.Instance().ParseHeader(ToUtf32(line));
+                            HttpHeader header = HttpParser.ParseHeader(line);
                             trailer.Add(header);
                             line.Clear();
                         }
@@ -155,13 +155,13 @@ namespace System.Net.Http
             }
             x = stream.ReadByte();
         }
-        throw HttpException(HttpStatus(u"HTTP/1.1", statusClientErrorBadRequest, u"invalid HTTP message"));
+        throw HttpException(HttpStatus("HTTP/1.1", statusClientErrorBadRequest, "invalid HTTP message"));
     }
     
     public SharedPtr<ByteStream> ReadChunkedBody(ByteStream& stream, List<HttpHeader>& trailer)
     {
         SharedPtr<ByteStream> resultStream(new BufferedByteStream(SharedPtr<ByteStream>(new MemoryByteStream())));
-        Map<ustring, ustring> firstChunkExtensions;
+        Map<string, string> firstChunkExtensions;
         ulong chunkSize = ReadChunkHeader(stream, firstChunkExtensions);
         while (chunkSize != 0u)
         {
@@ -176,7 +176,7 @@ namespace System.Net.Http
                 resultStream->Write(b);
             }
             ReadCRLF(stream);
-            Map<ustring, ustring> nextChunkExtensions;
+            Map<string, string> nextChunkExtensions;
             chunkSize = ReadChunkHeader(stream, nextChunkExtensions);
         }
         ReadTrailer(stream, trailer);

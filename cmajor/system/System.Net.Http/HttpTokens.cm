@@ -1,0 +1,180 @@
+using System;
+
+// this file has been automatically generated from 'D:/work/cmajorm/cmajor/system/System.Net.Http/HttpLexer.lexer' using soulcm lexer generator scmlg version 3.0.0
+
+namespace HttpTokens
+{
+    public const int END = 0;
+    public const int DIGIT = 1;
+    public const int HEX = 2;
+    public const int ALPHA = 3;
+    public const int HT = 4;
+    public const int DQ = 5;
+    public const int CR = 6;
+    public const int LF = 7;
+    public const int CTL = 8;
+    public const int SP = 9;
+    public const int LWS = 10;
+    public const int COLON = 11;
+    public const int SEMICOLON = 12;
+    public const int AT = 13;
+    public const int COMMA = 14;
+    public const int DOT = 15;
+    public const int LPAREN = 16;
+    public const int RPAREN = 17;
+    public const int LANGLE = 18;
+    public const int RANGLE = 19;
+    public const int LBRACKET = 20;
+    public const int RBRACKET = 21;
+    public const int LBRACE = 22;
+    public const int RBRACE = 23;
+    public const int SLASH = 24;
+    public const int BACKSLASH = 25;
+    public const int QUEST = 26;
+    public const int EQ = 27;
+    public const int CHAR = 28;
+    public const int TEXT = 29;
+    public const int OCTET = 30;
+    internal class TokenMap
+    {
+        static TokenMap() :
+            instance(new TokenMap())
+        {
+        }
+        public static TokenMap& Instance()
+        {
+            return *instance;
+        }
+        public int GetTokenId(const ustring& tokenName)
+        {
+            System.Collections.Map<ustring, int>.ConstIterator it = tokenIdMap.CFind(tokenName);
+            if (it != tokenIdMap.CEnd())
+            {
+                return it->second;
+            }
+            else
+            {
+                return -1;
+            }
+        }
+        public ustring GetTokenName(int tokenId)
+        {
+            return tokenNameList[tokenId];
+        }
+        public ustring GetTokenInfo(int tokenId)
+        {
+            return tokenInfoList[tokenId];
+        }
+        private TokenMap()
+        {
+            tokenIdMap[u"ALPHA"] = 3;
+            tokenIdMap[u"AT"] = 13;
+            tokenIdMap[u"BACKSLASH"] = 25;
+            tokenIdMap[u"CHAR"] = 28;
+            tokenIdMap[u"COLON"] = 11;
+            tokenIdMap[u"COMMA"] = 14;
+            tokenIdMap[u"CR"] = 6;
+            tokenIdMap[u"CTL"] = 8;
+            tokenIdMap[u"DIGIT"] = 1;
+            tokenIdMap[u"DOT"] = 15;
+            tokenIdMap[u"DQ"] = 5;
+            tokenIdMap[u"EQ"] = 27;
+            tokenIdMap[u"HEX"] = 2;
+            tokenIdMap[u"HT"] = 4;
+            tokenIdMap[u"LANGLE"] = 18;
+            tokenIdMap[u"LBRACE"] = 22;
+            tokenIdMap[u"LBRACKET"] = 20;
+            tokenIdMap[u"LF"] = 7;
+            tokenIdMap[u"LPAREN"] = 16;
+            tokenIdMap[u"LWS"] = 10;
+            tokenIdMap[u"OCTET"] = 30;
+            tokenIdMap[u"QUEST"] = 26;
+            tokenIdMap[u"RANGLE"] = 19;
+            tokenIdMap[u"RBRACE"] = 23;
+            tokenIdMap[u"RBRACKET"] = 21;
+            tokenIdMap[u"RPAREN"] = 17;
+            tokenIdMap[u"SEMICOLON"] = 12;
+            tokenIdMap[u"SLASH"] = 24;
+            tokenIdMap[u"SP"] = 9;
+            tokenIdMap[u"TEXT"] = 29;
+            tokenNameList.Add(u"END");
+            tokenInfoList.Add(u"end of file");
+            tokenNameList.Add(u"DIGIT");
+            tokenInfoList.Add(u"'digit'");
+            tokenNameList.Add(u"HEX");
+            tokenInfoList.Add(u"'hex'");
+            tokenNameList.Add(u"ALPHA");
+            tokenInfoList.Add(u"'alpha'");
+            tokenNameList.Add(u"HT");
+            tokenInfoList.Add(u"'\t'");
+            tokenNameList.Add(u"DQ");
+            tokenInfoList.Add(u"'dq'");
+            tokenNameList.Add(u"CR");
+            tokenInfoList.Add(u"'\r'");
+            tokenNameList.Add(u"LF");
+            tokenInfoList.Add(u"'\n'");
+            tokenNameList.Add(u"CTL");
+            tokenInfoList.Add(u"'ctl'");
+            tokenNameList.Add(u"SP");
+            tokenInfoList.Add(u"' '");
+            tokenNameList.Add(u"LWS");
+            tokenInfoList.Add(u"'lws'");
+            tokenNameList.Add(u"COLON");
+            tokenInfoList.Add(u"'colon'");
+            tokenNameList.Add(u"SEMICOLON");
+            tokenInfoList.Add(u"';'");
+            tokenNameList.Add(u"AT");
+            tokenInfoList.Add(u"'@'");
+            tokenNameList.Add(u"COMMA");
+            tokenInfoList.Add(u"','");
+            tokenNameList.Add(u"DOT");
+            tokenInfoList.Add(u"'.'");
+            tokenNameList.Add(u"LPAREN");
+            tokenInfoList.Add(u"'('");
+            tokenNameList.Add(u"RPAREN");
+            tokenInfoList.Add(u"')'");
+            tokenNameList.Add(u"LANGLE");
+            tokenInfoList.Add(u"'<'");
+            tokenNameList.Add(u"RANGLE");
+            tokenInfoList.Add(u"'>'");
+            tokenNameList.Add(u"LBRACKET");
+            tokenInfoList.Add(u"'['");
+            tokenNameList.Add(u"RBRACKET");
+            tokenInfoList.Add(u"']'");
+            tokenNameList.Add(u"LBRACE");
+            tokenInfoList.Add(u"'{'");
+            tokenNameList.Add(u"RBRACE");
+            tokenInfoList.Add(u"'}'");
+            tokenNameList.Add(u"SLASH");
+            tokenInfoList.Add(u"'/'");
+            tokenNameList.Add(u"BACKSLASH");
+            tokenInfoList.Add(u"'\\'");
+            tokenNameList.Add(u"QUEST");
+            tokenInfoList.Add(u"'?'");
+            tokenNameList.Add(u"EQ");
+            tokenInfoList.Add(u"'='");
+            tokenNameList.Add(u"CHAR");
+            tokenInfoList.Add(u"'char'");
+            tokenNameList.Add(u"TEXT");
+            tokenInfoList.Add(u"'text'");
+            tokenNameList.Add(u"OCTET");
+            tokenInfoList.Add(u"'octet'");
+        }
+        private static System.UniquePtr<TokenMap> instance;
+        private System.Collections.Map<ustring, int> tokenIdMap;
+        private System.Collections.List<ustring> tokenNameList;
+        private System.Collections.List<ustring> tokenInfoList;
+    }
+    public int GetTokenId(const ustring& tokenName)
+    {
+        return TokenMap.Instance().GetTokenId(tokenName);
+    }
+    public ustring GetTokenName(int tokenId)
+    {
+        return TokenMap.Instance().GetTokenName(tokenId);
+    }
+    public ustring GetTokenInfo(int tokenId)
+    {
+        return TokenMap.Instance().GetTokenInfo(tokenId);
+    }
+} // namespace HttpTokens

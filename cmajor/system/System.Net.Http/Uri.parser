@@ -1,0 +1,168 @@
+using System.Net.Http;
+using UriTokens;
+
+parser Uri
+{
+    uselexer UriLexer;
+    main;
+    
+    uri_reference : UriReference
+        ::= absolute_uri:au{ return au; } | relative_ref:rr{ return rr; }
+        ;
+    
+    absolute_uri(var UriReference uriReference) : UriReference
+        ::= (scheme:schm{ uriReference.SetScheme(schm); } 
+            COLON
+            hier_part(&uriReference):hp
+            (QUEST query:qry{ uriReference.SetQuery(qry); })?
+            (HASH fragment:frg{ uriReference.SetFragment(frg); })?
+        )
+        { 
+            return uriReference; 
+        }
+        ;
+        
+    scheme(var string s) : string
+        ::= ((scheme_char:sc{ s.Append(sc); })+){ return s; }
+        ;
+        
+    scheme_char : char
+        ::= ALPHA{ return lexer.GetChar(pos); } | DIGIT{ return lexer.GetChar(pos); } | DASH{ return '-'; } | PLUS{ return '+'; } | DOT{ return '.'; }
+        ;
+        
+    hier_part(UriReference* uriReference)
+        ::= SLASH SLASH authority:a{ uriReference->SetAuthority(a); } path_abempty:pae{ uriReference->SetPath(pae); }
+        |   path_absolute:pa{ uriReference->SetPath(pa); }
+        |   path_rootless:pr{ uriReference->SetPath(pr); }
+        |   path_empty:pe{ uriReference->SetPath(pe); }
+        ;
+        
+    relative_ref(var UriReference uriReference) : UriReference
+        ::= (relative_part(&uriReference):rp
+            (QUEST query:qry{ uriReference.SetQuery(qry); })? 
+            (HASH fragment:frg{ uriReference.SetFragment(frg); })?)
+        {
+            return uriReference;
+        }
+        ;
+        
+    relative_part(UriReference* uriReference)
+        ::= SLASH SLASH authority:a{ uriReference->SetAuthority(a); } path_abempty:pae{ uriReference->SetPath(pae); }
+        |   path_absolute:pa{ uriReference->SetPath(pa); }
+        |   path_noscheme:pn{ uriReference->SetPath(pn); }
+        |   path_empty:pe{ uriReference->SetPath(pe); }
+        ;
+        
+    authority(var Authority a) : Authority
+        ::= ((userinfo:ui AT{ a.SetUserInfo(ui); })? host:h{ a.SetHost(h); } (COLON port:p{ a.SetPort(p); })?){ return a; }
+        ;
+        
+    userinfo(var string s) : string
+        ::= ((unreserved:u{ s.Append(u); } | pct_encoded:e{ s.Append(e); } | sub_delims:d{ s.Append(d); } | COLON{ s.Append(':'); })*){ return s; }
+        ;
+        
+    host : string
+        ::= ip_literal:iplit{ return iplit; } | ipv4_address:ipv4{ return ipv4; } | reg_name:rn{ return rn; }
+        ;
+        
+    ip_literal(var string s) : string
+        ::= (LBRACKET{ s.Append('['); } (ipv6_address:ipv6{ s.Append(ipv6); } | ipv_future:ipvf{ s.Append(ipvf); }) RBRACKET{ s.Append(']'); }){ return s; }
+        ;
+        
+    ipv4_address(var string s) : string
+        ::= ((DIGIT{ s.Append(lexer.GetChar(pos)); })+ DOT{ s.Append('.'); } 
+            (DIGIT{ s.Append(lexer.GetChar(pos)); })+ DOT{ s.Append('.'); } 
+            (DIGIT{ s.Append(lexer.GetChar(pos)); })+ DOT{ s.Append('.'); } 
+            (DIGIT{ s.Append(lexer.GetChar(pos)); })+){ return s; }
+        ;
+
+    ipv6_address(var string s) : string
+        ::= ((ipv6_char:c{ s.Append(c); })+){ return s; }
+        ;
+        
+    ipv6_char : char
+        ::= DIGIT{ return lexer.GetChar(pos); } | HEX{ return lexer.GetChar(pos); } | COLON{ return ':'; }| DOT{ return '.'; } | SLASH{ return '/'; }
+        ;
+
+    ipv_future(var string s) : string
+        ::= (ALPHA{ pass = lexer.GetChar(pos) == 'v'; } (DIGIT{ s.Append(lexer.GetChar(pos)); } | HEX{ s.Append(lexer.GetChar(pos)); })+ DOT{ s.Append('.'); }
+            (unreserved:u{ s.Append(u); } | sub_delims:d{ s.Append(d); } | COLON{ s.Append(':'); })+){ return s; }
+        ;
+       
+    port(var string s) : int
+        ::= ((DIGIT{ s.Append(lexer.GetChar(pos)); })*){ return ParseInt(s); }
+        ;
+        
+    reg_name(var string s) : string
+        ::= ((unreserved:u{ s.Append(u); } | pct_encoded:e{ s.Append(e); } | sub_delims:d{ s.Append(d); })*){ return s; }
+        ;
+        
+    path_abempty(var string s) : string
+        ::= ((SLASH segment:seg{ s.Append('/').Append(seg); })*){ return s; }
+        ;
+        
+    path_absolute(var string s) : string
+        ::= SLASH{ s.Append('/'); } (segment_nz:snz{ s.Append(snz); } (SLASH segment:seg{ s.Append('/').Append(seg); })*){ return s; }
+        ;
+        
+    path_noscheme(var string s) : string
+        ::= (segment_nz_nc:snz{ s.Append(snz); } (SLASH segment:seg{ s.Append('/').Append(seg); })*){ return s; }
+        ;
+        
+    path_rootless(var string s) : string
+        ::= (segment_nz:snz{ s.Append(snz); } (SLASH segment:seg{ s.Append('/').Append(seg); })*){ return s; }
+        ;
+        
+    path_empty : string
+        ::= empty{ return string(); }
+        ;
+        
+    segment(var string s)  : string
+        ::= ((pchar:pc{ s.Append(pc); })*){ return s; }
+        ;
+    
+    segment_nz(var string s) : string
+        ::= ((pchar:pc{ s.Append(pc); })+){ return s; }
+        ;
+        
+    segment_nz_nc(var string s) : string
+        ::= ((unreserved:u{ s.Append(u); } | pct_encoded:e{ s.Append(e); } | sub_delims:d{ s.Append(d); } | AT{ s.Append('@'); })+){ return s; }
+        ;
+        
+    query(var string s) : string
+        ::= ((pchar:pc{ s.Append(pc); } | SLASH{ s.Append('/'); } | QUEST{ s.Append('?'); })*){ return s; }
+        ;
+        
+    fragment(var string s) : string
+        ::= ((pchar:pc{ s.Append(pc); } | SLASH{ s.Append('/'); } | QUEST{ s.Append('?'); })*){ return s; }
+        ;
+        
+    pchar : char
+        ::= unreserved:u{ return u; } | pct_encoded:e{ return e; } | sub_delims:d{ return d; } | COLON{ return ':'; } | AT{ return '@'; }
+        ;
+        
+    unreserved : char
+        ::= ALPHA{ return lexer.GetChar(pos); } | HEX{ return lexer.GetChar(pos); } | DIGIT{ return lexer.GetChar(pos); } | DOT{ return '.'; } | DASH{ return '-'; } | UNDERSCORE{ return '_'; } | TILDE{ return '~'; }
+        ;
+        
+    reserved : char
+        ::= gen_delims:gd{ return gd; } | sub_delims:sd{ return sd; }
+        ;
+        
+    gen_delims : char
+        ::= COLON{ return ':'; } | SLASH{ return '/'; } | QUEST{ return '?'; } | HASH{ return '#'; } | LBRACKET{ return '['; } | RBRACKET{ return ']'; } | AT{ return '@'; }
+        ;
+        
+    sub_delims : char
+        ::= EXCLAMATION{ return '!'; } | DOLLAR{ return '$'; } | AMP{ return '&'; } | SQ{ return '\''; } | LPAREN{ return '('; } | RPAREN{ return ')'; } | ASTERISK{ return '*'; } | PLUS{ return '+'; } | COMMA{ return ','; } | 
+            SEMICOLON{ return ';'; } | EQ{ return '='; }
+        ;
+        
+    pct_encoded(var string s) : char
+        ::= (PERCENT hex:x1{ s.Append(x1); } hex:x2{ s.Append(x2); }){ return cast<char>(ParseHexByte(s)); }
+        ;
+        
+    hex : char
+        ::= DIGIT{ return lexer.GetChar(pos); } | HEX{ return lexer.GetChar(pos); }
+        ;
+}

@@ -19,6 +19,7 @@ extern "C" RT_API int32_t WinWaitForMultipleObjects(uint32_t count, void** handl
 extern "C" RT_API void* WinFindFirstChangeNotification(const char* directoryPath);
 extern "C" RT_API bool WinFindNextChangeNotification(void* handle);
 extern "C" RT_API bool WinFindCloseChangeNotification(void* handle);
+extern "C" RT_API bool WinShellExecute(const char* filePath, int64_t& errorCode);
 
 #endif // CMAJOR_RT_WINDOWS_API_INCLUDED
 

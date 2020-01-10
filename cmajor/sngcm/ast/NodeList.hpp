@@ -34,7 +34,14 @@ public:
     }
     void Insert(int index, T* node)
     {
-        nodes.insert(nodes.begin() + index, std::unique_ptr<T>(node));
+        if (index >= static_cast<int>(nodes.size()))
+        {
+            Add(node);
+        }
+        else
+        {
+            nodes.insert(nodes.begin() + index, std::unique_ptr<T>(node));
+        }
     }
     void Clear()
     {

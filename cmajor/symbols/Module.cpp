@@ -70,6 +70,7 @@ SystemModuleSet::SystemModuleSet()
     systemModuleNames.insert(U"System.IO.Compression");
     systemModuleNames.insert(U"System.RegularExpressions");
     systemModuleNames.insert(U"System.XPath");
+    systemModuleNames.insert(U"System.Init");
     systemModuleNames.insert(U"System");
     systemModuleNames.insert(U"System.Install");
     systemModuleNames.insert(U"System.Windows");

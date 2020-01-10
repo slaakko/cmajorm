@@ -44,6 +44,33 @@ namespace System.Lex
         {
             return Span(fileIndex, line, cast<int>(GetPos()));
         }
+        public void PushSpan()
+        {
+            spanStack.Push(currentSpan);
+            currentSpan = Span(fileIndex, line, -1, -1);
+        }
+        public Span PopSpan()
+        {
+            Span s = currentSpan;
+            currentSpan = spanStack.Pop();
+            return s;
+        }
+        public void SetSpan()
+        {
+            if (currentSpan.start == -1)
+            {
+                currentSpan.line = line;
+                currentSpan.start = cast<int>(GetPos());
+            }
+            else
+            {
+                currentSpan.end = cast<int>(GetPos());
+            }
+        }    
+        public nothrow inline Span GetCurrentSpan() const
+        {
+            return currentSpan;
+        }
         public void SetLine(int line_)
         {
             line = line_;
@@ -221,6 +248,31 @@ namespace System.Lex
                 throw Exception("invalid token index");
             }
         }
+        public char GetChar(long pos) const
+        {
+            Token t = GetToken(pos);
+            return cast<char>(*t.match.begin);
+        }
+        public wchar GetWChar(long pos) const
+        {
+            Token t = GetToken(pos);
+            return cast<wchar>(*t.match.begin);
+        }
+        public uchar GetUChar(long pos) const
+        {
+            Token t = GetToken(pos);
+            return *t.match.begin;
+        }
+        public int GetInt(long pos) const
+        {
+            Token t = GetToken(pos);
+            return ParseInt(ToUtf8(t.match.ToString()));
+        }
+        public double GetDouble(long pos) const
+        {
+            Token t = GetToken(pos);
+            return ParseDouble(ToUtf8(t.match.ToString()));
+        }
         public void SetTokens(const List<Token>& tokens_)
         {
             if (!tokens_.IsEmpty())
@@ -354,6 +406,8 @@ namespace System.Lex
         private ParsingLog* log;
         private bool countLines;
         private uchar separatorChar;
+        private Stack<Span> spanStack;
+        private Span currentSpan;
     }
     public const uchar* LineStart(const uchar* start, const uchar* p)
     {

@@ -194,7 +194,7 @@ void SourceWriter::Visit(StringLiteralNode& stringLiteralNode)
 {
     formatter.Write("\"");
     formatter.Write(soulng::util::StringStr(stringLiteralNode.Value()));
-    formatter.Write("\"");
+formatter.Write("\"");
 }
 
 void SourceWriter::Visit(WStringLiteralNode& wstringLiteralNode)
@@ -260,8 +260,15 @@ void SourceWriter::Visit(NamespaceNode& namespaceNode)
 {
     if (!namespaceNode.Id()->Str().empty())
     {
-        formatter.Write("namespace ");
-        namespaceNode.Id()->Accept(*this);
+        if (namespaceNode.IsUnnamedNs())
+        {
+            formatter.Write("namespace");
+        }
+        else
+        {
+            formatter.Write("namespace ");
+            namespaceNode.Id()->Accept(*this);
+        }
         formatter.WriteLine();
         formatter.WriteLine("{");
         formatter.IncIndent();
@@ -286,7 +293,14 @@ void SourceWriter::Visit(NamespaceNode& namespaceNode)
     if (!namespaceNode.Id()->Str().empty())
     {
         formatter.DecIndent();
-        formatter.WriteLine("} // namespace " + soulng::unicode::ToUtf8(namespaceNode.Id()->Str()));
+        if (namespaceNode.IsUnnamedNs())
+        {
+            formatter.WriteLine("} // namespace");
+        }
+        else
+        {
+            formatter.WriteLine("} // namespace " + soulng::unicode::ToUtf8(namespaceNode.Id()->Str()));
+        }
     }
 }
 

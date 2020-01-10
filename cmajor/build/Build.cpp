@@ -305,6 +305,17 @@ std::vector<std::unique_ptr<CompileUnitNode>> ParseSources(Module* module, const
     }
 }
 
+void Preprocess(std::vector<std::unique_ptr<CompileUnitNode>>& compileUnits)
+{
+    for (std::unique_ptr<CompileUnitNode>& compileUnit : compileUnits)
+    {
+        if (compileUnit->GlobalNs()->HasUnnamedNs())
+        {
+            sngcm::ast::AddNamespaceImportsForUnnamedNamespaces(*compileUnit);
+        }
+    }
+}
+
 void CreateSymbols(SymbolTable& symbolTable, const std::vector<std::unique_ptr<CompileUnitNode>>& compileUnits, bool& stop)
 {
     SymbolCreatorVisitor symbolCreator(symbolTable);
@@ -886,6 +897,9 @@ void CreateMainUnitLlvm(std::vector<std::string>& objectFilePaths, Module& modul
     {
         callMainStatement = new AssignmentStatementNode(Span(), new IdentifierNode(Span(), U"exitCode"), invokeMain);
     }
+    InvokeNode* invokeInitialize = new InvokeNode(Span(), new IdentifierNode(Span(), U"Initialize"));
+    StatementNode* callInitializeStatement = new ExpressionStatementNode(Span(), invokeInitialize);
+    tryBlock->AddStatement(callInitializeStatement);
     tryBlock->AddStatement(callMainStatement);
     TryStatementNode* tryStatement = new TryStatementNode(Span(), tryBlock);
     CompoundStatementNode* catchBlock = new CompoundStatementNode(Span());
@@ -1468,7 +1482,8 @@ void BuildProject(Project* project, std::unique_ptr<Module>& rootModule, bool& s
         std::vector<ClassTemplateSpecializationSymbol*> classTemplateSpecializations;
         bool prevPreparing = rootModule->Preparing();
         rootModule->SetPreparing(true);
-        PrepareModuleForCompilation(rootModule.get(), project->References(), project->GetTarget()); 
+        PrepareModuleForCompilation(rootModule.get(), project->References(), project->GetTarget());
+        Preprocess(compileUnits);
         CreateSymbols(rootModule->GetSymbolTable(), compileUnits, stop);
         if (GetGlobalFlag(GlobalFlags::sym2xml))
         {

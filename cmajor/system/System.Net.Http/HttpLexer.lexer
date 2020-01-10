@@ -1,0 +1,78 @@
+classmap HttpClassMap;
+
+tokens HttpTokens
+{
+    (DIGIT, "'digit'"), (HEX, "'hex'"), (ALPHA, "'alpha'"), (HT, "'\t'"), (DQ, "'dq'"), (CR, "'\r'"), (LF, "'\n'"), (CTL, "'ctl'"), (SP, "' '"), (LWS, "'lws'"), 
+    (COLON, "'colon'"), (SEMICOLON, "';'"), (AT, "'@'"), (COMMA, "','"), (DOT, "'.'"), (LPAREN, "'('"), (RPAREN, "')'"), (LANGLE, "'<'"), (RANGLE, "'>'"), (LBRACKET, "'['"), (RBRACKET, "']'"), (LBRACE, "'{'"), (RBRACE, "'}'"),
+    (SLASH, "'/'"), (BACKSLASH, "'\\'"), (QUEST, "'?'"), (EQ, "'='"),
+    (CHAR, "'char'"), (TEXT, "'text'"), (OCTET, "'octet'")
+}
+
+expressions
+{
+    digit = "[0-9]";
+    hex = "{digit}|[a-fA-F]";
+    alpha = "[a-zA-Z]";
+    ht = "\t";
+    dq = "\"";
+    cr = "\r";
+    lf = "\n";
+    ctl = "[\x0-\x1f\x7f]";
+    sp = " ";
+    lwspc = "{sp}|{ht}";
+    lws = "(({cr}{lf})?{lwspc})+";
+    colon = ":";
+    semicolon = ";";
+    at = "@";
+    comma = ",";
+    dot = "\.";
+    lparen = "\(";
+    rparen = "\)";
+    langle = "<";
+    rangle = ">";
+    lbracket = "\[";
+    rbracket = "\]";
+    lbrace = "\{";
+    rbrace = "\}";
+    slash = "/";
+    backslash = "\\";
+    quest = "\?";
+    eq = "=";
+    chr = "[\x0-\x7f]";
+    text = "[\20-\xff]";
+    octet = "[\x0-\xff]";
+}
+
+lexer HttpLexer
+{
+    "{digit}"{ return DIGIT; }
+    "{hex}"{ return HEX; }
+    "{alpha}"{ return ALPHA; }
+    "{ht}"{ return HT; }
+    "{dq}"{ return DQ; }
+    "{cr}"{ return CR; }
+    "{lf}"{ return LF; }
+    "{ctl}"{ return CTL; }
+    "{sp}"{ return SP; }
+    "{lws}"{ return LWS; }
+    "{colon}"{ return COLON; }
+    "{semicolon}"{ return SEMICOLON; }
+    "{at}"{ return AT; }
+    "{comma}"{ return COMMA; }
+    "{dot}"{ return DOT; }
+    "{lparen}"{ return LPAREN; }
+    "{rparen}"{ return RPAREN; }
+    "{langle}"{ return LANGLE; }
+    "{rangle}"{ return RANGLE; }
+    "{lbracket}"{ return LBRACKET; }
+    "{rbracket}"{ return RBRACKET; }
+    "{lbrace}"{ return LBRACE; }
+    "{rbrace}"{ return RBRACE; }
+    "{slash}"{ return SLASH; }
+    "{backslash}"{ return BACKSLASH; }
+    "{quest}"{ return QUEST; }
+    "{eq}"{ return EQ; }
+    "{chr}"{ return CHAR; }
+    "{text}"{ return TEXT; }
+    "{octet}"{ return OCTET; }
+}

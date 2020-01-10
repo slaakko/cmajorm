@@ -25,7 +25,14 @@ namespace Cm.Ast
         }
         public nothrow void Insert(int index, T* node)
         {
-            nodes.Insert(nodes.Begin() + index, UniquePtr<T>(node));
+            if (index >= cast<int>(nodes.Count()))
+            {
+                Add(node);
+            }
+            else
+            {
+                nodes.Insert(nodes.Begin() + index, UniquePtr<T>(node));
+            }
         }
         public nothrow void Clear()
         {
@@ -72,7 +79,9 @@ namespace Cm.Ast
             uint n = reader.GetBinaryReader().ReadULEB128UInt();
             for (uint i = 0u; i < n; ++i)
             {
-                nodes.Add(UniquePtr<T>(cast<T*>(reader.ReadNode())));
+                Node* node = reader.ReadNode();
+                T* asTPtrNode = cast<T*>(node);
+                nodes.Add(UniquePtr<T>(asTPtrNode));
             }
         }
         public nothrow List<UniquePtr<T>>& Nodes()

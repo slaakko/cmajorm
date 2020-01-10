@@ -452,17 +452,17 @@ namespace soulcm.scmpg
                 set.SetInverse();
                 ++p;
             }
-            while (p != e && *p != ']')
+            while (p != e - 1)
             {
                 uchar first = *p;
-                uchar last = first;
                 ++p;
-                if (p != e && *p != ']')
+                uchar last = first;
+                if (p != e - 1)
                 {
                     if (*p == '-')
                     {
                         ++p;
-                        if (p != e && *p != ']')
+                        if (p != e - 1)
                         {
                             last = *p;
                             ++p;

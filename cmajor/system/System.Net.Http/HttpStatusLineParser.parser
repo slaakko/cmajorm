@@ -1,0 +1,41 @@
+using System.Net.Http;
+using HttpTokens;
+
+parser HttpStatusLineParser
+{
+    uselexer HttpLexer;
+    main;
+    
+    using Http.text;
+    
+    StatusLine : HttpStatus
+        ::= (HttpVersion:v SP StatusCode:sc SP ReasonPhrase:rp){ return HttpStatus(v, sc, rp); }
+        ;
+        
+    HttpVersion(var string s) : string
+        ::= (ALPHA{ s.Append(lexer.GetChar(pos)); }
+            ALPHA{ s.Append(lexer.GetChar(pos)); }
+            ALPHA{ s.Append(lexer.GetChar(pos)); }
+            ALPHA{ s.Append(lexer.GetChar(pos)); pass = s == "HTTP"; }
+            SLASH{ s.Append('/'); } (DIGIT{ s.Append(lexer.GetChar(pos)); })+ DOT{ s.Append('.'); } (DIGIT{ s.Append(lexer.GetChar(pos)); })+
+        )
+        { 
+            return s; 
+        }
+        ;
+            
+    StatusCode(var string s) : ushort
+        ::= (DIGIT{ s.Append(lexer.GetChar(pos)); }
+            DIGIT{ s.Append(lexer.GetChar(pos)); }
+            DIGIT{ s.Append(lexer.GetChar(pos)); }
+        )
+        { 
+            return ParseUShort(s); 
+        }
+        ;
+        
+    ReasonPhrase(var string s) : string
+        ::= ((text:t{ s.Append(t); })+){ return s; }
+        ;
+}
+ 

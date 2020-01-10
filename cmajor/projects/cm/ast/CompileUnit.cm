@@ -84,7 +84,7 @@ namespace Cm.Ast
         private bool isSynthesizedUnit;
         private string id;
     }
-    public class NamespaceCombinder : Visitor
+    public class NamespaceCombiner : Visitor
     {
         public override void Visit(CompileUnitNode& compileUnitNode)
         {
@@ -113,7 +113,7 @@ namespace Cm.Ast
     }
     public nothrow void CombineNamespaces(CompileUnitNode& cu)
     {
-        NamespaceCombinder combiner;
+        NamespaceCombiner combiner;
         cu.Accept(combiner);
     }
     public class ClassMemberArranger : Visitor
@@ -144,5 +144,42 @@ namespace Cm.Ast
     {
         ClassMemberArranger arranger;
         cu.Accept(arranger);
+    }
+    public class UnnamedNamespaceProcessor : Visitor
+    {
+        public nothrow UnnamedNamespaceProcessor()
+        {
+        }
+        public override void Visit(CompileUnitNode& compileUnitNode)
+        {
+            compileUnitNode.GlobalNs()->Accept(*this);
+            int index = 0;
+            for (NamespaceNode* unnamedNs : unnamedNamespaces)
+            {
+                CloneContext cloneContext;
+                IdentifierNode* unnamedNsId = cast<IdentifierNode*>(unnamedNs->Id()->Clone(cloneContext));
+                NamespaceImportNode* import = new NamespaceImportNode(compileUnitNode.GetSpan(), unnamedNsId);
+                compileUnitNode.GlobalNs()->Members().Insert(index, import);
+                ++index;
+            }
+        }
+        public override void Visit(NamespaceNode& namespaceNode)
+        {
+            if (namespaceNode.IsUnnamedNs())
+            {
+                unnamedNamespaces.Add(&namespaceNode);
+            }
+            int n = namespaceNode.Members().Count();
+            for (int i = 0; i < n; ++i)
+            {
+                namespaceNode.Members()[i]->Accept(*this);
+            }
+        }
+        private List<NamespaceNode*> unnamedNamespaces;
+    }
+    public nothrow void AddNamespaceImportsForUnnamedNamespaces(CompileUnitNode& cu)
+    {
+        UnnamedNamespaceProcessor processor;
+        cu.Accept(processor);
     }
 } // namespace Cm.Ast

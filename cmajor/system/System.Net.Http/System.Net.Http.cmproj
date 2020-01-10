@@ -2,32 +2,54 @@
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
  <PropertyGroup Label="Globals">
   <CustomProjectExtensionsPath>$(LocalAppData)\CustomProjectSystems\Cmajor\</CustomProjectExtensionsPath>
-  <ProjectGuid>410bc8f5-104d-4bdd-9ff6-016309dcd2ac</ProjectGuid>
+  <ProjectGuid>2995e743-71b2-4609-bb67-602dbef963cb</ProjectGuid>
  </PropertyGroup>
  <PropertyGroup>
   <TargetType>library</TargetType>
  </PropertyGroup>
  <ItemGroup>
   <CmCompile Include="ChunkedBodyReader.cm"/>
+  <CmCompile Include="Http.cm"/>
   <CmCompile Include="HttpAgent.cm"/>
+  <CmCompile Include="HttpChunkHeaderParser.cm"/>
+  <CmCompile Include="HttpClassMap.cm"/>
   <CmCompile Include="HttpClient.cm"/>
-  <CmCompile Include="HttpGrammar.cm"/>
+  <CmCompile Include="HttpDateParser.cm"/>
+  <CmCompile Include="HttpFieldValueParser.cm"/>
+  <CmCompile Include="HttpHeaderParser.cm"/>
+  <CmCompile Include="HttpLexer.cm"/>
+  <CmCompile Include="HttpMediaTypeParser.cm"/>
   <CmCompile Include="HttpParser.cm"/>
   <CmCompile Include="HttpRequest.cm"/>
+  <CmCompile Include="HttpStatusLineParser.cm"/>
+  <CmCompile Include="HttpTokens.cm"/>
+  <CmCompile Include="HttpUriParser.cm"/>
   <CmCompile Include="MediaType.cm"/>
-  <CmCompile Include="UriGrammar.cm"/>
+  <CmCompile Include="TokenValueParsers.cm"/>
+  <CmCompile Include="Uri.cm"/>
+  <CmCompile Include="UriClassMap.cm"/>
+  <CmCompile Include="UriLexer.cm"/>
   <CmCompile Include="UriReference.cm"/>
+  <CmCompile Include="UriTokens.cm"/>
  </ItemGroup>
  <ItemGroup>
-  <None Include="HttpGrammar.parser"/>
-  <None Include="Parsers.pl"/>
-  <None Include="Parsers.pp"/>
-  <None Include="UriGrammar.parser"/>
+  <None Include="Http.parser"/>
+  <None Include="HttpChunkHeaderParser.parser"/>
+  <None Include="HttpDateParser.parser"/>
+  <None Include="HttpFieldValueParser.parser"/>
+  <None Include="HttpHeaderParser.parser"/>
+  <None Include="HttpLexer.lexer"/>
+  <None Include="HttpMediaTypeParser.parser"/>
+  <None Include="HttpStatusLineParser.parser"/>
+  <None Include="Parsers.spg"/>
+  <None Include="Uri.parser"/>
+  <None Include="UriLexer.lexer"/>
  </ItemGroup>
  <ItemGroup>
   <ProjectReference Include="../System.Net.Sockets/System.Net.Sockets.cmproj"/>
   <ProjectReference Include="../System.IO.Compression/System.IO.Compression.cmproj"/>
-  <ProjectReference Include="../System.Text.Parsing/System.Text.Parsing.cmproj"/>
+  <ProjectReference Include="../System.Lex/System.Lex.cmproj"/>
+  <ProjectReference Include="../System.Parsing/System.Parsing.cmproj"/>
  </ItemGroup>
  <Import Project="$(CustomProjectExtensionsPath)Cmajor.props"/>
  <Import Project="$(CustomProjectExtensionsPath)Cmajor.targets"/>

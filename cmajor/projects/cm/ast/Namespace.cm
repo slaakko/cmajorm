@@ -3,15 +3,38 @@ using System.Collections;
 
 namespace Cm.Ast
 {
+    public enum NsFlags : sbyte
+    {
+        none = 0, isUnnamedNs = 1 << 0, hasUnnamedNs = 1 << 1
+    }
+    public inline constexpr nothrow NsFlags operator|(NsFlags left, NsFlags right)
+    {
+        return cast<NsFlags>(cast<sbyte>(left) | cast<sbyte>(right));
+    }
+    public inline constexpr nothrow NsFlags operator&(NsFlags left, NsFlags right)
+    {
+        return cast<NsFlags>(cast<sbyte>(left) & cast<sbyte>(right));
+    }
     public class NamespaceNode : Node
     {
         public nothrow NamespaceNode(const System.Lex.Span& span_) :
-            base(NodeType.namespaceNode, span_), id()
+            base(NodeType.namespaceNode, span_), id(), flags()
         {
         }
         public nothrow NamespaceNode(const System.Lex.Span& span_, IdentifierNode* id_) :
-            base(NodeType.namespaceNode, span_), id(id_)
+            base(NodeType.namespaceNode, span_), id(id_), flags()
         {
+            if (id.IsNull())
+            {
+                SetUnnamedNs();
+                System.Security.Sha1 sha1;
+                Uuid randomUuid = Uuid.Random();
+                for (byte x : randomUuid)
+                {
+                    sha1.Process(x);
+                }
+                id.Reset(new IdentifierNode(span_, u"unnamed_ns_" + ToUtf32(sha1.GetDigest())));
+            }
             id->SetParent(this);
         }
         public nothrow NodeList<Node>& Members()
@@ -22,6 +45,22 @@ namespace Cm.Ast
         {
             return members;
         }
+        public nothrow bool IsUnnamedNs() const
+        {
+            return (flags & NsFlags.isUnnamedNs) != NsFlags.none;
+        }
+        public nothrow void SetUnnamedNs()
+        {
+            flags = flags | NsFlags.isUnnamedNs;
+        }
+        public nothrow bool HasUnnamedNs() const
+        {
+            return (flags & NsFlags.hasUnnamedNs) != NsFlags.none;
+        }
+        public nothrow void SetHasUnnamedNs()
+        {
+            flags = flags | NsFlags.hasUnnamedNs;
+        }
         public nothrow IdentifierNode* Id() const
         {
             return id.Get();
@@ -30,6 +69,14 @@ namespace Cm.Ast
         {
             member->SetParent(this);
             members.Add(member);
+            if (member->GetNodeType() == NodeType.namespaceNode)
+            {
+                NamespaceNode* ns = cast<NamespaceNode*>(member);
+                if (ns->IsUnnamedNs() || ns->HasUnnamedNs())
+                {
+                    SetHasUnnamedNs();
+                }
+            }
         }
         public override void Accept(Visitor& visitor)
         {
@@ -39,6 +86,7 @@ namespace Cm.Ast
         {
             base->Write(writer);
             writer.Write(id.Get());
+            writer.GetBinaryWriter().Write(cast<sbyte>(flags));
             members.Write(writer);
         }
         public override void Read(AstReader& reader)
@@ -46,6 +94,7 @@ namespace Cm.Ast
             base->Read(reader);
             id.Reset(reader.ReadIdentifierNode());
             id->SetParent(this);
+            flags = cast<NsFlags>(reader.GetBinaryReader().ReadSByte());
             members.Read(reader);
             members.SetParent(this);
         }
@@ -71,6 +120,7 @@ namespace Cm.Ast
         }
         private UniquePtr<IdentifierNode> id;
         private NodeList<Node> members;
+        private NsFlags flags;
     }
     public class AliasNode : Node
     {
