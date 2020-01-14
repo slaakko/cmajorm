@@ -1,0 +1,31 @@
+classmap BigNumClassMap;
+
+tokens BigNumTokens
+{
+    (PLUS, "'+'"), (MINUS, "'-'"), (MUL, "'*'"), (DIV, "'/'"), (LPAREN, "'('"), (RPAREN, "')'"), (FLOAT, "'float"), (RATIONAL, "'rational'"), (INTEGER, "'integer'")
+}
+
+expressions
+{
+    ws = "[\n\r\t ]+";
+    sign = "\+|-";
+    digits = "[0-9]+";
+    exponent = "(e|E){sign}?{digits}";
+    floating = "{digits}\.{digits}{exponent}?|{digits}{exponent}";
+    rational = "\[{digits}(/{digits})?\]";
+    integer = "{digits}";
+}
+
+lexer BigNumLexer
+{
+    "{ws}" {}
+    "{floating}" { return FLOAT; }
+    "{rational}" { return RATIONAL; }
+    "{integer}" { return INTEGER; }
+    "\+"{ return PLUS; }
+    "-"{ return MINUS; }
+    "\*"{ return MUL; }
+    "/"{ return DIV; }
+    "\("{ return LPAREN; }
+    "\)"{ return RPAREN; }
+}

@@ -12,6 +12,7 @@ parser HttpHeaderParser
     using Http.tspecial;
     using Http.ctext;
     using Http.token;
+    using Http.lws;
     
     message_header : HttpHeader
         ::= (field_name:fn COLON field_value:fv?){ return HttpHeader(fn, fv); }
@@ -22,7 +23,7 @@ parser HttpHeaderParser
         ;
         
     field_value(var string s) : string
-        ::= ((LWS{ s.Append(' '); } | field_content:fc{ s.Append(fc); })+){ return s; }
+        ::= ((lws:lws1{ s.Append(' '); } | field_content:fc{ s.Append(fc); })+){ return s; }
         ;
     
     field_content(var string s) : string

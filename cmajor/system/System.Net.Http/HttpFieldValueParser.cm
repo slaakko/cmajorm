@@ -52,192 +52,116 @@ public static class HttpFieldValueParser
         Match match(false);
         Match* parentMatch0 = &match;
         {
-            Match match(false);
-            Match* parentMatch1 = &match;
-            {
-                Match match(false);
-                Match* parentMatch2 = &match;
-                {
-                    Match match(true);
-                    long save = lexer.GetPos();
-                    Match* parentMatch3 = &match;
-                    {
-                        Match match(false);
-                        if (*lexer == LWS)
-                        {
-                            ++lexer;
-                            match.hit = true;
-                        }
-                        if (match.hit)
-                        {
-                            *parentMatch3 = match;
-                        }
-                        else
-                        {
-                            lexer.SetPos(save);
-                        }
-                    }
-                    *parentMatch2 = match;
-                }
-                if (match.hit)
-                {
-                    Match match(false);
-                    Match* parentMatch4 = &match;
-                    {
-                        Match match = HttpFieldValueParser.GeneralFieldValue(lexer, values);
-                        *parentMatch4 = match;
-                    }
-                    *parentMatch2 = match;
-                }
-                *parentMatch1 = match;
-            }
-            if (match.hit)
-            {
-                Match match(false);
-                Match* parentMatch5 = &match;
-                {
-                    Match match(true);
-                    Match* parentMatch6 = &match;
-                    {
-                        while (true)
-                        {
-                            long save = lexer.GetPos();
-                            {
-                                Match match(false);
-                                Match* parentMatch7 = &match;
-                                {
-                                    Match match(false);
-                                    Match* parentMatch8 = &match;
-                                    {
-                                        Match match(false);
-                                        Match* parentMatch9 = &match;
-                                        {
-                                            Match match(false);
-                                            Match* parentMatch10 = &match;
-                                            {
-                                                Match match(true);
-                                                long save = lexer.GetPos();
-                                                Match* parentMatch11 = &match;
-                                                {
-                                                    Match match(false);
-                                                    if (*lexer == LWS)
-                                                    {
-                                                        ++lexer;
-                                                        match.hit = true;
-                                                    }
-                                                    if (match.hit)
-                                                    {
-                                                        *parentMatch11 = match;
-                                                    }
-                                                    else
-                                                    {
-                                                        lexer.SetPos(save);
-                                                    }
-                                                }
-                                                *parentMatch10 = match;
-                                            }
-                                            if (match.hit)
-                                            {
-                                                Match match(false);
-                                                Match* parentMatch12 = &match;
-                                                {
-                                                    Match match(false);
-                                                    if (*lexer == COMMA)
-                                                    {
-                                                        ++lexer;
-                                                        match.hit = true;
-                                                    }
-                                                    *parentMatch12 = match;
-                                                }
-                                                *parentMatch10 = match;
-                                            }
-                                            *parentMatch9 = match;
-                                        }
-                                        if (match.hit)
-                                        {
-                                            Match match(false);
-                                            Match* parentMatch13 = &match;
-                                            {
-                                                Match match(true);
-                                                long save = lexer.GetPos();
-                                                Match* parentMatch14 = &match;
-                                                {
-                                                    Match match(false);
-                                                    if (*lexer == LWS)
-                                                    {
-                                                        ++lexer;
-                                                        match.hit = true;
-                                                    }
-                                                    if (match.hit)
-                                                    {
-                                                        *parentMatch14 = match;
-                                                    }
-                                                    else
-                                                    {
-                                                        lexer.SetPos(save);
-                                                    }
-                                                }
-                                                *parentMatch13 = match;
-                                            }
-                                            *parentMatch9 = match;
-                                        }
-                                        *parentMatch8 = match;
-                                    }
-                                    if (match.hit)
-                                    {
-                                        Match match(false);
-                                        Match* parentMatch15 = &match;
-                                        {
-                                            Match match = HttpFieldValueParser.GeneralFieldValue(lexer, values);
-                                            *parentMatch15 = match;
-                                        }
-                                        *parentMatch8 = match;
-                                    }
-                                    *parentMatch7 = match;
-                                }
-                                if (match.hit)
-                                {
-                                    *parentMatch6 = match;
-                                }
-                                else
-                                {
-                                    lexer.SetPos(save);
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                    *parentMatch5 = match;
-                }
-                *parentMatch1 = match;
-            }
+            Match match = HttpFieldValueParser.GeneralFieldValue(lexer, values);
             *parentMatch0 = match;
         }
         if (match.hit)
         {
             Match match(false);
-            Match* parentMatch16 = &match;
+            Match* parentMatch1 = &match;
             {
                 Match match(true);
-                long save = lexer.GetPos();
-                Match* parentMatch17 = &match;
+                Match* parentMatch2 = &match;
                 {
-                    Match match(false);
-                    if (*lexer == LWS)
+                    while (true)
                     {
-                        ++lexer;
-                        match.hit = true;
-                    }
-                    if (match.hit)
-                    {
-                        *parentMatch17 = match;
-                    }
-                    else
-                    {
-                        lexer.SetPos(save);
+                        long save = lexer.GetPos();
+                        {
+                            Match match(false);
+                            Match* parentMatch3 = &match;
+                            {
+                                Match match(false);
+                                Match* parentMatch4 = &match;
+                                {
+                                    Match match(false);
+                                    Match* parentMatch5 = &match;
+                                    {
+                                        Match match(false);
+                                        Match* parentMatch6 = &match;
+                                        {
+                                            Match match(true);
+                                            long save = lexer.GetPos();
+                                            Match* parentMatch7 = &match;
+                                            {
+                                                Match match = Http.lws(lexer);
+                                                if (match.hit)
+                                                {
+                                                    *parentMatch7 = match;
+                                                }
+                                                else
+                                                {
+                                                    lexer.SetPos(save);
+                                                }
+                                            }
+                                            *parentMatch6 = match;
+                                        }
+                                        if (match.hit)
+                                        {
+                                            Match match(false);
+                                            Match* parentMatch8 = &match;
+                                            {
+                                                Match match(false);
+                                                if (*lexer == COMMA)
+                                                {
+                                                    ++lexer;
+                                                    match.hit = true;
+                                                }
+                                                *parentMatch8 = match;
+                                            }
+                                            *parentMatch6 = match;
+                                        }
+                                        *parentMatch5 = match;
+                                    }
+                                    if (match.hit)
+                                    {
+                                        Match match(false);
+                                        Match* parentMatch9 = &match;
+                                        {
+                                            Match match(true);
+                                            long save = lexer.GetPos();
+                                            Match* parentMatch10 = &match;
+                                            {
+                                                Match match = Http.lws(lexer);
+                                                if (match.hit)
+                                                {
+                                                    *parentMatch10 = match;
+                                                }
+                                                else
+                                                {
+                                                    lexer.SetPos(save);
+                                                }
+                                            }
+                                            *parentMatch9 = match;
+                                        }
+                                        *parentMatch5 = match;
+                                    }
+                                    *parentMatch4 = match;
+                                }
+                                if (match.hit)
+                                {
+                                    Match match(false);
+                                    Match* parentMatch11 = &match;
+                                    {
+                                        Match match = HttpFieldValueParser.GeneralFieldValue(lexer, values);
+                                        *parentMatch11 = match;
+                                    }
+                                    *parentMatch4 = match;
+                                }
+                                *parentMatch3 = match;
+                            }
+                            if (match.hit)
+                            {
+                                *parentMatch2 = match;
+                            }
+                            else
+                            {
+                                lexer.SetPos(save);
+                                break;
+                            }
+                        }
                     }
                 }
-                *parentMatch16 = match;
+                *parentMatch1 = match;
             }
             *parentMatch0 = match;
         }
@@ -316,20 +240,48 @@ public static class HttpFieldValueParser
                                         Match* parentMatch7 = &match;
                                         {
                                             Match match(false);
-                                            if (*lexer == SEMICOLON)
+                                            Match* parentMatch8 = &match;
                                             {
-                                                ++lexer;
-                                                match.hit = true;
+                                                Match match(false);
+                                                if (*lexer == SEMICOLON)
+                                                {
+                                                    ++lexer;
+                                                    match.hit = true;
+                                                }
+                                                *parentMatch8 = match;
+                                            }
+                                            if (match.hit)
+                                            {
+                                                Match match(false);
+                                                Match* parentMatch9 = &match;
+                                                {
+                                                    Match match(true);
+                                                    long save = lexer.GetPos();
+                                                    Match* parentMatch10 = &match;
+                                                    {
+                                                        Match match = Http.lws(lexer);
+                                                        if (match.hit)
+                                                        {
+                                                            *parentMatch10 = match;
+                                                        }
+                                                        else
+                                                        {
+                                                            lexer.SetPos(save);
+                                                        }
+                                                    }
+                                                    *parentMatch9 = match;
+                                                }
+                                                *parentMatch8 = match;
                                             }
                                             *parentMatch7 = match;
                                         }
                                         if (match.hit)
                                         {
                                             Match match(false);
-                                            Match* parentMatch8 = &match;
+                                            Match* parentMatch11 = &match;
                                             {
                                                 Match match = HttpFieldValueParser.GeneralParameter(lexer, &fieldValue);
-                                                *parentMatch8 = match;
+                                                *parentMatch11 = match;
                                             }
                                             *parentMatch7 = match;
                                         }
@@ -421,87 +373,21 @@ public static class HttpFieldValueParser
                                 Match* parentMatch6 = &match;
                                 {
                                     Match match(false);
-                                    Match* parentMatch7 = &match;
+                                    if (*lexer == EQ)
                                     {
-                                        Match match(false);
-                                        Match* parentMatch8 = &match;
-                                        {
-                                            Match match(true);
-                                            long save = lexer.GetPos();
-                                            Match* parentMatch9 = &match;
-                                            {
-                                                Match match(false);
-                                                if (*lexer == LWS)
-                                                {
-                                                    ++lexer;
-                                                    match.hit = true;
-                                                }
-                                                if (match.hit)
-                                                {
-                                                    *parentMatch9 = match;
-                                                }
-                                                else
-                                                {
-                                                    lexer.SetPos(save);
-                                                }
-                                            }
-                                            *parentMatch8 = match;
-                                        }
-                                        if (match.hit)
-                                        {
-                                            Match match(false);
-                                            Match* parentMatch10 = &match;
-                                            {
-                                                Match match(false);
-                                                if (*lexer == EQ)
-                                                {
-                                                    ++lexer;
-                                                    match.hit = true;
-                                                }
-                                                *parentMatch10 = match;
-                                            }
-                                            *parentMatch8 = match;
-                                        }
-                                        *parentMatch7 = match;
-                                    }
-                                    if (match.hit)
-                                    {
-                                        Match match(false);
-                                        Match* parentMatch11 = &match;
-                                        {
-                                            Match match(true);
-                                            long save = lexer.GetPos();
-                                            Match* parentMatch12 = &match;
-                                            {
-                                                Match match(false);
-                                                if (*lexer == LWS)
-                                                {
-                                                    ++lexer;
-                                                    match.hit = true;
-                                                }
-                                                if (match.hit)
-                                                {
-                                                    *parentMatch12 = match;
-                                                }
-                                                else
-                                                {
-                                                    lexer.SetPos(save);
-                                                }
-                                            }
-                                            *parentMatch11 = match;
-                                        }
-                                        *parentMatch7 = match;
+                                        ++lexer;
+                                        match.hit = true;
                                     }
                                     *parentMatch6 = match;
                                 }
                                 if (match.hit)
                                 {
                                     Match match(false);
-                                    Match* parentMatch13 = &match;
+                                    Match* parentMatch7 = &match;
                                     {
                                         Match match = Http.attrval(lexer);
                                         av.Reset(cast<Value<string>*>(match.value));
-                                        *parentMatch13 = match;
+                                        *parentMatch7 = match;
                                     }
                                     *parentMatch6 = match;
                                 }

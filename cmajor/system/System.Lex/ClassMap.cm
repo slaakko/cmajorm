@@ -1,0 +1,94 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.Collections;
+using System.IO;
+
+namespace System.Lex
+{
+    public SharedPtr<ByteStream> MakeClassMapData(const List<int>& classMapVec, bool compressData)
+    {
+        SharedPtr<ByteStream> in(new MemoryByteStream());
+        SharedPtr<ByteStream> out = in;
+        BinaryWriter binaryWriter(in);
+        binaryWriter.Write(cast<int>(classMapVec.Count()));
+        for (int i : classMapVec)
+        {
+            binaryWriter.Write(i);
+        }
+        if (compressData)
+        {
+            if (getSystemCompressionMethod != GetSystemCompressionMethodFunction())
+            {
+                byte compressionMethod = getSystemCompressionMethod();
+                if (compressionMethod >= numSystemCompressions)
+                {
+                    throw Exception("error: system compression method value too big (>= " + ToString(numSystemCompressions) + ") '" + ToString(compressionMethod) + "'");
+                }
+                DataCompressionFunction compressionFunction = compressFunctions[compressionMethod];
+                if (compressionFunction != DataCompressionFunction())
+                {
+                    out.Reset(new MemoryByteStream());
+                    out->Write(compressionMethod);
+                    compressionFunction(in, out);
+                }
+                else
+                {
+                    throw Exception("error: could not make class map data because System.IO.compressFunction[" + ToString(compressionMethod) + "] function not set");
+                }
+            }
+            else
+            {
+                throw Exception("error: could not make class map data because System.IO.getSystemCompressionMethod function not set");
+            }
+        }
+        return out;
+    }
+        
+    public int* CreateClassMap(byte* classMapData, long classMapDataLength, bool classMapDataCompressed)
+    {
+        SharedPtr<ByteStream> in(new MemoryByteStream());
+        SharedPtr<ByteStream> out = in;
+        BinaryWriter binaryWriter(in);
+        byte* e = classMapData + classMapDataLength;
+        for (byte* p = classMapData; p != e; ++p)
+        {
+            binaryWriter.Write(*p);
+        }
+        if (classMapDataCompressed)
+        {
+            int compressionMethod = in->ReadByte();
+            if (compressionMethod == -1)
+            {
+                throw Exception("error: could not expand class map because class map data is empty");
+            }
+            byte method = cast<byte>(compressionMethod);
+            if (method >= numSystemCompressions)
+            {
+                throw Exception("error: could not expand class map, invalid class map data compression method byte '" + ToString(method) + "', not 0=deflate or 1=bzip2");
+            }
+            DataCompressionFunction expandFunction = expandFunctions[method];
+            if (expandFunction != DataCompressionFunction())
+            {
+                out.Reset(new MemoryByteStream());
+                expandFunction(in, out);
+            }
+            else
+            {
+                throw Exception("error: could not expand class map because System.IO.expandFunction[" + ToString(method) + "] function not set");
+            }
+        }
+        BinaryReader binaryReader(out);
+        int n = binaryReader.ReadInt();
+        int* classMap = cast<int*>(MemAlloc(n * sizeof(int)));
+        for (int i = 0; i < n; ++i)
+        {
+            classMap[i] = binaryReader.ReadInt();
+        }
+        return classMap;
+    }
+}
+

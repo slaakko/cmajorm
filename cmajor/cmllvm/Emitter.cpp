@@ -7,13 +7,18 @@
 #include <soulng/util/Path.hpp>
 #include <soulng/util/System.hpp>
 #include <soulng/util/TextUtils.hpp>
+#include <soulng/util/MappedInputFile.hpp>
 #include <llvm/Support/raw_os_ostream.h>
 #include <llvm/IR/Module.h>
 #include <llvm/IR/Verifier.h>
 #include <llvm/IR/LegacyPassManager.h>
+#include <llvm/Bitcode/BitcodeWriter.h>
+#include <llvm/IRReader/IRReader.h>
 #include <llvm/Support/FileSystem.h>
 #include <llvm/Target/TargetMachine.h>
 #include <llvm/Config/llvm-config.h>
+#include <llvm/Support/SourceMgr.h>
+#include <boost/filesystem.hpp>
 #include <fstream>
 
 namespace cmllvm {
@@ -276,14 +281,88 @@ void Emitter::EmitIrText(const std::string& filePath)
     std::ofstream llFile(filePath);
     llvm::raw_os_ostream llOs(llFile);
     module->print(llOs, nullptr);
+    llOs.flush();
 }
 
-void Emitter::EmitOptIrText(const std::string& irFilePath, const std::string& optIrFilePath, int opmitizationLevel)
+void Emitter::EmitIrFile(const std::string& filePath)
 {
+    std::ofstream bcFile(filePath, std::ios::binary);
+    llvm::raw_os_ostream bcOs(bcFile);
+    llvm::WriteBitcodeToFile(*module, bcOs);
+    bcOs.flush();
+}
+
+void Emitter::Optimize(const std::string& bcFilePath, const std::string& optBCFilePath, const std::string& optimizationFlags)
+{
+    std::string optErrorFilePath = optBCFilePath + ".opt.error";
     std::string optCommandLine;
-    optCommandLine.append("opt -O").append(std::to_string(opmitizationLevel)).append(" ").append(QuotedPath(irFilePath)).append(" -S -o ");
-    optCommandLine.append(QuotedPath(optIrFilePath));
-    System(optCommandLine);
+    optCommandLine.append("cmfileredirector -2 " + optErrorFilePath + " opt ").append(optimizationFlags).append(" -o=").append(QuotedPath(optBCFilePath)).append(" ").append(QuotedPath(bcFilePath));
+    try
+    {
+        System(optCommandLine);
+        boost::filesystem::remove(boost::filesystem::path(optErrorFilePath));
+    }
+    catch (const std::exception& ex)
+    {
+        std::string errors = ReadFile(optErrorFilePath);
+        throw std::runtime_error("optimization of '" + bcFilePath + "' failed: " + ex.what() + ":\nerrors:\n" + errors);
+    }
+}
+
+void Emitter::Disassemble(const std::string& bcFilePath, const std::string& llFilePath)
+{
+    std::string disErrorFilePath = bcFilePath + ".llvm-dis.error";
+    std::string disCommandLine;
+    disCommandLine.append("cmfileredirector -2 " + disErrorFilePath + " llvm-dis -o=").append(QuotedPath(llFilePath)).append(" ").append(QuotedPath(bcFilePath));
+    try
+    {
+        System(disCommandLine);
+        boost::filesystem::remove(boost::filesystem::path(disErrorFilePath));
+    }
+    catch (const std::exception& ex)
+    {
+        std::string errors = ReadFile(disErrorFilePath);
+        throw std::runtime_error("disassembly of '" + bcFilePath + "' failed: " + ex.what() + ":\nerrors:\n" + errors);
+    }
+}
+
+void Emitter::Compile(const std::string& bcFilePath, const std::string& objectFilePath, int optimizationLevel)
+{
+/*
+    llvm::SMDiagnostic error;
+    std::unique_ptr<llvm::Module> mod = llvm::parseIRFile(bcFilePath, error, context);
+    auto it = mod->begin();
+    bool modified = false;
+    while (it != mod->end())
+    {
+        if (it->getUnnamedAddr() == llvm::GlobalValue::UnnamedAddr::Local)
+        {
+            it->setUnnamedAddr(llvm::GlobalValue::UnnamedAddr::None);
+            modified = true;
+        }
+        ++it;
+    }
+    if (modified)
+    {
+        std::ofstream bcFile(bcFilePath, std::ios::binary);
+        llvm::raw_os_ostream bcOs(bcFile);
+        llvm::WriteBitcodeToFile(*mod, bcOs);
+        bcOs.flush();
+    }
+*/
+    std::string llcErrorFilePath = bcFilePath + ".llc.error";
+    std::string llcCommandLine;
+    llcCommandLine.append("cmfileredirector -2 " + llcErrorFilePath + " llc -O=").append(std::to_string(optimizationLevel)).append(" --filetype=obj").append(" -o=").append(QuotedPath(objectFilePath).append(" ").append(QuotedPath(bcFilePath)));
+    try
+    {
+        System(llcCommandLine);
+        boost::filesystem::remove(boost::filesystem::path(llcErrorFilePath));
+    }
+    catch (const std::exception & ex)
+    {
+        std::string errors = ReadFile(llcErrorFilePath);
+        throw std::runtime_error("compilation of '" + bcFilePath + "' failed: " + ex.what() + ":\nerrors:\n" + errors);
+    }
 }
 
 void Emitter::VerifyModule()
@@ -1575,12 +1654,23 @@ uint64_t Emitter::GetClassTypeAlignmentInBits(void* classIrType)
 
 void Emitter::AddInlineFunctionAttribute(void* function)
 {
-    static_cast<llvm::Function*>(function)->addFnAttr(llvm::Attribute::InlineHint);
+    llvm::Function* fun = static_cast<llvm::Function*>(function);
+    fun->addFnAttr(llvm::Attribute::InlineHint);
+}
+
+void Emitter::SetFunctionLinkage(void* function, bool setInline)
+{
+    llvm::Function* fun = static_cast<llvm::Function*>(function);
+    if (setInline)
+    {
+        fun->setLinkage(llvm::GlobalValue::LinkageTypes::WeakODRLinkage);
+    }
 }
 
 void Emitter::SetFunctionLinkageToLinkOnceODRLinkage(void* function)
 {
-    static_cast<llvm::Function*>(function)->setLinkage(llvm::GlobalValue::LinkageTypes::LinkOnceODRLinkage);
+    llvm::Function* fun = static_cast<llvm::Function*>(function);
+    fun->setLinkage(llvm::GlobalValue::LinkageTypes::LinkOnceODRLinkage);
 }
 
 void* Emitter::CreateSubroutineType(const std::vector<void*>& elementTypes)

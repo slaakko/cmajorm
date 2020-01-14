@@ -550,10 +550,11 @@ soulng::parser::Match EnumerationParser::EnumConstant(CmajorLexer& lexer, Parsin
                                 {
                                     expr.reset(constantValue.release());
                                     expr->SetFullSpan();
+                                    Span v = expr->GetSpan();
                                     s.end = expr->GetSpan().end;
                                     EnumConstantNode * value = new EnumConstantNode(s, constantId.release(), expr.release());
                                     value->SetHasValue();
-                                    value->SetStrValue(lexer.GetMatch(s));
+                                    value->SetStrValue(lexer.GetMatch(v));
                                     {
                                         #ifdef SOULNG_PARSER_DEBUG_SUPPORT
                                         if (parser_debug_write_to_log) soulng::lexer::WriteSuccessToLog(lexer, parser_debug_match_span, soulng::unicode::ToUtf32("EnumConstant"));

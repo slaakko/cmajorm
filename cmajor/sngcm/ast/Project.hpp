@@ -10,6 +10,8 @@
 #include <string>
 #include <vector>
 #include <memory>
+#include <mutex>
+#include <atomic>
 
 namespace sngcm { namespace ast {
 
@@ -127,9 +129,9 @@ public:
     void SetIndex(int index_) { index = index_; }
     int Index() const { return index; }
     const std::vector<Project*>& DependsOnProjects() { return dependsOn; }
-    bool Built() const { return built; }
-    void SetBuilt() { built = true; }
-    bool Ready() const;
+    bool Built();
+    void SetBuilt();
+    bool Ready();
     void SetExcludeSourceFilePath(const std::string& excludeSourceFilePath_);
 private:
     std::u32string name;
@@ -152,10 +154,11 @@ private:
     std::vector<std::string> relativeReferencedProjectFilePaths;
     std::vector<std::string> relativeTextFilePaths;
     std::vector<Project*> dependsOn;
-    bool built;
+    std::atomic<bool> built;
     bool isSystemProject;
     int logStreamId;
     int index;
+    std::mutex mtx;
 };
 
 

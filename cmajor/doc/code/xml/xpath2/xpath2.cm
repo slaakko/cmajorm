@@ -5,21 +5,21 @@ using System.Dom;
 void main()
 {
     ustring query = u"/philosophers/philosopher[@name='Socrates']";
-    string xml;
-    xml.Append("<philosophers>")
-       .Append(    "<philosopher name='Plato'/>")
-       .Append(    "<philosopher name='Aristotle'/>")
-       .Append(    "<philosopher name='Socrates'/>")
-       .Append("</philosophers>");
-    UniquePtr<DomDocument> doc = ParseXmlContentToDomDocument(xml, "xml");
+    ustring xml;
+    xml.Append(u"<philosophers>")
+       .Append(    u"<philosopher name='Plato'/>")
+       .Append(    u"<philosopher name='Aristotle'/>")
+       .Append(    u"<philosopher name='Socrates'/>")
+       .Append(u"</philosophers>");
+    UniquePtr<Document> doc = ParseDocument(xml, "xml");
     UniquePtr<XPathObject> o = Evaluate(query, doc.Get());
     XPathNodeSet* ns = o.Get() as XPathNodeSet*;
     if (ns != null)
     {
-        long n = ns->Length();
-        for (long i = 0; i < n; ++i)
+        int n = ns->Length();
+        for (int i = 0; i < n; ++i)
         {
-            DomElement* p = (*ns)[i] as DomElement*;
+            Element* p = (*ns)[i] as Element*;
             if (p != null)
             {
                 Console.Out() << p->GetAttribute(u"name") << endl();

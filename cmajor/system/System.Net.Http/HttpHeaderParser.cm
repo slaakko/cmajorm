@@ -232,12 +232,7 @@ public static class HttpHeaderParser
                             Match* parentMatch5 = &match;
                             {
                                 long pos = lexer.GetPos();
-                                Match match(false);
-                                if (*lexer == LWS)
-                                {
-                                    ++lexer;
-                                    match.hit = true;
-                                }
+                                Match match = Http.lws(lexer);
                                 if (match.hit)
                                 {
                                     s.Append(' ');
@@ -291,12 +286,7 @@ public static class HttpHeaderParser
                                     Match* parentMatch11 = &match;
                                     {
                                         long pos = lexer.GetPos();
-                                        Match match(false);
-                                        if (*lexer == LWS)
-                                        {
-                                            ++lexer;
-                                            match.hit = true;
-                                        }
+                                        Match match = Http.lws(lexer);
                                         if (match.hit)
                                         {
                                             s.Append(' ');

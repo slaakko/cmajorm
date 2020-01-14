@@ -422,7 +422,7 @@ namespace soulcm.scmlg
                 }
             }
         }
-        public void MakeClassMap(const string& root, bool verbose)
+        public void MakeClassMap(const string& root, bool verbose, bool noClassMapCompression)
         {
             List<int> classMapVec(1114112, -1);
             for (Class* cls : partition)
@@ -447,15 +447,46 @@ namespace soulcm.scmlg
             Cm.Ast.CompileUnitNode classMapUnit(System.Lex.Span(), classMapSourceFileName);
             classMapUnit.GlobalNs()->AddMember(new Cm.Ast.NamespaceImportNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"System")));
             classMapUnit.GlobalNs()->AddMember(new Cm.Ast.CommentNode(System.Lex.Span(), u"this file has been automatically generated from \'" + ToUtf32(FileName()) + u"\' using soulcm lexer generator scmlg version " + ToUtf32(LexerGeneratorVersionStr())));
-            UniquePtr<Cm.Ast.GlobalVariableNode> classMapVariable(new Cm.Ast.GlobalVariableNode(System.Lex.Span(), Cm.Ast.Specifiers.private_, new Cm.Ast.ArrayNode(System.Lex.Span(), new Cm.Ast.IntNode(System.Lex.Span()), null), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"classMap"), &classMapUnit));
+            UniquePtr<Cm.Ast.GlobalVariableNode> classMapDataVariable(new Cm.Ast.GlobalVariableNode(System.Lex.Span(), Cm.Ast.Specifiers.private_, new Cm.Ast.ArrayNode(System.Lex.Span(), new Cm.Ast.ByteNode(System.Lex.Span()), null), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"classMapData"), &classMapUnit));
             UniquePtr<Cm.Ast.ArrayLiteralNode> arrayLiteral(new Cm.Ast.ArrayLiteralNode(System.Lex.Span()));
-            for (int i : classMapVec)
+            SharedPtr<ByteStream> stream = System.Lex.MakeClassMapData(classMapVec, !noClassMapCompression);
+            int x = stream->ReadByte();
+            while (x != -1)
             {
-                arrayLiteral->AddValue(new Cm.Ast.IntLiteralNode(System.Lex.Span(), i));
+                arrayLiteral->AddValue(new Cm.Ast.ByteLiteralNode(System.Lex.Span(), cast<byte>(x)));
+                x = stream->ReadByte();
             }
-            classMapVariable->SetInitializer(arrayLiteral.Release());
+            classMapDataVariable->SetInitializer(arrayLiteral.Release());
+            classMapUnit.GlobalNs()->AddMember(classMapDataVariable.Release());
+            UniquePtr<Cm.Ast.GlobalVariableNode> classMapVariable(new Cm.Ast.GlobalVariableNode(System.Lex.Span(), Cm.Ast.Specifiers.private_, new Cm.Ast.PointerNode(System.Lex.Span(), new Cm.Ast.IntNode(System.Lex.Span())), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"classMap"), &classMapUnit));
+            classMapVariable->SetInitializer(new Cm.Ast.NullLiteralNode());
             classMapUnit.GlobalNs()->AddMember(classMapVariable.Release());
+            UniquePtr<Cm.Ast.GlobalVariableNode> classMapCompressedVariable(new Cm.Ast.GlobalVariableNode(System.Lex.Span(), Cm.Ast.Specifiers.private_, new Cm.Ast.BoolNode(System.Lex.Span()), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"classMapDataCompressed"), &classMapUnit));
+            classMapCompressedVariable->SetInitializer(new Cm.Ast.BooleanLiteralNode(System.Lex.Span(), !noClassMapCompression));
+            classMapUnit.GlobalNs()->AddMember(classMapCompressedVariable.Release());
             UniquePtr<Cm.Ast.ClassNode> cls(new Cm.Ast.ClassNode(System.Lex.Span(), Cm.Ast.Specifiers.public_ | Cm.Ast.Specifiers.static_, new Cm.Ast.IdentifierNode(System.Lex.Span(), ToUtf32(classMapName)), null));
+            UniquePtr<Cm.Ast.MemberFunctionNode> initMemFun(new Cm.Ast.MemberFunctionNode(System.Lex.Span(), Cm.Ast.Specifiers.public_ | Cm.Ast.Specifiers.static_, new Cm.Ast.VoidNode(System.Lex.Span()), u"Init", null));
+            UniquePtr<Cm.Ast.CompoundStatementNode> initMemFunBody(new Cm.Ast.CompoundStatementNode(System.Lex.Span()));
+            UniquePtr<Cm.Ast.CompoundStatementNode> initMemFunThenS(new Cm.Ast.CompoundStatementNode(System.Lex.Span()));
+            UniquePtr<Cm.Ast.InvokeNode> initMemFunInvoke(new Cm.Ast.InvokeNode(System.Lex.Span(), new Cm.Ast.DotNode(System.Lex.Span(),
+                new Cm.Ast.DotNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"System"), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"Lex")),
+                new Cm.Ast.IdentifierNode(System.Lex.Span(), u"CreateClassMap"))));
+            initMemFunInvoke->AddArgument(new Cm.Ast.InvokeNode(System.Lex.Span(),
+                new Cm.Ast.DotNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"classMapData"),
+                    new Cm.Ast.IdentifierNode(System.Lex.Span(), u"Begin"))));
+            initMemFunInvoke->AddArgument(new Cm.Ast.InvokeNode(System.Lex.Span(),
+                new Cm.Ast.DotNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"classMapData"), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"Length"))));
+            initMemFunInvoke->AddArgument(new Cm.Ast.IdentifierNode(System.Lex.Span(), u"classMapDataCompressed"));
+            UniquePtr<Cm.Ast.AssignmentStatementNode> initMemFunAssigmentStmt(new Cm.Ast.AssignmentStatementNode(System.Lex.Span(), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"classMap"),
+                initMemFunInvoke.Release()));
+            initMemFunThenS->AddStatement(initMemFunAssigmentStmt.Release());
+            UniquePtr<Cm.Ast.IfStatementNode> initMemFunIfStmt(new Cm.Ast.IfStatementNode(System.Lex.Span(),
+                new Cm.Ast.EqualNode(System.Lex.Span(),
+                    new Cm.Ast.IdentifierNode(System.Lex.Span(), u"classMap"), new Cm.Ast.NullLiteralNode(System.Lex.Span())),
+                initMemFunThenS.Release(), null));
+            initMemFunBody->AddStatement(initMemFunIfStmt.Release());
+            initMemFun->SetBody(initMemFunBody.Release());
+            cls->AddMember(initMemFun.Release());
             UniquePtr<Cm.Ast.MemberFunctionNode> getClassMemFun(new Cm.Ast.MemberFunctionNode(System.Lex.Span(), Cm.Ast.Specifiers.public_ | Cm.Ast.Specifiers.static_, new Cm.Ast.IntNode(System.Lex.Span()), u"GetClass", null));
             getClassMemFun->AddParameter(new Cm.Ast.ParameterNode(System.Lex.Span(), new Cm.Ast.UCharNode(System.Lex.Span()), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"c")));
             UniquePtr<Cm.Ast.CompoundStatementNode> body(new Cm.Ast.CompoundStatementNode(System.Lex.Span()));
@@ -476,8 +507,8 @@ namespace soulcm.scmlg
             classMapUnit.GlobalNs()->AddMember(cls.Release());
             System.IO.StreamWriter classMapFile(System.IO.File.CreateText(classMapSourceFileName));
             CodeFormatter formatter(classMapFile);
-            Cm.Ast.SourceWriter writer(formatter);
-            classMapUnit.Accept(writer);
+            Cm.Ast.SourceWriter sourceWriter(formatter);
+            classMapUnit.Accept(sourceWriter);
             if (verbose)
             {
                 Console.Out() << "==> " << classMapSourceFileName << endl();

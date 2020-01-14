@@ -1,0 +1,459 @@
+<html>
+ <head>
+  <meta charset="utf-8"/>
+  <title>System.Windows/Api.cm</title>
+  <link href="../../../style/style.css" rel="stylesheet" type="text/css"/>
+ </head>
+ <body>
+  <span class="code" id="1" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;1</span>&nbsp;<span class="comment">//&nbsp;=================================
+</span></span>
+  <br/>
+  <span class="code" id="2" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;2</span>&nbsp;<span class="comment">//&nbsp;Copyright&nbsp;(c)&nbsp;2020&nbsp;Seppo&nbsp;Laakko
+</span></span>
+  <br/>
+  <span class="code" id="3" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;3</span>&nbsp;<span class="comment">//&nbsp;Distributed&nbsp;under&nbsp;the&nbsp;MIT&nbsp;license
+</span></span>
+  <br/>
+  <span class="code" id="4" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;4</span>&nbsp;<span class="comment">//&nbsp;=================================
+</span></span>
+  <br/>
+  <span class="code" id="5" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;5</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="6" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;6</span>&nbsp;<span class="kw">using</span>&nbsp;<span class="identifier">System</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="7" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;7</span>&nbsp;<span class="kw">using</span>&nbsp;<span class="identifier">System.Collections</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="8" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;8</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="9" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;9</span>&nbsp;<span class="kw">namespace</span>&nbsp;<span class="identifier">System</span><span class="other">.</span><span class="identifier">Windows</span><span class="other">.</span><span class="identifier">API</span></span>
+  <br/>
+  <span class="code" id="10" xml:space="preserve"><span class="lineNumber">&nbsp;10</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="11" xml:space="preserve"><span class="lineNumber">&nbsp;11</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">long</span>&nbsp;<a href="../doc/ns_System.Windows.API.html#constant_ERROR_DUPLICATE_CODE_MAPPING_597F718E02328CC76BC7A77282DD155FF77EC65D">ERROR_DUPLICATE_CODE_MAPPING</a><span class="other">&nbsp;=&nbsp;</span><span class="other">-</span><span class="number">2</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="12" xml:space="preserve"><span class="lineNumber">&nbsp;12</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">long</span>&nbsp;<a href="../doc/ns_System.Windows.API.html#constant_ERROR_CODE_NOT_FOUND_4633EAF9714FEEE44CD326DF52A4993E729DD80A">ERROR_CODE_NOT_FOUND</a><span class="other">&nbsp;=&nbsp;</span><span class="other">-</span><span class="number">1</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="13" xml:space="preserve"><span class="lineNumber">&nbsp;13</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">long</span>&nbsp;<a href="../doc/ns_System.Windows.API.html#constant_ERROR_OUT_OF_RESOURCES_171DC3275087AD8EFF0B1747B9846C4E631BD61C">ERROR_OUT_OF_RESOURCES</a><span class="other">&nbsp;=&nbsp;</span><span class="number">0</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="14" xml:space="preserve"><span class="lineNumber">&nbsp;14</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">long</span>&nbsp;<a href="../doc/ns_System.Windows.API.html#constant_ERROR_FILE_NOT_FOUND_8B613568568B5276FF34A09275B23B48BBFE2E07">ERROR_FILE_NOT_FOUND</a><span class="other">&nbsp;=&nbsp;</span><span class="number">1</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="15" xml:space="preserve"><span class="lineNumber">&nbsp;15</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">long</span>&nbsp;<a href="../doc/ns_System.Windows.API.html#constant_ERROR_PATH_NOT_FOUND_61D4A45CE3E1923E04E2D32B0A1BF0B26B141548">ERROR_PATH_NOT_FOUND</a><span class="other">&nbsp;=&nbsp;</span><span class="number">2</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="16" xml:space="preserve"><span class="lineNumber">&nbsp;16</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">long</span>&nbsp;<a href="../doc/ns_System.Windows.API.html#constant_ERROR_BAD_FORMAT_A648F102CFF6B0C3435F4AC269D893424D3C25D5">ERROR_BAD_FORMAT</a><span class="other">&nbsp;=&nbsp;</span><span class="number">3</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="17" xml:space="preserve"><span class="lineNumber">&nbsp;17</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">long</span>&nbsp;<a href="../doc/ns_System.Windows.API.html#constant_SE_ERR_ACCESSDENIED_B1459971E63E3A5DD6DA0A343771142B96FE713C">SE_ERR_ACCESSDENIED</a><span class="other">&nbsp;=&nbsp;</span>&nbsp;<span class="number">4</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="18" xml:space="preserve"><span class="lineNumber">&nbsp;18</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">long</span>&nbsp;<a href="../doc/ns_System.Windows.API.html#constant_SE_ERR_ASSOCINCOMPLETE_84DC810899C571A61CEDEBDF86A942F0A80D3B46">SE_ERR_ASSOCINCOMPLETE</a><span class="other">&nbsp;=&nbsp;</span><span class="number">5</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="19" xml:space="preserve"><span class="lineNumber">&nbsp;19</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">long</span>&nbsp;<a href="../doc/ns_System.Windows.API.html#constant_SE_ERR_DDEBUSY_04382248B3088A7585EE878EDA227A3481936EF8">SE_ERR_DDEBUSY</a><span class="other">&nbsp;=&nbsp;</span><span class="number">6</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="20" xml:space="preserve"><span class="lineNumber">&nbsp;20</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">long</span>&nbsp;<a href="../doc/ns_System.Windows.API.html#constant_SE_ERR_DDEFAIL_FC0AB69943340BE3D4C7660CF9E99812D50EB5FC">SE_ERR_DDEFAIL</a><span class="other">&nbsp;=&nbsp;</span><span class="number">7</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="21" xml:space="preserve"><span class="lineNumber">&nbsp;21</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">long</span>&nbsp;<a href="../doc/ns_System.Windows.API.html#constant_SE_ERR_DDETIMEOUT_D812F6568793FE6E470A92921751CF20B2775E37">SE_ERR_DDETIMEOUT</a><span class="other">&nbsp;=&nbsp;</span><span class="number">8</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="22" xml:space="preserve"><span class="lineNumber">&nbsp;22</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">long</span>&nbsp;<a href="../doc/ns_System.Windows.API.html#constant_SE_ERR_DLLNOTFOUND_EEB9AA4D55EDA5B734A0326E5ABB322A596C568F">SE_ERR_DLLNOTFOUND</a><span class="other">&nbsp;=&nbsp;</span><span class="number">9</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="23" xml:space="preserve"><span class="lineNumber">&nbsp;23</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">long</span>&nbsp;<a href="../doc/ns_System.Windows.API.html#constant_SE_ERR_FNF_CF29752D6B6811BDD82C8597A6D9D2A1B30A87EC">SE_ERR_FNF</a><span class="other">&nbsp;=&nbsp;</span><span class="number">10</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="24" xml:space="preserve"><span class="lineNumber">&nbsp;24</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">long</span>&nbsp;<a href="../doc/ns_System.Windows.API.html#constant_SE_ERR_NOASSOC_2DDCDA31AD4C5BDBA0E9AA982DA2DE71F5A30D02">SE_ERR_NOASSOC</a><span class="other">&nbsp;=&nbsp;</span><span class="number">11</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="25" xml:space="preserve"><span class="lineNumber">&nbsp;25</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">long</span>&nbsp;<a href="../doc/ns_System.Windows.API.html#constant_SE_ERR_OOM_FFECDD4AC26BED1D02B0BED1798AF60E50E0AD31">SE_ERR_OOM</a><span class="other">&nbsp;=&nbsp;</span><span class="number">12</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="26" xml:space="preserve"><span class="lineNumber">&nbsp;26</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">long</span>&nbsp;<a href="../doc/ns_System.Windows.API.html#constant_SE_ERR_PNF_A9F523244FF68876F631735C8D927E3C6411A57D">SE_ERR_PNF</a><span class="other">&nbsp;=&nbsp;</span><span class="number">13</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="27" xml:space="preserve"><span class="lineNumber">&nbsp;27</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">long</span>&nbsp;<a href="../doc/ns_System.Windows.API.html#constant_SE_ERR_SHARE_71A28179065841F043D3F1AE5609EDABAA632DC5">SE_ERR_SHARE</a><span class="other">&nbsp;=&nbsp;</span><span class="number">14</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="28" xml:space="preserve"><span class="lineNumber">&nbsp;28</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+  <br/>
+  <span class="code" id="29" xml:space="preserve"><span class="lineNumber">&nbsp;29</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<a href="../../System.Base/doc/ns_System.html#typedef_string_B6DB6B2DEFC437FBF697A2E84F7B7771FC1DDEE3">string</a>&nbsp;<a href="../doc/ns_System.Windows.API.html#function_GetWindowsAPIErrorMessage_059477060E91CA4E46261207ECF9510EC50BC15C">GetWindowsAPIErrorMessage</a><span class="other">(</span><span class="kw">ulong</span>&nbsp;<span class="identifier">errorCode</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="30" xml:space="preserve"><span class="lineNumber">&nbsp;30</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="31" xml:space="preserve"><span class="lineNumber">&nbsp;31</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">char</span><span class="other">[</span><span class="number">4096</span><span class="other">]</span>&nbsp;<span class="identifier">buffer</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="32" xml:space="preserve"><span class="lineNumber">&nbsp;32</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../System.Runtime/index.html#OsFormatMessage">OsFormatMessage</a><span class="other">(</span><span class="identifier">errorCode</span><span class="other">,&nbsp;</span><span class="other">&amp;</span><span class="identifier">buffer</span><span class="other">[</span><span class="number">0</span><span class="other">]</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="33" xml:space="preserve"><span class="lineNumber">&nbsp;33</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<a href="../../System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html#constructor_String_CharT_2CA8BDACF505B472EBB66EA1FE959881B47C557B">string</a><span class="other">(</span><span class="other">&amp;</span><span class="identifier">buffer</span><span class="other">[</span><span class="number">0</span><span class="other">]</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="34" xml:space="preserve"><span class="lineNumber">&nbsp;34</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="35" xml:space="preserve"><span class="lineNumber">&nbsp;35</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+  <br/>
+  <span class="code" id="36" xml:space="preserve"><span class="lineNumber">&nbsp;36</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">class</span>&nbsp;<a href="../doc/class_WindowsAPIException_9B20BA64F28373ABFF24D5B6E613BB02DAD75147.html">WindowsAPIException</a><span class="other">&nbsp;:&nbsp;</span><a href="../../System.Base/doc/class_Exception_02AEA5204AD1035A91C2D843597EACBE078C8989.html">Exception</a></span>
+  <br/>
+  <span class="code" id="37" xml:space="preserve"><span class="lineNumber">&nbsp;37</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="38" xml:space="preserve"><span class="lineNumber">&nbsp;38</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<a href="../doc/class_WindowsAPIException_9B20BA64F28373ABFF24D5B6E613BB02DAD75147.html#constructor_WindowsAPIException_151B563BC4F440FD6CDC8306A44125E697AF8564">WindowsAPIException</a><span class="other">(</span><span class="kw">ulong</span>&nbsp;<span class="identifier">errorCode_</span><span class="other">)</span><span class="other">&nbsp;:&nbsp;</span><span class="kw">base</span><span class="other">(</span><a href="../doc/ns_System.Windows.API.html#function_GetWindowsAPIErrorMessage_059477060E91CA4E46261207ECF9510EC50BC15C">GetWindowsAPIErrorMessage</a><span class="other">(</span><span class="identifier">errorCode_</span><span class="other">)</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">errorCode</span><span class="other">(</span><span class="identifier">errorCode_</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="39" xml:space="preserve"><span class="lineNumber">&nbsp;39</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="40" xml:space="preserve"><span class="lineNumber">&nbsp;40</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="41" xml:space="preserve"><span class="lineNumber">&nbsp;41</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">ulong</span>&nbsp;<a href="../doc/class_WindowsAPIException_9B20BA64F28373ABFF24D5B6E613BB02DAD75147.html#member_function_ErrorCode_WindowsAPIException_D1EC1851B0754551926DA6A021D9AC09CFB02177">ErrorCode</a><span class="other">(</span><span class="other">)</span>&nbsp;<span class="kw">const</span></span>
+  <br/>
+  <span class="code" id="42" xml:space="preserve"><span class="lineNumber">&nbsp;42</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="43" xml:space="preserve"><span class="lineNumber">&nbsp;43</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<a href="../doc/class_WindowsAPIException_9B20BA64F28373ABFF24D5B6E613BB02DAD75147.html#member_variable_errorCode_6B6597B456337EEC19A020DACAA45542750C1CA4">errorCode</a><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="44" xml:space="preserve"><span class="lineNumber">&nbsp;44</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="45" xml:space="preserve"><span class="lineNumber">&nbsp;45</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">private</span>&nbsp;<span class="kw">ulong</span>&nbsp;<span class="identifier">errorCode</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="46" xml:space="preserve"><span class="lineNumber">&nbsp;46</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="47" xml:space="preserve"><span class="lineNumber">&nbsp;47</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+  <br/>
+  <span class="code" id="48" xml:space="preserve"><span class="lineNumber">&nbsp;48</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">void</span><span class="other">*</span>&nbsp;<a href="../doc/ns_System.Windows.API.html#function_FindFirstChangeNotification_C78A388A846BCB67B07AEDE09ACC246303637975">FindFirstChangeNotification</a><span class="other">(</span><span class="kw">const</span>&nbsp;<a href="../../System.Runtime/index.html#d4ef2b45-bf26-49a4-bd52-383eb59b997b">string</a><span class="other">&amp;</span>&nbsp;<span class="identifier">directoryPath</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="49" xml:space="preserve"><span class="lineNumber">&nbsp;49</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="50" xml:space="preserve"><span class="lineNumber">&nbsp;50</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span><span class="other">*</span>&nbsp;<span class="identifier">notificationHandle</span><span class="other">&nbsp;=&nbsp;</span><a href="../../System.Runtime/index.html#WinFindFirstChangeNotification">WinFindFirstChangeNotification</a><span class="other">(</span><span class="identifier">directoryPath</span><span class="other">.</span><a href="../../System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html#member_function_Chars_String_CharT_F23E248DC46A5AA9215CDB25B6779E94681FBAB6">Chars</a><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="51" xml:space="preserve"><span class="lineNumber">&nbsp;51</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if</span>&nbsp;<span class="other">(</span><span class="identifier">notificationHandle</span><span class="other">&nbsp;==&nbsp;</span><span class="kw">null</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="52" xml:space="preserve"><span class="lineNumber">&nbsp;52</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="53" xml:space="preserve"><span class="lineNumber">&nbsp;53</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">throw</span>&nbsp;<a href="../doc/class_WindowsAPIException_9B20BA64F28373ABFF24D5B6E613BB02DAD75147.html#constructor_WindowsAPIException_151B563BC4F440FD6CDC8306A44125E697AF8564">WindowsAPIException</a><span class="other">(</span><a href="../../System.Runtime/index.html#WinGetLastError">WinGetLastError</a><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="54" xml:space="preserve"><span class="lineNumber">&nbsp;54</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="55" xml:space="preserve"><span class="lineNumber">&nbsp;55</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">notificationHandle</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="56" xml:space="preserve"><span class="lineNumber">&nbsp;56</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="57" xml:space="preserve"><span class="lineNumber">&nbsp;57</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+  <br/>
+  <span class="code" id="58" xml:space="preserve"><span class="lineNumber">&nbsp;58</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/ns_System.Windows.API.html#function_FindNextChangeNotification_D98A2787C53A8426FF5D9966D7B1011EB24AF660">FindNextChangeNotification</a><span class="other">(</span><span class="kw">void</span><span class="other">*</span>&nbsp;<span class="identifier">notificationHandle</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="59" xml:space="preserve"><span class="lineNumber">&nbsp;59</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="60" xml:space="preserve"><span class="lineNumber">&nbsp;60</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">bool</span>&nbsp;<span class="identifier">result</span><span class="other">&nbsp;=&nbsp;</span><a href="../../System.Runtime/index.html#WinFindNextChangeNotification">WinFindNextChangeNotification</a><span class="other">(</span><span class="identifier">notificationHandle</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="61" xml:space="preserve"><span class="lineNumber">&nbsp;61</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if</span>&nbsp;<span class="other">(</span><span class="other">!</span><span class="identifier">result</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="62" xml:space="preserve"><span class="lineNumber">&nbsp;62</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="63" xml:space="preserve"><span class="lineNumber">&nbsp;63</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">throw</span>&nbsp;<a href="../doc/class_WindowsAPIException_9B20BA64F28373ABFF24D5B6E613BB02DAD75147.html#constructor_WindowsAPIException_151B563BC4F440FD6CDC8306A44125E697AF8564">WindowsAPIException</a><span class="other">(</span><a href="../../System.Runtime/index.html#WinGetLastError">WinGetLastError</a><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="64" xml:space="preserve"><span class="lineNumber">&nbsp;64</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="65" xml:space="preserve"><span class="lineNumber">&nbsp;65</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="66" xml:space="preserve"><span class="lineNumber">&nbsp;66</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+  <br/>
+  <span class="code" id="67" xml:space="preserve"><span class="lineNumber">&nbsp;67</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/ns_System.Windows.API.html#function_FindCloseChangeNotification_846EE0B08253FFC6418FF2911F232106DCC5F0E9">FindCloseChangeNotification</a><span class="other">(</span><span class="kw">void</span><span class="other">*</span>&nbsp;<span class="identifier">notificationHandle</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="68" xml:space="preserve"><span class="lineNumber">&nbsp;68</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="69" xml:space="preserve"><span class="lineNumber">&nbsp;69</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">bool</span>&nbsp;<span class="identifier">result</span><span class="other">&nbsp;=&nbsp;</span><a href="../../System.Runtime/index.html#WinFindCloseChangeNotification">WinFindCloseChangeNotification</a><span class="other">(</span><span class="identifier">notificationHandle</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="70" xml:space="preserve"><span class="lineNumber">&nbsp;70</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if</span>&nbsp;<span class="other">(</span><span class="other">!</span><span class="identifier">result</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="71" xml:space="preserve"><span class="lineNumber">&nbsp;71</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="72" xml:space="preserve"><span class="lineNumber">&nbsp;72</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">throw</span>&nbsp;<a href="../doc/class_WindowsAPIException_9B20BA64F28373ABFF24D5B6E613BB02DAD75147.html#constructor_WindowsAPIException_151B563BC4F440FD6CDC8306A44125E697AF8564">WindowsAPIException</a><span class="other">(</span><a href="../../System.Runtime/index.html#WinGetLastError">WinGetLastError</a><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="73" xml:space="preserve"><span class="lineNumber">&nbsp;73</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="74" xml:space="preserve"><span class="lineNumber">&nbsp;74</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="75" xml:space="preserve"><span class="lineNumber">&nbsp;75</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+  <br/>
+  <span class="code" id="76" xml:space="preserve"><span class="lineNumber">&nbsp;76</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">void</span><span class="other">*</span>&nbsp;<a href="../doc/ns_System.Windows.API.html#function_CreateEvent_5CD6A30073B8135007491A2C16C4F221C5C06640">CreateEvent</a><span class="other">(</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="77" xml:space="preserve"><span class="lineNumber">&nbsp;77</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="78" xml:space="preserve"><span class="lineNumber">&nbsp;78</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">void</span><span class="other">*</span>&nbsp;<span class="identifier">eventHandle</span><span class="other">&nbsp;=&nbsp;</span><a href="../../System.Runtime/index.html#WinCreateEvent">WinCreateEvent</a><span class="other">(</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="79" xml:space="preserve"><span class="lineNumber">&nbsp;79</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if</span>&nbsp;<span class="other">(</span><span class="identifier">eventHandle</span><span class="other">&nbsp;==&nbsp;</span><span class="kw">null</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="80" xml:space="preserve"><span class="lineNumber">&nbsp;80</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="81" xml:space="preserve"><span class="lineNumber">&nbsp;81</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">throw</span>&nbsp;<a href="../doc/class_WindowsAPIException_9B20BA64F28373ABFF24D5B6E613BB02DAD75147.html#constructor_WindowsAPIException_151B563BC4F440FD6CDC8306A44125E697AF8564">WindowsAPIException</a><span class="other">(</span><a href="../../System.Runtime/index.html#WinGetLastError">WinGetLastError</a><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="82" xml:space="preserve"><span class="lineNumber">&nbsp;82</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="83" xml:space="preserve"><span class="lineNumber">&nbsp;83</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">eventHandle</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="84" xml:space="preserve"><span class="lineNumber">&nbsp;84</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="85" xml:space="preserve"><span class="lineNumber">&nbsp;85</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+  <br/>
+  <span class="code" id="86" xml:space="preserve"><span class="lineNumber">&nbsp;86</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/ns_System.Windows.API.html#function_SetEvent_F777F5135943618B344559900805AD84B277F7BA">SetEvent</a><span class="other">(</span><span class="kw">void</span><span class="other">*</span>&nbsp;<span class="identifier">eventHandle</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="87" xml:space="preserve"><span class="lineNumber">&nbsp;87</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="88" xml:space="preserve"><span class="lineNumber">&nbsp;88</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">bool</span>&nbsp;<span class="identifier">result</span><span class="other">&nbsp;=&nbsp;</span><a href="../../System.Runtime/index.html#WinSetEvent">WinSetEvent</a><span class="other">(</span><span class="identifier">eventHandle</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="89" xml:space="preserve"><span class="lineNumber">&nbsp;89</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if</span>&nbsp;<span class="other">(</span><span class="other">!</span><span class="identifier">result</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="90" xml:space="preserve"><span class="lineNumber">&nbsp;90</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="91" xml:space="preserve"><span class="lineNumber">&nbsp;91</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">throw</span>&nbsp;<a href="../doc/class_WindowsAPIException_9B20BA64F28373ABFF24D5B6E613BB02DAD75147.html#constructor_WindowsAPIException_151B563BC4F440FD6CDC8306A44125E697AF8564">WindowsAPIException</a><span class="other">(</span><a href="../../System.Runtime/index.html#WinGetLastError">WinGetLastError</a><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="92" xml:space="preserve"><span class="lineNumber">&nbsp;92</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="93" xml:space="preserve"><span class="lineNumber">&nbsp;93</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="94" xml:space="preserve"><span class="lineNumber">&nbsp;94</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+  <br/>
+  <span class="code" id="95" xml:space="preserve"><span class="lineNumber">&nbsp;95</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/ns_System.Windows.API.html#function_ResetEvent_C7C97B53BEB1E38BB64C355DC46536E6CA5E976D">ResetEvent</a><span class="other">(</span><span class="kw">void</span><span class="other">*</span>&nbsp;<span class="identifier">eventHandle</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="96" xml:space="preserve"><span class="lineNumber">&nbsp;96</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="97" xml:space="preserve"><span class="lineNumber">&nbsp;97</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">bool</span>&nbsp;<span class="identifier">result</span><span class="other">&nbsp;=&nbsp;</span><a href="../../System.Runtime/index.html#WinResetEvent">WinResetEvent</a><span class="other">(</span><span class="identifier">eventHandle</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="98" xml:space="preserve"><span class="lineNumber">&nbsp;98</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if</span>&nbsp;<span class="other">(</span><span class="other">!</span><span class="identifier">result</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="99" xml:space="preserve"><span class="lineNumber">&nbsp;99</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="100" xml:space="preserve"><span class="lineNumber">100</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">throw</span>&nbsp;<a href="../doc/class_WindowsAPIException_9B20BA64F28373ABFF24D5B6E613BB02DAD75147.html#constructor_WindowsAPIException_151B563BC4F440FD6CDC8306A44125E697AF8564">WindowsAPIException</a><span class="other">(</span><a href="../../System.Runtime/index.html#WinGetLastError">WinGetLastError</a><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="101" xml:space="preserve"><span class="lineNumber">101</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="102" xml:space="preserve"><span class="lineNumber">102</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="103" xml:space="preserve"><span class="lineNumber">103</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+  <br/>
+  <span class="code" id="104" xml:space="preserve"><span class="lineNumber">104</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/ns_System.Windows.API.html#function_WaitEvent_456BE4AE12703B4EF2232B01D55E6D0C969D5146">WaitEvent</a><span class="other">(</span><span class="kw">void</span><span class="other">*</span>&nbsp;<span class="identifier">eventHandle</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="105" xml:space="preserve"><span class="lineNumber">105</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="106" xml:space="preserve"><span class="lineNumber">106</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">bool</span>&nbsp;<span class="identifier">result</span><span class="other">&nbsp;=&nbsp;</span><a href="../../System.Runtime/index.html#WinWaitEvent">WinWaitEvent</a><span class="other">(</span><span class="identifier">eventHandle</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="107" xml:space="preserve"><span class="lineNumber">107</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if</span>&nbsp;<span class="other">(</span><span class="other">!</span><span class="identifier">result</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="108" xml:space="preserve"><span class="lineNumber">108</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="109" xml:space="preserve"><span class="lineNumber">109</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">throw</span>&nbsp;<a href="../doc/class_WindowsAPIException_9B20BA64F28373ABFF24D5B6E613BB02DAD75147.html#constructor_WindowsAPIException_151B563BC4F440FD6CDC8306A44125E697AF8564">WindowsAPIException</a><span class="other">(</span><a href="../../System.Runtime/index.html#WinGetLastError">WinGetLastError</a><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="110" xml:space="preserve"><span class="lineNumber">110</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="111" xml:space="preserve"><span class="lineNumber">111</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="112" xml:space="preserve"><span class="lineNumber">112</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+  <br/>
+  <span class="code" id="113" xml:space="preserve"><span class="lineNumber">113</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/ns_System.Windows.API.html#function_CloseHandle_9F0BD303D6259809BC16FAA6F6DBA962C5F5A758">CloseHandle</a><span class="other">(</span><span class="kw">void</span><span class="other">*</span>&nbsp;<span class="identifier">handle</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="114" xml:space="preserve"><span class="lineNumber">114</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="115" xml:space="preserve"><span class="lineNumber">115</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">bool</span>&nbsp;<span class="identifier">result</span><span class="other">&nbsp;=&nbsp;</span><a href="../../System.Runtime/index.html#WinCloseHandle">WinCloseHandle</a><span class="other">(</span><span class="identifier">handle</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="116" xml:space="preserve"><span class="lineNumber">116</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if</span>&nbsp;<span class="other">(</span><span class="other">!</span><span class="identifier">result</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="117" xml:space="preserve"><span class="lineNumber">117</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="118" xml:space="preserve"><span class="lineNumber">118</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">throw</span>&nbsp;<a href="../doc/class_WindowsAPIException_9B20BA64F28373ABFF24D5B6E613BB02DAD75147.html#constructor_WindowsAPIException_151B563BC4F440FD6CDC8306A44125E697AF8564">WindowsAPIException</a><span class="other">(</span><a href="../../System.Runtime/index.html#WinGetLastError">WinGetLastError</a><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="119" xml:space="preserve"><span class="lineNumber">119</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="120" xml:space="preserve"><span class="lineNumber">120</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="121" xml:space="preserve"><span class="lineNumber">121</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+  <br/>
+  <span class="code" id="122" xml:space="preserve"><span class="lineNumber">122</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/ns_System.Windows.API.html#function_CloseEvent_5C268D48B80004B43EE38B27999819AE831A1D59">CloseEvent</a><span class="other">(</span><span class="kw">void</span><span class="other">*</span>&nbsp;<span class="identifier">eventHandle</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="123" xml:space="preserve"><span class="lineNumber">123</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="124" xml:space="preserve"><span class="lineNumber">124</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../doc/ns_System.Windows.API.html#function_CloseHandle_9F0BD303D6259809BC16FAA6F6DBA962C5F5A758">CloseHandle</a><span class="other">(</span><span class="identifier">eventHandle</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="125" xml:space="preserve"><span class="lineNumber">125</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="126" xml:space="preserve"><span class="lineNumber">126</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+  <br/>
+  <span class="code" id="127" xml:space="preserve"><span class="lineNumber">127</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">int</span>&nbsp;<a href="../doc/ns_System.Windows.API.html#function_WaitForMultipleObjects_A7AAE773EBFD02425877EE464B98957D8E94B0F6">WaitForMultipleObjects</a><span class="other">(</span><span class="kw">const</span>&nbsp;<a href="../../System.Base/doc/class_List_T_4E42CF5913BEB21F5260DEFEC239180C94460B11.html">List</a><span class="other">&lt;</span><span class="kw">void</span><span class="other">*</span><span class="other">></span><span class="other">&amp;</span>&nbsp;<span class="identifier">handles</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="128" xml:space="preserve"><span class="lineNumber">128</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="129" xml:space="preserve"><span class="lineNumber">129</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">int</span>&nbsp;<span class="identifier">result</span><span class="other">&nbsp;=&nbsp;</span><a href="../../System.Runtime/index.html#WinWaitForMultipleObjects">WinWaitForMultipleObjects</a><span class="other">(</span><span class="kw">cast</span><span class="other">&lt;</span><span class="kw">uint</span><span class="other">></span><span class="other">(</span><span class="identifier">handles</span><span class="other">.</span><a href="../../System.Base/doc/class_List_T_4E42CF5913BEB21F5260DEFEC239180C94460B11.html#member_function_Count_List_T_CC08825E95DA25361D24D0B94402BCC8F4B0197F">Count</a><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">handles</span><span class="other">.</span><a href="../../System.Base/doc/class_List_T_4E42CF5913BEB21F5260DEFEC239180C94460B11.html#member_function_Begin_List_T_F01368757D5322AB3D9E213C9C311320405DBC29">Begin</a><span class="other">(</span><span class="other">)</span><span class="other">.</span><a href="../../System.Base/doc/class_RandomAccessIter_T_R_P_E5BB3CAC7F9DBE190F290EC17E5DCE3406706484.html#member_function_Ptr_RandomAccessIter_T_R_P_D2545B599EB3DD0359D657513DE21B8CF84C1CB9">Ptr</a><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="130" xml:space="preserve"><span class="lineNumber">130</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if</span>&nbsp;<span class="other">(</span><span class="identifier">result</span><span class="other">&nbsp;>=&nbsp;</span><span class="number">0</span><span class="other">&nbsp;&amp;&amp;&nbsp;</span><span class="identifier">result</span><span class="other">&nbsp;&lt;=&nbsp;</span><span class="identifier">handles</span><span class="other">.</span><a href="../../System.Base/doc/class_List_T_4E42CF5913BEB21F5260DEFEC239180C94460B11.html#member_function_Count_List_T_CC08825E95DA25361D24D0B94402BCC8F4B0197F">Count</a><span class="other">(</span><span class="other">)</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="131" xml:space="preserve"><span class="lineNumber">131</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="132" xml:space="preserve"><span class="lineNumber">132</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">result</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="133" xml:space="preserve"><span class="lineNumber">133</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="134" xml:space="preserve"><span class="lineNumber">134</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">else</span></span>
+  <br/>
+  <span class="code" id="135" xml:space="preserve"><span class="lineNumber">135</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="136" xml:space="preserve"><span class="lineNumber">136</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">throw</span>&nbsp;<a href="../doc/class_WindowsAPIException_9B20BA64F28373ABFF24D5B6E613BB02DAD75147.html#constructor_WindowsAPIException_151B563BC4F440FD6CDC8306A44125E697AF8564">WindowsAPIException</a><span class="other">(</span><a href="../../System.Runtime/index.html#WinGetLastError">WinGetLastError</a><span class="other">(</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="137" xml:space="preserve"><span class="lineNumber">137</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="138" xml:space="preserve"><span class="lineNumber">138</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="139" xml:space="preserve"><span class="lineNumber">139</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+  <br/>
+  <span class="code" id="140" xml:space="preserve"><span class="lineNumber">140</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<span class="kw">void</span>&nbsp;<a href="../doc/ns_System.Windows.API.html#function_ShellExecute_18CF2354436D4BD6C856E307EC2C72BC0E63886E">ShellExecute</a><span class="other">(</span><span class="kw">const</span>&nbsp;<a href="../../System.Base/doc/ns_System.html#typedef_string_B6DB6B2DEFC437FBF697A2E84F7B7771FC1DDEE3">string</a><span class="other">&amp;</span>&nbsp;<span class="identifier">filePath</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="141" xml:space="preserve"><span class="lineNumber">141</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="142" xml:space="preserve"><span class="lineNumber">142</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">long</span>&nbsp;<span class="identifier">errorCode</span><span class="other">&nbsp;=&nbsp;</span><span class="number">0</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="143" xml:space="preserve"><span class="lineNumber">143</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">bool</span>&nbsp;<span class="identifier">succeeded</span><span class="other">&nbsp;=&nbsp;</span><a href="../../System.Runtime/index.html#WinShellExecute">WinShellExecute</a><span class="other">(</span><span class="identifier">filePath</span><span class="other">.</span><a href="../../System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html#member_function_Chars_String_CharT_F23E248DC46A5AA9215CDB25B6779E94681FBAB6">Chars</a><span class="other">(</span><span class="other">)</span><span class="other">,&nbsp;</span><span class="identifier">errorCode</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="144" xml:space="preserve"><span class="lineNumber">144</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if</span>&nbsp;<span class="other">(</span><span class="other">!</span><span class="identifier">succeeded</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="145" xml:space="preserve"><span class="lineNumber">145</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="146" xml:space="preserve"><span class="lineNumber">146</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../System.Base/doc/ns_System.html#typedef_string_B6DB6B2DEFC437FBF697A2E84F7B7771FC1DDEE3">string</a>&nbsp;<span class="identifier">errorMessage</span><span class="other">&nbsp;=&nbsp;</span><span class="string">"shell&nbsp;execution&nbsp;error&nbsp;for&nbsp;file&nbsp;'"</span><span class="other">&nbsp;+&nbsp;</span><span class="identifier">filePath</span><span class="other">&nbsp;+&nbsp;</span><span class="string">"':&nbsp;"</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="147" xml:space="preserve"><span class="lineNumber">147</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../../System.Base/doc/ns_System.html#typedef_string_B6DB6B2DEFC437FBF697A2E84F7B7771FC1DDEE3">string</a>&nbsp;<span class="identifier">error</span><span class="other">&nbsp;=&nbsp;</span><span class="string">"out&nbsp;of&nbsp;resources"</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="148" xml:space="preserve"><span class="lineNumber">148</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">switch</span>&nbsp;<span class="other">(</span><span class="identifier">errorCode</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="149" xml:space="preserve"><span class="lineNumber">149</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="150" xml:space="preserve"><span class="lineNumber">150</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">case</span>&nbsp;<span class="identifier">ERROR_DUPLICATE_CODE_MAPPING</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="151" xml:space="preserve"><span class="lineNumber">151</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="152" xml:space="preserve"><span class="lineNumber">152</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">error</span><span class="other">&nbsp;=&nbsp;</span><span class="string">"duplicate&nbsp;code&nbsp;mapping&nbsp;detected"</span><span class="other">;</span>&nbsp;<span class="kw">break</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="153" xml:space="preserve"><span class="lineNumber">153</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="154" xml:space="preserve"><span class="lineNumber">154</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">case</span>&nbsp;<span class="identifier">ERROR_CODE_NOT_FOUND</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="155" xml:space="preserve"><span class="lineNumber">155</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="156" xml:space="preserve"><span class="lineNumber">156</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">error</span><span class="other">&nbsp;=&nbsp;</span><span class="string">"code&nbsp;not&nbsp;found"</span><span class="other">;</span>&nbsp;<span class="kw">break</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="157" xml:space="preserve"><span class="lineNumber">157</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="158" xml:space="preserve"><span class="lineNumber">158</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">case</span>&nbsp;<span class="identifier">ERROR_OUT_OF_RESOURCES</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="159" xml:space="preserve"><span class="lineNumber">159</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="160" xml:space="preserve"><span class="lineNumber">160</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">error</span><span class="other">&nbsp;=&nbsp;</span><span class="string">"out&nbsp;of&nbsp;resources"</span><span class="other">;</span>&nbsp;<span class="kw">break</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="161" xml:space="preserve"><span class="lineNumber">161</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="162" xml:space="preserve"><span class="lineNumber">162</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">case</span>&nbsp;<span class="identifier">ERROR_FILE_NOT_FOUND</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="163" xml:space="preserve"><span class="lineNumber">163</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="164" xml:space="preserve"><span class="lineNumber">164</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">error</span><span class="other">&nbsp;=&nbsp;</span><span class="string">"file&nbsp;not&nbsp;found"</span><span class="other">;</span>&nbsp;<span class="kw">break</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="165" xml:space="preserve"><span class="lineNumber">165</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="166" xml:space="preserve"><span class="lineNumber">166</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">case</span>&nbsp;<span class="identifier">ERROR_PATH_NOT_FOUND</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="167" xml:space="preserve"><span class="lineNumber">167</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="168" xml:space="preserve"><span class="lineNumber">168</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">error</span><span class="other">&nbsp;=&nbsp;</span><span class="string">"path&nbsp;not&nbsp;found"</span><span class="other">;</span>&nbsp;<span class="kw">break</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="169" xml:space="preserve"><span class="lineNumber">169</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="170" xml:space="preserve"><span class="lineNumber">170</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">case</span>&nbsp;<span class="identifier">ERROR_BAD_FORMAT</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="171" xml:space="preserve"><span class="lineNumber">171</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="172" xml:space="preserve"><span class="lineNumber">172</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">error</span><span class="other">&nbsp;=&nbsp;</span><span class="string">"invalid&nbsp;executable"</span><span class="other">;</span>&nbsp;<span class="kw">break</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="173" xml:space="preserve"><span class="lineNumber">173</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="174" xml:space="preserve"><span class="lineNumber">174</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">case</span>&nbsp;<span class="identifier">SE_ERR_ACCESSDENIED</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="175" xml:space="preserve"><span class="lineNumber">175</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="176" xml:space="preserve"><span class="lineNumber">176</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">error</span><span class="other">&nbsp;=&nbsp;</span><span class="string">"access&nbsp;denied"</span><span class="other">;</span>&nbsp;<span class="kw">break</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="177" xml:space="preserve"><span class="lineNumber">177</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="178" xml:space="preserve"><span class="lineNumber">178</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">case</span>&nbsp;<span class="identifier">SE_ERR_ASSOCINCOMPLETE</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="179" xml:space="preserve"><span class="lineNumber">179</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="180" xml:space="preserve"><span class="lineNumber">180</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">error</span><span class="other">&nbsp;=&nbsp;</span><span class="string">"invalid&nbsp;file&nbsp;association"</span><span class="other">;</span>&nbsp;<span class="kw">break</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="181" xml:space="preserve"><span class="lineNumber">181</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="182" xml:space="preserve"><span class="lineNumber">182</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">case</span>&nbsp;<span class="identifier">SE_ERR_DDEBUSY</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="183" xml:space="preserve"><span class="lineNumber">183</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="184" xml:space="preserve"><span class="lineNumber">184</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">error</span><span class="other">&nbsp;=&nbsp;</span><span class="string">"DDE&nbsp;busy"</span><span class="other">;</span>&nbsp;<span class="kw">break</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="185" xml:space="preserve"><span class="lineNumber">185</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="186" xml:space="preserve"><span class="lineNumber">186</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">case</span>&nbsp;<span class="identifier">SE_ERR_DDEFAIL</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="187" xml:space="preserve"><span class="lineNumber">187</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="188" xml:space="preserve"><span class="lineNumber">188</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">error</span><span class="other">&nbsp;=&nbsp;</span><span class="string">"DDE&nbsp;failed"</span><span class="other">;</span>&nbsp;<span class="kw">break</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="189" xml:space="preserve"><span class="lineNumber">189</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="190" xml:space="preserve"><span class="lineNumber">190</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">case</span>&nbsp;<span class="identifier">SE_ERR_DDETIMEOUT</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="191" xml:space="preserve"><span class="lineNumber">191</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="192" xml:space="preserve"><span class="lineNumber">192</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">error</span><span class="other">&nbsp;=&nbsp;</span><span class="string">"DDE&nbsp;timeout"</span><span class="other">;</span>&nbsp;<span class="kw">break</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="193" xml:space="preserve"><span class="lineNumber">193</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="194" xml:space="preserve"><span class="lineNumber">194</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">case</span>&nbsp;<span class="identifier">SE_ERR_DLLNOTFOUND</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="195" xml:space="preserve"><span class="lineNumber">195</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="196" xml:space="preserve"><span class="lineNumber">196</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">error</span><span class="other">&nbsp;=&nbsp;</span><span class="string">"DLL&nbsp;not&nbsp;found"</span><span class="other">;</span>&nbsp;<span class="kw">break</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="197" xml:space="preserve"><span class="lineNumber">197</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="198" xml:space="preserve"><span class="lineNumber">198</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">case</span>&nbsp;<span class="identifier">SE_ERR_FNF</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="199" xml:space="preserve"><span class="lineNumber">199</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="200" xml:space="preserve"><span class="lineNumber">200</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">error</span><span class="other">&nbsp;=&nbsp;</span><span class="string">"file&nbsp;not&nbsp;found"</span><span class="other">;</span>&nbsp;<span class="kw">break</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="201" xml:space="preserve"><span class="lineNumber">201</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="202" xml:space="preserve"><span class="lineNumber">202</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">case</span>&nbsp;<span class="identifier">SE_ERR_NOASSOC</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="203" xml:space="preserve"><span class="lineNumber">203</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="204" xml:space="preserve"><span class="lineNumber">204</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">error</span><span class="other">&nbsp;=&nbsp;</span><span class="string">"no&nbsp;association&nbsp;for&nbsp;this&nbsp;type&nbsp;of&nbsp;file"</span><span class="other">;</span>&nbsp;<span class="kw">break</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="205" xml:space="preserve"><span class="lineNumber">205</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="206" xml:space="preserve"><span class="lineNumber">206</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">case</span>&nbsp;<span class="identifier">SE_ERR_OOM</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="207" xml:space="preserve"><span class="lineNumber">207</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="208" xml:space="preserve"><span class="lineNumber">208</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">error</span><span class="other">&nbsp;=&nbsp;</span><span class="string">"not&nbsp;enough&nbsp;memory"</span><span class="other">;</span>&nbsp;<span class="kw">break</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="209" xml:space="preserve"><span class="lineNumber">209</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="210" xml:space="preserve"><span class="lineNumber">210</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">case</span>&nbsp;<span class="identifier">SE_ERR_PNF</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="211" xml:space="preserve"><span class="lineNumber">211</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="212" xml:space="preserve"><span class="lineNumber">212</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">error</span><span class="other">&nbsp;=&nbsp;</span><span class="string">"path&nbsp;not&nbsp;found"</span><span class="other">;</span>&nbsp;<span class="kw">break</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="213" xml:space="preserve"><span class="lineNumber">213</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="214" xml:space="preserve"><span class="lineNumber">214</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">case</span>&nbsp;<span class="identifier">SE_ERR_SHARE</span><span class="other">:</span></span>
+  <br/>
+  <span class="code" id="215" xml:space="preserve"><span class="lineNumber">215</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="216" xml:space="preserve"><span class="lineNumber">216</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">error</span><span class="other">&nbsp;=&nbsp;</span><span class="string">"sharing&nbsp;violation"</span><span class="other">;</span>&nbsp;<span class="kw">break</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="217" xml:space="preserve"><span class="lineNumber">217</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="218" xml:space="preserve"><span class="lineNumber">218</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="219" xml:space="preserve"><span class="lineNumber">219</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">errorMessage</span><span class="other">.</span><a href="../../System.Base/doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html#member_function_Append_String_CharT_AF953C10EFCD2B4E0A06C4E60B009E06D526C70F">Append</a><span class="other">(</span><span class="identifier">error</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="220" xml:space="preserve"><span class="lineNumber">220</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">throw</span>&nbsp;<a href="../../System.Base/doc/class_Exception_02AEA5204AD1035A91C2D843597EACBE078C8989.html#constructor_Exception_A65EEDA06AE7D97BE82E1650263EE003A2A82C65">Exception</a><span class="other">(</span><span class="identifier">errorMessage</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="221" xml:space="preserve"><span class="lineNumber">221</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="222" xml:space="preserve"><span class="lineNumber">222</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="223" xml:space="preserve"><span class="lineNumber">223</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+ </body>
+</html>

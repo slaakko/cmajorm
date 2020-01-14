@@ -101,6 +101,7 @@ public:
     int Install(const std::u16string& str) override;
     int Install(const std::u32string& str) override;
     void InsertAllocaIntoEntryBlock(void* allocaInst);
+    void Optimize(int optimizationLevel, const std::string& bcFilePath, const std::string& optBCFilePath);
 protected:
     cmajor::symbols::SymbolTable* symbolTable;
     cmajor::symbols::Module* symbolsModule;

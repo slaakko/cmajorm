@@ -6,7 +6,7 @@ void main()
 {
     try
     {
-        UniquePtr<DomDocument> doc = ParseXmlFileToDomDocument("test.xml");
+        UniquePtr<Document> doc = ReadDocument("test.xml");
         CodeFormatter formatter(Console.Out());
         doc->Write(formatter);
     }

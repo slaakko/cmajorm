@@ -1,0 +1,66 @@
+// =================================
+// Copyright (c) 2019 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+using System.IO;
+using System.IO.Compression;
+
+namespace System.Init.Compression
+{
+    public void CompressDeflate(SharedPtr<ByteStream>& in, SharedPtr<ByteStream>& out)
+    {
+        DeflateStream compressStream(out, CompressionMode.compress);
+        in->CopyTo(compressStream);
+    }
+
+    public void ExpandDeflate(SharedPtr<ByteStream>& in, SharedPtr<ByteStream>& out)
+    {
+        DeflateStream expandStream(in, CompressionMode.decompress);
+        expandStream.CopyTo(*out);
+    }
+
+    public void CompressBZ2(SharedPtr<ByteStream>& in, SharedPtr<ByteStream>& out)
+    {
+         BZip2Stream compressStream(out, CompressionMode.compress);
+         in->CopyTo(compressStream);
+    }
+
+    public void ExpandBZ2(SharedPtr<ByteStream>& in, SharedPtr<ByteStream>& out)
+    {
+        BZip2Stream expandStream(in, CompressionMode.decompress);
+        expandStream.CopyTo(*out);
+    }
+
+    public byte GetSystemCompressionMethod()
+    {
+        string compression = "deflate";
+        const char* cmajorCompression = RtGetEnvironmentVariable("CMAJOR_COMPRESSION");
+        if (cmajorCompression != null)
+        {
+            compression = ToLower(cmajorCompression);
+        }
+        if (compression == "bzip2")
+        {
+            return System.IO.bzip2Compression;
+        }
+        else
+        {
+            if (!compression.IsEmpty() && compression != "deflate")
+            {
+                Console.Error() << "warning: System.Init.Compression: unknown CMAJOR_COMPRESSION value '" << compression << "', using deflate compression." << endl();
+            }
+            return System.IO.deflateCompression;
+        }
+    }
+
+    public void SetCompressionFunctions()
+    {
+        System.IO.getSystemCompressionMethod = GetSystemCompressionMethod;
+        System.IO.compressFunctions[deflateCompression] = CompressDeflate;
+        System.IO.expandFunctions[deflateCompression] = ExpandDeflate;
+        System.IO.compressFunctions[bzip2Compression] = CompressBZ2;
+        System.IO.expandFunctions[bzip2Compression] = ExpandBZ2;
+    }
+}

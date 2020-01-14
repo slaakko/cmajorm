@@ -1,0 +1,49 @@
+using System;
+using System.Numerics.Multiprecision;
+using BigNumTokens;
+using BigNumCalc;
+
+parser BigNumExpressionParser
+{
+    uselexer BigNumLexer;
+    main;
+    
+    Expr(EvaluationStack* s, var uchar op)
+        ::= Term(s):left 
+        (
+            (PLUS | MINUS){ op = lexer.GetUChar(pos); }
+            Term(s):right
+            {
+                BigValue* r = s->Pop();
+                BigValue* l = s->Pop();
+                s->Push(Evaluate(l, r, op));
+            }
+        )*
+        ;
+        
+    Term(EvaluationStack* s, var uchar op)
+        ::= Factor(s):left
+        (
+            (MUL | DIV){ op = lexer.GetUChar(pos); }
+            Factor(s):right
+            {
+                BigValue* r = s->Pop();
+                BigValue* l = s->Pop();
+                s->Push(Evaluate(l, r, op));
+            }
+        )*
+        ;
+        
+    Factor(EvaluationStack* s)
+        ::= MINUS Factor(s):f1{ s->Push(Evaluate(s->Pop(), '-')); }
+        |   PLUS Factor(s):f2{ s->Push(Evaluate(s->Pop(), '+')); }
+        |   Number(s):num
+        |   LPAREN Expr(s):e RPAREN
+        ;
+
+    Number(EvaluationStack* s)
+        ::= FLOAT{ s->Push(ParseBigFloat(lexer.GetToken(pos))); }
+        |   RATIONAL{ s->Push(ParseBigRational(lexer.GetToken(pos))); }
+        |   INTEGER{ s->Push(ParseBigInteger(lexer.GetToken(pos))); }
+        ;
+}

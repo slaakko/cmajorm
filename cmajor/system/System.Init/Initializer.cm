@@ -1,10 +1,10 @@
 // =================================
-// Copyright (c) 2019 Seppo Laakko
+// Copyright (c) 2020 Seppo Laakko
 // Distributed under the MIT license
 // =================================
 
 using System;
-using System.Collections;
+using System.Init.Compression;
 
 namespace System.Init
 {
@@ -22,11 +22,7 @@ namespace System.Init
         }    
         private Initializer()
         {
-            Console.WriteLine("initializer running...");
-        }
-        public ~Initializer()
-        {
-            Console.WriteLine("initializer terminating...");
+            SetCompressionFunctions();
         }
         private static UniquePtr<Initializer> instance;
     }

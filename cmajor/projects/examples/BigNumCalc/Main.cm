@@ -5,7 +5,6 @@ int main()
 {
     try
     {
-        BigNumExpressionGrammar* grammar = new BigNumExpressionGrammar();
         Console.WriteLine("Bignum calculator.");
 #if (WINDOWS)        
         Console.WriteLine("Enter expression, or CTRL-Z to end.");
@@ -22,7 +21,8 @@ int main()
             try
             {
                 ustring s = ToUtf32(line);
-                grammar->Parse(s.Chars(), s.Chars() + s.Length(), 0, "expression", &stack);
+                BigNumLexer lexer(s, "", 0);
+                BigNumExpressionParser.Parse(lexer, &stack);
                 UniquePtr<BigValue> result = stack.Pop();
                 Console.Out() << "= " << result->ToString() << endl();
             }

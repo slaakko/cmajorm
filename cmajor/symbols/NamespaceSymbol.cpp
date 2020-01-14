@@ -49,7 +49,7 @@ void NamespaceSymbol::Import(NamespaceSymbol* that, SymbolTable& symbolTable)
 
 std::unique_ptr<sngxml::dom::Element> NamespaceSymbol::CreateDomElement(TypeMap& typeMap)
 {
-    if (HasProjectMembers())
+    if (HasProjectMembers() && Access() != SymbolAccess::private_)
     {
         return std::unique_ptr<sngxml::dom::Element>(new sngxml::dom::Element(U"NamespaceSymbol"));
     }

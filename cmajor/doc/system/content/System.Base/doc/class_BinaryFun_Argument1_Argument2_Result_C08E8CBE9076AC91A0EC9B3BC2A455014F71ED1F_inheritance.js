@@ -269,12 +269,12 @@ function drawDiagram(diagramNodes) {
 function drawInheritanceDiagram() {
     var diagramNodes = [
         { name: "System.BinaryFun&lt;Argument1, Argument2, Result&gt;", id: "diagram_node_0", level: 0, subject: true, hasDerivedNodes: true, link: "../../System.Base/doc/class_BinaryFun_Argument1_Argument2_Result_C08E8CBE9076AC91A0EC9B3BC2A455014F71ED1F.html" },
-        { name: "System.BinaryPred&lt;Argument1, Argument2&gt;", id: "diagram_node_2", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Base/doc/class_BinaryPred_Argument1_Argument2_0A37E09D22B252A20EF8DF63EF9141AFCB031BB4.html" },
-        { name: "System.BitAnd&lt;T&gt;", id: "diagram_node_4", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Base/doc/class_BitAnd_T_0B974EDF5B13F707B3D0529DD839ED0DA8511E14.html" },
+        { name: "System.BinaryPred&lt;Argument1, Argument2&gt;", id: "diagram_node_1", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Base/doc/class_BinaryPred_Argument1_Argument2_0A37E09D22B252A20EF8DF63EF9141AFCB031BB4.html" },
+        { name: "System.BitAnd&lt;T&gt;", id: "diagram_node_3", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Base/doc/class_BitAnd_T_0B974EDF5B13F707B3D0529DD839ED0DA8511E14.html" },
         { name: "System.BitOr&lt;T&gt;", id: "diagram_node_5", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Base/doc/class_BitOr_T_B976CF7C6B6789B7F1A19FB9E214F89FD71DA9EB.html" },
         { name: "System.BitXor&lt;T&gt;", id: "diagram_node_6", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Base/doc/class_BitXor_T_0258B89E5A321BD9AB4D3B5311B00B81711F9DB5.html" },
-        { name: "System.Divides&lt;T&gt;", id: "diagram_node_1", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Base/doc/class_Divides_T_530729138FA61A92115CAFDE4F9DB24081BF2E73.html" },
-        { name: "System.Minus&lt;T&gt;", id: "diagram_node_3", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Base/doc/class_Minus_T_C7D959DFE0FDC4A65AAF0525637E69033072BBD4.html" },
+        { name: "System.Divides&lt;T&gt;", id: "diagram_node_2", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Base/doc/class_Divides_T_530729138FA61A92115CAFDE4F9DB24081BF2E73.html" },
+        { name: "System.Minus&lt;T&gt;", id: "diagram_node_4", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Base/doc/class_Minus_T_C7D959DFE0FDC4A65AAF0525637E69033072BBD4.html" },
         { name: "System.Multiplies&lt;T&gt;", id: "diagram_node_7", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Base/doc/class_Multiplies_T_DDF4693577D1A42BE4AFA2F1B93B740D8B5ED381.html" },
         { name: "System.Plus&lt;T&gt;", id: "diagram_node_8", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Base/doc/class_Plus_T_6DE5E429D028D7343BC491CB6AA869D7DF7D5121.html" },
         { name: "System.Remainder&lt;T&gt;", id: "diagram_node_9", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Base/doc/class_Remainder_T_CBAFA68783451F41CF284DE14A39D96BDD4AFAFE.html" },

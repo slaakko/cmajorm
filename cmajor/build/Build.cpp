@@ -1207,7 +1207,7 @@ int compileGetTimeoutSecs = 3;
 class CompileQueue
 {
 public:
-    CompileQueue(const std::string& name_, bool& stop_, bool& ready_, int logStreamId_);
+    CompileQueue(const std::string& name_, bool& stop_, std::atomic<bool>& ready_, int logStreamId_);
     void Put(int compileUnitIndex);
     int Get();
 private:
@@ -1216,11 +1216,11 @@ private:
     std::mutex mtx;
     std::condition_variable cond;
     bool& stop;
-    bool& ready;
+    std::atomic<bool>& ready;
     int logStreamId;
 };
 
-CompileQueue::CompileQueue(const std::string& name_, bool& stop_, bool& ready_, int logStreamId_) : name(name_), stop(stop_), ready(ready_), logStreamId(logStreamId_)
+CompileQueue::CompileQueue(const std::string& name_, bool& stop_, std::atomic<bool>& ready_, int logStreamId_) : name(name_), stop(stop_), ready(ready_), logStreamId(logStreamId_)
 {
 }
 
@@ -1253,18 +1253,24 @@ int CompileQueue::Get()
 
 struct CompileData
 {
-    CompileData(Module* rootModule_, std::vector<std::unique_ptr<BoundCompileUnit>>& boundCompileUnits_, std::vector<std::string>& objectFilePaths_, bool& stop_, bool& ready_,
+    CompileData(Module* rootModule_, std::vector<std::unique_ptr<BoundCompileUnit>>& boundCompileUnits_, std::vector<std::string>& objectFilePaths_, bool& stop_, std::atomic<bool>& ready_,
         int numThreads_, CompileQueue& input_, CompileQueue& output_) :
         rootModule(rootModule_), boundCompileUnits(boundCompileUnits_), objectFilePaths(objectFilePaths_), stop(stop_), ready(ready_), numThreads(numThreads_),
         input(input_), output(output_)
     {
         exceptions.resize(numThreads);
+        sourceFileFilePaths.resize(boundCompileUnits.size());
+        for (int i = 0; i < boundCompileUnits.size(); ++i)
+        {
+            sourceFileFilePaths[i] = boundCompileUnits[i]->GetCompileUnitNode()->FilePath();
+        }
     }
     Module* rootModule;
+    std::vector<std::string> sourceFileFilePaths;
     std::vector<std::unique_ptr<BoundCompileUnit>>& boundCompileUnits;
     std::vector<std::string>& objectFilePaths;
     bool& stop;
-    bool& ready;
+    std::atomic<bool>& ready;
     int numThreads;
     CompileQueue& input;
     CompileQueue& output;
@@ -1283,17 +1289,15 @@ void GenerateCode(CompileData* data, int threadId)
             int compileUnitIndex = data->input.Get();
             if (compileUnitIndex >= 0 && compileUnitIndex < data->boundCompileUnits.size())
             {
-                BoundCompileUnit* compileUnit = data->boundCompileUnits[compileUnitIndex].get();
                 if (GetGlobalFlag(GlobalFlags::debugCompile))
                 {
-                    LogMessage(data->rootModule->LogStreamId(), CurrentCompileDebugMsStr() + " begin generating code for compile unit " + std::to_string(compileUnitIndex) + 
-                        " of " + std::to_string(data->boundCompileUnits.size()));
+                    LogMessage(-1, data->sourceFileFilePaths[compileUnitIndex] + " " + std::to_string(compileUnitIndex) + " : GET INPUT " + std::to_string(compileUnitIndex));
                 }
+                BoundCompileUnit* compileUnit = data->boundCompileUnits[compileUnitIndex].get();
                 cmajor::codegen::GenerateCode(emittingContext, *compileUnit);
                 if (GetGlobalFlag(GlobalFlags::debugCompile))
                 {
-                    LogMessage(data->rootModule->LogStreamId(), CurrentCompileDebugMsStr() + " end generating code for compile unit " + std::to_string(compileUnitIndex) + 
-                        " of " + std::to_string(data->boundCompileUnits.size()));
+                    LogMessage(-1, data->sourceFileFilePaths[compileUnitIndex] + " " + std::to_string(compileUnitIndex) + " : PUT OUTPUT " + std::to_string(compileUnitIndex));
                 }
                 std::lock_guard<std::mutex> lock(data->mtx);
                 data->objectFilePaths.push_back(compileUnit->ObjectFilePath());
@@ -1327,7 +1331,7 @@ void CompileMultiThreaded(Project* project, Module* rootModule, std::vector<std:
     }
     compileDebugStart = CurrentMs();
     rootModule->StartBuild();
-    bool ready = false;
+    std::atomic<bool> ready = false;
     CompileQueue input("input", stop, ready, rootModule->LogStreamId());
     CompileQueue output("output", stop, ready, rootModule->LogStreamId());
     CompileData compileData(rootModule, boundCompileUnits, objectFilePaths, stop, ready, numThreads, input, output);
@@ -1343,10 +1347,6 @@ void CompileMultiThreaded(Project* project, Module* rootModule, std::vector<std:
         if (GetGlobalFlag(GlobalFlags::verbose))
         {
             LogMessage(rootModule->LogStreamId(), "> " + compileUnit->GetCompileUnitNode()->FilePath());
-        }
-        if (GetGlobalFlag(GlobalFlags::debugCompile))
-        {
-            LogMessage(rootModule->LogStreamId(), CurrentCompileDebugMsStr() + " begin bind statements of compile unit " + std::to_string(i) + " of " + std::to_string(n));
         }
         try
         {
@@ -1375,7 +1375,7 @@ void CompileMultiThreaded(Project* project, Module* rootModule, std::vector<std:
         }
         if (GetGlobalFlag(GlobalFlags::debugCompile))
         {
-            LogMessage(rootModule->LogStreamId(), CurrentCompileDebugMsStr() + " end bind statements of compile unit " + std::to_string(i) + " of " + std::to_string(n));
+            LogMessage(rootModule->LogStreamId(), compileData.sourceFileFilePaths[i] + " : PUT INPUT " + std::to_string(i));
         }
         input.Put(i);
     }
@@ -1383,12 +1383,30 @@ void CompileMultiThreaded(Project* project, Module* rootModule, std::vector<std:
     while (numOutputsReceived < n && !stop)
     {
         int compileUnitIndex = output.Get();
-        if (numOutputsReceived != -1)
+        if (compileUnitIndex != -1)
+        {
+            if (GetGlobalFlag(GlobalFlags::debugCompile))
+            {
+                LogMessage(rootModule->LogStreamId(), compileData.sourceFileFilePaths[compileUnitIndex] + " : GET OUTPUT " + std::to_string(compileUnitIndex));
+            }
+        }
+        if (compileUnitIndex != -1)
         {
             ++numOutputsReceived;
         }
     }
-    ready = true;
+    if (GetGlobalFlag(GlobalFlags::debugCompile))
+    {
+        LogMessage(rootModule->LogStreamId(), ToUtf8(rootModule->Name()) + " > BEGIN READY");
+    }
+    {
+        std::lock_guard<std::mutex> lock(compileData.mtx);
+        ready = true;
+    }
+    if (GetGlobalFlag(GlobalFlags::debugCompile))
+    {
+        LogMessage(rootModule->LogStreamId(), ToUtf8(rootModule->Name()) + " < END READY");
+    }
     for (int i = 0; i < numThreads; ++i)
     {
         input.Put(-1);
@@ -1416,204 +1434,212 @@ void CompileMultiThreaded(Project* project, Module* rootModule, std::vector<std:
 
 void BuildProject(Project* project, std::unique_ptr<Module>& rootModule, bool& stop, bool resetRootModule)
 {
-    std::string config = GetConfig();
-    bool isSystemModule = IsSystemModule(project->Name());
-    if (isSystemModule)
+    try
     {
-        project->SetSystemProject();
-    }
-    bool upToDate = false;
-    if (!GetGlobalFlag(GlobalFlags::rebuild))
-    {
-        sngcm::ast::BackEnd astBackEnd = sngcm::ast::BackEnd::llvm;
-        if (GetBackEnd() == cmajor::symbols::BackEnd::cmsx)
+        std::string config = GetConfig();
+        bool isSystemModule = IsSystemModule(project->Name());
+        if (isSystemModule)
         {
-            astBackEnd = sngcm::ast::BackEnd::cmsx;
+            project->SetSystemProject();
         }
-        upToDate = project->IsUpToDate(CmajorSystemModuleFilePath(config, astBackEnd));
-    }
-    if (upToDate)
-    {
-        if (GetGlobalFlag(GlobalFlags::verbose))
+        bool upToDate = false;
+        if (!GetGlobalFlag(GlobalFlags::rebuild))
         {
-            LogMessage(project->LogStreamId(), "===== Project '" + ToUtf8(project->Name()) + "' (" + project->FilePath() + ") is up-to-date.");
-        }
-        return;
-    }
-    bool systemLibraryInstalled = false;
-    if (project->GetTarget() == Target::unitTest)
-    {
-        throw std::runtime_error("cannot build unit test project '" + ToUtf8(project->Name()) + "' using cmc, use cmunit.");
-    }
-    if (GetGlobalFlag(GlobalFlags::verbose))
-    {
-        LogMessage(project->LogStreamId(), "===== Building project '" + ToUtf8(project->Name()) + "' (" + project->FilePath() + ") using " + config + " configuration.");
-    }
-    if (GetGlobalFlag(GlobalFlags::cmdoc))
-    {
-        cmdoclib::SetEmptyLibraryPrefix(project->Name());
-        if (GetGlobalFlag(GlobalFlags::optimizeCmDoc))
-        {
-            if (cmdoclib::HtmlSourceFilePathsUpToDate(project) && cmdoclib::SymbolTableXmlFilesUpToDate(project))
+            sngcm::ast::BackEnd astBackEnd = sngcm::ast::BackEnd::llvm;
+            if (GetBackEnd() == cmajor::symbols::BackEnd::cmsx)
             {
-                if (GetGlobalFlag(GlobalFlags::verbose))
-                {
-                    LogMessage(project->LogStreamId(), "Project '" + ToUtf8(project->Name()) + " xml is up-to-date.");
-                }
-                return;
+                astBackEnd = sngcm::ast::BackEnd::cmsx;
             }
+            upToDate = project->IsUpToDate(CmajorSystemModuleFilePath(config, astBackEnd));
         }
-    }
-    rootModule.reset(new Module(project->Name(), project->ModuleFilePath(), project->GetTarget()));
-    rootModule->SetRootModule();
-    SetRootModuleForCurrentThread(rootModule.get());
-    {
-        rootModule->SetLogStreamId(project->LogStreamId());
-        rootModule->SetCurrentProjectName(project->Name());
-        rootModule->SetCurrentToolName(U"cmc");
-        boost::filesystem::path libraryFilePath = project->LibraryFilePath();
-        boost::filesystem::path libDir = libraryFilePath.remove_filename();
-        std::string definesFilePath = GetFullPath((libDir / boost::filesystem::path("defines.txt")).generic_string());
-        SetDefines(rootModule.get(), definesFilePath);
-        rootModule->SetFlag(cmajor::symbols::ModuleFlags::compiling);
-        std::vector<std::unique_ptr<CompileUnitNode>> compileUnits = ParseSources(rootModule.get(), project->SourceFilePaths(), stop);
-        AttributeBinder attributeBinder(rootModule.get());
-        std::vector<ClassTypeSymbol*> classTypes;
-        std::vector<ClassTemplateSpecializationSymbol*> classTemplateSpecializations;
-        bool prevPreparing = rootModule->Preparing();
-        rootModule->SetPreparing(true);
-        PrepareModuleForCompilation(rootModule.get(), project->References(), project->GetTarget());
-        Preprocess(compileUnits);
-        CreateSymbols(rootModule->GetSymbolTable(), compileUnits, stop);
-        if (GetGlobalFlag(GlobalFlags::sym2xml))
+        if (upToDate)
         {
-            std::unique_ptr<sngxml::dom::Document> symbolTableDoc = rootModule->GetSymbolTable().ToDomDocument();
-            std::string symbolTableXmlFilePath = Path::ChangeExtension(project->FilePath(), ".sym0.xml");
-            std::ofstream symbolTableXmlFile(symbolTableXmlFilePath);
-            CodeFormatter formatter(symbolTableXmlFile);
-            formatter.SetIndentSize(1);
-            symbolTableDoc->Write(formatter);
-        }
-        CompileUnitNode* compileUnit0 = nullptr;
-        if (!compileUnits.empty())
-        {
-            compileUnit0 = compileUnits[0].get();
-        }
-        if (GetGlobalFlag(GlobalFlags::verbose))
-        {
-            LogMessage(project->LogStreamId(), "Binding types...");
-        }
-        std::vector<std::unique_ptr<BoundCompileUnit>> boundCompileUnits = BindTypes(*rootModule, compileUnits, &attributeBinder, stop);
-        if (stop)
-        {
+            if (GetGlobalFlag(GlobalFlags::verbose))
+            {
+                LogMessage(project->LogStreamId(), "===== Project '" + ToUtf8(project->Name()) + "' (" + project->FilePath() + ") is up-to-date.");
+            }
             return;
         }
-        rootModule->SetPreparing(prevPreparing);
-        if (GetGlobalFlag(GlobalFlags::sym2xml))
+        bool systemLibraryInstalled = false;
+        if (project->GetTarget() == Target::unitTest)
         {
-            std::unique_ptr<sngxml::dom::Document> symbolTableDoc = rootModule->GetSymbolTable().ToDomDocument();
-            std::string symbolTableXmlFilePath = Path::ChangeExtension(project->FilePath(), ".sym1.xml");
-            std::ofstream symbolTableXmlFile(symbolTableXmlFilePath);
-            CodeFormatter formatter(symbolTableXmlFile);
-            formatter.SetIndentSize(1);
-            symbolTableDoc->Write(formatter);
+            throw std::runtime_error("cannot build unit test project '" + ToUtf8(project->Name()) + "' using cmc, use cmunit.");
         }
-        std::unordered_map<int, cmdoclib::File> docFileMap; 
-        cmajor::codegen::EmittingContext emittingContext(GetOptimizationLevel());
-        std::vector<std::string> objectFilePaths;
-        if (GetGlobalFlag(GlobalFlags::singleThreadedCompile))
+        if (GetGlobalFlag(GlobalFlags::verbose))
         {
-            CompileSingleThreaded(project, rootModule.get(), boundCompileUnits, emittingContext, objectFilePaths, docFileMap, stop); 
-        }
-        else
-        {
-            CompileMultiThreaded(project, rootModule.get(), boundCompileUnits, objectFilePaths, stop);
+            LogMessage(project->LogStreamId(), "===== Building project '" + ToUtf8(project->Name()) + "' (" + project->FilePath() + ") using " + config + " configuration.");
         }
         if (GetGlobalFlag(GlobalFlags::cmdoc))
         {
-            cmdoclib::GenerateSymbolTableXml(rootModule.get(), docFileMap); 
-            cmdoclib::GeneratePPXml(project); 
+            cmdoclib::SetEmptyLibraryPrefix(project->Name());
+            if (GetGlobalFlag(GlobalFlags::optimizeCmDoc))
+            {
+                if (cmdoclib::HtmlSourceFilePathsUpToDate(project) && cmdoclib::SymbolTableXmlFilesUpToDate(project))
+                {
+                    if (GetGlobalFlag(GlobalFlags::verbose))
+                    {
+                        LogMessage(project->LogStreamId(), "Project '" + ToUtf8(project->Name()) + " xml is up-to-date.");
+                    }
+                    return;
+                }
+            }
         }
-        else
+        rootModule.reset(new Module(project->Name(), project->ModuleFilePath(), project->GetTarget()));
+        rootModule->SetRootModule();
+        SetRootModuleForCurrentThread(rootModule.get());
         {
+            rootModule->SetLogStreamId(project->LogStreamId());
+            rootModule->SetCurrentProjectName(project->Name());
+            rootModule->SetCurrentToolName(U"cmc");
+            boost::filesystem::path libraryFilePath = project->LibraryFilePath();
+            boost::filesystem::path libDir = libraryFilePath.remove_filename();
+            std::string definesFilePath = GetFullPath((libDir / boost::filesystem::path("defines.txt")).generic_string());
+            SetDefines(rootModule.get(), definesFilePath);
+            rootModule->SetFlag(cmajor::symbols::ModuleFlags::compiling);
+            std::vector<std::unique_ptr<CompileUnitNode>> compileUnits = ParseSources(rootModule.get(), project->SourceFilePaths(), stop);
+            AttributeBinder attributeBinder(rootModule.get());
+            std::vector<ClassTypeSymbol*> classTypes;
+            std::vector<ClassTemplateSpecializationSymbol*> classTemplateSpecializations;
+            bool prevPreparing = rootModule->Preparing();
+            rootModule->SetPreparing(true);
+            PrepareModuleForCompilation(rootModule.get(), project->References(), project->GetTarget());
+            Preprocess(compileUnits);
+            CreateSymbols(rootModule->GetSymbolTable(), compileUnits, stop);
             if (GetGlobalFlag(GlobalFlags::sym2xml))
             {
                 std::unique_ptr<sngxml::dom::Document> symbolTableDoc = rootModule->GetSymbolTable().ToDomDocument();
-                std::string symbolTableXmlFilePath = Path::ChangeExtension(project->FilePath(), ".sym2.xml");
+                std::string symbolTableXmlFilePath = Path::ChangeExtension(project->FilePath(), ".sym0.xml");
                 std::ofstream symbolTableXmlFile(symbolTableXmlFilePath);
                 CodeFormatter formatter(symbolTableXmlFile);
                 formatter.SetIndentSize(1);
                 symbolTableDoc->Write(formatter);
             }
-            if (project->GetTarget() == Target::program || project->GetTarget() == Target::winapp)
+            CompileUnitNode* compileUnit0 = nullptr;
+            if (!compileUnits.empty())
             {
-                CheckMainFunctionSymbol(*rootModule);
-                if (!rootModule->GetSymbolTable().JsonClasses().empty())
-                {
-                    CreateJsonRegistrationUnit(objectFilePaths, *rootModule, emittingContext, &attributeBinder);
-                }
-                if (GetBackEnd() == cmajor::symbols::BackEnd::llvm)
-                {
-                    CreateMainUnitLlvm(objectFilePaths, *rootModule, emittingContext, &attributeBinder);
-                }
-                else if (GetBackEnd() == cmajor::symbols::BackEnd::cmsx)
-                {
-                    CreateMainUnitSystemX(objectFilePaths, *rootModule, emittingContext, &attributeBinder);
-                }
-            }
-            if (!objectFilePaths.empty())
-            {
-                GenerateLibrary(rootModule.get(), objectFilePaths, project->LibraryFilePath());
-            }
-            if (project->GetTarget() == Target::program || project->GetTarget() == Target::winapp)
-            {
-                Link(project->ExecutableFilePath(), project->LibraryFilePath(), rootModule->LibraryFilePaths(), *rootModule);
+                compileUnit0 = compileUnits[0].get();
             }
             if (GetGlobalFlag(GlobalFlags::verbose))
             {
-                LogMessage(project->LogStreamId(), "Writing module file...");
+                LogMessage(project->LogStreamId(), "Binding types...");
             }
-            SymbolWriter writer(project->ModuleFilePath());
-            writer.SetLexers(rootModule->GetLexers());
-            rootModule->ResetFlag(cmajor::symbols::ModuleFlags::compiling);
-            rootModule->Write(writer);
-            if (GetGlobalFlag(GlobalFlags::verbose))
+            std::vector<std::unique_ptr<BoundCompileUnit>> boundCompileUnits = BindTypes(*rootModule, compileUnits, &attributeBinder, stop);
+            if (stop)
             {
-                LogMessage(project->LogStreamId(), "==> " + project->ModuleFilePath());
+                return;
             }
-            if (GetGlobalFlag(GlobalFlags::verbose))
+            rootModule->SetPreparing(prevPreparing);
+            if (GetGlobalFlag(GlobalFlags::sym2xml))
             {
-                LogMessage(project->LogStreamId(), std::to_string(rootModule->GetSymbolTable().NumSpecializations()) + " class template specializations, " + 
-                    std::to_string(rootModule->GetSymbolTable().NumSpecializationsNew()) + " new, " + 
-                    std::to_string(rootModule->GetSymbolTable().NumSpecializationsCopied()) + " copied.");
-                LogMessage(project->LogStreamId(), "Project '" + ToUtf8(project->Name()) + "' built successfully.");
+                std::unique_ptr<sngxml::dom::Document> symbolTableDoc = rootModule->GetSymbolTable().ToDomDocument();
+                std::string symbolTableXmlFilePath = Path::ChangeExtension(project->FilePath(), ".sym1.xml");
+                std::ofstream symbolTableXmlFile(symbolTableXmlFilePath);
+                CodeFormatter formatter(symbolTableXmlFile);
+                formatter.SetIndentSize(1);
+                symbolTableDoc->Write(formatter);
             }
-            project->SetModuleFilePath(rootModule->OriginalFilePath());
-            project->SetLibraryFilePath(rootModule->LibraryFilePath());
-            if (rootModule->IsSystemModule())
+            std::unordered_map<int, cmdoclib::File> docFileMap;
+            cmajor::codegen::EmittingContext emittingContext(GetOptimizationLevel());
+            std::vector<std::string> objectFilePaths;
+            if (GetGlobalFlag(GlobalFlags::singleThreadedCompile))
             {
-                project->SetSystemProject();
+                CompileSingleThreaded(project, rootModule.get(), boundCompileUnits, emittingContext, objectFilePaths, docFileMap, stop);
             }
-            if (rootModule->Name() == U"System.Install")
+            else
             {
-                InstallSystemLibraries(rootModule.get());
-                systemLibraryInstalled = true;
+                CompileMultiThreaded(project, rootModule.get(), boundCompileUnits, objectFilePaths, stop);
             }
-            else if (rootModule->Name() == U"System.Windows.Install")
+            if (GetGlobalFlag(GlobalFlags::cmdoc))
             {
-                InstallSystemWindowsLibraries(rootModule.get());
-                systemLibraryInstalled = true;
+                cmdoclib::GenerateSymbolTableXml(rootModule.get(), docFileMap);
+                //cmdoclib::GeneratePPXml(project); 
+            }
+            else
+            {
+                if (GetGlobalFlag(GlobalFlags::sym2xml))
+                {
+                    std::unique_ptr<sngxml::dom::Document> symbolTableDoc = rootModule->GetSymbolTable().ToDomDocument();
+                    std::string symbolTableXmlFilePath = Path::ChangeExtension(project->FilePath(), ".sym2.xml");
+                    std::ofstream symbolTableXmlFile(symbolTableXmlFilePath);
+                    CodeFormatter formatter(symbolTableXmlFile);
+                    formatter.SetIndentSize(1);
+                    symbolTableDoc->Write(formatter);
+                }
+                if (project->GetTarget() == Target::program || project->GetTarget() == Target::winapp)
+                {
+                    CheckMainFunctionSymbol(*rootModule);
+                    if (!rootModule->GetSymbolTable().JsonClasses().empty())
+                    {
+                        CreateJsonRegistrationUnit(objectFilePaths, *rootModule, emittingContext, &attributeBinder);
+                    }
+                    if (GetBackEnd() == cmajor::symbols::BackEnd::llvm)
+                    {
+                        CreateMainUnitLlvm(objectFilePaths, *rootModule, emittingContext, &attributeBinder);
+                    }
+                    else if (GetBackEnd() == cmajor::symbols::BackEnd::cmsx)
+                    {
+                        CreateMainUnitSystemX(objectFilePaths, *rootModule, emittingContext, &attributeBinder);
+                    }
+                }
+                if (!objectFilePaths.empty())
+                {
+                    GenerateLibrary(rootModule.get(), objectFilePaths, project->LibraryFilePath());
+                }
+                if (project->GetTarget() == Target::program || project->GetTarget() == Target::winapp)
+                {
+                    Link(project->ExecutableFilePath(), project->LibraryFilePath(), rootModule->LibraryFilePaths(), *rootModule);
+                }
+                if (GetGlobalFlag(GlobalFlags::verbose))
+                {
+                    LogMessage(project->LogStreamId(), "Writing module file...");
+                }
+                SymbolWriter writer(project->ModuleFilePath());
+                writer.SetLexers(rootModule->GetLexers());
+                rootModule->ResetFlag(cmajor::symbols::ModuleFlags::compiling);
+                rootModule->Write(writer);
+                if (GetGlobalFlag(GlobalFlags::verbose))
+                {
+                    LogMessage(project->LogStreamId(), "==> " + project->ModuleFilePath());
+                }
+                if (GetGlobalFlag(GlobalFlags::verbose))
+                {
+                    LogMessage(project->LogStreamId(), std::to_string(rootModule->GetSymbolTable().NumSpecializations()) + " class template specializations, " +
+                        std::to_string(rootModule->GetSymbolTable().NumSpecializationsNew()) + " new, " +
+                        std::to_string(rootModule->GetSymbolTable().NumSpecializationsCopied()) + " copied.");
+                    LogMessage(project->LogStreamId(), "Project '" + ToUtf8(project->Name()) + "' built successfully.");
+                }
+                project->SetModuleFilePath(rootModule->OriginalFilePath());
+                project->SetLibraryFilePath(rootModule->LibraryFilePath());
+                if (rootModule->IsSystemModule())
+                {
+                    project->SetSystemProject();
+                }
+                if (rootModule->Name() == U"System.Install")
+                {
+                    InstallSystemLibraries(rootModule.get());
+                    systemLibraryInstalled = true;
+                }
+                else if (rootModule->Name() == U"System.Windows.Install")
+                {
+                    InstallSystemWindowsLibraries(rootModule.get());
+                    systemLibraryInstalled = true;
+                }
             }
         }
+        if (resetRootModule)
+        {
+            PutModuleToModuleCache(std::move(rootModule));
+            rootModule.reset();
+        }
+        if (systemLibraryInstalled)
+        {
+            ResetModuleCache();
+        }
     }
-    if (resetRootModule)
+    catch (const std::exception& ex)
     {
-        PutModuleToModuleCache(std::move(rootModule));
-        rootModule.reset();
-    }
-    if (systemLibraryInstalled)
-    {
-        ResetModuleCache();
+        LogMessage(-1, "project: " + ToUtf8(project->Name()) + ": " + ex.what());
+        throw;
     }
 }
 
@@ -1853,7 +1879,7 @@ void BuildSolution(const std::string& solutionFilePath, std::vector<std::unique_
             cmdoclib::ReadGlobals(moduleNames);
         }
         int numProjectsToBuild = projectsToBuild.size();
-        int numThreads = std::min(numProjectsToBuild, int(std::thread::hardware_concurrency() * 2)); 
+        int numThreads = std::min(numProjectsToBuild, int(std::thread::hardware_concurrency() * 2));
         int n = GetNumBuildThreads();
         if (n != -1)
         {

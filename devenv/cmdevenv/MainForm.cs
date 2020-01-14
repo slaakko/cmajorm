@@ -2364,7 +2364,7 @@ namespace cmdevenv
             try
             {
                 string cmajorRootDir = Environment.GetEnvironmentVariable("CMAJOR_ROOT");
-                await OpenProjectOrSolution(Path.Combine(Path.Combine(Path.Combine(Path.Combine(cmajorRootDir, "projects"), "tools"), "cmparsergen"), "cmparsergen.cms"));
+                await OpenProjectOrSolution(Path.Combine(Path.Combine(Path.Combine(Path.Combine(cmajorRootDir, "projects"), "tools"), "soulcm"), "soulcm.cms"));
             }
             catch (Exception ex)
             {

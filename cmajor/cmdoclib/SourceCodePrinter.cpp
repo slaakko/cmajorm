@@ -381,11 +381,14 @@ void SourceCodePrinter::MoveTo(const Span& span)
     }
     soulng::lexer::Lexer* lexer = (*module.GetLexers())[sourceFileIndex];
     Span s = span;
-    lexer->ConvertExternal(s);
-    if (currentPos < s.start)
+    if (s.Valid())
     {
-        int length = s.start - currentPos;
-        WriteSpace(length);
+        lexer->ConvertExternal(s);
+        if (currentPos < s.start)
+        {
+            int length = s.start - currentPos;
+            WriteSpace(length);
+        }
     }
 }
 
@@ -704,6 +707,7 @@ void SourceCodePrinter::Other(const std::u32string& token)
 
 void SourceCodePrinter::WriteSpecifiers(const Span& specifierSpan, Specifiers specifiers)
 {
+    if (specifiers == Specifiers::none) return;
     MoveTo(specifierSpan);
     bool space = false;
     if ((specifiers & Specifiers::public_) != Specifiers::none)

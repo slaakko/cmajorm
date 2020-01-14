@@ -8,7 +8,7 @@
   <span class="code" id="1" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;1</span>&nbsp;<span class="comment">//&nbsp;=================================
 </span></span>
   <br/>
-  <span class="code" id="2" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;2</span>&nbsp;<span class="comment">//&nbsp;Copyright&nbsp;(c)&nbsp;2019&nbsp;Seppo&nbsp;Laakko
+  <span class="code" id="2" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;2</span>&nbsp;<span class="comment">//&nbsp;Copyright&nbsp;(c)&nbsp;2020&nbsp;Seppo&nbsp;Laakko
 </span></span>
   <br/>
   <span class="code" id="3" xml:space="preserve"><span class="lineNumber">&nbsp;&nbsp;3</span>&nbsp;<span class="comment">//&nbsp;Distributed&nbsp;under&nbsp;the&nbsp;MIT&nbsp;license
@@ -1601,7 +1601,7 @@
   <br/>
   <span class="code" id="796" xml:space="preserve"><span class="lineNumber">796</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">x</span><span class="other">&nbsp;=&nbsp;</span><span class="number">0u</span><span class="other">;</span></span>
   <br/>
-  <span class="code" id="797" xml:space="preserve"><span class="lineNumber">797</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">for</span>&nbsp;<span class="other">(</span><span class="kw">char</span>&nbsp;<span class="identifier">c</span>&nbsp;<span class="other">:</span>&nbsp;<a href="../../System.Core/index.html#20629938-70fe-494f-9113-2b8cefe32baf">s</a><span class="other">)</span></span>
+  <span class="code" id="797" xml:space="preserve"><span class="lineNumber">797</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">for</span>&nbsp;<span class="other">(</span><span class="kw">char</span>&nbsp;<span class="identifier">c</span>&nbsp;<span class="other">:</span>&nbsp;<a href="../../System.Core/index.html#24c9084d-7b53-489d-90ac-17c8b867d901">s</a><span class="other">)</span></span>
   <br/>
   <span class="code" id="798" xml:space="preserve"><span class="lineNumber">798</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
   <br/>
@@ -1939,7 +1939,27 @@
   <br/>
   <span class="code" id="965" xml:space="preserve"><span class="lineNumber">965</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
   <br/>
-  <span class="code" id="966" xml:space="preserve"><span class="lineNumber">966</span>&nbsp;<span class="other">}</span></span>
+  <span class="code" id="966" xml:space="preserve"><span class="lineNumber">966</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">public</span>&nbsp;<a href="../doc/class_Timestamp_2B1FF310EF8A16F5D055D85D39E0BC73A373EE7C.html">Timestamp</a>&nbsp;<a href="../doc/ns_System.html#function_ParseTimestamp_81C79B8E07DB159CD0E6F1C0B22B9A7990065DF8">ParseTimestamp</a><span class="other">(</span><span class="kw">const</span>&nbsp;<a href="../doc/ns_System.html#typedef_string_B6DB6B2DEFC437FBF697A2E84F7B7771FC1DDEE3">string</a><span class="other">&amp;</span>&nbsp;<span class="identifier">s</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="967" xml:space="preserve"><span class="lineNumber">967</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="968" xml:space="preserve"><span class="lineNumber">968</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if</span>&nbsp;<span class="other">(</span><span class="identifier">s</span><span class="other">.</span><a href="../doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html#member_function_Length_String_CharT_5DAD659AF865F217935177758B9A1E040AFCB58F">Length</a><span class="other">(</span><span class="other">)</span><span class="other">&nbsp;!=&nbsp;</span><span class="number">20</span><span class="other">&nbsp;+&nbsp;</span><span class="number">9</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="969" xml:space="preserve"><span class="lineNumber">969</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="970" xml:space="preserve"><span class="lineNumber">970</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../doc/ns_System.html#function_ThrowConversionException_584AC16B013DF0505027AC8D884E36CAC768A263">ThrowConversionException</a><span class="other">(</span><span class="string">"cannot&nbsp;parse&nbsp;timestamp&nbsp;from&nbsp;string&nbsp;'"</span><span class="other">&nbsp;+&nbsp;</span><span class="identifier">s</span><span class="other">&nbsp;+&nbsp;</span><span class="string">"':&nbsp;not&nbsp;in&nbsp;format&nbsp;YYYY-MM-DDTHH:MM:SS.nnnnnnnnn"</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="971" xml:space="preserve"><span class="lineNumber">971</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="972" xml:space="preserve"><span class="lineNumber">972</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="../doc/class_DateTime_1CCCF400289F734AAAB9BC0562E46C77468B398E.html">DateTime</a>&nbsp;<span class="identifier">dateTime</span><span class="other">&nbsp;=&nbsp;</span><a href="../doc/ns_System.html#function_ParseDateTime_544D549054D568822B68A83FF50889205A7A3BF9">ParseDateTime</a><span class="other">(</span><span class="identifier">s</span><span class="other">.</span><a href="../doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html#member_function_Substring_String_CharT_752D88D116645EC0E27217EF5A6AA357FDD0EED9">Substring</a><span class="other">(</span><span class="number">0</span><span class="other">,&nbsp;</span><span class="number">19</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="973" xml:space="preserve"><span class="lineNumber">973</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">int</span>&nbsp;<span class="identifier">nanosecs</span><span class="other">&nbsp;=&nbsp;</span><a href="../doc/ns_System.html#function_ParseInt_A8EDABE83FFE7F67EFC550AB3628C92F7F371F0A">ParseInt</a><span class="other">(</span><span class="identifier">s</span><span class="other">.</span><a href="../doc/class_String_CharT_CF8CFC76E94ACA12B05A3C1C384DFA2026CAADAC.html#member_function_Substring_String_CharT_4AED2BC96E1E901320F2BF6C86B5C85FD0FC2DE2">Substring</a><span class="other">(</span><span class="number">20</span><span class="other">)</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="974" xml:space="preserve"><span class="lineNumber">974</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span>&nbsp;<a href="../doc/class_Timestamp_2B1FF310EF8A16F5D055D85D39E0BC73A373EE7C.html#constructor_Timestamp_14B9FE94BC8AC0253206A5F0D33D7025C7B65A7F">Timestamp</a><span class="other">(</span><span class="identifier">dateTime</span><span class="other">,&nbsp;</span><span class="identifier">nanosecs</span><span class="other">)</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="975" xml:space="preserve"><span class="lineNumber">975</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="976" xml:space="preserve"><span class="lineNumber">976</span>&nbsp;<span class="other">}</span></span>
   <br/>
  </body>
 </html>

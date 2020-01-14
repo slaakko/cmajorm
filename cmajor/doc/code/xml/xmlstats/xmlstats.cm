@@ -11,19 +11,19 @@ class XmlStats : XmlContentHandler
         ++numElements;
         numAttributes = numAttributes + attributes.Count();
     }
-    public override void PI(const ustring& target, const ustring& data)
+    public override void HandlePI(const ustring& target, const ustring& data)
     {
         ++numProcessingInstructions;
     }
-    public override void Comment(const ustring& comment)
+    public override void HandleComment(const ustring& comment)
     {
         ++numComments;
     }
-    public override void CDataSection(const ustring& cdata)
+    public override void HandleCDataSection(const ustring& cdata)
     {
         numCharacters = numCharacters + cdata.Length();
     }
-    public override void Text(const ustring& text)
+    public override void HandleText(const ustring& text)
     {
         numCharacters = numCharacters + text.Length();
     }

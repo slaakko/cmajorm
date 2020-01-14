@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("cmdevenv")]
-[assembly: AssemblyCopyright("Copyright © 2019 Seppo Laakko")]
+[assembly: AssemblyCopyright("Copyright © 2020 Seppo Laakko")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

@@ -10,6 +10,7 @@
 #include <cmajor/binder/BoundFunction.hpp>
 #include <cmajor/symbols/GlobalFlags.hpp>
 #include <cmajor/symbols/InterfaceTypeSymbol.hpp>
+#include <soulng/util/Log.hpp>
 #include <soulng/util/Util.hpp>
 #include <soulng/util/Unicode.hpp>
 
@@ -92,10 +93,19 @@ void LlvmCodeGenerator::Visit(BoundCompileUnit& boundCompileUnit)
         emitter->EmitIrText(boundCompileUnit.LLFilePath());
     }
     emitter->VerifyModule();
-    emitter->EmitObjectCodeFile(boundCompileUnit.ObjectFilePath());
-    if (GetGlobalFlag(GlobalFlags::emitOptLlvm))
+    if (GetGlobalFlag(GlobalFlags::release))
     {
-        emitter->EmitOptIrText(boundCompileUnit.LLFilePath(), boundCompileUnit.OptLLFilePath(), GetOptimizationLevel());
+        emitter->EmitIrFile(boundCompileUnit.BCFilePath());
+        Optimize(GetOptimizationLevel(), boundCompileUnit.BCFilePath(), boundCompileUnit.OptBCFilePath());
+        if (GetGlobalFlag(GlobalFlags::emitOptLlvm))
+        {
+            emitter->Disassemble(boundCompileUnit.OptBCFilePath(), boundCompileUnit.OptLLFilePath());
+        }
+        emitter->Compile(boundCompileUnit.OptBCFilePath(), boundCompileUnit.ObjectFilePath(), GetOptimizationLevel());
+    }
+    else
+    {
+        emitter->EmitObjectCodeFile(boundCompileUnit.ObjectFilePath());
     }
     if (debugInfo)
     {
@@ -274,8 +284,13 @@ void LlvmCodeGenerator::Visit(BoundFunction& boundFunction)
     pads.clear();
     labeledStatementMap.clear();
     FunctionSymbol* functionSymbol = boundFunction.GetFunctionSymbol();
+    if (functionSymbol->MangledName() == U"destructor_UriReference_8CBF77C6F886CEDF4CA6604B8E45644C02F0A53E")
+    {
+        int x = 0;
+    }
     void* functionType = functionSymbol->IrType(*emitter);
     function = emitter->GetOrInsertFunction(ToUtf8(functionSymbol->MangledName()), functionType);
+    bool setInline = false;
     if (GetGlobalFlag(GlobalFlags::release) && functionSymbol->IsInline())
     {
         emitter->AddInlineFunctionAttribute(function);
@@ -283,9 +298,10 @@ void LlvmCodeGenerator::Visit(BoundFunction& boundFunction)
     }
     if (functionSymbol->HasLinkOnceOdrLinkage())
     {
+        setInline = true;
         void* comdat = emitter->GetOrInsertAnyFunctionComdat(ToUtf8(functionSymbol->MangledName()), function);
-        emitter->SetFunctionLinkageToLinkOnceODRLinkage(function);
     }
+    emitter->SetFunctionLinkage(function, setInline);
     emitter->SetFunction(function);
     bool hasSource = functionSymbol->HasSource();
     bool prevDebugInfo = debugInfo;
@@ -1483,6 +1499,11 @@ void LlvmCodeGenerator::InsertAllocaIntoEntryBlock(void* allocaInst)
 {
     emitter->InsertAllocaIntoBasicBlock(allocaInst, lastAlloca, entryBasicBlock);
     lastAlloca = allocaInst;
+}
+
+void LlvmCodeGenerator::Optimize(int optimizationLevel, const std::string& bcFilePath, const std::string& optBCFilePath)
+{
+    emitter->Optimize(bcFilePath, optBCFilePath, "-O" + std::to_string(optimizationLevel));
 }
 
 } } // namespace cmajor::codegen

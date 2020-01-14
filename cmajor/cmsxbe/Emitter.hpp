@@ -265,7 +265,10 @@ public:
     void FinalizeDebugInfo() override;
     void EndDebugInfo() override;
     void EmitIrText(const std::string& filePath) override;
-    void EmitOptIrText(const std::string& irFilePath, const std::string& optIrFilePath, int opmitizationLevel) override;
+    void EmitIrFile(const std::string& filePath) override;
+    void Optimize(const std::string& bcFilePath, const std::string& optBCFilePath, const std::string& optimizationFlags) override;
+    void Disassemble(const std::string& bcFilePath, const std::string& filePath) override;
+    void Compile(const std::string& bcFilePath, const std::string& objectFilePath, int optimizationLevel) override;
     void VerifyModule() override;
     void EmitObjectCodeFile(const std::string& objectFilePath) override;
     void* CreateDebugInfoForNamespace(void* scope, const std::string& name) override;
@@ -276,6 +279,7 @@ public:
     uint64_t GetClassTypeSizeInBits(void* classIrType) override;
     uint64_t GetClassTypeAlignmentInBits(void* classIrType) override;
     void AddInlineFunctionAttribute(void* function) override;
+    void SetFunctionLinkage(void* function, bool setInline) override;
     void SetFunctionLinkageToLinkOnceODRLinkage(void* function) override;
     void SetFunction(void* function_) override;
     void SetInPrologue(bool inPrologue_) override;

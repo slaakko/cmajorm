@@ -8,9 +8,10 @@ parser HttpMediaTypeParser
     
     using Http.token;
     using Http.parameter;
+    using Http.lws;
  
     MediaType(MimeType* mimeType, var Pair<string, string> param)
-        ::= LWS? (Type:t SLASH Subtype:st){ mimeType->SetValue(t, st); } (LWS? SEMICOLON LWS? parameter:p{ param = p; mimeType->SetParameter(param.first, param.second); })* LWS?
+        ::= (Type:t SLASH Subtype:st){ mimeType->SetValue(t, st); } (lws:lws1? SEMICOLON lws:lws2? parameter:p{ param = p; mimeType->SetParameter(param.first, param.second); })*
         ;
         
     Type : string

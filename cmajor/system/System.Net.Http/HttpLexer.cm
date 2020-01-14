@@ -9,10 +9,12 @@ public class HttpLexer : System.Lex.Lexer
     public HttpLexer(const ustring& content_, const string& fileName_, int fileIndex_) :
         base(content_, fileName_, fileIndex_)
     {
+        HttpClassMap.Init();
     }
     public HttpLexer(const uchar* start_, const uchar* end_, const string& fileName_, int fileIndex_) :
         base(start_, end_, fileName_, fileIndex_)
     {
+        HttpClassMap.Init();
     }
     public override int NextState(int state, uchar c)
     {
@@ -169,7 +171,7 @@ public class HttpLexer : System.Lex.Lexer
             {
                 System.Lex.Lexeme prevMatch = token.match;
                 token.match = lexeme;
-                int tokenId = GetTokenId(26);
+                int tokenId = GetTokenId(25);
                 if (tokenId == CONTINUE_TOKEN)
                 {
                     token.id = CONTINUE_TOKEN;
@@ -192,7 +194,7 @@ public class HttpLexer : System.Lex.Lexer
             {
                 System.Lex.Lexeme prevMatch = token.match;
                 token.match = lexeme;
-                int tokenId = GetTokenId(25);
+                int tokenId = GetTokenId(24);
                 if (tokenId == CONTINUE_TOKEN)
                 {
                     token.id = CONTINUE_TOKEN;
@@ -215,7 +217,7 @@ public class HttpLexer : System.Lex.Lexer
             {
                 System.Lex.Lexeme prevMatch = token.match;
                 token.match = lexeme;
-                int tokenId = GetTokenId(24);
+                int tokenId = GetTokenId(23);
                 if (tokenId == CONTINUE_TOKEN)
                 {
                     token.id = CONTINUE_TOKEN;
@@ -238,7 +240,7 @@ public class HttpLexer : System.Lex.Lexer
             {
                 System.Lex.Lexeme prevMatch = token.match;
                 token.match = lexeme;
-                int tokenId = GetTokenId(23);
+                int tokenId = GetTokenId(22);
                 if (tokenId == CONTINUE_TOKEN)
                 {
                     token.id = CONTINUE_TOKEN;
@@ -261,7 +263,7 @@ public class HttpLexer : System.Lex.Lexer
             {
                 System.Lex.Lexeme prevMatch = token.match;
                 token.match = lexeme;
-                int tokenId = GetTokenId(22);
+                int tokenId = GetTokenId(21);
                 if (tokenId == CONTINUE_TOKEN)
                 {
                     token.id = CONTINUE_TOKEN;
@@ -284,7 +286,7 @@ public class HttpLexer : System.Lex.Lexer
             {
                 System.Lex.Lexeme prevMatch = token.match;
                 token.match = lexeme;
-                int tokenId = GetTokenId(21);
+                int tokenId = GetTokenId(20);
                 if (tokenId == CONTINUE_TOKEN)
                 {
                     token.id = CONTINUE_TOKEN;
@@ -307,7 +309,7 @@ public class HttpLexer : System.Lex.Lexer
             {
                 System.Lex.Lexeme prevMatch = token.match;
                 token.match = lexeme;
-                int tokenId = GetTokenId(20);
+                int tokenId = GetTokenId(19);
                 if (tokenId == CONTINUE_TOKEN)
                 {
                     token.id = CONTINUE_TOKEN;
@@ -330,7 +332,7 @@ public class HttpLexer : System.Lex.Lexer
             {
                 System.Lex.Lexeme prevMatch = token.match;
                 token.match = lexeme;
-                int tokenId = GetTokenId(19);
+                int tokenId = GetTokenId(18);
                 if (tokenId == CONTINUE_TOKEN)
                 {
                     token.id = CONTINUE_TOKEN;
@@ -353,7 +355,7 @@ public class HttpLexer : System.Lex.Lexer
             {
                 System.Lex.Lexeme prevMatch = token.match;
                 token.match = lexeme;
-                int tokenId = GetTokenId(18);
+                int tokenId = GetTokenId(17);
                 if (tokenId == CONTINUE_TOKEN)
                 {
                     token.id = CONTINUE_TOKEN;
@@ -376,7 +378,7 @@ public class HttpLexer : System.Lex.Lexer
             {
                 System.Lex.Lexeme prevMatch = token.match;
                 token.match = lexeme;
-                int tokenId = GetTokenId(17);
+                int tokenId = GetTokenId(16);
                 if (tokenId == CONTINUE_TOKEN)
                 {
                     token.id = CONTINUE_TOKEN;
@@ -399,7 +401,7 @@ public class HttpLexer : System.Lex.Lexer
             {
                 System.Lex.Lexeme prevMatch = token.match;
                 token.match = lexeme;
-                int tokenId = GetTokenId(16);
+                int tokenId = GetTokenId(15);
                 if (tokenId == CONTINUE_TOKEN)
                 {
                     token.id = CONTINUE_TOKEN;
@@ -422,7 +424,7 @@ public class HttpLexer : System.Lex.Lexer
             {
                 System.Lex.Lexeme prevMatch = token.match;
                 token.match = lexeme;
-                int tokenId = GetTokenId(15);
+                int tokenId = GetTokenId(14);
                 if (tokenId == CONTINUE_TOKEN)
                 {
                     token.id = CONTINUE_TOKEN;
@@ -445,7 +447,7 @@ public class HttpLexer : System.Lex.Lexer
             {
                 System.Lex.Lexeme prevMatch = token.match;
                 token.match = lexeme;
-                int tokenId = GetTokenId(14);
+                int tokenId = GetTokenId(13);
                 if (tokenId == CONTINUE_TOKEN)
                 {
                     token.id = CONTINUE_TOKEN;
@@ -468,7 +470,7 @@ public class HttpLexer : System.Lex.Lexer
             {
                 System.Lex.Lexeme prevMatch = token.match;
                 token.match = lexeme;
-                int tokenId = GetTokenId(13);
+                int tokenId = GetTokenId(12);
                 if (tokenId == CONTINUE_TOKEN)
                 {
                     token.id = CONTINUE_TOKEN;
@@ -491,7 +493,7 @@ public class HttpLexer : System.Lex.Lexer
             {
                 System.Lex.Lexeme prevMatch = token.match;
                 token.match = lexeme;
-                int tokenId = GetTokenId(12);
+                int tokenId = GetTokenId(11);
                 if (tokenId == CONTINUE_TOKEN)
                 {
                     token.id = CONTINUE_TOKEN;
@@ -514,7 +516,7 @@ public class HttpLexer : System.Lex.Lexer
             {
                 System.Lex.Lexeme prevMatch = token.match;
                 token.match = lexeme;
-                int tokenId = GetTokenId(11);
+                int tokenId = GetTokenId(10);
                 if (tokenId == CONTINUE_TOKEN)
                 {
                     token.id = CONTINUE_TOKEN;
@@ -537,7 +539,7 @@ public class HttpLexer : System.Lex.Lexer
             {
                 System.Lex.Lexeme prevMatch = token.match;
                 token.match = lexeme;
-                int tokenId = GetTokenId(10);
+                int tokenId = GetTokenId(9);
                 if (tokenId == CONTINUE_TOKEN)
                 {
                     token.id = CONTINUE_TOKEN;
@@ -575,270 +577,6 @@ public class HttpLexer : System.Lex.Lexer
                     else
                     {
                         token.match = prevMatch;
-                    }
-                }
-                switch (i)
-                {
-                    case 2: 
-                    {
-                        return 30;
-                    }
-                    case 3: 
-                    {
-                        return 31;
-                    }
-                    case 5: 
-                    {
-                        return 32;
-                    }
-                    case 15: 
-                    {
-                        return 33;
-                    }
-                    default: 
-                    {
-                        return -1;
-                    }
-                }
-                return -1;
-            }
-            case 33: 
-            {
-                System.Lex.Lexeme prevMatch = token.match;
-                token.match = lexeme;
-                int tokenId = GetTokenId(9);
-                if (tokenId == CONTINUE_TOKEN)
-                {
-                    token.id = CONTINUE_TOKEN;
-                    return -1;
-                }
-                else
-                {
-                    if (tokenId != INVALID_TOKEN)
-                    {
-                        token.id = tokenId;
-                    }
-                    else
-                    {
-                        token.match = prevMatch;
-                    }
-                }
-                switch (i)
-                {
-                    case 2: 
-                    {
-                        return 30;
-                    }
-                    case 3: 
-                    {
-                        return 31;
-                    }
-                    case 5: 
-                    {
-                        return 32;
-                    }
-                    case 15: 
-                    {
-                        return 33;
-                    }
-                    default: 
-                    {
-                        return -1;
-                    }
-                }
-                return -1;
-            }
-            case 32: 
-            {
-                System.Lex.Lexeme prevMatch = token.match;
-                token.match = lexeme;
-                int tokenId = GetTokenId(9);
-                if (tokenId == CONTINUE_TOKEN)
-                {
-                    token.id = CONTINUE_TOKEN;
-                    return -1;
-                }
-                else
-                {
-                    if (tokenId != INVALID_TOKEN)
-                    {
-                        token.id = tokenId;
-                    }
-                    else
-                    {
-                        token.match = prevMatch;
-                    }
-                }
-                switch (i)
-                {
-                    case 2: 
-                    {
-                        return 30;
-                    }
-                    case 3: 
-                    {
-                        return 31;
-                    }
-                    case 15: 
-                    {
-                        return 33;
-                    }
-                    case 5: 
-                    {
-                        return 34;
-                    }
-                    default: 
-                    {
-                        return -1;
-                    }
-                }
-                return -1;
-            }
-            case 34: 
-            {
-                System.Lex.Lexeme prevMatch = token.match;
-                token.match = lexeme;
-                int tokenId = GetTokenId(9);
-                if (tokenId == CONTINUE_TOKEN)
-                {
-                    token.id = CONTINUE_TOKEN;
-                    return -1;
-                }
-                else
-                {
-                    if (tokenId != INVALID_TOKEN)
-                    {
-                        token.id = tokenId;
-                    }
-                    else
-                    {
-                        token.match = prevMatch;
-                    }
-                }
-                switch (i)
-                {
-                    case 2: 
-                    {
-                        return 30;
-                    }
-                    case 3: 
-                    {
-                        return 31;
-                    }
-                    case 15: 
-                    {
-                        return 33;
-                    }
-                    case 5: 
-                    {
-                        return 35;
-                    }
-                    default: 
-                    {
-                        return -1;
-                    }
-                }
-                return -1;
-            }
-            case 35: 
-            {
-                switch (i)
-                {
-                    case 2: 
-                    {
-                        return 30;
-                    }
-                    case 15: 
-                    {
-                        return 33;
-                    }
-                    case 5: 
-                    {
-                        return 36;
-                    }
-                    default: 
-                    {
-                        return -1;
-                    }
-                }
-                return -1;
-            }
-            case 36: 
-            {
-                switch (i)
-                {
-                    case 2: 
-                    {
-                        return 30;
-                    }
-                    case 15: 
-                    {
-                        return 33;
-                    }
-                    default: 
-                    {
-                        return -1;
-                    }
-                }
-                return -1;
-            }
-            case 31: 
-            {
-                switch (i)
-                {
-                    case 4: 
-                    {
-                        return 35;
-                    }
-                    default: 
-                    {
-                        return -1;
-                    }
-                }
-                return -1;
-            }
-            case 30: 
-            {
-                System.Lex.Lexeme prevMatch = token.match;
-                token.match = lexeme;
-                int tokenId = GetTokenId(9);
-                if (tokenId == CONTINUE_TOKEN)
-                {
-                    token.id = CONTINUE_TOKEN;
-                    return -1;
-                }
-                else
-                {
-                    if (tokenId != INVALID_TOKEN)
-                    {
-                        token.id = tokenId;
-                    }
-                    else
-                    {
-                        token.match = prevMatch;
-                    }
-                }
-                switch (i)
-                {
-                    case 2: 
-                    {
-                        return 30;
-                    }
-                    case 3: 
-                    {
-                        return 31;
-                    }
-                    case 5: 
-                    {
-                        return 32;
-                    }
-                    case 15: 
-                    {
-                        return 33;
-                    }
-                    default: 
-                    {
-                        return -1;
                     }
                 }
                 return -1;
@@ -914,7 +652,7 @@ public class HttpLexer : System.Lex.Lexer
                 {
                     case 5: 
                     {
-                        return 37;
+                        return 30;
                     }
                     default: 
                     {
@@ -923,7 +661,7 @@ public class HttpLexer : System.Lex.Lexer
                 }
                 return -1;
             }
-            case 37: 
+            case 30: 
             {
                 System.Lex.Lexeme prevMatch = token.match;
                 token.match = lexeme;
@@ -994,7 +732,7 @@ public class HttpLexer : System.Lex.Lexer
                 {
                     case 5: 
                     {
-                        return 37;
+                        return 30;
                     }
                     default: 
                     {
@@ -1007,7 +745,7 @@ public class HttpLexer : System.Lex.Lexer
             {
                 System.Lex.Lexeme prevMatch = token.match;
                 token.match = lexeme;
-                int tokenId = GetTokenId(27);
+                int tokenId = GetTokenId(26);
                 if (tokenId == CONTINUE_TOKEN)
                 {
                     token.id = CONTINUE_TOKEN;
@@ -1030,7 +768,7 @@ public class HttpLexer : System.Lex.Lexer
             {
                 System.Lex.Lexeme prevMatch = token.match;
                 token.match = lexeme;
-                int tokenId = GetTokenId(28);
+                int tokenId = GetTokenId(27);
                 if (tokenId == CONTINUE_TOKEN)
                 {
                     token.id = CONTINUE_TOKEN;
@@ -1186,7 +924,7 @@ public class HttpLexer : System.Lex.Lexer
                     }
                     case 5: 
                     {
-                        return 38;
+                        return 31;
                     }
                     default: 
                     {
@@ -1195,7 +933,7 @@ public class HttpLexer : System.Lex.Lexer
                 }
                 return -1;
             }
-            case 38: 
+            case 31: 
             {
                 System.Lex.Lexeme prevMatch = token.match;
                 token.match = lexeme;
@@ -1218,29 +956,13 @@ public class HttpLexer : System.Lex.Lexer
                 }
                 switch (i)
                 {
-                    case 2: 
-                    {
-                        return 30;
-                    }
-                    case 3: 
-                    {
-                        return 31;
-                    }
-                    case 15: 
-                    {
-                        return 33;
-                    }
-                    case 5: 
-                    {
-                        return 35;
-                    }
                     case 9: 
                     {
-                        return 39;
+                        return 32;
                     }
                     case 11: 
                     {
-                        return 40;
+                        return 33;
                     }
                     default: 
                     {
@@ -1249,7 +971,7 @@ public class HttpLexer : System.Lex.Lexer
                 }
                 return -1;
             }
-            case 40: 
+            case 33: 
             {
                 System.Lex.Lexeme prevMatch = token.match;
                 token.match = lexeme;
@@ -1274,7 +996,7 @@ public class HttpLexer : System.Lex.Lexer
                 {
                     case 5: 
                     {
-                        return 37;
+                        return 30;
                     }
                     default: 
                     {
@@ -1283,7 +1005,7 @@ public class HttpLexer : System.Lex.Lexer
                 }
                 return -1;
             }
-            case 39: 
+            case 32: 
             {
                 System.Lex.Lexeme prevMatch = token.match;
                 token.match = lexeme;
@@ -1308,7 +1030,7 @@ public class HttpLexer : System.Lex.Lexer
                 {
                     case 5: 
                     {
-                        return 37;
+                        return 30;
                     }
                     default: 
                     {
@@ -1361,17 +1083,6 @@ public class HttpLexer : System.Lex.Lexer
                         token.match = prevMatch;
                     }
                 }
-                switch (i)
-                {
-                    case 4: 
-                    {
-                        return 35;
-                    }
-                    default: 
-                    {
-                        return -1;
-                    }
-                }
                 return -1;
             }
             case 1: 
@@ -1393,29 +1104,6 @@ public class HttpLexer : System.Lex.Lexer
                     else
                     {
                         token.match = prevMatch;
-                    }
-                }
-                switch (i)
-                {
-                    case 2: 
-                    {
-                        return 30;
-                    }
-                    case 3: 
-                    {
-                        return 31;
-                    }
-                    case 5: 
-                    {
-                        return 32;
-                    }
-                    case 15: 
-                    {
-                        return 33;
-                    }
-                    default: 
-                    {
-                        return -1;
                     }
                 }
                 return -1;
@@ -1484,124 +1172,118 @@ public class HttpLexer : System.Lex.Lexer
             case 9: 
             {
                 Retract();
-                return LWS;
+                return COLON;
                 break;
             }
             case 10: 
             {
                 Retract();
-                return COLON;
+                return SEMICOLON;
                 break;
             }
             case 11: 
             {
                 Retract();
-                return SEMICOLON;
+                return AT;
                 break;
             }
             case 12: 
             {
                 Retract();
-                return AT;
+                return COMMA;
                 break;
             }
             case 13: 
             {
                 Retract();
-                return COMMA;
+                return DOT;
                 break;
             }
             case 14: 
             {
                 Retract();
-                return DOT;
+                return LPAREN;
                 break;
             }
             case 15: 
             {
                 Retract();
-                return LPAREN;
+                return RPAREN;
                 break;
             }
             case 16: 
             {
                 Retract();
-                return RPAREN;
+                return LANGLE;
                 break;
             }
             case 17: 
             {
                 Retract();
-                return LANGLE;
+                return RANGLE;
                 break;
             }
             case 18: 
             {
                 Retract();
-                return RANGLE;
+                return LBRACKET;
                 break;
             }
             case 19: 
             {
                 Retract();
-                return LBRACKET;
+                return RBRACKET;
                 break;
             }
             case 20: 
             {
                 Retract();
-                return RBRACKET;
+                return LBRACE;
                 break;
             }
             case 21: 
             {
                 Retract();
-                return LBRACE;
+                return RBRACE;
                 break;
             }
             case 22: 
             {
                 Retract();
-                return RBRACE;
+                return SLASH;
                 break;
             }
             case 23: 
             {
                 Retract();
-                return SLASH;
+                return BACKSLASH;
                 break;
             }
             case 24: 
             {
                 Retract();
-                return BACKSLASH;
+                return QUEST;
                 break;
             }
             case 25: 
             {
                 Retract();
-                return QUEST;
+                return EQ;
                 break;
             }
             case 26: 
             {
                 Retract();
-                return EQ;
+                return CHAR;
                 break;
             }
             case 27: 
             {
                 Retract();
-                return CHAR;
-                break;
-            }
-            case 28: 
-            {
-                Retract();
                 return TEXT;
                 break;
             }
-            case 29: 
+            case 28: 
             {
                 Retract();
                 return OCTET;

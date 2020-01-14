@@ -166,10 +166,13 @@ int Lexer::GetKeywordToken(const Lexeme& lexeme) const
 
 void Lexer::ConvertExternal(Span& span)
 {
-    Token startToken = GetToken(span.start);
-    span.start = static_cast<int>(startToken.match.begin - start);
-    Token endToken = GetToken(span.end);
-    span.end = static_cast<int>(endToken.match.end - start);
+    if (span.Valid())
+    {
+        Token startToken = GetToken(span.start);
+        span.start = static_cast<int>(startToken.match.begin - start);
+        Token endToken = GetToken(span.end);
+        span.end = static_cast<int>(endToken.match.end - start);
+    }
 }
 
 Token Lexer::GetToken(int64_t pos) const

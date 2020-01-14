@@ -51,10 +51,11 @@ parser api(SNGCM_PARSER_API) EnumerationParser
             {
                 expr.reset(constantValue);
                 expr->SetFullSpan();
+                Span v = expr->GetSpan();
                 s.end = expr->GetSpan().end;
                 EnumConstantNode* value = new EnumConstantNode(s, constantId, expr.release());
                 value->SetHasValue();
-                value->SetStrValue(lexer.GetMatch(s));
+                value->SetStrValue(lexer.GetMatch(v));
                 return value;
             }
         |   empty{ return new EnumConstantNode(s, constantId, MakeNextEnumConstantValue(s, enumType)); }

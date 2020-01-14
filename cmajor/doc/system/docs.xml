@@ -2,21 +2,28 @@
 <docs>
   <doc id="solution">
     <desc>
-      The Cmajor System Library consists of sixteen modules.
+      The Cmajor System Library consists of eighteen modules.
       The <a href="content/System.Base/index.html">System.Base</a> module constitutes the major part of the System Library.
     </desc>
   </doc>
-  <doc id="System.Install">
+  <doc id="System.Windows.Install">
     <desc>
-      The System.Install module is a special module that takes care of installing the System Library to cmajor/system/lib/&lt;config> directory.
-      It contains no source code entities, but references the <ref>System</ref> module.
+      The System.Windows.Install module is a special module that takes care of installing the System and System.Windows libraries to cmajor/system/lib/&lt;config> directory.
+      It contains no source code entities, but references the <ref>System.Windows</ref> module.
+    </desc>
+  </doc>
+  <doc id="System.Windows">
+    <desc>
+      The System.Windows module provides interface to Windows API and hopefully eventually will contain support for Windows GUI applications.
+      This library is linked with programs and libraries that have <strong>target=winapp</strong> or <strong>target=winlib</strong> in a <em>.cmp</em> file respectively.
     </desc>
   </doc>
 
   <doc id="System">
     <desc>
-      The System module acts as an umbrella module that references all other System Library modules. It contains no source code entities.
-      The System module is implicitly referenced by all user programs and libraries, so an explicit reference for any System Library module is not needed.
+      The System module acts as an umbrella module that references all other System Library modules except System.Windows module. It contains no source code entities.
+      The System module is implicitly referenced by all user programs and libraries, so an explicit reference for any system library module is not needed.
+      This library is linked with programs and libraries that have <strong>target=program</strong> or <strong>target=library</strong> in a <em>.cmp</em> file respectively.
     </desc>
   </doc>
 
@@ -168,14 +175,14 @@
     </desc>
   </doc>
 
-  <doc id="System.Text.RegularExpressions">
+  <doc id="System.RegularExpressions">
     <desc>
-      The System.Text.RegularExpressions contains a minimal implementation of a regular expression matching engine.
+      The System.RegularExpressions contains a minimal implementation of a regular expression matching engine.
     </desc>
+    
     <details title="Example">
-      This <a href="../../../code/cmdoc/content/rex/file/rex.cm.html">rex</a> program searches a regular expression pattern from the given text files.
-      A pattern can be compiled to a <a href="https://en.wikipedia.org/wiki/Deterministic_finite_automaton">DFA</a> or
-      represented as an <a href="https://en.wikipedia.org/wiki/Nondeterministic_finite_automaton">NFA</a>.
+      This <a href="../../../code/cmdoc/content/sgrep/file/sgrep.cm.html">sgrep</a> program searches a regular expression pattern from the given text files.
+      The pattern is represented as an <a href="https://en.wikipedia.org/wiki/Nondeterministic_finite_automaton">NFA</a>.
       Names of files can contain wildcards * and ?.
     </details>
   </doc>
@@ -248,6 +255,10 @@
     <details>
       This <a href="../../../code/http/cmdoc/content/httpClient2/file/httpClient2.cm.html">httpClient2</a> example program
       retrieves a HTML document using HTTPS protocol and prints the response statistics to console.
+    </details>
+    <details>
+      This <a href="../../../code/cmdoc/content/rfc/file/main.cm.html">program</a> retrieves an RFC document from rfc-editor.org, saves it to a 
+      file and then shows it in the default browser.
     </details>
   </doc>
   <doc id="class_HttpClient_83C2D3F4BD814B26EED122D5467B7A58D6B02DCB">
@@ -444,6 +455,12 @@
     </details>
   </doc>
 
+  <doc id="System.Init">
+    <desc>
+      The System.Init library does dynamic initialization before program main function is called.
+    </desc>
+  </doc>
+
   <doc id="System.IO.Compression">
     <desc>
       The System.IO.Compression module contains data compression/decompression streams.
@@ -475,56 +492,36 @@
       writes it to a UTF-8 encoded text file, reads it back from the text file and writes it to console.
     </details>
   </doc>
-  <doc id="class_DomDocument_975632F3AA8CF3FEC1D51FB0E91F580D6EBA16C8">
+  <doc id="class_Document_55733573E779F43C27626A09417DC9D84BFCB81B">
     <desc>
       Represents an in-memory XML or XHTML document.
     </desc>
   </doc>
-  <doc id="function_ParseXmlContentToDomDocument_908DF5EBE9F27F3A5F117904A2E58021B0EC0AC2">
+  <doc id="function_ParseDocument_BE2ACDA88F309E8A83AD9EFD9B27A5158D0A0E49">
     <desc>
-      Parses a UTF-8 encoded XML string to a <ref>class_DomDocument_975632F3AA8CF3FEC1D51FB0E91F580D6EBA16C8</ref> and returns it.
+      Parses a UTF-32 encoded XML string to a <ref>class_Document_55733573E779F43C27626A09417DC9D84BFCB81B</ref> and returns it.
     </desc>
     <details>
       The given <strong>systemId</strong> parameter is used for error reporting only and will occur in the possible error message.
-      If the XML string is not syntactically valid, the function throws an <ref>class_ExpectationFailure_EBDBB0FC1DDED5BE7E15008622BB34AFCA7E9A8C</ref> exception.
+      If the XML string is not syntactically valid, the function throws an <ref>class_ParsingException_05B147C5054E1ADB84074F65FDF2E8CFBF5052EF</ref> exception.
       If the XML string is not otherwise well-formed, the function throws an <ref>class_XmlProcessingException_38961E809BD4812FD6BEA01B8DDA08229100E6F5</ref> exception.
     </details>
   </doc>
-  <doc id="function_ParseXmlContentToDomDocument_0BE70E7597FC179FFB38BBE863EB51E81DCF4005">
+  <doc id="function_ReadDocument_5FC028805AA730C01D80778478307E33095ACBA3">
     <desc>
-      Parses a UTF-16 encoded XML string to a <ref>class_DomDocument_975632F3AA8CF3FEC1D51FB0E91F580D6EBA16C8</ref> and returns it.
+      Parses a UTF-8 encoded XML file to a <ref>class_Document_55733573E779F43C27626A09417DC9D84BFCB81B</ref> and returns it.
     </desc>
     <details>
-      The given <strong>systemId</strong> parameter is used for error reporting only and will occur in the possible error message.
-      If the XML string is not syntactically valid, the function throws an <ref>class_ExpectationFailure_EBDBB0FC1DDED5BE7E15008622BB34AFCA7E9A8C</ref> exception.
-      If the XML string is not otherwise well-formed, the function throws an <ref>class_XmlProcessingException_38961E809BD4812FD6BEA01B8DDA08229100E6F5</ref> exception.
-    </details>
-  </doc>
-  <doc id="function_ParseXmlContentToDomDocument_43FCDABD5857D3B7093B08EE39ABDA8D063B9990">
-    <desc>
-      Parses a UTF-32 encoded XML string to a <ref>class_DomDocument_975632F3AA8CF3FEC1D51FB0E91F580D6EBA16C8</ref> and returns it.
-    </desc>
-    <details>
-      The given <strong>systemId</strong> parameter is used for error reporting only and will occur in the possible error message.
-      If the XML string is not syntactically valid, the function throws an <ref>class_ExpectationFailure_EBDBB0FC1DDED5BE7E15008622BB34AFCA7E9A8C</ref> exception.
-      If the XML string is not otherwise well-formed, the function throws an <ref>class_XmlProcessingException_38961E809BD4812FD6BEA01B8DDA08229100E6F5</ref> exception.
-    </details>
-  </doc>
-  <doc id="function_ParseXmlFileToDomDocument_CDBEF03097E654DC3609B662FEAF72116D01B7CA">
-    <desc>
-      Parses a UTF-8 encoded XML file to a <ref>class_DomDocument_975632F3AA8CF3FEC1D51FB0E91F580D6EBA16C8</ref> and returns it.
-    </desc>
-    <details>
-      If the XML file is not syntactically valid, the function throws an <ref>class_ExpectationFailure_EBDBB0FC1DDED5BE7E15008622BB34AFCA7E9A8C</ref> exception.
+      If the XML file is not syntactically valid, the function throws an <ref>class_ParsingException_05B147C5054E1ADB84074F65FDF2E8CFBF5052EF</ref> exception.
       If the XML file is not otherwise well-formed, the function throws an <ref>class_XmlProcessingException_38961E809BD4812FD6BEA01B8DDA08229100E6F5</ref> exception.
     </details>
   </doc>
   <doc id="class_DomException_EE72D4E688A5F4B0F4D22924FF24D42E74D944CA">
     <desc>
-      Thrown when an error is detected during manipulation of a <ref>class_DomDocument_975632F3AA8CF3FEC1D51FB0E91F580D6EBA16C8</ref>.
+      Thrown when an error is detected during manipulation of a <ref>class_Document_55733573E779F43C27626A09417DC9D84BFCB81B</ref>.
     </desc>
   </doc>
-  <doc id="member_function_GetAttribute_DomElement_E340EFCACFF415B6AE664EAC51245781B895A16D">
+  <doc id="member_function_GetAttribute_Element_CD84C3F5F156ABD14B26DD9E0B403E5DC1062D1B">
     <desc>
       Returns the value of an attribute if it exists and empty string otherwise.
     </desc>
@@ -545,72 +542,34 @@
       The <ref>function_ParseXmlFile_7ED565F7B87DFEA8BE61A14E6C0BDB5D473022BC</ref> function parses the given XML file with a content handler.
       As XML file is parsed, the overridden methods of user supplied class derived from the <ref>class_XmlContentHandler_7429223FCBE3A541F14FD9475F2099B20E248715</ref>
       class are called. If the XML document need to be manipulated entirely in memory, it can be parsed with the
-      <ref>function_ParseXmlFileToDomDocument_CDBEF03097E654DC3609B662FEAF72116D01B7CA</ref> function instead.
+      <ref>function_ReadDocument_5FC028805AA730C01D80778478307E33095ACBA3</ref> function instead.
     </details>
     <details title="Example">
       This <a href="../../../code/xml/cmdoc/content/XmlStats/file/xmlstats.cm.html">xmlstats</a> example program prints statistics of an XML file.
     </details>
   </doc>
-  <doc id="function_ParseXmlContent_FB317CA5307F6138BFBA2CA2A43B5744FE92B917">
-    <desc>
-      Parses an UTF-8 encoded XML string with a content handler derived from the <ref>class_XmlContentHandler_7429223FCBE3A541F14FD9475F2099B20E248715</ref> class.
-      The base class content handler does nothing by default.
-    </desc>
-    <details>
-      The <strong>systemId</strong> parameter is used for error reporting only and will occur in the possible error message.
-      If the XML string is not syntactically valid, the function throws an <ref>class_ExpectationFailure_EBDBB0FC1DDED5BE7E15008622BB34AFCA7E9A8C</ref>
-      exception. If the XML string is not otherwise well-formed, the function throws an <ref>class_XmlProcessingException_38961E809BD4812FD6BEA01B8DDA08229100E6F5</ref>
-      exception.
-    </details>
-  </doc>
-  <doc id="function_ParseXmlContent_02CBE0E791587725441F53556A92648D169B81B9">
-    <desc>
-      Parses an UTF-16 encoded XML string with a content handler derived from the <ref>class_XmlContentHandler_7429223FCBE3A541F14FD9475F2099B20E248715</ref> class.
-      The base class content handler does nothing by default.
-    </desc>
-    <details>
-      The <strong>systemId</strong> parameter is used for error reporting only and will occur in the possible error message.
-      If the XML string is not syntactically valid, the function throws an <ref>class_ExpectationFailure_EBDBB0FC1DDED5BE7E15008622BB34AFCA7E9A8C</ref>
-      exception. If the XML string is not otherwise well-formed, the function throws an <ref>class_XmlProcessingException_38961E809BD4812FD6BEA01B8DDA08229100E6F5</ref>
-      exception.
-    </details>
-  </doc>
-  <doc id="function_ParseXmlContent_61335068D4F75C1370C9C52E1DDE3F3C6797D054">
-    <desc>
-      Parses a UTF-32 encoded XML string with a content handler derived from the <ref>class_XmlContentHandler_7429223FCBE3A541F14FD9475F2099B20E248715</ref> class.
-      The base class content handler does nothing by default.
-    </desc>
-    <details>
-      The <strong>systemId</strong> parameter is used for error reporting only and will occur in the possible error message.
-      If the XML string is not syntactically valid, the function throws an <ref>class_ExpectationFailure_EBDBB0FC1DDED5BE7E15008622BB34AFCA7E9A8C</ref>
-      exception. If the XML string is not otherwise well-formed, the function throws an <ref>class_XmlProcessingException_38961E809BD4812FD6BEA01B8DDA08229100E6F5</ref>
-      exception.
-    </details>
-  </doc>
-  <doc id="function_ParseXmlFile_7ED565F7B87DFEA8BE61A14E6C0BDB5D473022BC">
-    <desc>
-      Parses an UTF-8 encoded XML file with a content handler derived from the <ref>class_XmlContentHandler_7429223FCBE3A541F14FD9475F2099B20E248715</ref> class.
-      The base class content handler does nothing by default.
-    </desc>
-    <details>
-      If the XML file is not syntactically valid, the function throws an <ref>class_ExpectationFailure_EBDBB0FC1DDED5BE7E15008622BB34AFCA7E9A8C</ref>
-      exception. If the XML file is not otherwise well-formed, the function throws an <ref>class_XmlProcessingException_38961E809BD4812FD6BEA01B8DDA08229100E6F5</ref>
-      exception.
-    </details>
-  </doc>
 
-  <doc id="System.Text.Parsing">
+  <doc id="System.Parsing">
     <desc>
-      The System.Text.Parsing module provides parsing infrastructure to upper layer modules.
-      User programs and libraries can benefit only little of this module directly.
+      The System.Parsing module contains parsing helper classes.
     </desc>
   </doc>
-
-  <doc id="System.Text.Parsing.CodeDom">
+  
+  <doc id="System.Lex">
     <desc>
-      The System.Text.Parsing.CodeDom module provides abstract syntax tree classes to <ref>System.Text.Parsing</ref> module.
-      User programs and libraries can benefit only little of this module directly.
+      The System.Lex module contains lexical analyzer engine and lexing utilities.
     </desc>
+  </doc>
+  <doc id="class_Span_BD14F38E21FE17B2F59D2E90BFB5D984755F9267">
+    <desc>
+      Represents either a span of tokens during parsing or a span of text after parsing.
+    </desc>
+    <details>
+      During parsing the span is said to be <em>internal</em>. Then it contains the starting line number, index of the file being parsed and a range of token indeces.
+      The string corresponding to the tokens can then be obtained from the <ref>class_Lexer_156A4FBAF81A8279F7218814A16ED516A1B97F23</ref> for a span.
+      When a span is serialized to a module file, it is turned to an <em>external</em> span that contains start and end indeces of the characters that a range of tokens contained.
+      The start and end character indeces are counted from the start of the file. 
+    </details>
   </doc>
 
   <doc id="System.Base">
@@ -1380,7 +1339,7 @@
   <doc id="System.Runtime">
     <desc>
       The System.Runtime module contains symbols for functions that form the lowest level of the Cmajor runtime library.
-      The functions themselves are defined in the <a href="https://github.com/slaakko/cmajorw64/tree/master/cmajor/rt">rt</a> library written in C++.
+      The functions themselves are defined in the <a href="../compiler/reference/rt/rt.html">rt</a> library written in C++.
     </desc>
   </doc>
 

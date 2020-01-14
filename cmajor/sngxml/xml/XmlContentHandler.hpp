@@ -39,6 +39,7 @@ public:
     const_iterator cend() const { return attributes.cend(); }
     void Add(const Attribute& attribute);
     void Clear();
+    size_t Count() const { return attributes.size(); }
     const std::u32string* GetAttributeValue(const std::u32string& namespaceUri, const std::u32string& localName) const;
     const std::u32string* GetAttributeValue(const std::u32string& qualifiedName) const;
 private:

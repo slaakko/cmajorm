@@ -1,0 +1,20 @@
+// =================================
+// Copyright (c) 2020 Seppo Laakko
+// Distributed under the MIT license
+// =================================
+
+using System;
+
+namespace System.IO
+{
+    public delegate byte GetSystemCompressionMethodFunction();
+    public delegate void DataCompressionFunction(SharedPtr<ByteStream>& in, SharedPtr<ByteStream>& out);
+
+    public const int numSystemCompressions = 2;
+    public const byte deflateCompression = 0u;
+    public const byte bzip2Compression = 1u;
+
+    public GetSystemCompressionMethodFunction getSystemCompressionMethod;
+    public DataCompressionFunction[numSystemCompressions] compressFunctions;
+    public DataCompressionFunction[numSystemCompressions] expandFunctions;
+}

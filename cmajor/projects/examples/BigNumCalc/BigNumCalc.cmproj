@@ -2,21 +2,25 @@
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
  <PropertyGroup Label="Globals">
   <CustomProjectExtensionsPath>$(LocalAppData)\CustomProjectSystems\Cmajor\</CustomProjectExtensionsPath>
-  <ProjectGuid>ff05ded2-a8ea-4a49-a5f2-89a1aff14621</ProjectGuid>
+  <ProjectGuid>c9a09739-6f8f-455b-8119-9e097961c410</ProjectGuid>
  </PropertyGroup>
  <PropertyGroup>
   <TargetType>program</TargetType>
  </PropertyGroup>
  <ItemGroup>
-  <CmCompile Include="BigNumExpressionGrammar.cm"/>
+  <CmCompile Include="BigNumClassMap.cm"/>
+  <CmCompile Include="BigNumExpressionParser.cm"/>
+  <CmCompile Include="BigNumLexer.cm"/>
+  <CmCompile Include="BigNumParser.cm"/>
+  <CmCompile Include="BigNumTokens.cm"/>
   <CmCompile Include="BigValue.cm"/>
   <CmCompile Include="Evaluator.cm"/>
   <CmCompile Include="Main.cm"/>
  </ItemGroup>
  <ItemGroup>
-  <None Include="BigNumExpressionGrammar.parser"/>
-  <None Include="BigNumExpressionGrammar.pl"/>
-  <None Include="BigNumExpressionGrammar.pp"/>
+  <None Include="BigNumExpressionParser.parser"/>
+  <None Include="BigNumLexer.lexer"/>
+  <None Include="BigNumParser.spg"/>
  </ItemGroup>
  <ItemGroup/>
  <Import Project="$(CustomProjectExtensionsPath)Cmajor.props"/>

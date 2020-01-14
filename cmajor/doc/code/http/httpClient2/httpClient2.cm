@@ -6,10 +6,10 @@ int main()
 {
     try
     {
-        HttpClient httpClient(UriReference(u"https://tools.ietf.org/"), &Console.Out());
+        HttpClient httpClient(UriReference("https://tools.ietf.org/"), &Console.Out());
         HttpHeaderCollection responseHeaders;
         SharedPtr<ByteStream> body;
-        UriReference uri = u"/html/rfc2616";
+        UriReference uri = "/html/rfc2616";
         HttpStatus status = httpClient.Get(uri, responseHeaders, body);
         if (status.StatusCode() == statusSuccessOK)
         {
@@ -17,10 +17,10 @@ int main()
             ulong contentLength = responseHeaders.GetContentLength();
             Console.WriteLine("content length : " + ToString(contentLength));
             MimeType contentType = responseHeaders.GetContentType();
-            Console.WriteLine("content type   : " + ToUtf8(contentType.ToString()));
+            Console.WriteLine("content type   : " + contentType.ToString());
             DateTime date = responseHeaders.GetDate();
             Console.WriteLine("date           : " + date.ToString());
-            if (ToLower(contentType.GetMediaType()->Name()) == u"text" && ToLower(contentType.GetSubtype()->Name()) == u"html")
+            if (ToLower(contentType.GetMediaType()->Name()) == "text" && ToLower(contentType.GetSubtype()->Name()) == "html")
             {
                 StreamReader reader(body);
                 string content = reader.ReadToEnd();
@@ -44,4 +44,3 @@ int main()
     }
     return 0;
 }
-

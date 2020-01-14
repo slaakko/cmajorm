@@ -17,6 +17,11 @@ enum class FormatWidth
     exact, min
 };
 
+enum class FormatJustify
+{
+    left, right
+};
+
 UTIL_API std::string Trim(const std::string& s);
 UTIL_API std::string TrimAll(const std::string& s);
 UTIL_API std::u32string Trim(const std::u32string& s);
@@ -48,7 +53,10 @@ UTIL_API int Log10(int n);
 UTIL_API std::u32string FormatNumber(int n, int numDigits);
 UTIL_API std::string CurrentThreadIdStr();
 UTIL_API std::string Format(const std::string& s, int width);
+UTIL_API std::string Format(const std::string& s, int width, FormatJustify justify);
 UTIL_API std::string Format(const std::string& s, int width, FormatWidth fw);
+UTIL_API std::string Format(const std::string& s, int width, FormatWidth fw, FormatJustify justify);
+UTIL_API std::string Format(const std::string& s, int width, FormatWidth fw, FormatJustify justify, char fillChar);
 
 } } // namespace soulng::util
 

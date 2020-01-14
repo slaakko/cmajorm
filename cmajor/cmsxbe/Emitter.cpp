@@ -1465,7 +1465,22 @@ void Emitter::EmitIrText(const std::string& filePath)
     // todo
 }
 
-void Emitter::EmitOptIrText(const std::string& irFilePath, const std::string& optIrFilePath, int opmitizationLevel)
+void Emitter::EmitIrFile(const std::string& filePath)
+{
+    // todo
+}
+
+void Emitter::Optimize(const std::string& bcFilePath, const std::string& optBCFilePath, const std::string& optimizationFlags)
+{
+    // todo
+}
+
+void Emitter::Disassemble(const std::string& bcFilePath, const std::string& filePath)
+{
+    // todo
+}
+
+void Emitter::Compile(const std::string& bcFilePath, const std::string& objectFilePath, int optimizationLevel)
 {
     // todo
 }
@@ -1521,6 +1536,11 @@ uint64_t Emitter::GetClassTypeAlignmentInBits(void* classIrType)
 }
 
 void Emitter::AddInlineFunctionAttribute(void* function)
+{
+    // todo
+}
+
+void Emitter::SetFunctionLinkage(void* function, bool setInline)
 {
     // todo
 }

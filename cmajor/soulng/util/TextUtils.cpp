@@ -484,20 +484,40 @@ std::string CurrentThreadIdStr()
 
 std::string Format(const std::string& s, int width)
 {
-    return Format(s, width, FormatWidth::exact);
+    return Format(s, width, FormatWidth::exact, FormatJustify::left);
+}
+
+std::string Format(const std::string& s, int width, FormatJustify justify)
+{
+    return Format(s, width, FormatWidth::exact, justify);
 }
 
 std::string Format(const std::string& s, int width, FormatWidth fw)
+{
+    return Format(s, width, fw, FormatJustify::left);
+}
+
+std::string Format(const std::string& s, int width, FormatWidth fw, FormatJustify justify)
+{
+    return Format(s, width, fw, justify, ' ');
+}
+
+std::string Format(const std::string& s, int width, FormatWidth fw, FormatJustify justify, char fillChar)
 {
     if (fw == FormatWidth::min)
     {
         width = std::max(width, int(s.length()));
     }
-    std::string result(width, ' ');
+    std::string result(width, fillChar);
     int n = std::min(int(s.length()), width);
+    int offset = 0;
+    if (justify == FormatJustify::right)
+    {
+        offset = width - n;
+    }
     for (int i = 0; i < n; ++i)
     {
-        result[i] = s[i];
+        result[i + offset] = s[i];
     }
     return result;
 }

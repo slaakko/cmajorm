@@ -20,6 +20,8 @@ public void PrintUsage()
     Console.Out() << "  By default uses Unicode identifier classes." << endl();
     Console.Out() << "--no-identifier-classes | -n" << endl();
     Console.Out() << "  No predefined identifier classes" << endl();
+    Console.Out() << "--no-class-map-compression | -c" << endl();
+    Console.Out() << "  Do not compress class maps." << endl();
 }
 public int main(int argc, const char** argv)
 {
@@ -27,6 +29,7 @@ public int main(int argc, const char** argv)
     {
         bool verbose = false;
         bool debug = false;
+        bool noClassMapCompression = false;
         soulcm.scmlg.IdentifierClassKind identifierClassKind = soulcm.scmlg.IdentifierClassKind.unicode;
         string fileName;
         for (int i = 1; i < argc; ++i)
@@ -54,6 +57,10 @@ public int main(int argc, const char** argv)
                 else if (arg == "--no-identifier-classes")
                 {
                     identifierClassKind = soulcm.scmlg.IdentifierClassKind.none;
+                }
+                else if (arg == "--no-class-map-compression")
+                {
+                    noClassMapCompression = true;
                 }
                 else
                 {
@@ -90,6 +97,10 @@ public int main(int argc, const char** argv)
                     {
                         identifierClassKind = soulcm.scmlg.IdentifierClassKind.none;
                     }
+                    else if (o == 'c')
+                    {
+                        noClassMapCompression = true;
+                    }
                     else
                     {
                         throw Exception("unknown option \'-" + string(o, 1) + "\'");
@@ -120,7 +131,7 @@ public int main(int argc, const char** argv)
         soulcm.scmlg.RegularExpressionParser regularExpressionParser;
         lexerContext.SetParser(&regularExpressionParser);
         string root = Path.GetDirectoryName(fileName);
-        lexerFile->Process(root, verbose, debug, lexerContext);
+        lexerFile->Process(root, verbose, debug, noClassMapCompression, lexerContext);
     }
     catch (const Exception& ex)
     {

@@ -42,21 +42,35 @@ bool codeMappingInitialized = false;
 std::map<long, long> winToExtCodeMap;
 std::map<long, long> extToWinCodeMap;
 
-void InitCodeMapping()
+bool InitCodeMapping()
 {
     for (const CodeMapping& mapping : code_mapping)
     {
+        auto it1 = winToExtCodeMap.find(mapping.winCode);
+        if (it1 != winToExtCodeMap.cend())
+        {
+            return false;
+        }
         winToExtCodeMap[mapping.winCode] = mapping.extCode;
+        auto it2 = extToWinCodeMap.find(mapping.extCode);
+        if (it2 != extToWinCodeMap.cend())
+        {
+            return false;
+        }
         extToWinCodeMap[mapping.extCode] = mapping.winCode;
     }
     codeMappingInitialized = true;
+    return true;
 }
 
 long MapWinCodeToExtCode(long winCode)
 {
     if (!codeMappingInitialized)
     {
-        InitCodeMapping();
+        if (!InitCodeMapping())
+        {
+            return -2;
+        }
     }
     auto it = winToExtCodeMap.find(winCode);
     if (it != winToExtCodeMap.cend())
@@ -70,7 +84,10 @@ long MapExtCodeToWinCode(long extCode)
 {
     if (!codeMappingInitialized)
     {
-        InitCodeMapping();
+        if (!InitCodeMapping())
+        {
+            return -2;
+        }
     }
     auto it = extToWinCodeMap.find(extCode);
     if (it != extToWinCodeMap.cend())

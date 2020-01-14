@@ -296,7 +296,10 @@ public:
     virtual void FinalizeDebugInfo() = 0;
     virtual void EndDebugInfo() = 0;
     virtual void EmitIrText(const std::string& filePath) = 0;
-    virtual void EmitOptIrText(const std::string& irFilePath, const std::string& optIrFilePath, int opmitizationLevel) = 0;
+    virtual void EmitIrFile(const std::string& filePath) = 0;
+    virtual void Optimize(const std::string& bcFilePath, const std::string& opBCFilePath, const std::string& optimizationFlags) = 0;
+    virtual void Disassemble(const std::string& bcFilePath, const std::string& llFilePath) = 0;
+    virtual void Compile(const std::string& bcFilePath, const std::string& objectFilePath, int optimizationLevel) = 0;
     virtual void VerifyModule() = 0;
     virtual void EmitObjectCodeFile(const std::string& objectFilePath) = 0;
     virtual void* CreateDebugInfoForNamespace(void* scope, const std::string& name) = 0;
@@ -307,6 +310,7 @@ public:
     virtual uint64_t GetClassTypeSizeInBits(void* classIrType) = 0;
     virtual uint64_t GetClassTypeAlignmentInBits(void* classIrType) = 0;
     virtual void AddInlineFunctionAttribute(void* function) = 0;
+    virtual void SetFunctionLinkage(void* function, bool setInline) = 0;
     virtual void SetFunctionLinkageToLinkOnceODRLinkage(void* function) = 0;
     virtual void SetFunction(void* function_) = 0;
     virtual void SetInPrologue(bool inPrologue_) = 0;

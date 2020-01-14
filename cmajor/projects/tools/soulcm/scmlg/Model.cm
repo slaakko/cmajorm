@@ -622,6 +622,10 @@ namespace soulcm.scmlg
                 UniquePtr<Cm.Ast.ExpressionStatementNode> setKeywordMapStmt(new Cm.Ast.ExpressionStatementNode(System.Lex.Span(), invokeSetKeywordMap.Release()));
                 contentCtorBody->AddStatement(setKeywordMapStmt.Release());
             }
+            UniquePtr<Cm.Ast.InvokeNode> invokeInitClassMap(new Cm.Ast.InvokeNode(System.Lex.Span(), new Cm.Ast.DotNode(System.Lex.Span(),
+                new Cm.Ast.IdentifierNode(System.Lex.Span(), lexerContext.GetClassMap()->Name()), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"Init"))));
+            UniquePtr<Cm.Ast.ExpressionStatementNode>  initClassMapStmt(new Cm.Ast.ExpressionStatementNode(System.Lex.Span(), invokeInitClassMap.Release()));
+            contentCtorBody->AddStatement(initClassMapStmt.Release());
             contentCtor->SetBody(contentCtorBody.Release());
             classNode->AddMember(contentCtor.Release());
             UniquePtr<Cm.Ast.ConstructorNode> startCtor(new Cm.Ast.ConstructorNode(System.Lex.Span(), Specifiers.public_, null));
@@ -649,12 +653,17 @@ namespace soulcm.scmlg
                 UniquePtr<Cm.Ast.ExpressionStatementNode> setKeywordMapStmt2(new Cm.Ast.ExpressionStatementNode(System.Lex.Span(), invokeSetKeywordMap2.Release()));
                 startCtorBody->AddStatement(setKeywordMapStmt2.Release());
             }
+            UniquePtr<Cm.Ast.InvokeNode> invokeInitClassMap2(new Cm.Ast.InvokeNode(System.Lex.Span(), new Cm.Ast.DotNode(System.Lex.Span(),
+                new Cm.Ast.IdentifierNode(System.Lex.Span(), lexerContext.GetClassMap()->Name()), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"Init"))));
+            UniquePtr<Cm.Ast.ExpressionStatementNode>  initClassMapStmt2(new Cm.Ast.ExpressionStatementNode(System.Lex.Span(), invokeInitClassMap2.Release()));
+            startCtorBody->AddStatement(initClassMapStmt2.Release());
             startCtor->SetBody(startCtorBody.Release());
             classNode->AddMember(startCtor.Release());
             UniquePtr<Cm.Ast.MemberFunctionNode> nextStateMemFun(new Cm.Ast.MemberFunctionNode(System.Lex.Span(), Specifiers.public_ | Specifiers.override_, new Cm.Ast.IntNode(System.Lex.Span()), u"NextState", null));
             nextStateMemFun->AddParameter(new Cm.Ast.ParameterNode(System.Lex.Span(), new Cm.Ast.IntNode(System.Lex.Span()), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"state")));
             nextStateMemFun->AddParameter(new Cm.Ast.ParameterNode(System.Lex.Span(), new Cm.Ast.UCharNode(System.Lex.Span()), new Cm.Ast.IdentifierNode(System.Lex.Span(), u"c")));
             UniquePtr<Cm.Ast.CompoundStatementNode> nextStateMemFunBody(new Cm.Ast.CompoundStatementNode(System.Lex.Span()));
+
             string classMapName = "ClassMap";
             if ((lexerContext.GetClassMap() != null))
             {
@@ -832,7 +841,7 @@ namespace soulcm.scmlg
             declarations.Add(UniquePtr<Declaration>(declaration));
             declarationMap[declaration->Name()] = declaration;
         }
-        public void Process(const string& root, bool verbose, bool debug, LexerContext& lexerContext)
+        public void Process(const string& root, bool verbose, bool debug, bool noClassMapCompression, LexerContext& lexerContext)
         {
             for (UniquePtr<Declaration>& d : declarations)
             {
@@ -852,7 +861,7 @@ namespace soulcm.scmlg
             }
             lexerContext.MakeCanonicalClasses();
             lexerContext.MakeClassPartition(debug);
-            lexerContext.MakeClassMap(root, verbose);
+            lexerContext.MakeClassMap(root, verbose, noClassMapCompression);
             lexerContext.GetLexer()->MakeMasterNfa(lexerContext);
             lexerContext.GetLexer()->MakeDfa(lexerContext);
             lexerContext.GetLexer()->WriteAutomaton(root, verbose, lexerContext);

@@ -59,223 +59,53 @@ public static class HttpMediaTypeParser
             Match match(false);
             Match* parentMatch1 = &match;
             {
+                long pos = lexer.GetPos();
                 Match match(false);
                 Match* parentMatch2 = &match;
                 {
-                    Match match(true);
-                    long save = lexer.GetPos();
+                    Match match(false);
                     Match* parentMatch3 = &match;
                     {
                         Match match(false);
-                        if (*lexer == LWS)
+                        Match* parentMatch4 = &match;
                         {
-                            ++lexer;
-                            match.hit = true;
+                            Match match = HttpMediaTypeParser.Type(lexer);
+                            t.Reset(cast<Value<string>*>(match.value));
+                            *parentMatch4 = match;
                         }
                         if (match.hit)
                         {
-                            *parentMatch3 = match;
+                            Match match(false);
+                            Match* parentMatch5 = &match;
+                            {
+                                Match match(false);
+                                if (*lexer == SLASH)
+                                {
+                                    ++lexer;
+                                    match.hit = true;
+                                }
+                                *parentMatch5 = match;
+                            }
+                            *parentMatch4 = match;
                         }
-                        else
+                        *parentMatch3 = match;
+                    }
+                    if (match.hit)
+                    {
+                        Match match(false);
+                        Match* parentMatch6 = &match;
                         {
-                            lexer.SetPos(save);
+                            Match match = HttpMediaTypeParser.Subtype(lexer);
+                            st.Reset(cast<Value<string>*>(match.value));
+                            *parentMatch6 = match;
                         }
+                        *parentMatch3 = match;
                     }
                     *parentMatch2 = match;
                 }
                 if (match.hit)
                 {
-                    Match match(false);
-                    Match* parentMatch4 = &match;
-                    {
-                        Match match(false);
-                        Match* parentMatch5 = &match;
-                        {
-                            long pos = lexer.GetPos();
-                            Match match(false);
-                            Match* parentMatch6 = &match;
-                            {
-                                Match match(false);
-                                Match* parentMatch7 = &match;
-                                {
-                                    Match match(false);
-                                    Match* parentMatch8 = &match;
-                                    {
-                                        Match match = HttpMediaTypeParser.Type(lexer);
-                                        t.Reset(cast<Value<string>*>(match.value));
-                                        *parentMatch8 = match;
-                                    }
-                                    if (match.hit)
-                                    {
-                                        Match match(false);
-                                        Match* parentMatch9 = &match;
-                                        {
-                                            Match match(false);
-                                            if (*lexer == SLASH)
-                                            {
-                                                ++lexer;
-                                                match.hit = true;
-                                            }
-                                            *parentMatch9 = match;
-                                        }
-                                        *parentMatch8 = match;
-                                    }
-                                    *parentMatch7 = match;
-                                }
-                                if (match.hit)
-                                {
-                                    Match match(false);
-                                    Match* parentMatch10 = &match;
-                                    {
-                                        Match match = HttpMediaTypeParser.Subtype(lexer);
-                                        st.Reset(cast<Value<string>*>(match.value));
-                                        *parentMatch10 = match;
-                                    }
-                                    *parentMatch7 = match;
-                                }
-                                *parentMatch6 = match;
-                            }
-                            if (match.hit)
-                            {
-                                mimeType->SetValue(t->value, st->value);
-                            }
-                            *parentMatch5 = match;
-                        }
-                        *parentMatch4 = match;
-                    }
-                    *parentMatch2 = match;
-                }
-                *parentMatch1 = match;
-            }
-            if (match.hit)
-            {
-                Match match(false);
-                Match* parentMatch11 = &match;
-                {
-                    Match match(true);
-                    Match* parentMatch12 = &match;
-                    {
-                        while (true)
-                        {
-                            long save = lexer.GetPos();
-                            {
-                                Match match(false);
-                                Match* parentMatch13 = &match;
-                                {
-                                    Match match(false);
-                                    Match* parentMatch14 = &match;
-                                    {
-                                        Match match(false);
-                                        Match* parentMatch15 = &match;
-                                        {
-                                            Match match(false);
-                                            Match* parentMatch16 = &match;
-                                            {
-                                                Match match(true);
-                                                long save = lexer.GetPos();
-                                                Match* parentMatch17 = &match;
-                                                {
-                                                    Match match(false);
-                                                    if (*lexer == LWS)
-                                                    {
-                                                        ++lexer;
-                                                        match.hit = true;
-                                                    }
-                                                    if (match.hit)
-                                                    {
-                                                        *parentMatch17 = match;
-                                                    }
-                                                    else
-                                                    {
-                                                        lexer.SetPos(save);
-                                                    }
-                                                }
-                                                *parentMatch16 = match;
-                                            }
-                                            if (match.hit)
-                                            {
-                                                Match match(false);
-                                                Match* parentMatch18 = &match;
-                                                {
-                                                    Match match(false);
-                                                    if (*lexer == SEMICOLON)
-                                                    {
-                                                        ++lexer;
-                                                        match.hit = true;
-                                                    }
-                                                    *parentMatch18 = match;
-                                                }
-                                                *parentMatch16 = match;
-                                            }
-                                            *parentMatch15 = match;
-                                        }
-                                        if (match.hit)
-                                        {
-                                            Match match(false);
-                                            Match* parentMatch19 = &match;
-                                            {
-                                                Match match(true);
-                                                long save = lexer.GetPos();
-                                                Match* parentMatch20 = &match;
-                                                {
-                                                    Match match(false);
-                                                    if (*lexer == LWS)
-                                                    {
-                                                        ++lexer;
-                                                        match.hit = true;
-                                                    }
-                                                    if (match.hit)
-                                                    {
-                                                        *parentMatch20 = match;
-                                                    }
-                                                    else
-                                                    {
-                                                        lexer.SetPos(save);
-                                                    }
-                                                }
-                                                *parentMatch19 = match;
-                                            }
-                                            *parentMatch15 = match;
-                                        }
-                                        *parentMatch14 = match;
-                                    }
-                                    if (match.hit)
-                                    {
-                                        Match match(false);
-                                        Match* parentMatch21 = &match;
-                                        {
-                                            Match match(false);
-                                            Match* parentMatch22 = &match;
-                                            {
-                                                long pos = lexer.GetPos();
-                                                Match match = Http.parameter(lexer);
-                                                p.Reset(cast<Value<Pair<string, string>>*>(match.value));
-                                                if (match.hit)
-                                                {
-                                                    param = p->value;
-                                                    mimeType->SetParameter(param.first, param.second);
-                                                }
-                                                *parentMatch22 = match;
-                                            }
-                                            *parentMatch21 = match;
-                                        }
-                                        *parentMatch14 = match;
-                                    }
-                                    *parentMatch13 = match;
-                                }
-                                if (match.hit)
-                                {
-                                    *parentMatch12 = match;
-                                }
-                                else
-                                {
-                                    lexer.SetPos(save);
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                    *parentMatch11 = match;
+                    mimeType->SetValue(t->value, st->value);
                 }
                 *parentMatch1 = match;
             }
@@ -284,28 +114,122 @@ public static class HttpMediaTypeParser
         if (match.hit)
         {
             Match match(false);
-            Match* parentMatch23 = &match;
+            Match* parentMatch7 = &match;
             {
                 Match match(true);
-                long save = lexer.GetPos();
-                Match* parentMatch24 = &match;
+                Match* parentMatch8 = &match;
                 {
-                    Match match(false);
-                    if (*lexer == LWS)
+                    while (true)
                     {
-                        ++lexer;
-                        match.hit = true;
-                    }
-                    if (match.hit)
-                    {
-                        *parentMatch24 = match;
-                    }
-                    else
-                    {
-                        lexer.SetPos(save);
+                        long save = lexer.GetPos();
+                        {
+                            Match match(false);
+                            Match* parentMatch9 = &match;
+                            {
+                                Match match(false);
+                                Match* parentMatch10 = &match;
+                                {
+                                    Match match(false);
+                                    Match* parentMatch11 = &match;
+                                    {
+                                        Match match(false);
+                                        Match* parentMatch12 = &match;
+                                        {
+                                            Match match(true);
+                                            long save = lexer.GetPos();
+                                            Match* parentMatch13 = &match;
+                                            {
+                                                Match match = Http.lws(lexer);
+                                                if (match.hit)
+                                                {
+                                                    *parentMatch13 = match;
+                                                }
+                                                else
+                                                {
+                                                    lexer.SetPos(save);
+                                                }
+                                            }
+                                            *parentMatch12 = match;
+                                        }
+                                        if (match.hit)
+                                        {
+                                            Match match(false);
+                                            Match* parentMatch14 = &match;
+                                            {
+                                                Match match(false);
+                                                if (*lexer == SEMICOLON)
+                                                {
+                                                    ++lexer;
+                                                    match.hit = true;
+                                                }
+                                                *parentMatch14 = match;
+                                            }
+                                            *parentMatch12 = match;
+                                        }
+                                        *parentMatch11 = match;
+                                    }
+                                    if (match.hit)
+                                    {
+                                        Match match(false);
+                                        Match* parentMatch15 = &match;
+                                        {
+                                            Match match(true);
+                                            long save = lexer.GetPos();
+                                            Match* parentMatch16 = &match;
+                                            {
+                                                Match match = Http.lws(lexer);
+                                                if (match.hit)
+                                                {
+                                                    *parentMatch16 = match;
+                                                }
+                                                else
+                                                {
+                                                    lexer.SetPos(save);
+                                                }
+                                            }
+                                            *parentMatch15 = match;
+                                        }
+                                        *parentMatch11 = match;
+                                    }
+                                    *parentMatch10 = match;
+                                }
+                                if (match.hit)
+                                {
+                                    Match match(false);
+                                    Match* parentMatch17 = &match;
+                                    {
+                                        Match match(false);
+                                        Match* parentMatch18 = &match;
+                                        {
+                                            long pos = lexer.GetPos();
+                                            Match match = Http.parameter(lexer);
+                                            p.Reset(cast<Value<Pair<string, string>>*>(match.value));
+                                            if (match.hit)
+                                            {
+                                                param = p->value;
+                                                mimeType->SetParameter(param.first, param.second);
+                                            }
+                                            *parentMatch18 = match;
+                                        }
+                                        *parentMatch17 = match;
+                                    }
+                                    *parentMatch10 = match;
+                                }
+                                *parentMatch9 = match;
+                            }
+                            if (match.hit)
+                            {
+                                *parentMatch8 = match;
+                            }
+                            else
+                            {
+                                lexer.SetPos(save);
+                                break;
+                            }
+                        }
                     }
                 }
-                *parentMatch23 = match;
+                *parentMatch7 = match;
             }
             *parentMatch0 = match;
         }

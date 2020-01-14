@@ -1,5 +1,5 @@
 // =================================
-// Copyright (c) 2019 Seppo Laakko
+// Copyright (c) 2020 Seppo Laakko
 // Distributed under the MIT license
 // =================================
 
@@ -8,6 +8,7 @@ using System.Collections;
 
 namespace System.Windows.API
 {
+    public const long ERROR_DUPLICATE_CODE_MAPPING = -2;
     public const long ERROR_CODE_NOT_FOUND = -1;
     public const long ERROR_OUT_OF_RESOURCES = 0;
     public const long ERROR_FILE_NOT_FOUND = 1;
@@ -146,6 +147,10 @@ namespace System.Windows.API
             string error = "out of resources";
             switch (errorCode)
             {
+                case ERROR_DUPLICATE_CODE_MAPPING:
+                {
+                    error = "duplicate code mapping detected"; break;
+                }
                 case ERROR_CODE_NOT_FOUND:
                 {
                     error = "code not found"; break;

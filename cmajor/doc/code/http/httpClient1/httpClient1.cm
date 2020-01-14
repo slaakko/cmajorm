@@ -7,10 +7,10 @@ int main()
 {
     try
     {
-        HttpClient httpClient(UriReference(u"http://www.w3.org/"), &Console.Out());
+        HttpClient httpClient(UriReference("http://www.w3.org/"), &Console.Out());
         HttpHeaderCollection responseHeaders;
         SharedPtr<ByteStream> body;
-        UriReference uri = u"/2001/xml.xsd";
+        UriReference uri = "/2001/xml.xsd";
         HttpStatus status = httpClient.Get(uri, responseHeaders, body);
         if (status.StatusCode() == statusSuccessOK)
         {

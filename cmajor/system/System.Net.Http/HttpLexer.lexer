@@ -2,9 +2,9 @@ classmap HttpClassMap;
 
 tokens HttpTokens
 {
-    (DIGIT, "'digit'"), (HEX, "'hex'"), (ALPHA, "'alpha'"), (HT, "'\t'"), (DQ, "'dq'"), (CR, "'\r'"), (LF, "'\n'"), (CTL, "'ctl'"), (SP, "' '"), (LWS, "'lws'"), 
-    (COLON, "'colon'"), (SEMICOLON, "';'"), (AT, "'@'"), (COMMA, "','"), (DOT, "'.'"), (LPAREN, "'('"), (RPAREN, "')'"), (LANGLE, "'<'"), (RANGLE, "'>'"), (LBRACKET, "'['"), (RBRACKET, "']'"), (LBRACE, "'{'"), (RBRACE, "'}'"),
-    (SLASH, "'/'"), (BACKSLASH, "'\\'"), (QUEST, "'?'"), (EQ, "'='"),
+    (DIGIT, "'digit'"), (HEX, "'hex'"), (ALPHA, "'alpha'"), (HT, "'\t'"), (DQ, "'dq'"), (CR, "'\r'"), (LF, "'\n'"), (CTL, "'ctl'"), (SP, "' '"),
+    (COLON, "'colon'"), (SEMICOLON, "';'"), (AT, "'@'"), (COMMA, "','"), (DOT, "'.'"), (LPAREN, "'('"), (RPAREN, "')'"), (LANGLE, "'<'"),
+    (RANGLE, "'>'"), (LBRACKET, "'['"), (RBRACKET, "']'"), (LBRACE, "'{'"), (RBRACE, "'}'"), (SLASH, "'/'"), (BACKSLASH, "'\\'"), (QUEST, "'?'"), (EQ, "'='"),
     (CHAR, "'char'"), (TEXT, "'text'"), (OCTET, "'octet'")
 }
 
@@ -19,8 +19,6 @@ expressions
     lf = "\n";
     ctl = "[\x0-\x1f\x7f]";
     sp = " ";
-    lwspc = "{sp}|{ht}";
-    lws = "(({cr}{lf})?{lwspc})+";
     colon = ":";
     semicolon = ";";
     at = "@";
@@ -54,7 +52,6 @@ lexer HttpLexer
     "{lf}"{ return LF; }
     "{ctl}"{ return CTL; }
     "{sp}"{ return SP; }
-    "{lws}"{ return LWS; }
     "{colon}"{ return COLON; }
     "{semicolon}"{ return SEMICOLON; }
     "{at}"{ return AT; }

@@ -7,9 +7,9 @@ void main()
 {
     try
     {
-        UniquePtr<DomDocument> doc = ParseXmlFileToDomDocument("test.xml");
+        UniquePtr<Document> doc = ReadDocument("test.xml");
         UniquePtr<XPathObject> result = Evaluate(u"/test/alpha[@a=\"1\"]/beta/gamma/text()", doc.Get());
-        UniquePtr<DomNode> resultAsDom = result->ToDom();
+        UniquePtr<Node> resultAsDom = result->ToDom();
         CodeFormatter formatter(Console.Out());
         resultAsDom->Write(formatter);
     }

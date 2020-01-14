@@ -9,16 +9,17 @@ parser HttpFieldValueParser
     using Http.token;
     using Http.attribute;
     using Http.attrval;
+    using Http.lws;
  
     CommaSeparatedFieldValue(List<HttpFieldValue>* values)
-        ::= LWS? GeneralFieldValue(values):gfv1 (LWS? COMMA LWS? GeneralFieldValue(values):gfv2)* LWS?
+        ::= GeneralFieldValue(values):gfv1 (lws:lws1? COMMA lws:lws2? GeneralFieldValue(values):gfv2)*
         ;
     
     GeneralFieldValue(List<HttpFieldValue>* values, var HttpFieldValue fieldValue)
-        ::= (token:t{ fieldValue.SetFieldValue(t); } (SEMICOLON GeneralParameter(&fieldValue):gp)*){ values->Add(fieldValue); }
+        ::= (token:t{ fieldValue.SetFieldValue(t); } (SEMICOLON lws:lws1? GeneralParameter(&fieldValue):gp)*){ values->Add(fieldValue); }
         ;
     
     GeneralParameter(HttpFieldValue* fieldValue)
-        ::= (attribute:a (LWS? EQ LWS? attrval:av)?){ fieldValue->SetParameter(a, av); }
+        ::= (attribute:a (EQ attrval:av)?){ fieldValue->SetParameter(a, av); }
         ;
 }

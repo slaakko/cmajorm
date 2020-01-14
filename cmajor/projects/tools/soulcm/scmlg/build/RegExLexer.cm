@@ -9,10 +9,12 @@ public class RegExLexer : System.Lex.Lexer
     public RegExLexer(const ustring& content_, const string& fileName_, int fileIndex_) :
         base(content_, fileName_, fileIndex_)
     {
+        RegExClassMap.Init();
     }
     public RegExLexer(const uchar* start_, const uchar* end_, const string& fileName_, int fileIndex_) :
         base(start_, end_, fileName_, fileIndex_)
     {
+        RegExClassMap.Init();
     }
     public override int NextState(int state, uchar c)
     {

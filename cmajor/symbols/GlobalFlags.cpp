@@ -76,7 +76,7 @@ int GetOptimizationLevel()
     {
         if (GetGlobalFlag(GlobalFlags::release))
         {
-            return 3;
+            return 2;
         }
         else
         {

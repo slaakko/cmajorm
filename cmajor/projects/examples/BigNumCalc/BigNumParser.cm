@@ -1,0 +1,27 @@
+using System;
+using System.Lex;
+using System.Numerics.Multiprecision;
+
+namespace BigNumCalc
+{
+    public BigValue* ParseBigFloat(const Token& token)
+    {
+        BigFloat value(ToUtf8(token.match.ToString()));
+        return new BigFloatValue(value);
+    }
+    
+    public BigValue* ParseBigRational(const Token& token)
+    {
+        long n = token.match.end - token.match.begin;
+        #assert(n >= 2 && *token.match.begin == '[' && *(token.match.end - 1) == ']');
+        string s = ToUtf8(token.match.ToString());
+        BigRational value(s.Substring(1, s.Length() - 2));
+        return new BigRationalValue(value);
+    }
+    
+    public BigValue* ParseBigInteger(const Token& token)
+    {
+        BigInt value(ToUtf8(token.match.ToString()));
+        return new BigIntValue(value);
+    }
+}

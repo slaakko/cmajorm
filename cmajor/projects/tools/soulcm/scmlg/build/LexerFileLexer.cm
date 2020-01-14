@@ -10,11 +10,13 @@ public class LexerFileLexer : System.Lex.Lexer
         base(content_, fileName_, fileIndex_), floatingLit(), floatingLitFloat(), intLit(), intLitUnsigned(), chrLit(), chrLitPrefix(), strLit(), strLitPrefix(), leftAngleCount(), parsingOperatorFunctionGroupId()
     {
         SetKeywordMap(LexerFileKeywords.GetKeywordMap());
+        LexerFileClassMap.Init();
     }
     public LexerFileLexer(const uchar* start_, const uchar* end_, const string& fileName_, int fileIndex_) :
         base(start_, end_, fileName_, fileIndex_), floatingLit(), floatingLitFloat(), intLit(), intLitUnsigned(), chrLit(), chrLitPrefix(), strLit(), strLitPrefix(), leftAngleCount(), parsingOperatorFunctionGroupId()
     {
         SetKeywordMap(LexerFileKeywords.GetKeywordMap());
+        LexerFileClassMap.Init();
     }
     public override int NextState(int state, uchar c)
     {

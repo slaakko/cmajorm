@@ -3,24 +3,24 @@ using System.Dom;
 using System.IO;
 using System.Text;
 
-public UniquePtr<DomDocument> CreateDoc()
+public UniquePtr<Document> CreateDoc()
 {
-    UniquePtr<DomDocument> doc(new DomDocument());
-    UniquePtr<DomElement> phs(new DomElement(u"philosophers"));
-    UniquePtr<DomElement> ph1(new DomElement(u"philosopher"));
+    UniquePtr<Document> doc(new Document());
+    UniquePtr<Element> phs(new Element(u"philosophers"));
+    UniquePtr<Element> ph1(new Element(u"philosopher"));
     ph1->SetAttribute(u"name", u"Plato");
-    phs->AppendChild(UniquePtr<DomNode>(ph1.Release()));
-    UniquePtr<DomElement> ph2(new DomElement(u"philosopher"));
+    phs->AppendChild(UniquePtr<Node>(ph1.Release()));
+    UniquePtr<Element> ph2(new Element(u"philosopher"));
     ph2->SetAttribute(u"name", u"Aristotle");
-    phs->AppendChild(UniquePtr<DomNode>(ph2.Release()));
-    UniquePtr<DomElement> ph3(new DomElement(u"philosopher"));
+    phs->AppendChild(UniquePtr<Node>(ph2.Release()));
+    UniquePtr<Element> ph3(new Element(u"philosopher"));
     ph3->SetAttribute(u"name", u"Socrates");
-    phs->AppendChild(UniquePtr<DomNode>(ph3.Release()));
-    doc->AppendChild(UniquePtr<DomNode>(phs.Release()));
+    phs->AppendChild(UniquePtr<Node>(ph3.Release()));
+    doc->AppendChild(UniquePtr<Node>(phs.Release()));
     return doc;
 }
 
-public void WriteDocToFile(DomDocument* doc)
+public void WriteDocToFile(Document* doc)
 {
     StreamWriter writer = File.CreateText("philosophers.xml");
     CodeFormatter formatter(writer);
@@ -28,13 +28,13 @@ public void WriteDocToFile(DomDocument* doc)
     doc->Write(formatter);
 }
 
-public UniquePtr<DomDocument> ReadDocFromFile()
+public UniquePtr<Document> ReadDocFromFile()
 {
-    UniquePtr<DomDocument> doc = ParseXmlFileToDomDocument("philosophers.xml");
+    UniquePtr<Document> doc = ReadDocument("philosophers.xml");
     return doc;
 }
 
-public void WriteDocToConsole(DomDocument* doc)
+public void WriteDocToConsole(Document* doc)
 {
     CodeFormatter formatter(Console.Out());
     formatter.SetIndentSize(4);
@@ -45,9 +45,9 @@ int main()
 {
     try
     {
-        UniquePtr<DomDocument> doc = CreateDoc();
+        UniquePtr<Document> doc = CreateDoc();
         WriteDocToFile(doc.Get());
-        UniquePtr<DomDocument> docRead = ReadDocFromFile();
+        UniquePtr<Document> docRead = ReadDocFromFile();
         WriteDocToConsole(docRead.Get());
     }
     catch (const Exception& ex)

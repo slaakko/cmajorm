@@ -439,6 +439,10 @@ bool GenerateNamespaceNames(int level, sngxml::dom::Element* namespaceTableEleme
             if (nsNode->GetNodeType() == sngxml::dom::NodeType::elementNode)
             {
                 sngxml::dom::Element* nsElement = static_cast<sngxml::dom::Element*>(nsNode);
+                if (nsElement->GetAttribute(U"name").find(U"unnamed_ns_") != std::u32string::npos)
+                {
+                    continue;
+                }
                 nsElements.push_back(nsElement);
                 std::unique_ptr<sngxml::dom::Element> trElement(new sngxml::dom::Element(U"tr"));
                 for (int l = 0; l < level; ++l)
@@ -2527,8 +2531,8 @@ void GenerateClassDoc(Input* input, const std::string& docDir, sngxml::dom::Elem
             tdElement->SetAttribute(U"class", U"rightAlignedCol");
             AppendSpecifiers(tdElement.get(), constantElement->GetAttribute(U"specifiers"), U"const", true);
             AppendType(input, tdElement.get(), constantElement->GetAttribute(U"type"), U"CONSTANT_TYPE", moduleXmlDoc, otherModuleXmlDocs, std::u32string());
-            tdElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::EntityReference(U"nbsp")));
-            tdElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::Text(constantElement->GetAttribute(U"name"))));
+            //tdElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::EntityReference(U"nbsp")));
+            //tdElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::Text(constantElement->GetAttribute(U"name"))));
             trElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(tdElement.release()));
             std::unique_ptr<sngxml::dom::Element> td2Element(new sngxml::dom::Element(U"td"));
             td2Element->SetAttribute(U"xml:space", U"preserve");
@@ -3221,8 +3225,8 @@ void GenerateNamespaceDoc(Input* input, const std::string& docDir, sngxml::dom::
             tdElement->SetAttribute(U"class", U"rightAlignedCol");
             AppendSpecifiers(tdElement.get(), constantElement->GetAttribute(U"specifiers"), U"const", true);
             AppendType(input, tdElement.get(), constantElement->GetAttribute(U"type"), U"CONSTANT_TYPE", moduleXmlDoc, otherModuleXmlDocs, std::u32string());
-            tdElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::EntityReference(U"nbsp")));
-            tdElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::Text(constantElement->GetAttribute(U"name"))));
+            //tdElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::EntityReference(U"nbsp")));
+            //tdElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::Text(constantElement->GetAttribute(U"name"))));
             trElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(tdElement.release()));
             std::unique_ptr<sngxml::dom::Element> td2Element(new sngxml::dom::Element(U"td"));
             td2Element->SetAttribute(U"xml:space", U"preserve");
@@ -3664,8 +3668,8 @@ void GenerateModuleIndexHtml(Input* input, const std::string& moduleDir, const s
                 tdElement->SetAttribute(U"class", U"rightAlignedCol");
                 AppendSpecifiers(tdElement.get(), constantElement->GetAttribute(U"specifiers"), U"const", true);
                 AppendType(input, tdElement.get(), constantElement->GetAttribute(U"type"), U"CONSTANT_TYPE", moduleXmlDoc, otherModuleXmlDocs, U"doc/");
-                tdElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::EntityReference(U"nbsp")));
-                tdElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::Text(constantElement->GetAttribute(U"name"))));
+                //tdElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::EntityReference(U"nbsp")));
+                //tdElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::Text(constantElement->GetAttribute(U"name"))));
                 trElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(tdElement.release()));
                 std::unique_ptr<sngxml::dom::Element> td2Element(new sngxml::dom::Element(U"td"));
                 td2Element->SetAttribute(U"xml:space", U"preserve");
@@ -3736,7 +3740,7 @@ void BuildDocs(const std::u32string& solutionName, const std::vector<std::u32str
         std::string grammarXmlFilePath = GetFullPath(Path::Combine(moduleDir, "grammars.xml"));
         std::string relativeModuleDir = Path::Combine("content", moduleNameStr);
         std::vector<GrammarInfo> grammars;
-        BuildParserDocs(input, moduleDir, grammarXmlFilePath, relativeModuleDir, grammarFilePaths, moduleName, grammars);
+        //BuildParserDocs(input, moduleDir, grammarXmlFilePath, relativeModuleDir, grammarFilePaths, moduleName, grammars);
         sngxml::dom::Document* moduleXmlDoc = moduleXmlFiles[i].get();
         std::vector<sngxml::dom::Document*> otherModuleXmlDocs;
         {

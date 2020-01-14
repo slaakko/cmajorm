@@ -270,14 +270,14 @@ function drawInheritanceDiagram() {
     var diagramNodes = [
         { name: "System.BinaryFun&lt;Argument1, Argument2, bool&gt;", id: "diagram_node_0", level: 0, subject: false, hasDerivedNodes: true, link: "../../System.Base/doc/class_BinaryFun_Argument1_Argument2_Result_C08E8CBE9076AC91A0EC9B3BC2A455014F71ED1F.html" },
         { name: "System.BinaryPred&lt;Argument1, Argument2&gt;", id: "diagram_node_1", level: 1, subject: true, hasDerivedNodes: true, link: "../../System.Base/doc/class_BinaryPred_Argument1_Argument2_0A37E09D22B252A20EF8DF63EF9141AFCB031BB4.html" },
-        { name: "System.EqualTo&lt;T, U&gt;", id: "diagram_node_3", level: 2, subject: false, hasDerivedNodes: false, link: "../../System.Base/doc/class_EqualTo_T_U_5246CB25ED487120E98F2B8A0E795C0CF03A3C9D.html" },
-        { name: "System.Greater&lt;T, U&gt;", id: "diagram_node_5", level: 2, subject: false, hasDerivedNodes: false, link: "../../System.Base/doc/class_Greater_T_U_20894328C5991937D304402D5BB48ACBCF150664.html" },
+        { name: "System.EqualTo&lt;T, U&gt;", id: "diagram_node_2", level: 2, subject: false, hasDerivedNodes: false, link: "../../System.Base/doc/class_EqualTo_T_U_5246CB25ED487120E98F2B8A0E795C0CF03A3C9D.html" },
+        { name: "System.Greater&lt;T, U&gt;", id: "diagram_node_4", level: 2, subject: false, hasDerivedNodes: false, link: "../../System.Base/doc/class_Greater_T_U_20894328C5991937D304402D5BB48ACBCF150664.html" },
         { name: "System.GreaterOrEqualTo&lt;T, U&gt;", id: "diagram_node_6", level: 2, subject: false, hasDerivedNodes: false, link: "../../System.Base/doc/class_GreaterOrEqualTo_T_U_B4DE9B7C0C023429948DD3D6C6018755B584012D.html" },
-        { name: "System.Less&lt;T, U&gt;", id: "diagram_node_8", level: 2, subject: false, hasDerivedNodes: false, link: "../../System.Base/doc/class_Less_T_U_4BF240D04EE3CC14E87CD6D7F17521A032D30FB3.html" },
+        { name: "System.Less&lt;T, U&gt;", id: "diagram_node_7", level: 2, subject: false, hasDerivedNodes: false, link: "../../System.Base/doc/class_Less_T_U_4BF240D04EE3CC14E87CD6D7F17521A032D30FB3.html" },
         { name: "System.LessOrEqualTo&lt;T, U&gt;", id: "diagram_node_9", level: 2, subject: false, hasDerivedNodes: false, link: "../../System.Base/doc/class_LessOrEqualTo_T_U_6B4FD2EAAF9B57919CFBF0B07D5B83DFBE7C1C83.html" },
-        { name: "System.LogicalAnd&lt;T&gt;", id: "diagram_node_7", level: 2, subject: false, hasDerivedNodes: false, link: "../../System.Base/doc/class_LogicalAnd_T_E35A5C58E5FFDEFC94BC4F4A396B315039492654.html" },
-        { name: "System.LogicalOr&lt;T&gt;", id: "diagram_node_2", level: 2, subject: false, hasDerivedNodes: false, link: "../../System.Base/doc/class_LogicalOr_T_7F2F87F001DF8F564ABE5F63CCA120661CE54294.html" },
-        { name: "System.NotEqualTo&lt;T, U&gt;", id: "diagram_node_4", level: 2, subject: false, hasDerivedNodes: false, link: "../../System.Base/doc/class_NotEqualTo_T_U_4F5ED40C402A34550F8A6C43C05A6CE2A0895409.html" },
+        { name: "System.LogicalAnd&lt;T&gt;", id: "diagram_node_8", level: 2, subject: false, hasDerivedNodes: false, link: "../../System.Base/doc/class_LogicalAnd_T_E35A5C58E5FFDEFC94BC4F4A396B315039492654.html" },
+        { name: "System.LogicalOr&lt;T&gt;", id: "diagram_node_3", level: 2, subject: false, hasDerivedNodes: false, link: "../../System.Base/doc/class_LogicalOr_T_7F2F87F001DF8F564ABE5F63CCA120661CE54294.html" },
+        { name: "System.NotEqualTo&lt;T, U&gt;", id: "diagram_node_5", level: 2, subject: false, hasDerivedNodes: false, link: "../../System.Base/doc/class_NotEqualTo_T_U_4F5ED40C402A34550F8A6C43C05A6CE2A0895409.html" },
         { name: "System.Rel&lt;Argument&gt;", id: "diagram_node_10", level: 2, subject: false, hasDerivedNodes: false, link: "../../System.Base/doc/class_Rel_Argument_E8617BA707A447FA873DA26388F823802164C257.html" }];
     drawDiagram(diagramNodes);
 }

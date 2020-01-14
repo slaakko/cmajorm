@@ -6,7 +6,7 @@
  </head>
  <body>
   <h1>System.Runtime Module</h1>
-  <p class="description" xml:space="preserve">The System.Runtime module contains symbols for functions that form the lowest level of the Cmajor runtime library. The functions themselves are defined in the <a href="https://github.com/slaakko/cmajorw64/tree/master/cmajor/rt"> rt</a> library written in C++.</p>
+  <p class="description" xml:space="preserve">The System.Runtime module contains symbols for functions that form the lowest level of the Cmajor runtime library. The functions themselves are defined in the <a href="../compiler/reference/rt/rt.html"> rt</a> library written in C++.</p>
   <h2>Namespaces</h2>
   <table>
    <tr>
@@ -37,6 +37,9 @@
    </tr>
    <tr>
     <td xml:space="preserve"><a href="file/StaticInitCriticalSection.cm.html">System.Runtime/StaticInitCriticalSection.cm</a></td>
+   </tr>
+   <tr>
+    <td xml:space="preserve"><a href="file/Win.cm.html">System.Runtime/Win.cm</a></td>
    </tr>
   </table>
   <h2>Functions</h2>
@@ -1125,420 +1128,468 @@
     <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">short</span></td>
     <td xml:space="preserve"><a href="doc/../../System.Runtime/doc/../index.html#RtYellow">RtYellow</a>()</td>
    </tr>
+   <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">bool</span></td>
+    <td xml:space="preserve"><a href="doc/../../System.Runtime/doc/../index.html#WinCloseHandle">WinCloseHandle</a>(<span class="kw">void</span>*&nbsp;handle)</td>
+   </tr>
+   <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span>*</td>
+    <td xml:space="preserve"><a href="doc/../../System.Runtime/doc/../index.html#WinCreateEvent">WinCreateEvent</a>()</td>
+   </tr>
+   <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">bool</span></td>
+    <td xml:space="preserve"><a href="doc/../../System.Runtime/doc/../index.html#WinFindCloseChangeNotification">WinFindCloseChangeNotification</a>(<span class="kw">void</span>*&nbsp;handle)</td>
+   </tr>
+   <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span>*</td>
+    <td xml:space="preserve"><a href="doc/../../System.Runtime/doc/../index.html#WinFindFirstChangeNotification">WinFindFirstChangeNotification</a>(<span class="kw">const</span>&nbsp;<span class="kw">char</span>*&nbsp;directoryPath)</td>
+   </tr>
+   <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">bool</span></td>
+    <td xml:space="preserve"><a href="doc/../../System.Runtime/doc/../index.html#WinFindNextChangeNotification">WinFindNextChangeNotification</a>(<span class="kw">void</span>*&nbsp;handle)</td>
+   </tr>
+   <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span></td>
+    <td xml:space="preserve"><a href="doc/../../System.Runtime/doc/../index.html#WinFormatMessage">WinFormatMessage</a>(<span class="kw">ulong</span>&nbsp;errorCode, <span class="kw">char</span>*&nbsp;buffer)</td>
+   </tr>
+   <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">ulong</span></td>
+    <td xml:space="preserve"><a href="doc/../../System.Runtime/doc/../index.html#WinGetLastError">WinGetLastError</a>()</td>
+   </tr>
+   <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">bool</span></td>
+    <td xml:space="preserve"><a href="doc/../../System.Runtime/doc/../index.html#WinResetEvent">WinResetEvent</a>(<span class="kw">void</span>*&nbsp;eventHandle)</td>
+   </tr>
+   <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">bool</span></td>
+    <td xml:space="preserve"><a href="doc/../../System.Runtime/doc/../index.html#WinSetEvent">WinSetEvent</a>(<span class="kw">void</span>*&nbsp;eventHandle)</td>
+   </tr>
+   <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">bool</span></td>
+    <td xml:space="preserve"><a href="doc/../../System.Runtime/doc/../index.html#WinShellExecute">WinShellExecute</a>(<span class="kw">const</span>&nbsp;<span class="kw">char</span>*&nbsp;filePath, <span class="kw">long</span>&amp;&nbsp;errorCode)</td>
+   </tr>
+   <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">bool</span></td>
+    <td xml:space="preserve"><a href="doc/../../System.Runtime/doc/../index.html#WinWaitEvent">WinWaitEvent</a>(<span class="kw">void</span>*&nbsp;eventHandle)</td>
+   </tr>
+   <tr>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">int</span></td>
+    <td xml:space="preserve"><a href="doc/../../System.Runtime/doc/../index.html#WinWaitForMultipleObjects">WinWaitForMultipleObjects</a>(<span class="kw">uint</span>&nbsp;count, <span class="kw">void</span>**&nbsp;handles)</td>
+   </tr>
   </table>
   <h2>Constants</h2>
   <table>
    <tr>
-    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span>&nbsp;keyBackspace</td>
-    <td xml:space="preserve">public const int keyBackspace = cast</td>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span></td>
+    <td xml:space="preserve">keyBackspace = cast</td>
    </tr>
    <tr>
-    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span>&nbsp;keyControlA</td>
-    <td xml:space="preserve">public const int keyControlA = 0x001</td>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span></td>
+    <td xml:space="preserve">keyControlA = 0x001</td>
    </tr>
    <tr>
-    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span>&nbsp;keyControlB</td>
-    <td xml:space="preserve">public const int keyControlB = 0x002</td>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span></td>
+    <td xml:space="preserve">keyControlB = 0x002</td>
    </tr>
    <tr>
-    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span>&nbsp;keyControlC</td>
-    <td xml:space="preserve">public const int keyControlC = 0x003</td>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span></td>
+    <td xml:space="preserve">keyControlC = 0x003</td>
    </tr>
    <tr>
-    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span>&nbsp;keyControlD</td>
-    <td xml:space="preserve">public const int keyControlD = 0x004</td>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span></td>
+    <td xml:space="preserve">keyControlD = 0x004</td>
    </tr>
    <tr>
-    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span>&nbsp;keyControlDel</td>
-    <td xml:space="preserve">public const int keyControlDel = specialKeyStart + 41</td>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span></td>
+    <td xml:space="preserve">keyControlDel = specialKeyStart + 41</td>
    </tr>
    <tr>
-    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span>&nbsp;keyControlDown</td>
-    <td xml:space="preserve">public const int keyControlDown = specialKeyStart + 34</td>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span></td>
+    <td xml:space="preserve">keyControlDown = specialKeyStart + 34</td>
    </tr>
    <tr>
-    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span>&nbsp;keyControlE</td>
-    <td xml:space="preserve">public const int keyControlE = 0x005</td>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span></td>
+    <td xml:space="preserve">keyControlE = 0x005</td>
    </tr>
    <tr>
-    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span>&nbsp;keyControlEnd</td>
-    <td xml:space="preserve">public const int keyControlEnd = specialKeyStart + 40</td>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span></td>
+    <td xml:space="preserve">keyControlEnd = specialKeyStart + 40</td>
    </tr>
    <tr>
-    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span>&nbsp;keyControlF</td>
-    <td xml:space="preserve">public const int keyControlF = 0x006</td>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span></td>
+    <td xml:space="preserve">keyControlF = 0x006</td>
    </tr>
    <tr>
-    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span>&nbsp;keyControlF1</td>
-    <td xml:space="preserve">public const int keyControlF1 = specialKeyStart + 42</td>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span></td>
+    <td xml:space="preserve">keyControlF1 = specialKeyStart + 42</td>
    </tr>
    <tr>
-    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span>&nbsp;keyControlF10</td>
-    <td xml:space="preserve">public const int keyControlF10 = specialKeyStart + 51</td>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span></td>
+    <td xml:space="preserve">keyControlF10 = specialKeyStart + 51</td>
    </tr>
    <tr>
-    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span>&nbsp;keyControlF11</td>
-    <td xml:space="preserve">public const int keyControlF11 = specialKeyStart + 52</td>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span></td>
+    <td xml:space="preserve">keyControlF11 = specialKeyStart + 52</td>
    </tr>
    <tr>
-    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span>&nbsp;keyControlF12</td>
-    <td xml:space="preserve">public const int keyControlF12 = specialKeyStart + 53</td>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span></td>
+    <td xml:space="preserve">keyControlF12 = specialKeyStart + 53</td>
    </tr>
    <tr>
-    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span>&nbsp;keyControlF2</td>
-    <td xml:space="preserve">public const int keyControlF2 = specialKeyStart + 43</td>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span></td>
+    <td xml:space="preserve">keyControlF2 = specialKeyStart + 43</td>
    </tr>
    <tr>
-    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span>&nbsp;keyControlF3</td>
-    <td xml:space="preserve">public const int keyControlF3 = specialKeyStart + 44</td>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span></td>
+    <td xml:space="preserve">keyControlF3 = specialKeyStart + 44</td>
    </tr>
    <tr>
-    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span>&nbsp;keyControlF4</td>
-    <td xml:space="preserve">public const int keyControlF4 = specialKeyStart + 45</td>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span></td>
+    <td xml:space="preserve">keyControlF4 = specialKeyStart + 45</td>
    </tr>
    <tr>
-    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span>&nbsp;keyControlF5</td>
-    <td xml:space="preserve">public const int keyControlF5 = specialKeyStart + 46</td>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span></td>
+    <td xml:space="preserve">keyControlF5 = specialKeyStart + 46</td>
    </tr>
    <tr>
-    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span>&nbsp;keyControlF6</td>
-    <td xml:space="preserve">public const int keyControlF6 = specialKeyStart + 47</td>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span></td>
+    <td xml:space="preserve">keyControlF6 = specialKeyStart + 47</td>
    </tr>
    <tr>
-    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span>&nbsp;keyControlF7</td>
-    <td xml:space="preserve">public const int keyControlF7 = specialKeyStart + 48</td>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span></td>
+    <td xml:space="preserve">keyControlF7 = specialKeyStart + 48</td>
    </tr>
    <tr>
-    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span>&nbsp;keyControlF8</td>
-    <td xml:space="preserve">public const int keyControlF8 = specialKeyStart + 49</td>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span></td>
+    <td xml:space="preserve">keyControlF8 = specialKeyStart + 49</td>
    </tr>
    <tr>
-    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span>&nbsp;keyControlF9</td>
-    <td xml:space="preserve">public const int keyControlF9 = specialKeyStart + 50</td>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span></td>
+    <td xml:space="preserve">keyControlF9 = specialKeyStart + 50</td>
    </tr>
    <tr>
-    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span>&nbsp;keyControlG</td>
-    <td xml:space="preserve">public const int keyControlG = 0x007</td>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span></td>
+    <td xml:space="preserve">keyControlG = 0x007</td>
    </tr>
    <tr>
-    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span>&nbsp;keyControlH</td>
-    <td xml:space="preserve">public const int keyControlH = 0x008</td>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span></td>
+    <td xml:space="preserve">keyControlH = 0x008</td>
    </tr>
    <tr>
-    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span>&nbsp;keyControlHome</td>
-    <td xml:space="preserve">public const int keyControlHome = specialKeyStart + 39</td>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span></td>
+    <td xml:space="preserve">keyControlHome = specialKeyStart + 39</td>
    </tr>
    <tr>
-    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span>&nbsp;keyControlI</td>
-    <td xml:space="preserve">public const int keyControlI = 0x009</td>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span></td>
+    <td xml:space="preserve">keyControlI = 0x009</td>
    </tr>
    <tr>
-    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span>&nbsp;keyControlJ</td>
-    <td xml:space="preserve">public const int keyControlJ = 0x00A</td>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span></td>
+    <td xml:space="preserve">keyControlJ = 0x00A</td>
    </tr>
    <tr>
-    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span>&nbsp;keyControlK</td>
-    <td xml:space="preserve">public const int keyControlK = 0x00B</td>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span></td>
+    <td xml:space="preserve">keyControlK = 0x00B</td>
    </tr>
    <tr>
-    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span>&nbsp;keyControlL</td>
-    <td xml:space="preserve">public const int keyControlL = 0x00C</td>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span></td>
+    <td xml:space="preserve">keyControlL = 0x00C</td>
    </tr>
    <tr>
-    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span>&nbsp;keyControlLeft</td>
-    <td xml:space="preserve">public const int keyControlLeft = specialKeyStart + 35</td>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span></td>
+    <td xml:space="preserve">keyControlLeft = specialKeyStart + 35</td>
    </tr>
    <tr>
-    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span>&nbsp;keyControlM</td>
-    <td xml:space="preserve">public const int keyControlM = 0x00D</td>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span></td>
+    <td xml:space="preserve">keyControlM = 0x00D</td>
    </tr>
    <tr>
-    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span>&nbsp;keyControlN</td>
-    <td xml:space="preserve">public const int keyControlN = 0x00E</td>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span></td>
+    <td xml:space="preserve">keyControlN = 0x00E</td>
    </tr>
    <tr>
-    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span>&nbsp;keyControlO</td>
-    <td xml:space="preserve">public const int keyControlO = 0x00F</td>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span></td>
+    <td xml:space="preserve">keyControlO = 0x00F</td>
    </tr>
    <tr>
-    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span>&nbsp;keyControlP</td>
-    <td xml:space="preserve">public const int keyControlP = 0x010</td>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span></td>
+    <td xml:space="preserve">keyControlP = 0x010</td>
    </tr>
    <tr>
-    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span>&nbsp;keyControlPgDown</td>
-    <td xml:space="preserve">public const int keyControlPgDown = specialKeyStart + 38</td>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span></td>
+    <td xml:space="preserve">keyControlPgDown = specialKeyStart + 38</td>
    </tr>
    <tr>
-    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span>&nbsp;keyControlPgUp</td>
-    <td xml:space="preserve">public const int keyControlPgUp = specialKeyStart + 37</td>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span></td>
+    <td xml:space="preserve">keyControlPgUp = specialKeyStart + 37</td>
    </tr>
    <tr>
-    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span>&nbsp;keyControlQ</td>
-    <td xml:space="preserve">public const int keyControlQ = 0x011</td>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span></td>
+    <td xml:space="preserve">keyControlQ = 0x011</td>
    </tr>
    <tr>
-    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span>&nbsp;keyControlR</td>
-    <td xml:space="preserve">public const int keyControlR = 0x012</td>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span></td>
+    <td xml:space="preserve">keyControlR = 0x012</td>
    </tr>
    <tr>
-    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span>&nbsp;keyControlRight</td>
-    <td xml:space="preserve">public const int keyControlRight = specialKeyStart + 36</td>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span></td>
+    <td xml:space="preserve">keyControlRight = specialKeyStart + 36</td>
    </tr>
    <tr>
-    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span>&nbsp;keyControlS</td>
-    <td xml:space="preserve">public const int keyControlS = 0x013</td>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span></td>
+    <td xml:space="preserve">keyControlS = 0x013</td>
    </tr>
    <tr>
-    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span>&nbsp;keyControlT</td>
-    <td xml:space="preserve">public const int keyControlT = 0x014</td>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span></td>
+    <td xml:space="preserve">keyControlT = 0x014</td>
    </tr>
    <tr>
-    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span>&nbsp;keyControlU</td>
-    <td xml:space="preserve">public const int keyControlU = 0x015</td>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span></td>
+    <td xml:space="preserve">keyControlU = 0x015</td>
    </tr>
    <tr>
-    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span>&nbsp;keyControlUp</td>
-    <td xml:space="preserve">public const int keyControlUp = specialKeyStart + 33</td>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span></td>
+    <td xml:space="preserve">keyControlUp = specialKeyStart + 33</td>
    </tr>
    <tr>
-    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span>&nbsp;keyControlV</td>
-    <td xml:space="preserve">public const int keyControlV = 0x016</td>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span></td>
+    <td xml:space="preserve">keyControlV = 0x016</td>
    </tr>
    <tr>
-    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span>&nbsp;keyControlW</td>
-    <td xml:space="preserve">public const int keyControlW = 0x017</td>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span></td>
+    <td xml:space="preserve">keyControlW = 0x017</td>
    </tr>
    <tr>
-    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span>&nbsp;keyControlX</td>
-    <td xml:space="preserve">public const int keyControlX = 0x018</td>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span></td>
+    <td xml:space="preserve">keyControlX = 0x018</td>
    </tr>
    <tr>
-    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span>&nbsp;keyControlY</td>
-    <td xml:space="preserve">public const int keyControlY = 0x019</td>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span></td>
+    <td xml:space="preserve">keyControlY = 0x019</td>
    </tr>
    <tr>
-    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span>&nbsp;keyControlZ</td>
-    <td xml:space="preserve">public const int keyControlZ = 0x01A</td>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span></td>
+    <td xml:space="preserve">keyControlZ = 0x01A</td>
    </tr>
    <tr>
-    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span>&nbsp;keyDel</td>
-    <td xml:space="preserve">public const int keyDel = specialKeyStart + 19</td>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span></td>
+    <td xml:space="preserve">keyDel = specialKeyStart + 19</td>
    </tr>
    <tr>
-    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span>&nbsp;keyDown</td>
-    <td xml:space="preserve">public const int keyDown = specialKeyStart + 1</td>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span></td>
+    <td xml:space="preserve">keyDown = specialKeyStart + 1</td>
    </tr>
    <tr>
-    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span>&nbsp;keyEnd</td>
-    <td xml:space="preserve">public const int keyEnd = specialKeyStart + 24</td>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span></td>
+    <td xml:space="preserve">keyEnd = specialKeyStart + 24</td>
    </tr>
    <tr>
-    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span>&nbsp;keyEnter</td>
-    <td xml:space="preserve">public const int keyEnter = specialKeyStart + 0</td>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span></td>
+    <td xml:space="preserve">keyEnter = specialKeyStart + 0</td>
    </tr>
    <tr>
-    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span>&nbsp;keyEscape</td>
-    <td xml:space="preserve">public const int keyEscape = 0x01B</td>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span></td>
+    <td xml:space="preserve">keyEscape = 0x01B</td>
    </tr>
    <tr>
-    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span>&nbsp;keyF0</td>
-    <td xml:space="preserve">public const int keyF0 = specialKeyStart + 6</td>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span></td>
+    <td xml:space="preserve">keyF0 = specialKeyStart + 6</td>
    </tr>
    <tr>
-    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span>&nbsp;keyF1</td>
-    <td xml:space="preserve">public const int keyF1 = specialKeyStart + 7</td>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span></td>
+    <td xml:space="preserve">keyF1 = specialKeyStart + 7</td>
    </tr>
    <tr>
-    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span>&nbsp;keyF10</td>
-    <td xml:space="preserve">public const int keyF10 = specialKeyStart + 16</td>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span></td>
+    <td xml:space="preserve">keyF10 = specialKeyStart + 16</td>
    </tr>
    <tr>
-    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span>&nbsp;keyF11</td>
-    <td xml:space="preserve">public const int keyF11 = specialKeyStart + 17</td>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span></td>
+    <td xml:space="preserve">keyF11 = specialKeyStart + 17</td>
    </tr>
    <tr>
-    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span>&nbsp;keyF12</td>
-    <td xml:space="preserve">public const int keyF12 = specialKeyStart + 18</td>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span></td>
+    <td xml:space="preserve">keyF12 = specialKeyStart + 18</td>
    </tr>
    <tr>
-    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span>&nbsp;keyF2</td>
-    <td xml:space="preserve">public const int keyF2 = specialKeyStart + 8</td>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span></td>
+    <td xml:space="preserve">keyF2 = specialKeyStart + 8</td>
    </tr>
    <tr>
-    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span>&nbsp;keyF3</td>
-    <td xml:space="preserve">public const int keyF3 = specialKeyStart + 9</td>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span></td>
+    <td xml:space="preserve">keyF3 = specialKeyStart + 9</td>
    </tr>
    <tr>
-    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span>&nbsp;keyF4</td>
-    <td xml:space="preserve">public const int keyF4 = specialKeyStart + 10</td>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span></td>
+    <td xml:space="preserve">keyF4 = specialKeyStart + 10</td>
    </tr>
    <tr>
-    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span>&nbsp;keyF5</td>
-    <td xml:space="preserve">public const int keyF5 = specialKeyStart + 11</td>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span></td>
+    <td xml:space="preserve">keyF5 = specialKeyStart + 11</td>
    </tr>
    <tr>
-    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span>&nbsp;keyF6</td>
-    <td xml:space="preserve">public const int keyF6 = specialKeyStart + 12</td>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span></td>
+    <td xml:space="preserve">keyF6 = specialKeyStart + 12</td>
    </tr>
    <tr>
-    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span>&nbsp;keyF7</td>
-    <td xml:space="preserve">public const int keyF7 = specialKeyStart + 13</td>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span></td>
+    <td xml:space="preserve">keyF7 = specialKeyStart + 13</td>
    </tr>
    <tr>
-    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span>&nbsp;keyF8</td>
-    <td xml:space="preserve">public const int keyF8 = specialKeyStart + 14</td>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span></td>
+    <td xml:space="preserve">keyF8 = specialKeyStart + 14</td>
    </tr>
    <tr>
-    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span>&nbsp;keyF9</td>
-    <td xml:space="preserve">public const int keyF9 = specialKeyStart + 15</td>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span></td>
+    <td xml:space="preserve">keyF9 = specialKeyStart + 15</td>
    </tr>
    <tr>
-    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span>&nbsp;keyFS</td>
-    <td xml:space="preserve">public const int keyFS = 0x01C</td>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span></td>
+    <td xml:space="preserve">keyFS = 0x01C</td>
    </tr>
    <tr>
-    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span>&nbsp;keyGS</td>
-    <td xml:space="preserve">public const int keyGS = 0x01D</td>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span></td>
+    <td xml:space="preserve">keyGS = 0x01D</td>
    </tr>
    <tr>
-    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span>&nbsp;keyHome</td>
-    <td xml:space="preserve">public const int keyHome = specialKeyStart + 5</td>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span></td>
+    <td xml:space="preserve">keyHome = specialKeyStart + 5</td>
    </tr>
    <tr>
-    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span>&nbsp;keyIns</td>
-    <td xml:space="preserve">public const int keyIns = specialKeyStart + 20</td>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span></td>
+    <td xml:space="preserve">keyIns = specialKeyStart + 20</td>
    </tr>
    <tr>
-    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span>&nbsp;keyLeft</td>
-    <td xml:space="preserve">public const int keyLeft = specialKeyStart + 3</td>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span></td>
+    <td xml:space="preserve">keyLeft = specialKeyStart + 3</td>
    </tr>
    <tr>
-    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span>&nbsp;keyPgDown</td>
-    <td xml:space="preserve">public const int keyPgDown = specialKeyStart + 21</td>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span></td>
+    <td xml:space="preserve">keyPgDown = specialKeyStart + 21</td>
    </tr>
    <tr>
-    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span>&nbsp;keyPgUp</td>
-    <td xml:space="preserve">public const int keyPgUp = specialKeyStart + 22</td>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span></td>
+    <td xml:space="preserve">keyPgUp = specialKeyStart + 22</td>
    </tr>
    <tr>
-    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span>&nbsp;keyPrint</td>
-    <td xml:space="preserve">public const int keyPrint = specialKeyStart + 23</td>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span></td>
+    <td xml:space="preserve">keyPrint = specialKeyStart + 23</td>
    </tr>
    <tr>
-    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span>&nbsp;keyRS</td>
-    <td xml:space="preserve">public const int keyRS = 0x01E</td>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span></td>
+    <td xml:space="preserve">keyRS = 0x01E</td>
    </tr>
    <tr>
-    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span>&nbsp;keyResize</td>
-    <td xml:space="preserve">public const int keyResize = specialKeyStart + 30</td>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span></td>
+    <td xml:space="preserve">keyResize = specialKeyStart + 30</td>
    </tr>
    <tr>
-    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span>&nbsp;keyRight</td>
-    <td xml:space="preserve">public const int keyRight = specialKeyStart + 4</td>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span></td>
+    <td xml:space="preserve">keyRight = specialKeyStart + 4</td>
    </tr>
    <tr>
-    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span>&nbsp;keyShiftDel</td>
-    <td xml:space="preserve">public const int keyShiftDel = specialKeyStart + 25</td>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span></td>
+    <td xml:space="preserve">keyShiftDel = specialKeyStart + 25</td>
    </tr>
    <tr>
-    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span>&nbsp;keyShiftDown</td>
-    <td xml:space="preserve">public const int keyShiftDown = specialKeyStart + 32</td>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span></td>
+    <td xml:space="preserve">keyShiftDown = specialKeyStart + 32</td>
    </tr>
    <tr>
-    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span>&nbsp;keyShiftEnd</td>
-    <td xml:space="preserve">public const int keyShiftEnd = specialKeyStart + 26</td>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span></td>
+    <td xml:space="preserve">keyShiftEnd = specialKeyStart + 26</td>
    </tr>
    <tr>
-    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span>&nbsp;keyShiftF1</td>
-    <td xml:space="preserve">public const int keyShiftF1 = specialKeyStart + 56</td>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span></td>
+    <td xml:space="preserve">keyShiftF1 = specialKeyStart + 56</td>
    </tr>
    <tr>
-    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span>&nbsp;keyShiftF10</td>
-    <td xml:space="preserve">public const int keyShiftF10 = specialKeyStart + 65</td>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span></td>
+    <td xml:space="preserve">keyShiftF10 = specialKeyStart + 65</td>
    </tr>
    <tr>
-    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span>&nbsp;keyShiftF11</td>
-    <td xml:space="preserve">public const int keyShiftF11 = specialKeyStart + 66</td>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span></td>
+    <td xml:space="preserve">keyShiftF11 = specialKeyStart + 66</td>
    </tr>
    <tr>
-    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span>&nbsp;keyShiftF12</td>
-    <td xml:space="preserve">public const int keyShiftF12 = specialKeyStart + 67</td>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span></td>
+    <td xml:space="preserve">keyShiftF12 = specialKeyStart + 67</td>
    </tr>
    <tr>
-    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span>&nbsp;keyShiftF2</td>
-    <td xml:space="preserve">public const int keyShiftF2 = specialKeyStart + 57</td>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span></td>
+    <td xml:space="preserve">keyShiftF2 = specialKeyStart + 57</td>
    </tr>
    <tr>
-    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span>&nbsp;keyShiftF3</td>
-    <td xml:space="preserve">public const int keyShiftF3 = specialKeyStart + 58</td>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span></td>
+    <td xml:space="preserve">keyShiftF3 = specialKeyStart + 58</td>
    </tr>
    <tr>
-    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span>&nbsp;keyShiftF4</td>
-    <td xml:space="preserve">public const int keyShiftF4 = specialKeyStart + 59</td>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span></td>
+    <td xml:space="preserve">keyShiftF4 = specialKeyStart + 59</td>
    </tr>
    <tr>
-    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span>&nbsp;keyShiftF5</td>
-    <td xml:space="preserve">public const int keyShiftF5 = specialKeyStart + 60</td>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span></td>
+    <td xml:space="preserve">keyShiftF5 = specialKeyStart + 60</td>
    </tr>
    <tr>
-    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span>&nbsp;keyShiftF6</td>
-    <td xml:space="preserve">public const int keyShiftF6 = specialKeyStart + 61</td>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span></td>
+    <td xml:space="preserve">keyShiftF6 = specialKeyStart + 61</td>
    </tr>
    <tr>
-    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span>&nbsp;keyShiftF7</td>
-    <td xml:space="preserve">public const int keyShiftF7 = specialKeyStart + 62</td>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span></td>
+    <td xml:space="preserve">keyShiftF7 = specialKeyStart + 62</td>
    </tr>
    <tr>
-    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span>&nbsp;keyShiftF8</td>
-    <td xml:space="preserve">public const int keyShiftF8 = specialKeyStart + 63</td>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span></td>
+    <td xml:space="preserve">keyShiftF8 = specialKeyStart + 63</td>
    </tr>
    <tr>
-    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span>&nbsp;keyShiftF9</td>
-    <td xml:space="preserve">public const int keyShiftF9 = specialKeyStart + 64</td>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span></td>
+    <td xml:space="preserve">keyShiftF9 = specialKeyStart + 64</td>
    </tr>
    <tr>
-    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span>&nbsp;keyShiftHome</td>
-    <td xml:space="preserve">public const int keyShiftHome = specialKeyStart + 27</td>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span></td>
+    <td xml:space="preserve">keyShiftHome = specialKeyStart + 27</td>
    </tr>
    <tr>
-    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span>&nbsp;keyShiftLeft</td>
-    <td xml:space="preserve">public const int keyShiftLeft = specialKeyStart + 28</td>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span></td>
+    <td xml:space="preserve">keyShiftLeft = specialKeyStart + 28</td>
    </tr>
    <tr>
-    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span>&nbsp;keyShiftPgDown</td>
-    <td xml:space="preserve">public const int keyShiftPgDown = specialKeyStart + 55</td>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span></td>
+    <td xml:space="preserve">keyShiftPgDown = specialKeyStart + 55</td>
    </tr>
    <tr>
-    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span>&nbsp;keyShiftPgUp</td>
-    <td xml:space="preserve">public const int keyShiftPgUp = specialKeyStart + 54</td>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span></td>
+    <td xml:space="preserve">keyShiftPgUp = specialKeyStart + 54</td>
    </tr>
    <tr>
-    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span>&nbsp;keyShiftRight</td>
-    <td xml:space="preserve">public const int keyShiftRight = specialKeyStart + 29</td>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span></td>
+    <td xml:space="preserve">keyShiftRight = specialKeyStart + 29</td>
    </tr>
    <tr>
-    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span>&nbsp;keyShiftUp</td>
-    <td xml:space="preserve">public const int keyShiftUp = specialKeyStart + 31</td>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span></td>
+    <td xml:space="preserve">keyShiftUp = specialKeyStart + 31</td>
    </tr>
    <tr>
-    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span>&nbsp;keyTab</td>
-    <td xml:space="preserve">public const int keyTab = cast</td>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span></td>
+    <td xml:space="preserve">keyTab = cast</td>
    </tr>
    <tr>
-    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span>&nbsp;keyUS</td>
-    <td xml:space="preserve">public const int keyUS = 0x01F</td>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span></td>
+    <td xml:space="preserve">keyUS = 0x01F</td>
    </tr>
    <tr>
-    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span>&nbsp;keyUp</td>
-    <td xml:space="preserve">public const int keyUp = specialKeyStart + 2</td>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span></td>
+    <td xml:space="preserve">keyUp = specialKeyStart + 2</td>
    </tr>
    <tr>
-    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span>&nbsp;specialKeyEnd</td>
-    <td xml:space="preserve">public const int specialKeyEnd = specialKeyStart + 67</td>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span></td>
+    <td xml:space="preserve">specialKeyEnd = specialKeyStart + 67</td>
    </tr>
    <tr>
-    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span>&nbsp;specialKeyStart</td>
-    <td xml:space="preserve">public const int specialKeyStart = 0xE000</td>
+    <td class="rightAlignedCol" xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">const</span>&nbsp;<span class="kw">int</span></td>
+    <td xml:space="preserve">specialKeyStart = 0xE000</td>
    </tr>
   </table>
   <h2>Function Details</h2>
@@ -3436,6 +3487,90 @@
   <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">short</span>&nbsp;RtYellow()</h4>
   <h5>Definition</h5>
   <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Runtime/file/Runtime.cm.html#227">227</a>&nbsp;of&nbsp;<a href="doc/../../System.Runtime/file/Runtime.cm.html">System.Runtime/Runtime.cm</a></span>
+  <br/>
+  <br/>
+  <hr/>
+  <h3 id="WinCloseHandle" xml:space="preserve">WinCloseHandle&nbsp;Function</h3>
+  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">bool</span>&nbsp;WinCloseHandle(<span class="kw">void</span>*&nbsp;handle)</h4>
+  <h5>Definition</h5>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Runtime/file/Win.cm.html#12">12</a>&nbsp;of&nbsp;<a href="doc/../../System.Runtime/file/Win.cm.html">System.Runtime/Win.cm</a></span>
+  <br/>
+  <br/>
+  <hr/>
+  <h3 id="WinCreateEvent" xml:space="preserve">WinCreateEvent&nbsp;Function</h3>
+  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span>*&nbsp;WinCreateEvent()</h4>
+  <h5>Definition</h5>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Runtime/file/Win.cm.html#8">8</a>&nbsp;of&nbsp;<a href="doc/../../System.Runtime/file/Win.cm.html">System.Runtime/Win.cm</a></span>
+  <br/>
+  <br/>
+  <hr/>
+  <h3 id="WinFindCloseChangeNotification" xml:space="preserve">WinFindCloseChangeNotification&nbsp;Function</h3>
+  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">bool</span>&nbsp;WinFindCloseChangeNotification(<span class="kw">void</span>*&nbsp;handle)</h4>
+  <h5>Definition</h5>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Runtime/file/Win.cm.html#16">16</a>&nbsp;of&nbsp;<a href="doc/../../System.Runtime/file/Win.cm.html">System.Runtime/Win.cm</a></span>
+  <br/>
+  <br/>
+  <hr/>
+  <h3 id="WinFindFirstChangeNotification" xml:space="preserve">WinFindFirstChangeNotification&nbsp;Function</h3>
+  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span>*&nbsp;WinFindFirstChangeNotification(<span class="kw">const</span>&nbsp;<span class="kw">char</span>*&nbsp;directoryPath)</h4>
+  <h5>Definition</h5>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Runtime/file/Win.cm.html#14">14</a>&nbsp;of&nbsp;<a href="doc/../../System.Runtime/file/Win.cm.html">System.Runtime/Win.cm</a></span>
+  <br/>
+  <br/>
+  <hr/>
+  <h3 id="WinFindNextChangeNotification" xml:space="preserve">WinFindNextChangeNotification&nbsp;Function</h3>
+  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">bool</span>&nbsp;WinFindNextChangeNotification(<span class="kw">void</span>*&nbsp;handle)</h4>
+  <h5>Definition</h5>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Runtime/file/Win.cm.html#15">15</a>&nbsp;of&nbsp;<a href="doc/../../System.Runtime/file/Win.cm.html">System.Runtime/Win.cm</a></span>
+  <br/>
+  <br/>
+  <hr/>
+  <h3 id="WinFormatMessage" xml:space="preserve">WinFormatMessage&nbsp;Function</h3>
+  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">void</span>&nbsp;WinFormatMessage(<span class="kw">ulong</span>&nbsp;errorCode, <span class="kw">char</span>*&nbsp;buffer)</h4>
+  <h5>Definition</h5>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Runtime/file/Win.cm.html#7">7</a>&nbsp;of&nbsp;<a href="doc/../../System.Runtime/file/Win.cm.html">System.Runtime/Win.cm</a></span>
+  <br/>
+  <br/>
+  <hr/>
+  <h3 id="WinGetLastError" xml:space="preserve">WinGetLastError&nbsp;Function</h3>
+  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">ulong</span>&nbsp;WinGetLastError()</h4>
+  <h5>Definition</h5>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Runtime/file/Win.cm.html#6">6</a>&nbsp;of&nbsp;<a href="doc/../../System.Runtime/file/Win.cm.html">System.Runtime/Win.cm</a></span>
+  <br/>
+  <br/>
+  <hr/>
+  <h3 id="WinResetEvent" xml:space="preserve">WinResetEvent&nbsp;Function</h3>
+  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">bool</span>&nbsp;WinResetEvent(<span class="kw">void</span>*&nbsp;eventHandle)</h4>
+  <h5>Definition</h5>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Runtime/file/Win.cm.html#10">10</a>&nbsp;of&nbsp;<a href="doc/../../System.Runtime/file/Win.cm.html">System.Runtime/Win.cm</a></span>
+  <br/>
+  <br/>
+  <hr/>
+  <h3 id="WinSetEvent" xml:space="preserve">WinSetEvent&nbsp;Function</h3>
+  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">bool</span>&nbsp;WinSetEvent(<span class="kw">void</span>*&nbsp;eventHandle)</h4>
+  <h5>Definition</h5>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Runtime/file/Win.cm.html#9">9</a>&nbsp;of&nbsp;<a href="doc/../../System.Runtime/file/Win.cm.html">System.Runtime/Win.cm</a></span>
+  <br/>
+  <br/>
+  <hr/>
+  <h3 id="WinShellExecute" xml:space="preserve">WinShellExecute&nbsp;Function</h3>
+  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">bool</span>&nbsp;WinShellExecute(<span class="kw">const</span>&nbsp;<span class="kw">char</span>*&nbsp;filePath, <span class="kw">long</span>&amp;&nbsp;errorCode)</h4>
+  <h5>Definition</h5>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Runtime/file/Win.cm.html#17">17</a>&nbsp;of&nbsp;<a href="doc/../../System.Runtime/file/Win.cm.html">System.Runtime/Win.cm</a></span>
+  <br/>
+  <br/>
+  <hr/>
+  <h3 id="WinWaitEvent" xml:space="preserve">WinWaitEvent&nbsp;Function</h3>
+  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">bool</span>&nbsp;WinWaitEvent(<span class="kw">void</span>*&nbsp;eventHandle)</h4>
+  <h5>Definition</h5>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Runtime/file/Win.cm.html#11">11</a>&nbsp;of&nbsp;<a href="doc/../../System.Runtime/file/Win.cm.html">System.Runtime/Win.cm</a></span>
+  <br/>
+  <br/>
+  <hr/>
+  <h3 id="WinWaitForMultipleObjects" xml:space="preserve">WinWaitForMultipleObjects&nbsp;Function</h3>
+  <h4 xml:space="preserve"><span class="kw">public</span>&nbsp;<span class="kw">extern</span>&nbsp;<span class="kw">cdecl</span>&nbsp;<span class="kw">nothrow</span>&nbsp;<span class="kw">int</span>&nbsp;WinWaitForMultipleObjects(<span class="kw">uint</span>&nbsp;count, <span class="kw">void</span>**&nbsp;handles)</h4>
+  <h5>Definition</h5>
+  <span class="indent" xml:space="preserve">Line&nbsp;<a href="doc/../../System.Runtime/file/Win.cm.html#13">13</a>&nbsp;of&nbsp;<a href="doc/../../System.Runtime/file/Win.cm.html">System.Runtime/Win.cm</a></span>
   <br/>
   <br/>
   <hr/>

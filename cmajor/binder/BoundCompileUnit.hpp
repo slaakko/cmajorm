@@ -74,7 +74,9 @@ public:
     ConstantStructureRepository& GetConstantStructureRepository() { return constantStructureRepository; }
     const std::string& SourceFilePath() const { return compileUnitNode->FilePath(); }
     const std::string& LLFilePath() const { return llFilePath; }
+    const std::string& BCFilePath() const { return bcFilePath; }
     const std::string& OptLLFilePath() const { return optLLFilePath; }
+    const std::string& OptBCFilePath() const { return optBCFilePath; }
     const std::string& ObjectFilePath() const { return objectFilePath; }
     const std::string& Id() const { return compileUnitNode->Id(); }
     void SetHasGotos() { hasGotos = true; }
@@ -105,6 +107,8 @@ private:
     std::stack<BoundNamespace*> namespaceStack;
     BoundNamespace* currentNamespace;
     std::string llFilePath;
+    std::string bcFilePath;
+    std::string optBCFilePath;
     std::string optLLFilePath;
     std::string objectFilePath;
     std::vector<std::unique_ptr<FileScope>> fileScopes;

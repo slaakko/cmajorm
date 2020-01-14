@@ -6,22 +6,36 @@
  </head>
  <body>
   <h1>System Reference</h1>
-  <p class="description" xml:space="preserve">The Cmajor System Library consists of sixteen modules. The <a href="content/System.Base/index.html"> System.Base</a> module constitutes the major part of the System Library.</p>
+  <p class="description" xml:space="preserve">The Cmajor System Library consists of eighteen modules. The <a href="content/System.Base/index.html"> System.Base</a> module constitutes the major part of the System Library.</p>
   <h2>Modules</h2>
   <table>
    <tr>
     <td>
-     <a href="content/System.Install/index.html">System.Install</a>
+     <a href="content/System.Windows.Install/index.html">System.Windows.Install</a>
     </td>
     <td>
-     The System.Install module is a special module that takes care of installing the System Library to cmajor/system/lib/&lt;config> directory. It contains no source code entities, but references the <a href="content/System/doc/../../System/index.html">System</a>
+     The System.Windows.Install module is a special module that takes care of installing the System and System.Windows libraries to cmajor/system/lib/&lt;config> directory. It contains no source code entities, but references the <a href="content/System/doc/../../System.Windows/index.html">System.Windows</a>
       module.</td>
+   </tr>
+   <tr>
+    <td>
+     <a href="content/System.Windows/index.html">System.Windows</a>
+    </td>
+    <td>
+     The System.Windows module provides interface to Windows API and hopefully eventually will contain support for Windows GUI applications. This library is linked with programs and libraries that have <strong> target=winapp</strong>
+      or <strong> target=winlib</strong>
+      in a <em> .cmp</em>
+      file respectively.</td>
    </tr>
    <tr>
     <td>
      <a href="content/System/index.html">System</a>
     </td>
-    <td>The System module acts as an umbrella module that references all other System Library modules. It contains no source code entities. The System module is implicitly referenced by all user programs and libraries, so an explicit reference for any System Library module is not needed.</td>
+    <td>
+     The System module acts as an umbrella module that references all other System Library modules except System.Windows module. It contains no source code entities. The System module is implicitly referenced by all user programs and libraries, so an explicit reference for any system library module is not needed. This library is linked with programs and libraries that have <strong> target=program</strong>
+      or <strong> target=library</strong>
+      in a <em> .cmp</em>
+      file respectively.</td>
    </tr>
    <tr>
     <td>
@@ -33,14 +47,9 @@
    </tr>
    <tr>
     <td>
-     <a href="content/System.Text.RegularExpressions/index.html">System.Text.RegularExpressions</a>
+     <a href="content/System.RegularExpressions/index.html">System.RegularExpressions</a>
     </td>
-    <td>The System.Text.RegularExpressions contains a minimal implementation of a regular expression matching engine.</td>
-   </tr>
-   <tr>
-    <td>
-     <a href="content/System.Parsing/index.html">System.Parsing</a>
-    </td>
+    <td>The System.RegularExpressions contains a minimal implementation of a regular expression matching engine.</td>
    </tr>
    <tr>
     <td>
@@ -75,6 +84,12 @@
    </tr>
    <tr>
     <td>
+     <a href="content/System.Init/index.html">System.Init</a>
+    </td>
+    <td>The System.Init library does dynamic initialization before program main function is called.</td>
+   </tr>
+   <tr>
+    <td>
      <a href="content/System.IO.Compression/index.html">System.IO.Compression</a>
     </td>
     <td>
@@ -101,27 +116,15 @@
    </tr>
    <tr>
     <td>
-     <a href="content/System.Text.Parsing/index.html">System.Text.Parsing</a>
+     <a href="content/System.Parsing/index.html">System.Parsing</a>
     </td>
-    <td>The System.Text.Parsing module provides parsing infrastructure to upper layer modules. User programs and libraries can benefit only little of this module directly.</td>
-   </tr>
-   <tr>
-    <td>
-     <a href="content/System.Text.Parsing.CodeDom/index.html">System.Text.Parsing.CodeDom</a>
-    </td>
-    <td>
-     The System.Text.Parsing.CodeDom module provides abstract syntax tree classes to <a href="content/System/doc/../../System.Text.Parsing/index.html">System.Text.Parsing</a>
-      module. User programs and libraries can benefit only little of this module directly.</td>
-   </tr>
-   <tr>
-    <td>
-     <a href="content/System.Cmajor.Ast/index.html">System.Cmajor.Ast</a>
-    </td>
+    <td>The System.Parsing module contains parsing helper classes.</td>
    </tr>
    <tr>
     <td>
      <a href="content/System.Lex/index.html">System.Lex</a>
     </td>
+    <td>The System.Lex module contains lexical analyzer engine and lexing utilities.</td>
    </tr>
    <tr>
     <td>
@@ -134,7 +137,7 @@
      <a href="content/System.Runtime/index.html">System.Runtime</a>
     </td>
     <td>
-     The System.Runtime module contains symbols for functions that form the lowest level of the Cmajor runtime library. The functions themselves are defined in the <a href="https://github.com/slaakko/cmajorw64/tree/master/cmajor/rt"> rt</a>
+     The System.Runtime module contains symbols for functions that form the lowest level of the Cmajor runtime library. The functions themselves are defined in the <a href="../compiler/reference/rt/rt.html"> rt</a>
       library written in C++.</td>
    </tr>
    <tr>
