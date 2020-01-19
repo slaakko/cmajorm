@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -16,8 +16,8 @@ namespace CmajorTasks
             systemModules.Add("System.Core");
             systemModules.Add("System.Runtime");
             systemModules.Add("System.Base");
-            systemModules.Add("System.Text.Parsing.CodeDom");
-            systemModules.Add("System.Text.Parsing");
+            systemModules.Add("System.Lex");
+            systemModules.Add("System.Parsing");
             systemModules.Add("System.Net.Sockets");
             systemModules.Add("System.Net.Http");
             systemModules.Add("System.Json");
@@ -25,10 +25,13 @@ namespace CmajorTasks
             systemModules.Add("System.Dom");
             systemModules.Add("System.Numerics.Multiprecision");
             systemModules.Add("System.IO.Compression");
-            systemModules.Add("System.Text.RegularExpressions");
+            systemModules.Add("System.RegularExpressions");
             systemModules.Add("System.XPath");
+            systemModules.Add("System.Init");
             systemModules.Add("System");
             systemModules.Add("System.Install");
+            systemModules.Add("System.Windows");
+            systemModules.Add("System.Windows.Install");
         }
         public static bool Contains(string projectName)
         {

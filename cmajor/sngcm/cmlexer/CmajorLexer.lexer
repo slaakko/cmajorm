@@ -66,7 +66,7 @@ expressions
     exponent = "(e|E){sign}?{decdigits}";
     integer = "(0{octaldigits}?|[1-9]{decdigits}?|0(x|X){hexdigits})(u|U)?";
     floating = "({fraction}{exponent}?|{decdigits}{exponent})(f|F)?";
-    escape = "\\((x|X){hexdigits}|(d|D){decdigits}|{octaldigits}|u{hex4}|U{hex8}|(a|b|f|n|r|t|v|.))";
+    escape = "\\((x|X){hexdigits}|(d|D){decdigits}|{octaldigits}|u{hex4}|U{hex8}|[abfnrtv\"'\\])";
     character = "(w|u)?'([^\\\r\n']+|{escape})'";
     string = "((w|u)?@\"[^\"]*\")|(w|u)?\"([^\\\r\n\"]|{escape})*\"";
 }

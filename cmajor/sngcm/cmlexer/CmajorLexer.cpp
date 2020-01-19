@@ -32,45 +32,45 @@ int CmajorLexer::NextState(int state, char32_t c)
             switch (i)
             {
                 case 0:
+                case 1:
+                case 6:
+                case 7:
                 {
                     return 1;
                 }
-                case 1:
                 case 2:
-                case 9:
-                case 10:
                 {
                     return 2;
                 }
-                case 4:
+                case 3:
                 {
                     return 3;
                 }
-                case 5:
-                {
-                    return 4;
-                }
-                case 6:
-                {
-                    return 5;
-                }
-                case 7:
+                case 4:
+                case 9:
+                case 10:
                 case 12:
-                case 13:
-                case 15:
+                case 18:
+                case 19:
                 case 20:
                 case 21:
                 case 22:
                 case 23:
-                case 25:
-                case 26:
-                case 27:
-                case 28:
-                case 29:
                 case 30:
                 case 31:
                 case 32:
                 case 33:
+                case 34:
+                case 35:
+                case 36:
+                {
+                    return 4;
+                }
+                case 11:
+                {
+                    return 5;
+                }
+                case 13:
                 {
                     return 6;
                 }
@@ -78,32 +78,32 @@ int CmajorLexer::NextState(int state, char32_t c)
                 {
                     return 7;
                 }
-                case 16:
+                case 15:
                 {
                     return 8;
                 }
-                case 17:
+                case 16:
                 {
                     return 9;
                 }
-                case 18:
+                case 17:
                 {
                     return 10;
                 }
-                case 19:
+                case 24:
+                case 26:
                 {
                     return 11;
                 }
-                case 24:
+                case 25:
                 {
                     return 12;
                 }
-                case 34:
-                case 36:
+                case 27:
                 {
                     return 13;
                 }
-                case 35:
+                case 29:
                 {
                     return 14;
                 }
@@ -853,551 +853,82 @@ int CmajorLexer::NextState(int state, char32_t c)
         }
         case 14:
         {
-            Lexeme prevMatch = token.match;
-            token.match = lexeme;
-            int tokenId = GetTokenId(2);
-            if (tokenId == CONTINUE_TOKEN)
-            {
-                token.id = tokenId;
-                return -1;
-            }
-            else if (tokenId != INVALID_TOKEN)
-            {
-                token.id = tokenId;
-            }
-            else
-            {
-                token.match = prevMatch;
-            }
             switch (i)
             {
+                case 2:
+                case 3:
+                case 4:
+                case 5:
+                case 6:
+                case 7:
+                case 8:
+                case 9:
+                case 10:
+                case 11:
                 case 12:
+                case 13:
+                case 14:
+                case 15:
+                case 16:
+                case 17:
+                case 18:
+                case 19:
+                case 20:
+                case 21:
+                case 22:
+                case 23:
+                case 24:
+                case 25:
+                case 26:
+                case 27:
+                case 30:
+                case 31:
+                case 32:
+                case 33:
+                case 34:
+                case 35:
+                case 36:
+                case 37:
+                case 38:
+                case 39:
+                case 40:
+                case 41:
+                case 42:
+                case 43:
+                case 44:
+                case 45:
+                case 46:
+                case 47:
+                case 48:
+                case 49:
+                case 50:
+                case 51:
+                case 52:
+                case 53:
+                case 54:
+                case 55:
                 {
                     return 44;
                 }
-                case 13:
+                case 28:
                 {
                     return 45;
                 }
-                case 14:
+                case 29:
                 {
                     return 46;
                 }
-                case 15:
-                {
-                    return 47;
-                }
-                case 16:
-                {
-                    return 48;
-                }
-                case 26:
-                {
-                    return 49;
-                }
-                case 27:
-                {
-                    return 50;
-                }
-                case 34:
-                {
-                    return 51;
-                }
-                case 35:
-                case 36:
-                {
-                    return 52;
-                }
                 default:
                 {
                     return -1;
                 }
             }
-        }
-        case 52:
-        {
-            Lexeme prevMatch = token.match;
-            token.match = lexeme;
-            int tokenId = GetTokenId(2);
-            if (tokenId == CONTINUE_TOKEN)
-            {
-                token.id = tokenId;
-                return -1;
-            }
-            else if (tokenId != INVALID_TOKEN)
-            {
-                token.id = tokenId;
-            }
-            else
-            {
-                token.match = prevMatch;
-            }
-            switch (i)
-            {
-                case 14:
-                {
-                    return 46;
-                }
-                case 15:
-                {
-                    return 47;
-                }
-                case 16:
-                {
-                    return 48;
-                }
-                case 26:
-                {
-                    return 49;
-                }
-                case 27:
-                {
-                    return 50;
-                }
-                case 34:
-                {
-                    return 51;
-                }
-                case 35:
-                case 36:
-                {
-                    return 52;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 51:
-        {
-            switch (i)
-            {
-                case 16:
-                {
-                    return 48;
-                }
-                case 26:
-                {
-                    return 49;
-                }
-                case 27:
-                {
-                    return 50;
-                }
-                case 34:
-                case 35:
-                case 36:
-                {
-                    return 51;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 50:
-        {
-            switch (i)
-            {
-                case 17:
-                {
-                    return 53;
-                }
-                case 18:
-                {
-                    return 54;
-                }
-                case 34:
-                case 35:
-                case 36:
-                {
-                    return 55;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 55:
-        {
-            Lexeme prevMatch = token.match;
-            token.match = lexeme;
-            int tokenId = GetTokenId(3);
-            if (tokenId == CONTINUE_TOKEN)
-            {
-                token.id = tokenId;
-                return -1;
-            }
-            else if (tokenId != INVALID_TOKEN)
-            {
-                token.id = tokenId;
-            }
-            else
-            {
-                token.match = prevMatch;
-            }
-            switch (i)
-            {
-                case 34:
-                case 35:
-                case 36:
-                {
-                    return 55;
-                }
-                case 28:
-                {
-                    return 56;
-                }
-                case 29:
-                {
-                    return 57;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 57:
-        {
-            Lexeme prevMatch = token.match;
-            token.match = lexeme;
-            int tokenId = GetTokenId(3);
-            if (tokenId == CONTINUE_TOKEN)
-            {
-                token.id = tokenId;
-                return -1;
-            }
-            else if (tokenId != INVALID_TOKEN)
-            {
-                token.id = tokenId;
-            }
-            else
-            {
-                token.match = prevMatch;
-            }
-            return -1;
-        }
-        case 56:
-        {
-            Lexeme prevMatch = token.match;
-            token.match = lexeme;
-            int tokenId = GetTokenId(3);
-            if (tokenId == CONTINUE_TOKEN)
-            {
-                token.id = tokenId;
-                return -1;
-            }
-            else if (tokenId != INVALID_TOKEN)
-            {
-                token.id = tokenId;
-            }
-            else
-            {
-                token.match = prevMatch;
-            }
-            return -1;
-        }
-        case 54:
-        {
-            switch (i)
-            {
-                case 34:
-                case 35:
-                case 36:
-                {
-                    return 55;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 53:
-        {
-            switch (i)
-            {
-                case 34:
-                case 35:
-                case 36:
-                {
-                    return 55;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 49:
-        {
-            switch (i)
-            {
-                case 17:
-                {
-                    return 53;
-                }
-                case 18:
-                {
-                    return 54;
-                }
-                case 34:
-                case 35:
-                case 36:
-                {
-                    return 55;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 48:
-        {
-            Lexeme prevMatch = token.match;
-            token.match = lexeme;
-            int tokenId = GetTokenId(3);
-            if (tokenId == CONTINUE_TOKEN)
-            {
-                token.id = tokenId;
-                return -1;
-            }
-            else if (tokenId != INVALID_TOKEN)
-            {
-                token.id = tokenId;
-            }
-            else
-            {
-                token.match = prevMatch;
-            }
-            switch (i)
-            {
-                case 28:
-                {
-                    return 56;
-                }
-                case 29:
-                {
-                    return 57;
-                }
-                case 26:
-                {
-                    return 58;
-                }
-                case 27:
-                {
-                    return 59;
-                }
-                case 34:
-                case 35:
-                case 36:
-                {
-                    return 60;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 60:
-        {
-            Lexeme prevMatch = token.match;
-            token.match = lexeme;
-            int tokenId = GetTokenId(3);
-            if (tokenId == CONTINUE_TOKEN)
-            {
-                token.id = tokenId;
-                return -1;
-            }
-            else if (tokenId != INVALID_TOKEN)
-            {
-                token.id = tokenId;
-            }
-            else
-            {
-                token.match = prevMatch;
-            }
-            switch (i)
-            {
-                case 28:
-                {
-                    return 56;
-                }
-                case 29:
-                {
-                    return 57;
-                }
-                case 26:
-                {
-                    return 58;
-                }
-                case 27:
-                {
-                    return 59;
-                }
-                case 34:
-                case 35:
-                case 36:
-                {
-                    return 60;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 59:
-        {
-            switch (i)
-            {
-                case 17:
-                {
-                    return 61;
-                }
-                case 18:
-                {
-                    return 62;
-                }
-                case 34:
-                case 35:
-                case 36:
-                {
-                    return 63;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 63:
-        {
-            Lexeme prevMatch = token.match;
-            token.match = lexeme;
-            int tokenId = GetTokenId(3);
-            if (tokenId == CONTINUE_TOKEN)
-            {
-                token.id = tokenId;
-                return -1;
-            }
-            else if (tokenId != INVALID_TOKEN)
-            {
-                token.id = tokenId;
-            }
-            else
-            {
-                token.match = prevMatch;
-            }
-            switch (i)
-            {
-                case 28:
-                {
-                    return 56;
-                }
-                case 29:
-                {
-                    return 57;
-                }
-                case 34:
-                case 35:
-                case 36:
-                {
-                    return 63;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 62:
-        {
-            switch (i)
-            {
-                case 34:
-                case 35:
-                case 36:
-                {
-                    return 63;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 61:
-        {
-            switch (i)
-            {
-                case 34:
-                case 35:
-                case 36:
-                {
-                    return 63;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 58:
-        {
-            switch (i)
-            {
-                case 17:
-                {
-                    return 61;
-                }
-                case 18:
-                {
-                    return 62;
-                }
-                case 34:
-                case 35:
-                case 36:
-                {
-                    return 63;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 47:
-        {
-            Lexeme prevMatch = token.match;
-            token.match = lexeme;
-            int tokenId = GetTokenId(2);
-            if (tokenId == CONTINUE_TOKEN)
-            {
-                token.id = tokenId;
-                return -1;
-            }
-            else if (tokenId != INVALID_TOKEN)
-            {
-                token.id = tokenId;
-            }
-            else
-            {
-                token.match = prevMatch;
-            }
-            return -1;
         }
         case 46:
         {
             Lexeme prevMatch = token.match;
             token.match = lexeme;
-            int tokenId = GetTokenId(2);
+            int tokenId = GetTokenId(4);
             if (tokenId == CONTINUE_TOKEN)
             {
                 token.id = tokenId;
@@ -1417,8 +948,35 @@ int CmajorLexer::NextState(int state, char32_t c)
         {
             switch (i)
             {
+                case 9:
+                {
+                    return 47;
+                }
+                case 10:
+                {
+                    return 48;
+                }
+                case 11:
+                {
+                    return 49;
+                }
+                case 12:
+                {
+                    return 50;
+                }
+                case 22:
+                {
+                    return 51;
+                }
+                case 23:
+                {
+                    return 52;
+                }
                 case 25:
                 case 26:
+                {
+                    return 53;
+                }
                 case 27:
                 case 28:
                 case 29:
@@ -1426,6 +984,330 @@ int CmajorLexer::NextState(int state, char32_t c)
                 case 31:
                 case 32:
                 case 33:
+                case 34:
+                case 35:
+                case 36:
+                {
+                    return 54;
+                }
+                default:
+                {
+                    return -1;
+                }
+            }
+        }
+        case 54:
+        {
+            switch (i)
+            {
+                case 29:
+                {
+                    return 46;
+                }
+                default:
+                {
+                    return -1;
+                }
+            }
+        }
+        case 53:
+        {
+            switch (i)
+            {
+                case 29:
+                {
+                    return 46;
+                }
+                case 25:
+                case 26:
+                {
+                    return 53;
+                }
+                default:
+                {
+                    return -1;
+                }
+            }
+        }
+        case 52:
+        {
+            switch (i)
+            {
+                case 24:
+                case 25:
+                case 26:
+                {
+                    return 55;
+                }
+                default:
+                {
+                    return -1;
+                }
+            }
+        }
+        case 55:
+        {
+            switch (i)
+            {
+                case 29:
+                {
+                    return 46;
+                }
+                case 24:
+                case 25:
+                case 26:
+                {
+                    return 55;
+                }
+                default:
+                {
+                    return -1;
+                }
+            }
+        }
+        case 51:
+        {
+            switch (i)
+            {
+                case 24:
+                case 25:
+                case 26:
+                {
+                    return 55;
+                }
+                default:
+                {
+                    return -1;
+                }
+            }
+        }
+        case 50:
+        {
+            switch (i)
+            {
+                case 18:
+                case 19:
+                case 20:
+                case 21:
+                case 22:
+                case 23:
+                case 24:
+                case 25:
+                case 26:
+                case 34:
+                case 35:
+                case 36:
+                {
+                    return 56;
+                }
+                default:
+                {
+                    return -1;
+                }
+            }
+        }
+        case 56:
+        {
+            switch (i)
+            {
+                case 18:
+                case 19:
+                case 20:
+                case 21:
+                case 22:
+                case 23:
+                case 24:
+                case 25:
+                case 26:
+                case 34:
+                case 35:
+                case 36:
+                {
+                    return 57;
+                }
+                default:
+                {
+                    return -1;
+                }
+            }
+        }
+        case 57:
+        {
+            switch (i)
+            {
+                case 18:
+                case 19:
+                case 20:
+                case 21:
+                case 22:
+                case 23:
+                case 24:
+                case 25:
+                case 26:
+                case 34:
+                case 35:
+                case 36:
+                {
+                    return 58;
+                }
+                default:
+                {
+                    return -1;
+                }
+            }
+        }
+        case 58:
+        {
+            switch (i)
+            {
+                case 18:
+                case 19:
+                case 20:
+                case 21:
+                case 22:
+                case 23:
+                case 24:
+                case 25:
+                case 26:
+                case 34:
+                case 35:
+                case 36:
+                {
+                    return 59;
+                }
+                default:
+                {
+                    return -1;
+                }
+            }
+        }
+        case 59:
+        {
+            switch (i)
+            {
+                case 18:
+                case 19:
+                case 20:
+                case 21:
+                case 22:
+                case 23:
+                case 24:
+                case 25:
+                case 26:
+                case 34:
+                case 35:
+                case 36:
+                {
+                    return 60;
+                }
+                default:
+                {
+                    return -1;
+                }
+            }
+        }
+        case 60:
+        {
+            switch (i)
+            {
+                case 18:
+                case 19:
+                case 20:
+                case 21:
+                case 22:
+                case 23:
+                case 24:
+                case 25:
+                case 26:
+                case 34:
+                case 35:
+                case 36:
+                {
+                    return 61;
+                }
+                default:
+                {
+                    return -1;
+                }
+            }
+        }
+        case 61:
+        {
+            switch (i)
+            {
+                case 18:
+                case 19:
+                case 20:
+                case 21:
+                case 22:
+                case 23:
+                case 24:
+                case 25:
+                case 26:
+                case 34:
+                case 35:
+                case 36:
+                {
+                    return 62;
+                }
+                default:
+                {
+                    return -1;
+                }
+            }
+        }
+        case 62:
+        {
+            switch (i)
+            {
+                case 18:
+                case 19:
+                case 20:
+                case 21:
+                case 22:
+                case 23:
+                case 24:
+                case 25:
+                case 26:
+                case 34:
+                case 35:
+                case 36:
+                {
+                    return 63;
+                }
+                default:
+                {
+                    return -1;
+                }
+            }
+        }
+        case 63:
+        {
+            switch (i)
+            {
+                case 29:
+                {
+                    return 46;
+                }
+                default:
+                {
+                    return -1;
+                }
+            }
+        }
+        case 49:
+        {
+            switch (i)
+            {
+                case 18:
+                case 19:
+                case 20:
+                case 21:
+                case 22:
+                case 23:
+                case 24:
+                case 25:
+                case 26:
                 case 34:
                 case 35:
                 case 36:
@@ -1440,118 +1322,17 @@ int CmajorLexer::NextState(int state, char32_t c)
         }
         case 64:
         {
-            Lexeme prevMatch = token.match;
-            token.match = lexeme;
-            int tokenId = GetTokenId(2);
-            if (tokenId == CONTINUE_TOKEN)
-            {
-                token.id = tokenId;
-                return -1;
-            }
-            else if (tokenId != INVALID_TOKEN)
-            {
-                token.id = tokenId;
-            }
-            else
-            {
-                token.match = prevMatch;
-            }
             switch (i)
             {
-                case 14:
-                {
-                    return 46;
-                }
-                case 15:
-                {
-                    return 47;
-                }
+                case 18:
+                case 19:
+                case 20:
+                case 21:
+                case 22:
+                case 23:
+                case 24:
                 case 25:
                 case 26:
-                case 27:
-                case 28:
-                case 29:
-                case 30:
-                case 31:
-                case 32:
-                case 33:
-                case 34:
-                case 35:
-                case 36:
-                {
-                    return 64;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 44:
-        {
-            switch (i)
-            {
-                case 25:
-                case 26:
-                case 27:
-                case 28:
-                case 29:
-                case 30:
-                case 31:
-                case 32:
-                case 33:
-                case 34:
-                case 35:
-                case 36:
-                {
-                    return 64;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 13:
-        {
-            Lexeme prevMatch = token.match;
-            token.match = lexeme;
-            int tokenId = GetTokenId(2);
-            if (tokenId == CONTINUE_TOKEN)
-            {
-                token.id = tokenId;
-                return -1;
-            }
-            else if (tokenId != INVALID_TOKEN)
-            {
-                token.id = tokenId;
-            }
-            else
-            {
-                token.match = prevMatch;
-            }
-            switch (i)
-            {
-                case 14:
-                {
-                    return 46;
-                }
-                case 15:
-                {
-                    return 47;
-                }
-                case 16:
-                {
-                    return 48;
-                }
-                case 26:
-                {
-                    return 49;
-                }
-                case 27:
-                {
-                    return 50;
-                }
                 case 34:
                 case 35:
                 case 36:
@@ -1566,61 +1347,20 @@ int CmajorLexer::NextState(int state, char32_t c)
         }
         case 65:
         {
-            Lexeme prevMatch = token.match;
-            token.match = lexeme;
-            int tokenId = GetTokenId(2);
-            if (tokenId == CONTINUE_TOKEN)
-            {
-                token.id = tokenId;
-                return -1;
-            }
-            else if (tokenId != INVALID_TOKEN)
-            {
-                token.id = tokenId;
-            }
-            else
-            {
-                token.match = prevMatch;
-            }
             switch (i)
             {
-                case 14:
-                {
-                    return 46;
-                }
-                case 15:
-                {
-                    return 47;
-                }
-                case 16:
-                {
-                    return 48;
-                }
+                case 18:
+                case 19:
+                case 20:
+                case 21:
+                case 22:
+                case 23:
+                case 24:
+                case 25:
                 case 26:
-                {
-                    return 49;
-                }
-                case 27:
-                {
-                    return 50;
-                }
                 case 34:
                 case 35:
                 case 36:
-                {
-                    return 65;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 12:
-        {
-            switch (i)
-            {
-                case 0:
                 {
                     return 66;
                 }
@@ -1634,27 +1374,6 @@ int CmajorLexer::NextState(int state, char32_t c)
         {
             switch (i)
             {
-                case 0:
-                {
-                    return 67;
-                }
-                case 1:
-                case 2:
-                case 3:
-                case 4:
-                case 5:
-                case 6:
-                case 7:
-                case 8:
-                case 9:
-                case 10:
-                case 11:
-                case 12:
-                case 13:
-                case 14:
-                case 15:
-                case 16:
-                case 17:
                 case 18:
                 case 19:
                 case 20:
@@ -1664,35 +1383,48 @@ int CmajorLexer::NextState(int state, char32_t c)
                 case 24:
                 case 25:
                 case 26:
-                case 27:
-                case 28:
-                case 29:
-                case 30:
-                case 31:
-                case 32:
-                case 33:
                 case 34:
                 case 35:
                 case 36:
-                case 37:
-                case 38:
-                case 39:
-                case 40:
-                case 41:
-                case 42:
-                case 43:
-                case 44:
-                case 45:
-                case 46:
-                case 47:
-                case 48:
-                case 49:
-                case 50:
-                case 51:
-                case 52:
-                case 53:
-                case 54:
-                case 55:
+                {
+                    return 67;
+                }
+                default:
+                {
+                    return -1;
+                }
+            }
+        }
+        case 67:
+        {
+            switch (i)
+            {
+                case 29:
+                {
+                    return 46;
+                }
+                default:
+                {
+                    return -1;
+                }
+            }
+        }
+        case 48:
+        {
+            switch (i)
+            {
+                case 18:
+                case 19:
+                case 20:
+                case 21:
+                case 22:
+                case 23:
+                case 24:
+                case 25:
+                case 26:
+                case 34:
+                case 35:
+                case 36:
                 {
                     return 68;
                 }
@@ -1706,11 +1438,60 @@ int CmajorLexer::NextState(int state, char32_t c)
         {
             switch (i)
             {
-                case 0:
+                case 29:
                 {
-                    return 67;
+                    return 46;
                 }
-                case 1:
+                case 18:
+                case 19:
+                case 20:
+                case 21:
+                case 22:
+                case 23:
+                case 24:
+                case 25:
+                case 26:
+                case 34:
+                case 35:
+                case 36:
+                {
+                    return 68;
+                }
+                default:
+                {
+                    return -1;
+                }
+            }
+        }
+        case 47:
+        {
+            switch (i)
+            {
+                case 18:
+                case 19:
+                case 20:
+                case 21:
+                case 22:
+                case 23:
+                case 24:
+                case 25:
+                case 26:
+                case 34:
+                case 35:
+                case 36:
+                {
+                    return 68;
+                }
+                default:
+                {
+                    return -1;
+                }
+            }
+        }
+        case 44:
+        {
+            switch (i)
+            {
                 case 2:
                 case 3:
                 case 4:
@@ -1737,7 +1518,74 @@ int CmajorLexer::NextState(int state, char32_t c)
                 case 25:
                 case 26:
                 case 27:
-                case 28:
+                case 30:
+                case 31:
+                case 32:
+                case 33:
+                case 34:
+                case 35:
+                case 36:
+                case 37:
+                case 38:
+                case 39:
+                case 40:
+                case 41:
+                case 42:
+                case 43:
+                case 44:
+                case 45:
+                case 46:
+                case 47:
+                case 48:
+                case 49:
+                case 50:
+                case 51:
+                case 52:
+                case 53:
+                case 54:
+                case 55:
+                {
+                    return 44;
+                }
+                case 29:
+                {
+                    return 46;
+                }
+                default:
+                {
+                    return -1;
+                }
+            }
+        }
+        case 13:
+        {
+            switch (i)
+            {
+                case 2:
+                case 3:
+                case 4:
+                case 5:
+                case 6:
+                case 7:
+                case 8:
+                case 9:
+                case 10:
+                case 11:
+                case 12:
+                case 13:
+                case 14:
+                case 15:
+                case 16:
+                case 17:
+                case 18:
+                case 19:
+                case 20:
+                case 21:
+                case 22:
+                case 23:
+                case 24:
+                case 25:
+                case 26:
                 case 29:
                 case 30:
                 case 31:
@@ -1766,7 +1614,15 @@ int CmajorLexer::NextState(int state, char32_t c)
                 case 54:
                 case 55:
                 {
-                    return 68;
+                    return 69;
+                }
+                case 27:
+                {
+                    return 70;
+                }
+                case 28:
+                {
+                    return 71;
                 }
                 default:
                 {
@@ -1774,7 +1630,888 @@ int CmajorLexer::NextState(int state, char32_t c)
                 }
             }
         }
-        case 67:
+        case 71:
+        {
+            switch (i)
+            {
+                case 9:
+                {
+                    return 72;
+                }
+                case 10:
+                {
+                    return 73;
+                }
+                case 11:
+                {
+                    return 74;
+                }
+                case 12:
+                {
+                    return 75;
+                }
+                case 22:
+                {
+                    return 76;
+                }
+                case 23:
+                {
+                    return 77;
+                }
+                case 25:
+                case 26:
+                {
+                    return 78;
+                }
+                case 27:
+                case 28:
+                case 29:
+                case 30:
+                case 31:
+                case 32:
+                case 33:
+                case 34:
+                case 35:
+                case 36:
+                {
+                    return 79;
+                }
+                default:
+                {
+                    return -1;
+                }
+            }
+        }
+        case 79:
+        {
+            switch (i)
+            {
+                case 2:
+                case 3:
+                case 4:
+                case 5:
+                case 6:
+                case 7:
+                case 8:
+                case 9:
+                case 10:
+                case 11:
+                case 12:
+                case 13:
+                case 14:
+                case 15:
+                case 16:
+                case 17:
+                case 18:
+                case 19:
+                case 20:
+                case 21:
+                case 22:
+                case 23:
+                case 24:
+                case 25:
+                case 26:
+                case 29:
+                case 30:
+                case 31:
+                case 32:
+                case 33:
+                case 34:
+                case 35:
+                case 36:
+                case 37:
+                case 38:
+                case 39:
+                case 40:
+                case 41:
+                case 42:
+                case 43:
+                case 44:
+                case 45:
+                case 46:
+                case 47:
+                case 48:
+                case 49:
+                case 50:
+                case 51:
+                case 52:
+                case 53:
+                case 54:
+                case 55:
+                {
+                    return 69;
+                }
+                case 27:
+                {
+                    return 70;
+                }
+                case 28:
+                {
+                    return 71;
+                }
+                default:
+                {
+                    return -1;
+                }
+            }
+        }
+        case 78:
+        {
+            switch (i)
+            {
+                case 2:
+                case 3:
+                case 4:
+                case 5:
+                case 6:
+                case 7:
+                case 8:
+                case 9:
+                case 10:
+                case 11:
+                case 12:
+                case 13:
+                case 14:
+                case 15:
+                case 16:
+                case 17:
+                case 18:
+                case 19:
+                case 20:
+                case 21:
+                case 22:
+                case 23:
+                case 24:
+                case 29:
+                case 30:
+                case 31:
+                case 32:
+                case 33:
+                case 34:
+                case 35:
+                case 36:
+                case 37:
+                case 38:
+                case 39:
+                case 40:
+                case 41:
+                case 42:
+                case 43:
+                case 44:
+                case 45:
+                case 46:
+                case 47:
+                case 48:
+                case 49:
+                case 50:
+                case 51:
+                case 52:
+                case 53:
+                case 54:
+                case 55:
+                {
+                    return 69;
+                }
+                case 27:
+                {
+                    return 70;
+                }
+                case 28:
+                {
+                    return 71;
+                }
+                case 25:
+                case 26:
+                {
+                    return 78;
+                }
+                default:
+                {
+                    return -1;
+                }
+            }
+        }
+        case 77:
+        {
+            switch (i)
+            {
+                case 24:
+                case 25:
+                case 26:
+                {
+                    return 80;
+                }
+                default:
+                {
+                    return -1;
+                }
+            }
+        }
+        case 80:
+        {
+            switch (i)
+            {
+                case 2:
+                case 3:
+                case 4:
+                case 5:
+                case 6:
+                case 7:
+                case 8:
+                case 9:
+                case 10:
+                case 11:
+                case 12:
+                case 13:
+                case 14:
+                case 15:
+                case 16:
+                case 17:
+                case 18:
+                case 19:
+                case 20:
+                case 21:
+                case 22:
+                case 23:
+                case 29:
+                case 30:
+                case 31:
+                case 32:
+                case 33:
+                case 34:
+                case 35:
+                case 36:
+                case 37:
+                case 38:
+                case 39:
+                case 40:
+                case 41:
+                case 42:
+                case 43:
+                case 44:
+                case 45:
+                case 46:
+                case 47:
+                case 48:
+                case 49:
+                case 50:
+                case 51:
+                case 52:
+                case 53:
+                case 54:
+                case 55:
+                {
+                    return 69;
+                }
+                case 27:
+                {
+                    return 70;
+                }
+                case 28:
+                {
+                    return 71;
+                }
+                case 24:
+                case 25:
+                case 26:
+                {
+                    return 80;
+                }
+                default:
+                {
+                    return -1;
+                }
+            }
+        }
+        case 76:
+        {
+            switch (i)
+            {
+                case 24:
+                case 25:
+                case 26:
+                {
+                    return 80;
+                }
+                default:
+                {
+                    return -1;
+                }
+            }
+        }
+        case 75:
+        {
+            switch (i)
+            {
+                case 18:
+                case 19:
+                case 20:
+                case 21:
+                case 22:
+                case 23:
+                case 24:
+                case 25:
+                case 26:
+                case 34:
+                case 35:
+                case 36:
+                {
+                    return 81;
+                }
+                default:
+                {
+                    return -1;
+                }
+            }
+        }
+        case 81:
+        {
+            switch (i)
+            {
+                case 18:
+                case 19:
+                case 20:
+                case 21:
+                case 22:
+                case 23:
+                case 24:
+                case 25:
+                case 26:
+                case 34:
+                case 35:
+                case 36:
+                {
+                    return 82;
+                }
+                default:
+                {
+                    return -1;
+                }
+            }
+        }
+        case 82:
+        {
+            switch (i)
+            {
+                case 18:
+                case 19:
+                case 20:
+                case 21:
+                case 22:
+                case 23:
+                case 24:
+                case 25:
+                case 26:
+                case 34:
+                case 35:
+                case 36:
+                {
+                    return 83;
+                }
+                default:
+                {
+                    return -1;
+                }
+            }
+        }
+        case 83:
+        {
+            switch (i)
+            {
+                case 18:
+                case 19:
+                case 20:
+                case 21:
+                case 22:
+                case 23:
+                case 24:
+                case 25:
+                case 26:
+                case 34:
+                case 35:
+                case 36:
+                {
+                    return 84;
+                }
+                default:
+                {
+                    return -1;
+                }
+            }
+        }
+        case 84:
+        {
+            switch (i)
+            {
+                case 18:
+                case 19:
+                case 20:
+                case 21:
+                case 22:
+                case 23:
+                case 24:
+                case 25:
+                case 26:
+                case 34:
+                case 35:
+                case 36:
+                {
+                    return 85;
+                }
+                default:
+                {
+                    return -1;
+                }
+            }
+        }
+        case 85:
+        {
+            switch (i)
+            {
+                case 18:
+                case 19:
+                case 20:
+                case 21:
+                case 22:
+                case 23:
+                case 24:
+                case 25:
+                case 26:
+                case 34:
+                case 35:
+                case 36:
+                {
+                    return 86;
+                }
+                default:
+                {
+                    return -1;
+                }
+            }
+        }
+        case 86:
+        {
+            switch (i)
+            {
+                case 18:
+                case 19:
+                case 20:
+                case 21:
+                case 22:
+                case 23:
+                case 24:
+                case 25:
+                case 26:
+                case 34:
+                case 35:
+                case 36:
+                {
+                    return 87;
+                }
+                default:
+                {
+                    return -1;
+                }
+            }
+        }
+        case 87:
+        {
+            switch (i)
+            {
+                case 18:
+                case 19:
+                case 20:
+                case 21:
+                case 22:
+                case 23:
+                case 24:
+                case 25:
+                case 26:
+                case 34:
+                case 35:
+                case 36:
+                {
+                    return 88;
+                }
+                default:
+                {
+                    return -1;
+                }
+            }
+        }
+        case 88:
+        {
+            switch (i)
+            {
+                case 2:
+                case 3:
+                case 4:
+                case 5:
+                case 6:
+                case 7:
+                case 8:
+                case 9:
+                case 10:
+                case 11:
+                case 12:
+                case 13:
+                case 14:
+                case 15:
+                case 16:
+                case 17:
+                case 18:
+                case 19:
+                case 20:
+                case 21:
+                case 22:
+                case 23:
+                case 24:
+                case 25:
+                case 26:
+                case 29:
+                case 30:
+                case 31:
+                case 32:
+                case 33:
+                case 34:
+                case 35:
+                case 36:
+                case 37:
+                case 38:
+                case 39:
+                case 40:
+                case 41:
+                case 42:
+                case 43:
+                case 44:
+                case 45:
+                case 46:
+                case 47:
+                case 48:
+                case 49:
+                case 50:
+                case 51:
+                case 52:
+                case 53:
+                case 54:
+                case 55:
+                {
+                    return 69;
+                }
+                case 27:
+                {
+                    return 70;
+                }
+                case 28:
+                {
+                    return 71;
+                }
+                default:
+                {
+                    return -1;
+                }
+            }
+        }
+        case 74:
+        {
+            switch (i)
+            {
+                case 18:
+                case 19:
+                case 20:
+                case 21:
+                case 22:
+                case 23:
+                case 24:
+                case 25:
+                case 26:
+                case 34:
+                case 35:
+                case 36:
+                {
+                    return 89;
+                }
+                default:
+                {
+                    return -1;
+                }
+            }
+        }
+        case 89:
+        {
+            switch (i)
+            {
+                case 18:
+                case 19:
+                case 20:
+                case 21:
+                case 22:
+                case 23:
+                case 24:
+                case 25:
+                case 26:
+                case 34:
+                case 35:
+                case 36:
+                {
+                    return 90;
+                }
+                default:
+                {
+                    return -1;
+                }
+            }
+        }
+        case 90:
+        {
+            switch (i)
+            {
+                case 18:
+                case 19:
+                case 20:
+                case 21:
+                case 22:
+                case 23:
+                case 24:
+                case 25:
+                case 26:
+                case 34:
+                case 35:
+                case 36:
+                {
+                    return 91;
+                }
+                default:
+                {
+                    return -1;
+                }
+            }
+        }
+        case 91:
+        {
+            switch (i)
+            {
+                case 18:
+                case 19:
+                case 20:
+                case 21:
+                case 22:
+                case 23:
+                case 24:
+                case 25:
+                case 26:
+                case 34:
+                case 35:
+                case 36:
+                {
+                    return 92;
+                }
+                default:
+                {
+                    return -1;
+                }
+            }
+        }
+        case 92:
+        {
+            switch (i)
+            {
+                case 2:
+                case 3:
+                case 4:
+                case 5:
+                case 6:
+                case 7:
+                case 8:
+                case 9:
+                case 10:
+                case 11:
+                case 12:
+                case 13:
+                case 14:
+                case 15:
+                case 16:
+                case 17:
+                case 18:
+                case 19:
+                case 20:
+                case 21:
+                case 22:
+                case 23:
+                case 24:
+                case 25:
+                case 26:
+                case 29:
+                case 30:
+                case 31:
+                case 32:
+                case 33:
+                case 34:
+                case 35:
+                case 36:
+                case 37:
+                case 38:
+                case 39:
+                case 40:
+                case 41:
+                case 42:
+                case 43:
+                case 44:
+                case 45:
+                case 46:
+                case 47:
+                case 48:
+                case 49:
+                case 50:
+                case 51:
+                case 52:
+                case 53:
+                case 54:
+                case 55:
+                {
+                    return 69;
+                }
+                case 27:
+                {
+                    return 70;
+                }
+                case 28:
+                {
+                    return 71;
+                }
+                default:
+                {
+                    return -1;
+                }
+            }
+        }
+        case 73:
+        {
+            switch (i)
+            {
+                case 18:
+                case 19:
+                case 20:
+                case 21:
+                case 22:
+                case 23:
+                case 24:
+                case 25:
+                case 26:
+                case 34:
+                case 35:
+                case 36:
+                {
+                    return 93;
+                }
+                default:
+                {
+                    return -1;
+                }
+            }
+        }
+        case 93:
+        {
+            switch (i)
+            {
+                case 2:
+                case 3:
+                case 4:
+                case 5:
+                case 6:
+                case 7:
+                case 8:
+                case 9:
+                case 10:
+                case 11:
+                case 12:
+                case 13:
+                case 14:
+                case 15:
+                case 16:
+                case 17:
+                case 29:
+                case 30:
+                case 31:
+                case 32:
+                case 33:
+                case 37:
+                case 38:
+                case 39:
+                case 40:
+                case 41:
+                case 42:
+                case 43:
+                case 44:
+                case 45:
+                case 46:
+                case 47:
+                case 48:
+                case 49:
+                case 50:
+                case 51:
+                case 52:
+                case 53:
+                case 54:
+                case 55:
+                {
+                    return 69;
+                }
+                case 27:
+                {
+                    return 70;
+                }
+                case 28:
+                {
+                    return 71;
+                }
+                case 18:
+                case 19:
+                case 20:
+                case 21:
+                case 22:
+                case 23:
+                case 24:
+                case 25:
+                case 26:
+                case 34:
+                case 35:
+                case 36:
+                {
+                    return 93;
+                }
+                default:
+                {
+                    return -1;
+                }
+            }
+        }
+        case 72:
+        {
+            switch (i)
+            {
+                case 18:
+                case 19:
+                case 20:
+                case 21:
+                case 22:
+                case 23:
+                case 24:
+                case 25:
+                case 26:
+                case 34:
+                case 35:
+                case 36:
+                {
+                    return 93;
+                }
+                default:
+                {
+                    return -1;
+                }
+            }
+        }
+        case 70:
         {
             Lexeme prevMatch = token.match;
             token.match = lexeme;
@@ -1794,53 +2531,35 @@ int CmajorLexer::NextState(int state, char32_t c)
             }
             return -1;
         }
-        case 11:
+        case 69:
         {
-            Lexeme prevMatch = token.match;
-            token.match = lexeme;
-            int tokenId = GetTokenId(1);
-            if (tokenId == CONTINUE_TOKEN)
-            {
-                token.id = tokenId;
-                return -1;
-            }
-            else if (tokenId != INVALID_TOKEN)
-            {
-                token.id = tokenId;
-            }
-            else
-            {
-                token.match = prevMatch;
-            }
             switch (i)
             {
-                case 0:
-                {
-                    return 1;
-                }
+                case 2:
+                case 3:
                 case 4:
-                {
-                    return 3;
-                }
-                case 24:
-                {
-                    return 12;
-                }
+                case 5:
+                case 6:
                 case 7:
                 case 8:
+                case 9:
+                case 10:
+                case 11:
                 case 12:
                 case 13:
                 case 14:
                 case 15:
+                case 16:
+                case 17:
+                case 18:
                 case 19:
                 case 20:
                 case 21:
                 case 22:
                 case 23:
+                case 24:
                 case 25:
                 case 26:
-                case 27:
-                case 28:
                 case 29:
                 case 30:
                 case 31:
@@ -1849,8 +2568,35 @@ int CmajorLexer::NextState(int state, char32_t c)
                 case 34:
                 case 35:
                 case 36:
+                case 37:
+                case 38:
+                case 39:
+                case 40:
+                case 41:
+                case 42:
+                case 43:
+                case 44:
+                case 45:
+                case 46:
+                case 47:
+                case 48:
+                case 49:
+                case 50:
+                case 51:
+                case 52:
+                case 53:
+                case 54:
+                case 55:
                 {
                     return 69;
+                }
+                case 27:
+                {
+                    return 70;
+                }
+                case 28:
+                {
+                    return 71;
                 }
                 default:
                 {
@@ -1858,11 +2604,11 @@ int CmajorLexer::NextState(int state, char32_t c)
                 }
             }
         }
-        case 69:
+        case 12:
         {
             Lexeme prevMatch = token.match;
             token.match = lexeme;
-            int tokenId = GetTokenId(1);
+            int tokenId = GetTokenId(2);
             if (tokenId == CONTINUE_TOKEN)
             {
                 token.id = tokenId;
@@ -1878,31 +2624,744 @@ int CmajorLexer::NextState(int state, char32_t c)
             }
             switch (i)
             {
-                case 7:
-                case 8:
+                case 9:
+                {
+                    return 94;
+                }
+                case 10:
+                {
+                    return 95;
+                }
+                case 11:
+                {
+                    return 96;
+                }
                 case 12:
+                {
+                    return 97;
+                }
                 case 13:
+                {
+                    return 98;
+                }
+                case 19:
+                {
+                    return 99;
+                }
+                case 20:
+                {
+                    return 100;
+                }
+                case 24:
+                {
+                    return 101;
+                }
+                case 25:
+                case 26:
+                {
+                    return 102;
+                }
+                default:
+                {
+                    return -1;
+                }
+            }
+        }
+        case 102:
+        {
+            Lexeme prevMatch = token.match;
+            token.match = lexeme;
+            int tokenId = GetTokenId(2);
+            if (tokenId == CONTINUE_TOKEN)
+            {
+                token.id = tokenId;
+                return -1;
+            }
+            else if (tokenId != INVALID_TOKEN)
+            {
+                token.id = tokenId;
+            }
+            else
+            {
+                token.match = prevMatch;
+            }
+            switch (i)
+            {
+                case 11:
+                {
+                    return 96;
+                }
+                case 12:
+                {
+                    return 97;
+                }
+                case 13:
+                {
+                    return 98;
+                }
+                case 19:
+                {
+                    return 99;
+                }
+                case 20:
+                {
+                    return 100;
+                }
+                case 24:
+                {
+                    return 101;
+                }
+                case 25:
+                case 26:
+                {
+                    return 102;
+                }
+                default:
+                {
+                    return -1;
+                }
+            }
+        }
+        case 101:
+        {
+            switch (i)
+            {
+                case 13:
+                {
+                    return 98;
+                }
+                case 19:
+                {
+                    return 99;
+                }
+                case 20:
+                {
+                    return 100;
+                }
+                case 24:
+                case 25:
+                case 26:
+                {
+                    return 101;
+                }
+                default:
+                {
+                    return -1;
+                }
+            }
+        }
+        case 100:
+        {
+            switch (i)
+            {
                 case 14:
+                {
+                    return 103;
+                }
                 case 15:
+                {
+                    return 104;
+                }
+                case 24:
+                case 25:
+                case 26:
+                {
+                    return 105;
+                }
+                default:
+                {
+                    return -1;
+                }
+            }
+        }
+        case 105:
+        {
+            Lexeme prevMatch = token.match;
+            token.match = lexeme;
+            int tokenId = GetTokenId(3);
+            if (tokenId == CONTINUE_TOKEN)
+            {
+                token.id = tokenId;
+                return -1;
+            }
+            else if (tokenId != INVALID_TOKEN)
+            {
+                token.id = tokenId;
+            }
+            else
+            {
+                token.match = prevMatch;
+            }
+            switch (i)
+            {
+                case 24:
+                case 25:
+                case 26:
+                {
+                    return 105;
+                }
+                case 21:
+                {
+                    return 106;
+                }
+                case 34:
+                {
+                    return 107;
+                }
+                default:
+                {
+                    return -1;
+                }
+            }
+        }
+        case 107:
+        {
+            Lexeme prevMatch = token.match;
+            token.match = lexeme;
+            int tokenId = GetTokenId(3);
+            if (tokenId == CONTINUE_TOKEN)
+            {
+                token.id = tokenId;
+                return -1;
+            }
+            else if (tokenId != INVALID_TOKEN)
+            {
+                token.id = tokenId;
+            }
+            else
+            {
+                token.match = prevMatch;
+            }
+            return -1;
+        }
+        case 106:
+        {
+            Lexeme prevMatch = token.match;
+            token.match = lexeme;
+            int tokenId = GetTokenId(3);
+            if (tokenId == CONTINUE_TOKEN)
+            {
+                token.id = tokenId;
+                return -1;
+            }
+            else if (tokenId != INVALID_TOKEN)
+            {
+                token.id = tokenId;
+            }
+            else
+            {
+                token.match = prevMatch;
+            }
+            return -1;
+        }
+        case 104:
+        {
+            switch (i)
+            {
+                case 24:
+                case 25:
+                case 26:
+                {
+                    return 105;
+                }
+                default:
+                {
+                    return -1;
+                }
+            }
+        }
+        case 103:
+        {
+            switch (i)
+            {
+                case 24:
+                case 25:
+                case 26:
+                {
+                    return 105;
+                }
+                default:
+                {
+                    return -1;
+                }
+            }
+        }
+        case 99:
+        {
+            switch (i)
+            {
+                case 14:
+                {
+                    return 103;
+                }
+                case 15:
+                {
+                    return 104;
+                }
+                case 24:
+                case 25:
+                case 26:
+                {
+                    return 105;
+                }
+                default:
+                {
+                    return -1;
+                }
+            }
+        }
+        case 98:
+        {
+            Lexeme prevMatch = token.match;
+            token.match = lexeme;
+            int tokenId = GetTokenId(3);
+            if (tokenId == CONTINUE_TOKEN)
+            {
+                token.id = tokenId;
+                return -1;
+            }
+            else if (tokenId != INVALID_TOKEN)
+            {
+                token.id = tokenId;
+            }
+            else
+            {
+                token.match = prevMatch;
+            }
+            switch (i)
+            {
+                case 21:
+                {
+                    return 106;
+                }
+                case 34:
+                {
+                    return 107;
+                }
+                case 19:
+                {
+                    return 108;
+                }
+                case 20:
+                {
+                    return 109;
+                }
+                case 24:
+                case 25:
+                case 26:
+                {
+                    return 110;
+                }
+                default:
+                {
+                    return -1;
+                }
+            }
+        }
+        case 110:
+        {
+            Lexeme prevMatch = token.match;
+            token.match = lexeme;
+            int tokenId = GetTokenId(3);
+            if (tokenId == CONTINUE_TOKEN)
+            {
+                token.id = tokenId;
+                return -1;
+            }
+            else if (tokenId != INVALID_TOKEN)
+            {
+                token.id = tokenId;
+            }
+            else
+            {
+                token.match = prevMatch;
+            }
+            switch (i)
+            {
+                case 21:
+                {
+                    return 106;
+                }
+                case 34:
+                {
+                    return 107;
+                }
+                case 19:
+                {
+                    return 108;
+                }
+                case 20:
+                {
+                    return 109;
+                }
+                case 24:
+                case 25:
+                case 26:
+                {
+                    return 110;
+                }
+                default:
+                {
+                    return -1;
+                }
+            }
+        }
+        case 109:
+        {
+            switch (i)
+            {
+                case 14:
+                {
+                    return 111;
+                }
+                case 15:
+                {
+                    return 112;
+                }
+                case 24:
+                case 25:
+                case 26:
+                {
+                    return 113;
+                }
+                default:
+                {
+                    return -1;
+                }
+            }
+        }
+        case 113:
+        {
+            Lexeme prevMatch = token.match;
+            token.match = lexeme;
+            int tokenId = GetTokenId(3);
+            if (tokenId == CONTINUE_TOKEN)
+            {
+                token.id = tokenId;
+                return -1;
+            }
+            else if (tokenId != INVALID_TOKEN)
+            {
+                token.id = tokenId;
+            }
+            else
+            {
+                token.match = prevMatch;
+            }
+            switch (i)
+            {
+                case 21:
+                {
+                    return 106;
+                }
+                case 34:
+                {
+                    return 107;
+                }
+                case 24:
+                case 25:
+                case 26:
+                {
+                    return 113;
+                }
+                default:
+                {
+                    return -1;
+                }
+            }
+        }
+        case 112:
+        {
+            switch (i)
+            {
+                case 24:
+                case 25:
+                case 26:
+                {
+                    return 113;
+                }
+                default:
+                {
+                    return -1;
+                }
+            }
+        }
+        case 111:
+        {
+            switch (i)
+            {
+                case 24:
+                case 25:
+                case 26:
+                {
+                    return 113;
+                }
+                default:
+                {
+                    return -1;
+                }
+            }
+        }
+        case 108:
+        {
+            switch (i)
+            {
+                case 14:
+                {
+                    return 111;
+                }
+                case 15:
+                {
+                    return 112;
+                }
+                case 24:
+                case 25:
+                case 26:
+                {
+                    return 113;
+                }
+                default:
+                {
+                    return -1;
+                }
+            }
+        }
+        case 97:
+        {
+            Lexeme prevMatch = token.match;
+            token.match = lexeme;
+            int tokenId = GetTokenId(2);
+            if (tokenId == CONTINUE_TOKEN)
+            {
+                token.id = tokenId;
+                return -1;
+            }
+            else if (tokenId != INVALID_TOKEN)
+            {
+                token.id = tokenId;
+            }
+            else
+            {
+                token.match = prevMatch;
+            }
+            return -1;
+        }
+        case 96:
+        {
+            Lexeme prevMatch = token.match;
+            token.match = lexeme;
+            int tokenId = GetTokenId(2);
+            if (tokenId == CONTINUE_TOKEN)
+            {
+                token.id = tokenId;
+                return -1;
+            }
+            else if (tokenId != INVALID_TOKEN)
+            {
+                token.id = tokenId;
+            }
+            else
+            {
+                token.match = prevMatch;
+            }
+            return -1;
+        }
+        case 95:
+        {
+            switch (i)
+            {
+                case 18:
                 case 19:
                 case 20:
                 case 21:
                 case 22:
                 case 23:
+                case 24:
                 case 25:
                 case 26:
-                case 27:
-                case 28:
-                case 29:
-                case 30:
-                case 31:
-                case 32:
-                case 33:
                 case 34:
                 case 35:
                 case 36:
                 {
-                    return 69;
+                    return 114;
+                }
+                default:
+                {
+                    return -1;
+                }
+            }
+        }
+        case 114:
+        {
+            Lexeme prevMatch = token.match;
+            token.match = lexeme;
+            int tokenId = GetTokenId(2);
+            if (tokenId == CONTINUE_TOKEN)
+            {
+                token.id = tokenId;
+                return -1;
+            }
+            else if (tokenId != INVALID_TOKEN)
+            {
+                token.id = tokenId;
+            }
+            else
+            {
+                token.match = prevMatch;
+            }
+            switch (i)
+            {
+                case 11:
+                {
+                    return 96;
+                }
+                case 12:
+                {
+                    return 97;
+                }
+                case 18:
+                case 19:
+                case 20:
+                case 21:
+                case 22:
+                case 23:
+                case 24:
+                case 25:
+                case 26:
+                case 34:
+                case 35:
+                case 36:
+                {
+                    return 114;
+                }
+                default:
+                {
+                    return -1;
+                }
+            }
+        }
+        case 94:
+        {
+            switch (i)
+            {
+                case 18:
+                case 19:
+                case 20:
+                case 21:
+                case 22:
+                case 23:
+                case 24:
+                case 25:
+                case 26:
+                case 34:
+                case 35:
+                case 36:
+                {
+                    return 114;
+                }
+                default:
+                {
+                    return -1;
+                }
+            }
+        }
+        case 11:
+        {
+            Lexeme prevMatch = token.match;
+            token.match = lexeme;
+            int tokenId = GetTokenId(2);
+            if (tokenId == CONTINUE_TOKEN)
+            {
+                token.id = tokenId;
+                return -1;
+            }
+            else if (tokenId != INVALID_TOKEN)
+            {
+                token.id = tokenId;
+            }
+            else
+            {
+                token.match = prevMatch;
+            }
+            switch (i)
+            {
+                case 11:
+                {
+                    return 96;
+                }
+                case 12:
+                {
+                    return 97;
+                }
+                case 13:
+                {
+                    return 98;
+                }
+                case 19:
+                {
+                    return 99;
+                }
+                case 20:
+                {
+                    return 100;
+                }
+                case 24:
+                case 25:
+                case 26:
+                {
+                    return 115;
+                }
+                default:
+                {
+                    return -1;
+                }
+            }
+        }
+        case 115:
+        {
+            Lexeme prevMatch = token.match;
+            token.match = lexeme;
+            int tokenId = GetTokenId(2);
+            if (tokenId == CONTINUE_TOKEN)
+            {
+                token.id = tokenId;
+                return -1;
+            }
+            else if (tokenId != INVALID_TOKEN)
+            {
+                token.id = tokenId;
+            }
+            else
+            {
+                token.match = prevMatch;
+            }
+            switch (i)
+            {
+                case 11:
+                {
+                    return 96;
+                }
+                case 12:
+                {
+                    return 97;
+                }
+                case 13:
+                {
+                    return 98;
+                }
+                case 19:
+                {
+                    return 99;
+                }
+                case 20:
+                {
+                    return 100;
+                }
+                case 24:
+                case 25:
+                case 26:
+                {
+                    return 115;
                 }
                 default:
                 {
@@ -1911,6 +3370,300 @@ int CmajorLexer::NextState(int state, char32_t c)
             }
         }
         case 10:
+        {
+            switch (i)
+            {
+                case 27:
+                {
+                    return 116;
+                }
+                default:
+                {
+                    return -1;
+                }
+            }
+        }
+        case 116:
+        {
+            switch (i)
+            {
+                case 0:
+                case 1:
+                case 2:
+                case 3:
+                case 4:
+                case 5:
+                case 6:
+                case 7:
+                case 8:
+                case 9:
+                case 10:
+                case 11:
+                case 12:
+                case 13:
+                case 14:
+                case 15:
+                case 16:
+                case 17:
+                case 18:
+                case 19:
+                case 20:
+                case 21:
+                case 22:
+                case 23:
+                case 24:
+                case 25:
+                case 26:
+                case 28:
+                case 29:
+                case 30:
+                case 31:
+                case 32:
+                case 33:
+                case 34:
+                case 35:
+                case 36:
+                case 37:
+                case 38:
+                case 39:
+                case 40:
+                case 41:
+                case 42:
+                case 43:
+                case 44:
+                case 45:
+                case 46:
+                case 47:
+                case 48:
+                case 49:
+                case 50:
+                case 51:
+                case 52:
+                case 53:
+                case 54:
+                case 55:
+                {
+                    return 117;
+                }
+                case 27:
+                {
+                    return 118;
+                }
+                default:
+                {
+                    return -1;
+                }
+            }
+        }
+        case 118:
+        {
+            Lexeme prevMatch = token.match;
+            token.match = lexeme;
+            int tokenId = GetTokenId(5);
+            if (tokenId == CONTINUE_TOKEN)
+            {
+                token.id = tokenId;
+                return -1;
+            }
+            else if (tokenId != INVALID_TOKEN)
+            {
+                token.id = tokenId;
+            }
+            else
+            {
+                token.match = prevMatch;
+            }
+            return -1;
+        }
+        case 117:
+        {
+            switch (i)
+            {
+                case 0:
+                case 1:
+                case 2:
+                case 3:
+                case 4:
+                case 5:
+                case 6:
+                case 7:
+                case 8:
+                case 9:
+                case 10:
+                case 11:
+                case 12:
+                case 13:
+                case 14:
+                case 15:
+                case 16:
+                case 17:
+                case 18:
+                case 19:
+                case 20:
+                case 21:
+                case 22:
+                case 23:
+                case 24:
+                case 25:
+                case 26:
+                case 28:
+                case 29:
+                case 30:
+                case 31:
+                case 32:
+                case 33:
+                case 34:
+                case 35:
+                case 36:
+                case 37:
+                case 38:
+                case 39:
+                case 40:
+                case 41:
+                case 42:
+                case 43:
+                case 44:
+                case 45:
+                case 46:
+                case 47:
+                case 48:
+                case 49:
+                case 50:
+                case 51:
+                case 52:
+                case 53:
+                case 54:
+                case 55:
+                {
+                    return 117;
+                }
+                case 27:
+                {
+                    return 118;
+                }
+                default:
+                {
+                    return -1;
+                }
+            }
+        }
+        case 9:
+        {
+            Lexeme prevMatch = token.match;
+            token.match = lexeme;
+            int tokenId = GetTokenId(1);
+            if (tokenId == CONTINUE_TOKEN)
+            {
+                token.id = tokenId;
+                return -1;
+            }
+            else if (tokenId != INVALID_TOKEN)
+            {
+                token.id = tokenId;
+            }
+            else
+            {
+                token.match = prevMatch;
+            }
+            switch (i)
+            {
+                case 17:
+                {
+                    return 10;
+                }
+                case 27:
+                {
+                    return 13;
+                }
+                case 29:
+                {
+                    return 14;
+                }
+                case 4:
+                case 5:
+                case 9:
+                case 10:
+                case 11:
+                case 12:
+                case 16:
+                case 18:
+                case 19:
+                case 20:
+                case 21:
+                case 22:
+                case 23:
+                case 24:
+                case 25:
+                case 26:
+                case 30:
+                case 31:
+                case 32:
+                case 33:
+                case 34:
+                case 35:
+                case 36:
+                {
+                    return 119;
+                }
+                default:
+                {
+                    return -1;
+                }
+            }
+        }
+        case 119:
+        {
+            Lexeme prevMatch = token.match;
+            token.match = lexeme;
+            int tokenId = GetTokenId(1);
+            if (tokenId == CONTINUE_TOKEN)
+            {
+                token.id = tokenId;
+                return -1;
+            }
+            else if (tokenId != INVALID_TOKEN)
+            {
+                token.id = tokenId;
+            }
+            else
+            {
+                token.match = prevMatch;
+            }
+            switch (i)
+            {
+                case 4:
+                case 5:
+                case 9:
+                case 10:
+                case 11:
+                case 12:
+                case 16:
+                case 18:
+                case 19:
+                case 20:
+                case 21:
+                case 22:
+                case 23:
+                case 24:
+                case 25:
+                case 26:
+                case 30:
+                case 31:
+                case 32:
+                case 33:
+                case 34:
+                case 35:
+                case 36:
+                {
+                    return 119;
+                }
+                default:
+                {
+                    return -1;
+                }
+            }
+        }
+        case 8:
         {
             Lexeme prevMatch = token.match;
             token.match = lexeme;
@@ -1930,13 +3683,13 @@ int CmajorLexer::NextState(int state, char32_t c)
             }
             switch (i)
             {
-                case 18:
+                case 15:
                 {
-                    return 70;
+                    return 120;
                 }
                 case 39:
                 {
-                    return 71;
+                    return 121;
                 }
                 default:
                 {
@@ -1944,7 +3697,7 @@ int CmajorLexer::NextState(int state, char32_t c)
                 }
             }
         }
-        case 71:
+        case 121:
         {
             Lexeme prevMatch = token.match;
             token.match = lexeme;
@@ -1964,7 +3717,7 @@ int CmajorLexer::NextState(int state, char32_t c)
             }
             return -1;
         }
-        case 70:
+        case 120:
         {
             Lexeme prevMatch = token.match;
             token.match = lexeme;
@@ -1984,7 +3737,7 @@ int CmajorLexer::NextState(int state, char32_t c)
             }
             return -1;
         }
-        case 9:
+        case 7:
         {
             Lexeme prevMatch = token.match;
             token.match = lexeme;
@@ -2004,9 +3757,9 @@ int CmajorLexer::NextState(int state, char32_t c)
             }
             switch (i)
             {
-                case 17:
+                case 14:
                 {
-                    return 72;
+                    return 122;
                 }
                 default:
                 {
@@ -2014,7 +3767,7 @@ int CmajorLexer::NextState(int state, char32_t c)
                 }
             }
         }
-        case 72:
+        case 122:
         {
             Lexeme prevMatch = token.match;
             token.match = lexeme;
@@ -2034,7 +3787,7 @@ int CmajorLexer::NextState(int state, char32_t c)
             }
             return -1;
         }
-        case 8:
+        case 6:
         {
             Lexeme prevMatch = token.match;
             token.match = lexeme;
@@ -2054,127 +3807,11 @@ int CmajorLexer::NextState(int state, char32_t c)
             }
             switch (i)
             {
-                case 34:
-                case 35:
-                case 36:
-                {
-                    return 60;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 7:
-        {
-            Lexeme prevMatch = token.match;
-            token.match = lexeme;
-            int tokenId = GetTokenId(1);
-            if (tokenId == CONTINUE_TOKEN)
-            {
-                token.id = tokenId;
-                return -1;
-            }
-            else if (tokenId != INVALID_TOKEN)
-            {
-                token.id = tokenId;
-            }
-            else
-            {
-                token.match = prevMatch;
-            }
-            switch (i)
-            {
-                case 0:
-                {
-                    return 1;
-                }
-                case 4:
-                {
-                    return 3;
-                }
                 case 24:
-                {
-                    return 12;
-                }
-                case 7:
-                case 8:
-                case 12:
-                case 13:
-                case 14:
-                case 15:
-                case 19:
-                case 20:
-                case 21:
-                case 22:
-                case 23:
                 case 25:
                 case 26:
-                case 27:
-                case 28:
-                case 29:
-                case 30:
-                case 31:
-                case 32:
-                case 33:
-                case 34:
-                case 35:
-                case 36:
                 {
-                    return 69;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 6:
-        {
-            Lexeme prevMatch = token.match;
-            token.match = lexeme;
-            int tokenId = GetTokenId(1);
-            if (tokenId == CONTINUE_TOKEN)
-            {
-                token.id = tokenId;
-                return -1;
-            }
-            else if (tokenId != INVALID_TOKEN)
-            {
-                token.id = tokenId;
-            }
-            else
-            {
-                token.match = prevMatch;
-            }
-            switch (i)
-            {
-                case 7:
-                case 8:
-                case 12:
-                case 13:
-                case 14:
-                case 15:
-                case 19:
-                case 20:
-                case 21:
-                case 22:
-                case 23:
-                case 25:
-                case 26:
-                case 27:
-                case 28:
-                case 29:
-                case 30:
-                case 31:
-                case 32:
-                case 33:
-                case 34:
-                case 35:
-                case 36:
-                {
-                    return 69;
+                    return 110;
                 }
                 default:
                 {
@@ -2183,6 +3820,122 @@ int CmajorLexer::NextState(int state, char32_t c)
             }
         }
         case 5:
+        {
+            Lexeme prevMatch = token.match;
+            token.match = lexeme;
+            int tokenId = GetTokenId(1);
+            if (tokenId == CONTINUE_TOKEN)
+            {
+                token.id = tokenId;
+                return -1;
+            }
+            else if (tokenId != INVALID_TOKEN)
+            {
+                token.id = tokenId;
+            }
+            else
+            {
+                token.match = prevMatch;
+            }
+            switch (i)
+            {
+                case 17:
+                {
+                    return 10;
+                }
+                case 27:
+                {
+                    return 13;
+                }
+                case 29:
+                {
+                    return 14;
+                }
+                case 4:
+                case 5:
+                case 9:
+                case 10:
+                case 11:
+                case 12:
+                case 16:
+                case 18:
+                case 19:
+                case 20:
+                case 21:
+                case 22:
+                case 23:
+                case 24:
+                case 25:
+                case 26:
+                case 30:
+                case 31:
+                case 32:
+                case 33:
+                case 34:
+                case 35:
+                case 36:
+                {
+                    return 119;
+                }
+                default:
+                {
+                    return -1;
+                }
+            }
+        }
+        case 4:
+        {
+            Lexeme prevMatch = token.match;
+            token.match = lexeme;
+            int tokenId = GetTokenId(1);
+            if (tokenId == CONTINUE_TOKEN)
+            {
+                token.id = tokenId;
+                return -1;
+            }
+            else if (tokenId != INVALID_TOKEN)
+            {
+                token.id = tokenId;
+            }
+            else
+            {
+                token.match = prevMatch;
+            }
+            switch (i)
+            {
+                case 4:
+                case 5:
+                case 9:
+                case 10:
+                case 11:
+                case 12:
+                case 16:
+                case 18:
+                case 19:
+                case 20:
+                case 21:
+                case 22:
+                case 23:
+                case 24:
+                case 25:
+                case 26:
+                case 30:
+                case 31:
+                case 32:
+                case 33:
+                case 34:
+                case 35:
+                case 36:
+                {
+                    return 119;
+                }
+                default:
+                {
+                    return -1;
+                }
+            }
+        }
+        case 3:
         {
             Lexeme prevMatch = token.match;
             token.match = lexeme;
@@ -2202,7 +3955,7 @@ int CmajorLexer::NextState(int state, char32_t c)
             }
             return -1;
         }
-        case 4:
+        case 2:
         {
             Lexeme prevMatch = token.match;
             token.match = lexeme;
@@ -2222,2723 +3975,11 @@ int CmajorLexer::NextState(int state, char32_t c)
             }
             switch (i)
             {
-                case 5:
-                {
-                    return 73;
-                }
-                case 6:
-                {
-                    return 74;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 74:
-        {
-            switch (i)
-            {
-                case 0:
-                case 1:
                 case 2:
-                case 3:
-                case 4:
-                case 5:
-                case 7:
-                case 8:
-                case 9:
-                case 10:
-                case 11:
-                case 12:
-                case 13:
-                case 14:
-                case 15:
-                case 16:
-                case 17:
-                case 18:
-                case 19:
-                case 20:
-                case 21:
-                case 22:
-                case 23:
-                case 24:
-                case 25:
-                case 26:
-                case 27:
-                case 28:
-                case 29:
-                case 30:
-                case 31:
-                case 32:
-                case 33:
-                case 34:
-                case 35:
-                case 36:
-                case 37:
-                case 38:
-                case 39:
-                case 40:
-                case 41:
-                case 42:
-                case 43:
-                case 44:
-                case 45:
-                case 46:
-                case 47:
-                case 48:
-                case 49:
-                case 50:
-                case 51:
-                case 52:
-                case 53:
-                case 54:
-                case 55:
-                {
-                    return 75;
-                }
-                case 6:
-                {
-                    return 76;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 76:
-        {
-            switch (i)
-            {
-                case 6:
-                {
-                    return 76;
-                }
-                case 0:
-                case 1:
-                case 2:
-                case 3:
-                case 4:
-                case 7:
-                case 8:
-                case 9:
-                case 10:
-                case 11:
-                case 12:
-                case 13:
-                case 14:
-                case 15:
-                case 16:
-                case 17:
-                case 18:
-                case 19:
-                case 20:
-                case 21:
-                case 22:
-                case 23:
-                case 24:
-                case 25:
-                case 26:
-                case 27:
-                case 28:
-                case 29:
-                case 30:
-                case 31:
-                case 32:
-                case 33:
-                case 34:
-                case 35:
-                case 36:
-                case 37:
-                case 38:
-                case 39:
-                case 40:
-                case 41:
-                case 42:
-                case 43:
-                case 44:
-                case 45:
-                case 46:
-                case 47:
-                case 48:
-                case 49:
-                case 50:
-                case 51:
-                case 52:
-                case 53:
-                case 54:
-                case 55:
-                {
-                    return 77;
-                }
-                case 5:
-                {
-                    return 78;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 78:
-        {
-            Lexeme prevMatch = token.match;
-            token.match = lexeme;
-            int tokenId = GetTokenId(0);
-            if (tokenId == CONTINUE_TOKEN)
-            {
-                token.id = tokenId;
-                return -1;
-            }
-            else if (tokenId != INVALID_TOKEN)
-            {
-                token.id = tokenId;
-            }
-            else
-            {
-                token.match = prevMatch;
-            }
-            switch (i)
-            {
-                case 0:
-                case 3:
-                case 4:
-                case 7:
-                case 8:
-                case 11:
-                case 12:
-                case 13:
-                case 14:
-                case 15:
-                case 16:
-                case 17:
-                case 18:
-                case 19:
-                case 20:
-                case 21:
-                case 22:
-                case 23:
-                case 24:
-                case 25:
-                case 26:
-                case 27:
-                case 28:
-                case 29:
-                case 30:
-                case 31:
-                case 32:
-                case 33:
-                case 34:
-                case 35:
-                case 36:
-                case 37:
-                case 38:
-                case 39:
-                case 40:
-                case 41:
-                case 42:
-                case 43:
-                case 44:
-                case 45:
-                case 46:
-                case 47:
-                case 48:
-                case 49:
-                case 50:
-                case 51:
-                case 52:
-                case 53:
-                case 54:
-                case 55:
-                {
-                    return 75;
-                }
-                case 6:
-                {
-                    return 76;
-                }
-                case 1:
-                case 2:
-                case 9:
-                case 10:
-                {
-                    return 79;
-                }
-                case 5:
-                {
-                    return 80;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 80:
-        {
-            switch (i)
-            {
-                case 0:
-                case 1:
-                case 2:
-                case 3:
-                case 4:
-                case 7:
-                case 8:
-                case 9:
-                case 10:
-                case 11:
-                case 12:
-                case 13:
-                case 14:
-                case 15:
-                case 16:
-                case 17:
-                case 18:
-                case 19:
-                case 20:
-                case 21:
-                case 22:
-                case 23:
-                case 24:
-                case 25:
-                case 26:
-                case 27:
-                case 28:
-                case 29:
-                case 30:
-                case 31:
-                case 32:
-                case 33:
-                case 34:
-                case 35:
-                case 36:
-                case 37:
-                case 38:
-                case 39:
-                case 40:
-                case 41:
-                case 42:
-                case 43:
-                case 44:
-                case 45:
-                case 46:
-                case 47:
-                case 48:
-                case 49:
-                case 50:
-                case 51:
-                case 52:
-                case 53:
-                case 54:
-                case 55:
-                {
-                    return 75;
-                }
-                case 5:
-                {
-                    return 81;
-                }
-                case 6:
-                {
-                    return 82;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 82:
-        {
-            switch (i)
-            {
-                case 6:
-                {
-                    return 76;
-                }
-                case 0:
-                case 1:
-                case 2:
-                case 3:
-                case 4:
-                case 7:
-                case 8:
-                case 9:
-                case 10:
-                case 11:
-                case 12:
-                case 13:
-                case 14:
-                case 15:
-                case 16:
-                case 17:
-                case 18:
-                case 19:
-                case 20:
-                case 21:
-                case 22:
-                case 23:
-                case 24:
-                case 25:
-                case 26:
-                case 27:
-                case 28:
-                case 29:
-                case 30:
-                case 31:
-                case 32:
-                case 33:
-                case 34:
-                case 35:
-                case 36:
-                case 37:
-                case 38:
-                case 39:
-                case 40:
-                case 41:
-                case 42:
-                case 43:
-                case 44:
-                case 45:
-                case 46:
-                case 47:
-                case 48:
-                case 49:
-                case 50:
-                case 51:
-                case 52:
-                case 53:
-                case 54:
-                case 55:
-                {
-                    return 77;
-                }
-                case 5:
-                {
-                    return 78;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 81:
-        {
-            switch (i)
-            {
-                case 0:
-                case 3:
-                case 4:
-                case 5:
-                case 7:
-                case 8:
-                case 9:
-                case 10:
-                case 11:
-                case 12:
-                case 13:
-                case 14:
-                case 15:
-                case 16:
-                case 17:
-                case 18:
-                case 19:
-                case 20:
-                case 21:
-                case 22:
-                case 23:
-                case 24:
-                case 25:
-                case 26:
-                case 27:
-                case 28:
-                case 29:
-                case 30:
-                case 31:
-                case 32:
-                case 33:
-                case 34:
-                case 35:
-                case 36:
-                case 37:
-                case 38:
-                case 39:
-                case 40:
-                case 41:
-                case 42:
-                case 43:
-                case 44:
-                case 45:
-                case 46:
-                case 47:
-                case 48:
-                case 49:
-                case 50:
-                case 51:
-                case 52:
-                case 53:
-                case 54:
-                case 55:
-                {
-                    return 83;
-                }
-                case 1:
-                {
-                    return 84;
-                }
-                case 2:
-                {
-                    return 85;
-                }
-                case 6:
-                {
-                    return 86;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 86:
-        {
-            switch (i)
-            {
-                case 6:
-                {
-                    return 86;
-                }
-                case 0:
-                case 3:
-                case 4:
-                case 7:
-                case 8:
-                case 9:
-                case 10:
-                case 11:
-                case 12:
-                case 13:
-                case 14:
-                case 15:
-                case 16:
-                case 17:
-                case 18:
-                case 19:
-                case 20:
-                case 21:
-                case 22:
-                case 23:
-                case 24:
-                case 25:
-                case 26:
-                case 27:
-                case 28:
-                case 29:
-                case 30:
-                case 31:
-                case 32:
-                case 33:
-                case 34:
-                case 35:
-                case 36:
-                case 37:
-                case 38:
-                case 39:
-                case 40:
-                case 41:
-                case 42:
-                case 43:
-                case 44:
-                case 45:
-                case 46:
-                case 47:
-                case 48:
-                case 49:
-                case 50:
-                case 51:
-                case 52:
-                case 53:
-                case 54:
-                case 55:
-                {
-                    return 87;
-                }
-                case 1:
-                {
-                    return 88;
-                }
-                case 2:
-                {
-                    return 89;
-                }
-                case 5:
-                {
-                    return 90;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 90:
-        {
-            Lexeme prevMatch = token.match;
-            token.match = lexeme;
-            int tokenId = GetTokenId(0);
-            if (tokenId == CONTINUE_TOKEN)
-            {
-                token.id = tokenId;
-                return -1;
-            }
-            else if (tokenId != INVALID_TOKEN)
-            {
-                token.id = tokenId;
-            }
-            else
-            {
-                token.match = prevMatch;
-            }
-            switch (i)
-            {
-                case 0:
-                case 3:
-                case 4:
-                case 7:
-                case 8:
-                case 11:
-                case 12:
-                case 13:
-                case 14:
-                case 15:
-                case 16:
-                case 17:
-                case 18:
-                case 19:
-                case 20:
-                case 21:
-                case 22:
-                case 23:
-                case 24:
-                case 25:
-                case 26:
-                case 27:
-                case 28:
-                case 29:
-                case 30:
-                case 31:
-                case 32:
-                case 33:
-                case 34:
-                case 35:
-                case 36:
-                case 37:
-                case 38:
-                case 39:
-                case 40:
-                case 41:
-                case 42:
-                case 43:
-                case 44:
-                case 45:
-                case 46:
-                case 47:
-                case 48:
-                case 49:
-                case 50:
-                case 51:
-                case 52:
-                case 53:
-                case 54:
-                case 55:
-                {
-                    return 83;
-                }
-                case 6:
-                {
-                    return 86;
-                }
-                case 1:
-                {
-                    return 91;
-                }
-                case 2:
-                {
-                    return 92;
-                }
-                case 5:
-                {
-                    return 93;
-                }
-                case 9:
-                case 10:
-                {
-                    return 94;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 94:
-        {
-            Lexeme prevMatch = token.match;
-            token.match = lexeme;
-            int tokenId = GetTokenId(0);
-            if (tokenId == CONTINUE_TOKEN)
-            {
-                token.id = tokenId;
-                return -1;
-            }
-            else if (tokenId != INVALID_TOKEN)
-            {
-                token.id = tokenId;
-            }
-            else
-            {
-                token.match = prevMatch;
-            }
-            switch (i)
-            {
-                case 0:
-                case 3:
-                case 4:
-                case 7:
-                case 8:
-                case 11:
-                case 12:
-                case 13:
-                case 14:
-                case 15:
-                case 16:
-                case 17:
-                case 18:
-                case 19:
-                case 20:
-                case 21:
-                case 22:
-                case 23:
-                case 24:
-                case 25:
-                case 26:
-                case 27:
-                case 28:
-                case 29:
-                case 30:
-                case 31:
-                case 32:
-                case 33:
-                case 34:
-                case 35:
-                case 36:
-                case 37:
-                case 38:
-                case 39:
-                case 40:
-                case 41:
-                case 42:
-                case 43:
-                case 44:
-                case 45:
-                case 46:
-                case 47:
-                case 48:
-                case 49:
-                case 50:
-                case 51:
-                case 52:
-                case 53:
-                case 54:
-                case 55:
-                {
-                    return 83;
-                }
-                case 6:
-                {
-                    return 86;
-                }
-                case 1:
-                {
-                    return 91;
-                }
-                case 2:
-                {
-                    return 92;
-                }
-                case 5:
-                {
-                    return 93;
-                }
-                case 9:
-                case 10:
-                {
-                    return 94;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 93:
-        {
-            switch (i)
-            {
-                case 5:
-                {
-                    return 81;
-                }
-                case 0:
-                case 3:
-                case 4:
-                case 7:
-                case 8:
-                case 9:
-                case 10:
-                case 11:
-                case 12:
-                case 13:
-                case 14:
-                case 15:
-                case 16:
-                case 17:
-                case 18:
-                case 19:
-                case 20:
-                case 21:
-                case 22:
-                case 23:
-                case 24:
-                case 25:
-                case 26:
-                case 27:
-                case 28:
-                case 29:
-                case 30:
-                case 31:
-                case 32:
-                case 33:
-                case 34:
-                case 35:
-                case 36:
-                case 37:
-                case 38:
-                case 39:
-                case 40:
-                case 41:
-                case 42:
-                case 43:
-                case 44:
-                case 45:
-                case 46:
-                case 47:
-                case 48:
-                case 49:
-                case 50:
-                case 51:
-                case 52:
-                case 53:
-                case 54:
-                case 55:
-                {
-                    return 83;
-                }
-                case 1:
-                {
-                    return 84;
-                }
-                case 2:
-                {
-                    return 85;
-                }
-                case 6:
-                {
-                    return 95;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 95:
-        {
-            switch (i)
-            {
-                case 6:
-                {
-                    return 86;
-                }
-                case 0:
-                case 3:
-                case 4:
-                case 7:
-                case 8:
-                case 9:
-                case 10:
-                case 11:
-                case 12:
-                case 13:
-                case 14:
-                case 15:
-                case 16:
-                case 17:
-                case 18:
-                case 19:
-                case 20:
-                case 21:
-                case 22:
-                case 23:
-                case 24:
-                case 25:
-                case 26:
-                case 27:
-                case 28:
-                case 29:
-                case 30:
-                case 31:
-                case 32:
-                case 33:
-                case 34:
-                case 35:
-                case 36:
-                case 37:
-                case 38:
-                case 39:
-                case 40:
-                case 41:
-                case 42:
-                case 43:
-                case 44:
-                case 45:
-                case 46:
-                case 47:
-                case 48:
-                case 49:
-                case 50:
-                case 51:
-                case 52:
-                case 53:
-                case 54:
-                case 55:
-                {
-                    return 87;
-                }
-                case 1:
-                {
-                    return 88;
-                }
-                case 2:
-                {
-                    return 89;
-                }
-                case 5:
-                {
-                    return 90;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 92:
-        {
-            Lexeme prevMatch = token.match;
-            token.match = lexeme;
-            int tokenId = GetTokenId(0);
-            if (tokenId == CONTINUE_TOKEN)
-            {
-                token.id = tokenId;
-                return -1;
-            }
-            else if (tokenId != INVALID_TOKEN)
-            {
-                token.id = tokenId;
-            }
-            else
-            {
-                token.match = prevMatch;
-            }
-            switch (i)
-            {
-                case 0:
-                case 3:
-                case 4:
-                case 7:
-                case 8:
-                case 11:
-                case 12:
-                case 13:
-                case 14:
-                case 15:
-                case 16:
-                case 17:
-                case 18:
-                case 19:
-                case 20:
-                case 21:
-                case 22:
-                case 23:
-                case 24:
-                case 25:
-                case 26:
-                case 27:
-                case 28:
-                case 29:
-                case 30:
-                case 31:
-                case 32:
-                case 33:
-                case 34:
-                case 35:
-                case 36:
-                case 37:
-                case 38:
-                case 39:
-                case 40:
-                case 41:
-                case 42:
-                case 43:
-                case 44:
-                case 45:
-                case 46:
-                case 47:
-                case 48:
-                case 49:
-                case 50:
-                case 51:
-                case 52:
-                case 53:
-                case 54:
-                case 55:
-                {
-                    return 75;
-                }
-                case 6:
-                {
-                    return 76;
-                }
-                case 2:
-                case 9:
-                case 10:
-                {
-                    return 79;
-                }
-                case 5:
-                {
-                    return 80;
-                }
-                case 1:
-                {
-                    return 96;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 96:
-        {
-            Lexeme prevMatch = token.match;
-            token.match = lexeme;
-            int tokenId = GetTokenId(0);
-            if (tokenId == CONTINUE_TOKEN)
-            {
-                token.id = tokenId;
-                return -1;
-            }
-            else if (tokenId != INVALID_TOKEN)
-            {
-                token.id = tokenId;
-            }
-            else
-            {
-                token.match = prevMatch;
-            }
-            switch (i)
-            {
-                case 0:
-                case 3:
-                case 4:
-                case 7:
-                case 8:
-                case 11:
-                case 12:
-                case 13:
-                case 14:
-                case 15:
-                case 16:
-                case 17:
-                case 18:
-                case 19:
-                case 20:
-                case 21:
-                case 22:
-                case 23:
-                case 24:
-                case 25:
-                case 26:
-                case 27:
-                case 28:
-                case 29:
-                case 30:
-                case 31:
-                case 32:
-                case 33:
-                case 34:
-                case 35:
-                case 36:
-                case 37:
-                case 38:
-                case 39:
-                case 40:
-                case 41:
-                case 42:
-                case 43:
-                case 44:
-                case 45:
-                case 46:
-                case 47:
-                case 48:
-                case 49:
-                case 50:
-                case 51:
-                case 52:
-                case 53:
-                case 54:
-                case 55:
-                {
-                    return 75;
-                }
-                case 6:
-                {
-                    return 76;
-                }
-                case 1:
-                case 2:
-                case 9:
-                case 10:
-                {
-                    return 79;
-                }
-                case 5:
-                {
-                    return 80;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 91:
-        {
-            Lexeme prevMatch = token.match;
-            token.match = lexeme;
-            int tokenId = GetTokenId(0);
-            if (tokenId == CONTINUE_TOKEN)
-            {
-                token.id = tokenId;
-                return -1;
-            }
-            else if (tokenId != INVALID_TOKEN)
-            {
-                token.id = tokenId;
-            }
-            else
-            {
-                token.match = prevMatch;
-            }
-            switch (i)
-            {
-                case 0:
-                case 3:
-                case 4:
-                case 7:
-                case 8:
-                case 11:
-                case 12:
-                case 13:
-                case 14:
-                case 15:
-                case 16:
-                case 17:
-                case 18:
-                case 19:
-                case 20:
-                case 21:
-                case 22:
-                case 23:
-                case 24:
-                case 25:
-                case 26:
-                case 27:
-                case 28:
-                case 29:
-                case 30:
-                case 31:
-                case 32:
-                case 33:
-                case 34:
-                case 35:
-                case 36:
-                case 37:
-                case 38:
-                case 39:
-                case 40:
-                case 41:
-                case 42:
-                case 43:
-                case 44:
-                case 45:
-                case 46:
-                case 47:
-                case 48:
-                case 49:
-                case 50:
-                case 51:
-                case 52:
-                case 53:
-                case 54:
-                case 55:
-                {
-                    return 75;
-                }
-                case 6:
-                {
-                    return 76;
-                }
-                case 1:
-                case 2:
-                case 9:
-                case 10:
-                {
-                    return 79;
-                }
-                case 5:
-                {
-                    return 80;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 89:
-        {
-            Lexeme prevMatch = token.match;
-            token.match = lexeme;
-            int tokenId = GetTokenId(0);
-            if (tokenId == CONTINUE_TOKEN)
-            {
-                token.id = tokenId;
-                return -1;
-            }
-            else if (tokenId != INVALID_TOKEN)
-            {
-                token.id = tokenId;
-            }
-            else
-            {
-                token.match = prevMatch;
-            }
-            switch (i)
-            {
-                case 0:
-                case 3:
-                case 4:
-                case 7:
-                case 8:
-                case 11:
-                case 12:
-                case 13:
-                case 14:
-                case 15:
-                case 16:
-                case 17:
-                case 18:
-                case 19:
-                case 20:
-                case 21:
-                case 22:
-                case 23:
-                case 24:
-                case 25:
-                case 26:
-                case 27:
-                case 28:
-                case 29:
-                case 30:
-                case 31:
-                case 32:
-                case 33:
-                case 34:
-                case 35:
-                case 36:
-                case 37:
-                case 38:
-                case 39:
-                case 40:
-                case 41:
-                case 42:
-                case 43:
-                case 44:
-                case 45:
-                case 46:
-                case 47:
-                case 48:
-                case 49:
-                case 50:
-                case 51:
-                case 52:
-                case 53:
-                case 54:
-                case 55:
-                {
-                    return 75;
-                }
-                case 6:
-                {
-                    return 76;
-                }
-                case 2:
-                case 9:
-                case 10:
-                {
-                    return 79;
-                }
-                case 5:
-                {
-                    return 80;
-                }
-                case 1:
-                {
-                    return 96;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 88:
-        {
-            Lexeme prevMatch = token.match;
-            token.match = lexeme;
-            int tokenId = GetTokenId(0);
-            if (tokenId == CONTINUE_TOKEN)
-            {
-                token.id = tokenId;
-                return -1;
-            }
-            else if (tokenId != INVALID_TOKEN)
-            {
-                token.id = tokenId;
-            }
-            else
-            {
-                token.match = prevMatch;
-            }
-            switch (i)
-            {
-                case 0:
-                case 3:
-                case 4:
-                case 7:
-                case 8:
-                case 11:
-                case 12:
-                case 13:
-                case 14:
-                case 15:
-                case 16:
-                case 17:
-                case 18:
-                case 19:
-                case 20:
-                case 21:
-                case 22:
-                case 23:
-                case 24:
-                case 25:
-                case 26:
-                case 27:
-                case 28:
-                case 29:
-                case 30:
-                case 31:
-                case 32:
-                case 33:
-                case 34:
-                case 35:
-                case 36:
-                case 37:
-                case 38:
-                case 39:
-                case 40:
-                case 41:
-                case 42:
-                case 43:
-                case 44:
-                case 45:
-                case 46:
-                case 47:
-                case 48:
-                case 49:
-                case 50:
-                case 51:
-                case 52:
-                case 53:
-                case 54:
-                case 55:
-                {
-                    return 75;
-                }
-                case 6:
-                {
-                    return 76;
-                }
-                case 1:
-                case 2:
-                case 9:
-                case 10:
-                {
-                    return 79;
-                }
-                case 5:
-                {
-                    return 80;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 87:
-        {
-            switch (i)
-            {
-                case 0:
-                case 3:
-                case 4:
-                case 5:
-                case 7:
-                case 8:
-                case 9:
-                case 10:
-                case 11:
-                case 12:
-                case 13:
-                case 14:
-                case 15:
-                case 16:
-                case 17:
-                case 18:
-                case 19:
-                case 20:
-                case 21:
-                case 22:
-                case 23:
-                case 24:
-                case 25:
-                case 26:
-                case 27:
-                case 28:
-                case 29:
-                case 30:
-                case 31:
-                case 32:
-                case 33:
-                case 34:
-                case 35:
-                case 36:
-                case 37:
-                case 38:
-                case 39:
-                case 40:
-                case 41:
-                case 42:
-                case 43:
-                case 44:
-                case 45:
-                case 46:
-                case 47:
-                case 48:
-                case 49:
-                case 50:
-                case 51:
-                case 52:
-                case 53:
-                case 54:
-                case 55:
-                {
-                    return 83;
-                }
-                case 1:
-                {
-                    return 84;
-                }
-                case 2:
-                {
-                    return 85;
-                }
-                case 6:
-                {
-                    return 86;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 85:
-        {
-            Lexeme prevMatch = token.match;
-            token.match = lexeme;
-            int tokenId = GetTokenId(0);
-            if (tokenId == CONTINUE_TOKEN)
-            {
-                token.id = tokenId;
-                return -1;
-            }
-            else if (tokenId != INVALID_TOKEN)
-            {
-                token.id = tokenId;
-            }
-            else
-            {
-                token.match = prevMatch;
-            }
-            switch (i)
-            {
-                case 0:
-                case 3:
-                case 4:
-                case 7:
-                case 8:
-                case 11:
-                case 12:
-                case 13:
-                case 14:
-                case 15:
-                case 16:
-                case 17:
-                case 18:
-                case 19:
-                case 20:
-                case 21:
-                case 22:
-                case 23:
-                case 24:
-                case 25:
-                case 26:
-                case 27:
-                case 28:
-                case 29:
-                case 30:
-                case 31:
-                case 32:
-                case 33:
-                case 34:
-                case 35:
-                case 36:
-                case 37:
-                case 38:
-                case 39:
-                case 40:
-                case 41:
-                case 42:
-                case 43:
-                case 44:
-                case 45:
-                case 46:
-                case 47:
-                case 48:
-                case 49:
-                case 50:
-                case 51:
-                case 52:
-                case 53:
-                case 54:
-                case 55:
-                {
-                    return 75;
-                }
-                case 6:
-                {
-                    return 76;
-                }
-                case 2:
-                case 9:
-                case 10:
-                {
-                    return 79;
-                }
-                case 5:
-                {
-                    return 80;
-                }
-                case 1:
-                {
-                    return 96;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 84:
-        {
-            Lexeme prevMatch = token.match;
-            token.match = lexeme;
-            int tokenId = GetTokenId(0);
-            if (tokenId == CONTINUE_TOKEN)
-            {
-                token.id = tokenId;
-                return -1;
-            }
-            else if (tokenId != INVALID_TOKEN)
-            {
-                token.id = tokenId;
-            }
-            else
-            {
-                token.match = prevMatch;
-            }
-            switch (i)
-            {
-                case 0:
-                case 3:
-                case 4:
-                case 7:
-                case 8:
-                case 11:
-                case 12:
-                case 13:
-                case 14:
-                case 15:
-                case 16:
-                case 17:
-                case 18:
-                case 19:
-                case 20:
-                case 21:
-                case 22:
-                case 23:
-                case 24:
-                case 25:
-                case 26:
-                case 27:
-                case 28:
-                case 29:
-                case 30:
-                case 31:
-                case 32:
-                case 33:
-                case 34:
-                case 35:
-                case 36:
-                case 37:
-                case 38:
-                case 39:
-                case 40:
-                case 41:
-                case 42:
-                case 43:
-                case 44:
-                case 45:
-                case 46:
-                case 47:
-                case 48:
-                case 49:
-                case 50:
-                case 51:
-                case 52:
-                case 53:
-                case 54:
-                case 55:
-                {
-                    return 75;
-                }
-                case 6:
-                {
-                    return 76;
-                }
-                case 1:
-                case 2:
-                case 9:
-                case 10:
-                {
-                    return 79;
-                }
-                case 5:
-                {
-                    return 80;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 83:
-        {
-            switch (i)
-            {
-                case 0:
-                case 3:
-                case 4:
-                case 5:
-                case 7:
-                case 8:
-                case 9:
-                case 10:
-                case 11:
-                case 12:
-                case 13:
-                case 14:
-                case 15:
-                case 16:
-                case 17:
-                case 18:
-                case 19:
-                case 20:
-                case 21:
-                case 22:
-                case 23:
-                case 24:
-                case 25:
-                case 26:
-                case 27:
-                case 28:
-                case 29:
-                case 30:
-                case 31:
-                case 32:
-                case 33:
-                case 34:
-                case 35:
-                case 36:
-                case 37:
-                case 38:
-                case 39:
-                case 40:
-                case 41:
-                case 42:
-                case 43:
-                case 44:
-                case 45:
-                case 46:
-                case 47:
-                case 48:
-                case 49:
-                case 50:
-                case 51:
-                case 52:
-                case 53:
-                case 54:
-                case 55:
-                {
-                    return 83;
-                }
-                case 1:
-                {
-                    return 84;
-                }
-                case 2:
-                {
-                    return 85;
-                }
-                case 6:
-                {
-                    return 86;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 79:
-        {
-            Lexeme prevMatch = token.match;
-            token.match = lexeme;
-            int tokenId = GetTokenId(0);
-            if (tokenId == CONTINUE_TOKEN)
-            {
-                token.id = tokenId;
-                return -1;
-            }
-            else if (tokenId != INVALID_TOKEN)
-            {
-                token.id = tokenId;
-            }
-            else
-            {
-                token.match = prevMatch;
-            }
-            switch (i)
-            {
-                case 0:
-                case 3:
-                case 4:
-                case 7:
-                case 8:
-                case 11:
-                case 12:
-                case 13:
-                case 14:
-                case 15:
-                case 16:
-                case 17:
-                case 18:
-                case 19:
-                case 20:
-                case 21:
-                case 22:
-                case 23:
-                case 24:
-                case 25:
-                case 26:
-                case 27:
-                case 28:
-                case 29:
-                case 30:
-                case 31:
-                case 32:
-                case 33:
-                case 34:
-                case 35:
-                case 36:
-                case 37:
-                case 38:
-                case 39:
-                case 40:
-                case 41:
-                case 42:
-                case 43:
-                case 44:
-                case 45:
-                case 46:
-                case 47:
-                case 48:
-                case 49:
-                case 50:
-                case 51:
-                case 52:
-                case 53:
-                case 54:
-                case 55:
-                {
-                    return 75;
-                }
-                case 6:
-                {
-                    return 76;
-                }
-                case 1:
-                case 2:
-                case 9:
-                case 10:
-                {
-                    return 79;
-                }
-                case 5:
-                {
-                    return 80;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 77:
-        {
-            switch (i)
-            {
-                case 0:
-                case 1:
-                case 2:
-                case 3:
-                case 4:
-                case 5:
-                case 7:
-                case 8:
-                case 9:
-                case 10:
-                case 11:
-                case 12:
-                case 13:
-                case 14:
-                case 15:
-                case 16:
-                case 17:
-                case 18:
-                case 19:
-                case 20:
-                case 21:
-                case 22:
-                case 23:
-                case 24:
-                case 25:
-                case 26:
-                case 27:
-                case 28:
-                case 29:
-                case 30:
-                case 31:
-                case 32:
-                case 33:
-                case 34:
-                case 35:
-                case 36:
-                case 37:
-                case 38:
-                case 39:
-                case 40:
-                case 41:
-                case 42:
-                case 43:
-                case 44:
-                case 45:
-                case 46:
-                case 47:
-                case 48:
-                case 49:
-                case 50:
-                case 51:
-                case 52:
-                case 53:
-                case 54:
-                case 55:
-                {
-                    return 75;
-                }
-                case 6:
-                {
-                    return 76;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 75:
-        {
-            switch (i)
-            {
-                case 0:
-                case 1:
-                case 2:
-                case 3:
-                case 4:
-                case 5:
-                case 7:
-                case 8:
-                case 9:
-                case 10:
-                case 11:
-                case 12:
-                case 13:
-                case 14:
-                case 15:
-                case 16:
-                case 17:
-                case 18:
-                case 19:
-                case 20:
-                case 21:
-                case 22:
-                case 23:
-                case 24:
-                case 25:
-                case 26:
-                case 27:
-                case 28:
-                case 29:
-                case 30:
-                case 31:
-                case 32:
-                case 33:
-                case 34:
-                case 35:
-                case 36:
-                case 37:
-                case 38:
-                case 39:
-                case 40:
-                case 41:
-                case 42:
-                case 43:
-                case 44:
-                case 45:
-                case 46:
-                case 47:
-                case 48:
-                case 49:
-                case 50:
-                case 51:
-                case 52:
-                case 53:
-                case 54:
-                case 55:
-                {
-                    return 75;
-                }
-                case 6:
-                {
-                    return 76;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 73:
-        {
-            switch (i)
-            {
-                case 0:
-                case 3:
-                case 4:
-                case 5:
-                case 6:
-                case 7:
-                case 8:
-                case 9:
-                case 10:
-                case 11:
-                case 12:
-                case 13:
-                case 14:
-                case 15:
-                case 16:
-                case 17:
-                case 18:
-                case 19:
-                case 20:
-                case 21:
-                case 22:
-                case 23:
-                case 24:
-                case 25:
-                case 26:
-                case 27:
-                case 28:
-                case 29:
-                case 30:
-                case 31:
-                case 32:
-                case 33:
-                case 34:
-                case 35:
-                case 36:
-                case 37:
-                case 38:
-                case 39:
-                case 40:
-                case 41:
-                case 42:
-                case 43:
-                case 44:
-                case 45:
-                case 46:
-                case 47:
-                case 48:
-                case 49:
-                case 50:
-                case 51:
-                case 52:
-                case 53:
-                case 54:
-                case 55:
-                {
-                    return 97;
-                }
-                case 1:
-                {
-                    return 98;
-                }
-                case 2:
-                {
-                    return 99;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 99:
-        {
-            Lexeme prevMatch = token.match;
-            token.match = lexeme;
-            int tokenId = GetTokenId(0);
-            if (tokenId == CONTINUE_TOKEN)
-            {
-                token.id = tokenId;
-                return -1;
-            }
-            else if (tokenId != INVALID_TOKEN)
-            {
-                token.id = tokenId;
-            }
-            else
-            {
-                token.match = prevMatch;
-            }
-            switch (i)
-            {
-                case 2:
-                case 9:
-                case 10:
-                {
-                    return 2;
-                }
-                case 1:
-                {
-                    return 100;
-                }
-                case 5:
-                {
-                    return 101;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 101:
-        {
-            switch (i)
-            {
-                case 5:
-                {
-                    return 73;
-                }
-                case 6:
-                {
-                    return 74;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 100:
-        {
-            Lexeme prevMatch = token.match;
-            token.match = lexeme;
-            int tokenId = GetTokenId(0);
-            if (tokenId == CONTINUE_TOKEN)
-            {
-                token.id = tokenId;
-                return -1;
-            }
-            else if (tokenId != INVALID_TOKEN)
-            {
-                token.id = tokenId;
-            }
-            else
-            {
-                token.match = prevMatch;
-            }
-            switch (i)
-            {
-                case 1:
-                case 2:
-                case 9:
-                case 10:
-                {
-                    return 2;
-                }
-                case 5:
-                {
-                    return 101;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 98:
-        {
-            Lexeme prevMatch = token.match;
-            token.match = lexeme;
-            int tokenId = GetTokenId(0);
-            if (tokenId == CONTINUE_TOKEN)
-            {
-                token.id = tokenId;
-                return -1;
-            }
-            else if (tokenId != INVALID_TOKEN)
-            {
-                token.id = tokenId;
-            }
-            else
-            {
-                token.match = prevMatch;
-            }
-            switch (i)
-            {
-                case 1:
-                case 2:
-                case 9:
-                case 10:
-                {
-                    return 2;
-                }
-                case 5:
-                {
-                    return 101;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 97:
-        {
-            switch (i)
-            {
-                case 0:
-                case 3:
-                case 4:
-                case 5:
-                case 6:
-                case 7:
-                case 8:
-                case 9:
-                case 10:
-                case 11:
-                case 12:
-                case 13:
-                case 14:
-                case 15:
-                case 16:
-                case 17:
-                case 18:
-                case 19:
-                case 20:
-                case 21:
-                case 22:
-                case 23:
-                case 24:
-                case 25:
-                case 26:
-                case 27:
-                case 28:
-                case 29:
-                case 30:
-                case 31:
-                case 32:
-                case 33:
-                case 34:
-                case 35:
-                case 36:
-                case 37:
-                case 38:
-                case 39:
-                case 40:
-                case 41:
-                case 42:
-                case 43:
-                case 44:
-                case 45:
-                case 46:
-                case 47:
-                case 48:
-                case 49:
-                case 50:
-                case 51:
-                case 52:
-                case 53:
-                case 54:
-                case 55:
-                {
-                    return 97;
-                }
-                case 1:
-                {
-                    return 98;
-                }
-                case 2:
-                {
-                    return 99;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 3:
-        {
-            switch (i)
-            {
-                case 0:
-                case 5:
-                case 6:
-                case 7:
-                case 8:
-                case 9:
-                case 10:
-                case 11:
-                case 12:
-                case 13:
-                case 14:
-                case 15:
-                case 16:
-                case 17:
-                case 18:
-                case 19:
-                case 20:
-                case 21:
-                case 22:
-                case 23:
-                case 24:
-                case 25:
-                case 26:
-                case 27:
-                case 28:
-                case 29:
-                case 30:
-                case 31:
-                case 32:
-                case 33:
-                case 34:
-                case 35:
-                case 36:
-                case 37:
-                case 38:
-                case 39:
-                case 40:
-                case 41:
-                case 42:
-                case 43:
-                case 44:
-                case 45:
-                case 46:
-                case 47:
-                case 48:
-                case 49:
-                case 50:
-                case 51:
-                case 52:
-                case 53:
-                case 54:
-                case 55:
-                {
-                    return 102;
-                }
-                case 3:
-                {
-                    return 103;
-                }
-                case 4:
-                {
-                    return 104;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 104:
-        {
-            Lexeme prevMatch = token.match;
-            token.match = lexeme;
-            int tokenId = GetTokenId(4);
-            if (tokenId == CONTINUE_TOKEN)
-            {
-                token.id = tokenId;
-                return -1;
-            }
-            else if (tokenId != INVALID_TOKEN)
-            {
-                token.id = tokenId;
-            }
-            else
-            {
-                token.match = prevMatch;
-            }
-            return -1;
-        }
-        case 103:
-        {
-            switch (i)
-            {
-                case 0:
-                case 1:
-                case 2:
-                case 3:
-                case 5:
-                case 6:
-                case 7:
-                case 8:
-                case 9:
-                case 10:
-                case 11:
-                case 16:
-                case 17:
-                case 18:
-                case 19:
-                case 24:
-                case 25:
-                case 26:
-                case 27:
-                case 29:
-                case 34:
-                case 37:
-                case 38:
-                case 39:
-                case 40:
-                case 41:
-                case 42:
-                case 43:
-                case 44:
-                case 45:
-                case 46:
-                case 47:
-                case 48:
-                case 49:
-                case 50:
-                case 51:
-                case 52:
-                case 53:
-                case 54:
-                case 55:
-                {
-                    return 105;
-                }
-                case 4:
-                {
-                    return 106;
-                }
-                case 12:
-                {
-                    return 107;
-                }
-                case 13:
-                {
-                    return 108;
-                }
-                case 14:
-                {
-                    return 109;
-                }
-                case 15:
-                {
-                    return 110;
-                }
-                case 20:
-                {
-                    return 111;
-                }
-                case 21:
-                {
-                    return 112;
-                }
-                case 22:
-                {
-                    return 113;
-                }
-                case 23:
-                {
-                    return 114;
-                }
-                case 28:
-                {
-                    return 115;
-                }
-                case 30:
-                {
-                    return 116;
-                }
-                case 31:
-                {
-                    return 117;
-                }
-                case 32:
-                {
-                    return 118;
-                }
-                case 33:
-                {
-                    return 119;
-                }
-                case 35:
-                case 36:
-                {
-                    return 120;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 120:
-        {
-            switch (i)
-            {
-                case 4:
-                {
-                    return 104;
-                }
-                case 35:
-                case 36:
-                {
-                    return 121;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 121:
-        {
-            switch (i)
-            {
-                case 4:
-                {
-                    return 104;
-                }
-                case 35:
-                case 36:
-                {
-                    return 121;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 119:
-        {
-            switch (i)
-            {
-                case 4:
-                {
-                    return 104;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 118:
-        {
-            switch (i)
-            {
-                case 4:
-                {
-                    return 104;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 117:
-        {
-            switch (i)
-            {
-                case 4:
-                {
-                    return 104;
-                }
-                case 34:
-                case 35:
-                case 36:
-                {
-                    return 122;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 122:
-        {
-            switch (i)
-            {
-                case 4:
-                {
-                    return 104;
-                }
-                case 34:
-                case 35:
-                case 36:
-                {
-                    return 122;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 116:
-        {
-            switch (i)
-            {
-                case 4:
-                {
-                    return 104;
-                }
-                case 34:
-                case 35:
-                case 36:
-                {
-                    return 122;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 115:
-        {
-            switch (i)
-            {
-                case 4:
-                {
-                    return 104;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 114:
-        {
-            switch (i)
-            {
-                case 4:
-                {
-                    return 104;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 113:
-        {
-            switch (i)
-            {
-                case 4:
-                {
-                    return 104;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 112:
-        {
-            switch (i)
-            {
-                case 4:
-                {
-                    return 104;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 111:
-        {
-            switch (i)
-            {
-                case 4:
-                {
-                    return 104;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 110:
-        {
-            switch (i)
-            {
-                case 4:
-                {
-                    return 104;
-                }
-                case 25:
-                case 26:
-                case 27:
-                case 28:
-                case 29:
-                case 30:
-                case 31:
-                case 32:
-                case 33:
-                case 34:
-                case 35:
-                case 36:
                 {
                     return 123;
                 }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 123:
-        {
-            switch (i)
-            {
-                case 25:
-                case 26:
-                case 27:
-                case 28:
-                case 29:
-                case 30:
-                case 31:
-                case 32:
-                case 33:
-                case 34:
-                case 35:
-                case 36:
+                case 3:
                 {
                     return 124;
                 }
@@ -4952,420 +3993,10 @@ int CmajorLexer::NextState(int state, char32_t c)
         {
             switch (i)
             {
-                case 25:
-                case 26:
-                case 27:
-                case 28:
-                case 29:
-                case 30:
-                case 31:
-                case 32:
-                case 33:
-                case 34:
-                case 35:
-                case 36:
-                {
-                    return 125;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 125:
-        {
-            switch (i)
-            {
-                case 25:
-                case 26:
-                case 27:
-                case 28:
-                case 29:
-                case 30:
-                case 31:
-                case 32:
-                case 33:
-                case 34:
-                case 35:
-                case 36:
-                {
-                    return 126;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 126:
-        {
-            switch (i)
-            {
-                case 25:
-                case 26:
-                case 27:
-                case 28:
-                case 29:
-                case 30:
-                case 31:
-                case 32:
-                case 33:
-                case 34:
-                case 35:
-                case 36:
-                {
-                    return 127;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 127:
-        {
-            switch (i)
-            {
-                case 25:
-                case 26:
-                case 27:
-                case 28:
-                case 29:
-                case 30:
-                case 31:
-                case 32:
-                case 33:
-                case 34:
-                case 35:
-                case 36:
-                {
-                    return 128;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 128:
-        {
-            switch (i)
-            {
-                case 25:
-                case 26:
-                case 27:
-                case 28:
-                case 29:
-                case 30:
-                case 31:
-                case 32:
-                case 33:
-                case 34:
-                case 35:
-                case 36:
-                {
-                    return 129;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 129:
-        {
-            switch (i)
-            {
-                case 25:
-                case 26:
-                case 27:
-                case 28:
-                case 29:
-                case 30:
-                case 31:
-                case 32:
-                case 33:
-                case 34:
-                case 35:
-                case 36:
-                {
-                    return 130;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 130:
-        {
-            switch (i)
-            {
-                case 4:
-                {
-                    return 104;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 109:
-        {
-            switch (i)
-            {
-                case 4:
-                {
-                    return 104;
-                }
-                case 25:
-                case 26:
-                case 27:
-                case 28:
-                case 29:
-                case 30:
-                case 31:
-                case 32:
-                case 33:
-                case 34:
-                case 35:
-                case 36:
-                {
-                    return 131;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 131:
-        {
-            switch (i)
-            {
-                case 25:
-                case 26:
-                case 27:
-                case 28:
-                case 29:
-                case 30:
-                case 31:
-                case 32:
-                case 33:
-                case 34:
-                case 35:
-                case 36:
-                {
-                    return 132;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 132:
-        {
-            switch (i)
-            {
-                case 25:
-                case 26:
-                case 27:
-                case 28:
-                case 29:
-                case 30:
-                case 31:
-                case 32:
-                case 33:
-                case 34:
-                case 35:
-                case 36:
-                {
-                    return 133;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 133:
-        {
-            switch (i)
-            {
-                case 25:
-                case 26:
-                case 27:
-                case 28:
-                case 29:
-                case 30:
-                case 31:
-                case 32:
-                case 33:
-                case 34:
-                case 35:
-                case 36:
-                {
-                    return 134;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 134:
-        {
-            switch (i)
-            {
-                case 4:
-                {
-                    return 104;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 108:
-        {
-            switch (i)
-            {
-                case 4:
-                {
-                    return 104;
-                }
-                case 25:
-                case 26:
-                case 27:
-                case 28:
-                case 29:
-                case 30:
-                case 31:
-                case 32:
-                case 33:
-                case 34:
-                case 35:
-                case 36:
-                {
-                    return 135;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 135:
-        {
-            switch (i)
-            {
-                case 4:
-                {
-                    return 104;
-                }
-                case 25:
-                case 26:
-                case 27:
-                case 28:
-                case 29:
-                case 30:
-                case 31:
-                case 32:
-                case 33:
-                case 34:
-                case 35:
-                case 36:
-                {
-                    return 135;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 107:
-        {
-            switch (i)
-            {
-                case 4:
-                {
-                    return 104;
-                }
-                case 25:
-                case 26:
-                case 27:
-                case 28:
-                case 29:
-                case 30:
-                case 31:
-                case 32:
-                case 33:
-                case 34:
-                case 35:
-                case 36:
-                {
-                    return 135;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 106:
-        {
-            Lexeme prevMatch = token.match;
-            token.match = lexeme;
-            int tokenId = GetTokenId(4);
-            if (tokenId == CONTINUE_TOKEN)
-            {
-                token.id = tokenId;
-                return -1;
-            }
-            else if (tokenId != INVALID_TOKEN)
-            {
-                token.id = tokenId;
-            }
-            else
-            {
-                token.match = prevMatch;
-            }
-            switch (i)
-            {
-                case 4:
-                {
-                    return 104;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 105:
-        {
-            switch (i)
-            {
-                case 4:
-                {
-                    return 104;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 102:
-        {
-            switch (i)
-            {
                 case 0:
+                case 1:
+                case 2:
+                case 4:
                 case 5:
                 case 6:
                 case 7:
@@ -5418,11 +4049,11 @@ int CmajorLexer::NextState(int state, char32_t c)
                 case 54:
                 case 55:
                 {
-                    return 102;
+                    return 125;
                 }
-                case 4:
+                case 3:
                 {
-                    return 104;
+                    return 126;
                 }
                 default:
                 {
@@ -5430,7 +4061,82 @@ int CmajorLexer::NextState(int state, char32_t c)
                 }
             }
         }
-        case 2:
+        case 126:
+        {
+            switch (i)
+            {
+                case 3:
+                {
+                    return 126;
+                }
+                case 0:
+                case 1:
+                case 4:
+                case 5:
+                case 6:
+                case 7:
+                case 8:
+                case 9:
+                case 10:
+                case 11:
+                case 12:
+                case 13:
+                case 14:
+                case 15:
+                case 16:
+                case 17:
+                case 18:
+                case 19:
+                case 20:
+                case 21:
+                case 22:
+                case 23:
+                case 24:
+                case 25:
+                case 26:
+                case 27:
+                case 28:
+                case 29:
+                case 30:
+                case 31:
+                case 32:
+                case 33:
+                case 34:
+                case 35:
+                case 36:
+                case 37:
+                case 38:
+                case 39:
+                case 40:
+                case 41:
+                case 42:
+                case 43:
+                case 44:
+                case 45:
+                case 46:
+                case 47:
+                case 48:
+                case 49:
+                case 50:
+                case 51:
+                case 52:
+                case 53:
+                case 54:
+                case 55:
+                {
+                    return 127;
+                }
+                case 2:
+                {
+                    return 128;
+                }
+                default:
+                {
+                    return -1;
+                }
+            }
+        }
+        case 128:
         {
             Lexeme prevMatch = token.match;
             token.match = lexeme;
@@ -5450,16 +4156,73 @@ int CmajorLexer::NextState(int state, char32_t c)
             }
             switch (i)
             {
+                case 4:
+                case 5:
+                case 8:
+                case 9:
+                case 10:
+                case 11:
+                case 12:
+                case 13:
+                case 14:
+                case 15:
+                case 16:
+                case 17:
+                case 18:
+                case 19:
+                case 20:
+                case 21:
+                case 22:
+                case 23:
+                case 24:
+                case 25:
+                case 26:
+                case 27:
+                case 28:
+                case 29:
+                case 30:
+                case 31:
+                case 32:
+                case 33:
+                case 34:
+                case 35:
+                case 36:
+                case 37:
+                case 38:
+                case 39:
+                case 40:
+                case 41:
+                case 42:
+                case 43:
+                case 44:
+                case 45:
+                case 46:
+                case 47:
+                case 48:
+                case 49:
+                case 50:
+                case 51:
+                case 52:
+                case 53:
+                case 54:
+                case 55:
+                {
+                    return 125;
+                }
+                case 3:
+                {
+                    return 126;
+                }
+                case 0:
                 case 1:
+                case 6:
+                case 7:
+                {
+                    return 129;
+                }
                 case 2:
-                case 9:
-                case 10:
                 {
-                    return 2;
-                }
-                case 5:
-                {
-                    return 101;
+                    return 130;
                 }
                 default:
                 {
@@ -5467,18 +4230,12 @@ int CmajorLexer::NextState(int state, char32_t c)
                 }
             }
         }
-        case 1:
+        case 130:
         {
             switch (i)
             {
                 case 0:
-                {
-                    return 136;
-                }
-                case 3:
-                {
-                    return 137;
-                }
+                case 1:
                 case 4:
                 case 5:
                 case 6:
@@ -5532,7 +4289,15 @@ int CmajorLexer::NextState(int state, char32_t c)
                 case 54:
                 case 55:
                 {
-                    return 138;
+                    return 125;
+                }
+                case 2:
+                {
+                    return 131;
+                }
+                case 3:
+                {
+                    return 132;
                 }
                 default:
                 {
@@ -5540,18 +4305,16 @@ int CmajorLexer::NextState(int state, char32_t c)
                 }
             }
         }
-        case 138:
+        case 132:
         {
             switch (i)
             {
-                case 0:
-                {
-                    return 136;
-                }
                 case 3:
                 {
-                    return 137;
+                    return 126;
                 }
+                case 0:
+                case 1:
                 case 4:
                 case 5:
                 case 6:
@@ -5605,7 +4368,11 @@ int CmajorLexer::NextState(int state, char32_t c)
                 case 54:
                 case 55:
                 {
-                    return 138;
+                    return 127;
+                }
+                case 2:
+                {
+                    return 128;
                 }
                 default:
                 {
@@ -5613,20 +4380,104 @@ int CmajorLexer::NextState(int state, char32_t c)
                 }
             }
         }
-        case 137:
+        case 131:
+        {
+            switch (i)
+            {
+                case 0:
+                {
+                    return 133;
+                }
+                case 1:
+                {
+                    return 134;
+                }
+                case 2:
+                case 4:
+                case 5:
+                case 6:
+                case 7:
+                case 8:
+                case 9:
+                case 10:
+                case 11:
+                case 12:
+                case 13:
+                case 14:
+                case 15:
+                case 16:
+                case 17:
+                case 18:
+                case 19:
+                case 20:
+                case 21:
+                case 22:
+                case 23:
+                case 24:
+                case 25:
+                case 26:
+                case 27:
+                case 28:
+                case 29:
+                case 30:
+                case 31:
+                case 32:
+                case 33:
+                case 34:
+                case 35:
+                case 36:
+                case 37:
+                case 38:
+                case 39:
+                case 40:
+                case 41:
+                case 42:
+                case 43:
+                case 44:
+                case 45:
+                case 46:
+                case 47:
+                case 48:
+                case 49:
+                case 50:
+                case 51:
+                case 52:
+                case 53:
+                case 54:
+                case 55:
+                {
+                    return 135;
+                }
+                case 3:
+                {
+                    return 136;
+                }
+                default:
+                {
+                    return -1;
+                }
+            }
+        }
+        case 136:
         {
             switch (i)
             {
                 case 3:
                 {
-                    return 137;
+                    return 136;
                 }
                 case 0:
+                {
+                    return 137;
+                }
+                case 1:
+                {
+                    return 138;
+                }
+                case 2:
                 {
                     return 139;
                 }
-                case 1:
-                case 2:
                 case 4:
                 case 5:
                 case 6:
@@ -5635,16 +4486,31 @@ int CmajorLexer::NextState(int state, char32_t c)
                 case 9:
                 case 10:
                 case 11:
+                case 12:
+                case 13:
+                case 14:
+                case 15:
                 case 16:
                 case 17:
                 case 18:
                 case 19:
+                case 20:
+                case 21:
+                case 22:
+                case 23:
                 case 24:
                 case 25:
                 case 26:
                 case 27:
+                case 28:
                 case 29:
+                case 30:
+                case 31:
+                case 32:
+                case 33:
                 case 34:
+                case 35:
+                case 36:
                 case 37:
                 case 38:
                 case 39:
@@ -5667,588 +4533,1503 @@ int CmajorLexer::NextState(int state, char32_t c)
                 {
                     return 140;
                 }
+                default:
+                {
+                    return -1;
+                }
+            }
+        }
+        case 140:
+        {
+            switch (i)
+            {
+                case 0:
+                {
+                    return 133;
+                }
+                case 1:
+                {
+                    return 134;
+                }
+                case 2:
+                case 4:
+                case 5:
+                case 6:
+                case 7:
+                case 8:
+                case 9:
+                case 10:
+                case 11:
                 case 12:
+                case 13:
+                case 14:
+                case 15:
+                case 16:
+                case 17:
+                case 18:
+                case 19:
+                case 20:
+                case 21:
+                case 22:
+                case 23:
+                case 24:
+                case 25:
+                case 26:
+                case 27:
+                case 28:
+                case 29:
+                case 30:
+                case 31:
+                case 32:
+                case 33:
+                case 34:
+                case 35:
+                case 36:
+                case 37:
+                case 38:
+                case 39:
+                case 40:
+                case 41:
+                case 42:
+                case 43:
+                case 44:
+                case 45:
+                case 46:
+                case 47:
+                case 48:
+                case 49:
+                case 50:
+                case 51:
+                case 52:
+                case 53:
+                case 54:
+                case 55:
+                {
+                    return 135;
+                }
+                case 3:
+                {
+                    return 136;
+                }
+                default:
+                {
+                    return -1;
+                }
+            }
+        }
+        case 139:
+        {
+            Lexeme prevMatch = token.match;
+            token.match = lexeme;
+            int tokenId = GetTokenId(0);
+            if (tokenId == CONTINUE_TOKEN)
+            {
+                token.id = tokenId;
+                return -1;
+            }
+            else if (tokenId != INVALID_TOKEN)
+            {
+                token.id = tokenId;
+            }
+            else
+            {
+                token.match = prevMatch;
+            }
+            switch (i)
+            {
+                case 4:
+                case 5:
+                case 8:
+                case 9:
+                case 10:
+                case 11:
+                case 12:
+                case 13:
+                case 14:
+                case 15:
+                case 16:
+                case 17:
+                case 18:
+                case 19:
+                case 20:
+                case 21:
+                case 22:
+                case 23:
+                case 24:
+                case 25:
+                case 26:
+                case 27:
+                case 28:
+                case 29:
+                case 30:
+                case 31:
+                case 32:
+                case 33:
+                case 34:
+                case 35:
+                case 36:
+                case 37:
+                case 38:
+                case 39:
+                case 40:
+                case 41:
+                case 42:
+                case 43:
+                case 44:
+                case 45:
+                case 46:
+                case 47:
+                case 48:
+                case 49:
+                case 50:
+                case 51:
+                case 52:
+                case 53:
+                case 54:
+                case 55:
+                {
+                    return 135;
+                }
+                case 3:
+                {
+                    return 136;
+                }
+                case 0:
                 {
                     return 141;
                 }
-                case 13:
+                case 1:
                 {
                     return 142;
                 }
-                case 14:
+                case 2:
                 {
                     return 143;
                 }
-                case 15:
+                case 6:
+                case 7:
                 {
                     return 144;
                 }
+                default:
+                {
+                    return -1;
+                }
+            }
+        }
+        case 144:
+        {
+            Lexeme prevMatch = token.match;
+            token.match = lexeme;
+            int tokenId = GetTokenId(0);
+            if (tokenId == CONTINUE_TOKEN)
+            {
+                token.id = tokenId;
+                return -1;
+            }
+            else if (tokenId != INVALID_TOKEN)
+            {
+                token.id = tokenId;
+            }
+            else
+            {
+                token.match = prevMatch;
+            }
+            switch (i)
+            {
+                case 4:
+                case 5:
+                case 8:
+                case 9:
+                case 10:
+                case 11:
+                case 12:
+                case 13:
+                case 14:
+                case 15:
+                case 16:
+                case 17:
+                case 18:
+                case 19:
                 case 20:
+                case 21:
+                case 22:
+                case 23:
+                case 24:
+                case 25:
+                case 26:
+                case 27:
+                case 28:
+                case 29:
+                case 30:
+                case 31:
+                case 32:
+                case 33:
+                case 34:
+                case 35:
+                case 36:
+                case 37:
+                case 38:
+                case 39:
+                case 40:
+                case 41:
+                case 42:
+                case 43:
+                case 44:
+                case 45:
+                case 46:
+                case 47:
+                case 48:
+                case 49:
+                case 50:
+                case 51:
+                case 52:
+                case 53:
+                case 54:
+                case 55:
+                {
+                    return 135;
+                }
+                case 3:
+                {
+                    return 136;
+                }
+                case 0:
+                {
+                    return 141;
+                }
+                case 1:
+                {
+                    return 142;
+                }
+                case 2:
+                {
+                    return 143;
+                }
+                case 6:
+                case 7:
+                {
+                    return 144;
+                }
+                default:
+                {
+                    return -1;
+                }
+            }
+        }
+        case 143:
+        {
+            switch (i)
+            {
+                case 2:
+                {
+                    return 131;
+                }
+                case 0:
+                {
+                    return 133;
+                }
+                case 1:
+                {
+                    return 134;
+                }
+                case 4:
+                case 5:
+                case 6:
+                case 7:
+                case 8:
+                case 9:
+                case 10:
+                case 11:
+                case 12:
+                case 13:
+                case 14:
+                case 15:
+                case 16:
+                case 17:
+                case 18:
+                case 19:
+                case 20:
+                case 21:
+                case 22:
+                case 23:
+                case 24:
+                case 25:
+                case 26:
+                case 27:
+                case 28:
+                case 29:
+                case 30:
+                case 31:
+                case 32:
+                case 33:
+                case 34:
+                case 35:
+                case 36:
+                case 37:
+                case 38:
+                case 39:
+                case 40:
+                case 41:
+                case 42:
+                case 43:
+                case 44:
+                case 45:
+                case 46:
+                case 47:
+                case 48:
+                case 49:
+                case 50:
+                case 51:
+                case 52:
+                case 53:
+                case 54:
+                case 55:
+                {
+                    return 135;
+                }
+                case 3:
                 {
                     return 145;
                 }
+                default:
+                {
+                    return -1;
+                }
+            }
+        }
+        case 145:
+        {
+            switch (i)
+            {
+                case 3:
+                {
+                    return 136;
+                }
+                case 0:
+                {
+                    return 137;
+                }
+                case 1:
+                {
+                    return 138;
+                }
+                case 2:
+                {
+                    return 139;
+                }
+                case 4:
+                case 5:
+                case 6:
+                case 7:
+                case 8:
+                case 9:
+                case 10:
+                case 11:
+                case 12:
+                case 13:
+                case 14:
+                case 15:
+                case 16:
+                case 17:
+                case 18:
+                case 19:
+                case 20:
                 case 21:
+                case 22:
+                case 23:
+                case 24:
+                case 25:
+                case 26:
+                case 27:
+                case 28:
+                case 29:
+                case 30:
+                case 31:
+                case 32:
+                case 33:
+                case 34:
+                case 35:
+                case 36:
+                case 37:
+                case 38:
+                case 39:
+                case 40:
+                case 41:
+                case 42:
+                case 43:
+                case 44:
+                case 45:
+                case 46:
+                case 47:
+                case 48:
+                case 49:
+                case 50:
+                case 51:
+                case 52:
+                case 53:
+                case 54:
+                case 55:
+                {
+                    return 140;
+                }
+                default:
+                {
+                    return -1;
+                }
+            }
+        }
+        case 142:
+        {
+            Lexeme prevMatch = token.match;
+            token.match = lexeme;
+            int tokenId = GetTokenId(0);
+            if (tokenId == CONTINUE_TOKEN)
+            {
+                token.id = tokenId;
+                return -1;
+            }
+            else if (tokenId != INVALID_TOKEN)
+            {
+                token.id = tokenId;
+            }
+            else
+            {
+                token.match = prevMatch;
+            }
+            switch (i)
+            {
+                case 4:
+                case 5:
+                case 8:
+                case 9:
+                case 10:
+                case 11:
+                case 12:
+                case 13:
+                case 14:
+                case 15:
+                case 16:
+                case 17:
+                case 18:
+                case 19:
+                case 20:
+                case 21:
+                case 22:
+                case 23:
+                case 24:
+                case 25:
+                case 26:
+                case 27:
+                case 28:
+                case 29:
+                case 30:
+                case 31:
+                case 32:
+                case 33:
+                case 34:
+                case 35:
+                case 36:
+                case 37:
+                case 38:
+                case 39:
+                case 40:
+                case 41:
+                case 42:
+                case 43:
+                case 44:
+                case 45:
+                case 46:
+                case 47:
+                case 48:
+                case 49:
+                case 50:
+                case 51:
+                case 52:
+                case 53:
+                case 54:
+                case 55:
+                {
+                    return 125;
+                }
+                case 3:
+                {
+                    return 126;
+                }
+                case 1:
+                case 6:
+                case 7:
+                {
+                    return 129;
+                }
+                case 2:
+                {
+                    return 130;
+                }
+                case 0:
                 {
                     return 146;
                 }
+                default:
+                {
+                    return -1;
+                }
+            }
+        }
+        case 146:
+        {
+            Lexeme prevMatch = token.match;
+            token.match = lexeme;
+            int tokenId = GetTokenId(0);
+            if (tokenId == CONTINUE_TOKEN)
+            {
+                token.id = tokenId;
+                return -1;
+            }
+            else if (tokenId != INVALID_TOKEN)
+            {
+                token.id = tokenId;
+            }
+            else
+            {
+                token.match = prevMatch;
+            }
+            switch (i)
+            {
+                case 4:
+                case 5:
+                case 8:
+                case 9:
+                case 10:
+                case 11:
+                case 12:
+                case 13:
+                case 14:
+                case 15:
+                case 16:
+                case 17:
+                case 18:
+                case 19:
+                case 20:
+                case 21:
                 case 22:
+                case 23:
+                case 24:
+                case 25:
+                case 26:
+                case 27:
+                case 28:
+                case 29:
+                case 30:
+                case 31:
+                case 32:
+                case 33:
+                case 34:
+                case 35:
+                case 36:
+                case 37:
+                case 38:
+                case 39:
+                case 40:
+                case 41:
+                case 42:
+                case 43:
+                case 44:
+                case 45:
+                case 46:
+                case 47:
+                case 48:
+                case 49:
+                case 50:
+                case 51:
+                case 52:
+                case 53:
+                case 54:
+                case 55:
+                {
+                    return 125;
+                }
+                case 3:
+                {
+                    return 126;
+                }
+                case 0:
+                case 1:
+                case 6:
+                case 7:
+                {
+                    return 129;
+                }
+                case 2:
+                {
+                    return 130;
+                }
+                default:
+                {
+                    return -1;
+                }
+            }
+        }
+        case 141:
+        {
+            Lexeme prevMatch = token.match;
+            token.match = lexeme;
+            int tokenId = GetTokenId(0);
+            if (tokenId == CONTINUE_TOKEN)
+            {
+                token.id = tokenId;
+                return -1;
+            }
+            else if (tokenId != INVALID_TOKEN)
+            {
+                token.id = tokenId;
+            }
+            else
+            {
+                token.match = prevMatch;
+            }
+            switch (i)
+            {
+                case 4:
+                case 5:
+                case 8:
+                case 9:
+                case 10:
+                case 11:
+                case 12:
+                case 13:
+                case 14:
+                case 15:
+                case 16:
+                case 17:
+                case 18:
+                case 19:
+                case 20:
+                case 21:
+                case 22:
+                case 23:
+                case 24:
+                case 25:
+                case 26:
+                case 27:
+                case 28:
+                case 29:
+                case 30:
+                case 31:
+                case 32:
+                case 33:
+                case 34:
+                case 35:
+                case 36:
+                case 37:
+                case 38:
+                case 39:
+                case 40:
+                case 41:
+                case 42:
+                case 43:
+                case 44:
+                case 45:
+                case 46:
+                case 47:
+                case 48:
+                case 49:
+                case 50:
+                case 51:
+                case 52:
+                case 53:
+                case 54:
+                case 55:
+                {
+                    return 125;
+                }
+                case 3:
+                {
+                    return 126;
+                }
+                case 0:
+                case 1:
+                case 6:
+                case 7:
+                {
+                    return 129;
+                }
+                case 2:
+                {
+                    return 130;
+                }
+                default:
+                {
+                    return -1;
+                }
+            }
+        }
+        case 138:
+        {
+            Lexeme prevMatch = token.match;
+            token.match = lexeme;
+            int tokenId = GetTokenId(0);
+            if (tokenId == CONTINUE_TOKEN)
+            {
+                token.id = tokenId;
+                return -1;
+            }
+            else if (tokenId != INVALID_TOKEN)
+            {
+                token.id = tokenId;
+            }
+            else
+            {
+                token.match = prevMatch;
+            }
+            switch (i)
+            {
+                case 4:
+                case 5:
+                case 8:
+                case 9:
+                case 10:
+                case 11:
+                case 12:
+                case 13:
+                case 14:
+                case 15:
+                case 16:
+                case 17:
+                case 18:
+                case 19:
+                case 20:
+                case 21:
+                case 22:
+                case 23:
+                case 24:
+                case 25:
+                case 26:
+                case 27:
+                case 28:
+                case 29:
+                case 30:
+                case 31:
+                case 32:
+                case 33:
+                case 34:
+                case 35:
+                case 36:
+                case 37:
+                case 38:
+                case 39:
+                case 40:
+                case 41:
+                case 42:
+                case 43:
+                case 44:
+                case 45:
+                case 46:
+                case 47:
+                case 48:
+                case 49:
+                case 50:
+                case 51:
+                case 52:
+                case 53:
+                case 54:
+                case 55:
+                {
+                    return 125;
+                }
+                case 3:
+                {
+                    return 126;
+                }
+                case 1:
+                case 6:
+                case 7:
+                {
+                    return 129;
+                }
+                case 2:
+                {
+                    return 130;
+                }
+                case 0:
+                {
+                    return 146;
+                }
+                default:
+                {
+                    return -1;
+                }
+            }
+        }
+        case 137:
+        {
+            Lexeme prevMatch = token.match;
+            token.match = lexeme;
+            int tokenId = GetTokenId(0);
+            if (tokenId == CONTINUE_TOKEN)
+            {
+                token.id = tokenId;
+                return -1;
+            }
+            else if (tokenId != INVALID_TOKEN)
+            {
+                token.id = tokenId;
+            }
+            else
+            {
+                token.match = prevMatch;
+            }
+            switch (i)
+            {
+                case 4:
+                case 5:
+                case 8:
+                case 9:
+                case 10:
+                case 11:
+                case 12:
+                case 13:
+                case 14:
+                case 15:
+                case 16:
+                case 17:
+                case 18:
+                case 19:
+                case 20:
+                case 21:
+                case 22:
+                case 23:
+                case 24:
+                case 25:
+                case 26:
+                case 27:
+                case 28:
+                case 29:
+                case 30:
+                case 31:
+                case 32:
+                case 33:
+                case 34:
+                case 35:
+                case 36:
+                case 37:
+                case 38:
+                case 39:
+                case 40:
+                case 41:
+                case 42:
+                case 43:
+                case 44:
+                case 45:
+                case 46:
+                case 47:
+                case 48:
+                case 49:
+                case 50:
+                case 51:
+                case 52:
+                case 53:
+                case 54:
+                case 55:
+                {
+                    return 125;
+                }
+                case 3:
+                {
+                    return 126;
+                }
+                case 0:
+                case 1:
+                case 6:
+                case 7:
+                {
+                    return 129;
+                }
+                case 2:
+                {
+                    return 130;
+                }
+                default:
+                {
+                    return -1;
+                }
+            }
+        }
+        case 135:
+        {
+            switch (i)
+            {
+                case 0:
+                {
+                    return 133;
+                }
+                case 1:
+                {
+                    return 134;
+                }
+                case 2:
+                case 4:
+                case 5:
+                case 6:
+                case 7:
+                case 8:
+                case 9:
+                case 10:
+                case 11:
+                case 12:
+                case 13:
+                case 14:
+                case 15:
+                case 16:
+                case 17:
+                case 18:
+                case 19:
+                case 20:
+                case 21:
+                case 22:
+                case 23:
+                case 24:
+                case 25:
+                case 26:
+                case 27:
+                case 28:
+                case 29:
+                case 30:
+                case 31:
+                case 32:
+                case 33:
+                case 34:
+                case 35:
+                case 36:
+                case 37:
+                case 38:
+                case 39:
+                case 40:
+                case 41:
+                case 42:
+                case 43:
+                case 44:
+                case 45:
+                case 46:
+                case 47:
+                case 48:
+                case 49:
+                case 50:
+                case 51:
+                case 52:
+                case 53:
+                case 54:
+                case 55:
+                {
+                    return 135;
+                }
+                case 3:
+                {
+                    return 136;
+                }
+                default:
+                {
+                    return -1;
+                }
+            }
+        }
+        case 134:
+        {
+            Lexeme prevMatch = token.match;
+            token.match = lexeme;
+            int tokenId = GetTokenId(0);
+            if (tokenId == CONTINUE_TOKEN)
+            {
+                token.id = tokenId;
+                return -1;
+            }
+            else if (tokenId != INVALID_TOKEN)
+            {
+                token.id = tokenId;
+            }
+            else
+            {
+                token.match = prevMatch;
+            }
+            switch (i)
+            {
+                case 4:
+                case 5:
+                case 8:
+                case 9:
+                case 10:
+                case 11:
+                case 12:
+                case 13:
+                case 14:
+                case 15:
+                case 16:
+                case 17:
+                case 18:
+                case 19:
+                case 20:
+                case 21:
+                case 22:
+                case 23:
+                case 24:
+                case 25:
+                case 26:
+                case 27:
+                case 28:
+                case 29:
+                case 30:
+                case 31:
+                case 32:
+                case 33:
+                case 34:
+                case 35:
+                case 36:
+                case 37:
+                case 38:
+                case 39:
+                case 40:
+                case 41:
+                case 42:
+                case 43:
+                case 44:
+                case 45:
+                case 46:
+                case 47:
+                case 48:
+                case 49:
+                case 50:
+                case 51:
+                case 52:
+                case 53:
+                case 54:
+                case 55:
+                {
+                    return 125;
+                }
+                case 3:
+                {
+                    return 126;
+                }
+                case 1:
+                case 6:
+                case 7:
+                {
+                    return 129;
+                }
+                case 2:
+                {
+                    return 130;
+                }
+                case 0:
+                {
+                    return 146;
+                }
+                default:
+                {
+                    return -1;
+                }
+            }
+        }
+        case 133:
+        {
+            Lexeme prevMatch = token.match;
+            token.match = lexeme;
+            int tokenId = GetTokenId(0);
+            if (tokenId == CONTINUE_TOKEN)
+            {
+                token.id = tokenId;
+                return -1;
+            }
+            else if (tokenId != INVALID_TOKEN)
+            {
+                token.id = tokenId;
+            }
+            else
+            {
+                token.match = prevMatch;
+            }
+            switch (i)
+            {
+                case 4:
+                case 5:
+                case 8:
+                case 9:
+                case 10:
+                case 11:
+                case 12:
+                case 13:
+                case 14:
+                case 15:
+                case 16:
+                case 17:
+                case 18:
+                case 19:
+                case 20:
+                case 21:
+                case 22:
+                case 23:
+                case 24:
+                case 25:
+                case 26:
+                case 27:
+                case 28:
+                case 29:
+                case 30:
+                case 31:
+                case 32:
+                case 33:
+                case 34:
+                case 35:
+                case 36:
+                case 37:
+                case 38:
+                case 39:
+                case 40:
+                case 41:
+                case 42:
+                case 43:
+                case 44:
+                case 45:
+                case 46:
+                case 47:
+                case 48:
+                case 49:
+                case 50:
+                case 51:
+                case 52:
+                case 53:
+                case 54:
+                case 55:
+                {
+                    return 125;
+                }
+                case 3:
+                {
+                    return 126;
+                }
+                case 0:
+                case 1:
+                case 6:
+                case 7:
+                {
+                    return 129;
+                }
+                case 2:
+                {
+                    return 130;
+                }
+                default:
+                {
+                    return -1;
+                }
+            }
+        }
+        case 129:
+        {
+            Lexeme prevMatch = token.match;
+            token.match = lexeme;
+            int tokenId = GetTokenId(0);
+            if (tokenId == CONTINUE_TOKEN)
+            {
+                token.id = tokenId;
+                return -1;
+            }
+            else if (tokenId != INVALID_TOKEN)
+            {
+                token.id = tokenId;
+            }
+            else
+            {
+                token.match = prevMatch;
+            }
+            switch (i)
+            {
+                case 4:
+                case 5:
+                case 8:
+                case 9:
+                case 10:
+                case 11:
+                case 12:
+                case 13:
+                case 14:
+                case 15:
+                case 16:
+                case 17:
+                case 18:
+                case 19:
+                case 20:
+                case 21:
+                case 22:
+                case 23:
+                case 24:
+                case 25:
+                case 26:
+                case 27:
+                case 28:
+                case 29:
+                case 30:
+                case 31:
+                case 32:
+                case 33:
+                case 34:
+                case 35:
+                case 36:
+                case 37:
+                case 38:
+                case 39:
+                case 40:
+                case 41:
+                case 42:
+                case 43:
+                case 44:
+                case 45:
+                case 46:
+                case 47:
+                case 48:
+                case 49:
+                case 50:
+                case 51:
+                case 52:
+                case 53:
+                case 54:
+                case 55:
+                {
+                    return 125;
+                }
+                case 3:
+                {
+                    return 126;
+                }
+                case 0:
+                case 1:
+                case 6:
+                case 7:
+                {
+                    return 129;
+                }
+                case 2:
+                {
+                    return 130;
+                }
+                default:
+                {
+                    return -1;
+                }
+            }
+        }
+        case 127:
+        {
+            switch (i)
+            {
+                case 0:
+                case 1:
+                case 2:
+                case 4:
+                case 5:
+                case 6:
+                case 7:
+                case 8:
+                case 9:
+                case 10:
+                case 11:
+                case 12:
+                case 13:
+                case 14:
+                case 15:
+                case 16:
+                case 17:
+                case 18:
+                case 19:
+                case 20:
+                case 21:
+                case 22:
+                case 23:
+                case 24:
+                case 25:
+                case 26:
+                case 27:
+                case 28:
+                case 29:
+                case 30:
+                case 31:
+                case 32:
+                case 33:
+                case 34:
+                case 35:
+                case 36:
+                case 37:
+                case 38:
+                case 39:
+                case 40:
+                case 41:
+                case 42:
+                case 43:
+                case 44:
+                case 45:
+                case 46:
+                case 47:
+                case 48:
+                case 49:
+                case 50:
+                case 51:
+                case 52:
+                case 53:
+                case 54:
+                case 55:
+                {
+                    return 125;
+                }
+                case 3:
+                {
+                    return 126;
+                }
+                default:
+                {
+                    return -1;
+                }
+            }
+        }
+        case 125:
+        {
+            switch (i)
+            {
+                case 0:
+                case 1:
+                case 2:
+                case 4:
+                case 5:
+                case 6:
+                case 7:
+                case 8:
+                case 9:
+                case 10:
+                case 11:
+                case 12:
+                case 13:
+                case 14:
+                case 15:
+                case 16:
+                case 17:
+                case 18:
+                case 19:
+                case 20:
+                case 21:
+                case 22:
+                case 23:
+                case 24:
+                case 25:
+                case 26:
+                case 27:
+                case 28:
+                case 29:
+                case 30:
+                case 31:
+                case 32:
+                case 33:
+                case 34:
+                case 35:
+                case 36:
+                case 37:
+                case 38:
+                case 39:
+                case 40:
+                case 41:
+                case 42:
+                case 43:
+                case 44:
+                case 45:
+                case 46:
+                case 47:
+                case 48:
+                case 49:
+                case 50:
+                case 51:
+                case 52:
+                case 53:
+                case 54:
+                case 55:
+                {
+                    return 125;
+                }
+                case 3:
+                {
+                    return 126;
+                }
+                default:
+                {
+                    return -1;
+                }
+            }
+        }
+        case 123:
+        {
+            switch (i)
+            {
+                case 0:
                 {
                     return 147;
                 }
-                case 23:
+                case 1:
                 {
                     return 148;
                 }
+                case 2:
+                case 3:
+                case 4:
+                case 5:
+                case 6:
+                case 7:
+                case 8:
+                case 9:
+                case 10:
+                case 11:
+                case 12:
+                case 13:
+                case 14:
+                case 15:
+                case 16:
+                case 17:
+                case 18:
+                case 19:
+                case 20:
+                case 21:
+                case 22:
+                case 23:
+                case 24:
+                case 25:
+                case 26:
+                case 27:
                 case 28:
+                case 29:
+                case 30:
+                case 31:
+                case 32:
+                case 33:
+                case 34:
+                case 35:
+                case 36:
+                case 37:
+                case 38:
+                case 39:
+                case 40:
+                case 41:
+                case 42:
+                case 43:
+                case 44:
+                case 45:
+                case 46:
+                case 47:
+                case 48:
+                case 49:
+                case 50:
+                case 51:
+                case 52:
+                case 53:
+                case 54:
+                case 55:
                 {
                     return 149;
-                }
-                case 30:
-                {
-                    return 150;
-                }
-                case 31:
-                {
-                    return 151;
-                }
-                case 32:
-                {
-                    return 152;
-                }
-                case 33:
-                {
-                    return 153;
-                }
-                case 35:
-                case 36:
-                {
-                    return 154;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 154:
-        {
-            switch (i)
-            {
-                case 0:
-                {
-                    return 136;
-                }
-                case 3:
-                {
-                    return 137;
-                }
-                case 4:
-                case 5:
-                case 6:
-                case 7:
-                case 8:
-                case 9:
-                case 10:
-                case 11:
-                case 12:
-                case 13:
-                case 14:
-                case 15:
-                case 16:
-                case 17:
-                case 18:
-                case 19:
-                case 20:
-                case 21:
-                case 22:
-                case 23:
-                case 24:
-                case 25:
-                case 26:
-                case 27:
-                case 28:
-                case 29:
-                case 30:
-                case 31:
-                case 32:
-                case 33:
-                case 34:
-                case 37:
-                case 38:
-                case 39:
-                case 40:
-                case 41:
-                case 42:
-                case 43:
-                case 44:
-                case 45:
-                case 46:
-                case 47:
-                case 48:
-                case 49:
-                case 50:
-                case 51:
-                case 52:
-                case 53:
-                case 54:
-                case 55:
-                {
-                    return 138;
-                }
-                case 35:
-                case 36:
-                {
-                    return 155;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 155:
-        {
-            switch (i)
-            {
-                case 0:
-                {
-                    return 136;
-                }
-                case 3:
-                {
-                    return 137;
-                }
-                case 4:
-                case 5:
-                case 6:
-                case 7:
-                case 8:
-                case 9:
-                case 10:
-                case 11:
-                case 12:
-                case 13:
-                case 14:
-                case 15:
-                case 16:
-                case 17:
-                case 18:
-                case 19:
-                case 20:
-                case 21:
-                case 22:
-                case 23:
-                case 24:
-                case 25:
-                case 26:
-                case 27:
-                case 28:
-                case 29:
-                case 30:
-                case 31:
-                case 32:
-                case 33:
-                case 34:
-                case 37:
-                case 38:
-                case 39:
-                case 40:
-                case 41:
-                case 42:
-                case 43:
-                case 44:
-                case 45:
-                case 46:
-                case 47:
-                case 48:
-                case 49:
-                case 50:
-                case 51:
-                case 52:
-                case 53:
-                case 54:
-                case 55:
-                {
-                    return 138;
-                }
-                case 35:
-                case 36:
-                {
-                    return 155;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 153:
-        {
-            switch (i)
-            {
-                case 0:
-                {
-                    return 136;
-                }
-                case 3:
-                {
-                    return 137;
-                }
-                case 4:
-                case 5:
-                case 6:
-                case 7:
-                case 8:
-                case 9:
-                case 10:
-                case 11:
-                case 12:
-                case 13:
-                case 14:
-                case 15:
-                case 16:
-                case 17:
-                case 18:
-                case 19:
-                case 20:
-                case 21:
-                case 22:
-                case 23:
-                case 24:
-                case 25:
-                case 26:
-                case 27:
-                case 28:
-                case 29:
-                case 30:
-                case 31:
-                case 32:
-                case 33:
-                case 34:
-                case 35:
-                case 36:
-                case 37:
-                case 38:
-                case 39:
-                case 40:
-                case 41:
-                case 42:
-                case 43:
-                case 44:
-                case 45:
-                case 46:
-                case 47:
-                case 48:
-                case 49:
-                case 50:
-                case 51:
-                case 52:
-                case 53:
-                case 54:
-                case 55:
-                {
-                    return 138;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 152:
-        {
-            switch (i)
-            {
-                case 0:
-                {
-                    return 136;
-                }
-                case 3:
-                {
-                    return 137;
-                }
-                case 4:
-                case 5:
-                case 6:
-                case 7:
-                case 8:
-                case 9:
-                case 10:
-                case 11:
-                case 12:
-                case 13:
-                case 14:
-                case 15:
-                case 16:
-                case 17:
-                case 18:
-                case 19:
-                case 20:
-                case 21:
-                case 22:
-                case 23:
-                case 24:
-                case 25:
-                case 26:
-                case 27:
-                case 28:
-                case 29:
-                case 30:
-                case 31:
-                case 32:
-                case 33:
-                case 34:
-                case 35:
-                case 36:
-                case 37:
-                case 38:
-                case 39:
-                case 40:
-                case 41:
-                case 42:
-                case 43:
-                case 44:
-                case 45:
-                case 46:
-                case 47:
-                case 48:
-                case 49:
-                case 50:
-                case 51:
-                case 52:
-                case 53:
-                case 54:
-                case 55:
-                {
-                    return 138;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 151:
-        {
-            switch (i)
-            {
-                case 0:
-                {
-                    return 136;
-                }
-                case 3:
-                {
-                    return 137;
-                }
-                case 4:
-                case 5:
-                case 6:
-                case 7:
-                case 8:
-                case 9:
-                case 10:
-                case 11:
-                case 12:
-                case 13:
-                case 14:
-                case 15:
-                case 16:
-                case 17:
-                case 18:
-                case 19:
-                case 20:
-                case 21:
-                case 22:
-                case 23:
-                case 24:
-                case 25:
-                case 26:
-                case 27:
-                case 28:
-                case 29:
-                case 30:
-                case 31:
-                case 32:
-                case 33:
-                case 37:
-                case 38:
-                case 39:
-                case 40:
-                case 41:
-                case 42:
-                case 43:
-                case 44:
-                case 45:
-                case 46:
-                case 47:
-                case 48:
-                case 49:
-                case 50:
-                case 51:
-                case 52:
-                case 53:
-                case 54:
-                case 55:
-                {
-                    return 138;
-                }
-                case 34:
-                case 35:
-                case 36:
-                {
-                    return 156;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 156:
-        {
-            switch (i)
-            {
-                case 0:
-                {
-                    return 136;
-                }
-                case 3:
-                {
-                    return 137;
-                }
-                case 4:
-                case 5:
-                case 6:
-                case 7:
-                case 8:
-                case 9:
-                case 10:
-                case 11:
-                case 12:
-                case 13:
-                case 14:
-                case 15:
-                case 16:
-                case 17:
-                case 18:
-                case 19:
-                case 20:
-                case 21:
-                case 22:
-                case 23:
-                case 24:
-                case 25:
-                case 26:
-                case 27:
-                case 28:
-                case 29:
-                case 30:
-                case 31:
-                case 32:
-                case 33:
-                case 37:
-                case 38:
-                case 39:
-                case 40:
-                case 41:
-                case 42:
-                case 43:
-                case 44:
-                case 45:
-                case 46:
-                case 47:
-                case 48:
-                case 49:
-                case 50:
-                case 51:
-                case 52:
-                case 53:
-                case 54:
-                case 55:
-                {
-                    return 138;
-                }
-                case 34:
-                case 35:
-                case 36:
-                {
-                    return 156;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 150:
-        {
-            switch (i)
-            {
-                case 0:
-                {
-                    return 136;
-                }
-                case 3:
-                {
-                    return 137;
-                }
-                case 4:
-                case 5:
-                case 6:
-                case 7:
-                case 8:
-                case 9:
-                case 10:
-                case 11:
-                case 12:
-                case 13:
-                case 14:
-                case 15:
-                case 16:
-                case 17:
-                case 18:
-                case 19:
-                case 20:
-                case 21:
-                case 22:
-                case 23:
-                case 24:
-                case 25:
-                case 26:
-                case 27:
-                case 28:
-                case 29:
-                case 30:
-                case 31:
-                case 32:
-                case 33:
-                case 37:
-                case 38:
-                case 39:
-                case 40:
-                case 41:
-                case 42:
-                case 43:
-                case 44:
-                case 45:
-                case 46:
-                case 47:
-                case 48:
-                case 49:
-                case 50:
-                case 51:
-                case 52:
-                case 53:
-                case 54:
-                case 55:
-                {
-                    return 138;
-                }
-                case 34:
-                case 35:
-                case 36:
-                {
-                    return 156;
                 }
                 default:
                 {
@@ -6262,12 +6043,14 @@ int CmajorLexer::NextState(int state, char32_t c)
             {
                 case 0:
                 {
-                    return 136;
+                    return 147;
                 }
-                case 3:
+                case 1:
                 {
-                    return 137;
+                    return 148;
                 }
+                case 2:
+                case 3:
                 case 4:
                 case 5:
                 case 6:
@@ -6321,7 +6104,7 @@ int CmajorLexer::NextState(int state, char32_t c)
                 case 54:
                 case 55:
                 {
-                    return 138;
+                    return 149;
                 }
                 default:
                 {
@@ -6331,70 +6114,92 @@ int CmajorLexer::NextState(int state, char32_t c)
         }
         case 148:
         {
+            Lexeme prevMatch = token.match;
+            token.match = lexeme;
+            int tokenId = GetTokenId(0);
+            if (tokenId == CONTINUE_TOKEN)
+            {
+                token.id = tokenId;
+                return -1;
+            }
+            else if (tokenId != INVALID_TOKEN)
+            {
+                token.id = tokenId;
+            }
+            else
+            {
+                token.match = prevMatch;
+            }
             switch (i)
             {
+                case 1:
+                case 6:
+                case 7:
+                {
+                    return 1;
+                }
                 case 0:
                 {
-                    return 136;
+                    return 150;
+                }
+                case 2:
+                {
+                    return 151;
+                }
+                default:
+                {
+                    return -1;
+                }
+            }
+        }
+        case 151:
+        {
+            switch (i)
+            {
+                case 2:
+                {
+                    return 123;
                 }
                 case 3:
                 {
-                    return 137;
+                    return 124;
                 }
-                case 4:
-                case 5:
+                default:
+                {
+                    return -1;
+                }
+            }
+        }
+        case 150:
+        {
+            Lexeme prevMatch = token.match;
+            token.match = lexeme;
+            int tokenId = GetTokenId(0);
+            if (tokenId == CONTINUE_TOKEN)
+            {
+                token.id = tokenId;
+                return -1;
+            }
+            else if (tokenId != INVALID_TOKEN)
+            {
+                token.id = tokenId;
+            }
+            else
+            {
+                token.match = prevMatch;
+            }
+            switch (i)
+            {
+                case 0:
+                case 1:
                 case 6:
                 case 7:
-                case 8:
-                case 9:
-                case 10:
-                case 11:
-                case 12:
-                case 13:
-                case 14:
-                case 15:
-                case 16:
-                case 17:
-                case 18:
-                case 19:
-                case 20:
-                case 21:
-                case 22:
-                case 23:
-                case 24:
-                case 25:
-                case 26:
-                case 27:
-                case 28:
-                case 29:
-                case 30:
-                case 31:
-                case 32:
-                case 33:
-                case 34:
-                case 35:
-                case 36:
-                case 37:
-                case 38:
-                case 39:
-                case 40:
-                case 41:
-                case 42:
-                case 43:
-                case 44:
-                case 45:
-                case 46:
-                case 47:
-                case 48:
-                case 49:
-                case 50:
-                case 51:
-                case 52:
-                case 53:
-                case 54:
-                case 55:
                 {
-                    return 138;
+                    return 1;
+                }
+                case 2:
+                {
+                    return 151;
                 }
                 default:
                 {
@@ -6404,1587 +6209,9 @@ int CmajorLexer::NextState(int state, char32_t c)
         }
         case 147:
         {
-            switch (i)
-            {
-                case 0:
-                {
-                    return 136;
-                }
-                case 3:
-                {
-                    return 137;
-                }
-                case 4:
-                case 5:
-                case 6:
-                case 7:
-                case 8:
-                case 9:
-                case 10:
-                case 11:
-                case 12:
-                case 13:
-                case 14:
-                case 15:
-                case 16:
-                case 17:
-                case 18:
-                case 19:
-                case 20:
-                case 21:
-                case 22:
-                case 23:
-                case 24:
-                case 25:
-                case 26:
-                case 27:
-                case 28:
-                case 29:
-                case 30:
-                case 31:
-                case 32:
-                case 33:
-                case 34:
-                case 35:
-                case 36:
-                case 37:
-                case 38:
-                case 39:
-                case 40:
-                case 41:
-                case 42:
-                case 43:
-                case 44:
-                case 45:
-                case 46:
-                case 47:
-                case 48:
-                case 49:
-                case 50:
-                case 51:
-                case 52:
-                case 53:
-                case 54:
-                case 55:
-                {
-                    return 138;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 146:
-        {
-            switch (i)
-            {
-                case 0:
-                {
-                    return 136;
-                }
-                case 3:
-                {
-                    return 137;
-                }
-                case 4:
-                case 5:
-                case 6:
-                case 7:
-                case 8:
-                case 9:
-                case 10:
-                case 11:
-                case 12:
-                case 13:
-                case 14:
-                case 15:
-                case 16:
-                case 17:
-                case 18:
-                case 19:
-                case 20:
-                case 21:
-                case 22:
-                case 23:
-                case 24:
-                case 25:
-                case 26:
-                case 27:
-                case 28:
-                case 29:
-                case 30:
-                case 31:
-                case 32:
-                case 33:
-                case 34:
-                case 35:
-                case 36:
-                case 37:
-                case 38:
-                case 39:
-                case 40:
-                case 41:
-                case 42:
-                case 43:
-                case 44:
-                case 45:
-                case 46:
-                case 47:
-                case 48:
-                case 49:
-                case 50:
-                case 51:
-                case 52:
-                case 53:
-                case 54:
-                case 55:
-                {
-                    return 138;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 145:
-        {
-            switch (i)
-            {
-                case 0:
-                {
-                    return 136;
-                }
-                case 3:
-                {
-                    return 137;
-                }
-                case 4:
-                case 5:
-                case 6:
-                case 7:
-                case 8:
-                case 9:
-                case 10:
-                case 11:
-                case 12:
-                case 13:
-                case 14:
-                case 15:
-                case 16:
-                case 17:
-                case 18:
-                case 19:
-                case 20:
-                case 21:
-                case 22:
-                case 23:
-                case 24:
-                case 25:
-                case 26:
-                case 27:
-                case 28:
-                case 29:
-                case 30:
-                case 31:
-                case 32:
-                case 33:
-                case 34:
-                case 35:
-                case 36:
-                case 37:
-                case 38:
-                case 39:
-                case 40:
-                case 41:
-                case 42:
-                case 43:
-                case 44:
-                case 45:
-                case 46:
-                case 47:
-                case 48:
-                case 49:
-                case 50:
-                case 51:
-                case 52:
-                case 53:
-                case 54:
-                case 55:
-                {
-                    return 138;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 144:
-        {
-            switch (i)
-            {
-                case 0:
-                {
-                    return 136;
-                }
-                case 3:
-                {
-                    return 137;
-                }
-                case 4:
-                case 5:
-                case 6:
-                case 7:
-                case 8:
-                case 9:
-                case 10:
-                case 11:
-                case 12:
-                case 13:
-                case 14:
-                case 15:
-                case 16:
-                case 17:
-                case 18:
-                case 19:
-                case 20:
-                case 21:
-                case 22:
-                case 23:
-                case 24:
-                case 37:
-                case 38:
-                case 39:
-                case 40:
-                case 41:
-                case 42:
-                case 43:
-                case 44:
-                case 45:
-                case 46:
-                case 47:
-                case 48:
-                case 49:
-                case 50:
-                case 51:
-                case 52:
-                case 53:
-                case 54:
-                case 55:
-                {
-                    return 138;
-                }
-                case 25:
-                case 26:
-                case 27:
-                case 28:
-                case 29:
-                case 30:
-                case 31:
-                case 32:
-                case 33:
-                case 34:
-                case 35:
-                case 36:
-                {
-                    return 157;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 157:
-        {
-            switch (i)
-            {
-                case 0:
-                {
-                    return 136;
-                }
-                case 3:
-                {
-                    return 137;
-                }
-                case 4:
-                case 5:
-                case 6:
-                case 7:
-                case 8:
-                case 9:
-                case 10:
-                case 11:
-                case 12:
-                case 13:
-                case 14:
-                case 15:
-                case 16:
-                case 17:
-                case 18:
-                case 19:
-                case 20:
-                case 21:
-                case 22:
-                case 23:
-                case 24:
-                case 37:
-                case 38:
-                case 39:
-                case 40:
-                case 41:
-                case 42:
-                case 43:
-                case 44:
-                case 45:
-                case 46:
-                case 47:
-                case 48:
-                case 49:
-                case 50:
-                case 51:
-                case 52:
-                case 53:
-                case 54:
-                case 55:
-                {
-                    return 138;
-                }
-                case 25:
-                case 26:
-                case 27:
-                case 28:
-                case 29:
-                case 30:
-                case 31:
-                case 32:
-                case 33:
-                case 34:
-                case 35:
-                case 36:
-                {
-                    return 158;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 158:
-        {
-            switch (i)
-            {
-                case 0:
-                {
-                    return 136;
-                }
-                case 3:
-                {
-                    return 137;
-                }
-                case 4:
-                case 5:
-                case 6:
-                case 7:
-                case 8:
-                case 9:
-                case 10:
-                case 11:
-                case 12:
-                case 13:
-                case 14:
-                case 15:
-                case 16:
-                case 17:
-                case 18:
-                case 19:
-                case 20:
-                case 21:
-                case 22:
-                case 23:
-                case 24:
-                case 37:
-                case 38:
-                case 39:
-                case 40:
-                case 41:
-                case 42:
-                case 43:
-                case 44:
-                case 45:
-                case 46:
-                case 47:
-                case 48:
-                case 49:
-                case 50:
-                case 51:
-                case 52:
-                case 53:
-                case 54:
-                case 55:
-                {
-                    return 138;
-                }
-                case 25:
-                case 26:
-                case 27:
-                case 28:
-                case 29:
-                case 30:
-                case 31:
-                case 32:
-                case 33:
-                case 34:
-                case 35:
-                case 36:
-                {
-                    return 159;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 159:
-        {
-            switch (i)
-            {
-                case 0:
-                {
-                    return 136;
-                }
-                case 3:
-                {
-                    return 137;
-                }
-                case 4:
-                case 5:
-                case 6:
-                case 7:
-                case 8:
-                case 9:
-                case 10:
-                case 11:
-                case 12:
-                case 13:
-                case 14:
-                case 15:
-                case 16:
-                case 17:
-                case 18:
-                case 19:
-                case 20:
-                case 21:
-                case 22:
-                case 23:
-                case 24:
-                case 37:
-                case 38:
-                case 39:
-                case 40:
-                case 41:
-                case 42:
-                case 43:
-                case 44:
-                case 45:
-                case 46:
-                case 47:
-                case 48:
-                case 49:
-                case 50:
-                case 51:
-                case 52:
-                case 53:
-                case 54:
-                case 55:
-                {
-                    return 138;
-                }
-                case 25:
-                case 26:
-                case 27:
-                case 28:
-                case 29:
-                case 30:
-                case 31:
-                case 32:
-                case 33:
-                case 34:
-                case 35:
-                case 36:
-                {
-                    return 160;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 160:
-        {
-            switch (i)
-            {
-                case 0:
-                {
-                    return 136;
-                }
-                case 3:
-                {
-                    return 137;
-                }
-                case 4:
-                case 5:
-                case 6:
-                case 7:
-                case 8:
-                case 9:
-                case 10:
-                case 11:
-                case 12:
-                case 13:
-                case 14:
-                case 15:
-                case 16:
-                case 17:
-                case 18:
-                case 19:
-                case 20:
-                case 21:
-                case 22:
-                case 23:
-                case 24:
-                case 37:
-                case 38:
-                case 39:
-                case 40:
-                case 41:
-                case 42:
-                case 43:
-                case 44:
-                case 45:
-                case 46:
-                case 47:
-                case 48:
-                case 49:
-                case 50:
-                case 51:
-                case 52:
-                case 53:
-                case 54:
-                case 55:
-                {
-                    return 138;
-                }
-                case 25:
-                case 26:
-                case 27:
-                case 28:
-                case 29:
-                case 30:
-                case 31:
-                case 32:
-                case 33:
-                case 34:
-                case 35:
-                case 36:
-                {
-                    return 161;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 161:
-        {
-            switch (i)
-            {
-                case 0:
-                {
-                    return 136;
-                }
-                case 3:
-                {
-                    return 137;
-                }
-                case 4:
-                case 5:
-                case 6:
-                case 7:
-                case 8:
-                case 9:
-                case 10:
-                case 11:
-                case 12:
-                case 13:
-                case 14:
-                case 15:
-                case 16:
-                case 17:
-                case 18:
-                case 19:
-                case 20:
-                case 21:
-                case 22:
-                case 23:
-                case 24:
-                case 37:
-                case 38:
-                case 39:
-                case 40:
-                case 41:
-                case 42:
-                case 43:
-                case 44:
-                case 45:
-                case 46:
-                case 47:
-                case 48:
-                case 49:
-                case 50:
-                case 51:
-                case 52:
-                case 53:
-                case 54:
-                case 55:
-                {
-                    return 138;
-                }
-                case 25:
-                case 26:
-                case 27:
-                case 28:
-                case 29:
-                case 30:
-                case 31:
-                case 32:
-                case 33:
-                case 34:
-                case 35:
-                case 36:
-                {
-                    return 162;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 162:
-        {
-            switch (i)
-            {
-                case 0:
-                {
-                    return 136;
-                }
-                case 3:
-                {
-                    return 137;
-                }
-                case 4:
-                case 5:
-                case 6:
-                case 7:
-                case 8:
-                case 9:
-                case 10:
-                case 11:
-                case 12:
-                case 13:
-                case 14:
-                case 15:
-                case 16:
-                case 17:
-                case 18:
-                case 19:
-                case 20:
-                case 21:
-                case 22:
-                case 23:
-                case 24:
-                case 37:
-                case 38:
-                case 39:
-                case 40:
-                case 41:
-                case 42:
-                case 43:
-                case 44:
-                case 45:
-                case 46:
-                case 47:
-                case 48:
-                case 49:
-                case 50:
-                case 51:
-                case 52:
-                case 53:
-                case 54:
-                case 55:
-                {
-                    return 138;
-                }
-                case 25:
-                case 26:
-                case 27:
-                case 28:
-                case 29:
-                case 30:
-                case 31:
-                case 32:
-                case 33:
-                case 34:
-                case 35:
-                case 36:
-                {
-                    return 163;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 163:
-        {
-            switch (i)
-            {
-                case 0:
-                {
-                    return 136;
-                }
-                case 3:
-                {
-                    return 137;
-                }
-                case 4:
-                case 5:
-                case 6:
-                case 7:
-                case 8:
-                case 9:
-                case 10:
-                case 11:
-                case 12:
-                case 13:
-                case 14:
-                case 15:
-                case 16:
-                case 17:
-                case 18:
-                case 19:
-                case 20:
-                case 21:
-                case 22:
-                case 23:
-                case 24:
-                case 37:
-                case 38:
-                case 39:
-                case 40:
-                case 41:
-                case 42:
-                case 43:
-                case 44:
-                case 45:
-                case 46:
-                case 47:
-                case 48:
-                case 49:
-                case 50:
-                case 51:
-                case 52:
-                case 53:
-                case 54:
-                case 55:
-                {
-                    return 138;
-                }
-                case 25:
-                case 26:
-                case 27:
-                case 28:
-                case 29:
-                case 30:
-                case 31:
-                case 32:
-                case 33:
-                case 34:
-                case 35:
-                case 36:
-                {
-                    return 164;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 164:
-        {
-            switch (i)
-            {
-                case 0:
-                {
-                    return 136;
-                }
-                case 3:
-                {
-                    return 137;
-                }
-                case 4:
-                case 5:
-                case 6:
-                case 7:
-                case 8:
-                case 9:
-                case 10:
-                case 11:
-                case 12:
-                case 13:
-                case 14:
-                case 15:
-                case 16:
-                case 17:
-                case 18:
-                case 19:
-                case 20:
-                case 21:
-                case 22:
-                case 23:
-                case 24:
-                case 25:
-                case 26:
-                case 27:
-                case 28:
-                case 29:
-                case 30:
-                case 31:
-                case 32:
-                case 33:
-                case 34:
-                case 35:
-                case 36:
-                case 37:
-                case 38:
-                case 39:
-                case 40:
-                case 41:
-                case 42:
-                case 43:
-                case 44:
-                case 45:
-                case 46:
-                case 47:
-                case 48:
-                case 49:
-                case 50:
-                case 51:
-                case 52:
-                case 53:
-                case 54:
-                case 55:
-                {
-                    return 138;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 143:
-        {
-            switch (i)
-            {
-                case 0:
-                {
-                    return 136;
-                }
-                case 3:
-                {
-                    return 137;
-                }
-                case 4:
-                case 5:
-                case 6:
-                case 7:
-                case 8:
-                case 9:
-                case 10:
-                case 11:
-                case 12:
-                case 13:
-                case 14:
-                case 15:
-                case 16:
-                case 17:
-                case 18:
-                case 19:
-                case 20:
-                case 21:
-                case 22:
-                case 23:
-                case 24:
-                case 37:
-                case 38:
-                case 39:
-                case 40:
-                case 41:
-                case 42:
-                case 43:
-                case 44:
-                case 45:
-                case 46:
-                case 47:
-                case 48:
-                case 49:
-                case 50:
-                case 51:
-                case 52:
-                case 53:
-                case 54:
-                case 55:
-                {
-                    return 138;
-                }
-                case 25:
-                case 26:
-                case 27:
-                case 28:
-                case 29:
-                case 30:
-                case 31:
-                case 32:
-                case 33:
-                case 34:
-                case 35:
-                case 36:
-                {
-                    return 165;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 165:
-        {
-            switch (i)
-            {
-                case 0:
-                {
-                    return 136;
-                }
-                case 3:
-                {
-                    return 137;
-                }
-                case 4:
-                case 5:
-                case 6:
-                case 7:
-                case 8:
-                case 9:
-                case 10:
-                case 11:
-                case 12:
-                case 13:
-                case 14:
-                case 15:
-                case 16:
-                case 17:
-                case 18:
-                case 19:
-                case 20:
-                case 21:
-                case 22:
-                case 23:
-                case 24:
-                case 37:
-                case 38:
-                case 39:
-                case 40:
-                case 41:
-                case 42:
-                case 43:
-                case 44:
-                case 45:
-                case 46:
-                case 47:
-                case 48:
-                case 49:
-                case 50:
-                case 51:
-                case 52:
-                case 53:
-                case 54:
-                case 55:
-                {
-                    return 138;
-                }
-                case 25:
-                case 26:
-                case 27:
-                case 28:
-                case 29:
-                case 30:
-                case 31:
-                case 32:
-                case 33:
-                case 34:
-                case 35:
-                case 36:
-                {
-                    return 166;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 166:
-        {
-            switch (i)
-            {
-                case 0:
-                {
-                    return 136;
-                }
-                case 3:
-                {
-                    return 137;
-                }
-                case 4:
-                case 5:
-                case 6:
-                case 7:
-                case 8:
-                case 9:
-                case 10:
-                case 11:
-                case 12:
-                case 13:
-                case 14:
-                case 15:
-                case 16:
-                case 17:
-                case 18:
-                case 19:
-                case 20:
-                case 21:
-                case 22:
-                case 23:
-                case 24:
-                case 37:
-                case 38:
-                case 39:
-                case 40:
-                case 41:
-                case 42:
-                case 43:
-                case 44:
-                case 45:
-                case 46:
-                case 47:
-                case 48:
-                case 49:
-                case 50:
-                case 51:
-                case 52:
-                case 53:
-                case 54:
-                case 55:
-                {
-                    return 138;
-                }
-                case 25:
-                case 26:
-                case 27:
-                case 28:
-                case 29:
-                case 30:
-                case 31:
-                case 32:
-                case 33:
-                case 34:
-                case 35:
-                case 36:
-                {
-                    return 167;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 167:
-        {
-            switch (i)
-            {
-                case 0:
-                {
-                    return 136;
-                }
-                case 3:
-                {
-                    return 137;
-                }
-                case 4:
-                case 5:
-                case 6:
-                case 7:
-                case 8:
-                case 9:
-                case 10:
-                case 11:
-                case 12:
-                case 13:
-                case 14:
-                case 15:
-                case 16:
-                case 17:
-                case 18:
-                case 19:
-                case 20:
-                case 21:
-                case 22:
-                case 23:
-                case 24:
-                case 37:
-                case 38:
-                case 39:
-                case 40:
-                case 41:
-                case 42:
-                case 43:
-                case 44:
-                case 45:
-                case 46:
-                case 47:
-                case 48:
-                case 49:
-                case 50:
-                case 51:
-                case 52:
-                case 53:
-                case 54:
-                case 55:
-                {
-                    return 138;
-                }
-                case 25:
-                case 26:
-                case 27:
-                case 28:
-                case 29:
-                case 30:
-                case 31:
-                case 32:
-                case 33:
-                case 34:
-                case 35:
-                case 36:
-                {
-                    return 168;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 168:
-        {
-            switch (i)
-            {
-                case 0:
-                {
-                    return 136;
-                }
-                case 3:
-                {
-                    return 137;
-                }
-                case 4:
-                case 5:
-                case 6:
-                case 7:
-                case 8:
-                case 9:
-                case 10:
-                case 11:
-                case 12:
-                case 13:
-                case 14:
-                case 15:
-                case 16:
-                case 17:
-                case 18:
-                case 19:
-                case 20:
-                case 21:
-                case 22:
-                case 23:
-                case 24:
-                case 25:
-                case 26:
-                case 27:
-                case 28:
-                case 29:
-                case 30:
-                case 31:
-                case 32:
-                case 33:
-                case 34:
-                case 35:
-                case 36:
-                case 37:
-                case 38:
-                case 39:
-                case 40:
-                case 41:
-                case 42:
-                case 43:
-                case 44:
-                case 45:
-                case 46:
-                case 47:
-                case 48:
-                case 49:
-                case 50:
-                case 51:
-                case 52:
-                case 53:
-                case 54:
-                case 55:
-                {
-                    return 138;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 142:
-        {
-            switch (i)
-            {
-                case 0:
-                {
-                    return 136;
-                }
-                case 3:
-                {
-                    return 137;
-                }
-                case 4:
-                case 5:
-                case 6:
-                case 7:
-                case 8:
-                case 9:
-                case 10:
-                case 11:
-                case 12:
-                case 13:
-                case 14:
-                case 15:
-                case 16:
-                case 17:
-                case 18:
-                case 19:
-                case 20:
-                case 21:
-                case 22:
-                case 23:
-                case 24:
-                case 37:
-                case 38:
-                case 39:
-                case 40:
-                case 41:
-                case 42:
-                case 43:
-                case 44:
-                case 45:
-                case 46:
-                case 47:
-                case 48:
-                case 49:
-                case 50:
-                case 51:
-                case 52:
-                case 53:
-                case 54:
-                case 55:
-                {
-                    return 138;
-                }
-                case 25:
-                case 26:
-                case 27:
-                case 28:
-                case 29:
-                case 30:
-                case 31:
-                case 32:
-                case 33:
-                case 34:
-                case 35:
-                case 36:
-                {
-                    return 169;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 169:
-        {
-            switch (i)
-            {
-                case 0:
-                {
-                    return 136;
-                }
-                case 3:
-                {
-                    return 137;
-                }
-                case 4:
-                case 5:
-                case 6:
-                case 7:
-                case 8:
-                case 9:
-                case 10:
-                case 11:
-                case 12:
-                case 13:
-                case 14:
-                case 15:
-                case 16:
-                case 17:
-                case 18:
-                case 19:
-                case 20:
-                case 21:
-                case 22:
-                case 23:
-                case 24:
-                case 37:
-                case 38:
-                case 39:
-                case 40:
-                case 41:
-                case 42:
-                case 43:
-                case 44:
-                case 45:
-                case 46:
-                case 47:
-                case 48:
-                case 49:
-                case 50:
-                case 51:
-                case 52:
-                case 53:
-                case 54:
-                case 55:
-                {
-                    return 138;
-                }
-                case 25:
-                case 26:
-                case 27:
-                case 28:
-                case 29:
-                case 30:
-                case 31:
-                case 32:
-                case 33:
-                case 34:
-                case 35:
-                case 36:
-                {
-                    return 169;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 141:
-        {
-            switch (i)
-            {
-                case 0:
-                {
-                    return 136;
-                }
-                case 3:
-                {
-                    return 137;
-                }
-                case 4:
-                case 5:
-                case 6:
-                case 7:
-                case 8:
-                case 9:
-                case 10:
-                case 11:
-                case 12:
-                case 13:
-                case 14:
-                case 15:
-                case 16:
-                case 17:
-                case 18:
-                case 19:
-                case 20:
-                case 21:
-                case 22:
-                case 23:
-                case 24:
-                case 37:
-                case 38:
-                case 39:
-                case 40:
-                case 41:
-                case 42:
-                case 43:
-                case 44:
-                case 45:
-                case 46:
-                case 47:
-                case 48:
-                case 49:
-                case 50:
-                case 51:
-                case 52:
-                case 53:
-                case 54:
-                case 55:
-                {
-                    return 138;
-                }
-                case 25:
-                case 26:
-                case 27:
-                case 28:
-                case 29:
-                case 30:
-                case 31:
-                case 32:
-                case 33:
-                case 34:
-                case 35:
-                case 36:
-                {
-                    return 169;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 140:
-        {
-            switch (i)
-            {
-                case 0:
-                {
-                    return 136;
-                }
-                case 3:
-                {
-                    return 137;
-                }
-                case 4:
-                case 5:
-                case 6:
-                case 7:
-                case 8:
-                case 9:
-                case 10:
-                case 11:
-                case 12:
-                case 13:
-                case 14:
-                case 15:
-                case 16:
-                case 17:
-                case 18:
-                case 19:
-                case 20:
-                case 21:
-                case 22:
-                case 23:
-                case 24:
-                case 25:
-                case 26:
-                case 27:
-                case 28:
-                case 29:
-                case 30:
-                case 31:
-                case 32:
-                case 33:
-                case 34:
-                case 35:
-                case 36:
-                case 37:
-                case 38:
-                case 39:
-                case 40:
-                case 41:
-                case 42:
-                case 43:
-                case 44:
-                case 45:
-                case 46:
-                case 47:
-                case 48:
-                case 49:
-                case 50:
-                case 51:
-                case 52:
-                case 53:
-                case 54:
-                case 55:
-                {
-                    return 138;
-                }
-                default:
-                {
-                    return -1;
-                }
-            }
-        }
-        case 139:
-        {
             Lexeme prevMatch = token.match;
             token.match = lexeme;
-            int tokenId = GetTokenId(5);
+            int tokenId = GetTokenId(0);
             if (tokenId == CONTINUE_TOKEN)
             {
                 token.id = tokenId;
@@ -8001,67 +6228,15 @@ int CmajorLexer::NextState(int state, char32_t c)
             switch (i)
             {
                 case 0:
-                {
-                    return 136;
-                }
-                case 3:
-                {
-                    return 137;
-                }
-                case 4:
-                case 5:
+                case 1:
                 case 6:
                 case 7:
-                case 8:
-                case 9:
-                case 10:
-                case 11:
-                case 12:
-                case 13:
-                case 14:
-                case 15:
-                case 16:
-                case 17:
-                case 18:
-                case 19:
-                case 20:
-                case 21:
-                case 22:
-                case 23:
-                case 24:
-                case 25:
-                case 26:
-                case 27:
-                case 28:
-                case 29:
-                case 30:
-                case 31:
-                case 32:
-                case 33:
-                case 34:
-                case 35:
-                case 36:
-                case 37:
-                case 38:
-                case 39:
-                case 40:
-                case 41:
-                case 42:
-                case 43:
-                case 44:
-                case 45:
-                case 46:
-                case 47:
-                case 48:
-                case 49:
-                case 50:
-                case 51:
-                case 52:
-                case 53:
-                case 54:
-                case 55:
                 {
-                    return 138;
+                    return 1;
+                }
+                case 2:
+                {
+                    return 151;
                 }
                 default:
                 {
@@ -8069,11 +6244,11 @@ int CmajorLexer::NextState(int state, char32_t c)
                 }
             }
         }
-        case 136:
+        case 1:
         {
             Lexeme prevMatch = token.match;
             token.match = lexeme;
-            int tokenId = GetTokenId(5);
+            int tokenId = GetTokenId(0);
             if (tokenId == CONTINUE_TOKEN)
             {
                 token.id = tokenId;
@@ -8087,7 +6262,24 @@ int CmajorLexer::NextState(int state, char32_t c)
             {
                 token.match = prevMatch;
             }
-            return -1;
+            switch (i)
+            {
+                case 0:
+                case 1:
+                case 6:
+                case 7:
+                {
+                    return 1;
+                }
+                case 2:
+                {
+                    return 151;
+                }
+                default:
+                {
+                    return -1;
+                }
+            }
         }
     }
     return -1;

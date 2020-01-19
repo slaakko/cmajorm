@@ -34,6 +34,11 @@ void CompileUnitNode::Accept(Visitor& visitor)
     visitor.Visit(*this);
 }
 
+void CompileUnitNode::ResetGlobalNs(NamespaceNode* ns)
+{
+    globalNs.reset(ns);
+}
+
 void CompileUnitNode::ComputeLineStarts(const std::u32string& sourceFileContent)
 {
     int32_t index = 0;

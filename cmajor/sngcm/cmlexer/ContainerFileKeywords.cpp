@@ -20,7 +20,7 @@ namespace ContainerFileKeywords
         {U"winapp", WINAPP}, 
         {U"library", LIBRARY}, 
         {U"winlib", WINLIB}, 
-        {U"unittest", UNITTEST}, 
+        {U"unitTest", UNITTEST}, 
         {U"activeProject", ACTIVEPROJECT},
         {nullptr, -1}
     };

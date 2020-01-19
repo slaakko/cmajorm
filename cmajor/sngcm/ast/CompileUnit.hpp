@@ -20,6 +20,7 @@ public:
     const std::string& FilePath() const { return filePath; }
     const NamespaceNode* GlobalNs() const { return globalNs.get(); }
     NamespaceNode* GlobalNs() { return globalNs.get(); }
+    void ResetGlobalNs(NamespaceNode* ns);
     void ComputeLineStarts(const std::u32string& sourceFileContent);
     const std::vector<int32_t>& LineStarts() { return lineStarts; }
     void SetSynthesizedUnit() { isSynthesizedUnit = true; }

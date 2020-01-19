@@ -190,10 +190,12 @@ public:
     void Visit(Attributes& attributes) override;
     void Visit(CommentNode& comment) override;
     void WriteWarning(const std::string& message);
+    void WriteEmptyLine();
 private:
     soulng::util::CodeFormatter& formatter;
     bool omitNewLine;
     bool omitSemicolon;
+    bool emptyLine;
 };
 
 } } // sngcm::ast

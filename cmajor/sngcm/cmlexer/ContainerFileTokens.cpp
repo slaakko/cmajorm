@@ -82,7 +82,7 @@ namespace ContainerFileTokens
         "'winapp'",
         "'library'",
         "'winlib'",
-        "'unittest'",
+        "'unitTest'",
         "'activeProject'",
         "identifier",
         "file path",

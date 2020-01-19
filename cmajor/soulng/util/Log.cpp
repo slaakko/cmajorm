@@ -51,7 +51,7 @@ void LogMessage(int logStreamId, const std::string& message)
     {
         if (logStreamId == -1)
         {
-            std::cout << "   " << message << std::endl;
+            std::cout << message << std::endl;
         }
         else
         {
@@ -62,7 +62,7 @@ void LogMessage(int logStreamId, const std::string& message)
     {
         if (logStreamId == -1)
         {
-            log.push_back("   " + message);
+            log.push_back(message);
         }
         else
         {
@@ -93,11 +93,6 @@ int WaitForLogMessage()
     {
         return -1;
     }
-}
-
-std::string FetchLogMessage()
-{
-    return logMessage;
 }
 
 int FetchLogMessage(char16_t* buf, int size)

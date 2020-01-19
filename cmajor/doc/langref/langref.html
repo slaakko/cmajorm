@@ -191,6 +191,7 @@
         &nbsp;&nbsp;&nbsp;&nbsp;18.3 <a href="#definitions">Definitions</a><br />
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;18.3.1 <a href="#namespace">Namespaces</a><br />
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;18.3.2 <a href="#namespace-level-definitions">Namespace-level Definitions</a><br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;18.3.3 <a href="#unnamed-namespaces">Unnamed Namespaces</a><br />
         19 <a href="#projects">Projects</a><br />
         &nbsp;&nbsp;&nbsp;&nbsp;19.1 <a href="#projects-syntax">Syntax</a><br />
         &nbsp;&nbsp;&nbsp;&nbsp;19.2 <a href="#projects-example">Example</a><br />
@@ -5170,7 +5171,7 @@
             <td class="sep">&rarr;</td>
             <td class="rcontent">
                 <span class="kw">namespace</span>
-                <span class="rule"><a href="#rule.qualified-id">qualified&#8209;id</a></span>
+                <span class="rule"><a href="#rule.qualified-id">qualified&#8209;id</a></span>?
                 <span class="mono">{</span>
                 <span class="rule"><a href="#rule.namespace-content">namespace&#8209;content</a></span>
                 <span class="mono">}</span>
@@ -5338,6 +5339,15 @@
             <li><a href="#class-delegates">class delegate</a> definitions, and</li>
             <li><a href="#concepts">concept</a> definitions.</li>
         </ul>
+    </p>
+
+    <h4 id="unnamed-namespaces">18.3.3 Unnamed namespaces</h4>
+
+    <p>
+        A namespace is <em>unnamed</em> if it lacks an identifier. Contents of an unnamed namespace is available only in the same source file that it appears.
+        The names inside an unnamed namespace do not collide with identical names in other unnamed namespaces.
+        The mangled name of an unnamed namespace will be "unnamed_ns_UNIQUE_HEX_STRING" where UNIQUE_HEX_STRING will be SHA-1 hash of a random UUID.
+        The mangled names of the entities belonging to an unnamed namespace will be unique.
     </p>
 
     <h2 id="projects">19 Projects</h2>

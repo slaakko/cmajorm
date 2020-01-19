@@ -28,7 +28,7 @@
 
 namespace sngcm { namespace ast {
 
-SourceWriter::SourceWriter(soulng::util::CodeFormatter& formatter_) : formatter(formatter_), omitNewLine(false), omitSemicolon(false)
+SourceWriter::SourceWriter(soulng::util::CodeFormatter& formatter_) : formatter(formatter_), omitNewLine(false), omitSemicolon(false), emptyLine(false)
 {
 }
 
@@ -258,6 +258,7 @@ void SourceWriter::Visit(CompileUnitNode& compileUnitNode)
 
 void SourceWriter::Visit(NamespaceNode& namespaceNode)
 {
+    WriteEmptyLine();
     if (!namespaceNode.Id()->Str().empty())
     {
         if (namespaceNode.IsUnnamedNs())
@@ -302,6 +303,7 @@ void SourceWriter::Visit(NamespaceNode& namespaceNode)
             formatter.WriteLine("} // namespace " + soulng::unicode::ToUtf8(namespaceNode.Id()->Str()));
         }
     }
+    emptyLine = true;
 }
 
 void SourceWriter::Visit(AliasNode& aliasNode)
@@ -348,6 +350,7 @@ void SourceWriter::Visit(TemplateIdNode& templateIdNode)
 
 void SourceWriter::Visit(FunctionNode& functionNode)
 {
+    WriteEmptyLine();
     Attributes* attributes = functionNode.GetAttributes();
     if (attributes)
     {
@@ -401,10 +404,12 @@ void SourceWriter::Visit(FunctionNode& functionNode)
     {
         formatter.WriteLine(";");
     }
+    emptyLine = true;
 }
 
 void SourceWriter::Visit(ClassNode& classNode)
 {
+    WriteEmptyLine();
     Attributes* attributes = classNode.GetAttributes();
     if (attributes)
     {
@@ -460,6 +465,7 @@ void SourceWriter::Visit(ClassNode& classNode)
     }
     formatter.DecIndent();
     formatter.WriteLine("}");
+    emptyLine = true;
 }
 
 void SourceWriter::Visit(ThisInitializerNode& thisInitializerNode)
@@ -756,6 +762,7 @@ void SourceWriter::Visit(MemberVariableNode& memberVariableNode)
 
 void SourceWriter::Visit(InterfaceNode& interfaceNode)
 {
+    WriteEmptyLine();
     Attributes* attributes = interfaceNode.GetAttributes();
     if (attributes)
     {
@@ -779,10 +786,12 @@ void SourceWriter::Visit(InterfaceNode& interfaceNode)
     }
     formatter.DecIndent();
     formatter.WriteLine("}");
+    emptyLine = true;
 }
 
 void SourceWriter::Visit(DelegateNode& delegateNode)
 {
+    WriteEmptyLine();
     if (delegateNode.GetSpecifiers() != Specifiers::none)
     {
         formatter.Write(SpecifierStr(delegateNode.GetSpecifiers()));
@@ -803,10 +812,12 @@ void SourceWriter::Visit(DelegateNode& delegateNode)
         delegateNode.Parameters()[i]->Accept(*this);
     }
     formatter.WriteLine(");");
+    emptyLine = true;
 }
 
 void SourceWriter::Visit(ClassDelegateNode& classDelegateNode)
 {
+    WriteEmptyLine();
     if (classDelegateNode.GetSpecifiers() != Specifiers::none)
     {
         formatter.Write(SpecifierStr(classDelegateNode.GetSpecifiers()));
@@ -827,6 +838,7 @@ void SourceWriter::Visit(ClassDelegateNode& classDelegateNode)
         classDelegateNode.Parameters()[i]->Accept(*this);
     }
     formatter.WriteLine(");");
+    emptyLine = true;
 }
 
 void SourceWriter::Visit(ParenthesizedConstraintNode& parenthesizedConstraintNode)
@@ -1011,6 +1023,7 @@ void SourceWriter::Visit(ConceptIdNode& conceptIdNode)
 
 void SourceWriter::Visit(ConceptNode& conceptNode)
 {
+    WriteEmptyLine();
     if (conceptNode.GetSpecifiers() != Specifiers::none)
     {
         formatter.Write(SpecifierStr(conceptNode.GetSpecifiers()));
@@ -1061,6 +1074,7 @@ void SourceWriter::Visit(ConceptNode& conceptNode)
     }
     formatter.DecIndent();
     formatter.WriteLine("}");
+    emptyLine = true;
 }
 
 void SourceWriter::Visit(LabelNode& labelNode)
@@ -1286,7 +1300,10 @@ void SourceWriter::Visit(ExpressionStatementNode& expressionStatementNode)
 
 void SourceWriter::Visit(EmptyStatementNode& emptyStatementNode)
 {
-    formatter.Write(";");
+    if (!omitSemicolon)
+    {
+        formatter.Write(";");
+    }
     if (!omitNewLine)
     {
         formatter.WriteLine();
@@ -1494,6 +1511,10 @@ void SourceWriter::Visit(ConditionalCompilationStatementNode& conditionalCompila
 
 void SourceWriter::Visit(TypedefNode& typedefNode)
 {
+    if (typedefNode.Parent()->GetNodeType() != NodeType::classNode)
+    {
+        WriteEmptyLine();
+    }
     if (typedefNode.GetSpecifiers() != Specifiers::none)
     {
         formatter.Write(SpecifierStr(typedefNode.GetSpecifiers()));
@@ -1504,10 +1525,18 @@ void SourceWriter::Visit(TypedefNode& typedefNode)
     formatter.Write(" ");
     typedefNode.Id()->Accept(*this);
     formatter.WriteLine(";");
+    if (typedefNode.Parent()->GetNodeType() != NodeType::classNode)
+    {
+        emptyLine = true;
+    }
 }
 
 void SourceWriter::Visit(ConstantNode& constantNode)
 {
+    if (constantNode.Parent()->GetNodeType() != NodeType::classNode)
+    {
+        WriteEmptyLine();
+    }
     if (constantNode.GetSpecifiers() != Specifiers::none)
     {
         formatter.Write(SpecifierStr(constantNode.GetSpecifiers()));
@@ -1520,10 +1549,18 @@ void SourceWriter::Visit(ConstantNode& constantNode)
     formatter.Write(" = ");
     constantNode.Value()->Accept(*this);
     formatter.WriteLine(";");
+    if (constantNode.Parent()->GetNodeType() != NodeType::classNode)
+    {
+        emptyLine = true;
+    }
 }
 
 void SourceWriter::Visit(EnumTypeNode& enumTypeNode)
 {
+    if (enumTypeNode.Parent()->GetNodeType() != NodeType::classNode)
+    {
+        WriteEmptyLine();
+    }
     if (enumTypeNode.GetSpecifiers() != Specifiers::none)
     {
         formatter.Write(SpecifierStr(enumTypeNode.GetSpecifiers()));
@@ -1551,6 +1588,10 @@ void SourceWriter::Visit(EnumTypeNode& enumTypeNode)
     formatter.WriteLine();
     formatter.DecIndent();
     formatter.WriteLine("}");
+    if (enumTypeNode.Parent()->GetNodeType() != NodeType::classNode)
+    {
+        emptyLine = true;
+    }
 }
 
 void SourceWriter::Visit(EnumConstantNode& enumConstantNode)
@@ -1953,6 +1994,7 @@ void SourceWriter::Visit(ParenthesizedExpressionNode& parenthesizedExpressionNod
 
 void SourceWriter::Visit(GlobalVariableNode& globalVariableNode)
 {
+    WriteEmptyLine();
     if (globalVariableNode.GetSpecifiers() != Specifiers::none)
     {
         formatter.Write(SpecifierStr(globalVariableNode.GetSpecifiers()));
@@ -1967,6 +2009,7 @@ void SourceWriter::Visit(GlobalVariableNode& globalVariableNode)
         globalVariableNode.Initializer()->Accept(*this);
     }
     formatter.WriteLine(";");
+    emptyLine = true;
 }
 
 void SourceWriter::Visit(Attribute& attribute)
@@ -2003,6 +2046,15 @@ void SourceWriter::Visit(CommentNode& comment)
 void SourceWriter::WriteWarning(const std::string& message)
 {
     std::cerr << message << std::endl;
+}
+
+void SourceWriter::WriteEmptyLine()
+{
+    if (emptyLine)
+    {
+        formatter.WriteLine();
+        emptyLine = false;
+    }
 }
 
 } } // sngcm::ast

@@ -32,7 +32,7 @@
     </combineStep>
   </query>
   <result>
-    <nodeSet length="1">
+    <nodeset length="1">
       <element>
         <alpha a="1" b="2">
           <beta>
@@ -44,10 +44,119 @@
           </beta>
         </alpha>
       </element>
-    </nodeSet>
+    </nodeset>
   </result>
 </xpath>
-parsing XML took 8 ms
-parsing XPath query took 0 ms
-evaluating XPath query took 0 ms
-total duration: 16 ms
+execution number: 1
+parsing XML took 00:00:00.001.627
+parsing XPath query took 00:00:00.410.156
+evaluating XPath query took 00:00:00.000.114
+total duration: 00:00:00.412.096
+<xpath>
+  <query>
+    <combineStep>
+      <root/>
+      <combineStep>
+        <locationStep>
+          <axis name="child"/>
+          <nodeTest>
+            <nameTest name="test"/>
+          </nodeTest>
+          <predicates/>
+        </locationStep>
+        <locationStep>
+          <axis name="child"/>
+          <nodeTest>
+            <nameTest name="alpha"/>
+          </nodeTest>
+          <predicates>
+            <equal>
+              <locationStep>
+                <axis name="attribute"/>
+                <nodeTest>
+                  <nameTest name="a"/>
+                </nodeTest>
+                <predicates/>
+              </locationStep>
+              <literal value="1"/>
+            </equal>
+          </predicates>
+        </locationStep>
+      </combineStep>
+    </combineStep>
+  </query>
+  <result>
+    <nodeset length="1">
+      <element>
+        <alpha a="1" b="2">
+          <beta>
+            <gamma>text1</gamma>
+          </beta>
+          <beta name="foo">
+            <gamma>text2</gamma>
+            <delta><!--  comment  --></delta>
+          </beta>
+        </alpha>
+      </element>
+    </nodeset>
+  </result>
+</xpath>
+execution number: 2
+parsing XML took 00:00:00.000.877
+parsing XPath query took 00:00:00.000.091
+evaluating XPath query took 00:00:00.000.014
+total duration: 00:00:00.001.131
+<xpath>
+  <query>
+    <combineStep>
+      <root/>
+      <combineStep>
+        <locationStep>
+          <axis name="child"/>
+          <nodeTest>
+            <nameTest name="test"/>
+          </nodeTest>
+          <predicates/>
+        </locationStep>
+        <locationStep>
+          <axis name="child"/>
+          <nodeTest>
+            <nameTest name="alpha"/>
+          </nodeTest>
+          <predicates>
+            <equal>
+              <locationStep>
+                <axis name="attribute"/>
+                <nodeTest>
+                  <nameTest name="a"/>
+                </nodeTest>
+                <predicates/>
+              </locationStep>
+              <literal value="1"/>
+            </equal>
+          </predicates>
+        </locationStep>
+      </combineStep>
+    </combineStep>
+  </query>
+  <result>
+    <nodeset length="1">
+      <element>
+        <alpha a="1" b="2">
+          <beta>
+            <gamma>text1</gamma>
+          </beta>
+          <beta name="foo">
+            <gamma>text2</gamma>
+            <delta><!--  comment  --></delta>
+          </beta>
+        </alpha>
+      </element>
+    </nodeset>
+  </result>
+</xpath>
+execution number: 3
+parsing XML took 00:00:00.000.714
+parsing XPath query took 00:00:00.000.091
+evaluating XPath query took 00:00:00.000.013
+total duration: 00:00:00.000.964

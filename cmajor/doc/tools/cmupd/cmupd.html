@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title>cmupd</title>
+</head>
+<body>
+    <h1>cmupd</h1>
+
+    <p>
+        <strong>cmupd</strong> is a tool for converting user projects that use Cmajor version 3.2.0 or earlier APIs to use APIs of the current 3.3.0 version.
+    </p>
+
+    <pre>
+        Usage: cmupd [options] { SOLUTION.cms | PROJECT.cmp | SOURCEFILE.cm }
+        Options:
+        --help | -h
+            Print help and exit.
+        --verbose | -v
+            Be verbose.
+        --commit  | c
+            Make changes to sources.
+            If run without the --commit flag, only shows what changes would be made without actually making the changes.
+    </pre>
+
+    <p>
+        The tool may be able to convert source code to use new APIs of the following changed libraries:
+        <ul>
+            <li>System.Dom</li>
+            <li>System.Xml</li>
+        </ul>
+    </p>
+
+    <p>
+        The tool may not be able to convert all source code to use new APIs of the following changed libraries,
+        because APIs have changed so much or changes could not be automated:
+        <ul>
+            <li>System.Text.Parsing: new <strong>soulng</strong> parser generator used, this library has been replaced with the System.Parsing and System.Lex libraries.
+            Need to update .parser files and regenerate parsers with the new tool.</li>
+            <li>System.Text.Parsing.CodeDom: this library has been replaced with the Cm.Ast library that is in the projects/cm directory.</li>
+            <li>System.Text.RegularExpressions: some manual changes needed</li>
+            <li>System.XPath: some manual changes needed</li>
+            <li>System.Net.Http: some manual changes needed</li>
+        </ul>
+    </p>
+
+    <p>
+        If run without the --commit flag, prints the source lines that would be changed without actually making changes.
+    </p>
+
+    <p>
+        When run with the --commit flag, renames an old source file that need to be changed from <em>foo.cm</em> to <em>foo.cm.000</em> and
+        generates changed source file with name <em>foo.cm</em>.
+    </p>
+</body>
+</html>

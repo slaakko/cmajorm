@@ -63,11 +63,24 @@ void Execute(const string& xpathQuery, const string& xmlFilePath, Duration& pars
     result->Write(formatter);
 }
 
+void Run(int n, const string& query, const string& xmlFilePath, bool verbose)
+{
+    TimePoint start = Now();
+    Duration parsingDuration;
+    Execute(query, xmlFilePath, parsingDuration, verbose);
+    TimePoint end = Now();
+    Duration duration = end - start;
+    Console.WriteLine("execution number: " + ToString(n));
+    Console.WriteLine("parsing XML took " + DurationStr(parsingDuration));
+    Console.WriteLine("parsing XPath query took " + DurationStr(XPathQueryDuration()));
+    Console.WriteLine("evaluating XPath query took " + DurationStr(XPathExecuteDuration()));
+    Console.WriteLine("total duration: " + DurationStr(duration));
+}
+
 int main(int argc, const char** argv)
 {
     try
     {
-        TimePoint start = Now();
         bool first = true;
         bool verbose = false;
         string query;
@@ -122,14 +135,9 @@ int main(int argc, const char** argv)
         {
             throw Exception("no xml file specified");
         }
-        Duration parsingDuration;
-        Execute(query, xmlFilePath, parsingDuration, verbose);
-        TimePoint end = Now();
-        Duration duration = end - start;
-        Console.WriteLine("parsing XML took " + ToString(parsingDuration.Milliseconds()) + " ms");
-        Console.WriteLine("parsing XPath query took " + ToString(XPathQueryDuration().Milliseconds()) + " ms");
-        Console.WriteLine("evaluating XPath query took " + ToString(XPathExecuteDuration().Milliseconds()) + " ms");
-        Console.WriteLine("total duration: " + ToString(duration.Milliseconds()) + " ms");
+        Run(1, query, xmlFilePath, verbose);
+        Run(2, query, xmlFilePath, verbose);
+        Run(3, query, xmlFilePath, verbose);
     }
     catch (const Exception& ex)
     {
