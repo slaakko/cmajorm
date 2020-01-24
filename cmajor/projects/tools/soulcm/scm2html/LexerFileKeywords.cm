@@ -1,0 +1,204 @@
+using System;
+
+namespace LexerFileKeywords
+{
+    internal class Keywords
+    {
+        static Keywords() :
+            instance(new Keywords())
+        {
+        }
+        public static Keywords& Instance()
+        {
+            return *instance;
+        }
+        public System.Lex.KeywordMap* GetKeywordMap()
+        {
+            return keywordMap.Get();
+        }
+        private Keywords()
+        {
+            System.Lex.Keyword keyword0(u"classmap", LexerFileTokens.CLASSMAP);
+            keywordList.Add(keyword0);
+            System.Lex.Keyword keyword1(u"tokens", LexerFileTokens.TOKENS);
+            keywordList.Add(keyword1);
+            System.Lex.Keyword keyword2(u"keywords", LexerFileTokens.KEYWORDS);
+            keywordList.Add(keyword2);
+            System.Lex.Keyword keyword3(u"expressions", LexerFileTokens.EXPRESSIONS);
+            keywordList.Add(keyword3);
+            System.Lex.Keyword keyword4(u"lexer", LexerFileTokens.LEXER);
+            keywordList.Add(keyword4);
+            System.Lex.Keyword keyword5(u"variables", LexerFileTokens.VARIABLES);
+            keywordList.Add(keyword5);
+            System.Lex.Keyword keyword6(u"actions", LexerFileTokens.ACTIONS);
+            keywordList.Add(keyword6);
+            System.Lex.Keyword keyword7(u"assert", LexerFileTokens.ASSERT);
+            keywordList.Add(keyword7);
+            System.Lex.Keyword keyword8(u"elif", LexerFileTokens.ELIF);
+            keywordList.Add(keyword8);
+            System.Lex.Keyword keyword9(u"endif", LexerFileTokens.ENDIF);
+            keywordList.Add(keyword9);
+            System.Lex.Keyword keyword10(u"bool", LexerFileTokens.BOOL);
+            keywordList.Add(keyword10);
+            System.Lex.Keyword keyword11(u"true", LexerFileTokens.TRUE);
+            keywordList.Add(keyword11);
+            System.Lex.Keyword keyword12(u"false", LexerFileTokens.FALSE);
+            keywordList.Add(keyword12);
+            System.Lex.Keyword keyword13(u"sbyte", LexerFileTokens.SBYTE);
+            keywordList.Add(keyword13);
+            System.Lex.Keyword keyword14(u"byte", LexerFileTokens.BYTE);
+            keywordList.Add(keyword14);
+            System.Lex.Keyword keyword15(u"short", LexerFileTokens.SHORT);
+            keywordList.Add(keyword15);
+            System.Lex.Keyword keyword16(u"ushort", LexerFileTokens.USHORT);
+            keywordList.Add(keyword16);
+            System.Lex.Keyword keyword17(u"int", LexerFileTokens.INT);
+            keywordList.Add(keyword17);
+            System.Lex.Keyword keyword18(u"uint", LexerFileTokens.UINT);
+            keywordList.Add(keyword18);
+            System.Lex.Keyword keyword19(u"long", LexerFileTokens.LONG);
+            keywordList.Add(keyword19);
+            System.Lex.Keyword keyword20(u"ulong", LexerFileTokens.ULONG);
+            keywordList.Add(keyword20);
+            System.Lex.Keyword keyword21(u"float", LexerFileTokens.FLOAT);
+            keywordList.Add(keyword21);
+            System.Lex.Keyword keyword22(u"double", LexerFileTokens.DOUBLE);
+            keywordList.Add(keyword22);
+            System.Lex.Keyword keyword23(u"char", LexerFileTokens.CHAR);
+            keywordList.Add(keyword23);
+            System.Lex.Keyword keyword24(u"wchar", LexerFileTokens.WCHAR);
+            keywordList.Add(keyword24);
+            System.Lex.Keyword keyword25(u"uchar", LexerFileTokens.UCHAR);
+            keywordList.Add(keyword25);
+            System.Lex.Keyword keyword26(u"void", LexerFileTokens.VOID);
+            keywordList.Add(keyword26);
+            System.Lex.Keyword keyword27(u"enum", LexerFileTokens.ENUM);
+            keywordList.Add(keyword27);
+            System.Lex.Keyword keyword28(u"cast", LexerFileTokens.CAST);
+            keywordList.Add(keyword28);
+            System.Lex.Keyword keyword29(u"interface", LexerFileTokens.INTERFACE);
+            keywordList.Add(keyword29);
+            System.Lex.Keyword keyword30(u"namespace", LexerFileTokens.NAMESPACE);
+            keywordList.Add(keyword30);
+            System.Lex.Keyword keyword31(u"using", LexerFileTokens.USING);
+            keywordList.Add(keyword31);
+            System.Lex.Keyword keyword32(u"static", LexerFileTokens.STATIC);
+            keywordList.Add(keyword32);
+            System.Lex.Keyword keyword33(u"extern", LexerFileTokens.EXTERN);
+            keywordList.Add(keyword33);
+            System.Lex.Keyword keyword34(u"as", LexerFileTokens.AS);
+            keywordList.Add(keyword34);
+            System.Lex.Keyword keyword35(u"is", LexerFileTokens.IS);
+            keywordList.Add(keyword35);
+            System.Lex.Keyword keyword36(u"explicit", LexerFileTokens.EXPLICIT);
+            keywordList.Add(keyword36);
+            System.Lex.Keyword keyword37(u"delegate", LexerFileTokens.DELEGATE);
+            keywordList.Add(keyword37);
+            System.Lex.Keyword keyword38(u"inline", LexerFileTokens.INLINE);
+            keywordList.Add(keyword38);
+            System.Lex.Keyword keyword39(u"cdecl", LexerFileTokens.CDECL);
+            keywordList.Add(keyword39);
+            System.Lex.Keyword keyword40(u"nothrow", LexerFileTokens.NOTHROW);
+            keywordList.Add(keyword40);
+            System.Lex.Keyword keyword41(u"public", LexerFileTokens.PUBLIC);
+            keywordList.Add(keyword41);
+            System.Lex.Keyword keyword42(u"protected", LexerFileTokens.PROTECTED);
+            keywordList.Add(keyword42);
+            System.Lex.Keyword keyword43(u"private", LexerFileTokens.PRIVATE);
+            keywordList.Add(keyword43);
+            System.Lex.Keyword keyword44(u"internal", LexerFileTokens.INTERNAL);
+            keywordList.Add(keyword44);
+            System.Lex.Keyword keyword45(u"virtual", LexerFileTokens.VIRTUAL);
+            keywordList.Add(keyword45);
+            System.Lex.Keyword keyword46(u"abstract", LexerFileTokens.ABSTRACT);
+            keywordList.Add(keyword46);
+            System.Lex.Keyword keyword47(u"override", LexerFileTokens.OVERRIDE);
+            keywordList.Add(keyword47);
+            System.Lex.Keyword keyword48(u"suppress", LexerFileTokens.SUPPRESS);
+            keywordList.Add(keyword48);
+            System.Lex.Keyword keyword49(u"operator", LexerFileTokens.OPERATOR);
+            keywordList.Add(keyword49);
+            System.Lex.Keyword keyword50(u"class", LexerFileTokens.CLASS);
+            keywordList.Add(keyword50);
+            System.Lex.Keyword keyword51(u"return", LexerFileTokens.RETURN);
+            keywordList.Add(keyword51);
+            System.Lex.Keyword keyword52(u"if", LexerFileTokens.IF);
+            keywordList.Add(keyword52);
+            System.Lex.Keyword keyword53(u"else", LexerFileTokens.ELSE);
+            keywordList.Add(keyword53);
+            System.Lex.Keyword keyword54(u"switch", LexerFileTokens.SWITCH);
+            keywordList.Add(keyword54);
+            System.Lex.Keyword keyword55(u"case", LexerFileTokens.CASE);
+            keywordList.Add(keyword55);
+            System.Lex.Keyword keyword56(u"default", LexerFileTokens.DEFAULT);
+            keywordList.Add(keyword56);
+            System.Lex.Keyword keyword57(u"while", LexerFileTokens.WHILE);
+            keywordList.Add(keyword57);
+            System.Lex.Keyword keyword58(u"do", LexerFileTokens.DO);
+            keywordList.Add(keyword58);
+            System.Lex.Keyword keyword59(u"for", LexerFileTokens.FOR);
+            keywordList.Add(keyword59);
+            System.Lex.Keyword keyword60(u"break", LexerFileTokens.BREAK);
+            keywordList.Add(keyword60);
+            System.Lex.Keyword keyword61(u"continue", LexerFileTokens.CONTINUE);
+            keywordList.Add(keyword61);
+            System.Lex.Keyword keyword62(u"goto", LexerFileTokens.GOTO);
+            keywordList.Add(keyword62);
+            System.Lex.Keyword keyword63(u"typedef", LexerFileTokens.TYPEDEF);
+            keywordList.Add(keyword63);
+            System.Lex.Keyword keyword64(u"typename", LexerFileTokens.TYPENAME);
+            keywordList.Add(keyword64);
+            System.Lex.Keyword keyword65(u"typeid", LexerFileTokens.TYPEID);
+            keywordList.Add(keyword65);
+            System.Lex.Keyword keyword66(u"const", LexerFileTokens.CONST);
+            keywordList.Add(keyword66);
+            System.Lex.Keyword keyword67(u"constexpr", LexerFileTokens.CONSTEXPR);
+            keywordList.Add(keyword67);
+            System.Lex.Keyword keyword68(u"null", LexerFileTokens.NULLLIT);
+            keywordList.Add(keyword68);
+            System.Lex.Keyword keyword69(u"this", LexerFileTokens.THIS);
+            keywordList.Add(keyword69);
+            System.Lex.Keyword keyword70(u"base", LexerFileTokens.BASE);
+            keywordList.Add(keyword70);
+            System.Lex.Keyword keyword71(u"construct", LexerFileTokens.CONSTRUCT);
+            keywordList.Add(keyword71);
+            System.Lex.Keyword keyword72(u"destroy", LexerFileTokens.DESTROY);
+            keywordList.Add(keyword72);
+            System.Lex.Keyword keyword73(u"new", LexerFileTokens.NEW);
+            keywordList.Add(keyword73);
+            System.Lex.Keyword keyword74(u"delete", LexerFileTokens.DELETE);
+            keywordList.Add(keyword74);
+            System.Lex.Keyword keyword75(u"sizeof", LexerFileTokens.SIZEOF);
+            keywordList.Add(keyword75);
+            System.Lex.Keyword keyword76(u"try", LexerFileTokens.TRY);
+            keywordList.Add(keyword76);
+            System.Lex.Keyword keyword77(u"catch", LexerFileTokens.CATCH);
+            keywordList.Add(keyword77);
+            System.Lex.Keyword keyword78(u"throw", LexerFileTokens.THROW);
+            keywordList.Add(keyword78);
+            System.Lex.Keyword keyword79(u"concept", LexerFileTokens.CONCEPT);
+            keywordList.Add(keyword79);
+            System.Lex.Keyword keyword80(u"where", LexerFileTokens.WHERE);
+            keywordList.Add(keyword80);
+            System.Lex.Keyword keyword81(u"axiom", LexerFileTokens.AXIOM);
+            keywordList.Add(keyword81);
+            System.Lex.Keyword keyword82(u"and", LexerFileTokens.AND);
+            keywordList.Add(keyword82);
+            System.Lex.Keyword keyword83(u"or", LexerFileTokens.OR);
+            keywordList.Add(keyword83);
+            System.Lex.Keyword keyword84(u"unit_test", LexerFileTokens.UNIT_TEST);
+            keywordList.Add(keyword84);
+            System.Lex.Keyword nullKeyword(null, -1);
+            keywordList.Add(nullKeyword);
+            keywordMap.Reset(new System.Lex.KeywordMap(keywordList.CBegin().Ptr()));
+        }
+        private static System.UniquePtr<Keywords> instance;
+        private System.Collections.List<System.Lex.Keyword> keywordList;
+        private System.UniquePtr<System.Lex.KeywordMap> keywordMap;
+    }
+
+    public System.Lex.KeywordMap* GetKeywordMap()
+    {
+        return Keywords.Instance().GetKeywordMap();
+    }
+} // namespace LexerFileKeywords

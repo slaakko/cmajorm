@@ -3257,7 +3257,7 @@ void GenerateNamespaceDoc(Input* input, const std::string& docDir, sngxml::dom::
 }
 
 void GenerateModuleIndexHtml(Input* input, const std::string& moduleDir, const std::u32string& moduleName, sngxml::dom::Document* moduleXmlDoc, 
-    const std::vector<sngxml::dom::Document*>& otherModuleXmlDocs, std::vector<GrammarInfo>& grammars)
+    const std::vector<sngxml::dom::Document*>& otherModuleXmlDocs, std::vector<sngxml::dom::Element*>& grammarElements)
 {
     sngxml::dom::Document* docs = input->docs.get();
     std::string docDir = GetFullPath(Path::Combine(moduleDir, "doc"));
@@ -3291,20 +3291,25 @@ void GenerateModuleIndexHtml(Input* input, const std::string& moduleDir, const s
             bodyElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(descriptionAndDetails.release()));
         }
     }
-    if (!grammars.empty())
+    if (!grammarElements.empty())
     {
         std::unique_ptr<sngxml::dom::Element> h2Element(new sngxml::dom::Element(U"h2"));
         h2Element->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::Text(U"Grammars")));
         bodyElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(h2Element.release()));
         std::unique_ptr<sngxml::dom::Element> grammarTableElement(new sngxml::dom::Element(U"table"));
-        for (const GrammarInfo& grammar : grammars)
+        for (sngxml::dom::Element* grammarElement : grammarElements)
         {
             std::unique_ptr<sngxml::dom::Element> trElement(new sngxml::dom::Element(U"tr"));
             std::unique_ptr<sngxml::dom::Element> tdElement(new sngxml::dom::Element(U"td"));
             tdElement->SetAttribute(U"xml:space", U"preserve");
             std::unique_ptr<sngxml::dom::Element> linkElement(new sngxml::dom::Element(U"a"));
-            linkElement->SetAttribute(U"href", ToUtf32(grammar.grammarFileName));
-            linkElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::Text(grammar.grammarName)));
+            std::u32string fileAttr = grammarElement->GetAttribute(U"file");
+            std::u32string grammarName = ToUtf32(Path::GetFileNameWithoutExtension(ToUtf8(fileAttr)));
+            linkElement->SetAttribute(U"href", U"doc/" + grammarName + U".html");
+            std::string grammarFilePath = GetFullPath(Path::Combine(input->baseDir, ToUtf8(fileAttr)));
+            std::unique_ptr<sngxml::dom::Document> grammarDoc = sngxml::dom::ReadDocument(grammarFilePath);
+            std::u32string grammarTitle = grammarDoc->DocumentElement()->GetAttribute(U"title");
+            linkElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::Text(grammarTitle)));
             tdElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(linkElement.release()));
             trElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(tdElement.release()));
             grammarTableElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(trElement.release()));
@@ -3700,7 +3705,7 @@ void GenerateModuleIndexHtml(Input* input, const std::string& moduleDir, const s
     }
 }
 
-void BuildDocs(const std::u32string& solutionName, const std::vector<std::u32string>& moduleNames, std::vector<std::string>& grammarFilePaths)
+void BuildDocs(const std::u32string& solutionName, const std::vector<std::u32string>& moduleNames)
 {
     bool verbose = GetGlobalFlag(GlobalFlags::verbose);
     if (verbose)
@@ -3731,16 +3736,58 @@ void BuildDocs(const std::u32string& solutionName, const std::vector<std::u32str
         std::unique_ptr<sngxml::dom::Document> moduleXmlFile = sngxml::dom::ReadDocument(moduleXmlFilePath);
         moduleXmlFiles.push_back(std::move(moduleXmlFile));
     }
+    std::unique_ptr<sngxml::dom::Document> scm2htmlDoc;
+    if (!input->scm2htmlFilePath.empty())
+    {
+        scm2htmlDoc = sngxml::dom::ReadDocument(input->scm2htmlFilePath);
+    }
     int n = moduleNames.size();
     for (int i = 0; i < n; ++i)
     {
         const std::u32string& moduleName = moduleNames[i];
         std::string moduleNameStr = ToUtf8(moduleName);
         std::string moduleDir = GetFullPath(Path::Combine(contentDir, moduleNameStr));
-        std::string grammarXmlFilePath = GetFullPath(Path::Combine(moduleDir, "grammars.xml"));
         std::string relativeModuleDir = Path::Combine("content", moduleNameStr);
-        std::vector<GrammarInfo> grammars;
-        //BuildParserDocs(input, moduleDir, grammarXmlFilePath, relativeModuleDir, grammarFilePaths, moduleName, grammars);
+        std::vector<sngxml::dom::Element*> grammarElements;
+        if (!input->scm2htmlFilePath.empty())
+        {
+            std::unique_ptr<sngxml::xpath::XPathObject> result = sngxml::xpath::Evaluate(U"/scm2html/project", scm2htmlDoc.get());
+            if (result->Type() == sngxml::xpath::XPathObjectType::nodeSet)
+            {
+                sngxml::xpath::XPathNodeSet* nodeSet = static_cast<sngxml::xpath::XPathNodeSet*>(result.get());
+                int n = nodeSet->Length();
+                for (int i = 0; i < n; ++i)
+                {
+                    sngxml::dom::Node* node = (*nodeSet)[i];
+                    if (node->GetNodeType() == sngxml::dom::NodeType::elementNode)
+                    {
+                        sngxml::dom::Element* element = static_cast<sngxml::dom::Element*>(node);
+                        std::u32string nameAttr = element->GetAttribute(U"name");
+                        if (!nameAttr.empty())
+                        {
+                            if (nameAttr == moduleName)
+                            {
+                                std::unique_ptr<sngxml::xpath::XPathObject> result = sngxml::xpath::Evaluate(U"grammar", element);
+                                if (result->Type() == sngxml::xpath::XPathObjectType::nodeSet)
+                                {
+                                    sngxml::xpath::XPathNodeSet* nodeSet = static_cast<sngxml::xpath::XPathNodeSet*>(result.get());
+                                    int n = nodeSet->Length();
+                                    for (int i = 0; i < n; ++i)
+                                    {
+                                        sngxml::dom::Node* node = (*nodeSet)[i];
+                                        if (node->GetNodeType() == sngxml::dom::NodeType::elementNode)
+                                        {
+                                            sngxml::dom::Element* element = static_cast<sngxml::dom::Element*>(node);
+                                            grammarElements.push_back(element);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
         sngxml::dom::Document* moduleXmlDoc = moduleXmlFiles[i].get();
         std::vector<sngxml::dom::Document*> otherModuleXmlDocs;
         {
@@ -3757,7 +3804,7 @@ void BuildDocs(const std::u32string& solutionName, const std::vector<std::u32str
                 otherModuleXmlDocs.push_back(moduleXmlFiles[j].get());
             }
         }
-        GenerateModuleIndexHtml(input, moduleDir, moduleName, moduleXmlDoc, otherModuleXmlDocs, grammars);
+        GenerateModuleIndexHtml(input, moduleDir, moduleName, moduleXmlDoc, otherModuleXmlDocs, grammarElements);
     }
     GenerateRootIndexHtml(input, targetDir, solutionName, moduleNames, moduleLinks, moduleXmlFiles);
     if (verbose)

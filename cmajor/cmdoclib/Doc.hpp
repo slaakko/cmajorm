@@ -11,7 +11,7 @@
 
 namespace cmajor { namespace cmdoclib {
 
-CMDOCLIB_API void BuildDocs(const std::u32string& solutionName, const std::vector<std::u32string>& moduleNames, std::vector<std::string>& grammarFilePaths);
+CMDOCLIB_API void BuildDocs(const std::u32string& solutionName, const std::vector<std::u32string>& moduleNames);
 
 } } // namespace cmajor::cmdoclib
 

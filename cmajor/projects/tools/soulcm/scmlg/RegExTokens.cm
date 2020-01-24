@@ -5,21 +5,37 @@ using System;
 namespace RegExTokens
 {
     public const int END = 0;
+
     public const int LPAREN = 1;
+
     public const int RPAREN = 2;
+
     public const int LBRACKET = 3;
+
     public const int RBRACKET = 4;
+
     public const int LBRACE = 5;
+
     public const int RBRACE = 6;
+
     public const int ALT = 7;
+
     public const int STAR = 8;
+
     public const int PLUS = 9;
+
     public const int QUEST = 10;
+
     public const int DOT = 11;
+
     public const int ESCAPE = 12;
+
     public const int INVERSE = 13;
+
     public const int MINUS = 14;
+
     public const int CHAR = 15;
+
     internal class TokenMap
     {
         static TokenMap() :
@@ -109,10 +125,12 @@ namespace RegExTokens
     {
         return TokenMap.Instance().GetTokenId(tokenName);
     }
+
     public ustring GetTokenName(int tokenId)
     {
         return TokenMap.Instance().GetTokenName(tokenId);
     }
+
     public ustring GetTokenInfo(int tokenId)
     {
         return TokenMap.Instance().GetTokenInfo(tokenId);

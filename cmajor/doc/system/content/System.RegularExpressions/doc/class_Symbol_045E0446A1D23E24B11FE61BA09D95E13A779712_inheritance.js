@@ -269,10 +269,10 @@ function drawDiagram(diagramNodes) {
 function drawInheritanceDiagram() {
     var diagramNodes = [
         { name: "System.RegularExpressions.Symbol", id: "diagram_node_0", level: 0, subject: true, hasDerivedNodes: true, link: "../../System.RegularExpressions/doc/class_Symbol_045E0446A1D23E24B11FE61BA09D95E13A779712.html" },
-        { name: "System.RegularExpressions.Any", id: "diagram_node_1", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.RegularExpressions/doc/class_Any_0A418E4655ACB4783F86563EDB7D1DB9B1A0788F.html" },
+        { name: "System.RegularExpressions.Any", id: "diagram_node_2", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.RegularExpressions/doc/class_Any_0A418E4655ACB4783F86563EDB7D1DB9B1A0788F.html" },
         { name: "System.RegularExpressions.Char", id: "diagram_node_3", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.RegularExpressions/doc/class_Char_3F6134F745420FB12C0D9A0160C38BD18AE6808E.html" },
         { name: "System.RegularExpressions.Class", id: "diagram_node_4", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.RegularExpressions/doc/class_Class_6AE7BA360EE4A9959B036A4627C6EC5904E6421C.html" },
-        { name: "System.RegularExpressions.Range", id: "diagram_node_2", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.RegularExpressions/doc/class_Range_A83DB963E0A2ED4ABAC38D4E9F3A6EDE478E9CE5.html" }];
+        { name: "System.RegularExpressions.Range", id: "diagram_node_1", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.RegularExpressions/doc/class_Range_A83DB963E0A2ED4ABAC38D4E9F3A6EDE478E9CE5.html" }];
     drawDiagram(diagramNodes);
 }
 

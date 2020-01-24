@@ -1,0 +1,180 @@
+<html>
+ <head>
+  <meta charset="utf-8"/>
+  <title>HTTP Date Grammar</title>
+  <link href="../../../style/style.css" rel="stylesheet" type="text/css"/>
+ </head>
+ <body>
+  <h1>HTTP Date Grammar</h1>
+  <table class="grammar">
+   <tr id="http-date">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      http&#8209;date</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#rfc-1123-date">rfc&#8209;1123&#8209;date</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#rfc-850-date">rfc&#8209;850&#8209;date</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#asc-time-date">asc&#8209;time&#8209;date</a></span></td>
+   </tr>
+   <tr id="rfc-1123-date">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      rfc&#8209;1123&#8209;date</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#wkday">wkday</a></span><span class="ruleOp"> </span><span class="ruleChar">,</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#sp">sp</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#date1">date1</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#sp">sp</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#time">time</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#sp">sp</a></span><span class="ruleOp"> </span><span class="ruleString">GMT</span></td>
+   </tr>
+   <tr id="rfc-850-date">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      rfc&#8209;850&#8209;date</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#weekday">weekday</a></span><span class="ruleOp"> </span><span class="ruleString">,</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#sp">sp</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#date2">date2</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#sp">sp</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#time">time</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#sp">sp</a></span><span class="ruleOp"> </span><span class="ruleString">GMT</span></td>
+   </tr>
+   <tr id="asc-time-date">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      asc&#8209;time&#8209;date</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#wkday">wkday</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#sp">sp</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#date3">date3</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#sp">sp</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#time">time</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#sp">sp</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#year">year</a></span></td>
+   </tr>
+   <tr id="date1">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      date1</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#day">day</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#sp">sp</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#month">month</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#sp">sp</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#year">year</a></span></td>
+   </tr>
+   <tr id="date2">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      date2</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#day">day</a></span><span class="ruleOp"> </span><span class="ruleChar">-</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#month">month</a></span><span class="ruleOp"> </span><span class="ruleChar">-</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#year2">year2</a></span></td>
+   </tr>
+   <tr id="date3">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      date3</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#month">month</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#sp">sp</a></span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#day">day</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#day1">day1</a></span><span class="ruleOp">)</span></td>
+   </tr>
+   <tr id="year">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      year</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#digit">digit</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#digit">digit</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#digit">digit</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#digit">digit</a></span></td>
+   </tr>
+   <tr id="year2">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      year2</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#digit">digit</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#digit">digit</a></span></td>
+   </tr>
+   <tr id="day">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      day</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#digit">digit</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#digit">digit</a></span></td>
+   </tr>
+   <tr id="day1">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      day1</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#sp">sp</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#digit">digit</a></span></td>
+   </tr>
+   <tr id="wkday">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      wkday</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleString">Mon</span><span class="ruleOp"> | </span><span class="ruleString">Tue</span><span class="ruleOp"> | </span><span class="ruleString">Wed</span><span class="ruleOp"> | </span><span class="ruleString">Thu</span><span class="ruleOp"> | </span><span class="ruleString">Fri</span><span class="ruleOp"> | </span><span class="ruleString">Sat</span><span class="ruleOp"> | </span><span class="ruleString">Sun</span></td>
+   </tr>
+   <tr id="weekday">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      weekday</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleString">Monday</span><span class="ruleOp"> | </span><span class="ruleString">Tuesday</span><span class="ruleOp"> | </span><span class="ruleString">Wednesday</span><span class="ruleOp"> | </span><span class="ruleString">Thursday</span><span class="ruleOp"> | </span><span class="ruleString">Friday</span><span class="ruleOp"> | </span><span class="ruleString">Saturday</span><span class="ruleOp"> | </span><span class="ruleString">Sunday</span></td>
+   </tr>
+   <tr id="month">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      month</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleString">Jan</span><span class="ruleOp"> | </span><span class="ruleString">Feb</span><span class="ruleOp"> | </span><span class="ruleString">Mar</span><span class="ruleOp"> | </span><span class="ruleString">Apr</span><span class="ruleOp"> | </span><span class="ruleString">May</span><span class="ruleOp"> | </span><span class="ruleString">Jun</span><span class="ruleOp"> | </span><span class="ruleString">Jul</span><span class="ruleOp"> | </span><span class="ruleString">Aug</span><span class="ruleOp"> | </span><span class="ruleString">Sep</span><span class="ruleOp"> | </span><span class="ruleString">Oct</span><span class="ruleOp"> | </span><span class="ruleString">Nov</span><span class="ruleOp"> | </span><span class="ruleString">Dec</span></td>
+   </tr>
+   <tr id="time">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      time</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#hour">hour</a></span><span class="ruleOp"> </span><span class="ruleChar">:</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#min">min</a></span><span class="ruleOp"> </span><span class="ruleChar">:</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#sec">sec</a></span></td>
+   </tr>
+   <tr id="hour">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      hour</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#digit">digit</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#digit">digit</a></span></td>
+   </tr>
+   <tr id="min">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      min</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#digit">digit</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#digit">digit</a></span></td>
+   </tr>
+   <tr id="sec">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      sec</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#digit">digit</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#digit">digit</a></span></td>
+   </tr>
+   <tr id="delta-seconds">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      delta&#8209;seconds</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#digit">digit</a></span><span class="ruleOp">+</span></td>
+   </tr>
+   <tr id="sp">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      sp</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleChar"> </span></td>
+   </tr>
+   <tr id="digit">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      digit</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleCharSet">[0-9]</span></td>
+   </tr>
+  </table>
+ </body>
+</html>

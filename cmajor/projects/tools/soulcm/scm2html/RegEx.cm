@@ -1,0 +1,165 @@
+using System;
+using System.Collections;
+
+namespace soulcm.scm2html
+{
+    public abstract class RegExpression
+    {
+        public RegExpression()
+        {
+        }
+        public virtual ~RegExpression()
+        {
+        }
+        public abstract void Accept(Visitor& visitor);
+        public virtual bool IsCharSymbolExpr() const
+        {
+            return false;
+        }
+    }
+
+    public abstract class UnaryRegExpression : RegExpression
+    {
+        public UnaryRegExpression(RegExpression* child_) :
+            child(child_)
+        {
+        }
+        public RegExpression* Child() const
+        {
+            return child.Get();
+        }
+        private UniquePtr<RegExpression> child;
+    }
+
+    public abstract class BinaryRegExpression : RegExpression
+    {
+        public BinaryRegExpression(RegExpression* left_, RegExpression* right_) :
+            left(left_), right(right_)
+        {
+        }
+        public RegExpression* Left() const
+        {
+            return left.Get();
+        }
+        public RegExpression* Right() const
+        {
+            return right.Get();
+        }
+        public override bool IsCharSymbolExpr() const
+        {
+            return left->IsCharSymbolExpr() && right->IsCharSymbolExpr();
+        }
+        private UniquePtr<RegExpression> left;
+        private UniquePtr<RegExpression> right;
+    }
+
+    public class Alt : BinaryRegExpression
+    {
+        public Alt(RegExpression* left_, RegExpression* right_) :
+            base(left_, right_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+    }
+
+    public class Cat : BinaryRegExpression
+    {
+        public Cat(RegExpression* left_, RegExpression* right_) :
+            base(left_, right_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+    }
+
+    public class Kleene : UnaryRegExpression
+    {
+        public Kleene(RegExpression* child_) :
+            base(child_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+    }
+
+    public class Pos : UnaryRegExpression
+    {
+        public Pos(RegExpression* child_) :
+            base(child_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+    }
+
+    public class Opt : UnaryRegExpression
+    {
+        public Opt(RegExpression* child_) :
+            base(child_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+    }
+
+    public class ParenExpr : UnaryRegExpression
+    {
+        public ParenExpr(RegExpression* child_) :
+            base(child_)
+        {
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+    }
+
+    public class SymbolExpr : RegExpression
+    {
+        public SymbolExpr(Symbol* symbol_) :
+            symbol(symbol_)
+        {
+        }
+        public Symbol* GetSymbol() const
+        {
+            return symbol;
+        }
+        public override bool IsCharSymbolExpr() const
+        {
+            return symbol->IsChar();
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        private Symbol* symbol;
+    }
+
+    public class RefExpr : RegExpression
+    {
+        public RefExpr(const ustring& exprId_) :
+            exprId(exprId_)
+        {
+        }
+        public const ustring& ExprId() const
+        {
+            return exprId;
+        }
+        public override void Accept(Visitor& visitor)
+        {
+            visitor.Visit(*this);
+        }
+        private ustring exprId;
+    }
+} // namespace soulcm.scm2html

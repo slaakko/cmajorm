@@ -1,0 +1,140 @@
+<html>
+ <head>
+  <meta charset="utf-8"/>
+  <title>HTTP Grammar</title>
+  <link href="../../../style/style.css" rel="stylesheet" type="text/css"/>
+ </head>
+ <body>
+  <h1>HTTP Grammar</h1>
+  <table class="grammar">
+   <tr id="token">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      token</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#chr">chr</a></span><span class="ruleOp"> &minus; </span><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#control">control</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#t-special">t&#8209;special</a></span><span class="ruleOp">)</span><span class="ruleOp">+</span></td>
+   </tr>
+   <tr id="comment">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      comment</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="lexerRule"><a class="lexerRule" href="http-lexical-grammar.html#lparen">lparen</a></span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#ctext">ctext</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#quoted-pair">quoted&#8209;pair</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#comment">comment</a></span><span class="ruleOp">)</span><span class="ruleOp">*</span><span class="ruleOp"> </span><span class="lexerRule"><a class="lexerRule" href="http-lexical-grammar.html#rparen">rparen</a></span></td>
+   </tr>
+   <tr id="parameter">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      parameter</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#attribute">attribute</a></span><span class="ruleOp"> </span><span class="lexerRule"><a class="lexerRule" href="http-lexical-grammar.html#eq">eq</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#attr-val">attr&#8209;val</a></span></td>
+   </tr>
+   <tr id="attribute">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      attribute</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#token">token</a></span></td>
+   </tr>
+   <tr id="attr-val">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      attr&#8209;val</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#token">token</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#quoted-string">quoted&#8209;string</a></span></td>
+   </tr>
+   <tr id="hex">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      hex</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="lexerRule"><a class="lexerRule" href="http-lexical-grammar.html#digit">digit</a></span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="http-lexical-grammar.html#hx">hx</a></span></td>
+   </tr>
+   <tr id="chr">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      chr</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="lexerRule"><a class="lexerRule" href="http-lexical-grammar.html#digit">digit</a></span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="http-lexical-grammar.html#hx">hx</a></span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="http-lexical-grammar.html#alpha">alpha</a></span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="http-lexical-grammar.html#ht">ht</a></span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="http-lexical-grammar.html#dq">dq</a></span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="http-lexical-grammar.html#cr">cr</a></span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="http-lexical-grammar.html#lf">lf</a></span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="http-lexical-grammar.html#ctl">ctl</a></span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="http-lexical-grammar.html#sp">sp</a></span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="http-lexical-grammar.html#colon">colon</a></span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="http-lexical-grammar.html#semicolon">semicolon</a></span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="http-lexical-grammar.html#comma">comma</a></span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="http-lexical-grammar.html#dot">dot</a></span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="http-lexical-grammar.html#lparen">lparen</a></span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="http-lexical-grammar.html#rparen">rparen</a></span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="http-lexical-grammar.html#langle">langle</a></span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="http-lexical-grammar.html#rangle">rangle</a></span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="http-lexical-grammar.html#lbracket">lbracket</a></span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="http-lexical-grammar.html#rbracket">rbracket</a></span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="http-lexical-grammar.html#lbrace">lbrace</a></span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="http-lexical-grammar.html#rbrace">rbrace</a></span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="http-lexical-grammar.html#slash">slash</a></span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="http-lexical-grammar.html#backslash">backslash</a></span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="http-lexical-grammar.html#eq">eq</a></span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="http-lexical-grammar.html#ch">ch</a></span></td>
+   </tr>
+   <tr id="text">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      text</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#octet">octet</a></span><span class="ruleOp"> &minus; </span><span class="ruleLink"><a class="ruleLink" href="#control">control</a></span></td>
+   </tr>
+   <tr id="ctext">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      ctext</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#text">text</a></span><span class="ruleOp"> &minus; </span><span class="ruleOp">(</span><span class="lexerRule"><a class="lexerRule" href="http-lexical-grammar.html#lparen">lparen</a></span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="http-lexical-grammar.html#rparen">rparen</a></span><span class="ruleOp">)</span></td>
+   </tr>
+   <tr id="quoted-string">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      quoted&#8209;string</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="lexerRule"><a class="lexerRule" href="http-lexical-grammar.html#dq">dq</a></span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#qd-text">qd&#8209;text</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#quoted-pair">quoted&#8209;pair</a></span><span class="ruleOp">)</span><span class="ruleOp">*</span><span class="ruleOp"> </span><span class="lexerRule"><a class="lexerRule" href="http-lexical-grammar.html#dq">dq</a></span></td>
+   </tr>
+   <tr id="qd-text">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      qd&#8209;text</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#text">text</a></span><span class="ruleOp"> &minus; </span><span class="lexerRule"><a class="lexerRule" href="http-lexical-grammar.html#dq">dq</a></span></td>
+   </tr>
+   <tr id="quoted-pair">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      quoted&#8209;pair</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="lexerRule"><a class="lexerRule" href="http-lexical-grammar.html#backslash">backslash</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#chr">chr</a></span></td>
+   </tr>
+   <tr id="control">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      control</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="lexerRule"><a class="lexerRule" href="http-lexical-grammar.html#ht">ht</a></span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="http-lexical-grammar.html#cr">cr</a></span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="http-lexical-grammar.html#lf">lf</a></span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="http-lexical-grammar.html#ctl">ctl</a></span></td>
+   </tr>
+   <tr id="t-special">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      t&#8209;special</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="lexerRule"><a class="lexerRule" href="http-lexical-grammar.html#lparen">lparen</a></span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="http-lexical-grammar.html#rparen">rparen</a></span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="http-lexical-grammar.html#langle">langle</a></span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="http-lexical-grammar.html#rangle">rangle</a></span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="http-lexical-grammar.html#at">at</a></span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="http-lexical-grammar.html#comma">comma</a></span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="http-lexical-grammar.html#semicolon">semicolon</a></span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="http-lexical-grammar.html#colon">colon</a></span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="http-lexical-grammar.html#backslash">backslash</a></span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="http-lexical-grammar.html#dq">dq</a></span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="http-lexical-grammar.html#slash">slash</a></span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="http-lexical-grammar.html#lbracket">lbracket</a></span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="http-lexical-grammar.html#rbracket">rbracket</a></span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="http-lexical-grammar.html#quest">quest</a></span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="http-lexical-grammar.html#eq">eq</a></span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="http-lexical-grammar.html#lbrace">lbrace</a></span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="http-lexical-grammar.html#rbrace">rbrace</a></span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="http-lexical-grammar.html#sp">sp</a></span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="http-lexical-grammar.html#ht">ht</a></span></td>
+   </tr>
+   <tr id="octet">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      octet</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#chr">chr</a></span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="http-lexical-grammar.html#oct">oct</a></span></td>
+   </tr>
+   <tr id="lws">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      lws</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleOp">(</span><span class="ruleOp">(</span><span class="lexerRule"><a class="lexerRule" href="http-lexical-grammar.html#cr">cr</a></span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="http-lexical-grammar.html#lf">lf</a></span><span class="ruleOp">)</span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="lexerRule"><a class="lexerRule" href="http-lexical-grammar.html#sp">sp</a></span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="http-lexical-grammar.html#ht">ht</a></span><span class="ruleOp">)</span><span class="ruleOp">)</span><span class="ruleOp">+</span></td>
+   </tr>
+  </table>
+ </body>
+</html>

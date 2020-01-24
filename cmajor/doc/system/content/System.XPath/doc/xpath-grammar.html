@@ -1,0 +1,316 @@
+<html>
+ <head>
+  <meta charset="utf-8"/>
+  <title>XPATH Grammar</title>
+  <link href="../../../style/style.css" rel="stylesheet" type="text/css"/>
+ </head>
+ <body>
+  <h1>XPATH Grammar</h1>
+  <table class="grammar">
+   <tr id="expr">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      expr</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#or-expr">or&#8209;expr</a></span></td>
+   </tr>
+   <tr id="or-expr">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      or&#8209;expr</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#and-expr">and&#8209;expr</a></span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="lexerRule"><a class="lexerRule" href="xpath-lexical-grammar.html#name">name</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#and-expr">and&#8209;expr</a></span><span class="ruleOp">)</span><span class="ruleOp">*</span></td>
+   </tr>
+   <tr id="and-expr">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      and&#8209;expr</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#equality-expr">equality&#8209;expr</a></span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="lexerRule"><a class="lexerRule" href="xpath-lexical-grammar.html#name">name</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#equality-expr">equality&#8209;expr</a></span><span class="ruleOp">)</span><span class="ruleOp">*</span></td>
+   </tr>
+   <tr id="equality-expr">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      equality&#8209;expr</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#relational-expr">relational&#8209;expr</a></span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleOp">(</span><span class="ruleChar">=</span><span class="ruleOp"> | </span><span class="ruleChar">!</span><span class="ruleChar">=</span><span class="ruleOp">)</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#relational-expr">relational&#8209;expr</a></span><span class="ruleOp">)</span><span class="ruleOp">*</span></td>
+   </tr>
+   <tr id="relational-expr">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      relational&#8209;expr</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#additive-expr">additive&#8209;expr</a></span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleOp">(</span><span class="ruleChar">&lt;</span><span class="ruleChar">=</span><span class="ruleOp"> | </span><span class="ruleChar">></span><span class="ruleChar">=</span><span class="ruleOp"> | </span><span class="ruleChar">&lt;</span><span class="ruleOp"> | </span><span class="ruleChar">></span><span class="ruleOp">)</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#additive-expr">additive&#8209;expr</a></span><span class="ruleOp">)</span><span class="ruleOp">*</span></td>
+   </tr>
+   <tr id="additive-expr">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      additive&#8209;expr</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#multiplicative-expr">multiplicative&#8209;expr</a></span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleOp">(</span><span class="ruleChar">+</span><span class="ruleOp"> | </span><span class="ruleChar">-</span><span class="ruleOp">)</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#multiplicative-expr">multiplicative&#8209;expr</a></span><span class="ruleOp">)</span><span class="ruleOp">*</span></td>
+   </tr>
+   <tr id="multiplicative-expr">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      multiplicative&#8209;expr</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#unary-expr">unary&#8209;expr</a></span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleOp">(</span><span class="ruleChar">*</span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="xpath-lexical-grammar.html#name">name</a></span><span class="ruleOp">)</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#unary-expr">unary&#8209;expr</a></span><span class="ruleOp">)</span><span class="ruleOp">*</span></td>
+   </tr>
+   <tr id="unary-expr">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      unary&#8209;expr</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleChar">-</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#unary-expr">unary&#8209;expr</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#union-expr">union&#8209;expr</a></span></td>
+   </tr>
+   <tr id="union-expr">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      union&#8209;expr</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#path-expr">path&#8209;expr</a></span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleChar">|</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#path-expr">path&#8209;expr</a></span><span class="ruleOp">)</span><span class="ruleOp">*</span></td>
+   </tr>
+   <tr id="path-expr">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      path&#8209;expr</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#location-path">location&#8209;path</a></span><span class="ruleOp"> &minus; </span><span class="ruleLink"><a class="ruleLink" href="#function-call">function&#8209;call</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#filter-expr">filter&#8209;expr</a></span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleOp">(</span><span class="ruleChar">/</span><span class="ruleChar">/</span><span class="ruleOp"> | </span><span class="ruleChar">/</span><span class="ruleOp">)</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#relative-location-path">relative&#8209;location&#8209;path</a></span><span class="ruleOp">)</span><span class="ruleOp">?</span></td>
+   </tr>
+   <tr id="filter-expr">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      filter&#8209;expr</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#primary-expr">primary&#8209;expr</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#predicate">predicate</a></span><span class="ruleOp">*</span></td>
+   </tr>
+   <tr id="location-path">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      location&#8209;path</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#absolute-location-path">absolute&#8209;location&#8209;path</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#relative-location-path">relative&#8209;location&#8209;path</a></span></td>
+   </tr>
+   <tr id="absolute-location-path">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      absolute&#8209;location&#8209;path</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#abbreviated-absolute-location-path">abbreviated&#8209;absolute&#8209;location&#8209;path</a></span><span class="ruleOp"> | </span><span class="ruleChar">/</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#relative-location-path">relative&#8209;location&#8209;path</a></span><span class="ruleOp">?</span></td>
+   </tr>
+   <tr id="abbreviated-absolute-location-path">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      abbreviated&#8209;absolute&#8209;location&#8209;path</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleChar">/</span><span class="ruleChar">/</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#relative-location-path">relative&#8209;location&#8209;path</a></span></td>
+   </tr>
+   <tr id="relative-location-path">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      relative&#8209;location&#8209;path</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#step">step</a></span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleOp">(</span><span class="ruleChar">/</span><span class="ruleChar">/</span><span class="ruleOp"> | </span><span class="ruleChar">/</span><span class="ruleOp">)</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#step">step</a></span><span class="ruleOp">)</span><span class="ruleOp">*</span></td>
+   </tr>
+   <tr id="step">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      step</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#axis-specifier">axis&#8209;specifier</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#node-test">node&#8209;test</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#predicate">predicate</a></span><span class="ruleOp">*</span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#abbreviated-step">abbreviated&#8209;step</a></span></td>
+   </tr>
+   <tr id="axis-specifier">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      axis&#8209;specifier</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#axis-name">axis&#8209;name</a></span><span class="ruleOp"> </span><span class="ruleChar">:</span><span class="ruleChar">:</span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#abbreviated-axis-specifier">abbreviated&#8209;axis&#8209;specifier</a></span></td>
+   </tr>
+   <tr id="axis-name">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      axis&#8209;name</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="lexerRule"><a class="lexerRule" href="xpath-lexical-grammar.html#name">name</a></span></td>
+   </tr>
+   <tr id="abbreviated-axis-specifier">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      abbreviated&#8209;axis&#8209;specifier</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleChar">@</span><span class="ruleOp"> | </span><span class="ruleOp">&lt;empty></span></td>
+   </tr>
+   <tr id="node-test">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      node&#8209;test</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="lexerRule"><a class="lexerRule" href="xpath-lexical-grammar.html#name">name</a></span><span class="ruleOp"> </span><span class="ruleChar">(</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#literal">literal</a></span><span class="ruleOp"> </span><span class="ruleChar">)</span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#node-type">node&#8209;type</a></span><span class="ruleOp"> </span><span class="ruleChar">(</span><span class="ruleOp"> </span><span class="ruleChar">)</span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#name-test">name&#8209;test</a></span></td>
+   </tr>
+   <tr id="node-type">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      node&#8209;type</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="lexerRule"><a class="lexerRule" href="xpath-lexical-grammar.html#name">name</a></span></td>
+   </tr>
+   <tr id="name-test">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      name&#8209;test</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleChar">*</span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#ncname">ncname</a></span><span class="ruleOp"> </span><span class="ruleChar">:</span><span class="ruleOp"> </span><span class="ruleChar">*</span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#qname">qname</a></span></td>
+   </tr>
+   <tr id="abbreviated-step">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      abbreviated&#8209;step</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleChar">.</span><span class="ruleChar">.</span><span class="ruleOp"> | </span><span class="ruleChar">.</span></td>
+   </tr>
+   <tr id="literal">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      literal</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="lexerRule"><a class="lexerRule" href="xpath-lexical-grammar.html#dq-string">dq&#8209;string</a></span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="xpath-lexical-grammar.html#sq-string">sq&#8209;string</a></span></td>
+   </tr>
+   <tr id="number">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      number</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="lexerRule"><a class="lexerRule" href="xpath-lexical-grammar.html#num">num</a></span></td>
+   </tr>
+   <tr id="predicate">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      predicate</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleChar">[</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#predicate-expr">predicate&#8209;expr</a></span><span class="ruleOp"> </span><span class="ruleChar">]</span></td>
+   </tr>
+   <tr id="predicate-expr">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      predicate&#8209;expr</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#expr">expr</a></span></td>
+   </tr>
+   <tr id="primary-expr">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      primary&#8209;expr</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#function-call">function&#8209;call</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#variable-reference">variable&#8209;reference</a></span><span class="ruleOp"> | </span><span class="ruleChar">(</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#expr">expr</a></span><span class="ruleOp"> </span><span class="ruleChar">)</span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#literal">literal</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#number">number</a></span></td>
+   </tr>
+   <tr id="variable-reference">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      variable&#8209;reference</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleChar">$</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#qname">qname</a></span></td>
+   </tr>
+   <tr id="function-call">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      function&#8209;call</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#function-name">function&#8209;name</a></span><span class="ruleOp"> </span><span class="ruleChar">(</span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#argument">argument</a></span><span class="ruleOp"> % </span><span class="ruleChar">,</span><span class="ruleOp">)</span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleChar">)</span></td>
+   </tr>
+   <tr id="function-name">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      function&#8209;name</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#qname">qname</a></span><span class="ruleOp"> &minus; </span><span class="ruleLink"><a class="ruleLink" href="#node-type">node&#8209;type</a></span></td>
+   </tr>
+   <tr id="argument">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      argument</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#expr">expr</a></span></td>
+   </tr>
+   <tr id="qname">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      qname</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#prefixed-name">prefixed&#8209;name</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#unprefixed-name">unprefixed&#8209;name</a></span></td>
+   </tr>
+   <tr id="prefixed-name">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      prefixed&#8209;name</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#prefix">prefix</a></span><span class="ruleOp"> </span><span class="ruleChar">:</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#local-part">local&#8209;part</a></span></td>
+   </tr>
+   <tr id="prefix">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      prefix</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#ncname">ncname</a></span></td>
+   </tr>
+   <tr id="unprefixed-name">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      unprefixed&#8209;name</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#local-part">local&#8209;part</a></span></td>
+   </tr>
+   <tr id="local-part">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      local&#8209;part</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#ncname">ncname</a></span></td>
+   </tr>
+   <tr id="ncname">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      ncname</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="lexerRule"><a class="lexerRule" href="xpath-lexical-grammar.html#name">name</a></span></td>
+   </tr>
+  </table>
+ </body>
+</html>

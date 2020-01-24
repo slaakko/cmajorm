@@ -11,7 +11,7 @@ namespace Cm.Ast
     public class SourceWriter : Visitor
     {
         public nothrow SourceWriter(CodeFormatter& formatter_) :
-            formatter(formatter_), omitNewLine(false), omitSemicolon(false)
+            formatter(formatter_), omitNewLine(false), omitSemicolon(false), emptyLine(false)
         {
         }
         public nothrow void WriteWarning(const string& message)
@@ -207,6 +207,7 @@ namespace Cm.Ast
         }
         public override void Visit(NamespaceNode& namespaceNode)
         {
+            WriteEmptyLine();
             if (!namespaceNode.Id()->Str().IsEmpty())
             {
                 if (namespaceNode.IsUnnamedNs())
@@ -251,6 +252,7 @@ namespace Cm.Ast
                     formatter.WriteLine("} // namespace " + ToUtf8(namespaceNode.Id()->Str()));
                 }
             }
+            emptyLine = true;
         }
         public override void Visit(AliasNode& aliasNode)
         {
@@ -291,6 +293,7 @@ namespace Cm.Ast
         }
         public override void Visit(FunctionNode& functionNode)
         {
+            WriteEmptyLine();
             Attributes* attributes = functionNode.GetAttributes();
             if ((attributes != null))
             {
@@ -344,9 +347,11 @@ namespace Cm.Ast
             {
                 formatter.WriteLine(";");
             }
+            emptyLine = true;
         }
         public override void Visit(ClassNode& classNode)
         {
+            WriteEmptyLine();
             Attributes* attributes = classNode.GetAttributes();
             if ((attributes != null))
             {
@@ -402,6 +407,7 @@ namespace Cm.Ast
             }
             formatter.DecIndent();
             formatter.WriteLine("}");
+            emptyLine = true;
         }
         public override void Visit(ThisInitializerNode& thisInitializerNode)
         {
@@ -688,6 +694,7 @@ namespace Cm.Ast
         }
         public override void Visit(InterfaceNode& interfaceNode)
         {
+            WriteEmptyLine();
             Attributes* attributes = interfaceNode.GetAttributes();
             if ((attributes != null))
             {
@@ -711,9 +718,11 @@ namespace Cm.Ast
             }
             formatter.DecIndent();
             formatter.WriteLine("}");
+            emptyLine = true;
         }
         public override void Visit(DelegateNode& delegateNode)
         {
+            WriteEmptyLine();
             if (delegateNode.GetSpecifiers() != Specifiers.none)
             {
                 formatter.Write(SpecifierStr(delegateNode.GetSpecifiers()));
@@ -734,9 +743,11 @@ namespace Cm.Ast
                 delegateNode.Parameters()[i]->Accept(*this);
             }
             formatter.WriteLine(");");
+            emptyLine = true;
         }
         public override void Visit(ClassDelegateNode& classDelegateNode)
         {
+            WriteEmptyLine();
             if (classDelegateNode.GetSpecifiers() != Specifiers.none)
             {
                 formatter.Write(SpecifierStr(classDelegateNode.GetSpecifiers()));
@@ -757,6 +768,7 @@ namespace Cm.Ast
                 classDelegateNode.Parameters()[i]->Accept(*this);
             }
             formatter.WriteLine(");");
+            emptyLine = true;
         }
         public override void Visit(ParenthesizedConstraintNode& parenthesizedConstraintNode)
         {
@@ -925,6 +937,7 @@ namespace Cm.Ast
         }
         public override void Visit(ConceptNode& conceptNode)
         {
+            WriteEmptyLine();
             if (conceptNode.GetSpecifiers() != Specifiers.none)
             {
                 formatter.Write(SpecifierStr(conceptNode.GetSpecifiers()));
@@ -975,6 +988,7 @@ namespace Cm.Ast
             }
             formatter.DecIndent();
             formatter.WriteLine("}");
+            emptyLine = true;
         }
         public override void Visit(LabelNode& labelNode)
         {
@@ -1373,6 +1387,10 @@ namespace Cm.Ast
         }
         public override void Visit(TypedefNode& typedefNode)
         {
+            if (typedefNode.Parent()->GetNodeType() != NodeType.classNode)
+            {
+                WriteEmptyLine();
+            }
             if (typedefNode.GetSpecifiers() != Specifiers.none)
             {
                 formatter.Write(SpecifierStr(typedefNode.GetSpecifiers()));
@@ -1383,9 +1401,17 @@ namespace Cm.Ast
             formatter.Write(" ");
             typedefNode.Id()->Accept(*this);
             formatter.WriteLine(";");
+            if (typedefNode.Parent()->GetNodeType() != NodeType.classNode)
+            {
+                emptyLine = true;
+            }
         }
         public override void Visit(ConstantNode& constantNode)
         {
+            if (constantNode.Parent()->GetNodeType() != NodeType.classNode)
+            {
+                WriteEmptyLine();
+            }
             if (constantNode.GetSpecifiers() != Specifiers.none)
             {
                 formatter.Write(SpecifierStr(constantNode.GetSpecifiers()));
@@ -1398,9 +1424,17 @@ namespace Cm.Ast
             formatter.Write(" = ");
             constantNode.Value()->Accept(*this);
             formatter.WriteLine(";");
+            if (constantNode.Parent()->GetNodeType() != NodeType.classNode)
+            {
+                emptyLine = true;
+            }
         }
         public override void Visit(EnumTypeNode& enumTypeNode)
         {
+            if (enumTypeNode.Parent()->GetNodeType() != NodeType.classNode)
+            {
+                WriteEmptyLine();
+            }
             if (enumTypeNode.GetSpecifiers() != Specifiers.none)
             {
                 formatter.Write(SpecifierStr(enumTypeNode.GetSpecifiers()));
@@ -1428,6 +1462,10 @@ namespace Cm.Ast
             formatter.WriteLine();
             formatter.DecIndent();
             formatter.WriteLine("}");
+            if (enumTypeNode.Parent()->GetNodeType() != NodeType.classNode)
+            {
+                emptyLine = true;
+            }
         }
         public override void Visit(EnumConstantNode& enumConstantNode)
         {
@@ -1776,6 +1814,7 @@ namespace Cm.Ast
         }
         public override void Visit(GlobalVariableNode& globalVariableNode)
         {
+            WriteEmptyLine();
             if (globalVariableNode.GetSpecifiers() != Specifiers.none)
             {
                 formatter.Write(SpecifierStr(globalVariableNode.GetSpecifiers()));
@@ -1790,6 +1829,7 @@ namespace Cm.Ast
                 globalVariableNode.Initializer()->Accept(*this);
             }
             formatter.WriteLine(";");
+            emptyLine = true;
         }
         public override void Visit(Attribute& attribute)
         {
@@ -1819,8 +1859,17 @@ namespace Cm.Ast
             formatter.WriteLine("// " + ToUtf8(comment.Comment()));
             formatter.WriteLine();
         }
+        private void WriteEmptyLine()
+        {
+            if (emptyLine)
+            {
+                formatter.WriteLine();
+                emptyLine = false;
+            }
+        }
         private CodeFormatter& formatter;
         private bool omitNewLine;
         private bool omitSemicolon;
+        private bool emptyLine;
     }
 } // namespace Cm.Ast

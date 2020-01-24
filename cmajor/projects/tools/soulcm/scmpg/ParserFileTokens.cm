@@ -5,134 +5,263 @@ using System;
 namespace ParserFileTokens
 {
     public const int END = 0;
+
     public const int PARSER = 1;
+
     public const int MAIN = 2;
+
     public const int USELEXER = 3;
+
     public const int RULEINFO = 4;
+
     public const int EMPTY = 5;
+
     public const int VAR = 6;
+
     public const int PRODUCES = 7;
+
     public const int ASSERT = 8;
+
     public const int ELIF = 9;
+
     public const int ENDIF = 10;
+
     public const int BOOL = 11;
+
     public const int TRUE = 12;
+
     public const int FALSE = 13;
+
     public const int SBYTE = 14;
+
     public const int BYTE = 15;
+
     public const int SHORT = 16;
+
     public const int USHORT = 17;
+
     public const int INT = 18;
+
     public const int UINT = 19;
+
     public const int LONG = 20;
+
     public const int ULONG = 21;
+
     public const int FLOAT = 22;
+
     public const int DOUBLE = 23;
+
     public const int CHAR = 24;
+
     public const int WCHAR = 25;
+
     public const int UCHAR = 26;
+
     public const int VOID = 27;
+
     public const int ENUM = 28;
+
     public const int CAST = 29;
+
     public const int INTERFACE = 30;
+
     public const int NAMESPACE = 31;
+
     public const int USING = 32;
+
     public const int STATIC = 33;
+
     public const int EXTERN = 34;
+
     public const int AS = 35;
+
     public const int IS = 36;
+
     public const int EXPLICIT = 37;
+
     public const int DELEGATE = 38;
+
     public const int INLINE = 39;
+
     public const int CDECL = 40;
+
     public const int NOTHROW = 41;
+
     public const int PUBLIC = 42;
+
     public const int PROTECTED = 43;
+
     public const int PRIVATE = 44;
+
     public const int INTERNAL = 45;
+
     public const int VIRTUAL = 46;
+
     public const int ABSTRACT = 47;
+
     public const int OVERRIDE = 48;
+
     public const int SUPPRESS = 49;
+
     public const int OPERATOR = 50;
+
     public const int CLASS = 51;
+
     public const int RETURN = 52;
+
     public const int IF = 53;
+
     public const int ELSE = 54;
+
     public const int SWITCH = 55;
+
     public const int CASE = 56;
+
     public const int DEFAULT = 57;
+
     public const int WHILE = 58;
+
     public const int DO = 59;
+
     public const int FOR = 60;
+
     public const int BREAK = 61;
+
     public const int CONTINUE = 62;
+
     public const int GOTO = 63;
+
     public const int TYPEDEF = 64;
+
     public const int TYPENAME = 65;
+
     public const int TYPEID = 66;
+
     public const int CONST = 67;
+
     public const int CONSTEXPR = 68;
+
     public const int NULLLIT = 69;
+
     public const int THIS = 70;
+
     public const int BASE = 71;
+
     public const int CONSTRUCT = 72;
+
     public const int DESTROY = 73;
+
     public const int NEW = 74;
+
     public const int DELETE = 75;
+
     public const int SIZEOF = 76;
+
     public const int TRY = 77;
+
     public const int CATCH = 78;
+
     public const int THROW = 79;
+
     public const int CONCEPT = 80;
+
     public const int WHERE = 81;
+
     public const int AXIOM = 82;
+
     public const int AND = 83;
+
     public const int OR = 84;
+
     public const int EXCLAMATION = 85;
+
     public const int UNIT_TEST = 86;
+
     public const int ID = 87;
+
     public const int FLOATINGLIT = 88;
+
     public const int INTLIT = 89;
+
     public const int CHARLIT = 90;
+
     public const int STRINGLIT = 91;
+
     public const int EQUIVALENCE = 92;
+
     public const int IMPLICATION = 93;
+
     public const int DISJUNCTION = 94;
+
     public const int AMPAMP = 95;
+
     public const int BITOR = 96;
+
     public const int BITXOR = 97;
+
     public const int AMP = 98;
+
     public const int EQ = 99;
+
     public const int NEQ = 100;
+
     public const int LEQ = 101;
+
     public const int GEQ = 102;
+
     public const int SHIFTLEFT = 103;
+
     public const int SHIFTRIGHT = 104;
+
     public const int PLUS = 105;
+
     public const int MINUS = 106;
+
     public const int STAR = 107;
+
     public const int DIV = 108;
+
     public const int REM = 109;
+
     public const int PLUSPLUS = 110;
+
     public const int MINUSMINUS = 111;
+
     public const int CPL = 112;
+
     public const int DOT = 113;
+
     public const int ARROW = 114;
+
     public const int LBRACKET = 115;
+
     public const int RBRACKET = 116;
+
     public const int LPAREN = 117;
+
     public const int RPAREN = 118;
+
     public const int LANGLE = 119;
+
     public const int RANGLE = 120;
+
     public const int LBRACE = 121;
+
     public const int RBRACE = 122;
+
     public const int COMMA = 123;
+
     public const int ASSIGN = 124;
+
     public const int COLON = 125;
+
     public const int SEMICOLON = 126;
+
     public const int HASH = 127;
+
     public const int QUEST = 128;
+
     internal class TokenMap
     {
         static TokenMap() :
@@ -561,10 +690,12 @@ namespace ParserFileTokens
     {
         return TokenMap.Instance().GetTokenId(tokenName);
     }
+
     public ustring GetTokenName(int tokenId)
     {
         return TokenMap.Instance().GetTokenName(tokenId);
     }
+
     public ustring GetTokenInfo(int tokenId)
     {
         return TokenMap.Instance().GetTokenInfo(tokenId);

@@ -1,0 +1,64 @@
+using System;
+using System.XPath;
+using System.Dom;
+using System.Collections;
+using System.IO;
+
+namespace soulcm.scm2html
+{
+    public class Scm2htmlXml
+    {
+        public Scm2htmlXml(const string& scm2htmlFilePath_) :
+            scm2HtmlFilePath(scm2htmlFilePath_), rootDir(Path.GetDirectoryName(GetFullPath(scm2HtmlFilePath)))
+        {
+        }
+        public void Process(bool verbose)
+        {
+            this->verbose = verbose;
+            if (verbose)
+            {
+                Console.Out() << "> " << scm2HtmlFilePath << endl();
+            }
+            scm2htmlDoc = ReadDocument(scm2HtmlFilePath);
+            ReadProjects();
+            ProcessProjects();
+        }
+        public void ReadProjects()
+        {
+            UniquePtr<XPathObject> result = Evaluate(u"/scm2html/project", scm2htmlDoc.Get());
+            if (!result.IsNull())
+            {
+                if (result.Get() is XPathNodeSet*)
+                {
+                    XPathNodeSet* nodeSet = cast<XPathNodeSet*>(result.Get());
+                    int n = nodeSet->Length();
+                    for (int i = 0; i < n; ++i)
+                    {
+                        Node* node = (*nodeSet)[i];
+                        if (node is Element*)
+                        {
+                            Element* element = cast<Element*>(node);
+                            projects.Add(UniquePtr<Project>(new Project(this, element)));
+                        }
+                    }
+                }
+            }
+        }
+        public void ProcessProjects()
+        {
+            for (const UniquePtr<Project>& project : projects)
+            {
+                project->Process(verbose);
+            }
+        }
+        public inline nothrow const string& RootDir() const
+        {
+            return rootDir;
+        }
+        private bool verbose;
+        private string scm2HtmlFilePath;
+        private string rootDir;
+        private UniquePtr<Document> scm2htmlDoc;
+        private List<UniquePtr<Project>> projects;
+    }
+} // namespace soulcm.scm2html

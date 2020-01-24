@@ -1,0 +1,153 @@
+using System;
+using System.Collections;
+using System.IO;
+using System.Text;
+
+namespace soulcm.scm2html
+{
+    public enum IdentifierClassKind
+    {
+        none, unicode, ascii
+    }
+
+    public class LexerContext
+    {
+        public LexerContext(IdentifierClassKind identifierClassKind) :
+            classIndex(0), any(), epsilon(eps), classMap(null), tokens(null), keywords(null), expressions(null), lexer(null), currentExpression(null), idStart(new Class(0)), idCont(new Class(0))
+        {
+            if (identifierClassKind == IdentifierClassKind.unicode)
+            {
+                MakeUnicodeIdentifierClasses(*this);
+                symbols.Add(idStart);
+                symbols.Add(idCont);
+            }
+            else if (identifierClassKind == IdentifierClassKind.ascii)
+            {
+                MakeAsciiIdentifierClasses(*this);
+                symbols.Add(idStart);
+                symbols.Add(idCont);
+            }
+        }
+        public ~LexerContext()
+        {
+            for (Symbol* symbol : symbols)
+            {
+                delete symbol;
+            }
+        }
+        public Symbol* MakeAny()
+        {
+            return &any;
+        }
+        public Symbol* MakeEpsilon()
+        {
+            return &epsilon;
+        }
+        public Class* MakeIdStart()
+        {
+            return idStart;
+        }
+        public Class* MakeIdCont()
+        {
+            return idCont;
+        }
+        public const List<Symbol*>& Symbols() const
+        {
+            return symbols;
+        }
+        public const string& FileName() const
+        {
+            return fileName;
+        }
+        public void SetCurrentExpression(Expression* currentExpression_)
+        {
+            currentExpression = currentExpression_;
+        }
+        public Symbol* MakeChar(uchar c)
+        {
+            Map<uchar, Symbol*>.ConstIterator it = charSymbols.CFind(c);
+            if (it != charSymbols.CEnd())
+            {
+                return it->second;
+            }
+            Symbol* symbol = new Char(c);
+            symbol->DontSetContained();
+            symbols.Add(symbol);
+            charSymbols[c] = symbol;
+            return symbol;
+        }
+        public Symbol* MakeRange(uchar start, uchar end)
+        {
+            Range range(start, end);
+            Map<Range, Symbol*>.ConstIterator it = rangeSymbols.CFind(range);
+            if (it != rangeSymbols.CEnd())
+            {
+                return it->second;
+            }
+            Symbol* symbol = new Range(start, end);
+            symbols.Add(symbol);
+            rangeSymbols[range] = symbol;
+            return symbol;
+        }
+        public Class* MakeClass()
+        {
+            Class* cls = new Class(classIndex++);
+            symbols.Add(cls);
+            return cls;
+        }
+        public void AddUsingNode(Cm.Ast.Node* usingNode)
+        {
+            usingNodes.Add(usingNode);
+        }
+        public void SetFileName(const string& fileName_)
+        {
+            fileName = fileName_;
+        }
+        private int nextNfaStateId;
+        private int nextDfaStateId;
+        private int lexerStatementIndex;
+        private int classIndex;
+        private string fileName;
+        private List<Symbol*> symbols;
+        private List<Class*> canonicalClasses;
+        private List<Class*> partition;
+        private List<Cm.Ast.Node*> usingNodes;
+        private Map<uchar, Symbol*> charSymbols;
+        private Map<Range, Symbol*> rangeSymbols;
+        private Any any;
+        private Char epsilon;
+        private Class* idStart;
+        private Class* idCont;
+        private ClassMap* classMap;
+        private Usings* usings;
+        private Tokens* tokens;
+        private Keywords* keywords;
+        private Expressions* expressions;
+        private Lexer* lexer;
+        private Expression* currentExpression;
+    }
+
+    public class ClassLess
+    {
+        public bool operator()(const Class* left, const Class* right) const
+        {
+            if (left->Ranges().Count() < right->Ranges().Count()) return false;
+            if (left->Ranges().Count() > right->Ranges().Count()) return false;
+            if (!left->Ranges().IsEmpty())
+            {
+                Range leftRange = left->Ranges().Front();
+                Range rightRange = right->Ranges().Front();
+                return leftRange < rightRange;
+            }
+            return false;
+        }
+    }
+
+    public class ClassesEqual
+    {
+        public bool operator()(const Class* left, const Class* right) const
+        {
+            return left->Ranges() == right->Ranges();
+        }
+    }
+} // namespace soulcm.scm2html

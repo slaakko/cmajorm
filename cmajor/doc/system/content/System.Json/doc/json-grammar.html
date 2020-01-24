@@ -1,0 +1,44 @@
+<html>
+ <head>
+  <meta charset="utf-8"/>
+  <title>JSON Grammar</title>
+  <link href="../../../style/style.css" rel="stylesheet" type="text/css"/>
+ </head>
+ <body>
+  <h1>JSON Grammar</h1>
+  <table class="grammar">
+   <tr id="value">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      value</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="lexerRule"><a class="lexerRule" href="json-lexical-grammar.html#string">string</a></span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="json-lexical-grammar.html#number">number</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#object">object</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#array">array</a></span><span class="ruleOp"> | </span><span class="ruleChar">t</span><span class="ruleChar">r</span><span class="ruleChar">u</span><span class="ruleChar">e</span><span class="ruleOp"> | </span><span class="ruleChar">f</span><span class="ruleChar">a</span><span class="ruleChar">l</span><span class="ruleChar">s</span><span class="ruleChar">e</span><span class="ruleOp"> | </span><span class="ruleChar">n</span><span class="ruleChar">u</span><span class="ruleChar">l</span><span class="ruleChar">l</span></td>
+   </tr>
+   <tr id="object">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      object</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleChar">{</span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#field">field</a></span><span class="ruleOp"> % </span><span class="ruleChar">,</span><span class="ruleOp">)</span><span class="ruleOp"> </span><span class="ruleChar">}</span></td>
+   </tr>
+   <tr id="field">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      field</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="lexerRule"><a class="lexerRule" href="json-lexical-grammar.html#string">string</a></span><span class="ruleOp"> </span><span class="ruleChar">:</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#value">value</a></span></td>
+   </tr>
+   <tr id="array">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      array</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleChar">[</span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#value">value</a></span><span class="ruleOp"> % </span><span class="ruleChar">,</span><span class="ruleOp">)</span><span class="ruleOp"> </span><span class="ruleChar">]</span></td>
+   </tr>
+  </table>
+ </body>
+</html>

@@ -270,11 +270,11 @@ function drawInheritanceDiagram() {
     var diagramNodes = [
         { name: "System.Json.JsonValue", id: "diagram_node_0", level: 0, subject: true, hasDerivedNodes: true, link: "../../System.Json/doc/class_JsonValue_B86942C2856CC5758E1FB19BBBE97E4002D4008A.html" },
         { name: "System.Json.JsonArray", id: "diagram_node_1", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Json/doc/class_JsonArray_595A35C98AB243A92CA1C39BB1B07E82AA246D18.html" },
-        { name: "System.Json.JsonBool", id: "diagram_node_2", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Json/doc/class_JsonBool_DECA0A9F59CE58DA61371982ADCFCD31F1497F79.html" },
-        { name: "System.Json.JsonNull", id: "diagram_node_4", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Json/doc/class_JsonNull_E0746AE6880508740D5FFC8AF4E0FB0A7AE20ED2.html" },
+        { name: "System.Json.JsonBool", id: "diagram_node_3", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Json/doc/class_JsonBool_DECA0A9F59CE58DA61371982ADCFCD31F1497F79.html" },
+        { name: "System.Json.JsonNull", id: "diagram_node_5", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Json/doc/class_JsonNull_E0746AE6880508740D5FFC8AF4E0FB0A7AE20ED2.html" },
         { name: "System.Json.JsonNumber", id: "diagram_node_6", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Json/doc/class_JsonNumber_BA94887A1742701B420D069040E7953026161429.html" },
-        { name: "System.Json.JsonObject", id: "diagram_node_5", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Json/doc/class_JsonObject_1ACA524ABF05C4E15B709275F66F3BF5C165B69D.html" },
-        { name: "System.Json.JsonString", id: "diagram_node_3", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Json/doc/class_JsonString_5806452F49D8C71DEDC42FCEB48EC3A2163F7516.html" }];
+        { name: "System.Json.JsonObject", id: "diagram_node_4", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Json/doc/class_JsonObject_1ACA524ABF05C4E15B709275F66F3BF5C165B69D.html" },
+        { name: "System.Json.JsonString", id: "diagram_node_2", level: 1, subject: false, hasDerivedNodes: false, link: "../../System.Json/doc/class_JsonString_5806452F49D8C71DEDC42FCEB48EC3A2163F7516.html" }];
     drawDiagram(diagramNodes);
 }
 

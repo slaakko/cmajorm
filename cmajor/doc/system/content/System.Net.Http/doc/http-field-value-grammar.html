@@ -1,0 +1,36 @@
+<html>
+ <head>
+  <meta charset="utf-8"/>
+  <title>HTTP Field Value Grammar</title>
+  <link href="../../../style/style.css" rel="stylesheet" type="text/css"/>
+ </head>
+ <body>
+  <h1>HTTP Field Value Grammar</h1>
+  <table class="grammar">
+   <tr id="comma-separated-field-value">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      comma&#8209;separated&#8209;field&#8209;value</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#general-field-value">general&#8209;field&#8209;value</a></span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="http-grammar.html#lws">lws</a></span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="lexerRule"><a class="lexerRule" href="http-lexical-grammar.html#comma">comma</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="http-grammar.html#lws">lws</a></span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#general-field-value">general&#8209;field&#8209;value</a></span><span class="ruleOp">)</span><span class="ruleOp">*</span></td>
+   </tr>
+   <tr id="general-field-value">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      general&#8209;field&#8209;value</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="http-grammar.html#token">token</a></span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="lexerRule"><a class="lexerRule" href="http-lexical-grammar.html#semicolon">semicolon</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="http-grammar.html#lws">lws</a></span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#general-parameter">general&#8209;parameter</a></span><span class="ruleOp">)</span><span class="ruleOp">*</span></td>
+   </tr>
+   <tr id="general-parameter">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      general&#8209;parameter</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="http-grammar.html#attribute">attribute</a></span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="lexerRule"><a class="lexerRule" href="http-lexical-grammar.html#eq">eq</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="http-grammar.html#attr-val">attr&#8209;val</a></span><span class="ruleOp">)</span><span class="ruleOp">?</span></td>
+   </tr>
+  </table>
+ </body>
+</html>

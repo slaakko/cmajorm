@@ -1,0 +1,44 @@
+<html>
+ <head>
+  <meta charset="utf-8"/>
+  <title>HTTP Header Grammar</title>
+  <link href="../../../style/style.css" rel="stylesheet" type="text/css"/>
+ </head>
+ <body>
+  <h1>HTTP Header Grammar</h1>
+  <table class="grammar">
+   <tr id="message-header">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      message&#8209;header</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#field-name">field&#8209;name</a></span><span class="ruleOp"> </span><span class="lexerRule"><a class="lexerRule" href="http-lexical-grammar.html#colon">colon</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#field-value">field&#8209;value</a></span><span class="ruleOp">?</span></td>
+   </tr>
+   <tr id="field-name">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      field&#8209;name</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="http-grammar.html#token">token</a></span></td>
+   </tr>
+   <tr id="field-value">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      field&#8209;value</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="http-grammar.html#lws">lws</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#field-content">field&#8209;content</a></span><span class="ruleOp">)</span><span class="ruleOp">+</span></td>
+   </tr>
+   <tr id="field-content">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      field&#8209;content</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="http-grammar.html#text">text</a></span><span class="ruleOp">+</span></td>
+   </tr>
+  </table>
+ </body>
+</html>

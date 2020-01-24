@@ -136,6 +136,7 @@ void GenerateStyleFile()
     formatter.IncIndent();
     formatter.WriteLine("font-family: Consolas;");
     formatter.WriteLine("color: #a31515;");
+    formatter.WriteLine("font-weight: bold");
     formatter.DecIndent();
     formatter.WriteLine("}");
     formatter.WriteLine(".ruleString");
@@ -143,6 +144,7 @@ void GenerateStyleFile()
     formatter.IncIndent();
     formatter.WriteLine("font-family: Consolas;");
     formatter.WriteLine("color: #a31515;");
+    formatter.WriteLine("font-weight: bold");
     formatter.DecIndent();
     formatter.WriteLine("}");
     formatter.WriteLine(".ruleCharSet");
@@ -150,6 +152,7 @@ void GenerateStyleFile()
     formatter.IncIndent();
     formatter.WriteLine("font-family: Consolas;");
     formatter.WriteLine("color: #a31515;");
+    formatter.WriteLine("font-weight: bold");
     formatter.DecIndent();
     formatter.WriteLine("}");
     formatter.WriteLine(".ruleKeyword");
@@ -168,13 +171,20 @@ void GenerateStyleFile()
     formatter.WriteLine(".ruleOp");
     formatter.WriteLine("{");
     formatter.IncIndent();
-    formatter.WriteLine("padding-left: 2pt;");
-    formatter.WriteLine("padding-right: 2pt;");
+    formatter.WriteLine("padding-left: 0pt;");
+    formatter.WriteLine("padding-right: 0pt;");
     formatter.WriteLine("font-family: serif;");
     formatter.WriteLine("color: black;");
     formatter.DecIndent();
     formatter.WriteLine("}");
     formatter.WriteLine(".ruleLink");
+    formatter.WriteLine("{");
+    formatter.IncIndent();
+    formatter.WriteLine("font-family: serif;");
+    formatter.WriteLine("font-style: italic;");
+    formatter.DecIndent();
+    formatter.WriteLine("}");
+    formatter.WriteLine(".lexerRule");
     formatter.WriteLine("{");
     formatter.IncIndent();
     formatter.WriteLine("font-family: serif;");

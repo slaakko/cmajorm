@@ -5,134 +5,263 @@ using System;
 namespace LexerFileTokens
 {
     public const int END = 0;
+
     public const int CLASSMAP = 1;
+
     public const int TOKENS = 2;
+
     public const int KEYWORDS = 3;
+
     public const int EXPRESSIONS = 4;
+
     public const int LEXER = 5;
+
     public const int VARIABLES = 6;
+
     public const int ACTIONS = 7;
+
     public const int DOLLAR = 8;
+
     public const int ASSERT = 9;
+
     public const int ELIF = 10;
+
     public const int ENDIF = 11;
+
     public const int BOOL = 12;
+
     public const int TRUE = 13;
+
     public const int FALSE = 14;
+
     public const int SBYTE = 15;
+
     public const int BYTE = 16;
+
     public const int SHORT = 17;
+
     public const int USHORT = 18;
+
     public const int INT = 19;
+
     public const int UINT = 20;
+
     public const int LONG = 21;
+
     public const int ULONG = 22;
+
     public const int FLOAT = 23;
+
     public const int DOUBLE = 24;
+
     public const int CHAR = 25;
+
     public const int WCHAR = 26;
+
     public const int UCHAR = 27;
+
     public const int VOID = 28;
+
     public const int ENUM = 29;
+
     public const int CAST = 30;
+
     public const int INTERFACE = 31;
+
     public const int NAMESPACE = 32;
+
     public const int USING = 33;
+
     public const int STATIC = 34;
+
     public const int EXTERN = 35;
+
     public const int AS = 36;
+
     public const int IS = 37;
+
     public const int EXPLICIT = 38;
+
     public const int DELEGATE = 39;
+
     public const int INLINE = 40;
+
     public const int CDECL = 41;
+
     public const int NOTHROW = 42;
+
     public const int PUBLIC = 43;
+
     public const int PROTECTED = 44;
+
     public const int PRIVATE = 45;
+
     public const int INTERNAL = 46;
+
     public const int VIRTUAL = 47;
+
     public const int ABSTRACT = 48;
+
     public const int OVERRIDE = 49;
+
     public const int SUPPRESS = 50;
+
     public const int OPERATOR = 51;
+
     public const int CLASS = 52;
+
     public const int RETURN = 53;
+
     public const int IF = 54;
+
     public const int ELSE = 55;
+
     public const int SWITCH = 56;
+
     public const int CASE = 57;
+
     public const int DEFAULT = 58;
+
     public const int WHILE = 59;
+
     public const int DO = 60;
+
     public const int FOR = 61;
+
     public const int BREAK = 62;
+
     public const int CONTINUE = 63;
+
     public const int GOTO = 64;
+
     public const int TYPEDEF = 65;
+
     public const int TYPENAME = 66;
+
     public const int TYPEID = 67;
+
     public const int CONST = 68;
+
     public const int CONSTEXPR = 69;
+
     public const int NULLLIT = 70;
+
     public const int THIS = 71;
+
     public const int BASE = 72;
+
     public const int CONSTRUCT = 73;
+
     public const int DESTROY = 74;
+
     public const int NEW = 75;
+
     public const int DELETE = 76;
+
     public const int SIZEOF = 77;
+
     public const int TRY = 78;
+
     public const int CATCH = 79;
+
     public const int THROW = 80;
+
     public const int CONCEPT = 81;
+
     public const int WHERE = 82;
+
     public const int AXIOM = 83;
+
     public const int AND = 84;
+
     public const int OR = 85;
+
     public const int EXCLAMATION = 86;
+
     public const int UNIT_TEST = 87;
+
     public const int ID = 88;
+
     public const int FLOATINGLIT = 89;
+
     public const int INTLIT = 90;
+
     public const int CHARLIT = 91;
+
     public const int STRINGLIT = 92;
+
     public const int EQUIVALENCE = 93;
+
     public const int IMPLICATION = 94;
+
     public const int DISJUNCTION = 95;
+
     public const int AMPAMP = 96;
+
     public const int BITOR = 97;
+
     public const int BITXOR = 98;
+
     public const int AMP = 99;
+
     public const int EQ = 100;
+
     public const int NEQ = 101;
+
     public const int LEQ = 102;
+
     public const int GEQ = 103;
+
     public const int SHIFTLEFT = 104;
+
     public const int SHIFTRIGHT = 105;
+
     public const int PLUS = 106;
+
     public const int MINUS = 107;
+
     public const int STAR = 108;
+
     public const int DIV = 109;
+
     public const int REM = 110;
+
     public const int PLUSPLUS = 111;
+
     public const int MINUSMINUS = 112;
+
     public const int CPL = 113;
+
     public const int DOT = 114;
+
     public const int ARROW = 115;
+
     public const int LBRACKET = 116;
+
     public const int RBRACKET = 117;
+
     public const int LPAREN = 118;
+
     public const int RPAREN = 119;
+
     public const int LANGLE = 120;
+
     public const int RANGLE = 121;
+
     public const int LBRACE = 122;
+
     public const int RBRACE = 123;
+
     public const int COMMA = 124;
+
     public const int ASSIGN = 125;
+
     public const int COLON = 126;
+
     public const int SEMICOLON = 127;
+
     public const int HASH = 128;
+
     internal class TokenMap
     {
         static TokenMap() :
@@ -561,10 +690,12 @@ namespace LexerFileTokens
     {
         return TokenMap.Instance().GetTokenId(tokenName);
     }
+
     public ustring GetTokenName(int tokenId)
     {
         return TokenMap.Instance().GetTokenName(tokenId);
     }
+
     public ustring GetTokenInfo(int tokenId)
     {
         return TokenMap.Instance().GetTokenInfo(tokenId);

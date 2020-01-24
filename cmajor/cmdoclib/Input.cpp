@@ -83,6 +83,21 @@ Input ReadInputXml(const std::string& cmDocFilePath)
             }
         }
     }
+    std::unique_ptr<sngxml::xpath::XPathObject> scm2htmlObject = sngxml::xpath::Evaluate(U"/cmdoc/scm2html", inputDoc.get());
+    if (scm2htmlObject->Type() == sngxml::xpath::XPathObjectType::nodeSet)
+    {
+        sngxml::xpath::XPathNodeSet* nodeSet = static_cast<sngxml::xpath::XPathNodeSet*>(scm2htmlObject.get());
+        if (nodeSet->Length() == 1)
+        {
+            sngxml::dom::Node* node = (*nodeSet)[0];
+            if (node->GetNodeType() == sngxml::dom::NodeType::elementNode)
+            {
+                sngxml::dom::Element* element = static_cast<sngxml::dom::Element*>(node);
+                std::string filePath = ToUtf8(element->GetAttribute(U"filePath"));
+                input.scm2htmlFilePath = GetFullPath(Path::Combine(input.baseDir, filePath));
+            }
+        }
+    }
     std::unique_ptr<sngxml::xpath::XPathObject> libraryObjects = sngxml::xpath::Evaluate(U"/cmdoc/libraries/library", inputDoc.get());
     if (libraryObjects->Type() == sngxml::xpath::XPathObjectType::nodeSet)
     {

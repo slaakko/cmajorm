@@ -5,12 +5,19 @@ using System;
 namespace ProjectFileTokens
 {
     public const int END = 0;
+
     public const int PROJECT = 1;
+
     public const int SOURCE = 2;
+
     public const int ID = 3;
+
     public const int FILEPATH = 4;
+
     public const int DOT = 5;
+
     public const int SEMICOLON = 6;
+
     internal class TokenMap
     {
         static TokenMap() :
@@ -73,10 +80,12 @@ namespace ProjectFileTokens
     {
         return TokenMap.Instance().GetTokenId(tokenName);
     }
+
     public ustring GetTokenName(int tokenId)
     {
         return TokenMap.Instance().GetTokenName(tokenId);
     }
+
     public ustring GetTokenInfo(int tokenId)
     {
         return TokenMap.Instance().GetTokenInfo(tokenId);

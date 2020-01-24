@@ -1,0 +1,635 @@
+<html>
+ <head>
+  <meta charset="utf-8"/>
+  <title>XML Grammar</title>
+  <link href="../../../style/style.css" rel="stylesheet" type="text/css"/>
+ </head>
+ <body>
+  <h1>XML Grammar</h1>
+  <table class="grammar">
+   <tr id="document">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      document</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#prolog">prolog</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#element">element</a></span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#misc">misc</a></span><span class="ruleOp">)</span><span class="ruleOp">*</span></td>
+   </tr>
+   <tr id="char">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      char</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleCharSet">[\t\n\r -\x0000D7FF\x0000E000-\x0000FFFD\x00010000-\x0010FFFF]</span></td>
+   </tr>
+   <tr id="s">
+    <td class="grammarFirstCol">
+     <span class="rule">s</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleCharSet">[ \t\r\n]</span><span class="ruleOp">+</span></td>
+   </tr>
+   <tr id="name-start-char">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      name&#8209;start&#8209;char</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleCharSet">[:A-Z_a-z\x000000C0-\x000000D6\x000000D8-\x000000F6\x000000F8-\x000002FF\x00000370-\x0000037D\x0000037F-\x00001FFF\x0000200C-\x0000200D\x00002070-\x0000218F\x00002C00-\x00002FEF\x00003001-\x0000D7FF\x0000F900-\x0000FDCF\x0000FDF0-\x0000FFFD\x00010000-\x000EFFFF]</span></td>
+   </tr>
+   <tr id="name-char">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      name&#8209;char</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#name-start-char">name&#8209;start&#8209;char</a></span><span class="ruleOp"> | </span><span class="ruleCharSet">[-.0-9\x000000B7\x00000300-\x0000036F\x0000203F-\x00002040]</span></td>
+   </tr>
+   <tr id="name">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      name</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#name-start-char">name&#8209;start&#8209;char</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#name-char">name&#8209;char</a></span><span class="ruleOp">*</span></td>
+   </tr>
+   <tr id="names">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      names</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#name">name</a></span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleChar"> </span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#name">name</a></span><span class="ruleOp">)</span><span class="ruleOp">*</span></td>
+   </tr>
+   <tr id="nm-token">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      nm&#8209;token</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#name-char">name&#8209;char</a></span><span class="ruleOp">+</span></td>
+   </tr>
+   <tr id="nm-tokens">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      nm&#8209;tokens</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#nm-token">nm&#8209;token</a></span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleChar"> </span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#nm-token">nm&#8209;token</a></span><span class="ruleOp">)</span><span class="ruleOp">*</span></td>
+   </tr>
+   <tr id="prolog">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      prolog</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#xml-decl">xml&#8209;decl</a></span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#misc">misc</a></span><span class="ruleOp">*</span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#doc-type-decl">doc&#8209;type&#8209;decl</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#misc">misc</a></span><span class="ruleOp">*</span><span class="ruleOp">)</span><span class="ruleOp">?</span></td>
+   </tr>
+   <tr id="xml-decl">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      xml&#8209;decl</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleString">&lt;?xml</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#version-info">version&#8209;info</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#encoding-decl">encoding&#8209;decl</a></span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#sd-decl">sd&#8209;decl</a></span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#s">s</a></span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleString">?></span></td>
+   </tr>
+   <tr id="version-info">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      version&#8209;info</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#s">s</a></span><span class="ruleOp"> </span><span class="ruleString">version</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#eq">eq</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#version-number">version&#8209;number</a></span></td>
+   </tr>
+   <tr id="version-num">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      version&#8209;num</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleChar">1</span><span class="ruleOp"> </span><span class="ruleChar">.</span><span class="ruleOp"> </span><span class="ruleCharSet">[0-9]</span><span class="ruleOp">+</span></td>
+   </tr>
+   <tr id="version-num-dq">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      version&#8209;num&#8209;dq</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleChar">\"</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#version-num">version&#8209;num</a></span><span class="ruleOp"> </span><span class="ruleChar">\"</span></td>
+   </tr>
+   <tr id="version-num-sq">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      version&#8209;num&#8209;sq</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleChar">\'</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#version-num">version&#8209;num</a></span><span class="ruleOp"> </span><span class="ruleChar">\'</span></td>
+   </tr>
+   <tr id="version-number">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      version&#8209;number</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#version-num-dq">version&#8209;num&#8209;dq</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#version-num-sq">version&#8209;num&#8209;sq</a></span></td>
+   </tr>
+   <tr id="encoding-decl">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      encoding&#8209;decl</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#s">s</a></span><span class="ruleOp"> </span><span class="ruleString">encoding</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#eq">eq</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#enc-name">enc&#8209;name</a></span></td>
+   </tr>
+   <tr id="encoding-name">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      encoding&#8209;name</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleCharSet">[A-Za-z]</span><span class="ruleOp"> </span><span class="ruleCharSet">[A-Za-z0-9._-]</span><span class="ruleOp">*</span></td>
+   </tr>
+   <tr id="enc-name-dq">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      enc&#8209;name&#8209;dq</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleChar">\"</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#encoding-name">encoding&#8209;name</a></span><span class="ruleOp"> </span><span class="ruleChar">\"</span></td>
+   </tr>
+   <tr id="enc-name-sq">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      enc&#8209;name&#8209;sq</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleChar">\'</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#encoding-name">encoding&#8209;name</a></span><span class="ruleOp"> </span><span class="ruleChar">\'</span></td>
+   </tr>
+   <tr id="enc-name">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      enc&#8209;name</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#enc-name-dq">enc&#8209;name&#8209;dq</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#enc-name-sq">enc&#8209;name&#8209;sq</a></span></td>
+   </tr>
+   <tr id="sd-decl">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      sd&#8209;decl</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#s">s</a></span><span class="ruleOp"> </span><span class="ruleString">standalone</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#eq">eq</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#yes-no">yes&#8209;no</a></span></td>
+   </tr>
+   <tr id="doc-type-decl">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      doc&#8209;type&#8209;decl</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleString">&lt;!DOCTYPE</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#s">s</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#name">name</a></span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#s">s</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#external-id">external&#8209;id</a></span><span class="ruleOp">)</span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#s">s</a></span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleChar">[</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#int-subset">int&#8209;subset</a></span><span class="ruleOp"> </span><span class="ruleChar">]</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#s">s</a></span><span class="ruleOp">?</span><span class="ruleOp">)</span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleChar">></span></td>
+   </tr>
+   <tr id="external-id">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      external&#8209;id</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleOp">(</span><span class="ruleString">SYSTEM</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#s">s</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#system-literal">system&#8209;literal</a></span><span class="ruleOp">)</span><span class="ruleOp"> | </span><span class="ruleOp">(</span><span class="ruleString">PUBLIC</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#s">s</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#pub-id-literal">pub&#8209;id&#8209;literal</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#s">s</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#system-literal">system&#8209;literal</a></span><span class="ruleOp">)</span></td>
+   </tr>
+   <tr id="system-literal">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      system&#8209;literal</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleOp">(</span><span class="ruleChar">\"</span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleCharSet">[^\"]</span><span class="ruleOp">*</span><span class="ruleOp">)</span><span class="ruleOp"> </span><span class="ruleChar">\"</span><span class="ruleOp">)</span><span class="ruleOp"> | </span><span class="ruleOp">(</span><span class="ruleChar">\'</span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleCharSet">[^\']</span><span class="ruleOp">*</span><span class="ruleOp">)</span><span class="ruleOp"> </span><span class="ruleChar">\'</span><span class="ruleOp">)</span></td>
+   </tr>
+   <tr id="pub-id-literal">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      pub&#8209;id&#8209;literal</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleChar">\"</span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#pub-id-char">pub&#8209;id&#8209;char</a></span><span class="ruleOp">*</span><span class="ruleOp">)</span><span class="ruleOp"> </span><span class="ruleChar">\"</span><span class="ruleOp"> | </span><span class="ruleChar">\'</span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#pub-id-char">pub&#8209;id&#8209;char</a></span><span class="ruleOp"> &minus; </span><span class="ruleChar">\'</span><span class="ruleOp">)</span><span class="ruleOp">*</span><span class="ruleOp">)</span><span class="ruleOp"> </span><span class="ruleChar">\'</span></td>
+   </tr>
+   <tr id="pub-id-char">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      pub&#8209;id&#8209;char</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleCharSet">[ \r\n]</span><span class="ruleOp"> | </span><span class="ruleCharSet">[a-zA-Z0-9]</span><span class="ruleOp"> | </span><span class="ruleCharSet">[-\'()+,./:=?;!*#@$_%]</span></td>
+   </tr>
+   <tr id="int-subset">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      int&#8209;subset</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#markup-decl">markup&#8209;decl</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#decl-sep">decl&#8209;sep</a></span><span class="ruleOp">)</span><span class="ruleOp">*</span></td>
+   </tr>
+   <tr id="markup-decl">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      markup&#8209;decl</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#element-decl">element&#8209;decl</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#attlist-decl">attlist&#8209;decl</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#entity-decl">entity&#8209;decl</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#notation-decl">notation&#8209;decl</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#pi">pi</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#comment">comment</a></span></td>
+   </tr>
+   <tr id="decl-sep">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      decl&#8209;sep</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#pe-reference">pe&#8209;reference</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#s">s</a></span></td>
+   </tr>
+   <tr id="element-decl">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      element&#8209;decl</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleString">&lt;!ELEMENT</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#s">s</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#name">name</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#s">s</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#content-spec">content&#8209;spec</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#s">s</a></span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleChar">></span></td>
+   </tr>
+   <tr id="content-spec">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      content&#8209;spec</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleString">EMPTY</span><span class="ruleOp"> | </span><span class="ruleString">ANY</span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#mixed">mixed</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#children">children</a></span></td>
+   </tr>
+   <tr id="children">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      children</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#choice">choice</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#seq">seq</a></span><span class="ruleOp">)</span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleChar">?</span><span class="ruleOp"> | </span><span class="ruleChar">*</span><span class="ruleOp"> | </span><span class="ruleChar">+</span><span class="ruleOp">)</span><span class="ruleOp">?</span></td>
+   </tr>
+   <tr id="cp">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      cp</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#name">name</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#choice">choice</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#seq">seq</a></span><span class="ruleOp">)</span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleChar">?</span><span class="ruleOp"> | </span><span class="ruleChar">*</span><span class="ruleOp"> | </span><span class="ruleChar">+</span><span class="ruleOp">)</span><span class="ruleOp">?</span></td>
+   </tr>
+   <tr id="choice">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      choice</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleChar">(</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#s">s</a></span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#cp">cp</a></span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#s">s</a></span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleChar">|</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#s">s</a></span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#cp">cp</a></span><span class="ruleOp">)</span><span class="ruleOp">+</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#s">s</a></span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleChar">)</span></td>
+   </tr>
+   <tr id="seq">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      seq</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleChar">(</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#s">s</a></span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#cp">cp</a></span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#s">s</a></span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleChar">,</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#s">s</a></span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#cp">cp</a></span><span class="ruleOp">)</span><span class="ruleOp">*</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#s">s</a></span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleChar">)</span></td>
+   </tr>
+   <tr id="mixed">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      mixed</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleChar">(</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#s">s</a></span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleString">#PCDATA</span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#s">s</a></span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleChar">|</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#s">s</a></span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#name">name</a></span><span class="ruleOp">)</span><span class="ruleOp">*</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#s">s</a></span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleString">)*</span><span class="ruleOp"> | </span><span class="ruleChar">(</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#s">s</a></span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleString">#PCDATA</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#s">s</a></span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleChar">)</span></td>
+   </tr>
+   <tr id="attlist-decl">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      attlist&#8209;decl</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleString">&lt;!ATTLIST</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#s">s</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#name">name</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#att-def">att&#8209;def</a></span><span class="ruleOp">*</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#s">s</a></span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleChar">></span></td>
+   </tr>
+   <tr id="att-def">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      att&#8209;def</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#s">s</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#name">name</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#s">s</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#att-type">att&#8209;type</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#s">s</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#default-decl">default&#8209;decl</a></span></td>
+   </tr>
+   <tr id="att-type">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      att&#8209;type</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#string-type">string&#8209;type</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#tokenized-type">tokenized&#8209;type</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#enumerated-type">enumerated&#8209;type</a></span></td>
+   </tr>
+   <tr id="string-type">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      string&#8209;type</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleString">CDATA</span></td>
+   </tr>
+   <tr id="tokenized-type">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      tokenized&#8209;type</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleString">ID</span><span class="ruleOp"> | </span><span class="ruleString">IDREF</span><span class="ruleOp"> | </span><span class="ruleString">IDREFS</span><span class="ruleOp"> | </span><span class="ruleString">ENTITY</span><span class="ruleOp"> | </span><span class="ruleString">ENTITIES</span><span class="ruleOp"> | </span><span class="ruleString">NMTOKEN</span><span class="ruleOp"> | </span><span class="ruleString">NMTOKENS</span></td>
+   </tr>
+   <tr id="enumerated-type">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      enumerated&#8209;type</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#notation-type">notation&#8209;type</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#enumeration">enumeration</a></span></td>
+   </tr>
+   <tr id="notation-type">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      notation&#8209;type</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleString">NOTATION</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#s">s</a></span><span class="ruleOp"> </span><span class="ruleChar">(</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#s">s</a></span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#name">name</a></span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#s">s</a></span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleChar">|</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#s">s</a></span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#name">name</a></span><span class="ruleOp">)</span><span class="ruleOp">*</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#s">s</a></span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleChar">)</span></td>
+   </tr>
+   <tr id="enumeration">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      enumeration</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleChar">(</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#s">s</a></span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#nm-token">nm&#8209;token</a></span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#s">s</a></span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleChar">|</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#s">s</a></span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#nm-token">nm&#8209;token</a></span><span class="ruleOp">)</span><span class="ruleOp">*</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#s">s</a></span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleChar">)</span></td>
+   </tr>
+   <tr id="default-decl">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      default&#8209;decl</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleString">#REQUIRED</span><span class="ruleOp"> | </span><span class="ruleString">#IMPLIED</span><span class="ruleOp"> | </span><span class="ruleOp">(</span><span class="ruleOp">(</span><span class="ruleString">#FIXED</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#s">s</a></span><span class="ruleOp">)</span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#att-value">att&#8209;value</a></span><span class="ruleOp">)</span></td>
+   </tr>
+   <tr id="entity-decl">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      entity&#8209;decl</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#ge-decl">ge&#8209;decl</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#pe-decl">pe&#8209;decl</a></span></td>
+   </tr>
+   <tr id="ge-decl">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      ge&#8209;decl</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleString">&lt;!ENTITY</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#s">s</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#name">name</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#s">s</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#entity-def">entity&#8209;def</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#s">s</a></span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleChar">></span></td>
+   </tr>
+   <tr id="pe-decl">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      pe&#8209;decl</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleString">&lt;!ENTITY</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#s">s</a></span><span class="ruleOp"> </span><span class="ruleChar">%</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#s">s</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#name">name</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#s">s</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#pe-def">pe&#8209;def</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#s">s</a></span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleChar">></span></td>
+   </tr>
+   <tr id="entity-def">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      entity&#8209;def</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#entity-value">entity&#8209;value</a></span><span class="ruleOp"> | </span><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#external-id">external&#8209;id</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#ndata-decl">ndata&#8209;decl</a></span><span class="ruleOp">?</span><span class="ruleOp">)</span></td>
+   </tr>
+   <tr id="pe-def">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      pe&#8209;def</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#entity-value">entity&#8209;value</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#external-id">external&#8209;id</a></span></td>
+   </tr>
+   <tr id="entity-value">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      entity&#8209;value</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleChar">\"</span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleCharSet">[^%&amp;\"]</span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#pe-reference">pe&#8209;reference</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#reference">reference</a></span><span class="ruleOp">)</span><span class="ruleOp">*</span><span class="ruleOp"> </span><span class="ruleChar">\"</span><span class="ruleOp"> | </span><span class="ruleChar">\'</span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleCharSet">[^%&amp;\']</span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#pe-reference">pe&#8209;reference</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#reference">reference</a></span><span class="ruleOp">)</span><span class="ruleOp">*</span><span class="ruleOp"> </span><span class="ruleChar">\'</span></td>
+   </tr>
+   <tr id="ndata-decl">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      ndata&#8209;decl</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#s">s</a></span><span class="ruleOp"> </span><span class="ruleString">NDATA</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#s">s</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#name">name</a></span></td>
+   </tr>
+   <tr id="pe-reference">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      pe&#8209;reference</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleChar">%</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#name">name</a></span><span class="ruleOp"> </span><span class="ruleChar">;</span></td>
+   </tr>
+   <tr id="notation-decl">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      notation&#8209;decl</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleString">&lt;!NOTATION</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#s">s</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#name">name</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#s">s</a></span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#external-id">external&#8209;id</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#public-id">public&#8209;id</a></span><span class="ruleOp">)</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#s">s</a></span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleChar">></span></td>
+   </tr>
+   <tr id="public-id">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      public&#8209;id</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleString">PUBLIC</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#s">s</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#pub-id-literal">pub&#8209;id&#8209;literal</a></span></td>
+   </tr>
+   <tr id="element">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      element</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleChar">&lt;</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#name">name</a></span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#s">s</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#attribute">attribute</a></span><span class="ruleOp">)</span><span class="ruleOp">*</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#s">s</a></span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleString">/></span><span class="ruleOp"> | </span><span class="ruleChar">></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#content">content</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#etag">etag</a></span><span class="ruleOp">)</span></td>
+   </tr>
+   <tr id="etag">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      etag</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleString">&lt;/</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#name">name</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#s">s</a></span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleChar">></span></td>
+   </tr>
+   <tr id="content">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      content</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#char-data">char&#8209;data</a></span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#element">element</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#reference">reference</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#cd-sect">cd&#8209;sect</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#pi">pi</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#comment">comment</a></span><span class="ruleOp">)</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#char-data">char&#8209;data</a></span><span class="ruleOp">?</span><span class="ruleOp">)</span><span class="ruleOp">*</span></td>
+   </tr>
+   <tr id="char-data-char">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      char&#8209;data&#8209;char</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleCharSet">[^&lt;&amp;]</span></td>
+   </tr>
+   <tr id="char-data">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      char&#8209;data</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#char-data-char">char&#8209;data&#8209;char</a></span><span class="ruleOp">*</span><span class="ruleOp"> &minus; </span><span class="ruleOp">(</span><span class="ruleCharSet">[^&lt;&amp;]</span><span class="ruleOp">*</span><span class="ruleOp"> </span><span class="ruleString">]]></span><span class="ruleOp"> </span><span class="ruleCharSet">[^&lt;&amp;]</span><span class="ruleOp">*</span><span class="ruleOp">)</span></td>
+   </tr>
+   <tr id="cd-sect">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      cd&#8209;sect</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleString">&lt;![CDATA[</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#char">char</a></span><span class="ruleOp"> &minus; </span><span class="ruleString">]]></span><span class="ruleOp">*</span><span class="ruleOp"> </span><span class="ruleString">]]></span></td>
+   </tr>
+   <tr id="attribute">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      attribute</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#name">name</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#eq">eq</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#att-value">att&#8209;value</a></span></td>
+   </tr>
+   <tr id="att-value-dq">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      att&#8209;value&#8209;dq</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleChar">\"</span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleCharSet">[^&lt;&amp;\"]</span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#reference">reference</a></span><span class="ruleOp">)</span><span class="ruleOp">*</span><span class="ruleOp"> </span><span class="ruleChar">\"</span></td>
+   </tr>
+   <tr id="att-value-sq">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      att&#8209;value&#8209;sq</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleChar">\'</span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleCharSet">[^&lt;&amp;\']</span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#reference">reference</a></span><span class="ruleOp">)</span><span class="ruleOp">*</span><span class="ruleOp"> </span><span class="ruleChar">\'</span></td>
+   </tr>
+   <tr id="att-value">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      att&#8209;value</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#att-value-dq">att&#8209;value&#8209;dq</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#att-value-sq">att&#8209;value&#8209;sq</a></span></td>
+   </tr>
+   <tr id="entity-ref">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      entity&#8209;ref</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleChar">&amp;</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#name">name</a></span><span class="ruleOp"> </span><span class="ruleChar">;</span></td>
+   </tr>
+   <tr id="dec-code-point">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      dec&#8209;code&#8209;point</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleCharSet">[0-9]</span><span class="ruleOp">+</span></td>
+   </tr>
+   <tr id="hex-code-point">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      hex&#8209;code&#8209;point</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleCharSet">[0-9a-fA-F]</span><span class="ruleOp">+</span></td>
+   </tr>
+   <tr id="char-ref">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      char&#8209;ref</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleString">&amp;#</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#dec-code-point">dec&#8209;code&#8209;point</a></span><span class="ruleOp"> </span><span class="ruleChar">;</span><span class="ruleOp"> | </span><span class="ruleString">&amp;#x</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#hex-code-point">hex&#8209;code&#8209;point</a></span><span class="ruleOp"> </span><span class="ruleChar">;</span></td>
+   </tr>
+   <tr id="reference">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      reference</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#entity-ref">entity&#8209;ref</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#char-ref">char&#8209;ref</a></span></td>
+   </tr>
+   <tr id="misc">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      misc</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#comment">comment</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#pi">pi</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#s">s</a></span></td>
+   </tr>
+   <tr id="comment">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      comment</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleString">&lt;!--</span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#char">char</a></span><span class="ruleOp"> &minus; </span><span class="ruleChar">-</span><span class="ruleOp"> | </span><span class="ruleChar">-</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#char">char</a></span><span class="ruleOp"> &minus; </span><span class="ruleChar">-</span><span class="ruleOp">)</span><span class="ruleOp">*</span><span class="ruleOp"> </span><span class="ruleString">--></span></td>
+   </tr>
+   <tr id="pi">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      pi</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleString">&lt;?</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#pi-target">pi&#8209;target</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#s">s</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#char">char</a></span><span class="ruleOp"> &minus; </span><span class="ruleString">?></span><span class="ruleOp">*</span><span class="ruleOp"> </span><span class="ruleString">?></span></td>
+   </tr>
+   <tr id="pi-target">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      pi&#8209;target</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#name">name</a></span><span class="ruleOp"> &minus; </span><span class="ruleLink"><a class="ruleLink" href="#xml">xml</a></span></td>
+   </tr>
+   <tr id="xml">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      xml</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleCharSet">[xX]</span><span class="ruleOp"> </span><span class="ruleCharSet">[mM]</span><span class="ruleOp"> </span><span class="ruleCharSet">[lL]</span></td>
+   </tr>
+   <tr id="eq">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      eq</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#s">s</a></span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleChar">=</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#s">s</a></span><span class="ruleOp">?</span></td>
+   </tr>
+   <tr id="yes-no">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      yes&#8209;no</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleString">\"yes\"</span><span class="ruleOp"> | </span><span class="ruleString">\"no\"</span></td>
+   </tr>
+  </table>
+ </body>
+</html>

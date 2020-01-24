@@ -25,6 +25,7 @@ struct CMDOCLIB_API Input
     std::unordered_map<std::u32string, std::string> libraryPrefixMap;
     std::unordered_map<std::u32string, std::string> grammarMap;
     std::vector<std::unique_ptr<sngxml::dom::Document>> externalModuleDocs;
+    std::string scm2htmlFilePath;
 };
 
 CMDOCLIB_API Input ReadInputXml(const std::string& cmDocFilePath);

@@ -1,0 +1,1046 @@
+using System;
+
+namespace Cm.Ast
+{
+    public class DefaultVisitor : Visitor
+    {
+        public override void Visit(BoolNode& boolNode)
+        {
+        }
+        public override void Visit(SByteNode& sbyteNode)
+        {
+        }
+        public override void Visit(ByteNode& byteNode)
+        {
+        }
+        public override void Visit(ShortNode& shortNode)
+        {
+        }
+        public override void Visit(UShortNode& ushortNode)
+        {
+        }
+        public override void Visit(IntNode& intNode)
+        {
+        }
+        public override void Visit(UIntNode& uintNode)
+        {
+        }
+        public override void Visit(LongNode& longNode)
+        {
+        }
+        public override void Visit(ULongNode& ulongNode)
+        {
+        }
+        public override void Visit(FloatNode& floatNode)
+        {
+        }
+        public override void Visit(DoubleNode& doubleNode)
+        {
+        }
+        public override void Visit(CharNode& charNode)
+        {
+        }
+        public override void Visit(WCharNode& wcharNode)
+        {
+        }
+        public override void Visit(UCharNode& ucharNode)
+        {
+        }
+        public override void Visit(VoidNode& voidNode)
+        {
+        }
+        public override void Visit(BooleanLiteralNode& booleanLiteralNode)
+        {
+        }
+        public override void Visit(SByteLiteralNode& sbyteLiteralNode)
+        {
+        }
+        public override void Visit(ByteLiteralNode& byteLiteralNode)
+        {
+        }
+        public override void Visit(ShortLiteralNode& shortLiteralNode)
+        {
+        }
+        public override void Visit(UShortLiteralNode& ushortLiteralNode)
+        {
+        }
+        public override void Visit(IntLiteralNode& intLiteralNode)
+        {
+        }
+        public override void Visit(UIntLiteralNode& uintLiteralNode)
+        {
+        }
+        public override void Visit(LongLiteralNode& longLiteralNode)
+        {
+        }
+        public override void Visit(ULongLiteralNode& ulongLiteralNode)
+        {
+        }
+        public override void Visit(FloatLiteralNode& floatLiteralNode)
+        {
+        }
+        public override void Visit(DoubleLiteralNode& doubleLiteralNode)
+        {
+        }
+        public override void Visit(CharLiteralNode& charLiteralNode)
+        {
+        }
+        public override void Visit(WCharLiteralNode& wcharLiteralNode)
+        {
+        }
+        public override void Visit(UCharLiteralNode& ucharLiteralNode)
+        {
+        }
+        public override void Visit(StringLiteralNode& stringLiteralNode)
+        {
+        }
+        public override void Visit(WStringLiteralNode& wstringLiteralNode)
+        {
+        }
+        public override void Visit(UStringLiteralNode& ustringLiteralNode)
+        {
+        }
+        public override void Visit(NullLiteralNode& nullLiteralNode)
+        {
+        }
+        public override void Visit(ArrayLiteralNode& arrayLiteralNode)
+        {
+            int n = arrayLiteralNode.Values().Count();
+            for (int i = 0; i < n; ++i)
+            {
+                arrayLiteralNode.Values()[i]->Accept(*this);
+            }
+        }
+        public override void Visit(StructuredLiteralNode& structuredLiteralNode)
+        {
+            int n = structuredLiteralNode.Members().Count();
+            for (int i = 0; i < n; ++i)
+            {
+                structuredLiteralNode.Members()[i]->Accept(*this);
+            }
+        }
+        public override void Visit(UuidLiteralNode& uuidLiteralNode)
+        {
+        }
+        public override void Visit(CompileUnitNode& compileUnitNode)
+        {
+            compileUnitNode.GlobalNs()->Accept(*this);
+        }
+        public override void Visit(NamespaceNode& namespaceNode)
+        {
+            int n = namespaceNode.Members().Count();
+            for (int i = 0; i < n; ++i)
+            {
+                namespaceNode.Members()[i]->Accept(*this);
+            }
+        }
+        public override void Visit(AliasNode& aliasNode)
+        {
+            aliasNode.Id()->Accept(*this);
+            aliasNode.Qid()->Accept(*this);
+        }
+        public override void Visit(NamespaceImportNode& namespaceImportNode)
+        {
+            namespaceImportNode.Ns()->Accept(*this);
+        }
+        public override void Visit(IdentifierNode& identifierNode)
+        {
+        }
+        public override void Visit(CursorIdNode& cursorIdNode)
+        {
+        }
+        public override void Visit(TemplateIdNode& templateIdNode)
+        {
+            templateIdNode.Primary()->Accept(*this);
+            int n = templateIdNode.TemplateArguments().Count();
+            for (int i = 0; i < n; ++i)
+            {
+                templateIdNode.TemplateArguments()[i]->Accept(*this);
+            }
+        }
+        public override void Visit(FunctionNode& functionNode)
+        {
+            functionNode.ReturnTypeExpr()->Accept(*this);
+            int nt = functionNode.TemplateParameters().Count();
+            for (int i = 0; i < nt; ++i)
+            {
+                functionNode.TemplateParameters()[i]->Accept(*this);
+            }
+            int np = functionNode.Parameters().Count();
+            for (int i = 0; i < np; ++i)
+            {
+                functionNode.Parameters()[i]->Accept(*this);
+            }
+            if (functionNode.WhereConstraint() != null)
+            {
+                functionNode.WhereConstraint()->Accept(*this);
+            }
+            if (functionNode.Body() != null)
+            {
+                functionNode.Body()->Accept(*this);
+            }
+            if (functionNode.GetAttributes() != null)
+            {
+                functionNode.GetAttributes()->Accept(*this);
+            }
+        }
+        public override void Visit(ClassNode& classNode)
+        {
+            classNode.Id()->Accept(*this);
+            if (classNode.WhereConstraint() != null)
+            {
+                classNode.WhereConstraint()->Accept(*this);
+            }
+            int nt = classNode.TemplateParameters().Count();
+            for (int i = 0; i < nt; ++i)
+            {
+                classNode.TemplateParameters()[i]->Accept(*this);
+            }
+            int nb = classNode.BaseClassOrInterfaces().Count();
+            for (int i = 0; i < nb; ++i)
+            {
+                classNode.BaseClassOrInterfaces()[i]->Accept(*this);
+            }
+            int nm = classNode.Members().Count();
+            for (int i = 0; i < nm; ++i)
+            {
+                classNode.Members()[i]->Accept(*this);
+            }
+            if (classNode.GetAttributes() != null)
+            {
+                classNode.GetAttributes()->Accept(*this);
+            }
+        }
+        public override void Visit(ThisInitializerNode& thisInitializerNode)
+        {
+            int n = thisInitializerNode.Arguments().Count();
+            for (int i = 0; i < n; ++i)
+            {
+                thisInitializerNode.Arguments()[i]->Accept(*this);
+            }
+        }
+        public override void Visit(BaseInitializerNode& baseInitializerNode)
+        {
+            int n = baseInitializerNode.Arguments().Count();
+            for (int i = 0; i < n; ++i)
+            {
+                baseInitializerNode.Arguments()[i]->Accept(*this);
+            }
+        }
+        public override void Visit(MemberInitializerNode& memberInitializerNode)
+        {
+            memberInitializerNode.MemberId()->Accept(*this);
+            int n = memberInitializerNode.Arguments().Count();
+            for (int i = 0; i < n; ++i)
+            {
+                memberInitializerNode.Arguments()[i]->Accept(*this);
+            }
+        }
+        public override void Visit(StaticConstructorNode& staticConstructorNode)
+        {
+            int ni = staticConstructorNode.Initializers().Count();
+            for (int i = 0; i < ni; ++i)
+            {
+                staticConstructorNode.Initializers()[i]->Accept(*this);
+            }
+            if (staticConstructorNode.GetAttributes() != null)
+            {
+                staticConstructorNode.GetAttributes()->Accept(*this);
+            }
+            if (staticConstructorNode.Body() != null)
+            {
+                staticConstructorNode.Body()->Accept(*this);
+            }
+            if (staticConstructorNode.WhereConstraint() != null)
+            {
+                staticConstructorNode.WhereConstraint()->Accept(*this);
+            }
+        }
+        public override void Visit(ConstructorNode& constructorNode)
+        {
+            int ni = constructorNode.Initializers().Count();
+            for (int i = 0; i < ni; ++i)
+            {
+                constructorNode.Initializers()[i]->Accept(*this);
+            }
+            int np = constructorNode.Parameters().Count();
+            for (int i = 0; i < np; ++i)
+            {
+                constructorNode.Parameters()[i]->Accept(*this);
+            }
+            if (constructorNode.WhereConstraint() != null)
+            {
+                constructorNode.WhereConstraint()->Accept(*this);
+            }
+            if (constructorNode.Body() != null)
+            {
+                constructorNode.Body()->Accept(*this);
+            }
+            if (constructorNode.GetAttributes() != null)
+            {
+                constructorNode.GetAttributes()->Accept(*this);
+            }
+        }
+        public override void Visit(DestructorNode& destructorNode)
+        {
+            if (destructorNode.WhereConstraint() != null)
+            {
+                destructorNode.WhereConstraint()->Accept(*this);
+            }
+            if (destructorNode.Body() != null)
+            {
+                destructorNode.Body()->Accept(*this);
+            }
+            if (destructorNode.GetAttributes() != null)
+            {
+                destructorNode.GetAttributes()->Accept(*this);
+            }
+        }
+        public override void Visit(MemberFunctionNode& memberFunctionNode)
+        {
+            memberFunctionNode.ReturnTypeExpr()->Accept(*this);
+            int np = memberFunctionNode.Parameters().Count();
+            for (int i = 0; i < np; ++i)
+            {
+                memberFunctionNode.Parameters()[i]->Accept(*this);
+            }
+            if (memberFunctionNode.WhereConstraint() != null)
+            {
+                memberFunctionNode.WhereConstraint()->Accept(*this);
+            }
+            if (memberFunctionNode.Body() != null)
+            {
+                memberFunctionNode.Body()->Accept(*this);
+            }
+            if (memberFunctionNode.GetAttributes() != null)
+            {
+                memberFunctionNode.GetAttributes()->Accept(*this);
+            }
+        }
+        public override void Visit(ConversionFunctionNode& conversionFunctionNode)
+        {
+            conversionFunctionNode.ReturnTypeExpr()->Accept(*this);
+            if (conversionFunctionNode.WhereConstraint() != null)
+            {
+                conversionFunctionNode.WhereConstraint()->Accept(*this);
+            }
+            if (conversionFunctionNode.Body() != null)
+            {
+                conversionFunctionNode.Body()->Accept(*this);
+            }
+            if (conversionFunctionNode.GetAttributes() != null)
+            {
+                conversionFunctionNode.GetAttributes()->Accept(*this);
+            }
+        }
+        public override void Visit(MemberVariableNode& memberVariableNode)
+        {
+            memberVariableNode.TypeExpr()->Accept(*this);
+            memberVariableNode.Id()->Accept(*this);
+            if (memberVariableNode.GetAttributes() != null)
+            {
+                memberVariableNode.GetAttributes()->Accept(*this);
+            }
+        }
+        public override void Visit(InterfaceNode& interfaceNode)
+        {
+            interfaceNode.Id()->Accept(*this);
+            int n = interfaceNode.Members().Count();
+            for (int i = 0; i < n; ++i)
+            {
+                interfaceNode.Members()[i]->Accept(*this);
+            }
+            if (interfaceNode.GetAttributes() != null)
+            {
+                interfaceNode.GetAttributes()->Accept(*this);
+            }
+        }
+        public override void Visit(DelegateNode& delegateNode)
+        {
+            delegateNode.ReturnTypeExpr()->Accept(*this);
+            delegateNode.Id()->Accept(*this);
+            int np = delegateNode.Parameters().Count();
+            for (int i = 0; i < np; ++i)
+            {
+                delegateNode.Parameters()[i]->Accept(*this);
+            }
+        }
+        public override void Visit(ClassDelegateNode& classDelegateNode)
+        {
+            classDelegateNode.ReturnTypeExpr()->Accept(*this);
+            classDelegateNode.Id()->Accept(*this);
+            int np = classDelegateNode.Parameters().Count();
+            for (int i = 0; i < np; ++i)
+            {
+                classDelegateNode.Parameters()[i]->Accept(*this);
+            }
+        }
+        public override void Visit(ParenthesizedConstraintNode& parenthesizedConstraintNode)
+        {
+            parenthesizedConstraintNode.Constraint()->Accept(*this);
+        }
+        public override void Visit(DisjunctiveConstraintNode& disjunctiveConstraintNode)
+        {
+            disjunctiveConstraintNode.Left()->Accept(*this);
+            disjunctiveConstraintNode.Right()->Accept(*this);
+        }
+        public override void Visit(ConjunctiveConstraintNode& conjunctiveConstraintNode)
+        {
+            conjunctiveConstraintNode.Left()->Accept(*this);
+            conjunctiveConstraintNode.Right()->Accept(*this);
+        }
+        public override void Visit(WhereConstraintNode& whereConstraintNode)
+        {
+            whereConstraintNode.Constraint()->Accept(*this);
+        }
+        public override void Visit(PredicateConstraintNode& predicateConstraintNode)
+        {
+            predicateConstraintNode.InvokeExpr()->Accept(*this);
+        }
+        public override void Visit(IsConstraintNode& isConstraintNode)
+        {
+            isConstraintNode.TypeExpr()->Accept(*this);
+            isConstraintNode.ConceptOrTypeName()->Accept(*this);
+        }
+        public override void Visit(MultiParamConstraintNode& multiParamConstraintNode)
+        {
+            multiParamConstraintNode.ConceptId()->Accept(*this);
+            int n = multiParamConstraintNode.TypeExprs().Count();
+            for (int i = 0; i < n; ++i)
+            {
+                multiParamConstraintNode.TypeExprs()[i]->Accept(*this);
+            }
+        }
+        public override void Visit(TypeNameConstraintNode& typeNameConstraintNode)
+        {
+            typeNameConstraintNode.TypeId()->Accept(*this);
+        }
+        public override void Visit(ConstructorConstraintNode& constructorConstraintNode)
+        {
+            constructorConstraintNode.TypeParamId()->Accept(*this);
+            int n = constructorConstraintNode.Parameters().Count();
+            for (int i = 0; i < n; ++i)
+            {
+                constructorConstraintNode.Parameters()[i]->Accept(*this);
+            }
+        }
+        public override void Visit(DestructorConstraintNode& destructorConstraintNode)
+        {
+            destructorConstraintNode.TypeParamId()->Accept(*this);
+        }
+        public override void Visit(MemberFunctionConstraintNode& memberFunctionConstraintNode)
+        {
+            memberFunctionConstraintNode.ReturnTypeExpr()->Accept(*this);
+            memberFunctionConstraintNode.TypeParamId()->Accept(*this);
+            int n = memberFunctionConstraintNode.Parameters().Count();
+            for (int i = 0; i < n; ++i)
+            {
+                memberFunctionConstraintNode.Parameters()[i]->Accept(*this);
+            }
+        }
+        public override void Visit(FunctionConstraintNode& functionConstraintNode)
+        {
+            functionConstraintNode.ReturnTypeExpr()->Accept(*this);
+            int n = functionConstraintNode.Parameters().Count();
+            for (int i = 0; i < n; ++i)
+            {
+                functionConstraintNode.Parameters()[i]->Accept(*this);
+            }
+        }
+        public override void Visit(AxiomStatementNode& axiomStatementNode)
+        {
+            axiomStatementNode.Expression()->Accept(*this);
+        }
+        public override void Visit(AxiomNode& axiomNode)
+        {
+            axiomNode.Id()->Accept(*this);
+            int n = axiomNode.Parameters().Count();
+            for (int i = 0; i < n; ++i)
+            {
+                axiomNode.Parameters()[i]->Accept(*this);
+            }
+            int ns = axiomNode.Statements().Count();
+            for (int i = 0; i < ns; ++i)
+            {
+                axiomNode.Statements()[i]->Accept(*this);
+            }
+        }
+        public override void Visit(ConceptIdNode& conceptIdNode)
+        {
+            conceptIdNode.Id()->Accept(*this);
+            int n = conceptIdNode.TypeParameters().Count();
+            for (int i = 0; i < n; ++i)
+            {
+                conceptIdNode.TypeParameters()[i]->Accept(*this);
+            }
+        }
+        public override void Visit(ConceptNode& conceptNode)
+        {
+            conceptNode.Id()->Accept(*this);
+            int n = conceptNode.TypeParameters().Count();
+            for (int i = 0; i < n; ++i)
+            {
+                conceptNode.TypeParameters()[i]->Accept(*this);
+            }
+            if (conceptNode.Refinement() != null)
+            {
+                conceptNode.Refinement()->Accept(*this);
+            }
+            int nc = conceptNode.Constraints().Count();
+            for (int i = 0; i < n; ++i)
+            {
+                conceptNode.Constraints()[i]->Accept(*this);
+            }
+            int na = conceptNode.Axioms().Count();
+            for (int i = 0; i < na; ++i)
+            {
+                conceptNode.Axioms()[i]->Accept(*this);
+            }
+        }
+        public override void Visit(SameConstraintNode& sameConstraintNode)
+        {
+        }
+        public override void Visit(DerivedConstraintNode& derivedConstraintNode)
+        {
+        }
+        public override void Visit(ConvertibleConstraintNode& convertibleConstraintNode)
+        {
+        }
+        public override void Visit(ExplicitlyConvertibleConstraintNode& explicitlyConvertibleConstraintNode)
+        {
+        }
+        public override void Visit(CommonConstraintNode& commonConstraintNode)
+        {
+        }
+        public override void Visit(NonreferenceTypeConstraintNode& nonreferenceTypeConstraintNode)
+        {
+        }
+        public override void Visit(LabelNode& labelNode)
+        {
+        }
+        public override void Visit(LabeledStatementNode& labeledStatementNode)
+        {
+            labeledStatementNode.Label()->Accept(*this);
+            labeledStatementNode.Stmt()->Accept(*this);
+        }
+        public override void Visit(CompoundStatementNode& compoundStatementNode)
+        {
+            int n = compoundStatementNode.Statements().Count();
+            for (int i = 0; i < n; ++i)
+            {
+                compoundStatementNode.Statements()[i]->Accept(*this);
+            }
+        }
+        public override void Visit(ReturnStatementNode& returnStatementNode)
+        {
+            if (returnStatementNode.Expression() != null)
+            {
+                returnStatementNode.Expression()->Accept(*this);
+            }
+        }
+        public override void Visit(IfStatementNode& ifStatementNode)
+        {
+            ifStatementNode.Condition()->Accept(*this);
+            ifStatementNode.ThenS()->Accept(*this);
+            if (ifStatementNode.ElseS() != null)
+            {
+                ifStatementNode.ElseS()->Accept(*this);
+            }
+        }
+        public override void Visit(WhileStatementNode& whileStatementNode)
+        {
+            whileStatementNode.Condition()->Accept(*this);
+            whileStatementNode.Statement()->Accept(*this);
+        }
+        public override void Visit(DoStatementNode& doStatementNode)
+        {
+            doStatementNode.Statement()->Accept(*this);
+            doStatementNode.Condition()->Accept(*this);
+        }
+        public override void Visit(ForStatementNode& forStatementNode)
+        {
+            if (forStatementNode.InitS() != null)
+            {
+                forStatementNode.InitS()->Accept(*this);
+            }
+            if (forStatementNode.Condition() != null)
+            {
+                forStatementNode.Condition()->Accept(*this);
+            }
+            forStatementNode.LoopS()->Accept(*this);
+            forStatementNode.ActionS()->Accept(*this);
+        }
+        public override void Visit(BreakStatementNode& breakStatementNode)
+        {
+        }
+        public override void Visit(ContinueStatementNode& continueStatementNode)
+        {
+        }
+        public override void Visit(GotoStatementNode& gotoStatementNode)
+        {
+        }
+        public override void Visit(ConstructionStatementNode& constructionStatementNode)
+        {
+            constructionStatementNode.TypeExpr()->Accept(*this);
+            constructionStatementNode.Id()->Accept(*this);
+            int n = constructionStatementNode.Arguments().Count();
+            for (int i = 0; i < n; ++i)
+            {
+                constructionStatementNode.Arguments()[i]->Accept(*this);
+            }
+        }
+        public override void Visit(DeleteStatementNode& deleteStatementNode)
+        {
+            deleteStatementNode.Expression()->Accept(*this);
+        }
+        public override void Visit(DestroyStatementNode& destroyStatementNode)
+        {
+            destroyStatementNode.Expression()->Accept(*this);
+        }
+        public override void Visit(AssignmentStatementNode& assignmentStatementNode)
+        {
+            assignmentStatementNode.TargetExpr()->Accept(*this);
+            assignmentStatementNode.SourceExpr()->Accept(*this);
+        }
+        public override void Visit(ExpressionStatementNode& expressionStatementNode)
+        {
+            expressionStatementNode.Expression()->Accept(*this);
+        }
+        public override void Visit(EmptyStatementNode& emptyStatementNode)
+        {
+        }
+        public override void Visit(RangeForStatementNode& rangeForStatementNode)
+        {
+            rangeForStatementNode.TypeExpr()->Accept(*this);
+            rangeForStatementNode.Id()->Accept(*this);
+            rangeForStatementNode.Container()->Accept(*this);
+            rangeForStatementNode.Action()->Accept(*this);
+        }
+        public override void Visit(SwitchStatementNode& switchStatementNode)
+        {
+            switchStatementNode.Condition()->Accept(*this);
+            int n = switchStatementNode.Cases().Count();
+            for (int i = 0; i < n; ++i)
+            {
+                switchStatementNode.Cases()[i]->Accept(*this);
+            }
+            if (switchStatementNode.Default() != null)
+            {
+                switchStatementNode.Default()->Accept(*this);
+            }
+        }
+        public override void Visit(CaseStatementNode& caseStatementNode)
+        {
+            int n = caseStatementNode.CaseExprs().Count();
+            for (int i = 0; i < n; ++i)
+            {
+                caseStatementNode.CaseExprs()[i]->Accept(*this);
+            }
+            int ns = caseStatementNode.Statements().Count();
+            for (int i = 0; i < ns; ++i)
+            {
+                caseStatementNode.Statements()[i]->Accept(*this);
+            }
+        }
+        public override void Visit(DefaultStatementNode& defaultStatementNode)
+        {
+            int n = defaultStatementNode.Statements().Count();
+            for (int i = 0; i < n; ++i)
+            {
+                defaultStatementNode.Statements()[i]->Accept(*this);
+            }
+        }
+        public override void Visit(GotoCaseStatementNode& gotoCaseStatementNode)
+        {
+            gotoCaseStatementNode.CaseExpr()->Accept(*this);
+        }
+        public override void Visit(GotoDefaultStatementNode& gotoDefaultStatementNode)
+        {
+        }
+        public override void Visit(ThrowStatementNode& throwStatementNode)
+        {
+            if (throwStatementNode.Expression() != null)
+            {
+                throwStatementNode.Expression()->Accept(*this);
+            }
+        }
+        public override void Visit(TryStatementNode& tryStatementNode)
+        {
+            tryStatementNode.TryBlock()->Accept(*this);
+            int n = tryStatementNode.Catches().Count();
+            for (int i = 0; i < n; ++i)
+            {
+                tryStatementNode.Catches()[i]->Accept(*this);
+            }
+        }
+        public override void Visit(CatchNode& catchNode)
+        {
+            catchNode.TypeExpr()->Accept(*this);
+            if (catchNode.Id() != null)
+            {
+                catchNode.Id()->Accept(*this);
+            }
+            catchNode.CatchBlock()->Accept(*this);
+        }
+        public override void Visit(AssertStatementNode& assertStatementNode)
+        {
+            assertStatementNode.AssertExpr()->Accept(*this);
+        }
+        public override void Visit(ConditionalCompilationPartNode& conditionalCompilationPartNode)
+        {
+            if (conditionalCompilationPartNode.Expr() != null)
+            {
+                conditionalCompilationPartNode.Expr()->Accept(*this);
+            }
+            int n = conditionalCompilationPartNode.Statements().Count();
+            for (int i = 0; i < n; ++i)
+            {
+                conditionalCompilationPartNode.Statements()[i]->Accept(*this);
+            }
+        }
+        public override void Visit(ConditionalCompilationDisjunctionNode& conditionalCompilationDisjunctionNode)
+        {
+            conditionalCompilationDisjunctionNode.Left()->Accept(*this);
+            conditionalCompilationDisjunctionNode.Right()->Accept(*this);
+        }
+        public override void Visit(ConditionalCompilationConjunctionNode& conditionalCompilationConjunctionNode)
+        {
+            conditionalCompilationConjunctionNode.Left()->Accept(*this);
+            conditionalCompilationConjunctionNode.Right()->Accept(*this);
+        }
+        public override void Visit(ConditionalCompilationNotNode& conditionalCompilationNotNode)
+        {
+            conditionalCompilationNotNode.Expr()->Accept(*this);
+        }
+        public override void Visit(ConditionalCompilationPrimaryNode& conditionalCompilationPrimaryNode)
+        {
+        }
+        public override void Visit(ParenthesizedConditionalCompilationExpressionNode& parenthesizeCondCompExprNode)
+        {
+            parenthesizeCondCompExprNode.Expr()->Accept(*this);
+        }
+        public override void Visit(ConditionalCompilationStatementNode& conditionalCompilationStatementNode)
+        {
+            conditionalCompilationStatementNode.IfPart()->Accept(*this);
+            int n = conditionalCompilationStatementNode.ElifParts().Count();
+            for (int i = 0; i < n; ++i)
+            {
+                conditionalCompilationStatementNode.ElifParts()[i]->Accept(*this);
+            }
+            if (conditionalCompilationStatementNode.ElsePart() != null)
+            {
+                conditionalCompilationStatementNode.ElsePart()->Accept(*this);
+            }
+        }
+        public override void Visit(TypedefNode& typedefNode)
+        {
+            typedefNode.TypeExpr()->Accept(*this);
+            typedefNode.Id()->Accept(*this);
+        }
+        public override void Visit(ConstantNode& constantNode)
+        {
+            constantNode.TypeExpr()->Accept(*this);
+            constantNode.Id()->Accept(*this);
+            constantNode.Value()->Accept(*this);
+        }
+        public override void Visit(EnumTypeNode& enumTypeNode)
+        {
+            enumTypeNode.Id()->Accept(*this);
+            if (enumTypeNode.GetUnderlyingType() != null)
+            {
+                enumTypeNode.GetUnderlyingType()->Accept(*this);
+            }
+            int n = enumTypeNode.Constants().Count();
+            for (int i = 0; i < n; ++i)
+            {
+                enumTypeNode.Constants()[i]->Accept(*this);
+            }
+        }
+        public override void Visit(EnumConstantNode& enumConstantNode)
+        {
+            if (enumConstantNode.GetValue() != null)
+            {
+                enumConstantNode.GetValue()->Accept(*this);
+            }
+            enumConstantNode.Id()->Accept(*this);
+        }
+        public override void Visit(ParameterNode& parameterNode)
+        {
+            parameterNode.TypeExpr()->Accept(*this);
+            if (parameterNode.Id() != null)
+            {
+                parameterNode.Id()->Accept(*this);
+            }
+        }
+        public override void Visit(TemplateParameterNode& templateParameterNode)
+        {
+            templateParameterNode.Id()->Accept(*this);
+            if (templateParameterNode.DefaultTemplateArgument() != null)
+            {
+                templateParameterNode.DefaultTemplateArgument()->Accept(*this);
+            }
+        }
+        public override void Visit(ConstNode& constNode)
+        {
+            constNode.Subject()->Accept(*this);
+        }
+        public override void Visit(LValueRefNode& lvalueRefNode)
+        {
+            lvalueRefNode.Subject()->Accept(*this);
+        }
+        public override void Visit(RValueRefNode& rvalueRefNode)
+        {
+            rvalueRefNode.Subject()->Accept(*this);
+        }
+        public override void Visit(PointerNode& pointerNode)
+        {
+            pointerNode.Subject()->Accept(*this);
+        }
+        public override void Visit(ArrayNode& arrayNode)
+        {
+            arrayNode.Subject()->Accept(*this);
+            if (arrayNode.Size() != null)
+            {
+                arrayNode.Size()->Accept(*this);
+            }
+        }
+        public override void Visit(DotNode& dotNode)
+        {
+            dotNode.Subject()->Accept(*this);
+            dotNode.MemberId()->Accept(*this);
+        }
+        public override void Visit(ArrowNode& arrowNode)
+        {
+            arrowNode.Subject()->Accept(*this);
+            arrowNode.MemberId()->Accept(*this);
+        }
+        public override void Visit(EquivalenceNode& equivalenceNode)
+        {
+            equivalenceNode.Left()->Accept(*this);
+            equivalenceNode.Right()->Accept(*this);
+        }
+        public override void Visit(ImplicationNode& implicationNode)
+        {
+            implicationNode.Left()->Accept(*this);
+            implicationNode.Right()->Accept(*this);
+        }
+        public override void Visit(DisjunctionNode& disjunctionNode)
+        {
+            disjunctionNode.Left()->Accept(*this);
+            disjunctionNode.Right()->Accept(*this);
+        }
+        public override void Visit(ConjunctionNode& conjunctionNode)
+        {
+            conjunctionNode.Left()->Accept(*this);
+            conjunctionNode.Right()->Accept(*this);
+        }
+        public override void Visit(BitOrNode& bitOrNode)
+        {
+            bitOrNode.Left()->Accept(*this);
+            bitOrNode.Right()->Accept(*this);
+        }
+        public override void Visit(BitXorNode& bitXorNode)
+        {
+            bitXorNode.Left()->Accept(*this);
+            bitXorNode.Right()->Accept(*this);
+        }
+        public override void Visit(BitAndNode& bitAndNode)
+        {
+            bitAndNode.Left()->Accept(*this);
+            bitAndNode.Right()->Accept(*this);
+        }
+        public override void Visit(EqualNode& equalNode)
+        {
+            equalNode.Left()->Accept(*this);
+            equalNode.Right()->Accept(*this);
+        }
+        public override void Visit(NotEqualNode& notEqualNode)
+        {
+            notEqualNode.Left()->Accept(*this);
+            notEqualNode.Right()->Accept(*this);
+        }
+        public override void Visit(LessNode& lessNode)
+        {
+            lessNode.Left()->Accept(*this);
+            lessNode.Right()->Accept(*this);
+        }
+        public override void Visit(GreaterNode& greaterNode)
+        {
+            greaterNode.Left()->Accept(*this);
+            greaterNode.Right()->Accept(*this);
+        }
+        public override void Visit(LessOrEqualNode& lessOrEqualNode)
+        {
+            lessOrEqualNode.Left()->Accept(*this);
+            lessOrEqualNode.Right()->Accept(*this);
+        }
+        public override void Visit(GreaterOrEqualNode& greaterOrEqualNode)
+        {
+            greaterOrEqualNode.Left()->Accept(*this);
+            greaterOrEqualNode.Right()->Accept(*this);
+        }
+        public override void Visit(ShiftLeftNode& shiftLeftNode)
+        {
+            shiftLeftNode.Left()->Accept(*this);
+            shiftLeftNode.Right()->Accept(*this);
+        }
+        public override void Visit(ShiftRightNode& shiftRightNode)
+        {
+            shiftRightNode.Left()->Accept(*this);
+            shiftRightNode.Right()->Accept(*this);
+        }
+        public override void Visit(AddNode& addNode)
+        {
+            addNode.Left()->Accept(*this);
+            addNode.Right()->Accept(*this);
+        }
+        public override void Visit(SubNode& subNode)
+        {
+            subNode.Left()->Accept(*this);
+            subNode.Right()->Accept(*this);
+        }
+        public override void Visit(MulNode& mulNode)
+        {
+            mulNode.Left()->Accept(*this);
+            mulNode.Right()->Accept(*this);
+        }
+        public override void Visit(DivNode& divNode)
+        {
+            divNode.Left()->Accept(*this);
+            divNode.Right()->Accept(*this);
+        }
+        public override void Visit(RemNode& remNode)
+        {
+            remNode.Left()->Accept(*this);
+            remNode.Right()->Accept(*this);
+        }
+        public override void Visit(NotNode& notNode)
+        {
+            notNode.Subject()->Accept(*this);
+        }
+        public override void Visit(UnaryPlusNode& unaryPlusNode)
+        {
+            unaryPlusNode.Subject()->Accept(*this);
+        }
+        public override void Visit(UnaryMinusNode& unaryMinusNode)
+        {
+            unaryMinusNode.Subject()->Accept(*this);
+        }
+        public override void Visit(PrefixIncrementNode& prefixIncrementNode)
+        {
+            prefixIncrementNode.Subject()->Accept(*this);
+        }
+        public override void Visit(PrefixDecrementNode& prefixDecrementNode)
+        {
+            prefixDecrementNode.Subject()->Accept(*this);
+        }
+        public override void Visit(DerefNode& derefNode)
+        {
+            derefNode.Subject()->Accept(*this);
+        }
+        public override void Visit(AddrOfNode& addrOfNode)
+        {
+            addrOfNode.Subject()->Accept(*this);
+        }
+        public override void Visit(ComplementNode& complementNode)
+        {
+            complementNode.Subject()->Accept(*this);
+        }
+        public override void Visit(IsNode& isNode)
+        {
+            isNode.TargetTypeExpr()->Accept(*this);
+            isNode.Expr()->Accept(*this);
+        }
+        public override void Visit(AsNode& asNode)
+        {
+            asNode.TargetTypeExpr()->Accept(*this);
+            asNode.Expr()->Accept(*this);
+        }
+        public override void Visit(IndexingNode& indexingNode)
+        {
+            indexingNode.Subject()->Accept(*this);
+            indexingNode.Index()->Accept(*this);
+        }
+        public override void Visit(InvokeNode& invokeNode)
+        {
+            invokeNode.Subject()->Accept(*this);
+            int n = invokeNode.Arguments().Count();
+            for (int i = 0; i < n; ++i)
+            {
+                invokeNode.Arguments()[i]->Accept(*this);
+            }
+        }
+        public override void Visit(PostfixIncrementNode& postfixIncrementNode)
+        {
+            postfixIncrementNode.Subject()->Accept(*this);
+        }
+        public override void Visit(PostfixDecrementNode& postfixDecrementNode)
+        {
+            postfixDecrementNode.Subject()->Accept(*this);
+        }
+        public override void Visit(SizeOfNode& sizeOfNode)
+        {
+            sizeOfNode.Expression()->Accept(*this);
+        }
+        public override void Visit(TypeNameNode& typeNameNode)
+        {
+            typeNameNode.Expression()->Accept(*this);
+        }
+        public override void Visit(TypeIdNode& typeIdNode)
+        {
+            typeIdNode.Expression()->Accept(*this);
+        }
+        public override void Visit(CastNode& castNode)
+        {
+            castNode.TargetTypeExpr()->Accept(*this);
+            castNode.SourceExpr()->Accept(*this);
+        }
+        public override void Visit(ConstructNode& constructNode)
+        {
+            constructNode.TypeExpr()->Accept(*this);
+            int n = constructNode.Arguments().Count();
+            for (int i = 0; i < n; ++i)
+            {
+                constructNode.Arguments()[i]->Accept(*this);
+            }
+        }
+        public override void Visit(NewNode& newNode)
+        {
+            newNode.TypeExpr()->Accept(*this);
+            int n = newNode.Arguments().Count();
+            for (int i = 0; i < n; ++i)
+            {
+                newNode.Arguments()[i]->Accept(*this);
+            }
+        }
+        public override void Visit(ThisNode& thisNode)
+        {
+        }
+        public override void Visit(BaseNode& baseNode)
+        {
+        }
+        public override void Visit(ParenthesizedExpressionNode& parenthesizedExpressionNode)
+        {
+            parenthesizedExpressionNode.Subject()->Accept(*this);
+        }
+        public override void Visit(GlobalVariableNode& globalVariableNode)
+        {
+            globalVariableNode.TypeExpr()->Accept(*this);
+            globalVariableNode.Id()->Accept(*this);
+        }
+        public override void Visit(Attribute& attribute)
+        {
+        }
+        public override void Visit(Attributes& attributes)
+        {
+            long n = attributes.GetAttributes().Count();
+            for (long i = 0; i < n; ++i)
+            {
+                attributes.GetAttributes()[i]->Accept(*this);
+            }
+        }
+        public override void Visit(CommentNode& commentNode)
+        {
+        }
+    }
+}

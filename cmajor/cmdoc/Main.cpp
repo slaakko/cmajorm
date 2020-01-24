@@ -132,8 +132,6 @@ int main(int argc, const char** argv)
         {
             Input input = ReadInputXml(cmDocFilePath); 
             SetInputPtr(&input);
-            std::vector<std::string> grammarFilePaths;
-            ReadGrammars(&input);
             GenerateStyleFile();
             rootModules.clear();
             std::u32string solutionName;
@@ -143,8 +141,7 @@ int main(int argc, const char** argv)
             WriteGlobals(moduleNames);
             WriteModuleXml(input.targetDirPath, moduleNames);
             ReadExternalModuleDocuments(&input);
-            BuildDocs(solutionName, moduleNames, grammarFilePaths);
-            WriteGrammars(&input, grammarFilePaths);
+            BuildDocs(solutionName, moduleNames);
             SetInputPtr(nullptr);
         }
     }

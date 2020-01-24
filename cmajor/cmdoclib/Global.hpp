@@ -20,8 +20,6 @@ CMDOCLIB_API std::vector<std::u32string> GetDerivedClassIds(const std::u32string
 CMDOCLIB_API void AddConceptRefinement(ConceptSymbol* refinedConcept, ConceptSymbol* conceptSymbol);
 CMDOCLIB_API std::vector<std::u32string> GetDerivedConceptIds(const std::u32string& moduleName, const std::u32string& refinedConceptId);
 CMDOCLIB_API void WriteModuleXml(const std::string& targetDir, const std::vector<std::u32string>& moduleNames);
-CMDOCLIB_API void ReadGrammars(Input* input);
-CMDOCLIB_API void WriteGrammars(Input* input, const std::vector<std::string>& grammarFilePaths);
 CMDOCLIB_API void GlobalInit();
 CMDOCLIB_API void GlobalDone();
 

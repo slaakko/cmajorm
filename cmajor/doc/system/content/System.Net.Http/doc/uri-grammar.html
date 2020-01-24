@@ -1,0 +1,284 @@
+<html>
+ <head>
+  <meta charset="utf-8"/>
+  <title>URI Grammar</title>
+  <link href="../../../style/style.css" rel="stylesheet" type="text/css"/>
+ </head>
+ <body>
+  <h1>URI Grammar</h1>
+  <table class="grammar">
+   <tr id="uri-reference">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      uri&#8209;reference</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#absolute-uri">absolute&#8209;uri</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#relative-ref">relative&#8209;ref</a></span></td>
+   </tr>
+   <tr id="absolute-uri">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      absolute&#8209;uri</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#scheme">scheme</a></span><span class="ruleOp"> </span><span class="lexerRule"><a class="lexerRule" href="uri-lexical-grammar.html#colon">colon</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#hier-part">hier&#8209;part</a></span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="lexerRule"><a class="lexerRule" href="uri-lexical-grammar.html#quest">quest</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#query">query</a></span><span class="ruleOp">)</span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="lexerRule"><a class="lexerRule" href="uri-lexical-grammar.html#hash">hash</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#fragment">fragment</a></span><span class="ruleOp">)</span><span class="ruleOp">?</span></td>
+   </tr>
+   <tr id="scheme">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      scheme</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#scheme-char">scheme&#8209;char</a></span><span class="ruleOp">+</span></td>
+   </tr>
+   <tr id="scheme-char">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      scheme&#8209;char</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="lexerRule"><a class="lexerRule" href="uri-lexical-grammar.html#alpha">alpha</a></span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="uri-lexical-grammar.html#digit">digit</a></span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="uri-lexical-grammar.html#dash">dash</a></span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="uri-lexical-grammar.html#plus">plus</a></span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="uri-lexical-grammar.html#dot">dot</a></span></td>
+   </tr>
+   <tr id="hier-part">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      hier&#8209;part</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="lexerRule"><a class="lexerRule" href="uri-lexical-grammar.html#slash">slash</a></span><span class="ruleOp"> </span><span class="lexerRule"><a class="lexerRule" href="uri-lexical-grammar.html#slash">slash</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#authority">authority</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#path-abempty">path&#8209;abempty</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#path-absolute">path&#8209;absolute</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#path-rootless">path&#8209;rootless</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#path-empty">path&#8209;empty</a></span></td>
+   </tr>
+   <tr id="relative-ref">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      relative&#8209;ref</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#relative-part">relative&#8209;part</a></span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="lexerRule"><a class="lexerRule" href="uri-lexical-grammar.html#quest">quest</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#query">query</a></span><span class="ruleOp">)</span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="lexerRule"><a class="lexerRule" href="uri-lexical-grammar.html#hash">hash</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#fragment">fragment</a></span><span class="ruleOp">)</span><span class="ruleOp">?</span></td>
+   </tr>
+   <tr id="relative-part">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      relative&#8209;part</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="lexerRule"><a class="lexerRule" href="uri-lexical-grammar.html#slash">slash</a></span><span class="ruleOp"> </span><span class="lexerRule"><a class="lexerRule" href="uri-lexical-grammar.html#slash">slash</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#authority">authority</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#path-abempty">path&#8209;abempty</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#path-absolute">path&#8209;absolute</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#path-noscheme">path&#8209;noscheme</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#path-empty">path&#8209;empty</a></span></td>
+   </tr>
+   <tr id="authority">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      authority</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#user-info">user&#8209;info</a></span><span class="ruleOp"> </span><span class="lexerRule"><a class="lexerRule" href="uri-lexical-grammar.html#at">at</a></span><span class="ruleOp">)</span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#host">host</a></span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="lexerRule"><a class="lexerRule" href="uri-lexical-grammar.html#colon">colon</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#port">port</a></span><span class="ruleOp">)</span><span class="ruleOp">?</span></td>
+   </tr>
+   <tr id="user-info">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      user&#8209;info</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#unreserved">unreserved</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#pct-encoded">pct&#8209;encoded</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#sub-delims">sub&#8209;delims</a></span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="uri-lexical-grammar.html#colon">colon</a></span><span class="ruleOp">)</span><span class="ruleOp">*</span></td>
+   </tr>
+   <tr id="host">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      host</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#ip-literal">ip&#8209;literal</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#ipv4-address">ipv4&#8209;address</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#reg-name">reg&#8209;name</a></span></td>
+   </tr>
+   <tr id="ip-literal">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      ip&#8209;literal</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="lexerRule"><a class="lexerRule" href="uri-lexical-grammar.html#lbracket">lbracket</a></span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#ipv6-address">ipv6&#8209;address</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#ipv-future">ipv&#8209;future</a></span><span class="ruleOp">)</span><span class="ruleOp"> </span><span class="lexerRule"><a class="lexerRule" href="uri-lexical-grammar.html#rbracket">rbracket</a></span></td>
+   </tr>
+   <tr id="ipv4-address">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      ipv4&#8209;address</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="lexerRule"><a class="lexerRule" href="uri-lexical-grammar.html#digit">digit</a></span><span class="ruleOp">+</span><span class="ruleOp"> </span><span class="lexerRule"><a class="lexerRule" href="uri-lexical-grammar.html#dot">dot</a></span><span class="ruleOp"> </span><span class="lexerRule"><a class="lexerRule" href="uri-lexical-grammar.html#digit">digit</a></span><span class="ruleOp">+</span><span class="ruleOp"> </span><span class="lexerRule"><a class="lexerRule" href="uri-lexical-grammar.html#dot">dot</a></span><span class="ruleOp"> </span><span class="lexerRule"><a class="lexerRule" href="uri-lexical-grammar.html#digit">digit</a></span><span class="ruleOp">+</span><span class="ruleOp"> </span><span class="lexerRule"><a class="lexerRule" href="uri-lexical-grammar.html#dot">dot</a></span><span class="ruleOp"> </span><span class="lexerRule"><a class="lexerRule" href="uri-lexical-grammar.html#digit">digit</a></span><span class="ruleOp">+</span></td>
+   </tr>
+   <tr id="ipv6-address">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      ipv6&#8209;address</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#ipv6-char">ipv6&#8209;char</a></span><span class="ruleOp">+</span></td>
+   </tr>
+   <tr id="ipv6-char">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      ipv6&#8209;char</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="lexerRule"><a class="lexerRule" href="uri-lexical-grammar.html#digit">digit</a></span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="uri-lexical-grammar.html#hx">hx</a></span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="uri-lexical-grammar.html#colon">colon</a></span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="uri-lexical-grammar.html#dot">dot</a></span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="uri-lexical-grammar.html#slash">slash</a></span></td>
+   </tr>
+   <tr id="ipv-future">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      ipv&#8209;future</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="lexerRule"><a class="lexerRule" href="uri-lexical-grammar.html#alpha">alpha</a></span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="lexerRule"><a class="lexerRule" href="uri-lexical-grammar.html#digit">digit</a></span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="uri-lexical-grammar.html#hx">hx</a></span><span class="ruleOp">)</span><span class="ruleOp">+</span><span class="ruleOp"> </span><span class="lexerRule"><a class="lexerRule" href="uri-lexical-grammar.html#dot">dot</a></span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#unreserved">unreserved</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#sub-delims">sub&#8209;delims</a></span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="uri-lexical-grammar.html#colon">colon</a></span><span class="ruleOp">)</span><span class="ruleOp">+</span></td>
+   </tr>
+   <tr id="port">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      port</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="lexerRule"><a class="lexerRule" href="uri-lexical-grammar.html#digit">digit</a></span><span class="ruleOp">*</span></td>
+   </tr>
+   <tr id="reg-name">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      reg&#8209;name</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#unreserved">unreserved</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#pct-encoded">pct&#8209;encoded</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#sub-delims">sub&#8209;delims</a></span><span class="ruleOp">)</span><span class="ruleOp">*</span></td>
+   </tr>
+   <tr id="path-abempty">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      path&#8209;abempty</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleOp">(</span><span class="lexerRule"><a class="lexerRule" href="uri-lexical-grammar.html#slash">slash</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#segment">segment</a></span><span class="ruleOp">)</span><span class="ruleOp">*</span></td>
+   </tr>
+   <tr id="path-absolute">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      path&#8209;absolute</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="lexerRule"><a class="lexerRule" href="uri-lexical-grammar.html#slash">slash</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#segment-nz">segment&#8209;nz</a></span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="lexerRule"><a class="lexerRule" href="uri-lexical-grammar.html#slash">slash</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#segment">segment</a></span><span class="ruleOp">)</span><span class="ruleOp">*</span></td>
+   </tr>
+   <tr id="path-noscheme">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      path&#8209;noscheme</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#segment-nz-nc">segment&#8209;nz&#8209;nc</a></span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="lexerRule"><a class="lexerRule" href="uri-lexical-grammar.html#slash">slash</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#segment">segment</a></span><span class="ruleOp">)</span><span class="ruleOp">*</span></td>
+   </tr>
+   <tr id="path-rootless">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      path&#8209;rootless</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#segment-nz">segment&#8209;nz</a></span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="lexerRule"><a class="lexerRule" href="uri-lexical-grammar.html#slash">slash</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#segment">segment</a></span><span class="ruleOp">)</span><span class="ruleOp">*</span></td>
+   </tr>
+   <tr id="path-empty">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      path&#8209;empty</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleOp">&lt;empty></span></td>
+   </tr>
+   <tr id="segment">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      segment</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#pchar">pchar</a></span><span class="ruleOp">*</span></td>
+   </tr>
+   <tr id="segment-nz">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      segment&#8209;nz</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#pchar">pchar</a></span><span class="ruleOp">+</span></td>
+   </tr>
+   <tr id="segment-nz-nc">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      segment&#8209;nz&#8209;nc</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#unreserved">unreserved</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#pct-encoded">pct&#8209;encoded</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#sub-delims">sub&#8209;delims</a></span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="uri-lexical-grammar.html#at">at</a></span><span class="ruleOp">)</span><span class="ruleOp">+</span></td>
+   </tr>
+   <tr id="query">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      query</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#pchar">pchar</a></span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="uri-lexical-grammar.html#slash">slash</a></span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="uri-lexical-grammar.html#quest">quest</a></span><span class="ruleOp">)</span><span class="ruleOp">*</span></td>
+   </tr>
+   <tr id="fragment">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      fragment</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#pchar">pchar</a></span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="uri-lexical-grammar.html#slash">slash</a></span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="uri-lexical-grammar.html#quest">quest</a></span><span class="ruleOp">)</span><span class="ruleOp">*</span></td>
+   </tr>
+   <tr id="pchar">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      pchar</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#unreserved">unreserved</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#pct-encoded">pct&#8209;encoded</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#sub-delims">sub&#8209;delims</a></span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="uri-lexical-grammar.html#colon">colon</a></span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="uri-lexical-grammar.html#at">at</a></span></td>
+   </tr>
+   <tr id="unreserved">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      unreserved</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="lexerRule"><a class="lexerRule" href="uri-lexical-grammar.html#alpha">alpha</a></span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="uri-lexical-grammar.html#hx">hx</a></span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="uri-lexical-grammar.html#digit">digit</a></span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="uri-lexical-grammar.html#dot">dot</a></span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="uri-lexical-grammar.html#dash">dash</a></span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="uri-lexical-grammar.html#underscore">underscore</a></span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="uri-lexical-grammar.html#tilde">tilde</a></span></td>
+   </tr>
+   <tr id="reserved">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      reserved</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#gen-delims">gen&#8209;delims</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#sub-delims">sub&#8209;delims</a></span></td>
+   </tr>
+   <tr id="gen-delims">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      gen&#8209;delims</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="lexerRule"><a class="lexerRule" href="uri-lexical-grammar.html#colon">colon</a></span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="uri-lexical-grammar.html#slash">slash</a></span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="uri-lexical-grammar.html#quest">quest</a></span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="uri-lexical-grammar.html#hash">hash</a></span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="uri-lexical-grammar.html#lbracket">lbracket</a></span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="uri-lexical-grammar.html#rbracket">rbracket</a></span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="uri-lexical-grammar.html#at">at</a></span></td>
+   </tr>
+   <tr id="sub-delims">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      sub&#8209;delims</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="lexerRule"><a class="lexerRule" href="uri-lexical-grammar.html#exclamation">exclamation</a></span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="uri-lexical-grammar.html#dollar">dollar</a></span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="uri-lexical-grammar.html#amp">amp</a></span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="uri-lexical-grammar.html#sq">sq</a></span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="uri-lexical-grammar.html#lparen">lparen</a></span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="uri-lexical-grammar.html#rparen">rparen</a></span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="uri-lexical-grammar.html#asterisk">asterisk</a></span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="uri-lexical-grammar.html#plus">plus</a></span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="uri-lexical-grammar.html#comma">comma</a></span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="uri-lexical-grammar.html#semicolon">semicolon</a></span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="uri-lexical-grammar.html#eq">eq</a></span></td>
+   </tr>
+   <tr id="pct-encoded">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      pct&#8209;encoded</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="lexerRule"><a class="lexerRule" href="uri-lexical-grammar.html#percent">percent</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#hex">hex</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#hex">hex</a></span></td>
+   </tr>
+   <tr id="hex">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      hex</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="lexerRule"><a class="lexerRule" href="uri-lexical-grammar.html#digit">digit</a></span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="uri-lexical-grammar.html#hx">hx</a></span></td>
+   </tr>
+  </table>
+ </body>
+</html>
