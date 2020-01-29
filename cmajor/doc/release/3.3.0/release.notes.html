@@ -1,0 +1,115 @@
+<h1>Cmajor 3.3.0 for Windows x64 and Linux</h1>
+
+<h2>Release notes</h2>
+
+<ul>
+<li><p>Bug fix: Path.MakeCanonical now converts a drive letter to upper case.</p></li>
+<li><p>Bug fix: The following construct generated invalid code:</p>
+
+<p>class A
+{
+}</p>
+
+<p>class B : A
+{
+}</p>
+
+<p>void main()
+{
+    System.Collections.List&lt;A<em>> x;
+    B</em> b;
+    x.Add(b);
+}</p>
+
+<p>Now fixed.</p></li>
+<li><p>Bug fix: The following construct generated invalid code:</p>
+
+<p>class A
+{
+}</p>
+
+<p>class B : A
+{
+}</p>
+
+<p>void foo<T>(const T&amp; x)
+{
+}</p>
+
+<p>void main()
+{
+    B* b;
+    foo&lt;A*>(b);
+}</p>
+
+<p>Now fixed.</p></li>
+<li><p>Bug fix: System.String<CharT>(CharT c) constructor was not explicit, so that a single character may be converted to a string in an unwanted context.
+Now fixed.</p></li>
+<li><p><a href="https://slaakko.github.io/cmajor/langref/langref.html#global-variables">Global variables</a>.</p></li>
+<li><p>You can now create string literals and arrays of string literals as compile time constants, and obtain the length of a string literal as a compile time constant:</p>
+
+<p>public const char* foo = "foo";
+public const long n = foo.Length();
+public const char*[] strings = [ "abc", "xyzzy", "foobar" ];
+public const long m = strings[2].Length();</p>
+
+<p>The same applies to wchar* and uchar*.</p></li>
+<li><p>Unnamed namespaces like in C++. These two declarations with the same the name in two source files do not conflict each other because
+they are contained in an unnamed namespace that receives a unique name at compile time:</p>
+
+<p>// alpha.cm:</p>
+
+<p>namespace
+{
+    const int[] foo = [1, 2, 3];
+}</p>
+
+<p>// beta.cm:</p>
+
+<p>namespace
+{
+    const int[] foo = [2, 3, 4];
+}</p>
+
+<p>The mangled name of an unnamed namespace will be "unnamed_ns_UNIQUE_HEX_STRING" where UNIQUE_HEX_STRING will be SHA-1 hash of a random UUID.
+The mangled names of the entities belonging to an unnamed namespace will be unique.</p></li>
+<li><p>Visual Studio extension updated. It supports now Visual Studio 2019. The cmajor.vsix extension for VS 2019 is in the cmajor/vs/2019 directory.</p></li>
+<li><p>System library changes:</p>
+
+<ul>
+<li>System.Base library has some additions,
+for example a <a href="https://slaakko.github.io/cmajor/system/content/System.Base/doc/class_Timestamp_2B1FF310EF8A16F5D055D85D39E0BC73A373EE7C.html">Timestamp</a> class.</li>
+<li>System.Json library has now serialization support for UUID's and timestamps.</li>
+<li>APIs of the following libraries have changed because they have been regenerated from C++ code base using the 'cpp2cm' tool and they use new parsing libraries:
+<ul>
+<li>System.Dom </li>
+<li>System.Net.Http</li>
+<li>System.Text.RegularExpressions</li>
+<li>System.Xml</li>
+</ul></li>
+<li>New lexing, parsing and AST libraries System.Lex and System.Parsing and Cm.Ast added.
+Old  System.Text.Parsing and System.Text.Parsing.CodeDom libraries are now gone, because the new libraries offer superset of their functionality and
+duplicate functionality would have made the system library much larger.</li>
+</ul></li>
+<li><p>New <a href="https://slaakko.github.io/cmajor/tools/cmupd/cmupd.html">'cmupd'</a>
+tool for converting projects and solutions that use old System APIs to use the new APIs.
+It's not perfect of course, so some manual changes may be needed.</p></li>
+<li><p>All system library parsers and lexers are now generated using the 'soulcm' lexer/parser generator tool.
+Each generated lexer is a DFA that has a multimeg Unicode character class map array which is in compressed form inside an executable containing the lexer.
+First call to a constructor of some lexer takes a while (about half a second on my machine), because it expands the class map.
+Subsequent calls to the same lexer (to a constructor or other member function) are much faster (taking fraction of a millisecond), 
+because the class map is already expanded. </p></li>
+<li><p>New System.Windows library that is available only on Windows. It is still in preliminary stage.</p></li>
+<li><p>System.cms solution file can now be found in the cmajor/system/platform/windows and cmajor/system/platform/linux directories 
+for Windows and Linux respectively. The Windows version includes the new System.Windows library.</p></li>
+<li><p>Upgraded to LLVM 9.0.0</p></li>
+<li><p>Upgraded to Unicode 12.1. </p></li>
+<li><p>Files:</p>
+
+<ul>
+<li><a href="cmajor-3.3.0-src.tar.bz2">Source code with unicode database (.tar.bz2)</a></li>
+<li><a href="cmajor-3.3.0-src.zip">Source code with unicode database (.zip)</a></li>
+<li><a href="cmajor-3.3.0-ubuntu-18.04-x86_64-binaries.tar.bz2">Binaries for Ubuntu x86_64 18.04 (.tar.bz2)</a></li>
+<li><a href="cmajor-3.3.0-win-x64-setup.exe">Windows x64 Setup (.exe)</a></li>
+</ul></li>
+</ul>
