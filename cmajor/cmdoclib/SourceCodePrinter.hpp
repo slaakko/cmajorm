@@ -14,6 +14,7 @@ namespace cmajor { namespace cmdoclib {
 
 CMDOCLIB_API bool HtmlSourceFilePathsUpToDate(sngcm::ast::Project* project);
 CMDOCLIB_API void GenerateSourceCode(sngcm::ast::Project* project, cmajor::binder::BoundCompileUnit* boundCompileUnit, std::unordered_map<int, File>& fileMap);
+CMDOCLIB_API void GenerateLexerAndParserHtmlSources(sngcm::ast::Project* project, int maxFileIndex, std::unordered_map<int, File>& fileMap);
 CMDOCLIB_API void SourceCodePrinterInit();
 CMDOCLIB_API void SourceCodePrinterDone();
 

@@ -1,0 +1,44 @@
+<html>
+ <head>
+  <meta charset="utf-8"/>
+  <title>Type Expression Grammar</title>
+  <link href="../../../style/style.css" rel="stylesheet" type="text/css"/>
+ </head>
+ <body>
+  <h1>Type Expression Grammar</h1>
+  <table class="grammar">
+   <tr id="type-expr">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      type&#8209;expr</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#prefix-type-expr">prefix&#8209;type&#8209;expr</a></span></td>
+   </tr>
+   <tr id="prefix-type-expr">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      prefix&#8209;type&#8209;expr</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleKeyword">const</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#postfix-type-expr">postfix&#8209;type&#8209;expr</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#postfix-type-expr">postfix&#8209;type&#8209;expr</a></span></td>
+   </tr>
+   <tr id="postfix-type-expr">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      postfix&#8209;type&#8209;expr</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#primary-type-expr">primary&#8209;type&#8209;expr</a></span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleChar">.</span><span class="ruleOp"> </span><span class="lexerRule"><a class="lexerRule" href="lexical-parser-file-grammar.html#id">id</a></span><span class="ruleOp"> | </span><span class="ruleChar">*</span><span class="ruleOp"> | </span><span class="ruleChar">&amp;</span><span class="ruleChar">&amp;</span><span class="ruleOp"> | </span><span class="ruleChar">&amp;</span><span class="ruleOp"> | </span><span class="ruleChar">[</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="expression-grammar.html#expression">expression</a></span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleChar">]</span><span class="ruleOp">)</span><span class="ruleOp">*</span></td>
+   </tr>
+   <tr id="primary-type-expr">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      primary&#8209;type&#8209;expr</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="basic-type-grammar.html#basic-type">basic&#8209;type</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="template-grammar.html#template-id">template&#8209;id</a></span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="lexical-parser-file-grammar.html#id">id</a></span></td>
+   </tr>
+  </table>
+ </body>
+</html>

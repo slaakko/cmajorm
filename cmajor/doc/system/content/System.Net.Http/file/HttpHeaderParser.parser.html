@@ -1,0 +1,73 @@
+<html>
+ <head>
+  <meta charset="utf-8"/>
+  <title>System.Net.Http/HttpHeaderParser.parser</title>
+  <link href="../../../style/style.css" rel="stylesheet" type="text/css"/>
+ </head>
+ <body>
+  <span class="code" id="1" xml:space="preserve"><span class="lineNumber">&nbsp;1</span>&nbsp;<span class="kw">using</span>&nbsp;<span class="identifier">System</span><span class="other">.</span><span class="identifier">Net</span><span class="other">.</span><span class="identifier">Http</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="2" xml:space="preserve"><span class="lineNumber">&nbsp;2</span>&nbsp;<span class="kw">using</span>&nbsp;<span class="identifier">HttpTokens</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="3" xml:space="preserve"><span class="lineNumber">&nbsp;3</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="4" xml:space="preserve"><span class="lineNumber">&nbsp;4</span>&nbsp;<span class="kw">parser</span>&nbsp;<span class="identifier">HttpHeaderParser</span></span>
+  <br/>
+  <span class="code" id="5" xml:space="preserve"><span class="lineNumber">&nbsp;5</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="6" xml:space="preserve"><span class="lineNumber">&nbsp;6</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">uselexer</span>&nbsp;<span class="identifier">HttpLexer</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="7" xml:space="preserve"><span class="lineNumber">&nbsp;7</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">main</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="8" xml:space="preserve"><span class="lineNumber">&nbsp;8</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+  <br/>
+  <span class="code" id="9" xml:space="preserve"><span class="lineNumber">&nbsp;9</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">using</span>&nbsp;<span class="identifier">Http</span><span class="other">.</span><span class="identifier">text</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="10" xml:space="preserve"><span class="lineNumber">10</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">using</span>&nbsp;<span class="identifier">Http</span><span class="other">.</span><span class="identifier">chr</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="11" xml:space="preserve"><span class="lineNumber">11</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">using</span>&nbsp;<span class="identifier">Http</span><span class="other">.</span><span class="identifier">ctl</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="12" xml:space="preserve"><span class="lineNumber">12</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">using</span>&nbsp;<span class="identifier">Http</span><span class="other">.</span><span class="identifier">tspecial</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="13" xml:space="preserve"><span class="lineNumber">13</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">using</span>&nbsp;<span class="identifier">Http</span><span class="other">.</span><span class="identifier">ctext</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="14" xml:space="preserve"><span class="lineNumber">14</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">using</span>&nbsp;<span class="identifier">Http</span><span class="other">.</span><span class="identifier">token</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="15" xml:space="preserve"><span class="lineNumber">15</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">using</span>&nbsp;<span class="identifier">Http</span><span class="other">.</span><span class="identifier">lws</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="16" xml:space="preserve"><span class="lineNumber">16</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+  <br/>
+  <span class="code" id="17" xml:space="preserve"><span class="lineNumber">17</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">message_header</span>&nbsp;<span class="other">:</span>&nbsp;<span class="identifier">HttpHeader</span></span>
+  <br/>
+  <span class="code" id="18" xml:space="preserve"><span class="lineNumber">18</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">::=</span>&nbsp;<span class="other">(</span><span class="identifier">field_name</span><span class="other">:</span><span class="identifier">fn</span>&nbsp;<span class="identifier">COLON</span>&nbsp;<span class="identifier">field_value</span><span class="other">:</span><span class="identifier">fv</span><span class="other">?</span><span class="other">)</span><span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">HttpHeader</span><span class="other">(</span><span class="identifier">fn</span><span class="other">,</span>&nbsp;<span class="identifier">fv</span><span class="other">)</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="19" xml:space="preserve"><span class="lineNumber">19</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">;</span></span>
+  <br/>
+  <span class="code" id="20" xml:space="preserve"><span class="lineNumber">20</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+  <br/>
+  <span class="code" id="21" xml:space="preserve"><span class="lineNumber">21</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">field_name</span>&nbsp;<span class="other">:</span>&nbsp;<span class="identifier">string</span></span>
+  <br/>
+  <span class="code" id="22" xml:space="preserve"><span class="lineNumber">22</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">::=</span>&nbsp;<span class="identifier">token</span><span class="other">:</span><span class="identifier">tk</span><span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">tk</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="23" xml:space="preserve"><span class="lineNumber">23</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">;</span></span>
+  <br/>
+  <span class="code" id="24" xml:space="preserve"><span class="lineNumber">24</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+  <br/>
+  <span class="code" id="25" xml:space="preserve"><span class="lineNumber">25</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">field_value</span><span class="other">(</span><span class="kw">var</span>&nbsp;<span class="identifier">string</span>&nbsp;<span class="identifier">s</span><span class="other">)</span>&nbsp;<span class="other">:</span>&nbsp;<span class="identifier">string</span></span>
+  <br/>
+  <span class="code" id="26" xml:space="preserve"><span class="lineNumber">26</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">::=</span>&nbsp;<span class="other">(</span><span class="other">(</span><span class="identifier">lws</span><span class="other">:</span><span class="identifier">lws1</span><span class="other">{</span>&nbsp;<span class="identifier">s</span><span class="other">.</span><span class="identifier">Append</span><span class="other">(</span><span class="char">'&nbsp;'</span><span class="other">)</span><span class="other">;</span>&nbsp;<span class="other">}</span>&nbsp;<span class="other">|</span>&nbsp;<span class="identifier">field_content</span><span class="other">:</span><span class="identifier">fc</span><span class="other">{</span>&nbsp;<span class="identifier">s</span><span class="other">.</span><span class="identifier">Append</span><span class="other">(</span><span class="identifier">fc</span><span class="other">)</span><span class="other">;</span>&nbsp;<span class="other">}</span><span class="other">)</span><span class="other">+</span><span class="other">)</span><span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">s</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="27" xml:space="preserve"><span class="lineNumber">27</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">;</span></span>
+  <br/>
+  <span class="code" id="28" xml:space="preserve"><span class="lineNumber">28</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+  <br/>
+  <span class="code" id="29" xml:space="preserve"><span class="lineNumber">29</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">field_content</span><span class="other">(</span><span class="kw">var</span>&nbsp;<span class="identifier">string</span>&nbsp;<span class="identifier">s</span><span class="other">)</span>&nbsp;<span class="other">:</span>&nbsp;<span class="identifier">string</span></span>
+  <br/>
+  <span class="code" id="30" xml:space="preserve"><span class="lineNumber">30</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">::=</span>&nbsp;<span class="other">(</span><span class="other">(</span><span class="identifier">text</span><span class="other">:</span><span class="identifier">t</span><span class="other">{</span>&nbsp;<span class="identifier">s</span><span class="other">.</span><span class="identifier">Append</span><span class="other">(</span><span class="identifier">t</span><span class="other">)</span><span class="other">;</span>&nbsp;<span class="other">}</span><span class="other">)</span><span class="other">+</span><span class="other">)</span><span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">s</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="31" xml:space="preserve"><span class="lineNumber">31</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">;</span></span>
+  <br/>
+  <span class="code" id="32" xml:space="preserve"><span class="lineNumber">32</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+ </body>
+</html>

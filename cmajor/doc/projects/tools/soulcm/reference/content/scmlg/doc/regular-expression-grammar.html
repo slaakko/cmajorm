@@ -1,0 +1,84 @@
+<html>
+ <head>
+  <meta charset="utf-8"/>
+  <title>Regular Expression Grammar</title>
+  <link href="../../../style/style.css" rel="stylesheet" type="text/css"/>
+ </head>
+ <body>
+  <h1>Regular Expression Grammar</h1>
+  <table class="grammar">
+   <tr id="regular-expression">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      regular&#8209;expression</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#alternative">alternative</a></span></td>
+   </tr>
+   <tr id="alternative">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      alternative</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#catenation">catenation</a></span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleChar">|</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#catenation">catenation</a></span><span class="ruleOp">)</span><span class="ruleOp">*</span></td>
+   </tr>
+   <tr id="catenation">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      catenation</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#repetition">repetition</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#repetition">repetition</a></span><span class="ruleOp">*</span></td>
+   </tr>
+   <tr id="repetition">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      repetition</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#primary">primary</a></span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleChar">*</span><span class="ruleOp"> | </span><span class="ruleChar">+</span><span class="ruleOp"> | </span><span class="ruleChar">?</span><span class="ruleOp">)</span><span class="ruleOp">?</span></td>
+   </tr>
+   <tr id="primary">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      primary</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleChar">(</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#alternative">alternative</a></span><span class="ruleOp"> </span><span class="ruleChar">)</span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="lexical-regular-expression-grammar.html#escape">escape</a></span><span class="ruleOp"> | </span><span class="ruleChar">^</span><span class="ruleOp"> | </span><span class="ruleChar">-</span><span class="ruleOp"> | </span><span class="ruleOp">[^</span><span class="ruleChar">\0</span><span class="ruleChar">\r</span><span class="ruleChar">\n</span><span class="ruleChar">{</span><span class="ruleChar">}</span><span class="ruleChar">\\</span><span class="ruleChar">(</span><span class="ruleChar">)</span><span class="ruleChar">[</span><span class="ruleChar">]</span><span class="ruleChar">|</span><span class="ruleChar">*</span><span class="ruleChar">+</span><span class="ruleChar">?</span><span class="ruleChar">.</span><span class="ruleChar">^</span><span class="ruleChar">-</span><span class="ruleOp">]</span><span class="ruleOp"> | </span><span class="ruleChar">.</span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#class">class</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#expression-reference">expression&#8209;reference</a></span></td>
+   </tr>
+   <tr id="class">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      class</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleChar">[</span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleChar">^</span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#range">range</a></span><span class="ruleOp">*</span><span class="ruleOp">)</span><span class="ruleOp"> </span><span class="ruleChar">]</span></td>
+   </tr>
+   <tr id="range">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      range</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#char">char</a></span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleChar">-</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#char">char</a></span><span class="ruleOp"> | </span><span class="ruleOp">&lt;empty></span><span class="ruleOp">)</span></td>
+   </tr>
+   <tr id="char">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      char</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleChar">(</span><span class="ruleOp"> | </span><span class="ruleChar">)</span><span class="ruleOp"> | </span><span class="ruleChar">[</span><span class="ruleOp"> | </span><span class="ruleChar">{</span><span class="ruleOp"> | </span><span class="ruleChar">}</span><span class="ruleOp"> | </span><span class="ruleChar">|</span><span class="ruleOp"> | </span><span class="ruleChar">*</span><span class="ruleOp"> | </span><span class="ruleChar">+</span><span class="ruleOp"> | </span><span class="ruleChar">?</span><span class="ruleOp"> | </span><span class="ruleChar">.</span><span class="ruleOp"> | </span><span class="lexerRule"><a class="lexerRule" href="lexical-regular-expression-grammar.html#escape">escape</a></span><span class="ruleOp"> | </span><span class="ruleChar">^</span><span class="ruleOp"> | </span><span class="ruleChar">-</span><span class="ruleOp"> | </span><span class="ruleOp">[^</span><span class="ruleChar">\0</span><span class="ruleChar">\r</span><span class="ruleChar">\n</span><span class="ruleChar">{</span><span class="ruleChar">}</span><span class="ruleChar">\\</span><span class="ruleChar">(</span><span class="ruleChar">)</span><span class="ruleChar">[</span><span class="ruleChar">]</span><span class="ruleChar">|</span><span class="ruleChar">*</span><span class="ruleChar">+</span><span class="ruleChar">?</span><span class="ruleChar">.</span><span class="ruleChar">^</span><span class="ruleChar">-</span><span class="ruleOp">]</span></td>
+   </tr>
+   <tr id="expression-reference">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      expression&#8209;reference</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleChar">{</span><span class="ruleOp"> </span><span class="ruleOp">[^</span><span class="ruleChar">\0</span><span class="ruleChar">\r</span><span class="ruleChar">\n</span><span class="ruleChar">{</span><span class="ruleChar">}</span><span class="ruleChar">\\</span><span class="ruleChar">(</span><span class="ruleChar">)</span><span class="ruleChar">[</span><span class="ruleChar">]</span><span class="ruleChar">|</span><span class="ruleChar">*</span><span class="ruleChar">+</span><span class="ruleChar">?</span><span class="ruleChar">.</span><span class="ruleChar">^</span><span class="ruleChar">-</span><span class="ruleOp">]</span><span class="ruleOp">+</span><span class="ruleOp"> </span><span class="ruleChar">}</span></td>
+   </tr>
+  </table>
+ </body>
+</html>

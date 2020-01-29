@@ -274,6 +274,12 @@ void Project::ResolveDeclarations()
                 TextFileDeclaration* textFileDeclaration = static_cast<TextFileDeclaration*>(declaration.get());
                 boost::filesystem::path tfp(textFileDeclaration->FilePath());
                 relativeTextFilePaths.push_back(tfp.generic_string());
+                if (tfp.is_relative())
+                {
+                    tfp = sourceBasePath / tfp;
+                }
+                std::string textFilePath = GetFullPath(tfp.generic_string());
+                textFilePaths.push_back(textFilePath);
                 break;
             }
             default:

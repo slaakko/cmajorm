@@ -7,6 +7,8 @@
 #include <cmajor/cmdoclib/Input.hpp>
 #include <sngxml/dom/CharacterData.hpp>
 #include <sngcm/cmparser/SourceTokenParser.hpp>
+#include <sngcm/cmparser/LexerFileTokenParser.hpp>
+#include <sngcm/cmparser/ParserFileTokenParser.hpp>
 #include <cmajor/symbols/SymbolTable.hpp>
 #include <cmajor/symbols/GlobalFlags.hpp>
 #include <sngcm/ast/TypeExpr.hpp>
@@ -102,6 +104,21 @@ std::u32string GetOperatorId(const std::u32string& groupId)
     return OperatorMap::Instance().GetOperatorId(groupId);
 }
 
+void WriteToElement(sngxml::dom::Element* element, const std::u32string& text)
+{
+    for (char32_t c : text)
+    {
+        if (c == ' ')
+        {
+            element->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::EntityReference(U"nbsp")));
+        }
+        else
+        {
+            element->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::Text(std::u32string(1, c))));
+        }
+    }
+}
+
 class SourceCodePrinter : public sngcm::ast::Visitor, public sngcm::ast::SourceTokenFormatter
 {
 public:
@@ -116,7 +133,6 @@ public:
     void WriteRestOfInput();
     std::u32string MakeSymbolRef(Symbol* symbol);
     std::u32string MakeSymbolRef(Symbol* symbol, Module* module);
-    void WriteToElement(sngxml::dom::Element* element, const std::u32string& text);
     void WriteSpace(int n);
     void WriteLineNumber(const std::u32string& lineNumberText);
     void WriteLink(const std::u32string& linkText, const std::u32string& href, bool type);
@@ -496,21 +512,6 @@ std::u32string SourceCodePrinter::MakeSymbolRef(Symbol* symbol, Module* module)
     else
     {
         return MakeSymbolRef(symbol->Parent(), module) + U"#" + symbol->Id();
-    }
-}
-
-void SourceCodePrinter::WriteToElement(sngxml::dom::Element* element, const std::u32string& text)
-{
-    for (char32_t c : text)
-    {
-        if (c == ' ')
-        {
-            element->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::EntityReference(U"nbsp")));
-        }
-        else
-        {
-            element->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::Text(std::u32string(1, c))));
-        }
     }
 }
 
@@ -2904,6 +2905,194 @@ void GenerateSourceCode(sngcm::ast::Project* project, cmajor::binder::BoundCompi
         boundCompileUnit->GetCompileUnitNode()->GetSpan().fileIndex);
     boundCompileUnit->GetCompileUnitNode()->Accept(printer);
     printer.WriteDocument();
+}
+
+struct BasicSourcePrinter : public sngcm::ast::SourceTokenFormatter
+{
+    void Keyword(const std::u32string& token) override
+    {
+        std::unique_ptr<sngxml::dom::Element> keywordElement(new sngxml::dom::Element(U"span"));
+        keywordElement->SetAttribute(U"class", U"kw");
+        WriteToElement(keywordElement.get(), token);
+        lineElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(keywordElement.release()));
+    }
+    void Identifier(const std::u32string& token) override
+    {
+        std::unique_ptr<sngxml::dom::Element> identifierElement(new sngxml::dom::Element(U"span"));
+        identifierElement->SetAttribute(U"class", U"identifier");
+        WriteToElement(identifierElement.get(), token);
+        lineElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(identifierElement.release()));
+    }
+    void Number(const std::u32string& token) override
+    {
+        std::unique_ptr<sngxml::dom::Element> numberElement(new sngxml::dom::Element(U"span"));
+        numberElement->SetAttribute(U"class", U"number");
+        WriteToElement(numberElement.get(), token);
+        lineElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(numberElement.release()));
+    }
+    void Char(const std::u32string& token) override
+    {
+        std::unique_ptr<sngxml::dom::Element> charElement(new sngxml::dom::Element(U"span"));
+        charElement->SetAttribute(U"class", U"char");
+        WriteToElement(charElement.get(), token);
+        lineElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(charElement.release()));
+    }
+    void String(const std::u32string& token) override
+    {
+        std::unique_ptr<sngxml::dom::Element> stringElement(new sngxml::dom::Element(U"span"));
+        stringElement->SetAttribute(U"class", U"string");
+        WriteToElement(stringElement.get(), token);
+        lineElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(stringElement.release()));
+    }
+    void Spaces(const std::u32string& token) override
+    {
+        WriteSpace(token.length());
+    }
+    void Comment(const std::u32string& token) override
+    {
+        std::unique_ptr<sngxml::dom::Element> commentElement(new sngxml::dom::Element(U"span"));
+        commentElement->SetAttribute(U"class", U"comment");
+        WriteToElement(commentElement.get(), token);
+        lineElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(commentElement.release()));
+    }
+    void Other(const std::u32string& token) override
+    {
+        std::unique_ptr<sngxml::dom::Element> otherElement(new sngxml::dom::Element(U"span"));
+        otherElement->SetAttribute(U"class", U"other");
+        WriteToElement(otherElement.get(), token);
+        lineElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(otherElement.release()));
+    }
+    void WriteSpace(int n)
+    {
+        for (int i = 0; i < n; ++i)
+        {
+            lineElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::EntityReference(U"nbsp")));
+        }
+    }
+    std::unique_ptr<sngxml::dom::Element> lineElement;
+};
+
+struct LexerLineParser
+{
+    static void Parse(const std::u32string& line, sngcm::ast::SourceTokenFormatter* formatter, bool& inBlockComment)
+    {
+        sngcm::parser::ParseLexerFileLine(line, formatter, inBlockComment);
+    }
+};
+
+struct ParserLineParser
+{
+    static void Parse(const std::u32string& line, sngcm::ast::SourceTokenFormatter* formatter, bool& inBlockComment)
+    {
+        sngcm::parser::ParseParserFileLine(line, formatter, inBlockComment);
+    }
+};
+
+template<class LineParser>
+struct SourcePrinter : public BasicSourcePrinter
+{
+    SourcePrinter(sngxml::dom::Element* bodyElement_) : inBlockComment(false), bodyElement(bodyElement_)
+    {
+    }
+    void PrintLines(const std::vector<std::u32string>& lines)
+    {
+        int n = lines.size();
+        int numDigits = Log10(n);
+        for (int i = 0; i < n; ++i)
+        {
+            lineElement.reset(new sngxml::dom::Element(U"span"));
+            lineElement->SetAttribute(U"class", U"code");
+            lineElement->SetAttribute(U"xml:space", U"preserve");
+            lineElement->SetAttribute(U"id", ToUtf32(std::to_string(i + 1)));
+            std::u32string lineNumberText = FormatNumber(i + 1, numDigits);
+            std::unique_ptr<sngxml::dom::Element> lineNumberElement(new sngxml::dom::Element(U"span"));
+            lineNumberElement->SetAttribute(U"class", U"lineNumber");
+            WriteToElement(lineNumberElement.get(), lineNumberText);
+            lineElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(lineNumberElement.release()));
+            lineElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::EntityReference(U"nbsp")));
+            LineParser::Parse(lines[i], this, inBlockComment);
+            bodyElement->AppendChild(std::move(lineElement));
+            bodyElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::Element(U"br")));
+        }
+    }
+    bool inBlockComment;
+    sngxml::dom::Element* bodyElement;
+};
+
+template<class LineParser>
+void GenerateHtmlSource(sngcm::ast::Project* project, const std::string& filePath, int fileIndex, std::unordered_map<int, File>& fileMap)
+{
+    std::string fileName = Path::GetFileName(filePath);
+    Input* input = GetInputPtr();
+    std::string targetDir = input->targetDirPath;
+    boost::filesystem::create_directories(targetDir);
+    std::string contentDir = GetFullPath(Path::Combine(targetDir, "content"));
+    boost::filesystem::create_directories(contentDir);
+    std::string projectDir = GetFullPath(Path::Combine(contentDir, ToUtf8(project->Name())));
+    boost::filesystem::create_directories(projectDir);
+    std::string fileDir = GetFullPath(Path::Combine(projectDir, "file"));
+    boost::filesystem::create_directories(fileDir);
+    std::string extension = Path::GetExtension(filePath);
+    std::string htmlFileName = Path::ChangeExtension(fileName, extension + ".html");
+    std::string htmlFilePath = Path::Combine(fileDir, htmlFileName);
+    std::u32string title = project->Name();
+    title.append(1, '/').append(ToUtf32(fileName));
+    File file;
+    file.name = title;
+    file.htmlFilePath = Path::Combine(Path::Combine(Path::Combine("../..", ToUtf8(project->Name())), "file"), htmlFileName);
+    fileMap[fileIndex] = file;
+    std::vector<std::u32string> lines;
+    std::ifstream inputFile(filePath);
+    std::string line;
+    while (std::getline(inputFile, line))
+    {
+        lines.push_back(ToUtf32(line));
+    }
+    std::string styleFilePath = "../../../style/style.css";
+
+    std::unique_ptr<sngxml::dom::Document> htmlDoc(new sngxml::dom::Document());
+    std::unique_ptr<sngxml::dom::Element> htmlElement(new sngxml::dom::Element(U"html"));
+    std::unique_ptr<sngxml::dom::Element> headElement(new sngxml::dom::Element(U"head"));
+    std::unique_ptr<sngxml::dom::Element> metaElement(new sngxml::dom::Element(U"meta"));
+    metaElement->SetAttribute(U"charset", U"utf-8");
+    headElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(metaElement.release()));
+    std::unique_ptr<sngxml::dom::Element> titleElement(new sngxml::dom::Element(U"title"));
+    titleElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(new sngxml::dom::Text(title)));
+    headElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(titleElement.release()));
+    std::unique_ptr<sngxml::dom::Element> linkElement(new sngxml::dom::Element(U"link"));
+    linkElement->SetAttribute(U"rel", U"stylesheet");
+    linkElement->SetAttribute(U"type", U"text/css");
+    std::u32string relativeStyleFilePath = ToUtf32(styleFilePath);
+    linkElement->SetAttribute(U"href", relativeStyleFilePath);
+    headElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(linkElement.release()));
+    htmlElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(headElement.release()));
+    std::unique_ptr<sngxml::dom::Element> bodyElement(new sngxml::dom::Element(U"body"));
+    SourcePrinter<LineParser> printer(bodyElement.get());
+    printer.PrintLines(lines);
+    std::ofstream htmlFile(htmlFilePath);
+    CodeFormatter formatter(htmlFile);
+    formatter.SetIndentSize(1);
+    htmlElement->AppendChild(std::unique_ptr<sngxml::dom::Node>(bodyElement.release()));
+    htmlDoc->AppendChild(std::unique_ptr<sngxml::dom::Node>(htmlElement.release()));
+    htmlDoc->Write(formatter);
+}
+
+CMDOCLIB_API void GenerateLexerAndParserHtmlSources(sngcm::ast::Project* project, int maxFileIndex, std::unordered_map<int, File>& fileMap)
+{
+    for (const std::string& textFilePath : project->TextFilePaths())
+    {
+        std::string extension = Path::GetExtension(textFilePath);
+        if (extension == ".lexer")
+        {
+            ++maxFileIndex;
+            GenerateHtmlSource<LexerLineParser>(project, textFilePath, maxFileIndex, fileMap);
+        }
+        else if (extension == ".parser")
+        {
+            ++maxFileIndex;
+            GenerateHtmlSource<ParserLineParser>(project, textFilePath, maxFileIndex, fileMap);
+        }
+    }
 }
 
 void SourceCodePrinterInit()

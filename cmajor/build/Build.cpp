@@ -1154,6 +1154,7 @@ void CompileSingleThreaded(Project* project, Module* rootModule, std::vector<std
         LogMessage(project->LogStreamId(), "Compiling...");
     }
     rootModule->StartBuild();
+    int maxFileIndex = 0;
     for (std::unique_ptr<BoundCompileUnit>& boundCompileUnit : boundCompileUnits)
     {
         if (stop)
@@ -1181,12 +1182,17 @@ void CompileSingleThreaded(Project* project, Module* rootModule, std::vector<std
         if (GetGlobalFlag(GlobalFlags::cmdoc))
         {
             cmdoclib::GenerateSourceCode(project, boundCompileUnit.get(), docFileMap);
+            maxFileIndex = std::max(maxFileIndex, boundCompileUnit->GetCompileUnitNode()->GetSpan().fileIndex);
         }
         else
         {
             cmajor::codegen::GenerateCode(emittingContext, *boundCompileUnit);
             objectFilePaths.push_back(boundCompileUnit->ObjectFilePath());
         }
+    }
+    if (GetGlobalFlag(GlobalFlags::cmdoc))
+    {
+        cmdoclib::GenerateLexerAndParserHtmlSources(project, maxFileIndex, docFileMap);
     }
     rootModule->StopBuild();
     if (GetGlobalFlag(GlobalFlags::verbose))

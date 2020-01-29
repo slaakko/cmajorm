@@ -1,0 +1,180 @@
+<html>
+ <head>
+  <meta charset="utf-8"/>
+  <title>Lexer File Grammar</title>
+  <link href="../../../style/style.css" rel="stylesheet" type="text/css"/>
+ </head>
+ <body>
+  <h1>Lexer File Grammar</h1>
+  <table class="grammar">
+   <tr id="lexer-file">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      lexer&#8209;file</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#declaration">declaration</a></span><span class="ruleOp">*</span></td>
+   </tr>
+   <tr id="declaration">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      declaration</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#class-map">class&#8209;map</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#usings">usings</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#tokens">tokens</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#keywords">keywords</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#expressions">expressions</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#lexer">lexer</a></span></td>
+   </tr>
+   <tr id="class-map">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      class&#8209;map</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleKeyword">classmap</span><span class="ruleOp"> </span><span class="lexerRule"><a class="lexerRule" href="lexical-lexer-file-grammar.html#id">id</a></span><span class="ruleOp"> </span><span class="ruleChar">;</span></td>
+   </tr>
+   <tr id="usings">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      usings</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#using-directives">using&#8209;directives</a></span></td>
+   </tr>
+   <tr id="using-directives">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      using&#8209;directives</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#using-directive">using&#8209;directive</a></span><span class="ruleOp">+</span></td>
+   </tr>
+   <tr id="using-directive">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      using&#8209;directive</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#using-alias-directive">using&#8209;alias&#8209;directive</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#using-namespace-directive">using&#8209;namespace&#8209;directive</a></span></td>
+   </tr>
+   <tr id="using-alias-directive">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      using&#8209;alias&#8209;directive</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleKeyword">using</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="identifier-grammar.html#identifier">identifier</a></span><span class="ruleOp"> </span><span class="ruleChar">=</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="identifier-grammar.html#qualified-id">qualified&#8209;id</a></span><span class="ruleOp"> </span><span class="ruleChar">;</span></td>
+   </tr>
+   <tr id="using-namespace-directive">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      using&#8209;namespace&#8209;directive</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleKeyword">using</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="identifier-grammar.html#qualified-id">qualified&#8209;id</a></span><span class="ruleOp"> </span><span class="ruleChar">;</span></td>
+   </tr>
+   <tr id="tokens">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      tokens</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleKeyword">tokens</span><span class="ruleOp"> </span><span class="lexerRule"><a class="lexerRule" href="lexical-lexer-file-grammar.html#id">id</a></span><span class="ruleOp"> </span><span class="ruleChar">{</span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#token">token</a></span><span class="ruleOp"> % </span><span class="ruleChar">,</span><span class="ruleOp">)</span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleChar">}</span></td>
+   </tr>
+   <tr id="token">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      token</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleChar">(</span><span class="ruleOp"> </span><span class="lexerRule"><a class="lexerRule" href="lexical-lexer-file-grammar.html#id">id</a></span><span class="ruleOp"> </span><span class="ruleChar">,</span><span class="ruleOp"> </span><span class="lexerRule"><a class="lexerRule" href="lexical-lexer-file-grammar.html#string">string</a></span><span class="ruleOp"> </span><span class="ruleChar">)</span></td>
+   </tr>
+   <tr id="keywords">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      keywords</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleKeyword">keywords</span><span class="ruleOp"> </span><span class="lexerRule"><a class="lexerRule" href="lexical-lexer-file-grammar.html#id">id</a></span><span class="ruleOp"> </span><span class="ruleChar">{</span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#keyword">keyword</a></span><span class="ruleOp"> % </span><span class="ruleChar">,</span><span class="ruleOp">)</span><span class="ruleOp">?</span><span class="ruleOp"> </span><span class="ruleChar">}</span></td>
+   </tr>
+   <tr id="keyword">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      keyword</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleChar">(</span><span class="ruleOp"> </span><span class="lexerRule"><a class="lexerRule" href="lexical-lexer-file-grammar.html#string">string</a></span><span class="ruleOp"> </span><span class="ruleChar">,</span><span class="ruleOp"> </span><span class="lexerRule"><a class="lexerRule" href="lexical-lexer-file-grammar.html#id">id</a></span><span class="ruleOp"> </span><span class="ruleChar">)</span></td>
+   </tr>
+   <tr id="expressions">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      expressions</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleKeyword">expressions</span><span class="ruleOp"> </span><span class="ruleChar">{</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#expression">expression</a></span><span class="ruleOp">*</span><span class="ruleOp"> </span><span class="ruleChar">}</span></td>
+   </tr>
+   <tr id="expression">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      expression</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="lexerRule"><a class="lexerRule" href="lexical-lexer-file-grammar.html#id">id</a></span><span class="ruleOp"> </span><span class="ruleChar">=</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#expr-string">expr&#8209;string</a></span><span class="ruleOp"> </span><span class="ruleChar">;</span></td>
+   </tr>
+   <tr id="expr-string">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      expr&#8209;string</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="lexerRule"><a class="lexerRule" href="lexical-lexer-file-grammar.html#string">string</a></span></td>
+   </tr>
+   <tr id="lexer">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      lexer</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleKeyword">lexer</span><span class="ruleOp"> </span><span class="lexerRule"><a class="lexerRule" href="lexical-lexer-file-grammar.html#id">id</a></span><span class="ruleOp"> </span><span class="ruleChar">{</span><span class="ruleOp"> </span><span class="ruleOp">(</span><span class="ruleLink"><a class="ruleLink" href="#lexer-clause">lexer&#8209;clause</a></span><span class="ruleOp">)</span><span class="ruleOp">*</span><span class="ruleOp"> </span><span class="ruleChar">}</span></td>
+   </tr>
+   <tr id="lexer-clause">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      lexer&#8209;clause</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="#expr-string">expr&#8209;string</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#action">action</a></span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="statement-grammar.html#compound-statement">compound&#8209;statement</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#variables">variables</a></span><span class="ruleOp"> | </span><span class="ruleLink"><a class="ruleLink" href="#actions">actions</a></span></td>
+   </tr>
+   <tr id="variables">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      variables</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleKeyword">variables</span><span class="ruleOp"> </span><span class="ruleChar">{</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#variable">variable</a></span><span class="ruleOp">*</span><span class="ruleOp"> </span><span class="ruleChar">}</span></td>
+   </tr>
+   <tr id="variable">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      variable</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleLink"><a class="ruleLink" href="type-expr-grammar.html#type-expr">type&#8209;expr</a></span><span class="ruleOp"> </span><span class="lexerRule"><a class="lexerRule" href="lexical-lexer-file-grammar.html#id">id</a></span><span class="ruleOp"> </span><span class="ruleChar">;</span></td>
+   </tr>
+   <tr id="actions">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      actions</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleKeyword">actions</span><span class="ruleOp"> </span><span class="ruleChar">{</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="#action">action</a></span><span class="ruleOp"> </span><span class="ruleChar">=</span><span class="ruleOp"> </span><span class="ruleLink"><a class="ruleLink" href="statement-grammar.html#compound-statement">compound&#8209;statement</a></span><span class="ruleOp">*</span><span class="ruleOp"> </span><span class="ruleChar">}</span></td>
+   </tr>
+   <tr id="action">
+    <td class="grammarFirstCol">
+     <span class="rule">
+      action</span>
+    </td>
+    <td class="grammarSecondCol">&rarr;</td>
+    <td class="grammarThirdCol" xml:space="preserve"><span class="ruleChar">$</span><span class="ruleOp"> </span><span class="ruleChar">(</span><span class="ruleOp"> </span><span class="lexerRule"><a class="lexerRule" href="lexical-lexer-file-grammar.html#integer">integer</a></span><span class="ruleOp"> </span><span class="ruleChar">)</span><span class="ruleOp"> | </span><span class="ruleOp">&lt;empty></span></td>
+   </tr>
+  </table>
+ </body>
+</html>

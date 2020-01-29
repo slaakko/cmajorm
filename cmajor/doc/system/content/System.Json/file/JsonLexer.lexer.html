@@ -1,0 +1,75 @@
+<html>
+ <head>
+  <meta charset="utf-8"/>
+  <title>System.Json/JsonLexer.lexer</title>
+  <link href="../../../style/style.css" rel="stylesheet" type="text/css"/>
+ </head>
+ <body>
+  <span class="code" id="1" xml:space="preserve"><span class="lineNumber">&nbsp;1</span>&nbsp;<span class="kw">classmap</span>&nbsp;<span class="identifier">JsonClassMap</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="2" xml:space="preserve"><span class="lineNumber">&nbsp;2</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="3" xml:space="preserve"><span class="lineNumber">&nbsp;3</span>&nbsp;<span class="kw">tokens</span>&nbsp;<span class="identifier">JsonTokens</span></span>
+  <br/>
+  <span class="code" id="4" xml:space="preserve"><span class="lineNumber">&nbsp;4</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="5" xml:space="preserve"><span class="lineNumber">&nbsp;5</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="other">(</span><span class="identifier">STRING</span><span class="other">,</span>&nbsp;<span class="string">"'string'"</span><span class="other">)</span><span class="other">,</span>&nbsp;<span class="other">(</span><span class="identifier">NUMBER</span><span class="other">,</span>&nbsp;<span class="string">"'number'"</span><span class="other">)</span><span class="other">,</span>&nbsp;<span class="other">(</span><span class="identifier">LBRACKET</span><span class="other">,</span>&nbsp;<span class="string">"'['"</span><span class="other">)</span><span class="other">,</span>&nbsp;<span class="other">(</span><span class="identifier">RBRACKET</span><span class="other">,</span>&nbsp;<span class="string">"']"</span><span class="other">)</span><span class="other">,</span>&nbsp;<span class="other">(</span><span class="identifier">LBRACE</span><span class="other">,</span>&nbsp;<span class="string">"{'"</span><span class="other">)</span><span class="other">,</span>&nbsp;<span class="other">(</span><span class="identifier">RBRACE</span><span class="other">,</span>&nbsp;<span class="string">"'}'"</span><span class="other">)</span><span class="other">,</span>&nbsp;<span class="other">(</span><span class="identifier">COMMA</span><span class="other">,</span>&nbsp;<span class="string">"','"</span><span class="other">)</span><span class="other">,</span>&nbsp;<span class="other">(</span><span class="identifier">COLON</span><span class="other">,</span>&nbsp;<span class="string">"':'"</span><span class="other">)</span><span class="other">,</span>&nbsp;<span class="other">(</span><span class="identifier">TRUE</span><span class="other">,</span>&nbsp;<span class="string">"'true'"</span><span class="other">)</span><span class="other">,</span>&nbsp;<span class="other">(</span><span class="identifier">FALSE</span><span class="other">,</span>&nbsp;<span class="string">"'false'"</span><span class="other">)</span><span class="other">,</span>&nbsp;<span class="other">(</span><span class="identifier">NULL</span><span class="other">,</span>&nbsp;<span class="string">"'null'"</span><span class="other">)</span></span>
+  <br/>
+  <span class="code" id="6" xml:space="preserve"><span class="lineNumber">&nbsp;6</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="7" xml:space="preserve"><span class="lineNumber">&nbsp;7</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="8" xml:space="preserve"><span class="lineNumber">&nbsp;8</span>&nbsp;<span class="kw">expressions</span></span>
+  <br/>
+  <span class="code" id="9" xml:space="preserve"><span class="lineNumber">&nbsp;9</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="10" xml:space="preserve"><span class="lineNumber">10</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">ws</span>&nbsp;<span class="other">=</span>&nbsp;<span class="string">"[\n\r\t&nbsp;]+"</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="11" xml:space="preserve"><span class="lineNumber">11</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">hexdigit</span>&nbsp;<span class="other">=</span>&nbsp;<span class="string">"[0-9a-fA-F]"</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="12" xml:space="preserve"><span class="lineNumber">12</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">hex4</span>&nbsp;<span class="other">=</span>&nbsp;<span class="string">"{hexdigit}{hexdigit}{hexdigit}{hexdigit}"</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="13" xml:space="preserve"><span class="lineNumber">13</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">escape</span>&nbsp;<span class="other">=</span>&nbsp;<span class="string">"\\([\"\\/bfnrt]|u{hex4})"</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="14" xml:space="preserve"><span class="lineNumber">14</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">string</span>&nbsp;<span class="other">=</span>&nbsp;<span class="string">"\"([^\"\\]|{escape})*\""</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="15" xml:space="preserve"><span class="lineNumber">15</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">digit</span>&nbsp;<span class="other">=</span>&nbsp;<span class="string">"[0-9]"</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="16" xml:space="preserve"><span class="lineNumber">16</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="identifier">number</span>&nbsp;<span class="other">=</span>&nbsp;<span class="string">"-?{digit}+(\.{digit}+)?([eE][+-]?{digit}+)?"</span><span class="other">;</span></span>
+  <br/>
+  <span class="code" id="17" xml:space="preserve"><span class="lineNumber">17</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="18" xml:space="preserve"><span class="lineNumber">18</span>&nbsp;</span>
+  <br/>
+  <span class="code" id="19" xml:space="preserve"><span class="lineNumber">19</span>&nbsp;<span class="kw">lexer</span>&nbsp;<span class="identifier">JsonLexer</span></span>
+  <br/>
+  <span class="code" id="20" xml:space="preserve"><span class="lineNumber">20</span>&nbsp;<span class="other">{</span></span>
+  <br/>
+  <span class="code" id="21" xml:space="preserve"><span class="lineNumber">21</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="string">"{ws}"</span>&nbsp;<span class="other">{</span><span class="other">}</span></span>
+  <br/>
+  <span class="code" id="22" xml:space="preserve"><span class="lineNumber">22</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="string">"{string}"</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">STRING</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="23" xml:space="preserve"><span class="lineNumber">23</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="string">"{number}"</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">NUMBER</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="24" xml:space="preserve"><span class="lineNumber">24</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="string">"\["</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">LBRACKET</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="25" xml:space="preserve"><span class="lineNumber">25</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="string">"\]"</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">RBRACKET</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="26" xml:space="preserve"><span class="lineNumber">26</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="string">"\{"</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">LBRACE</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="27" xml:space="preserve"><span class="lineNumber">27</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="string">"\}"</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">RBRACE</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="28" xml:space="preserve"><span class="lineNumber">28</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="string">","</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">COMMA</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="29" xml:space="preserve"><span class="lineNumber">29</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="string">":"</span><span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">COLON</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="30" xml:space="preserve"><span class="lineNumber">30</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="string">"true"</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">TRUE</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="31" xml:space="preserve"><span class="lineNumber">31</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="string">"false"</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">FALSE</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="32" xml:space="preserve"><span class="lineNumber">32</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="string">"null"</span>&nbsp;<span class="other">{</span>&nbsp;<span class="kw">return</span>&nbsp;<span class="identifier">NULL</span><span class="other">;</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+  <span class="code" id="33" xml:space="preserve"><span class="lineNumber">33</span>&nbsp;<span class="other">}</span></span>
+  <br/>
+ </body>
+</html>

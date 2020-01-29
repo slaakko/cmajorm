@@ -114,6 +114,7 @@ public:
     const std::vector<std::string>& SourceFilePaths() const { return sourceFilePaths; }
     const std::vector<std::string>& RelativeSourceFilePaths() const { return relativeSourceFilePaths; }
     const std::vector<std::string>& RelativeTextFilePaths() const { return relativeTextFilePaths; }
+    const std::vector<std::string>& TextFilePaths() const { return textFilePaths; }
     Target GetTarget() const { return target; }
     bool DependsOn(Project* that) const;
     void AddDependsOnProjects(Project* dependsOnProject);
@@ -153,6 +154,7 @@ private:
     std::vector<std::string> relativeSourceFilePaths;
     std::vector<std::string> relativeReferencedProjectFilePaths;
     std::vector<std::string> relativeTextFilePaths;
+    std::vector<std::string> textFilePaths;
     std::vector<Project*> dependsOn;
     std::atomic<bool> built;
     bool isSystemProject;
